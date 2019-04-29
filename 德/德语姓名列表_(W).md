@@ -1,0 +1,144 @@
+{{pageTOC|德语姓名列表}}
+__NOTOC__
+<div style="-moz-column-count: 2">
+* Wackenroder——瓦肯罗德
+* Wackerle——瓦克勒
+* Wackernagel——瓦克纳格尔
+* Wagenseil——瓦根塞尔
+* Waggerl——瓦格尔
+* Wagner——瓦格纳
+* Wahl——瓦尔
+* Waiblinger——韦布林格
+* Walcha——瓦尔夏
+* Wald——瓦尔德
+* Waldau——瓦尔道
+* Waldbrunner——瓦尔德布伦纳
+* Waldemar——瓦尔德玛
+* Walden——瓦尔登
+* Waldersee——瓦尔德塞
+* Waldis——瓦尔迪斯
+* Waldteufel——瓦尔托伊菲尔
+* Wallach——瓦拉赫
+* Wallenstein——瓦伦斯坦
+* Walli——瓦莉（女）
+* Wallot——瓦洛特
+* Walser——瓦尔瑟
+* Walt(h)er——瓦尔特
+* Waltershausen——瓦尔特斯豪森
+* Waltaud——瓦尔特劳德（女）
+* Walzel——瓦尔泽尔
+* Wankel——万克尔
+* Warburg——瓦尔堡
+* Wasmann——瓦斯曼
+* Wasserman——瓦瑟曼
+* Watzlik——瓦茨利克
+* Weber——维贝
+* Weckherlin——维克林
+* Wedekind——维德金德
+* Weidenmann——维登曼
+* Wegener; Wigner——维格纳
+* Wehner; Werner——维纳
+* Weichmann——维希曼
+* Weierstraß——维尔斯特拉斯
+* Weigand; Wiegand——维根
+* Weigel——维格尔
+* Weinbrenner——维因布伦纳
+* Weinert——维纳特
+* Weingartner——维因加特纳
+* Weinheber——维因赫贝
+* Weinhold——维因霍尔德
+* Weinkauff——维因考夫
+* Weinrich——维因里希
+* Weinstock——维因斯托克
+* Weisenborn——维森伯恩
+* Weiser; Weißer——维瑟
+* Weisgerber——维斯格贝
+* Weiskopf——维斯科普夫
+* Weiß——维斯
+* Weiße——维塞
+* Weizsäcker——魏茨泽克
+* Welk——维尔克
+* Wellek——维勒克
+* Wellhausen——维尔豪森
+* Wels——维尔斯
+* Welzel——维尔泽尔
+* Wendel——温德尔
+* Wendelin——温德林
+* Wen(t)zel——温策尔
+* Wenzinger——温钦格
+* Wenzl——温茨尔
+* Werfel——维菲尔
+* W(e)erth; Wirth; Witt——维特
+* Wertheimer——维特海默
+* Wesendonk——维森东克
+* Wessely——维塞利
+* Wessenberg——维森贝格
+* Westarp——维斯塔普
+* Westermann——维斯特曼
+* Westrick——维斯特里克
+* Wettstein——维特斯坦
+* Wetz; Wirz; Witz——维茨
+* Weule——维伊勒
+* Weyrauch——维劳赫
+* Wichern——维歇恩
+* Wi(e)chert——维歇特
+* Wickram——维克拉姆
+* Wieland——维兰德
+* Wien——维恩
+* Wiese(r)——维瑟
+* Wilamowitz——维拉莫维茨
+* Wilbrandt——维尔布兰特
+* Wildenbruch——维尔登布鲁赫
+* Wildgans——维尔德甘斯
+* Wilfried——维尔弗里德
+* Wilhelm——威廉
+* Wilhelmine——威廉明妮
+* W(e)ill——维尔
+* Wille; Wöhler; Wyle(r)——维勒
+* Willemer——维勒默
+* Willi(y)——维利
+* Willibald——维利巴尔德
+* Willstätter——维尔斯泰特
+* Wilma(r)——维尔玛（女）
+* Wim——维姆
+* Wimmer——维默
+* Winand——维南德
+* Winckelmann——温克尔曼
+* Winckler——温克勒
+* Windelband——温德尔班德
+* Windischgrätz——温迪施格雷茨
+* Windscheid——温德沙伊德
+* Windthorst——温特霍斯特
+* Winfried——温弗里德
+* Winkler——温克勒
+* Winnie——温尼（女）
+* Winnig——温尼格
+* Winter——温特
+* Winternitz——温特尼茨
+* Winzer——温泽
+* Wissowa——维索瓦
+* Witkowski——维特科夫斯基
+* Witold——维托尔德
+* Wittelsbach——维特斯巴赫
+* Wittgenstein——维特根斯坦
+* Wohmann——沃曼
+* Wolf(f)——沃尔夫
+* Wolfdietrich——沃尔夫迪特里希（女）
+* Wölfflin——维尔夫林
+* Wolfgang——沃尔夫冈
+* Wolfram——沃尔夫拉姆
+* Wolgast——沃尔加斯特
+* Wolgemut——沃尔格穆特
+* Wollweber——沃尔维贝
+* Wolter——沃尔特
+* Wolters——沃尔特斯
+* Wolzogen——沃尔佐根
+* Wulf——乌尔夫
+* Wüllner——维尔纳
+* Wundt——冯特
+* Wurm——乌尔姆
+* Wustmann——乌斯特曼
+* Wyneken——维内肯
+</div>
+
+[[Category:德语姓名列表|Category:德语姓名列表]]

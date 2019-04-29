@@ -1,0 +1,142 @@
+{{pageTOC|德语姓名列表}}
+__NOTOC__
+<div style="-moz-column-count: 2">
+* Faber——法贝
+* Fabian——法比安
+* Fabricius——法布里奇乌斯
+* Fadinger——法丁格
+* Fahlberg——法尔贝格
+* Fahrenheit——法伦海特
+* Fahrenkamp——法伦坎普
+* Faistauer——法伊斯陶尔
+* Faistenberger——法伊斯滕贝格
+* Falk(e)——法尔克
+* Fal(c)kenberg——法尔肯贝格
+* Falkenhausen——法尔肯豪森
+* Falkenhayn——法尔肯海恩
+* Falkenhorst——法尔肯霍斯特
+* Fall——法尔
+* Fallada——法拉达
+* Fallmerayer——法尔梅莱尔
+* Fasch——法什
+* Faßbender——法斯本德
+* Faulhaber——福尔哈贝
+* Faulmann——福尔曼
+* Faust; Forst(er)——福斯特
+* Fechner——菲希纳
+* Fechter; Fichte——菲希特
+* Fehling——菲林
+* Fehrenbach——菲伦巴赫
+* Fehrs——菲尔斯
+* Feininger——法伊宁格
+* Feldtkeller——菲尔特凯勒
+* Felix——费利克斯
+* Felizia——菲利奇娅（女）
+* Felke——菲尔克
+* Fellner——菲尔纳
+* Felsing——菲尔辛
+* Ferdinand——费迪南德
+* Fernkorn——芬科恩
+* Ferstel——菲斯特尔
+* Fessler——菲斯勒
+* Feuchtersleben——福伊希特斯勒本
+* Feuchtmayer——福伊希特迈尔
+* Feuchtwanger——福伊希特万格
+* Feuerbach——费尔巴哈
+* Fey——法伊
+* Feyerabend——法伊尔阿本德
+* Fichtner——菲希特纳
+* Ficker——菲克
+* Fieseler——菲塞勒
+* Figl——菲格尔
+* Filbinger——菲尔宾格
+* Filchner——菲尔希纳
+* Finckenstein——芬肯斯坦
+* Finckh; Fink(e)——芬克
+* Finsch——芬什
+* Fischart——菲沙特
+* Fischer——菲舍
+* Flaischlen——弗莱什伦
+* Flake——弗拉克
+* Flechsig——弗莱克西格
+* Fleiner——弗莱纳
+* Fleischmann——弗莱什曼
+* Flemming——弗莱明
+* Flesch——弗莱什
+* Flettner——弗莱特纳
+* Flex——弗莱克斯
+* Flick——弗利克
+* Flickenschildt——弗利肯希尔特
+* Fliedner——弗利德纳
+* Flitner——弗利特纳
+* Flora——弗洛拉（女）
+* Florian——弗洛里安
+* Flötner——弗勒特纳
+* Flotow——弗洛托
+* Fock(e); Forke; Fokker——福克
+* Foerster——福尔斯特
+* Foertsch——弗奇
+* Fontane——冯塔纳
+* Forbes——福布斯
+* Forel——福雷尔
+* Forßmann——福斯曼
+* Förster——弗尔斯特
+* Fortner——福特纳
+* Franckenstein——弗兰肯斯坦
+* Frank; Franck(e)——弗兰克
+* Frantz——弗兰茨
+* Franziska——弗兰齐丝卡（女）
+* Franzos——弗兰佐斯
+* Fred——弗雷德
+* Freese——弗雷塞
+* Frege——弗雷格
+* Freiligrath——弗莱利格拉特
+* Freitag——弗莱塔格
+* Frels——弗雷尔斯
+* Frenssen——弗伦森
+* Frentzen——弗伦岑
+* Freud——弗洛伊德
+* Frey——弗莱
+* Freyer——弗莱尔
+* Freytag——弗莱塔格
+* Frick(e)——弗里克
+* Fridolin——弗里多林
+* Fried——弗里德
+* Frieda——弗丽达（女）
+* Friedel(l)——弗里德尔（女）
+* Friedjung——弗里德容
+* Friedländer——弗里德伦德
+* Fried(e)mann——弗里德曼
+* Friedrich——弗里德里希
+* Fries——弗里斯
+* Frings——弗林斯
+* Frisch——弗里什
+* Frischlin——弗里什林
+* Fritz——弗里茨
+* Fröbe——弗勒贝
+* Fröbel——弗勒贝尔
+* Froben——弗罗本
+* Frobenius——弗罗贝尼乌斯
+* Froberger——弗罗贝格
+* Froelich; Froöelich——弗勒利希
+* Fröhner——弗勒纳
+* Fromm——弗罗姆
+* Frommann——弗罗曼
+* Frommel——弗罗梅尔
+* Froschauer——弗罗绍尔
+* Frundsberg——弗伦茨贝格
+* Fuchs——富克斯
+* Füetrer——菲埃特勒
+* Füger——菲格
+* Fugger——富格
+* Fuhr——富尔
+* Fulda——富尔达
+* Funk——冯克
+* Furler; Furrer——富勒
+* Fürstenberg——菲尔斯滕贝格
+* Furtwängler——富特文勒
+* Fussenegger——富塞内格
+* Füßli——菲斯利
+</div>
+
+[[Category:德语姓名列表|Category:德语姓名列表]]

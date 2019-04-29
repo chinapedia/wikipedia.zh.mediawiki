@@ -1,0 +1,96 @@
+{{pageTOC|德语姓名列表}}
+__NOTOC__
+<div style="-moz-column-count: 2">
+* Taaffe——塔菲
+* Tafel——塔菲尔
+* Tannhäuser——坦霍伊瑟
+* Terrasch——特拉什
+* Tatjanna——塔特娅娜（女）
+* Taube(r)——陶贝
+* Tauchnitz——陶赫尼茨
+* Tauentzien——陶恩齐恩
+* Tauler——陶勒
+* Tegetthoff——泰格特霍夫
+* Telemann——泰勒曼
+* Teller; Theile——泰勒
+* Terhalle——特哈勒
+* Teschner——泰什纳
+* Tessenow——泰塞诺
+* Tetzel——泰策尔
+* Teubner——托伊布纳
+* Teutsch——托伊奇
+* Thaddäus——塔德乌斯
+* Thälmann——台尔曼
+* Thea——特亚（女）
+* Theo——特奥
+* Theobald——特奥巴尔特
+* Theodor——特奥多
+* Theodora——特奥多拉（女）
+* Theophil——特奥菲尔
+* Therese——特蕾塞（女）
+* Theresia——特蕾西亚（女）
+* Thiedemann——蒂德曼
+* Thieme; Tim(m)——蒂姆
+* Thieß——蒂斯
+* Thietmar——蒂特玛
+* T(h)ilde——蒂尔德（女）
+* T(h)ilo——蒂洛
+* Thimig——蒂米希
+* Thoma——托马
+* Thomas——托马斯
+* Thomasius——托马修斯
+* Thora——托拉（女）
+* T(h)orwald——托瓦尔德
+* Thümmel——蒂梅尔
+* Thünen——蒂内恩
+* Thurnwald——图恩瓦尔德
+* Tibor——蒂伯
+* Tieck——蒂克
+* Tiedge——蒂德格
+* Tiele——蒂勒
+* Tiemann——蒂曼
+* Tietjen——蒂特延
+* Till——蒂尔
+* Tilla——蒂拉（女）
+* Tillich——蒂利希
+* Tillmann——蒂尔曼
+* Tilly——蒂莉（女）
+* Timotheus——蒂莫特乌斯
+* Tirpitz——蒂尔皮茨
+* Tischbein——蒂施拜因
+* Tischendorf——蒂申多夫
+* Tischner——蒂什纳
+* Tobler——托布勒
+* Todt——托特
+* Toller——托勒
+* Tom——托姆
+* Toni——托尼
+* Tönnies——特尼斯
+* Torberg——托贝格
+* Tord——托德
+* Trakl——特拉克尔
+* Trapp——特拉普
+* Traugott——特劳戈特
+* Traut——特劳特
+* Traven——特拉温
+* Trebitsch——特雷比奇
+* Treitschke——特莱奇克
+* Trenck(er)——特伦克
+* Trettner——特雷特纳
+* Triepel——特里佩尔
+* Troeltsch——特勒尔奇
+* Troger——特罗格
+* Tropsch——特罗普施
+* Trotha——特罗塔
+* Trott——特罗特
+* Trübner——特吕布纳
+* Trude——特鲁德（女）
+* Trunk——特伦克
+* Tschirnhaus——齐尔恩豪斯
+* Tucholsky——图霍尔斯基
+* Tumler——图姆勒
+* Tumlirz——图姆利尔茨
+* Tunder——通德
+</div>
+
+[[Category:德语姓名列表|Category:德语姓名列表]]
