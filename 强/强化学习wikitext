@@ -1,0 +1,72 @@
+{{机器学习导航栏}}
+'''强化学习'''（{{lang-en|Reinforcement learning}}，簡稱{{lang|en|RL}}）是[[机器学习|机器学习]]中的一个领域，强调如何基于[[环境|环境]]而行动，以取得最大化的预期利益<ref>{{cite journal |last1=Hu |first1=J. |last2=Niu |first2=H. |last3=Carrasco |first3=J. |last4=Lennox |first4=B. |last5=Arvin |first5=F. |title=Voronoi-Based Multi-Robot Autonomous Exploration in Unknown Environments via Deep Reinforcement Learning |journal=IEEE Transactions on Vehicular Technology |date=2020 |volume=69 |issue=12 |page=14413-14423 |url=https://ieeexplore.ieee.org/abstract/document/9244647 |access-date=2021-03-21 |archive-date=2021-08-13 |archive-url=https://web.archive.org/web/20210813091536/https://ieeexplore.ieee.org/abstract/document/9244647 }}</ref>。强化学习是除了[[监督学习|监督学习]]和[[無監督學習|非监督学习]]之外的第三种基本的机器学习方法。与监督学习不同的是，强化学习不需要带标签的输入输出对，同时也无需对非最优解的精确地纠正。其关注点在于寻找探索（对未知领域的）和利用（对已有知识的）的平衡<ref name="kaelbling">{{cite journal|last1=Kaelbling|first1=Leslie P.|last2=Littman|first2=Michael L.|author-link2=Michael L. Littman|last3=Moore|first3=Andrew W.|author-link3=Andrew W. Moore|year=1996|title=Reinforcement Learning: A Survey|url=http://www.cs.washington.edu/research/jair/abstracts/kaelbling96a.html|url-status=dead|journal=Journal of Artificial Intelligence Research|volume=4|pages=237–285|doi=10.1613/jair.301|archive-url=http://webarchive.loc.gov/all/20011120234539/http://www.cs.washington.edu/research/jair/abstracts/kaelbling96a.html|archive-date=2001-11-20 |author-link1=Leslie P. Kaelbling|arxiv=cs/9605103|s2cid=1708582}}</ref>，强化学习中的“探索-利用”的交换，在{{le|多臂老虎机|multi-armed bandit}}问题和有限MDP中研究得最多。
+
+其灵感来源于心理学中的[[行为主义|行为主义]]理论，即有机体如何在环境给予的奖励或惩罚的刺激下，逐步形成对刺激的预期，产生能获得最大利益的习惯性行为。这个方法具有普适性，因此在其他许多领域都有研究，例如[[博弈论|博弈论]]、[[控制论|控制论]]、[[运筹学|运筹学]]、[[信息论|信息论]]、仿真优化、[[多智能体系统|多智能体系统]]、[[群体智能|群体智能]]、[[统计学|统计学]]以及[[遗传算法|遗传算法]]。在运筹学和控制理论研究的语境下，强化学习被称作“近似动态规划”（approximate dynamic programming，ADP）。在[[最优控制|最优控制]]理论中也有研究这个问题，虽然大部分的研究是关于最优解的存在和特性，并非是学习或者近似方面。在[[经济学|经济学]]和[[博弈论|博弈论]]中，强化学习被用来解释在[[有限理性|有限理性]]的条件下如何出现平衡。
+
+在机器学习问题中，环境通常被抽象为[[马尔可夫决策过程|马尔可夫决策过程]]（Markov decision processes，MDP），因为很多强化学习算法在这种假设下才能使用[[动态规划|动态规划]]的方法<ref>{{Cite book|title=Reinforcement learning and markov decision processes|author1=van Otterlo, M.|author2=Wiering, M.|journal=Reinforcement Learning |volume=12|pages=3–42 |year=2012 |doi=10.1007/978-3-642-27645-3_1|series=Adaptation, Learning, and Optimization|isbn=978-3-642-27644-6}}</ref>。传统的动态规划方法和强化学习算法的主要区别是，后者不需要关于MDP的知识，而且针对无法找到确切方法的大规模MDP。<ref>{{cite book |title=强化学习：原理与Python实现 |date=2019 |location=北京 |isbn=9787111631774 |pages=16-19}}</ref>
+
+==介绍==
+
+[[File:Reinforcement_learning_diagram.svg|thumb]]
+
+由于其通用性很强，强化学习已经在诸如[[博弈论|博弈论]]、[[控制论|控制论]]、[[运筹学|运筹学]]、[[信息论|信息论]]、[[仿真优化|仿真优化]]、[[多智能体|多智能体]]、[[群体智能|群体智能]]和[[统计学|统计学]]等领域有了深入研究。在运筹学和控制文献中，强化学习被称为''近似动态规划''或''神经动态规划''。强化学习所感兴趣的问题在[[最优控制|最优控制]]（一种关注最优解的存在性、表示和求解的理论，但较少涉及学习和近似）中也有所研究，尤其是环境的数学模型难以求得的时候。在经济学和博弈论中，强化学习可能被用来解释在有限的理性（{{lang|en|rationality}}）下如何达到平衡状态。
+
+基本的强化学习被建模为马尔可夫决策过程：
+
+# 环境状态的集合<math>S</math>;
+# 动作的集合<math>A</math>;
+# 在状态之间转换的规则（转移概率矩阵）<math>P</math>；
+# 规定转换后“即时奖励”的规则（奖励函数）<math>R</math>；
+# 描述主体能够观察到什么的规则。
+
+规则通常是[[随机|随机]]的。主体通常可以观察即时奖励和最后一次转换。在许多模型中，主体被假设为可以观察现有的环境状态，这种情况称为“完全可观测”（full observability），反之则称为“部分可观测”（partial observability）。通常，主体被允许的动作是有限的，例如，在棋盤中棋子只能上、下、左、右移動，或是使用的钱不能多于所拥有的。
+
+强化学习的主体与环境基于离散的时间步作用。在每一个时间<math>t</math>，主体接收到一个观测<math>o_t</math>，通常其中包含奖励<math>r_t</math>。然后，它从允许的集合中选择一个动作<math>a_t</math>，然后送出到环境中去。环境则变化到一个新的状态<math>s_{t+1}</math>，然后决定了和这个变化<math>(s_t,a_t,s_{t+1})</math>相关联的奖励<math>r_{t+1}</math>。强化学习主体的目标，是得到尽可能多的奖励。主体选择的动作是其历史的函数，它也可以选择随机的动作。
+
+将这个主体的表现和自始自终以最优方式行动的主体相比较，它们之间的行动差异产生了“悔过”的概念。如果要接近最优的方案来行动，主体必须根据它的长时间行动序列进行推理：例如，要最大化我的未来收入，我最好现在去上学，虽然这样行动的即时货币奖励为负值。
+
+因此，强化学习对于包含长期反馈的问题比短期反馈的表现更好。它在许多问题上得到应用，包括[[机器人控制|机器人控制]]、电梯调度、[[电信|电信]]通讯、[[双陆棋|双陆棋]]和[[西洋跳棋|西洋跳棋]]。<ref>Sutton1998|Sutton and Barto 1998 Chapter 11</ref>
+
+强化学习的强大能力来源于两个方面：使用样本来优化行为，使用函数近似来描述复杂的环境。它们使得强化学习可以使用在以下的复杂环境中：
+
+* 模型的环境已知，且解析解不存在；
+* 仅仅给出环境的模拟模型（模拟优化方法的问题）<ref>{{cite book
+  | last = Gosavi
+  | first = Abhijit
+  | authorlink = Abhijit Gosavi
+  | title = Simulation-based Optimization: Parametric Optimization Techniques and Reinforcement
+  | publisher = Springer
+  | year = 2003
+  | isbn = 1-4020-7454-9
+  | pages = 
+  | url = http://www.springer.com/mathematics/applications/book/978-1-4020-7454-7
+  | access-date = 2015-08-19
+  | archive-date = 2012-06-15
+  | archive-url = https://web.archive.org/web/20120615112934/http://www.springer.com/mathematics/applications/book/978-1-4020-7454-7
+  | dead-url = no
+  }}</ref>
+* 从环境中获取信息的唯一办法是和它互动。前两个问题可以被考虑为规划问题，而最后一个问题可以被认为是genuine learning问题。使用强化学习的方法，这两种规划问题都可以被转化为[[机器学习|机器学习]]问题。
+
+==常用算法==
+蒙特卡洛学习 Monte-Carlo Learning
+
+Temporal-Difference Learning
+
+SARSA
+
+Q-Learning
+
+==探索机制==
+强化学习需要比较聪明的探索机制，直接随机的对动作进行采样的方法性能比较差。虽然小规模的马氏过程已经被认识的比较清楚，这些性质很难在状态空间规模比较大的时候适用，这个时候相对简单的探索机制是更加现实的。
+
+其中的一种方法就是 <math>\epsilon</math>-[[貪婪演算法|貪婪演算法]]，这种方法会以比较大的概率(1-<math>\epsilon</math>)去选择现在最好的动作。如果没有选择最优动作，就在剩下的动作中随机选择一个。<math>\epsilon</math> 在这里是一个可调节的参数，更小的 <math>\epsilon</math> 意味着算法会更加贪心。<ref>{{citation | last1 = Tokic | first1 = Michel | last2 = Palm | first2 = Günther | chapter = Value-Difference Based Exploration: Adaptive Control Between Epsilon-Greedy and Softmax | pages = 335–346 | publisher = Springer | series = Lecture Notes in Computer Science | title = KI 2011: Advances in Artificial Intelligence | volume = 7006 | year = 2011 | url = http://www.tokic.com/www/tokicm/publikationen/papers/KI2011.pdf | isbn = 978-3-642-24455-1 | accessdate = 2018-09-03 | archive-date = 2018-11-23 | archive-url = https://web.archive.org/web/20181123145035/http://www.tokic.com/www/tokicm/publikationen/papers/KI2011.pdf | dead-url = no }}</ref>
+
+== 参考文献 ==
+{{Reflist}}
+
+{{-}}
+{{机器學習}}
+
+[[Category:機器學習|Category:機器學習]]
+[[Category:人工智能|Category:人工智能]]
+[[Category:機器學習演算法|Category:機器學習演算法]]

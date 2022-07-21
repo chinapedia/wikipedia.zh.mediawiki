@@ -1,0 +1,1 @@
+{{serial|前任|{{{1}}}|{{{2}}}|继任|{{{3}}}}}<noinclude>{{pp-template}}[[Category:前任继任模板]]</noinclude>

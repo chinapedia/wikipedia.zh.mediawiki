@@ -1,0 +1,201 @@
+{{noteTA
+|G1 = IT
+|1 = zh-hans:内存; zh-hant:記憶體;
+|2 = zh-hans:相关文档; zh-hant:相關文件;
+|3 = zh-hans:文档; zh-hant:檔案;
+}}
+{{Infobox programming language
+| name                   = XPath
+| paradigm               = [[查询语言|查询语言]]
+| year                   = {{start date and age|1998}}
+| designer               = 
+| developer              = [[W3C|W3C]]
+| latest_release_version = 3.1
+| latest_release_date    = {{Start date and age|2017|03|21}}
+| typing                 =
+| implementations        = 
+| dialects               = 
+| influenced_by          = [[XSLT|XSLT]], {{en-link|XPointer}}
+| influenced             = [[XML_Schema|XML Schema]], [[XForms|XForms]]
+| operating_system       = 
+| license                = 
+| website                = 
+}}
+'''XPath'''即为[[XML|XML]]路径语言（XML Path Language），它是一种用来确定XML文档中某部分位置的[[计算机语言|计算机语言]]。
+
+XPath基于XML的树状结构，提供在数据结构树中找寻节点的能力<ref>{{cite magazine | url=http://www.sqlmag.com/article/xml/xpath-151-retrieving-nodes-from-an-xml-document.aspx | title=XPath—Retrieving Nodes from an XML Document | author=Bergeron, Randy | magazine=SQL Server Magazine | date=October 31, 2000 | access-date=February 24, 2011 | archive-url=https://web.archive.org/web/20100726204716/http://www.sqlmag.com/article/xml/xpath-151-retrieving-nodes-from-an-xml-document.aspx | archive-date=July 26, 2010 }}</ref><ref>{{cite web| url=http://wam.inrialpes.fr/courses/PG-MoSIG12/xpath.pdf| title=Course: The XPath Language| author=Pierre Geneves| author-link=Pierre Geneves| date=October 2012| access-date=2021-03-15| archive-date=2021-04-14| archive-url=https://web.archive.org/web/20210414020636/http://wam.inrialpes.fr/courses/PG-MoSIG12/xpath.pdf}}</ref>。起初XPath的提出的初衷是将其作为一个通用的、介于{{link-en|XPointer|XPointer}}与[[XSL|XSL]]间的语法模型。但是XPath很快的被开发者采用来当作小型[[查询语言|查询语言]]。
+
+== 表示法 ==
+最常见的XPath表达式是路径表达式（XPath这一名称的另一来源）。路径表达式是从一个XML节点（当前的上下文节点）到另一个节点、或一组节点的书面步骤顺序。这些步骤以“/”字符分开，每一步有三个构成成分：
+
+* 轴描述（用最直接的方式接近目标节点）
+* 节点测试（用于筛选节点位置和名称）
+* 节点描述（用于筛选节点的属性和子节点特征）
+
+一般情况下，我们使用简写后的语法。虽然完整的轴描述是一种更加贴近人类语言，利用自然语言的单词和语法来书写的描述方式，但是相比之下也更加罗嗦。
+
+=== 简略的语法 ===
+
+最简单的XPath如下：
+* <code>/A/B/C</code>
+在这里选择所有符合规矩的C节点：C节点必须是B的子节点（<code>B/C</code>），同时B节点必须是A的子节点（<code>A/B</code>），而A是这个XML文档的根节点（<code>/A</code>）。此时的这种描述法类似于磁盘中文件的路径（[[URI|URI]]），从盘符开始顺着一级一级的目录最终找到文件。
+
+这里还有一个复杂一些的例子，包含了全部构成成分（请详细的看）：
+* <code>A//B/*[1]</code>
+此时选择的元素是：在B节点下的第一个节点（<code>B/*[1]</code>），不论节点的名称如何（<code>*</code>）；而B节点必须出现在A节点内，不论和A节点之间相隔几层节点（<code>//B</code>）；与此同时A节点还必须是当前节点的子节点（<code>A</code>，前边没有<code>/</code>）。
+
+=== 扩展的语法 ===
+
+在未缩简语法里，两个上述范例可以写为：
+
+* <code>/child::A/child::B/child::C</code>
+* <code>child::A/descendant-or-self::B/child::node()[1]</code>
+
+在XPath的每个步骤裡，通过完整的'''轴描述'''（例如：<code>child</code>或<code>descendant-or-self</code>）进行明确的指定，然后使用<code>::</code>，它的后面跟着'''节点测试'''的内容，例如上面范例所示的<code>A</code>以及<code>node()</code>。
+
+== 轴描述语法 ==
+轴描述元表示XML文件分支树表达式的浏览方向。这些坐标──包括全名及缩写语法──列举如下：
+
+{| class="wikitable" style="width:100%"
+|-
+!坐标!!名称!!说明!!缩写语法
+|-
+|child||子节点||比自身节点深度大的一层的节点，且被包含在自身之内||默认，不需要
+|-
+|attribute||属性||||<code>@</code>
+|-
+|descendant||子孙节点||比自身节点深度大的节点，且被包含在自身之内||不提供
+|-
+|descendant-or-self||自身引用及子孙节点||||<code>//</code>
+|-
+|parent||父节点||比自身节点深度小一层的节点，且包含自身||<code>..</code>
+|-
+|ancestor||祖先节点||比自身节点深度小的节点，且包含自身||不提供
+|-
+|ancestor-or-self||自身引用及祖先节点||||不提供
+|-
+|following||下文节点||按纵轴视图，在此节点后的所有完整节点，即不包含其祖先节点||不提供
+|-
+|preceding||前文节点||按纵轴视图，在此节点前的所有完整节点，即不包含其子孙节点||不提供
+|-
+|following-sibling||下一个同级节点||||不提供
+|-
+|preceding-sibling||上一个同级节点||||不提供
+|-
+|self||自己||||<code>.</code>
+|-
+|namespace||名称空间||||不提供
+|}
+
+关于使用'''attribute'''坐标简写语法的一个范例，<code>//a/@href</code>在文件树里任何地方的元素下选择了一个叫<code>href</code>的属性。'''self'''坐标最通常与述语同用，以参考现行选定节点。例如，<code>h3[.='See also']</code>在现行上下文选取了叫<code>h3</code>的元素，该元素文字内容是<code>See also</code>。
+
+如果需要了解更多，请查看[http://www.zvon.org/xxl/XPathTutorial/General_chi/examples.html ZVON.org给出的XPath帮助] {{Wayback|url=http://www.zvon.org/xxl/XPathTutorial/General_chi/examples.html |date=20210513003324 }}
+
+== 节点测试 ==
+节点测试包括特定节点名或者更一般的表达式。至于XML里命名空间前缀<code>gs</code>已定义的文件，<code>//gs:enquiry</code>将找到所有在那命名空间里<code>enquiry</code>的节点。
+
+其他节点格式：
+;comment() :寻找XML注释节点，例如<code><nowiki><!-- 注释 --></nowiki></code>
+;text() :寻找某点的文字型别，例如<code>hello</code>于<code><k>hello</k></code>
+;processing-instruction() :寻找XML[[处理指令|处理指令]]如<code><?php echo $a; ?></code>。在这个例子里，将符合<code>processing-instruction('php')</code>会传回值。
+;node() :寻找所有点
+
+== 节点描述 ==
+节点描述为一个逻辑真假表达式，任何真假判断表达式都可在节点后方括号里表示，这条件必须在XPath处理这个节点前先被满足。在某一步骤可有多少个描述并没有限制。
+
+范例如下：
+<code>//a[@href='help.php']</code>，这将检查元素<code>a</code>有没有<code>href</code>属性，并且该它的值是<code>help.php</code>。
+
+复杂一些的范例如下：
+* <code>//a[@href='help.php'][../div/@class='header']/@target</code>
+或
+* <code>//a[@href='help.php'][name(..)='div'][../@class='header']/@target</code>
+此例将会选择符合条件的元素<code>a</code>的<code>target</code>属性。
+要求元素<code>a</code>：
+* 具有属性<code>href</code>且值为<code>help.php</code>；
+* 并且元素<code>a</code>具有父元素<code>div</code>；
+* 并且父元素（<code>div</code>）其自身具备<code>class</code>属性，值为<code>header</code>。
+
+== 函数与运算符 ==
+XPath 1.0定义四种数据型别：节点型（本身无序的节点组）、字符串型、数字型、与[[布尔代数|布尔]]型。
+
+有效的运算符有：
+* <code>/</code>、<code>//</code>以及<code>..</code>运算符，一般用于轴描述。
+* 合集运算符 | 把两个节点形成联集。
+* 布尔运算符and、or以及not()函数
+* 数学运算符 +、-、*、div（除）以及mod（取余数）
+* 比较操作子 =、!=（不等于）、<、>、<=、>=
+
+函数有：
+* 文字运算函数
+:concat(), substring(), contains(), substring-before(), substring-after(), translate(), normalize-space(), string-length()
+* 数学运算函数
+:sum(), round(), floor(), ceiling()
+* 节点属性取得函数
+:name(), local-name(), namespace-uri()
+* 处理上下文数据取得函数
+:position(), last()
+* 类型转换函数
+:string(), number(), boolean()
+
+某些常用的函式详列如下。完整明细请参照[https://web.archive.org/web/20121209085946/http://www.w3.org/TR/xpath/ W3C建议书]。
+
+=== 节点组函式 ===
+;position() :返回当前节点集合内，该节点的位置。
+;count(''node-set'') :返回符合XPath的节点集合的节点总数。
+
+=== 字符串函式 ===
+;string(''object''?) :根据内建法则转换任何四种XPath数据型别为字符串。参数可为XPath，此时符合条件的节点（群）被转换成字符串返回。
+;concat(''string'', ''string'', ''string''*) :链接任何数量的字符串。
+;contains(''s1'', ''s2'') :如果<code>s1</code>包含<code>s2</code>返回真。
+;normalize-space(''string''?) :所有在字符串头和尾的{{link-en|空白字符|Whitespace (computer science)}}都被移除，或者將字符间两个及以上的空白字符置换成单一空格。有些XML因打印关系被美化，但可能让后来的字符串处理結果不可靠，故使用此函式有时能很好地改善情况。
+
+=== 布尔函数 ===
+;not(''boolean'') :布尔否运算函数。
+
+=== 数学运算函数 ===
+;sum(''node-set'') :根据内建转型规则，转换所有XPath参数定义找到的节点字符串值成为数字，然后返回这些数字总合
+
+使用操作子：<code><nowiki>=, !=, <=, <, >=</nowiki></code>和<code><nowiki>></nowiki></code>的表达式可以创造于术语内。布尔表达式可用括号<code>()</code>、布尔操作子<code>and</code>与<code>or</code>、和／或者上述的<code>not()</code>函式联合起来。数值计算使用<code><nowiki>*, +, -, div</nowiki></code>和<code><nowiki>mod</nowiki></code>。字符串可包含任何[[Unicode|Unicode]]字符。
+
+述语内外，整个节点组可利用"|"字符联合起来。
+
+<code>v[x or y] | w[z]</code>会返回单一节点组，包括现行上下文找到的所有拥有<code>x</code>或<code>y</code>子元素的<code>v</code>元素、有<code>z</code>子元素的<code>w</code>元素。
+
+<code>//item[@price > 2*@discount]</code>会选取price属性至少两倍于discount属性数值的对象
+
+== XPath 2及XPath 3 ==
+
+在[[W3C|W3C]]建议下<ref name="timelinehistory">{{cite web|url=http://www.dblab.ntua.gr/~bikakis/XML%20and%20Semantic%20Web%20W3C%20Standards%20Timeline-History.pdf|title=XML and Semantic Web W3C Standards Timeline|date=2012-02-04|access-date=2021-03-15|archive-date=2013-04-24|archive-url=https://web.archive.org/web/20130424125723/http://www.dblab.ntua.gr/~bikakis/XML%20and%20Semantic%20Web%20W3C%20Standards%20Timeline-History.pdf}}</ref>，XPath 1.0于1999年11月16日发表。[[XPath_2.0|XPath 2.0]]于2007年1月23日成为W3C推荐标准。XPath 2.0表达了XPath语言在大小与能力上显著的增加。
+
+最值得大书特书的改变是XPath 2.0有了更丰富的型别系统；XPath 2.0支持不可分割型态，如在[[XML_Schema|XML Schema]]内建型态定义一样，并且也可自纲要（schema）导入用户自定型别。现在每个值都是一个序列（一个单一不可分割值或节点都被视为长度一的序列）。XPath 1.0节点组被节点序列取代，它可以是任何顺序。
+
+为了支持更丰富的型别组，XPath 2.0提供相当延展的函式与操作子群。
+
+XPath 2.0实际上是[[XQuery_1.0|XQuery 1.0]]的子集合。它提供了一个for表达式。该式是XQuery里「FLWOR」表达式的缩减版。利用列出XQuery省去的部分来描述该语言是可能的。主要范例是查询前导语（query prolog）、元素和属性建构式、「FLWOR」语法的余项式、以及<code>typeswitch</code>表达式。
+
+XPath 3.0於2014年4月8日成為W3C推薦標準，而XPath3.1則於2017年3月21日成為W3C推薦標準。
+
+== 参看 ==
+* '''[[XML|XML]]'''
+* [[XSLT|XSLT]]，[[XSL-FO|XSL-FO]]
+* [[XLink|XLink]]，[[XPointer|XPointer]]
+* [[XPointer|XPointer]]
+* [[Xquery|Xquery]]
+* [[XML_Schema|XML Schema]]
+* [[STXPath|STXPath]]
+
+==引用==
+{{reflist}}
+
+== 外部链接 ==
+* [https://web.archive.org/web/20121209085946/http://www.w3.org/TR/xpath/ W3C XPath1.0规范]{{en icon}}
+* [http://www.w3.org/TR/xpath20/ W3C XPath 2.0候选推荐]{{Wayback|url=http://www.w3.org/TR/xpath/ |date=20121209085946 }}{{en icon}}
+
+
+{{查询语言}}
+{{W3C规范和标准}}
+{{网页技术与标准}}
+
+[[Category:W3C标准|Category:W3C标准]]
+[[Category:XML|Category:XML]]

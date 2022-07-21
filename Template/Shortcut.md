@@ -1,0 +1,1 @@
+<includeonly>{{#invoke:Shortcut|main}}</includeonly><noinclude>{{Documentation}}</noinclude>

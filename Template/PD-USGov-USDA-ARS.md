@@ -1,0 +1,1 @@
+{{Copy to Wikimedia Commons|[[美国农业部]]下属的农业研究服务局|US-AgriculturalResearchService-50thLogoAlt.svg}}

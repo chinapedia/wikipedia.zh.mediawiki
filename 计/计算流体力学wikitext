@@ -1,0 +1,209 @@
+{{noteTA
+|G1=物理學
+}}
+'''计算流体力学'''（{{lang-en|'''Computational Fluid Dynamics'''}}，簡稱'''CFD'''）是21世纪[[流体力学|流体力学]]领域的重要技術之一，使用[[数值方法|数值方法]]在计算机中对流体力学的控制方程进行求解，从而可预测[[流场|流场]]的流动。目前有多种商业CFD软件问世，比如[[FLUENT|FLUENT]]、CFD-ACE+（CFDRC）、[[Phoenics|Phoenics]]、CFX、Star-cd等。
+
+目前在工程领域CFD方法已经得到广泛的应用。美国海空军下一代[[F-35|F-35]]战斗机所使用的附面层分离进气道是CFD的成果之一。附面层分离进气道通过特殊设计形状的突起分离流速较慢的附面层以改善涡轮风扇发动机的进气流场。此设计比传统的附面层隔板方法可以减轻数百公斤重量，同时在一定速度范围内能够维持很好的分离效率。
+
+CFD最基本的考虑是如何把连续流体在计算机上用离散的方式处理。一个方法是把空间区域离散化成小胞腔，以形成一个立体[[多边形网格|网格]]或者格点，然后应用合适的[[算法|算法]]来解运动方程（对于不粘滞流体用[[欧拉方程_(流体动力学)|欧拉方程]]，对于粘滞流体用[[纳维-斯托克斯方程|纳维-斯托克斯方程]])。另外，这样的一个网格可以是不规则的（例如在二维由三角形组成，在三维由四面体组成）或者是规则的；前者的特征是每个胞腔必须单独存储在内存中。最后，如果问题是高度动态的并且在尺度上跨越很大的范围，网格本身应该可以动态随时间调整，譬如在[[自适应网格细化|自适应网格细化]]方法中。
+
+如果选择不使用基于网格的方法，也有一些可选的替代，比较突出的有：
+* [[光滑粒子流体动力学|光滑粒子流体动力学]]，求解流体问题的[[拉格朗日方法|拉格朗日方法]]，
+* 谱方法，把方程映射到像[[球谐函数|球谐函数]]和[[切比雪夫多项式|切比雪夫多项式]]等正交函数上的技术。
+* [[格子波尔兹曼方法|格子波尔兹曼方法]]（Lattice Boltzmann Methods），它在直角正交格点上模拟一个等价的中尺度系统，而不是求解宏观系统（也不是真正的微观物理）。
+
+对于[[层流|层流]]情况和对于所有相关的长度尺度都可以包含在格点中的[[湍流|湍流]]的情形，直接求解[[纳维-斯托克斯方程|纳维-斯托克斯方程]]是可能的（通过直接数值[[模拟|模拟]]）。但一般情况下，适合于问题的尺度的范围甚至大于今天的大型[[并行计算机|并行计算机]]可以建模的范围。
+
+在这些情况下，[[湍流|湍流]]模拟需要引入湍流模型。[[大涡流模拟|大涡流模拟]]和RANS表述（[[雷诺平均纳维－斯托克斯方程|雷诺平均纳维－斯托克斯方程]]）和''k-ε''模型或者雷诺应力模型一起，是处理这些尺度的两种技术。
+
+很多实例中，其他方程和[[纳维-斯托克斯方程|纳维-斯托克斯方程]]要同时被求解。这些其他的方程可能包括描述种类[[浓度|浓度]]、[[化学反应|化学反应]]、[[热传导|热传导]]等。很多高级的模擬軟體允许更复杂的情形的模拟，涉及到多相流（例如，液/气、固/气、液/固）或者非[[牛顿流体|牛顿流体]]（例如[[血液|血液]]）。
+
+== 方法论 ==
+所有这些方法都遵循同样的基本的程序。
+# 问题的[[几何|几何]]（物理界限）被定义。
+# 流体占据的[[体积|体积]]被分成离散胞腔（网格）。
+# 物理建模得到定义 - 例如，运动方程+[[焓|焓]]+种类不滅
+# 边界条件被定义。这涉及到液体在问题的边界行为和性质。对于暂态问题，初始条件也要定义。
+# 方程作为静态或者暂态被重复求解。
+# 最后答案的分析和可视化。
+
+=== 离散化方法 ===
+给定离散化的稳定性通常在数值上建立，而不是像在简单的线性问题上那样可以解析的建立。必须特别小心才能保证离散化能够漂亮的处理不连续的解。[[欧拉方程_(流体动力学)|欧拉方程]]和[[纳维-斯托克斯方程|纳维-斯托克斯方程]]两者都可能有冲击波和接触表面。
+
+在使用中的一些离散化方法包括：
+* [[有限体积法|有限体积法]]（Finite Volume Method）。这是“经典”或者说标准的方法，在商用软件和研究用程序中最为常见。控制方程在离散的控制体积上求解。这个积分方法导致了一个本身就保守（也就是说，密度这样的量保持了物理上守恒）的方法。
+::<math>\frac{\partial}{\partial t}\iiint Q dV + \iint F d\mathbf{A} = 0,</math>
+:其中<math>Q</math>是被守恒的变量的向量，而<math>F</math>是通量的向量，<math>V</math>是控制体积元体积，<math>A</math>是控制元表面积。
+* [[有限元法|有限元法]]（FEM）。这个方法在固体结构分析中很流行，但是也可以用于流体。但是，FEM表述需要特殊处理来保证保守的解。
+* [[有限差分|有限差分]]方法。这个方法有历史上的意义而且易于编程。现在只在特殊化的代码中使用。
+* [[边界元方法|边界元方法]]。流体占据的边界被分割成表面网格。
+
+=== 湍流模型 ===
+[[直接数值模拟|直接数值模拟]]（DNS）捕捉了所有相关尺度的湍流运动，所以不需要对最小的尺度建立另外的模型。该途径极其耗费资源，在现代的机器上对于复杂的问题甚至可能无法达成，因而对于流体运动最小尺度的模型还是有必要的。
+==== 雷诺平均纳维－斯托克斯方程 ====
+[[雷诺平均纳维－斯托克斯方程|雷诺平均纳维－斯托克斯方程]]（RANS）是湍流最古老的方法。将流体运动的各物理量表达为一个统计平均值和一个脉动值的和，代入原始的N-S方程后再取统计平均，从而得到关于统计平均物理量的控制方程——RANS方程。在动量方程中，出现了一个新的应力项，它是脉动速度的二阶相关，称为雷诺应力。这个二阶张量是新的未知量，必须通过一定的模型使整个方程组得到封闭（即使得方程个数与未知量个数相等），才能求解。对于这个张量有很多不同的封闭模型，常见的如零阶模型，一阶模型和二阶模型。目前二阶模型，如k-epsilon模型和k-omiga模型，是工程中最为常见的湍流模型。
+
+下面是常见的误解：RANS方程不适用于有一个时变平均流的流场，因为这些方程是‘时间-平均’的。事实上，统计不稳定（在非静态）流可以同等对待。这有时被称为URANS。没有任何雷诺平均方法中的先天缺陷使得这个情况不能被处理，但是用于闭合（封闭）方程的湍流模型必须要在均值中的变化发生的时间相对于包含大部分能量的湍流运动的时间尺度相对较大时才正确。
+
+==== 大涡流模拟 ====
+[[大涡流模拟|大涡流模拟]]（LES）是一种技术，其中更小的涡流被滤掉并用亚格点尺度模型来建模，而更大的能量的涡流则被模拟出来。该方法通常比RANS模型需要更细化的网格，但是比DNS解所需要的网格粗的多。
+==== 分离涡流模拟 ====
+[[分离涡流模拟|分离涡流模拟]]（Detached eddy simulation，DES)是RANS模型的一个修改，其中模型在细到足够使用LES计算的区域切换到亚格点尺度表述。接近固体边界的区域和涡流长度尺度小于最大格点尺寸的区域被交给RANS模式的解。随着涡流长度尺度超出格点尺寸，区域使用LES模式。所以格点解析度不像纯LES要求那样高，因此大大减少了计算开销。虽然DES最初为Spalart-Allmaras模型而建立（Spalart等人, 1997年），它可以用其它RANS模型实现（Strelets, 2001年），通过适当的修改RANS模型中隐含或显式地涉及到的长度尺度。所以虽然基于Spalart-Allamaras模型的DES像带墙模型的LES一样作用，基于其它模型的DES（譬如两方程模型）行为就像混合RANS-LES模型。格点的生成比简单的RANS或LES更为复杂因为要做RANS-LES切换。DES是一种非区域途径并会产生一个跨越解的RANS和LES区域的单一的光滑速度场。
+
+=== 求解算法 ===
+离散化完成后要进行的方程系统的基本求解由很多数值线性代数的为人熟知的许多算法完成。可以使用静态的迭代方法，譬如对称[[高斯-赛得尔|高斯-赛得尔]]（Gauss-Seidel）或者[[渐进松弛|渐进松弛]]（successive overrelaxation），或者[[克雷洛夫子空间|克雷洛夫子空间]]法（Krylov subspaces）。在后者中，解的余数在非线性算子的一个子空间的正交基上最小化。克雷洛夫子空间法通常和一个预条件算子（preconditioner）和一个内牛顿迭代一起使用。对于非线性问题不幸的是，正交基不能通过短循环来构造（相在一般的[[共轭梯度法|共轭梯度法]]中那样），而必须存储整个的序列的向量。
+
+== 应用 ==
+
+=== 套裝軟體 ===
+过去幾十年間，[[计算流体力学|计算流体力学]]進展快速，除了應用在[[空氣動力學|空氣動力學]]、[[渦輪|渦輪]]、[[航海工程|航海工程]]、航空載具、[[氣象學|氣象學]]模擬、[[環境工程學|環境工程學]]等重要科學領域；在过去的几年中，計算流體力學在[[建筑设计|建筑设计中]]越来越重要'''。'''[[计算流体力学|计算流体力学]]（和热傳學）是以電腦計算[[纳维-斯托克斯方程|纳维尔-斯托克斯方程]]等能量、動量方程，以求得流动系统或热系统的控制微分方程 <ref>{{Citation|journal=ASHRAE Journal|volume=39|number=1|pages=44–48|first=Ladeinde|last=Foluso|year=1997|title=CFD application in the HVAC & R}}</ref>，可透過[[有限元素分析|有限元素法]]或[[有限體積法|有限體積法]]求解。这些技术广泛用于[[工程|工程]]设计或者分析和[[流体|流体]]交互作用的设备，例如车辆，飞行器，泵，化学装置和通风系统等等。该技术也用于[[计算机图形学|计算机图形学]]，因为动画家不能像控制固态人物那样简单的处理流体，因而必须使用CFD技术结合交互工具，达成动画影片或游戏中的流体模拟。
+
+有许多求解纳维-斯托克斯方程的商用软體包括下面这些（按字母序排列）：
+AVL/FIRE、[[CFX|CFX]]、[[Fluent|Fluent]]、KIVA、NUMECA、Phoenics、和STAR-CD。其它软件包作为附件或CFD工具的补充产品使用。这些包括用于后置处理的FieldView和求解细节化学动力学的KINetics。
+
+=== 在建築方面之應用 ===
+[[计算流体力学|计算流体力学]]可用於分析建築物廢氣對環境的影響，預測建築物中的煙霧和火災風險、量化室内環境品質以及设计自然通风系统等方面，這對於[[建築性能模擬|建築性能模擬]]有重要幫助<ref name="#1">{{Cite book|title=Building Performance Analysis|last=de Wilde|first=Pieter|publisher=Wiley-Blackwell|year=2018|isbn=978-1-119-34192-5|location=Chichester|pages=325–422}}</ref>。[[建築性能模擬|建築性能模擬]]的目的是量化与建筑物的設計、建造、營運和控制等各個方面<ref name="#1"/>，而[[计算流体力学|计算流体力学]]正好提供具有科學根據的評估與計算。諸多[[建築能耗模擬軟體|建築能耗模擬軟體]]如ESP-r<ref>{{Cite web|title=CFD solvers in ESP-r|url=http://www.esru.strath.ac.uk/Courseware/ESP-r/tour/cfd_solvers.html|accessdate=2020-12-21|author=|date=|format=|work=www.esru.strath.ac.uk|publisher=|language=|archive-date=2021-01-15|archive-url=https://web.archive.org/web/20210115204934/http://www.esru.strath.ac.uk/Courseware/ESP-r/tour/cfd_solvers.html|dead-url=no}}</ref>、ENVI-met<ref>{{Cite web|title=ENVI-met - Decode urban nature with ENVI-met software|url=https://www.envi-met.com/|accessdate=2020-12-20|work=ENVI-met|language=en-US|archive-date=2022-02-08|archive-url=https://web.archive.org/web/20220208062133/https://www.envi-met.com/|dead-url=no}}</ref>、TRNSYS<ref>{{Cite web|title=Welcome {{!}} TRNSYS : Transient System Simulation Tool|url=http://www.trnsys.com/|accessdate=2020-12-20|work=www.trnsys.com|archive-date=2017-11-13|archive-url=https://web.archive.org/web/20171113024010/http://www.trnsys.com/|dead-url=no}}</ref>都有求解建築計算流體力學問題之功能。
+
+以前，大多数与[[建筑物|建筑]]有关的[[流體力學|流體力學]]问题，例如通風分析，風荷载，風环境等，都是使用[[风洞|风洞]]测试进行检查的，但如今，所有这些测试都可以使用[[计算流体力学|计算流体力学]]有效地完成。[[计算流体力学|计算流体力学]]可以在相對較短的时间内解决所有上述问题，并且與較舊的方法（實驗方法）相比，它更經濟，更有效。<ref>{{Cite book|last=Lawson|first=Tom|authorlink=Tom Lawson (engineer)|title=Building Aerodynamics|year=2010|publisher=Imperial College Press|isbn=978-81-7596-757-1}}</ref>[[计算流体力学|计算流体力学]]可以用于预测建筑物内部和周围的空气流动，热传递和污染物输送。  [[计算流体力学|计算流体力学]]可以輕鬆更改不同组件的类型和位置，送风条件和系统控制时间表，从而检查各种供[[暖通空調|暖通空調]]（HVAC）系统的有效性和效率。此外，[[计算流体力学|计算流体力学]]通过建模和最佳化建筑场地平面图和室内布局，帮助制定被动的加热/冷却/通风策略（例如自然通风）<ref>{{Citation|journal=Indoor and Built Environment|volume=15|number=4|pages=305–313|first=Zhiqiang|last=Zhai|year=2005|title=Application of Computational Fluid Dynamics in Building Design: Aspects and Trends|doi=10.1177/1420326X06067336}}</ref>。 在全球范围内，建筑部门约占总能耗的40％<ref>{{Citation|journal=The Appraisal Journal|volume=79|number=2|pages=115–125|first=Leopolds|last=Berger|year=2011|title=Energising property valuation: putting a value on energy-efficient buildings}}</ref>，加強建築節能設計對於總體[[節能|節能]]有巨大效益。
+
+由于建筑部门占总消耗量的巨大比例，因此有必要研究建筑物的最佳配置以减少建筑物的能源消耗。为了实现这一目标，[[计算流体力学|计算流体力学]]可以发挥重要作用。[[建築性能模擬|建築性能模擬]]和CFD程序是重要的[[建筑设计|建筑设计]]工具，可用于评估建筑性能，包括热舒适度，室内空气质量机械系统效率和能耗<ref>{{Citation|doi=10.1016/j.enbuild.2004.07.001|title=Performance of coupled building energy and CFD simulations|journal=Energy and Buildings|volume=37|number=4|pages=333|year=2005|last=Zhai|first=Zhiqiang John|last2=Chen|first2=Qingyan Yan}}</ref>。
+
+建筑物中的[[计算流体力学|计算流体力学]]主要用於建築[[通風|通风]]分析。
+
+==== 通风分析 ====
+通过调节室内空气参数（空气温度，相对湿度，空气速度和空气中的化学物质浓度）来进行建筑物的通风研究，以找到室内温度可接受的热舒适环境。 [[计算流体力学|计算流体力学]]可有效計算室内空气流動相關参数，用以预测建筑物的通风性能<ref>{{Cite journal|title=Ventilation performance prediction for buildings: A method overview and recent applications|last=Chen|first=Qingyan|authorlink=Qingyan Chen|date=2009|journal=Building and Environment|issue=4|doi=10.1016/j.buildenv.2008.05.025|volume=44|pages=848–858|language=en}}</ref>。
+
+这些空气参数对于设计舒适的室内以及室外环境中建筑物的良好整合至关重要。这是因为适当的通风系统的设计和控制策略的开发需要有关以下参数的详细信息；
+
+* 空气流动
+* 污染物扩散
+* 温度分布
+
+[[File:Figuree_onea.jpg|右]]
+[[File:Figuree_oneb.jpg|右]]
+上述資訊对于建筑师设计建筑結構與建築外殼也是有相當大的幫助。隨著電腦技術的進步，[[计算流体力学|计算流体力学]]技术在建筑物中得到了广泛的成功应用<ref>{{Citation|journal=International Journal on Architectural Science|volume=1|number=1|pages=14–29|first=Q.|last=Chen|first2=J.|last2=Srebric|year=2000|title=Application of CFD Tools for Indoor and Outdoor Environment Design}}</ref>。
+
+最近，通风及其相关领域已成为风能工程的重要组成部分。可以使用风洞调查（实验性地）或通过[[计算流体力学|计算流体力学]]建模（理论上）来进行通风研究。在某些应用中，自然通风系统可能比强制通风系统更可取，因为它消除或减少了机械通风系统，从而既可提供风扇能量又可节省第一笔费用。在当今时代，由于开发了许多[[计算流体力学|计算流体力学]]软件和其他建筑物性能模拟软件，因此评估建筑物中自然/强制通风系统的可能性变得更加容易。 [[计算流体力学|计算流体力学]]分析比实验方法非常有用，因为可以在后处理中找到变量之间的其他相关关系。通过实验或数值获得的数据可通过两种方式使用：<ref name=":0">{{Cite book|title=Building Aerodynamics|last=Lawson|first=Tom|publisher=Imperial College Press|year=2010|isbn=978-81-7596-757-1|location=|pages=|authorlink=}}</ref>
+
+# 更好的用户舒适度
+# 它提供了用作建筑物热量平衡计算输入的数据
+
+在选择建筑场地和位置时，风荷载起着重要作用。如果两座建筑物在某个位置并排存在并且有一定的间隙，那么当通过该间隙吹动建筑物两端的[[風|风]]量为时，在第一瞬间分别绕过每座建筑物的流量总和必须大于或等于围绕单个建筑物的末端以压力损失为代价。
+
+因此，将有压力的建筑物进入间隙，这将导致建筑物侧面的风荷载更高。当风吹过高层建筑的表面时，前面的向下流动会产生涡流（如图1所示）。靠近地面的反方向风速可能是参考风速的140％。因此，如果在该区域中存在任何建筑物，则该建筑物可能会受到损坏（尤其是建筑物的屋顶可能会受到严重损坏）。如果在建筑物的建造初期考虑到风荷载的影响，就可以成功地防止对建筑物的这种破坏。在建筑的早期，所有这些风荷载效应都是通过风洞试验确定的，但是今天所有这些试验都可以通过CFD分析成功地进行。为建筑物提供宜人的环境的重要性正在增加。经常要求建筑师和风力工程师在建筑物的形成阶段和施工的规划阶段仔细检查设计（方向，位置，位置以及周围建筑物之间的间隙）。 <ref name=":0">{{Cite book|title=Building Aerodynamics|last=Lawson|first=Tom|publisher=Imperial College Press|year=2010|isbn=978-81-7596-757-1|location=|pages=|authorlink=}}</ref>因此，通过计算流体力学分析，可以找到适合建筑物方向，位置和局部最佳化問題（局部风速，对流系数等）。
+
+== 计算流体力学知名专家 ==
+;Brian Spalding
+:Professor, Director, CHAM
+;舒其望
+:Professor of Mathematics, Brown University 
+;Suhas V. Patankar
+:Professor, Department of Mechanical Engineering, University of Minnesota.
+;Phillip Colella
+:Professor in Residence, Mechanical Engineering, UC Berkeley
+;A David Gosman
+:Professor, Mechanical Engineering, Imperial College
+;Thomas Hughes
+:Professor, Applied Mechanics Division, Department of Mechanical Engineering, Stanford
+;Antony Jameson
+:Professor, Stanford
+;John Kim
+:Professor, Mechanical and Aerospace Engineering, UCLA
+;Xiaolin Zhong
+:Professor, Mechanical and Aerospace Engineering, UCLA
+;Brian Launder
+:Professor, Mechanical Engineering, UMIST
+;Bram van Leer
+:Professor, Aerospace Engineering, University of Michigan.
+;Brian P. Leonard
+:Professor Emeritus, Mechanical Engineering, University of Akron
+;[https://en.wikipedia.org/wiki/Joel_H._Ferziger Joel H. Ferziger] {{Wayback|url=https://en.wikipedia.org/wiki/Joel_H._Ferziger |date=20160923143934 }}
+:Professor Emeritus, Mechanical Engineering, [[Stanford_University|Stanford University]] 
+;Michael A Leschziner
+:Professor of Computational Aerodynamics, Department of Aeronautics, Imperial College
+;Marcel Lesieur
+:Professor, Modelling and Numerical Simulation of Turbulence (MOST), Grenoble Institute of Mechanics
+;Thierry Poinsot
+:Professor, Institut of Fluid Mechanics Toulouse(IMFT)/CERFACS
+;Remy Abgrall
+:Professor of mathematics, University of Zurich
+;Randall J. LeVeque
+:Professor of Applied Mathematics and Mathematics, University of Washington.
+;Rainald Löhner
+:Professor, George Mason University.
+;Parviz Moin
+:Professor of Mechanical Engineering and the Director of Center for Turbulence Research at Stanford/NASA Ames.
+;K W Morton
+:Professor of Numerical Analysis, Director of ICFD, Oxford
+;Ugo Piomelli
+:Associate Professor, Department of Mechanical Engineering, University of Maryland - College Park.
+;Wolfgang Rodi
+:Prof. Dr., Intitut fur Hydromechanik, University of Karlsruhe
+;Philip L. Roe
+:Professor, Aerospace Engineering, University of Michigan.
+;[[陶文铨|陶文铨]]
+:[[中國|中國]][[西安交通大学|西安交通大学]] 
+;张涵信 
+:中国空气动力研究与发展中心
+;邓小刚
+:国防科学技术大学
+;Tayfun E. Tezduyar
+:Professor in Engineering, Rice University
+;David C. Wilcox
+:President of DCW Industries, Inc.
+
+== 软件 ==
+* [https://web.archive.org/web/20140517033443/http://esi-cfd.com/ CFD-ACE+]多重物理耦合之計算流體力學商用分析軟體，前身即為CFDRC。现在版权為法國[https://www.esi-group.com/ ESI Group]{{Wayback|url=https://www.esi-group.com/ |date=20140620183435 }}集團擁有。
+* [https://web.archive.org/web/20051118211443/http://www.opencfd.co.uk/openfoam/ OpenFOAM]现在GPL版权的前商用软件。内部链接：[[OpenFOAM|OpenFOAM]]
+* [http://www.palabos.org/ Palabos]{{Wayback|url=http://www.palabos.org/ |date=20130522004320 }}现在GPL版权的前商用软件
+* [http://www.nasa.gov NASA]{{Wayback|url=http://www.nasa.gov/ |date=20031223151214 }}提供CFD软件给美国居民
+* [[Fire_Dynamics_Simulator|Fire Dynamics Simulator]]消防工程应用软件
+* [http://gfs.sf.net GERRIS]{{Wayback|url=http://gfs.sf.net/ |date=20191019014622 }} GPL版权不可压缩流体求解器。内部链接：[[Gerris|Gerris]].
+* [https://web.archive.org/web/20051017030116/http://www.fluidflowinfo.com/FluidFlow/FluidFlow.asp 管道系统液体流]有一个功能完备的演示，它使用样品流体来做评估，可以下载使用
+* [https://web.archive.org/web/20051118201854/http://www.relinst.com/content/home Atmos]
+* [http://www.advanticastoner.com Stoner流水线模拟器]{{Wayback|url=http://www.advanticastoner.com/ |date=20110305145813 }}
+* [http://www.energy-solutions.com 流水线工作室]{{Wayback|url=http://www.energy-solutions.com/ |date=20200216104641 }}包括一个评估版的下载（~ 132 M）
+* [http://www.olga2000.com Olga 2000]{{Wayback|url=http://www.olga2000.com/ |date=20151104233158 }}
+* [http://www.sinmec.ufsc.br/cfd/doc/pt/index.html CFD Studio]{{Wayback|url=http://www.sinmec.ufsc.br/cfd/doc/pt/index.html |date=20060215194408 }}学习CFD问题的教学软件
+* [http://www.hyprotech.com Hysys]{{Wayback|url=http://www.hyprotech.com/ |date=20200305050557 }}
+* [http://www.iccm.de/ Comet]{{Wayback|url=http://www.iccm.de/ |date=20051120072544 }}商用有限体方法
+* [http://www.nongnu.org/channelflow/ Channelflow]{{Wayback|url=http://www.nongnu.org/channelflow/ |date=20051104135317 }} Channelflow采用"谱方法"（GPL） 
+* [https://web.archive.org/web/20051018033918/http://www.pipeflowsoft.com/en/Products/Net-Pipe.htm Net-Pipe]
+* [https://web.archive.org/web/20051230093333/http://www.cambridgeenvironmental.com/people/bullister/ed.htm NEKTON] "谱元素法（SEM）"
+* [https://web.archive.org/web/20100312201041/http://www.exa.com/ Exa] Powerflow "格波尔兹曼方法"
+* [http://cosmos.ucsd.edu/enzo/ Enzo]{{Wayback|url=http://cosmos.ucsd.edu/enzo/ |date=20050925004221 }}是开源宇宙模拟代码，采用自适应网格。
+* [http://flash.uchicago.edu FLASH]{{Wayback|url=http://flash.uchicago.edu/ |date=20200219113407 }}对非商业应用免费，使用自适应网格，对于天体物理流可压缩求解器
+* [http://www.cd-adapco.com STAR]{{Wayback|url=http://www.cd-adapco.com/ |date=20090916012148 }}工业CAD-嵌入流模拟器
+* [https://web.archive.org/web/20160207100217/http://www.fluent.com/ FLUENT]用于一大类自由曲面流应用的CFD代码
+* [http://www.flow3d.com FLOW-3D]{{Wayback|url=http://www.flow3d.com/ |date=20110805034923 }}特别适用于自由曲面流应用的CFD代码
+* [http://www.ilight.com/ Intelligent Light]{{Wayback|url=http://www.ilight.com/ |date=20051015031637 }} - FieldView的制作器
+* [http://www.tecplot.com Tecplot]{{Wayback|url=http://www.tecplot.com/ |date=20060627054851 }} CFD后置处理，绘制，图形和可视化软件
+* [https://web.archive.org/web/20050828154404/http://www.softpredict.com/ COSILAB] -用于层流和湍流中的化学的软件和CFD插件
+* [http://www.reactiondesign.com Reaction Design]{{Wayback|url=http://www.reactiondesign.com/ |date=20190810233129 }} - 用于化学运动学的软件和CFD插件
+* [https://web.archive.org/web/20050507114057/http://www.flotherm.com/ Flotherm]商用CFD软件，强调电子屏障，正交网格
+* [[COMSOL_Multiphysics|COMSOL Multiphysics]]（也称FEMLAB）商用有限元包，用于[[多物理|多物理]]包括CFD
+* [https://web.archive.org/web/20051023083634/http://www.ansys.com/cfx/index.htm CFX] Ansys的CFD-代码
+* [http://www.dlr.de/as TAU]{{Wayback|url=http://www.dlr.de/as |date=20051025042804 }}无结构有限体CFD-代码，来自DLR，用于飞机和直升机
+* [http://www.dlr.de/as FLOWer]{{Wayback|url=http://www.dlr.de/as |date=20051025042804 }}结构化有限体CFD-代码，来自DLR，用于飞机和直升机
+* [http://www.moldex3d.com Moldex3D]{{Wayback|url=http://www.moldex3d.com/ |date=20090413131257 }}商用CAE软件，用于塑膠射出成形
+* [http://www.pointwise.com/ Pointwise]{{Wayback|url=http://www.pointwise.com/ |date=20130523234743 }} - Gridgen的制作软件
+* [http://www.metacomptech.com/ Metacomp Technologies, Inc.]{{Wayback|url=http://www.metacomptech.com/ |date=20051027143610 }} - CFD++的制作软件
+* [http://www.gridpro.com.cn GridPro]{{Wayback|url=http://www.gridpro.com.cn/ |date=20140516214207 }} - 高效的计算流体力学网格生成软件
+* [https://web.archive.org/web/20100216024149/http://www.freefem.org/ff++/index.htm FreeFem++] - 免費的有限元素法計算軟體
+
+== 参看 ==
+* [[流体力学|流体力学]]
+* [[数值模拟技术|数值模拟技术]]
+* [[有限元分析|有限元分析]]
+
+== 外部链接 ==
+* https://web.archive.org/web/20070921041844/http://www.cfdnet.ca/
+* http://www.cfd-online.com/{{Wayback|url=http://www.cfd-online.com/ |date=20070611212329 }}
+* http://www.cfdreview.com/{{Wayback|url=http://www.cfdreview.com/ |date=20070529171607 }}
+* [http://groups.google.com/groups?group=sci.physics.computational.fluid-dynamics Usenet关于CFD的讨论组]
+* [https://web.archive.org/web/20131009152649/http://www.palabos.org/software/lattice-boltzmann-method 格波尔兹曼方法]
+* [http://fetchcfd.com/ FetchCFD]{{Wayback|url=http://fetchcfd.com/ |date=20160416135548 }} 展示和探索工程模拟.
+
+{{Authority control}}
+[[Category:计算流体力学|]]
+[[Category:流体力学|Category:流体力学]]

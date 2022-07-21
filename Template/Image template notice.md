@@ -1,0 +1,1 @@
+#重定向 [[Template:File_template_notice]]

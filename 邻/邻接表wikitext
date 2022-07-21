@@ -1,0 +1,535 @@
+{{noteTA
+|G1=IT
+}}
+[[File:Simple_cycle_graph.svg|thumb]]
+
+在[[图论|图论]]和[[计算机科学|计算机科学]]中，'''邻接表（'''英语'''：adjacency list）'''是表示了[[图_(数学)|图]]中与每一个[[顶点_(图论)|顶点]]相邻的边集的[[集合_(数学)|集合]]，这里的集合指的是无序集。
+
+如果是无向图，那么每条边由两个结点组成，分别代表边的两个端点；如果是有向图，那么每条边是一个[[结点对|结点对]]，分别代表边的始点和终点。
+
+==计算机科学中的应用==
+
+{|class="wikitable" align="left" style="width:10em;"
+|colspan="3"|上图的邻接表表示
+|-
+|a|| 邻接于 || b,c
+|-
+|b|| 邻接于 || a,c
+|-
+|c|| 邻接于 || a,b
+|}
+
+在[[计算机科学|计算机科学]]中，邻接表描述一种紧密相关的[[数据结构|数据结构]]，用于表征图。在邻接表的表示中，对于图中的每个[[顶点_(图论)|顶点]]，将保存所有其它与之相连的顶点（即“邻接表”）。例如，由[[吉多·范罗苏姆|吉多·范罗苏姆]]提出的，使用[[哈希表|哈希表]]将每个顶点和该顶点的邻接点[[数组|数组]]关连起来，就可以看作是上述表示方法的一种实现。又如，在Cormenetal中，顶点数组的每个元素都指向一个邻接点[[单链表|单链表]]。
+
+邻接表结构的困难之一是无法明确在什么地方保存相关边的长度或花销。为了解决这个问题，一些算法，如
+Goodrich and Tamassia所提出的面向对象邻接表，有时也称「关联度」，它为每个[[顶点_(图论)|顶点]]保存一个对象表，每个对象表示指向顶点的那条边的关联度。为了完善这个结构，每条边必须指向两个组成其端点的顶点。这个额外的边对象使得它比直接列出所有边的邻接表消耗更多的内存，但它不失为一种保存边相关信息的好方法。
+
+
+
+
+=== C 实现 ===
+<syntaxhighlight lang="C">
+ /* 图的邻接表存储表示 */
+ #define MAX_VERTEX_NUM 20
+ typedef enum{DG,DN,UDG,UDN}GraphKind; /* {有向图,有向网,无向图,无向网} */
+ typedef struct ArcNode
+ {
+   int adjvex; /* 该弧所指向的顶点的位置 */
+   struct ArcNode *nextarc; /* 指向下一条弧的指针 */
+   InfoType *info; /* 网的权值指针） */
+ }ArcNode; /* 表结点 */
+ typedef struct
+ {
+   VertexType data; /* 顶点信息 */
+   ArcNode *firstarc; /* 第一个表结点的地址,指向第一条依附该顶点的弧的指针 */
+ }VNode,AdjList[MAX_VERTEX_NUM]; /* 头结点 */
+ typedef struct
+ {
+   AdjList vertices;
+   int vexnum,arcnum; /* 图的当前顶点数和弧数 */
+   GraphKind kind; /* 图的种类标志 */
+ }ALGraph;
+
+ /* 图的邻接表存储的基本操作(15个)*/
+ #include"bo2-8.c" /* 不带头结点的单链表基本操作 */
+ #include"func2-1.c" /* 不带头结点的单链表扩展操作 */
+ int LocateVex(ALGraph G,VertexType u)
+ { /* 初始条件：图G存在，u和G中顶点有相同特征 */
+   /* 操作结果：若G中存在顶点u，则返回该顶点在图中位置；否则返回-1 */
+   int i;
+   for(i=0;i<G.vexnum;++i)
+     if(strcmp(u,G.vertices[i].data)==0)
+       return i;
+   return -1;
+ }
+
+ void CreateGraph(ALGraph *G)
+ { /* 采用邻接表存储结构，构造没有相关信息图或网G(用一个函数构造4种图) */
+   int i,j,k,w; /* w是权值 */
+   VertexType va,vb; /* 连接边或弧的2顶点 */
+   ElemType e;
+   printf("请输入图的类型(有向图:0,有向网:1,无向图:2,无向网:3): ");
+   scanf("%d",&(*G).kind);
+   printf("请输入图的顶点数,边数: ");
+   scanf("%d,%d",&(*G).vexnum,&(*G).arcnum);
+   printf("请输入%d个顶点的值(<%d个字符):\n",(*G).vexnum,MAX_NAME);
+   for(i=0;i<(*G).vexnum;++i) /* 构造顶点向量 */
+   {
+     scanf("%s",(*G).vertices[i].data);
+     (*G).vertices[i].firstarc=NULL; /* 初始化与该顶点有关的出弧链表 */
+   }
+   if((*G).kind%2) /* 网 */
+     printf("请输入每条弧(边)的权值、弧尾和弧头(以空格作为间隔):\n");
+   else /* 图 */
+     printf("请输入每条弧(边)的弧尾和弧头(以空格作为间隔):\n");
+   for(k=0;k<(*G).arcnum;++k) /* 构造相关弧链表 */
+   {
+     if((*G).kind%2) /* 网 */
+       scanf("%d%s%s",&w,va,vb);
+     else /* 图 */
+       scanf("%s%s",va,vb);
+     i=LocateVex(*G,va); /* 弧尾 */
+     j=LocateVex(*G,vb); /* 弧头 */
+     e.info=NULL; /* 给待插表结点e赋值，图无权 */
+     e.adjvex=j; /* 弧头 */
+     if((*G).kind%2) /* 网 */
+     {
+       e.info=(int *)malloc(sizeof(int)); /* 动态生成存放权值的空间 */
+       *(e.info)=w;
+     }
+     ListInsert(&(*G).vertices[i].firstarc,1,e); /* 插在第i个元素(出弧)的表头，在bo2-8.c中 */
+     if((*G).kind>=2) /* 无向图或网，产生第2个表结点，并插在第j个元素(入弧)的表头 */
+     {
+       e.adjvex=i; /* e.info不变，不必再赋值 */
+       ListInsert(&(*G).vertices[j].firstarc,1,e); /* 插在第j个元素的表头，在bo2-8.c中 */
+     }
+   }
+ }
+
+ void CreateGraphF(ALGraph *G)
+ { /* 采用邻接表 存储结构，由文件构造没有相关信息图或网G(用一个函数构造4种图) */
+   int i,j,k,w; /* w是权值 */
+   VertexType va,vb; /* 连接边或弧的2顶点 */
+   ElemType e;
+   char filename[13];
+   FILE *graphlist;
+   printf("请输入数据文件名(f7-1.txt或f7-2.txt)：");
+   scanf("%s",filename);
+   printf("请输入图的类型(有向图:0,有向网:1,无向图:2,无向网:3): ");
+   scanf("%d",&(*G).kind);
+   graphlist=fopen(filename,"r"); /* 以读的方式打开数据文件，并以graphlist表示 */
+   fscanf(graphlist,"%d",&(*G).vexnum);
+   fscanf(graphlist,"%d",&(*G).arcnum);
+   for(i=0;i<(*G).vexnum;++i) /* 构造顶点向量 */
+   {
+     fscanf(graphlist,"%s",(*G).vertices[i].data);
+     (*G).vertices[i].firstarc=NULL; /* 初始化与该顶点有关的出弧链表 */
+   }
+   for(k=0;k<(*G).arcnum;++k) /* 构造相关弧链表 */
+   {
+     if((*G).kind%2) /* 网 */
+       fscanf(graphlist,"%d%s%s",&w,va,vb);
+     else /* 图 */
+       fscanf(graphlist,"%s%s",va,vb);
+     i=LocateVex(*G,va); /* 弧尾 */
+     j=LocateVex(*G,vb); /* 弧头 */
+     e.info=NULL; /* 给待插表结点e赋值，图无权 */
+     e.adjvex=j; /* 弧头 */
+     if((*G).kind%2) /* 网 */
+     {
+       e.info=(int *)malloc(sizeof(int)); /* 动态生成存放权值的空间 */
+       *(e.info)=w;
+     }
+     ListInsert(&(*G).vertices[i].firstarc,1,e); /* 插在第i个元素(出弧)的表头，在bo2-8.c中 */
+     if((*G).kind>=2) /* 无向图或网，产生第2个表结点，并插在第j个元素(入弧)的表头 */
+     {
+       e.adjvex=i; /* e.info不变，不必再赋值 */
+       ListInsert(&(*G).vertices[j].firstarc,1,e); /* 插在第j个元素的表头，在bo2-8.c中 */
+     }
+   }
+   fclose(graphlist); /* 关闭数据文件 */
+ }
+
+ void DestroyGraph(ALGraph *G)
+ { /* 初始条件：图G存在。操作结果：销毁图G */
+   int i;
+   ElemType e;
+   for(i=0;i<(*G).vexnum;++i) /* 对于所有顶点 */
+     if((*G).kind%2) /* 网 */
+       while((*G).vertices[i].firstarc) /* 对应的弧或边链表不空 */
+       {
+	 ListDelete(&(*G).vertices[i].firstarc,1,&e); /* 删除链表的第1个结点，并将值赋给e */
+         if(e.adjvex>i) /* 顶点序号>i(保证动态生成的权值空间只释放1次) */
+           free(e.info);
+       }
+     else /* 图 */
+       DestroyList(&(*G).vertices[i].firstarc); /* 销毁弧或边链表，在bo2-8.c中 */
+   (*G).vexnum=0; /* 顶点数为0 */
+   (*G).arcnum=0; /* 边或弧数为0 */
+ }
+
+ VertexType* GetVex(ALGraph G,int v)
+ { /* 初始条件：图G存在，v是G中某个顶点的序号。操作结果：返回v的值 */
+   if(v>=G.vexnum||v<0)
+     exit(ERROR);
+   return &G.vertices[v].data;
+ }
+
+ Status PutVex(ALGraph *G,VertexType v,VertexType value)
+ { /* 初始条件：图G存在，v是G中某个顶点。操作结果：对v赋新值value */
+   int i;
+   i=LocateVex(*G,v);
+   if(i>-1) /* v是G的顶点 */
+   {
+     strcpy((*G).vertices[i].data,value);
+     return OK;
+   }
+   return ERROR;
+ }
+
+ int FirstAdjVex(ALGraph G,VertexType v)
+ { /* 初始条件：图G存在，v是G中某个顶点 */
+   /* 操作结果：返回v的第一个邻接顶点的序号。若顶点在G中没有邻接顶点，则返回-1 */
+   LinkList p;
+   int v1;
+   v1=LocateVex(G,v); /* v1为顶点v在图G中的序号 */
+   p=G.vertices[v1].firstarc;
+   if(p)
+     return p->data.adjvex;
+   else
+     return -1;
+ }
+
+ Status equalvex(ElemType a,ElemType b)
+ { /* DeleteArc()、DeleteVex()和NextAdjVex()要调用的函数 */
+   if(a.adjvex==b.adjvex)
+     return OK;
+   else
+     return ERROR;
+ }
+
+ int NextAdjVex(ALGraph G,VertexType v,VertexType w)
+ { /* 初始条件：图G存在，v是G中某个顶点，w是v的邻接顶点 */
+   /* 操作结果：返回v的(相对于w的)下一个邻接顶点的序号。若w是v的最后一个邻接点，则返回-1 */
+   LinkList p,p1; /* p1在Point()中用作辅助指针，Point()在func2-1.c中 */
+   ElemType e;
+   int v1;
+   v1=LocateVex(G,v); /* v1为顶点v在图G中的序号 */
+   e.adjvex=LocateVex(G,w); /* e.adjvex为顶点w在图G中的序号 */
+   p=Point(G.vertices[v1].firstarc,e,equalvex,&p1); /* p指向顶点v的链表中邻接顶点为w的结点 */
+   if(!p||!p->next) /* 没找到w或w是最后一个邻接点 */
+     return -1;
+   else /* p->data.adjvex==w */
+     return p->next->data.adjvex; /* 返回v的(相对于w的)下一个邻接顶点的序号 */
+ }
+
+ void InsertVex(ALGraph *G,VertexType v)
+ { /* 初始条件：图G存在，v和图中顶点有相同特征 */
+   /* 操作结果：在图G中增添新顶点v(不增添与顶点相关的弧，留待InsertArc()去做) */
+   strcpy((*G).vertices[(*G).vexnum].data,v); /* 构造新顶点向量 */
+   (*G).vertices[(*G).vexnum].firstarc=NULL;
+   (*G).vexnum++; /* 图G的顶点数加1 */
+ }
+
+ Status DeleteVex(ALGraph *G,VertexType v)
+ { /* 初始条件：图G存在，v是G中某个顶点。操作结果：删除G中顶点v及其相关的弧 */
+   int i,j,k;
+   ElemType e;
+   LinkList p,p1;
+   j=LocateVex(*G,v); /* j是顶点v的序号 */
+   if(j<0) /* v不是图G的顶点 */
+     return ERROR;
+   i=ListLength((*G).vertices[j].firstarc); /* 以v为出度的弧或边数，在bo2-8.c中 */
+   (*G).arcnum-=i; /* 边或弧数-i */
+   if((*G).kind%2) /* 网 */
+     while((*G).vertices[j].firstarc) /* 对应的弧或边链表不空 */
+     {
+       ListDelete(&(*G).vertices[j].firstarc,1,&e); /* 删除链表的第1个结点，并将值赋给e */
+       free(e.info); /* 释放动态生成的权值空间 */
+     }
+   else /* 图 */
+     DestroyList(&(*G).vertices[i].firstarc); /* 销毁弧或边链表，在bo2-8.c中 */
+   (*G).vexnum--; /* 顶点数减1 */
+   for(i=j;i<(*G).vexnum;i++) /* 顶点v后面的顶点前移 */
+     (*G).vertices[i]=(*G).vertices[i+1];
+   for(i=0;i<(*G).vexnum;i++) /* 删除以v为入度的弧或边且必要时修改表结点的顶点位置值 */
+   {
+     e.adjvex=j;
+     p=Point((*G).vertices[i].firstarc,e,equalvex,&p1); /* Point()在func2-1.c中 */
+     if(p) /* 顶点i的邻接表上有v为入度的结点 */
+     {
+       if(p1) /* p1指向p所指结点的前驱 */
+         p1->next=p->next; /* 从链表中删除p所指结点 */
+       else /* p指向首元结点 */
+         (*G).vertices[i].firstarc=p->next; /* 头指针指向下一结点 */
+       if((*G).kind<2) /* 有向 */
+       {
+         (*G).arcnum--; /* 边或弧数-1 */
+         if((*G).kind==1) /* 有向网 */
+           free(p->data.info); /* 释放动态生成的权值空间 */
+       }
+       free(p); /* 释放v为入度的结点 */
+     }
+     for(k=j+1;k<=(*G).vexnum;k++) /* 对于adjvex域>j的结点，其序号-1 */
+     {
+       e.adjvex=k;
+       p=Point((*G).vertices[i].firstarc,e,equalvex,&p1); /* Point()在func2-1.c中 */
+       if(p)
+         p->data.adjvex--; /* 序号-1(因为前移) */
+     }
+   }
+   return OK;
+ }
+
+ Status InsertArc(ALGraph *G,VertexType v,VertexType w)
+ { /* 初始条件：图G存在，v和w是G中两个顶点 */
+   /* 操作结果：在G中增添弧<v,w>，若G是无向的，则还增添对称弧<w,v> */
+   ElemType e;
+   int i,j;
+   i=LocateVex(*G,v); /* 弧尾或边的序号 */
+   j=LocateVex(*G,w); /* 弧头或边的序号 */
+   if(i<0||j<0)
+     return ERROR;
+   (*G).arcnum++; /* 图G的弧或边的数目加1 */
+   e.adjvex=j;
+   e.info=NULL; /* 初值 */
+   if((*G).kind%2) /* 网 */
+   {
+     e.info=(int *)malloc(sizeof(int)); /* 动态生成存放权值的空间 */
+     printf("请输入弧(边)%s→%s的权值: ",v,w);
+     scanf("%d",e.info);
+   }
+   ListInsert(&(*G).vertices[i].firstarc,1,e); /* 将e插在弧尾的表头，在bo2-8.c中 */
+   if((*G).kind>=2) /* 无向，生成另一个表结点 */
+   {
+     e.adjvex=i; /* e.info不变 */
+     ListInsert(&(*G).vertices[j].firstarc,1,e); /* 将e插在弧头的表头 */
+   }
+   return OK;
+ }
+
+ Status DeleteArc(ALGraph *G,VertexType v,VertexType w)
+ { /* 初始条件：图G存在，v和w是G中两个顶点 */
+   /* 操作结果：在G中删除弧<v,w>，若G是无向的，则还删除对称弧<w,v> */
+   int i,j;
+   Status k;
+   ElemType e;
+   i=LocateVex(*G,v); /* i是顶点v(弧尾)的序号 */
+   j=LocateVex(*G,w); /* j是顶点w(弧头)的序号 */
+   if(i<0||j<0||i==j)
+     return ERROR;
+   e.adjvex=j;
+   k=DeleteElem(&(*G).vertices[i].firstarc,&e,equalvex); /* 在func2-1.c中 */
+   if(k) /* 删除成功 */
+   {
+     (*G).arcnum--; /* 弧或边数减1 */
+     if((*G).kind%2) /* 网 */
+       free(e.info);
+     if((*G).kind>=2) /* 无向，删除对称弧<w,v> */
+     {
+       e.adjvex=i;
+       DeleteElem(&(*G).vertices[j].firstarc,&e,equalvex);
+     }
+     return OK;
+   }
+   else /* 没找到待删除的弧 */
+     return ERROR;
+ }
+
+ Boolean visited[MAX_VERTEX_NUM]; /* 访问标志数组(全局量) */
+ void(*VisitFunc)(char* v); /* 函数变量(全局量) */
+ void DFS(ALGraph G,int v)
+ { /* 从第v个顶点出发递归地深度优先遍历图G。算法7.5 */
+   int w;
+   visited[v]=TRUE; /* 设置访问标志为TRUE(已访问) */
+   VisitFunc(G.vertices[v].data); /* 访问第v个顶点 */
+   for(w=FirstAdjVex(G,G.vertices[v].data);w>=0;w=NextAdjVex(G,G.vertices[v].data,G.vertices[w].data))
+     if(!visited[w])
+       DFS(G,w); /* 对v的尚未访问的邻接点w递归调用DFS */
+ }
+
+ void DFSTraverse(ALGraph G,void(*Visit)(char*))
+ { /* 对图G作深度优先遍历。算法7.4 */
+   int v;
+   VisitFunc=Visit; /* 使用全局变量VisitFunc，使DFS不必设函数指针参数 */
+   for(v=0;v<G.vexnum;v++)
+     visited[v]=FALSE; /* 访问标志数组初始化 */
+   for(v=0;v<G.vexnum;v++)
+     if(!visited[v])
+       DFS(G,v); /* 对尚未访问的顶点调用DFS */
+   printf("\n");
+ }
+
+ typedef int QElemType; /* 队列元素类型 */
+ #include"c3-2.h" /* 链队列的存储结构 */
+ #include"bo3-2.c" /* 链队列的基本操作 */
+ void BFSTraverse(ALGraph G,void(*Visit)(char*))
+ {/*按广度优先非递归遍历图G。使用辅助队列Q和访问标志数组visited。算法7.6 */
+   int v,u,w;
+   LinkQueue Q;
+   for(v=0;v<G.vexnum;++v)
+     visited[v]=FALSE; /* 置初值 */
+   InitQueue(&Q); /* 置空的辅助队列Q */
+   for(v=0;v<G.vexnum;v++) /* 如果是连通图，只v=0就遍历全图 */
+     if(!visited[v]) /* v尚未访问 */
+     {
+       visited[v]=TRUE;
+       Visit(G.vertices[v].data);
+       EnQueue(&Q,v); /* v入队列 */
+       while(!QueueEmpty(Q)) /* 队列不空 */
+       {
+         DeQueue(&Q,&u); /* 队头元素出队并置为u */
+         for(w=FirstAdjVex(G,G.vertices[u].data);w>=0;w=NextAdjVex(G,G.vertices[u].data,G.vertices[w].data))
+           if(!visited[w]) /* w为u的尚未访问的邻接顶点 */
+           {
+             visited[w]=TRUE;
+             Visit(G.vertices[w].data);
+             EnQueue(&Q,w); /* w入队 */
+           }
+       }
+     }
+   printf("\n");
+ }
+
+ void DFS1(ALGraph G,int v,void(*Visit)(char*))
+ { /* 从第v个顶点出发递归地深度优先遍历图G。仅适用于邻接表存储结构 */
+   ArcNode *p; /* p指向表结点 */
+   visited[v]=TRUE; /* 设置访问标志为TRUE(已访问) */
+   Visit(G.vertices[v].data); /* 访问该顶点 */
+   for(p=G.vertices[v].firstarc;p;p=p->next) /* p依次指向v的邻接顶点 */
+     if(!visited[p->data.adjvex])
+       DFS1(G,p->data.adjvex,Visit); /* 对v的尚未访问的邻接点递归调用DFS1 */
+ }
+
+ void DFSTraverse1(ALGraph G,void(*Visit)(char*))
+ { /* 对图G作深度优先遍历。DFS1设函数指针参数 */
+   int v;
+   for(v=0;v<G.vexnum;v++)
+     visited[v]=FALSE; /* 访问标志数组初始化，置初值为未被访问 */
+   for(v=0;v<G.vexnum;v++) /* 如果是连通图，只v=0就遍历全图 */
+     if(!visited[v]) /* v尚未被访问 */
+       DFS1(G,v,Visit); /* 对v调用DFS1 */
+   printf("\n");
+ }
+
+ void BFSTraverse1(ALGraph G,void(*Visit)(char*))
+ { /* 按广度优先非递归遍历图G。使用辅助队列Q和访问标志数组visited。仅适用于邻接表结构 */
+   int v,u;
+   ArcNode *p; /* p指向表结点 */
+   LinkQueue Q; /* 链队列类型 */
+   for(v=0;v<G.vexnum;++v)
+     visited[v]=FALSE; /* 置初值为未被访问 */
+   InitQueue(&Q); /* 初始化辅助队列Q */
+   for(v=0;v<G.vexnum;v++) /* 如果是连通图，只v=0就遍历全图 */
+     if(!visited[v]) /* v尚未被访问 */
+     {
+       visited[v]=TRUE; /* 设v为已被访问 */
+       Visit(G.vertices[v].data); /* 访问v */
+       EnQueue(&Q,v); /* v入队列 */
+       while(!QueueEmpty(Q)) /* 队列不空 */
+       {
+         DeQueue(&Q,&u); /* 队头元素出队并置为u */
+         for(p=G.vertices[u].firstarc;p;p=p->next) /* p依次指向u的邻接顶点 */
+           if(!visited[p->data.adjvex]) /* u的邻接顶点尚未被访问 */
+           {
+             visited[p->data.adjvex]=TRUE; /* 该邻接顶点设为已被访问 */
+             Visit(G.vertices[p->data.adjvex].data); /* 访问该邻接顶点 */
+             EnQueue(&Q,p->data.adjvex); /* 入队该邻接顶点序号 */
+           }
+       }
+     }
+   printf("\n");
+ }
+
+ void Display(ALGraph G)
+ { /* 输出图的邻接矩阵G */
+   int i;
+   LinkList p;
+   switch(G.kind)
+   {
+     case DG: printf("有向图\n");
+	      break;
+     case DN: printf("有向网\n");
+              break;
+     case UDG:printf("无向图\n");
+              break;
+     case UDN:printf("无向网\n");
+   }
+   printf("%d个顶点：\n",G.vexnum);
+   for(i=0;i<G.vexnum;++i)
+     printf("%s ",G.vertices[i].data);
+   printf("\n%d条弧(边):\n",G.arcnum);
+   for(i=0;i<G.vexnum;i++)
+   {
+     p=G.vertices[i].firstarc;
+     while(p)
+     {
+       if(G.kind<=1||i<p->data.adjvex) /* 有向或无向两次中的一次 */
+       {
+         printf("%s→%s ",G.vertices[i].data,G.vertices[p->data.adjvex].data);
+	 if(G.kind%2) /* 网 */
+           printf(":%d ",*(p->data.info));
+       }
+       p=p->nextarc;
+     }
+     printf("\n");
+   }
+ }
+
+</syntaxhighlight>
+
+== 权衡 ==
+
+可用于替代邻接表的主要有[[邻接矩阵|邻接矩阵]]。用[[稀疏矩阵|稀疏]]邻接矩阵表示邻接表时，将占用更少的空间。这是因为它能避免为''不存在''的边分配任何空间。在一台32位计算机上，如果使用原始的[[数组|数组]]结构实现邻接表，那么对于一个无向图来说，它大约需要占用<math> 8e </math>字节的存储空间，其中<math> e </math>表示边的个数。每条边都将会在两个邻接表中重复出现，并分别占用4字节空间。
+
+相反地，由于邻接矩阵中的每个元素仅占用一位（bit），故可以以非常紧密的方式来存储，仅占用<math> n^2/8 </math>个字节，其中<math> n </math>代表顶点个数。除了节省空间外，这种紧密存储也发扬了[[locality_of_reference|locality of reference]]。
+
+注意到一个图至多能有<math> n^2 </math>条边（允许循环）。令<math> d=e/n^2 </math>表示图的''[[图致密度|致密度]]''，则由<math> 8e > n^2/8 </math>，可知邻接表将占用更多的空间，准确地说，仅当<math> d > 1/64 </math>'以说只有当图比较稀疏的时候，才有可能以较少的空间来存储邻接表。不过，以上分析只有在仅考虑边的[[连接性|连接性]]，而不考虑关于边的任何数值信息时才有效。
+
+除了空间方面的考虑外，不同的数据结构也使得不同的操作变得更容易。在一个邻接表中，给定一个[[顶点_(图论)|顶点]]，可以很容易地找出它的所有邻边，因为只需要读取它的邻接表就可以了。在一个邻接矩阵中，相同的操作则需要扫描一行，花费大约<math> O(n)</math>（[[大O标记|大O标记]]）时间。而如果你想知道给定的两个[[顶点_(图论)|顶点]]间是否存在有[[邊_(圖論)|边]]，在邻接矩阵里可以立刻查到，在邻接表中则需要花费以边的最小关联度成比例的时间。
+
+==参考资料==
+
+* {{cite book
+  | author = [[Joe_Celko|Joe Celko]]
+  | title = Trees and Hierarchies in SQL for Smarties
+  | pages = excerpt from Chapter 2: [http://www.SQLSummit.com/AdjacencyList.htm "Adjacency List Model"]
+  | year = 2004
+  | publisher = Morgan Kaufmann
+  | id = ISBN 978-1-55860-920-4}}
+* {{cite book
+  | author = [[Thomas_H._Cormen|Thomas H. Cormen]], [[Charles_E._Leiserson|Charles E. Leiserson]], [[Ronald_L._Rivest|Ronald L. Rivest]], and [[Clifford_Stein|Clifford Stein]]
+  | title = [[Introduction_to_Algorithms|Introduction to Algorithms]], Second Edition
+  | publisher = MIT Press and McGraw-Hill
+  | year = 2001
+  | id = ISBN 978-0-262-03293-3
+  | pages = 527–529 of section 22.1: Representations of graphs}}
+* {{cite web
+  | author = [[David_Eppstein|David Eppstein]]
+  | year = 1996
+  | title = ICS 161 Lecture Notes: Graph Algorithms
+  | url = http://www.ics.uci.edu/~eppstein/161/960201.html
+  | accessdate = 2008-04-15
+  | archive-date = 2008-04-10
+  | archive-url = https://web.archive.org/web/20080410152146/http://www.ics.uci.edu/~eppstein/161/960201.html
+  | dead-url = no
+  }}
+* {{cite book
+  | author = Michael T. Goodrich and Roberto Tamassia
+  | title = Algorithm Design: Foundations, Analysis, and Internet Examples
+  | publisher = John Wiley & Sons
+  | year = 2002
+  | id = ISBN 978-0-471-38365-9}}
+* {{cite web
+  | author = [[Guido_van_Rossum|Guido van Rossum]]
+  | year = 1998
+  | title = Python Patterns — Implementing Graphs
+  | url = http://www.python.org/doc/essays/graphs/
+  | accessdate = 2008-04-15
+  | archive-date = 2008-05-09
+  | archive-url = https://web.archive.org/web/20080509150746/http://www.python.org/doc/essays/graphs/
+  | dead-url = no
+  }}
+
+[[Category:图论|Category:图论]]
+[[Category:图数据结构|Category:图数据结构]]

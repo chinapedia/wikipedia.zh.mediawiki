@@ -1,0 +1,146 @@
+{{更新|time=2013-12-14T04:55:56+00:00}}
+目前数据库查询功能已经禁止，但您可以请求一个[[meta:Toolserver|Toolserver]]用户为您进行数据库查询，详见[[tswiki:Query_service|tswiki:Query service]]。
+
+下面是一些查询数据库的实例。
+
+==限定查询数量==
+
+使用limit命令：
+
+SELECT ... LIMIT 20
+
+这个命令返回20条记录。
+
+SELECT ... LIMIT 100, 20
+
+这个命令返回从101条记录开始的20条记录。
+
+==查询新用户==
+
+* SELECT user_name, COUNT(*) FROM user, cur WHERE user_id=cur_user GROUP BY user_id ORDER BY user_id DESC LIMIT 20
+
+这个语句返回最近创建的最多20个用户的用户名，并显示这些用户所编辑的条目数。这条语句显示的编辑的条目数不包括被其他用户修改的条目。
+
+*SELECT user_name, COUNT(*) FROM user, old WHERE user_id=old_user GROUP BY user_id ORDER BY user_id DESC LIMIT 20
+
+这个语句返回被其他用户修改过的条目数量。
+
+==查询短条目==
+
+*<nowiki>SELECT cur_title FROM cur WHERE cur_is_redirect=0 AND LENGTH(cur_text)<50 AND cur_text LIKE '%see%' </nowiki>
+
+这个语句返回小于50个字符的所有页面。
+
+==查询不适当的链接==
+
+*SELECT l_from,l_to,cb.cur_text AS rt,cb.cur_title AS ti FROM links,cur AS ca, cur AS cb WHERE ca.cur_is_redirect=1 AND cb.cur_is_redirect=1 AND l_to=cb.cur_id AND l_from=ca.cur_title LIMIT 250
+
+这个语句返回有双重重定向的页面
+
+*<nowiki>SELECT cur_title FROM cur WHERE cur_text LIKE "%http://%.jpg%" AND cur_namespace=0 </nowiki>
+
+这个语句返回链接有外部的jpg图像的条目。
+
+*SELECT cur_title FROM cur,links WHERE cur_is_redirect=0 AND cur_namespace=0 AND l_from=cur_title AND l_to=cur_id LIMIT 20
+
+这个语句返回有自我链接的页面。
+
+*SELECT cur_title FROM cur,brokenlinks WHERE bl_from=cur_id AND cur_is_redirect=1
+
+这个语句返回重定向到不存在的页面。
+
+==查询有特殊标记的页面==
+
+*<nowiki>SELECT cur_title FROM cur WHERE cur_namespace=0 AND cur_is_redirect=0 AND cur_text NOT LIKE "%'''%" AND cur_text NOT LIKE "%<b>%" LIMIT 50 </nowiki>
+
+这个语句返回不包含粗体标记的页面。
+
+*<nowiki>SELECT cur_title FROM cur WHERE cur_namespace=0 AND cur_is_redirect=0 AND cur_text NOT LIKE "%'''%" AND cur_text NOT LIKE "%<b>%" AND cur_text NOT LIKE "%disambiguation%" LIMIT 50 </nowiki>
+
+这个语句返回不包含粗体标记的页面，其中不包括消含糊页。
+
+*<nowiki>SELECT cur_title FROM cur WHERE cur_namespace=0 and cur_title like "%/%" and cur_is_redirect=0 </nowiki>
+
+这个语句返回含有“/”符号的页面。
+
+*<nowiki>SELECT CONCAT("Wikipedia:",cur_title) AS cur_title FROM cur
+ WHERE cur_namespace=4 AND cur_is_redirect=0 ORDER BY
+ cur_title</nowiki>
+
+这个语句返回标题含有Wikipedia:的条目。
+
+==查询一些统计数据==
+
+*SELECT COUNT(*) FROM cur WHERE LENGTH(cur_text)>1500 AND cur_namespace=0
+
+这个语句返回字符个数大于1500的条目数量。
+
+*<nowiki>SELECT DISTINCT ipb_address, COUNT(*) AS times, MIN(ipb_reason) AS reason, user_name AS blocker, DATE_FORMAT(MIN(ipb_timestamp), '%b %e %Y %k:%i') AS date FROM ipblocks, user WHERE user_id=ipb_by GROUP BY ipb_address ORDER BY ipb_timestamp </nowiki>
+
+这个语句返回被禁封的用户。
+
+*<nowiki>SELECT CONCAT("*[[User:",user_name,"|",user_name,"]]") from user where user_rights != "" ORDER BY user_name LIMIT 100 </nowiki>
+
+这个语句返回站长和开发者的信息。
+
+*<nowiki>SELECT COUNT(rc_title) FROM recentchanges
+WHERE rc_timestamp LIKE '20030623%'</nowiki>
+
+这个语句返回20030623这一天所作的所有改变的数量。
+
+*SELECT old_title, count(old_timestamp) AS count FROM old GROUP BY old_title ORDER BY count DESC
+
+这个语句返回各个条目的编辑次数.
+
+*SELECT rc_title, count(rc_timestamp) AS count FROM recentchanges GROUP BY rc_title ORDER BY count DESC LIMIT 100
+
+这个语句返回最近编辑过的条目的编辑次数。
+
+*SELECT rc_title, cur_counter FROM cur,recentchanges where rc_title like cur_title GROUP BY rc_title ORDER BY cur_counter DESC LIMIT 200
+
+这个语句返回最近浏览次数最多的100条条目，用于首页的'''热点条目'''。
+
+*SELECT cur_title,cur_is_new,cur_counter FROM cur where cur_is_new=1 GROUP BY cur_title ORDER BY cur_counter DESC LIMIT 100
+
+这个语句返回按浏览次数排序的前100条新建条目。
+
+*SELECT cur_title,cur_is_new,cur_timestamp,cur_counter FROM cur where cur_is_new=1 GROUP BY cur_title ORDER BY cur_timestamp DESC LIMIT 100
+
+这个语句返回按建立时间的前100条新建条目。
+
+*SELECT cur_id,cur_title,cur_timestamp,cur_counter FROM cur GROUP BY cur_title ORDER BY cur_id DESC LIMIT 100
+
+这个语句返回按建立顺序排列的前100条条目。
+
+*SELECT rc_title,rc_new,cur_counter FROM cur,recentchanges where rc_new=1 AND cur_title LIKE rc_title GROUP BY rc_title ORDER BY cur_counter DESC LIMIT 100
+
+这个语句返回按浏览次数排序的最近新增条目。
+
+*SELECT rc_title,rc_new,count(rc_timestamp) as count FROM recentchanges where rc_new=1 GROUP BY rc_title ORDER BY count DESC LIMIT 100
+
+这个语句返回按编辑次数排序的最近新增条目.
+
+*SELECT rc_title,rc_new,LENGTH(cur_text) as count FROM cur,recentchanges where rc_new=1 and rc_title like cur_title GROUP BY rc_title ORDER BY count DESC LIMIT 100
+
+这个语句返回按文章长度排序的最近新增条目，用于首页的'''新增条目'''统计。
+
+*SELECT cur_title,cur_counter FROM cur WHERE LENGTH(cur_text)=0 GROUP BY cur_title ORDER BY cur_counter DESC LIMIT 100
+
+这个语句返回按浏览次数排序的文本长度为0的条目，用于首页的'''待撰条目'''统计.
+
+*SELECT bl_to,count(cur_title) as count FROM cur,brokenlinks WHERE bl_from=cur_id AND cur_is_redirect=0 GROUP BY bl_to ORDER BY count DESC LIMIT 100
+
+查询待撰条目。
+
+*SELECT cur_title,count(cur_title) as count FROM cur, brokenlinks where cur_text LIKE "%Wikipedia:寻找并修理兔尾巴%" and bl_from=cur_id AND cur_is_redirect=0 GROUP BY cur_title ORDER BY count DESC LIMIT 100
+
+查询兔尾巴。
+
+==日志==
+*[http://zh.wikipedia.org/upload/sqllog_mFhyRe6 日志文件]记录了最近几个月来的所有的查询纪录。
+
+----
+详细的数据库字段的描述请看[http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/*checkout*/wikipedia/phpwiki/newcodebase/docs/schema.doc?rev=HEAD&content-type=text/plain SCHEMA.DOC]。
+
+[[Category:帮助文档|SJKCX]]
+[[de:Wikipedia:Datenbank-Abfragen|de:Wikipedia:Datenbank-Abfragen]]

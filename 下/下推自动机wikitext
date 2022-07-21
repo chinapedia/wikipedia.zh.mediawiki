@@ -1,0 +1,217 @@
+在[[自动机理论|自动机理论]]中，'''下推自动机'''（Pushdown automaton）是使用了包含数据的[[堆栈|栈]]的[[自动机|有限自动机]]。
+
+== 综述 ==
+下推自动机比[[有限状态自动机|有限状态自动机]]复杂：除了有限状态组成部分外，还包括一个长度不受限制的[[堆栈|栈]]；下推自动机的状态迁移不但要参考有限状态部分，也要参照[[堆栈|栈]]当前的状态；状态迁移不但包括有限状态的变迁，还包括一个[[堆栈|栈]]的出栈或入栈过程。下推自动机可以形象的理解为，藉由加上讀取一個容量無限[[堆栈|栈]]的能力，擴充一個能做<math>\epsilon</math>-轉移的[[有限状态自动机|非確定有限狀態自動機]]。
+
+下推自动机存在“[[确定下推自动机|确定]]”与“非确定”两种形式，两者并不等价。（对有限状态自动机两者是等价的）
+
+每一个下推自动机都接受一个[[形式语言|形式语言]]。被“非确定下推自动机”接受的语言是[[上下文无关语言|上下文无关语言]]。
+
+如果我们把下推自动机扩展，允许一个有限状态自动机存取两个[[堆栈|栈]]，我们得到一个能力更强的自动机，这个自动机与[[图灵机|图灵机]]等价。
+
+下推自动机作为一个形式系统最早于1961年出现在 Oettinger 的论文中。它与[[上下文无关文法|上下文无关文法]]的等价性是由[[诺姆·乔姆斯基|乔姆斯基]]于1962年发现的。
+
+== 形式定义 ==
+
+PDA 形式定义为 6-元组：
+
+<math>M=(Q,\  \Sigma,\  \Gamma,\  \delta, \ q_{0}, \ F)</math>
+这里的
+
+*<math>\, Q </math> 是[[状态|状态]]的有限集合
+*<math>\,\Sigma</math> 是输入[[字母表_(计算机科学)|字母表]]的有限集合
+*<math>\,\Gamma</math> 是[[堆栈|栈]]字母表的有限集合
+*<math>\,\delta</math>: <math>Q \times  \Sigma_{\epsilon}  \times \Gamma_{\epsilon} \longrightarrow \mathcal{P}( Q \times \Gamma_{\epsilon} )</math> 是[[转移函数|转移函数]] 
+*<math>q_{0}</math> 是“开始状态”
+*<math>F\subset Q</math> 是“接受状态”的集合
+*<math>\Gamma_{\epsilon} = \Gamma\cup\{\epsilon\}</math>
+*<math>\Sigma_{\epsilon} = \Sigma\cup\{\epsilon\}</math>
+
+'''计算定义 1''' 
+
+对于任何 PDA <math>M=(Q,\  \Sigma,\  \Gamma,\  \delta, \ q_{0}, \ F)</math>，计算路径是一个有序的（n+1）-元组 <math> (q_{0},\, q_{1}, ...., \,q_{n}) </math>，这里的 <math>q_{i} \in Q, n \geq 0</math>，它满足如下条件：
+
+(i) <math>\ \  (q_{i+1}, b_{i+1}) \in \delta (q_{i}, w_{i+1}, a_{i+1})</math> 对于 i = 0, 1, 2,......, n-1, 
+:这里的 <math>w_{i+1}\in \Sigma_{\epsilon}, \ a_{i+1}, \ b_{i+1}\in \Gamma_{\epsilon}</math>
+
+(ii) <math>\exists\, s_{0},\, s_{1},\,s_{2},\,s_{3},\,\cdots,\,s_{n}\,\in\Gamma^{*}</math> 使得
+:<math>s_{i} = a_{i+1}t_{i},\,s_{i+1} = b_{i+1}t_{i},\, t_{i}\in\Gamma^{*}</math>
+
+在直觉上，PDA 在计算过程中任何一点上都面对着多种可能性，从栈顶读一个符号并把它替代为另一个符号，从栈顶读一个符号并删除它而不替换，不从栈顶读任何符号但压入另一个符号进去，或什么都不做。所有这些都同时由等式 <math>s_{i} = a_{i+1}t_{i} \,</math> 和 <math>s_{i+1} = b_{i+1}t_{i} \,</math> 来支配。<math>s_{i} \,</math> 是紧接在第 i+1 次转移移动之前的栈内容，而 <math>a_{i+1} \,</math> 是要从栈顶去除的符号。<math>s_{i+1} \,</math> 是紧接在第 i+1 次转移移动之后栈内容，而 <math>b_{i+1} \,</math> 是在第 i+1 次转移移动期间要增加到栈上的符号。 
+
+<math>a_{i+1} \,</math> 和 <math>b_{i+1} \,</math> 二者都可以 <math>\epsilon \,</math>。
+
+如果 <math>a_{i+1}\neq\epsilon \,</math> 而 <math>b_{i+1}\neq\epsilon \,</math>，则 PDA 从栈读一个符号并把它替代为另一个符号。
+
+如果 <math>a_{i+1}\neq\epsilon \,</math> 而 <math>b_{i+1} = \epsilon \,</math>，则 PDA 从栈读一个符号并删除它而不替换。
+
+如果 <math>a_{i+1} = \epsilon \,</math> 而 <math>b_{i+1}\neq\epsilon \,</math>，则 PDA 简单的增加一个符号到栈上。
+
+如果 <math>a_{i+1} = \epsilon \,</math> 而 <math>b_{i+1} = \epsilon \,</math>，则 PDA 保持栈不变动。
+
+注意当 n=0 时，计算路径就是单元素集合 <math>(q_0) \,</math>。
+
+'''计算定义 2'''
+
+对于任何输入 <math>w = w_1w_2 \cdots w_m, \  w_i \in \Sigma , m \geq 0</math>，M 接受 w，如果存在计算路径 <math>(q_{0},\, q_{1}, ...., \,q_{n}) \,</math> 和有限序列 <math> r_0, r_1, r_2,\cdots r_m \in Q, \ m \leq n</math>，使得
+
+(i) 对于每个 i = 0, 1, 2,...m，<math>r_i \,</math> 都在计算路径上。就是说
+: <math>\exists f(i) </math> 这里的 <math>i \leq f(i) \leq n </math> 使得 <math>r_i = q_{f(i)} \,</math>
+
+(ii) <math>(q_{f(i)+1}, b_{f(i)+1}) \in \delta(r_i, w_{i+1}, a_{f(i)+1}) </math> 对于每个 i = 0, 1, 2,...m-1。
+:这里的 <math>a_{f(i)+1} \,</math> 和 <math>b_{f(i)+1} \,</math> 定义同于计算定义 1。
+
+(iii) <math>(q_{j+1}, b_{j+1}) \in \delta(q_j, \epsilon, a_{j+1})</math>，如果 <math> q_j \notin \{ r_0, r_1, \cdots r_m \} </math>
+:这里的 <math>a_{j+1} \,</math> 和 <math>b_{j+1} \,</math> 定义同于计算定义 1。
+
+(iv) <math> r_m = q_n \, </math> 且 <math>r_m \in F</math>
+
+注意上述定义不提供测试空栈的机制。要这么做你需要在所有计算开始前在栈上写一个特殊符号，使得 PDA 可以在检测到这个符号的时候有效的识别出栈已经空了。形式的说，实现它可通过介入转移 <math> \delta (q_0, \epsilon,\,\epsilon) = \{(q_1, \$)\} </math>这里的 $ 是特殊符号。
+
+== 例子 ==
+
+下面是识别语言 <math>\{0^n1^n | n \ge 0 \}</math> 的 PDA 的形式描述：
+
+<math>M=(Q,\  \Sigma,\  \Gamma,\  \delta, \ q_{1}, \ F)</math>
+
+*<math>Q = \{ q_1, q_2, q_3, q_4 \} \,</math>
+
+*<math>\Sigma = \{ 0, 1 \} \,</math> 
+
+*<math>\Gamma = \{0, \$ \} \,</math>
+
+*<math> F = \{q_1, q_4 \} \,</math>
+
+*<math>\delta (q_1, \epsilon, \epsilon) = \{ (q_2, \$), (q_1, \epsilon) \} \,</math>
+
+*<math>\delta (q_2, 0, \epsilon) = \{ (q_2, 0) \} \,</math>
+
+*<math>\delta (q_2, 1, 0) = \{ (q_3, \epsilon) \} \,</math>
+
+*<math>\delta (q_3, 1, 0) = \{ (q_3, \epsilon) \} \,</math>
+
+*<math>\delta (q_3, \epsilon, \$) = \{ (q_4, \epsilon) \} \,</math>
+
+*<math>\delta (q, w, a) = \varnothing</math> 对于任何其他状态、输入和栈符号的值。
+
+=== 理解计算过程 ===
+
+下面展示上述 PDA 如何计算不同的输入字符串。
+
+(a) 输入字符串 = 0011
+: (i) 写 <math>\delta</math>(q<sub>1</sub>, <math>\epsilon</math>, <math>\epsilon</math>) <math>\rightarrow</math> (q<sub>2</sub>, $) 来表示 (q<sub>2</sub>, $) <math>\in</math> <math>\delta</math>(q<sub>1</sub>, <math>\epsilon</math>, <math>\epsilon</math>)
+
+:: s<sub>0</sub> = <math>\epsilon</math>, s<sub>1</sub> = $, t = <math>\epsilon</math>, a = <math>\epsilon</math>, b = $
+
+:: 设置 r<sub>0</sub> = q<sub>2</sub>
+
+: (ii) <math>\delta</math>(r<sub>0</sub>, 0, <math>\epsilon</math>) = <math>\delta</math>(q<sub>2</sub>, 0, <math>\epsilon</math>) <math>\rightarrow</math> (q<sub>2</sub>, 0)
+
+:: s<sub>1</sub> = $, a = <math>\epsilon</math>, t = $, b = 0, s<sub>2</sub> = 0$
+
+:: 设置 r<sub>1</sub> = q<sub>2</sub> 
+
+: (iii) <math>\delta</math>(r<sub>1</sub>, 0, <math>\epsilon</math>) = <math>\delta</math>(q<sub>2</sub>, 0, <math>\epsilon</math>) <math>\rightarrow</math> (q<sub>2</sub>, 0)
+
+:: s<sub>2</sub> = 0$, a = <math>\epsilon</math>, t = 0$, b = 0, s<sub>3</sub> = 00$
+
+:: 设置 r<sub>2</sub> = q<sub>2</sub>
+
+: (iv) <math>\delta</math>(r<sub>2</sub>, 1, 0) = <math>\delta</math>(q<sub>2</sub>, 1, 0) <math>\rightarrow</math> (q<sub>3</sub>, <math>\epsilon</math>)
+
+:: s<sub>3</sub> = 00$, a = 0, t = 0$, b = <math>\epsilon</math>, s<sub>4</sub> = 0$
+
+:: 设置 r<sub>3</sub> = q<sub>3</sub>
+
+: (v) <math>\delta</math>(r<sub>3</sub>, 1, 0) = <math>\delta</math>(q<sub>3</sub>, 1, 0) <math>\rightarrow</math> (q<sub>3</sub>, <math>\epsilon</math>)
+
+:: s<sub>4</sub> = 0$, a = 0, t = $, b = <math>\epsilon</math>, s<sub>5</sub> = $
+
+: (vi) <math>\delta</math>(q<sub>3</sub>, <math>\epsilon</math>, $) <math>\rightarrow</math> (q<sub>4</sub>, <math>\epsilon</math>)
+
+:: s<sub>5</sub> = $, a = $, t = <math>\epsilon</math>, b = <math>\epsilon</math>, s<sub>6</sub> = <math>\epsilon</math>
+
+:: 设置 r<sub>4</sub> = q<sub>4</sub>
+
+: 因为 q<sub>4</sub> 是接受状态，0011 被接受。
+
+: 作为总结，计算路径 = (q<sub>1</sub>, q<sub>2</sub>, q<sub>2</sub>, q<sub>2</sub>, q<sub>3</sub>, q<sub>3</sub>, q<sub>4</sub>) 
+
+: 而 (r<sub>0</sub>, r<sub>1</sub>, r<sub>2</sub>, r<sub>3</sub>, r<sub>4</sub>) = (q<sub>2</sub>, q<sub>2</sub>, q<sub>2</sub>, q<sub>3</sub>, q<sub>4</sub>)
+
+(b) 输入字符串 = 001
+
+: 计算移动 (i), (ii), (iii), (iv) 将必定同于情况 (a)，否则，PDA 在到达 (v) 之前就已经进入死胡同。
+
+: (v) <math>\delta</math>(r<sub>3</sub>, <math>\epsilon</math>, a) = <math>\delta</math>(q<sub>3</sub>, <math>\epsilon</math>, a)
+
+:: 因为 s<sub>4</sub> = 0$，要么 a = <math>\epsilon</math> 要么 a = 0
+
+:: 在任何一种情况下，<math>\delta</math>(q<sub>3</sub>, <math>\epsilon</math>, a) = <math>\varnothing</math>
+
+:: 因此计算在 r<sub>3</sub> = q<sub>3</sub> 进入死胡同，这不是接受状态。所以 001 被拒绝。
+
+(c) 输入字符串 = <math>\epsilon</math>
+
+: 设置 r<sub>0</sub> = q<sub>1</sub>, r<sub>1</sub> = q<sub>1</sub>
+
+: <math>\delta</math>(r<sub>0</sub>, <math>\epsilon</math>, <math>\epsilon</math>) <math>\rightarrow</math> (q<sub>1</sub>, <math>\epsilon</math>) 
+
+: 因为 q<sub>1</sub> 是接受状态，<math>\epsilon</math> 被接受。
+
+== 广义下推自动机(GPDA) ==
+
+GPDA 是在一个步骤内写入整个字符串到栈上或从栈上去除整个字符串的 PDA。
+
+GPDA 形式定义为 6-元组 <math>M=(Q,\  \Sigma,\  \Gamma,\  \delta, \ q_{0}, \ F)</math>
+
+:这里的 Q, <math>\Sigma\,</math>, <math>\Gamma\,</math>, q<sub>0</sub> 和 F 的定义同于 PDA。
+
+:<math>\,\delta</math>: <math>Q \times  \Sigma_{\epsilon}  \times \Gamma^{*} \longrightarrow \mathcal{P}( Q \times \Gamma^{*} )</math> 是转移函数。 
+
+GPDA 的计算规则同于 PDA，除了 a<sub>i+1</sub> 和 b<sub>i+1</sub> 现在是字符串而不是符号之外。
+
+GPDA 和 PDA 是等价的，如果一个语言可被一个 PDA 识别，它也可被一个 GPDA 识别，反之亦然。
+
+可以使用下列模拟公式化对 GPDA 和 PDA 的等价性的一个分析式证明：
+
+设 <math>\delta</math>(q<sub>1</sub>, w, x<sub>1</sub>x<sub>2</sub>...x<sub>m</sub>) <math>\longrightarrow</math> (q<sub>2</sub>, y<sub>1</sub>y<sub>2</sub>...y<sub>n</sub>) 是 GPDA 的转移。
+
+这里的 q<sub>1</sub>, q<sub>2</sub> <math>\in</math> Q, w <math>\in\Sigma_{\epsilon}\,</math>, x<sub>1</sub>x<sub>2</sub>...x<sub>m</sub> <math>\in\Gamma^{*}</math>, m<math>\geq</math>0, y<sub>1</sub>y<sub>2</sub>...y<sub>n</sub> <math>\in\Gamma^{*}</math>, n<math>\geq</math>0。
+
+构造 PDA 的下列转移：
+
+::<math>\delta^{'}</math>(q<sub>1</sub>, w, x<sub>1</sub>) <math>\longrightarrow</math> (p<sub>1</sub>, <math>\epsilon</math>)
+
+::<math>\delta^{'}</math>(p<sub>1</sub>, <math>\epsilon</math>, x<sub>2</sub>) <math>\longrightarrow</math> (p<sub>2</sub>, <math>\epsilon</math>)
+
+::::<math>\vdots</math>
+
+::<math>\delta^{'}</math>(p<sub>m-1</sub>, <math>\epsilon</math>, x<sub>m</sub>) <math>\longrightarrow</math> (p<sub>m</sub>, <math>\epsilon</math>)
+
+::<math>\delta^{'}</math>(p<sub>m</sub>, <math>\epsilon</math>, <math>\epsilon</math> ) <math>\longrightarrow</math> (p<sub>m+1</sub>, y<sub>n</sub>)
+
+::<math>\delta^{'}</math>(p<sub>m+1</sub>, <math>\epsilon</math>, <math>\epsilon</math> ) <math>\longrightarrow</math> (p<sub>m+2</sub>, y<sub>n-1</sub>)
+
+::::<math>\vdots</math>
+
+::<math>\delta^{'}</math>(p<sub>m+n-1</sub>, <math>\epsilon</math>, <math>\epsilon</math> ) <math>\longrightarrow</math> (q<sub>2</sub>, y<sub>1</sub>)
+
+== 参见 ==
+*[[确定下推自动机|确定下推自动机]]
+*[[有限状态自动机|有限状态自动机]]
+*[[上下文无关文法|上下文无关文法]]
+
+== 外部链接 ==
+* [https://web.archive.org/web/20071031063603/http://planetmath.org/encyclopedia/PushdownAutomaton.html non-deterministic pushdown automaton,] on Planet Math.
+* [http://www.jflap.org JFLAP]{{Wayback|url=http://www.jflap.org/ |date=20201114003806 }}，simulator for several types of automata including nondeterministic pushdown automata
+
+== 参考书目 ==
+
+* 《自动机理论、语言和计算导引》，John E. Hopcroft，Jeffery D. Ullman，徐美瑞译，洪加威校，科学出版社，1986年
+* {{cite book|author = [[Michael_Sipser|Michael Sipser]] | year = 1997 | title = Introduction to the Theory of Computation |url = https://archive.org/details/introductiontoth00sips | publisher = PWS Publishing | id = ISBN 978-0-534-94728-6}} Section 2.2: Pushdown Automata, pp.101–114.
+
+{{形式语言与形式文法}}
+
+[[Category:编译原理|Category:编译原理]]
+[[Category:自动机|Category:自动机]]

@@ -1,0 +1,66 @@
+'''Cg语言'''（C for Graphics）是为[[GPU|GPU]]编程设计的[[高級著色器語言|高級著色器語言]]，由[[NVIDIA|NVIDIA]]公司开发。Cg极力保留[[C语言|C语言]]的大部分语义，并让开发者从硬件细节中解脱出来，Cg同时也有一个高级语言的其他好处，如代码的易重用性，可读性得到提高，编译器代码优化。
+
+Cg语言主要参照[[ANSI_C|ANSI C]]建模，但也从[[C++|C++]]和[[Java|Java]]以及早期的绘制语言如RenderMan and the Stanford shading language中吸取了一些思想。这些使得很容易写程序然后由编译器进行优化，提高了可读性。而且Cg的设计考虑了GPU的体系结构，如可编程多处理器单元（顶点处理器，像素处理器，外加不可编程单元）。这些部分和应用都是通过数据流连接起来。Cg语言允许分别为[[頂點_(電腦圖學)|顶点]]和像素写程序。Cg API引入了profiles的概念以处理顶点和像素编程所缺乏的通用性。一个Cg profile就定义了一套整个Cg语言的子集以适应不同的硬件平台和API。Cg程序可以根据运行时的需要或者事先编译成GPU汇编代码。这样可以很容易地将一个Cg像素程序和手写的顶点程序结合起来，或者甚至采用不可编程的OpenGL或者DirectX顶点流水线，反之亦然。
+
+由于Nvidia和微软合作紧密，Cg语言和[[HLSL|HLSL]]的共通之处很多。<ref>{{cite web|url=http://www.fusionindustries.com/default.asp?page=cg-hlsl-faq|archive-url=https://web.archive.org/web/20120824051248/http://www.fusionindustries.com/default.asp?page=cg-hlsl-faq|archive-date=2012-08-24|title=Fusion Industries :: Cg and HLSL FAQ ::|date=2012-08-24|publisher=|accessdate=2020-04-25|dead-url=yes}}</ref>在早期的官方文档里，这两者被解释成贴了两个牌的同一门语言。<ref>{{cite web |title=The Cg Tutorial - Chapter 1. Introduction |url=https://developer.download.nvidia.cn/CgTutorial/cg_tutorial_chapter01.html |website=developer.download.nvidia.cn |access-date=2020-04-25 |archive-date=2022-04-15 |archive-url=https://web.archive.org/web/20220415154027/https://developer.download.nvidia.cn/CgTutorial/cg_tutorial_chapter01.html }}</ref>
+== 細節 ==
+=== 資料型別 ===
+Cg有6種数据型別（data types），跟C語言相當類似，有一些是為GPU特別定義的，型別如下：
+* float - 32位元浮點數
+* half - 16位元浮點數
+* int - 32位元整數
+* fixed - 12位元定點數
+* bool - 布尔值
+* sampler* - 代表紋理物件（texture object）
+
+== 範例 ==
+*A sample Cg vertex shader
+<syntaxhighlight lang=c>
+ // input vertex
+ struct VertIn {
+     float4 pos   : POSITION;
+     float4 color : COLOR0;
+ };
+ 
+ // output vertex
+ struct VertOut {
+     float4 pos   : POSITION;
+     float4 color : COLOR0;
+ };
+ 
+ // vertex shader main entry
+ VertOut main(VertIn IN, uniform float4x4 modelViewProj) {
+     VertOut OUT;
+     OUT.pos     = mul(modelViewProj, IN.pos); // calculate output coords
+     OUT.color   = IN.color; // copy input color to output
+     OUT.color.z = 1.0f; // blue component of color = 1.0f
+     return OUT;
+ }
+</syntaxhighlight>
+
+== 參照 ==
+* [[程序设计语言|程序设计语言]]
+* [[计算机图形学|计算机图形学]]
+* [[Vertex_shader|Vertex and pixel shaders]]
+* [[HLSL|High level shader language]]
+* [[GLSL|OpenGL shading language]]
+* [[Shader_Model|Shader Model]]
+* [[OpenGL|OpenGL]]
+* [[DirectX|DirectX]]
+
+== 外部連結 ==
+* [http://www.nvidia.com/ NVIDIA]{{Wayback|url=http://www.nvidia.com/ |date=20130703204126 }}
+** [http://developer.nvidia.com/page/cg_main.html Cg home page]{{Wayback|url=http://developer.nvidia.com/page/cg_main.html |date=20070224123725 }}
+* [http://www.opengl.org OpenGL home page]{{Wayback|url=http://www.opengl.org/ |date=20110226000710 }}
+* [http://www.microsoft.com/windows/directx/default.aspx DirectX home page]{{Wayback|url=http://www.microsoft.com/windows/directx/default.aspx |date=20060306103740 }}
+* [https://web.archive.org/web/20070306123610/http://www.shadertech.com/ ShaderTech - GPU Programming]
+* [https://web.archive.org/web/20081219131420/http://nehe.gamedev.net/data/lessons/lesson.asp?lesson=47 NeHe Cg vertex shader tutorial]
+* [http://www.farcry-thegame.com/ Far Cry]{{Wayback|url=http://www.farcry-thegame.com/ |date=20070306010010 }}
+* [https://web.archive.org/web/20061026204236/http://www.deathfall.com/feature.php?op=showcontent&id=12 A glimpse at Cg Shader Toolkit]
+* [http://www.virtools.com Virtools]{{Wayback|url=http://www.virtools.com/ |date=20141218142938 }}
+
+{{NVIDIA}}
+{{程序设计语言|Cg}}
+
+[[Category:C語言家族|Category:C語言家族]]
+[[Category:著色器語言|Category:著色器語言]]

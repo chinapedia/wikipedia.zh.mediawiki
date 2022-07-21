@@ -1,0 +1,51 @@
+{{noteTA
+|G1=Electronics
+|G2=IT
+|G3=Communication
+}}
+
+{{不是|三值逻辑}}
+
+[[File:Tristate_buffer.svg|thumb]]
+
+在[[数字电路|数字电路]]中，'''三态逻辑'''（{{lang-en|'''Three-state logic'''}}）允许输出端在0和1两种逻辑电平之外呈现[[高阻态|高阻态]]，等效于将输出的影响从后级电路中移除。这允许多个电路共同使用同一个输出线（例如[[总线|总线]]）。
+
+{| class="wikitable" align=right style=text-align:center
+|colspan=2| 输入 || 输出
+|-
+| A || B || C
+|-
+| 0 ||rowspan=2| 1 || 0
+|-
+| 1 || 1
+|-
+| X || 0 || Z
+|}
+
+三态输出在[[寄存器|寄存器]]、[[总线|总线]]以及[[7400系列|7400系列]]、{{link-en|4000系列|4000 series}}等各型号的邏輯IC发挥着重要的作用，并常常内置在其他各种[[集成电路|集成电路]]。除此之外，三态逻辑的典型应用还包括[[微处理器|微处理器]]、[[存储设备|存储设备]]、外设的内部和外部总线。许多设备提供一个{{overline|OE}}（{{lang|en|Output Enable}}）用于在低电平时才令輸出使能，而在不使能时保持高阻态。
+
+不过，三态逻辑（{{lang|en|tri-state}}）<ref>''Tri-state''是[[美国国家半导体|美国国家半导体]]的注册商标，不过也经常用来描述任意制造商生产的这类产品。</ref>这个术语不应该同[[三值逻辑|三值逻辑]]混淆。
+
+== 应用 ==
+
+三态逻辑缓冲器还可以被用在[[数据选择器|数据选择器]]中，尤其是那些具有大量输入的情况。<ref>{{cite book |title=The Art of Electronics |author=Winfield Hill and Paul Horowitz |publisher=Cambridge University Press |year=1989 |isbn=0-521-37095-7 |url=http://books.google.com/books?id=bkOMDgwFA28C |pages=495–497 |access-date=2011-12-01 |archive-date=2011-08-05 |archive-url=https://web.archive.org/web/20110805111816/http://books.google.com/books?id=bkOMDgwFA28C |dead-url=no }}</ref>另外，三态逻辑对于总线的工作十分关键。
+三态逻辑能够减少用于驱动一系列[[发光二极管|发光二极管]]所用的导线数量。
+
+== 输出选择和芯片选择 ==
+许多设计为连接总线的存储设备（例如 [[随机存取存储器|RAM]] 和 [[只读存储器|ROM]]）同时具有{{overline|CS}}（芯片选择，{{lang|en|'''c'''hip '''s'''elect}}）和{{overline|OE}}（输出使能，{{lang|en|'''o'''utput '''e'''nable}}）引脚，它们起到的作用即产生三态逻辑。如果{{overline|CS}}未与一个低电平连接，那么将输出高阻态。
+
+不同之处在于输出信号所需的时间。当芯片选择未被使能({{overline|CS}}連接高电平<ref>但如果不是{{overline|CS}}而是CS，則連接高电平才是使能</ref>)时，芯片内部根本不工作，并且在提供地址和接收数据之间有显著的时间延迟。当然，这样的优点是在此情况中，芯片所消耗的功率最少。
+
+当芯片选择连接到一个低电平，那么芯片内部将会进行预设的工作流程，只是因为输出使能引脚未连接低电平，最后并未输出对应的信号。当总线正在进行其他工作的时候，这种特性将会起到作用，而当最后输出使能连接到低电平之后，数据才会以最小延迟的状态输出。具有这样的输出使能引脚的 ROM 或者 [[静态随机存取存储器|SRAM]] 通常具有两个存取时序：一个是芯片被选择以及地址有效，另一个是输出被使能。
+
+== 上拉电阻和下拉电阻 ==
+{{main|上拉电阻}}
+当一節點所有相連的输出都处于第三状态（高阻态），它们对于电路其余部门的影响就被消除了。如果没有别的电路元素来决定其具体的状态（高或者低），那么其对应的电路节点会处于一种类似“浮动”的状态。电路设计人员经常使用[[上拉电阻|上拉电阻]]以及下拉电阻（通常为1至100 kΩ）讓這個處於三态的節點能有確定的預設逻辑狀態，防止狀態不定或感染雜訊。例如，[[I²C|I²C]]总线协议（一种常用的设备间双向通信的协议）在两条通信线上使用了上拉电阻。当设备处于非激活状态，它们“释放”掉通信线并使它们的输出端呈现高阻态，这样使它们的高低电平不影响其他电路。当总线上所有的设备都“释放”掉通信线时，对输出目标电路的唯一影响就是上拉电阻将输出端的电平拉高。当一个设备需要通信时，这个输出端脱离高阻态，并使得通信线的输出端电平降低。这时，通信的设备利用此协议将通信的内容呈现在输出端上——这样将避免总线上一个设备驱动高电平而另一个设备驱动低电平的冲突。
+
+[[PCI|PCI]]总线也提供了上拉电阻，但是它们要求在数个时钟周期内将输出信号拉高，为了使得高速工作成为可能，其对应的工作协议要求每一个连接到总线上的设备在至少一个时钟周期的时间里输出控制信号，然后才进入高阻态。这样，上拉电阻的作用只是在面对[[串扰|串扰]]的情况下，维持总线的信号。<ref>[http://vswww.kaist.ac.kr/ENGLISH/old_lecture/ee878-2002/lecture/SoC_22-OCNetwork-1113.pdf "On-Chip Buses/Networks for SoC"] {{Wayback|url=http://vswww.kaist.ac.kr/ENGLISH/old_lecture/ee878-2002/lecture/SoC_22-OCNetwork-1113.pdf |date=20120211184734 }} "On-Chip Buses [have] No use of tri-state signals [because] Tri-state bus is difficult for static timing analysis"</ref>
+
+== 参考文献 ==
+{{reflist}}
+
+[[Category:数字电子|Category:数字电子]]
+[[Category:三進位電腦|Category:三進位電腦]]

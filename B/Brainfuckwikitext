@@ -1,0 +1,179 @@
+{{NoteTA
+|G1 = IT
+}}
+'''Brainfuck'''，是一种极小化的[[程序语言|程序语言]]，它是由[[Urban_Müller|Urban Müller]]在1993年创造的。由於[[fuck|fuck]]在[[英語|英語]]中是[[髒話|髒話]]，这种语言有时被称为'''Brainf*ck'''或'''Brainf***'''，或被简称为'''BF'''。
+
+== 概述 ==
+Müller的目标是建立一种简单的、可以用最小的[[编译器|编译器]]来实现的、符合[[图灵完全|图灵完全]]思想的编程语言。这种语言由八种[[运算符|运算符]]构成，为[[Amiga|Amiga]]机器编写的编译器（第二版）只有240个[[字节|字节]]大小。<ref>{{cite web |url=http://www.aminet.net/package.php?package=dev/lang/brainfuck-2.lha |archive-url=https://web.archive.org/web/20051106213924/http://www.aminet.net/package.php?package=dev%2Flang%2Fbrainfuck-2.lha |dead-url=yes |archive-date=2005-11-06 |title=dev/lang/brainfuck-2.lha |publisher=Aminet |date= |accessdate=2013-10-30 }}</ref>
+
+就像它的名字所暗示的，Brainfuck[[计算机程序|程序]]很难读懂。尽管如此，Brainfuck[[图灵机|图灵机]]一样可以完成任何计算任务。虽然Brainfuck的计算方式如此与众不同，但它确实能够正确运行。
+
+这种语言基于一个简单的机器模型，除了指令，这个机器还包括：一个以字节为单位、被初始化为零的[[数组|数组]]、一个指向该数组的[[指针|指针]]（初始时指向数组的第一个字节）、以及用于输入输出的两个[[字节流|字节流]]。
+
+下面是这八种状态的描述，其中每个状态由一个[[字符|字符]]标识：
+
+{| class="wikitable" border="1"
+|-
+! 字符
+! 含义
+|-
+| align="center" | <code>></code> || 指针加一
+|-
+| align="center" | <code><</code> || 指针减一
+|-
+| align="center" | <code>+</code> || 指针指向的字节的值加一
+|-
+| align="center" | <code>-</code> || 指针指向的字节的值减一
+|-
+| align="center" | <code>.</code> || 输出指针指向的单元内容（[[ASCII码|ASCII码]]）
+|-
+| align="center" | <code>,</code> || 输入内容到指针指向的单元（ASCII码）
+|-
+| align="center" | <code>[</code>
+| 如果指针指向的单元值为零，向后跳转到对应的<code>]</code>指令的次一指令处
+|-
+| align="center" | <code>]</code>
+| 如果指针指向的单元值不为零，向前跳转到对应的<code>[</code>指令的次一指令处
+|}
+
+按照更节省时间的简单说法，<code>]</code>也可以说成“向前跳转到对应的<code>[</code>状态”。这两解释是一样的。
+
+第三种同价的说法，<code>[</code>意思是“向後跳转到对应的<code>]</code>”，<code>]</code>意思是“向前跳转到对应的<code>[</code>指令的次一指令处，如果指针指向的字节非零。”
+
+Brainfuck程序可以用下面的替换方法翻译成[[C语言|C语言]]（假设<code>ptr</code>是<code>char *</code>[[資料類型|类型]]）：
+
+{| class="wikitable" border="1"
+|-
+! Brainfuck
+! C
+|-
+| align="center" | <code>></code> || <code>++ptr;</code>
+|-
+| align="center" | <code><</code> || <code>--ptr;</code>
+|-
+| align="center" | <code>+</code>
+| <code>++*ptr;</code>
+|-
+| align="center" | <code>-</code>
+| <code>--*ptr;</code>
+|-
+| align="center" | <code>.</code>
+| <code>putchar(*ptr);</code>
+|-
+| align="center" | <code>,</code>
+| <code>*ptr = getchar();</code>
+|-
+| align="center" | <code>[</code>
+| <code>while (*ptr) {</code>
+|-
+| align="center" | <code>]</code>
+| <code>}</code>
+|}
+
+== 例子 ==
+
+=== Hello World! ===
+
+一个在屏幕上打印[[Hello_World!|Hello World!]]的程序：
+<syntaxhighlight lang="bf">
+++++++++++[>+++++++>++++++++++>+++>+<<<<-]
+>++.>+.+++++++..+++.>++.<<+++++++++++++++.
+>.+++.------.--------.>+.>.
+</syntaxhighlight>
+
+=== 目前位置归零 ===
+<syntaxhighlight lang="bf">
+[-]
+</syntaxhighlight>
+
+=== 字符[[I/O|I/O]] ===
+<syntaxhighlight lang="bf">
+,.
+</syntaxhighlight>
+从键盘读取一个字符并输出到屏幕上。
+
+=== 简单的循环 ===
+<syntaxhighlight lang="bf">
+,[.,]
+</syntaxhighlight>
+这是一个连续从键盘读取字符并回显到屏幕上的[[程式迴圈|循环]]。注意，这里假定0表示输入结束，事实上有些系统并非如此。以-1和“未改变”作为判断依据的程序代码分别是<syntaxhighlight lang="bf" inline>,+[-.,+]</syntaxhighlight>和<syntaxhighlight lang="bf" inline>,[->+>-<<]>[-<+>]>[[-]<<.[->>+<<],[->+>-<<]>[-<+>]>]</syntaxhighlight>。
+
+=== 指针维护 ===
+<syntaxhighlight lang="bf">
+>,[.>,]
+</syntaxhighlight>
+通过移动指针保存所有的输入，供后面的程序使用。
+
+=== 加法 ===
+<syntaxhighlight lang="bf">
+[->+<]
+</syntaxhighlight>
+把当前位置的值加到后面的单元中（破坏性的加，它导致左边的单元被归零）。
+
+=== 条件指令 ===
+<syntaxhighlight lang="bf">
+,----------[----------------------.,----------]
+</syntaxhighlight>
+这个程序会把从键盘读来的小写字符转换成大写。按回车键退出程序。
+
+首先，我们通过<code>,</code>读入第一个字符并把它减10（10 在大多数情况下为换行符 LF 的值）。如果用户按的是回车键，循环命令（<code>[</code>）就会直接跳转到程序的结尾：因为这时第一个字节已经被减到了零。如果输入的字符不是换行符（假设它是一个小写字符），程序进入循环。在这里我们再减去剩下的22，这样总共减掉32：这是ASCII码中小写字符和大写字符的差值。
+
+下面我们把它输出到屏幕。然后接收下一个输入字符，并减去10。如果它是换行符，退出循环；否则，再回到循环的开始，减去22并输出……当循环退出时，因为后面已经没有其他的指令，程序也随之终止。
+
+=== 加法器 add(summand, addend, *sum) ===
+<syntaxhighlight lang="brainfuck">
+>>[-]>[-]<<<        // clear cell #2 and #3
+[->>+>+<<<]         // transfer cell #0 to #2 and #3
+>
+    >>[-<<<+>>>]<<  // transfer cell #3 to #0
+    [->+>+<<]       // transfer cell #1 to #2 and #3
+    >>[-<<+>>]<<    // transfer cell #3 to #1
+<
+</syntaxhighlight>该代码以 cell #3 作为临时变量，将保存在 cell #0 和 cell #1 中的两个整数相加，
+结果保存在 cell #2；同时维持原来的两个存储单元数值不变，方便以后使用。
+
+代码运行前，设定指针指向 cell #0，
+
+第一步，先将 cell #2 和 cell #3 清空，确保不会有多余的数据影响运算结果；
+
+第二步，将 cell #0 的数值转移到 cell #2 和 cell #3，随后利用 cell #3 这个来恢复 cell #0 的值；
+
+第三步，将 cell #1 的数值转移到 cell #2 和 cell #3，随后利用 cell #3 这个来恢复 cell #1 的值；
+
+最后，指针归位（回到初始位置，即指向 cell #0），方便后续运算。
+
+=== 乘法器 multiply(multiplicand, multiplier, *product) ===
+<syntaxhighlight lang="brainfuck">
+>>[-]>[-]>[-]<<<<       // clear cell #2 and #3 and #4
+[->                     // reduce cell #0 by 1
+    [->+>+<<]           // add cell #1 to #2 and #3
+    >>
+        [-<<+>>]        // move cell #3 back to #1
+        >+<             // increase cell #4 by 1, so that cell #4 will equal to original cell #0 value when the outer loop ends
+    <<
+<]
+>>>>[-<<<<+>>>>]<<<<    // move cell #4 back to #0
+</syntaxhighlight>跟上面的“加法器”类似，这个“乘法器”将保存在 cell #0 和 cell #1 的两个整数相乘，结果保存在 cell #2；同时维持原来的两个存储单元数值不变，方便以后使用。
+
+更多代码解析请参见 https://github.com/moky/BrainFuck {{Wayback|url=https://github.com/moky/BrainFuck |date=20180617135009 }}
+
+==注释==
+*注意，这里[[数组|数组]]的每个单元都是一个字节大小；<code>-</code>命令允许[[算術溢出|溢出]]，它可以用255个<code>+</code>命令来代替。同样，如果数组单元是有限、[[環形緩衝區|循环的]]，<code><</code>可以用29999个<code>></code>命令代替。每个修改动作都可以被分解为最多7条指令。可是，两个连在一起的修改动作将会破坏“图灵完全”，因为这会把可能的内存状态限制到有限个数。（更确切的说，从这个角度看，现代的计算机依然不是完全意义上的“[[图灵完全|图灵完全]]”）
+
+==参考资料==
+{{Reflist}}
+
+==外部链接==
+* [http://www.muppetlabs.com/~breadbox/bf/ Brian Raiter, Muppetlabs. '''Brainfuck：八条指令的图灵完全编程语言''']{{Wayback|url=http://www.muppetlabs.com/~breadbox/bf/ |date=20070930053059 }}。这个网站包括一个Brainfuck程序[[自產生程式|quine]]。
+* [https://web.archive.org/web/20031206060451/http://esoteric.sange.fi/brainfuck/ Panu Kalliokoski. '''Brainfuck档案''']有许多Brainfuck实现、程序和quine。
+* [https://web.archive.org/web/20030207172452/http://www.catseye.mb.ca/esoteric/bf/ Cat's Eye Technologies. '''Brainfuck''']
+* [http://home.planet.nl/~faase009/Ha_bf_Turing.html Frans Faase. '''BF is Turing Complete''']{{Wayback|url=http://home.planet.nl/~faase009/Ha_bf_Turing.html |date=20040302032800 }}
+* [https://web.archive.org/web/20050303201936/http://home.arcor.de/partusch/html_en/bfd.html '''Brainfucked''' - Brainfuck Compiler]
+* [https://github.com/moky/BrainFuck BrainFuck Codes - moky]{{Wayback|url=https://github.com/moky/BrainFuck |date=20180617135009 }}
+* [https://esolangs.org/wiki/Brainfuck Brainfuck - Esolang]{{Wayback|url=https://esolangs.org/wiki/Brainfuck |date=20181023084337 }}
+
+{{-}}
+{{程序设计语言|Brainfuck}}
+
+[[Category:深奥的编程语言|Category:深奥的编程语言]]
+[[Category:1993年建立的程式語言|Category:1993年建立的程式語言]]

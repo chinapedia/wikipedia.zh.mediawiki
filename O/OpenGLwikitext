@@ -1,0 +1,241 @@
+{{NoteTA|G1 = IT}}
+{{distinguish|OpenCL}}
+{{Infobox Software
+| name = OpenGL
+| logo = [[File:Opengl-logo.svg|250px]]
+| author = [[矽谷圖形公司|矽谷圖形公司（SGI）]]
+| developer = [[Khronos_Group|Khronos Group]]
+| released = {{start date and age|1992|06|30}}
+| latest release version = 4.6
+| latest release date = {{start date and age|2017|07|31}}
+| programming_language = [[C语言|C]]
+| operating_system = [[跨平台|跨平台]]
+| genre = [[應用程序接口|API]]
+| license = 多種<ref name="OpenGL® Licensing and Logos">{{cite web | author =  | title = OpenGL® Licensing and Logos | publisher = Silicon Graphics International Corp | date =  | accessdate = 2013-12-15 | language = en | url = http://www.sgi.com/products/software/opengl/license.html | archive-url = https://web.archive.org/web/20121101073722/http://www.sgi.com/products/software/opengl/license.html | archive-date = 2012-11-01 | dead-url = yes }}</ref>
+| website = https://www.opengl.org/
+}}
+'''OpenGL'''（{{lang-en|''Open Graphics Library''}}，譯名：'''開放圖形庫'''或者“開放式圖形庫”）是用於[[渲染|渲染]][[二維計算機圖形|2D]]、[[三維計算機圖形|3D]][[矢量圖形|矢量圖形]]的跨[[程式語言|語言]]、[[跨平台|跨平台]]的[[應用程序編程接口|應用程序編程接口]]（API）。這個接口由近350個不同的函數调用組成，用來從簡單的圖形位元繪製複雜的三維景象。而另一种程式介面系统是仅用于[[Microsoft_Windows|Microsoft Windows]]上的[[Direct3D|Direct3D]]。OpenGL常用於[[CAD|CAD]]、[[虛擬實境|虛擬實境]]、科學視覺化程式和[[電子遊戲開發|電子遊戲開發]]。
+
+OpenGL的高效實現（利用图形加速硬件）存在于[[Microsoft_Windows|Windows]]，部分[[UNIX|UNIX]]平台和[[Mac_OS|Mac OS]]。這些實現一般由顯示裝置廠商提供，而且非常依賴於該廠商提供的硬體。[[開放原始碼|開放原始碼]]函式庫[[Mesa_library|Mesa]]是一個純基於軟體的圖形API，它的代码兼容於OpenGL。但是，由于许可证的原因，它只声称是一个“非常相似”的API。
+
+OpenGL规范由1992年成立的OpenGL架构评审委员会（ARB）维护。ARB由一些對建立一个统一的、普遍可用的API特别感兴趣的公司组成。根据OpenGL官方网站，2002年6月的ARB投票成员包括[[3Dlabs|3Dlabs]]、[[蘋果公司|Apple Computer]]、[[ATI技術公司|ATI Technologies]]、[[戴尔|Dell Computer]]、{{le|Evans & Sutherland}}、[[Hewlett-Packard|Hewlett-Packard]]、[[International_Business_Machines|IBM]]、[[Intel|Intel]]、[[Matrox|Matrox]]、[[NVIDIA|NVIDIA]]、[[Silicon_Graphics|SGI]]和[[Sun_Microsystems|Sun Microsystems]]，[[Microsoft|Microsoft]]曾是创立成员之一，但已于2003年3月-{退出}-。
+
+== 設計 ==
+[[File:Pipeline_OpenGL.svg|thumb]]
+
+OpenGL規範描述了繪製2D和3D圖形的抽象[[API|API]]。儘管這些API可以完全通過軟體實現，但它是為大部分或者全部使用[[硬體加速|硬體加速]]而設計的。
+
+OpenGL的API定義了若干可被客戶端程序調用的[[函數|函數]]，以及一些具名[[整型|整型]][[常數|常數]]（例如，常數GL_TEXTURE_2D對應的[[十進制|十進制]]整數為3553）。雖然這些函數的定義表面上類似於[[C編程語言|C編程語言]]，但它們是語言獨立的。因此，OpenGL有許多語言綁定，值得一提的包括：[[JavaScript|JavaScript]]綁定的[[WebGL|WebGL]]（基於OpenGL ES 2.0在Web[[瀏覽器|瀏覽器]]中的進行3D渲染的API）；C綁定的WGL、GLX和CGL；[[iOS|iOS]]提供的C綁定；[[Android|Android]]提供的[[Java|Java]]和C綁定。
+
+OpenGL不僅語言無關，而且平台無關。規範隻字未提獲得和管理OpenGL上下文相關的內容，而是將這些作為細節交給底層的[[窗口系統|窗口系統]]。出於同樣的原因，OpenGL純粹專注于渲染，而不提供輸入、音頻以及窗口相關的API。
+
+OpenGL是一個不斷進化的API。新版OpenGL規範會定期由Khronos Group發布，新版本通過擴展API來支持各種新功能。每個版本的細節由Khronos Group的成員一致決定，包括[[顯卡|顯卡]]廠商、[[作業系統|作業系統]]設計人員以及類似[[Mozilla|Mozilla]]和[[谷歌|谷歌]]的一般性[[科技公司|科技公司]]。
+
+除了核心API要求的功能之外，[[GPU|GPU]][[供應商|供應商]]可以通過擴展的形式提供額外功能。擴展可能會引入新功能和新常數，並且可能放鬆或取消現有的OpenGL函數的限制。然后一个扩展就分成两部分发布：包含扩展函数原型的头文件和作为厂商的[[设备驱动|设备驱动]]。供應商使用擴展公開自定義的API而無需獲得其他供應商或Khronos Group的支持，這大大增加了OpenGL的靈活性。OpenGL Registry負責所有擴展的收集和定義。
+
+每個擴展都與一個簡短的標識符關聯，該標識符基於開發公司的名稱。例如，[[英偉達|英偉達]]（NVIDIA）的標識符是'''NV'''。如果多個供應商同意使用相同的API來實現相同的功能，那麼就用EXT標誌符。這種情況更進一步，Khronos Group的架構評審委員（Architecture Review Board，ARB）正式批准該擴展，那麼這就被稱為一個“標準擴展”，標識符使用ARB。第一個ARB擴展是GL_ARB_multitexture。
+
+OpenGL每個新版本中引入的功能，特別是ARB和EXT類型的擴展，通常由數個被廣泛實現的擴展功能組合而成。
+
+== 文檔 ==
+OpenGL普及的部分原因是其高質量的官方文件。OpenGL架構評審委員會隨規範一同發布一系列包含API變化更新的手冊。這些手冊因其封面顏色而眾所周知。
+* 紅寶書
+Dave Shreiner, Graham Sellers, John M. Kessenich and Bill M. Licea-Kane. 2013. '''OpenGL Programming Guide: The Official Guide to Learning OpenGL, Version 4.3（8th Edition）'''. Addison-Wesley Professional. ISBN 978-0321773036.
+* 橙寶書
+Randi J. Rost, Bill M. Licea-Kane, Dan Ginsburg, John M. Kessenich, Barthold Lichtenbelt, Hugh Malan and Mike Weiblen. 2009. '''OpenGL Shading Language (3rd Edition)'''.
+Addison-Wesley Professional. ISBN 978-0321637635
+
+== 相關程序庫 ==
+
+早期的 OpenGL 版本会一同发布配套的 [[GLU|GLU]] 库，提供一些同时代硬件尚不支持的简单功能。GLU 最后一次更新规格要求是在 1998 年，对[[已弃用|已弃用]]的 OpenGL 特性有依赖。
+
+还有几个库也建立在OpenGL之上，提供了OpenGL本身没有的功能：
+* [[GLFW|GLFW]]
+* [[GLUT|GLUT]]
+* {{Tsl|en|GLEW}}、{{Tsl|en|GLEE}}
+
+特别是，{{Tsl|en|OpenGL Performer}}库——由SGI开发并可以在[[IRIX|IRIX]]、[[Linux|Linux]]和[[Microsoft_Windows|Microsoft Windows]]的一些版本上使用，构建于OpenGL，可以建立[[实时计算|实时]]可视化仿真程序。
+
+当开发者需要使用最新的OpenGL扩展时，他们往往需要使用{{Tsl|en|GLEW}}庫或者是{{Tsl|en|GLEE}}库提供的功能，可以在程序的运行期判断当前硬件是否支持相关的扩展，防止程序崩溃甚至造成硬件损坏。這類庫利用[[動態加載|動態加載]]技術（dlsym、GetProcAddress等函數）搜尋各種擴展的信息。
+
+=== 上下文与窗口套件 ===
+
+OpenGL 上下文（{{lang-en|OpenGL context}}）的创建过程相当复杂，在不同的[[操作系统|操作系统]]上也需要不同的做法。因此很多游戏开发和用户界面库都提供自动创建 OpenGL 上下文的功能，其中包括 [[SDL|SDL]]、[[Allegro|Allegro]]、{{Tsl|en|SFML}}、[[FLTK|FLTK]]、[[Qt|Qt]] 等。也有一些库是专门用来创建OpenGL窗口的，其中最早的便是 [[GLUT|GLUT]]，后被[[freeglut|freeglut]]取代，比较新的也有 [[GLFW|GLFW]] 可以使用。<ref>{{cite web |url=https://www.opengl.org/resources/libraries/windowtoolkits/ |title=GLUT-like Windowing toolkits |publisher=Khronos Group |date= |accessdate=2018-07-19 |language=en |archive-date=2018-07-19 |archive-url=https://web.archive.org/web/20180719054257/https://www.opengl.org/resources/libraries/windowtoolkits/ |dead-url=no }}</ref>
+
+* 以下套件可以用来创建并管理 OpenGL 窗口，也可以管理输入，但几乎没有除此以外的其它功能：
+** [[GLFW|GLFW]]——跨平台窗口和键盘、鼠标、手柄处理；偏向游戏
+** [[freeglut|freeglut]]——跨平台窗口和键盘、鼠标处理；API 是 GLUT API 的超集，同时也比 GLUT 更新、更稳定
+** [[GLUT|GLUT]]——早期的窗口处理库，已不再维护
+* 支持创建 OpenGL 窗口的还有一些「多媒体库」，同时还支持输入、声音等类似游戏的程序所需要的功能：
+** [[Allegro|Allegro 5]]——跨平台多媒体库，提供针对游戏开发的 C API
+** [[SDL|SDL]]——跨平台多媒体库，提供 C API
+** {{Tsl|en|SFML}}——跨平台多媒体库，提供 C++ API；同时也提供 C#、Java、Haskell、Go 等语言的绑定
+* 窗口套件
+** [[FLTK|FLTK]]——小型的跨平台 C++ 窗口组件库
+** [[Qt|Qt]]——跨平台 C++ 窗口组件库，提供许多OpenGL辅助对象
+** [[wxWidgets|wxWidgets]]——跨平台 C++ 窗口组件库
+
+== 歷史 ==
+1980年代，開發可以用在各種各樣圖形硬件上的軟件是個真正的挑戰。通常，軟件開發人員為每種硬件編寫自定義的接口和驅動程序。但這非常昂貴并會導致大量工作的重複。
+
+20世紀90年代初，[[SGI|SGI]]成為[[工作站|工作站]]3D圖形領域的領導者。其[[IRIS|IRIS]] GL的API被認為是最先進的科技並成為事實上的行業標準，而基於開放標準的[[PHIGS|PHIGS]]則相形見絀。IRIS GL更容易使用，而且還支持即時模式的[[渲染|渲染]]。相比之下，PHIGS難於使用並且功能老舊。
+
+SGI的競爭對手（包括[[Sun|Sun]]、[[惠普|惠普]]和[[IBM|IBM]]）通過擴展PHIGS標準也能將3D硬件投入[[市場|市場]]。這反過來導致SGI市場份額的削弱，因為有越來越多的3D圖形硬件供應商進入市場。爲攻佔市場，SGI決定把IRIS GL API轉變為一項開放標準，即OpenGL。
+
+然而，SGI擁有大量的軟件客戶，對他們來說從IRIS GL遷移到OpenGL將需要巨額投資。此外，IRIS GL的應用程序接口擁有與3D圖形不相關的函數。例如，它包括窗口、鍵盤和鼠標的API，部分原因是由於它是在[[X_Window|X Window]]系統和Sun公司的NeWS系統之前開發的。而且，IRIS GL庫由於授權和[[專利|專利]]問題并不適合開放。上述種種因素要求SGI繼續支持先進和專有的IRIS Inventor和IRIS Performer應用程序接口。
+
+IRIS GL的限制之一是只能訪問由底層硬件支持的功能。如果圖形硬件不支持一項功能，那麼該應用程序將不能使用它。OpenGL通過為硬件不具備的功能提供軟件支持克服此問題，這就允許應用程序在相對較弱的系統中使用先進的圖形技術。OpenGL標準化訪問硬件的方式：硬件接口程序的開發（有時也稱為設備驅動程序）交由硬件製造商，而窗口功能委託給底層作業系統。讓大量不同種類的圖形硬件講同一種語言影響深遠，它為軟件開發者進行3D軟件發展提供更高層次的平台。
+
+1992年，SGI公司領導OpenGL架構審查委員會（OpenGL ARB）的創建。該委員會由若干公司組成，負責未來OpenGL規範的維護和擴充。
+
+[[微軟|微軟]]在1995年發布[[Direct3D|Direct3D]]，Direct 3D最終成為OpenGL的主要競爭對手。1997年12月17日，微軟和SGI發起[[華氏溫標項目|華氏溫標項目]]，旨在統一OpenGL和Direct3D的接口。1998年，惠普加入。後來，由於SGI的財政限制、微軟的戰略以及缺乏行業普遍支持，項目1999年遭棄。
+
+2006年7月，OpenGL架構評審委員會投票決定將OpenGL API標準的控制權交給Khronos Group。
+
+== 高级功能 ==
+OpenGL被設計為只有輸出的，所以它只提供[[計算機渲染|渲染]]功能。核心[[API|API]]没有-{zh-cn:[[窗口系统|窗口系统]]; zh-tw:[[視窗系統|視窗系統]]}-、音频、[[数字打印|打印]]、键盘／鼠标或其他[[输入设备|输入设备]]的概念。雖然这一开始看起来像是一种限制，但它允许进行[[计算机渲染|渲染]]的代码完全独立于他运行的[[操作系统|操作系统]]，允許跨平台開發。然而，有些整合于原生-{zh-cn:窗口系统; zh-tw:視窗系統}-的东西需要允许和宿主系统交互。这通过下列附加API實現：
+* [[GLX|GLX]] - X11（包括透明的網路）
+* [[WGL|WGL]] - [[Microsoft|Microsoft]] Windows
+
+另外，[[GLUT|GLUT]]库能够以可移植的方式提供基本的-{zh-cn:窗口;zh-tw:視窗}-功能。
+
+== 版本 ==
+OpenGL进化自（而且风格很相似）SGI的早期3D接口[[IRIS_GL|IRIS GL]]。IRIS GL的一个限制是它只能访问底层硬件提供的特性。如果图形硬件不支持例如[[纹理映射|纹理映射]]这样的功能，那么应用程序就不能使用它。OpenGL通过在软件上对硬件不支持的特性提供支持的方法克服了这个问题，允许应用程序在相对低配置的系统上使用高级的图形特性。[[Fahrenheit图形API|Fahrenheit]]项目是Microsoft和SGI之间的联合行动，为了统一OpenGL和Direct3D接口的目的。它一开始提出了一些把规则带给交互3D计算机图形API世界的承诺，但因为SGI的财政限制，这个项目后来被放弃了。
+
+2002年微軟的DirectX 9提出了全新的Shader繪圖功能以及高階著色語言（[[HLSL|HLSL]]），OpenGL霸主地位開始被瓦解。這使得3DLabs了解到必須開發全新的OpenGL 2.0版本，但僅加入支援[[GLSL|GLSL]]的功能。2006年Khronos接手OpenGL，立刻着手發展Longs Peak與Mount Evans。2008年推出OpenGL 3，但評價普遍不高。
+
+2010年3月10日, OpenGL同時推出了3.3和4.0版本，同年7月26日又发布了4.1版本。2011年8月8日发布4.2版本。2013年發佈4.3版。
+
+{| class="wikitable" width="100%"
+! 主要版本
+! 发布日期 
+! 重要变更 
+|-
+| 1.1
+| 1997年1月
+|
+|-
+| 1.2
+| 1998年3月16日
+|
+|-
+| 1.2.1
+| 1998年10月14日
+|
+|-
+| 1.3
+| 2001年8月14日
+|
+|-
+| 1.4
+| 2002年7月24日
+|
+|-
+| 1.5
+| 2003年7月29日
+|
+|-
+| 2.0
+| 2004年9月7日
+|
+|-
+| 2.1
+| 2006年7月2日
+|
+|-
+| 3.0
+| 2008年8月11日
+|
+|-
+| 3.1
+| 2009年3月24日
+|
+|-
+| 3.2
+| 2009年8月3日
+|
+|-
+| 3.3
+| 2010年3月11日
+|OpenGL 3.3与4.0版一起发布。 以体现硬件支持Direct3D 10的可能性。
+|-
+| 4.0
+| 2010年3月11日
+|OpenGL 4.0与版本3.3一起发布。 它是为硬件设计的，以体现硬件支持Direct3D 11的可能性。
+
+与OpenGL 3.0一样，这个版本的OpenGL包含大量相当无关紧要的扩展，旨在彻底揭示Direct3D 11级硬件的能力。
+|-
+| 4.1
+| 2010年7月26日
+|
+|-
+| 4.2
+| 2011年8月8日
+| 支持的显卡：NVIDIA GeForce 400系列以上，AMD Radeon HD7000系列以上，[[Intel_HD_Graphics|Intel HD Graphics]] （第7代Ivy Bridge系列以上） 
+AMD Radeon HD 6000 Series, AMD Radeon HD 7000 Series
+* 支持Shaders原子计数器和加载/存储/原子读-修改-写操作的单级纹理着色器。
+* 捕捉GPU-tessellated几何变换反馈的结果绘制的多个实例，使复杂的对象进行有效的重新定位和复制。
+* 支持修改任意子集的压缩纹理，而无需重新下载整个GPU的纹理，显著的性能改进。
+* 支持包装成一个单一的32位值显著降低内存存储和带宽的高效着色处理多个8位和16位值。
+|-
+| 4.3
+| 2012年8月6日
+| 支持的显卡：NVIDIA GeForce 400系列以上，AMD Radeon HD5000系列以上，[[Intel_HD_Graphics|Intel HD Graphics]] （第7.5代Haswell系列以上）
+
+* 圍內充分利用GPU的並行計算着色器的圖形管道
+* 暗器的存儲緩衝區對象
+* 紋理參數查詢
+* 作為標準功能的高品質的紋理壓縮ETC2/EAC
+* 完全兼容的OpenGL ES3.0的API
+* 在應用程序開發過程中調試能力接收調試消息
+* 沒有數據複製以不同的方式解釋紋理的紋理意見
+* 增加了內存的安全性
+* 一個多應用的健壯性擴展
+|-
+| 4.4
+| 2013年7月22日<ref name = "Khronos Releases OpenGL 4.4 Specification">{{cite web | author =  | title = Khronos Releases OpenGL 4.4 Specification | publisher = Khronos Group | date = 2013-07-22 | accessdate = 2013-12-15 | language = en | url = https://www.khronos.org/news/press/khronos-releases-opengl-4.4-specification | archive-date = 2013-10-29 | archive-url = https://web.archive.org/web/20131029004225/http://www.khronos.org/news/press/khronos-releases-opengl-4.4-specification | dead-url = no }}</ref>
+| 支持的顯示卡：NVIDIA GeForce 400系列以上，AMD Radeon HD5000系列以上，[[Intel_HD_Graphics|Intel HD Graphics]] （第7.5代Haswell系列以上）
+* 緩衝區位置控制
+* 高效異步查詢
+* 着色器可變佈局
+* 高效多對象綁定
+* 精簡化Direct3D應用的移植
+* 非綁定的紋理擴展
+* 稀疏紋理擴展
+|-
+| 4.5
+|2014年8月11日<ref name="OpenGL 4.5">{{Cite web |url=http://www.extremetech.com/gaming/187796-opengl-4-5-released-next-gen-opengl-unveiled-cross-platform-mantle-killer-dx12-competitor |title=OpenGL 4.5 released, next-gen OpenGL unveiled: Cross-platform Mantle killer, DX12 competitor |accessdate=2014-08-12 |work= |publisher=ExtremeTech |date=2014-08-11 |archive-date=2014-08-11 |archive-url=https://web.archive.org/web/20140811205123/http://www.extremetech.com/gaming/187796-opengl-4-5-released-next-gen-opengl-unveiled-cross-platform-mantle-killer-dx12-competitor |dead-url=no }}</ref>
+|支持的显卡：NVIDIA GeForce 400系列以上，AMD Radeon HD7000系列以上，[[Intel_HD_Graphics|Intel HD Graphics]] （第8代Broadwell系列以上），[[Tegra_K1|Tegra K1]], Tegra X1
+* 直接状态访问（DSA） - 对象访问器使查询和修改状态不会将对象绑定到上下文中，从而提高应用程序和中间件的效率和灵活性
+* 刷新控制 - 应用程序可以在上下文切换之前控制挂起命令的刷新，实现高性能多线程应用程序
+* 鲁棒性 - 为WebGL浏览器等应用程序提供安全平台，包括阻止GPU复位影响任何其他正在运行的应用程序
+* OpenGL ES 3.1 API和着色器兼容性 - 可轻松开发和执行桌面系统上最新的OpenGL ES应用程序
+|-
+|4.6
+|2017年7月31日
+|支持的显卡：NVIDIA GeForce 400系列以上（理论上可支持）
+* SPIR-V着色器
+* 各向异性过滤
+|}
+
+== 參見 ==
+* [[Khronos_Group|Khronos Group]]
+* [[OpenGL_ES|OpenGL ES]]
+
+== 参考文献 ==
+{{Reflist|30em}}
+
+== 外部链接 ==
+* [http://www.opengl.org/ OpenGL官方網站]{{Wayback|url=http://www.opengl.org/ |date=20110226000710 }}
+* [http://www.khronos.org/ Khronos Group官方網站]{{Wayback|url=http://www.khronos.org/ |date=20090105174640 }}
+
+{{-}}
+{{Khronos Group standards}}
+
+{{DEFAULTSORT:OpenGL}}
+[[Category:应用程序接口|Category:应用程序接口]]
+[[Category:计算机图形学|Category:计算机图形学]]
+[[Category:三维计算机图形学|Category:三维计算机图形学]]
+[[Category:图形标准|Category:图形标准]]
+[[Category:OpenGL|Category:OpenGL]]
+[[Category:繪圖函式庫|Category:繪圖函式庫]]

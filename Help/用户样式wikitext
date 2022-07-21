@@ -1,0 +1,561 @@
+{{Translating|[[:en:Help:User_style|:en:Help:User style]]||tpercent=25|time=2012-02-09T11:34:28+00:00 }}
+{{NoteTA
+|G1 = IT
+|G2 = MediaWiki
+|1 = zh-cn:皮肤; zh-tw:面版;
+|2 = zh-cn:对象; zh-tw:物件;
+|3 = zh-cn:支持; zh-tw:支援;
+}}
+{{hh}}
+{{读者手册导航}}
+
+登录用户不仅可以设置维基百科参数，还可以通过[[Special:Mypage/common.css|Special:Mypage/common.css]]和[[Special:Mypage/common.js|Special:Mypage/common.js]]实现更强大的自定义。
+
+[[Special:Mypage/common.css|common.css]]里编写[[CSS|CSS]]，可以定制页面的字体、颜色、链接的位置等等。[[Special:Mypage/common.js|common.js]]里编写[[JavaScript|JavaScript]]（JS），可以在网页上增加功能。注意在维基百科上编写的样式表和JS代码都是在[[GFDL|GFDL]]下公开发布的。
+
+==概述==
+'''注意：'''在默认配置下，所有的用户样式和脚本会被忽略；除非管理员在LocalSettings.php里面加入这样两行：
+<syntaxhighlight lang="PHP">
+ $wgAllowUserJs  = true;
+ $wgAllowUserCss = true;
+</syntaxhighlight>
+在用户样式设定的时候，首先要选中一个[[meta:Skins|皮肤]]，然后系统会确定相应的[[层叠样式表|层叠样式表]]（CSS）。用户可针对每个皮肤对字体、颜色等做不同的选择。CSS是用选择器[http://www.w3.org/TR/REC-CSS2/selector.html]来定制的，每个选择器作用的对象包括[[HTML元素|HTML元素]]、class和id。它们在具体的HTML代码中定义。因此，只要查看HTML源代码，便可知道一个皮肤可以怎么样调整。尤其是那些class和id越多，则变化就越多。
+
+所有皮肤都享有（继承）[[MediaWiki:Common.css|MediaWiki:Common.css]]文件中定义的样式，其他的样式则依选择的皮肤不同而存放在分离的文件中。例如，中文维基百科中默认的样式为：
+
+*http://zh.wikipedia.org/style/monobook/main.css 及 [[:zh:MediaWiki:Monobook.css|:zh:MediaWiki:Monobook.css]]
+*http://zh.wikipedia.org/style/wikistandard.css 及 [[:zh:MediaWiki:Standard.css|:zh:MediaWiki:Standard.css]] 
+*http://zh.wikipedia.org/style/cologneblue.css 及 [[:zh:MediaWiki:Cologneblue.css|:zh:MediaWiki:Cologneblue.css]]（科龙香水蓝）
+*http://zh.wikipedia.org/style/nostalgia.css 及 [[:zh:MediaWiki:Nostalgia.css|:zh:MediaWiki:Nostalgia.css]]（怀旧）
+在元维基中则为：
+*http://meta.wikimedia.org/style/monobook/main.css 及 [[MediaWiki:Monobook.css|MediaWiki:Monobook.css]]
+*http://meta.wikimedia.org/style/wikistandard.css 及 [[MediaWiki:Standard.css|MediaWiki:Standard.css]]
+*http://meta.wikimedia.org/style/cologneblue.css 及 [[MediaWiki:Cologneblue.css|MediaWiki:Cologneblue.css]]
+*http://meta.wikimedia.org/style/nostalgia.css 及 [[MediaWiki:Nostalgia.css|MediaWiki:Nostalgia.css]]
+*[[MediaWiki:Myskin.css|MediaWiki:Myskin.css]]
+
+放在样式目录的文件是供特定的皮肤使用的，它们在各个维基项目中大致上相同。样式表目录的名字在安装的时候就设置好了，参见[[LocalSettings.php#Stylesheet_Location|LocalSettings.php#Stylesheet_Location]]。
+
+在vector皮肤中，你可以通过[[JavaScript|JavaScript]]以及[[CSS|CSS]]改变[http://zh.wikipedia.org/style/vector/main.css] 及 [[:zh:MediaWiki:Vector.css|:zh:MediaWiki:Vector.css]]的样式定义。然后将这些改变存放在你的用户页子页面[[Special:Mypage/vector.css|Special:Mypage/vector.css]]和[[Special:Mypage/vector.js|Special:Mypage/vector.js]]中。
+
+你同样可以改变标准皮肤；用户页面应该这样起名：User:''用户名/'' standard.css 和User:''用户名/'' standard.js（其它的皮肤类推）。
+
+只要输入一些css或者js代码到该页即可。该页面的预览会有些特别：它能让你根据页面所定义的样式看到页面的边界（而不是内容），只要所用的皮肤正好要用到正在预览的页面。这样会有些限制，例如你会看到边界范围内的链接看起来怎么样，但也许看不到你想要检查的所有类型的内容。在保存之后，不管还在该页面或是转到了其它页面，可以强制刷新立即应用新的设置。
+
+特定皮肤（在这里是[{{SERVER}}/style/wikistandard.css {{SERVER}}/style/wikistandard.css]）的项目通用CSS及个性化的JS和CSS是通过
+
+<syntaxhighlight lang="html4strict">
+ <script type="text/javascript"
+ src="/w/wiki.phtml?title=User:''username''/standard.js&action=raw&ctype=text/javascript">
+ </script>
+ @import "/style/wikistandard.css";
+ @import "/w/wiki.phtml?title=User:''username''/standard.css&action=raw&ctype=text/css";
+</syntaxhighlight>
+
+这样的HTML源代码进行链接的。
+
+“MySkin”没有对应的main.css。个性化的css页面是在User:''用户名/'' myskin.css（全部小写！）。
+
+参见[[Help:站点范围的css维基页|Help:站点范围的css维基页]].
+
+== CSS ==
+
+===自定义CSS和浏览器CSS的对比===
+维基百科的登录用户才能使用[[Mediawiki|Mediawiki]]系统提供的自定义CSS，设置的CSS也只应用于维基百科，其他网站不受影响。
+
+很多浏览器支持本地CSS。这样的CSS会应用到所有网站，而不仅限于MediaWiki项目，且不论你是否登录了维基百科。
+
+如果想针对不同的MediaWiki项目的相同页面元素设置不同的样式，如设置在中文维基用红链显示不存在的页面，而在英文维基用蓝链显示不存在的页面，这就不能用浏览器CSS；因为浏览器CSS几乎<ref>{{cite web|title=Firefox 3.5 实现按站点自定义CSS样式|url=http://blog.csdn.net/herringcg/article/details/4801182|accessdate=2013-06-21}}</ref>无法区别中文维基还是英文维基。这样的样式设置应该分别放在中文和英文维基的用户子页面。
+
+不论你用自己的电脑还是别人的电脑登录维基百科，你的自定义CSS都会起作用；浏览器CSS则不会。
+
+当浏览器设定为忽略网页内及外部 CSS 中的字体大小的时候，设定字体大小样式的代码行只能放在本地CSS里面。
+
+=== CSS选择器 ===
+CSS通过选择器针对[[HTML元素|HTML元素]]、class、id，以及它们的组合设置样式。页面主体有关的样式在下面列出，有些提供了显示其效果的例子。
+
+{| class="wikitable"
+|-
+! 选择器 !! 效果 !! 备注
+|-
+| :link || [[help:index|help:index]]  || 
+|-
+| :link:link ||  || 
+|-
+| :link:visited ||  || 
+|-
+| :link#contentTop ||  || 
+|-
+| :link.external || http://www.example.org || 
+|-
+| :link.extiw ||  || 跨维基连接
+|-
+| :link.image ||  || 从完整图像到图像描述页的链接
+|-
+| :link.internal ||  || 链接到文件本身（Media:），或者从缩略图及标志图标到图像描述页（注意对a.internel指定的颜色和字体大小仅适用于第一种情况）
+|-
+| :link.new || [[example|example]] || 
+|-
+| body.ns-0, ..., body.ns-15 ||  || 命名空间
+|-
+| div#bodyContent ||  || 
+|-
+| div#column-content ||  || 
+|-
+| div#editsection ||  || 
+|-
+| div#globalWrapper ||  || 
+|-
+| div#tocindent ||  || 
+|-
+| div.tocline ||  || 
+|-
+| h1.firstHeading ||  || 
+|-
+| h2 ||  || 
+|-
+| h3 ||  || 
+|-
+| img.tex ||  || TeX 图片
+|-
+| small || <small>小字</small> || 小字
+|-
+| table.toc ||  || 
+|}
+
+'''a和:link的对比'''：
+用"<code>a</code>"代替"<code>:link</code>"设定链接的样式是常见的误用。这里"<code>:link</code>"仅适用于链接，"<code>a</code>"适用于链接和命名锚点（例如<code><a name="书签"></code>）。
+
+正常的内部链接不属于internel这个class（以前是属于的，使用旧版软件的网站现在也还是这样，例如[http://openfacts.berlios.de/index-en.phtml?title=Main_Page]）；它们可以用:link和:link:visited设定样式。一般来说：link.extiw后面的一些选择器可以用来设置链接样式的一些特殊情况。
+
+跨语言链接可以用:
+
+*<nowiki>#p-lang a</nowiki>
+
+你也可以使样式取决于某个属性的值，例如，以下的选择器：
+
+*:link[title ="User:''用户名''"]
+*:link[title ="''页面名''"]
+*:link[href ="''完整url''"] 
+
+可以用来设定用户（包括你自己）以及到特定页面的链接的颜色，或使之高亮显示，就像在最近更改里面已监视页面会被加黑一样。在Opera里可以做到这点，但IE不支持。参见[[Help:监视页面#Css|Help:监视页面#Css]]。
+
+监视列表和最近更改使用两个class：
+
+*autocomment <div class="autocomment">示例</div>
+*new（见下）
+
+页面历史具有autocomment这个class，而且还有：
+
+*user
+*minor
+
+这样为user设定的字体可用于页面历史，但不用于监视列表或者最近更改。
+
+====编辑页面====
+在编辑页面中使用下列选择器：
+
+*编辑框: textarea#wpTextbox1
+ <div class="textarea#wpTextbox1">示例</div>
+*编辑摘要框: input#wpSummary
+  <div class="input#wpSummary">示例</div>
+
+====主要样式块====
+<!--需要更新-->
+[http://meta.wikimedia.org/wiki/Customization:Explaining_skins#Major_style_blocks_by_name]
+以下内容是针对Monobook皮肤的默认布局。其它皮肤的布局可能与此不同，敬请留意。
+
+*''column-content'' - 边框里面有内容的所有空间
+*''content'' - 白色背景、细边框线的含有页面主要内容的框，叫内容框
+*''firstHeading'' - 每个页面顶部标记的class
+*''bodyContent'' -  在内容框里面的页面主要内容
+*''contentSub'' -  维基页面里紧跟在主头部下方，但在主体文本以上
+
+portlet这个class用来设定主内容周围的所有div块。下面的选择器可以用来分辨不同的块： 
+*''p-cactions'' - 主内容上方那个标签列表的id
+*''p-personal'' - 在页面顶端、含有登陆/退出链接的那个链接列表的id
+*''p-logo'' - 左上方含有维基标志的那个块的id
+*''p-navigation'' - 左方含有导航链接的那个块的id
+*''p-search'' - 含有搜索按钮的那个块的id
+*''p-tb'' - 工具块的id
+*''p-lang'' - 跨语言链接块的id
+
+页面底部的页脚部分那些块可以用这些id：
+*''footer'' - 整个页脚容器块
+*''f-poweredbyico'' - “Power by mediawiki”图像，通常放在右方
+*''f-list'' - 页面底部所有文字用这个id
+
+===依赖于参数和变量的样式===
+====可变的 class 及 id====
+模板中的HTML元素的class或者id是可以通过参数指定的。例如可以写class="abc<nowiki>{{{1|def}}}</nowiki>"。这样可以为一个或多个class名称定义同一类型的样式。如果该class未定义，将会被忽略，而采用标准的样式。
+
+最简单的情况就是我们写出class="abc<nowiki>{{{1}}}</nowiki>"并且定义一个class名为abcdef。如果模板参数为“def”就会用上这个class。
+
+如果一个通用页面仅在这些特定的class的样式定义好的情况下才有意义，那么它们必须定义在MediaWiki:Common.css里面。只要它们没被覆盖掉，就会应用于所有用户和所有皮肤。在这个项目里面：
+
+<nowiki>{{pimcnl|MediaWiki|Common.css}}</nowiki> <!--什么意思？-->
+
+这会被应用于{{tim|m to ft css}}.<!--这个模板又是什么意思？-->
+
+====可变的HTML属性名====
+HTML属性名可以是可变的。[[w:en:HTML_Tidy|HTML Tidy]]在服务器端移除名字不合法的属性，因此其结果不依赖于是否忽略属性值的浏览器兼容性设置，而且传送的数据量也减少了。请参考[[w:en:Wikipedia:HiddenStructure|w:en:Wikipedia:HiddenStructure]]和{{tim|en|Infobox}}了解“class”值的可能变化。
+
+=== 示例 ===
+<syntaxhighlight lang="CSS">
+/* 设置内容区底色和标签底色为浅灰 */
+#content, #content table
+#p-cactions ul li a { background: #f5f5f5; }
+
+
+/* 把背景里的书换成别的东西 */
+body { background: Purple; }
+
+/* 改变pre区域背景（changes the background of pre areas）  */
+pre { background: White }
+
+/* 改变logo（change the logo） */
+#p-logo a { background: url(http://en.wikipedia.org/upload/wiki.png) 35% 50% no-repeat !important; }
+
+/* 不使用任何logo，向上移动盒子代替logo区域（don't use any logo, move the boxes onto that area instead） */
+#p-logo { display: none }
+#column-one { padding-top: 0; }
+
+/* suppress the person icon by your username */
+li#pt-userpage { background: none }
+
+/* 使用浏览器大小和字体设置（use browser prefs for text size and font） */
+body, #globalWrapper { font: inherit !important; }
+
+/* 总是在链接下加下划线（always underline links） */
+:link { text-decoration: underline; }
+
+/* Display body content in a narrower column for easier reading */
+/* adjust percentages as desired */
+div#bodyContent {
+  width: 50%;
+  line-height: 105%;
+}
+
+/* 改变未选择的标签的背景（change background of unselected tabs） */
+#p-cactions ul li a { background: #C7FDC7; }
+
+/* 改变已选择的标签的背景（change background of selected tabs） */
+#p-cactions ul li.selected a { background: white; }
+
+/* 更改所选标签的边框背景 */
+#p-cactions li.selected { border-color: #aaaaaa; }
+
+/* 鼠标悬停时未移除标签底部（tab bottom not removed on hover） */
+#p-cactions li a:hover { z-index: 0; text-decoration: none; }
+#p-cactions li.selected a:hover { z-index: 3; }
+
+/* 搜索框的和按钮的样式如下所示（style the search box and the buttons below it） */
+input.searchButton {
+    background-color: #efefef !important;
+    border: 1px outset !important;  
+}
+#searchInput { border: 1px inset !important; }
+
+/* 标准链接颜色（standard link colors） */
+:link { color: #0000FF; }
+:link:visited { color: #7F007F; }
+:link:active, :link.new { color: #FF0000; }
+:link.interwiki, :link.external { color: #3366BB; }
+:link.stub { color: #772233; }
+
+/* put scrollbar on pre sections instead of ugly cutoff/overlap in firefox */
+pre { overflow: auto; }
+
+/* strikeout Upload File link as a reminder to upload to Commons instead */
+li#t-upload { text-decoration: line-through; }
+</syntaxhighlight>
+
+==== Print view tweaks ====
+<syntaxhighlight lang="CSS">
+/*
+** Place all print-specific rules in an @media print block.
+*/
+
+/* save ink and paper with very small fonts */
+@media print {
+    #footer,
+    #content,
+    body { font-size: 8pt !important; }
+    h1 { font-size: 17pt }
+    h2 { font-size: 14pt }
+    h3 { font-size: 11pt }
+    h4 { font-size: 9pt }
+    h5 { font-size: 8pt }
+    h6 { 
+        font-size: 8pt;
+        font-weight: normal;
+    }
+}
+
+/* Advanced things: using :before and :after it's possible to add formatting 
+this here adds the full href of a link after it (not needed in the current version): */
+@media print {
+  #content a:link:after, 
+  #content a:visited:after {
+     content: " ( " attr(href) " ) ";
+  }
+}
+</syntaxhighlight>
+
+==== 改变用户工具栏变为侧边栏 ====
+在[[Camino|Camino]]、[[Safari|Safari]]和[[Internet_Explorer_7|Internet Explorer 7]]下工作运行。
+<syntaxhighlight lang="CSS">
+/* 改变用户工具栏变为侧边栏（Transform the user toolbar into a sidebox） */
+#p-personal {
+    position:relative;
+    z-index:3;
+    width: 11.6em;
+}
+
+#p-personal .pBody {
+    width: 11.6em;
+    border: none;
+    margin: 0 0 0.1em 0em;
+    float: none;
+    overflow: hidden;
+    font-size: 95%;
+    background: White;
+    border-collapse: collapse;
+    border: 1px solid #aaaaaa;
+    padding: 0.3em 0.5em 0.3em 0.3em;
+}
+
+#p-personal ul {
+    line-height: 1.5em;
+    list-style-type: square;
+    list-style-image: url("/style/monobook/bullet.gif");
+
+    font-size:95%;
+    margin: 0 0 0 1.5em;
+    padding:0;
+    text-align:left;
+    text-transform: none;
+}
+
+#p-personal li {
+    display: list-item;
+    padding:0;
+    margin: 0 0 0 0;
+    margin-bottom: 0.1em;
+}
+
+/* suppress the person icon by your username and by anon IP */
+/* needed if not already in place */
+li#pt-userpage { background: none }
+li#pt-anonuserpage { background: none }
+
+</syntaxhighlight>
+See the monobook [http://test.wikipedia.org/style/monobook/main.css main.css] for the full styles in use by default.
+
+==== 滚动时侧边栏自适应（Fix the sidebar's position while you scroll） ====
+
+[[File:Fixed_sidebar.png|thumb]]
+
+“科隆香水蓝”有一个左浮动快速启动栏选项能使导航和工具箱在滚动时同样停留在屏幕同一位置上。（The ''Cologne Blue'' skin has an option for a "floating left" quickbar, which causes the navigation links and toolboxes and such to stay in the same position on the screen while you scroll.  ）这在Mozilla中提供了同样的函数，见[[Help:User_style/floating_quickbar|Help:User style/floating quickbar]]。
+
+==== 在Monobook皮肤的内容区域使用衬线字体（Monobook menus with serif fonts in the content area） ====
+I've hacked together a q&d combinaton of monobook menus with serif fonts in the text area; there are some quirks and bugs (some because the css scheme of wikipedia doesn't seem to be soo thoughtful), but if you want to give it a try or have a look, go to [http://en.wikipedia.org/wiki/User:Tillwe/monobook.css] and copy the first part. No warranty; works on Netscape7/Win98 for me ... -- [[User:Tillwe|Tillwe]] 14:05, 30 May 2004 (UTC)
+
+Update (01.06.04): Now also displays table formatted things more or less correctly. -- [[User:Tillwe|Tillwe]] 17:45, 1 Jun 2004 (UTC)
+
+==== 移动分类链接 ====
+Moves category links in the upper right corner of content area, and paints them gray -- [[User:Tillwe|Tillwe]] 21:22, 31 May 2004 (UTC)
+:Small fix --[[User:Ævar_Arnfjörð_Bjarmason|Ævar Arnfjörð Bjarmason]] 22:05, 15 Jun 2004 (UTC)
+
+<syntaxhighlight lang="CSS">
+/******************************************************************/
+/* 向右移动分类链接                                   */
+/******************************************************************/
+
+/* 移动分类链接盒子 */
+#catlinks {  
+  position:absolute;
+  z-index:1;
+/*  border: 1px solid #aaaaaa; 
+  background: #fafaff; */
+  right:1em; 
+  top:-0.25em;
+  width:10.5em;
+  float:right;
+  margin: 0.2em;
+  padding:0.2em;
+}
+
+/* 格式化分类链接 */
+p.catlinks {
+  color: #aaaaaa;
+  font-family: Verdana,sans-serif;
+  font-size:67%;
+  line-height: 1.5em;
+  text-align:left;
+  text-indent:0;
+  text-transform: none;
+  white-space:normal;
+  margin: 0.2em;
+}
+
+#p-personal h5 {
+    display: inline;
+}
+
+/* 分类链接格式化（为了区分“:”和“|”） format links in the catlinks (as distinguished from ":" and "|") */
+p.catlinks a {
+  color:#888888;
+}
+</syntaxhighlight>
+
+==== Diff view styling ====
+<syntaxhighlight lang="CSS">
+/* 不使用更小的字体（don't use a smaller font） */
+td.diff-addedline, td.diff-deletedline, td.diff-context { font-size: 100% };
+
+/* underline just the text that's different */
+span.diffchange { text-decoration:underline; }
+</syntaxhighlight>
+
+=== 关于CSS的外部链接 ===
+* http://www.csszengarden.com/ —— inspiration
+* http://css-discuss.incutio.com/ ——highly concentrated info, very comprehensive
+* http://www.alistapart.com/ ——好文章
+* http://www.positioniseverything.net/ ——some entertaining ie bugs and more
+
+== JavaScript ==
+JavaScript有很大的潜力，例如添加文本，还包括链接（for example adding text, including links），at the desired positions. This added content may depend on content on the HTML source page produced by the server; for example it may depend on HTML elements with an ID, by applying [[w:getElementById|getElementById]]. The position of insertion may be specified by insertBefore
+
+请参考[[帮助:维基用户脚本开发指南|帮助:维基用户脚本开发指南]]。
+
+=== 复制编辑链接到内容区域底部（Duplicate edit links at the bottom of the content area） ===
+See [[Help:User_style/bottom_tabs|Help:User style/bottom tabs]]
+[[File:Bottom_tabs_position_corrected.png|framed]]
+[[File:Bottomlinks.png|framed]]
+
+=== Changing access keys ===
+
+These are now defined/set from js, you can easily customize them by changing some elements in the 'ta' array (see [http://meta.wikimedia.org/w/index.php?title=-&action=raw&gen=js]). Example line:
+<syntaxhighlight lang="javascript">
+ ta['ca-nstab-main'] = new Array('c','View the content page');
+</syntaxhighlight>
+The access key is the first value in the array. An example which changes this accesskey to '0':
+<syntaxhighlight lang="javascript">
+ ta['ca-nstab-main'] = new Array('0','View the content page');
+</syntaxhighlight>
+Since alt-d is also a shortcut to the address bar in most browsers, you might want to disable the alt-d shortcut for Delete, by entering an empty string as access key this way:
+<syntaxhighlight lang="javascript">
+ ta['ca-delete'] = new Array('','Delete this page');
+ </syntaxhighlight>
+
+''最后， to disable ''all'' access and tooltips drop''
+<syntaxhighlight lang="javascript">
+ ta = false;
+</syntaxhighlight>
+''in your monobook.js.''
+
+'''这是最后一个建议，关于 ta = false不工作。看[http://en.wikipedia.org/wiki/Wikipedia_talk:Keyboard_shortcuts#How_to_disable_access_key.3F How to disable access key] for discussion, and [http://en.wikipedia.org/wiki/User:Matt_B./monobook.js this example of monobook.js] 寻找一个至少部分能工作的解决方法（for a solution that will work, at least partially.——''' Note that monobook.js seems to be deprecated, and MediaWiki:Common.js is supposed to be used instead.
+
+The site's global access keys are in corresponding JavaScript for the skins. For example, the keys for Monobook are in the (protected) page [[MediaWiki:Monobook.js|MediaWiki:Monobook.js]].
+
+To disable or change the global access keys for the 'power user editing shortcuts', you must edit the six (protected) pages starting with the Accesskey prefix in the MediaWiki namespace.
+
+=== 移动分类到顶部 ===
+
+下列代码移动分类盒子到文章顶部。当然，你可能想要使用一些CSS使它看起来更漂亮：
+<syntaxhighlight lang="javascript">
+ function catsattop() {
+   var cats = document.getElementById('catlinks');
+   var bc = document.getElementById('bodyContent');
+   bc.insertBefore(cats, bc.childNodes[0]);
+ }
+</syntaxhighlight>
+An alternative that, when coupled with an appropriate stylesheet, will put the text up at about the same line as the title:
+
+<syntaxhighlight lang="javascript">
+function categoryToTop() {
+  var thebody = document.getElementById('contentTop');
+  var categories = document.getElementById('catlinks');
+
+  if (categories != null) {
+    categories.parentNode.removeChild (categories);
+    thebody.parentNode.insertBefore(categories, thebody);
+  }
+}
+</syntaxhighlight>
+
+Some CSS to go with that...
+
+<syntaxhighlight lang="CSS">
+/* move the catlinks box */
+#catlinks {  
+  right:1em; 
+  top:-0.25em;
+  max-width: 50%; /* this limits the box size, but doesn't set strictly */
+  float: right;
+  margin: 0.5em;
+  padding: 0.2em;
+}
+
+/* format the catlinks itself */
+p.catlinks {
+  font-size:67%;
+  text-align:left;
+  text-indent:0;
+  text-transform: none;
+  white-space:normal;
+  margin: 0.2em;
+}
+</syntaxhighlight>
+
+不幸的是，如果分类盒子太长（ if the category box is large ）(such as on entries on U.S. presidents and other major figures), it can push an infobox off to the side.  To correct this, the "clear: right" attribute can be added to an infobox.
+
+===Wikitext-controlled CSS===
+CSS can be controlled through JS by wikitext. For example, a HTML element "span" without content can, through its class and id, provide parameters for JS specifying CSS for any parts of the page. For example, if a page contains a "span" element with class FA and id ''lc'', [[w:en:MediaWiki:Monobook.js|w:en:MediaWiki:Monobook.js]] specifies the style and title of elements "li" of class interwiki-''lc'', thus controlling the style and title of the  interlanguage link of language code ''lc'' in the margin, provided that the skin specifies this class interwiki-''lc'' (E.g., Cologne Blue specifies class='external' for each language, so it does not work for that skin.) See also {{links-small|w|template|Link FA}}.
+
+=== 可访问的变量 ===
+以下是Mediawiki启用JS后产生的部分变量，用户脚本可以访问。完整的列表请参见[[mw:Manual:Configuration_settings/zh|配置选项]]和[[mw:Manual:Interface/JavaScript|mw:Manual:Interface/JavaScript]]。
+<syntaxhighlight lang="javascript">
+var skin = "myskin";
+var stylepath = "/skins-1.5";
+var wgArticlePath = "/wiki/$1";
+var wgScriptPath = "/w";
+var wgServer = "http://meta.wikimedia.org";
+var wgCanonicalNamespace = "Help";
+var wgCanonicalSpecialPageName = false;
+var wgNamespaceNumber = 12;
+var wgPageName = "Help:User_style";
+var wgTitle = "User style";
+var wgAction = "view";
+var wgArticleId = "6919";
+var wgIsArticle = true;
+var wgUserName = "Patrick";
+var wgUserGroups = ["sysop", "*", "user", "autoconfirmed", "emailconfirmed"];
+var wgUserLanguage = "en";
+var wgContentLanguage = "en";
+var wgBreakFrames = false;
+var wgCurRevisionId = "568720";
+</syntaxhighlight>
+
+=== 关于JS的外部链接 ===
+* '''[[mw:ResourceLoader|mw:ResourceLoader]]'''
+* '''[[mw:ResourceLoader/Default_modules/zh|mw:ResourceLoader/Default modules]]'''：MediaWiki提供的可被JS使用的对象和方法。
+* http://www.quirksmode.org/ ——见JavaScript和DOM部分
+* http://www.alistapart.com/
+* http://www.quirksmode.org/dom/domform.html ——form cloning (might be possible to upload a few images at once using this, also a good starting point for the structure cloning)
+* http://www.seoinseo.com/ ——SEO tutorials and resources
+
+== 参考资料 ==
+{{reflist}}
+
+==參見==
+*[[Gallery_of_user_styles|Gallery of user styles]]
+*[[Skin_projects|Skin projects]]
+*[[Help:Preferences|Help:Preferences]]
+*[[Help:Namespace#Tab_labels|Help:Namespace#Tab labels]]
+
+{{H-f Help}}
+
+[[Category:帮助文档|YHYS]]
+[[Category:维基百科用户空间|Category:维基百科用户空间]]

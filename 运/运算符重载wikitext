@@ -1,0 +1,91 @@
+{{NoteTA
+|G1 = IT
+}}
+{{多态}}{{编程范式}}
+在计算机[[程序设计|程序设计]]中，'''运算符重载'''（{{Lang-en|operator overloading}}）是[[多态_(计算机科学)|多态]]的一种。这里，运算符（比如<tt>+</tt>，<tt>=</tt>或<tt>==</tt>）被当作多态函数，它们的行为随着其参数类型的不同而不同。运算符并不一定总是符号。
+
+==简介==
+运算符重载通常只是一种[[语法糖|语法糖]]<ref>{{cite web |website=C++ FAQ |title=Operator Overloading |url=https://isocpp.org/wiki/faq/operator-overloading#op-ov-benefits |last=Stroustrup |first=Bjarne |author-link=Bjarne Stroustrup |access-date=27 August 2020 |archive-url=https://web.archive.org/web/20110814105309/http://www.parashift.com/c++-faq-lite/operator-overloading.html#faq-13.2 |archive-date=14 August 2011}}</ref>。它可以简单地通过函数调用来模拟：
+ a + b * c
+
+在一个支持运算符重载的语言里，上面的写法要比下面的写法有效而简练：
+ add(a, multiply(b, c))
+
+（假设运算符* 的[[优先级|优先级]]高于运算符 +）
+
+当一种语言允许运算符在某种情况下被隐式调用的时候，运算符重载将不只提供写法上的方便。例如，[[Ruby编程语言|Ruby]]中的<code>to_s</code>运算符就是如此，它將一个[[对象_(计算机科学)|对象]]轉換為字符串。
+
+== 用途 ==
+运算符重载由于使程序员能够根据运算子类型的不同来决定运算符功能的不同而有多樣用途。[[C++|C++]]中<code><<</code>的使用就是一个例子。表达式
+ a << 1
+
+当<tt>a</tt>是整型变量时将返回<tt>a</tt>的两倍，但是当<tt>a</tt>是一个输出流时将向这个流中写入“1”。因为运算符重载允许程序员改变运算符通常的语义，慎重使用运算符重载通常被认为是一个好习惯。
+
+== 簡易實例 ==
+以下是C++语言示例：<syntaxhighlight lang = "cpp">
+#include <iostream>
+using namespace std;
+class point {
+public:
+	int x, y;
+	point() {
+		x = y = 0;
+	}
+	point(int ix, int iy) {
+		x = ix;
+		y = iy;
+	}
+	point pointxyadd(point pi) {
+		return point(x + pi.x, y + pi.y);
+	}
+	point operator+(point pi) {
+		return point(x + pi.x, y + pi.y);
+	}
+};
+int main() {
+	point p1(5, 10), p2(8, 13), p3, p4;
+	p3 = p1.pointxyadd(p2);
+	p4 = p1 + p2;
+	cout << "p3 = (" << p3.x << ',' << p3.y << ')' << endl;
+	cout << "p4 = (" << p4.x << ',' << p4.y << ')' << endl;
+	return 0;
+}
+</syntaxhighlight>
+
+== 分类 ==
+支持运算符重载和定义新运算符的语言：
+{{div col|colwidth=15em}}
+*[[PostgreSQL|PostgreSQL的SQL方言]]
+*[[Ruby编程语言|Ruby]]<ref>{{cite web |url=https://www.ruby-lang.org/en/documentation/faq/7/ |website=Official Ruby FAQ |title=Methods}}</ref>
+*[[Haskell|Haskell]]<ref>[[类型类|Type class]]es instead of overloading.</ref>
+{{div col end}}
+支持运算符重载的语言：
+{{div col|colwidth=15em}}
+*[[Ada|Ada]]<ref>{{cite web |url=https://www.adaic.org/resources/add_content/standards/05aarm/html/AA-6-6.html |website=Annotated Ada Reference Manual |title=6.6 Overloading of Operators}}</ref>
+*[[C++|C++]]<ref>{{cite web |url=https://en.cppreference.com/w/cpp/language/operators |title=C++ Operator Overloading}}</ref>
+*[[C＃|C#]]<ref name="DraytonAlbahari2003">{{cite book |last1=Drayton |first1=Peter |last2=Albahari |first2=Ben |last3=Neward |first3=Ted |title=C# in a Nutshell |url=https://books.google.com/books?id=bG_Aqb6iOUYC&q=%22operator+overloading%22 |year=2003 |publisher=O'Reilly Media, Inc. |isbn=978-0-596-00526-9}}</ref>
+*[[D编程语言|D]]<ref>{{Cite web|title=Operator Overloading - D Programming Language|url=https://dlang.org/spec/operatoroverloading.html|access-date=2020-10-10|website=dlang.org}}</ref>
+*[[Kotlin|Kotlin]]<ref>{{cite web |title=Operator overloading |url=https://kotlinlang.org/docs/reference/operator-overloading.html |website=Kotlin |access-date=24 June 2018}}</ref>
+*[[Perl|Perl]]<ref name="Orwant2002">{{cite book |last=Orwant |first=Jon |title=Computer Science & Perl Programming: Best of The Perl Journal |url=https://books.google.com/books?id=8TkEOyBHoOoC&q=%22operator+overloading%22&pg=PA347 |date=4 November 2002 |publisher=O'Reilly Media, Inc. |isbn=978-0-596-00310-4 |pages=347–}}</ref>
+*[[Python编程语言|Python]]<ref>{{cite web |url=https://docs.python.org/3/reference/datamodel.html |website=The Python Language Reference |title=3. Data Model}}</ref>
+*{{en-link|Pico (编程语言)|Pico (programming language)|Pico}}（某种程度上）<ref>Binary functions with a symbolic name can be called infix.</ref>
+*[[Free_Pascal|Free Pascal]]<ref>{{Cite web|title=Introduction|url=https://www.freepascal.org/docs-html/ref/refse101.html#x213-23500015.1|access-date=2020-09-30|website=freepascal.org}}</ref>
+*[[FreeBASIC|FreeBASIC]]<ref>{{Cite web|title=Operator Overloading|url=http://bourabai.kz/einf/freebasic/ProPgOperatorOverloading.html|access-date=2021-04-07|website=bourabai.kz}}</ref>
+*[[Visual_Basic|Visual Basic]]（需要Visual Basic .NET 2008或更高版本）<ref>{{cite web|title=How to: Define an Operator (Visual Basic)|url=https://docs.microsoft.com/en-us/dotnet/visual-basic/programming-guide/language-features/procedures/how-to-define-an-operator}}</ref>
+*[[Delphi编程语言|Delphi]]<ref>{{cite web |title=Operator Overloading |website=Delphi Manual |url=http://docwiki.embarcadero.com/RADStudio/XE4/en/Operator_Overloading_%28Delphi%29 |access-date=1 December 2014}}</ref>
+*[[Lua|Lua]]<ref>{{cite web |url=http://lua-users.org/wiki/MetamethodsTutorial |title=Metamethods Tutorial |website=Lua-users Wiki}}</ref>
+{{div col end}}
+不支持运算符重载的语言：
+{{div col|colwidth=15em}}
+*[[C编程语言|C]]
+*[[Java编程语言|Java]]<ref>字符串使用“+”运算符串联一般不认为是运算符重载，而是编译器“魔法”，即将相应操作转译为StringBuilder类的调用。</ref>
+*[[Objective-C|Objective-C]]
+{{div col end}}
+
+==注释与引用==
+{{reflist|2}}
+
+{{Authority control}}
+[[category:多态|category:多态]]
+[[Category:计算机编程|Category:计算机编程]]
+[[Category:运算符_(编程)|Category:运算符_(编程)]]

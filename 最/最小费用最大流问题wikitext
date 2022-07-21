@@ -1,0 +1,136 @@
+{{noteTA
+|G1=Railway
+|1=zh-tw:成本;zh-cn:费用;
+|2=zh-tw:最佳化;zh-cn:优化;
+|3=zh-tw:思路;zh-cn:思想;
+|4=zh-tw:程式;zh-cn:程序;
+}}
+
+'''最小费用最大流问题'''是[[经济学|经济学]]和[[管理学|管理学]]中的一类典型问题。在一个网络中每段路径都有“容量”和“费用”两个限制的条件下，此类问题的研究试图寻找出：流量从A到B，如何选择路径、分配经过路径的流量，可以达到所用的费用最小的要求。
+
+
+== 问题提出 ==
+有足够多辆卡车要将数量无限的某种物品从一个地点运输到另外一个地点，现在有有限条单向行驶道路直接或者间接地连接了这两地。但是每一条道路都有运输通过总数量的限制，称为'''容量'''，同时携带物品通过该路段时，都会按照携带物品数量多少被收取一定的'''费用'''。如何合理地安排每辆车的行驶路线，使得在运输的货物总量尽可能大的情况下，交付的总费用尽可能少？
+
+注意，在此问题中总费用仅包括携带物品通过路段时被收取的费用，车辆和路线安排上没有限制，但通过某一路段的物品数量总和不得超过它的容量，收取的费用与携带物品的多少成正比。
+
+== 定义 ==
+
+最小费用最大流建立在[[最大流|最大流]]和[[网络流|网络流]]问题的基础之上。
+
+带权[[有向图|有向图]] <math>G=(V,E)</math> 是一个特殊的[[网络流#网络流图|容量网络]],所有边 <math>(u,v)\in E</math> 包含 <math>c(u,v)\in\mathbb{R}^+</math>, 称为这条弧的容量； 以及 <math>w(u,v)\in\mathbb{R}</math> 称为这条边的'''费用'''。
+
+容量网络中一个[[网络流#可行流|可行流]]的总费用为 <math>\sum\left (f(u,v)\times w(u,v)\right )</math>. 所有[[最大流|最大流]]中总费用最少的称为这个容量网络的'''最小费用最大流'''。
+
+== 思想 ==
+求解最小费用最大流可以采用贪心的思想，即每一次找一条从[[网络流#源点|源点]]到[[网络流#汇点|汇点]]的[[网络流#增广路|增广路]]，同时保证这条增广路是目前所有增广路中运输单位物品费用最小的。由于对于一个确定的[[网络流#残量网络|容量网络]]，它的[[网络流#最大流|最大流]]是有限且确定的，所以一定存在某一时刻无法再在当前残量网络中找到增广路，这时算法结束，总流量等于最大流，而又由于每一次增广的单位花费都是最小的，所以总花费也必定是所有方案中最少的。
+
+可见，求解这类问题的关键是每一次找到一条''目前所有增广路中运输单位物品费用最小的增广路''。如果将费用看作两点之间的距离，那么这就转换为了一个[[最短路问题|最短路问题]]。
+
+== 求解方法 ==
+
+=== 利用[[SPFA|队列优化的Bellman-Ford]]算法求解 ===
+
+在[[最短路问题|最短路问题]]中，我们利用[[SPFA|队列优化的Bellman-Ford]]算法（以下简称 SPFA) 求[[单源最短路|单源最短路]]，进而得到两个结点之间的最短路径 <math>dis_{u\to v}</math>. 使用类似的思想，将两点之间的距离转换为两点之间的费用，然后运行 SPFA 算法，同时维护可以从源点到达每个点的最大流量，得到从源点到汇点一条费用最小的[[网络流#增广路|增广路]]，使用这条路径进行增广，然后重复这个过程。直到找不到增广路，此时的总流量和总费用即为所求答案。
+
+具体而言，记源点为 <math>s</math>,汇点为 <math>t</math>. 设 <math>u\in V,\ d(u)</math> 代表从 <math>s</math> 到 <math>u</math> 每单位流量花费的最小费用，<math>f(u)</math> 代表使用上述每单位流量花费费用最小的路径能够让多少流量从源点流到 <math>u</math>. 在 SPFA 每一轮循环过程中，从队列中取出一个结点 <math>u</math>, 并枚举每一条边 <math>(u,v)\in E</math>, 如果满足 <math>d(v)>d(u)+w(u,v)</math> 则更新相应的 <math>d(v)=d(u)+w(u,v)</math> 和 <math>f(v)=\min\{f(u),f(u,v)\}</math>，同时记录 <math>last(v)</math> 代表来到结点 <math>v</math> 使用了哪一条弧. 求出[[单源最短路|单源最短路]]后，就等同于找到了一条增广路，花费 <math>f(t)\times d(t)</math> 将流量增大 <math>f(t)</math>. 增广结束后，我们需要更新这条增广路上[[网络流#弧|弧]]和反向弧的流量。<ref>{{cite book |author1=刘汝佳 |coauthors=陈锋 |editor=朱英彪 |title=Suan fa jing sai ru men jing dian xun lian zhi nan |publisher=Qing hua ta xue chu ban she |isbn=978-7-302-29107-7 |page=362}}</ref>
+
+需要注意的是，与求解[[单源最短路|单源最短路]]问题时类似，虽然[[SPFA|SPFA]]能够处理带有负权的边（也就是费用为负的弧），但是如果出现了[[图论#负环|负环]]，则会让算法陷入死循环。
+
+== 实际应用与推广 ==
+
+利用这种算法，不仅可以解决[[#问题提出|前面提到]]的类似问题，经过变换也可以通过建立相应模型间接地解决许多问题。
+
+=== [[二分图的带权匹配|二分图的带权匹配]] ===
+[[二分图的带权匹配|二分图的最佳带权匹配问题]]在经过变形之后，可以使用最小费用最大流相关算法进行求解。首先对于[[二分图|二分图]]中的每一条边，视其容量为1，它的权值也就是费用，由于最佳带权匹配需要所有匹配边权值之和最大，所以视其费用为权值的相反数。正确地求得最小费用 <math>C</math> 之后，最佳带权匹配的总权值之和 <math>T</math> 就是最小费用的相反数 <math>T=-C</math>.
+
+需要注意的是，二分图匹配问题中有许多个源点和许多个汇点，一条[[网络流#可行流|可行流]]可以从其中任何一个源点出发到达任何一个汇点结束，对于这种情况，我们可以建立一个额外的源点何一个额外的汇点，将额外源点与所有源点连容量为 <math>\infty</math> 费用为 <math>0</math> 的弧，额外汇点也执行类似的操作。完成这一步后，所得到的模型已与普通最小费用最大流无异。
+
+== 参考程序 ==
+=== [[C++|C++]] ===
+<syntaxhighlight lang=cpp>
+#include<bits/stdc++.h>
+
+constexpr auto MAXN = 5000 + 50;
+
+struct Edge {
+	int fr, to, residual, cost;
+};
+std::vector<Edge>edges; std::vector<int> G[MAXN];
+int s, t, maxFlow, minCost;
+int last[MAXN], flow[MAXN], dis[MAXN];
+bool inQueue[MAXN];
+
+bool SPFA() {
+	memset(inQueue, false, sizeof(inQueue)); std::fill(dis, dis + MAXN, INT_MAX);
+	std::queue<int> que; que.push(s); inQueue[s] = true; 
+	flow[s] = INT_MAX; last[s] = 0; dis[s] = 0;
+
+	int nowAt;
+	while (!que.empty()) {
+		nowAt = que.front(); que.pop(); inQueue[nowAt] = false;
+		for (int i = 0; i < G[nowAt].size(); i++) {
+			Edge& it = edges[G[nowAt][i]];
+			if (it.residual > 0 && dis[it.to] > dis[nowAt] + it.cost) {
+				dis[it.to] = dis[nowAt] + it.cost;
+				last[it.to] = G[nowAt][i];
+				flow[it.to] = std::min(flow[nowAt], it.residual);
+				if (!inQueue[it.to]) { inQueue[it.to] = true; que.push(it.to); }
+			}
+		}
+	}
+	if (dis[t] == INT_MAX)return false;
+
+	maxFlow += flow[t]; minCost += dis[t] * flow[t];
+	nowAt = t;
+	while (nowAt != s) {
+		edges[last[nowAt]].residual -= flow[t];
+		edges[last[nowAt] ^ 1].residual += flow[t];
+		nowAt = edges[last[nowAt]].fr;
+	}
+    return true;
+}
+
+void MCMF() {
+	maxFlow = 0; minCost = 0;
+	while (SPFA());
+}
+
+signed main()
+{
+	int fr, to, cost, flow;
+	int totNode, totEdges;
+
+	scanf("%d%d%d%d", &totNode, &totEdges, &s, &t);
+	for (int i = 0; i < totEdges; i++) {
+		scanf("%d%d%d%d", &fr, &to, &flow, &cost);
+		G[fr].push_back(edges.size()); edges.push_back({ fr,to,flow,cost });
+		G[to].push_back(edges.size()); edges.push_back({ to,fr,0,-cost });
+	}
+    MCMF();
+
+	printf("%d %d\n", maxFlow, minCost);
+
+	//system("pause");
+	return 0;
+}
+</syntaxhighlight>
+
+== 参见 ==
+* [[网络流|网络流]]
+* [[最大流|最大流]]
+* [[最短路问题|最短路问题]]
+* [[Bellman-Ford算法|Bellman-Ford算法]]
+* [[SPFA算法|SPFA算法]]
+* [[最大流最小割定理|最大流最小割定理]]
+* [[Ford–Fulkerson算法|Ford–Fulkerson算法]]
+* [[Dinic算法|Dinic算法]]
+* [[ISAP算法|ISAP算法]]
+
+== 参考文献 ==
+{{reflist}}
+
+[[Category:管理学|Category:管理学]]
+[[Category:经济学|Category:经济学]]
+[[Category:网络流|Category:网络流]]
+[[Category:图论|Category:图论]]

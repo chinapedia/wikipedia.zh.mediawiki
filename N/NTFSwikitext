@@ -1,0 +1,660 @@
+{{expand language|1=en|page=|time=2020-09-23}}
+{{更新|time=2020-09-23T12:42:16+00:00}}
+{{NoteTA
+|G1=IT
+}}
+{{Infobox filesystem
+| name = NTFS
+| full_name=New Technology File System
+| developer = [[Microsoft|Microsoft]]
+| introduction_os = [[Windows_NT_3.1|Windows NT 3.1]]
+| introduction_date = 1993年7月
+| partition_id =[[主引导记录|主引导记录（MBR）]]:0x07<br /> <tt>[[GUID磁碟分割表|GUID磁碟分割表]]（GPT）:EBD0A0A2-B9E5-4433-87C0-68B6B72699C7（[[基本数据分区|基本数据分区]]（BDP）)</tt>
+| directory_struct = [[B+树|B+树]]<ref name=insidewin2kntfs>{{cite web
+   | url = http://msdn2.microsoft.com/en-us/library/ms995846.aspx
+   | title = Inside Win2K NTFS, Part 1
+   | author = [[Mark_Russinovich|Mark Russinovich]]
+   | publisher = [[MSDN|Microsoft Developer Network]]
+   | accessdate = 2008-04-18
+   | archive-date = 2008-04-13
+   | archive-url = https://web.archive.org/web/20080413181940/http://msdn2.microsoft.com/en-us/library/ms995846.aspx
+   | dead-url = no
+   }}</ref>
+| file_struct = [[位图|位图]]
+| bad_blocks_struct = $BadClus（MFT记录）
+| max_filename_size = 255个[[UTF-16|UTF-16]]编码单元<ref name="ntfsdoc">{{cite web
+ |url         = http://data.linux-ntfs.org/ntfsdoc.html.gz
+ |title       = NTFS Documentation
+ |author      = Richard Russon and Yuval Fledel
+ |accessdate  = 2007-07-01
+ |deadurl     = yes
+ |archiveurl  = https://web.archive.org/web/20060213202831/http://data.linux-ntfs.org/ntfsdoc.html.gz
+ |archivedate = 2006-02-13
+}}</ref>
+| max_files_no = 4,294,967,295（2<sup>32</sup>-1）<ref name="How NTFS Works">{{cite web
+ |url         = http://technet2.microsoft.com/windowsserver/en/library/8cc5891d-bf8e-4164-862d-dac5418c59481033.mspx
+ |title       = How NTFS Works
+ |author      = Microsoft Corporation
+ |accessdate  = 2008-01-27
+ |deadurl     = yes
+ |archiveurl  = https://www.webcitation.org/61BaJpESU?url=http://technet.microsoft.com/en-us/library/cc706993(WS.10).aspx
+ |archivedate = 2011-08-24
+}}</ref>
+| max_volume_size =理論：2<sup>64</sup>-1簇<ref name="How NTFS Works"/><br />實際：256 [[TiB|TiB]]-64 [[KiB|KiB]]<ref name="How NTFS Works"/>
+| max_file_size = 理論：16[[EiB|EiB]]-1[[KiB|KiB]]<ref name="How NTFS Works"/><br />實際：16[[TiB|TiB]]-64[[KiB|KiB]]([[Windows_7|Windows 7]]、[[Windows_Server_2008_R2|Windows Server 2008 R2]]及以前版本)，256[[TiB|TiB]]-64[[KiB|KiB]]（[[Windows_8|Windows 8]]、[[Windows_Server_2012|Windows Server 2012]]及以后版本）<ref name="How NTFS Works"/>
+| filename_character_set = 在[[POSIX|POSIX]]命名空间中，非U+0000（[[空字符|NUL]]）和/（[[斜杠|斜杠]]）的任何[[UTF-16|UTF-16]]码元（大小写敏感）。在Win32命名空间中，非U+0000（[[空字符|NUL]]）、/（[[斜杠|斜杠]]）、\（[[反斜杠|反斜杠]]）、:（[[冒号|冒号]]）、*（[[星号|星号]]）、?（[[问号|问号]]）、"（[[引号|引号]]）、<（[[小于号|小于号]]）、>（[[大于号|大于号]]）和 |（[[谢费尔竖线|竖线]]或[[管道符|管道符]]）的任何[[UTF-16|UTF-16]]字符（大小写不敏感）。<ref name="ntfsdoc"/>
+| dates_recorded = 创建、修改、POSIX更改、访问
+| date_range = 1601年1月1日– 60056年5月28日（文件时间为64位数字，计时间隔为100纳秒（每秒一千万次），从1601年开始持续58000+年）
+| date_resolution = 100ns
+| forks_streams = 是（请参见下面的''可选数据流''）
+| attributes = 只读、隐藏、系统、存档、内容未索引、脱机、临时
+| file_system_permissions = [[访问控制列表|访问控制列表（ACL）]]
+| compression = 对每个文件，[[LZ77|LZ77]]（[[Windows_NT|Windows NT 3.51]]以上）
+| single_instance_storage = 是
+| encryption = 对每个文件<br />[[DESX|DESX]]（[[Windows_2000|Windows 2000]]以上）<br />[[Triple_DES|Triple DES]]（[[Windows_XP|Windows XP]]以上）<br />[[高级加密标准|高级加密标准（AES）]]（Windows XP Service Pack 1、[[Windows_Server_2003|Windows Server 2003]]以上）
+| OS = [[Windows_NT_3.1|Windows NT 3.1]]以上<br />[[OSX_10.3|OSX 10.3]]以上（只读）<br />[[Linux内核|Linux内核]]版本2.6以上<br />[[Linux内核|Linux内核]]版本2.2-2.4（只读）<br />[[FreeBSD|FreeBSD]]<br />[[NetBSD|NetBSD]]<br />[[Chrome_OS|Chrome OS]]<br />[[Solaris|Solaris]]<br />[[ReactOS|ReactOS]]（只读）
+}}
+
+'''NTFS'''（{{lang-en|'''New Technology File System'''}}），是[[Microsoft|Microsoft]]公司开发的[[专有软件|专用]][[文件系统|文件系统]]，从[[Windows_NT_3.1|Windows NT 3.1]]开始成为[[Windows_NT|Windows NT]]家族的默认文件系统。<ref name="Custer, Helen">{{cite book | last=Custer | first=Helen | title=Inside the Windows NT File System | url=https://archive.org/details/insidewindowsntfs | year=2020 | publisher=[[Microsoft_corporation|Microsoft corporation]] | isbn=978-1-55615-660-1 }}</ref>
+
+NTFS取代[[FAT|FAT]]（文件分配表）和[[HPFS|HPFS]]（高性能文件系统）并进行一系列改进成为更加完善的安全系统，例如增强对[[元数据|元数据]]的支持，使用更高级的数据结构以提升性能、可靠性和磁盘空间利用率，并附带一系列增强功能，如[[访问控制列表|访问控制列表]]（ACL）和[[文件系统日志|文件系统日志]]。
+
+其他台式机和服务器操作系统也支持NTFS。[[Linux|Linux]]和[[windows|windows]]提供[[封閉源代码软件|代码]]的软件[[NTFS-system|NTFS-system]]，可用于读写NTFS文件。[[Mac_OS_X|Mac OS X]]内核不能对NTFS进行读操作。
+
+== 歷史 ==
+20世纪80年代中期，[[微软|微软]]（Microsoft）和[[IBM|IBM]]合作，希望创建下一代的图形[[操作系统|操作系统]]。该项目的成果為[[OS/2|OS/2]]，但由于微軟和IBM在很多重要问题上无法达成共识，最后合作被终止，目前OS/2至今仍属於IBM，而Microsoft从此后开始研究Windows NT。
+
+OS/2的文件系统[[HPFS|HPFS]]包含许多重要功能，当Microsoft开始创建他们自己的新操作系统时，NTFS文件系统的很多功能正是从HPFS中借鉴改善的。<ref>{{cite web
+   |url=http://www.pcguide.com/ref/hdd/file/ntfs/over-c.html
+   |title=Overview and History of NTFS
+   |last=Kozierok
+   |first=Charles M.
+   |date=April 17, 2001
+   |publisher=PCGuide
+   |accessdate=2008-10-31
+   |archive-date=2010-01-02
+   |archive-url=https://web.archive.org/web/20100102061347/http://pcguide.com/ref/hdd/file/ntfs/over-c.html
+   |dead-url=yes
+   }}</ref>可能正是因为他们来自于同一个项目，HPFS和NTFS使用相同的[[磁盘分区标识代码|磁盘分区标识代码]]（0x07）。这是一种非常特殊的情况，因为可用的标识码并不匮乏，其它每个文件系统具有自己的标识码，例如，FAT拥有超过九个编号（[[档案配置表|FAT12]]、[[档案配置表|FAT16]]、[[档案配置表|FAT32]]等等各自都拥有不同的标识码）。这种特例也导致之后用于区分文件系统的算法当遇到代码0x07时候不得不进行额外的检测。
+
+NTFS的开发者包括：[[Tom_Miller|Tom Miller]]、[[Gary_Kimura|Gary Kimura]]、[[Brian_Andrew|Brian Andrew]]以及[[David_Goebel|David Goebel]]。
+
+== 版本 ==
+微软正式发布的NTFS版本有五个：
+* v1.0，随[[Windows_NT_3.1|Windows NT 3.1]]在1993年中旬发布<ref name="Custer, Helen" />。v1.0和v1.1和之后的所有版本不兼容。也即使用NT 3.5x写入的卷无法被NT 3.1读取。该问题的一个解决方案是使用NT 3.5x光盘更新NT 3.1，并添加对FAT系统的长文件名支持。<ref>{{cite web
+   |url=http://support.microsoft.com/kb/q129102/
+   |title=Recovering Windows NT After a Boot Failure on an NTFS Drive
+   |publisher=Microsoft
+   |date=November 1, 2006
+   |accessdate=2008-10-31
+   |archive-date=2012-10-24
+   |archive-url=https://web.archive.org/web/20121024163220/http://support.microsoft.com/kb/q129102
+   |dead-url=no
+   }}</ref>
+* v1.1，随[[Windows_NT_3.5|Windows NT 3.5]]于1994年秋季发布。
+* v1.2，随[[Windows_NT_3.51|Windows NT 3.51]]于1995年中旬发布。支持[[压缩文件|压缩文件]]、[[命名流|命名流]]、基于ACL（访问控制列表）的安全性等功能。<ref name="insidewin2kntfs" />
+* v3.0，随[[Windows_2000|Windows 2000]]发布。支持[[磁盘限额|磁盘限额]]、[[加密|加密]]、[[稀疏文件|稀疏文件]]、[[NTFS重解析点|重解析点]]{{Fact|time=2008-10-31}}，[[更新序列数|更新序列数]]（USN）日志、$Extend文件夹（及其中的文件），并改进[[安全描述符|安全描述符]]设计方案，允许使用同样的安全设置的多个文件共享一个安全描述符。<ref name=insidewin2kntfs />
+* v3.1随[[Windows_XP|Windows XP]]于2001年秋季发布。在MFT中提供[[冗余MFT记录数|冗余MFT记录数]]扩展项，可用于恢复受损的MFT文件。
+
+不应将NTFS.sys文件版本（如[[Windows_2000|Windows 2000]]中的 v5.0）和NTFS磁盘格式版本（如[[Windows_XP|Windows XP]]开始的v3.1）相混淆。<ref>{{cite web
+   |url=http://support.microsoft.com/kb/310749
+   |title=New Capabilities and Features of the NTFS 3.1
+   |publisher=Microsoft
+   |date=December 1, 2007
+   |accessdate=2011-04-01
+   |archive-date=2010-09-14
+   |archive-url=https://web.archive.org/web/20100914062500/http://support.microsoft.com/kb/310749
+   |dead-url=no
+   }}</ref>
+
+后续的Windows的版本更新增加了许多文件系统相关的功能，但并没有改变NTFS本身。例如[[Windows_Vista|Windows Vista]]增加了[[NTFS符号链接|NTFS符号链接]]、[[事务NTFS|事务NTFS]]、磁盘收缩和自我修复，但除了符号链接外其他功能其实都由操作系统实现。
+
+== 功能 ==
+相对于之前的版本，NTFS v3.0包含若干新功能：磁盘使用限额、稀疏文件支持、重解析点、[[分布链接跟踪|分布链接跟踪]]，以及文件级加密（即“[[加密文件系统|加密文件系统]]（EFS）”）。
+
+=== 可伸缩性 ===
+理论上，NTFS卷的最大容量为2<sup>64</sup>-1簇。在Windows XP专业版中，由于分区表限制，实际实现的最大容量为2<sup>32</sup>-1簇。例如，在当簇的从大小为64 KiB时，Windows XP的NTFS卷的最大容量为256 TiB减去64 KiB；而当簇大小为默认的4 KiB时，卷最大容量将变为16 TiB减去4 KiB（但这都超过了[[Windows_XP_SP1|Windows XP SP1]]对磁盘容量的128 GiB限制）。由于主引导记录（MBR）分区表最大支持单个分区容量为2 TiB，因此如果要创建超过2 TiB的NTFS卷，必须要使用动态卷或者[[GPT|GPT]]卷。注意：微软默认的引导程序必须使用[[UEFI|UEFI]]和[[64位|64位]]操作系统才能从GPT卷引导系统。
+
+=== 日志 ===
+NTFS是一个[[日志文件系统|日志文件系统]]，使用NTFS日志（$Logfile）记录卷更改元数据。这是NTFS一个非常关键的功能（FAT/FAT32不提供此项功能），可确保其内部的复杂数据结构（如比较重要的如卷分配图、[[磁盘碎片整理|磁盘碎片整理]]API产生的数据转移操作、MFT（[[主文件表|主文件表]]）记录的更改情况（包括移动MFT记录中存储的变长属性和属性表等））和索引（在目录和安全描述符中使用）即使在系统崩溃后仍然能保证一致性，而当在卷被重新加载后，可以非常容易地回滚这些关键数据的意外修改。
+
+[[USN日志|USN日志]]是一项系统管理功能，用于记录卷中所有文件、数据流、目录的内容、属性以及各项安全设置的更改情况。应用程序可以利用日志追踪卷的更改。<ref>{{cite web|url=http://msdn.microsoft.com/en-us/library/aa363798.aspx|title=Change Journals (Windows)|publisher=[[MSDN|MSDN]]|accessdate=2010-04-16|archive-date=2011-01-17|archive-url=https://web.archive.org/web/20110117013809/http://msdn.microsoft.com/en-us/library/aa363798.aspx|dead-url=no}}</ref>对于非系统卷，可以选择打开或关闭日志。<ref>{{cite web|url=http://msdn.microsoft.com/en-us/library/aa363877（v=VS.85）.aspx|title=Creating, Modifying, and Deleting a Change Journal (Windows)|publisher=[[MSDN|MSDN]]|accessdate=2010-04-16}}{{Dead link|date=2018年8月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>当添加一个新卷后，默认情况下日志功能处于打开状态。
+
+=== 硬链接 ===
+硬链接可用于将不同的文件名直接关联到同样的文件内容。
+
+[[硬链接|硬链接]]类似于[[目录连接|目录连接]]，但必须引用到文件。硬链接只能连接到同一个卷内的文件，因为每个卷拥有自己的主文件表（[[#主文件表（MFT）|MFT]]）。硬链接有自己的元数据，因此如果更改某个硬链接的文件大小或尺寸，其他硬链接在被打开前可能不会自动更新这些信息。
+
+[[硬链接|硬链接]]原本用于支持Windows NT的[[POSIX|POSIX]][[子系统|子系统]]<ref>MS Windows NT Workstation 4.0 Resource Guide, "[http://www.microsoft.com/technet/archive/ntwrkstn/reskit/poscomp.mspx?mfr=true POSIX Compatibility] {{Wayback|url=http://www.microsoft.com/technet/archive/ntwrkstn/reskit/poscomp.mspx?mfr=true |date=20080501042054 }}"</ref>。
+
+Windows使用硬链接实现对[[8.3文件名|8.3文件名]]的支持。操作系统需要该功能，因为有些古老的应用程序只能使用短文件名。NTFS将会为文件和目录创建额外的NTFS记录，但他们将总是自动同步更新（常规硬链接并不会同步更新）。
+
+NTFS文件系统限制单个文件只能关联到1024个硬链接。<ref>{{cite web|title=MSDN - CreateHardLink function|url=https://msdn.microsoft.com/en-us/library/aa363860%28v=vs.85%29.aspx|accessdate=14 January 2016|archive-date=2016-09-10|archive-url=https://web.archive.org/web/20160910105149/https://msdn.microsoft.com/en-us/library/aa363860%28v=vs.85%29.aspx|dead-url=no}}</ref>
+
+=== 可选数据流（ADS） ===
+[[分岔_(文件系统)|可选数据流]]使单个文件可以关联到多个数据流。NTFS数据流的表述方式为“文件名:流名”，例如“text.txt:extrastream”。
+
+NTFS流从[[Windows_NT_3.1|Windows NT 3.1]]开始被引入，起初设计目的是为了[[Services_for_Macintosh|Services for Macintosh]]（SFM）能够正确存储[[Macintosh|Macintosh]]的[[资源分岔|资源分岔]]。现在的Windows服务器已经不再包含此功能，但很多第三方的[[Apple归档服务|Apple归档服务]]（AFP）产品（例如Group Logic的[[ExtremeZ-IP|ExtremeZ-IP]]）仍然会继续使用可选数据流。Internet Explorer和其它一些浏览器会在从网络上下载的文件中添加一个非常小的可选数据流，用于标记它们来自于外部网站（表示可能会存在安全风险），用户在打开这些文件前系统将会显示一个确认提示。<ref>
+{{cite book
+| title = Windows Internals
+| url = https://archive.org/details/windowsinternals0000russ
+| edition = 5th
+| last1 = Russinovich | first1 = Mark E.  | authorlink = Mark Russinovich
+| last2 = Solomon     | first2 = David A.
+| last3 = Ionescu     | first3 = Alex
+| publisher = Microsoft Press
+| year = 2009
+| chapter = File Systems
+| page = [https://archive.org/details/windowsinternals0000russ/page/921 921]
+| quote = 一个使用多数据流的Windows组件例子是附件执行服务[...]，根据文件所下载位置的所属区域不同[...]，Windows资源管理器可能会警告用户
+| ISBN = 978-0-7356-2530-3
+}}</ref>当用户表示不希望再次看到这个确认对话框的时候，这个可选流将会从下载的文件中被直接删除。
+
+可选数据流不会显示在Windows资源管理器中，也不会算入查看文件属性时显示的文件大小。如果将文件复制到FAT格式的磁盘、附加到电子邮件、上传到网站，或者移动到任何其它不支持可选流的位置上时，则只有主数据流会被保留下来，其它可选流将被全部丢弃，因此使用可选流来保存重要数据很可能会发生意外。Microsoft提供了一个叫作Streams<ref>{{Cite web |url=http://technet.microsoft.com/en-us/sysinternals/bb897440.aspx |title=Sysinternals Streams v1.56 |accessdate=2011-04-01 |archive-date=2011-03-18 |archive-url=https://web.archive.org/web/20110318222728/http://technet.microsoft.com/en-us/sysinternals/bb897440.aspx |dead-url=no }}</ref>的工具，用户可以使用这个工具查看卷中的可选流。从[[Windows_Powershell|Windows Powershell]] 3.0版本开始，以下[[cmdlet|cmdlet]]支持对可选数据流进行操作：Add-Content、Clear-Content、Get-Item、Out-String、Remove-Item，以及Set-Item。<ref>{{cite web|title=FileSystem Provider|url=https://technet.microsoft.com/en-us/library/hh847764(v=wps.620).aspx|publisher=Microsoft|accessdate=23 January 2015|date=9 August 2012|deadurl=yes|archiveurl=https://web.archive.org/web/20150123140513/https://technet.microsoft.com/en-us/library/hh847764(v=wps.620).aspx|archivedate=2015年1月23日}}</ref>
+
+有些媒体播放器也尝试使用可选数据流记录多媒体文件的自定义元数据，用于管理媒体文件。MPEG、OGG等格式通常在文件内签入信息标签记录媒体信息，但不是所有格式都支持这种设计，而使用可选数据流的好处正是他不会影响文件本身的内容。在Windows中注册外壳扩展程序后，系统就可以解析这些数据，然后可以在Windows资源管理器的信息栏中显示它们。但大部分媒体播放器还是选择使用独立数据库而非可选数据流来保存这些信息，因为可选数据流可能带来一些其它问题，一个典型问题是文件上的信息对于所有用户都可见并且是共享的，因此使用可选数据流将无法根据不同用户的安全设置和喜好进行分别管理和保护。
+
+一些[[恶意软件|恶意软件]]会使用可选数据流来隐藏程序代码，<ref>[https://www.auscert.org.au/render.html?it=7967 Malware utilising Alternate Data Streams?] {{Wayback|url=https://www.auscert.org.au/render.html?it=7967 |date=20080723180729 }}, AusCERT Web Log, 21 August 2007</ref>不过不少恶意软件扫描程序和特殊工具现在已经能够检查可选数据流中的内容。
+
+=== 文件压缩 ===
+NTFS能够使用LZNT1算法（[[LZ77|LZ77]]算法的一种变种）[[数据压缩|压缩]]文件。<ref>{{cite web
+|url=http://msdn.microsoft.com/library/default.asp?url=/library/en-us/fileio/fs/file_compression_and_decompression.asp
+|title=File Compression and Decompression
+|publisher=MSDN Platform SDK: File Systems
+|accessdate=2005-08-18
+|archive-date=2019-10-18
+|archive-url=https://web.archive.org/web/20191018203854/https://msdn.microsoft.com/library?url=%2Flibrary%2Fen-us%2Ffileio%2Ffs%2Ffile_compression_and_decompression.asp
+|dead-url=no
+}}</ref>文件压缩以16个簇为一个区块进行，也即如果簇大小为4KB，则压缩时单个区块的大小为64KB。NTFS压缩算法支持的最大簇大小为 4KB，如果簇大小超过 4KB，则压缩功能将不可用。<ref>{{cite web |url= http://support.microsoft.com/kb/314878 |title= The Default Cluster Size for the NTFS and FAT File Systems |publisher= Microsoft |date= January 31, 2002 |accessdate= 2012-01-10 |archive-date= 2012-01-30 |archive-url= https://web.archive.org/web/20120130105254/http://support.microsoft.com/kb/314878 |dead-url= no }}</ref> 如果压缩可以将64KB数据压缩到60KB或者更小，则NTFS会将多余的4KB页面视为[[稀疏文件|稀疏文件]]簇，认为他们未经写入。对此类簇的随机访问的性能是可以接受的，操作系统只需跟踪碎片链接即可。但如果处理大型可压缩文件，则会产生大量碎片，因为NTFS会将每个小于64KB的区块都看成一个碎片区域。<ref>{{cite web
+|url=http://blogs.msdn.com/b/ntdebugging/archive/2008/05/20/understanding-ntfs-compression.aspx
+|title=Understanding NTFS Compression
+|accessdate=2011-03-16
+|archive-date=2011-06-29
+|archive-url=https://web.archive.org/web/20110629043102/http://blogs.msdn.com/b/ntdebugging/archive/2008/05/20/understanding-ntfs-compression.aspx
+|dead-url=no
+}}</ref><ref>{{cite web|url=http://www.forensicfocus.com/index.php?name=Content&pid=179|title=Shrinking the gap: carving NTFS-compressed files|accessdate=2011-05-29|archive-url=https://web.archive.org/web/20111007105753/http://www.forensicfocus.com/index.php?name=Content&pid=179|archive-date=2011-10-07|dead-url=yes}}</ref>微软NTFS开发团队的研究表明，在簇大小为4KB（默认设置）时，NTFS卷上压缩文件的合理最大尺寸应当在50-60GB之间。当簇大小更小时，最大尺寸也会减小。<ref>{{cite web |url=http://blogs.msdn.com/b/ntdebugging/archive/2008/05/20/understanding-ntfs-compression.aspx |title=Understanding NTFS Compression |work=Ntdebugging Blog |publisher=[[Microsoft|Microsoft]] |date=20 May 2008 |first=Dennis |last=Middleton |accessdate=2011-04-01 |archive-date=2011-06-29 |archive-url=https://web.archive.org/web/20110629043102/http://blogs.msdn.com/b/ntdebugging/archive/2008/05/20/understanding-ntfs-compression.aspx |dead-url=no }}</ref>硬盘空间受限的单用户系统可以使用NTFS压缩在处理小文件（4KB到64KB，或者更大尺寸，具体范围取决于压缩比）时受益。小于900字节的文件将被直接存储在MFT的目录项中。<ref>{{cite web
+|url=http://technet.microsoft.com/en-us/library/cc781134%28WS.10%29.aspx
+|title=How NTFS Works
+|date=2003-03-28
+|accessdate=2011-10-24
+|archive-date=2016-07-30
+|archive-url=https://web.archive.org/web/20160730212559/https://technet.microsoft.com/en-us/library/cc781134%28WS.10%29.aspx
+|dead-url=no
+}}</ref>
+
+闪存设备（如[[固态硬盘|固态硬盘]]）没有传统[[硬盘|硬盘]]的磁头移动延迟，因此对此类设备，磁盘碎片的影响非常有限。具有快速多处理器系统的用户可以通过压缩应用程序文件和数据以提升速度并降低磁盘空间使用率。<ref>{{cite web 
+|url=http://www.tomshardware.com/reviews/ssd-ntfs-compression,3073-11.html 
+|title=Should You Compress Data On Your SSD? 
+|date=2011-12-01
+|accessdate= 2013-04-05
+}}</ref>请注意，使用Sandforce控制器的SSD本身也会压缩数据，但文件系统压缩会导致传输的数据量变少，因此I/O负载会降低。
+
+数据压缩的最佳目标是内容具有重复性、很少写入、通常顺序访问，并且尚未被压缩过的文件。例如，日志文件就是一种理想的压缩目标。
+
+压缩系统引导时需要使用的文件，如驱动程序、NTLDR、winload.exe，或者BOOTMGR，会导致系统无法正确启动。<ref>{{cite web
+|url=http://technet.microsoft.com/en-us/library/cc977213.aspx
+|title=Disk Concepts and Troubleshooting
+|publisher=Microsoft
+|accessdate=2012-03-26
+|archive-date=2012-04-20
+|archive-url=https://web.archive.org/web/20120420000103/http://technet.microsoft.com/en-us/library/cc977213.aspx
+|dead-url=no
+}}</ref>不过在较新版本的Windows系统中，重要的系统文件会被禁止压缩。
+
+当在驱动器或目录的“高级设置”中更改“将文件进行压缩”的设置时，每个文件将被独立进行压缩或者解压缩。
+
+对于压缩文件的读写绝大部分时候是[[网络透明|透明]]的<ref>{{cite web
+|url=http://msdn.microsoft.com/en-us/library/ms190257.aspx
+|title=Read-Only Filegroups and Compression
+|publisher=SQL Server 2008 Books Online (November 2009)
+|accessdate=2010-04-20
+|archive-date=2010-03-06
+|archive-url=https://web.archive.org/web/20100306170641/http://msdn.microsoft.com/en-us/library/ms190257.aspx
+|dead-url=no
+}}</ref>，但Microsoft建议避免对服务器系统或者通过网络共享的远程配置文件进行压缩，因为这可能增加处理器的负担。<ref>"[http://support.microsoft.com/default.aspx?scid=kb;en-us;Q251186 Best practices for NTFS compression in Windows] {{Wayback|url=http://support.microsoft.com/default.aspx?scid=kb;en-us;Q251186 |date=20131113184821 }}." ''Microsoft Knowledge Base.'' Retrieved on 2005-08-18.</ref>Microsoft建议不要压缩超过30MB的文件，因为这可能会产生性能问题。{{citation needed|date=May 2012}}由于压缩文件会产生很多碎片，因此磁盘碎片整理过程通常需要花费更长时间。
+
+计算机系统中最慢的设备通常不是CPU而是硬盘，因此NTFS压缩通常可以更有效地利用慢速的非RAM存储系统，节省空间和时间（前提是假设压缩文件的碎片不会连续存放）
+。<ref>{{cite web
+ |url         = http://www.windowsitlibrary.com/Content/435/07/8.html
+ |title       = Optimizing Disks
+ |first       = Sean
+ |last        = Daily
+ |date        = January 1998
+ |publisher   = IDG books
+ |accessdate  = 2007-12-17
+ |deadurl     = yes
+ |archiveurl  = https://web.archive.org/web/20071217083624/http://www.windowsitlibrary.com/Content/435/07/8.html
+ |archivedate = 2007-12-17
+}}</ref> 
+
+=== 稀疏文件 ===
+[[稀疏文件|稀疏文件]]是包含[[稀疏矩阵|稀疏数据集]]的文件，稀疏文件只储存文件中各个有意义的片段，而片段之间的空白将被忽略，这种设计特别适合实际数据非常少、大部分区域空白的文件。读取文件时，对任何被忽略的位置，文件系统程序都会返回数据0，因此文件内容看起来几乎全是零。很多数据库和科学程序使用稀疏文件<ref>[http://blogs.msdn.com/psssql/archive/2009/03/04/sparse-file-errors-1450-or-665-due-to-file-fragmentation-fixes-and-workarounds.aspx Sparse File Errors: 1450 or 665 due to file fragmentation: Fixes and Workarounds] {{Wayback|url=http://blogs.msdn.com/psssql/archive/2009/03/04/sparse-file-errors-1450-or-665-due-to-file-fragmentation-fixes-and-workarounds.aspx |date=20100516122013 }}, Microsoft Customer Service and Support (CSS) SQL Server Engineers Blog, March 4, 2009</ref>。Microsoft实现对稀疏文件的高效存储支持，允许应用程序指定文件的空（零）数据区域。读取稀疏文件的应用程序不需要做单独处理，可以继续使用常规方法读取数据，操作系统将根据读取的位置决定返回零或者实际数据。和压缩文件类似，磁盘限额对稀疏文件的尺寸判断以声明大小而非实际占用大小为准。<ref>{{cite web
+|url=http://msdn.microsoft.com/library/default.asp?url=/library/en-us/fileio/fs/sparse_files.asp
+|title=Sparse Files
+|publisher=MSDN Platform SDK: File Systems
+|accessdate=2005-05-22
+|archive-date=2019-10-18
+|archive-url=https://web.archive.org/web/20191018203849/https://msdn.microsoft.com/library?url=%2Flibrary%2Fen-us%2Ffileio%2Ffs%2Fsparse_files.asp
+|dead-url=no
+}}</ref><ref>{{cite web
+|url=http://msdn2.microsoft.com/en-us/library/aa365565.aspx
+|title=Sparse FIles and Disk Quotas
+|publisher=Win32 and COM Development: File Systems
+|accessdate=2007-12-05
+|archive-date=2008-02-24
+|archive-url=https://web.archive.org/web/20080224024620/http://msdn2.microsoft.com/en-us/library/aa365565.aspx
+|dead-url=no
+}}</ref>
+
+=== 卷影复制 ===
+[[卷影复制服务|卷影复制]]（VSC）服务通过将新改写的数据复制到卷影（[[写入时复制|写入时复制]]）来保存NTFS卷上的文件和文件夹的历史版本。当用户请求恢复文件的早期版本时，旧的文件数据将会覆盖新数据。该功能也使得数据备份程序可以存档当前系统正在使用的文件。对于负载较重的系统，Microsoft建议将卷影副本设置到单独的磁盘上，以减小系统主要卷的[[I/O|I/O]]负载。
+
+Windows Vista通过持久卷影副本实现[[系统还原|系统还原]]和[[先前的版本|先前的版本]]功能。但旧版本的操作系统加载NTFS卷时，由于其无法识别持久卷影副本的数据格式，这些副本将被删除。
+
+=== 事务 ===
+在Windows Vista中，应用程序可以使用[[事务NTFS|事务NTFS]]（Transactional NTFS，TxF）将一系列对文件的更改归组到一个[[事务|事务]]中。事务能够确保所有更改要么同时生效，要么同时作废，并能确保在事务提交完成前，其它应用程序无法无法检测到其中的更改。<ref>{{cite web|url=http://msdn2.microsoft.com/en-us/library/aa363764.aspx|title=Transactional NTFS|publisher=[[MSDN|MSDN]]|accessdate=2007-02-02|archive-date=2008-10-11|archive-url=https://web.archive.org/web/20081011213523/http://msdn2.microsoft.com/en-us/library/aa363764.aspx|dead-url=no}}</ref>
+
+该技术使用和卷影复制类似的技术（也即写入时复制）以确保在事务不成功时，被改写的数据可以安全地回滚。[[通用日志文件系统|通用日志文件系统]]的日志将记录下尚未成功提交或者已经提交但尚未完全生效的事务（常见原因是事务的某个参与者在提交过程中系统意外崩溃）。
+
+事务NTFS并不要求事务是本机NTFS卷的文件操作，可以包含在其它位置的任意事务数据或操作，例如对其它卷、本地注册表、SQL数据库中、系统服务或者远程服务中的事务修改。所有这些事务使用Windows系统中的“[[分布事务协调器（DTC）|分布事务协调器（DTC）]]”服务在网络级别协调所有参与者，以确保所有参与者都能接收到同样的提交状态，并传输所有经过确认的更改。分布式NTFS事务的一个典型例子是可以以事务方式创建一个网络级别的分布式文件系统，并且每个客户端都保留每个文件的准确的脱机缓存。
+
+=== 安全 ===
+在NTFS中，每个文件或文件夹具有一个[[安全描述符|安全描述符]]，用于说明其所有者，并包含两个[[安全控制列表|安全控制列表]]（ACL）。
+
+第一个列表被称为[[自主访问控制|自主访问控制]]列表（DACL），用于描述是否允许或禁止特定的用户或用户组进行特定的操作（如读取、写入、执行或删除）。例如，“C:\Program Files”文件夹可能被设定为允许所有用户读取并执行，但只有具有管理员权限的用户才能修改其内容。Windows Vista为DACL增加了[[强制访问控制|强制访问控制]]功能。DACL是Windows Vista及后续操作系统的[[用户账户控制|用户账户控制]]功能的主要检查点。
+
+第二个列表被称为系统访问控制列表（SACL），用于描述对文件或文件夹的特定行为是否应当被审核，以及在操作成功后是否应当记录操作。例如，企业可能会对高度敏感的文件开启审核功能，这样管理员就可以了解到是否有人尝试删除或复制这些文件，以及他们的操作是否成功完成。
+
+=== 加密 ===
+{{Main|加密文件系统}}
+[[加密文件系统|加密文件系统（EFS）]]提供对NTFS卷上任意文件和文件夹的用户透明的强保护。加密文件系统需要与EFS服务、Microsoft的[[加密应用程序接口|加密应用程序接口]]（CryptoAPI）以及EFS [[文件运行时库|文件运行时库]]（FSRTL）联合工作。
+
+EFS使用[[对称密钥算法|对称密钥]]（也被称为“文件加密密钥（FEK）”）加密文件，这比起使用[[非对称密钥算法|非对称密钥]]加密在加密和解密大量数据时消耗的时间较少。该对称密钥使用一个和请求加密文件的用户相关的[[公钥加密|公钥]]加密文件的内容，加密后的数据储存在被加密文件的可选数据流中。当需要解密文件时，文件系统使用用户的密钥解密储存在文件头中的对称密钥，然后使用该对称密钥解密文件。这些操作在文件系统级别完成，因此对用户来说是透明的。<ref>[http://www.microsoft.com/technet/prodtechnol/windows2000serv/reskit/distrib/dsck_efs_duwf.mspx How EFS Works] {{Wayback|url=http://www.microsoft.com/technet/prodtechnol/windows2000serv/reskit/distrib/dsck_efs_duwf.mspx |date=20070427062206 }}, ''Microsoft Windows 2000 Resource Kit''</ref>为了处理用户丢失密钥的情况，加密文件系统中还支持多个附加解密密钥，因此除用户外，授权过的[[恢复代理|恢复代理]]也能访问数据。NTFS提供的加密和压缩功能是互相排斥的——如果同时希望加密和压缩，则NTFS文件系统级别只能打开其中一种功能，另一种功能需要使用其它第三方工具完成。
+
+Basic、Home和MediaCenter版本的Windows上不支持EFS功能。要使用这个功能，必须安装Professional、Ultimate或者服务器版本的Windows，或者使用Windows域中的企业部署工具进行部署。
+
+=== 限额 ===
+[[磁盘限额|磁盘限额]]是NTFS v3开始提供的功能。此功能允许计算机管理员在受支持的Windows操作系统上为每个用户分别设定允许使用的磁盘空间阈值，或者跟踪查看每个用户使用的磁盘空间使用量。管理员可以设定当某个用户使用特定量的磁盘空间后收到“磁盘空间超限”的警告，甚至拒绝他们继续占用更多空间。如果有文件或者目录使用NTFS文件压缩，则磁盘限额管理的尺寸以压缩后的实际尺寸为准。如果应用程序通过操作系统接口查询用户可用的剩余磁盘空间大小，开启限额后程序得到的大小将是在限额范围内的剩余空间，而不再是磁盘的总剩余空间。
+
+Basic、Home和MediaCenter版本的Windows不支持磁盘限额功能。要使用这个功能，必须安装Professional、Ultimate或者服务器版本的Windows，或者使用Windows域中的企业部署工具进行部署。
+
+=== 重解析点 ===
+{{main|NTFS重解析点}}
+该功能从NTFS v3开始可用。该功能可以在用户空间中为文件或目录添加一个关联的重解析点属性。当对象管理器（请参见[[Windows_NT操作系统线架构#执行|Windows NT线执行]]）解析文件系统名称并遇到重解析点属性时，它将“重新解析”名称，具体做法是：Windows会将需要重解析的名称传递给已经加载的所有文件过滤驱动程序，每个过滤驱动程序都会检查重解析数据并判断自己是否和该重解析点相关联。如果某个过滤驱动程序判定自己匹配该重解析点，则它将拦截这次文件系统调用，然后执行对应的特定功能。重解析点是实现[[卷加载点|卷加载点]]、[[目录连接|目录连接]]、[[分层存储管理|分层存储管理]]、[[本机结构存储|本机结构存储]]，以及[[单实例存储|单实例存储]]等功能的基础。
+
+=== 卷加载点 ===
+类似于[[Unix|Unix]] [[加载点|加载点]]，可以将一个卷的根目录附加到另一个文件系统的某个目录下。这项功能可以让驱动器不需要单独的卷标（如<tt>C:</tt>或<tt>D:</tt>）就可以被访问。
+
+当卷被加载到另一个卷的某个目录时，该目录原来的内容将无法访问，而被新加载的卷中的内容所代替。被加载的卷仍然可以继续拥有独立的卷标。NTFS文件系统不允许卷之间相互加载。卷加载点可以是永久的，也可以是非永久的。前者在系统重启后会自动加载，而后者需要手动重新加载。
+
+被加载的卷可以使用NTFS外的其它文件系统。一个常见的例子是，被加载的卷一个远程共享的目录，该目录拥有自己的权限设置，并且能够根据实际文件系统的策略为当前操作系统设定特定的访问权限。
+
+=== 目录连接 ===
+类似于卷加载点，但[[NTFS连接点|目录连接]]的连接目标是文件系统中的某个其它目录。例如，目录<code>C:\exampledir</code>带有一个目录连接属性，连接到<code>D:\linkeddir</code>。当用户级别的应用程序访问时，NTFS将自动把所有引用重定向到<code>D:\linkeddir</code>。<ref name="insidewin2kntfs"/>目录连接功能在概念上类似于[[Unix|Unix]]的目录[[符号链接|符号链接]]，但符号链接可以连接到任何目标，而NTFS目录连接只允许连接到目录。
+
+目录连接可以在控制台中通过命令<tt>MKLINK /J连接名目标目录</tt>创建，使用<tt>RMDIR连接名</tt>删除。目录连接是永久性的，如果在客户端访问服务器的目录连接，则操作系统会使用被链接的目录所属的系统（或域）的安全设置。但连接本身可能拥有独立的安全设置，并且删除一个目录连接不会同时删除目标目录。
+
+有些目录连接是Windows Vista系统创建的，用于保持和早期版本的Windows的兼容性，例如系统驱动器中的<tt>Documents and Settings</tt>文件夹会被连接到同一个卷中的<tt>Users</tt>物理目录上。这些目录默认情况下是隐藏的，并且进行相关的安全设置，因此Windows资源管理器不允许[[外壳|外壳]]或者大部分应用程序直接打开它们，这样的设置可能是为了防止用户发现两个看上去相同的文件夹，然后错误地删除其中的某一个。默认情况下只有本机的SYSTEM账户或者的Administrators用户组成员可以访问这些目录，这是考虑到这些账户安装软件的权限，而安装时可能会产生兼容性问题。
+
+目录连接属于软链接（即使目标目录已经被删除，他们也仍然存在），使用一种类似符号链接的方式工作（只不过对于目标位置和类型有额外的限制），但NTFS文件系统对它们进行特殊优化，解析更快，相比于之后提出的NTFS [[符号链接|符号链接]]，目录连接的开销更小，且可以在服务器端解析，因此可以在远程共享目录中使用它们。
+
+=== 符号链接 ===
+{{See Also|NTFS符号链接}}
+[[符号链接|符号链接]]（或称软链接）从Windows Vista开始引入。<ref>{{cite web|url=https://msdn.microsoft.com/en-us/library/aa365680(VS.85).aspx|title=Symbolic Links (Windows)|publisher=MSDN|accessdate=2017-05-28|archive-date=2016-02-06|archive-url=https://web.archive.org/web/20160206102600/https://msdn.microsoft.com/en-us/library/aa365680(VS.85).aspx|dead-url=no}}</ref>符号链接在客户端解析，因此如果服务器上共享一个符号链接，则客户端访问时将服从本机而非服务器端的访问限制。
+
+符号链接可以链接到文件（使用<tt>MKLINK符号链接目标文件名</tt>创建），也可以链接到目录（使用<tt>MKLINK /D符号链接目标目录</tt>创建）。和Unix符号链接不同的一点是，NTFS符号链接在创建的时候就要决定目标类型（目录或文件），但创建符号链接的时候并不需要目标已经存在或可以访问，在访问时才会实际检查可访问性。NTFS在访问符号链接时也会检查目标的类型，由于NTFS不允许在任何位置有目录和文件同名，因此如果目标名称存在但是类型不正确，系统也会返回一个找不到目标的错误。
+
+符号链接也可以引用远程主机上的共享文件夹或者其中的文件、子文件夹。但目标并不会被立即加载，而是在应用程序使用OpenFile()或者CreateFile() API请求打开目标的时候才加载到系统中。符号链接是永久的（重新启动后仍然保留在对应的卷上），可以在命令行或者脚本中使用<tt>DEL符号链接</tt>删除它们。
+
+=== 分层存储管理（HSM） ===
+[[分层存储管理|分层存储管理]]是一种转移一定时间不用的文件到价值更低的储存介质中的方法。当文件再次被访问时，文件上的重解析点将判定文件需要被使用，并将文件从储存介质中恢复出来。分层存储不但可以节省存储开销，也可以提高操作系统的数据读写和运行效率。
+
+=== 本机结构存储（NSS） ===
+本机结构存储是一种已经被Microsoft终止使用的[[ActiveX|ActiveX]]文档存储技术。这项技术允许[[ActiveX文档|ActiveX文档]]使用和ActiveX内部的多流格式相同的方式进行储存。操作系统会加载一个NSS文件过滤驱动程序，可以在应用程序使用文件时透明地处理多流格式。当NSS文件被传输到非NTFS格式的磁盘卷上时，文件内部的多个流将被合并转换为一个流。<ref>John Saville, "[http://www.windowsitpro.com/Article/ArticleID/13785/13785.html What is Native Structured Storage?] {{Wayback|url=http://www.windowsitpro.com/Article/ArticleID/13785/13785.html |date=20070927212324 }}"</ref>
+
+===分布链接跟踪（DLT）===
+{{See also|文件快捷方式}}
+分布链接跟踪功能允许应用程序跟踪被重命名或者移动到同一计算机、域或工作组的其它卷中的文件、[[文件快捷方式|快捷方式]]和OLE链接。<ref>{{Cite web |url=http://msdn.microsoft.com/en-us/library/windows/desktop/aa363997.aspx |title=存档副本 |accessdate=2013-07-25 |archive-date=2016-03-12 |archive-url=https://web.archive.org/web/20160312131758/https://msdn.microsoft.com/en-us/library/windows/desktop/aa363997.aspx |dead-url=no }}</ref>跟踪功能由一个系统服务提供，使用存储在[[#元文件|元文件]]中的对象标识符（OID）索引实现。<ref>http://technet.microsoft.com/en-us/library/cc736811（WS.10）.aspx{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>当应用程序请求跟踪某个文件或目录后，跟踪服务将会创建对象的OID项并指向目标。在一个NTFS v3上执行文件重命名、复制或移动操作时，也会同时复制对象的OID，这样跟踪服务就可以有效地寻找到目标。
+
+=== 单实例存储（SIS） ===
+当若干个不同目录中存有内容相同的文件时，[[单实例存储|单实例存储]]允许将相同文件归并到一个单一文件中，并将所有文件引用到实际的文件上。单实例存储功能包含一个用于管理复制、修改和归并文件的文件系统过滤器和一个用于搜索需要归并的相同文件的用户空间服务（“groveler”）。单实例存储提出时的主要针对目标是远程安装服务器，这些服务器上往往拥有若干个包含大量相同文件的安装镜像，单实例存储可以将它们统一起来，因而节省需要占用的总尺寸。和硬链接不同的一点是，在SIS下，每个文件在逻辑上仍然是独立的，更改被合并为单个文件的任意其中一个文件都不会影响其它文件，而是会取消对该文件的合并并产生一个新的副本。不过新文件不会立即写入到硬盘，NTFS使用类似于[[写入时复制|写入时复制]]的技术，在文件最终需要保存时才执行复制。<ref>{{cite web|url=http://research.microsoft.com/sn/Farsite/WSS2000.pdf|format=PDF|title=Single Instance Storage in Windows 2000|publisher=[[Microsoft_Research|Microsoft Research]] and Balder Technology Group|accessdate=2008-10-31|archive-date=2008-10-29|archive-url=https://web.archive.org/web/20081029163043/http://research.microsoft.com/sn/Farsite/WSS2000.pdf|dead-url=no}}</ref>
+
+== 内部实现 ==
+
+[[File:NTPermissions.png|thumb]]系统上的NTFS文件权限设置对话框。]]在内部，NTFS使用[[B+树|B+树]]索引文件系统数据。这种数据结构的方式实现比较复杂，但能够在大多数情况下提高文件的查找速度。[[日志文件系统|文件系统日志]]用于确保文件的元数据完整，不存在孤立的文件内容。相比于FAT文件系统，NTFS文件系统的可靠性更高。<ref>"[http://www.microsoft.com/technet/archive/ntwrkstn/reskit/file_sys.mspx?mfr=true Microsoft TechNet Resource Kit] {{Wayback|url=http://www.microsoft.com/technet/archive/ntwrkstn/reskit/file_sys.mspx?mfr=true |date=20080224040805 }}"</ref>
+
+NTFS允许对名称（包括文件名称、流名称、索引名称等）使用除了0x0000以外的任意16位值序列进行编码。这意味着支持NTFS支持UTF-16码位，但文件系统并不会检查某个[[UTF-16/UCS-2|UTF-16]]序列是否有效（也即允许NTFS内部任意16位整数序列，不受Unicode标准的限制）。
+
+==={{Anchor|PBS}} 分区引导扇区===
+
+{| class="wikitable sortable"
+|+ NTFS 引导扇区内容
+! 字节偏移 !! 字段长度（字节） !! 典型值 !! 字段名 !! 描述
+|-
+| 0x00
+| 3
+| 0xEB5290
+| JMP 指令
+| 用于命令处理器继续执行引导扇区后的内容
+|-
+| 0x03
+| 8
+| "<code>NTFS    </code>"<br/><small>单词“NTFS”，以及后续四个空格（0x20）</small>
+| OEM 标识
+| 用于标记当前分区使用NTFS文件系统
+|-
+| 0x0B
+| 2
+| 0x0200
+| 每扇区字节数
+| 说明每个扇区的字节数
+|-
+| 0x0D
+| 1
+| 0x08
+| 每簇扇区数
+| 说明每个簇包含的扇区数
+|-
+| 0x0E
+| 2
+| 0x0000
+| 保留扇区数
+| 被操作系统保留的扇区数，参考文献中未说明保留扇区的位置
+|-
+| 0x10
+| 3
+| 0x000000
+| 未使用
+| 该字段的内容始终为零
+|-
+| 0x13
+| 2
+| 0x0000
+| NTFS 未使用
+| 该字段的内容始终为零
+|-
+| 0x15
+| 1
+| 0xF8
+| 介质描述符
+| 参考文件中未说明详细信息
+|-
+| 0x16
+| 2
+| 0x0000
+| 未使用Unused
+| 该字段的内容始终为零
+|-
+| 0x18
+| 2
+| 0x003F
+| 每磁道扇区数
+| 说明每个磁道的扇区数
+|-
+| 0x1A
+| 2
+| 0x00FF
+| 磁头数
+| 该驱动器包含的读写磁头数
+|-
+| 0x1C
+| 4
+| 0x0000003F
+| 隐藏扇区数
+| 隐藏的扇区数目。参考文献中未说明隐藏扇区位置
+|-
+| 0x20
+| 4
+| 0x00000000
+| 未使用
+| NTFS未使用
+|-
+| 0x24
+| 4
+| 0x80008000
+| 未使用
+| NTFS未使用
+|-
+| 0x28
+| 8
+| 0x00000000007FF54A
+| 总扇区数
+| 该分区包含的总扇区数目
+|-
+| 0x30
+| 8
+| 0x0000000000000004
+| $MFT 簇编号
+| $MFT 所在的簇的编号
+|-
+| 0x38
+| 8
+| 0x000000000007FF54
+| $MFTMirr 簇编号
+| $MFT镜像（备份）所在的簇的编号
+|-
+| 0x40
+| 1
+| 0xF6
+| 文件记录段字节数
+| 每个文件记录段的包含的字节数目。如果该值为负数，则实际值为 2 的 -value 次幂，例如值 0xF6 表示记录长度为 2^10（10==-0xf6）
+|-
+| 0x41
+| 3
+| 0x000000
+| 未使用
+| NTFS未使用该字段
+|-
+| 0x44
+| 1
+| 0x01
+| 索引缓冲簇数
+| 每个索引缓冲占据的簇数目，算法和文件记录段相同
+|-
+| 0x45
+| 3
+| 0x000000
+| 未使用
+| NTFS未使用该字段
+|-
+| 0x48
+| 8
+| 0x1C741BC9741BA514
+| 卷序列数
+| 该分区的唯一随机编号，用于确保内容一致性
+|-
+| 0x50
+| 4
+| 0x00000000
+| 校验和
+| 表中上述所有项目的校验和。文献中未说明校验算法
+|-
+| 0x54
+| 426
+|
+| 启动指令码
+| 用于加载操作系统其它部分的指令码，该字段位置正是引导扇区前三个字节指向的位置
+|-
+| 0x01FE
+| 2
+| 0xAA55
+| 扇区结束标记
+| 该字段用于标记一个正常扇区的结束
+|}
+<ref>[http://www.ntfs.com/ntfs-partition-boot-sector.htm NTFS Partition Boot Sector] {{Wayback|url=http://www.ntfs.com/ntfs-partition-boot-sector.htm |date=20160719125827 }} Information on structure of the boot sector.</ref>
+
+操作系统首先通过0x30位置的8个字节找到 $MFT 所在的簇编号，然后将其和每簇扇区数（0x0D位置的1字节）以及每扇区字节数（0x0B位置的2字节）相乘，获得$MFT的字节偏移量。
+
+=== {{Anchor|MFT}}主文件表（MFT）===
+在NTFS中，所有[[计算机文件|文件]]数据——文件名、创建日期、访问权限（使用[[访问控制列表|访问控制列表（ACL）]]实现），以及内容——都作为[[元数据|元数据]]储存在[[主文件表|主文件表]]中。这种抽象的实现方式能够大大简化为文件系统添加功能的成本。例如，[[Active_Directory|Active Directory（活动目录）]]服务可以很容易在文件系统中为文件添加索引字段。这种设计方式也使得[[Everything_(软件)|Everything]]或者Ultrasearch<ref>{{cite web|url=http://www.jam-software.com/ultrasearch/|title=UltraSearch v1.7 – Freeware for Ultra-Fast File Search|accessdate=2013-10-17|archive-date=2013-04-25|archive-url=https://web.archive.org/web/20130425225638/http://www.jam-software.com/ultrasearch/|dead-url=no}}</ref>一类的软件可以不依赖于[[Windows_Search|Windows Search]]实现对文件和文件夹名称的实时搜索。
+
+MFT结构支持最小化[[磁盘碎片|磁盘碎片]]的算法。<ref>{{cite web
+ |url       = http://msdn.microsoft.com/en-us/library/windows/desktop/aa365230（v=vs.85）.aspx
+ |title     = Master File Table
+ |date      = July 2, 2012
+ |publisher = [[Microsoft_Developer_Network|MSDN]]
+}}{{Dead link|date=2018年8月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>一个目录项同时包含“文件名”和“文件ID”，后者是用于在主文件表中标识文件的记录编号。文件ID也包含“重用次数”信息，可用于检测对文件的过期引用。这点设计非常类似于[[Files-11|Files-11]]文件系统的[[W_FID|W_FID]]，和NTFS的其他部分迥然不同。
+
+=== 元文件 ===
+NTFS包含若干用于定义和组织文件系统的文件。总体来说，这些文件中的绝大多数结构和其它用户文件类似（只有“$Volume”比较特殊），但不能被文件系统客户端直接访问。这些元文件为定义文件、备份文件系统的关键数据、缓存文件系统的更改、管理空闲空间的分配、满足[[BIOS|BIOS]]的要求、跟踪坏[[扇区|扇区]]单元，以及储存安全信息和磁盘空间使用情况等等多种不同需求提供支持。
+
+{| class="wikitable"
+! 区段编号 !! 文件名 !! 作用
+|-
+| 0 || <tt>$MFT</tt> || 描述卷上的所有文件，包括文件名、时间戳、流名称和数据流所在的簇的编号列表、索引、安全标识符，以及文件属性（如“只读”、“压缩”、“加密”等）。
+|-
+| 1 || <tt>$MFTMirr</tt> || $MFT的最开始的几个关键项的副本，通常是4项（4[[Kibibyte|KiB]]）。
+|-
+| 2 || <tt>$LogFile</tt> || 文件系统更改的事务日志，用于保护元数据的稳定性。
+|-
+| 3 || <tt>$Volume</tt>  || 卷的相关信息，如卷对象标识符、[[卷标|卷标]]、文件系统版本，以及若干卷标志（包括：“正在加载”、“需要扫描”、“需要调整$LogFile大小”、“在NT4上加载”、“正在更新卷序列号”、“需要升级结构”等）。这些数据不直接在数据流中存储，而是存储于特殊的 MFT 属性中。如果卷对象标识符存在，则将会在一个 $OJBECT_ID 记录中；卷标存储在 $VOLUME_NAME 记录中；其它数据存储在 $VOLUME_INFORMATION 记录中；卷序列号储存在$Boot文件中（请参见下文）。
+|-
+| 4 || <tt>$AttrDef</tt> || 所有NTFS项目使用到的属性的定义表，包含属性名称、属性编号和属性描述等。
+|-
+| 5 || <tt>.</tt> || [[根目录|根目录]]。目录数据存储在两个名称均为 $I30 的 $INDEX_ROOT 和 $INDEX_ALLOCATIOn 属性中
+|-
+| 6 || <tt>$Bitmap</tt> || 一个[[位图|位图]]，每一位按顺序指示卷上的对应簇正在被使用（1）或空闲（0）。
+|-
+| 7 || <tt>$Boot</tt> || [[卷引导记录|卷引导记录]]，该文件始终位于卷的第一个簇，其中包含[[引导代码|引导代码]]（用于定位并启动[[NTLDR|NTLDR]]/[[Windows_Vista启动过程#Windows引导管理器|BOOTMGR]]）、[[BIOS参数块|BIOS参数块]]（其中包含[[卷序列号|卷序列号]]），以及$MFT和$MFTMirr所在的簇编号。
+|-
+| 8 || <tt>$BadClus</tt> || 包含所有标记为“有[[坏扇区|坏扇区]]”的簇的一个文件。该文件通常被chkdsk（磁盘扫描）工具使用，用于管理所有簇状态，记录坏扇区，以及标记空白簇。该文件包含两个数据流（无论卷是否有坏道）：一个包含所有坏扇区编号的无名称流（如果卷没有坏扇区则该流长度为零），以及名称为$Bad的流，包含所有包含记录在第一个流中的簇。
+|-
+| 9 || <tt>$Secure</tt> || [[访问控制列表|访问控制列表]]（ACL）数据库，NTFS将所有ACL信息集中存储于该数据库（而非每个文件独立存储各自的ACL）以节省磁盘占用并提高执行效率。此部分包含两个索引，分别是：“$SII”——可能是{{Fact|time=2008-10-31}}''安全ID索引''，以及“$SDH”——''安全描述符哈希''。注意大部分ACL列表通常都很长，因此这个部分只是索引，记录的是实际存储ACL数据的$SDS流的位置。<ref name="insidewin2kntfs" />
+|-
+| 10 || <tt>$UpCase</tt> || [[Unicode|Unicode]]大写字母表，用于确保在Win32和DOS命名空间下大小写不敏感。
+|-
+| 11 || <tt>$Extend</tt> || 文件系统目录，用于包含若干操作系统或其它软件所需要的扩展数据，如$Quota、$ObjId、$Reparse、$UsnJrnl等。
+|-
+| 12 ... 23
+| colspan="2" | 保留为 $MFT 扩展项使用。扩展项目是一系列附加MFT记录，用于描述未在主记录中包含的属性。例如，当卷需要磁盘清理，包含太多流，具有长文件名或者非常复杂的安全设定，以及其它特殊情况时，可能会用到保留项目
+|-
+| 24 || <tt>$Extend\$Quota</tt> || 磁盘限额设置。包含两个索引根目录，名称分别为$O和$Q。
+|-
+| 25 || <tt>$Extend\$ObjId</tt> || [[分布链接跟踪|分布链接跟踪]]数据。包含一个索引根目录，名称为$O。
+|-
+| 26 || <tt>$Extend\$Reparse</tt> || 卷上所有[[重解析点|重解析点]]（如[[符号链接|符号链接]]）数据。包含一个索引根目录，名称为$R。
+|-
+| ''27 ...'' || <tt>''file.ext''</tt> || 常规文件系统项目的起始位置。
+|}
+
+Windows对这些元文件的处理方式较为特殊，直接由NTFS.SYS进行处理，因此难以直接查看，需要使用特殊工具进行提取。从Windows 7开始，NTFS驱动程序完全阻擋了用户访问权限，任何尝试访问元文件的请求都会直接进入[[蓝屏死机|蓝屏死机]]界面。微软“OEM支持工具”中的“nfi.exe（NTFS文件扇区信息实用工具）”是一个可查看这些文件的工具l.liru，要查看“$MFT”的内容，只需使用下列命令行：<code>nfi.exe c:\$MFT</code>。另一个绕过操作系统保护限制的方法是使用[[7-Zip|7-Zip]]文件管理器工具并输入低级NTFS路径<code>\\.x:\</code>，此时将会出现三个新的文件夹：<code>$extend</code>、<code>$[DELETED]</code>以及<code>[SYSTEM]</code>。这个操作可以用于任何可移动设备，但如果需要访问当前活动分区，则需要进入离线模式（也即[[WinRE|WinRE]]）。
+
+=== 从MFT到属性、属性表和流 ===
+对于每个MFT记录所描述的文件或目录，都有一个线性存放的流描述符（也即''属性''）存储区，被打包后存放在一个变长记录（也即''属性表''）中，然后使用额外的填充符填充以满足MFT记录的1Kib对齐要求。这部分数据完整地描述了和文件相关联的所有数据流。注意此处的“流”和文件数据流不是一个概念，而是所有数据信息的统称。
+
+每个流（或称''属性''）本身包含如下数据：类型（内部通常存储为一个固定长度的整数或者一个描述符，但通常开发应用程序开发时调用<tt>FileOpen()</tt>或者<tt>FileCreate()</tt> API时会使用等效的标识符来代表它）、流名称（可选，注意和文件名没有任何关系），以及数据（可选，但大部分流具有数据）。对于NTFS而言，文件的主数据（也即文件内容）、目录的索引信息、文件的可选数据流、以及文件的所有属性，处理方式都是完全相同的，他们都是属性表中的某个属性而已。
+
+* 对于每个MFT中描述的文件（或非常驻的流描述符存储区，此概念请参考下文），每种流描述符（使用流类型+流名称联合区分）必须唯一。此外，NTFS还对于描述符有一些用于排序的约束要求。
+* NTFS预定义了一种称为“空流”的类型，用于在流存储区中表明流描述符的结尾。空流必须是每个存储区中的最后一个流描述符，所有之后的剩余空间都将被忽略，只包含填充字节（用于满足MFT的记录尺寸要求或者非常驻流存储区的簇尺寸要求）。
+* 对于每个MFT记录，某些类型的流必须存在，例外是整个记录只有一个空流表示该记录未使用。
+** 这里的“某些”具体指的是包含[[时间戳|时间戳]]和其它单比特（Bit）的属性的“标准属性”，这种属性的长度和格式是固定的，这是为了兼容DOS或者Windows 95/98管理的[[FAT|FAT]]/[[FAT32|FAT32]]文件。
+* 某些类型的流不能包含名称，必须是匿名的。
+** 这里的“某些”包括标准属性、NTFS的“文件名”流，以及“短文件名”流（注意如果该文件无需考虑对DOS应用程序的兼容性，则“短文件名”流并不一定出现）。有些时候文件也可能只包含“短文件名”而没有“文件名”，这时候短文件名会代替文件名显示在资源管理器的“文件名”一栏中。
+** 即使流存储区中包含有“文件名”流，也并不表示文件一定会出现在文件系统中。要显示文件，该项目还必须要进入卷上的某个目录的索引表。注意目录的索引表中除了记录该文件的MFT记录编号外，也对文件单独提供一份MFT记录、安全描述符、属性表等，因此理论上单个文件可以被多个目录“硬链接”多次，并且在每个目录中显示为不同的名称。
+* 表示文件数据的默认数据流的流类型为$DATA，该数据流没有名称。可选数据流使用同样的流类型，但必须具有流名称。 
+* 目录的默认数据流和文件的情况不同，目录的数据流（存放文件的索引表）不是匿名的，NTFS会通过目录的数据流的名称（如在NTFS 3以上版本中为“$I30”）来表明目录索引的格式。
+
+可以使用nfi.exe（NTFS文件扇区信息实用工具）查看任意文件或者目录的数据流，这个实用工具目前包含在Microsoft OEM Support Tools中，可以免费发布。<ref>{{cite web
+    | title = OEM Support Tools Phase 3 Service Release 2 Availability
+    | url = http://support.microsoft.com/kb/253066/
+    | publisher = Microsoft Corporation
+    | date = 2007-02-21
+    | quote = Windows NT File System (NTFS) File Sector Information Utility [...] A tool used to dump information about an NTFS volume
+    | accessdate = 2010-06-16
+    | archive-date = 2015-02-23
+    | archive-url = https://web.archive.org/web/20150223112102/http://support.microsoft.com/kb/253066/en-us
+    | dead-url = no
+    }}</ref>
+
+=== 常驻文件和非常驻文件 ===
+为了优化小数据文件的资源占用并降低I/O负荷，在流描述符和文件数据大小总和不超过单个MFT最大记录大小时，NTFS会直接将数据放入流描述符区域中（通常情况下，MFT中数据流的内容是实际文件数据锁在的簇的列表）。此类直接将数据存入MFT的文件被称[[计算机取证|计算机取证]]工作者称为“常驻数据”。常驻文件允许的数据量受到文件其它信息占用的流描述符大小的影响，通常一个没有可选数据流、文件名不长且无特殊ACL设置的文件允许存放700到800个字节。
+
+* 某些流描述符（如上文提到的首选文件名、基本文件属性，以及下文所述的非常驻流主分配表）必须以常驻形式存在。
+* 启用NTFS加密的流、稀疏数据流，以及压缩数据流无法常驻。
+* 非常驻流的分配图格式和文件是否为稀疏文件有关。对目前版本的NTFS而言，如果某个非常驻数据流被转换为稀疏流，将无法还原为非稀疏格式，因此该文件将无法重新常驻，除非将流完全截断并且丢弃整个稀疏分配图。
+* 如果一个非常驻数据流碎片太多，以至于在MFT记录中无法放下整个分配图，则分配图本身可能也会被存放到一个非常驻流当中，而文件本身只包含一个小型常驻数据流，其内容是标识非常驻分配图所在的簇的位置。
+* 如果一个文件的流太多（包括可选数据流、扩展属性、安全描述符等），流描述符无法完整放入MFT中，则NTFS也会建立一个非常驻数据流，用于存放必须常驻的流之外的其它流描述，该数据流使用和MFT一样的格式，但不再有空间尺寸限制。
+
+由于常驻文件不直接占据簇（也即基本的“分配单元”），这使得NTFS卷有可能包含比簇数目更多的文件。例如，一个80GB（74.5[[Gibibyte|GiB]]）的分区，NTFS可以将其格式化并产生19,543,064个4[[Kibibyte|KiB]]的簇。除去系统文件（64MiB日志文件，一个2,442,888字节的位图，以及大约25个簇的固定头部），还剩余19,526,158个簇可用于文件和索引。由于每个簇有4个MFT记录，因此卷理论上可以包含将近4×19,526,158 = 78,104,632个常驻文件。
+
+=== 机会锁 ===
+机会锁（Oplock）允许网络客户端改变对文件或数据流的缓存策略，以便于增强性能或降低网络占用。<ref>{{Cite web |url=http://msdn.microsoft.com/en-us/library/cc308442.aspx |title=存档副本 |access-date=2013-07-25 |archive-url=https://web.archive.org/web/20100823125612/http://msdn.microsoft.com/en-us/library/cc308442.aspx |archive-date=2010-08-23 |dead-url=yes }}</ref>机会锁应用到文件某个打开的流上，不影响同一个文件的其它流。
+
+机会锁可以用于在后台透明访问文件。如果没有其它进程访问服务器文件，网络客户端可以避免向文件写入数据；而如果没有其他进程正在写入数据，客户端可以缓存即将读取的数据。
+
+Windows支持四种不同类型的机会锁：
+
+* 等级2（共享）：多个读取，不可写入（也即读缓存）。
+* 等级1（独占）：任意缓冲方式的独占访问（也即读写缓存）。
+* 批量锁（也是独占的）：在服务器上打开流，在客户端关闭流（读、写和句柄缓存）。
+* 过滤锁（也是独占的）：当其它程序尝试访问流时，应用程序和系统过滤器可以放弃该锁（读写缓存，从Windows 2000开始受支持）
+
+在Windows 7和Windows Server 2008 R2系统中，机会锁得到增强，支持每个客户端使用独立的机会锁键。<ref>http://technet.microsoft.com/en-us/library/ff383236（WS.10）.aspx{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>
+
+=== 时间 ===
+Windows NT和后续产品使用[[UTC|UTC]]作为内部时间戳，并在显示时进行适当的转换。也就是说，NTFS时间戳使用UTC模式。
+
+由于历史原因，不支持NTFS的Windows使用本地时区作为时间戳，而目前版本的Windows对非NTFS分区也是用此方式进行处理。这意味着当文件在NTFS和非NTFS分区间进行移动时，操作系统需要实时转换时间戳。如果某些文件移动时处于[[夏令时|夏令时]]，而某些文件处于[[标准时间|标准时间]]，则可能移动后的时间可能会产生歧义，特别是当执行时间正好在时制转换前后时，用户可能会看到一小时的时间差。基于不同地区的不同夏令时规则，在任意12个月中，可能会产生最多4个小时的永久时间戳错误。<ref>"[http://www.codeproject.com/datetime/dstbugs.asp Beating the Daylight Saving Time bug and getting correct file modification times] {{Wayback|url=http://www.codeproject.com/datetime/dstbugs.asp |date=20041114032240 }}" ''The Code Project''</ref>
+
+
+== 互操作性 ==
+NTFS具体的内部实现细节属于商业秘密，这给第三方开发者制作NTFS文件系统处理程序带来很大的困难。
+
+=== Microsoft Windows ===
+尽管绝大多数NTFS版本的绝大部分都完全[[向前兼容性|向前]]以及[[向后兼容性|向后]]兼容，但在旧版本的Microsoft Windows加载新版本的NTFS卷仍然会产生不少技术问题。这种问题往往来自于同一台计算机的[[多重启动|多重启动]]功能，或者使用[[移动硬盘|移动硬盘]]设备传输文件。
+
+例如，在不支持的操作系统上尝试使用带有“先前版本”（严格的说称为[[卷影副本|卷影副本]]）的NTFS分区，会导致先前版本数据丢失。<ref>{{cite web | url=http://blogs.technet.com/filecab/archive/2006/07/14/441829.aspx | title=How restore points and other recovery features in Windows Vista are affected when dual-booting with Windows XP | author=cfsbloggers | date=July 14, 2006 | work=The Filing Cabinet | accessdate=2007-03-21 | archive-url=https://web.archive.org/web/20060718011852/http://blogs.technet.com/filecab/archive/2006/07/14/441829.aspx | archive-date=2006-07-18 | dead-url=yes }}</ref>
+
+Windows提供了一个命令行工具“convert.exe”可用于将部分文件系统转换为NTFS，包括HPFS（仅在Windows NT 3.1、3.5和3.51中受支持）、FAT16和FAT32（在Windows 2000及后续版本中受支持）。
+=== Mac OS X ===
+[[Mac_OS_X_Panther|Mac OS X 10.3]]及后续版本包含对NTFS格式分区的只读支持。基于[[GNU_General_Public_License|GPL]]授权的[[NTFS-3G|NTFS-3G]]也可以通过[[用户空间文件系统|用户空间文件系统]]在Mac OS X上使用并读写NTFS分区。NTFS-3G的开发团队还提供一个性能更好的商业版本，名称为“[[Tuxera_NTFS_for_Mac|Tuxera NTFS for Mac]]”。<ref>{{cite web |url=http://www.tuxera.com/products/tuxera-ntfs-for-mac/ |title=Tuxera NTFS for Mac |date=August 30, 2011 |accessdate=September 20, 2011 |publisher=Tuxera |archive-date=2013-10-17 |archive-url=https://web.archive.org/web/20131017150208/http://www.tuxera.com/products/tuxera-ntfs-for-mac/ |dead-url=no }}</ref> [[Paragon_Software_Group|Paragon Software Group]]也出售可执行读写操作的驱动程序，名称为“NTFS for Mac OS X”，<ref>{{cite web |url=http://www.paragon-software.com/home/ntfs-mac/release.html |title=NTFS for Mac OS X, communication channel between Mac OS X and Windows |date= |accessdate=September 20, 2011 |publisher=Paragon Software Group |archive-date=2013-10-17 |archive-url=https://web.archive.org/web/20131017125908/http://www.paragon-software.com/home/ntfs-mac/release.html |dead-url=no }}</ref>部分[[希捷科技|希捷（Seagate）]]硬盘包含该组件。<ref>{{Cite web |url=http://www.seagate.com/ww/v/index.jsp?locale=en-US&name=goflex-software&vgnextoid=11c1fab114b48210VgnVCM1000001a48090aRCRD |title=Seagate Read/Write NTFS driver for Mac OS X |accessdate=2013-10-17 |archive-date=2011-02-10 |archive-url=https://web.archive.org/web/20110210152004/http://www.seagate.com/ww/v/index.jsp?locale=en-US&name=goflex-software&vgnextoid=11c1fab114b48210VgnVCM1000001a48090aRCRD |dead-url=no }}</ref>[[Mac_OS_X_Snow_Leopard|Mac OS X 10.6]]和后续版本中包含有本机NTFS的写入支持，默认情况下此功能未激活，可以通过特定方法打开。但有用户报告此功能不稳定并会导致[[内核错误|内核错误]]，可能这也是该功能未启动或者被宣告的原因之一。<ref>{{cite web |url=http://smokingapples.com/software/tutorials/snow-leopards-hidden-ntfs-readwrite-support/ |title=Snow Leopard's hidden NTFS read/write support |author=Alvares, Milind |date=2009-10-02|accessdate=18 September 2010 |deadurl=yes |archiveurl=https://web.archive.org/web/20100810084414/http://smokingapples.com/software/tutorials/snow-leopards-hidden-ntfs-readwrite-support/ |archivedate=2010年8月10日 }}</ref><ref>{{cite web|title=How to Write to NTFS Drives on a Mac|url=https://www.howtogeek.com/236055/how-to-write-to-ntfs-drives-on-a-mac/|accessdate=2018-04-05|archive-date=2018-04-05|archive-url=https://web.archive.org/web/20180405215051/https://www.howtogeek.com/236055/how-to-write-to-ntfs-drives-on-a-mac/|dead-url=no}}</ref>
+
+=== Linux ===
+完整并安全的对NTFS的读写功能由[[NTFS-3G|NTFS-3G]] [[驱动程序|驱动程序]]提供。该驱动程序包含在绝大多数[[Linux发行版|Linux发行版]]中。同时也存在过时的，大部分仅只读的解决方案：
+* [[Linux内核|Linux内核]]2.2：从版本2.2.0开始，可以读取NTFS分区。
+* [[Linux内核|Linux内核]]2.6：包含一个由Anton Altaparmakov（来自[[剑桥大学|剑桥大学]]）和Richard Russon编写的驱动程序，该驱动程序支持读取文件以及在部分情况下的改写文件和调整文件大小。
+* NTFSMount：使用ntfsmount可以通过一个[[用户级驱动程序|用户级驱动程序]]对文件和目录进行有限的读写操作。<ref>"[http://wiki.linux-ntfs.org/doku.php?id=ntfsmount ntfsmount wiki page on linux-ntfs.org] {{Wayback|url=http://wiki.linux-ntfs.org/doku.php?id=ntfsmount |date=20070927213220 }}"</ref>
+* Tuxera NTFS：高性能可读写商业内核驱动，主要是针对嵌入式设备，他还开发了开源的[[NTFS-3G|NTFS-3G]]驱动。
+* NTFS for Linux：由[[Paragon_Software_Group|Paragon Software Group]]提供的对NTFS提供完整读写支持的商用驱动程序，桌面版可免费下载，嵌入式Linux版本则需要收费。
+* [[Captive_NTFS|Captive NTFS]]（已停止维护）：一个使用Windows自身的驱动程序“<tt>ntfs.sys</tt>”并进行简单封装的驱动程序。
+
+请注意，上面所有三个用户级别驱动程序（NTFSMount、NTFS-3G以及Captive NTFS）都基于[[用户空间文件系统|用户空间文件系统]]（FUSE）实现的，该系统是一个用于在用户空间和内核代码间通讯以获取或保存数据的Linux内核模块。上面所有的驱动程序（除了Tuxera NTFS和Paragon NTFS for Linux）都是以[[GPL|GPL]]的方式[[开源|开源]]的。由于NTFS内部结构非常复杂，内置的2.6.14内核驱动程序和FUSE都不允许修改被认为是不安全的卷，以避免发生数据丢失。
+
+=== 其他 ===
+[[eComStation|eComStation]]和[[FreeBSD|FreeBSD]]都提供对NTFS的只读访问支持（eComStation有一个测试版本的驱动程序允许写入／删除操作，但通常认为该驱动程序还不安全）。[[BeOS|BeOS]]有一个基于NTFS-3G的的第三方工具，允许完整的NTFS读写操作。除了Linux，[[NTFS-3G|NTFS-3G]]也能工作在[[Mac_OS_X|Mac OS X]]、[[FreeBSD|FreeBSD]]、[[NetBSD|NetBSD]]、[[Solaris|Solaris]]以及[[Haiku|Haiku]]上。同时，也有一个称为“[[NTFS4DOS|NTFS4DOS]]”的商用驱动程序允许在DOS下进行读写。<ref>{{Cite web |url=http://www.avira.de/en/products/avira_ntfs4dos.html |title=Recovery information<!-- Bot generated title --> |accessdate=2008-10-31 |archive-date=2008-11-09 |archive-url=https://web.archive.org/web/20081109210417/http://www.avira.de/en/products/avira_ntfs4dos.html |dead-url=no }}</ref> [[Ahead_Software|Ahead Software]]曾经在2002至2004年间开发了一个名为“NTFSREAD”的驱动程序（版本1.200），可用于[[DR-DOS|DR-DOS]]，并曾包含在他们的[[Nero_Burning_ROM|Nero Burning ROM]]软件中。[[OpenBSD|OpenBSD]]在2011年5月1日发布的4.9版本中提供了针对i386和amd64体系结构的NTFS只读支持。<ref>{{Cite web |url=http://openbsd.com/49.html |title=存档副本 |accessdate=2013-10-17 |archive-date=2013-10-17 |archive-url=https://web.archive.org/web/20131017114730/http://openbsd.com/49.html |dead-url=no }}</ref> [[Google|Google]]開發的[[Chrome_OS|Chrome OS]]作業系統也支援NTFS<ref>{{Cite web |url=https://support.google.com/chromebook/answer/183093 |title=Chromebook 支援的檔案類型和外接裝置 |access-date=2021-05-04 |archive-date=2021-06-08 |archive-url=https://web.archive.org/web/20210608133053/https://support.google.com/chromebook/answer/183093 }}</ref>。
+
+=== 调整大小 ===
+有许多第三方工具可以安全地重新调整NTFS分区的大小。在Windows Vista中，Microsoft添加收缩和扩展分区的功能，但该功能非常有限，因为该功能无法整理[[页面文件|页面文件]][[碎片|碎片]]或者标记为不可移动的文件，因此限制对分区的收缩能力。取消页面文件重新启动或使用第三方的工具进行[[磁盘碎片整理|磁盘碎片整理]]也许能改善收缩效果。
+
+== 另请参阅 ==
+* [[文件系统的对比|文件系统的对比]]
+* [[NTFSDOS|NTFSDOS]]
+* [[Files-11|Files-11]]—ODS-2非常类似于NTFS（如相比较于<code>INDEXF.SYS</code>和<code>$Mft</code>，<code>BITMAP.SYS</code>和  <code>$Bitmap</code>）
+* [[HPFS|HPFS]]，为[[OS/2|OS/2]]操作系统开发的文件系统
+* [[ntfsresize|ntfsresize]]
+* [[Samba|Samba]]（软件）
+
+== 参考文献 ==
+{{reflist|3}}
+
+{{refbegin}}
+* {{cite paper|author=Bolosky, William J.; Corbin, Scott; Goebel, David; & Douceur, John R.|url=http://research.microsoft.com/sn/Farsite/WSS2000.pdf|title=Single Instance Storage in Windows 2000|publisher=Microsoft Research & Balder Technology Group, Inc.|format=PDF|date=date|access-date=2008-10-31|archive-date=2008-10-29|archive-url=https://web.archive.org/web/20081029163043/http://research.microsoft.com/sn/Farsite/WSS2000.pdf|dead-url=no}}
+* {{cite book |last= Custer |first= Helen |title= Inside the Windows NT File System |url= https://archive.org/details/insidewindowsntf00cust |year= 1994 | publisher= [[Microsoft_Press|Microsoft Press]] |isbn= 978-1-55615-660-1}}
+* {{cite book |last=Nagar |first= Rajeev |date=1997 |title= Windows NT File System Internals: A Developer's Guide |publisher= [[O'Reilly_Media|O'Reilly]] |isbn= 978-1-56592-249-5 }}
+{{refend}}
+
+== 外部链接 ==
+* 文献：
+** [http://sourceforge.net/project/showfiles.php?group_id=13956&package_id=16543 Low-level description of NTFS disk structures]{{Wayback|url=http://sourceforge.net/project/showfiles.php?group_id=13956&package_id=16543 |date=20090201080954 }} from the Linux-NTFS project
+** [http://www.ntfs.com/ NTFS.com]{{Wayback|url=http://www.ntfs.com/ |date=20100107030918 }} – documentation and resources for NTFS
+** [https://web.archive.org/web/20080704051237/http://technet2.microsoft.com/WindowsServer/en/library/81cc8a8a-bd32-4786-a849-03245d68d8e41033.mspx Microsoft NTFS Technical Reference]
+* 实现技术：
+** [http://www.ntfs-3g.org/ NTFS-3G]{{Wayback|url=http://www.ntfs-3g.org/ |date=20090917181509 }} – an open source read/write NTFS driver for Linux, FreeBSD, Mac OS X, NetBSD, Solaris and Haiku.<!-- this link is redundant, since it has a topic --> 
+** [http://linux-ntfs.org/ Linux-NTFS]{{Wayback|url=http://linux-ntfs.org/ |date=20090106004433 }} – an open source project to add NTFS support to the Linux kernel（write support is limited, but can be used for simple tasks）, and write POSIX-compatible utilities for accessing and manipulating NTFS（ntfsprogs; includes ntfsls, ntfsresize, ntfsclone, etc）. Linux NTFS [https://web.archive.org/web/20081112060709/http://www.linux-faqs.com/faq/misc/ntfs.php FAQ] and [https://web.archive.org/web/20081207193302/http://www.linux-faqs.com/Forum/viewtopic.php?t=7 howto]
+** [http://www.jankratochvil.net/project/captive/ Captive NTFS]{{Wayback|url=http://www.jankratochvil.net/project/captive/ |date=20100114190757 }} – a [[shim_(computing)|shim]] which used the Windows NTFS driver to access NTFS file systems under Linux
+
+{{視窗元件}}
+{{Filesystem}}
+
+[[Category:微软磁盘文件系统|Category:微软磁盘文件系统]]
+[[Category:Windows组件|Category:Windows组件]]

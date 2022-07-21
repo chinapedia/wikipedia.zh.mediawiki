@@ -1,0 +1,73 @@
+{{TA
+|G1=Math
+|G2=IT
+}}
+{{Infobox Algorithm
+|class=全局[[最短路径问题|最短路径问题]]（适用于带权图）
+|image=
+|caption =
+|data=[[图|图]]
+|time=<math>O(|V|^3)</math>
+|best-time=<math>\Omega (|V|^3)</math>
+|space=<math>\Theta(|V|^2)</math>
+}}
+{{图搜索算法}}
+'''{{lang|en|Floyd-Warshall}}算法'''（{{lang-en|Floyd-Warshall algorithm}}），中文亦称'''弗洛伊德算法'''或'''佛洛依德算法'''<ref>{{cite journal |author1=杨军庆、安容瑾、任志国、张潇赟、蔡晓龙 |title=基于佛洛依德算法的各院校间最短路径问题的求解 |journal=《甘肃科技纵横》 |date=2010年 |issue=5 |page=28-29 |url=http://www.cqvip.com/qk/90259a/201005/35530168.html |access-date=2020-08-09 |archive-date=2011-02-24 |archive-url=https://web.archive.org/web/20110224043025/http://www.cqvip.com/qk/90259A/201005/35530168.html |dead-url=no }}</ref>，是解决任意两点间的[[最短路径|最短路径]]的一种[[算法|算法]]<ref>{{cite journal|author=Stefan Hougardy|title=The Floyd–Warshall algorithm on graphs with negative cycles|journal=Information Processing Letters|volume=110|issue=8-9|pages=279-281|doi=10.1016/j.ipl.2010.02.001|language=en|url=http://www.sciencedirect.com/science/article/pii/S002001901000027X|accessdate=2015-04-11|date=2010年4月|archive-date=2015-09-24|archive-url=https://web.archive.org/web/20150924153424/http://www.sciencedirect.com/science/article/pii/S002001901000027X|dead-url=no}}</ref>，可以正確處理[[有向圖|有向圖]]或负权（但不可存在负权回路）的最短路径問題，同时也被用于计算有向图的传递闭包<ref>{{cite book |last=Skiena |first1=Steven |url=http://sist.sysu.edu.cn/~isslxm/DSA/textbook/Skiena.-.TheAlgorithmDesignManual.pdf |title=The Algorithm Design Manual |edition=2 |publisher=Springer |date=2008-07-26 |page=212 |isbn=978-0073523408 |doi=10.1007/978-1-84800-070-4 |language=en |accessdate=2015-04-11 |deadurl=yes |archiveurl=https://web.archive.org/web/20150609195555/http://sist.sysu.edu.cn/~isslxm/DSA/textbook/Skiena.-.TheAlgorithmDesignManual.pdf |archivedate=2015-06-09 }}</ref>。
+
+{{lang|en|Floyd-Warshall}}算法的[[时间复杂度|时间复杂度]]為<math>O(N^3)</math><ref>{{cite book| origyear =2001|title={{VarSerif|Introduction to Algorithms}}| url =https://archive.org/details/suanfadaolun0002unse|trans_title=算法导论| language =zh-cn|year=2006|publisher=机械工业出版社|isbn=9787111187776|pages=[https://archive.org/details/suanfadaolun0002unse/page/n405 386]}}</ref>，[[空间复杂度|空间复杂度]]为<math>O(N^2)</math>。
+
+==原理==
+{{lang|en|Floyd-Warshall}}算法的原理是[[动态规划|动态规划]]<ref>{{cite book |last=Dasgupta |first1=Sanjoy |last2=Papadimitriou |first2=Christos |last3=Vazirani |first3=Umesh |url=http://beust.com/algorithms.pdf |title=Algorithms |edition=1 |publisher=McGraw-Hill Science/Engineering/Math |date=2006-09-13 |page=176 |language=en |isbn=978-0073523408 |accessdate=2015-04-11 |deadurl=yes |archiveurl=https://web.archive.org/web/20150213063608/http://beust.com/algorithms.pdf |archivedate=2015-02-13 }}</ref>。
+
+设<math>D_{i,j,k}</math>为从<math>i</math>到<math>j</math>的只以<math>(1..k)</math>集合中的节点为中间節点的最短路径的长度。
+#若最短路径经过点k，则<math>D_{i,j,k}=D_{i,k,k-1}+D_{k,j,k-1}</math>；
+#若最短路径不经过点k，则<math>D_{i,j,k}=D_{i,j,k-1}</math>。
+
+因此，<math>D_{i,j,k}=\mbox{min}(D_{i,j,k-1},D_{i,k,k-1}+D_{k,j,k-1})</math>。
+
+在实际算法中，为了节约空间，可以直接在原来空间上进行迭代，这样空间可降至二维。
+
+==算法描述==
+
+{{lang|en|Floyd-Warshall}}算法的[[伪代码|伪代码]]描述如下：
+ 1 '''let''' dist be a |V| × |V| array of minimum distances initialized to ∞ (infinity)
+ 2 '''for each''' vertex ''v''
+ 3    dist[''v''][''v''] ← 0
+ 4 '''for each''' edge (''u'',''v'')
+ 5    dist[''u''][''v''] ← w(''u'',''v'')  ''// the weight of the edge (''u'',''v'')
+ 6 '''for''' ''k'' '''from''' 1 '''to''' |V|
+ 7    '''for''' ''i'' '''from''' 1 '''to''' |V|
+ 8       '''for''' ''j'' '''from''' 1 '''to''' |V|
+ 9          '''if''' dist[''i''][''j''] > dist[''i''][''k''] + dist[''k''][''j''] 
+ 10             dist[''i''][''j''] ← dist[''i''][''k''] + dist[''k''][''j'']
+ 11         '''end if'''
+
+其中<code>dist[i][j]</code>表示由點<math>i</math>到點<math>j</math>的代價，當其為 ∞ 表示兩點之間沒有任何連接。
+
+== 使用动态规划的算法 ==
+* [[最长公共子序列|最长公共子序列]]
+* [[维特比算法|Viterbi算法]]
+
+==实现==
+Floyd算法在不同的[[编程语言|编程语言]]中均有大量的实现方法：
+* [[C++|C++]]：[http://www.boost.org/libs/graph/doc/ boost::graph]{{Wayback|url=http://www.boost.org/libs/graph/doc/ |date=20080113203926 }}库下
+* [[C♯|C#]]：[http://www.codeplex.com/quickgraph QuickGraph]{{Wayback|url=http://www.codeplex.com/quickgraph |date=20100317031339 }}和[https://www.nuget.org/packages/QuickGraphPCL/3.6.61114.2 QuickGraphPCL]{{Wayback|url=https://www.nuget.org/packages/QuickGraphPCL/3.6.61114.2 |date=20200611163124 }}中均有相关实现方法
+* [[Java|Java]]：[http://commons.apache.org/sandbox/commons-graph/ Apache Commons Graph]{{Wayback|url=http://commons.apache.org/sandbox/commons-graph/ |date=20130512104032 }}库中
+* [[JavaScript|JavaScript]]：{{tsl|en|Cytoscape|Cytoscape}}库中
+* [[MATLAB|MATLAB]]：[http://www.mathworks.com/matlabcentral/fileexchange/10922 Matlab_bgl]{{Wayback|url=http://www.mathworks.com/matlabcentral/fileexchange/10922 |date=20130817093138 }}包中
+* [[Perl|Perl]]：[https://metacpan.org/module/Graph Graph]{{Wayback|url=https://metacpan.org/module/Graph |date=20131008150307 }}组件下
+* [[Python|Python]]：[[SciPy|SciPy]]库下（[http://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csgraph.floyd_warshall.html#scipy.sparse.csgraph.floyd_warshall scipy.sparse.csgraph]{{Wayback|url=http://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csgraph.floyd_warshall.html#scipy.sparse.csgraph.floyd_warshall |date=20200611184646 }}），{{tsl|en|NetworkX}}库中也有
+* [[R语言|R]]：[https://cran.r-project.org/web/packages/e1071/index.html e1071]{{Wayback|url=https://cran.r-project.org/web/packages/e1071/index.html |date=20200821013138 }}和[https://cran.r-project.org/web/packages/Rfast/index.html Rfast]{{Wayback|url=https://cran.r-project.org/web/packages/Rfast/index.html |date=20200718043904 }}包内
+
+== 参考来源 ==
+{{reflist|2}}
+
+== 参见 ==
+* [[图论最短路|图论最短路]]
+* [[Dijkstra算法|Dijkstra算法]]
+* [[Bellman-Ford算法|Bellman-Ford算法]]
+
+{{算法}}
+[[Category:图算法|Category:图算法]]
+[[Category:多项式时间问题|Category:多项式时间问题]]
+[[Category:带有伪代码示例的条目|Category:带有伪代码示例的条目]]

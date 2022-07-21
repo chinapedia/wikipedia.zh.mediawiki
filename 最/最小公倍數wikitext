@@ -1,0 +1,154 @@
+'''最小公倍數'''是[[数论|数论]]中的一个概念。若有一個數<math>X</math>，可以被另外兩個數<math>A</math>、<math>B</math>整除，且<math>X</math>大於（或等于）<math>A</math>和<math>B</math>，則<math>X</math>為<math>A</math>和<math>B</math>的[[公倍數|公倍數]]。<math>A</math>和<math>B</math>的公倍數有無限個，而所有正的公倍數中，最小的公倍數就叫做最小公倍數。同样地，若干个整数公有的倍数中最小的正整数称为它们的最小公倍数。<math>n</math>整数<math>a_1, a_2, \cdots , a_n</math>的最小公倍数一般记作：<math>[a_1, a_2, \cdots , a_n]</math>，或者参照英文记法记作<math>\operatorname{lcm}(a_1, a_2, \cdots , a_n)</math>，其中'''lcm'''是英语中“最小公倍数”一词（''least common multiple''）的首字母缩写。
+
+对[[分數|分數]]进行加減运算時，要求兩數的分母相同才能計算，故需要-{zh-hans:通分; zh-hant:擴分;}-；标准的计算步骤是将兩個分數的分母-{zh-hans:通分; zh-hant:擴分;}-成它们的最小公倍數，然后将-{zh-hans:通分; zh-hant:擴分;}-后的分子相加。
+
+== 与最大公因数之关系 ==
+两个整数的最小公倍数与[[最大公因数|最大公因数]]之间有如下的关系：
+:<math>\operatorname{lcm}(a,b)=\frac{|a\cdot b|}{\operatorname{gcd}(a,b)}</math>
+
+== 计算方法 ==
+最小公倍数可以通过多种方法得到，最直接的方法是列举法，从小到大列举出其中一个数（如最大數）的倍数，当这个倍数也是另一个数的倍数时，就求得最小公倍数。另一个方法是利用公式<math>\operatorname{lcm}(a_1,a_2)=\frac{a_1 a_2 }{\gcd(a_1,a_2)}</math>来求解，这时首先要知道它们的最大公因数。而最大公因数可以通过[[短除法|短除法]]得到。
+
+利用整数的[[算术基本定理|唯一分解定理]]，还可以用[[質因數分解|質因數分解]]法。将每个整数进行质因数分解。对每个质数，在质因数分解的表达式中寻找次数最高的乘幂，最后将所有这些质数乘幂相乘就可以得到最小公倍数。譬如求'''216'''、'''384'''和'''210'''的最小公倍數。对'''216'''、'''384'''和'''210'''来说：
+:<math>216=2^3 \times 3^3</math>，<math>384=2^7 \times 3^1</math>，<math>210=2^1 \times 3^1 \times 5^1 \times 7^1</math>。
+:其中<math>2</math>对应的最高次乘幂为<math>2^7</math>；<math>3</math>对应的最高次乘幂为<math>3^3</math>；<math>5</math>和<math>7</math>对应的最高次乘幂分别是<math>5^1</math>与<math>7^1</math>。将这些乘幂乘起来，就可以得到最小公倍数：
+:<math>[216, 384, 210]=2^7 \times 3^3 \times 5^1 \times 7^1 = 120960</math>。
+:
+
+=== 递归计算多个整数的最小公倍数 ===
+可以递归求出多个整数的最小公倍数：欲求 <math>\operatorname{lcm}(a_1,...,a_n) (n\geq 3)</math>，只需求 <math>\operatorname{lcm}(a_1,...,a_{n-2},\operatorname{lcm}(a_{n-1},a_n))</math>。
+
+这利用了性质 <math>\operatorname{lcm}(a_1,a_2,a_3)=\operatorname{lcm}(\operatorname{lcm}(a_1,a_2),a_3)</math>。该性质证明如下：
+
+记 <math>a_1,a_2,a_3</math> 的质因数分解分别为<math>\prod_{i=1}^n p_i^{e_{1i}},\prod_{i=1}^n p_i^{e_{2i}},\prod_{i=1}^n p_i^{e_{3i}}</math>，其中 <math>p_i</math> 是第 <math>i</math> 个质数。
+
+那么根据最小公倍数的定义，<math>\operatorname{lcm}(a_1,a_2,a_3)=\prod_{i=1}^n p_i^{\max(e_{1i},e_{2i},e_{3i})}</math>，
+
+<math>\operatorname{lcm}(\operatorname{lcm}(a_1,a_2),a_3)=\operatorname{lcm}(\prod_{i=1}^n p_i^{\max(e_{1i},e_{2i})},a_3)
+=\prod_{i=1}^n p_i^{\max(\max(e_{1i},e_{2i}),e_{3i})}
+=\prod_{i=1}^n p_i^{\max(e_{1i},e_{2i},e_{3i})}</math>，
+
+证毕。
+
+==程式代碼==
+以下使用[[輾轉相除法|輾轉相除法]]求得最大公因數，之後再求最小公倍數。
+
+===C#===
+<syntaxhighlight lang="csharp">
+int GCD(int a, int b)
+{
+	return a % b == 0 ? b : GCD(b, a % b);
+}
+
+int LCM(int a, int b)
+{
+	return a * b / GCD(a, b);
+}
+</syntaxhighlight>
+
+===C===
+<syntaxhighlight lang="c">
+int GCD(int a, int b) {
+	if(b) while((a %= b) && (b %= a));
+	return a + b;
+}
+int LCM(int a, int b) {
+	return a * b / GCD(a, b);
+}
+</syntaxhighlight>
+===C++===
+<syntaxhighlight lang="cpp">
+template < typename T >
+T GCD(T a, T b) {
+	if(b) while((a %= b) && (b %= a));
+	return a + b;
+}
+template < typename T >
+T LCM(T a, T b) {
+	return a * b / GCD(a, b);
+}
+</syntaxhighlight>
+===PASCAL===
+<syntaxhighlight lang = "pascal">
+1、
+var a,b,ans:integer;
+function gcd(a,b:integer):longint;
+begin
+    if b=0 then gcd:=a
+    else gcd:=gcd(b,a mod b ) ;
+end;
+2、
+var a,b,ans:integer;
+function lcm(a,b:integer):longint;
+begin
+    readln(a,b );
+    ans:=(a*b) div gcd(a,b);
+    write(ans);
+end;
+</syntaxhighlight>
+===JAVA===
+<syntaxhighlight lang="cpp">
+int GCD(int a, int b) {
+	return a % b == 0 ? b : GCD(b, a % b);
+}
+int LCM(int a, int b) { 
+	return a * b / GCD(a, b);
+}
+</syntaxhighlight>
+
+===RUBY===
+<syntaxhighlight lang="ruby">
+def gcd(a, b)
+  b.zero? ? a : gcd(b, a % b)
+end
+
+def lcm(a, b)
+  a * b / gcd(a, b)
+end
+</syntaxhighlight>
+
+=== Python ===
+<syntaxhighlight lang="python">
+def gcd(a, b):
+    return a if b == 0 else gcd(b, a % b)
+    
+def lcm(a, b):
+    return a * b / gcd(a, b)
+</syntaxhighlight>
+
+=== Golang ===
+<syntaxhighlight lang="go">
+func GCD(a, b int) int {
+    if b == 0{
+        return a
+    }
+	if a%b == 0 {
+		return b
+	}
+	return GCD(b, a%b)
+}
+
+func LCM(a, b int) int {
+	return a * b / GCD(a, b)
+}
+</syntaxhighlight>
+
+== 应用 ==
+求最小公倍数是进行分数加减法时的步骤之一。将分母-{zh-hans:通分; zh-hant:擴分;}-时，会把所有分数的分母-{zh-hans:通分; zh-hant:擴分;}-为它们的最小公倍数，然后将分子相加。例如：
+:<math>{2\over21}+{1\over6}={4\over42}+{7\over42}={11\over42}</math>
+
+其中分母42就是21与6的最小公倍数。
+
+== 参见 ==
+* [[公倍数|公倍数]]
+* [[公因数|公因数]]
+* [[最大公因数|最大公因数]]
+
+== 参考来源 ==
+* {{cite book|title=《数论讲义》|author=柯召，孙绮，孙琦|publisher=高等教育出版社|year=2005|isbn=753205473X}}
+* {{cite book|title=《数论妙趣：数学女王的盛情款待》|author=阿尔伯特·H·贝勒著  谈祥柏译
+|publisher=上海教育出版社|isbn=7040091909|year=1998}}
+
+[[Category:数论|Category:数论]]
+[[Category:算术|Category:算术]]
+[[Category:二元运算|Category:二元运算]]

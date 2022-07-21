@@ -1,0 +1,153 @@
+{{noteTA|G1=IT
+|T = zh-hans:面向切面的程序设计;zh-hant:剖面導向程式設計;zh-tw:剖面導向程式設計;
+|1 = zh-hans:面向切面的程序设计;zh-hant:剖面導向程式設計;zh-tw:剖面導向程式設計;
+|2 = zh-hans:思想;zh-hant:范型;zh-tw:范型;
+}}
+{{编程范式}}
+'''-{zh-hans:面向切面的程序设计;zh-hant:剖面導向程式設計;}-'''（Aspect-oriented programming，AOP，又译作'''面向方面的程序设计'''、'''-{zh-hans:剖面导向程序设计;zh-hant:面向切面的程式設計;}-'''），是[[计算机科学|计算机科学]]中的一种[[编程范型|程序设计范型]]，旨在将[[横切关注点|横切关注点]]与业务主体进行进一步分离，以提高程序代码的[[模块化编程|模块化]]程度。通过在现有代码基础上增加额外的通知（Advice）机制，能够对被声明为“切点（Pointcut）”的代码块进行统一管理与装饰，比如说：“对所有方法名以<code>set*</code>开头的方法添加后台日志”。该思想使得开发人员能够将与代码核心业务逻辑关系不那么密切的功能（如日志功能）添加至程序中，同时又不降低业务代码的可读性。面向切面的程序设计思想也是面向切面软件开发的基础。
+
+==简介==
+面向切面的程序设计将代码逻辑切分为不同的[[模块化编程|模块]]（即{{en-link|关注点|Concern (computer science)}}，一段特定的逻辑功能)。几乎所有的编程思想都涉及代码功能的分类，将各个关注点（Concern）封装成独立的抽象模块（如函数、过程、模块、类以及方法等），后者又可供进一步实现、封装和重写。部分关注点“横切”程序代码中的数个模块，即在多个模块中都有出现，它们即被称作[[横切关注点|横切关注点]]（Cross-cutting concerns, Horizontal concerns）。
+
+日志功能即是横切关注点的一个典型案例，因为日志功能往往横跨系统中的每个业务模块，即“横切”所有有日志需求的类及方法体。而对于一个信用卡应用程序来说，存款、取款、帐单管理是它的核心关注点，日志和持久化将成为横切整个对象结构的横切关注点。
+
+切面的概念源于对[[面向对象的程序设计|面向对象的程序设计]]和[[反射式编程|計算反射]]的融合。面向切面编程语言拥有很多类似于[[元对象协议|元对象协议]]的功能，但有更多的限制。切面相关的编程概念包括{{en-link|面向主题编程|Subject-oriented programming|主题}}、[[混入|混入]]和{{en-link|委托 (计算)|Delegation (computing)|委托}}。使用面向切面范型的其他方式有{{en-link|复合过滤器|Composition Filters}}和Hyper/J的hyperslices方式。
+
+==历史==
+
+“面向切面的程序设计”这一术语出现的具体时间已经不可考证了，但该词是由[[施乐|施乐]][[帕洛阿尔托研究中心|帕洛阿尔托研究中心]]的Chris Maeda首先提出的。术语“横切”是由{{en-link|Gregor Kiczales}}提出的。同许多重大的技术创新一样，面向切面的程序设计，也是在不同的地方被独立发展出来。面向切面编程的早期工作，主要是由下面几个机构和人员作出的：
+*施乐帕洛阿尔托研究中心：Gregor Kiczales、John Lamping、Cristina Videira Lopes等人，进行的早期工作，有关于反射机制和元对象协议；1997年Gregor Kiczales发表了论文《面向切面的程序设计》；代表系统是基于[[元对象协议|元对象协议]]的面向切面程序设计系统和{{en-link|AspectJ}}。
+*国际商用机器公司托马斯·J·沃森研究中心：William Harrison、Harold Ossher、Peri Tarr等人，在1980年代末进行的早期工作，有关于软件开发环境与工具集成；后来提出多维关注点分离（MDSOC）；代表系统是Hyper/J。
+*美国东北大学：Karl Lieberherr等人，进行的早期工作是研究软件演化，提出了[[得墨忒耳定律|得墨忒耳定律]]、传播模式、适应性程序设计；代表系统是Demeter/C++和Demeter/Java。
+*荷兰特温特大学：Mehmet Aksit等人的代表系统是复合过滤器。
+
+== 基本概念 ==
+{{en-link|关注点|Concern (computer science)}}是对软件工程有意义的小的、可管理的、可描述的软件组成部分，一个关注点通常只同一个特定概念或目标相关联。传统的程序设计语言，以一种线性的文本来描述软件，只采用一种方式比如类，将软件分解成模块；这导致某些关注点比较好的被捕捉，容易进一步组合、扩展；但还有一些关注点没有被捕捉，弥散在整个软件内部。
+
+[[关注点分离|关注点分离]]（SOC）是标识、封装和操纵只与特定概念、目标相关联的软件组成部分的能力，即标识、封装和操纵关注点的能力。分离关注点使得解决特定领域问题的代码从业务逻辑中独立出来，业务逻辑的代码中不再含有针对特定领域问题代码的调用，业务逻辑同特定领域问题的关系通切面来封装、维护，这样原本分散在在整个应用程序中的变动就可以很好的管理起来。
+
+[[主关注点|核心关注点]]是一个软件最主要的关注点。在传统的程序设计语言中，将软件分解成模块的主要方式，是支配性分解，即按主关注点进行模块分解。用来描述、设计、实现一个给定关注点的软件构造单位是[[方法|方法]]。如果两个关注点的实现的方法存在交集，则称谓这两个关注点相互横切（Crosscut）。
+
+面向切面的程序设计的核心概念，是从[[主关注点|核心关注点]]中分离出[[横切关注点|横切关注点]]。面向切面编程，在支配性分解的基础上，提供叫做{{en-link|切面|Aspect (computer programming)}}（Aspect）的一种辅助的模块化机制，这种新的模块化机制可以捕捉横切关注点。
+
+== 连接点模型 ==
+
+面向切面语言的通知相关构件，定义了一个连接点模型（JPM）。一个JPM定义了三种东西：
+
+#何时通知可以运行。这些叫做{{en-link|连接点|join point}}，因为在一个运行的程序中，它们是可以有用的连接上额外行为的点。一个连接点要有用，它必需是可寻址的，并且对普通程序员是可理解的。它还应该经历无关紧要的程序变更而保持稳定，使得一个切面经历这种变更而保持稳定。很多AOP实现支持方法执行和字段引用作为连接点。
+# 规定（或量化）连接点的方式，这叫做{{en-link|切点 (编程)|pointcut|切点}}。切点确定是否匹配一个给定连接点。最有用的切点语言使用像基础语言的语法（例如{{en-link|AspectJ}}使用Java[[类型签名|签名]]），并允许通过命名和组合来重新使用。
+# 指定在连接点要运行的代码的手段。{{en-link|AspectJ}}称之为{{en-link|通知 (编程)|Advice (programming)|通知}}，并且可以在连接点之前、之后和周围运行。一些实现还支持在一个切面中定义另一个类上的一个方法。
+
+连接点模型可以基于暴露的连接点、如何规定连接点、在连接点上允许的操作，和可以表达的结构性增强来进行比较。
+
+=== AspectJ的连接点模型 ===
+{{Main article|{{en-link|AspectJ}}}}
+所有有效的Java程序也是有效的AspectJ程序，但是AspectJ容许编程者定义叫{{en-link|切面 (编程)|Aspect (computer programming)|切面}}的特殊构造。切面包含一些对于标准类不能获得到的实体。它们是扩展方法、切点和通知。
+
+{{en-link|扩展方法|Extension method}}允许编程者从这个切面内向现存的增加方法、字段或接口。下面例子向类<code>Point</code>增加一个<code>acceptVisitor</code>方法（参见[[访问者模式|访问者模式]]）：
+
+<syntaxhighlight lang="aspectj">
+aspect VisitAspect {
+  void Point.acceptVisitor(Visitor v) {
+    v.visit(this);
+  }
+}
+</syntaxhighlight>
+
+在AspectJ中连接点包括：方法或构造子调用或执行，一个类或对象的初始化，字段读或写访问，异常处理等。它们不包括：循环、<code>super</code>调用，<code>throw</code>子句，多个语句等。
+切点是通过组合“原始切点指示符”（PCD）来规定的。
+
+“种类”PCD匹配特定种类的连接点（比如方法执行），并且倾向于接受类似Java签名作为输入。一个这种切点如下所示：
+<syntaxhighlight lang="aspectj">
+execution(* set*(*))
+</syntaxhighlight>
+这个切点匹配一个方法执行连接点，如果这个方法名字开始于<code>set</code>，并且精确的只有一个任何类型的实际参数。
+
+“动态”PCD检查运行时间类型和绑定变量。例如：
+<syntaxhighlight lang="aspectj">
+this(Point)
+</syntaxhighlight>
+这个切点在当前执行对象是类<code>Point</code>的实例之时匹配。注意一个类的未限定名字可以通过Java的正常类型查找来使用。
+
+“范围”PCD限制连接点的词法作用域。例如：
+<syntaxhighlight lang="aspectj">
+within(com.company.*)
+</syntaxhighlight>
+这个切点匹配在<code>com.company</code>包中任何类型的任何连接点。<code>*</code>是一种形式的通配符，它用来匹配具有一个签名的任何东西。
+
+切点可以复合和命名来重新使用。例如：
+<syntaxhighlight lang="aspectj">
+pointcut set() : execution(* set*(*) ) && this(Point) && within(com.company.*);
+</syntaxhighlight>
+这个切点匹配一个方法执行连接点，如果这个方法名字开始于<code>set</code>，并且<code>this</code>是在<code>com.company</code>包中类型<code>Point</code>的实例。它可以使用名字<code>set()</code>来提及。
+
+通知规定在（通过切点指定的）一个连接点（之前、之后或周围）运行特定代码（指定如若一个方法中的代码）。AOP运行时间系统，在这个切点匹配一个连接点的时候，自动调用通知。例如：
+<syntaxhighlight lang="aspectj">
+after() : set() {
+  Display.update();
+}
+</syntaxhighlight>
+这在效果上指定了：“如果<code>set()</code>切点匹配这个连接点，在连接点完成之后，运行代码<code>Display.update()</code>。”
+
+==实现==
+下列[[编程语言|编程语言]]已经实现了AOP，于语言之内或外部库：
+{{div col|colwidth=20em}}
+*[[.NET_Framework|.NET Framework]]语言（[[C_Sharp_(programming_language)|C#]] / [[Visual_Basic_.NET|VB.NET]]）<ref>Numerous: 
+[https://github.com/vc3/Afterthought Afterthought] {{webarchive|url=https://web.archive.org/web/20160315162029/https://github.com/vc3/Afterthought |date=2016-03-15 }}, [http://www.rapier-loom.net/ LOOM.NET] {{webarchive|url=https://web.archive.org/web/20080827215106/http://www.rapier-loom.net/ |date=2008-08-27 }}, [http://www.codeplex.com/entlib Enterprise Library 3.0 Policy Injection Application Block] {{webarchive|url=https://web.archive.org/web/20070119154829/http://www.codeplex.com/entlib |date=2007-01-19 }}, [http://sourceforge.net/projects/aspectdng/ AspectDNG] {{webarchive|url=https://web.archive.org/web/20040929053513/http://sourceforge.net/projects/aspectdng |date=2004-09-29 }}, [http://www.castleproject.org/projects/dynamicproxy/ DynamicProxy] {{webarchive|url=https://web.archive.org/web/20151205001755/http://www.castleproject.org/projects/dynamicproxy/ |date=2015-12-05 }}, [http://composestar.sourceforge.net/ Compose*] {{webarchive|url=http://archive.wikiwix.com/cache/20050821193804/http://composestar.sourceforge.net/ |date=2005-08-21 }}, [http://www.postsharp.net/ PostSharp] {{webarchive|url=https://web.archive.org/web/20160503095409/https://www.postsharp.net/ |date=2016-05-03 }}, [http://www.seasar.org/en/dotnet/ Seasar.NET] {{webarchive|url=https://web.archive.org/web/20060725015434/http://www.seasar.org/en/dotnet/ |date=2006-07-25 }}, [http://dotspect.tigris.org/ DotSpect (.SPECT)] {{webarchive|url=https://web.archive.org/web/20060331071126/http://dotspect.tigris.org/ |date=2006-03-31 }}, [http://www.springframework.net/ Spring.NET] {{webarchive|url=https://web.archive.org/web/20060402205922/http://springframework.net/ |date=2006-04-02 }} (as part of its functionality), [https://www.cs.columbia.edu/~eaddy/wicca Wicca and Phx.Morph] {{webarchive|url=https://web.archive.org/web/20061207110849/http://www1.cs.columbia.edu/~eaddy/wicca/ |date=2006-12-07 }}, [http://setpoint.codehaus.org/ SetPoint] {{webarchive|url=https://web.archive.org/web/20081007002006/http://setpoint.codehaus.org/ |date=2008-10-07 }}</ref>
+**PostSharp<ref>[https://www.postsharp.net/ PostSharp]</ref>，是一个商业AOP实现，具有免费但有限制的版本。
+**{{en-link|微软企业库|Microsoft Enterprise Library|Unity}}，提供到在核心编程领域包括数据访问、安全性、日志、异常处理和其他之中经过实践检验的设施的API。
+*[[ActionScript|ActionScript]]<ref>{{cite web|url=http://www.as3commons.org/as3-commons-bytecode|title=Welcome to as3-commons-bytecode|website=as3commons.org|access-date=5 May 2018|url-status=live|archive-url=https://web.archive.org/web/20141003100345/http://www.as3commons.org/as3-commons-bytecode/|archive-date=3 October 2014}}</ref>
+*[[Ada|Ada]]<ref>{{cite web|url=http://www.adacore.com/uploads/technical-papers/Ada2012_Rational_Introducion.pdf|title=Ada2012 Rationale|website=adacore.com|access-date=5 May 2018|url-status=live|archive-url=https://web.archive.org/web/20160418132340/http://www.adacore.com/uploads/technical-papers/Ada2012_Rational_Introducion.pdf|archive-date=18 April 2016}}</ref>
+*[[AutoHotkey|AutoHotkey]]<ref>{{cite web|url=http://www.autohotkey.com/forum/viewtopic.php?p=243426|archive-url=https://archive.today/20130117125117/http://www.autohotkey.com/forum/viewtopic.php?p=243426|url-status=dead|archive-date=17 January 2013|title=Function Hooks|website=autohotkey.com|access-date=5 May 2018}}</ref>
+*[[C语言|C]] / [[C++|C++]]<ref>Several: [[AspectC++|AspectC++]], [http://wwwiti.cs.uni-magdeburg.de/iti_db/forschung/fop/featurec/ FeatureC++], [http://www.cs.ubc.ca/labs/spl/projects/aspectc.html AspectC] {{webarchive|url=https://web.archive.org/web/20060821190630/http://www.cs.ubc.ca/labs/spl/projects/aspectc.html |date=2006-08-21 }}, [http://www.aspectc.net/ AspeCt-oriented C] {{webarchive|url=https://web.archive.org/web/20081120144608/http://www.aspectc.net/ |date=2008-11-20 }}, [https://archive.today/20120721212648/http://www.bramadams.org/aspicere/index.html Aspicere]</ref>
+*[[COBOL|COBOL]]<ref>{{cite web|url=http://homepages.vub.ac.be/~kdeschut/cobble/|title=Cobble|website=vub.ac.be|access-date=5 May 2018}}{{dead link|date=May 2018 |bot=SheriffIsInTown |fix-attempted=yes }}</ref>
+*The [[Cocoa|Cocoa]] [[Objective-C|Objective-C]]框架<ref>{{cite web|url=http://www.ood.neu.edu/aspectcocoa/|title=AspectCocoa|website=neu.edu|access-date=5 May 2018|url-status=dead|archive-url=https://web.archive.org/web/20071026022525/http://www.ood.neu.edu/aspectcocoa/|archive-date=26 October 2007}}</ref>
+*[[ColdFusion|ColdFusion]]<ref>{{cite web|url=http://coldspringframework.org/|title=ColdSpring Framework: Welcome|date=5 November 2005|access-date=5 May 2018|archive-url=https://web.archive.org/web/20051105014513/http://coldspringframework.org/|archive-date=5 November 2005}}</ref>
+*[[Common_Lisp|Common Lisp]]<ref>{{cite web|url=http://common-lisp.net/project/closer/aspectl.html|title=Closer Project: AspectL.|access-date=11 August 2015|url-status=live|archive-url=http://archive.wikiwix.com/cache/20110223172923/http://common-lisp.net/project/closer/aspectl.html|archive-date=23 February 2011}}</ref>
+*[[Delphi|Delphi]]<ref>{{cite web|url=https://code.google.com/p/infra/|title=infra - Frameworks Integrados para Delphi - Google Project Hosting|access-date=11 August 2015|url-status=live|archive-url=https://web.archive.org/web/20150909070130/http://code.google.com/p/infra/|archive-date=9 September 2015}}</ref><ref>{{cite web|url=https://code.google.com/p/meaop/|title=meaop - MeSDK: MeObjects, MeRTTI, MeAOP - Delphi AOP(Aspect Oriented Programming), MeRemote, MeService... - Google Project Hosting|access-date=11 August 2015|url-status=live|archive-url=https://web.archive.org/web/20150910210536/http://code.google.com/p/meaop/|archive-date=10 September 2015}}</ref><ref>{{cite web|url=https://code.google.com/p/delphisorcery/|title=Google Project Hosting|access-date=11 August 2015|url-status=live|archive-url=https://web.archive.org/web/20141225080131/https://code.google.com/p/delphisorcery/|archive-date=25 December 2014}}</ref>
+*{{en-link|Oxygene (编程语言)|Oxygene (programming language)|Delphi Prism}}<ref>{{cite web|url=http://prismwiki.codegear.com/en/Cirrus|title=RemObjects Cirrus|website=codegear.com|access-date=5 May 2018|url-status=dead|archive-url=https://web.archive.org/web/20120123094027/http://prismwiki.codegear.com/en/Cirrus|archive-date=23 January 2012}}</ref>
+*{{en-link|e (验证语言)|e (verification language)|e}}（IEEE 1647）
+*[[Emacs_Lisp|Emacs Lisp]]<ref>{{cite web|url=https://www.gnu.org/software/emacs/elisp/html_node/Advising-Functions.html|title=Emacs Advice Functions|website=gnu.org|access-date=5 May 2018|url-status=live|archive-url=https://web.archive.org/web/20111024211408/http://www.gnu.org/software/emacs/elisp/html_node/Advising-Functions.html|archive-date=24 October 2011}}</ref>
+*[[Groovy|Groovy]]
+*[[Haskell|Haskell]]<ref>[[Monad_(functional_programming)|Monad]]s allow program semantics to be altered by changing the type of the program without altering its code: {{cite journal | citeseerx = 10.1.1.25.8262 | title = Monads As a theoretical basis for AOP |journal = International Workshop on Aspect-Oriented Programming at ECOOP | first = Wolfgang | last = De Meuter | year = 1997| page = 25 }} {{cite journal | url = http://dl.acm.org/citation.cfm?id=2451457 | title = A Typed Monadic Embedding of Aspects | first1 = Nicolas | last1 = Tabareau | first2 = Ismael | last2 = Figueroa | first3 = Éric | last3 = Tanter | journal = Proceedings of the 12th Annual International Conference on Aspect-oriented Software Development | series = Aosd '13 | date = March 2013 | pages = 171–184 | doi = 10.1145/2451436.2451457 | isbn = 9781450317665 | s2cid = 27256161 }} [[Type_class|Type class]]es allow additional capabilities to be added to a type: {{cite journal | first1 = Martin | last1 = Sulzmann | first2 = Meng | last2 = Wang | url = http://portal.acm.org/citation.cfm?id=1233842 | title = Aspect-oriented programming with type classes | journal = Proceedings of the 6th Workshop on Foundations of Aspect-oriented Languages | date = March 2007 | pages = 65–74 | doi = 10.1145/1233833.1233842 | isbn = 978-1595936615 | s2cid = 3253858 }}.</ref>
+*[[Java|Java]]<ref>Numerous others: [http://www.caesarj.org/ CaesarJ] {{webarchive|url=https://web.archive.org/web/20081219181529/http://caesarj.org/ |date=2008-12-19 }}, [http://composestar.sourceforge.net/ Compose*] {{webarchive|url=http://archive.wikiwix.com/cache/20050821193804/http://composestar.sourceforge.net/ |date=2005-08-21 }}, [http://dynaop.dev.java.net/ Dynaop] {{webarchive|url=https://web.archive.org/web/20070724061030/https://dynaop.dev.java.net/ |date=2007-07-24 }}, [http://jac.objectweb.org/ JAC] {{webarchive|url=https://web.archive.org/web/20040619135517/http://jac.objectweb.org/ |date=2004-06-19 }}, [[Google_Guice|Google Guice]] (as part of its functionality), [http://www.csg.is.titech.ac.jp/~chiba/javassist/ Javassist] {{webarchive|url=https://web.archive.org/web/20040901095342/http://www.csg.is.titech.ac.jp/~chiba/javassist/ |date=2004-09-01 }}, [http://ssel.vub.ac.be/jasco/ JAsCo (and AWED)] {{webarchive|url=https://web.archive.org/web/20050411010213/http://ssel.vub.ac.be/jasco/ |date=2005-04-11 }}, [http://www.ics.uci.edu/~trungcn/jaml/ JAML] {{webarchive|url=https://web.archive.org/web/20050415091244/http://www.ics.uci.edu/~trungcn/jaml/ |date=2005-04-15 }}, [http://labs.jboss.com/portal/jbossaop JBoss AOP] {{webarchive|url=https://web.archive.org/web/20061017211354/http://labs.jboss.com/portal/jbossaop/ |date=2006-10-17 }}, [http://roots.iai.uni-bonn.de/research/logicaj LogicAJ] {{webarchive|url=https://web.archive.org/web/20060504154852/http://roots.iai.uni-bonn.de/research/logicaj/ |date=2006-05-04 }}, [http://www.objectteams.org/ Object Teams] {{webarchive|url=https://web.archive.org/web/20050831200910/http://objectteams.org/ |date=2005-08-31 }}, [http://prose.ethz.ch/ PROSE] {{webarchive|url=https://web.archive.org/web/20070124094344/http://prose.ethz.ch/ |date=2007-01-24 }}, [http://www.aspectbench.org/ The AspectBench Compiler for AspectJ (abc)] {{webarchive|url=https://web.archive.org/web/20141216200424/http://aspectbench.org/ |date=2014-12-16 }}, [[Spring_framework|Spring framework]] (as part of its functionality), [[Seasar|Seasar]], [http://roots.iai.uni-bonn.de/research/jmangler/ The JMangler Project] {{webarchive|url=https://web.archive.org/web/20051028191025/http://roots.iai.uni-bonn.de/research/jmangler/ |date=2005-10-28 }}, [http://injectj.sourceforge.net/ InjectJ] {{webarchive|url=https://web.archive.org/web/20050405080539/http://injectj.sourceforge.net/ |date=2005-04-05 }}, [http://www.csg.is.titech.ac.jp/projects/gluonj/ GluonJ] {{webarchive|url=https://web.archive.org/web/20070206010219/http://www.csg.is.titech.ac.jp/projects/gluonj/ |date=2007-02-06 }}, [http://www.st.informatik.tu-darmstadt.de/static/pages/projects/AORTA/Steamloom.jsp Steamloom] {{webarchive|url=https://web.archive.org/web/20070818100432/http://www.st.informatik.tu-darmstadt.de/static/pages/projects/AORTA/Steamloom.jsp |date=2007-08-18 }}</ref>
+**{{en-link|AspectJ}}
+*[[JavaScript|JavaScript]]<ref>Many: [http://i.gotfresh.info/2007/12/7/advised-methods-for-javascript-with-prototype/ Advisable] {{webarchive|url=https://web.archive.org/web/20080704052200/http://i.gotfresh.info/2007/12/7/advised-methods-for-javascript-with-prototype |date=2008-07-04 }}, [https://code.google.com/p/ajaxpect/ Ajaxpect] {{webarchive|url=https://web.archive.org/web/20160709203939/https://code.google.com/p/ajaxpect/ |date=2016-07-09 }}, [http://plugins.jquery.com/project/AOP jQuery AOP Plugin] {{webarchive|url=https://web.archive.org/web/20080113184156/http://plugins.jquery.com/project/AOP |date=2008-01-13 }}, [http://aspectes.tigris.org/ Aspectes] {{webarchive|url=http://archive.wikiwix.com/cache/20060508035836/http://aspectes.tigris.org/ |date=2006-05-08 }}, [http://www.aspectjs.com/ AspectJS] {{webarchive|url=https://web.archive.org/web/20081216010832/http://www.aspectjs.com/ |date=2008-12-16 }}, [http://www.cerny-online.com/cerny.js/ Cerny.js] {{webarchive|url=https://web.archive.org/web/20070627024906/http://www.cerny-online.com/cerny.js/ |date=2007-06-27 }}, [http://dojotoolkit.org/ Dojo Toolkit] {{webarchive|url=https://web.archive.org/web/20060221211958/http://www.dojotoolkit.org/ |date=2006-02-21 }}, [http://humax.sourceforge.net/ Humax Web Framework] {{webarchive|url=https://web.archive.org/web/20081209103012/http://humax.sourceforge.net/ |date=2008-12-09 }}, [https://code.google.com/p/joose-js/ Joose] {{webarchive|url=https://web.archive.org/web/20150318193601/http://code.google.com/p/joose-js/ |date=2015-03-18 }}, [[Prototype.js|Prototype]] - [http://www.prototypejs.org/api/function/wrap Prototype Function#wrap] {{webarchive|url=https://web.archive.org/web/20090505233620/http://www.prototypejs.org/api/function/wrap |date=2009-05-05 }}, [http://developer.yahoo.com/yui/3/api/Do.html YUI 3 (Y.Do)] {{webarchive|url=https://web.archive.org/web/20110125115930/https://developer.yahoo.com/yui/3/api/Do.html |date=2011-01-25 }}</ref>
+*{{en-link|Logtalk}}<ref>Using built-in support for categories (which allows the encapsulation of aspect code) and event-driven programming (which allows the definition of ''before'' and after ''event'' handlers).</ref>
+*[[Lua|Lua]]<ref>{{cite web|url=http://luaforge.net/projects/aspectlua/|title=AspectLua|access-date=11 August 2015|url-status=live|archive-url=https://web.archive.org/web/20150717094121/http://luaforge.net/projects/aspectlua/|archive-date=17 July 2015}}</ref>
+*[[make|make]]<ref>{{cite web|url=http://www.bramadams.org/makao/|archive-url=https://archive.today/20120724151524/http://www.bramadams.org/makao/|url-status=dead|archive-date=24 July 2012|title=MAKAO, re(verse)-engineering build systems|access-date=11 August 2015}}</ref>
+*[[Matlab|Matlab]]<ref>{{cite web|url=http://www.sable.mcgill.ca/mclab/aspectmatlab/index.html|title=McLab|access-date=11 August 2015|url-status=live|archive-url=https://web.archive.org/web/20150924093214/http://www.sable.mcgill.ca/mclab/aspectmatlab/index.html|archive-date=24 September 2015}}</ref>
+*[[ML语言|ML]]<ref>{{cite web|url=http://www.cs.princeton.edu/sip/projects/aspectml/|title=AspectML - Aspect-oriented Functional Programming Language Research|access-date=11 August 2015|url-status=live|archive-url=https://web.archive.org/web/20101205005108/http://www.cs.princeton.edu/sip/projects/aspectml/|archive-date=5 December 2010}}</ref>
+*[[Perl|Perl]]<ref>{{cite web|url=https://metacpan.org/module/Aspect|title=Aspect - Aspect-Oriented Programming (AOP) for Perl - metacpan.org|author=Adam Kennedy|access-date=11 August 2015|url-status=live|archive-url=https://web.archive.org/web/20130831064935/https://metacpan.org/module/Aspect|archive-date=31 August 2013}}</ref>
+*[[PHP|PHP]]<ref>Several: [http://aop.io PHP-AOP (AOP.io)] {{webarchive|url=http://archive.wikiwix.com/cache/20140818050736/http://aop.io/ |date=2014-08-18 }}, [http://go.aopphp.com Go! AOP framework] {{webarchive|url=https://web.archive.org/web/20130301043014/http://go.aopphp.com/ |date=2013-03-01 }}, [https://code.google.com/p/phpaspect/ PHPaspect] {{webarchive|url=https://web.archive.org/web/20160822234503/https://code.google.com/p/phpaspect/ |date=2016-08-22 }}, [http://www.seasar.org/en/php5/index.html Seasar.PHP] {{webarchive|url=https://web.archive.org/web/20051226040309/http://www.seasar.org/en/php5/index.html |date=2005-12-26 }}, [https://archive.today/20120712081326/http://php-aop.googlecode.com/ PHP-AOP], [https://flow.neos.io/ Flow] {{webarchive|url=https://web.archive.org/web/20180104132543/https://flow.neos.io/ |date=2018-01-04 }}, [https://github.com/AOP-PHP/AOP AOP PECL Extension] {{webarchive|url=https://web.archive.org/web/20170411031809/https://github.com/AOP-PHP/AOP |date=2017-04-11 }}</ref>
+*[[Prolog|Prolog]]<ref>{{cite web|url=http://www.bigzaphod.org/whirl/dma/docs/aspects/aspects-man.html|title=bigzaphod.org is coming soon|website=www.bigzaphod.org|access-date=5 May 2018|url-status=live|archive-url=https://web.archive.org/web/20160420181837/http://www.bigzaphod.org/whirl/dma/docs/aspects/aspects-man.html|archive-date=20 April 2016}}</ref>
+*[[Python|Python]]<ref>Several: [http://peak.telecommunity.com/ PEAK] {{webarchive|url=https://web.archive.org/web/20050409082546/http://peak.telecommunity.com/ |date=2005-04-09 }}, [https://web.archive.org/web/20110609153559/http://old.aspyct.org/ Aspyct AOP], [http://www.cs.tut.fi/~ask/aspects/aspects.html Lightweight Python AOP] {{webarchive|url=https://web.archive.org/web/20041009194711/http://www.cs.tut.fi/~ask/aspects/aspects.html |date=2004-10-09 }}, [http://www.logilab.org/projects/aspects Logilab's aspect module] {{webarchive|url=https://web.archive.org/web/20050309034259/http://www.logilab.org/projects/aspects |date=2005-03-09 }}, [http://pythius.sourceforge.net/ Pythius] {{webarchive|url=https://web.archive.org/web/20050408072457/http://pythius.sourceforge.net/ |date=2005-04-08 }}, [http://springpython.webfactional.com/1.1.x/reference/html/aop.html Spring Python's AOP module] {{webarchive|url=https://web.archive.org/web/20160304055741/http://springpython.webfactional.com/1.1.x/reference/html/aop.html |date=2016-03-04 }}, [http://pytilities.sourceforge.net/doc/1.1.0/guide/aop/ Pytilities' AOP module] {{webarchive|url=https://web.archive.org/web/20110825101213/http://pytilities.sourceforge.net/doc/1.1.0/guide/aop/ |date=2011-08-25 }}, [http://python-aspectlib.readthedocs.org/en/latest/ aspectlib] {{webarchive|url=https://web.archive.org/web/20141105061010/http://python-aspectlib.readthedocs.org/en/latest/ |date=2014-11-05 }}</ref>
+*[[Racket|Racket]]<ref>{{cite web|url=http://planet.racket-lang.org/display.ss?package=aspectscheme.plt&owner=dutchyn|title=PLaneT Package Repository : PLaneT > dutchyn > aspectscheme.plt|access-date=11 August 2015|url-status=live|archive-url=https://web.archive.org/web/20150905062740/http://planet.racket-lang.org/display.ss?package=aspectscheme.plt&owner=dutchyn|archive-date=5 September 2015}}</ref>
+*[[Ruby|Ruby]]<ref>{{cite web|url=http://aspectr-fork.sourceforge.net/|title=AspectR - Simple aspect-oriented programming in Ruby|access-date=11 August 2015|url-status=live|archive-url=http://archive.wikiwix.com/cache/20150812003432/http://aspectr-fork.sourceforge.net/|archive-date=12 August 2015}}</ref><ref>{{cite web|url=http://aquarium.rubyforge.org/|archive-url=https://web.archive.org/web/20071026055811/http://aquarium.rubyforge.org/|url-status=dead|archive-date=26 October 2007|title=Home|author=Dean Wampler|access-date=11 August 2015}}</ref><ref>{{cite web|url=https://github.com/gcao/aspector|title=gcao/aspector|work=GitHub|access-date=11 August 2015|url-status=live|archive-url=https://web.archive.org/web/20150104180534/https://github.com/gcao/aspector|archive-date=4 January 2015}}</ref>
+*[[Squeak|Squeak]] [[Smalltalk|Smalltalk]]<ref>{{cite web|url=http://www.prakinf.tu-ilmenau.de/~hirsch/Projects/Squeak/AspectS/|title=AspectS|website=tu-ilmenau.de|access-date=5 May 2018|url-status=dead|archive-url=https://web.archive.org/web/20060106112030/http://www.prakinf.tu-ilmenau.de/~hirsch/Projects/Squeak/AspectS/|archive-date=6 January 2006}}</ref><ref>{{cite web|url=http://csl.ensm-douai.fr/MetaclassTalk|title=MetaclassTalk: Reflection and Meta-Programming in Smalltalk|access-date=11 August 2015|url-status=dead|archive-url=https://web.archive.org/web/20150729062351/http://csl.ensm-douai.fr/MetaclassTalk|archive-date=29 July 2015}}</ref>
+*[[统一建模语言|UML 2.0]]<ref>{{cite web|url=http://www.iit.edu/~concur/weavr|title=WEAVR|website=iit.edu|access-date=5 May 2018|url-status=live|archive-url=https://web.archive.org/web/20081212200221/http://www.iit.edu/~concur/weavr/|archive-date=12 December 2008}}</ref>
+*[[XML|XML]]<ref>{{cite web|url=https://code.google.com/p/aspectxml/|title=aspectxml - An Aspect-Oriented XML Weaving Engine (AXLE) - Google Project Hosting|access-date=11 August 2015|url-status=live|archive-url=https://web.archive.org/web/20150912161613/http://code.google.com/p/aspectxml/|archive-date=12 September 2015}}</ref>
+{{div col end}}
+
+== 參考文獻 ==
+{{Reflist|2}}
+
+== 站外链接 ==
+* [http://aosd.net/ Aspect-Oriented Software Development]
+* [https://web.archive.org/web/20030821074213/http://aosd.net/conference/ Aspect-Oriented Software Development]（AOP年會）
+* [http://aosd.net/wiki AOSD Wiki] {{Wayback|url=http://aosd.net/wiki |date=20080517085216 }}（英文維基給AOP的專欄）
+* [http://eclipse.org/aspectj/ AspectJ] {{WebCite|url=https://www.webcitation.org/61CrjFWVy?url=http://eclipse.org/aspectj/ |date=20110825172434 |dateformat=iso }}（Java的實現）
+** [http://www.eclipse.org/aspectj/doc/next/progguide/semantics-declare.html] {{Wayback|url=http://www.eclipse.org/aspectj/doc/next/progguide/semantics-declare.html |date=20200219132654 }} 更多有關於型態間成員宣告的資料
+* [https://web.archive.org/web/20130726000858/http://www.javaworld.com/javaworld/jw-01-2002/jw-0118-aspect.html 关于面向侧面的程序设计和AspectJ的系列文章]
+* [https://web.archive.org/web/20141216200424/http://www.aspectbench.org/ The AspectBench Compiler for AspectJ]（另一個Java實現）
+* [https://web.archive.org/web/20130726000858/http://www.javaworld.com/javaworld/jw-01-2002/jw-0118-aspect.html 一篇深度討論AOP與AspectJ的系列文章]
+* [https://web.archive.org/web/20051124013101/http://www.codefez.com/Home/tabid/36/articleType/ArticleView/articleId/98/AspectOrientedProgrammingwithTacobymarchoffman.aspx 利用RemObject Taco實現AOP的文章]
+* [http://www.cis.uab.edu/gray/Research/C-SAW/ Constraint-Specification Aspect Weaver] {{Wayback|url=http://www.cis.uab.edu/gray/Research/C-SAW/ |date=20071026060419 }}
+* [http://www.devx.com/Java/Article/28422 面向側面對物件導向：該用哪個？何時使用？] {{Wayback|url=http://www.devx.com/Java/Article/28422 |date=20210415064448 }}
+* [https://web.archive.org/web/20041009194711/http://www.cs.tut.fi/~ask/aspects/aspects.html 給Python用的AOP輕量實現]
+* [http://www.rapier-loom.net LOOM.NET] {{Wayback|url=http://www.rapier-loom.net/ |date=20080827215106 }}
+* [http://www.cs.nccu.edu.tw/~chenk/AOP-intro.pdf 剖面導向程式設計(AOP/AOSD)簡介] {{Wayback|url=http://www.cs.nccu.edu.tw/~chenk/AOP-intro.pdf |date=20150923211641 }}
+
+{{编程语言类别}}
+
+[[Category:編程典範|Category:編程典範]]

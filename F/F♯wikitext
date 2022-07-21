@@ -1,0 +1,184 @@
+{{DISPLAYTITLE:F#}}
+{{noteTA|G1=IT}}
+{{Infobox programming language
+| name                   = F#
+| logo                   = File:F_Sharp_logo.svg
+| logo_size             = 160px
+| caption                = 
+| file ext               = .fs, .fsi, .fsx, .fsscript
+| paradigm               = [[多范型|多范型]]: [[函數程式語言|函数式]], [[指令式編程|指令式]], [[面向对象編程|面向对象]], [[元编程|元编程]], [[并发计算|并发计算]]
+| released               = {{Start date|2005}} (version 1.0)
+| designer               = [[微软研究院|微软研究院]], {{en-link|Don Syme}}
+| developer              = [[微软|微软]], {{en-link|F♯软件基金会|F Sharp Software Foundation}}
+| latest_release_version = {{wikidata|property|reference|edit|Q648619|P348}}
+| latest_release_date = {{wikidata|qualifier|Q648619|P348|P577}}，{{Time ago|{{wikidata|qualifier|raw|Q648619|P348|P577}}}}
+| latest preview version = 
+| latest preview date    = 
+| typing                 = [[类型系统|静态类型]], [[强类型|强类型]], [[类型推论|类型推论]]
+| implementations        = 
+| dialects               = 
+| influenced by          = [[ML语言|ML]], [[OCaml|OCaml]], [[C♯|C#]], [[Python|Python]], [[Haskell|Haskell]],<ref name="haskellInfluence">{{harvcoltxt|Syme|Granicz|Cisternino|2007|p=2}} "F# also draws from Haskell particularly with regard to two advanced language features called ''sequence expressions'' and ''workflows''."</ref> [[Scala|Scala]], [[Erlang|Erlang]]
+| influenced             = [[F*|F*]], {{en-link|LiveScript}}
+| programming language   = 
+| operating system       = [[跨平台|跨平台]] ([[.NET框架|.NET框架]], [[Mono|Mono]], [[JavaScript|JavaScript]])
+| license                = [[Apache许可证|Apache许可证]]
+| website                = {{URL|fsharp.org}}
+| wikibooks              = F Sharp Programming
+}}
+
+'''F#'''是由[[微软|微软]]发展的为[[.NET|.NET]]语言提供运行环境的[[程序设计语言|程序设计语言]]，是[[函數程式語言|函數程式語言]]（'''FP'''，Functional Programming），函數程式語言最重要的基礎是[[Λ演算|Lambda Calculus]]。它是基于[[OCaml|OCaml]]的，而[[OCaml|OCaml]]是基于[[ML语言|ML]]函数程式语言。有時F#和OCaml的程式是可以交互編譯的。
+
+F#支援高阶函数、[[柯里化|柯里化]]、[[惰性求值|惰性求值]]、Continuations、模式匹配、[[闭包_(计算机科学)|闭包]]、列表处理和[[元编程|元编程]]。这是一个用于显示.NET在不同编程语言间互通的程序设计，可以被.NET中的任意其它代碼編譯和調用。
+
+2002年微软開始由Don Syme帶領研發F#，從C#，[[语言集成查询|LINQ]]和[[Haskell|Haskell]]中獲取了經驗，2005年推出第一個版本，2007年7月31日释出1.9.2.9版。2007年底，微軟宣布F#進入產品化的階段。
+
+F#已被集成在[[Visual_Studio|Visual Studio]] 2010中，版本是2.0，含有对.Net Framework的完全支持。
+
+F#现在在[[Visual_Studio|Visual Studio]] 2015中，版本是4.0。
+
+F#现在在[[Visual_Studio|Visual Studio]] 2017中，版本是4.1。
+
+== 范例 ==
+
+一些小小范例如下：
+<syntaxhighlight lang="fsharp">
+// This is a comment for a sample hello world program.
+printfn "Hello World!"
+</syntaxhighlight>
+
+具有構造函數的Person類，該構造函數具有名稱和年齡以及兩個不可變的屬性。
+<syntaxhighlight lang="fsharp">
+/// This is a documentation comment for a type definition.
+type Person(name : string, age : int) =
+    member x.Name = name
+    member x.Age = age
+    
+/// class instantiation
+let mrSmith = Person("Smith", 42)
+
+</syntaxhighlight>
+一个经常用于演示函数式语言语法的简单示例。此处以32位的阶乘函数为例，使用f#
+A simple example that is often used to demonstrate the syntax of functional languages is the [[factorial_function|factorial function]] for non-negative 32-bit integers, here shown in F#:
+<syntaxhighlight lang="fsharp">
+/// Using pattern matching expression
+let rec factorial n =
+    match n with
+    | 0 -> 1
+    | _ -> n * factorial (n - 1)
+
+/// For a single-argument functions there is syntactic sugar (pattern matching function):
+let rec factorial = function 
+    | 0 -> 1 
+    | n -> n * factorial (n - 1)
+    
+/// Using fold and range operator
+let factorial n = [1..n] |> Seq.fold (*) 1
+</syntaxhighlight>
+
+迭代示例:
+<syntaxhighlight lang="fsharp">
+/// Iteration using a 'for' loop
+let printList lst = 
+    for x in lst do
+        printfn "%d" x
+
+/// Iteration using a higher-order function
+let printList2 lst = 
+    List.iter (printfn "%d") lst
+
+/// Iteration using a recursive function and pattern matching
+let rec printList3 lst =
+    match lst with
+    | [] -> ()
+    | h :: t ->
+        printfn "%d" h
+        printList3 t
+</syntaxhighlight>
+斐波那契数列数列示例：
+<syntaxhighlight lang="fsharp">
+/// Fibonacci Number formula
+let fib n =
+    let rec g n f0 f1 =
+        match n with
+        | 0 -> f0
+        | 1 -> f1
+        | _ -> g (n - 1) f1 (f0 + f1)
+    g n 0 1
+
+/// Another approach - a lazy infinite sequence of Fibonacci numbers
+let fibSeq = Seq.unfold (fun (a,b) -> Some(a+b, (b, a+b))) (0,1)
+
+// Print even fibs
+[1 .. 10]
+|> List.map     fib
+|> List.filter  (fun n -> (n % 2) = 0)
+|> printList
+
+// Same thing, using a list expression
+[ for i in 1..10 do
+    let r = fib i
+    if r % 2 = 0 then yield r ]
+|> printList
+</syntaxhighlight>
+一个Windows程序样本示例:
+<syntaxhighlight lang="fsharp">
+// Open the Windows Forms library
+open System.Windows.Forms
+
+// Create a window and set a few properties
+let form = new Form(Visible=true, TopMost=true, Text="Welcome to F#")
+
+// Create a label to show some text in the form
+let label =
+    let x = 3 + (4 * 5)
+    new Label(Text = sprintf "x = %d" x)
+
+// Add the label to the form
+form.Controls.Add(label)
+
+// Finally, run the form
+[<System.STAThread>]
+Application.Run(form)
+</syntaxhighlight>
+多线程编程示例（此处为CPU和I/O任务同时进行）:
+<syntaxhighlight lang="fsharp">
+/// A simple prime number detector
+let isPrime (n:int) =
+   let bound = int (sqrt (float n))
+   seq {2 .. bound} |> Seq.forall (fun x -> n % x <> 0)
+
+// We are using async workflows
+let primeAsync n =
+    async { return (n, isPrime n) }
+
+/// Return primes between m and n using multiple threads
+let primes m n =
+    seq {m .. n}
+        |> Seq.map primeAsync
+        |> Async.Parallel
+        |> Async.RunSynchronously
+        |> Array.filter snd
+        |> Array.map fst
+
+// Run a test
+primes 1000000 1002000
+    |> Array.iter (printfn "%d")
+</syntaxhighlight>
+
+== 参考文献 ==
+{{reflist}}
+
+== 外部链接 ==
+* [http://research.microsoft.com/projects/ilx/fsharp.aspx 微软F#]{{Wayback|url=http://research.microsoft.com/projects/ilx/fsharp.aspx |date=20030802175920 }}
+* [https://web.archive.org/web/20111231160059/http://www.fsharp.name/ F Sharp]
+* [https://web.archive.org/web/20080216232744/http://ocaml.cn/planet Planet F#]
+* {{en}}[http://www.fsharp.net  F#]{{Wayback|url=http://www.fsharp.net/ |date=20081119161341 }}
+
+{{dotNET}}
+{{Microsoft development tools}}
+{{程序設計語言}}
+[[Category:微软研究院|Category:微软研究院]]
+[[Category:.NET编程语言|Category:.NET编程语言]]
+[[Category:ML語言家族|Category:ML語言家族]]
+[[Category:模式匹配编程语言|Category:模式匹配编程语言]]
+[[Category:2005年建立的程式語言|Category:2005年建立的程式語言]]

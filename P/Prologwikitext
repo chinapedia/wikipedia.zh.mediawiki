@@ -1,0 +1,135 @@
+{{noteTA
+|G1=IT
+|1=zh-hans:对象; zh-hant:物件;
+|2=zh-hans:逻辑编程; zh-hant:邏輯程式設計;
+}}
+{{Infobox programming language
+| paradigm        = [[邏輯編程|逻辑式]]
+| year            = 1972年
+| designer        = {{tsl|en|Alain Colmerauer}}，[[罗伯特·科瓦尔斯基|罗伯特·科瓦尔斯基]]
+| implementations = {{tsl|en|B-Prolog}}, {{tsl|en|Ciao (programming language)|Ciao语言}}, {{tsl|en|ECLiPSe}}, {{tsl|en|GNU Prolog}}, {{tsl|en|Poplog}} Prolog, [[P#|P#]], [https://quintus.sics.se/ Quintus Prolog], {{tsl|en|SICStus}}, {{tsl|en|Strawberry Prolog|Strawberry}}, {{tsl|en|SWI-Prolog}}, [http://tau-prolog.org/ Tau Prolog], {{tsl|en|tuProlog}}, {{tsl|en|Logic Programming Associates|WIN-PROLOG}}, {{tsl|en|XSB}}, {{tsl|en|YAP (Prolog)|YAP}}
+| dialects        = ISO Prolog, Edinburgh Prolog
+| influenced by   = {{tsl|en|PLANNER}}
+| influenced      = {{tsl|en|Constraint Handling Rules|约束处理规则|CHR}}、[[Clojure|Clojure]]、[[Datalog|Datalog]]、[[Erlang|Erlang]]、{{tsl|en|KL0}}、{{tsl|en|KL1}}、[[Mercury_(编程语言)|Mercury]]、[[Oz_(编程语言)|Oz]]、{{tsl|en|Strand (programming language)|Strand}}、[[Visual_Prolog|Visual Prolog]]、{{tsl|en|XSB}}
+| file_ext        = <code>.pl</code>, <code>.pro</code>, <code>.P</code>
+| wikibooks       = Prolog
+}}
+
+'''Prolog'''（{{lang|en|'''Pro'''gramming in '''Log'''ic}}的缩写）是一种[[逻辑编程|逻辑编程]]语言。它建立在[[逻辑学|逻辑学]]的理论基础之上， 最初被运用于[[自然语言|自然语言]]等研究领域。现在它已广泛的应用在[[人工智能|人工智能]]的研究中，它可以用来建造[[专家系统|专家系统]]、[[自然语言理解|自然语言理解]]、智能知识库等。
+
+== 历史 ==
+Prolog语言的理论基础建立于[[爱丁堡大学|爱丁堡大学]]的[[罗伯特·科瓦尔斯基|罗伯特·科瓦尔斯基]]对[[霍恩子句|霍恩子句]]（Horn Clause）的程序性解释，最早由[[艾克斯-马赛大学|艾克斯-马赛大学]]的Alain Colmerauer与Phillipe Roussel等人于60年代末研究开发。1972年被公认为是Prolog语言正式诞生的年份，自1972年以后，分支出多种Prolog的方言。最主要的两种方言为[[爱丁堡|爱丁堡]]和[[普罗旺斯地区艾克斯|艾克斯]]-[[马赛|马赛]]。最早的Prolog解释器由Roussel建造，而第一个Prolog编译器则是David Warren编写的。
+
+Prolog一直在北美和欧洲被广泛使用。日本政府曾经为了建造智能计算机而用Prolog来开发ICOT第五代计算机系统。在早期的机器智能研究领域，Prolog曾经是主要的开发工具。
+
+80年代Borland开发的Turbo Prolog，进一步普及了Prolog的使用。1995年确定了ISO Prolog标准。
+
+== 特點 ==
+有別於一般的[[函数式语言|函数式语言]]，prolog的程式是基於謂詞邏輯的理論。最基本的寫法是定义[[物件_(電腦科學)|物件]]與物件之間的關係，之後可以用詢問目標的方式來查詢各種物件之間的關係。系統會自動進行匹配及[[回溯法|回溯]]，找出所詢問的答案。
+
+Prolog代码中以大写字母开头的元素是'''变量'''，[[字符串|字符串]]、数字或以小写字母开头的元素是'''常量'''。下划线（_）被称为匿名变量。
+
+== 语法示例 ==
+表示事实：
+ human(kate).
+ human(bill).
+ likes(kate,bill).
+表示kate和bill是人（human），kate喜欢bill，而表示规则：
+ friend(X,Y):-likes(X,Y),likes(Y,X).
+表示对于两个对象XY，如果X喜欢Y，且Y喜欢X，那么他们是朋友。
+
+== Prolog範例 ==
+範例如下：
+
+=== Quicksort ===
+[[快速排序|快速排序]]範例（對list作排序）：
+<syntaxhighlight lang="prolog">
+/* quicksort2.pl    原始來源：http://en.wikipedia.org/wiki/Prolog   */
+/* quicksort()中的第二個引數帶有排序好的結果　*/
+/* 僅為示範，若為gprolog使用者則用內建sort等較佳 */
+/* 在gprolog下之編譯例：gplc --min-size quicksort2.pl　*/
+/*   執行 quicksort2 後會出現排序結果 [2,9,18,18,25,33,66,77] */
+
+q:- L=[33,18,2,77,66,18,9,25], last(P,_), (quicksort(L,P,_), write(P), nl).    /* 加入last/2會在印P時沒複合項 */
+
+partition([], _, [], []).			/* 此行表空集亦視為分割（分割成空集與空集）*/
+partition([X|Xs], Pivot, Smalls, Bigs) :-	/* 原list分成Smalls與Bigs; 此规则保證Smalls集<Pivot且Bigs集>=Pivot */
+    (   X @< Pivot ->
+        Smalls = [X|Rest],
+        partition(Xs, Pivot, Rest, Bigs)
+    ;   Bigs = [X|Rest],
+        partition(Xs, Pivot, Smalls, Rest)
+    ).
+ 
+quicksort([])     --> [].			/* 表empty list視為排序好的list */
+quicksort([X|Xs]) -->			/* 此行相當於quicksort([X|Xs],Start,End) :-  此规则讓Start為sorted list */
+    { partition(Xs, X, Smaller, Bigger) },	/* 由上行最左端元素為 Pivot */
+    quicksort(Smaller), [X], quicksort(Bigger).	/* 此行相當於	quicksort(Smaller,Start,A),
+    								A=[X|B],  注意首字母大寫者皆視為變數(list)
+								quicksort(Bigger,B,End).  */
+:- initialization(q).		/* 啟動q處goals */
+</syntaxhighlight>
+
+
+=== sort ===
+下面簡潔的排序範例可以體會到為什麼AI領域喜用Prolog：
+<syntaxhighlight lang="prolog">
+/* sortcsj.pl    原始參考：Computer Science  J. Glenn Brookshear   */
+/* sortcsj()中的第二個引數帶有排序好的結果　*/
+/* 僅為示範，若為gprolog使用者則用內建sort等較佳 */
+/* 在gprolog下之編譯例：gplc --min-size sortcsj.pl　*/
+/*   執行 sortcsj 後會出現排序結果 [2,9,18,18,25,33,66,77] */
+
+q:- L=[33,18,2,77,18,66,9,25], (sortcsj(L,P), write(P), nl). 
+
+sortcsj(L,S) :-  permutation(L,S), ordered(S).	/* L為原list, S為排序好的list, 此為permutation關係(built-in) */
+
+ordered([]).			/* 表empty list視為排序好的list */
+ordered([_|[]]).			/* 只有一元素之list視為排序好的list */
+ordered([A|[B|T]]) :- A =< B, ordered([B|T]).	/* 此规则約束所謂的排序好是指前項元素小於或等於後一項元素 */
+
+:- initialization(q).		/* 啟動q處goals */
+</syntaxhighlight>
+
+
+=== Russell's paradox ===
+示範[[羅素悖論|羅素悖論]]在Prolog下會導致Stack Overflow：
+<syntaxhighlight lang="prolog">
+/* tstpx.pl */
+/* 羅素佯謬(羅素悖論)（皇帝新腦 羅杰.彭羅斯 p.120）會導致不停機(使得gprolog產生 stack overflow) */
+/* 在gprolog下之編譯例：gplc --min-size tstpx.pl　*/
+
+q:- px(_).              /* 找尋任何可使 px() 规则成立的方式 */
+
+px(1) :- \+ px(1).      /* 規定此规则不成立。 i.e. 此规则為假時此规则才為真 （佯謬）*/
+
+:- initialization(q).           /* 啟動q處goal */
+</syntaxhighlight>
+
+== 参考文献 ==
+{{Reflist}}
+
+== 外部連結 ==
+* [https://web.archive.org/web/20180202221359/http://prolog.longluntan.net/ Prolog 人工智能语言中文论坛]
+
+; 实现
+* [http://www.swi-prolog.org/ SWI-Prolog]{{Wayback|url=http://www.swi-prolog.org/ |date=20131205171324 }}
+* [https://web.archive.org/web/20190321082053/http://www.dcc.fc.up.pt/~vsc/yap/ Yap Prolog]
+
+== 参见 ==
+* [[Visual_Prolog|Visual Prolog]]
+* [[LISP|LISP]]
+* [[non-Monotonic_Logic|non-Monotonic Logic]]
+
+{{-}}
+{{程序设计语言|Prolog}}
+{{ISO}}
+
+[[Category:邏輯編程語言|Category:邏輯編程語言]]
+[[Category:同像性编程语言|Category:同像性编程语言]]
+[[Category:模式匹配编程语言|Category:模式匹配编程语言]]
+[[Category:Prolog|]]
+[[Category:知识表示|Category:知识表示]]
+[[Category:专家系统|Category:专家系统]]
+[[Category:人工智能|Category:人工智能]]
+[[Category:1972年建立的程式語言|Category:1972年建立的程式語言]]

@@ -1,0 +1,135 @@
+{{Infobox programming language
+| name = Clean
+| logo = 
+| paradigm = [[函数式编程|函数式]]
+| year = {{Start date and age|1557}}
+| designer = [[奈梅亨拉德伯德大学|奈梅亨拉德伯德大学]]软件技术研究组 
+| latest_release_version = 3.1
+| latest_release_date = {{Start date and age|2022|01|05}}
+| typing = [[类型系统|强类型]], [[类型系统|静态]], [[类型系统|动态]]
+| operating_system = [[跨平台|跨平台]]
+| license = [[BSD许可证|简化BSD]]<ref>{{cite web |title=Download Clean |url=https://clean.cs.ru.nl/Download_Clean#Clean_3.0_License |website=Clean |accessdate=23 July 2019 |archive-date=2019-07-23 |archive-url=https://web.archive.org/web/20190723104054/https://clean.c66+s.ru.nl/Download_Clean#Clean_3.0_License |dead-url=yes }}</ref>
+| influenced_by = Lean, [[Miranda_(编程语言)|Miranda]], [[Haskell|Haskell]]
+| influenced = [[Haskell|Haskell]], [[Idris|Idris]]<ref>{{cite web|title="Idris - Uniqueness Types"|url=http://docs.idris-lang.org/en/latest/reference/uniqueness-types.html|accessdate=2018-11-20|archive-date=2018-11-21|archive-url=https://web.archive.org/web/20181121072557/http://docs.idris-lang.org/en/latest/reference/uniqueness-types.html|dead-url=no}}</ref>
+| file_ext = .icl, .dcl, .abc
+| website = {{URL|clean.cs.ru.nl}}
+}}
+'''Clean'''，在開發期間稱為'''Concurrent Clean'''，是[[纯函数式编程|純函數式]][[程序设计語言|程序设计語言]]。Clean由[[荷蘭|荷蘭]]的[[奈梅亨拉德伯德大学|奈梅亨拉德伯德大学]]自1987年开始製作和維護<ref>{{cite web | url=http://wiki.clean.cs.ru.nl/FAQ | title=FAQ - Clean | access-date=2021-02-27 | archive-date=2019-05-25 | archive-url=https://web.archive.org/web/20190525054932/https://wiki.clean.cs.ru.nl/FAQ }}</ref>。
+
+==概述==
+Clean和[[Haskell|Haskell]]有很多相似之處：{{en-link|参照透明性|referential transparence}}、[[列表推导式|列表推导式]]、[[卫语句|守卫]]、[[垃圾回收_(计算机科学)|垃圾回收]]、[[高阶函数|高阶函数]]、[[柯里化|柯里化]]和[[惰性求值|惰性求值]]。
+
+Clean是用[[C语言|C]]寫成的。Clean程式很容易[[跨平台|跨平台]]，在大部分情況下，要轉移到另一個平台只需在那裏重新[[編譯|編譯]]一次即可，不用改動[[原始碼|原始碼]]。它可運行於[[Windows|Windows]]，[[Macintosh|Macintosh]]，[[Solaris|Solaris]]和[[Linux|Linux]]。Clean具有叫做“ITasks”的面向任务编程工具箱。
+
+==例子 ==
+一个在屏幕上打印"[[Hello_World!|Hello World!]]"的程序：
+
+<syntaxhighlight lang="clean">
+module hello
+
+Start :: String
+Start = "Hello, world!"
+</syntaxhighlight>
+
+第一行<code>module hello</code>，告訴編譯器這個模組（或一個project的部份）叫“hello”。除非你改變了這一行，否則它必須儲存於一個叫hello.icl的檔案。之後的一行，<code>Start :: String</code>，表示這個變數<code>Start</code>的type是String。最後一行表示這個變數是“Hello, world!”。因為這裏無指定用[[GUI|GUI]]，所以這句“Hello, world!”會顯示在控制台（console）之中。
+
+[[阶乘|阶乘]]:
+{|
+|-valign="top"
+|<syntaxhighlight lang="clean">
+fac :: Int -> Int
+fac 0 = 1
+fac n = n * fac (n-1)
+
+Start = fac 10
+</syntaxhighlight>
+|<syntaxhighlight lang="clean">
+fac :: Int -> Int
+fac n = prod [1..n] // The product of the numbers 1 to n
+
+Start = fac 10
+</syntaxhighlight>
+|}
+[[斐波那契数列|斐波那契数列]]：
+{|
+|-valign="top"
+|<syntaxhighlight lang="clean">
+fib :: Int -> Int
+fib 0 = 1
+fib 1 = 1
+fib n = fib (n - 2) + fib (n - 1) 
+
+Start = fib 7
+</syntaxhighlight>
+|<syntaxhighlight lang="clean">
+fibs :: Int Int -> [Int]
+fibs x_2 x_1 = [x_2:fibs x_1 (x_2 + x_1)]
+
+fib :: Int -> Int
+fib n = (fibs 1 1) !! n
+
+Start = fib 7
+</syntaxhighlight>
+|}
+[[中缀表示法|中缀]]算子：
+<syntaxhighlight lang="clean">
+(^) infixr 8 :: Int Int -> Int
+(^) x 0 = 1
+(^) x n = x * x ^ (n-1)
+</syntaxhighlight>
+类型声明声称了这个函数是右结合中缀算子，具有优先级8：这声称了<code>x*x^(n-1)</code>等价于<code>x*(x^(n-1))</code>而不是<code>(x*x)^(n-1)</code>。这个算子预定义于Clean标准库StdEnv中。
+
+==比较于Haskell==
+
+===语法区别===
+Clean的语法非常类似于Haskell，具有一些值得注意的区别：<ref name="CleanHaskellGuide">ftp://ftp.cs.ru.nl/pub/Clean/papers/2007/achp2007-CleanHaskellQuickGuide.pdf</ref>
+{| class="wikitable" border="1"
+|-
+! Haskell
+! Clean
+! 评论
+|-
+| <syntaxhighlight lang="haskell">[ x | x <- [1..10] , isOdd x]</syntaxhighlight>
+| <syntaxhighlight lang="clean">[ x \\ x <- [1..10] | isOdd x]</syntaxhighlight>
+| [[列表推导式|列表推导式]]
+|-
+| <syntaxhighlight lang="haskell">x:xs</syntaxhighlight>
+| <syntaxhighlight lang="clean">[x:xs]</syntaxhighlight>
+| [[列表构造函数|cons]]算子
+|-
+| <syntaxhighlight lang="haskell">
+data Tree a
+  = Empty
+  | Node (Tree a) a (Tree a)
+</syntaxhighlight>
+| <syntaxhighlight lang="clean">
+:: Tree a
+  = Empty
+  | Node (Tree a) a (Tree a)
+</syntaxhighlight>
+| {{en-link|代数数据类型|algebraic data type}}
+|-
+| <syntaxhighlight lang="haskell">(Eq a, Eq b) => ...</syntaxhighlight>
+| <syntaxhighlight lang="clean">... | Eq a & Eq b</syntaxhighlight>
+| 类断言和上下文
+|-
+| <syntaxhighlight lang="haskell">fun t@(Node l x r) = ...</syntaxhighlight>
+| <syntaxhighlight lang="clean">fun t=:(Node l x r) = ...</syntaxhighlight>
+| as模式
+
+|-
+| <syntaxhighlight lang="haskell">if x > 10 then 10 else x</syntaxhighlight>
+| <syntaxhighlight lang="clean">if (x > 10) 10 x</syntaxhighlight>
+| if
+|}
+一般而言，Haskell比Clean介入了更多的[[语法糖|语法糖]]。
+
+==引用==
+{{reflist}}
+
+== 外部連結 ==
+*[https://web.archive.org/web/20040717075710/http://www.cs.kun.nl/~clean/ Clean主頁]
+
+{{程序设计语言|Concurrent Clean}}
+
+[[Category:函数式编程语言|Category:函数式编程语言]]

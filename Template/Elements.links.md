@@ -1,0 +1,7 @@
+{{#iferror:{{CheckElement|{{{1|}}}|link=yes}}|{{#ifeq:{{lc:{{NAMESPACE}}}}|{{lc:{{ns:0}}}}|[[Category:含有錯誤元素符號的條目]]}}|{{#ifexpr:{{ProtonsForElement|{{#invoke:TemplateParameters|argTrim|{{{1|0}}} }}}}<=118|*元素{{LinkForElement|{{{1|}}} }}在[http://periodic.lanl.gov/{{ProtonsForElement|{{#invoke:TemplateParameters|argTrim|{{{1|}}} }}}}.shtml 洛斯阿拉莫斯国家实验室]的介紹{{en icon}}
+*[http://www.environmentalchemistry.com/yogi/periodic/{{SymbolForElement|{{{1|}}} }}.html {{lang|en|EnvironmentalChemistry.com}} —— {{虛擬模板|delnowiki=yes|code=<nowiki>{{LinkForElement|</nowiki>{{{1|}}}<nowiki>|</nowiki>{{{4|}}}<nowiki> }}</nowiki>}}]{{en icon}}
+*元素[http://www.periodicvideos.com/videos/{{padleft:{{ProtonsForElement|{{#invoke:TemplateParameters|argTrim|{{{1|}}} }}}}|3|0}}.htm {{LinkForElement|{{{1|}}} }}]在''The Periodic Table of Videos''（諾丁漢大學）的介紹{{en icon}} }}{{#ifexpr:{{ProtonsForElement|{{#invoke:TemplateParameters|argTrim|{{{1|0}}} }}}}<=120|
+*元素{{LinkForElement|{{{1|}}} }}在[http://elements.vanderkrogt.net/element.php?sym={{SymbolForElement|{{{1|}}} }} Peter van der Krogt elements site]的介紹{{en icon}} }}
+*[http://www.webelements.com/webelements/elements/text/{{SymbolForElement|{{{1|}}} }}/index.html WebElements.com – {{虛擬模板|delnowiki=yes|code=<nowiki>{{LinkForElement|</nowiki>{{{1|}}}<nowiki>|</nowiki>{{{4|}}}<nowiki> }}</nowiki>}}]{{#if:{{{3|}}}|{{en icon}}
+{{{3}}}|{{en icon}} }}}}<noinclude>
+{{Doc}}</noinclude>

@@ -1,0 +1,144 @@
+{{Expand language|1=en|time=2020-10-01T11:52:14+00:00}}
+{{about|簡稱“MIME”的網際網路標準|最初由该标准定义的媒体分类|MIME类型|其他名称相近或相同的条目|MIM}}
+
+{{IPstack}}
+
+'''多用途網際網路郵件擴展'''（{{Lang-en|'''M'''ultipurpose '''I'''nternet '''M'''ail '''E'''xtensions}}，缩写：'''MIME'''）是一个[[互联网标准|互联网标准]]，它扩展了[[电子邮件|电子邮件]]标准，使其能够支持：
+* 非[[ASCII|ASCII]]字符文本；
+* 非文本格式附件（[[二進位制|二進位制]]、聲音、圖片等）；
+* 由多部分（multiple parts）組成的消息体；
+* 包含非[[ASCII|ASCII]]字元的標頭資訊（Header information）。這個標準被定義於 RFC 2045、RFC 2046、RFC 2047、RFC 2048、RFC 2049 等[[RFC|RFC]]中。
+MIME改善了由 RFC 822 轉變而来的 RFC 2822 ，這些舊標準规定[[電子郵件|電子郵件]]標準並不允许在邮件消息中使用7位ASCII字符集以外的字符。正因如此，一些非英语字符消息和二进制文件，图像，声音等非文字消息原本都不能在电子邮件中传输（MIME可以）。MIME规定了用于表示各种各样的数据类型的符号化方法。此外，在[[万维网|万维网]]中使用的[[超文字传输協定|HTTP協定]]中也使用了MIME的框架，標準被擴展為[[互联网媒体类型|網際網路媒體形式]]。
+
+== MIME headers ==
+MIME是通过标准化电子邮件报文的头部的附加域（fields）而实现的；这些头部的附加域，描述新的报文类型的内容和组织形式。
+
+=== MIME版本 ===
+MIME版本（MIME-Version），这个標頭區域在邮件訊息的报文用一个版本號碼來指明消息遵從的MIME規範版本。目前版本是1.0。
+
+ MIME-Version: 1.0
+
+=== 內容類型 ===
+內容類型（Content-Type），這個標頭區域用於指定資訊的類型。一般以下面的形式呈現。
+
+ Content-Type: [type]/[subtype]; parameter
+
+type有以下的形式：
+*Text：用于標準化地表示的文字訊息，文字訊息可以是多種字符集和或者多種格式的；
+*Multipart：用於連接消息体的多个部分構成一個消息，這些部分可以是不同類型的資料；
+*Application：用於傳輸應用程式資料或者二進位資料；
+*Message：用於包裝一個E-mail訊息；
+*Image：用於傳輸靜態圖片資料；
+*Audio：用於傳輸音頻或者音声資料；
+*Video：用於傳輸動態影像資料，可以是與音頻編輯在一起的視訊資料格式；
+*Font：用于传输字体文件；
+*Model：用于传输3D模型文件。
+
+subtype用于指定type的详细形式。content-type/subtype配对的集合和与此相关的参数，将随着时间而增长。为了确保这些值在一个有序而且公开的状态下开发，MIME使用Internet Assigned Numbers Authority (IANA)作为中心的注册机制来管理这些值。常用的subtype值如下所示：
+* text/plain（[[純文字|純文字]]）
+* text/html（HTML文件）
+* application/xhtml+xml（XHTML文件）
+* image/gif（GIF圖片）
+* image/jpeg（JPEG圖片）【PHP中为：image/pjpeg】
+* image/png（PNG圖片）【PHP中为：image/x-png】
+* audio/mpeg（MP3音频）
+* audio/aac（AAC音频）
+* video/mpeg（MPEG视频）
+* video/mp4（MPEG-4视频）
+* application/octet-stream（任意的二進位資料）
+* application/pdf（PDF文件）
+* application/msword（Microsoft Word文件）
+* application/vnd.openxmlformats-officedocument.wordprocessingml.document（Microsoft Word 2007文件）
+* application/vnd.wap.xhtml+xml (wap1.0+)
+* application/xhtml+xml (wap2.0+)
+* message/rfc822（RFC 822形式）
+* multipart/alternative（HTML邮件的HTML形式和纯文本形式，相同内容使用不同形式表示）
+* application/x-www-form-urlencoded（使用HTTP的POST方法送出的表單）
+* multipart/form-data（同上，但主要用于表单送出时伴随文件上传的场合）
+此外，尚未被接受为正式数据类型的subtype，可以使用x-开始的独立名称（例如application/x-gzip）。vnd-开始的固有名称也可以使用（例：application/vnd.ms-excel）。
+
+parameter可以用来指定附加的信息，更多情况下是用于指定text/plain和text/htm等的文字编码方式的charset参数。MIME根据type制定了默认的subtype，当客户端不能确定消息的subtype的情况下，消息被看作默认的subtype进行处理。Text默认是text/plain，Application默认是application/octet-stream而Multipart默认情况下被看作multipart/mixed。
+
+=== 内容配置 ===
+内容配置（Content-Disposition），原始的MIME只描述邮件内容的结构，并不会处理表现类型的问题。内容配置（Content-Disposition）在[https://tools.ietf.org/html/rfc2183 RFC 2183] {{Wayback|url=https://tools.ietf.org/html/rfc2183 |date=20210213220850 }}中被添加，用来指明MIME的表现类型。MIME的每一部分可以添加下列配置。
+* inline 添加此配置后客户端应自动展示信息。
+* attachment 添加此配置后客户端在接受到信息后不自动展示，需要用户自己选择相应的方法处理信息。
+Content-Disposition字段也提供了一些参数。如文件名，文件的创建日期和修改日期等，使邮件客户端可以保存附件。
+以下是一个示例。
+  Content-Disposition: attachment; filename=genome.jpeg;
+  modification-date="Wed, 12 Feb 1997 16:29:51 -0500";
+
+儘管有些邮件客户端仅在Content-Type的参数中添加了文件名来通訊，但這是不推薦的。正確的做法是在Content-Disposition中指定filename或是同时在Content-Type和Content-Disposition中指定name和filename的参数。在HTTP中Content-Disposition: attachment通常用来提示客户端将响应体作为下载文件，而不是在页面中展示它。filename参数是默认的下载文件名。
+
+=== 内容传输编码 ===
+内容传输编码（Content-Transfer-Encoding），这个區域使指定ASCII以外的文字編碼方式成为可能。形式如下：
+   Content-Transfer-Encoding: [mechanism]
+其中，mechanism的值可以指定为“7bit”，“8bit”，“binary”，“quoted-printable”，“base64”。
+
+==== 7bit ====
+7位元ASCII码。
+
+==== 8bit ====
+8位元ASCII码。
+
+==== binary ====
+Not only may non-ASCII characters be present but the lines
+are not necessarily short enough for SMTP transport.
+
+==== quoted-printable ====
+因为歐洲的一些文字和ASCII字符集中的某些字符有部分相同。如果邮件消息使用的是这些语言的话，与ASCII重叠的那些字符可以原样使用，ASCII字符集中不存在的字符采用形如“=??”的方法编码。这里“??”需要用将字符编码后的16进制数字来指定。采用quoted-printable编码的消息，长度不会变得太长，而且大部分都是ASCII中的字符，即使不通过解码也大致可以读懂消息的内容。
+
+==== base64 ====
+[[base64|base64]]是一種將二進位的01序列轉化成ASCII字元的編碼方式。編碼後的文字或者二進位訊息，就可以運用[[SMTP|SMTP]]等只支援ASCII字元的協定傳送了。Base64一般被认为会平均增加33%的报文长度，而且，经过编码的消息对于人类来说是不可读的。
+
+==== x-encodingname ====
+这个值是预留的扩展。
+
+=== 内容标识符（可选） ===
+=== 内容描述（可选） ===
+== 参见 ==
+* [[8BITMIME|8BITMIME]]
+* [[Unicode_and_email|Unicode and email]]
+* [[Binary-to-text_encoding|Binary-to-text encoding]]
+* [[Direct_Internet_Message_Encapsulation|DIME]]—[[微软|微软]]提议的一种[[技术|技术]]，被称为DIME，是部分改变的MIME，最初应用于[[Web服务|Web服务]]
+* [[Extended_SMTP|Extended SMTP]] (ESMTP)
+* [[互联网媒体类型|Mailcap]]
+* [[mime.types|mime.types]]
+* [[对象链接与嵌入|Object Linking and Embedding]] (OLE)
+* [[S/MIME|S/MIME]]
+* [[带附件的SOAP消息|SOAP with Attachments]]
+* [[Uuencode|Uuencoding]]
+* [[VPIM|VPIM]]
+
+== 参考 ==
+{{Reflist}}
+;备注
+{{Refbegin}}
+; RFC 1426 : SMTP Service Extension for 8bit-MIMEtransport. [[John_Klensin|J. Klensin]], [[Ned_Freed|N. Freed]], [[Marshall_Rose|M. Rose]], [[Einar_Stefferud|E. Stefferud]], D. Crocker. February 1993.
+; RFC 1847 : Security Multiparts for MIME: Multipart/Signed and Multipart/Encrypted
+; RFC 3156 : MIME Security with OpenPGP
+; RFC 2045 : MIME Part One: Format of Internet Message Bodies.
+; RFC 2046 : MIME Part Two: Media Types. N. Freed, [[Nathaniel_Borenstein|Nathaniel Borenstein]]. November 1996.
+; RFC 2047 : MIME Part Three: Message Header Extensions for Non-ASCII Text. [[Keith_Moore|Keith Moore]]. November 1996.
+; RFC 4288 : MIME Part Four: Media Type Specifications and Registration Procedures.
+; RFC 4289 : MIME Part Four: Registration Procedures. N. Freed, J. Klensin. December 2005.
+; RFC 2049 : MIME Part Five: Conformance Criteria and Examples. N. Freed, N. Borenstein. November 1996.
+; RFC 2183 : Communicating Presentation Information in Internet Messages: The Content-Disposition Header. Troost, R., Dorner, S. and K. Moore. August 1997.
+; RFC 2231 : MIME Parameter Value and Encoded Word Extensions: Character Sets, Languages, and Continuations. N. Freed, K. Moore. November 1997.
+; RFC 2387 : The MIME Multipart/Related Content-type
+; RFC 1521 : Mechanisms for Specifying and Describing the Format of Internet Message Bodies
+{{Refend}}
+
+== 外部链接 ==
+*[https://web.archive.org/web/20110824185614/https://www.w3schools.com/media/media_mimeref.asp MIME类型]
+*[https://web.archive.org/web/20041209204714/http://db.org/blog/ 追踪互联网邮件草稿与标准的Blog]
+*[http://www.iana.org/assignments/media-types IANA已注册的MIME媒体类型列表] {{Wayback|url=http://www.iana.org/assignments/media-types |date=20131105221940 }}
+*[http://www.iana.org/assignments/character-sets 字符集列表]{{Wayback|url=http://www.iana.org/assignments/character-sets |date=20040716042926 }}
+*[http://wiki.debian.org/MIME Debian Wiki上的MIME] {{Wayback|url=http://wiki.debian.org/MIME |date=20210224184619 }}
+*[https://web.archive.org/web/20060623063612/http://mgrand.home.mindspring.com/mime.html MIME的更详细综述]（1993年）
+
+<!--'''MIME'''-->
+
+[[Category:电子邮件|Category:电子邮件]]
+[[Category:互联网标准|Category:互联网标准]]
+[[Category:应用层协议|Category:应用层协议]]

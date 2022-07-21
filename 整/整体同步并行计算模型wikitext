@@ -1,0 +1,102 @@
+[[Image:bsp.wiki.fig1.svg|thumb]]{{编程范式}}
+'''整体同步并行计算模型'''（Bulk Synchronous Parallel Computing Model），又名'''大同步模型'''或'''BSP模型'''，由哈佛大学[[莱斯利·瓦利安特|莱斯利·瓦利安特]]提出，他希望像[[冯·诺伊曼|冯·诺伊曼]]体系结构那样，架起计算机程序语言和体系结构间的桥梁，故又称其为'''桥接模型'''（Bridging Model）。
+
+==历史==
+BSP是[[哈佛大学|哈佛大学]]计算机科学家[[Leslie_Valiant|Leslie Valiant]]在1980年代开发的，决定性文章发表于1990年<ref name="CACM_Valiant">Leslie G. Valiant, A bridging model for parallel computation, Communications of the ACM, Volume 33 Issue 8, Aug. 1990 [http://portal.acm.org/citation.cfm?id=79173.79181]</ref>。
+
+在1990年至1992年间，Leslie Valiant在普林斯顿和哈佛，与[[牛津大学|牛津大学]]的Bill McColl致力于分布式内存BSP编程模型的工作。在1992年至1997年间，McColl在牛津领导了一个大型研究组开发了各种BSP编程库、语言和工具，还有多种大规模并行BSP算法。随着兴趣和势头的增长，McColl接着领导了源自牛津、哈佛、佛罗里达、普利斯顿、贝尔实验室、哥伦比亚和乌特勒支的一个组织为BSP编程开发并在1996年出版了BSPlib标准。
+
+Valiant在2000年代开发了BSP模型的一个扩展，在2011年出版为Multi-BSP模型<ref name="JCSS_Valiant">Valiant, L. G. (2011). [https://people.seas.harvard.edu/~valiant/bridging-2010.pdf A bridging model for multi-core computing] {{Wayback|url=https://people.seas.harvard.edu/~valiant/bridging-2010.pdf |date=20170829172450 }}. Journal of Computer and System Sciences, 77(1), 154-166 [https://dx.doi.org/10.1016/j.jcss.2010.06.012]</ref>。
+
+在2017年，McColl开发了BSP模型的一个主要新扩展，提供了在AI、分析和HPC的大规模并行中的错误容忍和tail容忍<ref name="McC2017">A Bridging Model for High Performance Cloud Computing by Bill McColl in 18th SIAM Conference on Parallel Processing for Scientific Computing (2018), http://meetings.siam.org/sess/dsp_talk.cfm?p=88973 {{Wayback|url=http://meetings.siam.org/sess/dsp_talk.cfm?p=88973 |date=20191211050948 }}.</ref>。
+
+==模型==
+BSP计算构成自：
+# 部件（component）：例如处理器，它们胜任处理{{en-link|及或|And/or}}局部内存事务，
+# 网络：它在成对的这种部件之间路由消息，
+# 屏障（barrier）：它是允许所有或子集的部件进行同步化的硬件设施。
+这通常解释为可以跟进不同的计算[[线程|线程]]的一组处理器，每个处理器配备了快速局部内存并用通信网络互连起来。BSP算法严重依赖第三个特征；计算是在一系列的全局“超级步骤”中行进的，它由三部份构成：
+# 并发计算：所有参与处理器可以进行本地计算，就是说每个处理器只能利用在这个处理器的快速本地内存内存储的数值。计算与所有其他计算异步发生但可以经由通信搭接（overlap）。
+# 通信：处理器相互之间交换数据来促成远程数据存储能力。
+# 同步：当一个处理器到达一个[[同步屏障|屏障]]点的时候，它一直等待到所有其他处理器也到达同样这个屏障。
+
+计算和通信活动不必须在时间上依次安排。通信典型的采用单边的“put”和“get”直接远程内存访问（DRMA）调用的形式，而不用成对的双边“send”和“receive”消息传递调用。屏障同步化终结超级步骤：它确保所有单边通信都正确终结。基于双边通信的系统于每次消息发送中隐式包含了这种同步化代价。屏障同步的方法依赖于BSP计算机的硬件设施。在Valiant的最初论文<ref name="CACM_Valiant" />中，这个设施周期的检查当前超级步骤的末端是否被全局性的到达了。这个检查的周期指示为<math>L</math>。
+
+这个模型展示在右侧的示意图中。进程不被当作有特定的线性次序（从左至右或反之），并可以按任何方式映射到处理器。
+
+BSP模型通过对问题的超额分解和对处理器的超额认订，还非常适合于对分布式内存计算启用自动内存管理。计算被分开进入比实有的物理处理器更多的逻辑进程中，并且进程随机的被指派到处理器。这种策略在统计上可以证实会导致最佳的负载平衡，对于工作和通信二者都是如此。
+
+==通信==
+在很多并行编程系统中，通信被认为是在个体行动的层面：发送和接收一个消息，内存到内存传送等。这是难于共事的，因为在并行编程中会有很多同时通信行动，而它们的交互典型的是复杂的。特别是，难于说出任何单一通信行动要完成到底要得花多少时间。
+
+BSP模型认为通信行动是全体性的。这样做的效果是可以给出一组数据通信要花费的时间的上限。BSP把一个超级步骤的所有通信行动认作一个单元，并假定所有个体信息发送作为由固定大小的这个单元的一部份。
+
+超级步骤的到来和外出信息的最大数目指示为<math>h</math>。通信网络递送数据的能力通过参数<math>g</math>来捕获，定义一个处理器花费时间<math>hg</math>来递送大小为1的<math>h</math>个消息。
+
+发送长度<math>m</math>的消息显然要比大小为1的消息用时更长。但是，BSP模型不区分长度<math>m</math>的1个消息和长度1的 <math>m</math>个消息。在二者情况下代价都计为<math>mg</math>。
+
+参数<math>g</math>依赖于下列因素：
+* 在通信网络内用来交互的协议。
+* 处理器和通信网络二者所做的缓冲区管理。
+* 在网络中使用的路由策略。
+* BSP运行时系统。
+
+实际上，对于每个并行计算机<math>g</math>的确定都是经验性的。注意<math>g</math>不是规格化（normalise）的单字递送时间，而是在连续交通条件下的单字递送时间。
+
+==屏障==
+BSP模型的单边通信要求[[同步屏障|屏障同步]]。[[同步屏障|屏障]]是潜在的有代价的，但是避免了[[死锁|死锁]]或[[死锁|活锁]]的可能性，因为不能建立循环的数据依赖。检测并处理它们的工具是不需要的。
+
+屏障同步的代价受到几个要素的影响：
+*参与进来的并行计算的完成时间上的变化所施加的代价。举例来说，除了一个之外的所有进程都完成了它们在这个超级步骤内的工作，并等待最后的那个进程，而它仍有很多工作要完成。一个实现能做的最好的事情是确保所有进程工作在大致相同的问题大小上。
+*所有处理器达到全局一致性状态的代价。这依赖于通信网络，但也依赖于是否有专门硬件用于同步化，并依赖于处理器处理中断的方式。
+
+屏障同步的代价指示为<math>l</math>。注意如果BSP计算机的同步化机制是Valiant建议的那样<ref name=CACM_Valiant/>，则<math>l<L</math>。实际上，<math>l</math>值的确定是经验性的。
+
+屏障在大型的计算机上是代价高昂的，并随着更大的规模而逐渐增大。已有关于从现存算法中去除同步点的大量文献，包括在BSP计算和此外的语境下。例如，很多算法允许对超级步骤的全局结束的局部检测，简单的通过将局部信息比较于已经收到了的消息的数目。相较于最小的要求的通信延迟，这驱使全局同步的代价可计为零<ref name="Alpert">Alpert, R., & Philbin, J. (1997). cBSP: Zero-cost synchronization in a modified BSP model. NEC Research Institute, 4 Independence Way, Princeton NJ, 8540, [http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.36.7784&rep=rep1&type=pdf] {{Wayback|url=http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.36.7784&rep=rep1&type=pdf |date=20140225234100 }}.</ref>。然而对将来的超级计算机架构和网络互连，这个最小延迟预期还会进一步增加；BSP模型，与其他并行计算模型一起，需要适应应对这种趋势。Multi-BSP<ref name="JCSS_Valiant" />是基于BSP的一种解决方案。
+
+==BSP算法的代价==
+超级步骤的代价确定自三项之和：最长的运行的局部计算的代价，在处理器之间全局通信的代价，和在超级步骤结束处屏障同步的代价。<math>p</math>个处理器的超级步骤的代价是：
+:<math>
+max_{i = 1}^{p}(w_i) + max_{i=1}^{p}(h_i g) + l 
+</math>，
+这里的<math>w_i</math>是进程<math>i</math>中局部计算的代价，而<math>h_i</math>是进程<math>i</math>发送或接收的消息的数目。注意这里假定了同构处理器。更常见的表达式写为：
+:<math>w + hg + l</math>，
+这里的<math>w</math>和<math>h</math>取了最大值。算法的代价是每个超级步骤的代价的总和：
+:<math>
+W + Hg + Sl = \sum_{s=1}^{S}w_s + g \sum_{s=1}^{S}h_s + Sl
+</math>，
+这里的<math>S</math>是超级步骤的数目。<math>W</math>、<math>H</math>和<math>S</math>通常建模为函数，随着问题大小而变化。BSP算法的这三个特征通常采用[[大O符号|渐进符号]]，比如<math>H \in O(n/p)</math>。
+
+==其他特点==
+*如果一个处理器至多可以接收/发送消息的数目是h条，那么该模型就是“h-Relation”的。如果一个超级步中某个处理器的计算没有完成，那么下一个超级步就被分给该处理器继续进行。
+*所有[[PRAM模型|PRAM]]上的算法均可在BSP上模拟，每个BSP处理器所能模拟的PRAM数目即成为并行宽松度（Slackness）。
+*BSP放弃了[[程序局部性原理|程序局部性原理]]，从而简化的程序与实现的设计。这一点在并行计算中往往是一个好的特点，注意到一个大规模的计算中可能需要很多处理器，但实际上我们却不可能提供那么多处理器，于是一个处理器可能会被映射到多个虚拟进程，此时，附带的程序局部性原理反而会束缚处理器对存储器的访问。
+*选路器使用[[对等网络|P2P]]的方式进行通信，从而有效的避免了[[网络拥塞|网络拥塞]]。
+
+==扩展和使用==
+对BSP的兴趣近年来有所飙升，Google通过Pregel这样的技术，将它接受为大规模的图分析的主要技术。还有就是新一代的[[Apache_Hadoop|Apache Hadoop]]将[[MapReduce|MapReduce]]模型与Hadoop下部构造的余下部份拆解开来，现有活跃的开源项目在Hadoop顶上增加显式的BSP编程，以及其他高性能并行编程模型，例如{{en-link|Apache Hama}}<ref name="hama">{{Cite web |url=http://hama.apache.org/ |title=Apache Hama |access-date=2019-12-11 |archive-date=2021-03-08 |archive-url=https://web.archive.org/web/20210308232824/https://hama.apache.org/ |dead-url=no }}</ref>和[[Apache_Giraph|Apache Giraph]]。
+
+BSP已经被很多作者扩展来致力解决BSP在建模特定架构或计算范型上的不适合性。其中一个例子是可分解BSP模型。这个模型已经用于一些新建的编程语言和接口中，比如整体同步并行ML（BSML）、BSPLib<ref>{{Cite web |url=http://www.bsp-worldwide.org/implmnts/oxtool/bsplib.html |title=BSPlib |access-date=2019-12-11 |archive-date=2020-02-22 |archive-url=https://web.archive.org/web/20200222090654/http://www.bsp-worldwide.org/implmnts/oxtool/bsplib.html |dead-url=no }}</ref> 、Apache Hama<ref name="hama"/>和Pregel<ref>{{Cite web |url=http://dl.acm.org/citation.cfm?id=1582723 |title=Pregel |access-date=2019-12-11 |archive-date=2019-02-14 |archive-url=https://web.archive.org/web/20190214145756/https://dl.acm.org/citation.cfm?id=1582723 |dead-url=no }}</ref>。
+
+BSPLib标准的著名实现，是Paderborn大学BSP库<ref name=PUB>The Paderborn University BSP (PUB) Library - Design, Implementation and Performance
+Heinz Nixdorf Institute, Departement of Computer Science, University of Paderborn, Germany, [http://www.uni-paderborn.de/fachbereich/AG/agmadh/PapersPostscript/inri.98.tr-rsfb-98-063.ps.gz technical report] {{Wayback|url=http://www.uni-paderborn.de/fachbereich/AG/agmadh/PapersPostscript/inri.98.tr-rsfb-98-063.ps.gz |date=20010605075544 }}.</ref>，和Jonathan Hill的牛津BSP Toolset<ref name="hill">Jonathan Hill: [http://www.bsp-worldwide.org/implmnts/oxtool/ The Oxford BSP Toolset] {{Wayback|url=http://www.bsp-worldwide.org/implmnts/oxtool/ |date=20200218073328 }}, 1998.</ref>。现代实现包括：在[[消息传递接口|消息传递接口]]顶上模拟BSP的BSPonMPI<ref>Wijnand J. Suijlen: [http://bsponmpi.sourceforge.net BSPonMPI] {{Wayback|url=http://bsponmpi.sourceforge.net/ |date=20140627173501 }}, 2006.</ref>，和以现代共享内存架构为目标的MulticoreBSP<ref name=Yze13>MulticoreBSP for C: a high-performance library for shared-memory parallel programming
+by A. N. Yzelman, R. H. Bisseling, D. Roose, and K. Meerbergen in International Journal of Parallel Programming, in press (2013), [https://dx.doi.org/10.1109/TPDS.2013.31 doi:10.1109/TPDS.2013.31].</ref><ref name=Yze12>An Object-Oriented Bulk Synchronous Parallel Library for Multicore Programming
+by A. N. Yzelman & Rob H. Bisseling in Concurrency and Computation: Practice and Experience 24(5), pp. 533-553 (2012), [https://dx.doi.org/10.1002/cpe.1843 doi:10.1002/cpe.1843]</ref>。C语言版MulticoreBSP，特别知名于它的开启嵌套BSP运行的能力，从而允许显式的Multi-BSP编程。
+
+==参阅==
+* [[并行编程模型|并行编程模型]]
+* [[同步屏障|同步屏障]]
+
+==引用==
+{{reflist|2}}
+
+==外部連結==
+* [http://www.bsp-worldwide.org/ BSP Worldwide] {{Wayback|url=http://www.bsp-worldwide.org/ |date=20191201070728 }}
+* [http://www.bsp-worldwide.org/implmnts/oxtool/papers.html BSP related papers] {{Wayback|url=http://www.bsp-worldwide.org/implmnts/oxtool/papers.html |date=20180627172314 }}
+* [http://frederic.loulergue.eu/research/bsml/index.html BSML official website] {{Wayback|url=http://frederic.loulergue.eu/research/bsml/index.html |date=20160825192637 }}
+* [https://web.archive.org/web/20180129094236/http://www2.cs.uni-paderborn.de/~pub/ Paderborn University BSP library]
+* [http://bsponmpi.sourceforge.net BSPonMPI] {{Wayback|url=http://bsponmpi.sourceforge.net/ |date=20140627173501 }}
+* [http://www.multicorebsp.com MulticoreBSP] {{Wayback|url=http://www.multicorebsp.com/ |date=20200807012817 }}
+
+[[Category:并行计算|Category:并行计算]]
+[[Category:计算模型|Category:计算模型]]

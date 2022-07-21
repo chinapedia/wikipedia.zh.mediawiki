@@ -1,0 +1,1 @@
+#redirect [[Template:Non-free Crown copyright]]

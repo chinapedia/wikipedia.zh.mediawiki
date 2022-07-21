@@ -1,0 +1,116 @@
+{{For|地理學的堆積|堆積作用}}
+{{NoteTA
+|G1= IT
+|1 = zh-cn:堆; zh-tw:堆積;
+}}
+{{各地中文名
+|cn = 堆
+|tw = 堆積
+}}
+'''堆'''（{{Lang-en|Heap}}）是[[计算机科学|计算机科学]]中的一種特別的[[完全二叉树|完全二叉树]]。若是滿足以下特性，即可稱為堆積：「給定堆積中任意[[節點|節點]]P和C，若P是C的母節點，那麼P的值會小於等於（或大於等於）C的值」。若母節點的值恆'''小於等於'''子節點的值，此堆積稱為'''最小堆積'''（{{Lang|en|min heap}}）；反之，若母節點的值恆'''大於等於'''子節點的值，此堆積稱為'''最大堆積'''（{{Lang|en|max heap}}）。在堆積中最頂端的那一個節點，稱作'''根節點'''（{{Lang|en|root node}}），根節點本身沒有'''母節點'''（{{Lang|en|parent node}}）。
+
+堆積始於{{le|J. W. J. Williams}}在1964年發表的'''堆積排序'''（{{Lang|en|heap sort}}），當時他提出了二元堆積樹作為此演算法的資料結構。
+
+==性质==
+堆的实现通过构造'''二叉堆'''（binary heap），实为[[二叉树|二叉树]]的一种；由于其应用的普遍性，当不加限定时，均指该数据结构的这种实现。这种数据结构具有以下性质。
+* 任意节点小于（或大于）它的所有后裔，最小元（或最大元）在堆的根上（'''堆序性'''）。
+* 堆总是一棵[[完全二叉树|完全树]]。即除了最底层，其他层的节点都被元素填满，且最底层尽可能地从左到右填入。
+将根节点最大的堆叫做'''最大堆'''或'''大根堆'''，根节点最小的堆叫做'''最小堆'''或'''小根堆'''。
+
+堆有許多種進階類型包含了適合製作雙端佇列的[[最大—最小堆|最大—最小堆積]]及製作優先權佇列的[[斐波那契堆|斐波那契堆積]]等。
+
+== 支持的基本操作 ==
+
+{| class="wikitable"
+|-
+! 操作 !! 描述 !! [[时间复杂度|时间复杂度]]
+|- 
+| build || 採用[[罗伯特·弗洛伊德|羅伯特·弗洛伊德]]提出的較快方式建立堆 || <math>O(n)</math>
+|-
+| insert || 向堆中插入一个新元素 || <math>O(\log n)</math>
+|-
+| update || 将新元素提升使其符合堆的性质 || <math>O(\log n)</math>
+|-
+| get || 获取当前堆顶元素的值 || <math>O(1)</math>
+|-
+| delete || 删除堆顶元素 || <math>O(\log n)</math>
+|-
+| heapify || 使删除堆顶元素的堆再次成为堆 || <math>O(\log n)</math>
+|}
+
+某些堆实现还支持其他的一些操作，如斐波那契堆支持检查一个堆中是否存在某个元素。
+
+==例程==
+为将元素X插入堆中，找到空闲位置，建立一个空穴，若满足'''堆序性'''（英文：'''heap order'''），则插入完成；否则将[[二叉树|父节点]]元素装入空穴，删除该父节点元素，完成空穴上移。直至满足堆序性。这种策略叫做'''上滤'''（percolate up）。<ref name="定义">《数据结构与算法分析》Mark Allen Weiss（美）第六章，优先队列（堆）。</ref>
+<syntaxhighlight lang="c" style="overflow:hidden" line="1">
+void Insert( ElementType X, PriorityQueue H ) {
+    int i;
+    if (IsFull(H)) {
+        printf("Queue is full.\n");
+        return;
+    }
+    for (i = ++H->Size; H->Element[i / 2] > X; i /= 2)
+        H->Elements[i] = H->Elements[i / 2];
+    H->Elements[i] = X;
+}
+</syntaxhighlight>
+以上是插入到一个二叉堆的过程。
+
+<code>DeleteMin</code>，删除最小元，即二叉树的根或父节点。删除该节点元素后，队列最后一个元素必须移动到堆得某个位置，使得堆仍然满足堆序性质。这种向下替换元素的过程叫作'''下滤'''。
+<syntaxhighlight lang="c" style="overflow:hidden" line="1">
+ElementType DeleteMin(PriorityQueue H) {
+    int i, Child;
+    ElementType MinElement, LastElement;
+    if (IsEmpty(H)) {
+        printf("Queue is empty.\n");
+        return H->Elements[0];
+    }
+    MinElement = H->Elements[1];
+    LastElement = H->Elements[H->Size--];
+    for (i = 1; i * 2 <= H->Size; i = Child) {
+        // Find smaller child.
+        Child = i * 2;
+        if (Child != H->Size && H->Elements[Child + 1]
+                <  H->Elements[Child])
+            Child++;
+        // Percolate one level.
+        if (LastElement > H->Elements[Child])
+            H->Elements[i] = H->Elements[Child];
+        else
+            break;
+    }
+    H->Elements[i] = LastElement;
+    return MinElement;
+}
+</syntaxhighlight>
+
+== 应用 ==
+=== 堆排序 ===
+{{main|堆排序}}
+堆（通常是二叉堆）常用于排序。这种算法称作[[堆排序|堆排序]]。
+=== 事件模拟 ===
+主要运用堆的排序以选择优先。
+
+=== 優先權佇列 ===
+在[[队列|队列]]中，调度程序反复提取队列中第一个作业并运行，因为实际情况中某些时间较短的任务将等待很长时间才能结束，或者某些不短小，但具有重要性的作业，同样应当具有优先权。堆即为解决此类问题设计的最佳数据结构。<ref name="定义" />
+
+=== 戴克斯特拉演算法 ===
+在[[戴克斯特拉算法|戴克斯特拉演算法]]中使用[[斐波那契堆|斐波那契堆積]]或二元堆可使得佇列的操作更為快速。
+
+==参考==
+<references />
+
+== 参见 ==
+* [[二叉堆|二叉堆]]
+* [[二项式堆|二项式堆]]
+* [[最小-最大堆|最小-最大堆]]
+* [[斐波纳契堆|斐波纳契堆]]
+* [[数据结构|数据结构]]
+
+{{-}}
+{{Data structures}}
+{{计算机科学中的树}}
+
+[[Category:数据结构|D]]
+[[Category:树结构|Category:树结构]]
+[[Category:堆|]]

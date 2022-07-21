@@ -1,0 +1,158 @@
+{{NoteTA
+|G1 = IT
+}}
+在[[形式语言|形式语言理论]]中，'''文法'''（为了避免歧义，常称作“形式文法”）是[[形式语言|形式语言]]中[[字符串|字符串]]的一套{{le|产生式规则|Production (computer science)}}。这些规则描述了如何用语言的[[字母表_(计算机科学)|字母表]]生成符合{{le|语法 (编程语言)|syntax (programming languages)|语法}}的有效的字符串。文法不描述[[语义学|字符串的含义]]，也不描述在任何上下文中可以用它们做什么——只描述它们的形式。
+
+[[形式语言|形式语言理论]]是[[应用数学|应用数学]]的一个分支，是研究形式文法和语言的学科。它在[[理論計算機科學|理論計算機科學]]、[[理论语言学|理论语言学]]、[[邏輯語義學|形式语义学]]、[[数理逻辑|数理逻辑]]等领域有着广泛的应用。
+
+形式文法是从一个“开始符号”出发的一套重写字符串的规则。因此，文法通常被认为是语言生成器。然而，它有时也可以用作“[[有限状态机#接受器和识别器|识别器]]”（计算机学中的一种函数，用于确定给定字符串是否属于该语言，是否为语法错误）的基础。形式语言理论使用另一个理论来描述识别器，也就是[[自動機理論|自動機理論]]。自动机理论有一个有趣的结果，某些形式语言是无法设计出识别器的。<ref>{{citation|title=Formal Languages and Computation: Models and Their Applications|first=Alexander|last=Meduna|publisher=CRC Press|year=2014|isbn=9781466513457|page=233|url=https://books.google.com/books?id=KJ-NAgAAQBAJ&pg=PA233|accessdate=2019-11-12|archive-date=2020-04-15|archive-url=https://web.archive.org/web/20200415032617/https://books.google.com/books?id=KJ-NAgAAQBAJ&pg=PA233|dead-url=no}}. 有关此主题的更多信息，请参见[[不可判定问题|不可判定问题]]。</ref>
+[[語法分析器|语法分析]]是通过将一段话语（自然语言中的一个字符串）分解成一组符号，并根据语言的语法分析每一个符号的过程。大多数语言的话语含义都是根据其句法结构来确定的——这种做法被称为[[复合性原理|组合语义学]]。因此，在语言中描述话语含义的第一步就是把它分解成若干部分，然后观察它经过分析后的形式（在计算机科学中被称为[[分析树|分析树]]，在[[生成文法|生成文法]]中被称为[[深层结构|深层结构]]）。
+
+== 入门示例 ==
+
+文法主要由一组变换字符串的规则组成。（如果它'''只'''包含这些规则，那么它就是一个{{le|半图厄系统|semi-Thue system}}。）要在该语言中生成字符串，首先需要一个只包含一个'''开始符号'''的字符串。然后按任意顺序应用'''产生式规则'''，直到生成既不包含起始符号也不包含指定'''非终结符号'''的字符串。产生式规则是通过把字符串中第一次出现产生式规则左边的地方，替换成产生式规则的右边，来作用于这个字符串的（参见理论[[图灵机|图灵机]]的运算）。由文法产生的语言包含能用这种方式产生的所有不同的字符串。开始符号上的任何特定产生式规则序列都会在语言中产生一个不同的字符串。如果产生同一个字符串有多种不同的方式，那这个文法就是具有二义性的文法了。
+
+例如，假设字母表由 ''a'' 和 ''b'' 组成，开始符号是 ''S''，我们有以下产生式规则：
+
+: 1. <math>S \rightarrow aSb</math>
+: 2. <math>S \rightarrow ba</math>
+
+那么我们从 ''S'' 开始，选择一个规则。如果我们选择规则1，我们将获得字符串 ''aSb''。如果我们再次选择规则1，我们用 ''aSb'' 替换 ''S''，得到字符串 ''aaSbb''。如果我们现在选择规则2，我们将 ''S'' 替换为 ''ba'' 并获得字符串 ''aababb''，然后就完成了。我们可以用符号将这一系列选择写得更简短：<math>S \Rightarrow aSb \Rightarrow aaSbb \Rightarrow aababb</math>。这种文法的语言就是无限集 <math>\{a^nbab^n \mid n \geq 0 \} = \{ba, abab, aababb, aaababbb, \dotsc \}</math>，其中 <math>a^k</math> 是 <math>a</math> 重复 <math>k</math> 次（<math>n</math> 表示使用规则1的次数）。
+
+== 形式定义 ==
+{{main|无限制文法}}
+
+=== 文法的语法 ===
+20世纪50年代，[[诺姆·乔姆斯基|诺姆·乔姆斯基]]首次提出了生成语法的经典形式化理论，<ref name="Chomsky1956">{{Cite journal | last = Chomsky  | first = Noam  | authorlink = | title = Three models for the description of language | journal = [[IRE_Transactions_on_Information_Theory|IRE Transactions on Information Theory]] | volume = 2 | issue = 3 | pages = 113–124 | date = Sep 1956 | doi = 10.1109/TIT.1956.1056813 | id =  }}</ref><ref name="Chomsky1957">{{Cite book
+ | author = Chomsky, Noam
+ | title = Syntactic Structures
+ | url = https://archive.org/details/syntacticstructu0000chom
+ | publisher = [[德格鲁伊特|Mouton]]
+ | location = The Hague
+ | year = 1957
+}}</ref> 其中文法 ''G'' 由以下部分组成：
+* 有限的'''[[終結符與非終結符|非终结符号]]'''集 ''N''，与 ''G'' 生成的字符串[[不交集|无交]]。
+* 有限的'''终结符号'''集 <math>\Sigma</math>，与 ''N'' [[不交集|无交]]。
+* 有限的'''产生式规则'''集 ''P''，每个规则都为如下形式
+:: <math>(\Sigma \cup N)^{*} N (\Sigma \cup N)^{*} \rightarrow (\Sigma \cup N)^{*} </math> 
+:这里的 <math>{*}</math> 是[[克莱尼星号|克莱尼星号]]，<math>\cup</math> 表示[[并集|并集]]。也就是说，每个产生式规则从一个符号串映射到另一个符号串，并且产生式左侧的字符串中必须至少包括一个非终结符号。产生式右侧的字符串如果只有一个 [[空字串|空字符串]]的话，也就是说没有任何符号的话，它有一个特别的标记（通常是<math>\Lambda</math>、''e'' 或者 <math>\epsilon</math>）。
+* '''开始符号''' <math>S \in N</math>，也叫'''句子符号'''。
+文法的形式定义为[[多元组|四元组]] <math>(N, \Sigma, P, S)</math>。这种形式语法在文献中常被称为[[重写逻辑|重写系统]]或{{le|短语结构文法|phrase structure grammar}}。<ref>{{cite book|first=Seymour|last=Ginsburg|authorlink=Seymour Ginsburg|title=Algebraic and automata theoretic properties of formal languages|publisher=North-Holland|pages=8–9|year=1975|isbn=978-0-7204-2506-2}}</ref><ref>{{cite book|last=Harrison|first=Michael A.|authorlink=Michael A. Harrison|title=Introduction to Formal Language Theory|url=https://archive.org/details/introductiontofo00harr_425|year=1978|pages=[https://archive.org/details/introductiontofo00harr_425/page/n14 13]|isbn=978-0-201-02955-0|location=Reading, Mass.|publisher=Addison-Wesley Publishing Company}}</ref>
+
+=== 关于形式文法的一些数学构造 ===
+
+文法的运算可以用字符串的关系来定义:
+* 设有文法 <math>G = (N, \Sigma, P, S)</math>，<math>(\Sigma \cup N)^{*}</math> 内的字符串的二元关系 <math>\underset G \Rightarrow</math>（读作“G经过直接推导为”）定义为：
+*:<math>x \underset G \Rightarrow y \iff \exists u, v, p, q \in (\Sigma \cup N)^*: (x = upv) \wedge (p \rightarrow q \in P) \wedge (y = uqv)</math>
+* 关系 <math>\overset * {\underset G \Rightarrow}</math>（读作“G经0或更多步推导”）定义为 <math>\underset G \Rightarrow</math> 的[[闭包_(数学)|自反传递闭包]]
+* '''句型'''是指可以由开始符号 <math>S</math> 经过有限步推导得到的 <math>(\Sigma \cup N)^*</math> 的一个成员；也就是，句型是 <math>\left\{ w \in (\Sigma \cup N)^* \mid S \overset * {\underset G \Rightarrow} w \right\}</math> 的一个成员。不包含非终结符号（即 <math>\Sigma^*</math> 的成员）的句型称为'''句子'''。<ref>[http://www.seas.upenn.edu/~cit596/notes/dave/cfg7.html Sentential Forms] {{Wayback|url=http://www.seas.upenn.edu/~cit596/notes/dave/cfg7.html |date=20191113123733 }}, Context-Free Grammars, David Matuszek</ref>
+* <math>G</math> 的'''语言'''，记为 <math>\boldsymbol{L}(G)</math>，定义为从开始符号 <math>S</math> 开始经过有限步骤可以推导出的所有句子；也就是集合 <math>\left\{ w \in \Sigma^* \mid S \overset * {\underset G \Rightarrow} w \right\}</math>。
+
+注意文法 <math>G = (N, \Sigma, P, S)</math> 实际上是{{le|半图厄系统|semi-Thue system}} <math>(N \cup \Sigma, P)</math>，以完全相同的方式重写字符串；唯一的区别在于我们区分了特定的非终结符号，这些符号必须在重写规则中重写，并且只对从指定的开始符号 <math>S</math> 到没有非终结符号的字符串的重写感兴趣。
+
+=== 例子 ===
+''在这些例子中，形式语言使用[[集合建構式符號|集合建構式符號]]描述。''
+
+考虑文法 <math>G</math>，其中 <math>N = \left \{S, B\right \}</math>，<math>\Sigma = \left \{a, b, c\right \}</math>，<math>S</math> 是开始符号，<math>P</math> 由以下产生式规则组成：
+
+: 1. <math>S \rightarrow aBSc</math>
+: 2. <math>S \rightarrow abc</math>
+: 3. <math>Ba \rightarrow aB</math>
+: 4. <math>Bb \rightarrow bb </math>
+
+这个文法定义了语言 <math>L(G) = \left \{ a^{n}b^{n}c^{n} \mid n \ge 1 \right \}</math>，这里 <math>a^{n}</math> 表示 ''n'' 个 <math>a</math> 串连所得的字符串。因此，该语言是由1个或更多的 <math>a</math>，后面跟着相同数量的 <math>b</math>，接着是相同数量的 <math>c</math> 组成的字符串集合。
+
+<math>L(G)</math> 内字符串的推导例子如下：
+{{columns-list|colwidth=22em|
+* <math>\boldsymbol{S} \underset 2 \Rightarrow \boldsymbol{abc}</math>
+* <math>\begin{align} \boldsymbol{S} & \underset 1 \Rightarrow \boldsymbol{aBSc} \\
+& \underset 2 \Rightarrow aB\boldsymbol{abc}c \\
+& \underset 3 \Rightarrow a\boldsymbol{aB}bcc \\
+& \underset 4 \Rightarrow aa\boldsymbol{bb}cc 
+\end{align}</math>
+* <math>\begin{align}
+\boldsymbol{S} & \underset 1 \Rightarrow \boldsymbol{aBSc} \underset 1 \Rightarrow aB\boldsymbol{aBSc}c \\
+& \underset 2 \Rightarrow aBaB\boldsymbol{abc}cc \\ 
+& \underset 3 \Rightarrow a\boldsymbol{aB}Babccc \underset 3 \Rightarrow aaB\boldsymbol{aB}bccc \underset 3 \Rightarrow aa\boldsymbol{aB}Bbccc \\
+& \underset 4 \Rightarrow aaaB\boldsymbol{bb}ccc \underset 4 \Rightarrow aaa\boldsymbol{bb}bccc \end{align}</math>
+}}
+:（标记 <math>P \underset i \Rightarrow Q</math> 读作“字符串 {{mvar|P}} 通过产生式 {{mvar|i}} 生成 {{mvar|Q}}”，替换的字符串用粗体标出。）
+
+== 乔姆斯基谱系 ==
+{{main|乔姆斯基谱系}}
+1956年[[诺姆·乔姆斯基|诺姆·乔姆斯基]]首次将生成文法形式化时，<ref name="Chomsky1956"/> 他将它们分为现在称为[[乔姆斯基谱系|乔姆斯基谱系]]的四种类型。其中两种重要的文法类型分别是[[上下文无关文法|上下文无关文法]]（2型）和[[正则文法|正则文法]]（3型）。可以用这两种文法描述的语言分别称为[[上下文无关语言|上下文无关语言]]和[[正则语言|正则语言]]。尽管比[[无限制文法|无限制文法]]（0型，实际上无限制文法可以表示任何[[图灵机|图灵机]]可以接受的语言）要弱得多，但这两种受限制的语法最常用，因为它们的解析器可以高效地实现。<ref name="Grune&Jacobs1990">Grune, Dick & Jacobs, Ceriel H., ''Parsing Techniques – A Practical Guide'', Ellis Horwood, England, 1990.</ref> 例如，所有正规语言都可以被[[有限状态机|有限状态机]]识别，对于上下文无关文法的有用子集，有一些著名的算法可以生成高效的[[LL剖析器|LL剖析器]][[LR剖析器|LR剖析器]]，以识别文法生成的相应语言。
+
+=== 上下文无关文法 ===
+[[上下文无关文法|上下文无关文法]]要求产生式左侧只能包含一个符号，并且该符号为非终结符号。这个限制是非常重要的；不是所有的语言都可以由上下文无关的语法生成。那些可以被称为'''上下文无关语言'''。
+
+上例定义的语言 <math>L(G) = \left \{ a^{n}b^{n}c^{n} \mid n \ge 1 \right \}</math> 并不是一个上下文无关语言，并且这个可以用上下文无关语言的[[泵引理|泵引理]]严格证明，但 <math>\left \{ a^{n}b^{n} \mid n \ge 1 \right \}</math>（1个及以上 <math>a</math> 后面跟同样数量的 <math>b</math>）是一个上下文无关语言。因为它可以由文法 <math>G_2</math>（<math>N=\left \{S\right \}</math>，<math>\Sigma=\left \{a,b\right \}</math>，<math>S</math> 为开始符号）定义，用下列产生式规则：
+
+: 1. <math>S \rightarrow aSb</math>
+: 2. <math>S \rightarrow ab</math>
+
+通过{{le|Earley算法|Earley's algorithm}}可以在 <math>O(n^3)</math> 时间（参见[[大O符号|大O符号]]）内识别上下文无关语言。也就是说，对于每一种上下文无关的语言，都可以构建一台以字符串为输入并及时确定字符串是否为该语言成员的机器，其中 <math>n</math> 是字符串的长度。<ref name="Earley1970">Earley, Jay, "[http://ra.adm.cs.cmu.edu/anon/home/anon/usr/ftp/scan/CMU-CS-68-earley.pdf An Efficient Context-Free Parsing Algorithm] {{Wayback|url=http://ra.adm.cs.cmu.edu/anon/home/anon/usr/ftp/scan/CMU-CS-68-earley.pdf |date=20200519113604 }}," ''Communications of the ACM'', Vol. 13 No. 2, pp. 94-102, February 1970.</ref> {{le|确定性上下文无关语言|Deterministic context-free language}}是可在线性时间内识别的上下文无关语言的子集。<ref>{{Cite journal | last1 = Knuth | first1 = D. E. | authorlink = Donald Knuth | title = On the translation of languages from left to right | doi = 10.1016/S0019-9958(65)90426-2 | journal = Information and Control | volume = 8 | issue = 6 | pages = 607–639 | date = July 1965 | url = http://www.cs.dartmouth.edu/~mckeeman/cs48/mxcom/doc/knuth65.pdf | accessdate = 29 May 2011 | ref = harv | author =  | archive-url = https://web.archive.org/web/20120315152151/http://www.cs.dartmouth.edu/~mckeeman/cs48/mxcom/doc/knuth65.pdf | archive-date = 2012-03-15 | dead-url = yes }}</ref> 由多种算法针对这类语言或它的子集。
+
+=== 正则文法 ===
+在[[正则文法|正则文法]]中，左侧仍然只是一个非终结符号，但右侧也受到限制。右侧可以是空字符串，也可以是单个终结符号，或者是后跟非终结符号的单个终结符号，但不能是其他符号。（有时会使用更宽泛的定义：可以允许更长的终结字符串或单个非终结字符串，而不能有其他任何东西，从而使语言更易于表示，同时仍然定义同一类语言。）
+
+上面定义的语言 <math>\left \{ a^{n}b^{n} \mid n \ge 1 \right \}</math> 不是一个正则语言，但下面这个语言是：<math>\left \{ a^{n}b^{m} \mid m,n \ge 1 \right \}</math>（一个或多个 <math>a</math> 后面跟着一个或多个 <math>b</math>，这两个的数量可以不一样）。它之所以是正则语言，是因为可以通过文法 <math>G_3</math> 定义，其中 <math>N=\left \{S, A,B\right \}</math>，<math>\Sigma=\left \{a,b\right \}</math>，<math>S</math> 为开始符号，还有如下产生式规则：
+
+:# <math>S \rightarrow aA</math>
+:# <math>A \rightarrow aA</math>
+:# <math>A \rightarrow bB</math>
+:# <math>B \rightarrow bB</math>
+:# <math>B \rightarrow \epsilon</math>
+
+由正则文法生成的所有语言都可以被[[有限状态机|有限状态机]]在 <math>O(n)</math> 时间内识别出来。虽然在实际应用中，正则文法通常使用[[正则表达式|正则表达式]]来表示，但是实际应用中使用的一些正则表达式并没有严格地生成正则语言，也因此没有表现出线性识别性能。
+
+=== 生成文法的其他形式 ===
+语言学家和计算机科学家对乔姆斯基的形式语法的原始层次结构进行了许多扩展和变化，通常是为了增强表达能力，或者是为了使分析或解析更加容易。一些形式的文法包括:
+
+* [[树-邻接文法|树-邻接文法]]允许重写规则在[[分析树|分析树]]上操作，而不仅仅是字符串，从而提高了传统生成文法的表达能力。<ref name="JoshiEtAl1975">Joshi, Aravind K., ''et al.'', "[https://www.sciencedirect.com/science/article/pii/S0022000075800195/pdf?md5=82330b1e496c533551304514520a91e6&pid=1-s2.0-S0022000075800195-main.pdf Tree Adjunct Grammars] {{Wayback|url=https://www.sciencedirect.com/science/article/pii/S0022000075800195/pdf?md5=82330b1e496c533551304514520a91e6&pid=1-s2.0-S0022000075800195-main.pdf |date=20200415032637 }}," ''Journal of Computer Systems Science'', Vol. 10 No. 1, pp. 136-163, 1975.</ref>
+* {{le|词缀文法|Affix grammar}}<ref name="Koster1971">Koster , Cornelis H. A., "Affix Grammars," in ''ALGOL 68 Implementation'', North Holland Publishing Company, Amsterdam, p. 95-109, 1971.</ref>和{{le|属性文法|attribute grammar}}<ref name="Knuth1968">Knuth, Donald E., "[https://www.csee.umbc.edu/courses/331/fall16/01/resources/papers/Knuth67AG.pdf Semantics of Context-Free Languages] {{Wayback|url=https://www.csee.umbc.edu/courses/331/fall16/01/resources/papers/Knuth67AG.pdf |date=20200519113619 }}," ''Mathematical Systems Theory'', Vol. 2 No. 2, pp. 127-145, 1968.</ref><ref name="Knuth1971">Knuth, Donald E., "Semantics of Context-Free Languages (correction)," ''Mathematical Systems Theory'', Vol. 5 No. 1, pp 95-96, 1971.</ref>允许通过语义属性和操作扩充重写规则，这对于提高语法表达能力和构建实用的语言翻译工具都很有用。
+
+=== 递归文法 ===
+{{distinguish|递归语言}}
+递归文法是包含[[递归_(计算机科学)|递归]]产生式规则的语法。例如，如果存在一个非终结符 ''A''，可以通过产生式规则生成一个以 ''A'' 为最左边符号的字符串，那么[[上下文无关语言|上下文无关语言]]的文法就是[[左遞歸|左遞歸]]的。<ref>[http://www.cs.may.ie/~jpower/Courses/parsing/parsing.pdf#search='indirect%20left%20recursion'  Notes on Formal Language Theory and Parsing] {{Wayback|url=http://www.cs.may.ie/~jpower/Courses/parsing/parsing.pdf#search='indirect%20left%20recursion' |date=20170828232456 }}, James Power, Department of Computer Science National University of Ireland, Maynooth Maynooth, Co. Kildare, Ireland.[[JPR02|JPR02]]</ref>
+
+== 分析型文法 ==
+
+尽管有大量关于[[語法分析器|语法分析算法]]的文献，但这些算法大多假设要被分析的语言最初是通过'''生成式'''文法来'''描述'''的，并且目标是将生成式文法转换成一个有效的语法分析器。严格地说，生成文法不能在任何方面都与解析语言的算法对应上，而且各种算法对产生式规则的形式有不同的限制，这些产生式规则被认为是形式良好的。
+
+另一种方法是首先根据分析型文法将语言形式化，分析型文法能更直接地对应于语言分析器的结构和语义。分析型文法体系的例子包括：
+* [http://languagemachine.sourceforge.net/ 语言机器] {{Wayback|url=http://languagemachine.sourceforge.net/ |date=20191030102455 }}直接实现了无限制的分析型文法。替换规则用于转换输入以产生输出和行为。该系统还可以生成[http://languagemachine.sourceforge.net/picturebook.html lm图] {{Wayback|url=http://languagemachine.sourceforge.net/picturebook.html |date=20200415032658 }}，显示在应用无限制分析型文法规则时的情况。
+* {{le|自顶向下的语法分析语言|Top-down parsing language}}（TDPL）：一种高度简约的分析型文法形式，在20世纪70年代早期发展起来，用来研究{{le|自顶向下的语法分析|Top-down parsing|自顶向下的语法分析器}}的行为。<ref name="Birman1970">Birman, Alexander, ''[http://bford.info/packrat/ref/birman70tmg.pdf The TMG Recognition Schema] {{Wayback|url=http://bford.info/packrat/ref/birman70tmg.pdf |date=20200415032701 }}'', Doctoral thesis, Princeton University, Dept. of Electrical Engineering, February 1970.</ref>
+* {{le|连接文法|Link grammar}}：为[[语言学|语言学]]设计的一种分析型文法形式，它通过检查词对之间的位置关系来推导句法结构。<ref name="Sleater&Temperly1991">Sleator, Daniel D. & Temperly, Davy, "[https://arxiv.org/pdf/cmp-lg/9508004 Parsing English with a Link Grammar]," Technical Report CMU-CS-91-196, Carnegie Mellon University Computer Science, 1991.</ref><ref name="Sleater&Temperly1993">Sleator, Daniel D. & Temperly, Davy, "Parsing English with a Link Grammar," ''Third International Workshop on Parsing Technologies'', 1993. (Revised version of above report.)</ref>
+* [[解析表达文法|解析表达文法]]（PEG）：围绕[[编程语言|编程语言]]和[[編譯器|編譯器]]编写者的实际{{le|表达性|Expressivity (computer science)}}需求而设计的TDPL的最新概括。<ref>Ford, Bryan, ''[https://dspace.mit.edu/bitstream/handle/1721.1/87310/51972156-MIT.pdf;sequence=2 Packrat Parsing: a Practical Linear-Time Algorithm with Backtracking] {{Wayback|url=https://dspace.mit.edu/bitstream/handle/1721.1/87310/51972156-MIT.pdf;sequence=2 |date=20200331043942 }}'', Master’s thesis, Massachusetts Institute of Technology, Sept. 2002.</ref>
+
+==参见==
+{{div col|colwidth=22em}}
+* [[抽象語法樹|抽象語法樹]]
+* {{le|适应型文法|Adaptive grammar}}
+* {{le|歧义文法|Ambiguous grammar}}
+* [[巴科斯范式|巴科斯范式 (BNF)]]
+* {{le|范畴文法|Categorial grammar}}
+* [[分析树|分析树]]
+* [[扩展巴科斯范式|扩展巴科斯范式 (EBNF)]]
+* [[语法|语法]]
+* [[L系統|L系統]]
+* [[逻辑语|逻辑语]]
+* {{le|后规范系统|Post canonical system}}
+* {{le|形状文法|Shape grammar}}
+* [[合式公式|合式公式]]
+{{div col end}}
+
+== 参考文献 ==
+{{Reflist|30em}}
+
+== 外部链接 ==
+* [http://www.formalgrammar.tk/ Yearly Formal Grammar conference] {{Wayback|url=http://www.formalgrammar.tk/ |date=20071008144738 }}
+
+{{-}}
+{{形式语言与形式文法}}
+
+[[Category:形式语言|Category:形式语言]]
+[[Category:语法|Category:语法]]
+[[Category:數理邏輯|Category:數理邏輯]]
+[[Category:句法|Category:句法]]
+[[Category:自动机|Category:自动机]]

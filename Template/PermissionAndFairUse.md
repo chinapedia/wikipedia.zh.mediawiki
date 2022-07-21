@@ -1,0 +1,1 @@
+#REDIRECT [[Template:Non-free fair use in]]

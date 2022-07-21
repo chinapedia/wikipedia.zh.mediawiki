@@ -1,0 +1,293 @@
+{{noteTA
+|G1=IT
+}}
+{{算法信息框
+|image=[[File:Sorting_shellsort_anim.gif|Step-by-step visualisation of Shellsort]]
+|caption = 以23, 10, 4, 1的步長序列進行希爾排序。
+|class=[[排序算法|排序算法]]
+|data=[[數組|數組]]
+|best-time=O(''n'')
+|average-time=根據步長序列的不同而不同。
+|time=根據步長序列的不同而不同。已知最好的：<math>O(n\log^2 n)</math>
+|space=O(''1'')
+|optimal=非最佳算法
+}}
+[[File:Shell_sorting_algorithm_color_bars.svg|thumb]]
+'''希爾排序'''（Shellsort），也稱'''遞減增量排序算法'''，是[[插入排序|插入排序]]的一種更高效的改進版本。希爾排序是非穩定排序算法。
+
+希爾排序是基於插入排序的以下兩點性質而提出改進方法的：
+* 插入排序在對幾乎已經排好序的數據操作時，效率高，即可以達到[[線性排序|線性排序]]的效率
+* 但插入排序一般來說是低效的，因為插入排序每次只能將數據移動一位
+
+== 歷史 ==
+希爾排序按其設計者[[唐納德.希爾|希爾]]（Donald Shell）的名字命名，該算法由1959年公佈。一些老版本教科書和參考手冊把該算法命名為Shell-Metzner，即包含[[Marlene_Metzner_Norton|Marlene Metzner Norton]]的名字，但是根據Metzner本人的說法，“我沒有為這種算法做任何事，我的名字不應該出現在算法的名字中。”{{FACT}}
+
+== 算法實現 ==
+原始的算法實現在最壞的情況下需要進行[[大O符號|O]](''n''<sup>2</sup>)的比較和交換。 V. Pratt的書<ref>{{Cite book|last=Pratt|first=V|year=1979|publisher=Garland|title=Shellsort and sorting networks (Outstanding dissertations in the computer sciences)|isbn=0-824- 04406-1}} (This was originally presented as the author's Ph.D. thesis, Stanford University, 1971)</ref>對算法進行了少量修改，可以使得性能提升至O(''n'' log<sup >2</sup> ''n'')。這比最好的[[比較算法|比較算法]]的O(''n'' log ''n'')要差一些。
+
+希爾排序通過將比較的全部元素分為幾個區域來提升[[插入排序|插入排序]]的性能。這樣可以讓一個元素可以一次性地朝最終位置前進一大步。然後算法再取越來越小的步長進行排序，算法的最後一步就是普通的[[插入排序|插入排序]]，但是到了這步，需排序的數據幾乎是已排好的了（此時[[插入排序|插入排序]]較快）。
+
+假設有一個很小的數據在一個已按升序排好序的[[數組|數組]]的末端。如果用複雜度為O(''n''<sup>2</sup>)的排序（[[冒泡排序|冒泡排序]]或[[插入排序|插入排序]]），可能會進行''n''次的比較和交換才能將該數據移至正確位置。而希爾排序會用較大的步長移動數據，所以小數據只需進行少數比較和交換即可到正確位置。
+
+一個更好理解的希爾排序實現：將數組列在一個表中並對列排序（用[[插入排序|插入排序]]）。重複這過程，不過每次用更長的-{zh-hans:列; zh-hant:行;}-來進行。最後整個表就只有一-{zh-hans:列; zh-hant:行;}-了。將數組轉換至表是為了更好地理解這算法，算法本身僅僅對原數組進行排序（通過增加索引的步長，例如是用<code>i += step_size</code>而不是<code>i++ </code>）。
+
+例如，假設有這樣一組數[ 13 14 94 33 82 25 59 94 65 23 45 27 73 25 39 10 ]，如果我們以步長為5開始進行排序，我們可以通過將這列表放在有5-{ zh-hans:列; zh-hant:行;}-的表中來更好地描述算法，這樣他們就應該看起來是這樣：
+
+<pre>
+13 14 94 33 82
+25 59 94 65 23
+45 27 73 25 39
+10
+</pre>
+然後我們對每-{zh-hans:列; zh-hant:行;}-進行排序：
+<pre>
+10 14 73 25 23
+13 27 94 33 39
+25 59 94 65 82
+45
+</pre>
+將上述四-{zh-hans:行; zh-hant:列;}-數字，依序接在一起時我們得到：[ 10 14 73 25 23 13 27 94 33 39 25 59 94 65 82 45 ].這時10已經移至正確位置了，然後再以3為步長進行排序：
+<pre>
+10 14 73
+25 23 13
+27 94 33
+39 25 59
+94 65 82
+45
+</pre>
+排序之後變為：
+<pre>
+10 14 13
+25 23 33
+27 25 59
+39 65 73
+45 94 82
+94
+</pre>
+最後以1步長進行排序（此時就是簡單的插入排序了）。
+
+== 步長序列 ==
+步長的選擇是希爾排序的重要部分。只要最終步長為1任何步長序列都可以工作。算法最開始以一定的步長進行排序。然後會繼續以一定步長進行排序，最終算法以步長為1進行排序。當步長為1時，算法變為普通插入排序，這就保證了數據一定會被排序。
+
+Donald Shell最初建議步長選擇為<math>\frac{n}{2}</math>並且對步長取半直到步長達到1。雖然這樣取可以比<math>\mathcal{O}(n^2)</math>類的算法（插入排序）更好，但這樣仍然有減少平均時間和最差時間的餘地。
+
+{|class="wikitable sortable"
+!步長序列 !! 最壞情況下複雜度
+|- align="center"
+|nowrap|<math>{n/2^i}</math>
+||<math>\mathcal{O}</math><math>(n^2)</math>
+|- align="center"
+|nowrap|<math>2^k - 1</math>
+||<math>\mathcal{O}</math><math>(n^{3/2})</math>
+|- align="center"
+|nowrap|<math>2^i 3^j</math>
+||<math>\mathcal{O}</math><math>( n\log^2 n )</math>
+|}
+
+已知的最好步長序列是由Sedgewick提出的(1, 5, 19, 41, 109,...)，該序列的項，從第0項開始，偶數來自<math>9 \times 4^i - 9 \times 2^i + 1</math>和奇數來自<math>2^{i+2} \times (2^{i+2} - 3) + 1</math>這兩個算式[http://faculty.simpson.edu/lydia.sinapova/www/cmsc250/LN250_Weiss/L12-ShellSort.htm#increments] {{Wayback|url=http://faculty.simpson.edu/lydia.sinapova/www/cmsc250/LN250_Weiss/L12-ShellSort.htm#increments |date=20190427051559 }}。這項研究也表明“比較在希爾排序中是最主要的操作，而不是交換。”用這樣步長序列的希爾排序比[[插入排序|插入排序]]要快，甚至在小數組中比[[快速排序|快速排序]]和[[堆排序|堆排序]]還快，但是在涉及大量數據時希爾排序還是比快速排序慢。
+
+另一個在大數組中表現優異的步長序列是（[[斐波那契數列|斐波那契數列]]除去0和1將剩餘的數以[[黃金分割比|黃金分割比]]的兩倍的[[冪|冪]]進行運算得到的數列）：(1, 9, 34, 182, 836, 4025, 19001, 90358, 428481, 2034035, 9651787, 45806244, 217378076, 1031612713,…)<ref>{{OEIS2C|A154393}} The fibonacci to the power of two times the golden ratio gap sequence</ref>
+
+== 偽代碼 ==
+<pre>
+input: an array a of length n with array elements numbered 0 to n − 1
+inc ← floor(n/2)
+while inc > 0 do:    
+    for i = inc .. n − 1 do:        
+        temp ← a[i]        
+        j ← i        
+        while j ≥ inc and a[j − inc] > temp do:            
+            a[j] ← a[j − inc]            
+            j ← j − inc        
+        a[j] ← temp    
+    inc ← floor(inc / 2)
+</pre>
+<pre>
+输入：1个长度为n的矩阵a，矩阵的编号从0到n - 1
+整数inc从n / 2到1，每次循环inc变为inc / 2向下取整
+    i从inc到n - 1，每次循环i变为i + 1
+        将a[ i ]的值赋给temp
+        j从i到inc，每次循环j变为j - inc
+            如果a[ j − inc ]大于temp，则将a[ j - inc ]的值赋给a[ j ]
+            否则跳出j循环
+        j循环结束
+        将temp的值赋给a[ j ]
+    i循环结束
+inc循环结束
+</pre>
+
+== 程式代碼 ==
+=== C語言 ===
+<syntaxhighlight lang="c">
+void shell_sort(int arr[], int len) {
+	int gap, i, j;
+	int temp;
+	for (gap = len >> 1; gap > 0; gap >>= 1)
+		for (i = gap; i < len; i++) {
+			temp = arr[i];
+			for (j = i - gap; j >= 0 && arr[j] > temp; j -= gap)
+				arr[j + gap] = arr[j];
+			arr[j + gap] = temp;
+		}
+}
+</syntaxhighlight>
+
+=== C++ ===
+<syntaxhighlight lang="cpp">
+
+template<typename T>
+void shell_sort(T array[], int length) {
+    int h = 1;
+    while (h < length / 3) {
+        h = 3 * h + 1;
+    }
+    while (h >= 1) {
+        for (int i = h; i < length; i++) {
+            for (int j = i; j >= h && array[j] < array[j - h]; j -= h) {
+                std::swap(array[j], array[j - h]);
+            }
+        }
+        h = h / 3;
+    }
+}
+
+</syntaxhighlight>
+
+=== Java ===
+<syntaxhighlight lang="java">
+public static void shellSort(int[] arr) {
+        int length = arr.length;
+        int temp;
+        for (int step = length / 2; step >= 1; step /= 2) {
+            for (int i = step; i < length; i++) {
+                temp = arr[i];
+                int j = i - step;
+                while (j >= 0 && arr[j] > temp) {
+                    arr[j + step] = arr[j];
+                    j -= step;
+                }
+                arr[j + step] = temp;
+            }
+        }
+    }
+</syntaxhighlight>
+
+=== C# ===
+<syntaxhighlight lang="C#">
+public void shellSort(int[]a)
+        {
+            int h = a.Length / 2;
+            while(h>=1)
+            {
+                for(int i=0;i<h;i++)
+                {
+                    for(int j=i+h;j<a.Length;j+=h)
+                    {
+                        int temp=a[j];
+                        int loc = j;
+                        while (loc - h >= i&&temp < a[loc - h])
+                        {
+                            a[loc] = a[loc - h];
+                            loc = loc - h;
+                        }
+                        a[loc] = temp;
+                    }
+                }
+                h = h / 2;
+            }
+        }
+</syntaxhighlight>
+
+===JavaScript===
+<syntaxhighlight lang="javascript">
+function shell_sort(arr) {
+	for (let gap = arr.length >> 1; gap > 0; gap >>= 1) {
+		for (let i = gap; i < arr.length; i++) {
+			let temp = arr[i],j;
+			for (j = i - gap; j >= 0 && arr[j] > temp; j -= gap) {
+				arr[j + gap] = arr[j];
+			}
+			arr[j + gap] = temp;
+		}
+	}
+	return arr;
+};
+</syntaxhighlight>
+
+===Python===
+<syntaxhighlight lang="python">
+def shell_sort(list):
+    n = len(list)
+    # 初始步長
+    gap = n // 2
+    while gap > 0:
+        for i in range(gap, n):
+            # 每个步長進行插入排序
+            temp = list[i]
+            j = i
+            # 插入排序
+            while j >= 0 and j-gap >= 0 and list[j - gap] > temp:
+                list[j] = list[j - gap]
+                j -= gap
+            list[j] = temp
+        # 得到新的步長
+        gap = gap // 2
+    return list
+</syntaxhighlight>
+
+===PHP===
+<syntaxhighlight lang="php">
+function shell_sort(&$arr) {//php的陣列視為基本型別，所以必須用傳參考才能修改原陣列
+	for ($gap = count($arr)>>1; $gap > 0; $gap>>=1)
+		for ($i = $gap; $i < count($arr); $i++) {
+			$temp = $arr[$i];
+			for ($j = $i - $gap; $j >= 0 && $arr[$j] > $temp; $j -= $gap)
+				$arr[$j + $gap] = $arr[$j];
+			$arr[$j + $gap] = $temp;
+		}
+}
+</syntaxhighlight>
+
+===Go===
+<syntaxhighlight lang="go">
+package main
+
+import (
+	"fmt"
+)
+
+func ShellSort(array []int) {
+	n := len(array)
+	if n < 2 {
+		return
+	}
+	key := n / 2
+	for key > 0 {
+		for i := key; i < n; i++ {
+			j := i
+			for j >= key && array[j] < array[j-key] {
+				array[j], array[j-key] = array[j-key], array[j]
+				j = j - key
+			}
+		}
+		key = key / 2
+	}
+}
+
+func main() {
+	array := []int{
+		55, 94, 87, 1, 4, 32, 11, 77, 39, 42, 64, 53, 70, 12, 9,
+	}
+	fmt.Println(array)
+	ShellSort(array)
+	fmt.Println(array)
+
+}
+</syntaxhighlight>
+
+== 引用 ==
+<references/>
+
+{{排序算法表}}
+{{算法}}
+[[Category:排序算法|Category:排序算法]]

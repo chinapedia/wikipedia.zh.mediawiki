@@ -1,0 +1,322 @@
+{{non-free|time=2017-11-25T14:02:26+00:00}}
+{{cleanup-jargon|time=2018-01-31T02:22:38+00:00}}
+{{NoteTA|G1=IT|1=zh-cn:面向连接;zh-tw:連接導向}}
+{{网络协议}}
+'''传输控制协议'''（{{lang-en|'''T'''ransmission '''C'''ontrol '''P'''rotocol}}，縮寫：{{lang|en|'''TCP'''}}）是一种面向连接的、可靠的、基于[[字节流|字节流]]的[[传输层|传输层]]通信协议，由[[IETF|IETF]]的{{RFC|793}}定义。在简化的计算机网络[[OSI模型|OSI模型]]中，它完成第四层传输层所指定的功能。[[用户数据报协议|用户数据报协议]]（UDP）是同一层内另一个重要的传输协议。
+
+在因特网协议族（{{lang|en|Internet protocol suite}}）中，TCP层是位于[[网际协议|IP]]层之上，[[应用层|应用层]]之下的中间层。不同主机的应用层之间经常需要可靠的、像[[管道_(Unix)|管道]]一样的连接，但是IP层不提供这样的流机制，而是提供不可靠的包交换。
+
+应用层向TCP层发送用于网间传输的、用8位字节表示的数据流，然后TCP把数据流分割成适当长度的报文段（通常受该计算机连接的网络的数据链路层的[[最大传输单元|最大传输单元]]（MTU）的限制）。之后TCP把结果包传给IP层，由它来透过网络将包传送给接收端实体的TCP层。TCP为了保证不发生丢包，就给每个包一个序号，同时序号也保证了传送到接收端实体的包的按序接收。然后接收端实体对已成功收到的包发回一个相应的[[確認訊息|确认信息]]（ACK）；如果发送端实体在合理的[[來回通訊延遲|往返时延]]（RTT）内未收到确认，那么对应的数据包就被假设为[[丢包|已丢失]]并进行重传。TCP用一个[[校验和|校验和]]函数来检验数据是否有错误，在发送和接收时都要计算校验和。
+
+== 简介 ==
+数据在TCP层称为流（Stream），数据分组称为分段（Segment）。作为比较，数据在IP层称为Datagram，数据分组称为分片（Fragment）。 UDP 中分组称为Message。
+
+== 运作方式 ==
+[[File:Tcp_state_diagram_fixed_new.svg|right]]
+
+TCP协议的运行可划分为三个阶段：连接建立(''connection establishment'')、数据传送（''data transfer''）和连接终止（''connection termination''）。操作系统将TCP连接抽象为[[Berkeley套接字|套接字]]表示的本地端点（local end-point），作为编程接口给程序使用。在TCP连接的生命期内，本地端点要经历一系列的[[#状态编码|状态]]改变。<ref name="#1">RFC 793 Section 3.2</ref>
+
+=== 建立通路 ===
+TCP用三-{zh-hans:次;zh-hant:路}-[[握手_(技术)|握手]]（或称三-{zh-hans:路;zh-hant:次}-握手，{{lang|en|three-way handshake}}）过程建立一个连接。在连接建立过程中，很多参数要被初始化，例如序号被初始化以保证按序传输和连接的强壮性。
+[[File:Connection_TCP.png|thumb]]
+一对终端同时初始化一个它们之间的连接是可能的。但通常是由一端（服务器端）打开一个[[Berkeley套接字|套接字]]（[[socket|socket]]）然后监听来自另一方（客户端）的连接，这就是通常所指的被动打开（passive open）。服务器端被被动打开以后，客户端就能开始建立主动打开（active open）。
+
+服务器端执行了listen函数后，就在服务器上建立起两个队列：
+*SYN队列：存放完成了二次握手的结果。  队列长度由listen函数的参数backlog指定。
+*ACCEPT队列：存放完成了三次握手的结果。队列长度由listen函数的参数backlog指定。
+
+三次握手协议的过程：
+# 客户端（通过执行connect函数）向服务器端发送一个SYN包，请求一个主动打开。该包携带客户端为这个连接请求而设定的随机数'''A'''作为消息序列号。
+# 服务器端收到一个合法的SYN包后，把该包放入SYN队列中；回送一个SYN/ACK。ACK的确认码应为'''A+1'''，SYN/ACK包本身携带一个随机产生的序号'''B'''。
+# 客户端收到SYN/ACK包后，发送一个[[確認訊息|ACK包]]，该包的序号被设定为'''A+1'''，而ACK的确认码则为'''B+1'''。然后客户端的connect函数成功返回。当服务器端收到这个ACK包的时候，把请求帧从SYN队列中移出，放至ACCEPT队列中；这时accept函数如果处于阻塞状态，可以被唤醒，从ACCEPT队列中取出ACK包，重新建立一个新的用于双向通信的sockfd，并返回。
+
+如果服务器端接到了客户端发的SYN后回了SYN-ACK后客户端-{zh-hans:掉;zh-hant:斷}-线了，服务器端没有收到客户端回来的ACK，那么，这个连接处于一个中间状态，既没成功，也没失败。于是，服务器端如果在一定时间内没有收到的TCP会重发SYN-ACK。在Linux下，默认重试次数为5次，重试的间隔时间从1s开始每次都翻倍，5次的重试时间间隔为1s, 2s, 4s, 8s, 16s，总共31s，第5次发出后还要等32s才知道第5次也超时了，所以，总共需要 1s + 2s + 4s+ 8s+ 16s + 32s = 63s，TCP才会断开这个连接。使用三个TCP参数来调整行为：tcp_synack_retries 减少重试次数；tcp_max_syn_backlog，增大SYN连接数；tcp_abort_on_overflow决定超出能力时的行为。
+
+“三次握手”的目的是“为了防止已失效的连接(connect)请求报文段传送到了服务端，因而产生错误”，也即为了解决“网络中存在延迟的重复分组”问题。例如：client发出的第一个连接请求报文段并没有丢失，而是在某个网络结点长时间的滞留了，以致延误到连接释放以后的某个时间才到达server。本来这是一个早已失效的报文段。但server收到此失效的连接请求报文段后，就误认为是client发出的一个新的连接请求。于是就向client发出确认报文段，同意建立连接。假设不采用“三次握手”，那么只要server发出确认，新的连接就建立了。由于现在client并没有发出建立连接的请求，因此不会理睬server的确认，也不会向server发送数据。但server却以为新的运输连接已经建立，并一直等待client发来数据。这样，server的很多资源就白白浪费掉了。采用“三次握手”的办法可以防止上述现象发生，client不会向server的确认发出确认。server由于收不到确认，就知道client并没有要求建立连接。
+
+=== 资源使用 ===
+主机收到一个TCP包时，用两端的IP地址与端口号来标识这个TCP包属于哪个session。使用一张表来存储所有的session，表中的每条称作Transmission Control Block（TCB），tcb结构的定义包括连接使用的源端口、目的端口、目的ip、序号、应答序号、对方窗口大小、己方窗口大小、tcp状态、tcp输入/输出队列、应用层输出队列、tcp的重传有关变量等。
+
+服务器端的连接数量是无限的，只受内存的限制。客户端的连接数量，过去由于在发送第一个SYN到服务器之前需要先分配一个随机空闲的端口，这限制了客户端IP地址的对外发出连接的数量上限。从Linux 4.2开始，有了socket选项IP_BIND_ADDRESS_NO_PORT，它通知Linux内核不保留usingbind使用端口号为0时内部使用的临时端口（ephemeral port），在connect时会自动选择端口以组成独一无二的四元组（同一个客户端端口可用于连接不同的服务器[[套接字|套接字]]；同一个服务器端口可用于接受不同客户端套接字的连接）。<ref>{{Cite web |url=http://www.man7.org/linux/man-pages/man7/ip.7.html |title=存档副本 |accessdate=2017-11-02 |archive-date=2020-11-11 |archive-url=https://web.archive.org/web/20201111230730/https://man7.org/linux/man-pages/man7/ip.7.html |dead-url=no }}</ref>
+
+对于不能确认的包、接收但还没读取的数据，都会占用操作系统的资源。
+
+=== 数据传输 ===
+在TCP的数据传送状态，很多重要的机制保证了TCP的可靠性和强壮性。它们包括：使用序号，对收到的TCP报文段进行排序以及检测重复的数据；使用校验和检测报文段的错误，即无错传输<ref>{{cite web |url=http://www.linfo.org/tcp.html |title=TCP Definition |accessdate=2011-03-12 |archive-date=2020-05-06 |archive-url=https://web.archive.org/web/20200506183752/http://www.linfo.org/tcp.html |dead-url=no }}</ref>；使用确认和计时器来检测和纠正丢包或延时；流控制（Flow control）；拥塞控制（Congestion control）；丢失包的重传。 
+
+==== 可靠传输 ====
+通常在每个TCP报文段中都有一对序号和确认号。TCP报文发送者称自己的字节流的编号为序号（''sequence number''），称接收到对方的字节流编号为确认号。TCP报文的接收者为了确保可靠性，在接收到一定数量的连续字节流后才发送确认。这是对TCP的一种扩展，称为选择确认（{{lang|en|Selective Acknowledgement}}）。选择确认使得TCP接收者可以对乱序到达的数据块进行确认。每一个字节传输过后，SN号都会递增1。
+
+通过使用序号和确认号，TCP层可以把收到的报文段中的字节按正确的顺序交付给应用层。序号是32位的无符号数，在它增大到2<sup>32</sup>-1时，便会回绕到0。对于初始化序列号(ISN)的选择是TCP中关键的一个操作，它可以确保强壮性和安全性。
+
+TCP协议使用序号标识每端发出的字节的顺序，从而另一端接收数据时可以重建顺序，无惧传输时的{{tsl|en|packet reordering|包的乱序交付}}或[[丢包|丢包]]。在发送第一个包时（SYN包），选择一个随机数作为序号的初值，以克制{{tsl|en|TCP sequence prediction attack|TCP序号预测攻击}}.
+
+发送确认包（Acks），携带了接收到的对方发来的字节流的编号，称为确认号，以告诉对方已经成功接收的数据流的字节位置。Ack并不意味着数据已经交付了上层应用程序。
+
+可靠性通过发送方检测到丢失的传输数据并重传这些数据。包括超时重传（Retransmission timeout，RTO）与重复累计确认（duplicate cumulative acknowledgements，DupAcks）。
+
+===== 基于重复累计确认的重传 =====
+如果一个包（不妨设它的序号是100，即该包始于第100字节）丢失，接收方就不能确认这个包及其以后的包，因为采用了累计ack。接收方在收到100以后的包时，发出对包含第99字节的包的确认。这种重复确认是包丢失的信号。发送方如果收到3次对同一个包的确认，就重传最后一个未被确认的包。阈值设为3被证实可以减少乱序包导致的无作用的重传（spurious retransmission）现象。<ref>{{cite journal|last1=Mathis|last2=Mathew|last3=Semke|last4=Mahdavi|last5=Ott|title=The macroscopic behavior of the TCP congestion avoidance algorithm|journal=ACM SIGCOMM Computer Communication Review|volume=27.3|pages=67–82|year=1997}}</ref> [[#选择性确认|选择性确认]]（SACK）的使用能明确反馈哪个包收到了，极大改善了TCP重传必要的包的能力。
+
+===== 超时重传 =====
+发送方使用一个保守估计的时间作为收到数据包的确认的超时上限。如果超过这个上限仍未收到确认包，发送方将重传这个数据包。每当发送方收到确认包后，会重置这个重传定时器。典型地，定时器的值设定为 <math>\text{smoothed RTT} + \max(G, 4\times\text{RTT variation})</math> 其中<math>G</math>是时钟粒度。<ref>{{cite IETF |title= Computing TCP's Retransmission Timer |rfc= 6298 |sectionname= The Basic Algorithm |section= 2 |page= 2 |last1= Paxson |first1= V. |last2=Allman |first2=M. |last3=Chu |first3=J. |last4=Sargent |first4= M. |year= 2011 |month= June |publisher=[[Internet_Engineering_Task_Force|IETF]] |accessdate= October 24, 2015 }}</ref> 进一步，如果重传定时器被触发，仍然没有收到确认包，定时器的值将被设为前次值的二倍（直到特定阈值）。这是由于存在一类通过欺骗发送者使其重传多次，进而压垮接收者的攻击，而使用前述的定时器策略可以避免此类[[中间人攻击|中间人攻击]]方式的[[拒绝服务攻击|拒绝服务攻击]]。
+
+==== 数据传输举例 ====
+[[File:tcp_transport_example.gif|350px]]
+# 发送方首先发送第一个包含序列号为1（可变化）和1460字节数据的TCP报文段给接收方。接收方以一个没有数据的TCP报文段来回复（只含报头），用确认号1461来表示已完全收到并请求下一个报文段。
+# 发送方然后发送第二个包含序列号为1461，长度为1460字节的数据的TCP报文段给接收方。正常情况下，接收方以一个没有数据的TCP报文段来回复，用确认号2921（1461+1460）来表示已完全收到并请求下一个报文段。发送接收这样继续下去。
+# 然而当这些数据包都是相连的情况下，接收方没有必要每一次都回应。比如，他收到第1到5条TCP报文段，只需回应第五条就行了。在例子中第3条TCP报文段被丢失了，所以尽管他收到了第4和5条，然而他只能回应第2条。
+# 发送方在发送了第三条以后，没能收到回应，因此当时钟（{{lang|en|timer}}）过时（{{lang|en|expire}}）时，他重发第三条。（每次发送者发送一条TCP报文段后，都会再次启动一次时钟：RTT）。
+# 这次第三条被成功接收，接收方可以直接确认第5条，因为4，5两条已收到。
+
+==== 校验和 ====
+TCP的16位的[[校验和|校验和]]（checksum）的计算和检验过程如下：发送者将TCP报文段的头部和数据部分的和计算出来，再对其求[[反码|反码]]（[[一補數|一的補數]]），就得到了校验和，然后将结果装入报文中传输。（这里用反码和的原因是这种方法的循环进位使校验和可以在16位、32位、64位等情况下的计算结果再叠加后相同）接收者在收到报文后再按相同的算法计算一次校验和。这里使用的反码使得接收者不用再将校验和字段保存起来后清零，而可以直接将报文段连同校验加總。如果计算结果是全部為一，那么就表示了报文的完整性和正确性。
+
+注意：TCP校验和也包括了96位的伪头部，其中有源地址、目的地址、协议以及TCP的长度。这可以避免报文被错误地路由。
+
+按现在的标准，TCP的校验和是一个比较脆弱的校验。出错概率高的数据链路层需要更高的能力来探测和纠正连接错误。TCP如果是在今天设计的，它很可能有一个32位的[[循环冗余校验|CRC校验]]来纠错，而不是使用校验和。但是通过在第二层使用通常的[[循环冗余校验|CRC校验]]或更完全一点的校验可以部分地弥补这种脆弱的校验。第二层是在TCP层和IP层之下的，比如[[PPP|PPP]]或[[以太网|以太网]]，它们使用了这些校验。但是这也并不意味着TCP的16位校验和是冗余的，对于因特网传输的观察，表明在受[[循环冗余校验|CRC校验]]保护的各跳之间，软件和硬件的错误通常也会在报文中引入错误，而端到端的TCP校验能够捕捉到大部分简单的错误。<ref>{{Cite journal |last1=Stone |last2=Partridge |title=When The CRC and TCP Checksum Disagree |journal=Sigcomm |year=2000 |url=http://citeseer.ist.psu.edu/stone00when.html |postscript=<!--None--> |access-date=2017-11-02 |archive-date=2008-05-05 |archive-url=https://web.archive.org/web/20080505024952/http://citeseer.ist.psu.edu/stone00when.html |dead-url=no }}</ref> 这就是应用中的[[端到端|端到端]]原则。
+==== 流量控制 ==== 
+[[流量控制_(数据)|流量控制]]用来避免主机分组发送得过快而使接收方来不及完全收下，一般由接收方通告给发送方进行调控。
+
+TCP使用{{tsl|en|Sliding Window Protocol|滑动窗口协议}}实现流量控制。接收方在“接收窗口”域指出还可接收的字节数量。发送方在没有新的确认包的情况下至多发送“接收窗口”允许的字节数量。接收方可修改“接收窗口”的值。
+
+[[File:Tcp.svg|right]]
+
+当接收方宣布接收窗口的值为0，发送方停止进一步发送数据，开始了“保持定时器”（persist timer），以避免因随后的修改接收窗口的数据包丢失使连接的双侧进入死锁，发送方无法发出数据直至收到接收方修改窗口的指示。当“保持定时器”到期时，TCP发送方尝试恢复发送一个小的ZWP包（Zero Window Probe），期待接收方回复一个带着新的接收窗口大小的确认包。一般ZWP包会设置成3次，如果3次过后还是0的话，有的TCP实现就会发RST把链接断了。
+
+如果接收方以很小的增量来处理到来的数据，它会发布一系列小的接收窗口。这被称作[[愚蠢窗口综合症|愚蠢窗口综合症]]，因为它在TCP的数据包中发送很少的一些字节，相对于TCP包头是很大的开销。解决这个问题，就要避免对小的window size做出响应，直到有足够大的window size再响应：
+* 接收端使用David D Clark算法：如果收到的数据导致window size小于某个值，可以直接ack把window给关闭了，阻止了发送端再发数据。等到接收端处理了一些数据后windows size大于等于了MSS，或者接收端buffer有一半为空，就可以把window打开让发送端再发数据过来。
+* 发送端使用Nagle算法来延时处理，条件一：Window Size>=MSS 且 Data Size >=MSS；条件二：等待时间或是超时200ms，这两个条件有一个满足，才会发数据，否则就是在积累数据。Nagle算法默认是打开的，所以对于一些需要小包场景的程序——比如像telnet或ssh这样的交互性程序，需要关闭这个算法。可以在Socket设置TCP_NODELAY选项来关闭这个算法。
+
+==== 拥塞控制 ====
+[[TCP拥塞控制|拥塞控制]]是发送方根据网络的承载情况控制分组的发送量，以获取高性能又能避免拥塞崩溃（congestion collapse，网络性能下降几个数量级）。这在网络流之间产生近似{{tsl|en|max-min fairness|最大最小公平}}分配。 
+
+发送方与接收方根据确认包或者包丢失的情况，以及定时器，估计网络拥塞情况，从而修改数据流的行为，这称为拥塞控制或网络拥塞避免。
+
+TCP的现代实现包含四种相互影响的拥塞控制算法：[[慢开始|慢开始]]、拥塞避免、[[TCP拥塞控制#快速重传|快速重传]]、[[TCP拥塞控制#快速恢复|快速恢复]]。
+
+此外，发送方采取“超时重传”（retransmission timeout，RTO），这是估计出[[來回通訊延遲|來回通訊延遲]] (RTT) 以及RTT的方差。
+
+RFC793中定义的计算SRTT的经典算法：指数加权移动平均（Exponential weighted moving average）
+# 先采样RTT，记下最近好几次的RTT值。 
+# 做平滑计算SRTT公式为：<math>SRTT=(\alpha * SRTT)+((1-\alpha)*RTT)</math>，其中 α 取值在0.8 到 0.9之间
+# 计算RTO，公式：<math>RTO=min(UBOUND,max(LBOUND,(\beta*SRTT))</math>，其中 UBOUND是最大的timeout时间上限值，LBOUND是最小的timeout时间下限值，β值一般在1.3到2.0之间。
+
+1987年，出现计算RTT的{{tsl|en|Karn's Algorithm|Karn算法}}或TCP时间戳（{{IETF RFC|1323}}），最大特点是——忽略重传，不把重传的RTT做采样。但是，如果在某一时间，网络闪动，突然变慢了，产生了比较大的延时，这个延时导致要重传所有的包（因为之前的RTO很小），于是，因为重传的不算，所以，RTO就不会被更新，这是一个灾难。为此，Karn算法一发生重传，就对现有的RTO值翻倍。这就是的Exponential backoff。
+
+1988年，在{{IETF RFC|6298}}中给出[[范·雅各布森|范·雅各布森]]算法取平均以获得平滑往返时延（Smoothed Round Trip Time，SRTT），作为最终的RTT估计值。这个算法在被用在今天的TCP协议中：
+
+<math>SRTT=SRTT+\alpha*(RTT-SRTT)</math>
+<math>DevRTT=(1-\beta)*DevRTT+\beta*\left\vert RTT-SRTT \right\vert</math>
+<math>RTO=\mu*SRTT+\partial*DevRTT</math>
+
+其中：DevRTT是Deviation RTT。在Linux下，α = 0.125，β = 0.25， μ = 1，∂= 4  
+
+目前有很多[[TCP拥塞控制|TCP拥塞控制算法]]在研究中。
+
+=== 最大分段大小 ===
+[[最大分段大小|最大分段大小]] (MSS)是在单个分段中TCP愿意接受的数据的字节数最大值。MSS应当足够小以避免[[IP分片|IP分片]]，它会导致丢包或过多的重传。在TCP连接建立时，双端在SYN报文中用MSS选项宣布各自的MSS，这是从双端各自直接相连的[[数据链路层|数据链路层]]的[[最大传输单元|最大传输单元]]（MTU）的尺寸减去固定的IP首部和TCP首部长度。以太网MTU为1500字节， MSS值可达1460字节。使用IEEE 802.3的MTU为1492字节，MSS可达1452字节。如果目的IP地址为“非本地的”，MSS通常的默认值为536（这个默认值允许20字节的IP首部和20字节的TCP首部以适合576字节IP数据报）。此外，发送方可用{{tsl|en|path MTU discovery|传输路径MTU发现}}（{{IETF RFC|1191}}）推导出从发送方到接收方的网络路径上的最小MTU，以此动态调整MSS以避免网络[[IP分片|IP分片]]。
+
+MSS发布也被称作“MSS协商”（MSS negotiation）。严格讲，这并非是协商出来一个统一的MSS值，TCP允许连接两端使用各自不同的MSS值。<ref>{{cite web|url=http://www.faqs.org/rfcs/rfc879.html|title=RFC 879|publisher=|accessdate=2017-11-02|archive-date=2020-11-27|archive-url=https://web.archive.org/web/20201127012716/http://www.faqs.org/rfcs/rfc879.html|dead-url=no}}</ref> 例如，这会发生在参与TCP连接的一台设备使用非常少的内存处理到来的TCP分组。
+
+=== 选择确认 ===
+{{anchor|选择性确认}}
+最初采取累计确认的TCP协议在丢包时效率很低。例如，假设通过10个分组发出了1万个字节的数据。如果第一个分组丢失，在纯粹的累计确认协议下，接收方不能说它成功收到了1,000到9,999字节，但未收到包含0到999字节的第一个分组。因而，发送方可能必须重传所有1万个字节。 
+
+为此，TCP采取了“选择确认”（selective acknowledgment，SACK）选项。<nowiki>RFC 2018</nowiki> 对此定义为'''允许接收方确认它成功收到的分组的不连续的块'''，以及基础TCP确认的成功收到最后连续字节序号。这种确认可以指出''SACK block''，包含了已经成功收到的连续范围的开始与结束字节序号。在上述例子中，接收方可以发出SACK指出序号1000到9999，发送方因此知道只需重发第一个分组（字节 0 到 999）。
+
+TCP发送方会把乱序收包当作丢包，因此会重传乱序收到的包，导致连接的性能下降。重复SACK选项（duplicate-SACK option）是定义在RFC 2883中的SACK的一项扩展，可解决这一问题。接收方发出D-ACK指出没有丢包，接收方恢复到高传输率。D-SACK使用了SACK的第一个段来做标志，
+* 如果SACK的第一个段的范围被ACK所覆盖，那么就是D-SACK;
+* 如果SACK的第一个段的范围被SACK的第二个段覆盖，那么就是D-SACK
+D-SACK旨在告诉发送端：收到了重复的数据，数据包没有丢，丢的是ACK包；或者“Fast Retransmit算法”触发的重传不是因为发出去的包丢了，也不是因为回应的ACK包丢了，而是因为网络延时导致的reordering。
+
+SACK选项并不是强制的。仅当双端都支持时才会被使用。TCP连接建立时会在TCP头中协商SACK细节。在 Linux下，可以通过tcp_sack参数打开SACK功能（Linux 2.4后默认打开）。Linux下的tcp_dsack参数用于开启D-SACK功能（Linux 2.4后默认打开）。选择确认也用于[[流控制传输协议|流控制传输协议]] (SCTP).
+
+=== TCP窗口缩放选项 ===
+TCP窗口尺寸域控制数据包在2至65,535字节。<nowiki>RFC 1323</nowiki> 定义的{{tsl|en|TCP window scale option|TCP窗口缩放选项}}用于把最大窗口尺寸从65,535字节扩大至1G字节。扩大窗口尺寸是{{tsl|en|TCP tuning|TCP优化}}的需要。
+
+窗口缩放选项尽在TCP三次握手时双端在SYN包中独立指出这个方向的缩放系数。该值是16比特窗口尺寸的向左位移数，从0 (表示不位移)至14。
+
+某些路由器或分组防火墙会重写窗口缩放选项，这可能导致不稳定的网络传输。<ref>{{cite web|url=https://lwn.net/Articles/92727/|title=TCP window scaling and broken routers [LWN.net]|publisher=|accessdate=2017-11-02|archive-date=2020-03-31|archive-url=https://web.archive.org/web/20200331213612/https://lwn.net/Articles/92727/|dead-url=no}}</ref>
+
+=== TCP时间戳 ===
+<nowiki>RFC 1323</nowiki>  定义了TCP时间戳，并不对应于系统时钟，使用随机值初始化。许多操作系统每毫秒增加一次时间戳；但RFC只规定tick应当成比例。
+
+有两个时间戳域:
+:4字节的发送时间戳值 
+:4字节的响应回复时间戳值（最近收到数据的时间戳）
+
+TCP时间戳用于“防止序列号回绕算法”（Protection Against Wrapped Sequence numbers，PAWS），细节见RFC 1323。PAWS用于接收窗口跨序号回绕边界。这种情形下一个包可能会重传以回答问题：“是否是第一个还是第二个4 GB的序号？”时间戳可以打破这一问题。 
+
+另外，Eifel检测算法（ <nowiki>RFC 3522</nowiki> ）使用TCP时间戳确定如果重传发生是因为丢包还是简单乱序。 
+
+最近统计表明时间戳的采用率停滞在~40%，这归因于Windows服务器从Windows Server 2008起降低了支持。<ref name="2017stats">{{cite web |url=http://profiles.murdoch.edu.au/myprofile/david-murray/files/2012/06/An_Analysis_of_Changing_Enterprise_Network_Traffic_Characteristics-22.pdf |title=An Analysis of Changing Enterprise Network Traffic Characteristics |author1=David Murray |author2=Terry Koziniec |author3=Sebastian Zander |author4=Michael Dixon |author5=Polychronis Koutsakis |publisher=The 23rd Asia-Pacific Conference on Communications (APCC 2017) |date=2017 |accessdate=3 October 2017 |archive-date=2017-10-03 |archive-url=https://web.archive.org/web/20171003124654/http://profiles.murdoch.edu.au/myprofile/david-murray/files/2012/06/An_Analysis_of_Changing_Enterprise_Network_Traffic_Characteristics-22.pdf |dead-url=no }}</ref>.
+
+=== 带外数据 ===
+{{tsl|en|out-of-band data|带外数据}}（OOB）是指对紧急数据，中断或放弃排队中的数据流；接收方应立即处理紧急数据。完成后，TCP通知应用程序恢复流队列的正常处理。
+
+OOB并不影响网络，“紧急”仅影响远程端的处理。这一协议很少被实现。<ref>{{cite web |last= Gont |first= Fernando |title= On the implementation of TCP urgent data |publisher= 73rd IETF meeting |date= November 2008 |url= http://www.gont.com.ar/talks/IETF73/ietf73-tcpm-urgent-data.ppt |accessdate= 2009-01-04 |archive-date= 2019-05-16 |archive-url= https://web.archive.org/web/20190516181338/https://www.gont.com.ar/talks/IETF73/ietf73-tcpm-urgent-data.ppt |dead-url= no }}</ref><ref>{{cite book |last= Peterson |first= Larry |title= Computer Networks |url= https://archive.org/details/computernetworks00pete_974 |publisher= Morgan Kaufmann |year= 2003 |page= [https://archive.org/details/computernetworks00pete_974/page/n419 401] |isbn= 1-55860-832-X}}</ref>
+
+=== 强制数据递交 ===
+正常情况下，TCP等待200 ms以准备一个完整分组发出（[[纳格算法|纳格算法]]试图把小的信息组装为单一的包）。这产生了小的、但潜在很严重的延迟并在传递一个文件时不断重复延迟。例如，典型发送块是4 KB，典型的MSS是1460字节，在10 Mbit/s以太网上发出两个包，每个耗时约~1.2 ms，随后是剩余1176个字节的包，之后是197 ms停顿因为TCP等待装满缓冲区。
+
+对于telnet，每次用户击键的回应，如果有200 ms将会非常烦人。 
+
+socket选项<code>TCP_NODELAY</code>能放弃默认的200 ms发送延迟。应用程序使用这个socket选项强制发出数据。 
+
+RFC定义了<code>PSH</code>能立即发出比特。[[Berkeley套接字|Berkeley套接字]]不能控制或指出这种情形，只能由[[协议栈|协议栈]]控制。<ref name="Stevens2006">{{cite book|author=Richard W. Stevens|title=TCP/IP Illustrated. Vol. 1, The protocols|url=https://books.google.co.uk/books/about/TCP_IP_Illustrated.html?id=X-l9NX3iemAC November 2011|year=2006|publisher=Addison-Wesley|isbn=978-0-201-63346-7|pages=Chapter 20|access-date=2017-11-02|archive-date=2020-10-25|archive-url=https://web.archive.org/web/20201025145241/https://books.google.co.uk/books/about/TCP_IP_Illustrated.html?id=X-l9NX3iemAC|dead-url=no}}</ref>
+
+=== 终结通路 ===
+[[File:Deconnection_TCP.png|thumb]]
+[[File:TCP_CLOSE.svg|right]]
+连接终止使用了四路握手过程（或称四次握手，{{lang|en|four-way handshake}}），在这个过程中连接的每一侧都独立地被终止。当一个端点要停止它这一侧的连接，就向对侧发送FIN，对侧回复ACK表示确认。因此，拆掉一侧的连接过程需要一对FIN和ACK，分别由两侧端点发出。
+
+首先发出FIN的一侧，如果给对侧的FIN响应了ACK，那么就会超时等待2*MSL时间，然后关闭连接。在这段超时等待时间内，本地的端口不能被新连接使用；避免延时的包的到达与随后的新连接相混淆。RFC793定义了MSL为2分钟，Linux设置成了30s。参数tcp_max_tw_buckets控制并发的TIME_WAIT的数量，默认值是180000，如果超限，那么，系统会把多的TIME_WAIT状态的连接给destory掉，然后在日志里打一个警告（如：time wait bucket table overflow）
+
+连接可以工作在{{tsl|en|TCP half-open|TCP半开}}状态。即一侧关闭了连接，不再发送数据；但另一侧没有关闭连接，仍可以发送数据。已关闭的一侧仍然应接收数据，直至对侧也关闭了连接。
+
+也可以通过测三-{zh-hans:次;zh-hant:路}-握手关闭连接。主机A发出FIN，主机B回复FIN & ACK，然后主机A回复ACK.<ref>{{cite book |last= Tanenbaum|first= Andrew S.|authorlink= Andrew S. Tanenbaum|title= Computer Networks|edition= Fourth |date= 2003-03-17|publisher= Prentice Hall|isbn= 0-13-066102-3}}</ref>
+
+一些主机（如[[Linux|Linux]]或[[HP-UX|HP-UX]]）的TCP栈能实现半双工关闭序列。这种主机如果主动关闭一个连接但还没有读完从这个连接已经收到的数据，该主机发送RST代替FIN<ref>Section 4.2.2.13 in RFC 1122</ref>。这使得一个TCP应用程序能确认远程应用程序已经读了所有已发送数据，并等待远程侧发出的FIN。但是远程的TCP栈不能区分''Connection Aborting RST''与''Data Loss RST''，两种原因都会导致远程的TCP栈失去所有的收到数据。 
+
+一些应用协议使用TCP open/close handshaking，因为应用协议的TCP open/close handshaking可以发现主动关闭的RST问题。例如：
+ s = connect(remote);
+ send(s, data);
+ close(s);
+TCP/IP栈采用上述方法不能保证所有数据到达对侧，如果未读数据已经到达对侧。
+
+=== 状态编码 ===
+下表为TCP状态码列表，以'''S'''指代服务器，'''C'''指代客户端，'''S&C'''表示两者，'''S/C'''表示两者之一：<ref name="#1"/>
+
+;LISTEN <span style="font-weight:normal">S</span>
+:服务器等待从任意远程TCP端口的连接请求。侦听状态。
+;SYN-SENT <span style="font-weight:normal">C</span>
+:客户在发送连接请求后等待匹配的连接请求。通过connect()函数向服务器发出一个同步（SYNC）信号后进入此状态。
+;SYN-RECEIVED <span style="font-weight:normal">S</span>
+:服务器已经收到并发送同步（SYNC）信号之后等待确认（ACK）请求。
+;ESTABLISHED <span style="font-weight:normal">S&C</span>
+:服务器与客户的连接已经打开，收到的数据可以发送给用户。数据传输步骤的正常情况。此时连接两端是平等的。这称作全连接。
+;FIN-WAIT-1 <span style="font-weight:normal">S&C</span>
+:（服务器或客户）主动关闭端调用close（）函数发出FIN请求包，表示本方的数据发送全部结束，等待TCP连接另一端的ACK确认包或FIN&ACK请求包。
+;FIN-WAIT-2 <span style="font-weight:normal">S&C</span>
+:主动关闭端在FIN-WAIT-1状态下收到ACK确认包，进入等待远程TCP的连接终止请求的半关闭状态。这时可以接收数据，但不再发送数据。
+;CLOSE-WAIT <span style="font-weight:normal">S&C</span>
+:被动关闭端接到FIN后，就发出ACK以回应FIN请求，并进入等待本地用户的连接终止请求的半关闭状态。这时可以发送数据，但不再接收数据。
+;CLOSING <span style="font-weight:normal">S&C</span>
+:在发出FIN后，又收到对方发来的FIN后，进入等待对方对己方的连接终止（FIN）的确认（ACK）的状态。少见。
+;LAST-ACK <span style="font-weight:normal">S&C</span>
+:被动关闭端全部数据发送完成之后，向主动关闭端发送FIN，进入等待确认包的状态。
+;TIME-WAIT <span style="font-weight:normal">S/C</span>
+:主动关闭端接收到FIN后，就发送ACK包，等待足够时间以确保被动关闭端收到了终止请求的确认包。（按照RFC 793，一个连接可以在TIME-WAIT保证最大四分钟，即[[最大分段寿命|最大分段寿命]]（maximum segment lifetime）的2倍）
+;CLOSED <span style="font-weight:normal">S&C</span>
+:完全没有连接。
+
+== 端口 ==
+TCP使用了[[通信端口|通信端口]]（{{lang|en|Port number}}）的概念来标识发送方和接收方的应用层。对每个TCP连接的一端都有一个相关的16位元的无符号端口号分配给它们。端口被分为三类：众所周知的、注册的和动态/私有的。众所周知的端口号是由[[因特网赋号管理局|因特网赋号管理局]]（IANA）来分配的，并且通常被用于系统一级或根进程。众所周知的应用程序作为服务器程序来运行，并被动地侦听经常使用这些端口的连接。例如：[[FTP|FTP]]、[[TELNET|TELNET]]、[[SMTP|SMTP]]、[[HTTP|HTTP]]、[[IMAP|IMAP]]、[[POP3|POP3]]等。注册的端口号通常被用来作为终端用户连接服务器时短暂地使用的源端口号，但它们也可以用来标识已被第三方注册了的、被命名的服务。动态/私有的端口号在任何特定的TCP连接外不具有任何意义。可能的、被正式承认的端口号有65535个。
+
+== 封包結構 ==
+{| class="wikitable" style="margin: 0 auto; text-align:center"
+|+TCP表頭
+|-
+! style="border-bottom:none; border-right:none;"| 偏移
+! style="border-left:none;"| [[位元組|位元組]]
+! colspan="8" | 0
+! colspan="8" | 1
+! colspan="8" | 2
+! colspan="8" | 3
+|-
+! style="border-top: none" | 位元組
+! <tt>[[位元|位元]]</tt>!!<tt> 0</tt>!!<tt> 1</tt>!!<tt> 2</tt>!!<tt> 3</tt>!!<tt> 4</tt>!!<tt> 5</tt>!!<tt> 6</tt>!!<tt> 7</tt>!!<tt> 8</tt>!!<tt> 9</tt>!!<tt>10</tt>!!<tt>11</tt>!!<tt>12</tt>!!<tt>13</tt>!!<tt>14</tt>!!<tt>15</tt>!!<tt>16</tt>!!<tt>17</tt>!!<tt>18</tt>!!<tt>19</tt>!!<tt>20</tt>!!<tt>21</tt>!!<tt>22</tt>!!<tt>23</tt>!!<tt>24</tt>!!<tt>25</tt>!!<tt>26</tt>!!<tt>27</tt>!!<tt>28</tt>!!<tt>29</tt>!!<tt>30</tt>!!<tt>31</tt>
+|-
+! 0
+!<tt> 0</tt>
+| colspan="16"| 來源連接埠 || colspan="16"| 目的連接埠
+|-
+! 4
+!<tt>32</tt>
+| colspan="32"| 序列號碼
+|-
+! 8
+!<tt>64</tt>
+| colspan="32"| 確認號碼（當<tt>ACK</tt>設定）
+|-
+! 12
+! <tt>96</tt>
+| colspan="4"| 資料偏移 || colspan="3"| 保留<br><tt>'''0 0 0'''</tt> || cellpadding="1"|<tt>N<br>S</tt>|||<tt>C<br>W<br>R</tt>|||<tt>E<br>C<br>E</tt>|||<tt>U<br>R<br>G</tt>|||<tt>A<br>C<br>K</tt>|||<tt>P<br>S<br>H</tt>|||<tt>R<br>S<br>T</tt>|||<tt>S<br>Y<br>N</tt>|||<tt>F<br>I<br>N</tt>|| colspan="16"| 窗口大小
+|-
+! 16
+!<tt>128</tt>
+|colspan="16"| 校验和 || colspan="16" | 緊急指標（當<tt>URG</tt>設定）
+|-
+! 20<br/>...
+!<tt>160<br/>...</tt>
+| colspan="32" style="background:#ffd0d0;"| 選项（如果資料偏移 > 5，需要在結尾添加0。）<br/>...
+|}
+
+* 來源連接埠（16位元長）－辨識傳送連接埠
+* 目的連接埠（16位元長）－辨識接收連接埠
+* 序列號（seq，32位元長） 
+** 如果含有同步化旗標（SYN），則此為最初的序列號；第一個資料位元的序列碼為本序列號加一。
+** 如果沒有同步化旗標（SYN），則此為第一個資料位元的序列碼。
+* 确认號（ack，32位元長）—期望收到的数据的开始序列号。也即已经收到的数据的字节长度加1。
+* 資料偏移（4位元長）—以4字节为单位计算出的数据段开始地址的偏移值。
+* 保留（3位元長）—须置0
+* 標誌符（9位元長）
+** NS—ECN-nonce。ECN显式拥塞通知（Explicit Congestion Notification）是对TCP的扩展，定义于 <nowiki>RFC 3540</nowiki> （2003）。ECN允许拥塞控制的端对端通知而避免丢包。ECN为一项可选功能，如果底层网络设施支持，则可能被启用ECN的两个端点使用。在ECN成功协商的情况下，ECN感知路由器可以在IP头中设置一个标记来代替丢弃数据包，以标明阻塞即将发生。数据包的接收端回应发送端的表示，降低其传输速率，就如同在往常中检测到包丢失那样。
+** CWR—Congestion Window Reduced，定义于 <nowiki>RFC 3168</nowiki>（2001）。
+** ECE—ECN-Echo有兩種意思，取決於SYN標誌的值，定义于 <nowiki>RFC 3168</nowiki>（2001）。
+** URG—为1表示高优先级数据包，緊急指標字段有效。
+** ACK—为1表示确认号字段有效
+** PSH—为1表示是带有PUSH标志的数据，指示接收方应该尽快将这个报文段交给应用层而不用等待缓冲区装满。  
+** RST—为1表示出现严重差错。可能需要重新建立TCP连接。还可以用于拒绝非法的报文段和拒绝连接请求。
+** SYN—为1表示这是连接请求或是连接接受请求，用于建立连接和使顺序号同步
+** FIN—为1表示发送方没有数据要传输了，要求释放连接。
+* 窗口（WIN，16位元長）—表示从确认号开始，本报文的发送方可以接收的字节数，即接收窗口大小。用于流量控制。
+* 校验和（Checksum，16位元長）—对整个的TCP报文段，包括TCP头部和TCP数据，以16位字进行计算所得。这是一个强制性的字段。
+* 緊急指標（16位元長）—本报文段中的紧急数据的最后一个字节的序号。
+* 選项字段—最多40字节。每个选项的开始是1字节的kind字段，说明选项的类型。
+** 0：选项表结束（1字节）
+** 1：无操作（1字节）用于选项字段之间的字边界对齐。
+** 2：最大报文段长度（4字节，Maximum Segment Size，MSS）通常在建立连接而设置SYN标志的数据包中指明这个选项，指明本端所能接收的最大长度的报文段。通常将MSS设置为（MTU-40）字节，携带TCP报文段的IP数据报的长度就不会超过MTU（MTU最大长度为1518字节，最短为64字节），从而避免本机发生IP分片。只能出现在同步报文段中，否则将被忽略。
+** 3：窗口扩大因子（3字节，wscale），取值0-14。用来把TCP的窗口的值左移的位数，使窗口值乘倍。只能出现在同步报文段中，否则将被忽略。这是因为现在的TCP接收数据缓冲区（接收窗口）的长度通常大于65535字节。
+** 4：sackOK—发送端支持并同意使用SACK选项。
+** 5：SACK实际工作的选项。
+** 8：时间戳（10字节，TCP Timestamps Option，TSopt）
+*** 发送端的时间戳（Timestamp Value field，TSval，4字节）
+*** 时间戳回显应答（Timestamp Echo Reply field，TSecr，4字节）
+**19：MD5摘要，将TCP伪首部、校验和为0的TCP首部、TCP数据段、通信双方约定的密钥（可选）计算出[[MD5|MD5]]摘要值并附加到该选项中，作为类似对TCP报文的签名。通过 RFC 2385  引入，主要用于增强[[边界网关协议|BGP]]通信的安全性。
+**29：安全摘要，通过  RFC 5925 引入，将“MD5摘要”的散列方法更换为[[SHA家族|SHA散列算法]]。
+
+== 發展過程 ==
+TCP是一个复杂的但同时又是在发展之中的协议。尽管许多重要的改进被提出和实施，发表于1981年的RFC793中说明的TCP（TCP-Tahoe）的许多基本操作还是未作多大改动。RFC1122：《因特网对主机的要求》阐明了许多TCP协议的实现要求。RFC2581：《TCP的拥塞控制》是一篇近年来关于TCP的很重要的RFC，描述了更新后的避免过度拥塞的算法。写于2001年的RFC3168描述了对明显拥塞的报告，这是一种拥塞避免的信号量机制。在21世纪早期，在所有因特网的数据包中，通常有大约95%的包使用了TCP协议。常见的使用TCP的应用层有[[HTTP|HTTP]]/[[HTTPS|HTTPS]]（万维网协议），[[SMTP|SMTP]]/[[POP3|POP3]]/[[IMAP|IMAP]]（电子邮件协议）以及[[FTP|FTP]]（文件传输协议）。这些协议在今天被广泛地使用，这证明了它们的原作者的创造是卓越的。
+
+最近，一个新协议已经被[[加州理工学院|加州理工学院]]的科研人员开发出来，命名为[[FAST_TCP|FAST TCP]]（基于快速活动队列管理的规模可变的传输控制协议）。它使用排队延迟作为拥塞控制信号；但是因为端到端的延迟通常不仅仅包括排队延迟，所以FAST TCP（或更一般地，所有基于排队延迟的算法）在实际互联网中的能否工作仍然是一个没有解决的问题。
+
+== 应用 ==
+TCP并不是对所有的应用都适合，一些新的带有一些内在的脆弱性的运输层协议也被设计出来。比如，实时应用并不需要甚至无法忍受TCP的可靠传输机制。在这种类型的应用中，通常允许一些丢包、出错或拥塞，而不是去校正它们。例如通常不使用TCP的应用有：[[流媒体|流媒体]]、[[網絡游戏|網絡游戏]]、IP电话（[[VoIP|VoIP]]）等等。任何不是很需要可靠性或者是想将功能减到最少的应用可以避免使用TCP。在很多情况下，当只需要多路复用应用服务时，[[用户数据报协议|用户数据报协议]]（UDP）可以代替TCP为应用提供服务。
+
+除外，由于TCP的实现是由操作系统提供，而TCP的悠久历史、系统级别的配置机制，一些特性在特定的网络环境下会成为一种累赘而且无法优化，所以也有一些通过在UDP上重新实现用户层级的类似TCP的面向连接的、可靠的、基于字节流的类传输层协议，来代替TCP，例如[[QUIC|QUIC]]。
+
+== 参见 ==
+* [[TCP校验和卸载|TCP校验和卸载]]
+* [[TCP/UDP端口列表|TCP/UDP端口列表]]
+* [[SCTP|SCTP]]
+* [[连接重置|连接重置]]
+* [[拥塞控制|拥塞控制]]
+
+== 参考资料 ==
+<div class="references-small">
+* Timothy S. Ramteke: ''Networks, Second Edition.'', Prentice-Hall 2001, ISBN 0-13-901265-6
+* Torsten Braun , Martina Zitterbart: ''Hochleistungskommunikation, Bd.2, Transportdienste und Transportprotokolle '', Oldenbourg 1996, ISBN 978-3-486-23088-8
+</div>
+{{reflist|2}}
+
+== 外部链接 ==
+* {{RFC|793}}（1981年）
+* {{RFC|1323}}（1992年）
+* {{RFC|3168}}（2001年）
+* {{RFC|3540}}（2003年）
+
+[[Category:传输层协议|Category:传输层协议]]
+[[Category:TCP/IP|Category:TCP/IP]]
+[[Category:TCP协议|*]]

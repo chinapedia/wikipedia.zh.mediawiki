@@ -1,0 +1,528 @@
+{{NoteTA
+|G1 = Signals and Systems
+|G2 = Math
+|G3 = IT
+|1 = zh-hans:变换; zh-hant:變換;
+}}
+{{redirect|FFT}}
+
+[[File:Time_Signal_of_Five_Term_Cosine_Series.png|thumb]]
+[[File:DFTs_of_Five_Term_Cosine_Series.png|thumb]]
+[[File:Zoomed_DFTs_of_Five_Term_Cosine_Series.png|thumb]]
+
+'''快速傅里叶变换'''（{{lang-en|'''Fast Fourier Transform, FFT'''}}），是快速计算序列的[[离散傅里叶变换|离散傅里叶变换]]（DFT）或其逆变换的方法<ref>{{Cite book|title=数字信号处理（第2版）|last=杨毅明|first=|publisher=机械工业出版社|year=2017年|isbn=9787111576235|location=北京|pages=第95页}}</ref>。[[傅里叶分析|傅里叶分析]]将信号从原始域（通常是时间或空间）转换到[[頻域|頻域]]的表示或者逆过来转换。FFT会通过把[[離散傅里葉變換矩陣|DFT矩阵]][[矩阵分解|分解]]为[[稀疏矩阵|稀疏]]（大多为零）因子之积来快速计算此类变换。<ref>Charles Van Loan, ''Computational Frameworks for the Fast Fourier Transform'' (SIAM, 1992).</ref>  因此，它能够将计算DFT的[[計算複雜性理論|复杂度]]从只用DFT定义计算需要的 <math>O(n^2)</math>，降低到 <math>O(n \log n)</math>，其中 <math>n</math> 为数据大小。
+
+快速傅里叶变换广泛的应用于工程、科学和数学领域。这里的基本思想在1965年才得到普及，但早在1805年就已推导出来。<ref name=Heideman84>{{cite journal
+|last1=Heideman
+|first1=M. T.
+|first2=D. H.
+|last2=Johnson
+|first3=C. S.
+|last3=Burrus
+|doi=10.1109/MASSP.1984.1162257
+|title=Gauss and the history of the fast Fourier transform
+|journal=IEEE ASSP Magazine
+|volume=1
+|issue=4
+|pages=14–21
+|year=1984
+}}</ref> 1994年美國數學家{{le|吉尔伯特·斯特朗|Gilbert Strang}}把FFT描述为“我们一生中最重要的[[数值分析|数值算法]]”<ref>{{cite journal|last=Strang|first=Gilbert|title=Wavelets|journal=American Scientist|date=May–June 1994|volume=82|issue=3|page=253|jstor=29775194}}</ref>，它还被IEEE科学与工程计算期刊列入20世纪十大算法。<ref>{{Cite journal|title = Guest Editors Introduction to the top 10 algorithms|url = http://ieeexplore.ieee.org/lpdocs/epic03/wrapper.htm?arnumber=814652|journal = Computing in Science Engineering|date = January 2000|issn = 1521-9615|pages = 22–23|volume = 2|issue = 1|doi = 10.1109/MCISE.2000.814652|first = J.|last = Dongarra|first2 = F.|last2 = Sullivan}}</ref>
+
+==定义和速度==
+用FFT计算[[离散傅里叶变换|DFT]]会得到与直接用DFT定义计算相同的结果；最重要的区别是FFT更快。（由于[[捨入誤差|捨入誤差]]的存在，许多FFT算法还会比直接运用定义求值精确很多，后面会讨论到这一点。）
+
+令 ''x''<sub>0</sub>, ...., ''x''<sub>''N''-1</sub> 為[[复数_(数学)|复数]]。DFT由下式定义
+
+:<math> X_k =  \sum_{n=0}^{N-1} x_n e^{-{i 2\pi k \frac{n}{N}}}
+\qquad
+k = 0,\dots,N-1. </math>
+
+直接按这个定义求值需要 O(''N''<sup>2</sup>) 次运算：''X''<sub>''k''</sub> 共有 ''N'' 个输出，每个输出需要 ''N'' 项求和。直接使用DFT運算需使用N個複數乘法(4N 個實數乘法)與N-1個複數加法(2N-2個實數加法)，因此，計算使用DFT所有N點的值需要''N''<sup>2</sup>複數乘法與''N''<sup>2</sup>-N 個複數加法。FFT则是能够在 O(''N'' log ''N'') 次操作计算出相同结果的任何方法。更准确的说，所有已知的FFT算法都需要 [[大O符号|O]](''N'' log ''N'') 次运算（技术上O只标记[[上界|上界]]），虽然还没有已知的证据证明更低的复杂度是不可能的。（Johnson and Frigo, 2007）
+
+要说明FFT节省时间的方式，就得考虑复数相乘和相加的次数。直接计算DFT的值涉及到 ''N''<sup>2</sup> 次复数相乘和 ''N''(''N''−1) 次复数相加（可以通过削去琐碎运算（如乘以1）来节省 O(''N'') 次运算）。众所周知的基2[[#库利-图基算法|库利-图基算法]]，''N'' 为2的幂，可以只用 (''N''/2)log<sub>2</sub>(''N'') 次复数乘法（再次忽略乘以1的简化）和 ''N''log<sub>2</sub>(''N'') 次加法就可以得到相同结果。在实际中，现代计算机通常的实际性能通常不受算术运算的速度和对复杂主体的分析主导（参见Frigo & Johnson, 2005），但是从 O(''N''<sup>2</sup>) 到 O(''N'' log ''N'') 的总体改进仍然能够体现出来。
+
+== 一般的簡化理論 ==
+假設一個M*N型矩阵'''S'''可分解成列向量以及行向量相乘：
+
+<math>\mathbf{S}=\begin{bmatrix} a_1 \\ a_2 \\ \vdots \\ a_m\end{bmatrix}\begin{bmatrix} b_1 & b_2 & \cdots & b_n\end{bmatrix}</math>
+
+若<math>\begin{bmatrix} a_1 & a_2 & \cdots & a_m\end{bmatrix}^T</math>有<math>M_0</math>個相異的非平凡值（<math>a_m\ne\pm2^k,a_m\ne\pm2^ka_n </math> where <math> m\ne n</math>）　
+
+<math>\begin{bmatrix} b_1 & b_2 & \cdots & b_n\end{bmatrix}</math>有<math>N_0</math>個相異的非平凡值
+
+則'''S'''共需要<math>M_0*N_0</math>個乘法。
+
+<math>\begin{bmatrix} Z[1] \\ Z[2] \\ \vdots \\ Z[N] \end{bmatrix}= \mathbf{S}\begin{bmatrix} X[1] \\ X[2] \\ \vdots \\ X[N]\end{bmatrix}=\begin{bmatrix} a_1 \\ a_2 \\ \vdots \\ a_m\end{bmatrix}\begin{bmatrix} b_1 & b_2 & \cdots & b_n\end{bmatrix}\begin{bmatrix} X[1] \\ X[2] \\ \vdots \\ X[N]\end{bmatrix}</math>
+
+Step 1：<math>Z_a=b_1X[1]+b_2X[2]+\cdots+b_nX[N]</math>
+
+Step 2：<math>Z[1]=a_1Z_a,Z[2]=a_2Z_a,\cdots,Z[N]=a_mZ_a</math>
+
+簡化理論的變型：
+
+<math>\mathbf{S}=\begin{bmatrix} a_1 \\ a_2 \\ \vdots \\ a_m\end{bmatrix}\begin{bmatrix} b_1 & b_2 & \cdots & b_n\end{bmatrix}+\mathbf{S}_1</math>
+
+<math>S_1</math>也是一個M*N的矩陣。
+
+若<math>S_1</math>有<math>P_1</math>個值不等於0，則<math>\mathbf{S}</math>的乘法量上限為<math>M_0+N_0+P_1</math>。
+
+== 快速傅立葉變換乘法量的計算 ==
+
+假設<math>N= P_1 \times P_2 \times \cdots \times P_k </math>，其中<math>P_1,P_2, \cdots , P_k </math>彼此互質
+
+<math>\mathbf{P_k}</math>點DFT的乘法量為<math> \mathbf{B_k}</math>，則<math>\mathbf{N}</math>點DFT的乘法量為：
+
+:<math>\frac{N}{P_1}B_1+\frac{N}{P_2}B_2+\cdots\cdots+\frac{N}{P_k}B_k</math>
+
+假設<math>\mathbf{N=P^c}</math>，P是一個質數。
+
+若<math>\mathbf{N_1=P^a}</math>點的DFT需要的乘法量為<math>\mathbf{B_1}</math>
+
+且<math>n_1\times n_2</math>當中（<math> n_1=0,1,\cdots,N_1-1, \quad n_2=0,1, \cdots , N_2-1</math>）
+
+有<math>D_1</math>個值不為<math>\frac{N}{12}</math>及<math>\frac{N}{8}</math>的倍數，
+
+有<math>D_2</math>個值為<math>\frac{N}{12}</math>及<math>\frac{N}{8}</math>的倍數，但不為<math>\frac{N}{4}</math>的倍數，
+
+則N點DFT的乘法量為：
+
+:<math>\mathbf{N_2B_1+N_1B_2+3D_1+2D_2}</math>
+
+== 库利-图基算法 ==
+{{main|库利－图基快速傅里叶变换算法}} 
+
+库利-图基算法是最常见的FFT算法。这一方法以[[分治法|分治法]]为策略[[递归|递归]]地将长度为<math>N=N_1 N_2</math>的[[离散傅里叶变换|离散傅里叶变换]]分解为长度为<math>N_1</math>的<math>N_2</math>个较短序列的离散傅里叶变换，以及与<math>\Omicron (N)</math>个[[旋转因子|旋转因子]]的复数乘法。
+
+这种方法以及FFT的基本思路在1965年J. W. Cooley和J. W. Tukey合作发表''An algorithm for the machine calculation of complex Fourier series''之后开始为人所知。但后来发现，实际上这两位作者只是重新发明了[[高斯|高斯]]在1805年就已经提出的算法（此算法在历史上数次以各种形式被再次提出）。
+
+库利-图基算法最有名的应用，是将序列长为''N ''的DFT分割为两个长为''N/2 ''的子序列的DFT，因此这一应用只适用于序列长度为2的幂的DFT计算，即基2-FFT。实际上，如同高斯和Cooley与Tukey都指出的那样，Cooley-Tukey算法也可以用于序列长度''N ''为任意因数分解形式的DFT，即混合基FFT，而且还可以应用于其他诸如分裂基FFT等变种。尽管Cooley-Tukey算法的基本思路是采用递归的方法进行计算，大多数传统的算法实现都将显式的递归算法改写为非递归的形式。另外，因为Cooley-Tukey算法是将DFT分解为较小长度的多个DFT，因此它可以同任一种其他的DFT算法联合使用。
+
+=== 设计思想 ===
+下面，我们用'''N次单位根'''<math>W_{N}</math>来表示<math>e^{-j\frac{2\pi}{N}}</math>。
+
+<math>W_{N}</math>的性质：
+# '''周期性'''，<math>W_{N}</math>具有周期<math>N</math>，即<math>W_{N}^{k+N}=W_{N}^{k}</math>
+# '''对称性'''：<math>W_{N}^{k+\frac{N}{2}}=-W_{N}^{k}</math>。
+# 若<math>m</math>是<math>N</math>的约数，<math>W_{N}^{mkn}=W_{\frac{N}{m}}^{kn}</math>
+
+为了简单起见，我们下面设待变换序列长度<math>n=2^r</math>。根据上面单位根的对称性，求级数<math>y_k=\sum_{n=0}^{N-1} W_{N}^{kn}x_n</math>时，可以将求和区间分为两部分：
+
+<math>\begin{matrix}y_k=\sum_{n=2t} W_{N}^{kn} x_n + \sum_{n=2t+1} W_{N}^{kn}x_n\\= \sum_{t} W_{\frac{N}{2}}^{kt}x_{2t} + W_{N}^{k}\sum_{t} W_{\frac{N}{2}}^{kt}x_{2t+1}\\= F_{even}(k) + W_{N}^{k}F_{odd}(k)&&&&&&(i\in\mathbb{Z})\end{matrix}</math>
+
+<math>F_{odd}(k)</math>和<math>F_{even}(k)</math>是两个分别关于序列<math>\left\{x_n\right\}_0^{N-1}</math>奇数号和偶数号序列N/2点变换。由此式只能计算出<math>y_k</math>的前N/2个点，对于后N/2个点，注意<math>F_{odd}(k)</math>和<math>F_{even}(k)</math>都是周期为N/2的函数，由单位根的对称性，于是有以下变换公式：
+
+* <math>y_{k+\frac{N}{2}} = F_{even}(k) - W_{N}^{k}F_{odd}(k)</math>
+* <math>y_k = F_{even}(k) + W_{N}^{k}F_{odd}(k)</math>。
+
+这样，一个N点变换就分解成了两个N/2点变换。照这样可继续分解下去。这就是'''库利-图基快速傅里叶变换'''算法的基本原理。根据[[主定理|主定理]]不难分析出此时算法的时间复杂度为<math>\Omicron (N\log N)</math>
+
+===算法实现===
+*[[蝶形结|蝶形结]]网络和位反转（Bit Reversal）：
+:首先将<math>n=2^N</math>个输入点列按二进制进行编号，然后对各个编号按位倒置并按此重新排序。例如，对于一个8点变换，
+:001倒置以后变成 100
+:000 → 000
+:001 → 100
+:010 → 010
+:011 → 110
+:100 → 001
+:101 → 101
+:110 → 011
+:111 → 111
+:倒置后的编号为{0,4,2,6,1,5,3,7}。
+:然后将这n个点列作为输入传送到[[蝶形结|蝶形结]]网络中，注意将因子<math>W_{N}^{k}</math>逐层加入到蝶形网络中。
+
+===算法复杂度===
+由于按[[蝶形结|蝶形结网络]]计算n点变换要进行log ''n''层计算，每层计算n个点的变换，故算法的时间复杂度为<math>\Omicron (n \log n)</math>。
+
+== 其他算法 ==
+
+在[[Cooley-Tukey快速傅里叶变换算法|Cooley-Tukey算法]]之外还有其他DFT的快速演算法。对于长度<math>N = N_1N_2</math>且<math>N_1</math>与<math>N_2</math>互质的序列，可以采用基于[[中国剩余定理|中国剩余定理]]的[[互质因子算法|互质因子算法]]将N长序列的DFT分解为两个子序列的DFT。与Cooley-Tukey算法不同的是，[[互质因子算法|互质因子算法]]不需要旋转因子。
+
+Rader-Brenner算法是类似于Cooley-Tukey算法，但是采用的旋转因子都是纯虚数，以增加加法运算和降低了数值稳定性为代价减少了乘法运算。这方法之后被split-radix variant of Cooley-Tukey所取代，与Rader-Brenner演算法相比，有一样多的乘法量，却有较少的加法量，且不牺牲数值的准确性。
+
+[[Bruun|Bruun]]以及[[QFT|QFT]]演算法是不断的把DFT分成许多较小的DFT运算。（Rader-Brenner以及QFT演算法是为了2的指数所设计的演算法，但依然可以适用在可分解的整数上。Bruun演算法则可以运用在可被分成偶数个运算的数字）。尤其是Bruun演算法，把FFT看成是<math>z^N-1</math>，并把它分解成<math>z^{M-1}</math>与<math>z^{2M}+az^M+1</math>的形式。
+
+另一个从多项式观点的快速傅立叶变换法是[[威诺格拉德快速傅立叶变换演算法|Winograd算法]]。此演算法把<math>z^N-1</math>分解成cyclotomic多项式，而这些多项式的系数通常为1，0，-1。这样只需要很少的乘法量（如果有需要的话），所以winograd是可以得到最少乘法量的快速傅立叶演算法，对于较小的数字，可以找出有效率的算方式。更精确地说，winograd演算法让DFT可以用<math>2^k</math>点的DFT来简化，但减少乘法量的同时，也增加了非常多的加法量。Winograd也可以利用剩余值定理来简化DFT。
+
+Rader演算法提出了利用点数为N（N为质数）的DFT进行长度为N-1的回旋摺积来表示原本的DFT，如此就可利用摺积用一对基本的FFT来计算DFT。另一个prime-size的FFT演算法为chirp-Z演算法。此法也是将DFT用摺积来表示，此法与Rader演算法相比，能运用在更一般的转换上，其转换的基础为Z转换（Rabiner et al., 1969）。
+
+== 实数或对称资料专用的演算法 ==
+在许多的运用当中，要进行DFT的资料是纯实数，如此一来经过DFT的结果会满足对称性：
+
+:<math>\mathbf{X}_{N-k}</math>=<math>\mathbf{X}_k^*</math>
+
+而有一些演算法是专门为这种情形设计的（e.g. Sorensen, 1987）。另一些则是利用旧有的演算法（e.g. Cooley-Tukey），删去一些不必要的演算步骤，如此省下了记忆体的使用，也省下了时间。另一方面，也可以把一个偶数长度且纯实数的DFT，用长度为原本一半的复数型态DFT来表示（实数项为原本纯实数资料的偶数项，虚数项则为奇数项）。
+
+'''在Matlab上用一次N點FFT計算兩個N點實數信號x,y的FFT:'''
+<syntaxhighlight lang="matlab">
+function [X,Y] = Real2FFT( x,y )
+
+% N-point FFT is used for 2 real signals both with length N
+
+N = length(x);
+
+z = x+y*i ;
+
+Z = fft(z);
+
+X = 0.5*(Z+conj(Z(1+mod(0:-1:1-N,N))));
+
+Y = 0.5*(Z-conj(Z(1+mod(0:-1:1-N,N))))/i;
+
+end
+</syntaxhighlight>
+一度人们认为，用[[离散哈特利转换|离散哈特利转换]]（Discrete Hartley Transform）来处理纯实数的DFT会更有效率，但接着人们发现，对于同样点数的纯实数DFT，经过设计的FFT，可以比DHT省下更多的运算。Bruun演算法是第一个试着从减少实数输入的DFT运算量的演算法，但此法并没有成为人们普遍使用的方法。
+
+对于实数输入，且输入为偶对称或奇对称的情形，可以更进一步的省下时间以及记忆体，此时DFT可以用[[离散余弦转换|离散余弦转换]]或[[离散正弦转换|离散正弦转换]]来代替（Discrete cosine/sine transforms）。由于DCT/DST也可以设计出FFT的演算法，故在此种情形下，此方法取代了对DFT设计的FFT演算法。
+
+DFT可以应用在频谱分析以及做摺积的运算，而在此处，不同应用可以用不同的演算法来取代，列表如下：
+
+用来做[[频谱分析|频谱分析]]的情况下，DFT可用下列的演算法代替：
+*DCT
+*DST
+*DHT
+*正交基底的扩展（orthogonal basis expantion）包括正交多项式（orthogonal polynomials）以及CDMA.
+*Walsh（Hadamard）转换
+*Haar转换
+*小波（wavelet）转换
+*时频分布（time-frequency distribution） 
+
+用来做[[摺积|摺积]]的情况下，DFT可用下列的演算法代替：
+*DCT
+*DST
+*DHT
+*直接做摺积（direct computing）
+*分段式DFT摺积（sectioned DFT convolution）
+*[[威諾格拉德快速傅立葉變換演算法|威諾格拉德快速傅立葉變換演算法]]
+*沃尔什（Walsh、Hadamard）转换
+*[[数论转换|数论转换]]
+
+== 複雜度以及運算量的極限 ==
+長久以來，人們對於求出快速傅立葉變換的複雜度下限以及需要多少的運算量感到很有興趣，而實際上也還有許多問題需要解決。即使是用較簡單的情形，即<math>2^k</math>點的DFT，也還沒能夠嚴謹的證明出FFT至少需要<math>\Omega (N\log N)</math>（不比<math>N\log N</math>小）的運算量，目前也沒有發現複雜度更低的演算法。通常數學運算量的多寡會是運算效率好壞最主要的因素，但在現實中，有許多因素也會有很大的影響，如快取記憶體以及CPU均有很大的影響。
+
+在1978年，Winograd率先導出一個較嚴謹的FFT所需乘法量的下限：<math>\Theta (N)</math>。當<math>N=2^k</math>時，DFT只需要<math>4N-2\log_{2}^2N-2\log_{2}N-4</math>次無理實數的乘法即可以計算出來。更詳盡，且也能趨近此下限的演算法也一一被提出（Heideman & Burrus, 1986; Duhamel, 1990）。很可惜的是，這些演算法，都需要很大量的加法計算，目前的硬體無法克服這個問題。
+
+對於所需加法量的數目，雖然我們可以在某些受限制的假設下，推得其下限，但目前並沒有一個精確的下限被推導出來。1973年，Morgenstern在乘法常數趨近巨大的情形下（對大部分的FFT演算法為真，但不是全部）推導出加法量的下限：<math>\Omega \left(N \log N \right)</math>。Pan（1986）在假設FFT演算法的不同步的情形有其極限下證明出加法量的下限<math>\Omega (NlogN)</math>，但一般來說，此假設相當的不明確。長度為<math>N=2^k</math>的情形下，在某些假設下，Papadimitriou（1979）提出使用Cooley-Tukey演算法所需的複數加法量<math>N\log_{2}N</math>是最少的。到目前為止，在長度為<math>N=2^k</math>情況，還沒有任何FFT的演算法可以讓複數的加法量比<math>N\log_{2}N</math>還少。
+
+還有一個問題是如何把乘法量與加法量的總和最小化，有時候稱作"演算複雜度"（在這裡考慮的是實際的運算量，而不是漸近複雜度）。同樣的，沒有一個嚴謹下限被證明出來。從1968年開始，<math>N=2^k</math>點DFT而言，split-radix FFT演算法需要最少的運算量，在<math>N>1</math>的情形下，其需要<math>4N\log_{2}N-6N+8</math>個乘法運算以及加法運算。最近有人導出更低的運算量：<math>\frac{34}{9}N\log_{2}N</math>。（Johnson and Frigo, 2007; Lundy and Van Buskirk, 2007）
+
+大多數嘗試要降低或者證明FFT複雜度下限的人都把焦點放在複數資料輸入的情況，因其為最簡單的情形。但是，複數資料輸入的FFT演算法，與實數資料輸入的FFT演算法，離散餘弦轉換（DCT），離散哈特列轉換（DHT），以及其他的演算法，均有很大的關連性。故任何一個演算法，在複雜度上有任何的改善的話，其他的演算法複雜度也會馬上獲得改善（Duhamel & Vetterli, 1990）。
+
+== 快速演算法查表 ==
+當輸入信號長度為N時:
+
+N = 1~60
+{| class="wikitable"
+|N
+|乘法數
+|加法數
+|N
+|乘法數
+|N
+|乘法數
+|N
+|乘法數
+|-
+|1
+|0
+|0
+|11
+|46
+|24
+|28
+|39
+|182
+|-
+|2
+|0
+|4
+|12
+|8
+|25
+|148
+|40
+|100
+|-
+|3
+|2
+|12
+|13
+|52
+|26
+|104
+|42
+|124
+|-
+|4
+|0
+|16
+|14
+|32
+|27
+|114
+|44
+|160
+|-
+|5
+|10
+|34
+|15
+|40
+|28
+|64
+|45
+|170
+|-
+|6
+|4
+|36
+|16
+|20
+|30
+|80
+|48
+|92
+|-
+|7
+|16
+|72
+|18
+|32
+|32
+|72
+|52
+|208
+|-
+|8
+|4
+|52
+|20
+|40
+|33
+|160
+|54
+|228
+|-
+|9
+|16
+|72
+|21
+|62
+|35
+|150
+|56
+|156
+|-
+|10
+|20
+|88
+|22
+|80
+|36
+|64
+|60
+|160
+|}
+N < 1000
+{| class="wikitable"
+|N
+|乘法數
+|N
+|乘法數
+|N
+|乘法數
+|N
+|乘法數
+|-
+|63
+|256
+|96
+|280
+|192
+|752
+|360
+|1540
+|-
+|64
+|204
+|104
+|468
+|204
+|976
+|420
+|2080
+|-
+|66
+|284
+|108
+|456
+|216
+|1020
+|480
+|2360
+|-
+|70
+|300
+|112
+|396
+|224
+|1016
+|504
+|2300
+|-
+|72
+|164
+|120
+|380
+|240
+|940
+|512
+|3180
+|-
+|80
+|260
+|128
+|560
+|252
+|1024
+|560
+|3100
+|-
+|81
+|480
+|144
+|436
+|256
+|1308
+|672
+|3496
+|-
+|84
+|248
+|160
+|680
+|288
+|1160
+|720
+|3620
+|-
+|88
+|412
+|168
+|580
+|312
+|1324
+|784
+|4412
+|-
+|90
+|340
+|180
+|680
+|336
+|1412
+|840
+|4580
+|}
+N > 1000
+{| class="wikitable"
+|N
+|乘法數
+|N
+|乘法數
+|N
+|乘法數
+|N
+|乘法數
+|-
+|1008
+|5356
+|1440
+|8680
+|2520
+|16540
+|4032
+|29488
+|-
+|1024
+|7436
+|1680
+|10420
+|2688
+|19108
+|4096
+|37516
+|-
+|1152
+|7088
+|2016
+|12728
+|2880
+|20060
+|4368
+|35828
+|-
+|1260
+|7640
+|2048
+|16836
+|3369
+|24200
+|4608
+|36812
+|-
+|1344
+|8252
+|2304
+|15868
+|3920
+|29900
+|5040
+|36860
+|}
+
+== 参阅 ==
+* [[离散傅里叶变换|离散傅里叶变换]]
+* [[并行快速傅里叶变换|并行快速傅里叶变换]]
+
+== 参考资料 ==
+{{reflist|2}}
+
+==延伸阅读==
+{{refbegin|2}}
+* {{cite journal |first1=N. |last1=Brenner |first2=C. |last2=Rader |year=1976 |title= A New Principle for Fast Fourier Transformation |journal=IEEE Acoustics, Speech & Signal Processing |volume=24 |issue=3 |doi=10.1109/TASSP.1976.1162805 |pages=264–266}}
+* {{cite document |first=E. O. |last=Brigham |title=The Fast Fourier Transform |publication-place=New York |publisher=Prentice-Hall |date=2002}}
+* {{cite book |first1=Thomas H. |last1=Cormen |author-link1=Thomas H. Cormen |first2=Charles E. |last2=Leiserson |author-link2=Charles E. Leiserson | first3=Ronald L. |last3=Rivest |author-link3=Ronald L. Rivest | first4=Clifford |last4=Stein |author-link4=Clifford Stein | date=2001 |title=Introduction to Algorithms |title-link=Introduction to Algorithms |edition=2 |publisher=MIT Press and McGraw-Hill |isbn=0-262-03293-7 |chapter=30. (Polynomials and the FFT)}}
+* {{cite journal |first1=Pierre |last1=Duhamel |year=1990 |doi=10.1109/29.60070 |title=Algorithms meeting the lower bounds on the multiplicative complexity of length-2<sup>n</sup> DFTs and their connection with practical algorithms |journal=IEEE Trans. Acoust. Speech. Sig. Proc. |volume=38 |issue=9 |pages=1504–151}}
+* {{cite journal |first1=P. |last1=Duhamel |first2=M. |last2=Vetterli |date=1990 |doi= 10.1016/0165-1684(90)90158-U |title=Fast Fourier transforms: a tutorial review and a state of the art |url=https://archive.org/details/sim_signal-processing_1990-11_21_3/page/259 |journal=Signal Processing |volume=19 |pages=259–299}}
+* {{cite journal |first1=A. |last1=Edelman |first2=P. |last2=McCorquodale |first3=S. |last3=Toledo |date=1999 |doi=10.1137/S1064827597316266 |title=The Future Fast Fourier Transform? |journal=SIAM J. Sci. Computing |volume=20 |pages=1094–1114}}
+* D. F. Elliott, & K. R. Rao, 1982, ''Fast transforms: Algorithms, analyses, applications''. New York: Academic Press.
+* Funda Ergün, 1995, {{doi-inline|10.1145/225058.225167|Testing multivariate linear functions: Overcoming the generator bottleneck}}, ''Proc. 27th ACM Symposium on the Theory of Computing'': 407–416.
+*{{cite journal |last1=Frigo |first1=M. |last2=Johnson |first2=S. G. |year=2005 |title=The Design and Implementation of FFTW3 |url=http://fftw.org/fftw-paper-ieee.pdf |format=PDF |journal=Proceedings of the IEEE |volume=93 |pages=216–231 |doi=10.1109/jproc.2004.840301 |access-date=2008-06-22 |archive-date=2019-07-16 |archive-url=https://web.archive.org/web/20190716053010/http://fftw.org/fftw-paper-ieee.pdf |dead-url=no }}
+* H. Guo and C. S. Burrus, 1996, {{doi-inline|10.1117/12.255236|Fast approximate Fourier transform via wavelets transform}}, ''Proc. SPIE Intl. Soc. Opt. Eng.'' '''2825''': 250–259.
+* H. Guo, G. A. Sitton, C. S. Burrus, 1994, {{doi-inline|10.1109/ICASSP.1994.389994|The Quick Discrete Fourier Transform}}, ''Proc. IEEE Conf. Acoust. Speech and Sig. Processing (ICASSP)'' '''3''': 445–448.
+* Steve Haynal and Heidi Haynal, "[https://web.archive.org/web/20120426031804/http://jsat.ewi.tudelft.nl/content/volume7/JSAT7_13_Haynal.pdf Generating and Searching Families of FFT Algorithms]", ''Journal on Satisfiability, Boolean Modeling and Computation'' vol. 7, pp. 145–187 (2011).
+* {{cite journal |first1=Michael T. |last1=Heideman |first2=C. Sidney |last2=Burrus |year=1986 |doi=10.1109/TASSP.1986.1164785 |title=On the number of multiplications necessary to compute a length-2<sup>n</sup> DFT |journal=IEEE Trans. Acoust. Speech. Sig. Proc. |volume=34 |issue=1 |pages=91–95}}
+* {{cite journal |last1=Johnson |first1=S. G. |last2=Frigo |first2=M. |year=2007 |title=A modified split-radix FFT with fewer arithmetic operations |url=http://www.fftw.org/newsplit.pdf |format=PDF |journal=IEEE Trans. Signal Processing |volume=55 |issue=1 |pages=111–119 |doi=10.1109/tsp.2006.882087 |access-date=2008-06-22 |archive-date=2021-02-25 |archive-url=https://web.archive.org/web/20210225225026/http://www.fftw.org/newsplit.pdf |dead-url=no }}
+* T. Lundy and J. Van Buskirk, 2007. "A new matrix approach to real FFTs and convolutions of length 2<sup>k</sup>," ''Computing'' '''80''' (1): 23–45.
+*Kent, Ray D. and Read, Charles (2002). ''Acoustic Analysis of Speech''. ISBN 978-0-7693-0112-9. Cites Strang, G. (1994)/May–June). Wavelets. ''American Scientist, 82,'' 250–255.
+* {{cite journal |first1=Jacques |last1=Morgenstern |year=1973 |doi=10.1145/321752.321761 |title=Note on a lower bound of the linear complexity of the fast Fourier transform |journal=J. ACM |volume=20 |issue=2 |pages=305–306}}
+* {{cite journal |doi=10.1007/BF01261607 |first1=M. J. |last1=Mohlenkamp |year=1999 |title=A fast transform for spherical harmonics |journal=J. Fourier Anal. Appl. |volume=5 |issue=2–3 |pages=159–184 |url=http://www.math.ohiou.edu/~mjm/research/MOHLEN1999P.pdf |deadurl=yes |archiveurl=https://web.archive.org/web/20070206134937/http://www.math.ohiou.edu/~mjm/research/MOHLEN1999P.pdf |archivedate=2007年2月6日 |df= }}
+* {{cite journal |first1=H. J. |last1=Nussbaumer |year=1977 |doi=10.1049/el:19770280 |title=Digital filtering using polynomial transforms |journal=Electronics Lett. |volume=13 |issue=13 |pages=386–387}}
+* V. Pan, 1986, {{doi-inline|10.1016/0020-0190(86)90035-9|The trade-off between the additive complexity and the asyncronicity of linear and bilinear algorithms}}, ''Information Proc. Lett.'' '''22''': 11–14.
+* Christos H. Papadimitriou, 1979, {{doi-inline|10.1145/322108.322118|Optimality of the fast Fourier transform}}, ''J. ACM'' '''26''': 95–102.
+* D. Potts, G. Steidl, and M. Tasche, 2001. "[http://www.tu-chemnitz.de/~potts/paper/ndft.pdf Fast Fourier transforms for nonequispaced data: A tutorial]", in: J.J. Benedetto and P. Ferreira (Eds.), ''Modern Sampling Theory: Mathematics and Applications'' (Birkhauser).
+*{{Citation |last1=Press |first1=W.H. |last2=Teukolsky |first2=S.A. |last3=Vetterling |first3=W.T. |last4=Flannery |first4=B.P. |year=2007 |title=Numerical Recipes: The Art of Scientific Computing |edition=3 |publisher=Cambridge University Press |publication-place=New York |isbn=978-0-521-88068-8 |chapter=Chapter 12. Fast Fourier Transform |chapter-url=http://apps.nrbook.com/empanel/index.html#pg=600 |accessdate=2015-12-11 |archive-date=2011-08-11 |archive-url=https://web.archive.org/web/20110811154417/http://apps.nrbook.com/empanel/index.html#pg=600 |dead-url=no }}
+* {{cite journal |first1=Vladimir |last1=Rokhlin |first2=Mark |last2=Tygert |year=2006 |title=Fast algorithms for spherical harmonic expansions |journal=SIAM J. Sci. Computing |volume=27 |issue=6 |doi=10.1137/050623073 |pages=1903–1928}}
+* {{cite journal |last1=Schatzman |first1=James C. |year=1996 |title=Accuracy of the discrete Fourier transform and the fast Fourier transform |url=http://portal.acm.org/citation.cfm?id=240432 |journal=SIAM J. Sci. Comput |volume=17 |pages=1150–1166 |doi=10.1137/s1064827593247023}}
+* {{cite journal |first1=O. V. |last1=Shentov |first2=S. K. |last2=Mitra |first3=U. |last3=Heute |first4=A. N. |last4=Hossen |year=1995 |doi=10.1016/0165-1684(94)00103-7 |title=Subband DFT. I. Definition, interpretations and extensions |journal=Signal Processing |volume=41 |issue=3 |pages=261–277}}
+* {{cite journal |first1=H. V. |last1=Sorensen |first2=D. L. |last2=Jones |first3=M. T. |last3=Heideman |first4=C. S. |last4=Burrus |year=1987 |doi=10.1109/TASSP.1987.1165220 |title=Real-valued fast Fourier transform algorithms |journal=IEEE Trans. Acoust. Speech Sig. Processing |volume=35 |issue=35 |pages=849–863}} See also {{cite journal|doi=10.1109/TASSP.1987.1165284|last1=Sorensen|first1=H.|year=1987|pages=1353–1353|issue=9|volume=35|last2=Jones|journal=IEEE Transactions on Acoustics, Speech, and Signal Processing|first2=D.|last3=Heideman|first3=M.|last4=Burrus|first4=C.|title=Corrections to "Real-valued fast Fourier transform algorithms"}}
+* {{cite journal |first1=Peter D. |last1=Welch |year=1969 |doi=10.1109/TAU.1969.1162035 |title=A fixed-point fast Fourier transform error analysis |journal=IEEE Trans. Audio Electroacoustics |volume=17 |issue=2 |pages=151–157}}
+* {{cite journal |first1=S. |last1=Winograd |year=1978 |doi=10.1090/S0025-5718-1978-0468306-4 |title=On computing the discrete Fourier transform |journal=Math. Computation |volume=32 |issue=141 |pages=175–199 |jstor=2006266}}
+{{refend}}
+
+[[Category:数字信号处理|Category:数字信号处理]]
+[[Category:变换编码|Category:变换编码]]
+[[分类:数学术语|分类:数学术语]]
+[[Category:傅里叶变换|Category:傅里叶变换]]
+[[Category:计算机科学中未解决的问题|Category:计算机科学中未解决的问题]]

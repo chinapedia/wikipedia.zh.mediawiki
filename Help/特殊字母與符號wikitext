@@ -1,0 +1,287 @@
+{{NoteTA|G1=IT}}
+{{Hh}}
+{{SpecialChars}}
+
+== 概述 ==
+在MediaWiki 1.5中，所有的项目都使用了[[Unicode|Unicode]]（[[UTF-8|UTF-8]]）字符编码。如果你的操作系统和浏览器不支持Unicode（如[[網景_(瀏覽器)|網景 (瀏覽器)]]或[[Internet_Explorer_for_Mac|Internet Explorer for Mac]]），或者没有安装可以显示某些Unicode字符的字体，你将无法正确浏览、编辑带有这类字符的文章。典型的状况是：把不能显示的字符被显示成内有数字的小方框，编辑框内不能显示的字符被显示成一组组字符代码。本文章的下列章节会给出具体的介绍。
+
+你可在在[[#显示|#显示]]和[[#相关字体的下载与安装|#相关字体的下载与安装]]这2章节找到有关的解决方案。
+
+== 字符编码系统 ==
+到[[2005年|2005年]][[6月|6月]]底，当这个新的版本开始在维基媒体上使用时，英国、荷兰、丹麦和瑞典的维基百科已经使用了[[ISO_8859-1|windows-1252]]编码（他们宣布他们使用的是[[ISO-8859-1|ISO-8859-1]]编码，但实际上浏览器把二者识别为同一种，而且Mediawiki并没有限制使用windows-1252的历史）。在数据库中准备升级的wiki文档将始终以windows-1252编码保存，并且在载入时被转换。此后编辑们的更新将作为UTF-8编码储存在数据库内。载入时转换的过程对于用户来说是不可见的。
+
+*Unicode（UTF-8）
+**各字符字节数可变
+**特殊字符，包括[[中日韩统一表意文字|中日韩统一表意文字]]，都可以在网页和编辑框里正常显示。另外可以使用多字符代码，且不会在编辑框里被自动转换。
+*ISO 8859-1
+**各字符仅一字节
+**在此字符集中不可用的特殊字符以多字符代码形式储存，它们通常有两到三个等价表示，例如：€，可表示为&euro;，或&#8364;，或&#x20AC;。
+**包含最常见的特殊字符，比如é，也可表示为&eacute;，但这样没必要。
+
+注意到Special:Export输出时使用UTF-8，无论数据库使用的是哪种编码。
+
+若想了解某维基使用的编码系统，打开浏览器的“察看源代码”，找到类似字符：
+
+ <meta http-equiv="Content-type" content="text/html; charset=iso-8859-1" />
+
+或
+
+ <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+
+== 编辑 ==
+{{Main|Help:編輯特殊字母與符號}}
+许多不在标准[[ASCII|ASCII]]表中的字符也许对维基十分重要。有四种方法输入非ASCII字符：
+
+*使用编辑框下的特殊字符以插入文章。但有可能部分字符无法显示。
+*按住ALT键并从数字键区依次输入三位数输入[[EASCII|EASCII]]字符，但超出EASCII范围的数字会被转换成SOH符号（U+0001）。
+*直接使用[[鍵盤配置|特种键盘]]、[[输入法|输入法]]，或者字符映射程序。在ISO-8859-1的维基将把字符集以外的字符转换为HTML数字字符实体（见下）。
+*使用[[Help:HTML|HTML]]命名字符实体引用，比如<code>&agrave;</code>。这对于不同的字符集来说都能非常正确的表达指定字符，即使无法显示。不过可能引起搜索的困难（见下）。
+*使用HTML数字字符引用，比如<code>&#161;</code>。这是输入未命名实体Unicode值的唯一办法，比如土耳其字符。代码点128到159在[[ISO-8859-1|ISO-8859-1]]和[[Unicode|Unicode]]中都未使用，因此其间的字符引用是错误的，“非法的”，会引起多种问题。
+
+总的来说，西欧语言一般不出现问题。
+
+为了搜索的成功，特殊字符最好不用字符实体引用，否则搜索会出现问题。比如“Odiliënberg”，服务器只会以“Odili”、“euml”或“nberg”进行搜索。这其实是个bug，应该被修正。参见：[[Help:搜索|Help:搜索]]。
+
+=== 网页浏览器 ===
+有些网页浏览器会对编辑框裡的文字作一些手脚。最常见的行为就是将文字转换为本地的编码形式。用户将不得不手动转换回来。这也常造成特殊字符变成问号（在某些浏览器变成了'''音译'''文字！）。
+
+==== Internet Explorer ====
+这种常见浏览器使用Mac OS Roman编码系统。它几乎把所有的Unicode字符变成问号，部分ISO-8859-1也不能幸免于难（特别是¤ ¦ ¹ ² ³ ¼ ½ ¾ Ð × Ý Þ ð ý þ 和软连字符，包括所有[[Extended_ASCII|Extended ASCII]]中編號161到255的字元）。所以用它浏览维基百科会造成极大的不便。
+
+==== Netscape 4 ====
+问题与上者类似。
+
+==== 工作区 ====
+{| class="wikitable" align="right" border="1" cellspacing="0" cellpadding="4"
+|-----
+| 正常浏览器：<br>数据库和编辑框 || 异常浏览器：<br>编辑框
+|-----
+| œ || &#x153; 
+|-----
+| &#x153; || &#x0153;
+|-----
+| &#x0153; || &#x00153;
+|}
+
+在英文维基变为UTF-8之后，跨维基机器人就开始替换HTML实体为Unicode字符，但对于有些浏览器来说，不正常的Unicode字符越来越多。工作区就是为此设计，以保证那些浏览器能安全的进行编辑，当然仅当Mediawiki知道哪些浏览器是有问题的。
+
+列在$wgBrowserBlackList（一组正则表达式，匹配User-Agent字符串）的浏览器被提供一个特别的编辑框。十六进制HTML实体有多余的前导0，非ASCII字符在编辑框显示为无前导0的十六进制HTML实体。
+
+当前IE Mac和一些版本的Linux Netscape 4.x浏览器在黑名单之中，不过这能解决一些问题。
+
+=== 模板 ===
+为了请读者注意页面中含有特殊字符，可以使用下列模板：
+
+{| class="wikitable"
+|----
+! 代码 || 说明 || 效果
+
+|----
+| {{T1|Special characters}} || 提示读者该页面中含有特殊字母或符号 || {{Special characters}}
+|----
+| {{T1|Non-printing character}} || 提示读者该页面中含有[[控制字元|非打印字元]] || {{Non-printing character}}
+|----
+| {{T1|Burmese characters}} || 提示读者该页面中含有[[缅文|缅文字母]] || {{Burmese characters}}
+|----
+| {{T1|Contains Arabic text}} || 提示读者该页面中含有[[阿拉伯文字|阿拉伯文字]] || {{Contains Arabic text}}
+|----
+| {{T1|谚文组字}} || 提示读者该页面中含有[[古谚文|古谚文]]，需要谚文组字 || {{谚文组字}}
+|----
+|}
+
+== 查看 ==
+目前大多数网页浏览器都配备一定程度的Unicode编码字元支持，最常遇到的问题是，在Microsoft Windows XP上运行的网页浏览器依赖于注册表中的预配置字体链接，而不是实际搜索可检视相关字符的字体。这意味着网页浏览器通常不得不被迫检视特定的字体。在维基百科上有一套模板可以做到这一点，例如国际音标的{{IPA}}。Windows Glyph List 4中的内容在没有这些特殊措施的情况下应该可以安全使用。
+
+;显示特殊字符
+要在网页上显示Unicode或特殊字符，首先需要在您的电脑上显示或安装一个或多个Unicode编码字元的字体。为了实现正常的工作功能，还需要修改浏览器软件、扩充功能或附加元件的设置。
+
+Unicode编码字元支持通过安装可选的独立Microsoft Windows 7更新包KB2729094进行扩展，可用于Microsoft下载中心的32位和64位版本的Microsoft Windows 7 SP1。 Microsoft Windows 8的这个反向端口通过在Microsoft Windows 7中添加对Emoji（表情符号）和其他符号的浏览器支持来更新Segoe UI字体。
+
+使用Konqueror、Opera、Safari和其他基于Chromium开源项目的大多数浏览器时，特殊符号应该可以正确显示，而不必进一步配置。在遵循先前提到的步骤之后，为了更好（和正确）显示具有连字形式的字符，组合字符的可选步骤是安装渲染引擎软件。
+
+要使用一种可用的Unicode字体在表格或图表或框中显示特殊字符，请指定<code>class="Unicode"</code>在表的TR行标记中（或者每个TD标记中，但每个TR中使用它比在每个TD中使用它更容易），于维基表代码使用时则在（TR等值）之后使用<code>|-</code>（例如<code>|- class ="Unicode"</code>）。
+
+为了显示单个特殊字符，可以在char的位置使用HTML十进制或十六进制数字实体代码。如果需要显示具有许多特殊Unicode字符的段落，可以使用<code><p class="Unicode"></code>……<code></p></code>或<code><span class="Unicode"></code>……<code></span></code>。
+
+<code>class="Unicode"</code>用于网页和页面、HTML或维基标签，其中各种各样的Unicode编码字元的各种字符需要被显示。如果需要在网页上显示的特殊字符大部分覆盖较少的与拉丁脚本有关的Unicode编码字元，可以使用<code>class="latinx"</code>。对于与国际音标有关的特殊字符或符号，可以使用<code>class="IPA"</code>。对于polytonic (Greek)字符或相关符号，可以使用<code>class="polytonic"</code>。
+
+;更改默认字体
+Google Chrome允许用户为普通，衬线，无衬线和等宽显示模式设置默认字体。使用当前在系统上安装的任何字体。若要访问此设置，请点击设置，並选择显示高级设置，然后进入自定义字体。您可以在这里可以选择系统中的任何字体作为默认值。
+
+注意：根据页面元素，许多网站（包括维基媒体）默认为serif或sans-serif字体（例如标题可能默认为serif，正文文本为sans serif），因此如果您希望覆盖并强制这个某种字体，需要使用自定义CSS样式。
+
+用于Microsoft Windows的旧版Internet Explorer中的拉丁脚本的默认字体是Times New Roman。较早版本的字体不包含许多Unicode编码字元。要在Internet Explorer中正确查看特殊字符，必须将字型更改，例如免费提供的TITUS Cyber​​bit Basic和GNU Unifont。
+
+请点击从IE菜单栏并选择工具，然后点击Internet选项并选择不同的网页字体显示特殊字符，例如Lucida Sans Unicode。
+
+Firefox必须更改默认设置。要做到这一点，请点击选单，并选择更多，然后进入文字编码。取消选中默认框允许页面以选择其自己的字体，然后在默认字符编码框中选择一个Unicode选项（例如Unicode (UTF-32BE)或Arabic (ISO-8859-6)）。另一种方法是将字体切换为Arial Unicode MS，然后可以选中默认框。
+
+=== 世界语 ===
+{| class="wikitable" border="1" align="right"
+|-----
+| 在编辑框
+<td>在数据库和输出
+|-----
+| S
+<td>S
+|-----
+| Sx
+<td>Ŝ
+|-----
+| Sxx
+<td>Sx
+|-----
+| Sxxx
+<td>Ŝx
+|-----
+| Sxxxx
+<td>Sxx
+|-----
+| Sxxxxx
+<td>Ŝxx
+|}
+
+Mediawiki软件可以设置世界语使用UTF-8编码作为储存和显示编码。但在编辑时，这些文字被转换为容易以标准键盘编辑的格式。
+
+有这种特性的字符有：Ĉ，Ĝ，Ĥ，Ĵ，Ŝ，Ŭ，ĉ，ĝ，ĥ，ĵ，ŝ，ŭ。你可以用特种键盘直接键入这些字符，不过保存后在编辑时你还是会看见Sx。这叫做“x-加帽拼写”（参见：[[:en:Esperanto_orthography#The_x-system|:en:Esperanto orthography#The x-system]]）。如果想输入在这些字符或它们的不发音形式（A，G，H，J，S，U，c，g，h，j，s，u）后的“x”，则应输入显示出来的“x”两倍的“x”。
+
+比如，世界语维基链接到[[:en:Luxury_car|:en:Luxury car]]的[[Help:跨语言链接|跨语言链接]]，源代码是<nowiki>[[:en:Luxxury_car|:en:Luxxury car]]</nowiki>。这曾造成跨维基机器人工作的问题。
+
+== 相关字体的下载与安装 ==
+=== 古代字母 ===
+古代字母在这里包括：[[腓尼基字母|腓尼基字母]]、[[古意大利字母|古意大利字母]]、[[线形文字B|线形文字B]]。
+
+;Microsoft Windows
+下载安装下列的任意一种字体：
+*[http://www.google.com/get/noto/ Noto Sans Phoenician、Noto Sans Old Italic、Noto Sans Linear B]
+*[http://users.teilar.gr/~g1951d/ Aegean]
+*[http://www.fonts2u.com/akkadian.font Akkadian/Cuneiform]
+*[http://scholarsfonts.net/cardofnt.html Cardo]
+*[http://www.wazu.jp/downloads/damase_v.2.zip MPH 2B Damase]
+*[http://www.cs.tut.fi/~jkorpela/code2001.html Code2001]
+*[http://junicode.sourceforge.net/ Junicode]
+
+;Linux
+基于[[Debian|Debian]]的[[Linux|Linux]]（例如ubuntu和Linux Mint等）可通过[[Synaptic|Synaptic]]下载<code>ttf-ancient-fonts</code>的[[deb|deb包]]。
+
+=== 撒马利亚字母 ===
+要显示[[撒马利亚字母|撒马利亚字母]]，请安装以下字体：
+*[https://noto-website-2.storage.googleapis.com/pkgs/NotoSansSamaritan-unhinted.zip Noto Sans Samaritan]
+
+=== 楔形文字 ===
+要显示苏美尔[[楔形文字|楔形文字]]，下载安装下列的任意一种字体：
+* [http://users.teilar.gr/~g1951d/ Akkadian]
+* [http://flaez.ch/freeidg.html Free Idg Serif]
+* [http://www.google.com/get/noto/ Noto Sans Cuneiform]
+安装这几种字体后firefox中能正常显示和编辑，不过IE和Chrome仅能正常显示楔形文字音节表，位于辅助多语言平面（SMP）內的U+12000—U+1236E 楔形文字（879個字符）和U+12400—U+12473 楔形文字数字和标点（103個字符）則無法显示。
+
+=== 古埃及圣书体 ===
+要显示古埃及[[圣书体|圣书体]]，下载安装下列的字体：
+* [http://www.google.com/get/noto/ Noto Sans Egyptian Hieroglyphs]
+* [http://users.teilar.gr/~g1951d/ Aegyptus]
+
+=== 奥斯曼亚字母和萧伯纳字母 ===
+要显示[[奥斯曼亚字母|奥斯曼亚字母]]和[[萧伯纳字母|萧伯纳字母]]，下载安装下列的字体：
+*[http://www.wazu.jp/gallery/Fonts_Glagolitic.html MPH 2B Damase]
+*[http://www.google.com/get/noto/ “Noto Sans Osmanya”和“Noto Sans Shavian”]
+
+=== 古埃及象形文字 ===
+{{main|Help:WikiHiero語法教學}}
+比如<nowiki><hiero>A54</hiero></nowiki>得到<hiero>A54</hiero>。参见[[mw:Extension:WikiHiero/Syntax|mw:Extension:WikiHiero/Syntax]]（'''警告：本頁面含大量图像！部分瀏覽器可能會崩潰。'''）。
+
+这与浏览器的编码系统无关，因为这是图像。
+
+当然也可用Unicode来表示它们，不过对于Windows 10以前的版本，您需要安装“[http://www.google.com/get/noto/ Noto Sans Egyptian Hieroglyphs]”或“[http://users.teilar.gr/~g1951d/ Aegyptus]”以支持古埃及象形文字。
+
+=== 盲文 ===
+要显示[[盲文|盲文]]，从下列的链接下载安装字体：
+* [http://www.wazu.jp/gallery/Fonts_Braille.html Braille Unicode Fonts]
+
+=== 婆罗米系文字 ===
+要显示[[婆罗米系文字|婆罗米系文字]]，从下列的链接下载安装字体：
+
+* [[高棉文|高棉文]]：[http://www.wazu.jp/gallery/Fonts_Khmer.html Khmer Unicode Fonts]
+* [[天城文|天城文]]：[http://www.wazu.jp/gallery/Fonts_Devanagari.html Devanagari Unicode Fonts]
+* [[孟加拉文|孟加拉文]]：[http://www.wazu.jp/gallery/Fonts_Bengali.html Bengali Unicode Fonts]
+* [[古吉拉特文|古吉拉特文]]：[http://www.wazu.jp/gallery/Fonts_Gujarati.html Gujarati Unicode Fonts]
+* [[古木基文|古木基文]]：[http://www.wazu.jp/gallery/Fonts_Gurmukhi.html Gurmukhi Unicode Fonts]
+* [[缅文|缅文]]：[http://www.wazu.jp/gallery/Fonts_Myanmar.html Myanmar Unicode Fonts]
+* [[奥里亚文|奥里亚文]]：[http://www.wazu.jp/gallery/Fonts_Oriya.html Oriya Unicode Fonts]
+* [[泰卢固文|泰卢固文]]：[http://www.wazu.jp/gallery/Fonts_Telugu.html Telugu Unicode Fonts]
+* [[卡纳达文|卡纳达文]]：[http://www.wazu.jp/gallery/Fonts_Kannada.html Kannada Unicode Fonts]
+* [[僧伽罗文|僧伽罗文]]：[http://www.wazu.jp/gallery/Fonts_Sinhala.html Sinhala Unicode Fonts]
+* [[马拉雅拉姆文|马拉雅拉姆文]]：[http://www.wazu.jp/gallery/Fonts_Malayalam.html Malayalam Unicode Fonts]
+* [[泰米尔文|泰米尔文]]：[http://www.wazu.jp/gallery/Fonts_Tamil.html Tamil Unicode Fonts]
+* [[泰文|泰文]]：[http://www.wazu.jp/gallery/Fonts_Thai.html Thai Unicode Fonts]、[[泰国国家字体|泰国国家字体]]、[https://www.google.com/get/noto/#sans-thai Noto Sans Thai]
+* -{zh-cn:[[老挝文|老挝文]]; zh-hk:[[老撾文|老撾文]]; zh-tw:[[寮文|寮文]]; zh-sg:[[寮文|寮文]];}-：[http://www.wazu.jp/gallery/Fonts_Lao.html Lao Unicode Fonts]
+* {{link-en|布吉文|Lontara alphabet}}：[http://www.wazu.jp/gallery/Fonts_Buginese.html Buginese Unicode Fonts]、[http://www.google.com/get/noto/ Noto Sans Buginese]
+* [[藏文|藏文]]：[http://www.wazu.jp/gallery/Fonts_Tibetan.html Tibetan Unicode Fonts]
+* [[悉昙文|悉昙文]]：[http://mihafont.seesaa.net/article/167209339.html Muktamsiddham]、[https://github.com/googlefonts/noto-fonts Noto Sans Siddham]、[http://siddham.shikisokuzekuu.net/ ApSiddham]（需要 [[Graphite|Graphite]] 技术支持）
+
+=== 蒙古文、满文、锡伯文 ===
+要显示[[蒙古文|蒙古文]]、[[满文|满文]]、[[锡伯文|锡伯文]]，从下列的链接下载安装字体：
+* [http://www.google.com/get/noto/ Noto Sans Mongolian]
+* [http://abkai.net/core/zh/manchu/manchu-fonts/ 太清 - 满文、锡伯文、达呼尔文字体]
+* [http://trans.mglip.com/css/MONG140728_BT.ttf Mongolian BT]
+* [http://oyun.mglip.com/mongolfont/index.aspx 奥云蒙文字体]
+* [http://www.menksoft.com/site/alias__menkcms/2805/Default.aspx 蒙科立字体字库]
+* [http://hkuri.cneas.tohoku.ac.jp/project2/font Mongolian Universal White]
+Windows 7以上版本自带Mongolian Baiti也可以显示蒙古文、满文、锡伯文。
+
+=== 八思巴字 ===
+要显示[[八思巴字|八思巴字]]，从下列的链接下载安装字体：
+* [http://www.babelstone.co.uk/Fonts/Phags-pa.html BabelStone Phags-pa Fonts]
+
+=== 旧式韩文／朝鲜文 ===
+参见[[維基百科:古諺文支援|維基百科:古諺文支援]]
+
+=== 西夏文 ===
+要显示[[西夏文|西夏文]]，从下列的链接下载安装字体：
+* [https://github.com/googlefonts/noto-fonts/tree/main/hinted/ttf/NotoSerifTangut Noto Serif Tangut]
+* [http://www.babelstone.co.uk/Fonts/Yinchuan.html Tangut Yinchuan]
+* [http://ccamc.co/fonts.php#n4694 字體和输入法 | 古今文字集成]
+
+=== 象雄文 ===
+显示[[象雄文|象雄文]]（Marchen），从下列的链接下载安装字体：
+* [http://www.babelstone.co.uk/Fonts/Marchen.html BabelStone Marchen]
+
+=== 傣那文 ===
+{{Incubator|code=tdd|lang=傣那语}}
+[[傣那文|傣那文]]在[[傣那语|傣那语]]中使用，支持以下字体显示：
+* [http://www.gnu.org/software/freefont GNU FreeFont]
+* Microsoft Tai Le（Microsoft Windows字体，适用于Windows 7及以上版本）
+* [https://noto-website.storage.googleapis.com/pkgs/NotoSansTaiLe-unhinted.zip Noto Sans Tai Le （直接下载链接）]、[https://github.com/googlei18n/noto-fonts/raw/master/unhinted/NotoSansTaiLe-Regular.ttf （GitHub链接）]，谷歌制作的字体
+
+{| class="wikitable"
+! 应该正确显示的字体 !! 您浏览器显示的字体 !! 转写
+|-
+| [[File:_Tai_Le_text_sample.svg|90px]] || style="font-size: 200%;" | {{lang|tdd-Tale|ᥖᥭᥰᥘᥫᥴ}} || Tai Le ({{IPA|[tai˦.lə˧˥]}})
+|}
+
+=== 国际音标 ===
+参见[[國際音標#字體|國際音標#字體]]。
+
+==有特殊字符的链接==
+当用户使用下划链接时，且链接有特殊字符时，结果可能有歧义。
+
+链接 + - < > ⊂ ⊃ 得到 [[x|+ - < > ⊂ ⊃]]，也许看起来像± = ≤ ≥ ⊆ ⊇。这样最好单独给出链接。
+*A ⊂ B （见[[子集|子集]]）
+
+==参见==
+*[[基本多文种平面|基本多文种平面]]
+*[[Help:编辑|Help:编辑]]
+*[[Help:数学公式|Help:数学公式]]
+*[[维基百科:Unicode扩展汉字|维基百科:Unicode扩展汉字]]
+
+==外部链接==
+*http://www.unicode.org/charts/ Unicode字符表，仅十六进制数，PDF文件显示所有浏览器不能显示的字符（英文）。
+*http://www.unicode.org/help/display_problems.html 在大多数平台上启用Unicode的帮助（英文）。
+*[http://unicode.coeurlumiere.com/ 0到65535Unicode字符]，十进制。
+*[http://www.alanwood.net/demos/ent4_frame.html HTML 4.0 Character Entity References]—shows how the named and decimal character references look in one's browser
+*[http://www.fileformat.info/info/unicode/block/index.htm FileFormat.Info]—details of many Unicode characters, including the named, decimal and hexadecimal character reference, showing how it should look and for each, how it looks in one's browser
+*[http://www.alanwood.net/unicode/index.html Alan Wood's Unicode resources]—comprehensive resource with character test pages for all Unicode ranges, as well as OS-specific Unicode support information and links to fonts and utilities
+*[http://www.tacowidgets.com/widgets/ CharacterPal]—Free Mac OS X Dashboard Widget that displays key combinations for special characters
+* A [http://people.w3.org/rishida/scripts/uniview/conversion converter] that helps one find the right escape sequence to use—helps when one needs to escape ASCII/Unicode characters that are special characters in wiki markup
+
+{{H-f Help}}
+[[Category:維基百科文字幫助文檔|TSZF]]

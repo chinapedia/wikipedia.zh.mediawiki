@@ -1,0 +1,88 @@
+{{noteTA
+|G1 = IT
+}}
+'''安全散列演算法'''（{{lang-en|Secure Hash Algorithm}}，縮寫為SHA）是一個[[密碼雜湊函數|密碼雜湊函數]]家族，是[[联邦资料处理标准|FIPS]]所認證的安全[[雜湊函數|雜湊演算法]]。能計算出一個數位訊息所對應到的，長度固定的字串（又稱訊息摘要）的算法。且若輸入的訊息不同，它們對應到不同字串的機率很高。
+
+SHA家族的演算法，由[[美國國家安全局|美國國家安全局]]（NSA）所設計，並由[[美國國家標準與技術研究院|美國國家標準與技術研究院]]（NIST）發佈，是美國的政府標準，其分別是：
+*'''[[SHA-0|SHA-0]]'''：1993年发布，当时称做安全散列标准（Secure Hash Standard），发布之后很快就被NSA撤回，是SHA-1的前身。
+
+*'''[[SHA-1|SHA-1]]'''：1995年发布，SHA-1在許多安全協定中廣為使用，包括[[TLS|TLS]]、[[GnuPG|GnuPG]]、[[Secure_Shell|SSH]]、[[S/MIME|S/MIME]]和[[IPsec|IPsec]]，是[[MD5|MD5]]的後繼者。但SHA-1的安全性在2010年以后已经不被大多数的加密场景所接受。2017年荷兰密码学研究小组CWI和Google正式宣布攻破了SHA-1<ref>{{Cite web|url=http://shattered.it/|title=SHAttered|accessdate=2017-02-24|work=shattered.it|language=en|archive-date=2017-02-23|archive-url=https://web.archive.org/web/20170223184831/https://shattered.it/|dead-url=no}}</ref>。
+
+*'''[[SHA-2|SHA-2]]'''：2001年发布，包括SHA-224、SHA-256、SHA-384、SHA-512、SHA-512/224、SHA-512/256。SHA-2目前沒有出現明顯的弱點。雖然至今尚未出現對SHA-2有效的攻擊，但它的演算法跟SHA-1基本上仍然相似。
+
+*'''[[SHA-3|SHA-3]]'''：2015年正式发布，由於對MD5出現成功的破解，以及對SHA-0和SHA-1出現理論上破解的方法，[[國家標準暨技術研究院|NIST]]感覺需要一個與之前演算法不同的，可替換的加密雜湊演算法，也就是現在的SHA-3。
+
+== SHA函数对比 ==
+下表中的中繼雜湊值（internal state）表示對每個資料區塊壓縮雜湊過後的中繼值（internal hash sum）。
+{{Further|Merkle–Damgård construction}}
+{| class="wikitable" style="margin-top: 0px; width:100%"
+|+ SHA函数对比
+|- style="vertical-align:bottom;"
+! colspan="2" | 算法和变体
+! 輸出雜湊值長度<br/>（bits）
+! 中繼雜湊值長度<br/>（bits）
+! 資料區塊長度<br/>（bits）
+! 最大輸入訊息長度<br/>（bits）
+! 迴圈次數
+! 使用到的運算子
+! 碰撞攻击<br/>（bits）
+! 性能示例{{refn|Found on an [[AMD_Opteron|AMD Opteron]] 8354 2.2 GHz processor running 64-bit Linux<ref>{{cite web
+ | url=http://www.cryptopp.com/benchmarks-amd64.html
+ | title=Crypto++ 5.6.0 Benchmarks
+ | accessdate=2013-06-13
+ | archive-date=2016-10-14
+ | archive-url=https://web.archive.org/web/20161014211419/http://www.cryptopp.com/benchmarks-amd64.html
+ | dead-url=no
+ }}</ref>}}<br/>([[Mebibyte|MiB]]/s)
+|- style="text-align:center;vertical-align:top;"
+| colspan="2" | '''[[MD5|MD5]]'''（作为参考）|| 128 || 128<br>{{nowrap|(4 × 32)}} || 512 || 无限<ref>{{cite web |url=http://tools.ietf.org/html/rfc1321 |title=The MD5 Message-Digest Algorithm |date= |accessdate=2016-04-18 |archive-date=2017-04-26 |archive-url=https://web.archive.org/web/20170426215704/https://tools.ietf.org/html/rfc1321 |dead-url=no }}</ref> || 64 || And, Xor, Rot, {{nowrap|Add (mod 2<sup>32</sup>),}} Or || {{Bad|≤18<br/>（发现碰撞）}} || 335
+|- style="text-align:center;vertical-align:top;"
+| colspan="2" | '''{{nowrap|[[SHA-0|SHA-0]]}}''' || 160 || 160<br>{{nowrap|(5 × 32)}} || 512 || 2<sup>64</sup> − 1|| 80 || rowspan="2" | And, Xor, Rot, {{nowrap|Add (mod 2<sup>32</sup>),}} Or || {{Bad|<34<br/>（发现碰撞）}}  || -
+|- style="text-align:center;vertical-align:top;"
+| colspan="2" | '''{{nowrap|[[SHA-1|SHA-1]]}}''' || 160 || 160<br>{{nowrap|(5 × 32)}} || 512 || 2<sup>64</sup> − 1 || 80 || {{Bad|<63<ref>{{cite web |url=https://sites.google.com/site/itstheshappening/ |title=The SHAppening: freestart collisions for SHA-1 |date= |accessdate=2015-11-05 |archive-date=2017-04-19 |archive-url=https://web.archive.org/web/20170419214146/https://sites.google.com/site/itstheshappening/ |dead-url=no }}</ref><br/>（发现碰撞<ref>{{cite web |url=https://security.googleblog.com/2017/02/announcing-first-sha1-collision.html |title=Announcing the first SHA1 collision |date=2017-02-23 |accessdate=2017-02-23 |archive-date=2017-04-24 |archive-url=https://web.archive.org/web/20170424012912/https://security.googleblog.com/2017/02/announcing-first-sha1-collision.html |dead-url=no }}</ref>）}} || 192
+|- style="text-align:center;vertical-align:top;"
+| rowspan="2" | '''{{nowrap|[[SHA-2|SHA-2]]}}''' || ''SHA-224''<br/>''SHA-256'' || 224<br/>256 || 256<br/>{{nowrap|(8 × 32)}} || 512 || 2<sup>64</sup> − 1 || 64 || And, Xor, Rot, {{nowrap|Add (mod 2<sup>32</sup>),}} Or, Shr || {{Won|112 <br/> 128}} || 139
+|- style="text-align:center;vertical-align:top;"
+| ''SHA-384''<br/>''SHA-512''<br/>''{{nowrap|SHA-512/224}}''<br/>''{{nowrap|SHA-512/256}}'' ||  384<br/>512<br/>224 <br/>256 || 512<br/>{{nowrap|(8 × 64)}} || 1024 || 2<sup>128</sup> − 1 || 80 || And, Xor, Rot, {{nowrap|Add (mod 2<sup>64</sup>),}} Or, Shr || {{Won|192<br/>256<br/>112<br/>128}} || 154
+|- style="text-align:center;vertical-align:top;"
+| rowspan="2" | '''{{nowrap|[[SHA-3|SHA-3]]}}''' || ''SHA3-224''<br/>''SHA3-256''<br/>''SHA3-384''<br/>''SHA3-512'' || 224<br/>256<br/>384<br/>512 || rowspan="2" | 1600<br>{{nowrap|(5 × 5 × 64)}} || 1152<br/>1088<br/>832<br/>576 || rowspan="2" | 无限<ref>{{cite web |url=http://sponge.noekeon.org/ |title=The Sponge Functions Corner |date= |accessdate=2016-01-27 |archive-date=2012-09-04 |archive-url=https://www.webcitation.org/6AQLAQuz4?url=http://sponge.noekeon.org/ |dead-url=no }}</ref>|| rowspan="2" | 24<ref>{{cite web |url=http://keccak.noekeon.org/specs_summary.html |title=The Keccak sponge function family |date= |accessdate=2016-01-27 |archive-date=2016-08-06 |archive-url=https://web.archive.org/web/20160806192717/http://keccak.noekeon.org/specs_summary.html |dead-url=no }}</ref> || rowspan="2" | And, Xor, Rot, Not  || {{Won|112<br/>128<br/>192<br/>256}} || -
+|- style="text-align:center;vertical-align:top;"
+| ''SHAKE128''<br/>''SHAKE256'' || {{nowrap|''d'' (arbitrary)}}<br/>{{nowrap|''d'' (arbitrary)}} || 1344<br/>1088 || {{Won|min(''d''/2, 128)<br/>min(''d''/2, 256)}} || -
+|}
+
+== SHA<sub>d</sub> ==
+{{Unreferenced section|time=2016-12-15T16:17:38+00:00}}
+SHA<sub>d</sub>函數是一個簡單的相同SHA函數的重述：
+
+SHA<sub>d</sub>-256(m)=SHA-256(SHA-256(m))。它會克服有關''延伸長度''攻擊的問題。
+
+== 参考文献 ==
+=== 引用 ===
+{{Reflist}}
+
+=== 来源 ===
+* Eli Biham, Rafi Chen, Near-Collisions of SHA-0, Cryptology ePrint Archive, Report 2004/146, 2004 (to appear CRYPTO 2004) [http://eprint.iacr.org/2004/146/]{{Wayback|url=http://eprint.iacr.org/2004/146/ |date=20040927021451 }}
+* Florent Chabaud, Antoine Joux: Differential Collisions in SHA-0. [[CRYPTO|CRYPTO]] 1998. pp. 56–71.
+* Henri Gilbert, Helena Handschuh: Security Analysis of SHA-256 and Sisters. Selected Areas in Cryptography 2003: pp. 175–193.
+
+== 外部链接 ==
+* [https://web.archive.org/web/20021212213605/http://csrc.nist.gov/encryption/tkhash.html FIPS PUB 180-2]，''安全雜湊標準''
+* [http://www.ietf.org/rfc/rfc3174.txt RFC 3174]{{Wayback|url=http://www.ietf.org/rfc/rfc3174.txt |date=20110824210522 }}，''美國安全雜湊演算法1（SHA1）''
+* [http://www.cs.eku.edu/faculty/styer/460/Encrypt/JS-SHA1.html 這個Javascript SHA-1計算機會展示計算過程中的中繼值]{{Wayback|url=http://www.cs.eku.edu/faculty/styer/460/Encrypt/JS-SHA1.html |date=20040830062306 }}
+* [https://web.archive.org/web/20180620001154/https://passwordsgenerator.pro/sha256 SHA-256在线格计算工具]
+
+== 參見 ==
+{{Portal box|信息技术|计算机科学}}
+* [[编码|编码]]
+* [[密码学|密码学]]
+* [[加密技术|加密技术]]
+* [[演算法|演算法]]
+* [[图灵机|图灵机]]
+* [[图灵归约|图灵归约]]
+* [[交互式证明系统|交互式证明系统]]
+* [[隨機預言機|隨機預言機]]
+* [[MD5|MD5]]
+
+{{密碼學|hash}}
+
+[[Category:密码散列函数|Category:密码散列函数]]

@@ -1,0 +1,426 @@
+ {{noteTA
+|1=zh-hans:图形; zh-hant:圖型;
+|G1=Windows
+|G2=IT
+}}
+{{Infobox file format
+| name = Windows位图
+| extension = <tt>.bmp</tt>
+| mime =
+| owner = [[Microsoft|Microsoft]]
+| creatorcode = <tt>BMP</tt>
+| genre = [[图像文件格式|图像文件格式]]
+| containerfor =
+| containedby =
+| extendedfrom =
+| extendedto =
+}}
+{{ about|一种图像文件格式|Unicode的第1區編碼|基本多文種平面|Linux/Unix平台下的音樂播放器|Beep Media Player}}
+'''BMP'''取自位图'''B'''it'''m'''a'''p'''的縮寫，也称为'''DIB'''（与[[设备|设备]]无关的'''位图'''），是一种独立于[[显示器|显示器]]的[[位图|位图]][[数字图像|数字图像]]文件格式。常见于[[微软视窗|微软视窗]]和[[OS/2|OS/2]]操作系统，Windows GDI API内部使用的DIB[[数据结构|数据结构]]与 BMP 文件格式几乎相同。
+
+图像通常保存的[[颜色深度|颜色深度]]有2（1位）、16（4位）、256（8位）、65536（16位）和1670万（24位）种颜色（其中位是表示每点所用的数据位）。8位图像可以是索引彩色图像外，也可以是灰阶图像。表示{{tsl|en|transparency (graphic)|透明 (繪圖)|透明}}的[[alpha通道|alpha通道]]也可以保存在一个类似于[[灰阶|灰阶]]图像的独立文件中。带有集成的alpha通道的32位版本已经随着[[Windows_XP|Windows XP]]出现，它在[[Windows系统|Windows系统]]的登录界面和系统主题中都有使用。
+
+== 存储算法 ==
+
+BMP文件通常是不[[图像压缩|压缩]]的，所以它们通常比同一幅图像的压缩图像文件格式要大很多。例如，一个800×600的24位几乎占据1.4[[百萬位元組|MB]]空间。因此它们通常不适合在[[因特网|因特网]]或者其他低速或者有容量限制的[[媒介|媒介]]上进行传输。
+
+根据颜色深度的不同，图像上的一个像素可以用一个或者多个字节表示，它由'''n/8'''所确定（n是位深度，1字节包含8个数据位）。图片浏览器等基于字节的[[ASCII|ASCII]]值计算像素的颜色，然后从调色板中读出相应的值。更为详细的信息请参阅下面关于位图文件的部分。
+
+n位2<sup>n</sup>种颜色的包含调色板的位图近似[[字节|字节]]数可以用下面的公式计算：
+
+'''BMP文件大小'''<math>\approx 54+4 \cdot 2^n+\frac{{\rm width} \cdot {\rm height} \cdot n}{8}</math>，其中高度（height）和宽度（width）都以像素为单位。
+
+需要注意的是上面公式中的'''54'''是位图文件的{{tsl|en|Header (information technology)|文件头}}，<math>4 \cdot 2^n</math>是彩色[[調色盤_(電腦圖形學)|调色板]]的大小。
+如果位图文件不包含调色板，如24位，32位位图，则位图的近似[[字节|字节]]数可以用下面的公式计算：
+
+'''BMP文件大小'''<math>\approx 54+\frac{{\rm width} \cdot {\rm height} \cdot n}{8}</math>，其中高度（height）和宽度（width）都以像素为单位。
+
+另外需要注意的是这是一个近似值，对于n位的位图图像来说，尽管可能有最多<math>2^n</math>种颜色，一个特定的图像可能并不会使用这些所有的颜色。由于彩色调色板仅仅定义了图像所用的颜色，所以实际的彩色调色板将小于<math>4 \cdot 2^n</math>。
+
+如果想知道这些值是如何得到的，请参考下面文件格式的部分。
+
+由于存储算法本身决定的因素，根据几个图像参数的不同计算出的大小与实际的文件大小将会有一些细小的差别。
+
+== 文件格式 ==
+
+位图图像文件由若干大小固定（文件头）和大小可变的结构体按一定的顺序构成。由于该文件格式几经演进，这些结构体的版本也很多。
+
+位图文件由以下结构体依次构成：
+
+{| class="wikitable" style="margin: 1em auto"
+|-
+! 结构体名称
+! 可选
+! 大小
+! 用途
+! 备注
+|-
+| '''位图文件头'''
+| 否
+| 14字节
+| 存储位图文件通用信息
+| 仅在读取文件时有用
+|-
+| '''DIB头'''
+| 否
+| 固定（存在7种不同版本）
+| 存储位图详细信息及像素格式
+| 紧接在位图文件头后
+|-
+| '''附加位掩码'''
+| 是
+| 3或4 DWORD（12或16字节）
+| 定义像素格式
+| 仅在DIB头是BITMAPINFOHEADER时存在
+|-
+| '''调色板'''
+| 见备注
+| 可变
+| 定义图像数据（像素数组）所用颜色
+| [[色深|色深]]≤ 8时不能省略
+|-
+| '''填充区A'''
+| 是
+| 可变
+| 结构体对齐
+| 位图文件头中像素数组偏移量的产物
+|-
+| '''像素数组'''
+| 否
+| 可变
+| 定义实际的像素数值
+| 像素数据在DIB头和附加位掩码中定义。像素数组中每行均以4字节对齐
+|-
+| '''填充区B'''
+| 是
+| 可变
+| 结构体对齐
+| DIB头中ICC色彩特性数据偏移量的产物
+|-
+| '''ICC色彩特性数据'''
+| 是
+| 可变
+| 定义色彩特性
+| 可以包含外部文件路径，由该文件来定义色彩特性
+|}
+
+下面的部分将会详细地描述位图文件中保存的数据。需要注意的是这是标准位图的文件格式，其他一些位图图像可能根据生成文件的应用程序不同所使用格式可能会有细微的区别。
+
+=== 位图文件头 ===
+
+这部分数据块位于文件开头，用于进行文件的识别。典型的应用程序会首先普通读取这部分数据以确保的确是位图文件并且没有损坏。所有的整数值都以[[小端序|小端序]]存放（即最低有效位前置）。
+
+{| class="wikitable" style="margin: 1em auto"
+|-
+! 偏移量
+! 大小
+! 用途
+|-
+| 0000<sub>h</sub>
+| 2字节
+| 用于标识BMP和DIB文件的魔数，一般为0x42 0x4D，即ASCII的BM。以下为可能的取值：
+*'''BM''' – Windows 3.1x, 95, NT, ... etc.
+*'''BA''' – OS/2 struct Bitmap Array
+*'''CI''' – OS/2 struct Color Icon
+*'''CP''' – OS/2 const Color Pointer
+*'''IC''' – OS/2 struct Icon
+*'''PT''' – OS/2 Pointer
+|-
+| 0002<sub>h</sub>
+| 4字节
+| BMP文件的大小（单位为字节）
+|-
+| 0006<sub>h</sub>
+| 2字节
+| 保留；实际值因创建程序而异
+|-
+| 0008<sub>h</sub>
+| 2字节
+| 保留；实际值因创建程序而异
+|-
+| 000A<sub>h</sub>
+| 4字节
+| 位图数据（像素数组）的地址偏移，也就是起始地址。
+|}
+
+=== DIB头 ===
+
+这部分告诉应用程序图像的详细信息，在屏幕上显示图像将会使用这些信息，它从文件的第15个字节开始。
+
+这部分数据块对应了Windows和OS/2中的内部使用的头结构以及其它一些版本的变体。但所有版本均以一个DWORD位（32位）开始，用以说明该数据區塊的大小，使得应用程序能够根据这个大小来区分该图像实际使用了哪种版本的DIB头结构。
+
+存在多种版本的头结构的原因是微软对DIB格式进行过多次擴充。下表即为所有不同版本的DIB头：
+
+{| class="wikitable" style="margin: 1em auto"
+|- Windows V3 header
+! 大小
+! 结构名称
+! -{zh-cn:操作系统支持;zh-hant:作業系統支援}-
+! 所加特性
+|-
+| 12
+| BITMAPCOREHEADER<br>OS21XBITMAPHEADER
+| [[OS/2|OS/2]]和3.0版本以来的Windows
+| 
+|-
+| 64
+| BITMAPCOREHEADER2<br>OS22XBITMAPHEADER
+| [[OS/2|OS/2]]
+| 添加半调网屏；添加RLE及[[霍夫曼编码|霍夫曼]]1D压缩。
+|-
+| 40
+| BITMAPINFOHEADER
+| [[Windows_3.0|Windows 3.0]]及更高版本
+| 删除RLE-24及霍夫曼1D压缩；添加16/32位像素格式；添加可选的RGB位掩码。
+|-
+| 52
+| BITMAPV2INFOHEADER
+| Undocumented
+| 删除可选的RGB位掩码；添加必选的RGB位掩码。Adobe Photoshop
+|-
+| 56
+| BITMAPV3INFOHEADER
+| Not officially documented
+| 添加必选的Alpha通道位掩码。Adobe Photoshop
+|-
+| 108
+| BITMAPV4HEADER
+| Windows [[Windows_95|95]]/[[Windows_NT_4.0|NT4]]及更高版本
+| 添加色彩空间类型和[[伽玛校正|伽玛校正]]。
+|-
+| 124
+| BITMAPV5HEADER
+| Windows [[Windows_98|98]]/[[Windows_2000|2000]]及更高版本
+| 添加[[ICC_profile|ICC色彩特性]]。
+|}
+
+BITMAPCOREHEADER之后的版本都只是在前一版本结构末尾追加字段。
+
+出于兼容性的考量，大多数应用程序使用较旧版本的DIB头保存文件。在不考虑OS/2的情况下，目前通用的格式为BITMAPINFOHEADER版本，内容在下表中列出。除非有特殊说明，其中所有值均为无符号整数。
+
+{| class="wikitable" style="margin: 1em auto"
+! 偏移量
+! 大小（位元組）
+! 用途
+|-
+| 0Eh
+| 4
+| 该头结构的大小（40字节）
+|-
+| 12h
+| 4
+| 位图宽度，单位为像素（有符号整数）
+|-
+| 16h
+| 4
+| 位图高度，单位为像素（有符号整数）
+|-
+| 1Ah
+| 2
+| 色彩平面数；只有1为有效值
+|-
+| 1Ch
+| 2
+| 每个像素所占位数，即图像的[[色深|色深]]。典型值为1、4、8、16、24和32
+|-
+| 1Eh
+| 4
+| 所使用的压缩方法，可取值见下表。
+|-
+| 22h
+| 4
+| 图像大小。指原始位图数据的大小（详见后文），与文件大小不是同一个概念。
+|-
+| 26h
+| 4
+| 图像的横向分辨率，单位为像素每米（有符号整数）
+|-
+| 2Ah
+| 4
+| 图像的纵向分辨率，单位为像素每米（有符号整数）
+|-
+| 2Eh
+| 4
+| 调色板的颜色数，为0时表示颜色数为默认的2<sup>''色深''</sup>个
+|-
+| 32h
+| 4
+| 重要颜色数，为0时表示所有颜色都是重要的；通常不使用本项
+|}
+
+注意：BI_RGB图像的图像大小字段可以为0。
+
+压缩方法字段（字节#30-33）的有效值如下表：
+
+{| class="wikitable" style="margin: 1em auto"
+|-
+! 值
+! 标识
+! 压缩方法
+! 备注
+|-
+| 0
+| BI_RGB
+| 无
+| 最常见
+|-
+| 1
+| BI_RLE8
+| [[游程编码|RLE]] 8位/像素
+| 只能用-{zh-cn:于;zh-hant:於}-格式为8位/像素的位图
+|-
+| 2
+| BI_RLE4
+| RLE 4位/像素
+| 只能用-{zh-cn:于;zh-hant:於}-格式为4位/像素的位图
+|-
+| 3
+| BI_BITFIELDS
+| 位字段或者霍夫曼1D压缩（BITMAPCOREHEADER2）
+| 像素格式由位掩码指定，或位图经过霍夫曼1D压缩（BITMAPCOREHEADER2）
+|-
+| 4
+| BI_JPEG
+| JPEG或RLE-24压缩（BITMAPCOREHEADER2）
+| 位图包含[[JPEG|JPEG]]图像或经过RLE-24压缩（BITMAPCOREHEADER2）
+|-
+| 5
+| BI_PNG
+| PNG
+| 位图包含[[Portable_Network_Graphics|PNG]]图像
+|-
+| 6
+| BI_ALPHABITFIELDS
+| 位字段
+| 针对Windows CE .NET 4.0及之后版本
+|}
+
+注意：BI_JPEG和BI_PNG仅对打印机驱动有效，不支持屏幕渲染。
+
+除此之外，OS/2的BITMAPCOREHEADER头也不鲜见：
+
+{| class="wikitable" style="margin: 1em auto"
+|-
+! 偏移量
+! 大小（位元組）
+! 用途
+|-
+| 0Eh
+| 4
+| 该头结构的大小（12字节）
+|-
+| 12h
+| 2
+| 位图宽度，单位为像素
+|-
+| 14h
+| 2
+| 位图高度，单位为像素
+|-
+| 16h
+| 2
+| 色彩平面数；只有1为有效值
+|-
+| 18h
+| 2
+| 每个像素所占位数。典型值为1、4、8和24
+|}
+
+注意：OS/2 BITMAPCOREHEADER的位图都是未压缩的，而且不能是16或32位/像素。OS/2 BITMAPCOREHEADER中的所有值均为无符号整数。
+
+=== 调色板 ===
+
+这部分定义了图像中所用的颜色。如上所述，位图图像一个像素接着一个像素储存，每个像素使用一个或者多个字节的值表示，所以调色板的目的就是要告诉应用程序这些值所对应的实际颜色。
+
+典型的位图文件使用[[RGB|RGB]]彩色模型。在这种模型中，每种颜色都是由不同强度（从0到最大强度）的红色（R）、绿色（G）和蓝色（B）组成的，也就是说，每种颜色都可以使用红色、绿色和蓝色的值所定义。
+
+在位图文件的实现中，调色板可以包含很多条目，条目个数就是图像中所使用的颜色的个数。
+<syntaxhighlight source="c">
+typedef struct tagRGBQUAD {
+    BYTE rgbBlue;
+    BYTE rgbGreen;
+    BYTE rgbRed;
+    BYTE rgbReserved;
+}   RGBQUAD;
+</syntaxhighlight>
+每个条目用来描述一种颜色，包含4个字节，其中三个表示蓝色、绿色和红色，第四个字节没有使用（大多数应用程序将它设为0）；对于每个字节，数值0表示该颜色分量在当前的颜色中没有使用，而数值255表示这种颜色分量使用最大的强度。
+
+=== 像素存储 ===
+
+表示位图中像素的位元是以行为单位对齐存储的，每一行的大小都向上取整为4字节（32位DWORD）的倍数。如果图像的高度大于1，多个经过填充实现对齐的行就形成了'''像素数组'''。
+
+完整存储的一行像素所需的字节数可以通过这个公式计算：
+:<math>\mbox{RowSize} = \left\lfloor\frac { \mbox{BitsPerPixel} \cdot \mbox{ImageWidth}+31
+ }{32}\right\rfloor \cdot 4,</math>
+:''ImageWidth''以像素为单位
+
+==== 像素数组 ====
+
+这部分逐个像素表示图像。每个像素使用一个或者多个字节表示。
+
+通常，像素是从下到上、从左到右保存的。但如果使用的不是BITMAPCOREHEADER，那么未压缩的Windows位图还可以从上到下存储，此时图像高度为负值。
+
+每一行的末尾通过填充若干个字节的数据（并不一定为0）使该行的长度为4字节的倍数。像素数组读入内存后，每一行的起始地址必须为4的倍数。这个限制仅针对内存中的像素数组，针对存储时，仅要求每一行的大小为4字节的倍数，对文件的偏移没有限制。
+
+例如：对于24位色的位图，如果它的宽度为1像素，那么除了每一行的数据（蓝、绿、红）需要占3字节外，还会填充1字节；而如果宽为2像素，则需要2字节的填充；宽为3像素时，需要3字节填充；宽为4像素时则不需要填充。
+
+图像相同的条件下，位图图像文件通常比使用其它压缩算法的图像文件大很多。
+
+==== 压缩 ====
+
+索引色图像可以使用4位或8位[[RLE|RLE]]或[[霍夫曼编码|霍夫曼]]1D算法压缩。
+
+[[OS/2|OS/2]] BITMAPCOREHEADER2 24位色图像则可以使用24位RLE算法压缩。
+
+16位色与32位色图像始终为未压缩数据。
+
+如果需要，任何色深的图像都可以以未压缩形式存储。
+
+==== 像素格式 ====
+
+无论是磁盘上的位图文件还是内存中的位图图像，像素都由一组位（{{lang-en|bit}}）表示。
+
+* 每像素占1位（色深为1位，1bpp）的格式支持2种不同颜色。像素值直接对应一个位的值，最左像素对应第一个字节的最高位。使用该位的值用来对色表的索引：为0表示色表中的第一项，为1表示色表中的第二项（即最后一项）。
+
+* 每像素占2位（色深为2位，2bpp）的格式支持4种不同颜色。每个字节对应4个像素，最左像素为最高的两位（仅在[[Windows_CE|Windows CE]]中有效）。需要使用像素值来对一张含有4个颜色值的色表进行索引。
+
+* 每像素占4位（色深为4位，4bpp）的格式支持16种不同的颜色。每个字节对应2个像素，最左像素为最高的四位。需要使用像素值来对一张含有16个颜色值的色表进行索引。
+
+* 每像素占8位（色深为8位，8bpp）的格式支持256种不同的颜色。每个字节对应1个像素。需要使用像素值来对一张含有256个颜色值的色表进行索引。
+
+* 每像素占16位（色深为16位，16bpp）的格式支持65536种不同的颜色，每2个字节（byte）对应一个像素。该像素的不透明度（{{lang-en|alpha}}）、红、绿、蓝采样值即存储在该2个字节中。
+
+* 每像素占24位（色深为24位，24bpp）的格式支持16777216种不同的颜色，每3个字节对应一个像素。
+
+* 每像素占32位（色深为32位，32bpp）的格式支持4294967296种不同的颜色，每4个字节对应一个像素。
+
+为了区分一个颜色值中的哪些位表示哪种采样值，DIB头给出了一套默认规则，同时也允许使用BITFIELDS将某组位指定为像素中的某个[[通道|通道]]。
+
+== 其他 ==
+
+尽管文件大小比较大，但是位图文件的简单性、在微软视窗和其他地方的广泛使用以及这种格式的优秀文档标准以及没有[[专利|专利]]约束，使得它成为其他操作系统图像处理程序能够读写的一种最为常用的格式。
+
+[[X_Window_System|X Window System]]使用类似的'''.XBM'''格式表示一位[[黑白|黑白]]图像以及'''.XPM'''（'''pixelmap'''）表示[[彩色|彩色]]图像。另外还有一种'''.RAW'''格式，它除了保存原始[[数据|数据]]之外没有任何其他[[信息|信息]]。其他还有[[Portable_Pixmap_file_format|Portable Pixmap file format]]（'''.PPM'''）和[[Truevision_TGA|Truevision TGA]]（'''.TGA'''），但是它们用得很少或者只用于特殊目的。尽管其他格式也保存为“位图”（与[[矢量图形|矢量图]]不同），但是它们使用数据压缩或者颜色索引，所以它们不是严格意义上的位图。
+
+由于包含有冗余信息，许多BMP文件使用类似于[[ZIP_(file_format)|ZIP]]这样的[[无损数据压缩|无损数据压缩]]算法能够取得很好的压缩效果。
+
+== 参见 ==
+
+*[[图像文件格式比较|图像文件格式比较]]
+*[[Windows_Picture_and_Fax_Viewer|Windows Picture and Fax Viewer]]
+==参考文献==
+* Feng Yuan：《Windows Graphics Programming——Win32 GDI and DirectDraw》，Prentice Hall PTR， 1st ed.，2000-12-1，ISBN: 0-13-086985-6, 1234 pages. Chapter 10: Bitmap Basics; Chapter 11:Advanced Bitmap Graphics;  Chapter 12:Image Processing Using Windows Bitmaps;
+
+== 外部链接 ==
+
+* [http://msdn.microsoft.com/en-us/library/dd183377 Microsoft's MSDN page on Bitmaps]{{Wayback|url=http://msdn.microsoft.com/en-us/library/dd183377 |date=20110612153630 }}
+* [http://msdn.microsoft.com/library/default.asp?url=/library/en-us/gdi/bitmaps_4v1h.asp Bitmap Storage Explanation]{{Wayback|url=http://msdn.microsoft.com/library/default.asp?url=%2Flibrary%2Fen-us%2Fgdi%2Fbitmaps_4v1h.asp |date=20190919071421 }}
+* [http://www.digicamsoft.com/bmp/bmp.html Bitmap File Structure]{{Wayback|url=http://www.digicamsoft.com/bmp/bmp.html |date=20060412140709 }}
+* [http://www.herdsoft.com/ti/davincie/imex3j8i.htm An introduction to DIBs (Device Independent Bitmaps)]{{Wayback|url=http://www.herdsoft.com/ti/davincie/imex3j8i.htm |date=20060411050345 }}
+* [https://web.archive.org/web/20060625100540/http://wvnvaxa.wvnet.edu/vmswww/bmp.html Example BMP images with various internal formats]
+* [https://web.archive.org/web/20060811155453/http://www.writeka.com/emage/bmp16_format.html Turbo C++ 3.0 Code to open 16-color bitmaps in DOS]
+* [http://crazycat1130.pixnet.net/blog/post/1345538 點陣圖（Bitmap）檔案格式by chiapei]{{Wayback|url=http://crazycat1130.pixnet.net/blog/post/1345538 |date=20100117163757 }}
+
+{{多媒體壓縮格式}}
+
+[[Category:图形文件格式|Category:图形文件格式]]
