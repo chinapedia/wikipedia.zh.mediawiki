@@ -1,0 +1,179 @@
+{{About|计算机算法|生物过程|神经反向传播}}
+{{Hatnote|反向传播也可以指[[蒙特卡洛树搜索|蒙特卡洛树搜索]]中向上传播的搜索树的方式}}
+{{机器学习导航栏}}
+
+'''反向传播'''（{{lang-en|Backpropagation}}，意為'''误差反向传播'''，缩写为'''BP'''）是對多層[[人工神经网络|人工神经网络]]進行[[梯度下降法|梯度下降]]的算法，也就是用[[链式法则|链式法则]]以网络每层的权重為變數计算[[损失函数|损失函数]]的梯度，以更新权重來最小化损失函数。
+
+==动机==
+任何[[监督式学习|监督式学习]]算法的目标是找到一个能把一组输入最好地映射到其正确的输出的函数。例如一个简单的[[分类问题|分类]]任务，其中输入是动物的图像，正确的输出将是动物的名称。一些输入和输出模式可以很容易地通过单层神经网络（如[[感知器|感知器]]）学习。但是这些单层的感知机只能学习一些比较简单的模式，例如那些非{{le|线性可分的|linearly separable}}模式。例如，人可以通过识别动物的图像的某些特征进行分类，例如肢的数目，皮肤的纹理（无论是毛皮，羽毛，鳞片等），该动物的体型，以及种种其他特征。但是，单层神经网络必须仅仅使用图像中的像素的强度来学习一个输出一个标签函数。因为它被限制为仅具有一个层，所以没有办法从输入中学习到任何抽象特征。多层的网络克服了这一限制，因为它可以创建内部表示，并在每一层学习不同的特征。<ref name=Rumelhart1986 /> 第一层可能负责从图像的单个像素的输入学习线条的走向。第二层可能就会结合第一层所学并学习识别简单形状（如圆形）。每升高一层就学习越来越多的抽象特征，如上文提到的用来图像分类。每一层都是从它下方的层中找到模式，就是这种能力创建了独立于为多层网络提供能量的外界输入的内部表达形式。
+反向传播算法的发展的目标和动机是找到一种训练的多层神经网络的方法，于是它可以学习合适的内部表达来让它学习任意的输入到输出的映射。<ref name=Rumelhart1986 />
+
+==概括==
+
+反向传播算法（BP 算法）主要由两个阶段组成：激励传播与权重更新。
+
+===第1阶段：激励传播===
+每次迭代中的传播环节包含两步：
+# （前向传播阶段）将训练输入送入网络以获得預測結果；
+# （反向传播阶段）對預測結果同训练目标求差([[损失函数|损失函数]])。
+
+===第2阶段：权重更新===
+对于每个突触上的权重，按照以下步骤进行更新：
+# 将输入激励和响应误差相乘，从而获得权重的梯度；
+# 将这个梯度乘上一个比例并取反后加到权重上。
+
+这个比例（百分比）将会影响到训练过程的速度和效果，因此成为「训练因子」。梯度的方向指明了误差扩大的方向，因此在更新权重的时候需要对其取反，从而减小权重引起的误差。
+
+第 1 和第 2 阶段可以反复循环迭代，直到网络对输入的响应达到满意的预定的目标范围为止。
+
+==算法==
+
+=== 數學推導 ===
+假設多層[[人工神经网络|人工神经网络]]的第 <math>l</math> 層是由[[线性算子|线性算子]] <math>W^l:\mathbb{R}^{n_{l-1}} \to \mathbb{R}^{n_l}</math> 和激活函數 <math>f^l:\mathbb{R} \to \mathbb{R}</math> 所構成，也就是說，第 <math>l</math> 層的輸入是 <math>n_{l-1}</math> 維[[实数|实数]]向量
+
+: <math>y^{l-1} = (x_1,\,x_2,\,\cdots,\,x_{n_{l-1}})</math>
+
+輸出則為<math>n_l</math> 維實向量
+
+: <math>y^{l} = (y_1,\,y_2,\,\cdots,\,y_{n_l}) </math>
+
+換句話說，第 <math>l-1</math> 層的輸出 <math>y^{l-1}</math> 就是第 <math>l</math> 層的輸入。
+
+而 <math>y^{l}</math> 和 <math>y^{l-1}</math> 的具體(以第 <math>i</math> 分量表示)[[遞迴關係式|遞迴關係]]為
+
+: <math>{y^{l}}_i = f^l\{\,[W^l(y^{l-1}) ]_i\,\} = f^l
+\left[\,
+\sum^{n_{l-1}}_{j=1}y^{l-1}_{j} W^l_{ji} 
+\,\right]</math> （ <math>1 \leq i \leq n_l </math> ）
+
+上式通常會簡寫為
+
+: <math>y^{l} = f^l[\,W^l(y^{l-1})\,]</math>
+
+若這個多層人工神經網路總共有 <math>L</math> 層，也就是說，<math>y^{0}</math> 是最一開始的輸入，而 <math>y^{L}</math> 是最後一層的輸出，那跟[[损失函数|损失函数]] <math>g</math> 是以最後一層輸出 <math>y^{L}</math> 的各分量 <math>{y^{L}}_i</math> (與真實值)為變數。依據上面的[[遞迴關係式|遞迴關係]]，可以把 <math>g</math> 進一步的轉成以第 <math>L</math> 層的輸入 <math>y^{L-1}</math> 與權重因子 <math>{W^{m}}_{ij}</math> 為變數的[[函数|函数]] <math>g^{L}</math>
+
+: <math>g^{L}(W^{L}_{ij},\,{y^{L-1}_k}) = g\left[\,
+f^{L}\left(
+\sum^{n_{L-1}}_{a = 1} y^{L-1}_{a} W^L_{ab}
+\right)
+\,\right]</math> （ <math>1 \leq k \leq n_{L-1} </math> ,  <math>1 \leq b \leq n_L </math> ）
+
+由此可以歸納到 <math>1 \leq l <L </math> 的情況(注意到前幾層的權重因子不會消失在表達式中)
+
+: <math>g^{l}(W^{l}_{ij},\,\cdots,\,W^{L}_{ij},\,{y^{l-1}_k}) 
+= g^{l+1}\left[\,
+W^{l+1}_{ij},\,\cdots,\,W^{L}_{ij},\, 
+f^{l}\left( 
+\sum^{n_{l-1}}_{a=1}y^{l-1}_a W^l_{ab}
+\right)
+\,\right]</math> （ <math>1 \leq k \leq n_{l-1} </math> ,  <math>1 \leq b \leq n_l </math> ）
+
+那這樣'''如果假設適當的可微分條件'''，由[[链式法则|链式法则]]會有以下的[[遞迴關係式|遞迴關係]] ( 若取 <math>g^{m+1} := g </math> 和 <math>1 \leq l \leq L </math> )
+
+: <math>\frac{\partial g^l}{\partial W^l_{cd}} 
+= \frac{\partial g^{l+1}}{\partial {y^l}_d}\bigg|_{{y^l}_d = f^l(x)}
+\times\frac{df^{l}}{dx}\bigg|_{x = \sum {y^{l-1}}_a W^l_{ad}}
+\times {y^{l-1}}_c
+</math>
+: <math>\frac{\partial g^l}{\partial {y^{l-1}}_c}= \sum^{n_l}_{i=1}
+\left[\,
+\frac{\partial g^{l+1}}{\partial {y^l}_i}\bigg|_{{y^l}_i = f^l(x)}
+\times\frac{df^{l}}{dx}\bigg|_{x = \sum{y^{l-1}}_a W^l_{ai}}
+\times W^l_{ci} 
+\,\right] 
+</math>
+
+這樣就可以依據這個[[遞迴關係式|遞迴關係]]進行[[梯度下降法|梯度下降]]，因為計算上是由 <math>{y^{L}}_i</math> 對 [[损失函数|损失函数]] <math>g</math> 的[[偏微分|偏微分]]出發，一層層向後遞推出前面各層的權重因子梯度，所以被稱為'''反向傳播'''。
+
+注意到可將輸入設為
+
+: <math>y^{l-1} = (1, \,x_1,\,x_2,\,\cdots,\,x_{n_{l-1}})</math>
+
+並多加一行權重因子 <math>W^l_{i0}</math> 為偏移，就可以把有偏移的多層網路納入剛剛討論的範圍內。
+
+=== 實際範例 ===
+三层网络算法（只有一个隐藏层）：
+   初始化网络权值（通常是小的随机值）
+   '''do'''
+      '''forEach''' 训练样本 ex
+         prediction = <u>neural-net-output</u>(network, ex)  ''// 正向传递''
+         actual = <u>teacher-output</u>(ex)
+         计算输出单元的误差 (prediction - actual)
+         计算 <math>\Delta w_h</math>  对于所有隐藏层到输出层的权值                           ''// 反向传递''
+         计算 <math>\Delta w_i</math>  对于所有输入层到隐藏层的权值                           ''// 继续反向传递''
+         更新网络权值 ''// 输入层不会被误差估计改变''
+   '''until''' 所有样本正确分类或满足其他停止标准
+   '''return''' 该网络
+
+这个[[算法|算法]]的名称意味着误差会从输出结点反向传播到输入结点。严格地讲，反向传播算法对网络的可修改权值计算了网络误差的梯度。<ref>Paul J. Werbos (1994). The Roots of Backpropagation. From Ordered Derivatives to Neural Networks and Political Forecasting. New York, NY: John Wiley & Sons, Inc.</ref> 这个梯度会在简单{{le|随机梯度下降法|stochastic gradient descent}}中经常用来求最小化误差的权重。通常“反向传播”这个词使用更一般的含义，用来指涵盖了计算梯度以及在随机梯度下降法中使用的整个过程。在适用反向传播算法的网络中，它通常可以快速收敛到令人满意的[[极值|极小值]]。
+
+==直观理解==
+
+=== 学习作为一个优化问题 ===
+在给出反向传播算法的数学推导之前，我们举一个例子来培养关于神经元的真实输出与正确输出间的直观感受。考虑一个有两个输入单元、一个输出单元、没有隐藏单元的简单神经网络。每个神经元都使用输入的加权作为{{le|人工神经元|Artificial neuron|线性输出}}<ref group="note">注意多层神经网络一般采用非线性的激活函数，而此例中的激活函数为线性函数，所以并不能给出明确的示范。虽然多层神经网络的误差表面要复杂许多，但在小范围内，我们可以用一个抛物面来估测这样的复杂表面。我们在这里采用线性的例子，因为它们简单易懂。</ref>。[[File:A_simple_neural_network_with_two_input_units_and_one_output_unit.png|thumb]]
+
+在训练之前，我们将随机分配权重<math>w_{1}, w_{2}</math>。之后神经元根据[[训练集|训练实例]]进行学习。在此例中，训练集为 (<math>x_{1}</math>, <math>x_{2}</math>, <math>t</math>)，其中 <math>x_{1}</math> 与 <math>x_{2}</math> 是网络的输入，<math>t</math> 为正确输出（在给定相同的输入时网络最终应当产生的输出）。网络在给定 <math>x_{1}</math> 和 <math>x_{2}</math> 时，会计算一个输出 <math>y</math>，很可能与 <math>t</math> 不同（因为权重最初是随机的）。为了衡量期望输出 <math>t</math> 与实际输出 <math>y</math> 之间的差异，一个常用的方法是采用平方误差测度：
+:<math>E=(t-y)^2 \,</math>,
+其中 <math>E</math> 为误差。
+
+举例来讲，考虑单一训练实例的网络：<math>(1, 1, 0)</math>，输入 <math>x_{1}</math> 与 <math>x_{2}</math> 均为1，正确输出 <math>t</math> 为 0。现在若将实际输出 <math>y</math> 画在x轴，误差 <math>E</math> 画在 <math>y</math> 轴，得出的是一条抛物线。[[抛物线|抛物线]]的[[极值|极小值]]对应输出 <math>y</math>，最小化了误差 <math>E</math>。对于单一训练实例，极小值还会接触到 <math>x</math> 轴，这意味着误差为零，网络可以产生与期望输出 <math>t</math> 完全匹配的输出 <math>y</math>。因此，把输入映射到输出的问题就化为了一个找到一个能产生最小误差的函数的[[最佳化問題|最佳化問題]]。[[File:Error_surface_of_a_linear_neuron_for_a_single_training_case.png|right]]
+
+然而，一个神经元的输出取决于其所有输入的加权总和：
+:<math>y=x_1w_1 + x_2w_2</math>,
+其中 <math>w_1</math> 和 <math>w_2</math> 是从输入单元到输出单元相连的权重。因此，误差取决于输入到该神经元的权重，也是网络要学习最终需要改变的。若每个权重都画在一个水平的轴上，而误差画在垂直轴上，得出的就是一个[[抛物面|抛物面]]（若一个神经元有 <math>k</math> 个权重，则误差曲面的[[維度|維度]]就会是 <math>k+1</math>，因而就是二维抛物线的 <math>k+1</math> 维等价）。
+[[File:Error_surface_of_a_linear_neuron_with_two_input_weights.png|thumb]]
+
+反向传播算法的目的是找到一组能最大限度地减小误差的权重。寻找抛物线或任意维度中的任何函数的极大值的方法有若干种。其中一种方法是通过求解方程组，但这依赖于网络是一个[[線性系統|線性系統]]，而目标也需要可以训练多层[[非線性|非線性]]网络（因为多层线性网络与单层网络等价）。在反向传播中使用的方法是[[梯度下降法|梯度下降法]]。
+
+=== 运用类比理解梯度下降法 ===
+{{Further|梯度下降法}}
+[[梯度下降法|梯度下降法]]背后的直观感受可以用假设情境进行说明。一个被卡在山上的人正在试图下山（即试图找到极小值）。大雾使得能见度非常低。因此，下山的道路是看不见的，所以他必须利用局部信息来找到极小值。他可以使用梯度下降法，该方法涉及到察看在他当前位置山的陡峭程度，然后沿着负陡度（即下坡）最大的方向前进。如果他要找到山顶（即极大值）的话，他需要沿着正陡度（即上坡）最大的方向前进。使用此方法，他会最终找到下山的路。不过，要假设山的陡度不能通过简单地观察得到，而需要复杂的工具测量，而这个工具此人恰好有。需要相当长的一段时间用仪器测量山的陡峭度，因此如果他想在日落之前下山，就需要最小化仪器的使用率。问题就在于怎样选取他测量山的陡峭度的频率才不致偏离路线。
+
+在这个类比中，此人代表反向传播算法，而下山路径表示能使误差最小化的权重集合。山的陡度表示误差曲面在该点的[[斜率|斜率]]。他要前行的方向对应于误差曲面在该点的[[梯度|梯度]]。用来测量陡峭度的工具是[[导数|微分]]（误差曲面的斜率可以通过对平方误差函数在该点求[[导数|导数]]计算出来）。他在两次测量之间前行的距离（与测量频率成正比）是算法的学习速率。参见[[#限制|限制一节]]中对此类型“爬山”算法的限制的讨论。
+
+== 限制 ==
+{{Unreferenced section|date=December 2012}}
+* 结果可能会收敛到[[极值|极值]]。如果只有一个极小值，梯度下降的“爬山”策略一定可以起作用。然而，往往是误差曲面有许多局部最小值和最大值。如果梯度下降的起始点恰好介于局部最大值和局部最小值之间，则沿着梯度下降最大的方向会到达局部最小值。[[File:Extrema_example.svg|thumb]]
+* 从反向传播学习获得的收敛很慢。
+* 在反向传播学习的收敛性不能保证。
+** 然而，收敛到全局最小值据说使用自适应终止条件得到保证<ref>{{cite journal|last1=Lalis|first1=Jeremias|last2=Gerardo|first2=Bobby|last3=Byun|first3=Yung-Cheol|title=An Adaptive Stopping Criterion for Backpropagation Learning in Feedforward Neural Network|journal=International Journal of Multimedia and Ubiquitous Engineering|date=2014|volume=9|issue=8|pages=149-156|doi=10.14257/ijmue.2014.9.8.13|url=http://www.sersc.org/journals/IJMUE/vol9_no8_2014/13.pdf|accessdate=17 March 2015|author=|archive-url=https://web.archive.org/web/20160304102053/http://www.sersc.org/journals/IJMUE/vol9_no8_2014/13.pdf|archive-date=2016-03-04|dead-url=yes}}</ref>。
+* 反向传播学习不需要输入向量的标准化（normalization）；然而，标准化可提高性能<ref>ISBN 1-931841-08-X,</ref>。
+
+== 历史 ==
+{{See also|感知器#历史|l1=感知器的历史}}
+[[弗拉基米尔·瓦普尼克|弗拉基米尔·瓦普尼克]]引用（Bryson, A.E.; W.F. Denham; S.E. Dreyfus. Optimal programming problems with inequality constraints. I: Necessary conditions for extremal solutions. AIAA J. 1, 11 (1963) 2544-2550）在他的书《支持向量机》中首次发表反向传播算法。在1969年[[Arthur_E._Bryson|Arthur E. Bryson]]和[[何毓琦|何毓琦]]将其描述为多级动态系统优化方法。<ref>{{cite book|title=Artificial Intelligence A Modern Approach|author1=[[Stuart_J._Russell|Stuart Russell]]|author2=[[彼德·諾米格|Peter Norvig]]|quote=The most popular method for learning in multilayer networks is called Back-propagation. It was first invented in 1969 by Bryson and Ho, but was largely ignored until the mid-1980s.|page=578}}</ref><ref>{{cite book|title=Applied optimal control: optimization, estimation, and control|authors=Arthur Earl Bryson, Yu-Chi Ho|year=1969|pages=481|publisher=Blaisdell Publishing Company or Xerox College Publishing}}</ref>  直到1974年以后在神经网络的背景下应用，并由[[Paul_Werbos|Paul Werbos]]<ref>Paul J. Werbos. Beyond Regression: New Tools for Prediction and Analysis in the Behavioral Sciences. PhD thesis, Harvard University, 1974</ref>、[[David_E._Rumelhart|David E. Rumelhart]]、[[杰弗里·辛顿|杰弗里·辛顿]]和[[Ronald_J._Williams|Ronald J. Williams]]<ref name=Rumelhart1986>{{cite journal|last=Rumelhart|first=David E.|author2=Hinton, Geoffrey E.|author3=Williams, Ronald J.|title=Learning representations by back-propagating errors|journal=Nature|date=8 October 1986|volume=323|issue=6088|pages=533–536|doi=10.1038/323533a0}}</ref><ref name=Alpaydin2010>{{cite book|last=Alpaydın|first=Ethem|title=Introduction to machine learning|year=2010|publisher=MIT Press|location=Cambridge, Mass.|isbn=978-0-262-01243-0|edition=2nd ed.|quote=...and hence the name ''backpropagation'' was coined (Rumelhart, Hinton, and Williams 1986a).|page=250}}</ref>的著作，它才获得认可，并引发了一场人工神经网络的研究领域的“文艺复兴”。在21世纪初人们对其失去兴趣，但在2010年后又拥有了兴趣，如今可以通过[[圖形處理器|GPU]]等大型现代运算器件用于训练更大的网络。例如在2013年，顶级语音识别器现在使用反向传播算法训练神经网络。
+
+==注释==
+{{Reflist|group=note}}
+
+==参见==
+* [[人工神经网络|人工神经网络]]
+* [[生物神经网络|生物神经网络]]
+* {{le|灾难性干扰|Catastrophic interference}}
+* [[表徵學習|表徵學習]]
+* [[AdaBoost|AdaBoost]]
+* [[過適|過適]]
+
+==参考文献==
+{{reflist|2}}
+
+== 外部連結 ==
+*[https://web.archive.org/web/20160206002034/http://numericinsight.com/uploads/A_Gentle_Introduction_to_Backpropagation.pdf A Gentle Introduction to Backpropagation - An intuitive tutorial by Shashi Sathyanarayana] The article contains pseudocode ("Training Wheels for Training Neural Networks") for implementing the algorithm.
+*[http://msdn.microsoft.com/en-us/magazine/jj658979.aspx Neural Network Back-Propagation for Programmers (a tutorial)]{{Wayback|url=http://msdn.microsoft.com/en-us/magazine/jj658979.aspx |date=20160208194649 }}
+*[http://www.matematica.ciens.ucv.ve/dcrespin/Pub/backprop.pdf Backpropagation for mathematicians]{{Wayback|url=http://www.matematica.ciens.ucv.ve/dcrespin/Pub/backprop.pdf |date=20120310222224 }}
+* Chapter 7 [http://page.mi.fu-berlin.de/rojas/neural/chapter/K7.pdf The backpropagation algorithm]{{Wayback|url=http://page.mi.fu-berlin.de/rojas/neural/chapter/K7.pdf |date=20120305071631 }} of [http://page.mi.fu-berlin.de/rojas/neural/index.html.html ''Neural Networks - A Systematic Introduction'']{{Wayback|url=http://page.mi.fu-berlin.de/rojas/neural/index.html.html |date=20160122162741 }} by [[Raúl_Rojas|Raúl Rojas]] (ISBN 978-3540605058)
+*[http://www.codeproject.com/KB/recipes/BP.aspx Implementation of BackPropagation in C++]{{Wayback|url=http://www.codeproject.com/KB/recipes/BP.aspx |date=20120109041844 }}
+*[http://www.codeproject.com/KB/cs/BackPropagationNeuralNet.aspx Implementation of BackPropagation in C#]{{Wayback|url=http://www.codeproject.com/KB/cs/BackPropagationNeuralNet.aspx |date=20111221033903 }}
+*[https://github.com/guycole/BackProp1 Implementation of BackPropagation in Java]{{Wayback|url=https://github.com/guycole/BackProp1 |date=20160209061125 }}
+*[https://github.com/agibsonccc/java-deeplearning/blob/67ffee2c431f5fdbf3be9f393279c98caaa35f76/deeplearning4j-core/src/main/java/org/deeplearning4j/nn/BaseMultiLayerNetwork.java Another Implementation of BackPropagation in Java]
+*[http://ai4r.org/neuralNetworks.html Implementation of BackPropagation in Ruby]{{Wayback|url=http://ai4r.org/neuralNetworks.html |date=20121109100519 }}
+*[http://arctrix.com/nas/python/bpnn.py Implementation of BackPropagation in Python]{{Wayback|url=http://arctrix.com/nas/python/bpnn.py |date=20130215200402 }}
+*[http://freedelta.free.fr/r/php-code-samples/artificial-intelligence-neural-network-backpropagation/ Implementation of BackPropagation in PHP]{{Wayback|url=http://freedelta.free.fr/r/php-code-samples/artificial-intelligence-neural-network-backpropagation/ |date=20120820104546 }}
+*[http://www.tek271.com/documents/others/into-to-neural-networks Quick explanation of the backpropagation algorithm]{{Wayback|url=http://www.tek271.com/documents/others/into-to-neural-networks |date=20130210020402 }}
+*[http://galaxy.agh.edu.pl/~vlsi/AI/backp_t_en/backprop.html Graphical explanation of the backpropagation algorithm]{{Wayback|url=http://galaxy.agh.edu.pl/~vlsi/AI/backp_t_en/backprop.html |date=20121102090627 }}
+*[http://pandamatak.com/people/anand/771/html/node37.html Concise explanation of the backpropagation algorithm using math notation]{{Wayback|url=http://pandamatak.com/people/anand/771/html/node37.html |date=20160326222634 }} by Anand Venkataraman
+*[http://en.wikiversity.org/wiki/Learning_and_Neural_Networks Backpropagation neural network tutorial at the Wikiversity]{{Wayback|url=http://en.wikiversity.org/wiki/Learning_and_Neural_Networks |date=20121101074922 }}
+
+[[Category:機器學習演算法|Category:機器學習演算法]]
+[[Category:人工神经网络|Category:人工神经网络]]
+[[Category:带有伪代码示例的条目|Category:带有伪代码示例的条目]]

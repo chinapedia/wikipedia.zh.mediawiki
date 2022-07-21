@@ -1,0 +1,86 @@
+{{NoteTA|G1=IT}}
+'''語法鹽'''（{{lang-en|'''syntactic salt'''}}）是指在[[計算機語言|計算機語言]]中為了降低[[程式設計師|程式設計師]]撰寫出不良[[程式碼|程式碼]]的設計，但其中仍會有潛藏錯誤存在的可能。例如，C語言或C++語言中{{link-en|Switch指令|switch statement}}的<code>case</code>中若不加<code>break</code>編譯器並不會產生錯誤訊息，部分[[程式設計師|程式設計師]]認為宣告變數型態也是語法鹽的一種。
+
+==語法鹽的例子==
+
+===C++===
+相较于 [[C语言|C]] 中形如 (T)v 的 C 样式转换和 T(v) 的函数样式转换，[[C++|C++]] 通过引入 static_cast、reinterpret_cast、const_cast 和 dynamic_cast 这四种转换来强迫程序员多敲键盘，从而令他们少用转换。{{請求來源}}
+<syntaxhighlight lang="c++">
+double  d =0.1;
+const int i=static_cast<int>(d);//静态转换：编译时能进行类型检查的转换
+void *pv=reinterpret_cast<void*>(i);//重解释转换：在不兼容的类型间进行转换（例如指针与非指针）
+const int *pi=&i;
+int *pi2=const_cast<int*>(pi);//常量转换：去掉 const、volatile 等修饰符
+class C{
+    public:
+    virtual ~C(){};
+};
+class D: pub lic C{};
+D d;
+const C &rc=d;
+const D &rd=dynamic_cast<const D &>(rc);//动态转换：在类继承体系里上下转换，因必须在编译时检查（RTTI）而得名
+</syntaxhighlight>
+
+===Java===
+[[Java|Java]]中並不允许將一个宣告为float[[數據類型|类型]]的变量赋值给一个宣告为int类型的变量，但是[[C語言|C]]和[[C++|C++]]会自动把float类型的变量捨去小數并赋值给int类型的变量。
+<syntaxhighlight lang="java">
+int num1;
+float pi=3.14159;
+num1=pi;  //賦值錯誤
+</syntaxhighlight>
+
+===C#===
+在[[C♯|C#]]中，如果要隱藏一個繼承的[[成員函數|成員函數]]，需加上<code>new</code>關鍵字來說明該[[成員函數|成員函數]]是隱藏的，即便不使用<code>new</code>關鍵字來說明隱藏也能通過編譯產生隱藏效果，但仍會產生編譯警告<ref>{{Cite web|title=new Modifier (C# Reference) - Visual Studio 2012|url=http://msdn.microsoft.com/en-us/library/435f1dw2.aspx|accessdate=2014-02-04|archive-url=https://web.archive.org/web/20140209102832/http://msdn.microsoft.com/en-us/library/435f1dw2.aspx|archive-date=2014-02-09|dead-url=no}}</ref>。
+<syntaxhighlight lang="csharp">
+public class BaseC
+{
+    public int x;
+    public void Invoke() { }
+}
+public class DerivedC : BaseC
+{
+    new public void Invoke() { } //隱藏繼承自BaseC的Invoke()成員函數
+}
+</syntaxhighlight>
+C#在<code>switch</code>語法中的<code>case</code>[[標記_(程式語言)|標記]]代码块內，如果沒有<code>goto</code>、<code>return</code>、<code>throw</code>跳離語法，一定得加上<code>break</code>語法<ref>{{Cite web|title=switch (C# Reference) - Visual Studio 2012|url=http://msdn.microsoft.com/en-us/library/vstudio/06tc147t.aspx|accessdate=2014-02-04|archive-url=https://web.archive.org/web/20140204043332/http://msdn.microsoft.com/en-us/library/vstudio/06tc147t.aspx|archive-date=2014-02-04|dead-url=no}}</ref>。
+<syntaxhighlight lang="csharp">
+switch (caseSwitch)
+{
+    case 1:
+        Console.WriteLine("Case 1...");
+        //在此撰寫break或其他跳離語法，否則將產生編譯錯誤
+    case 2:
+        Console.WriteLine("... and/or Case 2");
+        break;
+}
+</syntaxhighlight>
+
+==總結==
+語法鹽有可能會違背它的初衷，使[[程式碼|程式碼]]的[[程式可讀性|可讀性]]降低或浪費程式碼的空間占用。在極端條件下，真正有用的程式碼可能要比為了滿足語法鹽要求而增加的程式碼還要短。另外一種替代語法鹽的方法是在程式碼可能產生錯誤時，讓[[編譯器|編譯器]]產生警告——這也是C和C++的編譯器常見的作法。
+
+== 参考文献 ==
+{{Reflist}}
+
+== 延伸阅读 ==
+{{ReflistH}}
+* {{Cite book|isbn=0-262-51087-1|title=Structure and Interpretation of Computer Programs|last1=Abelson|first1 = Harold|author-link1 =哈尔·阿伯尔森|last2=Sussman|first2=Gerald Jay|author-link2=傑拉德·傑伊·薩斯曼|first3=Julie|last3=Sussman|year=1996|orig-year=1984|publisher=[[麻省理工学院出版社|MIT Press]]|location=Cambridge, MA|ref={{SfnRef|AbelsonSussman1996}}|title-link=计算机程序的构造和解释}}
+* {{Cite journal|title=Correspondence between ALGOL 60 and Church's Lambda-notation: part I|url=https://dl.acm.org/doi/10.1145/363744.363749|last=Landin|first=P. J.|date=1965-02|journal=Communications of the ACM|issue=2|doi=10.1145/363744.363749|volume=8|pages=89–101|language=en|issn=0001-0782|s2cid=6505810}}
+* {{cite journal|last=Landin|first=Peter J.|title=Programming Without Imperatives – An Example|journal=UNIVAC Systems Programming Research|date=1965-03}}
+* {{Cite journal|title=Getting rid of labels|url=http://link.springer.com/10.1007/s10990-010-9057-5|last=Landin|first=P. J.|date=2009-12|journal=Higher-Order and Symbolic Computation|issue=4|doi=10.1007/s10990-010-9057-5|volume=22|pages=315–329|language=en|issn=1388-3690}}
+* {{cite journal|last=Landin|first=Peter J.|title=A Generalization of Jumps and Labels|journal=UNIVAC Systems Programming Research|date=1965-08}}, reprinted in {{Cite journal|title=A Generalization of Jumps and Labels|url=https://doi.org/10.1023/A:1010068630801|last=Landin|first=Peter J.|date=1998-12-01|journal=Higher-Order and Symbolic Computation|issue=2|doi=10.1023/A:1010068630801|volume=11|pages=125–143|language=en|issn=1573-0557|citeseerx=10.1.1.85.2610}}
+* {{FOLDOC}}
+{{ReflistF}}
+
+== 参閱==
+* [[语法糖|语法糖]]
+
+==外部連結==
+{{Portal box|计算机程序设计}}
+
+[[en:Syntactic_sugar#Syntactic_salt|en:Syntactic_sugar#Syntactic_salt]]
+[[de:Syntaktischer_Zucker#Syntaktisches_Salz|de:Syntaktischer_Zucker#Syntaktisches Salz]]
+[[io:Sintaxala_sukro#Sintaxala_salo|io:Sintaxala_sukro#Sintaxala salo]]
+[[ru:Синтаксический_сахар#Синтаксическая_соль|ru:Синтаксический_сахар#Синтаксическая соль]]
+
+[[Category:程序设计语言语法|Category:程序设计语言语法]]
+[[Category:源代码|Category:源代码]]

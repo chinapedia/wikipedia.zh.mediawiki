@@ -1,0 +1,101 @@
+{{Infobox software
+| name                   = XStream Library
+| logo                   =
+| screenshot             =
+| caption                =
+| developer              = [[Codehaus|Codehaus]]
+| released               = {{initial release|2004|01|01}}
+| latest release version = 1.4.11.1
+| latest release date    = {{release date|2018|10|27}}
+| operating system       = [[跨平台|跨平台]]
+| programming language   = [[Java|Java]]
+| license                = [[BSD许可证|BSD]]风格的许可
+| website                = https://web.archive.org/web/20120711075012/http://xstream.codehaus.org/
+}}
+'''XStream'''是[[Java|Java]]类库，用来将[[面向对象程序设计|对象]][[序列化|序列化]]成[[XML|XML]] （[[JSON|JSON]]）或反序列化为对象。<ref>{{cite web |url=http://www.xml.com/lpt/a/1462 |title=Serializing Java Objects with XStream |publisher=XML.com, O'Reilly Media, Inc |date=2004-08-18 |accessdate=2009-12-14 |deadurl=yes |archiveurl=https://web.archive.org/web/20090411100000/http://www.xml.com/lpt/a/1462 |archivedate=2009-04-11 }}</ref>
+
+XStream是[[自由软件|自由软件]],可以在[[BSD许可证|BSD许可证]]的许可下分发。
+==XStream库==
+XStream在[[執行期|运行时]]使用Java[[反射式编程|反射]]机制对要进行序列化的对象树的结构进行探索，并不需要对对象作出修改。XStream可以序列化内部字段，包括私private和final字段，并且支持非公开类以及内部类。<ref>{{cite web |url=http://www.ibm.com/developerworks/java/library/x-xstream/index.html |title=Use XStream to serialize Java objects into XML |publisher=Ibm.com |date= |accessdate=2009-12-14 |deadurl=yes |archiveurl=https://web.archive.org/web/20090219204439/http://www.ibm.com/developerworks/java/library/x-xstream/index.html |archivedate=2009-02-19 }}</ref>
+
+在缺省情况下，XStream不需要配置映射关系，对象和字段将映射为同名XML元素。但是当对象和字段名与XML中的元素名不同时，XStream支持指定别名。XStream支持以方法调用的方式，或是[[Java_标注|Java 标注]]的方式指定别名。
+
+XStream在进行数据类型转换时，使用系统缺省的类型转换器。同时，也支持用户自定义的类型转换器。
+
+===对象图的序列化===
+当序列化一个对象时，XStream将序列化整个对象图。如果在对象图中遇到重复引用，在生成的XML中奖保留这些引用。以下面的CD类为例：
+<syntaxhighlight lang="java">
+package com.abc.xstream;
+public class Cd {
+	private String id;
+
+	private Cd bonusCd;
+
+	Cd(String id, Cd bonusCd) {
+		this.id = id;
+		this.bonusCd = bonusCd;
+	}
+
+	Cd(String id) {
+		this.id = id;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public Cd getBonusCd() {
+		return bonusCd;
+	}
+}
+</syntaxhighlight>
+并且向列表添加一些Cd对象
+<syntaxhighlight lang="java">
+Cd bj = new Cd("basement_jaxx_singles");
+Cd mr = new Cd("maria rita");
+		
+List order = new ArrayList();
+order.add(mr);
+// 两次添加同一个CD（两个引用指向同一个对象）
+order.add(bj);
+order.add(bj);
+
+// 添加自己 （循环）
+order.add(order);
+
+XStream xstream = new XStream();
+xstream.alias("cd", Cd.class);
+System.out.println(xstream.toXML(order));
+</syntaxhighlight>
+如果在XStream的缺省的相对引用模式下执行以上程序，程序将生成下面的XML：
+<syntaxhighlight lang="xml"><list>
+  <cd>
+    <id>maria rita</id>
+  </cd>
+  <cd>
+    <id>basement_jaxx_singles</id>
+  </cd>
+  <cd reference="../cd[2]"/>
+  <list reference=".."/>
+</list>
+</syntaxhighlight>
+
+== 使用 ==
+* [[Confluence|Confluence]]<ref name="codehaus1">{{cite web |url=http://xstream.codehaus.org/references.html |title=XStream - References |publisher=Xstream.codehaus.org |date= |accessdate=2009-12-14 |deadurl=yes |archiveurl=https://web.archive.org/web/20091228024744/http://xstream.codehaus.org/references.html |archivedate=2009-12-28 }}</ref>
+* [[Apache_Muse|Apache Muse]]<ref name="codehaus1"/>
+
+== 参考文献 ==
+{{Reflist}}
+
+== 外部链接 ==
+{{Portal|自由軟體}}
+* [https://web.archive.org/web/20120711075012/http://xstream.codehaus.org/ XStream类库主页]
+
+<!-- Interlang -->
+
+{{DEFAULTSORT:Xstream}}
+[[Category:XML软件|Category:XML软件]]
+[[Category:Java|Category:Java]]
+[[Category:Java平台軟體|Category:Java平台軟體]]
+[[Category:计算机程序库|Category:计算机程序库]]
+[[Category:自由電腦程式設計工具|Category:自由電腦程式設計工具]]

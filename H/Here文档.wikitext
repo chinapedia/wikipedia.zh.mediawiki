@@ -1,0 +1,648 @@
+{{NoteTA
+|1=zh-hans:程序;zh-hant:程式
+|2=zh-hans:缩进;zh-hant:縮排
+|3=zh-hans:字符串;zh-hant:字串
+}}
+'''here文档'''<ref>{{Cite web|url=http://www.ylinux.org/246|title=Bash Shell 的 HERE 文档 (cat << EOF)|deadurl=yes|archiveurl=https://web.archive.org/web/20120503220914/http://ylinux.org/246|archivedate=2012-05-03|accessdate=2012-07-16}}</ref>，又称作'''heredoc'''、'''hereis'''、'''here-字串'''或'''here-脚本'''，是一种在命令行shell（如[[Bourne_Shell|sh]]、[[C_shell|csh]]、[[Korn_shell|ksh]]、[[bash|bash]]、[[PowerShell|PowerShell]]和[[Z_shell|zsh]]）和程序语言（像[[Perl|Perl]]、[[PHP|PHP]]、[[Python|Python]]和[[Ruby|Ruby]]）里定义一个[[字串|字串]]的方法。它可以保存文字裡面的换行或是縮排等空白字元。一些语言允许在字串里执行[[变量|变量]]替换和[[命令替换|命令替换]]。
+
+here文档最通用的语法是<code><<</code>紧跟一个标识符，从下一行开始是想要引用的文字，然后再在单独的一行用相同的标识符关闭。在Unix shell里，here文档通常用于给命令提供输入内容。
+
+== 实例 ==
+以下几节提供了不同语言和环境中的例子。
+
+=== 命令行 shell ===
+==== Unix shell ====
+在以下几个例子中，文字用here文档传递给[[tr|tr]]命令。
+
+<syntaxhighlight lang="bash">
+ $ tr a-z A-Z <<END_TEXT
+ > one two three
+ > uno dos tres
+ > END_TEXT
+ ONE TWO THREE
+ UNO DOS TRES
+</syntaxhighlight><ref>{{Cite web|url=http://www.diantop.com/article/ldjh/jishuwenda/2011/0217/8728.html|title=unix系统下here文档的详解|deadurl=yes|archiveurl=https://web.archive.org/web/20160310003239/http://www.diantop.com/article/ldjh/jishuwenda/2011/0217/8728.html|archivedate=2016-03-10|accessdate=2012-07-16}}</ref>
+<code>END_TEXT</code>被用作标识符。它指定了here文档的开始和结束<code>ONE TWO THREE</code>和<code>UNO DOS TRES</code>是执行后<code>tr</code>的输出。
+
+在<<后面添加一个减号，可以使TAB字元被忽略。这允许在shell脚本中缩进here文档而不改变它们的值。（注意在命令行上可能会需要输入''Ctrl-v TAB''来真正地输入一个制表符。下边的例子用空格模拟制表符；不要复制粘贴。）
+
+<syntaxhighlight lang="bash">
+ $ tr a-z A-Z <<-END_TEXT
+ >         one two three
+ >         uno dos tres
+ > END_TEXT
+ ONE TWO THREE
+ UNO DOS TRES
+</syntaxhighlight>
+
+默认地，会进行变量替换和命令替换：
+
+<syntaxhighlight lang="bash">
+ $ cat << EOF
+ > Working dir $PWD
+ > EOF
+ Working dir /home/user
+</syntaxhighlight>
+
+这可以通过使用引号包裹标识符来禁用。可以使用单引号或双引号：
+
+<syntaxhighlight lang="bash">
+ $ cat << "EOF"
+ > Working dir $PWD
+ > EOF
+ Working dir $PWD
+</syntaxhighlight>
+
+bash，ksh或zsh中也可以用here-字串：
+
+<syntaxhighlight lang="bash">
+ $ tr a-z A-Z <<<"Yes it is a string"
+ YES IT IS A STRING
+</syntaxhighlight>
+
+==== Windows 命令行 ====
+
+等价的代码目前没有找到。下列代码较为有用。
+
+<syntaxhighlight lang="bash">
+
+set GREETING=Hello
+echo %GREETING%
+cmd /k 
+  echo %GREETING%
+  set GREETING=Goodbye
+  echo %GREETING% 
+exit
+echo %GREETING%
+
+C:\>
+C:\>set GREETING=Hello
+
+C:\>echo %GREETING%
+Hello
+
+C:\>cmd /k
+C:\>  echo %GREETING%
+Hello
+
+C:\>  set GREETING=Goodbye
+
+C:\>  echo %GREETING%
+Goodbye
+
+C:\>exit
+
+C:\>echo %GREETING%
+Hello
+
+C:\>
+
+</syntaxhighlight>
+
+==== Windows PowerShell ====
+在[[Windows_PowerShell|Windows PowerShell]]里，here文档表示的是'''here-字串'''。一个here-字串是由<code>@"</code>或<code>@'</code>开始，由独立成行的<code>"@</code>或<code>'@</code>结束的字串。所有在开始符号和结束符号之间的字符都被当做字面的字串<ref>{{Cite web|url=http://www.windowsitpro.com/article/powershell-faqs/what-is-a-here-string-in-windows-powershell|title=Q. What is a here-string in Windows PowerShell?|deadurl=yes|archiveurl=https://archive.is/20130428134548/http://www.windowsitpro.com/article/powershell-faqs/what-is-a-here-string-in-windows-powershell|archivedate=2013-04-28|accessdate=2012-07-16}}</ref>。
+
+使用双引号引起来的here-字串允许变量替换，而单引号不行<ref>{{Cite web|url=http://blogs.msdn.com/b/powershell/archive/2006/07/15/variable-expansion-in-strings-and-herestrings.aspx|title=Variable expansion in strings and here-strings - Windows PowerShell Blog|accessdate=2012-07-16|archive-date=2012-06-30|archive-url=https://web.archive.org/web/20120630214044/http://blogs.msdn.com/b/powershell/archive/2006/07/15/variable-expansion-in-strings-and-herestrings.aspx|dead-url=no}}</ref>。
+
+变量替换只发生于简单变量（如<code>$x</code>，但不是<code>$x.y</code>或<code>$x[0]</code>）。
+
+可以将命令放进<code>$()</code>中来获取执行结果。
+
+在如下的PowerShell的代码中，文字使用here-字串传递给一个函数。这个函数<code>ConvertTo-UpperCase</code>定义如下：
+
+ PS> function ConvertTo-UpperCase($string) { $string.ToUpper() }
+
+ PS> ConvertTo-UpperCase @'
+ >> one two three
+ >> eins zwei drei
+ >> '@
+ >>
+ ONE TWO THREE
+ EINS ZWEI DREI
+
+下边是一个证明了双引号的here-字串里的变量替换和命令替换的例子：
+
+ $doc, $marty = 'Dr. Emmett Brown', 'Marty McFly'
+ $time = [DateTime]'Friday, October 25, 1985 8:00:00 AM'
+ $diff = New-TimeSpan -Minutes 25
+ @"
+ $doc : Are those my clocks I hear?
+ $marty : Yeah! Uh, it's $($time.Hour) o'clock!
+ $doc : Perfect! My experiment worked! They're all exactly $($diff.Minutes) minutes slow.
+ $marty : Wait a minute. Wait a minute. Doc... Are you telling me that it's $(($time + $diff).ToShortTimeString())?
+ $doc : Precisely.
+ $marty : Damn! I'm late for school!
+ "@
+
+输出：
+
+ Dr. Emmett Brown : Are those my clocks I hear?
+ Marty McFly : Yeah! Uh, it's 8 o'clock!
+ Dr. Emmett Brown : Perfect! My experiment worked! They're all exactly 25 minutes slow.
+ Marty McFly : Wait a minute. Wait a minute. Doc... Are you telling me that it's 08:25?
+ Dr. Emmett Brown : Precisely.
+ Marty McFly : Damn! I'm late for school!
+
+如果用单引号的here-字串代替，输出看起来会像这样：
+
+ $doc : Are those my clocks I hear?
+ $marty : Yeah! Uh, it's $($time.Hour) o'clock!
+ $doc : Perfect! My experiment worked! They're all exactly $($diff.Minutes) minutes slow.
+ $marty : Wait a minute. Wait a minute. Doc... Are you telling me that it's $(($time + $diff).ToShortTimeString())?
+ $doc : Precisely.
+ $marty : Damn! I'm late for school!
+
+=== 编程语言 ===
+==== C++ ====
+[[C++|C++]]11引入了原始字面字串。原始字面字串的前缀有一个“R”，以'''<code>"分隔符(</code>'''开始，以'''<code>)分隔符"</code>'''结束。分隔符可以是0到16字符长，可以包括简单的字符，除开空格，括号与反斜杠。
+
+<syntaxhighlight lang="cpp">
+char const *a = R"(The escape sequence '\n' represents a newline character.)";
+
+wchar_t const *b = LR"...(Raw strings look like R"(...)")...";
+
+char16_t const *b = uR"xyz(
+Universal character names such as "\u5367\u864E\u85CF\u3863" are not
+processed in raw string literals. Therefore the above can be written
+as "臥虎藏龍" in a raw string literal, but only if the source character
+set contains those characters.
+)xyz";
+</syntaxhighlight>
+
+==== D语言 ====
+从2.0版本开始，[[D语言|D语言]]支持用“q”引导的here-字串。这些字串以一个括号（<>，[]，()，{}）或者单独成行的标识符开始。
+
+下列D代码展示了使用括号和标识符的here-字串。
+<syntaxhighlight lang="D">
+int main() {
+    string list = q"[1. Item One
+2. Item Two
+3. Item Three]";
+    writef( list );
+}
+</syntaxhighlight>
+
+使用标识符：
+<syntaxhighlight lang="D">
+int main() {
+    string list = q"IDENT
+1. Item One
+2. Item Two
+3. Item Three
+IDENT";
+    writef( list );
+}
+</syntaxhighlight>
+
+==== Lua ====
+[[Lua|Lua]]使用<code>[[</code>和<code>|</code>和<code>]]</code>定义字面字串，字面字串中的换行会原样保留，不允许含有转义字符。这不便放置长的注释（<code><nowiki>--[[注释|注释]]</nowiki></code>）和一些字串（<code>x = a[b[c]]</code>）。所以在版本5.1时，Lua添加了一个新语法：起始的两个括号中间可以加入任意多的等号，并且只有相同的等号数字才能关闭字串。
+
+<syntaxhighlight lang="Lua">
+local ls = [[
+Initial newline isn't part of the string.
+Two lines.]]
+local lls = [==[
+This notation can be used for Windows paths: 
+local path = [=[C:\Windows\Fonts]=]
+]==]
+</syntaxhighlight>
+
+==== Perl ====
+在Perl里有许多不同的方法使用here文档<ref>{{Cite web|url=http://perldoc.perl.org/perlop.html|title=Perl operators and precedence|accessdate=2012-07-16|archive-date=2012-07-17|archive-url=https://web.archive.org/web/20120717041740/http://perldoc.perl.org/perlop.html|dead-url=no}}</ref>。在here文档的标签名前后加括号的效果和一般的字面字串效果是一样的：标签前后加双引号允许变量扩展，单引号则不行，不加引号的和加双引号的效果一样。加反引号将会把here文档当做shell脚本执行，并获取输出。需要保证结束标签必须在一行的开始，不然这个标签不会被直译器认出。
+
+注意here文档不是从标签开始的，而是从下一行开始的。所以包含标签的语句将会在标签后继续。
+
+这是一个使用双引号的例子：
+
+<syntaxhighlight lang="Perl">
+my $sender = "Buffy the Vampire Slayer";
+my $recipient = "Spike";
+
+print <<"END";
+
+Dear $recipient, 
+
+I wish you to leave Sunnydale and never return.
+
+Not Quite Love,
+$sender
+
+END
+</syntaxhighlight>
+
+输出：
+
+ Dear Spike,
+ 
+ I wish you to leave Sunnydale and never return.
+ 
+ Not Quite Love,
+ Buffy the Vampire Slayer
+
+这是使用单引号的例子：
+
+<syntaxhighlight lang="Perl">
+print <<'END';
+Dear $recipient,
+
+I wish you to leave Sunnydale and never return.
+
+Not Quite Love,
+$sender
+END
+</syntaxhighlight>
+
+输出：
+
+ Dear $recipient,
+ 
+ I wish you to leave Sunnydale and never return.
+ 
+ Not Quite Love,
+ $sender
+
+另外一个使用反引号的例子（可能不具有可移植性）：
+
+<syntaxhighlight lang="Perl">
+my $shell_script_stdout = <<`END`;
+echo foo
+echo bar
+END
+</syntaxhighlight>
+
+可以在同一行上开始多个here文档：
+
+<syntaxhighlight lang="Perl">
+say(<<BEGIN . "this is the middle\n" . <<END);
+This is the beginning:
+BEGIN
+And now it is over!
+END
+
+#上边的和这个相同：
+say("This is the beginning:\nthis is the middle\nAnd now it is over!");
+</syntaxhighlight>
+
+标签本身可以使用空格，这允许here文档不会破坏[[缩进|缩进]]。
+
+<syntaxhighlight lang="Perl">
+  say <<'  END';
+Hello World
+  END
+</syntaxhighlight>
+
+==== PHP ====
+
+<syntaxhighlight lang="PHP">
+<?php
+ 
+$name       = "Joe Smith";
+$occupation = "Programmer";
+echo <<<EOF
+
+	This is a heredoc section.
+	For more information talk to $name, your local $occupation.
+
+	Thanks!
+
+EOF;
+
+$toprint = <<<EOF
+
+	Hey $name! You can actually assign the heredoc section to a variable!
+
+EOF;
+echo $toprint;
+
+?>
+</syntaxhighlight>
+
+输出：
+ 
+ This is a heredoc section.
+ For more information talk to Joe Smith, your local Programmer.
+  
+ Thanks!
+   
+ Hey Joe Smith! You can actually assign the heredoc section to a variable!
+
+包含关闭标识符的行不得包含除了（可选的）分号的任何其他字符。不然它就不会被识别为关闭标识符，PHP就会继续寻找一个。如果没有找到关闭标识符，分析错误会发生在最后一行<ref>{{Cite web |url=http://php.net/heredoc |title=Heredoc in PHP manual |accessdate=2012-07-16 |archive-date=2012-07-12 |archive-url=https://archive.is/20120712054054/http://php.net/heredoc |dead-url=no }}</ref>。
+
+在PHP 5.3和以后的版本中，就像[[Perl|Perl]]一样，可以用单引号包裹标识符阻止变量扩展；这叫作''nowdoc''<ref>{{Cite web|url=http://www.php.net/manual/en/language.types.string.php#language.types.string.syntax.nowdoc|title=PHP: Strings - Manual|accessdate=2012-07-16|archive-date=2012-07-03|archive-url=https://web.archive.org/web/20120703002354/http://php.net/manual/en/language.types.string.php#language.types.string.syntax.nowdoc|dead-url=no}}</ref>：
+
+<syntaxhighlight lang="php">
+$x = <<<'END'
+Dear $recipient,
+
+I wish you to leave Sunnydale and never return.
+
+Not Quite Love,
+$sender
+END;
+</syntaxhighlight>
+
+在PHP5.3和以后的版本中，也可以用双引号包裹标识符，像Perl一样，和不用引号的效果一样。
+
+==== Python ====
+[[Python|Python]]支持使用三个连续单引号或双引号的字面字串（如<code><nowiki>'''</nowiki></code>或<code>"""</code>）。这些字面字串可以跨越多行，支持here文档的功能。
+
+一个简单的Python3兼容的例子给出像上边第一个Perl例子一样：
+
+<syntaxhighlight lang="Python">
+message="""Dear {recipient},
+
+I wish you to leave Sunnydale and never return.
+
+Not Quite Love,
+{sender}
+"""
+print(message.format(sender='Buffy the Vampire Slayer', recipient='Spike'))
+</syntaxhighlight>
+
+在Python3.0以前的版本中，用print关键字代替print函数。
+
+==== R ====
+[[R语言|R语言]]在字串里使用空格，包括换行。不执行变量替换。字串可以用<code>textConnection()</code>函数转化为[[文件描述符|文件描述符]]。例如，以下代码将一个嵌入源码的数据表转化为一个数据框架变量：
+<syntaxhighlight lang="rsplus">
+str <-
+"State          Population Income Illiteracy Life.Exp Murder HS.Grad Frost
+Alabama              3615   3624        2.1    69.05   15.1    41.3    20
+Alaska                365   6315        1.5    69.31   11.3    66.7   152
+Arizona              2212   4530        1.8    70.55    7.8    58.1    15
+Arkansas             2110   3378        1.9    70.66   10.1    39.9    65"
+x <- read.table(textConnection(str), header=TRUE, row.names=1)
+</syntaxhighlight>
+
+==== Racket ====
+[[Racket|Racket]]的here字串以<code>#<<</code>开始，紧跟定义字串终止的标识符<ref>{{Cite web|url=http://docs.racket-lang.org/reference/reader.html#(idx._(gentag._188._(lib._scribblings/reference/reference..scrbl)))|title=Here string in Racket Documentation|accessdate=2012-07-16|archive-date=2011-09-03|archive-url=https://web.archive.org/web/20110903010715/http://docs.racket-lang.org/reference/reader.html#(idx._(gentag._188._(lib._scribblings/reference/reference..scrbl)))|dead-url=no}}</ref>。
+
+字串的内容包括所有的在<code>#<<</code>一行和仅包括定义了的终止符的那一行。即：字串的内容开始于<code>#<<</code>后的新行，结束于终止符之前的一行。
+
+<syntaxhighlight lang="Scheme">
+#lang racket
+
+(displayln
+ #<<HERESTRING
+This is a simple here string in Racket.
+  * One
+  * Two
+  * Three
+HERESTRING
+ )
+</syntaxhighlight>
+
+输出：
+
+ This is a simple here string in Racket.
+   * One
+   * Two
+   * Three
+
+here字串中的转义字符不被识别；字串（和终止符）中所有的字符都会保持原样。
+
+<syntaxhighlight lang="Scheme">
+#lang racket
+
+(displayln
+ #<<A here string in Racket ☺
+This string spans for multiple lines
+and can contain any Unicode symbol.
+So things like λ, ☠, α, β, are all fine.
+
+In the next line comes the terminator. It can contain any Unicode symbol as well, even spaces and smileys!
+A here string in Racket ☺
+ )
+</syntaxhighlight>
+
+输出：
+
+ This string spans for multiple lines
+ and can contain any Unicode symbol.
+ So things like λ, ☠, α, β, are all fine.
+ 
+ In the next line comes the terminator. It can contain any Unicode symbol as well, even spaces and smileys!
+
+here字串可以像一般的字串一样使用：
+
+<syntaxhighlight lang="Scheme">
+#lang racket
+
+(printf #<<END
+Dear ~a,
+
+Thanks for the insightful conversation ~a.
+
+                ~a
+
+END
+        "Isaac"
+        "yesterday"
+        "Carl")
+</syntaxhighlight>
+
+输出：
+
+ Dear Isaac,
+ 
+ Thanks for the insightful conversation yesterday.
+ 
+                 Carl
+
+一个有趣的替代方案是使用语言的扩展<code>at-exp</code>来写@-表达式<ref>{{Cite web|url=http://docs.racket-lang.org/scribble/reader.html|title=@ Syntax in Racket Documentation|accessdate=2012-07-16|archive-date=2012-01-22|archive-url=https://web.archive.org/web/20120122091958/http://docs.racket-lang.org/scribble/reader.html|dead-url=no}}</ref>。
+
+它们看起来像这样：
+
+<syntaxhighlight lang="Scheme">
+#lang at-exp racket
+
+(displayln @string-append{
+  This is a long string,
+  very convenient when a
+  long chunk of text is
+  needed.
+  
+  No worries about escaping
+  "quotes". It's also okay
+  to have λ, γ, θ, ...
+  
+  Embed code: @|(number->string (+ 3 4))|
+  })
+</syntaxhighlight>
+
+输出：
+
+ This is a long string,
+ very convenient when a
+ long chunk of text is
+ needed.
+ 
+ No worries about escaping
+ "quotes". It's also okay
+ to have λ, γ, θ, ...
+ 
+  Embed code: 7
+
+
+==== Ruby ====
+下列[[Ruby|Ruby]]代码用here文档显示了一个列表：
+
+<syntaxhighlight lang="Ruby">
+puts <<GROCERY_LIST
+Grocery list
+------------
+1. Salad mix.
+2. Strawberries.*
+3. Cereal.
+4. Milk.*
+ 
+* Organic
+GROCERY_LIST
+</syntaxhighlight><ref name='ruby'>{{Cite web|url=http://log.gmarik.info/2007/12/rubys-here-document-heredoc-mini.html|title=Ruby's here document mini tutorial.|deadurl=yes|archiveurl=https://web.archive.org/web/20120712082107/http://log.gmarik.info/2007/12/rubys-here-document-heredoc-mini.html|archivedate=2012-07-12|accessdate=2012-07-16}}</ref>
+
+输出：
+
+ Grocery list
+ ------------
+ 1. Salad mix.
+ 2. Strawberries.*
+ 3. Cereal.
+ 4. Milk.*
+ 
+ * Organic
+
+写入文件：
+
+<syntaxhighlight lang="Ruby">
+
+File::open("grocery-list", "w") do |f|
+  f << <<GROCERY_LIST
+Grocery list
+------------
+1. Salad mix.
+2. Strawberries.*
+3. Cereal.
+4. Milk.*
+ 
+* Organic
+GROCERY_LIST
+end
+</syntaxhighlight>
+
+Ruby也允许标识符不起始于行首，需要以<code><nowiki><<-</nowiki></code>起始here文档。
+
+另外，Ruby对待here文档就像一个双引号括起来的字串，即可以使用#{}来进行代码替换。
+
+以下例子展示了这2个特性：
+
+<syntaxhighlight lang="Ruby">
+now = Time.now
+puts <<-EOF
+  It's #{now.hour} o'clock John, where are your kids?
+  EOF
+</syntaxhighlight>
+
+但是如果标识符是用单引号引起来的，则当做单引号内的字串对待<ref name='ruby' />。
+
+类似于Perl，Ruby允许在一行内开始多个here文档<ref name='ruby' />：
+
+<syntaxhighlight lang="Ruby">
+puts <<BEGIN + "<--- middle --->\n" + <<END
+This is the beginning:
+BEGIN
+And now it is over!
+END
+
+# 以上相等于：
+puts "This is the beginning:\n<--- middle --->\nAnd now it is over!"
+</syntaxhighlight>
+
+==== Tcl ====
+[[Tcl|Tcl]]没有为here文档设立特殊的语法，因为一般的字串语法已经允许嵌入换行和保持缩进。用括号括起来的字串，没有扩展：
+
+<!-- The following is really Tcl, but the syntax highlighting is mostly wrong. -->
+<syntaxhighlight lang="text">
+puts {
+Grocery list
+------------
+1. Salad mix.
+2. Strawberries.*
+3. Cereal.
+4. Milk.*
+ 
+* Organic
+}
+</syntaxhighlight>
+
+用引号括起来的字串在运行时执行替换：
+
+<syntaxhighlight lang="Tcl">
+set sender "Buffy the Vampire Slayer"
+set recipient "Spike"
+
+puts "
+Dear $recipient, 
+
+I wish you to leave Sunnydale and never return.
+
+Not Quite Love,
+$sender
+"
+</syntaxhighlight>
+
+在括号包裹的字串里，起始括号和终止括号数量应该一样多。在引号包裹的字串里，括号可以不一样多，但是反斜杠，美元符号和括号都会被替换，此时第一个没有被转义的双引号会结束字串。
+
+需要注意的一点是：上边的字串的第一个和最后一个字符都是换行。<code>string trim</code>可以用来删除头尾空行：
+
+<syntaxhighlight lang="Tcl">
+puts [string trim "
+Dear $recipient, 
+
+I wish you to leave Sunnydale and never return.
+
+Not Quite Love,
+$sender
+" \n]
+</syntaxhighlight>
+
+=== 其它 ===
+==== 微软 NMAKE ====
+在微软[[Make#Microsoft_nmake|NMAKE]]里，here文档是行内的文件。行内文件以<code><<</code>或<code><<文件名</code>开始<ref>{{Cite web|url=http://msdn.microsoft.com/en-us/library/z440c98k|title=Specifying an Inline File|accessdate=2012-07-16|archive-date=2019-10-17|archive-url=https://web.archive.org/web/20191017081314/https://docs.microsoft.com/en-us/cpp/build/reference/specifying-an-inline-file?redirectedfrom=MSDN&view=vs-2019|dead-url=no}}</ref>。第一种方法创建一个临时文件。第二种创建（或覆盖）特定文件。所有的行内文件都终止于独自成行的<code><<</code>，后边可以添加不区分大小写的<code>KEEP</code>或<code>NOKEEP</code>来决定该文件是否保留。两个都不添加和加入<code>NOKEEP</code>效果一样<ref>{{Cite web|url=http://msdn.microsoft.com/en-us/library/a98y7wat|title=Creating Inline File Text|accessdate=2012-07-16|archive-date=2016-05-17|archive-url=https://web.archive.org/web/20160517231931/https://msdn.microsoft.com/en-us/library/a98y7wat|dead-url=no}}</ref>。
+
+<syntaxhighlight lang="make">
+target0: dependent0
+    command0 <<
+临时行内文件
+...
+<<
+
+target1: dependent1
+    command1 <<
+临时行内文件，但保留
+...
+<<KEEP
+
+target2: dependent2
+    command2 <<filename2
+专有行内文件，但用完后删除
+...
+<<NOKEEP
+
+target3: dependent3
+    command3 <<filename3
+专有行内文件
+...
+<<KEEP
+</syntaxhighlight>
+
+== 参见 ==
+*[[tr|tr]]关于tr程序的说明
+*[[管道_(Unix)|管道 (Unix)]]关于管道的信息。
+
+== 参考 ==
+{{reflist|2}}
+
+== 外部链接 ==
+* [http://rosettacode.org/wiki/Here_document Here document]{{Wayback|url=http://rosettacode.org/wiki/Here_document |date=20200629092809 }}。超过15种语言里的here文档。
+
+[[Category:程序架構|Category:程序架構]]
+[[Category:字符串|Category:字符串]]
