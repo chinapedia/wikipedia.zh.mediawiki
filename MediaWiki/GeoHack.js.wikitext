@@ -1,0 +1,30 @@
+/**
+ * The file is used by GeoHack on Tool Labs (linked from [[Template:GeoTemplate|Template:GeoTemplate]]).
+ *
+ * This file is not loaded within a wiki context. Standard libraries (jQuery, mediawiki.js etc) are not available.
+ */
+mw.loader.addStyleTag('.directory tr:hover {background:#fdc!important}');
+mw.loader.load('https://maps.wikimedia.org/leaflet/leaflet.css', 'text/css');
+mw.loader.load('https://maps.wikimedia.org/leaflet/leaflet.js');
+
+var OSM_class_R = /\bOSM:([\d.+-]+)_([\d.+-]+)_([\d.+-]+)_(\w+)/;
+function embedOpenStreetMap() {
+	clearInterval(osmtimer);
+	var osmTarget = document.getElementById('osmEmbed');
+	if (osmTarget && OSM_class_R.exec(osmTarget.className)) {
+		var lat = 1.0 * RegExp.$1,
+		lon = 1.0 * RegExp.$2,
+		zoom = RegExp.$3;
+
+		var map = L.map('osmEmbed').setView([lat, lon], zoom);
+		map.attributionControl.setPrefix('');
+		L.tileLayer('//maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png', {
+			attribution: '维基媒体地图测试版 | 地图数据 © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap贡献者</a>'
+		}).addTo(map);
+
+		L.marker([lat, lon]).addTo(map);
+	}
+}
+
+osmtimer = setInterval("if (document.getElementById('osmEmbed') && L) { embedOpenStreetMap(); }", 200);
+setTimeout('clearInterval(osmtimer)', 5000);

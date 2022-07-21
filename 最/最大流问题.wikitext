@@ -1,0 +1,86 @@
+{{NoteTA
+|G1 = IT
+}}
+[[File:Max_flow.svg|缩略图]]
+在优化理论中,'''最大流问题'''涉及到在一个单源点、单汇点的[[网络流|网络流]]中找到一条最大的流。
+
+最大流问题可以被看作是一个更复杂的网络流问题（循环问题，circulation problem）的特殊情况。s-t流（从源点s到汇点t）的最大值等于s-t割的最小容量，这被称为[[最大流最小割定理|最大流最小割定理]]。
+
+== 历史 ==
+最大流问题最早是在1954年，由T.E.Harris 和F.S.Ross通过一个苏联铁路的交通流量的简化模型提出的。<ref>{{Cite journal|title=On the history of the transportation and maximum flow problems|last=Schrijver|first=A.|journal=Mathematical Programming|issue=3|doi=10.1007/s101070100259|year=2002|volume=91|pages=437–445}}</ref><ref>{{Cite book|title=An Annotated Timeline of Operations Research|last=Gass|first=Saul I.|last2=Assad|first2=Arjang A.|year=2005|isbn=1-4020-8116-2|series=International Series in Operations Research & Management Science|volume=75|pages=79–110|chapter=Mathematical, algorithmic and professional developments of operations research from 1951 to 1956|doi=10.1007/0-387-25837-X_5}}</ref><ref>{{Cite journal|title=Fundamentals of a Method for Evaluating Rail Net Capacities|url=http://www.dtic.mil/dtic/tr/fulltext/u2/093458.pdf|last=Harris|first=T. E.|last2=Ross|first2=F. S.|journal=Research Memorandum|publisher=Rand Corporation|year=1955|access-date=2017-03-07|archive-date=2017-02-17|archive-url=https://web.archive.org/web/20170217142053/http://www.dtic.mil/dtic/tr/fulltext/u2/093458.pdf|dead-url=no}}</ref>
+1955年，L.R. Ford, Jr.和D.R. Fulkerson创建了第一个已知的算法， [[Ford–Fulkerson算法|Ford–Fulkerson算法]]。<ref>{{Cite journal|title=Maximal flow through a network|url=https://archive.org/details/sim_canadian-journal-of-mathematics_1956_8_3/page/399|last=Ford|first=L. R.|last2=Fulkerson|first2=D. R.|authorlink2=D. R. Fulkerson|journal=[[Canadian_Journal_of_Mathematics|Canadian Journal of Mathematics]]|doi=10.4153/CJM-1956-045-5|year=1956|volume=8|pages=399}}</ref><ref>Ford, L.R., Jr.; Fulkerson, D.R., ''Flows in Networks'', Princeton University Press (1962).</ref>
+
+多年来，最大流问题的各种改进算法被发现，例如Edmonds和Karp还有Dinitz的最短增广路算法；Dinitz的阻塞流算法； Goldberg和[[羅伯特·塔揚|陶尔扬]]的Push-Relabel算法；Goldberg和Rao的binary阻塞流算法。 Christiano, Kelner, Madry的电流算法，Spielman 发现一个最大流近似最优解，但仅适用于无向图。<ref>{{Cite book|url=http://math.mit.edu/~kelner/Publications/Docs/klos_maxflow_main.pdf|title=Proceedings of the Twenty-Fifth Annual ACM-SIAM Symposium on Discrete Algorithms|last=Kelner|first=J. A.|last2=Lee|first2=Y. T.|last3=Orecchia|first3=L.|last4=Sidford|first4=A.|year=2014|isbn=978-1-61197-338-9|pages=217|chapter=An Almost-Linear-Time Algorithm for Approximate Max Flow in Undirected Graphs, and its Multicommodity Generalizations|arxiv=1304.2338|doi=10.1137/1.9781611973402.16|deadurl=yes|archiveurl=https://web.archive.org/web/20160303170302/http://math.mit.edu/~kelner/Publications/Docs/klos_maxflow_main.pdf|archivedate=2016-03-03}}</ref><ref>{{Cite web|url=http://web.mit.edu/newsoffice/2013/new-algorithm-can-dramatically-streamline-solutions-to-the-max-flow-problem-0107.html|title=New algorithm can dramatically streamline solutions to the ‘max flow’ problem|accessdate=8 January 2014|date=7 January 2014|last=Knight|first=Helen|publisher=MIT News|archive-date=2014-02-26|archive-url=https://web.archive.org/web/20140226211541/http://web.mit.edu/newsoffice/2013/new-algorithm-can-dramatically-streamline-solutions-to-the-max-flow-problem-0107.html|dead-url=no}}</ref>
+
+== 定义 ==
+[[File:MFP1.jpg|缩略图]]
+
+设<math>N = (V, E)</math>为一个网络，其中<math>s</math>和<math>t</math>分别是<math>N</math>的源点和汇点（<math>s, t \in V</math>）。
+
+: 一个边的'''容量'''为映射<math>c : E \to \mathbb{R}^+</math>，记为<math>c_{uv}</math>或<math>c(u, v)</math>。它表示可以通过一条边的流量的最大值。
+
+: 一个'''流'''为一个映射<math>f : E \to \mathbb{R}^+</math>，记为<math>f_{uv}</math>或<math>f(u, v)</math>，遵循下面两个限制：
+:# 对于每个<math>(u, v) \in E</math>，有<math>f_{uv} \leq c_{uv}</math>（即容量限制：一个边的流量不能超过它的容量）；
+:# 对于每个<math>v \in V \setminus \{s, t\}</math>，有<math>\sum_{u:(u, v) \in E} f_{uv} = \sum_{u:(v, u) \in E} f_{vu}</math>（即流的保留：流入一个节点的流的总和必须等于流出这个节点的流的总和，源点和汇点除外）。
+
+: '''流量'''定义为 <math>|f| = \sum_{v:(s,v) \in E} f_{sv}</math>，其中<math>s</math>为<math>N</math>的源点，它表示从源点到汇点的流的数量。
+
+: '''最大流问题'''就是最大化<math>|f|</math>，即从<math>s</math>点到<math>t</math>点尽可能规划最大的流量。
+
+== 解法 ==
+
+{| class="wikitable" style="margin-bottom: 10px;"
+! 算法
+! 复杂度
+! 描述
+|-
+| [[线性规划|线性规划]]
+|
+|-
+| [[Ford–Fulkerson算法|Ford–Fulkerson算法]]
+| {{math|''O''(''E'' max<nowiki>|</nowiki> ''f'' <nowiki>|</nowiki>)}}
+|
+|-
+| [[Edmonds–Karp算法|Edmonds–Karp算法]]
+|  {{math|''O''(''VE''<sup>2</sup>)}}
+| Ford–Fulkerson算法的特例，使用[[广度优先搜索|广度优先搜索]]寻找增广路径.
+|-
+| [[Dinic算法|Dinic阻塞流算法]]
+|  {{math|''O''(''V''<sup>2</sup>''E'')}}
+|
+|-
+|MPM (Malhotra, Pramodh-Kumar and Maheshwari)算法<ref>{{Cite journal | last1 = Malhotra | first1 =V.M.| last2 = Kumar | first2 = M.Pramodh| last3 = Maheshwari | first3 = S.N.| doi = 10.1016/0020-0190(78)90016-9| title = An <math>O(|V|^3)</math> algorithm for finding maximum flows in networks| journal = Information Processing Letters| volume = 7| issue = 6| pages = 277–278 | year = 1978}}</ref>
+| {{math|''O''(''V''<sup>3</sup>)}}
+| 只适用于无环图。参考 [http://dx.doi.org/10.1016/0020-0190(78)90016-9 Original Paper].
+|-
+| [[Dinic算法|Dinic算法]]
+| {{math|''O''(''VE'' log(''V''))}}
+| 
+|-
+| push-relabel maximum flow算法
+| {{math|''O''(''V''<sup>2</sup>''E'')}}
+|
+|-
+| Push-relabel算法，使用''FIFO'' vertex selection rule
+| {{math|''O''(''V''<sup>3</sup>)}}
+| 
+|-
+| Push-relabel算法，使用 dynamic trees
+| <math>O\left(VE \log \frac {V^2} E \right)</math>
+| 
+|-
+|KRT (King, Rao, Tarjan)算法<ref>{{Cite journal|title=A Faster Deterministic Maximum Flow Algorithm|last=King|first=V.|last2=Rao|first2=S.|journal=Journal of Algorithms|issue=3|doi=10.1006/jagm.1994.1044|year=1994|volume=17|pages=447–474|last3=Tarjan|first3=R.}}</ref>
+| <math>O(EV \log_{\frac E {V \log V}}V)</math>
+|-
+|Binary阻塞流算法<ref>{{Cite journal|title=Beyond the flow decomposition barrier|last=Goldberg|first=A. V.|last2=Rao|first2=S.|journal=[[ACM期刊|ACM期刊]]|issue=5|doi=10.1145/290179.290181|year=1998|volume=45|pages=783}}</ref>
+| <math>O\left(E \cdot \min(V^{\frac 2 3},\sqrt{E}) \cdot \log \frac {V^2} E \log{U}\right)</math>
+|
+|-
+|James B Orlin's + KRT (King, Rao, Tarjan)算法<ref>{{Cite journal|title=Max flows in O(nm) time, or better|last=Orlin|first=James B.|journal=STOC '13 Proceedings of the forty-fifth annual ACM symposium on Theory of computing|doi=10.1145/2488608.2488705|year=2013|pages=765–774}}</ref>
+| <math>O(VE)</math>
+|[http://jorlin.scripts.mit.edu/Max_flows_in_O(nm)_time.html Orlin's algorithm] {{Wayback|url=http://jorlin.scripts.mit.edu/Max_flows_in_O(nm)_time.html |date=20170505230634 }} solves max-flow in <span class="texhtml">''O''(''VE'')</span> time for <math>E \leq O(V^{{16 \over 15} - \epsilon})</math> while KRT solves it in <span class="texhtml">''O''(''VE'')</span> for <math>E > V^{1+\epsilon}</math>.
+|}
+
+== 参考文献 ==
+{{reflist}}
+[[Category:網絡流|Category:網絡流]]

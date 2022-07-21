@@ -1,0 +1,1280 @@
+--
+-- This module will implement {{Navbox}}
+--
+
+local p = {}
+
+--Context start
+local _NavboxContext={}
+local NavboxContextNewObj=function(_prefix,_level,_type)
+    return {
+         prefix = _prefix
+        ,level = _level
+        ,type = _type
+        ,_Context={}
+    }
+end
+
+local NavboxContextMetaFunction={
+     __index=function(_obj,key)
+      local _key = tostring(key)
+      if _key=='prefix' or _key =='level' or _key =='type' then
+       return _obj[_key]
+   else
+         return _obj._Context[_key]
+        end
+    end
+    ,__newindex=function(_obj,key,val)
+     local _key = tostring(key)
+      if _key=='prefix' or _key =='level' or _key =='type' then
+       _obj[_key]=val
+   else
+         _obj._Context[_key]=val
+        end
+    end
+    ,__tostring=function(_obj)
+        local output={}
+        table.insert(output,'prefix='.._obj.prefix)
+        table.insert(output,'level='.._obj.level)
+        table.insert(output,'type='.._obj.type)
+        for k,v in pairs(_obj._Context) do
+            table.insert(output,k..'='..v)
+        end
+        return 'context:{\n'..table.concat(output,",\n")..'\n}'
+    end
+}
+
+_NavboxContext.new=function(prefix,level,_type)
+    local _prefix = prefix or ""
+    local _level = level or 1
+
+    local newobj=NavboxContextNewObj(_prefix,_level,_type or '')
+    setmetatable(newobj,NavboxContextMetaFunction)
+    --[[function newobj:remove(key)
+        mw.log(self)
+        NavboxContext_Remove(self,key)
+    end]]
+    return newobj
+end
+--Context end
+
+local navbarFunc = require('Module:Navbar')._navbar
+local NavboxContext = _NavboxContext
+local getArgs -- lazily initialized
+local DEBUG=false
+
+--全局性参数锚
+local args
+
+--常量定义 (Constant Define)
+local Limit={
+      vertical=35
+     ,horizontal={
+         col =20
+        ,list=6
+      }
+     ,vertical_collapsible=20
+     ,child=10
+}
+
+local NavType={
+     V="vertical" --垂直，list
+    ,H="horizontal" --水平，col
+    ,VC="vertical_collapsible" --折叠垂直
+}
+
+local MainTemplateName = 'Template:NavboxV2'
+
+---------------------------------------------------------------
+--
+--工具箱方法 (Util Function)
+--
+
+local function trim(s)
+    return (mw.ustring.gsub(s, "^%s*(.-)%s*$", "%1"))
+end
+
+local function addNewline(s)
+    if s:match('^[*:;#]') or s:match('^{|') then
+        return '\n' .. s ..'\n'
+    else
+        return s
+    end
+end
+
+---数组除重
+local function removeDump(arr)
+    local _t1,_t2={},{}
+    for _,val in pairs(arr) do
+        _t1[val]=true
+    end
+    --table.remove(arr)
+    for key,_ in pairs(_t1) do
+        table.insert(_t2,key)
+    end
+    return _t2
+end
+
+local function tableToString(_table)
+    local outputs={}
+    if type(_table)=='table' then
+        for k,v in pairs(_table) do
+            local output
+            if type(v)=='table' then
+                output=tableToString(v)
+            else
+                output=tostring(v)
+            end
+            table.insert(outputs,tostring(k).."="..output)
+        end
+    end
+    return '{'..table.concat(outputs,",")..'}'
+end
+
+local debugLog=function(...)
+    if DEBUG then
+        if #arg==1 then
+            mw.log(tostring(arg[1]))
+            mw.log("--------------------")
+        else
+            for k,v in pairs(arg) do
+                local pass= false or tostring(k)=='n'
+                if not pass then
+                    local _v=v
+                    if type(v)=='table' then
+                        _v=tableToString(v)
+                    end
+                    mw.log(tostring(_v))
+                end
+            end
+        end
+    end
+end
+
+---------------------------------------------------------------
+--
+--功能性方法 (Functional Function)
+--
+
+---获得有效的类型
+local getValidType=function(input,defVal)
+ if NavType.V==input or NavType.H==input or NavType.VC==input then
+  return input
+ end
+ return defVal
+end
+
+---检查border判断是不是子Navbox
+local borderIsChild=function(border)
+ if border == 'subgroup' or border == 'child' then
+  return true
+ end
+ return false
+end
+
+---获得参数
+local getArg=function( _a , _b,defVal,context,_contextKey)
+ local contextKey = _contextKey or _b
+ if context and contextKey and context[contextKey] then
+  --debugLog('getArg By Context',contextKey)
+  return context[contextKey]
+ else
+  local prefix= _a~=nil and _a or ""
+  local key= (_b==nil and _a~=nil) and _a or _b
+  local argsKey=prefix .. (prefix=="" and "" or "-") ..key
+  --debugLog('getArg By InputArg',argsKey)
+  return args[ argsKey ] or defVal
+ end
+end
+
+---子Navbox参数组判断
+local checkHaveChild=function(prefix,valuekey)
+    if getValidType(getArg(prefix, valuekey..'-'..'type'),nil) and
+       borderIsChild(getArg(prefix, valuekey..'-'..'border')) then
+        return true
+    end
+    return false
+end
+
+---获得listnum
+local function getListnum(prefix,limit,contentEqList)
+    debugLog("getListnum",{['prefix']=prefix,['limit']=limit})
+    prefix=prefix:gsub('(-)','%%-')
+    local listnums={}
+    for k, v in pairs(args) do
+        k = ('' .. k)
+        --debugLog("getListnum,k=",k)
+        local listnum =
+              ( k:match('^'..prefix..(prefix=="" and "" or "%-")..'list(%d+)$') or
+                k:match('^'..prefix..(prefix=="" and "" or "%-")..'list(%d+)%-')
+              )or
+              ( contentEqList and ( --VerticalCollapsibleTable 的 Content适配
+                 k:match('^'..prefix..(prefix=="" and "" or "%-")..'content(%d+)$') or
+                 k:match('^'..prefix..(prefix=="" and "" or "%-")..'content(%d+)%-')
+              ) or nil)
+        if listnum and tonumber(listnum)<=limit then
+            listnum=tonumber(listnum)
+            table.insert(listnums,listnum)
+            --debugLog("getListnum,listnum=",listnum)
+        end
+    end
+    listnums=removeDump(listnums)
+    table.sort(listnums)
+    debugLog('list:',listnums)
+    debugLog('getListnum End')
+    return listnums
+end
+
+---参数检查和摇匀
+function p.shakeArgs(prefix,level)
+    local _
+    local list_limit=0
+
+    _ = getArg(prefix,"title")
+    _ = getArg(prefix,"above")
+
+    if getArg(prefix,"type")==NavType.H then
+       list_limit = Limit.horizontal.list
+       for i = 1, Limit.horizontal.col do
+           _ = getArg(prefix,"col"..tostring(i).."header")
+           if checkHaveChild(prefix,"col"..tostring(i).."header") then
+               p.shakeArgs((prefix=="" and "" or "-").."col"..tostring(i).."header",level+1)
+           end
+
+           _ = getArg(prefix,"col"..tostring(i))
+           if checkHaveChild(prefix,"col"..tostring(i)) then
+               p.shakeArgs((prefix=="" and "" or "-").."col"..tostring(i),level+1)
+           end
+
+           _ = getArg(prefix,"col"..tostring(i).."footer")
+           if checkHaveChild(prefix,"col"..tostring(i).."footer") then
+               p.shakeArgs((prefix=="" and "" or "-").."col"..tostring(i).."footer",level+1)
+           end
+       end
+    end
+
+    if getArg(prefix,"type")==NavType.V then
+        list_limit = Limit.vertical
+    elseif getArg(prefix,"type")==NavType.VC then
+        list_limit = Limit.vertical_collapsible
+    end
+    for i = 1, list_limit do
+        _ = getArg(prefix,"group"..tostring(i))
+        _ = getArg(prefix,"list"..tostring(i))
+
+        if checkHaveChild(prefix,"list"..tostring(i)) then
+            --debugLog('shakeArgs',prefix,"list"..tostring(i))
+            p.shakeArgs((prefix=="" and "" or "-").."list"..tostring(i),level+1)
+        end
+        if checkHaveChild(prefix,"content"..tostring(i)) then
+            p.shakeArgs((prefix=="" and "" or "-").."content"..tostring(i),level+1)
+        end
+    end
+
+    _ = getArg(prefix,"below")
+end
+---------------------------------------------------------------
+--
+--  元素渲染方法 (Element Render)
+--
+
+---创建表头
+local function createNavTableHeader(context)
+    debugLog('render TableHeader',context)
+    local prefix = context.prefix
+    local state ,title ,border =
+             getArg(prefix,"state",nil,context)
+            ,getArg(prefix,"title")
+            ,getArg(prefix,"border",nil,context)
+    debugLog('render TableHeader args',{['prefix']=prefix,['state']=state,['title']=title,['border']=border})
+
+    local rootTable=
+        mw.html.create('table')
+            :attr('cellspacing', 0)
+            :addClass('nowraplinks')
+            :addClass(getArg(prefix,"bodyclass",nil,context))
+            :css('border-spacing', 0)
+
+    if title and (state ~= 'plain' and state ~= 'off') then
+        rootTable
+            :addClass('collapsible')
+            :addClass( state or 'autocollapse')
+    end
+
+    if border == 'subgroup' or border == 'child' or border == 'none' then
+        rootTable
+            :addClass('navbox-subgroup')
+            :cssText(getArg(prefix,"bodystyle",nil,context))
+            :cssText(getArg(prefix,"style",nil,context))
+    else -- regular navobx - bodystyle and style will be applied to the wrapper table
+        rootTable
+            :addClass('navbox-inner')
+            :css('background', 'transparent')
+            :css('color', 'inherit')
+    end
+
+    rootTable:cssText(getArg(prefix,"innerstyle"))
+
+    debugLog('render TableHeader End')
+    return rootTable
+end
+
+---分割行 （SplitRow）
+local function renderSplitRow(rootTable,context)
+    local colspan= context.splitRowcolspan or context.totalColspan
+    debugLog('render SplitRow',{
+        ['needAddSplitRow']=context.needAddSplitRow,
+        ['colspan']=colspan,
+    }
+    ,context)
+    if context.needAddSplitRow then
+        rootTable
+            :tag('tr')
+                :css('height', '2px')
+                :tag('td')
+                    :attr('colspan',colspan)
+                --[[ :done()
+                :done()]]
+    else
+    end
+    context.splitRowcolspan=colspan
+    context.needAddSplitRow=true
+end
+
+---创建三键导航
+local function renderNavBar(titleCell,context)
+    local prefix = context.prefix
+    local  navbar , state , border, name , titlestyle =
+           getArg(prefix,"navbar",nil,context)
+          ,getArg(prefix,"state",nil,context)
+          ,getArg(prefix,"border",nil,context)
+          ,getArg(prefix,"name")
+          ,getArg(prefix,'titlestyle',nil,context)
+    debugLog('render Navbar',
+        {['prefix']=prefix,
+         ['navbar']=navbar,['state']=state,
+         ['border']=border,['name']=name,
+         ['titlestyle']=titlestyle}
+        ,context
+    )
+    -- Depending on the presence of the navbar and/or show/hide link, we may need to add a spacer div on the left
+    -- or right to keep the title centered.
+    local spacerSide = nil
+
+    if navbar == 'off' then
+        -- No navbar, and client wants no spacer, i.e. wants the title to be shifted to the left. If there's
+        -- also no show/hide link, then we need a spacer on the right to achieve the left shift.
+        if state == 'plain' then spacerSide = 'right' end
+    elseif navbar == 'plain' or
+        (   not name and
+            mw.getCurrentFrame():getParent():getTitle() == MainTemplateName and
+            (border == 'subgroup' or border == 'child' or border == 'none')
+        )
+        then
+        -- No navbar. Need a spacer on the left to balance out the width of the show/hide link.
+            if state ~= 'plain' then spacerSide = 'left' end
+    else
+        -- Will render navbar (or error message). If there's no show/hide link, need a spacer on the right
+        -- to balance out the width of the navbar.
+        if state == 'plain' then spacerSide = 'right' end
+
+        titleCell:wikitext(navbarFunc{
+            name,
+            mini = 1,
+            fontstyle = table.concat(
+            {
+                  getArg(prefix,'basestyle',nil,context) or ''
+                 ,(titlestyle or '')
+                 ,'background:none transparent;border:none'
+            }
+            ,';')
+        })
+    end
+
+    -- Render the spacer div.
+    if spacerSide then
+        titleCell
+            :tag('span')
+                :css('float', spacerSide)
+                :css('width', '8em')
+                :css('font-size', '80%')
+                :css('margin-' .. (spacerSide == 'left' and 'right' or 'left'), '0.5em')
+                :wikitext(' ')
+            --:done()
+    end
+
+    debugLog('render Navbar End')
+end
+
+---标题行
+local function renderTitleRow(rootTable,context)
+    local prefix = context.prefix
+    local title = getArg(prefix,"title",nil,context)
+    if not title then return end
+    debugLog('render TitleRow',{['prefix']=prefix,['title']=title},context)
+    local basestyle = getArg(prefix,"basestyle",nil,context)
+    renderSplitRow(rootTable,context)
+    local titleRow=rootTable:tag('tr')
+
+    local titlegroup=getArg(prefix,"titlegroup")
+    if titlegroup and (not context.notNeedTitlegroup) then
+        titleRow
+            :tag('th')
+                :attr('scope', 'row')
+                :addClass('navbox-group')
+                :addClass(getArg(prefix,"titlegroupclass"))
+                :cssText(basestyle)
+                :cssText(getArg(prefix,"groupstyle",nil,context))
+                :cssText(getArg(prefix,"titlegroupstyle"))
+                :wikitext(titlegroup)
+    end
+
+    local titleCell = titleRow:tag('th'):attr('scope', 'col')
+    local titleStyle = getArg(prefix,"titlestyle",nil,context)
+    local titleColspan = context.totalColspan
+    if titlegroup and (not context.notNeedTitlegroup) then
+        titleCell
+            :css('border-left', '2px solid #fdfdfd')
+            :css('width', '100%')
+
+        titleColspan = titleColspan - 1
+    end
+    titleCell
+        :cssText(basestyle)
+        :cssText(titleStyle)
+        :addClass('navbox-title')
+        :addClass(getArg(prefix,"titleclass",nil,context))
+        :attr('colspan', titleColspan)
+
+    renderNavBar(titleCell,context)
+
+    titleCell
+         :tag('div')
+             :css('font-size', '110%')
+             :wikitext(addNewline(title))
+    --titleRow:done() --row done
+
+    debugLog('render TitleRow End')
+end
+
+---上列
+local function renderAboveRow(rootTable,context)
+    local prefix = context.prefix
+    local above = getArg(prefix,"above")
+    if not above then return end
+    debugLog('render AboveRow',{['prefix']=prefix},context)
+    renderSplitRow(rootTable,context)
+
+    local Colspan=context.totalColspan
+    local AboveRow=rootTable:tag('tr')
+    AboveRow
+        :tag('td')
+            :addClass('navbox-abovebelow')
+            :addClass(getArg(prefix,"aboveclass"))
+            :cssText(getArg(prefix,"basestyle"))
+            :cssText(getArg(prefix,"abovestyle"))
+            :attr('colspan', Colspan)
+            :tag('div')
+                :wikitext(addNewline(above))
+            --[[:done() --div done
+        :done() --td done
+    :done() --row done]]
+    debugLog('render AboveRow End')
+end
+
+---下列
+local function renderBelowRow(rootTable,context)
+    local prefix = context.prefix
+    local below = getArg(prefix,"below")
+    if not below then return end
+    debugLog('render BelowRow',{['prefix']=prefix},context)
+    renderSplitRow(rootTable,context)
+
+    local Colspan=context.totalColspan
+    local BelowRow=rootTable:tag('tr')
+    BelowRow
+        :tag('td')
+            :addClass('navbox-abovebelow')
+            :addClass(getArg(prefix,"belowclass"))
+            :cssText(getArg(prefix,"basestyle"))
+            :cssText(getArg(prefix,"belowstyle"))
+            :attr('colspan', Colspan)
+            :tag('div')
+                :wikitext(addNewline(below))
+            --[[:done() --div done
+        :done() --td done
+    :done() --row done ]]
+    debugLog('render BelowRow End')
+end
+
+---------------------------------------------------------------
+
+--数据列的方法生成器
+local function _renderColRow_FunctionBuilder(rootTable,context,nodeFunc)
+    debugLog("_renderColRow_FunctionBuilder builded",{['context']=context})
+    return function(listCellDivToWrite,divNotClose)
+        debugLog(debug.traceback('FunctionInrenderColRow'),{['context']=context,['divNotClose']=divNotClose})
+        if not divNotClose then
+         listCellDivToWrite:done()--div end
+         :node(
+             rootTable and nodeFunc(rootTable,context) or
+             nodeFunc(context)
+         )
+         :tag('div'):done()
+        else
+         listCellDivToWrite:node(nodeFunc(rootTable,context))
+        end
+    end
+end
+
+---数据行，统一的实现
+local function _renderListRow(rootTable,context,OtherListFunction)
+    renderSplitRow(rootTable,context)
+
+    local prefix, level = context.prefix, context.level
+    local listnum = context.listnum or 1
+    local isFirst, isOdd = (listnum==1) ,(listnum % 2) == 1
+    local ImageRowspan = 2 * context.totalRowspan - 1 + ( context['imageCellCompensate'] or 0)
+    local notNeedImage, notNeedGroup =
+             context.notNeedImage
+            ,context.notNeedGroup
+    debugLog('ValueRow Implement',
+            {['prefix']=prefix,
+            ['listnum']=listnum,
+            ['ImageRowspan']=ImageRowspan,
+            ['HaveOtherListFunction']=tostring(not not OtherListFunction),
+            ['notNeedImage']=notNeedImage,
+            ['notNeedGroup']=notNeedGroup},
+            context)
+    local listRow=rootTable:tag('tr')
+    local groupCell,listCell
+    local insertImage=false
+
+    --image
+    local  imageLeft , image , insertImage =
+                 getArg(prefix,"imageleft",nil,context)
+                ,getArg(prefix,"image",nil,context)
+                ,false
+    --CollapsibleListRow 适配
+    if context.notImageLeftCell then
+        imageLeft = nil
+    end
+    if context.notImageCell then
+        image = nil
+    end
+    if isFirst and (not notNeedImage) then
+        if imageLeft then
+            debugLog('imageLeftRow',{['imageLeft']=imageLeft})
+            listRow:tag('td')--[[,{['parent']=listRow}|,{['parent']=listRow}]]
+             :addClass('navbox-image')
+             :addClass(getArg(prefix,"imageclass",nil,context))
+             :css('width', '0%')
+             :css('padding', '0px 2px 0px 0px')
+             :cssText(getArg(prefix,"imageleftstyle",nil,context))
+             :attr('rowspan', ImageRowspan)
+             :tag('div')
+                 :wikitext(addNewline(imageLeft))
+             :done() --div done
+            :done() --td done
+        end
+        if image then
+          insertImage=true
+        end
+    end
+
+    --list pre
+    local listHaveChild = checkHaveChild(prefix,'list'..listnum)
+    local contentHaveChild = context.contentEqList and checkHaveChild(prefix,'content'..listnum)
+
+    --group
+    local  group, groupwidth , grouppadding , removeGroupPadding =
+             getArg(prefix,"group"..listnum,nil,context)
+            ,( ( group and getArg(prefix,"groupwidth") ) or nil )
+            ,( getArg(prefix,"grouppadding") or '0em 0.75em;' )
+            ,( getArg(prefix,'removeGroupPadding',false) and level > 1 )
+    if group and not notNeedGroup then
+        debugLog('groupTh',{['group']=group})
+        groupCell=listRow:tag('th')
+            :attr('scope', 'row')
+            :addClass('navbox-group')
+            :addClass(getArg(prefix,"groupclass",nil,context))
+            :cssText(getArg(prefix,"basestyle"))
+            :css((( groupwidth and {['width']=groupwidth}) or {}))
+            :cssText(getArg(prefix,"groupstyle"))
+            :cssText(getArg(prefix,'group' .. listnum .. 'style'))
+        local tempEle=groupCell
+        if (borderIsChild(getArg(prefix,"border"))) and (getArg(prefix,'type')==NavType.V) and (not removeGroupPadding) then --针对列式子组合的适配
+         groupCell:cssText("padding-left:0em;padding-right:0em;")
+
+         tempEle=tempEle:tag("div"):css("padding",grouppadding)
+        end
+        tempEle:wikitext(group)
+
+    end
+
+    --list
+    do
+        listCell=listRow:tag('td')
+        if group and not notNeedGroup then
+            listCell
+                :css('text-align', 'left')
+                :css('border-left-width', '2px')
+                :css('border-left-style', 'solid')
+        else
+            listCell:attr('colspan', 2)
+        end
+
+        if not groupwidth then
+            listCell:css('width', '100%')
+        end
+
+        local evenOdd = getArg(prefix,"evenodd")
+        evenOdd = (
+            evenOdd == 'swap' and
+            (isOdd and 'even' or 'odd') or
+            (isOdd and (evenOdd or 'odd') or (evenOdd or 'even'))
+        )
+        local evenOddStyle=(isOdd and getArg(prefix,"evenstyle")) or getArg(prefix,"oddstyle")
+        if context.lockEvenOdd then --CollapsibleListRow 适配
+            evenOdd='odd'
+        end
+        if context.noEvenOddStyle then --CollapsibleListRow 适配
+         evenOddStyle=''
+        end
+
+        local list1padding = (notNeedGroup) and getArg(prefix,"list1padding",nil,context) or
+                             '0em 0.25em'
+        local listNpadding = (isFirst and list1padding) or
+                             ( getArg(prefix,"listpadding",nil,context) or '0em 0.25em' )
+        local listNstyle= --((not notNeedGroup))
+                        (isFirst and getArg(prefix,'list1style','',context) ) or
+                        getArg(prefix,'list'..listnum .. 'style','')
+        local liststyle = getArg(prefix,"liststyle",'',context)
+  
+  listCell
+            :css('padding', '0px')
+            :cssText(liststyle)
+            :cssText(evenOddStyle)
+            :cssText(listNstyle)
+            :addClass('navbox-list')
+            :addClass('navbox-' .. evenOdd)
+            :addClass(getArg(prefix,"listclass"))
+        local tempdiv=listCell:tag('div'):css('padding', listNpadding)
+        --local listHaveChild = checkHaveChild(prefix,'list'..listnum)
+        --local contentHaveChild = context.contentEqList and checkHaveChild(prefix,'content'..listnum)
+        if OtherListFunction then
+            debugLog('ValueRow OtherListFunction',{['otherListFunctionDivNotClose']=context.otherListFunctionDivNotClose})
+            --OtherListFunction(listCell)
+            OtherListFunction(tempdiv,context.otherListFunctionDivNotClose)
+        elseif (listHaveChild or contentHaveChild) and level<= Limit.child then
+            local listKeyName='list'
+            if contentHaveChild then
+                listKeyName='content'
+            end
+            local childContext=NavboxContext.new(
+                 prefix..(prefix=='' and '' or '-')..listKeyName..listnum ,
+                 level+1 ,
+                 getValidType(
+                     getArg(prefix..(prefix=='' and '' or '-')..
+                                   listKeyName..listnum,'type'),
+                     NavType.V
+                 )
+            )
+            debugLog('ValueRow NewChild',childContext)
+            tempdiv:done()-- div end
+                :node(p.renderNavTable(childContext))
+                :tag('div'):done()
+        else
+            local listContent = getArg(prefix,'list'..listnum,'')..
+                           ( ((not context.contentEqList ) and '') or getArg(prefix,'content' .. listnum,''))
+            debugLog('ValueRow listnum',{['listnum']=listnum})
+            tempdiv:wikitext(addNewline(listContent))
+        end
+    end
+    --end
+
+    if insertImage then
+      debugLog('imageRow',{['image']=image})
+      listRow:tag('td')
+          :addClass('navbox-image')
+          :addClass(getArg(prefix,"imageclass",nil,context))
+          :css('width', '0%')
+          :css('padding', '0px 0px 0px 2px')
+          :cssText(getArg(prefix,"imagestyle",nil,context))
+          :attr('rowspan', ImageRowspan)
+          :tag('div')
+              :wikitext(addNewline(image))
+       --[[:done() --div done
+      :done() --td done ]]
+    end
+    debugLog('ValueRow Implement End')
+end
+
+---数据行，垂直式的具体实现
+local function renderListRow(rootTable,context)
+    debugLog('render ListRow',context)
+    _renderListRow(rootTable,context)
+    debugLog('render ListRow End')
+end
+
+---------------------------------------------------------------
+
+---数据列，水平式的具体实现 （ColRow）
+local function _renderColRow(rootTable,context)
+    local prefix, level = context.prefix, context.level
+    local fullwidth  =getArg(prefix,"fullwidth")
+    local col1header,col1,col1footer=
+           getArg(prefix,'col'..'1'..'header')
+          ,getArg(prefix,'col'..'1')
+          ,getArg(prefix,'col'..'1'..'footer')
+    debugLog('ColRow Implement',{['prefix']=prefix},context)
+    --new table root
+    rootTable=mw.html.create('table')
+    rootTable
+        :addClass("navbox-columns-table")
+        :attr("cellspacing","0")
+        :cssText("text-align:left;")
+        :cssText( ( col1header or fullwidth ) and
+            "width:100%;" or
+            "width:auto;margin-left:auto;margin-right:auto;"
+        )
+        :cssText(getArg(prefix,"coltablestyle"))
+
+    local headerTR,colbodyTR,footerTR=nil,nil,nil
+
+    context.needAddSplitRow=false
+    context.splitRowcolspan=1
+    --header
+    if col1header then
+        renderSplitRow(rootTable,context)
+        debugLog('ColRow Header',{})
+        headerTR=rootTable:tag('tr')
+        for colnum=1,Limit.horizontal.col do
+            debugLog('ColRow Header',colnum)
+            local isFirst,isOdd = colnum == 1, (colnum % 2) == 1
+            local colheaderkey='col'..colnum..'header'
+            local colNheader= isFirst and col1header or getArg(prefix,colheaderkey)
+
+            if  headerTR  and colNheader then
+                debugLog('ColRow Herder Cell',{['colnum']=colnum})
+                local headerNCell=headerTR:tag('td')
+                headerNCell
+                    :addClass('navbox-abovebelow')
+                    :cssText(isFirst and "" or "border-left:2px solid #fdfdfd;")
+                    :cssText(getArg(prefix, "colheaderstyle"))
+                    :cssText(getArg(prefix, colheaderkey..'style'))
+                    :attr(( colnum~=Limit.horizontal.col and {['colspan']=getArg(prefix,colheaderkey..'colspan',1)} ) or {})
+--[[                if checkHaveChild(prefix,colheaderkey) and level<= Limit.child then
+                    local childContext=NavboxContext.new(colheaderkey ,level+1 ,NavType.H)
+                    debugLog('ColRow Herder NewChild',childContext)
+                    headerNCell:node(p.renderNavTable(childContext):allDone())
+                else]]
+                    --debugLog('ColRow Herder Cell',{['colnum']=colnum})
+                    --headerNCell
+                    :wikitext(addNewline("'''"..colNheader.."'''"))
+                --end
+            end
+        end
+        debugLog('ColRow Header End',{['colnum']=colnum})
+    end
+
+    --col
+    local col1havechild = checkHaveChild(prefix,"col1")
+    if col1 or col1havechild then
+        renderSplitRow(rootTable,context)
+        debugLog('ColRow Body',{
+         ['col1havechild']=col1havechild
+        })
+        colbodyTR=rootTable:tag('tr'):cssText('vertical-align:top;')
+        if not(col1header or col1footer or fullwidth) then
+            local padding,test0=getArg(prefix, "padding"),nil
+            if padding then
+                padding = trim(padding)
+                test0=padding:find('^0[%%%a]?[%a]?[;]?$')
+            end
+            if test0~=nil or padding=='off' then else
+                colbodyTR
+                    :tag('td')
+                        :css("width", padding or '5em')
+                        :wikitext('   ')
+                    :done()
+            end
+        end
+        for colnum=1,Limit.horizontal.col do
+            debugLog('ColRow Body',colnum)
+            local isFirst,isOdd = colnum == 1, (colnum % 2) == 1
+            local colkey = 'col'..colnum
+            local colN = isFirst and col1 or getArg(prefix,colkey)
+            local colNhavechild = isFirst and col1havechild or
+                                  checkHaveChild(prefix,colkey)
+            if  colN or colNhavechild then
+                local oddevenstyle = getArg( prefix , isOdd and 'oddcolstyle' or 'evencolstyle')
+                local colNCell=colbodyTR
+                    :tag('td')
+                    :css("padding","0px")
+                    :cssText(((not isFirst) and "border-left:2px solid #fdfdfd;" ) or '')
+                    :cssText(getArg(prefix,'colstyle'))
+                    :cssText(oddevenstyle)
+                    :cssText(getArg(prefix, colkey..'style'))
+                    :css('width', ( getArg(prefix, colkey..'width') or getArg(prefix,'colwidth') ) or '10em')
+
+                if checkHaveChild(prefix,colkey) and level<= Limit.child then
+                    local childContext=NavboxContext.new(prefix..(prefix=='' and '' or '-')..colkey ,level+1 ,getValidType(getArg(prefix,'type'),NavType.H))
+                    debugLog('ColRow Body NewChild',childContext)
+                    colNCell:tag('div'):done()
+                    :node(p.renderNavTable(childContext):allDone())
+                    :tag('div'):done()
+                else
+                    debugLog('ColRow Body Cell',{['colnum']=colnum})
+                    colNCell:tag('div'):wikitext(addNewline(colN))
+                end
+            end
+            debugLog('ColRow Body End',{['colnum']=colnum})
+        end
+    end
+
+    --footer
+    if col1footer then
+        renderSplitRow(rootTable,context)
+        debugLog('ColRow footer',{})
+        footerTR=rootTable:tag('tr')
+        for colnum=1,Limit.horizontal.col do
+            debugLog('ColRow footer',colnum)
+            local isFirst,isOdd = colnum == 1, (colnum % 2) == 1
+            local colfooterkey='col'..colnum..'footer'
+            local colNfooter=isFirst and col1footer or getArg(prefix,colfooterkey)
+
+            if colNfooter then
+                debugLog('ColRow footer Cell',{['colnum']=colnum})
+                local footerNCell=footerTR:tag('td')
+                footerNCell
+                    :addClass('navbox-abovebelow')
+                    :cssText(isFirst and "" or "border-left:2px solid #fdfdfd;")
+                    :cssText(getArg(prefix, "colfooterstyle"))
+                    :cssText(getArg(prefix, colfooterkey..'style'))
+                    :attr(( colnum~=Limit.horizontal.col and {['colspan']=getArg(prefix,colfooterkey..'colspan',1)}) or {})
+--[[                if checkHaveChild(prefix,colfooterkey) and level<= Limit.child then
+                    local childContext=NavboxContext.new(colfooterkey ,level+1 ,NavType.H)
+                    debugLog('ColRow footer NewChild',childContext)
+                    footerNCell:node(p.renderNavTable(childContext):allDone())
+                else]]
+                    --debugLog('ColRow footer Cell',{['colnum']=colnum})
+                    --footerNCell
+                    :wikitext(addNewline("'''"..colNfooter.."'''"))
+                --end
+            end
+        end
+        debugLog('ColRow footer End',{['colnum']=colnum})
+    end
+
+    debugLog('ColRow Implement End')
+    return rootTable:allDone()
+end
+
+--数据列，具体实现
+local function renderColRow(rootTable,context)
+    debugLog('renderColRow',{['context']=context})
+
+    context.notNeedGroup = true
+    context['list1padding']='0px'
+    context['list1style']="background:transparent;color:inherit;"
+    context['otherListFunctionDivNotClose']=true
+    context['imageCellCompensate']=2
+
+    _renderListRow(
+        rootTable,context,
+        _renderColRow_FunctionBuilder(rootTable,context,_renderColRow)
+    )
+    --clean up
+    context.notNeedGroup=nil
+    context['list1padding']=nil
+    context['list1style']=nil
+    context['otherListFunctionDivNotClose']=nil
+    context['imageCellCompensate']=nil
+    debugLog('renderColRow End')
+end
+
+---------------------------------------------------------------
+
+--折叠行式的子Nabox
+local function _renderSmallNavboxInCollapsibleListRow(rootTable,context)
+    local prefix, level = context.prefix, context.level
+    debugLog('_renderSmallNavboxInCollapsibleListRow',{['prefix']=prefix},{['context']=context})
+    local listnum = context.listnum
+
+    --部分需要压制传入的样式
+    context.bodyclass = ''
+    context.titleclass = ''
+    context.groupclass = ''
+    context.imageclass = ''
+    context.bodystyle = ''
+    context.style = ''
+    context.basestyle = ''
+    context.imagestyle = ''
+    context.imageleftstyle = ''
+
+    --传入renderNavBar,renderTitleRow
+    context.navbar='plain'
+    context.border='child'
+    local selected , abbrN , state = 
+          getArg(prefix,'selected') , getArg(prefix,'abbr'..listnum) , 'uncollapsed'
+    if selected ~= nil and selected == abbrN then 
+    	state='uncollapsed'
+	else
+		state=getArg(prefix,'state'..listnum,'collapsed')
+	end
+    context.state = state
+
+    --传入renderTitleRow
+    --context.titleEqGroup=true
+    context.notNeedTitlegroup=true
+    context.titlestyle=table.concat(
+    {
+          (getArg(prefix,'basestyle','')                  )
+         ,(getArg(prefix,'groupstyle','')                 )
+         ,(getArg(prefix,'secttitlestyle','')             )
+         ,(getArg(prefix,'group'..listnum..'style','')    )
+         ,(getArg(prefix,'sect'..listnum..'titlestyle',''))
+    }
+    ,';')
+    context.title=(getArg(prefix,'group'..listnum,'')  )..
+                  (getArg(prefix,'sect'..listnum,'')   )..
+                  (getArg(prefix,'section'..listnum,''))
+
+    --传入renderListRow
+    context.contentEqList=true
+    context.notNeedGroup=true
+    context.liststyle=table.concat(
+    {
+          (getArg(prefix,'liststyle','')                )
+         ,(getArg(prefix,'contentstyle','')             )
+         ,(getArg(prefix,'list'..listnum..'style','')   )
+         ,(getArg(prefix,'content'..listnum..'style',''))
+    }
+    ,';')
+    local totalColspan=2 --title,above,below
+    local totalRowspan=1 --image,imageleft
+    --传入image
+    local  imageLeft,image=
+                 getArg(prefix,"imageleft"..listnum,nil,context,'imageleft')
+                ,getArg(prefix,"image"..listnum,nil,context,'image')
+    if imageLeft then
+     totalColspan = totalColspan + 1
+     context.imageleft = imageLeft
+    else
+     context.notImageLeftCell=true --CollapsibleListRow 适配
+    end
+    if image then
+     totalColspan = totalColspan + 1
+     context.image = image
+    else
+     context.notImageCell=true --CollapsibleListRow 适配
+    end
+
+    context.totalColspan = totalColspan
+    context.totalRowspan = totalRowspan
+    context.splitRowcolspan = totalColspan
+    context.lockEvenOdd=true --CollapsibleListRow 适配
+
+    debugLog('SmallNavboxInCollapsibleListRow Implement','listnum='..listnum,context)
+    --start
+    local rootTable2 = createNavTableHeader(context)
+    renderTitleRow(rootTable2,context)
+    --only 1 list
+    local otherListFunction
+    local listHaveChild = checkHaveChild(prefix,'list'..listnum)
+    local contentHaveChild = context.contentEqList and checkHaveChild(prefix,'content'..listnum)
+    if (listHaveChild or contentHaveChild) and level<= Limit.child then
+        local listKeyName='list'
+        if contentHaveChild then
+            listKeyName='content'
+        end
+        local childContext=NavboxContext.new(
+                               prefix..(prefix=='' and '' or '-')..listKeyName..listnum ,
+                               level+1 ,
+                               getValidType(getArg(prefix..(prefix=='' and '' or '-')..listKeyName..listnum,'type'),NavType.V))
+        debugLog('SmallNavboxInCollapsibleListRow NewChild',childContext)
+        otherListFunction=_renderColRow_FunctionBuilder(nil,childContext,p.renderNavTable)
+    end
+    context.noEvenOddStyle=true
+    _renderListRow(rootTable2,context,otherListFunction)
+ context.noEvenOddStyle=nil
+    debugLog('_renderSmallNavboxInCollapsibleListRow End')
+    return rootTable2:allDone()
+end
+
+---折叠行具体实现
+local function renderCollapsibleListRow(rootTable,context)
+   local prefix, level = context.prefix, context.level
+   debugLog('renderCollapsibleListRow',{['prefix']=prefix},{['context']=context})
+   context.notNeedGroup = true
+   local listnum = context.listnum
+   local context_function
+   if getArg(prefix,'group'..listnum)   or
+      getArg(prefix,'sect'..listnum)    or
+      getArg(prefix,'section'..listnum) then
+        local grandChild_context=NavboxContext.new(prefix,level)
+        grandChild_context.notNeedGroup=true
+        grandChild_context.listpadding=getArg(prefix,'listpadding')
+        grandChild_context.listnum=listnum
+        context_function=_renderColRow_FunctionBuilder(
+            rootTable,grandChild_context,
+            _renderSmallNavboxInCollapsibleListRow
+        )
+        debugLog('renderCollapsibleListRow function generate',{['context']=context,['grandChild_context']=grandChild_context})
+      end
+ context.noEvenOddStyle=true
+    debugLog('renderCollapsibleListRow renderListRow',{['context']=context})
+    _renderListRow(rootTable,context,context_function)
+    context.noEvenOddStyle=nil
+    debugLog('renderCollapsibleListRow End')
+end
+
+---------------------------------------------------------------
+--
+--   Tracking categories
+--
+local function needsHorizontalLists(context)
+    local prefix = context.prefix
+    local border ,listclass ,bodyclass =
+             context.border    or getArg(prefix,'border')
+            ,context.listclass or getArg(prefix,'listclass')
+            ,context.bodyclass or getArg(prefix,'bodyclass')
+
+    if borderIsChild(border)
+        or getArg(prefix,'tracking') == 'no' then
+        return false
+    end
+
+    local listClasses = {'plainlist', 'hlist', 'hlist hnum', 'hlist hwrap', 'hlist vcard', 'vcard hlist', 'hlist vevent'}
+    for i, cls in ipairs(listClasses) do
+        if listclass == cls or bodyclass == cls then
+            return false
+        end
+    end
+
+    return true
+end
+
+local function hasBackgroundColors(context)
+    local prefix = context.prefix
+    local titlestyle ,groupstyle ,basestyle =
+             context.titlestyle or getArg(prefix,'titlestyle')
+            ,context.groupstyle or getArg(prefix,'groupstyle')
+            ,context.basestyle  or getArg(prefix,'basestyle')
+    return mw.ustring.match(titlestyle or '','background') or
+           mw.ustring.match(groupstyle or '','background') or
+           mw.ustring.match(basestyle  or '','background')
+end
+
+local function argNameAndRealTitleAreDifferent(context)
+    local prefix = context.prefix
+    local border ,name =
+             getArg(prefix,'border',nil,context)
+            ,getArg(prefix,'name',nil,context)
+    if borderIsChild(border)
+        or getArg(prefix,'tracking') == 'no' then
+        return false
+    end
+
+    if name ~= mw.title.getCurrentTitle().text then
+        return true
+    end
+    return false
+end
+
+local function getTrackingCategories(context)
+    local cats = {}
+    if needsHorizontalLists(context) then table.insert(cats, '没有使用水平列表的导航框') end
+    if hasBackgroundColors(context) then table.insert(cats, '使用背景颜色的导航框') end
+    if argNameAndRealTitleAreDifferent(context) then table.insert(cats, 'name參數和實際不同的導航框') end
+    return cats
+end
+
+local function renderTrackingCategories(builder,context)
+    local title = mw.title.getCurrentTitle()
+    if title.namespace ~= 10 then return end -- not in template space
+    local subpage = title.subpageText
+    if subpage == 'doc' or subpage == 'sandbox' or subpage == 'testcases' then return end
+
+    for i, cat in ipairs(getTrackingCategories(context)) do
+        builder:wikitext('[[Category:'_.._cat_.._'|Category:' .. cat .. ']]')
+    end
+end
+
+---------------------------------------------------------------
+--
+--  SubType Implement
+--
+
+---水平式
+local function renderHorizontalTable(context)
+    debugLog('render Horizontal NavTable',context)
+    local prefix, level = context.prefix, context.level
+
+    local rootTable = createNavTableHeader(context)
+
+    local listnums=getListnum(prefix,Limit.horizontal.list)
+
+    local totalColspan=2 --title,above,below
+    local totalRowspan=#listnums --image,imageleft
+    if getArg(prefix,"imageleft",nil,context) then totalColspan =totalColspan + 1 end
+    if getArg(prefix,"image",nil,context) then totalColspan =totalColspan + 1 end
+    context.totalColspan = totalColspan
+    context.totalRowspan = totalRowspan
+    --context.splitRowcolspan = totalColspan
+
+    renderTitleRow(rootTable,context)
+    renderAboveRow(rootTable,context)
+
+    if listnums==nil or #listnums==0 then --没有list的话，只有col
+     debugLog('render Horizontal NavTable,no list',{listnums})
+     context.listnum=1
+     renderColRow(rootTable,context)
+     --context.notNeedImage=true
+     context.splitRowcolspan = totalColspan
+    else
+     debugLog('render Horizontal NavTable,have list with col',{listnums})
+     for i,listnum in ipairs(listnums) do
+         context.listnum=listnum
+         if listnum==1 then
+           --一行Col
+           renderColRow(rootTable,context)
+           context.notNeedImage=true
+           context.splitRowcolspan = totalColspan
+         else
+           context.notNeedImage=nil
+         end
+         _renderListRow(rootTable,context)
+     end
+    end
+    renderBelowRow(rootTable,context)
+
+    renderTrackingCategories(rootTable,context)
+    debugLog('render Horizontal NavTable End')
+    return rootTable
+end
+
+---垂直式
+local function renderVerticalTable(context)
+    debugLog('render Vertical NavTable',context)
+    local prefix, level = context.prefix, context.level
+
+    local rootTable = createNavTableHeader(context)
+
+    local listnums=getListnum(prefix,Limit.vertical)
+
+    local totalColspan=2 --title,above,below
+    local totalRowspan=#listnums --image,imageleft
+    if getArg(prefix,"imageleft",nil,context) then totalColspan =totalColspan + 1 end
+    if getArg(prefix,"image",nil,context) then totalColspan =totalColspan + 1 end
+    context.totalColspan = totalColspan
+    context.totalRowspan = totalRowspan
+    --context.splitRowcolspan = totalColspan
+
+    renderTitleRow(rootTable,context)
+    renderAboveRow(rootTable,context)
+    for i,listnum in ipairs(listnums) do
+        context.listnum=listnum
+        renderListRow(rootTable,context)
+    end
+    renderBelowRow(rootTable,context)
+
+    renderTrackingCategories(rootTable,context)
+    debugLog('render Vertical NavTable End')
+    return rootTable
+end
+
+---垂直折叠式
+local function renderVerticalCollapsibleTable(context)
+    debugLog('render VerticalCollapsible NavTable',context)
+    local prefix, level = context.prefix, context.level
+
+    local rootTable = createNavTableHeader(context)
+
+    local listnums=getListnum(prefix,Limit.vertical
+      ,(--[[context.contentEqList_or|context.contentEqList or]]true) --VerticalCollapsibleTable 的 Content适配
+    )
+
+    local totalColspan=2 --title,above,below
+    local totalRowspan=#listnums --image,imageleft
+    if getArg(prefix,"imageleft",nil,context) then totalColspan =totalColspan + 1 end
+    if getArg(prefix,"image",nil,context) then totalColspan =totalColspan + 1 end
+    context.totalColspan = totalColspan
+    context.totalRowspan = totalRowspan
+    --context.splitRowcolspan = totalColspan
+
+    renderTitleRow(rootTable,context)
+    renderAboveRow(rootTable,context)
+    for i,listnum in ipairs(listnums) do
+        context.listnum=listnum
+        renderCollapsibleListRow(rootTable,context)
+    end
+    renderBelowRow(rootTable,context)
+
+    renderTrackingCategories(rootTable,context)
+    debugLog('render VerticalCollapsible NavTable End')
+    return rootTable
+end
+
+---Type Selector
+function p.renderNavTable(context)
+    local navtype  = context.type
+    debugLog('render NavTable')
+    debugLog('Type='..navtype)
+    local result
+    if navtype==NavType.H then
+        result=renderHorizontalTable(context)
+    elseif navtype==NavType.VC then
+        result=renderVerticalCollapsibleTable(context)
+    else
+        result=renderVerticalTable(context)
+    end
+    debugLog('render NavTable End')
+    return result
+end
+
+--Main Funtion
+function p._navbox(context)
+    debugLog('Navbox mainfuntion',context)
+    local prefix, level = context.prefix, context.level
+    local rootTable = mw.html.create('table')
+    rootTable
+        :attr('cellspacing', 0)
+        :addClass('navbox')
+        :css('border-spacing', 0)
+        :cssText(getArg(prefix,'bodystyle'))
+        :cssText(getArg(prefix,'style'))
+        :tag('tr')
+            :tag('td')
+                :css('padding', '2px')
+                :node(p.renderNavTable(context):allDone())
+    debugLog('Navbox mainfuntion End')
+    return rootTable
+end
+
+function p.navbox(frame)
+    if not getArgs then
+        getArgs = require('Module:Arguments').getArgs
+    end
+    local modelArgs=getArgs(frame,{frameOnly=true})
+    DEBUG = modelArgs['DEBUG'] or DEBUG
+    MainTemplateName=modelArgs['MainTemplateName'] or MainTemplateName
+    debugLog('Navbox start')
+
+    args = getArgs(frame, {wrappers = MainTemplateName, trim = true})
+    debugLog('getArgs done,',args)
+
+    local prefix, level = "", 1
+    local NavType = getValidType(getArg(prefix,'type') or  modelArgs['type'],NavType.V)
+    DEBUG = modelArgs['DEBUG'] or DEBUG
+    -- Read the arguments in the order they'll be output in, to make references number in the right order.
+    p.shakeArgs(prefix,level,NavType)
+
+    local L0Context=NavboxContext.new(prefix,level,NavType)
+    local rootNode=p._navbox(L0Context)
+    debugLog('rootnode build done, Navbox end')
+    return tostring(rootNode:allDone())
+end
+
+return p

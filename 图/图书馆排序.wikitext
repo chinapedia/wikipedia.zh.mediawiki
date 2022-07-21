@@ -1,0 +1,53 @@
+{{NoteTA
+|G1 = IT
+}}
+{{算法信息框|class=[[Sorting_algorithm|排序算法]]|data=[[Array_data_structure|数组]]|time=<math>O(n^2)</math>|best-time=<math>O(n)</math>|average-time=<math>O(n\log n)</math>|space=<math>O(n)</math>}}'''图书馆排序'''，或'''空位插入排序'''是一种[[排序算法|排序算法]] ，它基于[[插入排序|插入排序]]，但在每两个元素之间存在空位，以便于加速随后的插入。这个名字来自一个比喻：<blockquote class="">假设一名图书管理员在一个长架上按字母顺序來整理书，从左边A開頭的書，一直到右边Z開頭的書，书本之间没有空格。如果图书管理员有一本開頭為B的新书，当他找到了這本書在B區中的正确位置，他将不得不把從該位置後一直到Z的每一本书向右移动，就只是为了腾出空位放置这本新书。这就是插入排序的原理。但是，如果他在每一字母區後留有額外的空間，只要在B區之后還有空间，他插入书時就只需要移动少数几本书，而不会移动后面所有的书，这是图书馆排序的原理。</blockquote>此算法由 [[Michael_A._Bender|Michael A. Bender]]、[[Martín_Farach-Colton|Martín Farach-Colton]]和[[Miguel_Mosteiro|Miguel Mosteiro]] 于2004年提出<ref>{{Cite web |url=http://arxiv.org/abs/cs/0407003 |title=存档副本 |accessdate=2017-03-28 |archive-date=2016-08-25 |archive-url=https://web.archive.org/web/20160825193745/http://arxiv.org/abs/cs/0407003 |dead-url=no }}</ref>，并于2006年出版。<ref name="definition">{{cite journal|title=Insertion Sort is O(n log n)|authorlink2=Martin Farach-Colton|journal=Theory of Computing Systems|issue=3|doi=10.1007/s00224-005-1237-z|year=2006|volume=39|pages=391|author1=Bender, M. A.|author2=Farach-Colton, M.|author3=Mosteiro M.}}</ref>
+
+图书馆排序像插入排序一样，是[[排序算法|稳定]]的排序算法，并且它是[[線上演算法|在线排序]]；然而，它被证明在大部分情况下具有O(n log n)的运行速度（相当于[[快速排序|快速排序]]），而不是插入排序的O(n<sup>2</sup>)。用于此改进的机制与跳过列表非常相似。本文没有给出完整的实现，也没有重要部分的确切算法，如插入和重新平衡。需要更多的信息来比较图书馆排序的效率与现实中其他排序方法的效率。
+
+相比基本的插入排序，图书馆排序的缺点是需要额外空间。该空间的大小将取决于实作的情況。在本文中，需要的空间为''(1+ε)n'',，但没有进一步的建议如何选择ε。
+
+[[插入排序|插入排序]]的一个缺点是它可能需要大量的交换操作，并且如果内存写入是昂贵的，则成本很高。图书馆排序可能会在插入步骤中有所改进，因为騰出空間所需移动的次數較少，但也因此在重新平衡步骤中增加了额外的成本。另外，由于随机数据集中的每个插入都可以访问不再处于高速缓存中的内存，特别是对于大型数据集，因此与[[归并排序|归并排序]]相比，引用的局部性将变差。
+
+== 实现 ==
+
+=== 算法 ===
+现在我们有大小为n个元素的数组。我们选择每两个元素之间的空位，那么我们将有一个最大的数组（1 +ε）n。该算法在log n轮中工作。我们通过二分查找来找到插入的位置，然后交换后面的元素，直到我们命中一个空格。一旦结束，我们通过在每个元素之间插入空格来重新平衡最终的数组。
+
+算法根据以下三个重要的步骤：
+
+1. 二分查找：我们在已经插入的元素中，二分查找这个元素应该插入的位置。这可以通过线性移动到阵列的左侧或右侧，如果您点击中间元素中的空格。
+
+2. 插入:
+将元素插入到正确的位置，并且通过交换把后面的元素向右移动，直到空格。
+
+3. 重新平衡：在数组中的每对元素之间插入空格。这需要线性时间，并且由于算法只运行log n轮，总重新平衡只需要O（n log n）时间。
+
+=== 伪代码 ===
+ '''proc''' rebalance(A, begin, end)
+     r ← end
+     w ← end * 2
+     '''while''' r >= begin
+         A[w+1] ← gap
+         A[w] ← A[r]
+         r ← r - 1
+         w ← w - 2
+
+ '''proc''' sort(A)
+     n ← length(A)
+     S ← new array of n gaps
+     '''for''' i ← 1 to floor(log2(n) + 1)
+         '''for''' j ← 2^i to 2^(i+1)
+             ins ← binarysearch(A[j], S, 2^(i-1))
+             insert A[j] at S[ins]
+在这里，<code>binarysearch(A，k)</code>是执行[[二分查找|二分查找]]中的''A''中的第k个元素，并且跳过空格，找到元素A[j]应该插入的位置。插入应该优于填补元素的空格。
+
+== 参考资料 ==
+{{reflist}}
+
+== 外部链接 ==
+* [http://www.cs.sunysb.edu/~bender/newpub/BenderFaMo06-librarysort.pdf Gapped Insertion Sort]{{Wayback|url=http://www.cs.sunysb.edu/~bender/newpub/BenderFaMo06-librarysort.pdf |date=20130313081835 }}
+[[Category:排序算法|Category:排序算法]]
+
+{{排序算法表}}
+{{算法}}

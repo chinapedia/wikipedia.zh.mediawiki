@@ -1,0 +1,83 @@
+{{refimprove|time=2019-05-27T18:27:57+00:00}}
+{{copyedit|time=2018-06-28T02:29:06+00:00}}
+{{NoteTA|G1=IT}}
+'''尤達條件式'''（也稱為尤達標記法）是一種計算機編程中的編程風格，在此風格中表達式的兩個部份與條件語句中的順序將會對調, 並且表達式的常量部份將會放在條件語句的左側。這種風格的名稱來自於[[星際大戰|星際大戰]]的絕地大師[[尤達|尤達]]，他使用着缺乏標準語法的英語。
+
+尤達條件式是[[PHP|PHP]] [[Symfony|Symfony]]編碼標準的一部份。<ref>{{cite web |url=http://symfony.com/doc/current/contributing/code/standards.html#structure |title=Coding Standards (Contributing to Symfony) |website=Symfony.com |date= |accessdate=2016-11-12 |archive-date=2016-11-08 |archive-url=https://web.archive.org/web/20161108002754/http://symfony.com/doc/current/contributing/code/standards.html#structure |dead-url=yes }}</ref>
+
+== 範例 ==
+通常計算機編程中的條件語句會寫成：
+<syntaxhighlight lang="java">
+if ( $value == 42 ) { /* ... */ }
+// Reads like: "If the value is equal to 42..."
+</syntaxhighlight>
+
+在尤達條件式中對於相同的條件語句会反轉过来：
+<syntaxhighlight lang="java">
+if ( 42 == $value ) { /* ... */ }
+// Reads like: "If 42 equals the value..."
+</syntaxhighlight>
+
+常數會放在比較運算子的左側，而右側會寫入測試常數的變量。這個次序和尤達的非標準口語風格非常相似，类似于[[賓主動語序|賓主動語序]]<ref>{{cite web|title=Yoda's Syntax the Tribune Analyzes; Supply More Details I Will!|url=http://itre.cis.upenn.edu/~myl/languagelog/archives/002173.html|accessdate=2014-12-22|date=2005-05-18|publisher=Language Log|quote=One way to look at Yoda's syntax is that it shows signs of favoring OSV syntax (Object-Subject-Verb) as the basic order in the simple clause.|last1=Pullum|first1=Geoffrey K.|website=Itre.cis.upenn.edu|archive-date=2013-03-09|archive-url=https://web.archive.org/web/20130309180340/http://itre.cis.upenn.edu/~myl/languagelog/archives/002173.html|dead-url=yes}}</ref>（例如"When nine hundred years old you reach, look as good you will not."，“當九百歲你活到，看起來很好你將不”<ref>{{cite web|title=The StarWars.com 10: Best Yoda Quotes|url=http://www.starwars.com/news/the-starwars-com-10-best-yoda-quotes|accessdate=2014-12-22|date=2013-11-26|publisher=Lucasfilm, Ltd.|quote=When nine hundred years old you reach, look as good you will not.|website=starwars.com|archive-date=2014-12-22|archive-url=https://web.archive.org/web/20141222231941/http://www.starwars.com/news/the-starwars-com-10-best-yoda-quotes|dead-url=no}}</ref><ref>{{cite web|title=Quotes for Yoda (Character)|url=http://www.imdb.com/character/ch0000015/quotes|accessdate=2014-12-22|publisher=Amazon|quote=When nine hundred years old *you* reach, look as good *you* will not, hmm?|website=imdb.com|archive-date=2015-02-12|archive-url=https://web.archive.org/web/20150212073133/http://www.imdb.com/character/ch0000015/quotes|dead-url=no}}</ref>）。
+
+== 優點 ==
+將常量放在表達式中不會改變程序的行為（除非此值被評估為false，請參見下文）。在使用單個等號（=）執行賦值操作
+而非條件關係比較的編程語法中，可能会發生錯誤使程序產生意料之外的賦值操作，而並非如程序員原意要編寫關係判斷的條件語句。
+<syntaxhighlight lang="java">
+if (myNumber = 42) { /* ... */ }
+// This assigns 42 to myNumber instead of evaluating the desired condition
+</syntaxhighlight>
+
+使用尤達條件式的優點：
+<syntaxhighlight lang="java">
+if (42 = myNumber) { /* ... */ }
+// This is a syntax error and will not compile
+</syntaxhighlight>
+
+由於 42 是一個無法變動的固定常量，因此編譯器會捕捉到該錯誤。
+<syntaxhighlight lang="java">
+Boolean myBoolean = true;
+if (myBoolean = null) { /* ... */ }
+// This causes a NullPointerException in Java Runtime, but legal in compilation.
+</syntaxhighlight>
+
+它也可以解決一些不安全的null型別行為。
+<syntaxhighlight lang="java">
+String myString = null;
+if (myString.equals("foobar")) { /* ... */ }
+// This causes a NullPointerException in Java
+</syntaxhighlight>
+
+以尤達條件式：
+<syntaxhighlight lang="java">
+String myString = null;
+if ("foobar".equals(myString)) { /* ... */ }
+// This is false, as expected
+</syntaxhighlight>
+== 評論 ==
+有評論認為尤達條件式一個缺點是缺乏可讀性，其負面效果超過了上述優點。
+
+一些編程語言如Python和Swift之中是不允許在條件式中進行對變量賦值操作的，藉由定義賦值表達式不會被評估就沒有任何值，在這種情況下是不可能發生這類錯誤的。<ref>{{cite web|title=The Swift Programming Language (Swift 3.0.1): Basic Operators|url=https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/BasicOperators.html|accessdate=2016-11-12|date=2016-10-27|website=Developer.apple.com|archive-date=2016-04-23|archive-url=https://web.archive.org/web/20160423153650/https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/BasicOperators.html|dead-url=no}}</ref>
+
+許多編譯器會對如<code>if (myNumber = 42)</code>的源碼發出警示訊息（例如，GCC<code>-Wall</code>選項會警告括號語句中的賦值為真），讓程序員發現可能發生錯誤的地方。在JavaScript中如ESLint之類的語法建議程序，可以警告條件式中出現賦值操作。<ref>{{cite web|title=disallow assignment operators in conditional statements|url=http://eslint.org/docs/rules/no-cond-assign|accessdate=2017-02-17|website=eslint.org|archive-date=2017-02-18|archive-url=https://web.archive.org/web/20170218064218/http://eslint.org/docs/rules/no-cond-assign|dead-url=yes}}</ref>
+
+尤達條件式寫法避免null行為的優點也可被認為是一個缺點，因為空指針錯誤或被隱藏，並只出現在程序後期中。
+
+當比較非基本類型時，這種寫法在C++中出現了另一個缺點，因為 == 是一個運算子，並可能沒有定義適當的重載運算子函數，例如<code>CComBSTR</code>與字串文本比較，寫成<code>(L"Hello" == cbstrMessage)</code>，不會對應到重載的函數。<ref>{{cite web|title=CComBSTR::operator|url=https://msdn.microsoft.com/en-us/library/cfy54764.aspx|accessdate=2016-11-12|date=|website=Msdn.microsoft.com|archive-date=2016-09-10|archive-url=https://web.archive.org/web/20160910175711/https://msdn.microsoft.com/en-us/library/cfy54764.aspx|dead-url=no}}</ref>
+
+== 參考 ==
+<br />
+
+<references />
+== 外部連結 ==
+
+* [http://united-coders.com/christian-harms/what-are-yoda-conditions united-coders.com: What are Yoda Conditions?] {{Wayback|url=http://united-coders.com/christian-harms/what-are-yoda-conditions |date=20151230204136 }} Examples in [[Java|Java]]
+* [http://blogs.msdn.com/b/cdndevs/archive/2010/05/09/new-programming-jargon.aspx New programming jargon] {{Wayback|url=http://blogs.msdn.com/b/cdndevs/archive/2010/05/09/new-programming-jargon.aspx |date=20130426153030 }} Mentions Yoda Conditions in a list of new programming jargon
+* [http://thomas.tuerke.net/on/design/?with=1249091668 Coding in Style] {{Wayback|url=http://thomas.tuerke.net/on/design/?with=1249091668 |date=20170729180324 }} Probable origin of the term
+* [https://web.archive.org/web/20140512223633/http://blue-walrus.com/2010/11/reverse-equals-in-java-a-dangerous-technique/ Yoda Conditions in Java] Potential pitfalls of the technique
+
+{{Star Wars}}
+
+[[Category:编程原则|Category:编程原则]]
+[[Category:程序设计语言语法|Category:程序设计语言语法]]
+[[Category:流行文化中的电影作品|Category:流行文化中的电影作品]]

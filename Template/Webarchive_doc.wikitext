@@ -1,0 +1,157 @@
+{{NoteTA
+|G1 = IT
+|G2 = MediaWiki
+}}
+{{Documentation subpage}}
+{{High-use|38470}}
+{{缺乏使用說明}}
+{{lua|Module:Webarchive}}
+<!-- 在本行下編輯模板說明 -->
+
+{{tl|{{PAGENAME}}}}用于增加[[Wayback Machine]]、[[WebCite]]等{{tsl|en|List of Web archiving initiatives|网页存档机构列表|网页存档站点}}的链接。
+
+此模板是{{tlx|wayback}}、{{tlx|webcite}}、{{tlx|memento}}和{{tlx|cite archives}}的替代品。
+
+== 用法 ==
+In most cases the template needs only two arguments, the archive {{para|url}} and archive {{para|date}}. 
+
+Example: 
+::<code><nowiki>{{webarchive |url=https://web.archive.org/web/20160801000000/http://example.com |date=2016-08-01}}</nowiki></code>
+::Produces: {{webarchive |url=https://web.archive.org/web/20160801000000/http://example.com |date=2016-08-01}}
+
+Example 2:
+::<code><nowiki>{{webarchive |url=http://www.webcitation.org/5eWaHRbn4?url=http://www.example.com/ |date=2009-02-12}}</nowiki></code>
+::Produces: {{webarchive |url=http://www.webcitation.org/5eWaHRbn4?url=http://www.example.com/ |date=2009-02-12}}
+
+It is also common to include a {{para|title}}
+
+Example 3:
+
+::<code><nowiki>{{webarchive |url=http://www.webcitation.org/5eWaHRbn4?url=http://www.example.com/ |date=2009-02-12 |title=Page title}}</nowiki></code>
+::Produces: {{webarchive |url=http://www.webcitation.org/5eWaHRbn4?url=http://www.example.com/ |date=2009-02-12 |title=Page title}}
+
+== 多个URL ==
+
+The template optionally supports multiple URLs (up to 10) for linking to multiple archiving services for the same source link. The first url argument is {{para|url}} then {{para|url2}} .. {{para|url10}}. Each URL can have its own date and title argument, thus {{para|date2}} .. {{para|date10}} and {{para|title2}} .. {{para|title10}}. 
+
+== 选项 ==
+
+'''Main options'''
+
+:;url..url10: The URL(s) to the archive service. There should always be a {{para|url}} which counts as the first url. Each {{para|url#}} can have its own numbered corresponding {{para|date#}} and {{para|title#}}. Matching of url with date and title is done by numbers, not position. Numbers do not need to be in sequence, for example {{para|url2}} followed by {{para|url5}} works. 
+
+:;date..date10: The date the page was archived. The date format displayed is the same as entered. If {{para|date}} is missing the template will make a best effort to find the date by decoding the archive URL (wayback and webcite for example provide this data in the URL), and will display the date in iso format by default. However including a date is recommended for date formatting reasons, and because other tools may not have the ability to decode the date from the URL.
+
+:;title..title10: The text displayed for the link. If no {{para|title}} is provided then {{para|date}} is displayed. Otherwise {{para|title}} takes precedence if both are set.
+
+'''Secondary options'''
+
+:;nolink: If set to any value (including blank such as {{para|nolink}}) the wiki-link for the archive service will not be displayed. For example if [[Wayback Machine]] was previously linked in an article, it won't be linked again.
+
+:;format: This is a special option to support the merger of {{tld|cite archives}}. It may be deprecated in the future. Because CS1|2 templates do not currently support more than 1 archive link, this template will tack on additional archive links to the end of a CS1|2 template output. It takes two values: {{para|format|addlarchives}} or {{para|format|addlpages}}. ''Addlarchives'' will display output appropriate for linking to multiple web archiving services. ''Addlpages'' will display output appropriate for linking to multiple pages at the same archive.
+
+:;origurl: This is the original URL and this argument ''should not be used unless you know what you're doing''. This option is not recommended because it is redundant, not needed by the template and creates error-prone interactions with other link rot tools. For example given the original URL <code><nowiki>http://www.example.com</nowiki></code> it is already contained in the archive URLs:
+:::'''Wayback''': {{para|url|https://web.archive.org/web/YYYYMMDDhhmmss/http://www.example.com}}
+:::'''Webcite''': {{para|url|http://www.webcitation.org/5eWaHRbn4?url{{=}}http://www.example.com}} (more info at [[WP:Using WebCite#Use_within_Wikipedia|Using WebCite]])
+:::'''Archive.is''': {{para|url|http://archive.is/YYYYMMDDhhmmss/http://www.example.com}} (more info at [[WP:Using archive.is#Use_within_Wikipedia|Using Archive.is]])
+::Archive services that have the option for long-form URLs, like the above examples, should use that (most do) instead of {{para|origurl}}. [[Wikipedia_talk:Using_archive.is#RfC:_Should_we_use_short_or_long_format_URLs.3F|See RfC]] which discusses the policy of disallowing URL-shortening which can be used to hide blacklisted websites. In the rare instances when an archive service only has shortened URLs available, the original URL can be stored in the {{para|origurl}} argument. Another reason not to use this argument unless necessary is because other link-rot tools (bots, edit scripts etc) may try to "save" the URL - which is presumably dead - by converting it to an archive URL, adding a dead link tag or even messing with the archive URL. Note that the argument is not used by the template it's only for storage.
+
+==Examples==
+The number of possible examples is extensive depending on the mix of options. Some common cases follow. For more extensive testing see the [[Template:Webarchive/testcases|testcases page]].
+
+* Single link at Wayback with date and title ('''recommended method''')
+::<code><nowiki>{{webarchive |url=https://web.archive.org/web/20160801000000/http://example.com |date=2016-08-01|title=Page title}}</nowiki></code>
+::{{webarchive |url=https://web.archive.org/web/20160801000000/http://example.com |date=2016-08-01|title=Page title}}
+* Single link at Wayback with date only
+::<code><nowiki>{{webarchive |url=https://web.archive.org/web/20160801000000/http://example.com |date=2016-08-01}}</nowiki></code>
+::{{webarchive |url=https://web.archive.org/web/20160801000000/http://example.com |date=2016-08-01}}
+* Single link at WebCite with no date and no title
+::<code><nowiki>{{webarchive |url=http://www.webcitation.org/5eWaHRbn4?url=http://www.example.com/}}</nowiki></code>
+::{{webarchive |url=http://www.webcitation.org/67xHmVFWP}}
+
+*Multi-link at Wayback with dates and titles ('''recommended method''')
+::<code><nowiki>{{webarchive |url=https://web.archive.org/web/20160801/http://example.com |title=Page title |date=2016-08-01|url2=https://web.archive.org/web/20160901/http://example.com |title2=Page2 title |date2=2016-09-01}}</nowiki></code>
+::{{webarchive |url=https://web.archive.org/web/20160801/http://example.com |title=Page title |date=2016-08-01|url2=https://web.archive.org/web/20160901/http://example.com |title2=Page2 title |date2=2016-09-01}}
+*Multi-link at Wayback with dates only
+::<code><nowiki>{{webarchive |url=https://web.archive.org/web/20160801/http://example.com |date=2016-08-01|url2=https://web.archive.org/web/20160901/http://example.com |date2=2016-09-01}}</nowiki></code>
+::{{webarchive |url=https://web.archive.org/web/20160801/http://example.com |date=2016-08-01|url2=https://web.archive.org/web/20160901/http://example.com |date2=2016-09-01}}
+*Multi-link at Wayback with titles only
+::<code><nowiki>{{webarchive |url=https://web.archive.org/web/20160801/http://example.com |title=Page title |url2=https://web.archive.org/web/20160901/http://example.com |title2=Page2 title}}</nowiki></code>
+::{{webarchive |url=https://web.archive.org/web/20160801/http://example.com |title=Page title |url2=https://web.archive.org/web/20160901/http://example.com |title2=Page2 title}}
+
+== 跟踪分类 ==
+The template has a number of hidden tracking categories which may be added (via [[Module:Webarchive]]):
+
+* {{clc|Webarchive模板wayback链接}} – links to Wayback Machine
+* {{clc|Webarchive模板webcite链接}} – links to WebCite
+* {{clc|Webarchive模板archiveis链接}} – links to Archive.is
+* {{clc|Webarchive模板其他存档站点}} – links to known archive sites that don't have their own tracking category
+* {{clc|Webarchive模板未知存档站点}} – the template doesn't recognize the archive URL; this may indicate an error in the data; or the template itself needs updating to reflect a new archive site
+* {{clc|Webarchive模板警告}} – soft errors that don't prevent the template from working but leave a red message
+* {{clc|Webarchive模板错误}} – errors typically requiring human intervention
+
+== 模板维护 ==
+
+The following can be done to maintain the template.
+
+'''Monitor tracking categories'''
+
+* The tracking categories for "warnings" and "errors" can be monitored to alert for any problems in the data. 
+* The tracking category for "unknown archives" may indicate a problem in the data; for example an editor used the source URL instead of the archive URL in the {{para|url}} field. 
+
+'''Configuration: verifydates'''
+
+The template can verify that Wayback (or WebCite) dates in the URL portion match the date in the {{para|date}} argument. If the dates don't match it will leave a red warning message "date mismatch" and add the article to the warning tracking category. 
+
+Because the verification function adds some overhead to the template, it can optionally be globally disabled by setting the variable "verifydates = no" (see the Module source in function p.webarchive()). Note that after setting to "yes", it can take a week or more for the tracking category to be fully populated. Set to "yes" if you are searching for problems in the data that need fixing (they'll show up in the tracking category). 
+
+'''Configuration: maxurls'''
+
+The max number of URLs is 10 but this can be changed by setting the "maxurls" variable in the p.webarchive() function. This is a global variable that will effect all instances of the template, use with caution. Reducing the number will increase the template speed and reduce resource use.
+
+==VisualEditor TemplateData==
+What is this? See https://www.mediawiki.org/wiki/Help:TemplateData
+
+<templatedata>
+{
+    "description": "A template for linking to offsite archives such as Wayback, WebCite, Archive.is, etc.. ",
+    "params": {
+        "url": {
+            "label": "Archive URL",
+            "description": "URL to the archive.",
+            "type": "string",
+            "example": "https://web.archive.org/web/20160101000000/http://example.com",
+            "required": true
+        },
+        "date": {
+            "label": "Archive date",
+            "description": "Date of the archive.",
+            "type": "string",
+            "example": "January 1, 2016",
+            "suggested": true
+        },
+        "title": {
+            "label": "Archive title",
+            "description": "Title (or text) displayed on the Wiki page for the link.",
+            "type": "string",
+            "suggested": true,
+            "example": "Example website",
+            "default": "Date argument, or the word 'Archive'"
+        },
+        "nolink": {
+            "label": "Wikilink",
+            "description": "Wikilink to the archive's page in the rendering. Any value including blank means no wikilink.",
+            "type": "string"
+        },
+        "format": {
+            "label": "Format of template rendering.",
+            "description": "For multi-URL instances, render display in one of two formats.",
+            "type": "string"
+        }
+    }
+}
+</templatedata>
+
+<includeonly>{{sandbox other||
+<!-- 本行下加入模板的分類，跨維基連結加入Wikidata（參見[[Wikipedia:Wikidata]]） -->
+}}</includeonly>

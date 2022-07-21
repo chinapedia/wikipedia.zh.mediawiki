@@ -1,0 +1,147 @@
+{{NoteTA
+|G1=IT
+}}
+{{校对翻译}}
+{{Lowercase}}
+{{Infobox programming language
+|influenced by = [[JavaScript|JavaScript]]
+|operating system = [[平台无关|平台无关]]
+|released = {{Start date and age|2013|3|21|df=yes}}<ref>{{cite web|url=https://blog.mozilla.org/luke/2013/03/21/asm-js-in-firefox-nightly/|title=asm.js in Firefox Nightly|accessdate=13 Nov 2014|date=21 Mar 2013|website=Luke Wagner's blog|archive-date=2017-04-21|archive-url=https://web.archive.org/web/20170421061832/https://blog.mozilla.org/luke/2013/03/21/asm-js-in-firefox-nightly/|dead-url=no}}</ref>
+|name = asm.js
+|designer = [[Mozilla|Mozilla]]
+|website = {{URL|asmjs.org}}
+}}
+'''asm.js'''是一个[[中間語言|中間語言]]，设计目的是使采用[[C语言|C]]等[[编程语言|编程语言]]编写的[[计算机软件|计算机软件]]可运行为[[网络应用程序|网络应用程序]]，同时性能特征明显优于标准[[JavaScript|JavaScript]]。
+
+asm.js包括一个[[JavaScript|JavaScript]]的严格子集，其中的代码采用具有手动内存管理的静态类型语言（就像C语言）编写，代码使用一个[[源代码至源代码编译器|源代码至源代码编译器]]（例如基于[[LLVM|LLVM]]的{{tsl|en|Emscripten}}）翻译。通过将语言特性限制在适合{{tsl|en|Ahead-of-time optimization|提前优化}}和其他性能改进的范围内，性能得到了提高。
+
+[[Firefox|Mozilla Firefox]]是第一个实现针对asm.js优化的浏览器，从Firefox 22开始使用。<ref name="languages">{{cite web|url=https://www.mozilla.org/en-US/firefox/22.0/releasenotes/|title=Firefox 22.0 release notes|accessdate=July 4, 2013|publisher=Mozilla|archive-date=2014-08-21|archive-url=https://web.archive.org/web/20140821215925/https://www.mozilla.org/en-US/firefox/22.0/releasenotes/|dead-url=no}}</ref>
+
+== 设计 ==
+asm.js由[[JavaScript|JavaScript]]语言的一个严格子集组成。它可以显著提高采用具有手动内存管理（例如C）的静态类型语言编写的[[网络应用程序|网络应用程序]]在使用源代码至源代码编译器转换为JavaScript后的性能。Asm.js的目标并不是提高手写JavaScript代码的性能，也不实现增强性能以外的其他目的。
+
+通过将语言特性限制在适合提前优化和其他性能改进的范围内，其旨在具有比标准JavaScript更接近于本地（原生）代码的性能特征。<ref>{{cite web|url=http://asmjs.org/spec/latest/|title=Asm.js|accessdate=2015-03-05|date=|publisher=Asm.js|archive-date=2015-03-06|archive-url=https://web.archive.org/web/20150306052212/http://asmjs.org/spec/latest/|dead-url=no}}</ref>通过使用JavaScript的一个子集，asm.js很大程度上支持所有主要的[[网页浏览器|网页浏览器]]<ref>{{cite web|url=http://asmjs.org/faq.html|title=asm.js — frequently asked questions|date=July 26, 2014|publisher=Asmjs.org|accessdate=2017-03-15|archive-date=2014-06-04|archive-url=https://web.archive.org/web/20140604012024/http://asmjs.org/faq.html|dead-url=no}}</ref>，这不同于[[WebAssembly|WebAssembly]]或[[Native_Client|Google Native Client]]等途径。
+
+== 代码生成 ==
+asm.js通常不直接编写，而是作为一种通过[[编译器|编译器]]生成的中间语言，该编译器获取[[C++|C++]]或其他语言的源代码，然后输出asm.js。
+
+例如，提供下列C语言代码：<syntaxhighlight lang="c">
+int f(int i) {
+  return i + 1;
+}
+
+</syntaxhighlight>Emscripten将输出下列JavaScript代码：<syntaxhighlight lang="ecmascript">
+function f(i) {
+  i = i|0;
+  return (i + 1)|0;
+}
+</syntaxhighlight>注意新增的<code>|0</code>和去除的类型说明符。在JavaScript中，按位运算符会将操作数转换为32位有符号整数并给出整数结果。这意味着使用0的[[位操作|按位OR]]为一个无作用的操作，只是将值转换为整数。通过对每个参数这样做，确保了从外部代码调用该函数时，该值被转换为正确的类型。这也用于返回值，在该情况下确保添加1到i的结果将是一个整数（否则可能变得太大），并标记函数的返回类型。这些转换为asm.js所必需，这样优化编译器才可以提前生成高效的本地代码。在此类优化编译器中，当asm.js代码调用其他asm.js代码时，转换不执行，因为必需的类型说明符意味着已保证值具有正确的类型。此外，不同于执行浮点加法和转换为整数，它可以简单地执行本机整数运算。这样一来，它可以得到显著的性能增益。
+
+下面是另一个计算字符串长度的例子：<syntaxhighlight lang="c">
+size_t strlen(char *ptr) {
+  char *curr = ptr;
+  while (*curr != 0) {
+    curr++;
+  }
+  return (curr - ptr);
+}
+</syntaxhighlight>它对应以下asm.js代码：<syntaxhighlight lang="ecmascript">
+function strlen(ptr) {
+  ptr = ptr|0;
+  var curr = 0;
+  curr = ptr;
+  while (MEM8[curr]|0 != 0) {
+    curr = (curr + 1)|0;
+  }
+  return (curr - ptr)|0;
+}
+</syntaxhighlight>在生成的代码中，变量MEM8实际上是一个类型缓冲区的逐字节“视图”，它充当asm.js代码的堆（heap）。
+
+== 性能 ==
+因为asm.js在浏览器中运行，所以性能很大程度上取决于浏览器和硬件。编译为asm.js的C程序的初步基准通常比使用[[Clang|Clang]]的本地编译慢一倍以上。<ref>{{cite web|url=http://asmjs.org/faq.html|title=asm.js|accessdate=2015-03-05|publisher=Asm.js|archive-date=2014-06-04|archive-url=https://web.archive.org/web/20140604012024/http://asmjs.org/faq.html|dead-url=no}}</ref>
+
+这种超过普通JavaScript的性能增益主要是由于100％的[[資料類型|类型]]一致性以及几乎没有[[垃圾回收_(計算機科學)|垃圾回收]]（内存是手动管理的大型类型数组）。这个更简单的模型没有动态行为，没有内存分配或释放，只有一组简单、定义明确的整数和浮点操作，从而可实现更好的性能和优化潜力。{{Fact|date=October 2014}}
+
+Mozilla在2013年12月的基准测试显示：“使用[[單精度浮點數|float32]]优化的Firefox可以运行所有基准，只比原生速度慢不到1.5倍。<ref name="float32">{{cite web|url=https://hacks.mozilla.org/2013/12/gap-between-asm-js-and-native-performance-gets-even-narrower-with-float32-optimizations/|title=Gap between asm.js and native performance gets even narrower with float32 optimizations|accessdate=11 April 2014|author=Alon Zakai|date=20 December 2013|author2=Robert Nyman|archive-date=2017-03-31|archive-url=https://web.archive.org/web/20170331162312/https://hacks.mozilla.org/2013/12/gap-between-asm-js-and-native-performance-gets-even-narrower-with-float32-optimizations/|dead-url=no}}</ref> Mozilla指出本地编译代码的性能不是单个度量，而是一个范围，使用不同的本地编译器（此例中为[[Clang|Clang]]与[[GCC|GCC]]）将提供不同性能的代码。“事实上，在一些基准测试比如[[Box2D|Box2D]]、FASTA和copy中，asm.js与Clang比较接近，或者比Clang到GCC还接近Clang。在一种情况下，asm.js甚至在Box2D上略微击败Clang。”
+
+== 实现 ==
+[[Emscripten|Emscripten]]项目提供了可以编译C和C++（或其他任何可转换为[[LLVM|LLVM]] [[中間語言|IR]]的语言）代码为asm.js的工具。<ref name="github.com">{{cite web|url=https://github.com/kripken/emscripten|title=kripken/emscripten · GitHub|accessdate=2015-03-05|author=|date=|publisher=Github.com|archive-date=2015-03-03|archive-url=https://web.archive.org/web/20150303184309/https://github.com/kripken/emscripten|dead-url=no}}</ref>
+
+所有支持[[ECMAScript|JavaScript较新版本]]的浏览器都应该能支持运行asm.js代码，因为它是该规范的子集。
+
+部分浏览器的实现针对asm.js进行了特别优化：
+* [[Firefox|Mozilla Firefox]]是第一个实现针对asm.js优化的网页浏览器，自Firefox 22开始使用。 OdinMonkey是Mozilla在Firefox中使用的asm.js提前编译器，它是[[SpiderMonkey|IonMonkey]]（[[SpiderMonkey|SpiderMonkey]]的JIT编译器）的一个组件。
+* 微软在[[Microsoft_Edge|Microsoft Edge]]使用的JavaScript引擎[[Chakra|Chakra]]中实现了asm.js支持，执行验证以产生高度优化的JIT代码。<ref name="edge">{{cite web|url=https://blogs.windows.com/msedgedev/2015/05/07/bringing-asm-js-to-chakra-microsoft-edge/|title=Bringing Asm.js to Chakra and Microsoft Edge|accessdate=May 7, 2015|date=May 7, 2015|publisher=Microsoft|archive-date=2017-03-31|archive-url=https://web.archive.org/web/20170331163641/https://blogs.windows.com/msedgedev/2015/05/07/bringing-asm-js-to-chakra-microsoft-edge/|dead-url=no}}</ref>
+* [[Google_Chrome|Google Chrome]]的[[V8_(JavaScript引擎)|V8 JavaScript引擎]]在Chrome 28中对asm.js基准测试的性能是以前Chrome版本的两倍以上，<ref name="chromiumblog">{{cite web|url=http://blog.chromium.org/2013/05/chrome-28-beta-more-immersive-web.html|title=Chrome 28 Beta: A more immersive web, everywhere|accessdate=2013-07-06|publisher=Google|archive-date=2016-09-15|archive-url=https://web.archive.org/web/20160915220120/http://blog.chromium.org/2013/05/chrome-28-beta-more-immersive-web.html|dead-url=no}}</ref>尽管Chrome的V8没有使用提前编译。
+
+== 采用 ==
+目前几乎所有基于asm.js的应用程序都是使用[[Emscripten|Emscripten]]或Mandreel编译为asm.js的C/C++应用程序。
+
+到目前为止，已有不少[[编程语言|编程语言]]、{{tsl|en|Application framework|应用程序框架}}、[[计算机程序|程序]]、[[函式庫|函式庫]]、[[电脑游戏|游戏]]、[[游戏引擎|游戏引擎]]及其他软件已被[[移植_(軟體)|移植]]。<ref>{{cite web|url=https://github.com/kripken/emscripten/wiki#games-and-game-engines|title=Home — Demos — Games and Game Engines|accessdate=2017-03-15|archive-date=2017-03-20|archive-url=https://web.archive.org/web/20170320131808/https://github.com/kripken/emscripten/wiki#games-and-game-engines|dead-url=no}}</ref>部分名单见下：
+
+=== 编程语言 ===
+* C/C++：[[Clang|Clang]]和[[LLVM|LLVM]]
+* [[Lua|Lua]] VM：Lua [[虛擬機器|虛擬機器]]<ref>{{cite web|url=http://kripken.github.io/lua.vm.js/repl.html|title=Lua REPL|accessdate=2015-03-05|publisher=Kripken.github.io|deadurl=yes|archiveurl=https://web.archive.org/web/20150217013559/http://kripken.github.io/lua.vm.js/repl.html|archivedate=2015-02-17}}</ref>
+* [[Perl|Perl]]：(micro)perl-5.16.3的移植<ref>{{cite web|url=http://themucker.github.io/plu/|title=plu|accessdate=2015-03-05|publisher=Themucker.github.io|deadurl=yes|archiveurl=https://web.archive.org/web/20140615000300/http://themucker.github.io/plu/|archivedate=2014-06-15}}</ref>
+* [[Python|Python]] – [[CPython|CPython]]移植<ref>{{cite web|url=http://repl.it/languages/Python|title=repl.it — Python|accessdate=2015-03-05|publisher=Repl.it|archive-date=2015-03-06|archive-url=https://web.archive.org/web/20150306034337/http://repl.it/languages/Python|dead-url=yes}}</ref>
+* [[Ruby|Ruby]] – Ruby移植<ref>{{cite web|url=http://repl.it/languages/Ruby|title=repl.it — Ruby|accessdate=2015-03-05|publisher=Repl.it|archive-date=2015-03-03|archive-url=https://web.archive.org/web/20150303224111/http://repl.it/languages/Ruby|dead-url=no}}</ref>
+
+=== 应用程序框架 ===
+* pepper.js：许多[[Native_Client|PNaCl]]应用的移植<ref>{{cite web|url=http://trypepperjs.appspot.com/examples.html|title=pepper.js Examples|accessdate=2015-03-05|publisher=Trypepperjs.appspot.com|archive-date=2020-02-14|archive-url=https://web.archive.org/web/20200214073858/http://trypepperjs.appspot.com/examples.html}}</ref>
+* [[Qt|Qt]]：various Qt demos及KDE应用（如[[Kate|Kate]]）的移植<ref>{{cite web|url=http://vps2.etotheipiplusone.com:30176/redmine/projects/emscripten-qt/wiki/Demos|title=emscripten-qt — Demos|accessdate=2015-03-05|publisher=Vps.etotheipiplusone.com|archive-date=2015-02-13|archive-url=https://web.archive.org/web/20150213134306/http://vps2.etotheipiplusone.com:30176/redmine/projects/emscripten-qt/wiki/Demos|dead-url=yes}}</ref>
+
+=== 程序和库 ===
+* [[OpenGL|OpenGL]]、[[SDL|SDL]]和[[SDL|SDL2]]<ref>{{cite web|url=https://kripken.github.io/emscripten-site/docs/introducing_emscripten/about_emscripten.html#porting-code-to-use-emscripten|title=About Emscripten|accessdate=2017-03-15|archive-date=2017-03-16|archive-url=https://web.archive.org/web/20170316024317/https://kripken.github.io/emscripten-site/docs/introducing_emscripten/about_emscripten.html#porting-code-to-use-emscripten|dead-url=no}}</ref>
+* [[Vim|Vim]]（Vi IMproved）<ref>{{cite web|url=http://coolwanglu.github.io/vim.js/web/vim.html|title=Vim.js — JavaScript port of Vim|accessdate=2015-03-05|publisher=Coolwanglu.github.io|archive-date=2017-10-19|archive-url=https://web.archive.org/web/20171019030653/http://coolwanglu.github.io/vim.js/web/vim.html|dead-url=yes}}</ref>
+* [[FreeType|FreeType]]：在JavaScript中使用FreeType的[[TrueType|TrueType]][[字体光栅化|字体光栅化]]<ref>{{cite web|url=http://www.syntensity.com/static/freetype.html|title=TrueType Fonts in JavaScript|archiveurl=https://web.archive.org/web/20121012061814/http://www.syntensity.com/static/freetype.html|archivedate=2012-10-12|accessdate=2017-03-15|dead-url=no}}</ref>
+* [[SQLite|SQLite]]<ref>{{cite web|url=https://github.com/kripken/sql.js|title=Port of SQLite to Javascript|accessdate=2015-03-05|publisher=Github.com|archive-date=2015-02-16|archive-url=https://web.archive.org/web/20150216075538/https://github.com/kripken/sql.js|dead-url=no}}</ref>
+* [[GnuPG|GNU Privacy Guard]]<ref>{{cite web|url=http://manuels.github.io/unix-toolbox.js-gnupg/|title=GnuPG.js|accessdate=2015-03-05|publisher=Manuuels.github.io|archive-date=2015-04-25|archive-url=https://web.archive.org/web/20150425031658/http://manuels.github.io/unix-toolbox.js-gnupg/|dead-url=no}}</ref>
+* [[ctags|ctags]]<ref>{{cite web|url=https://github.com/larsxschneider/ctags.js|title=ctags in the browser|accessdate=2015-03-05|publisher=Github.com|archive-date=2019-02-15|archive-url=https://web.archive.org/web/20190215133216/https://github.com/larsxschneider/ctags.js|dead-url=no}}</ref>
+* [[gnuplot|gnuplot]]<ref>{{cite web|url=http://gnuplot.respawned.com/|title=Gnuplot online|accessdate=2015-03-05|publisher=Gnuplot.respawned.com|archive-date=2015-02-22|archive-url=https://web.archive.org/web/20150222081533/http://gnuplot.respawned.com/|dead-url=no}}</ref>
+* [[Graphviz|Graphviz]]<ref>{{cite web|url=https://github.com/mdaines/viz.js|title=A hack to put GraphViz on the web.|accessdate=2015-03-05|publisher=Github.com|archive-date=2015-02-22|archive-url=https://web.archive.org/web/20150222160227/https://github.com/mdaines/viz.js/|dead-url=no}}</ref>
+* [[zlib|zlib]]<ref>{{cite web|url=https://github.com/richardassar/zpipe|title=JavaScript port of ZLib DEFLATE for the browser|accessdate=2015-03-05|publisher=Github.com|archive-date=2014-12-05|archive-url=https://web.archive.org/web/20141205140242/https://github.com/richardassar/zpipe|dead-url=no}}</ref>
+
+=== 游戏引擎 ===
+* [[虚幻引擎|虚幻引擎3]]: 在4天内移植<ref>{{cite press release|title=Epic Games Releases ‘Epic Citadel’ on the Web|url=https://www.unrealengine.com/news/epic-games-releases-epic-citadel-on-the-web|website=UnrealEngine.com|date=May 2, 2013|access-date=2017-03-15|archive-url=https://web.archive.org/web/20161130004131/https://www.unrealengine.com/news/epic-games-releases-epic-citadel-on-the-web|archive-date=2016-11-30|dead-url=yes}}</ref><ref>{{cite web|url=http://www.extremetech.com/gaming/151900-unreal-engine-3-ported-to-javascript-and-webgl-works-in-any-modern-browser|title=Unreal Engine 3 ported to JavaScript and WebGL, works in any modern browser|accessdate=2015-03-05|work=[[ExtremeTech|ExtremeTech]]|publisher=[[Ziff_Davis|Ziff Davis]]|archive-date=2015-03-10|archive-url=https://web.archive.org/web/20150310150830/http://www.extremetech.com/gaming/151900-unreal-engine-3-ported-to-javascript-and-webgl-works-in-any-modern-browser|dead-url=no}}</ref>
+* [[Unreal_Engine_4|Unreal Engine 4]]
+* [[Unity_(游戏引擎)|Unity]]<ref>{{cite web|url=http://blogs.unity3d.com/2014/04/29/on-the-future-of-web-publishing-in-unity/|title=On the future of Web publishing in Unity|date=April 29, 2014|publisher=Blogs.unity3d.com|accessdate=2017-03-15|archive-date=2014-07-27|archive-url=https://web.archive.org/web/20140727111808/http://blogs.unity3d.com/2014/04/29/on-the-future-of-web-publishing-in-unity/|dead-url=yes}}</ref>
+* [[ScummVM|ScummVM]]，它支持许多经典的冒险游戏<ref>{{cite web|url=http://clb.demon.fi/html5scummvm/|title=HTML5|accessdate=2015-03-05|date=|publisher=Clb.demon.fi|archive-url=https://web.archive.org/web/20150306054337/http://clb.demon.fi/html5scummvm/|archive-date=2015-03-06|dead-url=yes}}</ref>
+* [[Godot|Godot]]<ref>{{cite web|url=http://docs.godotengine.org/en/stable/reference/compiling_for_web.html|title=Compiling for the Web|date=November 10, 2016|website=godotengine.org|accessdate=2017-03-15|archive-date=2017-01-13|archive-url=https://web.archive.org/web/20170113030209/http://docs.godotengine.org/en/stable/reference/compiling_for_web.html|dead-url=no}}</ref>
+
+=== 游戏 ===
+* ''[[毀滅戰士_(1993年遊戲)|Doom]]''：运行在[[PrBoom|PrBoom]]上的开源[[Freedoom|Freedoom]]游戏assets，基于开源的Doom代码<ref>{{cite web|url=http://kripken.github.io/boon/boon.html|title=Emscripten-Generated Code|accessdate=2015-03-05|date=|publisher=Kripken.github.io|archive-date=2015-02-23|archive-url=https://web.archive.org/web/20150223093957/http://kripken.github.io/boon/boon.html|dead-url=yes}}</ref>
+* ''[[超級企鵝|SuperTux]]''<ref>{{cite web|url=http://forandom.github.io/WebSupertux/|title=Emscripten-Generated Code|accessdate=2015-03-05|date=|publisher=Forandom.github.io|archive-date=2015-03-15|archive-url=https://web.archive.org/web/20150315031644/http://forandom.github.io/WebSupertux/|dead-url=yes}}</ref>
+* ''[[沙丘II_新王朝|Dune II]]'' via OpenDune<ref>{{cite web|url=http://epicport.com/en/dune2|title=Dune 2 - Online (browser version)|accessdate=2015-03-05|author=Guryanov Aleksander|date=|publisher=Epicport|archive-date=2015-03-10|archive-url=https://web.archive.org/web/20150310145336/http://epicport.com/en/dune2|dead-url=no}}</ref>
+* ''[[BananaBread|BananaBread]]'' based on [[Sauerbraten|Cube 2]]<ref>{{cite web|url=https://developer.mozilla.org/en-US/demos/detail/bananabread/|title=Mozilla Banana Bread Demo|accessdate=2015-03-05|publisher=Developer.mozilla.org|archive-date=2015-03-04|archive-url=https://web.archive.org/web/20150304190643/https://developer.mozilla.org/en-US/demos/detail/bananabread|dead-url=yes}}</ref>
+* [[Humble_Bundle|Humble Mozilla Bundle]]中的每个游戏<ref>{{cite web|url=http://arstechnica.com/gaming/2014/10/humble-mozilla-bundle-pushes-webgl-powered-browser-gaming/|title=Humble Mozilla Bundle pushes WebGL-powered browser gaming|accessdate=15 Oct 2014|date=15 Oct 2014|publisher=Ars Technica|archive-date=2014-10-16|archive-url=https://web.archive.org/web/20141016185305/http://arstechnica.com/gaming/2014/10/humble-mozilla-bundle-pushes-webgl-powered-browser-gaming/|dead-url=no}}</ref>（[[Super_Hexagon|Super Hexagon]]、[[轻率漠视重力|轻率漠视重力]]、[[Osmos|Osmos]]、[[Zen_Bound_2|Zen Bound 2]]、[[Dustforce_DX|Dustforce DX]]、[[Humble_Bundle|Voxatron]]、[[FTL:_Advanced_Edition|FTL: Advanced Edition]]和[[民主選舉_(遊戲)|Democracy 3]]）
+
+=== 仿真器 ===
+* EM-DOSBox：一个[[DOSBox|DOSBox]]模拟器的移植<ref>{{cite web|url=https://github.com/dreamlayers/em-dosbox|title=EM-Dosbox on Github|accessdate=2015-04-09|archive-date=2015-03-29|archive-url=https://web.archive.org/web/20150329184907/https://github.com/dreamlayers/em-dosbox|dead-url=no}}</ref>
+* [[Start9.io|Start9.io]]：面向多个游戏架构的网络仿真平台
+* JSMESS：一个[[Multi_Emulator_Super_System|MESS]]模拟器的移植，面向许多游戏机和计算机系统<ref>{{cite web|url=http://jsmess.textfiles.com/|title=Page Redirection|accessdate=2015-03-05|date=|publisher=Jsmess.textfiles.com|archive-date=2015-03-05|archive-url=https://web.archive.org/web/20150305122918/http://jsmess.textfiles.com/|dead-url=yes}}</ref>
+
+=== 数学计算 ===
+* HTML5 Fractal Playground<ref>{{cite web|url=http://danielsadventure.info/html5fractal|title=HTML5 Fractal Playground|accessdate=2015-03-05|publisher=Danielsadvernture.info|deadurl=yes|archiveurl=https://web.archive.org/web/20150222131913/http://danielsadventure.info/html5fractal/|archivedate=2015-02-22|df=}}</ref> – 绘制迭代函数生成的分形，例如[[曼德博集合|Mandelbrot fractal]]。
+
+== 参见 ==
+* [[WebAssembly|WebAssembly]] – 一个开发中的用于浏览器的字节码，旨在比asm.js更快地解析<br>[[PyPy|RPython]]
+* [[CrossBridge|CrossBridge]]
+* [[Native_Client|Google Native Client]]（NaCl）
+
+== 参考资料 ==
+{{reflist|30em}}
+
+== 外部链接 ==
+* {{Official website}}
+* {{GitHub|dherman/asm.js}}
+* [http://ejohn.org/blog/asmjs-javascript-compile-target Asm.js: The JavaScript Compile Target]{{Wayback|url=http://ejohn.org/blog/asmjs-javascript-compile-target |date=20170316204448 }}
+* [https://github.com/wbraswell/rperl#rperl RPerl]{{Wayback|url=https://github.com/wbraswell/rperl#rperl |date=20170305192346 }}
+* [https://www.chromestatus.com/metrics/feature/popularity#UseAsm Asm.js usage per Google Chrome statistics]{{Wayback|url=https://www.chromestatus.com/metrics/feature/popularity#UseAsm |date=20200904054200 }}
+
+
+{{JavaScript}}
+{{ECMAScript}}
+{{Mozilla}}
+[[Category:JavaScript|Category:JavaScript]]
+[[Category:Mozilla|Category:Mozilla]]
+[[Category:Web编程|Category:Web编程]]

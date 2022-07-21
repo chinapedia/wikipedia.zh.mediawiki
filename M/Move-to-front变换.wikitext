@@ -1,0 +1,117 @@
+'''MTF'''（'''Move-To-Front'''）是一种数据编码方式，作为一个额外的步骤，用于提高[[数据压缩|数据压缩]]技术效果。MTF主要使用的是数据“空间局部性”，也就是最近出现过的字符很可能在接下来的文本附近再次出现。
+
+== MTF的主要思想==
+
+（1）首先维护一个文本字符集大小的栈表，“recently used symbols”（最近访问过的字符），其中每个不同的字符在其中占一个位置，位置从0开始编号。（2）扫描需要重新编码的文本数据，对于每个扫描到的字符，使用该字符在“recently used symbols”中的index替换，并将该字符提到“recently used symbols”的栈顶的位置(index为0的位置)。重复上一步骤，直到文本扫描结束。
+
+== MTF的压缩过程==
+
+以字符串“annbaa”为例（“annbaa”在这里为字符串“banana”经过BWT变换后的结果[[:Bzip2|:Bzip2]] [[:Burrows-Wheeler变换|:Burrows-Wheeler变换]]）。基于recently used symbols，设立一个栈表“abcdefghijklmnopqrstuvwxyz”。
+
+{| class="wikitable"
+|- style="width:500px"
+!  colspan="6" | Move-To-Front 压缩过程
+|- 
+! 迭代
+! 序列
+! 栈表
+! 说明
+|-|
+|
+ a n n b a a<br/>
+ a n n b a a<br/>
+ a n n b a a<br/>
+ a n n b a a<br/>
+ a n n b a a<br/>
+ a n n b a a<br/>
+ 结果<br/>
+|
+ 0<br/>
+ 0,13<br/>
+ 0,13,0<br/>
+ 0,13,0,2<br/>
+ 0,13,0,2,2<br/>
+ 0,13,0,2,2,0<br/>
+ 0,13,0,2,2,0<br/>
+|
+ <span style="color:red;">a</span>bcdefghijklmnopqrstuvwxyz<br/>
+ <span style="color:red;">n</span>abcdefghijklmopqrstuvwxyz<br/>
+ <span style="color:red;">n</span>abcdefghijklmopqrstuvwxyz<br/>
+ <span style="color:red;">b</span>nacdefghijklmopqrstuvwxyz<br/>
+ <span style="color:red;">a</span>bncdefghijklmopqrstuvwxyz<br/>
+ <span style="color:red;">a</span>bncdefghijklmopqrstuvwxyz<br/>
+ <span style="color:red;">a</span>bncdefghijklmopqrstuvwxyz<br/>
+|
+ Index of a = 0; record 0; a is on the top<br/>
+ Index of n = 13; record 13; move n to the top<br/>
+ Index of n = 0; record 0; n is on the top<br/>
+ Index of b = 2; record 2; move b to the top<br/>
+ Index of a = 2; record 2; move a to the top<br/>
+ Index of a = 0; record 0; a is on the top<br/>
+ <br/>
+|}
+
+== MTF的压还原过程==
+
+以序列“0, 13, 0, 2, 2, 0”为例（“0, 13, 0, 2, 2, 0”在这里为字符串“aaabnn”经过MVT压缩后的结果）。基于栈表“abncdefghijklmopqrstuvwxyz”，n的指数为0，z的指数为25。
+
+{| class="wikitable"
+|- style="width:500px"
+!  colspan="6" | Move-To-Front 压缩过程
+|- 
+! 序列
+! 栈表
+! 说明
+! 输出
+! 操作
+|-|
+|
+ 0,13,0,2,2,0<br/>
+ 0,13,0,2,2<br/>
+ 0,13,0,2<br/>
+ 0,13,0<br/>
+ 0,13<br/>
+ 0<br/>
+ 结果<br/>
+|
+ <span style="color:red;">a</span>bncdefghijklmopqrstuvwxyz<br/>
+ <span style="color:red;">a</span>bncdefghijklmopqrstuvwxyz<br/>
+ <span style="color:red;">b</span>nacdefghijklmopqrstuvwxyz<br/>
+ <span style="color:red;">n</span>abcdefghijklmopqrstuvwxyz<br/>
+ <span style="color:red;">n</span>abcdefghijklmopqrstuvwxyz<br/>
+ <span style="color:red;">a</span>bcdefghijklmnopqrstuvwxyz<br/>
+ abcdefghijklmnopqrstuvwxyz<br/>
+|
+ Index of 0 = a; record a<br/>
+ Index of 0 = a; record a<br/>
+ Index of 0 = b; record b<br/>
+ Index of 0 = n; record n<br/>
+ Index of 0 = n; record n<br/>
+ Index of 0 = a; record a<br/>
+ <br/>
+|
+ a<br/>
+ a a<br/>
+ b a a<br/>
+ n b a a<br/>
+ n n b a a<br/>
+ a n n b a a<br/>
+ a n n b a a<br/>
+|
+ move a to the 0<br/>
+ move a to the 2<br/>
+ move b to the 2<br/>
+ move n to the 0<br/>
+ move n to the 13<br/>
+ move a to the 0<br/>
+ <br/>
+|}
+
+==外部链接==
+{{reflist}}
+*{{cite journal|url=http://www.cs.cmu.edu/~sleator/papers/Adaptive-data-compression.htm|title=A Locally Adaptive Data Compression Scheme|author1=J. L. Bentley|author2=D. D. Sleator|author3=R. E. Tarjan|author4=V. K. Wei|journal=Communications of the ACM|volume=29|issue=4|year=1986|doi=10.1145/5684.5688|access-date=2017-03-07|archive-date=2020-02-19|archive-url=https://web.archive.org/web/20200219140509/http://www.cs.cmu.edu/~sleator/papers/Adaptive-data-compression.htm|dead-url=no}}
+
+{{压缩方法}}
+[[Category:数据压缩|Category:数据压缩]]
+[[Category:无损压缩算法|Category:无损压缩算法]]
+[[Category:變換|Category:變換]]

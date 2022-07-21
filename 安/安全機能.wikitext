@@ -1,0 +1,46 @@
+{{NoteTA|G1=物理學
+|1=zh-hans:电动机;zh-hk:摩打;zh-tw:馬達;
+}}
+'''安全機能'''（safety function，又稱'''安全功能'''）是[[功能安全|功能安全]]中的概念，是指一些有助於設備安全性的機能，在[[IEC_61508|IEC 61508]]《電氣/電子/可程式電子安全相關系統的功能安全》法規中有提到這類的概念，但實際的安全機能會隨著應用而不同。
+
+==驅動器安全機能==
+以下是EN IEC 61800-5-2: 2007《可調速電機驅動系統，Part 5-2：安全需求-機能》 （Adjustable speed electrical power drive systems - Part 5-2: Safety requirements – Functional）中提到的一些安全機能，對應機能也可以應用在[[氣壓馬達|氣壓馬達]]及[[油壓馬達|油壓馬達]]。
+
+===STO（Safe torque off）===
+STO（Safe torque off，[[安全轉矩關閉|安全轉矩關閉]]）對應EN 60204的停止類別0。馬達的電源切斷，馬達以不受控的方式停止。在電源切斷後，馬達就不輸出轉矩。不過也不會輸出制動轉矩，因此需要靠其他方式（例如機械剎車）提供剎車，以免設備非預期的拖曳或過衝超過預期停止位置。若系統有外力（例如彈簧或是重物），需在無轉矩輸出時避免對馬達施力。
+安全機能STO 的一般應用包括輸送帶的停止、由主電源或是接觸器移除電源的緊急停止機能、藉由一個耦合設備進行的轉矩分離機能。
+
+===SS1（Safe stop 1）===
+SS1（Safe stop 1，安全停止1）對應EN 60204的停止類別1。驅動器出力使馬達減速靜止，並且停止不動，之後就驅動STO的安全機能。安全停止可以沒有監控機能（用時序控制的方式啟動STO，不論當時馬達是否靜止都啟動STO），也可以有監控機能（一直到馬達靜止時才啟動STO）。若進入驅動STO的安全機能後，對外力的反應就和STO安全機能中的相同（不出力，不會抵抗外力）。此機能多半是整合在[[變頻器|變頻器]]或是[[伺服驅動器|伺服驅動器]]中，其效果則和系統整體設計及馬達/驅動器組態而定。若馬達減速時間太短，或是剎車的轉矩太高，可能會讓STO機能過早動作，讓馬達處於旋轉中，隨自由運轉而停止的狀態下。
+
+===SS2（Safe stop 2）===
+SS1（Safe stop 2，安全停止2）對應EN 60204的停止類別2<!--，意思是SS2不能用於緊急機能-->。此安全機能下，馬達會減速停止，而且停止不動。此停止不動的狀態會由安全機能加以監控（安全受控停止，SOS）。實務上，因為馬達在控制時會有微幅的控制擾動，因此會允許在停止時，馬達位置有微小的變化，這個變化可能會造成危險。若安全監控發現馬達位置偏差已超過允許值，會依適當的故障反應（例如依STO的作法，讓馬達不出力，不抵抗外力）。此一機能一般會整合在變頻器、伺服驅動器或是機械手臂控制器中。安全機能SS2的好處是變頻器仍持續輸出電力，馬達隨時都可以再繼續運轉。若是用來設定驅動有效/無效的模式，相當方便。
+
+===SOS（Safe operation stop） ===
+SOS（Safe operation stop，安全受控停止）時，馬達會維持靜止，但其位置允許有微幅的變化，安全機能會監控馬達位置，若已超過設定允許值，會依適當的故障反應（例如依STO的作法，讓馬達不出力，不抵抗外力）。依照位置變化的允許值不同，可以監控馬達是否靜止，或是是否在一定範圍內變化。 
+===SLS（Safely limited speed）=== 
+SLS（Safely limited speed，安全限制速度）會監控馬達是否超過最高允許速度，若是有，會啟動像SS1、STO或是剎車等故障處理機制。SLS可以整合在變頻器、伺服驅動器或是由外部速度監控設備來實現。 
+===SSM （Safe speed monitor）===
+SSM（Safely speed monitor，安全速度監控）會監控馬達是否低於最低允許速度，若是有，會由上一層的安全控制啟動適合的故障處機制。例如若泵浦已低於最低速度，會由STO讓驅動泵浦的馬達不輸出。 
+===SSR（Safe speed range）===
+SSR（Safe speed range，安全速度範圍）結合了SLS和SSM機能。 
+===SLT（Safely Limited Torque）及STR（Safe Torque Range）===
+SLT（Safely Limited Torque，安全限制轉矩）會限制馬達的轉矩，避免超過一定值，而STR（Safe Torque Range，安全轉矩範圍）會限制馬達的轉矩在一定範圍內。一般的驅動器不會加裝轉矩感測器，因此此應用會用電流來估算轉矩。
+===SLP（Safe limited position）===
+SLP（Safe limited position，安全限制位置）會控制馬達（及所帶動負載）不超過事先定義的停止位置，此一機能對應極限開關。一開始是用在限制機械手臂的位置，後來也用在工業應用的驅動器中。
+===SP（Safe position）===
+SP（Safe position，安全位置）會由安全的總線提供馬達的安全位置資料，可以供安全控制器使用（停止位置監側，依位置啟動的安全機能等）。 
+===SDI（Safe direction）===
+SDI（Safe direction，安全方向）會監控馬達只能運轉在指定的位置，例如一個只能順時針旋轉的轉軸，或是一個在危險位置的裝置，只能打開，不能關閉。此一機能可以整合在變頻器、伺服驅動器或是由外部速度監控設備來實現。
+===SCA（Safe CAM）===
+SCA（Safe CAM，安全凸輪）會監控馬達只能在指定的位置範圍內定位。
+===SLI（Safely Limited Increment）===
+SDI（Safely Limited Increment，安全限制增量）會限制馬達在啟動後的位置只能在一定範圍內。若超過此範圍，需要啟動安全停止機能。
+===SBC（Safe brake control）/ SBT（Safe brake Test）===
+這二個機能會一起使用。SBC（Safe brake control，安全剎車控制）控制一個或是多個機械剎車。因此可以確保在STO啟動時，重物不會下滑或是掉落，會及時被剎車剎住。SBT（Safe brake test，安全剎車測試）會週期性的測試剎車<!-- The safety function SBT therefore tests the brake cyclically and / or before releasing the guard locking of a separate protective device with a defined torque. If a slipping of the brake is detected, a suitable fault reaction is initiated (eg approaching a safe position, engaging a support).-->，此一機能可以整合在變頻器、伺服驅動器或是安全機械手臂控制器中。
+
+==參考資料==
+* EN IEC 61800-5-2:2007
+* [https://web.archive.org/web/20180310132940/http://www.industry.siemens.com/topics/global/en/safety-integrated/machine-safety/product-portfolio/drive-technology/Pages/safety-drives.aspx?tabcardname=functions Information on safety functions of drives on the website of Siemens AG, 2014-06-25] 
+* [http://www.machinebuilding.net/ta/t0592.htm Safe motion standard EN 61800-5-2: more than Safe Torque Off] {{Wayback|url=http://www.machinebuilding.net/ta/t0592.htm |date=20180910095844 }}
+[[分類:安全工程|分類:安全工程]]
