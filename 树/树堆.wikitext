@@ -1,0 +1,322 @@
+{{Multiple issues|
+{{Expand language|1=en|time=2020-07-18T13:20:16+00:00}}
+{{Expert needed|time=2020-07-18T13:20:16+00:00}}
+{{Unreferenced|time=2020-07-18T13:20:16+00:00}}
+}}
+{{NoteTA
+|G1 = IT
+}}
+'''樹堆'''（{{lang-en|Treap}}），是計算機科學中術語。是有一个随机附加域满足[[堆|堆]]的性质的[[二叉搜索树|二叉搜索树]]，其結構相当于以随机數據插入的[[二叉搜索树|二叉搜索树]]。其基本操作的期望[[時間複雜度|時間複雜度]]为<math>O(\log{n})</math>。相對於其他的[[平衡二叉搜索樹|平衡二叉搜索樹]]，Treap的特点是實現簡單，且能基本實現隨機平衡的結構。属于弱平衡树。
+
+== 介绍 ==
+Treap一词由[[树_(数据结构)|Tree]]和[[二叉堆|Heap]]二词合成而来。其本身是一棵[[二叉搜索树|二叉搜索树]]，它的左子树和右子树也分别是一个Treap，和一般的[[二叉搜索树|二叉搜索树]]不同的是，Treap为每个节点记录优先级。Treap在以关键码构成[[二叉搜索树|二叉搜索树]]的同时，其节点优先级还满足[[堆_(数据结构)|堆]]的性质。Treap维护堆性质的方法用到了旋转，且只需要进行两种旋转操作，因此编程复杂度较[[Splay|Splay]]要小一些。
+
+=== 插入 ===
+给节点随机分配一个优先级，先和[[二叉搜索树|二叉搜索树]]的插入一样，先把要插入的点插入到一个叶子上，然后跟维护堆一样，如果当前节点的优先级比根大就旋转，如果当前节点是根的左儿子就右旋如果当前节点是根的右儿子就左旋。
+
+由于旋转是<math>O(1)</math>的，最多进行h次（h是树的高度），插入的复杂度是<math>O(h)</math>的，在期望情况下<math>h=O(\log{n})</math>，所以它的期望复杂度是<math>O(\log{n})</math>。
+
+=== 删除 ===
+
+因为Treap满足堆性质，所以只需要把要删除的节点旋转到叶节点上，然后直接删除就可以了。具体的方法就是每次找到优先级最大的儿子，向与其相反的方向旋转，直到那个节点被旋转到了叶节点，然后直接删除。
+
+删除最多进行<math>O(h)</math>次旋转，期望复杂度是<math>O(\log{n})</math>。
+
+=== 查找 ===
+和一般的[[二叉搜索树|二叉搜索树]]一样，但是由于Treap的随机化结构，Treap中查找的期望复杂度是<math>O(\log{n})</math>。
+
+== 算法分析 ==
+
+[[二叉搜索树|二叉搜索树]]有一个特性，就是每个子树的形态在优先级唯一确定的情况下都是唯一的，不受其他因素影响，也就是说，左子树的形态与树中大于根节点的值无关，右子树亦然。这是因为Treap满足堆的性质，Treap的根节点是优先级最大的那个节点，考虑它的左子树，树根也是子树里面最大的一点，右子树亦然。所以Treap相当于先把所有节点按照优先级排序，然后插入，实质上就相当于以随机顺序建立的[[二叉搜索树|二叉搜索树]]，只不过它并不需要一次读入所有数据，可以一个一个地插入。而当这个随机顺序确定的时候，这个树是唯一的。因此在给定优先级的情况下，只要是用符合要求的操作，通过任何方式得出的Treap都是一样的，所以不改变优先级的情况下，特殊的操作不会造成Treap结构的退化。而改变优先级可能会使Treap变得不够随机以致退化。
+
+Treap的其它操作的期望复杂度同样是<math>O(\log{n})</math>。
+
+== 参考程序 ==
+{{HideH|Pascal}}
+
+<syntaxhighlight lang=" pascal">
+ (*
+    Project: Amber Standard Sources Library [ASSL]
+    Author: Amber
+    Title: Treap
+    Category: Data Structure
+    Version: v1.0
+    Remark: XXXXXXXX
+    Tested Problems: N/A
+    Date: 2006-11-16
+ *)
+ program ASSL_Treap(Input, Output);
+ const
+    Infinity = 65535;
+ type
+    TIndex = Longint;
+    TKey = Longint;
+    TPriority = Word;
+    PTreapNode = ^TTreapNode;
+    TTreapNode = record
+        Left, Right: PTreapNode;
+        Priority: TPriority;
+        Key: TKey;
+    end;
+ var
+    NullNode: PTreapNode;
+ 
+ procedure Initalize;
+ begin
+    if NullNode = nil then
+    begin
+        New(NullNode);
+        NullNode^.Left := NullNode;
+        NullNode^.Right := NullNode;
+        NullNode^.Priority := Infinity;
+    end;
+ end;
+ 
+ function FindMax(T: PTreapNode): PTreapNode;
+ begin
+    if T <> NullNode then
+        while T^.Right <> NullNode do
+            T := T^.Right;
+    Result := T;
+ end;
+ 
+ function FindMin(T: PTreapNode): PTreapNode;
+ begin
+    if T <> NullNode then
+        while T^.Left <> NullNode do
+            T := T^.Left;
+    Result := T;
+ end;
+ 
+ function Find(T: PTreapNode; Key: TKey): PTreapNode;
+ begin
+    while T <> NullNode do
+        if Key < T^.Key then
+            T := T^.Left
+        else if Key > T^.Key then
+            T := T^.Right
+        else
+            Break;
+    Result := T;
+ end;
+ 
+ function LeftRotate(T: PTreapNode): PTreapNode;
+ begin
+    Result := T^.Left;
+    T^.Left := Result^.Right;
+    Result^.Right := T;
+ end;
+ 
+ function RightRotate(T: PTreapNode): PTreapNode;
+ begin
+    Result := T^.Right;
+    T^.Right := Result^.Left;
+    Result^.Left := T;
+ end;
+ 
+ function InsertNode(Key: TKey; T: PTreapNode): PTreapNode;
+ begin
+    if T = NullNode then
+    begin
+        New(T);
+        T^.Left := NullNode;
+        T^.Right := NullNode;
+        T^.Key := Key;
+        T^.Priority := Random(65535);
+    end
+    else if Key < T^.Key then
+    begin
+        T^.Left := InsertNode(Key, T^.Left);
+        if T^.Left^.Priority < T^.Priority then
+            T := LeftRotate(T);
+    end
+    else if Key > T^.Key then
+    begin
+        T^.Right := InsertNode(Key, T^.Right);
+        if T^.Right^.Priority < T^.Priority then
+            T := RightRotate(T);
+    end;
+    Result := T;
+ end;
+ 
+ function DeleteNode(Key: TKey; T: PTreapNode): PTreapNode;
+ begin
+    if T <> NullNode then
+        if Key < T^.Key then
+            T^.Left := DeleteNode(Key, T^.Left)
+        else if Key > T^.Key then
+            T^.Right := DeleteNode(Key, T^.Right)
+        else
+        begin
+            if T^.Left^.Priority < T^.Right^.Priority then
+                T := LeftRotate(T)
+            else
+                T := RightRotate(T);
+            if T <> NullNode then
+                T := DeleteNode(Key, T)
+            else //RightRotate
+            begin
+                Dispose(T^.Left);
+                T^.Left := NullNode;
+            end;
+        end;
+     Result := T;
+ end;
+ 
+ procedure Main;
+ begin
+     Initalize;
+ end;
+ begin
+     Main;
+ end.
+
+</syntaxhighlight>
+
+{{HideF}}
+
+{{HideH|C++}}
+
+<syntaxhighlight lang="cpp">
+#include <iostream>
+#include <ctime>
+
+#include <cstdlib>
+#define MAX 100
+
+using namespace std;
+
+typedef struct
+{
+	int l,r,key,fix;
+} node;
+
+class treap
+{
+public:
+	node p[MAX];
+	int size,root;
+	treap()
+	{
+		srand(time(0));
+		size=-1;
+		root=-1;
+	}
+
+	void rot_l(int &x)
+	{
+		int y=p[x].r;
+		p[x].r=p[y].l;
+		p[y].l=x;
+		x=y;
+	}
+
+	void rot_r(int &x)
+	{
+		int y=p[x].l;
+		p[x].l=p[y].r;
+		p[y].r=x;
+		x=y;
+	}
+
+	void insert(int &k,int tkey)
+	{
+		if (k==-1)
+		{
+			k=++size;
+			p[k].l=p[k].r=-1;
+			p[k].key=tkey;
+			p[k].fix=rand();
+		}
+		else if (tkey<p[k].key)
+		{
+			insert(p[k].l,tkey);
+			if (p[ p[k].l ].fix>p[k].fix)
+				rot_r(k);
+		}
+		else
+		{
+			insert(p[k].r,tkey);
+			if (p[ p[k].r ].fix>p[k].fix)
+				rot_l(k);
+		}
+
+	}
+
+	void remove(int &k,int tkey)
+	{
+		if (k==-1) return;
+		if (tkey<p[k].key)
+			remove(p[k].l,tkey);
+		else if (tkey>p[k].key)
+			remove(p[k].r,tkey);
+		else
+		{
+			if (p[k].l==-1 && p[k].r==-1)
+				k=-1;
+			else if (p[k].l==-1)
+				k=p[k].r;
+			else if (p[k].r==-1)
+				k=p[k].l;
+			else if (p[ p[k].l ].fix < p[ p[k].r ].fix)
+			{
+				rot_l(k);
+				remove(p[k].l,tkey);
+			}
+			else
+			{
+				rot_r(k);
+				remove(p[k].r,tkey);
+			}
+		}
+	}
+
+	void print(int k)
+	{
+		if (k == -1) return ;
+		if (p[k].l!=-1)
+			print(p[k].l);
+		cout << p[k].key << " : " << p[k].fix << endl;
+		if (p[k].r!=-1)
+			print(p[k].r);
+	}
+};
+
+treap T;
+
+int main(void)
+{
+
+	int i;
+	for (i = 3; i >= 1; i--)
+		T.insert(T.root,i);
+	T.print(T.root);
+	for (i = 3; i >= 1; i--)
+	{
+		cout << endl;
+		T.remove(T.root,i);
+		T.print(T.root);
+	}
+	return 0;
+}
+</syntaxhighlight>
+{{HideF}}
+
+== 与其他结构的比较 ==
+*[[AVL树|AVL树]]
+*[[伸展树|伸展树]]（Splay Tree）
+*[[线段树|线段树]]
+*[[红黑树|红黑树]]
+*[[節點大小平衡樹|Size Balanced Tree]]
+
+== 外部链接 ==
+*[http://www.ibr.cs.tu-bs.de/courses/ss98/audii/applets/BST/Treap-Example.html 一个Treap的演示] {{Wayback|url=http://www.ibr.cs.tu-bs.de/courses/ss98/audii/applets/BST/Treap-Example.html |date=20210225091757 }}
+
+*[https://web.archive.org/web/20070706050244/http://www.ischool.berkeley.edu/~aragon/pubs/rst96.pdf Randomized Search Trees(pdf)]，有对Treap和它的加权形式的详尽介绍以及复杂度的严格证明
+
+*[https://web.archive.org/web/20090814205058/http://www.nocow.cn/index.php/Treap nocow.cn - Treap]
+{{计算机科学中的树}}
+[[Category:数据结构|Category:数据结构]]
+[[Category:樹結構|Category:樹結構]]
+[[Category:二叉树|Category:二叉树]]
+[[Category:搜索树|Category:搜索树]]

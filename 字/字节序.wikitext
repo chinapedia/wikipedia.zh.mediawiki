@@ -1,0 +1,204 @@
+{{noteTA
+|T=zh-cn:字节顺序;zh-tw:位元組順序;
+|1=zh-cn:字节;zh-tw:位元組;
+|2=zh-cn:大端派;zh-tw:大頭派;
+|3=zh-cn:小端派;zh-tw:小頭派;
+|4=zh-cn:变量;zh-tw:變數;
+|5=zh-cn:配置;zh-tw:調整;
+|6=zh-cn:网络;zh-tw:網路;
+|7=zh-cn:数据;zh-tw:資料;
+|8=zh-cn:数字通信;zh-tw:數位通訊;
+|9=zh-cn:内存;zh-tw:記憶體;
+|10=zh-cn:存储;zh-tw:儲存;
+|11=zh-cn:地址;zh-tw:位址;
+}}
+'''字节顺序'''，又称'''端序'''或'''尾序'''（{{lang-en|'''Endianness'''}}），在[[计算机科学|计算机科学]]领域中，指[[存储器|電腦記憶體]]中或在数字通信链路中，组成[[字_(计算机)|多字节的字]]的[[字节|字节]]的排列顺序。
+
+在几乎所有的机器上，多字节对象都被存储为连续的字节序列。例如在[[C语言|C语言]]中，一个类型为<code>int</code>的变量<code>x</code>地址为<code>0x100</code>，那么其对应地址表达式<code>&x</code>的值为<code>0x100</code>。且<code>x</code>的四个字节将被存储在[[存储器|電腦記憶體]]的<code>0x100, 0x101, 0x102, 0x103</code>位置。<ref>《深入理解计算机系统》 第2章 ''信息的表示和处理'' P26.</ref>
+
+字节的排列方式有两个通用规则。例如，将一个多位数的低位放在较小的地址处，高位放在较大的地址处，则称'''小端序'''；反之则称'''大端序'''。在网络应用中，字节序是一个必须被考虑的因素，因为不同机器类型可能采用不同标准的字节序，所以均按照网络标准转化。
+
+例如假设上述变量<code>x</code>类型为<code><font color="#000000">int</font></code>，位于地址<code>0x100</code>处，它的值为<code>0x01234567</code>，地址范围为<code>0x100~0x103</code>字节，其内部排列顺序依赖于机器的类型。大端法从首位开始将是：<code>0x100: 0x01, 0x101: 0x23,..</code>。而小端法将是：<code>0x100: 0x67, 0x101: 0x45,..</code>。
+
+== 端（endian）的起源 ==
+“'''endian'''”一词来源于十八世紀愛爾蘭作家[[乔纳森·斯威夫特|乔纳森·斯威夫特]]（Jonathan Swift）的小说《[[格列佛游记|格列佛游记]]》（{{lang|en|''Gulliver's Travels''}}）。小说中，小人国为水煮蛋该从大的一端（Big-End）剥开还是小的一端（Little-End）剥开而争论，争论的双方分别被称为“大端派（Big-Endians）”和“小端派（Little-Endians）”。以下是1726年关于大小端之争历史的描述：
+
+{{cquote|我下面要告诉你的是，Lilliput和Blefuscu这两大强国在过去36个月里一直在苦战。战争开始是由于以下的原因：我们大家都认为，吃鸡蛋前，原始的方法是打破鸡蛋较大的一端，可是当今皇帝的祖父小时候吃鸡蛋，一次按古法打鸡蛋时碰巧将一个手指弄破了。因此他的父亲，当时的皇帝，就下了一道敕令，命令全体臣民吃鸡蛋时打破鸡蛋较小的一端，违令者重罚。老百姓们对这项命令极其反感。历史告诉我们，由此曾经发生过6次叛乱，其中一个皇帝送了命，另一个丢了王位。这些叛乱大多都是由Blefuscu的国王大臣们煽动起来的。叛乱平息后，流亡的人总是逃到那个帝国去寻求避难。据估计，先后几次有11000人情愿受死也不肯去打破鸡蛋较小的一端。关于这一争端，曾出版过几百本大部著作，不过大端派的书一直是受禁的，法律也规定该派任何人不得做官。”|《格列夫游记》 第一卷第4章 蒋剑锋（译）}}
+
+1980年，[[丹尼·科恩_(工程師)|丹尼·科恩]]（Danny Cohen），一位网络协议的早期开发者，在其著名的[[论文|论文]]"''On Holy Wars and a Plea for Peace''"中，为平息一场关于字节该以什么样的顺序传送的争论，而第一次引用了该词。<ref>《深入理解计算机系统》 第2章 ''信息的表示和处理'' P27.</ref>
+
+== 字节顺序 ==
+在哪种字节顺序更合适的问题上，人们表现得非常情绪化，实际上，就像鸡蛋的问题一样，没有技术上的原因来选择字节顺序规则，因此，争论沦为关于社会政治问题的争论，只要选择了一种规则并且始终如一地坚持，其实对于哪种字节排序的选择是任意的。
+
+对于单一的字节（''a byte''），大部分[[处理器|处理器]]以相同的顺序处理[[位元|位元]]（bit），因此单字节的存放方法和传输方式一般相同。
+
+对于多字节数据，如整数（32位机中一般占4字节），在不同的处理器的存放方式主要有两种，以内存中0x0A0B0C0D的存放方式为例，分别有以下几种方式：
+
+: ''注: <tt>0x</tt>前缀代表十六进制。''
+
+=== 大端序 ===
+'''大端序'''（英：big-endian）或稱'''大尾序'''。
+
+[[File:Big-Endian.svg|right]]
+
+* ''数据以8bit为单位'':
+
+{| cellpadding="4" style="border-collapse: collapse; margin: 0.4em 0.4em; text-align: center;"
+|-
+| colspan="6" |''地址增长方向''  →
+|-
+| style="border: 1px solid; border-left: hidden;" | <tt>...</tt>
+| style="border: 1px solid;" | <tt>0x0A</tt>
+| style="border: 1px solid;" | <tt>0x0B</tt>
+| style="border: 1px solid;" | <tt>0x0C</tt>
+| style="border: 1px solid;" | <tt>0x0D</tt>
+| style="border: 1px solid; border-right: hidden;" | <tt>...</tt>
+|}
+
+示例中，最高位字节是<tt>0x0A</tt> 存储在最低的内存地址处。下一个字节<tt>0x0B</tt>存在后面的地址处。正类似于十六进制字节从左到右的阅读顺序。
+
+* ''数据以16bit为单位'':
+
+{| cellpadding="4" style="border-collapse: collapse; margin: 0.4em 0.4em; text-align: center;"
+|-
+| colspan="6" |''地址增长方向''  →
+|-
+| style="border: 1px solid; border-left: hidden;" | <tt>...</tt>
+| style="border: 1px solid;" | <tt>0x0A0B</tt>
+| style="border: 1px solid;" | <tt>0x0C0D</tt>
+| style="border: 1px solid; border-right: hidden;" | <tt>...</tt>
+|}
+
+最高的16bit单元<tt>0x0A0B</tt>存储在低位。
+
+=== 小端序 ===
+'''小端序'''（英：little-endian）或稱'''小尾序'''。
+
+[[File:Little-Endian.svg|right]]
+
+* ''数据以8bit为单位'':
+
+{| cellpadding="4" style="border-collapse: collapse; margin: 0.4em 0.4em; text-align: center;"
+|-
+| colspan="6" |''地址增长方向''  →
+|-
+| style="border: 1px solid; border-left: hidden;" | <tt>...</tt>
+| style="border: 1px solid;" | <tt>0x0D</tt>
+| style="border: 1px solid;" | <tt>0x0C</tt>
+| style="border: 1px solid;" | <tt>0x0B</tt>
+| style="border: 1px solid;" | <tt>0x0A</tt>
+| style="border: 1px solid; border-right: hidden;" | <tt>...</tt>
+|}
+
+最低位字节是<tt>0x0D</tt> 存储在最低的内存地址处。后面字节依次存在后面的地址处。
+
+* ''数据以16bit为单位'':
+
+{| cellpadding="4" style="border-collapse: collapse; margin: 0.4em 0.4em; text-align: center;"
+|-
+| colspan="6" |''地址增长方向''  →
+|-
+| style="border: 1px solid; border-left: hidden;" | <tt>...</tt>
+| style="border: 1px solid;" | <tt>0x0C0D</tt>
+| style="border: 1px solid;" | <tt>0x0A0B</tt>
+| style="border: 1px solid; border-right: hidden;" | <tt>...</tt>
+|}
+
+最低的16bit单元<tt>0x0C0D</tt>存储在低位。
+
+* ''更改地址的增长方向'':
+
+当更改地址的增长方向，使之由右至左时，表格更具有可阅读性。
+
+{| cellpadding="4" style="border-collapse: collapse; margin: 0.4em 0.4em; text-align: center;"
+|-
+| colspan="6" |←  ''地址增长方向''
+|-
+| style="border: 1px solid; border-left: hidden;" | <tt>...</tt>
+| style="border: 1px solid;" | <tt>0x0A</tt>
+| style="border: 1px solid;" | <tt>0x0B</tt>
+| style="border: 1px solid;" | <tt>0x0C</tt>
+| style="border: 1px solid;" | <tt>0x0D</tt>
+| style="border: 1px solid; border-right: hidden;" | <tt>...</tt>
+|}
+
+最低有效位（LSB）是<tt>0x0D</tt> 存储在最低的内存地址处。后面字节依次存在后面的地址处。
+
+{| cellpadding="4" style="border-collapse: collapse; margin: 0.4em 0.4em; text-align: center;"
+|-
+| colspan="6" |←  ''地址增长方向''
+|-
+| style="border: 1px solid; border-left: hidden;" | <tt>...</tt>
+| style="border: 1px solid;" | <tt>0x0A0B</tt>
+| style="border: 1px solid;" | <tt>0x0C0D</tt>
+| style="border: 1px solid; border-right: hidden;" | <tt>...</tt>
+|}
+
+最低的16bit单元<tt>0x0C0D</tt>存储在低位。
+
+=== 混合序 ===
+'''混合序'''（英：middle-endian）具有更复杂的顺序。以[[PDP-11|PDP-11]]为例，0x0A0B0C0D被存储为：
+
+* ''32bit在PDP-11的存储方式''
+
+{| cellpadding="4" style="border-collapse: collapse; margin: 0.4em 0.4em; text-align: center;"
+|-
+| colspan="6" |''地址增长方向''  →
+|-
+| style="border: 1px solid; border-left: hidden;" | <tt>...</tt>
+| style="border: 1px solid;" | <tt>0x0B</tt>
+| style="border: 1px solid;" | <tt>0x0A</tt>
+| style="border: 1px solid;" | <tt>0x0D</tt>
+| style="border: 1px solid;" | <tt>0x0C</tt>
+| style="border: 1px solid; border-right: hidden;" | <tt>...</tt>
+|}
+
+可以看作高16bit和低16bit以大端序存储，但16bit内部以小端存储。
+<!--
+The [[ARM_architecture|ARM architecture]] can also produce this format when writing a 32-bit word to an address 2 bytes from a 32-bit word [[Data_structure_alignment|alignment]].
+-->
+
+== 处理器体系 ==
+* [[x86|x86]]、[[MOS_Technology_6502|MOS Technology 6502]]、[[Z80|Z80]]、[[VAX|VAX]]、[[PDP-11|PDP-11]]等处理器为小端序；
+* [[Motorola_6800|Motorola 6800]]、[[Motorola_68000|Motorola 68000]]、[[PowerPC_970|PowerPC 970]]、[[System/370|System/370]]、[[SPARC|SPARC]]（除V9外）等处理器为大端序；
+* [[ARM|ARM]]、[[PowerPC|PowerPC]]（除PowerPC 970外）、[[DEC_Alpha|DEC Alpha]]、[[SPARC|SPARC V9]]、[[MIPS|MIPS]]、[[PA-RISC|PA-RISC]]及[[IA64|IA64]]的字节序是可配置的。
+
+== 网络序 ==
+网络传输一般采用大端序，也被称之为'''网络字节序'''，或'''网络序'''。[[IP地址|IP]]协议中定义大端序为网络字节序。
+
+[[Berkeley套接字|Berkeley套接字]]定义了一组转换函数，用于16和32bit整数在网络序和'''本机字节序'''之间的转换。htonl，htons用于本机序转换到网络序；ntohl，ntohs用于网络序转换到本机序。
+
+== 位序 ==
+一般用于描述串行设备的传输顺序。[[网络协议|网络协议]]中只有[[数据链路层|数据链路层]]的底端会涉及到。
+
+===小端序（先传低位）的串行协议===
+* [[RS-232|RS-232]]
+* [[RS-422|RS-422]]
+* [[RS-485|RS-485]]
+* [[USB|USB]]
+* [[以太网|以太网]]（虽然高字节先传，但每一字节内低位先传）
+
+===大端序（先传高位）的串行协议===
+* [[I2C|I2C]]协议
+* [[序列周邊介面|SPI]]协议
+* [[摩尔斯电码|摩尔斯电码]]
+
+== 参见 ==
+* [[最高有效位|最高有效位]]
+* [[最低有效位|最低有效位]]
+* [[网络协议|网络协议]]
+
+==参考資料==
+<references/>
+
+== 外部链接 ==
+* [http://www.eygle.com/digest/2007/01/whats_mean_endian.html Endian的由来] {{Wayback|url=http://www.eygle.com/digest/2007/01/whats_mean_endian.html |date=20201126042656 }}
+* White Paper: [http://3bc.bertrand-blanc.com/endianness05.pdf Endianness or Where is Byte 0?]{{Wayback|url=http://3bc.bertrand-blanc.com/endianness05.pdf |date=20071203190220 }}{{en}}
+* [https://developer.apple.com/library/content/documentation/CoreFoundation/Conceptual/CFMemoryMgmt/Concepts/ByteOrdering.html Byte Ordering PPC] {{Wayback|url=https://developer.apple.com/library/content/documentation/CoreFoundation/Conceptual/CFMemoryMgmt/Concepts/ByteOrdering.html |date=20170901152917 }}{{en}}
+* [https://web.archive.org/web/20090129101142/http://www.steveheller.com/cppad/Output/basics7.html The Layout of Data in Memory]{{en}}
+* [http://www.ibm.com/developerworks/aix/library/au-endianc/index.html?ca=drs- Writing endian-independent code in C] {{Wayback|url=http://www.ibm.com/developerworks/aix/library/au-endianc/index.html?ca=drs- |date=20190119214525 }}{{en}}
+* [http://techforb.blogspot.com/2007/10/how-to-convert-integer-to-little-endian.html How to convert an integer to little endian or big endian] {{Wayback|url=http://techforb.blogspot.com/2007/10/how-to-convert-integer-to-little-endian.html |date=20200919103948 }}{{en}}
+* [http://betterexplained.com/articles/understanding-big-and-little-endian-byte-order/ Understanding big and little endian byte order]{{Wayback|url=http://betterexplained.com/articles/understanding-big-and-little-endian-byte-order/ |date=20071113135656 }}{{en}}
+* [https://web.archive.org/web/20130701081245/http://www.ietf.org/rfc/ien/ien137.txt Mandatory reading: ON HOLY WARS AND A PLEA FOR PEACE]{{en}}
+
+[[Category:電腦架構|Category:電腦架構]]

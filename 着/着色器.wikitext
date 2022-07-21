@@ -1,0 +1,106 @@
+{{NoteTA
+|G1 = IT
+}}
+{{更新|time=2019-02-05T07:09:23+00:00}}
+[[File:Phong-shading-sample.jpg|thumb]]生成光照和阴影。]]
+
+[[计算机图形学|计算机图形学]]领域中，'''着色器'''（{{lang-en|'''shader'''}}）是一种[[计算机程序|计算机程序]]，原本用于进行图像的[[浓淡处理|浓淡处理]]（计算图像中的[[光照|光照]]、[[黑暗|亮度]]、[[颜色|颜色]]等），但近来，它也被用于完成很多不同领域的工作，比如处理[[CG|CG]][[特殊效果|特效]]、进行与浓淡处理无关的{{Tsl|en|video post-processing|影片后期处理}}、甚至用于一些与计算机图形学无关的其它领域。<ref>{{cite web |url = http://www.cra.org/reports/tenure_review.html |title=Best Practices Memo |website = Cra.org |access-date=2014-05-01 |archive-url = https://web.archive.org/web/20140502002308/http://www.cra.org/reports/tenure_review.html |archive-date=2014-05-02 |url-status=dead }}</ref>
+
+使用着色器在图形硬件上计算[[渲染|渲染]]效果有很高的自由度。尽管不是硬性要求，但目前大多数着色器是针对[[GPU|GPU]]开发的。GPU的可编程[[绘图管线|绘图管线]]已经全面取代传统的固定管线，可以使用着色器语言对其编程。构成最终图像的[[像素|像素]]、[[頂點_(電腦圖學)|顶点]]、[[纹理贴图|纹理]]，它们的位置、色相、饱和度、亮度、对比度也都可以利用着色器中定义的[[算法|算法]]进行动态调整。调用着色器的外部程序，也可以利用它向着色器提供的外部[[变量|变量]]、纹理来修改这些着色器中的参数。
+
+在[[电影制作|电影]]后期处理、[[计算机成像|计算机成像]]、[[电子游戏|电子游戏]]等领域，着色器常被用来制作各种特效。除了普通的光照模型，着色器还可以调整图像的[[色相|色相]]、[[饱和度|饱和度]]、[[亮度|亮度]]、[[对比度|对比度]]，生成[[模糊|模糊]]、[[高光|高光]]、有体积光源、失焦、[[卡通渲染|卡通渲染]]、[[色調分離|色調分離]]、[[畸變|畸变]]、[[凹凸贴图|凹凸贴图]]、[[色键|色键]]（即所谓的蓝幕、绿幕抠像效果）、[[边缘检测|边缘检测]]等效果。
+
+== 历史 ==
+1988年5月，[[Pixar|Pixar]]公布了第三版[[RenderMan规范|RenderMan规范]]，将「着色器」的使用推广到了我们目前所知的各大应用领域。<ref>{{Cite web|url=http://www.redrabbit-studios.com/coursework/renderman/prman/RISpec/index.html|title=The RenderMan Interface Specification|last=|first=|date=|website=|archive-url=https://web.archive.org/web/20190616153042/https://www.redrabbit-studios.com/coursework/renderman/prman/RISpec/index.html|archive-date=2019-06-16|dead-url=yes|access-date=}}</ref>
+
+随着[[图形处理器|图形处理器]]的进步，[[OpenGL|OpenGL]]和[[Direct3D|Direct3D]]等主要的图形软件库都开始支持着色器。第一批支持着色器的 GPU 仅支持像素着色器，但随着开发者逐渐认识到着色器的强大，很快便出现了顶点着色器。2000年，第一款支持可编程像素着色器的[[显卡|显卡]] Nvidia GeForce 3（NV20）问世。Direct3D 10 和 OpenGL 3.2 则引入了几何着色器。
+
+目前，图形硬件正在朝{{Tsl|en|Unified shader model|统一着色器模型}}发展。
+
+== 设计 ==
+着色器是描述顶点或像素特征的简单程序。顶点着色器描述顶点的属性（位置、纹理坐标、颜色等），而像素着色器描述像素的特征（颜色、z深度和alpha值）。
+
+基本图形管线如下所示：
+* [[中央处理器|中央处理器]]（CPU）发送指令(已编译的[[着色器|着色器]]程序)和几何数据到位于[[显卡|显卡]]内的[[图形处理器|图形处理器]]（GPU）。
+* 顶点着色器执行几何变换。
+* 若几何着色器位于图形处理器内并已激活，它便会修改一些场景中的几何结构。
+* 若细分着色器位于图形处理器内并已激活，场景中的几何结构会被细分。
+* 计算后的几何结构被三角化（分割为三角形）。
+* 三角形被分解为2 × 2的像素块。
+* 像素块通过片段着色器被修改。
+* 进行深度测试；通过的片段将被写入屏幕，并可能被混合到帧缓冲区中。
+
+== 种类 ==
+常用的着色器有三种。比较老的显卡倾向于使用不同的处理单元处理不同类型的着色器，但新出的显卡通常都支持{{Tsl|en|Unified shader model|统一着色器模型}}，可以执行任意类型的着色器、更好地发挥显卡的处理能力。<ref>{{cite web|url=http://msdn.microsoft.com/en-us/library/bb205123(VS.85).aspx|title=Pipeline Stages (Direct3D 10) (Windows)|website=msdn.microsoft.com|access-date=2021-09-15|archive-date=2010-05-21|archive-url=https://web.archive.org/web/20100521065019/http://msdn.microsoft.com/en-us/library/bb205123(VS.85).aspx|dead-url=no}}</ref>
+
+=== 二维着色器 ===
+二维着色器处理的是[[数字图像|数字图像]]，也叫[[纹理贴图|纹理]]，着色器可以修改它们的[[像素|像素]]。二维着色器也可以参与三维图形的渲染。目前只有「像素着色器」一种二维着色器。
+
+==== 像素着色器 ====
+{{Main|像素著色引擎}}
+
+'''像素着色器'''（{{lang-en|pixel shader}}）也叫'''片段着色器'''（{{lang-en|fragment shader}}），用于计算「片段」的[[颜色|颜色]]和其它属性，此处的「片段」通常是指单独的[[像素|像素]]。最简单的像素着色器只有输出颜色值；复杂的像素着色器可以有多个输入输出<ref>{{Cite web |url=http://www.lighthouse3d.com/tutorials/glsl-tutorial/fragment-shader/ |title=存档副本 |access-date=2018-06-25 |archive-date=2021-04-24 |archive-url=https://web.archive.org/web/20210424132632/http://www.lighthouse3d.com/tutorials/glsl-tutorial/fragment-shader/ |dead-url=no }}</ref>。像素着色器既可以永远输出同一个颜色，也可以考虑光照、做[[凹凸贴图|凹凸贴图]]、生成[[阴影|阴影]]和[[高光|高光]]，还可以实现半透明等效果。像素着色器还可以修改片段的[[深度缓冲|深度]]，也可以为多个渲染目标输出多个颜色。
+
+三维图形学中，单独一个像素着色器并不能实现非常复杂的效果，因为它只能处理单独的像素，没有场景中其它几何体的信息。不过，像素着色器有屏幕坐标信息，如果将屏幕上的内容作为纹理传入，它就可以对当前像素附近的像素进行采样。利用这种方法，可以实现大量二维后期特效，例如模糊和[[边缘检测|边缘检测]]。
+
+像素着色器还可以处理管线中间过程中的任何二维图像，包括[[精灵图|精灵]]和[[纹理贴图|纹理]]。因此，如果需要在[[栅格化|栅格化]]后进行后期处理，像素着色器是唯一选择。
+
+=== 三维着色器 ===
+三维着色器处理的是[[三维模型|三维模型]]或者其它几何体，可以访问用来绘制模型的颜色和纹理。顶点着色器是最早的三维着色器；几何着色器可以在着色器中生成新的[[頂點_(電腦圖學)|顶点]]；细分曲面着色器（{{lang-en|tessellation shader}}）则可以向一组顶点中添加细节。
+
+==== 顶点着色器 ====
+顶点着色器是最常见的一种 3D 着色器，对每个交给图形处理器的[[頂點_(電腦圖學)|顶点]]都运行一次。目的是将每个顶点在虚拟空间中的 3D 坐标变换到在屏幕上显示的 2D 坐标（[[深度缓冲|深度缓冲]]（Z-Buffer）的深度值也是如此）。顶点着色器可以掌控顶点的位置、颜色和[[纹理坐标|纹理坐标]]等属性，但无法生成新的顶点。顶点着色器的输出传递到流水线的下一步。如果有之后定义了[[几何着色器|几何着色器]]，则几何着色器会处理顶点着色器的输出数据，否则，[[光栅化器|光栅化器]]继续流水线任务。
+
+=== 几何着色器 ===
+几何着色器在 OpenGL 3.2 和 Direct3D 10 中被引入, 以前可在带扩展的 OpenGL 2.0+ 中使用。改类型的着色器可以生成新的图形基元，比如点，线和三角形。[[几何着色器|几何着色器]]可以从[[多边形网格|多边形网格]]中增删顶点。它能够执行对 CPU 来说过于繁重的生成几何结构和增加模型细节的工作。Direct3D 10 增加了支持几何着色器的API，成为 Shader Model 4.0 的组成部分。OpenGL 只可通过它的一个插件来使用几何着色器，但极有可能在3.1版本中该功能将会归并。几何着色器的输出连接光栅化器的输入。
+
+==== 曲面细分着色器 ====
+
+曲面细分着色器作為一類新的著色器，在 OpenGL 4.0 和 Direct3D 11 中被引入，並在著色器的模型增加了兩個階段：曲面細分控制著色器(或外殼著色器)和曲面細分評估著色器(或域著色器)。這允許了較簡單的網格藉由特定函式計算，實時被細分成更細膩的網格。這個函示可以與多種變數相關，包含與視點的距離，因此可以主動調整[[細節層次|細節層次]]，使較接近相機的物體有著較多細節。藉由在著色器單元中才加上細節，這還可以大幅降低網格所需的頻寬，也不需要降採樣記憶體中的網格。有些計算方式可以上採樣任意的網格，有些則允許「提示」網格所要凸顯的頂點和邊緣。
+
+==== 图元和网格着色器 ====
+大约 2017 年, 图元着色器做为新的着色器阶段被 AMD Vega 微体系结构所支持。类似可以访问必要数据的计算着色器来处理几何体。
+
+==== 光线追踪着色器 ====
+光线追踪着色器被微软的 DirectX 光线追踪，Khronos Group 的 Vulkan，GLSL 和 SPIR-V，苹果的 Metal 所支持。
+
+==== 计算着色器 ====
+计算着色器并不仅限于图形应用程序，还有使用相同的通用图形处理单元执行资源的程序。它们可能在图形管线中被使用，比如额外的动画阶段或光照算法。 一些渲染 API 允许计算着色器轻松的与图形管线共享数据资源。
+
+== 并行处理 ==
+着色器被用来同时处理大量的数据，比如屏幕上的一整块像素群，或者一个模型结构的所有[[頂點_(電腦圖學)|顶点]]。[[并行计算|并行计算]]适用于这样的情况，而且当今的GPU也设计有多核结构来极大的提高处理效率。
+
+== 编程 ==
+用于编写着色器的编程语言取决于目标环境。官方的OpenGL和OpenGL ES着色语言是OpenGL着色语言，也称为GLSL，官方的Direct3D着色语言是高级着色器语言，也称为HLSL。Cg是[[英伟达|英伟达]]开发的第三方着色语言，可输出OpenGL和Direct3D着色器；然而，自2012年以来，它一直被弃用。苹果发布了自己的着色语言，称为Metal着色语言，作为Metal框架的一部分。
+
+=== GUI 着色器编辑器 ===
+现代[[电子游戏|电子游戏]]开发平台，如 [[Unity_(游戏引擎)|Unity]]，[[Unreal_Engine|Unreal Engine]] 和 [[Godot|Godot]] 越来越多的包含了基于节点的编辑器，允许创建着色器而无需编写实际的代码。向用户展现了包含相互连接的节点的有向图，允许用户将各种各样的纹理，映射和数学函数直接导向输出值，如漫反射颜色，高亮和强度，金属度/粗糙度，高度，法向量等。自动将这些图编译为实际的已编译的着色器。
+
+== 另见 ==
+* [[GLSL|GLSL]]
+* [[SPIR-V|SPIR-V]]
+* [[HLSL|HLSL]]
+* [[着色器语言|着色器语言]]
+* [[GPGPU|GPGPU]]
+
+== 参考资料 ==
+{{Reflist}}
+
+== 拓展阅读 ==
+*[http://www.lighthouse3d.com/opengl/glsl/ GLSL] {{Wayback|url=http://www.lighthouse3d.com/opengl/glsl/ |date=20210405223438 }}: ''OpenGL Shading Language @ Lighthouse 3D - GLSL Tutorial''
+*[[Steve_Upstill|Steve Upstill]]: ''The RenderMan Companion: A Programmer's Guide to Realistic Computer Graphics'', Addison-Wesley, ISBN 0-201-50868-0
+*[[David_S._Ebert|David S. Ebert]], [[F._Kenton_Musgrave|F. Kenton Musgrave]], [[Darwyn_Peachey|Darwyn Peachey]], [[Ken_Perlin|Ken Perlin]], [[Steven_Worley|Steven Worley]]: ''Texturing and modeling: a procedural approach'', AP Professional, ISBN 0-12-228730-4. [[Ken_Perlin|Ken Perlin]] is the author of [[Perlin_noise|Perlin noise]], an important procedural texturing primitive.
+*[[Randima_Fernando|Randima Fernando]], [[Mark_Kilgard|Mark Kilgard]]. ''The Cg Tutorial: The Definitive Guide to Programmable Real-Time Graphics,'' Addison-Wesley Professional, ISBN 0-321-19496-9
+*[[Randi_J._Rost|Randi J. Rost]]: ''OpenGL Shading Language'', Addison-Wesley Professional, ISBN 0-321-19789-5
+*[http://www.riemers.net/eng/Tutorials/DirectX/Csharp/series3.php Riemer's DirectX & HLSL Tutorial] {{Wayback|url=http://www.riemers.net/eng/Tutorials/DirectX/Csharp/series3.php |date=20200320230545 }}: ''HLSL Tutorial using DirectX with lots of sample code''
+*[[GPGPU|GPGPU]]: ''general purpose GPU''
+*[[MSDN|MSDN]]: [http://msdn2.microsoft.com/en-us/library/bb205123.aspx Pipeline Stages (Direct3D 10)] {{Wayback|url=http://msdn2.microsoft.com/en-us/library/bb205123.aspx |date=20080409125650 }}
+
+== 外部链接 ==
+*[http://appsrv.cse.cuhk.edu.hk/~ymxie/Geometry_Shader Geometry shader tutorial] {{Wayback|url=http://appsrv.cse.cuhk.edu.hk/~ymxie/Geometry_Shader |date=20100109232655 }}
+*nVidia releases a [http://www.nvidia.com/object/IO_37226.html new programming environment] {{Wayback|url=http://www.nvidia.com/object/IO_37226.html |date=20200703112618 }} and language compiler specifically for writing science applications that run on the shader units of its graphics cards. Also see [http://developer.nvidia.com/object/cuda.html developer's home page] {{Wayback|url=http://developer.nvidia.com/object/cuda.html |date=20080516053153 }}.
+*[https://web.archive.org/web/20070528171100/http://msi.unilim.fr/~porquet/glexts/GL_EXT_geometry_shader4.txt.html OpenGL geometry shader extension]
+
+{{Authority control}}
+{{DEFAULTSORT:Z}}
+[[Category:计算机图形学|Category:计算机图形学]]

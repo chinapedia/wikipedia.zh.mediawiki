@@ -1,0 +1,384 @@
+{{NoteTA|G1=IT}}
+{{Shortcut|H:COLL}}
+{{Notice|应当尽量使用mw自带的<code>[[mw:Manual:Collapsible_elements|mw-collapsible]]</code><code>mw-collapsed</code>及<code>mw-collapsible-content</code>CSS类，避免使用過時的NavFrame。}}
+
+在中文維基百科，'''摺疊顯示'''應用在很多條目的[[WP:导航模板|導航模板]]、[[WP:TALK|討論頁面]]等地方，透過滑鼠的點擊就可以展開和收縮一些版面，以方便讀者進行導航閱讀。
+
+此外，中文維基百科在2011年7月引入了新的折疊效果，其客製性更強，有關詳情參見[[#新摺疊效果|#新摺疊效果]]。
+
+== 摺疊模板 ==
+為了方便維基編輯的使用，下面例舉了一些常用的有摺疊功能的模板。至於它们的實現基礎，放在最下方說明，以供有興趣研究它的維基人。
+
+
+<nowiki>{{hideH|通用摺疊}}摺疊內容{{hideF}}</nowiki>
+{{hideH|通用摺疊}}摺疊內容{{hideF}}
+<pre>{{tl|delH|關閉刪除投票}}刪除討論內容{{tl|delF}}</pre>
+{{delH|關閉刪除投票}}刪除討論內容{{delF}}
+<pre>{{tl|Talkendh|關閉保护页面、破坏等请求（完成与未完成）}}刪除討論內容{{tl|Talkendf}}</pre>
+{{Talkendh|關閉保护页面、破坏等请求}}刪除討論內容{{Talkendf}}
+<pre>{{tl|talkH|關閉無關討論}}討論內容{{tl|talkF}}</pre>
+{{talkH|關閉無關討論}}討論內容{{talkF}}
+<pre>{{tl|TransH}}非中文文字{{tl|TransF}}</pre>
+<div class="NavFrame collapsed" style="color: gray!important; background-color: #F3F9FF; margin: 0 auto; padding: 0 10px 0 10px; text-align: left;">
+<div class="NavHead" style="color: gray!important; background-color: #F3F9FF; margin: 0 auto; padding: 0 10px 0 10px; font-weight:normal;">
+一些非中文的文字因为尚未翻譯而被隐藏，歡迎參與翻譯。</div><div class="NavContent" style="color: gray!important; background-color: #F3F9FF; margin: 0 auto; padding: 0 10px 0 10px;">非中文文字 not chinese</div></div>
+
+注意：{{tl|delH}}重定向至{{tl|Talkendh}}，{{tl|delF}}、{{tl|Talkendf}}、{{tl|TransF}}重定向至{{tl|hideF}}，其余参見[[:Category:摺疊模板|:Category:摺疊模板]]。
+
+== 相關政策 ==
+{{main|Wikipedia:隱藏元素|Wikipedia:剧透内容}}
+摺疊功能在主條目空間和portal空間的使用是有限制的，但在其它空間頁面下一般不會限制。由於主條目空間和portal空間是作為百科知識的載體，面對讀者，它不應當在知識的呈現上進行過多的花哨展示；並且，維基百科的條目內容要在包括電腦的多種介面上裝載，比如紙介質、PDA、手機等，在這些介面上的摺疊展示是受限的。
+
+在條目空間使用折疊功能的指導思想是：摺疊功能不可用時，必须不影響該條目的知識完整性；被摺疊部分本身对于条目的完善、阅读有辅助价值。
+
+所有在条目空间出现的摺疊块应当是noprint的，即不可打印。
+
+以下是一些可接受的使用摺疊的方面：
+*未完成的、中文读者还不能阅读的、没有形成有效知识的内容（比如未翻譯成中文的文字、短时间内正在撰写的不成型段落、可疑无来源的文字）
+*与该条目相關的主題導航
+*對多數讀者不適的內容和圖片（該內容圖片不影響條目的完整性）
+*閱讀指導，包括字詞轉換說明、免責說明等
+*自我参照的内容，比如站務維護指示
+
+== 實現基礎 ==
+<small>'''注意'''：中文維基是獨立實現的摺疊，與其它維基計劃的摺疊功能在語法上有細小差異。</small>
+
+閱讀這一節的內容要求你有一定的[[HTML|HTML]]和[[CSS|CSS]]基礎知識，通过在原始碼中設定特定的class（[[HTML|HTML]]屬性）值，就可以實現指定版面的可摺疊性。
+
+[[MediaWiki:Common.js|MediaWiki:Common.js]]中的[[javascript|javascript]]腳本会自動完成相關的[[DHTML|DHTML]]動作。
+
+目前有兩種HTML元素可以設定成可摺疊，分別是div元素和table元素。本章節的以下說明用CSS選擇器來說明各種class設定。
+
+=== 定義摺疊塊 ===
+* '''div.NavFrame''' 或 '''table.collapsible''' ：指示該區域或表格是可折疊的，該值是实现某元素的折叠功能所必須的。
+<center>
+{| class="wikitable"
+|+
+!折叠块
+! colspan="2" |折叠表格
+|-
+|<syntaxhighlight lang="html4strict"><div class="NavFrame">...</div></syntaxhighlight>
+|<syntaxhighlight lang="html4strict"><table class="collapsible">...</table></syntaxhighlight>
+|<syntaxhighlight lang="moin">
+{|
+class="collapsible"
+這里放置表格的 Wiktext 語法
+|}</syntaxhighlight>
+|}
+</center>
+* '''div.collapsed''' 或 '''table.collapsed''' ：指示該摺疊塊的初始狀態是已摺疊的，如果沒有設定該值，則摺疊塊的預設初始狀態是展開的。以下两种折叠块都可以透過點擊進行摺疊和展開。
+:<div class="NavFrame collapsed"><div class="NavHead">設定了 collapsed</div><div class="NavContent"><center>展開的文字</center></div></div>
+:<div class="NavFrame"><div class="NavHead">沒有設定 collapsed</div><div class="NavContent"><center>展開的文字</center></div></div>
+* '''div.autocollapse''' 或 '''table.autocollapse''' ：指示該摺疊塊的初始狀態是否摺疊由該頁面的可摺疊塊數量控制。如果有2個及以上的摺疊塊，則自動摺疊塊就摺疊，否則自動摺疊塊展開。
+
+=== 定義摺疊標題 ===
+摺疊標題的作用是系統自動生成“顯示▼/隱藏▲”的指示，滑鼠在摺疊標題單擊時，就會產生摺疊或展開的動作。
+==== 折叠块使用例 ====
+定義摺疊標題主要是針對div摺疊塊的，透過在div.NavFrame中放置一個'''div.NavHead'''元素，則這個div.NavHead元素就變成摺疊標題供點擊。<syntaxhighlight lang="html4strict"><div class="NavFrame collapsed"><div class="NavHead">設定了 collapsed</div><div class="NavContent"><center>展開的文字</center></div></div></syntaxhighlight>
+<div class="NavFrame collapsed"><div class="NavHead">設定了 NavHead</div><div class="NavContent"><center>展開的文字</center></div></div>
+如果在 div.NavFrame 中沒有設定 div.NavHead，則該摺疊塊將沒有摺疊標題，因此隐藏的内容无法显示。<syntaxhighlight lang="html4strict"><div class="NavFrame collapsed"><div>没有設定 collapsed</div><div class="NavContent"><center>展開的文字</center></div></div></syntaxhighlight>
+<div class="NavFrame collapsed"><div>没有設定 NavHead</div><div class="NavContent"><center>展開的文字</center></div></div>
+
+==== 表格使用例 ====
+至於table，系統自動將表格的第一行（并且該行有標題單元）作為摺疊標題。如果在 table.collapsible 中第一行沒有標題單元格，則該摺疊塊將沒有摺疊標題。
+<center>
+{| class="wikitable"
+|+
+!代码
+!效果
+|-
+|<pre>{| class="collapsible collapsed"
+|-
+! 第一行
+|-
+| 第二行
+|}</pre>
+|
+{| class="wikitable collapsible collapsed"
+|-
+! 第一行
+|-
+| 第二行
+|}
+|-
+|<pre>{| class="collapsible collapsed"
+|-
+| 第一行
+|-
+| 第二行
+|}</pre>
+|
+{| class="wikitable collapsible collapsed"
+|-
+| 第一行
+|-
+| 第二行
+|}
+|}
+</center>
+== 新摺疊效果 ==
+新的摺疊效果並不是中文維基百科開發的，而是由一些外語维基社群開發，中文維基再採用。以下各項均可加入 mw-collapsed 以实现預設隱藏。<div style="overflow:auto; ">
+{| class="wikitable"
+! 代碼及顯示
+! CSS ID，Class
+! 提示
+|-
+|
+<div style="overflow:auto;"><pre>
+<div class="mw-collapsible" data-collapsetext="點此隱藏" data-expandtext="點此開啟">
+Lorem ipsum
+</div>
+</pre></div>
+<div class="mw-collapsible" data-collapsetext="點此隱藏" data-expandtext="點此開啟">
+Lorem ipsum
+</div>
+| mw-collapsible
+| 可以加入「data-collapsetext」屬性定義打開時的文字，及「data-expandtext」定義隱藏時顯示的文字。
+|-
+| <pre>
+<div class="mw-collapsible mw-collapsed">
+Lorem ipsum
+</div>
+</pre>
+<div class="mw-collapsible mw-collapsed">
+Lorem ipsum
+</div>
+| mw-collapsible mw-collapsed
+| 
+|-
+| <pre>
+<div class="mw-collapsible mw-collapsed">
+第一個摺疊
+<div class="mw-collapsible" style="background:#eee">
+第一个子摺疊
+</div>
+<div class="mw-collapsible" style="background:#eee">
+第二个子摺疊
+</div>
+</div>
+</pre>
+<div class="mw-collapsible mw-collapsed">
+第一個摺疊
+<div class="mw-collapsible" style="background:#eee">
+第一個子摺疊
+</div>
+<div class="mw-collapsible" style="background:#eee">
+第二個子摺疊
+</div>
+</div>
+| mw-collapsible mw-collapsed
+| 可在折疊中包含多個子摺疊
+|-
+| <pre>
+{| class="wikitable sortable mw-collapsible"
+! 你好
+! 世界
+|-
+| 內容
+| 會在
+|-
+| 這裡
+| 出現
+|}
+</pre>
+{| class="wikitable sortable mw-collapsible"
+! 你好
+! 世界
+|-
+| 內容
+| 會在
+|-
+| 這裡
+| 出現
+|}
+| wikitable sortable mw-collapsible
+| 首行將會作為標題顯示
+|-
+| <pre>
+<table class="wikitable">
+<tr>
+<th>X</th> <th>Y</th> <th>Z</th>
+</tr>
+<tr>
+<td>下面的內容是預設隱藏的</td> <td>35</td> <td>91</td>
+</tr>
+<tr>
+<td class="mw-collapsible mw-collapsed">我是mw-collapsible的內容</td> <td>42</td> <td>63</td>
+</tr>
+</table>
+</pre>
+<table class="wikitable">
+<tr>
+<th>X</th> <th>Y</th> <th>Z</th>
+</tr>
+<tr>
+<td>下面的內容是預設隱藏的</td> <td>35</td> <td>91</td>
+</tr>
+<tr>
+<td class="mw-collapsible mw-collapsed">我是mw-collapsible的內容</td> <td>42</td> <td>63</td>
+</tr>
+</table>
+| mw-collapsible mw-collapsed
+| 這個有時候需要較深的HTML代碼，正常理應使用簡單的wikitable代碼。
+|-
+| <pre>
+<ul class="mw-collapsible">
+<li>Lorem
+<li>Ipsum
+<li>Dolor
+</ul>
+</pre>
+<ul class="mw-collapsible">
+<li>Lorem
+<li>Ipsum
+<li>Dolor
+</ul>
+| mw-collapsible
+| rowspan="2"| 可以使用較簡單的代碼
+|-
+| <pre><ol class="mw-collapsible">
+<li>One
+<li>Two is more than one
+<li>..a total of three items!
+</ol>
+</pre>
+<ol class="mw-collapsible">
+<li>One
+<li>Two is more than one
+<li>..a total of three items!
+</ol>
+| mw-collapsible
+|-
+| <pre>
+:<strong class="mw-customtoggle-myDivision">@</strong>
+
+<div class="mw-customtoggle-myDivision">點選這裡或任何@來打開或隱藏。</div>
+
+<div class="mw-customtoggle-myDivision" style="cursor:pointer">
+[[File:At_char.svg|100px]] ⇐ @@這裡或圖片都可以打開@@
+<div style="clear:both"></div></div>
+
+<div class="mw-collapsible mw-collapsed" id="mw-customcollapsible-myDivision">
+<div class="toccolours mw-collapsible-content">
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit
+. Morbi commodo, ipsum sed pharetra gravida
+</div>
+</div>
+</pre>
+:<strong class="mw-customtoggle-myDivision">@</strong>
+
+<div class="mw-customtoggle-myDivision">點選這裡或任何@來打開或隱藏。</div>
+
+<div class="mw-customtoggle-myDivision" style="cursor:pointer">
+[[File:At_char.svg|100px]] ⇐ @@這裡或圖片都可以打開@@
+<div style="clear:both"></div></div>
+
+<div class="mw-collapsible mw-collapsed" id="mw-customcollapsible-myDivision">
+<div class="toccolours mw-collapsible-content">
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit
+. Morbi commodo, ipsum sed pharetra gravida
+</div>
+</div>
+| class=mw-customtoggle-myDivision, class=toccolours mw-collapsible-content, id=mw-customcollapsible-myDivision
+| 每頁面只可用一次
+|-
+| <pre>
+<div class="mw-customtoggle-myTable">點此摺疊表格</div>
+{| class="wikitable sortable mw-collapsible" id="mw-customcollapsible-myTable"
+! Hello
+! World
+|-
+| Content
+| Goes
+|-
+| In
+| Here
+|}
+</pre>
+<div class="mw-customtoggle-myTable">點此摺疊表格</div>
+{| class="wikitable sortable mw-collapsible" id="mw-customcollapsible-myTable"
+! Hello
+! World
+|-
+| Content
+| Goes
+|-
+| In
+| Here
+|}
+| mw-customtoggle-myTable
+| 每頁面只可用一次
+|-
+| <pre>
+<div class="mw-customtoggle-myList">摺疊列表</div>
+
+<ul class="mw-collapsible" id="mw-customcollapsible-myList">
+<li>A
+<li>B
+<li>C
+<li>D
+</ul>
+</pre>
+<div class="mw-customtoggle-myList">摺疊列表</div>
+
+<ul class="mw-collapsible" id="mw-customcollapsible-myList">
+<li>A
+<li>B
+<li>C
+<li>D
+</ul>
+| mw-customcollapsible-myList
+| 每頁面只可用一次
+|-
+| <pre>
+<table class="wikitable">
+<tr>
+<th>X</th> <th>Y</th> <th>Z</th>
+</tr>
+<tr>
+<td><span class="mw-customtoggle-AA mw-customtoggle-BB mw-customtoggle-CC">
+點這裡隱藏或顯示行A,B及C
+</span></td> <td>20</td> <td>11</td>
+</tr>
+<tr id="mw-customcollapsible-AA" class="mw-collapsible mw-collapsed">
+<td>行A</td> <td>20</td> <td>7</td>
+</tr>
+<tr id="mw-customcollapsible-BB" class="mw-collapsible mw-collapsed">
+<td>行B</td> <td>21</td> <td>11</td>
+</tr>
+<tr id="mw-customcollapsible-CC" class="mw-collapsible mw-collapsed">
+<td>行C</td> <td>29</td> <td>1</td>
+</tr>
+<tr>
+<td>普通行</td><td>0</td><td>30</td>
+</tr>
+</table>
+</pre>
+<table class="wikitable">
+<tr>
+<th>X</th> <th>Y</th> <th>Z</th>
+</tr>
+<tr>
+<td><span class="mw-customtoggle-AA mw-customtoggle-BB mw-customtoggle-CC">
+點這裡隱藏或顯示行A,B及C
+</span></td> <td>20</td> <td>11</td>
+</tr>
+<tr id="mw-customcollapsible-AA" class="mw-collapsible mw-collapsed">
+<td>行A</td> <td>20</td> <td>7</td>
+</tr>
+<tr id="mw-customcollapsible-BB" class="mw-collapsible mw-collapsed">
+<td>行B</td> <td>21</td> <td>11</td>
+</tr>
+<tr id="mw-customcollapsible-CC" class="mw-collapsible mw-collapsed">
+<td>行C</td> <td>29</td> <td>1</td>
+</tr>
+<tr>
+<td>普通行</td><td>0</td><td>30</td>
+</tr>
+</table>
+| mw-customtoggle, mw-customcollapsible, mw-collapsible mw-collapsed
+| 每頁面只可用一次，宜使用更簡單的表格代碼
+|}
+</div>
+{{维基帮助导航}}
+[[Category:维基百科特性|Category:维基百科特性]]

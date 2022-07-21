@@ -1,0 +1,62 @@
+{{translating|[[:en:Cycle_(graph_theory)|:en:Cycle (graph theory)]]|tpercent=96|time=2020-10-04}}
+[[File:Directed_cycle.svg|thumb]]
+
+在[[图论|图论]]中，'''环'''是一条只有第一个和最后一个顶点重复的非空[[道路_(图论)|路徑]]。一个没有环的图被称作无环图，一个没有有向环的有向图被称做[[有向无环图|有向无环图]]。一个无环的连通图被称作[[树_(图论)|树]]。
+
+== 定义 ==
+=== 回路，环 ===
+* 一个'''回路'''是一条非空的路径， 其中第一个[[顶点_(图论)|顶点]]和最后一个顶点相同。令图<math>G = (V, E, \varnothing)</math>，一个回路是一条非空路径<math>(e_1, e_2, \ldots, e_n)</math>，其顶点序列为<math>(v_1, v_2, \ldots, v_n, v_1)</math>
+*一个'''环路'''或'''简单回路'''是只有第一个与最后一个顶点相同的回路。
+*回路和环的'''长度'''是它们经过的边的个数。
+
+=== 有向回路，有向环路 ===
+
+* 一个有向回路是一个非空的有向路径，其第一个与最后一个顶点相同。  令有向图<math>G=(V,E,\varnothing)</math>，一个回路是一条非空有向路径<math>(e_1, e_2, \ldots, e_n)</math>，其顶点序列为<math>(v_1, v_2, \ldots, v_n, v_1)</math>。
+* 一个有向环路，或者简单有向回路，是只有第一个与最后一个顶点重复的有向回路。
+
+==无弦环==
+如果环上任意两个顶点都不会被一条不属于环的边相连，则它被称作图中的[[弦图|无弦环]]或洞，其补被称作反洞(antihole)。无弦环可以被用来刻画{{le|完美图|Perfect graph}}：根据{{le|强完美图定理|strong perfect graph theorem}}，一个图是完美图的充要条件是它不存在顶点数为奇数的洞或反洞。[[弦图|弦图]]是一种特殊的完美图，其不存在顶点数大于等于3的无弦环
+
+图的[[圍長_(圖論)|围长]]是这个图包含的最短的环的长度。根据这个定义，最短环一定是无弦的。{{le|籠 (圖論)|Cage (graph theory)|笼}}被定义为给定了围长和度之后的最小的[[正则图|正则图]]。
+
+{{le|Peripheral cycle}}是图上具有一些特殊性质的环：对任意两个不在环上的顶点，任意连接它们的路径必须经过这个环上的顶点。如果一个图不是由一个环添加一条边构成的，则peripheral cycle一定是导出环。
+
+==在图上探测环==
+在有向图和无向图上的环可以被使用[[深度优先搜索|深度优先搜索]]（{{lang|en|DFS}}）的方法，通过寻找一条连接当前顶点与之前顶点的边（它包含了一条后向边），我们可以探测有向图和无向图上环的存在。<ref>{{cite book |author={{le|Alan Tucker||Tucker, Alan}} |title=Applied Combinatorics |year=2006 |publisher=John Wiley & sons |location=Hoboken |isbn=978-0-471-73507-6 |edition=5th |page=49 |chapter=Chapter 2: Covering Circuits and Graph Colorings }}</ref>所有DFS跳过的后向边都是某些环的一部分。<ref name="sedgewick">{{citation |first=Robert |last=Sedgewick |authorlink=罗伯特·塞奇威克 |title=Algorithms |chapter=Graph algorithms |year=1983 |publisher=Addison–Wesley |isbn=0-201-06672-6 |url=https://archive.org/details/algorithms00sedg }}</ref>在一个无向图上，指向父节点的边不能被算作后向边，但是找到已经被经过了的顶点意味着后向边的存在。在无向图的情况下，找到一个阶数为<math>n</math>图上的环只需要''O''(''n'')时间。
+
+许多[[拓扑排序|拓扑排序]]算法也会探测环的存在，因为这些环会成为拓扑排序存在的障碍。另外，如果一个有向图被分成了几个[[强连通分量|强连通分量]]，那么环只会在这些分量内部存在，而不会连接这几个分量，因为环本身就是强连接的。<ref name="sedgewick" />
+
+对于有向图，还可以使用基于分布式信息的算法。这些算法的思路基于一条从一个顶点发出的信息可以通过环回到这个顶点。分布式环检测算法对于在[[计算机集群|计算机集群]]上使用分布式图处理系统来处理大规模的图很有帮助。
+
+环检测的应用包含了使用{{le|wait-for graph}}来检测并行系统中的[[死锁|死锁]]。<ref>{{cite book |last=Silberschatz |first=Abraham |author2=Peter Galvin |author3=Greg Gagne |title=Operating System Concepts |url=https://archive.org/details/operatingsystemc0006silb |publisher=John Wiley & Sons, INC. |year=2003 |pages=[https://archive.org/details/operatingsystemc0006silb/page/260 260] |isbn=0-471-25060-0 }}</ref>
+
+==用环覆盖图==
+1736年，[[欧拉|欧拉]]证明了对于一个有限无向的图，存在一个环不重复地经过图上的每一条边地充要条件是除了孤立的定点之外，它是连通的，同时每个点的度都是偶数。相对应地，对于一个有向图来说，存在一个闭的漫游（{{lang|en|closed walk}}）不重复地经过图上的每条边的红药条件是这个图是[[强连通分量|强连接]]的，并且每个顶点都有相同的出度和入度。在这两个情况下，这个环或漫游被称作[[一笔画问题|欧拉环]]。如果一个有限的无向图，不论它是否连通，如果其每个顶点的度都是偶数，则可以找到一组简单的环不重复地覆盖每一条边，这被称作{{le|Veblen's theorem}}。<ref>{{Citation |last=Veblen |first=Oswald |authorlink=奧斯瓦爾德·維布倫 |title=An Application of Modular Equations in Analysis Situs |jstor=1967604 |series=Second Series | year=1912 |journal=[[數學年刊|數學年刊]] |volume=14 |issue=1 |pages=86–94 |doi=10.2307/1967604 }}.</ref> 即使当一个连通图并不满足欧拉定理的条件，我们仍然可以在[[多项式时间|多项式时间]]内通过解[[邮递员问题|邮递员问题]]来找到一个长度最短的闭漫游使其经过每一条边至少一次。
+
+在图上找到一个简单的环使其经过不重复地每一个顶点的问题，相比较而言更加困难，这样的环是一个[[哈密顿环|哈密顿环]]，确定图上是否存在哈密顿环是一个[[NP完全|NP完全]]问题。<ref>{{citation |author=[[理查德·卡普|Richard M. Karp]] |chapter=Reducibility Among Combinatorial Problems |chapter-url=http://cgi.di.uoa.gr/~sgk/teaching/grad/handouts/karp.pdf |title=Complexity of Computer Computations |editor=R. E. Miller and J. W. Thatcher |publisher=New York: Plenum |pages=85–103 |year=1972 |accessdate=2020-10-04 |archive-date=2021-02-10 |archive-url=https://web.archive.org/web/20210210182452/http://cgi.di.uoa.gr/~sgk/teaching/grad/handouts/karp.pdf |dead-url=no }}.</ref> 很多研究已经找到了一些种类的图，在它们上一定能够找到哈密顿环。其中的一个例子是[[奧爾定理|奧爾定理]]：如果图上每一对不相邻的顶点的度之和大于等于图的阶数，则这个图有哈密顿环。 <ref>{{citation |first=Ø. |last=Ore |authorlink=奥斯丁·欧尔 |title=Note on Hamilton circuits |journal=[[美國數學月刊|美國數學月刊]] |volume=67 |year=1960 |page=55 |issue=1 |jstor=2308928 |doi=10.2307/2308928 }}.</ref>
+
+{{le|cycle double cover conjecture}}可以表述为：对于每个无[[桥_(图论)|桥]]的图，存在一个简单环组成的[[多重集|多重集]]使得它们一起能够覆盖每一条边恰好两次。目前这个猜想仍未被证明或证伪。<ref>{{citation |last=Jaeger |first=F. |contribution=A survey of the cycle double cover conjecture |doi=10.1016/S0304-0208(08)72993-1 |pages=1–12 |series=North-Holland Mathematics Studies |title=Annals of Discrete Mathematics 27 – Cycles in Graphs |volume=27 |year=1985 }}..</ref>
+
+==由环刻画的图类别 ==
+有一些重要的图的类型可以被环来刻画和定义。它们包括：
+* [[二分图|二分图]]，不存在奇数长的环的图
+* {{le|仙人掌圖|Cactus graph}}，a graph in which every nontrivial biconnected component is a cycle
+* [[环图|环图]]，一个环组成的图
+* [[弦圖|弦圖]]，不存在长度大于3的导出环（induced cycle）的图
+* [[有向无环图|有向无环图]]，a directed graph with no cycles
+* [[线完美图|线完美图]]，每一个奇数长度的简单环都是一个三角形
+* [[完美图定理|完美图]]，不存在长度大于3的洞(hole)或反洞(antihole)
+* {{le|Pseudoforest}}，a graph in which each connected component has at most one cycle
+* {{le|Strangulated graph}}，a graph in which every peripheral cycle is a triangle
+* [[强连通分量|强连通图]]，一个有向图，其中每一条边都是环的一部分
+* {{le|無三角形圖|Triangle-free graph}}，a graph without three-vertex cycles
+
+==參見==
+* {{le|环空间|Cycle space}}
+* {{le|循環基底|Cycle basis}}
+* [[Cycle_detection|Cycle detection]] in a sequence of iterated function values
+
+==參考文獻==
+{{reflist}}
+
+{{图论}}

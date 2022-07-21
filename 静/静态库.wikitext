@@ -1,0 +1,95 @@
+{{NoteTA
+|G1 = IT
+|1 = zh-cn:库; zh-tw:函式庫; zh-hk:函數庫;
+}}
+{{refimprove|time=2015-01-06T06:38:32+00:00}}
+在[[计算机科学|计算机科学]]中，'''靜態庫'''（{{lang-en|Static library, Statically-linked library}}），或称'''靜態函式庫'''，是一個外部函式與變數的集合體。靜態函式庫的檔案內容，通常包含一堆程式設計師自定的變數與函式，其內容不像[[動態連結庫|動態連結庫]]那麼複雜，在編譯期間由[[編譯器|編譯器]]與[[链接器|链接器]]將它整合至應用程式內，並製作成[[目的碼|目的檔]]以及可以獨立運作的[[執行檔|執行檔]]。而這個執行檔與編譯執行檔的程序，都是一種程式的靜態建立（static build）。以過去的觀點來說，函式庫只能算是靜態（static）類型。
+
+需要特别指明的一点是，Linux系统下的静态库文件并非ELF二进制文件<ref>{{Cite web|title=File format differences between a static library (.a) and a shared library (.so)?|url=https://stackoverflow.com/questions/41879433/file-format-differences-between-a-static-library-a-and-a-shared-library-so}}</ref>
+
+== 与动态链接库的比较 ==
+
+=== 优点 ===
+只需保证在开发者的计算机有正确的[[函式庫|库]]文件，在以二进制发布时不需考虑在使用者的计算机上库文件是否存在及[[版本|版本]]问题，可避免[[DLL地狱|DLL地狱]]等问题。
+
+=== 缺点 ===
+生成的[[可执行文件|可执行文件]]体积较大。当初正是为了避免此问题，才开发了[[动态链接库|动态库]]技术。
+
+== 实现及使用 ==
+
+靜態函式庫可以用簡單的[[C語言|C語言]]或是[[C++|C++]]程式碼去建立它。這兩個程式語言提供關鍵字指定函式與變數是否為外部（external）或是內部（internal）連結，此外，還提供其他的特性。
+
+建立這類的函式庫時，將函式或是變數匯出（export）一定要用外部連結（''external linkage'' ）的語法特別指定它們。
+
+=== [[GCC|GCC]] ===
+静态库文件名为<code>lib*.a</code>，在使用了其中的函数之后，使用<code>-l*</code>参数要求连接器连入。
+
+例如，在许多系统上，当使用了<code>math.h</code>中的函数后，需要使用<code>-lm</code>参数连接<code>libm.a</code>文件。
+
+=== [[Visual_C++|Visual C++]] ===
+静态库文件名为<code>*.lib</code>，在使用了其中的函数之后，使用<code>#pragma comment(lib,"*")</code>预编译指令要求连接器连入。
+
+== 原始碼範例 ==
+
+=== C/C++ ===
+
+[[File:Static_lib_000.png|thumb]]的原始碼與執行結果]]
+
+{| class="wikitable" border="1"
+|+ 靜態函式庫的原始碼範例
+! 標頭檔案（Header File） !! 原始碼檔案（Source File）
+|- valign = "top"
+| <syntaxhighlight lang="cpp">
+// static_lib.h
+
+# ifndef _STATIC_LIB_H_
+# define _STATIC_LIB_H_
+
+# include <iostream>
+# include <string>
+# include <Windows.h>
+
+using namespace std;
+
+namespace STAIC_LIB
+{
+BOOL PRINT(__in string& STRING);
+}
+
+# endif
+
+</syntaxhighlight>
+| | <syntaxhighlight lang="cpp">
+// static_lib.cpp
+
+# include "static_lib.h"
+
+BOOL STAIC_LIB::PRINT(__in string& STRING)
+{
+if ( STRING.empty() )
+{
+return FALSE;
+}
+// 顯示一個字串
+cout<<STRING<<endl;
+return TRUE;
+}
+</syntaxhighlight>
+|}
+
+== 参见 ==
+
+* [[函式庫|函式庫]]
+* [[链接器|链接器]]
+* [[载入器|载入器]]
+* [[共享库|共享库]]
+* [[动态链接库|动态链接库]]
+* [[外部变量|外部变量]]
+* [[目标文件|目标文件]]
+* [[预绑定|预绑定]]
+
+== 外部連結 ==
+
+* [http://publications.gbdirect.co.uk/c_book/chapter4/linkage.html The C Book - Linkage.]
+
+[[Category:计算机程序库|Category:计算机程序库]]

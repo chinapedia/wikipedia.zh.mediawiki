@@ -1,0 +1,56 @@
+{{noteTA|G1=IT}}'''通用型別系統''' (Common Type System) 定義了執行期引擎如何使用程式中的資料型別，以及如何配置資料在記憶體中的一種標準，依照此種標準所撰寫的程式語言，都可以在同一個執行期引擎中使用，因此它是跨語言支援的重要部份，亦即符合 CTS 規範的程式語言所撰寫出的程式，都可以在 [[CLR|CLR]] 中使用。
+
+CTS與CLI規格都是由微軟所發展，目前已標準化為 ECMA 335 標準：「Common Language Infrastructure (CLI) Partitions I to VI.」，並且由 Microsoft 在 .NET Framework 中完全的實作。
+
+== CTS 的功能 ==
+
+# 建立一個可協助跨語言整合、型別安全與程式碼的高效能執行的框架規範。 
+# 提供可在許多程式語言中完全實作的物件導向模型。
+# 定義程式語言必須遵行，以幫助在不同的程式語言中所實作的物件能夠與其他程式語言互動的規則。 
+# CTS 也定義了確保由不同程式語言所定義的資料類型能與其他程式語言互動的規則。
+
+== CTS 的類型 ==
+
+CTS 定義了兩種類型： 
+
+'''實值型別 (Value-type)'''
+: 實值型別直接包含資料，而且實值型別的執行個體 (Instance) 不是在堆疊上配置，就是在結構中內嵌 (Inline) 配置。實值型別可為內建 (由執行階段實作)、使用者定義或列舉型別 (Enumeration)。
+'''參考型別 (Reference-type)'''
+: 儲存變數記憶體位址的參考，並且在堆積 (Heap) 上配置。參考型別可為自我描述型別、指標型別 (Pointer Type) 或介面型別 (Interface Type)。參考型別的型別可從自我描述型別的值判斷出來。自我描述型別可再分為陣列和類別型別。類別型別包括使用者定義型別、Boxed 實值型別和委派。
+
+== Boxing 與 Unboxing ==
+
+=== Boxing ===
+所謂的打包 (Boxing)，是指將實值型別轉換成參考型別的一種機制，如下列程式碼所示，程式並不一定要明確的告知編譯器要將實值型別轉換成參考，它自己會處理這個部份。
+<syntaxhighlight lang="csharp">
+Int32 x = 10; 
+object o = x ; // 隱含打包
+Console.WriteLine("The Object o = {0}",o); // prints out 10
+</syntaxhighlight>
+然而，一個 Int32 變數總能夠使用類似下列的方式來外顯打包：
+<syntaxhighlight lang="csharp">
+Int32 x = 10; 
+object o = (object) x; // 外顯打包（明確指定）
+Console.WriteLine("The object o = {0}",o); // prints out 10
+</syntaxhighlight>
+
+=== Unboxing ===
+所謂的解包 (Unboxing)，是指將參考型別反轉回實值型別，如下列程式所示。
+<syntaxhighlight lang="csharp">
+Int32 x = 5; 
+object o = x; // 隱含打包
+x = o; // 隱含解包
+</syntaxhighlight>
+
+== 参考文献 ==
+{{Reflist}}
+
+== 外部連結 ==
+* [http://msdn2.microsoft.com/en-us/library/zcx1eb1e(VS.80).aspx Microsoft developer's guide describing the CTS] {{Wayback|url=http://msdn2.microsoft.com/en-us/library/zcx1eb1e(VS.80).aspx |date=20080417174117 }}
+* [http://vb.net-informations.com/framework/common_type_system.htm How to Common Type System (CTS)] {{Wayback|url=http://vb.net-informations.com/framework/common_type_system.htm |date=20210421171144 }}
+* [http://msdn2.microsoft.com/en-us/library/hfa3fa08(VS.80).aspx built-in types in the .NET Framework] {{Wayback|url=http://msdn2.microsoft.com/en-us/library/hfa3fa08(VS.80).aspx |date=20080423100142 }}
+
+{{-}}
+{{DotNET}}
+
+[[Category:.NET|Category:.NET]]

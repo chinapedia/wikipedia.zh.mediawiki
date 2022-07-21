@@ -1,0 +1,87 @@
+{{noteTA
+|G1=IT
+}}
+'''Modbus'''是一种串行[[通信协议|通信协议]]，是Modicon公司（现在的[[施耐德电气|施耐德电气]] Schneider Electric）于1979年为使用[[可编程逻辑控制器|可编程逻辑控制器]]（PLC）通信而发表。Modbus已经成为工业领域通信协议事实上的[[業界標準|業界標準]]，并且现在是工业电子设备之间常用的连接方式。<ref name=Drury2009>{{cite book |first=Bill |last=Drury |title=Control Techniques Drives and Controls Handbook |edition=2nd |date=2009 |publisher=[[Institution_of_Engineering_and_Technology|Institution of Engineering and Technology]] |url=http://knovel.com/web/portal/browse/display?_EXT_KNOVEL_DISPLAY_bookid=2995&VerticalID=0 |format=PDF |pages=508– |subscription=yes |access-date=2014-12-17 |archive-date=2013-11-02 |archive-url=https://web.archive.org/web/20131102143806/http://www.knovel.com/web/portal/browse/display?_EXT_KNOVEL_DISPLAY_bookid=2995&VerticalID=0 |dead-url=no }}</ref> Modbus比其他通信协议使用的更广泛的主要原因有：
+# 公开发表并且无版权要求
+# 易于部署和维护
+# 对供应商来说，修改移动原生的位元或字节没有很多限制
+
+Modbus允许多个 (大約240個) 设备连接在同一个网络上进行通信，举个例子，一个由测量温度和湿度的装置，并且将结果发送给[[计算机|计算机]]。在[[数据采集与监视控制系统|数据采集与监视控制系统]]（SCADA）中，Modbus通常用来连接监控计算机和[[远程终端控制系统|远程终端控制系统]]（RTU）。
+
+== 协议版本 ==
+
+Modbus协议目前存在用于[[串口|串口]]、[[以太网|以太网]]以及其他支持[[互联网协议|互联网协议]]的网络的版本。
+
+大多数Modbus设备通信通过串口[[EIA-485|EIA-485]]物理层进行<ref>{{cite web |url=http://www.obvius.com/documentation/faq/modbus.html |title=存档副本 |accessdate=2008-12-23 |deadurl=yes |archiveurl=https://web.archive.org/web/20090209114051/http://obvius.com/documentation/faq/modbus.html |archivedate=2009-02-09 }}</ref>。
+
+对于串行连接，存在两个变种，它们在数值数据表示不同和协议细节上略有不同。Modbus RTU是一种紧凑的，采用二进制表示数据的方式，Modbus ASCII是一种人类可读的，冗长的表示方式。这两个变种都使用[[串行通訊|串行通訊]]（serial communication）方式。RTU格式后续的命令／数据带有[[循环冗余校验|循环冗余校验]]的校验和，而ASCII格式采用[[纵向冗余校验|纵向冗余校验]]的校验和。被配置为RTU变种的节点不会和设置为ASCII变种的节点通信，反之亦然。
+
+对于通过[[TCP/IP|TCP/IP]]（例如[[以太网|以太网]]）的连接，存在多个Modbus/TCP变种，这种方式不需要[[校验和|校验和]]计算。
+
+对于所有的这三种通信协议在数据模型和功能调用上都是相同的，只有封装方式是不同的。
+
+Modbus有一个扩展版本Modbus Plus（Modbus+或者MB+），不過此協定是Modicon专有的，和Modbus不同。它需要一个专门的协处理器来处理類似[[HDLC|HDLC]]的高速令牌旋转。它使用1Mbit/s的[[双绞线|双绞线]]，并且每个节点都有转换隔离装置，是一种采用转换／边缘触发而不是电压／水平触发的装置。连接Modbus Plus到计算机需要特别的接口，通常是支持ISA（SA85），PCI或者PCMCIA总线的板卡。
+
+== 通信和设备 ==
+Modbus协议是一個master/slave架構的協議。有一個節點是master節點，其他使用Modbus协议参与通信的節點是slave節點。每一个slave设备都有一个唯一的地址。在串行和MB+网络中，只有被指定为主节点的节点可以启动一个命令（在以太网上，任何一个设备都能发送一个Modbus命令，但是通常也只有一个主节点设备啟動指令）。
+
+一个ModBus命令包含了打算执行的设备的Modbus地址。所有設備都會收到命令，但只有指定位置的设备会执行及回應指令（地址0例外，指定地址0的指令是廣播指令，所有收到指令的設備都會執行，不過不回應指令）。所有的Modbus命令包含了检查碼，以确定到达的命令没有被破坏。基本的ModBus命令能指令一个RTU改变它的寄存器的某个值，控制或者读取一个I/O端口，以及指挥设备回送一个或者多个其寄存器中的数据。
+
+有许多modems和网关支持Modbus协议，因为Modbus协议很简单而且容易复制。它们当中一些为这个协议特别设计的。有使用有线、无线通信甚至短消息和GPRS的不同实现。不過设计者需要克服一些包括高延迟和时序的问题。
+
+== 实现 ==
+几乎所有的实现都是官方标准的某种变体。不同的供应商设备之间可能无法正确的通信。一些主要的变化有：
+* 数据类型
+** IEEE标准的[[浮点数|浮点数]]
+** 32位整型数
+** 8位数据
+** 混合数据类型
+** 整数中的位域
+** multipliers to change data to/from integer. 10, 100, 1000, 256 ...
+
+* 协议扩展
+** 16位元的從站地址
+** 32位的数据大小（1个地址 = 返回32位数据）
+** 字交换数据
+
+== 限制 ==
+
+* Modbus是在1970年末为[[可编程逻辑控制器|可编程逻辑控制器]]通信开发的，这些有限的数据类型在那个时代是可以被PLC理解的，大型二进制对象数据是不支持的。 
+
+* 对节点而言，没有一个标准的方法找到数据对象的描述信息，举个例子，确定一个寄存器数据是否表示一个介于30-175度之间的温度。 
+
+* 由于Modbus是一个主／从协议，没有办法要求设备“报告异常”（构建在以太网的TCP/IP协议之上，被称为open-mbus除外）- 主节点必须循环的询问每个节点设备，并查找数据中的变化。在带宽可能比较宝贵的应用中，这种方式在应用中消耗带宽和网络时间，例如在低速率的无线链路上。
+
+* Modbus在一个数据链路上只能处理247个地址，这种情况限制了可以连接到主控站点的设备数量（再一次指出以太网TCP/IP除外）
+
+* Modbus传输在远端通讯设备之间缓冲数据的方式进行，有对通訊一定是连续的限制，避免了传输中的缓冲区漏洞的问题
+
+* Modbus協議針對未經授權的命令或截取數據沒有安全性。<ref>{{cite conference |url= |title=Critical Infrastructure Protection III |first= |last= |date=23–25 March 2009 |conference=Third IFIP WG 11. 10 International Conference |editor-last=Palmer |editor2-first=Sujeet |editor2-last=Shenoi |publisher=Springer |location=Hanover, New Hampshire |isbn=3-642-04797-1 |page=87}}</ref>
+
+== Modbus 通訊協定學理上的弱點分析 ==
+Modbus 當初設計的時候，主要著重兩點，分別是簡單－易於各項系統或是設備上的實現與各項系統所需求的資源較低，以利降低成本， 另一則是通用－便於整合各式各樣設備或是平台，同樣地，這樣也帶來一些缺點，從資安的角度上去解析可發現具有三個主要的弱點：
+
+# 沒有保護機制－指令明碼傳輸(透過第三方封包側錄軟體就可以擷取封包內容，無須解密)。
+# 沒有認證機制－符合規範就執行 (只要符合Modbus規範之封包傳輸便可透過第三方控制軟體監控接受端設備)
+# 有可能有實現上的問題(針對未定義參考位置輸入指令值，可能造成接收端傳輸異常進而癱瘓接收端設備)。
+
+== 參考文獻 ==
+{{reflist}}
+* https://www.grb.gov.tw/search/planDetail?id=8176605 {{Wayback|url=https://www.grb.gov.tw/search/planDetail?id=8176605 |date=20210711082214 }}
+== 外部链接 ==
+* [http://www.modbus.org/specs.php 详细协议说明]{{Wayback|url=http://www.modbus.org/specs.php |date=20200927205430 }}
+* [http://www.modbus.org Modbus-IDA站点]{{Wayback|url=http://www.modbus.org/ |date=20150820100609 }}
+
+;开源软件
+* [http://libmodbus.org/ 一个基于GNU/Linux C开发的开源Modbus库]{{Wayback|url=http://libmodbus.org/ |date=20200808210334 }}
+* [http://www.freemodbus.org/index.php?lang=cn 为微控制器开发的免费的Modbus ASCII/RTU和TCP软件]{{Wayback|url=http://www.freemodbus.org/index.php?lang=cn |date=20170627044517 }}。
+*C开发。新站点位置[http://www.freemodbus.org/ http://www.freemodbus.org]{{Wayback|url=http://www.freemodbus.org/ |date=20180831171602 }}。商业支持版本在[http://www.embedded-solutions.at/ http://www.embedded-solutions.at]{{Wayback|url=http://www.embedded-solutions.at/ |date=20201029170424 }}。
+* [http://NModbus.com NModbus]{{Wayback|url=http://nmodbus.com/ |date=20200829054522 }}是一个有例子的C#实现版本
+* [https://web.archive.org/web/20081215041857/http://search.cpan.org/~cosimo/Protocol-Modbus-0.04/lib/Protocol/Modbus.pm Perl语言开发的Protocol::Modbus] 
+* [http://search.cpan.org/~dvklein/Modbus-Client-1.03/lib/Modbus/Client.pm Perl语言开发的Modbus::Client]{{Wayback|url=http://search.cpan.org/~dvklein/Modbus-Client-1.03/lib/Modbus/Client.pm |date=20180524085441 }}
+* [http://www.messen-und-deuten.de/modbus.html Ruby开发的Modbus master]{{Wayback|url=http://www.messen-und-deuten.de/modbus.html |date=20130511053005 }}。公共领域的示例代码，可以很容易的用其他脚本语言重新开发。
+
+{{自動化通訊協定}}
+
+[[Category:工業乙太網|Category:工業乙太網]]
+[[Category:网络协议|Category:网络协议]]

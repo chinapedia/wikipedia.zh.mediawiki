@@ -1,0 +1,57 @@
+{{NoteTA
+|G1=IT
+|1= zh-cn:拒绝服务; zh-tw:阻斷服務; zh-hk:阻斷服務;
+|2=zh-tw:TCP三向交握;zh-cn:TCP三次握手;
+}}
+
+[[File:Tcp_normal.svg|thumb]]）與伺服器之間正常連線狀況。三向交握正確的進行。]]
+[[File:Tcp_synflood.png|thumb]]）傳送許多封包就是不送"ACK"回到伺服器。該連線因此處於半開狀態並吞食伺服器資源。因為阻斷服務攻擊的結果合法用戶Alice與伺服器嘗試建立連線遭拒。]]
+
+'''SYN flood'''或稱'''SYN洪水'''、'''SYN洪泛'''是一種[[阻斷服務攻擊|阻斷服務攻擊]]，起因於攻擊者傳送一系列的<code>[[传输控制协议|SYN]]</code>請求到目標系統。<ref>[http://tools.ietf.org/html/rfc4987 RFC4987] {{Wayback|url=http://tools.ietf.org/html/rfc4987 |date=20170429093325 }} TCP SYN Flood攻擊與一般對策</ref><ref>[https://partners.nytimes.com/library/cyber/week/0914panix.html New York's Panix Service Is Crippled by Hacker Attack] {{Wayback|url=https://partners.nytimes.com/library/cyber/week/0914panix.html |date=20171120054438 }}, New York Times, September 14, 1996</ref>
+
+當用戶端試著與伺服器間建立[[传输控制协议|TCP]]連線時，正常情況下[[客戶端|用戶端]]與[[伺服器|伺服器]]端交換一系列的信息如下：
+
+# 用戶端透過傳送<code>SYN</code>同步（synchronize）信息到伺服器要求建立連線。
+# 伺服器透過響應用戶端<code>SYN-ACK</code>以抄收（acknowledge）請求。
+# 用戶端答應<code>[[ACK_(TCP)|ACK]]</code>，連線隨之建立。
+
+這即是所謂[[传输控制协议#建立通路|TCP三向交握]]，並且這是每個使用TCP傳輸協議建立連線的基礎。
+
+SYN flood是一種廣為人知的攻擊，一般對現代網路不太有效。這種攻擊只有在伺服器在收到<code>SYN</code>後分配資源，但在收到<code>ACK</code>之前這個區段有效。
+
+SYN flood攻擊目前有兩種方法，不過都與伺服器端沒收到<code>ACK</code>有關。惡意用戶可以跳過傳送最後的<code>ACK</code>信息；或者在<code>SYN</code>裡透過[[IP位址欺騙|欺騙]]來源[[IP位址|IP位址]]，這讓伺服器送<code>SYN-ACK</code>到假造的IP位址，因此永不可能收到<code>ACK</code>。這兩個案例伺服器會花點時間等抄收通知，故一個簡單的網路壅塞可能是由於沒有<code>ACK</code>造成的。
+
+如果這些{{le|半開通連線|TCP half-open}}綁定伺服器資源，透過海量<code>SYN</code>信息淹沒伺服器是有可能耗盡其資源。一旦所有資源都撥給半開通連線所保留，沒有新的連線（不管合法不合法）可被建立，導致阻斷服務攻擊。如果[[系统调用|系统调用]]函数需要使用到此类被消耗资源，某些系統可能會出现极为严重的故障，甚至宕機。
+
+過去(1996年)用來分配資源給半開通連線的技術牽涉到通常相當短的佇列<ref>例如：[http://www.sean.de/Solaris/soltune.html 8個空位長] {{Wayback|url=http://www.sean.de/Solaris/soltune.html |date=20071113133855 }}</ref>。佇列的每個空位可在連線完成、或者到期時<ref>例如：[http://tools.ietf.org/html/rfc1122#section-4.2.3.5 3分鐘後] {{Wayback|url=http://tools.ietf.org/html/rfc1122#section-4.2.3.5 |date=20080915103315 }}</ref>被清空。當佇列滿時，新進來的連線建立會失敗。以上面的範例來說，所有新進來的連線在總共8個封包被送出之前會被阻擋下來。也就是說，每3分鐘正時算好的8個封包將阻斷所有新進的TCP連線完成。這讓這種阻斷服務攻擊只須佔很小的傳輸量。
+
+建議的反制方法包括[[SYN_cookie|SYN cookie]]或者限定某一段時間內來自同一來源請求新連線的數量，不過因為現代的[[TCP/IP协议|TCP/IP堆疊]]沒有上面所述的[[瓶頸|瓶頸]]，因此介於SYN flood與其它種基於[[通道容量|通道容量]]類型的攻擊應該會只有很小或幾乎沒有差別。
+
+[[反射路由器|反射路由器]]亦可以被攻擊者所利用，以取代客戶端機器。SYN讲的是黑客利用TCP协议发送大量的半连接请求去攻击目标服务器或者主机，致使目标服务器发生拒绝服务，或者蓝屏。
+
+== 對策 ==
+在 RFC 4987 中有许多著名的对策，包括：
+# 過濾
+# 增加積壓
+# 減少SYN-RECEIVED定時
+# 複用古老的{{link-en|半开通TCP|TCP_half-open}}
+# SYN緩存
+# [[SYN_cookie|SYN Cookie]]
+# 混合方法
+# 防火牆和代理
+
+==相關概念==
+* [[阻斷服務攻擊|阻斷服務攻擊]]
+* [[互联网控制消息协议|互联网控制消息协议]]
+* [[IP地址欺骗|IP地址欺骗]]
+* {{le|Smurf attack}}
+* {{le|Ping flood}}
+
+== 參考資料 ==
+<references/>
+
+== 外部連結 ==
+* [http://www.cert.org/advisories/CA-1996-21.html CERT官方對SYN攻擊的建議]{{Wayback|url=http://www.cert.org/advisories/CA-1996-21.html |date=20080914221531 }}
+* {{cite web|url=http://www.vivaolinux.com.br/artigos/verArtigo.php?codigo=7070|title=Iptables protege contra SYN FLOOD?|language=pt-br|accessdate=2008-09-25|archive-date=2008-06-28|archive-url=https://web.archive.org/web/20080628220659/http://www.vivaolinux.com.br/artigos/verArtigo.php?codigo=7070|dead-url=no}}
+
+[[Category:阻斷服務攻擊|Category:阻斷服務攻擊]]

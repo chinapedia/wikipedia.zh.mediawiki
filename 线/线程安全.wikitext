@@ -1,0 +1,57 @@
+{{NoteTA
+|G1=IT
+}}
+'''线程安全'''是[[编程|程式設計]]中的术语，指某个[[函数_(计算机科学)|函数]]、[[函数库|函数库]]在[[多執行緒|多執行緒]]环境中被调用时，能够正确地处理多个[[執行緒|執行緒]]之间的[[公用變數|公用變數]]，使[[程序|程序]]功能正确完成。
+
+假設有間銀行只有 1000 元，而兩個人同時提領 1000 元時就可能會拿到總計 2000 元的金額。為了避免這個問題，該間銀行提款時應該使用[[互斥锁|互斥鎖]]，即意味著針對同一個資源處理時，前一個人提領交易完成後才處理下一筆交易。但這種手法會使得效能降低。
+
+一般来说，线程安全的函数应该为每个调用它的线程分配专门的空间，来储存需要单独保存的状态（如果需要的话），不依赖于“[[线程惯性|线程惯性]]”，把多个线程共享的变量正确对待（如，通知编译器该[[變數|變數]]为“易失（volatile）”型，阻止其进行一些不恰当的优化），而且，线程安全的[[函数|函数]]一般不应该修改全局对象。
+
+很多C库代码（比如某些strtok的实现，它将“多次调用中需要保持不变的状态”储存在静态变量中，导致不恰当的共享）不是线程安全的，在[[多執行緒|多執行緒]]环境中调用这些函数时，要进行特别的预防措施，或者寻找别的替代方案。
+
+==例子==
+在下面这段代码中，函数increment_counter是线程安全的，但不是[[可重入|可重入]]的。
+<syntaxhighlight lang="cpp">
+#include <pthread.h>
+
+int increment_counter ()
+{
+	static int counter = 0;
+	static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+	pthread_mutex_lock(&mutex);
+	
+	// only allow one thread to increment at a time
+	++counter;
+	// store value before any other threads increment it further
+	int result = counter;	
+
+	pthread_mutex_unlock(&mutex);
+	
+	return result;
+}
+</syntaxhighlight>
+上面的代码中，函数increment_counter可以在多个线程中被调用，因为有一个互斥锁mutex来同步对共享变量counter的访问。但是如果这个函数用在可重入的中断处理程序中，如果在pthread_mutex_lock(&mutex)和pthread_mutex_unlock(&mutex)之间产生另一个调用函数increment_counter的中断，则会第二次执行此函数，此时由于mutex已被lock，函数会在pthread_mutex_lock(&mutex)处阻塞，并且由于mutex没有机会被unlock，阻塞会永远持续下去。简言之，问题在于 [[pthread|pthread]] 的 mutex 不可重入。
+
+解决办法是设定 PTHREAD_MUTEX_RECURSIVE 属性。然而对于给出的问题而言，专门使用一个 mutex 来保护一次简单的增量操作显然过于昂贵，因此[[c++11|c++11]]中的[[Atomic_(C++标准库)|原子变量]]提供了一个可使此函数既线程安全又可重入（而且还更简洁）的替代方案：
+
+<syntaxhighlight lang="cpp">
+#include <atomic>
+
+int increment_counter ()
+{
+	static std::atomic<int> counter(0);
+	
+	// increment is guaranteed to be done atomically
+	int result = ++counter;
+
+	return result;
+}
+</syntaxhighlight>
+
+==外部連結==
+*[http://wiki.tcl.tk/3839 Thread-safe Tcl Extensions]（wiki page）
+*[https://web.archive.org/web/20060709225447/http://www.javaworld.com/javaworld/javaqa/1999-04/01-threadsafe.html Thread-safe design]
+*Article "[https://web.archive.org/web/20060813123122/http://www.javaworld.com/javaworld/jw-08-1998/jw-08-techniques.html Design for thread safety]" by Bill Venners
+*Article "[https://web.archive.org/web/20060810232654/http://www.javaworld.com/javaworld/jw-07-2004/jw-0712-threadsafe.html Write thread-safe servlets]" by Phillip Bridgham
+[[Category:執行緒|Category:執行緒]]

@@ -1,0 +1,101 @@
+{{Documentation subpage}}
+<includeonly>{{缺乏中文說明}}{{Intricate template}}</includeonly>
+<!-- EDIT TEMPLATE DOCUMENTATION BELOW THIS LINE -->
+這是{{tl|pp-meta}}，一個用於製造[[Wikipedia:模板消息/维护#受到保護的文章、頁面和圖片|保護訊息框]]的元模板。
+
+這元模板會自動替名字空間選用正確的風格。It also takes care of the code for the "small" case with just a small padlock icon at the top right corner of the page.
+
+=== Examples ===
+Note that the small padlock in the top right corner of this page also is an example created with this meta-template. This template uses a position that does not collide with icons such as the "Featured Article" star, the "[[Wikipedia:WikiProject Spoken Wikipedia|Spoken Wikipedia]]" icon, or other top-right-hand-corner icons.
+
+==== Main space ====
+{{pp-protected|demospace=main|demolevel=sysop|categories=no}}
+
+==== Any talk space ====
+{{pp-protected|demospace=talk|demolevel=sysop|categories=no|small=no}}
+
+==== Other spaces ====
+{{pp-protected|demospace=other|demolevel=sysop|categories=no}}
+
+=== Usage ===
+
+<pre style="white-space: pre-wrap;">{{pp-meta
+| type = <any of "full", "semi", "pc1", "pc2", "indef", "move", "create" or "office" depending on protection type>
+| disallowlevel = <if type is not move or create and the template should only be used on one protection level, then "autoconfirmed" or "sysop">
+| small = {{{small|}}} <unless template should always be small, then "yes", or if never small, "no" or omit>
+| right = {{{right|}}} <unless small versions of the template should be somewhere other than the default location>
+| expiry = {{{expiry|}}} <omit for indef templates>
+| reason = &amp;#32;<your reason here>
+| xfd = <if type is "create", then "{{{xfd|}}}", else omit>
+| demospace = {{{demospace|}}} <unless template should only be used in one mainspace, when it is then
+   appropriate to set this to "main", "talk", or "other" where talk includes all odd-numbered namespaces>
+| demolevel = {{{demolevel|undefined}}} <unless you want the template to strictly fail on inappropriate protection levels, or want to disable the protection checks>
+| image = <your image here without Image: prefix, omit unless nonstandard>
+| icon-link = <your link without any [[]] but perhaps with a #section here, applies to icon version>
+| icon-text = <your *complete* alternate icon text including full stop if applicable.
+   Use only plaintext. Omit unless nonstandard.>
+| icon-reason = <your specific reason here without full stop, use only plaintext>
+| reason-text = <your complete top line without formatting but including full stop and allowing wikilinks.>
+| explanation-text = <Your full explanation here>
+| categories = {{{categories|<your categories here, else replace all with "no">}}}
+}}</pre>
+
+=== Parameters ===
+This template is designed to be both defining of the major types of protection notice, but flexible enough to allow exceptions. All parameters have some fallback to allow for [[fault-tolerant system|graceful failure]], but some should almost always be applied.
+
+===="Usually" required parameters====
+;<code>type</code>:The '''type''' parameter applies most default settings for the broad classes of protection templates. It can have values equal to any of the following: <code>full</code>, <code>semi</code>, <code>pc1</code>, <code>pc2</code>, <code>indef</code>, <code>move</code>, <code>create</code>, and <code>office</code> (all case-insensitive). These values apply default boilerplate text, images, and links. This parameter should almost always be used, as the default settings require little other input, making the code of templates such as <span style="font-family:monospace;"><nowiki>{{</nowiki>[[Template:Pp-protected|pp-protected]]<nowiki>}}</nowiki></span> very clean. Note that not supplying this parameter causes the image to default to [[:Image:Transparent.gif]].
+;<code>small</code>: The '''small''' parameter lets the template decide whether to display a small icon version or a large boilerplate version. It can take any value, but the only one which will be acted on is "<code>yes</code>" (case-insensitive). As instance templates should be able to decide, using their input, whether or not to apply <code>small</code>, this should usually be set to <code><nowiki>{{{small|}}}</nowiki></code>, which defaults to non-small but allows small to be specified. Not supplying this parameter will cause the template to always be expanded big.
+;<code>right</code>: The '''right''' parameter sets the horizontal location of the small version of the template. The default value is 55px. Templates should pass this through, changing the default value if necessary.
+;<code>expiry</code>: This '''expiry''' parameter allows, when <code>type</code> is defined normally, the expiry date to be automatically displayed properly for both the tooltip of the small version and in text for the large version. It should typically take the input <code><nowiki>{{{expiry|}}}</nowiki></code>, which allows instances using this template to be provided input specifying the expiry date. It should be left blank for templates where <code>type</code> is set to <code>indef</code>, as it has no effect because indefinite protection templates clearly do not need expiry dates to be specified.
+;<code>dispute</code>:The '''dispute''' parameter adds some boilerplate text disclaiming against endorsement of the protected version or title. It is not dependent on the <code>type</code> parameter, but the <code>explanation-text</code> parameter described below overrides it when applicable.
+;<code>reason</code>:The '''reason''' parameter allows a particular reason to be applied to the template to explain why the page is protected. The code used in this parameter should be prefixed with <code>&amp;#32;</code> so that there are proper spaces between words as <code><nowiki>{{{reason|}}}</nowiki></code> in the code is not prefixed with a space, such that the requisite full stop is not prefixed by a space when <code>reason</code> is null. Instances which want to pass through the reason should use code along the general lines of <code><nowiki>{{{reason|a default reason}}}</nowiki></code>.
+;<code>categories</code>: The '''categories''' parameter is relatively strict in the input form instances of this template should use: if the template has categories that it should apply to pages upon which it is placed, they should be implemented within the container of <code><nowiki>{{{categories|</nowiki></code> and <code><nowiki>}}}</nowiki></code>, which will cause categories to be disabled in the instances if they are given <code>|categories=no</code> as an argument. If the template applies no categories, there is no use for this parameter.
+;<code>demospace</code>: Although the '''demospace''' parameter is primarily useful for testing purposes, its name betrays its purpose: demonstration. Instances should generally use the code <code>demospace=<nowiki>{{{demospace|}}}</nowiki></code> so as to allow them to be forced to display as though they were in a particular namespace. If a template is to be always used in a particular namespace and never in another, it is also possible to set <code>demospace</code> to any of <code>main</code>, <code>talk</code>, or <code>other</code> (all case-insensitive) to specify the messagebox type typical for that namespace or namespace family such that it will never change from that type.
+;<code>demolevel</code>: The '''demolevel''' parameter, like the <code>demospace</code> parameter, is useful for demonstration and testing. Instances should generally use the code <code>demospace=<nowiki>{{{demolevel|undefined}}}</nowiki></code> so as to allow them to be forced to display as though they were on a page with a particular level of protection. This must have the default of "undefined" if it is used, as a null value will cause the template to fail. Failing the demolevel test causes the template to disappear and the page to be placed into [[:Category:Wikipedia pages with incorrect protection templates]].
+
+====Type-dependent parameters====
+;<code>xfd</code>: If the <code>type</code> applied is <code>create</code>, and <code>explanation-text</code> as below does not over-ride it, then the parameter '''xfd''' should be applied as equal to <code><nowiki>{{{xfd|}}}</nowiki></code> so that this input is passed through and the explanation can be more descriptive.
+
+====Optional parameters====
+;<code>image</code>:The '''image''' parameter allows an alternate icon to be chosen if so desired. This image should typically be chosen from [[Commons:Padlock icons]], though any image can be chosen. Only the name of the alternate image should be applied; ''do not'' supply the "Image:" prefix.
+;<code>icon-link</code>:The '''icon-link''' parameter allows one to change the page to which the small version's icon links. This probably shouldn't generally be used if <code>type</code> is in use as <code>type</code> applies proper links to [[Wikipedia:Protection policy]], but it allows for exceptions and can define the link to sections within that page. Input given to this parameter should ''not'' be supplied within <nowiki>[[double brackets]]</nowiki>.
+;<code>icon-text</code>: The '''icon-text''' parameter, like the <code>icon-link</code> parameter, affects only the small version. This one, however, affects the text outputted as the tooltip for the protection icon. It completely replaces, when used, the default text and any specified by <code>type</code>, ''including'' the final full stop.
+;<code>icon-reason</code>: The '''icon-reason''' parameter allows text to be added to the default text of the small version's tooltip as supplied by <code>type</code>. It is over-written by <code>icon-text</code> if that parameter is used.
+;<code>reason-text</code>: This parameter, '''reason-text''', allows one to over-ride the first, bolded line of the text of the expanded version of any instance. It, when used, over-rides input as initially defined by <code>type</code>, <code>expiry</code>, and <code>reason</code>, ''including'' the final full stop.
+;<code>explanation-text</code>:This code over-rides the explanation text following the bolded reason line; it over-rides text initially provided by the template itself, <code>type</code>, <code>dispute</code>, and, if applicable, <code>xfd</code>.
+;<code>disallowlevel</code>:This code disallows a particular level of protection for templates which do not have the type <code>move</code> or <code>create</code>. It can be set to either <code>autoconfirmed</code> or <code>sysop</code> to disable the template on semi-protected or full-protected pages respectively. If the page is protected at the disallowed level and <code>demolevel</code> is not set to the allowed level, the template will not appear and the page will be placed into [[:Category:Wikipedia pages with incorrect protection templates]].
+
+====Full list of parameters in vertical form====
+<pre><nowiki>
+{{pp-meta
+| type =
+| disallowlevel =
+| small =
+| expiry =
+| reason =
+| xfd =
+| demospace =
+| demolevel =
+| image =
+| icon-link =
+| icon-text =
+| icon-reason =
+| reason-text =
+| explanation-text =
+| categories =
+}}
+</nowiki></pre>
+
+=== See also ===
+* [[Wikipedia:Template messages/Maintenance#Protected articles, pages and images]] for examples of all current protection templates.
+
+{{Protection templates}}
+ 	
+<includeonly>{{#ifeq:{{SUBPAGENAME}}|sandbox |
+| <!-- ADD CATEGORIES BELOW THIS LINE, PLEASE: -->
+[[Category:條目訊息模板|{{PAGENAME}}]]
+[[Category:討論訊息模板|{{PAGENAME}}]]
+[[Category:保護模板|*]]
+[[Category:維基百科元模板|Pp-meta]]
+}}</includeonly>

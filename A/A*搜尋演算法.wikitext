@@ -1,0 +1,79 @@
+{{noteTA
+|G1 = IT
+|T=zh-cn:A*搜索算法;zh-tw:A*搜尋演算法;zh-hk:A*搜尋演算法;
+|1=zh-cn:A*搜索算法;zh-tw:A*搜尋演算法;zh-hk:A*搜尋演算法;
+}}
+{{Refimprove|time=2015-06-30T10:49:26+00:00}}
+{{Expand|time=2018-03-05T03:07:28+00:00}}
+[[File:Astar_progress_animation.gif|right]]
+'''A*搜索算法'''（A* search algorithm）是一種在圖形平面上，有多個[[節點|節點]]的[[路径|路徑]]，求出最低通過[[成本|成本]]的[[算法|演算法]]。常用於遊戲中的NPC的移動計算，或[[网络游戏|网络游戏]]的BOT的移動計算上。
+
+该算法综合了{{link-en|最良優先搜索|Best-first search}}和[[Dijkstra算法|Dijkstra算法]]的优点：在进行启发式搜索提高算法效率的同时，可以保证找到一条最优路径（需要评估函数满足单调性）。
+
+在此算法中，如果以<math>g(n)</math>表示从起点到任意顶点<math>n</math>的实际距离，<math>h(n)</math>表示任意顶点<math>n</math>到目标顶点的估算距离（根据所采用的评估函数的不同而变化），那么A*算法的估算函数为：
+
+:<math>f(n) = g(n) + h(n)</math>
+
+这个公式遵循以下特性：
+
+* 如果<math>g(n)</math>为0，即只计算任意顶点<math>n</math>到目标的评估函数<math>h(n)</math>，而不计算起点到顶点<math>n</math>的距离，则算法转化为使用贪心策略的{{link-en|最良優先搜索|Best-first search}}，速度最快，但可能得不出最优解；
+* 如果<math>h(n)</math>不大于顶点<math>n</math>到目標[[顶点_(图论)|頂點]]的實際距離，则一定可以求出最优解，而且<math>h(n)</math>越小，需要计算的节点越多，算法效率越低，常见的评估函数有——[[欧几里得距离|欧几里得距离]]、[[曼哈顿距离|曼哈顿距离]]、[[切比雪夫距离|切比雪夫距离]]；
+* 如果<math>h(n)</math>为0，即只需求出起点到任意顶点<math>n</math>的最短路径<math>g(n)</math>，而不计算任何评估函数<math>h(n)</math>，则转化为[[最短路问题|最短路问题]]问题，即[[Dijkstra算法|Dijkstra算法]]，此时需要计算最多的顶点；
+
+== 虛擬碼 ==
+<syntaxhighlight lang="matlab">
+//Matlab語言
+ function A*(start,goal)
+     closedset := the empty set                                        //已经被估算的節點集合
+     openset := set containing the initial node                        //將要被估算的節點集合，初始只包含start
+     came_from := empty map
+     g_score[start] := 0                                               //g(n)
+     h_score[start] := heuristic_estimate_of_distance(start, goal)     //通過估計函數 估計h(start)
+     f_score[start] := h_score[start]                                  //f(n)=h(n)+g(n)，由於g(n)=0，所以省略
+     while openset is not empty                                        //當將被估算的節點存在時，執行循環
+         x := the node in openset having the lowest f_score[] value    //在將被估計的集合中找到f(x)最小的節點
+         if x = goal                                                   //若x為終點，執行
+             return reconstruct_path(came_from,goal)                   //返回到x的最佳路徑
+         remove x from openset                                         //將x節點從將被估算的節點中刪除
+         add x to closedset                                            //將x節點插入已經被估算的節點
+         for each y in neighbor_nodes(x)                               //循環遍歷與x相鄰節點
+             if y in closedset                                         //若y已被估值，跳過
+                 continue
+             tentative_g_score := g_score[x] + dist_between(x,y)       //從起點到節點y的距離
+
+             if y not in openset                                       //若y不是將被估算的節點
+                 tentative_is_better := true                           //暫時判斷為更好
+             elseif tentative_g_score < g_score[y]                     //如果起點到y的距離小於y的實際距離
+                 tentative_is_better := true                           //暫時判斷為更好
+             else
+                 tentative_is_better := false                          //否則判斷為更差
+             if tentative_is_better = true                             //如果判斷為更好
+                 came_from[y] := x                                     //將y設為x的子節點
+                 g_score[y] := tentative_g_score                       //更新y到原點的距離
+                 h_score[y] := heuristic_estimate_of_distance(y, goal) //估計y到終點的距離
+                 f_score[y] := g_score[y] + h_score[y]
+                 add y to openset                                      //將y插入將被估算的節點中
+     return failure
+ 
+ function reconstruct_path(came_from,current_node)
+     if came_from[current_node] is set
+         p = reconstruct_path(came_from,came_from[current_node])
+         return (p + current_node)
+     else
+         return current_node
+</syntaxhighlight>
+
+== 相關連結 ==
+* [[寻路|寻路]]
+* [[广度优先搜索|广度优先搜索]]
+* [[深度优先搜索|深度优先搜索]]
+
+== 外部連結 ==
+* [http://blog.minstrel.idv.tw/2004/12/star-algorithm.html A* 演算法簡介 (A* Algorithm Brief)]{{Wayback|url=http://blog.minstrel.idv.tw/2004/12/star-algorithm.html |date=20080524114615 }}
+{{算法}}
+[[Category:图算法|Category:图算法]]
+[[Category:路由算法|Category:路由算法]]
+[[Category:搜尋演算法|Category:搜尋演算法]]
+[[Category:组合优化|Category:组合优化]]
+[[Category:游戏人工智能|Category:游戏人工智能]]
+[[Category:带有伪代码示例的条目|Category:带有伪代码示例的条目]]

@@ -1,0 +1,207 @@
+{{noteTA
+|G1=IT
+|1=zh-hans:函数;zh-hant:函式;
+|2=zh-hans:返回;zh-hant:回傳;
+|3=zh-hans:数据类型;zh-hant:型態;
+|4=zh-hans:声明;zh-hant:宣告;
+|5=zh-hans:变量;zh-hant:變數;
+|6=zh-hans:调用;zh-hant:呼叫;
+}}
+{{lowercase}}
+
+{{C_Standard_library}}
+
+'''<code>stdarg.h</code>'''是[[C語言|C語言]]中[[C標準函式庫|C標準函式庫]]的[[標頭檔|標頭檔]]，stdarg是由'''st'''andar'''d'''（標準） '''arg'''uments（參數）簡化而來，主要目的為讓函式能夠接收不定量參數。<ref>{{cite web | url=http://www.opengroup.org/onlinepubs/009695399/basedefs/stdarg.h.html | title=IEEE Std 1003.1 <code>stdarg.h</code> | accessdate=2009-07-04 | archive-date=2009-04-11 | archive-url=https://web.archive.org/web/20090411042801/http://www.opengroup.org/onlinepubs/009695399/basedefs/stdarg.h.html | dead-url=no }}</ref> [[C++|C++]]的<code>cstdarg</code>標頭檔中也提供這樣的機能；雖然與C的標頭檔是相容的，但是也有衝突存在。
+
+[[不定參數函式|不定參數函式]]（Variadic functions）是<code>stdarg.h</code>內容典型的應用，雖然也可以使用在其他由不定參數函式呼叫的函式（例如，<code>[[vprintf|vprintf]]</code>）。
+
+== 宣告不定參數函式 ==
+
+不定參數函式的參數數量是可變動的，它使用[[省略號|省略號]]來忽略之後的參數。例如<code>[[printf|printf]]</code>函式一般。代表性的宣告為:
+
+<syntaxhighlight lang="c">
+int check(int a, double b, ...);
+</syntaxhighlight>
+
+不定參數函式最少要有一個命名的參數，所以
+
+<syntaxhighlight lang="c">
+char *wrong(...);
+</syntaxhighlight>
+
+在C是不被允許的。在C，省略符號之前必須要有逗號；在C++，則沒有這種強制要求。
+（雖然在C++中，這樣的宣告是合理的，但是這種寫法，因為沒有已命名的參數，使得<code>va_start</code>沒辦法抓到動態參數的正確起始點。）
+
+== 定義不定參數函式 ==
+
+使用與聲明時相同的語法來定義:
+
+<syntaxhighlight lang=c>
+long func(char, double, int, ...);
+
+long func(char a, double b, int c, ...)
+{
+    /* ... */
+}
+</syntaxhighlight>
+
+在舊形式中可能會出現較省略的函式定義:
+
+<syntaxhighlight lang=c>
+long func();
+
+long func(a, b, c, ...)
+    char a;
+    double b;
+{
+    /* ... */
+}
+</syntaxhighlight>
+
+== <code>stdarg.h</code>数据类型 ==
+
+{|class="wikitable"
+|-
+! 名稱 !! 描述 !! 相容
+|-
+|<code>va_list</code> || 用來保存宏va_arg与宏va_end所需信息 || [[C89_(C_version)|C89]]
+|}
+
+== <code>stdarg.h</code>巨集 ==
+
+{|class="wikitable"
+|-
+! 名稱 !! 描述 !! 相容
+|-
+|<code>va_start</code> || 使<code>va_list</code>指向起始的參數 || C89
+|-
+|<code>va_arg</code> || 檢索參數 || C89
+|-
+|<code>va_end</code> || 釋放<code>va_list</code> || C89
+|-
+|<code>va_copy</code> || 拷貝<code>va_list</code>的內容 || [[C99|C99]]
+|}
+
+== 存取參數 ==
+
+存取未命名的參數，首先必須在不定參數函式中宣告<code>va_list</code>型態的變數。呼叫<code>va_start</code>並傳入兩個參數：第一個參數為<code>va_list</code>型態的變數，第二個参数為函式的動態參數前面最後一個已命名的參數名稱，接著每一呼叫<code>va_arg</code>就會回傳下一個參數，<code>va_arg</code>的第一個參數為<code>va_list</code>，第二個參數為回傳的型態。最後<code>va_end</code>必須在函式回傳前被<code>va_list</code>呼叫(當作參數)。(沒有要求要讀取完所有參數)
+
+[[C99|C99]]提供額外的巨集，<code>va_copy</code>，它能夠複製<code>va_list</code>。而<code>va_copy(va2, va1)</code>意思為拷貝<code>va1</code>到<code>va2</code>。
+
+沒有機制定義該怎麼判別傳遞到函式的參數量或者型態。函式通常需要知道或確定它們變化的方法。共通的慣例包含:
+* 使用<code>[[printf|printf]]</code>或<code>[[scanf|scanf]]</code>類的格式化字串來嵌入明確指定的型態。
+* 在不定參數最後的[[標记值|標记值]](sentinel value)。
+* 總數變數來指明不定參數的數量。
+
+== 型別安全性 ==
+
+有些C的实现，提供了对不定参数的扩展，允許編譯器檢查適當的格式化字串及標志(sentinels)的使用。如果沒有這种擴充，編譯器通常無從檢查傳入函式的未命名參數是否為所預期的型態，也不能转换它们为所需要的数据类型。因此，必須小心謹慎以确保正確性，因为不匹配的型態降到导致[[未定義行為|未定義行為]](Undefined behavior)。例如，如果傳递[[空指针|空指针]]，不能仅仅写入<code>NULL</code>（可能实际定义为0），还要转化为（cast）适当的指针类型。另一个考慮是未命名参数的默认的类型提升。<code>float</code>將會自動的被轉換成<code>double</code>‧同樣的比<code>int</code>(整數)更小容量的參數型態將會被轉換成<code>int</code>或者<code>unsigned int</code>‧函式所接收到的未命名參數必須預期将被型態提升。
+
+== 例子 ==
+<syntaxhighlight lang=c>
+#include <stdio.h>
+#include <stdarg.h>
+
+void printargs(int arg1, ...) /* 輸出所有int型態的參數，直到-1結束 */
+{
+  va_list ap;
+  int i;
+
+  va_start(ap, arg1); 
+  for (i = arg1; i != -1; i = va_arg(ap, int))
+    printf("%d ", i);
+  va_end(ap);
+  putchar('\n');
+}
+
+int main(void)
+{
+   printargs(5, 2, 14, 84, 97, 15, 24, 48, -1);
+   printargs(84, 51, -1);
+   printargs(-1);
+   printargs(1, -1);
+   return 0;
+}
+</syntaxhighlight>
+
+這個程式產生輸出:
+
+<pre>
+5 2 14 84 97 15 24 48
+84 51
+
+1
+</pre>
+
+== <code>varargs.h</code> ==
+
+[[POSIX|POSIX]]定義所遺留下的標頭檔<code>varargs.h</code>，它早在C標準化前就已經開始使用了且提供類似<code>stdarg.h</code>的機能。[[MSDN|MSDN]]明确指出这一头文件已经过时，完全被stdarg.h取代<ref>[http://msdn.microsoft.com/zh-cn/site/kb57fad8%28v=VS.100%29 The macros defined in VARARGS.H are deprecated and exist solely for backwards compatibility. Use the macros defined in STDARGS.H unless you are working with code before the ANSI standard. ]</ref>。這個標頭檔不屬於ISO C的一部分。檔案定義在[[单一UNIX规范|单一UNIX规范]]的第二個版本中，簡單的包含所有C89 <code>stdarg.h</code>的機能，除了:不能使用在標準C較新的形式定義；你可以不給予參數(標準C需要最少一個參數)；與標準C運作的方法不同，其中一個寫成：
+
+<syntaxhighlight lang="c">
+#include <stdarg.h>
+
+int summate(int n, ...)
+{
+    va_list ap;
+    int i = 0;
+
+    va_start(ap, n);
+    for (; n; n--)
+        i += va_arg(ap, int);
+    va_end(ap);
+    return i;
+}
+</syntaxhighlight>
+
+或比較舊式的定義:
+
+<syntaxhighlight lang="c">
+#include <stdarg.h>
+
+int summate(n, ...)
+    int n;
+{
+    /* ... */
+}
+</syntaxhighlight>
+
+以此呼叫
+
+<syntaxhighlight lang="c">
+summate(0);
+summate(1, 2);
+summate(4, 9, 2, 3, 2);
+</syntaxhighlight>
+
+
+使用<code>varargs.h</code>的函式為:
+
+<syntaxhighlight lang="c">
+#include <varargs.h>
+
+summate(n, va_alist)
+    va_dcl /* 這裡沒有分號! */
+{
+    va_list ap;
+    int i = 0;
+
+    va_start(ap);
+    for (; n; n--)
+        i += va_arg(ap, int);
+    va_end(ap);
+    return i;
+}
+</syntaxhighlight>
+
+以及相同的呼叫方法。
+
+<code>varargs.h</code>因為運作的模式需要舊型態的函式定義。<ref>{{cite web | url=http://www.opengroup.org/onlinepubs/007908799/xsh/varargs.h.html | title=單使用者UNIX系統規範(Single UNIX Specification) <code>varargs.h</code> | accessdate=2007-08-01 | archive-date=2008-06-18 | archive-url=https://web.archive.org/web/20080618153236/http://www.opengroup.org/onlinepubs/007908799/xsh/varargs.h.html | dead-url=no }}</ref>
+
+== 參見 ==
+
+*[[可變參數函數|可變參數函數]]
+
+== 參考 ==
+<references/>
+
+[[Category:C标准库头文件|Category:C标准库头文件]]

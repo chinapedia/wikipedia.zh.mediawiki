@@ -1,0 +1,90 @@
+{{Rough translation|time=2021-01-29T08:56:50+00:00}}
+{{lowercase}}
+{{NoteTA|G1=IT|G2=FL}}
+{{infobox software
+| name = zlib
+| logo = [[File:Zlib_3D_green.png|48px]]
+| released = 0.9（{{Start date and age|1995|05|01}}）
+| latest_release_version = 1.2.11
+| latest_release_date = {{Start date and age|2017|01|15}}
+| programming language = [[C语言|C]]
+| operating_system = [[跨平台|跨平台]]
+| genre = [[数据压缩|数据压缩]]
+| license = [[zlib授权|zlib授权]]
+| website = 官方网站：<br />[http://zlib.net/ zlib.net]<br />镜像网站：<br />[http://www.gzip.org/zlib/ http://www.gzip.org/zlib/（法国）]<br />[http://zlib.ipinfo.de/ http://zlib.ipinfo.de/（德国）]
+}}
+
+'''zlib'''是提供[[資料壓縮|資料壓縮]]之用的[[函式庫|函式庫]]，由Jean-loup Gailly與Mark Adler所開發，初版0.9版在1995年5月1日發表。zlib使用[[抽象化(计算机科学)|抽象化]]的[[DEFLATE|DEFLATE]][[演算法|演算法]]，最初是為[[libpng|libpng]]函式庫所寫的，後來普遍為許多軟體所使用。此函式庫為[[自由軟體|自由軟體]]，使用zlib授權。
+
+截至2007年3月，zlib是包含在[[Coverity|Coverity]]的[[美国国土安全部|美国国土安全部]]赞助者选择继续审查的开源项目<ref>{{citation|title = Press release: Critical Open Source Software Projects Receive 6,000 Bug Fixes in First Year of Coverity Scan Site|url = http://www.coverity.com/html/press_story35_03_27_07.html|date = 2007-03-27|accessdate = 2007-12-10|publisher = [[Coverity|Coverity]]|deadurl = yes|archiveurl = https://web.archive.org/web/20071212094641/http://www.coverity.com/html/press_story35_03_27_07.html|archivedate = 2007-12-12}}.</ref>。
+
+== 功能 ==
+
+=== 数据头 ===
+zlib能使用gzip数据头（header）、zlib数据头或者不使用数据头压缩数据。通常情况下，数据压缩使用zlib数据头，因为这提供错误数据检测。当数据不使用数据头写入时，结果是没有任何错误检测的原始[[DEFLATE|DEFLATE]]数据，那么解压缩软件的调用者将不知道压缩数据在什么地方结束。
+
+gzip数据头比zlib数据头要大，因为它保存了文件名和其他文件系统信息，事实上这是广泛使用的[[gzip|gzip]]文件的数据头格式。注意zlib函式库本身不能创建一个gzip文件，但是它能够相当轻松地把压缩数据写入到一个有gzip文件头的文件中。
+
+=== 演算法 ===
+目前zlib仅支持一个[[LZ77|LZ77]]的变种算法，[[DEFLATE|DEFLATE]]的算法。
+
+这个算法使用很少的系统资源，对各种数据提供很好的压缩效果。这也是在[[ZIP_(文件格式)|ZIP檔案]]中无一例外地使用的算法。（尽管zip文件格式也支持几种其他的算法）。
+
+看起来zlib格式将不会被扩展使用任何其他算法，尽管数据头可以有这种可能性。
+
+=== 使用资源 ===
+函式库提供了对处理器和内存使用控制的能力。
+
+不同的压缩级别数值可以指示不同的压缩执行速度。
+
+还有内存控制管理的功能。这在一些诸如嵌入式系统这样内存有限制的环境中是有用的。
+
+=== 策略 ===
+压缩可以针对特定类型的数据进行优化。
+
+若使用者总是使用zlib压缩特定类型的数据，那么使用有针对性的策略可以提高压缩效率和性能。例如，如果使用者的数据包含很长的重复数据，那么可以用[[RLE|RLE]]（运行长度编码）策略，可能会有更好的结果。
+
+对于一般的数据，默认的策略是首选。
+
+=== 错误处理 ===
+错误可以被发现和跳过，数据混乱可以被检测（只要数据和zlib或者gzip数据头一起被写入）。
+
+此外，如果全刷新点（full-flush points）被写入到压缩后的数据流中，那么错误数据是可以被跳过的，并且解压缩将重新同步到下个全刷新点。（错误数据的无错恢复被提供）。全刷新点技术对于在不可靠的通道上的大数据流是很有用的，一些过去的数据丢失是不重要的（例如多媒体数据），但是建立太多的全刷新点会极大地影响速度和压缩。
+
+=== 数据长度 ===
+对于压缩和解压缩，没有数据长度的限制。重复调用库函数允许处理无限的数据块。一些辅助代码（计数变量）可能会溢出，但是不影响实际的压缩和解压缩。当压缩一个长（无限）数据流时，最好写入全刷新点。
+
+== 使用zlib的軟體 ==
+今天，zlib是一种事实上的[[业界标准|业界标准]]，以至于在标准文档中，zlib和[[DEFLATE|DEFLATE]]常常互换使用。数以千计的应用程序直接或间接依靠zlib压缩函式库，<ref>{{citation|title = zlib Applications|url = http://zlib.net/apps.html|date = 2002-04-18|first1 = Jean-loup|last1 = Gailly|first2 = Mark|last2 = Adler|accessdate = 2009-01-18|archive-date = 2019-06-10|archive-url = https://web.archive.org/web/20190610212240/http://zlib.net/apps.html|dead-url = no}}.</ref>，包括：
+*[[Linux核心|Linux核心]]：使用zlib以實作網路協定的壓縮、[[檔案系統|檔案系統]]的壓縮以及開機時解壓縮自身的核心。
+* [[libpng|libpng]]，用于[[PNG|PNG]]图形格式的一个实现，对[[bitmap|bitmap]]数据规定了DEFLATE作为流压缩方法。
+*[[Apache_HTTP_Server|Apache]]：使用zlib實作[[超文本传输协议|http 1.1]]。
+*[[OpenSSH|OpenSSH]]、[[OpenSSL|OpenSSL]]：以zlib達到最佳化加密網路傳輸。
+*[[FFmpeg|FFmpeg]]：以zlib讀寫[[Matroska|Matroska]]等以DEFLATE演算法壓縮的[[多媒體|多媒體]][[串流格式|串流格式]]。
+*[[rsync|rsync]]：以zlib最佳化遠端同步時的傳輸。
+* [[Subversion|Subversion]]、[[Git|Git]]和[[CVS|CVS]]等[[版本控制|版本控制系统]]，使用zlib来压缩和远端仓库的通讯流量。
+*[[dpkg|dpkg]]和[[RPM|RPM]]等包管理软件：以zlib解壓縮RPM或者其他封包。
+
+因为其代码的可移植性，宽松的授權许可以及较小的内存占用，zlib在许多嵌入式设备中也有应用。
+
+== 参见 ==
+{{portalpar|自由軟體}}
+{{portal|Free software|Free Software Portal Logo.svg}} 
+* [[gzip|gzip]]
+* [[DEFLATE|DEFLATE]]
+* RFC 1950, RFC 1951, RFC 1952
+* [[LZ77|LZ77]]
+* [[ZIP_(文件格式)|ZIP (文件格式)]]
+
+== 参考资料 ==
+*[https://web.archive.org/web/20190218131020/https://www.openfoundry.org/index.php?Itemid=192&id=36&option=com_content&task=view 自由軟體鑄造場]
+{{reflist}}
+
+== 外部連結 ==
+*[http://zlib.net/ zlib官方網站] {{Wayback|url=http://zlib.net/ |date=20200612084417 }}
+*[https://archive.is/20130424170957/http://www.leapsoul.cn/?tag=php-zlib%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95 php-zlib使用方法]
+
+[[Category:自由發展元件與函式庫|Category:自由發展元件與函式庫]]
+[[Category:自由軟體|Category:自由軟體]]
+[[Category:数据压缩|Category:数据压缩]]
+[[Category:C函式库|Category:C函式库]]

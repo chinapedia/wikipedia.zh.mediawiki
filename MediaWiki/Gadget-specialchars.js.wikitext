@@ -1,0 +1,16 @@
+(function($, mw) {
+	mw.loader.using('ext.wikiEditor', function() {
+		var $toolbar = $('#toolbar, #wikiEditor-ui-toolbar');
+		var $specialchars = $('#editpage-specialchars');
+		if ($toolbar.length == 0 || $specialchars.length == 0) {
+			return;
+		}
+		var $menu = $('<select/>').css('display', 'inline').change(function(e) {
+			$specialchars.find('p').hide().eq(this.selectedIndex).css('display', 'inline');
+		});
+		$specialchars.find('p').each(function() {
+			$('<option/>').text(this.title).appendTo($menu);
+		});
+		$specialchars.prepend($menu.change()).insertAfter($toolbar);
+	});
+})(jQuery, mediaWiki);

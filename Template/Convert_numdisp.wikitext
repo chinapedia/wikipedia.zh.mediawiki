@@ -1,0 +1,84 @@
+<noinclude><!--
+--============================================================
+-- Display a number, with optional fraction part: 6+3/8
+--============================================================
+--                                (see NOTES at bottom)
+--
+--></noinclude><includeonly>{{#if:{{#titleparts:{{{1|-1200-3~118}}}|1|2}}
+|{{Convert/numdisp/frac
+  |{{{1|-1200-3/118}}}|{{#titleparts:{{{1|-1200-3/118}}}|1|1}}|{{#titleparts:{{{1|-1200-3/118}}}|1|2}}}}<!--split at "/"
+--else-->|{{#ifexpr:{{{1|-14000.00}}}*0 = 0 and {{{1|-14000.00}}} < 0
+  |<!--then re-build negative number (see NOTE Z4 below)
+-->{{formatnum:
+  {{padright:−<!--&minus-->{{#expr:-( {{{1|-14000.00}}} ) }}<!--endexpr
+    --put decimal if needed-->{{
+     #ifexpr:{{{1|-14000.00}}}0={{{1|-14000.00}}}
+     and {{{1|-14000.00}}}=floor( {{{1|-14000.00}}} )|.}}<!--
+  padlength-->|{{#expr:
+    {{strlen_short|{{{1|-14000.00}}}|}}<!--endstrlen_short--> + {{
+    #ifeq:&minus| {{padleft:|6|{{{1|x}}} }} |-6|0}} }}<!--endexpr
+    -->|0}}<!--endpadright end-zeroes "0" to original length
+  -->}}<!--endformatnum
+  else-->|{{formatnum: {{{1|6000.500}}} }}}}<!--endif {1}<0
+-->}}</includeonly><noinclude><!--endif {#titleparts..}
+--------------------------------------------------------------
+--NOTES:
+--     [ These comments are skipped by <noinclude> and not sent
+--       in formatted Internet pages, only during edit. ]
+--
+--NOTE A1: This template processes a number, for display, by
+--     checking to display a fraction part ("/"), else it
+--     will check for negative to display a unicode &minus
+--     and {{formatnum:{{#expr:abs( {{{1|-6000}}} )}}}} such
+--     as "-6000" with a full minus sign rather than hyphen.
+--     In 99% of Wikipedia usage, there are no fractions.
+--
+--NOTE D2: The check, for fraction parts, uses parser-function
+--     #titleparts to split the number at "/" (if any) and
+--     then checks part 2 (the denominator, after the slash)
+--     to trigger use of {{Convert/numdisp/fracparts}}. Hence,
+--         #if: {{#titleparts:{{{1|6+3/8}}}|1|2}}
+--     will be true if a denominator exists (such as "8").
+--
+--NOTE N3: This template uses minimal expansion depth of the
+--     if-else logic by checking for "/" before invoking the
+--     nested subtemplate {{Convert/numdisp/fracparts}}. The
+--     check for a negative number increases the nesting depth
+--     by 1 level to apply abs({1}) in a nested {#expr:} parser
+--     function, to use the absolute value of the amount {1}.
+--
+--NOTE Z4: Any end-zeroes on a decimal are preserved by not
+--     using positive amounts in an expression, and for rare
+--     negative amounts, the &minus with inverse -<nowiki/>{1} is padded
+--     by {padright:} with end-zeroes "0" to {strlen_short} but
+--     uses #ifexpr:{1}0={1} and floor({1})={1} to put ".".
+--     So, {strlen_short} keeps minimal expansion depth of +2.
+--
+-- WARNING: *** DO NOT DELETE COMMENTS FROM THIS TEMPLATE ***
+--      Unless these comments are readily available, people
+--      might tinker with the coding (or rename templates),
+--      in hopes to clarify operation because these comments
+--      were not nearby to explain the issues. Having these
+--      comments only on a doc-page increases the danger of
+--      explanations no longer matching the current coding.
+--      UPDATE these comments to match changes to the template.
+--      UPDATE the HISTORY during major changes (not typos).
+--
+--------------------------------------------------------------
+--HISTORY:
+--03Apr09 Created by [[User:Jimp]] on English Wikipedia.
+--19Nov10 Invokes subtemplate only if has denominator (at "/").
+--19Nov10 Put NOTES comments to explain template coding.
+--19Nov10 Put HISTORY comments to log major changes.
+--19Nov10 Put all parameters on 1 line to avoid newline "2^ /3"
+--20Nov10 Linked {Documentation} to hold any interwiki links.
+--12Feb11 Shows Unicode &minus ("−") for negative numbers.
+--17Feb11 Used {padright:} to re-add end-zeroes on negatives.
+--17Feb11 Used #ifexpr:{1}0={1} and floor({1})={1}, to put "."
+--30Nov13 Fixed to allow prefix "&minus;" as extra 6 long.
+--07Jan14 Fixed to pass negative sum without padding "0".
+--
+ ** Add interwiki links to /doc subpage to avoid changes here **
+--
+-->{{Documentation}}
+</noinclude>

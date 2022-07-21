@@ -1,0 +1,102 @@
+{{No footnotes|time=2017-05-29T08:17:46+00:00}}
+{{noteTA|G1=IT}}
+'''資料定義語言'''（data definition language，DDL）屬於DBMS語言的一種，用於明確定義概念綱要(conceptual schemas)及內部綱要(internal schemas)，DBMS內的DDL[[編譯器|編譯器]](compiler)能夠處理DDL，識別[[綱要建構物|綱要建構物]](schema constructs)的描述(description)並加以存入DBMS目錄中的綱要描述(schema description)<ref name="#1">Elmasri, R., & Navathe, S. B. (2017). Fundamentals of database systems. Hoboken, NJ: Pearson.</ref>。
+為[[SQL|SQL]]語言集中負責資料結構定義與[[資料庫物件|資料庫物件]]定義的語言，由<code>CREATE</code>、<code>ALTER</code>與<code>DROP</code>三個語法所組成，最早是由Codasyl（Conference on Data Systems Languages）資料模型開始，現在被納入SQL指令中作為其中一個子集。
+
+== 語法結構 ==
+
+目前大多數的[[DBMS|DBMS]]都支援對資料庫物件的DDL操作，部份資料庫 (如 [[PostgreSQL|PostgreSQL]]) 可把DDL放在交易指令中，也就是它可以被撤回 (Rollback)。較新版本的[[DBMS|DBMS]]會加入DDL專用的觸發程序，讓資料庫管理員可以追蹤來自DDL的修改。
+
+=== CREATE ===
+
+CREATE 是負責資料庫物件的建立，舉凡[[資料庫|資料庫]]、[[資料庫表|資料表]]、[[資料庫索引|資料庫索引]]、[[存儲程序|預存程序]]、[[使用者函數|使用者函數]]、[[觸發器_(資料庫)|觸發程序]]或是[[使用者自定型別|使用者自定型別]]等物件，都可以使用 CREATE 指令來建立，而為了各式資料庫物件的不同，CREATE 也有很多的參數。
+
+例如，CREATE DATABASE (建立資料庫) 的指令為：
+
+<syntaxhighlight lang="sql">
+CREATE DATABASE Sales
+ON ( NAME = Sales_dat, FILENAME = 'saledat.mdf', SIZE = 10, MAXSIZE = 50, FILEGROWTH = 5 )
+LOG ON ( NAME = Sales_log, FILENAME = 'salelog.ldf', SIZE = 5MB, MAXSIZE = 25MB, FILEGROWTH = 5MB )
+</syntaxhighlight>
+
+其中的<code>ON</code>為資料庫檔案的宣告，而<code>LOG ON</code>為交易記錄檔的宣告。
+若需要更進階的設定，則還有 <code>FOR</code> 和 <code>WITH</code> 以及 <code>COLLATE</code>等等。
+
+又例如，CREATE TABLE (建立資料表) 的指令為：
+
+<syntaxhighlight lang="sql">
+CREATE TABLE [dbo].[PurchaseOrderDetail]
+(
+    [PurchaseOrderID] [int] NOT NULL REFERENCES Purchasing.PurchaseOrderHeader(PurchaseOrderID), -- 具參考完整性限制欄位
+    [LineNumber] [smallint] NOT NULL,
+    [ProductID] [int] NULL REFERENCES Production.Product(ProductID), -- 具參考完整性限制欄位
+    [UnitPrice] [money] NULL,
+    [OrderQty] [smallint] NULL,
+    [ReceivedQty] [float] NULL,
+    [RejectedQty] [float] NULL,
+    [DueDate] [datetime] NULL,
+    [rowguid] [uniqueidentifier] ROWGUIDCOL  NOT NULL CONSTRAINT [DF_PurchaseOrderDetail_rowguid] DEFAULT (newid()), -- 具限制欄位，並有預設值
+    [ModifiedDate] [datetime] NOT NULL CONSTRAINT [DF_PurchaseOrderDetail_ModifiedDate] DEFAULT (getdate()), -- 具限制欄位，並有預設值
+    [LineTotal]  AS (([UnitPrice]*[OrderQty])),
+    [StockedQty]  AS (([ReceivedQty]-[RejectedQty])),
+CONSTRAINT [PK_PurchaseOrderDetail_PurchaseOrderID_LineNumber] -- 主鍵宣告
+    PRIMARY KEY CLUSTERED ([PurchaseOrderID], [LineNumber])
+    WITH (IGNORE_DUP_KEY = OFF)
+) 
+ON [PRIMARY]
+</syntaxhighlight>
+
+其中，每個欄位的格式都有定義，並且若有需要建立[[參考完整性|參考完整性]]的連結時，可以使用 <code>REFERENCES</code> 來宣告，主鍵則是用<code>PRIMARY KEY</code> 來宣告，計算型欄位(Computed Field)則是直接給定運算式等等，<code>CREATE TABLE</code> 指令很常用，但若設定起來會較為複雜，因此很多資料庫管理人員都會使用GUI工具來設計。
+
+其他像是：
+
+* CREATE INDEX：建立資料表索引。
+* CREATE PROCEDURE：建立預存程序。
+* CREATE FUNCTION：建立使用者函數。
+* CREATE VIEW：建立檢視表。
+* CREATE TRIGGER：建立觸發程序。
+
+等等，都是使用來建立不同資料庫物件的指令。
+
+=== ALTER ===
+
+<code>ALTER</code> 是負責資料庫物件修改的指令，相較於<code> CREATE</code> 需要定義完整的資料物件參數，<code>ALTER</code> 則是可依照要修改的幅度來決定使用的參數，因此使用上並不會太困難，例如：
+
+<syntaxhighlight lang="sql">
+ALTER TABLE doc_exa ADD column_b VARCHAR(20) NULL ; -- 在資料表 doc_exa 中加入一個新的欄位，名稱為 column_b，資料型別為 varchar(20)，允許 NULL 值。
+ALTER TABLE doc_exb DROP COLUMN column_b ; -- 在資料表 doc_exb 中移除 column_b 欄位。
+alter table scm.scm_d_pp_detail_1h  change  column PP_ID_2H PP_ID_1H varchar(50)  -- 列改名
+alter table test modify address char(10) --修改表列类型
+</syntaxhighlight>
+
+=== DROP ===
+
+DROP 則是刪除資料庫物件的指令，並且只需要指定要刪除的資料庫物件名稱即可，在 DDL 語法中算是最簡單的。
+
+例如：
+
+<syntaxhighlight lang="sql">
+DROP TABLE myTable; -- 刪除 myTable 資料表。
+DROP VIEW myView; -- 刪除 myView 檢視表。
+</syntaxhighlight>
+
+== DBMS語言 ==
+其他DBMS語言包括：
+*[[儲存定義語言|儲存定義語言]](Storage Definition Language, SDL)
+*[[視野定義語言|視野定義語言]](View Definition Language, VDL)
+*[[資料操縱語言|資料操縱語言]](Data Manipulation Language, DML)<ref name="#1"/>
+
+== 參考資料 ==
+# [https://web.archive.org/web/20110228114213/http://structedtext.appspot.com/db/ddl.html DDL]
+# [http://dev.mysql.com/doc/refman/6.0/en/sql-syntax.html MySQL SQL Syntax] {{Wayback|url=http://dev.mysql.com/doc/refman/6.0/en/sql-syntax.html |date=20090615193105 }}
+# [http://68.142.116.68/docs/cd/B28359_01/server.111/b28286/toc.htm Oracle® Database SQL Language Reference]{{dead link|date=十月 2017 |bot=InternetArchiveBot }}
+# [http://msdn.microsoft.com/zh-tw/library/ms189826(SQL.90).aspx Transact-SQL Reference] {{Wayback|url=http://msdn.microsoft.com/zh-tw/library/ms189826(SQL.90).aspx |date=20160527002414 }}
+# [http://www.postgresql.org/docs/8.3/interactive/index.html PostgreSQL SQL Commands] {{Wayback|url=http://www.postgresql.org/docs/8.3/interactive/index.html |date=20100113003849 }}
+
+{{SQL}}
+{{database}}
+
+[[Category:資料庫|Category:資料庫]]
+[[Category:SQL|Category:SQL]]
+
+[[pl:Create_(SQL)|pl:Create (SQL)]]

@@ -1,0 +1,725 @@
+{{NoteTA|G1=IT}}
+{{编程范式}}
+在[[電腦科學|電腦科學]]中，'''演員模型'''（{{lang-en|Actor model}}）是一種[[并发计算|並行運算]]上的模型。「演員」是一種程式上的抽象概念，被視為並行運算的基本單元：當一個演員接收到一則訊息，它可以做出一些決策、建立更多的演員、傳送更多的訊息、決定要如何回答接下來的訊息。演员可以修改它们自己的[[封裝_(物件導向程式設計)|私有状态]]，但是只能通过消息间接的相互影响（避免了[[锁_(计算机科学)|基于锁的同步]]）。
+
+演員模型在1973年於{{en-link|Carl Hewitt}}、Peter Bishop及Richard Steiger的論文中提出<ref name="hewitt1973">{{cite paper |url=https://www.ijcai.org/Proceedings/73/Papers/027B.pdf |author=Carl Hewitt |coauthors=Peter Bishop and Richard Steiger |title=A Universal Modular Actor Formalism for Artificial Intelligence |publisher=IJCAI |date=1973 |access-date=2020-05-06 |archive-date=2021-02-25 |archive-url=https://web.archive.org/web/20210225043811/https://www.ijcai.org/Proceedings/73/Papers/027B.pdf |dead-url=no }}</ref>。它已经被用作[[并发计算|并发计算]]的{{en-link|演员模型理论|Actor model theory|理论理解}}框架和[[并发性|并发系统]]的{{en-link|演员模型实现|Actor model implementation|实际实现}}基础。演员模型和其他类似工作的关系讨论可见于{{en-link|演员模型和进程演算|actor model and process calculi}}。
+
+==基本概念==
+
+演员模型推崇的哲学是“一切皆是演员”，这与[[面向对象编程|面向对象编程]]的“一切皆是对象”类似。
+
+演员是一个运算实体，响应接收到的消息，相互间是[[并发计算|并发]]的：
+
+* 发送有限数量的消息给其他演员；
+* 创建有限数量的新演员；
+* 指定接收到下一个消息时要用到的行为。
+
+以上动作不含有顺序执行的假设，因此可以[[并行计算|并行]]进行。
+
+发送者与已发送通信的解耦，是演员模型的根本优势，演员模型启用了[[异步通信|异步通信]]并将[[控制结构|控制结构]]当作[[消息传递|消息传递]]的模式<ref>Carl Hewitt. [https://dspace.mit.edu/handle/1721.1/6272 Viewing Control Structures as Patterns of Passing Messages] {{Wayback|url=https://dspace.mit.edu/handle/1721.1/6272 |date=20201205062031 }}. Journal of Artificial Intelligence. June 1977.</ref>。
+
+消息接收者是通过地址区分的，有时也被称作“邮件地址”。因此演员只能和它拥有地址的演员通信。它可以通过接收到的信息获取地址，或者获取它创建的演员的地址。
+
+演员模型的特征是，演员内部或相互之间的计算本质上是[[并发性|并发性]]的，演员可以动态创建，演员地址包含在消息中，交互只有通过直接的异步[[消息传递|消息传递]]通信，不限制消息到达的顺序。
+
+== 历史 ==
+{{Main|{{en-link|演员模型历史|History of the Actor model}}}}
+演员模型受到了[[Lisp|Lisp]]、[[Simula|Simula]]、[[Smalltalk|Smalltalk-72]]、{{en-link|基于权限的安全性|capability-based security|基于权限的系统}}和[[分组交换|分组交换]]的影响。其发展“受到由几十、几百、甚至几千个独立微处理机构成的高度[[并行计算|并行计算]]机器的前景所推动，其中的每个处理机都有自己局部内存和通信处理器，它们通过高性能网络进行通信。”<ref name="clinger1981">{{cite journal|author=William Clinger|authorlink=William Clinger (computer scientist)|title=Foundations of Actor Semantics|publisher=MIT|version=Mathematics Doctoral Dissertation|date=June 1981|hdl=1721.1/6935}}</ref>此后随着采用[[多核心处理器|多核]]和{{en-link|众核处理器|Manycore processor|众核}}计算机架构的大规模并发计算的出现，人们已经重新燃起了对演员模型的兴趣。
+
+在Hewitt、Bishop和Steiger的1973年刊物之后，{{en-link|Irene Greif}}在1975年博士论文中，为演员模型开发出了一种[[操作语义|操作语义]]<ref name="greif1975">{{cite journal|author=Irene Greif|authorlink=Irene Greif|title=Semantics of Communicating Parallel Processes|publisher=MIT|version=EECS Doctoral Dissertation|date=August 1975}}</ref>。{{en-link|Henry Baker}}和Hewitt在1977年发表了演员系统的[[公理语义|公理法则]]<ref name="baker1977">{{cite journal|author=Henry Baker|authorlink=Henry Baker (computer scientist)|author2=Carl Hewitt|title=Laws for Communicating Parallel Processes|publisher=IFIP|date=August 1977|authorlink2=Carl Hewitt}}</ref><ref>{{cite web|url=http://dspace.mit.edu/bitstream/handle/1721.1/41962/AI_WP_134A.pdf|title=Laws for Communicating Parallel Processes|date=10 May 1977|access-date=2020-05-04|archive-date=2016-06-24|archive-url=https://web.archive.org/web/20160624000258/http://dspace.mit.edu/bitstream/handle/1721.1/41962/AI_WP_134A.pdf|dead-url=no}}</ref>。其他主要的里程碑包括：{{en-link|William Clinger}}的1981年学位论文，它介入了基于{{en-link|幂域|Power domains}}的[[演员模型的指称语义|指称语义]]<ref name="clinger1981" />；还有{{en-link|Gul Agha}}的1985年学位论文，它进一步发展出基于transition的语义模型，从而补充了Clinger的模型<ref name="agha1986">{{cite journal|author=Gul Agha|title=Actors: A Model of Concurrent Computation in Distributed Systems|version= Doctoral Dissertation|publisher=MIT Press|year=1986|hdl=1721.1/6952}}</ref>。这些工作促成了{{en-link|演员模型理论|actor model theory}}的全面发展。
+
+主要的软件实现工作，由[[麻省理工学院|麻省理工学院]]的[[消息传递|消息传递]]语义小组完成，其成员包括Russ Atkinson、Giuseppe Attardi、Henry Baker、Gerry Barber、Peter Bishop、Peter de Jong、Ken Kahn、Henry Lieberman、Carl Manning、Tom Reinhardt、Richard Steiger和Dan Theriault。分别由[[加州理工学院|加州理工学院]]的Chuck Seitz和[[麻省理工学院|麻省理工学院]]的Bill Dally领导的研究小组，致力于构造新的计算机架构，用以进一步发展演员模型中的消息传递。有关工作详见{{en-link|演员模型实现|Actor model implementation}}。
+
+演员模型的研究，已经开展于[[加州理工学院|加州理工学院]]、[[京都大学|京都大学]]、{{en-link|微电子及计算机技术公司|Microelectronics and Computer Technology Corporation}}、[[MIT計算機科學與人工智慧實驗室|MIT人工智能实验室]]、[[国际斯坦福研究所|斯坦福国际研究所]]、[[斯坦福大学|斯坦福大学]]、[[伊利诺伊大学厄巴纳-香槟分校|伊利诺伊大学厄巴纳-香槟分校]]<ref>{{cite web|url=http://osl.cs.uiuc.edu |title=Home |publisher=Osl.cs.uiuc.edu |accessdate=2012-12-02 |archiveurl=https://web.archive.org/web/20130222175604/http://osl.cs.uiuc.edu/ |archivedate=2013-02-22}}</ref>、[[巴黎第六大学|巴黎第六大学]]、[[比萨大学|比萨大学]]、[[东京大学|东京大学]]{{ja-link|米泽明宪|米澤明憲|米澤}}研究室、[[荷兰数学和计算机科学研究学会|荷兰数学和计算机科学研究学会]]和其他一些地方。
+
+==影响==
+演员模型在[[并发计算|并发计算]]的理论发展和实践软件开发中都有影响。
+
+===理论===
+演员模型影响了[[π-演算|π-演算]]和随后的[[进程演算|进程演算]]的发展。在[[Robin_Milner|Robin Milner]]的图灵奖获奖演说中，他写到<ref>{{cite journal|title=Elements of interaction |journal=Communications of the ACM |volume=36 |pages=78–89 |doi=10.1145/151233.151240 |year=1993 |last1=Milner |first1=Robin }}</ref>：
+<blockquote>纯lambda演算现在只使用两种东西来建造：项和变量。我们在进程演算上也能实现同样的经济性吗？Carl Hewitt凭借其演员模型，很久以前就应对了这个挑战；他宣告了值、在值上的算子和进程，都应该是同一种东西：即演员。
+这个目标打动了我，因为它蕴涵了表达式有着同质性和完整性 ... 但是很久以后我才明白了如何依据代数演算来达成这个目标 ...
+因此本着Hewitt的精神，我们的第一步，就是要求由项指示或由名字访问的所有东西，包括值、寄存器、算子、进程、对象，都是同一种东西；它们都应当是进程。</blockquote>
+
+===实践===
+演员模型在商业实践中已经有了巨大的影响。例如，[[Twitter|Twitter]]将演员用于可伸缩性应用<ref>{{cite web |url=https://waimingmok.wordpress.com/2009/06/27/how-twitter-is-scaling/ |title=How Twitter Is Scaling « Waiming Mok's Blog |publisher=Waimingmok.wordpress.com |date=2009-06-27 |accessdate=2012-12-02 |archive-date=2021-02-05 |archive-url=https://web.archive.org/web/20210205000818/https://waimingmok.wordpress.com/2009/06/27/how-twitter-is-scaling/ |dead-url=no }}</ref>。还有，[[Microsoft|Microsoft]]在其开发的异步代理库中使用了演员模型<ref>"[https://msdn.microsoft.com/magazine/623b6c0f-c229-4fcd-8a9d-a5ef24c60db9 Actor-Based Programming with the Asynchronous Agents Library] {{Wayback|url=https://msdn.microsoft.com/magazine/623b6c0f-c229-4fcd-8a9d-a5ef24c60db9 |date=20170831090637 }}" MSDN September 2010.</ref>。下面章节列出了很多其他的演员库。
+
+== 使用演员模型编程 ==
+一些编程语言使用了演员模型或变种。这些语言包括：
+
+===早期的演员模型编程语言===
+{{div col|colwidth=10em}} 
+* Act 1，2，3<ref>{{cite journal
+ |author    = Henry Lieberman
+ |title     = A Preview of Act 1
+ |date      = June 1981
+ |publisher = MIT AI memo 625
+ |url       = 
+}}</ref><ref>{{cite journal
+ |author    = Henry Lieberman
+ |title     = Thinking About Lots of Things at Once without Getting Confused: Parallelism in Act 1
+ |date      = June 1981
+ |publisher = MIT AI memo 626
+ |url       = 
+}}</ref>
+*Acttalk<ref>Jean-Pierre Briot. Acttalk: A framework for object-oriented concurrent programming-design and experience 2nd France-Japan workshop. 1999.</ref>
+*Ani<ref>Ken Kahn. A Computational Theory of Animation MIT EECS Doctoral Dissertation. August 1979.</ref>
+*Cantor<ref>William Athas and Nanette Boden Cantor: An Actor Programming System for Scientific Computing in Proceedings of the NSF Workshop on Object-Based Concurrent Programming. 1988. Special Issue of SIGPLAN Notices.</ref>
+*Rosette<ref>Darrell Woelk. Developing InfoSleuth Agents Using Rosette: An Actor Based Language Proceedings of the CIKM '95 Workshop on Intelligent Information Agents. 1995.</ref>
+{{div col end}}
+===后期的演员模型编程语言===
+{{div col|colwidth=10em}} 
+* {{en-link|基于演员的并发语言|Actor-Based Concurrent Language|ABCL}}
+* {{en-link|AmbientTalk}}<ref>Dedecker J., Van Cutsem T., Mostinckx S., D'Hondt T., De Meuter W. Ambient-oriented Programming in AmbientTalk. In “Proceedings of the 20th European Conference on Object-Oriented Programming (ECOOP), Dave Thomas (Ed.), Lecture Notes in Computer Science Vol. 4067, pp. 230-254, Springer-Verlag.”, 2006</ref>
+* {{en-link|Axum (编程语言)|Axum (programming language)|Axum}}<ref>{{cite web |author=Darryl K. Taft |url=http://www.eweek.com/c/a/Application-Development/Microsoft-Cooking-Up-New-Parallel-Programming-Language-Axum-868670/ |title=Microsoft Cooking Up New Parallel Programming Language |publisher=Eweek.com |date=2009-04-17 |accessdate=2012-12-02 }}{{Dead link}}</ref>
+* {{en-link|CAL演员语言|CAL Actor Language}}
+* [[D语言|D]]
+* [[E语言|E]]
+* [[Elixir|Elixir]]
+* Encore<ref>{{cite journal| author=Brandauer, Stephan| title=Parallel objects for multicores: A glimpse at the parallel language encore. |journal=Formal Methods for Multicore Programming.|publisher=Springer International Publishing|date=2015 |pages=1–56|display-authors=etal}}</ref>
+* [[Erlang|Erlang]]
+* {{en-link|Fantom (编程语言)|Fantom (programming language)|Fantom}}
+* Humus<ref>{{cite web |url=http://www.dalnefre.com/wp/humus/ |title=Humus |publisher=Dalnefre.com |date= |accessdate=2012-12-02 |archive-date=2021-02-07 |archive-url=https://web.archive.org/web/20210207122820/http://www.dalnefre.com/wp/humus/ |dead-url=no }}</ref>
+* [[Io_(编程语言)|Io]]
+* Pony<ref>{{cite web|url=http://www.ponylang.org|title=The Pony Language|access-date=2022-01-11|archive-date=2018-09-04|archive-url=https://web.archive.org/web/20180904223053/https://www.ponylang.org/|dead-url=no}}</ref><ref>{{cite book| chapter=Deny capabilities for safe, fast actors| doi=10.1145/2824815.2824816| title=Proceedings of the 5th International Workshop on Programming Based on Actors, Agents, and Decentralized Control - AGERE! 2015| pages=1–12| year=2015| last1=Clebsch| first1=Sylvan| last2=Drossopoulou| first2=Sophia| last3=Blessing| first3=Sebastian| last4=McNeil| first4=Andy| isbn=9781450339018}} by Sylvan Clebsch, Sophia Drossopoulou, Sebastian Blessing, Andy McNeil</ref>
+* {{en-link|Ptolemy计划|Ptolemy Project}}
+* {{en-link|P (编程语言)|P (programming language)|P}}<ref>{{cite web|url=https://github.com/p-org/P|title=The P Language|date=2019-03-08|access-date=2020-05-06|archive-date=2021-01-15|archive-url=https://web.archive.org/web/20210115123320/https://github.com/p-org/p|dead-url=no}}</ref>
+* P#<ref>{{cite web|url=https://github.com/p-org/PSharp|title=The P# Language|date=2019-03-12|access-date=2020-05-06|archive-date=2021-03-23|archive-url=https://web.archive.org/web/20210323114539/https://github.com/p-org/PSharp|dead-url=no}}</ref>
+* {{en-link|Rebeca (编程语言)|Rebeca (programming language)|Rebeca}}
+* Reia
+* [[Rust|Rust]]
+* SALSA<ref>{{cite journal
+| author = Carlos Varela and Gul Agha
+| title = Programming Dynamically Reconfigurable Open Systems with SALSA
+| journal = ACM SIGPLAN Notices. OOPSLA'2001 Intriguing Technology Track Proceedings
+| year = 2001
+| volume = 36}}</ref>
+* [[Scala|Scala]]<ref>{{cite journal
+| author = Philipp Haller and Martin Odersky
+| title = Event-Based Programming without Inversion of Control
+| date = September 2006
+| publisher = Proc. JMLC 2006
+| url = http://lampwww.epfl.ch/~odersky/papers/jmlc06.pdf
+| format = PDF
+| access-date = 2014-08-04
+| archive-date = 2020-11-09
+| archive-url = https://web.archive.org/web/20201109005527/http://lampwww.epfl.ch/~odersky/papers/jmlc06.pdf
+| dead-url = no
+}}</ref><ref>{{cite journal
+| author = Philipp Haller and Martin Odersky
+| title = Actors that Unify Threads and Events
+| date = January 2007
+| publisher = Technical report LAMP 2007
+| url = http://lamp.epfl.ch/~phaller/doc/haller07coord.pdf
+| format = PDF
+| journal = 
+| access-date = 2014-08-04
+| archive-url = https://web.archive.org/web/20110607225711/http://lamp.epfl.ch/~phaller/doc/haller07coord.pdf
+| archive-date = 2011-06-07
+| dead-url = yes
+}}</ref>
+* [[Scratch_(编程语言)|Scratch]]
+* {{en-link|TNSDL}}
+{{div col end}}
+
+===演员模型库及框架===
+演员模型库及框架，允许用户在没有内置演员模型的语言中进行编程。这些框架包括：
+
+{| class="wikitable sortable" style="font-size: small; text-align: center; width: auto; "
+|-
+! style="width: 13em;" | 名称
+! 状态
+! 最新发行
+! [[软件许可证|许可证]]
+! 语言
+|-
+| ReActed<ref>[https://github.com/reacted-io/reacted ReActed] {{Wayback|url=https://github.com/reacted-io/reacted |date=20211110163321 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2021-09-05
+| [[Apache_License|Apache 2.0]]
+| Java
+|-
+| Acteur<ref>[https://github.com/DavidBM/acteur-rs Acteur] {{Wayback|url=https://github.com/DavidBM/acteur-rs |date=20201012190941 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2020-04-16<ref>{{cite web |url=https://crates.io/crates/acteur/0.9.1 |title=acteur - 0.9.1· David Bonet · Crates.io |publisher=crates.io |access-date=2020-04-16 |archive-date=2021-02-05 |archive-url=https://web.archive.org/web/20210205000304/https://crates.io/crates/acteur/0.9.1 |dead-url=no }}</ref>
+|[[Apache_License|Apache-2.0]] / [[MIT_License|MIT]]
+| Rust
+|-
+| Bastion<ref>[https://github.com/bastion-rs/bastion Bastion] {{Wayback|url=https://github.com/bastion-rs/bastion |date=20210301202920 }}</ref>
+| {{Active|style=font-size:smaller}}
+|2020-08-12<ref>{{Cite web|url=https://crates.io/crates/bastion|title=Bastion on Crates.io|last=Bulut|first=Mahmut|date=2019-12-15|website=Crates.io|access-date=2019-12-15|archive-date=2021-02-05|archive-url=https://web.archive.org/web/20210205004405/https://crates.io/crates/bastion|dead-url=no}}</ref>
+|[[MIT_License|Apache-2.0 / MIT]]
+|Rust
+|-
+| Actix<ref>[https://github.com/actix/actix Actix] {{Wayback|url=https://github.com/actix/actix |date=20210313211001 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2019-05-30<ref>{{cite web |url=https://crates.io/crates/actix/0.8.3 |title=actix - 0.8.3· Nikolay Kim · Crates.io |publisher=crates.io |access-date=2019-06-03 |archive-date=2021-02-05 |archive-url=https://web.archive.org/web/20210205000513/https://crates.io/crates/actix/0.8.3 |dead-url=no }}</ref>
+| [[MIT_License|MIT]]
+| Rust
+|-
+| Aojet<ref>[https://github.com/aojet/Aojet Aojet] {{Wayback|url=https://github.com/aojet/Aojet |date=20201016085340 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2016-10-17
+| [[MIT_License|MIT]]
+| Swift
+|-
+| Actor<ref>[https://github.com/edescourtis/actor Actor] {{Wayback|url=https://github.com/edescourtis/actor |date=20201003143218 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2017-03-09
+| [[MIT_License|MIT]]
+| Java
+|-
+| Actor4j<ref>[https://github.com/relvaner/actor4j-core Actor4j] {{Wayback|url=https://github.com/relvaner/actor4j-core |date=20201219063949 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2020-01-31
+| [[Apache_License|Apache 2.0]]
+| Java
+|-
+| Actr<ref>[https://github.com/zakgof/actr Actr] {{Wayback|url=https://github.com/zakgof/actr |date=20201112031330 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2019-04-09<ref>{{cite web |url=https://github.com/zakgof/actr/releases |title=Releases · zakgof/actr · GitHub |publisher=Github.com |access-date=2019-04-16 |archive-date=2020-10-26 |archive-url=https://web.archive.org/web/20201026142401/https://github.com/zakgof/actr/releases |dead-url=no }}</ref>
+| [[Apache_License|Apache 2.0]]
+| Java
+|-
+| Vert.x<ref>[http://vertx.io Vert.x] {{Wayback|url=http://vertx.io/ |date=20211224065301 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2018-02-13
+| [[Apache_License|Apache 2.0]]
+| Java, Groovy, Javascript, Ruby, Scala, Kotlin, Ceylon
+|-
+| ActorFx<ref>[https://archive.codeplex.com/?p=actorfx ActorFx] {{Wayback|url=https://archive.codeplex.com/?p=actorfx |date=20210205004408 }}</ref>
+| {{no|<small>不活跃</small>|style=font-size:smaller}}
+| 2013-11-13
+| [[Apache_License|Apache 2.0]]
+| .NET
+|-
+| [[Akka|Akka]]
+| {{Active|style=font-size:smaller}}
+| 2019-05-21<ref>{{cite web|url=https://akka.io/blog/news/2019/05/21/akka-2.5.23-released|title=Akka 2.5.23 Released · Akka|publisher=Akka|date=2019-05-21|access-date=2019-06-03|archive-date=2021-02-05|archive-url=https://web.archive.org/web/20210205000404/https://akka.io/blog/news/2019/05/21/akka-2.5.23-released|dead-url=no}}</ref>
+| [[Apache_License|Apache 2.0]]
+| Java and Scala
+|-
+| Akka.NET<ref>[http://getakka.net Akka.NET] {{Wayback|url=http://getakka.net/ |date=20210123175432 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2020-08-20<ref>Akka.NET v1.4.10 Stable Release {{Citation|title=GitHub - akkadotnet/akka.net: Port of Akka actors for .NET.|date=2020-10-01|url=https://github.com/akkadotnet/akka.net|publisher=Akka.NET|access-date=2020-10-01|archive-date=2021-02-24|archive-url=https://web.archive.org/web/20210224183816/https://github.com/akkadotnet/akka.net|dead-url=no}}</ref>
+| [[Apache_License|Apache 2.0]]
+| .NET
+|-
+| Remact.Net<ref>[https://github.com/steforster/Remact.Net Remact.Net] {{Wayback|url=https://github.com/steforster/Remact.Net |date=20200905191450 }}</ref>
+| {{no|<small>不活跃</small>|style=font-size:smaller}}
+| 2016-06-26
+| [[MIT_License|MIT]]
+| .NET, Javascript
+|-
+| Ateji PX<ref>[https://web.archive.org/web/20100725024213/http://www.ateji.com/px/ Ateji PX]</ref>
+| {{no|<small>不活跃</small>|style=font-size:smaller}}
+| ?
+| ?
+| Java
+|-
+| czmq<ref>[http://czmq.zeromq.org/manual:zactor czmq] {{Wayback|url=http://czmq.zeromq.org/manual:zactor |date=20210205000613 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2016-11-10
+| [[Mozilla_Public_License|MPL-2]]
+| C
+|-
+| [[Wikibooks:F_Sharp_Programming/MailboxProcessor|F# MailboxProcessor]]
+| {{Active|style=font-size:smaller}}
+| 同于F# (内建核心库)
+| [[Apache_License|Apache License]]
+| F#
+|-
+| Korus<ref>[https://code.google.com/p/korus/ Korus] {{Wayback|url=https://code.google.com/p/korus/ |date=20160117105514 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2010-02-04
+| [[GPL|GPL 3]]
+| Java
+|-
+| Kilim<ref>[http://kilim.malhar.net/ Kilim] {{Wayback|url=http://kilim.malhar.net/ |date=20210116182459 }}</ref><ref>{{cite conference |last=Srinivasan |first=Sriram |author2=Alan Mycroft |title=Kilim: Isolation-Typed Actors for Java |url=http://www.malhar.net/sriram/kilim/kilim_ecoop08.pdf |book-title=European Conference on Object Oriented Programming ECOOP 2008 |year=2008 |location=Cyprus |access-date=2016-02-25 |archive-date=2020-10-28 |archive-url=https://web.archive.org/web/20201028145553/https://www.malhar.net/sriram/kilim/kilim_ecoop08.pdf |dead-url=no }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2018-11-09<ref>{{cite web|url=https://github.com/kilim/kilim/releases|title=Releases · kilim/kilim · GitHub|publisher=Github.com|access-date=2019-06-03|archive-date=2020-10-16|archive-url=https://web.archive.org/web/20201016013355/https://github.com/kilim/kilim/releases|dead-url=no}}</ref>
+| [[MIT_License|MIT]]
+| Java
+|-
+| ActorFoundry (基于Kilim)
+| {{no|<small>不活跃</small>|style=font-size:smaller}}
+| 2008-12-28
+| ?
+| Java
+|-
+| ActorKit<ref>[https://github.com/stevedekorte/ActorKit ActorKit] {{Wayback|url=https://github.com/stevedekorte/ActorKit |date=20200910060129 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2011-09-13<ref>{{cite web|url=https://github.com/stevedekorte/ActorKit/commits/master |title=Commit History · stevedekorte/ActorKit · GitHub |publisher=Github.com |access-date=2016-02-25}}</ref>
+| [[BSD|BSD]]
+| Objective-C
+|-
+| Cloud Haskell<ref>[https://haskell-distributed.github.com/wiki.html Cloud Haskell]</ref>
+| {{Active|style=font-size:smaller}}
+| 2015-06-17<ref>{{cite web |url=https://github.com/haskell-distributed/distributed-process/commits/master |title=Commit History · haskell-distributed/distributed-process · GitHub |publisher=Github.com |access-date=2012-12-02 |archive-date=2017-03-24 |archive-url=https://web.archive.org/web/20170324095844/https://github.com/haskell-distributed/distributed-process/commits/master |dead-url=no }}</ref>
+| [[BSD|BSD]]
+| Haskell
+|-
+| CloudI<ref>[http://cloudi.org CloudI] {{Wayback|url=http://cloudi.org/ |date=20140517062440 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2021-05-27<ref>{{cite web |url=https://github.com/CloudI/CloudI/releases |title=Releases · CloudI/CloudI · GitHub |publisher=Github.com |access-date=2021-06-21 |archive-date=2020-09-14 |archive-url=https://web.archive.org/web/20200914044804/https://github.com/CloudI/CloudI/releases |dead-url=no }}</ref>
+|[[MIT_License|MIT]]
+| ATS, C/C++, Elixir/Erlang/LFE, Go, Haskell, Java, Javascript, OCaml, Perl, PHP, Python, Ruby
+|-
+| Clutter<ref>[https://wiki.gnome.org/Projects/Clutter Clutter] {{Wayback|url=https://wiki.gnome.org/Projects/Clutter |date=20210205120625 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2017-05-12<ref>{{cite web |url=https://gitlab.gnome.org/GNOME/clutter/tags |title=Tags · GNOME/clutter · GitLab |publisher=gitlab.gnome.org |access-date=2019-06-03 |archive-date=2019-06-03 |archive-url=https://web.archive.org/web/20190603183830/https://gitlab.gnome.org/GNOME/clutter/tags |dead-url=no }}</ref>
+| [[LGPL|LGPL 2.1]]
+| C, C++ (cluttermm), Python (pyclutter), Perl (perl-Clutter)
+|-
+| NAct<ref>[https://code.google.com/p/n-act/ NAct] {{Wayback|url=https://code.google.com/p/n-act/ |date=20160123103728 }}</ref>
+| {{no|<small>不活跃</small>|style=font-size:smaller}}
+| 2012-02-28
+| [[LGPL|LGPL 3.0]]
+| .NET
+|-
+| Nact<ref>[https://nact.io/ Nact] {{Wayback|url=https://nact.io/ |date=20210205004409 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2018-06-06<ref>{{cite web|url=https://github.com/ncthbrt/nact/releases|title=Releases · ncthbrt/nact · GitHub|access-date=2019-06-03|archive-date=2020-11-27|archive-url=https://web.archive.org/web/20201127021215/https://github.com/ncthbrt/nact/releases|dead-url=no}}</ref>
+| [[Apache_License|Apache 2.0]]
+| JavaScript/ReasonML
+|-
+| Retlang<ref>[https://code.google.com/p/retlang/ Retlang] {{Wayback|url=https://code.google.com/p/retlang/ |date=20160603063405 }}</ref>
+| {{no|<small>不活跃</small>|style=font-size:smaller}}
+| 2011-05-18<ref>{{cite web |url=https://code.google.com/p/retlang/source/list |title=Changes - retlang - Message based concurrency in .NET - Google Project Hosting |access-date=2016-02-25 |archive-date=2015-11-24 |archive-url=https://web.archive.org/web/20151124094146/http://code.google.com/p/retlang/source/list |dead-url=no }}</ref>
+| [[BSD_License|New BSD]]
+| .NET
+|-
+| JActor<ref>[https://web.archive.org/web/20140808051834/http://jactorconsulting.com/product/jactor/ JActor]</ref>
+| {{no|<small>不活跃</small>|style=font-size:smaller}}
+| 2013-01-22
+| [[LGPL|LGPL]]
+| Java
+|-
+| Jetlang<ref>[https://code.google.com/p/jetlang/ Jetlang] {{Wayback|url=https://code.google.com/p/jetlang/ |date=20160410115426 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2013-05-30<ref>{{cite web |url=https://code.google.com/p/jetlang/downloads/detail?name=jetlang-0.2.9-bin.zip&can=2&q= |title=jetlang-0.2.9-bin.zip - jetlang - jetlang-0.2.9-bin.zip - Message based concurrency for Java - Google Project Hosting |date=2012-02-14 |access-date=2016-02-25 |archive-date=2016-01-14 |archive-url=https://web.archive.org/web/20160114205235/https://code.google.com/p/jetlang/downloads/detail?name=jetlang-0.2.9-bin.zip&can=2&q= |dead-url=no }}</ref>
+| [[BSD_License|New BSD]]
+| Java
+|-
+| Haskell-Actor<ref>[https://code.google.com/p/haskellactor/ Haskell-Actor] {{Wayback|url=https://code.google.com/p/haskellactor/ |date=20160113194818 }}</ref>
+| {{dunno|<small>不活跃？</small>}}
+| 2008
+| [[BSD_License|New BSD]]
+| Haskell
+|-
+| GPars<ref>[http://gpars.org/ GPars] {{Wayback|url=http://gpars.org/ |date=20210127134412 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2014-05-09<ref>{{cite web |url=https://github.com/GPars/GPars/releases |title=GPars Releases |publisher=GitHub |access-date=2016-02-25 |archive-date=2020-09-04 |archive-url=https://web.archive.org/web/20200904211029/https://github.com/GPars/GPars/releases |dead-url=no }}</ref>
+| [[Apache_License|Apache 2.0]]
+| Groovy
+|-
+| OOSMOS<ref>[https://www.oosmos.com/ OOSMOS] {{Wayback|url=https://www.oosmos.com/ |date=20210205001219 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2019-05-09<ref>{{cite web|url=https://github.com/oosmos/oosmos/releases|title=Releases · oosmos/oosmos · GitHub|publisher=GitHub|access-date=2019-06-03|archive-date=2020-11-13|archive-url=https://web.archive.org/web/20201113052931/https://github.com/oosmos/oosmos/releases|dead-url=no}}</ref>
+| [[GPL|GPL 2.0]]和商业(双许可证)
+| C. C++ friendly
+|-
+| Panini<ref>[http://www.cs.iastate.edu/~panini/ Panini] {{Wayback|url=http://www.cs.iastate.edu/~panini/ |date=20141223154241 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2014-05-22
+| [[Mozilla_Public_License|MPL 1.1]]
+| 自己的编程语言
+|-
+| PARLEY<ref>[https://web.archive.org/web/20100616003529/http://osl.cs.uiuc.edu/parley/ PARLEY]</ref>
+| {{dunno|<small>不活跃？</small>}}
+| 2007-22-07
+| [[GPL|GPL 2.1]]
+| Python
+|-
+| Peernetic<ref>[https://github.com/offbynull/peernetic Peernetic]</ref>
+| {{Active|style=font-size:smaller}}
+| 2007-06-29
+| [[LGPL|LGPL 3.0]]
+| Java
+|-
+| PostSharp<ref>[http://doc.postsharp.net/actor PostSharp] {{Wayback|url=http://doc.postsharp.net/actor |date=20210118041008 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2014-09-24
+| 商业 / [[Freemium|Freemium]]
+| .NET
+|-
+| Pulsar<ref>[https://pypi.org/project/pulsar/ Pulsar] {{Wayback|url=https://pypi.org/project/pulsar/ |date=20210205004405 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2016-07-09<ref>{{cite web|url=http://pythonhosted.org/pulsar/design.html#actors|title=Pulsar Design and Actors|archive-url=https://web.archive.org/web/20150704114118/http://pythonhosted.org/pulsar/design.html#actors|archive-date=2015-07-04}}</ref>
+| [[BSD_License|New BSD]]
+| Python
+|-
+| Pulsar<ref>[https://github.com/puniverse/pulsar Pulsar] {{Wayback|url=https://github.com/puniverse/pulsar |date=20201117234802 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2016-02-18<ref>{{cite web|url=https://puniverse.github.io/pulsar/manual/core.html |title=Pulsar documentation |archive-url=https://web.archive.org/web/20130726095621/http://puniverse.github.io/pulsar/manual/core.html |archive-date=2013-07-26}}</ref>
+| [[LGPL|LGPL]]/[[Eclipse_Public_License|Eclipse]]
+| Clojure
+|-
+| Pykka<ref>[http://pykka.readthedocs.org/en/latest/index.html Pykka] {{Wayback|url=http://pykka.readthedocs.org/en/latest/index.html |date=20160413132855 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2019-05-07<ref>{{cite web |url=https://www.pykka.org/en/latest/changes/#v2-0-0-2019-05-07 |title=Changes – Pykka 2.0.0 documentation |publisher=pykka.org |access-date=2019-06-03 |archive-date=2021-02-05 |archive-url=https://web.archive.org/web/20210205001043/https://www.pykka.org/en/latest/changes/#v2-0-0-2019-05-07 |dead-url=no }}</ref>
+| [[Apache_License|Apache 2.0]]
+| Python
+|-
+| Termite Scheme<ref>[https://code.google.com/p/termite/ Termite Scheme] {{Wayback|url=https://code.google.com/p/termite/ |date=20160516050742 }}</ref>
+| {{dunno|<small>不活跃？</small>}}
+| 2009-05-21
+| [[LGPL|LGPL]]
+| Scheme (Gambit实现)
+|-
+| Theron<ref>[https://web.archive.org/web/20140810090245/http://www.theron-library.com/ Theron]</ref>
+| {{no|<small>不活跃</small>|style=font-size:smaller}}<ref>{{cite web |url=http://www.ashtonmason.net/theron/ |title=Theron – Ashton Mason |access-date=2018-08-29 |archive-date=2019-03-31 |archive-url=https://web.archive.org/web/20190331023110/http://www.ashtonmason.net/theron/ |dead-url=no }}</ref>
+| 2014-01-18<ref>{{cite web |url=http://www.theron-library.com/index.php?t=news |title=Theron - Version 6.00.02 released |publisher=Theron-library.com |access-date=2016-02-25 |archive-url=https://web.archive.org/web/20160316122155/http://www.theron-library.com/index.php?t=news |archive-date=2016-03-16}}</ref>
+| [[MIT_License|MIT]]<ref>{{cite web |url=http://www.theron-library.com/index.php?t=page&p=license |title=Theron |publisher=Theron-library.com |access-date=2016-02-25 |archive-url=https://web.archive.org/web/20160304000109/http://www.theron-library.com/index.php?t=page&p=license |archive-date=2016-03-04}}</ref>
+| C++
+|-
+| Thespian<ref>[https://thespianpy.com Thespian] {{Wayback|url=https://thespianpy.com/ |date=20210205001836 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2020-03-10
+| [[MIT_License|MIT]]
+| Python
+|-
+| Quasar<ref>[https://github.com/puniverse/quasar Quasar] {{Wayback|url=https://github.com/puniverse/quasar |date=20201215084824 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2018-11-02<ref>{{cite web|url=https://github.com/puniverse/quasar/releases|title=Releases · puniverse/quasar · GitHub|access-date=2019-06-03|archive-date=2020-12-15|archive-url=https://web.archive.org/web/20201215084827/https://github.com/puniverse/quasar/releases|dead-url=no}}</ref>
+| [[LGPL|LGPL]]/[[Eclipse_Public_License|Eclipse]]
+| Java
+|-
+| Libactor<ref>[https://code.google.com/p/libactor/ Libactor] {{Wayback|url=https://code.google.com/p/libactor/ |date=20160116221611 }}</ref>
+| {{dunno|<small>不活跃？</small>}}
+| 2009
+| [[GPL|GPL 2.0]]
+| C
+|-
+| Actor-CPP<ref>[https://code.google.com/p/actor-cpp/ Actor-CPP] {{Wayback|url=https://code.google.com/p/actor-cpp/ |date=20151220233840 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2012-03-10<ref>{{cite web |url=https://code.google.com/p/actor-cpp/source/list |title=Changes - actor-cpp - An implementation of the actor model for C++ - Google Project Hosting |access-date=2012-12-02 |archive-date=2015-11-18 |archive-url=https://web.archive.org/web/20151118010906/http://code.google.com/p/actor-cpp/source/list |dead-url=no }}</ref>
+| [[GPL|GPL 2.0]]
+| C++
+|-
+| S4<ref>[http://incubator.apache.org/s4/ S4 ] {{Wayback|url=http://incubator.apache.org/s4/ |date=20170604140056 }}</ref>
+| {{no|<small>不活跃</small>|style=font-size:smaller}}
+| 2012-07-31<ref>{{cite web |url=https://git1-us-west.apache.org/repos/asf?p=incubator-s4.git |title=Commit History · s4/s4 · Apache |publisher=apache.org |access-date=2016-01-16 |archive-url=https://web.archive.org/web/20160306073515/https://git1-us-west.apache.org/repos/asf?p=incubator-s4.git |archive-date=2016-03-06}}</ref>
+| [[Apache_License|Apache 2.0]]
+| Java
+|-
+| C++ Actor Framework (CAF)<ref>[http://actor-framework.org/ C++ Actor Framework (CAF)] {{Wayback|url=http://actor-framework.org/ |date=20210224195741 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2020-02-08<ref>{{cite web |url=https://github.com/actor-framework/actor-framework/releases |title=Releases · actor-framework/actor-framework · GitHub |publisher=Github.com |access-date=2020-03-07 |archive-date=2021-03-26 |archive-url=https://web.archive.org/web/20210326101904/https://github.com/actor-framework/actor-framework/releases |dead-url=no }}</ref>
+| [[Boost_Software_License|Boost Software License 1.0]] and [[BSD_licenses|BSD 3-Clause]]
+| C++11
+|-
+| Celluloid<ref>[https://github.com/celluloid/celluloid/ Celluloid] {{Wayback|url=https://github.com/celluloid/celluloid/ |date=20210301064445 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2018-12-20<ref>{{cite web |url=http://rubygems.org/gems/celluloid |title=celluloid | RubyGems.org | your community gem host |publisher=RubyGems.org |access-date=2019-06-03 |archive-date=2020-09-29 |archive-url=https://web.archive.org/web/20200929070522/https://rubygems.org/gems/celluloid |dead-url=no }}</ref>
+| [[MIT_License|MIT]]
+| Ruby
+|-
+| LabVIEW Actor Framework<ref>[http://ni.com/actorframework LabVIEW Actor Framework]</ref>
+| {{Active|style=font-size:smaller}}
+| 2012-03-01<ref>{{cite web |url=https://decibel.ni.com/content/docs/DOC-18308 |title=Community: Actor Framework, LV 2011 revision (version 3.0.7) |publisher=Decibel.ni.com |date=2011-09-23 |access-date=2016-02-25 |archive-date=2016-10-13 |archive-url=https://web.archive.org/web/20161013085507/https://decibel.ni.com/content/docs/DOC-18308 |dead-url=no }}</ref>
+| National Instruments SLA<ref>[http://www.ni.com/legal/license/ National Instruments SLA] {{Wayback|url=http://www.ni.com/legal/license/ |date=20200116050607 }}</ref>
+| LabVIEW
+|-
+| LabVIEW Messenger Library<ref>[https://lavag.org/files/file/220-messenger-library/ LabVIEW Messenger Library] {{Wayback|url=https://lavag.org/files/file/220-messenger-library/ |date=20210205001045 }}</ref>
+| {{Active|style=font-size:smaller}}
+|2021-05-24
+|BSD
+|LabVIEW
+|-
+| Orbit<ref>[http://www.orbit.cloud Orbit] {{Wayback|url=http://www.orbit.cloud/ |date=20210117030508 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2019-05-28<ref>{{cite web|url=https://github.com/orbit/orbit/releases |title=Releases · orbit/orbit · GitHub|publisher=GitHub |access-date=2019-06-03}}</ref>
+| [[BSD_License|New BSD]]
+| Java
+|-
+| [[QP_(框架)|用于实时嵌入式系统的QP框架]]
+| {{Active|style=font-size:smaller}}
+| 2019-05-25<ref>{{cite web |url=https://sourceforge.net/projects/qpc/files/ |title=QP Real-Time Embedded Frameworks & Tools - Browse Files at |publisher=Sourceforge.net |access-date=2019-06-03 |archive-date=2021-02-24 |archive-url=https://web.archive.org/web/20210224154900/https://sourceforge.net/projects/qpc/files/ |dead-url=no }}</ref>
+| [[GPL|GPL 2.0]]和商业(双许可证)
+| C and C++
+|-
+| libprocess<ref>[https://github.com/3rdparty/libprocess libprocess] {{Wayback|url=https://github.com/3rdparty/libprocess |date=20201018001803 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2013-06-19
+| [[Apache_License|Apache 2.0]]
+| C++
+|-
+| SObjectizer<ref>[https://bitbucket.org/sobjectizerteam/sobjectizer/ SObjectizer] {{Wayback|url=https://bitbucket.org/sobjectizerteam/sobjectizer/ |date=20200810185432 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2020-05-09<ref>{{cite web |url=https://github.com/Stiffstream/sobjectizer/releases |title=Releases · Stiffstream/sobjectizer · GitHub |publisher=GitHub |access-date=2019-06-19 |archive-date=2020-10-19 |archive-url=https://web.archive.org/web/20201019174839/https://github.com/Stiffstream/sobjectizer/releases |dead-url=no }}</ref>
+| [[BSD_License|New BSD]]
+| C++11
+|-
+| rotor<ref>[https://github.com/basiliscos/cpp-rotor rotor] {{Wayback|url=https://github.com/basiliscos/cpp-rotor |date=20201109184446 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2020-10-23<ref>{{cite web |url=https://github.com/basiliscos/cpp-rotor/releases |title=Releases · basiliscos/cpp-rotor· GitHub |publisher=GitHub |access-date=2020-10-10 |archive-date=2020-09-15 |archive-url=https://web.archive.org/web/20200915224347/https://github.com/basiliscos/cpp-rotor/releases |dead-url=no }}</ref>
+| [[MIT_License|MIT License]]
+| C++17
+|-
+| Orleans<ref>[https://dotnet.github.io/orleans/ Orleans] {{Wayback|url=https://dotnet.github.io/orleans/ |date=20210205004408 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2021-09-03<ref>{{cite web |url=https://github.com/dotnet/orleans/releases |title=Releases · dotnet/orleans · GitHub |publisher=GitHub |access-date=2021-09-03 |archive-date=2020-12-04 |archive-url=https://web.archive.org/web/20201204021228/https://github.com/dotnet/orleans/releases |dead-url=no }}</ref>
+| [[MIT_License|MIT License]]
+| C#/.NET
+|-
+| Skynet<ref>[https://github.com/cloudwu/skynet Skynet] {{Wayback|url=https://github.com/cloudwu/skynet |date=20210114030106 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2016-07-11
+| [[MIT_License|MIT License]]
+| C/Lua
+|-
+| Reactors.IO<ref>[http://reactors.io/ Reactors.IO] {{Wayback|url=http://reactors.io/ |date=20210224150311 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2016-06-14
+| [[BSD_License|BSD License]]
+| Java/Scala
+|-
+| libagents<ref>[http://itgroup.ro/libagents libagents] {{Wayback|url=http://itgroup.ro/libagents |date=20200810224218 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2020-03-08
+| [[Free_software_license|Free software license]]
+| C++11
+|-
+| Proto.Actor<ref>[https://github.com/AsynkronIT Proto.Actor] {{Wayback|url=https://github.com/AsynkronIT |date=20201011040007 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2021-01-05
+| [[Free_software_license|Free software license]]
+| Go, C#, Python, JavaScript, Java, Kotlin
+|-
+| FunctionalJava<ref>[https://www.functionaljava.org/ FunctionalJava] {{Wayback|url=https://www.functionaljava.org/ |date=20210422085450 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2018-08-18<ref>{{cite web |url=https://github.com/functionaljava/functionaljava/releases |title=FunctionalJava releases |publisher=GitHub |access-date=2018-08-23 |archive-date=2021-01-15 |archive-url=https://web.archive.org/web/20210115210742/https://github.com/functionaljava/functionaljava/releases |dead-url=no }}</ref>
+| [[BSD_licenses|BSD 3-Clause]]
+| Java
+|-
+| Riker<ref>[https://riker.rs/ Riker] {{Wayback|url=https://riker.rs/ |date=20210125145839 }}</ref>
+| {{Active|style=font-size:smaller}}
+| 2019-01-04
+| [[MIT_License|MIT License]]
+| Rust
+|-
+| Comedy<ref>[https://github.com/untu/comedy Comedy] {{Wayback|url=https://github.com/untu/comedy |date=20210421153059 }}</ref>
+|{{Active|style=font-size:smaller}}
+|2019-03-09
+|[[Eclipse_Public_License|EPL 1.0]]
+|JavaScript
+|-
+| vlingo<ref>[https://github.com/vlingo/vlingo-actors vlingo] {{Wayback|url=https://github.com/vlingo/vlingo-actors |date=20201129113857 }}</ref>
+|{{Active|style=font-size:smaller}}
+|2020-07-26
+|[[Mozilla_Public_License|Mozilla Public License 2.0]]
+|Java, Kotlin, soon .NET
+|-
+| waSCC<ref>[https://github.com/wascc waSCC]</ref>
+|{{Active|style=font-size:smaller}}
+|2020-08-30
+|[[Apache_License|Apache 2.0]]
+|WebAssembly (Rust, TinyGo, Zig, AssemblyScript)
+|-
+|ray<ref>[https://github.com/ray-project/ray ray] {{Wayback|url=https://github.com/ray-project/ray |date=20210412191242 }}</ref>
+|{{Active|style=font-size:smaller}}
+|2020-08-27
+|[[Apache_License|Apache 2.0]]
+|Python
+|}
+
+注意这里没有列出全部框架和库。
+
+==并发编程语言用例==
+尽管设计者并未如此表述<ref>{{cite journal
+ |title=Erlang
+ |journal=[[Communications_of_the_ACM|Communications of the ACM]]
+ |volume=53
+ |issue=9
+ |date=September 2010
+ |pages=68–75
+ |doi=10.1145/1810891.1810910
+ |first=Joe
+ |last=Armstrong
+ |authorlink=Joe Armstrong (programmer)
+ |url=https://dl.acm.org/doi/10.1145/1810891.1810910
+ |quote=Erlang is conceptually similar to the [[occam|occam]] programming language, though it recasts the ideas of [[通信顺序进程|CSP]] in a functional framework and uses asynchronous message passing instead of the synchronous message passing in CSP.
+ |access-date=2020-05-07
+ |archive-date=2020-06-09
+ |archive-url=https://web.archive.org/web/20200609153654/https://dl.acm.org/doi/10.1145/1810891.1810910
+ |dead-url=no
+ }}</ref>，[[Erlang|Erlang]]语言一般被引证为采用演员模型的典型代表之一。在[[Erlang|Erlang]]中，[[进程间通信|进程间通信]]是通过{{en-link|无共享架构|Shared-nothing architecture|无共享}}{{en-link|异步 (编程)|Asynchrony (computer programming)|异步}}[[消息传递|消息传递]]系统运作的：所有[[进程|进程]]都有一个自己的“邮箱”，它是从其他进程已经发送过来而仍未被消费的消息的[[队列|队列]]。进程使用<code>receive</code>原语来检索匹配预期模式的消息。一个消息处理例程针对每个模式依次测试这些消息，直到其中有一个匹配。在消息被消费并从邮箱中移除之时进程恢复执行。消息可以包含任何Erlang结构，包括原始类型（整数，浮点数、字符、原子）、元组、列表和函数。
+
+下面例子展示了Erlang对[[分布式系统|分布式]]进程的内建支持：
+<syntaxhighlight lang="erlang">
+ % 建立一个进程并启用函数web:start_server(Port, MaxConnections)
+ ServerProcess = spawn(web, start_server, [Port, MaxConnections]),
+
+ % 建立一个远程进程并启用函数
+ % web:start_server(Port, MaxConnections)于机器RemoteNode
+ RemoteProcess = spawn(RemoteNode, web, start_server, [Port, MaxConnections]),
+
+ % 发送消息到ServerProcess(异步的)。消息包含一个元组
+ % 它具有原子"pause"和数"10"。
+ ServerProcess ! {pause, 10},
+
+ % 接收发给这个进程的消息
+ receive
+         a_message -> do_something;
+         {data, DataContent} -> handle(DataContent);
+         {hello, Text} -> io:format("Got hello message: ~s", [Text]);
+         {goodbye, Text} -> io:format("Got goodbye message: ~s", [Text])
+ end.
+</syntaxhighlight>
+
+==原型的演员编程语言==
+{{main|{{en-link|演员模型实现|Actor model implementation}}}}
+Hewitt在2006年发表了一个原型的演员编程语言，用意在于直接表达演员行为的重要方面<ref>Carl Hewitt. [https://web.archive.org/web/20171210124010/https://vvvvw.aaai.org/Papers/Symposia/Spring/2006/SS-06-08/SS06-08-003.pdf The repeated demise of logic programming and why it will be reincarnated]. What Went Wrong and Why: Lessons from AI Research and Applications.  Technical Report SS-06-08. AAAI Press.  March 2006.</ref>。消息采用如下表示法：
+
+:<kbd><标签>[<元素><sub>1</sub> ... <元素><sub>n</sub>]
+
+编程语言的语义是通过将每个程序构造确定为有自己行为的演员来定义的。执行是通过在执行期间让Eval消息在程序构造之间传递来建模的。
+
+===环境演员===
+每个<kbd>Eval</kbd>消息都有一个充当环境的演员的地址，它能够进行标识符与值的绑定（binding）。environment演员是不可变的（immutable），也就是不变更的。当一个environment演员收到<kbd>Request[Bind[identifier value] customer]</kbd>的时候，建立一个新的环境演员<kbd>environment’</kbd>发送给<kbd>customer</kbd>，使得这个新环境演员收到<kbd>Request[Lookup[identifier’] customer’]</kbd>的时候，如果<kbd>identifier</kbd>同于<kbd>identifier’</kbd>，则发送给<kbd>customer’</kbd>一个<kbd>Returned[value]</kbd>，否则发送给<kbd>environment</kbd>一个<kbd>Request[Lookup[identifier’] customer’]</kbd>。
+
+当一个environment演员收到<kbd>Request[Bind[<模式> String] customer]</kbd>的时候，如果此<kbd><[[模式匹配|模式]]></kbd>形如<kbd>Request[msg[paramerer] customer]</kbd>，匹配于<kbd>String</kbd>形如<kbd>Request[msg[argument] customer]</kbd>，则建立一个新的环境演员<kbd>environment’</kbd>发送给<kbd>customer</kbd>，使得这个新环境演员收到<kbd>Request[Lookup[parameter’] customer’]</kbd>的时候，如果<kbd>parameter’</kbd>同于<kbd>parameter</kbd>，则发送给<kbd>customer’</kbd>一个<kbd>Returned[argument]</kbd>，否则发送给<kbd>customer</kbd>一个<kbd>Thrown[NotFound[<模式>]]</kbd>。
+
+当一个environment演员收到<kbd>Request[Bind[identifier(parameter) value] customer]</kbd>的时候，建立一个新的环境演员<kbd>environment’</kbd>发送给<kbd>customer</kbd>，使得这个新环境演员收到<kbd>Request[Lookup[identifier’(argument)] customer’]</kbd>的时候，如果<kbd>identifier</kbd>同于<kbd>identifier’</kbd>，则建立一个新的环境演员<kbd>environment’’</kbd>，发送给<kbd>customer’</kbd>一个<kbd>Returned[value]</kbd>和一个<kbd>Returned[environment’’]</kbd>，否则发送给<kbd>environment</kbd>一个<kbd>Request[Lookup[identifier’(argument)] customer’]</kbd>。这个新环境演员<kbd>environment’’</kbd>在收到<kbd>Request[Lookup[parameter’] customer’]</kbd>的时候，如果<kbd>parameter’</kbd>同于<kbd>parameter</kbd>，则发送给<kbd>customer’</kbd>一个<kbd>Returned[argument]</kbd>，否则发送给<kbd>environment’</kbd>一个<kbd>Request[Lookup[parameter’] customer’]</kbd>。
+
+上述环境演员建造在<kbd>EmptyEnvironment</kbd>演员之上，它在接收到<kbd>Request[Lookup[identifier] customer]</kbd>的时候，发送给<kbd>customer</kbd>一个<kbd>Thrown[NotFound[identifier]]</kbd>。当它收到<kbd>Bind</kbd>请求的时候，<kbd>EmptyEnvironment</kbd>表现的如同上述环境演员。
+
+===表达式===
+原型语言有如下种类的表达式，这里的通信包括<kbd>Request[...]</kbd>、<kbd>Returned[...]</kbd>和<kbd>Thrown[...]</kbd>，这里的消息包括<kbd>Eval[...]</kbd>、<kbd>Bind[...]</kbd>和<kbd>Lookup[...]</kbd>：
+
+; <标识符>
+:在收到<kbd>Request[Eval[environment] customer]</kbd>的时候，发送给<kbd>environment</kbd>一个<kbd>Request[Lookup[<标识符>] customer]</kbd>。
+
+; ''send'' <接收者> <通信>
+:在收到<kbd>Request[Eval[environment] customer]</kbd>的时候，建立一个新演员<kbd>evalCustomer<sub>1</sub></kbd>，发送给<kbd><接收者></kbd>一个<kbd>Request[Eval[environment] evalCustomer<sub>1</sub>]</kbd>，使得
+:在<kbd>evalCustomer<sub>1</sub></kbd>收到通信<kbd>Returned[theRecipient]</kbd>的时候，建立一个新演员<kbd>evalCustomer<sub>2</sub></kbd>，发送给<kbd><通信></kbd>一个<kbd>Request[Eval[environment] evalCustomer<sub>2</sub>]</kbd>，使得
+:在<kbd>evalCustomer<sub>2</sub></kbd>收到通信<kbd>Returned[theCommunication]</kbd>的时候，发送给<kbd>theRecipient</kbd>一个<kbd>theCommunication</kbd>。
+
+;<接收者>.<消息>
+:在收到<kbd>Request[Eval[environment] customer]</kbd>的时候，建立一个新演员<kbd>evalCustomer<sub>1</sub></kbd>，发送<kbd><接收者></kbd>一个<kbd>Request[Eval[environment] evalCustomer<sub>1</sub>]</kbd>，使得
+:在<kbd>evalCustomer<sub>1</sub></kbd>收到通信<kbd>Returned[theRecipient]</kbd>的时候，建立一个新演员<kbd>evalCustomer<sub>2</sub></kbd>，发送给<kbd><消息></kbd>一个<kbd>Request[Eval[environment] evalCustomer<sub>2</sub>]</kbd>，使得
+:在 <kbd>evalCustomer<sub>2</sub></kbd>收到通信<kbd>Returned[theMessage]</kbd>的时候，发送给<kbd>theRecipient</kbd>一个<kbd>Request[theMessage customer]</kbd>。
+
+;''receiver'' ... <模式><sub>i</sub> <表达式><sub>i</sub> ...
+:在收到<kbd>Request[Eval[environment] customer]</kbd>的时候，发送给<kbd>customer</kbd>一个新演员<kbd>theReceiver</kbd>，使得 
+:在<kbd>theReceiver</kbd>收到通信内容<kbd>com</kbd>的时候，建立一个新演员<kbd>bindingCustomer</kbd>，并发送给environment一个<kbd>Request[Bind[<模式><sub>i</sub> com] bindingCustomer]</kbd>，而且
+:#如果<kbd>bindingCustomer</kbd>收到<kbd>Returned[environment’]</kbd>，发送给<kbd><表达式><sub>i</sub></kbd>一个<kbd>Request[Eval[environment’]]</kbd>
+:#不然如果<kbd>bindingCustomer</kbd>收到<kbd>Thrown[...]</kbd>，尝试<kbd><模式><sub>i+1</sub></kbd>。
+
+; ''behavior'' ... <模式><sub>i</sub> <表达式><sub>i</sub> ...
+:在收到<kbd>Request[Eval[environment] customer]</kbd>的时候，发送给customer一个新演员<kbd>theReceiver</kbd>，使得 
+:在<kbd>theReceiver</kbd>收到<kbd>Request[message customer’]</kbd>的时候，建立一个新演员<kbd>bindingCustomer</kbd>，并发送给<kbd>environment</kbd>一个<kbd>Request[bind[<模式><sub>i</sub> message] customer’]</kbd>，而且
+:# 如果<kbd>bindingCustomer</kbd>收到<kbd>Returned[environment’]</kbd>，发送给<kbd><表达式><sub>i</sub></kbd>一个<kbd>Request[Eval[environment’] customer’]</kbd>
+:# 不然如果<kbd>bindingCustomer</kbd>收到<kbd>Thrown[...]</kbd>，尝试<kbd><模式><sub>i+1</sub></kbd>。
+
+;{<表达式><sub>1</sub>, <表达式><sub>2</sub>}
+:在收到<kbd>Request[Eval[environment] customer]</kbd>的时候，发送给<kbd><表达式><sub>1</sub></kbd>一个<kbd>Request[Eval[environment]]</kbd>，而且并发的发送给<kbd><表达式><sub>2</sub></kbd>一个<kbd>Request[Eval[environment] customer]</kbd>。
+
+; ''let'' <标识符> = <表达式><sub>值</sub> ''in'' <表达式><sub>体</sub>
+:在收到<kbd>message[Eval[environment] customer]</kbd>的时候，建立一个新演员<kbd>evalCustomer</kbd>，并发送给<kbd><表达式><sub>值</sub></kbd>一个<kbd>Request[Eval[environment] evalCustomer]</kbd>。
+:在<kbd>evalCustomer</kbd>收到<kbd>Returned[theValue]</kbd>的时候，建立一个新演员<kbd>bindingCustomer</kbd>，并发送给<kbd>environment</kbd>一个<kbd>Request[bind[<标识符> theValue] bindingCustomer]</kbd>。
+:在<kbd>bindingCustomer</kbd>收到<kbd>Returned[environment’]</kbd>的时候，发送给<kbd><expression><sub>体</sub></kbd>一个<kbd>Request[Eval[environment’] customer]</kbd>。
+
+; ''serializer'' <表达式>
+:在收到<kbd>Request[Eval[environment] customer]</kbd>的时候，发送给<kbd>customer</kbd>一个<kbd>Returned[theSerializer]</kbd>，这里的<kbd>theSerializer</kbd>是新演员，使得发送到<kbd>theSerializer</kbd>的通信按FIFO次序由行为演员处理，行为演员初始是<kbd><表达式>.Eval[environment]</kbd>，而且
+:在<kbd>theSerializer</kbd>收到通信内容<kbd>com</kbd>的时候，建立一个新演员<kbd>customer’</kbd>，发送给行为演员一个<kbd>Request[com customer’]</kbd>，使得
+:在<kbd>customer’</kbd>收到<kbd>Returned[value]</kbd>和<kbd>Returned[theNextBehavior]</kbd>的时候，<kbd>Returned[value]</kbd>被发送给<kbd>customer</kbd>，而<kbd>theNextBehavior</kbd>被<kbd>theSerializer</kbd>用作下次通信的行为演员。
+
+===例子程序===
+下面是简单的存储单元格（cell）的例子[[剧本|脚本]]（script），它可以包含任何演员地址：
+
+: Cell ≡
+:: ''receiver''
+::: Request[Create[initial] customer]
+:::: ''send'' customer Returned[''serializer'' ReadWrite(initial)]
+上述脚本将建立一个存储单元格，它采用的行为ReadWrite定义如下：
+
+: ReadWrite(contents) ≡
+:: ''behavior''
+::: Request[read[] customer]
+:::: {''send'' customer Returned[contents], Returned[ReadWrite(contents)]}
+::: Request[write[x] customer]
+:::: {''send'' customer Returned[], Returned[ReadWrite(x)]}
+
+例如，下列表达式建立一个单元格x，具有初始内容5，并接着并发的向它写值7和9。
+
+:''let'' x = Cell.Create[5] ''in'' {x.write[7], x.write[9], x.read[]}
+
+上述表达式的值是5、7或9。
+
+==参见==
+* [[数据流程编程|数据流程编程]]
+* [[并行编程模型|并行编程模型]]
+* {{en-link|输入/输出自动机|Input/output automaton}}
+* {{en-link|科学共同体隐喻|Scientific community metaphor}}
+
+==引用==
+{{reflist|2}}
+
+==延伸阅读==
+{{Refbegin|2}}
+*Gul Agha. [https://apps.dtic.mil/dtic/tr/fulltext/u2/a157917.pdf Actors: A Model of Concurrent Computation in Distributed Systems] {{Wayback|url=https://apps.dtic.mil/dtic/tr/fulltext/u2/a157917.pdf |date=20201112004342 }}. MIT Press 1985.
+*Paul Baran. On Distributed Communications Networks [[IEEE_Transactions_on_Communications_Systems|IEEE Transactions on Communications Systems]]. March 1964.
+*William A. Woods. [http://files.eric.ed.gov/fulltext/ED037733.pdf Transition network grammars for natural language analysis] {{Wayback|url=http://files.eric.ed.gov/fulltext/ED037733.pdf |date=20170203134542 }} CACM. 1970.
+*Carl Hewitt. [https://www.ijcai.org/Proceedings/71/Papers/014%20A.pdf Procedural Embedding of Knowledge In Planner] {{Wayback|url=https://www.ijcai.org/Proceedings/71/Papers/014%20A.pdf |date=20210205001847 }} IJCAI 1971.
+*G.M. Birtwistle, [[Ole-Johan_Dahl|Ole-Johan Dahl]], B. Myhrhaug and [[Kristen_Nygaard|Kristen Nygaard]]. SIMULA Begin Auerbach Publishers Inc, 1973.
+*Carl Hewitt, ''et al.'' Actor Induction and Meta-evaluation Conference Record of ACM Symposium on Principles of Programming Languages, January 1974.
+*Carl Hewitt, [https://link.springer.com/chapter/10.1007/3-540-06859-7_147 Behavioral Semantics of Nonrecursive Control Structure] {{Wayback|url=https://link.springer.com/chapter/10.1007/3-540-06859-7_147 |date=20180610081217 }} Proceedings of Colloque sur la Programmation, April 1974.
+*Irene Greif and Carl Hewitt.  [https://dspace.mit.edu/bitstream/handle/1721.1/41116/AI_WP_081.pdf?sequence=4&origin=publication_detail Actor Semantics of PLANNER-73] {{Wayback|url=https://dspace.mit.edu/bitstream/handle/1721.1/41116/AI_WP_081.pdf?sequence=4&origin=publication_detail |date=20210205120636 }} Conference Record of ACM Symposium on Principles of Programming Languages. January 1975.
+*Carl Hewitt. [https://pdfs.semanticscholar.org/fc65/4c70dece00b1e4bbb63453c6ff2c81c0893a.pdf How to Use What You Know] {{Wayback|url=https://pdfs.semanticscholar.org/fc65/4c70dece00b1e4bbb63453c6ff2c81c0893a.pdf |date=20190307161903 }} IJCAI. September, 1975.
+*Alan Kay and Adele Goldberg.  Smalltalk-72 Instruction Manual. Xerox PARC Memo SSL-76-6.  May 1976.
+*[[Edsger_Dijkstra|Edsger Dijkstra]]. A discipline of programming Prentice Hall. 1976.
+*Carl Hewitt and Henry Baker [https://web.archive.org/web/20060919015756/http://www.lcs.mit.edu/publications/pubs/pdf/MIT-LCS-TR-194.pdf Actors and Continuous Functionals] Proceeding of IFIP Working Conference on Formal Description of Programming Concepts. August 1–5, 1977.
+*Carl Hewitt and Russ Atkinson.  [http://portal.acm.org/citation.cfm?id=512975&coll=portal&dl=ACM Synchronization in Actor Systems] Proceedings of the 4th ACM SIGACT-SIGPLAN symposium on Principles of programming languages. 1977
+*Carl Hewitt and Russ Atkinson.  [https://pdfs.semanticscholar.org/bd25/d3a1ed23c79ff09bccf91ce9affd3b399ebe.pdf Specification and Proof Techniques for Serializers] {{Wayback|url=https://pdfs.semanticscholar.org/bd25/d3a1ed23c79ff09bccf91ce9affd3b399ebe.pdf |date=20170831085117 }} IEEE Journal on Software Engineering. January 1979.
+*Ken Kahn. [https://dspace.mit.edu/bitstream/handle/1721.1/41979/AI_WP_145.pdf?sequence=1 A Computational Theory of Animation] {{Wayback|url=https://dspace.mit.edu/bitstream/handle/1721.1/41979/AI_WP_145.pdf?sequence=1 |date=20170818200257 }} MIT EECS Doctoral Dissertation. August 1979.
+*Carl Hewitt, Beppe Attardi, and Henry Lieberman.  Delegation in Message Passing Proceedings of First International Conference on Distributed Systems Huntsville, AL. October 1979.
+*[[Nissim_Francez|Nissim Francez]], C.A.R. Hoare, Daniel Lehmann, and [[Willem-Paul_de_Roever|Willem-Paul de Roever]]. Semantics of nondetermiism, concurrency, and communication Journal of Computer and System Sciences.  December 1979.
+*[[George_Milne|George Milne]] and [[Robin_Milner|Robin Milner]]. Concurrent processes and their syntax JACM. April 1979.
+*Daniel Theriault. A Primer for the Act-1 Language MIT AI memo 672. April 1982.
+*Daniel Theriault.  [https://apps.dtic.mil/dtic/tr/fulltext/u2/a132326.pdf Issues in the Design and Implementation of Act 2] {{Wayback|url=https://apps.dtic.mil/dtic/tr/fulltext/u2/a132326.pdf |date=20190408011038 }} MIT AI technical report 728. June 1983.
+*Henry Lieberman. An Object-Oriented Simulator for the Apiary Conference of the American Association for Artificial Intelligence, Washington, D. C., August 1983
+*Carl Hewitt and Peter de Jong. [http://www.dtic.mil/get-tr-doc/pdf?AD=ADA133614 Analyzing the Roles of Descriptions and Actions in Open Systems] {{Wayback|url=http://www.dtic.mil/get-tr-doc/pdf?AD=ADA133614 |date=20170714021055 }} Proceedings of the National Conference on Artificial Intelligence. August 1983.
+*Carl Hewitt and Henry Lieberman. Design Issues in Parallel Architecture for Artificial Intelligence MIT AI memo 750.  Nov. 1983.
+*[[C.A.R._Hoare|C.A.R. Hoare]]. [http://www.usingcsp.com/ Communicating Sequential Processes] {{Wayback|url=http://www.usingcsp.com/ |date=20210201151713 }} Prentice Hall. 1985.
+*Carl Hewitt. The Challenge of Open Systems Byte. April 1985.  Reprinted in ''The foundation of artificial intelligence: a sourcebook'' Cambridge University Press. 1990.
+*Carl Manning. Traveler: the actor observatory ECOOP 1987. Also appears in [[Lecture_Notes_in_Computer_Science|Lecture Notes in Computer Science]], vol. 276.
+*William Athas and Charles Seitz [https://ieeexplore.ieee.org/abstract/document/73/ Multicomputers: message-passing concurrent computers] {{Wayback|url=https://ieeexplore.ieee.org/abstract/document/73/ |date=20210205000300 }} IEEE Computer August 1988.
+*William Athas and Nanette Boden Cantor: An Actor Programming System for Scientific Computing in Proceedings of the NSF Workshop on Object-Based Concurrent Programming.  1988.  Special Issue of SIGPLAN Notices.
+*Jean-Pierre Briot.  [https://www.researchgate.net/profile/Jean-Pierre_Briot/publication/234812358_From_objects_to_Actors_Study_of_a_limited_symbiosis_in_Smalltalk-80/links/0c96053bd5ac8322b6000000.pdf From objects to actors: Study of a limited symbiosis in Smalltalk-80] {{Wayback|url=https://www.researchgate.net/profile/Jean-Pierre_Briot/publication/234812358_From_objects_to_Actors_Study_of_a_limited_symbiosis_in_Smalltalk-80/links/0c96053bd5ac8322b6000000.pdf |date=20201125071501 }} Rapport de Recherche 88-58, RXF-LITP, Paris, France, September 1988
+*William Dally and Wills, D. [https://link.springer.com/chapter/10.1007/3540512845_30 Universal mechanisms for concurrency] {{Wayback|url=https://link.springer.com/chapter/10.1007/3540512845_30 |date=20180618003814 }} PARLE 1989.
+*W. Horwat, A. Chien, and W. Dally. [http://www.dtic.mil/get-tr-doc/pdf?AD=ADA211882 Experience with CST: Programming and Implementation] PLDI. 1989.
+*Carl Hewitt. Towards Open Information Systems Semantics Proceedings of 10th International Workshop on Distributed Artificial Intelligence. October 23–27, 1990. Bandera, Texas.
+*Akinori Yonezawa, Ed. ABCL: An Object-Oriented Concurrent System MIT Press. 1990.
+* K. Kahn and Vijay A. Saraswat, "[http://doi.acm.org/10.1145/97946.97955 Actors as a special case of concurrent constraint (logic) programming]", in SIGPLAN ''Notices'', October 1990. Describes [[Janus_(concurrent_constraint_programming_language)|Janus]].
+*Carl Hewitt. Open Information Systems Semantics Journal of Artificial Intelligence. January 1991.
+*Carl Hewitt and Jeff Inman.  [https://pdfs.semanticscholar.org/7840/bbf6b2fceb014cd3e8eeb2bd81529c7b36b5.pdf DAI Betwixt and Between: From "Intelligent Agents" to Open Systems Science] {{Wayback|url=https://pdfs.semanticscholar.org/7840/bbf6b2fceb014cd3e8eeb2bd81529c7b36b5.pdf |date=20170831090048 }} IEEE Transactions on Systems, Man, and Cybernetics. Nov./Dec. 1991.
+*Carl Hewitt and Gul Agha. Guarded Horn clause languages: are they deductive and Logical? International Conference on Fifth Generation Computer Systems, Ohmsha 1988. Tokyo.  Also in ''Artificial Intelligence at MIT'', Vol. 2. MIT Press 1991.
+*William Dally, ''et al.'' [https://ieeexplore.ieee.org/abstract/document/127581/ The Message-Driven Processor: A Multicomputer Processing Node with Efficient Mechanisms] {{Wayback|url=https://ieeexplore.ieee.org/abstract/document/127581/ |date=20210205001037 }} [[IEEE_Micro|IEEE Micro]]. April 1992.
+*S. Miriyala, G. Agha, and Y.Sami. [http://osl.cs.illinois.edu/media/papers/miriyala-1992-vlc-visualizing_actor_programs_using_predicate_transition_nets.pdf Visualizing actor programs using predicate transition nets] {{Wayback|url=http://osl.cs.illinois.edu/media/papers/miriyala-1992-vlc-visualizing_actor_programs_using_predicate_transition_nets.pdf |date=20201110134840 }} Journal of Visual Programming. 1992.
+*Carl Hewitt and Carl Manning.  [https://web.archive.org/web/20170831125720/https://vvvvw.aaai.org/Papers/Workshops/1994/WS-94-04/WS94-04-008.pdf Negotiation Architecture for Large-Scale Crisis Management] AAAI-94 Workshop on Models of Conflict Management in Cooperative Problem Solving. Seattle, WA. Aug. 4, 1994.
+*Carl Hewitt and Carl Manning.  Synthetic Infrastructures for Multi-Agency Systems Proceedings of ICMAS '96. Kyoto, Japan. December 8–13, 1996.
+*S. Frolund. Coordinating Distributed Objects: An Actor-Based Approach for Synchronization MIT Press. November 1996.
+*W. Kim. [https://www.researchgate.net/profile/Wooyoung_Kim2/publication/2308617_Thal_An_Actor_System_For_Efficient_And_Scalable_Concurrent_Computing/links/02e7e517614e73041a000000.pdf ThAL: An Actor System for Efficient and Scalable Concurrent Computing] {{Wayback|url=https://www.researchgate.net/profile/Wooyoung_Kim2/publication/2308617_Thal_An_Actor_System_For_Efficient_And_Scalable_Concurrent_Computing/links/02e7e517614e73041a000000.pdf |date=20170831085055 }} PhD thesis. University of Illinois at Urbana Champaign. 1997.
+*Jean-Pierre Briot. [https://web.archive.org/web/20030427222407/http://www.ifs.uni-linz.ac.at/~ecoop/cd/papers/ec89/ec890109.pdf Acttalk: A framework for object-oriented concurrent programming-design and experience] 2nd France-Japan workshop. 1999.
+*N. Jamali, P. Thati, and G. Agha. [https://www.researchgate.net/profile/Gul_Agha/publication/3420461_An_Actor-Based_Architecture_for_Customizing_and_Controlling_Agent_Ensembles/links/55aeb2ed08aed9b7dcdda586.pdf An actor based architecture for customizing and controlling agent ensembles] {{Wayback|url=https://www.researchgate.net/profile/Gul_Agha/publication/3420461_An_Actor-Based_Architecture_for_Customizing_and_Controlling_Agent_Ensembles/links/55aeb2ed08aed9b7dcdda586.pdf |date=20201125071501 }} IEEE Intelligent Systems. 14(2). 1999.
+*Don Box, David Ehnebuske, Gopal Kakivaya, Andrew Layman, Noah Mendelsohn, Henrik Nielsen, Satish Thatte, Dave Winer. Simple Object Access Protocol (SOAP) 1.1 [[W3C|W3C]] Note. May 2000.
+*M. Astley, D. Sturman, and G. Agha. [http://osl.cs.illinois.edu/media/papers/astley-2001-cacm-customizable_middleware_for_modular_distributed_software.pdf Customizable middleware for modular distributed software] {{Wayback|url=http://osl.cs.illinois.edu/media/papers/astley-2001-cacm-customizable_middleware_for_modular_distributed_software.pdf |date=20170831083740 }} CACM. 44(5) 2001.
+*Edward Lee, S. Neuendorffer, and M. Wirthlin. [http://ptolemy.eecs.berkeley.edu/papers/02/actorOrientedDesign/newFinal.pdf Actor-oriented design of embedded hardware and software systems] {{Wayback|url=http://ptolemy.eecs.berkeley.edu/papers/02/actorOrientedDesign/newFinal.pdf |date=20161020063715 }} ''[[Journal_of_Circuits,_Systems,_and_Computers|Journal of Circuits, Systems, and Computers]]''. 2002.
+*P. Thati, R. Ziaei, and G. Agha. A Theory of May Testing for Actors Formal Methods for Open Object-based Distributed Systems. March 2002.
+*P. Thati, R. Ziaei, and G. Agha. A theory of may testing for asynchronous calculi with locality and no name matching Algebraic Methodology and Software Technology. Springer Verlag. September 2002. LNCS 2422.
+*Stephen Neuendorffer.  [http://www.eecs.berkeley.edu/Pubs/TechRpts/2005/ERL-05-1.pdf Actor-Oriented Metaprogramming] {{Wayback|url=http://www.eecs.berkeley.edu/Pubs/TechRpts/2005/ERL-05-1.pdf |date=20200925073835 }} PhD Thesis. University of California, Berkeley. December, 2004
+*Carl Hewitt (2006a)  [https://web.archive.org/web/20171210124010/https://vvvvw.aaai.org/Papers/Symposia/Spring/2006/SS-06-08/SS06-08-003.pdf The repeated demise of logic programming and why it will be reincarnated]   What Went Wrong and Why: Lessons from AI Research and Applications.  Technical Report SS-06-08. AAAI Press.  March 2006.
+*Carl Hewitt (2006b) [http://www.pcs.usp.br/~coin-aamas06/10_commitment-43_16pages.pdf ''What is Commitment? Physical, Organizational, and Social''] {{Wayback|url=http://www.pcs.usp.br/~coin-aamas06/10_commitment-43_16pages.pdf |date=20210211011938 }}  COIN@AAMAS.  April 27, 2006b.
+*Carl Hewitt (2007a) What is Commitment? Physical, Organizational, and Social (Revised) Pablo Noriega .et al. editors. LNAI 4386. Springer-Verlag. 2007.
+*Carl Hewitt (2007b) [https://www.researchgate.net/profile/Bob_Wielinga/publication/221456241_Towards_a_Framework_for_Agent_Coordination_and_Reorganization_AgentCoRe/links/0fcfd508a9cd76ca47000000.pdf#page=105 Large-scale Organizational Computing requires Unstratified Paraconsistency and Reflection] {{Wayback|url=https://www.researchgate.net/profile/Bob_Wielinga/publication/221456241_Towards_a_Framework_for_Agent_Coordination_and_Reorganization_AgentCoRe/links/0fcfd508a9cd76ca47000000.pdf#page=105 |date=20201125071524 }} COIN@AAMAS'07.
+*D. Charousset, T. C. Schmidt, R. Hiesgen and M. Wählisch. [https://dx.doi.org/10.1145/2541329.2541336 ''Native actors: a scalable software platform for distributed, heterogeneous environments''] in AGERE! '13 Proceedings of the 2013 workshop on Programming based on actors, agents, and decentralized control.
+{{Refend}}
+
+==外部链接==
+{{编程语言类别}}
+
+[[Category:并发计算|Category:并发计算]]
+[[Category:计算模型|Category:计算模型]]
+[[Category:演员模型|Category:演员模型]]

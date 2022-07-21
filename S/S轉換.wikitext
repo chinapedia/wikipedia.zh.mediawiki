@@ -1,0 +1,155 @@
+{{NoteTA|1=zh:傅里叶; zh-hans:傅里叶; zh-hant:傅立葉;|2=zh-cn:变换; zh-tw:轉換;}}
+
+'''S轉換'''(s-transform)是一種[[時頻分析|時頻分析]]的工具。
+
+和其他時頻分析工具一樣，透過S轉換，我們可以同時從[[時域|時域]]以及[[頻域|頻域]]觀察一個信號的能量分布。S轉換的特別之處在它既保持與[[傅立葉變換|傅立葉變換]]的直接關係，又可在不同頻率有不同的解析度。此外，S轉換與[[小波轉換|小波轉換]]（wavelet transform）有密切的關係，或可視為[[連續小波轉換|連續小波轉換]]（continuous wavelet transform）的變形。S轉換的清晰度略優於[[加伯轉換|加伯轉換]]（Gabor transform），而不如[[韋格納分佈|韋格納分佈]]（Wigner distribution function）、[[科恩克萊斯分佈|科恩克萊斯分佈]]、[[改良式韋格納分佈|改良式韋格納分佈]]（Modified Wigner distribution function）。
+
+== 定義 ==
+一個信號x(t)的S轉換為<br />
+:<math>S_x(t,\,f)=\int_{-\infty}^{\infty} x(\tau)\,|f|\,e^{-\pi(t-\tau)^2f^2} e^{-j2\pi f\tau}\, d\tau</math>
+其中[[窗函數|窗函數]]為高斯窗函數
+:<math>w(t,f) = |f|e^{-\pi t^2f^2}</math>
+
+===另種表示-頻譜表示式===
+藉著[[摺積定理|摺積定理]] 
+:<math> x(t)\ast h(t) = \mathcal{F}^{-1}(X(f)\cdot H(f))</math>
+S轉換能以頻域 <math>X(f)</math> 表示，<br />
+:<math> S_x(t,f) = \int_{-\infty}^{\infty} (x(\tau) e^{-j2 \pi f \tau})(|f|e^{- \pi (t- \tau)^2 f^2})\, d\tau</math>
+这里可将<math> S_x(t,f)</math>看成<math>x(t) e^{-j2 \pi ft}</math>与<math>|f|e^{-\pi t^2 f^2}</math>的卷积，<br />
+將<math>x(\tau) e^{-j2 \pi f \tau}</math> 以及 <math>|f|e^{-\pi (t-\tau)^2 f^2}</math>分別取[[傅立葉變換|傅立葉變換]]可得
+:<math> S_x(t,f) = \int_{-\infty}^{\infty} X(f+\alpha)\,e^{-\pi\alpha^2 /f^2}\,e^{j2\pi\alpha t}\, d\alpha  </math>
+
+== 窗函數(window function) ==
+對一訊號<math>x(t)</math>進行S轉換，寫為
+
+<math>S_x(t,f)=\int_{-\infty}^{\infty} x(\tau)\,w(t-\tau,f) e^{-j2\pi f\tau}\, d\tau</math>
+
+其中 <math>w(t,f)</math>為S轉換之[[窗函數|窗函數]]，常見之窗函數為高斯函數，即
+
+<math>w(t,f) = |f|e^{-\pi t^2f^2}</math> 
+
+事實上，S轉換之窗函數並不局限於高斯函數，考慮以下一般化型態的S轉換(generalized S transform):
+
+<math>S_x(t,f,P)=\int_{-\infty}^{\infty} x(\tau)\,w(t-\tau,f,P) e^{-j2\pi f\tau}\, d\tau</math>
+
+其中 <math>w(t,f,P)</math>為 一般化之窗函數(generalized window function), 參數 P 為一系列數值而組成之矩陣，可控制window function，舉例來說
+
+<math>w(t,f,\gamma) = |f|e^{-\pi t^2f^2/\gamma^2}</math> ，此時 <math>\gamma
+</math> 為矩陣 P 內之唯一數值
+
+通過選取較小的 <math>\gamma
+</math> 值，可得到時域上較窄的窗函數，提高時間軸的解析度，然而，頻率軸上的解析度將因此變差。
+
+改善時頻兩域解析度的問題，可選擇非對稱的窗函數(asymmetric window)，在正方向(forward direction)上有較陡峭之斜率，反方向(backward direction)上有較緩之斜率，藉由犧牲終端時間的解析度(一般而言較不重要)換取初始時間上更好的解析度。<ref>The S-transform with windows of arbitrary and varying shape, C. Robert Pinnegar, Lalu Mansinha, GEOPHYSICS, VOL.68, NO.1 (JANUARY-FEBRUARY 2003); P.381–385</ref>
+
+==逆S轉換(inverse S-transform)==
+S轉換可以沿著時間軸方向積分，將可以得到<math>x(t)</math>的頻譜<math>X(f)</math>。推導如下，<br />
+利用Gaussian window所包含面積等於1的特性，
+:<math>\int_{-\infty}^{\infty}|f|e^{-\pi (t-\tau)^2 f^2}\, dt= |f|\int_{-\infty}^{\infty}e^{-\pi (t-\tau)^2 f^2}\, dt= 1</math>
+因此，沿著時間軸t積分，
+:<math>\int_{-\infty}^{\infty}S_x(t,f)\, dt = \int_{-\infty}^{\infty} x(\tau) \left[\int_{-\infty}^{\infty} |f|\,e^{-\pi(t-\tau)^2f^2}\, dt\right]\,e^{-j2\pi f\tau}\, d\tau = X(f)</math>
+這表示S頻譜是可逆的，同時也提供一個簡單的逆轉換。<br />
+:<math>x(\tau) = \int_{-\infty}^{\infty}\left[\int_{-\infty}^{\infty}S_x(t,f)\, dt\right]\,e^{j2\pi f\tau}\, df</math>
+::<math> = \int_{-\infty}^{\infty}X(f)\,e^{j2\pi f\tau}\, df</math>
+===濾波應用(Filtering)===
+S轉換如同其他時頻分析轉換，皆可以設計波器來達到消除雜訊留下訊號的功用，<br>
+利用逆S轉換，我們可以設計一個S域的濾波器''U(t,f)''，對x(t)進行訊號處理<br>
+:<math>x_{filter}(\tau) = \int_{-\infty}^{\infty}\left[\int_{-\infty}^{\infty}S_x(t,f)\cdot U(t,f) \, dt\right]\,e^{j2\pi f\tau}\, df</math>
+
+==離散時間S轉換==
+'''S轉換'''相較於'''加伯轉換'''，雖在清晰度有較好的改善，但也有其缺點，就是運算複雜度變高，積分的範圍會隨著<math>f\,</math>的增加而增加。<br>
+因此，這裡利用上面推導的'''頻譜'''表示式來推導'''離散時間S轉換'''<br>
+頻譜表示式
+:<math>S_x(t,f) = \int_{-\infty}^{\infty} X(f+\alpha)\,e^{-\pi\alpha^2 /f^2}\,e^{j2\pi\alpha t}\, d\alpha</math><br>
+令<math>t = n\Delta_{T}\,\, f = m\Delta_{F}\,\, \alpha = p\Delta_{F}</math><br>
+:<math>\Delta_{T}\,</math>表示取樣時間間隔<math>, \Delta_{F}\,</math>表示取樣頻率<br>
+如果要使用FFT的方式來實作，必須另加條件
+:<math>\Delta_{T} \cdot \Delta_{F}=1/N</math>
+首先先對<math>x(t)</math>做傅立葉變換得到<math>X(f)</math><br>
+:<math>X[m\Delta_{F}]=\frac{1}{N}\,\sum_{k=0}^{N-1}x[k\Delta_{T}]\,e^{\frac{-j2\pi mk}{N}}</math><br>
+接著帶入頻譜表示式中，<br>
+:<math>S_{x}(n\Delta_{T}\, ,m\Delta_{F}) = \sum_{p=0}^{N-1} X[(p+m)\,\Delta_{F}]\,e^{-\pi\frac{p^2}{m^2}}\,e^{\frac{j2pn}{N}}</math>
+當 m=0 時，S轉換就定義成
+:<math>S_{x}(n\Delta_{T}\, ,0)= \frac{1}{N}\,\sum_{k=0}^{N-1}x[k\Delta_{F}</math>]
+
+===流程===
+Step1 : 計算<math>X[p\Delta_{F}]\,</math>,這個步驟只需要計算一次。<br>
+Step2 : 計算<math>e^{-\pi \frac{p^2}{m^2}}</math>for <math>f=m\Delta_{F}</math><br>
+Step3 : 將<math>X[p\Delta_{F}]</math>移動至<math>X[(p+m)\Delta_{F}]</math><br>
+Step4 : 將Step2,Step3的結果相乘得到
+:<math>B[m,p] = X[(p+m)\Delta_{F}]\cdot e^{-\pi \frac{p^2}{m^2}}</math><br>
+Step5 : 對B[m,p]取'''逆離散傅立葉變換'''(IDFT)可得到，<math>S_{x}(n\Delta_{T}\, ,m\Delta_{F})</math>在<math>f=m\Delta_{F}</math>的行向量<br>
+Step6 : 重複Step2~5直到<math>S_{x}(n\Delta_{T}\, ,m\Delta_{F})</math>全部定義完成。
+
+== S轉換特性 ==
+S轉換與加伯轉換(Gabor Transform)很相似，
+:<math> G_{x}(t,f)=\int_{-\infty}^{\infty}x(\tau)\,e^{-\pi (t-\tau)^2} e^{-j2\pi f \tau}\, d\tau</math>
+:<math> S_{x}(t,f)=\int_{-\infty}^{\infty}x(\tau)\,|f|e^{-\pi (t-\tau)^2 f^2} e^{-j2\pi f \tau}\, d\tau</math>
+唯一的不同就在於S轉換的Gaussian Window的寬度會隨著<math>f</math>改變。<br>
+{| class="wikitable"
+|-
+| 低頻 || 時域解析度差 || 頻域解析度佳
+|-
+| 高頻 || 頻域解析度差 || 時域解析度佳
+|}
+原因就是<math>f\,</math>在高頻時，Gaussian Window寬度變小，時域解析度好；反之，<math>f\,</math>在低頻時，Gaussian Window寬度變寬，頻域解析度好。<br>
+但是，當<math>f\rightarrow0</math>時，Gaussian Window會無窮無盡的變寬，就喪失時頻分析只做局部分析的精神。<br>
+一種解決的方式是:使Gaussian Window寬度不再因<math>f^2\,</math>改變\，產生頻寬劇烈的變化，<br>
+'''S轉換一般式'''
+:<math>S_{x}(t,f)=|s(f)|\int_{-\infty}^{\infty}x(\tau)\,e^{-\pi (t-\tau)^2 s^2(f)} e^{-j2\pi f \tau}\, d\tau</math>
+:<math>s(f)</math>是一個相對平緩的曲線(見底下示意圖)，當<math>f\rightarrow0</math>時，<math>s(f)\neq 0</math><br>
+S轉換是一種運算量高的時頻分析工具，尤其在低頻部分，Gaussian Window寬度變寬，頻域解析度比加伯轉換來的好，所以S轉換對於低頻訊號分析比較有優勢<br>
+例如:聲音訊號，人耳對高頻的部分沒有太特別的感覺，但在低頻部分卻比較敏感，如:中央Do = 262Hz,高八度Do = 512Hz 可以很清楚的聽出兩個不同的音，
+但10000Hz 和 10170Hz對人來說差別不大，再說人耳對3KHz以內的聲音最敏感，所以能分析低頻訊號就顯得重要。<br>
+此時，就可以使用S轉換，來強調低頻訊號，而犧牲高頻訊號。
+[[File:StransformSf.jpg|center]]
+
+== 與韋格納分佈的比較 ==
+韋格納分佈是時頻分析工具中，具有高清晰度的一個，但最大的缺點是有交叉項（cross-term）的問題。若一個信號是由數個信號成份組合而成，那麼使用韋格納分佈來分析時就會受到兩兩信號成份之間的交叉項干擾，这将会产生一些不必要的噪声。一個信號x的韋格納分佈為
+:<math>W_x(t,f)= \int_{-\infty}^{\infty} x(t+\frac{\tau}{2})x^*( t-\frac{\tau}{2})e^{-j2\pi\tau f}\, d\tau </math>
+交叉項是在積分中兩個x項相乘時產生的。S轉換的計算原理與韋格納分佈不同，是直接對<math>x(\tau)</math>進行轉換，不會有交叉項的問題。
+
+== 與加伯轉換的比較 ==
+加伯轉換的定義為
+
+<math>G_x(t,f)=\int_{-\infty}^{\infty} x(\tau)e^\left [ -\pi(t-\tau)^2f^2 \right ]e^\left ( -j2\pi f\tau \right )d\tau</math>
+
+我們知道加伯轉換是短時距傅立葉轉換的一種特殊形式，其中只要把短時距傅立葉轉換的窗函數用高斯函數來替代就成了加伯轉換；S轉換則可視為一種窗函數會隨f變化的加伯轉換；隨著頻率的升高，高斯函數在時域上的寬度會越來越窄，使得時域上的解析度會增加，反之犧牲頻域上的解析度。
+
+加伯轉換和S轉換原理相同，兩者唯一不同的地方就是窗函數的<math>f^2</math>和強度<math>f</math>，基本上都是由短時距傅立葉轉換延伸而來；兩者共有的好處是不會像韋格納分布一樣會有交叉項；又S轉換在低頻時的頻率解析度會優於加伯轉換。
+
+== 與小波轉換的關係 ==
+連續小波轉換可以視為將一個信號對小波做[[相關_(概率論)|相關]]（correlation）：<br />
+:<math>W(\tau,\,d)=\int_{-\infty}^{\infty} x(t)\,W(t-\tau,\,d)\, dt</math>
+而S轉換可以視為連續小波轉換乘上一個相位項：<br />
+:<math>S(\tau,\,f)=e^{-j2\pi\tau f}W(\tau,\,d)</math>
+而其用的母小波為：<br />
+:<math>w(t,\,f)=|f|\,\exp[-\pi t^2f^2] \exp[-j2\pi ft]</math>
+
+
+
+== S轉換，加伯轉換和短時距傅立葉轉換的比較 ==
+假設我們想要對一訊號<math>x(t)</math>做時頻分析
+
+<math>x(t)=cos(2\pi t), t<10,
+</math>
+
+<math>x(t)=cos(2\pi t), 10\leq t <20,
+</math>
+
+<math>x(t)=cos(2\pi t), 20\leq t.
+</math>
+
+如果使用一個寬度為1秒的矩形函數來做短時距傅立葉轉換會得到
+[[File:Rect_s.png|无]]
+如果使用一個加伯轉換會得到時頻分析圖
+[[File:Gabor.png|无]]
+如果用S轉換會得到時頻分析圖
+[[File:St0.png|无]]
+由上三圖可知，S轉換是一個在低頻時頻域解析度高，高頻時時域解析度高的時頻分析；舉例來說，對於100Hz與300Hz和1000Hz與1200Hz這兩組聲音，哪一組對於人耳會有明顯的差異呢? 答案是100Hz和300Hz，低頻時的頻率差異對於人耳較明顯，當頻率越高時，人耳就越難分辨出頻率的差異；同樣的道理，S轉換便符合我們的需求，低頻時訊號變化慢擁有低的時域解析度和擁有高的頻域解析度，高頻時因為訊號變化很快則擁有高的時域解析度和低的頻域解析度。
+
+== 參考文獻 ==
+* R. G. Stockwell, L. Mansinha, and R. P. Lowe, "Localization of the complex spectrum: the S transform," ''IEEE Trans. Signal Processing,'' vol. 44, no. 4, pp. 998–1001, Apr. 1996.
+* Jian-Jiun Ding, Time frequency analysis and wavelet transform class note, the Department of Electrical Engineering, National Taiwan University (NTU), Taipei, Taiwan, 2010.
+* Sitanshu Sekhar, Ganapati Panda and Nithin V George, "An Improved S-Transform for Time-Frequency Analysis," "IACC2009", pp. 315-319, March 2009.
+[[Category:積分變換|S]]

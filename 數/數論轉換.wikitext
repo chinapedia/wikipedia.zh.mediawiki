@@ -1,0 +1,279 @@
+{{noteTA
+|G1=Signals and Systems
+}}
+
+'''數論轉換'''是一種計算[[摺積|摺積]]的快速演算法。計算摺積的快速演算法中最常用的一種是使用[[快速傅里葉變換|快速傅里葉變換]]，然而快速傅立葉變換具有一些實現上的缺點，舉例來說，資料向量必須乘上[[複數_(數學)|複數]]係數的矩陣加以處理，而且每個複數係數的實部和虛部是一個[[正弦|正弦]]及[[餘弦|餘弦]]函數，因此大部分的係數都是[[浮點數|浮點數]]，也就是說，必須做複數而且是浮點數的運算，因此計算量會比較大，而且浮點數運算產生的誤差會比較大。
+
+而在數論轉換中，資料向量需要乘上的矩陣是一個[[整數|整數]]的矩陣，因此不需要作浮點數的乘法運算，更進一步，在模數為<math>M</math>的情況下，只有<math>M^2</math>種可能的加法與<math>M^2</math>種可能的乘法，這可以使用記憶體把這些有限數目的加法和乘法存起來，利用查表法來計算，使得數論轉換完全不須任何乘法與加法運算，不過需要較大的記憶體與消耗較大的存取記憶體量。
+
+雖然使用數論轉換可以降低計算摺積的複雜度，不過由於只進行整數的運算，所以只能用於對整數的信號計算摺積，而利用快速傅立葉變換可以對任何複數的信號計算摺積{{来源请求}}，這是降低運算複雜度所要付出的代價。
+
+==轉換公式==
+數論轉換的轉換式為
+
+<math>F[k]=\sum_{n=0}^{N-1} f[n]\alpha^{nk} \pmod{M}\quad k=0,1,2,\ldots ,N-1</math>
+
+而數論轉換的反轉換式為
+
+<math>f[n]=N^{-1}\sum_{k=0}^{N-1} F[k]\alpha^{-nk}\pmod{M}\quad n=0,1,2,\ldots ,N-1</math>
+
+註解：
+
+(1) <math>M</math>是一個[[質數|質數]]。
+
+(2) <math>\pmod{M}</math> 表示除以M的[[餘數|餘數]]
+
+(3) <math>N</math>必須是<math>M-1</math>的[[因數|因數]]。(當<math>N\ne 1</math>時<math>N</math>和<math>M</math>[[互質|互質]])
+
+(4)<math>N^{-1}</math>是<math>N</math>對模數<math>M</math>之[[模反元素|模反元素]]
+
+(5)<math>\alpha</math>為模M的N階單位根，即<math>\alpha^N=1\pmod{M}</math>而且<math>\alpha^k \ne 1 \pmod{M}\ k=1,2,\ldots,N-1</math>。若此時<math>N=M-1</math>，我們稱<math>\alpha</math>為模M的[[原根|原根]]
+
+舉一個例子：
+
+一個<math>M=5</math>的<math>N=4</math>點數論轉換與反轉換如下，取<math>\alpha = 2</math>，注意此時<math>N^{-1}=4</math>
+
+正轉換
+<math>\begin{pmatrix} F[0] \\ F[1] \\ F[2] \\ F[3] \end{pmatrix}=\begin{pmatrix} 1 & 1 & 1 & 1 \\ 1 & 2 & 4 & 3 \\1 & 4 & 1 & 4 \\ 1 & 3 & 4 & 2 \end{pmatrix}\begin{pmatrix} f[0] \\ f[1] \\ f[2] \\ f[3] \end{pmatrix}\pmod{M}</math>
+
+反轉換
+<math>\begin{pmatrix} f[0] \\ f[1] \\ f[2] \\ f[3] \end{pmatrix}=\begin{pmatrix} 4 & 4 & 4 & 4 \\ 4 & 2 & 1 & 3 \\4 & 1 & 4 & 1 \\ 4 & 3 & 1 & 2 \end{pmatrix}\begin{pmatrix} F[0] \\ F[1] \\ F[2] \\ F[3] \end{pmatrix}\pmod{M}</math>
+
+==數論轉換的性質==
+
+(1) 正交性質
+
+數論轉換矩陣的每個列是互相正交的，即<math>\sum_{n=0}^{N-1}\alpha^{nl}\alpha^{-nk}=\begin{cases} N \quad if\ k=l\\ 0 \quad if\ k\ne l\end{cases} \pmod{M}</math>
+
+(2) 對稱性
+
+若<math>f[n]=f[N-n]</math>，則<math>f[n]</math>的數論轉換<math>F[k]</math>也會有<math>F[k]=F[N-k]</math>的特性。
+
+若<math>f[n]=-f[N-n]</math>，則<math>f[n]</math>的數論轉換<math>F[k]</math>也會有<math>F[k]=-F[N-k]</math>的特性。
+
+(3) 反數論轉換可由正數論轉換實現
+
+<math>f[n]=N^{-1}\sum_{k=0}^{N-1}F[k]\alpha^{-nk}=N^{-1}\sum_{-k=0}^{N-1}F[-k]\alpha^{nk}</math>，即<math>N^{-1}F[-k]</math>的數論轉換。
+
+步驟一：把<math>F[k]</math>改寫成<math>F[-k]</math>，若<math>F[k]=F_0,F_1,,F_2\ldots,F_{N-1} </math>，則<math>F[-k]=F_0,F_{N-1},\ldots,F_2,F_1</math>
+
+步驟二：求<math>F[-k]</math>的數論轉換。
+
+步驟三：乘上<math>N^{-1}</math>。
+
+(4) 線性性質
+
+若<math>f[n]\leftrightarrow F[k]</math>，<math>g[n]\leftrightarrow G[k]</math>，(<math>\leftrightarrow</math>表互為數論轉換對)則有<math>af[n]+bg[n]\leftrightarrow aF[k]+bg[k]\pmod{M}</math>。
+
+(5) 平移性質
+
+若<math>f[n]\leftrightarrow F[k]</math>，則<math>f[n+l]\leftrightarrow \alpha^{-lk}F[k]\pmod{M}</math>，而且<math>f[n]\alpha^{nl}\leftrightarrow F[k+l]</math>。
+
+(6) [[圓周摺積|圓周摺積]]性質
+
+若<math>f[n]\leftrightarrow F[k]</math>，<math>g[n]\leftrightarrow G[k]</math>，則<math>f[n]\otimes g[n]\leftrightarrow F[k]G[k]\pmod{M}</math>，而且<math>f[n]g[n]\leftrightarrow \frac{1}{N}F[k]\otimes G[k]\pmod{M}</math>。(<math>\otimes</math>代表圓形摺積。)
+
+這個性質是數論轉換可以用來作為摺積的快速演算法的主要原因。
+
+(7) [[帕塞瓦爾定理|帕塞瓦爾定理]](Parseval's Theorem)
+
+若<math>f[n]\leftrightarrow F[k]</math>，則<math>N\sum_{n=0}^{N-1}f[n]f[-n]=\sum_{k=0}^{N-1}F^2[k]\pmod{M}</math>，而且<math>N\sum_{n=0}^{N-1}f^2[n]=\sum_{k=0}^{N-1}F[k]F[-k]\pmod{M}</math>
+
+==快速數論轉換==
+
+如果轉換點數N是一個2的次方，則可以使用類似基數-2快速傅立葉變換的蝴蝶結構來有效率的實現數論轉換。同樣的[[互質因子算法|互質因子算法]]也可以應用在數論轉換上。
+
+<math>\begin{matrix}F[k]&=&\sum_{n=0}^{N-1}f[n]\alpha^{nk}\\ \ &=&\sum_{r=0}^{N/2-1}f[2r]\alpha^{2rk}+\sum_{r=0}^{N/2-1}f[2r+1]\alpha^{(2r+1)k} \\ \ & = & \sum_{r=0}^{N/2-1}f[2r](\alpha^2)^{rk}+\alpha^k\sum_{r=0}^{N/2-1}f[2r+1](\alpha^2)^{rk}\\ \ &=& \begin{cases} G[k]+\alpha^kH[k]\quad 0\le k\le \frac{N}{2}-1 \\ G[k-\frac{N}{2}]-\alpha^kH[k-\frac{N}{2}]\quad \frac{N}{2}\le k\le N-1 \end{cases}\end{matrix}</math>
+
+其中，<math>G[k]=\sum_{r=0}^{N/2-1}f[2r](\alpha^2)^{rk}</math>，<math>H[k]=\sum_{r=0}^{N/2-1}f[2r+1](\alpha^2)^{rk}</math>。
+因此一個<math>N</math>點數論轉換可以拆解成兩個<math>\frac{N}{2}</math>點的數論轉換。
+
+== N, M, alpha的選擇 ==
+
+由於數論轉換可以擁有類似快速傅立葉變換的快速演算法，因此通常<math>N</math>會選擇適合使用快速演算的值，比如說取為2的[[冪|冪]]次，或是可以分解成許多小質數相乘的數。
+
+在數論轉換中，需要大量地和<math>\alpha</math>的冪次做乘法，因此，如果可以取<math>\alpha</math>為2或2的冪次，則每一次的乘法在二進制中只會是一個移位的操作，可以省下大量的乘法運算。
+
+因為要做模<math>M</math>的運算，所以<math>M</math>的二進位表示法中，1的個數越少越好，同時<math>M</math>的值不能取太小，這是因為數論轉換後的值都小於<math>M</math>，因此當真實的摺積的結果會大於<math>M</math>時就會發生錯誤，所以必須謹慎選取<math>M</math>的大小。
+
+==特殊的數論轉換==
+===[[梅森質數|梅森質數]]數論轉換===
+
+梅森質數是指形如<math>2^p-1</math>的質數記做<math>M_p</math>，其中<math>p</math>是一個質數。
+
+在梅森質數數論轉換中，取<math>M=M_p</math>，可以證明<math>\alpha , N</math>可以如下選取：
+
+(1) <math>\alpha = 2, N=p, N^{-1}=M_p-\frac{M_p-1}{p}</math>
+
+(2) <math>\alpha = -2, N=2p, N^{-1}=M_p-\frac{M_p-1}{2p}</math>
+
+在這兩種選取方式下，由於<math>\alpha</math>是2的冪次，所以只需移位運算，但<math>N</math>不是2的冪次，所以基數-2的蝴蝶結構不適用於此例中，同時<math>N</math>為質數或一個質數的兩倍，並不是一個可以拆解成很多質因數乘積的數，因此也無法由互質因子演算法得到太大的好處。梅森質數數論轉換通常用於較短序列的摺積運算
+
+===[[費馬數|費馬數]]數論轉換===
+
+費馬數是指形如<math>2^{2^t}+1</math>的數記做<math>F_t</math>。
+
+在費馬數數論轉換中，取<math>M=F_t</math>，可以證明在<math>0<t\le 4</math>之下<math>\alpha , N</math>可以如下選取：
+
+(1) <math>\alpha = 2, N=2^{t+1}</math>
+
+(2) <math>\alpha = 3, N=F_t-1</math>
+
+在這兩種選取方式下，<math>N</math>是2的冪次，所以基數-2的蝴蝶結構適用於此例中，而若<math>\alpha</math>是2的冪次，只需移位運算。費馬數數論轉換通常用於較長序列的摺積運算。
+
+== 實作議題 ==
+由於數論轉換需運用到餘數下的反元素，這邊提供一些不同的演算法。
+
+<big>'''(一) Euclidean algorithm - iterative version'''</big>
+
+假設M為質數的mod，N為我們當前的元素且符合M-1的因數，藉由Euclidean Algorithm知道必然存在x, y的整數使得
+
+xM + yN = 1 - (1)
+
+由上式左右mod M 可以得到 yN mod M= 1，顯然y就是我們這邊想求的反元素。
+
+我們已知最大公因數(gcd)有如下性質。
+
+gcd(M, N) = gcd(N, M mod N) = gcd(M mod N, N mod (M mod N)) = ... = 1
+
+這邊設定q為商數，r為餘數，接上面的等式方程式化如下。
+
+<math>M = q_{0}N + r_{1}, 
+</math>
+
+<math>
+N = q_{1}r_{1}+r_{2},
+</math>
+
+<math>
+r_{1} = q_{2}r_{2} + r_{3},
+</math>
+
+<math>
+r_{2} = q_{3}r_{3} + r_{4},
+...</math>
+
+整理一下
+
+<math>M - q_{0}N=   r_{1}, 
+</math>
+
+<math>
+N -q_{1}r_{1}= r_{2},
+</math>
+
+<math>
+r_{1} -q_{2}r_{2} = r_{3},
+</math>
+
+<math>
+r_{2} - q_{3}r_{3} =  r_{4},
+...</math>
+
+最後的r 一定會變成1，所以我們只要不斷的將r乘上-q帶往下一個式子(像是r1*(-q1))，跟代往下下個式子(像是r3的左邊式子要帶入r1)即可求得最後我們想得到的 (1)，最後的N旁的係數就是反元素。<syntaxhighlight lang="python">
+def modInv(x, M): #by Euclidean algorithm - iterative version
+    t, new_t, r, new_r = 0, 1, M, x
+
+    while new_r != 0:
+        quotient = int(r / new_r)
+        tmp_new_t = new_t
+        tmp_t = t
+        tmp_new_r = new_r
+        tmp_r = r
+        t, new_t = new_t, (t - quotient * new_t)
+        r, new_r = new_r, (r % new_r)
+    if r > 1:
+        print("Inverse doesn't exist")
+    if t < 0:
+        t = t + M
+    return t
+</syntaxhighlight><big>'''(二) Euclidean algorithm - recursion version'''</big>
+
+根據gcd的性質gcd(M, N) = gcd(N, M mod N) = gcd(M mod N, N mod (M mod N)) = ... = 1
+
+可以看出遞迴的關係，藉此我們可以從這邊得到N的係數，也就是反元素。
+
+gcd(M, N) = 1來看，我們知道存在<math>xM + yN = 1</math> 。
+
+gcd(N, M mod N)=1，則存在<math>x_{1}N + y_{1}(M \, mod \,N) = 1</math>
+
+<math>x_{1}N + y_{1}(M \, mod \,N) = x_{1}N + y_{1}(M - q_{1}N) = y_{1}M + (x_{1}-q_{1}y_{1})N = 1</math>
+
+這邊q就是相除的商數，比較M跟N的係數，這邊可以得到一個遞迴關係，
+
+<math> (x_{1}-q_{1}y_{1}) = y</math>
+
+<math> y_{1} =x</math>
+
+可以藉由下一層的係數來推出上一層的係數。<syntaxhighlight lang="python3">
+def egcd(a, b): # y = x1 - quotient * y1  , x = y1 
+    if a == 0:
+        return (b, 0, 1)
+    else:
+        g, y, x = egcd(b % a, a)
+        return (g, x - (b // a) * y, y)
+
+def modInv(n, m): #by Euclidean algorithm - recursion version 
+    g, y, x = egcd(n, m)
+    if g != 1:
+        print("Inverse doesn't exist")
+    else:
+        return y % m
+</syntaxhighlight><big>'''(三) Fermat little theorem'''</big>
+
+當M是質數時，我們知道任何一個數字N，<math> N^{M-1} \, mod \, M = 1</math>
+
+<math> N (N^{M-2}\,mod\,M)\,mod\,M=1</math>
+
+顯然<math> N^{M-2}\,mod\,M</math>就是N的反元素。
+
+搭配快速mod可以容易的算出反元素，power是偶數時則可以用<math> (a^{2} \,mod\,M)^{power/2}</math>; power是基數時則可以用<math> (aN \,mod\,M)^{power-1}</math>，讓power變成偶數。反覆直到power變成1。<syntaxhighlight lang="python3">
+def modInv(a, m): #fermat little thm
+      return modExponent(a, m - 2, m)
+      
+def modExponent(base, power, M): #quick mod O(log(power))
+    result = 1
+    power = int(power)
+    base = base % M
+    while power > 0:
+        if power & 1:
+            result = (result * base) % M
+        base = (base * base) % M
+        power = power >> 1
+    return result
+</syntaxhighlight>
+
+== 演算法 ==
+以下程式預設。<syntaxhighlight lang="python3">
+import numpy as np
+</syntaxhighlight>這邊只要再從1到M-1中選出一個適當的alpha (Root Of Unity)，其滿足"轉換公式"段落的(5)即可。<syntaxhighlight lang="python">
+def NTT(x,N,M):
+    #TODO: RootOfUnity 
+    alpha = RootOfUnity(N, M)
+    NInv = modInv(N, M)
+    A = np.ones((N,N))
+    for i in range(1,N):
+        for j in range(1,i+1):
+          A[i][j] = A[i][j-1]*modExponent(alpha,i,M) % M
+          A[j][i] = A[i][j]
+    return np.matmul(A,x) % M, alpha
+</syntaxhighlight><syntaxhighlight lang="python3">
+def invNTT(x,alpha,N,M):
+    alphaInv = modInv(alpha, M)
+    NInv = modInv(N, M)
+    B = np.ones((N,N))
+    for i in range(1,N):
+        for j in range(1,i+1):
+          B[i][j] = B[i][j-1]*modExponent(alphaInv,i,M) % M
+          B[j][i] = B[i][j]
+    B = B * NInv 
+    return np.matmul(B,x) % M
+</syntaxhighlight>
+
+==參考資料==
+[1] R.C. Agarval and C.S. Burrus,"Number Theoretic Transforms to Implement Fast Digital Convolution," ''Proc. IEEE'', vol.63, no.4, pp. 550-560, Apr. 1975.
+
+[2] I. Reed and T.K. Truong,"The use of finite fileds to compute convolution," ''IEEE Trans. Info. Theory'', vol.21 ,pp.208-213, Mar. 1975.
+
+[[Category:數字信號處理|Category:數字信號處理]]
+[[Category:傅里叶分析|Category:傅里叶分析]]

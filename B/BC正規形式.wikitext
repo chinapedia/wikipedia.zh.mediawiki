@@ -1,0 +1,83 @@
+{{Expert|time=2015-12-14T03:27:56+00:00|subject=计算机科学}}
+
+{{NoteTA
+|G1=IT
+|1=zh-cn:规范化;zh-tw:正規化;zh-hk:規範化;
+|2=zh-cn:范式;zh-tw:正規化;zh-hk:範式;
+|3=zh-cn:依赖;zh-tw:相依;zh-hk:依賴;
+}}
+
+'''Boyce-Codd范式'''（{{lang-en|'''Boyce-Codd normal form'''}}，缩写{{lang|en|'''BCNF'''}}），是[[数据库规范化|数据库规范化]]的一种[[数据库规范化#范式|正规形式]]。是在[[第三范式|第三范式]]的基础上加上稍微更严格约束，每个BCNF关系需满足[[第三范式|第三范式]]。BCNF去除了属性间的不必要的函数依赖。
+
+BCNF的定义是：
+
+:如果对于[[关系模式|关系模式]]R中存在的任意一个非平凡函数依赖X->A，都满足X是R的一个[[超键|超键]]，那么关系模式R就属于BCNF。
+
+对上述定义，可以理解为：平凡函数依赖关系是指，如果属性集合X包含了属性集合A，那么就一定有X->A；超键是指能够唯一确定表中各行的属性集合，因此一个超键的最小化就是一个[[候选键|候選鍵]]；BCNF是说，如果一个属性集合X能“不平凡”地推导出另一个属性集合A，而且X还不能唯一区分表的各行，那么这个表中一定包含了一些冗余信息。
+
+BCNF与[[第三范式|第三范式]]的不同之处在于：第三范式中不允许[[非主属性|非主属性]]被另一个非主属性决定，但第三范式允许主属性被非主属性决定；而在BCNF中，任何属性（包括非主属性和主属性）都不能被非主属性所决定。
+
+任何一个BCNF必然满足：
+
+* 所有非主属性都完全函数依赖于每个候选键
+* 所有主属性都完全函数依赖于每个不包含它的候选键
+* 没有任何属性完全函数依赖于非候选键的任何一组属性
+
+== 范例 ==
+关系模式R：
+{| class="wikitable" border="1"
+|-
+! ''Property_id#''(主键)
+! County_name
+! Lot#
+! Area
+|-
+|}
+
+其中依赖关系如下：
+
+{Property_id#}　　　->{County_name,Lot#,Area};
+ 
+{County_name,Lot#} ->{Property_id#,Area}; 
+
+{Area} 　　　　　　 ->{County_name};
+
+很明显最后一个依赖违反了BC范式的要求，Area不是关系模式R的主键，而依赖于它的County_name是能够决定其他属性的主属性。故应当规范化为：
+{| class="wikitable" border="1"
+|-
+! ''Property_id#''(主键)
+! Area
+! Lot#
+|-
+|}
+{| class="wikitable" border="1"
+|-
+! ''Area''(主键)
+! County_name
+|-
+|}
+
+== 参考文獻 ==
+* [http://www.troubleshooters.com/littstip/ltnorm.html Litt's Tips: Normalization]{{Wayback|url=http://www.troubleshooters.com/littstip/ltnorm.html |date=20070210121236 }}
+* [https://web.archive.org/web/20080805014412/http://www.datamodel.org/NormalizationRules.html Rules Of Data Normalization]
+* [http://www.elsevier.com/wps/product/cws_home/680662 Temporal Data & the Relational Model]{{Webarchive|url=https://archive.today/20121209052842/http://www.elsevier.com/wps/product/cws_home/680662 |date=2012-12-09 }} (1st ed.). Morgan Kaufmann. ISBN 1-55860-855-9.Date, C. J., & Lorentzos, N., & Darwen, H. (2002).
+* [https://web.archive.org/web/20050404010227/http://www.aw-bc.com/catalog/academic/product/0%2C1144%2C0321197844%2C00.html An Introduction to Database Systems] (8th ed.). Addison-Wesley Longman. ISBN 0-321-19784-4. Date, C. J. (1999),
+* [http://www.bkent.net/Doc/simple5.htm A Simple Guide to Five Normal Forms in Relational Database Theory]{{Wayback|url=http://www.bkent.net/Doc/simple5.htm |date=20070202060442 }}'', Communications of the ACM, vol. 26, pp. 120-125 Kent, W. (1983)
+* [http://www.dbdebunk.com Database Debunkings]{{Wayback|url=http://www.dbdebunk.com/ |date=20200627203408 }} Date, C.J., & Darwen, H., & Pascal, F. 
+* H.-J. Schek, P.Pistor Data Structures for an Integrated Data Base Management and Information Retrieval System
+
+== 外部連結 ==
+* [http://databases.about.com/od/specificproducts/a/normalization.htm Database Normalization Basics]{{Wayback|url=http://databases.about.com/od/specificproducts/a/normalization.htm |date=20070205184226 }} by Mike Chapple (About.com)
+* [https://web.archive.org/web/20110606025027/http://dev.mysql.com/tech-resources/articles/intro-to-normalization.html An Introduction to Database Normalization] by Mike Hillyer.
+* [https://web.archive.org/web/20100106115112/http://www.utexas.edu/its/archive/windows/database/datamodeling/rm/rm7.html Normalization] by ITS, University of Texas.
+* [https://web.archive.org/web/20110715075109/http://phlonx.com/resources/nf3/ A tutorial on the first 3 normal forms] by Fred Coulson
+* [https://web.archive.org/web/20071227154911/http://www.marcrettig.com/poster/ Free PDF poster available] by Marc Rettig
+* [http://support.microsoft.com/kb/283878 Description of the database normalization basics]{{Wayback|url=http://support.microsoft.com/kb/283878 |date=20070210080439 }} by Microsoft
+
+{{-}}
+{{資料庫正規化}}
+
+[[Category:資料庫正規化|2NF]]
+
+[[de:Normalisierung_(Datenbank)#Boyce-Codd-Normalform_(BCNF)|de:Normalisierung (Datenbank)#Boyce-Codd-Normalform (BCNF)]]
+[[Category:需要计算机科学专家关注的页面|Category:需要计算机科学专家关注的页面]]

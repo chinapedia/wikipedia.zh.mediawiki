@@ -1,0 +1,44 @@
+'''無監督式學習網絡'''(Unsupervised Learning Network)是人工智慧網絡的一種演算法(algorithm)，其目的是去對原始資料進行分類，以便瞭解資料內部結構。有別於[[監督式學習網絡|監督式學習網絡]]，無監督式學習網絡在學習時並不知道其分類結果是否正確，亦即沒有受到監督式增強(告訴它何種學習是正確的)。其特點是僅對此種網絡提供輸入範例，而它會自動從這些範例中找出其潛在類別規則。當學習完畢並經測試後，也可以將之應用到新的案例上。
+[[File:UnsupervisedLearning.jpg|frame]]
+
+
+== 演算法 ==
+
+無監督式學習網絡的演算法一般僅涉及單一個核心模組，但重複多次計算而已。細節如下解釋：
+
+將輸入層各節點的激發程度表示為 <math>a_j</math>，輸出層各節點的激發程度表示為 <math>a_i</math>，從輸入層各節點指向輸出層各節點的網絡路徑值表示為 <math>w_{ij}</math>。輸出層各節點間則為互相抑制，亦即<math>w_{ii}</math> 是一個對角線均為零，其餘元素為-1的矩陣。
+
+核心模組的計算分為兩部份：
+
+第一部份是想知道，當基於目前 <math> w_{ij} </math> 的情況下，若欲使網絡穩定的話，則輸出層各節點激發程度 (<math>a_i</math>) 應該形成何種型態？計算乃遵循下列公式：
+
+步驟1: <math> netE_i = \frac{\sum_{j} w_{ij}a_j}{1+\sum_{j} w_{ij}}, netI_i = \sum_{i} w_{ii}a_i </math>
+
+步驟2: <math> \Delta a_i = \tau \left[ \gamma (1-a_i)(netE_i + netI_i) - \delta a_i \right] </math>
+
+重複此二步驟的 <math>\Delta a_i</math> 的更新，直到 <math>\Delta a_i</math> 低於某個臨界值（如：0.001）
+
+第二部份是想知道，若要得到剛才的 <math>a_i</math> 激發型態的話，則應該反映在 <math>w_{ij}</math> 的何種調整上，以便使得 <math>a_j</math> 可以更直接透過 <math>w_{ij}</math> 來得到 <math>a_i</math>？公式如下：<math>\Delta w_{ij} = a_i(a_j - w_{ij})</math>
+
+最後整體計算便將所有的輸入資料分別透過上述的核心模組來得到 <math>\Delta w_{ij}</math>，然後全部加總後，更新到實際的 <math>w_{ij}</math> 上頭，並重複所有步驟若干次（如：50次）即可。
+
+== 常見的應用 ==
+
+1. [[聚类分析|聚类分析]] （clustering analysis）
+
+2. [[降維|降維]] (dimensionality reduction)
+
+== 特定的無監督式學習網絡 ==
+
+1. [[自組織對映|自組織對映]] (Self-Organizing Map, SOM): SOM是由Kohonen於1982年所提出，目的在於用一個較低維度的拓撲圖(topographic map)以視覺化(visualiztion)的方式說明高維度的資料情況。屬於前饋式、無監督式學習網絡，同時亦是競爭式學習網絡。其特徵能夠在輸入範例的學習過程中，產生自我組織性而需要依靠目標輸出值修正誤差，亦可展現輸入範例的分佈或相似性，具有將輸入集合聚類到相似群組中的能力。
+
+2. [[適應性共振理論網絡|適應性共振理論網絡]] (Adaptive Resonance Theory, ART; Carpenter & Grossberg, 1988)
+
+== 相關條目 ==
+* [[人工神經網絡|人工神經網絡]]
+* [[監督式學習|監督式學習]]
+* [[監督式學習網絡|監督式學習網絡]]
+* [[非監督式學習|非監督式學習]]
+* [[非監督式學習網絡|非監督式學習網絡]]
+
+[[Category:機器學習|Category:機器學習]]

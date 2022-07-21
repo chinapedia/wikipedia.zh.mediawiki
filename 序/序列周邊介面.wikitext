@@ -1,0 +1,154 @@
+{{multiple issues|
+{{expand|time=2015-05-03T08:22:37+00:00}}
+{{expert|subject=电子学}}
+
+{{RoughTranslation}}
+}}
+{{noteTA|G1=IT}}
+{| align="right"
+|-
+| [[File:SPI_single_slave.svg|thumb]]
+|}
+[[File:SPI_three_slaves.svg|thumb]]
+'''串行外设接口'''（Serial Peripheral Interface Bus，SPI），是一种用于晶片通信的[[同步電路|同步]][[串行通信|串行通信]]接口规范，主要应用于[[单片机系统|单片机系统]]中。类似[[I²C|I²C]]。
+这种接口首先由[[摩托罗拉公司|摩托罗拉公司]]于20世纪80年代中期开发，后发展成了行业规范。它的典型应用有[[快閃記憶體|快閃記憶體]]<ref>{{Cite web |url=https://www.micron.com/products/nor-flash/serial-nor-flash |title=存档副本 |accessdate=2020-09-10 |archive-date=2019-11-09 |archive-url=https://web.archive.org/web/20191109141737/https://www.micron.com/products/nor-flash/serial-nor-flash |dead-url=no }}</ref><ref>{{Cite web |url=https://www.micron.com/products/nand-flash/serial-nand |title=存档副本 |accessdate=2020-09-10 |archive-date=2019-04-30 |archive-url=https://web.archive.org/web/20190430042215/https://www.micron.com/products/nand-flash/serial-nand |dead-url=no }}</ref>、[[EEPROM|EEPROM]]、[[SD卡|SD卡]]与[[液晶显示器|液晶显示器]]。
+
+SPI设备之间使用[[全双工|全双工]]模式通信，是一个主机和一个或多个从机的[[主从模式|主从模式]]。主机负责初始化[[数据传输帧|帧]]，这个数据传输帧可以用于读与写两种操作，{{le|片选|Chip select}}线路可以从多个从机选择一个来响应主机的请求。
+
+有时SPI接口被称作四线式接口，这是为了与其他不同线制的数据传输接口加以区分。SPI准确来讲应为“同步串行接口”，但是它又与[[同步串行接口|同步串行接口]]协议（SSI）是完全不同的两种协议。虽然SSI也是一个四线式同步通信协议，但是它使用差分信号，而且仅提供一个单工通信信道。于此相对地，SPI是一个单主机多从机的通信接口。
+
+SPI是一种事实标准，也就是说这种规范没有对应的技术标准。因此各个厂家生产的SPI器件配置不一样，不一定有[[互操作性|互操作性]]。
+
+== 接口==
+SPI总线规定了4个保留逻辑信号接口：
+* SCLK（Serial Clock）：串列时脈，由主机发出
+* MOSI（Master Output, Slave Input）：主机输出从机输入信号（数据由主机发出）
+* MISO（Master Input, Slave Output）：主机输入从机输出信号（数据由从机发出）
+* SS（Slave Select）：片选信号，由主机发出，一般是低電位有效
+
+尽管上面的引脚名称是最常用的，但在过去，有时会使用其他引脚命名方式，因此旧的集成电路产品的SPI端口引脚名称可能有所不同。
+
+== 操作 ==
+
+SPI总线的通訊操作可以在单个主设备与一或多个从机之间进行。
+
+在只有单一从机的情况下，如果从机允许，SS线可以固定为[[逻辑电平|逻辑低电平]]。然而有一些从机需要片选訊号的下降沿来触发动作，例如Maxim MAX1242 ADC在高→低转换时才会开始进行模数转换。对于多个从机，每个从机都需要一个独立的SS訊号。
+
+大多数从属设备具有[[三態邏輯|三態邏輯]]的特性，所以当器件未被选中时，它们的MISO訊号变为高阻抗（逻辑断开）。没有三态输出的器件不能与其他器件共享SPI总线段，但是可以使用外接的三态逻辑缓存来解决这个问题。
+
+=== 数据传输 ===
+
+为了开始通訊，总线上的主设备需要使用从设备支持的频率来配置时钟，这个频率最高为几兆赫兹左右。然后主设备将某个从设备的SS线置为低电平，来选中这个从设备。如果等待时间是必要的话（例如进行模数转换），主设备必须在这段时间结束后，才可以发出时钟周期訊号。
+
+在每个SPI时钟周期内，都会发生全双工数据传输。主设备在MOSI线上发送一个位，从设备读取它，同时从机在MISO线上发送一位数据，主机读取它。即使只有单向数据传输的目的，主从机之间的通訊工作方式仍然是双工的。
+[[File:SPI_8-bit_circular_transfer.svg|upright=1.8]]的移位寄存器]]
+
+传输通常会使用给定字长的两个[[移位寄存器|移位寄存器]]，一个在主设备中，一个在从设备中，这两个寄存器连接成一个虚拟的[[環形緩衝區|環形緩衝區]]。数据通常先从最高位移出。在时钟訊号边沿，主机和从机均移出一位，然后在传输线上输出给对方。在下一个时钟沿，每个接收器都从传输线接受对方发出的数据位，并且从移位寄存器的最低位推入。每完成这样一个移出——推入的周期后，主机和从机就交换寄存器中的一位数据。当所有数据位都经过了这样的移出——推入过程后，主机和从机就完成了寄存器上的数据交换。如果需要交换的数据比寄存器的位数还要长的话，则需要重新加载移位寄存器并重复该过程。传输可能会持续任意数量的时钟周期。完成后，主设备会停止发送时钟訊号，并通常会取消选择从设备。
+
+传输寄存器通常包含8位。但是其他字长也很常见，例如触摸屏控制器或音频编解码器通常采用16位字长（如[[德州仪器|德州仪器]]的TSC2101），许多数模转换或者模数转换的设备则会采用12位字长。
+
+所有在总线上的没有被片选线激活的从设备必须忽略输入时钟和MOSI訊号，并且不得从MISO发送数据。
+
+=== 独立的从设备配置 ===
+
+在独立的从设备配置中，每个从设备都有独立的晶片选择线。在一般情况下，要通过[[上拉电阻|上拉电阻]]将片选线（ss线）与电源连接起来，以减少器件之间的串扰<ref>{{Cite web|url=https://www.pjrc.com/better-spi-bus-design-in-3-steps/|title=Better SPI Bus Design in 3 Steps|accessdate=2021-01-01|language=en|archive-date=2021-12-15|archive-url=https://web.archive.org/web/20211215201119/https://www.pjrc.com/better-spi-bus-design-in-3-steps/|dead-url=no}}</ref>。
+由于从机的MISO引脚连接在一起，因此它们需要为三态引脚（高，低或高阻抗）。
+
+=== 中断 ===
+
+SPI从设备有时会使用另一条訊号线将中断訊号发送到主设备的CPU。 例子包括来自触摸屏传感器的笔下中断，来自温度传感器的热限制警报，实时时钟芯片发出的警报， [[SD卡#SDIO介绍|SDIO]]以及来自手机中声音编解码器的耳机插孔插入。 SPI标准中并不包括中断。 中断的使用既不被禁止也不被标准规定。
+
+=== SPI代码示例 ===
+<syntaxhighlight lang="c">
+/*
+ * 通过SPI协议在主设备和从设备之间交换一个字节的数据
+ *
+ * Polarity and phase are assumed to be both 0, i.e.:
+ *   - 输入数据在SCLK的上升沿捕获。
+ *   - 输出数据在SCLK的下降沿传播。
+ *
+ * 返回接收到的一字节的数据
+ */
+uint8_t SPI_transfer_byte(uint8_t byte_out)
+{
+    uint8_t byte_in = 0;
+    uint8_t bit;
+
+    for (bit = 0x80; bit; bit >>= 1) {
+        /* Shift-out a bit to the MOSI line */
+        write_MOSI((byte_out & bit) ? HIGH : LOW);
+
+        /* Delay for at least the peer's setup time */
+        delay(SPI_SCLK_LOW_TIME);
+
+        /* Pull the clock line high */
+        write_SCLK(HIGH);
+
+        /* Shift-in a bit from the MISO line */
+        if (read_MISO() == HIGH)
+            byte_in |= bit;
+
+        /* Delay for at least the peer's hold time */
+        delay(SPI_SCLK_HIGH_TIME);
+
+        /* Pull the clock line low */
+        write_SCLK(LOW);
+    }
+
+    return byte_in;
+}
+</syntaxhighlight>
+
+== 优点和缺点 ==
+=== 优点 ===
+* SPI协议默认是全双工通信。
+* 与[[漏极开路|漏极开路]]输出相反，SPI的[[推挽输出|推挽输出]]可提供良好的信号完整性和高速度
+* 比[[I²C|I²C]]或[[SMBus|SMBus]]更高的傳輸頻寬 。 不限于任何最大時脈頻率，可实现高速运行
+* 完整的传输位协议灵活性
+** 不限于8位字
+** 任意选择消息大小，内容和目的地
+* 简单的線路連接
+** 由于电路较少（包括上拉电阻），因此通常比I²C或SMBus的功耗要低，
+** 没有仲裁或相关的失败模式
+** 从站與主機使用同一時脈來源，不需要各自配置精密振荡器
+** 从站不需要唯一的地址 - 不像[[I²C|I²C]]或[[GPIB|GPIB]]或[[SCSI|SCSI]]
+** 不需要收发器
+* IC封装只使用四个引脚，而电路板布局或连接器则少于并行接口
+* 每个器件至多有一个独特的总线信号（芯片选择）;其他信号均可以共享
+* 信号是单向的，允许简单的[[電氣隔離|電氣隔離]]
+* 軟體撰寫簡易
+
+=== 缺点 ===
+* 即使是三线式SPI，也需要比[[I²C|I²C]]更多的IC線路
+* 没有带内寻址; 共享总线上需要带外片选信号
+* 从机不支持[[流控制|流控制]] （但主机可以延迟下一个时钟边沿以降低传输速率）
+* 不支持动态添加节点（[[热插拔|热插拔]]）。
+** 没有从机检测机制，主机无法检测是否与从机断开。
+* 通常只支持一个主设备（取决于设备的硬體实现）
+* 没有错误检测机制，不像[[I²C|I²C]]在每個位元組後有回覆訊號
+* 无法进行数据檢驗，不定义额外的协议时（如CRC）无法保证數據正確性。
+* 与[[RS-232|RS-232]] ， [[RS-485|RS-485]]或CAN总线相比，它只能处理短距离内的数据传输。（距离可以通过使用收发器如RS-422进行扩展）
+* 有许多现有的变体，使得很难找到支持这些变体的主机适配器等开发工具。
+** 一些变体，如[[双路SPI|双路SPI]] ， [[四路SPI|四路SPI]]和[[三线SPI|三线SPI]]是半双工的。
+* 必须通过[[带外信号|带外信号]]来实现中断，或者通过使用类似于USB 1.1和2.0的定期轮询来模拟中断
+
+==參見==
+{{Portal|电子学}}
+*[[I²C|I²C]]
+*[[网络总线列表|网络总线列表]]
+
+==参考文献==
+{{reflist}}
+
+== 外部連結 ==
+* [https://web.archive.org/web/20061111110015/http://www.embedded.com/showArticle.jhtml?articleID=9900483 Introduction to Serial Peripheral Interface] article on embedded.com
+* [http://www.epanorama.net/links/serialbus.html Serial buses information page] {{Wayback|url=http://www.epanorama.net/links/serialbus.html |date=20080719114000 }}
+* [http://www.mct.net/faq/spi.html SPI Introduction] {{Wayback|url=http://www.mct.net/faq/spi.html |date=20111209052907 }} with helpful diagrams
+* [https://web.archive.org/web/20100217170308/http://www.serialflash.com/ Serial Flash] Lots of good information on SPI part manufacturers and models.
+* [http://ww1.microchip.com/downloads/en/DeviceDoc/spi.pdf SPI - PICmicro Serial Peripheral Interface] {{Wayback|url=http://ww1.microchip.com/downloads/en/DeviceDoc/spi.pdf |date=20120110124309 }} Microchip (company) tutorial on SPI.
+
+
+
+{{Computer-bus}}
+
+[[Category:串行总线|Category:串行总线]]

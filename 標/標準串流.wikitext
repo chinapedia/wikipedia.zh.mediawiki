@@ -1,0 +1,186 @@
+{{校对翻译}}
+{{noteTA
+|G1=IT
+|T=zh-cn:标准流; zh-tw:標準串流;
+|1=zh-cn:标准流; zh-tw:標準串流;
+}}
+在[[Unix|Unix]]和[[類Unix系統|類Unix系統]]中，如同某些[[程式語言|程式語言]]介面一樣，'''標準串流'''是當一個電腦程式執行時，在它和它的環境間（典型為[[終端|終端]]），事先連接的輸入和輸出頻道。這三個[[I/O|I/O]]連結稱作“'''標準輸入'''”、“'''標準輸出'''”和“'''標準錯誤輸出'''”。
+
+==背景==
+在Unix之前的作業系統，程式必須明確指出連結到合適的輸入和輸出資料。對這當中的許多系統而言，這牽涉一些錯綜複雜而又與特定作業系統相關的事，是一件嚇人的程式設計挑戰。如控制環境設定、存取一個檔案表格、決定區域資料集、和決定讀卡機、磁帶、磁碟、列印機、打卡機或互動式終端機。
+
+Unix 提供許多開創產的進步，其中之一是提供 ''抽象設備'' ：它免除了程式須要知道或在意它正與哪個設備溝通。 Unix 藉由資料串流的概念來消除這種複雜：一種資料位元組的有序序列，直到讀到[[檔案結尾|檔案結尾]]。程式員亦可依需求寫入而無須宣告寫入多少或如何組織。
+
+另一個 Unix 突破為預設自動連結輸入和輸出－程式（和程式設計師）不用為了典型''輸入－處理－輸出''程式建立輸入和輸出。相對地，之前作業系統通常要求一些－有時複雜－[[工作控制語言|工作控制語言]]（{{tsl|en|Job Control Language}}）以建立連結，或者，相者近似於協調的責任。
+
+既然 Unix 提供標準串流，Unix C 的執行環境被要求要支援它。結果不管什麼作業系統， C 的執行環境（及 C 的衍生）都提供類似功能。
+
+==標準輸入 (stdin)==
+標準輸入是指輸入至程式的資料（通常是文件）。程式要求以''讀''(read)操作來傳輸資料。並非所有程式都要求輸入。如''dir''或''ls''程式（顯示一個目錄中的檔名）運行時不用任何輸入。
+
+除非[[重導向|重導向]]，輸入是預期由 [[鍵盤|鍵盤]]取得的。
+
+標準輸入的[[檔案描述子|檔案描述子]]為 0。在[[POSIX|POSIX]] ''<unistd.h>'' 的定義是 <tt>STDIN_FILENO</tt>；相對應的 ''<stdio.h>'' 變數為 <tt>FILE* stdin</tt> ；類似地， ''<iostream>'' 變數為 <tt>std::cin</tt> 。
+
+==標準輸出 (stdout)==
+標準輸出是指程式寫輸出資料的串流。程式要求資料傳輸使用''寫''的運算。並非所有程式都要求輸出。如''mv''或''ren''程式在成功完成時是沈默的。
+
+除非[[重導向|重導向]]，輸出為 [[終端|終端]]。
+
+標準輸出的[[檔案描述子|檔案描述子]]為 1 。[[POSIX|POSIX]] ''<unistd.h>'' 定義是 <tt>STDOUT_FILENO</tt>；相對應的 ''<stdio.h>'' 變數為 <tt>FILE* stdout</tt> ；類似地， ''<iostream>'' 變數為 <tt>std::cout</tt> 。
+
+==標準錯誤輸出 (stderr)==
+標準錯誤輸出是另一輸出串流，用於輸出錯誤訊息或診斷。它獨立於標準輸出，且可以分別被重導。常見的目的則為啟始這個程式的[[終端|終端]]，即使其''標準輸出''被重導亦如此。例如：一個管線中的程式的輸出被重導到下一個程式，但錯誤訊息仍然直接流向文字終端機。
+
+把''標準輸出''和''標準錯誤輸出''導到相同的目的地，如文字終端，是可以（且正常）的。訊息會以如同程式寫入的順序來出現，除非使用了緩衝。（例如，一個常見狀況是，當標準錯誤串流未使用緩衝，但標準輸出串流使用了緩衝；在這种情況下，如果標準輸出的緩衝區還沒滿的話，較迟寫到標準錯誤的文字可能會較早出現在終端。
+
+標準錯誤輸出的[[檔案描述子|檔案描述子]]為 2 ；[[POSIX|POSIX]] ''<unistd.h>'' 定義為 <tt>STDERR_FILENO</tt>；相對的 ''<stdio.h>'' 變數 <tt>FILE* stderr</tt>。C++ ''<iostream>'' 標準表頭檔提供兩個相關的變數： <tt>std::cerr</tt> 和 <tt>std::clog</tt>，前者用於無緩衝的而後者使用和其它 C++ 串流相同的緩衝機制。
+
+大部分[[殼層|殼]]程式允許使用
+  >& filename
+將''標準輸出''和''標準錯誤輸出''重導向到相同的檔案。
+
+[[Bourne_shell|Bourne]]-類殼程式允許使用
+    2>&1
+將''標準錯誤輸出''重導向到''標準輸出''的目的。
+
+== 年表 ==
+=== 1950 年代: Fortran ===
+Fortran 提供類於 Unix 檔案描述子：<code>UNIT=5</CODE> 用於 stdin 、 <CODE>UNIT=6</CODE> 用於 stdout 和 <CODE>UNIT=0</CODE> 用於 stderr 。
+<syntaxhighlight lang="fortran">
+! FORTRAN 77 example
+      PROGRAM MAIN
+      READ(UNIT=5,*)NUMBER
+      WRITE(UNIT=6,'(F5.3)')' NUMBER IS: ',NUMBER
+      END
+</syntaxhighlight>
+<!-- It is FORTRAN 77? -->
+
+=== 1960: ALGOL 60===
+[[ALGOL|ALGOL 60]]因沒有標準檔案存取而受批評。
+
+=== 1968: ALGOL 68===
+[[ALGOL|ALGOL 68]] 的輸入和輸出機制合起來稱為 transput 。 {{tsl|en|Cornelis H. A. Koster}} coordinated the definition of the ''transput'' standard.  這標準包含：<code>stand in</code>、<code>stand out</code>、<code>stand error</code>和<code>stand back</code>。 
+
+範例：<syntaxhighlight lang="algol68">
+# ALGOL 68 example #
+main:(
+REAL number;
+getf(stand in,($g$,number));
+printf(($"Number is: "g(6,4)"OR "$,number)); # OR #
+putf(stand out,($" Number is: "g(6,4)"!"$,number));
+newline(stand out)
+)</syntaxhighlight>
+{|
+!align="left"|輸入:
+!align="left"|輸出: 
+|-
+|<pre>3.14159</pre>
+|<pre>Number is: +3.142 OR Number is: +3.142!</pre>
+|}
+
+=== 1970 年代: C 和 Unix ===
+在 '''[[C語言|C語言]]''' 中，標準輸入、標準輸出和標準錯誤輸出分別連接到已存的 Unix 檔案描述子 0 、1 和 2。
+
+===1995: Java ===
+在[[Java|Java]]中，標準串流被稱為 System.in（標準輸入）、System.out（標準輸出）和 System.err（標準錯誤）。
+
+<syntaxhighlight lang="java">
+public static void main(String args[]) {
+    try {
+        BufferedReader br = 
+          new BufferedReader(new InputStreamReader(System.in));
+        String s = br.readLine();
+        double number = Double.parseDouble(s);
+        System.out.println("Number is:" + number);
+    } catch (Exception e) {
+        System.err.println("Error:" + e.getMessage());
+    }
+}
+</syntaxhighlight>
+
+===2000s: .NET ===
+在 [[C♯|C#]] 和其它 [[.NET框架|.NET]] 語言中，標準串流為 <code>System.Console.In</code> （標準輸入）、<code>System.Console.Out</code> （標準輸出）和<code>System.Console.Error</code> （標準錯誤）。stdin 和 stdout 的基本讀寫能力可以直接透過 <code>System.Console</code> 來存取（如 <code>System.Console.WriteLine()</code> 可以取代 <code>System.Console.Out.WriteLine()</code> ）。
+
+注意， <code>System.Console.In</code>、<code>System.Console.Out</code> 和 <code>System.Console.Error</code> 是 <code>System.IO.TextReader</code> (stdin) 和 <code>System.IO.TextWriter</code> (stdout、stderr) 的[[对象_(计算机科学)|对象]]，只允許存取底層基於文件的標準串流。存取二位元標準串流要分別經由  <code>System.Console.OpenStandardInput()</code>，<code>System.Console.OpenStandardOutput()</code> 和 <code>System.Console.OpenStandardError()</code> 所傳回的<code>System.IO.Stream</code>。
+<syntaxhighlight lang="csharp">
+// C# example
+public static int Main(string[] args)
+{
+    try {
+        string s = System.Console.In.ReadLine();
+        double number = double.Parse(s);
+        System.Console.Out.WriteLine("Number is: {0:F3}", number);
+        return 0;
+
+    // If Parse() threw an exception
+    } catch (System.ArgumentNullException) { 
+        System.Console.Error.WriteLine("No number was entered!");
+    } catch (System.FormatException) {
+        System.Console.Error.WriteLine("The specified value is not a valid number!");
+    } catch (System.OverflowException) {
+        System.Console.Error.WriteLine("The specified number is too big!");
+    }
+
+    return -1;
+}
+</syntaxhighlight>
+
+<syntaxhighlight lang="vbnet">
+' Visual Basic .NET example
+
+Public Function Main() As Integer
+    Dim number As Double
+    Dim s As String
+
+    Try
+        s = System.Console.In.ReadLine()
+        number = CDbl(s)
+        System.Console.Out.WriteLine("Number is: {0:F3}", number)
+        Return 0
+    Catch e As System.InvalidCastException
+        ' if CDbl() threw an exception
+        System.Console.Error.WriteLine("No number was entered!")
+        Return 1
+    End Try
+End Function
+</syntaxhighlight>
+
+當使用 <code>System.Diagnostics.Process</code> [[类_(计算机科学)|类]]時，可以使用
+<code>StandardInput</code>、<code>StandardOutput</code> 和 <code>StandardError</code> [[屬性|屬性]]來存取程序的標準串流。
+
+Console 並非指 Dos 的命令列視窗。
+
+===圖形使用者介面===
+[[圖形使用者介面|圖形使用者介面]]很少使用標準串流。
+重導圖形使用者介面或建立管線是不實用的。
+最近似的大概是從一個程式''剪下''（或''複製''）再貼到另一個。
+既然需要人工使用者的運作，移動大量的''貼上''就不會特別有效率。
+一個值得一提的例外為[[dwm|dwm]][[鋪磚式視窗管理器|鋪磚式視窗管理器]]（{{tsl|en|tiling window manager}}），其會將導入標準輸入的資料顯示到狀態列。
+
+一些原本在 Unix 上的圖形使用者介面程式仍會寫錯誤訊息到標準錯誤輸出。
+其它可能會從標準輸入取得檔案，如許多 Unix 媒體播放程式。
+
+{{tsl|en|GTK-Server}} 可以使用標準輸入為溝通介面，以便互動式程式能理解圖形使用者介面程式。
+
+==另見==
+* [[重定向_(计算机)|重定向 (计算机)]]
+* [[管線_(Unix)|管線 (Unix)]]
+* [[字串流|字串流]]
+* [[I/O|I/O]]
+* [[C_file_input/output|C file input/output]]
+
+==參考==
+* ''KRONOS 2.1 Reference Manual'', Control Data Corporation, Part Number 60407000, 1974
+* ''NOS Version 1 Applications Programmer's Instant'', Control Data Corporation, Part Number 60436000, 1978
+* [http://www.bitsavers.org/pdf/honeywell/multics/AG90-03_PgmgIntro_Dec81.pdf Level 68 Introduction to Programming on MULTICS] {{Wayback|url=http://www.bitsavers.org/pdf/honeywell/multics/AG90-03_PgmgIntro_Dec81.pdf |date=20210225022744 }}, Honeywell Corporation, 1981
+* [http://www.research.ibm.com/journal/rd/255/auslander.pdf Evolution of the MVS Operating System] {{Wayback|url=http://www.research.ibm.com/journal/rd/255/auslander.pdf |date=20090325221850 }}, IBM Corporation, 1981
+* ''Lions' Commentary on UNIX Sixth Edition'', John Lions, ISBN 1-57398-013-7, 1977
+* [http://msdn2.microsoft.com/en-us/library/system.console.aspx Console Class, .NET Framework Class Library] {{Wayback|url=http://msdn2.microsoft.com/en-us/library/system.console.aspx |date=20080409012123 }}, Microsoft Corporation, 2008
+
+==外部連結==
+* [http://www.linfo.org/standard_output.html Standard Output Definition] {{Wayback|url=http://www.linfo.org/standard_output.html |date=20210308145528 }} - by The Linux Information Project (LINFO)
+* [https://web.archive.org/web/20090502041349/http://compsecblog.bruceblacklaws.com/2008/07/redirect-stdout-and-stderr.html Video tutorial demonstrating stdout and stderr]
+
+[[Category:C語言|Category:C語言]]
+[[Category:Unix|Category:Unix]]

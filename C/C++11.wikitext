@@ -1,0 +1,1595 @@
+{{noteTA
+|G1=IT
+|1=zh-hans:数组;zh-hant:陣列;
+|2=zh-hans:构造函数;zh-hant:建構子;
+|3=zh-hans:构造函数;zh-hant:建構式;
+|4=zh-hans:构造函数;zh-hant:构造式;
+|5=zh-hans:构造;zh-hant:建構;
+|6=zh-hans:指针;zh-hant:指標;
+|7=zh-hans:临时;zh-hant:暫時;
+|8=zh-hans:对象;zh-hant:物件;
+|9=zh-hans:析构函数;zh-hant:解構式;
+|10=zh-hans:析构;zh-hant:解構;
+|11=zh-hans:内存;zh-hant:記憶體;
+|12=zh-hans:函数;zh-hant:函式;
+|13=zh-hans:调用;zh-hant:呼叫;
+|14=zh-hans:调用;zh-hant:喚起;
+|15=zh-hans:参数;zh-hant:變數;
+|16=zh-hans:声明;zh-hant:宣告;
+|17=zh-hans:引用;zh-hant:引數;
+|18=zh-hans:引用;zh-hant:參考;
+|19=zh-hans:列表;zh-hant:串列;
+|20=zh-hans:回返;zh-hant:返回;
+|21=zh-hans:实现;zh-hant:實做;
+|22=zh-hans:派生;zh-hant:衍伸;
+|23=zh-hans:布尔;zh-hant:布林;
+|24=zh-hans:转义;zh-hant:跳脫;
+|25=zh-hans:线程;zh-hant:緒程;
+|26=zh-hans:预处理器;zh-hant:前處理器;
+|27=zh-hans:模式;zh-hant:樣式;
+|28=zh-hans:实体;zh-hant:實體;
+|29=zh-hans:标准;zh-hant:規格;
+|30=zh-hans:类型;zh-hant:型別;
+}}
+
+'''C++11'''，先前被稱作'''C++0x'''，即ISO/IEC 14882:2011，是[[C++程式語言|C++程式語言]]的一个標準。它取代第二版標準ISO/IEC 14882:2003（第一版ISO/IEC 14882:1998公開於1998年，第二版於2003年更新，分别通稱C++98以及C++03，两者差异很小），且已被[[C++14|C++14]]取代。相比于C++03，C++11標準包含[[核心語言|核心語言]]的新機能，而且擴展[[C++標準程式庫|C++標準程式庫]]，併入了大部分的[[C++_Technical_Report_1|C++ Technical Report 1]]程式庫（數學的特殊函式除外）。
+[[ISO|ISO]]／[[IEC|IEC]] JTC1/SC22/WG21 C++標準委員會計劃在2010年8月之前完成對最終委員會草案的投票，以及於2011年3月召開的標準會議完成國際標準的最終草案。然而，WG21預期ISO將要花費六個月到一年的時間才能正式發佈新的C++標準。為了能夠如期完成，委員會決定致力於直至2006年為止的提案，忽略新的提案{{ref label|strousup-brieflook|1|a}}。最终于2011年8月12日公布，并于2011年9月出版。
+
+2012年2月28日的國際標準草案<ref>{{Cite web |url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3376.pdf |title=N3376 |accessdate=2012-07-12 |archive-date=2012-08-13 |archive-url=https://web.archive.org/web/20120813042618/http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2012/n3376.pdf |dead-url=no }}</ref>是最接近于C++11标准的草案，差异仅有编辑上的修正。
+
+像C++這樣的[[程式語言|程式語言]]，透過一種演化的的過程來發展其定義。這個過程不可避免地將引發與現有程式碼的相容問題，在C++的發展過程中偶爾會發生。不過根據[[比雅尼·斯特劳斯特鲁普|比雅尼·斯特劳斯特鲁普]]（C++的創始人並且是委員會的一員）表示，新的標準將幾乎100%相容於現有標準。
+
+== 设计原则 ==
+C++的修訂包含核心語言以及標準程式庫。
+
+在發展新標準的每個機能上，委員會採取了幾個方向：
+* 維持穩定性和與C++98，可能的話還有[[C語言|C]]之間的兼容性；
+* 儘可能不透過核心語言的擴展，而是透過標準程式庫來引進新的特性；
+* 能夠演進編程技術的變更優先；
+* 改進C++以幫助系統以及函式庫設計，而不是引進只針對特別應用的新特性；
+* 增進型別安全，提供對現行不安全的技術更安全的替代方案；
+* 增進直接對硬體工作的能力與表現；
+* 提供現實世界中問題的適當解決方案；
+* 實行“zero-overhead”原則（某些功能要求的額外支援只有在該功能被使用時才能使用）；
+* 使C++易於教授與學習
+
+关照初學者被認為是重要的，因為他們構成了計算機程序員的主體。也因為許多初學者不願擴展他們對C++的知識，只限於使用他們對C++專精的部分。此外，考慮到C++被廣泛的使用（包含應用領域和編程風格），即便是最有經驗的程序員在面對新的編程范式時也會成為初學者。
+
+== C++核心語言的擴充 ==
+C++委員會的主要作用之一是改善語言核心。核心語言將被大幅改善的領域包括[[多线程|多线程]]支援、[[泛型編程|泛型編程]]、統一的初始化，以及效能表現的加強。
+
+在此分成4個區塊來討論核心語言的特色以及變更：
+執行期表現強化、建構期表現強化、可用性強化，還有新的功能。某些特性可能會同時屬於多個區塊，但在此僅於其最具代表性的區塊描述。
+
+== 核心語言的執行期表現強化 ==
+以下的語言機能主要用來提升某些效能表現，像是記憶體或是速度上的表現。
+
+=== 右值引用和move語意 ===
+在C++03及之前的標準，臨時對象（稱為右值"R-values"，因为它们通常位於賦值運算子右侧）無法被改變，在C中亦同（且被視為等同于'''const T&'''）。儘管如此，在某些情況下臨時對象仍然可能會被改變，但这种表现也被視為是一個有用的漏洞。
+
+C++11增加一個新的非常數引用（reference）型別，稱作[[右值引用|右值引用]]（R-value reference），標記為<code>T &&</code>。右值引用所绑定的臨時對象可以在該臨時對象被初始化之後做修改，這是為了允許[[移动语义|move語意]]。
+
+C++03低性能问题的之一，就是在以传值方式传递对象时隐式发生的耗時且不必要的[[深度拷貝|深度拷貝]]。舉例而言，<code>std::vector<T></code>本质上是一个C-style陣列及其大小的封裝，如果一個<code>std::vector<T></code>的臨時物件是在函式内部或者函数返回时创建，要將其儲存就只能透過生成新的<code>std::vector<T></code>並且把該臨時物件所有的資料複製过去（為了討論上的方便，這裡忽略[[返回值优化|返回值优化]]）。然后該臨時物件會被析构，其使用的記憶體会被释放。
+
+在C++11，把一個<code>vector</code>的右值引用作为参数<code>std::vector</code>的"move建構子"，可以把右值参数所绑定的<code>vector</code>內部的指向C-style陣列的指標複製给新的<code>vector</code>，然後把该指標置null。由于临时变量不会被再次使用，所以不会有代码去访问该null指针；又因为该指针为null，当该临时对象超出作用域时曾经指向的內部C-style陣列所使用的内存不会被释放。因此，该操作不仅无形中免去了深拷贝的开销，而且还很安全。
+
+右值引用作为数据类型的引入，使得函数可以[[重載_(程式設計)|重载区分]]它的参数是值类型、传统的左值引用还是右值引用。这让除了标准库的现有代码无须任何改动就能等到性能提升。一个返回<code>std::vector<T></code>的函数的返回类型无须为了调用move构造函数而显式修改为<code>std::vector<T>&&</code>，因为临时对象自动作为[[右值|右值]]。（但是，如果<code>std::vector<T></code>是没有move构造函数的C++03版，由于传统的[[左值引用|左值引用]]也可以绑定到临时对象上，因此具有<code>const std::vector<T>&</code>参数的复制构造函数会被调用，导致一次显著的内存分配。）
+
+出于安全的考虑，推行了一些限制。具名的变量被認定為左值，即使它是被宣告为右值引用数据类型；為了獲得右值必須使用显式类型转换，如模板函数<code>std::move<T>()</code>。右值引用所绑定的对象应该只在特定情境下被修改，主要用于move构造函数中。
+<syntaxhighlight lang="cpp">
+bool is_r_value(int &&) { return true; }
+bool is_r_value(const int &) { return false; }
+
+void test(int && i)
+{
+    is_r_value(i); // i為具名變數，即使被宣告成右值引用类型，i作为实参表达式也不會被認定是右值表达式。
+    is_r_value(std::move<int&>(i)); // 使用std::move<T>()取得右值。
+}
+</syntaxhighlight>
+
+由於右值引用的语义特性以及對於[[左值引用|左值引用]]（L-value references;regular references）的某些语义修正，右值引用让開發者能够提供函数参数的[[完美轉發|完美轉發]]（perfect function forwarding）。當與[[可变参数模板|不定長參數模板]]結合，這項能力允許函式模板能夠完美地轉送参数給其他接受這些特定参数的函式。最大的用處是轉送建構子參數，創造出能夠自動為這些特定参数呼叫正確建構式的工廠函式（factory function）。这个用法可以在C++标准库中的[http://en.cppreference.com/w/cpp/container/vector/emplace_back emplace_back]{{Wayback|url=http://en.cppreference.com/w/cpp/container/vector/emplace_back |date=20151208053637 }}方法中看到。
+
+=== constexpr – 泛化的常數表示式 ===
+C++本來就已具備常數表示式（constant expression）的概念。像是<code>3+4</code>總是會產生相同的結果並且沒有任何的副作用。常數表示式對編譯器來說是最佳化的機會，編譯器時常在編譯期執行它們並且將值存入程式中。同樣地，在許多場合下，C++規格要求使用常數表示式。例如在陣列大小的定義上，以及列舉值（enumerator values）都要求必須是常數表示式。
+
+然而，常數表示式不能含有函式呼叫或是物件建構式。所以像是以下的例子是不合法的：
+
+<syntaxhighlight lang="cpp">
+int GetFive() {return 5;}
+
+int some_value[GetFive() + 7]；// 欲產生12個整數的陣列。不合法的C++寫法
+</syntaxhighlight>
+
+這在C++03中是不合法的，因為<code>GetFive() + 7</code>並不是常數表示式。C++03編譯器無從得知<code>GetFive</code>實際上在執行期是常數。理論上而言，這個函式可能會影響全域變數，或者呼叫其他的非執行期（non-runtime）常數函式等。
+
+C++11引進關鍵字<code>constexpr</code>允許使用者保證函式或是物件建構式是編譯期常數。以上的例子可以被寫成像是下面這樣：
+
+<syntaxhighlight lang="cpp">
+constexpr int GetFive() {return 5;}
+
+int some_value[GetFive() + 7]；// 欲產生12個整數的陣列。合法的C++11寫法
+</syntaxhighlight>
+
+這使得編譯器能夠瞭解並去驗證<code>GetFive</code>是個編譯期常數。
+
+用<code>constexpr</code>修饰函数将限制函式的行为。首先，該函式的回返值型別不能為void。第二，函式的內容必須依照"return ''expr''"的形式。第三，在参数替换後，<code>expr</code>必須是個常數表示式。這些常數表示式只能夠呼叫其他被定義為<code>constexpr</code>的函式，或是其他常數表示式的資料變數。最後，有著這樣修饰符的函式直到在該編譯單元內被定義之前是不能夠被呼叫的。
+
+声明为<code>constexpr</code>的函数也可以像其他函数一样用于常量表达式以外的地方，此时不需要满足后两点。
+
+C++11之前，可以在常量表达式中使用的的变量必须被声明为<code>const</code>，用常量表达式来初始化，并且必须是整型或枚举类型。C++11去除了变量必须是整型或枚举类型的限制，只要变量使用了<code>constexpr</code>关键字来定义：
+
+<syntaxhighlight lang="cpp">
+constexpr double earth_gravitational_acceleration = 9.8;
+constexpr double moon_gravitational_acceleration = earth_gravitational_acceleration / 6.0;
+</syntaxhighlight>
+
+这些变量都是隐式常量，必须使用常量表达式来初始化。
+
+為了让使用者自定义型別（user-defined type）参与建構常量表示式，建構式也可以用<code>constexpr</code>来声明。與<code>constexpr</code>函式一樣，<code>constexpr</code>建構式必須在該編譯單元內使用之前被定義。它的函数体必须为空。它必須用常量表示式初始化他的成員（member）。而這種型別的解構式應當是平凡的（trivial）。
+
+拥有<code>constexpr</code>构造函数的类型的复制构造函数通常也應該被定義為<code>constexpr</code>，以便该类型的对象以值传递的方式从<code>constexpr</code>函数返回。该類別的任何成員函式，像是複製建構式、运算符重载函数等等，只要他們符合常數表达式函式的定義，都可以被宣告成<code>constexpr</code>。使得編譯器能夠在編譯期進行類別的複製、對他們施行運算等等。
+
+常數表达式函式或建構式，可以以非常數表示式（<code>non-constexpr</code>）作为參數喚起。就如同<code>constexpr</code>整數字面值能夠指派給<code>non-constexpr</code>變數，<code>constexpr</code>函式也可以接受<code>non-constexpr</code>參數，其結果儲存於<code>non-constexpr</code>變數。<code>constexpr</code>關鍵字只有當表示式的成員都是<code>constexpr</code>，才允許編譯期常數性的可能。
+
+=== 對POD定義的修正 ===
+
+在C++03中，一個类（class）或結構（struct）要想被作为[[POD_(程序设计)|POD]]，必須遵守幾條規則。符合這種定義的型別能夠產生與C相容的物件内存佈局（object layout），而且可以被静态初始化。但C++03标准严格限制了何种类型与C兼容或可以被静态初始化的，尽管并不存在技术原因导致编译器无法处理。如果创建一个C++03 POD类型，然后为其添加一个非虚成员函数，这个类型就不再是POD类型了，从而无法被静态初始化，也不再与C兼容，尽管其内存布局并没有发生变化。
+
+C++11通过把POD概念划分成两个概念：''平凡的（trivial）''和标准布局''（standard-layout）''，放寬了關於POD的定義。
+
+一个平凡的类型可以被静态初始化，意味着使用<code>memcpy</code>来复制数据是合法的，而无须使用复制构造函数。平凡的类型对象的生命周期开始于其存储空间被分配时，而不是其构造函数完成时。使用模版类std::is_trivial<T>::value来判断数据类型是否为平凡类型
+
+一個平凡的的類別或結構符合以下定義：
+# 平凡的預設建構式。這可以使用[[#使用或禁用物件的預設函式|預設建構式語法]]，例如<code>SomeConstructor() = default;</code>
+# 平凡的複製建構式和move构造函数，可使用預設語法（default syntax）
+# 平凡的賦值運算子和move赋值操作符，可使用預設語法（default syntax）
+# 平凡的解構式，不可以是虛函数（virtual）
+# 类没有虚基类和虚成员函数
+# 复制构造函数和赋值操作符还额外要求所有非静态数据成员都是平凡的。
+
+一个符合标准布局的类封装成员的方式与C兼容。使用模版类std::is_standard_layout<A>::value来判断类型是否是一个标准布局类型。一個標準佈局（standard-layout）的類別或結構符合以下定義：
+
+# 所有non-static成員有相同的存取控制（public，private，protected）
+# 沒有虛擬函式
+# 沒有虛基類
+# 所有基礎類別符合標準佈局
+# 所有非靜態的（non-static）資料成員属于符合標準佈局的類別
+# 类中第一个非静态類別与基类不是同一个類別。例如：struct A:B{ B b; int c;}不符合要求  
+# 两种情况必局其一：或者所有基礎類別都没有non-static成員；或者最派生類別沒有non-static資料成員且至多一個帶有non-static成員的基礎類別。基本上，在該類別的繼承體系中只會有一個類別帶有non-static成員。
+
+一个类、结构、联合只有在其是平凡的、符合标准布局，并且所有非静态成员和基类都是POD时，才被视为POD。使用<type_traits>中的is_pod<T>::value判断T是不是POD类型
+
+通过划分，使得放弃一个特性而不失去另一个成为可能。一个具有复杂的复制和move构造函数的类可能不是平凡的，但是它可能符合标准布局，从而能与C程序交互。类似地，一个同时具有public和private数据成员的类不符合标准布局，但它可以是平凡的，从而能够使用<code>memcpy</code>来复制。
+
+== 核心語言建構期表現的加強 ==
+=== 外部模板 ===
+在標準C++中，只要在編譯單元內遇到被完整定義的模板，编译器都必須將其-{A|zh-hans:实例化; zh-hant:具現化;}-（instantiate）。這會大大增加編譯時間，特別是模板在許多編譯單元內使用相同的參數具現化。看起来沒有辦法告訴C++不要引發模板的具現化。
+
+C++11將會-{zh-hans:引入; zh-hant:引進}-外部模板这一-{zh-hans:概念; zh-hant:構想;}-。C++已經有了強制編譯器在特定-{zh-hans:位置; zh-hant:地點}-开始具現化的語法：
+
+<syntaxhighlight lang="cpp">
+template class std::vector<MyClass>;
+</syntaxhighlight>
+
+而C++所缺乏的是阻止編譯器在某個編譯單元內具現化模板的能力。C++11將簡單-{zh-hans:地; zh-hant:的}-擴充前文語法如下：
+
+<syntaxhighlight lang="cpp">
+extern template class std::vector<MyClass>;
+</syntaxhighlight>
+
+這样就告訴編譯器''不要''在該編譯單元內將該模板具現化。
+
+== 核心語言使用性的加強 ==
+
+這些特色存在的主要目的是為了使C++能夠更容易使用。舉凡可以增進型別安全，減少程式碼重複，不易誤用程式碼之類的。
+
+=== 初始化列表 ===
+標準C++從C帶來了[[b:C++/Initializer_list|初始化列表]]（initializer list）的概念。這個構想是結構或是数组能夠依據成員在該結構內定義的順序透過給予的一串引數來產生。這些[[b:C++/Initializer_list|初始化列表]]是遞迴的，所以結構的数组或是包含其他結構的結構可以使用它們。這對靜態列表或是僅是把結構初始化為某值而言相當有用。C++有构造函数，能夠重複对象的初始化。但單單只有那樣並不足以取代這項特色的所有機能。在C++03中，只允許在嚴格遵守POD的定義和限制條件的結構及類別上使用這項機能，非POD的型別不能使用，就連相當有用的STL容器std::vector也不行。
+
+C++11將會把初始化列表的概念綁到型別上，稱作<tt>std::initializer_list</tt>。這允許构造函数或其他函数像參數般地使用[[b:C++/Initializer_list|初始化列表]]。舉例來說：
+
+<syntaxhighlight lang="cpp">
+class SequenceClass
+{
+public:
+  SequenceClass(std::initializer_list<int> list);
+};
+</syntaxhighlight>
+
+這將允許<tt>SequenceClass</tt>由一連串的整數构造，就像：
+
+<syntaxhighlight lang="cpp">
+SequenceClass someVar = {1, 4, 5, 6};
+</syntaxhighlight>
+這個构造函数是種特殊的构造函数，稱作[[b:C++/Initializer_list|初始化列表构造函数]]。有著這種构造函数的類別在統一初始化的時候會被特別對待。
+
+類別<tt>std::initializer_list<></tt>是個第一級的C++11標準程式庫型別。然而他們只能夠經由C++11編譯器透過{}語法的使用被靜態地构造。這個列表一經构造便可複製，雖然這只是copy-by-reference。初始化列表是常數；一旦被建立，其成員均不能被改變，成員中的資料也不能夠被變動。
+
+因為初始化列表是真實型別，除了類別构造式之外還能夠被用在其他地方。正規的函数能夠使用初始化列表作為形参。例如：
+
+<syntaxhighlight lang="cpp">
+void FunctionName(std::initializer_list<float> list);
+
+FunctionName({1.0f, -3.45f, -0.4f});
+</syntaxhighlight>
+
+標準容器也能夠以這種方式初始化：
+<syntaxhighlight lang="cpp">
+vector<string> v = { "xyzzy", "plugh", "abracadabra" };
+vector<string> v({ "xyzzy", "plugh", "abracadabra" });
+vector<string> v{ "xyzzy", "plugh", "abracadabra" };//见下节“统一的初始化”
+</syntaxhighlight>
+
+=== 統一的初始化 ===
+標準C++在初始化型別方面有著許多問題。初始化型別有數種方法，而且交換使用時不會都產生相同結果。傳統的建構式語法，看起來像是函式宣告，而且為了能使編譯器不會弄錯必須採取一些步驟。只有集合體和POD型別能夠被集合式的初始化（使用<code>SomeType var = {/*stuff*/};</code>）。
+
+C++11將會提供一種統一的語法初始化任意的物件，它擴充了初始化串列語法：
+<syntaxhighlight lang="cpp">
+struct BasicStruct
+{
+ int x;
+ float y;
+};
+
+struct AltStruct
+{
+  AltStruct(int _x, float _y) : x(_x), y(_y) {}
+
+private:
+  int x;
+  float y;
+};
+
+BasicStruct var1{5, 3.2f};
+AltStruct var2{2, 4.3f};
+</syntaxhighlight>
+
+<tt>var1</tt>的初始化的運作就如同C-style的初始化串列。每個公開的變數將被對應於初始化串列的值給初始化。隱式型別轉換會在需要的時候被使用，這裡的隱式型別轉換不會產生範圍縮限（narrowing）。要是不能夠轉換，編譯便會失敗。（範圍縮限 （narrowing）：轉換後的型別無法表示原型別。如將32-bit的整數轉換為16-bit或8-bit整數，或是浮點數轉換為整數。）<tt>var2</tt>的初始化則是簡單地呼叫建構式。
+
+統一的初始化建構能夠免除具體指定特定型別的必要：
+
+<syntaxhighlight lang="cpp">
+struct IdString
+{
+  std::string name;
+  int identifier;
+};
+
+IdString var3{"SomeName", 4};
+</syntaxhighlight>
+
+該語法將會使用<tt>const char *</tt>參數初始化<tt>std::string</tt>。你也可以做像下面的事：
+
+<syntaxhighlight lang="cpp">
+IdString GetString()
+{
+  return {"SomeName", 4}; // 注意這裡不需要明確的型別
+}
+</syntaxhighlight>
+
+統一初始化不會取代建構式語法。仍然會有需要用到建構式語法的時候。如果一個類別擁有[[b:C++/Initializer_list|初始化列表构造函数]]（<tt>TypeName(initializer_list<SomeType>);</tt>），而初始化串列与构造函数的参数类型一致，那麼它比其他形式的建構式的優先權都來的高。C++11版本的<tt>std::vector</tt>將會有初始化串列建構式。這表示：
+
+<syntaxhighlight lang="cpp">
+std::vector<int> theVec{4};
+</syntaxhighlight>
+
+這將會呼叫初始化串列建構式，而不是呼叫<tt>std::vector</tt>只接受一個尺寸參數產生相應尺寸vector的建構式。要使用這個建構式，使用者必須直接使用標準的建構式語法。
+
+=== 型別推導 ===
+在C++03和C，使用變數必須明確的指出其型別。然而，隨著模版型別的出現以及[[模板超編程|模板超編程]]的技巧，某物的型別，特別是函式定義明確的回返型別，就不容易表示。在這樣的情況下，將中間結果儲存於變數是件困難的事，可能會需要知道特定的超編程程式庫的內部情況。
+
+C++11提供兩種方法緩解上述所遇到的困難。首先，有被明確初始化的變數可以使用[[Auto_(C++)|<code>auto</code>]]關鍵字。对于指针类型，声明为auto* 或者auto 是一样的。对于引用类型，必须使用auto & 。這會依據該初始化子（initializer）的具體型別產生變數：
+
+<syntaxhighlight lang="cpp">
+auto integralVariable = 5;
+auto unsignedVariable = 5UL;
+auto ptrToObject = new MyPackage::Object();
+</syntaxhighlight>
+在上面的简易例子中，程序员和编译器都能轻易判断出几个变量的类型。而通过使用<code>UL</code>后缀，<code>unsignedVariable</code>的类型自动成为<code>unsigned long</code>。最后，动态创建对象时已经要在 <code>new</code> 后输入类型，此时使用 <code>auto</code> 就能省略掉累赘的<code>MyPackage::Object*</code>声明。
+
+<syntaxhighlight lang="cpp">
+using namespace std::placeholders;
+auto someStrangeCallableType = std::bind(&SomeFunction, _2, _1, someObject);
+auto otherVariable = 5;
+</syntaxhighlight>
+上面的例子中说明<code>auto</code>有利于C++支援函数式编程。这里注意<code>std::bind</code>也是C++11从[[Boost_C++_Libraries|Boost C++ Libraries]]中引入的模版函数。<code>std::bind</code>实现了偏函数，在上面的例子中它将函数<code>SomeFunction</code>的第三个参数绑定为<code>someObject</code>，并将第一和第二个参数的在参数列表中的顺序倒转，由此生成一个函数对象<code>someStrangeCallableType</code>。该函数对象的类型非常复杂，但编译器却能轻易地将其推导出来。
+
+除此之外，[[Decltype|<code>decltype</code>]]能夠被用來在編譯期決定一個表示式的型別。舉例：
+
+<syntaxhighlight lang="cpp">
+int someInt;
+decltype(someInt) otherIntegerVariable = 5;
+</syntaxhighlight>
+
+<code>decltype</code>和<code>auto</code>一起使用會更為有用，因為auto變數的型別只有編譯器知道。然而<code>decltype</code>對於那些大量運用運算子重載和特化的型別的程式碼的表示也非常有用。
+
+<code>auto</code>對於減少冗贅的程式碼也很有用。舉例而言，程式員不用寫像下面這樣：
+<syntaxhighlight lang="cpp">
+for (vector<int>::const_iterator itr = myvec.cbegin(); itr != myvec.cend(); ++itr)
+</syntaxhighlight>
+而可以用更簡短的
+<syntaxhighlight lang="cpp">
+for (auto itr = myvec.cbegin(); itr != myvec.cend(); ++itr)
+</syntaxhighlight>
+由于"myvec"实现了begin/end迭代器，C++11提供了基于范围的{{lang|en|for}}循环来大幅度省略代码。
+<syntaxhighlight lang="cpp">
+for (auto& x : myvec)
+</syntaxhighlight>
+
+這項差異隨著程式員開始嵌套容器而更為顯著，雖然在這種情況下<code>typedef</code>是一個減少程式碼的好方法。
+
+<code>decltype</code>所表示的型別可以和<code>auto</code>推導出來的不同。
+<syntaxhighlight lang="cpp">
+#include <vector>
+
+int main()
+{
+  const std::vector<int> v(1);
+  auto a = v[0]；// a為int型別
+  decltype（v[0]) b = 0;   // b為const int&型別，即
+                      // std::vector<int>::operator[]（size_type）const的回返型別
+  auto c = 0;         // c為int型別
+  auto d = c;         // d為int型別      
+  decltype(c) e;      // e為int型別，c實體的型別 
+  decltype((c)) f = e; // f為int&型別，因為（c）是左值
+  decltype(0) g;      // g為int型別，因為0是右值
+}
+
+</syntaxhighlight>
+
+=== 基于范围的for迴圈 ===
+
+
+<tt>for</tt>语句將允許簡單的範圍迭代：
+
+<syntaxhighlight lang="cpp">
+int my_array[5] = {1, 2, 3, 4, 5};
+// double the value of each element in my_array:
+for (int &x : my_array)
+{
+  x *= 2;
+}
+// similar but also using type inference for array elements
+for (auto &x : my_array) {
+    x *= 2;
+}
+</syntaxhighlight>
+
+上面<tt>for</tt>述句的第一部份定義被用來做範圍迭代的变量，就像被宣告在一般for迴圈的变量一樣，其作用域僅只於迴圈的範圍。而在":"之後的第二區塊，代表將被迭代的範圍。这种for语句还可以用于C型数组，初始化列表，和任何定义了<code>begin()</code>和<code>end()</code>来返回首尾迭代器的类型。
+
+=== Lambda函式與表示式 ===
+在標準C++，特別是當使用C++標準程式庫演算法函式諸如<tt>sort</tt>和<tt>find</tt>，使用者經常希望能夠在演算法函式呼叫的附近定義一个临时的述部函式（又称谓词函数，predicate function）。由于語言本身允許在函式內部定義類別，可以考虑使用函数对象，然而這通常既麻煩又冗贅，也阻礙了程式碼的流程。此外，標準C++不允許定義於函式內部的類別被用於模板，所以前述的作法是不可行的。
+
+C++11對[[λ演算|lambda]]（即[[匿名函数|匿名函数]]）的支援可以解決上述問題。
+
+一個lambda函式可以用如下的方式定義：
+
+<syntaxhighlight lang="cpp">
+[](int x, int y) { return x + y; }
+</syntaxhighlight>
+
+這個不具名函式的回返型別是<tt>decltype(x+y)</tt>。只有在lambda函式符合"return ''expression''"的形式下，它的回返型別才能被忽略。在前述的情況下，lambda函式僅能為一個述句。
+
+在一個更為複雜的例子中，回返型別可以被明確的指定如下：
+
+<syntaxhighlight lang="cpp">
+[](int x, int y) -> int { int z = x + y; return z + x; }
+</syntaxhighlight>
+
+本例中，一個暫時的變數<tt>z</tt>被建立用來儲存中間結果。如同一般的函式，<tt>z</tt>的值不會保留到下一次該不具名函式再次被呼叫時。
+
+如果lambda函式沒有傳回值（例如<tt>void</tt>），其回返型別可被完全忽略。
+
+定義在與lambda函式相同作用域的變數參考也可以被使用。這種的變數集合一般被稱作closure（[[闭包_(计算机科学)|閉包]]）。
+
+<syntaxhighlight lang="cpp">
+[]      // 沒有定义任何变量。使用未定义变量会引发错误。
+[x, &y] // x以传值方式传入（默认），y以引用方式传入。
+[&]     // 任何被使用到的外部变量都隐式地以引用方式加以引用。
+[=]     // 任何被使用到的外部变量都隐式地以传值方式加以引用。
+[&, x]  // x显式地以传值方式加以引用。其余变量以引用方式加以引用。
+[=, &z] // z显式地以引用方式加以引用。其余变量以传值方式加以引用。
+</syntaxhighlight>
+
+closure被定義與使用如下：
+
+<syntaxhighlight lang="cpp">
+std::vector<int> someList;
+int total = 0;
+std::for_each(someList.begin(), someList.end(), [&total](int x) {
+  total += x;
+});
+std::cout << total;
+</syntaxhighlight>
+
+上例可計算<tt>someList</tt>元素的總和並將其印出。變數<tt>total</tt>是lambda函式closure的一部分，同時它以引用方式被传递入谓词函数，因此它的值可被lambda函式改變。
+
+若不使用引用的符號''&''，則代表變數以傳值的方式傳入lambda函式。讓使用者可以用這種表示法明確區分變數傳遞的方法：傳值，或是傳參考。由於lambda函式可以不在被宣告的地方就地使用（如置入<tt>std::function</tt>物件中）；
+這種情況下，若變數是以傳參考的方式連結到closure中，是無意義甚至是危險的行為。
+
+若lambda函式只在定義的作用域使用，則可以用<tt>[&]</tt>宣告lambda函式，代表所有引用到stack中的變數，都是以參考的方式傳入，不必一一顯式指明：
+
+<syntaxhighlight lang="cpp">
+std::vector<int> someList;
+int total = 0;
+std::for_each(someList.begin(), someList.end(), [&](int x) {
+  total += x;
+});
+</syntaxhighlight>
+變數傳入lambda函式的方式可能隨實做有所變化，一般期望的方法是lambda函式能保留其作用域函式的stack指標，藉此存取區域變數。
+
+若使用<tt>[=]</tt>而非<tt>[&]</tt>，則代表所有的參考的變數都是傳值使用。
+
+對於不同的變數，傳值或傳參考可以混和使用。比方說，使用者可以讓所有的變數都以傳參考的方式使用，但帶有一個傳值使用的變數：
+
+<syntaxhighlight lang="cpp">
+int total = 0;
+int value = 5;
+[&, value](int x) { total += (x * value); };
+</syntaxhighlight>
+
+<tt>total</tt>是傳參考的方式傳入lambda函式，而<tt>value</tt>則是傳值。
+
+若一個lambda函式被定義於某類別的成員函式中，则可以使用該類別物件的參考，並且能夠存取其內部的成員。
+
+<syntaxhighlight lang="cpp">
+[](SomeType *typePtr) { typePtr->SomePrivateMemberFunction(); };
+</syntaxhighlight>
+
+這只有當該lambda函式創建的作用域是在<tt>SomeType</tt>的成員函式內部時才能運作。
+
+在成員函式中指涉物件的this指標，必須要顯式的傳入lambda函式，否則成員函式中的lambda函式無法使用任何該物件的變數或函式。
+
+<syntaxhighlight lang="cpp">
+[this]() { this->SomePrivateMemberFunction(); };
+</syntaxhighlight>
+
+若是lambda函式使用[&]或是[=]的形式，<tt>this</tt>在lambda函式即為可見。
+
+lambda函式是編譯器從屬型別的函式物件；這種型別名稱只有編譯器自己能夠使用。如果使用者希望將lambda函式作為參數傳入，該型別必須是模版型別，或是必須創建一個<tt>std::function</tt>去獲取lambda的值。使用<tt>auto</tt>關鍵字讓我們能夠儲存lambda函式：
+
+<syntaxhighlight lang="cpp">
+auto myLambdaFunc = [this]() { this->SomePrivateMemberFunction(); };
+auto myOnheapLambdaFunc = new auto([=] { /*...*/ });
+</syntaxhighlight>
+
+lambda函数按照值方式捕获的环境中的变量，是不能修改的。否则，编译器会报错：“by copy capture cannot be modified in a non-mutable lambda”。其值是lambda函数定义时捕获的值，不再改变。如果在lambda函数定义时加上mutable关键字，则该捕获的传值变量是可以修改的，对同一个lambda函数的随后调用也会累加影响该捕获的传值变量，但对外界环境中被捕获的那个变量无影响。例如：
+<syntaxhighlight lang="cpp">
+#include <iostream> 
+using namespace std;
+int main()
+{
+ size_t t = 9;
+ auto f = [t]() mutable {return t; };
+ cout << f() << endl;
+ t = 100;
+ cout << f() << endl;
+ cout << "t:" << t << endl;
+ return 0;
+}
+</syntaxhighlight>
+
+=== 返回型別後置的函式宣告 ===
+[[C語言|標準C]]函式宣告語法對於C語言已經足夠。演化自C的C++除了C的基礎語法外，又擴充額外的語法。然而，當C++變得更為複雜時，它暴露出許多語法上的限制，特別是針對函數模板的宣告。下面的範例，不是合法的C++03：
+
+<syntaxhighlight lang="cpp">
+template< typename LHS, typename RHS> 
+  Ret AddingFunc(const LHS &lhs, const RHS &rhs) {return lhs + rhs;} //Ret的型別必須是(lhs+rhs)的型別
+</syntaxhighlight>
+
+<tt>Ret</tt>的型別由<tt>LHS</tt>與<tt>RHS</tt>相加之後的結果的型別來決定。即使使用C++11新加入的<tt>decltype</tt>來宣告<tt>AddingFunc</tt>的返回型別，依然不可行。
+
+<syntaxhighlight lang="cpp">
+template< typename LHS, typename RHS> 
+  decltype(lhs+rhs) AddingFunc(const LHS &lhs, const RHS &rhs) {return lhs + rhs;} //不合法的C++11
+</syntaxhighlight>
+
+不合法的原因在於<tt>lhs</tt>及<tt>rhs</tt>在定義前就出現了。直到剖析器解析到函數原型的後半部，<tt>lhs</tt>與<tt>rhs</tt>才是有意義的。
+
+針對此問題，C++11引進一種新的函數定義與聲明的語法：
+
+<syntaxhighlight lang="cpp">
+template< typename LHS, typename RHS> 
+  auto AddingFunc(const LHS &lhs, const RHS &rhs) -> decltype(lhs+rhs) {return lhs + rhs;}
+</syntaxhighlight>
+
+這種語法也能套用到一般的函數定義與聲明：
+
+<syntaxhighlight lang="cpp">
+struct SomeStruct
+{
+  auto FuncName(int x, int y) -> int;
+};
+
+auto SomeStruct::FuncName(int x, int y) -> int
+{
+  return x + y;
+}
+</syntaxhighlight>
+
+關鍵字'''auto'''的使用與其在自動型別推導代表不同的意義。
+
+=== 物件建構的改良 ===
+在C++03中，建構式不能呼叫其它的建構式；每個建構式必須自己初始化所有的成員或是呼叫一個共用的成員函式。基礎類別的建構式不能夠直接作為衍生類別的建構式；就算基類的建構式已經足夠，每個衍伸的類別仍必須實做自己的建構式。類別中non-constant的資料成員不能夠在宣告的地方被初始化，它們只能在建構式中被初始化。
+C++11將會提供這些問題的解決方案。
+
+C++11允許建構式呼叫其他建構式，這種做法稱作委託（delegation）构造。僅僅只需要加入少量的代碼，就能讓數個建構式之間達成功能復用（reuse）。[[Java|Java]]以及[[C♯|C♯]]都有提供這種功能。C++11語法如下：
+
+<syntaxhighlight lang="cpp">
+class SomeType {
+  int number;
+  string name;
+  SomeType( int i, string& s ) : number(i), name(s){}
+public:
+  SomeType( )           : SomeType( 0, "invalid" ){}
+  SomeType( int i )     : SomeType( i, "guest" ){}
+  SomeType( string& s ) : SomeType( 1, s ){ PostInit(); }
+};
+
+class DCExcept{			
+    public:			
+        DCExcept(double d)			
+            try : DCExcept(1, d){			
+                cout << "run the body." << endl;			
+            }catch(...){			
+                cout << "caught exception."<<endl;			
+            }			
+    private:			
+        DCExcept(int i, double d){			
+            cout << "going to throw" << endl;			
+            throw 0;			
+        }			
+			
+        int type;			
+        double date;			
+};	
+</syntaxhighlight>
+
+C++03中，建構式執行結束代表物件建構完成；
+而允許使用轉接建構式的C++11則是以"任何"一個建構式結束代表建構完成。使用委托的建構式，函式本體中的代碼將於被委托的建構式完成後繼續執行（如上例的<tt>PostInit()</tt>）。若基類使用了委托建構式，則衍生類別的建構式會在"所有"基底類別的建構式都完成後，才會開始執行。
+
+C++11允許衍生類別手動繼承基底類別的建構式，編譯器可以使用基底類別的建構式完成衍生類別的建構。而將基類的建構式帶入衍生類的動作，無法選擇性地部分帶入，要不就是繼承基類全部的建構式，要不就是一個都不繼承（不手動帶入）。此外，若牽涉到多重繼承，從多個基底類別繼承而來的建構式不可以有相同的函式簽名（signature）。而衍生類別的新加入的建構式也不可以和繼承而來的基底建構式有相同的函式簽名，因為這相當於重複宣告。
+
+語法如下：
+
+<syntaxhighlight lang="cpp">
+class BaseClass
+{
+public:
+  BaseClass(int iValue);
+};
+
+class DerivedClass : public BaseClass
+{
+public:
+  using BaseClass::BaseClass;
+};
+</syntaxhighlight>
+
+此語法等同於DerivedClass宣告一個<tt>DerivedClass(int)</tt>的建構式。同時也因為DerivedClass有了一個繼承而來的建構式，所以不會有預設建構式。
+
+另一方面，C++11可以使用以下的語法完成数据成員的原地（in-place)初始化：
+
+<syntaxhighlight lang="cpp">
+class SomeClass
+{
+public:
+  SomeClass() {}
+  explicit SomeClass(int iNewValue) : iValue(iNewValue) {}
+
+private:
+  int iValue = 5;
+};
+</syntaxhighlight>
+
+若是建構式中沒有設定<tt>iValue</tt>的初始值，則會採用類別定義中的成員初始化，令<tt>iValue</tt>初值為5。在上例中，無參數版本的建構式，<tt>iValue</tt>便採用預設所定義的值；而帶有一個整數參數的建構式則會以指定的值完成初始化。
+
+成員初始化除了上例中的賦值形式（使用"="），也可以採用建構式以及統一形的初始化（uniform initialization，使用"{}"）。
+
+=== 顯式虛函數重載===
+在C++裡，在子類別中容易意外的重載虛函數。舉例來說：
+
+<syntaxhighlight lang="cpp">
+struct Base {
+    virtual void some_func();
+};
+
+struct Derived : Base {
+    void some_func();
+};
+</syntaxhighlight>
+
+<code>Derived::some_func</code>的真實意圖為何？程序員真的試圖重載該虛函數，或這只是意外？這也可能是<code>base</code>的維護者在其中加入了一個與<code>Derived::some_func</code>同名且擁有相同簽名的虛函式。
+
+另一個可能的狀況是，當基類中的虛函式的簽名被改變，子類中擁有舊簽名的函式就不再重載該虛函式。因此，如果程序員忘記修改所有子類，執行期將不會正確呼叫到該虛函式正確的實現。
+
+C++11將加入支援用來防止上述情形產生，並在編譯期而非執行期捕獲此類錯誤。為保持向後兼容，此功能將是選擇性的。其語法如下：
+
+<syntaxhighlight lang="cpp">
+struct Base {
+    virtual void some_func(float);
+};
+
+struct Derived : Base {
+    virtual void some_func(int) override;   // 錯誤格式：Derive::some_func並沒有override Base::some_func
+    virtual void some_func(float) override; // OK：顯式改寫
+};
+</syntaxhighlight>
+
+編譯器會檢查基底類別是否存在一虛擬函數，與衍生類別中帶有聲明<code>override</code>的虛擬函數，有相同的函數簽名（signature）；若不存在，則會回報錯誤。
+
+C++11也提供指示字<code>final</code>，用來避免類別被繼承，或是基底類別的函數被改寫：
+
+<syntaxhighlight lang="cpp">
+struct Base1 final { };
+
+struct Derived1 : Base1 { }; // 錯誤格式：class Base1已標明為final
+
+struct Base2 {
+    virtual void f() final;
+};
+
+struct Derived2 : Base2 {
+    void f(); // 錯誤格式：Base2::f已標明為final
+};
+</syntaxhighlight>
+
+以上的範例中，<code>virtual void f() final;</code>聲明一新的虛擬函數，同時也表明禁止衍生函數改寫原虛擬函數。
+
+<code>override</code>與<code>final</code>都不是語言關鍵字（keyword），只有在特定的位置才有特別含意，其他地方仍舊可以作為一般指示字（identifier）使用。
+
+=== 空指標 ===
+早在1972年，C語言誕生的初期，常數[[0|0]]帶有常數及空指標的雙重身分。
+C使用preprocessor macro <code>NULL</code>表示空指標，讓<code>NULL</code>及<code>0</code>分別代表空指標及常數0。
+<code>NULL</code>可被定義為<code>((void*)0)</code>或是<code>0</code>。
+
+C++並不採用C的規則，不允許將<code>void*</code>隱式轉換為其他型別的指標。為了使代碼<code>char* c = NULL;</code>能通過編譯，NULL只能定義為<code>0</code>。這樣的決定使得函數多載無法區分代碼的語意：
+
+<syntaxhighlight lang="cpp">
+void foo(char *);
+void foo(int);
+void foo(nullptr_t);
+</syntaxhighlight>
+
+C++建議<code>NULL</code>應當定義為<code>0</code>，所以<code>foo(NULL);</code>將會呼叫<code>foo(int)</code>，這並不是程序員想要的行為，也違反了代碼的直觀性。0的歧義在此處造成困擾。
+
+C++11引入了新的關鍵字來代表空指標常數：[[Nullptr|<code>nullptr</code>]]，將空指標和整數0的概念拆開。
+<code>nullptr</code>的型別為<code>nullptr_t</code>，能隱式轉換為任何指標或是成員指標的型別，也能和它們進行相等或不等的比較。而<code>nullptr</code>不能隱式轉換為整數，也不能和整數做比較。
+
+為了向下相容，<code>0</code>仍可代表空指標常數。
+
+<syntaxhighlight lang="cpp">
+char* pc = nullptr;     // OK
+int * pi = nullptr;     // OK
+int    i = nullptr;     // error
+bool   b = nullptr;     // OK
+
+foo(pc);           // 调用foo(char *), 而不是 foo(int);
+foo(nullptr);      // 调用foo(nullptr_t);
+
+</syntaxhighlight>
+
+值得注意的是上面的 foo(nullptr_t) 被隐式转换为 foo(char *) 只会发生在该函数不存在其它的指针类型重载（比如 foo(int*), foo(MyClass*)等）时候，否则就会产生歧义错误（可以通过显示声明一个 foo(nullptr_t) 来消除该歧义）。
+在C++11的标准类型头文件中，nullptr_t 类型应该被声明为：
+
+<syntaxhighlight lang="cpp">
+      typedef decltype(nullptr) nullptr_t;
+</syntaxhighlight>
+
+而不是：
+
+<syntaxhighlight lang="cpp">
+      typedef int nullptr_t; //  C++11之前的标准需要定义 NULL 为 0
+      typedef void *nullptr_t; // ANSI C 定义 NULL 为 ((void*)0)
+</syntaxhighlight>
+
+=== 強型別列舉 ===
+在C++03中，列舉型別不是型別安全的。列舉型別被視為整數，这使得两种不同的列舉型別之間可以進行比較。C++03唯一提供的安全機制是一个整数或一个枚举型值不能隱式轉換到另一个列舉別型。此外，列舉所使用整數型別及其大小都由實作方法定義，皆無法明確指定。最後，列舉的名稱全數暴露於枚举类型的[[作用域|作用域]]中，因此兩個不同的列舉，不可以有相同的列舉名。（好比<tt> enum Side{ Right, Left }; </tt>和<tt> enum Thing{ Wrong, Right }; </tt>不能一起使用。）
+
+C++11引進了一種特別的"列舉類"，可以避免上述的問題。使用<tt>enum class</tt>的語法來宣告：
+
+<syntaxhighlight lang="cpp">
+enum class myEnumeration
+{
+  Val1,
+  Val2,
+  Val3 = 100,
+  Val4 /* = 101 */,
+};
+</syntaxhighlight>
+此種列舉為型別安全的。列舉類別不能隱式地轉換為整數；也無法與整數數值做比較。（表示式<code>Enumeration::Val4 == 101</code>會觸發編譯期錯誤）。
+
+列舉類別所使用型別必須顯式指定。在上面的範例中，使用的是預設型別<tt>int</tt>，但也可以指定其他型別：
+
+<syntaxhighlight lang="cpp">
+enum class Enum2 : unsigned int {Val1, Val2};
+</syntaxhighlight>
+
+列舉類別的[[作用域|作用域]]（scoping）不包含枚举值的名字。使用枚举值的名字，必須明確限定于其所屬的枚举类型。例如，前述列舉類別Enum2，<tt>Enum2::Val1</tt>是有意義的表示法，而單獨的<tt>Val1</tt>則否。
+
+此外，C++11允許為傳統的列舉指定使用型別：
+
+<syntaxhighlight lang="cpp">
+enum Enum3 : unsigned long {Val1 = 1, Val2};
+</syntaxhighlight>
+列舉名<tt>Val1</tt>定義於Enum3的列舉範圍中（Enum3::Val1），但為了向后相容性，
+<tt>Val1</tt>仍然可以於所属枚举类型所在的作用域中單獨使用。
+
+在C++11中，列舉類別的前置聲明（forward declaration）也是可行的，只要使用可指定型別的新式列舉即可。之前的C++無法寫出列舉的前置聲明，是由於無法確定列舉變數所佔的空間大小，C++11解決了這個問題：
+
+<syntaxhighlight lang="cpp">
+enum Enum1;                     // C++與C++11中不合法;無法判別大小
+enum Enum2 : unsigned int;      // 合法的C++11
+enum class Enum3;               // 合法的C++11，列舉類別使用預設型別int 
+enum class Enum4: unsigned int; // 合法的C++11
+enum Enum2 : unsigned short;    // 不合法的C++11，Enum2已被聲明為unsigned int
+</syntaxhighlight>
+
+=== 角括號 ===
+C++03的剖析器一律將">>"視為右移運算子。但在嵌套樣板定義式中，絕大多數的場合其實都代表兩個連續右角括號。為了避免剖析器誤判，撰碼時不能把右角括號連著寫。
+
+C++11變更了剖析器的解讀規則；當遇到連續的右角括號時，会在合理的情况下将右尖括號解析為樣板引數的結束符號。给使用<code>></code>,<code>>=</code>,<code>>></code>的表达式加上圆括号，可以避免其与圆括号外部的左尖括号相匹配：
+
+<syntaxhighlight lang="cpp">
+template<bool bTest> class SomeType;
+std::vector<SomeType<1>2>> x1;   // 解讀為std::vector of "SomeType<true> 2>"，
+                                 // 非法的表示式，整數1被轉換為bool型別true
+std::vector<SomeType<(1>2)>> x1; // 解讀為std::vector of "SomeType<false>",
+                                 // 合法的C++11表示式，(1>2)被轉換為bool型別false
+</syntaxhighlight>
+
+=== 顯式型別轉換子 ===
+C++98引入了關鍵字<tt>explicit</tt>来避免用戶自定的單引數建構式被當成隱式型別轉換子。但是，却没有限制明确定义的类型转换函数。比方說，一個smart pointer類別具有一個<tt>operator bool()</tt>，被定義成若該smart pointer不为null則傳回true，反之傳回false。遇到這樣的代碼時：<tt>if(smart_ptr_variable)</tt>，編譯器可以藉由<tt>operator bool()</tt>隱式轉換成布林值，和测试原生指標的方法一樣。但是這類隱式轉換同樣也會發生在非預期之處。由於C++的<tt>bool</tt>型別也是算术型別，能隱式換為整數甚至是浮點數。拿物件轉換出的布林值做布林運算以外的數學運算，往往不是程序員想要的。
+
+在C++11中，關鍵字<tt>explicit</tt>修飾符也能套用到型別轉換函数上。如同建構式一樣，它能避免型別轉換函数被隱式轉換調用。但C++11特別指定，在<tt>if</tt>條件式、迴圈、邏輯運算等需要布林值的地方，将其作为显式类型转换，因此即使对应的类型转换函数被explicit修饰也可以调用。这主要为了解决[https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Safe_bool safe bool]{{Wayback|url=https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Safe_bool |date=20151208081521 }}问题。
+
+=== 模板的別名 ===
+在進入這個主題之前，各位應該先弄清楚「模板」和「型別」本質上的不同。class template (類別模板，是模板)是用來產生template class（模板類別，是型別）。在C++03中，<code>typedef</code>可定義模板類別一個新的型別名稱，但是不能夠使用<code>typedef</code>來定義模板的別名。舉例來說：
+
+<syntaxhighlight lang="cpp">
+template< typename first, typename second, int third>
+class SomeType;
+
+template< typename second>
+typedef SomeType<OtherType, second, 5> TypedefName; // 在C++03是不合法的
+</syntaxhighlight>
+
+這不能夠通過編譯。
+
+為了定義模板的別名，C++11將會增加以下的語法：
+
+<syntaxhighlight lang="cpp">
+template< typename first, typename second, int third>
+class SomeType;
+
+template< typename second>
+using TypedefName = SomeType<OtherType, second, 5>;
+</syntaxhighlight>
+
+<tt>using</tt>也能在C++11中定義一般型別的別名，等同<tt>typedef</tt>：
+<syntaxhighlight lang="cpp">
+typedef void (*PFD)(double);		// 傳統語法
+using PFD = void (*)(double);		// 新增語法
+</syntaxhighlight>
+===模板参数的缺省值 ===
+C++98支持类模板的模板参数默认值，不支持函数模板的模板参数默认值。C++11可以支持函数模板的模板参数默认值。类模板的模板参数默认值需要从右到左依次出现；函数模板的默认模板参数没有此约束。
+<syntaxhighlight lang="cpp">
+void DefParm(int m = 3) {} // c++98编译通过，c++11编译通过
+
+template <typename T = int>
+class DefClass {};        // c++98编译通过，c++11编译通过
+
+template <typename T = int>
+void DefTempParm() {};    // c++98编译失败，c++11编译通过
+
+
+//以下为C++11编译：
+template <typename T1, typename T2 = int>
+class DefClass1 {};
+
+template <typename T1 = int, typename T2>
+class DefClass2 {};  // ERROR: 无法通过编译：因为模板参数的默认值没有遵循“由右往左”的规则
+
+template <typename T, int i = 0>
+class DefClass3 {};
+
+template <int i = 0, typename T>
+class DefClass4 {};  // ERROR: 无法通过编译：因为模板参数的默认值没有遵循“由右往左”的规则
+
+template <typename T1 = int, typename T2>
+void DefFunc1(T1 a, T2 b) {}; // OK 函数模板不用遵循“由右往左”的规则
+
+template <int i = 0, typename T>
+void DefFunc2(T a) {};  // OK 函数模板不用遵循“由右往左”的规则
+
+//通常，如果能够从函数实参中推导出类型的话，那么默认模板参数就不会被使用，反之，默认模板参数则可能会被使用：
+template <class T, class U = double>
+void f(T t = 0, U u = 0) {};
+void g() 
+{
+    f(1, 'c'); // f<int, char>(1, 'c') 
+    f(1);      // f<int, double>(1, 0), 使用了默认模板参数double
+    f();       // 错误: T无法被推导出来
+    f<int>();  // f<int, double>(0, 0), 使用了默认模板参数double
+    f<int, char>(); // f<int, char>(0, 0)
+}
+</syntaxhighlight>
+=== 無限制的unions ===
+在C++03中，並非任意的-{A|zh-hans:类型; zh-hant:型別}-都能做為union的成員。比方說，帶有non-trivial -{A|zh-hans:构造函数; zh-hant:建構式}-的型別就不能是union的成員。在新的標準裡，移除了所有对union的使用限制，除了其成員仍然不能是-{A|zh-hans:引用; zh-hant:參照}-型別。這一改變使得union更強大，更有用，也易於使用。<ref>{{Cite web |url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2544.pdf |title=N2544 |accessdate=2009-02-06 |archive-date=2008-12-21 |archive-url=https://web.archive.org/web/20081221083351/http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2544.pdf |dead-url=no }}</ref>
+
+但是如果union成员具有非平凡的[https://en.wikipedia.org/wiki/Special_member_functions 特殊成员函数]{{Wayback|url=https://en.wikipedia.org/wiki/Special_member_functions |date=20151208104850 }}，则编译器不会为union生成对应的特殊成员函数，必须手工定义。
+
+以下為C++11中union使用的簡單-{A|zh-hans:样例; zh-hant:範例}-：
+<syntaxhighlight lang="cpp">
+struct Point
+{
+  Point() {}
+  Point(int x, int y): x_(x), y_(y) {}
+  int x_, y_;
+};
+union U
+{
+	 int z;
+	 double w;
+	 Point p;  // 在C++03中是不合法（point有一non-trivial建構式），但是在C++11是合法的
+	 U() {} // 由于 Point 成员的存在，必须要定义一个构造函数
+	 U(const Point& pt) : p(pt) {} // 通过初始化列表构造 Point 对象
+	 U& operator=(const Point& pt) { new (&p) Point(pt); return *this; } // 通过原地new方式赋值构造Point对象
+};
+</syntaxhighlight>
+
+這一改變僅放寬union的使用限制，不會影響既有的舊代碼。
+
+== 核心語言能力的提升 ==
+
+這些特性让C++語言能夠做一些以前做不到的，或者极其复杂的，或者需求一些不可移植的库的事情。
+
+=== 可变参数模板 ===
+在C++11之前，不論是类模板或是-{A|zh-hans:函数; zh-hant:函式}-模板，都只能按其被声明時所指定的样子，接受一組固定数目的模板参数<!---英文wiki中确为arguments，中文应该翻译成实参。但是这里直接翻译成实参，感觉会引入歧义。--->；C++11加入新的表示法，允许任意-{A|zh-hans:个数; zh-hant:長度}-、任意-{A|zh-hans:类别; zh-hant:型別}-的模板参数，不必在定義時將參數的个数固定。
+
+<syntaxhighlight lang="cpp">
+template<typename... Values> class tuple;
+</syntaxhighlight>
+模板類<tt>tuple</tt>的-{A|zh-hans:对象; zh-hant:物件}-，能接受不限個數的typename作為它的模板-{A|zh-hans:形参; zh-hant:引數}-：
+
+<syntaxhighlight lang="cpp">
+class tuple<int, std::vector<int>, std::map<std::string, std::vector<int>>> someInstanceName;
+</syntaxhighlight>
+-{zh-hans:实参; zh-hant:引數}-的个数也可以是0，所以<tt>class tuple<> someInstanceName</tt>这样的定义也是可以的。
+
+若不希望產生-{zh-hans:实参; zh-hant:引數}-个数為0的不定長參數模板，則可以採用以下的定義：
+
+<syntaxhighlight lang="cpp">
+template<typename First, typename... Rest> class tuple;
+</syntaxhighlight>
+
+不定長參數模板也能運用到模板函式上。傳統C中的printf函式，雖然也能達成不定長度的引數的調用，但其並非型別安全。以下的範例中，C++11除了能定義型別安全的-{A|zh-hans:变长参数函数; zh-hant:不定長引數函式}-外，還能讓类似printf的函式能自然地處理非內建型別的物件。除了在模板參數中能使用''...''表示不定長模板參數外，函數參數也使用同樣的表示法代表不定長參數。
+<syntaxhighlight lang="cpp">
+template<typename... Params> void printf(const std::string &strFormat, Params... parameters);
+</syntaxhighlight>
+
+其中，<tt>Params</tt>與<tt>parameters</tt>分別代表模板與函式的-{A|zh-hans:变长参数; zh-hant:不定長參數}-集合，稱之為參數包（parameter pack）。參數包必須要和-{A|zh-hans:运算符; zh-hant:算子}-"..."搭配使用，避免語法上的歧義。
+
+不定長參數模板中，不定長參數包無法如同一般參數在類或函式中使用；
+因此典型的手法是以遞迴的方法取出可用參數，參看以下的C++11 <tt>printf</tt>範例：
+
+<syntaxhighlight lang="cpp">
+void printf(const char *s)
+{
+  while (*s)
+  {
+    if (*s == '%' && *(++s) != '%')
+      throw std::runtime_error("invalid format string: missing arguments");
+    std::cout << *s++;
+  }
+}
+
+template<typename T, typename... Args>
+void printf(const char* s, T value, Args... args)
+{
+  while (*s)
+  {
+    if (*s == '%' && *(++s) != '%')
+    {
+      std::cout << value;
+      printf(*s ? ++s : s, args...); // 即便当*s == 0也会产生调用，以检测更多的类型参数。
+      return;
+    }
+    std::cout << *s++;
+  }
+  throw std::logic_error("extra arguments provided to printf");
+}
+</syntaxhighlight>
+
+printf會不斷地遞迴調用自身：函式參數包<tt>args...</tt>在調用時，會被模板型別匹配分離為<tt>T value</tt>和<tt>Args... args</tt>。直到<tt>args...</tt>變為空參數，則會與簡單的<tt>printf(const char *s)</tt>形成匹配，結束遞迴。
+
+另一個例子為計算模板參數的長度，這裡使用相似的技巧展開模板參數包<tt>Args...</tt>：
+<syntaxhighlight lang="cpp">
+template<typename... args>
+struct Count{};
+template<>
+struct count<> {
+    static const int value = 0;
+};
+
+template<typename T, typename... Args>
+struct count<T, Args...> { 
+    static const int value = 1 + count<Args...>::value;
+};
+</syntaxhighlight>
+
+-{zh-hans:虽然没有一个简洁的机制能够对[[变长参数模板|变长参数模板]]中的值进行迭代; zh-hant:雖然沒有很簡單的機制能個別依序處理[[变长参数模板|变长参数模板]]的參數}-，但使用算子"..."還能在代碼各處對參數包施以更複雜的展開操作。舉例來說，一個模板類的定義：
+
+<syntaxhighlight lang="cpp">
+template <typename... BaseClasses> class ClassName : public BaseClasses...
+{
+public:
+
+   ClassName (BaseClasses&&... baseClasses) : BaseClasses(baseClasses)... {}
+}
+</syntaxhighlight>
+<tt>BaseClasses...</tt>會被展開成類別<tt>ClassName</tt>的基底類；ClassName的-{A|zh-hans:构造函数; zh-hant:建構式}-需要所有-{A|zh-hans:基类; zh-hant:基底類}-的右值-{A|zh-hans:引用; zh-hant:參照}-，而每一個基底類都是以傳入的參數做初始化（<tt>BaseClasses(baseClasses)...</tt>）。
+
+在函式模板中，不定長參數可以和右值參照搭配，達成引數的完美轉送（perfect forwarding）：
+
+<syntaxhighlight lang="cpp">
+template<typename TypeToConstruct> struct SharedPtrAllocator
+{
+  template<typename... Args> std::shared_ptr<TypeToConstruct> ConstructWithSharedPtr(Args&&... params)
+  {
+    return std::shared_ptr<TypeToConstruct>(new TypeToConstruct(std::forward<Args>(params)...));
+  }
+}
+</syntaxhighlight>
+
+參數包<tt>parms</tt>可展開為<tt>TypeToConstruct</tt>建構式的引數。-{A|zh-hans:表达式; zh-hant:表示式}-<tt>std::forward<Args>(params)</tt>可將引數的型別-{A|zh-hans:信息; zh-hant:資訊}-保留（利用右值參照），傳入建構式。而算子"..."則能將前述的表示式套用到每一個參數包中的參數。這種工廠函式（factory function）的手法，使用<tt>std::shared_ptr</tt>管理配置物件的記憶體，避免了不當使用所產生的記憶體洩漏（memory leaks）。
+
+此外，不定長參數的數量可以藉以下的語法得知：
+
+<syntaxhighlight lang="cpp">
+template<typename ...Args> struct SomeStruct
+{
+  static const int size = sizeof...(Args);
+}
+</syntaxhighlight>
+<tt>SomeStruct<Type1, Type2>::size</tt>是2，而<tt>SomeStruct<>::size</tt>會是0。（<tt>sizeof...(Args)</tt>的結果是編譯期常數。）
+
+=== 新的字串字面值 ===
+標準C++提供了兩種字串字面值。第一種，包含有雙引號，產生以空字元結尾的<tt>const char</tt>陣列。第二種有著前標L，產生以空字元結尾的<tt>const wchar_t</tt>陣列，其中<tt>wchar_t</tt>代表寬字元。對於[[Unicode|Unicode]]編碼的支援尚付闕如。
+
+為了加強C++編譯器對Unicode的支援，型別<tt>char</tt>的定義被修改為其大小至少能夠儲存[[UTF-8|UTF-8]]的8位元編碼，並且能夠容納編譯器的基本字元集的任何成員。
+
+C++11將支援三種Unicode編碼方式：[[UTF-8|UTF-8]]，[[UTF-16|UTF-16]]，和[[UTF-32|UTF-32]]。除了上述<tt>char</tt>定義的變更，C++11將增加兩種新的字元型別：<tt>char16_t</tt>和<tt>char32_t</tt>。它們各自被設計用來儲存UTF-16以及UTF-32的字元。
+
+以下展示如何產生使用這些編碼的字串字面值：
+
+<syntaxhighlight lang="cpp">
+u8"I'm a UTF-8 string."
+u"This is a UTF-16 string."
+U"This is a UTF-32 string."
+</syntaxhighlight>
+
+第一個字串的型別是通常的<code>const char[]</code>；第二個字串的型別是<code>const char16_t[]</code>；第三個字串的型別是<code>const char32_t[]</code>。
+
+當建立Unicode字串字面值時，可以直接在字串內插入Unicode codepoints。C++11提供了以下的語法：
+<syntaxhighlight lang="cpp">
+u8"This is a Unicode Character: \u2018."
+u"This is a bigger Unicode Character: \u2018."
+U"This is a Unicode Character: \U00002018."
+</syntaxhighlight>
+
+在'\u'之後的是16個位元的十六進位數值；它不需要'0x'的前標。識別字'\u'代表了一個16位元的Unicode codepoint；如果要輸入32位元的codepoint，使用'\U'和32個位元的十六進位數值。只有有效的Unicode codepoints能夠被輸入。舉例而言，codepoints在範圍U+D800—U+DFFF之間是被禁止的，它們被保留給UTF-16編碼的surrogate pairs。
+
+有時候避免手動將字串換碼也是很有用的，特別是在使用[[XML|XML]]檔案或是一些[[腳本語言|腳本語言]]的字面值的時候。C++11將提供raw（原始）字串字面值：
+
+<pre>
+R"(The String Data \ Stuff " )"
+R"delimiter(The String Data \ Stuff " )delimiter"
+</pre>
+
+在第一個例子中，任何包含在<code>(</code> <code>)</code>括號（標準已經從<code>[]</code>改為<code>()</code>）當中的都是字串的一部分。其中<code>"</code>和<code>\</code>字元不需要經過转义。在第二個例子中，<code>"delimiter(</code>開始字串，只有在遇到<code>)delimiter"</code>才代表結束。其中<code>delimiter</code>可以是最多16个字符的任意的字串（包含空字符串），但不能包含空格、控制字符和'('、')'、'\'。原始字符串允許使用者使用圆括号<code>(</code>,<code>)</code>，例如R"delimiter((a-z))delimiter"等价于"(a-z)"。原始字串字面值能夠和寬字面值或是Unicode字面值結合：
+
+<syntaxhighlight lang="cpp">
+u8R"XXX(I'm a "raw UTF-8" string.)XXX"
+// uR"*@(This is a "raw UTF-16" string.)*@"    //visual studio not support '@'
+uR"*(This is a "raw UTF-16" string.)*"
+UR"(This is a "raw UTF-32" string.)"
+</syntaxhighlight>
+
+=== 用户定义字面量 ===
+標準C++提供了數種字面值。字元"12.5"是能夠被編譯器解釋為數值12.5的<tt>double</tt>型別字面值。然而，加上"f"的後置，像是"12.5f"，則會產生數值為12.5的<tt>float</tt>型別字面值。之前的C++規範中字面值的修饰符是固定的，C++代碼不能創立新的字面修饰符。
+
+C++11開放使用者定義新的字面修飾符（literal modifier），利用自訂的修飾符完成由字面值建構物件。
+
+字面值轉換可以定义為兩個階段：原始與轉換後（raw與cooked）。原始字面值指特定类型的字符序列，而轉換後的字面值則代表另一種型別。如字面值<tt>1234</tt>，原始字面值是<tt>'1', '2', '3', '4'</tt>的字符序列；而轉換後的字面值是整數值<tt>1234</tt>。另外，字面值<tt>0xA</tt>轉換前是序列<tt>'0', 'x', 'A'</tt>；轉換後代表整數值10。
+
+=== 多工記憶體模型 ===
+{{seealso|内存模型(computing)}}
+C++标准委员会计划统一对[[多线程|多緒編程]]的支援。
+
+这将涉及两个部分：第一、设计一个可以使多个线程在一个进程中共存的内存模型；第二、为线程之間的互動提供支援。第二部分将由程式庫提供支持，更多请看[[#緒程支援|緒程支援]]。
+
+在多个线程可能会访问相同内存的情形下，由一个内存模型对它们进行调度是非常有必要的。遵守模型规则的程序是被保证正确运行的，但违反规则的程序会发生不可预料的行为，这些行为依赖于[[编译器的最佳化|编译器的最佳化]]和記憶體一致性的问题。
+
+=== thread-local的存儲期限 ===
+在多緒環境下，讓各緒程擁有各自的變數是很普遍的。這已經存在於函式的區域變數，但是對於全域和靜態變數都還不行。
+
+新的''thread_local''存儲期限（在現行的''static''、''dynamic''和''automatic''之外）被作為下個標準而提出。緒程區域的存儲期限會藉由存儲指定字<code>thread_local</code>來表明。
+
+static物件(生命週期為整個程式的執行期間)的存儲期限可以被thread-local給替代。就如同其他使用static存儲期的變數，thread-local物件能夠以建構式初始化並以解構式摧毀。
+
+=== 使用或禁用物件的預設函式 ===
+
+在傳統C++中，若使用者沒有提供，則編譯器會自動為物件生成預設建構式(default constructor)、複製建構式（copy constructor），賦值運算子（copy assignment operator <tt>operator=</tt>）以及解構式（destructor）。另外，C++也為所有的類別定義了數個全域算子（如<tt>operator delete</tt>及<tt>operator new</tt>）。當使用者有需要時，也可以提供自訂的版本改寫上述的函式。
+
+問題在於原先的c++無法精確地控制這些預設函數的生成。比方說，要讓類別不能被拷貝，必須將複製建構式與賦值運算子宣告為private，並不去定義它們。嘗試使用這些未定義的函式會導致編譯期或連結期的錯誤。但這種手法並不是一個理想的解決方案。
+
+此外，編譯器產生的預設建構式與使用者定義的建構式無法同時存在。若使用者定義了任何建構式，編譯器便不會生成預設建構式；
+但有時同時帶有上述兩者提供的建構式也是很有用的。目前並沒有顯式指定編譯器產生預設建構式的方法。
+
+C++11允許顯式地表明採用或拒用編譯器提供的內建函式。例如要求類別帶有預設建構式，可以用以下的語法：
+
+<syntaxhighlight lang="cpp">
+struct SomeType
+{
+  SomeType() = default; // 預設建構式的顯式聲明
+  SomeType(OtherType value);
+};
+</syntaxhighlight>
+
+另一方面，也可以禁止編譯器自動產生某些函式。如下面的例子，類別不可複製：
+
+<syntaxhighlight lang="cpp">
+struct NonCopyable
+{
+  NonCopyable & operator=(const NonCopyable&) = delete;
+  NonCopyable(const NonCopyable&) = delete;
+  NonCopyable() = default;
+};
+</syntaxhighlight>
+
+禁止類別以<tt>operator new</tt>配置記憶體：
+<syntaxhighlight lang="cpp">
+struct NonNewable
+{
+  void *operator new(std::size_t) = delete;
+};
+</syntaxhighlight>
+
+此種物件只能生成於stack中或是當作其他類別的成員，它無法直接配置於heap之中，除非使用了與平台相關，不可移植的手法。（使用placement new算子雖然可以在用戶自配置的記憶體上呼叫物件建構式，但在此例中其他形式的new算子一併被上述的定義遮蔽（"name hiding"），所以也不可行。）
+
+<code>= delete</code>的聲明（同時也是定義）也能適用於非內建函式，禁止成員函式以特定的引數呼叫：
+<syntaxhighlight lang="cpp">
+struct NoDouble
+{
+  void f(int i);
+  void f(double) = delete;
+};
+</syntaxhighlight>
+若嘗試以double的引數呼叫<code>f()</code>，將會引發編譯期錯誤，編譯器不會自動將double引數轉型為int再呼叫<code>f()</code>。若要徹底的禁止以非int的引數呼叫<code>f()</code>，可以將<code>= delete</code>與模板相結合：
+<syntaxhighlight lang="cpp">
+struct OnlyInt
+{
+  void f(int i);
+  template<class T> void f(T) = delete;
+};
+</syntaxhighlight>
+
+=== <code>long long int</code>型別 ===
+在32位元系統上，一個<code>long long int</code>是保有至少64個有效位元的整數型別。[[C99|C99]]將這個型別引入了標準C中，目前大多數的C++編譯器也支援這種型別。C++11將把這種型別添加到標準C++中。
+
+=== 靜態assertion ===
+C++提供了兩種方法測試assertion（聲明）：巨集<code>assert</code>以及[[前處理器|前處理器]]指令<code>#error</code>。但是這兩者對於模版來說都不合用。巨集在執行期測試assertion，而前處理器指令則在前置處理時測試assertion，這時候模版還未能具現化。所以它們都不適合來測試牽扯到模板參數的相關特性。
+
+新的機能會引進新的方式可以在編譯期測試assertion，只要使用新的關鍵字<code>static_assert</code>。宣告採取以下的形式：
+ static_assert( ''constant-expression'', ''error-message'' ) ;
+
+這裡有一些如何使用<code>static_assert</code>的例子：
+<syntaxhighlight lang="cpp">
+static_assert( 3.14 < GREEKPI && GREEKPI < 3.15, "GREEKPI is inaccurate!" ) ;
+</syntaxhighlight>
+<syntaxhighlight lang="cpp">
+template< class T >
+struct Check
+{
+  static_assert( sizeof(int) <= sizeof(T), "T is not big enough!" ) ;
+} ;
+</syntaxhighlight>
+
+當常數表示式值為<code>false</code>時，編譯器會產生相應的錯誤訊息。第一個例子是前處理器指令<code>#error</code>的替代方案；第二個例子會在每個模板類別<code>Check</code>生成時檢查assertion。
+
+靜態assertion在模板之外也是相當有用的。例如，某個演算法的實作依賴於<code>long long</code>型別的大小比<code>int</code>還大，這是標準所不保證的。這種假設在大多數的系統以及編譯器上是有效的，但不是全部。
+
+=== 允許sizeof運算子作用在類別的資料成員上，無須明確的物件 ===
+C++98, <tt>sizeof</tt>只能对实例的变量或者类的静态成员进行操作，不能对类的非静态成员进行操作，若要想达成对类的非静态成员的操作，可以用如下ugly方式, 0强转成对象的指针，并解析访问对应非静态成员变量。 
+<syntaxhighlight lang="cpp">
+struct SomeType { OtherType member; };
+
+sizeof( (SomeType *)(0) ->member); //C++98
+
+sizeof(SomeType::member); // 直接由SomeType型別取得非靜態成員的大小，C++03不行。C++11允許
+</syntaxhighlight>
+
+這會傳回<tt>OtherType</tt>的大小。C++03並不允許這樣做，所以會引發編譯錯誤。C++11將會允許這種使用。
+
+=== 垃圾回收機制 ===
+是否會自動回收那些無法被使用到（unreachable）的動態分配物件由實作決定。
+
+参见<memory>头文件中的几个函数：
+* void declare_reachable(void* p);			
+* template<class T> T* undeclare_reachable(T *p) noexcept;			
+* void declare_no_pointers(char*p ,size_t n)noexcept;			
+* void undeclare_no_pointers(char*p ,size_t n) noexcept;
+
+== C++標準程式庫的變更 ==
+C++11標準[[程式庫|程式庫]]有數個新機能。其中許多可以在現行標準下實作，而另外一些則依賴於（或多或少）新的C++11核心語言機能。
+
+新的程式庫的大部分被定義於''[[TR1|C++標準委員會的Library Technical Report]]''（稱TR1），於2005年發布。各式TR1的完全或部分實作目前提供在[[命名空間|命名空間]]<code>std::tr1</code>。C++11會將其移置於命名空間<code>std</code>之下。
+
+=== 標準庫元件上的升級 ===
+目前的標準庫能受益於C++11新增的一些語言特性。舉例來說，對於大部份的標準庫容器而言，像是搬移內含大量元素的容器，或是容器之內對元素的搬移，基於[[右值引用|右值引用]]（Rvalue reference）的<code>move</code>建構子都能優化前述動作。在適當的情況下，標準庫元件將可利用C++11的語言特性進行升級。這些語言特性包含但不局限以下所列：
+* 右值引用和其相關的<code>move</code>支援
+* 支援UTF-16編碼，和UTF-32字元集
+* 變長參數模板（與右值引用搭配可以達成[[完美转发|完美转发]]（perfect forwarding））
+* 編譯期常數表達式
+* <code>Decltype</code>
+* 顯式型別轉換子
+* 使用或禁用物件的預設函式
+
+此外，自C++標準化之後已經過許多年。現有許多代碼利用到了標準庫;這同時揭露了部份的標準庫可以做些改良。其中之一是標準庫的記憶體配置器（allocator）。C++11將會加入一個基於作用域模型的記憶體配置器來支援現有的模型。
+
+=== 執行緒支援 ===
+雖然C++11會在語言的定義上提供一個記憶體模型以支援執行緒，但執行緒的使用主要將以C++11標準函式庫的方式呈現。
+
+C++11標準函式庫會提供類別<code>thread</code>（<code>std::thread</code>）。若要執行一個執行緒，可以建立一個類別<code>thread</code>的實體，其初始參數為一個函式物件，以及該函式物件所需要的參數。透過成員函式<code>std::thread::join()</code>對執行緒會合的支援，一個執行緒可以暫停直到其它執行緒執行完畢。若有底層平台支援，成員函式<code>std::thread::native_handle()</code>將可提供對原生執行緒物件執行平台特定的操作。
+
+對於執行緒間的同步，標準函式庫將會提供適當的互斥鎖（像是<code>std::mutex</code>，<code>std::recursive_mutex</code>等等）和條件變數（<code>std::condition_variable</code>和<code>std::condition_variable_any</code>）。前述同步機制將會以RAII鎖（<code>std::lock_guard</code>和<code>std::unique_lock</code>）和鎖相關演算法的方式呈現，以方便程式員使用。
+
+對於要求高效能，或是極底層的工作，有時或甚至是必須的，我們希望執行緒間的通訊能避免互斥鎖使用上的開銷。以原子操作來存取記憶體可以達成此目的。針對不同情況，我們可以透過顯性的記憶體屏障改變該存取記憶體動作的可見性。
+
+對於執行緒間非同步的傳輸，C++11標準函式庫加入了以及<code>std::packaged_task</code>用來包裝一個會傳回非同步結果的函式呼叫。因為缺少結合數個future的功能，和無法判定一組promise集合中的某一個promise是否完成，futures此一提案因此而受到了批評。
+
+更高級的執行緒支援，如執行緒池，已經決定留待在未來的Technical Report加入此類支援。更高級的執行緒支援不會是C++11的一部份，但設想是其最終實現將建立在目前已有的執行緒支援之上。
+
+<code>std::async</code>提供了一個簡便方法以用來執行執行緒，並將執行緒綁定在<code>std::future</code>。使用者可以選擇一個工作是要多個執行緒上非同步的執行，或是在一個執行緒上執行並等待其所需要的資料。預設的情況，實作可以根據底層硬體選擇前面兩個選項的其中之一。另外在較簡單的使用情形下，實作也可以利用執行緒池提供支援。
+
+=== 多元組型別 ===
+[[多元組|多元組]]是一個內由數個異質物件以特定順序排列而成的資料結構。多元組可被視為是<code>struct</code>其資料成員的一般化。
+
+由TR1演進而來的C++11多元組型別將受益於C++11某些特色像是[[可变參數模板|可变參數模板]]。TR1版本的多元組型別對所能容納的物件個數會因實作而有所限制，且實作上需要用到大量的巨集技巧。相反的，C++11版本的多元組型基本上於對其能容納的物件個數沒有限制。然而，編譯器對於模板實體化的遞迴深度上的限制仍舊影響了元組型別所能容納的物件個數（這是無法避免的情況）；C++11版本的多元組型不會把這個值讓使用者知道。
+
+使用[[可变參數模板|可变參數模板]]，多元組型別的宣告可以長得像下面這樣：
+<syntaxhighlight lang="cpp">
+template <class ...Types> class tuple;
+</syntaxhighlight>
+
+底下是一個多元組型別的定義和使用情況：
+<syntaxhighlight lang="cpp">
+typedef std::tuple <int, double, long &, const char *> test_tuple;
+long lengthy = 12;
+test_tuple proof (18, 6.5, lengthy, "Ciao!");
+
+lengthy = std::get<0>(proof);  // 將proof的第一個元素賦值給lengthy（索引從零開始起跳）
+std::get<3>(proof) = " Beautiful!";  // 修改proof的第四個元素
+</syntaxhighlight> 
+
+我們可以定義一個多元組型別物件<code>proof</code>而不指定其內容，前提是<code>proof</code>裡的元素其型別定義了預設建構子（default constructor）。此外，以一個多元組型別物件賦值給另一個多元組型別物件是可能的，但只有在以下情況：若這兩個多元組型別相同，則其內含的每一個元素其型別都要定義拷貝建構子（copy constructor）；否則的話，賦值操作符右邊的多元組其內含元素的型別必須能轉換成左邊的多元組其對應的元素型別，又或者賦值操作符左邊的多元組其內含元素的型別必須定義適當的建構子。
+<syntaxhighlight lang="cpp">
+std::tuple< int , double, string       > t1;
+std::tuple< char, short , const char * > t2 ('X', 2, "Hola!");
+t1 = t2 ;  // 可行。前兩個元素會作型別轉換，
+           // 第三個字串元素可由'const char *'所建構。
+</syntaxhighlight>
+
+多元組類型物件的比較運算是可行的（當它們擁有同樣數量的元素）。此外，C++11提供兩個表達式用來檢查多元組類型的一些特性（僅在編譯期做此檢查）。
+*<code>std::tuple_size<nowiki><T></nowiki>::value</code>回傳多元組<code>T</code>內的元素個數，
+*<code>std::tuple_element<nowiki><I, T></nowiki>::type</code>回傳多元組<code>T</code>內的第<code>I</code>個元素的型別
+
+=== 雜湊表 ===
+在過去，不斷有要求想將雜湊表（無序關聯式容器）引進標準庫。只因為時間上的限制，雜湊表才沒有被標準庫所採納。雖然，雜湊表在最糟情況下（如果出現許多衝突（collision）的話）在效能上比不過平衡樹。但實際運用上，雜湊表的表現則較佳。
+
+因為標準委員會還看不到有任何機會能將開放定址法標準化，所以目前衝突僅能透過[[#哈希表|鏈地址法（linear chaining）]]的方式處理。為避免與第三方函式庫發展的雜湊表發生名稱上的衝突，字首將採用unordered而非hash。
+
+函式庫將引進四種雜湊表，其中差別在於底下兩個特性：是否接受具相同鍵值的項目（Equivalent keys），以及是否會將鍵值映射到相對應的資料（Associated values）。
+
+{| class="wikitable" style="text-align: center"
+! 雜湊表類型 !! 有無關聯值 !! 接受相同鍵值
+|-
+| style="text-align: left" | <code>std::unordered_set</code>      || {{no}}  || {{no}}
+|-
+| style="text-align: left" | <code>std::unordered_multiset</code> || {{no}} || {{yes}}
+|-
+| style="text-align: left" | <code>std::unordered_map</code>      || {{yes}} || {{no}}
+|-
+| style="text-align: left" | <code>std::unordered_multimap</code> || {{yes}} || {{yes}}
+|}
+
+上述的類別將滿足對一個容器類別的要求，同時也提供存取其中元素的成員函式：<code>insert</code>，<code>erase</code>，<code>begin</code>，<code>end</code>。
+
+雜湊表不需要對現有核心語言做擴展（雖然雜湊表的實作會利用到C++11新的語言特性），只會對標頭檔<code><nowiki><functional></nowiki></code>做些許擴展，並引入<code><nowiki><unordered_set></nowiki></code>和<code><nowiki><unordered_map></nowiki></code>兩個標頭檔。對於其它現有的類別不會有任何修改。同時，雜湊表也不會依賴其它標準庫的擴展功能。
+
+=== 正規表示式 ===
+過去許多或多或少標準化的程式庫被建立用來處理[[正規表示式|正規表示式]]。有鑑於這些演算法的使用非常普遍，因此標準程式庫將會包含他們，並使用各種[[物件導向語言|物件導向語言]]的潛力。
+
+這個新的程式庫，被定義於<code><nowiki><regex></nowiki></code>標頭檔，由幾個新的類別所組成：
+* 正規表示式（樣式）以樣板類<code>basic_regex</code>的實體表示
+* 樣式匹配的情況以樣板類<code>match_results</code>的實體表示
+函式<code>regex_search</code>是用來搜尋樣式；若要搜尋並取代，則要使用函式<code>regex_replace</code>，該函式會回傳一個新的字串。演算法<code>regex_search</code>和<code>regex_replace</code>接受一個正規表示式（樣式）和一個字串，並將該樣式匹配的情況儲存在struct <code>match_results</code>。
+
+底下描述了<code>match_results</code>的使用情況：
+<syntaxhighlight lang="cpp">
+const char *reg_esp = "[ ,.\\t\\n;:]" ;  // 分隔字元列表
+
+std::regex rgx(reg_esp) ;  // 'regex'是樣板類'basic_regex'以型別為'char' 
+                           //  的參數具現化的實體
+std::cmatch match ;  // 'cmatch'是樣板類match_results'以型別為'const char *'
+                     // '的參數具現化的實體
+const char *target = "Polytechnic University of Turin " ;
+
+// 辨別所有被分隔字元所分隔的字
+if( regex_search( target, match, rgx ) )
+{
+  // 若此種字存在
+
+  const size_t n = match.size();
+  for( size_t a = 0 ; a < n ; a++ )
+  {
+    string str( match[a].first, match[a].second ) ;
+    cout << str << "\n" ;
+  }
+}
+</syntaxhighlight>
+
+注意雙反斜線的使用，因為C++將反斜線作為跳脫字元使用。但C++11的[[#新的字串字面值|raw string]]可以用來避免此一問題。函式庫<regex>不需要改動到現有的標頭檔，同時也不需要對現有的語言作擴展。
+
+=== 通用智能指針 ===
+這些指針是由TR1智能指標演變而來。注意! 智能指針是類別而非一般指標。
+
+<code>shared_ptr</code>是一引用計數（reference-counted）指針，其行為與一般C++指標极為相似。在TR1的實作中，缺少了一些一般指針所擁有的特色，像是別名或是指標運算。C++11新增前述特色。
+
+一個<code>shared_ptr</code>只有在已經沒有任何其它<code>shared_ptr</code>指向其原本所指向物件時，才會銷毀該物件。
+
+一個<code>weak_ptr</code>指向的是一個被<code>shared_ptr</code>所指向的物件。該<code>weak_ptr</code>可以用來決定該物件是否已被銷毀。<code>weak_ptr</code>不能被解參考;想要存取其內部所保存的指針，只能透過<code>shared_ptr</code>。有兩種方法可達成此目的。第一，類別<code>shared_ptr</code>有一個以<code>weak_ptr</code>為參數的建構子。第二，類別<code>weak_ptr</code>有一個名為<code>lock</code>的成員函式，其返回值為一個<code>shared_ptr</code>。<code>weak_ptr</code>並不擁有它所指向的物件，因此不影響該物件的銷毀與否。
+
+底下是一個<code>shared_ptr</code>的使用範例：
+
+<syntaxhighlight lang="cpp">
+int main( )
+{
+    std::shared_ptr<double> p_first(new double) ;
+
+    {
+        std::shared_ptr<double> p_copy = p_first ;
+
+        *p_copy = 21.2;
+
+    }  // 此時'p_copy'會被銷毀，但動態分配的double不會被銷毀。
+
+    return 0;  // 此時'p_first'會被銷毀，動態分配的double也會被銷毀（因為不再有指針指向它）。
+}
+</syntaxhighlight>
+
+<code>auto_ptr</code>將會被C++標準所廢棄，取而代之的是<code>unique_ptr</code>。<code>unique_ptr</code>提供<code>auto_ptr</code>大部份特性，唯一的例外是<code>auto_ptr</code>的不安全、隱性的左值搬移。不像<code>auto_ptr</code>，<code>unique_ptr</code>可以存放在C++11提出的那些能察覺搬移動作的容器之中。
+
+=== 可扩展的随机数功能 ===
+C标准库允许使用<code>rand</code>函数来生成[[伪随机数|伪随机数]]。不過其演算法則取決於各程式庫開发者。C++直接從C繼承了這部份，但是C++11將會提供產生偽亂數的新方法。
+
+C++11的随机数功能分为两部分：第一，一個亂數生成引擎，其中包含該生成引擎的狀態，用來產生亂數。第二，一個分布，這可以用來決定產生亂數的範圍，也可以決定以何種分布方式產生亂數。亂數生成物件即是由亂數生成引擎和分布所構成。
+
+不同於C標準庫的<code>rand</code>;針對產生亂數的機制，C++11將會提供三種演算法，每一種演算法都有其強項和弱項：
+
+{| class="wikitable"
+! 樣板類 !! 整數/浮點數 !! 品質 !! 速度!! 狀態數*
+|-
+! linear_congruential
+| align="center" | 整數 || align="center" | 低 || align="center" | 中等{{Fact|time=2009-4-26}} || align="center" | 1
+|-
+! subtract_with_carry
+| align="center" | 兩者皆可 || align="center" | 中等 || align="center" | 快 || align="center" | 25
+|-
+! mersenne_twister
+| align="center" | 整數 || align="center" | 佳 || align="center" | 快 || align="center" | 624
+|}
+
+C++11將會提供一些標準分布：uniform_int_distribution（[[離散型均勻分佈|離散型均勻分佈]]），bernoulli_distribution([[伯努利分布|伯努利分布]]），geometric_distribution（[[幾何分佈|幾何分佈]]），poisson_distribution（[[卜瓦松分佈|卜瓦松分佈]]），binomial_distribution（[[二項分佈|二項分佈]]），uniform_real_distribution（[[離散型均勻分佈|離散型均勻分佈]])，exponential_distribution（[[指数分布|指数分布]]），normal_distribution（[[常態分佈|常態分佈]]）和gamma_distribution（[[伽玛分布|伽玛分布]]）。
+
+底下描述一個亂數生成物件如何由亂數生成引擎和分布構成：
+
+<syntaxhighlight lang="cpp">
+std::uniform_int_distribution<int> distribution(0, 99); // 以離散型均勻分佈方式產生int亂數，範圍落在0到99之間
+std::mt19937 engine; // 建立亂數生成引擎
+auto generator = std::bind(distribution, engine); // 利用bind將亂數生成引擎和分布組合成一個亂數生成物件
+int random = generator();  // 產生亂數
+</syntaxhighlight>
+
+=== 包装引用 ===
+我們可以透過實體化樣板類<code>reference_wrapper</code>得到一個包装引用（wrapper reference）。包装引用類似於一般的引用。對於任意物件，我們可以透過模板類<code>ref</code>得到一個包装引用（至於constant reference則可透過<code>cref</code>得到）。
+
+當樣板函式需要形參的引用而非其拷貝，這時包装引用就能派上用場：
+<syntaxhighlight lang="cpp">
+// 此函數將得到形參'r'的引用並對r加一
+void f (int &r)  { r++; }
+
+// 樣板函式
+template<class F, class P> void g (F f, P t)  { f(t); }
+
+int main()
+{
+    int i = 0 ;
+    g (f, i) ;  // 實體化'g<void (int &r), int>' 
+                // 'i'不會被修改
+    std::cout << i << std::endl;  // 輸出0
+
+    g (f, std::ref(i));  // 實體化'g<void(int &r),reference_wrapper<int>>'
+                         // 'i'會被修改
+    std::cout << i << std::endl;  // 輸出1
+}
+</syntaxhighlight>
+
+這項功能將加入標頭檔<code><functional></code>之中，而非透過擴展語言來得到這項功能。
+
+=== 多态函数对象包装器 ===
+針對函数对象的多态包装器（又稱多态函数对象包装器）在語義和語法上和函式指標相似，但不像函式指標那麼狹隘。只要能被呼叫，且其參數能與包裝器相容的都能以多态函数对象包装器稱之（函式指標，成員函式指標或仿函式）。
+
+透過以下例子，我們可以了解多态函数对象包装器的特性：
+<syntaxhighlight lang="cpp">
+std::function<int (int, int)> func;  // 利用樣板類'function'
+                                     // 建立包裝器
+std::plus<int> add;  // 'plus'被宣告為'template<class T> T plus( T, T ) ;'
+                     //  因此'add'的型別是'int add( int x, int y )'
+func = &add;  // 可行。'add'的型參和回返值型別與'func'相符
+ 
+int a = func (1, 2);  // 注意：若包裝器'func'沒有參考到任何函式
+                      // 會丟出'std::bad_function_call'例外
+
+std::function<bool (short, short)> func2 ;
+if(!func2) { // 因為尚未賦值與'func2'任何函式，此條件式為真
+
+    bool adjacent(long x, long y);
+    func2 = &adjacent ;  // 可行。'adjacent'的型參和回返值型別可透過型別轉換進而與'func2'相符
+  
+    struct Test {
+        bool operator()(short x, short y);
+    };
+    Test car;
+    func = std::ref(car);  // 樣板類'std::ref'回傳一個struct 'car'
+                           // 其成員函式'operator()'的包裝
+}
+func = func2;  // 可行。'func2'的型參和回返值型別可透過型別轉換進而與'func'相符
+</syntaxhighlight>
+
+模板類<code>function</code>將定義在標頭檔<code><nowiki><functional></nowiki></code>，而不須更動到語言本身。
+
+=== 用於元編程的型別屬性 ===
+對於那些能自行創建或修改本身或其它程式的程式，我們稱之為[[元編程|元編程]]。這種行為可以發生在編譯或執行期。C++標準委員會已經決定引進一組由[[模板|模板]]實現的函式庫，程式員可利用此一函式庫於編譯期進行元編程。
+
+底下是一個以元編程來計算指數的例子：
+
+<syntaxhighlight lang="cpp">
+template<int B, int N>
+struct Pow {
+    // recursive call and recombination.
+    enum{ value = B*Pow<B, N-1>::value };
+};
+
+template< int B > 
+struct Pow<B, 0> { 
+    // ''N == 0'' condition of termination.
+    enum{ value = 1 };
+};
+int quartic_of_three = Pow<3, 4>::value;
+</syntaxhighlight>
+
+許多演算法能作用在不同的資料型別；C++模板支援[[泛型|泛型]]，這使得代碼能更緊湊和有用。然而，演算法經常會需要目前作用的資料型別的資訊。這種資訊可以透過型別屬性（<code>type traits</code>）於模板實體化時將該資訊萃取出來。
+
+型別屬性能識別一個物件的種類和有關一個型別（class或struct）的特徵。標頭檔<code><nowiki><type_traits></nowiki></code>描述了我們能識別那些特徵。
+
+底下的例子說明了模板函式‘elaborate’是如何根據給定的資料型別，從而實體化某一特定的演算法（<code>algorithm.do_it</code>）。
+
+<syntaxhighlight lang="cpp">
+// 演算法一
+template< bool B > struct Algorithm {
+    template<class T1, class T2> static int do_it (T1 &, T2 &)  { /*...*/ }
+};
+
+// 演算法二
+template<> struct Algorithm<true> {
+    template<class T1, class T2> static int do_it (T1, T2)  { /*...*/ }
+};
+
+// 根據給定的型別，實體化之後的'elaborate'會選擇演算法一或二
+template<class T1, class T2> 
+int elaborate (T1 A, T2 B) 
+{
+    // 若T1為int且T2為float，選用演算法二
+    // 其它情況選用演算法一
+    return Algorithm<std::is_integral<T1>::value && std::is_floating_point<T2>::value>::do_it( A, B ) ;
+}
+</syntaxhighlight> 
+
+此種編程技巧能寫出優美、簡潔的代碼；然而除錯是此種編程技巧的弱處：編譯期的錯誤訊息讓人不知所云，執行期的除錯更是困難。
+
+=== 用于计算函数对象返回类型的统一方法 ===
+要在編譯期決定一個樣板仿函式的回返值型別並不容易，特別是當回返值依賴於函式的參數時。舉例來說：
+<syntaxhighlight lang="cpp">
+struct Clear {
+    int    operator()(int);     // 參數與回返值的型別相同
+    double operator()(double);  // 參數與回返值的型別相同
+};
+
+template <class Obj> 
+class Calculus {
+public:
+    template<class Arg> Arg operator()(Arg& a) const
+    {
+        return member(a);
+    }
+private:
+    Obj member;
+};
+</syntaxhighlight>
+
+實體化樣板類<code>Calculus<nowiki><Clear></nowiki></code>，<code>Calculus</code>的仿函式其回返值總是和<code>Clear</code>的仿函式其回返值具有相同的型別。然而，若給定類別<code>Confused</code>:
+<syntaxhighlight lang="cpp">
+struct Confused {
+    double operator()(int);     // 參數與回返值的型別不相同
+    int    operator()(double);  // 參數與回返值的型別不相同
+};
+</syntaxhighlight>
+企圖實體化樣板類Calculus<Confused>將導致Calculus的仿函式其回返值和類別Confused的仿函式其回返值有不同的型別。對於<code>int</code>和<code>double</code>之間的轉換，編譯器將給出警告。
+
+模板<code>std::result_of</code>被TR1引進且被C++11所採納，可允許我們決定和使用一個仿函式其回返值的型別。底下，<code>CalculusVer2</code>物件使用<code>std::result_of</code>物件來推導其仿函式的回返值型別：
+<syntaxhighlight lang="cpp">
+template< class Obj >
+class CalculusVer2 {
+public:
+    template<class Arg>
+    typename std::result_of<Obj(Arg)>::type operator()(Arg& a) const
+    { 
+        return member(a);
+    }
+private:
+    Obj member;
+};
+</syntaxhighlight>
+如此一來，在實體化<code>CalculusVer2<nowiki><Confused></nowiki></code>其仿函式時，不會有型別轉換，警告或是錯誤發生。
+
+模板<code>std::result_of</code>在TR1和C++11有一點不同。TR1的版本允許實作在特殊情況下，可以無法決定一個函式呼叫其回返值型別。然而，因為C++11支持了[[decltype|decltype]]，實作被要求在所有情況下，皆能計算出回返值型別。
+
+=== iota 函数 ===
+{{main|iota函数}}
+iota 函数可将给定区间的值设定为从某值开始的连续值，例如将连续十个整数设定为从 1 开始的连续整数（即 1、2、3、4、5、6、7、8、9、10）。
+<syntaxhighlight lang="c++">
+#include <iostream>
+#include <array>
+#include <numeric>
+
+std::array<int, 10> ai;
+std::iota(ai.begin(), ai.end(), 1);
+for(int i: ai){
+  std::cout<<i<<" ";//1 2 3 4 5 6 7 8 9 10 
+}
+</syntaxhighlight>
+== 已被移除或是不包含在C++11標準的特性 ==
+預計由Technical Report提供支援：
+* [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2316.pdf 模組]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2316.pdf |date=20110727150409 }}
+* 十進制型別
+* 数学专用函数
+
+延後討論：
+* Concepts（[[概念_(C++)|概念 (C++)]]）
+* 更完整或必備的垃圾回收支援
+* Reflection
+* Macro Scopes
+
+== 被移除或廢棄的特性 ==
+* 循序點（[[顺序点|sequence point]]），這個術語正被更為易懂的描述所取代。一個運算可以發生（is sequenced before）在另一個運算之前;又或者兩個運算彼此之間沒有順序關係（are unsequenced）。
+* export
+* [[异常处理|exception specification]]s
+* {{tsl|en|std::auto ptr|std::auto_ptr}}被'''std::unique_ptr'''取代。
+* 仿函式基底類別 (std::unary_function, std::binary_function)、函式指針適配器、類別成員指針適配器以及綁定器 (binder)。
+
+== 编译器实现 ==
+C++编译器对C++11新特性的支持情况：
+* [[Visual_C++|Visual C++]] 2010：[http://blogs.msdn.com/b/vcblog/archive/2010/04/06/c-0x-core-language-features-in-vc10-the-table.aspx C++0x Core Language Features In VC10: The Table]{{Wayback|url=http://blogs.msdn.com/b/vcblog/archive/2010/04/06/c-0x-core-language-features-in-vc10-the-table.aspx |date=20110707194344 }}
+* [[Visual_C++|Visual C++]] 2010与[[Visual_C++|Visual C++]] 2012支持的C++11特性的对比列表：[http://msdn.microsoft.com/en-us/library/vstudio/hh567368.aspx C++11 Features (Modern C++)]{{Wayback|url=http://msdn.microsoft.com/en-us/library/vstudio/hh567368.aspx |date=20130802012107 }}
+* [[Visual_C++|Visual C++]] 2013支持的C++11特性的对比列表：[https://msdn.microsoft.com/zh-cn/library/hh567368.aspx C++11 Features (Modern C++)]{{Wayback|url=https://msdn.microsoft.com/zh-cn/library/hh567368.aspx |date=20150722051731 }}
+* [[Visual_C++|Visual C++]] 2015预览版支持的C++11/14/17特性的对比列表：[http://blogs.msdn.com/b/c/archive/2015/01/29/vs2015-c-11-14-17.aspx VC2015 Preview语言特性列表 ]{{Wayback|url=http://blogs.msdn.com/b/c/archive/2015/01/29/vs2015-c-11-14-17.aspx |date=20150722012420 }} 
+* [[GCC|GCC]] 4.8.1已实现C++11标准的所有主要语言特性：[http://gcc.gnu.org/gcc-4.8/cxx0x_status.html Status of Experimental C++11 Support in GCC 4.8]{{Wayback|url=http://gcc.gnu.org/gcc-4.8/cxx0x_status.html |date=20130518050847 }}
+
+== 關聯項目 ==
+* [[C++_Technical_Report_1|C++ Technical Report 1]]
+* [[C11|C11]]，C程式語言的最新標準
+* [[C++17|C++17]]，C++的最新標準
+* [[Constexpr|Constexpr]]，用於編譯時的常量與常量函數。
+
+== 參考資料 ==
+{{reflist|2}}
+
+=== C++標準委員會文件 ===
+* {{note|n1401}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2002/n1401.pdf  1401]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2002/n1401.pdf |date=20110728051516 }}: Jan Kristoffersen（2002年10月21日）''Atomic operations with multi-threaded environments''
+* {{note|n1402}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2002/n1402.html 1402]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2002/n1402.html |date=20110520201155 }}: Doug Gregor（2002年10月22日）''A Proposal to add a Polymorphic Function Object Wrapper to the Standard Library''
+* {{note|n1403}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2002/n1403.pdf  1403]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2002/n1403.pdf |date=20110520195642 }}: Doug Gregor（2002年11月8日）''Proposal for adding tuple types into the standard library''
+* {{note|n1424}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1424.htm  1424]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1424.htm |date=20110520184557 }}: John Maddock（2003年3月3日）''A Proposal to add Type Traits to the Standard Library''
+* {{note|n1429}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1429.htm  1429]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1429.htm |date=20110520170836 }}: John Maddock（2003年3月3日）''A Proposal to add Regular Expression to the Standard Library''
+* {{note|n1449}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1449.pdf  1449]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1449.pdf |date=20110728051552 }}: B. Stroustrup, G. Dos Reis, Mat Marcus, Walter E. Brown, Herb Sutter（2003年4月7日）''Proposal to add template aliases to C++''
+* {{note|n1450}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1450.html 1450]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1450.html |date=20110514162213 }}: P. Dimov, B. Dawes, G. Colvin（2003年3月27日）''A Proposal to Add General Purpose Smart Pointers to the Library Technical Report (Revision 1)''
+* {{note|n1452}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1452.html 1452]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1452.html |date=20110520171216 }}: Jens Maurer (April 10, 2003) ''A Proposal to Add an Extensible Random Number Facility to the Standard Library (Revision 2)''
+* {{note|n1453}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1453.html 1453]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1453.html |date=20110520200108 }}: D. Gregor, P. Dimov (April 9, 2003) ''A proposal to add a reference wrapper to the standard library (revision 1)''
+* {{note|n1454}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1454.html 1454]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1454.html |date=20110520205239 }}: Douglas Gregor, P. Dimov (April 9, 2003) ''A uniform method for computing function object return types (revision 1)''
+* {{note|n1456}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1456.html 1456]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1456.html |date=20110520171153 }}: Matthew Austern (April 9, 2003) ''A Proposal to Add Hash Tables to the Standard Library (revision 4)''
+* {{note|n1471}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1471.pdf  1471]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2003/n1471.pdf |date=20110728050943 }}: Daveed Vandevoorde (April 18, 2003) ''Reflective Metaprogramming in C++''
+* {{note|n1676}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1676.htm  1676]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1676.htm |date=20110728051935 }}: Bronek Kozicki (September 9, 2004) ''Non-member overloaded copy assignment operator''
+* {{note|n1704}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1704.pdf  1704]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1704.pdf |date=20110728051301 }}: Douglas Gregor, Jaakko Järvi, Gary Powell (September 10, 2004) ''Variadic Templates: Exploring the Design Space''
+* {{note|n1705}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1705.pdf  1705]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1705.pdf |date=20090704105244 }}: J. Järvi, B. Stroustrup, D. Gregor, J. Siek, G. Dos Reis (September 12, 2004) ''Decltype (and auto)''
+* {{note|n1717}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1717.pdf  1717]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1717.pdf |date=20110728051041 }}: Francis Glassborow, Lois Goldthwaite (November 5, 2004) ''explicit class and default definitions''
+* {{note|n1719}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1719.pdf  1719]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1719.pdf |date=20110728051245 }}: Herb Sutter, David E. Miller (October 21, 2004) ''Strongly Typed Enums (revision 1)''
+* {{note|n1720}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1720.html 1720]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1720.html |date=20110520164923 }}: R. Klarer, J. Maddock, B. Dawes, H. Hinnant (October 20, 2004) ''Proposal to Add Static Assertions to the Core Language (Revision 3)''
+* {{note|n1757}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1757.html 1757]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1757.html |date=20110412040406 }}: Daveed Vandevoorde (January 14, 2005) ''Right Angle Brackets (Revision 2)''
+* {{note|n1811}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1811.pdf  1811]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1811.pdf |date=20110520154527 }}: J. Stephen Adamczyk (April 29, 2005) ''Adding the long long type to C++ (Revision 3)''
+* {{note|n1815}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1815.html 1815]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1815.html |date=20110728050824 }}: Lawrence Crowl (May 2, 2005) ''ISO C++ Strategic Plan for Multithreading''
+* {{note|n1827}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1827.htm 1827]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1827.htm |date=20110728051125 }}: Chris Uzdavinis, Alisdair Meredith (August 29, 2005) ''An Explicit Override Syntax for C++''
+* {{note|n1834}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1834.html 1834]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1834.html |date=20110628094549 }}: Detlef Vollmann (June 24, 2005) ''A Pleading for Reasonable Parallel Processing Support in C++''
+* {{note|n1836}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf  1836]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf |date=20110414134932 }}: ISO/IEC DTR 19768 (June 24, 2005) ''Draft Technical Report on C++ Library Extensions''
+* {{note|n1886}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1886.pdf  1886]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1886.pdf |date=20110728051536 }}: Gabriel Dos Reis, Bjarne Stroustrup (October 20, 2005) ''Specifying C++ concepts''
+* {{note|n1891}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1891.pdf  1891]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1891.pdf |date=20110728051329 }}: Walter E. Brown (October 18, 2005) ''Progress toward Opaque Typedefs for C++0X''
+* {{note|n1898}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1898.pdf  1898]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1898.pdf |date=20110709135753 }}: Michel Michaud, Michael Wong (October 6, 2004) ''Forwarding and inherited constructors''
+* {{note|n1919}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1919.pdf  1919]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1919.pdf |date=20110709140246 }}: Bjarne Stroustrup, Gabriel Dos Reis (December 11, 2005) ''Initializer lists''
+* {{note|n1968}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n1968.pdf  1968]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n1968.pdf |date=20110728051114 }}: V Samko; J Willcock, J Järvi, D Gregor, A Lumsdaine (February 26, 2006) ''Lambda expressions and closures for C++''
+* {{note|n1986}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n1986.pdf  1986]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n1986.pdf |date=20110728051350 }}: Herb Sutter, Francis Glassborow (April 6, 2006) ''Delegating Constructors (revision 3)''
+* {{note|n2016}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n2016.html 2016]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n2016.html |date=20180617204548 }}: Hans Boehm, Nick Maclaren (April 21, 2002) ''Should volatile Acquire Atomicity and Thread Visibility Semantics?''
+* {{note|n2142}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2142.html 2142]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2142.html |date=20110728052403 }}: ISO/IEC DTR 19768 (January 12, 2007) ''State of C++ Evolution (between Portland and Oxford 2007 Meetings)''
+* {{note|n2228}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2228.html 2228]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2228.html |date=20110728051058 }}: ISO/IEC DTR 19768 (May 3, 2007) ''State of C++ Evolution (Oxford 2007 Meetings)''
+* {{note|n2258}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2258.pdf  2258]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2258.pdf |date=20110520164402 }}: G. Dos Reis and B. Stroustrup ''Templates Aliases''
+* {{note|n2280}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2280.html 2280]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2280.html |date=20110626031534 }}: Lawrence Crowl (May 2, 2007) ''Thread-Local Storage''
+* {{note|n2291}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2291.html 2291]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2291.html |date=20110728052146 }}: ISO/IEC DTR 19768 (June 25, 2007) ''State of C++ Evolution (Toronto 2007 Meetings)''
+* {{note|n2336}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2336.html 2336]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2336.html |date=20110728051523 }}: ISO/IEC DTR 19768 (July 29, 2007) ''State of C++ Evolution (Toronto 2007 Meetings)''
+* {{note|n2389}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2389.html 2389]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2389.html |date=20110728051911 }}: ISO/IEC DTR 19768 (August 7, 2007) ''State of C++ Evolution (pre-Kona 2007 Meetings)''
+* {{note|n2431}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2431.pdf 2431]{{WebCite|url=https://www.webcitation.org/65NGO4mjK?url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2431.pdf |date=20120211142205 |dateformat=iso }}: SC22/WG21/N2431 = J16/07-0301 (October 2, 2007), ''A name for the null pointer: nullptr''
+* {{note|n2432}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2432.html 2432]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2432.html |date=20110306095322 }}: ISO/IEC DTR 19768 (October 23, 2007) ''State of C++ Evolution (post-Kona 2007 Meeting)''
+* {{note|n2437}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2437.pdf  2437]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2437.pdf |date=20110728052133 }}: Lois Goldthwaite (October 5, 2007) ''Explicit Conversion Operators''
+* {{note|n2461}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2461.pdf  2461]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2461.pdf |date=20110112094507 }}: ISO/IEC DTR 19768 (October 22, 2007) ''Working Draft, Standard for programming Language C++''
+* {{note|n2507}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2507.html 2507]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2507.html |date=20090220044649 }}: ISO/IEC DTR 19768 (February 4, 2008) ''State of C++ Evolution (pre-Bellevue 2008 Meeting)''
+* {{note|n2544}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2544.pdf  2544]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2544.pdf |date=20081221083351 }}: Alan Talbot, Lois Goldthwaite, Lawrence Crowl, Jens Maurer (February 29, 2008) ''Unrestricted unions''
+* {{note|n2565}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2565.html 2565]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2565.html |date=20090126235607 }}: ISO/IEC DTR 19768 (March 7, 2008) ''State of C++ Evolution (post-Bellevue 2008 Meeting)''
+* {{note|n2597}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2597.html 2597]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2597.html |date=20090126235701 }}: ISO/IEC DTR 19768 (April 29, 2008) ''State of C++ Evolution (pre-Antipolis 2008 Meeting)''
+* {{note|n2606}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2606.pdf  2606]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2606.pdf |date=20081006164955 }}: ISO/IEC DTR 19768 (May 19, 2008) ''Working Draft, Standard for Programming Language C++''
+* {{note|n2697}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2697.html 2697]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2697.html |date=20110520221904 }}: ISO/IEC DTR 19768 (June 15, 2008) ''Minutes of WG21 Meeting June 8–15, 2008''
+* {{note|n2798}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2798.pdf  2798]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2798.pdf |date=20090124045029 }}: ISO/IEC DTR 19768 (October 4, 2008) ''Working Draft, Standard for Programming Language C++''
+* {{note|n2857}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2857.pdf  2857]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2857.pdf |date=20110728050828 }}: ISO/IEC DTR 19768 (March 23, 2009) ''Working Draft, Standard for Programming Language C++''
+* {{note|n2869}} Doc No. [http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2009/n2869.html 2869]{{Wayback|url=http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2009/n2869.html |date=20110304043512 }}: ISO/IEC DTR 19768 (April 28, 2009) ''State of C++ Evolution (post-San Francisco 2008 Meeting)''
+* {{note|n3000}} Doc No. [http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2009/n3000.pdf 3000]{{Wayback|url=http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2009/n3000.pdf |date=20110728051402 }}: ISO/ISC DTR 19769 (November 9, 2009) ''Working Draft, Standard for Programming Language C++''
+* {{note|n3014}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n3014.pdf 3014]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n3014.pdf |date=20110520222200 }}: Stephen D. Clamage (November 4, 2009) ''AGENDA, PL22.16 Meeting No. 53, WG21 Meeting No. 48, March 8–13, 2010, Pittsburgh, PA''
+* {{note|n3082}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2010/n3082.pdf 3082]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2010/n3082.pdf |date=20110728051131 }}: Herb Sutter（2010年3月13日）''C++0x Meeting Schedule''
+* {{note|n3092}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2010/n3092.pdf 3092]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2010/n3092.pdf |date=20110501150416 }}: ISO/ISC DTR 19769（2010年3月26日）''Working Draft, Standard for Programming Language C++''
+* {{note|n3126}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2010/n3126.pdf 3126]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2010/n3126.pdf |date=20100926034946 }}: ISO/ISC DTR 19769（2010年8月21日）''Working Draft, Standard for Programming Language C++''
+* {{note|n3225}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2010/n3225.pdf 3225]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2010/n3225.pdf |date=20110728052254 }}: ISO/ISC DTR 19769（2010年11月27日）''Working Draft, Standard for Programming Language C++''
+* {{note|n3242}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2011/n3242.pdf 3242]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2011/n3242.pdf |date=20110313023443 }}: ISO/ISC DTR 19769（2011年2月28日）''Working Draft, Standard for Programming Language C++''
+* {{note|n3290}} Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2011/n3290.pdf 3290]{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }}: ISO/ISC DTR 19769（2011年4月11日）''Working Draft, Standard for Programming Language C++''
+
+=== 文章 ===
+* {{note label|strousup-brieflook|1|a}}{{note label|strousup-brieflook|1|b}} The C++ Source Bjarne Stroustrup（2006年1月2日）''A Brief Look at C++0x''
+* {{note|strousup-designof}} C/C++ Users Journal Bjarne Stroustrup (May, 2005) ''The Design of C++0x: Reinforcing C++’s proven strengths, while moving into the future''
+* Web Log di Raffaele Rialdi（2005年9月16日）''Il futuro di C++ raccontato da Herb Sutter''
+* [[Informit.com|Informit.com]]（2006年8月5日）''The Explicit Conversion Operators Proposal''
+* Informit.com（2006年7月25日）''Introducing the Lambda Library''
+* Dr. Dobb's Portal Pete Becker（2006年4月11日）''Regular Expressions TR1's regex implementation''
+* Informit.com（2006年7月25日）''The Type Traits Library''
+* Dr. Dobb's Portal Pete Becker（2005年5月11日）''C++ Function Objects in TR1''
+* The C++ Source Howard E. Hinnant, Bjarne Stroustrup, and Bronek Kozicki（2008年3月10日）[http://www.artima.com/cppsource/rvalue.html A Brief Introduction to Rvalue References]{{Wayback|url=http://www.artima.com/cppsource/rvalue.html |date=20090202090503 }}
+* DevX.com Special Report（2008年8月18日）[http://www.devx.com/SpecialReports/Door/38865 C++0x: The Dawning of a New Standard]{{Wayback|url=http://www.devx.com/SpecialReports/Door/38865 |date=20090215175027 }}
+
+== 外部連結 ==
+* [http://www.open-std.org/jtc1/sc22/wg21/ '''The C++ Standards''' Committee]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/ |date=20180110175536 }}
+* [http://www.research.att.com/~bs/ Bjarne Stroustrup's homepage]{{Wayback|url=http://www.research.att.com/~bs/ |date=20090208232052 }}
+* [https://web.archive.org/web/20080221185141/http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=216 C++0X: The New Face of Standard C++]
+* [http://herbsutter.wordpress.com/ Herb Sutter's blog coverage of C++0X]{{Wayback|url=http://herbsutter.wordpress.com/ |date=20090204101420 }}
+* [http://www.csclub.uwaterloo.ca/media/C++0x%20-%20An%20Overview.html A talk on C++0x given by Bjarne Stroustrup at the University of Waterloo]{{Wayback|url=http://www.csclub.uwaterloo.ca/media/C++0x%20-%20An%20Overview.html |date=20090123171916 }}
+* [http://www.pvv.org/~oma/cpp0x_aquadi_nov_2007.pdf A quick and dirty introduction to C++0x (as of November 2007)]{{Wayback|url=http://www.pvv.org/~oma/cpp0x_aquadi_nov_2007.pdf |date=20081006120850 }}
+* [http://www.devx.com/SpecialReports/Article/38813/0/page/1 The State of the Language: An Interview with Bjarne Stroustrup (August 15, 2008)]{{Wayback|url=http://www.devx.com/SpecialReports/Article/38813/0/page/1 |date=20090131065906 }}
+* [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2798.pdf Working draft for the C++ language, October 4, 2008]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2798.pdf |date=20090124045029 }}
+
+{{C++}}
+
+[[Category:C++|Category:C++]]
+[[Category:编程语言标准|Category:编程语言标准]]

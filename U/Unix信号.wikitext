@@ -1,0 +1,202 @@
+{{expand language|en|page=Signal (IPC)|time=2020-01-10T16:20:10+00:00}}{{noteTA|G1=IT}}
+在计算机科学中，'''信号'''（{{lang-en|Signals}}）是[[Unix|Unix]]、[[类Unix|类Unix]]以及其他[[POSIX|POSIX]]兼容的操作系统中[[进程间通讯|进程间通讯]]的一种有限制的方式。它是一种[[异步|异步]]的通知机制，用来提醒[[进程|进程]]一个事件已经发生。当一个信号发送给一个进程，操作系统中断了进程正常的[[控制流程|控制流程]]，此时，任何非[[原子操作|原子操作]]都将被中断。如果进程定义了信号的处理函数，那么它将被执行，否则就执行默认的处理函数。
+
+信号类似于中断，不同之处在于中断由处理器调解并由内核处理，而信号由内核调解(可能通过系统调用)并由进程处理。内核可以将中断作为信号传递给导致中断的进程(典型的例子有SIGSEGV、SIGBUS、SIGILL和SIGFPE)。
+
+信号起源于20世纪70年代的贝尔实验室Unix，最近在POSIX标准中有所规定。
+
+嵌入式程序可能会发现信号对于进程间通信很有用，因为信号的计算和内存占用很小。
+
+== 发送信号 ==
+* 在一个运行的程序的[[控制终端|控制终端]]键入特定的组合键可以向它发送某些信号：
+** [[Ctrl-C|Ctrl-C]]发送INT信号（[[SIGINT_(POSIX)|SIGINT]]）；默认情况下，这会导致进程终止。
+** [[Ctrl-Z|Ctrl-Z]]发送TSTP信号（[[SIGTSTP|SIGTSTP]]）；默认情况下，这会导致进程[[挂起|挂起]]。
+** [[Ctrl-/|Ctrl-\]]发送QUIT信号（[[SIGQUIT|SIGQUIT]]）；默认情况下，这会导致进程终止并且将内存中的信息转储到硬盘（[[核心转储|核心转储]]）。
+** （这些组合键可以通过[[stty|stty]]命令来修改。）
+* <tt>kill()</tt>[[系统调用|系统调用]]会在权限允许的情况下向进程发送特定的信号，类似地，<tt>[[kill_(命令)|kill]]</tt>命令允许用户向进程发送信号。<code>raise(3)</code>库函数可以将特定信号发送给当前进程。
+* 像除数为零、段错误这些[[异常|异常]]也会产生信号（这里分别是[[SIGFPE|SIGFPE]]和[[SIGSEGV|SIGSEGV]]，默认都会导致进程终止和核心转储).
+* 内核可以向进程发送信号以告知它一个事件发生了。例如当进程将数据写入一个已经被关闭的[[管道|管道]]是将会收到[[SIGPIPE|SIGPIPE]]信号，默认情况下会使进程关闭。
+
+== 处理信号 ==
+信号处理函数可以通过<code>[[Sigaction_(Unix)|signal()]]</code>系统调用来设置。如果没有为一个信号设置对应的处理函数，就会使用默认的处理函数，否则信号就被进程截获并调用相应的处理函数。在没有处理函数的情况下，程序可以指定两种行为：忽略这个信号（SIG_IGN）或者用默认的处理函数（SIG_DFL）。但是有两个信号是无法被截获并处理的：[[SIGKILL|SIGKILL]]和[[SIGSTOP|SIGSTOP]]。
+=== 风险 ===
+因为[[竞态条件|竞态条件]]的存在，信号的处理是有弱点的。因为信号是异步的，所以在处理一个信号的过程中，进程可能收到另一个信号（甚至是相同的信号）。<code>[[sigprocmask_(Unix)|sigprocmask()]]</code>系统调用可以用来阻塞和恢复信号的传递。信号可以造成进程中系统调用的中断，并在信号处理完后重新开始未完成的系统调用。信号处理函数应该没有任何不想要的副作用，比如，[[errno|errno]]的改变、信号掩码的改变、信号处理方法的改变，以及其他全局[[进程|进程]]性质的改变。在信号处理函数内使用不[[可重入|可重入]]函数，如[[malloc|malloc]]和[[printf|printf]]，也是不安全的。
+
+== 与硬件异常的关系 ==
+[[进程|进程]]的运行也可能导致硬件异常，例如，将一个数[[除以零|除以零]]，或者出现[[轉譯後備緩衝區|TLB]]不命中。在[[类Unix|类Unix]]系统中，这会自动运行[[内核|内核]]的异常处理程序。对于某些异常如[[页缺失_（计算机科学）|页缺失]]，内核有足够的信息来处理完并恢复进程的运行。但是对于另外一些异常，内核不能处理而只能通过发送信号把异常交给进程自己处理。例如在[[x86|x86]]架构的[[CPU|CPU]]上，如果一个进程尝试将一个数除以零，将会产生''divide error''异常，并使内核向出错的进程发送[[SIGFPE|SIGFPE]]信号。相似地，如果一个进程尝试访问[[虚拟地址空间|虚拟地址空间]]以外的内存，内核将向进程发送[[SIGSEGV|SIGSEGV]]信号。异常与信号的具体对应关系在不同的CPU架构上是不同的。
+
+== 信号列表 ==
+[[单一UNIX规范|单一UNIX规范]]规定了在<tt><[[signal.h|signal.h]]></tt>中定义的信号有：
+
+备注：打星号的部分表示这是X/Open System Interfaces (XSI)扩充的部分。使用引号的文字是引用自SUS[http://www.opengroup.org/onlinepubs/007904975] {{Wayback|url=http://www.opengroup.org/onlinepubs/007904975 |date=20210326044603 }}。
+
+; {{mono|{{vanchor|SIGABRT}}}} 和 {{mono|{{vanchor|SIGIOT}}}} 
+SIGABRT 和 SIGIOT 信号能让程序异常终止（abort）。 该信号通常是由进程自身调用 [[C++標準函式庫|C标准函数库]] 的 <code>abort()</code> 函数来触发， 但它也可以像其它信号一样由外部发送给进程。
+
+; {{mono|{{vanchor|SIGALRM}}}}, {{mono|{{vanchor|SIGVTALRM}}}} 和 {{mono|{{vanchor|SIGPROF}}}} 
+如果你用 setitimer 这一类的报警设置函数设置了一个时限，到达时限时进程会接收到 SIGALRM, SIGVTALRM 或者 SIGPROF。但是这三个信号量的含义各有不同，SIGALRM 计时的是真实时间，SIGVTALRM计时的是进程使用了多少CPU时间，而 SIGPROF 计时的是进程和代表该进程的内核用了多少时间。
+
+; {{mono|{{vanchor|SIGBUS}}}} 
+总线发生错误时，进程接收到一个SIGBUS信号。举例来说，存储器访问对齐或者或不存在对应的物理地址都会产生SIGBUS信号。
+
+; {{mono|{{vanchor|SIGCHLD}}}} 
+当子进程终止、被中断或被中断后恢复时，SIGCHLD信号被发送到进程。该信号的一个常见用法是指示操作系统在子进程终止后清理其使用的资源，而不显式调用等待系统调用。
+
+; {{mono|{{vanchor|SIGCONT}}}} 
+SIGCONT信号指示操作系统继续(重启)先前由SIGSTOP或SIGTSTP信号暂停的进程。Unix 壳的作业控制是该信号的一个重要应用。
+
+; {{mono|{{vanchor|SIGFPE}}}} 
+当进程执行了一个错误的算术运算时，例如被零除，信号被发送到一个进程。这可能包括整数被零除，以及整数在除结果中溢出(在C中只有INT_MIN/-1、INT64_MIN/-1和%-1会触发该行为)。注意该信号与浮点数溢出无关。
+
+; {{mono|{{vanchor|SIGHUP}}}} 
+检测到控制中断挂起或者控制进程死亡时，进程会收到 SIGHUP。现在操作系统，该信号通常意味着使用的 [[虚拟终端|虚拟终端]] 已经被关闭。许多 [[守护进程|守护进程]] 在接收到该信号时，会重载他们的设置和重新打开日志文件（logfiles），而不是去退出程序。[[nohup|nohup]] 命令用于无视该信号。
+
+; {{mono|{{vanchor|SIGILL}}}} 
+当进程试图执行非法、格式错误、未知或特权指令时，SIGILL信号被发送到该进程。
+
+; {{mono|{{vanchor|SIGINT}}}} 
+当用户希望中断进程时，SIGINT信号由用户的控制终端发送到进程。这通常通过按下Ctrl+C来发送，但是在某些系统中，可以使用“DELETE”键或“BREAK”键。
+; {{mono|{{vanchor|SIGKILL}}}} 
+{{main|SIGKILL}}
+发送SIGKILL信号到一个进程可以使其立即终止(KILL)。与SIGTERM和SIGINT相不同的是，这个信号不能被捕获或忽略，接收过程在接收到这个信号时不能执行任何清理。
+以下例外情况适用:
+* 僵尸进程不能被杀死，因为它们已经死了，正在等待它们的父进程来收获它们。
+* 处于阻塞状态的进程不会死亡，直到它们再次醒来。
+* init 进程是特殊的: init不接收任何它不打算处理的信号，因此它会忽略SIGKILL。<ref>https://manpages.ubuntu.com/manpages/zesty/man2/kill.2.html {{Wayback|url=https://manpages.ubuntu.com/manpages/zesty/man2/kill.2.html |date=20180128103316 }} section NOTES</ref>这条规则有一个例外，Linux 上的 init 如果被 ptrace 了，那么它是可以接收 SIGKILL 并被杀死的<ref>{{cite web|url=https://stackoverflow.com/a/21031583|title=SIGKILL init process (PID 1)|author=|date=|website=Stack Overflow}}</ref><ref>{{cite web|url=https://unix.stackexchange.com/a/308429|title=Can root kill init process?|author=|date=|website=Unix & Linux Stack Exchange}}</ref>。
+* 处于不可中断的睡眠的进程即使发送了SIGKILL，也有可能不会终止(并释放其资源)。这是少数 Unix 系统必须重新启动才能解决临时软件问题的几种情况之一。
+当在大多数系统关闭程序中终止进程时，如果进程没有响应 SIGTERM 而自动退出，SIGKILL 是最后的手段。为了加快电脑关机过程，苹果OS X 10.6(又名雪豹)向标记自己为“clean”的进程发送SIGKILL，从而加快关机时间，而且可能不会产生任何不良影响。<ref>{{cite web | url = https://developer.apple.com/mac/library/releasenotes/MacOSX/WhatsNewInOSX/Articles/MacOSX10_6.html#//apple_ref/doc/uid/TP40008898-SW22 | title = Mac Dev Center: What's New in Mac OS X: Mac OS X v10.6 | date = 2009-08-28 | accessdate = 18 November 2017 | archive-date = 2010-01-14 | archive-url = https://web.archive.org/web/20100114012647/http://developer.apple.com/mac/library/releasenotes/MacOSX/WhatsNewInOSX/Articles/MacOSX10_6.html#//apple_ref/doc/uid/TP40008898-SW22 }}</ref>。在 Linux 中执行 <code>killall -9</code> 命令具有类似不过更危险的效果；它不让程序保存未保存的数据。
+; {{mono|{{vanchor|SIGPIPE}}}} 
+
+当一个进程试图写入一个没有连接到另一端进程的管道时，SIGPIPE信号会被发送到该进程。
+
+; {{mono|{{vanchor|SIGPOLL}}}} 
+
+当一个事件发生在一个正在显式监视的文件描述符上时，就会发送SIGPOLL信号。有效使用这种用法可以进行异步 I/O，因为内核将代替调用者轮询描述符。它提供了主动轮询的替代方案。
+
+; {{mono|{{vanchor|SIGRTMIN}}}} 到 {{mono|{{vanchor|SIGRTMAX}}}}
+
+SIGRTMIN至SIGRTMAX信号用于用户自定义的目的。它们是'''实时'''信号。
+
+; {{mono|{{vanchor|SIGTTIN}}}} 和 {{mono|{{vanchor|SIGTTOU}}}}
+
+当进程在后台试图分别从tty读取或写入时，SIGTTIN和SIGTTOU信号会被发送到该进程。通常，这些信号仅由作业控制下的进程接收；守护进程没有控制终端，因此永远不会接收这些信号。
+
+; {{mono|{{vanchor|SIGQUIT}}}}
+
+当用户在进程的控制终端请求退出进程并进行[[核心转储|核心转储]]时，SIGQUIT信号会被发送到该进程。
+
+; {{mono|{{vanchor|SIGSEGV}}}}
+
+当进程试图访问无效内存引用时发生[[記憶體區段錯誤|存储器区段错误]]，SIGSEGV信号会被发送到该进程。
+
+; {{mono|{{vanchor|SIGSTOP}}}}
+
+当操作系统暂停进程的运行时，会产生SIGSTOP信号。SIGSTOP信号无法被捕获或无视。
+
+; {{mono|{{vanchor|SIGSYS}}}}
+
+当系统调用时传入非法的参数，会产生SIGSYS信号。实际上，SIGSYS信号很少会出现，因为应用程序依赖[[函式庫|库]]调用系统调用。SIGSYS可以被违反Linux Seccomp安全规则的应用程序捕获。SIGSYS也可用于模拟外部系统调用，例如：在Linux上模拟 Windows系统调用。
+
+; {{mono|{{vanchor|SIGTERM}}}}
+
+当用户请求终止进程时，会产生SIGTERM信号。SIGTERM信号可以被捕获或无视。这允许该进程在结束前释放掉所占用的资源并保存其状态。SIGINT和SIGTERM非常相似。
+
+; {{mono|{{vanchor|SIGTSTP}}}}
+
+当用户在进程的控制终端请求退出进程时，会产生SIGTSTP信号。SIGTSTP信号可以被捕获或无视。SIGTSTP信号的产生通常是由于用户按下[[Ctrl-Z|{{keypress]]。
+
+=== 默认行为 ===
+
+一个进程可以自定义如何处理传入的POSIX信号。如果一个进程没有定义一个信号处理程序，那么这个信号的默认处理程序将被使用。下表列出了一些与POSIX兼容的UNIX系统的默认操作，例如[[FreeBSD|FreeBSD]]、[[OpenBSD|OpenBSD]]和[[Linux|Linux]]。
+
+{| class="wikitable sortable"
+|-
+! 信号 !! data-sort-type="number"|可移植代号 !! 默认行为 !! class="unsortable"|描述
+|-
+| SIGABRT || style="text-align:right" | 6 || {{terminated|终止}} (核心转储) || 进程终止信号
+|-
+| SIGALRM || style="text-align:right" | 14 || {{terminated|终止}} || 计时器告警
+|-
+| SIGBUS || {{n/a}} || {{terminated|终止}} (核心转储) || 访问内存对象未定义区域
+|-
+| SIGCHLD || {{n/a}} || style="text-align:center" | 忽略 || 子进程终止、暂停、继续
+|-
+| SIGCONT || {{n/a}} || style="text-align:center" | 继续 || 如果被暂停，重新继续执行
+|-
+| SIGFPE || style="text-align:right" | 8 || {{terminated|终止}} (核心转储) || 错误的算术运算
+|-
+| SIGHUP || style="text-align:right" | 1 || {{terminated|终止}} || 挂起
+|-
+| SIGILL || style="text-align:right" | 4 || {{terminated|终止}} (核心转储) || 非法的指令
+|-
+| SIGINT || style="text-align:right" | 2 || {{terminated|终止}} || 终端中断信号
+|-
+| SIGKILL || style="text-align:right" | 9 || {{terminated|终止}} || 杀死 (无法被捕获或忽略的信号)
+|-
+| SIGPIPE || style="text-align:right" | 13 || {{terminated|终止}} || 写入一个没有连接另一端的管道
+|-
+| SIGPOLL || {{n/a}} || {{terminated|终止}} || 可轮询事件
+|-
+| SIGPROF || {{n/a}} || {{terminated|终止}} || 性能调优定时器超时
+|-
+| SIGQUIT || style="text-align:right" | 3 || {{terminated|终止}} (核心转储) || 终端退出信号
+|-
+| SIGSEGV || style="text-align:right" | 11 || {{terminated|终止}} (核心转储) || 非法的内存引用
+|-
+| SIGSTOP || {{n/a}} || {{dropped|暂停}} || 暂停执行（无法被捕获或忽略的信号）
+|-
+| SIGSYS  || {{n/a}} || {{terminated|终止}} (核心转储) || 错误的系统调用
+|-
+| SIGTERM  || style="text-align:right" | 15 || {{terminated|终止}} || 终止信号
+|-
+| SIGTRAP || style="text-align:right" | 5 || {{terminated|终止}} (核心转储) || 追踪/断点陷阱
+|-
+| SIGTSTP || {{n/a}} || {{dropped|暂停}} || 终端中止信号
+|-
+| SIGTTIN || {{n/a}} || {{dropped|暂停}} || 后台进程尝试读
+|-
+| SIGTTOU || {{n/a}} || {{dropped|暂停}} || 后台进程尝试写
+|-
+| SIGUSR1 || {{n/a}} || {{terminated|终止}} || 用户自定义信号1
+|-
+| SIGUSR2 || {{n/a}} || {{terminated|终止}} || 用户自定义信号2
+|-
+| SIGURG || {{n/a}} || style="text-align:center" | 忽略 || [[Out-of-band_data|Out-of-band data]] is available at a socket
+|-
+| SIGVTALRM || {{N/A}} || {{terminated|终止}} || 虚拟定时器超时
+|-
+| SIGXCPU || {{n/a}} || {{terminated|终止}} (核心转储) || 超出CPU时间限制
+|-
+| SIGXFSZ || {{n/a}} || {{terminated|终止}} (核心转储) || 超出文件大小限制
+|-
+| SIGWINCH || {{n/a}} || style="text-align:center" | 忽略 || 终端窗口大小已变化
+|}
+
+; 可移植编号
+
+对于大多数信号，相应的信号编号由实现定义。此列列出了POSIX标准中指定的数字。
+
+; 行为释义
+: '''终止''' {{snd}} 进程异常终止。进程终止的结果和调用 _exit() 是一样的，除了'''终止'''可以向 wait() 和 waitpid() 返回导致进程终止的信号。
+: '''终止(核心转储)'''{{snd}} 进程异常终止。这种进程中止的过程根据实现有所不同，一般会创建一个核心文件。
+: '''忽略'''{{snd}} 进程忽略该信号。
+: '''暂停'''{{snd}} 进程被暂停（不是终止）。
+: '''继续'''{{snd}} 进程恢复执行。
+
+== 参考文献 ==
+{{Reflist}}
+
+== 外部链接 ==
+* [https://web.archive.org/web/20071101082659/http://users.actcom.co.il/~choo/lupg/tutorials/signals/signals-programming.html#the_what Introduction to Unix Signals Programming]
+* [http://www.linuxprogrammingblog.com/all-about-linux-signals Another Introduction to Unix Signals Programming] {{Wayback|url=http://www.linuxprogrammingblog.com/all-about-linux-signals |date=20150811035518 }}
+* [http://www.enderunix.org/docs/signals.pdf UNIX and Reliable POSIX Signals] {{Wayback|url=http://www.enderunix.org/docs/signals.pdf |date=20160303180321 }} by Baris Simsek
+* [http://www.openbsd.org/papers/opencon04/index.html Signal Handlers] {{Wayback|url=http://www.openbsd.org/papers/opencon04/index.html |date=20220311165622 }} by Henning Brauer
+
+== 参见 ==
+* <code><[[signal.h|signal.h]]></code>
+
+{{-}}
+{{Computing signals}}
+
+[[Category:控制流程|Category:控制流程]]
+[[Category:Unix|Category:Unix]]

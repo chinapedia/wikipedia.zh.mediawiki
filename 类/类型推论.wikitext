@@ -1,0 +1,110 @@
+{{NoteTA
+|G1 = IT
+|1 = zh-cn:类型; zh-tw:型別;
+}}{{Type systems}}
+'''类型推论'''、'''类型推导'''<ref>{{cite book |author1=祁宇 |title=深入应用C++11：代码优化与工程级应用 |date=2015-5 |publisher=机械工业出版社 |isbn=9787111500698 |accessdate=2020-03-03 |url=https://book.51cto.com/art/201506/480666.htm |archive-date=2020-03-03 |archive-url=https://web.archive.org/web/20200303204623/https://book.51cto.com/art/201506/480666.htm |dead-url=no }}</ref>、'''型別推斷'''、或'''隐含类型'''，是指[[编程语言|编程语言]]中在[[编译期|编译期]]自动推导出值的[[数据类型|数据类型]]的能力，它是一些[[强类型|强]][[静态类型|静态类型]]语言的特性。一般而言，[[函数式编程语言|函数式编程语言]]具有此特性。自动推断类型的能力让很多编程任务变得容易，让程序员可以忽略[[类型标注|类型标注]]的同时仍然允许类型检查。
+
+具有类型推论的语言有：[[Rust|Rust]], [[Haskell|Haskell]], [[Cayenne|Cayenne]], [[Clean_(编程语言)|Clean]], [[ML语言|ML]], [[OCaml|OCaml]], {{en-link|Epigram (编程语言)|Epigram (programming language)|Epigram}}, [[Scala|Scala]], [[Nemerle|Nemerle]], [[D语言|D]], [[Google_Chrome|Chrome]]，[[Visual_Basic_2008|Visual Basic 2008]]、[[Boo|Boo]]、[[C_Sharp|C# 3.0]]和[[C++11|C++11]]<ref>{{Cite web |url=http://www.artima.com/cppsource/cpp0x.html |title=C++0x |access-date=2007-11-02 |archive-date=2020-11-09 |archive-url=https://web.archive.org/web/20201109042832/https://www.artima.com/cppsource/cpp0x.html |dead-url=no }}</ref>。计划支持类型推论的有 {{en-link|Fortress (编程语言)|Fortress (programming language)|Fortress}}, [[Vala|Vala]]和[[Perl_6|Perl 6]]。
+
+与此相对，通过类型标注以及字面量或其它特定语法隐含类型的语义规则（而非类型推断规则）明确指定目标类型确定类型的过程称为[[类型转换|类型转换]]。
+
+==非技术性解说==
+在大多数的编程语言中，所有值都有一个[[数据类型|类型]]，它描述特定值的数据种类。在一些语言中，表达式的类型只在[[執行期|运行时]]才知道；这些语言被称作[[动态类型|动态类型]]语言。而另一些语言中，表达式的类型在[[编译时|编译时]]就知道，这些语言叫做[[静态类型|静态类型]]语言。在静态类型语言中，函数的输入和输出与[[局部变量|局部变量]]的类型一般必须用[[类型标注|类型标注]]明确的提供。例如，在 [[C语言|C]] 语言中:
+<syntaxhighlight lang="c">
+ int addone(int x)
+ {
+     int result; /*声明整数 result (C 语言)*/
+ 
+     result = x+1;
+     return result;
+ }
+</syntaxhighlight>
+这个函数定义开始处，<code>int addone(int x)</code> 声明了 <code>addone</code> 是函数，接受一个整数类型的参数，并返回一个整数。<code>int result;</code> 声明了局部变量 <code>result</code> 是个整数。在支持类型推论的建议的语言中，代码可写为如下:
+<syntaxhighlight lang="javascript">
+ addone(x) {
+     var result;  /*推论类型 result (在建议的语言中)*/
+     var result2; /*推论类型 result #2 */
+ 
+     result = x+1;
+     result2 = x+1.;  /* 此行不工作 */
+     return result;
+ }
+</syntaxhighlight>
+这看起来非常像在动态类型语言中写出的代码，但是提供了一些额外的约束（见下）使得能够在编译时推断出所有变量的类型。在上面的例子中，因为<code>+</code> 总是接受两个整数并返回一个整数。编译器可以推论出 <code>x+1</code> 的值是个整数，因此 <code>result</code> 是个整数，<code>addone</code> 的返回值是个整数。类似的，因为 <code>+</code> 要求它的两个实际参数都是整数，<code>x</code> 必须是整数，因此 <code>addone</code> 接受一个整数实际参数。
+
+但是在随后一行中 ''result2'' 加上了一个浮点数 "<code>1.</code>"，导致了 <code>x</code> 同时用于整数和浮点数的冲突。这种情况将生成编译时间错误消息。在老语言中，''result2'' 可以被隐含的声明为浮点变量，通过隐含的转换表达式中的整数 <code>x</code>，简单的因为小数点意外的被放到了整数 1 的后面。这种情况说明了二者之间的区别，“类型推论”不涉及类型转换，而“[[隐含类型转换|隐含类型转换]]”经常没有限制的把数据强制成高精度的数据类型。
+
+==技术描述==
+
+类型推论指的是要么部分要么完全自动演绎的能力，把值的类型从表达式的最终计算中推导出来。因为这个过程在编译时间系统性的进行，编译器经常能推出变量的类型或函数的[[类型标署|类型标署]]，而不用给出明确的类型标注。在很多情况下，如果推论系统足够强壮或程序足够简单，有可能完全从程序中省略类型标注。
+
+要获得正确推导出缺乏类型标注的一个表达式的类型所必要的信息，编译器要么随着给它的子表达式(它们自身可以是变量或函数)的类型标注的聚集(aggregate)和后续简约来收集这种信息，要么通过各种原子值的类型的隐含理解(比如 () : [[单位类型|单位]]; true : 布尔; 42 : 整数; 3.14159 : 实数; 等等)。通过表达式的最终简约到隐含类型原子值的识别，类型推论语言的编译器有能力编译完全没有类型标注的程序。在[[高阶编程|高阶编程]]和[[多态性|多态性]]的高度复杂的情况下，编译器不能总是如此推论，偶尔需要类型标注来去除歧义。
+
+==例子==
+
+例如，考虑 [[Haskell|Haskell]] 函数 <code>map</code>，它把一个函数应用于一个列表的每个元素上，它可定义为:
+<syntaxhighlight lang="haskell">
+map f [] = []
+map f (first:rest) = f first : map f rest
+</syntaxhighlight>
+明显的函数 <code>map</code> 接受一个列表作为第二个实际参数，它的第一个实际参数 <code>f</code> 是可以应用于这个列表的元素的类型上函数，而 <code>map</code> 的结果被构造为其元素是 <code>f</code> 的结果的一列表。所以假定列表包含同样类型的元素，我们能可靠的构造出类型标署
+<syntaxhighlight lang="haskell">
+map :: (a -> b) -> [a] -> [b]
+</syntaxhighlight>
+这里的语法 "<code>a->b</code>" 指示接受 <code>a</code> 作为它的形式参数并生成 <code>b</code> 的一个过程。 "<code>a->b->c</code>" 等价于 "<code>a->(b->c)</code>"。
+
+注意 <code>map</code> 的推论类型是[[类型多态性|参数化多态]]的: 实际参数和 <code>f</code> 的结果的类型是不推出的，而是留作类型变量，所以 <code>map</code> 可以应用于各种类型的函数和列表，只要在每次调用中实际类型是匹配的。
+
+==Hindley–Milner 类型推论算法==
+
+进行类型推论的常用算法是 Hindley–Milner 或 Damas–Milner 算法。
+
+这个算法的起源是 [[Haskell_B._Curry|Haskell B. Curry]] 和 [[Robert_Feys|Robert Feys]] 在1958年为[[简单类型lambda演算|简单类型lambda演算]]设计的类型推论算法。在 1969 年 [[Roger_Hindley|Roger Hindley]] 扩展了这项工作并证明他们的算法总能推出最一般的类型。在 1978 年 [[Robin_Milner|Robin Milner]]，独立于 Hindley 的工作，提供了等价的算法。在 1985 年 [[Luis_Damas|Luis Damas]] 最终证明了 Milner 的算法是完备的并扩展它来支持带有多态引用的系统。
+
+===算法===
+
+算法过程分两个步骤。首先需要生成一些要解的方程，接着解它们。
+====生成方程====
+
+用来生成方程的算法类似与正规的类型检查器，所以我们首先如下[[有类型lambda演算|有类型lambda演算]]的正规类型检查器:
+
+<math>e \, ::= E \mid v \mid (\lambda v:\tau. e) \mid (e\, e)</math>
+
+和
+
+<math>\tau \, ::= T \mid \tau \to \tau </math>
+
+这里的 <math>E</math> 是原始表达式 (比如 "3") 而 <math>T</math> 是原始类型 (比如 "Integer")。
+
+我们希望构造有类型 <math>(\epsilon, t) \to \tau</math> 的一个函数 <math>f</math>，这里的 <math>\epsilon</math> 是类型环境而 <math>t</math> 是一个项。我们假定这个函数已经定义在原始表达式上。其他情况有:
+
+* <math>f(\epsilon, v) = \tau</math> 这里的 <math>(v, \tau)</math> 在 <math>\epsilon</math> 中
+* <math>f(\epsilon, g\, e) = \tau</math> 这里的 <math>f(\epsilon, g) = \tau_1 \to \tau</math> 且 <math>f(\epsilon, e) = \tau_1</math>
+* <math>f(\epsilon, \lambda v:\tau. e) = \tau \to f(\epsilon_1, e)</math> 这里的 <math>\epsilon_1 = \epsilon \cup (v, \tau)</math>
+
+注意我们至今没有指定在不能满足各种条件的时候做什么。这是因为，在简单类型检查算法中，检查在任何事情出错的时候都失败。
+
+现在，我们开发一个更复杂的算法来处理类型变量和在它们上的约束。所以，我们扩展原始类型的集合 T 来包括变量的无限补给，指示为小写希腊字母 <math>\alpha, \beta, ...</math>。详情参见 <ref>{{cite book | author=[[Benjamin_C._Pierce|Pierce, Benjamin C.]] | title=Types and Programming Languages | publisher=MIT Press | year=2002 | id=ISBN 0-262-16209-1
+}}</ref>。
+
+====解方程====
+
+解方程通过[[合一|合一]]进行。这是个意外简单的算法。函数 <math>u</math> 运算在类型方式上并返回叫做“代换”的一个结构。代换简单是一从类型变量到类型的一个映射。代换可以用明显的方式组成和扩展。
+
+合一方程的空集是足够容易的: <math>u\, \emptyset = \mathbf{i}</math>，这里的 <math>\mathbf{i}</math> 是同一代换。
+
+合一变量与类型以如下方式进行: <math>u\, ([\alpha = T] \cup C) = u\, (C') \cdot (\alpha \mapsto T)</math>，这里的 <math>\cdot</math> 是代换合成算子，而 <math>C'</math> 是保持约束 <math>C</math> 于应用到它的新代换 <math>\alpha \mapsto T</math> 的集合。
+
+当然 <math>u\, ([T = \alpha] \cup C) = u ([\alpha = T] \cup C)</math>。
+
+有趣的情况保持为 <math>u\, ([S \to S' = T \to T']\cup C) = u \, (\{[S = T], [S' = T']\}\cup C)</math>。
+
+==引用==
+{{reflist}}
+
+==外部链接==
+*[http://www.cis.upenn.edu/~bcpierce/types/archives/1988/msg00042.html Archived e-mail message] {{Wayback|url=http://www.cis.upenn.edu/~bcpierce/types/archives/1988/msg00042.html |date=20210206063046 }} by Roger Hindley explaining the history of type inference
+*[https://web.archive.org/web/20050911123640/http://www.cs.berkeley.edu/~nikitab/courses/cs263/hm.html Implementation] of Hindley-Milner in Perl 5, by Nikita Borisov (via [[Internet_Archive|Internet Archive]], version [[Sep_11|Sep 11]]2005)
+
+[[Category:类型论|Category:类型论]]
+[[Category:带有代码示例的条目|Category:带有代码示例的条目]]

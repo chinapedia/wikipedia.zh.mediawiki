@@ -1,0 +1,86 @@
+'''XML Signature'''（也称作''XMLDsig''，''XML-DSig''，''XML-Sig''）是一个定义[[數位簽章|数字签名]]的[[XML|XML]]语法的[[W3C推荐标准|W3C推荐标准]]。从功能上或，XML Signature与[[公開金鑰密碼編譯標準|PKCS]]#7有很多共同点，但是XML签名具有更好的可扩展性，并为签名XML文档做了调整。XML Signature在许多[[万维网|Web]]技术，如[[SOAP|SOAP]], [[SAML|SAML]]等中使用。
+
+XML signature可以用来签名任何类型的数据（称作资源），最常见的是XML文档，但是任何可以通过[[统一资源定位符|URL]]访问的资源都可以被签名。如果XML签名用于对包含该签名的XML文档之外的资源签名，则称为'''detached''' signature如果XML签名用于对包含它的XML文档的某个部分进行签名，则称为'''enveloped''' signature;如果XML签名包含被签名的数据，则称为'''enveloping''' signature。
+
+== 结构 ==
+一个XML签名包含一个<tt>Signature</tt>元素，其名字空间为<tt><nowiki>http://www.w3.org/2000/09/xmldsig#</nowiki></tt>。基本结构如下所示：
+
+<syntaxhighlight lang="xml">
+<Signature>
+  <SignedInfo>
+    <SignatureMethod />
+    <CanonicalizationMethod />
+    <Reference>
+       <Transforms>
+       <DigestMethod>
+       <DigestValue>
+    </Reference>
+    <Reference />等
+  </SignedInfo>
+  <SignatureValue />
+  <KeyInfo />
+  <Object />
+</Signature>
+</syntaxhighlight>
+
+* SignedInfo元素包含或引用签名后的数据，并指出使用了那种算法。
+** SignatureMethod和CanonicalizationMethod元素被SignatureValue元素所使用，并包含在SignedInfo元素中以防止篡改。
+** 一个或多个<tt>Reference</tt>元素通过URI引用的方式说明被签名的资源；以及在签名前对资源进行的任何转换。转换可以是一个XPath表达式，从文档树中选择一个子集<ref>http://www.w3.org/TR/xmldsig-filter2/ {{Wayback|url=http://www.w3.org/TR/xmldsig-filter2/ |date=20220422021905 }} XML-Signature XPath Filter 2.0</ref>。
+***DigestMethod元素指定散列算法。
+***DigestValue元素包含转换后资源经过散列算法的结果。
+*SignatureValue元素包含一个经过[[Base64|Base64]]编码的签名结果 - 签名是按照SignedInfo元素中的SignatureMethod元素中指明的参数进行的，签名前要先根据CanonicalizationMethod元素中指定的算法进行规范化。
+* KeyInfo元素（可选）允许签名者为接收者提供验签该签名的密钥，通常是以一个或多个[[X.509|X.509]]数字证书的形式。如果没有出现KeyInfo元素，接收方必须从上下文中识别出验签的密钥。
+*Object元素（可选）包含被签名的数据，如果是''enveloping signature''（签名的数据在Signature元素内）的情况。
+
+== 验证及安全考虑 ==
+
+当验证一个XML签名时，需要遵守一个称作核心验证（'''Core Validation'''）的程序：
+# '''引用验证：'''每一个引用的摘要都通过获取相应的资源，并且按照指定的转换方法和摘要方法进行转换和摘要，然后将结果与DigestValue元素中的内容进行比较，如果不匹配，验证失败。
+# '''签名验证：'''SignedInfo元素使用CanonicalizationMethod元素中指定的XML标准化方法进行处理，密钥或取自KeyInfo元素或通过其他方法取得，然后通过SignatureMethod指定的签名方法进行验签。
+
+这一程序确定该资源是否是真的由宣称的当事人签名的。然而由于XML标准化和转换方法的可扩展性，验证方必须同时确认实际被签名或摘要的正式在原始数据中出现的内容，换句话说，确信签名或摘要所使用的算法没有改变被签名的数据的意思。
+
+== XML规范化 ==
+{{main|Canonical XML}}
+XML签名的产生要比通常的数字签名的产生复杂一点，这有由于一个给定的XML文档（在XML开发人员通用的说法是"[[XML信息集|XML信息集]]"）可能包含合法的序列化的表达方式以外的内容。例如，在XML元素中的白空格从句法上说是没有意义的，因此<Elem >和<Elem>没有区别。
+
+由于数字签名是由[[公开密钥加密|非对称密钥加密算法]]（通常是[[RSA加密演算法|RSA加密演算法]]）对序列化的XML文档进行[[密码散列算法|散列]]（通常是[[SHA家族|SHA1]]）的结果进行加密。一个字节的差别会导致数字签名的不同。
+
+此外，如果XML文档是在计算机间传输，不同操作系统的[[換行|換行符]]可能不同，从CR到LF再到CR LF等。  对XML文档进行摘要和验证的程序可能随后以不同的方式呈现XML。例如，在元素定义的属性定义间添加额外的空格，或是使用相对的（而不是绝对的）URL，或者改变XML命名空间定义的顺序。标准化的XML对于引用远端文档的XML数字签名尤其重要，远端服务器可能会随时间改变XML呈现的方式。
+
+为了避免这些问题，并保证逻辑上相同的XML文档会产生相同的数字签名，在对XML文档进行签名（在对SignedInfo进行签名时，规范化是强制的）时使用了一种XML规范化的转换（Canonicalization，通常缩写为'''C14n'''）这些算法保证逻辑上相同的文档产生完全相同的序列化的表达方式。
+
+缺省的规范化算法处理命名空间生命的方式带来了另一个问题；通常来说一个被签名的XML文档需要嵌入另一个文档；在这种情形下，原来的规范化算法产生的结果与单独的文档规范化的结果不同。由于这个原因，一个被称为''Exclusive Canonicalization''的规范化算法产生了，该算法在序列化一个元素的[[XML命名空间|XML命名空间]]声明时独立于该元素所嵌入的XML文档。
+
+== 好处 ==
+与其他形式的数字签名，如[[PGP|Pretty Good Privacy]]和[[Cryptographic_Message_Syntax|Cryptographic Message Syntax]]相比，XML Signature更加灵活，这是因为它操作的不是[[二进制文件|二进制数据]]，而是[[XML信息集|XML信息集]]，允许操作数据的子集，可以以不同形式将签名与被签名的信息结合，以及可以执行转换。另一个核心概念是标准化，也就是说仅对“精华”进行签名，而排除了无意义的区别，如白空格和换行符。
+
+== 缺点 ==
+通常，批评都对准XML安全的体系结构<ref>http://www.cs.auckland.ac.nz/~pgut001/pubs/xmlsec.txt {{Wayback|url=http://www.cs.auckland.ac.nz/~pgut001/pubs/xmlsec.txt |date=20220422021905 }} Why XML Security is Broken</ref>，以及在签名和加密XML数据前对XML进行规范化的适宜性，这是因为XML规范化的复杂性，内在的处理需求，以及性能不高的特性<ref>http://grids.ucs.indiana.edu/ptliupages/publications/WSSPerf.pdf {{Wayback|url=http://grids.ucs.indiana.edu/ptliupages/publications/WSSPerf.pdf |date=20210224140108 }} Performance of Web Services Security</ref>
+<ref>http://www.extreme.indiana.edu/xgws/papers/sec-perf.pdf {{Wayback|url=http://www.extreme.indiana.edu/xgws/papers/sec-perf.pdf |date=20180328155832 }} Performance Comparison of Security Mechanisms for Grid Services</ref>
+<ref>http://www.javaworld.com/javaworld/jw-01-2007/jw-01-vtd.html {{Wayback|url=http://www.javaworld.com/javaworld/jw-01-2007/jw-01-vtd.html |date=20080213091759 }} Why XML canonicalization is bad for Web Services Security</ref>.争论在于执行XML标准化会导致额外的等待时间，这对事务的，性能敏感的[[面向服务的架构|SOA]]应用来说简直难以克服。
+
+这些问题正在[http://www.w3.org/2008/xmlsec/ XML安全工作组] {{Wayback|url=http://www.w3.org/2008/xmlsec/ |date=20220308043036 }}进行解决。
+<ref>http://www.w3.org/2007/xmlsec/ws/report.html {{Wayback|url=http://www.w3.org/2007/xmlsec/ws/report.html |date=20220422021901 }} W3C Workshop on Next Steps for XML Signature and XML Encryption, 2007</ref>
+<ref>http://www.w3.org/TR/xmlsec-reqs2/ {{Wayback|url=http://www.w3.org/TR/xmlsec-reqs2/ |date=20220422021902 }} XML Security 2.0 Requirements and Design Considerations</ref>
+
+另一个问题是没有合适的策略，XML在SOAP中的使用和WS-Security可能导致容易受到攻击。<ref>{{Cite web |url=http://domino.research.ibm.com/library/cyberdig.nsf/papers/73053F26BFE5D1D385257067004CFD80/$File/rc23691.pdf |title=存档副本 |access-date=2010-07-20 |archive-date=2016-03-03 |archive-url=https://web.archive.org/web/20160303193057/http://domino.research.ibm.com/library/cyberdig.nsf/papers/73053F26BFE5D1D385257067004CFD80/$File/rc23691.pdf }}</ref>
+
+==参见==
+
+*[[Canonical_XML|Canonical XML]]
+*[[XML_Encryption|XML Encryption]]
+*[[XAdES|XAdES]], extensions to XML-DSig for use with advanced electronic signature
+
+==参考文献==
+<references/>
+
+==外部链接==
+* [http://www.w3.org/TR/xmldsig-core/  XML-Signature Syntax and Processing (W3C)] {{Wayback|url=http://www.w3.org/TR/xmldsig-core/ |date=20190506201754 }}
+* [http://www.w3.org/TR/2001/REC-xml-c14n-20010315 Canonical XML] {{Wayback|url=http://www.w3.org/TR/2001/REC-xml-c14n-20010315 |date=20220513042520 }}
+* [http://www.w3.org/TR/xml-exc-c14n/ Exclusive XML Canonicalization] {{Wayback|url=http://www.w3.org/TR/xml-exc-c14n/ |date=20100730114656 }}
+* [http://www.ietf.org/rfc/rfc4051.txt  Additional XML Security Uniform Resource Identifiers (URIs)] {{Wayback|url=http://www.ietf.org/rfc/rfc4051.txt |date=20120723062259 }}
+
+{{W3C规范和标准}}
+[[Category:密碼學標準|Category:密碼學標準]]
+[[Category:基于XML的标准|Category:基于XML的标准]]

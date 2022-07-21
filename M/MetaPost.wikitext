@@ -1,0 +1,112 @@
+{{Infobox programming language
+| name =MetaPost
+| logo =[[File:MPlogo.svg|225px]]
+| paradigm = [[指令式编程|指令式]]，[[排版|排版]]
+| year =
+| designer = John D. Hobby
+| developer = Taco Hoekwater
+| latest_release_version = 1.001
+| latest_release_date = {{release date and age|2007|11|14}}
+| typing = [[推断类型|推断类型]], [[动态类型|动态类型]], [[强类型|强类型]]
+| implementations =
+| dialects =
+| influenced_by =[[Metafont|Metafont]]
+| influenced =
+| operating_system = [[跨平台|跨平台]]
+| license =[[公有领域|公有领域]]
+| website =[https://archive.is/20121209030037/http://foundry.supelec.fr/gf/project/metapost/ Development website]
+| file_ext =
+}}
+
+'''MetaPost'''是一个[[程序语言|程序语言]]和它的[[编译器|编译器]]的名字，衍生于[[高德纳|高德纳]]的[[Metafont|Metafont]]。MetaPost擅长通过数学描述制作矢量图，生成的图片为[[PostScript|PostScript]]格式。它的语法来自[[Metafont|Metafont]]。
+
+== 实例 ==
+这个文件<tt>example.mp</tt>通过MetaPost的编译器编译（在[[Linux|Linux]]系统中使用<code>mpost</code>命令）之后产生了3个[[EPS文件|EPS文件]]： <tt>example.1</tt>, <tt>example.2</tt>, <tt>example.3</tt>。这三个文件就是右边的三张图
+[[Image:Metapost_ex.svg|thumb]]
+<syntaxhighlight lang="postscript">
+ transform pagecoords;
+ pagecoords:=identity scaled 10mm shifted (100mm,150mm);
+ beginfig (1)
+     fill ((0,0)--(2,0)--(2,1)--(1,1)--(1,2)--(0,2)--cycle)
+         transformed pagecoords withcolor green;
+     draw ((2,0)..(2,1)..(1,1)..(1,2)..(0,2))
+         transformed pagecoords;
+     drawarrow ((0,0)--(2,2)) transformed pagecoords;
+ endfig;
+ beginfig (2)
+     draw (for i=0 up to 7: dir (135i)-- endfor cycle)
+         transformed pagecoords;
+ endfig;
+ pagecoords:=identity scaled 15mm shifted (100mm,150mm);
+ beginfig (3);
+     % declare paths to be used
+     path p[],p[]t;
+     % set up points by defining relationships
+     z1=(0,0);   z2=z1+2up;
+     z3=z1+whatever*dir (60)=z2+whatever*dir (-50);
+     z4=z3+(-1.5,-.5);
+     z5=z1+dir (135);
+     z0=whatever[z1,z2]=whatever[z3,z4];
+     % set up paths
+     p0=fullcircle yscaled .5 rotated 45 shifted z0 ;
+     p1=z2—z4..z0..z3---z1;
+     p2=p1 cutbefore p0 cutafter p0;
+     p3=p0 cutbefore p1 cutafter p1;
+     p4=p2—p3—cycle;
+     % define transformed versions of paths and points
+     for i=0 up to 4: p[i]t=p[i] transformed pagecoords; endfor
+     for i=0 up to 5: z[i]t=z[i] transformed pagecoords; endfor
+     % do some drawing
+     fill p4t withcolor (1,1,0.2);
+     draw z1t—z2t withcolor .5white;
+     draw z3t—z4t withcolor .5white;
+     pickup pencircle;
+     draw p0t dashed withdots scaled .3;
+     draw p1t dashed evenly;
+     draw p2t withcolor blue;
+     draw p3t withcolor red;
+     label.lrt (btex $z_0$ etex, z0t);
+     label.llft (btex $z_1$ etex, z1t);
+     label.top (btex $z_2$ etex, z2t);
+     label.rt (btex $z_3$ etex, z3t);
+     label.llft (btex $z_4$ etex, z4t);
+     for i=0 up to 4:
+         drawdot z[i]t withpen pencircle scaled 2;
+     endfor
+ endfig;
+ bye
+</syntaxhighlight>
+
+产生的3个eps文件可以直接用在[[TeX|TeX]]中（通过[[LaTeX|LaTeX]]的<code>\includegraphics</code>命令、[[ConTeXt|ConTeXt]]的<code>\externalfigure</code>命令、Plain TeX的<code>\epsfbox</code>命令，或者Plain pdftex中来自<tt>supp-pdf.tex</tt>的<code>\convertMPtoPDF</code>命令。为了看或者打印这三张图片，这些引用是必须的，因为TeX的字体([[Metafont|Metafont]])并不包含在MetaPost产生的eps文件中。
+
+== 参见 ==
+{{portal|自由软件|Free Software Portal Logo.svg}}
+* [[PGF/TikZ|PGF/TikZ]]
+
+== 参考 ==
+{{refbegin}}
+* MetaFun (modules for Metapost) by Hans Hagen, [http://wiki.contextgarden.net/MetaFun] {{Wayback|url=http://wiki.contextgarden.net/MetaFun |date=20190928064515 }}
+*[[Donald_Knuth|Donald Knuth]]: ''The [[METAFONT|METAFONT]]book'', ([[Computers_and_Typesetting|Computers and Typesetting]] Volume C)  [[Addison-Wesley|Addison-Wesley]] 1986.  ISBN 0-201-13444-6
+*Comprehensive T<sub>E</sub>X Archive Network ([[CTAN|CTAN]]): http://www.ctan.org/ {{Webarchive|url=https://archive.is/20121209004851/http://dante.ctan.org/tex-archive/help/Catalogue/index.html |date=2012-12-09 }}. Repository of the T<sub>E</sub>X source and hundreds of add-ons and style files.
+*(La)TeX Navigator provides 305 simple MetaPost examples: https://web.archive.org/web/20130727021112/http://tex.loria.fr/prod-graph/zoonekynd/metapost/metapost.html
+*Taco Hoekwater: [http://www.tug.org/TUGboat/Articles/tb27-1/tb86hoekwater-metapost.pdf MetaPost developments—autumn 2006] {{Wayback|url=http://www.tug.org/TUGboat/Articles/tb27-1/tb86hoekwater-metapost.pdf |date=20160303210501 }}. ''TUGboat'' '''27''':1 (2006).
+{{refend}}
+
+== 外部链接 ==
+*The TeX users group ([[TeX_Users_Group|TUG]]) http://www.tug.org/ {{Wayback|url=http://www.tug.org/ |date=20120204061616 }} has a page devoted to MetaPost: http://www.tug.org/metapost.html {{WebCite|url=https://www.webcitation.org/65J8vHxWL?url=http://www.tug.org/metapost.html |date=20120208212126 |dateformat=iso }}
+*Active development of MetaPost continues at https://web.archive.org/web/20070929092912/http://foundry.supelec.fr/projects/metapost/
+*[https://web.archive.org/web/20081113124212/http://cryp.to/funcmp/ Functional MetaPost] allows MetaPost to be used from the functional programming language [[Haskell_(programming_language)|Haskell]]
+*John D. Hobby has a homepage at https://web.archive.org/web/20131003040005/http://ect.bell-labs.com/who/hobby/index.shtml and some other pages and publications devoted to MetaPost, though these are now a little dated
+**Historic MetaPost homepage: https://web.archive.org/web/20081212090123/http://ect.bell-labs.com/who/hobby/MetaPost.shtml
+**''A User's Manual for MetaPost'' John D. Hobby. Available as a file mpman.ps distributed with MetaPost, or from the [https://web.archive.org/web/20051217231314/http://cm.bell-labs.com/cm/cs/doc/92/2-21.ps.gz Bell Labs web site]. Also available in [http://www.tug.org/tutorials/mp/mpman.pdf PDF format] {{Wayback|url=http://www.tug.org/tutorials/mp/mpman.pdf |date=20200803235236 }} from [[CTAN|CTAN]].
+<!-- Interwikis found using http://vs.aka-online.de/globalwpsearch/ -->
+
+{{矢量图形置标语言}}
+{{Free and open-source typography}}
+{{TeX navbox}}
+
+[[Category:领域特定语言|Category:领域特定语言]]
+[[Category:矢量图形置标语言|Category:矢量图形置标语言]]
+[[Category:TeX|Category:TeX]]
+[[Category:公有领域软件|Category:公有领域软件]]
+[[Category:1994年建立的程式語言|Category:1994年建立的程式語言]]

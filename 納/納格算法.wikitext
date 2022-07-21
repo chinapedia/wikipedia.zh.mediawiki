@@ -1,0 +1,49 @@
+{{Refimprove|time=2017-06-18T04:33:07+00:00}}
+{{noteTA
+|G1=IT
+}}
+'''納格演算法'''是以減少封包傳送量來增進[[TCP/IP|TCP/IP]]網路的效能。它由約翰·納格任職於{{tsl|en|Ford Aerospace|Ford Aerospace}}時命名。
+
+納格的文件<ref group="注">''Congestion Control in IP/TCP Internetworks''（[http://www.ietf.org/rfc/rfc896.txt RFC 896]）</ref>描述了他所謂的「小封包問題」－某個應用程式不斷地送出小單位的資料，且某些常只佔1[[位元組|位元組]]大小。因為[[傳輸控制協議|TCP]]封包具有40[[位元組|位元組]]的標頭資訊（TCP與IPv4各佔20位元組），這導致了41位元組大小的封包只有1位元組的可用資訊，造成龐大的浪費。這種狀況常常發生於[[Telnet|Telnet]]工作階段－大部分的鍵盤操作會產生1位元組的資料並馬上送出。更糟的是，在慢速的網路連線下，這類的封包會大量地在同一時點傳輸，造成{{tsl|en|Congestion Collapse|壅塞碰撞}}。
+
+納格演算法的工作方式是合併（[[wikt:en:Coalesce|coalescing]]）一定數量的輸出資料後一次送出。特別的是，只要有已送出的封包尚未確認，傳送者會持續緩衝封包，直到累積一定數量的資料才送出。
+
+==演算法==
+
+  if有新資料要傳送
+    if訊窗大小>= MSS and可傳送的資料>= MSS
+      立刻傳送完整MSS大小的segment
+    else
+     if管線中有尚未確認的資料
+       在下一個確認（ACK）封包收到前，將資料排進緩衝區佇列
+     else
+       立即傳送資料  
+
+''MSS = [[最大分段大小|最大分段大小]]''
+
+该算法与 [[w:en:TCP_delayed_acknowledgment|TCP延迟确认]] 会有不好的相互作用，例如当程序发送端进行两次连续的小段写再跟着读时，接收端接收到第一次写后因[[w:en:TCP_delayed_acknowledgment|TCP延迟确认]]而等待第二次写后一并发送ACK，发送端则因第二次写数据长度小于MSS而等待第一次写的ACK（如上算法所示），最终将导致两对端都进入等待直到ACK延迟超时。因为这个原因，TCP实现通常为应用程序提供一个禁用Nagle算法的接口（通常称为TCP_NODELAY选项）。用户级解决方案是避免套接字上的 写-写-读 序列。 写-读-读 和 写-写-写 都是没问题的。但 写-写-读 则是性能杀手。所以，如果可以的话，缓冲你对TCP的小段写，然后一次发送它们。在每次读之前使用标准的[[UNIX|UNIX]] I/O包并冲刷写缓存通常能起作用。
+
+== 與延遲 ACK 的交互 ==
+該算法與TCP 延遲確認（delayed ACK）的交互很糟糕，該功能在 1980 年代初大致同時引入 TCP，但由不同的組。啟用這兩種算法後，對 TCP 連接執行兩次連續寫入，然後在第二次寫入的數據到達目的地後才會完成讀取的應用程序會經歷長達 500 毫秒的持續延遲，“確認延遲”。建議禁用其中任何一個，儘管傳統上禁用 Nagle 更容易，因為實時應用程序已經存在這樣的開關。
+
+Nagle 推薦的解決方案是通過緩衝應用程序寫入然後刷新緩衝區來避免算法發送過早的數據包：
+
+用戶級解決方案是避免套接字上的寫-寫-讀序列。寫-讀-寫-讀沒問題。寫-寫-寫很好。但是寫-寫-讀是一個殺手。因此，如果可以的話，緩衝您對 TCP 的少量寫入並一次性發送它們。使用標準 UNIX I/O 包並在每次讀取之前刷新寫入通常是可行的。
+
+Nagle 認為延遲 ACK 是一個“壞主意”，因為應用層通常不會在時間窗口內響應。對於典型用例，他建議禁用“延遲 ACK”而不是他的算法，因為“快速”ACK 不會像許多小數據包那樣產生那麼多開銷。
+
+=====禁用 Nagle 或延遲 ACK =====
+TCP 實現通常為應用程序提供一個接口來禁用 Nagle 算法。這通常稱為TCP_NODELAY選項。在 Microsoft Windows 上，TcpNoDelay註冊表開關決定了默認值。TCP_NODELAY自 1983 年 4.2BSD 中的 TCP/IP 堆棧以來就存在，這是一個具有許多後代的堆棧。
+
+系統間禁用延遲ACK的接口不一致。該TCP_QUICKACK標誌自 2001 年 (2.4.4) 起在 Linux 上可用，並且可能在官方界面為SIO_TCP_SET_ACK_FREQUENCY. 默認情況下，在 Windows 註冊表中設置TcpAckFrequency為 1 會關閉延遲 ACK。
+
+== 注释 ==
+{{reflist|group="注"}}
+
+
+==外部連結==
+*[http://searchnetworking.techtarget.com/sDefinition/0,,sid7_gci754347,00.html Nagle's algorithm]
+*[http://developers.slashdot.org/comments.pl?sid=174457&threshold=1&commentsort=0&mode=thread&cid=14515105 Nagle's explanation of why the algorithm isn't always beneficial]
+
+[[Category:網路算法|Category:網路算法]]
+[[Category:TCP协议|Category:TCP协议]]

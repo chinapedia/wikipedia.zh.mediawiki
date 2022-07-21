@@ -1,0 +1,239 @@
+{{refimprove|time=2018-09-30T18:25:17+00:00}}
+{{NoteTA
+|G1 = IT
+}}
+{{算法信息框
+|class=[[排序算法|排序算法]]
+|image=[[File:comb_sort_demo.gif|File:comb sort demo.gif]]
+|caption=使用梳排序為一列数字进行排序的过程
+|data=[[陣列|陣列]]
+|time=<math>\Omega(n^2)</math><ref name=BB>[http://www.sciencedirect.com/science/article/pii/S0020019000002234 Brejová, Bronislava.  "Analyzing variants of Shellsort"]</ref>
+|average-time=<math>\Omega(n^2/2^p)</math>
+其中{{math|''p''}}表示增量
+(the number of increments)<ref name=BB/>
+|best-time=<math>O(n\log n)</math>
+|space=<math>O(1)</math>
+|optimal=
+}}
+
+'''梳排序（Comb sort）'''是一種由{{tsl|en|Wlodzimierz Dobosiewicz|}}於1980年所發明的不穩定[[排序算法|排序算法]]，並由{{tsl|en|Stephen Lacey|}}和{{tsl|en|Richard Box|}}於1991年四月號的{{link-en|Byte雜誌|Byte Magazine}}中推廣。梳排序是改良自[[泡沫排序|泡沫排序]]和[[快速排序|快速排序]]，其要旨在於消除''烏龜''，亦即在陣列尾部的小數值，這些數值是造成泡沫排序緩慢的主因。相對地，''兔子''，亦即在陣列前端的大數值，不影響泡沫排序的效能。
+
+在泡沫排序中，只比較陣列中相鄰的二項，即比較的二項的''間距（Gap）''是1，梳排序提出此間距其實可大於1，改自[[插入排序|插入排序]]的[[希爾排序|希爾排序]]同樣提出相同觀點。梳排序中，開始時的間距設定為陣列長度，並在迴圈中以固定比率遞減，通常''遞減率''設定為1.3。在一次迴圈中，梳排序如同泡沫排序一樣把陣列從首到尾掃描一次，比較及交換兩項，不同的是兩項的間距不固定於1。如果間距遞減至1，梳排序假定輸入陣列大致排序好，並以泡沫排序作最後檢查及修正。
+
+== 遞減率 ==
+遞減率的設定影響著梳排序的效率，原作者以隨機數作實驗，得到最有效遞減率為1.3的。如果此比率太小，則導致一迴圈中有過多的比較，如果比率太大，則未能有效消除陣列中的烏龜。
+
+亦有人提議用<math>1/\left(1-\frac{1}{e^\varphi}\right) \approx 1.247330950103979</math>作遞減率，同時增加換算表協助於每一迴圈開始時計算新間距。
+
+因為程式語言中乘法比除法快，故會取遞減率倒數與間距相乘，<math>\frac{1}{1.247330950103979}=0.801711847137793 \approx 0.8</math>
+
+== 變異形式 ==
+=== 梳排序-11 ===
+設定遞減率為1.3時，最後只會有三種不同的間距組合：(9, 6, 4, 3, 2, 1)、(10, 7, 5, 3, 2, 1)、或 (11, 8, 6, 4, 3, 2, 1)。實驗證明，如果間距變成9或10時一律改作11，則對效率有明顯改善，原因是如果間距曾經是9或10，則到間距變成1時，數值通常不是遞增序列，故此要進行幾次泡沫排序迴圈修正。加入此指定間距的變異形式稱為''梳排序-11(Combsort11)''。
+
+=== 混合梳排序和其他排序算法 ===
+如同[[快速排序|快速排序]]和[[合併排序|合併排序]]，梳排序的效率在開始時最佳，接近結束時最差。如果間距變得太小時(例如小於10)，改用[[插入排序|插入排序]]或[[希爾排序|希爾排序]]等算法，可提昇整體效能。
+
+此方法最大好處是不需要檢查是否進行過交換程序以將排序迴圈提早結束。
+
+==虛擬碼==
+ -{}-
+ 梳排序程序（以array作輸入）
+     gap = array的長度 <span style="color:green">//設定開始時的間距</span>
+     <br />
+     當gap > 1或swaps = 1時執行迴圈 <span style="color:green">//代表未完成排序</span>
+         gap = 取「gap除以遞減率」的整數值 <span style="color:green">//更新間距</span>
+         <br />
+         swaps = 0 <span style="color:green">//用以檢查陣列是否已在遞增形式，只限gap=1時有效</span>
+         <br />
+         <span style="color:green">//把輸入陣列「梳」一次</span>
+         i = 0 到 (array的長度 - 1 - gap)來執行迴圈 <span style="color:green">//從首到尾掃描一次；因為陣列元素的編號從0開始，所以最後一個元素編號為長度-1</span>
+             如果array[i] > array[i+gap]
+                 把array[i]和array[i+gap]的數值交換
+                 swaps = 1 <span style="color:green">//曾作交換，故此陣列未必排序好</span>
+             如果結束
+         迴圈結束
+     迴圈結束
+ 程序結束
+
+==實作範例==
+
+===C語言===
+<syntaxhighlight lang="c">
+void comb_sort(int arr[], int len) {
+	double shrink_factor = 0.8;
+	int gap = len, swapped = 1, i;
+	int temp;
+	while (gap > 1 || swapped) {
+		if (gap > 1)
+			gap *= shrink_factor;
+		swapped = 0;
+		for (i = 0; gap + i < len; i++)
+			if (arr[i] > arr[i + gap]) {
+				temp = arr[i];
+				arr[i] = arr[i + gap];
+				arr[i + gap] = temp;
+				swapped = 1;
+			}
+	}
+}
+</syntaxhighlight>
+
+===C++===
+<syntaxhighlight lang="cpp">
+template<typename T> //整數或浮點數皆可使用，若要使用物件（class）時必須設定大於（>）的運算子功能
+void comb_sort(T arr[], int len) {
+	double shrink_factor = 0.8;
+	int gap = len, swapped = 1, i;
+	while (gap > 1 || swapped) {
+		if (gap > 1)
+			gap = (int) ((double) gap * shrink_factor);
+		swapped = 0;
+		for (i = 0; gap + i < len; i++)
+			if (arr[i] > arr[i + gap]) {
+				swap(arr[i], arr[i + gap]);
+				swapped = 1;
+			}
+	}
+}
+</syntaxhighlight>
+
+===Java===
+<syntaxhighlight lang="java">
+public static <E extends Comparable<? super E>> void sort(E[] input) {
+    int gap = input.length;
+    boolean swapped = true;
+    while (gap > 1 || swapped) {
+        if (gap > 1) {
+            gap = (int) (gap * 0.8);
+        }
+        int i = 0;
+        swapped = false;
+        while (i + gap < input.length) {
+            if (input[i].compareTo(input[i + gap]) > 0) {
+                E t = input[i];
+                input[i] = input[i + gap];
+                input[i + gap] = t;
+                swapped = true;
+            }
+            i++;
+        }
+    }
+}
+</syntaxhighlight>
+
+===JavaScript===
+<syntaxhighlight lang="javascript">
+Array.prototype.comb_sort = function() {
+	var shrink_factor = 0.8;
+	var gap = this.length, swapped = 1, i;
+	var temp;
+	while (gap > 1 || swapped) {
+		if (gap > 1)
+			gap = Math.floor(gap * shrink_factor);
+		swapped = 0;
+		for (i = 0; gap + i < this.length; i++)
+			if (this[i] > this[i + gap]) {
+				temp = this[i];
+				this[i] = this[i + gap];
+				this[i + gap] = temp;
+				swapped = 1;
+			}
+	}
+	return this;
+};
+</syntaxhighlight>
+
+===PHP===
+<syntaxhighlight lang="php">
+function swap(&$x, &$y) {
+	$t = $x;
+	$x = $y;
+	$y = $t;
+}
+function comb_sort(&$arr) {//php的陣列視為基本型別，所以必須用傳參考才能修改原陣列
+	$shrink_factor = 0.8;
+	$gap = count($arr);
+	$swapped = 1;
+	while ($gap > 1 || $swapped) {
+		if ($gap > 1)
+			$gap = floor($gap * $shrink_factor);
+		$swapped = 0;
+		for ($i = 0; $gap + $i < count($arr); $i++)
+			if ($arr[$i] > $arr[$i + $gap]) {
+				swap($arr[$i], $arr[$i + $gap]);
+				$swapped = 1;
+			}
+	}
+}
+</syntaxhighlight>
+
+===Go===
+<syntaxhighlight lang="go">
+func comb_sort(data sort.Interface) {
+	n := data.Len()
+	shrinkFactor := 0.8
+	gap := n
+	swapped := true
+
+	for gap > 1 || swapped {
+		if gap > 1 {
+			gap = int(float64(gap) * shrinkFactor)
+		}
+
+		// 冒泡排序
+		swapped = false
+		for i := 0; i < n - gap; i++ {
+			if data.Less(i + gap, i) {
+				data.Swap(i + gap, i)
+				swapped = true
+			}
+		}
+	}
+}
+</syntaxhighlight>
+
+==動作原理==
+假設輸入為
+: 8 4 3 7 6 5 2 1
+目標為將之變成遞增排序。因為輸入長度=8，開始時設定間距為8/1.3≒6，則比較8和2、4和1，並作交換兩次。
+: '''8''' 4 3 7 6 5 '''2''' 1
+: 2 '''4''' 3 7 6 5 8 '''1'''
+: 2 1 3 7 6 5 8 4
+第二次迴圈，更新間距為6/1.3≒4。比較2和6、1和5，直至7和4，此迴圈中只須交換一次。
+: 2 1 3 '''7''' 6 5 8 '''4'''
+: 2 1 3 4 6 5 8 7
+接下來的每次迴圈，間距依次遞減為3 → 2 → 1，
+
+間距=3時，不須交換
+: 2 1 3 4 6 5 8 7
+
+間距=2時，不須交換
+: 2 1 3 4 6 5 8 7
+
+間距h=1時，交換三次
+: '''2''' '''1''' 3 4 6 5 8 7
+: 1 2 3 4 '''6''' '''5''' 8 7
+: 1 2 3 4 5 6 '''8''' '''7'''
+: 1 2 3 4 5 6 7 8
+
+上例中，共作了六次交換以完成排序。
+
+== 參考文獻 ==
+<references/>
+
+== 參看 ==
+* [[泡沫排序|泡沫排序]]，梳排序的基本，較慢的算法。
+* [[雞尾酒排序|雞尾酒排序]]，或雙向泡沫排序，一樣解決了泡沫排序中的烏龜問題。
+
+== 外部連結 ==
+{{Wikibooks|Algorithm implementation|Sorting/Comb sort|Comb sort}}
+*[http://www.sharpdeveloper.net/content/archive/2007/08/14/dot-net-data-structures-and-algorithms.aspx .NET Implementation of comb sort and several other algorithms] {{Wayback|url=http://www.sharpdeveloper.net/content/archive/2007/08/14/dot-net-data-structures-and-algorithms.aspx |date=20120212173240 }}
+*[https://web.archive.org/web/20100214074856/http://yagni.com/combsort/ Combsort - Who ever knew that bubblesort could be so good?]
+
+{{算法}}
+{{排序算法表}}
+
+[[Category:排序算法|Category:排序算法]]
+[[Category:带有伪代码示例的条目|Category:带有伪代码示例的条目]]
+[[Category:带有代码示例的条目|Category:带有代码示例的条目]]

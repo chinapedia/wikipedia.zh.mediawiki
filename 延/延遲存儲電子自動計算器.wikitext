@@ -1,0 +1,163 @@
+[[File:EDSAC_(10).jpg|thumb]]
+[[File:EDSAC_(12).jpg|thumb]]
+'''电子延迟存储自动计算器'''（[[英文|英文]]：'''Electronic Delay Storage Auto-matic Calculator'''、'''EDSAC'''）是[[英国|英国]]的早期[[电子计算机|计算机]]。1946年,英国[[剑桥大学|剑桥大学]]数学实验室的[[莫里斯·威尔克斯|莫里斯·威尔克斯]]教授和他的团队受[[冯·诺伊曼|冯·诺伊曼]]的''[[First_Draft_of_a_Report_on_the_EDVAC|First Draft of a Report on the EDVAC]]''<ref>[http://www.virtualtravelog.net/entries/2003-08-TheFirstDraft.pdf http://www.virtualtravelog.net/entries/2003-08-TheFirstDraft.pdf] {{webarchive|url=https://web.archive.org/web/20040423232125/http://www.virtualtravelog.net/entries/2003-08-TheFirstDraft.pdf |date=2004-04-23 }}</ref>的启发，以[[EDVAC|EDVAC]]为蓝本，设计和建造EDSAC，1949年5月6日正式运行，是世界上第一台实际运行的[[冯·诺伊曼结构|存储程序式]][[电子计算机|电子计算机]]<ref>EDVAC是第一个设计为[[冯·诺伊曼结构|冯·诺伊曼结构]]的电子计算机，但直到1952年该计算机才首次正式运行。</ref>。
+
+项目的投资方是英国的J. Lyons & Co. Ltd.，该公司后来推出基于EDSAC设计的第一代[[商业|商业]]应用电子计算机'''{{link-en|LEO I|LEO I}}'''。
+
+== 物理组件 ==
+EDSAC使用了约3000个[[真空管|真空管]]，排在12个柜架上，占地5×4[[米_(單位)|米]]，[[功率|功率]]消耗12Kw <ref name="ref3"> Martin Campbell-Kelly: Programming the EDSAC, IEEE Annals of the History of Computing, Vol 2(1), 1980.</ref>。
+
+[[File:EDSAC_(8).jpg|thumb]]
+=== 存储器 ===
+使用[[水银|水银]]延迟线作[[存储器|存储器]]，分布在32个槽中，每个槽5英尺长，里面包含32个内存位置，共1024个位置。 <ref name="ref1">Report of a Conference on High Speed Automatic Calculating-machines, University Mathematical Laboratory, Cambridge, June 1949; M.R. Williams与M. Campbell-Kelly的修改版于1989年由MIT/Tomash historical series重印（报告也包含了EDSAC与曼彻斯特与美国的同时期电子计算机的比较报告。）
+</ref><ref name="ref2">Peter Robinson and Karen Sparck Jones: EDSAC 99 commemorative booklet, University of Cambridge Computer Laboratory, April 1999. [http://www.cl.cam.ac.uk/UoCCL/misc/EDSAC99/booklet.pdf 在线版本] {{Wayback|url=http://www.cl.cam.ac.uk/UoCCL/misc/EDSAC99/booklet.pdf |date=20061019075201 }}.</ref>
+
+建造时只实现了一半，512个字，第二组于1952年添加.<ref name="ref3"></ref>
+1952年增加一个[[磁带|磁带]]存储，但实际使用中不能良好工作。<ref name="ref4">Karen Sparck Jones: Brief informal history of the Computer Laboratory [http://www.cl.cam.ac.uk/UoCCL/misc/EDSAC99/history.html 在线版本] {{Wayback|url=http://www.cl.cam.ac.uk/UoCCL/misc/EDSAC99/history.html |date=20070205073459 }}</ref>
+
+=== [[输入输出|输入输出]] ===
+
+[[File:EDSAC_(5).jpg|left]]
+'''输入'''采用5路的[[穿孔纸带|穿孔纸带]]，使用电子纸带读入机，速度为每秒<math>6\frac{2}{3}</math>个[[字符_(计算机科学)|字符]]，1949年10月改进为每秒16字符，1950年使用光电阅读器，达到50字符每秒。 <ref name="ref3"></ref>
+
+'''输出'''使用[[电传打字机|电传打字机]]，速度<math>6\frac{2}{3}</math>字符每秒，1951年添加一个16字符每秒的纸带打孔机 <ref name="ref3"></ref>
+
+另外，EDSAC可以外接[[阴极射线管|阴极射线管]]（CRT），可以用来观察[[寄存器|寄存器]]的值。
+
+
+== 体系结构 ==
+EDSAC的原始设计基于[[EDVAC|EDVAC]]，概念上是一台十分简单的机器，这是它的一个良好特征，与1960-1970年代的[[RISC|RISC]]体系很相似。<ref name="ref7"></ref>
+
+包含5部分：'''运算器'''（ALU）、'''控制器'''、'''存储器'''、'''输入'''和'''输出'''。运算器和控制器现在一般合称[[CPU|CPU]]。
+
+工作在500k[[Hz|Hz]]<ref name="ref5"> M.V. Wilkes, Memoirs of a Computer Pioneer, MIT Press, 1985.</ref>，平均每秒运行650[[指令|指令]]<ref name="ref3"></ref>
+=== 内存 ===
+共1024字（word），每[[字_(计算机)|字]]18[[位|位]]（bit）。但一般只能使用17bit，第一个bit由于电路的建立时间（set-up time）而不能使用。
+
+存放指令时，包含如下结构：
+:{| cellpadding="4" style="border-collapse: collapse; margin: 0.4em 0.4em; text-align: center;"
+|-
+| style="border: 1px solid;" | <tt>     5     </tt>
+| style="border: 1px solid;" | <tt> 1 </tt>
+| style="border: 1px solid;" | <tt>          10          </tt>
+| style="border: 1px solid;" | <tt> 1 </tt>
+|-
+|指令代码
+|保留
+|内存地址
+|长度
+|-
+| colspan="6" |指令格式
+|}
+:5bit的指令代码，11bit内存地址（由于EDSAC内存只有1024，所以实际有1bit保留），余下1bit在某些指令中，用于指示操作子是单字还是双字（word）。
+
+存放数据时，EDSAC采用[[二进制|二进制]][[补码|补码]]，可表示正负[[整数|整数]]和正负[[真分数|真分数]]。
+单字17bit，其中第一个bit用于符号位；双字35bit，此时，第二个字可用满18bit。
+
+如下图所示：
+:{| cellpadding="4" style="border-collapse: collapse; margin: 0.4em 0.4em; text-align: center;"
+|-
+| style="background:yellow;border: 1px solid;" | <tt>  </tt>
+| style="border: 1px solid;" | <tt>          16          </tt>
+|-
+| colspan="6" |a.短整数
+|}
+:{| cellpadding="4" style="border-collapse: collapse; margin: 0.4em 0.4em; text-align: center;"
+|-
+| style="background:yellow;border: 1px solid;" | <tt>  </tt>
+| style="border: 1px solid;" | <tt>          16          </tt>
+| style="background:green;border: 1px solid;" | <tt>  </tt>
+| style="border: 1px solid;" | <tt>          17            </tt>
+|-
+| colspan="6" |b.长整数
+|}
+:隐含的[[小数点|小数点]]在[[最低有效位|最低有效位]]上
+:{| cellpadding="4" style="border-collapse: collapse; margin: 0.4em 0.4em; text-align: center;"
+|-
+| style="background:yellow;border: 1px solid;" | <tt>  </tt>
+| style="border: 1px solid;" | <tt>          16          </tt>
+|-
+| colspan="6" |c.短分数
+|}
+:{| cellpadding="4" style="border-collapse: collapse; margin: 0.4em 0.4em; text-align: center;"
+|-
+| style="background:yellow;border: 1px solid;" | <tt>  </tt>
+| style="border: 1px solid;" | <tt>          16          </tt>
+| style="background:green;border: 1px solid;" | <tt>  </tt>
+| style="border: 1px solid;" | <tt>          17            </tt>
+|-
+| colspan="6" |d.长分数
+|}
+:隐含的小数点在[[符号位|符号位]]后面。
+:::{| cellpadding="4" style="border-collapse: collapse; margin: 0.4em 0.4em; text-align: center;"
+| style="background:yellow;border: 1px solid;" | <tt>  </tt>
+| style="border:0 solid;"| <tt>表示符号位</tt>
+| style="background:green;border: 1px solid;" | <tt>  </tt>
+| style="border:0 solid;"| <tt>表示中间位</tt>
+|}
+
+=== 寄存器 ===
+[[File:EDSAC_(17).jpg|thumb]]
+EDSAC的[[中央处理器|处理器]]包含5个基本[[寄存器|寄存器]]：
+* '''指令地址寄存器'''
+* '''顺序存储器'''
+* '''被乘数寄存器'''
+* '''乘数寄存器'''
+* '''累加器'''
+EDSAC和同时代的计算机均没有{{link-en|变址寄存器|Index_register}}。<ref name="ref7">[http://www.dcs.warwick.ac.uk/~edsac/Software/EdsacTG.pdf EDSAC模拟器的文档] {{Wayback|url=http://www.dcs.warwick.ac.uk/~edsac/Software/EdsacTG.pdf |date=20151222132057 }} 马丁·坎贝尔-凯利编写</ref>
+
+=== 指令集 ===
+平均每条指令运行时间1.5ms，乘法4.5ms，软件[[除法|除法]]大约需要200ms。<ref name="ref3"></ref>
+
+完整的[[指令集|指令集]]可以在[https://web.archive.org/web/20151222132057/http://www.dcs.warwick.ac.uk/~edsac/Software/EdsacTG.pdf 这里]的p41找到。
+
+* [[转移指令|转移指令]]
+:转移指令只有E-和G-（分别表示[[累加器|累加器]]的符号位为0和1时转移），而没有无条件转移。因此无条件转移就需要使用两条指令；同样的原因，使得判断两个数相等需要八条指令。<ref name="ref7"></ref> 1952年，指令集添加了无条件转移，但许多程序和[[子程序|子程序]][[库|库]]需要重写。
+* [[算术指令|算术指令]]
+:加法指令将存放的数据按整数处理。而乘法指令将数据解释为真分数，两个17bit的分数相乘得到一个35bit的分数存入累加器。
+:EDSAC缺少[[逻辑运算指令|逻辑运算指令]]，只有AND，也缺少[[字符处理指令|字符处理指令]]。<ref name="ref7"></ref>
+
+== 软件 ==
+=== 操作系统 ===
+[[操作系统|操作系统]]，或者称之为'''初始化指令'''，使用了31条指令，存放在机械结构的[[只读存储器|只读存储器]]中。这些指令将纸带上的[[计算机程序|程序]]读入[[内存|内存]]，然后运行。
+
+第二个版本在1949年8月安装，占用了41条指令，使得[[子程序|子程序]]的重定位和协作变得简单易用（D.J. Wheeler的重要发明）。<ref name="ref3"></ref>
+=== 应用软件 ===
+1949年5月6日，第一个在EDSAC程序是打印0-99的[[平方|平方]]表。
+
+EDSAC的非凡的特征是提供了大量的[[子程序|子程序]]。到1951年，EDSAC含有87个子程序，涵盖：
+:[[浮点|浮点]]运算、[[复数_(数学)|复数]]运算、检测、[[除法|除法]]、[[幂|幂]]、[[微分方程|微分方程]]、特殊函数、[[幂级数|幂级数]]、[[对数|对数]]、[[数值积分|正交]]、[[输入输出|输入输出]]、n次方根、[[三角函数|三角函数]]、[[向量|向量]]和[[矩阵|矩阵]]、循环（模拟repeat，while和for）。
+
+== EDSAC的应用 ==
+[[File:EDSAC_(21).jpg|thumb]]
+EDSAC早期应用集中在解决[[气象学|气象学]]、[[遗传学|遗传学]]和[[X光|X光]][[结晶学|结晶学]]等方面的问题。
+* 1951年，Miller和Wheeler利用EDSAC发现了一个当时最大的79位[[素数|素数]]。
+* 1951年，A.S. Douglas开发出OXO（[[井字過三關|井字游戏]]），输出到[[阴极射线管|阴极射线管]]，是最早的[[电子计算机|电子计算机]][[视频游戏|视频游戏]]。
+* 1960年代，EDSAC用于收集[[椭圆曲线|椭圆曲线]]解的数值现象，这引出了[[贝赫和斯维讷通-戴尔猜想|贝赫和斯维讷通-戴尔猜想]]。
+
+<!-- <ref name='tpop'>{{cite book en|title=The Preparation of Programs for an Electronic Digital Computer|author=[[莫里斯·威尔克斯|莫里斯·威尔克斯]], [[大卫·惠勒|大卫·惠勒]]，[[斯坦利·吉尔|斯坦利·吉尔]]}}</ref> -->
+
+== 后续发展 ==
+EDSAC的后继机型'''EDSAC2'''于1958年投入使用。EDSAC2引入了[[微程序|微程序]]（microprogramme）和{{link-en|位片|bit-slice}}的概念。<ref name="ref4"></ref>
+
+== 参考 ==
+* The Preparation of Programs for an Electronic Digital Computer [[莫里斯·威尔克斯|莫里斯·威尔克斯]], [[大卫·惠勒|大卫·惠勒]]和[[斯坦利·吉尔|斯坦利·吉尔]], Addison-Wesley, 第一版, 1951年
+* {{cite web en|title=First Draft of a Report on the EDVAC|author=John von Neumann|url=http://www.virtualtravelog.net/entries/2003-08-TheFirstDraft.pdf|deadurl=yes|archiveurl=https://web.archive.org/web/20040423232125/http://www.virtualtravelog.net/entries/2003-08-TheFirstDraft.pdf|archivedate=2004-04-23}}
+
+
+== 相关条目 ==
+* [[莫里斯·威尔克斯|莫里斯·威尔克斯]]
+* [[EDVAC|EDVAC]]
+* [[冯·诺伊曼结构|冯·诺伊曼结构]]
+
+== 外部链接 ==
+{{commonscat|EDSAC}}            
+* [https://web.archive.org/web/20101124230055/http://www.dcs.warwick.ac.uk/%7Eedsac/ EDSAC模拟器]{{en}} 英国[[华威大学|华威大学]]计算机科学系马丁·坎贝尔-凯利开发
+* [http://www.cl.cam.ac.uk/UoCCL/misc/EDSAC99/ EDSAC50周年] {{Wayback|url=http://www.cl.cam.ac.uk/UoCCL/misc/EDSAC99/ |date=20070205024514 }} {{en}}
+* [http://www.cs.man.ac.uk/CCS/res/res22.htm#b Nicholas Enticknap and Maurice Wilkes, Cambridge's Golden Jubilee] {{Wayback|url=http://www.cs.man.ac.uk/CCS/res/res22.htm#b |date=20210616003625 }} {{en}}
+
+== 脚注 ==
+{{reflist}}
+
+[[Category:早期电脑|Y]]
+[[Category:计算机历史|Y]]

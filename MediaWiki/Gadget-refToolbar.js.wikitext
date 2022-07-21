@@ -1,0 +1,48 @@
+/**
+ * from //en.wikipedia.org/wiki/Wikipedia:RefToolbar/2.0
+ * RefToolbar
+ *
+ * Adds tools for citing references to the edit toolbar.
+ * See [[Wikipedia:RefToolbar|Wikipedia:RefToolbar]] for further documentation. One of two
+ * possible versions will load (Reftoolbar 1.0 or Reftoolbar 1.0)
+ * depending on the user preferences (the usebetatoolbar preference).
+ *
+ * @see: [[Wikipedia:RefToolbar|Wikipedia:RefToolbar]]
+ * @see: [[MediaWiki:RefToolbar.js|MediaWiki:RefToolbar.js]]
+ * @see: [[MediaWiki:RefToolbarConfig.js|MediaWiki:RefToolbarConfig.js]]
+ * @see: [[MediaWiki:RefToolbarLegacy.js|MediaWiki:RefToolbarLegacy.js]]
+ * @see: [[MediaWiki:RefToolbarMessages-en.js|MediaWiki:RefToolbarMessages-en.js]]
+ * @see: [[MediaWiki:RefToolbarMessages-de.js|MediaWiki:RefToolbarMessages-de.js]]
+ * @see: [[MediaWiki:Gadget-refToolbarBase.js|MediaWiki:Gadget-refToolbarBase.js]]
+ * @author: [[User:Mr.Z-man|User:Mr.Z-man]]
+ * @author: [[User:Kaldari|User:Kaldari]]
+ */
+/*jshint browser: true, camelcase: true, curly: true, eqeqeq: true */
+/*global jQuery, mediaWiki, importScript */
+(function($, mw) {
+	'use strict';
+	function initializeRefTools() {
+		if (window.refToolbarInstalled || $('#wpTextbox1[readonly]').length) {
+			return;
+		}
+		if (mw.user.options.get('usebetatoolbar')) {
+			// Enhanced editing toolbar is on. Going to load RefToolbar 2.0.
+			$.getScript('//zh.wikipedia.org/w/index.php?title=MediaWiki:Gadget-refToolbarBase.js&action=raw&ctype=text/javascript', function() { // workaround for [[WP:AUTOLOGOUT|WP:AUTOLOGOUT]]
+				mw.loader.using('ext.wikiEditor').then(function() {
+					mw.loader.load('//zh.wikipedia.org/w/index.php?title=MediaWiki:RefToolbar.js&action=raw&ctype=text/javascript'); // workaround for [[WP:AUTOLOGOUT|WP:AUTOLOGOUT]]
+				});
+			});
+		} else if (mw.user.options.get('showtoolbar')) {
+			// Enhanced editing toolbar is off. Loading RefToolbar 1.0. (legacy)
+			mw.loader.load('//zh.wikipedia.org/w/index.php?title=MediaWiki:RefToolbarLegacy.js&action=raw&ctype=text/javascript&smaxage=21600&maxage=86400'); // workaround for [[WP:AUTOLOGOUT|WP:AUTOLOGOUT]]
+		} else {
+			return;
+		}
+		window.refToolbarInstalled = true;
+	}
+
+	if ($.inArray(mw.config.get('wgAction'), ['edit', 'submit']) !== -1) {
+		// Double check if user.options is loaded, to prevent errors when copy pasted accross installations
+		$.when(mw.loader.using(['user.options']), $.ready).done(initializeRefTools);
+	}
+})(jQuery, mw);

@@ -1,0 +1,43 @@
+{{noteTA
+|G1=IT
+|1=zh-hans:宏; zh-hant:巨集;
+}}
+
+{{lowercase|title=assert.h}}
+
+{{C_Standard_library}} <!-- to edit this template go to [[template:C_Standard_library|template:C_Standard_library]] -->
+
+<code>assert.h</code>是[[C標準函数庫|C標準函数庫]]中的[[头文件|头文件]]。其中定义了<code>assert()</code>宏用于程序调试。
+
+在C標準函数庫中，它是個非常特別的头文件，你可以將它引入數次以獲得不同的效果，此效果依引入時是否以定義NDEBUG而定。
+
+== 宏 ==
+<code>assert()</code>是一个诊断宏，用于动态辨识程序的逻辑错误条件。其原型是：
+<code>void assert(int expression);</code>
+
+如果宏的参数求值结果为非零值，则不做任何操作（no action）；如果是零值，用[[宽字符|宽字符]]打印诊断消息，然后调用<code>abort()</code>。诊断消息包括：
+* 源文件名字（在<code>[[stdlib.h|stdlib.h]]</code>中声明的宏<code>__FILE__</code>的值）
+* 所在的源文件的行号（在<code>stdlib.h</code>中声明的宏<code>__LINE__</code>的值） 
+* 所在的函数名（在stdlib.h中声明的宏<code>__func__</code>的值），这是[[C99|C99]]新增的特性
+* 求值结果为0的表达式
+诊断信息的显示目标依赖于被调用程序的类型。如果是控制台程序，诊断信息显示在[[stderr|stderr]]设备；如果是基于窗口的程序，<code>assert()</code>产生一个Windows MessageBox来显示诊断信息。
+
+程序可以屏蔽掉所有的<code>assert()</code>而无需修改源代码。这只需要在命令行调用C语言的编译器时添加宏定义的命令行选项，定义<code>NDEBUG</code>宏;也可以在源程序程序引入<code><assert.h></code>之前就使用<code>#define NDEBUG</code>来定义宏。被屏蔽的<code>assert()</code>甚至不对传递给它的参数表达式求值，因此使用<code>assert()</code>时其参数表达式不能有副作用（side-effects）。
+==例程==
+<syntaxhighlight lang="c">
+#include <stdio.h>
+#include <assert.h>
+
+int main (void)
+{
+    FILE *fd;
+
+    fd = fopen ("/home/user/file.txt", "r");
+    assert (fd);
+    fclose (fd);
+
+    return 0;
+}
+</syntaxhighlight>
+
+[[Category:C标准库头文件|Category:C标准库头文件]]

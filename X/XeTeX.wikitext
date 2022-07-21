@@ -1,0 +1,175 @@
+{{noteTA
+|G1=IT
+}}
+{{DISPLAYTITLE:{{XeTeX}}}}
+{{Infobox software
+| name                   = {{XeTeX}}
+| logo                   = [[Image:XeTeX_Logo.svg|200px]]
+| author              = Jonathan Kew
+| developer              = Khaled Hosny
+| latest release version = 0.999992
+| latest release date    = {{Start date and age|2020|1|20}}
+| operating_system       = [[跨平台|跨平台]]
+| genre                  = [[排版|排版]]
+| license                = [[MIT许可证|MIT许可证]]
+| website                = [http://xetex.sourceforge.net/ xetex.sourceforge.net]
+}}
+
+'''{{XeTeX}}'''（{{IPA-en|ˈziːtɛx|}}或{{IPA-en|ˈziːtɛk|}}<ref>{{cite interview |last=Kew |first=Jonathan |url=http://tug.org/interviews/interview-files/jonathan-kew.html |interviewer=Dave Walden |title= |work=TUG |date=2007-04-03 |accessdate=2012-10-25 |language=en |archive-date=2020-10-28 |archive-url=https://web.archive.org/web/20201028203628/http://www.tug.org/interviews/interview-files/jonathan-kew.html }}</ref>，文本模式下写作XeTeX）是一种使用[[Unicode|Unicode]]的[[TeX|TeX]][[排版|排版引擎]]，并支持一些现代字体技术，例如[[OpenType|OpenType]]、[[Graphite|Graphite]]和{{link-en|苹果高级文字排版技术|Apple Advanced Typography|Apple Advanced Typography}}（AAT）。其作者和维护者是Jonathan Kew，并以[[MIT许可证|X11自由软件许可证]]发布<ref>{{Cite web | url=http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=xetex_download | title=XeTeX downloads | accessdate=2012-10-25 | publisher=SIL International | language=en | archive-date=2021-10-20 | archive-url=https://web.archive.org/web/20211020045347/https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=xetex_download }}</ref>。
+
+虽然{{XeTeX}}最初只是为[[Mac_OS_X|Mac OS X]]所开发，但它现在在各主要平台上都可以运作。它原生支持Unicode，并默认其输入文件为[[UTF-8|UTF-8]]编码。{{XeTeX}}可以在不进行额外配置的情况下直接使用操作系统中安装的字体，因此可以直接利用OpenType、Graphite中的高级特性，例如额外的[[字形|字形]]，[[花体|花体]]，[[合字|合字]]，可变的文本粗细等等。{{XeTeX}}提供了对OpenType中本地排版约定（<code>locl</code>标签）的支持，也允许向字体传递OpenType的元标签。它亦支持使用包含特殊数学字符的Unicode字体排版数学公式，例如使用[[Cambria#Cambria_Math|Cambria Math]]或[[Asana_Math|Asana Math]]字体代替传统的TeX字体。
+
+==历史==
+
+2004年4月，发布了{{XeTeX}}的第一个版本，这个版本只支持[[Mac_OS_X|Mac OS X]]，并包括了内建的[[Apple_Advanced_Typography|ATT]]和[[Unicode|Unicode]]支持。2005年，加入了对OpenType的支持。在2006年BachoTeX期间，发布了第一个支持[[Linux|Linux]]的版本，并在数月后由Akira Kakuto移植到了[[Microsoft_Windows|Microsoft Windows]]上，其跨平台版本最终包含在[[TeX_Live|{{TeX}} Live]] 2007中。另外，从2.7版开始，[[MiKTeX|MiK{{TeX}}]]也包含了{{XeTeX}}。
+
+作为[[TeX_Live|{{TeX}} Live]]的一部分，{{XeTeX}}支持大多数为[[LaTeX|{{LaTeX}}]]、[[OpenType|OpenType]]、[[TrueType|TrueType]]和[[PostScript|PostScript]]字体开发的巨集包，而无需特别的安装和设定。
+
+[[BachoTeX|BachoTeX]] 2008上宣布发行0.998版本，通过<code>\XeTeXinputnormalization</code>命令支持[[Unicode正规化|Unicode正规化]]。
+
+2013年5月发布0.9999，为了[[OpenType|OpenType]]排版从[[International_Components_for_Unicode|ICU]]排版引擎转换到[[HarfBuzz|HarfBuzz]]，为[[Graphite|Graphite]]排版输出增添Graphite2，并在Mac OS X以[[Core_Text|Core Text]]取代[[ATSUI|ATSUI]]。
+
+==工作过程==
+
+[[Image:Rare_and_ancient_ligatures_in_XeTeX.svg|thumbnail]]字体（[[Hoefler_Text|Hoefler Text]]）渲染[[合字|合字]]]]
+
+{{XeTeX}}分两个阶段处理输入文件。在第一阶段中，{{XeTeX}}输出扩展DVI （<code>xdv</code>）文件，然后由驱动转换为[[PDF|PDF]]文件。在默认模式下，<code>xdv</code>文件被直接通过管道送入驱动，不产生任何用户可见的中间文件。同时，也可以只运行{{XeTeX}}的第一阶段，保存<code>xdv</code>文件，但在{{As of|2008|7|lc=on}}尚无可以阅读这种格式的阅读器。
+
+有两种后端驱动可以从<code>xdv</code>文件产生PDF文件：
+*<code>xdv2pdf</code>：它使用{{link-en|苹果高级文字排版技术|Apple Advanced Typography|AAT}}技术（Apple Advanced Typography），只能在[[Mac_OS_X|Mac OS X]]上工作。
+*<code>xdvipdfmx</code>：它是<code>{{link-en|dvipdfmx|dvipdfmx}}</code>的修改版。它在标准的[[FreeType|FreeType]]和[[fontconfig|fontconfig]]上采用了修改版本的Unicode国际化组件（ICU），可以在所有平台上工作。
+从0.997版开始，所有平台上的默认驱动都是<code>xdvipdfmx</code>。在0.9999版中xdv2pdf不再得到支持，其开发也被中止。<ref>{{Cite web | url=http://tug.org/pipermail/xetex/2013-March/024120.html | last=Hosny | first=Khaled | title=Future of xdv2pdf driver on Mac | date=March 12, 2013 | accessdate=2013-06-07 | archive-date=2021-01-18 | archive-url=https://web.archive.org/web/20210118211526/https://tug.org/pipermail/xetex/2013-March/024120.html }}</ref>
+
+{{XeTeX}}可以很好的支持[[LaTeX|{{LaTeX}}]]和{{link-en|ConTeXt|ConTeXt}}[[巨集|巨集]]包。其中，LaTeX部分以<code>xelatex</code>的方式引用。并通常与<code>fontspec</code>一起使用，该巨集包提供字体的配置方式，并允许重新命名复杂的字体名称以便于再利用<ref>{{Cite web|url=http://www.ctan.org/tex-archive/macros/xetex/latex/fontspec/fontspec.pdf|last=Robertson|first=Will|date=2008-08-09|format=PDF|title=The fontspec package|accessdate=2009-01-08|language=en|archive-date=2009-02-05|archive-url=https://web.archive.org/web/20090205222415/http://ctan.org/tex-archive/macros/xetex/latex/fontspec/fontspec.pdf|dead-url=no}}</ref>。
+
+{{XeTeX}}包含在[[TeX_Live|{{TeX}} Live]]、{{link-en|MacTeX|MacTeX|Mac{{TeX}}}}和[[MiKTeX|MiK{{TeX}}]]发行包中。
+
+== 示例 ==
+下面的例子包括了{{XeTeX}}源代码和渲染结果。例子中使用了开源字体[[文泉驿微米黑|文泉驿微米黑]]（WenQuanYi Micro Hei）显示Unicode字符，使用了以[[SIL开源字体授权|SIL开源字体授权]]发布的[[Linux_Libertine_O|Linux Libertine O]]字体显示[[OpenType|OpenType]]字体的连字及旧式数字样式。以{{XeLaTeX}}命令处理。
+
+{| style="width:80%;" border="0" cellpadding="1em" cellspacing="1em" class="noresize"
+|
+<syntaxhighlight lang="latex">
+%!Tex Program = xelatex
+\documentclass[a4paper]{article}
+\usepackage{xltxtra}
+\setmainfont[Mapping=tex-text]{WenQuanYi Micro Hei}
+\begin{document}\pagestyle{empty}
+\section{Unicode support}
+ 
+\subsection{English}
+All human beings are born free and equal in dignity and rights.
+ 
+\subsection{Íslenska}
+Hver maður er borinn frjáls og jafn öðrum að virðingu og réttindum.
+ 
+\subsection{Русский}  
+Все люди рождаются свободными
+и равными в своем достоинстве и 
+правах.
+ 
+\subsection{Tiếng Việt}
+Tất cả mọi người sinh ra đều được tự do và bình đẳng về nhân phẩm và 
+quyền lợi.
+
+\subsection{简体中文}
+每个人生来平等，享有相同的地位和权利。
+
+\subsection{繁體中文}
+每個人生來平等，享有相同的地位和權利。
+
+\subsection{日本語}
+すべての人間は自由であり、かつ、尊厳と権利とについて平等である。
+
+\section{Legacy syntax}
+When he goes---``Hello World!''\\
+She replies—“Hello dear!”
+ 
+\section{Ligatures}
+\fontspec[Ligatures={Common, Historical}]{Linux Libertine O Italic}
+\fontsize{12pt}{18pt}\selectfont Questo è strano assai!
+ 
+\section{Numerals}
+\fontspec[Numbers={OldStyle}]{Linux Libertine O}Old style: 1234567\\
+\fontspec[Numbers={Lining}]{Linux Libertine O}Lining: 1234567
+ 
+\end{document}
+</syntaxhighlight>
+|
+[[File:XeTeX样例.png|400px]]
+|}
+
+===阿拉伯文字支持===
+
+在{{XeTeX}}中使用阿拉伯文字的一个解决方案是使用arabxetex软件包。为此，你需要在下列文本中插入阿拉伯文字：
+
+<syntaxhighlight lang="latex">
+\begin{arab}[utf]
+.
+.
+.
+\end{arab}
+</syntaxhighlight>
+
+用下列代码举例说明：
+{| style="width:80%;" border="0" cellpadding="1em" cellspacing="1em" class="noresize"
+|
+<syntaxhighlight lang="latex">
+\documentclass[12pt,fleqn,titlepage,twoside,a4paper]{book}
+\usepackage{etex}
+\usepackage{amsfonts,amsmath,amssymb,graphicx}
+\usepackage{txfonts}
+\usepackage[centering,includeheadfoot,margin=1in]{geometry}
+\usepackage{tabvar}
+\usepackage{arabxetex}
+%\newfontfamily{\arabicfont}[Script=Arabic,Scale=1.5]{Traditional Arabic}
+
+\parindent = 0pt
+
+\begin{document}
+
+\begin{arab}[utf]
+\chapter*{\textarab[utf]{ حِكَم من تَجمـيعي }}
+\section*{\textarab[utf]{   شِعر    }}
+
+  أديـن بدين الحـــب أنـى تــوجـهت ركـائبه \qquad فالحـــب دينــي و إيماني\\
+ لنا أسوة في بشر هند و اختها و قيس و ليلى \qquad ثـــــم مـــــي و غـــيــــلان
+\end{arab}
+
+\end{document}
+</syntaxhighlight>
+|
+[[File:Xetex_arabic_text.png|thumb]]
+|}
+
+==参见==
+{{Portal|自由软件}}
+
+* [[TeX|{{TeX}}]]
+* [[LaTeX|{{LaTeX}}]]
+* [[LuaTeX|Lua{{TeX}}]]
+* [[字体|字体]]
+
+==参考文献==
+
+{{Reflist}}
+
+==延伸阅读==
+* M. Goossens (Ed.) (2008) [http://xml.web.cern.ch/XML/lgc2/xetexmain.pdf The XeTeX Companion: TeX meets OpenType and Unicode] {{Wayback|url=http://xml.web.cern.ch/XML/lgc2/xetexmain.pdf |date=20220303231725 }}.
+
+==外部链接==
+* {{Official website|http://tug.org/xetex/}}
+* [http://nitens.org/taraborelli/latex The Beauty of LaTeX] {{Wayback|url=http://nitens.org/taraborelli/latex |date=20210329145345 }}：用专业字体演示 XeTeX。
+* [https://web.archive.org/web/20090401183546/http://ctan.org/tex-archive/help/Catalogue/entries/fontspec.html TeX Catalogue Entry for fontspec].
+* [https://web.archive.org/web/20080730073155/http://www.ctan.org/tex-archive/help/Catalogue/entries/xltxtra.html TeX Catalogue Entry for xltxtra].
+* [https://web.archive.org/web/20100311182043/http://www.ctan.org/tex-archive/help/Catalogue/entries/xunicode.html TeX Catalogue Entry for xunicode].
+* [http://www.tug.org/xetexshowcase/ TUG上的XeTeX作品展] {{Wayback|url=http://www.tug.org/xetexshowcase/ |date=20211017121631 }}
+
+{{TeX navbox}}
+{{DEFAULTSORT:Xetex}}
+[[Category:TeX|Category:TeX]]
+[[Category:数码字体排印|Category:数码字体排印]]
+[[Category:Unicode|Category:Unicode]]
+[[Category:使用MIT许可证的软件|Category:使用MIT许可证的软件]]
+[[Category:自由PDF软件|Category:自由PDF软件]]
+[[Category:自由TeX软件|Category:自由TeX软件]]

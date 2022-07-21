@@ -1,0 +1,164 @@
+{{noteTA
+|G1=IT
+}}
+[[File:proxy_pattern_diagram.svg|thumb]]图]]
+[[File:Proxy_pattern_in_LePUS3.gif|thumb]]
+
+'''代理模式'''（{{lang-en|Proxy Pattern}}）是[[程式設計|程式設計]]中的一種[[設計模式_(計算機)|設計模式]]。
+
+所謂的代理者是指一個類別可以作為其它東西的介面。代理者可以作任何東西的介面：網路連接、記憶體中的大物件、檔案或其它昂貴或無法複製的資源。
+
+著名的代理模式例子為[[參照計數|參照計數]]（{{lang-en|reference counting}}）指標物件。
+
+當一個複雜物件的多份副本須存在時，代理模式可以結合[[享元模式|享元模式]]以減少記憶體用量。典型作法是建立一個複雜物件及多個代理者，每個代理者會參照到原本的複雜物件。而作用在代理者的運算會轉送到原本物件。一旦所有的代理者都不存在時，複雜物件會被移除。
+
+==示例==
+=== [[Java|Java]] ===
+以下[[Java|Java]]範例解釋"虛擬代理"模式。<code>ProxyImage</code> 類別用來存取遠端方法。
+<syntaxhighlight lang="java">
+import java.util.*;
+ 
+interface Image {
+    public void displayImage();
+}
+
+//on System A 
+class RealImage implements Image {
+    private String filename;
+    public RealImage(String filename) { 
+        this.filename = filename;
+        loadImageFromDisk();
+    }
+
+    private void loadImageFromDisk() {
+        System.out.println("Loading   " + filename);
+    }
+
+    public void displayImage() { 
+        System.out.println("Displaying " + filename); 
+    }
+}
+
+//on System B 
+class ProxyImage implements Image {
+    private String filename;
+    private Image image;
+ 
+    public ProxyImage(String filename) { 
+        this.filename = filename; 
+    }
+    public void displayImage() {
+        if(image == null)
+              image = new RealImage(filename);
+        image.displayImage();
+    }
+}
+ 
+class ProxyExample {
+    public static void main(String[] args) {
+        Image image1 = new ProxyImage("HiRes_10MB_Photo1");
+        Image image2 = new ProxyImage("HiRes_10MB_Photo2");     
+        
+        image1.displayImage(); // loading necessary
+        image2.displayImage(); // loading necessary
+    }
+}
+</syntaxhighlight>
+
+程式的輸出為：
+ Loading    HiRes_10MB_Photo1
+ Displaying HiRes_10MB_Photo1
+ Loading    HiRes_10MB_Photo2
+ Displaying HiRes_10MB_Photo2
+
+=== [[C♯|C#]] ===
+<syntaxhighlight lang="csharp">
+using System;
+
+namespace Proxy
+{
+    class Program
+    {
+        interface IImage
+        {
+            void Display();
+        }
+
+        class RealImage : IImage
+        {
+            public RealImage(string fileName)
+            {
+                FileName = fileName;
+                LoadFromFile();
+            }
+
+            private void LoadFromFile()
+            {
+                Console.WriteLine("Loading " + FileName);
+            }
+
+            public String FileName { get; private set; }
+
+            public void Display()
+            {
+                Console.WriteLine("Displaying " + FileName);
+            }
+        }
+
+        class ProxyImage : IImage
+        {
+            public ProxyImage(string fileName)
+            {
+                FileName = fileName;
+            }
+
+            public String FileName { get; private set; }
+
+            private IImage image;
+
+            public void Display()
+            {
+                if (image == null)
+                    image = new RealImage(FileName);
+                image.Display();
+            }
+        }
+
+        static void Main(string[] args)
+        {
+            IImage image = new ProxyImage("HiRes_Image");
+            for (int i = 0; i < 10; i++)
+                image.Display();
+        }
+    }
+}
+
+</syntaxhighlight>
+
+程式的輸出為：
+ Loading HiRes_Image
+ Displaying HiRes_Image
+ Displaying HiRes_Image
+ Displaying HiRes_Image
+ Displaying HiRes_Image
+ Displaying HiRes_Image
+ Displaying HiRes_Image
+ Displaying HiRes_Image
+ Displaying HiRes_Image
+ Displaying HiRes_Image
+ Displaying HiRes_Image
+
+==另見==
+*[[組合模式|組合模式]]
+*[[修飾模式|修飾模式]]
+*[[惰性初始模式|惰性初始模式]]
+
+==外部連結==
+*[https://web.archive.org/web/20100428080722/http://wiki.java.net/bin/view/Javapedia/ProxyPattern Java 中的代理模式]
+*[https://web.archive.org/web/20111003001610/http://www.lepus.org.uk/ref/companion/Proxy.xml UML 和 LePUS3 （一種形式塑模語言）中的代理模式]
+*[https://web.archive.org/web/20100407023617/http://www.javaworld.com/javaworld/jw-02-2002/jw-0222-designpatterns.html 以代理模式掌控大局]
+*[http://perfectjpattern.sourceforge.net/dp-proxy.html PerfectJPattern 開源計劃]{{Wayback|url=http://perfectjpattern.sourceforge.net/dp-proxy.html |date=20170812183246 }}，提供 Java 中代理模式的元件實作。
+
+
+{{软件设计模式}}
+[[Category:軟體設計模式|Category:軟體設計模式]]

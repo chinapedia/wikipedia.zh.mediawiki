@@ -1,0 +1,104 @@
+{{NoteTA	|G1 = IT}}
+
+'''里德-所罗门码'''（{{lang|en|Reed-solomon codes}}，簡稱'''里所码'''或 {{lang|en|RS codes}}）是一种[[前向錯誤更正|前向錯誤更正]]的[[信道编码|信道编码]]，对由校正[[过采样|过采样]]数据所产生的有效[[多项式|多项式]]。编码过程首先在多个点上对这些多项式求冗余，然后将其传输或者存储。对多项式的这种超出必要值的采样使得多项式超定（过限定）。当接收器正确地收到足够的点后，它就可以恢复原来的多项式，即使接收到的多项式上有很多点被噪声干扰失真。
+
+里德-所罗门码被广泛地应用于各种商业用途，最显著的是在 [[CD|CD]]、[[DVD|DVD]]、[[蓝光光盘|蓝光光盘]]和[[QR_code|QR code]]上的使用；在数据传输中，它也被用于 [[DSL|DSL]] 和 [[WiMAX|WiMAX]]；广播系统中 [[DVB|DVB]] 和 [[ATSC|ATSC]] 也闪现着它的身影；在计算机科学里，它是 [[RAID#RAID_6|RAID 6]] 标准的重要成员。
+
+== 概述 ==
+里德-所罗门码是[[定长码|定长码]]。这意味着一个固定长度输入的数据将被处理成一个固定长度的输出数据。在最常用的（255,223）里所码中，223个-{}-里德-所罗门输入符号（每个符号有8个[[位元|位元]]）被编码成255个输出符号。
+* 大多数里所错误校正编码流程是成体系的（{{link-en|Systematic code|Systematic code}}）。这意味着输出的码字中有一部分包含着输入数据的原始形式。
+* 符号大小为8位元的里所码迫使码长（[[编码长度|编码长度]]）最长为255个符号。
+* 标准的（255,223）里所码可以在每个码字中校正最多16个-{}-里所符号的错误。由于每个符号事实上是8个位元，这意味着这个码可以校正最多16个短爆发性错误。
+
+里德-所罗门码，如同[[卷积码|卷积码]]一样，是一种透明码。这代表如果信道符号在队列的某些地方被反转，解码器一样可以工作。解码结果将是原始数据的补充。但是，里所码在缩短后会失去透明性。在缩短了的码中，「丢失」的位元需要被0或者1替代，这由数据是否需要补足而决定。（如果符号这时候反转，替代的0需要变成1）。于是乎，需要在里所解码前对数据进行强制性的侦测决定（「是」或者「补足」）。
+
+== 定义 ==
+=== 概述 ===
+在里德-所罗门数据编码背后的核心可以形象化的表示为[[多项式|多项式]]。这种码依靠一个[[代数|代数]]理论，这个代数理论说明任何長度為k的碼可唯一表示成一個階數(degree)至多為k-1的多項式。
+
+发送者表明一个在有限域中的k-1阶的多项式，它表示k个数据点。这个多项式就根据它在各点的赋值被“编码”，实际传送的是这些值。 在資訊传输中，一些值会被破坏。所以，实际发送的点不止k个。只要正确地接收了足量的数值，接收方就可以推算出原始多项式，进而译出原始数据。
+
+同样的，我们可以通过插值来修正曲线。RS码可以将一组有错误序列的信息码转换到找回画出原始曲线的多项式的系数。
+
+=== 数学公式 ===
+给定一个[[有限域|有限域]]F和[[多项式环|多项式环]]F[x]，令n和k满足<math>1 \le k \le n \le |F|</math>.选择F中的n个确定元素，记作<math>\{x_1, x_2, \dots, x_n\}</math>.码本C是通过计算F中每个<math>x_i</math>的阶数小于k的多项式得到的值，即
+
+: <math>\mathbf{C} = \left\{ \left( f(x_1), f(x_2), \dots, f(x_n) \right)| f \in F[x], \operatorname{deg}(f)<k \right\}.</math>
+
+'''C'''是<math>[n, k, n-k+1]</math>码;换句话说，是F中长为n，维度为k，最小[[汉明距离|汉明距离]]为n-k+1的线性码。
+
+一个RS码满足以上的形式，并遵循:集合<math>\{x_1, x_2, \dots, x_n\}</math>是<math>F</math>域中所有非零元素组成的集合（因而,<math>n=|F|-1</math>）。
+
+=== 注意 ===
+
+RS码在实际应用中，常常使用一个有<math>2^m</math>个元素的有限域F。这样，每个符号就可以表示为一个m比特的数值。发送方以编码块的形式发送数据点，编码块的符号数量为<math>n = 2^m - 1</math>个。这样，一个用于8比特符号的RS码每块有<math>n = 2^8 - 1 = 255</math>个符号。 (在字节型计算机系统普及的今天，这个数字很实用。)编码块中的数据符号k是一个设计参数，<math>k < n</math>。在一个n = 255的符号块中，常用<math>k = 223</math>的8比特数据符加上32个8比特校验符来编码，用<math>(n, k) = (255,223)</math>表示，每块最多可以校正16个符号错误。
+
+由有限域中的非零元素构成的集合<math>\{x_1,...,x_n\}</math>可以写作<math>\{1,\alpha,\alpha^2,...,\alpha^{n-1}\}</math>，<math>\alpha</math>是一个"单位的n次本原根"。习惯上按照这种顺序对RS码进行编码。由于<math>\alpha^n=1</math>，并且对于每个多项式<math>p(x)</math>，函数<math>p(\alpha x)</math>是与它同次的多项式，因而RS码是循环的。
+
+=== RS码与BCH码的关系 ===
+
+1968年，[[埃尔温·伯利坎普|埃尔温·伯利坎普]]发现了一种[[BCH码|BCH码]]解码算法。由于RS码可以看作是BCH码的特例，该算法也可用于解码RS码。
+
+通过RS码的另一种定义方法<ref>{{cite book | first1 = Rudolf | last1 = Lidl | first2 = Günter | last2 = Pilz | title = Applied Abstract Algebra | edition = 2nd | publisher = Wiley | year = 1999 | page = 226}}</ref>，可以很容易的看出RS码是BCH码的一种特例。令[[有限域|有限域]]<math> F </math>大小为<math> q </math>, <math>\alpha</math>为<math>F</math>的[[單位根|<math>n</math>次原单位根]]，亦即<math>\alpha^n=1</math>，且对所有小于<math>n</math>的正整数<math>i</math>,均有<math>\alpha^i\neq 1</math>。给定<math>1\le k \le n</math>, <math>(f_0,f_1,...,f_{n-1})</math>是RS码的码字当且仅当<math>\alpha,\alpha^2,...,\alpha^{n-k}</math>是多项式<math>p(x) = f_0 + f_1x + ... + f_{n-1}x^{n-1}</math>的根。这样，很容易可以看出RS码是一种多项式码，也就是[[BCH码|BCH码]]。生成多项式<math>g(x)</math>为<math>\alpha,\alpha^2,...,\alpha^{n-k}</math>的[[最小多项式|最小多项式]]，而码字为能够整除多项式<math>g(x)</math>的多项式。
+
+=== RS码的两种定义的等价性 ===
+
+RS码的两种定义方式有着非常大的区别，而它们的等价关系并不是显而易见的。在第一种定义中，码字是多项式的值，而在第二种定义中，码字是多项式的系数。另外，第一种定义要求多项式具有特定的比较小的幂次，而在第二种定义中，多项式需要有特定的根。
+
+这两种定义的等价性可以通过[[有限域|有限域]]上的[[离散傅立叶变换|离散傅立叶变换]]来证明。[[离散傅立叶变换|离散傅立叶变换]]建立起了多项式的系数与值之间的对偶关系。这种对偶关系可以不严格的概述如下：令<math>p(x)</math>和<math>q(x)</math>为两个次数小于<math>n</math>的多项式。如果多项式  <math>p(x)</math>的在<math>x=\alpha^i</math>（<math>i=0,\dots,n-1</math>, <math>\alpha</math>是1的n次[[單位根|本原单位根]]）处的值是<math>q(x)</math>的系数，那么<math>q(x)</math>在这些点上的取值在经过乘以一个特定的系数和重新排列以后就成为了<math>p(x)</math>的系数。
+
+严格的说，令
+:<math>p(x) = v_0 + v_1x + v_2x^2 + \dots + v_{n-1}x^{n-1}</math>,
+:<math>q(x) = f_0 + f_1x + f_2x^2 + \dots + f_{n-1}x^{n-1}</math>
+同时假定<math>p(x)</math>和<math>q(x)</math>为离散傅立叶变换对，那么<math>p(x)</math>和<math>q(x)</math>的系数和取值有如下关系：对所有的<math>i=0,\dots,n-1</math>，<math>f_i=p(\alpha^i)</math>并且<math>\textstyle v_i=\frac{1}{n}q(\alpha^{n-i})</math>.
+
+这样，我们可以得出<math>(f_0,\ldots,f_{n_1})</math>是满足RS码第一种定义方式的码字
+* 当且仅当<math>p(x)</math>的次数小于<math>k</math>（由于<math>f_0,\ldots,f_{n_1}</math>是<math>p(x)</math>的值），
+* 当且仅当如果<math>i=k,...,n-1</math>，<math>v_i=0</math>，
+* 当且仅当对所有的<math>i=1,...,n-k</math>，<math>q(\alpha^i)=0</math>（由于<math>q(\alpha^i)=nv_{n-i}</math>）,
+* 当且仅当<math>(f_0,\ldots,f_{n_1})</math>是RS码在第二种定义方式下的码字。
+
+这样，两种定义方式的等价性便得到了证明。
+
+== 历史 ==
+里德所罗门码由麻省理工学院林肯实验室的工作人员 Irving S.Reed 和 Gustave Solomon 于1960年开发出来。他们开创性的文章题目为"Polynomial Codes over Certain Finite Fields".(Reed & Solomon 1960)。Reed和Solomon文章中描述的原始编码方案使用基于要编码的信息的可变多项式，其中编码器和解码器只知道要编码的一组固定值（评估点）。由最初的理论，解码器根据接收到的消息的 n（编码消息长度）值中的 k（未编码消息长度）的子集生成潜在多项式，选择最流行的多项式作为正确的多项式，除了最简单的情况，这种方案几乎对于所有人都是不切实际的。最初的解决办法是通过将原始方案更改为基于编码器和解码器都已知的固定多项式的类[[BCH码|BCH码]]方案，但后来发展了基于原始方案的实用解码器，尽管比 BCH 方案慢。这样做的结果是，有两种主要类型的里德-所罗门码，一种使用原始编码方案，一种使用 BCH 编码方案。
+
+同样在1960年，在Zierler于1960年1月的麻省理工学院林肯实验室报告中，以及后来在1961年6月的一篇论文中，描述了由 Daniel Gorenstein 和 Neal Zierler 开发的[[BCH码|BCH码]]的实用固定多项式解码器<ref>D. Gorenstein and N. Zierler, "A class of cyclic linear error-correcting codes in p^m symbols", J. SIAM, vol. 9, pp. 207-214, June 1961</ref>。Gorenstein-Zierler 解码器和 BCH 码的相关工作在 W. Wesley Peterson 的《Error Correcting Codes》(1961)一书中进行了描述<ref>Error Correcting Codes by W_Wesley_Peterson, 1961</ref>。到1963年（或更早），J. J. Stone（和其他人）认识到里德-所罗门码可以使用使用固定生成多项式的 BCH 方案，使此类码成为一种特殊的[[BCH码|BCH码]]<ref>Error Correcting Codes by W_Wesley_Peterson, second edition, 1972</ref>，但基于原始编码的里德-所罗门码方案，不是一种[[BCH码|BCH码]]，并且根据评估点的集合，它们甚至不是[[循环码|循环码]]。
+
+1969 年，[[埃尔温·伯利坎普|埃尔温·伯利坎普]]和James Massey开发了一种改进的 BCH 方案解码器，此后被称为[[伯利坎普－梅西算法|伯利坎普－梅西算法]]解码算法。
+
+1975 年，Yasuo Sugiyama在[[扩展欧几里得算法|扩展欧几里得算法]]的基础上开发了另一种改进的 BCH 方案解码器。<ref>Yasuo Sugiyama, Masao Kasahara, Shigeichi Hirasawa, and Toshihiko Namekawa. A method for solving key equation for decoding Goppa codes. Information and Control, 27:87–99, 1975.</ref>
+
+1977 年，Reed-Solomon 码以级联纠错码的形式在[[旅行者计划|旅行者计划]]中实现。 1982 年，在大批量消费产品中的首次商业应用出现在光盘上，其中使用了两个交错的里德-所罗门码。今天，里德-所罗门码在数字存储设备和数字通信标准中得到广泛应用，尽管它们正慢慢被 [[BCH码|Bose-Chaudhuri-Hocquenghem (BCH) 码]]取代。例如，里德-所罗门码与卷积内码一起用于数字视频广播 (DVB) 标准 DVB-S，但 BCH 码与 LDPC 一起在其后继者 DVB-S2 中使用。
+
+1986 年，开发了一种称为[[伯利坎普－韦尔奇算法|伯利坎普－韦尔奇算法]]的原始方案解码器。
+
+1996 年，Madhu Sudan 和其他人开发了称为列表解码器或软解码器的原始方案解码器的变体，并且这些类型的解码器的工作仍在继续——参见Guruswami-Sudan 列表解码算法（英文维基百科词条：Guruswami–Sudan list decoding algorithm）。
+
+2002年，Shuhong Gao基于[[扩展欧几里得算法|扩展欧几里得算法]]开发了另一种独创的方案解码器。<ref>http://www.math.clemson.edu/~sgao/papers/RS.pdf {{Bare URL PDF|date=March 2022}}</ref>
+
+== 性质 ==
+
+RS码是一个<math> [n, k, n-k+1]</math>码，是一种定义在有限域<math>F</math>上的长度为<math>n</math>,信息长度为<math>k</math>，最短汉明距离为<math>n-k+1</math>的线性分组码。由于这种编码满足Singleton界，因此它是一种最大距离可分码。由于码长为<math>n</math>信息长度为<math>k</math>的码的最大汉明距离为<math>n-k+1</math>，所以在这种意义下RS码是一种最优的编码方法。
+
+RS码的纠错能力由最短汉明距离决定，为<math>n-k+1</math>。如果预先并不知道错误的位置，RS码最多可以纠正<math>(n-k)/2</math>个错误。而在某些情况下，我们可以预知错误的位置（比如BEC信道），此时RS码最多可以纠正<math>n-k</math>个错误。如果我们可以预先知道<math>S</math>个错误位置，而此外还有<math>E</math>个未知的错误位置，那么在满足<math>2E+S<n-k</math>的情况下，我们可以完全纠正这些错误。
+
+在实际应用中，RS码经常使用大小为<math>2^m</math>的有限域。在这种情况下，每个符号都包含有<math>m</math>比特的信息。发送者将编码后的分组发送给接受者，每个分组通常含有<math>2^m-1</math>个符号。例如，定义在<math>GF(2^8)</math>上的RS码每个分组包含有<math>255=2^8-1</math>个符号。由于计算机通常以[[字节|字节]]为单位来处理数据，因此定义在<math>GF(2^8)</math>的RS码非常流行。设计参数<math>k</math>需要满足<math>k<n</math>，对于定义在<math>GF(2^8)</math>上的RS码，通常选择<math>k=223</math>。这个RS码包含有223个数据符号和32个校验符号，表示为<math>(255,223)</math>RS码，它最多可以纠正16个符号错误。
+
+RS码的这种性质使得它非常适合纠正传输系统中的[[突发错误|突发错误]]。这是由于不论一个符号中有多少个比特发生错误，都只发生了一个符号错误。而对于不发生突发错误的传输系统，RS码的性能通常不如普通的二元码，
+
+== 参见 ==
+
+== 参考资料 ==
+{{Reflist}}
+* F. J. MacWilliams and N. J. A. Sloane, The Theory of Error-Correcting Code, New York: North-Holland Publishing Company, 1977.
+* Irving S. Reed and Xuemin Chen, Error-Control Coding for Data Networks", Boston: Kluwer Academic Publishers, 1999.
+
+== 外部連結 ==
+* [http://www.schifra.com Schifra Open Source C++ Reed–Solomon Codec] {{Wayback|url=http://www.schifra.com/ |date=20200718012446 }}
+* [http://rscode.sourceforge.net/ Henry Minsky's RSCode library, Reed–Solomon encoder/decoder] {{Wayback|url=http://rscode.sourceforge.net/ |date=20210330032512 }}
+* A thesis on [http://sidewords.files.wordpress.com/2007/12/thesis.pdf Algebraic soft-decoding of Reed–Solomon codes] {{Wayback|url=http://sidewords.files.wordpress.com/2007/12/thesis.pdf |date=20170727183059 }}. It explains the basics as well.
+* [https://web.archive.org/web/20150502212224/http://dept.ee.wits.ac.za/%7Eversfeld/research_resources/sourcecode/Errors_And_Erasures_Test.zip Matlab implementation of errors-and-erasures Reed-Solomon decoding]
+* [http://allmydata.org/trac/zfec FEC (Forward Erasure Encoding) Open Source Library (with Python bindings)] {{Wayback|url=http://allmydata.org/trac/zfec |date=20190630194946 }}
+
+[[Category:错误检测与校正|Category:错误检测与校正]]

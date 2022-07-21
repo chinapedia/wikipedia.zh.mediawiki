@@ -1,0 +1,87 @@
+{{NoteTA|G1=IT|G2=FL}}
+{{Infobox software
+| name = Autoconf
+| logo = Heckert GNU white.svg
+| logo size = 100px
+| developer = [[GNU|GNU]]
+| latest release version = 2.71
+| latest release date = {{Release date and age|2021|01|28}}
+| operating system = [[跨平台|跨平台]]
+| genre = [[编程工具|编程工具]]
+| license = [[GPL|GPL]]
+| website = http://www.gnu.org/software/autoconf/
+}}
+[[File:Autoconf-automake-process.svg|thumb]]的工作流程图。请注意"configure.ac"在Autoconf早期版本中名为"configure.in" ]]
+'''GNU Autoconf'''是一个在[[Bourne_shell|Bourne shell]]下制作供编译、安装和打包软件的{{link-en|配置脚本|Configure_script (computing)|}}的工具<ref>{{cite web|title=Autoconf - GNU Project - Free Software Foundation (FSF)|url=http://www.gnu.org/software/autoconf/#TOCintroduction|publisher=GNU Project|accessdate=2010-12-16|archive-date=2010-12-23|archive-url=https://web.archive.org/web/20101223013817/http://www.gnu.org/software/autoconf/#TOCintroduction|dead-url=no}}</ref>。Autoconf并不受程式语言限制，常用于[[C语言|C]]、[[C++|C++]]、[[Erlang|Erlang]]和[[Objective-C|Objective-C]]。配置脚本控制了一个软件包在特定系统上的安装。在进行一系列测试后，配置脚本从模板中生成[[makefile|makefile]]与[[头文件|头文件]]进而调整软件包，使之适应某一种系统。Autoconf与[[Automake|Automake]]、[[Libtool|Libtool]]等软件组成了[[GNU构建系统|GNU构建系统]]<ref>{{cite web|title=The GNU Build System - Autoconf|url=http://www.gnu.org/software/autoconf/manual/html_node/The-GNU-Build-System.html#The-GNU-Build-System|publisher=GNU Project|accessdate=2010-12-16|archive-date=2010-12-25|archive-url=https://web.archive.org/web/20101225073720/http://www.gnu.org/software/autoconf/manual/html_node/The-GNU-Build-System.html#The-GNU-Build-System|dead-url=no}}</ref>。Autoconf由{{link-en|戴维·麦肯思|David Mackenzie}}于1991年夏天编写用于支持他在[[自由软件基金会|自由软件基金会]]的编程工作<ref>{{cite web|author=David Mackenzie|title=Genesis - Autoconf|url=http://www.gnu.org/software/autoconf/manual/html_node/Genesis.html#Genesis|publisher=GNU Project|accessdate=2010-12-16|archive-date=2010-12-25|archive-url=https://web.archive.org/web/20101225075904/http://www.gnu.org/software/autoconf/manual/html_node/Genesis.html#Genesis|dead-url=no}}</ref>。此后，Autoconf包含了多人编写的改进代码并成为了使用最广泛的自由编译配置软件。<ref>{{cite web|author=David Mackenzie|title=Leviticus - Autoconf|url=http://www.gnu.org/software/autoconf/manual/html_node/Leviticus.html#Leviticus|publisher=GNU Project|accessdate=2010-12-16|archive-date=2010-12-25|archive-url=https://web.archive.org/web/20101225075913/http://www.gnu.org/software/autoconf/manual/html_node/Leviticus.html#Leviticus|dead-url=no}}</ref><ref>{{cite web|author=David Mackenzie|title=Numbers - Autoconf|url=http://www.gnu.org/software/autoconf/manual/html_node/Numbers.html#Numbers|publisher=GNU Project|accessdate=2010-12-16|archive-date=2010-12-25|archive-url=https://web.archive.org/web/20101225075917/http://www.gnu.org/software/autoconf/manual/html_node/Numbers.html#Numbers|dead-url=no}}</ref>
+
+== 使用概要 ==
+软件开发者通过使用[[GNU_m4|GNU m4]]语言在''configure.ac''中写出限定配置脚本行为的列表。Autoconf将''configure.ac''中的命令转化为对应特定平台的配置脚本。Autoconf本身并不具备编译能力，它仅仅用于产生通常附带在软件包中的配置脚本。
+
+=== configure.ac格式===
+The GNU Autoconf手册建议configure.ac file使用如下格式：
+; Autoconf requirements
+: The AC_PREREQ（''version''）macro can be used to ensure that a recent enough version of the autoconf program is available to process the configure.ac file
+; AC_INIT（''package'', ''version'', ''bug-report-address''）
+: This macro is required in every configure.ac file.  It specifies the name and version of the software package for which to generate a configure script and the email address of the developer.
+; information on the package
+; checks for programs
+; checks for libraries
+; checks for header files
+; checks for types
+; checks for structures
+; checks for compiler characteristics
+; checks for library functions
+; checks for system services
+; AC_CONFIG_FILES（[file...]）
+; AC_OUTPUT
+<!-- 
+An example file is as follows:
+<source lang="text">
+AC_PREREQ（[2.63]）
+AC_INIT（[hello], [1.0], [developer@example.com]）
+</source> -->
+
+==工作原理==
+autoconf类似于perl使用的metaconfig包。先前[[X_window系统|X window系统]]所使用的imake系统与autoconf是密切相关，但有不同的理念。
+
+autoconf通过检查特性而不是软件版本来确保可移植性。例如Sun OS 4的原生[[C编译器|C编译器]]不支持ISO C，但是用户或管理员可以自行安装支持ISO C的编译器。基于软件特性的检查方法可以发现仅检查软件版本的方法检测不到的支持ISO C的编译器。因此配置脚本可以在未知的或者较新的系统中得到合理的结果，同样允许管理员按照他们的系统来配置脚本。
+
+==批评==
+autoconf是一个古老和成熟的产品，如果使用得当，可以使用一个非常简单的接口进行复杂的交叉编译。但是有一些批评指出autoconf使用了过时的技术，因而遗留了很多限制。autoconf无法为[[Xcode|Xcode]]与[[Visual_Studio|Visual Studio]]制作项目文件，其脚本通常大且复杂，因此增加了Debug的难度。Autoconf所使用的M4对于一些开发者来说是陌生的，因此他们需要专门学习<ref name="stop-insanity">{{cite web|first = Andrew|last = McCall|title = Stop the autoconf insanity! Why we need a new build system|url = http://freshmeat.net/articles/stop-the-autoconf-insanity-why-we-need-a-new-build-system|date = 2003-06-21|accessdate = 2010-12-14|archive-date = 2010-12-27|archive-url = https://web.archive.org/web/20101227013518/http://freshmeat.net/articles/stop-the-autoconf-insanity-why-we-need-a-new-build-system|dead-url = no}}</ref>。一些开发者并不遵循配置脚本的一些习惯约定<ref name="gnu-coding">{{cite web|title = GNU Coding Standards|url = http://www.gnu.org/prep/standards/standards.html|accessdate = 2010-12-14|archive-date = 2010-12-23|archive-url = https://web.archive.org/web/20101223010425/http://www.gnu.org/prep/standards/standards.html|dead-url = no}}</ref>。
+
+因此一些自由软件开发者开始使用其他软件代替autoconf，[[KDE|KDE]]于KDE 4起开始使用[[CMake|CMake]]<ref name="kde">{{cite web|title = Why the KDE project switched to CMake -- and how|first = Alexander|last = Neundorf|date = 2006-06-21|url = http://lwn.net/Articles/188693/|accessdate = 2010-12-14|archive-date = 2011-05-07|archive-url = https://web.archive.org/web/20110507043418/http://lwn.net/Articles/188693/|dead-url = no}}</ref>，[[Scribus|Scribus]]同样开始使用CMake<ref name="kde"/>。
+
+==参见==
+{{Portal|Free software}}
+* [[CMake|CMake]] 
+* [[配置脚本|配置脚本]]
+* [[GNU构建系统|GNU构建系统]]
+* [[pkg-config|pkg-config]]
+
+==脚注==
+{{Reflist}}
+
+==外部链接==
+*[http://www.gnu.org/software/autoconf/ GNU Autoconf home page]{{Wayback|url=http://www.gnu.org/software/autoconf/ |date=20101223013817 }}
+*[http://www.gnu.org/software/ac-archive/ GNU Autoconf macro archive]{{Wayback|url=http://www.gnu.org/software/ac-archive/ |date=20050204094917 }}
+*[http://sources.redhat.com/autobook/ ''The Goat Book'' homepage (aka the Autobook)]{{Wayback|url=http://sources.redhat.com/autobook/ |date=20101220095404 }}
+*Murray Cumming（of [[gtkmm|gtkmm]] fame）produced these succinct Autotool info pages:[https://web.archive.org/web/20060110134958/http://www.openismus.com/documents/linux/automake/automake.shtml *one] [https://web.archive.org/web/20130514201100/http://www.openismus.com/documents/linux/using_libraries/using_libraries.shtml *two].
+*[http://autotoolset.sourceforge.net/ Autotoolset home page]{{Wayback|url=http://autotoolset.sourceforge.net/ |date=20030416234012 }}
+*https://web.archive.org/web/20140816060326/http://www.freesoftwaremagazine.com/books/autotools_a_guide_to_autoconf_automake_libtool
+
+===教程===
+* https://web.archive.org/web/20100627142047/http://mi.eng.cam.ac.uk/~er258/code/autoconf/
+* [https://web.archive.org/web/20060321205403/http://www.amath.washington.edu/~lf/tutorials/autoconf/ Learning Autoconf and Automake]" by Eleftherios Gkioulekas
+*[http://autotoolset.sourceforge.net/tutorial.html ''Learning the GNU development tools'' @sourceforge]{{Wayback|url=http://autotoolset.sourceforge.net/tutorial.html |date=20101201015903 }}
+*[http://www.lrde.epita.fr/~adl/autotools.html Autotools Tutorial]{{Wayback|url=http://www.lrde.epita.fr/~adl/autotools.html |date=20101227173311 }} by Alexandre Duret-Lutz introduces Autoconf, [[Automake|Automake]], [[Libtool|Libtool]],和[[Gettext|Gettext]]
+*[http://www.seul.org/docs/autotut/ Using GNU auto{conf,make,header}]{{Wayback|url=http://www.seul.org/docs/autotut/ |date=20101225231302 }} by Felipe Bergo
+
+{{GNU}}
+
+[[Category:GNU计划软件|Category:GNU计划软件]]
+[[Category:自由發展元件與函式庫|Category:自由發展元件與函式庫]]
+[[Category:自由跨平台軟體|Category:自由跨平台軟體]]
+[[Category:自动化构建|Category:自动化构建]]
+[[Category:配置腳本|Category:配置腳本]]
+
+[[de:GNU_Build_System#GNU_Autoconf|de:GNU Build System#GNU Autoconf]]

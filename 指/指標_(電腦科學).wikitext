@@ -1,0 +1,208 @@
+{{NoteTA
+|T = zh-cn:指针; zh-tw:指標 (電腦科學);
+|G1 = IT
+}}
+{{multiple issues|
+{{disputed|time=2013-06-28T10:46:26+00:00}}
+{{expert|time=2013-06-28T10:46:26+00:00}}
+{{copyedit|time=2011-04-29T16:08:12+00:00}}
+{{refimprove|time=2016-04-07T03:07:09+00:00}}
+}}
+[[File:Pointers.svg|thumb]]
+
+在[[计算机科学|计算机科学]]中，'''指標'''（{{lang-en|Pointer}}），是[[程式語言|程式語言]]中的一类数据类型及其[[物件_(電腦科學)|物件]]或[[變數|變數]]，用來表示或儲存一個[[記憶體位址|記憶體位址]]，這個位址的[[值_(電腦科學)|值]]直接指向（{{lang|en|points to}}）存在该地址的对象的[[值_(電腦科學)|值]]。
+
+==歷史==
+在1964年，[[哈羅德·勞森|哈羅德·勞森]]發明了最早的指標。他在[[PL/I|PL/I]]中實作出了這個概念，其他高級程式語言也很快跟進，使用了這個想法。指標（{{lang|en|pointer}}）這個名稱首次出現在系統發展公司（{{lang|en|System Development Corporation}}，SDC）的技術文件，當中使用了堆疊指標（{{lang|en|stack pointer}}）這個名詞。
+
+==概論==
+在計算機科學中，指標是一種最簡單形式的[[參照|參照]]（reference）。
+
+指標有兩種含義，一是作為資料類型，二是作為實體。前者如字元指標、浮點數指標等等；後者如指標物件、指標變數等。
+
+指標作為資料類型，可以從一個函式類型、一個物件類型或一個不完備類型中導出。從中導出的資料類型被稱之為'''被引用型態'''（referenced type）。指標類型描述了一類的物件，物件值为對被引用類型的實體的引用。<ref>C99語言標準的6.2.5 Types中規定：A pointer type may be derived from a function type, an object type, or an incomplete type, called the referenced type. A pointer type describes an object whose value provides a reference to an entity of the referenced type. A pointer type derived from the referenced type T is sometimes called ‘‘pointer to T’’. The construction of a pointer type from a referenced type is called ‘‘pointer type derivation’’.</ref>
+
+C++標準中規定，“指针”概念不適用于[[成员指针|成员指针]]（不包含指向靜態成員的指標）。<ref>見[[C++11|C++11]]標準3.9.2 Compound types中的規定：Except for pointers to static members, text referring to “pointers” does not apply to pointers to members</ref>C++標準規定，指標分为兩類：<ref>見[[C++11|C++11]]標準3.9.2第3段</ref>
+*object pointer type：指向void或物件類型，表示對象在[[随机存取存储器|随机存取存储器]]中的字元地址或[[空指標|空指標]]。
+*function pointer type：指代一個函式
+
+指標參考（{{lang|en|reference}}）了記憶體中一個位址。通過被稱為指標反參考（{{lang|en|dereferencing}}）的動作，可以取出在那個位址中儲存的[[值_(電腦科學)|值]]。保存在指標指向的位址中的[[值_(電腦科學)|值]]，可能代表另一個[[變數_(程式设计)|變數]]、[[資料結構|結構]]、[[对象_(计算机科学)|物件]]或[[函數|函數]]。但是從指標值是無法得知它所參照的記憶體中儲存了什麼資料型別的資訊。可以打个比方，假設將電腦記憶體當成一本書，那麼一張記錄了某個頁碼加上行號的[[便利貼|便利貼]]，可以被當成是一個指向特定頁面的指標；根據便利貼上面的頁碼與行號，翻到那個頁面，把那個頁面的那一行文字讀出來，就相當於是對這個指標進行反參考的動作。可做一類比以增強對指標的理解：整數（integral）也是一類資料類型及其物件或[[變數_(程式设计)|變數]]，可定義具體的資料類型如短整數（short）、長整數（long）、超長整數（long long）、無符號整數（unsigned）等等；也可以用於稱呼整數值、整數物件、整數變數等。又如，一個浮點數指標（float *），可稱作指向了一個浮點數類型的物件。
+
+在[[高階語言|高階語言]]中，指標有效的取代了在[[低階語言|低階語言]]（如[[組合語言|組合語言]]與[[機器碼|機器碼]]）直接使用記憶體地址。但它可能只適用於合法位址之中。因為指標更貼近硬體，[[編譯器|編譯器]]能夠很容易的將指標翻譯為機械碼，這使指標操作時的負擔較少，因此能夠提高程式的執行速度。
+
+使用指標能夠簡化許多[[資料結構|資料結構]]的實作，例如在走訪字串，查取表格，控制表格及樹狀結構上。對指標進行複製，之後再解參照指標以取出資料，無論在時間或空間上，都比直接複製及存取資料本身來的經濟快速。指標表示法較為直覺，使程式的表達更為簡潔，同時也能夠提供動態機制來建立新的節點。
+
+在[[程序式程式設計|程序式程式設計]]（procedural programming）中，指標也被用來保存系統呼叫流程，以及動態連結資料庫（DLL）的進入點位址。在[[物件導向程式設計|物件導向程式設計]]中，使用[[函數指標|函數指標]]（Function pointer）來綁定[[方法_(電腦科學)|方法]]（method），常見於[[虛擬方法表|虛擬方法表]]（Virtual method table）中。
+
+但是指標本身也存在一些可被濫用之处，在存取某個資料結構時，可能會超出可用範圍，使軟體或作業系統出現異常，嚴重時可造成當機。利用指標去存取或修改非合法可取用的資料，也可能造成安全性問題。為此，C與C++語言規定指標類型為[[弱类型|强类型]]，即指標值不僅是一個記憶體位址，同時它的資料類型說明了存在这個地址可以安全訪問的地址的範圍，例如，float*可以訪問4個字元的記憶體空間，double*可以訪問8個字元的記憶體空間。
+
+許多程式語言中都支援某種形式的指標，最著名的是[[C語言|C語言]]，但是有些程式語言對指標的運用採取比較嚴格的限制。因為指標的機制比較簡單，其功能可以被集中重新實作成更抽象化的[[參照|參照]]（reference）資料形別，如[[Java|Java]]一般避免用指標，改為使用[[參照|參照]]。<ref>實際上Java在傳遞物件的时候用的是指標（这里認為指標和參照没有本質區別）傳遞，在傳遞基本型態（如int）時用的是按值（副本）傳遞。</ref>
+
+== 指针的实质 ==
+C99与C++11标准分别明确规定了把一个指针值转换自（from）/成（to）整形是允许的，但整型的大小至少不低于<code>std::intptr_t</code>。<ref>见[[C++11|C++11]]标准3.7.4.3</ref>
+
+在C语言的多数实现中，指针值是一个以当前系统寻址范围为取值范围的整数。
+
+32位系统的寻址能力（地址空间）是4GB<ref>这和32位操作系统最大支持内存大小没有关系，所谓32位操作系统只支持4GB的说法是不对的，[https://msdn.microsoft.com/zh-cn/library/windows/desktop/aa366778(v=vs.85).aspx#physical_memory_limits_windows_server_2003_sp2 Windows 2003数据中心版的32位版本] {{Wayback|url=https://msdn.microsoft.com/zh-cn/library/windows/desktop/aa366778(v=vs.85).aspx#physical_memory_limits_windows_server_2003_sp2 |date=20160105172402 }}就支持最大64GB的内存。操作系统支持的内存数还取决于其存储访问的组织形式，以及操作系统的使用许可。</ref>（0~2<sup>32</sup>-1），以二进制表示时长度为32[[位元|位元]]，每格儲存空間是1 Byte。不难验证，在32位系统的大多数实现裡，<code>int</code>类型也正好是32-bit长度，可以取遍上述范围。
+
+同理，64位系统取值范围为0~2<sup>64</sup>-1，<code>int</code>类型长度为64-bit。
+
+== 使用指標的目的 ==
+=== 簡化程式碼 ===
+如果没有指標，很難用一個統一的模式去<code>A</code>的定位並修改一棵樹的節點。例如：不用指標要修改<code>A</code>的左子樹的左子樹的右子節點，只有“<code>A.LC.LC.RC=…</code>”一種表達方式，不能透過賦值而簡化。
+
+=== 參數傳遞 ===
+C中函式調用是[[求值策略#传值调用_(Call_by_value)|按值传递]]的，傳入參數在子函式中只是一個初值相等的副本，無法對傳入參數作任何改動。但實際程式設計中，经常要改動傳入參數的值。在C語言中一般透過傳入參數的位址而不是原參數本身來實現。當對傳入參數（地址）取“<code>*</code>”運算时，就可以直接在記憶體中修改，从而改動原想作为傳入參數的參數值。
+
+;傳指標
+<syntaxhighlight lang="c">
+#include <stdio.h>
+
+void inc(int *val){
+    (*val)++;
+}
+
+int main(){
+    int a=3;
+    inc(&a);
+    printf("%d\n", a);
+    return 0;
+}
+
+// Output:
+// 4
+</syntaxhighlight>
+
+在執行<code>inc(&a);</code>時，操作<code>*val</code>，即是在操作<code>a</code>了。
+
+;傳值
+以下例子中，<code>main()</code>內的變數從來沒有改變，改變的只是<code>sw()</code>內的變數。
+<syntaxhighlight lang="cpp">
+#include <iostream>
+using namespace std;
+
+void sw(int x, int y) {
+	int Temp;
+	Temp = x;
+	x = y;
+	y = Temp;
+}
+
+int main() {
+	int a=1;
+	int b=2;
+	cout <<  a << b << endl;
+	sw(a,b);
+	cout <<  a << b << endl;
+	return 0;
+}
+
+// Output:
+// 12
+// 12
+</syntaxhighlight>
+
+<br /><code>sw()</code>執行完畢後，其內容會自動刪除。
+{| class="wikitable"
+|-
+! a !! b !! x !! y
+|-
+| 1 || 2 || - || -
+|-
+| 1 || 2 || 1 || 2
+|-
+| 1 || 2 || 2 || 1
+|-
+| 1 || 2 || - || -
+|}
+
+== 指针的运算和声明 ==
+=== 取地址和取值运算 ===
+
+取值运算（<code>*p</code>）返回保存在内存地址为<code>p</code>的内存空间中的值。取地址（<code>&p</code>）运算则返回操作数<code>p</code>的内存地址。<ref>C99标准6.5.3.2.3中规定：The unary & operator returns the address of its operand.</ref>显然可以用赋值语句对内存地址赋值。
+
+假设一段内存地址空间取值如下：（十六进制）
+
+{| class="wikitable" style="font-family: Courier New"
+|- align="center"
+! 地址 
+| 0000 || … || 2000 || 2001 || 2002 || 2003 || 2004 || … || 3000 || 3001 || 3002 || 3003 || …
+|- align="center"
+! 取值 
+|???? || … || 01 || 30 || 00 || 30 || 00 || … || 00 || 20 || 03 || 9A || …
+|}
+
+然后，执行代码“<code>int *p;</code>”，假设初始化时<code>p</code>被分配3001H、3002H两个地址。则<code>p</code>为2003H，<code>*p</code>为3000H。<ref>这里的[[字节序|字节序]]为小尾序，Little-Endian，低位在低地址，[[Intel|Intel]]的[[x86|x86]]系列[[CPU|CPU]]适用。[[Motorola|Motorola]]的[[PowerPC|PowerPC]]系列则采用大尾序，Big-Endian，高位在低地址，则上述<code>p</code>为0320H，<code>*p</code>需进一步查内存0320H处的存储值。</ref>
+
+则<code>**p</code>、<code>&&p</code>、<code>*(&p)</code>和<code>&(*p)</code>的值分别为：
+
+<code>**p=*(*(p))=*(*(2003H))=*(3000H)=</code>0020H。
+
+<code>&&p=&(&(p))=&(3001H)</code>，出错，3001H是常数，无地址可言。
+
+<code>*&p=*(&(p))=*(3001H)</code>=2003H，也即<code>*&p=p</code>。
+
+<code>&*p=&(*(p))=&(3000H)</code>，出错，3000H是常数，无地址可言。
+
+== 指针的复杂形式 ==
+=== 双重指针（指向指针的指针） ===
+双重指针是指向指针的指针，它是一个指针，这个指针指向某个内存地址，该地址的值是一个指针，指向给另一个内存地址（通常异于前者，但不排除二者相等）。
+
+本质上，指针值就是内存地址。但为了防范指针值被滥用（如内存访问时越界），可以规定指针类型为强类型，即指针值及保存在该内存地址的对象的类型。双重指针不过是这种强类型的一个应用：该地址空间长度为一个指针长度（4或8字节），对象类型为另一种指针。
+
+=== 指针数组 ===
+指针[[数组|数组]]：就是一个数组，数组的各个元素都是指针值。
+
+=== 数组指针 ===
+数组名出现在[[表达式|表达式]]中时，绝大多数情况（除了数组名作为sizeof的操作数或者作为取地址&元素符的操作数）会被隐式转换为指向数组的首个元素的指针[[右值|右值]]。 
+
+当数组名作为取地址&运算符的操作数，则表达式的值为指向整个数组的指针右值。
+
+例子：
+<syntaxhighlight lang="cpp">
+char s[]="hello";
+
+int main() {
+  char (*p1)[6]=&s; //OK!
+  char (*p2)[6]=s; //compile error: cannot convert 'char*' to 'char (*)[6]'   
+  char *p3=&s;//compile error: cannot convert 'char (*)[6]' to 'char*' 
+}
+</syntaxhighlight>
+根据上述C语言标准中的规定，表达式 &s 的值的类型是char (*)[6]，即指向整个数组的指针；而表达式 s 则被隐式转换为指向数组首元素的指针值，即 char* 类型。同理，表达式 s[4] ，等效于表达式 *(s+4)。
+
+=== 指向函数的指针 ===
+{{Main|函数指针}}
+
+指向函数的指针：不同于指向数据类型的指针，函数指针指向一段可执行的代码的首地址，这段代码仍然占用了一块内存空间。{{Fact|很多人都说C语言是一种[[面向过程|面向过程]]的语言}}，因为它最多只有[[结构体(C语言)|结构体]]的定义，而没有[[类_(计算机科学)|类]]的概念。根据本段所述，可以认为C语言能成为[[面向对象|面向对象]]的语言，只是表述比较麻烦而已。<ref>实际上，可以用C语言完成[[COM|COM]]模块，这完全模拟了C++语言的类、对象、虚表、虚函数等结构。</ref>事实上很多[[开源|开源]]程序都使用这种方式组织他们的代码。
+
+<syntaxhighlight lang="c">
+#include <stdio.h>
+
+void inc(int *val)
+{
+    (*val)++;
+}
+
+int main(void)
+{
+    void (*fun)(int *);
+    int a=3;
+    fun=inc;
+    (*fun)(&a);
+    printf("%d", a);
+    return 0;
+}</syntaxhighlight>
+
+===指针运算符的重载===
+{{main|通过指针访问成员运算符}}
+
+==指標的進化與取代==
+由於指標太活躍，因此導致它幾乎能不受限制的在各種[[記憶體位址|記憶體位址]]間活動，所以一旦有任何重複、重疊、溢位的情形發生時，電腦便直接當機，這成為指標功能上的最大缺憾。因此在新的網路程式語言的開發上，新的語言如[[Java|Java]]、[[C#|C#]]等語種已經取消了指標的無限制使用形式。 C#允許指標的有限功能的使用，[[指標和運算指標|指標和運算指標]]在一個操作的環境中是存在潛在的[[非安全性|非安全性]]的，因為他們的使用可以避開對象的一些嚴格訪問規則。C#中使用指標的代碼段或者方法的地址要用unsafe關鍵字進行標記，這樣，這些代碼的使用者就會知道這個代碼相比其他的代碼而言是不具有安全性的。編譯器需要unsafe關鍵字時將使用此代碼的程序轉換成是允許被編譯的。一般來說，[[不安全代碼|不安全代碼]]的使用可能是為了非託管的API（應用程序編程介面）的更好互用，或者是為了（存在內在不安全性的）系統調用，也有可能是出於提高性能等方面的原因。而Java中不允許[[指標或者算術指標|指標或者算術指標]]的使用。
+
+== 参考 ==
+{{Reflist}}
+
+{{Authority control}}
+[[Category:数据结构|Z]]
+
+[[sv:Datatyp#Pekare_och_referenstyper|sv:Datatyp#Pekare och referenstyper]]

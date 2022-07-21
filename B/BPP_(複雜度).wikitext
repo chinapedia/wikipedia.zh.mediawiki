@@ -1,0 +1,109 @@
+在[[計算複雜度理論|計算複雜度理論]]裡面，'''BPP'''是在[[多項式時間|多項式時間]]內以[[機率圖靈機|機率圖靈機]]解出的[[問題|問題]]的集合, 並且對所有的輸入，輸出結果有錯誤的[[概率|概率]]在1/3之內。'''BPP'''這個簡寫代表"'''B'''ounded-error"(有限錯誤)，"'''P'''robabilistic"(機率的)，"'''P'''olynomial time"(多項式時間)。
+
+{| class="wikitable" style="float:right;text-align:center"
+!colspan="3"|BPP 演算法 (操作一次)
+|-
+|
+|colspan="2"|產生的答案
+|-
+| 正確<br>解答
+| 是
+| 否
+|-
+| 是
+| ≥ 2/3
+| ≤ 1/3
+|-
+| 否
+| ≤ 1/3
+| ≥ 2/3
+|-
+!colspan="3"|BPP 演算法 (操作''k''次)
+|-
+|
+|colspan="2"|產生的答案
+|-
+| 正確<br>解答
+| 是
+| 否
+|-
+| 是
+| > 1 − 2<sup>−''ck''</sup>
+| < 2<sup>−''ck''</sup>
+|-
+| 否
+| < 2<sup>−''ck''</sup>
+| > 1 − 2<sup>−''ck''</sup>
+|-
+|colspan="3" style="font-size:85%"|對於某些常數 ''c'' > 0
+|}
+要是一個問題在'''BPP'''集合裡面，則存在一個演算法，此演算法允許轉硬幣作隨機的決定，並在多項式時間內結束。 對這個演算法的任何輸入，他都要在小於1/3的錯誤概率之下給出正確判斷，不論這一個問題的答案是"正確"或者"錯誤"。
+
+在這裡定義裡面的1/3是任意給定的。它可以是在 0 與 1/2(不包含0與1/2自身) 之間的 [[常數|任意常數]]而BPP集合維持不變(當然這個常數必須跟輸入值為何無關)。原因在於，雖然這演算法有錯誤的機率，但是只要我們多進行幾次演算法，那多數的答案都是錯誤的機率會呈現[[指數衰減|指數衰減]]<!-- as a consequence of the [[Chernoff_bound|Chernoff bound]]--> [http://www.cs.sfu.ca/~kabanets/cmpt710/lec16.pdf]{{Wayback|url=http://www.cs.sfu.ca/~kabanets/cmpt710/lec16.pdf |date=20090316160846 }}. 因此證明我們可以很簡單的架構一個更準確的演算法，僅僅單純多重複幾次這個演算法然後對每次的答案作多數決。
+
+'''BPP'''是大小最大的幾個''實際的''問題類別之一，代表大多數的'''BPP'''問題都有有效率的[[概率演算法|概率演算法]]，因此以上倏地方法可以用現在的機器快速取得解答。因為這個原因，我們對哪一些問題或問題種類在'''BPP'''裡面有著實用方面的興趣。
+
+==定義==
+一個語言''L''在'''BPP'''裡面，若且唯若這語言存在一個概率圖靈機 ''M''，另
+* ''M''對任何輸入均在多項式時間後停止
+* 對任何字串''x''在''L''之內, 對''M''輸入''x''之後，''M'' 輸出 1 的機率大於或者等於 2/3
+* 對任何字串 ''x'' 不在 ''L''之內, 對''M''輸入''x''之後，''M'' 輸出 1 的機率小於或者等於 1/3
+
+另外，'''BPP'''可以僅以決定性圖靈機定義。一個語言''L''是在'''BPP'''裡面若且唯若存在一個多項式''p''和一個決定性圖靈機''M''，滿足
+* ''M''對任何輸入均操作多項式時間之內
+* 對任何字串''x''在''L''之內, 對長度為 ''p''(|''x''|)的任意字串''y'' ，滿足 ''M(x,y)'' = 1 這條件的機率超過或等於2/3
+* 對任何字串 ''x'' 不在 ''L''之內, 對長度為 ''p''(|''x''|)的任意字串 ''y'' ，滿足 ''M(x,y)'' = 1 這條件的機率小於或等於1/3
+
+== 與其他複雜度類別的關係 ==
+已知 '''BPP''' 在取補集之下有封閉性; 換句話說, '''BPP'''='''Co-BPP'''。 '''BPP'''是否是'''[[NP_(複雜度)|NP]]'''的[[子集|子集]]仍舊是一個公開的問題。 另外'''NP'''是否是'''BPP'''的子集也是個公開的問題; 如果是的話，則'''NP'''='''RP'''並且'''[[PH_(複雜度)|PH]]''' <math>\subseteq</math> '''BPP'''([https://web.archive.org/web/20060314023701/http://weblog.fortnow.com/2005/12/pulling-out-quantumness.html]) (大多數人認為不會，因為這代表對一些很難的'''[[NP-完全|NP-完全]]''' 問題有著實際的解法)。現在已知'''[[RP_(複雜度)|RP]]'''是'''BPP'''的子集，並且'''BPP'''是'''[[PP_(複雜度)|PP]]'''的子集。 尚不清楚這兩個是否為嚴格子集。 '''BPP'''包含在'''[[PH_(複雜度)|PH]]'''裡面。因此之故，'''P'''='''NP'''代表'''BPP'''='''P'''，因為'''PH'''在這時會變成'''P'''。 
+存在特定夠強的[[偽亂數產生器|偽亂數產生器]] 是這領域裡面大多數專家的[[猜想|猜想]]。這個猜想代表隨機性並不給予多項式計算更多的能力：換句話說，'''P'''='''RP'''='''BPP'''。注意一般的產生器並不足以表示出結果；使用典型的亂數產生器實做的任何概率演算法，與亂數的種子無關，對某一些特定的輸入會一直給出錯誤的答案(即使這一些輸入可能很稀少)。我們也可得到'''P''' = '''BPP''' ，若指數時間等級等同於'''E''' = <math>\textrm{DTIME} \left( 2^{O(n)} \right)</math> ([[#Babai_et_al.|Babai et al.]]),或者若'''E'''有指數的[[電路複雜性|電路複雜性]] ([[#Impagliazzo_and_Wigderson|Impagliazzo and Wigderson]])。 又'''BPP'''包含在'''i.o.-SUBEXP''' = <math>\bigcap_{\varepsilon>0}\hbox{i.o.-DTIME}(2^{n^\varepsilon})</math>裡面，若'''[[EXPTIME|EXPTIME]]'''並不等同於'''[[MA_(複雜度)|MA]]''' ([[Laszlo_Babai|Babai]] et al.).
+<!--
+暫時先保留這一段好了
+
+An equivalent statement to the above is the following.  Consider this statement:
+
+: There exists a language ''L'' in '''E''' for which any family of circuits deciding ''L'' is of exponential size.
+
+If this statement is false, then '''P'''≠'''NP'''.
+If this statement is true, then '''P'''='''BPP'''.
+-->
+
+一個[[Monte_Carlo演算法|Monte Carlo演算法]]是一個"差不多正確"的[[隨機演算法|隨機演算法]]。
+與跟它很像的[[拉斯維加斯演算法|拉斯維加斯演算法]]比較，後者則是一個永遠正確的隨機演算法，不過隨機性在於有可能會回傳推算失敗。多項式時間之內的拉斯維加斯演算法可以用來定義'''[[ZPP_(複雜度)|ZPP]]'''這個複雜度類。
+
+'''BPP'''包含在'''[[P/poly|P/poly]]'''裡面， 根據Adleman的理論，'''BPP'''是包含於'''[[P_(複雜度)|P (複雜度)]]'''裡面的。<ref>
+{{cite conference
+ | author = [[Leonard_Adleman|Adleman, L. M.]]
+ | title = Two theorems on random polynomial time
+ | booktitle = Proceedings of the Nineteenth Annual IEEE Symposium on Foundations of Computing
+ | date = 1978
+ | pages = 75–83}}
+</ref>; 的確，根據這個事實證明的結果，每一個BPP的演算法，只要輸入是有限長度的話，我們可以藉由一個決定性演算法去找足夠長的隨機字串來消除BPP的隨機特性。不過問題在於找到這個字串可能是很花費時間的事情。
+
+== 其他特性 ==
+有很長一段時間, 一個非常有名的題目已知是'''BPP'''但不確定是否是'''P'''，是[[素性測試|質數檢測]]，也就是求一個給定的數字是否是[[質數|質數]]。 然而,在2002年的論文'' [[AKS質數測試|PRIMES is in P]]'', [[Manindra_Agrawal|Manindra Agrawal]] 與他的學生 [[Neeraj_Kayal|Neeraj Kayal]] 和 [[Nitin_Saxena|Nitin Saxena]]為了這個問題找到了一決定性，多項式時間的演算法，因而證實這個問題是在'''P'''裡面。
+
+一個很重要的範例問題已知在'''BPP'''內 (事實上在[[RP_(複雜度)|co-RP]]內)，但不知道是否在'''P'''之內。這問題是[[等同多項式檢定|等同多項式檢定]], 這問題在於決定一個多項式是否完全等同於一個零多項式。 換句話說，是否存在任何變數數值的組合令這個多項式的結果不為零？ 這題目應均勻且隨意的從一個至少 ''d''個值的有限集合取變數的值來達到有限機率的錯誤(''d''代表多項式的總次數)。<ref>Madhu Sudan and Shien Jin Ong. Massachusetts Institute of Technology: 6.841/18.405J Advanced Complexity Theory: Lecture 6: Randomized Algorithms, Properties of BPP. February 26, 2003. http://people.csail.mit.edu/madhu/ST03/scribe/lect06.pdf {{Wayback|url=http://people.csail.mit.edu/madhu/ST03/scribe/lect06.pdf |date=20100716092129 }}</ref>
+
+'''BPP'''是[[低_(複雜度)|低]]對應於自己 , 代表一個能在常數時間內解決'''BPP'''問題的'''BPP'''機器 (一個'''BPP''' [[啟示圖靈機|啟示圖靈機]]) ，他的運算能力並不因此比沒有這能力的機器更強(或說，兩個不同機器定義出來的問題種類維持不變)。
+
+'''BPP'''這個語言集合是以一個普通的[[圖靈機|圖靈機]]加上一個亂數的來源來定義。  相對應的[[量子計算機|量子計算機]]語言集合則是'''[[BQP|BQP]]'''。
+
+任何在'''BPP'''裡面的語言可以被多項式大小的[[布林線路|布林線路]]來決定 (參見[[P/poly|P/poly]]).<ref>[[Leonard_Adleman|Leonard Adleman]], ''Two theorems on random polynomial time'', Proceedings of the Nineteenth Annual IEEE Symposium on Foundations of Computing, 1978, pp. 75–83.</ref>
+
+== 參考資料 ==
+<references />
+*<span id="Babai_et_al">László Babai, Lance Fortnow, Noam Nisan, and Avi Wigderson (1993). "BPP has subexponential time simulations unless [[EXPTIME|EXPTIME]] has publishable proofs". ''Computational Complexity'', 3:307–318.</span>
+*<span id="Impagliazzo_and_Wigderson">[[Russell_Impagliazzo|Russell Impagliazzo]] and Avi Wigderson (1997). "P=BPP if E requires exponential circuits: Derandomizing the XOR Lemma". ''Proceedings of the Twenty-Ninth Annual ACM Symposium on Theory of Computing'', pp. 220–229. {{doi|10.1145/258533.258590}}</span>
+*<span id="Kabanets">Valentine Kabanets (2003). "CMPT 710 – Complexity Theory: Lecture 16". [[Simon_Fraser_University|Simon Fraser University]].</span>
+* {{cite book|author = [[Christos_Papadimitriou|Christos Papadimitriou]] | year = 1993 | title = Computational Complexity | publisher = Addison Wesley | edition = 1st edition | isbn = 0-201-53082-1}} Pages 257–259 of section 11.3: Random Sources. Pages 269–271 of section 11.4: Circuit complexity.
+* {{cite book|author = [[Michael_Sipser|Michael Sipser]] | year = 1997 | title = Introduction to the Theory of Computation |url = https://archive.org/details/introductiontoth00sips | publisher = PWS Publishing | isbn = 0-534-94728-X}} Section 10.2.1: The class BPP, pp.336–339.
+
+== 外部連結 ==
+* [https://web.archive.org/web/20051205100423/http://www.cs.princeton.edu/courses/archive/fall03/cs597E/ Princeton CS 597E: Derandomization paper list]
+* [https://web.archive.org/web/20030805021413/http://www.courses.fas.harvard.edu/~cs225/ Harvard CS 225: Pseudorandomness]
+
+{{复杂度类}}
+
+[[Category:概率複雜度類|Category:概率複雜度類]]
+[[Category:计算机科学中未解决的问题|Category:计算机科学中未解决的问题]]

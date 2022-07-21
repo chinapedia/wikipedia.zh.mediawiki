@@ -1,0 +1,196 @@
+{{lowercase}}
+{{noteTA
+|G1=IT
+|G2=FL
+}}
+{{Infobox_Software
+ |name = iptables
+ |logo =
+ |screenshot =
+ |caption =
+ |author = [[羅斯迪·魯塞爾|羅斯迪·魯塞爾]]（Rusty Russell）
+ |developer = Netfilter核心團隊
+ |released = 1998年
+ |latest_release_version = 1.8.8
+ |latest_release_date ={{release date and age|2022|05|13}}
+ |programming language = [[C语言|C]]
+ |operating_system = [[Linux|Linux]]
+ |genre = 封包過濾
+ |license = [[GNU通用公共许可证|GNU通用公共许可证]]
+ |website = {{URL|https://www.netfilter.org/}}
+ |repo   = https://git.netfilter.org/iptables/
+}}
+'''iptables'''是運行在[[使用者空間|使用者空間]]的應用軟體，通過控制[[Linux內核|Linux內核]][[netfilter|netfilter]]模組，來管理網路封包的处理和转发。在大部分[[Linux发行版|Linux发行版]]中，可以通过 [https://linux.die.net/man/8/iptables 手册页] {{Wayback|url=https://linux.die.net/man/8/iptables |date=20210125014539 }} 或 <code>man iptables</code> 获取用户手册。通常iptables需要[[内核模块|内核模块]]支持才能运行，此处相应的内核模块通常是Xtables。因此，iptables操作需要[[超级用户|超级用户]]权限，其可执行文件通常位于 <code>/sbin/iptables</code> 或 <code>/usr/sbin/iptables</code> 。同时，需要说明的是，以上命令通常只用于处理 [[IPv4|IPv4]] 数据包；而对于 [[IPv6|IPv6]] 数据包，则使用类似的 '''ip6tables''' 命令。<ref>{{Cite web |url=https://www.linux.com/learn/intro-to-linux/2017/8/iptables-rules-ipv6 |title=How to Write iptables Rules for IPv6
+|date=2017-08-03
+|accessdate=2022-01-22
+|author=Carla Schroder
+|website=www.linux.com
+|archive-date=2019-06-12 |archive-url=https://web.archive.org/web/20190612163038/https://www.linux.com/learn/intro-to-linux/2017/8/iptables-rules-ipv6 |dead-url=no }}</ref>
+
+目前，iptables 支持内核2.4以上版本，旧版内核环境下则使用[[ipchains|ipchains]]（于2.2版内核）或 [[ipwadm|ipwadm]]（于2.0版内核）完成类似的功能。2014年1月19日起發行的Linux内核3.13版则使用{{link-en|nftables|nftables}}取而代之，但仍然提供 iptables 命令做为兼容接口。<ref>{{Cite web |url=https://netfilter.org/projects/nftables/ |title=The netfilter.org "nftables" project 
+|website=netfilter.org
+|accessdate=2022-01-22
+|archive-date=2020-11-12 |archive-url=https://web.archive.org/web/20201112011519/https://netfilter.org/projects/nftables/ |dead-url=no }}</ref>
+
+== 概要 ==
+[[File:Netfilter-packet-flow.svg|thumb]]
+iptables、ip6tables等都使用Xtables框架。存在「表（tables）」、「链（chain）」和「规则（rules）」三个层面。
+
+每个「表」指的是不同类型的数据包处理流程，如<code>filter表</code>表示进行数据包过滤，而<code>nat表</code>针对连接进行地址转换操作。每个表中又可以存在多个「链」，系统按照预订的规则将数据包通过某个内建链，例如将从本机发出的数据通过<code>OUTPUT链</code>。在「链」中可以存在若干「规则」，这些规则会被逐一进行匹配，如果匹配，可以执行相应的动作，如修改数据包，或者跳转。跳转可以直接接受该数据包或拒绝该数据包，也可以跳转到其他链继续进行匹配，或者从当前链返回调用者链。当链中所有规则都执行完仍然没有跳转时，将根据该链的默认策略（「policy」）执行对应动作；如果也没有默认动作，则是返回调用者链。<ref>{{Cite web |url=https://lesca.me/archives/iptables-tutorial-structures-configuratios-examples.html |title=iptables详细教程：基础、架构、清空规则、追加规则、应用实例
+|date=2012-03-23
+|accessdate=2022-01-22
+|website=lesca.me
+|archive-date=2020-11-27 |archive-url=https://web.archive.org/web/20201127163251/https://lesca.me/archives/iptables-tutorial-structures-configuratios-examples.html |dead-url=no }}</ref>
+
+=== filter表 ===
+
+filter表是默认的表，如果不指明表则使用此表。其通常用于过滤数据包。其中的内建链包括：
+* INPUT，输入链。发往本机的数据包通过此链。
+* OUTPUT，输出链。从本机发出的数据包通过此链。
+* FORWARD，转发链。本机转发的数据包通过此链。
+
+=== nat表 ===
+
+nat表如其名，用于[[网络地址转换|地址转换]]操作。其中的内建链包括：
+* PREROUTING，路由前链，在处理路由规则前通过此链，通常用于目的地址转换（DNAT）。
+* POSTROUTING，路由后链，完成路由规则后通过此链，通常用于源地址转换（SNAT）。
+* OUTPUT，输出链，类似PREROUTING，但是处理本机发出的数据包。
+
+=== mangle表 ===
+
+mangle表用于处理数据包。其和nat表的主要区别在于，nat表侧重连接而mangle表侧重每一个数据包。<ref>{{Cite web |url=https://www.netfilter.org/documentation/HOWTO/NAT-HOWTO-6.html |title=Linux 2.4 NAT HOWTO: Saying How To Mangle The Packets
+|website=netfilter.org
+|accessdate=2022-01-22 |archive-date=2021-01-10 |archive-url=https://web.archive.org/web/20210110181428/https://netfilter.org/documentation/HOWTO/NAT-HOWTO-6.html |dead-url=no }}</ref>其中内建链列表如下。
+* PREROUTING
+* OUTPUT
+* FORWARD
+* INPUT
+* POSTROUTING
+
+=== raw表 ===
+
+raw表用于处理异常，有如下两个内建链：
+* PREROUTING
+* OUTPUT
+
+== 命令示例 ==
+
+=== 防火墙示例 ===
+
+一个典型的工作站的防火墙配置实例。超级用户（root）可以用"<code> iptables -L</code>"指令顯示防火牆上的配置。完整的配置可以添加<code>-v</code>或<code>-vv</code>参数来显示更详细信息，或者使用<code> iptables-save -c </code>导出生成当前表的命令。由于没有指明「表」，因此默认使用<code>filter表</code>。
+<pre>
+ # iptables -L
+ Chain INPUT(policy DROP)
+ target     prot opt source               destination
+ ACCEPT     all—localhost.localdomain  localhost.localdomain
+ ACCEPT     all—anywhere             anywhere            state RELATED,ESTABLISHED
+ REJECT     all—anywhere             anywhere
+ 
+ Chain FORWARD(policy DROP)
+ target     prot opt source               destination
+ 
+ Chain OUTPUT(policy ACCEPT)
+ target     prot opt source               destination</pre>
+
+以上配置允许本机连接所有外部的系统，拒绝（REJECT）或丢弃（DROP）任何发往本机的数据包，但是有以下例外（和<code>INPUT链</code>逐一对应）：
+* 来自[[Localhost|本地环回地址]]的连接。
+* 已建立的连接（ESTABLISHED），如本机发起到远端的连接后远端的回应。
+* 关联的连接（RELATED），如[[文件传输协议|FTP协议]]使用的额外端口。<ref>{{Cite web |url=https://major.io/2007/07/01/active-ftp-connections-through-iptables/ |title=Active FTP connections through iptables
+|date=2007-07-01
+|website=major.io
+|author=Major Hayden
+|accessdate=2022-01-22
+|archive-date=2018-12-11 |archive-url=https://web.archive.org/web/20181211163517/https://major.io/2007/07/01/active-ftp-connections-through-iptables/ |dead-url=no }}</ref>
+
+此时，来自外部的[[ping|ping]]将没有回应：
+<pre>
+ $  ping -c 1 10.0.0.1 
+ PING 10.0.0.1 (10.0.0.1) 56(84) bytes of data. 
+ --- 10.0.0.1 ping statistics --- 
+ 1 packets transmitted, 0 received, 100% packet loss, time 0ms</pre>
+外部尝试连接本机的[[HTTP|HTTP]]端口（即[[传输控制协议|TCP]] 80端口）将被拒绝连接：
+<pre>
+ $ telnet 10.0.0.1 80 
+ Trying 10.0.0.1... 
+ telnet: connect to address 10.0.0.1: Connection refused</pre>
+但本机访问外部（OUTPUT）均正常，因为其链为空且默认策略为接受（ACCEPT）；且本机不转发（FORWARD）数据包，因为其默认策略为丢弃（DROP）。需要额外注意的是，这里仅展示了IPv4的情况，若同时使用IPv6则需要另行配置ip6tables。
+
+=== 端口重定向示例 ===
+
+iptables的重要功能之一是用于端口和/或地址的转换。如下示例展示了將預設[[HTTP|HTTP]]埠的封包由80轉向8080埠。這樣，HTTP的daemon可以允許由一般用户權限啟動，而不需要對一般使用者無法將埠號綁在1024埠以下的限制的問題多加考慮。
+
+<code> iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 8080 </code>
+
+注意：如果你在你的電腦上面運行了這個指令，它只會對連到你的機器上的外部的IP發生效果。從本地端發起的連線不會遵循nat表上PREROUTING鏈的設置。如果你想讓本地端也遵循規則，你可以另外鍵入下面的指令：
+
+<code> iptables -t nat -A OUTPUT -o lo -p tcp --dport 80 -j REDIRECT --to-port 8080 </code>
+
+這條規則會將lo介面上的封包輸出由80埠轉向到8080埠上面。
+
+=== [[网络地址转换|网络地址转换]]示例 ===
+
+典型设置如办公室用小型局域网，由一台Linux主机作为[[路由器|路由器]]共享地址接入[[Internet|Internet]]。
+
+假设局域网接口为eth0，地址使用192.168.0.0/24；而Internet接口为eth1，使用的地址为198.51.100.3。
+
+在局域网用户访问Internet时，源地址需要被转换为198.51.100.3，则使用规则：
+
+<pre> iptables -t nat -I POSTROUTING -s 192.168.0.0/24 -o eth1 -j SNAT --to 198.51.100.3 </pre>
+
+若需要在局域网192.168.0.2上开启HTTP服务，则可以设置相应的DNAT服务，将访问外部TCP 80端口的数据包重定向：
+
+<pre> iptables -t nat -I PREROUTING -p tcp -d 198.51.100.3 --dport 80 -j DNAT --to 192.168.0.2 </pre>
+
+需要注意的是，转发操作需要在<code>filter表</code>中<code>FORWARD链</code>中允许，并且打开系统的转发功能。<ref>{{Cite web |url=https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/4/html/Security_Guide/s1-firewall-ipt-fwd.html |title=7.4. FORWARD and NAT Rules Red Hat Enterprise Linux 4 
+|website=access.redhat.com
+|accessdate=2022-01-22 |archive-date=2019-07-19 |archive-url=https://web.archive.org/web/20190719132608/https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/4/html/Security_Guide/s1-firewall-ipt-fwd.html |dead-url=no }}</ref>
+
+== 其他控制界面 ==
+
+=== 前端控制介面及命令 ===
+
+有很多第三方软件可以帮助设定iptables规则。前端介面像是[[Ncurses|Ncurses]]或圖型介面可以讓使用者用點選的方式產生許多簡單的規則。命令稿通常是參照[[Unix_shell|Unix shell]]產生出來的（不過當然也有可能會使用其它種類型的命令稿），它們有的會用一些預先定義好的規則或簡單的範本來调用iptables或<code> iptables-restore </code>执行。一些Linux發行版公司會在它們的發行版裡面包含这些方式，當然像這樣的方式能產生的變化就相當有限，不過也因為產生規則的方式很簡單，所以甚至可以利用php網頁撰寫的方式來產生這些規則。
+
+此类前端装置如生成器（generator）或脚本（script）往往会被其模板限制，模板仅仅能使用用户定义规则并替换指定的部分，如只能替换端口或IP地址，同时，生成的规则往往难以达到最佳状态，需要进行进一步优化，如此会增加开发和运维的成本。如果用户想要了解iptables并且优化自己的规则，则需要自己创建规则。
+
+=== 前端的設定 ===
+
+*[https://web.archive.org/web/20081210035025/http://www.fwbuilder.org/ Firewall Builder] —圖形前端配合規則/字集產生器、及自動規則集（automated ruleset）載入。
+*[[Shorewall|Shorewall]]，以本文為基礎的規則產生器。
+
+=== 其它的工具 ===
+*Fwsnort - iptables侵入測試以字串比對法及是諾特規則（Snort Rule）來進行[http://www.cipherdyne.org/fwsnort/ FWSnort] {{Wayback|url=http://www.cipherdyne.org/fwsnort/ |date=20210120141335 }}，Translates a Snort IDS ruleset into an IPTables ruleset.
+
+=== Iptables/Netfilter圖表 ===
+為了較好地了解一個封包穿越内核層的X表（Xtables）之表/鏈（table/chain），你可以參考下列圖表的使用：
+* Netfilter封包流；勾/表（hook/table）秩列[http://jengelh.medozas.de/images/nf-packet-flow.png] {{Wayback|url=http://jengelh.medozas.de/images/nf-packet-flow.png |date=20120211143959 }}
+
+== 參照 ==
+{{Portal|Free software|Free Software Portal Logo.svg}}
+
+*[[ipchains|ipchains]]為iptables的前一代
+*[[Netlink|Netlink]]為Netfilter使用之API
+*[[NuFW|NuFW]]延伸到Netfilter之認證防火墻
+*[[nftables|nftables]]为iptables的后继者
+*[[firewalld|firewalld]]
+=== 其它防火墻的解決方案 ===
+*[[PF_(firewall)|PF (firewall)]]
+*[[ipfirewall|ipfirewall]]
+*[[ipfilter|ipfilter]]
+
+== 外部連結 ==
+
+* [http://www.netfilter.org/ The netfilter/iptables project Web page]{{WebCite|url=https://www.webcitation.org/68tRogKk3?url=http://www.netfilter.org/ |date=20120704005047 |dateformat=iso }} {{en}}
+* [http://freshmeat.net/projects/iptables/ Freshmeat project page for the iptables package] {{Wayback|url=http://freshmeat.net/projects/iptables/ |date=20111028220035 }} {{en}}
+* [http://www.netfilter.org/documentation/index.html The netfilter/iptables documentation page] {{Wayback|url=http://www.netfilter.org/documentation/index.html |date=20210201075807 }} (outdated) {{en}}
+
+==参考文献==
+{{reflist}}
+
+{{Authority control}}
+
+[[Category:Linux内核功能|Category:Linux内核功能]]
+[[Category:防火墙软件|Category:防火墙软件]]
+[[Category:Linux安全软件|Category:Linux安全软件]] 
+[[Category:自由安全软件|Category:自由安全软件]]
+[[Category:命令行软件|Category:命令行软件]]

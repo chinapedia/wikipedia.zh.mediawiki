@@ -1,0 +1,54 @@
+{{noteTA|G1=IT}}
+{{Infobox software
+| name                   = Google Native Client
+| logo                   = Google Chrome icon (2011).svg
+| screenshot             =<!-- Deleted image removed:  [[Image:Native-client-python-repl.png|200px]] -->
+| caption                = A [[Python|Python]] [[read-eval-print_loop|REPL]] running under Native Client inside a web browser.
+| latest release version = SDK: [http://developer.chrome.com/native-client/sdk/release-notes Pepper 45] <small>({{start date and age|df=yes|2015|07|10}})</small>, Client: {{Latest stable software release/Google Chrome}}
+| latest release date    =
+| latest preview version = [http://code.google.com/chrome/nativeclient/docs/releasenotes.html 0.5]
+| latest preview date    = {{start date and age|2011|07|28}}
+| developer              = [[Google|Google]]，以及其他開發者
+| programming language   = [[C語言|C語言]]、[[C++|C++]]
+| operating system       = [[Cross-platform|Cross-platform]]: [[Microsoft_Windows|Microsoft Windows]], [[Linux|Linux]], [[Mac_OS|Mac OS]], [[Google_Chrome_OS|Chrome OS]]
+| status                 = 產品 (NaCl, PNaCl<ref>{{Cite web |url=http://src.chromium.org/viewvc/chrome?view=revision&revision=213999 |title=Chrome Revision 213999 |access-date=2015-01-07 |archive-date=2021-03-08 |archive-url=https://web.archive.org/web/20210308120902/https://src.chromium.org/viewvc/chrome?view=revision&revision=213999 }}</ref>)
+| genre                  = 利用[[沙盒_(計算機安全)|沙盒]]技術，讓[[機器碼|機器碼]]在[[瀏覽器|瀏覽器]]上運行
+| license                = [[BSD_licenses|New BSD license]]
+| website                = {{URL|code.google.com/p/nativeclient}}
+}}
+{{Portal|Free software}}
+'''Google Native Client'''（縮寫為'''{{lang|en|NaCl}}'''），是一个由[[谷歌|谷歌]]所發起的[[開放原始碼|開放原始碼]]計劃，採用[[BSD许可证|BSD许可证]]。它採用[[沙盒_(計算機安全)|沙盒]]技術，讓[[Intel_x86|Intel x86]]、[[ARM|ARM]]或[[MIPS|MIPS]]子集的[[機器碼|機器碼]]直接在沙盒上運行。它能夠從[[瀏覽器|瀏覽器]]直接運行程式機器碼，獨立於使用者的作業系統之外，使[[Web應用程式|Web應用程式]]可以用接近於機器碼運作的速度來執行，同時兼顧安全性。其功能類似於[[微軟|微軟]]的 [[ActiveX|ActiveX]]，但是ActiveX只支援視窗系統。
+
+Google將這項功能合併在[[Chrome_OS|Chrome OS]]之下開發。它也可以被用來開發安全的[[瀏覽器|瀏覽器]][[外掛|外掛]]程式。
+
+2017年5月31日，Google宣布放棄PNaCl轉向[[WebAssembly|WebAssembly]]<ref>{{Cite news|url=https://blog.chromium.org/2017/05/goodbye-pnacl-hello-webassembly.html|title=Goodbye PNaCl, Hello WebAssembly!|work=Chromium Blog|access-date=2017-05-31|language=en-US|archive-date=2017-05-30|archive-url=https://web.archive.org/web/20170530233036/https://blog.chromium.org/2017/05/goodbye-pnacl-hello-webassembly.html|dead-url=no}}</ref>。
+
+==技術內容==
+NaCl使用[[Newlib|Newlib]]作為它的[[C標準函式庫|C標準函式庫]]，但它也支援[[GNU_C_函式庫|GNU C 函式庫]]。
+
+它最初只支援[[x86|x86]]平台，但目前也支援[[ARM|ARM]]平台與[[x86-64|x86-64]]。
+
+===沙盒技術===
+NaCl運用沙盒技术以防止外來（第三方）機器碼影響系統安全；特別是在[[x86|x86]]平台上運用[[記憶體區段|記憶體區段]]，限制[[外掛程式|外掛程式]]所能讀寫的記憶體范围。<ref name="Sandboxx86">[http://research.google.com/pubs/archive/34913.pdf Native Client: A Sandbox for Portable, Untrusted x86 Native Code]</ref>
+
+由於ARM與x86-64[[長模式|長模式]]不支援記憶體區段，因此在這些平台上NaCl的記憶體寫入地址是由沙盒過濾。<ref>{{Cite web |url=http://nativeclient.googlecode.com/svn/data/site/NaCl_SFI.pdf |title=Adapting Software Fault Isolation to Contemporary CPU Architectures |accessdate=2011-09-12 |archive-date=2011-07-23 |archive-url=https://web.archive.org/web/20110723064729/http://nativeclient.googlecode.com/svn/data/site/NaCl_SFI.pdf |dead-url=no }}</ref>
+
+===機器碼驗證器===
+NaCl運用機器碼驗證器（Code Validator）来保證只有安全機器碼能在系統執行。由於x86/x86-64是[[複雜指令集|複雜指令集]]，[[指令|指令]]長度不一，透過[[控制流程|控制流程]]可能隱藏非安全機器碼，從而使驗證十分耗時。NaCl運用固定長度的16或32[[位元組|位元組]]的指令束(Instruction Bundle)，使機器碼驗證器設計簡單（只有約600行[[C語言|C語言]]）和高效率；<ref name="Sandboxx86"/> <ref>{{Cite web |url=http://src.chromium.org/viewvc/native_client/trunk/src/native_client/src/trusted/validator/x86/ |title=Index of /trunk/src/native_client/src/trusted/validator/x86 |accessdate=2011-09-12 |archive-date=2012-07-20 |archive-url=https://archive.is/20120720193306/http://src.chromium.org/viewvc/native_client/trunk/src/native_client/src/trusted/validator/x86/ |dead-url=no }}</ref> 而運用指令束只是失去5%的執行效率。
+
+== 應用軟件的移植 ==
+NaCl支援[[單指令流多數據流|單指令流多數據流]]指令（如[[SSE|SSE]]、[[3DNow!|3DNow!]]）及[[多執行緒|多執行緒]]介面，應用軟件一般只需簡單的修改便可以移植到NaCl平台；在2009年一個發布會上，NaCl開發人員示範一個為NaCl平台的移植而修改了20行原始碼的[[H264|H264]]解碼器軟件。<ref>{{Cite web |url=http://assets.en.oreilly.com/1/event/29/Native%20CPU%20Performance%20in%20the%20Browser%20with%20Google%20Native%20Client%20Presentation.pdf |title=Native CPU Performance in the Browser with Google Native Client |accessdate=2011-09-16 |archive-date=2019-02-17 |archive-url=https://web.archive.org/web/20190217094628/http://assets.en.oreilly.com/1/event/29/Native%20CPU%20Performance%20in%20the%20Browser%20with%20Google%20Native%20Client%20Presentation.pdf |dead-url=no }}</ref>
+
+== 參考資料 ==
+{{reflist}}
+
+==外部連結==
+* {{en}} [http://code.google.com/p/nativeclient/ NaCl計劃官網]{{Wayback|url=http://code.google.com/p/nativeclient/ |date=20100722230056 }}
+* {{en}} {{Youtube|id=2xV_0pTpNj0|title=Google I/O 2009 Native Code for Compute Intensive Web Apps}} - [[Google_I/O|Google I/O]] 2009技術專題討論
+* {{en}} {{Youtube|id=KOsJIhmeXoc|title=Google I/O 2012 Life of a Native Client Instruction}} - Google I/O 2012技術專題討論
+
+{{Google公司}}
+
+[[Category:Google軟體|Category:Google軟體]]
+[[Category:自由软件|Category:自由软件]]
+[[Category:安全软件|Category:安全软件]]

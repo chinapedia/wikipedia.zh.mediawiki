@@ -1,0 +1,40 @@
+{{noteTA|G1=IT|time=2010-02-28T12:55:13+00:00}}
+'''各向异性过滤'''（{{lang-en|Anisotropic filtering}}，简称AF）是一种3D显示技术，如其名称所示，它是对周围各个方向上的像素进行[[取样|取样]]计算后映射到目标像素上的技术。与[[双线性过滤|双线性过滤]]和三线性过滤相比，它在大[[角度|角度]]显示方面具有更高的精度，令画面更逼真，但计算量也更大，对[[显示卡|显示卡]]的要求也更高。<ref>{{Cite web |url=http://hardware.mydrivers.com/2/36/36351.htm |title=寻求速度和画质的平衡—— 全屏抗锯齿技术与测试 |accessdate=2010-02-14 |archive-date=2007-11-12 |archive-url=https://web.archive.org/web/20071112181906/http://hardware.mydrivers.com/2/36/36351.htm |dead-url=yes }}</ref>
+[[文件:各向异性过滤.jpg|thumb]]催化剂控制中心里的各向异性过滤效果对比]]
+
+==實作==
+OpenGL 擴展規範<ref>{{Cite web |url=https://www.opengl.org/registry/specs/EXT/texture_filter_anisotropic.txt |title=OpenGL 擴展規範 |access-date=2015-10-23 |archive-url=https://web.archive.org/web/20160227180533/https://www.opengl.org/registry/specs/EXT/texture_filter_anisotropic.txt |archive-date=2016-02-27 |dead-url=yes }}</ref>中說明了可能的實作方式，首先定義以下符號：
+
+<math>
+\begin{align}
+P_x &= \sqrt{u_x^2+v_x^2}\\
+P_y &= \sqrt{u_y^2+v_y^2}\\
+P_{max} &= \max(P_x,P_y)\\
+P_{min} &= \min(P_x,P_y)\\
+N &= \min(\left \lceil \frac{P_{max}}{P_{min}} \right \rceil, maxAniso)\\
+\lambda' &= \lg \frac{P_{max}}{N}
+\end{align}
+</math>
+
+其中 <math>P_x, P_y</math> 和 mipmapping 中的定義相同，代表紋理座標對螢幕座標的微分。不同的是引入了變數 N 代表 anisotropic 的比例（一般不超過 16），並且只在<math>\lambda' \approx P_{min}</math> 的 mipmap 層級取樣（無視向上取整以及限制最大 anisotropic 程度的 min 的話，則<math>\lambda'=P_{min}</math>）。
+
+Anisotropic filter 的結果 <math>\tau_{aniso}</math> 可以用平均多個 mipmap 的採樣 <math>\tau</math> 求出。
+
+<math>
+\tau_{aniso} = \frac{1}{N}\sum_{1}^{N} \tau(u+u_x\frac{2i-N-1}{2(N+1)},v+v_x\frac{2i-N-1}{2(N+1)})
+</math>
+
+可以看到這個方式需要存取比原本多出 N 倍的紋理記憶體，而且跟原本的 mipmap 方法是正交的，也就是我們可以任意的 mipmap 方法，配合任意的 <math>maxAniso</math>。
+
+==優化==
+* 相鄰的像素點通常存在於快取裡面。
+* 一般來說高度[[各向异性|各向异性]]的點很少（通常小於10%），而需要[[材质过滤|材质过滤]]的點也不需要各向异性[[过滤|过滤]]。
+
+==参考文献==
+{{reflist}}
+
+{{Computer-stub}}
+
+[[Category:计算机图形学|Category:计算机图形学]]
+[[Category:三维计算机图形学|Category:三维计算机图形学]]
+[[Category:顯示科技|Category:顯示科技]]

@@ -1,0 +1,69 @@
+'''NaN'''（'''N'''ot '''a''' '''N'''umber，非数）是[[计算机科学|计算机科学]]中数值[[数据类型|数据类型]]的一类值，表示未定义或不可表示的值。常在[[浮点数|浮点数]]运算中使用。首次引入NaN的是1985年的[[IEEE_754|IEEE 754]]浮点数标准。
+
+== 浮点数 ==
+在浮点数运算中，NaN与[[无穷|无穷大]]的概念不同，尽管两者均是以浮点数表示实数时的特殊值。无效操作（Invalid Operation）同样也不同于[[算術溢出|算術溢出]]（可能返回无穷大）和算术下溢出（可能返回最小的一般数值、特殊数值、零等）。
+
+[[IEEE_754-1985|IEEE 754-1985]]中，用指数部分全为1、小数部分非零表示NaN。以32位IEEE单精度浮点数的NaN为例，按位表示即：S111 1111 1AXX XXXX XXXX XXXX XXXX XXXX，S为符号位，符号位S的取值无关紧要；A是小数部分的最高位（the most significant bit of the significand），其取值表示了NaN的类型：小数部分不能全为0，小数部分除了A之外的部分被称为NaN的payload；{{NoteTag|如果浮点数的小数部分全为零，则该数为浮点[[无穷大|无穷大]]。}}
+* 大多数处理器，包括[[Intel|Intel]]与[[AMD|AMD]]的[[x86|x86]]系列、[[Motorola|Motorola]] {{tsl|en|Motorola 68000 series|68000系列}}、[[AIM联盟|AIM]] [[PowerPC|PowerPC]]系列、[[ARM架構|ARM]]系列、[[昇陽電腦|Sun]] [[SPARC|SPARC]]系列，采取了A为'is_quiet'标记位。即，如果A = 1，则该数是quiet NaN；如果A为零、其余X部分非零，则是signaling NaN。'''IEEE 754-2008'''标准采纳了这一方案。
+* [[PA-RISC|PA-RISC]]与[[MIPS架構|MIPS]]处理器，采取了A为'is_signaling'标记位。恰与上述相反。
+
+=== 与NaN值的比较 ===
+IEEE 754标准定义了NaN值的比较方式。对两个浮点数作比较时，认为NaN是一个无顺序的、与任何数值都不相等的数值，而且会忽略NaN值中的符号位。
+
+当NaN与另一个浮点数x（其中x可为正常值、正负[[无穷大|无穷大]]或NaN）进行比较时，比较结果如下：
+{| class="wikitable" style="text-align: center"
+! 比较
+| NaN ≥ ''x''
+| NaN ≤ ''x''
+| NaN > ''x''
+| NaN < ''x''
+| NaN = ''x''
+| NaN ≠ ''x''
+|-
+! 结果
+| False
+| False
+| False
+| False
+| False
+| True
+|}
+
+由上表可知，判断一个值是否为NaN时，不能通过判断x=NaN或x≠NaN来进行比较，但因为NaN永远不等于其自身，因此可通过判断x=x或x≠x来判断x是否为NaN值（分别返回False和True）。
+
+=== 返回NaN的运算 ===
+返回NaN的运算有如下三种<ref>David Goldberg [http://docs.sun.com/source/806-3568/ncg_goldberg.html What Every Computer Scientist Should Know About Floating-Point] {{Wayback|url=http://docs.sun.com/source/806-3568/ncg_goldberg.html |date=20070329093550 }}</ref>：
+* 至少有一个[[參数|參数]]是NaN的运算{{NoteTag|在某些编程语言中，NaN^0等于1。}}
+* [[不定式_(數學)|不定式]]
+** 下列[[除法|除法]]运算：0/0、[[∞|∞]]/∞、∞/(−∞)、(−∞)/∞、(−∞)/(−∞)
+** 下列求余数运算：任意值%0、∞%任意值
+** 下列[[乘法|乘法]]运算：0×∞、0×−∞
+** 下列[[加法|加法]]运算：∞ + (−∞)、(−∞) + ∞
+** 下列[[减法|减法]]运算：∞ - ∞、(−∞) - (−∞)
+** 下列[[指數|指數]]運算：0^0、∞^0、1^∞{{NoteTag|在某些编程语言中，0^0、∞^0和1^∞均等于1。}}、∞^(−∞)
+* 产生[[复数_(数学)|复数]]结果或无意义结果的实数运算。例如：
+** 对[[负数|负数]]进行[[开方|开偶次方]]的运算
+** 对负数（包含−∞）进行[[对数|对数]]运算
+** 对[[正弦|正弦]]或[[餘弦|餘弦]][[到达域|到达域]]以外的数进行[[反正弦|反正弦]]或[[反餘弦|反餘弦]]运算
+
+是否返回NaN与编程语言有关。有些编程语言在进行以上运算时会引发异常，而另一些编程语言则会返回NaN值，不会引发异常或中止程序。
+
+== 整数的NaN ==
+大多数定长的[[整数|整数]]格式无法显式表示无效数据。
+
+[[Perl|Perl]]的BigInt包用“NaN”来表示不含有效整数数据字符串的处理结果。
+
+<code> >perl -mMath::BigInt -e "print Math::BigInt->new('foo')" </code>
+
+<code> NaN </code>
+
+== 注释 ==
+{{NoteFoot}}
+
+== 参考文献 ==
+{{Reflist}}
+
+== 外部链接 ==
+* http://foldoc.org/?Not-a-Number{{Wayback|url=http://foldoc.org/?Not-a-Number |date=20080314163652 }}
+[[Category:数据类型|Category:数据类型]]
+[[Category:計算機算術|Category:計算機算術]]

@@ -1,0 +1,212 @@
+{{mergeto|阿达马变换}}
+'''沃爾什轉換（Walsh Transform）'''是在[[頻譜分析|頻譜分析]]上作為[[離散傅立葉變換|離散傅立葉變換]]的替代方案的一種方法。
+
+在頻譜分析上最常用的一種方法是使用離散傅立葉變換，然而，即使已經有許多快速的演算法來實現離散傅立葉變換，仍然具有一些實現上的缺點，舉例來說，在離散傅立葉變換中，資料向量必須乘上[[复数_(数学)|複數]]係數的矩陣加以處理，而且每個複數係數的實部和虛部是一個[[正弦|正弦]]及[[餘弦|餘弦]]函數，因此大部分的係數都是[[浮點數|浮點數]]，也就是說在做離散傅立葉變換處理的時候，我們必須做複數而且是浮點數的運算，因此計算量會比較大，而且浮點數運算產生的誤差會比較大。
+
+而在沃爾什轉換中，資料向量需要乘上的矩陣是一個[[實數|實數]]的矩陣，而且這些矩陣的係數是1或是–1，因此所有的係數都是[[絕對值|絕對值]]大小相同的整數，這使得我們不需要作浮點數的乘法運算，更進一步，只需要使用加法來實現沃爾什轉換，這使的沃爾什轉換在[[計算複雜性理論|運算複雜度]]上遠小於離散傅立葉變換。
+
+使用離散傅立葉變換相當於把信號拆解成在不同頻率的正弦函數與餘弦函數的分量，而使用沃爾什轉換相當於把信號拆解成在許多不同震盪頻率的方波上，因此，除非所要分析的信號擁有類似方波組合的特性，使用沃爾什轉換作頻譜分析的效果會比使用離散傅立葉變換分析的效果要差，這是降低運算複雜度所要付出的代價。
+
+==轉換公式==
+沃爾什轉換的轉換式為
+
+<math>F[m]=\sum_{n=0}^{N-1} f[n]W[m,n]</math>
+
+其中<math>W[m,n]</math>是沃爾什轉換矩陣的第（m,n）個元素。
+舉例來說，一個8點沃爾什轉換的轉換矩陣如下：
+
+<math>W_8=\begin{pmatrix} 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\ 1 & 1 & 1 & 1 & -1 & -1 & -1 & -1 \\1 & 1 & -1 & -1 & -1 & -1 & 1 & 1 \\1 & 1 & -1 & -1 & 1 & 1 & -1 & -1 \\1 & -1 & -1 & 1 & 1 & -1 & -1 & 1 \\1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 \\1 & -1 & 1 & -1 & -1 & 1 & -1 & 1 \\1 & -1 & 1 & -1 & 1 & -1 & 1 & -1 \\ \end{pmatrix}</math>
+
+後面會解釋沃爾什轉換矩陣是如何產生，而沃爾什轉換的反轉換式為
+
+<math>f[m]=\frac{1}{N}\sum_{n=0}^{N-1} F[n]W[m,n]</math>
+
+注意到正轉換式與反轉換式只差了一個常數，這是由於沃爾什轉換矩陣的[[逆矩陣|反矩陣]]就是自己的[[轉置矩陣|轉置矩陣]]乘上一個常數的緣故。
+
+==沃爾什轉換矩陣的產生==
+<math>2^k</math>點的沃爾什矩陣可以用下面的遞迴方式產生：
+
+起始值<math>k=1</math>（2點沃爾什轉換矩陣）
+
+<math>W_2=\begin{pmatrix} 1 & 1 \\ 1 & -1 \\ \end{pmatrix}</math>
+
+假設我們已經有一個<math>2^k</math>點的沃爾什轉換矩陣<math>W_{2^k}</math>  則我們可以藉由下面的方法來產生<math>2^{k+1}</math>點的沃爾什轉換矩陣<math>W_{2^{k+1}}</math>
+
+Step 1  定義<math>V_{2^{k+1}}=\begin{pmatrix} W_{2^k} & W_{2^k} \\ W_{2^k} & -W_{2^k} \\ \end{pmatrix}</math>
+
+Step 2  根據變號次數把<math>V_{2^{k+1}}</math>的列（row）重新排列成為<math>W_{2^{k+1}}</math>
+
+以下舉一個使用4點沃爾什轉換矩陣產生8點沃爾什轉換矩陣的例子：
+
+<math>W_4=\begin{pmatrix} 1 & 1 & 1 & 1 \\ 1 & -1 & 1 & -1 \\ 1 & 1 & -1 & -1\\ 1 & -1 & -1 & 1\\\end{pmatrix}</math>
+
+<math>V_8=\begin{pmatrix} W_4 & W_4 \\ W_4 & -W_4 \\ \end{pmatrix}=\begin{pmatrix} 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\ 1 & -1 & 1 & -1 & 1 & -1 & 1 & -1 \\1 & 1 & -1 & -1 & 1 & 1 & -1 & -1 \\1 & -1 & -1 & 1 & 1 & -1 & -1 & 1 \\1 & 1 & 1 & 1 & -1 & -1 & -1 & -1 \\1 & -1 & 1 & -1 & -1 & 1 & -1 & 1 \\1 & 1 & -1 & -1 & -1 & -1 & 1 & 1 \\1 & -1 & -1 & 1 & -1 & 1 & 1 & -1 \\ \end{pmatrix}</math>
+
+接著對<math>V_8</math>的列做排序即可得上面的<math>W_8</math>。
+
+在不同的應用上，我們較常使用的沃爾什矩陣的列的排列順序也不同，以下以一個表來區分：
+
+{| border="1" 
+|- 
+| 序數順序（沃爾什順序） || 雙積順序（培力順序） || 自然順序（哈德碼得順序） || <math>W[m,n]</math> 
+|- 
+| Sequency Ordering(Walsh Ordering) || Dyadic Ordering(Paley Ordering)||Natural Ordering（Hadamard Ordering）
+|- 
+| 較常用於信號處理 || 較常用於控制工程 || 較常用於數學 ||
+|- 
+| 第0列 || 第0列 || 第0列 ||<math>\begin{pmatrix} 1 & 1 & 1 & 1 & 1 & 1 & 1 & 1\\ \end{pmatrix}</math>
+|- 
+| 第1列 || 第1列 || 第4列 ||<math>\begin{pmatrix} 1 & 1 & 1 & 1 & -1 & -1 & -1 & -1\\ \end{pmatrix}</math>
+|- 
+| 第2列 || 第3列 || 第6列 ||<math>\begin{pmatrix} 1 & 1 & -1 & -1 & -1 & -1 & 1 & 1\\ \end{pmatrix}</math>
+|- 
+| 第3列 || 第2列 || 第2列 ||<math>\begin{pmatrix} 1 & 1 & -1 & -1 & 1 & 1 & -1 & -1\\ \end{pmatrix}</math>
+|- 
+| 第4列 || 第6列 || 第3列 ||<math>\begin{pmatrix} 1 & -1 & -1 & 1 & 1 & -1 & -1 & 1\\ \end{pmatrix}</math>
+|- 
+| 第5列 || 第7列 || 第7列 ||<math>\begin{pmatrix} 1 & -1 & -1 & 1 & -1 & 1 & 1 & -1\\ \end{pmatrix}</math>
+|- 
+| 第6列 || 第5列 || 第5列 ||<math>\begin{pmatrix} 1 & -1 & 1 & -1 & -1 & 1 & -1 & 1\\ \end{pmatrix}</math>
+|- 
+| 第7列 || 第4列 || 第1列 ||<math>\begin{pmatrix} 1 & -1 & 1 & -1 & 1 & -1 & 1 & -1\\ \end{pmatrix}</math>
+|}
+
+若使用二進位來表示各種順序的列的編號，則雙積順序的二進位編號是序數順序的[[格雷碼|格雷碼]]編碼，而自然順序的二進位編號是雙積順序的[[位元反轉|位元反轉]]。
+
+==沃爾什轉換與沃爾什轉換矩陣的性質==
+
+（1）	正交性質
+
+沃爾什轉換矩陣的每個列是互相正交的，即如果<math>m_0\ne m_1</math>則<math>\sum_{n=0}^{N-1} W[m_0,n]W[m_1,n]=0</math>
+
+（2）	零交（zero-crossing）性質
+
+<math>2^k</math>點沃爾什轉換矩陣的每個列的變號次數都不相同，分別為變號0次到變號<math>2^k-1</math>，這個性質是沃爾什轉換可以用來做頻譜分析的原因之一，不同的變號次數相當於不同的頻率。
+
+（3）	奇偶性質
+
+沃爾什轉換矩陣（沃爾什順序）中，編號為偶數的列是偶對稱，編號為奇數的列是奇對稱。（有第0列）
+
+（4）	線性性質
+
+若<math>f[n]\Rightarrow F[m]</math>，<math>g[n]\Rightarrow G[m]</math>，（<math>\Rightarrow</math>表沃爾什轉換）則有<math>af[n]+bg[n]\Rightarrow aF[m]+bg[m]</math>。
+
+（5）	加法性質
+
+<math>W[m,n]W[l,n]=W[m\oplus l,n]</math>，<math>\oplus</math>表示邏輯互斥或（exclusive or）
+
+（6）	平移性質
+
+若<math>f[n]\Rightarrow F[m]</math>則<math>f[n\oplus k]\Rightarrow W[k,m]F[m]</math>
+
+（7）	調變性質
+
+若<math>f[n]\Rightarrow F[m]</math>則<math>W[k,n]f[n]\Rightarrow F[k\oplus m]</math>
+
+（8）	巴斯瓦定理（Parseval's Theorem）
+
+若<math>f[n]\Rightarrow F[m]</math>則<math>\sum_{n=0}^{N-1}|f[n]|^2=\frac {1}{N}\sum_{n=0}^{N-1}|F[m]|^2</math>
+
+（9）	[[摺積|摺積]]性質
+
+若<math>f[n]\Rightarrow F[m]</math>，<math>g[n]\Rightarrow G[m]</math>，則<math>\sum_{l=0}^{N-1}f[l]g[((n\oplus l))_N]=\sum_{l=0}^{N-1}g[l]f[((n\oplus l))_N]\Rightarrow F[m]G[m]</math>，在這裡<math>\sum_{l=0}^{N-1}f[l]g[((n\oplus l))_N]=\sum_{l=0}^{N-1}g[l]f[((n\oplus l))_N]</math>代表邏輯摺積（logical convolution）。
+
+==快速沃爾什轉換==
+由於一個<math>2^k</math>點沃爾什轉換矩陣可以由<math>2^{k-1}</math>點的沃爾什轉換矩陣堆疊後做變號與排序產生，因此一個<math>2^k</math>沃爾什轉換可以由做兩次<math>2^{k-1}</math>的沃爾什轉換及一些加減法和排序產生，可以得到一個類似[[快速傅立葉變換|快速傅立葉變換]]的蝴蝶結構。
+
+== 沃爾什轉換的優點 ==
+
+# 運算數值皆為實數不存在複數
+# 不需要應用到乘法運算
+# 頻譜分析( spectrum analysis)
+# 正向轉換跟反向轉換結構相似
+#* Forward :<math>F[m]=\textstyle \sum_{n=0}^{N-1} \displaystyle f[n]W[m,n]</math>
+#* Inverse : <math>f[m]=1/N\textstyle \sum_{n=0}^{N-1} \displaystyle F[n]W[m,n]</math>
+# 跟DFT有一樣的以下性質
+## 正交性質
+## 零交（zero-crossing）性質
+## 線性運算性質
+## 調變性質
+## 巴斯瓦定理（Parseval's Theorem)
+
+== 應用 ==
+沃爾什轉換適合做頻譜分析，但未必適合做摺積
+
+因此不適合分析線性非時變系統(LTI system)
+
+證明:
+
+* Linear convolution (standard form of convolution)
+
+<math>\textstyle \sum_{n=0}^{N-1} \displaystyle f[n]g[n-l]</math>
+
+* Circular convolution
+
+<math>\textstyle \sum_{n=0}^{N-1} \displaystyle f[n]g[(n-l)_{N}]</math>
+
+但是在Walsh Transform中Convolution Property 代表著"logic convolution"
+
+* Logic convolution
+
+<math>h[n]=f[n]*g[n]=\textstyle \sum_{n=0}^{N-1} \displaystyle f[n]g[(n\oplus l] =\textstyle \sum_{n=0}^{N-1} \displaystyle f[n\oplus l]g[l]</math>
+
+<nowiki>*</nowiki> 代表 "Logic convolution"
+
+<math>\oplus</math> 代表 "logic addition" (similar to '''XOR''') ,for example  3<math>\oplus</math>7=4
+
+<math>\begin{array}{lcr}  3& 0 1 1\\\oplus 7 & 111 \end{array}</math>         
+
+* '''XOR(1,0)=XOR(0,1)=1'''
+
+* '''XOR(0,0)=XOR(1,1)=0'''
+
+以訊號處理的角度,Circular convolution 可以滿足 Linear convolution ,即可分析LTI系統 
+
+假使Logic convolution 與 Circular convolution 結果不一致則無法分析 LTI系統 
+
+舉例來說:
+
+* 當N=8
+* Circular convolution 
+
+H[2]=f[0]g[2]+f[1]g[1] + f[2]g[0] + f[3]g[7] + f[4]g[6] + f[5]g[5] + f[6]g[4]+ f[7]g[3]
+
+Logical convolution
+
+h[2] = f[0]g[2] + f[1]g[3] + f[2]g[0] + f[3]g[1] + f[4]g[6] + f[5]g[7] + f[6]g[4]+ f[7]g[5]
+
+由上面可知，兩者結果不一致
+
+
+CDMA 領域
+
+* 主要應用在[[多路复用|多工]]，其中[[码分多址|CDMA]]為主要應用<br> 若使用N點沃爾什轉換，則可以對N個通道做多工<br> 而且使用沃爾什轉換的好處是不需要同步<br> 其他正交轉換則需要同步<br> <br> 舉例：CDMA使用沃爾什轉換做多工的方法<br> 假設現在有兩組資料要傳，分別是[1,0,1],[1,1,0]<br> 並且使用8點沃爾什轉換<math>W_8</math>的第一行與第二行來當作通道一與通道二的正交基底<br> 1.將0變為-1<br> [1,0,1]→[1,-1,1]<br> [1,1,0]→[1,1,-1]<br> 2.調變<br> 對於第一組資料拿通道一來調變<br> 第一組資料為[1,-1,1],通道一為[1,1,1,1,1,1,1,1]<br> →[1*通道一, -1*通道一, 1*通道一]<br> →[1,1,1,1,1,1,1,1, -1,-1,-1,-1,-1,-1,-1,-1, 1,1,1,1,1,1,1,1]<br> <br> 對於第二組資料拿通道二來調變<br> 第二組資料為[1,1,-1],通道二為[1,1,1,1,-1,-1,-1,-1]<br> →[1*通道二, 1*通道二, -1*通道二]<br> →[1,1,1,1,-1,-1,-1,-1, 1,1,1,1,-1,-1,-1,-1, -1,-1,-1,-1,1,1,1,1]<br> 3.相加<br> [1,1,1,1,1,1,1,1, -1,-1,-1,-1,-1,-1,-1,-1, 1,1,1,1,1,1,1,1]+[1,1,1,1,-1,-1,-1,-1, 1,1,1,1,-1,-1,-1,-1, -1,-1,-1,-1,1,1,1,1]<br> →[2,2,2,2,0,0,0,0,0,0,0,0,-2,-2,-2,-2,0,0,0,0,2,2,2,2]<br> <br>
+
+* 解調<br> 1.如果使用N點沃爾什轉換，則把接收的訊號每隔N點拆開來<br> [2,2,2,2,0,0,0,0,0,0,0,0,-2,-2,-2,-2,0,0,0,0,2,2,2,2]<br> →[2,2,2,2,0,0,0,0], [0,0,0,0,-2,-2,-2,-2], [0,0,0,0,2,2,2,2]<br> 2.將每段訊號與通道做內積<br> 若大於0,則解調為1<br> 若小於0,則解調為0<br> 對於通道一<br> [2,2,2,2,0,0,0,0]·[1,1,1,1,1,1,1,1]=8      → 1<br> [0,0,0,0,-2,-2,-2,-2]·[1,1,1,1,1,1,1,1]=-8 → 0<br> [0,0,0,0,2,2,2,2]·[1,1,1,1,1,1,1,1]=8      → 1<br> 通道一接收的資料為[1,0,1]<br> 對於通道二<br> [2,2,2,2,0,0,0,0]·[1,1,1,1,-1,-1,-1,-1]=8      → 1<br> [0,0,0,0,-2,-2,-2,-2]·[1,1,1,1,-1,-1,-1,-1]=8  → 1<br> [0,0,0,0,2,2,2,2]·[1,1,1,1,-1,-1,-1,-1]=-8     → 0<br> 通道二接收的資料為[1,1,0]<br>
+
+== 其他應用 ==
+
+* Bandwidth reduction
+* High resolution
+* Information coding
+* Feature extraction
+* ECG(心電圖) signal (in medical signal processing) analysis
+* Hadamard spectrometer
+* Avoiding quantization error
+
+==相關條目==
+*[[阿达马矩阵|阿达马矩阵]]
+*[[Hadamard變換|Hadamard變換]]
+*[[Hadamard矩陣|Hadamard矩陣]]
+
+==參考文獻==
+*Jian-Jiun Ding, Advanced Digital Signal Processing class note,the Department of Electrical Engineering, National Taiwan University (NTU), Taipei, Taiwan, 2008.
+*H. F. Harmuth,“Transmission of information by orthogonal functions,”1970.
+*Moon-Hu. Lee,“A new reverse Jacket transform and its fast algorithm,”IEEE Trans. Circuits Syst.-II, vol. 47, pp.39-46, 2000.
+*K.G.Beauchamp, "Walsh Functions and Their Applications," Academic Press,1975.
+*H. F. Harmuth, "Transmission of Information by Orthogonal Functions," Springer, 1969.
+
+[[category:数字信号处理|category:数字信号处理]]
+[[Category:影片和電影技術|Category:影片和電影技術]]
+[[Category:变换编码|Category:变换编码]]
+[[Category:量子算法|Category:量子算法]]

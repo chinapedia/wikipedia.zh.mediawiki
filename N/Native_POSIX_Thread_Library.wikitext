@@ -1,0 +1,29 @@
+{{noteTA
+|G1=IT
+}}
+'''{{lang|en|Native POSIX Thread Library}}'''（'''{{lang|en|NPTL}}'''）是[[Linux内核|Linux内核]]中實踐[[POSIX_Threads|POSIX Threads]]標準的函式庫。
+
+测试表明，NPTL能够成功地在[[IA-32|IA-32]]平台上在两秒鐘内生成100,000个[[多线程|线程]]；相应的没有{{lang|en|NPTL}}的内核将耗费15分钟左右。<ref>{{Cite web |url=http://www.linuxjournal.com/article/6530 |title=引入2.6内核 |accessdate=2008-08-12 |archive-date=2012-01-21 |archive-url=https://www.webcitation.org/64qRgTBuZ?url=http://www.linuxjournal.com/article/6530 |dead-url=no }}</ref><ref>{{Cite web |url=http://people.redhat.com/drepper/nptl-design.pdf |title=The Native POSIX Thread Library for Linux |accessdate=2008-08-12 |archive-date=2012-01-21 |archive-url=https://www.webcitation.org/64qRhElzZ?url=http://www.akkadia.org/drepper/nptl-design.pdf |dead-url=no }}</ref>
+
+== 历史 ==
+在{{lang|en|Linux}}内核2.6出现之前进程是(最小)可调度的对象，当时的{{lang|en|Linux}}不真正支持线程。但是{{lang|en|Linux}}内核有一个[[系统调用|系统调用]]指令{{lang|en|clone()}}，这个指令产生一个呼叫调用的進程的复件，而且这个复件与原進程使用同一地址空间。{{lang|en|LinuxThreads}}计划使用这个系统调用来提供一个内核级的线程支持。但是这个解决方法与真正的{{lang|en|POSIX}}标准有一些不相容的地方，尤其是在信号处理、进程调度和进程间同步原语方面。
+
+要提高{{lang|en|LinuxThreads}}的效应很明显需要提供内核支持以及必须重写线程函式库。为了解决这个问题出现了两个互相竞争的项目：一个{{lang|en|[[IBM|IBM]]}}的组的项目叫做{{lang|en|NGPT}}（{{lang|en|Next Generation POSIX Threads}}，下一代{{lang|en|POSIX}}线程），另一个组是由{{lang|en|[[Red_Hat|Red Hat]]}}程序员组成的。2003年中{{lang|en|NGPT}}被放弃，几乎与此同时{{lang|en|NPTL}}公布了。
+
+{{lang|en|NPTL}}首次是随{{lang|en|Red Hat Linux 9}}发表的。此前老式的{{lang|en|Linux POSIX}}线程偶尔会发生系统无法产生线程的毛病，这个毛病的原因是因为在新线程开始的时候系统没有借机先占。当时的{{lang|en|Windows}}系统对这个问题的解决比较好。{{lang|en|Red Hat}}在关于{{lang|en|Red Hat Linux 9}}上的{{lang|en|[[Java|Java]]}}的网页上发表了一篇文章称{{lang|en|NPTL}}解决了这个问题<ref>{{Cite web |url=http://java.sun.com/developer/technicalArticles/JavaTechandLinux/RedHat/ |title=Red Hat Linux 9 and Java 2 Platform, Standard Edition 1.4.2: A Winning Combination |accessdate=2008-12-13 |archive-date=2009-02-08 |archive-url=https://web.archive.org/web/20090208111809/http://java.sun.com/developer/technicalArticles/JavaTechandLinux/RedHat/ |dead-url=no }}</ref>。
+
+从第3版开始{{lang|en|NPTL}}是{{lang|en|Red Hat Enterprise Linux}}的一部分，从{{lang|en|Linux}}内核2.6开始它被纳入内核。目前它完全被结合入[[GNU_C_函式庫|GNU C 函式庫]]。
+
+== 设计 ==
+{{lang|en|NPTL}}的解决方法与{{lang|en|LinuxThreads}}类似，内核看到的首要抽象依然是一个進程，新线程是通过{{lang|en|clone()}}系统调用产生的。但是{{lang|en|NPTL}}需要特殊的内核支持来解决同步的原始类型之间互相竞争的状况。在这种情况下线程必须能够入眠和再复苏。用来完成这个任务的原始类型叫做{{lang|en|[[futex|futex]]}}。
+
+{{lang|en|NPTL}}是一个所谓的1×1线程函式库。用户产生的线程与内核能够分配的物件之间的联系是一对一的。这是所有线程程式中最简单的。
+
+== 参考资料 ==
+<references />
+
+== 外部链接 ==
+* [http://people.redhat.com/drepper/nptl-design.pdf NPTL设计论文]{{WebCite|url=https://www.webcitation.org/64qRhElzZ?url=http://www.akkadia.org/drepper/nptl-design.pdf |date=20120121003438 |dateformat=iso }} 
+* [http://nptltracetool.sourceforge.net/ NPTL跟踪工具]{{Wayback|url=http://nptltracetool.sourceforge.net/ |date=20080515132733 }} 可以同来跟踪和调试NPTL程式的开源工具
+
+[[Category:Linux|Category:Linux]]

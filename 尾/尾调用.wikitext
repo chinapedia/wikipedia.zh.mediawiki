@@ -1,0 +1,259 @@
+{{noteTA|G1=IT}}
+
+在[[计算机学|计算机学]]{{里}}，'''尾调用'''是指一个函数里的最后一个动作是返回一个[[子程序|函数]]的调用结果的情形，即最后一步新调用的返回值直接被当前函数的返回结果。<ref name="N.C.Zakas_p61-64"/>此时，该尾部调用位置被称为'''尾位置'''。尾调用中有一种重要而特殊的情形叫做'''尾递归'''。经过适当处理，尾递归形式的函数的运行效率可以被极大地优化。<ref name="N.C.Zakas_p61-64"/>尾调用原则上都可以通过简化函数[[调用栈|调用栈]]的结构而获得性能优化（称为“尾调用消除”），但是优化尾调用是否方便可行取决于运行环境对此类优化的支持程度如何。
+
+== 概述 ==
+在[[计算机科学|计算机科学]]{{里}}，'''尾调用'''是指一个函数里的最后一个动作是一个[[子程序|函数]]调用的情形：即这个调用的返回值直接被当前函数返回的情形。这种情形下称该调用位置为'''尾位置'''。若这个函数在尾位置调用本身（或是一个尾调用本身的其他函数等等），则称这种情况为'''尾递归'''，是[[递归|递归]]的一种特殊情形。尾调用不一定是递归调用，但是尾递归特别有用，也比较容易实现。
+
+在程序运行时，计算机会为应用程序分配一定的内存空间；应用程序则会自行分配所获得的内存空间，其中一部分被用于记录程序中正在调用的各个函数的运行情况，这就是函数的[[调用栈|调用栈]]。常规的函数调用总是会在调用栈最上层添加一个新的堆栈帧（stack frame，也翻译为“栈帧”或简称为“帧”），这个过程被称作“入栈”或“压栈”（意即把新的帧压在栈顶）。当函数的调用层数非常多时，调用栈会消耗不少内存，甚至会撑爆内存空间（[[栈溢出|栈溢出]]）<ref name="N.C.Zakas_p61-64"/>，造成程序严重卡顿或意外崩溃。尾调用的调用栈则特别易于优化，从而可减少内存空间的使用，也能提高运行速度。<ref name="N.C.Zakas_p61-64"/>其中，对尾递归情形的优化效果最为明显，尤其是递归算法非常复杂的情形。<ref name="N.C.Zakas_p61-64"/>
+
+一般来说，尾调用消除是可选的，可以用，也可以不用。然而，在[[函数编程语言|函数编程语言]]中，语言标准通常会要求编译器或运行平台实现尾调用消除。这让程序员可以用递归取代[[程序循環|循环]]而不丧失性能。<!-- 英文后面两句话感觉很水... -->
+
+== 定义与说明 ==
+=== 定义 ===
+尾调用 （tail call） 指的是一个函数的最后一条语句也是一个返回调用函数的语句。在函数体末尾被返回的可以是对另一个函数的调用，也可以是对自身调用（即自身递归调用）。<ref name="N.C.Zakas_p61-64">{{cite book |title=''Understanding ECMAScript 6'' |trans_title=理解ES6 |author=[[Nicholas_C._Zakas|Nicholas C. Zakas]] |publisher=No Starch Press |location=245 8th Street, San Francisco, CA 94103 |edition=1 |ISBN=978-1-59327-757-4 |section=第3章“Functions”第9节“Tail Call Optimization” |pages=61-64 |language=en |year=2016}}</ref>
+
+=== 特征与简单示例 ===
+尾调用可能位于一个函数语法上最后的位置：
+
+<syntaxhighlight lang="javascript">
+function foo(data) {
+    a(data);
+    return b(data);
+}
+</syntaxhighlight>
+
+在这里，<code>a(data)</code>、<code>b(data)</code> 都是函数调用，但是 <code>b(data)</code> 是函式返回前的最后运行的东西，所以也是所谓的尾位置。然后，并非所有的尾调用都必须在一个函数语法上最后的位置。考虑：
+
+<syntaxhighlight lang="javascript">
+function bar(data) {
+    if ( a(data) ) {
+        return b(data);
+    }
+    return c(data);
+}
+</syntaxhighlight>
+
+在这里，<code>b</code>、<code>c</code> 的调用都在尾位置。这是因为尽管 <code>b(data)</code> 不在 <code>bar</code> 语法上最后的位置，它是 <code>if</code> 叙述其中一个分支最后的位置。
+
+现在考虑以下代码：
+
+<syntaxhighlight lang="javascript">
+function foo1(data) {
+    return a(data) + 1;
+}
+</syntaxhighlight>
+<syntaxhighlight lang="javascript">
+function foo2(data) {
+    var ret = a(data);
+    return ret;
+}
+</syntaxhighlight>
+<syntaxhighlight lang="javascript">
+function foo3(data) {
+    var ret = a(data);
+    return (ret === 0) ? 1 : ret;
+}
+</syntaxhighlight>
+
+在这里，<code>a(data)</code> 处于 <code>foo2</code> 的尾位置，但'''不'''处于 <code>foo1</code> 或 <code>foo3</code> 的尾位置。这是因為程序必須返回這2個 <code>a</code> 函數的调用以檢查、更動 <code>a</code> 的返回值。
+
+=== 说明 ===
+传统模式的编译器对于尾调用的处理方式就像处理其他普通函数调用一样，总会在调用时创建一个新的栈帧（stack frame）并将其推入[[调用栈|调用栈]]顶部，用于表示该次函数调用。<ref name="N.C.Zakas_p61-64"/>
+
+当一个函数调用发生时，电脑必须 “记住” 调用函数的位置 —— 返回位置，才可以在调用结束时带着返回值回到该位置，返回位置一般存在调用栈上。在尾调用这种特殊情形中，电脑理论上可以不需要记住尾调用的位置而从被调用的函数直接带着返回值返回调用函数的返回位置（相当于直接连续返回两次）。尾调用消除即是在不改变当前调用栈（也不添加新的返回位置）的情况下跳到新函数的一种优化（完全不改变调用栈是不可能的，还是需要校正调用栈上[[形式参数|形式参数]]与[[局部变量|局部变量]]的信息。<ref>{{cite web |url=http://cstheory.stackexchange.com/q/7540/1037 |title=recursion - Stack memory usage for tail calls - Theoretical Computer Science |author= |website=Cstheory.stackexchange.com |language=en |date=2011-07-29 |accessdate=2013-03-21 |archive-date=2012-07-11 |archive-url=https://archive.is/20120711205515/http://cstheory.stackexchange.com/q/7540/1037 |dead-url=yes }}</ref>）
+
+由于当前[[函数帧|函数帧]]上包含局部变量等等大部分的东西都不需要了，当前的函数帧经过适当的更动以后可以直接当作被尾调用的函数的帧使用，然后程序即可以[[分支_(计算机科学)|跳]]到被尾调用的函数。产生这种函数帧更动代码与 “jump”（而不是一般常规函数调用的代码）的过程称作'''尾调用消除'''(Tail Call Elimination)或'''尾调用优化'''(Tail Call Optimization, TCO)。尾调用优化让位于尾位置的函数调用跟 [[Goto|<code>goto</code> 语句]]性能一样高，也因此使得高效的结构编程成为现实。
+
+然而，对于 [[C++|C++]] 等语言来说，在函数最后 return g(x); 并不一定是尾递归——在返回之前很可能涉及到对象的[[析构函数|析构函数]]，使得 g(x) 不是最后执行的那个。这可以通过[[返回值优化|返回值优化]]来解决。
+
+== 尾递归 ==
+若函数在尾位置调用自身（或是一个尾调用本身的其他函数等等），则称这种情况为'''尾递归'''。尾递归也是[[递归|递归]]的一种特殊情形。尾递归是一种特殊的尾调用，即在尾部直接调用自身的递归函数。对尾递归的优化也是关注尾调用的主要原因。尾调用不一定是递归调用，但是尾递归特别有用，也比较容易实现。
+
+=== 特点 ===
+尾递归在普通尾调用的基础上，多出了2个特征：
+* 在尾部调用的是函数自身 （Self-called）；
+* 可通过优化，使得计算仅占用常量栈空间 (Stack Space)。
+
+=== 优化尾递归的分析与示例 ===
+对函数调用在尾位置的递归或[[互相递归|互相递归]]的函数，由于函数自身调用次数很多，递归层级很深，尾递归优化则使原本 [[Big-O_notation|O]](n) 的调用栈空间只需要 O(1)。因此一些编程语言的标准要求语言实现进行尾调用消除，例如 [[Scheme|Scheme]]<ref name='SchemeProperTailRec'>{{cite web |url=http://www.r6rs.org/final/html/r6rs/r6rs-Z-H-8.html#node_sec_5.11 |title=Revised^6 Report on the Algorithmic Language Scheme |website=R6rs.org |date= |accessdate=2013-03-21 |archive-date=2013-05-06 |archive-url=https://web.archive.org/web/20130506040830/http://www.r6rs.org/final/html/r6rs/r6rs-Z-H-8.html#node_sec_5.11 |dead-url=yes }}</ref><ref>{{cite web |url=http://www.r6rs.org/final/html/r6rs-rationale/r6rs-rationale-Z-H-7.html#node_sec_5.3 |title=Revised^6 Report on the Algorithmic Language Scheme - Rationale |publisher=R6rs.org |date= |accessdate=2013-03-21 |archive-date=2013-11-11 |archive-url=https://web.archive.org/web/20131111033726/http://www.r6rs.org/final/html/r6rs-rationale/r6rs-rationale-Z-H-7.html#node_sec_5.3 |dead-url=yes }}</ref>與 [[ML語言|ML]] 家族的語言。在 [[Scheme|Scheme]] 中，語言標準還將尾位置形式化，指定了各種語法中允許尾調用的地方<ref>{{cite web |url=http://www.r6rs.org/final/html/r6rs/r6rs-Z-H-14.html#node_sec_11.20 |title=Revised^6 Report on the Algorithmic Language Scheme |website=R6rs.org |date= |accessdate=2013-03-21 |archive-date=2018-03-15 |archive-url=https://web.archive.org/web/20180315134554/http://www.r6rs.org/final/html/r6rs/r6rs-Z-H-14.html#node_sec_11.20 |dead-url=no }}</ref>。<!-- 未翻譯 properly tail-recursive 的部份，還有 CPS -->
+
+以 [[Python|Python]] 为例，主要区分普通递归和尾递归对栈空间的使用<ref>Python并没有优化尾递归调用功能（以实现真正的尾递归特性），这里只是用Python的语法来模拟描述尾递归的语法。参见[http://stackoverflow.com/questions/13591970/does-python-optimize-tail-recursion Does Python optimize tail-reccursion?] {{Wayback|url=http://stackoverflow.com/questions/13591970/does-python-optimize-tail-recursion |date=20140505125956 }}</ref>{{需要更好来源}}：
+
+<syntaxhighlight lang="python">
+def recsum(x):
+  if x == 1:
+    return x
+  else:
+    return x + recsum(x - 1)
+</syntaxhighlight>
+
+调用<code>recsum(5)</code>为例，[[SICP|SICP]]中描述了相应的栈空间变化<ref>见《计算机程序的构造和解释》第1章第2节“Procedure and Their Computation”。</ref>：
+
+<syntaxhighlight lang="python">
+recsum(5)
+5 + recsum(4)
+5 + (4 + recsum(3))
+5 + (4 + (3 + recsum(2)))
+5 + (4 + (3 + (2 + recsum(1))))
+5 + (4 + (3 + (2 + 1)))
+5 + (4 + (3 + 3))
+5 + (4 + 6)
+5 + 10
+15
+</syntaxhighlight>
+
+可观察，堆栈从左到右，增加到一个峰值后再计算从右到左缩小，这往往是我们不希望的，所以在[[C语言|C语言]]等语言中设计<code>for, while, goto</code>等特殊结构语句，使用迭代、尾递归，对普通递归进行优化，减少可能对内存的极端消耗。修改以上代码，可以成为尾递归：
+
+<syntaxhighlight lang="python">
+def tailrecsum(x, running_total=0):
+  if x == 0:
+    return running_total
+  else:
+    return tailrecsum(x - 1, running_total + x)
+</syntaxhighlight>
+或者使用迭代：
+<syntaxhighlight lang="python">
+for i in range(6):
+  sum += i
+</syntaxhighlight>
+对比后者尾递归对内存的消耗：
+<syntaxhighlight lang="python">
+tailrecsum(5, 0) 
+tailrecsum(4, 5) 
+tailrecsum(3, 9)
+tailrecsum(2, 12) 
+tailrecsum(1, 14) 
+tailrecsum(0, 15) 
+15
+</syntaxhighlight>
+则是线性的。
+
+== 优化尾调用的不同方式 ==
+要方便地实现尾调用优化，一般需借助编译器或运行环境提供的现成的尾递归优化特性，或是依赖所用程序语言能直接支持更底层的指令跳转。
+
+=== 利用运行平台的支持直接实现 ===
+在 [[Perl|Perl]] 里，程序员可以直接用一种带有函数名称的 “goto” 叙述变体：<code>goto &NAME;</code> 直接使用尾调用<ref>{{cite web |author=Contact details |url=http://perldoc.perl.org/functions/goto.html |title=goto |website=perldoc.perl.org |date= |accessdate=2013-03-21 |archive-date=2013-03-28 |archive-url=https://web.archive.org/web/20130328043859/http://perldoc.perl.org/functions/goto.html |dead-url=no }}</ref>。
+
+在程序语言实现中，消除尾递归里的尾调用比消除一般的尾调用容易很多。举例来说，[[Java虚拟机|Java 虚拟机]]（JVM）的实现会消除尾递归里的尾调用（因为重新使用了原来的调用栈），但是不会消除一般的尾调用（因为改变了的调用栈）。[[Scala|Scala]] 等同样基于 JVM 平台的语言可以有效地实现单个函数的尾递归优化，但是对于多个函数的相互尾递归就无法优化了。
+
+[[JavaScript|JavaScript]]则原本不支持尾调用优化，到其第6代语言核心标准“[[ECMAScript|ECMAScript 6]]”开始规定程序引擎应在严格模式下使用尾调用优化。而且ECMAScript 6限定了尾位置不含[[闭包_(计算机科学)|闭包]]的尾调用才能进行优化。<ref name="N.C.Zakas_p61-64"/>
+
+=== 动手实现的方案 ===
+==== 汇编重组 ====
+对于直接生成汇编的编译器，尾部调用消除很简单：只要校正栈上的形参之后把 “call” 的机器码换成一个 “jump” 的就行了。从编译器的观点，以下代码
+
+ '''function''' foo()
+    '''return''' a()
+
+先会被翻译成（这是合法的 [[x86_汇编|x86 汇编]]）：
+
+ foo:
+  call a
+  ret
+
+然后，尾部调用消除指的是将最后两个指令以一个 “jump” 指令替换掉：
+
+ foo:
+  jmp a
+
+在 <code>a</code> 函數完成的時候，它会直接返回到 <code>foo</code> 的返回地址，省去了不必要的 <code>ret</code> 指令。
+
+函数调用可能带有[[参数|参数]]，因此生成的汇编必须确保被调用函数的函数帧在跳过去之前已设置好。举例来说，若是[[系统平台|平台]]的[[调用栈|调用栈]]除了返回位置以外还有函数参数，编译器需要输出调整调用栈的指令。在这类平台上，考虑代码：
+
+ '''function''' foo(data1, data2)
+    a(data1)
+    '''return''' b(data2)
+
+其中 <code>data1</code>、<code>data2</code> 是参数。编译器会把这个代码翻译成以下汇编：
+
+ foo:
+   mov  reg,[sp+data1] ; 透过栈指针（sp）取得 data1 并放到暂用暂存器。
+   push reg            ; 将 data1 放到栈上以便 a 使用。
+   call a              ; a 使用 data1。
+   pop                 ; 把 data1 從栈上拿掉。
+   mov  reg,[sp+data2] ; 透过栈指針（sp）取得 data2 並放到暂用暂存器。 
+   push reg            ; 将 data2 放到栈上以便 b 使用。 
+   call b              ; b 使用 data2。
+   pop                 ; 把 data2 從栈上拿掉。
+   ret
+
+尾部调用优化会将代码变成：
+
+ foo:
+   mov  reg,[sp+data1] ; 透过栈指针（sp）取得 data1 并放到暂用暂存器。
+   push reg            ; 将 data1 放到栈上以便 a 使用。
+   call a              ; a 使用 data1。
+   pop                 ; 把 data1 從栈上拿掉。
+   mov  reg,[sp+data2] ; 透过栈指針（sp）取得 data2 並放到暂用暂存器。  
+   '''mov  [sp+data1],reg ; 把 data2 放到 b 预期的位置。'''
+   '''jmp  b              ; b 使用 data2 並返回到调用 foo 的函数。'''
+
+更改后的代码不管在执行速度或是栈空间的使用上的效能都比较好。
+
+==== 透过弹跳床 ====
+由于很多 [[Scheme|Scheme]] 的编译器使用 [[C|C]] 作为中间目标语言，问题可转化为如何在 C 里在不让栈向上增长的前提下实现尾部递归（假设 C 的编译器不优化尾部调用）。很多实现透过一种叫做{{le|弹跳床 (计算机术语)|Trampoline_(computing)|弹跳床}} (trampoline)的装置，也就是一块不断进行函数调用的代码。所有函数代码的加载过程都透过这个弹跳床。当一个函数需要调用另一个函数时，它不是直接调用该函数，而是将该函数的位置、该调用使用的参数等信息传递给弹跳床，让爱插手的弹跳床去代为执行。这样就可以确保 C 的栈不会向上增长并且可以让迭代无限地继续。
+
+用 [[Groovy|Groovy]]、[[Visual_Basic_.NET|Visual Basic .NET]]、[[C♯|C#]] 等等支持高阶函数的语言实现弹跳床是可能的<ref name="onyourtail">Samuel Jack, [http://blog.functionalfun.net/2008/04/bouncing-on-your-tail.html Bouncing on your tail] {{Wayback|url=http://blog.functionalfun.net/2008/04/bouncing-on-your-tail.html |date=20110429190411 }}. ''Functional Fun''. April 9, 2008.</ref>。<!-- 不翻譯 Chicken 實現的部份，感覺過於深入。 --><!-- 不翻譯跟 "while" 有關的部份，不了解英文版提這個有什麼意義。 -->
+
+== 更多實例 ==
+
+通常被用於解釋[[遞迴_(電腦科學)|遞迴]]的程式是計算[[階乘|階乘]]。以下計算階乘的 [[Scheme|Scheme]] 程式'''不是'''尾端遞迴，而只是一般遞迴<ref name="sicp">见《计算机程序的构造和解释》。{{page needed}}
+</ref>：
+
+<syntaxhighlight lang="Scheme">
+(define (factorial n)
+  (if (= n 1)
+      1
+      (* n (factorial (- n 1)))))
+</syntaxhighlight>
+
+因此，如果呼叫 <code>factorial</code> 時的參數 <code>n</code> 足夠大，這一程式會出現[[堆疊溢位|堆疊溢位]]。然而，如果將同一程式寫作尾端遞迴，按 Scheme 的標準將不會出現溢位<ref name="sicp" />：
+
+<syntaxhighlight lang="Scheme">
+(define (factorial n)
+  (define (iter product counter)
+    (if (> counter n)
+        product
+        (iter (* counter product)
+              (+ counter 1))))
+  (iter 1 1))
+</syntaxhighlight>
+
+在第2個程式中，注意 <code>iter</code> 函數直接返回其遞迴呼叫，而沒有對其進行運算。因此，這是一個尾端遞迴，这让[[直译器|直译器]]或[[编译器|编译器]]将本来是
+
+   call factorial (3)
+    call iter (3 1)
+     call iter (2 3)
+      call iter (1 6)
+       call iter (0 6)
+       return 6
+      return 6
+     return 6
+    return 6
+   return 6
+
+的執行過程組合成在時間、空間上性能都較好的型態：
+
+   call factorial (3)
+    call iter (3 1)
+    将参数变为 (2 3)，跳至 "iter"
+    将参数变为 (1 6)，跳至 "iter"
+    将参数变为 (0 6)，跳至 "iter"
+    return 6
+   return 6
+
+因为在中间过程中重复使用 <code>iter</code> 的函数帧，这种重组节省了空间。这也代表程序员不需要为了担心栈空间或是堆空间用完。在一般的实现中，尾部递归的型态也比其他型态更快速，不过仅仅是常量倍数的差异（非指数差异）。
+
+很多使用函数语言的程序员会为了使用这个优化将递归的代码写成为尾部递归的形式。这通常需要一个多出来代表 “搜集器” 的形参（上述例子的 <code>product</code> 参数）。在一些语言中的一些函数的实现中（像是过滤一个列的实现等等），如果要使用尾部递归则需要将本来没有副作用的纯函数改写成会更动其他参引的形式{{Citation needed|date=April 2007}}<!-- 英文版也没有例子…… -->。<!-- 跳過不明所以的 C 例子 --><!-- Tail recursion modulo cons：跳過 Prolog 什麼的 -->
+
+== 注释与资料 ==
+=== 註釋 ===
+{{reflist}}
+=== 引用 ===
+* {{Cite book |author=[[哈尔·阿伯尔森|Harold Abelson]], [[杰拉德·杰伊·萨斯曼|Gerald Jay Sussman]], Julie Sussman |title=''Structure and Interpretation of Computer Programs |trans_title=计算机程序的构造和解释 |publisher=MIT Press |location=Cambridge, MA |ISBN=0-262-01153-0 |url=http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-4.html#%_toc_start |language=en |date=1996 |accessdate=2011 |deadurl=yes |archiveurl=https://web.archive.org/web/20180309173822/https://mitpress.mit.edu/sicp/full-text/book/book-Z-H-4.html#%_toc_start |archivedate=2018年3月9日 |df= }}
+
+{{DEFAULTSORT:Tail call}}
+[[Category:计算机编程|Category:计算机编程]]
+[[Category:控制流程|Category:控制流程]]
+[[Category:递归|Category:递归]]

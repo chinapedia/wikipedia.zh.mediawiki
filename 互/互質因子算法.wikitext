@@ -1,0 +1,181 @@
+'''互質因子算法'''（Prime-factor FFT algorithm, PFA），又稱為Good-Thomas算法<ref>{{citation|author=I. J. Good|title=The interaction algorithm and practical Fourier analysis|journal=J. R. Statist. Soc. B|volume=20(2)|year=1958|pages=361-372|url=http://www.jstor.org/pss/2983896}}</ref>
+<ref>{{citation|author=L. H. Thomas|title=Using a computer to solve problems in physics
+|journal=Applications of Digital Computers|year=1963}}</ref>，是一種[[快速傅立葉變換|快速傅立葉變換]]（FFT），把''N'' = ''N''<sub>1</sub>''N''<sub>2</sub>大小的[[離散傅立葉變換|離散傅立葉變換]]重新表示為''N''<sub>1</sub> * ''N''<sub>2</sub>大小的[[离散傅里叶变换|二維離散傅立葉變換]]，其中''N''<sub>1</sub>與''N''<sub>2</sub>需[[互質|互質]]。變成''N''<sub>1</sub>和''N''<sub>2</sub>大小的傅立葉變換後，可以繼續遞迴使用PFA，或用其他[[快速傅立葉變換|快速傅立葉變換]]算法來計算。
+
+較流行的[[库利－图基快速傅里叶变换算法|Cooley-Tukey算法]]經由mixed-radix一般化後，也是把''N'' = ''N''<sub>1</sub>''N''<sub>2</sub>大小的[[離散傅立葉變換|離散傅立葉變換]]分割為''N''<sub>1</sub>和''N''<sub>2</sub>大小的轉換，但和互質因子算法 (PFA)作法並不相同，不應混淆。[[库利－图基快速傅里叶变换算法|Cooley-Tukey算法]]的''N''<sub>1</sub>與''N''<sub>2</sub>不需[[互質|互質]]，可以是任何整數。然而有個缺點是比PFA多出一些乘法，和[[單位根|單位根]][[旋轉因子|twiddle factors]]相乘。相對的，PFA的缺點則是''N''<sub>1</sub>與''N''<sub>2</sub>需[[互質|互質]] (例如''N'' 是2次方就不適用)，而且要藉由[[中国剩余定理|中國剩餘定理]]來進行較複雜的re-indexing。互質因子算法 (PFA)可以和mixed-radix [[库利－图基快速傅里叶变换算法|Cooley-Tukey算法]]相結合，前者將''N'' 分解為[[互質|互質]]的[[因數|因數]]，後者則用在重複[[質因子|質因數]]上。
+
+PFA也與nested [[威諾格拉德快速傅立葉變換演算法|Winograd FFT]]算法密切相關，後者使用更為精巧的二維[[卷积|摺積]]技巧分解成''N''<sub>1</sub> * ''N''<sub>2</sub>的轉換。因而一些較古老的論文把Winograd算法稱為PFA FFT。
+
+儘管PFA和Cooley-Tukey算法並不相同，但有趣的是Cooley和Tukey在他們1965年發表的有名的論文中，沒有發覺到[[卡爾·弗里德里希·高斯|高斯]]和其他人更早的研究，只引用Good在1958年發表的PFA作為前人的FFT結果。剛開始的時候人們對這兩種作法是否不同有點困惑。
+
+== 算法 ==
+
+[[離散傅立葉變換|離散傅立葉變換]]（DFT）的定義如下:
+
+:<math>X_k = \sum_{n=0}^{N-1} x_n e^{-\frac{2\pi i}{N} nk }
+\qquad
+k = 0,\dots,N-1 </math>
+
+PFA將輸入和輸出re-indexing，代入DFT公式後轉換成二維DFT。
+
+=== Re-indexing ===
+
+設''N'' = ''N''<sub>1</sub>''N''<sub>2</sub>，''N''<sub>1</sub>與''N''<sub>2</sub>兩者[[互質|互質]]，然後把輸入''n''  和輸出''k'' [[双射|一一對應]]到
+
+:<math>n = n_1 N_2 + n_2 N_1 \mod N</math>
+
+因''N''<sub>1</sub>與''N''<sub>2</sub> [[互質|互質]]，故根據[[貝祖等式|最大公因數表現定理]]，對每個''n'' 都存在滿足上式的整數''n''<sub>1</sub>與''n''<sub>2</sub>，且在[[同餘|同餘]]''N'' 之下''n''<sub>1</sub>可以調整至0～''N''<sub>1</sub> –1之間，''n''<sub>2</sub>可以調整至0～''N''<sub>2</sub> –1之間。並根據[[同餘|同餘]]理論易知滿足上式且在以上範圍內的整數''n''<sub>1</sub>與''n''<sub>2</sub>是唯一的。這稱為''Ruritanian'' [[映射|映射]] (或''Good's'' 映射)，
+
+:<math>k = k_1 \mod N_1</math>
+:<math>k = k_2 \mod N_2</math>
+
+舉例來說: 
+
+如果<math>N=15, N_1=5, N_2=3, n=0,1,2,...,12, 13,14, </math>對於任一 <math>n</math> 都可以對應到
+
+<math>n = n_1 N_2 + n_2 N_1 \mod N, n_1=0,1,...,N_1-1, n_2=0,1,...,N_2-1</math>
+
+<math>0=0\centerdot N_2+0\centerdot N_1 \mod 15</math>
+
+<math>1=2\centerdot N_2+2\centerdot N_1 \mod 15</math>
+
+<math>2=4\centerdot N_2+1\centerdot N_1 \mod 15</math>
+
+<math>3=1\centerdot N_2+0\centerdot N_1 \mod 15</math>
+
+<math>4=3\centerdot N_2+2\centerdot N_1 \mod 15</math>
+
+<math>5=0\centerdot N_2+1\centerdot N_1 \mod 15</math>
+
+<math>6=2\centerdot N_2+0\centerdot N_1 \mod 15</math>
+
+<math>7=4\centerdot N_2+2\centerdot N_1 \mod 15</math>
+
+<math>8=1\centerdot N_2+1\centerdot N_1 \mod 15</math>
+
+<math>9=3\centerdot N_2+0\centerdot N_1 \mod 15</math>
+
+<math>10=0\centerdot N_2+2\centerdot N_1 \mod 15</math>
+
+<math>11=2\centerdot N_2+1\centerdot N_1 \mod 15</math>
+
+<math>12=4\centerdot N_2+0\centerdot N_1 \mod 15</math>
+
+<math>13=1\centerdot N_2+2\centerdot N_1 \mod 15</math>
+
+<math>14=3\centerdot N_2+1\centerdot N_1 \mod 15</math>
+
+因''N''<sub>1</sub>與''N''<sub>2</sub> [[互質|互質]]，故根據[[中国剩余定理|中國剩餘定理]]，對於每組 ( ''k''<sub>1</sub> , ''k''<sub>2</sub> ) (其中''k''<sub>1</sub>在0～''N''<sub>1</sub> – 1之間, ''k''<sub>2</sub>在0～''N''<sub>2</sub> – 1之間)，都有存在且唯一的''k'' 在0～''N'' - 1之間且滿足上兩式。這稱為[[中国剩余定理|''CRT'']] 映射。
+[[中国剩余定理|''CRT'']] 映射的另一種表示法如下
+
+:<math>k = k_1 N_2^{-1} N_2 + k_2 N_1^{-1} N_1 \mod N</math>
+
+其中''N''<sub>1</sub><sup>-1</sup>表示''N''<sub>1</sub>在[[同餘|模]]''N''<sub>2</sub>之下的[[逆元素|反元素]]，''N''<sub>2</sub><sup>-1</sup>反之。
+
+( 也可以改成對輸入''n'' 用[[中国剩余定理|''CRT'']]映射以及對輸出''k'' 用''Ruritanian'' 映射)
+
+對於有效re-indexing (理想上是達到[[原地算法|原地]])的方法有許多研究<ref>{{citation|author=S. C. Chan and K. L. Ho
+|title=On indexing the prime-factor fast Fourier transform algorithm
+|journal= IEEE Trans. Circuits and Systems|volume=38(8)|year=1991|pages=951-953
+|url=http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=85638}}.</ref>，以減少耗費時間的[[同餘|模]]運算。
+
+=== DFT re-expression ===
+表示方法一:
+
+將以上的re-indexing代入DFT公式裡指數部分的''nk'' 之中，
+
+:<math>e^{-\frac{2\pi i}{N} nk } = e^{-\frac{2\pi i}{N} ( n_1 N_2 + n_2 N_1 )k} = e^{-\frac{2\pi i}{N_1} k n_1} e^{-\frac{2\pi i}{N_2} k n_2} = e^{-\frac{2\pi i}{N_1} k_1 n_1} e^{-\frac{2\pi i}{N_2} k_2 n_2}</math>
+
+( 因為''e''<sup>2π''i''</sup> = 1，所以兩個指數的''k'' 部份可以分別[[同餘|模]]''N''<sub>1</sub>與''N''<sub>2</sub> )。剩下的部分變成
+
+:<math>X_{k_1 , k_2 } =
+ \sum_{n_1=0}^{N_1-1}
+   \left( \sum_{n_2=0}^{N_2-1} x_{n_1 N_2 + n_2 N_1}
+           e^{-\frac{2\pi i}{N_2} n_2 k_2 } \right)
+   e^{-\frac{2\pi i}{N_1} n_1 k_1 }.
+
+</math>
+
+則內部和外部的[[總和|總和]]分別轉換成大小為''N''<sub>2</sub>與''N''<sub>1</sub>的DFT。
+
+表示方法二:
+
+如果令 <math>k=k_1 N_2 + k_2 N_1 \quad for\quad k=0,1,...,N-1,</math>
+
+令 <math>n = ((n_1 N_2 + n_2 N_1))_N</math>，<math>(\cdot)_N</math>相當於取 <math>N</math>的餘數，<math>n_1 = 0,\dots,N_1-1 </math>, <math>n_2 = 0,\dots,N_2-1 </math>
+
+<math>X[((k_1 N_2+k_2 N_1))_N]=\sum_{n=0}^{N-1}x[((n_1 N_2+n_2 N_1))_N]e^{-j \frac{2 \pi}{N_2 N_1}(k_1 N_2+k_2 N_1)(n_1 N_2+n_2 N_1)}</math>
+
+<math>=\sum_{n=0}^{N-1}x[((n_1 N_2 + n_2 N_1))_N]e^{-j \frac{2 \pi}{N_2 N_1}(k_1 n_1 N_2 N_2 + k_2 n_2 N_1 N_1 + k_1 n_2 N_2 N_1 + k_2 n_1 N_1 N_2)}</math>
+
+<math>=\sum_{n=0}^{N-1}x[((n_1 N_2 + n_2 N_1))_N]e^{-j \frac{2 \pi}{N_1}(k_1 n_1 N_2)}e^{-j \frac{2 \pi}{N_2}(k_2 n_2 N_1)}</math>
+
+<math>=\sum_{n_2=0}^{N_2-1}\{\sum_{n_1=0}^{N_1-1}x[((n_1 N_2 + n_2 N_1))_N]e^{-j \frac{2 \pi}{N_1}(k_1 n_1 N_2)}\}e^{-j \frac{2 \pi}{N_2}(k_2 n_2 N_1)}.</math>
+
+對於每一個 <math>n_2</math> 都要做一個 <math>N_1</math> 點的 <math>DFT</math>，而因為 <math>n_2 = 0,\dots,N_2-1 </math>有 <math>N_2</math>個，所以需要 <math>N_2</math> 個 <math>N_1</math> 點 <math>DFT</math>,
+
+對於每一組<math>((k_1N_2))_{N_1}</math>都要做一個 <math>N_2</math> 點的 <math>DFT</math>，而因為 <math>N_2</math>為常數，<math>k_1 = 0,\dots,N_1-1 </math>有 <math>N_1</math> 個，所以需要 <math>N_1</math> 個 <math>N_2</math> 點 <math>DFT</math>，
+
+因此如果要計算複雜度，可以乘法器的數量當作考量,
+
+假設<math>N_1</math> 點的 <math>DFT</math> 需要 <math>M_1</math>個乘法器,
+
+假設<math>N_2</math> 點的 <math>DFT</math> 需要 <math>M_2</math>個乘法器,
+
+則總共需要 <math>N_2 M_1 + N_1 M_2</math>個乘法器。
+
+===範例===
+
+以''N'' = 6為例，有兩種可能，''N''<sub>1</sub> = 2, ''N''<sub>2</sub> = 3或''N''<sub>1</sub> = 3, ''N''<sub>2</sub> = 2。
+
+[[File:PFA2by3.PNG|left]]
+[[File:PFA3by2.PNG|thumb]]
+
+第一種情形所產生的流程圖如左圖所示。先做2次3點DFT後再做3次2點DFT。
+
+第二種情形所產生的流程圖如右圖所示。先做3次2點DFT後再做2次3點DFT。
+
+其中2點DFT的部份因構造單純，皆以交錯的[[蝶形结|蝴蝶圖]]來顯示。
+
+可以看出即使在這個簡單的例子中，輸入和輸出的index也都經過有點複雜的重新排列。
+
+==與Cooley-Tukey算法的比較==
+
+如首段所述，[[库利－图基快速傅里叶变换算法|Cooley-Tukey算法]]和互質因子算法 (PFA)曾被誤認為很類似。兩者皆有各自優點可適用於不同狀況，因此分辨它們的不同是很重要的。在1965年著名的論文中發表的[[Cooley-Tukey算法|Cooley-Tukey算法]]，是在DFT的定義
+
+:<math>X_k = \sum_{n=0}^{N-1} x_n e^{-\frac{2\pi i}{N} nk }
+\qquad
+k = 0,\dots,N-1 </math>
+
+中代入''n'' = ''n''<sub>1</sub> + ''n''<sub>2</sub>''N''<sub>1</sub> , ''k'' = ''k''<sub>1</sub>''N''<sub>2</sub> + ''k''<sub>2</sub>，則
+
+:<math>e^{-\frac{2\pi i}{N} nk } = e^{-\frac{2\pi i}{N} ( n_1 + n_2 N_1 )( k_1 N_2 + k_2 )} = e^{-\frac{2\pi i}{N_1} n_1 k_1} e^{-\frac{2\pi i}{N} n_1 k_2} e^{-\frac{2\pi i}{N_2} n_2 k_2}</math>
+
+:<math>X_{k_1N_2 + k_2} =
+ \sum_{n_1=0}^{N_1-1}
+   \left( \sum_{n_2=0}^{N_2-1} x_{n_1 + n_2 N_1}
+           e^{-\frac{2\pi i}{N_2} n_2 k_2 } \right) e^{-\frac{2\pi i}{N} n_1 k_2}
+   e^{-\frac{2\pi i}{N_1} n_1 k_1 }
+</math>
+
+比PFA多了一些要乘的因子<math>e^{-\frac{2\pi i}{N} n_1 k_2}</math> (稱為[[旋轉因子|twiddle factors]] )，但index較為簡單，且適用於任何''N''<sub>1</sub>、''N''<sub>2</sub>。在J. Cooley稍後發表的關於FFT歷史探討的論文<ref>{{citation|author=J. Cooley, P. Lewis, and P. Welch|title=Historical notes on the fast Fourier transform|journal=IEEE Transactions on Audio and Electroacoustics|volume=15(2)|year=1967|pages=76-79|url=http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=1161903}}</ref>中使用''N'' = 24點FFT為例，顯示兩種作法在index結構上的不同。
+
+==相關條目==
+*[[快速傅立葉變換|快速傅立葉變換]]
+*[[中国剩余定理|中國剩餘定理]]
+*[[貝祖等式|Bézout引理]]
+
+== 注釋 ==
+{{reflist}}
+
+==參考文獻==
+# {{citation|author=P. Duhamel and M. Vetterli
+|title=Fast Fourier transforms: a tutorial review and a state of the art
+|journal=Signal Processing|volume=19|year=1990|pages=259-299|url=http://portal.acm.org/citation.cfm?id=78772.78773}}
+
+==外部連結==
+
+*[http://www.jjj.de/fft/fftnote.txt fft note by Burrus]{{Wayback|url=http://www.jjj.de/fft/fftnote.txt |date=20190928212615 }}
+*[http://cnx.org/content/m12033/latest/ cnx]{{Wayback|url=http://cnx.org/content/m12033/latest/ |date=20121101104356 }}
+
+[[category:数字信号处理|category:数字信号处理]]

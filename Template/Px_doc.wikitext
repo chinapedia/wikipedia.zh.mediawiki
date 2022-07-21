@@ -1,0 +1,134 @@
+<noinclude>{{Template doc page viewed directly}}</noinclude>
+{{high-use|19200}}
+__NOTOC__
+This is the {{tl|px}} template.
+
+This meta-template helps other templates, such as infoboxes, to take image size parameters in both of the forms "40" or "40px". It takes up to three parameters and returns the first one that has any content. That is, the first one that is defined (not null) and not empty. Thus a default value for the width of the image can be fed as the second or third parameter.
+
+=== Usage ===
+
+Here is what this template does. Code to the left, actual rendering to the right:
+
+:{{tlc|px|40}} = {{px|40}}
+:{{tlc|px|40px}} = {{px|40px}}
+
+And with an optional second or even third parameter to be used as a default value if the first or second parameter is empty or undefined:
+
+:{{tlc|px||50}} = {{px||50}}
+:{{tlc|px||50px}} = {{px||50px}}
+
+:{{tlc|px|||60}} = {{px|||60}}
+:{{tlc|px|||60px}} = {{px|||60px}}
+
+And here is how it can be used inside another template:
+
+:<code><nowiki>[[File:{{{image}}} | {{px|{{{size|}}}}} | {{{caption|}}} ]]</nowiki></code>
+:<code><nowiki>[[File:{{{image}}} | {{px|{{{size|}}}|250}} | {{{caption|}}} ]]</nowiki></code>
+:<code><nowiki>[[File:{{{image}}} | {{px| {{{size|}}} | {{{width|}}} | 250 }} | {{{caption|}}} ]]</nowiki></code>
+
+=== Default values ===
+
+It used to be a bit tricky to handle empty but defined image size values in a template, since the MediaWiki pipetrick doesn't return the default value for empty parameters. That is, <code><nowiki>{{{width|250px}}}</nowiki></code> does not return "250px" if the template was called like this: <code><nowiki>{{template|width=}}</nowiki></code>
+
+The usual workaround was to do like this: 
+:<code><nowiki>{{#if:{{{width|}}}|{{{width}}}|250px}}</nowiki></code>
+
+When at the same time handling the "pxpx" bug this became even more messy code:
+:<code><nowiki>[[File:{{{image}}} | {{#if:{{{width|}}}|{{px|{{{width}}}}}|250px}} ]]</nowiki></code>
+
+To simplify the coding, {{tl|px}} allows for an optional default value to be defined allowing for the following:
+
+:<code><nowiki>[[File:{{{image}}} | {{px|{{{width|}}}|250}} ]]</nowiki></code>
+
+'''Note!''' The parameters to {{tlf|px}} must use the pipe "|", like this: <code><nowiki>{{{width|}}}</nowiki></code>. Or else {{tlf|px}} will be fed and return the string "<code><nowiki>{{{width}}}</nowiki></code>" if ''width'' was not defined.
+
+=== Background ===
+
+Old usage was to always pad on "px" since MediaWiki used to tolerate "40pxpx":
+
+:<code><nowiki>[[File:{{{image}}} | {{{size}}}px | {{{caption|}}} ]]</nowiki></code>
+
+But since [[25 March]] [[2008]] that does not work anymore. That is, image sizes on Wikipedia now needs to be given in the form "40px", not "40" or "40pxpx". This template helps doing that. Note that the bug has since been fixed, although you can continue using this template.
+
+=== See also ===
+
+* [[Wikipedia:ClickFix]] – About the "pxpx" bug.
+* {{tl|ifempty}} – Helps detect empty parameters and fall back to default values. For instance for handling multiple image name parameters.
+
+=== Test examples ===
+
+* {{tlc|px|40}} = {{px|40}}
+* {{tlc|px|40px}} = {{px|40px}}
+* {{tlc|px|40pxpx}} = {{px|40pxpx}}
+* {{tlc|px|junk}} = {{px|junk}}
+* {{tlc|px}} = {{px}}
+* {{tlc|px|}} = {{px|}}
+* {{tlc|px||}} = {{px||}}
+* {{tlc|px|||}} = {{px|||}}
+* {{tlc|px|40|50}} = {{px|40|50}}
+* {{tlc|px||50}} = {{px||50}}
+* {{tlc|px||50px}} = {{px||50px}}
+* {{tlc|px||50|60}} = {{px||50|60}}
+* {{tlc|px|||60}} = {{px|||60}}
+* {{tlc|px|||60px}} = {{px|||60px}}
+
+* <code><nowiki>[[File:Example.png | 50 | thumb ]]</nowiki></code> = [[File:Example.png| 50 | thumb]]
+<br clear=all>
+* <code><nowiki>[[File:Example.png | 50pxpx | thumb ]]</nowiki></code> = [[File:Example.png| 50pxpx | thumb]]
+::Currently fails. But the devs have stated that they are adding back parsing of "pxpx" in the next update to Wikipedia. So if you see a small image to the right then Wikipedia again accepts "pxpx".
+<br clear=all>
+* <code><nowiki>[[File:Example.png | 50px | thumb ]]</nowiki></code> = [[File:Example.png| 50px | thumb]]
+<br clear=all>
+* <code><nowiki>[[File:Example.png | {{px|50}} | thumb ]]</nowiki></code> = [[File:Example.png| {{px|50}} | thumb]]
+<br clear=all>
+* <code><nowiki>[[File:Example.png | {{px|50px}} | thumb ]]</nowiki></code> = [[File:Example.png| {{px|50px}} | thumb]]
+<br clear=all>
+* <code><nowiki>[[File:Example.png | {{px|junk}} | thumb ]]</nowiki></code> = [[File:Example.png| {{px|junk}} | thumb]]
+<br clear=all>
+* <code><nowiki>[[File:Example.png | {{px|}} | thumb ]]</nowiki></code> = [[File:Example.png| {{px|}} | thumb]]
+<br clear=all>
+* <code><nowiki>[[File:Example.png | {{px}} | thumb ]]</nowiki></code> = [[File:Example.png| {{px}} | thumb]]
+<br clear=all>
+* <code><nowiki>[[File:Example.png | {{px||50}} | thumb ]]</nowiki></code> = [[File:Example.png| {{px||50}} | thumb]]
+::Giving the default width if the 1st parameter is empty 
+<br clear=all>
+* <code><nowiki>[[File:Example.png | {{px|{{{width|}}}|50}} | thumb ]]</nowiki></code> = [[File:Example.png| {{px|{{{width|}}}|50}} | thumb]]
+<br clear=all>
+* <code><nowiki>[[File:Example.png | {{px|{{{width}}}|50}} | thumb ]]</nowiki></code> = [[File:Example.png| {{px|{{{width}}}|50}} | thumb]]
+::Fails to use the default value of 50. Note the missing "|" in <nowiki>{{{width}}}</nowiki>.
+<br clear=all>
+* <code><nowiki>[[File:Example.png | {{px| {{{width|}}} | {{{size|}}} | 50 }} | thumb ]]</nowiki></code> = [[File:Example.png| {{px| {{{width|}}} | {{{size|}}} | 50 }} | thumb]]
+<br clear=all>
+
+<includeonly>
+<!-- ADD CATEGORIES AND INTERWIKIS BELOW THIS LINE -->
+[[Category:格式模板|{{PAGENAME}}]]
+[[Category:维基百科元模板|{{PAGENAME}}]]
+
+[[ar:قالب:بك]]
+[[arz:قالب:Px]]
+[[bn:টেমপ্লেট:Px]]
+[[cy:Nodyn:Px]]
+[[el:Πρότυπο:Px]]
+[[en:Template:Px]]
+[[eo:Ŝablono:Px]]
+[[es:Plantilla:Px]]
+[[gan:Template:Px]]
+[[gl:Modelo:Px]]
+[[hy:Կաղապար:Փք]]
+[[id:Templat:Px]]
+[[ko:틀:Px]]
+[[ja:Template:Px]]
+[[jv:Cithakan:Px]]
+[[ku:Şablon:Px]]
+[[lo:ແມ່ແບບ:Px]]
+[[lt:Šablonas:Px]]
+[[map-bms:Cithakan:Px]]
+[[mk:Шаблон:Px]]
+[[mn:Загвар:Px]]
+[[no:Mal:Px]]
+[[simple:Template:Px]]
+[[sq:Stampa:Px]]
+[[sv:Mall:Px]]
+[[zh-yue:Template:Px]]
+</includeonly>

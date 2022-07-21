@@ -1,0 +1,104 @@
+{{微积分学}}
+[[微积分|微积分]]中，'''矩形法'''是一种计算[[定积分|定积分]]近似值的方法，其思想是求若干个矩形的面积之和，这些矩形的高由函数值来决定。<ref>{{cite book | author = 同济大学数学教研室 | title = 《高等数学》 | edition = 第三版 | publisher = 高等教育出版社 | isbn = 7-04-000894-7 | pages = 319|date=1988年4月}}</ref>
+
+
+将[[积分区间|积分区间]] <math>(a,b)</math> 划分为 <math>n</math> 个长度相等的子区间，每个子区间的长度为 <math>\Delta x =\frac{b-a}{n}</math> 。这些[[矩形|矩形]]左上角、右上角或顶边中点在被积[[函数图像|函数图像]]上。这样，这些矩形的面积之和就约等于定积分的近似值。有：
+
+:<math>\int_a^b f(x)\,\mbox{d} x \approx \sum_{i=1}^{n} f(a+i'\Delta x)\Delta x</math>
+
+其中<math>i'</math>可以是以下三个值 <math>i-\frac{1}{2}</math>， <math>i</math> ， <math>i+\frac{1}{2}</math>之一，由函数图像上的点为矩形的左上角、右上角或顶边中点来决定。
+
+当 ''n'' 逐渐扩大时，此近似值更加准确。矩形法的计算本质上是与[[黎曼积分|黎曼积分]]的定义相吻合的。上述的<math>i'</math>无论取哪个值，最终和式的值都将趋近于定积分的值。<ref>{{cite book | author = 李忠、周建莹 | title = 《高等数学》 | edition = 第二版 | publisher = 北京大学出版社 | isbn = 978-7-301-15597-4 | pages = 166~167|date=2009年8月}}</ref>
+
+<gallery>
+Image:midRiemann.png|<math>i' = i-\frac{1}{2}</math>
+</gallery>
+
+==C 语言代码==
+<syntaxhighlight lang="c">
+#include <stdio.h>
+#include <math.h>
+
+double f(double x){
+   return sin(x);
+   /*也可以回传其他数学子程序,像cos(2*x)或2*atan(3*x+1)-1*/
+}
+
+double rectangle_integrate(double a, double b, int subintervals){
+   double result;
+   double interval;
+   int i;
+   
+   interval=(b-a)/subintervals;
+   result=0;
+   
+   for(i=1;i<=subintervals;i++){
+      result+=f(a+interval*(i-0.5));
+   }
+   result*=interval;
+
+   return result;
+}
+
+int main(void){
+   double integral;
+   integral=rectangle_integrate(0,2,100);
+   printf("Integral: %f \n",integral);
+   return 0;
+}
+</syntaxhighlight>
+
+==Fortran 语言代码==
+<syntaxhighlight lang="fortran">      
+      Program Calc
+
+      Double Precision f,y,a,b,J,mult,sum,c1,c2
+      Sum=0.0
+      c2=0.0
+      c1=0.0
+
+      Print*,'Enter the start and end of the interval'
+      Read*,a,b
+      If (b.gt.a) then
+         goto 1
+      Else
+         goto 2
+      End If
+      
+  1   Do J=a,b,.00000001
+         c1=J
+         Y=F(((c1+c2)/2))
+         Mult=Y*.00000001
+         Sum=sum+mult
+         c2=c1
+      End Do
+
+  2   Do J=a,b,-.00000001
+         c1=J
+         Y=F(((c1+c2)/2))
+         Mult=Y*.00000001
+         Sum=sum+mult
+         c2=c1
+      End Do
+
+      Print*,Sum
+  3   Format (F20.5)
+      End
+
+      Double Precision Function f(x)
+      Double Precision x
+
+      F=(4)/((x**2)+1)
+
+      Return
+      End
+</syntaxhighlight>
+
+==注释与参考==
+<references />
+
+==另见==
+*[[梯形法|梯形法]]
+*[[辛普森法|辛普森法]]
+
+[[Category:数值积分|Category:数值积分]]

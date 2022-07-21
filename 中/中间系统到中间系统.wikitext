@@ -1,0 +1,36 @@
+{{noteTA|G1=IT}}
+{{IPstack}}
+{{Otheruses|other='''ISIS'''的其他意义|ISIS}}
+'''中间系统到中间系统'''（'''IS-IS'''，Intermediate system to intermediate system，读作“i-sys”）是一种[[内部网关协议|内部网关协议]]，是电信运营商普遍采用的内部网关协议之一。<ref>（美）Abe Martey 著，凡璇、侯志荣 译：《IS-IS网络设计解决方案》 ，人民邮电出版社，2002年第1版，ISBN 7-115-10544-8 </ref>标准的'''IS-IS协议'''是由[[国际标准化组织|国际标准化组织]]制定的ISO/IEC 10589:2002 所规范的。但是标准的IS-IS协议是为[[无连接网络服务|无连接网络服务]]（CLNS）设计的，并不直接适合于IP网络，因此[[互联网工程任务组|互联网工程任务组]]制定可以适用于IP网络的集成化的IS-IS协议，称为集成IS-IS，它由RFC 1195等RFC文档所规范。由于IP网络的普遍存在，一般所称的IS-IS协议，通常是指集成IS-IS协议。
+
+== 历史 ==
+1985年，[[DEC|DEC]]制定作为[[DECnet|DECnet]]路由协议的DECnet Phase V Routing，这是IS-IS协议的前身。1988年，国际标准化组织将其接纳为国际标准，并改为现名。1990年2月，互联网工程任务组发布RFC 1142，将其接纳为[[互联网标准|互联网标准]]。同年12月，互联网工程任务组又发布使IS-IS协议能够适用于TCP/IP网络的技术规范RFC 1195。<ref name="ciscopress">Catherine Paquet、Diane Teare：《Configuring IS-IS Protocol》，http://www.ciscopress.com/articles/article.asp?p=31319 {{Wayback|url=http://www.ciscopress.com/articles/article.asp?p=31319 |date=20200210043721 }}</ref>
+
+1991年，[[思科公司|思科公司]]开始在其路由器的操作系统[[IOS|IOS]]中提供IS-IS协议的支持，<ref name="ciscopress" />这意味着IS-IS协议初步具备在TCP/IP环境下实施的条件。
+
+1995年，开始有[[ISP|ISP]]尝试在商用网络中使用IS-IS协议。<ref name="ciscopress" />随着使用者的增多，IS-IS协议已经成为最常使用的路由协议之一。
+
+1999年2月，IS-IS流量工程（IS-IS-TE）作为互联网草案被提出。<ref name="draft-ietf-isis-traffic-00">Henk Smit、Tony Li：《IS-IS extensions for Traffic Engineering》，http://tools.ietf.org/html/draft-ietf-isis-traffic-00 {{Wayback|url=http://tools.ietf.org/html/draft-ietf-isis-traffic-00 |date=20191206203247 }}</ref>2004年6月，IS-IS流量工程被接纳为互联网标准，编号RFC 3784。2008年10月，随着新的IS-IS流量工程标准RFC 5305的颁布，原标准RFC 3784被同时废止。
+
+2000年1月1日，对[[IPv6|IPv6]]的支持作为互联网草案被提出。<ref name="draft-ietf-isis-ipv6-00">Christian E. Hopps：《Routing IPv6 with IS-IS》，http://tools.ietf.org/html/draft-ietf-isis-ipv6-00 {{Wayback|url=http://tools.ietf.org/html/draft-ietf-isis-ipv6-00 |date=20191204095757 }}</ref>经过多番修改，在IS-IS协议中支持IPv6的标准在2008年10月被正式接纳为互联网标准，编号RFC 5308。
+
+== 技术特性 ==
+IS-IS协议是一种基于[[链路状态算法|链路状态算法]]的路由协议，这意味着作为中间系统的路由器，必须完全知晓自己所在区域内部所有其它的路由器和它们的链路状态。IS-IS协议通过发送[[LSP|LSP]]（链路状态协议数据单元）进行路由信息通告，通过[[Hello_PDU|Hello PDU]]发现邻居和建立邻接，<ref name="">杭州华三通信技术有限公司：《IS-IS for IPv6技术白皮书》，http://www.h3c.com.cn/Products___Technology/Technology/Router/Other_technology/Technology_book/200804/603578_30003_0.htm {{Wayback|url=http://www.h3c.com.cn/Products___Technology/Technology/Router/Other_technology/Technology_book/200804/603578_30003_0.htm |date=20081121113731 }}</ref>通过[[序号协议数据单元|SNP]]（序号协议数据单元）确保路由器持有最新的、有效的LSP。路由器在接收到的LSP的基础上，通过[[最短路径优先|SPF]]（最短路径优先）算法最终确定路由表。<ref>（美）Zaheer Aziz、Johnson Liu、Abe Martey、Faraz Shamim 著，卢泽新、白建军、朱培栋、朱珂 译：《IP路由协议疑难解析》，人民邮电出版社，2008年第2版，ISBN 978-7-115-18274-6</ref>
+
+IS-IS协议把路由器分为三种：L1路由器、L2路由器和L1/L2路由器。其中，L1路由器是为端系统（比如[[个人电脑|个人电脑]]）直接提供服务的路由器，L2路由器是骨干路由器。L1/L2路由器向L1路由器隐藏骨干区域的细节，并负责将由L1路由器组成的非骨干区域的数据请求转发到由L2路由器组成的骨干区域。
+
+和[[OSPF|OSPF]]协议直接使用IP地址标识路由器不同，IS-IS协议使用OSI的地址方案[[NASP|NASP]]标识路由器节点。因此，纯粹的IS-IS协议并不直接适合于IP网络；而集成IS-IS能够实现IP路由的关键，在于RFC 1195引入携带IP路由信息的CLV字段。
+
+== 相关RFC ==
+* RFC 1142：OSI IS-IS Intra-domain Routing Protocol
+* RFC 1195：Use of OSI IS-IS for Routing in TCP/IP and Dual Environments
+* RFC 5305：IS-IS Extensions for Traffic Engineering
+* RFC 5308：Routing IPv6 with IS-IS
+
+==相關條目==
+*[[IEEE_802.1aq|IEEE 802.1aq]] ([[Shortest_Path_Bridging|Shortest Path Bridging]])
+
+== 参考文献 ==
+{{Reflist|30em}}
+
+[[Category:路由协议|Category:路由协议]]

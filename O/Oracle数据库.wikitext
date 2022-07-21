@@ -1,0 +1,170 @@
+{{TA
+|G1=IT
+}}{{Expand|time=2018-05-10T14:07:08+00:00}}{{Refimprove|time=2018-05-10T14:07:08+00:00}}
+{{Infobox Software
+| name = Oracle Database
+| logo = [[File:Oracle_wordmark.svg|220px]]
+| screenshot = 
+| caption = 
+| developer = [[甲骨文公司|甲骨文公司]]
+| released = 1979
+| latest_release_version = {{LSR/wikidata}}
+| operating system = [[跨平台|跨平台]]
+| programming language = [[C语言|C]]
+| language = 
+| genre = [[關聯式資料庫管理系統|關聯式資料庫管理系統]]
+| license = [[专有软件|专有软件]]
+}}
+'''Oracle Database'''，又名'''Oracle RDBMS'''，或簡稱'''Oracle'''。是[[甲骨文公司|甲骨文公司]]的一款[[关系数据库|关系数据库]]管理系统。到目前仍在数据库市场上占有主要份额。<ref>{{cite news |url=https://www.pcworld.com/businesscenter/article/147684/idc_oracle_maintains_lead_in_database_market.html |title=IDC: Oracle Maintains Lead in Database Market |date=2008-06-27 |first=Chris |last=Kanaracus |website=[[PC_World|PC World]] |access-date=2018-12-04 |archive-date=2012-03-20 |archive-url=https://web.archive.org/web/20120320151309/http://www.pcworld.com/businesscenter/article/147684/idc_oracle_maintains_lead_in_database_market.html |dead-url=no }}</ref>
+
+[[劳伦斯·埃里森|劳伦斯·埃里森]]和他的朋友，之前的同事{{link-en|Bob Miner|Bob Miner}}和{{link-en|Ed Oates|Ed Oates}}在1977年建立了软件开发实验室咨询公司（SDL，Software Development Laboratories）。SDL开发了Oracle软件的最初版本。''Oracle''的名称来自于埃里森在[[Ampex|Ampex]]工作时参加的一个由[[CIA|中央情报局]]创建的项目的代码名称。<ref>{{cite news |url=https://www.guardian.co.uk/g2/story/0,3604,215072,00.html |title=Welcome to Larryland |website=[[衛報|衛報]] |first1=Jack |last1=Schofield |first2=Emma |last2=Brockes |date=2000-04-28 |access-date=2018-12-04 |archive-date=2013-03-18 |archive-url=https://web.archive.org/web/20130318002012/http://www.guardian.co.uk/g2/story/0,3604,215072,00.html |dead-url=no }}</ref>
+
+== 實體和邏輯結構 ==
+
+一個Oracle資料庫系統是以一個由字母和數字组成的系統識別碼（SID, Site ID）來做唯一性的區別<ref>{{cite web
+| url = http://download.oracle.com/docs/cd/B28359_01/install.111/b32077/glossary.htm?type=popup#BABEBJAG
+| title = Glossary
+| accessdate = 2008-11-17
+| author = 
+| last = Bhakthavatsalam
+| first = Namrata
+| authorlink = 
+| coauthors = 
+| work = Oracle Database Client Installation Guide 11g Release 1 (11.1) for AIX Based Systems Part Number B32077-03
+| publisher = Oracle
+| location = 
+| pages = 
+| doi = 
+| archiveurl = https://web.archive.org/web/20100316015619/http://download.oracle.com/docs/cd/B28359_01/install.111/b32077/glossary.htm?type=popup#BABEBJAG
+| archivedate = 2010-03-16
+| quote = The SID automatically defaults to the database name portion of the global database name (sales in the example sales.us.example.com) until you reach eight characters or enter a period. You can accept or change the default value.
+| date = August 2008
+| dead-url = no
+}}</ref>—包含了至少一個應用程式的[[資料庫|實例]]，和資料儲存設備。一個實例（instance）是由一個實例數字（或是一個啟動ID：SYS.V_$DATABASE.ACTIVATION#）表示—包含了一個作業系統[[程序|程序]]的集合和與儲存設備進行交談的內部結構。典型的程序有PMON（the process monitor程序監看器）和SMON（the system monitor系統監看器）。
+
+Oracle資料庫的用户設計到了SGA（System Global Area系统全局领域）服务器端内存结构。SGA保存了[[缓存|缓存]]信息比如数据缓冲区，[[SQL|SQL]]命令，和用户信息。在存储之外，数据库由保存了数据变更历史的在线恢复日志。进程可以把在线的恢复日志转换成存档的日志（离线恢复日志），给数据回复和再生提供了基础。
+
+如果Oracle数据库管理员实现了Oracle [[RAC|RAC]]（Real Application Clusters真正应用集群），那么在不同的服务器上的多个实例，隶属于一个中央[[磁盘阵列|磁盘阵列]]。这个方案提供了一些优点，比如更高的效率、扩展性和冗余。然而，这样会导致系统更复杂，因此许多站点并不使用RAC。在10g版本中，[[网格计算|网格计算]]引进了共享资源，这样一个实例可以使用（例如）网格中另一个节点的[[CPU|CPU]]资源。
+
+Oracle数据库管理系统可以保存并运行自己的[[存储程序|存储程序]]和函数。[[PL-SQL|PL-SQL]]（Oracle公司的专有的SQL扩展语言），或面向对象语言[[Java|Java]]可以调用那些代码对象或者编写这些代码。
+
+=== 存储 ===
+
+Oracle关系型数据库管理系统从逻辑上把数据保存在[[表空间|表空间]]内，在物理上以数据文件的形式存储。表空间可以包含多种类型的[[内存区段|内存区段]]，例如数据区段（Data Segment）、索引区段（Index Segment）等等。区段相应的由一个或多个扩展（extent）组成。扩展由相连的数据区块组成。数据区块是数据存储的基本单元。
+
+Oracle数据库管理系统通过存储在<code>SYSTEM</code>表空间内的信息来跟踪数据存储。<code>SYSTEM</code>表空间包含了[[数据字典|数据字典]]—以及（默认的）[[数据库索引|索引]]和[[计算机集群|集群]]。数据字典包含了一个保存了所有数据库中用户对象的信息的[[数据库表|表]]。从8i版本开始，Oracle开始支持''本地管理''表空间，即把空间管理信息保存在它们自己的[[信头|信头]]的位图中而不是<code>SYSTEM</code>表空间内。
+
+==== 磁盘文件 ====
+{{Expand-section}}
+
+===== 数据文件 =====
+在物理层，[[数据文件|数据文件]]由一个或多个[[块_(数据存储)|数据区块]]组成。区块的大小根据数据库的不同而不同。
+
+数据文件可以使用计算机服务器的文件系统的预先分配空间，直接操作磁盘，或保存在[[ASM|自动存储管理]]逻辑卷内。<ref>{{cite web 
+ |first=Bob 
+ |last=Watkins 
+ |authorlink= 
+ |title=Look inside ASM disk groups with Oracle 10gR2's ASMCMD 
+ |url=http://articles.techrepublic.com.com/5100-10878_11-6154262.html 
+ |archiveurl=https://archive.today/20120707211346/http://www.techrepublic.com/article/look-inside-asm-disk-groups-with-oracle-10gr2s-asmcmd/6154262 
+ |work=techrepublic.com 
+ |publisher=ZDNet 
+ |location= 
+ |doi= 
+ |date=2007-01-30 
+ |archivedate=2012-07-07 
+ |accessdate=2009-07-30 
+ |quote=In 10g, Oracle introduced a new kind of storage for its database product. Automatic Storage Management (ASM) is a logical volume manager that takes physical disk partitions and manages their contents [...] Until ASM, there were only two choices: file system storage and raw disk storage. 
+ |deadurl=yes 
+ }}</ref>
+
+===== 控制文件 =====
+一个或多个控制文件保存了系统整体的信息和状态。<ref>{{cite web
+ |first = René
+ |last = Nyffenegger
+ |title = Control files [Oracle]
+ |url = http://www.adp-gmbh.ch/ora/concepts/controlfiles.html
+ |archiveurl = https://web.archive.org/web/20090808094626/http://www.adp-gmbh.ch/ora/concepts/controlfiles.html
+ |work = René Nyffenegger's collection of things on the web
+ |publisher = 
+ |location = 
+ |doi = 
+ |date = 
+ |month = 
+ |year = 
+ |archivedate = 2009-08-08
+ |accessdate = 2009-07-30
+ |quote = The control files of a database store the status of the physical structure of the database.
+ |dead-url = no
+ }}</ref>
+
+== 国际化 ==
+
+Oracle数据库软件有63个语种的版本（包括了区域差异语言比如美国英语和英国英语）。不同语言版本间的差异包括了日期和月份的名字，缩写，时间格式和排序。<ref name="titleLocale Data">{{cite web |url=http://download.oracle.com/docs/cd/B19306_01/server.102/b14225/applocaledata.htm#i634428 |title=Locale Languages |accessdate=2008-02-26 |archive-date=2010-05-27 |archive-url=https://web.archive.org/web/20100527053840/http://download.oracle.com/docs/cd/B19306_01/server.102/b14225/applocaledata.htm#i634428 |dead-url=no }}</ref>
+
+Oracle公司已经把Oracle数据库的错误信息翻译到阿拉伯语、加泰罗尼亚语、中文、捷克语、丹麦语、荷兰语、英语、芬兰语、法语、德语、希腊语、希伯来语匈牙利语、意大利语、日语、韩语、挪威语、波兰语、葡萄牙语、罗马尼亚语、俄语、斯洛伐克语、西班牙语、瑞典语、泰语和土耳其语。<ref name="titleMessages Data">{{cite web |url=http://download.oracle.com/docs/cd/B19306_01/server.102/b14225/applocaledata.htm#i634673 |title=Error Message languagues |accessdate=2008-02-26 |archive-date=2010-05-27 |archive-url=https://web.archive.org/web/20100527053840/http://download.oracle.com/docs/cd/B19306_01/server.102/b14225/applocaledata.htm#i634673 |dead-url=no }}</ref>
+
+
+Oracle公司给数据库开发人员提供产生国际化的数据库应用程序的工具与机制。<ref>{{cite web
+| url = http://download.oracle.com/docs/cd/B28359_01/server.111/b28298/ch1overview.htm#sthref8
+| title = Overview of Globalization Support
+| accessdate = 2009-02-16
+| author = 
+| last = Shea
+| first = Cathy
+| authorlink = 
+| coauthors = ''et al.''
+| work = Oracle Database Globalization Support Guide 11g Release 1（11.1）
+| publisher = [[Oracle_Corporation|Oracle Corporation]]
+| location = 
+| pages = 
+| doi = 
+| archiveurl = https://web.archive.org/web/20090509204753/http://download.oracle.com/docs/cd/B28359_01/server.111/b28298/ch1overview.htm#sthref8
+| archivedate = 2009-05-09
+| dateformat = 
+| quote = In the past, Oracle referred to globalization support capabilities as National Language Support (NLS) features. NLS is actually a subset of globalization support. NLS is the ability to choose a national language and store data in a specific character set. Globalization support enables you to develop multilingual applications and software products that can be accessed and run from anywhere in the world simultaneously.
+| date = September 2007
+| dead-url = no
+}}</ref>
+
+== 历史 ==
+
+== 版本 ==
+
+=== 資料庫管理及開發工具 ===
+* [http://www.navicat.com/cht/products/navicat_oracle/oracle_overview.html Navicat for Oracle]{{Wayback|url=http://www.navicat.com/cht/products/navicat_oracle/oracle_overview.html |date=20101216124658 }}是一套專為Oracle設計的強大資料庫管理及開發工具。它可以用於任何版本的Oracle資料庫，並支援大部份Oracle的功能，包括觸發器、索引、檢視等。
+* [http://www.quest.com/toad-for-oracle/ Toad for Oracle]{{Wayback|url=http://www.quest.com/toad-for-oracle/ |date=20130728023830 }}是一款老牌的Oracle开发管理工具，比任何一款Oracle开发管理工具功能更多，并针对使用者不同的角色有多个分支版本。版本包括：Toad DBA Suite for Oracle是一款专门为Oracle DBA管理Oracle数据库工具, Toad Development Suite for Oracle是一款专门为Oracle开发工具， Toad DBA Suite for Oracle – Exadata Edition是一款专门为Oracle Exadata一体服务器及Oracle数据库管理工具, Toad DBA Suite for Oracle - RAC Edition是一款专门为Oracle搭建集群RAC的DBA管理工具
+
+== 支持平台 ==
+
+在2001年发布的Oracle9i之前，甲骨文公司把他们的数据库产品广泛的移植到了不同的平台上。近期，甲骨文公司巩固了一小部分的操作系统平台。
+
+截止至2006年10月，甲骨文公司的Oracle10g支持以下的操作系统和硬件：
+
+* [[Apple_Computer|Apple]] [[Mac_OS_X_Server|Mac OS X Server]]: [[PowerPC|PowerPC]]
+* [[Hewlett-Packard|HP]] [[HP-UX|HP-UX]]: [[PA-RISC|PA-RISC]], [[Itanium|Itanium]]
+* HP {{link-en|Tru64 UNIX|Tru64}}: [[DEC_Alpha|Alpha]]
+* HP [[OpenVMS|OpenVMS]]: Alpha, Itanium
+* [[IBM|IBM]] [[IBM_AIX|AIX5L]]: [[IBM_POWER|IBM POWER]]
+* IBM [[z/OS|z/OS]]: {{link-en|IBM System z|IBM System z|Security zSeries}}
+* [[Linux|Linux]]: [[x86|x86]], [[x86-64|x86-64]], PowerPC, zSeries, Itanium
+* [[Microsoft|Microsoft]] [[Microsoft_Windows|Windows]]: x86, x86-64, Itanium
+* [[Sun_Microsystems|Sun]] [[Solaris|Solaris]]: [[SPARC|SPARC]], x86, x86-64
+
+== 引用 ==
+
+{{refs|2}}
+
+== 外部連結 ==
+* [https://www.oracle.com/database/technologies/ Oracle Database]{{Wayback|url=https://www.oracle.com/database/technologies/ |date=20190529011654 }}, a view provided by Oracle Corporation
+* [https://docs.oracle.com/en/database/oracle/oracle-database/18/index.html Oracle 18c Database Documentation]{{Wayback|url=https://docs.oracle.com/en/database/oracle/oracle-database/18/index.html |date=20190507113924 }}
+
+== 参见 ==
+* [[PL-SQL|PL-SQL]]
+*[[OceanBase|OceanBase]]
+{{-}}
+{{Databases}}
+
+[[Category:数据库管理系统|Category:数据库管理系统]]
+[[Category:甲骨文公司软件|Category:甲骨文公司软件]]
+[[Category:跨平台軟體|Category:跨平台軟體]]

@@ -1,0 +1,109 @@
+{{Expert|time=2011-01-16}}
+{{copyedit|time=2010-04-22T07:15:21+00:00}}
+在文本的显示中， '''换行''' （line wrap）是指文本在一行已满的情况下转到新行，使得每一行都能在窗口范围看到，不需要任何水平的滚动。
+
+'''自动换行''' （word wrap）是大多数[[文字編輯器|文字編輯器]]、[[文書處理器|文書處理器]]、和[[网页浏览器|网页浏览器]]的一个附加功能。它用于在行间或一行里的单词间隔处分行，不考虑一个单词超过一行长度的情况。
+
+它通常是在看文档或打印的时候[[实时|实时]]完成的，所以没有储存或手动插入换行代码{{Citation needed|date=October 2009}}。如果用户改变了文档的边缘，编辑器就会自动重排换行符的位置，保证全部文本都处于可见状态，或者给打字员提供一些便捷的方式重排换行符。
+
+[[软回车|软回车]]是由于自动换行形成的回车，而[[硬回车|硬回车]]则用于另起一段。
+
+==单词边界，断字和硬空格==
+软回车通常放在一个完整单词的后面，或者紧接完整单词的标点符号后。但是，自动换行也有可能发生在连字号后。
+
+有时候并不需要连字号后的自动换行，这时候可以通过使用所谓的非断字连字号代替一般的连字号。另一方面，也可以在单词中插入不可见的连字号（软连字号），使得文字处理软件可以在该处自动换行。
+
+有时候，单词之间的自动换行是不必要的。这种情况下，可以通过单词之间的硬空格避免自动换行。
+
+==在中日韩文本中的自动换行==
+在[[中文|中文]]，[[日文|日文]]和[[韩语|韩文]]中，每个[[汉字|汉字]]通常被认为是一个词，因此自动换行可以在汉字之前或之后发生。
+
+而在某些情况下，是不需要换行的。例如：
+*人名处不宜换行
+*复合词处不宜换行
+
+大多数现有的文字处理和[[排版|排版]]软件不能处理上述任意一种情况。
+
+[[中日韩越统一表意文字|中日韩]]标点符号可能不遵守上述特殊情况，这些规则通常称为{{link-ja|避頭尾|禁則処理}}（意思是“禁止规则处理”）。
+
+{{link-en|避頭尾|Line breaking rules in East Asian languages}}有一个总是成立的特例：自动换行永远不能在中日韩越统一表意文字符集中的[[破折号|破折号]]和[[省略号|省略号]]之间发生。虽然由于现存字符编码的关系，这些符号需要用两个字符表示，但这些字符实际上是一个两字符宽的符号，而不是两个单字宽的符号对。
+
+==算法==
+自动换行是一个最优化问题。因应不同的需求，有不同的解决办法。
+
+===最小长度===
+自动换行的一个简单的实现是使用[[贪心算法|贪心算法]]：将尽可能多的单词放进一行里，直到所有的单词都已经放进去为止。这是很多现代文字处理软件的做法，如[[Microsoft_Word|Microsoft Word]]和[[Open_Office|Open Office]] 。这个算法在追求最少行数的目标上能够达到最优化。下面是该算法的伪代码实现：
+
+ SpaceLeft := LineWidth
+ for each Word in Text
+   if Width(Word) > SpaceLeft
+     insert line break before Word in Text
+     SpaceLeft := LineWidth - Width(Word)
+   else
+     SpaceLeft := SpaceLeft - (Width(Word) + SpaceWidth)
+
+LineWidth指一行的宽度，SpaceLeft指一行中剩余的空格，SpaceWidth是一个空格的宽度，Text是输入的文本，Word是文本中的一个单词。
+
+===最小破损度===
+
+在[[TeX|TeX]]中使用的，则是另一个算法，旨在将行尾空格数的平方和最小化，以产生一个更加美观的结果。以上的算法不能完成这一目标，例如：
+
+aaa bb cc ddddd
+
+如果惩罚函数定义为行尾剩余空格数的平方，则贪婪算法会得到一个次优解（为了简化起见，不妨假设采用定宽字体）：
+
+ ------ 一行的宽度为6
+ aaa bb 剩余的空格数：0，平方=0
+ cc     剩余的空格数：4，平方=16
+ ddddd  剩余的空格数：1，平方=1
+
+总计代价17，而最佳的解决方案是这样的：
+
+ ------ 一行的宽度为6
+ aaa    剩余空格数：3 平方=9
+ bb cc  剩余空格数：1 平方=1
+ ddddd  剩余空格数：1 平方=1
+
+
+请注意，第一行在bb前断开了，相对于在bb后断开的解法，可以得到更好的右边界和更低的代价11。
+
+为了解决这个问题，我们需要定义一个惩罚函数<math>c(i, j)</math>，用于计算包含单词<math>\text{Word}[i]</math>到单词<math>\text{Word}[j]</math>的一行的代价：
+
+:<math>c(i, j) = \left(\text{LineWidth}-(j-i)\cdot\text{OneSpaceWidth}-\sum_{k=i}^j \text{WidthOf}(\text{Word}[k])\right)^P.</math>
+
+其中<math>P</math>通常为<math>2</math>或<math>3</math>。另外，有一些特殊的情况值得考虑：如果结果为负（即单词串不能全部放在一行里），惩罚函数需要反映跟踪或压缩文本以适应一行的代价；如果这是不可能的，则返回<math>\infty</math>
+
+最优解的代价可以用以下的[[递归|递归]]式定义：
+
+:<math>f(j) = \begin{cases} 
+  c(1, j) & \text{if } c(1, j) < \infty, \\ 
+  \displaystyle \min_{1 \leq k < j} \big(f(k) + c(k + 1, j)\big) & \text{if } c(1, j) = \infty.
+\end{cases}</math>
+
+这可以利用[[动态规划|动态规划]]来高效地实现，时间和空间复杂度均为<math>O(j^2)</math>
+
+==参见==
+
+*[[分词|分词]]
+*[[零宽度非换行空格|零宽度非换行空格]]
+
+== 外部链接 ==
+=== Knuth's algorithm ===
+* [http://defoe.sourceforge.net/folio/knuth-plass.html "Knuth & Plass line-breaking Revisited"] {{Wayback|url=http://defoe.sourceforge.net/folio/knuth-plass.html |date=20210505063701 }}
+* [http://oedipus.sourceforge.net/texlib/ "tex_wrap": "Implements TeX's algorithm for breaking paragraphs into lines."] {{Wayback|url=http://oedipus.sourceforge.net/texlib/ |date=20201109012804 }} Reference: "Breaking Paragraphs into Lines", D.E. Knuth and M.F. Plass, chapter 3 of _Digital Typography_, CSLI Lecture Notes #78.
+* [http://search.cpan.org/perldoc?Text::Reflow Text::Reflow - Perl module for reflowing text files using Knuth's paragraphing algorithm.] "The reflow algorithm tries to keep the lines the same length but also tries to break at punctuation, and avoid breaking within a proper name or after certain connectives ("a", "the", etc.). The result is a file with a more "ragged" right margin than is produced by fmt or Text::Wrap but it is easier to read since fewer phrases are broken across line breaks."
+* [https://web.archive.org/web/20070930015603/http://www.nabble.com/Initial-soft-hyphen-support-t2970713.html adjusting the Knuth algorithm] to recognize the [[Hyphen#Hyphens_in_computing|"soft hyphen"]].
+* [http://wiki.apache.org/xmlgraphics-fop/KnuthsModel Knuth's breaking algorithm.] {{Wayback|url=http://wiki.apache.org/xmlgraphics-fop/KnuthsModel |date=20181118215424 }} "The detailed description of the model and the algorithm can be found on the paper "Breaking Paragraphs into Lines" by Donald E. Knuth, published in the book "Digital Typography" (Stanford, California: Center for the Study of Language and Information, 1999), (CSLI Lecture Notes, no. 78.)" ; part of [https://web.archive.org/web/20100102185441/http://wiki.apache.org/xmlgraphics-fop/GoogleSummerOfCode2006/FloatsImplementationProgress Google Summer Of Code 2006]
+* [http://citeseer.ist.psu.edu/23630.html "Bridging the Algorithm Gap: A Linear-time Functional Program for Paragraph Formatting"] {{Wayback|url=http://citeseer.ist.psu.edu/23630.html |date=20080429201304 }} by Oege de Moor, Jeremy Gibbons, 1999
+
+=== 其他自动换行有关的连接 ===
+* [http://www.codecomments.com/message230162.html the reverse problem -- picking columns just wide enough to fit (wrapped) text] {{Webarchive|url=https://archive.is/20070927021648/http://www.codecomments.com/message230162.html |date=2007-09-27 }}
+* [http://api.kde.org/4.x-api/kdelibs-apidocs/kdeui/html/classKWordWrap.html KWordWrap Class Reference] {{Wayback|url=http://api.kde.org/4.x-api/kdelibs-apidocs/kdeui/html/classKWordWrap.html |date=20110717090536 }} used in the KDE GUI
+* [https://web.archive.org/web/20090923020030/http://www.leverkruid.eu/GKPLinebreaking/elements.html "Knuth linebreaking elements for Formatting Objects"] by Simon Pepping 2006. Extends the Knuth model to handle a few enhancements.
+* [http://wiki.apache.org/xmlgraphics-fop/PageLayout/ "Page breaking strategies"] {{Wayback|url=http://wiki.apache.org/xmlgraphics-fop/PageLayout/ |date=20160319135013 }} Extends the Knuth model to handle a few enhancements.
+* [http://www.techwr-l.com/archives/0504/techwhirl-0504-00203.html "a Knuth-Plass-like linebreaking algorithm] ... The *really* interesting thing is how Adobe's algorithm differs from the Knuth-Plass algorithm. It must differ, since Adobe has managed to patent its algorithm (6,510,441)."[http://www.techwr-l.com/archives/0504/techwhirl-0504-00206.html ]
+* [http://blogs.msdn.com/murrays/archive/2006/11/15/lineservices.aspx "Murray Sargent: Math in Office"] {{Wayback|url=http://blogs.msdn.com/murrays/archive/2006/11/15/lineservices.aspx |date=20100422195219 }}
+
+[[Category:动态规划|Category:动态规划]]
+[[Category:字體排印|Category:字體排印]]
+[[Category:文本编辑器功能|Category:文本编辑器功能]]

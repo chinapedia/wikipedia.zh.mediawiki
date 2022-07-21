@@ -1,0 +1,161 @@
+{{noteTA
+|G1=IT
+}}
+在 [[物件導向程式設計|物件導向程式設計]]裡，'''迭代器模式'''是一種[[設計模式_(計算機)|設計模式]]，是一種最簡單也最常見的設計模式。它可以讓使用者透過特定的介面巡訪容器中的每一個元素而不用了解底層的實作。
+
+此外，也可以實作特定目的版本的迭代器。
+
+==介面==
+[[設計模式：可復用物件導向軟體的基礎|《設計模式》]]建議合理的介面該要有：
+
+<syntaxhighlight lang="java">
+public interface Iterator
+{
+    public Object First();
+    public Object Next();
+    public boolean isDone();
+    public Object CurrentItem();
+}
+</syntaxhighlight>
+
+==示例==
+===[[Java|Java]]===
+<syntaxhighlight lang="java">
+interface Iterator{
+    Object First();
+    Object Next();
+    boolean IsDone();
+    Object CurrentItem();
+}
+
+abstract class Aggregate{
+    abstract Iterator CreateIterator();
+}
+
+class ConcreteIterator implements Iterator{
+    private List<Object> list = new ArrayList<Object>();
+    private int curr=0;
+    public ConcreteIterator(List<Object> list){
+        this.list = list;
+    }
+
+    public Object First(){
+        return list.get(0);
+    }
+
+    public Object Next(){
+        Object ret = null;
+        curr++;
+        if(curr < list.size()){
+            ret = list.get(curr);
+        }
+        return ret;
+    }
+
+    public boolean IsDone(){
+        return curr>=list.size()?true:false;
+    }
+
+    public Object CurrentItem(){
+        return list.get(curr);
+    }
+}
+
+class ConcreteAggregate extends Aggregate{
+    private List<Object> list = new ArrayList<Object>();
+    public ConcreteAggregate(List<Object> list){
+        this.list = list;
+    }
+    public Iterator CreateIterator(){
+        return new ConcreteIterator(list);
+    }
+}
+
+class client{
+    public static void main(String[] args){
+    List<Object> list = new ArrayList<Object>();
+    list.add("miner");
+    list.add("any");
+    Aggregate agg = new ConcreteAggregate(list);
+    Iterator iterator = agg.CreateIterator();
+    iterator.First();
+    while(!iterator.IsDone()){
+        System.out.println(iterator.CurrentItem());
+        iterator.Next();
+        }
+    }
+}
+</syntaxhighlight>
+
+===[[C++|C++]]===
+=== [[Python|Python]]===
+在 Python 中，迭代器是遵循''迭代協議''的物件。使用者可以使用 <code>iter()</code> 以從任何序列得到迭代器（如 list, tuple, dictionary, set 等）。另一個方法則是建立一個另一種形式的迭代器 —— generator 。要取得下一個元素，則使用成員函式 next()（Python 2）或函數 next() function （Python 3） 。當沒有元素時，則引發 <code>StopIteration</code> 此例外。若要實作自己的迭代器，則只要實作 <code>next()</code>（Python 2）或 <code>__next__()</code>（ Python 3）。
+
+以下為兩個例子：
+<syntaxhighlight lang="python">
+# 從序列得到
+x = [42, "test", -12.34]
+it = iter(x)
+try:
+  while True:
+    x = next(it) # 在 Python 2 中，要改成 it.next()
+    print x
+except StopIteration:
+  pass
+
+# generator
+def foo(n):
+  for i in range(n):
+    yield i
+
+it = foo(5)
+try:
+  while True:
+    x = next(it) # 在 Python 2 中，要改成 it.next()
+    print x
+except StopIteration:
+  pass
+</syntaxhighlight>
+===[[CSharp|C#]]/[[Visual_Basic|Visual Basic]]===
+For Each…Next(Visual Basic)或者foreach(C#)循环语句，将调用迭代器遍历一个序列，每次获取一个返回值。
+
+迭代器可以作为一个方法或属性的get访问器，其中的Yield (Visual Basic)或yield return (C#)语句返回迭代器的返回值，并记住当前执行的位置。下次再调用迭代器，从该执行位置恢复执行，直至迭代器代码执行完或者遇到Exit Function或Return语句(Visual Basic)或yield break语句(C#) 。编译器把迭代器作为一个[[状态机|状态机]]的类。   
+<syntaxhighlight lang="vbnet">
+Sub Main()
+    Dim days As New DaysOfTheWeek()
+    For Each day As String In days
+        Console.Write(day & " ")
+    Next 
+    ' Output: Sun Mon Tue Wed Thu Fri Sat
+    Console.ReadKey()
+End Sub 
+
+Private Class DaysOfTheWeek
+    Implements IEnumerable
+
+    Public days =
+        New String() {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
+
+    Public Iterator Function GetEnumerator() As IEnumerator _
+        Implements IEnumerable.GetEnumerator
+
+        ' Yield each day of the week. 
+        For i As Integer = 0 To days.Length - 1
+            Yield days(i)
+        Next 
+    End Function 
+End Class
+
+</syntaxhighlight>
+==問題==
+* 在巡訪過程中，容器可能會被外部改變。譬如新增或刪除一個元素。
+
+==另見==
+* [[設計模式_(計算機)|設計模式]]
+* [[迭代器|迭代器]]
+* [[組合模式|組合模式]]
+
+
+{{软件设计模式}}
+[[Category:軟體設計模式|Category:軟體設計模式]]
+[[Category:编程中的迭代|Category:编程中的迭代]]

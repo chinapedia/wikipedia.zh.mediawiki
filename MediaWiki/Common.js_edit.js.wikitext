@@ -1,0 +1,239 @@
+//<nowiki>
+
+/**
+ * 管理员注意：
+ *
+ * 本页面脚本在使用传统编辑器、可视化编辑器、2017维基文本编辑器时均会加载，且只加载一次。
+ *
+ * 但可视化编辑器与2017维基文本编辑器有两个问题：
+ * 1. 此脚本运行时，编辑器可能尚未加载完成。
+ * 2. 互相切换时，或者放弃编辑之后再次点击编辑时，浏览器页面不会刷新，本页面脚本不会再次加载。
+ * 因此，如果代码与VE/2017维基文本编辑器相关，需要在进入编辑器时运行，请集中放在后面的
+ * mw.hook('ve.activationComplete').add(function () {
+ *     ......
+ * });
+ * 中。如有疑问，请到zh.wikipedia.beta.wmflabs.org进行测试。
+ */
+
+/*
+== 編輯工具欄 ==
+*/
+
+/**
+ * tip for custom edittools
+ *
+ * Maintainers: fdcn@zh.wikipedia
+ */
+if (mw.config.get('wgAction') === 'edit' && $("span.oo-ui-fieldLayout-header")) {
+    $("span.oo-ui-fieldLayout-header").css("max-width", "none"); // 一行显示编辑摘要
+}
+
+$(function () {
+    var veCount = 0;
+
+    //在提交新段落時，讓主題欄在特定情況下失效
+    if ($('#no-new-title').length) {
+        if ($('#editform input[name=wpSection]').val() === 'new') {
+            // 傳統文本編輯器
+            $('#wpSummary').attr('disabled', true);
+            $('#wpSummary').val('');
+        }
+    }
+
+    // 視覺化編輯器 / 新 wikitext 模式
+    var noSectionTitlePages = [
+        'Wikipedia:防滥用过滤器/错误报告',
+    ];
+    if ($.inArray(mw.config.get('wgPageName'), noSectionTitlePages) !== -1
+        && mw.util.getParamValue('section') === 'new') {
+        mw.util.addCSS('h2.ve-ui-init-desktopArticleTarget-sectionTitle { display: none; }');
+    }
+
+
+
+    // 快速选择常见编辑摘要
+    // 摘要内容请到[[MediaWiki:Summary|MediaWiki:Summary]]及相关中文变体页面维护。
+    var insertSummary = function ($this, $summary) {
+        var summary = $summary.val();
+        var $item = $this.parent('.mw-summary-preset-item');
+        summary = summary.replace(/\s+$/g, '');
+        if (summary != '') {
+            summary += ' ';
+        }
+        summary += $item.attr('title') || $this.text();
+        $this.replaceWith($this.contents());
+        $summary.val(summary).change();
+    };
+
+    // 传统编辑器
+    $('#wpSummaryLabel .mw-summary-preset').on('click', '.mw-summary-preset-item a', function(e) {
+        e.preventDefault();
+        insertSummary($(this), $('#wpSummary'));
+    });
+
+    // VE / 新维基文本
+    var isInitSummary = false;
+    mw.hook('ve.saveDialog.stateChanged').add(function () {
+        // 编辑摘要链接在第一次点击“发布更改”按钮之后才会加载，因此需要额外判断
+        if (!isInitSummary) {
+            $('div.ve-ui-mwSaveDialog-summaryLabel span.mw-summary-preset-item > a')
+                .removeAttr('target')
+                .click(function (e) {
+                    e.preventDefault();
+                    insertSummary($(this), $('div.ve-ui-mwSaveDialog-summary > textarea'))
+                });
+            isInitSummary = true;
+        }
+    });
+
+
+    // 每次进入可视化/2017维基文本编辑器都要运行的代码请集中放在此处，
+    // 由于无法保证加载顺序，请避免另外实现mw.hook('ve.activationComplete').add(...)。
+    mw.hook('ve.activationComplete').add(function () {
+        // 由于无法保证用户是第一次进入编辑器，需记录进入次数。
+        veCount++;
+
+        // 编辑摘要链接初始化
+        isInitSummary = false;
+    });
+});
+
+
+/**
+ * -------------------------------------------------------------------------------
+ *  Force Preview JavaScript code - Start
+ *
+ *  For MediaWiki >= 1.23
+ *
+ *  To allow any group to bypass being forced to preview,
+ *  enter the group name in the permittedGroups array.
+ *  E.g.
+ *    var permittedGroups = [];                        // force everyone
+ *    var permittedGroups = [ 'user' ];                // permit logged-in users
+ *    var permittedGroups = [ 'sysop', 'bureaucrat' ]; // permit sysop, bureaucrat
+ * -------------------------------------------------------------------------------
+ */
+
+( function () {
+    var permittedGroups = [ 'confirmed', 'autoconfirmed' ];
+    if (
+        mw.config.get( 'wgAction' ) !== 'edit' ||
+        permittedGroups.some( function ( val ) {
+            return mw.config.get( 'wgUserGroups' ).indexOf( val ) > -1;
+        } )
+    ) {
+        return;
+    }
+    mw.loader.using( 'oojs-ui-core', function () {
+        var originalLabel;
+        mw.hook( 'wikipage.editform' ).add( function ( $editForm ) {
+            var saveButton;
+            try {
+                saveButton = OO.ui.infuse( $editForm.find( '#wpSaveWidget' ) );
+            } catch ( e ) {
+                return;
+            }
+            if ( !$( '#wikiPreview, #wikiDiff' ).is( ':visible' ) ) {
+                if ( saveButton.isDisabled() ) {
+                    return;
+                }
+                if ( originalLabel === undefined ) {
+                    originalLabel = saveButton.getLabel();
+                }
+                var newLabel = /^zh(-.*)?$/.test(mw.config.get('wgUserLanguage')) ?  wgULS( '（请先预览）', '（請先預覽）') : ' (Preview first)';
+                saveButton.setDisabled( true ).setLabel( originalLabel + newLabel );
+            }
+            else if ( originalLabel !== undefined ) {
+                saveButton.setLabel( originalLabel ).setDisabled( false );
+            }
+        } );
+    } );
+}() );
+
+/**
+ * -----------------------------------------------------
+ *   Force Preview JavaScript code - End
+ * -----------------------------------------------------
+ */
+
+/*
+
+== 取消修訂編輯摘要修正 ==
+*/
+/**
+  fix edit summary prompt for undo
+  this code fixes the fact that the undo function combined with the "no edit summary prompter" causes problems if leaving the edit summary unchanged
+  this was added by [[:en:User:Deskana|:en:User:Deskana]], code by [[:en:User:Tra|:en:User:Tra]]
+*/
+$(function() {
+    var autoSummary = document.getElementsByName('wpAutoSummary')[0];
+    if (document.location.search.indexOf("undo=") != -1 && autoSummary) { autoSummary.value = ''; }
+});
+
+
+/*
+== WP:DYKC編輯時取消編輯摘要空段落標示 ==
+*/
+$(function() {
+    var $wpSummary = $("#editform #wpSummary"), $wpTextbox1 = $("#editform #wpTextbox1");
+    if ($wpSummary.length == 0 || $wpTextbox1.length == 0) return;
+    var wpSummary = $wpSummary.get(0), wpTextbox1 = $wpTextbox1.get(0);
+    var keyReg = /(?:\n|.)*\|\s*article\s*= *([\S ]*)(?:\n|.)*/m;
+    if (wpSummary.value.indexOf("  ") >= 0) wpSummary.value = "";
+    if (mw.config.get("wgPageName") != "Wikipedia:新条目推荐/候选") return;
+    if (wpSummary.value == "/" + "*  *" + "/ " && wpTextbox1.value.match(keyReg)) { } else return;
+    var temp = wpTextbox1.value.replace(keyReg, '$1');
+    if (!temp) return;
+    wpSummary.value = wpSummary.defaultValue = "\/" + "* " + temp + " *" + "\/ ";
+});
+
+
+/* Check for any client-side simplified/traditional Chinese conversion */
+var checkAntiConv = function() {
+    var $ac = $('#wpAntiConv');
+    if ($ac.length && $ac.val() != '\u6c49\u6f22') {
+        var text = $('#wpTextbox1').val();
+        var section = $('input[name=wpSection]').val();
+        var basetimestamp = $('input[name=wpEdittime]').val();
+        var starttimestamp = $('input[name=wpStarttime]').val();
+        $('#editform :input').attr({ disabled: true, readOnly: true });
+        mw.loader.using([ 'mediawiki.notification'], function() {
+            mw.notify(wgULS(
+                '系统检测到您使用了客户端繁简转换软件，且此软件对文本框中的内容进行了转换。请关闭此软件后重新打开编辑界面，再进行编辑。',
+                '系統檢測到您使用了用戶端繁簡轉換軟體，且此軟體對文字方塊中的內容進行了轉換。請關閉此軟體後重新打開編輯介面，再進行編輯。'
+            ), { autoHide: false });
+        });
+    } else {
+        setTimeout(checkAntiConv, 1000);
+    }
+};
+setTimeout(checkAntiConv, 1000);
+
+/**
+ * Preload function for existing page
+ */
+var revid = mw.util.getParamValue('preloadrevid');
+if (revid) {
+	var api = new mw.Api()
+	api.get({
+		'action': 'query',
+		'format': 'json',
+		'prop': 'revisions',
+		'revids': revid,
+		'formatversion': '2',
+		'rvprop': 'content',
+		'rvslots': '*',
+	}).then(function(data) {
+		var title = data.query.pages[0].title;
+		var content = data.query.pages[0].revisions[0].slots.main.content;
+		mw.hook('editorapi.ready').add(function(editor) {
+			console.log(editor.mode)
+			editor.text = content;
+			editor.showDiff();
+			mw.notify(wgULS('已从 ', '已從 ' )+ title + wgULS(' 加载版本 ', ' 載入版本 ') + revid + wgULS(' 的内容', ' 的內容'), {type: 'success'});
+		})
+		mw.loader.load('ext.gadget.EditorAPIs');
+	});
+}
+
+//</nowiki>

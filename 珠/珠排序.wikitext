@@ -1,0 +1,75 @@
+{{NoteTA
+|G1=IT
+|1=zh-hans:一行;zh-hant:一列
+}}
+'''珠排序'''是一种自然[[排序算法|排序算法]]，由{{le|Joshua J. Arulanandham}}、{{le|Cristian S. Calude}}和{{le|Michael J. Dinneen}}于2002年发展而来，并且在{{le|欧洲理论计算机协会|European Association for Theoretical Computer Science}}（简称EATCS）的新闻简报上发表了该算法。无论是电子还是实物上的实现，珠排序都能在[[O|O]](n)时间内完成；然而，该算法在电子上的实现明显比实物要慢很多，并且只能用于对[[正整数|正整数]]序列进行排序。并且，即使在最好的情况，该算法也需要O(n<sup>2</sup>)的空间。
+== 算法概述 ==
+[[File:BeadSort-Figure1.svg|thumb]]
+[[File:BeadSort-Figure2.svg|thumb]]
+
+在珠排序中，一行（row）表示一个数字。如果一行里有2颗珠子，该行代表数字2；如果一行里有4颗珠子，该行代表数字4。当给定一个数组，数组里有多少个数字，就要有多少行；数组里最大的数字是几，就要准备多少根杆子。
+
+准备就绪后，释放珠子，珠子按重力下落，就完成了排序。
+
+珠排序可以类比于珠子在平行的竖直杆上滑动，就像[[算盘|算盘]]一样。然而，每一竖直杆都有珠子数目的限制。因此，初始化就相当于在竖直的杆上悬挂珠子，在第一步中，排列就被显示为n=5行的珠子在m=4列队竖直杆上。每一行右边的数字意味着该行在问题中被表示的数；第1，2行表示正整数3（因为它们都有3个珠子）而顶层的一行表示正整数2（因为它只含有2个珠子）。
+
+如果我们要允许珠子掉落，那么每行表示已排序的整数。第1行表示在集合中最大的数，而第n行表示最小的数。如果按照前面提到的规则（行包含一系列在竖直杆1到k的珠子，并且让k+1到m竖直杆都空），那么它会出现这种情况。
+
+允许珠子掉落的行为在物理意义上就是允许珠子从高的行掉落至低的行。如果被行a表示的值小于被行a+1表示的值，那么一些珠子就会从a+1掉落至a；因为行a不包含足够的珠子防止珠从a+1行掉落，所以这一定会发生。
+
+用机械装置实现的珠排序类似于[[计数排序|计数排序]]；每一杆上的数字与那些在所有数中等于或大于该数字的数量相当。
+
+== 复杂度 ==
+
+珠排序可以是以下复杂度级别：
+*''[[大O记号|O]]''(1)：即所有珠子都同时移动，但这种算法只是概念上的，无法在计算机中实现。
+*''[[大O记号|O]]''(<math>\sqrt{n}</math>)：在真实的物理世界中用[[引力|引力]]实现，所需时间正比于珠子最大高度的平方根，而最大高度正比于n。
+*''[[大O记号|O]]''(n)：一次移动一列珠子，可以用模拟和数字的硬件实现。
+*''[[大O记号|O]]''(S)，S是所有输入数据的和：一次移动一个珠子，能在软件中实现。
+
+==Python 實现==
+<syntaxhighlight lang="python" line="1">
+def bead_sort(l):
+    b = []
+    l_len = len(l) - 1 
+    index = 0 
+    count = 0 
+ 
+    while(any(l)):
+        if l[index] != 0:
+            count += 1
+            l[index] -= 1
+ 
+        if index == l_len:
+            b.append(count)
+            index = 0 
+            count = 0 
+        else:
+            index += 1
+ 
+    if count != 0:
+        b.append(count)
+
+    result = []
+    for i, v in enumerate(b[:-1]):
+        if v == b[i+1]:
+            continue
+        else:
+            result.extend([i + 1 for _ in range(v - b[i + 1])])
+ 
+    result.extend([len(b) for _ in range(max(b) - len(result))])
+ 
+    return result
+
+if __name__ == "__main__":
+    print(bead_sort([2, 4, 1, 3, 3]))
+</syntaxhighlight>
+
+== 外部链接 ==
+*{{PDFlink|[http://www.cs.auckland.ac.nz/~jaru003/research/publications/journals/beadsort.pdf The Bead Sort paper]|114 [[Kibibyte|KiB]]<!-- application/pdf, 117730 bytes -->}}
+*[http://codersunited.net/2009/03/03/beadsort/ C# Bead Sort Implementation]{{dead link|date=2018年3月 |bot=InternetArchiveBot |fix-attempted=yes }} C# implementation of the Bead Sort Algorithm
+*[http://mgs.spatial-computing.org/ImageGallery/EXEMPLES/BeadSort/index.html Bead Sort in MGS] {{Wayback|url=http://mgs.spatial-computing.org/ImageGallery/EXEMPLES/BeadSort/index.html |date=20110728044018 }}, a visualization of a bead sort implemented in the [https://web.archive.org/web/20110721023343/http://mgs.ibisc.univ-evry.fr/ MGS] programming language
+*[http://mathworld.wolfram.com/Bead-Sort.html Bead Sort on MathWorld] {{Wayback|url=http://mathworld.wolfram.com/Bead-Sort.html |date=20100909043736 }}
+
+{{排序算法}}
+[[Category:排序算法|Category:排序算法]]

@@ -1,0 +1,154 @@
+'''環形摺積'''與[[線性摺積|線性摺積]]類似，皆是針對兩個函數的運算子。假設兩個函數分別為''f''與''g''，則摺積運算過程即為將其中一個函數(如''f'')經過翻轉後，對於每個位移量，將重疊的部份相乘累加起來(見下文定義)。不同的地方在於環形摺積的位移為環形位移，而線性摺積的位移為平移。摺積亦可以視為[[滑動平移|滑動平移]]的推廣。
+
+==定義==
+兩個函數的環形摺積定義為對一個或兩個函數做[[週期延伸|週期延伸]]後之[[摺積|摺積]]運算，而所謂的週期延伸是指原來的函數平移固定長度的整數倍再全部加起來所產生的新函數。
+''x''(''t'')經過週期延伸後之函數可寫成下式:
+:<math>x_T(t) \ \stackrel{\mathrm{def}}{=} \ \sum_{k=-\infty}^{\infty} x(t - kT) = \sum_{k=-\infty}^{\infty} x(t + kT).</math>
+
+其中'''T'''為週期(即週期延伸中的固定長度)
+
+對''x(t)''與''h(t)''計算環形摺積的運算(<math>x(t) \otimes h(t)</math>)可以下列兩種等價表示式定義:
+
+:<math>
+\begin{align}
+y(t) &= \int_{t_o}^{t_o+T} h_T(\tau)\cdot x_T(t - \tau)\,d\tau \\
+&= \int_{-\infty}^{\infty} h(\tau)\cdot x_T(t - \tau)\,d\tau
+\quad \stackrel{\mathrm{def}}{=} \quad x_T(t) * h(t),
+\end{align}
+</math>
+
+其中'''*'''表示線性摺積運算子
+
+此兩定義的等價關係證明如下:
+
+:<math>
+\begin{align}
+\int_{-\infty}^{\infty} h(\tau)\cdot x_T(t - \tau)\,d\tau 
+&= \sum_{k=-\infty}^{\infty} \left[\int_{t_o+kT}^{t_o+(k+1)T} h(\tau)\cdot x_T(t - \tau)\ d\tau\right] \\
+&= \sum_{k=-\infty}^{\infty} \left[\int_{t_o}^{t_o+T} h(\tau+kT)\cdot x_T(t - \tau-kT)\ d\tau\right] \\
+&= \sum_{k=-\infty}^{\infty} \left[\int_{t_o}^{t_o+T} h(\tau+kT)\cdot x_T(t - \tau)\ d\tau\right] \\
+&= \int_{t_o}^{t_o+T} \left[\sum_{k=-\infty}^{\infty} h(\tau+kT)\cdot x_T(t - \tau)\right]\ d\tau\\
+&= \int_{t_o}^{t_o+T} \left[\sum_{k=-\infty}^{\infty} h(\tau+kT)\right]\cdot x_T(t - \tau)\ d\tau\\
+& \ \stackrel{\mathrm{def}}{=} \  \int_{t_o}^{t_o+T} h_T(\tau)\cdot x_T(t - \tau)\ d\tau \quad \quad \mbox{QED}
+\end{align}
+</math>
+
+上述為針對兩個連續信號(函數)的環形摺積之定義的說明，類似的，我們對於週期為''N''的離散信號之環形摺積(<math>x[n] \otimes h[n]</math>)有如下的定義:
+
+:<math>
+\begin{align}
+x_N[n] * h[n] \ &\stackrel{\mathrm{def}}{=} \ \sum_{m=-\infty}^{\infty} h[m] \cdot x_N[n-m] \\
+&= \sum_{m=-\infty}^{\infty} h[m] \cdot \sum_{k=-\infty}^{\infty} x[n -m -kN].\,
+\end{align}
+</math>
+
+離散信號的環形摺積可以結合[[快速傅立葉變換|快速傅立葉變換]]與[[摺積理論|摺積理論]]做相當有效率的計算，然而，在實際上[[信號處理|信號處理]]或系統理論的應用，線性摺積運算較常被考慮也較有物理意義，於是，如果可將一個線性摺積的計算問題轉化為求算環形摺積，則一般當兩個輸入信號長度相距不遠時，往往計算量可以大為減少，增加了計算線性摺積的效率，至於線性摺積與環形摺積的關係以及如何利用環形折積與[[傅立葉變換|傅立葉變換]]求得線性摺積結果，將於下文進一步討論。
+
+==線性摺積與環形摺積之比較==
+[[File:Circular_convolution_example.png|right]]
+===線性摺積===
+連續信號線性摺積
+: <math>(f \star g )(t) = \int f(\tau) g(t - \tau)\, d\tau</math>
+離散信號線性摺積
+:<math>(f  \star g)[m] = \sum_n {f[n] g[m - n]} </math>
+
+對於一個[[線性非時變|線性非時變]](LTI)之系統，輸出的信號''y''(''n'')可以經由輸入信號''x''(''n'')與系統的[[脈衝響應|脈衝響應]]''h''(''n'')的線性摺積而得。
+也因此，在實際的應用上，線性摺積的運算較為具有物理意義，如[[數位濾波器|數位濾波器]]的濾波過程即為一個線性摺積的運算。
+
+===環形摺積===
+環形摺積定義如前文所述，運算上是將線性摺積的頭尾相連變成環形，觀念上可想像為一個輸入在內環，另一個輸入在外環，然後每一個輸出的求得皆是經由內環與外環對應位置的乘加。計算下一個輸出則將內環固定不動，外環圓周位移一格，再做對應位置之乘加得到此輸出，以此類推。(圓環上的點數即為週期延伸的週期''T''或''N'')
+
+===比較===
+不管是線性摺積或環形摺積均有反折、位移、相乘並求和的運算，但線性摺積的位移是平移，環形摺積的位移則是圓周位移。除此之外，線性摺積並不要求兩序列長度相等，若''x''(''n'')長度為''M''，''h''(''n'')長度為''N''，則其摺積輸出''y''(''n'')長度為''M''+''N''-1，而環形摺積則要求兩輸入序列等長(假設為''L'')，且摺積輸出的長度也為''L''。一般情況下，兩等長序列的環形摺積與線性摺積的結果是不同的(因為環形週期序列產生的影響)，但當''L''≥''M''+''N''-1時，兩者的結果相同。
+
+右圖為一個實際範例，可比較相同的兩輸入信號，線性摺積與環形摺積輸出的差異。
+
+==如何利用快速傅立葉變換計算線性摺積==
+由以上討論知道一般的情況，線性摺積與環形摺積的輸出結果並不會相同，且一般線性摺積較實用而有意義。然而離散信號的處理上，由於環形摺積可以藉由快速傅立葉變換較有效率的求得，所以兩輸入信號的線性摺積，如何利用環形摺積與快速傅立葉變換得到，在信號處理及相關應用上是特別重要的。
+
+我們根據摺積理論知道
+:<math>y[n] = x[n] \star h[n] = \sum_k {x[n-k] h[k]} </math>
+:<math>y[n] = IFFT( FFT{x[n]} FFT{h[n]})</math>
+
+然而''FFT''的點數該如何選取呢？
+因為''FFT''與''IFFT''的點數皆要是一樣的，且特別要注意的一點是:
+:<math>y_1[n] = IFFT_L (FFT_L{x_1[n]} FFT_L{h_1[n]})</math>
+:<math>y_1[n] = \sum_{k = 0}^{N-1} {x[((n-k))_L] h[k]}  </math>
+
+其中''FFT<sub>L</sub>''為''L''點''FFT''；''IFFT<sub>L</sub>''為''L''點''IFFT''
+((''a''))<sub>L</sub>: ''a''除以''L''的餘數
+
+上式表示根據摺積理論與快速傅立葉變換，我們求得的是兩個輸入信號的環形摺積而不是線性摺積 
+:<math>y[n] = x[n] \star h[n] = \sum_k {x[n-k] h[k]} </math>
+
+依據兩個輸入信號的長度，計算方法可分類如下:
+===''x''[''n''] 與 ''h''[''n''] 皆為無限長信號===
+由於此種類在實際應用上相當少且較不實際，故在此不進一步討論
+
+===''x''[''n''] 與 ''h''[''n''] 皆為有限長信號===
+假設''x''[''n'']的範圍[''n''<sub>1</sub>,''n''<sub>2</sub>]，長度為''N'' = ''n''<sub>2</sub>-''n''<sub>1</sub>+1；''h''[''n'']的範圍為[''k''<sub>1</sub>,''k''<sub>2</sub>]，長度''K''為 ''k''<sub>2</sub>-''k''<sub>1</sub>+1
+在這個情況下，''x''[''n'']與''h''[''n'']的線性摺積為
+:<math>y[n] = \sum_{k = k_1}^{k_2} {x[n-k] h[k]}  </math>
+
+容易以圖解推得''y''[''n'']有值的範圍為[''k''<sub>1</sub>+''n''<sub>1</sub>, ''k''<sub>2</sub>+''n''<sub>2</sub>]，輸出長度為<math>k_2+n_2-k_1-n_1+1 = N + K - 1</math> (輸出信號長度比兩輸入信號大)
+
+於是如欲以快速傅立葉變換計算線性摺積，則傅立葉變換之點數''M''要取''N''+''K''-1，不足部份補零，實作方法如下：
+:<math>x_1[n] = x[n+n_1] , n = 0,1,2,...,N-1</math>
+:<math>x_1[n] = 0        , n = N,N+1,N+2,...,M-1      M = N + K -1</math>
+:<math>h_1[n] = h[n+k_1] , n = 0,1,2,...,K-1</math>
+:<math>h_1[n] = 0        , n = K,K+1,K+2,...,M-1</math>
+:<math>y_1[n] = IFFT_M(FFT_M{x_1[n]} FFT_M{h_1[n]})</math>
+:<math>y[n] = y_1[n-n_1-k_1] , n-n_1-k_1 = 0,1,2,...,N-1</math>
+
+===''x''[''n''] 為無限長信號，而''h''[''n''] 為有限長信號===
+由於摺積運算的對稱性，此種類與''x''[''n''] 為有限長信號，而''h''[''n''] 為無限長信號的情況完全相同。
+假設''x''[''n'']的範圍[''n''<sub>1</sub>,''n''<sub>2</sub>]，長度為''N'' = ''n''<sub>2</sub> - ''n''<sub>1</sub> + 1，''h''[''n'']長度為無限長。
+在此情況下，摺積輸出''y''[''n'']每一點皆有值。但當我們只想求出''y''[''n'']的其中一段時，依然可利用快速傅立葉變換實作。
+如果我們希望算出''y''[''n'']在範圍[''m''<sub>1</sub>,''m''<sub>2</sub>]之間的值，此段長度為 ''M'' = ''m''<sub>2</sub>-''m''<sub>1</sub>+1，此時可圖解發現，在''h''[''n'']中與我們關心的輸出範圍有關聯之''h''[''n'']範圍為[''m''<sub>1</sub>-''n''<sub>2</sub>,''m''<sub>2</sub>-''n''<sub>1</sub>]，需要使用的''FFT''點數為''L'' =''N''+''M''-1 (''M''為輸出信號關心的長度)
+
+實作方法如下:
+:<math>x_1[n] = x[n+n_1] , n = 0,1,2,...,N-1</math>
+:<math>x_1[n] = 0        , n = N,N+1,N+2,...,L-1      L = N + M -1</math>
+:<math>h_1[n] = h[n+m_1-n_2] , n = 0,1,2,...,L-1</math>
+:<math>y_1[n] = IFFT_L(FFT_L{x_1[n]} FFT_L{h_1[n]})</math>
+:<math>y[n] = y_1[n-m_1+N-1] , n-m_1+N-1 = N-1,N,...,L</math> (只選''y''<sub>1</sub>[n]後面''M''個點)
+
+==區塊摺積==
+當計算摺積之兩信號長度相差很大時，利用快速傅立葉變換計算摺積是較沒有效率的，此時較有效率的方法是將較長的信號切成一段段的區塊，以此每一區塊對另一輸入信號進行摺積再合併，常見的[[區塊摺積|區塊摺積]]方法包括[[重疊-相加之摺積法|重疊-相加之摺積法]]與[[重疊-儲存之摺積法|重疊-儲存之摺積法]]，針對長度的不同，區塊長度的選取亦會影響計算的效率。
+
+==相關條目==
+* [[摺積|摺積]]
+* [[離散傅立葉變換|離散傅立葉變換]]
+* [[區塊摺積|區塊摺積]]
+
+==參考==
+*{{Cite book
+ | author=Rabiner, Lawrence R.; Gold, Bernard
+ | authorlink=
+ | coauthors=
+ | title=Theory and application of digital signal processing
+ | date=1975
+ | publisher=Prentice-Hall
+ | location=Englewood Cliffs, N.J. 
+ | isbn=0-13-914101-4
+ | pages=pp 63-67
+}}.
+*{{Cite book 
+ | author=Oppenheim, Alan V.; Schafer, Ronald W.; Buck, John A. 
+ | authorlink= 
+ | coauthors= 
+ | title=Discrete-time signal processing 
+ | date=1999 
+ | publisher=Prentice Hall 
+ | location=Upper Saddle River, N.J.  
+ | isbn=0-13-754920-2 
+ | pages=
+}}.
+* Jian-Jiun Ding, Advanced digital signal processing class note,the Department of Electrical Engineering, National Taiwan University (NTU), Taipei, Taiwan, 2007.
+
+
+[[category:泛函分析|H]]
+[[Category:信号处理|H]]
+[[Category:二元運算|H]]
+
+[[de:Zyklische_Faltung|de:Zyklische Faltung]]

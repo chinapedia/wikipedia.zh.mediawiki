@@ -1,0 +1,121 @@
+{{Expand English}}{{noteTA
+|G1=IT
+}}
+'''异常处理'''（Exception handling，中國大陆所用“{{Lang|zh-Hans|异常}}”对应的英文是Abnormality<ref>{{Cite web|title=abnormality汉语(繁体)翻译：剑桥词典|url=https://dictionary.cambridge.org/zhs/%E8%AF%8D%E5%85%B8/%E8%8B%B1%E8%AF%AD-%E6%B1%89%E8%AF%AD-%E7%B9%81%E4%BD%93/abnormality|accessdate=2020-02-04|work=dictionary.cambridge.org|language=zh-Hans|archive-date=2021-04-14|archive-url=https://web.archive.org/web/20210414094217/https://dictionary.cambridge.org/zhs/%E8%AF%8D%E5%85%B8/%E8%8B%B1%E8%AF%AD-%E6%B1%89%E8%AF%AD-%E7%B9%81%E4%BD%93/abnormality}}</ref>，港澳台以及日本使用的是“{{Lang|zh-Hans|例外}}”）是指在进行运算（ computation）时，出现{{Lang|zh-Hans|例外}}的情况（需要特殊处理的非常规或{{Lang|zh-Hans|例外}}的情况）对应的处理，这种情况经常会破坏程序正常的流程。它通常由特殊的编程语言结构、计算机硬件机制（如：[[中斷|中断]]或者如信号等操作系统[[行程間通訊|IPC]]设施）所构成的。具体实现由硬件和软件自身定义而决定。一些异常，尤其是硬件，将会在被中断后进行恢复。
+
+== 硬件领域 ==
+{{Expand section}}硬件的异常处理机制由 CPU 完成。这种机制支持错误检测，在发生错误后会将程序流跳转到专门的错误处理过程（{{lang-en|error handling routines}}）中。发生异常前的状态存储在栈上。<ref>{{cite web
+ | url         = http://processors.wiki.ti.com/
+ | title         = Hardware Exceptions Detection
+ | date         = 2011-11-24
+ | publisher         = TEXAS INSTRUMENTS
+ | archiveurl         = http://wayback.vefsafn.is/wayback/20131110061200/http%3A//processors.wiki.ti.com/index.php/Main_Page
+ | archivedate         = 2013-11-10
+ | quote         = 
+ | accessdate         = 2012-10-05
+ | deadurl         = yes
+ | df         = 
+ | language = en
+ }}</ref>
+
+== 操作系统提供的异常处理设施 ==
+{{Expand section}}
+针对程序中可能发生的异常，[[操作系统|操作系统]]可能通过 [[进程间通讯|IPC]] 来提供对应的处理设施。进程执行过程中发生的中断通常由操作提供的「中断服务子程序」处理，操作系统可以藉此向该进程发送[[Unix信号|信号]]。进程可以通过注册信号处理器的方式自行处理信号，也可以让操作系统执行默认行为（比如终止该程序）。
+
+从进程的视角，硬件中断相当于可恢复异常，虽然中断一般与程序流本身无关。
+
+== 软件领域 ==
+在[[编程语言|编程语言]]领域，通常 '''异常'''（{{lang-en|exception}}）这一术语所描述的是一种数据结构，该数据结构可以存储异常（exceptional）相关信息。异常处理的常见的一种机制是移交控制权。'''引发'''（Raise）异常，也叫作'''抛'''（Throw）异常，通过该方式达到移交控制权的效果。异常抛出后，控制权会被移交至某处的'''接'''（Catch），并执行处理。
+
+从[[子程序|子程序]]<sup>routine</sup>作者的角度看，如果要表示当前子程序无法正常执行，抛出异常是很好的选择。无法正常执行的原因可以是输入参数无效（比如值在函数的[[定义域|定义域]]之外），也可以是无法获得所需的资源（比如文件不存在、硬盘出错、内存不足）等等。在不支持异常的系统中，子程序需要通过返回特殊的{{Tsl|en|Error code|错误码}}实现类似的功能。然而返回错误码可能导致{{Tsl|en|Semipredicate problem|不完全预测问题}}，子程序的使用方需要编写额外的代码，才能将普通的返回值与错误码相区别。
+
+编程语言对异常有着截然不同的定义，但现代语言大致上可分两类：<ref name="Kiniry">{{Cite book|doi=10.1007/11818502_16|chapter=Exceptions in Java and Eiffel: Two Extremes in Exception Design and Application|title=Advanced Topics in Exception Handling Techniques|volume=4119|pages=288–300|series=Lecture Notes in Computer Science|year=2006|last1=Kiniry|first1=J. R.|isbn=978-3-540-37443-5}}</ref>
+
+* 用作于[[控制流程|控制流程]]的异常，如：Ada, Java, Modula-3, ML, OCaml, Python, and Ruby fall in this category 。
+* 用作于处理不正常、无法预测、错误性的情况。如：C++,<ref>{{cite web|title=Stroustrup: C++ Style and Technique FAQ|url=http://www.stroustrup.com/bs_faq2.html#exceptions-what-not|accessdate=5 May 2018|archiveurl=https://web.archive.org/web/20180202012417/http://www.stroustrup.com/bs_faq2.html#exceptions-what-not|archivedate=2 February 2018|website=www.stroustrup.com|url-status=live}}</ref> C#, Common Lisp, Eiffel, and Modula-2 。
+
+Kiniry 强调“语言的设计仅仅部分地影响了异常机制的使用，结果上，（在整个系统的运行期间）形成的对异常使用的态度会处理影响部分或者所有的失败（错误）。另外，其他主要的影响还有示例、核心代码的编写、技术书籍杂志文章以及相关讨论”。<ref name="Kiniry2">{{Cite book|doi=10.1007/11818502_16|chapter=Exceptions in Java and Eiffel: Two Extremes in Exception Design and Application|title=Advanced Topics in Exception Handling Techniques|volume=4119|pages=288–300|series=Lecture Notes in Computer Science|year=2006|last1=Kiniry|first1=J. R.|isbn=978-3-540-37443-5}}</ref> 
+
+=== 历史 ===
+在1960和1970年代，[[LISP|Lisp]]语言发展出软件异常。最初版本是在1962年 Lisp 1.5的时候，这时候异常通过<code>ERRSET</code>关键词进行捕捉，并在出错时候，通过<code>NIL</code>进行返回，而不是以前的终止程序或者进行调试器。{{sfn|Gabriel|Steele|2008|p=3}}1960年代后半，[[Maclisp|MacLisp]]语言通过<code>ERR</code>关键词引入'''引发'''（Raise）'''错误'''机制。{{sfn|Gabriel|Steele|2008|p=3}}Lisp的这种创新不仅仅被应用于抛出错误，还被应用于'''非本地控制流（non-local control flow）'''。在在1972年6月，MacLisp 语言通过<code>CATCH</code> 和<code>THROW</code>两个新的关键词来实现非本地控制流，并保留<code>ERRSET</code> 和 <code>ERR</code> 专门做错误处理。在1970中后，<code>NIL</code>衍生清除（Cleanup）操作（LISP的新功能），对应着现今常见的<code>finally</code>。{{sfn|White|1979|p=194}}该操作也被 Common Lisp使用了。与之同时代，Scheme也诞生了<code>dynamic-wind</code>，用于处理closures中的异常。{{harvtxt|Goodenough|1975a}} and {{harvtxt|Goodenough|1975b}}是首篇文章介绍结构化的异常处理。{{sfn|Stroustrup|1994|p=392}} 1980年后，异常处理被广泛利用于许多编程语言。
+
+PL/I语言使用的是动态域（Dynamically scoped）异常，然而稍微现代的编程语言多用词法作用域（lexically scoped</sup>的异常。PL/I语言的异常处理包含事件（不是错误）、注意（Attention）、EOF、列举了的变量的修改（Modification of listed variables）。虽然现在的一些编程语言支持不含错误信息的异常，但是他们并不常见。
+
+一开始，软件的异常处理是包含恢复的异常：恢复语法（Resumption semantics），就像大部分的硬件异常一样，以及不恢复的异常：终止语法（Termination semantics ）。但是，在1960和1970时代，在实践中得出恢复语句是十分低效的（C++标准相关的讨论可见{{sfn|Stroustrup|1994|loc=16.6 Exception Handling: Resumption vs. Termination, pp. 390–393}}），因此恢复语句就很少再出现了，通常只能在类似Common Lisp和Dylan这种语言中见到。
+
+=== 中止语句 ===
+{{Expand section}}
+=== 争论 ===
+1980年[[東尼·霍爾|Tony Hoare]] 在异常处理上提出了反对意见，这样描述[[Ada|Ada]]语言时，认为异常处理是十分危险的。<ref>C.A.R. Hoare. "The Emperor's Old Clothes". 1980 Turing Award Lecture</ref>
+
+对于软件而言，异常处理经常无法正确的处理，尤其是当这里有多种来自不同源代码的异常时。在对五百万行Java代码进行[[数据流分析|数据流分析]]时，我们发现了超过1300个异常处理。<ref name="toplas2008">{{cite news|author1=Weimer, W|author2=Necula, G.C.|title=Exceptional Situations and Program Reliability|journal=ACM Transactions on Programming Languages and Systems|volume=30|issue=2|url=http://www.cs.virginia.edu/~weimer/p/weimer-toplas2008.pdf|year=2008|url-status=live|archiveurl=https://web.archive.org/web/20150923211739/http://www.cs.virginia.edu/~weimer/p/weimer-toplas2008.pdf|archivedate=2015-09-23}}</ref>这是1999-2004年的前沿报告以及他们的结论，Weimer 和 Necula写到，异常是一个十分严峻的问题，他们会创造隐藏的控制流途径，这种途径是编程人员很难去推理的。
+
+[[Go|Go]]语言的初始版本并没有异常处理，而因此被有的开发者认为[[控制流程|控制流]]十分冗余。<ref>{{cite web|title=Frequently Asked Questions|url=https://golang.org/doc/faq#exceptions|accessdate=2017-04-27|archiveurl=https://web.archive.org/web/20170503205801/https://golang.org/doc/faq#exceptions|archivedate=2017-05-03|quote=We believe that coupling exceptions to a control structure, as in the try-catch-finally idiom, results in convoluted code. It also tends to encourage programmers to label too many ordinary errors, such as failing to open a file, as exceptional.|url-status=live}}</ref>后来，追加了类似的异常处理的语法{{code|panic|lang=go}}/{{code|recover|lang=go}}机制，但是Go语言的作者建立这仅仅在整个程序不可恢复的错误时候使用它。<ref>[https://code.google.com/p/go-wiki/wiki/PanicAndRecover Panic And Recover] {{webarchive|url=https://web.archive.org/web/20131024144034/https://code.google.com/p/go-wiki/wiki/PanicAndRecover|date=2013-10-24}}, Go wiki</ref><ref>{{cite web|title=Weekly Snapshot History|url=http://golang.org/doc/devel/weekly.html#2010-03-30|work=golang.org|archiveurl=https://web.archive.org/web/20170403123818/https://golang.org/doc/devel/weekly.html#2010-03-30|archivedate=2017-04-03|url-status=live}}</ref><ref>{{cite web|title=Proposal for an exception-like mechanism|url=https://groups.google.com/group/golang-nuts/browse_thread/thread/1ce5cd050bb973e4|accessdate=25 March 2010|date=25 March 2010|work=golang-nuts|archive-date=2013-03-06|archive-url=https://web.archive.org/web/20130306195756/http://groups.google.com/group/golang-nuts/browse_thread/thread/1ce5cd050bb973e4}}</ref><ref>{{cite web|title=Effective Go|url=https://golang.org/doc/effective_go.html#panic|work=golang.org|archiveurl=https://web.archive.org/web/20150106084926/https://golang.org/doc/effective_go.html#panic|archivedate=2015-01-06|url-status=live}}</ref>
+
+异常，作为一个非结构化的流程，它会增加资源泄露的可能性（如：从锁住的代码中逃脱，在打开文件时候逃脱掉），也有可能导致状态不一致。因此，出现了集中异常处理的资源管理技术，最常见的结合Dispose pattern和解除保护（Unwind protection）一起使用（如<code>finally</code>语句），会在这段代码的控制权结束时自动释放资源。
+
+=== 错误处理 ===
+错误处理（error handling）是通过处理函数的'''返回值'''的形式从而处理错误的一种编程方式。在Go等返回值可为复数的语言中，可通过将其中一个值设为错误值，从而达到错误处理的效果。<syntaxhighlight lang="go">
+f, err := os.Open("filename.ext")
+if err != nil {
+    log.Fatal(err)
+}
+// do something with the open *File f
+</syntaxhighlight>在仅仅支持返回状态码的语言里，可通过处理错误码，达到错误处理的效果。shell语言可通过<code>$?</code>获得函数执行的退出码，从而判断是否出错。
+
+在其他语言中，可以通过判断结果的某一个特征，从而达到错误处理部分的效果，但不意味着这些语言自身支持错误处理。如，Java等面向对象的语言往往会通过null值判断是否执行失败，但有时候也会通过异常处理判断是否执行失败。
+
+=== 未捕捉异常(Uncaught exceptions) ===
+如果一个异常抛出后，没有被捕捉，那么未捕捉异常将会在运行时被处理。进行该处理的程序（routine）叫 未捕捉异常处理器（'''{{visible anchor|uncaught exception handler}}'''）<ref name="cocoa">''Mac Developer Library'', "[https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Exceptions/Concepts/UncaughtExceptions.html Uncaught Exceptions] {{webarchive|url=https://web.archive.org/web/20160304111516/https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Exceptions/Concepts/UncaughtExceptions.html|date=2016-03-04}}"</ref><ref>''MSDN'', [https://msdn.microsoft.com/en-us/library/system.appdomain.unhandledexception(v=vs.110).aspx AppDomain.UnhandledException Event] {{webarchive|url=https://web.archive.org/web/20160304131615/https://msdn.microsoft.com/en-us/library/system.appdomain.unhandledexception(v=vs.110).aspx|date=2016-03-04}}</ref>。大部分的处理是终止程序并将错误信息打印至控制台，该信息通常包含调试用（debug）的信息，如：异常的描述信息、[[栈追踪|栈追踪]](stack trace)。<ref name="cocoa2">''Mac Developer Library'', "[https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Exceptions/Concepts/UncaughtExceptions.html Uncaught Exceptions] {{webarchive|url=https://web.archive.org/web/20160304111516/https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Exceptions/Concepts/UncaughtExceptions.html|date=2016-03-04}}"</ref><ref>''The Python Tutorial'', "[https://docs.python.org/2/tutorial/errors.html 8. Errors and Exceptions] {{webarchive|url=https://web.archive.org/web/20150901043830/https://docs.python.org/2/tutorial/errors.html|date=2015-09-01}}"</ref><ref>{{cite web|title=Java Practices -> Provide an uncaught exception handler|url=http://www.javapractices.com/topic/TopicAction.do?Id=229|accessdate=5 May 2018|archiveurl=https://web.archive.org/web/20160909002524/http://www.javapractices.com/topic/TopicAction.do?Id=229|archivedate=9 September 2016|website=www.javapractices.com|url-status=live}}</ref>通常处于最高级（应用级别）的处理器，即便捕捉到异常也会避免终止自身（如：线程出现异常，主线程也不会终止）。<ref name="cocoa3">''Mac Developer Library'', "[https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Exceptions/Concepts/UncaughtExceptions.html Uncaught Exceptions] {{webarchive|url=https://web.archive.org/web/20160304111516/https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Exceptions/Concepts/UncaughtExceptions.html|date=2016-03-04}}"</ref><ref>{{Cite web|title=Exception Handling — PyMOTW 3|url=https://pymotw.com/3/sys/exceptions.html|accessdate=2020-02-03|work=pymotw.com|archive-date=2021-05-16|archive-url=https://web.archive.org/web/20210516031316/https://pymotw.com/3/sys/exceptions.html}}</ref>
+
+值得了解的是，在即便未捕捉异常导致了程序异常中断（如：异常没被捕捉、滚动未完成、没释放资源），程序仍旧能正常地顺序性地关闭。只要确保运行时（runtime）能正常地运行，因为 运行时 控制着整个程序的执行。
+
+作为默认的未捕捉异常处理器是可以被替换的，不管是全局还是单线程的，新的未捕捉异常处理器可以尝试做这些事情：未捕捉异常导致关闭了的线程，使之重启；提供另一种方式记录日志；让用户报告未捕捉异常等等。在Java中，单一线程可以使用<code>[https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.html#setUncaughtExceptionHandler-java.lang.Thread.UncaughtExceptionHandler- Thread.setUncaughtExceptionHandler]</code> ，全局可以用<code>[https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.html#setDefaultUncaughtExceptionHandler- Thread.setDefaultUncaughtExceptionHandler]</code>；在python中，可通过修改<code>[https://docs.python.org/3/library/sys.html#sys.excepthook sys.excepthook]</code>。
+
+=== 异常的静态检查(Static checking of exceptions) ===
+{{Expand section}}
+
+==== 检查性异常（Checked exceptions） ====
+Java的设计者设计了<ref>{{cite web|title=Google Answers: The origin of checked exceptions|url=http://answers.google.com/answers/threadview?id=26101|accessdate=2011-12-15|archiveurl=http://archive.wikiwix.com/cache/20110806090553/http://answers.google.com/answers/threadview?id=26101|archivedate=2011-08-06|url-status=live}}</ref> 检查性异常（Checked exceptions）<ref>Java Language Specification, chapter 11.2. http://java.sun.com/docs/books/jls/third_edition/html/exceptions.html#11.2 {{webarchive|url=https://web.archive.org/web/20061208042454/http://java.sun.com/docs/books/jls/third_edition/html/exceptions.html|date=2006-12-08}}</ref>。当方法引发“检查性异常”时，“检查性异常”将成为方法符号的一部分。例如：如果方法抛出了<code>IOException</code> ，我们必须显式地使用方法符号（在Java中是<code>try...catch</code>），如果不这样做的话将会导致编译时错误（compile-time error）。
+
+===编程语言相关支持===
+许多常见的程序设计语言，包括[[Actionscript|Actionscript]]，[[Ada程序设计语言|Ada]]，[[BlitzMax|BlitzMax]]，[[C++|C++]]，[[C_Sharp|C#]]，[[D程序设计语言|D]]，[[ECMAScript|ECMAScript]]，[[Eiffel|Eiffel]]，[[Java程序设计语言|Java]]，[[ML语言|ML]]，[[Object_Pascal|Object Pascal]]（如[[Delphi|Delphi]]，[[Free_Pascal|Free Pascal]]等），[[Objective-C|Objective-C]]，[[OCaml|OCaml]]，[[PHP|PHP]]（version 5），[[PL/I|PL/I]]，[[Prolog|Prolog]]，[[Python|Python]]，[[REALbasic|REALbasic]]，[[Ruby|Ruby]]，[[Visual_Prolog|Visual Prolog]]以及大多数[[.NET_Framework|.NET]]程序设计语言，内建的异常机制都是沿着函数-{zh-hans:调用栈;zh-hant:呼叫堆疊}-的函数调用逆向搜索，直到遇到异常处理代码为止。一般在这个异常处理代码的搜索过程中逐级完成[[堆疊輾轉開解|-{zh-hans:栈卷回;zh-hant:堆疊輾轉開解;}-]]（stack unwinding）。但[[Common_Lisp|Common Lisp]]是个例外，它不采取-{zh-hans:栈卷回;zh-hant:堆疊輾轉開解;}-，因此允许异常处理完后在抛出异常的代码处原地恢复执行。而 [[Visual_Basic|Visual Basic]]（尤其是在其早于 .net 的版本，例如 6.0 中）走得更远：<code>on error</code> 语句可轻易指定发生异常后是重试（<code>resume</code>）还是跳过（<code>resume next</code>）还是执行程序员定义的错误处理程序（<code>goto ***</code>）。
+
+多数语言的异常机制的语法是类似的：用<code>throw</code>或<code>raise</code>抛出一个异常对象（Java或C++等）或一个特殊可扩展的枚举类型的值（如Ada语言）；异常处理代码的作用范围用标记子句（<code>try</code>或<code>begin</code>开始的语言作用域）标示其起始，以第一个异常处理子句（<code>catch, except, rescue</code>等）标示其结束；可连续出现若干个异常处理子句，每个处理特定类型的异常。某些语言允许<code>else</code>子句，用于无异常出现的情况。更多见的是<code>finally, ensure</code>子句，无论是否出现异常它都将执行，用于释放异常处理所需的一些资源。
+
+[[C++异常处理|C++异常处理]]是[[资源获取即初始化|资源获取即初始化]]（Resource-Acquisition-Is-Initialization）的基础。
+
+C语言一般认为是不支持异常处理的。Perl语言可选择支持[[结构化异常处理|结构化异常处理]]（structured exception handling）。
+
+Python语言对异常处理机制是非常普遍深入的，所以想写出不含<code>try, except</code>的程序非常困难。
+
+==== Python ====
+在python里只存在异常与语法错误（syntax errors）。语法错误是在运行之前发生的。而异常是在运行时发生的错误，它将无条件停止程序，除非进行捕捉处理。<ref>{{Cite web|title=8. Errors and Exceptions — Python 3.8.1 documentation|url=https://docs.python.org/3.8/tutorial/errors.html|accessdate=2020-02-04|work=docs.python.org|archive-date=2022-06-08|archive-url=https://web.archive.org/web/20220608231513/https://docs.python.org/3.8/tutorial/errors.html}}</ref>
+
+==== Java ====
+异常是异常事件（exceptional event）的缩写。异常是一个事件，它发生在程序运行时并会打乱程序指示的正常流程。当方法出现了错误时，方法会创建一个对象并将它交给运行时系统（runtime system），所创建的对象叫 异常对象（exception object），该对象包含了错误的信息（描述了出错时的程序的类型和状态）。创建错误对象和转交给运行时系统的过程，叫 抛出异常（throwing an exception）。<ref>{{Cite web|title=What Is an Exception? (The Java™ Tutorials > Essential Classes > Exceptions)|url=https://docs.oracle.com/javase/tutorial/essential/exceptions/definition.html|accessdate=2020-02-04|work=docs.oracle.com|archive-date=2022-06-09|archive-url=https://web.archive.org/web/20220609105725/https://docs.oracle.com/javase/tutorial/essential/exceptions/definition.html}}</ref>
+
+<code>class RuntimeException</code> 和<code>class Error</code>均是不检查的异常(Unchecked Exceptions)。<ref name="#1">{{Cite web|title=Unchecked Exceptions — The Controversy (The Java™ Tutorials > Essential Classes > Exceptions)|url=https://docs.oracle.com/javase/tutorial/essential/exceptions/runtime.html|accessdate=2020-02-04|work=docs.oracle.com|archive-date=2022-06-07|archive-url=https://web.archive.org/web/20220607021847/https://docs.oracle.com/javase/tutorial/essential/exceptions/runtime.html}}</ref>错误不等于错误类（<code>class Error</code>），错误类代表着不应该被捕捉的严重的问题。<ref>{{Cite web|title=Error (Java Platform SE 8 )|url=https://docs.oracle.com/javase/8/docs/api/java/lang/Error.html|accessdate=2020-02-04|work=docs.oracle.com|archive-date=2021-10-24|archive-url=https://web.archive.org/web/20211024100620/https://docs.oracle.com/javase/8/docs/api/java/lang/Error.html}}</ref><code>class RuntimeException</code> 意味着程序出现问题了。<ref name="#1"/>
+
+==== Go ====
+Go语言提倡的是错误处理（error handling）。Go语言设计者系统希望使用者在错误出时，显式地检查错误。<ref>{{Cite web|title=Error handling and Go - The Go Blog|url=https://blog.golang.org/error-handling-and-go|accessdate=2020-02-04|work=blog.golang.org|archive-date=2021-07-12|archive-url=https://web.archive.org/web/20210712233726/https://blog.golang.org/error-handling-and-go}}</ref> Go虽然不提供与Java语言的<code>try..catch</code>同等的功能语句，但是取而代之，提供了轻型的异常处理机制<code>panic...recover</code>。<ref>{{Cite web|title=Google 网上论坛|url=https://groups.google.com/forum/#!msg/golang-nuts/HOXNBQu5c-Q/5d-BN1LxOoYJ|accessdate=2020-02-04|work=groups.google.com|archive-date=2011-01-22|archive-url=http://arquivo.pt/wayback/20110122130054/https://groups.google.com/forum/#!msg/golang-nuts/HOXNBQu5c-Q/5d-BN1LxOoYJ|dead-url=no}}</ref>
+
+== 异常安全 ==
+一段代码是'''异常安全的'''，如果这段代码运行时的失败不会产生有害后果，如[[内存泄露|内存泄露]]、存储数据混淆、或无效的输出。异常安全可分成不同层次：
+# '''失败透明（failure transparency）'''，也称作'''不抛出保证（no throw guarantee）'''：代码的运行保证能成功并满足所有的约束条件，即使存在异常情况。如果出现了异常，将不会对外进一步抛出该异常。（异常安全的最好的层次）
+# '''提交或卷回的语义（commit or rollback semantics）'''，或称作'''强异常安全（strong exception safety）'''或'''无变化保证（no-change guarantee）'''：运行可以是失败，但失败的运行保证不会有负效应，因此所有涉及的数据都保持代码运行前的初始值。<ref>{{Cite web |url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/1997/N1077.asc |title=存档副本 |access-date=2011-08-13 |archive-date=2009-02-03 |archive-url=https://web.archive.org/web/20090203100940/http://www.open-std.org/jtc1/sc22/wg21/docs/papers/1997/N1077.asc |dead-url=no }}</ref>
+# '''基本异常安全（basic exception safety）'''：失败运行的已执行的操作可能引起了副作用，但会保证状态不变。所有存储数据保持有效值，即使这些数据与异常发生前的值有所不同。
+# '''最小异常安全（minimal exception safety）'''也称作'''无泄漏保证（no-leak guarantee）'''：失败运行的已执行的操作可能在存储数据中保存了无效的值，但不会引起崩溃，资源不会泄漏。
+# '''异常不安全（no exception safety）'''：没有保证（最差的异常安全层次）。
+
+例如，考虑一个smart vector类型，如C++'s <code>std::vector</code>或Java's <code>ArrayList</code>。当一个数据项<code>x</code>插入vector <code>v</code>，必须实际增加<code>x</code>的值到vector的内部对象列表中并且修改vector的计数域以正确表示<code>v</code>中保存了多少数据项；此时如果已有的存储空间不够大，就需要分配新的内存。内存分配可能会失败并抛出异常。因此，vector数据类型如果是“失败透明”保证将会非常困难甚至不可能实现。但vector类型提供“强异常安全”保证却是相当容易的；在这种情况下，<code>x</code>插入<code>v</code>或者成功，或者<code>v</code>保持不变。如果vector类型仅提供“基本异常安全”保证，如果数据插入失败，<code>v</code>可能包含也可能不包含<code>x</code>的值，但至少<code>v</code>的内部表示是一致的。但如果vector数据类型是“最小异常安全”保证，<code>v</code>可能会是无效的，例如<code>v</code>的计数域被增加了，但<code>x</code>并未实际插入，使得内部状态不一致。对于“异常不安全”的实现，程序可能会崩溃，例如写入数据到无效的内存。
+
+通常至少需要基本异常安全。失败透明是难于实现的，特别是在编写库函数时，因为对应用程序的复杂知识缺少获知。
+
+==参考文献==
+<references/>
+
+{{数据类型}}
+
+[[Category:控制流程|Category:控制流程]]
+[[Category:軟體工程|Category:軟體工程]]

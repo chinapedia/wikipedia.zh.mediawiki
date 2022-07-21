@@ -1,0 +1,906 @@
+{{noteTA
+|G1=IT
+|1=zh-cn:顯存;zh-tw:顯示記憶體;
+}}
+{{Infobox GPU
+| name  = Radeon HD 4000 系列
+| bgcolor = red
+| 圖片= Radeon HD 4870.JPG
+| caption = 
+| codename = ''Wekiva''
+| created = 2008年
+| entry = RV710（4300、4500）
+| midrange = RV730（4600）<br />RV740（4700）
+| highend = RV770 （4850、4870）<br> R700（4850 X2、4870 X2）<br> RV790 （HD 4890）
+| d3dversion = [[Direct3D#Direct3D_10|Direct3D 10.1]]、Shader Model 4.1
+| openclversion = 
+| openglversion = 
+| predecessor   = [[ATI_Radeon_HD_3000|ATI Radeon HD 3000]]
+| successor     =  [[ATI_Radeon_HD_5000|ATI Radeon HD 5000]]
+}}
+'''ATI Radeon HD 4000'''系列，其显示核心代号'''Radeon R700'''，由[[AMD|AMD]]（[[ATI|ATI]]）研发并推出。Radeon HD 4000系列的第一款產品是RV770[[顯示核心|顯示核心]]，採用此晶片的[[顯示卡|顯示卡]]名為Radeon HD 4850，有800個流處理器。而核心頻率更高的HD 4870及HD 4890緊隨其後，更率先採用[[GDDR5|GDDR5]]作為顯示記憶體。最高端顯示卡採用R700核心，是一款雙晶片顯示卡產品，名為HD 4870 X2。
+
+== 背景 ==
+與之前的系列不同，首發的'''Radeon R700'''顯示卡只是中端產品。這與[[AMD|AMD]]調整策略有關。過往，AMD往往在高端市場落後於[[NVIDIA|NVIDIA]]。此次，AMD在中端市場主動出擊，原因是該市場佔用家群一個較大的比例，利潤亦會較高。而對手NVIDIA方面，雖然推出了性能比較強的GTX 200系列顯示卡，但[[性價比|性價比]]明顯比R700不足。以往的[[顯示卡|顯示卡]]開發，是先研製旗艦級產品，再將此功能削減，成為中端和低端顯示卡。面對著顯示核心的架構愈來愈複雜，研發的成本和時間亦愈來愈高。另外，高端產品的市場比較細，產品往往只是技術的演示。而[[ATI|ATI]]在過往與[[NVIDIA|NVIDIA]]競爭的過程中，經常錯過適當的發佈時間，不只輸掉高端市場，亦減慢了中低端顯示卡的發佈。
+
+在AMD收購ATI後，市場策略亦開始調整。今次，公司只會研發針對主流市場的顯示卡，高端顯示卡則由雙核心顯示卡補上，例如Radeon HD 4870 X2。
+
+== 架構 ==
+整體的架構與上一代相約，但作出了多方面的微調。與上一代顯示卡系列一樣，支援[[DirectX|DirectX]] 10.1及Shader Model 4.1。RV770核心有9.56億個[[電晶體|電晶體]]，採用55 [[nm|nm]]製程製造。
+
+=== SIMD(Single Instruction Multiple Data) ===
+同樣是SIMD架構，核心擁有多個SIMD核心。每一個SIMD核心有16個流處理器、獨立的纹理单元和L1快取。
+由於取消了共用快取，各核心可以透過Global DataShare Unit互相溝通。而每個流處理器有5個[[ALU|ALU]]，換言之一個SIMD核心有80個[[ALU|ALU]]。與上一代不同，本次所有的ALU單元都可以作整數位元運算，可大大提升GPGPU應用的效能。RV770顯示核心有10個SIMD核心，合共擁有800個流處理器。
+
+=== 流處理器(Stream Processing Unit) ===
+RV770顯示核心擁有800個流處理器，是上一代RV670的2.5倍。流處理器的結構並沒有任何改變，只是數量上有所上升。每個流處理器有5個[[ALU|ALU]]，所有的ALU單元都可以作整數位元運算。流處理器的架構依然是4D+1D的結構，相對NVIDIA的全1D結構，雖然效率沒有那麼高，但架構簡單，可以輕易提升流處理器的數量。AMD方面，每一個流處理器內的5個ALU會共用一個指令发射端口；NVIDIA方面，一個ALU需要獨立的端口，難以有效提升流處理器的數量。
+
+=== 纹理单元(Texture Unit) ===
+每一個SIMD核心都擁有1組纹理单元，換言之RV770擁有10組纹理单元。每組纹理单元內有4个纹理寻址单元，16个32位元浮点纹理采样单元和4个纹理过滤单元。
+
+=== 快取(Cache) ===
+上一代的顯示核心，[[快取|快取]]（Cache）是被所有的SIMD核心共享的。在R700顯示核心中，每一個SIMD核心都擁有獨立的Cache。這樣做可以降低延遲，提高效率。上一代SIMD可透過共用快取互相溝通，由於採用了獨立快取，所以AMD為每一個核心加裝了Global DataShare Unit，作SIMD互相溝通之用。
+
+=== 片內互聯 ===
+AMD放棄了Ring Bus架構鏈接[[顯示記憶體|顯示記憶體]]，改用回傳統的Crossbar架構。因為縱使Ring Bus架構的結構簡單且可以優化，但延遲率高，亦要用更多的電晶體。最重要的是R600顯示Ring Bus架構對效能的幫助不明顯，
+
+=== 記憶體 ===
+RV770的記憶體[[頻寬|頻寬]]是256-[[位元|bit]]，但使用[[GDDR5|GDDR5]]的話仍可以保持高速率。
+
+=== 光栅单元(Render Back-Ends) ===
+AMD重新設計了光栅单元，用來改善AA性能。亦取消了針對透明及霧化效果的運算單元。而AA算法仍然會交由Shader處理，憑著流處理器的數量是上一代的2.5倍，AA的性能亦有所提升。
+
+=== CrossFire Sideport ===
+[[Image:R700_interconnect.svg|thumb]]
+這一代的雙顯示核心設計仍使用PCI Express橋接晶片。此次使用的是[[PLX技術公司|PLX]]出品，功耗為3.8瓦的PEX 8647晶片，這塊晶片支援[[PCIe|PCIe]] 2.0，允許兩顆GPU運作在相同的PCIe插槽但擁有兩倍於前代產品（Radeon HD 3870 X2）的頻寬。但AMD在此代顯示核心上還內建了一個新的「[[CrossFire|CrossFire]] X Sideport」，用來協調多個顯示核心之間的通訊<ref>{{Cite web |url=http://news.mydrivers.com/1/109/109517_2.htm |title=AMD绝地反击：Radeon HD 4870/4850正式发布 |accessdate=2008-07-14 |archive-date=2008-07-03 |archive-url=https://web.archive.org/web/20080703162206/http://news.mydrivers.com/1/109/109517_2.htm |dead-url=no }}</ref>，提供額外5GB/s且全雙工的GPU間資料傳送頻寬，增進圖形效能。如此一來兩個GPU間的總頻寬達到了21.8GB/s。籍此AMD利用兩顆顯示核心，組成一張顯示卡，用作對抗NVIDIA的高端產品。所以增加CrossFire的效能和效率就變得重要。在這一點上，CrossFire X Sideport內聯器從未被啟用，在任何支援CrossFire的驅動程式上。
+
+=== UVD2(Unified Video Decoder 2 ) ===
+相對第一代的[[UVD|UVD]]，UVD2可以解碼更高码率和分辨率的影片。另外，與NVIDIA的新[[PureVideo|PureVideo]]一樣，可以支援兩段影片同時解碼，方便提供畫中畫功能。新增Dynamic Contrast技術，用來提升影片的光暗對比。另外，顯示核心依然集成了音效卡，支援聲道由5.1升級到7.1，支援[[AC3|AC3]]和[[DTS|DTS]]，亦追加對[[LPCM|LPCM]]的支援。
+
+Radeon HD 4550/4350會支援UVD 2.2。<ref>{{Cite web |url=http://news.mydrivers.com/1/115/115548.htm |title=Radeon HD 4550/4350最终规格、价格详解 |accessdate=2008-09-02 |archive-date=2008-12-02 |archive-url=https://web.archive.org/web/20081202200656/http://news.mydrivers.com/1/115/115548.htm |dead-url=no }}</ref> 提高對高清影片格式的兼容性，支援新一代的影像輸出。
+
+=== AVT(Accelerated Video Transcoding) ===
+利用AVT技術，使用者可以利用R700顯示核心，編碼1080p的高清影片，這相當於GPGPU的一種應用。
+
+== 其他技術 ==
+=== GPGPU ===
+AMD選擇了開放標準，例如苹果電腦推廣的[[OpenCL|OpenCL]]，以至[[DirectX|DirectX]]，或者AMD自家的[[Brook_+|Brook +]]。AMD認為NVIDIA的[[CUDA|CUDA]]是閉源標準，最终都会失败。
+
+=== 物理引擎 ===
+AMD宣佈与[[Havok|Havok]]合作共同优化在AMD四核心处理器下的游戏物理运算的表现，并表示会共同研究将来让[[顯示卡|顯示卡]]支援[[Havok|Havok]]物理引擎。有第三開發者聲稱，[[PhysX|PhysX]]物理引擎可以在R700核心上實現。而NVIDIA就盡全力幫助那一位程式員，讓R700核心支持[[CUDA|CUDA]]技術，藉此讓核心支援[[PhysX|PhysX]]物理引擎。<ref>{{Cite web |url=http://news.mydrivers.com/1/110/110603.htm |title=A卡支持PhysX物理加速 NVIDIA鼎力协助 |accessdate=2008-07-08 |archive-date=2008-07-08 |archive-url=https://web.archive.org/web/20080708212528/http://news.mydrivers.com/1/110/110603.htm |dead-url=no }}</ref>
+
+=== GDDR5 ===
+Radeon HD 4870將會利用[[GDDR5|GDDR5]]作為顯示記憶體，是業界首次採用GDDR5裝備顯示卡。相對而言，NVIDIA就顯得比較保守，只採用GDDR3記憶體，但可以保證產品發佈順利，亦提供足夠的頻寬。對上一次，ATI亦率先採用GDDR4作為X1950 XTX顯示卡的記憶體，但由於頻率提升有限，並未能為新產品提供更大的頻寬。而GDDR5的頻寬更大，功耗更低，亦符合AMD對節能的要求。
+
+但由於GDDR5始終是新技術，所以開始的時候不能大量上市，亦耽誤了HD 4870顯示卡的發佈。而AMD放棄了Ring Bus記憶體架構，採用GDDR5記憶體是迫不得已的做法。
+
+=== PowerPlay ===
+這是一個電源管理技術，RV670將它首次引入到桌面市場中。而在R700顯示核心中，有關的技術亦得到升級。例如，顯示核心可以自行關閉不在工作中的處理單元，亦可以調整核心的電壓和頻率。顯示記憶體方面，就只有頻率可以調整。
+
+== 產品 ==
+=== Radeon HD 4800 ===
+最先推出的是Radeon HD 4850顯示卡，目標是中端市場，擁有800个流处理器，採用GDDR3顯示記憶體。比較高端的Radeon HD 4870 亦在其後推出，除核心頻率有所提升，更採用[[GDDR5|GDDR5]]顯示[[記憶體|記憶體]]。另外，由於RV770的核心頻率還有提升的空間，預計有廠商會推出超頻版本的RV770顯示卡，用來與GTX 280顯示卡競爭。
+
+旗艦型號Radeon HD 4870 X2已於2008年8月12日推出，採用雙顯示核心設計，對手是NVIDIA的GeForce GTX 280，而實際效能比nVidia Geforce GTX 280顯示卡更強，後來NVIDIA推出GeForce GTX 295方能戰勝之。顯示核心亦集成了CrossFire Sideport元件，兩個顯示核心可以雙向5GB/s的頻寬互相連結。<ref>{{Cite web |url=http://news.mydrivers.com/1/113/113695.htm |title=Radeon HD 4870 X2正式发布 |accessdate=2008-08-13 |archive-date=2008-08-19 |archive-url=https://web.archive.org/web/20080819094241/http://news.mydrivers.com/1/113/113695.htm |dead-url=no }}</ref> 橋接晶片方面，採用了PEX8647，支援[[PCI-E|PCI-E]] 2.0。<ref>{{Cite web |url=http://www.pcpop.com/doc/0/319/319704_7.shtml |title=HD4870X2全面评测 |accessdate=2008-08-13 |archive-date=2015-09-24 |archive-url=https://web.archive.org/web/20150924065919/http://www.pcpop.com/doc/0/319/319704_7.shtml |dead-url=no }}</ref>
+
+這個系列最低端的是Radeon HD 4830，它有640個流處理器，對手是GeForce 9800 GT。<ref>{{Cite web |url=http://news.mydrivers.com/1/117/117609.htm |title=Radeon HD 4830官方游戏性能展示 |accessdate=2008-09-26 |archive-date=2016-03-04 |archive-url=https://web.archive.org/web/20160304135824/http://news.mydrivers.com/1/117/117609.htm |dead-url=no }}</ref>
+
+AMD於2009年4月2日（原為4月6日，之後推遲到9日，最後由於產品提早在3月底發售，所以正式的官方發佈時間定為4月2日）<ref>{{Cite web |url=http://news.mydrivers.com/1/130/130906.htm |title=Radeon HD 4890准备就绪 提前一周发布 |accessdate=2009-03-26 |archive-date=2009-03-28 |archive-url=https://web.archive.org/web/20090328110048/http://news.mydrivers.com/1/130/130906.htm |dead-url=no }}</ref> 推出使用RV790核心的Radeon HD 4890，規格與Radeon HD 4870相似，但運作頻率更高。對手是[[NVIDIA|NVIDIA]]的GeForce GTX 275。RV790核心並不是單純的RV770核心超頻版本，還額外增加了300万个晶体管<ref>{{Cite web |url=http://www.pcpop.com/doc/0/387/387655.shtml |title=RV790晶体管数比RV770多 |accessdate=2009-05-04 |archive-date=2009-04-10 |archive-url=https://web.archive.org/web/20090410035125/http://www.pcpop.com/doc/0/387/387655.shtml |dead-url=yes }}</ref>。
+
+AMD於中國內地市場推出Radeon HD 4860，使用RV790核心，只擁有640個流處理器，採用512MB GDDR5顯示記憶體，由於以高時脈運作，所以效能與Radeon HD 4870接近。
+
+=== Radeon HD 4700 ===
+[[File:ATI_Radeon_HD_4770_Graphics_Card-oblique_view.jpg|thumb]]
+Radeon HD 4770於[[2009年4月|2009年4月]]推出，使用AMD首款40nm繪圖核心RV740，擁有640個流處理器，128bit顯示記憶體介面，但採用[[GDDR5|GDDR5]]顯示記憶體，以免記憶體頻宽不足。核心時脈750MHz，記憶體時脈3200MHz。效能較Radeon HD 4830優勝，部份測試成績甚至與Radeon HD 4850相近。由於需求高加上[[台積電|台積電]]的40nm晶片前期生產良率欠佳，造成市面上長期缺貨，相同級別需要由Radeon HD 4850降價接替。本產品可視為半年後推出的Radeon HD 5000系列的實驗品。
+
+=== Radeon HD 4600 ===
+*Radeon HD 4670 - 核心頻率為750MHZ，採用GDDR3顯示記憶體，頻率為1800MHz（容量是512/1024 MB）。核心擁有320个流处理器，但顯示記憶體頻宽仅有128bit，规格参数与HD3850 128-bit(HD3690)相似<ref>{{Cite web |url=http://news.mydrivers.com/1/116/116222.htm |title=AMD正式发布新一代主流显卡Radeon HD 4600 |accessdate=2008-09-12 |archive-date=2008-09-13 |archive-url=https://web.archive.org/web/20080913172408/http://news.mydrivers.com/1/116/116222.htm |dead-url=no }}</ref>。
+
+*Radeon HD 4650 - 核心頻率比4670慢，採用GDDR2顯示記憶體。
+
+=== Radeon HD 4550 ===
+[[File:Sapphire_ATI_Radeon_HD_4550.jpg|thumb]]
+*Radeon HD 4550 - 有80個流處理器，採用GDDR3顯示記憶體，頻寬只有64-bit。
+
+=== Radeon HD 4350 ===
+*Radeon HD 4350 - 與HD 4550同樣有80個流處理器，但只採用GDDR2顯示記憶體。對手是GeForce 9400 GT。
+
+=== FireStream 9000 ===
+GPGPU產品方面，AMD會推出基於RV770核心的FireStream 9250。它支援雙精度和64位元浮點運算。
+
+== 顯示核心規格列表 ==
+=== 桌上型 ===
+==== 獨立顯示核心 ====
+{| class="wikitable" style="font-size: 75%; text-align: center"
+!rowspan=2|型號
+!rowspan=2|發布日期
+!rowspan=2|開發[[代號|代號]]
+!rowspan=2|製程 ([[奈米|nm]])
+!rowspan=2|電晶體數量 (百萬)
+!rowspan=2|晶片面積 ([[平方毫米|mm<sup>2</sup>]])
+!rowspan=2|[[匯流排|匯流排]]介面
+!rowspan=2|顯示記憶體容量 ([[MiB|MiB]])
+!colspan=2 style="text-align:center"|時鐘頻率
+!rowspan=2|核心佈置
+!colspan=2|[[填充率|填充率]]
+!colspan=3|顯示記憶體類型
+!colspan=2 style="text-align:center;" |運算效能<br />GFLOPS
+!colspan=2|熱設計功耗 (W)
+!rowspan=2|GFLOPS/W<br />單精度浮點<br />運算能效
+!colspan=3 style="text-align:center;" | [[應用程式介面|API]]支援 (版本)
+!rowspan=2|發售價格 (美元)
+|-
+!核心 ([[MHz|MHz]])
+!記憶體 ([[MHz|MHz]])
+!像素 ([[Pixel|GP]]/s)
+!材質 ([[材質_(電腦圖形學)|GT]]/s)
+!記憶體頻寬 ([[GB|GB]]/s)
+!匯流排類型
+!記憶體位寬 ([[位元|位元]])
+![[單精度浮點數格式|單精度浮點數]]
+![[雙精度浮點數格式|雙精度浮點數]]
+!空載
+!滿載
+![[DirectX|DirectX]]
+![[OpenGL|OpenGL]]
+![[OpenCL|OpenCL]]
+|-
+!style="text-align:left"|Radeon HD 4350
+|2008年9月30日
+|RV710
+|55
+|242
+|73
+|PCIe 2.0 x16<br />PCIe 2.0 x1<br />AGP 8x
+|256<br />512<br />1024
+|575
+|500
+|80:8:4
+|2.3
+|4.6
+|6.4
+|DDR2
+|64
+|92
+|{{No}}
+|
+|20
+|4.6
+|10.1
+|3.3
+|1.0
+|?
+|-
+!style="text-align:left"|Radeon HD 4550
+|2008年9月30日
+|RV710
+|55
+|242
+|73
+|PCIe 2.0 x16
+|256<br />512<br />1024
+|600<br />600
+|600<br />800
+|80:8:4
+|2.4
+|4.8
+|6.4<br />12.8
+|DDR2<br />GDDR3
+|64
+|96
+|{{No}}
+|
+|25
+|3.84
+|10.1
+|3.3
+|1.0
+|?
+|-
+!style="text-align:left"|Radeon HD 4650
+|2008年9月10日
+|RV730 PRO
+|55
+|514
+|146
+|PCIe 2.0 x16<br />AGP 8x
+|256<br />512<br />1024
+|600<br />650
+|400-500<br />500<br />700
+|320:32:8
+|4.8<br />5.2
+|19.2<br />20.8
+|12.8-16.0<br />16.0<br />22.4
+|DDR2<br />GDDR3<br />GDDR4
+|64<br />128
+|384<br />416
+|{{No}}
+|
+|48
+|8.0<br />8.7
+|10.1
+|3.3
+|1.0
+|?
+|-
+!style="text-align:left"|Radeon HD 4670
+|2008年9月10日
+|RV730 XT
+|55
+|514
+|146
+|PCIe 2.0 x16<br />AGP 8x
+|512<br />1024
+|750<br />750
+|400-500<br />900<br />1000
+|320:32:8
+|6.0
+|24.0
+|12.8-16.0<br />28.8<br />32.0
+|DDR2<br />GDDR3<br />GDDR4
+|128
+|480
+|{{No}}
+|
+|59
+|8.14
+|10.1
+|3.3
+|1.0
+|?
+|-
+!style="text-align:left"|Radeon HD 4730
+|2009年6月8日
+|RV770 CE
+|55
+|956
+|256
+|PCIe 2.0 x16
+|512
+|700<br />750
+|900<br />900
+|640:32:8
+|5.6<br />6.0
+|22.4<br />24.0
+|28.8
+|GDDR3
+|128
+|896<br />960
+|{{Yes|179.2<br />192}}
+|
+|110
+|8.15
+|10.1
+|3.3
+|1.0
+|?
+|-
+!style="text-align:left"|Radeon HD 4770
+|2009年4月28日
+|RV740
+|40
+|826
+|137
+|PCIe 2.0 x16
+|512
+|750
+|800
+|640:32:16
+|12
+|24
+|51.2
+|GDDR5
+|128
+|960
+|{{Yes|192}}
+|
+|80
+|12
+|10.1
+|3.3
+|1.0
+|?
+|-
+!style="text-align:left"|Radeon HD 4830
+|2008年10月21日
+|RV770 LE
+|55
+|956
+|256
+|PCIe 2.0 x16
+|512<br />1024
+|575
+|900
+|640:32:16
+|9.2
+|18.4
+|57.6
+|GDDR3<br />GDDR4
+|256
+|736
+|{{Yes|147.2}}
+|
+|95
+|7.75
+|10.1
+|3.3
+|1.0
+|?
+|-
+!style="text-align:left"|Radeon HD 4850
+|2008年6月25日
+|RV770 PRO
+|55
+|956
+|256
+|PCIe 2.0 x16
+|512<br />1024<br />2048
+|625
+|993
+|800:40:16
+|10
+|25
+|63.55
+|GDDR3<br />GDDR4
+|256
+|1000
+|{{Yes|200}}
+|
+|110
+|9.09
+|10.1
+|3.3
+|1.0
+|?
+|-
+!style="text-align:left"|Radeon HD 4860
+|2009年9月9日
+|RV790 GT
+|55
+|959
+|282
+|PCIe 2.0 x16
+|512<br />1024
+|700
+|750
+|640:32:16
+|11.2
+|22.4
+|96
+|GDDR5
+|256
+|896
+|{{Yes|179.2}}
+|
+|130
+|6.89
+|10.1
+|3.3
+|1.0
+|?
+|-
+!style="text-align:left"|Radeon HD 4870
+|2008年6月25日
+|RV770 XT
+|55
+|956
+|256
+|PCIe 2.0 x16
+|512<br />1024<br />2048
+|750
+|900
+|800:40:16
+|12
+|30
+|115.2
+|GDDR5
+|256
+|1200
+|{{Yes|240}}
+|
+|150
+|8
+|10.1
+|3.3
+|1.0
+|?
+|-
+!style="text-align:left"|Radeon HD 4890
+|2009年4月2日
+|RV790 XT
+|55
+|959
+|282
+|PCIe 2.0 x16
+|1024<br />2048
+|850
+|975
+|800:40:16
+|13.6
+|34
+|124.8
+|GDDR5
+|256
+|1360
+|{{Yes|272}}
+|
+|190
+|7.16
+|10.1
+|3.3
+|1.0
+|?
+|-
+!style="text-align:left"|Radeon HD 4850 X2
+|2008年11月7日
+|R700
+|55
+|956x2
+|256x2
+|PCIe 2.0 x16
+|512x2<br />1024x2
+|625
+|993
+|800:40:16 ×2
+|2× 10
+|2× 25
+|2× 63.55
+|GDDR3
+|256x2
+|2000
+|{{Yes|400}}
+|
+|250
+|8
+|10.1
+|3.3
+|1.0
+|?
+|-
+!style="text-align:left"|Radeon HD 4870 X2
+|2008年8月12日
+|R700
+|55
+|956x2
+|256x2
+|PCIe 2.0 x16
+|1024x2
+|750
+|900
+|800:40:16 ×2
+|2× 12
+|2× 30
+|2× 115.2
+|GDDR5
+|256x2
+|2400
+|{{Yes|480}}
+|
+|286
+|8.39
+|10.1
+|3.3
+|1.0
+|?
+|}
+<sup>1</sup> [[GPGPU|統一渲染單元]]數量 : [[紋理對映單元|紋理對映單元]]數量 : [[渲染輸出單元|渲染輸出單元]]數量
+<br /><sup>2</sup>[[GDDR5|GDDR5]][[顯示記憶體|顯示記憶體]]的資料傳送速率是其時鐘頻率的4倍，而非其它DDR記憶體的兩倍
+<br /><sup>3</sup>熱設計功耗（TDP）數值來源於超微官方資料。不同廠商的非公版顯示卡電路板設計會使得實際TDP數值和官方資料的有所不同。
+<br /><sup>4</sup>全部型號帶有UVD2、ATI PowerPlay功能
+
+==== 整合式顯示核心 ====
+這一列表是Radeon HD 4000中內建於AMD晶片組系列的型號，整合這些型號的晶片組有[[AMD_700晶片組系列|700系列]]、[[AMD_800_芯片组系列|800系列]]以及[[AMD_900_芯片组系列|900系列]]（980G，實際是880G的更名版本）。這些型號全部支援DirectX 10.1以及OpenGL 3.3。
+
+{| class="wikitable" style="font-size: 75%; text-align: center"
+! rowspan=2 style="width:12em"| 型號
+!rowspan=2|發布日期
+!rowspan=2|開發[[代號|代號]]
+! rowspan=2|圖形核心
+!rowspan=2|製程 ([[奈米|nm]])
+!rowspan=2|電晶體數量 (百萬)
+!rowspan=2|晶片面積 ([[平方毫米|mm<sup>2</sup>]])
+!rowspan=2|[[匯流排|匯流排]]介面
+! rowspan=2|記憶體容量<sup>3</sup> ([[MiB|MiB]])
+! rowspan=2|核心時脈<sup>2</sup> ([[MHz|MHz]])
+!rowspan=2|核心佈置<sup>1</sup>
+!colspan=3|[[填充率|填充率]]
+!colspan=4|顯示記憶體類型
+! rowspan=2|運算效能<br />GFLOPS
+! rowspan=2|特性/備註
+|-
+!像素 ([[Pixel|GP]]/s)
+!材質 ([[材質_(電腦圖形學)|GT]]/s)
+! FP32 ([[Pixel|GP]]/s)
+!記憶體頻寬 ([[GB|GB]]/s)
+!匯流排類型
+!有效時脈 ([[MHz|MHz]])
+!記憶體位寬 ([[位元|位元]])
+|-
+! style="text-align:left"| Radeon HD 4200 Graphics (785G晶片組)
+|2009年8月
+|RS880
+|rowspan=3|RV620
+|rowspan=3|55
+|rowspan=3|>205
+|rowspan=3|~73 (~9 × 8.05)
+|rowspan=3|HT 3.0
+|rowspan=2|最高可從系統記憶體佔用512 + 可選的專用128（即板載顯存）
+|500
+|rowspan=3|40:4:4
+|2
+|2
+|1
+|rowspan=3|20.8 (系統記憶體) + 2.6 (專用)
+|[[HyperTransport|HT]] (系統) + [[DDR2_SDRAM|DDR2]]-1066 [[DDR3|DDR3]]-1333 (專用)
+|rowspan=3|1333 (專用)
+|rowspan=3|16 (專用)
+|40
+|rowspan=3|[[UVD2|UVD2]]
+|-
+! style="text-align:left"| Radeon HD 4250 Graphics (880G晶片組、980G晶片組)
+|rowspan=2|2010年3月（880G）、2011年9月（980G）
+|RS880
+|560
+|2.24
+|2.24
+|1.12
+|rowspan=2|[[HyperTransport|HT]] (系統) + [[DDR3|DDR3]]-1333 (專用)
+|44.8
+|-
+! style="text-align:left"| Radeon HD 4290 Graphics (890GX晶片組)
+|RS880D
+|最多佔用系統記憶體512 + 專用128
+|700
+|2.8
+|2.8
+|1.4
+|56
+|}
+<sup>1</sup> [[GPGPU|統一渲染單元]]數量 : [[紋理對映單元|紋理對映單元]]數量 : [[渲染輸出單元|渲染輸出單元]]數量
+<br /><sup>2</sup>在[[ATI_PowerPlay|ATI PowerPlay]]節電技術生效時，核心時脈在不同的使用場合時會有所不同。這個列表列出的時脈數值是官方預設的時脈值參數<br /><sup>3</sup>整合顯示核心的專用記憶體採用特別的sideport匯流排，用作[[顯示記憶體|顯示記憶體]]
+
+=== 行動型顯示核心 ===
+這個列表除了獨立顯示核心以外，還包括整合於[[北橋晶片|北橋晶片]]內的整合式顯示核心。
+
+{| class="wikitable" style="font-size: 75%; text-align: center; width: auto"
+!rowspan=2|型號<ref name="AMDMobilityX">{{Cite web |url=http://products.amd.com/en-us/MobilityGPUResult.aspx |title=ATI Radeon Mobility Graphics Cards |accessdate=2013-10-02 |archive-date=2010-03-01 |archive-url=https://web.archive.org/web/20100301062750/http://products.amd.com/en-us/MobilityGPUResult.aspx |dead-url=no }}</ref>
+!rowspan=2|發布日期
+!rowspan=2|型號代號
+!rowspan=2|開發[[代號|代號]]
+!rowspan=2|製程 ([[奈米|nm]])
+!rowspan=2|[[匯流排|匯流排]]介面
+!rowspan=2|記憶體容量 ([[MiB|MiB]])
+!rowspan=2|時鐘頻率 ([[MHz|MHz]])
+!rowspan=2|記憶體時脈 ([[MHz|MHz]])
+!rowspan=2|核心佈置<sup>1</sup>
+! colspan=2|[[填充率|填充率]]
+! colspan=3|記憶體
+! colspan=2|[[應用程式介面|API]]相容性 (版本)
+! rowspan=2|運算能力 <br> GFLOPs
+! rowspan=2|備註
+|-
+!像素 ([[Pixel|GP]]/s)
+!材質 (GT/s)
+!頻寬 ([[GB|GB]]/s)
+!匯流排類型
+!匯流排位寬 ([[位元|位元]])
+![[DirectX|DirectX]]
+![[OpenGL|OpenGL]]
+|- valign="top"
+! style="text-align:left"| Mobility Radeon HD 4200
+|2009年9月10日
+|{{unk}}
+|RV620
+|55
+|內建PCIe x16 1.1
+|可最多從系統記憶體中佔用512
+|500
+|800<br />(系統記憶體)
+|40:4:4
+|2
+|2
+|6.4/12.8
+|[[DDR2_SDRAM|DDR2]] [[DDR3|DDR3]]
+|64/128
+|10.1
+|2.0
+|40
+|[[UVD|UVD]]2, PowerPlay 7.0
+|- valign="top"
+! style="text-align:left"| Mobility Radeon HD 4225
+|2010年5月1日
+|{{unk}}
+|RV620
+|55
+|內建PCIe x16 1.1
+|可最多從系統記憶體中佔用512
+|380
+|800<br />(系統記憶體)
+|40:4:4
+|1.52
+|1.52
+|6.4/12.8
+|[[DDR2_SDRAM|DDR2]] [[DDR3|DDR3]]
+|64/128
+|10.1
+|2.0
+|30.4
+|[[UVD|UVD]]2, PowerPlay 7.0
+|- valign="top"
+! style="text-align:left"| Mobility Radeon HD 4250
+|2010年5月1日
+|{{unk}}
+|RV620
+|55
+|內建PCIe x16 1.1
+|可最多從系統記憶體中佔用512
+|500
+|800<br />(系統記憶體)
+|40:4:4
+|2
+|2
+|6.4/12.8
+|[[DDR2_SDRAM|DDR2]] [[DDR3|DDR3]]
+|64/128
+|10.1
+|2.0
+|40
+|[[UVD|UVD]]2, PowerPlay 7.0
+|- valign="top"
+! style="text-align:left"| Mobility Radeon HD 4270
+|2010年5月1日
+|{{unk}}
+|RV620
+|55
+|內建PCIe x16 1.1
+|可最多從系統記憶體中佔用512
+|590
+|800<br />(系統記憶體)
+|40:4:4
+|2.36
+|2.36
+|6.4/12.8
+|[[DDR2_SDRAM|DDR2]] [[DDR3|DDR3]]
+|64/128
+|10.1
+|2.0
+|47.2
+|[[UVD|UVD]]2, PowerPlay 7.0
+|- valign="top"
+! style="text-align:left"| Mobility Radeon HD 4330
+|2009年1月9日
+|M92
+|RV710
+|55
+|PCIe x16 2.0
+|512
+|450
+|600
+|80:8:4
+|1.8
+|3.6
+|9.6
+|[[DDR2_SDRAM|DDR2]]<br />[[DDR3|DDR3]]<br />[[GDDR3|GDDR3]]
+|64
+|10.1
+|3.3
+|72
+|[[UVD|UVD]]2, PowerPlay 7.0
+|- valign="top"
+! style="text-align:left"| Mobility Radeon HD 4530
+|2009年1月9日
+|M92
+|RV710
+|55
+|PCIe x16 2.0
+|512
+|500
+|700
+|80:8:4
+|2
+|4
+|11.2
+|[[DDR2_SDRAM|DDR2]]<br />[[DDR3|DDR3]]<br />[[GDDR3|GDDR3]]
+|64
+|10.1
+|3.3
+|80
+|[[UVD|UVD]]2, PowerPlay 7.0
+|- valign="top"
+! style="text-align:left"| Mobility Radeon HD 4550
+|2010年1月1日
+|M92
+|RV710
+|55
+|PCIe x16 2.0
+|512
+|550
+|700
+|80:8:4
+|2.2
+|4.4
+|11.2
+|[[DDR2_SDRAM|DDR2]]<br />[[DDR3|DDR3]]<br />[[GDDR3|GDDR3]]
+|64
+|10.1
+|3.3
+|80
+|[[UVD|UVD]]2, PowerPlay 7.0
+|- valign="top"
+! style="text-align:left"| Mobility Radeon HD 4570
+|2009年1月9日
+|M92
+|RV710
+|55
+|PCIe x16 2.0
+|512
+|680
+|800
+|80:8:4
+|2.72
+|5.44
+|12.8
+|[[DDR2_SDRAM|DDR2]]<br />[[DDR3|DDR3]]<br />[[GDDR3|GDDR3]]
+|64
+|10.1
+|3.3
+|108.8
+|[[UVD|UVD]]2, PowerPlay 7.0
+|- valign="top"
+! style="text-align:left"| Mobility Radeon HD 4650<ref name="AmdMobility4600">{{Cite web |url=http://ati.amd.com/products/mobilityradeonhd4600/index.html |title=ATI Mobility Radeon HD 4600 Series Graphics – Overview |accessdate=2013-10-02 |archive-date=2010-02-10 |archive-url=https://web.archive.org/web/20100210202642/http://ati.amd.com/products/mobilityradeonhd4600/index.html |dead-url=yes }}</ref>
+|2009年1月9日
+|M96
+|RV730
+|55
+|PCIe x16 2.0
+|512<br />1024
+|500<br />550
+|600<br />800
+|320:32:8
+|4<br />4.4
+|16<br />17.6
+|19.2<br />25.6
+|[[DDR2_SDRAM|DDR2]]<br />[[DDR3|DDR3]]<br />[[GDDR3|GDDR3]]
+|128
+|10.1
+|3.3
+|320<br />352
+|[[UVD|UVD]]2, PowerPlay 7.0
+|- valign="top"
+! style="text-align:left"| Mobility Radeon HD 4670<ref name="AmdMobility4600"/>
+|2009年1月9日
+|M96-XT
+|RV730
+|55
+|PCIe x16 2.0
+|512<br />1024
+|675
+|800
+|320:32:8
+|5.4
+|21.6
+|12.8<br />25.6
+|[[DDR2_SDRAM|DDR2]]<br />[[DDR3|DDR3]]<br />[[GDDR3|GDDR3]]
+|128
+|10.1
+|3.3
+|432
+|[[UVD|UVD]]2, PowerPlay 7.0
+|- valign="top"
+! style="text-align:left"| Mobility Radeon HD 4830<ref name="AmdMobility4800"/>
+|2009年3月3日<ref name="PressRelease4860"/>
+|M97
+|RV740
+|40
+|PCIe x16 2.0
+|512<br />1024
+|400/600<br />400/600
+|800/900<br />800/900
+|640:32:16
+|6.4/9.6<br />6.4/9.6
+|12.8/19.2<br />12.8/19.2
+|25.6/28.8<br />25.6/28.8
+|[[GDDR3|GDDR3]]<br />[[DDR3|DDR3]]
+|128
+|10.1
+|3.3
+|512/768<br />512/768
+|[[UVD|UVD]]2, PowerPlay 7.0
+|- valign="top"
+! style="text-align:left"| Mobility Radeon HD 4850<ref name="ATIID">[http://ati.amd.com/developer/vendorid.html ATI Device ID page] {{Wayback|url=http://ati.amd.com/developer/vendorid.html |date=20100619083209 }}. Retrieved April 1, 2008.</ref>
+|2009年1月9日
+|M98
+|RV770
+|55
+|PCIe x16 2.0
+|1024
+|500
+|850<br />700
+|800:40:16
+|8
+|20
+|54.4<br />89.6
+|[[GDDR3|GDDR3]]<br />[[GDDR5|GDDR5]]<sup>2</sup>
+|256
+|10.1
+|3.3
+|800
+|[[UVD|UVD]]2, PowerPlay 7.0
+|- valign="top"
+! style="text-align:left"| Mobility Radeon HD 4860<ref name="AmdMobility4800">[http://www.amd.com/mobility/hd4800 ATI Mobility Radeon HD 4800 Series]{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>
+||2009年3月3日<ref name="PressRelease4860">{{Cite web |url=http://www.amd.com/us/press-releases/Pages/amd_launches_worlds_first-2009mar03.aspx |title=AMD Launches World’s First 40 nm Graphics Processors |accessdate=2013-10-02 |archive-date=2010-02-19 |archive-url=https://web.archive.org/web/20100219234213/http://www.amd.com/us/press-releases/Pages/amd_launches_worlds_first-2009mar03.aspx |dead-url=no }}</ref>
+|M97
+|RV740
+|40
+|PCIe x16 2.0
+|1024
+|650
+|1000
+|640:32:16
+|10.4
+|20.8
+|64.0
+|[[GDDR5|GDDR5]]<sup>2</sup>
+|128
+|10.1
+|3.3
+|832
+|[[UVD|UVD]]2, PowerPlay 7.0
+|- valign="top"
+! style="text-align:left"| Mobility Radeon HD 4870
+|2009年1月9日
+|M98-XT
+|RV770
+|55
+|PCIe x16 2.0
+|512<br />1024
+|550
+|888<br />700
+|800:40:16
+|8.8
+|22
+|56.832<br />89.6
+|[[GDDR3|GDDR3]]<br />[[GDDR5|GDDR5]]<sup>2</sup>
+|256
+|10.1
+|3.3
+|880
+|[[UVD|UVD]]2, PowerPlay 7.0
+|- valign="top"
+! style="text-align:left"| Mobility Radeon HD 4870 X2
+|2009年1月9日
+|M98-XT
+|RV770
+|55
+|PCIe x16 2.0
+|2048
+|550
+|700
+|2x [800:40:16]
+|2x 8.8
+|2x 22
+|2x 89.6
+|[[GDDR5|GDDR5]]<sup>2</sup>
+|2x 256
+|10.1
+|3.3
+|2x 880
+|[[UVD|UVD]]2, PowerPlay 7.0<br />雙GPU解決方案
+|}
+<sup>1</sup> [[GPGPU|統一渲染單元]]數量 : [[紋理對映單元|紋理對映單元]]數量 : [[渲染輸出單元|渲染輸出單元]]數量
+<br /><sup>2</sup>[[GDDR5|GDDR5]][[顯示記憶體|顯示記憶體]]的資料傳送速率是其時鐘頻率的4倍，而非其它DDR記憶體的兩倍
+
+==參考文獻==
+<div class="references-small">
+<references></references>
+</div>
+
+==参见==
+* [[GeForce_GTX_200|GeForce GTX 200]]
+* [[ATI顯示核心列表|ATI顯示核心列表]]
+
+==外部連結==
+* [https://web.archive.org/web/20080701085758/http://ati.amd.com/products/Radeonhd4800/index.html ATI Radeon™ HD 4800 Series – Overview]
+{{ATI}}
+
+[[Category:ATI顯示卡|Category:ATI顯示卡]]

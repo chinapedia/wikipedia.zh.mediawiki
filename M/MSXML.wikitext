@@ -1,0 +1,203 @@
+'''微软XML核心服务'''（'''MSXML'''）提供了一组服务，使用户可以使用[[JScript|JScript]]、[[VBScript|VBScript]]和其它微软的开发工具开发基于[[XML|XML]]的本机应用程序。它支持XML 1.0、[[Document_Object_Model|DOM]]、[[Simple_API_for_XML|SAX]]、[[XSL_Transformations|XSLT]] 1.0，并提供了包括[[XSD|XSD]]和[[XDR_Schema|XDR]]在内的[[XML_schema|XML schema]]、XMLHttpRequest、XPath、SOM（）等技术。
+== 版本历史 ==
+'''MSXML'''是不同产品的合集。可从此处枚举各个版本：<ref>[http://support.microsoft.com/kb/269238 MSXML Version List] {{Wayback|url=http://support.microsoft.com/kb/269238 |date=20150304221355 }} at Microsoft.</ref>  
+=== 现行有效版本 ===
+* '''MSXML 6.0''' MSXML6是最新版本。与MSXML3一起随[[Microsoft_SQL_Server_2005|Microsoft SQL Server 2005]]、[[Microsoft_Visual_Studio|Visual Studio 2005]]、[[.NET_Framework_3.0|.NET Framework 3.0]]、[[Windows_Vista|Windows Vista]]、[[Windows_XP_Service_Pack_3|Windows XP Service Pack 3]]发行。支持64位本地环境。版本6可以替代版本4<ref>{{Cite web |url=http://msdn.microsoft.com/en-us/library/jj152146(v=vs.85).aspx |title=MSDN：MSXML版本6可以替代版本4 |accessdate=2018-01-13 |archive-date=2018-01-13 |archive-url=https://web.archive.org/web/20180113204504/https://msdn.microsoft.com/en-us/library/jj152146(v=vs.85).aspx |dead-url=no }}</ref>，但不能替代版本3。MSXML 6不支持[[Windows_9x|Windows 9x]]。
+* '''MSXML 3.0'''对应于msxml3.dll。MSXML 3.0 SP2随[[Windows_XP|Windows XP]]、[[Internet_Explorer|Internet Explorer]] 6.0与[[Microsoft_Data_Access_Components|MDAC]] 2.7发行。Windows XP SP2包含MSXML 3.0 SP5，作为MDAC 2.81的一部分。Internet Explorer 版本[[Internet_Explorer_6|6.0]]、[[Internet_Explorer_7.0|7.0]]、[[Internet_Explorer_8|8.0]]使用MSXML 3解析XML文档。MSXML 3.0 SP7是[[Windows_95|Windows 95]]支持的最高版本。Windows XP SP3包含MSXML 3.0 SP9。[[Windows_Vista|Windows Vista]]包含MSXML 3.0 SP10。
+
+=== 过时版本 ===
+* '''MSXML 5.0'''随[[Microsoft_Office|Microsoft Office]] 2003与[[Office_2007|Office 2007]]发布。Microsoft没有发布5.0的文档，因为MSXML 5仅为Office 2003与2007内部使用。[[Microsoft_Office_2010|Office 2010]]不包含MSXML 5.0。<ref>{{Cite web |url=https://technet.microsoft.com/en-us/library/cc178954%28office.14%29.aspx#BKMK_WhatsRemoved |title=Office 2010: What's removed: Office 2010 Resource Kit documentation on TechNet |accessdate=2018-01-13 |archive-date=2017-08-26 |archive-url=https://web.archive.org/web/20170826192415/https://technet.microsoft.com/en-us/library/cc178954%28office.14%29.aspx#BKMK_WhatsRemoved |dead-url=no }}</ref>
+* '''MSXML 4.0'''随独立的、可下载的SDK发布，不能完全兼容版本3.0 。只有32位版本。MSXML 4.0 SP3是最高版本。<ref name="MSXML4SP3">{{Citation |title=MSXML 4.0 SP3 Release Notes |publisher=[[Microsoft|Microsoft]] |date=2009-09-29 |url=http://download.microsoft.com/download/A/2/D/A2D8587D-0027-4217-9DAD-38AFDB0A177E/MSXML4%20SP3%20RTM%20Release%20Note.htm |accessdate=2011-01-21 |archive-date=2020-08-06 |archive-url=https://web.archive.org/web/20200806185226/https://download.microsoft.com/download/A/2/D/A2D8587D-0027-4217-9DAD-38AFDB0A177E/MSXML4%20SP3%20RTM%20Release%20Note.htm |dead-url=no }}</ref>并于2014年4月过期。<ref name="MSXML4SP3SupportLifeCycle">{{Citation |title=MSXML Roadmap |publisher=[[Microsoft|Microsoft]] |date=2013-03-15 |url=https://msdn.microsoft.com/en-us/library/jj152146(v=vs.85).aspx |accessdate=2015-07-11 |archive-date=2018-01-13 |archive-url=https://web.archive.org/web/20180113204504/https://msdn.microsoft.com/en-us/library/jj152146(v=vs.85).aspx |dead-url=no }}</ref>
+* '''MSXML 2.6'''随[[Microsoft_SQL_Server|Microsoft SQL Server]] 2000与MDAC 2.6发布，对应于msxml2.dll，最后版本为 [http://support.microsoft.com/kb/887606 KB887606] {{Wayback|url=http://support.microsoft.com/kb/887606 |date=20150219143919 }}.
+* '''MSXML 2.5'''随[[Windows_2000|Windows 2000]]中的[[Internet_Explorer|Internet Explorer]] 5.01 与[[Microsoft_Data_Access_Components|MDAC]] 2.5发布。对应于msxml.dll
+* '''MSXML 2.0a'''随[[Internet_Explorer_5.0|Internet Explorer 5.0]]发布
+* '''MSXML 1.0'''随[[Internet_Explorer_4|Internet Explorer 4.0]]发布
+
+==DOM==
+MSXML以COM接口（Interface）的形式提供了一套XML的分析器（parser），从而实现了DOM。
+
+常用的接口：
+===IXMLDOMDocument===
+IXMLDOMDocument是XML文档接口，是DOM树结构的根结点。
+<syntaxhighlight lang="cpp">
+//声明并创建一个IXMLDOMDocument的智能指针：
+MSXML2::IXMLDOMDocumentPtr pXmlDoc;
+HRESULT hr = pXmlDoc.CreateInstance( __uuidof(MSXML2::DOMDocument60), NULL, CLSCTX_INPROC_SERVER);
+if( FAILED(hr))
+        printf("Failed to create DOM document interface pointer.\n");
+
+//加载xml文件代码为： 
+try
+{
+        pXmlDoc->async = VARIANT_FALSE; // 使用阻塞式同步加载xml文件。默认是异步方式加载，还需要检查IXMLDOMDocument的ReadyState，这特别适用于从网络上加载。 
+        pXmlDoc->validateOnParse = VARIANT_FALSE;//加载xml文件时，是否依据xml文件中指明的DTD或schema检查xml文件的结构
+        pXmlDoc->resolveExternals = VARIANT_FALSE;//分析xml时，外部定义或ocument type definition(DTD)等不被处理
+        if( pXmlDoc->load("test.xml") != VARIANT_TRUE)
+        {
+            printf("Fail reason: %s\n", (LPCSTR)pXmlDoc->parseError->Getreason());
+       }
+       else
+       {
+            // success
+       }
+}
+catch(_com_error errorObject)
+{
+        printf("Exception, HRESULT = 0x%08x", errorObject.Error());
+} 
+
+//保存xml文件：
+try
+{   
+        if( FAILED( pXmlDoc->save(L"myData.xml")))
+        {
+              printf("Fail reason: %s\n", (LPCSTR)pXmlDoc->parseError->Getreason());
+         }
+         else
+         { 
+             // success
+          }
+}
+catch(_com_error errorObject)
+{
+          printf("Exception, HRESULT = 0x%08x", errorObject.Error());
+}
+</syntaxhighlight>
+===IXMLDOMNode===
+IXMLDOMNode是通用的节点接口，各种类型节点接口都从它派生，包括IXMLDOMDocument。节点类型包括：
+{| class="wikitable"
+|-
+! 节点类型 !! 示例
+|-
+| NODE_ELEMENT || <'''artist''' type="band">The Offspring<'''/artist'''>
+|-
+| NODE_ATTRIBUTE|| '''type="band"'''>The Offspring
+|-
+| NODE_TEXT || '''The Offspring'''
+|-
+| NODE_CDATA_SECTION || 示例
+|-
+| NODE_ENTITY_REFERENCE || 示例
+|-
+| NODE_ENTITY || 示例
+|-
+| NODE_PROCESSING_INSTRUCTION || <'''?xml version="1.0"?'''>
+|-
+| NODE_COMMENT || 示例
+|-
+| NODE_DOCUMENT || 示例
+|-
+| NODE_DOCUMENT_TYPE || <'''!DOCTYPE compactdiscs SYSTEM "cds.dtd"'''>
+|-
+| NODE_DOCUMENT_FRAGMENT || 示例
+|-
+| NODE_NOTATION || 示例
+|}
+ 
+获取根节点的一种方法：
+<syntaxhighlight lang="cpp">
+MSXML2::IXMLDOMNodePtr pRootNode, pTempNode;
+pXmlDoc->get_firstChild(&pRootNode);
+while( pRootNode)
+{
+         MSXML2::DOMNodeType type;
+         pRootNode->get_nodeType(&type);
+         if(type==NODE_ELEMENT)  // 如果是element节点，而不是注释、回车符等
+              break;                            //找到了根节点
+         pTempNode = pRootNode;
+         pTempNode->get_nextSibling(&pRootNode);
+}  
+</syntaxhighlight>
+===IXMLDOMNodeList===
+IXMLDOMNodeList是节点列表的接口，表示一组兄弟（sibling）节点的列表。可以通过index从0开始遍历列表。列表中的元素还是动态的，会随着XML文档的改变而更新。
+===IXMLDOMNamedNodeMap===
+IXMLDOMNamedNodeMap是命名节点的无序集合的接口。该接口常用于表示节点的属性集，并且是动态的。
+===IXMLDOMElement===
+IXMLDOMElement是元素的接口，一般用来表示一个节点及其属性。
+<syntaxhighlight lang="cpp">
+//获取文档根节点的方法一：
+MSXML2::IXMLDOMElementPtr pRootNode = pXmlDoc->documentElement;
+//获取文档根节点的方法二：
+MSXML2::IXMLDOMElementPtr pRootNode2;
+pXmlDoc->get_documentElement(&pRootNode2);
+</syntaxhighlight>
+===IXMLDOMAttribute===
+IXMLDOMAttribute是节点属性的接口。
+===IXMLDOMText===
+IXMLDOMText是节点的文本的接口。
+===IXMLDOMComment===
+IXMLDOMComment是XML文档的注释的接口。
+===IXMLDOMParseError===
+IXMLDOMParseError是XML分析时语法出错的接口，包括了错误的详细信息。
+===IXMLDOMImplementation===
+===IXMLDOMCharacterData===
+IXMLDOMCharacterData是字符数据的接口。也是一批基于字符的接口的基类。
+===IXMLDOMCDATASection===
+IXMLDOMCDATASection是CDATA类型的文本的接口。
+===IXMLDOMDocumentFragment===
+===IXMLDOMDocumentType===
+===IXMLDOMProcessingInstruction===
+===IXMLDOMNotation===
+===IXMLDOMEntity===
+===IXMLDOMEntityRefernce===
+===各种智能指针===
+DOM的各种接口一般都有相应的智能指针接口，通常为接口名加上Ptr。例如IXMLDOMDocument的智能指针接口为IXMLDOMDocumentPtr。 
+==C++语言使用==
+需要在源程序中加入这行：<syntaxhighlight lang="C++">
+#import <msxml6.dll> raw_interfaces_only
+</syntaxhighlight>
+这使得在工程（Project）的编译文件夹下生成msxml6.tlh和msxml6.tli两个文件，分别相当于COM接口的头文件与实现文件。“raw_interfaces_only”属性使得生成的msxml6.tlh中，各个结构中只包含返回类型为HRESULT的接口函数，并且接口函数名省去了raw_前缀；如果不用该属性，则默认是在各个结构中声明了一套带raw_前缀的返回HRESULT类型的接口函数以及不带raw_前缀的返回各种VARIANT_类型的wrapper接口函数。
+
+也可以通过连接输入库文件msxml6.lib来使用。
+
+作为COM库，在线程的开头与结束之处需要分别调用COM环境的初始化与去初始化函数：CoInitialize、CoUninitialize。
+
+MSXML的各种资源都放在了MSXML2名字空间（namespace）中。
+==Visual Basic使用==
+首先在Visual Basic的Project上打开Add Reference对话框，在COM标签页（tab）中，增加“Microsoft, v6.0”的引用。也可以选择4.0或5.0版本的引用。<ref>{{Cite web |url=https://msdn.microsoft.com/library/aa468547 |title=MSDN:A Beginner's Guide to the XML DOM |accessdate=2015-12-02 |archive-date=2015-12-09 |archive-url=https://web.archive.org/web/20151209072903/https://msdn.microsoft.com/library/aa468547 |dead-url=no }}</ref>
+
+然后，在源代码中输入：
+<syntaxhighlight lang="basic">
+Dim xDoc As MSXML.DOMDocument 
+Set xDoc = New MSXML.DOMDocument
+
+'If xDoc.Load("http://www.develop.com/hp/brianr/cds.xml") Then
+If xDoc.Load("C:\My Documents\cds.xml") Then
+   ' The document loaded successfully.
+   ' Now do something intersting.
+Else
+    ' The document failed to load.
+   Dim strErrText As String
+   Dim xPE As MSXML.IXMLDOMParseError
+   ' Obtain the ParseError object
+   Set xPE = xDoc.parseError
+   With xPE
+      strErrText = "Your XML Document failed to load" & _
+        "due the following error." & vbCrLf & _
+        "Error #: " & .errorCode & ": " & .reason & _
+        "Line #: " & .Line & vbCrLf & _
+        "Line Position: " & .linepos & vbCrLf & _
+        "Position In File: " & .filepos & vbCrLf & _
+        "Source Text: " & .srcText & vbCrLf & _
+        "Document URL: " & .url
+    End With
+
+    MsgBox strErrText, vbExclamation
+
+End If
+
+
+Set xDoc = Nothing
+</syntaxhighlight>
+==VBScript使用==
+ Set objParser = CreateObject( "Microsoft.XMLDOM" )
+
+==参考文献==
+*[http://blogs.msdn.com/b/xmlteam/ MSDN:Microsoft XML Team Blog] {{Wayback|url=http://blogs.msdn.com/b/xmlteam/ |date=20160307071246 }}
+<references/>
+
+{{Microsoft APIs}}
+{{Internet Explorer}}
+[[Category:微軟API|Category:微軟API]]
+[[Category:XML|Category:XML]]
+[[Category:Internet_Explorer|Category:Internet Explorer]]

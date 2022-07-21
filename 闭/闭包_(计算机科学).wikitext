@@ -1,0 +1,203 @@
+{{noteTA
+|G1=IT
+}}
+
+在[[计算机科学|计算机科学]]中，'''闭包'''（{{lang-en|Closure}}），又稱'''词法闭包'''（{{lang|en|Lexical Closure}}）或'''函數閉包'''（{{lang|en|function closures}}），是在支持[[头等函数|头等函数]]的编程语言中实现[[作用域#静态作用域与动态作用域|词法]][[名字绑定|绑定]]的一种技术。闭包在实现上是一个结构体，它存储了一个函数（通常是其入口地址）和一个关联的环境（相当于一个符号查找表）。环境里是若干对符号和值的对应关系，它既要包括[[约束变量|约束变量]]（该函数内部绑定的符号），也要包括[[自由变量|自由变量]]（在函数外部定义但在函数内被引用），有些函数也可能没有自由变量。闭包跟函数最大的不同在于，当捕捉闭包的时候，它的自由变量会在捕捉时被确定，这样即便脱离了捕捉时的上下文，它也能照常运行。捕捉时对于值的处理可以是值拷贝，也可以是名称引用，这通常由语言设计者决定，也可能由用户自行指定（如C++）。
+
+==概述==
+闭包的概念出现于60年代，最早实现闭包的程序语言是[[Scheme|Scheme]]。之后，闭包被广泛使用于[[函数式编程|函数式编程]]语言如[[ML语言|ML语言]]和[[LISP|LISP]]。很多命令式程序语言也开始支持闭包。
+
+在支持[[头等函数|头等函数]]的语言中，如果函数f内定义了函数g，那么如果g存在[[自由变量|自由变量]]，且这些自由变量没有在编译过程中被优化掉，那么将产生闭包。
+
+闭包和[[匿名函数|匿名函数]]经常被用作同义词。但严格来说，匿名函数就是字面意义上没有被赋予名称的函数，而闭包则实际上是一个函数的实例，也就是说它是存在于内存里的某个结构体。如果从实现上来看的话，匿名函数如果没有捕捉自由变量，那么它其实可以被实现为一个函数指针，或者直接内联到调用点，如果它捕捉了自由变量那么它将是一个闭包；而闭包则意味着同时包括函数指针和环境两个关键元素。在编译优化当中，没有捕捉自由变量的闭包可以被优化成普通函数，这样就无需分配闭包结构体，这种编译技巧被称为[https://en.wikipedia.org/wiki/Lambda_lifting 函数跃升] {{Wayback|url=https://en.wikipedia.org/wiki/Lambda_lifting |date=20210414093634 }}。
+
+== 词源 ==
+闭包的概念是在1960年代为采用[[lambda演算|lambda演算]]的表达式的机器求值而开发的，它首次在1970年于[[PAL_(编程语言)|PAL]]编程语言中完全实现，用来支持词法作用域的[[头等函数|头等函数]]<ref name=dat2012>[[David_A._Turner|David A. Turner]] (2012). [http://www.cs.kent.ac.uk/people/staff/dat/tfp12/tfp12.pdf "Some History of Functional Programming Languages"] {{Wayback|url=http://www.cs.kent.ac.uk/people/staff/dat/tfp12/tfp12.pdf |date=20210306184146 }}. Trends in Functional Programming '12. Section 2, note 8 contains the claim about M-expressions.</ref>。
+
+[[彼得·兰丁|彼得·兰丁]]（Peter Landin）在1964年将术语“闭包”定义为一种包含环境成分和控制成分的实体，用于在他的[[SECD机器|SECD机器]]上对表达式求值。<ref>{{cite
+| author = [[彼得·兰丁|彼得·兰丁]]
+| year = 1964
+| title = The mechanical evaluation of expressions
+}}</ref>
+{{en-link|Joel Moses}}认为是Landin发明了“闭包”这一术语，用来指代某些其开放绑定（自由变量）已经由其语法环境完成闭合（或者绑定）的[[lambda表达式|lambda表达式]]，从而形成了闭合的表达式，或称闭包。<ref>{{cite
+| author = [[Joel_Moses|Joel Moses]]
+| title = The Function of FUNCTION in LISP, or Why the FUNARG Problem Should Be Called the Environment Problem
+| id = [[AI_Memo|AI Memo]] 199
+| url = http://dspace.mit.edu/handle/1721.1/5854
+| format = PDF
+| accessdate = 2009-10-27
+| quote = A useful metaphor for the difference between FUNCTION and QUOTE in LISP is to think of QUOTE as a porous or an open covering of the function since free variables escape to the current environment. FUNCTION acts as a closed or nonporous covering (hence the term "closure" used by Landin). Thus we talk of "open" Lambda expressions (functions in LISP are usually Lambda expressions) and "closed" Lambda expressions. [...] My interest in the environment problem began while Landin, who had a deep understanding of the problem, visited MIT during 1966-67. I then realized the correspondence between the FUNARG lists which are the results of the evaluation of "closed" Lambda expressions in [[LISP_1.5|LISP]] and [[ISWIM|ISWIM]]'s Lambda Closures.
+| date = June 1970
+| archive-date = 2010-05-23
+| archive-url = https://web.archive.org/web/20100523000556/http://dspace.mit.edu/handle/1721.1/5854
+| dead-url = no
+}}</ref><ref>{{cite book
+| author = [[Åke_Wikström|Åke Wikström]]
+| year = 1987
+| title = Functional Programming using Standard ML
+| isbn = 0-13-331968-7
+| quote = The reason it is called a "closure" is that an expression containing free variables is called an "open" expression, and by associating to it the bindings of its free variables, you close it.
+}}</ref>这一用法后来于1975年被[[Gerald_Jay_Sussman|Sussman]]和[[Guy_L._Steele,_Jr.|Steele]]在定义 [[Scheme|Scheme]]语言的时候予以采纳。<ref>{{cite
+| author = [[Gerald_Jay_Sussman|Gerald Jay Sussman]] and [[Guy_L._Steele,_Jr.|Guy L. Steele, Jr.]]
+| title = Scheme: An Interpreter for the Extended Lambda Calculus
+| id = [[AI_Memo|AI Memo]] 349
+|date=December 1975}}</ref> 并广为流传。
+
+==语义==
+=== 闭包和状态表达 ===
+闭包可以用来在一个函数与一组“私有”变量之间建立关联关系。在给定函数被多次调用的过程中，这些私有变量能够保持其持久性。变量的作用域仅限于包含它们的函数，因此无法从其它程序代码部分进行访问。不过，变量的生存期是可以很长，在一次函数调用期间所建立所生成的值在下次函数调用时仍然存在。正因为这一特点，闭包可以用来完成信息隐藏，并进而应用于需要状态表达的某些编程范型中。
+
+不过，用这种方式来使用闭包时，闭包不再具有{{en-link|参照透明性|Referential transparency}}，因此也不再是[[纯函数|纯函数]]。即便如此，在某些非[[纯函数式编程|纯函数式编程]]语言，例如[[Scheme|Scheme]]中，闭包还是得到了广泛的使用。
+
+=== 闭包和头类函数 ===
+{{main|头等函数}}
+
+典型的支持闭包的语言中，通常将函数当作[[头等函数|头等函数]]——在这些语言中，函数可以被当作参数传递、也可以作为函数返回值、绑定到变量名、就像[[字符串|字符串]]、[[整数|整数]]等[[简单类型|简单类型]]。例如以下[[Scheme|Scheme]]代码：
+<syntaxhighlight lang="scheme">
+; Return a list of all books with at least THRESHOLD copies sold.
+(define (best-selling-books threshold)
+  (filter
+    (lambda (book)
+      (>= (book-sales book) threshold))
+    book-list))
+</syntaxhighlight>
+
+在这个例子中，[[lambda表达式|lambda表达式]]<code>(lambda  (book) (>= (book-sales book) threshold))</code>出现在函数<code>best-selling-books</code>中。当这个lambda表达式被执行时，Scheme创造了一个包含此表达式以及对<code>threshold</code>变量的引用的闭包，其中<code>threshold</code>变量在lambda表达式中是[[自由变量|自由变量]]。
+
+这个闭包接着被传递到<code>filter</code>函数。这个函数的功能是重复调用这个闭包以判断哪些书需要增加到列表哪些书需要丢弃。因为闭包中引用了变量<code>threshold</code>，所以它在每次被<code>filter</code>调用时都可以使用这个变量，虽然<code>filter</code>可能定义在另一个文件中。
+
+下面是用[[ECMAScript|ECMAScript]] （JavaScript）写的同一个例子：
+<syntaxhighlight lang="javascript">
+// Return a list of all books with at least 'threshold' copies sold.
+function bestSellingBooks(threshold) {
+  return bookList.filter(
+      function (book) { return book.sales >= threshold; }
+    );
+}
+</syntaxhighlight>
+
+这里，关键字<code>function</code>取代了<code>lambda</code>，<code>Array.filter</code>方法<ref>{{cite web | url = https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Global_Objects/Array/filter | title = array.filter | work = Mozilla Developer Center | date = 10  January 2010 | accessdate = 2010-02-09 | archive-date = 2008-10-15 | archive-url = https://web.archive.org/web/20081015154615/http://developer.mozilla.org/en/Core_JavaScript_1.5_Reference/Global_Objects/Array/filter | dead-url = no }}</ref>取代了<code>filter</code>函数，但两段代码的功能是一样的。
+
+一个函数可以创建一个闭包并返回它，如下述JavaScript例子：
+
+<syntaxhighlight lang="javascript">
+// Return a function that approximates the derivative of f
+// using an interval of dx, which should be appropriately small.
+function derivative(f, dx) {
+  return function (x) {
+    return (f(x + dx) - f(x)) / dx;
+  };
+}     
+</syntaxhighlight>
+
+因为在这个例子中闭包已经超出了创建它的函数的范围，所以变量<code>f</code>和<code>dx</code>将在函数<code>derivative</code>返回后继续存在。在没有闭包的语言中，变量的生命周期只限于创建它的环境。但在有闭包的语言中，只要有一个闭包引用了这个变量，它就会一直存在。清理不被任何函数引用的变量的工作通常由[[垃圾回收_(计算机科学)|垃圾回收]]完成，但对于 C++ 这种没有垃圾收集（起码目前仍没有一个为语言本身所认可的）的语言而言也不是难事——通过一些细致而琐碎的步骤。
+
+== 闭包的用途 ==
+
+* 因为闭包只有在被调用时才执行操作（暂且不论用于生成这个闭包对象本身的开销，比如 C++ 中按值捕获意味着执行复制构造函数），即“[[惰性求值|惰性求值]]”，所以它可以被用来定义控制结构。例如：在[[Smalltalk|Smalltalk]]语言中，所有的控制结构，包括分支条件（if/then/else）和循环（while和for），都是通过闭包实现的。用户也可以使用闭包定义自己的控制结构。
+* 多个函数可以使用一个相同的环境，这使得它们可以通过改变那个环境相互交流。比如在Scheme中：
+
+<syntaxhighlight lang="scheme">
+(define foo #f)
+(define bar #f)
+
+(let ((secret-message "none"))
+  (set! foo (lambda (msg) (set! secret-message msg)))
+  (set! bar (lambda () secret-message)))
+
+(display (bar)) ; prints "none"
+(newline)
+(foo "meet me by the docks at midnight")
+(display (bar)) ; prints "meet me by the docks at midnight"
+</syntaxhighlight>
+
+* 闭包可以用来实现[[面向对象编程|对象]]系统。<ref>{{cite web  | url = http://okmij.org/ftp/Scheme/oop-in-fp.txt  | title = Re: FP, OO and relations. Does anyone trump the others?  | date = 29 December 1999  | accessdate = 2008-12-23  | archive-url = https://web.archive.org/web/20081226055307/http://okmij.org/ftp/Scheme/oop-in-fp.txt  | archive-date = 2008-12-26  | dead-url = yes  }}</ref>
+
+==闭包的实现==
+典型实现方式是定义一个特殊的数据结构，保存了函数地址指针与闭包创建时的函数的词法环境表示（那些非局部变量的绑定）。使用[[调用栈|函数调用栈]]的语言实现闭包比较困难，因而这也说明了为什么大多数实现闭包的语言是基于[[垃圾回收_(計算機科學)|垃圾收集]]机制——当然，不使用垃圾收集也可以做到。
+
+闭包的实现与[[函数对象|函数对象]]很相似。
+
+通过将[[自由变量|自由变量]]放进参数表、并扩大函数名字的作用域，可以把一个闭包 / 匿名 / 内部函数变成一个普通的函数，这叫做“{{tsl|en|Lambda lifting|Lambda 提升}}”。例：
+<syntaxhighlight lang="cpp">
+void G(void){
+    const std::wstring wstr=L"Hello, world!";
+    std::function<wchar_t(size_t)> fn=[&wstr](size_t ui)->wchar_t{
+        return wstr[ui%wstr.length()];
+    };
+    std::wcout<<fn(3)<<std::endl;//'l'
+}
+//那么 fn 是一个闭包，指向那个匿名函数。
+//这里 wstr 是自由变量，首先将其放入参数表：
+void G(void){
+    const std::wstring wstr=L"Hello, world!";
+    std::function<wchar_t(size_t, const std::wstring &)> fn=[](size_t ui, const std::wstring &wstr)->wchar_t{
+        return wstr[ui%wstr.length()];
+    };
+    std::wcout<<fn(3, wstr)<<std::endl;//'l'
+}
+//现在 fn 中没有自由变量了。把这个匿名函数取个名之后放到全局命名空间里：
+wchar_t fn(size_t ui, const std::wstring &wstr){
+    return wstr[ui%wstr.length()];
+}
+void G(void){
+    const std::wstring wstr=L"Hello, world!";
+    std::wcout<<fn(3, wstr)<<std::endl;//'l'
+}
+//这就把 fn“提升”成了一个普通的函数。
+</syntaxhighlight>
+
+== 各种语言中（类似）闭包的结构 ==
+
+=== C语言的回调函数 ===
+在[[C语言|C语言]]中，支持[[回调函数|回调函数]]的库有时在注册时需要两个参数：一个函数指针，一个独立的<code>void*</code>指针用以保存用户数据。这样的做法允许回调函数恢复其调用时的状态。这样的惯用法在功能上类似于闭包，但语法上有所不同。
+===gcc对C语言的扩展===
+[[gcc|gcc]]编译器对[[C语言|C语言]]实现了一种闭包的程序特性。
+===C语言扩展：Blocks ===
+[[C语言|C语言]] (使用[[LLVM|LLVM]]编译器或[[苹果公司|苹果]]修改版的GCC)支持[[块_(C语言扩展)|块]]。闭包变量用<tt>__block</tt>标记。同时，这个扩展也可以应用到[[Objective-C|Objective-C]]与[[C++|C++]]中。
+
+<syntaxhighlight lang="c">
+typedef int (^IntBlock)();
+
+IntBlock downCounter(int start) {
+	 __block int i = start;
+	 return Block_copy( ^int() {
+		 return i--;
+	 });
+ }
+
+IntBlock f = downCounter(5);
+printf("%d", f());
+printf("%d", f());
+printf("%d", f());
+Block_release(f);
+</syntaxhighlight>
+
+=== C++函数对象 ===
+[[C++|C++]]早期标准允许通过[[重载|重载]]<code>operator()</code>来定义[[函数对象|函数对象]]。这种对象的行为在某种程度上与[[函数式编程语言|函数式编程语言]]中的函数类似。它们可以在[[执行时|运行时]]动态创建、保存状态，但是不能如闭包一般方便地隐式获取局部变量，并且有“专物专用”的繁琐问题——对于每一段闭包代码都要单独写一个函数对象类。
+
+C++11标准已经支持了闭包，这是一种特殊的函数对象，由特殊的语言结构——[[匿名函数#C.2B.2B|lambda表达式]]自动构建。C++闭包中保存了其代码内全部向外引用的变量的拷贝或引用。如果是对外界环境中的对象的引用，且闭包执行时该外界环境的变量已经不存在（如在调用栈上已经展开），那么可导致未定义行为，因为C++并不扩展这些被引用的外界环境的变量的生命期。示例代码如下：
+
+<syntaxhighlight lang="cpp">
+void foo(string myname) {
+	typedef vector<string> names;
+	int y;
+	names n;
+	// ...
+	names::iterator i =
+	 find_if(n.begin(), n.end(), [&](const string& s){return s != myname && s.size() > y;});	
+	// 'i' 现在是'n.end()'或指向'n'中第一个
+	// 不等于'myname'且长度大于'y'的字符串
+}
+</syntaxhighlight>
+
+== 参考文献 ==
+{{Reflist}}
+
+== 外部链接 ==
+* [http://www.ibm.com/developerworks/cn/java/j-cb01097.html 跨越边界: 闭包 (IBM DeveloperWorks)] {{Wayback|url=http://www.ibm.com/developerworks/cn/java/j-cb01097.html |date=20200812192014 }}
+* [http://www.ibm.com/developerworks/cn/linux/l-cn-closure/ 闭包的概念、形式与应用 (IBM DeveloperWorks)] {{Wayback|url=http://www.ibm.com/developerworks/cn/linux/l-cn-closure/ |date=20200409042300 }}
+* [https://web.archive.org/web/20100825182303/http://www.felixwoo.com/archives/247 深入理解Javascript闭包(closure) - Felix Woo]
+
+[[Category:编程语言概念|Category:编程语言概念]]
+[[Category:子程序|Category:子程序]]

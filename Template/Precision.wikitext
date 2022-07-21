@@ -1,0 +1,182 @@
+<noinclude><!--
+--============================================================
+-- Getprecision - Count decimal digits or in fraction (2+1/3)
+--============================================================
+--                          (see NOTES at bottom)
+--></noinclude>{{
+#expr: ( 0 {{
+#ifexpr: {{{1|0.0000}}}0={{{1|0.0000}}} |<!--see NOTE Z7-->
+-1 +  <noinclude><!--see NOTE S5--></noinclude>
+{{#switch: x{{{1|0.0000}}}
+  |{{padleft:|6|x{{{1}}}}}=5
+  |{{padleft:|5|x{{{1}}}}}=4
+  |{{padleft:|7|x{{{1|0.0000}}}}}=6
+  |{{padleft:|4|x{{{1}}}}}=3
+  |{{padleft:|8|x{{{1}}}}}=7
+  |{{padleft:|9|x{{{1}}}}}=8
+  |{{padleft:|10|x{{{1}}}}}=9
+  |{{padleft:|11|x{{{1}}}}}=10
+  |{{padleft:|2|x{{{1}}}}}=1 <!--for "0"-->
+  |{{padleft:|12|x{{{1}}}}}=11
+  |{{padleft:|13|x{{{1}}}}}=12
+  |{{padleft:|14|x{{{1}}}}}=13
+  |{{padleft:|15|x{{{1}}}}}=14
+  |{{padleft:|16|x{{{1}}}}}=15
+  |{{padleft:|17|x{{{1}}}}}=16
+  |{{padleft:|18|x{{{1}}}}}=17
+  |{{padleft:|19|x{{{1}}}}}=18
+  |{{padleft:|20|x{{{1}}}}}=19
+  |{{padleft:|21|x{{{1}}}}}=20
+  |{{padleft:|3|x{{{1}}}}}=2
+  |{{padleft:|22|x{{{1}}}}}=21
+  |{{padleft:|23|x{{{1}}}}}=22
+  |{{padleft:|24|x{{{1}}}}}=23
+  |{{padleft:|25|x{{{1}}}}}=24
+  |{{padleft:|26|x{{{1}}}}}=25
+  |{{padleft:|27|x{{{1}}}}}=26
+  |{{padleft:|28|x{{{1}}}}}=27
+  |{{padleft:|29|x{{{1}}}}}=28
+  |{{padleft:|30|x{{{1}}}}}=29
+  |{{padleft:|31|x{{{1}}}}}=30
+  |{{padleft:|32|x{{{1}}}}}=31
+  |{{padleft:|33|x{{{1}}}}}=32
+  |{{padleft:|34|x{{{1}}}}}=33
+  |{{padleft:|35|x{{{1}}}}}=34
+  |{{padleft:|36|x{{{1}}}}}=35
+  |{{padleft:|37|x{{{1}}}}}=36
+  |{{padleft:|38|x{{{1}}}}}=37
+  |{{padleft:|39|x{{{1}}}}}=38
+  |{{padleft:|40|x{{{1}}}}}=39
+  |{{padleft:|41|x{{{1}}}}}=40
+  |#default = 41
+  }} - floor(
+    ln (floor( abs({{{1|0}}}) )+0.99 )/ln10 ) - 1
+    {{#ifexpr: floor(abs({{{1|0}}}) )=0 |-1}}
+    {{#ifeq: {{{1|0.0000}}}x|0x| + 1}}{{
+    #ifexpr: {{{1|500}}}<0| - 1}}<!--For minus sign-->
+  |<noinclude><!--else for integers--></noinclude>{{
+    #ifexpr:{{{1|500}}}=floor({{{1|500}}}/10)*10|-1}}{{
+    #ifexpr:{{{1|500}}}=floor({{{1|500}}}/100)*100|-1}}{{
+    #ifexpr:{{{1|500}}}=floor({{{1|500}}}/1E3)*1E3|-1}}{{
+    #ifexpr:{{{1|500}}}=floor({{{1|500}}}/1E4)*1E4|-1}}{{
+    #ifexpr:{{{1|500}}}=floor({{{1|500}}}/1E5)*1E5|-1}}{{
+    #ifexpr:{{{1|500}}}=floor({{{1|500}}}/1E6)*1E6|-1}}{{
+    #ifexpr:{{{1|500}}}=floor({{{1|500}}}/1E7)*1E7|-1}}{{
+    #ifexpr:{{{1|500}}}=floor({{{1|500}}}/1E8)*1E8|-1}}{{
+    #ifexpr:{{{1|500}}}=floor({{{1|500}}}/1E9)*1E9|-1}}{{
+    #ifexpr:{{{1|500}}}=floor({{{1|500}}}/1E10)*1E10|-1}}{{
+    #ifexpr:{{{1|500}}}=floor({{{1|500}}}/1E11)*1E11|-1}}{{
+    #ifexpr:{{{1|500}}}=floor({{{1|500}}}/1E12)*1E12|-1}}{{
+    #ifexpr:{{{1|500}}}=floor({{{1|500}}}/1E13)*1E13|-1}}{{
+    #ifexpr:{{{1|500}}}=floor({{{1|500}}}/1E14)*1E14|-1
+  }}}}<noinclude><!--endif {1}0={1}
+--------------------------------------------------------
+  Check for fraction "/" to use logn of denominator, by
+  clearing prior count: (..prior..)*0 + (logn denom / logn 10).
+  (see NOTE A1). The whole expression ends with close ")".
+  --></noinclude>{{
+  #if: {{#titleparts:{{{1|6+3~8}}}|1|2}}| )*0 + (
+    (ln {{#titleparts:{{{1|6+3/8}}}|1|2}} / ln10)
+  }}<noinclude><!--endif fraction
+  --></noinclude> ) }}<noinclude><!--endexpr# (close paren.)
+--
+--------------------------------------------------------------
+--NOTES:
+--    [ These comments are skipped by <noinclude> and not send
+--      inside formatted Internet pages, only during edit. ]
+--
+--NOTE A1: This template determines the precision of decimals
+--     by counting the length of the numeric string (in a
+--     #switch comparing lengths of padded strings), then
+--     subtracting integer length, minus the decimal point,
+--     and minus 1 if negative. For integers, 1 place is
+--     subtracted for each trailing 0 on the integer.
+--     For fractions, any prior count is cleared x 0, then
+--     size is logarithm of denominator divided by logn 10:
+--     (..prior...)*0 + floor(logn denom / logn 10 - .01) + 1.
+--
+--NOTE D2: The check, for whole integers, compares the amount
+--     versus appending "0" at the end: when the amount is a
+--     decimal, then the value is unchanged by appending 0 at
+--     the end: so 5.23 = 5.230 is true, whereas for whole
+--     integers, it would be: 5 = 50 as false, due to values
+--     becoming n*10 for integer n. So, for integer n, the
+--     check rejects: n = n0 as false; hence n is integer.
+--
+--NOTE M3: The magnitude of the integer portion is calculated
+--     by logarithm of the floor of absolute value (divided by
+--     [[natural logarithm]] of 10 to adjust for e=2.71828*),
+--     as: ln (floor( abs({{{1|-0.050067}}}) )+0.99 )/ln10
+--     Function floor(x) trims the decimal part, to leave the
+--     whole count: 0-9 yield 0, 10-19 as 1, 1000-1999 as 3.
+--     The abs(x) avoids floor of negatives, floor(-0.1)= -1,
+--     hence using abs(x) ensures -0.1 floors to 0 not -1.
+--     Near zero, the +0.99 avoids invalid log of 0, but does
+--     not round-up any decimals, already floored as nnn.00.
+--     Complexity is 6 operations: floor of abs( {1} ) +0.99
+--     then logn div logn10, then floor that logarithm ratio.
+--     Decimals -1 < x < 1 yield -1, avoiding log 0.001 = -3.
+--
+--NOTE N4: Nesting of if-else and nested templates is kept to
+--     a minimum, due to the MediaWiki 1.6 limit of 40 levels
+--     of if-logic for all nested templates used together.
+--     Template {ordomag} was omitted to avoid 2 more levels
+--     of nested templates. Template {Precision} had 8 levels,
+--     and this template was trimmed to only 5 levels.
+--
+--NOTE S5: The #switch is run with "x" prepended in front of
+--     the amount, otherwise a #switch will compare as numeric
+--     where 2 would match "2.0" even though "2" is length 1.
+--     So "x2" won't match "x2.0" in non-numeric comparison.
+--     The #switch will exit on the first match, so smaller
+--     lengths are compared first, to avoid extra comparisons
+--     for more rare, longer numeric strings up to 41 long.
+--
+--NOTE W6: The check for integers with whole end-zeroes uses
+--     typical n=n/10*10, for each power of 10, where whole
+--     millions match: {{#ifexpr: {1}=floor( {1}/1E6 )*1E6| }}
+--     Previously, {Precision} had tried to use "round" to
+--     detect end-zeroes but "round" loses precision at -5,
+--     so, n00000 round -5 differs from n00000 slightly, and
+--     comparisons to exact rounded amounts failed to match
+--     some numbers when 6 or more zeroes "n000000".
+--
+--NOTE Z7: The check on zero for any .00000 compares adding 1
+--     to the amount, versus appending "1" at the end: if the
+--     amount is a decimal, then adding 1 will be larger than
+--     appending 1 at the end: 0.00 + 1 > 0.001, whereas for
+--     whole zero, it would be: 0+1 > 01 as false, due to the
+--     value being the same. So, for integer 0, the check
+--     rejects: 0+1 > 01 as false; hence whole 0 is integer.
+--
+-- WARNING: *** DO NOT DELETE COMMENTS FROM THIS TEMPLATE ***
+--      Unless these comments are readily available, people
+--      might tinker with the coding (or rename templates),
+--      in hopes to clarify operation because these comments
+--      were not nearby to explain the issues. Having these
+--      comments only on a doc-page increases the danger of
+--      explanations no longer matching the current coding.
+--      UPDATE these comments to match changes to the template.
+--      UPDATE the HISTORY during major changes (not typos).
+--
+--------------------------------------------------------------
+--HISTORY:
+--15Aug10 Created to get precision even if large or negative.
+--15Aug10 Put NOTES comments to explain template coding.
+--15Aug10 Put HISTORY comments to log major changes.
+--18Aug10 Fixed to handle zero: 0 as 0, 0.000 as 3, etc.
+--04Sep10 Fixed to handle decimals between 0~1 (by round 0).
+--04Sep10 Updated NOTES to explain the check appending 0 or 1.
+--03Jan11 Fix integer end-zeroes: 50 as -1, 500 as -2, 5000 -3.
+--03Jan11 Omit {Order of Magnitude} for 2 levels less nesting.
+--03Jan11 Omit {Str_len} for 8 fewer levels of 40-nest limit.
+--03Jan11 Put "noinclude" around all inter-line HTML comments.
+--03Jan11 Allow fraction "/": floor(ln denom/ln 10 -.01)+1.
+--08Feb11 Fixed to not count minus sign on negative integers.
+--08Feb11 Extended to handle integers with 14 end-zeroes "0".
+--08Feb11 Ordered length-search by most-likely (rarely 1 or 2).
+--10Feb11 Re-added NOTES/HISTORY to explain logic & changes.
+--22Jun11 Move to Precision: no need to keep all three.
+--22Jun11 No rounding up for fractions (i.e. ln denom/ln 10)
+--
+-->{{documentation}}</noinclude>

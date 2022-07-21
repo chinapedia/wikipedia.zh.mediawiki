@@ -1,0 +1,105 @@
+{{lowercase}}
+{{noteTA
+|G1=IT
+}}
+{{Infobox filesystem
+|name = ext4
+|full_name = Fourth extended file system
+|developer = Mingming Cao, Andreas Dilger, Alex Zhuravlev (Tomas), Dave Kleikamp, [[Theodore_Ts'o|Theodore Ts'o]], Eric Sandeen, Sam Naghshineh, others
+|introduction_os = [[Linux|Linux]] 2.6.28, 2.6.19
+|introduction_date = '''穩定版：''' 2008年10月21日<br />'''不穩定版：''' 2006年10月10日
+|partition_id = 0x83（[[主引導記錄|MBR]]）<br />EBD0A0A2-B9E5-4433-87C0-68B6B72699C7（[[全局唯一標識分區表|GPT]]）
+|directory_struct = [[链表|链表]], [http://ext2.sourceforge.net/2005-ols/paper-html/node3.html hashed B-tree]
+|file_struct = Extents/Bitmap
+|bad_blocks_struct = 表格
+|max_filename_size = 256位元組
+|max_files_no = 40億（在檔案系統建立時指定）
+|max_volume_size = 1 [[Exbibyte|EiB]]
+|max_file_size = 16 [[Tebibyte|TiB]]（for 4k block filesystem）
+|filename_character_set = 除NULL（'\0'）和 '/'外之所有字元（大小寫敏感）
+|dates_recorded = 修改（mtime），屬性修改（ctime），讀取（atime），刪除（dtime），建立（crtime）
+|date_range = 1901年12月14日 - 2514年4月25日
+|date_resolution = [[纳秒|纳秒]]
+|forks_streams = 否
+|attributes = extents, noextents, mballoc, nomballoc, delalloc, nodelalloc, data=journal, data=ordered, data=writeback, commit=nrsec, [[Orlov_block_allocator|orlov]], oldalloc, user_xattr, nouser_xattr, acl, noacl, bsddf, minixdf, bh, nobh, journal_dev
+|file_system_permissions = [[POSIX|POSIX]]
+|compression = 否
+|encryption = 否
+|single_instance_storage = 否
+|OS = [[Linux|Linux]]、[[Android|Android]]、[[Windows|Windows]]（通过[[Ext2Fsd|Ext2Fsd]]）
+}}
+
+'''第四代擴充套件檔案系統'''（{{lang-en|Fourth extended filesystem}}，縮寫為'''ext4'''）是[[Linux|Linux]]系統下的[[日誌檔案系統|日誌檔案系統]]，是[[ext3|ext3]]檔案系統的后继版本。
+
+==歷史==
+ext4原始的開發目標是一系列的[[向下兼容|向下兼容]]ext3、移除其64位元限制與提升其效能的延伸套件<ref name="Mathur">{{cite web | title = The new ext4 filesystem: current status and future plans | publisher = Red Hat | location = Ottawa, ON, CA | year = 2007 | work = Proceedings of the Linux Symposium | url = https://ols2006.108.redhat.com/2007/Reprints/mathur-Reprint.pdf | accessdate = 2008-01-15 | format = [[PDF|PDF]] | last = Mathur | first = Avantika | last2 = Cao | first2 = MingMing | last3 = Bhattacharya | first3 = Suparna | last4 = Dilger | first4 = Andreas | last5 = Tomas | first5 = Alex | last6 = Vivier | first6 = Laurent }}{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>。然而，某些[[Linux核心|Linux]]開發者因穩定性原因而拒絕將這些延伸套件應用在ext3上<ref>{{cite web | url = http://lkml.org/lkml/2006/6/9/183 | date = 2006-06-09 | publisher = LKML | first = Linus | last = Torvalds | title = extents and 48bit ext3 | accessdate = 2009-10-23 | archive-date = 2017-08-22 | archive-url = https://web.archive.org/web/20170822174301/http://lkml.org/lkml/2006/6/9/183 | dead-url = no }}</ref>，並要求其作為ext3的[[分支_(軟體開發)|分支]]，改名為ext4並另行開發，以免影響到目前的ext3使用者。該要求被接受以後，ext3維護者[[曹子德|曹子德]]（Theodore Ts'o）在2006年6月28日公開了ext4的開發計畫<ref>{{cite web | url = http://lkml.org/lkml/2006/6/28/454 | publisher = LKML | first = Theodore | last = Ts'o | title = Proposal and plan for ext2/3 future development work | date = 2006-06-28 | accessdate = 2009-10-23 | archive-date = 2009-02-19 | archive-url = https://web.archive.org/web/20090219231259/http://lkml.org/lkml/2006/6/28/454 | dead-url = no }}</ref>。
+
+在Linux核心2.6.19版中，首次導入ext4的一個先期開發版本<ref>{{cite news
+ | first = Thorsten
+ | last = Leemhuis
+ | authorlink = 
+ | title = Higher and further: The innovations of Linux 2.6.28（page 2）
+ | url = http://www.h-online.com/open/features/Kernel-Log-Higher-and-Further-The-innovations-of-Linux-2-6-28-746805.html
+ | work = 
+ | publisher = Heise Online
+ | date = 2008-12-23
+ | accessdate = 2010-01-09
+ | archive-date = 2009-01-03
+ | archive-url = https://web.archive.org/web/20090103164710/http://www.heise-online.co.uk/open/Kernel-Log-Higher-and-Further-The-innovations-of-Linux-2-6-28--/features/112299
+ | dead-url = no
+ }}</ref>。在2008年10月11日，ext4被當成穩定版本，加入Linux 2.6.29版的原始碼中，ext4的開發階段進入尾聲<ref>{{cite web
+ |title      = ext4: Rename ext4dev to ext4
+ |publisher      = Linus' kernel tree
+ |url      = http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commit;h=03010a3350301baac2154fa66de925ae2981b7e3
+ |accessdate      = 2008-10-20
+ |archive-date      = 2019-12-10
+ |archive-url      = https://web.archive.org/web/20191210053817/http://git.kernel.org/?p=linux%2Fkernel%2Fgit%2Ftorvalds%2Flinux-2.6.git%3Ba%3Dcommit%3Bh%3D03010a3350301baac2154fa66de925ae2981b7e3
+ |dead-url      = yes
+ }}</ref>。2008年12月25日，Linux 2.6.29版公開釋出之後，ext4成為Linux官方的建議預設檔案系統。
+
+2010年1月15日，Google宣布將他們公司使用的檔案系統，由ext2，升級為ext4。在同年12月14日，Google也宣布他們將在Android 2.3版中，使用ext4來取代之前的[[YAFFS|YAFFS]]。
+
+== 特色 ==
+
+;大型檔案系統
+:ext4檔案系統可支援最高1 [[Exbibyte|Exbibyte]]的分割區<ref>{{cite web |title=Migrating to Ext4 |url=http://www.ibm.com/developerworks/linux/library/l-ext4/ |accessdate=2008-12-14 |publisher=IBM |work=DeveloperWorks |deadurl=yes |archiveurl=https://web.archive.org/web/20081201104450/http://www.ibm.com/developerworks/linux/library/l-ext4/ |archivedate=2008-12-01 }}</ref>與最大16 [[Tebibyte|Tebibyte]]的檔案。
+
+;Extents
+:ext4引進了[[Extent_(檔案系統)|Extent]]檔案儲存方式，以取代ext2/3使用的[[Block_(data_storage)|block mapping]]方式。Extent指的是一連串的連續實體block，這種方式可以增加大型檔案的效率並減少分裂檔案。ext4支援的單一Extent，在單一block為4KB的系統中最高可達128MB<ref name = "Mathur" />。單一inode中可儲存4筆Extent；超過四筆的Extent會以Htree方式被索引。
+
+;向下相容
+:ext4向下相容於[[ext3|ext3]]與[[ext2|ext2]]，因此可以將ext3和ext2的檔案系統掛載為ext4分割區。由於某些ext4的新功能可以直接運用在ext3和ext2上，直接掛載即可提升少許效能。
+
+:ext3檔案系統可以部分[[向上相容|向上相容]]於ext4（也就是說ext4檔案系統可以被掛載為ext3分割區）。然而若是使用到Extent技術的ext4將無法被掛載為ext3。
+
+;預留空間
+:ext4允許對一檔案預先保留磁碟空間。目前大多數檔案系統做到這點的方式是直接產生一個填滿0的檔案；ext4和[[XFS|XFS]]可以使用Linux核心中的一個新的-{系統呼叫|zh-hant:系統呼叫;zh-cn:系统调用}-「fallocate()」取得足夠的預留空間。
+
+;延遲取得空間
+:ext4使用一種稱為[[allocate-on-flush|allocate-on-flush]]的方式，可以在資料將被寫入磁碟（sync）前才開始取得空間；大多數檔案系統會在之前便取得需要的空間。這種方式可以增加效能並減少檔案分散程度。
+
+;突破32000子目錄限制
+:ext3的一個目錄下最多只能有32000個子目錄。ext4的子目錄最高可達64000，且使用「dir_nlink」功能後可以達到更高（雖然父目錄的link count會停止增加）。為了避免效能受到大量目錄的影響，ext4預設開啟[[Htree|Htree]]（一種特殊的[[B树|B树]]）索引功能。該功能已經實作於Linux核心2.6.23版。
+
+;日志校验和
+:Ext4使用[[校验和|校验和]]特性来提高文件系统可靠性，因为日志是磁盘上被读取最频繁的部分之一。这个特性还有一个好处就是可以安全地避免日志处理时磁盘I/O的等待，而稍微提高一些性能。日志校验和的技术源于[[威斯康辛大学|威斯康辛大学]]的一篇名为''IRON File Systems''的研究论文（见第六节transaction checksums校验和处理）<ref>{{cite paper |url=http://www.cs.wisc.edu/wind/Publications/iron-sosp05.pdf |title=IRON File Systems |author=Vijayan Prabhakaran, ''et al.'' |publisher=CS Dept, University of Wisconsin |format=PDF |access-date=2009-10-23 |archive-date=2010-06-15 |archive-url=https://web.archive.org/web/20100615140300/http://www.cs.wisc.edu/wind/Publications/iron-sosp05.pdf |dead-url=no }}</ref>
+
+;在线磁盘整理
+:对于在线[[磁盘整理|磁盘整理]]工具有许多草案，但是这些草案都没有被包含在主流的[[内核|内核]]当中。即使Ext4包含有许多避免[[磁盘碎片|磁盘碎片]]的技术，但是磁盘碎片还是难免会在一个长时间使用过的[[文件系统|文件系统]]中存在。Ext4将会有一个具有磁盘整理功能的工具<ref>{{Cite web|url=http://kernelnewbies.org/Ext4#head-38e6ac2b5f58f10989d72386e6f9cc2ef7217fb0|title=ext4新功能#在线磁盘碎片整理|accessdate=2010-09-07|archive-date=2018-01-10|archive-url=https://web.archive.org/web/20180110160523/https://kernelnewbies.org/Ext4/#head-38e6ac2b5f58f10989d72386e6f9cc2ef7217fb0|dead-url=no}}</ref>。
+
+;快速文件系统检查
+:Ext4将未使用的区块标记在inode当中，这样可以使诸如e2fsck之类的工具在磁盘检查时将这些区块完全跳过，而节约大量的文件系统检查的时间。这个特性已经在2.6.24版本的[[Linux|Linux]][[内核|内核]]中实现。
+
+== 参见 ==
+* [[Btrfs|Btrfs]]
+
+== 參考資訊 ==
+{{reflist}}
+
+== 相关介绍 ==
+* [http://www.ibm.com/developerworks/cn/linux/l-anatomy-ext4/ 剖析ext4 (IBM Developer Works)]{{Wayback|url=http://www.ibm.com/developerworks/cn/linux/l-anatomy-ext4/ |date=20091208173435 }}
+
+{{Filesystem}}
+
+[[Category:磁盘文件系统|Category:磁盘文件系统]]
+[[Category:Linux檔案系統|Category:Linux檔案系統]]

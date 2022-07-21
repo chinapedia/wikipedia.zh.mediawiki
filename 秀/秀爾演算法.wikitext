@@ -1,0 +1,165 @@
+{{NoteTA
+|G1 = Physics
+|G2 = IT
+|1 = zh-cn:门; zh-hk:門; zh-tw:閘;
+}}
+'''秀爾演算法'''（{{Lang-en|Shor's algorithm}}）是一個于1994年發現的，以數學家[[彼得·秀爾|彼得·秀爾]]命名，針對[[整数分解|整數分解]]題目的的[[量子演算法|量子演算法]]（在[[量子計算機|量子計算機]]上面運作的[[演算法|演算法]]）。不正式地說，它解決的題目是：給定一個整數 <math>N</math>，找出他的[[質因數|質因數]]。在一個[[量子計算機|量子計算機]]上面，要分解整數<math>N</math>，秀爾演算法的運作需要[[多項式時間|多項式時間]]（時間是 <math>\log N</math>的某個多項式這麼長，<math>\log N</math> 在這裡的意義是輸入的檔案長度）。准确来说，该演算法花費 <math>O((\log N)^{3})</math> 的時間，展示出質因數分解問題可以使用量子計算機以多項式時間解出，因此在[[複雜度類|複雜度類]][[BQP|BQP]]裡面。這比傳統上已知的最快的因數分解演算法[[普通数域筛选法|普通數域篩選法]]所花費的[[指數時間|次指數時間]]——大約 <math>O(e^{1.9(\log N)^{\frac{1}{3}}(\log\log N)^{\frac{2}{3}})}</math>還要快了一個指數。
+
+秀爾演算法非常重要，它意味着：假如有可用的量子計算機，我們可以破解基于[[公开密钥加密|公開密鑰加密]]的算法（比如[[RSA加密演算法|RSA加密演算法]]）。RSA演算法的基礎在於假設了我們不能有效率的分解一個已知的整數。就目前所知，這假設對傳統（即非量子）的電腦為真；沒有已知的傳統演算法可以在多項式時間內解決這個問題。但秀爾演算法展示了因數分解問題在量子計算機上可以很有效率的解決，所以一個足夠大的量子計算機可以破解RSA。這對於建立量子計算機和研究新的量子計算機演算法是一個强大的動力。
+
+2001年，IBM的一個小組展示了秀爾演算法的實例，使用[[核磁共振量子計算|NMR實驗]]的量子計算機及7個[[量子位元|量子位元]]，將15分解成3×5。<ref name="VSBYSC01">{{Citation |last=Vandersypen |first=Lieven M. K. |last2=Steffen |first2=Matthias |last3=Breyta |first3=Gregory |last4=Yannoni |first4=Costantino S. |last5=Sherwood |first5=Mark H. |last6=Chuang |first6=Isaac L. |lastauthoramp=yes |year=2001 |title=Experimental realization of Shor's quantum factoring algorithm using nuclear magnetic resonance |journal=[[Nature_(journal)|Nature]] |volume=414 |issue=6866 |pages=883–887 |doi=10.1038/414883a }}.</ref>不过，对于IBM的實驗是否是量子計算的真實展示，有一些疑慮出現，因為沒有发现[[量子纏結|纏結現象]]。<ref name="BCJLPS99">{{Citation |last=Braunstein |first=S. L. |last2=Caves |first2=C. M. |last3=Jozsa |first3=R. |last4=Linden |first4=N. |last5=Popescu |first5=S. |last6=Schack |first6=R. |lastauthoramp= |year=1999 |title=Separability of Very Noisy Mixed States and Implications for NMR Quantum Computing |journal=Phys. Rev. Lett |volume=83 |issue=5 |pages=1054–1057 |doi=10.1103/PhysRevLett.83.1054 }}</ref>IBM的實驗之後，也有其他的團隊以光學量子位元實驗秀爾演算法，並強調可觀察到其纏結現象。<ref name="LBYP07">{{Citation |last=Lu |first=Chao-Yang |last2=Browne |first2=Daniel E. |last3=Yang |first3=Tao |last4=Pan |lastauthoramp=yes |year=2007 |title=Demonstration of a Compiled Version of Shor's Quantum Factoring Algorithm Using Photonic Qubits |journal=[[Physical_Review_Letters|Physical Review Letters]] |volume=99 |issue=25 |pages=250504 |doi=10.1103/PhysRevLett.99.250504 |first4=Jian-Wei }}</ref><ref name="LWLBJGW07">{{Citation |last=Lanyon |first=B. P. |last2=Weinhold |first2=T. J. |last3=Langford |first3=N. K. |last4=Barbieri |first4=M. |last5=James |first5=D. F. V. |last6=Gilchrist |first6=A. |last7=White |first7=A. G. |lastauthoramp=yes |year=2007 |title=Experimental Demonstration of a Compiled Version ofshor's algorithm with quantum Entanglement |journal=[[Physical_Review_Letters|Physical Review Letters]] |volume=99 |issue=25 |pages=250505 |doi=10.1103/PhysRevLett.99.250505 }}</ref>
+
+== 程序 ==
+試著解決的問題是：給定一個[[合成數|合成數]]<math>N</math>，找到整數<math>p</math>在<math>1</math>和<math>N</math>之間且不包含<math>1</math>和<math>N</math>，並且<math>N</math>整除於<math>p</math>。
+
+秀爾演算法包含兩個部份：
+
+# 一個以傳統電腦運作的簡化演算法，將因數分解簡化成搜尋[[階_(群論)|階]]問題。
+# 一個量子演算法，解決搜尋階問題。
+
+=== 傳統部份 ===
+<ol>
+<li>選擇任意數字<math>a</math> < <math>N</math></li>
+<li>計算[[最大公因數|gcd]]（ <math>a</math> ,  <math>N</math> ）。這裡可以使用[[輾轉相除法|輾轉相除法]]來計算。</li>
+<li>若gcd( <math>a</math> ,  <math>N</math> ) ≠ 1，則我們有了一個 <math>N</math> 非平凡的因數，因此這部份結束了。</li>
+<li>否則，利用下面的週期尋找子程序（Period-finding subroutine，下面會列出）來找出下面這個函數的[[周期函數|週期]] <math>r</math> ：
+:<math>f(x) = a^x\ \mbox{mod}\ N</math>,
+換句話說，找出<math>a</math>在[[整数模n乘法群|<math>\mathbb{Z}_N</math>]]裡面的[[階_(群論)|階]]<math>r</math>，或者最小的正整數 <math>r</math> 令
+<math>f(x+r) = f(x)</math>。
+</li>
+<li>若 <math>r</math> 是奇數，回到第一步。</li>
+<li>若 <math>a</math>  <sup> <math>r</math>  /2</sup> ≡ -1 (mod  <math>N</math> ),回到第一步。</li>
+<li>gcd(a<sup> <math>r</math> /2</sup>+1,  <math>N</math> )與gcd(a<sup> <math>r</math> /2</sup>-1,  <math>N</math> )至少有一個是 <math>N</math> 非平凡的因數。分解完成。</li>
+</ol>
+
+=== 量子部份：週期尋找子程序（Period-finding subroutine） ===
+這個演算法使用的量子線路是為了在給定一個固定常數 <math>N</math> 以及一個任意常數 <math>a</math> 之下，找出<math>f(x) = a^{x} \mod {N}</math> 所設定的。給定 <math>N</math> ,找出 <math>Q</math>  = 2<sup> <math>q</math> </sup>且合乎<math>N^2 \le Q < 2N^2</math>（這同時表示<math>Q/r > N</math>）。輸入和輸出[[量子位元|量子位元]]暫存器需要儲存從0到 <math>Q</math> -1所有值的疊加態，因此分別需要 <math>q</math> 個量子位元。這裡使用看起來比所需的數量還要更多一倍的量子位元，保證了即使週期 <math>r</math> 的大小逼近 <math>N</math> /2，也至少有 <math>N</math> 個不同的 <math>x</math> 會產生相同的 <math>f(x)</math> 。
+
+程序如下：
+
+<ol>
+<li>將暫存器初始化成
+
+:<math>Q^{-1/2} \sum_{x=0}^{Q-1} \left|x\right\rangle \left|0\right\rangle</math>
+
+ <math>x</math> 從0到 <math>Q</math>  − 1。所以這一個初始態是 <math>Q</math> 個狀態的疊加。</li>
+
+<li>建立量子函式版本的 <math>f</math> ( <math>x</math> )，並且應用於上面的疊加態，得到
+
+:<math>Q^{-1/2} \sum_x \left|x\right\rangle \left|f(x)\right\rangle</math>.
+
+這裡仍舊是 <math>Q</math> 個狀態的疊加。
+</li>
+
+<li>對輸入暫存器進行[[量子傅立葉變換|量子傅立葉變換]]。這個變換（操作於二的冪次—— <math>Q = 2^{q}</math> 個疊加態上面）
+使用一個 <math>Q</math>次[[單位根|單位根]][[虛數單位|例如]]<math>\omega = e^{2 \pi i /Q}</math>將任意給定態<math>\left|x\right\rangle</math>的振幅平均分佈在所有 <math>Q</math> 個<math>\left|y\right\rangle</math>態上。另一個方法是對於每個不同的 <math>x</math> ：
+
+:<math>U_{QFT} \left|x\right\rangle
+= Q^{-1/2} \sum_y \omega^{x y} \left|y\right\rangle</math>。
+
+由此得到最終狀態：
+:<math> Q^{-1} \sum_x \sum_y \omega^{x y} \left|y\right\rangle \left|f(x)\right\rangle</math>.
+
+這是一個遠多過 <math>Q</math> 個狀態的疊加態，但是遠低過 <math>Q</math> <sup>2</sup>個。雖然在和中有 <math>Q</math> <sup>2</sup>項，但只要 <math>x_0</math> 和 <math>x</math> 的值相同，態<math>\left|y\right\rangle \left|f(x_0)\right\rangle</math>就可被提出來。令
+:<math>\omega = e^{2 \pi i /Q}</math>為 <math>Q^{th}</math>的一個單位根，
+: <math>r</math> 為 <math>f</math> 的週期，
+: <math>x</math> <sub>0</sub>為一個產生相同 <math>f</math> ( <math>x</math> )的 <math>x</math> 的集裡面的最小元素（我們已經有 <math>x</math> <sub>0</sub> <  <math>r</math> ），以及
+:''b''在0到<math>\lfloor(Q-x_0-1)/r\rfloor</math>之間使得<math>x_0 + rb < Q</math>。那麼<math>\omega^{ry}</math>則是復平面的一個單位向量（<math>\omega</math>是一個單位根， <math>r</math> 和''y''是整數），而<math>Q^{-1}\left|y\right\rangle \left|f(x_0)\right\rangle</math>在最終狀態下的係數則為
+:<math> \sum_{x:\, f(x)=f(x_0)} \omega^{x y} = \sum_{b} \omega^{(x_0 + r b) y} = \omega^{x_0y} \sum_{b} \omega^{r b y}</math>。這一求和的每一項代表一個獲得相同結果的不同路徑，而量子[[干涉_(物理学)|干涉]]發生。在單位向量<math>\omega^{ryb}</math>幾乎與復平面指向同一方向（要求<math>\omega^{ry}</math>指向正實數軸）時，干涉將是相長的。</li>
+
+<li>進行測量。我們由輸入寄存器取得結果''y''，由輸出寄存器取得<math>f(x_0)</math>。而既然 <math>f</math> 是週期，對某對''y''和<math>f(x_0)</math>進行測量的概率則由
+
+:<math> \left| Q^{-1} \sum_{x:\, f(x)=f(x_0)} \omega^{x y} \right|^2
+= Q^{-2} \left| \sum_{b} \omega^{(x_0 + r b) y} \right|^2
+</math>
+
+給出。分析顯示這個概率越高，單位向量<math>\omega^{ry}</math>就越接近正實數軸，或者<math>\frac{ry}{Q}</math>越接近一個整數。除非 <math>r</math> 是2的乘方，否則它不會是<math>Q</math>的因子。</li>
+
+<li>對<math>\frac{y}{Q}</math>進行[[連分數|連分數展開]]來計算其近似值，並生成滿足下列兩個條件的<math>\frac{c}{r'}</math>：
+:<math>A: r'<N</math>
+:<math>B: |\frac{y}{Q} - \frac{c}{r'}| < \frac{1}{2Q} </math>
+藉著滿足這一些條件， <math>r</math> ′有很高的機率會是我們要找的週期 <math>r</math> 。</li>
+
+<li>檢查 <math>f</math> ( <math>x</math> ) =  <math>f</math> ( <math>x</math>  +  <math>r</math> ′) <math>\Leftrightarrow</math> <math>a^r \equiv 1 \pmod{N}</math>。如果成功了，我們就完成了。</li>
+
+<li>否則，以接近y左右的數值作為 <math>r</math> 的候選，或者說多取幾個 <math>r'</math>.如果任何候選成功了，我們就完成了。</li>
+
+<li>否則，回到第一步驟（也就是全部重新做一次）。</li>
+</ol>
+
+== 演算法的解釋 ==
+此演算法包含兩個部份。演算法的第一部份是將因數分解問題轉成尋找一個函式的週期，而且這部份可以用傳統方式實作。第二部份則是使用量子傅立葉變換來搜尋這個函式的週期，而且這一部份是量子加速這整個演算法的理由。
+
+=== I.從週期得到因數 ===
+小於''N''且[[互質|互質]]於''N''的整數組成一個有限大，且對乘法[[同餘|同餘]]''N''的[[群|群]]。在步驟3之後，我們有一個屬於這個群的整數''a''。既然這個群是有限的，''a''必有一個有限大的階''r'',也就是最小的正整數令
+
+:<math>a^r \equiv 1\ \mbox{mod}\ N.\,</math>
+因此可知，''N''是''a'' <sup>''r''</sup> − 1的因數。先假設我們有能力獲得''r''，而且''r''是偶數。則
+:<math>a^r - 1 = (a^{r/2} - 1) (a^{r/2} + 1) \equiv 0\ \mbox{mod}\ N</math>
+:<math>\Rightarrow N\ | (a^{r/2} - 1) (a^{r/2} + 1).\,</math>
+
+''r''是令''a'' <sup>''r''</sup> ≡ 1''最小的''正整數，所以（''a'' <sup>''r'' / 2</sup> − 1）必定不能整除於''N''。若（''a'' <sup>''r'' / 2</sup> + 1）也不整除於''N''的話，則''N''必定與（''a'' <sup>''r'' / 2</sup> − 1）或者（''a'' <sup>''r'' / 2</sup> + 1）有一個非顯然的公因數。
+
+'''證明：'''為了簡化，我們分別用''u''和''v''表示（''a'' <sup>''r'' / 2</sup> − 1）和（''a'' <sup>''r'' / 2</sup> + 1）。''N'' | ''uv''，故''kN'' = ''uv''（k是某個整數）。假設gcd(''v'', ''N'') = 1：則必定存在某個整數''m''和''n''令''mv'' + ''nN'' = 1  (這是[[最大公因數|最大公因數]]的一個性質)。兩邊同乘以''u''，我們得到''mkN'' + ''nuN'' = ''u'', 所以 ''N'' | ''u''，从而產生矛盾（前文提到（''a'' <sup>''r'' / 2</sup> − 1）必定不能整除於''N''）。故假设不成立，即gcd(''v'', ''N'') ≠ 1。用類似的方法，可以得知若（''a'' <sup>''r'' / 2</sup> + 1）不能整除於''N'',  gcd(''u'', ''N'') ≠ 1。故得證u和v不同時與''N''互質。
+
+這給予我們一個''N''的因數分解。若''N''是兩個質數的乘積，則這是''唯一''可能的分解。
+
+=== II.找尋週期 ===
+秀爾的週期尋找演算法非常倚賴[[量子計算機|量子計算機]]同時處於許多狀態的能力。物理學家稱呼這個特性為狀態的「[[態疊加原理|疊加]]」。在計算函數''f''的週期時，我們會同時估計這個函數的所有點。
+
+不過，量子物理不允許我們直接取得這些資訊。[[量子測量|測量]]會令觀測結果塌陷到其中一個可能的結果，並摧毀所有其他可能。如果不是因為[[不可複製原理|不可複製原理]]，我們可以先測量''f''(''x'')而非測量''x''，再製造幾個結果態的拷貝（將會是多個有著同樣的''f''(''x'')的態的疊加）。對這些態上的''x''的測量將會給出能給出相同''f''(''x'')的不同的''x''，由此推導出週期來。因為我們不能複製完全相同的量子狀態，這個方法行不通。因此在這裡我們需要小心的轉變疊加態，使其成為可以以高機率回傳正確答案的狀態。這可使用[[量子傅立葉變換|量子傅立葉變換]]來達成。
+
+因此秀爾在這裡必須解決三個「實作」的問題，而且速度必須夠快，也就是可這些問題可以用[[量子閘|量子閘]]個數為<math>\log N</math>的多項式來實作。
+<ol>
+<li>製造狀態的疊加。
+
+這可以藉著對所有輸入的量子位元使用[[量子閘#哈達瑪閘|哈達瑪閘]]（Hadamard gate）來達成。另一個方法是使用量子傅立葉變換（如下述）。</li>
+
+<li>以量子變換實作函數''f''。
+
+要達成這件事情，秀爾使用了[[平方求幂|反覆平方]]以完成模的取幂變換。值得注意的是，這一個步驟比起量子傅立葉變換還難以實作，需要更多輔助的量子位元以及明顯更多的閘來完成。</li>
+
+<li>進行量子傅立葉變換。
+
+利用受控旋轉閘（controlled rotation gate）和哈達瑪閘，秀爾設計了一個量子傅立葉變換的線路，只使用了<math>q(q-1)/2 = O((\log Q)^2)</math>個閘（''Q'' = 2<sup>''q''</sup>）。<ref>{{Harvnb|Shor|1999|p=14}}.</ref></li>
+</ol>
+
+在這一些變換之後，測量會給出週期''r''的近似值。為簡明起見，假設存在''y''令''yr/Q''是整數，則測量到''y''的機率是1（理論上）。要推導出這個，我們首先注意到對任何整數''b''，
+:<math>e^{-2 \pi i b yr/Q} = 1</math>。因此''Q/r''的平方能告訴我們測量''y''的概率，因為''b''大致上取''Q/r''個值，因此概率為<math>1/r^2</math>。有''r''個''y''使得''yr/Q''為整數，<math>f(x_0)</math>也有''r''種可能，所以機率總和為1。
+
+Note:另一種解釋秀爾演算法的方式是將之視為是喬裝過後的[[量子相位估計演算法|量子相位估計演算法]]。
+
+== 参见==
+*[[泡利矩陣|泡利矩陣]]
+*[[量子退火|量子退火]]
+
+==參考資料==
+{{reflist}}
+
+==延伸閱讀==
+{{refbegin|2}}
+*{{citation |last=Nielsen |first=Michael A. |last2=Chuang |first2=Isaac L. |lastauthoramp=yes |title=Quantum Computation and Quantum Information |year=2000 |publisher=Cambridge University Press |location= |isbn= |pages= |url= }}.
+* Phillip Kaye, Raymond Laflamme, Michele Mosca, ''An introduction to quantum computing'', Oxford University Press, 2007, ISBN 019857049X
+* [http://scottaaronson.com/blog/?p=208 "Explanation for the man in the street"] by {{tsl|en|Scott Aaronson|Scott Aaronson}}, "[http://scottaaronson.com/blog/?p=208#comment-9958 approved]" by Peter Shor. (Shor wrote "Great article, Scott! That’s the best job of explaining quantum computing to the man on the street that I’ve seen."). Scott Aaronson suggests the following 12 references as further reading (out of "the 10<sup>10<sup>5000</sup></sup> quantum algorithm tutorials that are already on the web."):
+*{{Citation |last=Shor |first=Peter W. |year=1999 |title=Polynomial-Time Algorithms for Prime Factorization and Discrete Logarithms on a Quantum Computer |journal=SIAM J.Sci.Statist.Comput. |volume=41 |issue=2 |pages=303–332 |id={{arXiv|quant-ph|9508027v2}} |doi=10.1137/S0036144598347011 }}. Revised version of the original paper by Peter Shor ("28 pages, LaTeX. This is an expanded version of a paper that appeared in the Proceedings of the 35th Annual Symposium on Foundations of Computer Science, Santa Fe, NM, Nov. 20--22, 1994. Minor revisions made January, 1996").
+*[http://alumni.imsa.edu/~matth/quant/299/paper/index.html Quantum Computing and Shor's Algorithm], Matthew Hayward, 2005-02-17, imsa.edu, LaTeX2HTML version of the original [http://alumni.imsa.edu/~matth/quant/299/paper.tex 2750 line LaTeX document], also available as a 61 page [http://alumni.imsa.edu/~matth/quant/299/paper.pdf PDF] or [http://alumni.imsa.edu/~matth/quant/299/paper.ps postscript] document.
+*[http://homepages.cwi.nl/~rdewolf/publ/qc/survey.ps Quantum Computation and Shor's Factoring Algorithm], Ronald de Wolf, CWI and University of Amsterdam, January 12, 1999, 9 page postscript document.
+*[http://www.cs.berkeley.edu/~vazirani/f04quantum/notes/lec9.ps Shor's Factoring Algorithm], Notes from Lecture 9 of Berkeley CS 294-2, dated 4 Oct 2004, 7 page postscript document.
+*[http://www.theory.caltech.edu/people/preskill/ph229/notes/chap6.ps Chapter 6 Quantum Computation], 91 page postscript document, Caltech, Preskill, PH229.
+*[http://www-users.cs.york.ac.uk/~schmuel/comp/comp.html Quantum computation: a tutorial] by [http://www.cs.york.ac.uk/~schmuel/ Samuel L. Braunstein].
+*[http://www.cs.ucr.edu/~neal/1996/cosc185-S96/shor/high-level.html The Quantum States of Shor's Algorithm], by Neal Young, Last modified: Tue May 21 11:47:38 1996.
+*A now-[[circular_reference|circular reference]] via the [[Wikipedia:Avoid_self-references|Wikipedia]] copy of [http://en.wikipedia.org/w/index.php?title=Shor%27s_algorithm this article]; clearly Aaronson's link originally reached [http://en.wikipedia.org/w/index.php?title=Shor%27s_algorithm&oldid=109598211 the 20 Feb 2007 version].
+*[http://people.ccmr.cornell.edu/~mermin/qcomp/chap3.pdf III. Breaking RSA Encryption with a Quantum Computer: Shor's Factoring Algorithm] {{Wayback|url=http://people.ccmr.cornell.edu/~mermin/qcomp/chap3.pdf |date=20121115112940 }}, LECTURE NOTES ON QUANTUM COMPUTATION, Cornell University, Physics 481-681, CS 483; Spring, 2006 by N. David Mermin. Last revised 2006-03-28, 30 page PDF document.
+*[http://www.arxiv.org/abs/quant-ph/0303175 arXiv quant-ph/0303175 Shor's Algorithm for Factoring Large Integers. C. Lavor, L.R.U. Manssur, R. Portugal]. Submitted on 29 Mar 2003. This work is a tutorial on Shor's factoring algorithm by means of a worked out example. Some basic concepts of Quantum Mechanics and quantum circuits are reviewed. It is intended for non-specialists which have basic knowledge on undergraduate Linear Algebra. 25 pages, 14 figures, introductory review.
+*[http://www.arxiv.org/abs/quant-ph/0010034 arXiv quant-ph/0010034 Shor's Quantum Factoring Algorithm, Samuel J. Lomonaco, Jr], Submitted on 9 Oct 2000, This paper is a written version of a one hour lecture given on Peter Shor's quantum factoring algorithm. 22 pages.
+*[http://www.cs.princeton.edu/theory/complexity/quantumchap.pdf Chapter 20 Quantum Computation], from ''Computational Complexity: A Modern Approach'', Draft of a book: Dated January 2007, Comments welcome!, Sanjeev Arora and Boaz Barak, Princeton University.
+{{refend}}
+
+{{量子計算}}
+{{数论算法}}
+
+[[Category:量子演算法|Category:量子演算法]]
+[[Category:整數分解算法|Category:整數分解算法]]
+[[Category:量子信息|Category:量子信息]]
+[[Category:包含證明的條目|Category:包含證明的條目]]
+[[Category:后量子密码学|Category:后量子密码学]]

@@ -1,0 +1,98 @@
+[[File:Corrected_S-expression_tree_2.svg|thumb]] [[data_structure|data structure]] representing the s-expression for <code>(* 2 (+ 3 4))</code> ]]
+所谓“S-[[表达式|表达式]]/[[運算式|運算式]]”（S-expression）或“sexp”（其中“S”代表“符号的”），是指一种以人类可读的文本形式表达[[半结构化数据|半结构化数据]]的约定。S-表达式可能以其在[[Lisp|Lisp]]家族的编程语言中的使用而为人所知。其他应用则见于由Lisp衍生的语言，如{{le|DSSSL|Document Style Semantics and Specification Language}}，以及如[[Internet_Message_Access_Protocol|IMAP]]之类通信协议中作为标记出现和[[约翰·麦卡锡|约翰·麦卡锡]]的{{le|CBCL|Common Business Communication Language}}。语法细节和所支持的数据类型虽因语言而异，但这些语言间最通用的特性则是使用S-表达式作为括号化的前缀表示法（有时亦作剑桥[[波兰表示法|波兰表示法]]）。
+
+== 數據類型和語法 ==
+S-表達式格式有許多變體，支持不同數據類型的各種不同語法。最廣泛支持的是：
+* ''列表和點對'': <code>(1 () (2 . 3) (4))</code>
+* ''符號'': <code>with-hyphen</code> <code>?@!$</code> <code>a\ symbol\ with\ spaces</code>
+* ''字串'': <code>"Hello, world!"</code>
+* ''整數'': <code>-9876543210</code>
+* ''浮點數'': <code>-0.0</code> <code>6.28318</code> <code>6.023e23</code>
+
+== 在 LISP 編程中使用 ==
+S-表达式在Lisp中既用作代码，也用作数据（见McCarthy Recursive Functions of Symbolic Expressions [https://web.archive.org/web/20040202215021/http://www-formal.stanford.edu/jmc/recursive/recursive.html]）。S-表达式原本被用于将被{{le|M-表达式|M-expression}}处理的数据，但Lisp的首个实现是一个 S-表达式的解释器，以 S-表达式编码 M-表达式，而Lisp程序员很快习惯于对代码和数据都使用 S-表达式。
+
+S-表达式可以是如数字这样的单个对象，包括特殊原子<code>nil</code>和<code>t</code>在内的{{le|LISP 原子|LIST atom}}，或写作 <code>(x . y)</code>的[[列表構造函數|cons pair]]。更长的列表则由嵌套的cons pair组成，例如<code>(1 . (2 . (3 . nil)))</code>（，亦可写作更易理解的<code>(1 2 3)</code>）。
+
+使用前缀表示法，程序代码可写作 S-表达式。书写Lisp程序中额外的[[语法糖|语法糖]]则是，一般的表达式<code>(quote x)</code>可以省略为<code>'x</code>。
+
+=== 數據表達式的示例 ===
+嵌套列表可以寫為 S-表達式：((milk juice) (honey marmalade))是一個雙元素S-表達式，其元素也是雙元素 S-表達式。Lisp（和本文）中使用的以空格分隔的符號是典型的。換行符（換行符）通常有資格作為分隔符。
+這是一個簡單的上下文無關語法的一小部分英語寫成 S-表達式（Gazdar / Melish，Lisp 中的自然語言處理）：
+<syntaxhighlight lang="lisp">
+(((S) (NP VP))
+ ((VP) (V))
+ ((VP) (V NP))
+ ((V) died)
+ ((V) employed)
+ ((NP) nurses)
+ ((NP) patients)
+ ((NP) Medicenter)
+ ((NP) "Dr Chan"))
+</syntaxhighlight>
+
+=== S 表達式的源碼示例 ===
+[[Common_Lisp|Common Lisp]]范例：
+<syntaxhighlight lang="lisp">
+(defun factorial (x)
+    (if (zerop x) 1
+        (* x (factorial (- x 1)))))
+</syntaxhighlight>
+[[Scheme|Scheme]]范例：
+<syntaxhighlight lang="scheme">
+(define (factorial x)
+    (if (zero? x) 1
+        (* x (factorial (- x 1)))))
+</syntaxhighlight>
+
+== 解析 ==
+S-表達式經常與 XML 進行比較，一個關鍵的區別是 S-表達式在語法上要簡單得多，因此更容易解析。例如，可以在幾十行 Python 代碼中實現一個簡單的 S-表達式解析器。
+<syntaxhighlight lang="python">
+def parse_sexp(string):
+    """
+    >>> parse_sexp("(+ 5 (+ 3 5))")
+    [['+',_'5',_['+',_'3',_'5'|'+', '5', ['+', '3', '5']]]
+    
+    """
+    sexp = [[]]
+    word = ''
+    in_str = False
+    for char in string:
+        if char == '(' and not in_str:
+            sexp.append([])
+        elif char == ')' and not in_str:
+            if word:
+                sexp[-1].append(word)
+                word = ''
+            temp = sexp.pop()
+            sexp[-1].append(temp)
+        elif char in (' ', '\n', '\t') and not in_str:
+            if word:
+                sexp[-1].append(word)
+                word = ''
+        elif char == '\"':
+            in_str = not in_str
+        else:
+            word += char
+    return sexp[0]
+</syntaxhighlight>
+
+== 標準化 ==
+1997年5月，[[罗纳德·李维斯特|罗纳德·李维斯特]] 提交了一份 {{le|Internet-Draft|Internet-草案}} ，拟作为[[RFC|RFC]]出版。该草案定义了基于Lisp S-表达式的语法，但旨在用于一般目的的数据存储及交换（类似[[XML|XML]]）而非仅限于编程。尽管未被批准为RFC，但此草案已被其他RFC（如RFC 2693）和数种出版物[http://scholar.google.com/scholar?hl=en&lr=&safe=off&q=rivest+sexp&btnG=Search]{{Wayback|url=http://scholar.google.com/scholar?hl=en&lr=&safe=off&q=rivest+sexp&btnG=Search |date=20130830141636 }}引用。最原始的用途则是在{{le|SPKI|Simple public key infrastructure}}中。
+
+Rivest的格式定义了 S-表达式为一个八位元组-串（一系列[[字节|字节]]）或其他S-表达式的有限列表。此定义描述了三种表达这种结构的互换格式。一种为“advanced transport”——以格式而言具有很大弹性，且语法上近似于Lisp-风格表达式，但并不等同。例如，advanced transport允许八位元组-串逐字表示（串的长度后跟随一分号及整个原始的串），引号形式允许转义字符，[[十六进制|十六进制]]，[[Base64|Base64]]，或者在满足一定条件时直接作为“token”。（Rivest的token与Lisp token不同之处在于前者仅仅为了方便与审美，像其他字符串一样对待，而后者有特别的语法意义。）为了更为紧密，更便于语法分析，独立于任何抽象的 S-表达式，另一种交换格式“canonical presentation”仅允许逐字表示的字符串，格式上禁止字符串以外的空白。
+
+== 相关条目 ==
+* [[M-表达式|M-表达式]]
+* {{tsl|en|CAR_and_CDR|CAR and CDR}}
+* [[列表構造函數|列表構造函數]]
+* {{tsl|en|Canonical S-expressions|}}
+
+== 外部链接 ==
+[[自由软件|自由软件]]：
+* [http://sexpr.sourceforge.net/ sfsexp]{{Wayback|url=http://sexpr.sourceforge.net/ |date=20090114201659 }} 小且快速的“s表达式”库（C/C++）
+* [http://leon.bottou.org/projects/minilisp minilisp]{{Wayback|url=http://leon.bottou.org/projects/minilisp |date=20120225131414 }}, by Léon Bottou.
+* [http://becquerel.org/curie libcurie]{{Wayback|url=http://becquerel.org/curie |date=20120827044604 }}一个小的[[libc|libc]]替换,依赖“s表达式”。
+
+[[Category:LISP程式語言|Category:LISP程式語言]]
+[[Category:数据序列化格式|Category:数据序列化格式]]

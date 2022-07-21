@@ -1,0 +1,105 @@
+{{NoteTA|G1=IT}}
+'''Web服务器-{zh-cn:网关;zh-tw:閘道}-接口'''（'''Python Web Server Gateway Interface'''，缩写为WSGI）是为[[Python|Python]]语言定义的[[網頁伺服器|Web服务器]]和[[网络应用程序|Web应用程序]]或[[Web应用框架|框架]]之间的一种简单而通用的[[介面_(程式設計)|接口]]。自从WSGI被开发出来以后，许多其它语言中也出现了类似接口。
+
+==发展背景==
+以前，如何选择合适的Web应用程序框架成为困扰Python初学者的一个问题，这是因为，一般而言，Web应用框架的选择将限制可用的[[Web服务器|Web服务器]]的选择，反之亦然。那时的Python应用程序通常是为[[通用网关接口|CGI]]，[[FastCGI|FastCGI]]，{{en-link|mod_python}}中的一个而设计，甚至是为特定Web服务器的自定义的API接口而设计的。
+
+WSGI<ref>[http://www.python.org/dev/peps/pep-3333/ PEP 3333] {{Wayback|url=http://www.python.org/dev/peps/pep-3333/ |date=20111101032123 }}, Python Web Server Gateway Interface v1.0</ref> （有时发音作'wiz-gee'）是作为Web服务器与Web应用程序或应用框架之间的一种低级别的[[介面_(程式設計)|接口]]，以提升可移植Web应用开发的共同点。WSGI是基于现存的[[通用网关接口|CGI]]标准而设计的。
+
+==规范概览==
+WSGI區分為兩個部份：一為「[[伺服器|伺服器]]」或「-{zh-cn:网关;zh-tw:閘道}-」，另一為「應用程序」或「應用框架」。在處理一個WSGI請求時，伺服器會為應用程序提供環境資訊及一個回呼函數（Callback Function）。當應用程序完成處理請求後，透過前述的回呼函數，將結果回傳給伺服器。
+
+所谓的“WSGI -{zh-cn:[[中间件|中间件]];zh-tw:[[中介軟體|中介軟體]]}-”同时实现了API的两方，因此可以在WSGI服务器和WSGI应用之间起调解作用：从Web服务器的角度来说，-{zh-cn:中间件;zh-tw:中介軟體}-扮演应用程序，而从应用程序的角度来说，-{zh-cn:中间件;zh-tw:中介軟體}-扮演服务器。“-{zh-cn:中间件;zh-tw:中介軟體}-”组件可以执行以下功能：
+* 重写[[环境变量|环境变量]]后，根据目标[[统一资源定位符|URL]]，将请求消息路由到不同的应用对象。
+*允许在一个[[行程|进程]]中同时运行多个应用程序或应用框架。
+* [[负载均衡|负载均衡]]和远程处理，通过在[[计算机网络|网络]]上转发请求和响应消息。
+* 进行内容后处理，例如应用[[XSLT|XSLT]]样式表。
+
+==示例程序==
+用[[Python|Python]]语言写的一个符合WSGI的“[[Hello_World|Hello World]]”应用程序如下所示：
+<syntaxhighlight lang="python">
+def app(environ, start_response):
+    start_response('200 OK', [('Content-Type', 'text/plain')])
+    yield b"Hello world!\n"
+</syntaxhighlight>
+其中
+* 第一行定义了一个名为 app 的 callable{{NoteTag|在规范中，使用术语“callable”表示一个函数，方法，类或带有__call__ method实例。}}，接受两个参数，environ 和 start_response，environ 是一个包含了 CGI 中的环境变量的字典。
+* 第二行调用了start_response，状态指定为“200 OK”，消息头指定为内容类型是“text/plain”。start_response 也是一个 callable，接受两个必须的参数，status（HTTP 状态）和 response_headers（响应消息的头）。
+* 第三行将响应消息的消息体返回。
+
+==调用一个应用程序的示例==
+{{Expand section|date=March 2011}}
+调用一个程序并获取它的应答消息的例子如下所示：
+<syntaxhighlight lang="python">
+def call_application(app, environ):
+    body = []
+    status_headers = [None, None]
+    def start_response(status, headers):
+        status_headers[:] = [status, headers]
+        return body.append
+    app_iter = app(environ, start_response)
+    try:
+        for item in app_iter:
+            body.append(item)
+    finally:
+        if hasattr(app_iter, 'close'):
+            app_iter.close()
+    return status_headers[0], status_headers[1], ''.join(body)
+
+status, headers, body = call_application(app, {...environ...})
+</syntaxhighlight>
+
+==WSGI兼容的应用和框架==
+支持WSGI的[[Web应用框架|Web应用框架]]有很多：
+{{div col|colwidth=20em}}
+* [[BlueBream|BlueBream]]
+* bobo<ref name="bobo">{{cite web|url=http://bobo.digicool.com|title=Bobo light-weight framework for creating WSGI web applications|accessdate=2021-02-09|archive-date=2011-12-01|archive-url=https://web.archive.org/web/20111201151500/http://bobo.digicool.com/|dead-url=no}}</ref>
+* [[Bottle|Bottle]]<ref name="bottle">{{cite web|url=http://bottlepy.org|title=Bottle Micro-Framework|accessdate=2021-02-09|archive-date=2014-06-04|archive-url=https://wayback.archive-it.org/all/20140604060716/http://bottlepy.org/docs/dev/index.html|dead-url=no}}</ref>
+* [[CherryPy|CherryPy]]
+* [[Django|Django]]<ref name="djangowsgi">{{cite web|url=http://www.djangoproject.com/weblog/2005/jul/18/local_server/|title=Django with WSGI support|access-date=2011-03-18|archive-date=2021-04-01|archive-url=https://web.archive.org/web/20210401044901/https://www.djangoproject.com/weblog/2005/jul/18/local_server/}}</ref>
+* [[Flask|Flask]]
+* [[Google_App_Engine|Google App Engine]]'s webapp2
+* [[Gunicorn|Gunicorn]]
+* prestans<ref name="prestans">{{cite web|url=http://code.google.com/p/prestans/|title=prestans Micro-Framework|access-date=2013-09-23|archive-date=2012-10-08|archive-url=https://web.archive.org/web/20121008002946/http://code.google.com/p/prestans/}}</ref>
+* [[Pylons|Pylons]]
+* [[Pylons|Pyramid]]
+* restlite<ref name="restlite">{{cite web|url=http://code.google.com/p/restlite/|title=restlite server tools for quick prototyping|access-date=2013-09-23|archive-date=2016-06-01|archive-url=https://web.archive.org/web/20160601134109/https://code.google.com/p/restlite/}}</ref>
+* [[Tornado|Tornado]]
+* [[Trac|Trac]]
+* [[TurboGears|TurboGears]]
+* [[Uliweb|Uliweb]]<ref name="Uliweb">{{cite web|url=http://github.com/limodou/uliweb|title=Ulibweb github source code|access-date=2013-09-23|archive-date=2021-12-10|archive-url=https://web.archive.org/web/20211210202601/https://github.com/limodou/uliweb}}</ref>
+* [[web.py|web.py]]<ref name="web.py">{{cite web|url=http://webpy.org/|title=web.py official site|accessdate=2012-08-28|archive-date=2011-10-26|archive-url=https://web.archive.org/web/20111026193319/http://webpy.org/|dead-url=no}}</ref>
+* [[web2py|web2py]]
+* weblayer<ref name="weblayer">{{cite web|url=http://packages.python.org/weblayer|title=weblayer package for writing WSGI application|access-date=2011-03-18|archive-date=2013-01-26|archive-url=https://web.archive.org/web/20130126142813/http://packages.python.org/weblayer/}}</ref>
+* Werkzeug<ref name="Werkzeug">{{cite web|url=http://werkzeug.pocoo.org/|title=Werkzeug, the Python WSGI Utility Library|access-date=2013-09-23|archive-date=2021-04-01|archive-url=https://web.archive.org/web/20210401044902/https://werkzeug.palletsprojects.com/en/1.0.x/}}</ref>
+{{div col end}}
+
+==影响==
+* 2003年： 原初的Python版本 <ref name="wsgi">[http://www.python.org/dev/peps/pep-0333/] {{Wayback|url=http://www.python.org/dev/peps/pep-0333/ |date=20210609072317 }} WSGI</ref>
+* 2007年： [[Rack|Rack]]，[[Ruby|Ruby]]版本 <ref name="rack">{{cite web |url=http://rack.rubyforge.org/doc/files/SPEC.html |title=存档副本 |accessdate=2011-03-18 |deadurl=yes |archiveurl=https://archive.is/20070315060148/http://rack.rubyforge.org/doc/files/SPEC.html |archivedate=2007-03-15 }} Rack接口</ref>
+* 2008年： Lua [[WSAPI|WSAPI]]，[[Lua|Lua]]版本 <ref name="wsapi">[http://keplerproject.github.com/wsapi/index.html] {{Wayback|url=http://keplerproject.github.com/wsapi/index.html |date=20110116215514 }} WSAPI接口</ref>
+* 2009年： [[JSGI|JSGI]]，[[JavaScript|JavaScript]]版本 <ref name="jsgi">[http://wiki.commonjs.org/wiki/JSGI] {{Wayback|url=http://wiki.commonjs.org/wiki/JSGI |date=20160321214410 }} JSGI接口</ref>
+* 2009年： [[PSGI|PSGI]]，[[Perl|Perl]]版本 <ref name="psgi">[http://search.cpan.org/~miyagawa/PSGI/PSGI.pod] {{Wayback|url=http://search.cpan.org/~miyagawa/PSGI/PSGI.pod |date=20180524231622 }} PSGI接口</ref>
+* 2010年： [[Hack|Hack]]，[[Haskell|Haskell]]版本 <ref name="hack">[http://hackage.haskell.org/package/hack] {{Wayback|url=http://hackage.haskell.org/package/hack |date=20220119023814 }} Hack接口</ref>
+
+== 注释 ==
+{{NoteFoot}}
+
+== 参考文献 ==
+{{Reflist|30em}}
+
+== 外部連結 ==
+*[http://www.python.org/dev/peps/pep-0333/ PEP 333 -- Python Web Server Gateway Interface v1.0] {{Wayback|url=http://www.python.org/dev/peps/pep-0333/ |date=20210609072317 }}
+*[http://www.python.org/dev/peps/pep-3333/ PEP 3333 -- Python Web Server Gateway Interface v1.0.1] {{Wayback|url=http://www.python.org/dev/peps/pep-3333/ |date=20111101032123 }}
+* [https://web.archive.org/web/20120723233359/http://pythonpaste.org/ WSGI metaframework]
+* [http://wsgi.org/ 关于WSGI的Wiki网站] {{Wayback|url=http://wsgi.org/ |date=20210401044904 }}{{en}}
+* [http://webpython.codepoint.net/wsgi WSGI教程] {{Wayback|url=http://webpython.codepoint.net/wsgi |date=20081204012403 }}{{en}}
+* [https://archive.is/20060422184652/http://cvs.woodpecker.org.cn/svn/woodpecker/pureprolog/trunk/essay/wsgiinto/wsgi_into.html Hoxide · 2006-03-03 · WSGI简介]
+* [http://wiki.woodpecker.org.cn/moin/WSGI 啄木鸟关于wsgi的介绍] {{Wayback|url=http://wiki.woodpecker.org.cn/moin/WSGI |date=20081027100405 }}
+
+{{-}}
+{{Python}}
+{{網頁技術與標準}}
+
+[[Category:应用程序接口|Category:应用程序接口]]
+[[Category:Python|Category:Python]]

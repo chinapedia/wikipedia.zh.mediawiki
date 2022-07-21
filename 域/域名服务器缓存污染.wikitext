@@ -1,0 +1,65 @@
+{{NoteTA
+|G1 = IT
+|1 = zh-cn:污染; zh-tw:汙染; zh-hk:污染;
+|2 = zh-cn:局域; zh-tw:區域;
+}}
+{{Multiple issues|
+{{Original research}}
+{{Globalize}}
+{{POV|time=2021-12-16}}
+{{Expert needed}}
+{{Lead too short|time=2022-02-06T09:39:28+00:00}}
+}}
+'''網域伺服器快取污染'''（DNS cache pollution）或'''DNS污染'''，是指由于[[防火长城|防火长城]]自动执行DNS劫持攻击导致DNS服务器缓存了错误记录的现象。而'''域名服务器缓存投毒'''（DNS cache poisoning）和'''DNS缓存投毒'''指由防火长城执行的DNS劫持攻击。'''污染'''一词可能取自域名系统[[域名系统#域名解析|域名解析]]之特性，若递归DNS解析器查询上游时收到错误回复，所有下游也会受影响。
+
+== 缓存污染攻擊 ==
+
+DNS劫持是一类[[旁观者攻击|旁观者攻击]]，攻击者借由其在[[网络拓扑|网络拓扑]]中的特殊位置，发送比真实的DNS回应更早到达攻击目标的伪造DNS回应。
+一部連上了互聯網的電腦一般都會使用[[互聯網服務供應商|互聯網服務供應商]]提供的递归DNS服务器，這個服务器通常都會將部分客戶曾經請求過的域名暫存起來。快取污染攻擊就是針對這一特性，影響服务器的使用者或下游服務。
+
+=== 中国防火長城 ===
+[[File:DNS_hijack_of_the_Great_Firewall.png|防火长城向查询zh.wikipedia.org的DNS请求注入伪造回复（使用[[dig]]测试）|thumb]]
+在中國大陆，對所有经过[[防火長城|防火長城]]（英語：Great Firewall，常用簡稱：GFW）的在[[用户数据报协议|UDP]]的53[[通信端口|端口]]上的域名查询进行IDS[[入侵检测|入侵检测]]，一經發現與黑名單關鍵詞相匹配的域名查詢請求，會馬上伪装成目标解析服务器注入伪造的查詢结果。攻击仅出现在DNS查询之路由经过防火长城时{{notetag|中国大陆用户查询当地的DNS服务器收到错误结果是[[域名系统#域名解析|缓存]]所致，其并没有直接受到防火长城的DNS劫持攻击。}}。伪造的查询结果中的IP地址不是一成不变的，在一段时间后会更新。<ref name=foci20>{{cite conference|url= https://www.usenix.org/system/files/foci20-paper-anonymous_0.pdf|title=Triplet Censors: Demystifying Great Firewall’s DNS Censorship Behavior|conference=10th USENIX Workshop on Free and Open Communications on the Internet (FOCI 20)|date=2020-08-11|conference-url= https://www.usenix.org/conference/foci20|author1=Anonymous|author2=Arian Akhavan Niaki|author3=Nguyen Phong Hoang|author4=Phillipa Gill|author5=Amir Houmansadr|quote=While other countries tend to use NXDOMAIN or reserved IP address space, China’s use of a range of public IP addresses owned by a variety of organizations is notable.}}</ref><ref name=gfw>{{cite web|url=http://gfwrev.blogspot.com/2009/11/gfwdns.html|title=深入了解GFW：DNS污染|date=2009-11-27|accessdate=2011-02-06|archive-date=2020-12-14|archive-url=https://web.archive.org/web/20201214234930/http://gfwrev.blogspot.com/2009/11/gfwdns.html|dead-url=no}}</ref>
+
+对于TCP协议下的域名查询，防火长城可使用[[TCP重置攻击|TCP重置攻击]]的方法进行干扰。
+
+=== 互联网服务提供商 ===
+中国大陆的互联网服务提供商经常劫持部分域名，转到自己指定的网站，以提供自己的广告，方式为劫持域名不存在时返回的NXDOMAIN记录（Non-existent domain）返回自己服务器的IP，从而跳转至自己的服务器上显示广告等内容。
+
+2021年，香港於1月起無法訪問網站「香港編年史」，傳媒消息稱警方要求網絡供應商封鎖網站。<ref>{{cite web |url=https://news.mingpao.com/ins/%E6%B8%AF%E8%81%9E/article/20210108/s00001/1610093311437/%E8%BC%89%E8%AD%A6%E5%93%A1%E5%80%8B%E4%BA%BA%E8%B3%87%E6%96%99%E3%80%8C%E9%A6%99%E6%B8%AF%E7%B7%A8%E5%B9%B4%E5%8F%B2%E3%80%8D%E7%B6%B2%E7%AB%99%E7%84%A1%E6%B3%95%E9%80%A3%E7%B7%9A-%E6%B6%88%E6%81%AF-%E8%AD%A6%E6%96%B9%E5%9C%8B%E5%AE%89%E8%99%95%E9%A6%96%E5%BC%95%E7%94%A8%E3%80%8A%E6%B8%AF%E5%8D%80%E5%9C%8B%E5%AE%89%E6%B3%95%E3%80%8B%E5%B0%81%E7%B6%B2 |title=載警員個人資料「香港編年史」網站無法連線　消息：警方國安處首引用《港區國安法》封網 |accessdate=2021-01-12 |archive-date=2021-01-15 |archive-url=https://web.archive.org/web/20210115164844/https://news.mingpao.com/ins/%E6%B8%AF%E8%81%9E/article/20210108/s00001/1610093311437/%E8%BC%89%E8%AD%A6%E5%93%A1%E5%80%8B%E4%BA%BA%E8%B3%87%E6%96%99%E3%80%8C%E9%A6%99%E6%B8%AF%E7%B7%A8%E5%B9%B4%E5%8F%B2%E3%80%8D%E7%B6%B2%E7%AB%99%E7%84%A1%E6%B3%95%E9%80%A3%E7%B7%9A-%E6%B6%88%E6%81%AF-%E8%AD%A6%E6%96%B9%E5%9C%8B%E5%AE%89%E8%99%95%E9%A6%96%E5%BC%95%E7%94%A8%E3%80%8A%E6%B8%AF%E5%8D%80%E5%9C%8B%E5%AE%89%E6%B3%95%E3%80%8B%E5%B0%81%E7%B6%B2 |dead-url=no }}</ref><ref>{{cite web |url=https://hk.appledaily.com/local/20210112/LL2N7DQUONA7ZHJYUJOOMJPNDM/ |title=警疑封編年史新IP 株連數百網站 IT人批損香港營商環境 |accessdate=2021-01-12 |archive-date=2021-01-12 |archive-url=https://web.archive.org/web/20210112165525/https://hk.appledaily.com/local/20210112/LL2N7DQUONA7ZHJYUJOOMJPNDM/ |dead-url=yes }}</ref>「香港編年史」於1月6日更改IP位址，但再次被封，共用同一IP的網站都無法訪問，包括麻醉科臨床藥理期刊（Journal of Anaesthesiology Clinical Pharmacology, JOACP）及美國機械人科技公司Apptronik。
+
+{{Citation needed|2021年起{{notetag|从哪个月开始不可考}}，部分域名通过互联网服务提供商提供的DNS被劫持到[[国家反诈中心|国家反诈中心app]]的推广页面{{notetag|例如：http://182.43.124.6 （中国电信）、http://39.102.194.95 （中国联通）、http://101.35.177.86 （中国移动）}}。|time=2022-02-15T14:28:25+00:00}}
+
+== 应对 ==
+
+[[DNSSEC|DNSSEC]]技术为DNS解析服务提供了解析数据验证机制，理论上可以有效抵御劫持。此外，[[DNSCrypt|DNSCrypt]]、[[DNS_over_TLS|DoT]]、[[DNS_over_HTTPS|DoH]]等方法通过将DNS请求封装于安全连接内，以保护DNS请求中的数据不被中间传输设备篡改。
+== 注释 ==
+{{notefoot}}
+
+== 参考文献 ==
+{{Reflist|35em}}
+
+== 參見 ==
+* [[名称服务器|名称服务器]]
+* [[根域名伺服器|根域名伺服器]]
+* [[DNSSEC|DNSSEC]]
+* [[金盾工程|金盾工程]]
+* [[防火長城|防火長城]]
+
+== 外部連結 ==
+{{wikiversity|Category:域名服务器缓存污染|cat=yes}}
+* [https://web.archive.org/web/20080511204328/http://www.trusteer.com/docs/bind9dns.html BIND 9 DNS Cache Poisoning - Discovered by Amit Klein (Trusteer)]
+* [https://web.archive.org/web/20080326233700/http://www.scanit.be/advisory-2007-11-14.html Predictable transaction IDs in Microsoft DNS server allow cache poisoning]
+* [https://web.archive.org/web/20070104104352/http://isc.sans.org/diary.php?date=2005-04-07 SANS DNS cache poisoning update]
+* [https://web.archive.org/web/20061013053825/http://www.dnssec.net/dns-threats.php DNS Threats & Weaknesses: research and presentations]
+* [http://www.hackernotcracker.com/2007-01/blocking-unwanted-domain-names-creative-usage-of-the-hosts-file.html Blocking Unwanted Domain Names]{{Wayback|url=http://www.hackernotcracker.com/2007-01/blocking-unwanted-domain-names-creative-usage-of-the-hosts-file.html |date=20080918230247 }} Creative Usage of the Hosts File
+* [https://web.archive.org/web/20120216024901/http://www.security-database.com/toolswatch/PorkBind-1-2-Yet-another-Cache-DNS.html Security-Database Tools Watch] PorkBind Scanner for 13 DNS Flaws including the DNS Poisoning
+* [https://web.archive.org/web/20120721083308/http://www.checkpoint.com/defense/advisories/public/dnsvideo/index.html Movie explaining DNS Cache Poisioning]
+
+{{-}}
+{{Hacking}}
+{{翻牆技術}}
+
+[[Category:网络安全|Category:网络安全]]
+[[Category:域名|緩存污染]]
+[[Category:保全漏洞|Category:保全漏洞]]

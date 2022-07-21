@@ -1,0 +1,71 @@
+{{Primarysources|time=2021-10-25}}
+{{Infobox website
+| name            = 欧拉计划
+| native_name     = Project Euler
+| native_name_lang= en
+| commercial      = 非盈利
+| screenshot      = Leonhard_Euler_2.jpg
+| url             = [https://projecteuler.net/ projecteuler.net]
+| type            = 解题类网站
+| registration    = 免费
+| author          = Colin Hughes
+| launch_date     = {{Start date and age|2001|10|5}}
+}}
+'''欧拉计划'''（Project Euler）是一个解题网站，站内提供了一系列数学题供用户解答，解题的用户主要是对[[数学|数学]]和[[计算机编程|计算机编程]]感兴趣的成年人及学生。其主旨为鼓励、挑战和培养爱好数学的人的技能和乐趣。目前该站包含了七百多道不同难度的数学题。每一题都可以通过计算机程序在1分钟内求出结果。该网站自2001年起定期增加新的题目，每题都有对应的讨论区，只有注册用户在正确提交了这题的答案后才能进入。<ref>{{cite web |url=http://projecteuler.net/index.php?section=about |title=关于Project Euler |accessdate=2009-02-08 |archive-date=2008-03-14 |archive-url=https://web.archive.org/web/20080314075827/http://projecteuler.net/index.php?section=about |dead-url=no }}</ref> 网站设立了6个排行榜，其中的欧拉人（Eulerians）排行榜的分数需要最新题目的前50位解答者才能获得。<ref>{{cite web |url=http://projecteuler.net/index.php?section=scores&show=eulerians |title=欧拉人积分规则和排行榜 |accessdate=2011-07-03 |archive-date=2011-09-25 |archive-url=https://web.archive.org/web/20110925023526/http://projecteuler.net/index.php?section=scores&show=eulerians |dead-url=no }}</ref>欧拉计划'''不希望'''在站外分享题目的答案。
+
+== 例题与解答 ==
+欧拉计划的第一题是：
+<blockquote>列举出10以下所有3或5的倍数，我们得到 3, 5, 6 和 9。他们的和是23。<br />
+求1000以下所有3或5的倍数之和。
+</blockquote>
+
+虽然这题比欧拉计划大多数题目要容易的多，我们仍然可以用它来分析不同解题方法的效率。
+
+用 <math>O\bigl(n\bigr)</math> 的[[穷举法|穷举法]]来测试1000以下的所有符合条件的自然数，再将它们相加就能得到这题的结果。这很容易实现，用以下两种不同的编程语言都能用很快求解出答案。
+
+[[Python|Python]]：
+<syntaxhighlight lang="python">
+print(sum(i for i in range(1000) if i%3 == 0 or i%5 == 0))
+</syntaxhighlight>
+
+[[C++|C++]]：
+<syntaxhighlight lang="cpp">
+#include <iostream>
+using namespace std;
+int main( ) {
+  int sum = 0;
+  for (int i = 0; i < 1000; i++)
+    if ( i % 3 == 0 || i % 5 == 0 )
+      sum += i;
+  cout << sum << endl;
+  return 0;
+}
+</syntaxhighlight>
+
+但如果用[[容斥原理|容斥原理]]进行求和，就可以减少1000多次运算，获得 <math>O\bigl(1\bigr)</math> 的时间复杂度。
+
+: <math>sum(n) = \sum_{i=1}^{\lfloor \frac{n}{3} \rfloor} 3i + \sum_{i=1}^{\lfloor \frac{n}{5} \rfloor} 5i - \sum_{i=1}^{\lfloor \frac{n}{15} \rfloor} 15i</math>
+
+: <math>\sum_{i=1}^n ki = k\frac{(n)(n+1)}{2}</math>
+
+Python 实现：
+<syntaxhighlight lang="python">
+def sum1toN(n):
+   return n * (n + 1) / 2
+
+def sumMultiples(limit, a):
+   return sum1toN((limit - 1) / a) * a
+
+sumMultiples(1000, 3) + sumMultiples(1000, 5) - sumMultiples(1000, 15)
+</syntaxhighlight>
+
+采用这种方法，计算10,000,000以下或1000以下所花费的时间是相等的。
+
+== 参考文献 ==
+{{reflist}}
+
+== 外部链接 ==
+*[http://projecteuler.net/ 欧拉计划首页] {{Wayback|url=http://projecteuler.net/ |date=20130725195438 }}
+
+[[Category:数学网站|Category:数学网站]]
+[[Category:智力游戏|Category:智力游戏]]

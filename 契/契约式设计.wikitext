@@ -1,0 +1,144 @@
+{{TA
+|G1=IT
+}}
+[[File:Design_by_contract.svg|thumbnail]]
+{{编程范式}}
+'''契约式设计'''（{{lang-en|Design by Contract}}，縮寫為 DbC），一种设计[[计算机软件|计算机软件]]的方法。这种方法要求软件设计者为[[基于组件的软件工程|软件组件]]定义[[形式化方法|正式的]]，精确的并且可验证的接口，这样，为传统的[[抽象数据类型|抽象数据类型]]又增加了先验条件、后验条件和不变式。这种方法的名字里用到的“契约”或者说“契约”是一种比喻，因为它和商业契约的情况有点类似。
+
+因为“Design by Contract”是属于Eiffel Software的注册商标，很多开发人员用契約式編程（Programming by Contract），契約編程（Contract Programming），或者契約優先式開發（Contract-First development）来指代这种方法。微軟也採用這種設計方法，稱為程式碼合約（Code Contracts）。
+
+==歷史==
+這個術語最早由[[伯特蘭·邁耶|伯特蘭·邁耶]]於1986年提出。他設計了[[Eiffel|Eiffel]]程式語言來實現這種程式設計方法，在《物件導向軟體建構》（Object-Oriented Software Construction）一書中，又提出兩個後繼版本。2003年，由[[伯特蘭·邁耶|伯特蘭·邁耶]]創建的Eiffel software公司，申請將“Design by Contract”作為商標，於2004年通過。
+
+契约式设计應用了[[形式验证|形式验证]]、{{en-link|形式规定|Formal specification}}與[[霍尔逻辑|霍尔逻辑]]的理論。
+
+== 描述 ==
+DbC的核心思想是对软件系统中的元素之间相互合作以及“责任”与“权利”的比喻。这种比喻从商业活动中“客户”与“供应商”达成“契约”而得来。例如：
+
+* 供应商必须提供某种产品（责任），并且他有权期望客户已经付款（权利）。
+* 客户必须付款（责任），并且有权得到产品（权利）。
+* 契约双方必须履行那些对所有契约都有效的责任，如法律和规定等。
+
+同样的，如果在[[面向对象程序设计|面向对象程序设计]]中一个[[类_(计算机科学)|类]]的函数提供了某种功能，那么它要：
+
+* 期望所有调用它的客户模块都保证一定的进入条件：这就是函数的[[先验条件|先验条件]]—客户的义务和供应商的权利，这样它就不用去处理不满足先验条件的情况。
+* 保证退出时给出特定的属性：这就是函数的{{tsl|en|Postcondition|后验条件}}—供应商的义务，显然也是客户的权利。
+* 在进入时假定，并在退出时保持一些特定的属性：[[不变条件|不变条件]]。
+
+契约就是这些权利和义务的正式形式。我们可以用“三个问题”来总结DbC，并且作为设计者要经常问：
+* 它期望的是什么？
+* 它要保证的是什么？
+* 它要保持的是什么？
+
+很多[[程式語言|程式語言]]都有对这种[[斷言_(程式)|断言]]的支持。然而DbC认为这些契约对于软件的正确性至关重要，它们应当是设计过程的一部分。实际上，DbC提倡首先写断言。
+
+契约的概念扩展到了方法/过程的级别。对于一个方法的契约通常包含下面这些信息：
+* 可接受和不可接受的值或类型，以及它们的含义
+* 返回的值或类型，以及它们的含义
+* 可能出现的[[错误|错误]]以及[[异常|异常]]情况的值和类型，以及它们的含义
+* [[副作用|副作用]]
+* [[先验条件|先验条件]]
+* {{tsl|en|Postcondition|后验条件}}
+* [[不变条件|不变条件]]
+* （不太常见）性能上的保证，如所用的时间和空间
+
+[[继承_(计算机科学)|继承]]中的子类型可以弱化先验条件（但不可以加强它们），并且可以加强后验条件和不变式（但不能弱化它们）。这些原则很接近[[Liskov代換原則|Liskov代換原則]]。
+
+所有类之间的关系就是客户与供应商的关系。一个客户在调用供应商的功能时有义务不去违反供应商所需的状态。相应的，供应商也有义务为客户提供它所需的状态和数据。例如，供应商的delete功能要求客户在data buffer当中有数据存在。相应的，供应商要保证当delete功能完成后，data buffer中的数据已被删除。其它的设计契约还有不变式。不变式保证类的状态在任何功能被执行后都保持在一个可接受的状态。
+
+当使用契约时，供应商不应对契约条件是否被满足进行校验。大体的思想是，利用契约条件校验为保护网，在契约被违反的情况下代码会“硬性失败”（fail hard）。DbC的“硬性失败”概念让对契约行为的调试变简单，因为每个过程的行为意图被定义得很清楚。它和一种叫作[[防御性编程|防御性编程]]的方法明顯不同，在那种方法里，供应商要负责解决先验条件不满足的情况。相对通常的情况下，在DbC和防御性编程中，如果客户违反了先验条件供应商都会抛出异常—由客户来负责解决这种情况。DbC让供应商的工作更简单。
+
+DbC同时也定义了软件模块的正确性条件：
+* 如果对一个供应商的调用之前类的不变式和先验条件是真，那么在调用后不变式和后验条件也为真。
+* 当调用供应商时，软件模块应保证不违反供应商的先验条件。
+
+因为契约条件在程序运行中不应被违反，它们可以只作为调试代码，或者在发布版本中被移除从而得到更好的性能。
+
+DbC也能帮助代码重用，因为每段代码的契约都被很好的文档化了。模块的契约可以被当做[[软件文档|软件文档]]来描述模块的行为。
+
+==语言支持==
+
+===原生支持语言===
+贯彻契约式设计特征最多的语言包含：
+{{div col|colwidth=15em}}
+* [[Ada|Ada 2012]]
+* {{en-link|Ciao (编程语言)|Ciao (programming language)|Ciao}}
+* [[Clojure|Clojure]]
+* {{en-link|Cobra (编程语言)|Cobra (programming language)|Cobra}}
+* [[D语言|D]]<ref name="d-contract-programming">{{cite web
+| last = Bright
+| first = Walter
+| title = D Programming Language, Contract Programming
+| publisher = Digital Mars
+| date = 2014-11-01
+| url = http://dlang.org/contracts.html
+| access-date = 2014-11-10
+| archive-date = 2014-11-28
+| archive-url = https://web.archive.org/web/20141128104628/http://dlang.org/contracts.html
+}}</ref>
+* {{en-link|Dafny}}
+* [[Eiffel|Eiffel]]
+* {{en-link|Fortress (编程语言)|Fortress (programming language)|Fortress}}
+* [[Kotlin|Kotlin]]
+* [[Mercury_(编程语言)|Mercury]]
+* {{en-link|Oxygene (编程语言)|Oxygene (programming language)|Oxygene}}（曾叫做Chrome和Delphi Prism<ref>{{cite web | url=http://edn.embarcadero.com/article/39398 | title=Write Cleaner, Higher Quality Code with Class Contracts in Delphi Prism | publisher=Embarcadero Technologies | access-date=20 January 2016 | author=Hodges, Nick | archive-date=2021-04-26 | archive-url=https://web.archive.org/web/20210426163433/https://edn.embarcadero.com/article/39398 }}</ref>）
+* [[Racket|Racket]]<ref>Findler, Felleisen [http://www.eecs.northwestern.edu/~robby/pubs/papers/ho-contracts-icfp2002.pdf Contracts for Higher-Order Functions] {{Wayback|url=http://www.eecs.northwestern.edu/~robby/pubs/papers/ho-contracts-icfp2002.pdf |date=20170810145639 }}</ref>
+* {{en-link|Sather}}
+* [[Scala|Scala]]<ref name="scala-assertions-dbc">{{cite web
+| title = Scala Standard Library Docs - Assertions
+| publisher = EPFL
+| url = https://www.scala-lang.org/api/current/scala/Predef$.html
+| access-date = 2019-05-24
+| archive-date = 2019-12-25
+| archive-url = https://web.archive.org/web/20191225101235/https://www.scala-lang.org/api/current/scala/Predef$.html
+}}</ref><ref>[[Strong_typing|Strong typing]] as another "contract enforcing" in Scala, see discussion at [https://www.scala-lang.org/old/node/6958 scala-lang.org/] {{Wayback|url=https://www.scala-lang.org/old/node/6958 |date=20220302154814 }}.</ref>
+* [[SPARK|SPARK]]（经过[[Ada|Ada]]程序的[[静态程序分析|静态分析]]）
+* [[Vala|Vala]]
+* {{en-link|维也纳开发方法|Vienna Development Method|VDM}}
+
+{{div col end}}
+
+===通过第三方支持的语言===
+{{div col|colwidth=30em}}
+* [[Ada|Ada]]，通过[[GNAT|GNAT]]的先决条件和后置条件的pragma。
+* [[C语言|C]]和[[C++|C++]]:
+** [https://www.boost.org/doc/libs/master/libs/contract/doc/html/index.html Boost.Contract] {{Wayback|url=https://www.boost.org/doc/libs/master/libs/contract/doc/html/index.html |date=20220302190445 }}
+** DBC for C[[预处理器|预处理器]]
+** GNU Nana
+** eCv和eCv++ [[形式验证|形式验证]]工具
+** {{en-link|Digital Mars}} C++编译器，通过C的CTESK扩展。
+** [[C++设计新思维|Loki库]]，提供叫做ContractChecker的机制用来验证一个类服从契约设计。
+** DBC C++<ref>[https://github.com/Bambofy/dbc_cpp DBC C++] {{Wayback|url=https://github.com/Bambofy/dbc_cpp |date=20220603182948 }} Design by contract for C++</ref>
+* [[C_Sharp_(programming_language)|C#]]（和其他.NET语言），通过Code Contracts<ref>{{cite web|url=https://docs.microsoft.com/en-us/dotnet/framework/debug-trace-profile/code-contracts|title=Code Contracts|website=msdn.microsoft.com|access-date=2022-03-02|archive-date=2022-06-04|archive-url=https://web.archive.org/web/20220604001131/https://docs.microsoft.com/en-us/dotnet/framework/debug-trace-profile/code-contracts}}</ref>
+* [[Groovy|Groovy]]，通过GContracts。
+*[[Go|Go]]，通过dbc<ref>{{Cite web |url=https://github.com/drblez/dbc |title=dbc |access-date=2022-03-02 |archive-date=2022-06-04 |archive-url=https://web.archive.org/web/20220604225409/https://github.com/drblez/dbc }}</ref>或gocontracts<ref>{{Cite web |url=https://github.com/Parquery/gocontracts |title=gocontracts |access-date=2022-03-02 |archive-date=2022-06-03 |archive-url=https://web.archive.org/web/20220603182456/https://github.com/Parquery/gocontracts }}</ref>
+* [[Java|Java]]:
+** OVal<code>[https://sebthom.github.io/oval/ OVal]</code>，经由{{en-link|AspectJ}}。
+** Contracts for Java<ref>{{Cite web |url=https://github.com/nhatminhle/cofoja |title=Contracts for Java |access-date=2022-03-02 |archive-date=2022-03-03 |archive-url=https://web.archive.org/web/20220303010141/https://github.com/nhatminhle/cofoja }}</ref>（Cofoja）
+** {{en-link|Java建模语言|Java Modeling Language}}（JML）
+** {{en-link|Bean Validation}}（只有先决条件和后置条件）<ref>{{cite web|url=http://beanvalidation.org/1.1/spec/|title=Bean Validation specification|website=beanvalidation.org|access-date=2022-03-02|archive-date=2014-07-16|archive-url=https://web.archive.org/web/20140716023527/http://beanvalidation.org/1.1/spec/}}</ref>
+** [http://www.valid4j.org valid4j] {{Wayback|url=http://www.valid4j.org/ |date=20220601015123 }}
+* [[JavaScript|JavaScript]]，通过AspectJS（特别是AJS_Validator）、Cerny.js、ecmaDebug、jsContract、dbc-code-contracts<ref>{{Cite web |url=https://www.npmjs.com/package/dbc-code-contracts |title=dbc-code-contracts |access-date=2022-03-02 |archive-date=2021-11-04 |archive-url=https://web.archive.org/web/20211104135749/https://www.npmjs.com/package/dbc-code-contracts }}</ref>或jscategory。
+* [[Common_Lisp|Common Lisp]]，通过宏设施或[[Common_Lisp对象系统|CLOS]][[元对象协议|元对象协议]]。
+* [[Nemerle|Nemerle]]，通过宏。
+* [[Nim|Nim]]，通过宏<ref>{{Cite web |url=https://github.com/Udiknedormin/NimContracts |title=macros |access-date=2022-03-02 |archive-date=2022-06-06 |archive-url=https://web.archive.org/web/20220606225116/https://github.com/Udiknedormin/NimContracts }}</ref>。
+* [[Perl|Perl]]，通过[[CPAN|CPAN]]模块Class::Contract（出自{{en-link|Damian Conway}}）或Carp::Datum（出自Raphael Manfredi）。
+* [[PHP|PHP]]，通过PhpDeal<ref>{{Cite web |url=https://github.com/php-deal/framework |title=PhpDeal |access-date=2022-03-02 |archive-date=2022-06-04 |archive-url=https://web.archive.org/web/20220604235145/https://github.com/php-deal/framework }}</ref>、{{en-link|Praspel}}或Stuart Herbert的ContractLib。
+* [[Python|Python]]，使用包如deal<ref>{{Cite web |url=https://github.com/life4/deal |title=deal |access-date=2022-03-02 |archive-date=2022-06-13 |archive-url=https://web.archive.org/web/20220613160502/https://github.com/life4/deal }}</ref>、icontract、PyContracts、Decontractors、dpcontracts、zope.interface、PyDBC或Contracts for Python。
+* [[Ruby|Ruby]]，通过Brian McCallister的DesignByContract、Ruby DBC ruby-contract或contracts.ruby。
+* [[Rust|Rust]]，通过contracts<ref>{{Cite web |url=https://crates.io/crates/contracts |title=contracts |access-date=2022-03-02 |archive-date=2022-05-31 |archive-url=https://web.archive.org/web/20220531065921/https://crates.io/crates/contracts }}</ref> crate。
+* [[Tcl|Tcl]]，通过{{en-link|XOTcl}}面向对象扩展。
+{{div col end}}
+
+==参考文献==
+{{reflist|2}}
+
+==外部链接==
+* [https://www.eiffel.com/values/design-by-contract/ The Power of Design by Contract(TM)] {{Wayback|url=https://www.eiffel.com/values/design-by-contract/ |date=20220531153544 }} A top-level description of DbC, with links to additional resources.
+* [http://archive.eiffel.com/doc/manuals/technology/contract/ Building bug-free O-O software: An introduction to Design by Contract(TM)] {{Wayback|url=http://archive.eiffel.com/doc/manuals/technology/contract/ |date=20090609085332 }} Older material on DbC.
+* [http://www.rps-obix.com/docs/manuals/design_by_contract_contract_programming.html Benefits and drawbacks; implementation in RPS-Obix] {{Webarchive|url=https://archive.is/20130201133053/http://www.rps-obix.com/docs/manuals/design_by_contract_contract_programming.html |date=2013-02-01 }}
+* Bertrand Meyer, [http://se.ethz.ch/~meyer/publications/computer/contract.pdf  ''Applying "Design by Contract"''] {{Wayback|url=http://se.ethz.ch/~meyer/publications/computer/contract.pdf |date=20170921232223 }}, IEEE Computer, October 1992.
+* [http://buksbaum.us/2011/04/20/using-code-contracts-for-safer-code/ Using Code Contracts for Safer Code] {{Wayback|url=http://buksbaum.us/2011/04/20/using-code-contracts-for-safer-code/ |date=20120112104245 }}
+
+[[Category:軟體設計|Category:軟體設計]]
+[[Category:編程典範|Category:編程典範]]

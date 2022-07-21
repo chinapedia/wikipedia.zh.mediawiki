@@ -1,0 +1,74 @@
+'''置信域方法'''（'''Trust-region methods'''）又称为'''信赖域方法'''，它是一种[[最佳化|最佳化]]方法，能够保证[[最佳化|最佳化]]方法总体收敛。
+
+== 算法发展 ==
+置信域方法的历史可以追溯到Levenberg(1944)，Marquardt(1963)，Goldfeld，Quandt and Trotter(1966)，但现代置信域方法由 [[麦克尔·詹姆斯·大卫·鲍威尔|Michael J. D. Powell]] 提出 (1970)。他明确提出了置信域子问题，接受方向步<math>s_k</math>的准则，校正置信域半径<math>\Delta _k</math>的准则，及收敛性定理。这些措施使置信域方法比[[线搜索|线搜索]]方法具有更大的优越性。
+
+== 思想框架 ==
+考虑<math>\underset{x\in {{R}^{n}}}{\mathop{\min }}\,f(x)</math>，其中''ƒ''(''x'')是定义在'''R'''<sup>n</sup>上的二阶连续可微[[函数|函数]]。
+定义当前点的[[邻域|邻域]]<math>{{\Omega }_{k}}</math>
+<div style="text-align: center;">
+<math>{{\Omega }_{k}}=\{x\in {{R}^{n}}|\left\| x-{{x}_{k}} \right\|\le {{\Delta }_{k}}\},</math>
+</div>
+这里<math>{\Delta }_{k}</math>称为置信域半径。假定在这个[[邻域|邻域]]中，二次模型是目标函数''ƒ''(''x'')的一个合适的近似，则在这个[[邻域|邻域]]（称为置信域）中极小化二次模型，得到近似极小点<math>s_k</math>，并取 ，其中<math>\left\| {{s}_{k}} \right\|\le {{\Delta }_{k}}</math>。
+
+
+置信域方法的模型子问题是
+<div style="text-align: center;">
+<math>\left\{ \begin{align}
+  & \min \ {{q}^{(k)}}(s)=f({{x}_{k}})+g_{k}^{T}s+\frac{1}{2}{{s}^{T}}{{B}_{k}}s \\ 
+ & s.t.\quad \left\| s \right\|\le {{\Delta }_{k}} \\ 
+\end{align} \right.</math>
+</div>
+其中，<math>s=x-x_k</math>，<math>{{g}_{k}}=\nabla f({{x}_{k}})</math>，<math>B_k</math>是一个[[对称矩阵|对称矩阵]]，它是[[黑塞矩阵|黑塞矩阵]]<math>{{\nabla }^{2}}f({{x}_{k}})</math>或其近似，<math>{{\Delta }_{k}}>0</math>为置信域半径，<math>\left\| \ \centerdot \  \right\|</math>为某一[[范数|范数]]，通常我们采用<math>l_2</math>[[范数|范数]]。
+
+
+选择<math>{{\Delta }_{k}}</math>的方法：根据模型函数<math>{{q}^{(k)}}(s)</math>对目标函数''ƒ''(''x'')的拟合程度来调整置信域半径<math>{{\Delta }_{k}}</math>。
+对于置信域方法的模型子问题的解<math>{{s}_{k}}</math>，设目标函数的下降量
+<div style="text-align: center;">
+<math>Are{{d}_{k}}=f({{x}_{k}})-f({{x}_{k}}+{{s}_{k}})</math>
+</div>
+为实际下降量，设模型函数的下降量
+<div style="text-align: center;">
+<math>Pre{{d}_{k}}={{q}^{(k)}}(0)-{{q}^{(k)}}({{s}_{k}})</math>
+</div>
+为预测下降量。
+定义比值
+<div style="text-align: center;">
+<math>{{r}_{k}}=\frac{Are{{d}_{k}}}{Pre{{d}_{k}}}=\frac{f({{x}_{k}})-f({{x}_{k}}+{{s}_{k}})}{{{q}^{(k)}}(0)-{{q}^{(k)}}({{s}_{k}})}</math>,
+</div>
+它用来衡量模型函数<math>{{q}^{(k)}}</math>与目标函数''ƒ'' 的一致性程度。
+
+== 置信域算法 ==
+*步1. 给出初始点''x''<sub>''0''</sub> ，置信域半径的上界<math>\bar{\Delta }</math>，<math>{{\Delta }_{0}}\in (0,\bar{\Delta })</math>，<math>\varepsilon \ge 0</math>，<math>0<{{\eta }_{1}}\le {{\eta }_{2}}<1</math>，<math>0<{{\gamma }_{1}}<1<{{\gamma }_{2}}</math>，<math>k\ :=0</math>
+*步2. 如果<math>\left\| {{g}_{k}} \right\|\le \varepsilon </math>，停止
+*步3. （近似地）求解置信域方法的模型子问题，得到 ''s''<sub>''k''</sub>
+*步4. 计算''ƒ''(''x''<sub>''k''</sub>+''s''<sub>''k''</sub>) 和 ''r''<sub>''k''</sub>。令
+<div style="text-align: center;">
+<math>{{x}_{k+1}}=\left\{ \begin{align}
+  & {{x}_{k}}+{{s}_{k}},\quad \text{if }{{r}_{k}}\ge {{\eta }_{1}} \\ 
+ & {{x}_{k}},\quad \quad \quad \text{else} \\ 
+\end{align} \right.</math>
+</div>
+*步5. 校正置信域半径，令
+<div style="text-align: center;">
+<math>\begin{align}
+  & {{\Delta }_{k+1}}\in (0,{{\gamma }_{1}}{{\Delta }_{k}}],\quad \quad \quad \quad \ \ \ \text{if }{{r}_{k}}<{{\eta }_{1}}; \\ 
+ & {{\Delta }_{k+1}}\in [{{\gamma }_{1}}{{\Delta }_{k}},{{\Delta }_{k}}],\quad \quad \quad \quad \ \text{if }{{r}_{k}}\in [{{\eta }_{1}},{{\eta }_{2}}); \\ 
+ & {{\Delta }_{k+1}}\in [{{\Delta }_{k}},\min \{{{\gamma }_{2}}{{\Delta }_{k}},\bar{\Delta }\}],\ \text{if }{{r}_{k}}\ge {{\eta }_{2}}. \\ 
+\end{align}</math>
+</div>
+*步6. 产生''B''<sub>''k+1''</sub>，校正''q''<sup>''(k)''</sup> ，令''k:=k+1'' ，转步2。
+
+==基于信赖域的优化软件==
+*[[PDFO|Powell 无导数优化求解器]] ([[麦克尔·詹姆斯·大卫·鲍威尔|Michael J. D. Powell]])
+*[http://www.numerical.rl.ac.uk/lancelot/blurb.html LANCELOT] {{Wayback|url=http://www.numerical.rl.ac.uk/lancelot/blurb.html |date=20210225235913 }} (Andrew Conn, Nick Gould, Philippe Toint)
+
+== 应用 ==
+现今，置信域算法广泛应用于应用数学、物理、化学、工程学、计算机科学、生物学与医学等学科。相信在不远将来，信赖域方法会在更广泛多样的领域有着更深远的的发展。
+
+== 参考文献 ==
+<div style="font-size:85%">
+# Andrew R. Conn,Nicholas I. M. Gould,Philippe L. Toint."Trust-region methods".Philadelphia, Pa. : SIAM [u.a.], 2000. ISBN 978-0-898714-60-9
+</div>
+
+[[Category:数学最佳化|Category:数学最佳化]]

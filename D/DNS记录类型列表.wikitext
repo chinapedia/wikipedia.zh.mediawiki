@@ -1,0 +1,186 @@
+{{noteTA|G1=IT}}
+{{Proofreader needed|en|List of DNS record types}}
+
+本'''網域名稱系統記錄類型列表'''提供[[DNS|網域名稱系統]]（DNS）記錄類型（數據庫記錄）的概覽，而這些記錄都是存儲在網域名稱系統（DNS）的區域文件（zone files）。
+
+網域名稱系統實現將[[域名|域名]]和[[IP_位址|IP 位址]]相互對映的一個[[分散式數據庫|分散式數據庫]]，能夠使人更方便的存取[[互聯網|互聯網]]。在這些[[域名伺服器|域名伺服器]]，不同的記錄類型有著不同的用途。
+
+==記錄類型==
+
+{| class="wikitable sortable"
+|-
+! |代碼
+! |號碼
+! width="90pt"|定義的 RFC
+! class="unsortable"|描述
+! class="unsortable"|功能
+|-
+|<div id="A"></div>A||1||RFC 1035||[[IPv4|IPv4]]地址記錄
+| 傳回一個32位元的IPv4地址，最常用於映射[[主機名稱|主機名稱]]到[[IP地址|IP地址]]，但也用於{{Link-en|DNSBL}}（RFC 1101）等。
+|-
+|<div id="AAAA"></div>AAAA||28||RFC 3596
+|[[IPv6|IPv6]]地址記錄|| 傳回一個128位元的IPv6地址，最常用於映射主機名稱到IP地址。
+|-
+|<div id="AFSDB"></div>AFSDB||18||RFC 1183||[[AFS檔案系統|AFS檔案系統]]
+|（Andrew File System）資料庫核心的位置，於域名以外的 AFS 客戶端常用來聯繫 AFS 核心。這個記錄的子類型是被過時的的 [[DCE/DFS|DCE/DFS]]（DCE Distributed File System）所使用。
+|-
+|<div id="APL"></div>APL||42||RFC 3123||地址字首列表||指定地址列表的範圍，例如：CIDR 格式為各個類型的地址（試驗性）。
+|-
+|CAA
+|257
+|RFC 6844
+|权威认证授权
+|[[DNS证书颁发机构授权|DNS认证机构授权]]，限制主机/域的可接受的CA
+|-
+|CDNSKEY
+|60
+|RFC 7344
+|子關鍵記錄
+|關鍵記錄记录的子版本，用于转移到父级
+|-
+|CDS
+|59
+|RFC 7344
+|子委託簽發者
+|委託簽發者记录的子版本，用于转移到父级
+|-
+|<div id="CERT"></div>CERT ||37||RFC 4398||憑證記錄||儲存 [[PKIX|PKIX]]、{{Link-en|SPKI|SPKI}}、[[Pretty_Good_Privacy|PGP]]等。
+|-
+|<div id="CNAME"></div>[[CNAME记录|CNAME]]||5||RFC 1035||規範名稱記錄|| 一個主機名字的別名：[[DNS|網域名稱系統]]將會繼續嘗試查找新的名字。
+|-
+|<div id="DHCID"></div>DHCID ||49||RFC 4701||[[DHCP|DHCP]]（動態主機設定協定）識別碼||用於將 FQDN 選項結合至 [[DHCP|DHCP]]。
+|-
+|<div id="DLV"></div>DLV||32769||RFC 4431||[[DNSSEC|DNSSEC]]（域名系統安全擴展）來源驗證記錄||為不在DNS委託者內發佈DNSSEC的信任錨點，與 DS 記錄使用相同的格式，RFC 5074 介紹了如何使用這些記錄。
+|-
+|<div id="DNAME"></div>[[CNAME记录#DNAME记录|DNAME]]||39||RFC 2672||代表名稱
+|DNAME 會為名稱和其子名稱產生別名，與 CNAME 不同，在其標籤別名不會重覆。但與 CNAME 記錄相同的是，DNS將會繼續嘗試查找新的名字。
+|-
+|<div id="DNSKEY"></div>DNSKEY||48||RFC 4034||DNSSEC所用公钥記錄||於[[DNSSEC|DNSSEC]]內使用的公钥，與 KEY 使用相同格式。
+|-
+|<div id="DS"></div>DS||43||RFC 4034||委託簽發者||包含DNSKEY的[[散列值|散列值]]，此記錄用於鑑定DNSSEC已授權區域的簽名密鑰。
+|-
+|<div id="HIP"></div>HIP||55||RFC 5205||主機鑑定協定||將端點標識符及IP 地址定位的分開的方法。
+|-
+|<div id="HTTPS"></div>HTTPS||65||[https://datatracker.ietf.org/doc/draft-ietf-dnsop-svcb-https/ IETF草案] {{Wayback|url=https://datatracker.ietf.org/doc/draft-ietf-dnsop-svcb-https/ |date=20211219012546 }}||绑定[[HTTPS|HTTPS]]||与建立HTTPS连接相关的记录。详见DNSOP工作组和[[阿卡迈科技|阿卡迈科技]]发布的草案。
+|-
+|<div id="IPSECKEY"></div>IPSECKEY||45||RFC 4025||IPSEC 密鑰||與 [[IPSEC|IPSEC]] 同時使用的密鑰記錄。
+|-
+|<div id="KEY"></div>KEY||25||RFC 2535<ref>RFC 2535, §3</ref>RFC 2930<ref name="rfc3445_sec1_def">RFC 3445, §1. "The KEY RR was defined in [RFC 2930]..."</ref>
+|密钥記錄
+|只用於 SIG(0)（RFC 2931）及 TKEY（RFC 2930）。<ref>RFC 2931, §2.4. "SIG(0) on the other hand, uses public key authentication, where the public keys are stored in DNS as KEY RRs and a private key is stored at the signer."</ref>RFC 3455 否定其作為應用程序鍵及限制DNSSEC的使用。<ref name="rfc3445_sec1_subtype">RFC 3445, §1. "DNSSEC will be the only allowable sub-type for the KEY RR..."</ref>RFC 3755 指定了 DNSKEY 作為DNSSEC的代替。<ref name="rfc3755_sec3">RFC 3755, §3. "DNSKEY will be the replacement for KEY, with the mnemonic indicating that these keys are not for application use, per [RFC3445].  RRSIG (Resource Record SIGnature) will replace SIG, and NSEC (Next SECure) will replace NXT.  These new types completely replace the old types, except that SIG(0) [RFC2931] and TKEY [RFC2930] will continue to use SIG and KEY."</ref>
+|-
+|[[LOC記錄|LOC記錄]]（LOC record）||29||RFC 1876||位置記錄||將一個域名指定地理位置。
+|-
+|[[MX記錄|MX記錄]]（MX record）||15||RFC 1035||電郵交互記錄
+|引導域名到該域名的[[郵件傳輸代理|郵件傳輸代理]]（MTA, Message Transfer Agents）列表。
+|-
+|[[NAPTR記錄|NAPTR記錄]]（NAPTR record）||35||RFC 3403||命名管理指標||允許基於正則表達式的域名重寫使其能夠作為 [[URI|URI]]、進一步域名查找等。
+|-
+|<div id="NS"></div>NS||2||RFC 1035||名稱伺服器記錄
+|委託[[DNS區域|DNS區域]]（DNS zone）使用已提供的權威域名伺服器。
+|-
+|<div id="NSEC"></div>NSEC||47||RFC 4034||下一个安全記錄
+|DNSSEC 的一部份 — 用來表示特定域名的记录并不存在，使用與 NXT（已過時）記錄的格式。
+|-
+|<div id="NSEC3"></div>NSEC3||50||RFC 5155||下一个安全记录第三版
+|DNSSEC 的一部份 — 用來表示特定域名的记录并不存在。
+|-
+|<div id="NSEC3PARAM"></div>NSEC3PARAM||51||RFC 5155||NSEC3 參數||與 NSEC3 同時使用的參數記錄。
+|-
+|OPENPGPKEY
+|61
+|RFC 7929
+|OpenPGP公钥记录
+|基于DNS的域名实体认证方法，用于使用OPENPGPKEY DNS资源记录在特定电子邮件地址的DNS中发布和定位OpenPGP公钥。
+|-
+|<div id="PTR"></div>PTR||12||RFC 1035||指標記錄
+|引導至一個[[規範名稱|規範名稱]]（Canonical Name）。與 CNAME 記錄不同，DNS「不會」進行處理程序，只會傳回名稱。最常用來執行[[反向DNS|反向DNS查找]]，其他用途包括引作 {{Link-en|DNS-SD|Zero_configuration_networking#Apple.27s_protocol:_Multicast_DNS.2FDNS-SD}}。
+|-
+|<div id="RRSIG"></div>RRSIG||46||RFC 4034||DNSSEC 憑證||用于DNSSEC，存放某记录的签名，與 SIG 記錄使用相同的格式。
+|-
+|<div id="RP"></div>RP||17||RFC 1183||負責人
+|有關域名負責人的資訊，電郵地址的 '''@''' 通常寫為 '''a'''。
+|-
+|<div id="SIG"></div>SIG||24||RFC 2535||憑證
+|SIG(0)（RFC 2931）及 TKEY（RFC 2930）使用的憑證。<ref name="rfc3755_sec3"/>RFC 3755 designated RRSIG as the replacement for SIG for use within DNSSEC.<ref name="rfc3755_sec3"/>
+|-
+|<div id="SOA"></div>SOA||6||RFC 1035||權威記錄的起始
+|指定有關DNS區域的權威性資訊，包含主要名稱伺服器、域名管理員的電郵地址、域名的流水式編號、和幾個有關刷新區域的定時器。
+|-
+|[[Sender_Policy_Framework|SPF]]||99||RFC 4408||SPF 記錄
+|作為 SPF 協議的一部分，優先作為先前在 TXT 存儲 SPF 數據的臨時做法，使用與先前在 TXT 存儲的格式。
+|-
+|[[SRV記錄|SRV記錄]]（SRV record）||33||RFC 2782||服務定位器
+|廣義為服務定位記錄，被新式協議使用而避免產生特定協議的記錄，例如：MX 記錄。
+|-
+|<div id="SSHFP"></div>SSHFP||44||RFC 4255||SSH 公共密鑰指紋
+|DNS 系統用來發佈 [[SSH|SSH]] 公共密鑰指紋的資源記錄，以用作輔助驗證伺服器的真實性。
+|-
+|<div id="TA"></div>TA||32768||無||DNSSEC 可信权威
+|DNSSEC 一部份無簽訂 DNS 根目錄的部署提案，使用與 DS 記錄相同的格式<ref>{{Cite web |url=http://www.iana.org/assignments/dns-parameters |title=IANA database |accessdate=2010-06-15 |archive-date=2010-05-02 |archive-url=https://web.archive.org/web/20100502082207/http://www.iana.org/assignments/dns-parameters |dead-url=no }}</ref><ref>{{Cite web |url=http://www.watson.org/~weiler/INI1999-19.pdf |title=Weiler Spec |accessdate=2010-06-15 |archive-date=2011-02-21 |archive-url=https://web.archive.org/web/20110221223032/http://www.watson.org/~weiler/INI1999-19.pdf |dead-url=no }}</ref>。
+|-
+|<div id="TKEY"></div>[[TKEY記錄|TKEY記錄]]（TKEY record）||249||RFC 2930||秘密密鑰記錄
+|為[[TSIG|TSIG]]提供密鑰材料的其中一類方法，that is 在公共密鑰下加密的 accompanying KEY RR。<ref>RFC 2930, §6. "... the keying material is sent within the key data field of a TKEY RR encrypted under the public key in an accompanying KEY RR [RFC 2535]."</ref>
+|-
+|<div id="TSIG"></div>TSIG||250||RFC 2845||交易憑證
+|用以認證動態更新（Dynamic DNS）是來自合法的用戶端，或與 DNSSEC 一樣是驗證回應是否來自合法的遞歸名稱伺服器。<ref>RFC 2845, abstract</ref>
+|-
+|<div id="TXT"></div>TXT||16||RFC 1035||文本記錄
+|最初是為任意可讀的文本 DNS 記錄。自1990年起，些記錄更經常地帶有機讀數據，以 RFC 1464 指定：[[机会性加密|机会性加密]]（opportunistic encryption）、[[Sender_Policy_Framework|Sender Policy Framework]]（雖然這個臨時使用的 TXT 記錄在 SPF 記錄推出後不被推薦）、DomainKeys、DNS-SD等。
+|-
+|URI
+|256
+|RFC 7553
+|统一资源标识符
+|可用于发布从主机名到URI的映射。
+|}
+
+==其他類型及偽資源記錄==
+其他類型的資源記錄簡單地提供一些類型的訊息（如：HINFO 記錄提供電腦或作業系統的類型），或傳回實驗中之功能的數據。「type」欄位也使用於其他協議作各種操作。
+
+{| class="wikitable sortable"
+|-
+! |代碼
+! |號碼
+! width="90pt"|定義的 RFC
+! class="unsortable"|描述
+! class="unsortable"|功能
+|-
+|*||255||RFC 1035||所有緩存的記錄
+|傳回所有伺服器已知類型的記錄。如果伺服器未有任何關於名稱的記錄，該請求將被轉發。而傳回的記錄未必完全完成，例如：當一個名稱有 A 及 MX 類型的記錄時，但伺服器已緩存了 A 記錄，就只有 A 記錄會被傳回。
+|-
+|{{Link-en|AXFR|AXFR}}||252||RFC 1035||全域轉移||由主域名伺服器轉移整個區域文件至二級域名伺服器。
+|-
+|<div id="IXFR"></div>IXFR||251||RFC 1995||增量區域轉移
+|請求只有與先前流水式編號不同的特定區域的區域轉移。此請求有機會被拒絕，如果權威伺服器由於配置或缺乏必要的資料而無法履行請求，一個完整的（AXFR）會被發送以作回應。
+|-
+| <div id="OPT"></div>OPT||41||RFC 2671||選項
+|這是一個「偽 DNS記錄類型」以支援 {{Link-en|EDNS|EDNS}}。
+|}
+
+==過時的記錄類型==
+發展呈現廢棄一些最初定義的記錄類型。從 IANA 的記錄可見，一些記錄類型由於一些原因而被限制其使用、一些被標示為明顯過時的、有些是為了隱藏的服務、有些是為了舊版本的服務、有的有特別記錄指出它們是「不正確的」。
+
+* 由 RFC 973 定義為過時：MD(3)、MF (4)、MAILA (254)
+* 為了發佈郵件列表訂戶的 DNS 記錄：MB(7)、MG(8)、MR(9)、MINFO(14)、MAILB (253)。 在 RFC 883 標明的意圖是為了讓 MB 代替 [[SMTP|SMTP]] VRFY 指令、MG 代替 SMTP EXPN 指令、及讓 MR 代替「551 User Not Local」SMTP 錯誤。其後，RFC 2505 提議將 VRFY 及 EXPN 指令兩者停用，使利用 MB 及 MG 永遠不可能獲得通過。
+* 在 RFC 1123 不提議使用「not to be relied upon」（RFC 1127 有更多的資訊）：WKS(11)<ref>RFC 1123 section 2.2, 5.2.12, 6.1.3.6</ref>
+* 錯誤: NB(32)、NBSTAT(33)（自 RFC 1002）；號碼現已分配給 NIMLOC 及 SRV。
+* 由 RFC 1035 定義為過時：NULL(10)（RFC 883 定義「完成查詢」（操作碼二及可能是三）有在使用此記錄，後來 RFC 1035 重新分配操作碼二為「狀態」及保留操作碼三）。
+* 定義為早期的 [[IPv6|IPv6]] 但其後由 RFC 3363 降級為試驗性：A6(38)
+* 由 DNSSEC 更新（RFC 3755） 定義為過時：NXT(30)。同一時間，為 KEY 及 SIG 域名的適用性限制為不包括 DNSSEC。
+* 第一版 DNSSEC（RFC 2230、RFC 2065）的一部份，現已過時：KX(36)
+* 目前沒有任何顯著的應用程序使用：HINFO(13)、RP(17)、X25(19)、ISDN(20)、RT(21)、NSAP(22)、NSAP-PTR(23)、PX(26)、EID(31)、NIMLOC(32)、ATMA(34)、APL(42)
+* 由 [http://www.tools.ietf.org/html/draft-eastlake-kitchen-sink Kitchen Sink]{{Wayback|url=http://www.tools.ietf.org/html/draft-eastlake-kitchen-sink |date=20190924225728 }} {{Link-en|互聯網草案|Internet draft}}，但從未達至 RFC 水平：SINK(40) 
+* 一個 LOC 記錄更有限的早期版本：GPOS(27)
+* IANA 保留，及後未有 RFC 記錄它們 [https://web.archive.org/web/20080611185015/http://www.ops.ietf.org/lists/namedroppers/namedroppers.2004/msg00949.html] 而支援已由 [[BIND|BIND]] 於九零年初移除：UINFO(100), UID(101)、GID(102)、UNSPEC(103)
+
+RP(17) 可能被使用於有關指定的主機的不同聯絡點、子網域其他 SOA 記錄不包含的域名級別的人類可讀信息。
+
+==更多有關資訊==
+* {{cite web|url=http://www.iana.org/assignments/dns-parameters|title=IANA DNS Parameters registry|accessdate=2008-05-25|archive-date=2008-05-13|archive-url=https://web.archive.org/web/20080513113155/http://www.iana.org/assignments/dns-parameters|dead-url=no}}.
+
+==參考資料==
+{{reflist|2}}
+
+[[Category:DNS记录类型|Category:DNS记录类型]]
+[[Category:網際協議|Category:網際協議]]

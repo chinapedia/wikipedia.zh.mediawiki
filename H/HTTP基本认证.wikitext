@@ -1,0 +1,107 @@
+{{NoteTA
+|G1=IT
+|1=zh-cn:密码; zh-tw:口令
+}}
+{{HTTP}} 
+在[[HTTP|HTTP]]中，'''基本认证'''（{{Lang-en|Basic access authentication}}）是允许[[用户代理|http用户代理]]（如：[[网页浏览器|网页浏览器]]）在请求时，提供 [[用户名|用户名]] 和 [[口令|口令]] 的一种方式。
+
+在进行基本认证的过程里，请求的[[HTTP头字段|HTTP头字段]]会包含<code>Authorization</code>字段，形式如下： <code>Authorization: Basic <憑證></code>，该凭证是用户和密码的组和的[[Base64|base64编码]]。
+
+最初，基本认证是定义在HTTP 1.0规范（RFC 1945）中，后续的有关安全的信息可以在HTTP 1.1规范（RFC 2616）和HTTP认证规范（RFC 2617）中找到。于1999年 RFC 2617 过期，于2015年的 RFC 7617 重新被定义。
+
+在[[MDN_Web_Docs|MDN]]网站，已经有对应的维基文章<ref>{{Cite web|title=HTTP 身份验证|url=https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Authentication|accessdate=2020-01-29|work=MDN Web 文档|language=zh|archive-date=2020-04-14|archive-url=https://web.archive.org/web/20200414213339/https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Authentication|dead-url=no}}</ref>。
+
+== 优点 ==
+HTTP基本认证 是一种十分简单的技术，使用的是 [[HTTP头字段|HTTP头部字段]] 强制用户访问网络资源，而不是通过必要的[[cookie|cookie]]、会话ID、登录页面等（非获取[[存取控制|访问控制]]的）手段。
+
+基本上所有流行的网页浏览器都支持基本认证<ref>这里的“所有的流行网页浏览器”包括任何目前市场份额超过0.2%的网页浏览器，参见[[网页浏览器比较|网页浏览器比较]]了解网页浏览器对HTTP的支持</ref>。基本认证很少在可公开访问的[[互联网|互联网]][[网站|网站]]上使用，有时候会在小型私有系统中使用（如[[路由器|路由器]]网页管理接口）。之后诞生的 [[HTTP摘要认证|HTTP摘要认证]] 用于替代基本认证，允许密钥以相对安全的方式在不安全的通道上传输。
+
+程序员和系统管理员有时会在可信网络环境中使用基本认证。由于，基本认证使用的是Base64，可解码成明文，因此使用[[Telnet|Telnet]]等网络协议工具进行监视时，可以直接获取内容，并用于诊断。
+
+== 缺点 ==
+基本认证 并没有为传送凭证（{{Lang-en|transmitted credentials}}）提供任何机密性的保护。仅仅使用 [[Base64|Base64]] 编码并传输，而没有使用任何 [[加密|加密]] 或 [[哈希|散列算法]]。因此，基本认证常常和 HTTPS 一起使用，以提供机密性。
+
+现存的浏览器保存认证信息直到标签页或浏览器被关闭，或者用户清除历史记录。<ref>{{Cite web |url=http://www.tolaris.com/2009/09/08/logging-out-of-http-auth-with-firefox/ |title=存档副本 |accessdate=2010-07-10 |archive-date=2010-05-26 |archive-url=https://web.archive.org/web/20100526122002/http://www.tolaris.com/2009/09/08/logging-out-of-http-auth-with-firefox/ |dead-url=no }}</ref>HTTP没有为服务器提供一种方法指示客户端丢弃这些被缓存的密钥。这意味着服务器端在用户不關閉瀏覽器的情況下，並没有一种有效的方法来让用户登出。
+
+同时 HTTP 并没有提供[[登出|登出]]机制。但是，在一些浏览器上，存在清除凭证（credentials ）缓存的方法。
+
+== 原理 ==
+
+=== 文字过程 ===
+这一个典型的HTTP客户端和HTTP服务器的对话，服务器安装在同一台计算机上（[[localhost|localhost]]），包含以下步骤：
+
+# 客户端请求一个需要身份认证的页面，但是没有提供用户名和口令。这通常是用户在地址栏输入一个[[URL|URL]]，或是打开了一个指向该页面的[[超链接|链接]]。
+# 服务端响应一个401[[HTTP状态码|应答码]]<ref name="section-11">{{cite web|title=RFC 1945 Section 11. Access Authentication|url=https://tools.ietf.org/html/rfc1945#section-11|accessdate=3 February 2017|date=May 1996|publisher=IETF|page=46|archive-date=2010-11-30|archive-url=https://web.archive.org/web/20101130120327/http://tools.ietf.org/html/rfc1945#section-11|dead-url=no}}</ref>，并提供一个认证域（{{Lang-en|Access Authentication}}）<ref>{{cite web|title=Hypertext Transfer Protocol -- HTTP/1.0|url=http://tools.ietf.org/html/rfc1945#section-10.16|date=|first1=Fielding, Roy|last1=T.|first2=Berners-Lee|last2=Tim|first3=Frystyk|last3=Henrik|website=tools.ietf.org|accessdate=2020-01-28|archive-date=2020-01-25|archive-url=https://web.archive.org/web/20200125093200/https://tools.ietf.org/html/rfc1945#section-10.16|dead-url=no}}</ref>，头部字段为：<code>WWW-Authenticate</code>，该字段为要求客户端提供适配的资源。<ref>{{Cite web|title=Hypertext Transfer Protocol -- HTTP/1.0|url=https://tools.ietf.org/html/rfc1945.html|accessdate=2020-01-28|last=Frystyk|first=Henrik|work=tools.ietf.org|language=en|archive-date=2020-04-15|archive-url=https://web.archive.org/web/20200415025505/https://tools.ietf.org/html/rfc1945.html|dead-url=no}}</ref> <code>WWW-Authenticate: Basic realm="Secure Area"</code> 该例子，<code>Basic</code> 为验证的模式，<code>realm="Secure Area"</code>为保护域，用于与其他请求URI作区别。
+# 接到应答后，客户端显示该认证域给用户并提示输入用户名和口令。此时用户可以选择确定或取消。
+# 用户输入了用户名和口令后，客户端软件将对其进行处理，并在原先的请求上增加认证消息头（{{Lang-en|Authorization}}）然后重新发送再次尝试。过程如下：
+##将用户名和口令拼接为<code>用户：密码</code>形式的字符串。
+##如果服务器<code>WWW-Authenticate</code>字段有指定编码，则将字符串编译成对应的编码（如：UTF-8）。
+##将字符串编码为base64。
+##拼接<code>Basic</code> ，放入<code>Authorization</code>头字段，就像这样：<code>Authorization Basic 字符串</code>。  示例：用户名：<code>Aladdin</code> ，密码：<code>OpenSesame</code> ，拼接后为<code>Aladdin:OpenSesame</code>，编码后<code>QWxhZGRpbjpPcGVuU2VzYW1l</code>，在HTTP头部里会是这样：<code>Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l</code>。  Base64编码并非加密算法，其无法保证安全与隐私，仅用于将用户名和口令中的不兼容的字符转换为均与[[HTTP协议|HTTP协议]]兼容的字符集。
+# 在本例中，服务器接受了该认证屏幕并返回了页面。如果用户凭据非法或无效，服务器可能再次返回401应答码，客户端可以再次提示用户输入口令。
+
+'''注意:'''客户端有可能不需要用户交互，在第一次请求中就发送认证消息头。
+
+=== 电文过程 ===
+
+==== 1.客户端请求（没有认证信息）====
+<syntaxhighlight lang=http>
+GET /private/index.html HTTP/1.0
+Host: localhost
+</syntaxhighlight>
+
+（跟随一个[[换行|换行]]，以[[回车符|回车（CR）]]加[[换行|换行（LF）]]的形式）
+
+==== 2.服务端应答====
+<syntaxhighlight lang=html4strict>
+HTTP/1.0 401 Authorization Required
+Server: HTTPd/1.0
+Date: Sat, 27 Nov 2004 10:18:15 GMT
+WWW-Authenticate: Basic realm="Secure Area"
+Content-Type: text/html
+Content-Length: 311
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+ "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<HTML>
+  <HEAD>
+    <TITLE>Error</TITLE>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+  </HEAD>
+  <BODY><H1>401 Unauthorized.</H1></BODY>
+</HTML>
+</syntaxhighlight>
+
+==== 3.客户端请求（有认证信息） ====
+用户名“Aladdin”，口令 “open sesame”<syntaxhighlight lang=http>
+GET /private/index.html HTTP/1.0
+Host: localhost
+Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+</syntaxhighlight>
+
+（跟随一个空行，如上所述）
+
+Authorization消息头的用户名和口令的值可以容易地编码和解码。
+
+==== 4.服务端的应答====
+<syntaxhighlight lang=http>
+HTTP/1.0 200 OK
+Server: HTTPd/1.0
+Date: Sat, 27 Nov 2004 10:19:07 GMT
+Content-Type: text/html
+Content-Length: 10476
+</syntaxhighlight>
+
+（跟随一个空行，随后是需凭据页的[[HTML|HTML]]文本）。
+
+== 参考文献和注释 ==
+{{reflist}}
+
+== 参见 ==
+* [[HTTP摘要认证|HTTP摘要认证]]
+
+== 外部链接==
+*[http://tools.ietf.org/html/rfc2617 RFC2617: HTTP Authentication: Basic and Digest Access Authentication]{{Wayback|url=http://tools.ietf.org/html/rfc2617 |date=20100704162509 }}
+
+[[Category:HTTP|Category:HTTP]]
+[[分类:認證方法|分类:認證方法]]

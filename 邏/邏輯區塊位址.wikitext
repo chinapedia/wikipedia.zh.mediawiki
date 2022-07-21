@@ -1,0 +1,66 @@
+{{Multiple issues|
+{{Expand language|1=en|time=2020-07-28T06:03:24+00:00}}
+{{No footnotes|time=2020-07-28T06:03:24+00:00}}
+}}
+{{noteTA
+|G1=IT
+}}
+'''邏輯區塊位址'''（'''{{lang-en|'''Logical Block Address'''}}'''，'''LBA'''）是描述[[電腦|電腦]][[儲存設備|儲存設備]]上[[資料|資料]]所在區塊的通用機制，一般用在像[[硬碟|硬碟]]這樣的輔助記憶裝置。LBA可以意指某個資料區塊的位址或是某個位址所指向的資料區塊。現今電腦上所謂一個邏輯區塊通常是512或1024位元組。ISO-9660格式的標準CD則以2048位元組為一個邏輯區塊大小。
+
+== LBA定址機制 ==
+LBA是非常單純的一種定址模式﹔從0開始編號來定位區塊，第一區塊LBA=0，第二區塊LBA=1，依此類推。這種定址模式取代了原先作業系統必須面對儲存設備硬體構造的方式。最具代表性的首推CHS(cylinders-heads-sectors，磁柱-磁頭-磁區)定址模式，區塊必須以硬碟上某個磁柱、磁頭、磁區的硬體位置所合成的位址來指定。CHS模式對硬碟以外的裝置來說沒什麼作用(例如磁帶或是網路儲存設備)，所以通常也不會用在這些地方。過去MFM(Modified Frequency Modulation, 改良調頻式)和RLL(Run Length Limited)儲存設備都曾使用CHS模式，ATA-1裝置更將延伸CHS(Extended Cylinders-Heads-Sectors, ECHS)也派上了用場。
+
+SCSI採用LBA抽象定址。實際上硬體控制器還是以CHS來定址區塊，但無論[[驅動程式|驅動程式]]還是任何以低階存取磁碟的應用程式(例如資料庫軟體)通常都不再需要這個參數。各種要求區塊低階存取的系統呼叫把定義好的LBA傳給驅動程式﹔最直接的情況下(邏輯裝置與實體裝置單一對應)驅動程式只是將LBA再傳給硬體控制器。
+
+== LBA對應與邏輯裝置虛擬化 ==
+當邏輯裝置是經由虛擬化或是集合所構成的，像是RAID(磁碟陣列)和SANs(Storage Area Network)這種複雜的情況，就得把應用程式根據其觀點中的磁碟來指定的LBA轉換成每個實體儲存設備上的LBA。在複雜的分散式儲存結構下，從發出要求的應用程式到實體甚至是遠端設備之間，會有太多這樣的LBA轉換。
+
+== CHS與LBA互換 ==
+CHS位址可用以下公式轉成LBA,
+ #lba=(#c*H+#h)*S+#s-1
+其中,
+* #c、#h、#s分別是磁柱、磁頭、磁區的編號
+* #lba是邏輯區塊編號
+* H=heads per cylinder，每個磁柱的磁頭數
+* S=sectors per track，每磁軌的磁區數
+LBA可用以下公式對應到CHS:
+ #c=#lba/(S*H)
+ #h=(#lba/S)%H
+ #s=(#lba%S)+1
+其中,
+* / 是整數除法
+* % 是取整數除法中的餘數
+* 請注意，當今的磁碟使用ZBR(Zone Bit Recording, 等密度記錄)方式，實際的每軌磁區數得根據它是哪一軌。不過磁碟還是會提供這個參數來符合公式，內部再自動調整。
+其它公式:
+ #lba/S=q 餘 r
+ #s=1+r
+ q/H=#c 餘 #h
+例如:
+: CHS總數=[600, 10, 84]，求#lba=1234所對應的CHS編號:
+: 1234/84=14 餘 58
+: #s=1+58=59
+: 14/10=1 餘 4
+: #c=1
+: #h=4
+: #chs=(1, 4, 59)
+: 驗算: (1*10+4)*84+59-1=14*84+58=1234
+
+== LBA、ATA裝置以及Enhanced BIOS ==
+ATA-1規範中定義了28位元定址模式，當成LBA或是CHS都可以。如果用CHS這28位元拆成: 磁柱16位元、磁頭4位元、磁區8位元。注意CHS模式磁區是從1開始算，所以在這個規範中磁區數最多只有255個，最大磁區編號為254(0xFE)。
+
+規範採用當時，CHS的BIOS規範只有24位元: 磁柱10位元、磁頭8位元、磁區6位元，定義在BIOS的INT 13H軟體中斷裡，而且已經用在DOS的MBR(Master Boot Record，主要開機記錄)。這造成了BIOS CHS跟ATA CHS之間必須經過轉換，否則各參數只能用到兩者的最大公因數即CHS位元數={10, 4, 6}，也就是1024×16×63個磁區，以每磁區512位元組計算得504 MiB。轉換方式其一是Large模式或稱Enhanced BIOS模式(又名Bit Shift Translation, 位移轉換)，此方式會重新對應偵測到的磁柱和磁頭數而磁區數不變﹔方式其二是將頭一種CHS對應到LBA之後再換算成另一種CHS機制，稱為LBA-assist。
+
+即使利用這些轉址方式，BIOS定給MS-DOS邏輯磁區(以及Windows NT 4.0硬碟分割區)的CHS位元數={10, 8, 6}機制頂多也只能達到7.84 GiB。以每磁區512位元組來計算，ATA-1所定義的28位元LBA上限達到128 GiB。2002年ATA-6規範採用48位元LBA，同樣以每磁區512位元組計算容量上限可達128 Petabytes。
+
+== 外部連結 ==
+* [http://support.microsoft.com/kb/303013/zh-tw 如何在 Windows XP 中啟用 ATAPI 磁碟機的 48 位元邏輯區塊定址支援] {{Wayback|url=http://support.microsoft.com/kb/303013/zh-tw |date=20130925033626 }}
+* [http://www.dewassoc.com/kbase/hard_drives/lba.htm LBAs explained] {{Wayback|url=http://www.dewassoc.com/kbase/hard_drives/lba.htm |date=20210225074751 }}
+* [http://www.boot-us.com/gloss11.htm LBA and CHS format, LBA mapping] {{Wayback|url=http://www.boot-us.com/gloss11.htm |date=20180527105438 }}
+* [http://support.microsoft.com/kb/q224526/ Microsoft article on 7.8GB limit on NT 4.0] {{Wayback|url=http://support.microsoft.com/kb/q224526/ |date=20120225063939 }}
+* [http://www.dewassoc.com/kbase/hard_drives/drive_size_barrier_limitations_2.htm Hard Drive Size Limitations and Barriers] {{Wayback|url=http://www.dewassoc.com/kbase/hard_drives/drive_size_barrier_limitations_2.htm |date=20210225073301 }}
+* [http://books.google.com/books?id=E1p2FDL7P5QC&pg=RA1-PA527&lpg=RA1-PA527&dq=bit+shifting+lba&source=bl&ots=M1poB75_cv&sig=3q6B9DsqOj08xkvE0iE6iiake44&hl=en&ei=HuABS5u6DpPNngefzYwR&sa=X&oi=book_result&ct=result&resnum=10&ved=0CEAQ6AEwCQ#v=onepage&q=bit%20shifting%20lba&f=false Upgrading and Repairing PC's] {{Wayback|url=http://books.google.com/books?id=E1p2FDL7P5QC&pg=RA1-PA527&lpg=RA1-PA527&dq=bit+shifting+lba&source=bl&ots=M1poB75_cv&sig=3q6B9DsqOj08xkvE0iE6iiake44&hl=en&ei=HuABS5u6DpPNngefzYwR&sa=X&oi=book_result&ct=result&resnum=10&ved=0CEAQ6AEwCQ#v=onepage&q=bit%20shifting%20lba&f=false |date=20170425213640 }}, by Scott Mueller. Pages 524-531.
+* [http://www.48bitlba.com/ Source for 48-bit LBA Information] {{Wayback|url=http://www.48bitlba.com/ |date=20210203191824 }}
+
+[[Category:電腦貯存裝置|L]]
+[[Category:SCSI|L]]
+[[Category:BIOS|L]]

@@ -1,0 +1,39 @@
+{{NoteTA
+|G1=IT
+}}
+{{expand|time=2013-09-02T07:32:31+00:00}}
+{{expert|subject=计算机科学|time=2013-09-02T07:32:31+00:00}}
+
+'''FTPS'''是一种对常用的[[文件传输协议|文件传输协议]]（FTP）添加[[传输层安全|传输层安全]]（TLS）和安全套接层（SSL）加密协议支持的扩展协议。
+
+FTPS不應與基於[[Secure_Shell|SSH]]的[[SSH文件传输协议|SSH文件传输协议]]或是[[Secure_FTP|Secure FTP]]协议相混淆。
+
+==背景==
+在1971年的[[FTP|FTP]]草案用於科學與研究網路[[ARPANET|ARPANET]]。<ref name="rfc265">{{Cite web |url=http://tools.ietf.org/html/rfc265 |title=RFC-265: File Transfer Protocol (FTP) |accessdate=2013-09-02 |archive-date=2017-07-08 |archive-url=https://web.archive.org/web/20170708005933/https://tools.ietf.org/html//rfc265 |dead-url=no }}</ref>最初只有一小部分軍事用地和大學裡的少數人使用，可以使用網路的人，任何人都可以操作存取，無視於用戶的數據安全和隱私要求。
+
+隨著ARPANET逐漸被{{link-en|National Science Foundation Network|National Science Foundation Network}}所取代，以及之後隨著[[Internet|Internet]]的普及，上網人口越來越多。用戶端到伺服器端經過的路徑越來越長，未經授權的第三方[[竊聽|竊聽]]數據傳輸的機會也因此增加。
+
+1994年，瀏覽器公司[[網景|網景]]開發與發布[[安全套接层|安全套接层]]（SSL）的[[应用层|应用层]]封裝<ref name="ssl2draft">{{Cite web |url=http://www.mozilla.org/projects/security/pki/nss/ssl/draft02.html |title=The SSL Protocol, Feb. 9th, 1995 |accessdate=2013-09-02 |archive-date=2013-05-28 |archive-url=https://web.archive.org/web/20130528221052/http://www.mozilla.org/projects/security/pki/nss/ssl/draft02.html |dead-url=no }}</ref>，該協議使應用程序在進行跨網路通信使用私人和安全的方式，防止竊聽、篡改、偽造消息。它可以增加安全性，使用[[传输控制协议|TCP]]連接，使[[HTTP|HTTP]]經由SSL形成更安全的[[HTTPS|HTTPS]]。
+
+SSL最終被應用到FTP，[[RFC|RFC]]草案發表在1996年底。<ref name="ftpsdraft">{{Cite web |url=http://tools.ietf.org/id/draft-murray-auth-ftp-ssl-00.txt |title=RFC draft, Secure FTP Over SSL, revision 1996-11-26 |accessdate=2013-09-02 |archive-date=2014-05-27 |archive-url=https://web.archive.org/web/20140527055227/http://tools.ietf.org/id/draft-murray-auth-ftp-ssl-00.txt |dead-url=no }}</ref>不久之後，官方[[IANA|IANA]]進行Port埠號註冊。然而，RFC卻沒有定案，直到2005年。<ref name="rfc4217">{{Cite web |url=http://tools.ietf.org/html/rfc4217 |title=RFC-4217: Securing FTP with TLS |accessdate=2013-09-02 |archive-date=2013-09-10 |archive-url=https://web.archive.org/web/20130910104531/http://tools.ietf.org/html/rfc4217 |dead-url=no }}</ref>
+
+已知的Linux客户端有[[curl|curl]]、lftp、[[wget|wget]]（版本1.16以上）等。
+
+==使用模式==
+有兩種不同模式被開發出來，隱式和顯式。
+===隱式（Implicit）===
+隐式模式FTPS下不支持协商是否使用加密，所有的连接数据均为加密。客户端必须先使用TLS Client Hello消息向FTPS服务器进行握手来建立加密连接。如果FTPS服务器未收到此类消息，则服务器应断开连接。
+为了保持与现有的非FTPS感知客户端的兼容性，隐式FTPS默认在IANA规定的端口990/TCP上监听FTPS控制通道，并在端口989/TCP上监听FTPS数据通道<ref>{{cite web|title=Service Name and Transport Protocol Port Number Registry|url=http://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml|accessdate=2019-08-18|archive-date=2018-01-26|archive-url=https://web.archive.org/web/20180126020551/http://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml|dead-url=no}}</ref>。这使得管理员可以保留端口(控制通道21/TCP与数据通道20/TCP)以兼容原始的FTP。
+RFC4217中未定义隐式模式。因此，它被认为是FTP协商TLS/SSL中过时的早期方法。
+===顯式（Explicit）===
+显式模式（也称为FTPES），FTPS客户端先与服务器建立明文连接，然后从控制通道明确请求服务端升级为加密连接（Cmd: AUTH TLS）。
+控制通道与数据通道默认端口与原始FTP一样。控制通道始终加密，而数据通道是否加密则为可选项。
+同时若服务器未限制明文连接，也可以使用未加密的原始FTP进行连接，也就是说服务器在相同的端口上同时提供FTP与FTPS服务。
+
+== 参考文献 ==
+{{Reflist}}
+
+[[Category:文件传输协议|Category:文件传输协议]]
+[[Category:网络协议|Category:网络协议]]
+[[Category:应用层协议|Category:应用层协议]]
+[[Category:傳輸層安全協議|Category:傳輸層安全協議]]

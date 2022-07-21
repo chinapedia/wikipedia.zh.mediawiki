@@ -1,0 +1,46 @@
+{{NoteTA
+|G1 = Math
+}}
+在[[线性代数|线性代数]]中，'''积和式'''（permanent）是一个由[[方块矩阵|方块矩阵]]<math>A</math>计算得到的标量，记作<math>\operatorname{perm}(A)</math>。积和式的定义与[[行列式|行列式]]类似，只是在求和时不添加正负号。当矩阵<math>A</math>包含若干变量时，积和式也可以看作是一个关于这些变量的多项式。积和式在[[计算机科学|计算机科学]]，特别是[[计算复杂性理论|计算复杂性理论]]中有重要的地位，因为理论上的一个重要难题——计算一个[[二分图|二分图]]（bipartite graph）上[[完美匹配|完美匹配]]（perfect matching）的数目——等价于求某个矩阵的积和式。
+
+==定义==
+一个<math>n \times n</math>矩阵<math>A=(a_{i,j})</math>的积和式定义为
+
+: <math> \operatorname{perm}(A)=\sum_{\sigma\in S_n}\prod_{i=1}^n a_{i,\sigma(i)}.</math>
+
+其中<math>S_n</math>为<math> n</math>阶[[置换群|置换群]]，即包含所有''<math> n</math>''元排列的集合。在<math> n = 2</math>的特殊情形下，
+
+: <math>\operatorname{perm}\begin{pmatrix}a&b \\ c&d\end{pmatrix}=ad+bc.</math>
+
+从定义不难验证，积和式是[[多线性多项式|多线性多项式]]，且置换<math> A</math>中行（或列）后保持不变。与行列式类似，积和式也可以用[[拉普拉斯展开式|拉普拉斯展开式]]展开。
+
+作为比较，同一个矩阵<math> A</math>的行列式定义为
+
+: <math>\det(A) = \sum_{\sigma \in S_n} \sgn(\sigma) \prod_{i=1}^n a_{i,\sigma(i)}</math>
+
+其中<math>\sgn(\sigma)</math>为[[置换的奇偶性|符号差]]。可以看出，两者形式上的区别仅在于某些项前面的符号有所不同。尽管如此，它们在性质上却有诸多不同。比如，置换<math> A</math>中两行（或列）后行列式的符号''会''改变，而正是这一性质使我们得以利用[[高斯消元法|高斯消元法]]高效求出行列式的值。
+
+==与组合问题的联系==
+
+积和式的定义可以从如下两方面理解，一是用于计算二分图上完美匹配的个数，二是用于计算一个[[图|图]]上的圈覆盖的个数。
+
+===与二分图完美匹配的关系===
+
+二分图上的完美匹配是算法理论和计算复杂性理论中的重要问题。设二分图<math>G=(L, R, E)</math>，其中<math>L = \{1, 2, \dots, n\}</math>是左边结点的集合，<math>R=\{1', 2', \dots, n'\}</math>是右边结点的集合，<math>E</math>为边的集合。如果双射<math>f: L \to R</math>满足<math>(1, f(1)), (2, f(2)), \dots, (n, f(n))</math>均为<math>E</math>中的边，那么我们称其为<math>G</math>的一个完美匹配。
+
+对包括二分图在内的任意图<math>G</math>，我们定义其[[邻接矩阵|邻接矩阵]]<math> A_G = (a_{ij})_{n \times n}</math>如下：若<math>(i,j')\in E</math> 则 <math>a_{ij}=1</math>，否则 <math>a_{ij}=0</math>。不难验证，<math>\operatorname{perm}(A_G)</math>的值即是<math>G</math>中完美匹配的个数，因为乘积项与双射之间一一对应，而不满足条件的双射所对应的乘积项为零。这样，我们就将积和式的值与二分图完美匹配的个数建立了联系。
+
+===与图的圈覆盖的关系===
+
+设有向图<math>G=(V,E)</math>，<math>V=\{1, 2, \dots, n\}</math>为结点集，<math>E</math>为边集。<math>G</math>的一个圈覆盖定义为<math>G</math>中一组不相交的[[圈|圈]]的集合，且这些圈覆盖了<math>V</math>。由于一个[[置换|置换]]可以做环状分解，可以看出一个置换与一个可能的圈覆盖是一一对应的。特别地，<math>G</math>的邻接矩阵<math>A_G</math>的积和式即是<math>G</math>中圈覆盖的数目。
+
+==积和式的计算复杂性==
+
+Valient首先证明了积和式的求值问题是[[＃P|#P]]完全的，即便矩阵各项的值仅能取0或1<ref>{{Cite journal|title=The complexity of computing the permanent|url=https://linkinghub.elsevier.com/retrieve/pii/0304397579900446|last=Valiant|first=L.G.|date=1979|journal=Theoretical Computer Science|issue=2|doi=10.1016/0304-3975(79)90044-6|volume=8|pages=189–201|language=en}}</ref>。也就是说，任何#P复杂性类中的计数问题都能多项式归约到积和式的求值问题。而[[戶田定理|户田定理]]（Toda's theorem）告诉我们<math>\textsf{PH} \subseteq \textsf{P}^{\# \textsf{P}}</math>，因此''假若''能在确定性多项式时间内解决积和式求值问题，那么也能在确定性多项式时间内解决一切属于[[多項式譜系|多项式谱系]]（<math>\textsf{PH}</math>）的判定问题，进而导致<math>\textsf{P} = \textsf{NP} = \textsf{PH}</math>；计算机科学家普遍相信这是不可能的。可见计算积和式的复杂性远比计算行列式高；后者易用高斯消元等算法在确定性多项式时间内解决。
+
+虽然精确计算积和式很困难，但是的确存在近似计算积和式的高效算法。Jerrum，Sinclair和Vigoda设计出了一种多项式时间内的随机算法，能以任意精度（FPRAS）近似计算非负矩阵的积和式<ref>{{Cite journal|title=A polynomial-time approximation algorithm for the permanent of a matrix with non-negative entries|url=http://portal.acm.org/citation.cfm?doid=380752.380877|last=Jerrum|first=Mark|last2=Sinclair|first2=Alistair|date=2001|journal=Proceedings of the thirty-third annual ACM symposium on Theory of computing  - STOC '01|publisher=ACM Press|doi=10.1145/380752.380877|location=Hersonissos, Greece|pages=712–721|language=en|isbn=978-1-58113-349-3|last3=Vigoda|first3=Eric}}</ref>。
+
+== 参考文献 ==
+<references />
+[[Category:线性代数|Category:线性代数]]
+[[Category:计算复杂性理论|Category:计算复杂性理论]]

@@ -1,0 +1,116 @@
+{{noteTA
+|G1 = IT
+|G2 = FL
+|T = zh:GNU侦错器; zh-hans:GNU调试器; zh-hant:GNU偵錯器; zh-tw:GNU偵錯器;
+|1 = zh-hans:直接內存訪問; zh-hant:直接記憶體存取;
+|2 = zh:发布; zh-hans:发布; zh-tw:釋出
+|3 = zh:调用; zh-hans:调用; zh-hant:呼用;
+|4 = zh-cn:调试; zh-hant:偵錯;
+}}
+{{Infobox_Software
+ |name = GNU Debugger
+ |logo = Gdb archer fish.svg
+ |logo size = 200px
+ |screenshot = GNU gdb 12.1 screenshot.png
+ |caption =
+ |developer = [[GNU計劃|GNU計劃]]
+ |latest_release_version = 12.1
+ |latest_release_date = {{Release date and age|2022|05|01}}
+ |operating_system = [[类Unix系统|类Unix系统]]、[[Microsoft_Windows|Windows]]
+ |genre = [[调试工具|调试工具]]
+ |license = [[GNU通用公共许可证|GNU通用公共许可证]]
+ |website = [https://www.gnu.org/software/gdb/ gnu.org/software/gdb/]
+}}
+'''GNU偵錯器'''（{{lang-en|'''G'''NU '''D'''e'''b'''ugger}}，缩写：{{lang|en|'''GDB'''}}），是[[GNU|GNU]]軟體系統中的標準[[调试工具|偵錯器]]，此外GDB也是個具有移攜性的偵錯器，經過移攜需求的調修與重新編譯，如今許多的[[類UNIX|類UNIX]]作業系統上都可以使用GDB，而現有GDB所能支援除錯的程式語言有[[C語言|C]]、[[C++|C++]]、[[Pascal_(程式語言)|Pascal]]以及[[Fortran|FORTRAN]]。
+
+== 歷史 ==
+GNU Debugger最初是在1988年由[[理查德·马修·斯托曼|理查德·马修·斯托曼]]（Richard Stallman）所撰寫，之後以[[GNU通用公共許可證|GNU通用公共許可證]]（GNU General Public License, GNU GPL）的授權方式將軟體釋出，因此GNU Debugger是一套自由軟體。釋出後的1990年－1993年間則由任職於[[Cygnus_Solutions|Cygnus Solutions]]公司的[[約翰·吉爾摩|約翰·吉爾摩]]（{{link-en|John Gilmore|John Gilmore (advocate)}}）負責後續的軟體維護工作。
+
+== 技術細節 ==
+=== 特點 ===
+GDB具備各種偵錯功效，能針對[[计算机程序|電腦程式]]的執行進行追蹤與警告，使用GDB的除錯人員可以監督及修改程式的內部[[變數|變數]]值，甚至監督與修改獨立於主程式運作外，以獨立個體型態呼用（呼叫使用）的[[子程序|函式]]。
+
+GDB能為多種不同處理器架構上執行的軟體進行偵錯，這些處理器架構包括：DEC/COMPAQ/HP的[[DEC_Alpha|Alpha]]、ARM的[[ARM_architecture|ARM]]、Hitachi的[[Hitachi_H8|H8/300]]、IBM的[[System/370|System/370]]、[[System_390|System 390]]、Intel的[[X86|X86]]及[[X86-64|X86-64]]、[[Itanium|IA-64]] "Itanium"、[[Motorola_68000|Motorola 68000]]、MIPS的[[MIPS_architecture|MIPS]]、HP的[[PA-RISC|PA-RISC]]、[[AIM联盟|AIM联盟]]的[[PowerPC|PowerPC]]、Hitachi/Renesas/ST的[[SuperH|SuperH]]、Sun的[[SPARC|SPARC]]、DEC/COMPAQ/HP的[[VAX|VAX]]。
+
+此外一些比較少人知的處理器也一樣受GDB支援，包括：AMD的[[A29K|A29K]]、ARC的[[Advanced_RISC_Computing|ARC]]、Atmel的[[AVR|AVR]]、Axis Communications的[[ETRAX_CRIS|ETRAX CRIS]]、[[D10V|D10V]]、[[D30V|D30V]]、Fujitsu的[[FR-30|FR-30]]、[[FR-V|FR-V]]、Intel的[[Intel_i960|i960]]、Renesas的[[M32R|M32R]]、Motorola的[[Motorola_68HC11|68HC11]]、Motorola的[[Motorola_88000|88000]]、Freescale的[[MCORE|MCORE]]、[[MN10200|MN10200]]、[[MN10300|MN10300]]、[[320xx_microprocessor|NS32K]]、[[Stormy16|Stormy16]]、[[V850|V850]]、以及Zilog的[[Zilog_Z8000|Z8000]]，此外更後續版本的GDB只會增加更多的處理器支援而不會短少。
+
+GDB的內部已具備了依據各種支援不同處理器的指令集所編譯成的[[模擬推演程式|模擬推演程式]]（{{link-en|Instruction Set Simulator|Instruction Set Simulator|Simulator}}），就連大眾少知少用的M32R、V850等架構的處理器也都具備。
+
+=== 遠端偵錯 ===
+[[File:cc25-GDB-Remote-Debugging.png|right]]
+GDB具有一種「遠端，Remote」模式，此種模式多半是在為嵌入式系統進行偵錯時使用，遠端操作指的是：GDB在一部機器內執行，而要進行偵錯的程式是在另一部機器上執行，接著欲偵錯的機器上會再加裝一個名為「Stub」的小程式，該程式能夠與另一端的GDB程式溝通，溝通的路徑可以是兩部機器間的{{tsl|en|Serial Cable|串接式接線}}，也可以是支援TCP/IP協定傳輸的各種網路，在TCP/IP網路及協定上再加搭傳輸GDB專有的除錯操作用通訊協定，如此便能進行遠端偵錯。
+
+不僅GDB有遠端模式，KGDB也同樣具有遠端模式，KGDB主要是為執行中的[[Linux核心|Linux核心]]進行偵錯，而GDB則是主要是用在原代碼的層次。運用KGDB，負責核心程式的程式設計師可以將核心以近似於應用程式的除錯方式來偵錯，包括為核心程式碼設置[[断点|中斷點]]（breakpoint）、讓核心程式以步階方式逐行執行以及觀看變數值等。
+
+在某些架構的處理器中，會以硬體方式提供一些偵錯功用的寄存器，以及可以設定觀察點（Watchpoint），觀察點的功用是：當程式設計師指定的記憶體位址被執行到或訪問到時，觀察點即會去觸發、觸動一個中斷點。對此KGDB可以安裝在一部傳統機器上，並透過遠端模式使用另一部受偵錯機器上的硬體偵錯功效，同樣的兩部機器可用各種方式進行溝通，如[[串接式接線|串接式接線]]、[[以太网|乙太網路]]等，尤其在[[FreeBSD|FreeBSD]]作業系統上還允許使用[[IEEE_1394|FireWire]]接線，並用[[直接記憶體存取|直接內存訪問]]（Direct Memory Access，DMA）的功效來協助遠端偵錯。
+
+=== 現有限制 ===
+[[File:Stack-browsing-with-regs-and-locals.png|right]]
+GDB運用上最明顯的限制是在「使用者介面」的部分，預設只有[[CLI|命令列介面]]（CLI）可用，而不具備較能親合上手、直覺操作的[[GUI|圖形化使用者介面]]（GUI），不過此一弱處也已經有幾個前端程式為其補強，例如[[Data_Display_Debugger|DDD]]、[[GDBtk|GDBtk]]／[http://sources.redhat.com/insight/ Insight] {{Wayback|url=http://sources.redhat.com/insight/ |date=20121016085046 }}以及[[Emacs|Emacs]]中的「GUD 模式」等，有了這些補強後，GDB在功效使用的便利性上就能夠與「[[集成开发环境|整合發展環境]]中的偵錯功效使用」相接近。
+
+另外，有些偵錯工具（軟體）也被設計成能與GDB搭配使用，例如[[記憶體洩漏|記憶體洩漏]]（[[内存泄漏|memory leak]]）的偵測程式。
+
+== 命令列使用的範例 ==
+ gdb prog.out      debug prog.out
+ (gdb) run         run
+
+== 過程範例 ==
+以下是用GDB進行除錯的一段過程示範，欲進行偵錯的程式已在{{link-en|堆疊追蹤|Stack trace}}區內：
+
+<pre>
+GNU gdb Red Hat Linux (6.3.0.0-1.21rh)
+Copyright 2004 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "i386-redhat-linux-gnu"...Using host libthread_db
+library "/lib/libthread_db.so.1".
+
+(gdb) run
+Starting program: /home/sam/programming/crash
+Reading symbols from shared object read from target memory...done.
+Loaded system supplied DSO at 0xc11000
+This program will demonstrate gdb
+
+Program received signal SIGSEGV, Segmentation fault.
+0x08048428 in function_2 (x=24) at crash.c:22
+22         return *y;
+(gdb) edit
+(gdb) shell gcc crash.c -o crash -gstabs+
+(gdb) run
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+warning: cannot close "shared object read from target memory": File in wrong format
+`/home/sam/programming/crash' has changed; re-reading symbols.
+Starting program: /home/sam/programming/crash
+Reading symbols from shared object read from target memory...done.
+Loaded system supplied DSO at 0xa3e000
+This program will demonstrate gdb
+24
+Program exited normally.
+(gdb) quit
+</pre>
+
+這個程式已處在執行階段，之後找出這個程式中會導致執行錯誤的段落，然後將對應處的原代碼用編輯器進行錯誤修訂，更正完成後用[[GCC|GNU 編譯器]]（GCC）重新編譯並再次執行。
+
+== 參考 ==
+* 書籍：''Debugging with GDB''（在此暫譯成：用GDB進行除錯）
+** 出版：2002年，[[自由软件基金会|自由软件基金会]]（Free Software Foundation，FSF）
+** ISBN 1-882114-88-4
+** 作者：[[Richard_Stallman|Richard M. Stallman]]、[[Roland_Pesch|Roland Pesch]]、[[Stan_Shebs|Stan Shebs]]及其他所有參與成員
+
+== 外部連結 ==
+{{Portalpar|自由軟體}}
+* [http://www.gnu.org/software/gdb/ GDB的官方網站] {{Wayback|url=http://www.gnu.org/software/gdb/ |date=20060701031341 }} {{en}}
+* [http://sources.redhat.com/gdb/current/onlinedocs/gdb.html GDB文件："Debugging with GDB，用GDB進行除錯"] {{Wayback|url=http://sources.redhat.com/gdb/current/onlinedocs/gdb.html |date=20120707130759 }}（線上HTML格式，折算成PDF格式則超過400頁）{{en}}
+* [https://web.archive.org/web/20080616054054/http://sources.redhat.com/gdb/current/onlinedocs/gdbint.html 深入GDB] {{en}}
+* [https://web.archive.org/web/20071017044810/http://users.actcom.co.il/~choo/lupg/tutorials/debugging/debugging-with-gdb.html 使用GDB進行C及C++程式語言的除錯] {{en}}
+* [https://web.archive.org/web/20130517035414/http://kgdb.linsyssoft.com/ 用來替Linux核心進行除錯的GDB後端程式：KGDB] {{en}}
+* [https://web.archive.org/web/20061004141706/http://www.dirac.org/linux/gdb/ Peter Jay Salzman所撰：如何更專精、善用GDB] {{en}}
+* [http://www.aosabook.org/en/gdb.html GDB內部結構] {{Wayback|url=http://www.aosabook.org/en/gdb.html |date=20200721025521 }} (The Architecture of Open Source Applications, Volume II - ISBN 9781105571817) {{en}}
+
+{{GNU}}
+
+[[Category:除錯器|Category:除錯器]]
+[[Category:GNU計劃軟體|除錯器]]

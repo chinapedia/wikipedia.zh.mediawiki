@@ -1,0 +1,238 @@
+{{NoteTA
+|G1=IT
+}}
+{{Infobox Software
+| name = libjpeg
+| logo = Logo JPEG 9.svg
+| logo size = 200px
+| logo alt = Logo IJG libjpeg v9
+| screenshot = 
+| caption = 
+| developer = [http://www.ijg.org 独立JPEG工作组]（Independent JPEG Group）
+| released = {{start date and age|1991|10|7}}
+| latest_release_version = 9e
+| latest_release_date = {{Release date and age|2022|01|16}}
+| programming language = [[C语言|C]]
+| operating_system = [[跨平台|跨平台]]
+| genre = [[函式庫|函式庫]]
+| license = 自定义[[BSD许可证|类BSD]]（[[自由软件|自由软件]]）
+| website = {{URL|https://ijg.org}}
+}}
+
+'''libjpeg'''是一个完全用[[C语言|C语言]]编写的处理[[JPEG|JPEG]]图像数据格式的自由[[函式庫|函式庫]]。它包含一个JPEG[[编解码器|编解码器]]的算法实现，以及用于处理JPEG数据的多种实用程序。
+
+该套软件采用[[C语言|C语言]]编写，并分发为附有[[源代码|源代码]]的[[自由软件|自由软件]]，采用自定义的[[寬鬆自由軟體授權條款|宽松]]（[[BSD许可证|类BSD]]）自由软件许可证，权利要求为{{tsl|en|attribution (copyright)||署名}}。原始版本由独立JPEG工作组（IJG）维护和发布。此外，也有数个提供额外特性的[[分叉_(软件开发)|分叉（Fork）]]。
+
+JPEG [[JPEG文件交换格式|JFIF]]图像在[[万维网|万维网]]上被广泛使用。它可以调整压缩量级以实现文件大小与视觉质量之间的期望与权衡。<ref>{{Cite web |url=http://www.w3.org/Graphics/JPEG/ |title=JPEG JFIF |accessdate=2017-03-17 |archive-date=2020-11-09 |archive-url=https://web.archive.org/web/20201109215438/http://www.w3.org/Graphics/JPEG/ |dead-url=no }}</ref>
+
+==实用程序==
+下列实用程序随libjpeg提供：
+* cjpeg和djpeg：用于JPEG与其他流行的图像文件格式之间的转换。
+* rdjpgcom和wrjpgcom：用于在JPEG文件中插入和提取文字注释。
+* jpegtran：用于在不同JPEG格式之间进行无损转换的工具。
+
+===jpegtran===
+[[File:CropGUI_GTK_small.png|thumb]]
+[[命令行界面|命令列介面]] jpegtran提供了幾種功能，用於重新格式化和重新編碼DCT係數的表示，分別用於轉換實際圖像數據和丟棄JPEG文件中的輔助數據。 關於係數表示的變換包括：
+* 優化JPEG文件的[[霍夫曼編碼|霍夫曼編碼]]層以增加壓縮。
+* 漸進和順序JPEG格式之間的轉換。
+* 霍夫曼和[[算术编码|算术编码]]在[[熵編碼法|熵編碼法]]層之間的轉換。<ref name="jpegcrop"/><ref name="patent-fail"/><ref name="bug680385"/>
+這些轉變都是完全無損且可逆的。 對圖像數據的轉換包括：
+* 消除某些圖像程序插入的非標準應用程序特定數據，
+* 對文件執行某些轉換，例如：
+** 丟棄顏色通道（轉換為灰階），
+** 旋轉和{{tsl|en|flipped image|翻轉}}90度，
+** [[裁剪|裁剪]]圖像塊邊框（8×8或16×16像素），
+** 縮放<ref name="jpegtran"/>
+這些是[[无损数据压缩|非破壞性資料壓縮]]並且對於保留的圖像數據是可逆的。重複轉檔時不重新壓縮現有資料解決重複編碼(修改)對資料進行二次壓縮導致多次{{tsl|en|generation loss|量化失真}}的問題
+
+有一个相关的Windows应用程序[http://sylvana.net/jpegcrop/ Jpegcrop] {{Wayback|url=http://sylvana.net/jpegcrop/ |date=20200629021141 }}为“jpegtran”提供了一个用户界面。对于[[Linux|Linux]]等[[类Unix系统|类Unix系统]]，自由的[http://emergent.unpythonic.net/01248401946 CropGUI] {{Wayback|url=http://emergent.unpythonic.net/01248401946 |date=20190416135810 }}能提供类似功能。
+许多程序基于IJG的代码支持JPEG无损转换功能，部分名单见[http://jpegclub.org/losslessapps.html Lossless Applications List] {{Wayback|url=http://jpegclub.org/losslessapps.html |date=20200512052949 }}{{en}}。
+
+==历史==
+独立JPEG工作组（IJG）的JPEG实现首次公开发布于{{date|1991-10-07}}，并在那是已相当完善。
+开发主要由{{tsl|en|Tom Lane (computer scientist)|Tom Lane}}完成。
+IJG的[[开源软件|开源]]是其中一个主要的开源包，并且是JPEG标准的成功的关键。许多公司将其整合到各种产品中，如[[图像编辑器|图像编辑器]]和[[网络浏览器|网络浏览器]]。<ref name="JPEG-homepage"/>
+
+版本5发布于1994年9月24日，整个代码库被重写。它引入了名为rdjpgcom和wrjpgcom的实用程序用于处理嵌入的文字注释。
+
+版本6于{{date|1995-08-02}}到来，支持渐进JPEG和第一版jpegtran实用程序。<!-- 该实用程序扩展了功能，支持旋转和翻转图像，以及在6b中支持灰度还原。 --><!-- 未理解，需核验 -->
+
+=== 摘要 ===
+{| class="wikitable"
+|-
+! 主版本
+! 新增文件格式特性
+! 新增主记录项
+! 参考资料
+|-
+| {{Version |o |6}}
+| 渐进式JPEG支持
+| progressive_mode ...
+| ITU-T Recommendation T.81 <br/> ISO/IEC IS 10918-1
+|-
+| {{Version |o |7}}
+| 算术编码支持
+| scale_num/scale_denom for <br/> compression (encoding) ...
+| ITU-T JPEG-Plus Proposal ...<ref>Contributed document - Word .doc file: [http://jpegclub.org/temp/ITU-T-JPEG-Plus-Proposal_R3.doc ITU-T JPEG-Plus Proposal R3] {{Wayback|url=http://jpegclub.org/temp/ITU-T-JPEG-Plus-Proposal_R3.doc |date=20160411084114 }}</ref>
+|-
+| {{Version |o |8}}
+| SmartScale <br/>（可变块大小）
+| block_size/lim_Se etc.
+| Evolution of JPEG<ref>Contributed document - Word .doc file: [http://jpegclub.org/temp/Evolution_of_JPEG.doc Evolution of JPEG] {{Wayback|url=http://jpegclub.org/temp/Evolution_of_JPEG.doc |date=20161024045553 }}</ref>
+|-
+| {{Version |c |9}}
+| 内部颜色转换 <br/>（FF F8 LSE扩展标记）
+| color_transform
+| JPEG 9 Lossless Coding<ref>Contributed document - Word .doc file: [http://jpegclub.org/temp/JPEG_9_Lossless_Coding.doc JPEG 9 Lossless Coding] {{Wayback|url=http://jpegclub.org/temp/JPEG_9_Lossless_Coding.doc |date=20161024045640 }}</ref> <br/> [http://www.infai.org/jpeg/ InfAI JPEG Development Site] {{Wayback|url=http://www.infai.org/jpeg/ |date=20170923030312 }}<ref>News c't magazine 2012 issue 18 page 43, [http://www.heise.de/ct/12/18/links/043.shtml Software Links] {{Wayback|url=http://www.heise.de/ct/12/18/links/043.shtml |date=20170318084111 }}</ref>
+|}
+{{Version |t |show=110100}}
+
+=== 时间线 ===
+<timeline>
+ImageSize  = width:640 height:100
+PlotArea   = width:90% height:40% left:5% bottom:20%
+Period     = from:1992 till:2006
+TimeAxis   = orientation:horizontal format:yyyy
+ScaleMajor = unit:year increment:1 start:1993 # rough scale
+PlotData   =
+  color:dullyellow fontsize:S                 # setting standards
+  bar:ReleaseYear from:1992 till:1994 # version 4
+  bar:ReleaseYear from:1994 till:1995 color:yelloworange # version 5
+  bar:ReleaseYear from:1995 till:end # version 6
+  at:1993 shift:(-6,0)  text:"4a"
+  at:1994 shift:(-3,0)  text:"5"
+  at:1995 shift:(-3,0)  text:"6"
+  at:1998 shift:(-6,0)  text:"6b"
+TextData   =
+  pos:(20,80) fontsize:M text: Year of release of versions # position and text for the title
+</timeline>
+<timeline>
+ImageSize  = width:640 height:100
+PlotArea   = width:90% height:40% left:5% bottom:45%
+Period     = from:2006 till:2020
+TimeAxis   = orientation:horizontal format:yyyy
+ScaleMajor = unit:year increment:1 start:2007 # rough scale
+PlotData   =
+  color:dullyellow fontsize:S                 # setting standards
+  bar:ReleaseYear from:2006 till:2009 # version 6
+  bar:ReleaseYear from:2009 till:2010 color:yelloworange # version 7
+  bar:ReleaseYear from:2010 till:2013 # version 8
+  bar:ReleaseYear from:2013 till:end  color:yelloworange # version 9
+  at:2009 shift:(-3,0)  text:"7"
+  at:2010 shift:(-3,0)  text:"8"
+  at:2012 shift:(-6,0)  text:"8d"
+  at:2013 shift:(-3,0)  text:"9"
+  at:2016 shift:(-6,0)  text:"9b"
+</timeline>
+
+==复刻==
+比较著名的复刻是libjpeg-turbo，它优化了执行的速度；还有mozjpeg，它的优化目标是更小的文件大小。除了这些以外，还有一个出自[[國際標準化組織|國際標準化組織]]（ISO）的libjpeg，其目的是所有JPEG 1标准的完整实现。<ref>{{Cite web |url=https://github.com/thorfdbg/libjpeg |title=存档副本 |accessdate=2017-03-17 |archive-date=2020-11-16 |archive-url=https://web.archive.org/web/20201116035421/https://github.com/thorfdbg/libjpeg |dead-url=no }}</ref>
+
+===libjpeg-turbo===
+{{Infobox Software
+| name = libjpeg
+| logo = libjpeg-turbo logotype.png
+| logo size = 167px
+| logo alt = Logo libjpeg-turbo
+| screenshot = 
+| caption = 
+| developer = libjpeg-turbo项目
+| released = {{start date and age|2010}}
+| latest_release_version = 2.1.3
+| latest_release_date = {{Release date and age|2022|02|25}}
+| website = {{URL|https://libjpeg-turbo.org/}}
+}}
+libjpeg-turbo是libjpeg的一个[[复刻_(软件工程)|复刻]]，它采用[[单指令流多数据流|单指令流多数据流]]（SIMD）[[指令集架構|指令]]来加速JPEG编码和解码基础效率。许多项目现在使用libjpeg-turbo而不是libjpeg，包括流行的GNU/Linux发行版（[[Fedora_(作業系統)|Fedora]]、[[Debian|Debian]]、[[Mageia|Mageia]]、[[OpenSUSE|OpenSUSE]]等）、[[Mozilla|Mozilla]]和[[Google_Chrome|Chrome]]。<ref name="turbo-software"/><ref name="Chromium"/><ref name="turbo 1.2"/>除了性能方面，部分项目也因它允许向后保留与旧的libjpeg v6b版本的[[应用二进制接口|ABI]]兼容性而选择使用libjpeg-turbo。<ref name="Fedora"/>libjpeg v7、v8和v9已打破与早期版本的ABI兼容性。<ref name="compatibility-analysis"/>
+
+libjpeg-turbo可以配置为与libjpeg v7或v8 ABI兼容，但，但它并没有实现IJG近期发布的完整的功能集，包括SmartScale格式的扩展名。<ref name="turboREADME"/><ref name="v9turbo"/>因此，通过libjpeg v8和之后版本创建的SmartScale文件将不能被libjpeg-turbo正确解压。
+
+=== mozjpeg ===
+{{Infobox Software
+| name = libjpeg
+| logo = mozjpeg logotype.svg
+| logo size = 120px
+| logo alt = mozjpeg
+| screenshot = cjpeg-screenshot.png
+| caption = mozjpeg尝试若干次对DCT系数频谱的分割
+| developer = [[Mozilla|Mozilla]] Research
+| released = {{start date and age|2014|3|4}}
+| latest_release_version = 4.0.3
+| latest_release_date = {{Release date and age|2021|02|26}}<ref>{{cite web
+  | url         = https://github.com/mozilla/mozjpeg/releases
+  | title         = Releases · mozilla/mozjpeg
+  | website         = github.com
+  | access-date         = 2021-04-14
+  | archive-date         = 2022-05-07
+  | archive-url         = https://web.archive.org/web/20220507145152/https://github.com/mozilla/mozjpeg/releases
+  }}</ref>
+| website = {{URL|https://github.com/mozilla/mozjpeg}}
+}}
+mozjpeg是由Josh Aas和其他Mozilla Research人员完成的libjpeg-turbo的一个复刻。它旨在通过减少文件大小（约10%）来加快网页的加载时间，以及在不改变图像质量的前提下提高编码效率。为达到此目的，它在编码（不对称）方面使用更多处理能力，同时保持与JPEG标准的完全兼容性，不需要在解码器侧做任何改变。它实际通过优化[[霍夫曼编码|霍夫曼编码]]树完成。
+
+除了libjpeg-turbo，mozjpeg版本也建立在jpegcrush之上，这是Loren Merritt编写的一个[[Perl|Perl]]脚本。<ref name="heise.de"/><ref name="golem.de"/>
+{{clear}}
+
+== 参见 ==
+{{Portal|自由软件}}
+* [[JPEG|JPEG]]
+* [[无损数据压缩#无损编辑|无损数据压缩#无损编辑]]
+* [[有损数据压缩|有损数据压缩]]
+
+==参考资料==
+{{Reflist|30em|refs=
+<ref name="jpegcrop">{{Cite web |url=http://jpegclub.org/jpegcrop/ |title=Jpegcrop Preferences and Options description |accessdate=2017-03-17 |archive-date=2020-07-11 |archive-url=https://web.archive.org/web/20200711222121/http://jpegclub.org/jpegcrop/ |dead-url=no }}</ref>
+
+<ref name="patent-fail">{{Cite web |url=http://filmicgames.com/archives/778 |title=Filmic Games >> The greatest failure of our patent system was... |accessdate=2017-03-17 |archive-date=2012-09-01 |archive-url=https://web.archive.org/web/20120901070906/http://filmicgames.com/archives/778 |dead-url=no }}</ref>
+
+<ref name="bug680385">{{Cite web |url=https://bugzilla.mozilla.org/show_bug.cgi?id=680385 |title=680385 - Firefox does not show arithmetic coded jpegs |accessdate=2017-03-17 |archive-date=2019-03-10 |archive-url=https://web.archive.org/web/20190310014726/https://bugzilla.mozilla.org/show_bug.cgi?id=680385 |dead-url=no }}</ref>
+
+<ref name="jpegtran">{{Cite web |url=http://jpegclub.org/jpegtran/ |title=New jpegtran features |accessdate=2017-03-17 |archive-date=2020-11-09 |archive-url=https://web.archive.org/web/20201109005020/http://jpegclub.org/jpegtran/ |dead-url=no }}</ref>
+
+<ref name="JPEG-homepage">{{Cite web |url=http://old.jpeg.org/jpeg/ |title=JPEG homepage |accessdate=2017-03-17 |archive-date=2014-11-29 |archive-url=https://web.archive.org/web/20141129041653/http://old.jpeg.org/jpeg/ |dead-url=no }}</ref>
+
+<ref name="libjpeg-turbo">{{Cite web |url=http://libjpeg-turbo.virtualgl.org/ |title=存档副本 |accessdate=2017-03-17 |archive-date=2020-10-12 |archive-url=https://web.archive.org/web/20201012224634/https://libjpeg-turbo.virtualgl.org/ |dead-url=no }}</ref>
+
+<ref name="compatibility-analysis">[http://upstream-tracker.org/versions/libjpeg.html libjpeg: API changes/compatibility] {{Wayback|url=http://upstream-tracker.org/versions/libjpeg.html |date=20140416182657 }}. February 9, 2012</ref>
+
+<ref name="ijg-is-back">Mans Rullgard (Hardwarebug.org), August 4, 2009: [http://hardwarebug.org/2009/08/04/ijg-is-back/ IJG is back] {{Wayback|url=http://hardwarebug.org/2009/08/04/ijg-is-back/ |date=20140716155045 }}</ref>
+
+<ref name="SmartScale">Tom Lane, January 16, 2013: [https://lists.fedoraproject.org/pipermail/devel/2013-January/176400.html jpeg-9, API/ABI compatibility, and the future role of this project] {{Wayback|url=https://lists.fedoraproject.org/pipermail/devel/2013-January/176400.html |date=20181204231539 }}</ref>
+
+<ref name="v9turbo">{{cite web|title=What About libjpeg v9?|url=http://libjpeg-turbo.org/About/Jpeg-9|publisher=libjpeg-turbo team|accessdate=February 8, 2013|archive-date=2020-11-12|archive-url=https://web.archive.org/web/20201112000748/https://libjpeg-turbo.org/About/Jpeg-9|dead-url=no}}</ref>
+
+<ref name="v8review">Mans Rullgard (Hardwarebug.org), February 1, 2010: [http://hardwarebug.org/2010/02/01/ijg-swings-again-and-misses/ IJG swings again, and misses] {{Wayback|url=http://hardwarebug.org/2010/02/01/ijg-swings-again-and-misses/ |date=20200927162244 }}</ref>
+
+<ref name="mozjpeg2">Sebastian Grüner, 16. Juli 2014: [http://golem.de/1407/107916 mozjpeg 2.0: Facebook unterstützt JPEG-Encoder von Mozilla] {{Wayback|url=http://golem.de/1407/107916 |date=20191018041407 }}</ref>
+
+<ref name="CloudFlare">{{Cite web |url=http://www.soeren-hentzschel.at/mozilla/2014/07/30/cloudflare-moechte-zu-mozillas-jpeg-encoder-beitragen/ |title=存档副本 |accessdate=2017-03-17 |archive-date=2015-09-07 |archive-url=https://web.archive.org/web/20150907194649/https://www.soeren-hentzschel.at/mozilla/2014/07/30/cloudflare-moechte-zu-mozillas-jpeg-encoder-beitragen/ |dead-url=no }}</ref>
+
+<ref name="heise.de">André Kramer (heise.de-Newsticker), January 14, 2013: [http://heise.de/-2135812 Mozilla-Encoder verbessert JPEG-Kompression] {{Wayback|url=http://heise.de/-2135812 |date=20191018041404 }}</ref>
+
+<ref name="turbo-software">[http://libjpeg-turbo.virtualgl.org/About/Software Software That Uses or Provides libjpeg-turbo] {{Wayback|url=http://libjpeg-turbo.virtualgl.org/About/Software |date=20170318000736 }}. February 9, 2012.</ref>
+
+<ref name="Chromium">[http://code.google.com/p/chromium/issues/detail?id=48789#c19 Issue 48789 – chromium – Use libjpeg-turbo instead of libjpeg] {{Wayback|url=http://code.google.com/p/chromium/issues/detail?id=48789#c19 |date=20150801035040 }}. April 14, 2011.</ref>
+
+<ref name="turbo 1.2">[https://bugzilla.mozilla.org/show_bug.cgi?id=698519 Bug 698519 – Update to libjpeg-turbo 1.2] {{Wayback|url=https://bugzilla.mozilla.org/show_bug.cgi?id=698519 |date=20190316091846 }}. February 28, 2012</ref>
+
+<ref name="Fedora">[http://lists.fedoraproject.org/pipermail/devel/2010-May/136575.html libjpeg for F14] {{Wayback|url=http://lists.fedoraproject.org/pipermail/devel/2010-May/136575.html |date=20160411084135 }}. February 9, 2012.</ref>
+
+<ref name="turboREADME">{{Cite web |url=https://sourceforge.net/p/libjpeg-turbo/code/HEAD/tree/trunk/README-turbo.txt?format=raw |title=libjpeg-turbo README file |accessdate=2017-03-17 |archive-date=2014-08-12 |archive-url=https://web.archive.org/web/20140812062122/http://sourceforge.net/p/libjpeg-turbo/code/HEAD/tree/trunk/README-turbo.txt?format=raw |dead-url=no }}</ref>
+
+<ref name="golem.de">Andreas Donath (golem.de), March 6, 2014: [http://golem.de/1403/104950 Mozilla will JPEGs besser komprimieren] {{Wayback|url=http://golem.de/1403/104950 |date=20191018041405 }}</ref>
+}}
+
+== 外部链接 ==
+{{commons category|libjpeg}}
+* {{Official website|ijg.org|Official website of the Independent JPEG Group}}{{en}}
+* [http://www.faqs.org/faqs/jpeg-faq/ JPEG FAQs] {{Wayback|url=http://www.faqs.org/faqs/jpeg-faq/ |date=20210126191551 }}{{en}}
+* [http://jpegclub.org/ JPEGclub] {{Wayback|url=http://jpegclub.org/ |date=20100116010354 }}{{en}} – 为libjpeg提供额外特性
+* [http://gnuwin32.sourceforge.net/packages/jpeg.htm libjpeg面向Windows的二进制包] {{Wayback|url=http://gnuwin32.sourceforge.net/packages/jpeg.htm |date=20200917053339 }}{{en}}（托管于SourceForge.net上的{{tsl|en|GnuWin32}}中）
+* [http://libjpeg-turbo.org/ libjpeg-turbo] {{Wayback|url=http://libjpeg-turbo.org/ |date=20210205205000 }}{{en}}，一个ABI及API兼容的libjpeg的复刻，它使用x86 SIMD指令实现参考实现的大幅加速。
+* {{github|mozilla/mozjpeg|mozjpeg - filesize-optimising复刻}}{{en}}
+* Josh Aas, Robert Nyman; August 2014： [https://hacks.mozilla.org/2014/08/using-mozjpeg-to-create-efficient-jpegs/ 使用mozjpeg创建高效JPEG] {{Wayback|url=https://hacks.mozilla.org/2014/08/using-mozjpeg-to-create-efficient-jpegs/ |date=20201112025821 }}{{en}} – mozjpeg的实用性概述
+* [https://fireattack.wordpress.com/2016/02/21/jpeg/ 关于JPEG的那点事儿] {{Wayback|url=https://fireattack.wordpress.com/2016/02/21/jpeg/ |date=20200926222411 }}{{zh-cn}}，2016/02/21
+
+[[Category:C函式庫|Category:C函式庫]]
+[[Category:用C編程的自由軟體|Category:用C編程的自由軟體]]
+[[Category:繪圖函式庫|Category:繪圖函式庫]]

@@ -1,0 +1,60 @@
+{{noteTA|G1=IT}}
+{{Infobox Computing signal
+| description = 错误的算术操作
+| action      = 进程异常终止
+| FPE_INTDIV | 整数除以零
+| FPE_INTOVF | 整数上溢
+| FPE_FLTDIV | 浮点除以零
+| FPE_FLTOVF | 浮点上溢
+| FPE_FLTUND | 浮点下溢
+| FPE_FLTRES | 浮点结果不准
+| FPE_FLTINV | 无效浮点操作
+| FPE_FLTSUB | 浮点下标越界
+}}
+在[[POSIX|POSIX]]<!-- Original: [[POSIX|POSIX]] -->兼容的平台上，'''SIGFPE'''是当一个[[行程|进程]]<!-- Original: [[process_(computing)|process]] -->执行了一个错误的算术操作时发送给它的[[信号_(计算机科学)|信号]]。SIGFPE的[[C预处理器|符号常量]]在[[头文件|头文件]]<!-- Original: [[header_file|header file]] --><code>[[signal.h|signal.h]]</code>中定义。因为在不同平台上，信号数字可能变化，因此常使用信号名称。<ref>{{ cite web | url = http://sourceware.org/git/?p=glibc.git;a=blob;f=bits/signum.h | title = sourceware.org Git - glibc.git/blob - bits/signum.h | accessdate = 2009-11-18 | date = 2001-07-06 }}{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>
+
+== 语源 ==
+''SIG''是信号名的通用[[詞綴|前缀]]<!-- Original: [[Prefix_(linguistics)|prefix]] -->。''FPE''是''floating-point exception''（浮点异常）的[[首字母縮略字|首字母缩略字]]<!-- Original: [[acronym|acronym]] -->。产生SIGFPE信号时并非一定要涉及[[浮点数|浮点算术]]<!-- Original: [[floating-point_arithmetic|floating-point arithmetic]] -->，之所以不修改名字是因为这么做会破坏[[向下兼容|向下兼容性]]。
+
+== 描述 ==
+导致SIGFPE被发送给进程的原因有很多。一个常见的例子是由于一个意外输入导致的溢出，或者在程序构造中的错误。
+
+SIGFPE可以被处理。也就是说，程序员可以指定他们在接收到信号时想要的动作，例如调用一个[[子程序|子程序]]<!-- Original: [[subroutine|subroutine]] -->，忽略事件等。
+
+在特定情形下，忽略SIGFPE可能导致程序出现意料之外的行为，包括但不限于由于不断重试违规操作而导致程序挂起。但是，忽略并非由计算造成的SIGFPE信号是安全的，例如通过<code>[[kill_(Unix)|kill]]</code>[[系统调用|系统调用]]发送的那些。
+
+一个通常的疏忽是认为[[除以零|除以零]]是SIGFPE的唯一来源。在一些架构上（包括IA-32{{Citation needed|date=2009-09}}），使用INT_MIN（最小的可以被表示的负整数值）除以-1的整数除法也会触发这个信号，因为商是一个无法被表示的正数。（比如8位有符号整数可以表示-128、+127和它们之间的整数。-128÷-1＝+128 ＞ +127，因此无法被表示而产生溢出并触发此信号）
+
+== 例子 ==
+这是一个尝试执行一个称为[[整数|整数]]<!-- Original: [[integer|integer]] -->[[除以零|除以零]]<!-- Original: [[division_by_zero|division by zero]] -->，或''FPE_INTDIV''的错误算术运算的[[ANSI_C|ANSI C]]程序的例子。
+
+ int main()
+ {
+        int x = 42/0;
+        return 0; /* Never reached */
+ }
+
+在一个运行[[Linux|Linux]]<!-- Original: [[Linux|Linux]] -->的[[IA-32|IA-32]]上编译运行，产生下列内容：
+
+ $ gcc -o sigfpe sigfpe.c
+ sigfpe.c: In function ‘main’:
+ sigfpe.c:3: warning: division by zero
+ $ ./sigfpe
+ Floating point exception (core dumped)
+
+一个来自[[GNU侦错器|gdb]]<!-- Original: [[gdb|gdb]] -->的[[栈跟踪|栈跟踪]]显示在<code>main</code>函数中发生了SIGFPE信号：
+
+ Program received signal SIGFPE, Arithmetic exception.
+ 0x08048373 in main ()
+
+== 参考 ==
+{{reflist}}
+
+== 参阅 ==
+* [[除以零|除以零]]<!-- Original: [[Division_by_zero|Division by zero]] -->
+* [[浮点数|浮点]]<!-- Original: [[Floating_point|Floating point]] -->
+
+{{Computing signals}}
+
+[[Category:計算機算術|Category:計算機算術]]
+[[Category:计算机错误|Category:计算机错误]]

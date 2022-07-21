@@ -1,0 +1,79 @@
+{{Refimprove|time=2020-09-29T14:40:24+00:00}}
+{{NoteTA
+|G1=Signals and Systems
+|G2=Electronics
+}}
+[[Image:Phase_detectors.svg|right]]和[[方波|方波]]，但对于脉冲效果不好。在方波的情况下，它用作一个异或门，也可由与非门构成。中间左侧是2个鉴相器：增加了反馈并移除了一个与非门就做成了时间频率检测器。延迟线避免了死区。右边是一个电荷泵，它的输出有一个过滤器。]]
+
+'''鉴相器'''是一个[[混频器|混频器]]、[[模拟乘法器|模拟乘法器]]或[[逻辑代数|逻辑]]电路，它的输出是表示两个输入信号的相差信息的电压信号。鉴相器是[[锁相环|锁相环]]（{{lang|en|PLL}}）电路的一个关键部件。
+
+相差检测在多种应用中均具有重要的作用，如[[电机|电机]]控制，[[雷达|雷达]]与[[电信|通信]]系统，[[伺服|伺服]]系统以及[[解調|解调器]]等。
+
+==类型==
+[[锁相环|锁相环]]电路的鉴相器可分为2种类型。<ref>Paul Horowitz and Winfield Hill, ''The Art of Electronics 2nd Ed. '' Cambridge University Press, Cambridge, 1989 ISBN 0-521-37095-7  pg. 644</ref> I型鉴相器被设计为由模拟信号或方波数字信号驱动，产生差频输出脉冲。I型鉴相器总是产生一个输出波形，必须进行滤波来控制锁相环[[壓控振盪器|壓控振盪器]]（{{lang|en|VCO}}）。II型鉴频器只对输入和参考脉冲的边缘的相对时间敏感，当两个信号都处于同一频率时，产生一个正比于相位差的恒定输出。在VCO的控制电压内此输出将不会产生纹波。
+
+===模拟鉴相器===
+鉴相器需要计算其两路输入信号的相位差。令 α 为第一个输入的相位，β 为第二个的相位。实际输入到鉴相器的信号其实不是 α 和 β，而是如同 sin(α) 和 cos(β) 的正弦波。在一般情况下，计算相位差会涉及到计算每个归一化的反正弦和反余弦（以得到不断增加的相位），并做减法。这样的模拟计算不容易進行。不過可以通过使用一些近似简化计算。
+
+假定相位差很小（例如小于1弧度）。正弦函数和[[三角恒等式|正弦角加法公式]]的[[小角度近似|小角度逼近]]得出：
+:<math> \alpha - \beta \approx \sin(\alpha-\beta) = \sin \alpha \cos\beta - \sin \beta \cos \alpha </math>
+
+该表达式表明，通过将两个乘法器的输出相加可以做出正交相位检测器。正交信号可以用相移网络产生。乘法器的两个常见的实现是双平衡混频器（double balanced diode mixer，二极管环）和四象限乘法器（four-quadrant multiplier，吉尔伯特单元）。
+
+更常见的鉴相器不使用2个乘法器，而用了一个乘法器和另一个三角恒等式中的[[三角恒等式#积化和差与和差化积恆等式|积化和差公式]]：
+:<math>\sin \alpha \cos \beta = {\sin(\alpha - \beta) \over 2} + {\sin(\alpha + \beta) \over 2}</math>
+
+第一项是和相位差有關，頻率是<math>\alpha - \beta</math>，是較低頻的訊號。第二项是参考频率两倍的正弦波，頻率是<math>\alpha + \beta</math>，是較高頻的訊號，後續可以用低通濾波器滤掉。
+
+第一項又可以用小角度逼近，近似為所求的相位差。
+
+:<math>\sin \alpha \cos \beta = {\sin(\alpha - \beta) \over 2} + {\sin(\alpha + \beta) \over 2} = \approx {\alpha - \beta \over 2} + {\sin(\alpha + \beta) \over 2} </math>
+
+对于一般波形的情况，鉴相器的输出可以用[[鉴相器特征|鉴相器特征]]来描述。
+
+由于不会在鉴相器输出中产生有限脉冲宽度，基于[[混频器|混频器]]的鉴相器（例如基于[[肖特基二极管|肖特基二极管]]的双平衡混频器）可以提供「the ultimate in phase noise floor performance」与「in system sensitivity」。<ref name="Craw9"/> 基于混频器的鉴相器的另一个好处是相对比较简单。<ref name="Craw9">{{Harvnb|Crawford|1994|pp=9, 19}}</ref> 正交和简单乘法器鉴相器的输出由输入振幅和相位差共同决定。在实际中，输入振幅是归一化的。
+
+===數位鑒相器===
+[[Image:Pass_PFD.png|thumb]]
+
+[[方波|方波]]的鑒相器可以用[[逻辑异或|逻辑异或]]（XOR）[[邏輯閘|邏輯閘]]實現。若二個信號相位完全相同同，XOR閘的輸出會持續為低電位，若二個信號相位差了一度，其輸出在每週期會有1/180的時間為高電位，這也就是二個電壓相位差的差值。若信號相差180度（完全反相），其輸出會持續為高電位。
+
+XOR偵測器在相位差約90度時，效果比類比鑒相器要好，會產生二倍頻率的方波。方波的任務比會依相位差而變化。若將XOR閘的輸出送到低通濾波器中，即可產生和相位差成正比的類比電壓。XOR偵測器需要輸入訊號是對應（或近似對應）的方波。其他像捕捉範圍、鎖定時間、假輸入以及需要低通濾波器等特性都和類比鉴相器類似。
+
+數位鑒相器也可以用[[取樣保持|取樣保持]]電路、[[電荷泵|電荷泵]]，有[[触发器|触发器]]的邏輯電路實現。當鑒相器是用邏輯閘所組成，可以快速的讓VCO和輸入信號同步，就算輸入信號的頻率和VCO原始頻率差很多也沒關係。這類鑒相器也有其他理想的特性，例如二信號的相位差很小時，仍然可以有好的精度。主要是因為相較於XOR偵測器，其他數位鑒相器的{{le|鎖相範圍|Pll ranges}}幾乎是無限大。
+===鉴频鉴相器===
+'''鉴频鉴相器'''（phase frequency detector）簡稱'''PFD'''，可以比較兩種輸入信號的相位誤差及頻率誤差。鉴频鉴相器是[[非同步電路|非同步電路]]，最早是由四顆正反器構成（像是1970年代的RCA CD4046以及motorola MC4344 [[集成电路|集成电路]]）。邏輯電路可以判斷二個信號中，哪一個比較早出現零交越，以及哪一個信號較常出現零交越。用在鎖相環的應用當中，就算是頻率不同，也可以達到鎖相的作用。
+
+和簡單的鉴相器（例如多工器或是XOR閘）相比，鉴频鉴相器可以提昇捕獲範圍（pull-in range）以及鎖定時間。簡單的鉴相器在輸入相位接近（已同步或是幾乎同步時）效果良好，但若相位差太大時（例如瞬時頻率差很大時），效果很差。此情形下的迴路增益會變號，讓VCO短時間內就發散。鉴频鉴相器可以避免這類問題。在二個訊號若相位不同，頻率也不同時，鉴频鉴相器也可以產生輸出。鉴频鉴相器可以避免鎖相環中「假鎖定」的問題，也就是鎖相環的輸出和輸入信號同步，但相位錯誤，或是輸出頻率和輸入信號不同（輸入信號的整數倍諧波）的情形<ref name="Craw17"/>。
+
+起停式的電荷泵鉴相器會提供固定電荷的電流脈波，可能是正值或是負值，電流流到類似[[積分器|積分器]]的電容器中。起停式的鉴相器會有死區，當相位差夠接近時，鉴相器的二個輸出可能會同時輸出脈波，或是完全不輸出脈波，整體而言沒有效果。起停式鉴相器很簡單，但因為死區的漂移，其最小峰對峰的抖動（minimum peak-to-peak jitter）會很大。
+
+在1976年時已證明利用三態鉴频鉴相器的組態（只用三個[[触发器|触发器]]），死區問題會比原來RCA/Motorola 12狀態的組態有明顯改善。對於其他型式的鉴频鉴相器，死區問題仍然有解，不過可能是比較不優雅的解法<ref name="Craw17">{{Harvnb|Crawford|1994|pp=17-23, 153, and several other pages}}</ref>。三態鉴频鉴相器無法用在有隨機信號退化的應用，這可能是一些信號再生系統的輸入（例如{{le|時脈恢復|clock recovery}}設計），因此仍需要其他的鉴频鉴相器<ref name="Wol91p211">{{Harvnb|Wolaver|1991|p=211}}</ref>
+
+比例型的鉴相器會使用電荷泵提供電荷，電荷量和相位誤差成比例。有些會有死區，有些則沒有。有些設計就算是相位偏差為零時，仍會產生up和down的控制信號。這些脈波很小，多半是相同的大小，因此當相位同步時，電荷泵會產生等量的正電流脈衝及負電流脈衝。若控制系統中使用這類的鉴相器，不會有死區，用在鎖相環中時，其最小峰對峰的抖動（minimum peak-to-peak jitter）會比較小。
+
+在鎖相環中常需要知道鎖相環是否有失鎖（out of lock）的情形。較複雜的數位鉴频鉴相器會有可靠的失鎖偵測輸出。
+
+==電子鑒相器==
+像[[雷达|雷达]]中使用的一些信號處理技術會需要信號的振幅以及相位，才能恢復信號中編碼的資訊。有一種技術是將[[限制器|振幅限制信號]]送到{{le|乘積檢測器|Product detector}}的一個埠，將參考信號送到乘積檢測器的另一個埠。檢測器的輸出表示信號的相位差。
+
+==光學鑒相器==
+[[光學|光學]]中的鉴相器也稱為[[干涉仪类型列表|干涉仪]]。對於脈波[[振幅調變|振幅調變]]光，可以量測載波之間的相位，也可以用[[非线性光学|非线性光学]]中的[[互相关|互相关]]量測二個短光學脈波包絡的延遲，也可以量測光脈波載波以及包絡之間的相位，作用是將脈波送到非线性晶體中。其頻譜會變寬，也會依相位而有明顯的變化。
+==相關條目==
+*{{le|載波恢復|Carrier recovery}}
+*[[差分放大器|差分放大器]]
+
+==参考文献==
+{{Reflist}}
+*{{Citation |last=Crawford |first=James A. |year=1994 |title=Frequency Synthesizer Design Handbook |publisher=Artech House |isbn=0-89006-440-7 |doi= }}
+*{{Citation |last=Wolaver |first=Dan H. |year=1991 |title=Phase-Locked Loop Circuit Design |publisher=Prentice Hall |isbn=0-13-662743-9 |doi= }}
+
+==延伸閱讀==
+*{{Citation |last=Egan |first=William F. |year=2000 |title=Frequency Synthesis by Phase-lock |edition=2nd |publisher=John Wiley & Sons |isbn=0-471-32104-4 |ref=none }}
+
+==外部連結==
+* [https://web.archive.org/web/20070913023239/http://www.eie.polyu.edu.hk/~ensurya/lect_notes/commun_cir/Ch8/Chapter8.htm#2-lawMixer Chapter 8 Modulators and Demodulators]
+* [http://www.maxim-ic.com/appnotes.cfm/an_pk/1130 Phase-Lock Loop Applications Using the MAX9382]
+* [http://www.radio-electronics.com/info/rf-technology-design/pll-synthesizers/phase-locked-loop-detector.php Phase-Lock Loop Phase Detectors]
+
+[[Category:电路|Category:电路]]

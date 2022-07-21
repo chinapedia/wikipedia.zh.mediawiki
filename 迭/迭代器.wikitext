@@ -1,0 +1,404 @@
+{{NoteTA
+|G1 = IT
+}}
+'''迭代器'''（{{lang|en|iterator}}），是确使用户可在容器物件（{{lang|en|container}}，例如[[鏈表|鏈表]]或[[陣列|陣列]]）上遍訪的[[对象_(计算机科学)|对象]]<ref>{{cite web
+ |url         = http://www.perl.com/
+ |title       = Understanding and Using Iterators
+ |last1       = Gatcomb
+ |first1      = Joshua
+ |publisher   = Perl.com
+ |archiveurl  = https://web.archive.org/web/20050630084634/http://www.perl.com/
+ |archivedate = 2005-06-30
+ |quote       = A user-defined iterator usually takes the form of a code reference that, when executed, calculates the next item in a list and returns it. When the iterator reaches the end of the list, it returns an agreed-upon value.
+ |accessdate  = 2012-08-08
+ |dead-url    = no
+}}</ref><ref name=definition>{{cite web
+ |url         = http://www.csd.uwo.ca/
+ |title       = A Technique for Generic Iteration and Its Optimization
+ |last1       = Watt
+ |first1      = Stephen M.
+ |format      = PDF
+ |work        = 
+ |publisher   = The University of Western Ontario, Department of Computer Science
+ |archiveurl  = https://web.archive.org/web/20120806072711/http://www.csd.uwo.ca/
+ |archivedate = 2012-08-06
+ |quote       = Iterators were introduced as constructs to allow looping over abstract data structures without revealing their internal representation.
+ |accessdate  = 2012-08-08
+ |dead-url    = no
+}}</ref><ref>{{cite web
+ |url          = http://www.cprogramming.com/tutorial/stl/iterators.html
+ |title        = STL Iterators
+ |author       = Alex Allain
+ |authorlink   = 
+ |date         = 
+ |publisher    = Cprogramming.com - Your resource for C and C++
+ |quote        = You can think of an iterator as pointing to an item that is part of a larger container of items.
+ |accessdate   = 2012-08-08
+ |archive-date = 2021-02-13
+ |archive-url  = https://web.archive.org/web/20210213140820/https://www.cprogramming.com/tutorial/stl/iterators.html
+ |dead-url     = no
+}}</ref>，設計人員使用此介面無需關心容器物件的内存分配的实现细节。其行为很像数据库技术中的[[指標_(資料庫)|游標]]（{{lang|en|cursor}}），迭代器最早出现在1974年设计的[[CLU|CLU]]编程语言中。
+
+在各種語言實作迭代器的方式皆不盡同，有些物件導向語言像[[Java|Java]]、[[C_Sharp|C#]]、[[Ruby|Ruby]]、[[Python|Python]]、[[Delphi|Delphi]]都已將迭代器的特性內建語言當中，完美的跟語言整合，我們稱之隱式迭代器。但像是C++語言本身就沒有迭代器的特色，但STL仍利用[[模板|模板]]實作了功能強大的迭代器。STL容器的數據的內存地址可能會重新分配（reallocate），與容器綁定的迭代器仍然可以定位到重新分配後的正確的內存地址。
+
+==描述==
+
+=== 内部迭代器 ===
+内部的迭代器是[[高阶函数|高阶函数]]（通常接受[[匿名函数|匿名函数]]），比如<code>[[Map_(高阶函数)|map]]</code>、 <code>[[Fold_(高阶函数)|reduce]]</code>等，它实现跨经一个容器的遍历，依次将给定函数应用到每个元素。
+
+=== 外部迭代器和迭代器模式 ===
+{{Main|迭代器模式}}
+
+外部的迭代器可以被认为是某种类型的[[指针_(计算机科学)|指针]]，它有两个主要操作：引用在一个对象{{en-link|搜集 (抽象数据类型)|Collection (abstract data type)|搜集}}（collection）中的一个特定元素（称为元素访问），和修改自身使其指向下一个元素（称为元素遍历）<ref name=ExternalInternal>{{cite web
+ |url         = http://www.careerride.com/
+ |title       = Difference between an external iterator and an internal iterator
+ |date        = 2009-04-03
+ |work        = 
+ |publisher   = CareerRide.COM
+ |archiveurl  = https://web.archive.org/web/20210418133330/https://www.careerride.com/
+ |archivedate = 2021-04-18
+ |quote       = An internal iterator is implemented by the member functions of the class which has the iteration logic. An external iterator is implemented by a separate class which can be attached to the object which has iteration logic. The advantage of external iterator is that, many iterators can be made active simultaneously on the existing or same object.
+ |accessdate  = 2012-08-08
+ |dead-url    = no
+}}</ref>。还必须有一种方式建立迭代器并指向容器的第一个元素，还要有某种方式确定何时迭代器已经穷尽了容器中所有的元素。依据语言和意向用途，迭代器还可以提供额外的操作或展示不同的行为。
+
+迭代器的主要用途是允许用户处理一个容器的所有元素，而将用户隔离于容器的内部结构<ref name=definition />。这允许容器以任何它希望的方式存储元素，而允许用户把它们看作就是简单的序列或列表。迭代器类通常设计为紧密协作于对应的容器类。容器类通常提供建立迭代器的方法。
+
+[[For循环|循环计数器]]有时也被称为循环迭代器。但是循环计数器只提供遍历功能而不提供访问功能。
+
+==== 生成器 ====
+{{Main|生成器 (计算机编程)}}
+实现迭代器的一种方式是使用受限形式的[[协程|协程]]，也叫做[[生成器_(计算机编程)|生成器]]。不同于[[子例程|子例程]]，生成器协程可以向它的调用者多次产生返回值，而非只是返回一次。多数迭代器可自然的表达为生成器，但是因为生成器在被多次启用之间保存了自己的局部状态，它们特别适合于复杂的、有状态的迭代器，比如[[树遍历|树遍历器]]。在不同的作者和语言之间，术语“生成器”和“迭代器”的用法上有微妙的差异和区别<ref>{{cite web
+ |url         = http://www.csd.uwo.ca/
+ |title       = A Technique for Generic Iteration and Its Optimization
+ |last1       = Watt
+ |first1      = Stephen M.
+ |format      = PDF
+ |work        = 
+ |publisher   = The University of Western Ontario, Department of Computer Science
+ |archiveurl  = https://web.archive.org/web/20120806072711/http://www.csd.uwo.ca/
+ |archivedate = 2012-08-06
+ |quote       = Some authors use the term iterator, and others the term generator. Some make subtle distinctions between the two.
+ |accessdate  = 2012-08-08
+ |dead-url    = no
+}}</ref>。有些語言將二者視為同一介面，有些語言如[[JavaScript|JavaScript]]<ref>{{Cite web|url=https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators|title=Iterators and generators|accessdate=2018-10-16|work=MDN Web Docs|language=en-US|archive-date=2021-05-18|archive-url=https://web.archive.org/web/20210518141833/https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_generators|dead-url=no}}</ref>則將之獨立化。在[[Python|Python]]中，生成器是一个迭代器[[构造器|构造器]]，即返回一个迭代器的函数。下面的Python生成器返回一个[[斐波那契数列|斐波那契数列]]的迭代器，使用到了Python的<code>yield</code>语句：
+<syntaxhighlight lang=Python>
+def fibonacci(limit):
+    a, b = 0, 1
+    for _ in range(limit):
+        yield a
+        a, b = b, a+b
+
+for number in fibonacci(100):  # 这个生成器构造了一个迭代器
+    print(number)
+</syntaxhighlight>
+
+===隐式迭代器===
+一些面向对象语言比如[[C♯|C#]]、[[C++|C++]]（后期版本）、 [[Object_Pascal|Delphi]]（后期版本）、[[Go|Go]]、[[Java|Java]]（后期版本）、[[Lua|Lua]]、[[Perl|Perl]]、[[Python|Python]]、[[Ruby|Ruby]]，提供了迭代一个容器对象的元素的[[内置函数|内置]]方式，而不用介入一个显式的迭代器对象。实际的迭代器对象可以在现实中存在，即便如此，它也不被暴露在这个语言的源代码中<ref name=ExternalInternal /><ref name="HFDPIterators">{{cite journal
+ |last1         = Freeman
+ |first1        = Eric
+ |authorlink1   = 
+ |last2         = Freeman
+ |first2        = Elisabeth
+ |authorlink2   = 
+ |last3         = Kathy
+ |first3        = Sierra
+ |authorlink3   = 
+ |last4         = Bert
+ |first4        = Bates
+ |authorlink4   = 
+ |editor-last   = Hendrickson
+ |editor-first  = Mike
+ |editor-link   = 
+ |editor2-last  = Loukides
+ |editor2-first = Mike
+ |editor-link2  = 
+ |year          = 2004
+ |title         = Head First Design Patterns
+ |volume        = 1
+ |pages         = 338
+ |publisher     = O'REILLY
+ |format        = paperback
+ |isbn          = 978-0-596-00712-6
+ |accessdate    = 2012-08-09
+ |url           = http://shop.oreilly.com/product/9780596007126.do
+ |journal       = 
+ |archive-date  = 2020-04-30
+ |archive-url   = https://web.archive.org/web/20200430035509/http://shop.oreilly.com/product/9780596007126.do
+ |dead-url      = yes
+}}</ref>。
+
+隐式迭代器经常通过<code>[[Foreach循环|foreach]]</code>语句（或等价者）来显现出来，比如下面的Python例子：
+
+<syntaxhighlight lang=Python>
+for value in iterable:
+    print(value)
+</syntaxhighlight>
+在Python中，可迭代者（iterable）是可以被转换成迭代器的一个对象，接着在这个<code>for</code>循环期间从头至尾迭代它，这是隐含完成的。
+
+在[[Smalltalk|Smalltalk]]家族语言和受其启发的语言中，它们可以由搜集（collection）对象自身建立。比如下面Ruby例子：
+
+<syntaxhighlight lang=Ruby>
+iterable.each do |value|
+  puts value
+end
+</syntaxhighlight>
+
+这种迭代风格有时叫做“内部迭代”，因为它的代码完全执行在可迭代对象的上下文（context）之内（它控制迭代的所有方面），而编程者只提供在每个步骤要执行的运算操作（使用[[匿名函数|匿名函数]]）。
+
+支持[[列表推导式|列表推导式]]或类似构造的语言，还可以在结果列表的构造期间使用隐式迭代器，比如在Python中：
+
+<syntaxhighlight lang=Python>
+names = [person.name for person in roster if person.male]
+</syntaxhighlight>
+
+有时隐式迭代只能做到部份的隐藏实质。[[C++|C++]]语言有一些用于隐式迭代的函数模板，比如<code>for_each()</code>。这些函数仍要求显式的迭代器对象作为它们的初始输入，但是后续的迭代不将迭代器对象暴露给用户。
+
+===串流===
+{{further|字串流}}
+迭代器是对[[字串流|输入串流]]的一种有用的抽象，串流提供了潜在的无限可迭代的（但不必然可索引）的对象。一些语言，比如Perl和Python，将串流实现为迭代器。串流的可替代的实现包括[[数据驱动编程|数据驱动]]语言，比如[[AWK|AWK]]和[[sed|sed]]。
+
+==迭代器分类==
+===迭代器范畴===
+迭代器可以依据功能而归类，下面是迭代器范畴的一个（不完全）列表<ref>{{cite web
+ |url          = http://www.phpro.org/tutorials/Introduction-to-SPL.html#2
+ |title        = C++ Iteratoren: Iterator-Kategorien
+ |author       = Kevin Waterson
+ |authorlink   = 
+ |date         = 
+ |language     = de
+ |publisher    = cppreference.com
+ |quote        = 
+ |accessdate   = 2012-08-09
+ |archive-url  = https://web.archive.org/web/20160110190300/http://www.phpro.org/tutorials/Introduction-to-SPL.html#2
+ |archive-date = 2016-01-10
+ |dead-url     = yes
+}}</ref><ref>{{cite web
+ |url          = http://www.sgi.com/tech/stl/Iterators.html
+ |title        = Iterators: Concepts
+ |author       = Kevin Waterson
+ |authorlink   = 
+ |date         = 
+ |publisher    = sgi
+ |quote        = 
+ |accessdate   = 2012-08-09
+ |archive-date = 2017-12-03
+ |archive-url  = https://web.archive.org/web/20171203024348/http://www.sgi.com/tech/stl/Iterators.html
+ |dead-url     = no
+}}</ref>:
+
+{| class="wikitable sortable"
+|-
+! 范畴 !! 语言
+|-
+| 双向迭代器 || [[C++|C++]]
+|-
+| 前向迭代器 || C++
+|-
+| 输入迭代器 || C++
+|-
+| 输出迭代器 || C++
+|-
+| 随机访问迭代器 || C++
+|-
+| Trivial迭代器 || C++ (旧[[标准模板库|STL]])<ref>{{cite web
+ |url         = https://stackoverflow.com/
+ |title       = Types of iterator: Output vs. input vs. forward vs. random access iterator
+ |author      = larsmans
+ |authorlink  = 
+ |date        = 2011-03-06
+ |work        = 
+ |publisher   = stackoverflow
+ |archiveurl  = https://web.archive.org/web/20151128032750/https://stackoverflow.com/
+ |archivedate = 2015-11-28
+ |quote       = 
+ |accessdate  = 2012-08-09
+ |dead-url    = no
+}}</ref>
+|}
+
+===迭代器类型===
+不同的语言或它们所具有的函数库定义了自己的迭代器的类型，下面是一个（不完全）列表<ref>{{cite web
+ |url          = http://www.phpro.org/tutorials/Introduction-to-SPL.html#2
+ |title        = Introduction to SPL: Introduction to Standard PHP Library (SPL)
+ |author       = Kevin Waterson
+ |authorlink   = 
+ |date         = 
+ |publisher    = PHPRO.ORG
+ |quote        = 
+ |accessdate   = 2012-08-09
+ |archive-url  = https://web.archive.org/web/20160110190300/http://www.phpro.org/tutorials/Introduction-to-SPL.html#2
+ |archive-date = 2016-01-10
+ |dead-url     = yes
+}}</ref>：
+
+{| class="wikitable sortable"
+|-
+! 类型 !! 语言
+|-
+| 数组迭代器 || [[PHP|PHP]], R<ref>{{cite web|last=Collier|first=Andrew|title=Iterators in R|url=http://www.exegetic.biz/blog/2013/11/iterators-in-r/|accessdate=16 November 2013|archive-url=https://web.archive.org/web/20181018084806/http://www.exegetic.biz/blog/2013/11/iterators-in-r/|archive-date=2018-10-18|dead-url=yes}}</ref> 
+|-
+| 缓存迭代器 || PHP
+|-
+| 常量迭代器 || [[C++|C++]],<ref>{{cite web
+ | url      = http://threadingbuildingblocks.org/docs/help/reference/containers_overview/concurrent_unordered_set_cls.htm
+ | title      = concurrent_unordered_set Template Class
+ | author      = 
+ | authorlink      = 
+ | date      = 
+ | publisher      = Intel Threading Building Blocks for Open Source
+ | quote      = •The iterator types iterator and const_iterator are of the forward iterator category
+ | accessdate      = 2012-08-09
+ | archive-url      = https://web.archive.org/web/20150501163238/http://threadingbuildingblocks.org/docs/help/reference/containers_overview/concurrent_unordered_set_cls.htm
+ | archive-date      = 2015-05-01
+ }}</ref> PHP
+|-
+| 目录迭代器 || PHP, [[Python|Python]]
+|-
+| 过滤器迭代器 || PHP, R
+|-
+| Limit迭代器 || PHP
+|-
+| 列表迭代器 || [[Java|Java]],<ref name=HFDPIterators /> R
+|-
+| 递归数组迭代器 || PHP
+|-
+| XML迭代器 || PHP
+|}
+
+==語言範例 ==
+=== C♯ ===
+在[[C♯|C♯]]中，一種新形式的迭代器提供了函數語言程式設計中的[[生成器_(计算机编程)|生成器]]，使用<code>yield return</code>
+
+類似於Python中使用的<code>yield</code>
+<syntaxhighlight lang="csharp">
+// Method that takes an iterable input (possibly an array)
+// and returns all even numbers.
+public static IEnumerable<int> GetEven(IEnumerable<int> numbers)
+{
+    foreach(int i in numbers)
+    {
+        if (i % 2 == 0) yield return i;
+    }
+}
+</syntaxhighlight>
+
+=== C++ ===
+[[C++|C++]]的[[標準模板庫|STL]]可支持迭代器。
+
+<syntaxhighlight lang="c++">
+ template<typename InputIterator>
+ void printall(InputIterator first, InputIterator last)
+ {
+     for(; first != last; ++first)
+     {
+         std::cout << *first << std::endl;
+     }
+ }
+</syntaxhighlight>
+
+=== Java ===
+[[Java|Java]] JDK 1.2 版開始支持迭代器。每一個迭代器提供<code>next()</code>以及<code>hasNext()</code>方法，同時也支持remove()。
+
+<syntaxhighlight lang="java">
+Iterator iter = list.iterator();
+//Iterator<MyType> iter = list.iterator();    in J2SE 5.0
+while (iter.hasNext())
+    System.out.println(iter.next());
+</syntaxhighlight>
+===Python===
+在[[Python|Python]]中，迭代器是语言的基础部份，而在很多情况下是不可见的，因为它们隐含的用在了<code>for</code>（[[Foreach循环|foreach]]）语句、[[列表推导式|列表推导式]]和[[生成器_(计算机编程)#生成器表达式|生成器表达式]]之中。Python标准内建的所有{{en-link|搜集 (抽象数据类型)|Collection (abstract data type)|搜集}}类型都支持迭代，还有很多支持它的类也是标准库的一部分。下面的例子展示典型的在序列（如列表、元组、字典、集合等）上的隐式迭代：
+
+<syntaxhighlight lang=Python>
+for value in sequence:
+    print(value)
+</syntaxhighlight>
+
+Python字典（某种形式的[[关联数组|关联数组]]），在字典返回了键（key）的时候，可以直接在其上进行迭代： 
+
+<syntaxhighlight lang=Python>
+for key in dictionary:
+    value = dictionary[key]
+    print(key, value)
+</syntaxhighlight>
+
+或者在字典<code>items</code>方法产生元组形式的对应键-值对的时候，在其上进行迭代：
+<syntaxhighlight lang=Python>
+for key, value in dictionary.items():
+    print(key, value)
+</syntaxhighlight>
+
+但是迭代器也可以被显式的使用和定义。对于一个可迭代的序列类型或类，内建的函数<code>iter()</code>可用来建立一个迭代对象。接着可以通过<code>next()</code>函数对这个迭代对象进行迭代；这个函数在内部使用<code>__next__()</code>方法，它返回这个容器中的下一个元素。（前面的叙述适用于Python 3.x，在Python 2.x中要使用等价的<code>next()</code>方法。）当没有元素剩余的时候，引发<code>StopIteration</code>异常。下面的例子展示与前例等价的使用显式迭代器的在序列上的迭代：
+<syntaxhighlight lang=Python>
+it = iter(sequence)
+while True:
+    try:
+        #value = it.next() # in Python 2.x
+        value = next(it) # in Python 3.x
+    except StopIteration:
+        break
+    print(value)
+</syntaxhighlight>
+
+任何用户定义的类都可以通过定义返回迭代器对象的<code>__iter__()</code>方法，支持标准迭代（无论隐式还是显式）。接着迭代器对象需要定义返回下一个元素的<code>__next__()</code>方法。
+
+[[生成器_(计算机编程)#Python|Python生成器]]实现了这个迭代[[协议_(面向对象编程)|协议]]。
+
+=== Ruby ===
+Ruby程序員可以用yield關鍵字定義迭代器，又將迭代器和[[生成器|生成器]]分开。
+<syntaxhighlight lang="ruby">
+0..42.each do |n|
+ puts n
+end
+</syntaxhighlight>
+...以及...
+<syntaxhighlight lang="ruby">
+for n in 0..42
+ puts n
+end
+</syntaxhighlight>
+
+=== Rust ===
+使用Rust可以对向量的元素进行迭代，或者创建自己的迭代器。
+每个迭代器都有适配器(map，filter，skip，take……)。
+
+<syntaxhighlight lang="rust">
+for n in 0..42 {
+    println!("{}", n);
+}
+</syntaxhighlight>
+
+fibonacci()下面是一个自定义迭代器。
+<syntaxhighlight lang="rust">
+for i in fibonacci().skip(4).take(4) {
+    println!("{}", i);
+}
+</syntaxhighlight>
+
+== 參見 ==
+* {{en-link|Iteratee||Iteratee}}
+* [[设计模式_(计算机)|设计模式]]
+* [[迭代|迭代]]
+* [[迭代器模式|迭代器模式]]
+* {{en-link|范围 (计算机编程)|Range (computer science)|范围}}
+* [[访问者模式|访问者模式]]
+* [[指针_(计算机编程)|指针 (计算机编程)]]
+
+== 引用 ==
+{{reflist|2}}
+
+== 外部連結 ==
+{{Wiktionary}}
+* Article "[http://www.perl.com/pub/a/2005/06/16/iterators.html Understanding and Using Iterators] {{Wayback|url=http://www.perl.com/pub/a/2005/06/16/iterators.html |date=20100515221523 }}" by [[Joshua_Gatcomb|Joshua Gatcomb]]
+* Article "[http://www.csd.uwo.ca/~watt/pub/reprints/2006-wgp-jflow.pdf A Technique for Generic Iteration and Its Optimization] {{Wayback|url=http://www.csd.uwo.ca/~watt/pub/reprints/2006-wgp-jflow.pdf |date=20200709144601 }}" (217 KB) by [[Stephen_M._Watt|Stephen M. Watt]]
+* [http://cplus.about.com/od/stltutorial/l/aa101003g.htm Overview of the Standard Template Library] {{Wayback|url=http://cplus.about.com/od/stltutorial/l/aa101003g.htm |date=20060813162032 }}
+* [http://www.cprogramming.com/tutorial/stl/iterators.html STL Iterators] {{Wayback|url=http://www.cprogramming.com/tutorial/stl/iterators.html |date=20210213140820 }}
+* [https://web.archive.org/web/20160110190300/http://www.phpro.org/tutorials/Introduction-to-SPL.html#2 What are iterators?] - [http://www.php.net/~helly/php/ext/spl/interfaceIterator.html#_details Reference description] {{Wayback|url=http://www.php.net/~helly/php/ext/spl/interfaceIterator.html#_details |date=20130315084550 }}
+* [http://java.sun.com/j2se/1.5.0/docs/api/java/util/Iterator.html Java interface] {{Wayback|url=http://java.sun.com/j2se/1.5.0/docs/api/java/util/Iterator.html |date=20100728123815 }}
+* [https://web.archive.org/web/20080120104458/http://gcc.gnu.org/onlinedocs/libstdc++/latest-doxygen/structstd_1_1iterator.html Template reference]
+* [http://boost.org/libs/iterator/doc/index.html Boost C++ Iterator Library] {{Wayback|url=http://boost.org/libs/iterator/doc/index.html |date=20041009145549 }}
+* [http://us3.php.net/manual/en/language.oop5.iterations.php PHP: Object Iteration] {{Wayback|url=http://us3.php.net/manual/en/language.oop5.iterations.php |date=20181221000954 }}
+
+[[Category:面向对象的程序设计|I]]
+[[Category:抽象数据类型|Category:抽象数据类型]]
+[[Category:编程中的迭代|Category:编程中的迭代]]

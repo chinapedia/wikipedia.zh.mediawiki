@@ -1,0 +1,229 @@
+{{NoteTA
+|G1=IT
+|G2=Math
+}}{{Multiple issues|update=2022-5-18|tone=2022-5-18}}
+'''C++ Technical Report 1（TR1）'''是'''ISO/IEC TR 19768, C++ Library Extensions（函式庫擴充）'''的一般名稱。TR1是一份文件，內容提出了對[[C++標準函式庫|C++標準函式庫]]的追加項目。這些追加項目包括了[[正则表达式|正则表达式]]、[[智能指针|智能指针]]、[[哈希表|哈希表]]、[[随机数生成器|随机数生成器]]等。TR1自己並非標準，它是一份草稿文件。然而它所提出的項目大多数已成為的C++11及之后版本的官方標準的一部分。這份文件的目標在於「為擴充的C++標準函式庫建立更為廣泛的現成實作品」。
+
+== 概要 ==
+[[編譯器|編譯器]]並不需要保證包含TR1的組件，因為TR1并非官方标准的一部分。順帶一提，[[Boost_C++_Libraries|Boost]]提供了TR1大部分的實作，數個編譯器／[[函式庫|函式庫]]開發商也已提供了各自的實作版本。
+
+TR1並不代表下一屆標準的全部；舉例而言，下一屆的標準[[C++11|C++11]]包含了[[线程|线程]]的支援。
+
+新的組件被放置在<code>std::tr1</code>的[[命名空間|命名空間]]（''[[命名空间|namespace]]''）裡，以和現在的標準函式庫做區別。
+
+== TR1的內容 ==
+TR1包含以下組件：
+=== 一般用途 ===
+;引用包装器（Reference Wrapper）
+* 來自Boost.Ref <ref>{{Cite web|url=https://www.boost.org/doc/libs/1_72_0/libs/core/doc/html/core/ref.html|title=ref - 1.72.0|website=www.boost.org}}</ref>
+* 在<code><functional></code> [[头文件|头文件]]中增加了 - <code>cref</code>、<code>ref</code>、<code>reference_wrapper</code>
+* 可以对算法（''algorithms''）或仿函数（''function objects''）传递[[引用|引用]]（''[[參考|references]]''），而不是传递副本。
+
+一個wrapper reference是由模板类<code>reference_wrapper</code>產生的實體（''instance''）獲得。wrapper reference近似於C++語言中的引用。
+
+使用<code>ref</code>以獲得任何实例的wrapper reference（對常数引用const &使用<code>cref</code>）。
+
+wrapper reference對模板函数(template function)尤其有用，當模板参数推導不出引用的時候（範例如下：）
+<syntaxhighlight lang="cpp">
+void f( int &r ) { r++; }
+
+template< class Funct, class Arg >
+void g( Funct f, Arg t )
+{
+  f(t);
+}
+
+int main()
+{
+  int i = 0;
+  g( f, i );          // 'g< void(int &r), int >' 被实例化
+  cout << i << endl;  // 輸出：0
+
+  g( f, ref(i) );     // 'g< void(int &r), reference_wrapper<int> >' 被实例化
+  cout << i << endl;  // 輸出：1
+}
+</syntaxhighlight>
+
+;智能指针（Smart Pointers）
+{{main|智能指针}}
+* 基于Boost Smart Pointer library<ref>{{Cite web|url=https://www.boost.org/doc/libs/1_72_0/libs/smart_ptr/doc/html/smart_ptr.html|title=Boost.SmartPtr: The Smart Pointer Library - 1.72.0|website=www.boost.org}}</ref>
+* 由<code><memory></code>头文件增加了 - <code>shared_ptr</code>、<code>weak_ptr</code>等
+* 将''[[RAII|Resource Acquisition Is Initialization]]''(RAII)手法用於内存管理和異常安全性。
+
+=== 仿函数 ===
+以下四個模組被加進<code><functional></code>標頭檔之中：
+
+;多形態的函式包裝器（Polymorphic Function Wrapper） 
+* <code>function</code>
+* 基於Boost.Function<ref>{{Cite web|url=https://www.boost.org/doc/libs/1_72_0/doc/html/function.html|title=Chapter 16. Boost.Function - 1.72.0|website=www.boost.org}}</ref>
+* 儲存任何使用特定函式簽名的"可呼叫物"（函数指针、成員函式指针、仿函数），不需要可呼叫物確切的型別。
+
+;仿函数綁定器（Function Object Binders）
+* <code>bind</code>
+* 採納自Boost Bind library<ref>{{Cite web|url=https://www.boost.org/doc/libs/1_72_0/libs/bind/doc/html/bind.html|title=Chapter 1. Boost.Bind - 1.72.0|website=www.boost.org}}</ref>
+* 標準<code>std::bind1st</code>和<code>std::bind2nd</code>的通用版
+* 將參數綁定給仿函数，並且允許函式的結合。
+
+;函式返回型別
+* <code>result_of</code>
+* 採納自Boost
+* 決定函式呼叫的返回型別
+
+;成員函式
+* <code>mem_fn</code>
+* 採納自Boost Mem Fn library<ref>{{Cite web|url=https://www.boost.org/doc/libs/1_72_0/libs/bind/doc/html/mem_fn.html|title=Chapter 1. Boost.Member Function - 1.72.0|website=www.boost.org}}</ref>
+* 標準<code>std::mem_fun</code>和<code>std::mem_fun_ref</code>的加強版
+* 允許成員函式指针能夠像仿函数一樣
+
+=== 元編程和型別特性（Type Traits） ===
+* 新的<code><type_traits></code>头文件 - <code>is_pod</code>、<code>has_virtual_destructor</code>、<code>remove_extent</code>等
+* 採納自Boost Type Traits library<ref>{{Cite web|url=https://www.boost.org/doc/libs/1_37_0/libs/type_traits/doc/html/index.html|title=Chapter 1. Boost.TypeTraits - 1.37.0|website=www.boost.org}}</ref>
+* 允許类编查询以及类别間的轉換，可促進元編程
+
+=== 數值工具 ===
+==== 随机数產生器 ====
+* 新的<code><random></code>头文件 - <code>variate_generator</code>、<code>mersenne_twister</code>、<code>poisson_distribution</code>等
+* 採納自Boost Random Number Library<ref>[http://www.boost.org/libs/random/]{{Wayback|url=http://www.boost.org/libs/random/ |date=20081202172712 }}</ref>
+
+==== 數學函式 ====
+* 新的<code><cmath></code>/<code><math.h></code>头文件 - <code>beta</code>、<code>legendre</code>等
+
+* 23種數學函式
+{| class="wikitable"
+! 函数名 !! 函数原型 !! 数学表达式
+|-
+! [[拉盖尔多项式#广义拉盖尔多项式|连带拉盖尔多项式]]
+| double '''assoc_laguerre'''( unsigned n, unsigned m, double x ) ; || <math>{L_n}^m(x) = (-1)^m \frac{d^m}{dx^m} L_{n+m}(x), \text{ for } x \ge 0</math>
+|-
+! [[连带勒让德多项式|连带勒让德多项式]]
+| double '''assoc_legendre'''( unsigned l, unsigned m, double x ) ; || <math>{P_l}^m(x) = (1-x^2)^{m/2} \frac{d^m}{dx^m} P_l(x), \text{ for } x \ge 0</math>
+|-
+! [[Β函数|Beta 函数]]
+| double '''beta'''( double x, double y ) ; || <math>\Beta(x,y)=\frac{\Gamma(x) \Gamma(y)}{\Gamma(x+y)}</math>
+|-
+! [[椭圆积分#第一类完全椭圆积分|第一类完全椭圆积分]]
+| double '''comp_ellint_1'''( double k ) ; || <math>K(k) = F\left(k, \textstyle \frac{\pi}{2}\right) = \int_0^{\frac{\pi}{2}} \frac{d\theta}{\sqrt{1 - k^2 \sin^2 \theta}}</math>
+|-
+! [[椭圆积分#第二类完全椭圆积分|第二类完全椭圆积分]]
+| double '''comp_ellint_2'''( double k ) ; || <math>E\left(k, \textstyle \frac{\pi}{2}\right) = \int_0^{\frac{\pi}{2}} \sqrt{1 - k^2 \sin^2 \theta}\; d\theta</math>
+|-
+! [[椭圆积分#第三类完全椭圆积分|第三类完全椭圆积分]]
+| double '''comp_ellint_3'''( double k , double nu ) ; || <math>\Pi\left(\nu, k, \textstyle \frac{\pi}{2}\right) = \int_0^{\frac{\pi}{2}} \frac{d\theta}{(1 - \nu \sin^2 \theta)\sqrt{1 - k^2 \sin^2 \theta}}</math>
+|-
+! [[合流超几何函数|合流超几何函数]]
+| double '''conf_hyperg'''( double a, double c, double x ) ; || <math>F(a, c, x) = \frac{\Gamma(c)}{\Gamma(a)} \sum_{n = 0}^\infty \frac{\Gamma(a + n) x^n}{\Gamma(c + n) n!}</math>
+|-
+! [[第一类变形贝塞尔函数|第一类变形贝塞尔函数]]
+| double '''cyl_bessel_i'''( double nu, double x ) ; || <math>I_\nu(x) = i^{-\nu} J_\nu(ix) = \sum_{k = 0}^\infty \frac{(x/2)^{\nu + 2k}}{k! \; \Gamma(\nu + k + 1)}, \text{ for } x \ge 0</math>
+|-
+! [[第二类变形贝塞尔函数|第二类变形贝塞尔函数]]
+| double '''cyl_bessel_j'''( double nu, double x ) ; || <math>J_\nu(x) = \sum_{k = 0}^\infty \frac{(-1)^k \; (x/2)^{\nu + 2k}}{k! \; \Gamma(\nu + k + 1)}, \text{ for } x \ge 0</math>
+|-
+! [[第三类变形贝塞尔函数|第三类变形贝塞尔函数]]
+| double '''cyl_bessel_k'''( double nu, double x ) ; || <math>\begin{align}
+K_\nu(x) & = \textstyle\frac{\pi}{2} i^{\nu+1} \big(J_\nu(ix) + i N_\nu(ix)\big) \\
+         & = \begin{cases}
+                 \displaystyle \frac{I_{-\nu}(x) - I_\nu(x)}{\sin \nu\pi}, & \text{for } x \ge 0 \text{ and } \nu \notin \mathbb{Z} \\[10pt]
+                 \displaystyle \frac{\pi}{2} \lim_{\mu \to \nu} \frac{I_{-\mu}(x) - I_\mu(x)}{\sin \mu\pi}, & \text{for } x < 0 \text{ and } \nu \in \mathbb{Z} \\
+             \end{cases}
+\end{align}</math>
+|-
+! [[柱诺依曼函数|柱诺依曼函数]]
+[[第二类柱贝塞尔函数|第二类柱贝塞尔函数]]
+| double '''cyl_neumann'''( double nu, double x ) ; || <math>
+N_\nu(x) = \begin{cases}
+                 \displaystyle \frac{J_\nu(x)\cos \nu\pi - J_{-\nu}(x)}{\sin \nu\pi}, & \text{for } x \ge 0 \text{ and } \nu \notin \mathbb{Z} \\[10pt]
+                 \displaystyle \lim_{\mu \to \nu} \frac{J_\mu(x)\cos \mu\pi - J_{-\mu}(x)}{\sin \mu\pi}, & \text{for } x < 0 \text{ and } \nu \in \mathbb{Z} \\
+             \end{cases}
+</math>
+|-
+! [[椭圆积分#第一类不完全椭圆积分|第一类不完全椭圆积分]]
+| double '''ellint_1'''( double k, double phi ) ; || <math>F(k,\phi)=\int_0^\phi\frac{d\theta}{\sqrt{1-k^2\sin^2\theta}}, \text{ for } \left|k\right| \le 1</math>
+|-
+! [[椭圆积分#第二类不完全椭圆积分|第二类不完全椭圆积分]]
+| double '''ellint_2'''( double k, double phi ) ; || <math>\displaystyle E(k,\phi)=\int_0^\phi\sqrt{1-k^2\sin^2\theta}d\theta, \text{ for } \left|k\right| \le 1</math>
+|-
+! [[椭圆积分#第三类不完全椭圆积分|第三类不完全椭圆积分]]
+| double '''ellint_3'''( double k, double nu, double phi ) ; || <math>\Pi(k,\nu,\phi)=\int_0^\phi\frac{d\theta}{\left(1-\nu\sin^2\theta\right)\sqrt{1-k^2\sin^2\theta}}, \text{ for } \left|k\right| \le 1</math>
+|-
+! [[指数积分|指数积分]]
+| double '''expint'''( double x ) ; || <math> \mbox{E}i(x)=-\int_{-x}^{\infty} \frac{e^{-t}}{t}\, dt</math>
+|-
+! [[埃爾米特多項式|埃爾米特多項式]]
+| double '''hermite'''( unsigned n, double x ) ; || <math>H_n(x)=(-1)^n e^{x^2}\frac{d^n}{dx^n}e^{-x^2}\,\!</math>
+|-
+! [[超几何级数|超几何级数]]
+| double '''hyperg'''( double a, double b, double c, double x ) ; || <math>F(a,b,c,x)=\frac{\Gamma(c)}{\Gamma(a)\Gamma(b)}\sum_{n = 0}^\infty\frac{\Gamma(a+n)\Gamma(b+n)}{\Gamma(c+n)}\frac{x^n}{n!}</math>
+|-
+! [[拉盖尔多项式|拉盖尔多项式]]
+| double '''laguerre'''( unsigned n, double x ) ; || <math>L_n(x)=\frac{e^x}{n!}\frac{d^n}{dx^n}\left(x^n e^{-x}\right), \text{ for } x \ge 0</math>
+|-
+! [[勒让德多项式|勒让德多项式]]
+| double '''legendre'''( unsigned l, double x ) ; || <math>P_l(x) = {1 \over 2^l l!} {d^l \over dx^l } (x^2 -1)^l, \text{ for } \left|x\right| \le 1 </math>
+|-
+! [[黎曼zeta函数|黎曼zeta函数]]
+| double '''riemann_zeta'''( double x ) ; || <math>
+\Zeta(x) =
+          \begin{cases}
+                 \displaystyle \sum_{k = 1}^\infty k^{-x}, & \text{for } x > 1 \\[10pt]
+                 \displaystyle 2^x\pi^{x-1}\sin\left(\frac{x\pi}{2}\right)\Gamma(1-x)\zeta(1-x), & \text{for } x < 1 \\
+             \end{cases}
+</math>
+|-
+! [[第一类球贝塞尔函数|第一类球贝塞尔函数]]
+| double '''sph_bessel'''( unsigned n, double x ) ; || <math>j_n(x) = \sqrt{\frac{\pi}{2x}} J_{n+1/2}(x), \text{ for } x \ge 0</math>
+|-
+! [[球谐函数|球谐函数]]
+| double '''sph_legendre'''( unsigned l, unsigned m, double theta ) ; || <math> Y_{l}^{m}(\theta, 0) \text{ where } Y_{l}^{m}(\theta, \phi) = (-1)^{m}\left[\frac{(2l+1)}{4\pi}\frac{(l-m)!}{(l+m)!}\right]^{1 \over 2} P_{l}^{m}(\cos \theta)e^{\mathrm{i}m\phi}, \text{ for } |m| \leq l</math>
+|-
+! [[球诺依曼函数|球诺依曼函数]]
+[[第二类球贝塞尔函数|第二类球贝塞尔函数]]
+| double '''sph_neumann'''( unsigned n, double x ) ; || <math>n_n(x) = \left(\frac{\pi}{2x}\right)^{\frac{1}{2}}N_{n+\frac{1}{2}}(x), \text{ for } x \ge 0</math>
+|}
+
+=== 容器 ===
+==== 多元組型別（Tuple Types） ====
+* 新<code><tuple></code>標頭檔 - <code>tuple</code>
+* 採納自Boost Tuple library<ref>{{Cite web |url=http://www.boost.org/libs/tuple/doc/tuple_users_guide.html |title=The Boost Tuple Library – Boost 1.48.0<!-- Bot generated title --> |access-date=2006-05-27 |archive-url=https://web.archive.org/web/20060526205142/http://www.boost.org/libs/tuple/doc/tuple_users_guide.html |archive-date=2006-05-26 |url-status=dead }}</ref>
+* 標準<code>std::pair</code>的擴充
+* 固定尺寸的元素集合，元素可以是不同的[[类型|类型]]
+
+==== 定量陣列（Fixed Size Array） ====
+* 新<code><array></code>標頭檔 - <code>array</code>
+* 來自Boost Array library<ref>{{Cite web|url=https://www.boost.org/doc/libs/1_72_0/doc/html/array.html|title=Chapter 5. Boost.Array - 1.72.0|website=www.boost.org}}</ref>
+* 与動態陣列型別，像是標準的<code>std::vector</code>相反，是静态的矩阵，但是能够享受类似于begin()等与<code>std::vector</code>相似的接口。
+
+==== 哈希表（Hash Tables） ====
+* 新<code><unordered_set></code>、<code><unordered_map></code>標頭檔
+* 完全是新的實作，不衍生自既有之程式庫。與既有之程式庫[[API|API]]並不完全相容
+* 就如同所有的[[哈希表|哈希表]]提供常數時間的元素查找，但最壞情況查找時間與容器的大小呈線性關係。
+
+=== 正規表示式 ===
+* 新<code><regex></code>標頭檔 - <code>regex</code>、<code>regex_match</code>、 <code>regex_search</code>、<code>regex_replace</code>等
+* 来自Boost RegEx library<ref>{{Cite web|url=https://www.boost.org/doc/libs/1_36_0/libs/regex/doc/html/index.html|title=Boost.Regex - 1.36.0|website=www.boost.org}}</ref>
+* pattern matching library
+
+=== C的兼容性 ===
+[[C++|C++]]被設計成與[[C語言|C語言]]兼容，但由於不同的標準，C++並不是C的嚴格超集合。TR1試圖調和這些差異，透過對各種標頭檔，如<complex>、<locale>、<cmath>等進行擴充。
+這些改變幫助C++能夠與[[C99|C99]]版本的C標準更為一致（並非所有C99都包含於TR1）。
+
+== 關聯項目 ==
+
+*[[C++11|C++11]]，C++新標準
+*[[C99|C99]]，C語言標準
+*[[Boost_C++_Libraries|Boost library]]，提供大量的C++程式庫，數個包含於TR1
+*[[标准模板库|STL]]標準模板庫，現行[[C++標準程式庫|C++標準程式庫]]的一部分
+
+== 参考文献 ==
+=== 腳註 ===
+{{reflist}}
+
+=== 其他 ===
+* {{cite paper | title = Draft Technical Report on C++ Library Extensions | url = http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf | date = 2005-06-24 | format = [[PDF|PDF]] | last = ISO/IEC JTC1/SC22/WG21 | journal =  | access-date = 2009-01-27 | archive-date = 2011-04-14 | archive-url = https://web.archive.org/web/20110414134932/http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1836.pdf | dead-url = no }}
+* {{cite book | first = Peter | last = Becker | title = The C++ Standard Library Extensions: A Tutorial and Reference | url = https://archive.org/details/cstandardlibrary0000beck | year = 2006 | publisher = Addison-Wesley Professional | isbn = 0-321-41299-0}}
+
+== 外部連結 ==
+*[http://aristeia.com/EC3E/TR1_info_frames.html Scott Meyers' Effective C++: TR1 Information]{{Wayback|url=http://aristeia.com/EC3E/TR1_info_frames.html |date=20080705221055 }} - 包含TR1提案文件的連結，提供了TR1程式庫的背景以及理由。
+
+{{C++}}
+[[Category:C++|Category:C++]]

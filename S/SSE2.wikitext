@@ -1,0 +1,101 @@
+{{noteTA|G1=IT}}
+
+'''SSE2'''，全名為'''Streaming SIMD Extensions 2'''，是一種[[IA-32|IA-32]]架構的[[SIMD|SIMD]]（單一指令多重資料）[[指令集|指令集]]。SSE2是在 2001年隨著[[Intel|Intel]]發表第一代[[Pentium_4|Pentium 4]]處理器也一併推出的指令集。它延伸較早的[[SSE|SSE]]指令集，而且可以完全取代[[MMX|MMX]]指令集。在2004年，Intel 再度擴展了SSE2指令為 SSE3 指令集。與 70 條指令的 SSE 相比，SSE2新增了144條指令。在2003年，[[AMD|AMD]]也在發布[[AMD64|AMD64]]的64位元處理器時跟進SSE2指令集。
+
+==SSE2的更動 ==
+SSE2延伸了MMX指令群使用XMM暫存器來運算，這能讓開發人員完全避免讓8個64位元MMX暫存器與原有的IA-32浮點運算暫存器共用。而這樣子就能夠不需要切換MMX與x87浮點運算的前提之下混合SIMD純量與浮點向量運算。不過，這不會因為 SSE 的暫存器的精度提高而讓運算結果的精度也提高。
+
+而還有部分的SSE2指令集包含了一系列的[[CPU快取|CPU快取]]控制指令。當處理理論上無限的資料流，還有數字格式轉換指令所產生出來的大量補數，能夠使{{Tsl|en|Cache pollution|快取污染}}有效的降低。
+
+AMD在AMD64架構上的SSE2再新增額外8個暫存器，把暫存器的量提升到16個（XMM0～XMM15）。這些額外的暫存器只有執行於64位元的模式下才能夠使用。2004年，Intel也採用這些額外的暫存器於它的86-64（Intel64）架構。
+
+== x87浮點運算器與SSE2的差別 ==
+[[FPU|FPU]]的指令集（x87）通常在運算時使用80位元的精度。原始的FPU軟體的演算法如果套用到SSE2，在數學運算上或是資料輸入肯定會造成一些可測得的數值誤差。這在科學運算上是很嚴重的問題，會導致在不同的架構上運算出互不相同的結果。而這問題很容易發生在編譯器在解釋一條包含好幾項運算子（加減乘除）的數學式上。取決於使用哪種編譯方式（與最佳化），計算過程中會產生不一樣的中間值。而在FPU中這些中間值會從80位元截成64位。而當這被截掉的中間值拿來運算，最後的數值有可能會大不相同。下面使用G95編譯的Fortran程式碼就是其中一個例子。
+
+<syntaxhighlight lang="fortran">
+program hi
+real a,b,c,d
+real x,y,z
+a=.013
+b=.027
+c=.0937
+d=.79
+y=-a/b + (a/b+c)*EXP(d)
+print *,y
+z=(-a)/b + (a/b+c)*EXP(d)
+print *,z
+x=y-z
+print *,x
+end
+</syntaxhighlight>
+
+編譯成387浮點運算指令並且執行結果：
+<syntaxhighlight lang="bash">
+# g95 -o hi -mfpmath=387 -fzero -ftrace=full -fsloppy-char hi.for
+# ./hi
+0.78587145
+0.7858714
+5.9604645E-8
+</syntaxhighlight>
+
+編譯成SSE2指令並且執行結果：
+<syntaxhighlight lang="bash">
+# g95 -o hi -mfpmath=sse -msse2 -fzero -ftrace=full -fsloppy-char hi.for
+# ./hi
+0.78587145
+0.78587145
+0.
+</syntaxhighlight>
+
+==MMX與SSE2的差別 ==
+SSE2讓MMX指令群使用XMM暫存器來運算。換句話說，現有的MMX指令碼能夠完全轉換成SSE2。不過SSE2的暫存器是MMX暫存器的兩倍大，迴圈計數器與記憶體存取機制也會跟著修改來因應此變化。
+
+而即使一個SSE2指令能夠比MMX指令操作多兩倍資料量，性能也並沒有很明顯的提升。有兩個主要原因導致此現象：記憶體內部存取SSE2的資料並沒有以16位元組的間隔[[資料結構對齊|對齊]]，這會造成明顯的性能損失。還有在大多數的[[x86|x86]]架構實作上SSE2的指令[[吞吐量|吞吐量]]是小於MMX的。[[Intel|Intel]]首先面對第一個問題的解決方案是在SSE3指令中新增一個指令，能夠在處理未對齊的資料時減少{{Tsl|en|Overhead (computing)|Overhead (computing)|Overhead}}。而第二個問題也在[[Intel_Core微處理器架構|Core 微架構]]中將執行引擎加寬而解決。
+
+== 支援的編譯器 ==
+於2000年剛發布的時候，完全沒有任何軟體開發工具支援SSE2。例如，如果想要在[[Microsoft_Visual_Studio|Microsoft Developer Studio]]裡面使用SSE2指令集，程式開發人員就要自己寫 inline-assembly，或是從外部來源引入（import）目的碼。後來發布了Visual C++ Processor Pack，才使[[Visual_C++|Visual C++]]與[[MASM|MASM]]支援SSE2。
+
+目前Intel官方版的[[Intel_C++編譯器|Intel C++編譯器]]能夠在不用自行輸入assembly而自動編譯出SSE4/SSSE3/SSE3/SSE2/SSE的機器碼，能夠使程式開發人員專注於更高層的演算法開發，而不是組譯階段的指令集實作。自從Intel發表了 Intel C++ 編譯器，它大量增加SSE2於Windows應用程式開發。
+
+自從[[GCC|GCC]] 3推出，它能夠自動生成SSE/SSE2純量碼。而SSE/SSE2的{{Tsl|en|Automatic vectorization|自動向量化}}也新增在GCC 4。
+
+[[Sun_Studio|Sun Studio Compiler Suite]]在使用此-xvector=simd參數時也能夠產生SSE2指令碼。
+
+[[Microsoft_Visual_C++|Microsoft Visual C++]] 2012 開始，在預設的情況下會啟用用於生成SSE2指令的編譯器選項。
+
+== 支援SSE2指令集的處理器 ==
+
+*[[Athlon_64|Athlon 64]]、[[Sempron|Sempron 64]]、[[Turion_64|Turion 64]]等為主的[[AMD_K8|AMD K8]]架構處理器
+*[[Phenom|Phenom]]、[[Phenom_II|Phenom II]]、[[Athlon_II|Athlon II]]等為主的[[AMD_K10|AMD K10]]、[[AMD_10h#命名|AMD K10.5]]架構處理器
+*[[Pentium_4|Pentium 4]]、[[Xeon|Xeon]]、[[Celeron|Celeron]]、[[Celeron_D|Celeron D]]等為主的[[Intel|Intel]] [[NetBurst|NetBurst]]架構的處理器
+*[[Intel_Pentium_M|Intel Pentium M]]與[[Celeron_M|Celeron M]]
+*[[Intel_Core_2|Intel Core 2]]架構的處理器
+*[[Intel_Core_i3|Intel Core i3]]、[[Core_i5|Core i5]]、[[Core_i7|Core i7]]等
+*[[Intel_Atom|Atom]]
+*[[全美達|Transmeta]]（全美達）{{Tsl|en|Transmeta Efficeon|Efficeon}}
+*[[VIA_Technologies|VIA]]（威盛）[[VIA_C7|C7]]
+*[[VIA_Technologies|VIA]][[VIA_Nano|Nano]]
+
+== 不支援SSE2處理器的共同特點 ==
+SSE2是[[IA-32|IA-32]]架構的延伸。所以目前所有不支援[[IA-32|IA-32]]架構的其他架構一概不支援SSE2。由於[[x86-64|x86-64]]架構的處理器是由IA-32延伸出來的，所有 x86-64架構的處理器也都支援SSE2指令集。而有些CPU並沒有支援 SSE2，但是有其他的指令集可以提供與SSE2相似的功能。
+
+下列的IA-32架構的處理器是在SSE2發表之後才開發的，但是並不支援SSE2指令集：
+* 比[[AMD_Athlon_64|Athlon64]]早推出的[[AMD|AMD]]處理器，包含了所有使用 Socket A 插槽的處理器。
+* 比[[Pentium_4|Pentium 4]]早推出的[[Intel|Intel]]處理器
+* [[VIA|VIA]]的[[VIA_C3|C3 處理器]]
+* [[全美達|全美達]]的{{Tsl|en|Transmeta Crusoe|Crusoe處理器}}
+* {{Tsl|en|Intel Quark}}
+
+== 參見 ==
+*[[SSE|SSE]]
+*[[SSE3|SSE3]]
+*[[SSSE3|SSSE3]]
+*[[SSE4|SSE4]]
+*[[SIMD|SIMD]]
+*[[3DNow!|3DNow!]]
+*[[x86指令列表|x86指令列表]]
+
+{{多媒體指令集}}
+
+[[Category:X86架構|Category:X86架構]]
+[[Category:X86指令|Category:X86指令]]

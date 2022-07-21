@@ -1,0 +1,76 @@
+{{noteTA
+|G1=IT
+}}
+'''交替式图灵机'''（{{Lang-en|Alternating Turing Machine}}, ATM）是[[计算复杂度理论|计算复杂度理论]]中定义的一种[[非确定型图灵机|非确定型图灵机]]（NTM）。与一般非确定型图灵机不同，交替式图灵机将接受语言的规则一般化到[[NP_(复杂度)|NP]]和[[反NP|反NP]]。交替式图灵机的概念由Chandra和{{tsl|en|Larry Stockmeyer|Stockmeyer}}于1976年提出。
+
+== 定义 ==
+=== 直观描述 ===
+
+NP的定义中使用了语言的'''存在形式'''，亦即如果'''存在'''一个选择都能够使得图灵机达到接受状态，那么整个语言就能够被接受。与此对应，反NP的定义中使用了语言的'''全称形式'''，亦即整个语言被接受，当且仅当'''每一个'''选择都达到一个接受状态。结合这两个定义，可以给出一个语言被交替式图灵机接受的定义。
+
+对一台交替式图灵机而言，状态集被划分为两部分：'''存在状态'''（existential state）和'''全称状态'''（universal state）。存在状态的接受条件为如果该状态存在一种转移序列到达接受状态，而全称状态的接受条件为对该状态而言，任何一种转移序列都能够到达接受状态。（因而，一个不包含任何转移的全称状态无条件接受，而一个不包含任何转移的存在状态无条件拒绝。）交互式图灵机接受此语言，当且仅当初始状态得到接受。
+
+=== 形式化描述 ===
+
+形式地，一台（单带）交替式图灵机是一个5[[元组|元组]]<math>M=(Q,\Gamma,\delta,q_0,g)</math>，其中
+
+* <math>Q</math>是一个有限大小的状态集
+* <math>\Gamma</math>是一个有限大小的字母表
+* <math>\delta:Q\times\Gamma\rightarrow\mathcal{P}(Q\times\Gamma\times\{L,R\})</math>被称为转移函数（<math>L</math>代表带头左移，<math>R</math>代表带头右移）
+* <math>q_0\in Q</math>是初始状态
+* <math>g:Q\rightarrow\{\wedge,\vee,accept,reject\}</math>定义每个状态的类型，其中<math>\wedge</math>代表全称状态，<math>\vee</math>代表存在状态。
+
+如果<math>M</math>的格局在状态<math>q\in Q</math>中，且<math>g(q)=accept</math>，那么，格局为接受格局。如果格局满足<math>g(q)=reject</math>，那么，格局为拒绝格局。对于格局满足<math>g(q)=\wedge</math>，该格局接受当且仅当所有一步之内能够到达的格局是接受格局。反之，如果这些格局中存在一个格局拒绝，那么拒绝。对于格局满足<math>g(q)=\vee</math>，该格局接受当且仅当存在一个一步之内能够到达的格局是接受格局。反之，如果所有一步之内可达的格局拒绝，那么拒绝。<math>M</math>接受输入串<math>w</math>，如果<math>M</math>的初始格局（即<math>M</math>的状态为<math>q_0</math>，带头在带的最左端，带中包含<math>w</math>）被接受。否则，<math>M</math>拒绝<math>w</math>。
+
+=== ''k''次交替图灵机 ===
+
+'''''k''次交替图灵机'''是一种将存在状态和全称状态互相转移次数限定在 <math>k-1</math> 次的交替式图灵机。亦即，定义状态集<math>Q=\bigcup_{n=1}^k{Q_k}</math>，其中，状态集<math>Q_{2k+1}</math>为存在状态，状态集 <math>Q_{2k}</math> 为全称状态（或者相反）。并且，不存在从 <math>Q_{i}</math> 到 <math>Q_{j}</math> 的状态转移满足 <math>i>j</math>。
+
+例如，考虑以下[[电路最小化问题|电路最小化问题]]：给定一个能够计算[[布尔函数|布尔函数]] <math>f</math> 的电路 <math>A</math> 和一个整数 <math>n</math>，确定是否存在一个最多包含<math>n</math>个[[逻辑门|门]]的电路<math>B</math>可以计算<math>f</math>。一台2次交替图灵机从一个存在状态出发可以在多项式时间内解决这个问题（在存在状态通过猜测电路 <math>B</math> 的 <math>n</math> 个门，此后进入全称状态，猜测输入并检查输出是否和 <math>A</math> 相同）。
+
+一台从存在状态（或者全称状态）出发的<math>k</math>次交替图灵机可以在多项式时间内解决<math>\Sigma_k\rm{P}</math>（或者<math>\Pi_k\rm{P}</math>）的问题。参见[[多项式时间分层|多项式时间分层]]。
+
+=== 资源上界 ===
+
+在利用上面的定义确定一台交替式图灵机是否接受或拒绝某一格局时，并不需要检查当前格局可以到达的所有格局。具体来说，对于存在格局，如果某一将来格局被接受即可标记为接受。对全称格局，如果某一将来格局被拒绝，则可被标记为拒绝。
+
+对于运行时间，规定一台ATM在<math>t(n)</math>时间内判定一个[[形式语言|形式语言]]，如果对于任意长度为<math>n</math>的输入，通过<math>t(n)</math>步检查（必要的）格局即可接受或拒绝初始格局。对于运行空间，规定一台ATM在<math>s(n)</math>空间内判定一个形式语言，如果至多修改图灵机带上从左端起<math>s(n)</math>位即可完成对必要格局的检查。
+
+如果一个语言在<math>c\cdot t(n)</math>时间内（<math>c</math>为正常数）被某个ATM判定，那么，该语言属于<math>{\rm ATIME}(t(n))</math>。类似地，一个语言在<math>c\cdot s(n)</math>空间内被某个ATM判定，那么，该语言属于<math>{\rm ASPACE}(s(n))</math>。
+
+== 例子 ==
+
+也许交替式图灵机解决的最简单的问题是[[量词布尔公式问题|量词布尔公式问题]]。这一问题是[[布尔可满足性问题|布尔可满足性问题]]的扩充，即每个变量可以被一个[[全称量词|全称量词]]或[[存在量词|存在量词]]所约束。交替式图灵机依照约束的次序对每一个存在量词寻找一个可能的赋值，对每一个全称量词寻找所有的赋值。在对所有约束变量确定值之后，交替式图灵机根据剩余的布尔公式确定接受还是拒绝。因此，接受一个存在量词意味着存在一个赋值，使得赋值后的量词布尔公式可满足。类似地，接受一个全称量词意味着对任何一个赋值，赋值后的量词布尔公式可满足。
+
+在ATM中，解决量词布尔公式问题需要<math>n^2</math>时间和<math>n</math>空间。
+
+布尔可满足性问题可被视为量词布尔公式问题将所有变量约束为存在量词的特例。从而普通的非确定型图灵机可以有效地解决这一问题。
+
+== 相关复杂度类 ==
+
+下面的[[复杂度类|复杂度类]]由ATM确定：
+
+* <math>{\rm AP}=\bigcup_{k>0}{\rm ATIME}(n^k)</math>是ATM在多项式时间内判定的语言集合
+* <math>{\rm APSPACE}=\bigcup_{k>0}{\rm ASPACE}(n^k)</math>是ATM在多项式空间内判定的语言集合
+* <math>{\rm AEXPTIME}=\bigcup_{k>0}{\rm ATIME}(k^n)</math>是ATM在指数时间内判定的语言集合
+
+这些定义与确定性图灵机给定的[[P_(复杂度)|P]]、[[PSPACE|PSPACE]]和[[EXPTIME|EXPTIME]]在空间上类似。对于两种计算模型导出的两类复杂度类，Chandra、Kozen和Stockmeyer证明了以下定理：
+
+* AP = PSPACE
+* APSPACE = EXPTIME
+* AEXPTIME = [[EXPSPACE|EXPSPACE]]
+
+这些结论在[[并行计算理论|并行计算理论]]中阐释。
+
+== 参见 ==
+* [[图灵机|图灵机]]
+* [[非确定型图灵机|非确定型图灵机]]
+
+== 参考资料 ==
+* {{en}}[http://portal.acm.org/citation.cfm?id=322243&coll=Portal&dl=ACM&CFID=60283170&CFTOKEN=44928981 Chandra, A.K. and Kozen, D.C. and Stockmeyer, L.J., 'Alternation'], Journal of the ACM, Volume 28, Issue 1, pp. 114-133, 1981.
+* {{en}}{{cite book|author = Michael Sipser | year = 1997 | title = Introduction to the Theory of Computation |url = https://archive.org/details/introductiontoth00sips | publisher = PWS Publishing | isbn = 0-534-94728-X}} Section 10.3: Alternation, pp.348–354.
+* {{en}}{{cite book|author = Michael Sipser | year = 2006 | title = Introduction to the Theory of Computation, 2nd ed. | publisher = PWS Publishing | isbn = 0-534-95097-3}} Section 10.3: Alternation, pp.380–386.
+* {{en}}{{cite book|author = Christos Papadimitriou | year = 1993 | title = Computational Complexity | publisher = Addison Wesley | edition = 1st edition | isbn = 0-201-53082-1}} Section 16.2: Alternation, pp.399–401.
+
+{{复杂度类}}
+[[Category:图灵机|Category:图灵机]]

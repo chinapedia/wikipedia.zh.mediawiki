@@ -1,0 +1,46 @@
+{{noteTA
+|G1=IT
+|T=zh-cn:上下文切换; zh-tw:上下文交換;
+|1=zh-cn:上下文切换; zh-tw:上下文交換;
+|2=zh-cn:切换; zh-tw:交換;
+}}
+{{copyedit|time=2018-01-06T14:55:11+00:00}}
+{{主條目消歧義|'''-{zh-cn:交换;zh-tw:交換;}-'''重定向至此，关于“-{zh-cn:交换;zh-tw:交換;}-”的其它含义参见'''[[交换|-{zh-cn:交换 (消歧义);zh-tw:交換 (消歧義);}-]]'''。}}
+'''上下文交換'''({{lang-en|context switch}})，又稱'''環境切換'''，電腦術語，是一個儲存和重建[[中央處理器|CPU]]的[[狀態_(電腦科學)|狀態]] ([[內文_(電腦科學)|內文]])，因此令多個[[進程|进程]](process)可以分享單一CPU資源的計算過程。要交換[[中央處理器|CPU]]上的[[進程|进程]]時，必需先行儲存目前[[進程|进程]]的狀態，再將欲執行的[[進程|进程]]之狀態讀回[[中央處理器|CPU]]中。 <ref>{{cite book |last= Silberschatz |first= Abraham |coauthors= Peter Baer Galvin, Greg Gagne |title=''Operating System Principles'' |publisher= John Wiley & Sons (Asia) Pte Ltd |isbn= 0-4717-2595-1 |edition= 7}}</ref>
+
+== 开销 ==
+
+上下文切换通常是计算密集型的，[[操作系统|操作系统]]中的许多设计都是针对上下文切换的优化。在[[进程|进程]]间切换需要消耗一定的时间进行相关的管理工作——包括[[寄存器|寄存器]]和内存映射的保存与读取、更新各种内部的表等等。处理器或者操作系统不同，上下文切换时所涉及的内容也不尽相同。比如在[[Linux内核|Linux内核]]中，上下文切换需要涉及寄存器、栈指针、程序计数器的切换，但和[[地址空间|地址空间]]的切换无关（虽然进程在进行上下文切换时也需要做地址空间的切换）<ref>''IA-64 Linux Kernel: Design and Implementation'', [http://www.informit.com/articles/article.aspx?p=29961&seqNum=7 4.7 Switching Address Spaces] {{Wayback|url=http://www.informit.com/articles/article.aspx?p=29961&seqNum=7 |date=20180727120551 }}</ref><ref>''Operating Systems'', 5.6 The Context Switch, [https://books.google.com/books?id=orZ0CLxEMXEC&pg=PA118 p. 118] {{Wayback|url=https://books.google.com/books?id=orZ0CLxEMXEC&pg=PA118 |date=20190509231720 }}</ref>。[[纤程|用户态线程]]之间也会发生类似的上下文切换，但这样的切换非常轻量。
+
+== 交換时机 ==
+有三種可能的情況會發生上下文交換，分別為：
+
+=== 多工 ===
+最常見的，在一些[[排程|排程]](scheduling)[[算法|算法]]內，其中[[進程|行程]]有時候需要暫時離開CPU，讓另一個[[進程|行程]]進來CPU運作。在先佔式多工系統中，每一個行程都將輪流執行不定長度的時間，這些時間段落稱為时间片。如果[[進程|行程]]並非自願讓出CPU(例如執行I/O操作時，[[進程|行程]]就需放棄CPU使用權)，當時限到時，系統將產生一個定時中斷，[[操作系統|作業系統]]將排定由其它的[[進程|行程]]來執行。此機制用以確保CPU不致被較依賴處理器運算的行程壟斷。若無定時中斷，除非[[進程|行程]]自願讓出CPU，否則該[[進程|行程]]將持續執行。對於擁有較多I/O指令的[[進程|行程]]，往往執行不了多久，便需要讓出CPU；而較依賴處理器的[[進程|行程]]相對而言I/O操作較少，反而能一直持續使用CPU，便形成了壟斷現象。
+
+=== 中斷處理 ===
+在接受到[[中斷|中斷]]（Interrupt）的時候，[[中央處理器|CPU]]必須要進行上下文交換。
+
+=== 用戶态或者内核态的交換 ===
+當[[用戶態|用戶態]]和[[内核态|内核态]]交換發生的時候，並不需要進行上下文交換；並且用戶態和kernel mode的交換本身並不是一個上下文交換。不過，根據作業系統的不同，有時候會在此時進行一次上下文交換的步驟。
+
+== 上下文交換：具體步驟 ==
+
+在一次交換中，第一個行程的狀態要被紀錄在某個地方，這樣當排程器(scheduler)要回到這個行程時，才可以重建這個行程並且繼續運算。
+
+這裡所謂「行程的狀態」，包含了這個行程使用的所有暫存器(register)，特別是[[程式計數器|程式計數器]]；加上所有作業系統可能需要的特定資料。這些資料一般以名為[[行程控制表|行程控制表]](process control block，PCB)的資料結構儲存起來。
+
+== 上下文交換：由軟體或硬體實現 ==
+上下文交換可分為主要由軟體實現或由硬體實現。部分中央處理器，比如[[Intel_80386|Intel 80386]]<ref>{{Cite web |url=http://www.linfo.org/context_switch.html |title=存档副本 |access-date=2010-02-05 |archive-url=https://web.archive.org/web/20100218115342/http://www.linfo.org/context_switch.html |archive-date=2010-02-18 |dead-url=yes }}</ref>或同系列更高階的處理器，就具備支持上下文交換的硬體設計。
+
+== 參考資料 ==
+{{reflist}}
+
+== 外部連結 ==
+* [http://wiki.osdev.org/Context_Switching  Context Switching]{{Wayback|url=http://wiki.osdev.org/Context_Switching |date=20091217135818 }} - at OSDev.org
+* [https://web.archive.org/web/20100218115342/http://www.linfo.org/context_switch.html  Context Switch Definition] - by The Linux Information Project (LINFO)
+* [https://web.archive.org/web/20091207203649/http://msdn.microsoft.com/en-us/library/ms682105(VS.85).aspx Context Switches] - from the Microsoft Developer Network (MSDN)
+
+{{操作系统}}
+
+[[Category:进程|Category:进程]]

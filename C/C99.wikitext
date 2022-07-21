@@ -1,0 +1,70 @@
+{{Not|Comic Market}}
+{{Sidebar <!-- NOTE: Please don't remove. Discuss naviagation concept at [[Talk:C11#Helpbox_experiment] -->
+|name = C語言標準
+|style = width:auto;background:#f5faff;font-size:90%;line-height:1.6em;
+|titlestyle = font-size:130%;padding-left:0.4em;padding-right:0.4em;background:#cee0f2; <!--(gap before first heading/content:)-->display:block;margin-bottom:6px;
+|title = [[C語言#歷史|C語言標準]]
+|headingstyle = padding:0.1em 0.25em 0.15em;{{{headingstyle|}}}
+|heading1 = [[K&R_C|K&R C]] • [[ANSI_C|ANSI C]] • [[C99|C99]] • [[C11|C11]] • [[C18_(C語言標準)|C18]] • [[C2x|C2x]]
+|navbar = none
+}}
+<!---[[Image:ISO-IEC-9899-1999-cover.png|thumb]]--->
+
+'''C99'''（之前名稱為'''C9X'''）是'''ISO/IEC 9899:1999'''的非正式名稱，是[[C語言|C語言]]標準的一個版本<ref>{{cite web |url=http://www.iso.org/iso/iso_catalogue/catalogue_ics/catalogue_detail_ics.htm?csnumber=29237 |title=ISO/IEC 9899:1999 - Programming languages - C |publisher=Iso.org |date=2011-12-08 |accessdate=2014-04-08 |archive-date=2016-10-10 |archive-url=https://web.archive.org/web/20161010112929/http://www.iso.org/iso/iso_catalogue/catalogue_ics/catalogue_detail_ics.htm?csnumber=29237 |dead-url=no }}</ref>。C99延伸了C90的內容，加入了C語言及[[C標準函式庫|標準函式庫]]的新功能，讓一些語言的實現（例如{{le|IEEE 754-1985|IEEE_754-1985}}浮點數，以及編譯器技術）可以更妥善的利用電腦的硬體<ref name="grouper.ieee.org">{{Cite web |url=http://grouper.ieee.org/groups/754/meeting-materials/2001-07-18-c99.pdf |title=存档副本 |accessdate=2020-07-03 |archive-date=2017-06-22 |archive-url=https://web.archive.org/web/20170622221328/http://grouper.ieee.org/groups/754/meeting-materials/2001-07-18-c99.pdf |dead-url=no }}</ref>。後來在2011年發行的[[C11|C11]]取代了此版本的C語言標準。
+
+==歷史==
+在[[美国国家标准协会|ANSI]]的标准确立後，C语言的规范在一段时间内没有大的变动，然而C++在自己的标准化建立过程中继续发展壮大。《标准修正案一》在1994年为C语言建立了一个新标准，但是只修正了一些C89标准中的细节和增加更多更广的国际字符集支持。不过，这个标准引出了1999年ISO 9899:1999的发表。它通常被称为C99。C99被ANSI于2000年3月采用。
+
+==設計==
+在C99中包括的特性有：
+* 增加了对编译器的限制，比如源始碼每行要求至少支持到 4095 字节，变量名函数名的要求支持到 63 字节（extern 要求支持到 31）。
+* 增强了预处理功能。例如：
+** [[巨集|巨集]]支持取可变参数 #define Macro(...) __VA_ARGS__
+** 使用[[巨集|巨集]]的时候，允许省略参数，被省略的参数会被扩展成空串。
+** 支持 // 开头的单行注释（这个特性实际上在C89的很多编译器上已经被支持了）
+* 增加了新关键字 <tt>restrict, inline, _Complex, _Imaginary, _Bool</tt>
+** 支持 <tt>long long, long double _Complex, float _Complex</tt> 等类型
+* 支持不定长的数组，即数组长度可以在运行时决定，比如利用变量作为数组长度。声明时使用 <tt>int a[var]</tt> 的形式。不过考虑到效率和实现，不定长数组不能用在全局，或 <tt>struct</tt> 与 <tt>union</tt> 。
+* [[变量_(程序设计)|变量]]声明不必放在语句块的开头，for 语句提倡写成 <tt>for(int i=0;i<100;++i)</tt> 的形式，即<tt>i</tt> 只在 <tt>for</tt> 语句块内部有效。
+* 允许采用<tt>（type_name）{xx,xx,xx}</tt> 类似于 C++ 的构造函数的形式构造匿名的结构体，即[[复合文字|复合文字]]特性。
+* 初始化结构体的时候允许对特定的元素赋值，形式为：
+*: <syntaxhighlight lang="c">struct test{int a[3]，b;} foo[] =  { [0].a = {1}, [1].a = 2 };</syntaxhighlight>
+*: <syntaxhighlight lang="c">struct test{int a, b, c, d;} foo =  { .a = 1, .c = 3, 4, .b = 5 };  // 3,4 是对 .c,.d 赋值的</syntaxhighlight>
+* 格式化字符串中，利用 <tt>\u</tt> 支持 unicode 的字符。
+* 支持 16 进制的浮点数的描述。
+* printf scanf 的格式化串增加了对 <tt>long long int</tt> 类型的支持。
+* 浮点数的内部数据描述支持了新标准，可以使用 #pragma 编译器指令指定。
+* 除了已有的 <tt>__line__ __file__</tt> 以外，增加了 <tt>__func__</tt> 得到当前的函数名。
+* 允许编译器化简非常数的表达式。
+* 修改了 <tt>/ %</tt> 处理负数时的定义，这样可以给出明确的结果，例如在C89中<tt>-22 / 7 = -3, -22 % 7 = -1</tt>，也可以<tt>-22 / 7= -4, -22 % 7 = 6</tt>。 而C99中明确为<tt> -22 / 7 = -3, -22 % 7 = -1</tt>，只有一种结果。
+* 取消了函数返回类型默认为 <tt>int</tt> 的规定。
+* 允许在 <tt>struct</tt> 的最后定义的数组不指定其长度，写做 [](flexible array member)。
+* <tt>const const int i</tt> 将被当作 <tt>const int i</tt> 处理。
+* 增加和修改了一些标准头文件，比如定义 bool 的 <stdbool.h> ，定义一些标准长度的 int 的 <inttypes.h> ，定义复数的 <complex.h> ，定义宽字符的 <wctype.h> ，类似于泛型的数学函数 <tgmath.h>， 浮点数相关的 <fenv.h>。 在<stdarg.h> 增加了 va_copy 用于复制 ... 的参数。<time.h> 里增加了 struct tmx ，对 struct tm 做了扩展。
+* 输入输出对宽字符以及长整数等做了相应的支持。<ref>{{Cite web |url =http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf |accessdate =2020-06-10 |title =ISO/IEC 9899:1999 |archive-date =2018-01-27 |archive-url =https://web.archive.org/web/20180127192726/http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf |dead-url =no }}</ref>
+
+用于[[x86架构|x86架构]]的[[GCC|GCC]],[[Clang|Clang]]和其它一些商业编译器(如[[IAR_Systems|IAR Systems]],[[Intel_C++編譯器|ICC]])现支持C99的全部特性<ref>GCC从3.0版本开始正式支持C99(-std=c99)，详情见</ref>，而[[微软|微软]]和[[Borland|Borland]]支持C99的部分特性<ref>{{cite web |website=[[Ars_Technica|Ars Technica]] |url=https://arstechnica.com/information-technology/2013/06/c99-acknowledged-at-last-as-microsoft-lays-out-its-path-to-c14/ |title=C99 acknowledged at last as Microsoft lays out its path to C++14 |author=Peter Bright |date=29 June 2013 |accessdate=9 January 2015 |archive-date=2020-07-02 |archive-url=https://web.archive.org/web/20200702224818/https://arstechnica.com/information-technology/2013/06/c99-acknowledged-at-last-as-microsoft-lays-out-its-path-to-c14/ |dead-url=no }}</ref>。
+
+==參考資料==
+{{reflist}}
+
+==延伸閱讀==
+* {{cite journal|last=Cheng|first=Harry|title=C99 & Numeric computing|journal=[[Dr._Dobb's_Journal|Dr. Dobb's Journal]]|url=http://drdobbs.com/cpp/184404993|date=1 March 2002}}
+* {{cite web|url=http://www.ibm.com/developerworks/library/l-c99.html|title=Open source development using C99|last=Seebach|first=Peter|date=24 March 2004|work=developerWorks|publisher=[[IBM|IBM]]|accessdate=2020-07-03|archive-date=2009-01-29|archive-url=https://web.archive.org/web/20090129160209/http://www.ibm.com/developerworks/library/l-c99.html|dead-url=no}}
+* {{cite web |url= http://www.open-std.org/jtc1/sc22/WG14/www/docs/n1256.pdf |title= Final version of the C99 standard with corrigenda TC1, TC2, and TC3 included, formatted as a draft |accessdate= 2020-07-03 |archive-date= 2018-01-27 |archive-url= https://web.archive.org/web/20180127192726/http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf |dead-url= no }} {{small|(3.61 MB)}}
+* [http://www.open-std.org/jtc1/sc22/wg14/www/C99RationaleV5.10.pdf Rationale for International Standard—Programming Languages—C Revision 5.10]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg14/www/C99RationaleV5.10.pdf |date=20160606072228 }}, April-2003, Rationale for C99
+
+==外部連結==
+* [http://www.open-std.org/jtc1/sc22/wg14/www/newinc9x.htm New things in C9X]{{Wayback|url=http://www.open-std.org/jtc1/sc22/wg14/www/newinc9x.htm |date=20190916084257 }}
+* [http://www.cplusplus.com/articles/iz3hAqkS/ Features of C99]{{Wayback|url=http://www.cplusplus.com/articles/iz3hAqkS/ |date=20200705141326 }}
+
+{{S-start}}
+{{S-bef| before = [[ANSI_C#C89|C89 / C90 / "ANSI C"]]}}
+{{S-ttl| title=[[C語言|C語言]]標準}}
+{{S-aft| after = [[C11|C11]]}}
+{{end}}
+
+{{CProLang}}
+
+[[Category:C語言|Category:C語言]]
+[[Category:程式語言標準|Category:程式語言標準]]

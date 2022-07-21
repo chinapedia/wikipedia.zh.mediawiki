@@ -1,0 +1,62 @@
+{{{{{subst|}}}#switch:none
+ |{{{{{subst|}}}#iferror: {{{{{subst|}}}#time:Y_M_d|{{{1|}}} }} | none }} <noinclude><!-- #time: can't handle --></noinclude>
+ |{{{{{subst|}}}#iferror: {{{{{subst|}}}#expr: {{{1|}}}+0 }}
+    |<noinclude><!--not a pure number--></noinclude>
+    |{{{{{subst|}}}#ifexpr: {{{1|}}}+0 > 10000000000000
+       |<noinclude><!-- a yyyymmddhhmmss timestamp --></noinclude>
+       |{{{{{subst|}}}#ifeq: {{{{{subst|}}}#expr:{{{1|}}}+0}} | {{{1|}}}
+          | none <noinclude><!-- pure number eg 123.456 --></noinclude>
+          | <noinclude><!-- assume yy-mm-dd --></noinclude>
+        }}
+     }}
+  }}
+ |{{{{{subst|}}}#switch:  {{lc:{{{2|}}}}} | none | asis=none }}
+ |{{{{{subst|}}}#ifexpr:  {{{{{subst|}}}#time:Y|{{{1|}}} }} < 1000 | none }}
+ |{{{{{subst|}}}#switch:  {{{{{subst|}}}#time:Ynj|{{{1|}}} }}|100031|110031|130031|140031|150031=none}}
+ |= {{{1|}}}<noinclude><!-- error or "none", so no formatting --></noinclude>
+ |<noinclude><!-- continue with formatting --></noinclude>
+  {{{{{subst|}}}#ifeq:<noinclude><!--
+    --></noinclude>{{{{{subst|}}}#time:Y|{{{1}}} 2008}}<noinclude><!--
+    --></noinclude>{{{{{subst|}}}#iferror: {{{{{subst|}}}#ifexpr: {{{1}}}>10000000000000 | no }} | }}<noinclude><!--
+    --></noinclude>{{{{{subst|}}}#time:Y|{{{1}}} 2004}}
+  |20082004
+  |<noinclude><!-- no year --></noinclude>
+    {{{{{subst|}}}#ifeq:{{{{{subst|}}}#time:d|{{{1}}} 2036}}|{{{{{subst|}}}#time:d|{{{1}}} }}
+    |<noinclude><!-- month+day --></noinclude>{{{{{subst|}}}#time:
+      {{{{{subst|}}}#switch: {{lc: {{{{{subst|}}}#ifeq:{{{3|}}}|y|L}}{{{2|}}} }}
+      | lmdy | liso | lymd      = [[:n月j日|F j]]
+      | mdy  | iso  | ymd       = F j
+      | ldmy | l                = [[:n月j日|j F]]
+      | #default                = j F
+      }}|{{{1}}} 2000 |en}}<noinclude><!-- default='dmy' or null or "" or unsupported option --></noinclude>
+    |<noinclude><!-- month only --></noinclude>{{{{{subst|}}}#time:
+      {{{{{subst|}}}#switch: {{lc: {{{{{subst|}}}#ifeq:{{{3|}}}|y|L}}{{{2|}}} }}
+      | lmdy | liso | lymd 
+      | ldmy | l                = [[n月|F]]
+      | #default                = F
+      }}|{{{1}}} 2000 |en}}<noinclude><!-- default='dmy'/'mdy'/'ymd'/'iso'/null/""/unsupported opt --></noinclude>
+    }}
+  |<noinclude><!-- with year--></noinclude>
+    {{{{{subst|}}}#if: {{{{{subst|}}}#iferror:{{{{{subst|}}}#time:j|2 {{{1|}}}}}|*D*|{{{{{subst|}}}#iferror:{{{{{subst|}}}#time:j|2000 {{{1|}}}}}|*D*| }}}}
+    |<noinclude><!-- day+month+year --></noinclude>{{{{{subst|}}}#time:
+      {{{{{subst|}}}#switch: {{lc: {{{{{subst|}}}#ifeq:{{{3|}}}|y|L}}{{{2|}}} }}
+      | lmdy                    = [[:n月j日|F j]], [[Y年|Y]]
+      | mdy                     = F j, Y
+      | liso                    = [[Y年|Y-]][[n月j日|m-d]]<noinclude><!-- i.e. [[Y-m-d]] --></noinclude>
+      | iso                     = Y-m-d
+      | lymd                    = [[Y年|Y]] [[:n月j日|F j]]
+      | ymd                     = Y F j
+      | ldmy | l                = [[:n月j日|j F]] [[Y年|Y]]
+      | #default                = j F Y
+      }}|{{{1|}}} |en}}<noinclude><!-- #default='dmy' or null or "" or unsupported option --></noinclude>
+    |<noinclude><!-- month+year --></noinclude>{{{{{subst|}}}#time:
+      {{{{{subst|}}}#switch: {{lc: {{{{{subst|}}}#ifeq:{{{3|}}}|y|L}}{{{2|}}} }}
+      | lmdy | liso | lymd | ldmy | l  = [[:Y年n月|F Y]]
+      | #default                = F Y
+      }}|{{{1|}}} |en}}<noinclude><!-- default='dmy'/'iso'/'mdy'/null/""/unsupported option --></noinclude>
+    }}
+  }}    
+}}<noinclude>
+
+{{documentation}}
+</noinclude>

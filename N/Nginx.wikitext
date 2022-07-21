@@ -1,0 +1,105 @@
+{{noteTA|G1=IT|G2=FL}}
+{{Infobox Software
+| name                   = Nginx
+| logo                   = Nginx logo.svg
+| logo size              = 160px
+| screenshot             = 
+| caption                = 
+| author                 = [[Igor_Sysoev|伊戈尔·赛索耶夫]]
+| developer              = NGINX, Inc.
+| released               = {{Start date and age|2004|10|4}}<ref name="CHANGES" />
+| latest release version = 1.22.0
+| latest release date    = {{Release date and age|2022|05|24}}
+| latest preview version = 1.21.6
+| latest preview date    = {{Release date and age|2022|01|26}}
+| operating system       = [[Linux|Linux]]\[[BSD|BSD variants]]、[[OS_X|OS X]]、[[Solaris|Solaris]]、[[AIX|AIX]]、[[HP-UX|HP-UX]]、[[Windows|Windows]]<ref name="Windows" />以及[[*nix|*nix]]<ref name="platforms" /> 
+| platform               =
+| language               = [[C语言|C]]<ref name="Ohloh" />
+| genre                  = [[網頁伺服器|網頁伺服器]]、[[郵件伺服器|郵件伺服器]]、[[反向代理伺服器|反向代理伺服器]]
+| license                = [[BSD许可证#BSD风格的许可证|类BSD]]<ref name="LICENSE" />
+| website                = {{URL|https://nginx.org/}}
+| repo                   = {{URL|https://hg.nginx.org/nginx}}<br/>{{URL|https://github.com/nginx/nginx}}
+}}
+
+'''Nginx'''（发音同「{{lang|en|engine X}}」）是异步框架的[[網頁伺服器|網頁伺服器]]，也可以用作[[反向代理|反向代理]]、[[负载均衡|负载平衡器]]和[[HTTP缓存|HTTP缓存]]。该软件由俄羅斯程式設計師[[伊戈爾·賽索耶夫|伊戈爾·賽索耶夫]]（{{lang|ru|Игорь Сысоев}}）开发并于2004年首次公开发布<ref name="Mobily" />。2011年成立同名公司以提供支持服务<ref name="D" />。2019年3月11日，Nginx公司被[[F5网络公司|F5网络公司]]以6.7億美元收购<ref>{{Cite web |url=https://www.oschina.net/news/105082/f5-acquires-nginx |title=F5收购NGINX |accessdate=2019-03-12 |archive-date=2019-10-18 |archive-url=https://web.archive.org/web/20191018221452/https://www.oschina.net/news/105082/f5-acquires-nginx |dead-url=no }}</ref>。
+
+Nginx是免费的[[开源软件|开源软件]]，根据类[[BSD许可证|BSD许可证]]的条款发布。一大部分Web服务器使用Nginx<ref>{{Cite web |url=https://news.netcraft.com/archives/2017/01/12/january-2017-web-server-survey.html |title=存档副本 |access-date=2018-01-27 |archive-url=https://web.archive.org/web/20180127203312/https://news.netcraft.com/archives/2017/01/12/january-2017-web-server-survey.html |archive-date=2018-01-27 |dead-url=no }}</ref>，通常作为[[负载均衡|负载均衡器]]。<ref>{{Cite web |url=https://www.linode.com/docs/uptime/loadbalancing/use-nginx-as-a-front-end-proxy-and-software-load-balancer |title=存档副本 |access-date=2018-01-27 |archive-url=https://web.archive.org/web/20171020052406/https://www.linode.com/docs/uptime/loadbalancing/use-nginx-as-a-front-end-proxy-and-software-load-balancer |archive-date=2017-10-20 |dead-url=no }}</ref>
+
+== 特点 ==
+Nginx可以部署在网络上使用[[FastCGI|FastCGI]]脚本、[[简单通用网关接口|SCGI]]处理程序、[[Web服务器网关接口|WSGI]]应用服务器或{{tsl|en|Phusion Passenger|}}模块的动态[[HTTP|HTTP]]内容，并可作为软件[[负载均衡|负载均衡器]]。<ref name="Kleinman" />
+
+Nginx使用异步事件驱动的方法来处理请求。Nginx的模块化事件驱动架构<ref name="aosabook" />可以在高负载下提供更可预测的性能<ref name="Configuration" />。
+
+Nginx是一款面向性能设计的HTTP服务器，相较于[[Apache_HTTP_Server|Apache]]、[[lighttpd|lighttpd]]具有占有[[内存|内存]]少，稳定性高等优势。与旧版本（≤2.2）的Apache不同，Nginx不采用每客户机一线程的设计模型，而是充分使用异步逻辑从而削减了上下文调度开销，所以并发服务能力更强。整体采用模块化设计，有丰富的模块库和第三方模块库，配置灵活。在Linux作業系統下，Nginx使用epoll事件模型，得益於此，Nginx在Linux作業系統下效率相當高。同時Nginx在OpenBSD或FreeBSD作業系統上採用類似於epoll的高效事件模型kqueue。
+
+根据{{tsl|en|Netcraft|}}在2016年11月网络服务器调查<ref name="netcraft" />，Nginx被发现是所有“活跃”站点（被调查站点的18.22%）和百万最繁忙站点（被调查站点的27.83%）中使用次数最多的Web服务器。根据W3Techs的数据，前100万个网站中的37.7%，前10万个网站中的49.7%，以及前10000个网站中的57.0%被使用<ref name="Usage of web servers" />。据BuiltWith统计，在全球前10000个网站中，有38.2%的网站使用Nginx<!--, and its growth within the top 10k, 100k and 1 million segments increased--><ref name="Builtwith" />。维基百科使用Nginx作为其{{le|SSL終端代理|SSL termination proxy}}<ref name="SSL termination" />。从[[OpenBSD|OpenBSD]] 5.2版本（2012年11月1日）开始，Nginx成为了OpenBSD基础系统的一部分，提供了替代Apache 1.3系统的替代方案<ref name="openbsd_5.2" />，但是后来被替换为OpenBSD自己的httpd(8)<ref name="Nginx Removed" />。
+
+=== 可大量并行處理 ===
+Nginx在官方測試的結果中，能夠支援五萬個并行連接，而在實際的運作中，可以支援二萬至四萬個并行連接。
+
+== 与Apache相比 ==
+
+Nginx的编写有一个明确目标就是超越[[Apache_HTTP_Server|Apache]] Web服务器的性能<ref>{{Cite news|url=https://www.nginx.com/blog/nginx-vs-apache-our-view/|title=NGINX vs. Apache: Our View of a Decade-Old Question|date=9 October 2015|newspaper=NGINX|access-date=28 December 2016|archive-url=https://web.archive.org/web/20171030115846/https://www.nginx.com/blog/nginx-vs-apache-our-view/|archive-date=2017-10-30|dead-url=no}}</ref>。Nginx提供开箱即用的静态文件，使用的内存比Apache少得多，每秒可以处理大约四倍于Apache的请求<ref>{{Cite web|url=https://help.dreamhost.com/hc/en-us/articles/215945987-Web-server-performance-comparison|title=Web server performance comparison|website=DreamHost|access-date=28 December 2016|archive-url=https://web.archive.org/web/20171210182651/https://help.dreamhost.com/hc/en-us/articles/215945987-Web-server-performance-comparison|archive-date=2017-12-10|dead-url=no}}</ref>。 在低并发下Nginx的性能与Apache相当（有时候还低于），但是在高并发下Nginx能保持低资源低消耗高性能。Nginx的优点还包括：高度模块化的设计，模块编写简单，以及配置文件简洁。
+
+这种性能提升的代价是降低了灵活性，例如能够以每个文件为基础覆盖系统范围的访问设置（ Apache使用[[.htaccess|.htaccess]]文件来完成这个工作，而Nginx并没有内置这样的功能）<ref>{{Cite news|url=http://www.hostingadvice.com/how-to/nginx-vs-apache/#flexibility|title=NGINX vs. Apache (Pro/Con Review, Uses, & Hosting for Each) - HostingAdvice.com|date=5 April 2016|newspaper=HostingAdvice.com|access-date=28 December 2016|archive-url=https://web.archive.org/web/20180126124108/http://www.hostingadvice.com/how-to/nginx-vs-apache/#flexibility|archive-date=2018-01-26|dead-url=no}}</ref>。以前，向Nginx添加第三方模块需要使用[[静态库|静态链接]]的模块从源代码重新[[編譯器|编译]]应用程序。在版本 1.9.11 中部分地克服了这一点，增加了动态模块加载。但是，模块仍然必须与Nginx同时编译，而不是所有的模块都与这个系统兼容——有些需要更老的静态链接过程<ref>{{Cite news|url=https://www.nginx.com/blog/dynamic-modules-nginx-1-9-11/|title=Introducing Dynamic Modules in NGINX 1.9.11 - NGINX|date=2016-02-09|newspaper=NGINX|language=en-US|access-date=2017-01-13|archive-url=https://web.archive.org/web/20170116152820/https://www.nginx.com/blog/dynamic-modules-nginx-1-9-11/|archive-date=2017-01-16|dead-url=no}}</ref>。
+
+相比起在[[Linux|Linux]]下的Nginx，在[[Windows_Server|Windows Server]]下的Nginx的稳定性较差，而Apache对两者都有较好的支持。<ref name="hostingcanada">{{cite web|url=https://hostingcanada.org/nginx-vs-apache-explained/|title=Choosing Between Apache and NGINX for Your Web Hosting Needs|publisher=Hosting Canada|accessdate=2019-12-02|archive-date=2019-11-07|archive-url=https://web.archive.org/web/20191107171455/http://hostingcanada.org/nginx-vs-apache-explained/|dead-url=no}}</ref>
+
+== Nginx模块 ==
+整体采用[[模块化设计|模块化设计]]是Nginx的一个重大特点，甚至http服务器核心功能也是一个模块。旧版本的Nginx的模块是静态的，添加和删除模块都要对Nginx进行重新编译，1.9.11以及更新的版本已经支持动态模块加载。
+
+== 数据统计 ==
+截至2017年3月，中国注册域名总数的9.65%使用Nginx。<ref>{{Cite web |url=https://www.duzli.cn/zhong-guo-wang-luo-tong-ji |title=存档副本 |accessdate=2017-03-02 |archive-date=2017-03-02 |archive-url=https://web.archive.org/web/20170302031534/https://www.duzli.cn/zhong-guo-wang-luo-tong-ji |dead-url=no }}</ref>
+
+截至2018年1月，Nginx服务或者代理了全球30.46%的网站。<ref>{{cite web|url=https://news.netcraft.com/archives/2018/01/19/january-2018-web-server-survey.html|title=January 2018 Web Server Survey|publisher=Netcraft|date=2018-01-19|access-date=2018-02-05|archive-url=https://web.archive.org/web/20180124191819/https://news.netcraft.com/archives/2018/01/19/january-2018-web-server-survey.html|archive-date=2018-01-24|dead-url=no}}</ref>
+
+== PHP整合 ==
+自PHP-5.3.3起，[[PHP-FPM|PHP-FPM]]加入到了[[PHP|PHP]]核心，编译时加上<code>--enable-fpm</code>即可提供支持。PHP-FPM以[[守护进程|守护进程]]在后台运行，Nginx响应请求后，自行处理静态请求，PHP请求则经过[[fastcgi_pass|fastcgi_pass]]交由PHP-FPM处理，处理完毕后返回。Nginx和PHP-FPM的组合，是一种稳定、高效的PHP运行方式，效率要比传统的Apache和mod_php高出不少。
+
+PHP-FPM不支持Windows平台，由于没有fastcgi进程管理器管理<code>php-cgi.exe</code>，因此一旦<code>php-cgi.exe</code>崩溃退出，前端将失去响应，这时Nginx会返回“The page you are looking for is temporarily unavailable. Please try again later.”的错误信息。因此在Windows上用Nginx和<code>php-cgi.exe</code>组合来运行PHP的方式并不可靠，稳定性有待提高。
+
+==參考文獻==
+{{reflist|2|30em|refs=
+<ref name="CHANGES">{{cite web | url = http://nginx.org/en/CHANGES | title = CHANGES | accessdate = 16 May 2017 | archive-url = https://web.archive.org/web/20160505031534/http://nginx.org/en/CHANGES | archive-date = 2016-05-05 | dead-url = no }}</ref>
+<ref name="Ohloh">{{cite web | title = The NGINX Open Source Project on Ohloh | url = http://www.ohloh.net/p/nginx/analyses/latest | work = ohloh.net | accessdate = 7 March 2013 | archive-url = https://web.archive.org/web/20120626182350/http://www.ohloh.net/p/nginx/analyses/latest | archive-date = 2012-06-26 | dead-url = no }}</ref>
+<ref name="Windows">{{cite web | url = http://nginx.org/en/docs/windows.html | title = nginx for Windows | accessdate = 28 May 2014 | archive-url = https://web.archive.org/web/20180125155834/http://nginx.org/en/docs/windows.html | archive-date = 2018-01-25 | dead-url = no }}</ref>
+<ref name="platforms">{{cite web | url = http://nginx.org/en/#tested_os_and_platforms | title = Tested OS and platforms | accessdate = 15 October 2011 | archive-url = https://web.archive.org/web/20180128225142/http://nginx.org/en/#tested_os_and_platforms | archive-date = 2018-01-28 | dead-url = no }}</ref>
+<ref name="LICENSE">{{cite web | url = http://nginx.org/LICENSE | title = Licensing | accessdate = 18 January 2013 | archive-url = https://www.webcitation.org/65HCw0nzP?url=http://www.nginx.org/LICENSE | archive-date = 2012-02-07 | dead-url = no }}</ref>
+<ref name="Kleinman">{{Cite web |url=http://library.linode.com/web-servers/nginx/configuration/front-end-proxy-and-software-load-balancing |title=Use nginx for Proxy Services and Software Load Balancing, 11 May 2010, by Sam Kleinman, Linode Library |access-date=2018-01-27 |archive-url=https://web.archive.org/web/20150610210548/http://library.linode.com/web-servers/nginx/configuration/front-end-proxy-and-software-load-balancing |archive-date=2015-06-10 |dead-url=no }}</ref>
+<ref name="aosabook">{{cite web | url = http://www.aosabook.org/en/nginx.html | title = The Architecture of Open Source Applications (Volume 2): nginx | work = aosabook.org | accessdate = 10 June 2015 | archive-url = https://web.archive.org/web/20180131043919/http://www.aosabook.org/en/nginx.html | archive-date = 2018-01-31 | dead-url = no }}</ref>
+<ref name="Configuration">[http://library.linode.com/web-servers/nginx/configuration/basic Basic nginx Configuration] {{Wayback|url=http://library.linode.com/web-servers/nginx/configuration/basic |date=20150916005717 }} by Sam Kleinman; 21 August 2010</ref>
+<ref name="netcraft">{{cite web | url = https://news.netcraft.com/archives/2016/11/22/november-2016-web-server-survey.html | title = November 2016 Web Server Survey | date = 22 November 2016 | accessdate = 19 December 2016 | archive-url = https://web.archive.org/web/20180216195855/https://news.netcraft.com/archives/2016/11/22/november-2016-web-server-survey.html | archive-date = 2018-02-16 | dead-url = no }}</ref>
+<ref name="Usage of web servers">{{cite web | url = http://w3techs.com/technologies/cross/web_server/ranking | title = Usage of web servers broken down by ranking | date = 19 December 2016 | accessdate = 19 December 2016 | archive-url = https://www.webcitation.org/6EDPxVaYe?url=http://w3techs.com/technologies/cross/web_server/ranking | archive-date = 2013-02-05 | dead-url = no }}</ref>
+<ref name="Builtwith">{{cite web | url = http://trends.builtwith.com/Web-Server/nginx | title = Builtwith: nginx Usage Statistics | date = 19 December 2016 | accessdate = 19 December 2016 | archive-url = https://web.archive.org/web/20180128021018/https://trends.builtwith.com/Web-Server/nginx | archive-date = 2018-01-28 | dead-url = no }}</ref>
+<ref name="SSL termination">{{ cite web | url = https://wikitech.wikimedia.org/view/Https#SSL_termination | title = Wikitech: HTTPS | publisher = Wikitech.wikimedia.org | date = 3 October 2011 | accessdate = 3 December 2011 }}{{Dead link|date=2018年8月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>
+<ref name="openbsd_5.2">[http://www.openbsd.org/faq/upgrade52.html#nginx OpenBSD Upgrade Guide: 5.1 to 5.2] {{Wayback|url=http://www.openbsd.org/faq/upgrade52.html#nginx |date=20171222055544 }}, 2012/11/06 15:00:27 sthen</ref>
+<ref name="Nginx Removed">{{cite web | title = Heads Up: Nginx Removed From Base | url = http://undeadly.org/cgi?action=article&sid=20140827065755 | access-date = 2018-01-27 | archive-url = https://web.archive.org/web/20180127203200/http://undeadly.org/cgi?action=article&sid=20140827065755 | archive-date = 2018-01-27 | dead-url = no }}</ref>
+<ref name="Mobily">{{cite news | title = Interview with Igor Sysoev, author of Apache's competitor NGINX | date = 5 January 2012 | work = Free Software Magazine | author = Tony Mobily | url = http://www.freesoftwaremagazine.com/articles/interview_igor_sysoev_author_apaches_competitor_nginx | accessdate = 18 October 2013 | archive-url = https://web.archive.org/web/20131019145106/http://www.freesoftwaremagazine.com/articles/interview_igor_sysoev_author_apaches_competitor_nginx | archive-date = 2013-10-19 | dead-url = yes }}</ref>
+
+<ref name="D">{{cite web | title = Notice of Exempt Offering of Securities | work = Form D | publisher = US Securities and Exchange Commission 17 October 2013 | url = https://www.sec.gov/Archives/edgar/data/1588848/000158884813000001/xslFormDX01/primary_doc.xml | accessdate = 15 September 2016 | archive-url = https://web.archive.org/web/20171107020804/https://www.sec.gov/Archives/edgar/data/1588848/000158884813000001/xslFormDX01/primary_doc.xml | archive-date = 2017-11-07 | dead-url = no }}</ref>
+}}
+
+==另请参阅==
+* [[Tengine|Tengine]]
+
+== 外部链接 ==
+*{{official|https://nginx.org}}
+*{{Official blog|1=https://www.nginx.com/blog/}}
+*{{Facebook|nginxinc|NGINX, Inc.}}
+*{{YouTube|custom=Nginxinc|NGINX, Inc.}}
+*{{Twitter|NGINX}}
+*{{Twitter|nginxorg|NGINX, Inc.}}（新版本發佈資訊）
+
+{{Web服务器软件}}
+
+[[Category:2002年软件|Category:2002年软件]]
+[[Category:自由跨平台軟體|Category:自由跨平台軟體]]
+[[Category:自由代理服务器|Category:自由代理服务器]]
+[[Category:用C編程的自由軟體|Category:用C編程的自由軟體]]
+[[Category:Linux网络服务器软件|Category:Linux网络服务器软件]]
+[[Category:Linux代理服务器软件|Category:Linux代理服务器软件]]
+[[Category:自由网络服务器软件|Category:自由网络服务器软件]]
+[[Category:反向代理|Category:反向代理]]
+[[Category:Unix网络相关软件|Category:Unix网络相关软件]]
+[[Category:俄羅斯發明|Category:俄羅斯發明]]
+[[Category:俄羅斯資訊科技|Category:俄羅斯資訊科技]]

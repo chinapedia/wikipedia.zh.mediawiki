@@ -1,0 +1,271 @@
+{{NoteTA
+|G1 = IT
+|G2 = MediaWiki
+}}
+{{Documentation subpage}}<!-- 请在本页最底部添加分类与跨语言链接。 -->
+{{High-risk|515297}}
+{{Lua|Module:Infobox}}
+本模板为一系列「信息框」模板的元模板，亦即本模板用于构建其他模板。通常不建議在条目中直接使用此模板，但是如有需要，可以在個別「一次性」情況中直接使用。参见[[Help:信息框]]以获取创建通用信息框的进一步方法。
+
+=== 用法 ===
+
+本模板与{{tl|navbox}}的用法相似，但也有一些不同之处。表格中的每一行既可以是顶栏（header），也可以是成对的标签（label）与-{A|zh-hans:数据; zh-hant:資料;}-（data），甚至还可以只是一个数据单元。每行只能有一种状态，且具有优先级：当你将一行同时定义为顶栏与标签／数据对，那么标签／数据对的定义将会被忽略。
+
+====編號====
+為方便日後更改信息框格式，header和label／data行的編號不需要完全按照1、2、3……的加一順序編寫，可以在中間預留一些行編號不用，可避免將來如要增加新行時要把該行後面的行編號一併更改。
+
+header和label／data行的編號不可以重複，例如不可以同時使用header1和label1／data1，請使用header1、label2／data2（舉例）。
+
+如希望大量移動編號（如為加入新label需將所有之後的label數字加一），可考慮使用[[模块:IncrementParams]]。
+
+=== 参数 ===
+
+==== “查看／讨论／编辑／历史”链接 ====
+;name : “查看／讨论／编辑／历史”链接需要指向模板页的名称（name）。你可以填写<nowiki>{{subst:PAGENAME}}</nowiki>。如果此参数未填，则“查看／讨论／编辑／历史”链接不会显示。
+
+==== 标题 ====
+{{Infobox
+|title = 信息框外的标题文本
+|data1 = （信息框的其余部分）
+}}
+{{Infobox
+|above = 信息框内的标题文本
+|data1 = （信息框的其余部分）
+}}
+
+有两种方式为一个信息框填入标题。一种是将标题填在信息框外，另一种则是填写在信息框内。根据需要，你可以选择其中的一种使用，亦或同时使用这两种标题，甚至都不使用（尽管我们不推荐这样做）。
+;title : 填写在信息框表格外顶部的标题文本。
+;above : 填写在信息框表格内顶部单元的标题文本。
+
+==== 可选项 ====
+;subheader : 在 above 下面的次標題。subheader2是第2個次標題。
+;image : 在模板上部显示的图像。请使用完整的图像语法，例如<nowiki>[[File:example.png|200px]]</nowiki>，推荐使用[[模块:InfoboxImage]]插入图像。图像的位置默认为居中。<br/>在中文維基百科，一個Infobox最多可使用4個圖像參數：overimage（置頂）、image（=image1）、image2、image3，與英文維基百科的Infobox僅提供image（=image1）、image2不同。
+;caption : 位于图像下方的说明文本。<br/>overcaption、caption（=caption1）、caption2、caption3分別對應上面4個圖像參數。
+;header(n) : 填入第n行的'''顶栏'''文本。
+;label(n): 填入第n行的'''标签'''文本。
+;data(n): 填入第n行的'''数据'''文本。
+;below: 填写在信息框表格底部单元的文本。底部单元一般用来填写脚注、参见及其他类似的信息。
+
+==== 可选的CSS风格 ====
+;bodystyle : 应用到信息框表格全体。
+;titlestyle : 应用到信息框表格外的标题中。不建议在此处填写背景颜色（background color），因为该处的文字位于信息框外。
+;abovestyle : 应用到信息框表格内顶部单元中。默认的风格为“<syntaxhighlight lang="css" inline>font-size:large;</syntaxhighlight>”（字号设为大号），因为该单元常被用作标题。如果你希望让顶部单元以正常字号显示，只需在该处填写的内容中包含“<syntaxhighlight lang="css" inline>font-size:medium;</syntaxhighlight>”。
+;imagestyle : 应用到信息框的图像单元中，包括图像下方的说明文本。但是，出于兼容性与未来修改的考虑，如果你需要设置说明文本的属性，请使用captionstyle而不要使用imagestyle。
+;captionstyle : 应用到图像说明文本中。
+;headerstyle : 应用到所有的顶栏单元。
+;header(n)style : 应用到第n行的顶栏单元。
+;labelstyle : 应用到所有的标签单元。如果你希望让标签文字不换行显示，只需在该处填写的内容中包含“<syntaxhighlight lang="css" inline>white-space:nowrap;</syntaxhighlight>”。
+;label(n)style : 应用到第n行的标签单元。
+;datastyle : 应用到所有的数据单元。
+;data(n)style : 应用到第n行的数据单元。
+;belowstyle : 应用到底部单元中。
+
+==== 微格式 ====
+;bodyclass: 该参数影响信息框整体的类（class）。
+;imageclass: 该参数影响图像的类。
+;class(n): 该参数影响特定行数据单元的类。如果信息框没有数据单元，则不会产生作用。
+;titleclass: 该参数影响信息框外标题的类。
+;aboveclass: 该参数影响信息框内标题的类。
+
+通过为各个数据单元定义类名，本模板可以支持[[微格式]]信息；此处所说的类名，是根据标准定义的，且可以向机器表明信息的类型。例如，如果一个信息框使用了[[hCard]]的微格式，要在信息框内标记此微格式，则填写以下参数：
+
+<pre>
+|bodyclass = vcard
+</pre>
+
+并为每一个包含了vcard所需数据单元的行添加相应的类参数：
+
+<pre>
+|class1 = fn
+|class2 = org
+|class3 = tel
+</pre>
+
+等等。用于显示信息框主题的“above”和“title”也可以指定类。
+
+请在[[Wikipedia:專題/微格式]]以获取在维基百科添加微格式信息的进一步信息，访问[http://microformats.org/wiki/Main_Page microformats.org]网站亦能获取更一般性的信息。
+
+=== 表格域可选项 ===
+如果表格的一行只有标签而没有数据，那么该行将不会显示。这样可以方便编者创建选填内容的行。要让某行成为可选项，只需填写一个默认为空字段的参数即可：
+
+<pre>
+|label5 = 人口
+|data5  = {{{population|}}}
+</pre>
+
+这样的话，如果在条目中不定义“population”参数，则信息框的那一行不会被显示。
+
+如果表格的一行填写的是预设格式内容（即除了参数外，还有其他内容），而又希望让该行成为可选项的话，你可以通过“#if”语句实现。当参数为空时，令所有的内容均不被呈现。譬如，在下面的例子里，“#if”会判断参数“mass”是否不为空，若不为空则显示它，并跟上“-{A|zh-hans:千克; zh-hant:公斤;}-”的后缀：
+
+<pre>
+|label6 = 质量
+|data6  = {{#if:{{{mass|}}} |{{{mass}}}千克}}
+</pre>
+
+更多关于#if的用法，参见[[Help:模板扩展语法#if|此处]]。
+
+如果你希望顶栏只在其下方的某个或多个数据单元有内容时才显示，以下的例子可以指导你如何实现：
+
+<pre style="overflow:auto;">
+{{Infobox
+|name        = {{subst:PAGENAME}}
+|title       = 可选顶栏的用例
+|autoheaders = y
+|header1     = 可选顶栏
+|label2      = 项目一
+|data2       = {{{item_one|}}}
+|label3      = 项目二
+|data3       = {{{item_two|}}}
+|label4      = 项目三
+|data4       = {{{item_three|}}}
+}}
+</pre>
+
+这样，只有在参数“item_one”、“item_two”或“item_three”其中之一被填写时，“header1”才会被显示。如果上述三个参数均未被定义，则顶栏不会显示。
+
+过去在实现这一功能时，需嵌套冗长的“#if”语法，现在只需设置{{para|autoheaders|y}}即可。
+
+=== 用例 ===
+{|style="border: 0px; width: 100%;"
+|-
+|{{Template Pre
+|br = <td style="vertical-align: top;">
+|demo_kill_categories =yes
+|<nowiki>{{Infobox
+|name         = Infobox
+|bodystyle    = 
+|title        = 测试信息框
+|titlestyle   = 
+|image        = [[File:example.png|200px]]
+|imagestyle   = 
+|caption      = Caption for example.png
+|captionstyle = 
+|headerstyle  = background:#ccf;
+|labelstyle   = background:#ddf;
+|datastyle    = 
+
+|header1 = 独自定义的顶栏
+|label1  = 
+|data1   = 
+|header2 = 
+|label2  = 独自定义的标签
+|data2   = 
+|header3 =
+|label3  = 
+|data3   = 独自定义的数据
+|header4 = 三项均有定义（顶栏）
+|label4  = 三项均有定义（标签）——错误：因为有设顶栏而不会显示出来
+|data4   = 三项均有定义（数据）——错误：因为有设顶栏而不会显示出来
+|header5 =
+|label5  = 标签和数据有定义（标签）
+|data5   = 标签和数据有定义（数据）
+
+|belowstyle = background:#ddf;
+|below = 下方文本
+}}</nowiki>}}
+|}
+注意到，当标签脱离数据单元单独定义时，所定义的那一行并未出现在信息框内；而当顶栏与标签、数据定义在同一栏时，顶栏将会优先显示。
+
+{{clear}}
+在下面的例子中，定义了“<code>{{nowrap|bodystyle {{=}} width:20em;}}</code>”和“<code>{{nowrap|labelstyle {{=}} width:33%;}}</code>”。
+
+{{Infobox
+|bodystyle    = width:20em;
+|name         = Infobox
+|title        = 测试信息框
+|titlestyle   = 
+|headerstyle  = 
+|labelstyle   = width:33%;
+|datastyle    = 
+
+|header1 = 
+|label1  = 标签1
+|data1   = 数据1
+|header2 = 
+|label2  = 标签2
+|data2   = 数据2
+|header3 = 
+|label3  = 标签3
+|data3   = 数据3
+|header4 = 顶栏4
+|label4  = 
+|data4   = 
+|header5 = 
+|label5  = 标签5
+|data5   = 数据5：叽里呱啦稀里哗啦。
+
+|belowstyle = 
+|below = 下方文本
+}}
+
+{{clear}}
+
+=== 完整模板 ===
+
+（备注：本模板目前最多可以同时处理80行表格，一般的信息框模板只会用到前20行的参数，因此此处省略了后60行的参数。需使用时可依此类推。微格式“class”参数亦被省略，因其不常被用到，使用时请自行添加。）
+
+<pre style="overflow:auto;">
+{{Infobox
+| name               = {{subst:PAGENAME}}
+| child              = {{{child|}}}
+| subbox             = {{{subbox|}}}
+| italic title       = {{{italic title|no}}}
+| bodystyle          = 
+| titlestyle         = 
+| abovestyle         = 
+| subheaderstyle     = 
+| title              = 
+| above              = 
+| subheader          = 
+| imagestyle         = 
+| captionstyle       = 
+| image              = 
+| caption            = 
+| image2             = 
+| caption2           = 
+| headerstyle        = 
+| labelstyle         = 
+| datastyle          = 
+| header1            = 
+| label1             = 
+| data1              = 
+| header2            = 
+| label2             = 
+| data2              = 
+| header3            = 
+| label3             = 
+| data3              = 
+| header4            = 
+| label4             = 
+| data4              = 
+| header5            = 
+| label5             = 
+| data5              = 
+| header6            = 
+| label6             = 
+| data6              = 
+| header7            = 
+| label7             = 
+| data7              = 
+| header8            = 
+| label8             = 
+| data8              = 
+| header9            = 
+| label9             = 
+| data9              = 
+| header10           = 
+| label10            = 
+| data10             = 
+| belowstyle         = 
+| below              = 
+}}
+</pre>
+
+=== 参见 ===
+* [[Special:前缀索引/Template:Infobox|所有以Template:Infobox为前缀的页面]]
+
+<includeonly>
+{{#ifeq:{{SUBPAGENAME}}|sandbox | |
+[[Category:信息框模板|*]]
+}}
+</includeonly>

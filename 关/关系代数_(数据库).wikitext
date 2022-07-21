@@ -1,0 +1,477 @@
+:''这里的关系代数不同于[[奥古斯都·德·摩根|奥古斯都·德·摩根]]在1860年为[[代数逻辑|代数逻辑]]提供的[[关系代数_(抽象代数)|关系代数]]''
+
+'''关系代数'''是[[一阶逻辑|一阶逻辑]]的分支，是[[闭包_(数学)|闭合]]于[[运算|运算]]下的[[数学关系|关系]]的集合。运算作用于一个或多个关系上来生成一个关系。关系代数是[[计算机科学|计算机科学]]的一部分。
+
+在纯数学中的[[关系代数_(抽象代数)|关系代数]]是有关于[[数理逻辑|数理逻辑]]和[[集合论|集合论]]的[[代数结构|代数结构]]。
+
+{{TOCright}}
+== 介绍 ==
+关系代数在1970年[[Edgar_F._Codd|E.F. Codd]]发表[[关系模型|数据的关系模型]]之前很少受到注意。Codd曾是[[查尔斯·桑德斯·皮尔士|皮尔士]]选集编辑者[[Arthur_W._Burks|Arthur W. Burks]]的博士研究生。Codd提议这样一种代数作为数据库查询语言的基础。第一个基于Codd的代数的查询语言是[[ISBL|ISBL]]，許多作者都認同這個先驱的工作展示了一個使Codd的想法成为有用语言的方式。[[商务系统12|商务系统12]]是追随ISBL先例的短命工业级实力的关系DBMS。在1998年[[Christopher_J._Date|Chris Date]]和[[Hugh_Darwen|Hugh Darwen]]提议了一种叫'''Tutorial D'''的语言，意图用于教学关系数据库理论，它的查询语言也吸取了ISBL的想法。[[Rel_(DBMS)|Rel]]是'''Tutorial D'''的一个实现。即使[[SQL|SQL]]的查询语言也松散的基于了关系代数，尽管SQL中的操作数（表）不完全是关系，很多有用的关于关系代数的理论在SQL对应者中不成立。
+
+因为关系被解释为某个谓词的[[外延|外延]]，关系代数的每个运算在[[一阶逻辑|谓词演算]]中都有对应者。例如，自然连接是逻辑AND（<math>\land</math>）的对应者。如果关系''R''和''S''分别表示谓词''p1''和''p2''的外延，则''R''和''S''的自然连接（''R'' <math>\bowtie</math> ''S''）是表示谓词''p1'' <math>\land</math> ''p2''的外延的关系。
+
+认识到Codd的代数事实上关于[[一阶逻辑|一阶逻辑]]不完备是很重要的。实现它会引起不可逾越的特定计算困难。为了克服这些困难，他限制操作数为有限关系，并提议了对否定（NOT）和析取（OR）的有限支持。类似的限制在很多其他基于逻辑的计算机语言中也能见到。Codd定义术语'''关系完备性'''来称呼一个语言除了他提议的限制之外关于[[一阶逻辑|一阶逻辑]]是完备的。在实践中这些限制对他的关系代数用于数据库用途的适用性没有不利作用。
+
+== 原始运算 ==
+如同任何代数，一些运算是原始的，而可以通过原始运算来定义的另一些运算是导出的。尽管逻辑中的AND, OR和NOT的选取，某种程度上是任意性的是众所周知的，Codd对他的代数作了类似的任意选取。
+
+Codd的代数的六个原始运算是“[[选择_(关系代数)|选择]]”、“[[投影_(关系代数)|投影]]”、[[笛卡尔积|笛卡尔积]]（也叫做“叉积”或“交叉连接”）、[[并集|并集]]、[[差集|差集]]和“[[重命名_(关系代数)|重命名]]”。（实际上，Codd忽略了重命名，而ISBL的发明者显式地包括了它）。这六个运算在省略其中任何一个都要损失表达能力的意义上是基本的。已经依据这六个原始运算定义了很多其他运算。其中最重要的是[[交集|交集]]、除法和自然连接。事实上ISBL显著的用自然连接替代了笛卡尔积，它是笛卡尔积的退化情况。
+
+总之，关系代数的运算有与[[域关系演算|域关系演算]]或[[元组关系演算|元组关系演算]]同样的表达能力。但是出于前面介绍中给出的原因，关系代数有严格弱于没有函数符号的[[一阶谓词演算|一阶谓词演算]]的表达能力。关系代数实际上对应于[[一阶逻辑|一阶逻辑]]的子集，即没有递归和否定的[[Horn子句|Horn子句]]。
+
+=== 集合运算 ===
+
+尽管六个基本运算中有三个取自[[集合论|集合论]]，在它们的关系[[代数|代数]]对应者中存在额外的约束：对于[[并集|并集]]和[[差集|差集]]，涉及到的两个关系必须是“并集相容”的—就是说，两个关系必须有同样的[[属性集合|属性集合]]。因为[[交集|交集]]可以用[[差集|差集]]来定义，交集所涉及的两个关系也必须是并集相容的。
+
+笛卡尔积定义得与[[集合|集合]]论有所不同，这里的元组是平坦的、无子元组的。就是说，不同于集合论，那里的''n''元组和''m''元组的笛卡尔积是2元组，而关系代数中它们的笛卡尔积把这个2元组展平为''n''+''m''元组。更形式的说，''R'' × ''S''被定义为：
+:''R'' <math>\times</math> ''S'' = {''r'' <math>\cup</math> ''s''| ''r'' <math>\in</math> ''R'', ''s'' <math>\in</math> ''S''}
+此外，对于要定义的笛卡尔积，涉及的两个关系必须有不相交[[表头|表头]]—就是说，它们一定不能有公共[[属性名字|属性名字]]。
+
+===投影 (π)===
+
+{{main|投影 (关系代数)}}
+'''投影'''是写为<math>\pi_{a_1, ...,a_n}( R )</math>的[[一元运算|一元运算]]，这里的<math>a_1,...,a_n</math>是[[属性|属性]]名字的集合。这种投影的结果定义为当所有在<math>R</math>中的[[元组|元组]]被限制为集合<math>\{a_1,...,a_n\}</math>的时候所获得的[[集合|集合]]。
+
+===选择 (σ)===
+
+{{main|选择 (关系代数)}}
+'''广义选择'''是写为<math>\sigma_\varphi(R)</math>的[[一元运算|一元运算]]，这里的<math>\varphi</math>是由[[选择_(关系代数)|正常选择]]中所允许的[[原子句子|原子]]和逻辑算子<math>\land</math>（[[逻辑合取|与]]）、<math>\lor</math>([[逻辑析取|或]])和<math>\lnot</math>（[[否定|非]]）构成的[[命题逻辑|命题]]公式。这种选择选出<math>R</math>中使<math>\varphi</math>成立的所有[[元组|元组]]。
+
+===重命名 (ρ)===
+
+{{main|重命名 (关系代数)}}
+'''重命名'''是写为<math>\rho_{a / b}(R)</math>的[[一元运算|一元运算]]，这里的结果同一于<math>R</math>，除了在所有元组中的<math>b</math>字段被重命名为<math>a</math>字段之外。它被简单的用来重命名关系的属性或关系自身。
+
+==连接和类似连接的运算==
+
+
+=== 自然连接 (⋈) ===
+
+自然连接是写为 (''R'' ⋈ ''S'')的[[二元关系|二元运算]]，这里的''R''和''S''是关系。<ref>在[[Unicode|Unicode]]中，自然连接符号是⋈（U+22C8），在[[Latex|Latex]]中用\bowtie表示。</ref>自然连接的结果是在''R''和''S''中的在它们的公共属性名字上相等的所有元组的组合。例如下面是表格“雇员”和“部门”和它们的自然连接：
+
+{| style="margin: 0 auto;" cellpadding="20"
+|- valign="top"
+|
+{| class="wikitable"
+ |+           雇员
+ |-
+ ! Name   !! EmpId !! DeptName
+ |-
+ | Harry  || 3415  || 财务
+ |-
+ | Sally  || 2241  || 销售
+ |-
+ | George || 3401  || 财务
+ |-
+ | Harriet || 2202 || 销售
+|}
+||
+{| class="wikitable"
+ |+           部门
+ |-
+ ! DeptName   !! Manager
+ |-
+ | 财务  || George
+ |-
+ | 销售  || Harriet
+ |-
+ | 生产 || Charles
+|}
+||
+{| class="wikitable"
+ |+  雇员⋈部门
+ |-
+ ! Name   !! EmpId !!  DeptName   !! Manager
+ |-
+ | Harry  || 3415   || 财务  || George
+ |-
+ | Sally  || 2241   || 销售  || Harriet
+ |-
+ | George || 3401  || 财务 || George
+ |-
+ | Harriet || 2202 || 销售 || Harriet
+|}
+|}
+
+连接是[[关系复合|关系复合]]的另一种术语；在[[范畴论|范畴论]]中连接精确的是[[纤维积|纤维积]]。
+
+自然连接被确证为最重要的算法之一，因为它的逻辑AND的关系对应者。仔细注意如果同一个变量在用AND连结的两个谓词中出现，则这个变量表示相同的事物而两个出现必须总是由同一个值来代换。特别是，自然连接允许组合有[[外键|外键]]关联的关系。例如，在上述例子中，外键成立于从''雇员''.''DeptName''到''部门''.''DeptName''，''雇员''和''部门''的自然连接组合了所有雇员和它们的部门。注意这能工作因为外键在相同名字的属性之间保持。如果不是这样，外键成立于从''部门''.''manager''到''Emp''.''emp-number''，则我们必须在采用自然连接之前必须重命名这些列。这种自然连接有时叫做'''相等连接'''（参见θ-连接）。
+
+更形式的说，自然连接的语义定义为：
+
+: ''R'' <math>\bowtie</math>''S'' = { ''t'' <math>\cup</math> ''s'' : ''t'' <math>\in</math> ''R'', ''s'' <math>\in</math> ''S'', fun (''t'' <math>\cup</math> ''s'') }
+这里的fun(''r'')是对于[[二元关系|二元关系]]''r''为[[真理|真]]的[[泛函谓词|谓词]]，[[当且仅当|当且仅当]]''r''是函数二元关系。通常要求''R''和''S''必须至少有一个公共属性，但是如果省略了这个约束则在那种特殊情况下自然连接就完全变成上面定义的笛卡尔积。
+
+自然连接可以用Codd的原始运算模拟如下。假定''b<sub>1</sub>,...,b<sub>m</sub>''是公共于''R''和''S''的公共属性名字，''a<sub>1</sub>,...,a<sub>n</sub>''是唯一于''R''的属性名字而''c<sub>1</sub>,...,c<sub>k</sub>''是唯一于''S''的属性名字。进一步假定属性名字  ''d<sub>1</sub>,...,d<sub>m</sub>''不在''R''
+和''S''二者中。第一步我们可以重命名''S''中的公共属性名字：: ''S' '':= ρ<sub>''d<sub>1</sub>''/''b<sub>1</sub>''</sub>(...ρ<sub>''d<sub>m</sub>''/''b<sub>m</sub>''</sub>(
+''S'')...)，接着我们采用笛卡尔积并选择要连接的元组：: ''T'' := σ<sub>''b<sub>1</sub>''=''d<sub>1</sub>''</sub>(...σ<sub>''b<sub>m</sub>''=''d<sub>m</sub>''</sub>(''R'' × ''S')...) ''，最后我们采用一个投影来去掉重命名的属性：: ''U'' := π<sub>''a<sub>1</sub>,...,a<sub>n</sub>,b<sub>1</sub>,...,b<sub>m</sub>,c<sub>1</sub>,...,c<sub>k</sub>''</sub>(''T'')
+。
+
+=== θ-连接和相等连接 ===
+
+考虑分别列出车模和船模的价格的表“车”和“船”。假设一个顾客要购买一个车模和一个船模，但不想为船花费比车更多的钱。在关系上的θ-连接''CarPrice'' ≥ ''BoatPrice''生成所有可能选项的一个表。
+
+{| style="margin: 0 auto;" cellpadding="20"
+|- valign="top"
+|
+{| class="wikitable"
+ |+           车
+ |-
+ ! CarModel   !! CarPrice
+ |-
+ | CarA  || 20'000
+ |-
+ | CarB  || 30'000
+ |-
+ | CarC  || 50'000
+|}
+||
+{| class="wikitable"
+ |+           船
+ |-
+ ! BoatModel   !! BoatPrice
+ |-
+ | Boat1  || 10'000
+ |-
+ | Boat2  || 40'000
+ |-
+ | Boat3  || 60'000
+|}
+||
+{| class="wikitable"
+ |+  车<math>\bowtie</math>船<math>\scriptstyle CarPrice \geq BoatPrice</math>
+ |-
+ ! CarModel  !! CarPrice !!  BoatModel !! BoatPrice
+ |-
+ | CarA  || 20'000   || Boat1 || 10'000
+ |-
+ | CarB  || 30'000   || Boat1 || 10'000
+ |-
+ | CarC  || 50'000   || Boat1 || 10'000
+ |-
+ | CarC  || 50'000   || Boat2 || 40'000
+|}
+|}
+
+如果我们要组合来自两个关系的元组，而组合条件不是简单的共享属性上的相等，则有一种更一般形式的连接算子才方便，这就是θ-连接（或theta-连接）。θ-连接是写为<math>\begin{matrix} R\ \bowtie\ S \\ a\ \theta\ b\end{matrix}</math>或<math>\begin{matrix} R\ \bowtie\ S \\ a\ \theta\ v\end{matrix}</math>的二元算子，这里的''a''和''b''是属性名字，θ是在集合{<, ≤, =, >, ≥}中的[[二元关系|二元关系]]，''v''是值常量，而''R''和''S''是关系。这个运算的结果由在''R''和''S''中满足关系θ的元素的所有组合构成。只有''S''和''R''的表头是不相交的，即不包含公共属性的情况下，θ-连接的结果才是有定义的。
+
+这个运算可以用基本运算模拟如下：
+: ''R'' <math>\bowtie</math><sub>θ</sub> ''S'' = σ<sub>θ</sub>(''R'' × ''S'')
+
+在算子θ是等号算子 (=)的时候这个连接也'''相等连接'''。
+
+但是要注意，支持自然连接和重命名的计算机语言可以不需要θ-连接，因为它可以通过对自然连接（在没有公共属性的时候的它退化为笛卡尔积）的选择来完成。
+
+=== 半连接 (⋉)(⋊) ===
+
+半连接是类似于自然连接的写为''R'' ⋉ ''S''的连接，这里的''R''和''S''是关系。<ref>在[[Unicode|Unicode]]中，半连接符号是⋉ (U+22C9)和⋊（U+22CA），前者在[[Latex|Latex]]中用\ltimes表示。</ref>半连接的结果只是在''S''中有在公共属性名字上相等的元组所有的''R''中的元组。例如下面的例子是“雇员”和“部门”和它们的半连接的表：
+
+{| style="margin: 0 auto;" cellpadding="20"
+|- valign="top"
+|
+{| class="wikitable"
+ |+           雇员
+ |-
+ ! Name   !! EmpId !! DeptName
+ |-
+ | Harry  || 3415  || 財務
+ |-
+ | Sally  || 2241  || 销售
+ |-
+ | George || 3401  || 财务
+ |-
+ | Harriet || 2202 || 生产
+|}
+||
+{| class="wikitable"
+ |+           部门
+ |-
+ ! DeptName   !! Manager
+ |-
+ | 销售  || Harriet
+ |-
+ | 生产 || Charles
+|}
+||
+{| class="wikitable"
+ |+  雇员⋉部门
+ |-
+ ! Name   !! EmpId !!  DeptName
+ |-
+ | Sally  || 2241   || 销售
+ |-
+ | Harriet || 2202 || 生产
+|}
+|}
+
+更形式的说半连接的语义定义如下：
+
+: ''R'' <math>\ltimes</math> ''S'' = { ''t'' : ''t'' <math>\in</math> ''R'', ''s'' <math>\in</math> ''S'', fun (''t'' <math>\cup</math> ''s'') }
+
+这里的fun(''r'')定义同于自然连接。
+
+半连接可以被使用自然连接模拟如下。假定''a<sub>1</sub>,...,a<sub>n</sub>''是''R''的属性名字，则：
+: ''R'' <math>\ltimes</math> ''S'' = <math>\Pi</math><sub>''a<sub>1</sub>'',..,''a<sub>n</sub>''</sub>（''R''<math>\bowtie</math>''S''）
+因为我们可以通过基本运算模拟自然连接因此也就可以模拟半连接。
+
+=== 反连接 (▷) ===
+
+反连接是类似于自然连接的写为''R'' ▷ ''S''的连接，这里的''R''和''S''是关系。<ref>在[[Unicode|Unicode]]中，反连接符号是▷（U+25B7），在[[Latex|Latex]]中用\triangleright表示。</ref>反连接的结果是在''S''中没有在公共属性名字上相等的元组的''R''中的那些元组。
+
+例如“雇员”和“部门”和它们的反连接的表：
+
+{| style="margin: 0 auto;" cellpadding="20"
+|- valign="top"
+|
+{| class="wikitable"
+ |+           雇员
+ |-
+ ! Name   !! EmpId !! DeptName
+ |-
+ | Harry  || 3415  || 财务
+ |-
+ | Sally  || 2241  || 销售
+ |-
+ | George || 3401  || 财务
+ |-
+ | Harriet || 2202 || 生产
+|}
+||
+{| class="wikitable"
+ |+           部门
+ |-
+ ! DeptName   !! Manager
+ |-
+ | 销售  || Harriet
+ |-
+ | 生产 || Charles
+|}
+||
+{| class="wikitable"
+ |+  雇员▷部门
+ |-
+ ! Name   !! EmpId !!  DeptName
+ |-
+ | Harry  || 3415  || 财务
+ |-
+ | George || 3401  || 财务
+|}
+|}
+
+反连接形式定义为：
+
+: ''R'' <math>\triangleright</math> ''S'' = { ''t'' : ''t'' <math>\in</math> ''R'' <math>\land</math> <math>\neg\exists</math>''s'' <math>\in</math> ''S'' : fun (''t'' <math>\cup</math> ''s'') }
+
+或
+
+: ''R'' <math>\triangleright</math> ''S'' = { ''t'' : ''t'' <math>\in</math> ''R''，''S''中没有''s''满足fun (''t'' <math>\cup</math> ''s'') }
+
+这里的fun(''r'')定义同于自然连接。
+
+反连接还可以定义为半连接的[[补集|补集]]：
+: ''R'' <math>\triangleright</math> ''S'' = ''R'' - ''R'' <math>\ltimes</math> ''S''
+为此反连接有时叫做反半连接，反连接算子有时写为其上有横杠的半连接符号。
+
+== 除法 (÷) ==
+
+除法是写为''R'' ÷ ''S''的二元关系。其结果由''R''中元组到唯一于''R''的属性名字（就是说只在''R''表头中而不在''S''表头中的属性）的限制构成，并且它们与''S''中的元组的所有组合都存在于''R''中。例如下面的“完成”和“DB项目”和它们的除法：
+
+{| style="margin: 0 auto;" cellpadding="20"
+|
+{| class="wikitable"
+ |+ 完成
+ |-
+ ! Student   !! Task
+ |-
+ | Fred  || Database1
+ |-
+ | Fred  || Database2
+ |-
+ | Fred || Compiler1
+ |-
+ | Eugene  || Database1
+ |-
+ | Eugene  || Compiler1
+ |-
+ | Sara  || Database1
+ |-
+ | Sara  || Database2
+|}
+||
+{| class="wikitable"
+ |+ DB项目
+ |-
+ ! Task
+ |-
+ | Database1
+ |-
+ | Database2
+|}
+||
+{| class="wikitable"
+ |+ 完成÷ DB项目
+ |-
+ ! Student
+ |-
+ | Fred
+ |-
+ | Sara
+|}
+|}
+
+如果“DB项目”包含数据库项目的所有任务，则这个除法的结果精确的包含已经完成了数据库项目的所有学生。
+
+更形式的说除法的语义定义如下：
+
+: ''R'' ÷ ''S'' = { ''t''[''a<sub>1</sub>,...,a<sub>n</sub>''] : t <math>\in</math> ''R'' <math>\wedge</math> <math>\forall</math>''s'' <math>\in</math> ''S'' ( (''t''[''a<sub>1</sub>,...,a<sub>n</sub>''] <math>\cup</math> ''s'') <math>\in</math> ''R'') }
+
+这里的{''a<sub>1</sub>,...,a<sub>n</sub>''}是唯一于''R''的属性名字的集合而''t''[''a<sub>1</sub>,...,a<sub>n</sub>'']是''t''到这个集合的限制。通常要求在''S''的表头中的属性名字是''R''的表头的属性名字的子集，否则运算的结果永远为空。
+
+除法可以用基本运算模拟如下。我们假定''a<sub>1</sub>,...,a<sub>n</sub>''是唯一于''R''的属性名字而
+''b<sub>1</sub>,...,b<sub>m</sub>''是''S''的属性名字。在第一步中我们投影''R''于它的唯一属性上，并接着构造它们与''S''的元组的所有组合：
+: ''T'' := π<sub>''a<sub>1</sub>,...,a<sub>n</sub>''</sub>(''R'') × ''S''
+
+在上面例子中，T将是表示所有学生（因为Student是“完成”表的唯一键/属性）与所有给定任务的组合的表。所以Eugene在T中将有两行Eugene -> Database1和Eugene -> Database2。
+
+在下个步骤中，我们从这个关系中减去''R'':
+: ''U'' := ''T'' - ''R''
+注意在''U''的都是''R''中没有出现的可能的组合。所以如果现在做到唯一于''R''
+的属性名字的投影，则我们有了''R''中元组的限制，它们与''S''的元组的所有组合都未出现在''R''中：
+: ''V'' := π<sub>''a<sub>1</sub>,...,a<sub>n</sub>''</sub>(''U'')
+剩下的就是投影''R''到唯一于它的属性名字并减去''V'':
+: ''W'' := π<sub>''a<sub>1</sub>,...,a<sub>n</sub>''</sub>(''R'') - ''V''
+
+== 外连接 ==
+{{main|外连接}}
+尽管连接（或内连接）的结果是由组合两个操作数的匹配元组而形成的元组组成，外连接由这些元组加上通过向一个操作数的未匹配元组扩展上另一个操作数的每个属性的“填充”值而形成的元组组成。
+
+本节定义的运算假定“空”值''ω''的存在性，我们不定义它并把它用做填充值。不应当假定它为数据库语言[[SQL|SQL]]所定义的[[NULL|NULL]]，也不应该假定''ω''为一个标号而非一个值，也不应该假定它介入了有争议的[[三值逻辑|三值逻辑]]。
+
+定义三个外连接：左外连接、右外连接和全外连接。（有时省略“外”字）
+
+=== 左外连接 (⟕) ===
+左外连接写成''R'' ⟕ ''S''，其中''R''与''S''为关系。<ref>在[[Unicode|Unicode]]中，左外连接符号是⟕ (U+27D5)</ref>左外连接的结果包含''R''中所有元组，对每个元组，若在''S''中有在公共属性名字上相等的元组，则正常连接，若在''S''中没有在公共属性名字上相等的元组，则依旧保留此元组，并将对应其他列设为NULL。
+
+:<math>(R \bowtie S) \cup ((R - \pi_{r_1, r_2, \dots, r_n}(R \bowtie S)) \times \{(\omega, \dots \omega)\})</math>
+
+=== 右外连接 (⟖) ===
+右外连接写成''R'' ⟖ ''S''，其中''R''与''S''为关系。<ref>在[[Unicode|Unicode]]中，右外连接符号是⟖ (U+27D6)</ref>右外连接的结果包含''S''中所有元组，对每个元组，若在''R''中有在公共属性名字上相等的元组，则正常连接，若在''R''中没有在公共属性名字上相等的元组，则依旧保留此元组，并将对应其他列设为NULL。
+
+:<math>(R \bowtie S) \cup ((S - \pi_{s_1, s_2, \dots, s_n}(R \bowtie S)) \times \{(\omega, \dots, \omega)\})</math>
+
+=== 全外连接 (⟗) ===
+全外连接写成''R'' ⟗ ''S''，其中''R''与''S''为关系。<ref>在[[Unicode|Unicode]]中，全外连接符号是⟗ (U+27D7)</ref>全外连接的结果包含''R''与''S''中所有元组，对每个元组，若在另一关系上中有在公共属性名字上相等的元组，则正常连接，若在另一关系上中没有在公共属性名字上相等的元组，则依旧保留此元组，并将对应其他列设为NULL。
+
+:''R'' ⟗ ''S'' = (''R'' ⟕ ''S'') ∪ (''R'' ⟖ ''S'')
+
+== 域计算的运算 ==
+=== 聚集运算 ===
+
+多数数据库包括五个[[聚集函数|聚集函数]]。这些运算是Sum、Count、Average、Maximum和Minimum。在关系代数中被写为<sub>Exp1,Exp2,Exp3...</sub>G<sub>func1,func2,func3...</sub>（关系）。必须指定要用的函数，而表达式是可选的。假定有一个叫Account的表有两列，分别是Branch_Name和Balance，并希望找到有最高结余的分部的名字，我们可以写<sub>Branch_Name</sub>G<sub>Max(Balance)</sub>（Account）。要找到最高余额我们可以简单的写G<sub>Max(Balance)</sub>（Account）。
+
+== 关系代数的限制 ==
+
+尽管关系代数对于大多数用途都足够强大了，有一些在关系上的简单而自然的运算不能用关系代数表达。二元关系的[[传递闭包|传递闭包]]就是其中之一。给定一个域''D''，设二元关系''R''是''D''x''D''的子集。''R''的传递闭包''R<sup>+</sup>''是包含''R''的满足如下条件的''D''x''D''的子集：
+
+:<math>\forall</math>x <math>\forall</math>y <math>\exist</math>z((x,y) <math>\in</math> R<sup></sup> <math>\wedge</math> (y,z) <math>\in</math> R<sup></sup> <math>\Rightarrow</math>  (x,z) <math>\in</math> R<sup></sup>)
+
+可以证明没有关系代数表达式''E''(''R'')接受''R''作为变量参数而生成''R''<sup>+</sup>。证明基于如下事实，给定一个关系表达式''E''，对它声称''E''(''R'') = ''R''<sup>+</sup>，这里的''R''是变量，我们总是可以找到''R''的一个实例'''''r'''''(和一个对应的域'''d''')使得''E''('''''r''''') ≠ '''''r'''''<sup>+</sup>。<ref> {{cite journal|title=Universality of data retrieval languages|journal=Proceedings of the 6th ACM SIGACT-SIGPLAN symposium on Principles of programming languages|date=1979|first=Alfred V.|last=Aho|coauthors=Jeffrey D. Ullman|volume=|issue=|pages=110-119|id= |url=http://portal.acm.org/citation.cfm?id=567763&coll=GUIDE&dl=ACM&CFID=26858249&CFTOKEN=38966071|format=|accessdate=}}</ref>
+
+== 有用于查询优化的代数性质 ==
+
+查询可以表示为一个树，这里的
+* 内部节点是算子，
+* 叶子是关系，
+* 子树是子表达式
+
+主要目标是把表达式树变换成等价的表达式树，使得在树中的子表达式生成的关系的平均大小比优化前更小。次要目标是在一个单一查询中，或在要同时求值多于一个查询的时候的所有这些查询中，尝试形成公共子表达式。在次要目标背后的原理是计算公共子表达式一次就够了，其结果可以用于包含这个子表达式的所有查询中。
+
+我们提出可用于这种变换的一组规则。
+
+=== 选择 ===
+关于选择运算的规则在查询优化中扮演了最重要的角色。选择是可非常有效的减少在它的操作数中的行数的运算，所以如果我们设法把在表达式树中选择向着叶子方向移动，（子表达式产生的）内部关系的大小将被缩小。
+==== 基本选择性质 ====
+选择是[[幂等律|幂等性]]的（多次应用同一个选择有同样效果），和[[交换律|交换性]]的（应用选择的次序在最终结果中没有影响）。
+
+#<math>\sigma_{A}(R)=\sigma_{A}\sigma_{A}(R)\,\!</math>
+#<math>\sigma_{A}\sigma_{B}(R)=\sigma_{B}\sigma_{A}(R)\,\!</math>
+
+==== 分解有复杂条件的选择 ====
+
+其条件是更简单条件的[[逻辑合取|合取]]的选择等价于针对这些单独条件的一序列选择，而其条件是[[逻辑析取|析取]]的选择等价于选择的并集。可以使用这些恒等式来合并多个选择为更少的需要求值的选择，或分解它们使得其成员选择可以被移动或单独优化。
+
+#<math>\sigma_{A \land B}(R)=\sigma_{A}(\sigma_{B}(R))=\sigma_{B}(\sigma_{A}(R))</math>
+#<math>\sigma_{A \lor B}(R)=\sigma_{A}(R)\cup\sigma_{B}(R)</math>
+
+==== 选择和叉积 ====
+
+叉积对于计算是最耗费的算子。如果输入关系有<math>N</math>和<math>M</math>行，结果将包含<math>NM</math>行。所以在应用叉积算子之前尽最大可能减少两个操作数的大小是非常重要的。
+
+这可以有效的完成，如果叉积跟随着选择算子，比如<math>\sigma_{A}</math>(<math>R</math> × <math>P</math>)。这是最合适考虑连接定义的情况。如果叉积不跟随着选择运算，我们可以尝试使用其他规则从表达式树更高层压下一个选择。
+
+在上节情况下我们使用对复杂条件的分解规则把条件<math>A</math>分解为条件<math>B</math>、<math>C</math>和<math>D</math>，使得<math>A</math> = <math>B</math> <math>\wedge</math> <math>C</math> <math>\wedge</math> <math>D</math>，而<math>B</math>只包含来自<math>R</math>的属性，<math>C</math>只包含来自<math>P</math>的属性，<math>D</math>包含<math>A</math>的包含来自<math>R</math>和<math>P</math>二者的属性的那些部分。注意<math>B</math>、<math>C</math>或<math>D</math>可能为空，则下列规则成立：
+:<math>\sigma_{A}(R \times P) = \sigma_{B \wedge C \wedge D}(R \times P) = \sigma_{D}(\sigma_{B}(R) \times \sigma_{C}(P))</math>
+
+==== 选择和集合运算 ====
+
+选择在差集、交集和并集算子上是[[分配律|分配性]]的。使用下列三个规则在表达式树中把压入下面的集合运算中。注意，在差集和交集算子的情况下有可能在变换之后只把选择算子应用于某一个操作数。在如下情况下这是有意义的，操作数之一很小，而计算选择的花费超过了使用更小关系作为操作数的利益。
+
+#<math>\sigma_{A}(R\setminus P)=\sigma_{A}(R)\setminus \sigma_{A}(P) =\sigma_{A}(R)\setminus P</math>
+#<math>\sigma_{A}(R\cup P)=\sigma_{A}(R)\cup\sigma_{A}(P)</math>
+#<math>\sigma_{A}(R\cap P)=\sigma_{A}(R)\cap\sigma_{A}(P)=\sigma_{A}(R)\cap P=R\cap \sigma_{A}(P)</math>
+
+====选择和投影====
+
+选择与投影是交换性的，当且仅当在选择条件中引用的字段是在投影中的字段的子集。在投影之前进行选择可能有用，如果操作数是叉积或连接。在其他情况下，如果选择条件计算相对破费，把选择从投影中移动出来可能减少要测试的元组的数目（因为投影可能产生更少的元组，因为它清除由于取消字段导致的重复元组）。
+
+:<math>\pi_{a_1, ...,a_n}(\sigma_A( R )) = \sigma_A(\pi_{a_1, ...,a_n}( R ))</math>这里的<math>A \, </math>中的字段<math>\subseteq \{a_1,...,a_n\}</math>
+
+===投影===
+====基本投影性质====
+
+投影是幂等性的，所以一系列（有效）投影等价于最外投影。
+
+:<math>\pi_{a_1, ..., a_n}(\pi_{b_1, ..., b_m}(R)) = \pi_{a_1, ..., a_n}(R)</math>这里的<math> \{a_1, ..., a_n\} \subseteq \{b_1, ..., b_m\}</math>
+
+====投影和集合运算====
+
+投影在并集上是[[分配律|分配性]]的。
+
+#<math>\pi_{a_1, ..., a_n}(R \cup P) = \pi_{a_1, ..., a_n}(R) \cup \pi_{a_1, ..., a_n}(P)</math>
+
+===重命名===
+
+====基本重命名性质====
+对一个变量的连续的重命名可以缩减为一个单一的重命名。没有公共变量的重命名运算可以任意相互重新排序，这可以导致能缩减的重命名毗连起来。
+
+#<math>\rho_{a / b}(\rho_{b / c}(R)) = \rho_{a / c}(R)\,\!</math>
+#<math>\rho_{a / b}(\rho_{c / d}(R)) = \rho_{c / d}(\rho_{a / b}(R))\,\!</math>
+
+====重命名和集合运算====
+重命名关于差集、并集和交集是分配性的。
+
+#<math>\rho_{a / b}(R \setminus P) = \rho_{a / b}(R) \setminus \rho_{a / b}(P)</math>
+#<math>\rho_{a / b}(R \cup P) = \rho_{a / b}(R) \cup \rho_{a / b}(P)</math>
+#<math>\rho_{a / b}(R \cap P) = \rho_{a / b}(R) \cap \rho_{a / b}(P)</math>
+
+==引用==
+<div class='references-small'>
+<references/>
+</div>
+
+==外部链接==
+*[http://leap.sourceforge.net LEAP - An implementation of the relational algebra] {{Wayback|url=http://leap.sourceforge.net/ |date=20201109033121 }}
+*[https://web.archive.org/web/20080518005204/http://www-db.stanford.edu/~widom/cs346/ioannidis.pdf Query Optimization] This paper is an excellent introduction into the use of the relational algebra in optimizing queries, and includes numerous citations for more in-depth study.
+
+==参见==
+<div style="-moz-column-count:3; column-count:3;">
+*[[数据库|数据库]]
+*[[关系模型|关系模型]]
+</div>
+
+{{-}}
+{{Databases}}
+
+[[Category:关系代数|]]
+[[Category:数据建模|G]]
+[[Category:代数逻辑|G]]

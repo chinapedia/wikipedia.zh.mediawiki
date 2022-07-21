@@ -1,0 +1,75 @@
+{{noteTA|G1=IT}}
+{{about|NTFS符号链接|UNIX符号链接|符号链接}}
+'''NTFS符号链接'''（Symbolic Link），又稱'''-{zh-cn:符号连结;zh-tw:符號鏈接}-'''<ref name=cht>Windows Vista繁體中文版內所使用的名稱。</ref>，是[[NTFS|NTFS]][[文件系统|文件系统]]中指向文件系统中的另一个对象的一类对象。被指向的对象叫做“目标”。它们可以像普通文件或目录一样操作，但所有对符号链接的操作都实际作用于目标对象。[[符号链接|符号链接]]对用户而言是透明的，符号链接看上去和普通的文件和文件夹没有区别，操作方法也一模一样。NTFS符号链接的设计目的是为了和[[POSIX|POSIX]]标准的[[操作系统|操作系统]]兼容、並用來增進與舊版作業系統的相容性，它首次出现于[[Windows_Vista|Windows Vista]]。
+
+[[NTFS|NTFS]][[文件系统|文件系统]]定义了三种方法实现“链接”：
+* '''[[硬链接|硬链接]]'''（Hard link）：多个文件平等地共享同一个MFT条目（[[inode|inode]]）；必须在同一个文件系统中。只能用于文件，不能用于目录。删除一个文件名字后，还可以用其它名字访问该文件。硬链接只能用于同一个磁盘分区内的文件。不能用于不存在的文件。
+* '''符号链接'''（Symbolic Link）：顾名思义，记录到目标对象（文件或目录）的路径。可以接受相对路径、远程[[服务器消息区块|SMB]]网络路径。从NTFS 3.1开始支持目录的符号链接。允许跨文件系统使用，但是对于跨主机的符号链接，还需要远程机器也支持这一功能才行。目标对象可为不存在的文件或目录。
+* '''{{link-en|NTFS连接点|NTFS junction point}}'''（NTFS junction point）<ref>Junction Point在Windows繁體中文版內使用'''連接點'''的名稱。</ref>：类似于符号链接，但支持目录。只支持本地绝对路径。<ref name="junction">Quote: "Note that Windows does not support junctions to directories on remote shares."  [https://technet.microsoft.com/en-us/sysinternals/bb896768 Sysinternals Junction documentation] {{Wayback|url=https://technet.microsoft.com/en-us/sysinternals/bb896768 |date=20170710172844 }}</ref>[[Windows_2000|Windows 2000]]开始支持[https://msdn.microsoft.com/en-us/library/windows/desktop/aa365006(v=vs.85).aspx]{{Wayback|url=https://msdn.microsoft.com/en-us/library/windows/desktop/aa365006(v=vs.85).aspx |date=20180619181640 }}。
+==命令及其参数==
+在NT6内核的操作系统，例如[[Windows_Vista|Windows Vista]]或[[Windows_7|Windows 7]]中，符号链接可以由命令<code>mklink</code>创建，mklink是<code>cmd.exe</code>的内部命令，语法如下<ref>{{Cite web |url=http://technet.microsoft.com/en-us/library/cc753194(WS.10).aspx |title=mklink on a technet.microsoft.com |accessdate=2010-07-07 |archive-date=2010-07-22 |archive-url=https://web.archive.org/web/20100722003939/http://technet.microsoft.com/en-us/library/cc753194(WS.10).aspx |dead-url=no }}</ref>：
+
+<syntaxhighlight lang="text">
+mklink [[NTFS符号链接/D]|[/H]]] link target
+</syntaxhighlight>
+
+* <code>/D</code>      –创建指向目录的符号链接，如果不指定此参数，默认为创建文件符号链接。
+* <code>/H</code>      –创建[[硬链接|硬链接]]（Hardlink），或稱[[永久連結|永久連結]]<ref name=cht>Windows Vista繁體中文版內所使用的名稱。</ref>。
+* <code>/J</code>      –创建{{link-en|NTFS连接点|NTFS junction point}}（Junction point）。
+* <code>link</code>    –指定符号链接的名字
+* <code>target</code>  –指定符号链接指向的对象的路径（相对或绝对皆可）。
+
+和普通文件一样，删除符号链接也可以使用<code>del</code>命令，具体语法如下：
+<syntaxhighlight lang="text">
+del filename
+</syntaxhighlight>
+* <code>filename</code> –要被删除的符号链接的名字
+
+和普通目錄（資料夾）一样，删除目錄符号链接也可以使用<code>rd</code>命令，具体语法如下：
+<syntaxhighlight lang="text">
+rd directoryname
+</syntaxhighlight>
+* <code>directoryname</code> –要被删除的符号链接的名字
+
+需要提升為管理員權限才能建立符號連結。
+
+复制链接的文件或目录时，使用<code>copy /L</code>或<code>xcopy /B</code>，可以复制这些符号链接，而不是复制文件或目录实体本身。
+==其他功能==
+
+符号链接可以指向不存在的对象，在创建符号链接时，系统并不会检查对象是否存在。<ref>{{Cite web |url=http://msdn.microsoft.com/en-us/library/aa365460(VS.85).aspx |title=存档副本 |accessdate=2010-07-07 |archive-date=2010-07-10 |archive-url=https://web.archive.org/web/20100710132308/http://msdn.microsoft.com/en-us/library/aa365460(VS.85).aspx |dead-url=no }}</ref>
+==限制==
+Windows 操作系統不支援在啟動時使用符號連結，因此不應重新導向以下目錄：
+*含有hiberfil.sys的目錄（設定為不在根目錄的時候）
+*\Windows
+*\Windows\system32
+*\Windows\system32\Config
+
+Windows Installer 對符號連結的支援不完整。如 \Windows\Installer 目錄被重新導向，將導致多數使用 .msi 的 Windows Installer 發生 2755 及/或 1632 錯誤。
+
+而下列目錄可以重新導向：
+*\Documents and Settings
+*\ProgramData
+*\Program Files
+*\Program Files (x86)
+*\Users
+
+但是不建議重新導向 \Users 及 \ProgramData，因為這樣做會影響 [[Windows_Update|Windows Update]] 及 [[通用Windows平台应用|Microsoft Store 應用程式]]的運作。<ref>{{Cite web|url = http://support.microsoft.com/kb/949977|title = Relocation of the Users directory and the ProgramData directory to a drive other than the drive that contains the Windows directory|date = |accessdate = |website = |publisher = |last = |first = |archive-date = 2015-02-10|archive-url = https://web.archive.org/web/20150210104157/http://support.microsoft.com/kb/949977|dead-url = no}}</ref>
+
+==內建符號連結的範例==
+Windows Vista中預先建立了一些符號連結（Junction point），以增進與舊版作業系統（Windows XP）間的相容性，部分範例如下：
+* C:\Document and Settings → C:\Users（連接點）
+* C:\Users\All Users → C:\ProgramData（目錄符號連結）
+
+==参考资料與附註==
+<references/>
+
+==外部链接==
+*[http://msdn2.microsoft.com/en-us/library/aa365680.aspx Documentation for NTFS symbolic links on MSDN]{{Wayback|url=http://msdn2.microsoft.com/en-us/library/aa365680.aspx |date=20081013074152 }}
+*[http://msdn2.microsoft.com/en-us/library/aa363866.aspx CreateSymbolicLink function in the Win32 API]{{Wayback|url=http://msdn2.microsoft.com/en-us/library/aa363866.aspx |date=20080408070652 }}
+*[http://schinagl.priv.at/nt/hardlinkshellext/hardlinkshellext.html Link Shell Extension]{{WebCite|url=https://www.webcitation.org/61BaQabun?url=http://schinagl.priv.at/nt/hardlinkshellext/hardlinkshellext.html |date=20110824211344 |dateformat=iso }}, which presents a graphical interface for creating [[hard_link|hard]] and symbolic links as well as directory junctions
+*[https://web.archive.org/web/20100716075342/http://homepage1.nifty.com/emk/symlink.html Symlink accessible driver for 2000/XP/2003]，
+*[http://technet.microsoft.com/zh-tw/library/cc754077(WS.10).aspx 符號連結（Microsoft Technet上的中文說明）]{{Wayback|url=http://technet.microsoft.com/zh-tw/library/cc754077(WS.10).aspx |date=20160311005245 }}
+
+{{Windows Components}}
+
+[[Category:文件系统|Category:文件系统]]

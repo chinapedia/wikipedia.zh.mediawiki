@@ -1,0 +1,71 @@
+{{NoteTA
+|G1=IT
+|G2=Signals and Systems
+|G3=Communication
+|1=zh-cn:模2加法器;zh-tw:二模數加法器;
+}}
+'''卷積碼'''（{{lang-en|'''convolution code'''}}）是[[頻道編碼|頻道編碼]]（channel coding）技術的一種，在[[電信|電信]]領域中，屬於一種錯誤更正碼（error-correcting code）。相對於[[分組碼|分組碼]]，卷積碼維持頻道的記憶效應（memory property）。卷積碼的由來，是因為輸入的原始訊息資料會和[[編碼器|編碼器]]（encoder）的[[脈衝響應|脈衝響應]]（impulse response）做卷積運算。卷積碼具有以下特性：
+*一段m字元的訊息(m字元的二進位元字串)會被編碼轉換成n字元的符號，m/n即是編碼率(code rate，n ≥ m)
+
+== 卷積碼的應用範圍 ==
+　為了達成資料傳輸，卷積碼被廣泛使用在許多儀器或技術上，比如[[數位視訊|數位視訊]]、廣播、手機通訊、衛星通訊傳輸。資訊通常透過'硬性决策方式'（hard-decision code）來解碼，例如[[里德-所羅門碼|里德-所羅門碼]]。在[[涡轮码|渦輪碼]] （turbo codes）出現之前，這種架構可以算是非常高效率的編碼。
+
+== 卷積碼編碼 ==
+原始訊息資料依序由輸入端（input）進入編碼器的[[暫存器|暫存器]](register，圖內簡稱reg.)，每一個暫存器會儲存一個輸入字元，而它們的起始值都是0。依圖一而言，編碼器內有3個二模數加法器(modulo-2 adder，可等價於一個[[异或门|异或门]]（Boolean XOR gate），運算方式是0+0 = 0, 0+1 = 1, 1+0 = 1, 1+1 = 0)對儲存的3位元原始資料，做各自的加法運算。接著，[[暫存器|暫存器]]（register）內的字元會移往下一格，(reg1 moves to reg2, reg2 moves to reg3)；然後繼續將信息傳至輸出端（output），如此便可以得到要傳輸的內容。
+::<math>output 1 = reg. 1 + reg. 3\,</math>
+::<math>output 2 = reg. 1 + reg. 2 + reg. 3\,</math>
+運算後，輸出端（output）則輸出編碼後的卷積碼資料。
+
+[[File:Convolutional_encoder.png|300px]]
+
+由於原始訊息資料是依序輸入至編碼器，所以3個[[暫存器|暫存器]]（register）儲存的資料是不同時間點的輸入值；reg. 1 儲存目前訊息資料，reg. 2儲存前一週期的資料，reg. 3則是前前一週期的資料。因此，每筆卷積碼資料皆與過去的訊息資料有關係，因而保有記憶效應（memory property）。
+
+G1 = (1,0,1), G2 = (1,1,1), 總輸出數量是2個，有3個[[暫存器|暫存器]]（register）。
+
+== 遞迴以及非遞迴編碼 ==
+圖一是一個非遞迴編碼（non-recursive code）的類型，而圖二我們提供了一個遞迴編碼（recursive code）再處理的類型，其即將被進行編碼的輸入訊號同時也是輸出訊號(參見output 2)；此外，遞迴編碼幾乎都是系統性的（systematic），反之非遞迴編碼則是非系統性的（non-systematic）。
+
+[[File:Convolutional_encoder_recursive.svg|300px]]
+
+== 脈衝響應以及轉移函數 ==
+卷積碼之所以得其名是因為其處理方法是將輸入端訊號以及[[編碼器|編碼器]]中的[[脈衝響應|脈衝響應]]進行[[摺積|摺積]]。
+
+[[File:Convolutional_encoder_non-recursive.png|300px]]
+
+:<math>y^j_i = \sum_{k=0}^{\infty} h^j_k x_{i-k}</math>
+
+此處 <math>x</math> 是輸入訊號，<math>y^j</math> 是輸出訊號j，而 <math>h^j</math> 則是輸出訊號j的脈衝響應。
+
+卷積碼的[[編碼器|編碼器]]是一個離散[[線性非時變系統|線性非時變系統]]，因此每個輸出端子的訊息都可以視為該編碼器的[[轉移函數|轉移函數]]；此外，[[脈衝響應|脈衝響應]]可以透過[[Z轉換|Z轉換]]與[[轉移函數|轉移函數]]建立關聯性。
+
+舉一個例子，圖三是一個非遞迴編碼器，它的轉移函數有三，如下：
+*<math>H_1(z) = 1 + z^{-1} + z^{-2} ,</math>
+*<math>H_2(z) = z^{-1} + z^{-2} ,</math>
+*<math>H_3(z) = 1 + z^{-2} .</math>
+
+再者，圖二的編碼器轉移函數如下：
+*<math>H_1(z) = \frac{1 + z^{-1} + z^{-3}}{1 - z^{-2} - z^{-3}} ,</math>
+*<math>H_2(z) = 1 .</math>
+
+== 樹狀圖==
+''參見：''{{Tsl|en|Trellis modulation}}
+
+[[File:Convolutional_code_trellis_diagram.svg|300px]]
+
+樹狀圖（Trellis diagram）又稱籬笆圖，樹圖表。
+
+卷積碼的[[編碼器|編碼器]]（encoder）可以表示成[[有限状态机|有限狀態機]](finite-state machine, FSM)，擁有<math>n</math>組輸出端（output）的編碼器在FSM上會有<math>2^n</math>個狀態（states）。
+
+以圖三的非遞迴編碼器來說，假設現在<math>m_0</math>存著'1'這一位元、'0'被存放在<math>m_{-1}</math>(<math>m_1</math>不用列入考量因為它存放的是現在這個時刻的值)，那我們便定義現在位在"10"這個狀態。而在下一個時刻，新的輸入端訊號進入編碼器時可能產生'1'或者'0'，因此下一時刻編碼器可抵達的狀態是"01"或者"11"；整個樹狀圖如圖四所示，顯而易見的，並不是所有的狀態間都可以進行相連，比如"10"就不會連到"00"或者"10"這兩個狀態。
+
+這個樹狀圖是卷積碼在解碼（decoding）時的基礎，唯有能夠從頭連到尾的輸出端訊號（output sequences），才有可能是解碼出來的結果，否則便會產生錯誤。
+
+== 卷積碼解碼==
+
+現存有許多解碼卷積碼的方法。對於較小的輸出端組數，[[维特比算法|维特比算法]]（Viterbi algorithm）是一種普遍被使用來解碼的演算法，其以[[最大似然估计|最大似然估計]]（maximum likelihood）來尋找最有可能產生觀測事件序列的路徑。
+
+== 參考資料 ==
+
+*This article incorporates [http://en.wikipedia.org/wiki/Copyright_status_of_work_by_the_U.S._government public domain material] {{Wayback|url=http://en.wikipedia.org/wiki/Copyright_status_of_work_by_the_U.S._government |date=20210225033020 }} from the [http://en.wikipedia.org/wiki/General_Services_Administration General Services Administration] {{Wayback|url=http://en.wikipedia.org/wiki/General_Services_Administration |date=20210120212128 }} document [http://www.its.bldrdoc.gov/fs-1037/fs-1037c.htm "Federal Standard 1037C"]{{Wayback|url=http://www.its.bldrdoc.gov/fs-1037/fs-1037c.htm |date=20090302235918 }}
+
+[[Category:錯誤檢測與校正|J]]

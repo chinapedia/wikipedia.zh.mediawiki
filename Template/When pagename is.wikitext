@@ -1,0 +1,39 @@
+{{#if:x   <!--Remove surrounding whitespace-->
+| <!--Check for match with full pagename-->
+  {{{ {{#if:{{{page|}}}| {{{page|}}} | {{FULLPAGENAME}} }}   <!--Has data, or is empty but defined-->
+  | <!--Check for match with "User:Somepage/+"-->
+    {{{ {{#titleparts:{{#if:{{{page|}}}| {{{page|}}} | {{FULLPAGENAME}} }}|1|1}}/+
+    | <!--Else, are we on a subpage or a basepage?-->
+      {{#if:{{#titleparts:{{#if:{{{page|}}}| {{{page|}}} | {{FULLPAGENAME}} }}|0|2}}
+      | <!--We are on a subpage, check for match with "User:Somepage/*"-->
+        {{{ {{#titleparts:{{#if:{{{page|}}}| {{{page|}}} | {{FULLPAGENAME}} }}|1|1}}/*
+        | <!--Check for match with "Somepage/*"-->
+          {{{ {{#titleparts:{{#if:{{{page|}}}| {{PAGENAME:{{{page|}}}}} | {{PAGENAME}} }}|1|1}}/*
+          | <!--Check for match with "/something"-->
+            {{{ /{{#titleparts:{{#if:{{{page|}}}| {{{page|}}} | {{FULLPAGENAME}} }}|0|-1}}
+            | <!--Check for match with "/somethin*"-->
+              {{{ /{{lc: {{padleft:|8| {{#titleparts:{{#if:{{{page|}}}| {{{page|}}} | {{FULLPAGENAME}} }}|0|-1}}# }} }}*
+              | <!--Check for match with "/someth*"-->
+                {{{ /{{lc: {{padleft:|6| {{#titleparts:{{#if:{{{page|}}}| {{{page|}}} | {{FULLPAGENAME}} }}|0|-1}}# }} }}*
+                | <!--Check for match with "/some*"-->
+                  {{{ /{{lc: {{padleft:|4| {{#titleparts:{{#if:{{{page|}}}| {{{page|}}} | {{FULLPAGENAME}} }}|0|-1}}# }} }}*   <!--Pad with # so "/a" doesn't match "/aaaa*"-->
+                  | {{{subpage| {{{other|}}} }}}   <!--Respecting empty parameter on purpose-->
+                  }}}
+                }}}
+              }}}
+            }}}
+          }}}
+        }}}
+      | <!--We are on a basepage, check for match with "Somepage"-->
+        {{{ {{#if:{{{page|}}}| {{PAGENAME:{{{page|}}}}} | {{PAGENAME}} }}
+        | {{{basepage| {{{other|}}} }}}   <!--Respecting empty parameter on purpose-->
+        }}}
+      }}   <!--End if, are we on a subpage or a basepage?-->
+    }}}
+  }}}
+}}<noinclude>
+
+
+{{documentation}}
+<!-- Add categories and interwikis to the /doc subpage, not here! -->
+</noinclude>

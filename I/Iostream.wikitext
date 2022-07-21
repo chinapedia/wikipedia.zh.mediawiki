@@ -1,0 +1,293 @@
+{{NoteTA
+|G1=IT
+|1=zh-cn:流输入输出;zh-tw:資料流輸入輸出
+|2=zh-cn:库;zh-tw:函式庫
+|3=zh-cn:类型;zh-tw:型別
+|4=zh-cn:类;zh-tw:類別
+|5=zh-cn:实现;zh-tw:實作
+|6=zh-cn:算符;zh-tw:運算子
+|7=zh-cn:数据汇;zh-tw:資料槽
+|8=zh-cn:汇;zh-tw:槽
+|9=zh-cn:编程者;zh-tw:程式設計師
+|10=zh-cn:构建;zh-tw:建構
+|11=zh-cn:声明;zh-tw:宣告
+|12=zh-cn:制表符;zh-tw:製表符（<code>'\n'</code>）
+|13=zh-cn:算子;zh-tw:運算子
+|14=zh-cn:代码;zh-tw:程式碼
+}}
+{{lowercase}}
+{{C++ Standard library}}
+'''iostream'''是[[C++|C++]]中用于数据的流式[[I/O|输入与输出]]的[[头文件|头文件]]，屬於[[C++标准程式库|C++标准程式库]]的一部分。<ref>''ISO/IEC 14882:2003 Programming Languages — C++. [lib.string.streams]/1''</ref><ref name="lippman_c++_sstream">{{cite book | title=C++ Primer | author=Stanley B. Lippman, Josee Lajoie | year=1999 - third edition | publisher=Addison-Wesley | location=Massachusetts | pages=1109–1112 | isbn=0-201-82470-1}}</ref>
+
+iostream 为 Input/Output Stream 的缩写，即是輸入/輸出流。「流」是一連串從I/O設備讀寫的[[字符|字符]]。<ref>{{cite book|title=C++ Primer (5th Edition)|isbn=0-201-72148-1|pages=5}}</ref>
+
+==概述==
+流输入输出库中的大部分类都是模板类，可以适用于不同的字符类型或操作函数（如字符比较）。常用的一些字符类型的流输入输出已经用[[typedef|typedef]]定义了相应的模板特化实例。
+
+例如，<code>basic_fstream<CharT,Traits></code>是文件流输入输出的实现的模板类。它的一个特化实例：<code>fstream</code>是<code>basic_fstream<char,char_traits<char>></code>的类型别名，换句话说，这是<code>basic_fstream</code>的字符类型为<code>char</code>使用默认字符操作集的特化实例。
+
+流输入输出库中的类可分为两-{zh-cn:类;zh-tw:類}-。一是定义了界面的抽象，适用于任何流类型，无论是文件流、内存缓存区流或者网络socket流。二是对具体数据源与数据汇（sink）的流的实现。C++标准库仅实现了文件流与内存缓冲区流。 
+
+流输入输出库中的类依据是否实现底层或高层操作可分为两类。实现了底层操作的类称作流缓冲区（stream buffer），处理没有任何格式化功能的字符。这些类极少被编程者直接使用。实现高层操作的类称作流，并提供了不同的格式化能力，是构建于流缓冲区之上的。 
+
+下表列出了流输入输出库的所有类的分-{zh-cn:类;zh-tw:類}-：
+{| class=wikitable style="font-size:0.85em"
+|-
+! Class
+! style="max-width:30em" | 解释
+! Typedefs
+|-
+! colspan=3 style="line-height:1em; padding: 0;" | Stream buffers (底层功能)
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/basic_streambuf basic_streambuf]</code>
+| 提供了底层的输入输出界面，被具体的数据源与汇实现。罕用
+| style="white-space:nowrap;" |
+*<code>streambuf</code> - 字符类型<code>char</code>
+*<code>wstreambuf</code> - 字符类型<code>wchar_t</code>
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/basic_filebuf basic_filebuf]</code>
+| 提供了文件流的底层的输入输出界面，被具体的数据源与汇实现。罕用
+| style="white-space:nowrap;" |
+*<code>filebuf</code> - 字符类型 <code>char</code>
+*<code>wfilebuf</code> -字符类型 <code>wchar_t</code>
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/basic_stringbuf basic_stringbuf]</code>
+| 提供了字符文件流的底层的输入输出界面，被具体的数据源与汇实现。罕用
+| style="white-space:nowrap;" |
+*<code>stringbuf</code> - 字符类型<code>char</code>
+*<code>wstringbuf</code> - 字符类型<code>wchar_t</code>
+|-
+! colspan=3 style="line-height:1em; padding: 0;" | Support classes
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/ios_base ios_base]</code>
+| 管理格式化信息与异常状态
+| {{n/a}}
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/basic_ios basic_ios]</code>
+| 管理流缓冲区
+| style="white-space:nowrap;" |
+*<code>ios</code> - 字符类型<code>char</code>
+*<code>wios</code> - 字符类型<code>wchar_t</code>
+|-
+! colspan=3 style="line-height:1em; padding: 0;" | Input streams buffers (高层功能)
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/basic_istream basic_istream]</code>
+| 包装一个抽象流缓冲区并提供高层输入界面，如格式化能力
+| style="white-space:nowrap;" |
+*<code>istream</code> - 字符类型 <code>char</code>
+*<code>wistream</code> - 字符类型<code>wchar_t</code>
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/basic_ifstream basic_ifstream]</code>
+| 包装一个文件流缓冲区并提供高层输入界面，如打开关闭流
+| style="white-space:nowrap;" |
+*<code>ifstream</code> - 字符类型<code>char</code>
+*<code>wifstream</code> - 字符类型<code>wchar_t</code>
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/basic_istringstream basic_istringstream]</code>
+| 包装一个字符串流缓冲区并提供高层输入界面，如访问基础字符串
+| style="white-space:nowrap;" |
+*<code>istringstream</code> - 字符类型<code>char</code>
+*<code>wistringstream</code> - 字符类型<code>wchar_t</code>
+|-
+! colspan=3 style="line-height:1em; padding: 0;" | Output streams buffers (高层功能)
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/basic_ostream basic_ostream]</code>
+| 包装一个抽象流缓冲区并提供高层输出界面，如格式化能力
+| style="white-space:nowrap;" |
+*<code>ostream</code> - 字符类型<code>char</code>
+*<code>wostream</code> - 字符类型<code>wchar_t</code>
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/basic_ofstream basic_ofstream]</code>
+| 包装一个文件流缓冲区并提供高层输出界面，如打开关闭流
+| style="white-space:nowrap;" |
+*<code>ofstream</code> - 字符类型<code>char</code>
+*<code>wofstream</code> - 字符类型<code>wchar_t</code>
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/basic_ostringstream basic_ostringstream]</code>
+| 包装一个字符串流缓冲区并提供高层输出界面，如访问基础字符串
+| style="white-space:nowrap;" |
+*<code>ostringstream</code> - 字符类型<code>char</code>
+*<code>wostringstream</code> - 字符类型<code>wchar_t</code>
+|-
+! colspan=3 style="line-height:1em; padding: 0;" | Input/output streams buffers (高层功能)
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/basic_iostream basic_iostream]</code>
+| 包装一个抽象流缓冲区并提供高层输入输出界面，如格式化能力
+| style="white-space:nowrap;" |
+*<code>iostream</code> - 字符类型<code>char</code>
+*<code>wiostream</code> - 字符类型<code>wchar_t</code>
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/basic_fstream basic_fstream]</code>
+| 包装一个文件流输入输出缓冲区，并提供高层输入输出界面，如打开关闭文件
+| style="white-space:nowrap;" |
+*<code>fstream</code> - 字符类型<code>char</code>
+*<code>wfstream</code> - 字符类型<code>wchar_t</code>
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/basic_stringstream basic_stringstream]</code>
+| 包装一个字符串流输入输出缓冲区，并提供高层输入输出界面，如访问基础字符串
+| style="white-space:nowrap;" |
+*<code>stringstream</code> - 字符类型<code>char</code>
+*<code>wstringstream</code> - 字符类型<code>wchar_t</code>
+|}
+
+===头文件===
+*<code><ios></code>包含着<code>ios_base</code>与<code>basic_ios</code>的类的定义，负责信息格式化与关联的流缓冲区。
+*<code><istream></code>包含了<code>basic_istream</code>类模板定义，实现了格式化输入
+*<code><ostream></code>包含了<code>basic_ostream</code>类模板定义，实现了格式化输出
+*<code><iostream></code>包含了<code>basic_iostream</code>类模板定义，实现格式化输入输出
+*<code><fstream></code>包含了<code>basic_ifstream</code>, <code>basic_ofstream</code>与<code>basic_fstream</code>类模板定义，实现格式化文件流的格式化输入、输出
+*<code><sstream></code>包含了<code>basic_istringstream</code>, <code>basic_ostringstream</code>与<code>basic_stringstream</code> 类模板定义，实现格式化字符串流的输入输出
+*<code><iomanip></code>包含了格式化manipulator
+*<code><iosfwd></code>包含了所有的流输入输出库的前向声明（forward declaration） 
+
+==支持类==
+<code>[http://en.cppreference.com/w/cpp/io/ios_base ios_base]</code>与<code>[http://en.cppreference.com/w/cpp/io/basic_ios basic_ios]</code>是两个类处理底层比特流。<code>ios_base</code>存储格式化信息与流的状态。<code>basic_ios</code>管理关联的流缓冲区。<code>basic_ios</code>通常以特化实例<code>ios</code>与<code>wios</code>出现。<code>basic_ios</code>与<code>ios_base</code>很少被程序员直接使用。通常，它们的功能通过其它派生的类，如<code>iostream</code>。<ref name="lippman_c++_iosmanipulation">{{cite book | title=C++ Primer | author=Stanley B. Lippman, Josee Lajoie | year=1999 - third edition | publisher=Addison-Wesley | location=Massachusetts | pages=1112–1120 | isbn=0-201-82470-1}}</ref><ref name="msdn_ios">{{cite web | url=http://msdn.microsoft.com/en-us/library/5yc0df6d.aspx | title=<ios> Visual Studio 2010 | accessdate=28 September 2011 | publisher=Microsoft MSDN: Visual Studio 2010 | archive-date=2016-03-10 | archive-url=https://web.archive.org/web/20160310130016/https://msdn.microsoft.com/en-us/library/5yc0df6d.aspx | dead-url=no }}</ref>
+
+=== Typedefs ===
+{|class="wikitable" style="font-size:0.85em"
+|-
+! 名字|| 描述
+|-
+|<code>ios</code> || <code>basic_ios</code>的<code>char</code>类型特化
+|-
+|<code>wios</code> || <code>basic_ios</code>的<code>wchar_t</code>类型特化
+|-
+|<code>streamoff</code> || 支持内部操作
+|-
+|<code>streampos</code> || 保存缓冲器指针或文件指针的当前位置 
+|-
+|<code>wstreampos</code> || 保存宽字符版的缓冲器指针或文件指针的当前位置
+|-
+|<code>streamsize</code> || 流的尺寸
+|}
+
+===格式化操纵符（manipulator） ===
+{|class="wikitable" style="font-size:0.85em"
+|-
+! 名字
+! 描述
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/manip/boolalpha boolalpha]</code> / <code>[http://en.cppreference.com/w/cpp/io/manip/boolalpha noboolalpha]</code> 
+| 指示流中的<code>bool</code>类型变量是否以<code>true</code>或<code>false</code>，还是以<code>0</code>或<code>1</code>形式出现
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/manip/skipws skipws]</code> / <code>[http://en.cppreference.com/w/cpp/io/manip/skipws noskipws]</code> 
+| 指示输入操作时空白符是否被跳过
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/manip/showbase showbase]</code> / <code>[http://en.cppreference.com/w/cpp/io/manip/showbase noshowbase]</code> 
+| 指示数的基数记数标志是否显示 
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/manip/showpoint showpoint]</code> / <code>[http://en.cppreference.com/w/cpp/io/manip/showpoint noshowpoint]</code> 
+| 指示当浮点数小数部分为0时，是否显示小数部分
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/manip/showpos showpos]</code> / <code>[http://en.cppreference.com/w/cpp/io/manip/showpos noshowpos]</code> 
+| 指示对于正数是否显示<code>+</code>符号
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/manip/unitbuf unitbuf]</code> / <code>[http://en.cppreference.com/w/cpp/io/manip/unitbuf nounitbuf]</code> 
+| 指示输出是否被缓冲
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/manip/uppercase uppercase]</code> / <code>[http://en.cppreference.com/w/cpp/io/manip/uppercase nouppercase]</code> 
+| 指示在16进制整数或浮点数输出时是否使用大写字符
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/manip/left left]</code> / <code>[http://en.cppreference.com/w/cpp/io/manip/left right]</code> / <code>[http://en.cppreference.com/w/cpp/io/manip/left internal]</code>
+| 指出对齐方式
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/manip/hex dec]</code> / <code>[http://en.cppreference.com/w/cpp/io/manip/hex oct]</code>/ <code>[http://en.cppreference.com/w/cpp/io/manip/hex hex]</code>
+| 指示显示整数时的记数法
+|-
+| <code>[http://en.cppreference.com/w/cpp/io/manip/fixed fixed]</code> / <code>[http://en.cppreference.com/w/cpp/io/manip/fixed scientific]</code>/<br> <code>[http://en.cppreference.com/w/cpp/io/manip/fixed hexfloat]</code>([[C++11|C++11]]) / <br><code>[http://en.cppreference.com/w/cpp/io/manip/fixed defaultfloat]</code>(C++11)
+| 指示浮点数显示时的记数法
+|}
+
+==输入/输出流==
+'''<code>iostream</code>'''头文件定义了输入输出流对象：'''<code>cin</code>''', '''<code>cout</code>''', '''<code>cerr</code>''', '''<code>clog</code>'''分别为标准输入、输出、错误（无缓冲）、簿记（有缓冲）的流对象。都属于'''<code>std</code>''' [[名字空间|名字空间]]。<ref>{{cite book|last=Holzner|first=Steven|title=C++ : Black Book|year=2001|publisher=Coriolis Group|location=Scottsdale, Ariz.|isbn=1-57610-777-9|page=584|quote=...endl, which flushes the output buffer and sends a newline to the standard output stream.}}</ref>
+===ostream对象===
+'''<code>cout</code>'''属于'''<code>ostream</code>'''类型，重载了左移位算符。cout左移位算符的运算结果为cout自身，这使得连续的左位移操作输出一串数据成为可能。'''<code>cerr</code>'''与'''<code>clog</code>'''对象是'''<code>ostream</code>'''类型。
+===istream对象===
+'''<code>cin</code>'''是'''<code>istream</code>'''类型，重载了右位移算符。
+
+输入设备是按照行来把数据移入流输入缓冲区。也就是说，键盘输入数据时，只有按了换行键，这一行数据才进入缓冲区，可以读取。
+
+表达式<code>cin >> ival</code>从标准输入读入一个值。有两种情况会使一个istream对象的bool转型为false：读到[[EOF|EOF]]（文件结束标志）或遇到一个无效的值（输入流进入fail状态）。可以用该istream对象的成员函数good()来测试，或者直接(bool)cin来测试。
+
+istream对象的bool转型为false的情况下，此后的所有读入动作都是无操作（nop）。直到调用istream对象的成员函数clear()来清除该对象的内部状态。
+
+缺省情况下，输入操作符丢弃空白符、空格符、制表符、换行符以及回车。如果希望读入上述字符，或读入原始的输入数据，一种方法是使用istream的get()成员函数来读取一个字符，另一种方法是使用istream的getline()成员函数来读取多个字符。istream的read(char* addr, streamsize size)函数从输入流中提取size个连续的字节，并将其放在地址从addr开始的内存中。istream成员函数gcount()返回由最后的get()、getline()、read()调用实际提取的字符数。
+
+输入流有三个函数来测试流状态：即bad(), fail()和eof()。ignore()用来抛掉制定个数的缓冲区中的字节。
+
+其它的istream成员函数：putback( char c ) 将字符放回iostream；unget()往回重置“下一个”istream项；peek()返回下一个字符或EOF，但不要提取出来 。
+==输出格式化==
+
+=== 方法（函数）===
+
+{|class = wikitable
+|-
+|<code>width(int x)</code> || 下一个输出的最小字符数目
+|-
+|<code>fill(char x)</code> || 填充字符
+|-
+|<code>precision(int x)</code> || 设置浮点数的有效数字的位数
+|}
+
+===操纵符（manipulator）===
+
+操纵符（manipulator）是使用<code><<</code>或<code>>></code>算子修改流的'''对象'''.
+
+{|class=wikitable
+|-
+|<code>endl</code> || "end line": 流中插入换行符并刷新（flush）流的输出缓冲.
+|-
+|<code>ends</code> || "end string": 向流中插入空字符（null character）并刷新（flush）流的输出缓冲.
+|-
+|<code>flush</code> || 强迫流的输出缓冲写出到输出设备.
+|-
+|<code>ws</code> || 导致输入流吃掉空白（whitespace）
+|-
+|<code>showpoint</code> || 指示流要显示小数点与一些数字0 
+|}
+
+头文件中<code>[[iomanip|iomanip]]</code>还定义了一些manipulators。
+
+== 批评 ==
+某些环境下并不提供共享版本的C++库。导致程序要静态编译入C++标准库，使得程序的尺寸变大。<ref>{{cite web | url=http://www.mingw.org/wiki/Large_executables | title=MinGW.org: Large executables | accessdate=22 April 2009 | archive-date=2020-07-04 | archive-url=https://web.archive.org/web/20200704231225/http://www.mingw.org/wiki/Large_executables | dead-url=no }}</ref> 
+
+==示例==
+使用[[C++|C++]]写成的 [[Hello_World|Hello World]] 程序如下所示:
+<syntaxhighlight lang="cpp">
+#include <iostream>
+using namespace std;
+
+int main()
+{
+    cout << "Hello, world!" << endl;
+    return 0;
+}
+</syntaxhighlight>
+在这段代码中，文件 iostream 中声明了[[程序|程序]]所要输入和输出操作的有关信息。
+
+下述代码创建一个文件'file.txt'并写入文本'Hello World'：
+
+<syntaxhighlight lang="cpp">
+#include <fstream>
+int main()
+{
+    std::ofstream file;// can be merged to std::ofstream file("file.txt");
+    file.open("file.txt");
+    file << "Hello world!\n";
+    file.close();// is not necessary because the destructor closes the open file by default
+    return 0;
+}
+</syntaxhighlight>
+
+==参考文献==
+{{reflist}}
+
+==外部链接==
+* [http://en.cppreference.com/w/cpp/io C++ reference for input/output library] {{Wayback|url=http://en.cppreference.com/w/cpp/io |date=20210126040413 }}
+*[http://incubator.apache.org/stdcxx/doc/stdlibug/VIII.html Apache C++ Standard Library Iostreams] {{Wayback|url=http://incubator.apache.org/stdcxx/doc/stdlibug/VIII.html |date=20080327071156 }}
+*[http://www.informit.com/articles/article.aspx?p=170770 Comprehensive tutorial on formatting output in C++.] {{Wayback|url=http://www.informit.com/articles/article.aspx?p=170770 |date=20200121044241 }}
+*[http://incubator.apache.org/stdcxx/doc/stdlibug/VIII.html Apache C++ Standard Library Iostreams] {{Wayback|url=http://incubator.apache.org/stdcxx/doc/stdlibug/VIII.html |date=20080327071156 }}
+<!--BROKEN LINK: *[http://www.cs.niu.edu/~z088031/c241man/node77.html Reference on output formatting.]-->
+
+{{C++}}
+[[Category:C++標準函式庫|Category:C++標準函式庫]]

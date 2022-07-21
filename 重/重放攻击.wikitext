@@ -1,0 +1,74 @@
+{{refimprove|time=2020-05-08T06:57:53+00:00}}
+{{noteTA
+|T=zh-cn:重放攻击;zh-tw:重送攻擊;
+|G1=IT
+}}
+'''重放攻击'''（{{lang-en|replay attack}}，或称为'''回放攻击'''）是一种恶意或欺诈的重复或延迟有效数据的[[计算机网络|网络]]攻击形式。 这可以由发起者或由拦截数据并重新传输数据的{{le|对手 (密码学)|Adversary (cryptography)|对手}}来执行。这是“[[中间人攻击|中间人攻击]]”的一个较低级别版本。
+
+这种攻击的另一种描述是：
+“从不同上下文将消息重播到安全协议的预期（或原始和预期）上下文，从而欺骗其他参与者，致使他们误以为已经成功完成了协议运行。”<ref name=":0">{{cite web|last1=Malladi|first1=Sreekanth|title=关于防止对安全协议的重放攻击（英文）|url=http://oai.dtic.mil/oai/oai?verb=getRecord&metadataPrefix=html&identifier=ADA462295|website=oai.dtic.mil|access-date=2020-06-13|archive-url=https://web.archive.org/web/20161220092606/http://oai.dtic.mil/oai/oai?verb=getRecord&metadataPrefix=html&identifier=ADA462295|archive-date=2016-12-20|dead-url=yes}}</ref>
+
+==重放攻击工作原理==
+[[File:Replay_attack_on_hash.svg|thumb]]
+假设[[愛麗絲與鮑伯|Alice]] 想向Bob 证明自己的身份。 Bob 要求她的密码作为身份证明，爱丽丝应尽全力提供（可能是在经过诸如[[哈希函数|哈希函数]]的转换之后）； 与此同时，Eve窃听了对话并保留了密码（或哈希）。交换结束后，Eve（冒充Alice）连接到Bob。当被要求提供身份证明时，Eve发送从Bob接受的最后一个会话中读取的Alice的密码（或哈希），从而授予Eve访问权限。<ref name=":0" />
+
+==预防与对策==
+
+===所有重放攻击的一般对策===
+通过使用会话ID和组件编号标记每个加密的组件，可以防止重放攻击。之所以可行，是因为为程序的每次运行创建了唯一的随机会话ID，因此先前的结果更加难以复制。 由于每个会话的ID不同，攻击者无法执行重放。<ref name=":0" />
+
+===关于会话标识符===
+{{Main|会话标识符}}
+会话标识符（也称为会话ID、会话令牌）是一种可用来帮助避免重放攻击的机制。 生成会话ID的方式如下。
+
+# Bob将一次性令牌发送给Alice，Alice使用该令牌来转换密码并将结果发送给Bob。例如，她将使用令牌来计算会话令牌的哈希，并将其附加到要使用的密码上。
+# Bob使用会话令牌执行相同的计算。
+# 当且仅当Alice和Bob的值都匹配时，登录成功。
+# 现在，假设攻击者Eve已经捕获了该值，并试图在另一个会话中使用它。Bob将发送一个不同的会话令牌，当Eve用她捕获的值进行答复时，它将不同于Bob的计算，因此他将知道这不是Alice。
+
+会话令牌应通过[[随机性|随机]]函数选择（通常使用[[伪随机性|伪随机]]函数）。 否则，Eve可能可以冒充Bob，提出一些预测的未来令牌，并说服Alice在她的转换中使用该令牌。 然后，Eve可以在稍后的时间重播她的答复（当Bob实际上提供了先前预测的令牌时），Bob将接受[[身份验证|身份验证]]。
+
+===一次性密码===
+[[一次性密码|一次性密码]]与会话令牌类似，因为一次性密码在使用后（或在很短的时间内）就会过期。 除会话外，它们还可用于验证单个交易，也可以在身份验证过程中使用，以帮助在彼此通信的两方之间建立信任。
+
+===随机数和MAC===
+Bob还可以发送[[Nonce|随机数]]，但[[消息认证码|消息认证码]]（MAC）应随其后发送，Alice应检查该消息。
+
+===时间戳===
+添加[[時間戳|时间戳]]是防止重放攻击的另一种方法。 [[同步|同步]]应使用安全协议来实现。例如，Bob 定期广播他的时间和MAC。当Alice要向Bob发送消息时，她会在消息中包含最佳的估计时间，这也是经过身份验证的。 Bob仅接受时间戳在合理范围内的消息。这种方案的优点是Bob不需要生成（伪）随机数，而Alice不需要向Bob询问随机数。在单向或接近单向的网络中，这可能是一个优势。但是，如果重放攻击执行得足够快（即在该“合理”范围内），则可以成功。
+
+==特定情况下的对策==
+
+===Kerberos协议防护=== 
+[[Kerberos|Kerberos身份验证协议]]包括一些对策。在重放攻击的经典情况下，对手捕获一条消息，然后在稍后的日期重放该消息以产生效果。例如，如果一个银行计划容易受到这种攻击，那么导致资金转移的信息可以一遍又一遍地重放，以转移比最初预期更多的资金。 但是，在[[活动目录|Microsoft Windows Active Directory]]中实现的Kerberos协议包括使用涉及时间戳的方案来严重限制重放攻击的有效性。 超过“生存时间（TTL）”的消息将被视为旧消息并被丢弃。<ref>{{Cite web|url=https://redmondmag.com/articles/2012/02/01/understanding-the-essentials-of-the-kerberos-protocol.aspx|title=Kerberos身份验证101：了解Kerberos安全协议的要点（英文）|last=Olsen|first=Geir|date=1 February 2012|website=Redmond Magazine|language=en|access-date=2017-06-13|archive-date=2019-03-31|archive-url=https://web.archive.org/web/20190331103434/https://redmondmag.com/articles/2012/02/01/understanding-the-essentials-of-the-kerberos-protocol.aspx|dead-url=no}}</ref>
+
+已经提出了改进措施，包括使用三重密码方案。这三个密码与身份验证服务器，票证授予服务器和TGS一起使用。这些服务器使用密码在不同服务器之间使用秘密[[密钥|密钥]]加密消息。这三个密钥提供的[[加密|加密]]有助于防止重放攻击。<ref>{{Cite journal|last1=Dua|first1=Gagan|title=使用三重密码在Kerberos身份验证协议中重播攻击防护（英文）|journal=International Journal of Computer Networks & Communications|volume=5|issue=2|pages=59–70|arxiv=1304.3550|year=2013|doi=10.5121/ijcnc.2013.5205}}</ref>
+
+===Ad hoc网络中的安全路由=== 
+[[無線隨意網路|无线随意网络]]也容易受到重放攻击。在这种情况下，可以通过扩展[[AODV|AODV]]协议来改进身份验证系统并使其更强大。这种改善Ad Hoc网络安全性的方法以少量开销增加了网络的安全性。<ref>{{cite book|last1=Zhen|first1=Jane|title=防止Ad Hoc网络中安全路由的重放攻击（英文）|volume=2865|pages=140–150|doi=10.1007/978-3-540-39611-6_13|chapter=Preventing Replay Attacks for Secure Routing in Ad Hoc Networks|series=Lecture Notes in Computer Science|year=2003|isbn=978-3-540-20260-8}}</ref> 如果存在大量{{le|开销 (计算机)|Overhead (computing)|开销}}，则网络将面临变慢的风险，并且其性能将下降。因此，通过保持相对较低的开销，网络可以保持更好的性能，同时仍可以提高安全性。
+
+===质询握手身份验证协议===
+当使用[[密码认证协议|密码验证协议]]（PAP）验证其身份时，使用[[点对点协议|点对点协议]]（PPP）的客户端进行的验证和登录很容易受到重放攻击，因为进行身份验证的客户端会“[[明文|明文]]”发送其用户名和密码， 然后，认证服务器响应此请求发送其确认；因此，拦截客户端可以自由地读取传输的数据，并将客户端和服务器中的每一个模拟为彼此，以及随后可以存储客户端凭据以供稍后模拟到服务器。 [[询问握手认证协议|询问握手认证协议]]（CHAP）通过使用来自身份验证器的“质询”消息代替客户端使用基于共享机密（例如，客户端密码）的哈希计算值来响应，从而在身份验证阶段防止此类重播攻击 ），身份验证者将其与自己对挑战和共享机密的计算进行比较，以对客户端进行身份验证。通过依靠自身尚未传送的共享机密以及其他功能（例如，身份验证器控制的挑战的重复以及更改标识符和挑战值），CHAP提供了针对重放攻击的有限保护。<ref>{{Cite web|url=https://tools.ietf.org/html/rfc1994|title=RFC 1994 – PPP质询握手身份验证协议（CHAP）（英文）|last=Simpson|first=William Allen|website=tools.ietf.org|language=en|access-date=2018-09-12|archive-date=2021-03-08|archive-url=https://web.archive.org/web/20210308043734/https://tools.ietf.org/html/rfc1994|dead-url=no}}</ref>
+
+==重放攻击敏感性的真实示例==
+
+有几个真实的例子，说明如何使用重放攻击以及如何检测和修复问题以防止进一步的攻击。
+
+===车辆远程无钥匙进入系统===
+为了方便用户，道路上的许多车辆使用远程无钥匙系统或密钥卡。 现代系统已针对简单的重放攻击进行了加固，但容易受到缓冲重放攻击的影响。 通过在目标车辆的范围内放置可以接收和发送无线电波的设备来执行此攻击。 发送器将尝试阻塞发送给它的任何RF车辆解锁信号，同时将其放置在缓冲区中以备后用。 在进一步尝试解锁车辆时，发射器将阻塞新信号，将其缓存并播放旧信号，从而创建一个滚动缓冲，该缓冲比车辆领先一步。 稍后，攻击者可能会使用此缓冲的代码来解锁车辆。<ref>{{cite journal|last1=Beek|first1=S. van de|last2=Leferink|first2=F.|title=远程无钥匙进入系统针对脉冲电磁干扰的脆弱性和可能的改进（英文）|journal=IEEE Transactions on Electromagnetic Compatibility|volume=58|issue=4|pages=1259–1265|doi=10.1109/TEMC.2016.2570303|date=1 August 2016}}</ref><ref>{{cite web|last1=Francillon|first1=Aurelien|title=现代汽车被动无钥匙进入和启动系统的攻击（英文）|url=https://eprint.iacr.org/2010/332.pdf|website=eprint.iacr.org/|accessdate=8 December 2016|archive-date=2019-04-12|archive-url=https://web.archive.org/web/20190412191527/https://eprint.iacr.org/2010/332.pdf|dead-url=no}}</ref>
+
+===文本相关的说话人验证===
+各种设备使用说话者识别来验证说话者的身份。 在依赖于文本的系统中，攻击者可以记录系统正确验证的目标个人的语音，然后再次播放录音以供系统验证。 使用频谱位图从已验证用户的存储语音中设计了一种对策。 在这种情况下，重放的语音具有不同的模式，然后将被系统拒绝。<ref>{{cite book|last1=Wu|first1=Z.|title=信号和信息处理协会年度峰会和会议（APSIPA），2014年亚太地区（英文）|last2=Gao|first2=S.|last3=Cling|first3=E. S.|last4=Li|first4=H.|pages=1–5|doi=10.1109/APSIPA.2014.7041636|date=1 December 2014|isbn=978-6-1636-1823-8}}</ref>
+
+==相關條目==
+* [[拒绝服务攻击|拒绝服务攻击]]
+* [[HTTP摘要认证|HTTP摘要认证]]
+* [[中间人攻击|中间人攻击]]
+* [[電話竊聽|電話竊聽]]
+
+==参考文献==
+{{Reflist}}
+
+{{DEFAULTSORT:重放攻击}}
+[[Category:保全漏洞|Category:保全漏洞]]
+[[Category:密码分析|Category:密码分析]]

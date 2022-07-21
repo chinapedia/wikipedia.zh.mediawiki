@@ -1,0 +1,171 @@
+{{多個問題|
+{{unreferenced|time=2015-05-26T08:53:20+00:00}}
+{{Untranslated-jargon|time=2015-07-04}}
+}}
+{{NoteTA
+|G1=Communication
+|G2=Signals and Systems
+}}
+'''無限脈衝響應濾波器'''，簡稱'''IIR數位濾波器'''（{{lang-en|'''infinite impulse response filter'''}}），是數位濾波器的一種。由於無限脈衝響應濾波器中存在反饋迴路，因此對於脈衝輸入信號的響應是無限延續的。濾波器的任務是通過一定運算關係，改變輸入信號的頻譜。數字濾波器是利用計算機程序、專用芯片等軟、硬體改變數字信號頻譜。如果要處理的是模擬信號可以通過A/D在信號形式上進行轉換，在利用數字濾波器處理後經過D/A恢復為模擬信號。
+
+== 選頻數字濾波器 ==
+利用選頻濾波器的特性可以提取有用的信號頻率分量，這類濾波器適用輸入信號中有用信號頻帶與干擾信號頻帶不同的情況。
+選頻數字濾波器設計過程一般歸納為以下三個步驟:
+# 按照實際需求性能要求確定濾波器技術指標。
+# 用一個因果穩定的系統函數IIR去逼近這個要求。
+# 用一個有限精度的運算(軟、硬體)去實現這個傳遞函數
+
+== 概述 ==
+無限脈衝響應濾波器的脈衝響應無限長，不像有限脈衝響應濾波器，所以有以下問題：
+* 如何使能量集中在<math>n=0\,</math>附近。
+* 如何正向Z轉換（forward Z transform）以及逆向Z轉換（inverse Z transform）為穩定。
+能使用[[最小相位|最小相位濾波器]]（minimum phase filter）來解決以上問題，使一無限脈衝響應濾波器為穩定且能量集中在<math>n=0\,</math>附近。
+* 最小相位濾波器（minimum phase filter）：所有的極點（poles）以及零點（zeros）都在單位圓以內。
+:最小相位濾波器為穩定（stable）且因果（causal），且最小相位濾波器的逆向（inverse）轉換也為穩定（stable）且因果（causal）。
+
+:<math>H(z)=C\frac{(z-z_1)(z-z_2)(z-z_3)...(z-z_R)}{(z-p_1)(z-p_2)(z-p_3)...(z-p_S)}\,</math>
+
+:<math>H^{-1}(z)=C^{-1}z^{S-R}\frac{(1-p_1z^{-1})(1-p_2z^{-1})(1-p_3z^{-1})...(1-p_Sz^{-1})}{(1-z_1z^{-1})(1-z_2z^{-1})(1-z_3z^{-1})...(1-z_Rz^{-1})}\,</math>
+
+:其中<math>z_1,z_2,...z_R\,</math>為<math>R\,</math>個零點，<math>p_1,p_2,...p_S\,</math>為<math>S\,</math>個極點，<math>R\,</math>個零點和<math>S\,</math>個極點都在單位圓內。
+* 如何將無限脈衝響應濾波器轉換成最小相位濾波器：
+:<math>H(z)=C\frac{(z-z_1)(z-z_2)(z-z_3)...(z-z_R)}{(z-p_1)(z-p_2)(z-p_3)...(z-p_S)}\,</math>
+:假設<math>z_2\,</math>在單位圓外。
+:<math>H_1(z)=C\frac{(z-z_1)(z-z_2)(z-z_3)...(z-z_R)}{(z-p_1)(z-p_2)(z-p_3)...(z-p_S)} \times z_2\frac{z-\overline{(z_2^{-1})}}{(z-z_2)}\,</math>
+:<math>=z_2C\frac{(z-z_1)(z-\overline{(z_2^{-1})})(z-z_3)...(z-z_R)}{(z-p_1)(z-p_2)(z-p_3)...(z-p_S)}\,</math>
+:<math>H_1(z)\,</math>為最小相位濾波器（minimum phase filter），符合<math>|H_1(z)|=|H(z)|\,</math>且<math>H_1(z)\,</math>和<math>H(z)\,</math>只有相位不同。
+:另外，<math>z_2\frac{z-\overline{(z_2^{-1})}}{(z-z_2)}\,</math>稱為全通濾波器（all pass filter）。
+* 無限脈衝響應濾波器為一個最小相位濾波器和一個全通濾波器串接（cascade）：
+:<math>H(z)=H_{mp}(z)H_{ap}(z)\,</math>
+:其中<math>H(z)\,</math>：無限脈衝響應濾波器，<math>H_{mp}(z)\,</math>：最小相位濾波器，<math>H_{ap}(z)\,</math>：全通濾波器。
+
+== 特性 ==
+無限脈衝響應濾波器（IIR filter）的優點：
+* 較容易設計以及實現。
+無限脈衝響應濾波器（IIR filter）的缺點：
+* 脈衝響應（impulse response）為無限長：造成當輸入數位訊號為有限長的時候，輸出數位訊號會變成無限長。
+* 比有限脈衝響應濾波器（FIR filter）較不易最佳化（optimize）。
+* 不一定是穩定的（stable）：因為Z轉換（Z transform）後所有的極點（pole）不一定都在單位圓內。
+
+== 數字濾波器設計原理 ==
+IIR數字濾波器設計有以下幾種基本方法:
+* 零、極點累試法：由於頻率響應在靠近集點頻處會出現峰值，在靠近零點頻率處會出現谷值，並且零、極點越靠近單位圓峰谷越明顯。所以在設計時通過不斷調整零、極點位置，達到設計標準，對要求不高的簡單濾波器，可以用此方法設計。
+* 最優化設計：這種設計方法一般事先確定最好的推測，找出最好推測下誤差最小的系統函數H(z)。在得到最佳結果之前，因為設計需要大量反覆計算，所以必須用到CAD技術，而此類設計隨著技術發展，應用也越來越多。
+* 用模擬濾波器理論設計數字濾波器：利用模擬濾波器理論先設計模擬濾波器，得到其系統函數H<sub>a</sub>(s)。然後經過一定的變換，得到滿足要求的數字濾波器系統函數H(z)。這樣設計的優點是模擬濾波器設計理論成熟，有許多現成的公式、曲線、表格可以直接使用。並且在許多場合下就是用數字濾波器代替模擬濾波器。這種由模擬濾波器設計數字濾波器的方法，其實就是從s平面到z平面的映射變換，對這個變換基本要求是:
+**數字濾波器的頻率響應要保持模擬濾波器的頻率響應，所以s平面的虛軸jΩ應當映射到z平面的單位圓e<sup>jw</sup>上。
+**模擬濾波器的因果穩定性經映射數字濾波器仍應保持，所以s平面的左半平面應當映射到z平面的單位圓內。
+
+== 設計方法 ==
+
+=== 脈冲響應不變法 ===
+脈冲響應不變法也稱冲激響應不變法，是滿足s平面到z平面的映射兩個基本要求的常用方法之一。實現方法是已知模擬濾波器的衝冲響應h<sub>a</sub>(t)，讓數字濾波器h(n)的包絡為h<sub>a</sub>(t)，即<br />
+:<math> h(n) = h_a(t)|_{t=nT}</math><br />
+故此得名脈衝不變法，這種方法的實質上是時域採樣法，基本設計步驟是先得到模擬濾波器的系統函數H<sub>a</sub>(s)；然後對沖激響應h<sub>a</sub>(t)採樣，得到數字濾波器的單位脈冲響應h(n)；最後，h(n)所對應的z變換，正是所要求的數字系統的系統函數
+H(z)，即<br />
+:<math> H_a(s) \leftrightarrow h_a(t)\longrightarrow h(n)\leftrightarrow H(z) </math> <br />       
+脈衝不變法又稱標準z變換法。根據理想採樣序列z變換與拉普拉斯變換的關係式，我們可以得到<br />
+:<math> H(z)\mid_{z=e^sT} = \frac{1}{T}\sum_{m=-\infty }^\infty H_a(s-j\Omega _sm) = \frac{1}{T}\sum_{m=-\infty }^\infty H_a(s-j\frac{2\pi}{T}m)\qquad \qquad</math>—(1)<br />
+其映射關係為<math>z = e^sT</math> 或 <math>s = \frac{1}{T}\ln z</math><br />
+由(1)式當s = jΩ 時，得到的數字濾波器的響應為<br />
+:<math> H(z)\mid_{z=e^j\Omega T} = H(e^j\omega)\mid_{\omega=\Omega T} = \frac{1}{T}\sum_{K=-\infty }^\infty H_a (j\Omega - j\frac{2\pi}{T}k )\qquad\qquad </math>—(2)<br />
+由(2)式可見，數字濾波器的頻率響應不是簡單的重現模擬濾波器的頻率響應，而是模擬濾波器頻率響應的週期展開，其中頻率映射關係為<math>\omega = \Omega T</math><br />
+若模擬濾波器是帶限的，即<math>H_a(j\Omega )=0,|\Omega|\ge \pi /T</math> ,則<br />
+:<math>H(e^j\omega) = \frac{1}{T} H_a(j\Omega) = \frac{1}{T} H_a(\frac{\omega}{T})\qquad \qquad|\omega|\le\pi\qquad\qquad</math>—(3)<br />
+這時，數字濾波器可在摺疊頻率內不失真的重現模擬濾波器的頻率響應。但是實際模擬濾波器頻率響應不可能是真正帶限的，所以脈冲響應不辨法總會有混疊失真。<br />
+下面以H<sub>a(s)</sub>均為單極點為例，討論脈衝不變法設計IIR濾波器的具體方式。H<sub>a(s)</sub>可展開為部分分式
+:<math>H_a(s)=\sum_{k = 1}^{N}\frac{A_k}{s-s_k}</math><br />
+上面式子中<math>s_k=\sigma _k + j\Omega _k</math>是H_a(s)的極點，對應的模擬系統單位沖激響應為<br />
+:<math>h_a(t) = \sum_{k=1}^{N} A_ke^{s_kt}u(t)</math><br />
+對h<sub>a</sub>(t)取樣，所有連續時間便量t由離散時間便量nT代替，則<br />
+:<math>h_a(nT)=\sum_{k=1}^{N} A_ke^{s_knT}u(nT)</math><br />
+對H<sub>a</sub>(n)取z變換<br />
+:<math>\mathcal{L}\left\{ h(n) \right\}=H(z)=\sum_{k=1}^{N}\frac{A_k}{1-e^{s_kT}z^{-1}}</math><br />
+上式中<math>z_k=e^{s_kT}</math>是z平面的極點，當極點s<sub>k</sub>在s平面的左半平面時，<math>Re[s_k]=\sigma _k\ll 0 </math>，則<br />
+<math> z_k=e^{s_kT}=e^{\sigma _kT}e^{j\Omega _k T}=r_ke^{j\omega _k}</math> ，<math>r_k=e^{\sigma _kT}<1</math> ，H(z)的極點在單位圓內。由此可知，s平面與z平面的極點一一對應，並且穩定的模擬系統變換後仍為穩定的數字系統。<br />
+在(3)式<math>H(e^j\omega)=\frac{1}{T}H_a(j\Omega)</math>，考慮到若取樣頻率很高時，會使得數字系統的福頻特性的增益很高。為防止溢出，通常在取樣時做修正，令h(n)=Th<sub>a</sub>(n)，這樣實際數字濾波器的系統函數及頻率響應特性分別為<br />
+:<math>H(z)=\sum_{k=1}{N} \frac{TA_k}{1-e^{s_kT}z^{-1}}</math><br />
+:<math>H(e^{j\omega})=\sum_{k=-\infty }^\infty H_a\left( j\frac{\omega}{T} - jk\Omega _s\right)\approx H_a\left( \frac{\omega}{T} \right)  \qquad\qquad |\omega|\le\pi</math><br />
+由以上分析可見，按照<math>H_a(s)\rightarrow h_a(t)\rightarrow h(n)\rightarrow H(z)</math>變換過程，從模擬濾波器H<sub>a</sub>(s)得到數字濾波器H(z)，設計還是相當冗繁，不過由於s平面與z平面的極點一一對應，我們可以簡化變換步驟。<br />
+設H<sub>a</sub>(s)均為一階極點，省略中間步驟，從<math>H_a(s)\rightarrow H(z)</math>設計過程分為兩個步驟:<br />
+* 將H<sub>a</sub>(s)部分分式展開
+:<math>H_a(s)=\sum_{k=1}{N}\frac{A_k}{s-s_k}</math><br />
+* 直接對應H(z)的部分分式
+:<math>H(z)=\sum_{k=1}{N}\frac{TA_k}{1-e^{s_kT}z^{-1}}</math><br />
+如果H<sub>a</sub>(s)還有m階的重極點，我們給出對應的z變換的有理分式為<br />
+:<math>\frac{1}{(s-s_k)^m}\rightarrow \frac{(-1)^{m-1}}{(m-1)!}\frac{d^{m-1}}{ds_k^{m-1}}\frac{1}{1-e^{s_kT}z^{-1}}</math><br />
+除了單極點與重極點外，對H<sub>a</sub>(s)的共軛極點，我們也給出對應的z變換的一般有理分式<br />
+:<math>\frac{s+a}{(s+a)^2+b^2}\rightarrow\frac{1-e^{-aT}\cos (bT)*z^{-1}}{1-2e^{-aT}\cos (bT)*2^{-1}+e^{-2aT}z^{-2}}</math><br />
+:<math>\frac{s+b}{(s+a)^2+b^2}\rightarrow\frac{1-e^{-aT}\sin (bT)*z^{-1}}{1-2e^{-aT}\cos (bT)*2^{-1}+e^{-2aT}z^{-2}}</math><br />
+這樣，當H<sub>a</sub>(s)部分分式展開式中如果有重極點或共軛極點，在上述設計過程第二步做相應修改即可。<br />
+脈衝不變法的頻率變換<math>\omega=\Omega T</math>是線性關係，所以在幅度及相位上數字濾波器都保留著模擬濾波器的頻率響應特點。但是由於脈沖不變法本身具有頻譜周期延展拓寬的特性，所以失真較大。尤其是對衰減特性差的濾波器頻率響應會有嚴重的混疊現象，適用範圍受到限制。<br />
+下面給出用脈沖不變法設計數字濾波器的一般步驟
+# 確定數字濾波器的性能要求及各數字臨界頻率<math>{\omega _k}</math><br />
+# 由脈沖不變法的變換關係將<math>{\omega _k}</math>變換為模擬域臨界頻率<math>{\Omega _k}</math><br />
+# 按<math>{\omega _k}</math>及衰減指標求出模擬濾波器的傳遞函數H<sub>a</sub>(s)。這個模擬低通濾波器也稱為模擬原型濾波器。<br />
+# 由脈沖不變法的變換關係將H<sub>a</sub>(s)轉換為數字濾波器的系統函數H(z)<br />
+在設計過程中，除了第一步求數字臨界頻率<math>{\omega _k}</math>時，要用到取樣間隔T或取樣頻率f<sub>s</sub>以外，最後的結果與其他各步驟中T或f<sub>s</sub>的取值無關。所以為了簡化運算，在實際運算時，除了第一步外，通常取T=1。
+
+
+==== 脉冲响应不变法 ====
+這是由解出和類比濾波器在同樣的取樣時間下有一樣輸出值的T(z)所獲得,且當這兩者的輸入接為一個脈衝時才適用。<br />
+有一點需要注意的是,藉由此種方法產生的數位濾波器的所有輸入皆是一個近似值，除了只對於脈衝輸入非常精確。這是一種最簡單的IIR濾波器設計方法，它在低頻是最精確的，所以通常被用在低通濾波器上。<br />
+
+對於拉普拉斯轉換(Laplace transform)或是z-transform，轉換過後的輸出只是輸入乘上相對應的轉換函數，T(s)或T(z)。Y(s)和Y(z)分別是輸入X(s)和輸入X(z)轉換過後的輸出。<br />
+:<math>Y(s)=T(s)X(s)</math><br />
+:<math>Y(z)=T(z)X(z)</math><br />
+然而，當拉普拉斯轉換和z-transform對單位脈衝作轉換時為1，轉換後的輸出結果分別為<br />
+:<math>Y(s)=T(s)</math><br />
+:<math>Y(z)=T(z)</math><br />
+現在類比濾波器的輸出在時域上就只是拉普拉斯逆轉換(inverse Laplace transform)<br />
+:<math>y(t)=L^{-1}[Y(s)]=L^{-1}[T(s)]</math><br />
+如果我們用nT代替t，可以得到在取樣時間下源於脈衝的輸出，y(nT)，又可以為了便利性表為y(n)<br />
+:<math>y(n)=y(nT)=y(t)|_{t=sT}</math><br />
+這個離散時間信號可以被z-transform得到T(z)<br />
+:<math>T(z)=Y(z)=Z[y(n)]</math><br />
+:<math>T(z)=Z[y(n)]=Z[y(nT)]</math><br />
+:<math>T(z)=Z\left\{L^{-1}[T(s)]_{t=nT}\right\}</math><br />
+最後這條等式指出在數學領域描述數位IIR濾波器就是對取樣完經拉普拉斯轉換為T(s)的類比信號作z-transform，通常會簡化為<br />
+:<math>T(z)=Z[T(s)]*T</math><br />
+雖然在數學領域上不是完全正確的。
+需特別注意有一個乘法數T出現在式子中，這是因為就算拉普拉斯轉換和z-transform對單位脈衝為1，脈衝本身不一定是一樣的。對類比信號而言，脈衝在t=0時有無限大的值但是面積為1，但在離散時間的脈衝t=0時為1，所以為了這個情況，需要乘法數T的存在。
+
+==== step invariant ====
+這通常相較於impulse invariant昰一個更好的設計方法，數位濾波器正是在取樣時有幾段不同常數的輸入，也就是由離散步階(step)組成。step invariant IIR 濾波器和同樣輸入步階信號至ADC相比是較低精確度的，然而，和impulse invariant相比這對任何輸入而言是一個較好的近似法。<br />
+當T(z)和T(s)兩者都是步階(step)輸入時，step invariant解決一樣取樣值的困擾，對數位濾波器的輸入為u(s)，對類比濾波器的輸入是u(t)，z-transform和拉普拉斯轉對這兩個輸入作轉換以得到轉換後的輸出信號。<br />
+z-transform的轉換函數為<math>Z[u(n)]=\dfrac{z}{z-1}</math><br />
+經z-transform的輸出<math>Y(z)=T(z)U(z)=T(z)\dfrac{z}{z-1}</math><br />
+Laplace transform的轉換函數為<math>L[u(t)]=\dfrac{1}{s}</math><br />
+經Laplace transform的輸出<math>Y(s)=T(s)U(s)=\dfrac{T(s)}{s}</math><br />
+類比濾波器的輸出是y(t)，就是Y(s)的拉普拉斯逆轉換。如果每經過T秒就被取樣一次，它就是y(n)，也就是Y(z)的逆轉換。這些信號被用來解出數位濾波器的和類比濾波器在取樣時間下有著相同輸出<br />
+以下的等式指出T(z)的解法，也就是對類比濾波器取近似的公式<br />
+:<math>T(z)=\dfrac{z-1}{z}Y(z)</math><br />
+:<math>T(z)=\dfrac{z-1}{z}Z[y(n)]</math><br />
+:<math>T(z)=\dfrac{z-1}{z}Z[Y(s)]</math><br />
+:<math>T(z)=\dfrac{z-1}{z}Z[\dfrac{T(s)}{s}]</math><br />
+
+==== bilinear transform(雙線性變換) ====
+BLT公式利用拉普拉斯轉換(Laplace transform)的特性：對於一個x(t)經Laplace轉換成的X(s)而言，它的積分在沒有初始條件下相當於X(s)/s。所以得出將拉普拉斯轉換的信號乘上1/s相當於對此信號在時域下做積分。<br />
+然而，接下來這個不同的等式一樣也是用近似積分x(t)信號的特性達成：利用x(nT)=x(n)。<br />
+在沒有初始條件下積分信號相當於計算信號下的面積
+:<math>y(n)=y(n-1)+\dfrac{x(n)+x(n-1)}{2}*T </math>
+此等式告訴我們再經過一個新的數入信號x(n)後計算新的面積y(n)，就只是將先前運算的面積y(n-1) 加上新輸入和先前輸入的平均乘上取樣時間。藉由z轉換先前的等式變為以下的式子
+:<math>Y(z)=z^{-1}Y(z)+0.5[X(z)+z^{-1}X(z)]*T</math><br />
+:<math>Y(z)(1-z^{-1})=0.5TX(z)(1+z^{-1})</math><br />
+:<math>T(z)=\dfrac{Y(z)}{X(z)}=\dfrac{T}{2}\dfrac{1+z^{-1}}{1-z^{-1}}</math><br />
+當我們得出X(z)和Y(z)後，我們將解出T(z)<br />
+先前的等式是一個數位訊號處理系統中的轉換函數，此函數將一個系統中的類比轉換函數趨近成作積分，並在分子分母同乘上z後開始解s<br />
+:<math>\dfrac{T}{2}\dfrac{z+1}{z-1}\approxeq\dfrac{1}{s}</math><br />
+:<math>s=\dfrac{2}{T}\dfrac{z-1}{z+1}</math><br />
+這個關係被用在任何類比濾波器的拉普拉斯轉換函數，以或取近似於類比濾波器的數位無限脈衝響應(IIR)濾波器T(z)。這個結果被標示在下列公式中，此公式用來運算BLT IIR數位濾波器，並從類比濾波器的拉普拉斯轉換函數開始運算起<br />
+:<math>T(z)=T(s)|_{s=\dfrac{2}{T}\dfrac{z-1}{z+1}}</math><br />
+這條公式指出近似類比濾波器的bilinear transform數位IIR濾波器可以從把類比轉換函數T(s)中的s替換成和z的關係得出
+
+==外部链接==
+* [http://4rdp.blogspot.tw/2013/08/kalman-filter.html Kalman filter與IIR、FIR比較] {{Wayback|url=http://4rdp.blogspot.tw/2013/08/kalman-filter.html |date=20180506000532 }}
+
+== 参见 ==
+* [[数字信号处理|数字信号处理]]
+* [[数字滤波器|数字滤波器]]
+
+[[Category:数字信号处理|]]
+[[Category:数字滤波器|Category:数字滤波器]]

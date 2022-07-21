@@ -1,0 +1,148 @@
+{{noteTA
+|T = zh-cn:多态 (计算机科学); zh-tw:多型 (電腦科學);
+|G1 = IT
+}}
+{{多态}}{{编程范式}}
+
+在[[编程语言|编程语言]]和[[类型论|类型论]]中，'''多态'''（{{lang-en|polymorphism}}）指为不同[[数据类型|数据类型]]的实体提供统一的[[介面_(程式設計)|接口]]<ref>{{cite web | url=http://www.stroustrup.com/glossary.html#Gpolymorphism | author=Bjarne Stroustrup | title=Bjarne Stroustrup's C++ Glossary | date=February 19, 2007 | quote=polymorphism – providing a single interface to entities of different types. | accessdate=2018-06-29 | archive-date=2018-06-29 | archive-url=https://web.archive.org/web/20180629131717/http://www.stroustrup.com/glossary.html#Gpolymorphism | dead-url=no }}</ref>，或使用一个单一的符号来表示多个不同的类型<ref name="Luca">{{Cite journal| last1 = Cardelli| first1 = Luca| authorlink1 = Luca Cardelli| last2 = Wegner| first2 = Peter| authorlink2 = Peter Wegner| doi = 10.1145/6041.6042| title = On understanding types, data abstraction, and polymorphism| journal = [[ACM_Computing_Surveys|ACM Computing Surveys]]| issn = 0360-0300| volume = 17| issue = 4| pages = 471–523| date = December 1985| url = http://lucacardelli.name/Papers/OnUnderstanding.A4.pdf| publisher = [[Association_for_Computing_Machinery|ACM]]| location = New York, NY, USA| ref = harv| access-date = 2018-06-29| archive-date = 2019-10-14| archive-url = https://web.archive.org/web/20191014052030/http://lucacardelli.name/Papers/OnUnderstanding.A4.pdf| dead-url = yes}}: "Polymorphic types are types whose operations are applicable to values of more than one type."</ref>。
+
+多态的最常见主要类别有：
+* [[特设多态|特设多态]]：为个体的特定类型的任意集合定义一个共同接口。
+* [[参数多态|参数多态]]：指定一个或多个类型不靠名字而是靠可以标识任何类型的抽象符号。
+* [[子类型|子类型]]（也叫做子类型多态或包含多态）：一个名字指称很多不同的类的实例，这些类有某个共同的超类<ref name="gbooch">Booch, et al 2007 ''Object-Oriented Analysis and Design with Applications.'' Addison-Wesley.</ref>。
+
+==历史==
+在1967年，英国计算机科学家[[克里斯托弗·斯特雷奇|克里斯托弗·斯特雷奇]]在他的讲义合集《{{Tsl|en|Fundamental Concepts in Programming Languages|编程语言中的基础概念}}》中<ref>{{cite journal |last1=Strachey |first1=Christopher |title=Fundamental Concepts in Programming Languages |journal=[[Higher-Order_and_Symbolic_Computation|Higher-Order and Symbolic Computation]] |date=2000 |volume=13 |issue=1/2 |pages=11–49 |doi=10.1023/A:1010000313106 |issn=1573-0557}}</ref>，首次提出了特设多态和参数多态的概念。特设多态是[[Algol_68|Algol 68]]的特征，而参数多态是[[ML语言|ML]]在1975年介入的类型系统的核心特征<ref>Milner, R., Morris, L., Newey, M. "A Logic for Computable Functions with reflexive and polymorphic types", ''Proc. Conference on Proving and Improving Programs'', Arc-et-Senans (1975)</ref>。
+
+在1985年，{{Tsl|en|Peter Wegner|彼得·瓦格纳}}和{{Tsl|en|Luca Cardelli|卢卡·卡代利}}在论文中引入了术语「包含多态」来为[[子类型|子类型]]和[[继承_(计算机科学)|继承]]建模<ref name="Luca"/>，引证1967年的[[Simula|Simula]]为子类型和继承的最早的对应实现。
+
+==类别==
+
+===特设多态===
+{{main|特设多态|名字修饰}}
+
+[[克里斯托弗·斯特雷奇|克里斯托弗·斯特雷奇]]选择术语“特设多态”来指称一个多态函数可以应用于有不同类型的实际参数上，但是以来它们所应用到的实际参数类型而有不同的表现（也叫做为[[函数重载|函数重载]]或[[运算符重载|运算符重载]]）<ref name="Strachey">{{cite book |author=Christopher Strachey |title=Fundamental Concepts in Programming Languages |url=http://www.itu.dk/courses/BPRD/E2009/fundamental-1967.pdf |website=www.itu.dk |publisher=Kluwer Academic Publishers |access-date=2012-10-13 |archive-url=https://web.archive.org/web/20170812012310/http://www.itu.dk/courses/BPRD/E2009/fundamental-1967.pdf |archive-date=2017-08-12 |dead-url=no }}</ref>。在这个上下文中术语“特设”（[[ad_hoc|ad hoc]]）不意图表达贬义，它只是简单的指出这种多态不是类型系统的基本特征。在下面的[[Pascal_(程式语言)|Pascal]]/[[Delphi|Delphi]]例子中，在查看<code>Add</code>函数的调用的时候，它好像通用的工作在各种类型之上，但编译器对所有意图和用途都把它们视为完全不同的两个函数:
+
+<syntaxhighlight lang="Pascal">
+program Adhoc;
+
+function Add(x, y : Integer) : Integer;
+begin
+    Add := x + y
+end;
+
+function Add(s, t : String) : String;
+begin
+    Add := Concat(s, t)
+end;
+
+begin
+    Writeln(Add(1, 2));                   (* 打印"3"             *)
+    Writeln(Add('Hello, ', 'Mammals!'));    (* 打印"Hello, Mammals!" *)
+end.
+</syntaxhighlight>
+
+在[[动态类型|动态类型]]语言中情况可能更加复杂，因为需要调用的正确函数只能在运行时间确定。
+
+[[类型转换|隐式类型转换]]也被定义为多态的一种形式，叫做“强迫多态”<ref name="Luca"/><ref name="Tucker2004">{{cite book|author=Allen B. Tucker|title=Computer Science Handbook, Second Edition|url=https://books.google.com/books?id=9IFMCsQJyscC&pg=SA91-PA5|date=28 June 2004|publisher=Taylor & Francis|isbn=978-1-58488-360-9|pages=91–|access-date=2021-02-06|archive-date=2017-03-31|archive-url=https://web.archive.org/web/20170331025117/https://books.google.com/books?id=9IFMCsQJyscC&pg=SA91-PA5|dead-url=no}}</ref>。
+
+===参数多态===
+{{main|参数多态|泛型编程}}
+
+参数多态允许函数或数据类型被一般性的书写，从而它可以“统一”的处理值而不用依赖于它们的类型<ref name="bjpierce">Pierce, B. C. 2002 ''Types and Programming Languages.'' MIT Press.</ref>。参数多态是使语言更加有表现力而仍维持完全的静态[[类型安全|类型安全]]的一种方式。这种函数和数据类型被分别称为“[[泛化函数|泛化函数]]”和“泛化数据类型”从而形成了[[泛型编程|泛型编程]]的基础。
+
+例如，可以构造连接两个列表的一个函数<code>append</code>，它不关心元素的类型：它可以附加整数的列表、实数的列表、字符串的列表等等。设定“类型变量<code>a</code>”来指定这个列表中元素的类型。接着<code>append</code>可以确定类型： 
+:<code>forall a. [a] × [a] -> [a]</code>
+这里的<code>[a]</code>指示具有类型<code>a</code>的元素的列表类型。我们称对于<code>a</code>的所有的值，<code>append</code>的类型“由<code>a</code>参数化”。结果的列表必须由相同类型的元素组成。对于应用<code>append</code>的每个位置，都要为<code>a</code>确定一个值。
+
+参数多态的概念适用于[[数据类型|数据类型]]和[[子程序|函数]]二者。可以被求值或应用于不同类型的值之上的函数叫做“多态函数”。看起来具有泛化类型性质的数据类型（比如具有任意类型的元素的[[列表_(抽象数据类型)|列表]]）被指认为“多态数据类型”，就像根据它来做特殊化的[[泛化|泛化]]类型那样。
+
+参数多态在[[函数式编程|函数式编程]]之中是普遍的，在这里它经常被简称为“多态”。下面的[[Haskell|Haskell]]例子展示了参数化列表数据类型和在其上的两个参数多态函数：
+
+<syntaxhighlight lang="Haskell">
+data List a = Nil | Cons a (List a)
+
+length :: List a -> Integer
+length Nil         = 0
+length (Cons x xs) = 1 + length xs
+
+map :: (a -> b) -> List a -> List b
+map f Nil         = Nil
+map f (Cons x xs) = Cons (f x) (map f xs)
+</syntaxhighlight>
+
+参数多态在很多[[面向对象语言|面向对象语言]]中也能获得到。例如，[[C++|C++]]和[[D语言|D]]的[[模板_(C++)|模板]]，和在[[C♯|C#]]、[[Delphi|Delphi]]和[[Java|Java]]中所称谓的[[泛型编程#Java_的泛型|泛型]]:
+
+<syntaxhighlight lang="CSharp">
+class List<T> {
+    class Node<T> {
+        T elem;
+        Node<T> next;
+    }
+    Node<T> head;
+    int length() { ... }
+}
+
+List<B> map(Func<A, B> f, List<A> xs) {
+    ...
+}
+</syntaxhighlight>
+
+{{en-link|John C. Reynolds|}}（和后来的{{en-link|Jean-Yves Girard|}}）正式的将这种多态概念发展为对lambda演算的扩展（叫做多态lambda演算或[[系统F|系统F]]）。任何参数多态函数都必然在能做什么上受到限制，工作在数据的形状而不是它的值之上，这导致了{{en-link|parametricity|}}的概念。
+
+===子类型===
+{{main|子类型|虚函数}}
+
+在[[面向对象程序设计|面向对象程序设计]]中，[[计算机程序|计算机程序]]執行時，相同的訊息可能會送給多個不同的類別之[[对象_(计算机科学)|物件]]，而系統可依據物件所屬類別，引發對應類別的方法，而有不同的行為。簡單來說，所謂多型意指相同的訊息給予不同的物件會引發不同的動作。比如有動物之[[类_(计算机科学)|類別]]，而且由動物[[继承_(计算机科学)|繼承]]出類別貓和類別狗，並對同一源自類別動物（父類別）之一訊息有不同的響應，如類別動物有「叫」之動作，而類別貓會「[[喵|喵喵]]」，類別狗則會「汪汪」，則稱之為多型態。
+
+在下面的这个例子中猫和狗都是动物的子类型。过程<code>letsHear()</code>接受一个动物，但在传递给它一个子类型的时候也能正确工作：
+
+<syntaxhighlight lang="Java">
+abstract class Animal {
+    abstract String talk();
+}
+
+class Cat extends Animal {
+    String talk() {
+        return "Meow!";
+    }
+}
+
+class Dog extends Animal {
+    String talk() {
+        return "Woof!";
+    }
+}
+
+static void letsHear(final Animal a) {
+    println(a.talk());
+}
+
+static void main(String[] args) {
+    letsHear(new Cat());
+    letsHear(new Dog());
+}
+</syntaxhighlight>
+
+多态可分为变量多态与函数多态。变量多态是指：基类型的变量（对于[[C++|C++]]是引用或指针）可以被赋值基类型对象，也可以被赋值派生类型的对象。函数多态是指，相同的函数调用界面（函数名与实参表），传送给一个对象变量，可以有不同的行为，这视该对象变量所指向的对象类型而定。多态也可定义为“一种将不同的特殊行为和单个泛化记号相关联的能力”，变量多态是函数多态的基础。
+
+==实现角度类别==
+{{main|模板超編程#靜態多型|动态分派}}
+依据实现时做出的选择，多态可分为：
+*动态多态（dynamic polymorphism）:生效于[[运行期|运行期]]。
+*静态多态（static polymorphism）：将不同的特殊行为和单个泛化记号相关联，由于这种关联处理于[[编译期|编译期]]而非运行期，因此被称为“静态”。可以用来实现类型安全、运行高效的同质对象集合操作。C++ [[标准模板库|STL]]不采用动态多态来实现就是个例子。
+对于[[C++|C++]]语言，带变量的宏和函数重载机制也允许将不同的特殊行为和单个泛化记号相关联。然而，习惯上并不将这种函数多态、宏多态展现出来的行为称为多态（或静态多态），否则就连[[C语言|C语言]]也具有宏多态了。谈及多态时，默认就是指动态多态，而静态多态则是指基于模板的多态。
+
+==参见==
+* [[鸭子类型|鸭子类型]]
+* [[系统F|系统F]]
+* [[类型类|类型类]]
+* [[类型论|类型论]]
+* [[虚继承|虚继承]]
+
+==参考资料==
+{{reflist|2}}
+
+[[Category:面向对象的程序设计|Category:面向对象的程序设计]]
+[[Category:泛型程序设计|Category:泛型程序设计]]
+[[Category:多态|]]

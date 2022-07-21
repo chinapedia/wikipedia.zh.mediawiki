@@ -1,0 +1,77 @@
+{{distinguish|短路測試}}
+{{求值策略}}
+'''短路求值'''（Short-circuit evaluation; minimal evaluation; [[約翰·麥卡錫|McCarthy]] evaluation; 又称'''最小化求值'''）<ref>Peter Hofer, Peter Fischer: Lexikon der Informatik. 15. Auflage. Springer, Berlin 2010, ISBN 3-642-15125-6, S. 81 (eingeschränkte Vorschau in der Google-Buchsuche).</ref>，是一种[[逻辑运算符|逻辑运算符]]的求值策略。只有当第一个运算数的值无法确定逻辑运算的结果时，才对第二个运算数进行求值。例如，当AND的第一个运算数的值为false时，其结果必定为false；当OR的第一个运算数为true时，最后结果必定为true，在这种情况下，就不需要知道第二个运算数的具体值。在一些语言中（如[[Lisp|Lisp]]），默认的逻辑运算符就是短路运算符，而在另一些语言中（如[[Java|Java]]，[[Ada|Ada]]），短路和非短路的运算符都存在。对于一些逻辑运算，如[[逻辑异或|XOR]]，短路求值是不可能的 。
+
+短路表达式<code>''x'' AND y</code>，事实上等价于条件语句：<code>if ''x'' then ''y'' else false</code>。短路表达式<code>''x'' OR ''y''</code>，则等价于条件语句：<code>if ''x'' then true else ''y''</code>。
+
+== C语言和C++ ==
+C语言和C++语言标准强制规定了<code>||</code>和<code>&&</code>短路求值语义以及求值顺序。从而，下述这样的包含安全检查的代码是非常常见的：
+<syntaxhighlight lang="c">
+   char* pChar = 0;
+   // some actions which may or may not set pChar to something
+   if ((pChar != 0) && (*pChar != '\0')) {
+      // do something useful
+   }
+</syntaxhighlight>
+C99语言标准的Section 6.5.13 Logical AND operator规定：
+    (4). Unlike the bitwise binary & operator, the && operator guarantees left-to-right evaluation; there is a sequence point after the evaluation of the first operand. If the first operand compares equal to 0, the second operand is not evaluated.
+    翻译：于二元位与运算符&不同，&&运算符保证从左到右求值，第一操作数求值后有一个[[顺序点|顺序点]]。如果第一操作数比较等于0，则第二操作数不再求值。
+类似地，section 6.5.14 Logical OR operator有类似规定。C++语言标准有同样规定。但如果重载了<code>||</code>和<code>&&</code>运算符，则仅是普通运算符。
+
+考虑以下使用[[C语言|C语言]]写的例子：
+
+<syntaxhighlight lang="c">
+int a = 0;
+if (a && myfunc(b)) {
+    do_something();
+}
+</syntaxhighlight>
+
+在这个例子中，最小化计算使得<code>myfunc(b)</code>永远不会被调用。这是因为 <code>a</code> 等于''false''，而''false AND q''无论''q''是什么总是得到''false''。这个特性允許兩個有用的編程結構。首先，不論判別式中第一個子判別語句要耗費多昂貴的計算，總是會被執行，若此時求得的值為 false，則第二個子判別運算將不會執行，這可以節省來自第二個語句的昂貴計算。再來，這個結構可由第一個子判別語句來避免第二個判別語句不會導致運行時錯誤。例如對以下使用[[C语言|C语言]]寫的例子而言，最小化計算可以避免對[[空指针|空指针]]進行存取。
+
+<!-- suxpert: 上下文不一致，缺少上文提到的C语言实例，故根据上文描述新增。(2010.09.02) -->
+<syntaxhighlight lang="c">
+void * p = NULL;
+int ret;
+/* ... */
+if(p && ret = func(p) ){
+    /* 或者另一種更清晰的寫法是if( (p != NULL) && (ret = func(p)) ) */
+    /* ... */
+}
+/* ... */
+</syntaxhighlight>
+
+當使用最小化計算時，很重要的一點是得知表示式取值的順序。某些編程語言中確保有一致的取值順序。例如：[[C语言|C语言]]、[[Java|Java]]、[[Perl|Perl]]、[[Python|Python]]和[[Ruby|Ruby]]等。
+
+它不过是下面语句的一种更加紧凑的表示形式罢了。
+
+<syntaxhighlight lang="c">
+if (cond_a) {
+    if (expensive_or_dangerous_cond_b) {
+        ...
+    }
+}
+</syntaxhighlight>
+
+==註釋==
+{{reflist}}
+
+==參考文獻==
+{{refbegin}}
+*Michael L. Scott: Programming Language Pragmatics. 3. Auflage. Elsevier LTD, Oxford 2009, ISBN 0-12-374514-4, S. 239 (eingeschränkte Vorschau in der Google-Buchsuche).
+{{refend}}
+
+== 参閲 ==
+{{div col|2}}
+*[[组合子逻辑|组合子逻辑]]
+*[[柯里化|柯里化]]
+*[[λ演算|λ演算]]
+*[[极小化求值|极小化求值]]
+*[[求值策略|求值策略]]
+* [[惰性求值|惰性求值]]
+{{div col end}}
+
+==外部連結==
+*[https://life-prog.ru/1_44531_vichislenie-po-korotkoy-sheme.html Вычисление по короткой схеме (Short circuit calculation).] {{Wayback|url=https://life-prog.ru/1_44531_vichislenie-po-korotkoy-sheme.html |date=20220126123514 }}
+
+[[Category:编程典范|Category:编程典范]]

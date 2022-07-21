@@ -1,0 +1,269 @@
+{{noteta
+|G1=IT
+|1=zh-hans:微芯;zh-hant:微晶;
+}}
+[[File:PIC_microcontrollers.jpg|thumb]]
+'''PIC微控制器'''（PIC microcontroller），是一種使用[[哈佛結構|哈佛結構]]的[[精簡指令集|精簡指令集]]微控制器，由[[Microchip|Microchip]]公司研發而成。
+
+PIC的架構是明顯的最低限度。它具有以下特點：
+
+* 分離式的-{zh-cn:程序存储器;zh-tw:程式碼;}-和-{zh-cn:数据存储器;zh-tw:資料空間;}-（哈佛結構）
+* 少量的固定長度指令
+* 指令是單週期執行（4時鐘週期），僅流程轉移指令(call, goto, return, 成立時的條件跳躍)需兩個指令週期
+<!--
+* a single accumulator (W), the use of which (as source operand) is implied (ie is not encoded in the opcode)一個單一的累加器（簡稱為 W） ，它的使用（如源運算）是隱含的（即沒有編碼的操作碼）← 某些是 implied 沒錯，某些有編碼 F, W 兩者之一
+-->
+* 所有 RAM 位置均可當作作為算數或其他運算的源寄存器或目的寄存器使用
+* 一個-{zh-cn:堆栈;zh-tw:硬體堆疊;}-用於存放-{zh-cn:子程序调用;zh-tw:副程式呼叫;}-的返回地址
+* 較小的-{zh-cn:数据;zh-tw:資料;}-定址空間，但使用多個 bank 的方式（每個 bank 通常為 128 字節），來存取較大的 '''RAM''' 
+<!-- 附註：存取較大的程式定址空間時的的程式碼區塊稱為 page -->
+* 暫存器、-{zh-cn:外部输入输出端口;zh-tw:週邊輸入輸出埠;}-等均映射在-{zh-cn:数据;zh-tw:資料;}-空間中
+* 程序計數器也是映射到-{zh-cn:数据;zh-tw:資料;}-空間和寫入（這是用來執行間接跳躍）
+
+==歷史==
+[[File:PIC1655A_GI.jpg|thumb]]
+PIC 微控制器源自於 1980 年代由[[通用儀器|通用儀器]]所推出的 PIC1650 系列，當時的 PIC 是周邊介面控制器（Peripheral Interface Controller）的簡稱。
+
+GI 的微電子部門於 1987 年分拆成為 Microchip Technology (微芯) 公司。
+<!-- 官方一般不翻譯，大陸一般稱微芯科技，台灣的分公司正式譯名是邁奇電子，台灣另有微芯科技 -->
+
+==PIC 產品系列==
+PIC 的產品線寬廣，型號眾多，現有數百種，各主要系列如下：
+
+===8-bit（資料寬度）微控制器===
+使用哈佛結構，指令碼與資料的位元寬度可以不同。但各指令的指令碼長度均相同。
+
+* Baseline 系列 (12-bit 指令碼)
+:* PIC10F : 6 接腳
+:* PIC12C5 , PIC12F5 : 8 接腳
+:* PIC16C5 , PIC16F5 : 14 以上接腳
+
+* Midrange (中階) 系列 (14-bit 指令碼)
+:* PIC12C6 , PIC12F6 : 8 接腳
+:* PIC16 : 14 以上接腳
+:* PIC16F1 : 新推出的 Enhanced Midrange (強化中階) 系列
+
+* PIC18 (8-bit 裡的高階) 系列 (16-bit 指令碼)
+:* PIC18 : PIC18C , PIC18Fxxx , 少數早期的 PIC18Fxxxx
+:* PIC18 Extended : 目前絕大多數的 PIC18Fxxxx, PIC18FxxJxx, PIC18FxxKxx
+
+* flash 产品：
+:* microchip 收购SST，拥有flash 产品
+
+===16-bit（資料寬度）微控制器===
+相當於不具 DSP 相關功能的 dsPIC 微控制器
+* PIC24 系列 
+:* PIC24F
+:* PIC24H
+
+===32-bit（資料寬度）微控制器===
+* PIC32 : 採用 [[MIPS科技公司|MIPS]] 的 M4K 內核，與其他 PIC 不同。
+
+===dsPIC 微控制器（16-bit 資料寬度）===
+* dsPIC30F
+* dsPIC33F
+
+==8-bit PIC 的指令集==
+PIC的指令十分精簡，只有35個，簡單易學，故執行速度比[[8051|8051]]快。其指令集又分成12-bit PIC instruction set，和14-bit PIC instruction set.
+{| class=wikitable
+|+ 12-bit PIC instruction set
+! Opcode（二進制）!! 助記體 !! 說明
+|-
+| <code>0000 0000 0000</code> || NOP || No operation
+|-
+| <code>0000 0000 0010</code> || OPTION || Load OPTION register with contents of W
+|-
+| <code>0000 0000 0011</code> || SLEEP || Go into standby mode
+|-
+| <code>0000 0000 0100</code> || CLRWDT || Reset watchdog timer
+|-
+| <code>0000 0000 01ff</code> || TRIS f || Move W to port control register (f=1..3)
+|-
+|colspan=3|
+|-
+| <code>0000 001 fffff</code> || MOVWF f || Move W to f
+|-
+| <code>0000 010 xxxxx</code> || CLRW || Clear W to 0 (a.k.a CLR x,W)
+|-
+| <code>0000 011 fffff</code> || CLRF f || Clear f to 0 (a.k.a. CLR f,F)
+|-
+| <code>0000 10d fffff</code> || SUBWF f,d || Subtract W from f (d = f − W)
+|-
+| <code>0000 11d fffff</code> || DECF f,d || Decrement f (d = f − 1)
+|-
+| <code>0001 00d fffff</code> || IORWF f,d || Inclusive OR W with F (d = f OR W)
+|-
+| <code>0001 01d fffff</code> || ANDWF f,d || AND W with F (d = f AND W)
+|-
+| <code>0001 10d fffff</code> || XORWF f,d || Exclusive OR W with F (d = f XOR W)
+|-
+| <code>0001 11d fffff</code> || ADDWF f,d || Add W with F (d = f + W)
+|-
+| <code>0010 00d fffff</code> || MOVF f,d || Move F (d = f)
+|-
+| <code>0010 01d fffff</code> || COMF f,d || Complement f (d = NOT f)
+|-
+| <code>0010 10d fffff</code> || INCF f,d || Increment f (d = f + 1)
+|-
+| <code>0010 11d fffff</code> || DECFSZ f,d || Decrement f (d = f − 1) and skip if zero
+|-
+| <code>0011 00d fffff</code> || RRF f,d || Rotate right F (rotate right through carry)
+|-
+| <code>0011 01d fffff</code> || RLF f,d || Rotate left F (rotate left through carry)
+|-
+| <code>0011 10d fffff</code> || SWAPF f,d || Swap 4-bit halves of f (d = f<<4 | f>>4)
+|-
+| <code>0011 11d fffff</code> || INCFSZ f,d || Increment f (d = f + 1) and skip if zero
+|-
+|colspan=3|
+|-
+| <code>0100 bbb fffff</code> || BCF f,b || Bit clear f (Clear bit b of f)
+|-
+| <code>0101 bbb fffff</code> || BSF f,b || Bit set f (Set bit b of f)
+|-
+| <code>0110 bbb fffff</code> || BTFSC f,b || Bit test f, skip if clear (Test bit b of f)
+|-
+| <code>0111 bbb fffff</code> || BTFSS f,b || Bit test f, skip if set (Test bit b of f)
+|-
+|colspan=3|
+|-
+| <code>1000 kkkkkkkk</code> || RETLW k || Set W to k and return
+|-
+| <code>1001 kkkkkkkk</code> || CALL k || Save return address, load PC with k
+|-
+| <code>101 kkkkkkkkk</code> || GOTO k || Jump to address k (9 bits!)
+|-
+| <code>1100 kkkkkkkk</code> || MOVLW k || Move literal to W (W = k)
+|-
+| <code>1101 kkkkkkkk</code> || IORLW k || Inclusive or literal with W (W = k OR W)
+|-
+| <code>1110 kkkkkkkk</code> || ANDLW k || AND literal with W (W = k AND W)
+|-
+| <code>1111 kkkkkkkk</code> || XORLW k || Exclusive or literal with W (W = k XOR W)
+|}
+
+
+{| class=wikitable
+|+ 14-bit PIC instruction set
+! Opcode（二進制）!! 助記元 !! 說明
+|-
+| <code>00 0000 0000 0000</code> || NOP || No operation
+|-
+| <code>00 0000 0000 1000</code> || RETURN || Return from subroutine, W unchanged
+|-
+| <code>00 0000 0000 1001</code> || RETFIE || Return from interrupt
+|-
+| <code>00 0000 0110 0010</code> || OPTION || Write W to OPTION register
+|-
+| <code>00 0000 0110 0011</code> || SLEEP || Go into standby mode
+|-
+| <code>00 0000 0110 0100</code> || CLRWDT || Reset watchdog timer
+|-
+| <code>00 0000 0110 01ff</code> || TRIS f || Write W to tristate register f
+|-
+|colspan=3|
+|-
+| <code>00 0000 1 fffffff</code> || MOVWF f || Move W to f
+|-
+| <code>00 0001 0 xxxxxxx</code> || CLRW || Clear W to 0 (W = 0)
+|-
+| <code>00 0001 1 fffffff</code> || CLRF f || Clear f to 0 (f = 0)
+|-
+| <code>00 0010 d fffffff</code> || SUBWF f,d || Subtract W from f (d = f − W)
+|-
+| <code>00 0011 d fffffff</code> || DECF f,d || Decrement f (d = f − 1)
+|-
+| <code>00 0100 d fffffff</code> || IORWF f,d || Inclusive OR W with F (d = f OR W)
+|-
+| <code>00 0101 d fffffff</code> || ANDWF f,d || AND W with F (d = f AND W)
+|-
+| <code>00 0110 d fffffff</code> || XORWF f,d || Exclusive OR W with F (d = f XOR W)
+|-
+| <code>00 0111 d fffffff</code> || ADDWF f,d || Add W with F (d = f + W)
+|-
+| <code>00 1000 d fffffff</code> || MOVF f,d || Move F (d = f)
+|-
+| <code>00 1001 d fffffff</code> || COMF f,d || Complement f (d = NOT f)
+|-
+| <code>00 1010 d fffffff</code> || INCF f,d || Increment f (d = f + 1)
+|-
+| <code>00 1011 d fffffff</code> || DECFSZ f,d || Decrement f (d = f − 1) and skip if zero
+|-
+| <code>00 1100 d fffffff</code> || RRF f,d || Rotate right F (rotate right through carry)
+|-
+| <code>00 1101 d fffffff</code> || RLF f,d || Rotate left F (rotate left through carry)
+|-
+| <code>00 1110 d fffffff</code> || SWAPF f,d || Swap 4-bit halves of f (d = f<<4 | f>>4)
+|-
+| <code>00 1111 d fffffff</code> || INCFSZ f,d || Increment f (d = f + 1) and skip if zero
+|-
+|colspan=3|
+|-
+| <code>01 00 bbb fffffff</code> || BCF f,b || Bit clear f (Clear bit b of f)
+|-
+| <code>01 01 bbb fffffff</code> || BSF f,b || Bit set f (Set bit b of f)
+|-
+| <code>01 10 bbb fffffff</code> || BTFSC f,b || Bit test f, skip if clear (Test bit b of f)
+|-
+| <code>01 11 bbb fffffff</code> || BTFSS f,b || Bit test f, skip if set (Test bit b of f)
+|-
+|colspan=3|
+|-
+| <code>10 0 kkkkkkkkkkk</code> || CALL k || Save return address, load PC with k
+|-
+| <code>10 1 kkkkkkkkkkk</code> || GOTO k || Jump to address k (11 bits)
+|-
+|colspan=3|
+|-
+| <code>11 00xx kkkkkkkk</code> || MOVLW k || Move literal to W (W = k)
+|-
+| <code>11 01xx kkkkkkkk</code> || RETLW k || Set W to k and return
+|-
+| <code>11 1000 kkkkkkkk</code> || IORLW k || Inclusive or literal with W (W = k OR W)
+|-
+| <code>11 1001 kkkkkkkk</code> || ANDLW k || AND literal with W (W = k AND W)
+|-
+| <code>11 1010 kkkkkkkk</code> || XORLW k || Exclusive or literal with W (W = k XOR W)
+|-
+| <code>11 110x kkkkkkkk</code> || SUBLW k || Subtract W from literal (W = k − W)
+|-
+| <code>11 111x kkkkkkkk</code> || ADDLW k || Add literal to W (W = k + W)
+|}
+=== PIC燒錄器 ===
+燒錄芯片的方式有兩種：普通燒錄和線上燒錄。
+
+早期的 PIC16C 系列需使用平行燒錄。 程式記憶體為 Flash 的版本使用方便的序列燒錄方式，稱為 ICSP。
+
+== 開發環境 ==
+Microchip 公司提供免費的開發環境 (MPLAB IDE) 與組譯器，也出售付費與提供有條件免費版本的 C 語言編譯器。另有第三方軟體商開發各式 C, BASIC 等編譯器與開發環境可以選用。
+
+MPLAB 的下一代多平台開發環境 MPLAB-X (基於 Java 技術) 目前尚處於 beta 階段。
+
+== 外部連結 ==
+{{Commonscat|PIC microcontrollers}}
+<!--===========================({{NoMoreLinks}})===============================-->
+<!--| DO NOT ADD MORE LINKS TO THIS ARTICLE. WIKIPEDIA IS NOT A COLLECTION OF |-->
+<!--| LINKS. If you think that your link might be useful, do not add it here, |-->
+<!--| but put it on this article's discussion page first or submit your link  |-->
+<!--| to the appropriate category at the Open Directory Project (www.dmoz.org)|-->
+<!--| and link back to that category using the {{dmoz}} template.             |-->
+<!--|                                                                         |-->
+<!--|           Links that have not been verified WILL BE DELETED.            |-->
+<!--|  See [[Wikipedia:External_links|Wikipedia:External links]] and [[Wikipedia:Spam|Wikipedia:Spam]] for details    |-->
+<!--===========================({{NoMoreLinks}})===============================--> 
+* [http://www.microchip.com Microchip.com]{{Wayback|url=http://www.microchip.com/ |date=20110209160442 }}  官方網站（美國）
+* [http://www.piclist.com the PICList]{{Wayback|url=http://www.piclist.com/ |date=20080906101435 }} FAQ and Archive from the "PICList" email list hosted at [[MIT|MIT]]。A well respected source of manufacturer-independent solutions, source code, and expertise.
+* [http://gputils.sourceforge.net GPUTILS]{{Wayback|url=http://gputils.sourceforge.net/ |date=20161128141025 }} Open Source assembler and linker.
+* [http://softwarepic.50webs.com Free software tools]{{Wayback|url=http://softwarepic.50webs.com/ |date=20170115161947 }} Free C, C++, Pascal, Basic compilers for the PIC microcontroller series.
+* [http://www.juts.net/rfpic.html]{{Wayback|url=http://www.juts.net/rfpic.html |date=20081029224731 }}Example C code for the rfPIC
+* example of robot controlled by PIC16F877A: [http://it.youtube.com/watch?v=NCo9fr7knK4] [http://it.youtube.com/watch?v=WoD_8QA2VSg]
+* [http://usbpicprog.org USB Pic Programmer]{{Wayback|url=http://usbpicprog.org/ |date=20200918093332 }} An open source project for a universal PIC programmer
+* [http://www.cainetworks.com/manuals/webcontrol/WebControlUserGuide.pdf]{{Wayback|url=http://www.cainetworks.com/manuals/webcontrol/WebControlUserGuide.pdf |date=20101026142952 }} A PIC microcontroller based Network I/O controller
+* [http://gb.boumpower.ch GameBoy® GB–PIC© Project]{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }}  Enable GameBoy hardware to PIC16F877
+
+{{-}}
+{{RISC-based processor architectures}}
+{{8bitMCUs}}
+{{Microcontrollers}}
+
+[[Category:微控制器|Category:微控制器]]

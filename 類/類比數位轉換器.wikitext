@@ -1,0 +1,254 @@
+{{noteTA
+|G1=Electronics
+|T=zh-cn:模拟数字转换器;zh-tw:類比數位轉換器;zh-hk:模擬數碼轉換器
+}}
+[[File:WM_WM8775SEDS-AB.jpg|thumb]]模拟数字转换器]]
+[[File:ADC_Symbol.jpg|thumb]]
+'''模拟数字转换器'''（{{lang-en|'''Analog-to-digital converter''', '''ADC''', '''A/D''' 或 '''A to D'''}}）是用于将[[模拟信号|模拟形式]]的[[连续信号|连续信号]]转换为[[数字信号|数字形式]]的[[离散信号|离散信号]]的一类设备。一个模拟数字转换器可以提供信号用于测量。与之相对的设备成为[[数字模拟转换器|数字模拟转换器]]。
+
+典型的模拟数字转换器将模拟信号转换为表示一定比例电压值的数字信号。然而，有一些模拟数字转换器并非纯的电子设备，例如[[旋转编码器|旋转编码器]]，也可以被视为模拟数字转换器。
+
+数字信号输出可能会使用不同的编码结构。通常会使用二进制[[二补数|二补数]]（也称作“补码”）进行表示，但也有其他情况，例如有的设备使用[[格雷码|格雷码]]（一种循环码）。<ref>{{cite journal|author=刘海涛，王志功，孟桥，唐凯|title=高速模数转换器中格雷码与二进制编码对比|journal=东南大学学报（自然科学版）|year=2010|volume=40|issue=3}}</ref>
+
+== 概念 ==
+=== 分辨率 ===
+[[File:ADC_voltage_resolution.svg|thumb]]
+模拟数字转换器的分辨率是指，对于允许范围内的模拟信号，它能输出离散数字信号值的个数。这些信号值通常用二进制数来存储，因此分辨率经常用[[位元|位元]]作为单位，且这些离散值的个数是2的幂指数。例如，一个具有8位分辨率的模拟数字转换器可以将模拟信号编码成256个不同的离散值（因为2<sup>8</sup> = 256），从0到255（即无符号整数）或从-128到127（即带符号整数），至于使用哪一种，则取决于具体的应用。
+
+分辨率同时可以用电气性质来描述，使用单位[[伏特|伏特]]。使得输出离散信号产生一个变化所需的最小输入电压的差值被称作最低有效位（{{lang|en|Least significant bit, LSB}}）电压。这样，模拟数字转换器的分辨率''Q''等于LSB电压。模拟数字转换器的电压分辨率等于它总的电压测量范围除以离散电压间隔数：
+
+:<math>Q = \dfrac{E_ \mathrm {FSR}}{N},</math>
+
+这里''N''是离散电压间隔数，''E''<sub>FSR</sub>是总的电压测量范围， ''E''<sub>FSR</sub>由下式给出
+
+:<math>E_ \mathrm {FSR} = V_ \mathrm {RefHi} - V_ \mathrm {RefLow}, \,</math>
+
+这里''V''<sub>RefHi</sub>和''V''<sub>RefLow</sub>是转换过程允许电压的上下限。
+
+正常情况下，电压间隔数等于
+
+:<math>N = 2^M, \,</math>
+
+这里''M''是模拟数字转换器以位元为单位下的分辨率。
+
+=== 响应类型 ===
+大多数模拟数字转换器的响应类型为线性，这里的“线性”是指，输出信号的大小与输入信号的大小成线性比例。
+
+一些早期的转换器的响应类型呈对数关系，由此来执行A-law算法或μ-law算法编码。这些编码现在由高分辨率的线性模拟数字转换器（例如12或16位）达到，并将其8为编码输出值进行绘制。
+
+=== 误差 ===
+模拟数字转换器的误差有若干种来源。[[量化_(信号处理)|量化]]错误和非线性误差（假设这个模拟数字转换器标称具有线性特征）是任何模拟数字转换中都存在的内在误差。也有一种被称作孔径误差（{{lang|en|aperture error}}），它是由于时钟的不良振荡，且常常在对时域信号数字化的过程中出现。时钟的不良振荡所引起的孔径误差可以等效到ADC的采样保持器中，这个时钟称之为采样信号而采样信号的相位不确定性就使得实际的采样时间是随机变化的，在对一个动态变化的信号采样时，我们认定的采样信号<math> V_{in} </math>可能变成了 <math> V_{in}(t-\Delta t) </math>，其中<math>\Delta t</math>是一个具有统计规律的随机时延。如果我们将时钟的这种相位不确定性看作是一种相位噪声，那么这个相位噪声会由采样过程传递到原始信号中去。这种误差就是上述的孔径误差或孔径抖动误差。孔径抖动误差必然会带来噪声。下面简单说明时钟抖动与噪声的关系。
+设信号为<math> v(t) </math>，那么若由于在孔径抖动造成的时间上的不确定量<math>\Delta t</math>会造成采样信号的不确定度<math>\Delta v(t)</math>，用数学公式可以表示为：
+  <math>\Delta v(t)=v(t')-v(t'-\Delta t)</math>                                           （式1）
+当时间抖动无偏时，那么有：
+   <math>\Delta v(t)=v(t+\frac {\Delta t}{2})-v(t-\frac {\Delta t}{2})</math>                                  （式2）
+再假设<math>\Delta t</math> 为一微小量，那么
+   <math>\Delta v(t)=\Delta t\cdot v'(t)</math>                                                 （式3）
+对于一个确定的信号，当<math>t</math>确定后，上式中的<math> v(t) </math>为一个确定量，而<math>\Delta t</math>是有统计规律的。因此两边取期望，得到：
+  <math>E[\Delta v(t)]=E[\Delta t\cdot v'(t)]=E[\Delta t]\cdot v'(t)</math>                                 （式4）
+且有：
+   <math>E[\Delta v^2(t)]=E[\Delta t^2\cdot v'^2(t)]=E[\Delta t^2]\cdot v'^2(t)</math>                            （式5）
+由式4和式5，并假设<math>\Delta v(t)</math> 和<math>\Delta t</math>都是零均值随机量，这时可以得到：
+   <math>\sigma _{ns}^2(t)=\sigma _t^2(t)\cdot v'^2(t)</math>                                               （式6）
+对两端求时间平均：
+     <math>\frac {1}{T}\int_{t-\frac {T}{2}}^{t+\frac {T}{2}} \sigma _{ns}^2(t) \, dt =\frac {1}{T}\int_{t-\frac {T}{2}}^{t+\frac {T}{2}} \sigma _t^2(t)\cdot v'^2(t) \, dt </math>                                  （式7）
+一般的，有<math>\sigma _t^2(t)=const</math> ，即 <math>\sigma _t^2(t)=\sigma _t^2</math>，上式可以写作：
+  <math>\frac {1}{T}\int_{t-\frac {T}{2}}^{t+\frac {T}{2}} \sigma _{ns}^2(t) \, dt =\sigma _t^2(t)\cdot \frac {1}{T}\int_{t-\frac {T}{2}}^{t+\frac {T}{2}} v'^2(t) \, dt</math>                            （式8）
+若原始信号有各态历经特性，那么上式的左边可以理解为噪声的功率。于是
+   <math>P_{ns}=\sigma_t^2\cdot E(v'^2(t))</math>                                                    （式9）
+因此，孔径抖动所引入的噪声大小与信号的导数有关，对于高动态的信号，即其导数大的信号，其噪声的功率在孔径误差相同时会更大。
+
+=== 采样率 ===
+模拟信号在时域上是连续的，因此可以将它转换为时间上连续的一系列数字信号。这样就要求定义一个参数来表示新的数字信号采样自模拟信号速率。这个速率称为转换器的[[采样率|采样率]]或[[采样频率|采样频率]]。
+
+可以采集连续变化、带宽受限的信号（即每隔一时间测量并存储一个信号值），然后可以通过[[插值|插值]]将转换后的离散信号还原为原始信号。这一过程的精确度受量化误差的限制。然而，仅当采样率比信号频率的两倍还高的情况下才可能达到对原始信号的忠实还原，这一规律在[[采样定理|采样定理]]有所体现。
+
+由于实际使用的模拟数字转换器不能进行完全实时的转换，所以对输入信号进行一次转换的过程中必须通过一些外加方法使之保持恒定。常用的有采样-保持电路<ref>{{cite journal|author=陈俊，周正中|title=高速、高精度频率采样中的量化误差分析|journal=电子科技大学学报|year=2007|volume=36|issue=1}}</ref>，在大多数的情况里，通过使用一个[[电容器|电容器]]可以存储输入的模拟电压，并通过开关或门电路来闭合、断开这个电容和输入信号的连接。许多模拟数字转换集成电路在内部就已经包含了这样的采样-保持子系统。
+
+=== 混叠 ===
+{{main|混叠}}
+
+所有的模拟数字转换器以每隔一定时间进行采样的形式进行工作。因此，它们的输出信号只是对输入信号行为的不完全描述。在某一次采样和下一次采样之间的时间段，仅仅根据输出信号，是无法得知输入信号的形式的。如果输入信号以比采样率低的速率变化，那么可以假定这两次采样之间的信号介于这两次采样得到的信号值。然而，如果输入信号改变过快，则这样的假设是错误的。
+
+如果模拟数字转换器产生的信号在系统的后期，通过[[数字模拟转换器|数字模拟转换器]]，则输出信号可以忠实地反映原始信号。如经过输入信号的变化率比采样率大得多，则是另一种情况，模拟数字转换器输出的这种“假”信号被称作“混叠”。混叠信号的频率为信号频率和采样率的差。例如，一个2千[[赫兹|赫兹]]的[[正弦曲线|正弦曲线]]信号在采样率在1.5千赫兹采样率的转换后，会被重建为500赫兹的正弦曲线信号。这样的问题被称作“混叠”。
+
+为了避免混叠现象，模拟数字转换器的输入信号必须通过[[低通滤波器|低通滤波器]]进行滤波处理，过滤掉频率高于采样率一半的信号。这样的滤波器也被称作[[反锯齿|反锯齿]]滤波器。它在实用的模拟数字转换系统中十分重要，常在混有高频信号的模拟信号的转换过程中应用。
+
+尽管在大多数系统里，混叠是不希望看到的现象，值得注意的是，它可以提供限制带宽高频信号的同步向下混合（{{lang|en|simultaneous down-mixing }}，请参见[[采样过疏|采样过疏]]和[[混频器|混频器]]）。
+
+=== Dither信号 ===
+在模拟数字转换器中，工作状况可以通过引入抖动信号（{{lang|en|Dither}}）得到改善。Dither信号是在转换前混入输入信号的微量随机噪声（[[白噪声|白噪声]]）。它的作用效果是输入信号极小时，造成LSB的状态随机在0和1之间振荡，而不是处于某一个固定值。这样做可以扩展模拟数字转换器可以转换的有效范围，而不需要在低输入的情况下完全切断这个信号，不过这样做的代价是噪音会小幅增加，量化误差会扩散到一系列噪音信号值。在时间范围上，还是可以较为精确地反映信号在时间上的变化。在输出端，使用一个适当的[[电子滤波器|电子滤波器]]可以还原这个小幅信号波动。
+
+没有加入Dither信号的低幅音频信号听起来十分扭曲和令人不快。因为如果没有Dither信号，低幅信号可能造成最低有效位固定在0或者1。引入Dither信号之后，音频的实际振幅可以通过在取一段时间上实际量化的采样和一系列Dither信号的采样的平均值来计算。Dither信号在一些集成系统里也有应用，例如[[电度表|电度表]]，它可以使信号值产生比模拟数字转换器最低有效位更为精确的结果。注意引入Dither信号只能增加采样器的分辨率，但是不能增加其线性的性质，因此精确度不一定能够改善。
+
+=== 过采样 ===
+{{main|过采样}}
+通常的，为了经济，信号以允许的最低采样率被采样，造成的结果是产生在转换器整个通带上分布的白噪声。如果信号以高于[[奈奎斯特频率|奈奎斯特频率]]的频率被采样、然后进行[[数字滤波器|数字滤波]]，才从而保证限制信号带宽，则又以下几个好处：
+
+* 数字滤波器具有比模拟滤波器更好的性质（更锐利的[[滚降|滚降]]、相位），所有可以构成更锐利的反锯齿滤波器，从而可以对信号进行向下采样，给出更好的结果；
+* 一个20位的模拟数字转换器可以当做一个24位、具有256倍过密采样的模拟数字转换器使用；
+* 尽管有量化噪声，[[信噪比|信噪比]]还是会比使用整个可用的带宽更高。使用了此技术后，可能会获得一个比单独使用转换器更高的分辨率；
+* 每倍频的过密采样（在很多应用中还不够）的信噪比的改善为3[[分贝|分贝]]（等效于0.5位）。因此，过密采样通常与噪音信号整形耦合在一起。通过噪音整形，改善可以达到每倍频6L+3 dB（这里L是用于噪音整形的环路滤波器的阶数，例如，一个2阶环路滤波器可以提供15分贝每倍频的改善）。
+
+=== 相对速度和精确度 ===
+模拟数字转换器的速度根据其种类有较大的差异。威尔金森模拟数字转换器受到其时钟率的限制。目前，频率超过300兆赫兹已经成为可能。转换所需的时间这届与通道的数量成比例。对于一个逐次逼近（{{lang|en|successive-approximation}}）模拟数字转换器，其转换时间与通道数量的对数成比例。这样，大量通道可以使逐次逼近转换器比威尔金森转换器快。然而，威尔金斯转换器消耗的时间是数字的，而逐次逼近转换器是模拟的。由于模拟的自身就比数字的更慢，当通道数量增加，所需的时间也增加。这样，其在工作时具有相互竞争的过程。Flash模拟数字转换器是这三种里面最快的一种，转换基本是一个单独平行的过程。对于一个8位单元，转换可以在十几个纳秒的时间内完成。
+
+人们期望在速度和精确度之间达到一个最佳平衡。Flash模拟数字转换器具有与比较器水平的漂移和不确定性，这将导致通道宽度的不均一性。结果是Flash模拟数字转换器的线性不佳。对于逐次逼近模拟数字转换器，糟糕的线性也很明显，不过这还是比Flash模拟数字转换器好一点。这里，非线性是源于减法过程的误差积累。在这一点上，威尔金森转换器是表现最好的。它们拥有最好的微分非线性。其他种类的转换器则要求通道平滑，以达到像威尔金森转换器的水平。<ref>{{Harvtxt|Knoll|1989|p=664–665}}</ref><ref>{{Harvtxt|Nicholson|1974|p=313–315}}</ref>
+
+== 分类 ==
+* 直接转换模拟数字转换器（{{lang|en|Direct-conversion ADC}}），或称Flash模拟数字转换器（{{link-en|Flash ADC|Flash ADC|Flash ADC}}）
+* [[循續漸近式類比數位轉換器|循續漸近式類比數位轉換器]]（{{lang|en|Successive approximation ADC}}）
+* 跃升-比较模拟数字转换器（{{lang|en|Ramp-compare ADC}}）<ref>{{Cite web |url=http://www.atmel.com/dyn/resources/prod_documents/doc0942.pdf |title=Atmel Application Note AVR400: Low Cost A/D Converter |access-date=2011-09-10 |archive-date=2011-06-29 |archive-url=https://web.archive.org/web/20110629070938/http://www.atmel.com/dyn/resources/prod_documents/doc0942.pdf |dead-url=no }}</ref>
+* 威尔金森模拟数字转换器（{{lang|en|Wilkinson ADC}}）<ref>{{Harvtxt|Knoll|1989|p=663–664}}</ref><ref>{{Harvtxt|Nicholson|1974|p=309–310}}</ref>
+* 積分模拟数字转换器（{{lang|en|Integrating ADC}}）
+* Delta编码模拟数字转换器（{{lang|en|Delta-encoded ADC}}）
+* 管道模拟数字转换器（{{lang|en|Pipeline ADC}}）
+* [[ΔΣ調變|Sigma-Delta]]模拟数字转换器（{{lang|en|Sigma-delta ADC}}）
+* 时间交织模拟数字转换器（{{lang|en|Time-interleaved ADC}}）
+* 带有即时FM段的模拟数字转换器<ref>
+[www.analog.com/static/imported-files/tutorials/MT-028.pdf Analog Devices MT-028 Tutorial: "Voltage-to-Frequency Converters"] by Walt Kester and James Bryant 2009,
+apparently adapted from
+[http://books.google.com/books?id=0aeBS6SgtR4C&pg=RA2-PA274&lpg=RA2-PA274&dq=%22voltage-to-frequency%22+%22frequency+counter%22+adc&source=bl&ots=6yR9U1k51Y&sig=_LuxxY_xE0uw6LwAdI1ubwIKO7M&hl=en&ei=xCWaSpjaDefqnQfu74irBQ&sa=X&oi=book_result&ct=result&resnum=2#v=onepage&q=%22voltage-to-frequency%22%20%22frequency%20counter%22%20adc&f=false "Data conversion handbook"]
+by Walter Allan Kester 2005, page 274
+</ref><ref>
+[ww1.microchip.com/downloads/en/AppNotes/00795a.pdf Microchip AN795 "Voltage to Frequency / Frequency to Voltage Converter"] page 4: "13-bit A/D converter"
+</ref><ref>
+[http://books.google.com/books?id=1yBTAAAAMAAJ&q=%22voltage-to-frequency%22+%22frequency+counter%22+adc&dq=%22voltage-to-frequency%22+%22frequency+counter%22+adc "Elements of electronic instrumentation and measurement"] by Joseph J. Carr 1996, page 402
+</ref><ref>{{Cite web |url=http://www.globalspec.com/reference/3127/Voltage-to-Frequency-Analog-to-Digital-Converters |title="Voltage-to-Frequency Analog-to-Digital Converters" |access-date=2011-09-10 |archive-date=2021-03-05 |archive-url=https://web.archive.org/web/20210305171259/https://www.globalspec.com/reference/3127/Voltage-to-Frequency-Analog-to-Digital-Converters |dead-url=no }}</ref><ref>
+[http://books.google.com/books?id=3kY4-HYLqh0C&pg=PA130&lpg=PA130&dq=%22voltage-to-frequency%22+adc&source=bl&ots=opOMCo42vk&sig=6Y8ykUT6fJAB0hFOrhVAz2vzXPY&hl=en&ei=bTGaSqXuL9eEngey_YiWCA&sa=X&oi=book_result&ct=result&resnum=2#v=onepage&q=%22voltage-to-frequency%22%20adc&f=false "Troubleshooting Analog Circuits"] by Robert A. Pease 1991, p. 130
+</ref>
+
+也有利用电子技术和其他技术结合的转换器：
+* 时间延伸模拟数字转换器（{{lang|en|Time stretch analog-to-digital converter, TS-ADC}}
+
+== 商用的模拟数字转换器 ==
+这类产品大多是[[集成电路|集成电路]]。
+
+大多数转换器具有6至24位的分辨率，且每秒进行少于百万采样。当要求更高的分辨率时会产生热噪声（{{lang|en|Thermal noise}}）。对于音频应用，在室温状态，这样的噪声通常小于1微伏的白噪声。如果最大有效位对应一个标准的2伏输出信号，对于有限噪声信号的转换低于20至21位，可以不需要使用抖动。截止到2002年2月，百万级、十亿级采样率已经可使用。在数码摄像机、视频捕获卡、电视调谐卡等需要转换全速模拟视频至数字视频文件的设备中，百万采样率的转换器的应用十分必要。商用转换器的输出信号通常具有±0.5至1.5的最低有效位误差。
+
+在很多情况中，集成电路中最昂贵的部分是插脚（{{lang|en|pins}}），因为它们让整个封装变得更大，且每一个插脚必须和集成电路中的硅连接。为了节省插脚，常用的做法是每一个插脚与计算机进行[[串行通信|串行通信]]，每当时钟信号改变到下一个状态时，传输一个位的电压信号，比如，从0伏特到5伏特。这样做可以为模拟数字转换器节省很多插脚，而且在许多情况里，可以避免将整个设计复杂化（即便是[[微处理器|微处理器]]，如果使用存储器映射输入输出（{{lang|en|Memory-mapped I/O}}），就只需要一个端口的几个位来进行串行通信）。
+
+商用的模拟数字转换器经常具有几个输入端口连接到同一个转换器，采用的技术通常是利用模拟[[数据选择器|数据选择器]]进行多路复用。不同的型号可能还会包含采样-保持电路，[[放大器|放大器]]和[[差分信号|差分信号]]输入（输入量表示为两个端口电压的差值）。
+
+== 应用 ==
+=== 音乐录制 ===
+模拟数字转换器对于目前的音乐复制技术至关重要。由于大多数音乐都在计算机上制作，当模拟信号被录制，就需要一个模拟数字转换器来创建[[脉冲编码调制|脉冲编码调制]]数据流，并可以以数字音乐格式刻录在[[CD|CD]]上。
+
+在音乐制作中使用的模拟数字转换器可以以最高192千赫兹的频率进行采样。高带宽净空允许使用更便宜、更快的反锯齿滤波器。过密采样的支持者强调，这样更浅的反锯齿滤波器对声音品质可以产生更少的负面效应，因为它们具有更舒缓的斜率。其他的一些人则完全支持使用无滤波器的模拟数字转换器，称使用反锯齿滤波器比转换前使用砖墙式滤波器对音质产生更小的损坏。有大量文献讨论了此类问题，不过商业考虑才是最有影响的。大多数高质量录音棚以24位/192-176.4千赫兹脉冲编码调制或[[Direct_Stream_Digital|DSD]]来录制音乐，然后向下采样或有损压缩以进行[[CDDA|红皮书CD]]的44.1千赫兹<ref>{{cite journal|author=庄杰|title=索尼SCD-XB940 SACD唱机|journal=使用应用技术|year=2001|issue=6}}</ref>，或针对广播电视应用的48千赫兹。
+
+=== 数字信号处理 ===
+在模拟信号需要以数字形式处理、存储或传输时，模拟数字转换器几乎必不可少。例如，快速视频模拟数字转换器在电视调谐卡中得到了应用。8,10,12或16位的慢速在片（{{lang|en|On-chip}}）模拟数字转换器在[[微控制器|微控制器]]里十分普遍。速度很高的模拟数字转换器在数字[[示波器|示波器]]里是必需的，另外在[[软件无线电|软件无线电]]里也很关键。
+
+== 参考文献 ==
+{{reflist}}
+* {{Citation
+ |first= Phillip E.
+ |last= Allen
+ |first2= Douglas R.
+ |last2= Holberg
+ |title= CMOS Analog Circuit Design
+ |year=
+ |publisher=
+ |isbn= 0-19-511644-5
+ |doi= }}
+* {{Citation
+ |editor-last= Kester
+ |editor-first= Walt
+ |title= The Data Conversion Handbook
+ |year= 2005
+ |publisher= Elsevier: Newnes
+ |url= http://www.analog.com/library/analogDialogue/archives/39-06/data_conversion_handbook.html
+ |isbn= 0-7506-7841-0
+ |doi= 
+ |accessdate= 2011-09-10
+ |archive-date= 2016-10-07
+ |archive-url= https://web.archive.org/web/20161007205654/http://www.analog.com/library/analogDialogue/archives/39-06/data_conversion_handbook.html
+ |dead-url= no
+ }}
+* {{Citation
+ |last= Johns
+ |first= David
+ |last2= Martin
+ |first2= Ken
+ |title= Analog Integrated Circuit Design
+ |year=
+ |publisher=
+ |isbn= 0-471-14448-7
+ |doi= }}
+* {{Citation
+ |last= Knoll
+ |first= Glenn F.
+ |title=Radiation Detection and Measurement
+ |edition= 2nd
+ |year= 1989
+ |publisher= John Wiley & Sons
+ |location= New York
+ |pages= 665–666
+ |isbn=
+ |doi= }}
+* {{Citation
+ |last= Liu
+ |first= Mingliang
+ |title= Demystifying Switched-Capacitor Circuits
+ |year=
+ |publisher=
+ |isbn= 0-7506-7907-7
+ |doi= }}
+* {{Citation
+ |last= Nicholson
+ |first= P. W.
+ |title= Nuclear Electronics
+ |year= 1974
+ |publisher= John Wiley & Sons
+ |location= New York
+ |pages= 315–316
+ |isbn=
+ |doi=}}
+* {{Citation
+ |last= Norsworthy
+ |first= Steven R.
+ |last2= Schreier
+ |first2= Richard
+ |last3= Temes
+ |first3= Gabor C.
+ |title= Delta-Sigma Data Converters
+ |year= 1997
+ |publisher= IEEE Press
+ |isbn= 0-7803-1045-4
+ |doi= }}
+* {{Citation
+ |last= Razavi
+ |first= Behzad
+ |authorlink= Behzad Razavi
+ |title= Principles of Data Conversion System Design
+ |year= 1995
+ |publisher= IEEE Press
+ |location= New York, NY
+ |isbn= 0-7803-1093-4
+ |doi= }}
+* {{Citation
+ |last    = Staller
+ |first   = Len
+ |url     = http://www.embedded.com/showArticle.jhtml?articleID=60403334
+ |title   = Understanding analog to digital converter specifications
+ |date    = February 24, 2005
+ |journal = Embedded Systems Design
+ |doi     = 
+}}{{dead link|date=2018年2月 |bot=InternetArchiveBot |fix-attempted=yes }}
+* {{Citation
+ |last= Walden
+ |first= R. H.
+ |title= Analog-to-digital converter survey and analysis
+ |journal= IEEE Journal on Selected Areas in Communications
+ |volume= 17
+ |issue= 4
+ |pages= 539–550
+ |year= 1999
+ |issn= 0733-8716
+ |url= http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=761034
+ |doi= 10.1109/49.761034}}
+
+{{模拟电路}}
+{{数字电路}}
+{{Authority control}}
+[[Category:电路|A]]

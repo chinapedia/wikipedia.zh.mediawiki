@@ -1,0 +1,118 @@
+{{NoteTA
+|G1 = IT
+|1 = zh-cn:标记; zh-tw:記號;
+}}
+'''位元組順序記號'''（{{lang-en|byte-order mark}}，'''BOM'''）是位於碼點<code>U+FEFF</code>的[[統一碼|統一碼]]字符的名称。當以[[UTF-16|UTF-16]]或[[UTF-32|UTF-32]]來將[[UCS|UCS]]/統一碼字符所組成的字串編碼時，這個字符被用來標示其[[位元組序|位元組序]]。它常被用來當做標示文件是以[[UTF-8|UTF-8]]、[[UTF-16|UTF-16]]或[[UTF-32|UTF-32]]編碼的記號。
+
+位元組順序記號通常有幾種涵義<ref name="unicode FAQ">{{cite web|url=https://www.unicode.org/faq/utf_bom.html#BOM |title=FAQ - UTF-8, UTF-16, UTF-32 & BOM |website=Unicode.org |access-date=2017-01-28}}</ref>：
+# 在16位元和32位元的情況下，文字流的[[位元組順序|位元組順序]]。
+# 表示文字流非常有可能是[[Unicode|Unicode]]編碼。
+# 使用的是哪一種Unicode[[字元編碼|字元編碼]]。
+
+位元組順序記號的使用是選擇性的。它的存在會干擾那些不希望檔案開頭出現非ASCII字元、但可以用其他方式處理文字流的軟體對於UTF-8的使用。
+
+Unicode可以以8位元、16位元或32位元整數為單位進行編碼。對於16位元和32位元的表示方法，從任意來源接收文本的電腦需要知道整數是以何種位元組順序編碼的。位元組順序記號的編碼方式與文件檔案的其他部分相同，如果它的位元組被調換，就會變成一個[[Unicode字符列表#特殊|非字元]]的Unicode碼位。因此，訪問文本的過程中，可以透過檢查這頭幾個位元組來確定[[位元組順序|位元組順序]]，而不需要文字流本身以外的一些約定或[[元資料|元資料]]。一般來說，如果有必要，接收資料的電腦會將位元組換成自己的位元組順序，不再需要位元組順序記號進行處理。
+
+每個Unicode編碼（包括Unicode標準以外的編碼，如UTF-7，見[[#不同編碼的位元組順序記號的表示|下表]]）的BOM位元組序列都不一樣，而且這些序列都不可能出現在以其他編碼儲存的文字流的開頭。因此，在文字流的開頭放置一個編碼的BOM，可以表明文本是Unicode，並識別所使用的編碼方案。這種對BOM字元的使用被稱為「Unicode簽名」<ref>{{cite web|title=The Unicode® Standard Version 9.0|url=https://www.unicode.org/versions/Unicode9.0.0/UnicodeStandard-9.0.pdf|website=The Unicode Consortium|ref=2.13 Special Characters}}</ref>。
+
+==使用==
+字符U+FEFF如果出现在字节流的开头，则用来标识该字节流的字节序，是高位在前还是低位在前。如果它出现在字节流的中间，则表达'''零寬度非换行空格'''的意义，用户看起来就是一个空格。从Unicode3.2开始，<code>U+FEFF</code>只能出现在字节流的开头，只能用于标识字节序，就如它的名称——字节顺序标记——所表示的一样；除此以外的用法已被捨棄。取而代之的是，使用<code>U+2060</code>來表达零寬度無斷空白。
+
+===UTF-8===
+在[[UTF-8|UTF-8]]中，雖然在 Unicode 標準上允許位元組順序記號的存在<ref>{{cite web|url=https://www.unicode.org/versions/Unicode5.0.0/ch02.pdf |title=The Unicode Standard 5.0, Chapter 2:General Structure |access-date=2009-03-29 |page=36 | quote=Table 2-4. The Seven Unicode Encoding Schemes}}</ref>，但實際上並不一定需要<ref>{{cite web|url=https://www.unicode.org/versions/Unicode5.0.0/ch02.pdf |title=The Unicode Standard 5.0, Chapter 2:General Structure |access-date=2008-11-30 |page=36 |quote=Use of a BOM is neither required nor recommended for UTF-8, but may be encountered in contexts where UTF-8 data is converted from other encoding forms that use a BOM or where the BOM is used as a UTF-8 signature}}</ref>。UTF-8編碼過的位元組順序記號則被用來標示它是UTF-8的文件。它只用來標示一個UTF-8的檔案，而不用來說明位元組順序<ref name="utf-8-bom">{{cite web|title = FAQ - UTF-8, UTF-16, UTF-32 & BOM: Can a UTF-8 data stream contain the BOM character (in UTF-8 form)? If yes, then can I still assume the remaining UTF-8 bytes are in big-endian order?|url = http://unicode.org/faq/utf_bom.html#29|accessdate = 2008-03-29|archive-date = 2012-09-01|archive-url = https://www.webcitation.org/6ALEu9GGt?url=http://unicode.org/faq/utf_bom.html#29|dead-url = no}}</ref>。但同時，該標準也不建議在有位元組順序記號的情況下將其刪除，以便在不同的編碼之間轉換時不會丟失資訊，並讓依賴位元組順序記號的程式能順利運作<ref>{{cite web|title=Re: pre-HTML5 and the BOM from Asmus Freytag on 2012-07-13 (Unicode Mail List Archive)|url=https://www.unicode.org/mail-arch/unicode-ml/y2012-m07/0268.html|website=Unicode.org|access-date = 2012-07-14}}</ref><ref>{{cite web|url=http://bugs.sun.com/view_bug.do?bug_id=6378911 |title=Bug ID: JDK-6378911 UTF-8 decoder handling of byte-order mark has changed |website=Bugs.sun.com |access-date=2017-01-28}}</ref>。IETF建議，如果一個協議(a)總是使用UTF-8，或者(b)有一些其他方法來表明正在使用的編碼，那麼它「應該禁止使用U+FEFF作為簽名」<ref name=rfc3629>{{cite IETF|title = UTF-8, a transformation format of ISO 10646|rfc = 3629|last1 = Yergeau|first1 = Francois|date=November 2003|publisher = [[Internet_Engineering_Task_Force|IETF]]|access-date = May 15, 2014}}</ref>。
+許多[[Windows作業系統|視窗]]程式（包含[[記事本|記事本]]）會需要添加位元組順序記號到UTF-8檔案，否則將無法正確解析編碼，而出現亂碼。然而，在[[類Unix系統|類Unix系統]]（大量使用[[文本文件|文本文件]]，用於[[檔案格式|檔案格式]]，用於[[行程間通訊|行程間通訊]]）中，這種做法則不被建議採用。因為它會妨礙到如解譯器腳本開頭的[[Shebang|Shebang]]等的一些重要的碼的正確處理。它亦會影響到無法識別它的程式語言。如[[gcc|gcc]]會報告源碼檔開頭有無法識別的字符。而在[[PHP|PHP]]中，如果沒有啟用輸出緩衝（output buffering），它會使得頁面內容開始被送往瀏覽器（即：用戶標頭檔已被送出），這使PHP腳本無法指定用戶標頭檔（HTTP Header）。位元組順序記號在UTF-8中被表示為序列<code>0xEF 0xBB 0xBF</code>，對大部分未準備好處理UTF-8的[[文本編輯器|文本編輯器]]及[[網頁瀏覽器|網頁瀏覽器]]而言，在[[ISO-8859-1|ISO-8859-1]]的環境中則會顯示<code>ï»¿</code>。
+
+Unicode標準允許在UTF-8中使用BOM，但並不要求或推薦使用它。位元組順序在UTF-8中沒有任何意義，所以它在UTF-8中的唯一用途是在開始時發出信號，表明文本流是用UTF-8編碼的，或者表明它是從包含可選BOM的文本流轉換到UTF-8的。該標準也不建議在有BOM的情況下將其刪除，以便在不同的編碼之間往返不會丟失信息，並使依賴BOM的代碼繼續工作。 IETF建議，如果一個協議要么(a)總是使用UTF-8，要么(b)有一些其他方法來表明正在使用的編碼，那麼它 "應該禁止使用U+FEFF作為簽名"。
+
+UTF-8是一種稀疏的編碼，意思是很大一部分可能的字元組合不會產生有效的UTF-8文本。任何其他編碼的二進制資料和文本都可能包含UTF-8無效的字元序列，唯一的例外是當文本純粹由ASCII範圍的字元組成的時候。因為所有的現代編碼都使用ASCII範圍的位元組來表示ASCII字元，所以無論發出這些位元組的系統打算使用什麼編碼，純ASCII的文本都可以被安全地解釋為UTF-8。由於這些考慮，使用啟發式的分析方法可以很有把握地檢測出文件是否使用UTF-8，而不需要加入BOM。
+另一方面，[[微軟|微軟]]的編譯器<ref>{{cite web|url=http://alfps.wordpress.com/2011/11/22/unicode-part-1-windows-console-io-approaches/|title=Unicode part 1: Windows console i/o approaches|author=Alf P. Steinbach|access-date=24 March 2012|year=2011|quote=However, since the C++ source code was encoded as UTF-8 without BOM (as is usual in Linux), the Visual C++ compiler erroneously assumed that the source code was encoded as Windows ANSI.}}</ref>和解釋器，以及許多[[Microsoft_Windows|Microsoft Windows]]上的軟體，如記事本，都將BOM視為一個必要的神奇數字，而不是使用啟發式分析法。這些工具在將文本保存為UTF-8時添加了BOM，並且只有在BOM存在或是文件只包含ASCII字元時才能解釋UTF-8。[[Windows_PowerShell|Windows PowerShell]]（截至5.1版本）在保存UTF-8的XML文件檔時，會添加一個BOM。然而，PowerShell Core 6在一些cmdlets上增加了一個-Encoding開關，稱為「utf8NoBOM」，這樣就可以在沒有BOM的情況下保存文件檔。[[Google文件|Google文件]]在將文件檔轉換為純文本文件以供下載時也會添加BOM。
+
+===UTF-16===
+在[[UTF-16|UTF-16]]中，位元組順序記號被放置為檔案或文字串流的第一個字符，以標示在此檔案或文字串流中，以所有十六位元為單位的字碼的端序（[[位元組順序|位元組順序]]）。如果試圖用錯誤的位元組順序來讀取這個流，位元組將被調換，從而產生字元<code>U+FFFE</code>，這個字元被Unicode定義為「非字元」，不應該出現在文本中。例如，值為<code>U+FFFE</code>的碼位被保證將不會被指定成一個統一碼字元。這意味著<code>0xFF</code>、<code>0xFE</code>將只能被解釋成小端序中的<code>U+FEFF</code>（因為不可能是大端序中的<code>U+FFFE</code>）。
+
+* 如果十六位元單位被表示成[[位元組順序|大端序]]，這位元組順序記號字符在序列中將呈現<code>0xFE</code>，其後跟著<code>0xFF</code>（其中的<code>0x</code>用來標示[[十六進位|十六進位]]）。
+* 如果十六位元單位使用[[位元組順序|小端序]]，這個位元組序列為<code>0xFF</code>，其後接著<code>0xFE</code>。
+
+這兩個序列都不是有效的UTF-8，所以它們的出現表明該文件不是用UTF-8編碼的。
+
+對於[[網際網路號碼分配局|網際網路號碼分配局]]註冊的字元集UTF-16BE和UTF-16LE，不應該使用位元組順序記號標記，因為這些字元集的名稱已經決定了位元組順序。如果在這樣的文本串流中的任何地方遇到<code>U+FEFF</code>，將被解釋為一個「零寬度無斷點空間」。
+
+如果沒有位元組順序記號，可以透過搜索ASCII字元（即與0x20-0x7E範圍內的字節相鄰的0位元組，還有CR和LF的0x0A和0x0D）來猜測該文本是否為UTF-16及其位元組順序。大量的（即遠遠高於隨機）相同的順序是UTF-16的一個非常好的指示，而0是在偶數還是奇數位元組中表明了位元組的順序。然而，這依然可能會導致假陽性和假陰性。
+
+Unicode標準的一致性條款D98（第3.10節）規定：「UTF-16編碼方案可以以BOM開始，也可以不以BOM開始。然而，當沒有BOM時，在沒有高層協議的情況下，UTF-16編碼方案的位元組順序是大端序。」是否有更高層次的協議是可以解釋的。例如，在一台本地位元組順序為小端序的電腦上的文件，可能被默認為是以UTF-16LE編碼。因此，大端序的推定被廣泛地忽略了。在HTML5中使用的[[全球資訊網協會|W3C]]/[[瀏覽器引擎比較_(HTML)|WHATWG]]編碼標準規定，標記為「utf-16」或「utf-16le」的內容將被解釋為小端序，「以處理部署的內容」<ref>{{cite web | url=https://encoding.spec.whatwg.org/#utf-16le | title=UTF-16LE | publisher=WHATWG | work=Encoding Standard}}</ref>。然而，如果出現了位元組順序記號，那麼該記號將被視為「比其他任何東西都更有權威性」<ref>{{cite web | url=https://encoding.spec.whatwg.org/#decode | title=Decode | publisher=WHATWG | work=Encoding Standard}}</ref>。
+
+將UTF-16解釋為基於位元組的編碼的程式可能會顯示出亂七八糟的字元，但是ASCII字元會被識別出來，因為UTF-16表示的低字元與ASCII代碼相同，因此會顯示相同的字元。0的上字元可以顯示為無、空白、句號，或其他一些不變的字形。
+
+===UTF-32===
+雖然位元組順序記號亦可以用於[[UTF-32|UTF-32]]，但這個編碼很少用於傳輸，其規則如同[[UTF-16|UTF-16]]。
+
+小端序UTF-32的BOM等同小端序UTF-16的BOM圖案後面加上一個NUL字元，這是一個不尋常的例子，即BOM在兩種不同的編碼中是相同的形式。使用BOM來識別編碼的程序員必須分辨文件是UTF-32編碼還是單純以NUL作為第一個字元。
+
+==不同編碼的位元組順序記號的表示==
+{| class="wikitable"
+|-
+! 編碼
+! 表示（[[十六進位|十六進位]]）
+! 表示（[[十進位|十進位]]）
+|-
+| [[UTF-8|UTF-8]]
+| <code>EF BB BF</code>
+| <code>239 187 191</code>
+|-
+| [[UTF-16|UTF-16]]（[[字节序#大端序|大端序]]）
+| <code>FE FF</code>
+| <code>254 255</code>
+|-
+| [[UTF-16|UTF-16]]（[[字节序#小端序|小端序]]）
+| <code>FF FE</code>
+| <code>255 254</code>
+|-
+| [[UTF-32|UTF-32]]（大端序）
+| <code>00 00 FE FF</code>
+| <code>0 0 254 255</code>
+|-
+| [[UTF-32|UTF-32]]（小端序）
+| <code>FF FE 00 00</code>
+| <code>255 254 0 0</code>
+|-
+| [[UTF-7|UTF-7]]
+| <code>2B 2F 76</code>和以下的<em>一個</em>位元組：<code><nowiki>[ 38 | 39 | 2B | 2F ]</nowiki></code>
+| <code>43 47 118</code>和以下的<em>一個</em>位元組：<code><nowiki>[ 56 | 57 | 43 | 47 ]</nowiki></code>
+|-
+| [[UTF-1|UTF-1]]
+| <code>F7 64 4C</code>
+| <code>247 100 76</code>
+|-
+| {{link-en|UTF-EBCDIC|UTF-EBCDIC}}
+| <code>DD 73 66 73</code>
+| <code>221 115 102 115</code>
+|-
+| {{link-en|Unicode标准压缩方案|Standard Compression Scheme for Unicode}}
+| <code>0E FE FF</code>
+| <code>14 254 255</code>
+|-
+| {{link-en|Unicode二进制有序压缩|Binary_Ordered_Compression_for_Unicode|BOCU-1}}
+| <code>FB EE 28</code> ''及可能跟隨著''<code>FF</code>
+| <code>251 238 40</code> ''及可能跟隨著''<code>255</code>
+|-
+| [[GB-18030|GB-18030]]
+| <code>84 31 95 33</code>
+| <code>132 49 149 51</code>
+|}
+
+== 另見 ==
+* [[左至右符號|左至右符號]]
+* [[右至左符號|右至左符號]]
+
+==參考文獻==
+<references/>
+
+==外部連結==
+* [http://www.unicode.org/faq/utf_bom.html Unicode FAQ: ''UTF-8, UTF-16, UTF-32 & BOM'']{{Wayback|url=http://www.unicode.org/faq/utf_bom.html |date=20080926024051 }}
+* [http://www.unicode.org/versions/Unicode5.0.0/ch02.pdf#G19273 The Unicode Standard, chapter 2.6  ''Encoding Schemes'']{{Wayback|url=http://www.unicode.org/versions/Unicode5.0.0/ch02.pdf#G19273 |date=20081116041027 }}
+* [http://www.unicode.org/versions/Unicode5.0.0/ch02.pdf#G9354 The Unicode Standard, chapter 2.13  ''Special Characters and Noncharacters'', section ''Byte Order Mark（BOM）'']{{Wayback|url=http://www.unicode.org/versions/Unicode5.0.0/ch02.pdf#G9354 |date=20081116041027 }}
+* [http://www.unicode.org/versions/Unicode5.0.0/ch16.pdf#G25817 The Unicode Standard, chapter 16.8 ''Specials'', section ''Byte Order Mark (BOM): U+FEFF'']{{Wayback|url=http://www.unicode.org/versions/Unicode5.0.0/ch16.pdf#G25817 |date=20081116041050 }}
+
+{{Unicode related}}
+
+[[Category:Unicode特殊碼位|Category:Unicode特殊碼位]]

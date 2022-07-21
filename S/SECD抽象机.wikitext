@@ -1,0 +1,93 @@
+'''SECD机'''是有高度影响力的一种[[虚拟机|虚拟机]]和[[抽象机器|抽象机器]]，它意图用作[[函数式编程|函数式编程语言]]编译器的编译目标。四个字母分别表示：'''S'''tack、'''E'''nvironment、'''C'''ontrol、'''D'''ump，它们是这个机器的内部寄存器。寄存器Stack、Control和Dump指向[[堆栈|堆栈]]（的某种实现），而Environment指向[[关联数组|关联数组]]（的某种实现）。  
+
+这个机器是第一个专门设计用来求值[[lambda演算|lambda演算]]表达式的机器。它最初描述于[[Peter_J._Landin|Peter J. Landin]]的1964年论文《表达式的机器求值》中<ref>{{Cite journal| last1 = Landin | first1 = P. J. | author1-link = Peter Landin| title = The Mechanical Evaluation of Expressions| doi = 10.1093/comjnl/6.4.308| journal = {{en-link|The Computer Journal}} | volume = 6| issue = 4| pages = 308–320| date=January 1964 }}</ref>。Landin发表的描述非常抽象，留下了很多实现选择待定（就像一种[[操作语义|操作语义]]）。因此SECD机经常以一种更具体的形式出现，比如Peter Henderson的[[LispKit_Lisp|LispKit Lisp]]编译器，它自从1980年开始发行。自此它已经被用作了一些其他的实验编译器的目标。
+
+在1989年[[卡尔加里大学|卡尔加里大学]]的研究者制作了这个机器的一个硬件实现<ref>A paper on the design, [http://hdl.handle.net/1880/46590 SECD: DESIGN ISSUES] is available.</ref>。
+
+==Landin的贡献==
+{{en-link|David Turner|David Turner (computer scientist)|D. A. Turner}}在2012年指出，《Algol 60修订报告》（[[彼得·諾爾|Peter Naur]]的1963年版）规定了依据复制规则的过程调用，这避免了具有对标识符的系统性改变的变量捕获<ref>{{Cite web|url=https://www.cs.kent.ac.uk/people/staff/dat/tfp12/tfp12.pdf|author=D. A. Turner|title=Some History of Functional Programming Languages|publisher=in an invited lecture TFP12, St Andrews University|date=12 June 2012|quote=Algol 60 is not normally thought of as a functional language but its rules for procedures (the Algol equivalent of functions) and variable binding were closely related to those of [[λ演算|λ-calculus]]. <br />The Revised Report on Algol 60 (Naur 1963) is a model of precise technical writing. It defines the effect of a procedure call by a copying rule with a requirement for systematic change of identifiers where needed to avoid variable capture — exactly like β-reduction. <br />Although formal parameters could be declared value the default parameter passing mode was call by name, which required the actual parameter to be copied unevaluated into the procedure body at every occurrence of the formal parameter. This amounts to normal order reduction (but not graph reduction, there is no sharing). The use of call by name allowed an ingenious programming technique: Jensen’s Device.|access-date=2021-02-18|archive-date=2020-04-15|archive-url=https://web.archive.org/web/20200415053847/https://www.cs.kent.ac.uk/people/staff/dat/tfp12/tfp12.pdf}}</ref>。这种方法被加入到了[[Algol_60|Algol 60]]实现之中，但是在函数是[[头等函数|头等公民]]的[[函数式编程|函数式编程]]语言之中，[[自由变量|自由变量]]在[[调用栈|调用栈]]上可能被错误的解引用<ref>{{Cite web|url=https://www.cs.kent.ac.uk/people/staff/dat/tfp12/tfp12.pdf|author=D. A. Turner|title=Some History of Functional Programming Languages|publisher=in an invited lecture TFP12, St Andrews University|date=12 June 2012|quote=Algol 60 allowed textually nested procedures and passing procedures as parameters (but not returning procedures as results). The requirement in the copying rule for systematic change of identifiers has the effect of enforcing static (that is lexicographic) binding of free variables. <br />In their book “Algol 60 Implementation”, Randell and Russell (1964, Sect. 2.2) handle this by two sets of links between stack frames. The dynamic chain links each stack frame, representing a procedure call, to the frame that called it. The static chain links each stack frame to that of the textually containing procedure, which might be much further away. Free variables are accessed via the static chain. <br />This mechanism works well for Algol 60 but in a language in which functions can be returned as results, a free variable might be held onto after the function call in which it was created has returned, and will no longer be present on the stack.|access-date=2021-02-18|archive-date=2020-04-15|archive-url=https://web.archive.org/web/20200415053847/https://www.cs.kent.ac.uk/people/staff/dat/tfp12/tfp12.pdf}}</ref>。
+
+{{en-link|David Turner|David Turner (computer scientist)|D. A. Turner}}注意到，[[彼得·兰丁|Peter J. Landin]]通过他的SECD机解决了这个问题，在这个机器中函数转而通过在[[堆积|堆]]中的[[闭包_(计算机科学)|闭包]]来表示<ref>{{Cite web|url=https://www.cs.kent.ac.uk/people/staff/dat/tfp12/tfp12.pdf|author=D. A. Turner|title=Some History of Functional Programming Languages|publisher=in an invited lecture TFP12, St Andrews University|date=12 June 2012|quote=Landin (1964) solved this in his SECD machine. A function is represented by a closure, consisting of code for the function plus the environment for its free variables. The environment is a linked list of name-value pairs. Closures live in the heap.|access-date=2021-02-18|archive-date=2020-04-15|archive-url=https://web.archive.org/web/20200415053847/https://www.cs.kent.ac.uk/people/staff/dat/tfp12/tfp12.pdf}}</ref>。
+
+==非正式描述==
+
+在开始求值一个表达式的时候，这个表达式被装载为控制'''<code>C</code>'''的唯一元素。环境'''<code>E</code>'''、堆栈'''<code>S</code>'''转储'''<code>D</code>'''开始时为空。
+
+在'''<code>C</code>'''的求值期间，表达式被转换成具有<code>ap</code>（就是{{en-link|apply|}}）作为唯一算符的[[逆波兰表示法|逆波兰表示法]]（RPN）。例如，表达式<code>F (G X)</code>（一个单一的列表元素）被转变为列表<code>X:G:ap:F:ap</code>。
+
+'''<code>C</code>'''的求值进行得类似于其他的RPN表达式。如果在'''<code>C</code>'''中的第一个项目是值，把它压入堆栈'''<code>S</code>'''。更准确的说，如果这个项目是个标识符，刚压入到堆栈的这个值，将绑定于在当前环境'''<code>E</code>'''中的那个标识符。如果这个项目是个抽象，则构造一个[[闭包_(计算机科学)|闭包]]来保存它的自由变量的绑定（它们在'''<code>E</code>'''中），并把这个闭包压入堆栈。
+
+如果这个项目是'''<code>ap</code>'''，从堆栈弹出两个值并完成应用（将第一个应用于第二个）。如果应用的结果是个值，把它压入堆栈。
+
+但是，如果应用是将一个抽象（已表示为闭包）应用于一个值，它结果的那个lambda演算表达式，自身可能就是应用（而非一个值），因而不能压入堆栈。在这种情况下，'''<code>S</code>'''、'''<code>E</code>'''和'''<code>C</code>'''的当前内容被压入'''<code>D</code>''' （它是这些三元组的堆栈），'''<code>S</code>'''被重新初始化为空，而'''<code>C</code>'''被重新初始化为这次应用的结果，具有'''<code>E</code>'''包含针对这个表达式的自由变量的环境，增加上对这个应用的实际参数值的绑定。求值继续如上那样进行。
+
+求值完成由'''<code>C</code>'''为空来指示，在这种情况下结果在堆栈'''<code>S</code>'''之上。接着弹出在'''<code>D</code>'''上的最近保存的求值状态，并把已经完成的计算的结果压入堆栈，位于从'''<code>D</code>'''恢复的内容之上。恢复状态的求值继续如上那样进行。
+
+如果'''<code>C</code>'''和'''<code>D</code>'''二者为空，则整体求值完成，结果在堆栈'''<code>S</code>'''之上。
+
+==寄存器和内存==
+ 
+SECD机是基于[[堆栈|堆栈]]的。函数从堆栈得到它们的实际参数。在指令流之中给内建指令的实际参数立即编码在它们之后。
+
+像所有内部数据结构一样，堆栈是个列表，具有'''<code>S</code>'''寄存器指向列表头部或开始处。由于列表数据结构，堆栈不需要连续的内存块，所以只要有一个单一空闲内存单元，就有堆栈空间可以获得。即使在所有单元都已经使用了时候，[[垃圾回收_(计算机科学)|垃圾回收]]可能产生额外的空闲内存。明显的，SECD结构的特定实现者可以将堆栈实现为正规的堆栈结构，从而改进这个虚拟机的整体效能，假定在这个堆栈的尺寸上施加严格限定的话。
+
+'''<code>C</code>'''寄存器指向要求值的代码或指令列表的头部。一旦这里的指令已经被执行，类似于常规机器中的“指令指针”（或[[程序计数器|程序计数器]]），'''<code>C</code>'''将指向在列表中的下一个指令，除非后续指令总是在执行期间指定而不缺省的包含在后续内存位置上，如在常规机器的情况下那样。
+
+当前变量环境由'''<code>E</code>'''寄存器管理，它指向一个列表的列表。每个个体列表表示一个环境层级：当前函数的那些形式参数位于这个列表的头部，在当前函数中是自由的但受到外围函数所约束的那些变量，在'''<code>E</code>'''的另一个元素中。
+
+'''<code>D</code>'''寄存器指向转储的头部， 它被用作其他寄存器的值临时存储，比如在函数调用期间。它可以比拟于其他机器的返回堆栈。
+
+SECD机的内存组织，类似于多数函数式语言[[解释器|解释器]]所用的模型：一些内存单元，其中每个都持有要么一个“原子”（一个单一的值比如<code>13</code>），要么表示一个空或非空列表。在后者情况下，这个单元持有两个到其他单元的指针，一个标识第一个个元素，而另一个标识排除第一个元素的列表。这两个指针传统上分别叫做{{en-link|CAR与CDR|CAR and CDR|<code>car</code>和<code>cdr</code>}}，但是更现代的术语是“head”和“tail”经常用作其替代。一个单元可以持有的不同类型单元，可以用通过一个{{en-link|标志体系|Tagged architecture|标志}}来区别。它还区分原子的常见不同类型（整数、字符串等）。
+
+所以，持有数字<code>1, 2, 3</code>的列表，通常写为<code>(1 2 3)</code>，可以表示为如下：
+
+ 地址       标志      内容（对于整数是值，对于列表是car和cdr）
+ 
+       9 [ integer |     2 ]
+       8 [ integer |     3 ]
+       7 [ list    | 8 | 0 ]
+       6 [ list    | 9 | 7 ]
+       ...
+       2 [ list    | 1 | 6 ]
+       1 [ integer |     1 ]
+       0 [ nil             ]
+
+内存单元3到5不属于这个列表，这个列表的那些单元可以随机的分布在内存中。单元2是这个列表的头部，它指向持有第一个元素值的单元1，和只包含<code>2</code>和<code>3</code>的列表（开始于单元6）。单元6指向持有<code>2</code>的单元和单元7，它表示只包含<code>3</code>的列表。它指向包含值<code>3</code>的单元8，并把指向空列表（<code>nil</code>）作为<code>cdr</code>。在SECD机中，单元0总是隐含的表示空列表，所有不需要特殊的标志来指示空列表（需要做的就是简单的指向单元0）。
+
+在列表中<code>cdr</code>必须指向另一个列表就是一个约定。如果<code>car</code>和<code>cdr</code>二者都指向原子，则产生一个有序对，通常写为<code>(1 . 2)</code>。
+
+==指令==
+
+* '''<code>nil</code>'''：将一个<code>nil</code>指针压入堆栈。
+* '''<code>ldc</code>'''：将一个常量实际参数压入堆栈。
+* '''<code>ld </code>'''：将一个变量的值压入堆栈。这个变量是由一个有序对实际参数来指示。这个有序对的car指定层级，而cdr指定位置。所以<code>(1 . 3)</code>给出当前函数（层级1）的第三个参数。
+* '''<code>sel</code>'''：接受两个列表实际参数，并从堆栈弹出一个值。如果弹出的值是非<code>nil</code>则执行第一个列表，否则执行第二个列表。在这些列表指针被制作成'''<code>C</code>'''的新值之前，把到跟随在'''<code>sel</code>'''之后指令的指针保存于转储之上。
+* '''<code>join</code>'''：从转储弹出一个列表引用，并使其成为'''<code>C</code>'''的新值。这个指令出现在'''<code>sel</code>'''的两个可选列表的结束。
+* '''<code>ldf</code>'''：接受表示一个函数的一个列表实际参数。它构造一个闭包（包含这个函数和当前环境的有序对），并把它压入堆栈。
+* '''<code>ap </code>'''：从堆栈弹出一个闭包和一个形式参数值的列表。通过安装这个闭包的环境作为当前环境，将这个形式参数列表压入到环境列表之前，清除堆栈，并设置<code>C</code>为这个闭包的函数指针，将这个闭包应用于这些形式参数。以前的'''<code>S</code>'''、'''<code>E</code>'''和'''<code>C</code>'''的下一个值被保存于转储之上。
+* '''<code>ret</code>'''：从堆栈弹出一个返回值，从转储恢复'''<code>S</code>'''、'''<code>E</code>'''和'''<code>C</code>'''，并把这个返回值压入新的当前堆栈。
+* '''<code>dum</code>'''：将一个虚设（dummy）即空列表，压入到环境列表之前。
+* '''<code>rap</code>'''：作用如同'''<code>ap</code>'''，只是它将出现的虚设环境替代为当前的环境，这使得递归函数成为可能。
+
+还存在一些用于基本函数的指令，比如<code>car</code>、<code>cdr</code>、列表构造、整数加法、I/O等。它们都从堆栈得到任何必须的实际参数。
+
+== 参见 ==
+* [[ISWIM|ISWIM]]
+* {{en-link|Krivine机|Krivine machine}}
+
+== 引用 ==
+{{reflist|2}}
+
+== 延伸阅读 ==
+* {{en-link|Olivier Danvy}}. [http://www.brics.dk/RS/03/33/ A Rational Deconstruction of Landin's SECD Machine] {{Wayback|url=http://www.brics.dk/RS/03/33/ |date=20201101123315 }}. BRICS research report RS-04-30, 2004. ISSN 0909-0878
+* Field, Anthony J. Field and Peter G. Harrison. 1988 Functional Programming. Addison-Wesley. {{ISBN|0-201-19249-7}}
+* Graham, Brian T. 1992 "The SECD Microprocessor: A Verification Case Study". Springer. {{ISBN|0-7923-9245-0}}
+* Henderson, Peter. 1980 Functional Programming: Application and Implementation. Prentice Hall. {{ISBN|0-13-331579-7}}
+* Kogge, Peter M. The Architecture of Symbolic Computers. {{ISBN|0-07-035596-7}}
+* {{Cite journal| author=[[Peter_Landin|Peter Landin]] | title = The next 700 programming languages| doi = 10.1145/365230.365257| journal = [[Communications_of_the_ACM|Comm. ACM]]| volume = 9| issue = 3| pages = 157–166| date = March 1966| url = http://fsl.cs.uiuc.edu/images/e/ef/P157-landin.pdf| access-date = 2021-02-18| archive-date = 2010-06-20| archive-url = https://web.archive.org/web/20100620004154/http://fsl.cs.uiuc.edu/images/e/ef/P157-landin.pdf| dead-url = yes}}
+
+==外部链接==
+*[http://skelet.ludost.net/sec/ SECD collection] {{Wayback|url=http://skelet.ludost.net/sec/ |date=20070927225804 }}
+
+{{DEFAULTSORT:Secd Machine}}
+[[Category:计算模型|Category:计算模型]]

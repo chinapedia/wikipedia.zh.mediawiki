@@ -1,0 +1,99 @@
+{{Refimprove|time=2020-08-18T19:47:40+00:00}}
+{{NoteTA
+|G1=IT
+}}
+{{Infobox Software
+| name = UPX<br /><small>''the Ultimate Packer for eXecutables''</small>
+| logo = 
+| screenshot = 
+| caption = 
+| collapsible = 
+| author = 
+| developer = 
+| released = {{Start date and age|1998|05|26}}
+| latest release version = 3.96
+| latest release date = {{Start date and age|2020|01|23}}
+| latest preview version = 
+| latest preview date = 
+| frequently updated = 
+| programming language = [[C++|C++]]、[[汇编语言|汇编]]
+| operating system = [[Microsoft_Windows|Windows]]、[[Linux|Linux]]、[[DOS|DOS]]、[[Atari|Atari TOS]]、[[macOS|macOS]]
+| platform = 
+| language = 
+| status = 
+| genre = [[可执行文件压缩|可执行文件压缩]]
+| license = [[GNU_General_Public_License|GPL]]
+| website = [https://upx.github.io/ upx.github.io]
+}}
+'''UPX'''（{{lang-en|the '''U'''ltimate '''P'''acker for e'''X'''ecutables}}）是一个免费且[[开源|开源]]的可执行程序文件加壳器，支持许多不同[[操作系统|操作系统]]下的可执行文件格式。
+
+== 压缩 ==
+
+UPX使用一种叫做UCL的压缩演算法，為NRV（{{lang|en|'''N'''ot '''R'''eally '''V'''anished}}）演算法的一个开源部分實做。
+
+得益于UCL的简单设计，其解压缩程式碼只需要额外的数百位元組。UCL最大的好处是在解压缩过程中不需要额外的記憶體，意味着经过UPX压缩的可执行文件执行时通常也不需要为了解压缩付出额外記憶體。
+
+UPX（从2.90 beta版本开始）可以在大多数平台上使用[[LZMA|LZMA]]演算法，但因为速度慢，在16位元平台上LZMA演算法預設被停止使用。（可以使用参数--lzma强制使用）。
+
+从版本3.91开始，UPX在Windows平台上还支持64位（x64）可执行文件。此功能目前宣布为实验性。
+
+== 解压缩 ==
+
+UPX支持两种解压方式：就地解压或解压至临时文件夹。
+
+就地解压方法会直接把可执行文件提取到[[內存|內存]]。但这种方式不可能支持所有系统平台，因此在必要之时UPX会使用另一种解压方式：將压缩文件提取到临时文件夾。这种方式支持封装任何平台和格式的可执行文件，可执行文件往往先会被提取到一个位置，之后用<code>open()</code>打开。
+
+然而提取到临时文件夹这种方式除了造成了额外占用之外，还有以下几个缺点：
+* 特殊权限会被忽略，如设置用户标识符。
+* [[命令行|argv[0]]]（即程序中获取到的可执行文件名）将会无效。
+* 多实例应用程序将无法共享共同的程序部分（如内存内的相同代码）。
+
+未特意以防止解包为目的修改过的UPX包通常能够被[[杀毒软件|杀毒软件]]识别并进行解压操作。UPX也内置能够解压未修改UPX包的功能。在默认的UPX许可证中也明确禁止以防止前文所提及的解包为目的的修改。
+
+== 支持的格式 ==
+
+* [[ARM_architecture|ARM]]/[[Portable_Executable|PE]]
+* [[Atari|Atari]]/[[Atari_TOS|TOS]]
+* *[[BSD|BSD]]/[[i386|i386]]
+* [[DJGPP2|DJGPP2]]/[[COFF|COFF]]
+* [[DOS|DOS]]/[[COM格式|COM]] (包括某些其它二进制映像<ref group="nb" name="UPX-images"/><ref group="nb" name="UPX-data"/>)<ref group="nb" name="UPX-8086"/>
+* DOS/[[EXE格式|EXE]]<ref group="nb" name="UPX-8086"/>
+* DOS/[[.sys|SYS]]<ref group="nb" name="UPX-8086"/>
+* [[Linux|Linux]]/i386 [[a.out_(file_format)|a.out]]
+* Linux/[[Executable_and_Linkable_Format|ELF]] （位于 i386, [[x86-64|x86-64]], [[ARM_architecture|ARM]], [[PowerPC|PowerPC]]平台）
+* Linux/kernel （位于i386, x86-64 and ARM平台） 
+* [[Mach-O|Mach-O]]/ppc32, Mach-O/i386 (自3.09版本后还支持Google Go创建的此格式程序)
+* rtm32/[[Portable_Executable|PE]] (如 [[Borland|Borland]] [[Turbo_C|C]]/[[Turbo_Pascal|Pascal]] compilers<ref>{{Cite web |url=http://www.vogons.org/viewtopic.php?t=25997 |title=存档副本 |access-date=2018-01-30 |archive-date=2022-01-11 |archive-url=https://web.archive.org/web/20220111150654/https://www.vogons.org/viewtopic.php?t=25997 |dead-url=no }}</ref>编译的程序)
+* tmt/adam (如the TMT Pascal compiler<ref>{{Cite web |url=https://linux.die.net/man/1/upx |title=存档副本 |access-date=2018-01-30 |archive-date=2018-10-05 |archive-url=https://web.archive.org/web/20181005014749/https://linux.die.net/man/1/upx |dead-url=no }}</ref>编译的程序)
+* [[PlayStation|PlayStation]]1/EXE
+* [[Watcom_C/C++编译器|Watcom]]/LE ([[DOS4G|DOS4G]]、[[PMODE/W|PMODE/W]]、[[DOS32A|DOS32A]] 和 [[CauseWay_DOS_Extender|CauseWay]])
+* 包含[[x86|x86]] (32-Bit)代码的[[Windows|Windows]]/[[Portable_Executable|PE]] [[EXE|EXE]] 文件
+* 包含[[AMD64|AMD64]] (64-Bit)代码的[[Windows|Windows]]/[[Portable_Executable|PE]] [[EXE|EXE]] 文件（实验性的）
+
+UPX{{When|目前}}不支持为了在[[Portable_Executable#.NET,_metadata,_and_the_PE_format|.NET Framework]].运行而包含了 [[通用中间语言|CIL]]代码的[[Windows|Windows]]/[[Portable_Executable|PE]] [[EXE|EXE]] 文件。
+
+==注释==
+{{Reflist|group="nb"|refs=
+<ref group="nb" name="UPX-images">UPX对DOS .COM风格的文件的压缩支持可以扩展到一些其它类似的二进制文件中去。一些[[FreeDOS|FreeDOS]] 和 [[EDR-DOS|EDR-DOS]]内核文件已经被证实可以进行UPX压缩。</ref>
+<ref group="nb" name="UPX-data">UPX也可以压缩不可执行的二进制文件，只要使用它们的程序或驱动能够识别它们是由UPX压缩并且能够执行在文件中包含的解压缩代码即可。已知的例子是FreeDOS使用的.CPX文件以及被UPX压缩过的.CPI字体文件。</ref>
+<ref group="nb" name="UPX-8086">对于DOS平台，UPX支持特殊选项<tt>-8086</tt>，以强制嵌入式解压缩器与[[Intel_8088|Intel 8088]]/[[8086|8086]]处理器兼容，这样做之后即使在运行DOS的最早的PC上也可以执行和解压缩压缩文件。</ref>
+}}
+
+== 參考資料 ==
+{{reflist}}
+
+== 外部链接 ==
+{{Portal|自由軟件|Free Software Portal Logo.svg}} 
+* [http://upx.sourceforge.net UPX: the Ultimate Packer for eXecutables] {{Wayback|url=http://upx.sourceforge.net/ |date=20210826052813 }}
+* [http://www.oberhumer.com/opensource/ucl/ UCL]
+* [http://www.oberhumer.com/products/nrv/ NRV]
+* {{SourceForge|upx|UPX - a powerful executable packer}}
+* {{Freshmeat|upx|UPX}}
+
+{{Compression Software Implementations}}
+
+[[Category:数据压缩软件|Category:数据压缩软件]]
+[[Category:SourceForge专案|Category:SourceForge专案]]
+[[Category:1998年软件|Category:1998年软件]]
+[[Category:数据压缩自由软件|Category:数据压缩自由软件]]
+[[Category:組合語言軟體|Category:組合語言軟體]]

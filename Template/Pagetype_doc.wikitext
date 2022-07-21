@@ -1,0 +1,544 @@
+{{high-risk|636096}}
+{{lua|模块:Pagetype}}
+{{NoteTA
+| G1=IT
+| G2=MediaWiki
+}}
+
+本模板用于检测指定页面之类型，其能自动检测[[WP:重定向|重定向页面]]，且可高度自定义。本模板可独立使用，亦可作为元模板用于创建其他页面类型检测模板。
+
+== 語法 ==
+
+; 基本代码
+
+<pre>
+{{pagetype}}
+</pre>
+
+; 完整代码
+<pre>
+{{pagetype
+| page              = 
+| defaultns         = 
+| main              = 
+| user              = 
+| wikipedia         = 
+| project           = 
+| wp                = 
+| file              = 
+| image             = 
+| mediawiki         = 
+| template          = 
+| help              = 
+| category          = 
+| portal            = 
+| book              = 
+| draft             = 
+| education program = 
+| timedtext         = 
+| module            = 
+| topic             = 
+| special           = 
+| media             = 
+| talk              = 
+| redirect          = 
+| dab               = 
+| na                = 
+| other             = 
+}}
+</pre>
+
+== 基本用法 ==
+
+如需对当前页面类型作简单检测，使用默认设置：
+
+ &#123;{pagetype}}
+
+如此即可根据页面类型或[[WP:名字空间|名字空间]]生成下列结果：
+
+{| class="wikitable"
+! 页面类型 / 名字空间 !! 输出
+|-
+| 重定向（任意名字空间） || 重定向
+|-
+| 主名字空间 || 条目
+|-
+| 文件名字空间 || 文件
+|-
+| 模板名字空间 || 模板
+|-
+| 分类名字空间 || 分类
+|-
+| 模块名字空间 || 模块
+|-
+| 图书名字空间 || 图书
+|-
+| 其他名字空间 || 页面
+|}
+
+（注：部分名字空间尚未在中文维基百科启用。）
+
+若本模板用于讨论页，则会检测对应主页面类型。
+
+; 範例
+
+{| class="wikitable"
+|-
+! 代码 !! 结果
+|-
+| <code><nowiki>{{pagetype}}</nowiki></code> || {{pagetype}}
+|}
+
+== 頁面參數 ==
+
+您可使用<code>page</code>参数模拟模板调用该页面。
+
+ &#123;{pagetype|page=''page name''}}
+
+; 範例
+
+{| class="wikitable"
+|-
+! 代码 !! 结果
+|-
+| <code><nowiki>{{pagetype|page=英国}}</nowiki></code> || {{pagetype|page=英国}}
+|-
+| <code><nowiki>{{pagetype|page=UK}}</nowiki></code> || {{pagetype|page=UK}}
+|-
+| <code><nowiki>{{pagetype|page=Talk:英国}}</nowiki></code> || {{pagetype|page=Talk:英国}}
+|-
+| <code><nowiki>{{pagetype|page=File:Example.svg}}</nowiki></code> || {{pagetype|page=File:Example.svg}}
+|-
+| <code><nowiki>{{pagetype|page=Wikipedia:Namespace}}</nowiki></code> || {{pagetype|page=Wikipedia:Namespace}}
+|-
+| <code><nowiki>{{pagetype|page=TimedText:Imagine.ogg.en.srt}}</nowiki></code> || {{pagetype|page=TimedText:Imagine.ogg.en.srt}}
+|}
+
+== 增減名字空間 ==
+
+可为各名字空间指定与[[#基本用法|基本用法]]一节不同的行为。例如，您可能希望模板在用戶名字空间显示“用戶页”而非默认的“页面”，为此您可以使用代码{{para|user|yes}}。这样便可为用戶名字空间页面查找典型名称，即本例中的“用戶页”，并在模板使用在用戶名字空间的页面时使用该文本。用于其他名字空间时，请使用小写字母的名字空间名作为参数。
+
+{{pagetype|
+ | user              = ''yes''
+ | wikipedia         = ''yes''
+ | project           = ''yes''
+ | wp                = ''yes''
+ | mediawiki         = ''yes''
+ | help              = ''yes''
+ | portal            = ''yes''
+ | draft             = ''yes''
+ | education program = ''yes''
+ | timedtext         = ''yes''
+ | topic             = ''yes''
+ | special           = ''yes''
+ | media             = ''yes''
+ }}
+
+您可使用下列代码中的任一形式指定名字空间："<code>yes</code>"、"<code>y</code>"、"<code>true</code>"或"<code>1</code>"，任意大小写字母组合形式均可使用（这些值由[[模板:Yesno]]定义）。
+
+此类名字空间的默认文本如下所示：
+
+{| class="wikitable"
+! 页面类型 / 名字空间!! 输出
+|-
+| User || 用戶頁
+|-
+| Wikipedia|| 維基百科
+|-
+| MediaWiki || MediaWiki
+|-
+| Help  || 幫助
+|-
+| Portal || 主題
+|-
+| Draft || 草稿
+|-
+| Education || 教育課程
+|-
+| Timed Text || 限時文字
+|-
+| Topic || 公告
+|-
+| Special || 特殊頁面
+|-
+| Media || 文件
+|}
+
+（注：部分名字空间尚未在中文维基百科启用。）
+
+您亦可使用相似的方式移除默认任意名字空间值。例如，若使用代码{{para|template|no}}，则模板使用于模板页时会显示“页面”，而非默认的“模板”。
+
+ &#123;{pagetype
+ | main     = ''no''
+ | file     = ''no''
+ | template = ''no''
+ | category = ''no''
+ | module   = ''no''
+ | book     = ''no''
+ }}
+
+下列值均可用于移除名字空间值："<code>no</code>"、"<code>n</code>"、"<code>false</code>"或"<code>0</code>"，任意大小写字母组合形式均可使用。
+
+; 範例
+
+{| class="wikitable"
+|-
+! 代码 !! 结果
+|-
+| <code><nowiki>{{pagetype|page=Wikipedia:Namespace}}</nowiki></code> || {{pagetype|page=Wikipedia:Namespace}}
+|-
+| <code><nowiki>{{pagetype|page=Wikipedia:Namespace|wikipedia=yes}}</nowiki></code> || {{pagetype|page=Wikipedia:Namespace|wikipedia=yes}}
+|-
+| <code><nowiki>{{pagetype|page=Talk:英国}}</nowiki></code> || {{pagetype|page=Talk:英国}}
+|-
+| <code><nowiki>{{pagetype|page=Talk:英国|talk=y}}</nowiki></code> || {{pagetype|page=Talk:英国|talk=y}}
+|-
+| <code><nowiki>{{pagetype|page=英国}}</nowiki></code> || {{pagetype|page=英国}}
+|-
+| <code><nowiki>{{pagetype|page=英国|main=no}}</nowiki></code> || {{pagetype|page=英国|main=no}}
+|-
+| <code><nowiki>{{pagetype|page=TimedText:Imagine.ogg.en.srt}}</nowiki></code> || {{pagetype|page=TimedText:Imagine.ogg.en.srt}}
+|-
+| <code><nowiki>{{pagetype|page=TimedText:Imagine.ogg.en.srt|timedtext=Yes}}</nowiki></code> || {{pagetype|page=TimedText:Imagine.ogg.en.srt|timedtext=Yes}}
+|}
+
+== 默認名字空間設置 ==
+
+除了添加或移除某个名字空间，亦可使用{{para|defaultns}}指定不同的名字空间集。共有四组集可供使用：<code>all</code>、<code>extended</code>、<code>none</code>和默认集。这些集允许您一次性指定多个名字空间，而无须一一使用所有名字空间参数。名字空间可按下表设置：
+
+{| class="wikitable"
+|-
+! rowspan="2" | 名字空間
+! colspan="4" | {{para|defaultns}}值
+! rowspan="2" | 輸出
+|-
+| style="width: 75px; text-align: center;" | <code>none</code>
+| style="width: 75px; text-align: center;" | <code>extended</code>
+| style="width: 75px; text-align: center;" | <code>all</code>
+| style="width: 75px; text-align: center;" | 其他值
+|-
+| 主名字空间
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{tick}}
+| 條目
+|-
+| User
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{cross}}
+| 用戶頁
+|-
+| Wikipedia
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{cross}}
+| 維基百科
+|-
+| File
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{tick}}
+| -{zh-cn:文件; zh-tw:檔案;}-
+|-
+| MediaWiki
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{cross}}
+| MediaWiki
+|-
+| Template
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{tick}}
+| 模板
+|-
+| Help
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{cross}}
+| 幫助
+|-
+| Category
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{tick}}
+| 分類
+|-
+| Portal
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{cross}}
+| 主題
+|-
+| Book
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{tick}}
+| 图书
+|-
+| Draft
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{cross}}
+| 草稿
+|-
+| Education Program
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{cross}}
+| 教育项目
+|-
+| TimedText
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{cross}}
+| 限时文字
+|-
+| -{模块}-
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{tick}}
+| 模塊
+|-
+| Topic (Flow boards) 
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{cross}}
+| 公告
+|-
+| 所有讨论名字空间
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{cross}}
+| 討論頁
+|-
+| Special
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{cross}}
+| 特殊頁面
+|-
+| Media
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{cross}}
+| style="text-align: center;" | {{tick}}
+| style="text-align: center;" | {{cross}}
+| -{zh-cn:文件; zh-tw:檔案;}-
+|}
+
+（注：部分名字空间尚未在中文维基百科启用。）
+
+; 範例
+
+{| class="wikitable"
+|-
+! 代码 !! 结果
+|-
+| <code><nowiki>{{pagetype|page=英国}}</nowiki></code> || {{pagetype|page=英国}}
+|-
+| <code><nowiki>{{pagetype|page=英国|defaultns=none}}</nowiki></code> || {{pagetype|page=英国|defaultns=none}}
+|-
+| <code><nowiki>{{pagetype|page=Talk:英国}}</nowiki></code> || {{pagetype|page=Talk:英国}}
+|-
+| <code><nowiki>{{pagetype|page=Talk:英国|defaultns=all}}</nowiki></code> || {{pagetype|page=Talk:英国|defaultns=all}}
+|-
+| <code><nowiki>{{pagetype|page=File:Example.svg}}</nowiki></code> || {{pagetype|page=File:Example.svg}}
+|-
+| <code><nowiki>{{pagetype|page=File:Example.svg|defaultns=none}}</nowiki></code> || {{pagetype|page=File:Example.svg|defaultns=none}}
+|-
+| <code><nowiki>{{pagetype|page=Wikipedia:Namespace}}</nowiki></code> || {{pagetype|page=Wikipedia:Namespace}}
+|-
+| <code><nowiki>{{pagetype|page=Wikipedia:Namespace|defaultns=extended}}</nowiki></code> || {{pagetype|page=Wikipedia:Namespace|defaultns=extended}}
+|-
+| <code><nowiki>{{pagetype|page=TimedText:Imagine.ogg.en.srt|defaultns=extended}}</nowiki></code> || {{pagetype|page=TimedText:Imagine.ogg.en.srt|defaultns=extended}}
+|-
+| <code><nowiki>{{pagetype|page=TimedText:Imagine.ogg.en.srt|defaultns=all}}</nowiki></code> || {{pagetype|page=TimedText:Imagine.ogg.en.srt|defaultns=all}}
+|}
+
+== 自訂名字空間值 ==
+
+可以为任意名字空间指定自定义值：
+
+ &#123;{pagetype
+ | main              = ''文字''
+ | user              = ''文字''
+ | wikipedia         = ''文字''
+ | project           = ''文字''
+ | wp                = ''文字''
+ | file              = ''文字''
+ | image             = ''文字''
+ | mediawiki         = ''文字''
+ | template          = ''文字''
+ | help              = ''文字''
+ | category          = ''文字''
+ | portal            = ''文字''
+ | book              = ''文字''
+ | draft             = ''文字''
+ | education program = ''文字''
+ | timedtext         = ''文字''
+ | module            = ''文字''
+ | topic             = ''文字''
+ | special           = ''文字''
+ | media             = ''文字''
+ }}
+
+; 範例
+
+{| class="wikitable"
+|-
+! 代码 !! 结果
+|-
+| <code><nowiki>{{pagetype|page=Wikipedia:Namespace}}</nowiki></code> || {{pagetype|page=Wikipedia:Namespace}}
+|-
+| <code><nowiki>{{pagetype|page=Wikipedia:Namespace|wikipedia=文字}}</nowiki></code> || {{pagetype|page=Wikipedia:Namespace|wikipedia=文字}}
+|-
+| <code><nowiki>{{pagetype|page=Talk:英国}}</nowiki></code> || {{pagetype|page=Talk:英国}}
+|-
+| <code><nowiki>{{pagetype|page=Talk:英国|talk=文字}}</nowiki></code> || {{pagetype|page=Talk:英国|talk=文字}}
+|-
+| <code><nowiki>{{pagetype|page=英国}}</nowiki></code> || {{pagetype|page=英国}}
+|-
+| <code><nowiki>{{pagetype|page=英国|main=文字}}</nowiki></code> || {{pagetype|page=英国|main=文字}}
+|-
+| <code><nowiki>{{pagetype|page=TimedText:Imagine.ogg.en.srt}}</nowiki></code> || {{pagetype|page=TimedText:Imagine.ogg.en.srt}}
+|-
+| <code><nowiki>{{pagetype|page=TimedText:Imagine.ogg.en.srt|timedtext=文字}}</nowiki></code> || {{pagetype|page=TimedText:Imagine.ogg.en.srt|timedtext=文字}}
+|}
+
+== 討論參數 ==
+一般而言，本模板会将讨论页视作对应主页面。然而，如果设有<code>talk</code>参数，模板则会把讨论页与主页面区别对待。<code>talk</code>参数会为所有讨论页设置值，即Talk:名字空间的页面、User talk:名字空间的页面、Wikipedia talk:名字空间的页面等等。
+
+ &#123;{pagetype|talk=''yes''}}
+
+ &#123;{pagetype|talk=''文字''}}
+
+"<code>talk=''yes''</code>"的默认值为"讨论页"。
+
+; 範例
+
+{| class="wikitable"
+|-
+! 代码 !! 结果
+|-
+| <code><nowiki>{{pagetype|page=Wikipedia talk:Namespace}}</nowiki></code> || {{pagetype|page=Wikipedia talk:Namespace}}
+|-
+| <code><nowiki>{{pagetype|page=Wikipedia talk:Namespace|wikipedia=yes}}</nowiki></code> || {{pagetype|page=Wikipedia talk:Namespace|wikipedia=yes}}
+|-
+| <code><nowiki>{{pagetype|page=Wikipedia talk:Namespace|talk=yes}}</nowiki></code> || {{pagetype|page=Wikipedia talk:Namespace|talk=yes}}
+|-
+| <code><nowiki>{{pagetype|page=Wikipedia talk:Namespace|wikipedia=yes|talk=yes}}</nowiki></code> || {{pagetype|page=Wikipedia talk:Namespace|wikipedia=yes|talk=yes}}
+|-
+| <code><nowiki>{{pagetype|page=Wikipedia talk:Namespace|talk=文字}}</nowiki></code> || {{pagetype|page=Wikipedia talk:Namespace|talk=文字}}
+|-
+| <code><nowiki>{{pagetype|page=Wikipedia talk:Namespace|wikipedia=yes|talk=文字}}</nowiki></code> || {{pagetype|page=Wikipedia talk:Namespace|wikipedia=yes|talk=文字}}
+|}
+
+== 主名字空间评级 ==
+
+对于主名字空间的页面，可在第一位置参数处添加一个评级值。
+
+ &#123;{pagetype|''class''}}
+
+如果该评级值与下表的某一值相匹配，即可生成与默认"条目"不同的输出。
+
+{| class="wikitable"
+|-
+! 评级!! 评级值 !! 输出
+|-
+| 消歧义级 || <code>disambiguation</code>、<code>disambig</code>、<code>disamb</code>、<code>dab</code> || 页面
+|-
+| 不适用级 || <code>na</code>、<code>n/a</code> || 页面
+|-
+|}
+
+任意大小写字母组合形式均可使用。
+
+=== 自定义主名字空间评级 ===
+
+亦可为主名字空间评级指定自定义值。
+
+ &#123;{pagetype|''class''|dab=''yes''|na=''yes''}}
+
+ &#123;{pagetype|''class''|dab=''文字''|na=''文字''}}
+
+与自定义名字空间页面类型的方式相同，可能的参数有：
+* '''dab'''：消歧义级页面的自定义值，若设为"<code>yes</code>"、"<code>y</code>"、"<code>true</code>"或"<code>1</code>"，则生成"消歧义页"。若设为"<code>no</code>"、"<code>n</code>"、"<code>false</code>"或"<code>0</code>"，则不生成自定义值。若设为其他任何值，则生成该文本。
+* '''na'''：不适用级页面的自定义值，与<code>dab</code>参数的运作方式相同。默认值为"<code>yes</code>"，即"页面"。
+; 範例
+
+{| class="wikitable"
+|-
+! 代码!! 结果
+|-
+| <code><nowiki>{{pagetype|page=英国}}</nowiki></code> || {{pagetype|page=英国}}
+|-
+| <code><nowiki>{{pagetype|page=英国|dab}}</nowiki></code> || {{pagetype|page=英国|dab}}
+|-
+| <code><nowiki>{{pagetype|page=英国|dab|dab=文字}}</nowiki></code> || {{pagetype|page=英国|dab|dab=文字}}
+|-
+| <code><nowiki>{{pagetype|page=英国|na}}</nowiki></code> || {{pagetype|page=英国|na}}
+|-
+| <code><nowiki>{{pagetype|page=英国|na|na=文字}}</nowiki></code> || {{pagetype|page=英国|na|na=文字}}
+|}
+
+== 重定向 ==
+
+本模板默认检测所有名字空间的重定向。无法按名字空间指定重定向行为，但您可以关闭重定向检测，或对重定向页使用自定义值。
+
+ &#123;{pagetype|redirect=''no''}}
+
+ &#123;{pagetype|redirect=''文字''}}
+
+; 範例
+
+{| class="wikitable"
+|-
+! 代码 !! 结果
+|-
+| <code><nowiki>{{pagetype|page=UK}}</nowiki></code> || {{pagetype|page=UK}}
+|-
+| <code><nowiki>{{pagetype|page=UK|redirect=no}}</nowiki></code> || {{pagetype|page=UK|redirect=no}}
+|-
+| <code><nowiki>{{pagetype|page=UK|redirect=文字}}</nowiki></code> || {{pagetype|page=UK|redirect=文字}}
+|}
+
+== 其他名字空間 ==
+
+若某名字空间未受指定，本模板默认生成"<code>页面</code>"，该值可通过{{para|other}}参数更改。
+
+ &#123;{pagetype|other=''文字''}}
+
+; 範例
+
+{| class="wikitable"
+|-
+! 代码 !! 结果
+|-
+| <code><nowiki>{{pagetype|page=Wikipedia:Namespace}}</nowiki></code> || {{pagetype|page=Wikipedia:Namespace}}
+|-
+| <code><nowiki>{{pagetype|page=Wikipedia:Namespace|other=文字}}</nowiki></code> || {{pagetype|page=Wikipedia:Namespace|other=文字}}
+|-
+| <code><nowiki>{{pagetype|page=Wikipedia:Namespace|other=文字|wikipedia=维基文字}}</nowiki></code> || {{pagetype|page=Wikipedia:Namespace|other=文字|wikipedia=维基文字}}
+|}
+
+<includeonly>{{Sandbox other||<!-- 本行下加入模板的分類，跨維基連結加入Wikidata（參見[[Wikipedia:Wikidata]]） -->
+[[Category:命名空間操作模板]]
+}}</includeonly>

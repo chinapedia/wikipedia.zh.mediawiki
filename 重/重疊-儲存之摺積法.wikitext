@@ -1,0 +1,106 @@
+{{NoteTA
+|G1=Signals and Systems
+|G2=IT
+}}
+'''重疊-儲存之摺積法''' ( ''Overlap-save method'', ''Overlap-discard method'' ) 是一種[[區塊摺積|區塊摺積]] ( block convolution, sectioned convolution )，可以有效的計算一個很長的信號 ''x''[''n''] 和一個 [[有限脉冲响应|FIR 濾波器]] ''h''[''n''] 的[[卷积#定义|離散摺積]]。
+
+:<math>
+\begin{align}
+y[n] = x[n] \star h[n] \ \stackrel{\mathrm{def}}{=} \ \sum_{m=-\infty}^{\infty} h[m] \cdot x[n-m]
+= \sum_{m=1}^{M} h[m] \cdot x[n-m]
+\end{align}</math>
+
+其中 ''h''[''m''] 在 [1, ''M''] 之外為零。
+
+與[[重疊-相加之摺積法|重疊-相加之摺積法]]不同之處在於，'''重疊-儲存之摺積法'''所算出的輸出區塊並不重疊 (因此計算上少了將輸出區塊相加所需的加法)，而是每次用的輸入區塊有所重疊。因此實作時每次讀取輸入後需將和下一個輸入<u>重疊</u>的部分<u>儲存</u>起來，作為下一輸入區塊的開頭部份，因此稱為''重疊''-''儲存''之摺積法。另外重疊-儲存之摺積法也不需補零。
+
+==算法==
+
+概念上，這個做法是選用一個較短的適當長度 ''L'' 來切割 ''y''[''n''] ，則因為 ''h''[''n''] 是有限長度，因此在某一區塊內的 ''y''[''n''] 也只被有限長的 ''x''[''n''] 區塊（會比 ''y''[''n''] 分割成的區塊長一點）所決定。因此只要選擇有影響的輸入區塊和 ''h''[''n''] [[卷积|摺積]]，再選擇結果中適當的部分即可得到正確的輸出區塊。
+
+
+:<math>x_k[n]  \ \stackrel{\mathrm{def}}{=}
+\begin{cases}
+x[n+kL-M] & 1 \le n \le L+M-1\\
+0 & \textrm{otherwise}.
+\end{cases}
+</math>
+
+:<math>y_k[n] \ \stackrel{\mathrm{def}}{=} \ x_k[n] \star h[n]\,</math>
+
+
+則對於在 <math>[kL+1, (k+1)L]</math> 內的 ''n'' ， 輸出 ''y''[''n''] 可寫成
+
+:<math>
+\begin{align}
+y[n] = \sum_{m=1}^{M} h[m] \cdot x[n-m] = \sum_{m=1}^{M} h[m] \cdot x_k[n+M-kL-m]
+&= x_k[n+M-kL] \star h[n] \\
+&\stackrel{\mathrm{def}}{=} \ y_k[n+M-kL].
+\end{align}
+</math>
+
+所以只需計算 ''n'' 在 <math>[kL+1, (k+1)L]</math> 中的 ''y''<sub>''k''</sub>[''n'' + ''M'' - ''kL''] ，亦即 ''n'' 在 <math>[M+1, L+M]</math> 的 ''y''<sub>''k''</sub>[''n''] 部份即可。因此每一段輸出區塊 ''y''<sub>''k''</sub>[''n''] 的前 ''M''-1 點可<u>丟棄</u>（discard）。
+
+
+儘管一時看不出切割成區塊的好處為何，但將 ''x''<sub>''k''</sub>[''n''] 做  <math>N\ge L+M-1\,</math>  的[[週期延伸|週期延伸]]，
+
+:<math>x_{k,N}[n] \ \stackrel{\mathrm{def}}{=} \ \sum_{k=-\infty}^{\infty} x_k[n - kN],</math>
+
+則  <math>(x_{k,N}) \star h\,</math>  和  <math>x_k \star h\,</math>  這兩個摺積在 <math>[M+1, L+M]</math> 的部份相等。所以可以將線性[[卷积|摺積]]改以 <math>N\,</math> 點[[圓周摺積|圓周摺積]]計算，結果的 <math>[M+1, L+M]</math> 部分作為輸出 ''y''[''n''] 在 <math>[kL+1, (k+1)L]</math> 的部份。由於每段 ''x''<sub>''k''</sub>[''n''] 原本就有  <math>L+M-1\,</math>  長，所以選擇  <math>N=L+M-1\,</math>  的話輸入 ''x''[''n''] 就不需補零。
+改以圓周摺積計算後即可藉[[卷积定理|圓周摺積定理]]
+
+:<math>y_k[n] = \textrm{IFFT}\left(\textrm{FFT}\left(x_k[n]\right)\cdot\textrm{FFT}\left(h[n]\right)\right)</math>
+
+轉換成三次 <math>N\,</math> 點[[快速傅立葉變換|快速傅立葉變換]]和 <math>N\,</math> 次乘法，使原本每段 ''O''(''N''<sup>2</sup>) 的運算量減少至 ''O''(''N'' ''logN'')，速度大幅增加。
+
+===[[伪代码|準程式碼]]===
+
+    <font color=green>(''Overlap-save algorithm for linear convolution'')</font>
+    //////// revised by fantastic ////////
+    N = length(x), M = length(h)
+    O = M – 1;	// overlap length must be M-1
+    L = M;	// >=1 is OK
+    P = O + L;
+    H = FFT(h, P);	// just calc once
+    idx = - (O - 1);	// starting index which is offset M-1 in matlab
+    '''while''' (idx <= N)
+        i1 = max(1, idx);	// must be >= 1
+        i2 = min(N, idx+P-1);	// must be <= N
+        yt = IFFT( FFT(x(i1:i2), P).*H, P );
+        y(idx:idx+P-M) = yt(M:P);	// discard first M-1 values and concatenate the remaining
+        idx = idx + L;
+    '''end'''
+    y = y(1:M+N-1);	// the first M+N-1 values are the convolution result
+
+==區塊長度的選擇==
+
+當 ''x''[''n''] 的長度 ''N' '' 和 ''h''[''n''] 的長度 ''M'' 相差太大時（例如 ''M''  < log<sub>2</sub>''N' '' ），直接[[卷积|摺積]]（不透過[[圓周摺積|圓周摺積]]和 [[快速傅里叶变换|FFT]] ）反而最快。而當 ''N' '' 和 ''M'' 差不多在同一個[[数量级|數量級]]時，不用分割，也就是只有一塊長度 ''L'' = ''N' '' 的區塊去做 FFT 即可。而當 ''N' '' 比 ''M'' 大了不少，卻沒大太多時，區塊長度 ''L'' 就需要選擇。除了與 ''N' '' 和 ''M'' 相關以外，也要考慮當兩者相除有餘數時，剩下一小段的輸入可能會造成浪費。
+
+==相關條目==
+
+*[[卷积#定义|離散摺積]]
+*[[圓周摺積|圓周摺積]]
+*[[快速傅立葉變換|快速傅立葉變換]]
+*[[重疊-相加之摺積法|重疊-相加之摺積法]]
+
+==參考文獻==
+*{{Cite book
+ | author=Rabiner, Lawrence R.; Gold, Bernard
+ | authorlink=
+ | coauthors=
+ | title=Theory and application of digital signal processing
+ | date=1975
+ | publisher=Prentice-Hall
+ | location=Englewood Cliffs, N.J.
+ | isbn=0-13-914101-4
+ | pages=pp 65-67
+}}
+*{{citation|author=Helms, H.|title=Fast Fourier transform method of computing difference equations and simulating filters|journal=IEEE Transactions on Audio and Electroacoustics|volume=15(2)|year=1967|pages=85-90|url=http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=1161905|accessdate=2008-06-23|archive-date=2019-06-30|archive-url=https://web.archive.org/web/20190630230826/https://ieeexplore.ieee.org/document/1161905/?arnumber=1161905|dead-url=no}}
+
+==外部連結==
+
+*DSP class Fall 2005 [http://www.uta.edu/faculty/zhouwang/teaching/DSP05/handouts/Lecture08.pdf Lecture08]{{dead link|date=2018年4月 |bot=InternetArchiveBot |fix-attempted=yes }} at The University of Texas at Arlington]
+
+[[Category:数字信号处理|Category:数字信号处理]]
+[[Category:傅里叶分析|Category:傅里叶分析]]
+[[Category:数值分析|Category:数值分析]]

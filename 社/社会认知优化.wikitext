@@ -1,0 +1,44 @@
+社会认知优化（Social Cognitive Optimization, SCO），又称社会认识优化算法、社会认知算法。它是一种基于[[社会认知理论|社会认知理论]]的[[群体智能|群体智能]]优化算法。
+
+SCO算法已经被应用于[[非线性规划问题|非线性规划问题]]，[[布尔可满足性问题|布尔可满足性问题]]，软件可靠性分配问题，自动机制设计等。
+
+==算法 ==
+SCO算法可用于求解全局最小化问题<math>f(x)</math>,其中<math>x</math>为属于问题空间'''S'''的一个问题状态（State），或称为知识点，而<math>f</math>为质量衡量函数。
+
+在SCO中，由<math>N_c</math>个主体（Agent）同时进行求解，而它们通过环境中的社会共享库（Library）的进行交互。其中每个主体<math>i</math> <math>(i = 1, \ldots, N_c)</math>拥有一个私有知识点<math>x_i</math>，而社会共享库中拥有一个知识集<math>X = \{ x_j | j=1, \ldots, N_L \}</math> (即一组知识点，其数量为<math>N_{pop}</math>)。，SCO以马尔科夫过程方式（即当前周期的运行只依赖于上一周期的状态）重复运行<math>T</math>个周期。其算法流程如下：
+
+
+* [1.初始化]：在问题空间'''S'''中（随机）初始化每个主体i的私有知识点<math>x_i</math>和社会共享库中的知识集<math>X</math>中的每个知识点。
+* [2.运行周期]：在每个周期<math>t</math> <math> (t = 1, \ldots, T)</math>中：
+** [2.1.主体认知]对每个主体<math>i</math> <math>(i = 1, \ldots, N_c)</math>：
+***  [2.1.1.榜样选择]：在<math>X(t)</math>中选择一个较高质量的知识点<math>x_M</math>。通常通过锦标选择来实现，即随机选择<math>TAU_B</math>个知识点，并返回其中质量最高（即<math>f</math>值最小）的知识点作为<math>x_M</math>。
+*** [2.1.2.质量衡量]：比较<math>x_i(t)</math>和<math>x_M</math>，将其中质量高的一个返回为基本知识点<math>x_{Base}</math>，而质量低的一个返回为参考知识点<math>x_{Ref}</math>。
+*** [2.1.3.社会学习]：以<math>x_{Base}</math>和  <math>x_{Ref}</math>为输入产生新知识点<math>x_{i}(t+1)</math>。通常<math>x_{i}(t+1)</math>应在以<math>x_{Base}</math>的周围，而且离<math>x_{Base}</math>的距离和与<math>x_{Ref}</math>离<math>x_{Base}</math>的距离相关，且应嵌入边界处理方式使得<math>x_{i}(t+1)</math>属于'''S'''。
+*** [2.1.4.知识反馈]：将部分已有知识反馈给社会共享库。通常将<math>x_i(t+1)</math>直接提交。
+*** [2.1.5.知识更新]：更新主体<math>i</math>本身的私有知识点。通常将  <math>x_{i}(t+1)</math>直接替换  <math>x_{i}(t)</math>，当然也可通过其它方式更新，比如蒙特卡洛方式。
+** [2.2.社会共享库维护]：社会共享库利用所有主体提交的知识点更新已有的知识集，即将<math>X(t)</math>更新为<math>X(t+1)</math>。一种简单的方式是一对一锦标选择方式，即对每一个主体提交的知识点，替换<math>X(t)</math>中随机选择<math>TAU_W</math>个知识点后质量最差（即<math>f</math>值最大）的一个。
+* [3.结束]：返回历史上得到的质量最高的知识点作为准优解。 
+【注】在以上这些步骤中，只有2.1.3步尤其和问题空间'''S'''的形式相关。例如'''S'''为<math>D</math>维连续空间时（每维值有给定的上下界），新知识点<math>x_{i}(t+1)</math>可以以如下方式产生。首先得到<math>x_{Ref}</math>以<math>x_{Base}</math>为中心的对称点<math>x_{Image}</math>，然后得到以<math>x_{Image}</math>和  <math>x_{Ref}</math>为顶点的超矩形体<math>S_V</math>（而<math>x_{Base}</math>可视为在该超矩形体的中心），接着得到'''S'''和<math>S_V</math>的交集空间（边界处理方式），并在该交集空间中返回一个纯随机知识点作为<math>x_{i}(t+1)</math>。如'''S'''为离散和组合空间（如对[[旅行商问题|旅行商问题]]），则该步需要进行相应的设计。
+
+
+SCO算法共有三个主要参数，即主体数目<math>N_c</math>，知识集大小<math>N_{pop}</math>，以及执行周期数<math>T</math>。通常<math>N_{pop}</math>为<math>N_c</math>的3～5倍。加上初始化过程，总知识点评估次数为<math>N_{pop}+N_c*(T+1)</math>，因此总知识点评估次数在T较大时基本与<math>N_{pop}</math>无关。SCO算法还有两个次要参数，通常固定为默认值，即<math>TAU_B=2</math>与<math>TAU_W=4</math>。
+
+最优化问题可以视为一个类似于Newell和Simon所定义的（可以度量的）问题空间，而问题求解则可看做在问题空间中进行搜索高质量的问题状态或知识点。对每个主体而言，其私有知识点可以看做一种私有记忆，而该知识点随执行周期的变化轨迹则可以视为是对认知过程的一种模拟，即由低质量知识点得到高质量知识点的过程。在每个周期中，每个主体使用他的私有记忆以及参考社会共享库中的部分信息或线索，通过搜索得到的新知识将会被主体用来更新它的私有记忆，并提交（部分）已有知识给环境用来最后更新社会共享库。因此SCO模拟一种简单的社会认知过程：每个主体的认知过程利用了社会共享库，而高质量的社会共享库的积累过程则来源于个体认知过程的贡献。主体间的交互和合作搜索实际上是隐式的通过对社会共享库的使用和影响其更新而实现。如果将在问题空间中迅速得到准优解的过程视为一种创造性思维过程，SCO也可以视为对{{link-en|脑力激荡优化法|Brain storm optimization algorithm}}的一种简单模拟，这也意味着SCO有在研究群体创造性方面的扩展的可能性。
+
+==比较==
+
+以下比较一下SCO和几种主要的基于群体的优化算法的异同点。这些算法包括[[遗传算法|遗传算法]]（Genetic Algorithm, GA)，[[蚁群算法|蚁群算法]]（Ant Colony Optimization, ACO），[[粒子群优化|粒子群优化]]（Particle Swarm Optimization，PSO）。
+
+和GA所不同的是，每个主体长期存在于所有周期中，而不会被新个体替换。也就是，SCO模拟多个个体的学习和认知周期，而GA模拟群体的演化周期。
+
+和ACO所不同的是，每个主体拥有私有记忆，这个记忆长期存在于所有周期中。在这点上，SCO和PSO类似。主体的私有记忆保证了个体学习能力，有助于群体中涌现新知识并维护群体知识的差异性。
+
+和PSO所不同的是，社会共享库中的知识和主体中的知识相互独立。首先，拿走某个主体，不会影响社会共享库。在这点上，SCO和ACO类似。减少个体数目不会严重影响算法性能，SCO甚至能在只有一个个体时得到比较稳定的搜索结果，尽管使用多个个体会使得搜索过程更鲁棒。其次，改变库里面的部分信息，不会直接影响到主体本身，因此也可以通过调整社会共享库来调节算法性能。
+
+==外部链接==
+*[http://wiki.services.openoffice.org/wiki/NLPSolver NLPSolver中的社会认知优化算法] {{Wayback|url=http://wiki.services.openoffice.org/wiki/NLPSolver |date=20100410041544 }}
+*[http://www.adaptivebox.net/CILib/code/scocodes_link.html SCO源代码链接] {{Wayback|url=http://www.adaptivebox.net/CILib/code/scocodes_link.html |date=20100221011323 }}
+
+
+[[Category:最优化算法|Category:最优化算法]]
+[[Category:群集智能|Category:群集智能]]

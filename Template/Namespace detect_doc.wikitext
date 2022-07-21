@@ -1,0 +1,153 @@
+{{Documentation subpage}}
+{{high-risk|454284}}
+{{Shortcut|Template:NSD}}
+<!-- PLEASE ADD CATEGORIES AND INTERWIKIS AT THE BOTTOM OF THIS PAGE -->
+
+这是{{tl|Namespace detect}}元模板，它可以帮助其他模板检测出它们被嵌入的页面[[Help:命名空间|命名空间]]，并针对不同命名空间显示通过参数指定的文本。
+
+大致用法如下所示：
+<pre>-{}-
+{{namespace detect
+| 参数名  = 模板被包含在该参数对应的命名空间时所显示的文本
+}}
+</pre>
+
+本模板支持的参数如下所示：
+
+* '''main'''：主/条目命名空间。
+* '''talk'''：讨论命名空间，包括但不限于“Talk:”“User_talk:”“Wikipedia_talk:”开头的页面。
+* '''pseudo'''：[[Wikipedia:偽命名空間|偽命名空間]]。
+** '''mos, lta'''：分别对应“MOS:”和“LTA:”开头的页面。
+* '''user, wikipedia, file, mediawiki, template, help, category, portal, wikiproject'''：分别对应用户命名空间、计划命名空间（维基百科命名空间）、文件命名空间、MediaWiki命名空间、模板命名空间、帮助命名空间、分类命名空间、主题命名空间和维基专题命名空间。
+* '''other''' = 如果对应的命名空间参数没有值，则使用此参数。
+
+为了向下兼容，本模板仍能理解'''file'''命名空间的旧名称'''image'''，但其现已弃用。
+
+'''注意'''：由于此模板容易出现人为错误（如参数名拼写错误），所以对于大部分使用情况，最好使用更简单的命名空间检测模板，见下列的[[#參見|參見]]部分。
+
+=== 用法 ===
+
+<pre>-{}-
+{{namespace detect
+| main  = 条目
+| talk  = 讨论页
+| other = 其他页面
+}}
+</pre>
+
+如果本模板用于主（条目）页面上，将返回：
+
+:{{namespace detect| demospace = main
+| main  = 条目
+| talk  = 讨论页
+| other = 其他页面
+}}
+
+如果本模板用于非条目和讨论命名空间的其他页面上，将返回：
+
+:{{namespace detect| demospace = user
+| main  = 条目
+| talk  = 讨论页
+| other = 其他页面
+}}
+
+上面的示例中，该模板对于所有命名空间都会返回文本。但如果不使用other参数或者留空，那么它将不会返回任何文本，如下所示：
+
+<pre>-{}-
+{{namespace detect
+| file     = 文件
+| category = 分类页面
+| other    =
+}}
+</pre>
+
+这个例子中，在除文件和分类命名空间以外的任何页面上, 这些代码都将不返回任何文本。
+<!-- 以下模板有测试用途，请不要删除。 -->
+:{{namespace detect
+| file     = 文件
+| category = 分类页面
+| other    =
+}}
+
+通过将参数留空，可以在特定命名空间的页面上不呈现任何内容，如下所示：
+
+<pre>-{}-
+{{namespace detect
+| main  = 
+| other = 其他页面
+}}
+</pre>
+
+上面的代码在主空间（条目）页上将不会呈现任何内容，但是在其他页面上将返回如下内容：
+
+:{{namespace detect
+| main  = 
+| other = 其他页面
+}}
+
+=== 演示空间 ===
+
+该模板提供了'''demospace'''参数以供演示用。该参数的值可以是该模板可以理解的任何一个页面命名空间参数（包括other）。一旦使用该参数，模板便会认为它被包含在该参数指定的命名空间中并呈现相应的文本，如下所示：
+
+<pre>-{}-
+{{namespace detect 
+| main  = 条目
+| other = 其他页面
+| demospace = main
+}}
+</pre>
+
+无论以上代码被包含在什么命名空间中，都将呈现如下文本：
+
+:{{namespace detect 
+| main  = 条目
+| other = 其他页面
+| demospace = main
+}}
+
+您可以在自己的模板中将demospace参数传递给本模板，如下所示：
+
+<pre>-{}-
+{{namespace detect 
+| main  = 条目
+| other = 其他页面
+| demospace = {{{demospace|}}}
+}}
+</pre>
+
+如果demospace参数为空，本模板会忽略该参数。
+
+=== 参数 ===
+
+所有参数列表：
+
+<pre>-{}-
+{{namespace detect
+| main  = 
+...
+| other =
+| demospace = {{{demospace|}}} / main / talk / user / 
+              wikipedia / file / mediawiki / template / 
+              help / category / portal / other
+}}
+</pre>
+
+Note: Empty values to the "main" ... "portal" parameters do have special meaning.
+
+=== 技术细节 ===
+
+Namespace "Image" was renamed to "File" on 11 December 2008. This template was updated to understand both names well before that, thus it still works fine. For backwards compatibility it still understands "image" both as a parameter name, such as "image = File page text", and as a value "demospace = image".
+
+If you intend to feed tables as content to the numbered parameters of this template, then you need to know this:
+
+[[Help:Template|Templates]] do have a problem to handle parameter data that contains pipes "<code>|</code>", unless the pipe is inside another template <code><nowiki>{{name|param1}}</nowiki></code> or inside a piped link <code><nowiki>[[帮助:模板|help]]</nowiki></code>. Thus templates can not handle [[帮助:表格|wikitables]] as input unless you escape them by using the {{tn|!}} template. This makes it hard to use wikitables as parameters to templates. Instead the usual solution is to use "[[Help:HTML in wikitext|HTML wikimarkup]]" for the table code, which is more robust.
+
+For more technical details such as about "copying to other projects" and "CSS based namespace detection" see {{tl|main talk other}} and its talk page.
+
+=== 參見 ===
+{{namespace detect see also}}
+
+<includeonly>{{Sandbox other||<!-- 本行下加入模板的分類，跨維基連結加入Wikidata（參見[[Wikipedia:Wikidata]]） -->
+[[Category:命名空間操作模板]]
+[[Category:If模板]]
+}}</includeonly>

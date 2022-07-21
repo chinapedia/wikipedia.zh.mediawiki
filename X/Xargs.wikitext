@@ -1,0 +1,53 @@
+{{noteTA
+|G1=IT
+}}
+{{lowercase}}
+'''xargs'''是一条[[Unix|Unix]]和[[类Unix|类Unix]][[操作系统|操作系统]]的常用命令。它的作用是将参数列表转换成小块分段传递给其他命令，以避免参数列表过长的问题<ref>{{Cite web |url=http://www.gnu.org/software/coreutils/faq/coreutils-faq.html#Argument-list-too-long |title=GNU Core Utilities FAQ |accessdate=2008-03-12 |archive-date=2020-11-11 |archive-url=https://web.archive.org/web/20201111173027/https://www.gnu.org/software/coreutils/faq/coreutils-faq.html#Argument-list-too-long |dead-url=no }}</ref>。xargs的作用一般等同于大多数[[Unix_shell|Unix shell]]中的[[反引号|反引号]]，但更加灵活易用，并可以正确处理输入中有空格等特殊字符的情况。对于经常产生大量输出的命令如[[find|find]]、[[locate|locate]]和[[grep|grep]]来说非常有用。
+
+== 示例 ==
+例如，下面的命令：
+<syntaxhighlight lang=bash>rm $(find /path -type f)</syntaxhighlight>
+
+如果path目录下文件过多就会因为“参数列表过长”而报错无法执行。但改用xargs以后，问题即获解决。
+<syntaxhighlight lang=bash>find /path -type f -print0 | xargs -0 rm</syntaxhighlight>
+
+本例中xargs将[[find|find]]产生的长串文件列表拆散成多个子串，然后对每个子串调用[[rm|rm]]。-print0表示輸出以null分隔（-print使用換行）；-0表示輸入以null分隔。这样要比如下使用find命令效率高的多。
+<syntaxhighlight lang=bash>find /path -type f -exec rm '{}' \;</syntaxhighlight>
+
+上面这条命令会对每个文件调用"rm"命令。当然使用新版的"find"也可以得到和"xargs"命令同样的效果：
+<syntaxhighlight lang=bash>find /path -type f -exec rm '{}' +</syntaxhighlight>
+
+<syntaxhighlight lang=bash>find . -name "*.foo" | xargs grep bar</syntaxhighlight>
+该命令大体等价于
+<syntaxhighlight lang=bash>grep bar $(find . -name "*.foo")</syntaxhighlight>
+
+<syntaxhighlight lang=bash>find . -name "*.foo" -print0 | xargs -0 grep bar</syntaxhighlight>
+使用了GNU特殊规定的空字符。
+
+<syntaxhighlight lang=bash>find . -name "*.foo" -print0 | xargs -0 -t -r vi</syntaxhighlight>
+与上面的基本相同但启动[[vi|vi]]进行编辑。-t参数会提前打印错误信息。-r参数是一个GNU扩展，表明在无输入情况下则不构造命令执行。
+
+<syntaxhighlight lang=bash>find . -name "*.foo" -print0 | xargs -0 -i mv {} /tmp/trash</syntaxhighlight>
+使用-i参数将{}中内容替换为列表中的内容。
+
+==参见==
+*[[GNU_parallel|GNU parallel]]
+*[[pexec|pexec]]
+
+== 参考 ==
+{{reflist}}
+
+== 外部链接 ==
+* {{man|cu|xargs|SUS|construct argument lists and invoke utility}}
+
+=== 手册页===
+* {{Man/format|1|xargs|http://www.gnu.org/software/findutils/manual/html_node/find_html/Invoking-xargs.html||[[GNU|GNU]] [[Findutils|Findutils]]参考}}
+* {{man|1|xargs|FreeBSD|construct argument list(s) and execute utility}}
+* {{man|1|xargs|NetBSD|construct argument list(s) and execute utility}}
+* {{man|1|xargs|OpenBSD|construct argument list(s) and execute utility}}
+* {{man|1|xargs|Solaris|construct argument lists and invoke utility}}
+
+{{Unix命令}}
+
+[[Category:Unix文字处理实用工具|Category:Unix文字处理实用工具]]
+[[Category:Unix_SUS2008实用工具|Category:Unix SUS2008实用工具]]

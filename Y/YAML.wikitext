@@ -1,0 +1,394 @@
+{{NoteTA
+|G1 = IT
+|1 = zh-cn:强制转型; zh-tw:強迫轉型;
+}}
+{{Infobox file format
+| name                   = YAML
+| icon                   = Official YAML Logo.svg
+| icon_size              = 140px
+| developer              = 
+| released               = {{Start date and age|2001|05|11|df=yes}}
+| latest_release_version = 1.2 (Revision 1.2.2)
+| latest_release_date    = {{start date and age|2021|10|01|df=yes}}
+| genre                  = 数据交换
+| free                   = Yes
+| url                    = {{URL|http://yaml.org/}}
+| extension = .yaml, .yml
+| mime      = 尚未註冊
+}}
+'''YAML'''（{{IPAc-en|ˈ|j|æ|m|əl}}，尾音類似camel駱駝）是一個可讀性高，用來表達資料[[序列化|序列化]]的格式。YAML參考了其他多種語言，包括：[[C語言|C語言]]、[[Python|Python]]、[[Perl|Perl]]，並從[[XML|XML]]、電子郵件的數據格式（RFC 2822<ref>[http://www.rfc-editor.org/rfc/rfc2822.txt 2822] {{Wayback|url=http://www.rfc-editor.org/rfc/rfc2822.txt |date=20220514042645 }}</ref>）中獲得靈感。Clark Evans在2001年首次發表了這種語言<ref>{{Cite web |url=http://tech.groups.yahoo.com/group/sml-dev/message/4710 |title=YAML Draft 0.1 |last=Evans |first=Clark |date=2001-05-11 |publisher=Yahoo! Tech groups(雅虎技術群組): sml-dev |accessdate=2008-08-02 |archive-date=2013-09-07 |archive-url=https://web.archive.org/web/20130907042053/http://tech.groups.yahoo.com/group/sml-dev/message/4710 }}</ref>，另外Ingy döt Net與Oren Ben-Kiki也是這語言的共同設計者<ref>{{Cite web |url=http://www.yaml.org/about.html |title=YAML Ain't Markup Language: About |accessdate=2010-06-16 |archive-date=2022-04-03 |archive-url=https://web.archive.org/web/20220403004031/http://yaml.org/about.html }}</ref>。目前已經有數種程式語言或腳本語言支援（或者說解析）這種語言。
+
+YAML是"YAML Ain't a Markup Language"（YAML不是一種[[标记語言|标记語言]]）的[[遞迴縮寫|遞迴縮寫]]。在開發的這種語言時，YAML的意思其實是："Yet Another Markup Language"（仍是一種[[标记語言|标记語言]]）<ref name="YAML_spec_2001_08_01">{{Cite web |title=Yet Another Markup Language (YAML) 1.0 |url=http://yaml.org/spec/history/2001-08-01.html |accessdate=2008-11-24 |archive-date=2022-03-06 |archive-url=https://web.archive.org/web/20220306093951/https://yaml.org/spec/history/2001-08-01.html }}</ref>，但為了強調這種語言以數據為中心，而不是以标记語言為重點，而用反向缩略语重新命名。
+
+== 功能 ==
+YAML的語法和其他高階語言類似，並且可以簡單表達清單、散列表，純量等資料形態。<ref name="Vartype000">在英文原文中，將下列幾組詞彙交替使用：(清單"list"和陣列"array"), (雜湊表"hash"、字典"dictionary"、映射"mapping")和(字串"string"和純量"scalar")。在其他程式語言，這幾組字的意義未必等價。中文則統一使用相同的詞彙。</ref>它使用空白符號縮排和大量依賴外觀的特色，特別適合用來表達或編輯資料結構、各種設定檔、傾印除錯內容、文件大綱（例如：許多電子郵件標題格式和YAML非常接近）。儘管它比較適合用來表達階層式（hierarchical model）的資料結構，不過也有精緻的語法可以表示關聯性（relational model）的資料。<ref name="RelationalNote000">階層式(hierarchical model)對應到樹狀結構時，只會有一個固定、整體性的結果。舉例說明：用階層式來表達電影的演員名單，每個演員都只能歸類到一個電影名稱；或是每個電影只能歸類給一位演員(雖然這樣很怪)。YAML同時也允許使用關聯式資料(relational model)。</ref>由於YAML使用空白字元和分行來分隔資料，使得它特別適合用[[grep|grep]]／[[Python|Python]]／[[Perl|Perl]]／[[Ruby|Ruby]]操作。其讓人最容易上手的特色是巧妙避開各種封閉符號，如：引號、各種括號等，這些符號在巢狀結構時會變得複雜而難以辨認。
+
+== 範例 ==
+
+=== 簡單的文件 ===
+資料結構可以用類似大綱的縮排方式呈現
+
+<syntaxhighlight lang="yaml">
+---
+receipt:     Oz-Ware Purchase Invoice
+date:        2012-08-06
+customer:
+    given:   Dorothy
+    family:  Gale
+   
+items:
+    - part_no:   A4786
+      descrip:   Water Bucket (Filled)
+      price:     1.47
+      quantity:  4
+
+    - part_no:   E1628
+      descrip:   High Heeled "Ruby" Slippers
+      size:      8
+      price:     133.7
+      quantity:  1
+
+bill-to:  &id001
+    street: | 
+            123 Tornado Alley
+            Suite 16
+    city:   East Centerville
+    state:  KS
+
+ship-to:  *id001   
+
+specialDelivery:  >
+    Follow the Yellow Brick
+    Road to the Emerald City.
+    Pay no attention to the
+    man behind the curtain.
+...
+</syntaxhighlight>
+
+注意在YAML中，字串不一定要用雙引號標示。另外，在縮排中空白字元的數目並不是非常重要，只要相同階層的元素左側對齊就可以了（不過不能使用TAB字元）。這個文件的頂層由七個鍵值組成：其中一個鍵值"items"，是兩個元素構成的[[陣列|陣列]]（或稱[[清單|清單]]），這清單中的兩個元素同時也是包含了四個鍵值的雜湊表。文件中重複的部分用這個方法處理：使用錨點（'''&'''）和引用（'''*'''）標籤將"bill-to"雜湊表的內容複製到"ship-to"雜湊表。也可以在文件中加入選擇性的空行，以增加可讀性。在一個檔案中，可同時包含多個文件，並用"<code>'''---'''</code>"分隔。選擇性的符號"<code>'''...'''</code>"可以用來表示檔案結尾（在利用串流的通訊中，這非常有用，可以在不關閉串流的情況下，發送結束訊號）。
+
+== 語言的構成元素 ==
+
+=== YAML的基本元件 ===
+YAML提供縮排／區塊以及內置（inline）兩種格式，來表示清單和[[雜湊表|雜湊表]]。以下展示幾種YAML的基本原件。
+
+==== 清單（[[陣列|陣列]]） ====
+習慣上清單比較常用區塊格式（block format）表示，也就是用短槓+空白字元作為起始。
+<syntaxhighlight lang="yaml">
+ --- # 最喜愛的電影
+ - Casablanca
+ - North by Northwest
+ - Notorious
+</syntaxhighlight>
+
+另外還有一種內置格式（inline format）可以選擇──用方括號圍住，並用逗號+空白區隔（類似[[JSON|JSON]]的語法）。<ref>{{cite web |url=http://redhanded.hobix.com/inspect/yamlIsJson.html |title=存档副本 |accessdate=2013-05-15 |deadurl=yes |archiveurl=https://web.archive.org/web/20080914015703/http://redhanded.hobix.com/inspect/yamlIsJson.html |archivedate=2008-09-14 }}</ref>
+<syntaxhighlight lang="yaml">
+ --- # 購物清單 
+ [milk, pumpkin pie, eggs, juice]
+</syntaxhighlight>
+
+==== [[關聯陣列|關聯陣列]] ====
+鍵值和資料由冒號及空白字元分開。區塊形式（常使用於YAML數據文檔中）使用縮進和換行符分隔'''key: value'''對。內置形式（常使用於YAML數據串流中）在大括號中使用逗號+空白字元分隔'''key: value'''對。
+<syntaxhighlight lang="yaml">
+ --- # 區塊形式
+   name: John Smith
+   age: 33
+ --- # 內置形式
+ {name: John Smith, age: 33}
+</syntaxhighlight>
+
+==== 區塊的字符 ====
+再次強調，字串不需要包在引號之內。
+
+有兩種語法可以書寫多行文字（multi-line strings），一種為保留換行（使用<code>|</code>字元），另一種為摺疊換行（使用<code>></code>字元）。兩種語法在其特殊字元之後都必須接著換行。
+
+===== 保留換行(Newlines preserved) =====
+<syntaxhighlight lang="yaml">
+data: |                                     # 譯者注：這是一首著名的五行民謠(limerick)
+   There once was a man from Darjeeling     # 這裡曾有一個人來自大吉嶺
+   Who got on a bus bound for Ealing        # 他搭上一班往伊靈的公車
+       It said on the door                  # 門上這麼說的
+       "Please don't spit on the floor"     # "請勿在地上吐痰"
+   So he carefully spat on the ceiling      # 所以他小心翼翼的吐在天花板上
+</syntaxhighlight>
+
+根據預設，每行開頭的縮排（以首行為基準）和行末空白會被去除，而不同的縮排會保留差異。
+
+===== 摺疊換行(Newlines folded) =====
+<syntaxhighlight lang="yaml">
+data: >
+   Wrapped text         # 摺疊的文字
+   will be folded       # 將會被收
+   into a single        # 進單一一個
+   paragraph            # 段落
+   
+   Blank lines denote   # 空白的行代表
+   paragraph breaks     # 段落之間的區隔
+</syntaxhighlight>
+
+和保留換行不同的是，只有空白行才視為換行，原本的換行字元會被轉換成空白字元，而行首縮排會被去除。
+
+==== 階層化的元素 ====
+
+===== 於清單中使用雜湊表 =====
+<syntaxhighlight lang="yaml">
+- {name: John Smith, age: 33}
+- name: Mary Smith
+  age: 27
+</syntaxhighlight>
+
+===== 於雜湊表中使用清單 =====
+<syntaxhighlight lang="yaml">
+men: [John Smith, Bill Jones]
+women:
+  - Mary Smith
+  - Susan Williams
+</syntaxhighlight>
+
+=== YAML的進階元件 ===
+這部分算是一個後續的討論，在比較各種數資料列語言時，YAML最常被提到的特色有兩個：關係樹和資料形態。
+
+==== 樹狀結構之間的交互參照 ====
+
+===== 資料合併和參考 =====
+為了維持文件的簡潔，並避免資料輸入的錯誤，YAML提供了節點參考（*）和雜湊合併（<<）參考到其他節點標籤的錨點標記（&）。參考會將樹狀結構加入錨點標記的內容，並可以在所有資料結構中運作（可以參考上面"ship-to"的範例）合併只有雜湊表可以使用，可以將鍵值自錨點標記複製到指定的雜湊表中。
+
+當資料被instantiate合併和參考會被剖析器自動展開。
+
+<syntaxhighlight lang="yaml">
+#眼部雷射手術之標準程序
+---
+- step:  &id001                  # 定義錨點標籤 &id001
+    instrument:      Lasik 2000
+    pulseEnergy:     5.4
+    pulseDuration:   12
+    repetition:      1000
+    spotSize:        1mm
+
+- step:
+     <<: *id001                  # 合併鍵值：使用在錨點標籤定義的內容
+     spotSize:       2mm         # 覆寫"spotSize"鍵值
+
+- step:
+     <<: *id001                  # 合併鍵值：使用在錨點標籤定義的內容
+     pulseEnergy:    500.0       # 覆寫鍵值
+     alert: >                    # 加入其他鍵值
+           warn patient of 
+           audible pop
+</syntaxhighlight>
+
+==== 資料形態 ====
+由於自動判定資料形態的功能，嚴格型態（也就是使用者有宣告的資料形態）很難在大部分的YAML文件中看到。資料型態可以被區分成三大類：原碼（core），定義（defined），使用者定義（user-defined）。原碼可以自動被解析器分析（例如：浮點數，整數，字串，清單，映射，...）。有一些進階的資料形態──例如位元資料──在YAML中有被「定義」，但不是每一種解析器都有支援。最後，YAML支援使用者自定的區域變數，包括：自訂的類別，結構或基本型態（例如：四倍精度的浮點數）。
+
+===== 強迫轉型 =====
+YAML的自動判定資料形態是哪一種實體。但有時使用者會想要將資料強迫轉型成自定的某種型態。最常見的狀況是字串，有時候可能看起來像數字或布林值，這種時候可以使用雙引號，或是使用嚴格型態標籤。
+
+<syntaxhighlight lang="yaml">
+---
+a: 123                     # 整數
+b: "123"                   # 字串（使用雙引號）
+c: 123.0                   # 浮點數
+d: !!float 123             # 浮點數，使用!!表達的嚴格型態
+e: !!str 123               # 字串，使用嚴格型態
+f: !!str Yes               # 字串，使用嚴格型態
+g: Yes                     # 布林值"真"
+h: Yes we have No bananas  # 字串（包含"Yes"和"No"）
+</syntaxhighlight>
+
+===== 其他特殊資料形態 =====
+除了一般的資料形態之外，使用者也可以使用一些較為進階的型態，但不保證可被每種解析器分析。使用時和強迫轉型類似，要在形態名稱之前加上兩個驚嘆號（!!）。有幾種重要的形態在本篇沒有討論，包括[[集合|集合]]（sets），有序映照（ordered maps），[[時間戳記|時間戳記]]（timestamps）以及十六進位資料（hexadecimal）。下面這個範例則是位元資料（binary）
+
+<syntaxhighlight lang="yaml">
+---
+picture: !!binary |
+ R0lGODdhDQAIAIAAAAAAANn
+ Z2SwAAAAADQAIAAACF4SDGQ
+ ar3xxbJ9p0qa7R0YxwzaFME
+ 1IAADs=
+</syntaxhighlight>
+
+===== 使用者自行擴充的資料形態 =====
+許多YAML的實現允許使用者自訂資料形態。在將一個物件序列化時，這個方法還頗方便的。某些區域資料形態可能不存在預設的資料形態中，不過這種型態在特定的YAML應用程式中是有定義的。這種區域資料形態用驚嘆號（''' <code>!</code> '''）表示。 
+
+<syntaxhighlight lang="yaml">
+---
+myObject:  !myClass { name: Joe, age: 15}
+</syntaxhighlight>
+
+=== 語法 ===
+在yaml.org<ref>[http://yaml.org yaml.org] {{Wayback|url=http://yaml.org/ |date=20220515165215 }}</ref>（英文）可以找到輕巧而好用的小抄<ref>[http://yaml.org/refcard.html 小抄] {{Wayback|url=http://yaml.org/refcard.html |date=20220303001324 }}</ref>（亦是用YAML表示）及格式說明<ref>[http://yaml.org/spec/ 格式說明] {{Wayback|url=http://yaml.org/spec/ |date=20220120221209 }}</ref>。下面的內容，是關於基本元件的摘要。
+* YAML使用可列印的[[Unicode|Unicode]]字元，可使用[[UTF-8|UTF-8]]或[[UTF-16|UTF-16]]。
+* 使用空白字元為文件縮排來表示結構；不過不能使用跳格字元(TAB)。
+* 註解由井字號（''' # '''）開始，可以出現在一行中的任何位置，而且範圍只有一行（也就是一般所謂的單行註解）
+* 每個清單成員以單行表示，並用短槓+空白（''' -   '''）起始。或使用[[括號|方括號]]（''' [ ] '''），並用[[逗號|逗號]]+空白（''' ,   '''）分開成員。
+* 每個雜湊表的成員用冒號+空白（''' :   '''）分開鍵值和內容。或使用大括號（''' {    } '''），並用逗號+空白（''' ,   '''）分開。
+** 雜湊表的鍵值可以用[[問號|問號]] (''' ? ''')起始，用來明確的表示多個詞彙組成的鍵值。 
+* 字串平常並不使用引號，但必要的時候可以用[[雙引號|雙引號]] (''' " ''')或[[單引號|單引號]] (''' ' ''')框住。
+** 使用雙引號表示字串時，可用倒斜線（''' \ '''）開始的跳脫字元（這跟[[C語言|C語言]]類似）表示特殊字元。
+* 區塊的字串用縮排和修飾詞（非必要）來和其他資料分隔，有新行保留（preserve）（使用符號''' | '''）或新行摺疊（flod）（使用符號''' > '''）兩種方式。
+* 在單一檔案中，可用連續三個[[連字號|連字號]]（'''---'''）區分多個檔案。
+**另外，還有選擇性的連續三個點號（''' ... '''）用來表示檔案結尾。
+* 重複的內容可使從參考標記[[星號|星號]] (''' * ''')複製到錨點標記（''' & '''）。 
+* 指定格式可以使用兩個[[驚嘆號|驚嘆號]] (''' !! ''')，後面接上名稱。
+* 檔案中的單一文件可以使用'''[[編譯程式定向|指導指令]]'''，使用方法是[[百分比符號|百分比符號]](''' % ''')。有兩個[[編譯程式定向|指導指令]]在YAML1.1版中被定義：
+** %YAML 指導指令，用來識別文件的YAML版本。
+** %TAG 指導指令，被用在URI的字首標記。這個方法在標記節點的型態時相當有用。
+YAML在使用逗號及冒號時，後面都必須接一個空白字元，所以可以在字串或數值中自由加入分隔符號（例如：5''','''280或http''':'''//www.wikipedia.org）而不需要使用引號。   
+
+另外還有兩個特殊符號在YAML中被[[保留字|保留]]，有可能在未來的版本被使用--（''' @ '''）和（''' ` '''）。
+
+== 與其他数据序列化格式比較 ==
+雖然YAML是參考[[JSON|JSON]]，[[XML|XML]]和[[SDL|SDL]]等語言，不過跟這些語言比起來，YAML仍有自己的特色。
+
+=== JSON ===
+JSON的語法是YAML1.2版的子集<ref>{{Cite web |url=http://yaml.org/spec/1.2/ |title=YAML 1.2 Spec |accessdate=2008-12-01 |archive-date=2008-05-16 |archive-url=https://web.archive.org/web/20080516232502/http://yaml.org/spec/1.2/ |dead-url=no }}</ref>,，同時非常''接近''<ref>這些語法非常細微且很少出現在文件中：JSON允許擴充字元集，如：UTF32；YAML在分隔符號──如引號、等號、冒號──後方需要接空白字元，而JSON不需要；一些非標準的JSON實現允許Javascript風格的的大範圍註解''/*...*/''。處理這種邊界情形或許需要在將其當成內置格式的YAML剖析前進行簡單的JSON前處理。</ref> YAML1.0與1.1版的子集，因此大部分的JSON文件都可以被YAML的剖析器剖析。<ref>{{Cite web |url=http://redhanded.hobix.com/inspect/yamlIsJson.html |title=用SYCK剖析JSON |accessdate=2008-09-28 |archive-date=2008-09-14 |archive-url=https://web.archive.org/web/20080914015703/http://redhanded.hobix.com/inspect/yamlIsJson.html |dead-url=no }}</ref>這是因為JSON的語法結構和YAML的內置格式相同。雖然大範圍的分層也可以使用類似JSON的內置格式，不過YAML標準並不建議這樣使用，除非這樣編寫能讓文件可讀性增加。YAML的許多擴展在JSON是找不到的，如：進階資料形態、關係錨點、字串不需要雙引號、映射資料形態會儲存鍵值的順序。
+
+=== [[可擴展标记語言|XML]]和SDL ===
+XML和SDL標籤概念，在YAML中是找不到的。''對於資料結構序列''（儘管這是有爭議的），標籤屬性的特色就是可以將資料及複雜資料附加資訊分離，並將各種原生資料結構（如：雜湊表、陣列）用同一種語言表示。YAML則以資料的可擴展性作為替代。（包括為了模擬物件的類別型態）在YAML本身的規範中，並沒有類似XML的語言定義文件剛要（language-defined document schema descriptors）──例如驗證自己本身的結構是否正確的文件。不過，[[YAML綱要描述語言|YAML綱要描述語言]]（YAML schema descriptor language）是存在<ref>[http://www.kuwata-lab.com/kwalify/ 存在] {{Wayback|url=http://www.kuwata-lab.com/kwalify/ |date=20210812231831 }}</ref>的。另外還有[[YAXML|YAXML]]──用XML描述YAML的結構──可以讓[[XML_Schema|XML Schema]]與[[XSLT|XSLT]]轉換程式應用在YAML之上。況且，在一般使用的情況下，YAML豐富的定義型態之語法已經提供了足夠的方式，來辨認YAML文件是否正確。
+
+=== 缩进劃界 ===
+由於YAML的運作主要依賴大綱式的缩进來決定結構，這有效解決了[[界定符衝突|界定符衝突]]（Delimiter collision）的問題。YAML的資料形態不依賴引號之特點，使的YAML文件可以利用區塊，輕易的插入各種其他類型文件，如：XML、SDL、JSON，甚至插入另一篇YAML。
+
+<syntaxhighlight lang="yaml">
+---
+example: >
+        HTML goes into YAML without modification
+message: |
+
+        <blockquote style="font: italic 12pt Times">
+        <p>"Three is always greater than two,
+           even for large values of two"</p>
+        <p>--Author Unknown</p>
+        </blockquote>
+</syntaxhighlight>
+
+相反的，要將YAML置入XML或SDL中時，需要將所有空白字元和位勢符號（potential sigils，如：'''<''','''>'''和'''&'''）轉換成實體語法；要將YAML置入JSON中，需要用引號框住，並轉換內部的所有引號。
+
+=== 非階層式的資料模型 ===
+跟SDL、JSON等，每個子結點只能有單一一個父節點的階層式模型不同，YAML提供了一個簡單的關係體制，可以從樹狀結構的其他地方，重複相同的資料，而不必顯示那些冗餘的結構。這點和XML中的IDRef類似<ref >{{Cite web |url=http://www.w3.org/TR/2000/REC-xml-20001006#idref |title=XML IDREF |access-date=2008-09-28 |archive-date=2022-05-15 |archive-url=https://web.archive.org/web/20220515043139/http://www.w3.org/TR/2000/REC-xml-20001006#idref }}</ref>YAML剖析器在將YAML轉換成物件時，會自動將那些參考資料的結構展開，所以程式在使用時並不會查覺到哪些資料是解碼自這種結構。XML則不會將這種結構展開。這種表示法可以增加程式的可讀性，並且，在那種『大部分參數維持和上次相同，只有少數改變』的設定檔及通訊協定中，可以減少數據輸入錯誤。一個例子是：『送貨地點』和『購買地點』在發票的紀錄中幾乎都是相同的資料。
+
+=== 實際的考量 ===
+YAML是「行導向的」，因此，就算想由現有程序的混亂輸出，轉換成YAML格式，並保留大部分的原始文件之外觀，也非常簡單。因為他不需要平衡封閉的標籤、括弧及引號，可以從很簡單的利用程式，從報表產生YAML。同樣，空格分隔可讓使用行導向的命令如：grep、Awk、perl、ruby，和Python，來應急性的過濾YAML文件時更加方便。
+
+特別是與標記語言不同的，連續的YAML區塊導向-{}-往往是格式良好的YAML文件本身。這使得很容易撰寫那種「在開始提取的具體記錄之前，不需要'讀取全部文件內容'」的解析器（通常需要平衡起始和關閉標籤、尋找引號和跳脫字符）。當處理一個單一靜態的，整個存在記憶體中的資料結構將很大，或為提取一個項目來重建的整個結構，代價相當昂貴的記錄檔，這種特性是相當方便的。
+
+值得討論的是，儘管它的縮排方式似乎複雜化了深度很大的巢狀層次， YAML將縮排視為一個單一的空白，這可能會取得比其他標記語言更好的壓縮比。此外，極深的縮排可以完全避免的是： (1)使用“內置格式”（即簡稱類JSON格式）而無縮排；或 (2)使用關聯錨點展開階層以形成一個攤平的格式，使得YAML解析器能透明地重組成完整的數據結構。
+
+==== 安全性 ====
+YAML是純粹用來表達資料的語言，所以內部不會存[[代碼注射|代碼注射]]的可執行命令。<ref>提案中的"yield"(迭代器)標籤可以允許簡單的算術運算</ref>這代表剖析器會相當（至少）安全的解析文件，而不用擔心潛在與執行命令相關的安全漏洞。舉例來說，[[JSON|JSON]]是[[JavaScript|JavaScript]]的子集，因此可能有人想使用JavaScript本身的剖析器直接eval，不過这样一来就造成許多[[代碼注射|代碼注射]]的漏洞。雖然在所有資料序列語言中，安全解析本質上是可能的，但可執行性卻正是這樣一個惡名昭彰的缺陷；而YAML缺乏相關的命令語言，可能是一個相對安全的利益。
+
+=== 資料處理和呈現 ===
+XML<ref name="XML 1.0">{{cite web
+| title       = Extensible Markup Language (XML) 1.0 (第四版)
+| url       = http://www.w3.org/TR/REC-xml/
+| accessdate       = 2007-11-04
+| archive-date       = 2020-01-10
+| archive-url       = https://web.archive.org/web/20200110151249/http://www.w3.org/TR/REC-xml/
+| dead-url       = no
+}}</ref><ref name="XML 1.1">{{cite web
+| title       = Extensible Markup Language (XML) 1.1 (第二版)
+| url       = http://www.w3.org/TR/xml11/
+| accessdate       = 2007-11-04
+| archive-date       = 2021-04-19
+| archive-url       = https://web.archive.org/web/20210419133700/https://www.w3.org/TR/xml11/
+}}</ref>和YAML規範<ref name="YAML_spec">{{cite web
+| title       =  YAML Ain't Markup Language (YAML) Version 1.1
+| url       =  http://yaml.org/spec/current.html
+| accessdate       =  2007-11-04
+| archive-date       =  2022-05-01
+| archive-url       =  https://web.archive.org/web/20220501053052/http://yaml.org/spec/current.html
+}}</ref>提供非常不同的''邏輯''模型來進行資料結點的展現、處理及儲存。
+
+== 實作與函式庫 ==
+
+=== 移植性 ===
+簡單的YAML檔案（例如：簡單的鍵值對）不需要完整的YAML剖析器，便可以被[[正則表達式|正則表達式]]解析。許多常用的程式語言──純用某個語言，讓函式庫具有可攜性──都有的YAML的產生器和剖析器。當效能比較重要時，也有許多和C語言綁定的函式庫可使用。
+
+=== C語言函式庫 ===
+*libYAML<ref>[http://pyyaml.org/wiki/LibYAML libYAML] {{Wayback|url=http://pyyaml.org/wiki/LibYAML |date=20220407050602 }}</ref> 2007-06時，這個YAML的函式庫漸趨穩定，並被YAML格式作者推薦<ref>YAML的創造者Clark Evans推薦</ref>。
+*SYCK<ref>[http://whytheluckystiff.net/syck/ SYCK] {{Wayback|url=http://whytheluckystiff.net/syck/ |date=20090803174140 }}</ref> 這個實現支援大部分1.0版的格式，並且被廣泛的使用。它使用高階[[解釋型語言|解釋型語言]]進行最佳化。在2005之後，這個專案已經不再更新，不過仍可使用。
+
+=== 其他函式庫 ===
+下面幾種程式語言都有與YAML相關的函式庫:
+{{div col|2}}
+*[[C++|C++]]
+**用C++將libYaml包裝<ref>[http://git.snoyman.com/cppweb.git?a=blob;f=src/cppmodels/yaml.hpp;h=e67377c792309a51eb5a4c9dac05ba89befd38d6;hb=HEAD 用C++將libYaml包裝]{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>
+*[[Go|Go]]
+**go-yaml<ref>[https://github.com/go-yaml/yaml go-yaml] {{Wayback|url=https://github.com/go-yaml/yaml |date=20220426092622 }}</ref> 借鉴 C 库 libyaml 设计的 Go 语言移植。
+*[[Haskell|Haskell]]
+** Haskell Reference wrappers<ref>[https://web.archive.org/web/20080803050852/http://www.ben-kiki.org/oren/YamlReference/  Haskell Reference wrappers]</ref>
+*[[Java|Java]]
+**jvyaml<ref>[https://web.archive.org/web/20081121204521/http://jvyaml.dev.java.net/ jvyaml]</ref> 以Syck為基礎設計。
+**JYaml<ref>[https://web.archive.org/web/20081225033223/http://jyaml.sourceforge.net/ JYaml]</ref> 純Java的實現。
+*[[JavaScript|JavaScript]] 
+**原生的JavaScript即可產生YAML，但不能解析。
+**YAML JavaScript<ref>[http://sourceforge.net/projects/yaml-javascript YAML JavaScript] {{Wayback|url=http://sourceforge.net/projects/yaml-javascript |date=20210313050647 }}</ref> 同時支持產生和解析。
+*[[Objective-C|Objective-C]]
+**Cocoa-Syck<ref>[https://web.archive.org/web/20070927213458/http://code.whytheluckystiff.net/syck/browser/trunk/ext/cocoa/src Cocoa-Syck]</ref>
+*[[OCaml|OCaml]] 
+**OCaml-Syck<ref>[http://sourceforge.net/projects/ocaml-syck/ OCaml-Syck] {{Wayback|url=http://sourceforge.net/projects/ocaml-syck/ |date=20200630031720 }}</ref>
+*[[Lua|Lua]]
+**Lua-Syck<ref>[https://web.archive.org/web/20080923161342/http://code.whytheluckystiff.net/syck/browser/trunk/ext/lua Lua-Syck]</ref>
+*[[Perl|Perl]]
+**CPAN YAML<ref>[http://search.cpan.org/dist/YAML CPAN YAML] {{Wayback|url=http://search.cpan.org/dist/YAML |date=20180604182707 }}</ref> 一個通用的介面，被數個YAML解析器使用。
+**YAML::Tiny<ref>[http://search.cpan.org/dist/YAML-Tiny/ YAML::Tiny] {{Wayback|url=http://search.cpan.org/dist/YAML-Tiny/ |date=20180520021623 }}</ref> YAML簡化版的實現。擁有小巧輕快的優點──比完整功能的YAML實現快上許多，並用純Perl寫成。
+**YAML::Syck<ref>[http://search.cpan.org/dist/YAML-Syck/ YAML::Syck] {{Wayback|url=http://search.cpan.org/dist/YAML-Syck/ |date=20180520041607 }}</ref> 與SYCK函式庫綁定。提供快速、功能豐富（highly featured）的YAML解析器。
+**YAML::XS<ref>[http://search.cpan.org/dist/YAML-LibYAML/ YAML::XS] {{Wayback|url=http://search.cpan.org/dist/YAML-LibYAML/ |date=20180520003853 }}</ref> 與LibYaml綁定。提供1.1版更好的相容性。
+*[[PHP|PHP]]
+**Spyc<ref>[https://web.archive.org/web/20081218100022/http://spyc.sourceforge.net/ Spyc]</ref> 純PHP的實現。
+**PHP-Syck<ref>[http://pecl.php.net/package/syck PHP-Syck] {{Wayback|url=http://pecl.php.net/package/syck |date=20220206175647 }}</ref>（與SYCK函式庫綁定）
+**sfYaml<ref>[https://web.archive.org/web/20080922222034/http://trac.symfony-project.org/browser/branches/1.1/lib/yaml sfYaml]</ref> 为[[symfony|symfony]]项目重写的Spyc, 可独立使用，可以產生和解析YAML文件。
+*[[Python|Python]]
+**PyYaml<ref>[http://pyyaml.org/ PyYaml]</ref> 純Python，或可選用LibYAML的函式庫。
+** PySyck<ref>[https://pypi.org/project/PySyck/ PySyck]</ref> 與SYCK綁定。
+*[[Ruby|Ruby]]（從1.8版開始，YAML解析器成為標準函式庫之一。以SYCK為基礎。）
+**Ya2YAML<ref>[https://web.archive.org/web/20081012115015/http://rubyforge.org/projects/ya2yaml/ Ya2YAML]</ref> 具有完全的[[UTF-8|UTF-8]]支持
+*[[R语言|R]] 
+**CRAN YAML<ref>[http://biostat.mc.vanderbilt.edu/twiki/bin/view/Main/YamlR CRAN YAML] {{Wayback|url=http://biostat.mc.vanderbilt.edu/twiki/bin/view/Main/YamlR |date=20120309022757 }}</ref> 以SYCK為基礎。
+*[[.NET|.NET]] 
+** .NET Parser<ref>[http://yaml-net-parser.sourceforge.net/ YAML .NET Parser] {{Wayback|url=http://yaml-net-parser.sourceforge.net/ |date=20090324201434 }}</ref> 
+*[[Scala|Scala]]
+**scala-yaml<ref>[https://github.com/yaml/scala-yaml scala-yaml] {{Wayback|url=https://github.com/yaml/scala-yaml |date=20200930204556 }}</ref>
+*[[Tcl|Tcl]]
+**在Tcl 8.4中可用<ref>[https://web.archive.org/web/20150515083439/http://tcllib.sourceforge.net/doc/yaml.html 在Tcl 8.4中可用]</ref>
+*[[XML|XML]] YAXML<ref>[http://yaml.org/xml.html YAXML] {{Wayback|url=http://yaml.org/xml.html |date=20201024011628 }}</ref> (當前仍在設計中)
+{{div col end}}
+
+=== 常見錯誤與使用細節 ===
+*'''編輯器：''' 
+**建議使用能將跳格字元自動轉換成空白字元的編輯器，並且使用定寬度的字型。
+**編輯器要能正確的處理UTF-8和UTF16編碼（或是使用純[[ASCII|ASCII]]編碼──它同時是UTF-8的子集）.
+*'''字串：''' 
+**YAML的字串不需使用引號，這可以增加可讀性，並避免巢狀的跳脫字元。然而，這有時也會導致錯誤，例如，字串本身是一個曖昧的字眼（像數字或布林值）；或在短句中意外的出現YAML的結構符號（常見的例子是由驚嘆號起始的句子，或是包含冒號-空白的句子："<code>!Caca de vaca!</code>"、"<code>Caution: lions ahead</code>"）。這在發布YAML檔案時並不造成困擾，但在製作小型指令碼和人工編輯檔案時，這問題卻會常常出現。比較好的方法是善用區塊符號（"|" or ">"）而不要使用單行字串，來避免這種曖昧的表示方法。
+*'''預期實做的特性'''
+
+== 參看 ==
+其他标记語言：
+*[[JSON|JSON]]，可以說是YAML的子集。
+*[[XML|XML]]
+*[[Simple_Outline_XML|Simple Outline XML]]
+*[[OGDL|OGDL]]
+*[[S-表达式|S-表达式]]
+*[[Plist|Plist]]，由[[NEXTSTEP|NEXTSTEP]]改寫成的資料序列語言。
+*[[Simple_Declarative_Language|SDL]]
+
+== 注釋 ==
+{{Reflist|2}}
+
+== 外部連結 ==
+* [http://yaml.org YAML.org] {{Wayback|url=http://yaml.org/ |date=20220515165215 }}
+* [http://yaml.org/spec/ YAML Specification] {{Wayback|url=http://yaml.org/spec/ |date=20220120221209 }}
+* [https://web.archive.org/web/20080509211926/http://yaml4r.sourceforge.net/cookbook/ YAML Cookbook--Equivalent data structures in YAML and Ruby]
+* [http://yaml.kwiki.org/?YamlInFiveMinutes YAML in Five Minutes] {{Wayback|url=http://yaml.kwiki.org/?YamlInFiveMinutes |date=20060618031422 }}
+* [http://www.ibm.com/developerworks/library/x-matters23.html YAML improves on XML] {{Wayback|url=http://www.ibm.com/developerworks/library/x-matters23.html |date=20160614090817 }} Intro to YAML in Python
+* [https://web.archive.org/web/20080914015703/http://redhanded.hobix.com/inspect/yamlIsJson.html YAML as a superset of JSON]
+* [http://www.kuwata-lab.com/kwalify/ Kwalify Schema definition for YAML] {{Wayback|url=http://www.kuwata-lab.com/kwalify/ |date=20210812231831 }}
+* [http://list.alwayspages.com/info/listsin5mins Lists in 5 minutes] {{Wayback|url=http://list.alwayspages.com/info/listsin5mins |date=20200930174656 }}
+* [https://codebeautify.org/yaml-validator YAML Validator] {{Wayback|url=https://codebeautify.org/yaml-validator |date=20141105141628 }}
+
+{{Data Exchange}}
+{{Document markup languages}}
+
+[[Category:数据序列化格式|Category:数据序列化格式]]
+[[Category:文件格式|Category:文件格式]]
+[[Category:标记語言|Category:标记語言]]

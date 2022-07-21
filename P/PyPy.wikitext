@@ -1,0 +1,73 @@
+{{NoteTA
+|G1=IT
+|G2=FL
+}}
+{{Infobox Software
+| name = PyPy
+| logo = Pypy logo (2011).png
+| screenshot =
+| caption =
+| developer =
+| programming language = RPython
+| released               = {{Start date and age|2007}}
+| latest release version = {{LSR/wikidata}}
+| latest preview version = 
+| operating_system = [[跨平台|跨平台]]
+| genre = [[Python|Python]][[解释器|解释器]]和[[编译器|编译器]][[工具链|工具链]]
+| license = [[MIT許可證|MIT許可證]]
+| website = https://www.pypy.org/
+}}
+'''PyPy'''（{{IPAc-en|'|p|aɪ|p|aɪ}}）是一种[[Python|Python]]编程语言实现<ref>{{cite web|url=https://decisionstats.com/2015/11/29/interview-maciej-fijalkowski-pypy/|title=Interview Maciej Fijalkowski PyPy|access-date=2020-09-26|archive-date=2021-03-09|archive-url=https://web.archive.org/web/20210309023455/https://decisionstats.com/2015/11/29/interview-maciej-fijalkowski-pypy/}}</ref>，可用于替代[[CPython|CPython]]（它是标准实现）。PyPy通常运行得比CPython更快，因为PyPy是一种[[即时编译|即时编译器]]，而CPython是一种[[解释器|解释器]]<ref>{{Cite web|url=https://speed.pypy.org/|title=PyPy Speed|website=speed.pypy.org|access-date=2019-12-01|archive-date=2021-05-10|archive-url=https://web.archive.org/web/20210510014902/https://speed.pypy.org/}}</ref>。多数Python代码可以很好的运行在PyPy之上，除非代码依赖于CPython扩展，它们在运行于PyPy的时候，要么不工作要么招致一些开销。PyPy在内部使用叫做元跟踪的技术，它将解释器变换成{{en-link|跟踪即时编译|Tracing just-in-time compilation|跟踪即时编译器}}。因为解释通常比编译器要容易写，但运行得更慢，这种技术可以更容易的产生出编程语言的高效实现。PyPy的元跟踪工具链叫做[[#RPython|RPython]]。
+
+PyPy不完全兼容于Python生态系统（至少是它的最新版本）：它只宣称兼容于Python 2.7和3.6以及3.7（是CPython的顺带替代者）；它不提供Python 3.8<ref>{{Cite web|title=What’s New In Python 3.8 — Python 3.9.1 documentation|url=https://docs.python.org/3/whatsnew/3.8.html|access-date=2021-02-15|website=docs.python.org|archive-date=2021-06-01|archive-url=https://web.archive.org/web/20210601101116/https://docs.python.org/3/whatsnew/3.8.html}}</ref>和3.9<ref>{{Cite web|title=What’s New In Python 3.9 — Python 3.9.1 documentation|url=https://docs.python.org/3/whatsnew/3.9.html|access-date=2021-02-15|website=docs.python.org|archive-date=2020-10-07|archive-url=https://web.archive.org/web/20201007172936/https://docs.python.org/3/whatsnew/3.9.html}}</ref>等中的新特征和语法，比如赋值表达式<ref>{{Cite web|title=PEP 572 -- Assignment Expressions|url=https://www.python.org/dev/peps/pep-0572/|access-date=2021-02-15|website=Python.org|language=en|archive-date=2021-06-01|archive-url=https://web.archive.org/web/20210601134416/https://www.python.org/dev/peps/pep-0572/}}</ref>、唯位置形式参数<ref>{{Cite web|title=PEP 570 -- Python Positional-Only Parameters|url=https://www.python.org/dev/peps/pep-0570/|access-date=2021-02-15|website=Python.org|language=en|archive-date=2021-05-23|archive-url=https://web.archive.org/web/20210523032458/https://www.python.org/dev/peps/pep-0570/}}</ref>；和最新的Python 3.10语法，比如[[模式匹配|模式匹配]]<ref>{{Cite web|title=PEP 634 -- Structural Pattern Matching: Specification|url=https://www.python.org/dev/peps/pep-0634/|access-date=2021-02-15|website=Python.org|language=en|archive-date=2021-05-06|archive-url=https://web.archive.org/web/20210506005315/https://www.python.org/dev/peps/pep-0634/}}</ref>。
+
+==细节和动机==
+PyPy被构思为使用一种类似于Python的编程语言来书写Python实现。目的是易于辨识出可改进的区域，并使得PyPy更加灵活和易于同[[CPython|CPython]]进行试验。
+
+PyPy目标是为产生[[动态语言|动态语言]]实现提供通用转换和支持框架，强调了在语言规定和实现方面之间的明晰分离。它还致力于提供规矩的、灵活的和快速的Python编程语言实现，使用上述框架来启用新的高级特征而不需要在其中编码低层细节<ref name=mission-statement>{{ cite web | author = Samuele Pedroni | date = March 2007 | title = PyPy – Goals and Architecture Overview | url = http://codespeak.net/pypy/dist/pypy/doc/architecture.html#mission-statement | archive-url = https://www.webcitation.org/68oX7r5q4?url=http://doc.pypy.org/en/latest/architecture.html#mission-statement | archive-date = 2012-06-30 }}</ref><ref name=mission-statement-2>{{cite web | access-date = 11 October 2013 | title = PyPy – Goals and Architecture Overview – Mission Statement | url = http://doc.pypy.org/en/latest/architecture.html#mission-statement | archive-date = 2021-05-26 | archive-url = https://web.archive.org/web/20210526234041/https://doc.pypy.org/en/latest/architecture.html#mission-statement }}</ref>。
+
+===RPython===
+PyPy解释器自身是使用叫作RPython（Restricted Python）的Python受限子集书写的<ref>[http://doc.pypy.org/en/latest/coding-guide.html#id1 Our runtime interpreter is “RPython”] {{Wayback|url=http://doc.pypy.org/en/latest/coding-guide.html#id1 |date=20210308143836 }}, Coding Guide – PyPy documentation</ref>。RPython在Python语言上施加了一些约束，使得一个变量的类型可以在编译时间[[类型推论|推论]]出来<ref>"It is a proper subset of Python, restricted in a way that enables easy analysis and efficient code generation", Ancona et al., 2007.</ref>。
+
+PyPy计划开发了一个[[工具链|工具链]]来分析RPython代码并将它转译成某种形式的字节码，它可以降低为C。除了C之外还有过其他后端：Java、C#和Javascript，但是它们遭受了[[软件腐败|软件腐败]]而已经移除了。PyPy的递归式图标是一个吞噬自己的蛇，因为RPython是用Python解释器转译的。代码还可以不转换的运行来测试和分析，这为动态语言研究提供了很好的试验台。
+
+它允许可插拔的[[垃圾回收_(计算机科学)|垃圾回收]]，还有可选的启用[[Stackless_Python|Stackless Python]]特征。最后，它包括了即时编译（JIT）生成器，在解释器源代码中加入一些标注，就能在解释器中建造入即时编译器。生成的JIT编译器是{{en-link|跟踪即时编译|tracing just-in-time compilation|跟踪JIT}}<ref>{{cite conference |title=Tracing the Meta-Level: PyPy’s Tracing JIT Compiler |doi=10.1145/1565824.1565827 |last1=Bolz |first1=Carl |last2=Cuni |first2=Antonio |last3=Fijalkowski |first3=Maciej |last4=Rigo |first4=Armin |conference=ICOOOLPS '09}}</ref>。
+
+RPython现在也用于书写非Python语言实现比如Pixie<ref>[https://medium.com/this-is-not-a-monad-tutorial/indie-languages-interview-pixie-and-timothy-baldridge-cadbc36418dc Timothy Balridge interview] {{Wayback|url=https://medium.com/this-is-not-a-monad-tutorial/indie-languages-interview-pixie-and-timothy-baldridge-cadbc36418dc |date=20160303200338 }}.</ref>。
+
+==项目状态==
+PyPy的7.3.7版本兼容于三个[[CPython|CPython]]版本：2.7、3.7和3.8<ref name=pypycompat>{{cite web |url=http://pypy.org/compat.html |title=PyPy – Python compatibility |access-date=2020-12-15 |website=pypy.org |archive-date=2021-06-07 |archive-url=https://web.archive.org/web/20210607150220/https://www.pypy.org/compat.html }}</ref><ref name=pypycompat36>{{cite web |url=https://www.pypy.org/posts/2021/10/pypy-v737-release.html |title=PyPy v7.3.7: bug-fix release of 3.7, 3.8 |access-date=2021-11-10 |website=pypy.org |archive-date=2022-04-06 |archive-url=https://web.archive.org/web/20220406234451/https://www.pypy.org/posts/2021/10/pypy-v737-release.html }}</ref>。第一个兼容于CPython v3的PyPy版本是2014年的PyPy v2.3.1<ref name=pypyblogpypy3>{{cite news |date=20 June 2014 |author=the PyPy team |title=PyPy3 2.3.1 – Fulcrum |publisher=PyPy blog |url=http://morepypy.blogspot.it/2014/06/pypy3-231-fulcrum.html |accessdate=2021-12-19 |archive-date=2017-12-26 |archive-url=https://web.archive.org/web/20171226234744/https://morepypy.blogspot.it/2014/06/pypy3-231-fulcrum.html }}</ref>。兼容于CPython v3的PyPy解释器叫作PyPy3。
+
+PyPy有着在32-bit/64-bit [[x86|x86]]和32-bit/64-bit [[ARM架构|ARM]]处理器上的[[即时编译|JIT编译]]支持<ref name="whatsnew720">{{cite news |date={{date|2019-10-16}} |title=PyPy v7.2.0: release of 2.7, and 3.6 |publisher=[[pypy.org|pypy.org]] |url=https://pypy.readthedocs.io/en/latest/release-v7.2.0.html |accessdate=2021-03-23 |archive-date=2019-10-16 |archive-url=https://web.archive.org/web/20191016082709/https://pypy.readthedocs.io/en/latest/release-v7.2.0.html }}</ref>。它已经夜间测试于Windows、Linux、OpenBSD和Mac OS X之上。PyPy能够运行不依赖于特定于实现特征的纯Python软件<ref>{{Cite web |title = PyPy – Python compatibility |url = http://pypy.org/compat.html |access-date = 2021-03-20 |archive-date = 2021-06-07 |archive-url = https://web.archive.org/web/20210607150220/https://www.pypy.org/compat.html }}</ref>。
+
+有叫作CPyExt的针对CPython C API扩展的兼容层，但它是不完全和实验性的。同[[C语言|C]][[共享库|共享库]]交互的较好方式是通过内建的C{{en-link|外界函数接口|foreign function interface}}（CFFI）或ctypes库<ref>{{cite web|title=ctypes — A foreign function library for Python|url=https://docs.python.org/3/library/ctypes.html|access-date=2021-12-20|archive-date=2022-04-27|archive-url=https://web.archive.org/web/20220427182117/https://docs.python.org/3/library/ctypes.html}}</ref>。
+
+===历史===
+PyPy可溯源至[[Psyco|Psyco]]计划，它是Python的[[即时编译|即时]]{{en-link|运行时间算法特殊化|Run-time algorithm specialization|特殊化编译器}}，由Armin Rigo在2002年至2010年间开发。最初时，RPython还可以被编译成[[Java字节码|Java字节码]]、[[通用中间语言|CIL]]和[[JavaScript|JavaScript]]，但是这些后端由于缺乏价值而被移除了。
+
+PyPy最初是研究和面向开发的项目。在2007年中期达到了开发成熟状态并官方发行了1.0版本，接下来它聚焦于发行更好的CPython兼容性的生产级版本。
+
+===资助===
+PyPy在2004年十二月至2007年三月期间由[[欧盟|欧盟]]特殊目标研究计划资助<ref>{{Cite web |title = EU Community Research and Development Information Service Entry |url = http://cordis.europa.eu/projects/rcn/74481_en.html |access-date = 2021-03-23 |archive-date = 2012-09-10 |archive-url = https://web.archive.org/web/20120910021220/http://cordis.europa.eu/projects/rcn/74481_en.html }}</ref>。在2008年六月，PyPy宣布获得资助为[[Google|Google]]开源规划的一部份，允诺使PyPy更加兼容于[[CPython|CPython]]。
+
+==註釋==
+{{reflist|2}}
+
+==參考文獻==
+{{refbegin|2}}
+* Davide Ancona, Massimo Ancona, Antonio Cuni, Nicholas D. Matsakis, 2007. [https://llvm.org/pubs/2007-10-DLS-RPython.pdf RPython: a Step Towards Reconciling Dynamically and Statically Typed OO Languages] {{Wayback|url=https://llvm.org/pubs/2007-10-DLS-RPython.pdf |date=20150816204310 }}. In Proc. Dynamic Language Symposium (DLS), 2007.  ACM Press.
+* Carl Friedrich Bolz, Antonio Cuni, Maciej Fijalkowski, 2009. [https://web.archive.org/web/20110716123213/http://codespeak.net/svn/pypy/extradoc/talk/icooolps2009/bolz-tracing-jit-final.pdf Tracing the meta-level: PyPy's Tracing JIT Compiler]. In Proc. ICOOOLPS, 2009.  ACM Press.
+* {{cite web | last = Corbet | first = Jonathan | title = A brief experiment with PyPy | publisher = [[LWN.net|LWN.net]] | date = 11 May 2011 | url = https://lwn.net/Articles/442268/ | accessdate = 2018-01-06 | archive-date = 2017-12-26 | archive-url = https://web.archive.org/web/20171226131240/https://lwn.net/Articles/442268/ | dead-url = no }}
+* {{cite news | last = von Eitzen | first = Chris | title = PyPy 1.7 widens the performance "sweet spot" | newspaper = [[The_H|The H]] | publisher = [[Heinz_Heise|Heinz Heise]] | date = 21 November 2011 | url = http://www.h-online.com/open/news/item/PyPy-1-7-widens-the-performance-sweet-spot-1382249.html | accessdate = 2018-01-06 | archive-date = 2018-02-17 | archive-url = https://web.archive.org/web/20180217110916/http://www.h-online.com/open/news/item/PyPy-1-7-widens-the-performance-sweet-spot-1382249.html | dead-url = no }}
+* {{cite web | last = Rose | first = John | title = A Day with PyPy | publisher = [[Oracle_Corporation|Oracle]] developer blog | date = 2 December 2011 | url = http://blogs.oracle.com/jrose/entry/a_day_with_pypy | accessdate = 2018-01-06 | archive-date = 2012-05-26 | archive-url = https://www.webcitation.org/67wcRyeiI?url=https://blogs.oracle.com/jrose/entry/a_day_with_pypy | dead-url = no }}
+* {{cite web | last =  | first =  | title = Interview Maciej Fijalkowski pypy | publisher = Decisionstats blog | date =  | url = http://decisionstats.com/2015/11/29/interview-maciej-fijalkowski-pypy/ | accessdate = 2018-01-06 | archive-date = 2018-01-07 | archive-url = https://web.archive.org/web/20180107174818/https://decisionstats.com/2015/11/29/interview-maciej-fijalkowski-pypy/ | dead-url = no }}
+{{refend}}
+
+== 外部链接 ==
+* {{Official website}}
+
+{{Python}}
+
+[[Category:開放原始碼|Category:開放原始碼]]
+[[Category:Python軟體|Category:Python軟體]]
+[[Category:Python解释器|Category:Python解释器]]

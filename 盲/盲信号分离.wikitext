@@ -1,0 +1,70 @@
+'''盲信号分离'''（'''信號分離'''，'''盲信號源分離'''）指的是从多个观测到的混合[[信号|信号]]中分析出没有观测的原始信号。通常观测到的混合信号来自多个[[传感器|传感器]]的输出，并且传感器的输出信号独立（线性不相关）。盲信号的“盲”字强调了两点：1)原始信号并不知道；2)对于信号混合的方法也不知道<ref>JEAN-FRAN ¸ COIS CARDOSO, MEMBER, IEEE,Blind Signal Separation: Statistical Principles</ref>。最常用在的領域是在[[數位訊號處理|數位訊號處理]]，且牽涉到對混合訊號的分析。盲信号分离最主要的目標就是將原始的信號還原出原始單一的訊號。一个经典的例子是[[雞尾酒會效應|雞尾酒會效應]]，當許多人一起在同一個空間裡說話的時候，聽者可以專注於某一個人說的話上，人類的大脑可以即時處理這類的語音訊號分離問題，但是在數位語音處理裡，這個問題還是一個困難的問題。
+
+盲信號分離在早期时集中于研究時間訊號，像是聲音，然而，盲信號分離目前已經可以应用在多维度的資料上，例如圖片和[[張量|張量]]这类不含时间维度的数据。
+
+這個問題到目前為止還没有很好的解决方案，但是在一些特定的情況下，有一些很有用的解決方式。例如，當時間沒有延遲的時候，我们可以采用[[主成分分析|主成分分析]]或[[独立成分分析|獨立成分分析]]。尽管這個問題已經有許多解決方式，科学家们仍然在持续对其进行研究。
+
+== 问题基本描述 ==
+
+如果可以对信号混合的方式直接建模，当然是最好的方法。但是，在盲信号分离中我们并不知道，信号混合的方式，所以，只能采用统计的方法。算法做出了如下的假定：
+
+具有<math>m</math>个独立的信号源<math>s_1(t),...,s_m(t)</math>和<math>n</math>个独立的观察量<math>x_1(t),...,x_n(t)</math>,观察量和信号源具有如下的关系
+
+<math>\mathbf{x}(t)=A\mathbf{s}(t)</math>
+
+其中<math>\mathbf{x}(t)={[x_1(t),...,x_n(t)]}^T</math>,<math>\mathbf{s}(t)={[s_1(t),...,s_m(t)]}^T</math>,<math>A</math>是一个<math>{n}\times{m}</math>的系数矩阵，原问题变成了已知<math>\mathbf{x}(t)</math>和<math>\mathbf{s}(t)</math>的独立性，求对<math>\mathbf{s}(t)</math>的估计问题。假定有如下公式
+
+<math>\mathbf{y}(t)=W\mathbf{x}(t)</math>
+
+其中<math>\mathbf{y}(t)</math>是对<math>\mathbf{s}(t)</math>的估计，W是一个<math>{m}\times{n}</math>系数矩阵，问题变成了如何有效的对矩阵W做出估计。
+
+== 问题基本假设 ==
+
+1)各源信号<math>s_i(t)</math>均为零均值信号，实随机变量，信号之间统计独立。如果源信号<math>s_i(t)</math>的概率密度为<math>p_i(s_i)</math>,则<math>s(t)</math>的概率密度为:<math>p(s)=\prod_{i=1}^{n}p_i(s_i)</math>。
+
+2)源信号数目<math>m</math>小于等于观察信号数目<math>n</math>，即<math>m<=n</math>。混合矩阵<math>A</math>是一个<math>n\times{m}</math>的矩阵。假定<math>A</math>满秩。
+
+3)源信号中只允许有一个[[高斯分布|高斯分布]]，当多于一个高斯分布时，源信号变得不可分。
+
+== 自然梯度解法 ==
+
+自然梯度法的计算公式为：<math>W(n+1)=W(n)+\eta(n)[I-\phi(y(n))y^T(n)]W(n)</math>
+
+其中<math>W</math>为我们需要估计的矩阵。<math>\eta(n)</math>为步长,<math>\phi(y)</math>是一个非线性变换，比如<math>\phi(y)=\phi(y^3)</math>
+
+实际计算时y为一个<math>m\times k</math>矩阵，m为原始信号个数，k为采样点个数
+
+=== 算法描述 ===
+
+1)初始化W(0)为单位矩阵
+
+2)循环执行如下的步骤,直到W(n+1)与W(n)差异小于规定值<math>\tau</math>(计算矩阵差异的方法可以人为规定)，有时候也人为规定迭代次数
+
+3)利用公式<math>y(n)=W(n)y(n-1)</math>,(其中<math>y(-1)=x</math>)
+
+4)利用公式<math>W(n+1)=W(n)+\eta(n)[I-\phi(y(n))y^T(n)]W(n)</math>
+
+== 深度學習解法 ==
+在信號分離的方法中，大部分的論文都是利用短時距傅立葉變換，將聲音轉換成時頻譜，且會用梅爾刻度，模仿人耳對等距音高變化的感官，來做到抽樣頻率的減少，最後再從混和信號的時頻譜中找出由一個信號源所發出乾淨的單一訊號的時頻譜，用反短時距傅立葉轉換找出單一訊號的聲音。有一部分的論文是用非線性回歸的技術來找出，而說到經典的作法，就要提到這篇論文<ref>Hershey, John R., et al. "Deep clustering: Discriminative embeddings for segmentation and separation." 2016 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP). IEEE, 2016.</ref>，要解決的是盲信號分離，作法是將時頻譜的抽樣時刻和頻率，利用神經網路和集群來分成不同群，每一群代表的是哪一個講話者在那個抽樣裡佔了最大的比例，這種方法稱為"deep clustering"，有許多論文\都是在這上面做延伸。
+
+然而利用時頻譜來作為訊號的特徵有幾項缺點：
+
+* 短時距傅立葉變換是一個通用的訊號轉換，然而在訊號分離的任務上，未必是最佳的訊號特徵。
+
+* 在反短時距傅立葉變換時，需要重建原始訊號的相位（phase），即使可以分離出跟原始信號一樣的時頻譜，然而具有偏差的估計會影響到重建訊號的準確度。
+
+* 利用時頻譜來做訊號分離是需要混和訊號高解析度的頻率分解，要用橫跨較長時間的窗函數來做短時距傅立葉變換，這個會增加系統的延遲，不利於即時的語音處理任務，像是在電信設備中的應用。
+
+這些問題都發生在用時頻譜來做訊號分離，而最直覺的解決方式就是直接在時域上做，這樣就可以避免將聲音的大小聲和相位做分離。其中表現的最好的就是Conv-Tasnet<ref>Luo, Yi, and Nima Mesgarani. "Conv-TasNet: Surpassing Ideal Time–Frequency Magnitude Masking for Speech Separation." IEEE/ACM Transactions on Audio, Speech, and Language Processing 27.8 (2019): 1256-1266.</ref>這個方法，Conv-Tasnet可分為三個區塊，編碼器（encoder）、分離器（separator）和解碼器（decoder），編碼器將一小段的混和訊換轉換為在特徵空間（feature space）上的特徵向量，藉由這個特徵向量，分離器要找出一個相對應的遮罩（mask），將特徵向量和遮罩做相乘後，再用解碼器將其轉換為原始訊號源所發出的單一訊號。
+
+== 历史 ==
+
+盲信号分离最早由Herault和Jutten在1985年提出，发表在一篇法文杂志上<ref>J. H´erault, C. Jutten, and B. Ans, “D´etection de grandeurs primitives dans un message composite par une architecture de calcul neuromim´etique en apprentissage non supervis´e,” in Proc. GRETSI, Nice, France, 1985, pp. 1017–1020.</ref>。随后他们相继发表文章对盲信号问题做出分析，提出了一种自适应的方法<ref>C. Jutten and J. Herault, “Blind separation of sources I. An adaptive algorithm based on neuromimetic architecture,” Signal Processing, vol. 24, no. 1, pp. 1–10, July 1991.</ref>。其他一些学者对他们的方法进行了分析<ref>J.-C. Fort, “Stability of the source separation algorithm of Jutten and H´erault,” in Artificial Neural Networks, T. Kohonen, Makasira, Simula, and Kangas, Eds. Amsterdam, The Netherlands: Elsevier, 1991, pp. 937–941.</ref>，分析了他们提出的方法的稳定性，在他们工作的基础上<ref>Y. Deville, “A unified stability analysis of the H´erault–Jutten source separation neural network,” Signal Processing, vol. 51,no. 3, pp. 229–233, June 1996.</ref>，引入了神经网络的方法对盲信号进行分离，并对其稳定性进行了分析。
+
+== 参考文献 ==
+{{Reflist}}
+
+[[Category:統計力學|Category:統計力學]]
+[[Category:信號處理|Category:信號處理]]
+[[Category:奇異值分解|Category:奇異值分解]]
+[[Category:矩阵分析|Category:矩阵分析]]

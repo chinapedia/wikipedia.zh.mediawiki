@@ -1,0 +1,148 @@
+{{noteTA|G1=IT}}
+{{Infobox software
+| name                   = Xlib
+| title                  = Xlib
+| logo                   = 
+| logo caption           = 
+| screenshot             = 
+| caption                = 
+| collapsible            = 
+| author                 = 
+| developer              = [[X.Org基金会|X.Org基金会]]
+| released               = 大约1985年 
+| discontinued           = 
+| latest release version = 
+| latest release date    = 
+| latest preview version = 
+| latest preview date    = 
+| programming language   = [[C语言|C]]
+| operating system       = 
+| platform               = 
+| size                   = 
+| language               = 
+| genre                  = [[函式库|库]]
+| license                = 
+| website                = {{URL|https://www.x.org}}, 文档: {{URL|https://www.x.org/releases/current/doc/libX11/libX11/libX11.html}}
+}}
+'''Xlib'''是一種[[X_Window_System|X Window System]]協定的用戶端，以[[C語言|C語言]]撰寫。其功能是與X server溝通。這樣的功能可以讓程式人員撰寫程式時，毋須了解其協定的細節。但甚少應用程式會直接使用Xlib;通常是透過其他的函式庫來呼叫Xlib用以提供[[部件工具箱|部件工具箱]]（widget toolkits）：
+
+[[File:Xlib_and_XCB_in_the_X_Window_System_graphics_stack.svg|thumb]]
+
+* [[Intrinsics|Intrinsics]]（Xt）
+* [[Xaw|Xaw]]（Xaw）
+* [[Motif|Motif]]
+* [[GTK+|GTK+]]
+* [[Qt|Qt]]（X11 version）
+* [[Tk|Tk]]
+
+Xlib發表於1985年，目前使用在許多的[[Unix|Unix]]-like作業系統上。
+
+目前[[XCB|XCB]]有可能取代Xlib.
+
+== 資料型別 ==
+Xlib主要的資料型別是<code>Display</code><ref name="DisplayStructure">{{cite web|url=http://webcvs.freedesktop.org/xorg/lib/X11/include/X11/Xlib.h?revision=1.6&view=markup|title=Display Structure on freedesktop CVS|date=|work=Tip search for: typedef struct _XDisplay Display|publisher=|deadurl=yes|archiveurl=https://web.archive.org/web/20080131195430/http://webcvs.freedesktop.org/xorg/lib/X11/include/X11/Xlib.h?revision=1.6&view=markup|archivedate=2008-01-31|accessdate=2009-07-09}}</ref>結構。
+
+== 範例 ==
+下面是一個XLib的範列，產生一個視窗。
+
+<syntaxhighlight lang=C>
+/*
+  Simple Xlib application drawing a box in a window.
+  gcc input.c -o output -lX11
+*/
+
+#include <X11/Xlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+int main(void)
+{
+  Display *d;
+  Window w;
+  XEvent e;
+  char *msg = "Hello, World!";
+  int s;
+
+  bool done = false;
+
+  /* open connection with the server */
+  d = XOpenDisplay(NULL);
+  if (d == NULL) {
+    fprintf(stderr, "Cannot open display\n");
+    exit(1);
+  }
+
+  s = DefaultScreen(d);
+
+  /* create window */
+  w = XCreateSimpleWindow(d, RootWindow(d, s), 10, 10, 640, 480, 0,
+			  BlackPixel(d, s), WhitePixel(d, s));
+
+  /* register interest in the delete window message */
+  Atom wmDeleteMessage = XInternAtom(d, "WM_DELETE_WINDOW", False);
+  XSetWMProtocols(d, w, &wmDeleteMessage, 1);
+   
+  /* select kind of events we are interested in */
+  XSelectInput(d, w, ExposureMask | KeyPressMask | StructureNotifyMask);
+
+  /* map (show) the window */
+  XMapWindow(d, w);
+
+  /* event loop */
+  while (!done) {
+    XNextEvent(d, &e);
+    /* draw or redraw the window */
+    if (e.type == Expose) {
+      XFillRectangle(d, w, DefaultGC(d, s), 20, 20, 10, 10);
+      XDrawString(d, w, DefaultGC(d, s), 50, 50, msg, strlen(msg));
+    }
+
+    /* exit on key press */
+    switch(e.type){
+      
+    case KeyPress:
+      XDestroyWindow(d, w);
+      break;
+
+    case DestroyNotify:
+      done = true;
+      break;
+
+    case ClientMessage:
+      if (e.xclient.data.l[0] == wmDeleteMessage){
+	done = true;
+      }
+      break;      
+    }
+  }
+
+  /* close connection to server */
+  XCloseDisplay(d);
+
+  return 0;
+}
+</syntaxhighlight>
+<!--
+The client creates a connection with the server by calling <code>XOpenDisplay</code>. It then requests the creation of a window with <code>XCreateSimpleWindow</code>. A separate call to <code>XMapWindow</code> is necessary for mapping the window, that is, for making it visible on the screen.
+
+The square is drawn by calling <code>XFillRectangle</code>. This operation can only be performed after the window is created. However, performing it once may not be enough. Indeed, the content of the window is not always guaranteed to be preserved. For example, if the window is covered and then uncovered again, its content might require being redrawn. The program is informed that the window or a part of it has to be drawn by the reception of an <code>Expose</code> event.
+
+The drawing of the window content is therefore made inside the [[Event_loop|loop handling the events]]. Before entering this loop, the events the application is interested in are selected, in this case with <code>XSelectInput</code>. The event loop waits for an incoming event: if this event is a key press, the application exits; if it is an expose event, the window content is drawn. The function <code>XNextEvent</code> blocks and flushes the request buffer if there is no event in the queue.-->
+
+== 注釋 ==
+<references/>
+
+== 外部連結 ==
+* [https://web.archive.org/web/20090217235848/http://www.sbin.org/doc/Xlib/ Xlib Programming Manual]
+* [http://tronche.com/gui/x/xlib/function-index.html Manual pages for all Xlib functions] {{Wayback|url=http://tronche.com/gui/x/xlib/function-index.html |date=20210401114216 }}
+* [http://www.rahul.net/kenton/bib.html Kenton Lee's pages on X Window and Motif] {{Wayback|url=http://www.rahul.net/kenton/bib.html |date=20130520013725 }}
+* [http://tronche.com/gui/x/xlib-tutorial/ A short tutorial on Xlib] {{Wayback|url=http://tronche.com/gui/x/xlib-tutorial/ |date=20120316210630 }}
+* [https://web.archive.org/web/20071018025425/http://users.actcom.co.il/~choo/lupg/tutorials/xlib-programming/xlib-programming.html#create_window#create_window A longer tutorial on Xlib]
+* [http://www.dis.uniroma1.it/%7eliberato/screensaver Using Xlib for creating a screensaver module] {{Wayback|url=http://www.dis.uniroma1.it/%7eliberato/screensaver |date=20120319215932 }}
+* [https://web.archive.org/web/20090308084753/http://www.init0.nl/simplex11tk.php Simple X11 toolkit for learning Xlib]
+
+{{XWinSys}}
+
+[[Category:C函式庫|Category:C函式庫]]

@@ -1,0 +1,298 @@
+{{NoteTA
+|G1 = IT
+|1 = zh-cn:查找; zh-tw:搜尋;
+|2 = zh-hans:迭代;zh-hant:疊代;
+}}
+{{Infobox Algorithm
+|class=[[搜索算法|搜索算法]]
+|image=[[File:Binary_search_into_array.png|upright]]
+|caption=
+|data=[[数组|数组]]
+|time=<math> O(\log n) </math>
+|space = 迭代：<math> O(1) </math><br />递归：<math> O(\log n) </math><br />（无[[尾调用|尾调用]]消除）
+|best-time=<math> O(1) </math>
+|average-time=<math> O(\log n) </math>
+|optimal=Yes
+}}
+在[[计算机科学|计算机科学]]中，'''二分查找算法'''（{{lang-en|binary search algorithm}}），也称'''折半搜索算法'''（{{lang-en|half-interval search algorithm}}）<ref>{{cite conference|last1=Willams, Jr.|first1=Louis F.|title=A modification to the half-interval search (binary search) method|conference=Proceedings of the 14th ACM Southeast Conference|date=1975|pages=95–101|doi=10.1145/503561.503582}}</ref>、'''对数搜索算法'''（{{lang-en|logarithmic search algorithm}}）{{Sfn|Knuth|1998|loc=§6.2.1 ("Searching an ordered table"), subsection "Binary search"}}，是一种在[[有序数对|有序数组]]中查找某一特定元素的搜索[[算法|算法]]。搜索过程从数组的中间元素开始，如果中间元素正好是要查找的元素，则搜索过程结束；如果某一特定元素大于或者小于中间元素，则在数组大于或小于中间元素的那一半中查找，而且跟开始一样从中间元素开始比较。如果在某一步骤数组为空，则代表找不到。这种搜索算法每一次比较都使搜索范围缩小一半。
+
+二分查找算法在{{Translink|en|Best, worst and average case|最坏情况}}下是[[时间复杂度#对数时间|对数时间复杂度]]的，需要进行<math>O(\log n)</math>次比较操作（<math>n</math>在此处是数组的元素数量，<math>O</math>是[[大O符号|大O记号]]，<math>\log</math>是[[对数|对数]]）。二分查找算法使用常数空间，对于任何大小的输入数据，算法使用的空间都是一样的。除非输入数据数量很少，否则二分查找算法比线性搜索更快，但数组必须事先被排序。尽管一些特定的、为了快速搜索而设计的数据结构更有效（比如[[哈希表|哈希表]]），二分查找算法应用面更广。
+
+二分查找算法有许多种变种。比如{{Translink|en|fractional casacading|分散层叠}}可以提升在多个数组中对同一个数值的搜索的速度。分散层叠有效的解决了[[计算几何学|计算几何学]]和其他领域的许多搜索问题。{{Translink|en|Exponential search|4=指数搜索}}将二分查找算法拓宽到无边界的列表。[[二叉搜索树|二叉搜索树]]和B树数据结构就是基于[[二分查找算法|二分查找算法]]的。
+
+== 演算法 ==
+二分搜索只对有序数组有效。二分搜索先比较数组中位元素和目标值。如果目标值与中位元素相等，则返回其在数组中的位置；如果目标值小于中位元素，则搜索继续在前半部分的数组中进行。如果目标值大于中位元素，则搜索继续在数组上部分进行。由此，算法每次排除掉至少一半的待查数组。
+
+=== 步驟 ===
+給予一個包含<math> n </math>個帶值元素的陣列<math> A </math>或是[[記錄|記錄]]<math> A_0,\cdots,A_{n-1} </math>，使<math> A_0\le\cdots\le A_{n-1} </math>，以及目標值<math> T </math>，還有下列用來搜尋<math> T </math>在<math> A </math>中位置的[[子程式|子程式]]{{Sfn|Knuth|1998|loc=§6.2.1 ("Searching an ordered table"), subsection "Algorithm B"}}。
+# 令<math> L </math>為<math> 0 </math>，<math> R </math>為<math> n-1 </math>。
+# 如果<math> L > R </math>，則搜尋以失敗告終。
+# 令<math> m </math>（中間值元素）為<math> \lfloor (L+R)/2 \rfloor </math>。（具体实现中，为防止[[算術溢出|算術溢出]]，一般采用<math> \lfloor  L+(R-L)/2 \rfloor </math>代替。）
+# 如果<math> A_m < T </math>，令<math> L </math>為<math> m + 1 </math>並回到步驟二。
+# 如果<math> A_m > T </math>，令<math> R </math>為<math> m - 1 </math>並回到步驟二。
+# 當<math> A_m = T </math>，搜尋結束；回傳值<math> m </math>。
+
+這個[[疊代|疊代]]步驟會持續透過兩個變數追蹤搜索的邊界。有些實際應用會在演算法的最後放入相等比較，讓比較迴圈更快，但平均而言會多一層疊代<ref name="bottenbruch">{{cite journal | title=Structure and Use of ALGOL 60 | author=Bottenbruch, Hermann | journal=[[Journal_of_the_ACM|Journal of the ACM]] | year=1962 | volume=9 | issue=2 | pages=161–211}} Procedure is described at p. 214 (§43), titled "Program for Binary Search".</ref>。
+
+=== 大致匹配 ===
+以上程序只適用於''完全''匹配，也就是尋找一個目標值的位置。不過，因為有序陣列的順序性，將二分搜索算法擴展到能適用大致匹配並不是很重要。舉例來說，二分搜索算法可以用來計算一個賦值的'''排名'''（或稱'''秩'''，比它更小的元素的數量）、'''前趨'''（下一個最小元素）、'''後繼'''（下一個最大元素）以及[[最鄰近搜索|'''最近鄰''']]。搜尋兩個值之間的元素數目的{{link-en|範圍查詢 (資料結構)|Range query (data structures)|範圍查詢}}可以藉由兩個[[排名查詢|排名查詢]]（又稱'''秩查詢'''）來執行{{sfn|Sedgewick|Wayne|2011|loc=§3.1, subsection "Rank and selection"}}。
+* 排名查詢可以使用調整版的二分搜索來執行。藉由在成功的搜索回傳<math> m </math>，以及在失敗的搜索回傳<math> L </math>，就會取而代之地回傳了比起目標值小的元素數目{{sfn|Sedgewick|Wayne|2011|loc=§3.1, subsection "Rank and selection"}}。
+* 前趨和後繼查詢可以藉由排名查詢來執行。一旦知道目標值的排名，其前趨就會是那個位於其排名位置的元素,或者排名位置的上一个元素（因為它是小於目標值的最大元素）。其後繼是（陣列中的）下一個元素，或是（非陣列中的）前趨的下一個元素{{Sfn|Goldman|Goldman|2008|pp=461–463}}。目標值的最近鄰可能是前趨或後繼，取決於何者較為接近。
+* 範圍查詢也是直接了當的。一旦知道兩個值的排名，不小於第一個值且小於第二個值的元素數量就會是兩者排名的差。這個值可以根據範圍的端點是否算在範圍內，或是陣列是否包含其端點的對應鍵來增加或減少1{{sfn|Sedgewick|Wayne|2011|loc=§3.1, subsection "Range queries"}}。
+
+==复杂度分析==
+; [[时间复杂度|时间复杂度]]: 折半搜索每次把搜索区域减少一半，时间复杂度为<math>O\left( \log n  \right)</math>。（n代表集合中元素的个数）
+; [[空间复杂度|空间复杂度]]: <math>O\left(  1  \right)</math>。虽以递归形式定义，但是[[尾递归|尾递归]]，可改写为循环。
+
+==应用==
+除直接在一个数组中查找元素外，可用在[[插入排序|插入排序]]中。
+
+==示例代码==
+
+===C 版本- 递归===
+<syntaxhighlight lang="c">
+int binary_search(const int arr[], int start, int end, int khey) {
+	if (start > end)
+		return -1;
+
+	int mid = start + (end - start) / 2;    //直接平均可能會溢位，所以用此算法
+	if (arr[mid] > khey)
+		return binary_search(arr, start, mid - 1, khey);
+	else if (arr[mid] < khey)
+		return binary_search(arr, mid + 1, end, khey);
+	else
+	    return mid;        //最後檢測相等是因為多數搜尋狀況不是大於要不就小於
+}
+
+</syntaxhighlight>
+
+===C 版本- while 循环===
+<syntaxhighlight lang="c">
+int binary_search(const int arr[], int start, int end, int key) {
+    int ret = -1;       // 未搜索到数据返回-1下标
+    
+	int mid;
+	while (start <= end) {
+		mid = start + (end - start) / 2; //直接平均可能會溢位，所以用此算法
+		if (arr[mid] < key)
+			start = mid + 1;
+		else if (arr[mid] > key)
+			end = mid - 1;
+		else {            // 最後檢測相等是因為多數搜尋狀況不是大於要不就小於
+			ret = mid;  
+            break;
+        }
+	}
+	
+	return ret;     // 单一出口
+}
+</syntaxhighlight>
+
+===javascript 版本===
+<syntaxhighlight lang="javascript">
+var arr = [1, 3, 5, 7, 9, 10, 11, 12, 14, 15, 19, 20];
+const binarySearch = (arr, target) => {
+  const search = (start, end) => {
+    if (start > end) return -1;
+    const mid = start + Math.floor((end - start) / 2);
+    if (arr[mid] > target) {
+      return search(0, mid - 1);
+    } else if (arr[mid] < target) {
+      return search(mid + 1, end);
+    } else {
+      return mid;
+    }
+  }
+  return search(0, arr.length - 1);
+}
+console.log( binarySearch(arr, 4) );
+</syntaxhighlight>
+
+===Python3 版本 while 循环===
+<syntaxhighlight lang="python3">
+def binary_search(arr, left, right, hkey):
+    while left <= right:
+        mid = left + (right - left) // 2
+        if arr[mid] == hkey:
+            return mid
+        elif arr[mid] < hkey:
+            left = mid + 1
+        elif arr[mid] > hkey:
+            right = mid - 1
+    return -1
+</syntaxhighlight>
+
+=== Python3 版本 递归 ===
+<syntaxhighlight lang="python3">
+def binary_search(arr, start, end, hkey):
+	if start > end:
+		return -1
+	mid = start + (end - start) // 2
+	if arr[mid] > hkey:
+		return binary_search(arr, start, mid - 1, hkey)
+	if arr[mid] < hkey:
+		return binary_search(arr, mid + 1, end, hkey)
+	return mid
+</syntaxhighlight><br />
+
+=== C# 版本 ===
+<syntaxhighlight lang="c#">
+static int binary_search(int[] arr, int start, int end, int khey)
+{
+    int mid;
+    while (start <= end)
+    {
+        mid = (start + end) / 2;
+        if (arr[mid] < khey)
+            start = mid + 1;
+        else if (arr[mid] > khey)
+            end = mid - 1;
+        else
+            return mid; 
+    }
+    return -1;
+}
+</syntaxhighlight>
+#this is c++
+
+===Swift 版本===
+<syntaxhighlight lang="Swift">
+import Foundation
+/// 二分搜索完全匹配
+///
+/// - Parameters:
+///   - arr: 有序数组
+///   - start: 起始位置
+///   - end: 结束点
+///   - khey: 特点目标值
+/// - Returns: 返回查找结果
+func binarySearch(arr: [Int], start: Int, end: Int, khey: Int) -> Int? {
+    if start > end {
+        return nil
+    }
+    let mid = start + (end - start) / 2
+    if arr[mid] > khey {
+        return binarySearch(arr: arr, start: start, end: mid - 1, khey: khey)
+    } else if arr[mid] < khey {
+        return binarySearch(arr: arr, start: mid + 1, end: end, khey: khey)
+    } else {
+        return mid
+    }
+}
+
+</syntaxhighlight>
+
+===golang 递归版本===
+<syntaxhighlight lang="go">
+func binary_search(arr []int, low, high, hkey int) int {
+	if low > high {
+		return -1
+	}
+	mid := low + (high-low)/2
+
+	if arr[mid] > hkey {
+		return binary_search(arr, low, mid-1, hkey)
+	} else if arr[mid] < hkey {
+		return binary_search(arr, mid+1, high, hkey)
+	}
+
+	return mid
+}
+
+
+</syntaxhighlight>
+
+===golang 非递归版本===
+<syntaxhighlight lang="go">
+func binarySearch(arr []int, hkey int) int {
+    low, high := 0, len(arr)-1
+	for low <= high {
+		mid := low + (high-low)/2
+		if arr[mid] == hkey {
+			return mid
+		} else if hkey < arr[mid] {
+			high = mid - 1
+		} else if hkey > arr[mid] {
+			low = mid + 1
+		}
+	}
+	return -1
+}
+
+
+</syntaxhighlight>
+
+===Java 递归===
+<syntaxhighlight lang="Java">
+
+public static int binarySearch(int[] arr, int start, int end, int hkey){
+    if (start > end)
+        return -1;
+
+    int mid = start + (end - start)/2;    //防止溢位
+    if (arr[mid] > hkey)
+        return binarySearch(arr, start, mid - 1, hkey);
+    if (arr[mid] < hkey)
+        return binarySearch(arr, mid + 1, end, hkey);
+    return mid;  
+
+}
+
+</syntaxhighlight>
+
+===Java while 循环===
+<syntaxhighlight lang="Java">
+public static int binarySearch(int[] arr, int start, int end, int hkey){
+    int result = -1;
+
+    while (start <= end){
+        int mid = start + (end - start)/2;    //防止溢位
+        if (arr[mid] > hkey)
+            end = mid - 1;
+        else if (arr[mid] < hkey)
+            start = mid + 1;
+        else {
+            result = mid ;  
+            break;
+        }
+    }
+
+    return result;
+
+}
+</syntaxhighlight>
+
+==历史==
+
+在1946年，[[约翰·莫奇利|约翰·莫奇利]]在{{link-en|摩尔学院讲座|Moore School Lectures}}上第一次提出二分搜索的概念。{{Sfn|Knuth|1998|loc=§6.2.1 ("Searching an ordered table"), subsection "History and bibliography"}}1957年，{{link-en|威廉·皮特逊|William Wesley Peterson}}发表了第一个应用插值搜索的算法{{Sfn|Knuth|1998|loc=§6.2.1 ("Searching an ordered table"), subsection "History and bibliography"}}<ref>{{cite journal |last1=Peterson |first1=William Wesley |authorlink=W. Wesley Peterson|title=Addressing for random-access storage |journal=IBM Journal of Research and Development |date=1957 |volume=1 |issue=2 |pages=130–146 |doi=10.1147/rd.12.0130}}</ref>。在此时，每个发表的二分搜索算法只对长度为2的幂减一的数组有用。<ref>"2<sup>''n''</sup>−1". [[整數數列線上大全|OEIS]] [http://oeis.org/A000225 A000225] {{Wayback|url=http://oeis.org/A000225 |date=20160608084228 }}.  Retrieved 7 May 2016.</ref>直到1960年，[[德里克·亨利·莱默|德里克·亨利·莱默]]发表了一个对于所有长度的数组都适用的算法<ref>{{cite conference | title=Teaching combinatorial tricks to a computer | author=Lehmer, Derrick | journal=Proceedings of Symposia in Applied Mathematics | year=1960 | volume=10 | pages=180–181 | doi=10.1090/psapm/010}}</ref>。1962年，赫尔曼·博滕布鲁赫发表了一个用[[ALGOL_60|ALGOL 60]]写的二分搜索，将判断相等的步骤放到算法末尾。虽然将平均迭代次数增加一，但是每次迭代中的比较次数减少了1次。<ref name="Bottenbruch1962">{{cite journal|last1=Bottenbruch|first1=Hermann|title=Structure and use of ALGOL 60|journal=[[Journal_of_the_ACM|Journal of the ACM]] |date=1962-04-01|volume=9|issue=2|pages=161–221 |issn=0004-5411|doi=10.1145/321119.321120 |ref=harv}} Procedure is described at p. 214 (§43), titled "Program for Binary Search".</ref>均匀二分搜索则是[[史丹佛大學|史丹佛大學]]的A. K.钱德拉在1971年发明的{{Sfn|Knuth|1998|loc=§6.2.1 ("Searching an ordered table"), subsection "History and bibliography"}}。1986年，[[伯纳德·查泽尔|伯纳德·查泽尔]]和[[列奥尼达斯·吉巴斯|列奥尼达斯·吉巴斯]]引入了[[分散层叠|分散层叠]]来解决[[计算几何|计算几何]]中大量存在的搜索问题<ref name="ChazelleLiu2001">{{cite conference|last1=Chazelle|first1=Bernard|last2=Liu|first2=Ding|authorlink1=Bernard Chazelle|title=Lower bounds for intersection searching and fractional cascading in higher dimension|conference=33rd [[Symposium_on_Theory_of_Computing|ACM Symposium on Theory of Computing]]|pages=322–329|date=2001-07-06|doi=10.1145/380752.380818|url=https://dl.acm.org/citation.cfm?doid=380752.380818|accessdate=2018-06-30|publisher=ACM|isbn=978-1-58113-349-3|archive-date=2018-10-29|archive-url=https://web.archive.org/web/20181029194224/https://dl.acm.org/citation.cfm?doid=380752.380818|dead-url=no}}</ref><ref>{{cite journal | last1 = Chazelle | first1 = Bernard | authorlink1 = Bernard Chazelle | last2 = Guibas | first2 = Leonidas J. | authorlink2 = Leonidas J. Guibas | title = Fractional cascading: I. A data structuring technique | journal = [[Algorithmica|Algorithmica]] | volume = 1 | issue = 1-4 | year = 1986 | pages = 133–162 | doi = 10.1007/BF01840440 | url = http://www.cs.princeton.edu/~chazelle/pubs/FractionalCascading1.pdf | citeseerx = 10.1.1.117.8349 | access-date = 2019-10-06 | archive-date = 2016-03-03 | archive-url = https://web.archive.org/web/20160303185237/http://www.cs.princeton.edu/~chazelle/pubs/FractionalCascading1.pdf | dead-url = no }}</ref><ref>{{citation | last1 = Chazelle | first1 = Bernard | authorlink1 = Bernard Chazelle | last2 = Guibas | first2 = Leonidas J. | authorlink2 = Leonidas J. Guibas | title = Fractional cascading: II. Applications | journal = [[Algorithmica|Algorithmica]] | volume = 1 | issue = 1-4 | year = 1986 | pages = 163–191 | doi = 10.1007/BF01840441 | url = http://www.cs.princeton.edu/~chazelle/pubs/FractionalCascading2.pdf | accessdate = 2019-10-06 | archive-date = 2016-03-04 | archive-url = https://web.archive.org/web/20160304054501/http://www.cs.princeton.edu/~chazelle/pubs/FractionalCascading2.pdf | dead-url = no }}</ref>。
+
+==实现中的问题==
+<blockquote>
+尽管二分查找的基本思想相对简单，但细节可以令人難以招架 ... — [[高德纳|高德纳]]{{Sfn|Knuth|1998|loc=§6.2.1 ("Searching an ordered table"), subsection "Binary search"}}
+</blockquote>
+当[[乔恩·本特利|乔恩·本特利]]将二分搜索问题布置给专业编程课的学生时，百分之90的学生在花费数小时后还是无法给出正确的解答，主要因为这些错误程序在面对边界值的时候无法运行，或返回错误结果。{{Sfn|Bentley|2000|loc=§4.1 ("The Challenge of Binary Search")}}1988年开展的一项研究显示，20本教科书里只有5本正确实现了二分搜索。<ref name="textbook">{{cite journal | first = Richard E. | last = Pattis | authorlink1=Richard E. Pattis| doi = 10.1145/52965.53012 | title = Textbook errors in binary searching | journal = SIGCSE Bulletin | volume = 20 | year = 1988 | pages = 190–194 }}</ref>不仅如此，本特利自己1986年出版的《编程珠玑》一书中的二分搜索算法存在整数溢出的问题，二十多年来无人发现。[[Java|Java语言]]的库所实现的二分搜索算法中同样的溢出问题存在了九年多才被修复。<ref>{{cite web | url = http://googleresearch.blogspot.com/2006/06/extra-extra-read-all-about-it-nearly.html | title = Extra, extra – read all about it: nearly all binary searches and mergesorts are broken | work = Google Research Blog | first = Joshua | last = Bloch | authorlink1 = Joshua Bloch | date = 2006-06-02 | accessdate = 2016-04-21 | archive-url = https://web.archive.org/web/20160401140544/http://googleresearch.blogspot.com/2006/06/extra-extra-read-all-about-it-nearly.html | archive-date = 2016-04-01 | dead-url = no }}</ref>
+
+==参考==
+{{reflist|30em}}
+{{reflist|list=
+* {{cite book|last=Sahni|first=Sartaj|coauthors=|title=''Data Structures, Algorithms, and Applications in C++''|publisher=McGraw2-Hill|year=1998|isbn=978-0072362268}}
+* {{cite book|last=Knuth|first=Donald|year=1997|authorlink=Donald Knuth|title=Fundamental algorithms|series=[[The_Art_of_Computer_Programming|The Art of Computer Programming]]|volume=1|edition=3rd|location=Reading, MA|publisher=Addison-Wesley Professional|ref=harv|isbn=978-0-201-89683-1}}
+* {{cite book|last=Knuth|first=Donald|year=1998|authorlink=Donald Knuth|title=Sorting and searching|series=[[The_Art_of_Computer_Programming|The Art of Computer Programming]]|volume=3|edition=2nd|location=Reading, MA|publisher=Addison-Wesley Professional|ref=harv|isbn=978-0-201-89685-5}}
+* {{cite book|last=Knuth|first=Donald|year=2011|authorlink=Donald Knuth|title=Combinatorial algorithms|series=[[The_Art_of_Computer_Programming|The Art of Computer Programming]]|volume=4A|edition=1st|location=Reading, MA|publisher=Addison-Wesley Professional|ref=harv|isbn=978-0-201-03804-0}}
+<!-- * {{cite book|last1=Leiss|first1=Ernst|title=A Programmer's Companion to Algorithm Analysis|date=2007|publisher=CRC Press|location=Boca Raton, Florida|isbn=1-58488-673-0|ref=harv}} -->
+* {{cite book|last1=Moffat|first1=Alistair|last2=Turpin|first2=Andrew|title=Compression and coding algorithms|date=2002|publisher=Kluwer Academic Publishers|location=Hamburg, Germany|isbn=978-0-7923-7668-2|ref=harv|doi=10.1007/978-1-4615-0935-6}}
+* {{cite book|last1=Sedgewick|first1=Robert|last2=Wayne|first2=Kevin|authorlink1=Robert Sedgewick (computer scientist)|title=Algorithms|date=2011|publisher=Addison-Wesley Professional|location=Upper Saddle River, New Jersey|isbn=978-0-321-57351-3|edition=4th|ref=harv|url=http://algs4.cs.princeton.edu/home/|access-date=2019-05-15|archive-date=2014-07-15|archive-url=https://web.archive.org/web/20140715144603/http://algs4.cs.princeton.edu/home/|dead-url=no}} Condensed web version: {{open access}}; book version {{closed access}}.
+* {{cite book|last1=Stroustrup|first1=Bjarne|authorlink=Bjarne Stroustrup|title=The C++ programming language|edition=4th|date=2013|publisher=Addison-Wesley Professional|location=Upper Saddle River, New Jersey|isbn=978-0-321-56384-2|ref=harv}}
+}}
+
+==外部链接==
+* [http://www.nist.gov/dads/HTML/binarySearch.html NIST Dictionary of Algorithms and Data Structures: binary search]{{Wayback|url=http://www.nist.gov/dads/HTML/binarySearch.html |date=20090122030332 }}
+* [http://googleresearch.blogspot.com/2006/06/extra-extra-read-all-about-it-nearly.html Google Research: Nearly All Binary Searches and Mergesorts are Broken]{{Wayback|url=http://googleresearch.blogspot.com/2006/06/extra-extra-read-all-about-it-nearly.html |date=20160401140544 }}.
+* [http://www.codecodex.com/wiki/Binary_search Binary search implemented in 12 languages]{{Wayback|url=http://www.codecodex.com/wiki/Binary_search |date=20200520173046 }}.
+* [http://blog.csdn.net/v_july_v/article/details/7093204  程序员编程艺术第二十五章：Jon Bentley：90%无法正确实现二分查找]{{Wayback|url=http://blog.csdn.net/v_july_v/article/details/7093204 |date=20190515160538 }}
+*https://leetcode.com/explore/learn/card/binary-search{{Wayback|url=https://leetcode.com/explore/learn/card/binary-search |date=20200814122724 }}
+{{Translation/Ref|lang=en|article=Binary search algorithm|oldid=}}
+
+{{算法}}
+[[分类:搜尋演算法|分类:搜尋演算法]]
+[[Category:二|Category:二]]

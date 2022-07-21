@@ -1,0 +1,257 @@
+{{NoteTA
+|G1=IT
+}}
+'''拜占庭将军问题'''（{{lang|en|Byzantine Generals Problem}}），是由[[莱斯利·兰波特|莱斯利·兰波特]]在其同名[[论文|论文]]<ref name=BGP_Paper>{{Cite journal | last1 = Lamport | first1 = L. | authorlink1 = Leslie Lamport| last2 = Shostak | first2 = R. | last3 = Pease | first3 = M. | doi = 10.1145/357172.357176 | title = The Byzantine Generals Problem | journal = ACM Transactions on Programming Languages and Systems | volume = 4 | issue = 3 | pages = 382–401 | year=1982 | archiveurl = https://web.archive.org/web/20170207104645/http://research.microsoft.com/en-us/um/people/lamport/pubs/byz.pdf | archivedate = 7 February 2017 | url = http://research.microsoft.com/en-us/um/people/lamport/pubs/byz.pdf}}</ref>中提出的[[对等网络|分布式对等网络]]通信容错問題。
+
+在[[分佈式計算|分佈式計算]]中，不同的[[計算機|計算機]]通过通讯交换信息达成共识而按照同一套协作策略行动。但有時候，系统中的成员计算机可能出错而发送错误的信息，用于传递信息的通讯网络也可能导致信息损坏，使得网络中不同的成员关于全体协作的策略得出不同结论<ref name="DriscollHall2004">{{cite journal| last1=Driscoll| first1=K.| last2=Hall| first2=B.| last3=Paulitsch| first3=M.| last4=Zumsteg| first4=P. |last5=Sivencrona| first5=H.| title=The Real Byzantine Generals| year=2004| pages=6.D.4–61-11| doi=10.1109/DASC.2004.1390734}}</ref>，从而破坏系统一致性<ref name="DriscollHall2003">{{cite journal| last1=Driscoll| first1=Kevin| last2=Hall| first2=Brendan| last3=Sivencrona| first3=Håkan| last4=Zumsteg| first4=Phil
+| title=Byzantine Fault Tolerance, from Theory to Reality| volume=2788| year=2003| pages=235–248| issn=0302-9743| doi=10.1007/978-3-540-39878-3_19}}</ref>。拜占庭将军问题被认为是容错性问题中最难的问题类型之一。
+
+== 问题描述 ==
+[[莱斯利·兰波特|莱斯利·兰波特]]在其论文<ref name="BGP_Paper" />中描述了如下问题：
+<blockquote>
+一组[[拜占庭帝國|拜占庭]]将军分别各率领一支军队共同围困一座城市。为了简化问题，将各支军队的行动策略限定为进攻或撤离两种。因为部分军队进攻部分军队撤离可能会造成灾难性后果，因此各位将军必须通过投票来达成一致策略，即所有军队一起进攻或所有军队一起撤离。因为各位将军分处城市不同方向，他们只能通过信使互相联系。在投票过程中每位将军都将自己投票给进攻还是撤退的信息通过信使分别通知其他所有将军，这样一来每位将军根据自己的投票和其他所有将军送来的信息就可以知道共同的投票结果而决定行动策略。
+</blockquote>
+系统的问题在于，可能将军中出现[[叛徒|叛徒]]，他们不仅可能向较为糟糕的策略投票，还可能选择性地发送投票信息。假设有9位将军投票，其中1名叛徒。8名忠诚的将军中出现了4人投进攻，4人投撤离的情况。这时候叛徒可能故意给4名投进攻的将领送信表示投票进攻，而给4名投撤离的将领送信表示投撤离。这样一来在4名投进攻的将领看来，投票结果是5人投进攻，从而发起进攻；而在4名投撤离的将军看来则是5人投撤离。这样各支军队的一致协同就遭到了破坏。
+
+由于将军之间需要通过信使通讯，叛变将军可能通过伪造信件来以其他将军的身份发送假投票。而即使在保证所有将军忠诚的情况下，也不能排除信使被敌人截杀，甚至被敌人间谍替换等情况。因此很难通过保证人员可靠性及通讯可靠性来解决问题。
+
+假使那些忠誠（或是沒有出錯）的將軍仍然能通過多數決定來決定他們的戰略，便稱達到了拜占庭容错。在此，票都會有一個預設值，若訊息（票）沒有被收到，則使用此預設值來投票。
+
+上述的故事對映到計算機系統裡，將軍便成了計算機，而信差就是通訊系統。雖然上述的問題涉及了電子化的決策支援與資訊安全，卻沒辦法單純的用[[密碼學|密碼學]]與[[數位簽章|數位簽章]]來解決。因為电路错误仍可能影響整個加密過程，這不是密碼學與數位簽章演算法在解決的問題。因此計算機就有可能將錯誤的結果送出去，亦可能導致錯誤的決策。
+
+==早期的解決方案==
+在1982年的論文<ref name=BGP_Paper/>中提過幾個解決方案。方案中把問題往下拆解，認為在「拜占庭将军」的問題可以在「軍官與士官的問題」裡解決，以降低将军問題的發生。而所謂的「軍官與士官的問題」，就是探討軍官與他的士官是否能忠實實行命令。
+
+* 其中一個解決方案認為即使出現了偽造或錯誤的訊息。只要有問題的將軍的數量不到三分之一，仍可以達到「拜占庭容错」。原因是把同樣的標準下放到「軍官與士官的問題」時，在背叛的軍士官不足三分之一的情況下，有問題的軍士官可以很容易的被糾出來。比如有軍官A，士官B與士官C。當A要求B進攻，卻要求C撤退時。就算B與C交換所收到的命令，B與C仍不能確定是否A有問題，因為B或C可能將竄改了的訊息傳給對方。以函式來表示，將軍的總數為''n''，''n''裡面背叛者的數量為''t''，則只要''n'' > 3''t''就可以容錯。<ref>{{cite journal
+| first1 = P.
+| last1 = Feldman
+| first2 = S.
+| last2 = Micali
+| url = http://people.csail.mit.edu/silvio/Selected%20Scientific%20Papers/Distributed%20Computation/An%20Optimal%20Probabilistic%20Algorithm%20for%20Byzantine%20Agreement.pdf
+| title = An optimal probabilistic protocol for synchronous Byzantine agreement
+| journal = SIAM J. Comput.
+| volume = 26
+| issue = 4
+| pages = 873–933
+| date = 1997
+| doi = 10.1137/s0097539790187084
+| access-date = 2017-11-29
+| archive-date = 2016-03-05
+| archive-url = https://web.archive.org/web/20160305012505/http://people.csail.mit.edu/silvio/Selected%20Scientific%20Papers/Distributed%20Computation/An%20Optimal%20Probabilistic%20Algorithm%20for%20Byzantine%20Agreement.pdf
+| dead-url = no
+}}</ref>
+* 另一個解決方案需要有無法消去的簽名。在現今許多高度資安要求的關鍵系統裡，數位簽章就經常被用來實作拜占庭容错，找出有問題的將軍。然而，在[[生命攸關系統|生命攸關系統]]裡，使用[[错误检测与纠正|錯誤偵測碼]]就可以大幅降低問題的發生。無論系統是否存在拜占庭将军問題。所以需要做密碼運算的數位簽章也不一定適合這類系統。<ref name="PaulitschMorris2005">{{cite journal
+| last1=Paulitsch
+| first1=M.
+| last2=Morris
+| first2=J.
+| last3=Hall
+| first3=B.
+| last4=Driscoll
+| first4=K.
+| last5=Latronico
+| first5=E.
+| last6=Koopman
+| first6=P.
+| title=Coverage and the Use of Cyclic Redundancy Codes in Ultra-Dependable Systems
+| year=2005
+| pages=346–355
+| doi=10.1109/DSN.2005.31}}</ref><ref name="DriscollHall2004" /><ref name="DriscollHall2003" />
+* 假如上述兩個解決方案裡，將軍們無法直接通訊時，該論文亦有進一步的解決方案。
+
+此外，1980年代還有其他用來達到拜占庭容错的架構被提出，如：FTMP<ref name="HopkinsLala1987">
+{{cite journal
+| last1=Hopkins
+| first1=Albert L.
+| last2=Lala
+| first2=Jaynarayan H.
+| last3=Smith
+| first3=T. Basil
+| title=The Evolution of Fault Tolerant Computing at the Charles Stark Draper Laboratory, 1955–85
+| volume=1
+| year=1987
+| pages=121–140
+| issn=0932-5581
+| doi=10.1007/978-3-7091-8871-2_6}}</ref>、MMFCS<ref name="MMFCS">
+{{citation
+| last1 = Driscoll
+| first1 = Kevin
+| last2 = Papadopoulos
+| first2 = Gregory
+| last3 = Nelson
+| first3 = Scott
+| last4 = Hartmann
+| first4 = Gary
+| last5 = Ramohalli
+| first5 = Gautham
+| title = Multi-Microprocessor Flight Control System
+| publisher = AFWAL/FIGL U.S. Air Force Systems Command
+| date = 1984
+| type = Technical Report
+| location = Wright-Patterson Air Force Base, OH 45433, USA 
+| id = AFWAL-TR-84-3076
+}}</ref>
+與 SIFT。<ref>{{cite journal
+| title=SIFT: design and analysis of a fault-tolerant computer for aircraft control|journal=Microelectronics Reliability|volume=19|issue=3|year=1979|page=190|issn=0026-2714|doi=10.1016/0026-2714(79)90211-7}}</ref>
+
+==實用拜占庭容錯==
+
+1999年，卡斯托（Miguel Castro）與[[芭芭拉·利斯科夫|利斯科夫]]（Barbara Liskov）提出了實用拜占庭容錯（PBFT）演算法<ref>{{cite journal
+| first1 = M.
+| last1 = Castro
+| first2 = B.
+| last2 = Liskov
+| title = Practical Byzantine Fault Tolerance and Proactive Recovery
+| url = https://archive.org/details/sim_acm-transactions-on-computer-systems_2002-11_20_4/page/398
+| publisher = Association for Computing Machinery
+| journal = ACM Transactions on Computer Systems
+| volume = 20
+| issue = 4
+| pages = 398–461
+| date = 2002
+| doi = 10.1145/571637.571640}}</ref>。該演算法能提供高效能的運算，使得系統可以每秒處理成千的請求，比起舊式系統快了一些。
+
+而在PBFT之後，許多用於拜占庭容錯（BFT）的通訊協議也被提出來改善其通訊的強健性與效率。比如Q/U<ref>{{cite journal
+| first1 = M.
+| last1 = Abd-El-Malek
+| first2 = G.
+| last2 = Ganger
+| first3 = G.
+| last3 = Goodson
+| first4 = M.
+| last4 = Reiter
+| first5 = J.
+| last5 = Wylie
+| doi = 10.1145/1095809.1095817
+| title = Fault-scalable Byzantine Fault-Tolerant Services
+| publisher = [[Association_for_Computing_Machinery|Association for Computing Machinery]]
+| conference = Symposium on Operating Systems Principles
+| date = 2005 }}</ref>、HQ<ref>{{cite conference
+| first1 = James
+| last1 = Cowling
+| first2 = Daniel
+| last2 = Myers
+| authorlink3 = Barbara Liskov
+| first3 = Barbara
+| last3 = Liskov
+| first4 = Rodrigo
+| last4 = Rodrigues
+| first5 = Liuba
+| last5 = Shrira
+| url = http://portal.acm.org/citation.cfm?id=1298455.1298473
+| title = HQ Replication: A Hybrid Quorum Protocol for Byzantine Fault Tolerance
+| conference = Proceedings of the 7th [[USENIX|USENIX]] Symposium on Operating Systems Design and Implementation
+| date = 2006
+| isbn = 1-931971-47-1
+| pages = 177–190}}</ref>、Zyzzyva<ref>{{cite journal
+| first1 = Ramakrishna
+| last1 = Kotla
+| first2 = Lorenzo
+| last2 = Alvisi
+| first3 = Mike
+| last3 = Dahlin
+| first4 = Allen
+| last4 = Clement
+| first5 = Edmund
+| last5 = Wong
+| doi = 10.1145/1658357.1658358
+| title = Zyzzyva: Speculative Byzantine Fault Tolerance
+| publisher = [[Association_for_Computing_Machinery|Association for Computing Machinery]]
+| journal = ACM Transactions on Computer Systems
+| volume = 27
+| issue = 4
+| date = December 2009 }}</ref>與ABsTRACTs<ref>{{cite conference
+| first1 = Rachid
+| last1 = Guerraoui
+| first2 = Nikola
+| last2 = Kneževic
+| first3 = Marko
+| last3 = Vukolic
+| first4 = Vivien
+| last4 = Quéma
+| url = http://infoscience.epfl.ch/record/144158
+| title = The Next 700 BFT Protocols
+| conference = Proceedings of the 5th European conference on Computer systems
+| publisher = EuroSys
+| date = 2010
+| access-date = 2017-11-29
+| archive-date = 2011-10-02
+| archive-url = https://web.archive.org/web/20111002225957/http://infoscience.epfl.ch/record/144158
+| dead-url = no
+}}</ref>
+...，用來提升效率。而Aardvark<ref>{{cite conference|first1=A.|last1=Clement|first2=E.|last2=Wong|first3=L.|last3=Alvisi|first4=M.|last4=Dahlin|first5=M.|last5=Marchetti|url=http://www.usenix.org/events/nsdi09/tech/full_papers/clement/clement.pdf|title=Making Byzantine Fault Tolerant Systems Tolerate Byzantine Faults|publisher=[[USENIX|USENIX]]|conference=Symposium on Networked Systems Design and Implementation|date=April 22–24, 2009|access-date=2017-11-29|archive-date=2010-12-25|archive-url=https://web.archive.org/web/20101225155052/https://www.usenix.org/events/nsdi09/tech/full_papers/clement/clement.pdf|dead-url=no}}</ref>與RBFT<ref>{{cite conference|first1=P.-L.|last1=Aublin|first2=S.|last2=Ben Mokhtar|first3=V.|last3=Quéma|url=http://www.temple.edu/cis/icdcs2013/program.html|title=RBFT: Redundant Byzantine Fault Tolerance|publisher=[[International_Conference_on_Distributed_Computing_Systems|International Conference on Distributed Computing Systems]]|conference=33rd IEEE International Conference on Distributed Computing Systems|date=July 8–11, 2013|deadurl=yes|archiveurl=https://web.archive.org/web/20130805115252/http://www.temple.edu/cis/icdcs2013/program.html|archivedate=August 5, 2013}}</ref>是用來加強強健性。另外，Adapt<ref>{{Cite journal|last=Bahsoun|first=J. P.|last2=Guerraoui|first2=R.|last3=Shoker|first3=A.|date=2015-05-01|title=Making BFT Protocols Really Adaptive|url=http://ieeexplore.ieee.org/document/7161576/|journal=Parallel and Distributed Processing Symposium (IPDPS), 2015 IEEE International|pages=904–913|doi=10.1109/IPDPS.2015.21|access-date=2017-11-29|archive-date=2018-06-20|archive-url=https://web.archive.org/web/20180620193012/https://ieeexplore.ieee.org/document/7161576/|dead-url=no}}</ref>則使用原有的BFT協議做調適，以強化其效率與強健性。BFT協議更可以藉由加入可任務的單元，以減少發出副本的次數。比如：A2M-PBFT-EA<ref>{{Cite journal|last=Chun|first=Byung-Gon|last2=Maniatis|first2=Petros|last3=Shenker|first3=Scott|last4=Kubiatowicz|first4=John|date=2007-01-01|title=Attested Append-only Memory: Making Adversaries Stick to Their Word|url=http://doi.acm.org/10.1145/1294261.1294280|journal=Proceedings of Twenty-first ACM SIGOPS Symposium on Operating Systems Principles|series=SOSP '07|location=New York, NY, USA|publisher=ACM|pages=189–204|doi=10.1145/1294261.1294280|isbn=9781595935915|access-date=2017-11-29|archive-date=2020-01-29|archive-url=https://web.archive.org/web/20200129053218/http://doi.acm.org/10.1145/1294261.1294280|dead-url=no}}</ref>與MinBFT。<ref>{{Cite journal|last=Veronese|first=G. S.|last2=Correia|first2=M.|last3=Bessani|first3=A. N.|last4=Lung|first4=L. C.|last5=Verissimo|first5=P.|date=2013-01-01|title=Efficient Byzantine Fault-Tolerance|url=http://ieeexplore.ieee.org/document/6081855/|journal=IEEE Transactions on Computers|volume=62|issue=1|pages=16–30|doi=10.1109/TC.2011.221|issn=0018-9340|access-date=2017-11-29|archive-date=2017-12-01|archive-url=https://web.archive.org/web/20171201032955/http://ieeexplore.ieee.org/document/6081855/|dead-url=no}}</ref>
+
+==计算机系统==
+在[[对等网络|分布式对等网络]]中需要按照共同一致策略协作的成员计算机即为问题中的将军，而各成员计算机赖以进行通讯的网络链路即为信使。拜占庭将军问题描述的就是某些成员计算机或网络链路出现错误、甚至被蓄意破坏者控制的情况。
+
+==實務應用==
+
+在對等式數位貨幣系統[[比特幣|比特幣]]裡，比特幣網路的運作是平行的（parallel）。各節點與終端都運算著[[區塊鏈|區塊鏈]]來達成[[工作量證明|工作量證明]]（PoW）。工作量證明的連結是解決比特幣系統中拜占庭問題的關鍵，避免有問題的節點（即前文提到的「反叛的將軍」）破壞數位貨幣系統裡交易帳的正確性，是對整個系統的運行狀態有著重要的意義。
+
+在一些飛行器（如[[波音777|波音777]]）的系統中<ref name="Zurawski2015">{{cite book
+| last1=M.
+| first1=Paulitsch
+| last2=Driscoll
+| first2=K.
+| editor-first=Richard
+| editor-last=Zurawski
+| title=Industrial Communication Technology Handbook, Second Edition
+| url=https://books.google.com/books?id=ppzNBQAAQBAJ
+| date=9 January 2015
+| chapter=Chapter 48:SAFEbus
+| pages=48-1–48-26
+| publisher=CRC Press
+| isbn=978-1-4822-0733-0
+| access-date=2017-11-29
+| archive-date=2020-06-26
+| archive-url=https://web.archive.org/web/20200626120606/https://books.google.com/books?id=ppzNBQAAQBAJ
+| dead-url=no
+}}</ref>
+<ref name="HenzingerKirsch2001">{{cite book
+| author1=Thomas A. Henzinger
+| author2=Christoph M. Kirsch
+| title=Embedded Software: First International Workshop, EMSOFT 2001, Tahoe City, CA, USA, October 8-10, 2001. Proceedings
+| url=http://www.csl.sri.com/papers/emsoft01/emsoft01.pdf
+| date=26 September 2001
+| publisher=Springer Science & Business Media
+| isbn=978-3-540-42673-8
+| pages=307–
+| access-date=2017-11-29
+| archive-date=2017-08-09
+| archive-url=https://web.archive.org/web/20170809093948/http://www.csl.sri.com/papers/emsoft01/emsoft01.pdf
+| dead-url=no
+}}</ref><ref name="Yeh2001">{{cite journal
+| last1=Yeh
+| first1=Y.C.
+| title=Safety critical avionics for the 777 primary flight controls system
+| volume=1
+| year=2001
+| pages=1C2/1–1C2/11
+| doi=10.1109/DASC.2001.963311}}</ref>也有使用拜占庭容錯。而且由於是即時系統，容錯的功能也要能儘快回覆，比如即使系統中有錯誤發生，容錯系統也只能做出一微秒以內的延遲。
+
+一些[[太空梭|太空梭]]的飛行系統<ref>[https://lwn.net/Articles/540368/ {{Wayback|url=https://lwn.net/Articles/540368/ |date=20160805064218 }} ELC: SpaceX lessons learned [LWN.net]<!-- Bot generated title -->]</ref>甚至將容錯功能放到整個系統的設計之中。
+
+拜占庭容錯機制是將收到的訊息（或是收到的訊息的簽章）轉交到其他的接收者。這類機制都假設它們轉交的訊息都可能含有拜占庭問題。在高度安全要求的系統中，這些假設甚至要求證明錯誤能在一個合理的等級下被排除。當然，要證明這點，首先遇到的問題就是如何有效的找出所有可能的、應能被容錯的錯誤<ref name="NanyaGoosen1989">{{cite journal |last1=Nanya|first1=T.|last2=Goosen|first2=H.A.|title=The Byzantine hardware fault model|journal=IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems|volume=8|issue=11|year=1989|pages=1226–1231|issn=0278-0070|doi=10.1109/43.41508}}</ref>。這時候會試著在系統中加入錯誤插入器<ref name="MartinsGandhi2013">{{cite journal|last1=Martins|first1=Rolando|last2=Gandhi|first2=Rajeev|last3=Narasimhan|first3=Priya|last4=Pertet|first4=Soila|last5=Casimiro|first5=António|last6=Kreutz|first6=Diego|last7=Veríssimo|first7=Paulo|title=Experiences with Fault-Injection in a Byzantine Fault-Tolerant Protocol|volume=8275|year=2013|pages=41–61|issn=0302-9743|doi=10.1007/978-3-642-45065-5_3}}</ref><ref>{{cite patent
+ | country = US
+ | number = 7475318
+ | status = patent
+ | title = Method for testing the sensitive input range of Byzantine filters
+ | gdate = 2009-01-06
+ | fdate = 2006-01-27
+ | pridate = 2005-01-28
+ | inventor = Kevin R. Driscoll
+ | assign1 = Honeywell International Inc.
+ | class = G01R31/28
+}}</ref>。
+
+==参考资料==
+{{reflist|2}}
+
+==外部連結==
+* [https://web.archive.org/web/20080828060019/http://www.rkbexplorer.com/explorer/#display=mechanism%2D{http://resex.rkbexplorer.com/id/resilience-mechanism-65b5cef4} Byzantine Fault Tolerance in the RKBExplorer]
+
+[[Category:分布式计算|Category:分布式计算]]
+[[Category:计算机科学|Category:计算机科学]]
+[[Category:理论计算机科学|Category:理论计算机科学]]
+[[Category:計算理論|Category:計算理論]]
+[[Category:容错|Category:容错]]

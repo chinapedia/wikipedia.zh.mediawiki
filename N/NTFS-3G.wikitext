@@ -1,0 +1,83 @@
+{{noteTA
+|G1=IT
+}}
+{{Infobox_Software
+| name                   = NTFS-3G
+| logo                   = [[File:Ntfs-3g-logo.png|File:Ntfs-3g-logo.png]]
+| developer              = Szabolcs Szakacsits，Tuxera Inc.
+| latest_release_version = 2022.5.17
+| latest_release_date    = {{release date and age|2022|05|26}}
+| programming language   = [[C語言|C]]
+| operating_system       = 主要是[[類Unix系統|類Unix系統]]
+| genre                  = [[檔案系統|檔案系統]]驅動程式
+| license                = [[GNU_GPL|GNU GPL]]
+| website                = http://www.ntfs-3g.org/
+}}
+
+'''NTFS-3G'''是一個由[[Tuxera|Tuxera]]公司開發並維護的[[自由軟體|自由軟體]]項目，採用[[GNU通用公共許可證|GNU通用公共許可證]]釋出，旨在為非微軟[[Windows_NT|Windows NT系]]的[[作業系統|作業系統]]提供安全快速、具備讀寫功能的[[NTFS|NTFS]]檔案系統[[驅動程式|驅動程式]]。
+
+NTFS-3G最初由資深Linux驅動程式開發者Szabolcs Szakacsits（{{IPA-hu|ˈsɒbolt͡ʃ ˈsɒkɒt͡ʃit͡ʃ|lang}}）於2006年發起並主導，2007年初公佈了第一個穩定版本ntfs-3g-2007.02.21，原始碼託管於[[SourceForge|SourceForge]]。隨後NTFS-3G團隊成立了[[Tuxera|Tuxera Inc.]]，負責NTFS-3G的進一步發展、商業推廣以及爲專案提供開發資金。目前Tuxera公司還推出了NTFS-3G的商用版本Tuxera NTFS及NTFS for Mac，後兩者除了NTFS-3G的原始碼以外還有一些非Tuxera開發的用以加強存取效能的專有元件。<ref name="NTFS on macOS Sierra">{{cite web|title=NTFS on macOS Sierra: Paragon or Tuxera?|url=https://www.alexwhittemore.com/ntfs-on-macos-sierra-paragon-or-tuxera/|website=alexw|date=2017-04-14|accessdate=2018-04-05|archive-date=2018-04-05|archive-url=https://web.archive.org/web/20180405214744/https://www.alexwhittemore.com/ntfs-on-macos-sierra-paragon-or-tuxera/|dead-url=no}}</ref>
+
+== 主要特性 ==
+[[Linux核心|Linux核心]]裡所包含的NTFS驱动程序（在一些發行版上則是作爲單獨的內核模組）在內核空間上執行，僅提供讀取操作（包括列出檔案清單、開啓、複製檔案），而缺少寫入操作（包括建立檔案，對檔案的修改、更名、移動和刪除）的支援。
+
+而NTFS-3G則是藉助[[使用者空間檔案系統|使用者空間檔案系統]]（'''F'''ilesystem in '''Use'''rspace，FUSE）框架完成[[掛載|掛載]]，以此支援對NTFS分区的大部分寫入操作。
+
+目前實現的特性有：
+* 在NTFS分割上建立任意大小的檔案
+* 在NTFS分割上對檔案進行更名、移動、刪除、修改
+* 支援[[UTF-8|UTF-8]]字元集
+* 支援[[存取控制串列|存取控制串列]]和[[文件系统权限|權限]]的修改<ref>{{Cite web |url=http://perso.orange.fr/b.andre/security.html |title=NTFS-3G: NTFS Driver with Ownership and permissions |accessdate=2008-04-23 |archive-date=2019-10-18 |archive-url=https://web.archive.org/web/20191018204254/http://pp.auto.ke.orange.fr/ |dead-url=no }}</ref>
+* 支援[[NTFS#硬链接|NTFS硬連結]]和[[NTFS符号链接|符号链接]]
+* 支援[[NTFS#文件压缩|NTFS透明壓縮]]：對經過NTFS透明壓縮的檔案進行讀取、更名、移動、新增、刪除、修改<ref>{{Cite web |url=https://www.tuxera.com/community/ntfs-3g-advanced/data-compression/ |title=Data Compression - Tuxera |accessdate=2018-02-15 |archive-date=2018-02-16 |archive-url=https://web.archive.org/web/20180216025851/https://www.tuxera.com/community/ntfs-3g-advanced/data-compression/ |dead-url=no }}</ref>
+* 對NTFS[[日志文件系统|日誌]]的基本支援，除了基本的檔案寫入操作記錄以外，還可完成對NTFS卷[[檔案系統|檔案系統]]層面上的修復操作
+* 對NTFS加密檔案的重命名、複製、移動、刪除操作等不涉及檔案加密/解密過程的存取操作。
+
+對於[[加密文件系统|NTFS加密]]，目前爲止加密檔案的建立、對已有檔案進行加密等涉及檔案加密/解密的存取操作仍未實現支援。<ref>{{Cite web |url=https://www.tuxera.com/community/ntfs-3g-faq/ |title=NTFS-3G FAQ |accessdate=2018-04-02 |archive-date=2018-02-19 |archive-url=https://web.archive.org/web/20180219162704/https://www.tuxera.com/community/ntfs-3g-faq/ |dead-url=no }}</ref>
+
+自ntfs-3g-2009.2.1起，NTFS-3G已經可以預設對含不完整日誌的NTFS卷進行恢復及掛接，需要時可通過「norecover」參數禁用這個設定。<ref>{{Cite web |url=http://article.gmane.org/gmane.comp.file-systems.ntfs-3g.devel/678 |title=NTFS-3G 2009.2.1 changelog |access-date=2018-04-02 |archive-url=https://web.archive.org/web/20090323033930/http://article.gmane.org/gmane.comp.file-systems.ntfs-3g.devel/678 |archive-date=2009-03-23 |dead-url=yes }}</ref>
+
+== 支援的作業系統 ==
+最初NTFS-3G是Linux-NTFS專案的分支，第一個穩定版本也只運行於[[Linux|Linux]]上。後來先後被移植至[[FreeBSD|FreeBSD]]、[[NetBSD|NetBSD]]、[[Solaris|OpenSolaris]]、[[BeOS|BeOS]]、[[QNX|QNX]]、[[Nucleus_RTOS|Nucleus]]、[[VxWorks|VxWorks]]、[[Haiku|Haiku]]、{{le|MorphOS}}、[[MINIX_3|Minix]]、[[macOS|Mac OS X/macOS]]（除10.13外<ref name="NTFS on macOS Sierra"/>）、[[OpenBSD|OpenBSD]]、[[Android|Android]]等<ref name="community-edition"/><ref>{{cite web |url=http://undeadly.org/cgi?action=article&sid=20131108082749&mode=expanded&count=2 |title=OpenBSD adds fuse(4) support for adding file systems in userland |publisher=[[OpenBSD_Journal|OpenBSD Journal]] |date=2013-11-08 |accessdate=2013-11-08 |archive-date=2013-11-10 |archive-url=https://web.archive.org/web/20131110032424/http://undeadly.org/cgi?action=article&sid=20131108082749&mode=expanded&count=2 |dead-url=no }}</ref><ref>{{cite web |url= http://ports.su/sysutils/ntfs-3g |title= ntfs_3g-2014.2.15 – FUSE NTFS driver with read/write support |work= [[OpenBSD_ports|OpenBSD ports]] |date= 2014-01-05 |accessdate= 2015-02-14 |archive-date= 2014-11-08 |archive-url= https://web.archive.org/web/20141108010009/http://ports.su/sysutils/ntfs-3g |dead-url= no }}</ref><ref name="catacombae">{{Cite web |url=https://sourceforge.net/projects/catacombae/files/NTFS-3G%20for%20Mac%20OS%20X/ |title=NTFS-3G for Mac OS X ("Catacombae") |accessdate=2018-04-02 |archive-date=2017-11-28 |archive-url=https://web.archive.org/web/20171128235324/https://sourceforge.net/projects/catacombae/files/NTFS-3G%20for%20Mac%20OS%20X/ |dead-url=no }}</ref>，甚至[[Windows_CE|WinCE]]等微軟尚未有NTFS支援的微軟作業系統也有移植支援。
+
+不過，由於NTFS-3G需要依賴FUSE框架運行，像是macOS等類UNIX作業系統並沒有內建FUSE，需要先安裝FUSE框架方能安裝NTFS-3G並使用（像是macOS需要安裝FUSE for macOS等FUSE框架。而NTFS-3G的商用版本Tuxera NTFS for Mac則是附帶了MacFUSE作爲FUSE框架）。<ref>{{cite web|title=Home - FUSE for macOS|url=https://osxfuse.github.io/|website=osxfuse.github.io|accessdate=2018-04-03|archive-date=2018-02-26|archive-url=https://web.archive.org/web/20180226104104/https://osxfuse.github.io/|dead-url=no}}</ref>
+
+Android對NTFS的支援，理論上以基於Linux核心載入NTFS-3G驅動的方式實現，但[[AOSP|AOSP]]並沒有整合任何的NTFS驅動程式，而且也不是所有的Android裝置廠商原廠就會用此種支援方式，甚至缺乏對NTFS的支援（如[[小米手机|小米系列手機]]，原廠預載的[[MIUI|MIUI]]缺少一些檔案系統的驅動程式，包括NTFS<ref>{{cite web|last1=Forum|first1=Xiaomi MIUI Official|title=MIUI does not support exFAT, NTFS, UDF and ext4 file system for micro sdxc. - MIUI General - Xiaomi MIUI Official Forum|url=http://en.miui.com/thread-299499-1-1.html|website=en.miui.com|access-date=2018-04-04|archive-url=https://web.archive.org/web/20180405024626/http://en.miui.com/thread-299499-1-1.html|archive-date=2018-04-05|dead-url=yes}}</ref>），不過在一些[[客制Android韌體列表|客製韌體]]上，絕大多數通過移植NTFS-3G驅動程式至Linux核心來實現對NTFS的支援。<ref>{{cite web|title=Full NTFS Read/Write Support for Android|url=https://www.xda-developers.com/full-ntfs-readwrite-support-for-android/|website=xda-developers|date=2012-06-25|accessdate=2018-04-04|archive-date=2017-01-11|archive-url=https://web.archive.org/web/20170111030628/https://www.xda-developers.com/full-ntfs-readwrite-support-for-android/|dead-url=no}}</ref>此外，一些裝置可以通過[[Root_(Android)|獲取root權限]]並安裝具備NTFS驅動程式供作業系統核心載入的[[App|App]]，實現對NTFS分割的掛載（如[[SD卡|SD卡]]、通過[[USB_OTG|USB OTG]]掛載的[[移动硬盘|移动硬盘]]）。
+
+== 效能 ==
+2007年与2008年的两个評測顯示，NTFS-3G的驅動程式效能已能與其它一些使用FUSE的檔案系統相比，但較依賴[[CPU|CPU]]的效能，表示NTFS-3G尚未完成對效能的[[最佳化|最佳化]]。<ref>{{cite web|title=比較 JFS、XFS、NTFS-3G 和 ZFS-FUSE 的效能|url=http://www.csamuel.org/2007/04/25/comparing-ntfs-3g-to-zfs-fuse-for-fuse-performance/|accessdate=2008-04-23|archive-date=2008-04-30|archive-url=https://web.archive.org/web/20080430081403/http://www.csamuel.org/2007/04/25/comparing-ntfs-3g-to-zfs-fuse-for-fuse-performance/|dead-url=no}}</ref><ref>{{cite web|title=10 個檔案系統的評測|archiveurl=https://web.archive.org/web/20080216123527/http://www.ntfs-3g.org/performance.html|archivedate=2008-02-16|url=http://www.ntfs-3g.org/performance.html|accessdate=2017-09-05|dead-url=yes}}</ref>
+
+Tuxera官方的使用手冊及NTFS-3G[[手册页|手册页]]上也提到，NTFS-3G當前的開發焦點仍集中在可靠性和實作欠缺的[[POSIX|POSIX]]功能性，存取效能並不是優先考量的，至少需要效能較好的CPU方能取得較好的存取效能。<ref>{{Cite web |url=https://www.tuxera.com/products/tuxera-ntfs-commercial/performance/ |title=Performance at Tuxera |accessdate=2018-04-02 |archive-date=2011-05-22 |archive-url=https://web.archive.org/web/20110522073141/http://www.tuxera.com/products/tuxera-ntfs-commercial/performance/ |dead-url=no }}</ref>在一些較老的系統或需要低功耗的[[嵌入式裝置|嵌入式裝置]]上，高CPU使用量會極大地限制NTFS-3G的存取效能（尤其是寫入效能），<ref>{{cite web|title=Raspberry Pi 2 vs Banana Pi ext4 vs NTFS vs exFAT •|url=https://www.htpcguides.com/raspberry-pi-2-vs-banana-pi-ext4-vs-ntfs-vs-exfat/|website=HTPC Guides|date=2015-03-19|accessdate=2018-04-05|archive-date=2017-07-19|archive-url=https://web.archive.org/web/20170719154908/https://www.htpcguides.com/raspberry-pi-2-vs-banana-pi-ext4-vs-ntfs-vs-exfat/|dead-url=no}}</ref>[[OpenWRT|OpenWRT]]/[[LEDE|LEDE]]的官方說明文檔中也告知對效能較爲注意的使用者儘量避免使用NTFS檔案系統。<ref>{{cite web|title=OpenWrt Project: Filesystems|url=https://openwrt.org/docs/guide-user/storage/filesystems-and-partitions#windows_filesystems|website=openwrt.org|language=en|accessdate=2018-04-05|archive-date=2018-04-05|archive-url=https://web.archive.org/web/20180405215103/https://openwrt.org/docs/guide-user/storage/filesystems-and-partitions#windows_filesystems|dead-url=no}}</ref>
+
+== 延伸專案 ==
+{{le|ntfsprogs}}是一套[[類UNIX|類Unix]]系統下的工具集，用於對NTFS卷進行建立、修改、刪除等多種操作。最初[[复刻_(软件工程)|復刻]]自NTFS-3G。2011年4月，ntfsprogs合併至NTFS-3G專案，並持續維護至今。
+
+== 發展過程 ==
+* 自2006年10月31日起，NTFS-3G獨立成專案，不再是Linux-NTFS專案的一部分。
+* 於2007年2月21日，Szabolcs Szakacsits宣布「第一個開放原始碼、完全自由、穩定的讀寫NTFS的驅動程式，NTFS-3G 1.0釋出」。
+* 自ntfs-3g-2009.1.1版起已經對UTF-8[[字元集|字元集]]實現完整支援
+* 2009年10月5日，Tuxera釋出NTFS-3G for Mac，並推出了含專有元件的商用版Tuxera NTFS。<ref>{{Cite web |url=http://macntfs-3g.blogspot.com/2009/10/tuxera-ntfs-for-mac.html |title=NTFS-3G for Mac OS X is now Tuxera NTFS for Mac |accessdate=2018-04-02 |archive-date=2018-04-03 |archive-url=https://web.archive.org/web/20180403112430/http://macntfs-3g.blogspot.com/2009/10/tuxera-ntfs-for-mac.html |dead-url=no }}</ref>
+* 自ntfs-3g-2009.11.14版開始支援新增透明壓縮的檔案、對透明壓縮檔案的更名。
+* 自ntfs-3g-2010.8.8版開始可對已有經過透明壓縮的檔案的修改操作。
+* 2011年4月12日，宣佈ntfsprogs專案合併至NTFS-3G。
+
+== 類似軟體 ==
+* Tuxera NTFS及NTFS for Mac —— NTFS-3G的商用版，內含一些對存取效能有提升的專有元件
+* Paragon NTFS —— 專有軟體，{{le|Paragon Software Group}}開發的一套運行於作業系統核心空間的NTFS檔案系統驅動程式
+* NTFS4DOS —— 專有免費軟體，運行於[[MS-DOS|MS-DOS]]上的NTFS檔案系統驅動程式
+
+== 參考資料 ==
+{{reflist}}
+
+== 外部連結 ==
+{{portal|自由軟體|}}
+
+* [https://www.tuxera.com/community/open-source-ntfs-3g/ NTFS-3G官方原始碼及預編譯二進位檔下載]{{Wayback|url=https://www.tuxera.com/community/open-source-ntfs-3g/ |date=20180401141327 }}
+* [https://sourceforge.net/projects/ntfs-3g/ SourceForge專案頁面]{{Wayback|url=https://sourceforge.net/projects/ntfs-3g/ |date=20180405090214 }}
+* [https://sourceforge.net/projects/catacombae/files/NTFS-3G%20for%20Mac%20OS%20X/ NTFS-3G for Mac OS X ("Catacombae")]{{Wayback|url=https://sourceforge.net/projects/catacombae/files/NTFS-3G%20for%20Mac%20OS%20X/ |date=20171128235324 }}
+* [http://i.vishalagarwal.com/post/30387627819/ntfs-write-on-lion-or-mountain-lion Writing on NTFS volumes on Mac OS X through NTFS-3G and OS X FUSE for free (works with Lion & Mountain Lion)]{{Wayback|url=http://i.vishalagarwal.com/post/30387627819/ntfs-write-on-lion-or-mountain-lion |date=20180403051603 }}
+* [https://web.archive.org/web/20190610230323/https://yulian.kuncheff.com/why-are-there-no-true-cross-platform-filesystems/ Why are there no true cross-platform filesystems?]
+
+[[Category:SourceForge專案|Category:SourceForge專案]]
+[[Category:磁盘文件系统|Category:磁盘文件系统]]
+[[Category:使用者空間檔案系統|Category:使用者空間檔案系統]]

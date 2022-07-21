@@ -1,0 +1,53 @@
+'''西厢计划'''提供了一组工具，使用户能够繞過[[中华人民共和国|中华人民共和国]][[防火长城|防火长城]]的规避[[中华人民共和国|中华人民共和国]][[防火长城|防火长城]]的DNS污染，[[防火长城#TCP连接重置|TCP连接重置]]等手段，直接访问目被封鎖的網站。其命名是为了向中国古典文学史上“翻墙”的先驱者[[西厢记|张生]]致敬。西厢计划由於各種原因而於 2010 年暫停更新，最後發佈的一個版本目前已由於[[防火长城|防火长城]]的更新而無法使用，但在當時的测试中已可以直接訪問 [[Youtube|Youtube]]。
+
+== 計劃與設想 ==
+
+西廂計劃與其他的[[翻牆|翻牆]]工具不同，它並不是代理服務或 [[VPN|VPN]]，而是從技術層面避開[[防火长城|防火长城]]的封鎖手段，如 [[传输控制协议|TCP]] 连接重置、[[域名服務器緩存污染|DNS 劫持]]、[[IP地址|IP]] 封锁和 [[URL|URL]] 关键字过滤，为此西厢计划希望提供三种特性：
+
+*TCP 连接混淆：在每次连接中，通过对[[防火长城|防火长城]]的[[入侵检测|入侵检测]]系统进行[[注入|注入]]，與正常的连接混淆，使得[[防火长城|防火长城]]无法正确解析连接和检测关键词，从而避開關鍵字過濾。
+*反 [[域名服務器緩存污染|DNS劫持]]：通过匹配[[防火长城|防火长城]]伪包的指纹并将其过滤，從而使一般的 DNS 解析也能获得正确的结果，但需要使用未受污染的 [[DNS|DNS]]，例如 [[Google_Public_DNS|Google Public DNS]]。
+*單向隧道：利用[[防火長城|防火長城]]僅僅對出站的數據包進行過濾的特性，将發出的数据包透過不受過濾的服务器中转，而收到的数据包可直接穿过[[防火長城|防火長城]]到达客户端。這種情況下，由於[[防火長城|防火長城]]无法獲取請求 URL，关键词过滤也將失效。當時的測試中，以這種方法觀看經由 [[HTTP|HTTP]] 協議傳輸的在线视频時，中转服务器仅耗费极小的流量。
+
+由於西廂計劃无需加密或透過代理伺服器中轉，亦不需要第三方支援，因此在多種[[翻牆|翻牆]]方式中理論性能顯得較爲優秀。
+
+== 技術原理 ==
+
+西厢计划采取了 T. Ptacek 等在 1998 年的论文<ref>{{Cite web|url=https://www.cs.unc.edu/~fabian/course_papers/PtacekNewsham98.pdf|title=Insertion, Evasion, and Denial of Service: Eluding Network Intrusion Detection|year=1998|author=Thomas H. Ptacek, Tomothy N. Newsham|language=en-US|access-date=2021-04-14|archive-date=2018-01-07|archive-url=https://web.archive.org/web/20180107172909/http://cs.unc.edu/~fabian/course_papers/PtacekNewsham98.pdf|dead-url=no}}</ref>中提出避開入侵检测的[[注入|注入]]方法，即发出特制报文，使得这些报文对对方没有效果，但是让[[入侵检测系统|入侵检测系统]]错误地分析协议，从而让其错误地认为连接被提前终止了。由于防火长城的 TCP 栈非常简陋，因此可利用此特性，对所有遵守 [[RFC|RFC]] 的目标主机都采取特定措施，让[[防火长城|防火长城]]无法正确解析 TCP 连接，从而避開关键词监测。
+
+== 局限 ==
+
+西厢计划的连接混淆功能对于基于 [[IP地址|IP 地址]]的封锁和其他无状态的[[网络封锁|封锁]]不能生效，因为它需要通过注入攻击改变防火长城的连接状态，如果封锁与连接状态无关便无法进行连接混淆。另外，连接混淆的实现假设连接双方遵守 [[RFC|RFC]]。有一些目标主机或者防火墙不遵守 [[RFC|RFC]]，可能导致正常不含关键词的连接被对方终止或者忽略，這可以經由使用 [[ipset|ipset]] 把作用范围限制在需要的地址段而避免。
+
+西厢计划目前依赖 [[Linux内核|Linux 內核]]的 [[netfilter|netfilter]] 功能，因此要求用户平台是 [[Linux|Linux]]，其他平臺的移植項目功能均有所缺失。[[Windows|Windows]] 平臺上曾有一個基於 Pcap [[WinPcap|WinPcap]] 的編譯版本实现了连接混淆的部分，但已不再维护。
+
+由於[[防火长城|防火长城]]的伪包指纹經常變動，因此用户需要不斷更新才能正常使用反DNS劫持。
+
+== 後續 ==
+
+西廂計劃後來發展出第二季與第三季兩個項目。第二季實現了單向隧道，而第三季則是對西廂計劃的後續開發，但兩者都是獨立的項目。
+
+由 Onion Project 開發的西廂計劃事實上與此西廂計劃毫無關聯，而是一個基於 [[GoAgent|GoAgent]] 的瀏覽器包。
+
+在ACM IMC 2017 会议上，[[加利福尼亚大学河滨分校|加利福尼亚大学河滨分校]]的研究人员发表了论文《Your State is Not Mine: A Closer Look at Evading Stateful Internet Censorship》（PDF）<ref>{{Cite journal|doi=10.1145/3131365.3131374|title=Your State is Not Mine: A Closer Look at Evading Stateful Internet Censorship|url=http://www.cs.ucr.edu/~krish/imc17.pdf|first1=Zhongjie|last1=Wang|year=2017|language=en-US|journal=|access-date=2021-04-14|archive-date=2018-06-20|archive-url=https://web.archive.org/web/20180620063925/http://www.cs.ucr.edu/~krish/imc17.pdf|dead-url=no}}</ref>，论文中提到[[防火长城|防火长城]]在检测到特殊报文时会进入「重同步」状态，显然是当时应对西厢计划的策略。他们提出了绕过防火长城的新策略，新策略的平均成功率在 90% 以上，最高达到 98%。
+
+== 外部链接 ==
+* [https://web.archive.org/web/20120806111246/http://code.google.com/p/scholarzhang/wiki/README 西廂計劃 Wiki]
+* {{cite web | url = http://www.rfa.org/mandarin/yataibaodao/xixiang-03112010095532.html | title = "西厢计划":中国破网技术新突破（组图） | author = 自由亚洲电台 | date = 2010-03-11 | accessdate = 2010-03-18 | archive-date = 2020-07-01 | archive-url = https://web.archive.org/web/20200701040428/https://www.rfa.org/mandarin/yataibaodao/xixiang-03112010095532.html | dead-url = no }}
+* 西厢计划 [https://web.archive.org/web/20120905051511/http://code.google.com/p/scholarzhang/ 在 Google Code 的主页], [https://github.com/liruqi/scholarzhang 在GitHub上的备份] {{Wayback|url=https://github.com/liruqi/scholarzhang |date=20200917144430 }}
+* 西廂計劃第二季 [https://web.archive.org/web/20130731052302/http://code.google.com/p/west-chamber-season-2/ 在 Google Code 的主頁]
+* 西廂計劃第三季 [https://web.archive.org/web/20130727100537/https://code.google.com/p/west-chamber-season-3/ 在 Google Code 的主頁]，[https://github.com/liruqi/west-chamber-season-3/ 在 GitHub 的主頁] {{Wayback|url=https://github.com/liruqi/west-chamber-season-3/ |date=20200913224030 }}
+* [https://blog.youxu.info/2010/03/14/west-chamber/ 西厢计划原理小解] {{Wayback|url=https://blog.youxu.info/2010/03/14/west-chamber/ |date=20200924233433 }}
+<!--- 你妈死了
+* [https://archive.ph/fH3gJ 西厢计划第一季新项目]
+
+--->
+
+== 參考資料 ==
+{{reflist}}
+
+
+[[Category:網路軟體|Category:網路軟體]]
+[[Category:中华人民共和国网络审查|Category:中华人民共和国网络审查]]
+[[Category:翻墙软件|Category:翻墙软件]]
+
+{{突破網路封鎖技術}}

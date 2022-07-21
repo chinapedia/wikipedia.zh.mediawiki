@@ -1,0 +1,46 @@
+'''最小描述長度原則'''是將[[奥卡姆剃刀|奧卡姆剃刀]]形式化後的一種結果。其想法是，在給予[[假說|假說]]的集合的情況下，能產生最多[[資料壓縮|資料壓縮]]效果的那個假說是最好的。它是在1978年由{{Tsl|en|Jorma Rissanen}}所引入的。在[[資訊理論|資訊理論]]和[[机器学习|計算機學習理論]]中，最小描述長度原則是個重要觀念。
+
+任一資料集都可以由一有限（譬如說，[[二進位|二進位]]制的）[[字母|字母]]集內[[符號|符號]]所成的字串來表示。"最小描述長度原則背後的基本想法是：在任一給定的資料集內的任何規律性都可用來[[資料壓縮|壓縮]]。亦即在描述資料時，與逐字逐句來描述資料的方式相比，能使用比所需還少的符號"（Grünwald, 1998。見底下的鏈結）。既然我們希望選取到的假說能抓到資料中最多的規律，於是我們則尋找壓縮效果最佳的假說。
+
+若要如此，我們首先要決定一個用來壓縮資料的程式[[代碼|代碼]]。最一般的方式是選一個（具有[[圖靈完備性|圖靈完全]]特性的）[[計算機|計算機]][[形式语言|程式語言]]。我們接著以這個語言撰寫一個會輸出某筆資料的[[電腦程式|電腦程式]]。於是這個程式則能代表此筆資料。而能輸出此資料而又最短的程式，其長度被稱為此項資料的[[柯氏复杂性|柯氏複雜性]]。這是{{Tsl|en|Ray Solomonoff}}的核心概念，一個將[[归纳推理|歸納推論]]理想化後的理論。
+
+然而，其想法在數學上並不提供一個實際的推論方法。最重要的理由如下：
+* 柯氏複雜度在[[計算理論|計算理論]]中是不可計算的：不存在一個電腦程式，能在給予任意序列的資料情況下，輸出最短而又可以產生此筆資料的程式。即使我們偶遇一個最短的程式，一般情況下也無法確知它是最短的。
+* 柯氏複雜度與使用什麼[[電腦語言|電腦語言]]來描述程式有關。使用什麼語言是可任意選擇的，但一些額外的常數項會影響複雜度。基於這個理由，柯氏複雜度理論中傾向不理會常數項。但實務上，通常只有資料中的很小一部分總量是可得的，如此，則常數通常可以對於推論結果有很大的影響：好的結果不能保證能適用於有限的資料。
+
+而最小描述長度原則則藉由以下方式來試圖補救上述問題：
+* 限制所能使用代碼的集合。使得對於所允許的代碼而言，尋找某筆資料最短的碼長變成可行（可計算）的。
+* 選擇一種代碼，使得不論手上有什麼樣的資料，此代碼在都是相當有效率的。這點是有些獨特的（exclusive），這方面則有許多研究在進行中。
+
+比起"程式"，在最小描述長度理論的領域中，比較常用的是侯選假說、模型或代碼。允許使用的代碼集合則被稱為模型類別。（有些作者則模型類別指為模型，這會令人混淆）於是代碼描述及借助於這代碼的資料描述的加總是最小的那個代碼會被選取。
+
+最小描述長度的一個重要特性是，它提供了一個避免[[過適|過適]]現象的保護裝置。這是因為它在假說複雜度和已知假說下的資料複雜度之間做了取捨。要理解為什麼這是對的，可以考慮以下的例子。假設你拋擲一個銅板一千次，且你觀察到了正反面的個數。我們考慮兩種模式類別：第一種是對每個結果，以0表正面及1表反面的方式來編碼。這代碼所代表的假說即為這銅板是公平。根據這個編碼方式所得的代碼長度總是1000位元。對於一個有偏向的銅板，第二個模型類別則是，所有有效率的代碼。其代表的假說即為這個銅板是不公正的。譬如，我們觀察到510個正面和490個反面。於是，根據第二個模型中最佳碼的所求得的碼長，應少於一千位元。因為這理由，一個天真的統計方法可能提出第二個假說應是對資料較好的解釋。然而，在一個最小描述長度策略中，我們必須基於假說建造一個 ''單一''碼，我們不能只是用最好的那一個。一個簡單的方式是，使用兩部分的代碼。我們先指定模型中哪一個假說擁有最佳的表現。然後指定使用這個代碼的資料。我們須要不少位元去指定哪一個代碼要使用。所以基於第二個模型的總碼長將大於一千位元。所以，如果你服從最小描述長度策略，其結論將是，即使第二個模型類別的最佳資料可以更適應資料，仍然沒有足夠的證據可以支持銅板是偏向的假說。
+
+最小描述長度核心是代碼長度[[函數|函數]]和[[機率分佈|機率分佈]]之間的[[双射|一對一且映成]]（牽涉到的引理為[[克拉夫特不等式|克拉夫特不等式]]）。
+對於任意機率分佈<math>P</math>，去建造一代碼<math>C</math>，其長度為<math>C(x)</math>等於<math>-log_2 P(x)</math>是可行的；這代碼最小化預期的碼長。反過來說，給予一個編碼<math>C</math>，則可以建造一個機率分佈<math>P</math>，保持同樣的結果。（在這裡忽略rounding issues）。換句話說，搜尋一有效代碼被化簡化搜尋一個好的機率分佈，反過來說亦如是。
+
+== 相關概念 ==
+
+透過上述的程式碼與機率分佈之間的相似點，最小描述長度原理和[[機率論|機率論]]及[[統計學|統計學]]是有很密切的關連。這使得有些研究員將最小描述長度看成等同於[[贝叶斯推断|Bayesian inference]]。模型的代碼長度和模型及資的料代碼長度則分別相當於Baysian架構中的[[先验概率|prior probability]]和{{Tsl|en|marginal likelihood}}。這觀點可用David MacKay的''Information Theory, Inference, and Learning Algorithms''中的例子來說明。（見下面鏈結）然而，當用Bayesian機器建造有效率 最小描述長度 程式碼有用時，最小描述長度 架構也包含其它非Bayesian的程式碼。一個例子是Shtarkov的'normalized maximum likelihood code'，在目前 最小描述長度 理論中扮演一個核心角色。但不等於Bayesian推論。更進一步，Rissanen強調，對於''真實''資料產生過程，我們應該''不做假設''：實務上，一個model class在傳統上是真實的減化，所以不包含任何客觀角度都為真的程式碼或機率分佈，根據 最小描述長度 哲學，如果Bayesian方法是基於對某於可能的資料產生過會導致不好結果的不安全的priors，我們應該除去。從 最小描述長度 的觀點來看，可接受的priors，通常傾向所謂的[[objvective_Bayesian|objvective Bayesian]]分析；然而，其動機通常是不同的。
+
+最小描述長度並非第一個[[資訊理論|資訊理論]]來學習的策略。早在1968年，Wallace和Boulton即提倡一類似概念，稱作[[最小訊息長度|最小訊息長度]]。最小描述長度和最小訊息長度的不同一直是讓學界及百科編撰者困惑的來源。表面上來說，這些方法大致看似相同，但有一些主要不同，特別是在解釋方法上：
+* 最小訊息長度是一個完全面向Bayesian策略：它從這個想法開始：一假說代表其在關於資料產生過程，以prior分佈表示的可信度。最小描述長度公開地避免任何關於資料產生過程的假設（但請面上面關於選擇一個"合理"代碼的困難）。
+* 兩種方法都使用了兩部分代碼：第一部分總是代表一人試圖去學習的資訊，如模型類別的索引（{{tsl|en|model selection}}）或參數值（[[估計理論|估計理論]]）第二部分則是一種資料的編碼，在給予第一部分資訊的情況下。其不同是在於，在 最小描述長度 中，其建議，我們不想學到的參數應被移到第二部分的碼，其中他們可以使用[[one-part_code|one-part code]]來和資料在一起。這通常比two-part code更有效率。在 最小訊息長度 原始描述，所有的參數是在第一部分被編碼，所以會學到所有參數。
+
+== 外部連結 ==
+
+* [https://web.archive.org/web/20100218134039/http://www.mdl-research.org/ Minimum Description Length on the Web]，by the University of Helsinki. Features readings, demonstrations, events and links to MDL researchers.
+
+* [https://web.archive.org/web/20101117044711/http://www.mdl-research.org/jorma.rissanen/ Homepage of Jorma Rissanen]，containing lecture notes and other recent material on MDL.
+
+* [http://www.cwi.nl/~pdg/ Homepage of Peter Grünwald] {{Wayback|url=http://www.cwi.nl/~pdg/ |date=20030221125310 }}，containing his very good tutorial on MDL.
+
+* P. Grunwald, M. A. Pitt and I. J. Myung (eds.), [http://mitpress.mit.edu/catalog/item/default.asp?sid=4C100C6F-2255-40FF-A2ED-02FC49FEBE7C&ttype=2&tid=10478 Advances in Minimum Description Length: Theory and Applications] {{Wayback|url=http://mitpress.mit.edu/catalog/item/default.asp?sid=4C100C6F-2255-40FF-A2ED-02FC49FEBE7C&ttype=2&tid=10478 |date=20060619060230 }}，M.I.T. Press (MIT Press), April 2005, [http://mitpress.mit.edu/catalog/item/default.asp?sid=4C100C6F-2255-40FF-A2ED-02FC49FEBE7C&ttype=2&tid=1047 ISBN][http://mitpress.mit.edu/catalog/item/default.asp?sid=4C100C6F-2255-40FF-A2ED-02FC49FEBE7C&ttype=2&tid=10478 0-262-07262-9] {{Wayback|url=http://mitpress.mit.edu/catalog/item/default.asp?sid=4C100C6F-2255-40FF-A2ED-02FC49FEBE7C&ttype=2&tid=10478 |date=20060619060230 }}。
+
+* [http://www.inference.phy.cam.ac.uk/mackay/itila/ On-line textbook: Information Theory, Inference, and Learning Algorithms] {{Wayback|url=http://www.inference.phy.cam.ac.uk/mackay/itila/ |date=20150206001819 }}，by [[David_MacKay_(scientist)|David MacKay]]，has many chapters on Bayesian methods, including examples illustrating the intimate connections between Bayesian inference and [[data_compression|data compression]]。
+
+* [http://volker.nannen.com/pdf/short_introduction_to_model_selection.pdf A short introduction] {{Wayback|url=http://volker.nannen.com/pdf/short_introduction_to_model_selection.pdf |date=20100602044851 }} to Model Selection, Kolmogorov Complexity and Minimum Description Length.
+
+* I. O. Kyrgyzov, O. O. Kyrgyzov, H. Maître and M. Campedel. [https://web.archive.org/web/20080625052201/http://www.tsi.enst.fr/~kyrgyzov/publications.html Kernel MDL to Determine the Number of Clusters]，[http://www.springerlink.com/content/j646uqx4p435j530/ MLDM, pp. 203-217, 2007]{{Dead link|date=2020年2月 |bot=InternetArchiveBot |fix-attempted=yes }}。
+
+[[Category:演算法資訊理論|Category:演算法資訊理論]]

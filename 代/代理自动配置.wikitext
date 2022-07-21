@@ -1,0 +1,90 @@
+{{NoteTA|G1=IT}}
+'''代理自动配置'''（{{lang-en|Proxy auto-config}}，简称PAC）是一种网页浏览器技术，用于定义浏览器该如何自动选择适当的代理服务器来访问一个网址。
+
+一个PAC文件包含一个[[JavaScript|JavaScript]]的函数“FindProxyForURL(url, host)”，这个函数返回一个包含一个或多个访问规则的字符串。用户代理根据这些规则使用一个特定的代理器或者直接访问，这些规则也有优先级。当使用高优先级的规则无法访问的时候，低优先级的访问规则（如果存在）就提供了备用的访问方式。浏览器在访问网页以前，会首先访问这个PAC文件。PAC文件中的URL可能是手工配置的，也可能是是通过网页的[[网络代理自动发现协议|网络代理自动发现协议]]自动配置的。
+
+== 相关技术 ==
+现代浏览器实现了多种级别的代理设置，用户可以选择最适合他们需要的级别。下面是三种常用的设置：
+* 手动代理配置/全局模式：为所有的URLs规定一个主机名和端口作为代理。大多数浏览器允许用户规定一个域名的列表（例如localhost），访问这个列表里面的域名的时候不通过代理服务器。
+* 代理自动配置（PAC）：规定一个指向PAC文件的URL，这个文件中包括一个选择代理服务器的[[JavaScript|JavaScript]]程序。这个方法适合复杂设置，例如需要针对不同网址配置不同的代理服务器，或者指定某些网站使用或不使用代理服务器。
+* 网络代理自发现协议：浏览器通过DHCP和DNS来搜索PAC文件。
+
+
+== PAC文件 ==
+要使用PAC，应当在一个网页服务器上发布一个PAC文件，并且通过在浏览器的代理链接设置页面输入这个PAC文件的URL或者通过使用[[网络代理自动发现协议|网络代理自动发现协议]]告知用户代理去使用这个文件。
+ 
+一个PAC文件是一个至少定义了一个[[JavaScript|JavaScript]]函数的文本文件。这个函数“FindProxyForURL(url, host)“有2个参数：url是一个对象的URL，host是一个由这个URL所衍生的主机名。按照惯例，这个文件名字一般是proxy.pac. [[网络代理自动发现协议|网络代理自动发现协议]]标准使用wpad.dat。
+ 
+虽然现代的大多数客户端无论从[[HTTP|HTTP]]请求返回的[[MIME|MIME]]类型是什么都能正确处理，但为了完整性和最佳的兼容性，我们应该设置[[网页服务器|网页服务器]]将这个文件的[[MIME|MIME]]类型声明为application/x-ns-proxy-autoconfig或者application/x-javascript-config。（application/x-ns-proxy-autoconfig相对application/x-javascript-config被更多的客户端所支持，因为它是最初被定义在[[Netscape|Netscape]]规范里面的，而后者最近才开始被使用。）
+ 
+一个非常简单的PAC文件内容
+<syntaxhighlight lang="javascript">
+   function FindProxyForURL(url, host) { return "PROXY proxy.example.com:8080; DIRECT"; }
+</syntaxhighlight>
+这个函数告知浏览器通过服务器proxy.example.com的8080端口来获取所有的页面。如果这个服务器没有反应，那么浏览器应该不使用[[代理服务器|代理服务器]]直接访问[[WWW|WWW]].
+下面是一个更加复杂一些的例子，展示了在FindProxyForURL函数中如何使用[[JavaScript|JavaScript]]函数：
+<syntaxhighlight lang="javascript">
+   function FindProxyForURL(url, host) {
+      // our local URLs from the domains below example.com don't need a proxy:
+      if (shExpMatch(url,"*.example.com/*"))                  {return "DIRECT";}
+      if (shExpMatch(url, "*.example.com:*/*"))               {return "DIRECT";}
+      
+      // URLs within this network are accessed through 
+      // port 8080 on fastproxy.example.com:
+      if (isInNet(host, "10.0.0.0",  "255.255.248.0"))    {
+         return "PROXY fastproxy.example.com:8080";
+      }
+      
+      // All other requests go through port 8080 of proxy.example.com.
+      // should that fail to respond, go directly to the WWW:
+      return "PROXY proxy.example.com:8080; DIRECT";
+   }
+</syntaxhighlight>
+ 
+=== 局限 ===
+==== PAC文件编码 ====
+有些浏览器，例如Internet Explorer只支持系统缺省编码的PAC文件，不支持[[Unicode|Unicode]]编码的PAC文件，例如[[UTF-8|UTF-8]]编码的PAC文件。 
+
+==== DnsResolve ====
+函数dnsResolv（及其他类似函数）在执行[[DNS|DNS]]查询时，如果[[DNS|DNS]]服务器没有回应，会导致你的浏览器被阻塞很长时间。
+[[Microsoft|Microsoft]]的IE5.5或更高版本浏览器提供的基于域名的代理自动配置缓存机制限制了PAC标准的灵活性。实际上，你是通过域名来选择[[代理服务器|代理服务器]]，而不是通过URL路径。当然，你可以通过修改[[注册表|注册表]]的方法来关闭代理自动配置的缓存，Royne Pollard描述了这个步骤（详见[[#深入阅读|深入阅读]]）。
+ 
+为了兼容[[Windows|Windows]]中其他使用Internet Explorer PAC设置的组件，例如[[.NET|.NET]] 2.0框架，推荐在isInNet函数中使用[[IP地址|IP地址]]而不是[[域名|域名]]。
+ 
+<syntaxhighlight lang="javascript">
+if (isInNet(host, dnsResolve(sampledomain) , "255.255.248.0") // .NET 2.0 will resolve proxy properly
+ 
+if (isInNet(host, sampledomain, "255.255.248.0") // .NET 2.0 will not resolve proxy properly
+</syntaxhighlight>
+ 
+当一个PAC规则不可用的时候，当前默认采用的方法是直接连接。
+ 
+其他的限制与本地的[[JavaScript|JavaScript]]有关。
+
+=== 其他功能 ===
+有些更高级的PAC文件可以使用负载平衡、故障转移甚至黑白名单等方法减少对于使用的[[代理服务器|代理服务器]]的负载。并且可以返回多个代理服务器，例如：
+ 
+<syntaxhighlight lang="javascript">
+      return "PROXY proxy1.example.com:8080; PROXY proxy2.example.com:8080";
+</syntaxhighlight>
+
+== 参考资料 ==
+
+{{cite web|url=https://jdebp.eu./FGA/web-browser-auto-proxy-configuration.html|title=Automatic proxy HTTP server configuration in web browsers|work=Frequently Given Answers|first=Jonathan|last=de Boyne Pollard|date=2004|accessdate=2016-08-12|archive-date=2012-04-23|archive-url=https://www.webcitation.org/678Mawshh?url=http://homepage.ntlworld.com./jonathan.deboynepollard/FGA/web-browser-auto-proxy-configuration.html|dead-url=no}}
+
+== 外部链接 ==
+* [https://web.archive.org/web/20060424005037/http://wp.netscape.com/eng/mozilla/2.0/relnotes/demo/proxy-live.html Navigator Proxy Auto-Config File Format] <small>（from the Release Notes for [[Netscape_Navigator|Netscape Navigator 2.0]]）</small>
+* [https://web.archive.org/web/20040810122331/http://developer.netscape.com/docs/manuals/proxy/adminux/autoconf.htm Using the Client Autoconfiguration File] <small>（Chapter 11 of ''Netscape Proxy Server Administrator's Guide'', version 3.5 for Unix）</small>
+* [https://web.archive.org/web/20081221125633/http://www.microsoft.com/technet/prodtechnol/ie/reskit/6/part6/c26ie6rk.mspx?mfr=true Description of proxy auto-configuration files from Microsoft]
+* [https://web.archive.org/web/20110207102422/http://returnproxy.com/ ReturnProxy.com - The Practical Proxy PAC File Guide and Forums]
+* [http://www.findproxyforurl.com PAC File & WPAD Examples]{{Wayback|url=http://www.findproxyforurl.com/ |date=20201210040800 }}
+* [http://code.google.com/p/pacparser pacparser]{{Wayback|url=http://code.google.com/p/pacparser |date=20150317070448 }} C and Python library to parse PAC files.
+* [http://code.google.com/p/pactester Pactester]{{Wayback|url=http://code.google.com/p/pactester |date=20150404092835 }} A tool to test PAC files.
+* [http://www.returnproxy.com/proxypac/index.php?option=com_wrapper&view=wrapper&Itemid=101 A web front-end for the Google PAC Tester]{{Wayback|url=http://www.returnproxy.com/proxypac/index.php?option=com_wrapper&view=wrapper&Itemid=101 |date=20100901062917 }}
+* [https://web.archive.org/web/20090828110324/http://luno.org/project/proxyvalidator proxyvalidator] Test all destination proxies within a PAC file.
+* [http://www.securemecca.com/pac.html PAC-file to filter bad hosts and pornography]{{Wayback|url=http://www.securemecca.com/pac.html |date=20100206023339 }}
+* [https://web.archive.org/web/20150701185956/https://calomel.org/proxy_auto_config.html Proxy Auto Config "how to". Fully working examples including anti-ad and anti-adult filter rules. ]
+{{网页浏览器}}
+{{突破网络封锁技术}}
+[[Category:網頁瀏覽器|Category:網頁瀏覽器]]
+[[Category:代理伺服器|Category:代理伺服器]]

@@ -1,0 +1,126 @@
+<includeonly><!-- 在這裡加入模板的保護標識 --></includeonly><noinclude>{{template doc page viewed directly}}</noinclude>
+<!-- 在本行下編輯模板說明 -->
+{{lua|Module:Portal}}
+
+== 用法 ==
+===基本===
+<div style="overflow:auto">
+ &#123;&#123;{{#ifeq: {{{type|}}} | module | &#35;invoke:Portal&#124;portal | Portal }} |''Portal 1'' |''Portal 2'' |''Portal 3'' |... &#125;&#125;
+</div>
+
+===所有参数===
+<div style="overflow:auto">
+ &#123;&#123;{{#ifeq: {{{type|}}} | module | &#35;invoke:Portal&#124;portal | Portal }}
+  | ''Portal 1''
+  | ''Portal 2''
+  | ''Portal 3''
+  | ... 
+  | left = &lt;!-- yes -->
+  | margin = &lt;!-- CSS margin -->
+  | break = &lt;!-- yes -->
+  | boxsize = &lt;!-- custom box width in pixels -->
+  | image1 = &lt;!-- image override for Portal 1 -->
+ &#125;&#125;
+</div>
+
+===兼容模式===
+中文维基百科旧portal模板的参数格式与Lua版本的多参数模式不尽相同。为保证兼容性，Lua模板中也增加了对这两种形式的支持。
+==== name image ====
+如果没有指定位置参数，则尝试将：
+<pre>{{Portal|name=Portal 1|image=Image 1.png &lt;!-- 可选 -->}}</pre>
+解读为：
+<pre>{{Portal|1=Portal 1|image1=Image 1.png &lt;!-- 可选 -->}}</pre>
+这一步骤并不会让模板运算变得十分复杂，因此基本无需修正到新格式。
+
+==== 2号位作图像 ====
+如果参数数量为2，且第二项按照文件名理解时扩展名长度为3或4，则尝试将：
+<pre>{{Portal|Portal 1|Image 1.xyz}}</pre>
+解读为：
+<pre>{{Portal|1=Portal 1|image1=Image 1.xyz}}</pre>
+为减少误报，模块会在扩展名不是常用图片格式（png、jpg、svg）时检查文件是否存在。检查步骤为“昂贵操作”，对服务器负担较重，因此请检查文档底部的追踪分类进行清理。
+
+== 位置 ==
+在条目里面，本模板通常放置在条目底端的“参见”章节。
+
+== 举例 ==
+{| style="background:transparent;"
+|-
+! Code !! Result
+|-
+|
+ <span style="font-size: 90%;">&#123;&#123;{{#ifeq: {{{type|}}} | module | &#35;invoke:Portal&#124;portal | Portal }}|科学&#125;&#125;</span>
+| {{Portal|科学}}
+|-
+|
+ <span style="font-size: 90%;">&#123;&#123;{{#ifeq: {{{type|}}} | module | &#35;invoke:Portal&#124;portal | Portal }}|1=科学|2=弹维基|image2=New-Bouncywikilogo.gif|3=默认图片&#125;&#125;</span>
+| {{Portal|1=科学|2=弹维基|image2=New-Bouncywikilogo.gif|3=默认图片}}
+|}
+
+==TemplateData==
+{{Collapse top|TemplateData}}
+{{TemplateData header}}
+<TemplateData>
+{
+        "description": "A template to create a list of portals",
+        "params": {
+                "1": {
+                        "label": "Portal (1)",
+                        "description": "Inserts the portal image and text. Further portals can be added to the template by increasing the number",
+                        "type": "string",
+                        "required": true
+                },
+                "2": {
+                        "label": "Portal (2)",
+                        "description": "Insert the portal image and text",
+                        "type": "string"
+                },
+                "3": {
+                        "label": "Portal (3)",
+                        "inherits": "2"
+                },
+                "left": {
+                        "label": "Side",
+                        "description": "If set to yes, the portal appears on the left side of the page instead of the right.",
+                        "type": "string",
+                        "default": "no"
+                },
+                "margin": {
+                        "label": "Margin size",
+                        "description": "Alters the margin size. Any valid CSS margin is accepted",
+                        "type": "number"
+                },
+                "break": {
+                        "label": "Line break",
+                        "description": "If set to yes, a line break is inserted after the portal name and before the word portal",
+                        "type": "string"
+                },
+                "boxsize": {
+                        "label": "Box size",
+                        "description": "This sets a custom box width in pixels.",
+                        "type": "number"
+                }
+        }
+}
+</TemplateData>
+{{Collapse bottom}}
+
+== 图片 ==
+自动配图模块（取代[[Template:Portal/Images]]，请检查图像数据是否迁移完毕）：
+
+*[[Module:Portal/images/letter]]，以字母开头
+*[[Module:Portal/images/chinese]]，以汉字开头
+*[[Module:Portal/images/other]]，以其他字符开头
+*[[Module:Portal/images/aliases]]，文字別名，可用于地区词及英文转换
+
+== 参见 ==
+* {{tl|Portals}}，该模板提供现有主题的一个列表。
+* {{tl|Portal bar}}，该模板可一次性添加数个主题链接，并横向显示。
+* {{tl|Portal-inline}}，该模板可添加一个不带边框的主题链接。
+* 排错分类：
+** {{clc|使用2號參數傳遞Portal模板圖像的頁面}}
+** {{clc|Portal模版没有使用参数}}
+<includeonly>
+<!-- 本行下加入模板的分類 -->
+[[Category:主題模板| ]]
+[[Category:鏈接模板]]
+</includeonly>

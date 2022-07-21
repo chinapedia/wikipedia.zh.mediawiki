@@ -1,0 +1,316 @@
+{{Lua|Module:TreeChart}}
+<noinclude>{{documentation subpage}}</noinclude>
+<!-- 在本行下編輯模板說明 -->
+{{Ambox
+| image = [[File:Edit-copy purple-wikit.svg|40px]]
+| type  = move
+| text  = 本模板基本兼容{{tl|familytree}}的參數值，但有一部分模板參數須要調整以避免衍生出不必要的模板。
+}}
+
+此模板建基於{{tl|Familytree}}，使用类似[[ASCII艺术]]的句法生成[[系谱图]]。它用[[HTML]]表格和[[CSS]]在适当的位置生成文字框和线条以构成家庭树，使用者在文本框内可以任意运用维基语法。
+
+== 用法 ==
+首先在紙上把家族圖畫好，如下圖：
+{{chart/start}}
+{{chart | | | | GRM |~|y|~| GRP | | GRM=奶奶|GRP=爷爷}}
+{{chart | | | | | | | |)|-|-|-|.| }}
+{{chart | | | MOM |y| DAD | |UNCLE| MOM=妈妈|DAD=爸爸|UNCLE=<s>長腿叔叔</s>}}
+{{chart | |,|-|-|-|+|-|-|-|.| | | }}
+{{chart | JOE | | ME  | | SIS | | | JOE=哥哥|ME='''我'''|SIS=妹妹}}
+{{chart/end}}
+
+選擇資料格最貼近左邊的一行，這裡選擇了「哥哥、我、妹妹」一行，按照排位寫以下代码：
+<pre><nowiki>{{chart | JOE | | ME  | | SIS | | | JOE=哥哥|ME='''我'''|SIS=妹妹}}</nowiki></pre>
+留意名字兩旁要留空格，豎線代表框線，框線間也應留空格，再定義名字。接着便可根據符號代表的線條直接加入代碼：
+<pre><nowiki>
+{{chart | |,|-|-|-|+|-|-|-|.| | | }}
+{{chart | JOE | | ME  | | SIS | | | JOE=哥哥|ME='''我'''|SIS=妹妹}}</nowiki></pre>
+如此類推，便生成以下代碼：
+<pre><nowiki>
+{{chart/start}}
+{{chart | | | | GRM |~|y|~| GRP | | GRM=奶奶|GRP=爷爷}}
+{{chart | | | | | | | |)|-|-|-|.| }}
+{{chart | | | MOM |y| DAD | |UNCLE| MOM=妈妈|DAD=爸爸|UNCLE=<s>長腿叔叔</s>}}
+{{chart | |,|-|-|-|+|-|-|-|.| | | }}
+{{chart | JOE | | ME  | | SIS | | | JOE=哥哥|ME='''我'''|SIS=妹妹}}
+{{chart/end}}
+</nowiki></pre>
+
+== 参数 ==
+模版接受至多100个未命名参数，每个参数代表一个“格子”或者一个“框”。
+
+*'''格子'''内含有线状元素，用来生成横纵线条以及各种拐角以连接各个“框”。每一个格子用简单的字符参数来描述，一个特别的例子是'''空格子'''，用一个空格来描述不含任何线条的格子。下面列出模版支持的格子类型：
+
+{| style="float: left; margin-left: 1em;"
+|+ 實體線
+|-
+| {{big|<code>!</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|!}}{{chart/end}} || &nbsp;
+| {{big|<code>,</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|,}}{{chart/end}} || &nbsp;
+| {{big|<code>v</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|v}}{{chart/end}} || &nbsp;
+| {{big|<code>.</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|.}}{{chart/end}} || &nbsp;
+|-
+| {{big|<code>-</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|-}}{{chart/end}} || &nbsp;
+| {{big|<code>)</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|)}}{{chart/end}} || &nbsp;
+| {{big|<code>+</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|+}}{{chart/end}} || &nbsp;
+| {{big|<code>(</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|(}}{{chart/end}} || &nbsp;
+|-
+| || ||
+| {{big|<code>`</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|`}}{{chart/end}} || &nbsp;
+| {{big|<code>^</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|^}}{{chart/end}} || &nbsp;
+| {{big|<code>'</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|'}}{{chart/end}} || &nbsp;
+|}
+{| style="float: left; margin-left: 1em;"
+|+ '''虛線'''
+|-
+| {{big|<code>:</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|:}}{{chart/end}} || &nbsp;
+| {{big|<code>F</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|F}}{{chart/end}} || &nbsp;
+| {{big|<code>V</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|V}}{{chart/end}} || &nbsp;
+| {{big|<code>7</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|7}}{{chart/end}} || &nbsp;
+|-
+| {{big|<code>~</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|~}}{{chart/end}} || &nbsp;
+| {{big|<code>D</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|D}}{{chart/end}} || &nbsp;
+| {{big|<code>%</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|%}}{{chart/end}} || &nbsp;
+| {{big|<code>C</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|C}}{{chart/end}} || &nbsp;
+|-
+| || ||
+| {{big|<code>L</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|L}}{{chart/end}} || &nbsp;
+| {{big|<code>A</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|A}}{{chart/end}} || &nbsp;
+| {{big|<code>J</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|J}}{{chart/end}} || &nbsp;
+|}
+{| style="float: left; margin-left: 1em;"
+|+ '''點線'''
+|-
+| {{big|<code>Q</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|Q}}{{chart/end}} || &nbsp;
+| {{big|<code>S</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|S}}{{chart/end}} || &nbsp;
+| {{big|<code>M</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|M}}{{chart/end}} || &nbsp;
+| {{big|<code>T</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|T}}{{chart/end}} || &nbsp;
+|-
+| {{big|<code>P</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|P}}{{chart/end}} || &nbsp;
+| {{big|<code>H</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|H}}{{chart/end}} || &nbsp;
+| {{big|<code>R</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|R}}{{chart/end}} || &nbsp;
+| {{big|<code>G</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|G}}{{chart/end}} || &nbsp;
+|-
+| || ||
+| {{big|<code>Y</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|Y}}{{chart/end}} || &nbsp;
+| {{big|<code>W</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|W}}{{chart/end}} || &nbsp;
+| {{big|<code>Z</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|Z}}{{chart/end}} || &nbsp;
+|}
+
+{| style="float: left; margin-left: 1em;"
+|+ '''混合型'''
+| {{big|<code>fy</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|fy}}{{chart/end}}
+| {{big|<code>y</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|y}}{{chart/end}}
+| {{big|<code>ye</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|ye}}{{chart/end}}
+|-
+| {{big|<code>f</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|f}}{{chart/end}}
+| {{big|<code>t</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|t}}{{chart/end}}
+| {{big|<code>e</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|e}}{{chart/end}} 
+|-
+| {{big|<code>fh</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|fh}}{{chart/end}}
+| {{big|<code>h</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|h}}{{chart/end}}
+| {{big|<code>he</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|he}}{{chart/end}}
+|}
+
+{| style="float: left; margin-left: 1em;"
+|+ '''Solid hrzntl dashes vrtcl:'''
+| {{big|<code>dj</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|dj}}{{chart/end}}
+| {{big|<code>j</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|j}}{{chart/end}}
+| {{big|<code>jc</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|jc}}{{chart/end}}
+|-
+| {{big|<code>d</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|d}}{{chart/end}}
+| {{big|<code>*</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|*}}{{chart/end}}
+| {{big|<code>c</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|c}}{{chart/end}}
+|-
+| {{big|<code>di</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|di}}{{chart/end}}
+| {{big|<code>i</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|i}}{{chart/end}}
+| {{big|<code>ic</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|ic}}{{chart/end}}
+|}
+
+{| style="float: left; margin-left: 1em;"
+|+'''Solid hrzntl dot vrtcl:'''
+| {{big|<code>kr</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|kr}}{{chart/end}} 
+| {{big|<code>r</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|r}}{{chart/end}} 
+| {{big|<code>rl</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|rl}}{{chart/end}} 
+|-
+| {{big|<code>k</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|k}}{{chart/end}}
+| {{big|<code>a</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|a}}{{chart/end}}
+| {{big|<code>l</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|l}}{{chart/end}}
+|-
+| {{big|<code>kq</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|kq}}{{chart/end}}
+| {{big|<code>q</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|q}}{{chart/end}}
+| {{big|<code>ql</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|ql}}{{chart/end}}
+|}
+{| style="float: left; margin-left: 1em;"
+|+ '''Dashed hrzntl dot vrtcl:'''
+| {{big|<code>kr2</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|kr2}}{{chart/end}}
+| {{big|<code>r2</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|r2}}{{chart/end}} 
+| {{big|<code>rl2</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|rl2}}{{chart/end}}
+|-
+| {{big|<code>k2</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|k2}}{{chart/end}} 
+| {{big|<code>a2</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|a2}}{{chart/end}}
+| {{big|<code>l2</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|l2}}{{chart/end}}
+|-
+|{{big|<code>kq2</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|kq2}}{{chart/end}}
+| {{big|<code>q2</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|q2}}{{chart/end}}
+| {{big|<code>ql2</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|ql2}}{{chart/end}}
+|}
+
+{| style="float: left; margin-left: 1em;"
+|+ '''Dots hrzntl solid vrtcl:'''
+| {{big|<code>om</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|om}}{{chart/end}}
+| {{big|<code>m</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|m}}{{chart/end}}
+| {{big|<code>mp</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|mp}}{{chart/end}}
+|-
+| {{big|<code>o</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|o}}{{chart/end}}
+| {{big|<code>b</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|b}}{{chart/end}}
+| {{big|<code>p</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|p}}{{chart/end}}
+|-
+| {{big|<code>on</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|on}}{{chart/end}}
+| {{big|<code>n</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|n}}{{chart/end}}
+| {{big|<code>np</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|np}}{{chart/end}} 
+|}
+
+{| style="float: left; margin-left: 1em;"
+|+ '''Dots hrzntl dashes vrtcl:'''
+| {{big|<code>om2</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|om2}}{{chart/end}}
+| {{big|<code>m2</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|m2}}{{chart/end}}
+| {{big|<code>mp2</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|mp2}}{{chart/end}}
+|-
+| {{big|<code>o2</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|o2}}{{chart/end}}
+| {{big|<code>b2</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|b2}}{{chart/end}}
+| {{big|<code>p2</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|p2}}{{chart/end}}
+|-
+| {{big|<code>on2</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|on2}}{{chart/end}}
+| {{big|<code>n2</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|n2}}{{chart/end}}
+| {{big|<code>np2</code>}} || style="border: 1px solid gray;" | {{chart/start}}{{chart|np2}}{{chart/end}} 
+|}
+
+{{clear}}
+{|
+|+ '''雜項'''<!-- This subset is an insufficient set or questionable, but maps onto tiles that exist in {{familytree}}: -->
+|-
+| ||
+| {{big|<code>T2</code>}} ||style="border:1px solid gray"| {{chart/start}}{{chart|T2}}{{chart/end}}
+|-
+| {{big|<code>G2</code>}} ||style="border:1px solid gray"| {{chart/start}}{{chart|G2}}{{chart/end}}
+| {{big|<code>X</code>}} ||style="border:1px solid gray"| {{chart/start}}{{chart|X}}{{chart/end}}
+| {{big|<code>K</code>}} ||style="border:1px solid gray"| {{chart/start}}{{chart|K}}{{chart/end}}
+| {{big|<code>l4</code>}} ||style="border:1px solid gray"| {{chart/start}}{{chart|l4}}{{chart/end}}
+|-
+| ||
+| {{big|<code>U</code>}} ||style="border:1px solid gray"| {{chart/start}}{{chart|U}}{{chart/end}}
+|}
+<br clear="left" />
+
+*'''框'''内可以填写任意的维基标记，框内的内容用附加命名变量的方法来加以描述。每一个框为'''三个格子'''宽，并且通常具有2px宽的黑边。附加的变量可以取用任何合法的名字，但是建议不要使用单字符的名字以免与“格子”冲突。
+
+===框的外型設定===
+框的外形可以由参数'''border'''和'''boxstyle'''控制，前一个以[[像素]]为单位控制框边的宽度，后者可以为任意[[CSS]]语句，用来修饰框的外观。{{tl|chart/start}}模版接受一个可选的'''style'''参数来制定整个表格的格式。例如下列代码：
+
+<pre><nowiki>
+{{chart/start}}
+{{chart|border=0|boxstyle=background:#dfd;| | FOO |y| BAR | |FOO=Box 1|BAR=Box 2}}
+{{chart|border=0|boxstyle=background:#dfd;| | |,|-|^|-|.| | }}
+{{chart|border=0|boxstyle=background:#dfd;| | FOO | | BAR | |FOO=Box 3|BAR=Box 4}}
+{{chart/end}}
+</nowiki></pre>
+
+产生如下效果：
+
+{{chart/start}}
+{{chart|border=0|boxstyle=background:#dfd;| | FOO |y| BAR | |FOO=Box 1|BAR=Box 2}}
+{{chart|border=0|boxstyle=background:#dfd;| | |,|-|^|-|.| | }}
+{{chart|border=0|boxstyle=background:#dfd;| | FOO | | BAR | |FOO=Box 3|BAR=Box 4}}
+{{chart/end}}
+
+此外，也接受每個框有各自的外觀設定。例如下列代码：
+
+<pre><nowiki>
+{{chart/start}}
+{{chart| | | | |CLEAR| | | | |CLEAR=Clear box}}
+{{chart| |,|-|-|'|!|`|-|-|.| }}
+{{chart|RED  |~| GREEN |~|BLUE |RED=Red box|GREEN=Green box|BLUE=Blue box
+|boxstyle_RED  =background-color: #faa;
+|boxstyle_ GREEN =background-color: #afa;
+|boxstyle_BLUE =background-color: #aaf;
+}}
+{{chart/end}}
+</nowiki></pre>
+
+产生如下效果：
+
+{{chart/start}}
+{{chart| | | | |CLEAR| | | | |CLEAR=Clear box}}
+{{chart| |,|-|-|'|!|`|-|-|.| }}
+{{chart|RED  |~| GREEN |~|BLUE |RED=Red box|GREEN=Green box|BLUE=Blue box
+|boxstyle_RED  =background-color: #faa;
+|boxstyle_ GREEN =background-color: #afa;
+|boxstyle_BLUE =background-color: #aaf;
+}}
+{{chart/end}}
+*注意本例中的RED、GREEN和BLUE所有相關參數，如果原始定義框位的名字前後存在空格，那麼在定義其CSS風格時就必須在「boxstyle_」後補充原有的空格數，所以一般來說並不建議在定義框名字時留有任何不必要的空格。
+
+=== 移植自Familytree須知 ===
+本模板基本對應{{tl|Familytree}}的大部分參數，但有一些小改動編者必須先讀，首先是在Familytree中你可以以「<code><nowiki>|}}</nowiki></code>」完結一行模板，但在Chart中請移除那個不必要的直桿「<code><nowiki>|</nowiki></code>」，另外有5個樹枝的參數定義改名及新增兩個混合型丁字樹枝：
+{|  class="wikitable" style="text-align:center; float: left; margin-left: 1em;"
+|+
+!標題!!{{tl|family tree}}!!{{tl|chart}}||備註
+|-
+|{{chart/start}}{{chart|c}}{{chart/end}}||<code>{</code>||<code>c</code>||Change
+|-
+|{{chart/start}}{{chart|d}}{{chart/end}}||<code>}</code>||<code>d</code>||Change
+|-
+|{{chart/start}}{{chart|t}}{{chart/end}}||<code>#</code>||<code>t</code>||Change
+|-
+|{{chart/start}}{{chart|e}}{{chart/end}}||<code>[</code>||<code>e</code>||Change
+|-
+|{{chart/start}}{{chart|f}}{{chart/end}}||<code>]</code>||<code>f</code>||Change
+|-
+|{{chart/start}}{{chart|di}}{{chart/end}}||<code>b</code>||<code>di</code>||Change
+|-
+|{{chart/start}}{{chart|fh}}{{chart/end}}||<code>c</code>||<code>fh</code>||Change
+|-
+|{{chart/start}}{{chart|ic}}{{chart/end}}||<code>d</code>||<code>ic</code>||Change
+|-
+|{{chart/start}}{{chart|he}}{{chart/end}}||<code>j</code>||<code>he</code>||Change
+|-
+|{{chart/start}}{{chart|ye}}{{chart/end}}||<code>n</code>||<code>ye</code>||Change
+|-
+|{{chart/start}}{{chart|om2}}{{chart/end}}||<code>p</code>||<code>om2</code>||Change
+|-
+|{{chart/start}}{{chart|mp2}}{{chart/end}}||<code>q</code>||<code>mp2</code>||Change
+|-
+|{{chart/start}}{{chart|kr2}}{{chart/end}}||<code>r</code>||<code>kr2</code>||Change
+|}
+
+{| class="wikitable" style="text-align:center; float: left; margin-left: 1em;"
+|+Miscellaneous tiles
+!Tile!!{{tl|family tree}}!!{{tl|chart}}||備註
+|-
+|{{chart/start}}{{chart|G2}}{{chart/end}}||<code>G</code>||<code>G2</code>||Change
+|-
+||{{chart/start}}{{chart|K}}{{chart/end}}||<code>K</code>||<code>K</code>||Same
+|-
+|{{chart/start}}{{chart|T2}}{{chart/end}}||<code>T</code>||<code>T2</code>||Change
+|-
+||{{chart/start}}{{chart|U}}{{chart/end}}||<code>U</code>||<code>U</code>||Same
+|-
+||{{chart/start}}{{chart|X}}{{chart/end}}||<code>X</code>||<code>X</code>||Same
+|-
+|{{chart/start}}{{chart|l4}}{{chart/end}}||<code>k</code>||<code>l4</code>||Change
+|}
+{{clear}}
+
+== 另見 ==
+* [[:en:Template:Nerva–Antonine family tree]], a large example.
+* [[Template:Tree list]]
+* [[Template:Ahnentafel]]
+
+== 參見 ==
+*[[:en:User:GregU/familytree.js]]：用來生成Chart系譜的Java工具。
+
+<includeonly>
+<!-- 本行下加入模板的分類 -->
+[[Category:系譜模板|{{PAGENAME}}]]
+[[Category:圖表模板]]
+</includeonly>

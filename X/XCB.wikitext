@@ -1,0 +1,106 @@
+{{noteTA|G1=IT|G2=FL}}
+{{Infobox_Software
+| name = XCB
+| logo = Xcb logo.svg
+| logo size = 200px
+| developer = Jamey Sharp、Josh Triplett、Bart Massey
+| latest_release_version = 1.14
+| latest_release_date = {{release date and age|2020|02|22}} <ref>{{cite mailing list |url=https://lists.x.org/archives/xorg-announce/2020-February/003039.html |title=[ANNOUNCE] libxcb 1.14 |date=2020-02-22 |accessdate=2020-02-22 |mailinglist=xcb |archive-date=2021-02-26 |archive-url=https://web.archive.org/web/20210226161646/https://lists.x.org/archives/xorg-announce/2020-February/003039.html }}</ref>
+| operating_system = [[POSIX|POSIX]]
+| license = [[MIT許可證|MIT許可證]]
+| genre = [[X_Window核心協議|X Window核心協議]]開發函式庫
+| website = [http://xcb.freedesktop.org xcb.freedesktop.org]
+}}
+'''XCB'''（X C Binding）是一套以 [[C語言|C語言]]撰寫，並用於綁定（Binding） [[X_Window_System|X Window System]]之上。XCB是一套免費的軟體，目標在於取代 [[Xlib|Xlib]]。這個計劃開始於2001年，作者是Bart Massey.
+
+== 理念 ==
+XCB 主要目標是:
+
+* 減輕函式庫的大小與複雜度;
+* 可直接存取 [[X_Window核心協議|X Window核心協議]]。
+
+== 範例 ==
+<syntaxhighlight lang="c">
+/* Simple XCB application drawing a box in a window */
+ 
+#include <xcb/xcb.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+  xcb_connection_t    *c;
+  xcb_screen_t        *s;
+  xcb_window_t         w;
+  xcb_gcontext_t       g;
+  xcb_generic_event_t *e;
+  uint32_t             mask;
+  uint32_t             values[2];
+  int                  done = 0;
+  xcb_rectangle_t      r = { 20, 20, 60, 60 };
+ 
+                        /* open connection with the server */
+  c = xcb_connect(NULL,NULL);
+  if (xcb_connection_has_error(c)) {
+    printf("Cannot open display\n");
+    exit(1);
+  }
+                        /* get the first screen */
+  s = xcb_setup_roots_iterator( xcb_get_setup(c) ).data;
+
+                       /* create black graphics context */
+  g = xcb_generate_id(c);
+  w = s->root;
+  mask = XCB_GC_FOREGROUND | XCB_GC_GRAPHICS_EXPOSURES;
+  values[0] = s->black_pixel;
+  values[1] = 0;
+  xcb_create_gc(c, g, w, mask, values);
+ 
+                       /* create window */
+  w = xcb_generate_id(c);
+  mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
+  values[0] = s->white_pixel;
+  values[1] = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_KEY_PRESS;
+  xcb_create_window(c, s->root_depth, w, s->root,
+                    10, 10, 100, 100, 1,
+                    XCB_WINDOW_CLASS_INPUT_OUTPUT, s->root_visual,
+                    mask, values);
+ 
+                        /* map (show) the window */
+  xcb_map_window(c, w);
+   
+  xcb_flush(c);
+ 
+                        /* event loop */
+  while (!done && (e = xcb_wait_for_event(c))) {
+    switch (e->response_type & ~0x80) {
+    case XCB_EXPOSE:    /* draw or redraw the window */
+      xcb_poly_fill_rectangle(c, w, g,  1, &r);
+      xcb_flush(c);
+      break;
+    case XCB_KEY_PRESS:  /* exit on key press */
+      done = 1;
+      break;
+    }
+    free(e);
+  }
+                        /* close connection to server */
+  xcb_disconnect(c);
+
+  return 0;
+}
+</syntaxhighlight>
+<!--
+XCB has a comparable, but slightly lower-level API than [[Xlib#Example|Xlib]], as can be seen with this example.
+-->
+== 注釋 ==
+<references/>
+
+== 外部連結 ==
+* [http://xcb.freedesktop.org/ XCB wiki] {{Wayback|url=http://xcb.freedesktop.org/ |date=20220509101308 }} ([[freedesktop.org|freedesktop.org]])
+* [http://xcb.freedesktop.org/XcbApi/ XCB API reference] {{Wayback|url=http://xcb.freedesktop.org/XcbApi/ |date=20220119133534 }}
+* [http://xcb.freedesktop.org/Publications Further publications] {{Wayback|url=http://xcb.freedesktop.org/Publications |date=20201027141453 }}
+
+{{Freedesktop.org}}
+{{XWinSys}}
+[[Category:X_Window系統|Category:X Window系統]]

@@ -1,0 +1,126 @@
+{{NoteTA
+|G1 = IT
+}}
+'''CYK算法'''（{{lang-en|Cocke–Younger–Kasami algorithm}}，縮寫為CYK algorithm）是由[[約翰·科克|約翰·科克]]，Younger和{{Internal link helper/ja|嵩忠雄}}共同研究出来大约发表于1965年的一个算法，它是一个用来判定任意给定的字符串<math>~w \in \Sigma^*</math> 是否属于一个[[上下文无关文法|上下文无关文法]]的算法。普通的[[回溯法|回溯法]]（backtracking）在最坏的情况下需要[[指数时间|指数时间]]才能解决这样的问题，而CYK算法只需要[[多项式时间|多项式时间]]就够了（<math>~O(n^3)</math> ， n 为字符串 w 的长度）。CYK算法采用了[[动态规划|动态规划]]的思想。
+
+对于一个任意给定的上下文无关文法，都可以使用CYK算法来计算上述问题，但首先要将该文法转换成[[乔姆斯基范式|乔姆斯基范式]]。
+
+== 相关参数定义 ==
+* <math>~G =(V,\Sigma,S,P)</math> 是一个上下文无关文法
+* 对于任意字符串 <math>w = \sigma_1...\sigma_n \in \Sigma^*</math> ，定义 <math>w[i,j] = \sigma_i...\sigma_j, ~1 \le i \le j \le n</math>
+* 对于任意选择的 <math>~i,j</math> ，定义 <math>V_{i,j} = \{ X \in V ~| ~X \Rightarrow^* w[i,j] \}</math>
+
+== 算法描述 ==
+=== 简介 ===
+通过由下而上的方法计算 <math>~V_{i,j}</math> 这个集合，如果 <math> S \in V_{1,n}</math> ，那么就说明 <math>~w</math> 是被上下文无关文法 <math>~G</math> 接受的字符串。
+
+因为 <math>~G</math> 是一个乔姆斯基范式，当且仅当有下面描述的情况时 <math>X \in V_{i,j}</math> ：
+* <math>i < j, ~\exists Y,Z,k : X \rarr YZ</math> 是 <math>~G</math> 中的一个规则且 <math>Y \in V_{i,k}, Z \in V_{k+1,j}</math>
+
+=== 伪代码 ===
+ ''FOR'' i:= 1 ''TO'' n ''DO'' <math>V_{i,i}:= \{ X \in V ~| ~X \rarr \sigma_i ~in ~P \}</math>
+ ''FOR'' l:= 1 ''TO'' n-1
+     ''FOR'' i:= 1 ''TO'' n-l ''DO''
+         <math>~V_{i,i+l} := \varnothing</math>
+         ''FOR'' k:= i ''TO'' i+l-1 ''DO''
+             <math>~V_{i,i+l} := V_{i,i+l} \cup \{X ~| ~X \rarr YZ, Y \in V_{i,k}, Z \in V_{k+1,i+l} \}</math>
+ ''IF'' <math>S \in V_{1,n}</math> ''THEN'' accept ''ELSE'' reject
+
+== 扩展CYK算法 ==
+=== 简介 ===
+对于上述CYK算法作一个小改动，也就是说记住每次的k，就可以自动产生一个由该上下文无关语言的推导树。
+
+=== 伪代码 ===
+ ''FOR'' i:= 1 ''TO'' n ''DO'' <math>V_{i,i}:= \{ X \in V ~| ~X \rarr \sigma_i ~in ~P \}</math>
+ ''FOR'' l:= 1 ''TO'' n-1
+     ''FOR'' i:= 1 ''TO'' n-l ''DO''
+         <math>~V_{i,i+l} := \varnothing</math>
+         ''FOR'' k:= i ''TO'' i+l-1 ''DO''
+             <math>~V_{i,i+l} := V_{i,i+l} \cup \{ (X,k) ~| ~X \rarr YZ, Y \in V_{i,k}, Z \in V_{k+1,i+l} \}</math>
+ ''IF'' <math>\exists k : (S,k) \in V_{1,n}</math> ''THEN'' accept ''ELSE'' reject
+
+通过对下面的方法递归运行就可以生成推导树。
+ -{}-
+ Tree(X,i,j):
+    ''IF'' i=j ''THEN'' RETURN <math>~\sigma_i</math>
+    选择一个 k 使 <math>(X,k) \in V_{i,j}</math>
+     选择 Y 和 Z 使 <math>X \rarr YZ, Y \in V_{i,k}, Z \in V_{k+1,j}</math>
+     RETURN Tree(X,Tree(Y,i,k),Tree(Z,k+1,j))
+
+== 例子 ==
+给定一个乔姆斯基范式的上下文无关文法 <math>~G = (\lbrace S, A, B, C \rbrace, \lbrace a, b \rbrace, S, P)</math> ，其中规则 P 如下：
+:<math>S \rightarrow AB \mid BC</math>
+:<math>A \rightarrow BA \mid a</math>
+:<math>B \rightarrow CC \mid b</math>
+:<math>C \rightarrow AB \mid a</math>
+问：字符串 bbabaa 能不能通过该文法产生？
+
+CYK算法可以通过一个表格来运算，表中 i 列 j 行表示由哪几个非终结符可以产生字字符串 <math>\sigma_i \dots \sigma_j</math> 。
+
+{| class="wikitable"
+! i
+! 1
+! 2
+! 3
+! 4
+! 5
+! 6
+|-
+! a<sub>i</sub>
+| b
+| b
+| a
+| b
+| a
+| a
+|-
+! j=1
+| {B}
+|-
+! j=2
+|  -
+| {B}
+|-
+! j=3
+| {A}
+| {S,A}
+| {A,C}
+|-
+! j=4
+| {S,C}
+| {S,C}
+| {S,C}
+| {B}
+|-
+! j=5
+| {B}
+| {B}
+| {B}
+| {A,S}
+| {A,C}
+|-
+! j=6
+| {A,S}
+| {A,S}
+| {A,S}
+| -
+| {B}
+| {A,C}
+|}
+
+如果在表格的最左下角一格中有文法的开始非终结符 S ，那么字符串 bbabaa 就能由上面给出文法 G 产生。
+
+== 参考文献 ==
+{{Reflist}}
+{{refbegin}}
+* John Cocke and Jacob T. Schwartz (1970). Programming languages and their compilers: Preliminary notes. Technical report, Courant Institute of Mathematical Sciences, New York University.
+* T. Kasami (1965). An efficient recognition and syntax-analysis algorithm for context-free languages. Scientific report AFCRL-65-758, Air Force Cambridge Research Lab, Bedford, MA.
+* Daniel H. Younger (1967). Recognition and parsing of context-free languages in time ''n''<sup>3</sup>. ''Information and Control'' 10(2): 189–208.
+{{refend}}
+
+== 外部链接 ==
+* [http://www.cs.iitm.ernet.in/tell/automata/Automata/final-cyk/app.html Interaktives Java-Applet zur Demonstration]{{Wayback|url=http://www.cs.iitm.ernet.in/tell/automata/Automata/final-cyk/app.html |date=20071224032357 }}
+
+[[Category:算法|Category:算法]]
+[[Category:形式语言|Category:形式语言]]
+[[Category:分析演算法|Category:分析演算法]]

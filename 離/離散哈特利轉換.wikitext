@@ -1,0 +1,112 @@
+{{NoteTA|1=zh:傅里叶; zh-hans:傅里叶; zh-hant:傅立葉;}}
+'''離散哈特利轉換'''(''DHT'')是一種與[[傅立葉變換|傅立葉變換]]相關之轉換，類似於[[離散傅立葉變換|離散傅立葉變換]](''DFT'')，與傅立葉變換在[[信號處理|信號處理]]及其他相關領域中有類似的應用。與離散傅立葉變換最主要的差異在於哈特利轉換對於實數的輸入，有實數的輸出，並不會牽涉到複數的運算。如同離散傅立葉變換是連續域傅立葉變換的離散類比，離散哈特利轉換亦為連續域哈特利轉換的類比。連續域哈特利轉換於1942年由R. V. Hartley提出。離散哈特利轉換則在1983年由 R. N. Bracewell所提出，由於有相當多類似於[[快速傅立葉變換|快速傅立葉變換]](''FFT'')的快速演算法被提出，於是在一般情況下當欲處理之資料為實數時，成為較傅立葉變換有效率之工具。然而，亦有人認為，特別針對實數輸入或輸出所設計之快速傅立葉變換演算法可以達到較相對應之哈特利轉換演算法而少的運算量(見下文)。
+
+==定義==
+在正式定義上，離散哈特利轉換是一種線性[[可逆函數|可逆函數]] ''H''; '''R'''<sup>''n''</sup> <tt>-></tt> '''R'''<sup>''n''</sup> ('''R'''表示實數的集合)。根據下列公式，''N''個實數輸入 ''x''<sub>0</sub>,''x''<sub>1</sub>,...,''x''<sub>''N''-1</sub>經由轉換產生''N''個實數輸出
+
+:<math>H_k = \sum_{n=0}^{N-1} x_n \left[ \cos \left( \frac{2 \pi}{N} n k \right) + \sin \left( \frac{2 \pi}{N} n k \right) \right]
+\quad \quad
+ k = 0, \dots, N-1 </math>
+
+
+其中<math>\cos(z) + \sin(z) \!</math> <math>= \sqrt{2} \cos(z-\frac{\pi}{4})</math>之組合有時候我們會以<math>\mathrm{cas}(z) \!</math>表示，與在離散傅立葉變換之定義式中出現的<math>e^{-iz} = \cos(z) - i \sin(z) \!</math>需有所區分(其中''i''為虛數單位)。
+
+就像離散傅立葉變換一樣，在一般的習慣或不同的應用上，離散哈特利轉換定義式前之比例因子或[[正弦函數|正弦函數]]之正負號或有些許的差異，但並不會對離散哈特利轉換的性質產生影響。
+
+==性質==
+此轉換可被詮釋為''N''維之向量(''x''<sub>0</sub>, ...., ''x''<sub>''N''-1</sub>) 乘上一個''N''-x-''N'' 之矩陣的矩陣運算，於是離散哈特利轉換為一種線性運算子。該矩陣是可逆矩陣，如欲由''H''<sub>''k''</sub> 重建回''x''<sub>''n''</sub>，此反轉換只需對將''H''<sub>''k''</sub>視為輸入，進行離散哈特利轉換，輸出再乘上1/''N''即得。也就是說，離散哈特利反轉換除了一個比例因子之外，與離散哈特利轉換完全相同，此一特性尤其在哈特利轉換之硬體架構設計有其優勢。
+
+離散哈特利轉換可用於計算離散傅立葉變換，反之亦然，其關係如下。
+對於實數輸入''x''<sub>''n''</sub>，經由離散傅立葉變換之輸出''X''<sub>''k''</sub>之實部為(''H''<sub>''k''</sub> + ''H''<sub>''N-k''</sub>)/2，虛部為(''H''<sub>''N-k''</sub> - ''H''<sub>''k''</sub>)/2。而離散哈特利轉換的輸出則等價於計算出''x''<sub>''n''</sub>的離散傅立葉變換後乘上(1+''i'')，再取其實部。
+
+如同離散傅立葉變換一樣，當我們考慮使用離散哈特利轉換計算兩個向量'''x'''與'''y'''( '''x''' = (''x''<sub>''n''</sub>)，'''y''' = (''y''<sub>''n''</sub>) )之[[環形摺積|環形摺積]] '''z''' = '''x'''*'''y''' ( '''z''' = (''z''<sub>''n''</sub>) )也變得簡單許多。我們令向量'''X''', '''Y'''與'''Z'''分別表示'''x''','''y'''與'''z'''之離散哈特利轉換結果，於是'''Z'''可以由下式求得：
+
+:<math> \begin{matrix}
+Z_k & = & \left[ X_k \left( Y_k + Y_{N-k} \right)
+                         + X_{N-k} \left( Y_k - Y_{N-k} \right) \right] / 2
+\\
+Z_{N-k} & = & \left[ X_{N-k} \left( Y_k + Y_{N-k} \right)
+                         - X_k \left( Y_k - Y_{N-k} \right) \right] / 2
+
+\end{matrix}
+</math>
+
+我們可發現，類似離散傅立葉變換將[[摺積|摺積]]運算轉化為點對點複數乘法運算。離散哈特利轉換將摺積運算轉化成簡單的頻率成份組成，其中的運算皆只包含實數運算。再經由離散哈特利反轉換即得欲求之向量'''z'''。於是當我們需要計算摺積時，除了利用離散傅立葉變換之外，亦可利用離散哈特利轉換代為完成。而基於上述關係，一個針對使用離散哈特利轉換進行摺積運算之快速演算法便可產生。
+
+==快速演算法討論==
+如同離散傅立葉變換的情況，如果我們直接依照定義計算離散哈特利轉換，則需要<math>O(N^2)</math>的計算法雜度。但我們有類似於快速傅立葉變換之快速演算法僅需<math>O(N \log N)</math>的計算複雜度。幾乎每種快速傅立葉變換演算法，如[[FFT|Cooley-Tukey]]、[[質因數分解|質因數分解]]、[[Winograd|Winograd]]等，皆有直接類比的快速離散哈特利轉換演算法。(然而，一些較為複雜之FFT演算法如[[QFT|QFT]]則目前未有對應版本)。
+
+特別地，由Cooley-Tukey演算法所類比之離散哈特利轉換演算法一般被稱為[[快速哈特利轉換|快速哈特利轉換]](''FHT'')演算法，在1984年由 Bracewell 提出，此''FHT''快速演算法對於2的冪次方點數之版本，由史丹佛大學於1987年提出為美國專利編號第4,646,256號，並於1995年公開專利權。
+
+如同前文所述，離散哈特利演算法之效率(基於浮點數的計算次數)可能較對應之特別針對實數輸出之快速傅立葉變換演算法差，此論點第一次是由Sorensen等人與Duhamel及Vetterli在1987年提出。現今電腦效能主要決定於快取與處理器管線化的考量，而非嚴格的運算數量所決定，所以在計算量上些微的差異已不如此顯著。而在實務上，針對實數輸入的高度最佳化快速傅立葉變換程式集已相當容易取得(由處理器廠商如[[英特爾|英特爾]])。然而，高度最佳化之離散哈特利轉換程式集則並非如此普遍。
+
+==一般化離散哈特利轉換==
+在離散傅立葉變換中，藉由將相位<math>e^{-i \frac{2 \pi nk} {N}}\!</math>一般化，得到了所謂的[[一般化離散傅立葉變換|一般化離散傅立葉變換]]，而離散哈特利轉換也有類比的一般化離散哈特利轉換，共有四種型態
+
+===型態一===
+:<math>H_k = \sum_{n=0}^{N-1} x_n \left[ \cos \left( \frac{2 \pi}{N} n k \right) + \sin \left( \frac{2 \pi}{N} n k \right) \right]
+\quad \quad
+ k = 0, \dots, N-1 </math>
+
+===型態二===
+:<math>H_k = \sum_{n=0}^{N-1} x_n \left[ \cos \left( \frac{2 \pi}{N} (n+ \frac{1}{2}) k \right) + \sin \left( \frac{2 \pi}{N} (n+ \frac{1}{2}) k \right) \right]
+\quad \quad
+ k = 0, \dots, N-1 </math> 
+
+===型態三===
+:<math>H_k = \sum_{n=0}^{N-1} x_n \left[ \cos \left( \frac{2 \pi}{N} n (k+ \frac{1}{2}) \right) + \sin \left( \frac{2 \pi}{N} n (k+ \frac{1}{2}) \right) \right]
+\quad \quad
+ k = 0, \dots, N-1 </math>
+ 
+===型態四===
+:<math>H_k = \sum_{n=0}^{N-1} x_n \left[ \cos \left( \frac{2 \pi}{N} (n+ \frac{1}{2}) (k+ \frac{1}{2}) \right) + \sin \left( \frac{2 \pi}{N} (n+ \frac{1}{2}) (k+ \frac{1}{2}) \right) \right]
+\quad \quad
+ k = 0, \dots, N-1 </math> 
+ 
+[[一般化離散哈特利轉換|一般化離散哈特利轉換]]適用於很多應用，如[[濾波器設計|濾波器設計]]、摺積計算、信號表示法、任意點數組合之離散哈特利轉換與快速演算法。
+對於一般化離散哈特利轉換，亦有快速演算法的設計(Guoan Bi et al. 2000)。
+
+==整數離散哈特利轉換==
+雖然離散哈特利轉換相較於離散傅立葉變換有一個主要的優點，當實數輸入時可以得到實數的輸出，且計算過程中完全避免了複數的運算，降低了計算複雜度且可達到類似離散傅立葉變換的效果，於是在許多應用上為傅立葉變換之替代方案之一。然而，如同前文所述，在特別針對實數輸入而設計之離散傅立葉變換演算法往往可以得到較低的計算複雜度，於是如欲使離散哈特利轉換之應用層面更廣，進一步的分析與簡化是必要的。
+
+有相關文獻(Soo-Chang Pei and Jian-Jiun Ding, 2000)探討對於傅立葉變換相關之轉換族，包括[[離散餘弦轉換|離散餘弦轉換]]、[[離散正弦轉換|離散正弦轉換]]、'''離散哈特利轉換'''等之整數版本近似轉換，其轉換核係數並不牽涉到浮點數。整數轉換主要有幾個優點，首先對於一個運算的計算複雜度與需要的記憶體可以再加以縮減，尤其當輸入亦為整數時特別顯著，另一方面，由於不同的平台對於浮點數的精準度不一定相同，在跨平台的應用上，如果牽涉到浮點數的運算，則會有潛在錯誤的可能性。
+
+在此提供八點離散哈特利轉換之整數近似轉換核如下:
+
+<math>HI_P=\begin{bmatrix}
+1 & 1 & 1 & 1 & 1 & 1 & 1 & 1\\
+8 & 10 & 8 & 0 & -8 & -10 & -8 & 0\\
+1 & 1 & -1 & -1 & 1 & 1 & -1 & -1\\
+5 & 0 & -5 & 8 & -5 & 0 & 5 & -8\\
+1 & -1 & 1 & -1 & 1 & -1 & 1 & -1\\
+5 & -8 & 5 & 0 & -5 & 8 & -5 & 0\\
+1 & -1 & -1 & 1 & 1 & -1 & -1 & 1\\
+8 & 0 & -8 & -10 & -8 & 0 & 8 & 10\\
+\end{bmatrix}</math>
+
+==結論==
+離散哈特利轉換為離散傅立葉變換之替代方案之一（其他包括[[离散余弦变换|離散餘弦轉換]]，[[离散正弦变换|離散正弦轉換]]，[[沃爾什轉換|瓦西轉換]]，[[哈爾轉換|哈爾轉換]]等），可視為離散傅立葉變換之簡化版本，對於實數輸入可以產生實數的輸出，去除離散傅立葉變換需要複數計算之缺點，而且如此一來，因為不需要儲存虛部的資訊，記憶體的需求亦有所減少。此外因為正轉換與逆轉換有相當的一致性，架構設計簡單亦有許多相關演算法提出。在輸入為實數時，可替代離散傅立葉變換進行頻譜分析與摺積的計算，。
+在不同的應用需求上，一般化離散哈特利轉換與其快速演算法被提出，如欲進一步降低複雜度，亦有相關文獻討論如何產生近似離散哈特利轉換之整數離散哈特利轉換，使離散哈特利轉換對浮點數乘法的需求可以進一步去除。
+
+==相關條目==
+[[傅立葉變換|傅立葉變換]]
+[[快速傅立葉變換|快速傅立葉變換]]
+
+==參考==
+* R. N. Bracewell, "Discrete Hartley transform," ''J. Opt. Soc. Am.'' '''73''' (12), 1832–1835 (1983).
+* R. N. Bracewell, "The fast Hartley transform," ''Proc. IEEE'' '''72''' (8), 1010–1018 (1984).
+* R. N. Bracewell, ''The Hartley Transform'' (Oxford Univ. Press, New York, 1986).
+* R. N. Bracewell, "Computing with the Hartley Transform," ''Computers in Physics'' '''9''' (4), 373–379 (1995).
+* R. V. L. Hartley, "A more symmetrical Fourier analysis applied to transmission problems," ''Proc. IRE'' '''30''', 144–150 (1942).
+* H. V. Sorensen, D. L. Jones, C. S. Burrus, and M. T. Heideman, "On computing the discrete Hartley transform," ''IEEE Trans. Acoust. Speech Sig. Processing'' '''ASSP-33''' (5), 1231–1238 (1985).
+* H. V. Sorensen, D. L. Jones, M. T. Heideman, and C. S. Burrus, "Real-valued fast Fourier transform algorithms," ''IEEE Trans. Acoust. Speech Sig. Processing'' '''ASSP-35''', 849–863 (1987).
+* Pierre Duhamel and Martin Vetterli, "Improved Fourier and Hartley transform algorithms: application to cyclic convolution of real data," ''IEEE Trans. Acoust. Speech Sig. Processing'' '''ASSP-35''', 818–824 (1987).
+* Mark A. O'Neill, "Faster than Fast Fourier", '''Byte''' '''13'''(4):293-300, (1988).
+* J. Hong and M. Vetterli and P. Duhamel, "Basefield transforms with the convolution property," ''Proc. IEEE'' '''82''' (3), 400-412 (1994).
+* D. A. Bini and E. Bozzo, "Fast discrete transform by means of eigenpolynomials," ''Computers & Mathematics (with Applications)'' '''26''' (9), 35–52 (1993).
+* Miodrag Popovi? and Dragutin ?evi?, "A new look at the comparison of the fast Hartley and Fourier transforms," ''IEEE Trans. Signal Processing'' '''42''' (8), 2178-2182 (1994).
+* Neng-Chung Hu et al., "Generalized Discrete Hartley Transforms," ''IEEE Trans. Signal Processing'', vol. 42, No. 12, Dec. 1992
+* Guoan Bi et al., "Fast Algorithms for Generalized Discrete Hartley Transform of Composite Sequence Lengths," ''IEEE Trans. Circuits and System-II'' vol. 49, No. 9, Sept. 2000
+* Soo-Chang Pei and Jian-Jiun Ding, "The Integer Transforms Analogous to Discrete Trigonometric Transforms," ''IEEE Trans. on Signal Processing'' vol.48, No. 12, Dec. 2000
+
+[[Category:傅里叶分析|L]]

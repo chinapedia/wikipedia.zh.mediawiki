@@ -1,0 +1,262 @@
+{{unreferenced|time=2015-02-01T08:17:03+00:00}}
+'''责任链模式'''在[[物件導向程式設計|物件導向程式設計]]裡是一种[[软件设计模式|软件设计模式]]，它包含了一些命令对象和一系列的处理对象。每一个处理对象决定它能处理哪些命令对象，它也知道如何将它不能处理的命令对象传递给该链中的下一个处理对象。该模式还描述了往该处理链的末尾添加新的处理对象的方法。
+
+== 代码示例 ==
+=== [[Java|Java]] ===
+以下的日志类(logging)例子演示了该模式。 每一个logging handler首先决定是否需要在该层做处理，然后将控制传递到下一个logging handler。程序的输出是:
+   Writting to stdout: Entering function y.
+   Writting to stdout: Step1 completed.
+   Sending via e-mail:      Step1 completed.
+   Writting to stdout: An error has occurred.
+   Sending via e-mail:      An error has occurred.
+   Writing to stderr:       An error has occurred.
+
+注意：该例子不是日志类的推荐实现方式。
+
+同时，需要注意的是，通常在责任链模式的实现中，如果在某一层已经处理了这个logger，那么这个logger就不会传递下去。在我们这个例子中，消息会一直传递到最底层不管它是否已经被处理。
+
+<syntaxhighlight lang="java">
+import java.util.*;
+
+abstract class Logger 
+{
+    public static int ERR = 3;
+    public static int NOTICE = 5;
+    public static int DEBUG = 7;
+    protected int mask;
+
+    // The next element in the chain of responsibility
+    protected Logger next;
+    public Logger setNext( Logger l)
+    {
+        next = l;
+        return this;
+    }
+
+    public final void message( String msg, int priority )
+    {
+        if ( priority <= mask ) 
+        {
+            writeMessage( msg );
+            if ( next != null )
+            {
+                next.message( msg, priority );
+            }
+        }
+    }
+    
+    protected abstract void writeMessage( String msg );
+
+}
+
+class StdoutLogger extends Logger 
+{
+
+    public StdoutLogger( int mask ) { this.mask = mask; }
+
+    protected void writeMessage( String msg )
+    {
+        System.out.println( "Writting to stdout: " + msg );
+    }
+}
+
+
+class EmailLogger extends Logger 
+{
+
+    public EmailLogger( int mask ) { this.mask = mask; }
+
+    protected void writeMessage( String msg )
+    {
+        System.out.println( "Sending via email: " + msg );
+    }
+}
+
+class StderrLogger extends Logger 
+{
+
+    public StderrLogger( int mask ) { this.mask = mask; }
+
+    protected void writeMessage( String msg )
+    {
+        System.out.println( "Sending to stderr: " + msg );
+    }
+}
+
+public class ChainOfResponsibilityExample
+{
+    public static void main( String[] args )
+    {
+        // Build the chain of responsibility
+        Logger l = new StdoutLogger( Logger.DEBUG).setNext(
+                            new EmailLogger( Logger.NOTICE ).setNext(
+                            new StderrLogger( Logger.ERR ) ) );
+
+        // Handled by StdoutLogger
+        l.message( "Entering function y.", Logger.DEBUG );
+
+        // Handled by StdoutLogger and EmailLogger
+        l.message( "Step1 completed.", Logger.NOTICE );
+
+        // Handled by all three loggers
+        l.message( "An error has occurred.", Logger.ERR );
+    }
+}
+</syntaxhighlight>
+
+=== [[PHP|PHP]] ===
+<syntaxhighlight lang="PHP">
+<?php
+abstract class Logger {
+	const ERR = 3;
+	const NOTICE = 5;
+	const DEBUG = 7;
+
+	protected $mask;
+	protected $next; // The next element in the chain of responsibility
+
+	public function setNext(Logger $l) {
+		$this->next = $l;
+		return $this;
+	}
+
+	abstract public function message($msg, $priority);
+}
+
+class DebugLogger extends Logger {
+	public function __construct($mask) {
+		$this->mask = $mask;
+	}
+
+	public function message($msg, $priority) {
+		if ($priority <= $this->mask) {
+			echo "Writting to stdout: {$msg}\n";
+		}
+
+		if (false == is_null($this->next)) {
+			$this->next->message($msg, $priority);
+		}
+	}
+}
+
+class EmailLogger extends Logger {
+	public function __construct($mask) {
+		$this->mask = $mask;
+	}
+
+	public function message($msg, $priority) {
+		if ($priority <= $this->mask) {
+			echo "Sending via email: {$msg}\n";
+		}
+
+		if (false == is_null($this->next)) {
+			$this->next->message($msg, $priority);
+		}
+	}
+}
+
+class StderrLogger extends Logger {
+	public function __construct($mask) {
+		$this->mask = $mask;
+	}
+
+	public function message($msg, $priority) {
+		if ($priority <= $this->mask) {
+			echo "Writing to stderr: {$msg}\n";
+		}
+
+		if (false == is_null($this->next)) {
+			$this->next->message($msg, $priority);
+		}
+	}
+}
+
+class ChainOfResponsibilityExample {
+	public function __construct() {
+		// build the chain of responsibility
+		$l = new DebugLogger(Logger::DEBUG);
+		$e = new EmailLogger(Logger::NOTICE);
+		$s = new StderrLogger(Logger::ERR);
+		
+		$e->setNext($s);
+		$l->setNext($e);
+
+		$l->message("Entering function y.",		Logger::DEBUG);		// handled by DebugLogger
+		$l->message("Step1 completed.",			Logger::NOTICE);	// handled by DebugLogger and EmailLogger
+		$l->message("An error has occurred.",	Logger::ERR);		// handled by all three Loggers
+	}
+}
+
+new ChainOfResponsibilityExample();
+?>
+</syntaxhighlight>
+
+=== [[Visual_Prolog|Visual Prolog]] ===
+
+这是一个用mutex保护对于stream的操作的真实例子。
+ 
+First the outputStream interface (a simplified version of the real one):
+ 
+ <font color="#808000">interface</font> outputStream
+    <font color="#808000">predicates</font>
+       write : <font color="#993300">(</font>...<font color="#993300">)</font>.
+       writef : <font color="#993300">(</font>string <font color="#008000">FormatString</font>, ...<font color="#993300">)</font>.
+ <font color="#808000">end</font> <font color="#808000">interface</font> outputStream
+ 
+This class encapsulates each of the stream operations the mutex. The '''finally''' predicate is used to ensure that the mutex is released no matter how the operation goes (i.e. also in case of exceptions). The underlying mutex object is released by a ''finalizer'' in the mutex class, and for this example we leave it at that.
+ 
+ <font color="#808000">class</font> outputStream_protected : outputStream
+    <font color="#808000">constructors</font>
+       new : <font color="#993300">(</font>string <font color="#008000">MutexName</font>, outputStream <font color="#008000">Stream</font><font color="#993300">)</font>.
+ <font color="#808000">end</font> <font color="#808000">class</font> outputStream_protected
+ 
+ <font color="#800080">#include</font> <font color="#0000FF">@"pfc\multiThread\multiThread.ph"</font>
+ 
+ <font color="#808000">implement</font> outputStream_protected
+    <font color="#808000">facts</font>
+       mutex : mutex.
+       stream : outputStream.
+    <font color="#808000">clauses</font>
+       new<font color="#993300">(</font><font color="#008000">MutexName</font>, <font color="#008000">Stream</font><font color="#993300">)</font> :-
+          mutex := mutex::createNamed<font color="#993300">(</font><font color="#008000">MutexName</font>, false<font color="#993300">)</font>, <font color="#AA77BD">% do not take ownership</font>
+          stream := <font color="#008000">Stream</font>.
+    <font color="#808000">clauses</font>
+       write<font color="#993300">(</font>...<font color="#993300">)</font> :-
+          _ = mutex:wait<font color="#993300">()</font>,  <font color="#AA77BD">% ignore wait code in this simplified example</font>
+          <font color="#333399">finally</font><font color="#993300">(</font>stream:write<font color="#993300">(</font>...<font color="#993300">)</font>, mutex:release<font color="#993300">())</font>.
+ 
+    <font color="#808000">clauses</font>
+       writef<font color="#993300">(</font><font color="#008000">FormatString</font>, ...<font color="#993300">)</font> :-
+          _ = mutex:wait<font color="#993300">()</font>,  <font color="#AA77BD">% ignore wait code in this simplified example</font>
+          <font color="#333399">finally</font><font color="#993300">(</font>stream:writef<font color="#993300">(</font><font color="#008000">FormatString</font>, ...<font color="#993300">)</font>, mutex:release<font color="#993300">())</font>.
+ <font color="#808000">end</font> <font color="#808000">implement</font> outputStream_protected
+
+'''Usage example'''.
+
+The '''client''' uses an '''outputStream'''. Instead of receiving the '''pipeStream''' directly, it gets the protected version of it.
+
+ <font color="#800080">#include</font> <font color="#0000FF">@"pfc\pipe\pipe.ph"</font>
+ 
+ <font color="#808000">goal</font>
+    <font color="#008000">Stream</font> = pipeStream::openClient<font color="#993300">(</font><font color="#0000FF">"TestPipe"</font><font color="#993300">)</font>,
+    <font color="#008000">Protected</font> = outputStream_protected::new<font color="#993300">(</font><font color="#0000FF">"PipeMutex"</font>, <font color="#008000">Stream</font><font color="#993300">)</font>,
+    client<font color="#993300">(</font><font color="#008000">Protected</font><font color="#993300">)</font>,
+    <font color="#008000">Stream</font>:close<font color="#993300">()</font>.
+
+== 另見 ==
+* [[Interception_pattern|Interception pattern]]
+* [[Interceptor_pattern|Interceptor pattern]]
+* [[Single_responsibility_principle|Single responsibility principle]]
+
+== 外部链接 ==
+* Article "[https://web.archive.org/web/20110608001551/http://www.javaworld.com/javaworld/jw-08-2004/jw-0816-chain.html The Chain of Responsibility pattern's pitfalls and improvements]" by [[Michael_Xinsheng_Huang|Michael Xinsheng Huang]]
+* Article "[https://web.archive.org/web/20111020000843/http://www.javaworld.com/javaworld/jw-08-2003/jw-0829-designpatterns.html Follow the Chain of Responsibility]" by [[David_Geary|David Geary]]
+* Article "[https://web.archive.org/web/20120305185518/http://www.developer.com/java/other/article.php/631261 Pattern Summaries: Chain of Responsibility]" by [[Mark_Grand|Mark Grand]]
+* [http://dofactory.com/Patterns/PatternChain.aspx CoR overview] {{Wayback|url=http://dofactory.com/Patterns/PatternChain.aspx |date=20080422185544 }}
+* [https://web.archive.org/web/20080220175113/http://www.allapplabs.com/java_design_patterns/chain_of_responsibility_pattern.htm Behavioral Patterns - Chain of Responsibility Pattern]
+* [https://web.archive.org/web/20110818180059/http://c2.com/cgi/wiki?ChainOfResponsibilityPattern Descriptions from Portland Pattern Repository]
+* [https://web.archive.org/web/20080517011147/http://jakarta.apache.org/commons/chain Apache Jakarta Commons Chain]
+
+{{软件设计模式}}
+
+[[Category:软件设计模式|Category:软件设计模式]]

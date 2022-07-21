@@ -1,0 +1,263 @@
+{{noteTA
+|G1=Signals and Systems
+}}
+'''哈爾小波轉換'''（{{lang-en|'''Haar wavelet'''}}）是由数学家{{link-en|阿尔弗雷德·哈尔|Alfréd Haar}}於1909年所提出的{{link-en|函数变换理论|Transform theory|函数变换}}，也是[[小波轉換|小波轉換]]中最簡單的一種轉換，也是最早提出的小波轉換。他是[[多贝西小波|多贝西小波]]的於N=2的特例，可稱之為D2
+
+'''哈爾小波'''的母小波（mother wavelet）可表示為：
+: <math>\psi(t) =  \begin{cases}1 \quad & 0 \leq  t < 1/2,\\
+ -1 & 1/2 \leq t < 1,\\0 &\mbox{otherwise.}\end{cases}</math>
+且對應的尺度函数（scaling function）可表示為：
+: <math>\phi(t) = \begin{cases}1 \quad & 0 \leq  t < 1,\\0 &\mbox{otherwise.}\end{cases}</math>
+
+其濾波器（filter）<math>h[n] </math>被定義為<br />
+<math>h[n] =</math> : <math>\begin{cases}\frac{1}{\sqrt{2}}&\mbox{if n = 0,1}\\0 &\mbox{otherwise}\end{cases}</math><br />
+當n = 0與n = 1時，有兩個非零係數，因此，我們可以將它寫成
+: <math>\begin{align}
+\frac{1}{\sqrt{2}}\psi(\left( \frac{t}{2} \right)) & = \sum_{n=-\infty}^{\infty} (-1)^{1-n} h[1-n] \phi(t-n) \\
+& = \frac{1}{\sqrt{2}}(\phi(t-1) - \phi(t)) \\
+\end{align}</math>
+
+在所有正交性（orthonormal）小波轉換中哈爾小波（Haar wavelet）轉換是最簡單的一種轉換，但它並不適合用於較為平滑的函數，因為它只有一個消失矩（Vanishing Moment）。
+
+== 小波母函數 ==
+参与变换的小波函数（wavelet function）也叫母小波（mother wavelet）。小波母函數可表示為：
+
+(1): <math>\psi(t)=\phi(2t)-\phi(2t-1)</math> 
+
+(2) :<math>\psi(2t)</math>
+
+(3): <math>\psi(2^{m}t-n)</math>
+
+因此，由上式我們可以歸納出幾個重點：
+
+(1): 
+
+<math>\Rightarrow
+\int \psi(t)\psi(2t)\, dt=0</math><br />
+: <math>\int \psi(t)\psi(4t)\, dt=0</math> <br />
+: <math>\int \psi(2^{m}t)\psi(2^{m1}t)\, dt=0</math> <br />
+(2): 
+
+<math>\Rightarrow 
+\int \psi(t)\psi(t-1)\, dt=0</math> <br />
+: <math>\int \psi(t)\psi(2t-1)\, dt=0</math> <br />
+: <math>\int \psi(t)\psi(2^{m}-1)\, dt=0</math>
+
+== 尺度函數 ==
+scaling function，以下為尺度函數的簡易圖示：
+
+(1): <math>\phi(t)</math> 
+
+(2): <math>\phi(2t),2\phi(2t)=\phi(t)+\psi(t)</math>
+
+(3): <math>\psi(2^{m}t-n)</math>
+
+== 優點 ==
+（1）簡單（Simple） 
+
+（2）快速算法（Fast algorithm）
+
+（3）正交（Orthogonal）→可逆（reversible）
+
+（4）結構緊湊（Compact），實（real），奇（odd）
+
+（5）消失矩（Vanish moment）
+
+== 特性 ==
+哈爾小波具有如下的特性：
+（1）任一函數都可以由<math>\phi(t),\phi(2t),\phi(4t),\dots,\phi(2^k t),\dots</math>以及它們的位移函數所組成
+
+（2）任一函數都可以由常函數，<math>\psi(t),\psi(2t),\psi(4t),\dots,\psi(2^k t),\dots</math>以及它們的位移函數所組成
+
+(3)'''正交性（Orthogonal） '''
+    <math>\int_{-\infty}^{\infty}2^m\psi(2^{m_1}t-n_1)\psi(2^mt-n)\, dt=\delta(m,m_1)\delta(n,n_1)</math>
+    <math>\delta(i,j) = \begin{cases}1&i = j,\\0&\mbox{i≠j.}\end{cases}</math>
+
+（4）不同寬度的（不同m）的wavelet/scaling functions之間會有一個關係
+
+  <math> \phi(t)=\phi(2t)+\phi(2t-1)</math>
+<math> \phi(t-n)=\phi(2t-2n)+\phi(2t-2n-1)</math>
+<math> \phi(2^{m}t-n)=\phi(2^{m+1}t-2n)+\phi(2^{m+1}t-2n-1)</math>
+
+  <math> \psi(t)=\phi(2t)-\phi(2t-1)</math>
+<math> \psi(t-n)=\phi(2t-n)-\phi(2t-2n-1)</math>
+<math> \psi(2^{m}t-n)=\phi(2^{m+1}t-n)-\phi(2^{m+1}t-2n-1)</math>
+
+（5）可以用m+1的 係數来計算m的係數
+
+若<math> \chi_w(n,m)=2^{m/2}\int_{-\infty}^{\infty}x(t)\phi(2^mt-n)\, dt</math>
+
+<math>\begin{align}
+\chi_w(n,m) & = 2^{m/2}\int_{-\infty}^{\infty}x(t)\phi(2^{m+1}t-2n)\, dt+  2^{m/2}\int_{-\infty}^{\infty}x(t)\phi(2^{m+1}t-2n-1)\, dt \\
+& = \sqrt{\frac{1}{2}}(\chi_w(2n,m+1)+\chi_w(2n+1,m+1)) \\
+\end{align}</math>
+
+若<math> \Chi_w(n,m)=2^{m/2}\int_{-\infty}^{\infty}x(t)\psi(2^mt-n)\, dt</math>
+
+<math>\begin{align}
+\Chi_w(n,m) & =2^{m/2}\int_{-\infty}^{\infty}x(t)\phi(2^{m+1}t-2n)\, dt- 2^{m/2}\int_{-\infty}^{\infty}x(t)\phi(2^{m+1}t-2n-1)\, dt\\
+& = \Chi_w(n,m)=\sqrt{\frac{1}{2}}(\chi_w(2n,m+1)-\chi_w(2n+1,m+1))\\
+\end{align}</math>
+
+圖示如下：
+
+[[File:Property(5).png|300px]]
+
+== 快速演算法==
+[[File:MRA.png|500px]]
+
+上圖為哈爾小波轉換的快速演算簡易圖示，此為多重解析結構（multiresolution analysis）。
+
+== 哈爾轉換 ==
+
+哈尔变换最早是由数学家{{link-en|阿尔弗雷德·哈尔|Alfréd Haar}}在1910年的论文《论正交函数系理论》（{{lang-de|Zur Theorie der Orthogonalen Funktionensysteme}}）中所提出，是一種最簡單又可以反應出時變頻譜（time-variant spectrum）的表示方法。其觀念與[[傅里叶变换|傅里叶变换]]相近。傅里叶变换的原理是利用正弦波與余弦波來對訊號進行調變；而哈尔变换則是利用哈尔函数來對訊號進行調變。哈尔函数也含有正弦函数系和余弦函数系所擁有的正交性，也就是說不同的哈尔函数是互相[[正交|正交]]的，其內積為零。
+
+以下面的哈爾轉換矩陣為例，我們取第1行和第2行來做[[內積|內積]]，得到的結果為零；取第二行和第三行來做內積，得到的結果也是零。依序下去，我們可以發現在哈爾轉換矩陣任取兩行來進行內積的運算，所得到的內積皆為零。
+:<math>N=2</math>，<math>H=\begin{bmatrix}
+\ 1 & 1 \\
+\ 1 & -1\\
+\end{bmatrix}</math>。
+
+:<math>N=4</math>，<math>H=\begin{bmatrix}
+\ 1 & 1 & 1 & 1 \\
+\ 1 & 1 & -1 & -1\\
+\ 1 & -1 & 0 & 0 \\
+\ 0 & 0 & 1 & -1 \\
+\end{bmatrix}</math>。
+
+:<math>N=8</math>，<math>H=\begin{bmatrix}
+\ 1 & 1 & 1 & 1 & 1 & 1 & 1& 1\\
+\ 1 & 1 & 1 & 1 & -1 & -1 & -1 & -1\\
+\ 1 & 1 & -1 & -1 & 0 & 0 & 0 & 0\\
+\ 0 & 0 & 0 & 0 & 1 & 1 & -1 & -1\\
+\ 1 & -1 & 0 & 0 & 0 & 0 & 0 & 0\\
+\ 0 & 0 & 1 & -1 & 0 & 0 & 0 & 0\\
+\ 0 & 0 & 0 & 0 & 1 & -1 & 0 & 0\\
+\ 0 & 0 & 0 & 0 & 0 & 0 & 1 & -1\\
+\end{bmatrix}</math>。
+
+在此前提下，利用傅里叶变换的觀念，假設所要分析的訊號可以使用多個頻率與位移不同的哈尔函数來組合而成。進行哈尔变换時，因為哈尔函数的正交性，便可求出訊號在不同哈尔函数（不同頻率）的情況下所占有的比例。
+
+哈尔变换有以下幾點特性：
+
+# 不需要乘法（只有相加或加減）
+# 輸入與輸出個數相同
+# 頻率只分為低頻（直流值）與高頻（1和-1）部分
+# 可以分析一個訊號的局部特征
+# 運算速度極快，但不適合用於訊號分析
+# 大部分運算為0，不用計算
+# 維度小，计算时需要占用的内存空间少
+# 因為大部分為高頻，轉換較籠統
+
+對一矩陣<math>A</math>做哈爾小波轉換的公式為<math>B=HAH^T</math>，其中<math>A</math>為一<math>N\times N</math>的區塊且<math>H</math>為<math>N</math>點的哈爾小波轉換。而反哈爾小波轉換為<math>A=H^TBH</math>。以下為<math>H</math>在2、4及8點時的值：
+
+:<math>N=2</math>，<math>H=\begin{bmatrix}
+\frac{1}{\sqrt{2}} & \frac{1}{\sqrt{2}} \\
+\frac{1}{\sqrt{2}} & \frac{-1}{\sqrt{2}}  
+\end{bmatrix}</math>。
+
+:<math>N=4</math>，<math>H=\begin{bmatrix}
+\frac{1}{2} & \frac{1}{2} & \frac{1}{2} & \frac{1}{2}\\
+\frac{1}{2} & \frac{1}{2} & \frac{-1}{2} & \frac{-1}{2}\\
+\frac{1}{\sqrt{2}} & \frac{-1}{\sqrt{2}} & 0 & 0\\
+0 & 0 &\frac{1}{\sqrt{2}} & \frac{-1}{\sqrt{2}}\\
+\end{bmatrix}</math>。
+
+:<math>N=8</math>，<math>H=\begin{bmatrix}
+\frac{1}{\sqrt{8}} & \frac{1}{\sqrt{8}} & \frac{1}{\sqrt{8}} & \frac{1}{\sqrt{8}} & \frac{1}{\sqrt{8}} & \frac{1}{\sqrt{8}} & \frac{1}{\sqrt{8}} & \frac{1}{\sqrt{8}}\\
+\frac{1}{\sqrt{8}} & \frac{1}{\sqrt{8}} & \frac{1}{\sqrt{8}} & \frac{1}{\sqrt{8}} & \frac{-1}{\sqrt{8}} & \frac{-1}{\sqrt{8}} & \frac{-1}{\sqrt{8}} & \frac{-1}{\sqrt{8}}\\
+\frac{1}{2} & \frac{1}{2} & \frac{-1}{2} & \frac{-1}{2} & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & \frac{1}{2} & \frac{1}{2} & \frac{-1}{2} & \frac{-1}{2}\\
+\frac{1}{\sqrt{2}} & \frac{-1}{\sqrt{2}} & 0 & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & \frac{1}{\sqrt{2}} & \frac{-1}{\sqrt{2}} & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & \frac{1}{\sqrt{2}} & \frac{-1}{\sqrt{2}} & 0 & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & \frac{1}{\sqrt{2}} & \frac{-1}{\sqrt{2}}\\
+\end{bmatrix}</math>。
+
+:此外，當<math>N=2^k</math>時，<math>H=\begin{bmatrix}
+\phi\\
+h_{0,0}\\
+h_{1,0}\\
+h_{1,1}\\
+:\\
+:\\
+h_{k-1,0}\\
+h_{k-1,1}\\
+:\\
+h_{k-1,2^{k-1}-1}\\
+\end{bmatrix}</math>。其中<math>H</math>除了第0個row為<math>\phi</math>（<math>\phi</math>=[1 1 1 ... 1]/<math>\sqrt{N}</math>，共N個1），第<math>2^p+q</math>個row為<math>h_{p,q}</math>且
+
+:<math>h_{p,q}[n] = \begin{cases} 1/\sqrt{2^{k-p}},\ when\ q2^{k-p}\leq n<(q+1/2)2^{k-p} \\-1/\sqrt{2^{k-p}},\ when\ (q+1/2)2^{k-p}\leq n<(q+1)2^{k-p}\\0, otherwise\end{cases}</math>。
+
+==哈爾小波轉換應用於圖像壓縮==
+===說明===
+:由於數位圖片檔案過大，因此我們往往會對圖片做圖像壓縮，壓縮過後的檔案大小不僅存放於電腦中不會佔到過大容量，也方便我們於網路上傳送。哈爾小波轉換其中一種應用便是用來壓縮圖像。壓縮圖像的基本概念為將圖像存成到一矩陣，例如256x256大小的圖片會存成256x256大小的矩阵，矩陣中的每一元素則代表是每一圖像的某畫素值，介於0到255間。JPEG影像壓縮的概念為先將圖像切成8x8大小的區塊，每一區塊為一8x8的矩陣。示意圖可見右圖。
+
+:在處理8x8二維矩陣前，先試著對一維矩陣<math>r=\begin{bmatrix}1.2\\1.2\\1.8\\0.8\\2\\2\\1.9\\2.1 \end{bmatrix}</math>作哈爾小波轉換，
+
+:公式為<math>r_1=Hr=\begin{bmatrix}13/\sqrt{8}\ (4.596)\\-3/\sqrt{8}\ (-1.061)\\-0.1\ (-0.1)\\0\\0\\1/\sqrt{2}\ (0.707)\\0\\-0.2/\sqrt{2}\ (-0.141)\end{bmatrix}\approx \begin{bmatrix}13/\sqrt{8}\\-3/\sqrt{8}\\0\\0\\0\\1/\sqrt{2}\\0\\0 \end{bmatrix}</math>。
+
+===範例===
+:對8x8的二維矩陣A作哈爾小波轉換，由於<math>AH</math>是對<math>A</math>的每一列作哈爾小波轉換，作完後還要對<math>A</math>的每一行作哈爾小波轉換，因此公式為<math>H^TAH</math>。以下為一簡單的例子：
+
+:<math>A=\begin{bmatrix}576 & 704& 1152 & 1280 & 1344 & 1472 & 1536 & 1536\\
+704 & 640 & 1156 & 1088 & 1344 & 1408 & 1536 & 1600\\
+768 & 832 & 1216 & 1472 & 1472 & 1536 & 1600 & 1600\\
+832 & 832 & 960 & 1344 & 1536 & 1536 & 1600 & 1536\\
+832 & 832 & 960 & 1216 & 1536 & 1600 & 1536 & 1536\\
+960 & 896 & 896 & 1088 & 1600 & 1600 & 1600 & 1536\\
+768 & 768 & 832 & 832 & 1280 & 1472 & 1600 & 1600\\
+448 & 768 & 704 & 640 & 1280 & 1408 & 1600 & 1600\\\end{bmatrix}</math>。
+
+:列哈爾小波轉換（row Haar wavelet transform）
+
+:<math>L=AH=\begin{bmatrix} 1200 & -272 & -288 & -64 & -64 & -64 & -64 & 0\\
+1185 & -288 & -225 & -96 & 32 & 34 & -32 & -32\\
+1312 & -240 & -272 & -48 & -32 & -128 & -32 & 0\\
+1272 & -280 & -160 & -16 & 0 & -192 & 0 & 32\\
+1256 & -296 & -128 & 16 & 0 & -128 & -32 & 0\\
+1272 & -312 & -32 & 16 & 32 & -96 & 0 & 32\\
+1144 & -344 & -32 & -112 & 0 & 0 & -96 & 0\\
+1056 & -416 & -32 & -128 & 160 & 32 & -64 & 0\\
+\end{bmatrix}</math>。
+
+:行哈爾小波轉換（column Haar wavelet transform）
+
+:<math>S=H^TL=\begin{bmatrix}1212 & -306 & -146 & -54 & -24 & -68 & -40 & 4\\
+30 & 36 & -90 & -2 & 8 & -20 & 8 & -4\\
+-50 &-10 & -20 & -24 & 0 & 72 & -16 & -16\\
+82 & 38 & -24 & 68 & 48 & -64 & 32 & 8\\
+8 & 8 & -32 & 16 & -48 & -48 & -16 & 16\\
+20 & 20 & -56 & -16 & -16 & 32 & -16 & -16\\
+-8 & 8 & -48 & 0 & -16 & -16 & -16 & -16\\
+44 & 36 & 0 & -8 & 80 & -16 & -16 & 0\\
+\end{bmatrix}</math>。
+
+:由以上例子可以看出哈爾小波轉換的效果，原本矩陣中變化量不大的元素經過轉換後會趨近零，再配合適當量化便可以達到壓縮的效果了。此外若一矩陣作完哈爾小波轉換後所含的零元素非常多的話，稱此矩陣叫稀疏，若一矩陣越稀疏壓縮效果越好。因此可對定一臨界值<math>\epsilon</math>若矩陣中元素的絕對值小於此臨界值<math>\epsilon</math>，可將該元素令成零，可得到更大的壓縮率。然而<math>\epsilon</math>取過大的話會造成圖像嚴重失真，因此如何取適當的<math>\epsilon</math>也是值得討論的議題。
+
+==哈爾小波轉換運算量比沃爾什轉換更少==
+:若應用於區域的頻譜分析及偵測邊緣的話，[[离散傅立叶变换|离散傅立叶变换]]、[[Walsh-Hadamard变换|Walsh-Hadamard变换]]及哈爾小波轉換的計算量見下表
+:
+{| class="wikitable" 
+!  !!Running Time!!terms required for [[NRMSE|NRMSE]] < <math>10^{-5}</math>
+|-
+|離散傅立葉變換||9.5秒
+|43
+|-
+|沃爾什轉換||2.2秒
+|65
+|-
+|哈爾小波轉換||0.3秒
+|128
+|}
+
+==參考==
+{{Commonscat|Haar wavelet|哈爾小波轉換}}
+*Jian-Jiun Ding, Time frequency analysis and wavelet transform class note,the Department of Electrical Engineering, National Taiwan University (NTU), Taipei, Taiwan, 2007.
+*[http://aix1.uottawa.ca/~jkhoury/haar.htm Joseph Khoury, Application to image compression, http://aix1.uottawa.ca/~jkhoury/haar.htm]{{Wayback|url=http://aix1.uottawa.ca/~jkhoury/haar.htm |date=20080113190642 }}
+*Lokenath Debnath, Wavelet Transforms and Their Application,Birkhauser, Boston,USA, 2002.
+*Charles K. Chui, Wavelets：A Tutorial in Theory and Applications,ACADEMIC PRESS,San Diego,USA, 1992.
+*Wavelets and subbands : fundamentals and applications/Agostino Abbate, Casimer M. DeCusatis, Pankaj K. Das.
+
+[[Category:数值分析|Category:数值分析]]
+[[Category:小波分析|Category:小波分析]]

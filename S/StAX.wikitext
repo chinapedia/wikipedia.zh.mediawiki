@@ -1,0 +1,81 @@
+'''XML流API'''（'''Streaming API for XML'''，缩写StAX）是用于读写[[XML|XML]]文档的[[应用程序接口|应用程序接口]]，起源于[[Java|Java]]社群，[[JSR|JSR]] 173定义了这个API。
+
+传统上来说，XML的API无外乎是以下两种：
+* 基于树的API- 整个文档以树的形式被读入内存，可以被调用程序随机访问。
+* 基于事件的API - 应用注册接收事件，当原XML文档遇到事体时就会产生这些事件。
+两者皆有优点，前者（例如[[文档对象模型|DOM]]）允许对文档进行随机访问，而后者（例如[[SAX|SAX]]）需要较小的内存开销，并却通常更快。
+
+这两个方法可以认为是正好相反。基于树的API允许无限制的，随机的访问和操纵，而基于事件的API是一次性地遍历源文档。
+
+StAX被设计为这两者的一个折中。在StAX中，程序的切入点是表示XML文档中一个位置的光标。应用程序在需要时向前移动光标，从解析器拉出信息。与基于事件的API（如SAX）将“数据推送”给应用程序不同的是，SAX需要应用程序维持时间间的状态，以保持文档内的位置信息。
+
+== 起源 ==
+StAX起源于一些“拉”XML的API，最著名的是XMLPULL, 其作者（Stefan Haustein和Aleksander Ominski）与[[BEA_Systems|BEA Systems]], [[甲骨文公司|甲骨文公司]], [[Sun_Microsystems|Sun]], [http://www.breezefactor.com/ Breeze Factor]{{Wayback|url=http://www.breezefactor.com/ |date=20110207225142 }}及[[James_Clark_(XML_expert)|James Clark]]合作编写了这个规范。
+
+== 例子 ==
+
+从JSR-173 Specification• Final, V1.0中摘取的例子（以合理使用方式使用）
+
+引用:
+:下面的Java API显示了以光标方式读取XML的主要方法。
+<syntaxhighlight lang="java">
+// Java 
+public interface XMLStreamReader { 
+  public int next() throws XMLStreamException; 
+  public boolean hasNext() throws XMLStreamException; 
+  public String getText(); 
+  public String getLocalName(); 
+  public String getNamespaceURI(); 
+  // ...其他方法隐去
+} 
+</syntaxhighlight>
+:写入的API与读取API的元素开始和元素结束相对应。
+<syntaxhighlight lang="java">
+// Java 
+public interface XMLStreamWriter { 
+  public void writeStartElement(String localName) throws XMLStreamException;
+  public void writeEndElement() throws XMLStreamException; 
+  public void writeCharacters(String text) throws XMLStreamException; 
+  // ...其他方法隐去
+} 
+</syntaxhighlight>
+:5.3.1 XMLStreamReader 
+:本例子说明初始化一个输入工厂，创建阅读器，并迭代XML文档中的元素。
+<syntaxhighlight lang="java">
+XMLInputFactory f = XMLInputFactory.newInstance(); 
+XMLStreamReader r = f.createXMLStreamReader(... ); 
+while (r.hasNext()) { 
+    r.next(); 
+}
+</syntaxhighlight>
+
+== 实现 ==
+
+* [https://sjsxp.dev.java.net Sun Java Streaming XML Parser]{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }} 开源。作为J2SE 6的一部分发布
+* JSR-173的参考实现[https://web.archive.org/web/20100724040030/http://stax.codehaus.org/]
+* [[Woodstox|Woodstox]][https://web.archive.org/web/20150525234136/http://woodstox.codehaus.org/]，开源StAX实现（以[[GNU宽通用公共许可证|LGPL]]或[[Apache许可证|Apache许可证]]发布）
+* [[Aalto|Aalto]][https://web.archive.org/web/20100422200438/http://wiki.fasterxml.com/AaltoHome]，超高性能的解析器（[[GNU通用公共许可证|GPL]]或商业许可证）
+* [[libxml2|libxml2]][http://xmlsoft.org/html/libxml-xmlwriter.html]{{Wayback|url=http://xmlsoft.org/html/libxml-xmlwriter.html |date=20100612202702 }}，XML的C解析器和工具（MIT許可證）
+* [[Expat_(XML)|Expat]][http://expat.sourceforge.net/]{{Wayback|url=http://expat.sourceforge.net/ |date=20100724165509 }}，用C写的XML解析器函数库
+
+== 参见 ==
+* [[文档对象模型|文档对象模型]]，基于树的XML的API
+* [[JDOM|JDOM]]
+* [[Dom4j|Dom4j]]
+* [[SAX|SAX]]，基于事件的XML的API。
+* [[JAXB|JAXB]]，基于XML解析器（通常是StAX）将XML数据绑定到Java对象上。
+* [[Apache_Axiom|Apache Axiom]]，基于StAX的轻量级的XML对象模型，支持滞后构建。
+* [[XMLPull_API|XMLPull API]]
+* [[kXML|kXML]] 使用XMLPull API的[[J2ME|J2ME]]上的XML解析器
+
+== 外部链接 ==
+* [http://jcp.org/en/jsr/detail?id=173 JSR 173 规范]{{Wayback|url=http://jcp.org/en/jsr/detail?id=173 |date=20100809153855 }} 
+* [http://www.xml.com/pub/a/2003/09/17/stax.html StAX介绍]{{Wayback|url=http://www.xml.com/pub/a/2003/09/17/stax.html |date=20100725172646 }} XML.com, Harold, Elliotte Rusty
+* [https://web.archive.org/web/20071212145813/http://www.vogella.de/articles/JavaXML/article.html StAX教程]
+* [https://web.archive.org/web/20120630184808/http://www.extreme.indiana.edu/~aslom/xmlpull/patterns.html XMLPull模式]关于XML Pull（以及StAX）的设计模式，Aleksander Slominski.
+* [http://www.xmlpull.org/ XMLPull.org]{{Wayback|url=http://www.xmlpull.org/ |date=20100724153213 }}
+* [http://www.devx.com/Java/Article/30298/0 StAX和Sax的比较]{{Wayback|url=http://www.devx.com/Java/Article/30298/0 |date=20100722143639 }}
+* [https://web.archive.org/web/20070813023718/https://stax-utils.dev.java.net/ StAX-Utils]提供工具类，便于开发者将StAX集成到现有的XML处理应用中。
+
+[[Category:Java|Category:Java]]
+[[Category:应用程序接口|Category:应用程序接口]]

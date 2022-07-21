@@ -1,0 +1,30 @@
+{{Unreferenced |time=2010-02-07T10:17:23+00:00 }}
+{{NoteTA
+|G1=IT
+|T=zh-cn:内存池;zh-tw:記憶池;
+|1=zh-cn:内存;zh-tw:記憶;
+}}
+'''記憶池'''（Memory Pool），又被稱為'''固定大小區塊規劃（fixed-size-blocks allocation）'''，允許程式設計師以類似 [[C語言|C語言]] 的 [[malloc|malloc]] 或是 [[C++|C++]] 的 new 運算元進行動態的記憶體規劃。對於其它動態記憶體規劃的實踐來說，因為會變動記憶體區塊大小導致的碎片問題，導致在[[實時系統|實時系統]]上受限於效能因此，根本無法使用。'''記憶池'''提供了一個更有效率的解決方案：預先規劃一定數量的記憶體區塊，使得整個程式可以在執行期規劃 (allocate)、使用 (access)、歸還 (free) 記憶體區塊。
+
+有許多[[實時作業系統|實時作業系統]]採用了'''記憶池'''，[[IBM|IBM]] 的 [[Transaction_Processing_Facility|Transaction Processing Facility]] 便是其中一個例子。
+
+==一個簡單的實踐示例==
+這個簡單的'''記憶池'''實踐模組在編譯期規劃 3 個示例記憶池，其區塊將大小針對程式的需求做最佳化。這個程式可以下列介面來規畫、使用及歸還記憶體區塊：
+*從記憶池中規劃記憶體區塊。這個函數會先檢測目前的記憶池是否仍有足夠空間可以規劃所需的記憶體區塊，若空間已不足，將繼續嘗試下一個記憶池。一個已規劃的記憶體區塊將使用[[句柄|handle]]來表示。
+*獲取一個指向已規劃記憶體區塊的[[指针_(信息学)|指標]]。
+*歸還之前規劃的記憶體區塊。
+*用以代表記憶體區塊的[[句柄|handle]]，可以使用像是 unsigned int 的資料型別來實踐。
+
+==記憶池與 malloc 的比較==
+'''優點'''
+*記憶池允許在執行期以常數時間規劃記憶體區塊，並且不會有記憶體破碎的情況產生。一次歸還記憶體中成千上萬個物件的記憶體區塊只需要一個操作，無需像 malloc 一般需要個別 free。
+*記憶池可以在階層式的樹狀結構中被分群，非常適合某些特定的程式結構，例如[[遞歸|遞歸]]與[[迭代|迭代]]。
+*固定區塊大小的記憶池不需將每次規劃的資訊記錄下來（例如規劃的記憶體區塊大小，因為每次規劃都是一樣的）。針對一些小而多的記憶體區塊規劃會節省一些空間。
+'''缺點'''
+*記憶池模組在使用時，必須依照程式需求來做個別調整，才能保持時間與空間效率。
+
+==外部連結==
+* [http://www.pjsip.org/pjlib/docs/html/group__PJ__POOL__GROUP.htm PJLIB Reference: Fast Memory Pool] {{Wayback|url=http://www.pjsip.org/pjlib/docs/html/group__PJ__POOL__GROUP.htm |date=20210224161452 }}
+* [https://web.archive.org/web/20080906164434/http://www.boost.org/libs/pool/doc/concepts.html Pool Concepts]
+* [http://gee.cs.oswego.edu/dl/html/malloc.html A Memory Allocator] {{Wayback|url=http://gee.cs.oswego.edu/dl/html/malloc.html |date=20201102064327 }}
+[[Category:記憶體管理|Category:記憶體管理]]

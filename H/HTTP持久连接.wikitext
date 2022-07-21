@@ -1,0 +1,48 @@
+{{noteTA|G1=IT}}
+{{HTTP}}
+'''HTTP持久连接'''（{{Lang-en|'''HTTP persistent connection'''}}，也称作{{Lang|en|'''HTTP keep-alive'''}}或{{Lang|en|'''HTTP connection reuse'''}}）是使用同一个[[传输控制协议|TCP]]连接来发送和接收多个HTTP请求/应答，而不是为每一个新的请求/应答打开新的连接的方法。
+
+== 操作 ==
+在HTTP 1.0中，没有官方的keepalive操作。通常是在现有协议上添加一个指数。如果浏览器支持keep-alive，它会在请求的包头中添加：
+ Connection: Keep-Alive
+然后当服务器收到请求，作出回应的时候，它也添加一个头在响应中：
+ Connection: Keep-Alive
+这样做，连接就不会中断，而是保持连接。当客户端发送另一个请求时，它会使用同一个连接。这一直继续到客户端或服务器端认为会话已经结束，其中一方中断连接。 
+
+在HTTP 1.1中所有的连接默认都是持续连接，除非特殊声明不支持。<ref>{{Cite web |url=http://tools.ietf.org/html/rfc2616#section-8.1 |title=Persistent HTTP Connections in RFC 2616 "Hypertext Transfer Protocol -- HTTP/1.1" |accessdate=2012-01-19 |archive-date=2011-03-07 |archive-url=https://web.archive.org/web/20110307142107/http://tools.ietf.org/html/rfc2616#section-8.1 |dead-url=no }}</ref> HTTP持久连接不使用独立的keepalive信息，而是仅仅允许多个请求使用单个连接。然而，Apache 2.0 httpd的默认连接过期时间<ref>{{Cite web |url=http://httpd.apache.org/docs/2.1/mod/core.html#keepalive |title=Apache HTTP Server - KeepAlive Directive |accessdate=2012-01-19 |archive-date=2012-01-21 |archive-url=https://web.archive.org/web/20120121073949/http://httpd.apache.org/docs/2.1/mod/core.html#keepalive |dead-url=yes }}</ref>仅有15秒<ref>{{Cite web |url=http://httpd.apache.org/docs/2.0/mod/core.html#keepalivetimeout |title=Apache HTTP Server 2.0 - KeepAliveTimeout Directive |access-date=2012-01-19 |archive-url=https://web.archive.org/web/20130503121401/http://httpd.apache.org/docs/2.0/mod/core.html#keepalivetimeout |archive-date=2013-05-03 |dead-url=yes }}</ref> ，Apache 2.2仅有5秒。<ref>{{Cite web |url=http://httpd.apache.org/docs/2.2/mod/core.html#keepalivetimeout |title=Apache HTTP Server 2.2 - KeepAliveTimeout Directive |accessdate=2012-01-19 |archive-date=2014-05-22 |archive-url=https://web.archive.org/web/20140522123325/http://httpd.apache.org/docs/2.2/mod/core.html#keepalivetimeout |dead-url=yes }}</ref> 短的过期时间的优点是能够快速的传输多个web页组件，而不会绑定多个服务器进程或线程太长时间。<ref>{{cite web |url=http://docforge.com/wiki/Httpd/KeepAlive |title=Httpd/KeepAlive |author=Multiple (wiki) |work=Docforge |accessdate=2010-01-30 |deadurl=yes |archiveurl=https://web.archive.org/web/20100106140535/http://docforge.com/wiki/Httpd/KeepAlive |archivedate=2010-01-06 }}</ref>
+
+== 优势 ==
+* 较少的[[CPU|CPU]]和内存的使用（由于同时打开的连接的减少了）
+* 允许请求和应答的[[HTTP管線化|HTTP管線化]]
+* 降低[[拥塞控制|拥塞控制]] （[[传输控制协议|TCP连接]]减少了）
+* 减少了后续请求的[[延遲_(電腦)|延遲]]（无需再进行[[握手_(技术)|握手]]）
+* 报告错误无需关闭TCP连接
+
+根据RFC 2616 （47页），用户客户端与任何服务器和代理服务器之间不应该维持超过2个链接。[[代理服务器|代理服务器]]应该最多使用2×<var>N</var>个持久连接到其他服务器或代理服务器，其中<var>N</var>是同时活跃的用户数。这个指引旨在提高HTTP响应时间并避免阻塞。
+
+== 劣势 ==
+对于现在的广泛普及的宽带连接来说，Keep-Alive也许并不像以前一样有用。web服务器会保持连接若干秒（Apache中默认15秒），这与提高的性能相比也许会影响性能。
+
+对于单个文件被不断请求的服务（例如图片存放网站），Keep-Alive可能会极大的影响性能，因为它在文件被请求之后还保持了不必要的连接很长时间。
+
+== Web浏览器中的使用 ==
+[[Image:HTTP_persistent_connection.svg|thumb]]
+[[网景导航者|网景导航者]]（4.05版本以后）和[[Internet_Explorer|Internet Explorer]]（4.01版本以后）支持使用持久链接链接Web服务器和代理服务器。
+
+网景不使用过时时间来关闭持久连接。而是对所有空闲的持久链接进行排队。当需要打开一个新的持久链接，但连接到不同的服务器上时，浏览器使用[[最近最少使用算法|最近最少使用算法]]终止一个空闲的持久链接。<ref>{{cite web | url=http://www.cs.wisc.edu/~cao/papers/persistent-connection.html | title=Persistent Connection Behavior of Popular Browsers | date=1998-12-09 | publisher=University of Wisconsin-Madison | accessdate=2009-07-08 | author=Zhe Wang and Pei Cao | archive-date=2007-04-04 | archive-url=https://web.archive.org/web/20070404025532/http://www.cs.wisc.edu/%7Ecao/papers/persistent-connection.html | dead-url=no }}</ref>
+
+[[Internet_Explorer|Internet Explorer]]支持持久链接，IE 6和IE 7缺省使用2个持久链接，而IE 8缺省使用6个持久链接<ref>{{cite web | url=http://www.stevesouders.com/blog/2008/03/10/ie8-speeds-things-up/ | title=IE8 speeds things up | date=2008-03-10 | publisher=stevesouders.com | accessdate=2009-07-17 | archive-date=2009-08-10 | archive-url=https://web.archive.org/web/20090810230948/http://www.stevesouders.com/blog/2008/03/10/ie8-speeds-things-up/ | dead-url=no }}</ref>。持久链接在不活跃60秒后过时，可以在Windows注册表中修改<ref>{{cite web | url=http://support.microsoft.com/kb/813827 | title=How to change the default keep-alive time-out value in Internet Explorer | date=2007-10-27 | publisher=Microsoft | accessdate=2009-07-17 | archive-date=2009-07-22 | archive-url=https://web.archive.org/web/20090722163626/http://support.microsoft.com/kb/813827 | dead-url=no }}</ref>。
+
+[[Mozilla_Firefox|Mozilla Firefox]]支持持久链接。可以定制同时的持久连接的最大个数（每个服务器，每个代理服务器，总数）。连接在不活跃300秒（5分钟）后过时（配置中可以修改）。<ref>{{cite web | url=http://kb.mozillazine.org/Network.http.keep-alive.timeout | title=Network.http.keep-alive.timeout | publisher=mozillazine.org | accessdate=2009-07-17 | archive-date=2009-06-08 | archive-url=https://web.archive.org/web/20090608091724/http://kb.mozillazine.org/Network.http.keep-alive.timeout | dead-url=no }}</ref>
+
+[[Opera浏览器|Opera]] 4.0版本开始支持持久链接<ref>{{cite web | url=http://www.opera.com/press/releases/2000/03/28/ | title=Opera 4.0 Upgrades File Exchange: Includes HTTP 1.1 | date=2000-03-28 | publisher=Opera Software | accessdate=2009-07-08 | archive-url=https://web.archive.org/web/20100910111319/http://www.opera.com/press/releases/2000/03/28/ | archive-date=2010-09-10 | dead-url=yes }}</ref>。可以配置同时的持久连接的最大个数（每个服务器，总数）。
+
+== 参考文献 ==
+{{reflist}}
+
+== 外部链接 ==
+* [http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html RFC 2616 (HTTP/1.1), 8.1 Persistent Connections]{{Wayback|url=http://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html |date=20100824013010 }}
+* [http://www.cs.wisc.edu/~cao/papers/persistent-connection.html Persistent Connection Behavior of Popular Browsers (dated)]{{Wayback|url=http://www.cs.wisc.edu/~cao/papers/persistent-connection.html |date=20070404025532 }}
+* [http://httpd.apache.org/docs/1.3/keepalive.html Apache Keep-Alive Support]{{Wayback|url=http://httpd.apache.org/docs/1.3/keepalive.html |date=20100722100137 }}
+
+[[Category:HTTP|Category:HTTP]]

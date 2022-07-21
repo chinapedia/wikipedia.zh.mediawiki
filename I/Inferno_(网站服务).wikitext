@@ -1,0 +1,163 @@
+{{多個問題|
+{{copyedit}}
+{{Expert|time=2015-12-14T03:28:20+00:00}}
+}}
+{{noteTA
+|G1=IT
+}}
+{{About|名为“Inferno”的操作系统|美国作家[[丹·布朗|丹·布朗]]的小说|地狱 (小说)}}
+{{Infobox OS
+| name = Inferno
+| logo =
+| screenshot = [[File:Inferno_4th_Edition.png|250px]]
+| caption = Inferno第四版
+| developer = [[貝爾實驗室|貝爾實驗室]] / [[Vita_Nuova_Holdings|Vita Nuova Holdings]]
+| source_model = [[自由軟體|自由軟體]]
+| kernel_type = [[虛擬機器|虛擬機器]]
+| supported_platforms = [[ARM架構|ARM]]，[[PA-RISC|PA-RISC]]，[[MIPS架構|MIPS]]，[[PowerPC|PowerPC]]，[[SPARC|SPARC]]，[[x86|x86]]
+| ui =
+| family = [[类Unix|类Unix]]
+| latest_release_version = 第四版
+| latest_release_date = 2007年2月2日
+| marketing_target =
+| programmed_in = [[C語言|C]]
+| prog_language =
+| language =
+| updatemodel =
+| package_manager =
+| working_state = 持續中
+| license = [[GNU通用公共許可證|GPL]] / [[GNU較寬鬆公共許可證|LGPL]] / [[MIT授權|MIT]]
+| website = [http://www.vitanuova.com/inferno/ Vita Nuova], {{URL|https://bitbucket.org/inferno-os/inferno-os}}
+}}
+'''Inferno'''是種可以創造並支援分散式服務的[[作業系統|作業系統]]。它主要是基於[[貝爾實驗室九號計畫|貝爾實驗室九號計畫]]的經驗以及貝爾實驗室接下來對於作業系統、語言、即時編譯器、圖形、安全性、網路、移植等的研究而產生的。
+
+Inferno應用程式可以移植到大多數混合的硬體、網路、環境上。它也定義了一套名為[[Dis虛擬機器|Dis]]的[[虛擬機器|虛擬機器]]，這個虛擬機器可以在任何實體機器上實做，使用[[Limbo|Limbo]]這種[[型別安全|型別安全]]的語言來編譯成位元碼。Inferno也提供了具備相同介面的虛擬作業系統來讓使用者可以在硬體上原生地執行Inferno或以應用程式的方式托管在其他系統中。
+
+一種名為[[Styx|Styx]]的[[通訊協定|通訊協定]]被用來讓系統內可以採用一致的方式，讓應用程式只要使用標準的檔案操作，如開啟、讀取、寫入，以及關閉，就可以存取近端與遠端的資源。在第四版的Inferno中，Styx跟[[貝爾實驗室九號計畫|九號計畫]]中[[9P|9P]]協定的新版本9P2000是一樣的。
+
+作業系統以及相關程式、[[Vita_Nuova_Holdings|Vita Nuova Holdings]]公司的名稱都是源自於[[但丁·阿利吉耶里|但丁·阿利吉耶里]]的著作，尤其是[[神曲|神曲]]。
+
+==設計概念==
+Inferno最早是於1995年由[[貝爾實驗室|貝爾實驗室]]計算機科學研究部門（Computer Science Research division）的成員為了把[[貝爾實驗室九號計畫|九號計畫]]的思想更廣泛的使用在设备及網路上所製作的。Inferno是基於九號計畫的三個基礎原则而製作的[[分散式作業系統|分散式作業系統]]：
+* '''把資源視做檔案'''：把所有的[[資源_(計算機科學)|資源]]都列在[[階層式|階層式]][[檔案系統|檔案系統]]中以檔案表示。
+* '''命名空間'''：從應用程式的觀點來看，網路是種單一且清楚的[[命名空間|命名空間]]，能展現階層式檔案系統，也能代表近端或遠端實體分離的資源。
+* '''標準通訊協定'''：採用名為[[Styx|Styx]]的標準協定，用來存取近端或遠端的所有資源。
+
+為了處理並使用多樣化的網路環境，設計者決定採用[[虛擬機器|虛擬機器]]當做系統中必要的元件。這跟後來成為[[Java|Java]]的Oak專案的結論相同，但各別達成了這樣的目標。[[Dis虛擬機器|Dis虛擬機器]]是一種傾向於貼近運行架構的一種寄存器機（register machine），相對來說[[Java虛擬機器|Java虛擬機器]]則是一種堆疊機（stack machine）。這種方法的優勢是只要簡單的為新架構創建一個[[即時編譯|即時編譯器]]就可以了。
+
+虛擬機器提供的記憶體管理功能設計上在1MB大小的記憶體且不提供記憶體映射的硬體上會較有效率。[[垃圾回收_(計算機科學)|垃圾回收]]機制則是一種參照計數（reference counting）與收集循環資料（cyclic data）的即時染色收集器（real-time coloring collector）混合而成的。
+
+Inferno核心包含了虛擬機器、即時編譯器（on-the-fly compiler）、排程、裝置、協定堆疊（protocol stacks）、各行程檔案命名空間的命名空間直譯器（evaluator），以及階層式檔案系統的根目錄。核心也同時包含了一些提供了虛擬作業系統介面的內建模組，像是系統呼叫、圖形、安全性、以及數學函式模組。
+
+[[貝爾實驗室技術期刊|貝爾實驗室技術期刊]]（{{link-en|Bell Labs Technical Journal|Bell Labs Technical Journal}}）<ref name = "bltj">{{Cite web |url=http://www.vitanuova.com/inferno/papers/bltj.html |title=貝爾實驗室技術論文 |accessdate=2010-04-05 |archive-date=2018-08-15 |archive-url=https://web.archive.org/web/20180815213935/http://www.vitanuova.com/inferno/papers/bltj.html |dead-url=no }}</ref>介紹Inferno具有幾個方面上由作業系統所支援的可移植性與通用性：
+
+<blockquote>
+* 可以移植到不同的處理器上：目前可以在[[ARM架構|ARM]]、[[MIPS架構|MIPS]]、[[PA-RISC|PA-RISC]]、[[PowerPC|PowerPC]]、[[SPARC|SPARC]]，以及[[x86|x86]]等架構上運作，也可以移植到其他的架構上。
+* 可以移植到不同的環境上：它可以以獨立的作業系統運作在小型終端機上，或是以使用者應用軟體的形式存在於[[貝爾實驗室九號計畫|九號計畫]]、[[Windows_NT|Windows NT]]、[[Windows_95|Windows 95]]、UNIX（[[Irix|Irix]]、[[Solaris|Solaris]]、[[FreeBSD|FreeBSD]]、[[GNU/Linux|GNU/Linux]]、[[AIX|AIX]]、[[HP-UX|HP-UX]]）。Inferno應用程式在這些環境中都有相同的介面。
+* 分散式設計：在使用者終端機以及伺服器的部分都具有相同的環境，而且彼此間可以匯入對方的資源（例如附加的輸入/輸出裝置或是網路）。應用程式可以在運行系統中的通訊機制輔助之下，輕鬆的（甚至是動態的）分散到客戶端或伺服器端。
+* 最低硬體需求：它在機器上所運行的實用應用程式只需要1MB的記憶體，也不需要[[記憶體映射|記憶體映射]]的硬體支援。
+* 可攜式應用：Inferno應用程式是以[[型別安全|型別安全]]的Limbo語言所撰寫，編譯出來的執行檔在各種平台上的執行結果都會一致。
+* 動態適應性（Dynamic adaptability）:應用程式可以根據硬體或其他可用資源來載入不同的程式模組來執行特定的功能。例如像影片播放器可以使用許多不同解碼模組中的任何一個來進行影片的解碼。
+</blockquote>
+
+這些設計面上的決定導致它為了能夠讓內容與服務提供者可以著重於他們所傳送的內容，而非把重心放在處理各種不同的硬體、軟體或網路環境，因此提供了一種標準的介面來達成這樣的目的。
+
+==歷史==
+
+{| class="wikitable" border="1"
+|-
+! 日期
+! 版本
+! 備註
+|-
+| 1996年
+| Inferno Beta
+| 貝爾實驗室
+|-
+| 1997年5月
+| Inferno Release 1.0
+| 貝爾實驗室技術期刊文章，1997年冬季
+|-
+| July 1999
+| Inferno第二版
+| Lucent's Inferno Business Unit
+|-
+| June 2001
+| Inferno第三版
+| Vitanuova
+|-
+| 2004
+| Inferno第四版
+| 開放原始版版本，改善了早期版本不相容的介面，納入了9P2000的支援
+|}
+
+Inferno是[[貝爾實驗室九號計畫|九號計畫]]的衍生產品，彼此之間有許多共通的設計概念以及核心中的程式碼，特別是關於裝置以及Styx/9P2000協定的部份。Inferno也把[[Unix哲學|Unix哲學]]與自貝爾實驗室繼承而來的UNIX經驗分享給九號計畫的專案。許多Inferno的命令列工具原先也都是九號計畫的工具，之後才用Limbo語言改寫。
+
+[[IEEE_Internet_Computing|IEEE Internet Computing]]在1997年3-4月的刊物中有Inferno網路軟體的廣告。該廣告宣稱可利用多種裝置在包含網際網路、電信網路，以及區域網路等之"任何網路"上進行通訊。圖中甚至擺放了[[PlayStation|PlayStation]]之類的照片，如果電玩可以跟電腦溝通、手機可以存取電子郵件、電視可以存取語音郵件。
+
+[[貝爾實驗室|貝爾實驗室]]計算科學研究中心（Computing Science Research Center）的成員[[Ken_Thompson|Ken Thompson]]、[[Dennis_Ritchie|Dennis Ritchie]]，以及[[道格拉斯·麥克羅伊|道格拉斯·麥克羅伊]]研究並開發了[[C語言|C語言]]，並使用該語言建造了[[UNIX|UNIX]]。貝爾實驗室中的程式設計師隨後進行九號計畫及Inferno等針對現代分散式環境的作業系統開發。
+
+[[朗訊科技|朗訊科技]]至少有兩個內部專案有採用Inferno：Lucent VPN Firewall Brick以及Lucent Pathstar phone switch。這也開啟了販賣Inferno原始碼授權的嘗試，不過反應並不熱烈。朗訊科技沒特別做行銷又忽略了Inferno與網際網路的重要關連，而[[Java|Java語言]]跟Inferno目標市場相似、採用類似的技術、可以在[[網頁瀏覽器|網頁瀏覽器]]中運行，也同時滿足了當時對於[[OOP|物件導向語言]]的流行。當[[昇陽電腦|昇陽電腦]]大力行銷自家的Java時，朗訊科技自昇陽電腦取得Java的授權，宣稱所有Inferno的裝置皆能執行Java。Java位元碼與Dis位元碼的轉譯器就是為了達成這個功能所產生的。然而Inferno還是賣不出去。
+
+Inferno商業部門過了三年就關閉且被賣給[[Vita_Nuova_Holdings|Vitanuova]]。Vitanuova持有相關的權利後，便繼續研發並對整個系統採用商業化授權的方式，隨後提供免費下載以及對核心以及虛擬機器以外的整個系統採非[[GPL|GPL]]相容授權的方式。Vitanuova將軟體繼續移植到新的硬體以及專注在分散式應用軟體上，最終將原始碼採用[[GPL|GPLv2]]授權釋出，而Inferno作業系統現今也變成是一個[[開放原始碼|開放原始碼]]的專案。
+
+==移植==
+Inferno可以直接在原生硬體中執行，也能在其他平台以應用程式的方式提供虛擬作業系統。應用程式無須經過修改或重編譯即可在所有的Inferno平台開發並執行。
+
+原生移植包括[[x86|x86]]、[[MIPS架構|MIPS]]、[[ARM架構|ARM]]、[[PowerPC|PowerPC]]，以及[[SPARC|SPARC]]。
+
+托管或虛擬作業系統移植則包括：[[Microsoft_Windows|Microsoft Windows]]、[[GNU/Linux|GNU/Linux]]、[[FreeBSD|FreeBSD]]、[[貝爾實驗室九號計畫|九號計畫]]、[[Mac_OS_X|Mac OS X]]、[[Solaris|Solaris]]、[[IRIX|IRIX]]、[[UnixWare|UnixWare]]。
+
+Inferno也可以以[[外掛程式|套件]]的方式托管於[[Internet_Explorer|IE]]中。根據Vita Nuova的說法，針對其他瀏覽器的套件也在開發中<ref name = "plugins">[http://www.vitanuova.com/inferno/pidoc/index.html 套件] {{Wayback|url=http://www.vitanuova.com/inferno/pidoc/index.html |date=20210126094730 }}, Vita Nuova.</ref>。
+
+Inferno也可以移植到[[OpenMoko|OpenMoko]]<ref>{{Cite web |url=http://code.google.com/p/inferno-openmoko/ |title=存档副本 |accessdate=2010-04-05 |archive-date=2016-01-22 |archive-url=https://web.archive.org/web/20160122211522/http://code.google.com/p/inferno-openmoko/ |dead-url=no }}</ref>、[[Nintendo_DS|Nintendo DS]]<ref>{{Cite web |url=http://code.google.com/p/inferno-ds/ |title=存档副本 |accessdate=2010-04-05 |archive-date=2015-01-06 |archive-url=https://web.archive.org/web/20150106085259/http://code.google.com/p/inferno-ds/ |dead-url=no }}</ref>以及[[SheevaPlug|SheevaPlug]]<ref>{{Cite web |url=http://code.google.com/p/inferno-kirkwood/ |title=存档副本 |accessdate=2010-04-05 |archive-date=2014-09-18 |archive-url=https://web.archive.org/web/20140918032902/http://code.google.com/p/inferno-kirkwood/ |dead-url=no }}</ref>。
+
+==授權==
+Inferno第四版於2005年初以[[自由軟體|自由軟體]]的授權釋出。具體來說，Inferno採用了[[多許可|雙授權]]的方式採用了兩種授權供使用者選擇。使用者可選擇在[[自由軟體授權|自由軟體授權]]或傳統商業化授權的情況下取得Inferno。根據自由軟體授權的規範，系統中各個部份可以採用不同的授權方式，這些授權方式包括[[GPL|GPL]]、[[LGPL|LGPL]]、[[Lucent_Public_License|Lucent Public License]]，以及[[MIT_License|MIT License]]。後來Vita Nuova讓Inferno可以在[[GPL|GPLv2]]的授權下取得除了字型（採用[[Bigelow_and_Holmes|Bigelow and Holmes]]授權）以外的整個系統。現在總共有三種授權方式可供選擇。
+
+==書籍==
+由[[Phillip_Stanley-Marbell|Phillip Stanley-Marbell]]所撰寫的''Inferno Programming with Limbo''<ref name="Book_IPwL">{{cite book |last=Stanley-Marbell |first=Phillip |title=Inferno Programming with Limbo |url=http://doc.cat-v.org/inferno/books/inferno_programming_with_limbo/ |year=2003 |publisher=Wiley |language=en |isbn=0470843527 |access-date=2010-04-05 |archive-date=2020-11-09 |archive-url=https://web.archive.org/web/20201109042258/http://doc.cat-v.org/inferno/books/inferno_programming_with_limbo/ |dead-url=no }}</ref>雖然描述了一些Inferno作業系統第三版的情況，但大多都專注在Limbo語言以及Inferno系統所提供的介面上。例如說這本書僅提到一點Inferno多用途[[命令列|命令列]]（command shell）的功能，不過作為一本程式設計相關的書籍，這也是可理解的情況。
+
+另一本由[[Brian_Stuart|Brian Stuart]]所撰寫的''Principles of Operating Systems: Design and Applications''<ref name="Book_PoOSDaA">{{cite book |last=Stuart |first=Brian |title=Principles of Operating Systems: Design and Applications |year=2008 |publisher=Course Technology |language=en |isbn=1418837695}}</ref>則採用Inferno作為作業系統設計的實例。
+
+而由Martin Atkins、Charles Forsyth、Rob Pike，以及Howard Trickey合著的"The Inferno Programming Book: An Introduction to Programming for the Inferno Distributed System"一書，嘗試以作業系統為中心的觀點介紹Inferno，只是不幸地作者從未完成或釋出該一著作。
+
+==參照==
+{{Portal|Free software|Free Software Portal Logo.svg}}
+* [[Inferno應用程式列表|Inferno應用程式列表]]
+* [[貝爾實驗室九號計畫|貝爾實驗室九號計畫]]
+* [[Unix|Unix]]
+* [[Language-based_system|Language-based system]]
+* [[JNode|JNode]]
+* [[Singularity_(作業系統)|Singularity (作業系統)]][[微軟研究院|微軟研究院]]作業系統方面的類似成果
+
+==參考文獻==
+{{Reflist}}
+
+==外部連結==
+* [http://code.google.com/p/inferno-os/ Inferno Project at Google Code] {{Wayback|url=http://code.google.com/p/inferno-os/ |date=20150224225244 }}
+* [http://www.vitanuova.com/inferno/net_download4T.html Inferno第四版下載頁面，提供原始碼下載] {{Wayback|url=http://www.vitanuova.com/inferno/net_download4T.html |date=20100704205215 }}
+* [http://doc.cat-v.org/inferno/4th_edition/ 教學文件] {{Wayback|url=http://doc.cat-v.org/inferno/4th_edition/ |date=20200724213209 }}
+* [http://man.cat-v.org/inferno/ Inferno使用者手冊] {{Wayback|url=http://man.cat-v.org/inferno/ |date=20201004194410 }}
+* [http://doc.cat-v.org/inferno/ 其他文件] {{Wayback|url=http://doc.cat-v.org/inferno/ |date=20200924062531 }}
+* [http://www.vitanuova.com/news/newsgroup.html 郵件列表及其他資源] {{Wayback|url=http://www.vitanuova.com/news/newsgroup.html |date=20201029165204 }}
+* [http://ninetimes.cat-v.org Ninetimes:關於Inferno、九號計畫及其他相關技術的新聞及文章] {{Wayback|url=http://ninetimes.cat-v.org/ |date=20201130071613 }}
+* [http://inferno.makesad.us/wiki/1 Inferno Wiki]{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }}
+* [https://web.archive.org/web/20100531122253/http://www.caerwyn.com/ipn/ Inferno程式設計師手冊] - 開發人員所撰寫的日誌。
+
+'''Ports'''
+* [http://code.google.com/p/inferno-ds/ Inferno for the Nintendo DS] {{Wayback|url=http://code.google.com/p/inferno-ds/ |date=20150106085259 }}
+* [http://code.google.com/p/inferno-kirkwood/ Inferno for the Marvell Kirkwood/Sheevaplug] {{Wayback|url=http://code.google.com/p/inferno-kirkwood/ |date=20140918032902 }}
+* [http://wiki.laptop.org/go/inferno Inferno on OLPC] {{Wayback|url=http://wiki.laptop.org/go/inferno |date=20210108202550 }}
+* [http://code.google.com/p/inferno-openmoko/ Inferno port to the Openmoko neo freerunner] {{Wayback|url=http://code.google.com/p/inferno-openmoko/ |date=20160122211522 }}
+
+'''Of Historical Interest'''
+* [http://doc.cat-v.org/inferno/historical_documents/website/ 朗訊科技Inferno原本網站的cat-v典藏頁面] {{Wayback|url=http://doc.cat-v.org/inferno/historical_documents/website/ |date=20210107222838 }}
+* [http://doc.cat-v.org/inferno/historical_documents/mailing_lists/interstice/ Inferno原本郵件列表的cat-v典藏頁面] {{Wayback|url=http://doc.cat-v.org/inferno/historical_documents/mailing_lists/interstice/ |date=20210107103931 }}
+
+[[Category:Inferno|*]]
+[[Category:分布式操作系统|Category:分布式操作系统]]
+[[Category:嵌入式操作系统|Category:嵌入式操作系统]]
+[[Category:貝爾實驗室九號計畫|Category:貝爾實驗室九號計畫]]
+[[Category:虛擬機器|Category:虛擬機器]]
+[[Category:ARM操作系统|Category:ARM操作系统]]

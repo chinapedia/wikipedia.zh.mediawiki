@@ -1,0 +1,286 @@
+{{NoteTA
+|G1 = Math
+}}
+{{线性代数}}
+在[[线性代数|线性代数]]與[[数值分析|数值分析]]中，'''LU分解'''是[[矩阵分解|矩阵分解]]的一种，将一个[[矩阵|矩阵]]分解为一个[[三角矩阵|下三角矩阵]]和一个[[三角矩阵|上三角矩阵]]的乘积，有时需要再乘上一个[[置换矩阵|置换矩阵]]。LU分解可以被視為[[高斯消去法|高斯消去法]]的矩陣形式。在[[数值计算|数值计算]]上，LU分解經常被用来解[[线性方程组|线性方程组]]、且在求[[逆矩阵|逆矩阵]]和计算[[行列式|行列式]]中都是一個關鍵的步驟。
+
+== 定义 ==
+對於[[方块矩阵|方阵]] [[方块矩阵|<math>A</math>]]， <math>A</math> 的 '''LU 分解'''是将它分解成一個[[下三角矩阵|下三角矩阵]] L 與[[上三角矩阵|上三角矩阵]] U 的乘積，也就是
+
+:<math> A = LU </math>
+
+如果適當的改變 <math>A</math>的行的順序或列的順序，就可以將 <math>A</math>做 LU 分解。
+
+舉例來說一个 <math>3 \times 3</math> 的矩阵 A ，其 LU 分解會寫成下面的形式：
+:<math> 
+        A=
+\begin{bmatrix}
+           a_{11} & a_{12} & a_{13} \\
+           a_{21} & a_{22} & a_{23} \\
+           a_{31} & a_{32} & a_{33} \\
+        \end{bmatrix} =
+      \begin{bmatrix}
+           l_{11} & 0 & 0 \\
+           l_{21} & l_{22} & 0 \\
+           l_{31} & l_{32} & l_{33} \\
+        \end{bmatrix}
+        \begin{bmatrix}
+           u_{11} & u_{12} & u_{13} \\
+           0 & u_{22} & u_{23} \\
+           0 & 0 & u_{33} \\
+        \end{bmatrix}
+</math>。
+
+事實上，並不是每個矩陣都有 LU 分解。例如，從上式可知 <math> 
+        a_{11}=l_{11}u_{11}
+</math>，若 <math> 
+        a_{11}=0
+</math>，則 <math> 
+        l_{11}
+</math>或 <math> 
+        u_{11}
+</math>等於 0，故 L 或 U 是[[可逆矩阵|可逆矩阵]]，A 必須也是[[可逆矩阵|可逆矩阵]]。然而，存在著[[可逆矩阵|可逆矩阵]] A 滿足 <math>a_{11}=0</math>，這些 A 就是沒有 LU 分解的例子。該問題可藉由置換 A 的各-{zh-hans:行; zh-hant:列;}-順序來解決，最終會得到一個 A 的 PLU 分解。 
+
+=== PLU 分解 ===
+方陣 A 的 '''PLU 分解'''是是将它分解成一个[[置换矩阵|置换矩阵]] P、一個[[下三角矩阵|下三角矩阵]] L 與[[上三角矩阵|上三角矩阵]] U 的乘積，即
+
+:<math> A = PLU </math>
+
+事實上，所有的方陣都可以寫成 PLU 分解的形式，由於左乘置換矩陣 <math> P^{-1} </math>是在交換行的順序，所以由 <math> P^{-1}A = LU </math>推得適當的交換 A 的行的順序，即可將 A 做 LU 分解。事實上，PLU 分解有很高的[[数值稳定性|數值穩定性]]，因此實用上是很好用的工具。
+
+有時為了計算上的方便，會同時間換行與列的順序，此時會將 A 分解成
+
+:<math> A = PLUQ </math>
+
+其中 P、L、U 同上，Q 是一個[[置換矩陣|置換矩陣]]。
+
+=== LDU 分解 ===
+方陣 A 的 '''LDU 分解'''是是将它分解成一個[[下三角矩阵|單位下三角矩阵]] L、[[對角矩陣|對角矩陣]] D 與[[上三角矩阵|單位上三角矩阵]] U 的乘積，即
+
+:<math> A = LDU </math>
+
+其中單位上、下三角矩陣是指对角线上全是 1 的上、下三角矩阵。 
+
+事實上，LDU 分解可以推廣到 A 是一般的矩陣，而非方陣。此時，L 和 D 是方陣，並且與 A 有相同的-{zh-hans:行; zh-hant:列;}-，U 則有和 A 相同的長寬。注意到現在 U 是上三角的定義改為[[主對角線|主對角線]]的下方都是 0，而主對角線是收集所有 <math>U_{ij}</math> 滿足 i=j。
+
+== 存在性和唯一性 ==
+
+一个[[可逆矩阵|可逆矩阵]]可以进行''LU''分解[[当且仅当|当且仅当]]它的所有[[子式|子式]]都非零。如果要求其中的''L''矩阵（或''U''矩阵）为单位三角矩阵，那么分解是唯一的。同理可知，矩阵的''LDU''可分解条件也相同，并且总是唯一的。
+
+即使矩阵不可逆，''LU''仍然可能存在。实际上，如果一个[[矩阵的秩|秩]]为''k''的矩阵的前''k''个顺序主子式不为零，那么它就可以进行''LU''分解，但反之则不然。
+
+目前，在任意[[体_(数学)|域]]上一个方块矩阵可进行''LU''分解的充要条件已经被发现，这些充要条件可以用某些特定子矩阵的秩表示。用[[高斯消去法|高斯消元法]]来得到''LU''分解的算法也可以扩张到任意域上。 
+
+任意矩阵''A''（不仅仅是方块矩阵）都可以进行''LUP''分解。其中的''L''和''U''矩阵是方阵，''P''矩阵则与''A''形状一样。
+
+== 正定矩阵 ==
+如果矩阵''A''是[[埃尔米特矩阵|埃尔米特矩阵]]，并且是[[正定矩阵|正定矩阵]]，那么可以使，''U''是''L''的[[共轭转置|共轭转置]]。也就是说，''A''可以写成
+:<math> A = L L^{*} \ </math>
+这个分解被称作[[Cholesky分解|Cholesky分解]]。对每一个正定矩阵，Cholesky分解都唯一存在。此外，比起一般的''LU''分解，计算Cholesky分解更为快捷，并具有更高的[[数值稳定性|数值稳定性]]。
+
+== 具体的表达式 ==
+
+由于''LDU''分解唯一存在，对给定的矩阵，可以给出相应三个矩阵''L''、''D''和''U''的具体的表达式。表达式由''A''的[[子式和余子式|主子式]]之比构成（因此要求它们不为零）。设<math>d_1, d_2, \cdots d_n</math>为矩阵''D''的对角线系数，则有<math>d_1 =\mathbf{A}_{1,1}</math>。对<math>i = 2, \ldots, n</math>，<math>d_i</math>的值等于''A''的第<math>i</math>个顺序主子式与第<math>i-1</math>个顺序主子式之比，其中约定<math>d_0</math>=1。
+
+== 算法 ==
+''LU''分解在本质上是[[高斯消去法|高斯消元法]]的一种表达形式。实质上是将''A''通过初等行变换变成一个上三角矩阵，其变换矩阵就是一个单位下三角矩阵。这正是所谓的杜尔里特算法（Doolittle algorithm）：从下至上地对矩阵''A''做初等行变换，将对角线左下方的元素变成零，然后再证明这些行变换的效果等同于左乘一系列单位下三角矩阵，这一系列单位下三角矩阵的乘积的逆就是L矩阵，它也是一个单位下三角矩阵。 
+
+这类算法的复杂度一般在<math>\frac{2n^3}{3}</math>左右，对充分消元的分解则不然<!--扥-->。
+
+=== 杜尔里特算法 ===
+对给定的''N'' × ''N''矩阵
+:<math> 
+A= (a_{n,n})
+</math>
+有
+:<math> A^{(0)} := A</math>
+然后定义对于''n'' = 1,...,''N-1''的情况如下：
+
+在第''n''步，消去矩阵''A''<sup>(''n-1'')</sup>的第''n''列主对角线下的元素：将''A''<sup>(''n-1'')</sup>的第''n''行乘以<math>l_{i,n} := -\frac{a_{i,n}^{(n-1)}}{a_{n,n}^{(n-1)}}</math>之后加到第''i''行上去。其中<math>i = n+1,\ldots,N</math>。
+
+这相当于在''A''<sup>(''n-1'')</sup>的左边乘上一个单位下三角矩阵：
+:<math> 
+L_n =
+\begin{bmatrix}
+     1 &        &           &         &         & 0 \\
+       & \ddots &           &         &         &   \\
+       &        &         1 &         &         &   \\
+       &        & l_{n+1,n} &  \ddots &         &   \\
+       &        &    \vdots &         &  \ddots &   \\
+     0 &        &   l_{N,n} &         &         & 1 \\
+\end{bmatrix} 
+</math>
+
+于是，定义为：设
+:<math> A^{(n)} := L_n A^{(n-1)} </math>
+
+经过''N-1''轮操作后，所有在主对角线下的系数都为0了，于是我们得到了一个上三角矩阵：''A''<sup>(''N-1'')</sup>，这时就有：
+:<math> 
+A = L_{1}^{-1} L_{1} A^{(0)}
+= L_{1}^{-1} A^{(1)} = L_{1}^{-1} L_{2}^{-1} L_{2} A^{(1)} = 
+L_{1}^{-1}L_{2}^{-1} A^{(2)} =\ldots = L_{1}^{-1} \ldots L_{N-1}^{-1} A^{(N-1)} 
+</math>
+
+这时，矩阵''A''<sup>(''N-1'')</sup> 就是''U''，<math>L=L_{1}^{-1} \ldots L_{N-1}^{-1}</math>。
+下三角矩阵<math>L_{k}</math>的逆依然是下三角矩阵，而且下三角矩阵的乘积仍是下三角矩阵，所以<math>L</math>是下三角矩阵。
+于是我们得到分解：<math>A=LU</math>。
+
+显然，要是算法成立，在每步操作时必须有<math>a_{n,n}^{(n-1)} \neq 0</math>。如果这一条件不成立，就要将第''n''行和另一行交换，由此就会出现一个置换矩阵''P''。这就是为什么一般来说''LU''分解里会带有一个置换矩阵的原因。
+
+== 例子 ==
+将一个简单的3×3矩阵''A''进行LU分解：
+:<math> A=
+        \begin{bmatrix}
+           1 & 2 & 3 \\
+           2 & 5 & 7 \\
+           3 & 5 & 3 \\
+        \end{bmatrix}
+</math>
+
+先将矩阵第一列元素中a<sub>11</sub>以下的所有元素变为0，即
+:<math> L_{1}A=
+        \begin{bmatrix}
+           1 & 0 & 0 \\
+          -2 & 1 & 0 \\
+          -3 & 0 & 1 \\
+        \end{bmatrix} \times
+        \begin{bmatrix}
+           1 & 2 & 3 \\
+           2 & 5 & 7 \\
+           3 & 5 & 3 \\
+        \end{bmatrix}  =
+        \begin{bmatrix}
+           1 & 2 & 3 \\
+           0 & 1 & 1 \\
+           0 & -1 & -6 \\
+        \end{bmatrix}
+</math>
+再将矩阵第二列元素中a<sub>22</sub>以下的所有元素变为0，即
+:<math> L_{2}(L_{1}A)=
+        \begin{bmatrix}
+           1 & 0 & 0 \\
+           0 & 1 & 0 \\
+           0 & 1 & 1 \\
+        \end{bmatrix} \times
+        \begin{bmatrix}
+           1 & 2 & 3 \\
+           0 & 1 & 1 \\
+           0 & -1 & -6 \\
+        \end{bmatrix}  =
+        \begin{bmatrix}
+           1 & 2 & 3 \\
+           0 & 1 & 1 \\
+           0 & 0 & -5 \\
+        \end{bmatrix} =U
+</math>
+:<math>L= L_{1}^{-1}L_{2}^{-1}=
+        \begin{bmatrix}
+           1 & 0 & 0 \\
+           2 & 1 & 0 \\
+           3 & 0 & 1 \\
+        \end{bmatrix} \times
+        \begin{bmatrix}
+           1 & 0 & 0 \\
+           0 & 1 & 0 \\
+           0 & -1 & 1 \\
+        \end{bmatrix} =
+        \begin{bmatrix}
+           1 & 0 & 0 \\
+           2 & 1 & 0 \\
+           3 & -1 & 1 \\
+        \end{bmatrix} </math>
+
+还有一种方法是通过方程求解，如下所示，将以下矩阵进行''LU''分解：
+:<math> 
+        \begin{bmatrix}
+           4 & 3 \\
+           6 & 3 \\
+        \end{bmatrix} =
+      \begin{bmatrix}
+           l_{11} & 0 \\
+           l_{21} & l_{22} \\
+        \end{bmatrix}
+        \begin{bmatrix}
+           u_{11} & u_{12} \\
+           0 & u_{22} \\
+        \end{bmatrix} 
+</math>
+由于矩阵阶数只是2，可以直接列方程解：
+:<math>l_{11}* u_{11} + 0 * 0 = 4</math>
+:<math>l_{11}* u_{12} + 0 * u_{22} = 3</math>
+:<math>l_{21}* u_{11} + l_{22} * 0 = 6</math>
+:<math>l_{21}* u_{12} + l_{22} * u_{22} = 3 </math>
+这个线性方程组有无数多组解。因此，可以假设其中一个是单位三角矩阵，比如说''L''，也就是说其对角线上的两个系数都是1。这时可以解出：
+:<math>l_{21} = 1.5</math>
+:<math>u_{11} = 4</math>
+:<math>u_{12} = 3</math>
+:<math>u_{22} = -1.5</math>。
+也就是说
+:<math> 
+        \begin{bmatrix}
+           4 & 3 \\
+           6 & 3 \\
+        \end{bmatrix} =
+      \begin{bmatrix}
+           1 & 0 \\
+           1.5 & 1 \\
+        \end{bmatrix}
+        \begin{bmatrix}
+           4 & 3 \\
+           0 & -1.5 \\
+        \end{bmatrix} 
+</math>
+
+== 稀疏矩阵分解 ==
+对于阶数很大的[[稀疏矩阵|稀疏矩阵]]，有特别的简便算法来获得其''LU''分解：这时的''L''和''U''也是稀疏矩阵。理论上来说，算法的复杂度约等于非零系数的个数，而不是矩阵的大小阶数。这些算法通过运用行和列的交换，使得过程中零系数因为操作而变成非零系数的次数减到最少。
+
+一般的将零系数因为操作而变成非零系数的次数减到最少的方法是运用[[图论|图论]]。
+
+== 应用 ==
+=== 求解线性方程 ===
+对于给定的线性方程组
+:<math>A x = L U x = b \,</math>
+
+要解出''x''，可以进行以下步骤：
+# 首先，解方程<math> Ly = b </math>得到<math> y </math>；
+# 然后解方程<math> Ux = y </math> 得到<math> x </math>。
+
+在两次的求解中，我们遇到的都是三角矩阵，因此运用向前（向后）替代法就可以简洁地求解（参见[[三角矩阵|三角矩阵]]），而不需要用到[[高斯消去法|高斯消元法]]。然而，在将''A''进行''LU''分解时，仍然要用到[[高斯消去法|高斯消元法]]。因此，这个方法适合在要对许多个不同的b求解时用。
+
+=== 求逆矩阵 ===
+求矩阵''A''的逆时，可以直接求''L''和''U''的逆矩阵，然后代入：<math>A^{-1} = U^{-1}L^{-1}</math> 。也可以将单位矩阵分解成''n''个列向量，然后用上面求解线性方程的方法解出逆矩阵的列向量，然后拼起来。后者的复杂度在''n''<sup>2</sup>级别{{fact}}，较高斯法为优。
+
+=== 计算行列式 ===
+
+矩阵<math>L</math>和<math>U</math>可以用来快速地计算矩阵<math>A</math>的[[行列式|行列式]]，因为det(''A'') = det(''L'') det(''U'')，而三角矩阵的行列式就是对角线元素的乘积。如果要求''L'' 是单位三角矩阵，那么<math> \det(A) = \det(L) \det(U) = \prod_{i=1}^n u_{ii} </math>
+
+同样的方法也可以应用于''LUP''分解，只需乘上''P''的行列式，即相应置换的[[符号差|符号差]]。
+
+== 参见 ==
+* [[分块LU分解|分块LU分解]]
+* [[Cholesky分解|Cholesky分解]]
+* [[矩阵分解|矩阵分解]]
+* [[LU约简|LU约简]]
+
+== 参考来源 ==
+* {{citation | first1=Lloyd | last1=Trefethen | first2=David | last2=Bau | title= Numerical Linear Algebra}}
+* {{citation | first1=T.H. | last1=Cormen | first2=C.E | last2=Leisserson | first3=R.L. | last3 = Rivest | title=Introduction to Algorithms }}
+* {{citation | first1=Gene H. | last1=Golub | author1-link=Gene H. Golub | first2=Charles F. | last2=Van Loan | author2-link=Charles F. Van Loan | year=1996 | title=Matrix Computations | edition=3rd | publisher=Johns Hopkins | place=Baltimore | isbn=978-0-8018-5414-9}}.
+* {{citation | first1=Roger A. | last1=Horn | first2=Charles R. | last2=Johnson | year=1985 | title=Matrix Analysis | publisher=Cambridge University Press | isbn=0-521-38632-2 }}. See Section 3.5.
+* {{citation | first1=Pavel | last1=Okunev | first2=Charles | last2=Johnson | year=1997| title=Necessary And Sufficient Conditions For Existence of the LU Factorization of an Arbitrary Matrix | id={{arxiv|archive=math.NA|id=0506382}} }}.
+* {{citation | first1=Alston | last1=Householder | year=1975| title=The Theory of Matrices in Numerical Analysis }}.
+* [http://mathworld.wolfram.com/LUDecomposition.html LU decomposition] {{Wayback|url=http://mathworld.wolfram.com/LUDecomposition.html |date=20201007195759 }} on ''MathWorld''.
+* [http://www.math-linux.com/spip.php?article51 LU decomposition] {{Wayback|url=http://www.math-linux.com/spip.php?article51 |date=20130305231146 }} on ''Math-Linux''.
+* [http://www.stat.nctu.edu.tw/misg/SUmmer_Course/C_language/Ch06/LUdecomposition.htm LU decomposition] {{Wayback|url=http://www.stat.nctu.edu.tw/misg/SUmmer_Course/C_language/Ch06/LUdecomposition.htm |date=20081026085129 }}
+
+== 外部链接 ==
+* [http://www.netlib.org/lapack/ LAPACK] {{Wayback|url=http://www.netlib.org/lapack/ |date=20110224085358 }} is a collection of FORTRAN subroutines for solving dense linear algebra problems
+* [http://www.alglib.net/ ALGLIB] {{Wayback|url=http://www.alglib.net/ |date=20170824061136 }} includes a partial port of the LAPACK to C++, C#, Delphi, etc.
+* [https://web.archive.org/web/20081212221215/http://www.bluebit.gr/matrix-calculator/ Online Matrix Calculator] performs LU decomposition
+* [http://numericalmethods.eng.usf.edu/mws/gen/04sle/mws_gen_sle_txt_ludecomp.doc LU decomposition] {{Wayback|url=http://numericalmethods.eng.usf.edu/mws/gen/04sle/mws_gen_sle_txt_ludecomp.doc |date=20070714100202 }} at ''Holistic Numerical Methods Institute''
+* [https://web.archive.org/web/20070609042305/http://math.fullerton.edu/mathews/n2003/LUFactorMod.html Module for LU Factorization with Pivoting]
+* [http://demonstrations.wolfram.com/LUDecomposition/ LU Decomposition] {{Wayback|url=http://demonstrations.wolfram.com/LUDecomposition/ |date=20200929003901 }} by [[Ed_Pegg,_Jr.|Ed Pegg, Jr.]]，[[The_Wolfram_Demonstrations_Project|The Wolfram Demonstrations Project]]，2007.
+
+[[Category:矩阵分解|Category:矩阵分解]]
+
+[[de:Gaußsches_Eliminationsverfahren#LR-Zerlegung|de:Gaußsches Eliminationsverfahren#LR-Zerlegung]]

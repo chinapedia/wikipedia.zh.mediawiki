@@ -1,0 +1,216 @@
+{{Translating|||time=2018-06-16T05:35:03+00:00}}
+{{NoteTA|G1=Signals and Systems}}
+'''倒頻譜'''（'''cepstrum'''），顧名思義，就是將[[頻譜|頻譜]]（spectrum）的英文前四個字母反過來寫。倒頻譜是為了某些時候，為了計算方便，將原來信號的頻譜先轉成類似[[分貝|分貝]]的單位，再作[[逆傅里叶变换|逆傅里叶变换]]，把它視為一種新的訊號做處理。倒頻譜有[[复数_(数学)|複數]]倒頻譜，及[[實數|實數]]倒頻譜。
+
+倒頻譜被定義在1963的論文（Bogert等）。定義如下：
+
+*字義：倒頻譜（信號）是信號頻譜取對數的傅立葉變換後的新頻譜（信號），有時候會稱頻譜的倒頻譜。
+*數學上：信號的倒頻譜 = [[逆傅里叶变换|IFT]] ( [[对数|log]] ( | [[傅里叶变换|FT]] (信号) | ) + j2πm )（m為實數）
+*演算法：信号 -> 傅立叶变换 -> 取[[绝对值|绝对值]] -> 取[[对数|对数]] -> 相位展开 -> 逆傅立叶变换 -> 倒频谱
+
+複數倒頻譜擁有頻譜大小跟相位的資訊，實數倒頻譜只有頻譜大小的資訊，各有各的不同應用。
+
+== 複數倒頻譜與實數倒頻譜 ==
+=== 複數倒頻譜 ===
+<math>\widehat {x}\left[ n\right] =\int _{-\frac {1} {2}}^{\frac {1} {2}}\widehat {X}\left( F\right) e^{j {2 \pi }F}dF</math><br>
+其中<math>\widehat {X}\left[ F\right] = \log |X(F)| + j \arg[X(F)]</math><br>
+可能遭遇的問題<br>
+1. <math>\log 0 = - \infty</math><br>
+2. <math>\arg[X[n]]</math>有無限多的解<br>
+當輸入是實數時,因為<math>\log |X(F)|</math>[[偶對稱|偶對稱]]，<math>\arg[X(F)]</math>[[奇對稱|奇對稱]],所以複數倒頻譜的值為實數<br>
+=== 實數倒頻譜 ===
+<math>C \left[ n\right] =\int _{-\frac {1} {2}}^{\frac {1} {2}} \log |X(F)| e^{j {2 \pi }Fn}dF</math><br>
+可能遭遇的問題<br>
+1. <math>\log 0 = - \infty</math><br>
+
+== 應用 ==
+*倒頻譜可以被視為在不同頻帶上變化速率的資訊，倒頻譜一開始被發明在[[地震|地震]]或[[炸彈|炸彈]]產生的地震回音，現今也被使用在分析[[雷達|雷達]]訊號，以及[[訊號處理|訊號處理]]等問題。
+*自相關倒頻譜(autocepstrum)被定義為倒頻譜的自相關性，自相關倒頻譜有時在分析處理回傳訊號時比倒頻譜還準確。
+*倒頻譜在處理[[人聲|人聲]]訊號以及音樂訊號有非常好的效果，例如梅爾頻率倒頻譜(Mel-Frequency Cepstrum)，用來做聲音的辨認，偵測音高等。近年來梅耳倒頻譜也被應用在音樂資訊的回覆。
+*倒頻譜在[[聲學|聲學]]中可以將[[聲帶|聲帶]]震動的影響去除。
+*倒頻譜用在處理多路徑問題時(如[[聲波|聲波]]的[[迴音|迴音]]、[[電磁波|電磁波]]的折、反射等)，如果將其他路徑[[干擾|干擾]]視為[[雜訊|雜訊]]，為了消除雜訊，利用倒頻譜，不需測量每條多路徑的延遲時間，可以利用傳送多次信號，觀察其他路徑在倒頻譜上的效果，並且加以濾除。
+*語音大致上是由音高、[[聲帶|聲帶]][[脈衝|脈衝]]、聲門波形所組成，我們可以利用倒頻譜將這三種元素在倒頻域上分開，以利於做[[語音|語音]]訊號的分析。
+*倒頻譜的微分適用於影像處理上的圖形辨認(pattern recognition)。
+*倒頻譜與同型聲音理論(homomorphic sound theory)有關。
+
+== 倒頻譜觀念 ==
+頻譜圖上的獨立變數是[[頻率|頻率]]，而倒頻譜圖上的獨立變數為倒頻率(quefrency)，倒頻率是一種時間的度量[[计量单位|單位]]。舉個例子，聲音訊號取樣速率等於44100[[赫茲|赫茲]]，在倒頻譜上有個很大的值在倒頻率等於100，代表實際上在44100/100=441[[赫茲|赫茲]]有很大的值，這值出現在倒頻譜上因為頻譜上[[週期|週期]]性出現，而頻譜上出現的週期與倒頻譜很大的值出現的位置有關。
+
+== 倒濾波器 ==
+[[濾波器|濾波器]](filter)常使用在頻譜上，用來保存或刪除我們所要或不要的資訊，經過上面的許多討論，不難猜到，倒濾波器(lifter)就是在倒頻譜上所使用的濾波器。低通的倒濾波器跟低通濾波器有點類似，它可以藉由在倒頻譜上乘以一個window係數，使倒頻譜上的高倒頻率被壓抑，如此依來，當信號轉回[[時域|時域]]空間時會變成一個較平滑的信號。
+
+== 計算倒頻譜的方法 ==
+
+=== 直接計算IDTFT(反離散時間傅立葉變換) ===
+<math>\widehat {x}\left[ n\right] =\int _{-\frac {1} {2}}^{\frac {1} {2}}\widehat {X}\left( F\right) e^{j {2 \pi }F}dF</math><br>
+問題: <math>\widehat {X}\left( F\right) </math> 可能會無限大, 且對於arg(x[n])有無限多個解<br>
+
+=== 利用Z轉換的零點與極點 ===
+先對信號做[[Z轉換|Z轉換]], 並整理一下係數, 讓他變成下面的形式<br>
+<math>X\left( Z \right)=\cfrac{A{Z^r}\prod_{k=1}^{m_i}(1-{a_k}{Z^{-1}})\prod_{k=1}^{m_0}(1-{b_k}Z)} {\prod_{k=1}^{P_i}(1-{c_k}{Z^{-1}})\prod_{k=1}^{P_0}(1-{d_k}Z)} </math><br>
+其中<math>\left| a_{k}\right| , \left| b_{k}\right| , \left| c_{k}\right| , \left| d_{k}\right| \leq 1</math><br>
+<br>
+分子: <br>
+第一項A是係數<br>
+第二項<math>Z^r</math>是延遲<br>
+第三項是位於單位圓內的零點<br>
+第四項是位於單位圓外的零點<br>
+<br>
+分母:<br>
+第一項是位於單位圓內的極點<br>
+第二項是位於單位圓外的極點<br>
+<br>
+對<math>X\left( Z \right)</math>取log變成<math>\widehat {X}\left( Z\right)</math><br>
+<math>\widehat {X}\left( Z\right)=log X\left( Z \right)=\log A + r \log Z + \sum_{k=1}^{m_i} \log (1-{a_k}{Z^{-1}}) + \sum_{k=1}^{m_0} \log (1-{b_k}Z) 
+- \sum_{k=1}^{P_i} \log (1-{c_k}{Z^{-1}}) - \sum_{k=1}^{P_0} \log (1-{d_k}Z)</math><br>
+假設r=0, 因為這只是延遲, 並不會破壞波形<br>
+根據[[Z轉換|Z轉換]]所得到的系數, 我們可以利用泰勒展開得到Z的反轉換<br>
+<math>\widehat {x}\left[n\right]=\begin{cases} \log A  & \mbox{if }n=0 \\
+- \sum_{k=1}^{m_i} \cfrac{{a_k}^n}{n} + \sum_{k=1}^{P_i} \cfrac{{c_k}^n}{n} & \mbox{if }n>0 \\
+\sum_{k=1}^{m_0} \cfrac{{b_k}^{-n}}{n} - \sum_{k=1}^{P_0} \cfrac{{d_k}^{-n}}{n} & \mbox{if }n<0 \end{cases}</math><br>
+<br>
+注意事項<br>
+1.<math>\widehat {x}\left[ n\right]</math>總是IIR([[無限脈衝響應|無限脈衝響應]])<br>
+2.對於FIR([[有限脈衝響應|有限脈衝響應]])的情況, <math>c_k=0, d_k=0</math>
+
+=== 利用Z轉換與微分 ===
+<math>Z \cdot \widehat {X}'\left( Z\right)=Z \cdot \cfrac{{X}'\left( Z\right)}{{X}\left( Z\right)}</math><br>
+<math>Z {X}'\left( Z\right) = Z \widehat {X}'\left( Z\right) \cdot {X}\left( Z\right)</math><br>
+對其做Z的反轉換<br>
+<math>nx[n]= \sum_{k=- \infty }^{\infty } k \widehat {x}\left[ k\right] x[n-k]</math><br>
+故<br>
+<math>x[n]= \sum_{k=- \infty }^{\infty } \frac{k}{n} \widehat {x}\left[ k\right] x[n-k] \quad for \ n \neq 0</math><br>
+<br>
+分別對於x[n]的四種不同的狀況做延伸<br>
+1.對於x[n]是因果(causal)和[[最小相位|最小相位]](minimum phase) i.e. <math>x[n]=\widehat {x}\left[ n\right]=0, n<0</math><br>
+對於<math>x[n]= \sum_{k=- \infty }^{\infty } \frac{k}{n} \widehat {x}\left[ k\right] x[n-k] \quad for \ n \neq 0</math><br>
+可得出<br>
+<math>x[n]= \sum_{k=0}^{\infty } \frac{k}{n} \widehat {x}\left[ k\right] x[n-k] \quad for \ n>0</math><br>
+故<br>
+<math>x[n]= \widehat {x}\left[ n\right]x[0] + \sum_{k=0}^{n-1} \frac{k}{n} \widehat {x}\left[ k\right] x[n-k]</math><br>
+2.對於x[n]是最小相位(minimum phase)<br>
+<math>\widehat {x}\left[ n\right]=\begin{cases} 0  & \mbox{if }n<0 \\ 
+\cfrac{x[n]}{x[0]} - \sum_{k=0}^{n-1} \cfrac{k}{n} \widehat {x}\left[ k\right] \cfrac{x[n-k]}{x[0]} & \mbox{if }n>0 \\
+\log A & \mbox{if }n=0 \end{cases}</math><br>
+3.對於x[n]是反因果(anti-causal)且最大相位(maximum phase) i.e. <math>x[n]=\widehat {x}\left[ n\right]=0, n>0</math><br>
+<math>\begin{align} 
+x[n] & = \sum_{k=n}^{0} \cfrac{k}{n}\widehat {x}\left[ k\right] x[n-k] \quad for \ n<0 \\
+& = \widehat {x}\left[ n\right] x[0] + \sum_{k=n+1}^{0} \cfrac{k}{n} \widehat {x}\left[ k\right] x[n-k] \\
+\end{align}</math><br>
+4.對於x[n]是最大相位(maximum phase)<br>
+<math>\widehat {x}\left[ n\right]= \begin{cases} 0  & \mbox{if }n>0 \\ 
+\cfrac{x[n]}{x[0]} - \sum_{k=n+1}^{0} \cfrac{k}{n} \widehat {x}\left[ k\right] \cfrac{x[n-k]}{x[0]} & \mbox{if }n<0 \\
+\log A & \mbox{if }n=0 \end{cases}</math><br>
+
+==特性==
+1. 複數倒頻譜至少以<math>\frac{1}{n}</math>的速度衰退<br>
+<math>|\widehat {x}\left[ n\right]|=c |\frac{{\alpha}^n}{n}| \quad - \infty<n<\infty</math><br>
+其中  <math>\alpha =max(a_k,b_k,c_k,d_k)</math><br>
+2. 如果X(Z)沒有在單位圓以外的零點和極點, 則<br>
+<math>\widehat {x}\left[ n\right]=0 \quad for \ all \ n<0 </math><br>
+因為<math>b_k,d_k=0</math><br>
+3. 如果X(Z)沒有在單位圓以內的零點和極點, 則<br>
+<math>\widehat {x}\left[ n\right]=0 \quad for \ all \ n>0 </math><br>
+因為<math>a_k,c_k=0</math><br>
+4. 如果x[n]是有限長度, 則<math>\widehat {x}\left[ n\right]</math>是無限長度<br>
+== 梅爾頻率倒頻譜 ==
+[[梅爾頻率倒頻譜|梅爾頻率倒頻譜]]是倒頻譜的一種應用，梅爾頻率倒頻譜常應用在聲音訊號處理，對於聲音訊號處理比倒頻譜更接近人耳對聲音的分析特性，而梅爾頻率倒頻譜與倒頻譜的差別在於:
+
+#梅爾頻率倒頻譜的頻帶分析是根據人耳聽覺特性所設計，人耳對於[[頻率|頻率]]的分辨能力，是由頻率的"比值"決定，也就是說，人耳對200[[赫茲|赫茲]]和300赫茲之間的差別與2000赫茲和3000赫茲之間的差別是相同的。
+#梅爾頻率倒頻譜是針對訊號的[[能量|能量]]取[[對數|對數]]，而倒頻譜是針對訊號原始在頻譜上的值取[[對數|對數]]。
+#梅爾頻率倒頻譜是使用[[离散余弦变换|離散餘弦轉換]]，倒頻譜是用[[离散傅里叶变换|離散傅立葉變換]]。
+#梅爾頻率倒頻譜係數足夠描述[[語音|語音]]的特徵。
+
+
+[[梅爾頻率倒頻譜係數|梅爾頻率倒頻譜係數]](MFCCs)的推導步驟：
+#將信號做[[傅立葉變換|傅立葉變換]]
+#頻譜上的值取絕對值再平方成為能量，在乘上頻譜上對應的梅爾頻率倒頻譜三角重疊窗(window)的係數。
+#對每個梅爾頻率取[[對數|對數]]。
+#作[[离散余弦变换|離散餘弦轉換]]。
+#求得梅爾頻率倒頻譜係數。
+
+== 梅爾頻率倒頻譜應用 ==
+*梅爾頻率倒頻譜係數常利用在辨認語音技術上，例如辨認電話中說話的人的身份。
+*利用每種[[樂風|樂風]]、或[[樂器|樂器]]在梅爾頻域上有不同特性來分析[[音樂|音樂]]的種類與類型，並且可以加以分類。
+
+== 雜訊敏感性 ==
+梅爾頻率倒頻譜係數很容易被外來的雜訊所破壞，因此有些研究結果指出，在求梅爾頻率倒頻譜係數時，在作離散餘弦轉換前，提升適當的能量(大約2或3倍)，以減少雜訊在低能量成份的影響。
+== 梅爾頻率倒頻譜優點 ==
+相較於原始的倒頻譜
+*有絕對值平方
+== 卷積 ==
+倒頻譜領域上的一項重要的特性為二信號[[卷積|卷積]]之產生，其產生之程序為二倒頻譜值(cepstra)之相加：
+
+<math>x_1 * x_2 \rightarrow x'_1 + x'_2</math>
+
+
+
+
+== 微分倒頻譜(differential cepstrum) ==
+=== 定義 ===
+ <math>\widehat {x}_d(n) = Z^{-1}\frac{X'(Z)}{X(Z)} </math> 或 <math>\widehat {x}_d[n] = \int_{-\frac{1}{2}}^{\frac{1}{2}}\frac{X'(F)}{X(F)} e^{i2 \pi F}dF</math><br>
+<math> (\frac{d}{dZ}\widehat {X}_d(Z) = \frac{d}{dZ}logX(Z) = \frac{X'(Z)}{X(Z)})</math><br>
+If <math>x(n) = x_1(n)*x_2(n)</math><br>
+<math> X(Z) = X_1(Z)X_2(Z)</math><br>
+<math> X'(Z) = X_1'(Z)X_2(Z)+X_1(Z)X_2'(Z)</math><br>
+<math> \frac{X'(Z)}{X(Z)} = \frac{X_1'(Z)}{X_1(Z)})+\frac{X_2'(Z)}{X_2(Z)})</math><br>
+<math> \therefore \widehat {x}_d(n) = \widehat {x}_{1d}(n)+\widehat {x}_{2d}(n)</math><br>
+優點: 
+(a)沒有模糊的相位
+(b)可以處理延遲問題
+=== 特性 ===
+(1)微分倒頻譜在shift和scaling時，結果不改變。<br>
+ex: <math>y[n] = AX[n-r] </math><br>
+<math>\Rightarrow \widehat {y}_d(n) = \begin{cases} \widehat {x}_d(n),n \neq 1 \\
+ -r + \widehat {x}_d(1),n = 1 \end{cases}</math><br>
+(proof):<br>
+<math>Y(z) = Az^{-r}X(z) </math><br>
+<math>Y(z) = Az^{-r}X'(z)-rAz^{-r-1}X(z) </math><br>
+<math>\frac{Y'(z)}{Y(z)} = \frac{X'(z)}{X(z)} - rz^{-1} </math><br>
+(2)複數倒頻譜<math>\widehat {C}[n]</math> 與 微分倒頻譜 <math>\widehat {x}_d[n]</math>和原訊號x[n]有關<br>
+<math>\widehat {C}(n) = \frac{-\widehat {x}_d(n+1)}{n}, n \neq 0</math> diff cepstrum<br>
+<math>-(n-1)x(n-1) = \sum_{k = -\infty}^{\infty} \widehat {x}_d(n)x(n-k)</math> recursive formula<br>
+<math>\Rightarrow</math>複數頻譜做得到的事情, 微分倒頻譜也做得到<br>
+(3)如果x[n]是最小相位(minimum phase),則<math>\widehat {x}_d[n]=0</math>,當<math>n \leq 0</math><br>
+minimum phase 意思為 no poles 或 zeros 在單位圓外<br>
+(4)如果x[n]是最大相位(maximum phase),則<math>\widehat {x}_d[n]=0</math>,當<math>n \geq 2</math><br>
+maximum phase 意思為 no poles 或 zeros 在單位圓內<br>
+(5)如果x(n)為有限區間,則<math> \widehat {x}_d[n]</math>為無限區間<br>
+*複數倒頻譜的衰減率反比於n
+*微分倒頻譜的衰減率下降
+<math>\therefore \widehat {x}_d(n+1) = n\widehat {c}(n) \varpropto n \frac{1}{n} = 1</math><br>
+== 範例 ==
+*<math>x[0] = 1,x[1] = 0.5</math> ,otherwise 0 , Find its cepstrum.
+<math>x[n] \quad \stackrel{Z transform}{\longrightarrow} \quad X(Z)\quad \stackrel{log}{\longrightarrow} \quad \widehat {X}(Z) \quad \stackrel{Z^{-1}}{\longrightarrow}\quad \widehat {x}[n]</math><br>
+<br>
+step 1. Z transform: <math>X(Z) = 1+0.5Z^{-1},pole = -0.5 </math><br>
+step 2. log: <math>\widehat {X}(Z) = \sum_{k=1}^{m_i}log(1-(-0.5Z^{-1}))</math><br>
+step 3. reverse Z transform: <math>\widehat {x}[n] = \sum_{n=0}^N -\frac{-0.5^n}{n},n>0</math>
+*<math>\widehat x[0]=1</math> ,otherwise 0 , Find its inverse cepstrum.
+<math> \widehat x[n] \quad \stackrel{Z transform}{\longrightarrow} \quad \widehat X(Z)\quad \stackrel{exp}{\longrightarrow} \quad  {X}(Z) \quad \stackrel{Z^{-1}}{\longrightarrow}\quad {x}[n]</math><br>
+<br>
+step 1. Z transform: <math>\widehat X[n]=Z^{-1}</math><br>
+step 2. exp: <math>e(\frac{1}{z}) = \sum_{n=0}^\infty \frac{\frac{1}{z^n}}{n!}</math><br>
+step 3. reverse Z transform: <math>x[n] = \begin{cases} \frac{1}{n!},n \geq 0 \\
+0, otherwise\\\end{cases}</math><br>
+*Suppose that an IIR filter is <math> H(Z) = \frac{2z^3-4z^2-z+2}{2z^2-2z+1}</math>
+
+<math>x[n] \quad \stackrel{Z transform}{\longrightarrow} \quad X(Z)\quad \stackrel{log}{\longrightarrow} \quad \widehat {X}(Z) \quad \stackrel{Z^{-1}}{\longrightarrow}\quad \widehat {x}[n]</math><br>
+<br>
+step 1. Z transform: <math>H(Z) = \frac{(-2) (z) (z-\frac{\sqrt{2}}{2}z^{-1})  (z+\frac{\sqrt{2}}{2}z^{-1})  (1-\frac{1}{2}z)  }{(1-\frac{1+j}{2}z^{-1})  (1-\frac{1-j}{2}z^{-1})} </math><br>
+step 2. log: <math>\widehat {H}(Z) = log(-2)+3log(z) + log(1\pm\frac{\sqrt{2}}{2}z^{-1})+log(1-\frac{1}{2}z)-log(1-\frac{1\pm j}{2}z^{-1})</math><br>
+step 3. reverse Z transform: <math>\widehat {h}[n] = \begin{cases} log(-2),n= 0 \\
+\displaystyle{-\frac{  {(\frac{\sqrt{2}}{2})}^n  + {(\frac{-\sqrt{2}}{2})}^n }{n}      +      \frac{  {(\frac{1+j}{2})}^n  + {(\frac{1-j}{2})}^n }{n},n>0 }\\
+\displaystyle{\frac{{(\frac{1}{2})}^{-n}}{n}},n<0\\\end{cases}</math><br>
+
+
+
+<math> </math><br>
+== 參考文獻 ==
+<div class="references-small">
+#B. P. Bogert, M. J. R. Healy, and [[J._W._Tukey|J. W. Tukey]]: "The quefrency analysis<!-- not a typo; the original paper is believed to use this spelling --> of [[time_series|time series]] for echoes: cepstrum, pseudo-[[autocovariance|autocovariance]], cross-cepstrum, and saphe cracking". ''Proceedings of the Symposium on Time Series Analysis'' (M. Rosenblatt, Ed) Chapter 15, 209-243. New York: Wiley, 1963.
+#D. G. Childers, D. P. Skinner, R. C. Kemerait, "[http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=1455016  The Cepstrum: A Guide to Processing]{{Wayback|url=http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=1455016 |date=20200603011416 }}," ''Proceedings of the IEEE'', Vol. 65, No. 10, October 1977, pp. 1428-1443.<references/>
+#Jian-Jiun Ding, Advanced Digital Signal Processing class note,the Department of Electrical Engineering, National Taiwan University (NTU), Taipei, Taiwan, 2008
+</div>
+
+[[category:信号处理|category:信号处理]]

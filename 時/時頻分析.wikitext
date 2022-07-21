@@ -1,0 +1,493 @@
+{{Multiple issues|
+{{More footnotes|time=2020-01-15T19:20:12+00:00}}
+{{Refimprove|time=2020-01-15T19:19:06+00:00}}
+}}
+{{merge from|時頻分析中的核方法|time=2019-01-26T13:17:07+00:00}}
+{{NoteTA|1=zh:傅里叶; zh-hans:傅里叶; zh-hant:傅立葉;}}
+時頻分佈是一項讓我們能夠同時觀察一個訊號的時域和頻域資訊的工具，而'''時頻分析'''就是在分析時頻分佈。傳統上，我們常用[[傅立葉變換|傅立葉變換]]來觀察一個訊號的頻譜。然而，這樣的方法不適合用來分析一個頻率會隨著時間而改變的訊號，由於傅立葉變換只分析了一維的訊號分布，而時頻分析卻能分析二維(時域跟頻域)的訊號分布，因此在訊號處理中更常被運用。
+
+時頻分析也可以說是[[傅里叶分析|傅立葉分析]]的一般化，通常用於頻率特性會隨時間而變化的訊號上，而在日常生活中符合符合此特性的訊號非常多，像是演講、音樂、影像、醫學訊號...等，因此能應用的領域相當廣泛。
+
+另外，更實際應用時頻分析的動機為傳統傅立葉分析假設訊號在時域是無限長或是週期性出現的，然而在現實中許多訊號都只有短暫的存在，而且在訊號持續期間可能有相當大的變化。舉例來說，傳統的音樂樂器不會持續產生無限長的正弦波，反而可能突然有一巨聲，然後漸漸減弱。因此時頻分析的研究勢不可擋。
+
+讓我們看看以下這個頻率會隨時間變化的訊號例子：
+
+<math>x(t)=\begin{cases}
+\cos(  \pi t);  & t  <10 \\
+\cos(3 \pi t);  & 10 \le t < 20 \\
+\cos(2 \pi t);  & t  > 20 
+\end{cases}</math>
+
+一旦這樣的數學式成立，便可利用時頻分析的各種技術，萃取訊號中的各種有用資訊，並分離噪音或干擾。
+
+== 歷史 ==
+最早的時頻分析方法應見於Alfréd Haar提出的[[哈爾小波轉換|哈爾小波轉換]](1909)，然而在當時因時頻分析所需的運算量仍是個無法忽視的議題，因此並未廣泛應用於訊號處理。而後更多的貢獻來自於Dennis Gabor，像是小波前身Gabor atoms (1947)，以及加伯轉換和改進型的短時距傅立葉變換。[[維格納準概率分佈|維格納準機率分布]](Ville 1948)也是一個重要的開端。
+
+特別在1930年代及1940年代，早期的時頻分析方法恰好與量子力學的發展一致，這反映了位置-動量平面及時域-頻域平面的數學機制有些共通性，像是海森堡[[不确定性原理|不確定性原理]](量子力學)與加伯限制(時頻分析)最終都得出了扭對稱幾何結構。
+
+==常見的時頻分佈函數==
+常見的時頻分佈函數有[[短時距傅立葉變換|短時距傅立葉變換]]（包含[[加伯轉換|加伯轉換]]）、[[科恩分佈|科恩分佈]]函數（包含[[韋格納分佈|韋格納分佈]]）、[[改進型韋格納分佈|改進型韋格納分佈]] ，以及[[加伯-韋格納分佈|加伯-韋格納分佈]]（Gabor-Wigner distribution function）函數及[[S轉換|S轉換]]等。
+
+而這些看似不同的時頻分析函數，其數學公式的由來都有些相關性，若想對時頻分析的了解更加透徹，應在學習時將它們一起理解，而非都視為單一函數，像是做1/4次傅立葉變換可以解讀成傅立葉變換在時頻分析平面上轉90°，而這個旋轉做了4次後就會回到原本的函數，只做2次時則會視反轉的圖形。
+
+==理想的時頻分佈函數==
+一個理想的時頻分佈函數有助於我們做時頻分析，而它大致上具有以下四種性質：<br />
+#「高清晰度」：可讓我們分析更容易。
+#「沒有cross-term」：可避免我們把訊號和雜訊混淆。
+#「好的數學性質」：有利於我們在許多方面的應用。
+#「較低的運算複雜度」：使得我們分析的速度變快。
+
+在這裡我們比較幾個較常用的時頻分析之優劣度。
+
+{| class="wikitable"
+
+|-
+| 
+| '''清晰度'''
+| '''Cross-term'''
+| '''好的數學性質'''
+| '''運算複雜度'''
+|-
+| '''加伯轉換'''
+| 較差
+| 無
+| 較差
+| 低
+|-
+| '''韋格納分佈函數'''
+| 最好
+| 有
+| 最好
+| 高
+|-
+| '''加伯-韋格納分佈函數'''
+| 好
+| 幾乎可以消除
+| 好
+| 高
+|-
+|'''錐狀分布'''
+|好
+|無
+|好
+|中
+|}
+
+為了能順利的分析各訊號之時頻分佈，選擇適當的時頻分佈函數是很重要的。而至於要如何選擇時頻分佈函數呢？這端看於我們所要應用它的地方在哪邊。韋格納分佈之定義中的[[自相關函數|自相關函數]]是一把雙面刃，它讓韋格納分佈函數擁有高的清晰度，然而，它也同時讓它產生了cross-term的問題。
+
+因此，如果我們想要分析一個只有單一項的訊號，此時不會有cross-term的產生，因此我們通常選擇韋格納分佈函數來獲得高清晰度；另一方面，如果我們要分析的訊號是由很多個項所組成的，此時若用韋格納分佈會有cross-term產生，所以我們可能選擇用加伯轉換或是加伯-韋格納分佈函數會比較好。
+
+==應用==
+在接下來即將介紹的應用中，我們除了需要時頻分佈函數，還需要搭配其他的運算才能達到目的，而著名的[[線性標準轉換|線性標準轉換]]（Linear canonical transform）可以幫助我們。我們可以利用線性標準轉換來任意的改變一個訊號在時頻分佈平面上面的形狀和位置，像是水平以及垂直的移動、擴大、shearing（扭曲），以及旋轉（用[[分數傅立葉變換|分數傅立葉變換]]，fractional Fourier transform, FRFT）等。由此可見，線性標準轉換讓我們對於時頻分佈的處理更靈活。
+
+這邊我們列舉一些時頻分佈之應用的例子。
+===找出瞬間頻率===
+瞬間頻率的定義是 <math>\frac{1}{2 \pi}  \frac{d}{dt} \phi (t) </math>，其中<math>\phi (t)</math> 是訊號的瞬時相位。我們可以直接由時頻分佈的圖形中看出每個時刻的瞬時頻率是多少，不過前提是這個時頻分佈的圖形要夠清晰，因此，我們經常選用韋格納分佈函數來做進一步的分析。
+===濾波器設計===
+濾波器的目的就是要移除我們不要的部份，並保留我們要的部份。在沒有應用時頻分佈之前，我們只能分別在時域跟頻域上面來做過濾的動作，如下所示。<br />
+[[File:filter_tf.jpg|File:filter_tf.jpg]]<br />
+像上面這樣只能分別在時域或頻域上過濾的方式，並不適合處理每一種訊號。如果訊號在時域上或在頻域上有重疊的話，這時候使用時頻分佈函數來做分析過濾，並搭配線性完整轉換的操作，就可以做出更有效且靈活的濾波器。讓我們看看以下的例子。<br />
+[[File:filter_fractional.jpg|File:filter_fractional.jpg]]<br />
+而在濾波器設計的應用中，時頻分佈通常處理的訊號是由很多個項所組成的，因此若用韋格納分佈來做分析的話，將會產生cross-term的問題。或許加伯轉換、加伯-韋格納分佈函數，亦或Cohen's class 分佈函數會是比較好的選擇。
+===訊號分解===
+訊號分解的概念就跟濾波器設計很類似。
+===取樣定理===
+由 [[Nyquist-Shannon取樣定理|Nyquist-Shannon取樣定理]]且經過一番推導，我們大致上可以說一個訊號經過取樣後而不產生失真（aliasing）的最低取樣點數，會和這訊號在時頻平面上圖形的面積相等（事實上，沒有一個訊號在時頻平面上的面積有限的，因此我們省略了一些精確度）。接下來，讓我們看看傳統取樣定理跟結合了時頻分析以後的取樣定理之差異。<br />
+[[File:sampling.jpg|File:sampling.jpg]]<br />
+若淺綠色的部份是我們取樣的涵蓋範圍，則我們可以很明顯的看出使用時頻分析後，所需取樣的點數會比之前少了許多，因此加快了我們的運算。當我們使用韋格納分佈函數時，可能會產生cross-term；另一方面，若使用加伯轉換做分析的話，又可能會因為清晰度不佳而讓所需要取樣的面積又變大了。因此，選用哪個函數要視訊號的情形而定，如果訊號是單一項組成的，那麼就使用韋格納分佈函數；然而，如果訊號是由多項組成的，則用加伯轉換、加伯-韋格納分佈函數，或是Cohen's class 分佈函數。
+
+===取樣方法===
+取樣點數(sampling points) = 時頻分析面積的總和 + 其餘額外參數
+
+* 如何使時頻分布的面積更小?
+
+# 將原本訊號切割成數個部分。
+# 使用啁啾乘法(chirp multiplications)、啁啾卷積(chirp convolutions)、分數傅立葉轉換(fractional Fourier transforms)或線性標準轉換(linear canonical transforms)減小面積。
+
+
+Step 1. 解析訊號轉換
+
+轉換訊號到座標軸的同一邊(一般是取該訊號的實數區)
+
+<math>x(t)\rightarrow \begin{alignat}{2} x_a(t) & = x(t)+j x_H (t) \\ x_a(f) & = x(f)+jH(f)x(f)\\ \end{alignat}, \ x_H (t): \text{Hilbert  transform of } x(t) 
+</math>
+
+<math>H(f) = \begin{cases} -j, & \text{for }f > 0 \\ j, & \text{for }f<0 \end{cases},x_a(f) = \begin{cases} 2x(f), & \text{for }f > 0 \\ 0, & \text{for }f<0 \end{cases}</math>
+[[File:Analytic_signal_conversion_first_step.png|链接=https://en.wikipedia.org/wiki/File:Analytic_signal_conversion_first_step.png]]
+Step 2. 訊號拆解
+
+使用短時距傅立葉變換(short time Fourier transform, STFT; 因為訊號包含許多不同成分)來拆解訊號成許多部份。
+[[File:Separate_the_components.png|链接=https://en.wikipedia.org/wiki/File:Separate_the_components.png]]
+Step 3. 使用斜推(shearing)或旋轉(rotation)使各個部分減少到最小"面積"
+
+使用韋格納分布方程(Wigner distribution function, WDF; 因為此時訊號為單一成分且屬隨機程序)來斜推和翻轉各個部份。
+
+Step 4. 使用傳統採樣理論採樣各個成份
+
+* 傳統的取樣方式
+
+<math>x_d[n]=x(n\vartriangle_t), \vartriangle_t<1/F </math>
+
+* 重建
+
+<math>x(t)=\sum_{n}x_d[n]sinc(\frac{t}{\vartriangle_t}-n)</math>
+<br />
+
+* 新的取樣方式
+
+# <math>x(t)\rightarrow x_a(t) = x(t)+j x_H (t), \ x_H (t): \text{Hilbert  transform of } x(t)</math>
+# <math>x(t)\rightarrow x_a(t) = x_1(t)+x_2(t)+...+x_K(t)
+</math>
+# <math>y_k(t)=exp(j2\pi a_k t^2)x_k(t), k=1,2,...,K</math>
+# <math>\begin{align} x_{d,k}[n] & = y_k(n\vartriangle_{t,k}) \\ & = exp(j2\pi a_k n^2 \vartriangle_{t,k}^2)x_k(n\vartriangle_{t,k}), k=1,2,...,K \\ \end{align}</math>
+
+* 重建
+
+# <math>y_k(t)=\sum_{n}x_{d,k}[n]sinc(\frac{t}{\vartriangle_{t,k}}-n)</math>
+# <math>x_k(t)=exp(-j2\pi a_k t^2)y_k(t)</math>
+# <math>x_a(t) = x_1(t)+x_2(t)+...+x_K(t)
+</math>
+# <math>x(t)=\real[x_a(t)]</math>
+
+
+嚴格來說，沒有任何一個訊號的時頻分布"面積"是有限的，但是我們可以選擇一個閾值"threshold" Δ，使   時頻分析 <math>\left\vert X(t,f) \right\vert >\bigtriangleup</math>或是分布的面積是有限的。但若以"面積"來討論取樣點數，也會犧牲一些精確度。
+
+* 理論
+
+如果<math>x(t)</math>是時間上有限的<math>(x(t)=0 \text{ for } t<t_1 \text{ and } t>t_2)</math>, 則頻率上則不可能是有限的。
+
+如果<math>x(t)</math>是頻率上有限的<math>(X(f)=0 \text{ for } f<f_1 \text{ and } f>f_2)</math>,則時間上則不可能是有限的。
+
+只取<math>t\in[t_1,t_2]</math>和<math>f\in[f_1,f_2]</math>犧牲的能量所佔的比例，<math>err=\frac{\int_{-\infty}^{t_1} |x(t)|^2dt+\int_{t_2}^{\infty} |x(t)|^2dt+\int_{-\infty}^{f_1} |X_1(f)|^2df+\int_{f_2}^{\infty} |X_1(f)|^2df}{\int_{-\infty}^{\infty} |x(t)|^2dt}</math>
+
+<math>X_1(f)=FT[x_1(t)], x_1(t)=x(t) \text{ for } t\in[t_1,t_2], x_1(t)=0  \text{ otherwise }</math>
+
+* 韋格納分布方程 (Wigner distribution function, WDF)
+
+<math>|x(t)|^2=\int_{-\infty}^{\infty} W_x(t,f)df,|X(f)|^2=\int_{-\infty}^{\infty} W_x(t,f)dt</math>
+
+<math>\int_{-\infty}^{\infty}\int_{-\infty}^{\infty} W_x(t,f)dfdt=\int_{-\infty}^{\infty}|x(t)|^2dt= \text{ energy of } x(t)</math>
+
+<math>\begin{align} & \int_{-\infty}^{t_1} |x(t)|^2dt+\int_{t_2}^{\infty} |x(t)|^2dt+\int_{-\infty}^{f_1} |X_1(f)|^2df+\int_{f_2}^{\infty} |X_1(f)|^2df
+\\ & = \int_{-\infty}^{t_1}\int_{-\infty}^{\infty} W_x(t,f)dfdt
++\int_{t_2}^{\infty}\int_{-\infty}^{\infty} W_x(t,f)dfdt
++\int_{-\infty}^{\infty}\int_{-\infty}^{f_1} W_{x_1}(t,f)dfdt
++\int_{-\infty}^{\infty}\int_{f_2}^{\infty} W_{x_1}(t,f)dfdt
+\\ & = \int_{-\infty}^{t_1}\int_{-\infty}^{\infty} W_x(t,f)dfdt
++\int_{t_2}^{\infty}\int_{-\infty}^{\infty} W_x(t,f)dfdt
++\int_{t_1}^{t_2}\int_{-\infty}^{f_1} W_{x_1}(t,f)dfdt
++\int_{t_1}^{t_2}\int_{f_2}^{\infty} W_{x_1}(t,f)dfdt
+\\ & \cong \int_{-\infty}^{t_1}\int_{-\infty}^{\infty} W_x(t,f)dfdt \text{ (A) }
++\int_{t_2}^{\infty}\int_{-\infty}^{\infty} W_x(t,f)dfdt \text{ (B) }
++\int_{t_1}^{t_2}\int_{-\infty}^{f_1} W_x(t,f)dfdt \text{ (C) }
++\int_{t_1}^{t_2}\int_{f_2}^{\infty} W_x(t,f)dfdt\text{ (D) }
+\end{align} </math>
+
+
+<math>err\cong1-\frac{\int_{t_1}^{t_2}\int_{f_1}^{f_2} W_x(t,f)dfdt}{\int_{-\infty}{\infty}|x(t)|^2dt}</math>
+[[File:Summation_of_area_of_Wigner_distribution_function_on_time-frequency_analysis.png|链接=https://en.wikipedia.org/wiki/File:Summation_of_area_of_Wigner_distribution_function_on_time-frequency_analysis.png]]
+
+===調變與多工===
+傳統上，[[調變|調變]]（modulation）與 [[多工|多工]]（multiplexing）都只有分別在時域及頻域上下功夫，也就是盡量塞滿時域及頻域上的空間，這都是一維的操作。如果我們利用時頻分佈函數，就可以將調變與多工的觸角延伸至二維的時頻平面上，所要做的就是塞滿整個時頻平面，做最有效的利用。由以下例子可以讓我們更瞭解。<br />
+[[File:mul_mod.jpg|File:mul_mod.jpg]]<br />由上例可知，使用韋格納分佈來分析會有嚴重的cross-term問題，這非常不利於調變與多工的作業，因此不能選擇它來做這種應用。
+
+通常可藉由以下方法來實行調變和多工，
+
+(1)加伯轉換(Gabor transform)或加伯–韋格納轉換(the Gabor-Wigner transform)
+
+(2)水平和垂直的位移(horizontal and vertical shifting)、擴張(dilation)、斜推(shearing)、廣義斜推(generalized shearing)和旋轉(rotation)
+
+* 傳統調變方法
+
+訊號<math>x_1(t), x_2(t), x_3(t),......,x_K(t)</math>可以被成功傳遞，如果<math>\begin{align} & \text{Allowed Bandwidth}\geq\sum_{k=1}^K B_k \\ & B_k\text{:the bandwidth (including the negative frequency part) of }x_k(t)  \\ \end{align}</math>
+
+<br />
+
+* 基於時頻分析的調變方法
+
+訊號<math>x_1(t), x_2(t), x_3(t),......,x_K(t)</math>可以被成功傳遞，如果<math>\begin{align} & \text{Allowed Time duration } \times \text{ Allowed Bandwidth }\geq\sum_{k=1}^K A_k \\ & A_k\text{:the area of the time-frequency distribution of }x_k(t)  \\ \end{align}</math>
+
+===電磁波的傳遞===
+應用時頻分析的觀念，我們可以將一個電磁波表示成一個2x1的矩陣<math>\begin{bmatrix}
+  x  \\
+  y
+\end{bmatrix}</math>。而當電磁波經過一段free-space時，著名的 [[Fresnel_diffraction|Fresnel diffraction]]就產生了。Fresnel diffraction可以用線性完整轉換的參數矩陣<math>\begin{bmatrix}
+  a & b \\
+  c & d
+\end{bmatrix}=
+\begin{bmatrix}
+  1 & \lambda z \\
+  0 & 1
+\end{bmatrix}
+</math>來表達，其中z是電磁波在free-space中傳遞的距離，而<math>\lambda</math>則是[[波長|波長]]。 
+===光學===
+光也是一種電磁波，所以在光學上的應用就跟電磁波傳遞很類似。
+
+如果電磁波通過一片球面透鏡片或是經過一個碟型面的反射，則線性完整轉換的參數矩陣可分別表示為<math>\begin{bmatrix}
+  a & b \\
+  c & d
+\end{bmatrix}=
+\begin{bmatrix}
+  1 & 0 \\
+  \frac{-1}{\lambda f} & 1
+\end{bmatrix}
+</math> 和 <math>\begin{bmatrix}
+  a & b \\
+  c & d
+\end{bmatrix}=
+\begin{bmatrix}
+  1 & 0 \\
+  \frac{1}{\lambda R} & 1
+\end{bmatrix}
+</math> ，其中f是球面透鏡的[[焦距|焦距]]，而R是碟型面的半徑。
+
+用 LCT 來分析光學系統的好處是只需要用到2x2的矩陣運算 <math>\begin{bmatrix}
+  a & b \\
+  c & d
+\end{bmatrix}
+\begin{bmatrix}
+  x \\
+  y
+\end{bmatrix}
+</math>，避免了複雜的物理理論和數學積分，但只有在「近軸」的情形下才能準確得到。
+
+光學也可以用在無線通訊(wireless communication), 光學系統分析(optical system analysis), 雷射(laser)和雷達系統分析(radar system analysis)。
+
+* 光在真空中傳輸 (Fresnel transform=LCT with parameters): 啁啾卷積(chirp convolution)
+* 光在透鏡或碟盤傳輸: 啁啾相乘(chirp multiplication)
+
+===訊號鑑別 ===
+以下兩個訊號無法經由單純的傅立葉分析分辨出來，它們的頻譜都長得一樣。<br />
+<math>x_1 (t)=\begin{cases}
+\cos(  \pi t);  & t  <10 \\
+\cos(3 \pi t);  & 10 \le t < 20 \\
+\cos(2 \pi t);  & t  > 20 
+\end{cases}</math><br /><br />
+<math>x_2 (t)=\begin{cases}
+\cos(  \pi t);  & t  <10 \\
+\cos(2 \pi t);  & 10 \le t < 20 \\
+\cos(3 \pi t);  & t  > 20 
+\end{cases}</math><br />
+不過幸虧有時頻分佈函數，我們可以看出隨時間改變之頻率的起落，進而鑑別訊號。這個想法也可以應用至[[模式识别|模式识别]]。
+
+===語音===
+語音訊號的特性就是它的頻率隨著時間劇烈變化。因為語音訊號所涵蓋的資訊非常的多，所以相對的計算時間會是很重要的考量。
+
+根據Nyquist criterion及人耳可聽的的頻率上限約為20000Hz這兩個條件，因此語音信號的取樣頻率需為40000左右。
+然而我們對於時頻分析的輸出在時間軸的解析度要求往往不會到這麼高，加上時頻分析出來的結果為原本輸入訊號維度的兩倍，為減少運算時間，我們會降低輸出的取樣頻率，如100Hz。
+
+
+以[[短時距傅立葉變換|短時距傅立葉變換]]為例
+
+<math>{X}\left( {t,f} \right) = \int_{ - \infty }^\infty {w\left( {t - \tau } \right) \cdot } {x}\left( {\tau} \right)\,{e^{ - j2\pi \,f\tau }} \cdot d\tau</math>
+
+可改寫為
+
+<math> {X}\left( {n{\Delta _t},m{\Delta _f}} \right) = \sum\limits_{p = n-Q }^{ n+Q} {w\left( {(nS - p){\Delta _\tau}} \right){x}\left( {p{\Delta _\tau}} \right)}{e^{ - j2\pi \,mp{\Delta _\tau}{\Delta _f}}}{\Delta _\tau} </math>
+
+其中<math>{\Delta _\tau}</math>為輸入信號的取樣間隔，
+<math>{\Delta _t}</math>為輸出信號的取樣間隔 
+
+<math> S =\frac{\Delta _t}{\Delta _\tau}, \qquad {\Delta _t}\ne{\Delta _\tau}, \qquad  B=Q{\Delta _\tau}</math>
+
+<math>\left| t\right| >B ,  w(t) \cong 0 \qquad\frac{B}{\Delta _t} = Q</math>
+
+其中<math> {\Delta _\tau}</math>需滿足下列條件
+
+(1)<math> {\Delta _\tau}{\Delta _f} = \frac{1}{N}</math> N為一整數
+
+(2)<math> N > 2Q+1</math>
+
+(3)<math> \frac{1}{2\Omega} > {\Delta _\tau}\qquad |X(t,f)| \approx 0 \mbox{when} |f| > \Omega</math>
+
+ <math>{X}\left( {n{\Delta _t},m{\Delta _f}} \right) = \sum\limits_{p = nS-Q }^{ nS+Q} {w\left( {(nS - p){\Delta _\tau}} \right){x}\left( {p{\Delta _\tau}} \right)}{e^{ - j{\textstyle{{2\pi \,pm} \over N}}}}{\Delta _\tau}</math>
+
+令<math>q=p-(nS+Q) \to p=(nS-Q)+q</math>
+
+ <math>{X}\left( {n{\Delta _t},m{\Delta _f}} \right) = {\Delta _\tau}{e^{ j{\textstyle{{2\pi \,(Q-nS)m} \over N}}}}\sum\limits_{q = 0}^{N-1} {x_1\left( {q} \right){e^{ - j{\textstyle{{2\pi \,qm} \over N}}}}}</math>
+
+其中
+<math> \begin{cases}
+{x_1}\left( q \right) = w\left( {(Q -q ){\Delta _\tau}} \right) x\left( {(nS - Q +  q){\Delta _\tau}} \right) , & \mbox{for}{\rm{0}} \le q \le 2{\rm{Q}} \\
+{x_1}\left( q \right) = 0, & \mbox{for}{\rm{ 2}}Q  \le q \le N \end{cases}</math>
+
+<br />時頻分析在語音領域同時包含音樂訊號、聲音訊號以及聲紋辨識。
+
+例如语音信号:
+
+* 聲紋:不同人說話的聲音頻譜(聲紋)不同
+* 同一個人發不同的聲音也擁有不同的聲音頻譜
+* 語調的不同也會使頻譜的變化情況不同
+* 同一個字音，其中子音與母音的頻譜亦不相同
+* 雙母音也有不同頻譜的變化
+
+例如研究指出在聲紋(中文注音第一、二、三、四聲和輕聲)當中的語調會使時間和瞬時頻率的關係有所不同。
+
+=== 生醫工程 ===
+
+時頻分析在生醫工程上的應用幾乎都是用以分析生理訊號，如[[肌電圖|肌電圖]](EMG)、[[心電圖|心電圖]](ECG)等等。
+
+==== 肌電圖(EMG)訊號處理 ====
+其中肌電圖(EMG)是肌肉收縮時的電位變化和肌纖維震動的變化所產生的生理訊號，故常用以探討肌肉收縮力量程度大小或用來判定肌肉是否產生疲勞的工具，進而推估身體狀態的生理訊號。EMG訊號為非週期性且隨機的訊號，所以若將時域訊號進行快速傅利葉轉換(FFT)並不適宜，取而代之的是對EMG信號進行短時傅立葉轉換(STFT)，獲得EMG信號的功率頻譜密度函數(power spectral density function，PSDF)，其反映了EMG信號頻率隨時間而變化。
+
+短時傅立葉轉換屬於時頻分析的一種，是在傅立葉轉換中加入一個移動的視窗函數(window function) w(t)，用來對輸入的訊號做切割，在對視窗內的訊號做傅立葉轉換，產生一個二維的時間頻率分佈圖。視窗選擇方面大約包含了Hamming、Hanning、Gaussian 等等，而視窗選擇對於STFT有很大的影響，若為較小的window function可得到較佳的時域解析度，但會犧牲頻域解析度；反之，若選擇較大的window function將會得到較佳的頻域解析度但較差的時域解析度，藉由適當window size的設定，就能觀察出肌肉收縮力量程度大小隨著時間而改變<ref>http://djj.ee.ntu.edu.tw/EMG(肌電圖)_Signal_Analysis.docx {{webarchive|url=https://web.archive.org/web/20150122171559/http://djj.ee.ntu.edu.tw/EMG%28%E8%82%8C%E9%9B%BB%E5%9C%96%29_Signal_Analysis.docx |date=2015-01-22 }}</ref>。
+
+[[File:HRV_analysis_in_frequency_domain.png|thumb]]
+
+==== 心電圖(ECG)訊號處理 ====
+心電圖也是常見的電生理訊號之一，記錄了心臟整個活動過程，心臟收縮前必先產生電氣活動(electrical activity)，此電氣活動是由許多心肌的興奮波所組成。興奮波起源於心臟的竇房節(SA Node)，並經由心肌特化的傳導系統(conducting system)將此興奮波傳遍整個心臟，心電圖即是源於心臟的興奮區與未興奮區之間的電位差。而在心電圖(ECG)的應用最常見的例子即為心率變異度分析（heart rate variability, HRV），將ECG信號使用時頻分析可用以檢測自主神經系統活性，亦可進行進行個人壓力與情緒分析。
+
+為了評估自主神經系統功能及對心血管活動的影響，亦可對ECG信號進行希爾伯特-黃變換（Hilbert-Huang transform,HHT）以獲得Hilbert時頻譜，利用Hilbert-Huang時頻來做時頻特徵提取和分析。依據短時程HRV信號的線性頻域分析指標，得到不同生理頻帶的Hilbert能量圖，提取總能量，各生理頻帶的能量和其歸一化能量以及生理頻段的能量比值作為評價心率變異性的時頻特徵。基於Hilbert譜的時頻特徵的區分性能好，有較清晰的生理意義，能反映人的生理病理變化，為短時程HRV信號分析提供了一種有效方法<ref>{{Cite web |url=http://wap.cnki.net/lunwen-1012497275.nh.html |title=存档副本 |access-date=2015-01-22 |archive-date=2019-08-20 |archive-url=https://web.archive.org/web/20190820185651/http://wap.cnki.net/lunwen-1012497275.nh.html |dead-url=no }}</ref>。
+
+以往大多數的心率變異度分析都是以快速傅立葉轉換頻譜分析為基礎，來探討研究現象之心率變異頻譜特性與自主神經活性之間關聯性。但是對於快速變化的生理訊號，如ECG是一個非穩定(non-stationary)訊號，使得傅立葉轉換無法達到有效的處理，使用快速傅立葉轉換頻譜分析有其侷限性。另一種較為合適的方法是以平滑式魏格納－韋立分佈時頻分析法(smoothed pseudo Wigner-Ville distribution; SPWVD)為基礎，分析受試者之心率變異度之頻譜特性，來檢視受試者心率變異度中之低頻頻譜能量(LF)與高頻頻譜能量(HF)的增減現象，其比值為自主神經平衡指標(LF/HF)，其頻率範圍定義如下所列。
+
+:1. 極低頻範圍的正常心跳間期的變異數(VLF) - 截取頻率範圍為0 - 0.04 Hz
+
+:2. 低頻範圍的正常心跳間期的變異數(LF) - 截取頻率範圍為0.04 - 0.15 Hz，為交感神經活性指標
+
+:3. 高頻範圍的正常心跳間期的變異數(HF) - 截取頻率範圍為0.15 - 0.4 Hz，為副交感神經活性指標
+
+==== 心音(PCG)訊號處理 ====
+PCG訊號含有預知身體狀況的資訊，所以可說是有臨床診斷的價值。
+
+在一個心動週期當中，有兩個主要的聲音，也就是第一心音及第二心音。
+
+第一心音是由四個成分組成，是因為主動脈膜的閉合所產生。
+
+第二心音是由兩個成分組成，是因為肺動脈瓣膜的閉合所產生。
+
+雖然心音訊號可以說是一個不段重複的訊號，但是我們不將它定義為一個簡單的週期訊號。
+
+這是因為，心音訊號具有非平穩性，而且心音訊號是由許多複雜的事件所產生的訊號所疊加的多成分訊號。
+
+而傳統的頻譜分析方法，只能反映訊號的靜態頻譜特徵，但是，能夠反映心臟及心血管系統病理特徵的心音訊號，一般來說是非平穩時變特徵。
+
+所以，使用頻譜分析方法，就無法反映心音訊號隨時間的變化。
+
+因此，心音訊號的時頻分析用於心臟方面的研究和臨床診斷，有非常好的分析效果。
+
+==== 腦電圖(EEG)訊號處理 ====
+EEG分析，是一種研究大腦電訊號的方法，並且是一種無創傷的方法。
+
+EEG可以分成三種，也就是非瞬時自發性EEG、瞬時自發性EEG和誘發性EEG。
+
+傅立葉轉換和各種衍生的方法，可以很好地用在非瞬時自發性EEG。
+
+但是，對於瞬時自發性EEG和誘發性EEG，用傅立葉轉換的方式來分析顯然無法給予充分的資訊，因為這兩種訊號都是非平穩訊號，因此就會用到時頻分析的方法。
+
+另外，EEG訊號中，有時會出現一些短瞬時脈衝，這些脈衝可能含有病理資訊，也可能僅僅只是干擾訊號。不論屬於哪種類型，對這些脈衝訊號做檢測和分析都十分重要，因此將時頻分析方法應用在EEG訊號處理中，是許多學者的研究方向。
+
+=== 機械設備故障診斷 ===
+一個機械設備的故障診斷可以概括為以下五個部分：
+
+(1)	採集訊號
+
+(2)	從採集的訊號中，用訊號處理的方法，提取出能夠反映機械設備狀態的特徵。
+
+(3)	以某些狀態識別方法，監測機械設備並判斷機械設備的狀態，檢查是否有故障的狀況。
+
+(4)	分析與診斷機械設備的狀態。若機械設備發生故障，要分析故障的類型、性質、發生部份等。
+
+(5)	最後，根據機械設備的狀態及可能的發展趨勢做出決策，例如維修。
+ 
+而對於蒐集來的訊號，不僅只會蒐集到能夠反映出機械設備某特定部分的工作狀態資訊，也會蒐集到其他零件的資料，這些資料對於研究該特定部分的狀態而言，是一種背景雜訊。
+
+另外，一般而言，這樣的背景雜訊會比狀態資訊來的更大，而由於大多數的機械訊號都是非平穩訊號，特徵時頻譜範圍又廣，成分非常複雜，並且又如前述參雜許多背景雜訊。
+
+所以，要怎樣把所需的狀態資訊提取出來，提高訊雜比，並且將故障特徵資訊放大，是一個重要的機械故障診斷的研究方向。
+
+時頻分析則為機械故障診斷帶來了一線曙光。作為一種聯合時間與頻率的分析方法，它能夠很好的分析非平穩訊號，並且將訊號與雜訊做分離，找出所謂的故障訊號。
+
+因此，用時頻分析方法來表示訊號在不同時間和頻率上的能量密度，從時域、頻域同時分析訊號成分，可以成功地應用於機械設備故障診斷。
+
+
+
+===近岸高頻測流雷達===
+運用無線電受到海面反射來的回波頻譜來估算表層海流。原理包括了幾種物理現象，布拉格散射、都卜勒效應、深水波假設。
+
+海洋的表面是粗糙的，其中包含了各種波長的波浪，當一個近岸的測站發射無線電波，電波碰撞到海面，因為布拉格散射，波浪波長為二分之一的無線電波長的波浪會造成強的回波。
+
+若是打向一靜止的粗糙面，回波訊號的頻率應該與發射頻率相符，但海面上的波浪是行進的，對於電波接收站而言，其所收到的訊號，是一個移動中的訊號來源，所以觀察到的回波頻率因為都卜勒效應，回波訊號頻率不再是原發射頻率，而會發生在發射頻率加上一偏移頻率。
+
+因為波浪沒有特定的方向，可說是在海面往四面傳遞，對於無線電側站位置而言，遠離的波會造成負的偏移頻率，即回波頻率降低，反之，靠近測站的波浪會形成一偏移頻率為正的回波。
+
+其偏移頻率的大小值與波速相關，波浪波速根據深水波的假設，波速是波長之函數，因為先前布拉格散射，當無線電波頻率給定，其回波訊號主要是二分之一無線電波長的波浪，故此偏移頻率可以估計出來。
+
+由於表層海流載著海表面的波浪走，所以觀測到的無線電頻譜，和預測上的頻譜會有所不同，而這中間不同的量可以來估算出表層海流。
+
+通常無線電波站都有Ｘ, Y, Z軸三個方向的天線，藉由三個方向的接收訊號，雷達可以分辨出回波的方位，藉由到達回波在時間軸上可以分辨出回波的距離。
+
+以下舉一個虛構的例子來解說。
+[[File:Codar_example.png|thumb]]
+無線電測站發出一頻率為Fc，也就是波長為<math> \frac{c}{Fc} </math>的無線電波，因為1) 海表面有波長不一的波浪2) 因為布拉格散射，波長為<math> \frac{c}{2Fc} </math>的波浪會產生較大的回波能量 3)這些波浪四面傳遞，且波浪波速在深水波假設中，可以近似成<math> c_wave = \sqrt{\frac{g \lambda}{2 \pi}} </math>。
+
+回波的產生源，波浪，因為以波浪波速移動，都卜勒現象的緣故，回波訊號會有一個頻率位移Δf，遠離測站靠近測站的波浪分別造成Fc-Δf， Fc+Δf的回波（如虛線所示）。
+
+假設又一個靠岸（流向測站）表層海流，海流帶著波浪行進，其結果是離岸的浪減速，靠岸的流加速，其在頻率域相當於右偏（頻率增加）。藉著觀察回波頻率極強值（實線）和無流情況推算出來的頻率強值之間的差距，來推算出逕向上流速（遠離或靠近測站方向上的流速）。
+
+===鯨豚研究===
+鯨豚的研究常常仰賴著研究者現場目視觀察，由於人力物力有限，只能在小範圍內，海況佳，日間的情況下來研究。鯨豚的一大習性是發聲，透過被動地監聽鯨豚，研究者可以更進一步的來研究。以海豚的聲音為例，最粗淺地看至少有兩種，即click 和 whistle。二種聲音從時頻圖來看是一目了然，二種在時頻圖有截然不同的特性，click是短時間(50-150 μs)寬頻的信號(65 – 100kHz)，whistle是頻率調變的訊號（2 – 20kHz）。一般來說，click信號和海豚用來定位導航，獵食有關，而whistle和海豚的社交，溝通有關。也有可能同一時間發出兩種聲音。這當中許多學問，包含各種聲音的功能，發聲的機制，有待釐清。
+
+===資料壓縮===
+資料的壓縮包含圖像、影像及語音的壓縮，其中最廣為利用的時頻分析方法應為[[小波分析|小波分析]]。以影像來說，是用二維離散的小波轉換進行壓縮，圖一為二維離散小波轉換的結構圖，所得的四個結果分別為影像中的低頻及不同範圍的高頻成分，<math>x_{1,L}[m,n]</math>為影像中的低頻成分，<math>x_{1,H1}[m,n]</math>為水平方向的邊緣，<math>x_{1,H2}[m,n]</math>為垂直方向的邊緣，<math>x_{1,H3}[m,n]</math>為圖像中的角落。而保留低頻成分<math>x_{1,L}[m,n]</math>，捨棄其他高頻部分，再進行數次的二維離散的小波轉換，可得粗略但很接近原圖的縮圖，以達到縮圖的效果，每進行一次二維離散的小波轉換可將資料量縮為原圖的1/4倍左右，其中小波分析的影像壓縮以JPEG 2000為主。
+[[File:TFW1.png|none]]
+
+=== 衛星訊號 ===
+台灣的第二顆衛星FORMOSAT-2(FS-2)是具高分辨率的遙感衛星，而FORMOSAT-3(FS-3)/COSMIC(Formosa 3號衛星，氣象、電離層和氣候星座觀測系統）包括6個低地球軌道(Low-Earth-Orbit, LEO)衛星是第一個演示近實時數值天氣的星座，使用來自全球定位系統(Global Positioning System, GPS)衛星的無線電信號進行預測(Numerical Weather Prediction, NWP)。資料中指出，衛星任務每天都會受到自動重配置命令 (Automatic Reconfiguration Order, ARO)的干擾，FS-2記錄著相當多ARO事件，另外在另一顆FS-3上也記錄了許多計算機異常事件(衛星重啟或重置)，同時也有相關紀錄在FS-2上。而這些ARO事件也大多歸因於發現這些異常當中有相當star tracker data多應歸因於單事件失敗(Single Event Upset, SEU)，也因此我們必須了解更多SEU的起因來避免ARO的事件一再發生而使衛星受到干擾。在研究中發現FS-2的ARO和星體追蹤儀數據的遺失位元(Lost Bytes, LB)與太空天氣成正向相關，而幾個太空氣象的主要參數正是影響衛星任務的原因:例如地球磁場的Kp指數，質子密度，電子密度和10.7 cm radio flux (RF)。另外也發現FS-3的電腦重置也與地球磁場的Kp指數，質子密度，10.7 cm radio flux (RF)和X射線相關。因此若能使用時頻分析當中的Hilbert-Huang transform和其他方法來分析此非線性且不穩定的太空數據，可以結合這些太空天氣的相關參數，進而避免SEU甚至其餘ARO事件的發生機率，也可使得衛星任務更為穩定。
+
+=== 加速規分析 ===
+三軸加速規可以用來判斷一個人的活動、行動，如果可以利用三軸加速規加上時頻分析，則可以分析一個人的活動行為，例如計步器(跑或走的活動)，亦有人利用此方法分析得到帕金森氏症的病人的健康狀態。
+
+=== 經濟資料分析 ===
+傳統上，經濟數據被視為不穩定且具嘈雜訊號的時間序列資訊，且被正統理論認為是隨機程序，基本上不存在規律性。經濟或金融資料屬於時變的資訊，而其在此領域中大多使用統計方法做分析，例如自回歸模型(AR)，經濟學家大多使用經驗數據來手動擬合人工線性模型，而此隨機模型的擬合通常只能計算均值和方差，對於大量的金融經濟應用層面並不足夠。因為經濟金融的時序統計資料在頻域上是相對未開發的領域。在這種情況下，其頻譜資訊會隨著時間而一直改變，以傳統的傅立葉轉換是不足以充分描述該資訊的循環特性，因此後人研發了聯合時頻表示法(joint time-frequency representation, JTFR)來克服這個問題，因為它能同時在時域和頻域表現其時間序列和做分析。使用JTFA，我們不僅可以知道此信號(資訊)當中存在哪種類型的周期，而且知道它們何時發生以及持續多長時間。當有持續一定時間的周期集中在聯合時頻域中時，隨機噪聲趨於均勻地擴展到整個時頻平面。因此，JTFA具有更高的信噪比(SNR)。例如部分研究中，會在JTFA當中先用加伯轉換(Gabor transform)和短時傅立葉轉換兩個線性模型分析原始的ISE資料，以及兩個二次模型(韋格納分布和Page distribution)做時頻分析。通過特殊合成的時間序列可以藉此評估每個TFR在檢測和解碼原始ISE數據中可能存在的特性，也可以對它們的趨勢或是週期分量進行分析和計算。此方法可以大致模擬股票指數系列(例如原始ISE系列)的模式，並以此做為比較績效分析的基準。接著比較不同時頻分析方法以取最優，並再使用過去指數數據重複做分析，以察看結果是否對從新興市場到成熟市場的股票數據來源變化是否可靠。另外也可以使用Hilbert-Huang transform，不是先進行預白化，而是找到一條平滑的趨勢曲線以擬合經驗數據，以便差值包含盡可能多的有意義的周期;儘管平滑曲線呈現長期趨勢，但差值可進一步用於分析短期行為。儘管頻譜表明了殘差所包含的頻率成分，但它並不能告訴它們何時出現或持續多長時間。因為只有那些持續一定時間的頻率才被認為是有意義的周期，所以無法僅從頻譜上確定經濟週期。
+
+使用JTFA或其餘時頻分析方法進行經濟數據分析的發展是指日可待的，這種發展趨勢可以使金融界發生分析及預測上大革命。
+
+=== 地震波分析 ===
+以訊號處理的方式解析地震波有助於地質學家更準確的掌握地底構造，透過觀察地震波在地底中傳播的情形，辨識岩層、礦物等物質。除了自然發生的地震，人為爆破而生成的震波，搭配訊號處理技術的使用，也可以應用於石油探測及礦石開採等實務面。
+
+近代隨著科技進步，電腦輔助運算成為必要之工具，地震觀測主要為數位地震儀系统，這樣一來，可獲取大量取樣點及高解析度、高頻寬、足夠的動態範圍的數位化地震波形資料。由於地震觀測系统得動態範圍和頻率範圍皆為有限值，並且記錄地面的活動有著不同程度的變形；因此不同型態的外界干擾和系統內部雜訊會對於地震波紀錄造成干擾。在資料記錄過程中，會出現傾斜、平移、波形變形等現象，因此在對地震波進行時頻分析前，必須進行修正，調整儀器內部影響，以及過濾雜訊。
+
+以時頻分析而言，對於地震波的處理，可以分為以下幾種，分別為使用短時傅立葉轉換(Short Time Fourier Transform), 希爾伯特-黃轉換(Hilbert-Huang Transform)以及小波轉換(Wavelet Transform)。
+
+[[短時距傅立葉變換|短時傅立葉轉換]](Short Time Fourier Transform, STFT)
+
+<math> X(t, f) = \int_{-\infty}^{\infty} w(t-\tau)x(\tau)  e^{-j 2 \pi f \tau} \, d\tau </math>
+
+窗函數(window function)若為矩形，則寫為 <math> w(t)=1, t<|T|
+     </math>， <math> o.w. ,w(t)=0
+     </math>
+
+計算速度快，呈現的圖形直觀且方便，可以於野外觀測現場進行。
+
+分析過程中，主要目的為確定各[[窗函数|窗函數]](window function)中的主頻，因此窗函數大都選擇為矩形，矩形窗(rectangular window)的寬度 T 一般選擇大於地震波的週期，透過窗函數的滑動，得到地震波隨時間變化的頻率表現。<ref>單娜琳 等，地震映像數據的時頻分析方法與應用, Progress in Geophisics, vol.22, No.6, p.1740-1745, December 2007</ref>
+
+[[希爾伯特-黃轉換|希爾伯特-黃轉換]](Hilbert-Huang Transform, HHT)
+
+適合用來對非線性及非穩定的訊號做時頻分析。
+
+透過經驗模態分解及希爾伯特轉換，得到包含時間、頻率、及振幅三種資訊的結果。由於經驗模態分解的效率高，加上此時頻分析方法不依賴於[[傅里叶变换|傅立葉轉換]]的使用，因此能有效反映訊號內部特徵，達到去除雜訊並保有訊號的非線性及非穩定特徵，符合地震波的訊號分析。
+
+[[小波分析|小波轉換]](Wavelet Transform)
+
+小波轉換分析具有良好的時頻局部化性質，優於傳統的傅立葉分析。
+
+透過時間窗(time window)及頻率窗(frequency window)的改變，能在時間軸及頻率軸上表達局部特徵，因此，適合用於觀察一正常訊號中的反常結果，在分析訊號的過程中具有放大鏡的功能。
+
+另外，ZAM(Zhao-Atlas-Marks distribution ，ZAM)方法為非線性時頻分析方法，其母函數為錐形函數，研究顯示，此類時頻分析方法適合應用像地震波等非平穩訊號之研究，能有效抑制時頻分析结果中的交互干擾項，同時使時頻分析之结果密集度較高。
+
+以下舉例以時頻分析對地震波之分析結果:
+
+對自然發生之地震及人為爆破事件進行ZAM時頻分析，觀察結果得知
+
+1.包括天然地震和人為爆破在内的數位地震波形中，S波之較高能量密度區域處於低頻區域，其頻带比P波之高能量密度區域頻带來得窄，且其能量密度比P波能量密度更大；
+
+2.天然地震的高能量密度分布較為離散，而人為爆破的高能量密度分布區域較為集中。<ref>戴勇 等，數字地震波時頻分析,地震地磁觀測與研究，vol 38，2017</ref>
+
+== 參考書目、資料來源 ==
+
+* Jian-Jiun Ding, Time frequency analysis and wavelet transform class note, the Department of Electrical Engineering, National Taiwan University (NTU), Taipei, Taiwan, 2018.
+* 葛哲學, and 陳仲生. "Matlab 時頻分析技術及其應用." 人民郵電出版社, pp10-15 (2006).
+
+[[Category:信号处理|S]]
+[[Category:時頻分析|]]

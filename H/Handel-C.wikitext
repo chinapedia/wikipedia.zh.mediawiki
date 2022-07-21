@@ -1,0 +1,83 @@
+{{NoteTA|G1=IT}}
+{{Infobox programming language
+| name = Handel-C
+| paradigm = [[指令式编程|指令式]]（[[过程式编程|过程式]], [[结构化编程|结构化]]）, [[并发计算|并发]]
+| logo = 
+| logo caption = 
+| year = 1996年
+| designer = [[牛津大学|牛津大学]]计算机实验室
+| developer = ESL; Celoxica; Agility; [[Mentor_Graphics|Mentor Graphics]]
+| latest release version = v3.0
+| latest release date = 
+| turing-complete = Yes
+| typing = [[类型系统|静态]], [[类型系统|表明]], [[类型系统|标称]], [[类型推论|类型推论]]
+| implementations = Celoxica DK
+| influenced_by = [[C语言|C]], [[通信顺序进程|CSP]], [[occam|occam]]
+| influenced = 
+| dialects = 
+| operating_system = [[跨平台|跨平台]]
+| file_ext = .hcc, .hch
+| website = {{URL|http://www.mentor.com/products/fpga/handel-c/}}
+| Test : = 
+}}
+'''Handel-C'''是一個[[程式語言|程式語言]]，是一個專門編譯用在[[FPGA|FPGA]]以及[[ASIC|ASIC]]上的[[硬體描述語言|硬體描述語言]]。它是一個[[C語言|C語言]]的子集，並且有一些非標準的控制硬體即時性以及并行性的特性。
+
+==补充特征==
+為了要描述複雜的[[演算法|演算法]]，C語言的子集包含了所有C語言常用的特性。像許多嵌入式編譯器，[[浮點數|浮點數]]資料型態都會被忽略掉。透過外部函式庫的支援，浮點數運算會變的更有效率。
+
+===并行程序===
+为了设立一种描述并行行为的方式，使用了一些[[通信顺序进程|CSP]]关键字，还有[[Occam|Occam]]的通用文件结构。
+
+例如<ref name="Handel-C_Manual">{{cite web |url=https://babbage.cs.qc.cuny.edu/courses/cs345/Manuals/HandelC.pdf |title=Handel-C Language Reference Manual |accessdate=2020-05-10 |archive-date=2010-06-15 |archive-url=https://web.archive.org/web/20100615173901/http://babbage.cs.qc.cuny.edu/courses/cs345/Manuals/HandelC.pdf |dead-url=no }}</ref>：
+<syntaxhighlight lang=C>
+par {    
+     ++c;
+     a = d + e;
+     b = d + e;
+}
+</syntaxhighlight>
+
+===通道===
+[[通道_(编程)|通道]]提供了在[[并行计算|并行线程]]之间的[[消息传递|消息传递]]机制。通道可以定义为异步的或同步的（分别有和没有缓冲区存储）。一个线程写一个同步通道会被立即[[阻塞_(计算)|阻塞]]，直到对应的监听线程准备好接收这个消息。类似的接收线程将阻塞在读语句上，直到发送线程执行了下一个发送。因此它们可以用作[[同步_(计算机科学)|同步]]线程的方式<ref name="Handel-C_Manual" />。例如：
+<syntaxhighlight lang=C>
+par {
+    chan int a; // 声明一个同步通道
+    int x;
+
+    // 开始发送线程
+    seq (i = 0; i < 10; i++) {
+        a ! i;  // 向通道顺序的发送0到9
+    }
+
+    // 开始接收线程
+    seq (j = 0; j < 10; j++) {
+        a ? x;  // 进行10次从通道读入变量x
+        delay;  // 在连续读取之间介入1个时钟周期的延迟
+                // 这有阻塞在写入之间的发送线程的效果
+    }
+}
+</syntaxhighlight>
+异步通道提供了特定数量的存储，通过它们以[[先进先出演算法|FIFO]]的形式进行数据传递。在这个FIFO既不充满又不空无的时候，发送和接收线程二者可以不被阻塞的进行。但是，在FIFO是空无的时候，接收线程将被阻塞于下次读取之时。当它是充满的时候，发送线程将被阻塞于下次发送之时。有着差异的{{en-link|时钟域交叉|Clock_domain_crossing|时钟域}}参与者的通道是自动异步的，因为需要至少一个存储元素来缓和{{en-link|亚稳定性 (电路)|Metastability (electronics)|亚稳定性}}。
+
+一个线程可以同时等待多个通道，同步的或异步的，作用于给定优先级的特定次序下的第一个可用者之上，或者在都没有准备好的情况下可选的执行一个可替代的路径。
+
+== 歷史 ==
+Handel-C是[[牛津大学|牛津大学]]计算实验室裡面的硬體編譯群組所發展一系列的硬體描述語言。大約在1996年早期，Handel HDL進化到Handel-C。
+
+Handel-C在被ESL發表之後，被許多大學的硬體研究單位被採用。
+
+其他的C HDL子集也大約在同一時間被發展出來，像是1994年在[[多倫多大學|多倫多大學]]的Transmogrifier C（現在變為開源碼專案{{en-link|FpgaC}}），還有在[[洛斯阿拉莫斯国家实验室|洛斯阿拉莫斯国家实验室]]的Streams-C（現在已經得到Impulse加速技术公司的認可，並且重命名為{{en-link|Impulse C}}）。
+
+==参见==
+*[[XC_(编程语言)|XC (编程语言)]]
+
+==引用==
+{{reflist}}
+
+== 外部連結 ==
+*[http://www.mentor.com/products/fpga/handel-c/ Handel-C language resources]{{Wayback|url=http://www.mentor.com/products/fpga/handel-c/ |date=20200808150017 }} at Mentor Graphics
+*[https://www.inf.pucrs.br/calazans/undergrad/topicosI/hdls/HANDEL-C/ Oxford Handel-C] {{Wayback|url=https://www.inf.pucrs.br/calazans/undergrad/topicosI/hdls/HANDEL-C/ |date=20220330081110 }}
+
+{{可编程逻辑设备}}
+[[Category:C語言家族|Category:C語言家族]]
+[[Category:硬件描述语言|Category:硬件描述语言]]

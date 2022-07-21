@@ -1,0 +1,128 @@
+<includeonly><!-- 在這裡加入模板的保護標識 --></includeonly><noinclude>{{template doc page viewed directly}}</noinclude>
+{{noteTA|G1=IT}}
+本模板包含有可将传递给{{para|class}}的输入规范化的[[掩码]]，亦可认为是“默认”掩码，但各横幅均可定义自己的单独的掩码。
+
+如果形如<code><nowiki>{{{BANNER_NAME}}}/class</nowiki></code>的页面存在且横幅设为了<code>QUALITY_SCALE=subpage</code>，那么规范化输入的控制权则由该页的代码支配，WPBannerMeta自身不会进行任何改变。下列参数可用：
+*{{para|class}}
+*{{para|b1}}至{{para|b6}}
+
+附加说明：
+*{{tlx|WPBannerMeta/qualityscale}} 将掩码的空输出认定为“未评级”
+*{{tlx|WPBannerMeta/importancescale}} 当掩码输出"<tt>不适用</tt>"时，以另外的方式处理重要度评级。
+
+请慎重设计所有可选掩码，以正确处理所有输入。
+
+{{important|请'''不要'''单单复制本页面的内容来创建自定义掩码。如果该横幅并不需要使用特殊的方式处理{{para|class}}的输入，请直接使用默认掩码即可。}}
+
+=== 示例 ===
+
+下列代码仅接受维基百科标准质量等级及少量附加等级：
+<pre>
+{{#switch:{{lc:{{{class|}}}}}
+ |fa       = 典范
+ |fl       = 特色列表
+ |a        = 甲
+ |ga       = 优良
+ |b        = 乙
+ |c        = 丙
+ |start    = 初
+ |stub     = 小作品
+ |list     = 列表
+ |template = 模板
+ |image    = 文件
+}}
+</pre>
+下列代码没有乙级，而改用乙级检查表：
+<pre>
+{{#switch:{{lc:{{{class|}}}}}
+ |fa   = 典范
+ |fl   = 特色列表
+ |a    = 甲
+ |ga   = 优良
+ |b={{#ifexpr:
+      {{#switch:{{lc:{{{b1|}}}}}|y|yes|1=1|0}}*
+      {{#switch:{{lc:{{{b2|}}}}}|y|yes|1=1|0}}*
+      {{#switch:{{lc:{{{b3|}}}}}|y|yes|1=1|0}}*
+      {{#switch:{{lc:{{{b4|}}}}}|y|yes|1=1|0}}*
+      {{#switch:{{lc:{{{b5|}}}}}|y|yes|1=1|0}}
+     |乙
+     |初
+    }}
+ |start= 初
+ |stub = 小作品
+}}
+</pre>
+
+下列代码包含“乙+”级：
+<pre>
+{{#switch:{{lc:{{{class|}}}}}
+ |fa       = 典范
+ |fl       = 特色列表
+ |a        = 甲
+ |ga       = 优良
+ |bplus|b+ = 乙+
+ |b        = 乙
+ |c        = 丙
+ |start    = 初
+ |stub     = 小作品
+ |list     = 列表
+}}
+</pre>
+
+下列代码包含合并、请求、未来和动态等级：
+<pre>
+{{#switch: {{lc:{{{class}}}}}
+ |fa   = 典范
+ |fl   = 特色列表
+ |a    = 甲
+ |ga   = 优良
+ |b    = 乙
+ |c    = 丙
+ |start= 初
+ |stub = 小作品
+ |list = 列表
+ |na                  = 非条目
+ |image|file          = 文件
+ |category|cat        = 分类
+ |disambig|disamb     = 消歧义
+ |portal              = 主题
+ |redirect|red        = 重定向
+ |template|temp       = 模板
+ |project             = 专题
+ |current             = 动态
+ |future              = 未来
+ |needed              = 请求
+ |merge               = 合并
+ |#default={{#switch:{{lc:{{NAMESPACE}}}}
+  |file talk      = 文件
+  |category talk  = 分类
+  |portal talk    = 主题
+  |template talk  = 模板
+  |wikipedia talk = 专题
+  |#default       = 未知
+ }}
+}}
+</pre>
+
+=== 通用自述文档 ===
+上述示例存在一个小问题：他人在若通过点击横幅模板的链接，看到的自定义掩码仅会显示出空白页面。为了让该掩码显示出说明文档，请将其基本结构：
+<pre>
+{{#switch: {{lc:{{{class}}}}}
+
+...
+
+}}
+</pre>
+替换为：
+<pre>
+<noinclude>:{{tl|{{BASEPAGENAME}}}}使用的[[Template:WPBannerMeta#自定义掩码|自定义掩码]]：
+<pre></noinclude>{{#switch: {{lc:{{{class}}}}}
+
+...
+
+}}<noinclude></pre></noinclude>
+</pre>
+
+<includeonly>
+[[en:Template:WPBannerMeta/class]]
+</includeonly>

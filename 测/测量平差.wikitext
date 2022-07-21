@@ -1,0 +1,738 @@
+[[File:Trikotnik.png|280x280px]]为例，由于测量误差的存在，对三个角度进行多次测量后，得到的各角度观测值内角和并不等于180°，此时需要进行平差以求得各角度的最佳估计值|替代=|缩略图]]
+
+在[[测量学|测量学]]中，'''测量平差'''，也称为'''平差'''或'''最小二乘平差'''（{{Lang-en|Least-squares adjustment}}），是指依据某类[[最优化|最优化]]准则对带有[[观测误差|观测误差]]的测量数据进行调整，以求得测量对象的[[最佳线性无偏预测|最佳估计值]]的理论和方法。测量平差的问题来源于测量过程中的多余观测。<ref name=":whu1">武汉大学测绘学院测量平差学科组．误差理论与测量平差基础（第三版）．武汉：武汉大学出版社，2014．ISBN 978-7-307-12922-1．</ref><ref name=":5">宁津生，陈俊勇，李德仁，等．测绘学概论（第三版）．武汉：武汉大学出版社，2016．ISBN 978-7-307-18610-1．</ref>受到[[测量误差|测量误差]]的影响，通过多余观测得到的测量值必然无法精确满足测量对象之间应存在的数学关系，这些测量值之间的不一致性被称为不符值或闭合差。<ref>{{Cite book|chapter=|url=https://books.google.co.jp/books?id=CJdaNQAACAAJ|publisher=Tekniska högskolan|date=1997|isbn=978-91-7170-200-5|language=en|first=Huaan|last=Fan|title=Theory of Errors and Least Squares Adjustment|year=|location=|pages=}}</ref><ref name=":0">{{Cite book|chapter=|url=https://books.google.co.jp/books?id=4qg1DwAAQBAJ|publisher=John Wiley & Sons|date=2017-10-23|isbn=978-1-119-38598-1|language=en|first=Charles D.|last=Ghilani|title=Adjustment Computations: Spatial Data Analysis|year=|location=|pages=}}</ref>包含多余观测的观测值在数学上组成了一个无精确解的{{Link-en|超定系统|Overdetermined system}}，但根据所选取的最优化准则，可以从该系统中求得一个符合该准则的近似解。<ref>{{Cite journal|title=Gauss–Jacobi combinatorial adjustment and its modification|author=|url=https://doi.org/10.1179/1752270613Y.0000000086|last=Xue|first=S. Q.|last2=Yang|first2=Y. X.|date=2013-12-19|journal=Survey Review|issue=337|doi=10.1179/1752270613y.0000000086|others=|year=|volume=46|page=|pages=298–304|language=en|issn=0039-6265|pmid=}}</ref><ref>{{Cite book|chapter=|url=https://books.google.co.jp/books?id=Exp6CwAAQBAJ|publisher=Springer|date=2016-01-29|isbn=978-3-319-25465-4|language=en|first=Joseph|last=Awange|first2=Béla|last2=Paláncz|title=Geospatial Algebraic Computations: Theory and Applications|year=|location=|pages=}}</ref>
+
+测量平差的基本任务即是处理观测值之间的不符值，并依据选取的最优化准则，求得观测量的最佳估计值，并对其[[精度|精度]]进行评定。<ref>Sneeuw, Nico, Friedhelm Krumm, and Matthias Roth. [https://web.archive.org/web/20140714115230/http://www.uni-stuttgart.de/gi/education/BSC/19820_Ausgleichungsrechnung/skript_prelim.pdf "Adjustment Theory."] ''University Stuttgart: Stuttgart, Germany'' (2014). {{Language icon|en}}</ref>由于经典的测量平差方法通常选取[[最小二乘|最小二乘准则]]作为最优化准则，这类经典的平差方法也被称为'''最小二乘平差'''。<ref name=":1">Okwuashi, Onuwa and Inemesit E Asuquo. [https://www.ijsr.net/archive/v3i8/MDIwMTU0ODU%3D.pdf “Basics of Least Squares Adjustment Computation in Surveying.”] {{Wayback|url=https://www.ijsr.net/archive/v3i8/MDIwMTU0ODU%3D.pdf |date=20140904105658 }} (2014). {{Language icon|en}}</ref>依据经典测量平差求得的估计值是测量对象的[[最佳线性无偏预测|最优线性无偏估计]]。<ref>{{Cite book|chapter=|url=https://espace.curtin.edu.au/handle/20.500.11937/3934|publisher=VSSD Press|date=2000|isbn=978-90-407-1974-5|language=en|first=Peter|last=Teunissen|title=Adjustment theory: an introduction|year=|location=|pages=|access-date=2020-05-21|archive-date=2019-04-14|archive-url=https://web.archive.org/web/20190414145800/https://espace.curtin.edu.au/handle/20.500.11937/3934|dead-url=no}}</ref><ref>{{Cite book|chapter=|url=https://books.google.co.jp/books?id=k0RZDwAAQBAJ|publisher=CRC Press|date=2014-04-21|isbn=978-1-4822-6937-6|language=en|first=T. J. M.|last=Kennie|title=Engineering Surveying Technology|year=|location=|pages=}}</ref>
+
+== 函数模型 ==
+平差的函数模型是描述观测量与未知量之间的数学关系的模型。这些数学关系即可是几何关系，也可是物理关系。例如，[[大地测量|大地测量]]中的[[测量控制网|测量控制网]]和[[摄影测量|摄影测量]]中的[[共线方程|共线方程]]描述的是几何关系，而在[[重力测量|重力测量]]、卫星定轨或是形变监测中使用的模型描述的则是物理关系。函数模型中的观测量在实际的观测过程中确定，而未知量可根据模型的需要进行选取，测量平差的目的即是对这些未知量做出最优估计。<ref name=":whu1" /><ref name=":5" />
+
+=== 观测量 ===
+函数模型的观测量指经测量得到的测量对象的测量值，可分为必要观测量和多余观测量。
+
+==== 必要观测量 ====
+必要观测量是唯一确定函数模型所需要的观测量，仅与函数模型有关，必要观测量之间相互[[線性獨立|独立]]。<ref>姚宜斌，邱卫宁．[http://www.cqvip.com/qk/93318x/200703/24130748.html 测量平差问题中必要观测数的确定]．测绘通报，2007(03)：14-15+18．</ref>以平面三角形为例，唯一确定其[[相似三角形|形状]]需要两个[[角|角度观测量]]，必要观测数为2；而唯一确定其[[全等三角形|形状和大小]]则需要两个角度及一条[[邊_(幾何)|边长]]、一个角度及两条边长，或是三条边长的观测量，必要观测数为3。
+
+平差模型中的总观测数 <math>n</math> 与必要观测数 <math>t</math> 之间必须满足 <math>t \ge n</math> ，才能保证该模型[[满秩|满秩]]，平差模型有解。<ref name=":2">夏春林主编．误差理论与测量平差．北京：清华大学出版社，2015．ISBN 978-7-302-38074-0．</ref><ref name=":3">王穗辉．误差理论与测量平差．上海：同济大学出版社，2010．ISBN 978-7-560-84209-7．</ref>
+
+==== 多余观测量 ====
+多余观测量则是在必要观测以外进行额外观测得到的观测量，其数目 <math>r</math> 亦称为自由度或冗余度（{{Lang-en|Redundancy}}）<ref name=":1" />，由总观测数 <math>n</math> 和必要观测数 <math>t</math> 确定：
+
+:<math>
+r=n-t
+</math>
+由多余观测可列出与其数目相对应的条件方程，从而检核出条件方程中的不符值或闭合差，进而对测量对象的理论值和测量精度进行估计。<ref>王侬，过静珺主编．[https://books.google.com/books?id=2Pls2_6vttUC 现代普通测量学] {{Wayback|url=https://books.google.com/books?id=2Pls2_6vttUC |date=20200622044338 }}．北京：清华大学出版社，2001．ISBN 978-7-302-04717-9．</ref>
+
+=== 未知量 ===
+函数模型的未知量通常特指模型的待求参数。其与观测量的区别在于，这些未知量既可以是被直接观测的对象（例如上述的角度和边长），亦可以是对观测量产生影响的因素（例如几何图形中点的坐标）。将观测量表达成未知量的函数的方程即为观测方程。函数模型中未知量（参数）的数目 <math>u</math> 与必要观测量的数目 <math>t</math> 之间的数量关系与函数模型的类型一一对应：<ref name=":whu1" /><ref name=":4">{{Cite journal|title=测量平差函数模型的若干讨论|author=孙海燕|url=http://ch.whu.edu.cn/CN/abstract/abstract4791.shtml|last=|last2=|first2=|journal=武汉大学学报信息科学版|issue=S1|doi=|others=|year=2003|volume=28|page=|pages=62–64|language=|issn=1671-8860|pmid=}}</ref>
+
+* 当 <math>u=0</math> 时，函数模型中只存在表达观测量间约束关系的条件方程，此时的平差方法为条件平差；
+* 当 <math>0<u<t</math> 时，除了表达观测量之间约束关系的条件方程外，还需在函数模型中增设 <math>u</math> 条对参数作出约束的条件方程，此时的平差方法为附有参数的条件平差；
+* 当 <math>u=t</math> 时，函数模型中的所有观测量都可通过 <math>u</math> 个相互独立的参数所组成的观测方程进行表达，此时的平差方法为间接平差；
+* 当 <math>u > t</math> 时，除了 <math>u</math> 个相互独立的参数，函数模型中还存在 <math>s=u-t</math> 个可表达为其他参数的函数的多余参数，因此需增设 <math>s</math> 个条件方程对其进行约束，此时的平差方法为附有限制条件的间接平差。
+
+=== 条件方程 ===
+测量平差中的条件方程是指描述各观测量之间，以及各观测量与参数之间应当满足的数学关系的[[方程式|方程式]]，其数学形式可统一为<ref name=":whu1" /><ref name=":4" />
+:<math>
+\operatorname{F}(\hat{L}, \hat{X}) = 0
+</math>
+式中， <math>
+\hat{L}
+</math> 表示经测量得到的观测量的理论值，<math>
+\hat{X}
+</math> 表示选取的参数的理论值。根据函数模型中选取参数的不同，条件方程有以下特殊形式：
+
+* 当平差模型中没有另选参数时，条件方程的形式化为 <math>
+\operatorname{F}(\hat{L}) = 0
+</math>，该条件方程是间接平差的函数模型；
+* 当条件方程仅表示对参数的约束条件，方程当中没有观测量时，条件方程的形式化为 <math>
+\operatorname{\Phi}(\hat{X}) = 0
+</math>，被特称为约束条件方程或限制条件方程，而其他形式的条件方程亦被统称为一般条件方程。
+
+==== 几何图形的条件方程 ====
+[[File:Geodetic_Triangulation_(Goniometric).svg|替代=]]
+在[[大地测量|大地测量]]中，条件方程选取的依据通常是观测量之间的[[几何|几何关系]]。<ref name=":6">{{Cite book|chapter=|url=https://books.google.com/books?id=4qg1DwAAQBAJ|publisher=John Wiley & Sons|date=2017-10-23|isbn=978-1-119-38598-1|language=en|first=Charles D.|last=Ghilani|title=Adjustment Computations: Spatial Data Analysis|year=|location=|pages=|access-date=2020-06-05|archive-date=2020-06-08|archive-url=https://web.archive.org/web/20200608013715/https://books.google.com/books?id=4qg1DwAAQBAJ|dead-url=no}}</ref>
+
+以右图的[[三角測量|平面测角三角网]]为例，其被测量的 <math>a_i</math> 、<math>b_i</math> 和 <math>c_i</math> 等九个角度需要满足内角和条件、圆周条件和边长条件三类条件方程：<ref name=":whu1" /><ref name=":8">{{Cite book|chapter=|url=https://books.google.com/books?id=aJpXAgAAQBAJ|publisher=國立中央大學出版中心|date=2012-09-16|isbn=978-986-87944-7-4|language=|last=吳究|title=測量平差|first=|year=|location=|pages=|access-date=2020-06-05|archive-date=2020-06-08|archive-url=https://web.archive.org/web/20200608013748/https://books.google.com/books?id=aJpXAgAAQBAJ|dead-url=no}}</ref> 
+
+* 内角和条件，指同一三角形内观测的三个内角之和的理论值之和应等于180度，即 <math>
+\hat{a}_i+\hat{b}_i+\hat{c}_i-180^\circ=0
+ </math> ；
+* 圆周条件，指在中间点 <math>D</math> 处观测的三个角度 <math>c_1</math>、<math>c_2</math> 和 <math>c_3</math> 的理论值之和应等于360度，即 <math>
+\hat{c}_1+\hat{c}_2+\hat{c}_3-360^\circ=0
+ </math>；
+*边长条件，指经由不同方式{{NoteTag|这里的不同方式是指，通过不同方式列出的数学表达式中至少包含一个不同的独立变量}}求得的同一条边的长度理论值应当相等，对于右图中的测角三角网为
+:<math>
+\frac{\sin{\hat{a}_1}}{\sin{\hat{b}_1}}\frac{\sin{\hat{a}_2}}{\sin{\hat{b}_2}}\frac{\sin{\hat{a}_3}}{\sin{\hat{b}_3}}-1=0
+ </math>
+
+上式可由[[正弦定理|正弦定理]]导出，将未知边长 <math>
+\overline{CD}
+ </math> 通过两种方式表示由已知边长 <math>
+\overline{AB}
+ </math> 的求得：
+
+:<math>
+\overline{CD}
+=\overline{AB}\frac{\sin{\hat{a}_1}}{\sin{\hat{c}_1}}\frac{\sin{\hat{a}_2}}{\sin{\hat{b}_2}}
+=\overline{AB}\frac{\sin{\hat{b}_1}}{\sin{\hat{c}_1}}\frac{\sin{\hat{b}_3}}{\sin{\hat{a}_3}}
+ </math>
+
+消去作为系数的已知边长 <math>
+\overline{AB}
+ </math>，即可得到仅由角度测量值表示的边长条件方程。
+
+=== 观测方程 ===
+测量平差中的观测方程是指将观测量表达为参数的函数的方程式，其数学形式可统一成：<ref name=":whu1" /><ref name=":4" />
+:<math>
+\hat{L} = \operatorname{F}(\hat{X})
+</math>
+在观测方程中，观测量和参数分别列于等号的两侧，且每一个观测量都对应一条观测方程。<ref name=":8" /><ref>{{Cite book|chapter=|url=https://books.google.com/books?id=5AFNBqbiLzoC|publisher=Walter de Gruyter|date=1988|isbn=978-3-11-008303-3|language=en|first=Heribert|last=Kahmen|first2=Wolfgang|last2=Faig|title=Surveying|year=|location=|pages=|access-date=2020-06-02|archive-date=2020-06-11|archive-url=https://web.archive.org/web/20200611130146/https://books.google.com/books?id=5AFNBqbiLzoC|dead-url=no}}</ref>相较于条件方程，观测方程无需考虑观测量之间应满足的数学关系，更为简单且便于电算。<ref>潘正风等．数字地形测量学．武汉：武汉大学出版社，2015．ISBN 978-7-307-15677-7</ref>
+
+== 随机模型 ==
+平差的随机模型描述的是平差模型中各类[[随机变量|随机变量]]自身以及随机量之间的统计相关性质。在经典平差方法中，观测量被假设为仅包含偶然误差的随机变量，服从于[[正态分布|正态分布]]。因此，常以[[方差|方差]]和[[中误差|中误差]]描述这类随机变量自身的精度，并以[[协方差|协方差]]描述随机变量之间的相关性，而方差-协方差矩阵即是这类随机变量的随机模型：<ref name=":2" /><ref name=":3" />
+:<math>
+D = \sigma_0^2Q = \sigma_0^2P^{-1}
+</math>
+式中，<math>
+D
+</math> 是随机变量的方差-协方差阵，通常直接简称为方差阵或协方差阵；<math>
+Q
+</math> 和 <math>
+P
+</math> 分布是随机变量的协因数阵和权阵，且互为对方的[[逆矩阵|逆]]；<math>
+\sigma_0^2
+</math> 是该随机变量的先验单位权方差。
+
+=== 独立观测量的权和协因数 ===
+假设[[独立_(概率论)|独立观测值]] <math>
+L_i
+</math> 的方差是 <math>
+\sigma_i^2
+</math>，则其有方差阵
+:<math>
+D = 
+\begin{bmatrix} 
+\sigma_1^2 & 0          & \cdots & 0         \\ 
+0          & \sigma_2^2 & \cdots & 0         \\
+\vdots     & \vdots     & \ddots & \vdots    \\
+0          & 0          & \cdots & \sigma_n^2 
+\end{bmatrix}
+</math>
+选定先验单位权中误差为 <math>
+\sigma_0^2
+</math>，按下式确定观测值的权 <math>
+p_i
+</math> ：
+:<math>
+p_i = \frac{\sigma_0^2}{\sigma_i^2}
+</math>
+因此，各观测值之间权的比例仅取决于观测值的方差（即观测值的[[测量精度|精度指标]]），即有 <math>
+p_1:p_2:\cdots:p_n = \sigma_1^{-2}:\sigma_2^{-2}:\cdots:\sigma_n^{-2}
+</math>，按如下方式组成权阵
+:<math>
+P = 
+\begin{bmatrix} 
+p_1    & 0      & \cdots & 0      \\ 
+0      & p_2    & \cdots & 0      \\
+\vdots & \vdots & \ddots & \vdots \\
+0      & 0      & \cdots & p_n
+\end{bmatrix}
+ = \sigma_0^2 D^{-1}
+</math>
+又观测值的协因数阵与权阵互逆，则有 <math>
+Q = P^{-1}
+</math>.
+
+=== 相关观测量的权和协因数 ===
+若[[相關_(概率論)|相关观测值]]有协方差阵
+:<math>
+D = 
+\begin{bmatrix} 
+\sigma_1^2  & \sigma_{12} & \cdots & \sigma_{1n} \\ 
+\sigma_{21} & \sigma_2^2  & \cdots & \sigma_{2n} \\
+\vdots      & \vdots      & \ddots & \vdots      \\
+\sigma_{n1} & \sigma_{n2} & \cdots & \sigma_n^2
+\end{bmatrix}
+</math>
+式中 <math>
+\sigma_i^2
+</math> 为各观测量自身的方差，<math>
+\sigma_{ij} = \sigma_{ji}\,(i\ne j)
+</math> 为两相关观测量之间的协方差。
+
+选定先验单位权中误差为 <math>
+\sigma_0^2
+</math>，相关观测值的协因数阵为 <math>
+Q = \frac{1}{\sigma_0^2} D
+</math>，相关观测量的权阵则被定义为 <math>
+P = Q^{-1}
+</math>.
+
+== 经典平差方法 ==
+以最小二乘为最优化准则的平差方法，可根据函数模型的不同分为条件平差、间接平差和混合平差等类型。这些模型的共同点在于，其模型中的误差均被假设为仅包含偶然误差，且通过最小二乘准则得到的观测量和参数的估计值具有相同的统计性质。因此，这些平差模型亦被统称为经典平差模型，其在形式上可以统一为概括平差模型。<ref name=":9">{{Cite journal|title=各种平差方法的统一与特性|url=https://www.cnki.net/kcms/doi/10.13203/j.whugis1986.04.004.html|author=於宗俦|author2=王正林|journal=武汉测绘科技大学学报|issue=04|doi=10.13203/j.whugis1986.04.004|others=|year=1986|volume=26|page=30-43|pmid=|access-date=2020-06-11|archive-date=2020-06-11|archive-url=https://web.archive.org/web/20200611130150/https://www.cnki.net/kcms/doi/10.13203/j.whugis1986.04.004.html|dead-url=no}}</ref><ref name=":10">{{Cite journal|title=论经典测量平差模型的内在联系|author=王新洲|url=http://nvsm.cnki.net/kcms/detail/detail.aspx?filename=CHTB200402000&dbcode=CJFQ&dbname=CJFD2004&v=|journal=测绘通报|issue=2|doi=|others=|year=2004|volume=|page=|issn=0494-0911|pmid=|access-date=2020-06-09|archive-date=2020-06-09|archive-url=https://web.archive.org/web/20200609050518/http://nvsm.cnki.net/kcms/detail/detail.aspx?filename=CHTB200402000&dbcode=CJFQ&dbname=CJFD2004&v=|dead-url=no}}</ref><ref name=":11">{{Cite journal|title=再论经典测量平差模型间的内在联系|author=赵超英|url=http://tow.cnki.net/kcms/detail/detail.aspx?filename=CHTB200603011&dbcode=CRJT_CJFD&dbname=cjfd2006&v=MDY3MTQvZ1c3L05KaVhmYkxHNEh0Zk1ySTlFWllSK0MzODR6aDRYbkQwTFRnMlgyaHN4RnJDVVJMT2ZiK1JxRnk=|journal=测绘通报|issue=03|doi=|others=|year=2006|volume=|page=26-27|issn=0494-0911|pmid=|author2=张勤|access-date=2020-06-11|archive-date=2020-06-11|archive-url=https://web.archive.org/web/20200611130148/http://tow.cnki.net/kcms/detail/detail.aspx?filename=CHTB200603011&dbcode=CRJT_CJFD&dbname=cjfd2006&v=MDY3MTQvZ1c3L05KaVhmYkxHNEh0Zk1ySTlFWllSK0MzODR6aDRYbkQwTFRnMlgyaHN4RnJDVVJMT2ZiK1JxRnk=|dead-url=no}}</ref>
+
+各类平差模型的计算步骤类似，首先建立函数模型并对其进行线性化，其次组成法方程并求解，再次由解得的联系数或参数求出观测值的改正数和观测值的估计值，最后进行精度评定。
+
+=== 条件平差方法 ===
+条件平差方法是以仅给出观测量之间约束条件的条件方程作为函数模型的平差方法，其函数模型的一般形式为 <math>
+\operatorname{F}(\hat{L}) = 0
+</math>，所有的观测值和非零常数都位于方程组的同一侧。方程组中，条件方程的个数与多余观测量 <math>r</math> 相等，观测量的个数则为 <math>n</math>。
+
+取 <math>
+A = \left.{\operatorname{d}\!\operatorname{F}\over\operatorname{d}\!\hat{L}}\right\vert_L
+</math>作为系数矩阵，<math>
+A_0 = \operatorname{F}(\hat{L}) - A\hat{L}
+</math> 作为常数向量，该函数模型可线性化为 <math>
+A\hat{L}+A_0 = 0
+</math>；
+
+又由 <math>
+\hat{L} = L + V
+</math>，因此取闭合差为 <math>
+W = AL+A_0
+</math>，将上式表述为观测值改正数 <math>
+V
+</math> 与观测值闭合差 <math>
+W
+</math> 之间的关系式，即
+:<math>
+AV+W = 0
+</math>
+以最小二乘准则 <math>
+V^TPV = \min
+</math> 作为该函数模型的附加条件进行解算，最终观测值改正数和观测量估计值的解分别为
+:<math>
+V = P^{-1}A^TK=QA^TK 
+</math>
+:<math>
+\hat{L} = L + V
+</math>
+由协因数传播律，观测值改正数和观测量估计值的协因数阵分别为
+:<math>
+Q_{VV} = QA^TN_{aa}^{-1}AQ 
+</math>
+:<math>
+Q_{\hat{L}\hat{L}} = Q - Q_{VV}
+</math>
+解算过程中出现的各矩阵和向量的大小、计算公式和含义如下表所示：
+{| class="wikitable"
+|+条件平差中各符号的大小含义和计算公式
+!符号
+!-{zh-cn:行; zh-tw:列;}-数
+!-{zh-cn:列; zh-tw:行;}-数
+!计算公式
+!含义
+|-
+|align="center"|<math>L</math>
+|align="center"|<math>n</math>
+|align="center"|<math>1</math>
+|align="center"|经实际测量获得
+|观测量的观测值
+|-
+|align="center"|<math>V</math>
+|align="center"|<math>n</math>
+|align="center"|<math>1</math>
+|align="center"|<math>V = QA^TK </math>
+|观测值的改正数
+|-
+|align="center"|<math>\hat{L}</math>
+|align="center"|<math>n</math>
+|align="center"|<math>1</math>
+|align="center"|<math>\hat{L} = L + V</math>
+|观测量的估计值，具有最优无偏估计的性质
+|-
+|align="center"|<math>A</math>
+|align="center"|<math>r</math>
+|align="center"|<math>n</math>
+|align="center"|<math>A = \left.{\operatorname{d}\!\operatorname{F}\over\operatorname{d}\!\hat{L}}\right\vert_L</math>
+|条件方程的系数矩阵，表达观测量之间的限制关系
+|-
+|align="center"|<math>A_0</math>
+|align="center"|<math>n</math>
+|align="center"|<math>1</math>
+|align="center"|<math>A_0 = \operatorname{F}(\hat{L}) - A\hat{L}</math>
+|条件方程的常数向量，表达与观测量的取值无关的部分
+|-
+|align="center"|<math>W</math>
+|align="center"|<math>n</math>
+|align="center"|<math>1</math>
+|align="center"|<math>W = AL+A_0</math>
+|条件方程的常数向量，表达观测量之间的不符值或闭合差
+|-
+|align="center"|<math>P</math>
+|align="center"|<math>n</math>
+|align="center"|<math>n</math>
+|align="center"|由随机模型确定
+|对称矩阵，观测值的权阵
+|-
+|align="center"|<math>Q</math>
+|align="center"|<math>n</math>
+|align="center"|<math>n</math>
+|align="center"|<math>Q = P^{-1}</math>
+|对称矩阵，观测值的协因数阵
+|-
+|align="center"|<math>N_{aa}</math>
+|align="center"|<math>r</math>
+|align="center"|<math>r</math>
+|align="center"|<math>N_{aa} = AQA^T</math>
+|法方程的系数矩阵，仅当其可逆时该平差模型有唯一解
+|-
+|align="center"|<math>K</math>
+|align="center"|<math>r</math>
+|align="center"|<math>1</math>
+|align="center"|<math>K = -N_{aa}^{-1}W </math>
+|拉格朗日函数中的联系数向量
+|}
+
+=== 间接平差方法 ===
+间接平差方法是以观测方程为函数模型的平差方法，亦称参数平差，其函数的一般形式为 <math>
+\hat{L} = \operatorname{F}(\hat{X})
+</math>，方程组中一侧仅有观测值，另一侧则是所选参数和非零常数，观测方程的个数与观测量的个数 <math>n</math> 相等，参数的个数则与必要观测数 <math>t</math> 相等。
+
+类似于条件平差，取 <math>
+B = \left.{\operatorname{d}\!\operatorname{F}\over\operatorname{d}\!\hat{X}}\right\vert_{X^0}
+</math>作为系数矩阵，<math>
+d = \hat{L} - B\hat{X}
+</math> 作为常数向量，该函数模型可线性化为 <math>
+\hat{L} = B\hat{X} + d
+</math>；
+
+设参数有近似值 <math>
+X^0
+</math>，即有 <math>
+\hat{X} = X^0+\hat{x}
+</math>；又由 <math>
+\hat{L} = L + V
+</math>，因此取约化观测量为 <math>
+l = L - \operatorname{F}(X^0) = L-(BX^0 + d) = L-L^0
+</math>，线性化后的函数模型亦可表示为
+:<math>
+V = B\hat{x}-l
+</math>
+该式也称误差方程，式中由参数改正数 <math>
+\hat{x}
+</math>  表达的观测值改正数（即观测值的后验误差）需满足最小二乘准则 <math>
+V^TPV = \min
+</math>，以此求得自由极值下的参数改正数和参数估计值分别为<ref name=":7">{{Cite web|title=観測方程式が|url=https://nippo1.co.jp/sokuti/007/re00702.html|accessdate=2020-06-05|author=|date=|format=|work=nippo1.co.jp|publisher=|language=ja|archive-date=2016-11-09|archive-url=https://web.archive.org/web/20161109232202/http://www.nippo1.co.jp/sokuti/007/re00702.html|dead-url=no}}</ref><ref>{{Cite book|edition=2|chapter=|url=https://www.springer.com/gp/book/9781461358589|publisher=Springer US|date=1995|isbn=978-1-4613-5858-9|language=en|first=Russell C.|last=Brinker|first2=Roy|last2=Minnick|title=The Surveying Handbook|year=|location=|pages=|access-date=2020-06-09|archive-date=2020-06-09|archive-url=https://web.archive.org/web/20200609074045/https://www.springer.com/gp/book/9781461358589|dead-url=no}}</ref>
+:<math>
+\hat{x} = N_{BB}^{-1}W
+</math>
+:<math>
+\hat{X} = X^0+\hat{x}
+</math>
+在误差方程中，由参数改正数 <math>
+\hat{x}
+</math> 表达的观测量、最终观测值改正数和观测量估计值的解分别为
+:<math>
+V = B\hat{x}-l
+</math>
+:<math>
+\hat{L} = L + V
+</math>
+由协因数传播律，参数估计值、观测值改正数和观测量估计值的协因数阵分别为
+
+:<math>
+Q_{\hat{X}\hat{X}} = N_{BB}^{-1} 
+</math>
+:<math>
+Q_{VV} = Q - BN_{BB}^{-1}B^T 
+</math>
+:<math>
+Q_{\hat{L}\hat{L}} = BN_{BB}^{-1}B^T
+</math>
+
+解算过程中出现的各矩阵和向量的大小、计算公式和含义如下表所示：
+{| class="wikitable"
+|+间接平差中各符号的大小含义和计算公式
+!符号
+!-{zh-cn:行; zh-tw:列;}-数
+!-{zh-cn:列; zh-tw:行;}-数
+!计算公式
+!含义
+|-
+| align="center" |<math>L</math>
+| align="center" |<math>n</math>
+| align="center" |<math>1</math>
+| align="center" |经实际测量获得
+|观测量的观测值
+|-
+| align="center" |<math>V</math>
+| align="center" |<math>n</math>
+| align="center" |<math>1</math>
+| align="center" |<math>V = B\hat{x}-l </math>
+|观测值的改正数
+|-
+| align="center" |<math>\hat{L}</math>
+| align="center" |<math>n</math>
+| align="center" |<math>1</math>
+| align="center" |<math>\hat{L} = L + V</math>
+|观测量的估计值，具有最优无偏估计的性质
+|-
+| align="center" |<math>X^0</math>
+| align="center" |<math>t</math>
+| align="center" |<math>1</math>
+| align="center" |根据实际情况估计
+|参数的近似值
+|-
+| align="center" |<math>\hat{x}</math>
+| align="center" |<math>t</math>
+| align="center" |<math>1</math>
+| align="center" |<math>
+\hat{x} = N_{BB}^{-1}W
+</math>
+|参数的改正数
+|-
+| align="center" |<math>\hat{X}</math>
+| align="center" |<math>t</math>
+| align="center" |<math>1</math>
+| align="center" |<math>\hat{X} = X^0+\hat{x}</math>
+|参数的估计值，具有最优无偏估计的性质
+|-
+| align="center" |<math>B</math>
+| align="center" |<math>r</math>
+| align="center" |<math>n</math>
+| align="center" |<math>B = \left.{\operatorname{d}\!\operatorname{F}\over\operatorname{d}\!\hat{X}}\right\vert_{X^0}</math>
+|观测方程的系数矩阵，表达观测量和参数的函数关系
+|-
+| align="center" |<math>d</math>
+| align="center" |<math>n</math>
+| align="center" |<math>1</math>
+| align="center" |<math>d = \hat{L} - B\hat{X}</math>
+|观测方程的常数向量，表达与参数的取值无关的部分
+|-
+| align="center" |<math>L^0</math>
+| align="center" |<math>n</math>
+| align="center" |<math>1</math>
+| align="center" |<math>L^0 = BX^0 + d</math>
+|观测值的近似值，由参数的近似值确定
+|-
+| align="center" |<math>l</math>
+| align="center" |<math>n</math>
+| align="center" |<math>1</math>
+| align="center" |<math>l = L-L^0</math>
+|误差方程的常数向量，表达观测量与近似观测量的差异
+|-
+| align="center" |<math>P</math>
+| align="center" |<math>n</math>
+| align="center" |<math>n</math>
+| align="center" |由随机模型确定
+|对称矩阵，观测值的权阵
+|-
+| align="center" |<math>Q</math>
+| align="center" |<math>n</math>
+| align="center" |<math>n</math>
+| align="center" |<math>Q = P^{-1}</math>
+|对称矩阵，观测值的协因数阵
+|-
+| align="center" |<math>N_{BB}</math>
+| align="center" |<math>t</math>
+| align="center" |<math>t</math>
+| align="center" |<math>N_{BB} = B^TPB</math>
+|法方程的系数矩阵，仅当其可逆时该平差模型有唯一解
+|-
+| align="center" |<math>W</math>
+| align="center" |<math>t</math>
+| align="center" |<math>1</math>
+| align="center" |<math>W = B^TPl</math>
+|法方程的常数向量
+|-
+|}
+
+=== 概括平差方法 ===
+概括平差方法的提出旨在同一条件平差和间接平差等经典平差方法的函数模型，以对其共性和特性进行研究。从概括平差方法出发可以证明各经典平差模型之间的等价性，从而将通过概括平差方法证明的数学性质推广到所有经典平差方法中。附有限制条件的间接平差模型和附有限制条件的条件平差模型均已被证明可作为概括模型的函数模型。<ref name=":9" /><ref name=":10" /><ref name=":11" />
+
+在此以附有限制条件的条件平差为例，其具体形式为
+
+: <math>
+\begin{cases}
+\operatorname{F}(\hat{L}, \hat{X}) = 0 \\
+\operatorname{\Phi}(\hat{X}) = 0
+\end{cases}
+</math>
+
+模型中共有 <math>
+n
+</math> 个观测量和 <math>
+u
+</math> 个参数，其中独立观测量的个数为 <math>
+r
+</math>，独立参数的个数为 <math>
+u-s
+</math>；因此，一般条件方程的个数为  <math>
+c=r+u-s
+</math>，限制条件方程的个数为 <math>
+s
+</math>，且满足 <math>
+c+s=r+u
+</math> 的关系。
+
+取 <math>
+A = \left.{\operatorname{\partial}\!\operatorname{F}\over\operatorname{\partial}\!\hat{L}}\right\vert_L
+</math>、<math>
+B = \left.{\operatorname{\partial}\!\operatorname{F}\over\operatorname{\partial}\!\hat{X}}\right\vert_{X^0}
+</math> 和 <math>
+C = \left.{\operatorname{\partial}\!\Phi\over\operatorname{\partial}\!\hat{X}}\right\vert_{X^0}
+</math> 作为系数矩阵，<math>
+W = \operatorname{F}\left(L,X^0\right)
+</math> 和 <math>
+W_x = \Phi\left(X^0\right) 
+</math> 作为常数项，将该函数模型线性化为
+
+: <math>
+\begin{cases}
+AV+B\hat{x}+W=0 \\
+C\hat{x}+W_x = 0
+\end{cases}
+</math>
+
+类似于条件平差模型，以最小二乘准则 <math>
+V^TPV = \min
+</math> 作为该函数模型的附加条件进行解算，最终参数改正数和观测值改正数的解分别为<ref name=":whu1" /><ref name=":9" />
+:<math>
+\hat{x} = -(N_{bb}^{-1}-N_{bb}^{-1}C^TN_{cc}^{-1}CN_{bb}^{-1})W_e - N_{bb}^{-1}C^TN_{cc}^{-1}W_x
+</math>
+:<math>
+V = -QA^TN_{aa}^{-1}(W+B\hat{x})
+</math>
+参数估计值和观测量估计值分别为
+:<math>
+\hat{X} = X^0+\hat{x}
+</math>
+:<math>
+\hat{L} = L + V
+</math>
+参数估计值、观测值改正数和观测量估计值的协方差阵分别为
+:<math>
+Q_{\hat{X}\hat{X}} = N_{bb}^{-1} - N_{bb}^{-1}C^TN_{cc}^{-1}CN_{bb}^{-1} 
+</math>
+:<math>
+Q_{VV} = QA^T\left(N_{aa}^{-1} - N_{aa}^{-1}BQ_{{\hat{X}\hat{X}}}B^TN_{aa}^{-1}\right)AQ 
+</math>
+:<math>
+Q_{\hat{L}\hat{L}} = Q - Q_{VV}
+</math>
+解算过程中出现的各矩阵和向量的大小、计算公式和含义如下表所示：
+{| class="wikitable"
+|+概括平差中各符号的大小含义和计算公式
+!符号
+!-{zh-cn:行; zh-tw:列;}-数
+!-{zh-cn:列; zh-tw:行;}-数
+!计算公式
+!含义
+|-
+| align="center" |<math>L</math>
+| align="center" |<math>n</math>
+| align="center" |<math>1</math>
+| align="center" |经实际测量获得
+|观测量的观测值
+|-
+| align="center" |<math>V</math>
+| align="center" |<math>n</math>
+| align="center" |<math>1</math>
+| align="center" |<math>
+V = -QA^TN_{aa}^{-1}(W+B\hat{x})
+</math>
+|观测值的改正数
+|-
+| align="center" |<math>\hat{L}</math>
+| align="center" |<math>n</math>
+| align="center" |<math>1</math>
+| align="center" |<math>\hat{L} = L + V</math>
+|观测量的估计值，具有最优无偏估计的性质
+|-
+| align="center" |<math>X^0</math>
+| align="center" |<math>t</math>
+| align="center" |<math>1</math>
+| align="center" |根据实际情况估计
+|参数的近似值
+|-
+| align="center" |<math>\hat{x}</math>
+| align="center" |<math>t</math>
+| align="center" |<math>1</math>
+| align="center" |<math>\hat{x} = -(N_{bb}^{-1}-N_{bb}^{-1}C^TN_{cc}^{-1}CN_{bb}^{-1})W_e - N_{bb}^{-1}C^TN_{cc}^{-1}W_x</math>
+|参数的改正数
+|-
+| align="center" |<math>\hat{X}</math>
+| align="center" |<math>t</math>
+| align="center" |<math>1</math>
+| align="center" |<math>\hat{X} = X^0+\hat{x}</math>
+|参数的估计值，具有最优无偏估计的性质
+|-
+|align="center"|<math>A</math>
+|align="center"|<math>c</math>
+|align="center"|<math>n</math>
+|align="center"|<math>A = \left.{\operatorname{\partial}\!\operatorname{F}\over\operatorname{\partial}\!\hat{L}}\right\vert_L</math>
+|一般条件方程的系数矩阵，表达一般条件方程和观测量之间的函数关系
+|-
+| align="center" |<math>B</math>
+| align="center" |<math>c</math>
+| align="center" |<math>u</math>
+| align="center" |<math>B = \left.{\operatorname{\partial}\!\operatorname{F}\over\operatorname{\partial}\!\hat{X}}\right\vert_{X^0}</math>
+|一般条件方程的系数矩阵，表达一般条件方程和参数之间的函数关系
+|-
+| align="center" |<math>C</math>
+| align="center" |<math>s</math>
+| align="center" |<math>u</math>
+| align="center" |<math>C = \left.{\operatorname{\partial}\!\Phi\over\operatorname{\partial}\!\hat{X}}\right\vert_{X^0}</math>
+|限制条件方程的系数矩阵，表达参数之间的限制关系
+|-
+| align="center" |<math>W</math>
+| align="center" |<math>c</math>
+| align="center" |<math>1</math>
+| align="center" |<math>W = \operatorname{F}\left(L,X^0\right)</math>
+|一般条件方程的常数向量，表达一般条件方程中与观测量和参数的取值无关的部分
+|-
+| align="center" |<math>W_x</math>
+| align="center" |<math>c</math>
+| align="center" |<math>1</math>
+| align="center" |<math>W_x = \Phi\left(X^0\right)</math>
+|限制条件方程的常数向量，表达限制条件方程中与参数的取值无关的部分
+|-
+| align="center" |<math>P</math>
+| align="center" |<math>n</math>
+| align="center" |<math>n</math>
+| align="center" |由随机模型确定
+|对称矩阵，观测值的权阵
+|-
+| align="center" |<math>Q</math>
+| align="center" |<math>n</math>
+| align="center" |<math>n</math>
+| align="center" |<math>Q = P^{-1}</math>
+|对称矩阵，观测值的协因阵
+|-
+| align="center" |<math>N_{aa}</math>
+| align="center" |<math>c</math>
+| align="center" |<math>c</math>
+| align="center" |<math>N_{aa} = AQA^T</math>
+|法方程的系数矩阵，仅当其可逆时该平差模型有唯一解
+|-
+| align="center" |<math>N_{bb}</math>
+| align="center" |<math>u</math>
+| align="center" |<math>u</math>
+| align="center" |<math>N_{bb} = B^TN_{aa}^{-1}B</math>
+|对称矩阵
+|-
+| align="center" |<math>N_{cc}</math>
+| align="center" |<math>s</math>
+| align="center" |<math>s</math>
+| align="center" |<math>N_{cc} = CN_{bb}^{-1}C^T</math>
+|对称矩阵
+|-
+| align="center" |<math>W_e</math>
+| align="center" |<math>u</math>
+| align="center" |<math>1</math>
+| align="center" |<math>W_e = B^TN_{aa}^{-1}W</math>
+|常数向量
+|-
+|}
+
+=== 概括平差方法与各类经典平差方法间的联系 ===
+根据概括平差方法和各类经典平差方法的函数模型，可以得出如下转换关系：<ref name=":whu1" /><ref name=":9" />
+{| class="wikitable"
+|+概括平差方法与各类经典平差方法间的转换关系
+!概括平差的函数模型
+!概括平差的法方程
+!转换关系
+!转换后的平差方法
+!转换后的平差方法的函数模型
+!转换后的平差方法的法方程
+|-
+| rowspan="4" |<math>
+\begin{cases}
+AV+B\hat{x}+W=0 \\
+C\hat{x}+W_x = 0
+\end{cases}
+</math>
+| rowspan="4" |<math>\begin{cases}
+N_{aa}K &+& B\hat{x} + W &= 0 \\
+B^TK    &+& C^TK_s &= 0  \\
+& &C\hat{x} + W_x &= 0
+\end{cases}</math>
+|<math>A = -I</math>
+|附有限制条件的间接平差方法
+|<math>
+\begin{cases}
+V=B\hat{x}-l \\
+C\hat{x}+W_x = 0
+\end{cases}
+</math>
+|<math>\begin{cases}
+N_{BB}\hat{x} + C^TK_s &-\, W &= 0 \\
+C\hat{x} &+\, W_x &= 0
+\end{cases}</math>
+|-
+|<math>C = 0</math>
+|附有未知参数的条件平差方法
+|<math>
+AV+B\hat{x}+W = 0
+</math>
+|<math>\begin{cases}
+N_{aa}K + B\hat{x} + W &= 0 \\
+B^TK &= 0
+\end{cases}</math>
+|-
+|<math>C = 0</math> 且 <math>B = 0</math> 
+|条件平差方法
+|<math>
+AV+W = 0
+</math>
+|<math>
+N_{aa}K+W = 0
+</math>
+|-
+|<math>C = 0</math> 且 <math>A = -I</math> 
+|间接平差方法
+|<math>
+V = B\hat{x}-l
+</math>
+|<math>
+N_{BB}\hat{x} - W = 0
+</math>
+|}
+值得注意的是，当系数矩阵 <math>A = -I</math> 时，该方法转化为附有限制条件的间接平差方法，且该方法中亦包含有一般观测方程和限制条件方差。因此附有限制条件的间接平差方法是与附有限制条件的条件平差方法等价的概括平差方法。<ref name=":10" /><ref name=":11" />
+
+== 注释 ==
+<references group="註"></references>
+
+== 相关条目 ==
+* [[测量精度|测量精度]]
+* [[测量误差|测量误差]]
+* [[导线测量|导线测量]]
+* [[估计理论|估计理论]]
+* [[卡尔曼滤波|卡尔曼滤波]]
+* [[水准测量|水准测量]]
+* [[最小二乘法|最小二乘法]]
+
+==参考文献==
+{{Reflist|3}}
+
+== 外部链接 ==
+
+* [http://www1.sgg.whu.edu.cn/jyjx/suadj/content5.htm 条件平差] {{Wayback|url=http://www1.sgg.whu.edu.cn/jyjx/suadj/content5.htm |date=20050104132756 }}
+* [http://www1.sgg.whu.edu.cn/jyjx/suadj/content6.htm 附有参数的条件平差] {{Wayback|url=http://www1.sgg.whu.edu.cn/jyjx/suadj/content6.htm |date=20050104135358 }}
+* [http://www1.sgg.whu.edu.cn/jyjx/suadj/content7.htm 间接平差] {{Wayback|url=http://www1.sgg.whu.edu.cn/jyjx/suadj/content7.htm |date=20050104135405 }}
+* [http://www1.sgg.whu.edu.cn/jyjx/suadj/content8.htm 附有限制条件的间接平差] {{Wayback|url=http://www1.sgg.whu.edu.cn/jyjx/suadj/content8.htm |date=20050104135408 }}
+* [http://www1.sgg.whu.edu.cn/jyjx/suadj/content9.htm 概括平差] {{Wayback|url=http://www1.sgg.whu.edu.cn/jyjx/suadj/content9.htm |date=20050104135415 }}
+
+== 拓展阅读 ==
+
+=== 讲义 ===
+
+* 白巨川．[http://www.geomatics.ncku.edu.tw/images/ckfinder/files/20160722233933.pdf 測量平差概論] {{Wayback|url=http://www.geomatics.ncku.edu.tw/images/ckfinder/files/20160722233933.pdf |date=20170516232115 }}．國立成功大學，2016．
+
+* Kyle Snow. ''[https://earthsciences.osu.edu/sites/earthsciences.osu.edu/files/AdjustmentNotes_2017-09-06_0.pdf Notes on Adjustment Computations.] {{Wayback|url=https://earthsciences.osu.edu/sites/earthsciences.osu.edu/files/AdjustmentNotes_2017-09-06_0.pdf |date=20180120154435 }}'' The Ohio State University, 2017.
+
+=== 书籍 ===
+* 崔希璋．广义测量平差（第二版）．武汉：武汉大学出版社，2009．ISBN 978-7-307-07268-8．
+*王新洲．高等测量平差．北京：测绘出版社，2006．ISBN 978-7-503-01396-6．
+*武汉大学测绘学院测量平差学科组．误差理论与测量平差基础（第三版）．武汉：武汉大学出版社，2014．ISBN 978-7-307-12922-1．
+*吳究．[https://books.google.com/books?id=aJpXAgAAQBAJ 測量平差] {{Wayback|url=https://books.google.com/books?id=aJpXAgAAQBAJ |date=20200608013748 }}．國立中央大學出版中心，2012．ISBN 978-986-87944-7-4．
+* Fan, Huaan. ''Theory of Errors and Least Squares Adjustment''. Royal Institute of Technology (KTH), Division of Geodesy and Geoinformatics, Stockholm, Sweden, 2010, ISBN 91-7170-200-8.
+*Ghilani, Charles D. ''Adjustment Computations: Spatial Data Analysis.'' John Wiley & Sons, 2017. ISBN 978-1-119-38598-1.
+* Teunissen, Peter. ''Adjustment theory: an introduction''. VSSD Press, 2000, ISBN 978-9-040-71974-5.
+*Thomas Wallace Wright.''[https://books.google.com/books?id=cKdAAAAAIAAJ The Adjustment of Observations by the Method of Least Squares: With Applications to Geodetic Work.] {{Wayback|url=https://books.google.com/books?id=cKdAAAAAIAAJ |date=20200621112531 }}'' D. Van Nostrand Company, 1906.
+
+[[Category:测量学|Category:测量学]]
+[[Category:误差理论|Category:误差理论]]
+[[Category:估计理论|Category:估计理论]]

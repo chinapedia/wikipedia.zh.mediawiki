@@ -1,0 +1,323 @@
+'''希爾伯特-黃轉換（Hilbert-Huang Transform）'''，由[[台灣|台灣]][[中央研究院|中央研究院]]院士[[黃鍔|黃鍔]]（Norden E. Huang）等人提出，將欲分析[[数据|数据]]分解為本質模態函數（intrinsic mode functions, IMF），這樣的分解流程稱為經驗模態分解（Empirical Mode Decomposition, EMD）的方法。然後將IMF作[[希爾伯特轉換|希爾伯特轉換]]（Hilbert Transform），正確地獲得資料的[[瞬時頻率|瞬時頻率]]。此方法處理對象乃針對[[穩態|非穩態]]與[[非線性|非線性]]訊號。與其他數學轉換運算（如[[傅立葉變換|傅立葉變換]]）不同，希爾伯特-黃轉換算是一種應用在數據資料上的[[演算法|演算法]]，而非理論工具。
+
+== 本質模態函數（IMF）==
+任何一個資料，滿足下列兩個條件即可稱作本質模態函數（intrinsic mode function，IMF）。
+:
+#局部極大值（local maxima）以及局部極小值(local minima)的數目之和必須與[[零交越點|零交越點]]（zero crossing）的數目相等或是最多只能差1，也就是說一個[[極值|極值]]後面必需馬上接一個零交越點。
+
+#在任何時間點，局部最大值所定義的上[[包絡線|包絡線]]（upper envelope）與局部極小值所定義的下包絡線，取平均要接近為零。
+:
+因此，一個函數若屬於IMF，代表其波形局部對稱於零平均值。此類函數類似於弦波（sinusoid-like），但是這些類似於弦波的部分其週期與振幅可以不是固定。因為，可以直接使用希爾伯特轉換，求得有意義的瞬時頻率。
+
+== 經驗模態分解(EMD)==
+[[File:EMD.PNG|thumb]]
+建立IMF是為了滿足希爾伯特轉換對於瞬時頻率的限制條件之前置處理，也是一種轉換的過程。我們將IMF來做希爾伯特轉換可以得到較良好的特性，不幸的是大部分的資料並不是IMF，而是由許多弦波所合成的一個組合。如此一來，希爾伯特轉換並不能得到正確的瞬時頻率，我們便無法準確的分析資料。為了解決非線性（non-linear）與非穩態（non-stationary）資料在分解成IMF時所遇到的困難，便發展出EMD。
+
+經驗模態分解是將訊號分解成IMF的組合。經驗模態分解是藉著不斷重覆的篩選程序來逐步找出IMF。
+:
+以訊號<math>s \left( t\right )</math>為例，篩選程序的流程概述如下:
+:
+'''步驟''' 1 : 找出<math>s \left( t\right )</math>中的所有局部極大值以及局部極小值，接著利用三次[[樣條|樣條]](cubic spline)，分別將局部極大值串連成上包絡線與局部極小值串連成下包絡線。
+:
+'''步驟''' 2 : 求出上下包絡線之平均，得到均值包絡線<math> m_1 \left( t\right )</math>。
+:
+'''步驟''' 3 : 原始信號<math>s \left( t\right )</math>與均值包絡線相減，得到第一個分量<math> h_1 \left( t\right )</math>。
+:::<math>h_1(t) = s \left( t\right )- m_1 \left( t\right ) </math>
+                                
+:
+'''步驟''' 4 : 檢查<math> h_1 \left( t\right )</math>是否符合IMF的條件。如果不符合，則回到步驟1並且將<math> h_1 \left( t\right )</math>當作原始訊號，進行第二次的篩選。亦即
+:::<math>h_2(t) = h_1 \left( t\right )- m_2 \left( t\right ) </math>
+重複篩選<math>k</math>次
+:::<math>h_k(t) = h_{k-1} \left( t\right )- m_k \left( t\right ) </math>
+直到<math> h_k \left( t\right )</math>符合IMF的條件，即得到第一個IMF分量<math> c_1 \left( t\right )</math>，亦即
+:::<math> c_1 \left( t\right )=h_k \left( t\right )</math>
+'''步驟''' 5 : 原始訊號<math>s \left( t\right )</math>減去<math> c_1 \left( t\right )</math>可得到剩餘量<math> r_1 \left( t\right )</math>，表示如下式
+:::<math>r_1(t) = s \left( t\right )-c_1 \left( t\right ) </math>
+'''步驟''' 6 : 將<math> r_1 \left( t\right )</math>當作新的資料，重新執行步驟1至步驟5，得到新的剩餘量<math> r_2 \left( t\right )</math>。如此重複<math>n</math>次
+:
+<math>r_2(t) = r_1 \left( t\right )-c_2 \left( t\right ) </math>
+:
+<math>r_3(t) = r_2 \left( t\right )-c_3 \left( t\right ) </math>
+:.                            
+:.
+:.
+<math>r_n(t) = r_{n-1} \left( t\right )-c_n \left( t\right ) </math>
+:
+當第<math>n</math>個剩餘量<math>r_n \left( t\right )</math>已成為[[單調函數|單調函數]](monotonic function)，將無法再分解IMF時，整個EMD的分解過程完成。原始訊號<math>s \left( t\right )</math>可以表示成<math>n</math>個IMF分量與一個平均趨勢(mean trend)分量<math> r_n \left( t\right )</math>的組合，亦即
+:<math>s(t)=\sum_{k=1}^n c_k(t) + r_n(t)</math>
+
+如此一來，原始資料便分解成n個IMF和一個趨勢函數，我們便可將IMF做希爾伯特轉換來進行瞬時頻率的分析。
+== 停止準則(Stopping Criterion) ==
+
+為了確保經驗模態分析法分解出的本質模態函數能夠保留瞬時頻率與瞬時振幅的物理意義，必須設定篩選的停止準則來決定篩選的次數，以避免次數過多，破壞其信號的物理性質。而大部分的判斷準則建立在振幅及能量的判斷上，以下將介紹幾種不同的停止準則。
+
+'''標準差準則''':利用連續兩次篩選結果的分量標準差 (Standard Deviation, SD) 作為停止準則如下式所示，一般當標準差小於0.2到0.3間時，即停止篩選動作。
+
+<math>SD = \sum_{t=0}^{T}{   \frac{|h_{k-1}(t)-h_k(t)|^2} {h_{k-1}(t)^2}}\! </math>
+
+'''S數準則'''(''S'' Number Criterion):訂連續''S''次的篩選，當極值數目與跨零點數目相同時，即停止篩選動作。若''S''值夠小，迭代的速度較快，但不能確保本質模態函數為嚴格對稱；當''S''值越大時，所需的迭代過程不但越費時，且可能破壞瞬時頻率和瞬時振幅所代表的物理意義。通常''S''值介於3到5之間為最佳的停止準則。
+
+'''能量差異追蹤法'''(Energy Different Tracking):假設原始訊號''x''(''t'')包含著有限個彼此不相關的正交分量''x''<sub>i</sub>(''t'')
+<math>x(t) = x_1(t) + x_2(t) + ... +x_n(t) = \sum_{i=1}^{n}{x_i(t)}\! </math>
+
+則原始訊號''x''(''t'')的總能量可以表示為<math>E_x = \int_{-\infty}^{\infty} x_i(t)^2 \, dt  \,\! = \int_{-\infty}^{\infty}[ \sum_{i=1}^{n}{x_i(t)^2}\! \, dt ] \,\!</math>
+
+如果從經驗模態分析法分解出的訊號本質模態函數''c''<sub>1</sub>(''t'')正好就是正交分量''x''<sub>1</sub>(''t'') ，則維持能量守恆；但如果''c''<sub>1</sub>(''t'')並非與原始訊號''x''(''t'')正交，則總能量表示為
+<math>E_{tot} = \int_{-\infty}^{\infty} c_1(t)^2 \, dt + \int_{-\infty}^{\infty} [x(t)-c_1(t)]^2 \, dt \,\! = 2E_{c1} + E_x - 2 \int_{-\infty}^{\infty} x(t)c_1(t) \, dt </math>
+
+此時''E''<sub>tot</sub> ≠''E''<sub>x</sub> ，會產生一個能量差異''E''<sub>err</sub> 。若分量彼此間是正交的特性，表示所得到的本質模態函數不會有尺度混合的問題。實際上必然存在能量洩漏的現象，故本質模態函數分量間並非完全正交，所以只要假設一個夠小的|''E''<sub>err</sub>| 當作停止準則，所分解出來的IMF正交性越高，其訊號的完整性、瞬時振幅與瞬時頻率特性也會比以標準差(SD)為停止準則來的好，可以降低不必要的振盪，尤其在初始邊界的部分。
+
+'''閾值準則''':以兩閾值''θ''<sub>1</sub>和''θ''<sub>2</sub>作為停止準則。先用上下包絡線算出模態振幅(mode amplitude)，其式為
+<math>a(t) = \frac{u_k(t)-l_k(t)}{2}</math>
+再求出包絡線均值''m''(''t'')與模態振幅的絕對比值，稱之為估計函數(evaluation function,''e''(''t'') )：<math> e(t) = |\frac{m(t)}{a(t)}|</math>
+
+當整體資料中規定的部分(''1''-''α'')達到''e''(''t'')<''θ''<sub>1</sub>，而且其剩餘部分達到''e''(''t'')<''θ''<sub>2</sub> ，則迭代停止。訂定''θ''<sub>1</sub>的目的是確保全域的小波動為均值使得本質模態函數不會產生不必要的振盪；而''θ''<sub>2</sub>是考量到局部可能發生的間斷性大偏離情況。典型的參數設定為''α'' ≈ 0.05，''θ''<sub>1</sub> ≈ 0.05 ，''θ''<sub>2</sub> ≈ 10''θ''<sub>1</sub> 。
+
+== 邊界效應(Boundary Effect) ==
+
+
+所有訊號分析工具都受邊界影響其準確性，經驗模態分析法尤其嚴重。主要造成邊界效應的原因是經驗模態分析法在邊界部分難以判斷極值，造成錯誤的包絡線判定，使得分解出的本質模態函數在邊界發生震盪或扭曲的現象，以下將介紹幾種解決邊界效應的方法。
+
+
+
+'''特徵波形擴充法''':標準經驗模態分析法的處理方式，在不改變邊界值的前提下，利用特徵波形擴充法 (Characteristic Wave Extending Method)，亦即由靠近邊界兩個連續極值的頻率以及振幅，找到邊界極大值與極小值。
+
+'''鏡像擴充法''':利用鏡像對稱映照的特性，先將鏡面放置在具有對稱性的極值所在位置，使得原始序列對稱地擴充成一個環狀序列，再對此環狀序列進行平穩化的動作。
+
+
+
+'''相似搜尋法''':利用了移動時間窗 (Moving Time Window) 先將原始訊號''x''(''t'')分割成''X''<sub>i</sub>，表示如下：
+<math>X_i = [x(i),x(i+1),....,x(i+w-1))]^T </math>
+
+其中，w為移動時間窗之長度。其次，透過鄰近搜尋的方式找到包含前端邊界點或後端邊界點之最相似向量，定義如下：
+
+<math>X_{nearest} = arg min ||X_i - X_{endpoint} || </math>
+
+對於前端邊界點，被分割的子序列 (Sub-series) 訊號擁有兩個極值點，一個極大點一個極小點，其位置會在''X''<sub>nearest</sub>的前方，將其附在原始序列的前頭；同樣地，對於後端邊界點，將位於''X''<sub>nearest</sub>後方這兩個極值點附在原始序列的尾端，完成擴充。
+
+'''資料重建法''':假設原始資料''x''的長度為''N'' ，資料重建法的步驟如下:
+# 找出訊號中所有的局部極大值與局部極小值(包含邊界)，此時，局部極大值與局部極小值分別表示成矩陣型式''Max'' = [''x''<sub>M</sub>(1) ''x''<sub>M</sub>(2) ... ''x''<sub>M</sub>(n)]與 ''min'' = [''x''<sub>m</sub>(1) ''x''<sub>m</sub>(2) ... ''x''<sub>m</sub>(N)] 
+# 找出除了第一個極大值外的所有極大值的平均''δ''<sub>1</sub>和除了最末個極大值外的所有極大值的平均''δ''<sub>n</sub>，同樣的也找出除了第一個極小值外的所有極小值的平均''γ''<sub>1</sub>和除了最末個極小值外的所有極小值的平均''γ''<sub>n</sub>
+# 如果''δ''<sub>1</sub> > ''x''<sub>M</sub>(1)則另''x''<sub>M</sub>(1) = ''δ''<sub>1</sub>；如果''δ''<sub>n</sub> > ''x''<sub>M</sub>(n)則另''x''<sub>M</sub>(n) = ''δ''<sub>n</sub>；如果''γ''<sub>1</sub> < ''x''<sub>m</sub>(1)則另''x''<sub>m</sub>(1) = ''γ''<sub>1</sub>；如果''γ''<sub>n</sub> < ''x''<sub>m</sub>(n)則另''x''<sub>m</sub>(n) = ''γ''<sub>n</sub>。
+# 利用Cubic Spline求得上、下包絡線，並重複上述篩選程序之步驟2、3以求得本質模態函數分量。
+
+== 標準化轉換（Normalized Hilbert Transform and the Direct Quadrature） ==
+理想情況下，希爾伯特-黃轉換能夠將訊號以及極低頻訊號徹底分離（基準線偏移），使得該低頻訊號不會影響最後出來的結果。
+:
+<math> H[a(t)cos(\theta(t))]= a(t)H[cos(\theta(t))] </math>
+:
+:
+但此式滿足Bedrosian定理，將前式一般化之後，可得：
+:
+:
+<math> H[f(t)h(t)]= f(t)H[h(t)] </math>
+:
+當此式成立時，<math>h(t)</math>及<math>f(t)</math>必需互不相交（disjoint）且<math>h(t)</math>頻譜必須要寬於<math>f(t)</math>的頻譜。否則，最後希爾伯特-黃轉換的結果，可能會使得瞬時頻率受到基準線的頻率所影響，進而產生現實中相同瞬時頻率，在希爾伯特-黃轉換之後，該瞬時頻率會受到低頻雜訊影響，而有週期性的波動。然而，Bedrosian定理上的限制在真實的資料之中，常常都是不成立的。因此希爾伯特-黃轉換出來的結果，常常會存在一個週期性的誤差波動。
+
+為了規避Bedrosian定理的所造成的限制造成的問題，標準化的過程之中，IMF被分解成兩個部分：AM(Amplitude Modulation)及FM(Frequency Modulation)，將一個訊號分解成兩個部分之後，如此一來便能夠規避Bedrosian定理所延伸的問題。
+
+標準化的第一步，先將原先得到的IMF，取絕對值之後再重新尋找新的極大值，並用這些新得到的極大值，重複建立IMF的步驟，建立一個新的信號<math>e(t)</math>。
+:
+<math> f_1(t)= \frac{x(t)}{e(t)}</math>
+:
+重複n次之後，直到得到的訊號在任何一點都小於1
+:
+<math> f_2(t)= \frac{f_1(t)}{e(t)}</math>......<math> f_n(t)=\frac{f_(n-1)(t)}{e(t)}</math>
+:
+而透過這種方式得到的訊號，便可以被拆解成AM及FM的部分：
+:
+<math>F(t)= f_n(t) </math><br />
+
+<math>A(t)=\frac{x(t)}{F(t)}</math>
+:
+而最後得到的<math>F(t)</math>與 <math>A(t)</math>，相較於原始的IMF，頻率與振幅無法被順利分離，新得出的<math>F(t)</math>由於基準線已經被分離至<math>A(t)</math>，因此此時留下的<math>F(t)</math>便能清楚的反映訊號的瞬時頻率，相較於改良前的希爾伯特-黃轉換，改良之後的誤差當運用在適合的訊號時，可以降低原本整段訊號所造成的偏離。使得每一個時間點，受到整段訊號的影響較小。而這樣的方法，便被稱作為Direct Quadrature（DQ）。
+
+透過如此直接、簡單的方法，便可以有效降低希爾伯特-黃轉換所產生的系統性誤差：全域性的場域（global domain）對於區域性場域（local domain）的影響。而不需要使用Wigner-Ville distribution等基於全域性場域所產生的處理方法。
+
+== 混模問題(Mode Mixing Problem) ==
+
+在經驗模態分解的過程中，會有混模問題產生，混模問題就是在同一個本質模態函數裡會有不同尺度的訊號混雜，或者是同一尺度的訊號出現在不同的本質模態函數裡。混模問題的發生是因為某些系統訊發生間斷性訊號 (intermittence)，間斷性訊號會使經驗模態分析法分解無法正確分解出同一尺度的訊號。混模會造成本質模態函數失去物理意義。此外，混模問題也可能使經驗模態分解的演算法不穩定，任何擾動都可能會產生新的本質模態函數。
+[[File:EMDsimulation.jpg|thumb]]
+
+有關於混模問題的解決，在2005年有人提出了以弦波輔助的遮罩方法(masking method)來解決混模問題，而在2009年黃鍔等人提出了以雜訊輔助的總體經驗模態分解法(Ensemble Empirical Mode Decomposition)，利用加入白雜訊(white noise)來解決混模問題。
+
+==IMF的統計特性(Statistical Significance of IMFs)==
+EMD能夠將一個信號拆解成數個部分，但通常不能夠將訊號與雜訊徹底分開來，在每一個輸出的軌道之中，或多或少都參雜著一些雜訊。
+
+由於自然中常見的雜訊都是白噪音，藉由混雜不同振幅程度的白噪音至原訊號，可以得到不同的曲線，藉由設定不同的邊界之後，再匯入EMD得到的各個IMF，便可以得知該IMF投射到這個信號-雜訊座標圖上的位置，藉此作為權重各個IMF的有效性，分別出何者含有較多的目標訊息量，何者含有較多的雜訊。此類方法用來分類各種IMF的有效性上有非常好的成效，唯一的缺點是由於必須要建構出一張信號-雜訊座標圖，會產生許多額外的運算量。而這樣的缺點，在資料量非常大的時候，如果要得到一個夠準確信號-雜訊座標圖，會造成系統稍大的負擔。
+
+== 遮罩方法(Masking Method) ==
+
+為一種弦波輔助的資料分析方法(sinusoidal assisted data analysis)，利用加減一個高於所有訊號頻率的弦波，使得極值出現的速率一致(消除間斷性特性)來解決混模問題。
+
+主要流程為
+
+'''步驟''' 1 :利用頻譜分析方法找出頻譜的組成
+
+'''步驟''' 2 :加減一個高於頻譜上最高頻率的遮罩弦波訊號以消除間斷性特性
+
+'''步驟''' 3 :分別做經驗模態分解得到良好的本質模態函數
+
+'''步驟''' 4 :將其相加[[除以二|除以二]]來抵消遮罩訊號
+
+遮罩方法有三個問題
+
+1.沒有針對相位做處理，使極值點出現錯誤。
+
+2.遮罩的弦波訊號頻率需要遠小於取樣頻率。
+
+3.只能針對比較簡單的合成訊號做處理。
+
+== 總體經驗模態分解法(Ensemble Empirical Mode Decomposition) ==
+
+針對混模問題，黃鍔等人在2009年提出總體經驗模態分析法(Ensemble Empirical Mode Decomposition, EEMD) 做為改善，總體經驗模態分解法為一種雜訊輔助的資料分析方法(noise-assisted data analysis)，首先對訊號加入白雜訊(white noise)，再對訊號作經驗模態分解，並重覆做以上兩個步驟若干次後得到若干組本質模態函數，最後將各自的本質模態函數取平均來抵銷雜訊造成的影響。
+
+[[File:EEMD.jpg|thumb]]
+
+總體個數的選擇：加入的白雜訊造成的影響，根據已知的統計理論，其影響與總體個數的關係為
+<math> \epsilon_n = \frac{\epsilon}{\sqrt{\Nu}} </math>
+,其中N是總體個數，<math> \epsilon</math>是加入雜訊的大小，<math> \epsilon_n</math>是最後誤差的標準差，誤差為輸入訊號和對應的本質模態函數的差值。
+
+雜訊強度的選擇：提出者建議以0.2倍原始資料的標準差當作雜訊強度，另外當資料以高頻訊號為主體時，雜訊強度需要下降；當資料以低頻訊號為主體時，雜訊強度需要提高。
+
+後處理：因為總體經驗模態分解做完後所得到的本質模態函數並不是真的符合先前本質模態函數的定義，因此黃鍔院士等人又提出了總體經驗模態分解法的後處理 (Post-processing)，其方法為做完總體經驗模態分解法後，把所得到的本質模態函數再去各自做經驗模態分解，其處理流程主要是把總體經驗模態函數處理過的第一個得到的本質模態函數再經過經驗模態分解分解成第一個真正的本質模態函數和第一個殘差，再把總體經驗模態函數處理過的第二個本質模態函數加上第一個殘差做經驗模態分解成第二個真正的本質模態函數和第二個殘差，以此類推。
+
+總體經驗模態分解法雖然可以解決混模問題，但是運算複雜度比傳統經驗模態分解多了總體數量的倍數，難以運用在需要即時運算或是資料量大的訊號上。
+== 二維EMD(Two-Dimensional EMD) ==
+上述的例子之中，所有的訊號皆為一維訊號，而在二維訊號之中，有以下的方式可以運用希爾伯特-黃轉換來進行圖檔、影像等處理：<br />
+
+1.擬二維EMD（pseudo-two-dimensional EMD）：
+直接將二維信號分為兩組一維信號，分別進行希爾伯特-黃轉換，最後在將產生的兩組訊號重新排列回二維訊號。最後得到的結果能夠產出優秀的樣式，同時在長波長的波之中，也能夠清楚的顯示局部的快速震動。不過這類型的方式有許多缺點，其中有項較為顯著、嚴重的缺點，便是當兩組處理完的IMF在重新組合回原本的二維信號，可能會有交點產生不連續。下列的方式可以用來改進這個問題。<br />
+
+2.擬二維EEMD（pseudo-two-dimensional EMD）：
+相較於擬二維EMD，若直接使用EEMD取代EMD，便能有效改善焦點的不連續情形。不過這樣的方法有所侷限性，只有在時間尺度十分明確的情況下，能有較好的效果，例如北大西洋的溫度檢測，倘若信號的時間尺度不明，就不適合使用這個方式。<br />
+
+3.真二維EMD（genuine two-dimensional EMD）：
+由於真二維EMD直接處理二維信號，因此會產生定義上的問題，第一個是要怎麼判斷最大值，是要找圖形的邊緣嗎？或是要由其他方式來定義最大值。再來第二個辨識找到最大值之後，該怎麼選擇漸進的方式，在一維訊號之中，使用貝茲曲線或許有較佳的效果，可是未必可以直接套用到二維信號上。
+Nunes et al.用了輻射狀的基底及Riesz transform來進行真二維EMD的處理。：
+以下是Riesz transform的型態：
+複數函數 ƒ on '''R'''<sup>''d''</sup> ：
+{{NumBlk|:|<math>R_jf(x) = c_d\lim_{\epsilon\to 0}\int_{\mathbf{R}^d\backslash B_\epsilon(x)}\frac{(t_j-x_j)f(t)}{|x-t|^{d+1}}\,dt</math>|{{EquationRef|1}}}}
+for ''j'' = 1,2,...,''d''.  <br />
+常數 ''c''<sub>''d''</sub> 是一個維度標準化的常數
+:<math>c_d = \frac{1}{\pi\omega_{d-1}} = \frac{\Gamma[(d+1)/2]}{\pi^{(d+1)/2}}.</math>
+Linderhed則使用真二維EMD來壓縮圖檔，相較於其他類型的壓縮方式，此方法能提供一個更低的失真率。<br />
+Song and Zhang [2001], Damerval et al. [2005] and Yuan et al. [2008] 則使用Delaunay triangulation來找尋圖形的上界以及下界。<br />
+依據需求決定極大值的定義以及不同的漸進方式的選擇，可以分別得到不同的效果。
+
+== 應用 ==
+由前述可知，希爾伯特-黃轉換與傳統的傅立葉轉換、小波轉換（wavelet）、短時間傅立葉轉換（short-time fourier transform, STFT）不同等建立在卷積（Convolution）上的訊號處理方式，希爾伯特-黃轉換是一套基於差值所建立出來的訊號處理模式，在大多數的情況下，運算量會遠小於上述基於旋積所延伸出來的訊號轉換方式。
+
+由於本質上的差異，透過希爾伯特-黃轉換在各種應用上，皆有可能得到一種新的解讀方式與成果，因此希爾伯特-黃轉換被廣泛到運用到各個領域之中：<br />
+
+1.ECG的分析：<br />
+
+由於ECG再測量時，常會有基準線(baseline)的偏移，因此使用希爾伯特-黃轉換最後可以在EMD中，找到整體的趨勢線，將之屏棄之後就能得到基準線校準之後的ECG信號。
+除此之外，ECG經過希爾伯特-黃轉換處理之後，可以有效的濾掉原本的高頻雜訊，使得相較於FFT之後的頻譜，相較於直接轉換的原訊號相比，在ECG相對應的峰值頻率能夠較為專一清楚。{{来源请求}}
+
+2.太陽黑子的觀測： 2015年1月21日 (三) 17:56 (UTC)<ref>The Hilbert-Huang Transform: theory, applications, development http://ir.uiowa.edu/cgi/viewcontent.cgi?article=2751&context=etd {{Wayback|url=http://ir.uiowa.edu/cgi/viewcontent.cgi?article=2751&context=etd |date=20190430172126 }}</ref><br />
+
+太陽黑子是觀察太陽活動的一個重要依據，透過太陽黑子的觀測，人們可以得知太陽目前的活躍程度，由於太陽黑子的多寡大小等，皆為不穩定、非線性的訊號，因此對於傅立葉變換來說，
+可能會因為Windows Function的性質差異，使得反映出來當下的資料有所誤差。而對於希爾伯特-黃轉換來說，並不會造成太大的影響，因此希爾伯特-黃轉換在太陽黑子的觀測上能有較佳的結果。
+
+3.語音辨識：<br />
+
+由於每個人的音色、說話習慣是截然不同的，透過希爾伯特-黃轉換，能夠將各種不同頻率的泛音以及振幅有規律且有效的分離出來，對於語音辨識來說是非常好的轉換工具。同時，除了作為區分人與人之間身份的特性之外，希爾伯特-黃轉換之後的語音訊號，對於應用大量機器學習的語音相關技術來說，是一個分類清楚且特性明顯的訓練資料，能夠進一步用來發展語意辨識等需要依靠大量資料，才能建構出有效模型的技術。此類特性為傅立葉轉換難以比擬的。
+
+4.建築結構的檢測：<br />
+
+希爾伯特-黃轉換能將訊號拆解成許多種子訊號，透過比對結構檢測產生的訊號，能清楚的找到異常的檢測訊號，並進一步找出建築結構有安全疑慮之處。
+
+5.經濟數據的預測：<br />
+
+希爾伯特-黃轉換可以處理金融相關的趨勢，找到短期中期長期的相關趨勢。
+
+例如在股票數據資料中先找到一條平滑的趨勢曲線以擬合經驗數據，再以與原數據的差值包含盡可能多的有意義的周期;而平滑曲線可呈現長期趨勢，差值則可進一步用於分析短期行為。
+
+6.影像處理：<br />
+
+希爾伯特-黃轉換在改良EMD之後,在影像的融合與增強上，相較於原本的EMD快上一倍。
+
+7.地震研究：<br />
+
+希爾伯特-黃轉換用來處理地震表面波的散射並比對經過傅立葉轉換後之後的地震信號，提供另一種角度研究並解析地震信號。
+西元1999年時，台灣發生慘重的集集大地震，在事後比對由傅立葉轉換所產生的頻譜分析，發現在非靜態、非線性的的表面信號之中，因為傅立葉轉換本身線性的特性，使得低頻信號被嚴重低估，同時產生大力的高頻泛音。{{来源请求}}
+由於地震訊號大多為非靜態、非線性的，這樣的特性透過希爾伯特-黃轉換分析，可能可以得到重大的分析成果，透過分離並保真原有信號，可以得知高頻訊號與低頻訊號可能發別來自於不同的區域，藉此研究地殼運動。
+
+8.神經科學：<br />
+
+EEG運用希爾伯特-黃轉換之後，將之與TMS做比對，找尋腦部對於輸入信號的反應。
+
+9.大氣科學：<br />
+由於大氣科學中，無論是氣流、降雨等，多半皆為間歇性的訊號，並不會是一個穩定的連續信號，不過透過頻寬較窄的IMF，使得最後得到的結果，可以呈現一個週期且有趨勢的變化。例如：曾經有研究運用希爾伯特-黃轉換以3至5年為週期分析後指出維吉尼亞（Virginia）的降雨與Southern Oscillation 指數的相關係數高達0.65。
+
+10.衛星訊號
+
+可用來分析非線性且不穩定的太空天氣數據(例如地球磁場的Kp指數、質子密度、電子密度、10.7 cm radio flux (RF)或X射線等等)，可以結合這些太空天氣的相關參數，進而避免SEU(Single Event Upset)甚至其餘ARO(Automatic Reconfiguration Order)事件的發生機率，也可使得衛星任務更為穩定。
+
+
+總結以上，可以發現希爾伯特-黃轉換與傳統的頻譜分析有極大的差異，希爾伯特-黃轉換由於透過EMD來分析，使得其在預測趨勢、分類資料（頻率、時間）上，相較於傳統的基於傅立葉轉換所發展出來的信號技術，更能夠讓使用者從信號之中找到想要的趨勢，因此在各個不同領域之中，都能或多或少看到希爾伯特-黃轉換的應用。這些應用在傳統信號處理領域是較為少見的，不過由於希爾伯特-黃轉的建立方式的特性，使得他在統計上擁有極大的優點。
+
+== 曲線選擇 ==
+由上述可知，經驗模態分解(EMD)是透過最大值重建訊號，並剔除之。因此，漸進的方式對於希爾伯特-黃轉換來說，是一個非常重要的選擇，不同的漸進選擇會影響到希爾伯特-黃轉換最後的結果。在大多數的情況之中，所選擇的大多都是貝茲曲線，其能夠有效產生出弦波，不過在某些極端例子中，例如脈衝波等，使用貝茲曲線作為希爾伯特-黃轉換的漸進方式，會使得得出來的結果變得平滑而喪失了脈衝波的特性。因此針對輸入信號選擇適當的漸進方式，對於希爾伯特-黃轉換是非常重要的課題。一般而言，越多階（order）的曲線會得到較佳的漸進效果，不過同時的也會增加計算量。<br />
+
+同時，倘若沒有設定結束遞回的條件，任意一個訊號最後是否都能製造出有限組IMF，換言之，IMF的疊加是否可以收斂成任意一個訊號，這個問題在經過證明之後，發現是一個NP問題。
+
+== 結論 ==
+傅立葉變換是將一個訊號分解成無限多個弦波來分析資料，但是希爾伯特-黃轉換則是將一個訊號分解成數個近似於弦波的訊號（周期、振幅不固定）和一個趨勢函數來做分析。
+
+兩者各有其優缺點，整理如下
+
+優點：
+
+1.避免複雜的數學運算
+
+2.可分析頻率會隨時間變化的訊號
+
+3.較適於分析氣候、經濟等具有趨勢的資料
+
+4.可以找出一個函數的趨勢
+
+
+缺點：
+
+1.缺乏嚴謹的物理及數學上的意義
+
+2.需要複雜的遞迴，運算時間反而比[[短時距傅立葉變換|短時距傅立葉變換]]要長
+
+3.希爾伯特轉換未必能正確計算出本質模態函數之瞬時頻率
+
+4.無法使用[[快速傅立葉變換|快速傅立葉變換]]
+
+5.只有在特例（組合較簡單的資料）時使用希爾伯特-黃轉換較快
+
+傳統上認為希爾伯特-黃轉換是一套無用且精準度低的方式，同時在發展前期，受到Bedrosian theorem的限制，直到後續又許多改良方法之後，使得希爾伯特-黃轉換的缺點得到改善。同時其善於處理非靜態、非線性的特性使得希爾伯特-黃轉換提供了另外一套分析工具，彌補了傅立葉轉換先天上的系統限制。混合兩種方式之後，相較於單用一種方式的信號，能夠得到更多的資訊提供判讀及分析。
+== 相關條目 ==
+* [[希爾伯特轉換|希爾伯特轉換]]
+* [[包絡線|包絡線]]
+* [[樣條|樣條]]
+* [[時頻分析|時頻分析]]
+
+==註釋==
+{{reflist}}
+
+== 參考文獻 ==
+*Norden E. Huang, et al. "The empirical mode decomposition and the Hilbert spectrum for nonlinear and non-stationary time series analysis." ''Proc. R. Soc. Lond. A'' (1998) '''454''', 903–995 ([https://web.archive.org/web/20060906154216/http://www.keck.ucsf.edu/~schenk/Huang_etal98.pdf Link])
+:
+*陳韋佑, "以希爾伯特-黃轉換法為GPS接收機抑制調頻干擾", 國立台灣大學電機工程研究所碩士論文, 2007.
+*Jian-Jiun Ding, Time frequency analysis and wavelet transform class ppt,the Department of Electrical Engineering, National Taiwan University (NTU), Taipei, Taiwan, 2009.
+*Jian-Jiun Ding,"時頻分析與小波轉換",available in http://djj.ee.ntu.edu.tw/TFW.htm {{Wayback|url=http://djj.ee.ntu.edu.tw/TFW.htm |date=20170101160000 }}
+*Zhaohua Wu and Norden E. Huang, "Ensemble Empirical Mode Decomposition:A Noise-Assisted Data Analysis Method", ''Advances in Adaptive Data Analysis'' 2009, Vol. 1, 1–41
+*Ryan Deering and James F. Kaiser, "The Use Of a Masking Signal To Improve Empirical Mode Decomposition",Proc. IEEE Conf. Acoust. Speech and Sig. Processing (ICASSP), 2005,Vol. 4, 485–488.
+*G. Rilling, P. Flandrin and P. Gonçalvés, “On Empirical Mode Decomposition and Its Algorithms”, IEEE-EURASIP Work- shop on Nonlinear Signal and Image Processing NSIP-03, Grado, Italy, 8-11 Jun. 2003.
+*J. Cheng, D. Yu and Y. Yang, “Research on the Intrinsic Mode Function (IMF) Criterion in EMD Method”, Mechanical Systems and Signal Processing, vol. 20, 2006, pp. 817-824.
+*J. Zhao and D. Huang, “Mirror Extending and Circular Spline Function for Empirical Mode Decomposition Method”, Journal of Zhejiang University, Science, vol. 2, no.3, July-Sep. 2001, pp. 247-252.
+*Z. Zhao and Y. Wang, “A New Method for Processing End Effect in Empirical Mode Decomposition”, IEEE Inter- national Conference on Circuits and Systems for Communications ICCSC 2007, 2007, pp. 841-845.
+*J. Wang, Y. Peng and X. Peng, ”Similarity Searching Based Boundary Effect Processing Method for Empirical Mode Decomposition”, Electronics Letters, vol. 43, no. 1, 4 Jan. 2007, pp. 58-59.
+
+== 外部連結 ==
+*{{zh-tw}}[https://web.archive.org/web/20080402130019/http://rcada.ncu.edu.tw/intro.html 國立中央大學數據分析方法研究中心]
+*{{zh-tw}}[https://web.archive.org/web/20191226215317/http://www.mydatademon.com/ HHT标准程序下載]
+
+[[Category:信號處理|Category:信號處理]]
+[[Category:時間序列分析|Category:時間序列分析]]

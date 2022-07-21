@@ -1,0 +1,95 @@
+{{lowercase}}
+{{noteTA
+|skin=黑白分明
+|G1=IT
+|G2=Windows
+|G3=FL
+}}
+{{Infobox software
+| name = rsync
+| logo = Newrsynclogo.png
+| caption = rsync標誌
+| author = [[安德魯·垂鳩|安德魯·垂鳩]]（Andrew Tridgell）與保羅·麥可拉斯（Paul Mackerras）
+| developer = 韋恩·大衛森（Wayne Davison）
+| released               = {{Start date and age|1996|06|19}}<ref name="rsyncrel">{{cite newsgroup |newsgroup=comp.os.linux.announce |date=19 June 1996 |first=Andrew |last=Tridgell |url=http://groups.google.com/group/comp.os.linux.announce/msg/3bb93f6484065f20 |title=First release of rsync - rcp replacement |message-id=cola-liw-835153950-21793-0@liw.clinet.fi |accessdate=2007-07-19 |archive-date=2011-11-08 |archive-url=https://web.archive.org/web/20111108064132/http://groups.google.com/group/comp.os.linux.announce/msg/3bb93f6484065f20 |dead-url=no }}</ref>
+| latest_release_version = 3.2.4
+| latest_release_date = {{Release date and age|2022|04|15}}
+| genre = [[数据传输|数据传输]]、{{tsl|en|Differential backup|差分備份}}
+| license = [[GNU通用公共许可证|GNU GPLv3]]
+| programming language   = [[C语言|C]]
+| operating system       =
+| platform               = [[跨平臺|跨平臺]]
+| website = {{URL|https://rsync.samba.org/}}
+}}
+
+'''rsync'''是[[Unix|Unix]]下的一款[[应用软件|应用软件]]，它能[[同步|同步]]更新两处计算机的[[電腦檔案|檔案]]與[[目錄_(文件系统)|目錄]]，並適當利用[[差分編碼|差分編碼]]以減少[[数据|数据]]傳輸量。rsync中的一項同类软件不常见的重要特性是每個目標的[[网站镜像|镜像]]只需傳送一次。rsync可以拷貝／顯示目錄內容，以及拷貝檔案，並可選[[数据压缩|壓縮]]以及[[遞歸_(計算機科學)|遞歸]]拷貝。
+
+在常駐模式（daemon mode）下，rsync預設監聽[[传输控制协议|TCP]][[TCP/UDP端口列表|埠]]873，以原生rsync傳輸協定或者透過遠端[[shell|shell]]如[[RSH|RSH]]或者[[Secure_Shell|SSH]]提供檔案。SSH模式下，rsync用戶端執行程式必須同時在本地和遠端機器上安裝。
+
+rsync是以[[GNU通用公共许可证|GNU通用公共许可证]]發行的[[自由软件|自由软件]]。
+
+== 演算法 ==
+rsync实用程序使用由[[澳洲|澳洲]]電腦程式師[[安德魯·垂鳩|安德魯·垂鳩]]（Andrew Tridgell）發明的[[算法|演算法]]，在當接受端電腦已經有相同結構（例如檔案）但不同版本時，有效的將結構傳輸過通訊連線。在他1999年的[[博士论文|博士论文]]《Efficient Algorithms for Sorting and Synchronization》<ref>Tridgell, Andrew; [//rsync.samba.org/~tridge/phd_thesis.pdf ''Efficient Algorithms for Sorting and Synchronization''], February 1999, retrieved 29 September 2009</ref>中，详细介绍了rsync的设计、实现与性能。
+
+接受端將檔案[[拷貝|拷貝]]打散成固定大小為<math>S</math>的不重疊片段，並對每個片段計算兩個[[校验和|校验和]]：[[MD4|MD4]][[散列函數|散列函數]]與一個較弱的[[旋转哈希|旋转哈希]]。它將這些校验和送給發送者。通訊協議版本30（與rsync版本3.0.0一並發行）現在使用[[MD5|MD5]]散列函數以替代MD4。<ref>{{Cite web |url=http://rsync.samba.org/ftp/rsync/src/rsync-3.0.0-NEWS |title=存档副本 |accessdate=2008-10-24 |archive-date=2008-03-20 |archive-url=https://web.archive.org/web/20080320001756/http://rsync.samba.org/ftp/rsync/src/rsync-3.0.0-NEWS |dead-url=no }}</ref>
+
+發送者對位於其版本的檔案中每個大小為<math>S</math>的片段計算輪替校验和，即使是重疊的片段。這可被有效的計算透過特別知識產權的輪替校验和算法：如果[[位元|位元]]<math>n</math>到<math>n+S-1</math>的輪替校验和是<math>R</math>，從位元<math>n+1</math>到<math>n+S</math>的輪替校验和可從<math>R</math>，位元<math>n</math>，以及位元<math>n+S</math>計算出而不需要真正去檢驗中間的位元。因此，如果位元1到25的輪替校验和已被算出，那計算位元2到26的輪替校验和可完全依靠之前的校验和與位元1與位元26算出。
+
+rsync使用的[[旋转哈希|旋转哈希]]来自于馬克艾德勒（Mark Adler）的[[adler-32|adler-32]]校验和算法。該算法也被用於[[zlib|zlib]]，而它本身也基於{{tsl|en|Fletcher's checksum|弗莱彻的校验和|Fletcher校验}}算法。
+
+發送者其後以接收者送來的一組輪替校验和比較它自己的輪替校验和以決定是否任何匹配存在。如果是的話，它便透過計算匹配區塊的MD4校验和與接受端送來的MD4校验和比較來驗證匹配。
+
+發送者稍後傳送給接收者不與接收者方任何區塊匹配的檔案的那些部分，以及如何合併這些區塊到接收者版本的組裝指令。在實際上，這產生了與發送者端檔案一模一樣的拷貝。然而，在原則上是可能接收者的拷貝在這一點上不同：這可能發生在當兩個檔案有不同的區塊但有著相同的MD4散列函數與輪替校验和；這種事情發生的機率在現實上極端罕見。
+
+如果發送者與接收者檔案版本有許多區段相同，該公用程式只需傳送相對小部分的資料以將檔案同步。
+
+在rsync演算法構成rsync應用程式核心並最佳化兩台電腦間TCP/IP的傳輸同時，rsync應用程式也支援其他種顯著增進檔案傳輸或備份的重要功能。他們包括在發送端與接收端個別利用[[zlib|zlib]]進行區塊區塊間壓縮解壓縮，以及支援通訊協定如[[Secure_Shell|ssh]]。該協定讓加密傳輸兼具壓縮與效率，透過rsync演算法產生的差分資料變得可能。除ssh以外，[[stunnel|stunnel]]亦可被利用於創造加密通道以保全被傳輸的資料。
+
+== 使用 ==
+*rsync -avh source destination
+<tt>'''rsync'''</tt>的撰寫是用来取代[[rcp|rcp]]與[[安全复制|SCP]]<ref>如在[http://rsync.samba.org/ftp/rsync/README README] {{Wayback|url=http://rsync.samba.org/ftp/rsync/README |date=20071210003559 }}所述</ref>。rsync最早期程式的其中之一是用來實現透過rsync/ssh與標準Unix帳號，從多重Unix客戶端鏡像或者備份到中央Unix伺服器。與如[[Cron|Cron]]類似的排程應用程式配合，任何人皆可排程介於多台電腦與中央伺服器間自動加密過、基於rsync的鏡像備份。
+
+== 變種 ==
+一個叫做'''rdiff'''的公用程式利用rsync的演算法產生檔案A與檔案B間不同的[[差分編碼|差分檔案]]（與公用程式[[diff|diff]]類似，不過不同的差分檔案格式）。差分檔案可稍後被套用到檔案A，轉成檔案B（類似[[patch|patch]]公用程式）。
+
+不像diff，產生差分檔案的過程有兩步：首先產生檔案A的簽名檔，然後這個（相對較小）的簽名檔與檔案B被用來產生差分檔。又與diff相異的是，rdiff可適用於[[二進位檔案|二進位檔案]]。
+
+利用rdiff，自由軟體作者們寫了一個叫做rdiff-backup的公用程式，它可以跨過網路維護位於另一台伺服器某個檔案或者目錄的[[備份|備份]]鏡像。rdiff-backup儲存備份以及遞增的rdiff差分檔。這種方式讓回溯到任何備份點成為可能。
+
+[[duplicity|duplicity]]是rdiff-backup的一個變種，它利用單一儲存服務（像[[Amazon_S3|Amazon S3]]）達成不需要與儲存伺服器合作的備份。它透過產生預先產生每個區塊的散列函數，將它們加密，並送到伺服器儲存，然後當進行遞增備份時取回。剩下的資料為滿足保全需求也被加密儲存。
+
+== 歷史 ==
+rsync首度發布於1996年6月19日。原始作者為[[安德魯·垂鳩|安德魯·垂鳩]]（Andrew Tridgell）與保羅·麥可拉斯（Paul Mackerras）。<ref>{{cite newsgroup | newsgroup = comp.os.linux.announce | date = 1996年6月19日 | first = Andrew | last = Tridgell | url = http://groups.google.com/group/comp.os.linux.announce/msg/3bb93f6484065f20 | title = First release of rsync - rcp replacement | id = <cola-liw-835153950-21793-0@liw.clinet.fi>#1/1 | accessdate = 2007-07-19 | archive-date = 2011-11-08 | archive-url = https://web.archive.org/web/20111108064132/http://groups.google.com/group/comp.os.linux.announce/msg/3bb93f6484065f20 | dead-url = no }}</ref>
+
+rsync 3.0於2008年3月1日發行。<ref>{{cite mailing list | url = http://lists.samba.org/archive/rsync-announce/2008/000057.html | date = 2008年3月1日 | first = Wayne | last = Davison | title = Rsync 3.0.0 released | mailinglist = rsync-announce | access-date = 2008年10月24日 | archive-date = 2009年8月15日 | archive-url = https://web.archive.org/web/20090815001351/http://lists.samba.org/archive/rsync-announce/2008/000057.html | dead-url = no }}</ref>
+
+== 參見 ==
+{{portal|自由軟體|Free Software Portal Logo.svg}} 
+*{{tsl|en|casync}}
+*{{tsl|en|Remote Differential Compression}}
+*[[TCP/UDP端口列表|TCP/UDP端口列表]]
+
+* [[CVSup|CVSup]]
+* {{tsl|en|Unison (file synchronizer)}}
+* [[PowerFolder|PowerFolder]]
+* [[Jigdo|Jigdo]]
+* [[Grsync|Grsync]]
+* [[cwRsync|cwRsync]]
+
+== 參考資料 ==
+{{reflist}}
+
+== 外部連結 ==
+* [http://rsync.samba.org rsync官方網頁]{{Wayback|url=http://rsync.samba.org/ |date=20141127111140 }}
+* [http://rsync.samba.org/tech_report/node2.html rsync演算法]{{Wayback|url=http://rsync.samba.org/tech_report/node2.html |date=20081016084633 }}
+* [http://everythinglinux.org/rsync/ rsync教學]{{Wayback|url=http://everythinglinux.org/rsync/ |date=20081026224121 }}
+*[https://web.archive.org/web/20160308143333/http://www.perihel.at/3/index.html 一個簡單實際的rsync例子]
+* [http://www.fredshack.com/docs/rsync.html 易於自行照做的rsync教學]{{Wayback|url=http://www.fredshack.com/docs/rsync.html |date=20081019201138 }}
+* [https://web.archive.org/web/20081016013449/http://greenmice.info/en/node/34 在Windows下使用rsync]
+
+[[Category:1996年软件|Category:1996年软件]]
+[[Category:数据同步|Category:数据同步]]
+[[Category:自由备份软件|Category:自由备份软件]]
+[[Category:自由網路軟體|Category:自由網路軟體]]
+[[Category:网络文件传输协议|Category:网络文件传输协议]]
+[[Category:Unix网络相关软件|Category:Unix网络相关软件]]

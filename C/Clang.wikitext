@@ -1,0 +1,290 @@
+{{NoteTA|G1=IT|G2=FL}}
+
+{{Infobox software
+| name = Clang
+| logo = LLVM Logo.svg
+| logo size = 136px
+| screenshot = Clang 13.0.1 version information screenshot.png
+| caption =
+| author = [[克里斯·拉特納|克里斯·拉特納]]
+| developer = LLVM开发小组
+| released =
+| latest release version = 13.0.1
+| latest release date = {{release date and age|2022|02|08}}
+| programming language = [[C++|C++]]
+| operating system = [[Unix-like|Unix-like]]
+| platform = [[跨平台|跨平台]]
+| language =
+| genre = [[編譯器|編譯器]]
+| license = 
+{{plainlist|
+*[http://llvm.org/releases/3.8.0/LICENSE.TXT 伊利诺伊大学厄巴纳-香槟分校開源碼許可（University of Illinois/NCSA Open Source License）]
+*[[Apache_License_2.0|Apache License 2.0]] with LLVM Exceptions (v9.0.0和之后的版本)<ref name="License">{{citation |title=The LLVM Project is under the Apache License v2.0 with LLVM Exceptions|url=https://releases.llvm.org/11.0.1/LICENSE.TXT |publisher=llvm.org |access-date=2021-02-03}}</ref>}}
+}}
+'''Clang'''（{{pron-en|ˈklæŋ}}類似英文單字''[[wikt:clang|clang]]''<ref>{{Cite mailing list
+ |url         = http://lists.cs.uiuc.edu/pipermail/llvmdev/2008-July/015624.html
+ |title       = simply wonder pronunciation of Clang
+ |date        = 2008-07-03
+ |accessdate  = 2008-07-09
+ |mailinglist = LLVMdev
+ |last        = Christopher
+ |first       = Eric
+ |authorlink  = 
+ |deadurl     = yes
+ |archiveurl  = https://web.archive.org/web/20120208050747/http://lists.cs.uiuc.edu/pipermail/llvmdev/2008-July/015624.html
+ |archivedate = 2012-02-08
+}}</ref>）
+是一個[[C語言|C]]、[[C++|C++]]、[[Objective-C|Objective-C]]和[[Objective-C++|Objective-C++]]程式語言的[[編譯器|編譯器]]前端。它採用了[[LLVM|LLVM]]作為其後端，由LLVM2.6開始，一起釋出新版本。它的目標是提供一個[[GCC|GNU編譯器套裝]]（GCC）的替代品，支援了GNU編譯器大多數的編譯設定以及非官方語言的擴充功能。作者是[[克里斯·拉特納|克里斯·拉特納]]（Chris Lattner），在[[蘋果公司|蘋果公司]]的贊助支持下進行開發，而原始碼授權是使用類BSD的[[伊利诺伊大学厄巴纳-香槟分校|伊利诺伊大学厄巴纳-香槟分校]]開源碼許可。
+
+Clang專案包括Clang前端和Clang靜態分析器等。<ref>{{cite web
+ | url=http://clang-analyzer.llvm.org/
+ | title=Clang Static Analyzer
+ | publisher=LLVM
+ | accessdate=2009-09-03
+ | archive-date=2011-10-08
+ | archive-url=https://web.archive.org/web/20111008200735/http://clang-analyzer.llvm.org/
+ | dead-url=no
+ }}</ref>
+
+== 概述 ==
+這個軟體專案在2005年由[[蘋果公司|蘋果公司]]發起，是[[LLVM|LLVM]]编译器工具集的前端（front-end），目的是输出代码对应的抽象语法树（Abstract Syntax Tree, AST），並將程式碼編譯成LLVM Bitcode。接著在後端（back-end）使用LLVM編譯成平台相关的[[機器語言|機器語言]]
+。Clang支持C、C++、Objective C。
+
+在Clang語言中，使用Stmt来代表statement。Clang程式碼的单元（unit）皆為语句（statement），语法树的节点（node）类型就是Stmt。另外Clang的表达式（Expression）也是語句的一種，Clang使用Expr來代表Expression，Expr本身繼承自Stmt。节点之下有子节点列表（sub-node-list）。
+
+Clang本身性能優異，其生成的AST所耗用掉的内存僅僅是GCC的20%左右。[[FreeBSD|FreeBSD]][[操作系统|操作系统]]自2014年1月發行的10.0版本开始将Clang/LLVM作为默认编译器<ref>{{Cite web |url=https://www.freebsd.org/releases/10.0R/announce.html |title=FreeBSD 10.0-RELEASE Announcement |accessdate=2017-07-17 |archive-date=2017-07-08 |archive-url=https://web.archive.org/web/20170708223529/https://www.freebsd.org/releases/10.0R/announce.html |dead-url=no }}</ref>。
+
+==效能==
+測試證明Clang编译Objective-C代码时速度为GCC的3倍<ref>{{Cite web |url=http://llvm.org/pubs/2007-07-25-LLVM-2.0-and-Beyond.pdf |title=LLVM - 2.0 and beyond! |accessdate=2013-09-26 |archive-date=2012-06-18 |archive-url=https://web.archive.org/web/20120618155435/http://llvm.org/pubs/2007-07-25-LLVM-2.0-and-Beyond.pdf |dead-url=no |author=Chris Lattner}}</ref>，還能針對使用者發生的編譯錯誤准确地给出建议<ref>{{Cite web |url=http://blog.llvm.org/2010/04/amazing-feats-of-clang-error-recovery.html |title=Amazing feats of Clang Error Recovery |accessdate=2013-09-26 |archive-date=2010-07-02 |archive-url=https://web.archive.org/web/20100702211432/http://blog.llvm.org/2010/04/amazing-feats-of-clang-error-recovery.html |dead-url=no }}</ref>。
+
+== 版本歷史 ==
+這個表格只記錄了Clang歷史中特別的階段與版本
+{| class="wikitable"
+
+|-
+! 日期
+! 要點
+
+|-
+|{{dts|2007|7|11}} || Clang前端以開放原始碼授權釋出
+
+|-
+|{{dts|2009|2|25}}  || Clang/LLVM能夠編譯出可運作的[[FreeBSD|FreeBSD]]核心。<ref>{{cite web
+ | first=Roman
+ | last=Divacky
+ | url=http://lists.freebsd.org/pipermail/freebsd-current/2009-February/003743.html
+ | title=[ANNOUNCE] clang/llvm can compile booting FreeBSD kernel on i386/amd64
+ | accessdate=2013-11-08
+ | archive-date=2012-04-30
+ | archive-url=https://www.webcitation.org/67JxI0H6j?url=http://lists.freebsd.org/pipermail/freebsd-current/2009-February/003743.html
+ | dead-url=no
+ }}</ref><ref>{{citation |url=http://wiki.freebsd.org/BuildingFreeBSDWithClang |title=Building FreeBSD with Clang |publisher=Wiki.freebsd.org |date=2012-08-24 |accessdate=2012-09-18 |archive-date=2012-10-01 |archive-url=https://web.archive.org/web/20121001103027/http://wiki.freebsd.org/BuildingFreeBSDWithClang |dead-url=no }}</ref>
+
+|-
+|{{dts|2009|3|16}} || Clang/LLVM能夠編譯出可運作的[[DragonFly_BSD|DragonFly BSD]]核心。<ref>{{cite web
+ | first=Alex
+ | last=Hornung
+ | url=http://leaf.dragonflybsd.org/mailarchive/kernel/2009-03/msg00067.html
+ | title=llvm/clang once more
+ | accessdate=2013-11-08
+ | archive-date=2012-04-30
+ | archive-url=https://www.webcitation.org/67JxIQ63x?url=http://leaf.dragonflybsd.org/mailarchive/kernel/2009-03/msg00067.html
+ | dead-url=no
+ }}</ref><ref>{{citation |url=http://www.dragonflybsd.org/docs/developer/clang/ |title=Clang |publisher=DragonFlyBSD |date= |accessdate=2012-09-18 |archive-date=2012-10-05 |archive-url=https://web.archive.org/web/20121005113539/http://www.dragonflybsd.org/docs/developer/clang/ |dead-url=no }}</ref>
+
+|-
+|{{dts|2009|10|23}} || Clang 1.0首度與LLVM 2.6一起釋出。
+
+|-
+|{{dts|2009|Dec|24}} || 產生的C和Objective-C程式碼達到產品品質（但C++和Objective-C++仍未完成）Clang C++能夠編譯GCC 4.2的[[libstdc++|libstdc++]]並為某些特定的程式產生可運作的程式碼，並可以編譯自身。<ref>{{cite web
+ | publisher=LLVM Project Blog
+ | url=http://blog.llvm.org/2009/12/clang-builds-llvm.html
+ | title=Clang can compile LLVM and Clang
+ | accessdate=2013-11-08
+ | archive-date=2012-04-30
+ | archive-url=https://www.webcitation.org/67JxJ28Q3?url=http://blog.llvm.org/2009/12/clang-builds-llvm.html
+ | dead-url=yes
+ }}</ref>
+
+|-
+|{{dts|2010|feb|2}} || Clang能夠{{Link-en|自举|Self-hosting}}。<ref>{{cite web
+ | publisher=LLVM Project Blog
+ | url=http://blog.llvm.org/2010/02/clang-successfully-self-hosts.html
+ | title=Clang Successfully Self-Hosts
+ | accessdate=2013-11-08
+ | archive-date=2012-04-30
+ | archive-url=https://www.webcitation.org/67JxJWr58?url=http://blog.llvm.org/2010/02/clang-successfully-self-hosts.html
+ | dead-url=yes
+ }}</ref>
+
+|-
+|{{dts|2010|feb|20}} || 經過修改後的{{Link-en|HelenOS|HelenOS}}能夠用Clang編譯，,並在[[IA-32|IA-32]]上通過所有空間與使用者回歸測試。<ref>{{cite web
+ |title       = HelenOS mainline changeset head,294
+ |url         = http://trac.helenos.org/trac.fcgi/changeset/mainline%2C294
+ |deadurl     = yes
+ |archiveurl  = https://www.webcitation.org/67JxK0Hvu?url=http://trac.helenos.org/changeset/mainline,294
+ |archivedate = 2012-04-30
+ |accessdate  = 2013-11-08
+}}</ref>
+
+|-
+|{{dts|2010|May|20}} || 最新版的Clang成功建制[[Boost_C++_Libraries|Boost C++ Libraries]]，並且幾乎通過了所有測驗<ref>{{cite web
+ | title=Clang++ Builds Boost!
+ | first=Doug
+ | last=Gregor
+ | url=http://blog.llvm.org/2010/05/clang-builds-boost.html
+ | publisher=LLVM Project Blog
+ | accessdate=2013-11-08
+ | archive-date=2012-04-30
+ | archive-url=https://www.webcitation.org/67JxKWoOp?url=http://blog.llvm.org/2010/05/clang-builds-boost.html
+ | dead-url=yes
+ }}</ref>
+
+|-
+|{{dts|2010|jun|10}} || Clang/LLVM被整合在[[FreeBSD|FreeBSD]]之中（但預設編譯器仍是GCC）<ref>{{cite web
+ | first=Brad
+ | last=Davis
+ | url=http://www.freebsd.org/news/status/report-2010-04-2010-06.html#Clang-Replacing-GCC-in-the-Base-System
+ | title=FreeBSD Status Reports April - June, 2010
+ | accessdate=2013-11-08
+ | archive-date=2012-04-30
+ | archive-url=https://www.webcitation.org/67JxL3rcf?url=http://www.freebsd.org/news/status/report-2010-04-2010-06.html#Clang-Replacing-GCC-in-the-Base-System
+ | dead-url=no
+ }}</ref>
+
+|-
+|{{dts|2010|oct|25}} || Clang/LLVM能夠編譯可運作的[[Linux核心|Linux核心]]。<ref>{{citation |url=http://lists.cs.uiuc.edu/pipermail/cfe-dev/2010-October/011711.html |title=Clang builds a working Linux Kernel (Boots to RL5 with SMP, networking and X, self hosts） |publisher=Lists.cs.uiuc.edu |date= |accessdate=2012-09-18 |deadurl=yes |archiveurl=https://web.archive.org/web/20150907044958/http://lists.cs.uiuc.edu/pipermail/cfe-dev/2010-October/011711.html |archivedate=2015-09-07 }}</ref>
+
+|-
+|{{dts|2011|January|26}} || 初步實現所有[[C++0x|C++0x]]草案標準，其中少部分草案中的新特性也出現在開發版的Clang中。<ref>{{cite mailing list
+ |url         = http://lists.cs.uiuc.edu/pipermail/cfe-dev/2011-January/013013.html
+ |first       = Douglas
+ |last        = Gregor
+ |title       = New C++0x feature support in Clang
+ |date        = 26 January 2011
+ |accessdate  = 29 January 2011
+ |deadurl     = yes
+ |archiveurl  = https://web.archive.org/web/20110130065354/http://lists.cs.uiuc.edu/pipermail/cfe-dev/2011-January/013013.html
+ |archivedate = 2011年1月30日
+}}</ref><ref>{{cite web
+ | publisher=LLVM
+ | url=http://clang.llvm.org/cxx_status.html
+ | title=C++ and C++'0x Support in Clang
+ | accessdate=2013-11-08
+ | archive-date=2019-05-28
+ | archive-url=https://web.archive.org/web/20190528214038/http://clang.llvm.org/cxx_status.html
+ | dead-url=no
+ }}</ref>
+
+|-
+|{{dts|2011|feb|10}} || Clang能夠編譯出可運作的[[HotSpot|HotSpot]] [[Java虛擬機器|Java虛擬機器]]
+
+|-
+|{{dts|2012|feb|28}} || Clang 3.0能夠重建超過91%[[Debian|Debian]]成品。<ref>{{cite web
+ | first=Sylvestre
+ | last=Ledru
+ | url=http://clang.debian.net/
+ | title=Rebuild of the Debian archive with clang
+ | accessdate=2013-11-08
+ | archive-date=2012-06-18
+ | archive-url=https://www.webcitation.org/68WUnYciw?url=http://clang.debian.net/
+ | dead-url=no
+ }}</ref>
+
+|-
+|{{dts|2012|feb|29}} || Clang成為[[MINIX_3|MINIX 3]]中預設的編譯器。<ref>{{cite web
+ | url=http://www.minix3.org/news/index.html
+ | title=Official Minix 3 website: News
+ | access-date=2013-11-08
+ | archive-url=https://web.archive.org/web/20151128021642/http://www.minix3.org/news/index.html
+ | archive-date=2015-11-28
+ | dead-url=yes
+ }}</ref>
+
+|-
+|{{dts|2012|may|12}} || [[FreeBSD|FreeBSD]]宣布Clang/LLVM將成為預設編譯器，取代沿用多年的GCC。<ref>{{cite mailing list
+ | url=http://lists.freebsd.org/pipermail/freebsd-stable/2012-May/067486.html
+ | first=Daniel
+ | last=Gerzo
+ | title=FreeBSD Quarterly Status Report January-March, 2012
+ | date=12 May 2012
+ | accessdate=14 May 2012
+ | archive-date=2012-06-30
+ | archive-url=https://www.webcitation.org/68oC9gNMN?url=http://lists.freebsd.org/pipermail/freebsd-stable/2012-May/067486.html
+ | dead-url=no
+ }}</ref>
+
+|-
+|{{dts|2012|nov|5}} || Clang成為[[FreeBSD|FreeBSD]]預設編譯器。<ref>{{cite mailing list
+ | url=http://lists.freebsd.org/pipermail/freebsd-current/2012-November/037610.html
+ | first=Brooks
+ | last=Davis
+ | title=HEADS UP: Clang now the default on x86
+ | date=5 November 2012
+ | accessdate=7 November 2012
+ | archive-date=2013-11-22
+ | archive-url=https://web.archive.org/web/20131122190530/http://lists.freebsd.org/pipermail/freebsd-current/2012-November/037610.html
+ | dead-url=no
+ }}</ref>
+
+|-
+|{{dts|2013|feb|18}} || Clang/LLVM能夠編譯出[[Nexus_7|Nexus 7]]修改版可運作的[[Android|Android]] [[Linux核心|Linux核心]]。<ref>{{cite web
+ | url=http://events.linuxfoundation.org/images/stories/slides/abs2013_webster.pdf
+ | first=Behan
+ | last=Webster
+ | title=LLVMLinux: Compiling Android with LLVM
+ | date=18 February 2013
+ | accessdate=11 May 2013
+ | archive-url=https://web.archive.org/web/20140512210100/http://events.linuxfoundation.org/images/stories/slides/abs2013_webster.pdf
+ | archive-date=2014-05-12
+ | dead-url=yes
+ }}</ref><ref>{{cite web
+ | url=http://llvm.linuxfoundation.org/index.php/Nexus_7
+ | first=Vinicius
+ | last=Tinti
+ | title=LLVMLinux: Nexus 7
+ | date=17 March 2013
+ | accessdate=11 May 2013
+ | archive-url=https://web.archive.org/web/20140611050105/http://llvm.linuxfoundation.org/index.php/Nexus_7
+ | archive-date=2014-06-11
+ | dead-url=yes
+ }}</ref>
+
+|-
+|{{dts|2013|apr|19}} || Clang完成所有[[C++11|C++11]]特性。<ref>{{cite web
+ | first=Stefanus
+ | last=Du Toit
+ | url=https://twitter.com/sdt_intel/status/325289093170864129
+ | title=Clang is C++11 feature complete as of *just now*!
+ | accessdate=2013-11-08
+ | archive-date=2019-09-24
+ | archive-url=https://web.archive.org/web/20190924204137/https://twitter.com/stefanusdutoit/status/325289093170864129
+ | dead-url=no
+ }}</ref>
+
+|-
+|{{dts|2013|nov|6}} || Clang完成所有[[C++14|C++14]]特性。<ref>{{cite web
+ | url=http://llvm.org/viewvc/llvm-project?view=revision&revision=194194
+ | title=[llvm-project] Revision 194194
+ | accessdate=2013-11-08
+ | archive-date=2017-01-30
+ | archive-url=https://web.archive.org/web/20170130114326/http://llvm.org/viewvc/llvm-project?view=revision&revision=194194
+ | dead-url=yes
+ }}</ref>
+
+|}
+
+==參考文獻==
+{{Reflist|2}}
+
+==外部連結==
+
+*{{Official|http://clang.llvm.org/}}
+*[https://web.archive.org/web/20070817044507/http://lists.cs.uiuc.edu/pipermail/llvmdev/2007-July/009817.html LLVMdev: New LLVM C front-end: "clang"], announcement（11 July 2007）
+*[https://web.archive.org/web/20100613070529/http://llvm.org/devmtg/2008-08/Kremenek_StaticAnalyzer_Hi.m4v Presentation: Ted Kremenek - Finding Bugs with the Clang Static Analyzer], [http://llvm.org/devmtg/2008-08/Kremenek_StaticAnalyzer.pdf Slides]{{Wayback|url=http://llvm.org/devmtg/2008-08/Kremenek_StaticAnalyzer.pdf |date=20100613063900 }}
+*[https://web.archive.org/web/20100613063447/http://llvm.org/devmtg/2008-08/Naroff_Clang_Hi.m4v Presentation: Steve Naroff - Clang Internals], [http://llvm.org/devmtg/2008-08/Naroff_Clang.pdf Slides]{{Wayback|url=http://llvm.org/devmtg/2008-08/Naroff_Clang.pdf |date=20100613063644 }}
+*[http://llvm.org/devmtg/2009-10/StateOfClang.pdf 2009 DevMtg Clang presentation]{{Wayback|url=http://llvm.org/devmtg/2009-10/StateOfClang.pdf |date=20100613090158 }}
+
+[[Category:C編譯器|Category:C編譯器]]
+[[Category:C++編譯器|Category:C++編譯器]]
+[[Category:静态代码分析工具|Category:静态代码分析工具]]

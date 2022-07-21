@@ -1,0 +1,109 @@
+{{Expand|time=2010-10-03}}
+{{NoteTA
+|G1 = IT
+}}
+{{图搜索算法}}
+在[[计算机科学|计算机科学]]裡，'''树的遍历'''（也称为'''树的搜索'''）是[[圖的遍歷|圖的遍歷]]的一种，指的是按照某种规则，不重复地访问某种[[樹_(資料結構)|樹]]的所有节点的过程。具体的访问操作可能是检查节点的值、更新节点的值等。不同的遍历方式，其访问节点的顺序是不一样的。以下虽然描述的是[[二叉树|二叉树]]的遍历算法，但它们也适用于其他树形结构。
+
+==遍历的种类==
+与那些基本上都有标准遍历方式（通常是按线性顺序）的[[线性数据结构|线性数据结构]]（如[[链表|链表]]、一维[[数组|数组]]）所不同的是，树结构有多种不同的遍历方式。从二叉树的根节点出发，节点的遍历分为三个主要步骤：对当前节点进行操作（称为“访问”节点）、遍历左边子节点、遍历右边子节点。这三个步骤的先后顺序也是不同遍历方式的根本区别。
+
+由于从给定的某个节点出发，有多个可以前往的下一个节点（树不是线性数据结构），所以在顺序计算（即非并行计算）的情况下，只能推迟对某些节点的访问——即以某种方式保存起来以便稍后再访问。常见的做法是采用[[栈|栈]]（LIFO）或[[队列|队列]]（FIFO）。由于树本身是一种自我引用（即递归定义）的数据结构，因此很自然也可以用[[递归|递归]]方式，或者更准确地说，用[[corecursion|corecursion]]，来实现延迟节点的保存。这时（采用递归的情况）这些节点被保存在[[call_stack|call stack]]中。
+
+遍历方式的命名，源于其访问节点的顺序。最简单的划分：是深度优先（先访问子节点，再访问父节点，最后是第二个子节点）？还是广度优先（先访问第一个子节点，再访问第二个子节点，最后访问父节点）？ 深度优先可进一步按照根节点相对于左右子节点的访问先后来划分。如果把左节点和右节点的位置固定不动，那么根节点放在左节点的左边，称为前序（pre-order）、根节点放在左节点和右节点的中间，称为中序（in-order）、根节点放在右节点的右边，称为后序（post-order）。对广度优先而言，遍历没有前序中序后序之分：给定一组已排序的子节点，其“广度优先”的遍历只有一种唯一的结果。
+
+===深度优先遍历===
+以下均是用[[递归|递归]]方法。
+====前序遍历(Pre-Order Traversal)====
+指先访问根，然后访问子树的遍历方式
+[[File:Sorted_binary_tree_preorder.svg|thumb]]
+其C代码如下：
+<syntaxhighlight lang=c line="1">
+void pre_order_traversal(TreeNode *root) {
+    // Do Something with root
+    if (root->lchild != NULL)//若其中一側的子樹非空則會讀取其子樹
+        pre_order_traversal(root->lchild);
+    if (root->rchild != NULL)//另一側的子樹也做相同事
+        pre_order_traversal(root->rchild);
+}
+</syntaxhighlight>
+
+====中序遍历(In-Order Traversal)====
+指先访问左（右）子树，然后访问根，最后访问右（左）子树的遍历方式
+[[File:Sorted_binary_tree_inorder.svg|thumb]]
+其C代码如下
+<syntaxhighlight lang=c line="1">
+void in_order_traversal(TreeNode *root) {
+    if (root->lchild != NULL)//若其中一側的子樹非空則會讀取其子樹
+        in_order_traversal(root->lchild);
+    // Do Something with root
+    if (root->rchild != NULL)//另一側的子樹也做相同事
+        in_order_traversal(root->rchild);
+}
+</syntaxhighlight>
+
+====后序遍历(Post-Order Traversal)====
+指先访问子树，然后访问根的遍历方式
+[[File:Sorted_binary_tree_postorder.svg|thumb]]
+其C代码如下
+<syntaxhighlight lang=c line="1">
+void post_order_traversal(TreeNode *root) {
+    if (root->lchild != NULL)//若其中一側的子樹非空則會讀取其子樹
+        post_order_traversal(root->lchild);
+    if (root->rchild != NULL)//另一側的子樹也做相同事
+        post_order_traversal(root->rchild);
+    // Do Something with root
+}
+</syntaxhighlight>
+
+===广度优先遍历===
+和深度优先遍历不同，广度优先遍历会先访问离根节点最近的节点。二叉树的广度优先遍历又称按层次遍历。算法借助队列实现。
+[[File:Sorted_binary_tree_breadth-first_traversal.svg|thumb]]
+<syntaxhighlight lang=c line="1">
+void level(TreeNode *node)
+{
+  Queue *queue = initQueue();
+  enQueue(queue, node);
+
+  while (!isQueueEmpty(queue))
+  {
+    TreeNode *curr = deQueue(queue);
+
+    // Do Something with curr
+
+    if (curr->lchild != NULL)
+      enQueue(queue, curr->lchild);
+    if (curr->rchild != NULL)
+      enQueue(queue, curr->rchild);
+  }
+}
+</syntaxhighlight>
+
+==多叉树的遍历==
+===深度优先遍历===
+先訪問根結點，後選擇一子結點訪問並訪問該節點的子結點，持續深入後再依序訪問其他子樹，可以輕易用[[递归_(计算机科学)|遞迴]]或[[堆疊|棧]]的方式實現。<syntaxhighlight lang="c++" line="1">
+void travel(treenode* nd){
+    for(treenode* nex :　nd->childs){ // childs 存放指向其每個子結點的指標
+        travel(nex);   
+    }
+    return;
+}
+</syntaxhighlight>
+
+== 参考文献 ==
+{{Reflist}}
+
+== 参见 ==
+* [[树_(数据结构)|树 (数据结构)]]
+* [[图的遍历|图的遍历]]
+* 《[[算法导论|算法导论]]》
+* 《[[计算机程序设计艺术|计算机程序设计艺术]]》
+
+{{-}}
+{{Data structures}}
+{{计算机科学中的树}}
+
+[[Category:树结构|Category:树结构]]
+[[Category:编程中的迭代|Category:编程中的迭代]]
+[[Category:递归|Category:递归]]
+[[Category:带有代码示例的条目|Category:带有代码示例的条目]]

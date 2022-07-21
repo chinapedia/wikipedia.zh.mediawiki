@@ -1,0 +1,185 @@
+{{NoteTA/MediaWiki}}
+{{Documentation subpage}}
+{{Lua|Module:Date_table_sorting|Module:Date_Convert}}
+'''DTS'''代表<big>'''D'''</big>ate <big>'''T'''</big>able <big>'''S'''</big>orting（以日期排序），用於在能排序表格裡整理和顯示日期（[[:en:Help:Sorting|幫助：排序(英文)]]）。
+
+==它解決的問題==
+通常如果要排序的話，日期必須要使用YYYY-MM-DD的格式輸入。但是，這格式與[[WP:MOSDATE|格式手冊]]中指定的格式不同。這模板會自動製作用作排序的排序键，但會以另外的形式顯示輸出（例如年-月-日）。
+
+==參數==
+
+===日期===
+{|class=wikitable
+|-
+|+年月日不一定要分開輸入。
+|-
+!width=50%|{{tlf|dts|''年''|''月''|''日''|''時代''}}
+!width=50%|{{tlf|dts|''日期''}}
+|-valign=top
+|
+*第一個參數 – 年份（如月份不空缺就非必要）
+**正數（1 到 9999）代表公元前或公元後年份（視乎第四个参数），第四个参数空缺的話，默認代表公元後年份。
+**負數（−1 到 −9999）代表公元前年份（第四个参数必須空缺）。
+*第二个参数 – 月份（如日子空缺就非必要）
+**月份的全称 – February 或 february
+**月份的缩写– Feb 或 feb
+**月份的数字 – 2 或者 02
+*第三个参数 – 日子（非必要）
+**日期数字 – 7 或 07
+*第四个参数 – （非必要）
+**可以是 BC、AD、BCE 或 CE
+**当年份值为正时使用
+|
+*第一个参数 – 完整日期。国际格式、{{what|美国格式}}或 YYYY-MM-DD 格式
+**国际格式的日期不会被改变。YYYY-MM-DD 式日期默认会转换到US格式。
+**可以接受月份缩写
+**大小写和逗号错误将被改正
+**模板使用{{tlxm|#time|<span></span>}}，所以它也受解析器函数的限制（例如不支持公元100年以下）<!--won't go beyond 100 AD -->
+|}
+
+;例子
+{| class="wikitable sortable"
+!輸入風格
+!輸入碼
+!隱藏排序键
+!顯示的輸出
+{{/row|1893|top= {{/rowtop|{{tlx|Date_table_sorting|''年''}}|2}} }}
+{{/row|-89}}
+{{/row|Oct|top= {{/rowtop|{{tlx|Date_table_sorting|''月''}}}} }}
+{{/row|February 1767|top= {{/rowtop|{{tlx|Date_table_sorting|''月 年''}}}} }}
+{{/row|12 Aug 1987|top= {{/rowtop|{{tlx|Date_table_sorting|''日 月 年''}}}} }}
+{{/row|July 1, 1867|top= {{/rowtop|{{tlx|Date_table_sorting|''月 日, 年''}}}} }}
+{{/row|25 October|top= {{/rowtop|{{tlx|Date_table_sorting|''日 月''}}}} }}
+{{/row|Jan 1|top= {{/rowtop|{{tlx|Date_table_sorting|''月 日''}}}} }}
+{{/row|2014-12-09|top= {{/rowtop|{{tlx|Date_table_sorting|''YYYY-MM-DD''}}}} }}
+{{/row|1990|10|top= {{/rowtop|{{tlx|Date_table_sorting|''年''|''月''}}|3}} }}
+{{/row|1980|Dec}}
+{{/row|1970|August}}
+{{/row|2024|Jun|12|top= {{/rowtop|{{tlx|Date_table_sorting|''年''|''月''|''日''}}|2}} }}
+{{/row|-204|11|22}}
+{{/row|44|3|15|BC|top= {{/rowtop|{{tlx|Date_table_sorting|''年''|''月''|''日''|''時代''}}|2}} }}
+{{/row|94|Oct|17|AD}}
+{{/row||May|top= {{/rowtop|{{tlx|Date_table_sorting|<span></span>|''月''}}}} }}
+{{/row||Sep|12|top= {{/rowtop|{{tlx|Date_table_sorting|<span></span>|''月''|''日''}}}} }}
+|}
+
+===格式化===
+使用<code>format</code>可以做出一個依賴但不需要相同於提供日期的格式。這需要多次調用函數 {{tlxm|#time|<span></span>}}，減少一個頁面中使用本模板的最多召喚次數到最差88次，參見下方。<code>format</code> 參數可以用九個數值。
+
+;例子
+{|class="wikitable sortable"
+|-
+!值
+!輸出格式
+!輸入碼
+!隱藏排序键
+!顯示的輸出
+{{/row|26 Jan 1788|top= {{/rowtop||3}} |top2= {{/rowtop|年-月-日|3}} }}
+{{/row|March 12, 1557}}
+{{/row|1975-02-13}}
+
+{{/row|August 31, 1901|format=ymd |top= {{/rowtop|<code>ymd</code>|4}} |top2= {{/rowtop|年-月-日（預設）|4}} }}
+{{/row|2006-11-08|format=ymd}}
+{{/row|1888|5|8|format=ymd}}
+{{/row|-56|08|09|format=ymd}}
+
+{{/row|26 Jun 1988|format=md |top= {{/rowtop|<code>md</code>|2}} |top2= {{/rowtop|月-日|2}} }}
+{{/row|2002-05-27|format=md}}
+{{/row|Feb 26, 1788|format=dm |top= {{/rowtop|<code>dm</code>|2}} |top2= {{/rowtop|月-日|2}} }}
+{{/row|2020-10-15|format=dm}}
+
+{{/row|16 November 1488|format=my |top= {{/rowtop|<code>my</code>}} |top2= {{/rowtop|年-月}} }}
+
+{{/row|6 July 1666|format=d |top= {{/rowtop|<code>d</code>}} |top2= {{/rowtop|日}} }}
+
+{{/row|1980-02-12|format=m |top= {{/rowtop|<code>m</code>}} |top2= {{/rowtop|月份}} }}
+
+{{/row|-26|Jan|18|format=y |top= {{/rowtop|<code>y</code>}} |top2= {{/rowtop|年份}} }}
+
+{{/row|15 October 1800|format=hide |top= {{/rowtop|<code>hide</code>}} |top2= {{/rowtop|隱藏日期}} }}
+
+|-
+| style="background:yellow;color:blue;text-align: center;font-family:標楷體" colspan="5"|<span style="font-size:400%;">'''{{red|注意：}}以下格式的值皆視為無效'''</span>
+|-
+
+{{/row|Sep 13, 1888|format=dmy |top= {{/rowtop|<code>dmy</code>|2}} |top2= {{/rowtop|中文版視為無效|2}} }}
+{{/row|1983-01-03|format=dmy}}
+
+{{/row|August 31, 1901|format=mdy |top= {{/rowtop|<code>mdy</code>|2}} |top2= {{/rowtop|中文版視為無效|2}} }}
+{{/row|2006-11-08|format=mdy}}
+|}
+
+当处理单一的日期参数时，除非只有一个数字（那么它将被解释为年份），模板将根据[http://www.php.net/manual/en/datetime.formats.php php date/time format]来解释参数。但由於中文習慣的格式的影響，預設皆是使用<code>年-月-日</code>。{{what|由於本模板調用函數{{tlxm|#time|<span></span>}}，因此單一頁面中最多僅能使用本模板1200次。}}
+
+===縮寫===
+在中文版本，只有一個方法縮寫日期：使用 <code>abbr=on</code> 參數。
+
+;例子
+{|class="wikitable sortable"
+|-
+!縮寫方法
+!輸入碼
+!隱藏排序键
+!顯示的輸出
+{{/row|2000-01-01|top= {{/rowtop|無|4}} }}
+{{/row|2000|1|1}}
+{{/row|1 January 2000}}
+{{/row|2000|January|1}}
+{{/row|1 Jan 2000|top= {{/rowtop|輸入月份縮寫|2}} }}
+{{/row|2000|Jan|1}}
+{{/row|1 January 2000|abbr=on|top= {{/rowtop|<code>abbr&#61;on</code>|4}} }}
+{{/row|2000|January|1|abbr=on}}
+{{/row|2000-01-01|abbr=on}}
+{{/row|2000|1|1|abbr=on}}
+|}
+
+===額外排序键===
+如果表格內的兩個日期一樣，它們可以利用參數 <code>addkey</code> 排序。
+
+;例子
+{|class="wikitable sortable"
+|-
+!輸入碼
+!隱藏排序键
+!顯示的輸出
+{{/row|2010-10-10|addkey=3}}
+{{/row|2010-10-09}}
+{{/row|2010-10-10|addkey=1}}
+{{/row|2010-10-10}}
+{{/row|2010-10-10|addkey=4}}
+{{/row|2010-10-11}}
+{{/row|2010-10-10|addkey=2}}
+|}
+
+===文字換行===
+要關閉自動換行的話，請使用<code>nowrap=off</code>參數。
+
+==註解==
+
+===排序非完整日期===
+====完整年份或月份====
+完整年份或月份（或完整年月），例如<code><nowiki>{{dts|2020}}</nowiki></code>、<code><nowiki>{{dts|Jan}}</nowiki></code>和<code><nowiki>{{dts|2020|1}}</nowiki></code>，系統會按其第一個日子排序。
+
+====沒有年份====
+如果未指定年份，系統將會視年份為現時年份來進行排序。
+
+===處理錯誤===
+輸入無效的日期格式（通常）會產生一條錯誤消息，例如{{tlx|dts|<span></span>|維基百科}}會產生以下內容：
+<blockquote>{{dts||維基百科}}</blockquote>
+
+===曆法選擇===
+本模板無法區分儒略曆和公曆日期。另外，它不能從一個曆法輸入日期並按另一曆法輸出日期。所以，要確保排序良好，用戶必須把日期統一於一個曆法，或者確定一個轉折日（例如，確定1582年10月4日為儒略曆，以後的所有日期為公曆），這可以用一條條的方法實現。如果可能造成混淆，用家有責任解釋給讀者究竟顯示的日期是儒略曆還是公曆。
+
+===链接===
+本模板默认自动链接到日期。若要关闭链接，则可使用参数<code>link=off</code>。根据目前的指引，此模板不再支持日期的内部链接。请不要使用此参数，并请将此参数从目前的模板调用中移除。
+
+==參見==
+* {{tl|sort}}，以一個特定的鑰匙排序
+* {{tl|sortname}}，排序人名（用姓氏和名稱作為預設排序鑰匙）。
+* {{tl|tts}}，用於在體育賽事結果表中排序時間（只需要用於一定情況——參見該模板的文档页面）
+* {{tl|number table sorting}}，為數字而設
+
+<includeonly>{{Sandbox other||<!-- 本行下加入模板的分類 -->
+[[Category:排序模板]]
+[[Category:日期计算模板]]
+}}</includeonly>

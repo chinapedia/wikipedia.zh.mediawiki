@@ -1,0 +1,249 @@
+{{NoteTA|1=zh:傅里叶; zh-hans:傅里叶; zh-hant:傅立葉;}}
+
+== 小波轉換(Wavelet Transform)的類型 ==
+[[小波轉換|小波轉換]]'''('''Wavelet Transform''')'''可依照輸入與輸出為連續或是離散(discrete)分成三種類型，
+
+* 第一種，輸入為連續，輸出為連續，則稱之為連續小波轉換(Continuous Wavelet Transform)
+* 第二種，輸入為連續，輸出為離散，則稱之為連續離散係數小波轉換(Continuous wavelet transform with discrete coefficients)
+* 第三種，輸入為離散，輸出為離散，則稱之為離散小波轉換(Discrete Wavelet Transform)
+* 並沒有第四種，輸入為離散輸出為連續的小波轉換，在應用中並不會將簡單的訊號轉換成更複雜的訊號
+
+[[傅立葉轉換|傅立葉轉換]](Fourier Transform)與'''小波轉換'''比較共有四種類型
+
+* 第一種，輸入為連續，輸出為連續，傅立葉轉換(Fourier Transform)
+* 第二種，輸入為連續，輸出為離散，傅立葉級數(Fourier Series)
+* 第三種，輸入為離散，輸出為離散，離散傅立葉轉換(Discrete Fourier Transform)
+* 第四種，輸入為離散，輸出為連續，離散(時間)傅立葉轉換(Discrete-time Fourier Transform)
+
+== 連續小波轉換介紹 ==
+{{傅里叶变换}}
+'''連續小波轉換'''(Continuous Wavelet Transform)是一種用來分解一個連續時間函數，使它變成數個[[小波|小波]](wavelet)。跟[[傅立葉變換|傅立葉變換]](Fourier Transform)不一樣的是，連續小波轉換可以建構一個具有良好[[時域|時域]]和[[頻域|頻域]]局部化的時頻訊號。以數學來說，一個有連續時間性質且可積分的函數<math>x(t)</math> 可以用下面的積分來表示
+ 
+:<math>X_w(a,b)=\frac{1}{\sqrt{|(b)|}} \int_{-\infty}^{\infty} x(t)\psi(\frac{t-a}{b})\, dt</math>
+
+<math>\psi(t)</math>為小波母函數(Mother Wavelet)，一個在時間領域和頻率領域都有連續性質的函數， <math>a</math>為平移位置而 <math>b</math>為縮放因子。
+
+* <math>a</math>的區間在<math>\left( -\infty,+\infty\right)</math>，<math>b</math>的區間<math>\left( 0,+\infty\right)</math>
+* 以時頻分析的角度分析，當<math>b</math>值越大，頻率的變化越小
+* 以時頻分析的角度分析，當<math>b</math>值越小，頻率的變化越大
+
+小波母函數的用途在於提供一個可以產生子波(Daughter Wavelet)的根源函數，而子波是小波母函數平移過或縮放過(或兩者都有)的版本。如果要將已知且存在的訊號 <math>x(t)</math>恢復原來的形式，我們可以用反轉連續小波轉換(Inverse Continuous Wavelet Transform)
+ 
+:<math>x(t)=\int_{0}^{\infty}\int_{-\infty}^{\infty} \frac{1}{b^2}X_w(a,b)\frac{1}{\sqrt{|(b)|}} \psi_1(\frac{t-a}{b})\, dadb</math>
+
+<math>\psi_1(t)</math>為<math>\psi(t)</math> 的对偶函數(Dual Function)。而這個对偶函數必須滿足
+ 
+:<math>\int_{0}^{\infty}\int_{-\infty}^{\infty} \frac{1}{|b^3|}\psi(\frac{t_1-a}{b})\psi_1(\frac{t-a}{b})\, dadb=\boldsymbol{\delta}(t-t_1)</math>
+
+有時 <math>\psi_1(t)=C^{-1}\psi(t)</math>。
+
+== 連續小波轉換的問題 ==
+
+* 尺度函数不易求出
+* 較難以解釋
+
+在實務上，相較於連續小波轉換，通常較多會使用离散小波变换 、連續離散係數小波轉換
+
+==連續小波轉換組成要素==
+
+=== 小波母函數(Mother Wavelet) ===
+舉例，2個例子來說明小波母函數(Mother Wavelet):
+
+* Haa基  ，[[消失動量|消失矩]]=1
+* 墨西哥帽函数，消失矩=2
+
+==== Mother wavelet 的五大限制 ====
+# 紧支撑
+#*支撑:函數的範圍沒有收斂區間
+#* 紧支撑: 函數的範圍有收斂
+#实函数
+#奇对称或偶对称
+# 消失矩
+# 容许性条件 
+#* 用於確認是否存在反小波轉換
+
+
+
+通常來說，我們會傾向選一個可以連續微分的小波母函數且擁有緊湊支撐(Compact Support)的尺度函數(Scaling Function)和高階的消失矩(Vanishing Moment)。一個小波母函數是以這兩個函數所組成:小波函數 <math>\psi(t)</math>和尺度函數 <math>\varphi(t)</math>。一個尺度函數擁有緊湊支撐性質如果它的尺度濾波器含有有限的支撐，且它們的支撐是一樣的。例如，如果一個尺度函數的支撐為[N1,N2] ，那它的就是[(N1-N2+1)/2,(N2-N1+1)/2]。另外，第k個矩可以以下的數學方程式表示
+ 
+:<math>m_k=\int t^k\psi(t)\, dt</math>
+
+如果 <math>m_0=m_1=m_2=.....=m_{p-1}=0</math>，  <math>\psi(t)</math>就有 <math>p</math>個消失矩。 
+在一個小波分析中，消失矩的數量代表著小波轉換的階級。根據Strang-Fix條件，一個正交小波的錯誤近似值在 <math>a^{-i}</math>進位法會朝 <math>a^L</math>衰減， <math>L</math>為小波的階級。換言之，一個較高階小波轉換會產生較好的訊號近似值。
+另外由帕瑟伐定理(Parseval's Theorem),<br>
+
+:<math>\int t^k\psi(t)\, dt=\int \boldsymbol{\Psi^{*}(f)}(\frac{j}{2\pi})^{2}\frac{d^{k}}{df^{k}}\delta(f)df\, dt</math><br>
+:<math>\Rightarrow \int t^k\psi(t)\, dt=0 \iff (\frac{j}{2\pi})^{2}\frac{d^{k}}{df^{k}} \boldsymbol{\Psi^{*}(f)}|_{f=0}=0 \iff \frac{d^{k}}{df^{k}}\boldsymbol{\Psi^{*}(f)}|_{f=0}=0 \iff  \frac{d^{k}}{df^{k}}\boldsymbol{\Psi(f)}|_{f=0}=0</math><br>
+
+其中 <math>\boldsymbol{\Psi(f)}</math>是<math>\psi(t)</math> 的傅立葉轉換。
+
+===尺度函數===
+
+* 目的是簡化反小波轉換(Inverse wavelet transform) 過程
+
+在連續小波轉換中，定義尺度函數 <math> \varphi(t) </math>為
+
+:<math> \varphi(t) = \int_{-\infty}^{\infty} \boldsymbol{\Phi(f)} e^{j2 \pi ft} df </math>
+
+其中<math>\boldsymbol{\Phi(f)} </math>為<math>\varphi(t) </math>的傅立葉轉換，並且滿足
+
+:<math> {\left| \boldsymbol{\Phi(f)} \right|}^2 = \int_{f}^{\infty} \frac{ {\left| \boldsymbol{\Psi(f_1)} \right|}^2 }{{\left| f_1 \right|}^2} d{f_1} </math>
+
+小波函數 <math>\phi(t)</math>和尺度函數 <math>\varphi(t)</math>描敘一個小波。尺度函數最重要的功能是提高小波頻譜的範圍。這不容易因為時間為頻率的反比。也就是說，如果我們想要讓時域的頻譜範圍加倍，我們就必須犧牲一半的頻域頻寬。與其用無限數目的階層來覆蓋頻譜，我們可以用有限的尺度函數組合來覆蓋頻譜。這樣的結果會使得須要用來覆蓋整個頻譜大大的減少。
+
+===縮放因子===
+縮放因子可以壓縮或拉長一個訊號。當縮放因子的值相對低時，訊號會比較緊縮，也就是會造成一個更細致的圖像。但是低縮放因子的缺點是它的效果無法覆蓋一個訊號的持續期間。另一方面，當縮放因子的值相對高時，訊號會比較被拉長造成一個比較粗糙的圖像，但是它的效果會持續整個訊號的期間。
+
+==連續小波轉換性質==
+
+1. 輸入與輸出的性質關係
+
+:基本上，連續小波轉換是輸入資料序列和一組由小波母函數所產生函數的[[卷積|卷積]]。這個卷積可以用快速傅立葉變換來計算。除非小波母函數為虛數函數，在正常的情況下，輸出信息 <math>X_w(a,b)</math>會是一個實數函數。在小波母函數是虛數函數的情況下，連續小波轉換會造成一個虛數函數。連續小波轉換的功率譜可以以 <math>\|X_w(a,b)|^2</math>的數學型式來表示。通常在設計小波母函數時，為了應用上的目的會將小波母函數設計為實數函數。
+
+2. 時間軸上的位移
+
+:輸入函數<math>x(t)</math>與輸出函數<math>X_w(a,b) </math>之間具有相對的位移關係：
+
+:若<math> x(t) </math> 經過小波轉換後的輸出函數為<math>X_w(a,b) </math>
+
+:則<math> x(t-\tau) </math> 經過小波轉換後的輸出函數為<math>X_w(a-\tau,b) </math>
+
+3. 時間軸上的縮放
+
+:當進行小波轉換的函數在時間軸上拉長或壓縮時，輸出函數也會有相對應的變化：
+
+:若<math> x(t) </math> 經過小波轉換後的輸出函數為<math>X_w(a,b) </math>
+
+:則<math> x(t/\sigma) </math> 經過小波轉換後的輸出函數為<math>\sqrt{\sigma}X_w(a/\sigma,b/\sigma) </math>
+
+4. 帕瑟伐定理(Parseval’s Theory)
+
+:在 <math>\varphi(t)=C^-1\psi(t)</math> 的條件下，滿足
+
+:<math>\int {|x(t)|}^2\,dt = \frac{1}{C}\,\int_{0}^{\infty}\int_{-\infty}^{\infty} \frac{1}{b^2} {|X_w(a,b)|}^2\,da\,db </math>
+
+== 相較於加伯变换 ==
+[[加伯轉換|加伯变换]]在處理訊號時不管是高頻或是低頻，尺度皆是相同的
+
+[[File:CwtcomparetoGabor.jpg|File:CwtcomparetoGabor.jpg]]
+
+而小波轉換則會根據不同的頻率改變其本身的的尺度
+
+[[File:CompareCwttogabor.jpg|File:CompareCwttogabor.jpg]]
+
+小波变换的解析度在a-axis中，不因a值的改變而改變，但延著不同的b值改變以得到較好的結果。
+
+==修正型連續小波轉換==
+利用上述尺度函數的定義，我們可以定義修正型的連續小波轉換。將原本的連續小波轉換定義為
+
+:<math>X_w(a,b)=\frac{1}{\sqrt{b^\prime}} \int_{-\infty}^{\infty} x(t)\psi(\frac{t-a}{b^\prime })\, dt</math> ,
+
+在<math> a </math> 屬於實數，且<math> 0 < b^\prime < b_0 </math>的情況下，則可定義
+
+:<math>{LX}_w(a,b_0)=\frac{1}{\sqrt{b_0}} \int_{-\infty}^{\infty} x(t)\varphi(\frac{t-a}{b_0 })\, dt</math> ,
+
+藉由新定義的函數<math>{LX}_w(a,b_0) </math>，我們可以將反轉連續小波轉換表示為
+
+:<math> x(t)=\frac{1}{C_\psi} \left[ \int_{0}^{b_0} \int_{-\infty}^{\infty} \frac{1}{{b^\prime}^{5/2}} X_w(a,b^\prime)\psi(\frac{t-a}{b^\prime })\, da\,db + \int_{-\infty}^{\infty} \frac{1}{{b_0}^{3/2}} {LX}_w(a,b_0) \varphi(\frac{t-a}{b_0}) \,da\right]</math>
+
+此建構<math> x(t) </math>的方法可視為簡化版的反轉連續小波轉換。其中，
+
+:<math> C_\psi = \int_{0}^{\infty} \frac{|{\Psi(f)|}^2}{|f|}\,df </math>
+
+此式中<math> \Psi(f) </math> 為<math> \psi(f) </math>的傅立葉轉換。
+
+通常在設計母小波函數時，會要求 <math> C_\psi \ < \ \infty </math>，此性質又稱為「可採納性(Admissibility Criterion)」。
+
+==小波量值圖(Scalogram)==
+
+在許多文獻資料中，常用小波量值圖(Scalogram)來表示連續小波轉換後的結果。其定義如下
+
+:<math> Sc_x(a,b) ={ \left| X_w(a,b)\right|}^2 = \frac{1}{|b|} {\left|\int_{-\infty}^{\infty} x(t)\psi(\frac{t-a}{b})\,dt \right| }^2 </math>
+
+此處的定義即為連續小波轉換結果的絕對值平方，用以視覺化連續小波轉換的結果。
+
+小波量值圖之於小波轉換函數的意義和[[頻譜圖|頻譜圖]]之於短時距時頻平分析的意義相似。
+
+在實際應用上通常以三個軸來顯示，分別代表時間、頻率與小波量值圖的振幅。若是在二維圖片則是利用顏色深淺來表示小波量值圖的強度。
+
+==連續小波轉換應用==
+小波轉換最熱門的一個應用為圖像壓縮。用小波轉換式的編碼在圖像壓縮可以提供顯著的圖像品質改善且給予更高的壓縮比率。因為小波轉換可以分解一個複雜的訊息或圖案成基本型式，它在音樂檔案和圖型辨識上被廣泛的使用。此外，我們還可以在以下的科學研究領域見到小波轉換的應用: 邊緣檢測，解偏微分方程，腦電瞬態信號檢測，濾波器設計，心電圖分析，衣料分析和商業資訊分析。
+
+==離散變數連續小波轉換==
+
+在離散變數連續小波轉換(Continuous Wavelet Transform with Discrete Coefficients)中，原本
+
+:<math>X_w(a,b) =\frac{1}{\sqrt{|(b)|}} \int_{-\infty}^{\infty} x(t)\psi(\frac{t-a}{b})\, dt</math>
+
+中的<math> a, \,b</math>具有一定的關係，不能隨意選取。若令<math> a = n2^{-m}, \ b = 2^{-m}</math> 
+
+則離散變數連續小波轉換則重新表示為
+
+:<math>X_w(a,b) =2^{m/2} \int_{-\infty}^{\infty} x(t)\psi(2^m-n)\, dt </math> 
+
+其中<math> n\in Z, \ n\in(-\infty,\infty) </math> 且 <math> n\in Z, \ n\in(-\infty,\infty)</math>
+
+選擇離散變數連續小波轉換的主要目的，在於簡化連續小波轉換在實作上的複雜性，並且利用快速演算法增加應用價值。實際上離散變數連續小波轉換算是連續小波轉換的一種特例，部分文獻將其當作離散小波轉換討論。
+
+此處的選擇<math> a </math>與<math>b</math>之間的限制，使我們可以利用離散卷積的方式，由<math>X_w(n,m-1)</math>計算<math>X_w(n,m)</math>。
+
+===離散變數反轉連續小波轉換===
+
+在<math> a = n2^{-m}, \ b = 2^{-m}</math>的條件下，可定義離散變數反轉連續小波轉換為：
+
+:<math> x(t) = \sum_{m=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} 2^{m/2} \psi_1(2^m-n) X_w(n,m) </math>
+
+<math> \psi_1(t) </math>為<math>\psi(t)</math>的雙效函數(dual function)，並且滿足特性
+
+:<math>\sum_{m=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} 2^{m} \psi_1(2^m-n)\psi(2^m t_1-n) = \delta{t-t_1} </math>
+
+又此條件可表示為
+
+:<math>\int_{-\infty}^{\infty} 2^{m} \psi_1(2^m_1-n_1)\psi(2^m t_1-n)\,dt = \delta{m-m_1}\delta{n-n_1}</math>
+
+== 離散變數連續小波優缺點 ==
+優點:
+
+* 快速演算法
+* Orthogonal (正交性質)
+* Non-uniform frequency analysis
+
+缺點:
+
+* 無限多項連乘
+* 難以保證紧支撑
+
+== 小波轉換應用 ==
+小波轉換的應用有以下兩項特點:
+
+# 信號的頻率分佈，會隨著不同的時間 (或地點 )有較大變化
+# 多尺度的分析扮演重要的角色
+#* 大采样间隔 <math>\longrightarrow</math>忽略细节信息
+#* 小采样间隔<math>\longrightarrow</math>需要大量数据
+
+應用:
+
+* 影像壓縮，例如JPEG /JPEG2000
+* 邊緣角落偵測
+* 特徵辨識
+* 強調前景壓縮背景
+* 濾波器設計
+* 聲音訊號
+* 指紋辨識
+* 金融
+* 氣象分析
+
+== 相關條目 ==
+*[[信號處理|信號處理]]
+*[[時頻分析|時頻分析]]
+*[[小波变换|小波变换]]
+
+==參考文獻==
+*Jian-Jiun Ding (2012) Time-Frequency Analysis and Wavelet Transform http://djj.ee.ntu.edu.tw/TFW.htm {{Wayback|url=http://djj.ee.ntu.edu.tw/TFW.htm |date=20170101160000 }} [viewed 17/01/2012]
+* A. Grossman and J. Morlet (1984) Decomposition of hardy functions into square integrable wavelets of constant shape, SIAM J. Appl. Math., vol. 15, pp. 723-736
+*Polikar, Robi (2001) The Wavelet Tutorial http://users.rowan.edu/~polikar/WAVELETS/WTtutorial.html {{Wayback|url=http://users.rowan.edu/~polikar/WAVELETS/WTtutorial.html |date=20180430090402 }} [view 19/01/2008]
+*WaveMetrics (2004) Time Frequency Analysis http://www.wavemetrics.com/products/igorpro/dataanalysis/signalprocessing/timefrequency.htm {{Wayback|url=http://www.wavemetrics.com/products/igorpro/dataanalysis/signalprocessing/timefrequency.htm |date=20180709230104 }} [viewed 18/01/2008]
+*Valens, Clemens (2004) A Really Friendly Guide to Wavelets https://web.archive.org/web/20080131154131/http://pagesperso-orange.fr/polyvalens/clemens/wavelets/wavelets.html#section7 [viewed 18/01/2008]
+
+[[Category:积分变换|L]]
+[[Category:连续映射|L]]

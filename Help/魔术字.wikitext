@@ -1,0 +1,922 @@
+{{Hh}}
+{{NoteTA/MediaWiki
+| G1 = IT
+}}
+{{shortcut|H:MW|H:MAGIC}}
+{{Mediawiki|Help:Magic_words/zh|Help:魔术字}}
+这是一个用于MediaWiki的魔术字索引。
+
+'''魔术字'''是MediaWiki软件所识别的特定字符串，它们可以返回特定的值或触发其他的功能。
+
+==大致資訊==
+魔术字有如下三种：
+*状态开关：以两个下划线<code>__</code>为前后缀的大写单词。例如<code><nowiki>__FOO__</nowiki></code>；
+*变量：与模板类似，以<code>{{</code>及<code>}}</code>为前后缀的大写单词，如<code>{{/tlm|FOO}}</code>；
+*解析器函数：这些形如<code>{{/tlm|foo:...}}</code>或<code>{{/tlm|#foo:...}}</code>的魔术字在使用时包含参数，且函数名称对大小写不敏感（包括可大小写混用）。请同时参见[[Help:解析器函数|Help:解析器函数]]。
+
+==状态开关==
+状态开关可以控制页面的显示方式或其他行为。它往往用于排除或加入特定的页面内容。
+
+{| class="wikitable"
+|-
+!魔术字
+!描述
+!版本
+|-
+!{{WTHR|3|left=1}}|目录
+|-
+| <nowiki>__NOTOC__</nowiki>
+| 隐藏目录。
+|
+|-
+|<nowiki>__FORCETOC__</nowiki>
+| 强制于默认位置（第一个章节标题上方）显示目录。
+|
+|-
+| <nowiki>__TOC__</nowiki>
+| 在魔术字的位置插入目录（忽略<nowiki>__NOTOC__</nowiki>）。如果这个魔术字在一个页面内被多次使用，目录将会被放置在首个<nowiki>__TOC__</nowiki>出现的位置。
+|
+|-
+!{{WTHR|3|left=1}}|编辑
+|-
+| <nowiki>__NOEDITSECTION__</nowiki>
+| 隐藏章节标题旁的编辑链接。
+|
+|-
+| <nowiki>__NEWSECTIONLINK__</nowiki>
+| 在非讨论页顶端“编辑页面”标签右侧加入一个按钮，用于在页面结尾加入新的章节（参见[[mw:Help:Section#Adding_a_section_at_the_end|MediaWiki上的说明]]）。
+| 1.7+
+|-
+| <nowiki>__NONEWSECTIONLINK__</nowiki>
+| 移除讨论页顶端“编辑页面”右侧的加入新章节链接。
+| [[rev:47522|1.15+]]
+|-
+!{{WTHR|3|left=1}}|分类
+|-
+| <nowiki>__NOGALLERY__</nowiki>
+| 用于分类页面。不显示分类中所包含-{zh-hans:文件;zh-hant:檔案}-的缩略图，而以普通链接代替。
+| 1.7+
+|-
+| <nowiki>__HIDDENCAT__</nowiki>
+| 用于分类页面。加入后此分类成为隐藏分类，将不会显示在上级分类其及成员页面的分类列表中（可以通过参数设置中的选项强制显示），建议用{{tl|hiddencat}}。
+| 1.13+
+|-
+!{{WTHR|3|left=1}}|字词转换
+|-
+| <nowiki>__NOCONTENTCONVERT__</nowiki><br /><nowiki>__NOCC__</nowiki>
+| 不对当前页面进行字词转换。
+|
+|-
+| <nowiki>__NOTITLECONVERT__</nowiki><br /><nowiki>__NOTC__</nowiki>
+| 不进行标题转换，其他内容照常转换。
+| 
+|-
+!{{WTHR|3|left=1}}|其他
+|-
+| <nowiki>__START__</nowiki>
+| 没有特殊效果。用于标识提交后不需要转换的数据库信息。功能已经移除。
+| r1695时功能移除，r24784时完全移除
+|-
+|  <nowiki>__INDEX__</nowiki>
+| 允许搜索引擎检索本页（忽略[[mw:Manual:$wgArticleRobotPolicies|$wgArticleRobotPolicies]]的设置，但无法忽略[[robots.txt|robots.txt]]）。
+| 1.14+
+|- 
+|  <nowiki>__NOINDEX__</nowiki>
+| 阻止搜索引擎检索本页。
+| [[rev:37973|1.14+]]
+|-
+|  <nowiki>__STATICREDIRECT__</nowiki>
+| 用于重定向页。当有人移动页面并勾选“更新所有指向原标题的重定向”时，禁止MediaWiki更新本页的重定向。
+| [[rev:37928|1.13+]]
+|-
+|  <nowiki>__DISAMBIG__ </nowiki>
+|用于消歧义页，该页会被标记为消歧义页并显示于[[Special:消歧义页面|Special:消歧义页面]]，建议用{{tl|Disambig}}。
+|使用[[:mw:Extension:Disambiguator|消歧义插件]]
+|}
+
+==变量==
+变量可以返回关于当前页面、wiki站点或日期的-{zh-tw:資訊;zh-cn:信息;}-。变量的语法与[[Help:模板|模板]]类似。其中标记为“<span style="background:#FED;">'''[高开销]'''</span>”的变量会被软件记录，且在一个页面中可使用的总数会被限制。
+
+如果某一模板名与变量名重复，软件会自动将其解释为变量（因此若要包含[[{{ns:10}}:PAGENAME|{{ns:10}}:PAGENAME]]，页面中需要写作<code><tt>{{/tlm|{{ns:10}}:PAGENAME}}</tt></code>）。在某些情况下，加入参数会强制软件将变量视作一个模板，如<code><tt>{{/tlm|CURRENTDAYNAME|x}}</tt></code>将会包含[[{{ns:10}}:CURRENTDAYNAME|{{ns:10}}:CURRENTDAYNAME]]。
+<!-- {{admin tip|You can configure the number of expensive parser functions allowed on a page using the [[mw:Manual:$wgExpensiveParserFunctionLimit|$wgExpensiveParserFunctionLimit]] configuration setting.}} -->
+===日期与时间===
+以下变量返回用户所[[Special:参数设置|设置]]的时区日期或时间，默认为[[UTC|UTC]]时间。
+
+在MediaWiki与浏览器缓存的影响下，这些变量显示的往往是被缓存的值，而非当前的时间。
+
+{| class="wikitable"
+|-
+!变量
+!输出
+!描述
+!版本
+|-
+!{{WTHR|4|left=1}}|年
+|-
+| <tt>{{/tlm|CURRENTYEAR}}</tt>
+| {{CURRENTYEAR}}
+| 年
+|
+|-
+!{{WTHR|4|left=1}}|月
+|-
+| <tt>{{/tlm|CURRENTMONTH}}</tt> 
+| {{CURRENTMONTH}}
+| 月（补足前导零）
+|
+|-
+| <tt>{{/tlm|CURRENTMONTHNAME}}</tt>
+| {{CURRENTMONTHNAME}}
+| 月（本地语言中的月份名称）
+|
+|-
+| <tt>{{/tlm|CURRENTMONTHNAMEGEN}}</tt>
+| {{CURRENTMONTHNAMEGEN}}
+| 月（本地语言中月份名称的属格形式）
+|
+|-
+| <tt>{{/tlm|CURRENTMONTHABBREV}}</tt>
+| {{CURRENTMONTHABBREV}}
+| 月（本地语言中月份名称的简称）
+| 1.5+
+|-
+!{{WTHR|4|left=1}}|日
+|-
+| <tt>{{/tlm|CURRENTDAY}}</tt>
+| {{CURRENTDAY}}
+| 日（无前导零）
+|
+|-
+| <tt>{{/tlm|CURRENTDAY2}}</tt>
+| {{CURRENTDAY2}}
+| 日（补足前导零）
+| 1.6+
+|-
+!{{WTHR|4|left=1}}|星期
+|-
+| <tt>{{/tlm|CURRENTDOW}}</tt>
+| {{CURRENTDOW}}
+| 星期（数字格式）
+|
+|-
+| <tt>{{/tlm|CURRENTDAYNAME}}</tt>
+| {{CURRENTDAYNAME}}
+| 星期
+|
+|-
+!{{WTHR|4|left=1}}|时间
+|-
+| <tt>{{/tlm|CURRENTTIME}}</tt>
+| {{CURRENTTIME}}
+| 时间（24小时制，格式为HH:mm）
+|
+|-
+| <tt>{{/tlm|CURRENTHOUR}}</tt>
+| {{CURRENTHOUR}}
+| 时间（24小时制，有前导零）
+|
+|-
+!{{WTHR|4|left=1}}|其他
+|-
+| <tt>{{/tlm|CURRENTWEEK}}</tt>
+| {{CURRENTWEEK}}
+| 周数
+|
+|-
+| <tt>{{/tlm|CURRENTTIMESTAMP}}<br><small>（相當於{{IFUT|#time:YmdHis}}）</small></tt>
+| {{CURRENTTIMESTAMP}}
+| YYYYMMDDHHmmss时间戳
+| 1.7+
+|}
+
+如下变量和以上列出的变量功能相同，但是使用的是站点所在时区的本地时间，而非用户所设置的时区或UTC：
+* <tt>{{/tlm|LOCALYEAR}}</tt>
+* <tt>{{/tlm|LOCALMONTH}}</tt>
+* <tt>{{/tlm|LOCALMONTHNAME}}</tt>
+* <tt>{{/tlm|LOCALMONTHNAMEGEN}}</tt>
+* <tt>{{/tlm|LOCALMONTHABBREV}}</tt>
+* <tt>{{/tlm|LOCALDAY}}</tt>
+* <tt>{{/tlm|LOCALDAY2}}</tt>
+* <tt>{{/tlm|LOCALDOW}}</tt>
+* <tt>{{/tlm|LOCALDAYNAME}}</tt>
+* <tt>{{/tlm|LOCALTIME}}</tt>
+* <tt>{{/tlm|LOCALHOUR}}</tt>
+* <tt>{{/tlm|LOCALWEEK}}</tt>
+* <tt>{{/tlm|LOCALTIMESTAMP}}</tt>
+
+:对于更详细的时间格式，请参见[[Help:時間序號|Help:時間序號]]。
+
+===技术元数据===
+历史版本变量返回的是与'''当前页面最近一次编辑'''有关的数据。
+{| class="wikitable"
+|-
+!变量
+!输出
+!描述
+!版本
+|-
+! {{WTHR|4|left=1}} | 站点
+|-
+| <tt>{{/tlm|SITENAME}}</tt>
+| {{SITENAME}}
+| 站点名称（[[mw:Manual:$wgSitename|$wgSitename]]）
+|
+|-
+| <tt>{{/tlm|SERVER}}</tt>
+| {{SERVER}}
+| 域名[[URL|URL]]（[[mw:Manual:$wgServer|$wgServer]]）
+|
+|-
+| <tt>{{/tlm|SERVERNAME}}</tt>
+| {{SERVERNAME}}
+| 域名名称（[[mw:Manual:$wgServerName|$wgServerName]]）
+|
+|-
+| <tt>{{/tlm|DIRMARK}}</tt><br /><tt>{{/tlm|DIRECTIONMARK}}</tt>
+| {{DIRMARK}}<br />{{DIRECTIONMARK}}
+| 输出这个wiki默认语言所使用的[[Unicode|Unicode]]文本方向控制字符（从左到右书写的语言使用[[左至右符號|<code>&lrm;</code>]]，反之使用[[右至左符號|<code>&rlm;</code>]]）
+| 1.7+
+|-
+| <tt>{{/tlm|SCRIPTPATH}}</tt>
+| {{SCRIPTPATH}}
+| 相对脚本路径（[[mw:Manual:$wgScriptPath|$wgScriptPath]]）
+|
+|-
+| <tt>{{/tlm|CURRENTVERSION}}</tt>
+| {{CURRENTVERSION}}
+| 当前所使用的MediaWiki版本
+| 1.7+
+|-
+| <tt>{{/tlm|CONTENTLANGUAGE}}</tt><br /><tt>{{/tlm|CONTENTLANG}}</tt>
+| {{CONTENTLANGUAGE}}<br />{{CONTENTLANG}}
+| 默认的界面语言（[[mw:Manual:$wgLanguageCode|$wgLanguageCode]]）
+| 1.7+
+|-
+! {{WTHR|4|left=1}} | 当前页面的最新编辑版本
+|- {{Hexp/bgcolor-row}} 
+| <tt>{{/tlm|REVISIONID}}<br/>{{/tlm|REVISIONID|''页面标题''}}</tt>
+| {{REVISIONID}}<br/> <!-- not yet implemented as of this edit-->
+| 最近一次编辑版本的ID，然而在[[mw:Manual:$wgMiserMode|Miser模式]]下只會顯示為[[連字暨減號|連字暨減號]]<br/>{{Hexp}} 指定页面最近修订版本的ID
+| 1.5+<br/>[[rev:49575|1.16+]]
+|- {{Hexp/bgcolor-row}} 
+| <tt>{{/tlm|REVISIONDAY}}<br/>{{/tlm|REVISIONDAY|''页面标题''}}</tt>
+| {{REVISIONDAY}}<br/> <!-- not yet implemented as of this edit-->
+| 最近一次编辑的日份<br/>{{Hexp}} 指定页面最近一次编辑的日份
+| 1.8+<br/>[[rev:49575|1.16+]]
+|- {{Hexp/bgcolor-row}} 
+| <tt>{{/tlm|REVISIONDAY2}}<br/>{{/tlm|REVISIONDAY2|''页面标题''}}</tt>
+| {{REVISIONDAY2}}<br/> <!-- not yet implemented as of this edit-->
+| 最近一次编辑的日份（前导零）<br/>{{Hexp}} 指定页面最近一次编辑的日份
+| 1.8+<br/>[[rev:49575|1.16+]]
+|- {{Hexp/bgcolor-row}} 
+| <tt>{{/tlm|REVISIONMONTH}}<br/>{{/tlm|REVISIONMONTH|''页面标题''}}</tt>
+| {{REVISIONMONTH}}<br/> <!-- not yet implemented as of this edit-->
+| 最近一次编辑的月份<br/>{{Hexp}} 指定页面最近一次编辑的月份
+| 1.8+<br/>[[rev:49575|1.16+]]
+|- {{Hexp/bgcolor-row}} 
+| <tt>{{/tlm|REVISIONYEAR}}<br/>{{/tlm|REVISIONYEAR|''页面标题''}}</tt>
+| {{REVISIONYEAR}}<br/> <!-- not yet implemented as of this edit-->
+| 最近一次编辑的年份<br/>{{Hexp}} 指定页面最近一次编辑的年份
+| 1.8+<br/>[[rev:49575|1.16+]]
+|- {{Hexp/bgcolor-row}} 
+| <tt>{{/tlm|REVISIONTIMESTAMP}}<br/>{{/tlm|REVISIONTIMESTAMP|''页面标题''}}</tt>
+| {{REVISIONTIMESTAMP}}<br/> <!-- not yet implemented as of this edit-->
+| 最近一次编辑的时间戳<br/>{{Hexp}} 最近修订版本的时间戳
+| 1.8+<br/>[[rev:49575|1.16+]]
+|- {{Hexp/bgcolor-row}} 
+| <tt>{{/tlm|REVISIONUSER}}</tt><br/><tt>{{/tlm|REVISIONUSER|''页面标题''}}</tt>
+| {{REVISIONUSER}}<br /> <!-- not yet implemented as of this edit-->
+| 最近一个对本页面作出编辑的用户<br/>{{Hexp}} 最近一个对指定页面作出编辑的用户<br/>在编辑提示里显示即将编辑的用户，见[http://en.wikipedia.org/w/index.php?title=Wikipedia:Requests_for_adminship&action=edit]
+| [[rev:48149|1.15+]]<br/>[[rev:49575|1.16+]]
+|- {{Hexp/bgcolor-row}} 
+| <tt>{{/tlm|PAGESIZE|''页面标题''}}</tt><br /><tt>{{/tlm|PAGESIZE|Help:魔术字}}</tt>
+| <br />{{PAGESIZE:Help:魔術字}}
+| {{Hexp}} 返回指定页面的大小
+| [[rev:33551|1.13+]]
+|-
+| <tt>{{/tlm|PROTECTIONLEVEL:''行为''}}</tt>
+| 保护级别
+| 输出当前页面对于特定行为（create，edit或move）的保护级别（autoconfirm或sysop等）。若未保护则返回空字符串。
+| [[rev:45587|1.15+]]
+|-
+! {{WTHR|4|left=1}} | 影响页面内容
+|-
+| <tt>{{/tlm|DISPLAYTITLE|''标题''}}</tt>
+|
+| 更改頁面的標題，與<nowiki>-{T|}-</nowiki>類似，但优先级高于后者，不推荐使用，建议使用具有字词转换的{{tl|DISPLAYTITLE}}代替。可以通过[[mw:Manual:$wgAllowDisplayTitle|$wgAllowDisplayTitle]]将其启用或禁用。在1.10+前默认禁用，之后的版本中默认启用。
+| 1.7+
+|-
+| <tt>{{/tlm|DEFAULTSORT|''排序索引''}}</tt><br /><tt>{{/tlm|DEFAULTSORTKEY|''排序索引''}}</tt><br /><tt>{{/tlm|DEFAULTCATEGORYSORT|''排序索引''}}</tt>
+|
+| 为页面设置一个默认的[[Help:分类|排序索引]]。例如在[[吉米·威爾士|吉米·威爾士]]条目的结尾加入<tt>{{/tlm|DEFAULTSORT|Wales, Jimmy}}</tt>，则默认此条目在所有分类中都会排在“W”下，而非“J”。
+| 1.10+
+|}
+
+===统计===
+这些变量返回的数字往往包含分隔符（根据本地语言设置而可能是逗号或空格）。可以通过“:R”来返回无分隔号的数字（例如<code><tt>{{/tlm|NUMBEROFPAGES}}</tt></code>→{{NUMBEROFPAGES}}而<code><tt>{{/tlm|NUMBEROFPAGES|R}}</tt></code>→{{NUMBEROFPAGES:R}})）。对于PAGESINCATEGORY等需要参数的变量则使用“|R”（例如<code><tt>{{/tlm|PAGESINCATEGORY|Help}}</tt></code>→{{PAGESINCATEGORY:Help}}而<code><tt>{{/tlm|PAGESINCATEGORY|Help|R}}</tt></code>→{{PAGESINCATEGORY:Help|R}}）。
+{| class="wikitable"
+|-
+!变量
+!输出
+!描述
+!版本
+|-
+!{{WTHR|4|left=1}} | 整个站点
+|-
+| <tt>{{/tlm|NUMBEROFPAGES}}</tt>
+| {{NUMBEROFPAGES}}
+| 页面总数
+| 1.7+
+|-
+| <tt>{{/tlm|NUMBEROFARTICLES}}</tt>
+| {{NUMBEROFARTICLES}}
+| 主命名空间（條目命名空間）内的页面总数
+|
+|-
+| <tt>{{/tlm|NUMBEROFFILES}}</tt>
+| {{NUMBEROFFILES}}
+| 上传的文件总数
+| 1.5+
+|-
+| <tt>{{/tlm|NUMBEROFEDITS}}</tt>
+| {{NUMBEROFEDITS}}
+| 总页面编辑次数
+| [[rev:21319|1.10+]]
+|-
+| <tt>{{/tlm|NUMBEROFVIEWS}}</tt>
+| <!-- {{NUMBEROFVIEWS}} -->
+| 页面浏览次数。通常对使用[[mw:Manual:Cache|缓存]]的wiki无效。
+| [[rev:42721|1.14]]～1.24
+|-
+| <tt>{{/tlm|NUMBEROFUSERS}}</tt>
+| {{NUMBEROFUSERS}}
+| 注册用户总数
+| 1.7+
+|-
+| <tt>{{/tlm|NUMBEROFADMINS}}</tt>
+| {{NUMBEROFADMINS}}
+| ''sysop''[[mw:Manual:User_rights|用户组]]中的用户总数
+| 1.7+
+|-
+| <tt>{{/tlm|NUMBEROFACTIVEUSERS}}</tt>
+| {{NUMBEROFACTIVEUSERS}}
+| 活跃用户总数，其标准与[[Special:Statistics|Special:Statistics]]中的标准相同
+| [[rev:47392|1.15+]]
+|- {{Hexp/bgcolor-row}} 
+| <tt>{{/tlm|PAGESINCATEGORY|''分类标题''}}</tt><br /><tt>{{/tlm|PAGESINCAT|帮助文档}}</tt>
+| <br />{{PAGESINCAT:帮助文档}}
+| {{Hexp}} 指定分类中的页面总数。
+| [[rev:32932|1.13+]]
+|- {{Hexp/bgcolor-row}} 
+|
+<tt>{{/tlm|PAGESINCATEGORY|帮助文档|all}}</tt><br/>
+<tt>{{/tlm|PAGESINCATEGORY|帮助文档|pages}}</tt><br/>
+<tt>{{/tlm|PAGESINCATEGORY|帮助文档|subcats}}</tt><br/>
+<tt>{{/tlm|PAGESINCATEGORY|帮助文档|files}}</tt><br/>
+|
+{{PAGESINCATEGORY:帮助文档|all}}<br/>
+{{PAGESINCATEGORY:帮助文档|pages}}<br/>
+{{PAGESINCATEGORY:帮助文档|subcats}}<br/>
+{{PAGESINCATEGORY:帮助文档|files}}
+| {{Hexp}} 返回指定分类的：
+*所有页面数
+*所有非分类页和非文件页数
+*所有子分类页数
+*所有文件页数
+|[[:gerrit:12790|1.20+]]
+|-
+| <tt>{{/tlm|NUMBERINGROUP|''用户群组''}}</tt><br /><tt>{{/tlm|NUMINGROUP|''用户群组''}}</tt>
+| {{/tlm|NUMBERINGROUP|bureaucrat}}→<br />{{NUMBERINGROUP:bureaucrat}}
+| 特定用户群组中的用户总数
+| [[rev:40116|1.14+]]
+|-
+| <tt>{{/tlm|PAGESINNS|''索引编号''}}</tt><br /><tt>{{/tlm|PAGESINNAMESPACE|''索引编号''}}</tt>
+| 禁用
+| 指定命名空间中的页面总数。例如<tt>{{/tlm|PAGESINNAMESPACE|''14''}}</tt>返回分类总数。在中文维基百科被禁用。
+| 1.7+
+|--
+| <tt>{{/tlm|NUMBEROFCONTRIBS|''用户名''}}</tt>
+| 禁用
+| 指定用户的贡献总数。在中文维基百科疑似被禁用。
+| [[rev:51200|1.16+]]
+|}
+
+===页面标题===
+{| class="wikitable"
+|-
+!变量
+!输出
+!描述
+!版本
+|-
+| <tt>{{/tlm|FULLPAGENAME}}</tt>
+| {{FULLPAGENAME}}
+| 命名空间及页面标题
+| 1.6+
+|-
+| <tt>{{/tlm|PAGENAME}}</tt>
+| {{PAGENAME}}
+| 页面标题
+|
+|-
+| <tt>{{/tlm|BASEPAGENAME}}</tt>
+| {{BASEPAGENAME}}
+| 页面标题，不包括当前子页面标题及命名空间（页面“Wikipedia:页面/子页面/子页面的子页面”则返回“页面/子页面”）
+| 1.7+
+|-
+| <tt>{{/tlm|ROOTPAGENAME}}</tt>
+| {{ROOTPAGENAME}}
+| 获得当前页面的根页名，不包括所有子页面标题及命名空间（页面“Wikipedia:页面/子页面/子页面的子页面”则返回“页面”）
+|-
+| <tt>{{/tlm|SUBPAGENAME}}</tt>
+| {{SUBPAGENAME}}
+| 子页面标题（页面“Wikipedia:页面/子页面”则返回“子页面”）
+| 1.6+
+|-
+| <tt>{{/tlm|SUBJECTPAGENAME}}</tt>
+| {{SUBJECTPAGENAME}}
+| 当前页面对应的内容页标题（包含命名空间）
+| 1.7+
+|-
+| <tt>{{/tlm|TALKPAGENAME}}</tt>
+| {{TALKPAGENAME}}
+| 当前页面对应的讨论页标题（包含命名空间）
+| 1.7+
+|}
+
+魔术字<tt>{{/tlm|BASEPAGENAME}}</tt>和<tt>{{/tlm|SUBPAGENAME}}</tt>仅在允许子页面出现的命名空间中有效。参见[[mw:Manual:$wgNamespacesWithSubpages|mw:Manual:$wgNamespacesWithSubpages]]。
+
+以下类似的魔术字返回URL编码结果：
+* <tt>{{/tlm|FULLPAGENAMEE}}</tt>
+* <tt>{{/tlm|PAGENAMEE}}</tt>
+* <tt>{{/tlm|BASEPAGENAMEE}}</tt>
+* <tt>{{/tlm|SUBPAGENAMEE}}</tt>
+* <tt>{{/tlm|SUBJECTPAGENAMEE}}</tt>
+* <tt>{{/tlm|TALKPAGENAMEE}}</tt>
+
+在[[rev:46662|1.15+]]版本中，这些魔术字均可通过参数来指明特定页面：
+* <tt>{{/tlm|PAGENAME|Template:Main Page}}</tt> → '''{{PAGENAME:Template:Main Page}}'''
+
+===命名空间===
+{| class="wikitable"
+|-
+!变量
+!输出
+!描述
+!版本
+|-
+| <tt>{{/tlm|NAMESPACE}}</tt>
+| {{NAMESPACE}}
+| 命名空间
+|
+|-
+| <tt>{{/tlm|SUBJECTSPACE}}</tt><br /><tt>{{/tlm|ARTICLESPACE}}</tt>
+| {{SUBJECTSPACE}}<br />{{ARTICLESPACE}}
+| 当前页面对应的内容页面命名空间
+| 1.7+
+|-
+| <tt>{{/tlm|TALKSPACE}}</tt>
+| {{TALKSPACE}}
+| 当前页面对应的讨论页命名空间
+| 1.7+
+|}
+
+以下类似的魔术字返回URL编码结果：
+* <tt>{{/tlm|NAMESPACEE}}</tt>
+* <tt>{{/tlm|SUBJECTSPACEE}}</tt>
+* <tt>{{/tlm|TALKSPACEE}}</tt>
+
+在[[rev:46662|1.15+]]版本中，这些魔术字均可通过参数来指明特定页面：
+* <tt>{{/tlm|NAMESPACE|Template:Main Page}}</tt> → '''{{NAMESPACE:Template:Main Page}}'''
+
+== 其他特殊符號 ==
+{| class="wikitable"
+|-
+!变量
+!输出
+!描述
+!版本
+|-
+| {{/tlm|!}}
+|style="text-align:center;"| |
+| 在参数中代替 |
+| [[gerrit:136234|1.24+]]
+|-
+| {{/tlm|1==}}
+|style="text-align:center;"| =
+| 在参数中代替 =
+| [[phab:T91154|phab:T91154]]
+|-
+| <code>[[Help:重定向|#REDIRECT]] <nowiki>[[條目名稱|條目名稱]]</nowiki></code><br/><code>#重定向 <nowiki>[[條目名稱|條目名稱]]</nowiki></code>
+|
+| 標記此條目為重新導向頁。此語法僅在條目第一行時有效。另見[[Help:重定向|Help:重定向]]。
+|
+|-
+| <code><nowiki>ISBN 0-12-345678-9</nowiki></code>
+| ISBN 0-12-345678-9
+| 同樣是MediaWiki軟體所辨識的特定字串，並且符合條件時會自動轉換為連結。目前中文維基百科支援的此類魔術語法有[[Help:各類書號|ISBN]]、[[PMID|PMID]]以及[[RFC|RFC]]。參見[[Help:魔術連結|Help:魔術連結]]。
+|
+|}
+=== 自動替換引用的符號 ===
+部分特殊符號或魔術字會在儲存編輯的當下自動替換引用（見過濾器紀錄的原始編輯內容[[Special:滥用日志/3876535|Special:滥用日志/3876535]]與實際儲存後的編輯內容[[Special:Diff/67182296|Special:Diff/67182296]]），部分功能可利用<nowiki><includeonly></includeonly></nowiki>標籤包裹來防止轉換，部分功能要透過其他符號將之斷開才能防止轉換。
+{| class="wikitable"
+|-
+!变量
+!输出
+!描述
+!版本
+|-
+| <code>[[Delete字符|␡]]'"`UNIQ--擴展標籤名稱-實體編號-QINU`"'[[Delete字符|␡]]</code><ref>「␡」須改輸入為ASCII版本的字元才會生效，例如<code><nowiki>'"`UNIQ--math-00000002-QINU`"'</nowiki></code>（需在編輯模式複製才有效），見[[Special:PermaLink/58346519|測試樣例]]。</ref>
+|style="text-align:center;"| (依實際實體標籤而定)
+| 若儲存的原始碼內容中直接存在此字串且存在對應編號的擴展標籤實體，則會自動被替換為對應擴展標籤內容<ref>見過濾器紀錄的原始編輯內容[[Special:滥用日志/3875674|Special:滥用日志/3875674]]與實際儲存後的編輯內容[[Special:Diff/67174865|Special:Diff/67174865]]</ref>。此外所有擴展標籤在模板解析處理過程中皆會以此種特殊符號儲存，這也是使用<code><nowiki>{{#ifeq:}}</nowiki></code>比較兩個內容相同且包含擴展標籤（如<code><nowiki><math></nowiki></code>﹑<code><nowiki><nowiki></nowiki></code>或<code><nowiki><ref></nowiki></code>等）的字串會失敗的原因。另見[[mw:Strip_marker|mw:Strip marker]]。這個自動替換引用的過程在<nowiki><includeonly></includeonly></nowiki>標籤內不起作用<ref>見過濾器紀錄的原始編輯內容[[Special:滥用日志/3875681|Special:滥用日志/3875681]]與實際儲存後的編輯內容[[Special:Diff/67174958|Special:Diff/67174958]]</ref>
+| [[gerrit:214404|1.26+]]
+|-
+| <code><nowiki>~~~</nowiki></code>
+| (因用戶而異)
+| 自動替換為用戶的簽名。另見[[WP:簽名|WP:簽名]]。
+|
+|-
+| <code><nowiki>~~~~</nowiki></code>
+| (因用戶而異)
+| 自動替換為用戶的簽名及時間。另見[[WP:簽名|WP:簽名]]。
+|
+|-
+| <code><nowiki>~~~~~</nowiki></code>
+| {{nowrap|{{5~|{{#time:c}}}}}}
+| 自動替換為儲存編輯時的時間。另見[[WP:簽名|WP:簽名]]。
+|
+|}
+
+==解析器函数==
+
+解析器函数与变量十分类似，但是有一个或多个参数（技术上来看，所有使用参数的魔术字均为解析器函数），且魔术字的名称前往往会有一个#号，以将它们与一般的模版区分开来。
+
+这一页仅列出了整合在MediaWiki软件中的解析器函数。其他扩展（例如[[mw:Extension:ParserFunctions|ParserFunctions extension]]）可能为MediaWiki加入更多的解析器函数。请参见[[Help:解析器函数|Help:解析器函数]]了解更多的解析器函数。
+
+===URL数据===
+{| class="wikitable"
+|-
+!魔术字
+!输出
+!描述
+!版本
+|-
+| <tt>{{/tlm|localurl|''页面标题''}}</tt><br /><tt>{{/tlm|localurl|''页面标题''|''字符串''}}</tt>
+| {{localurl:页面标题}}<br />{{localurl:页面标题|字符串}}
+| 指定标题的相对路径
+|
+|-
+| <tt>{{/tlm|fullurl|''页面标题''}}</tt><br /><tt>{{/tlm|fullurl|''页面标题''|''字符串''}}</tt><br /><tt>{{/tlm|fullurl|''跨维基链接:页面标题''|''字符串''}}</tt>
+| {{fullurl:Category:帮助文档}}<br />
+{{fullurl:Category:帮助文档|action=edit}}<br />
+{{fullurl:en:Category:Help|action=edit}}
+| 指定标题的绝对路径，同时处理跨维基前缀。
+| 1.5+
+|-
+| <tt>{{/tlm|filepath|''文件名''}}</tt><br /><tt>{{/tlm|filepath|文件名|nowiki}}</tt>
+| {{filepath:Wiki.png}}<br />{{filepath:Wiki.png|nowiki}}
+| 指定多媒体文件的绝对路径
+| [[rev:25854|1.12+]]
+|-
+| <tt>{{/tlm|urlencode|''字 符 串''}}</tt><br /><tt>{{/tlm|urlencode|x y z 一二三}}</tt>
+| {{urlencode:字 符 串}}  <br />{{urlencode:x y z 一二三}}
+| 将字符串以[[百分号编码|百分号编码]]以供URL使用。
+| [[rev:14273|1.7+]]
+|-
+| <tt>{{/tlm|anchorencode|''字 符 串''}}</tt><br /><tt>{{/tlm|anchorencode|x y z 一二三}}</tt>
+| {{anchorencode:字 符 串}}  <br />{{anchorencode:x y z一二三}}
+| 将字符串编码以供URL锚点（URL中#号后面的部分）使用。
+| [[rev:16279|1.8+]]
+|}
+
+===命名空间===
+<tt>{{tlc|ns:}}</tt>返回指定索引编号所对应命名空间的本地名称。
+{| class="wikitable"
+|-
+! {{WTHR|2}} | 内容页面命名空间
+! {{WTHR|2}} | 讨论页命名空间
+|-
+!用法
+!输出
+!用法
+!输出
+|-
+| <tt>{{/tlm|ns:-2}}</tt>或<tt>{{/tlm|ns:media}}</tt>
+| {{ns:-2}}
+| {{N/A}}
+| {{N/A}}
+|-
+| <tt>{{/tlm|ns:-1}}</tt>或<tt>{{/tlm|ns:Special}}</tt>
+| {{ns:-1}}
+|不支援
+|不支援
+|-
+| <tt>{{/tlm|ns:0}}</tt>
+| {{ns:0}}
+| <tt>{{/tlm|ns:1}}</tt>或<tt>{{/tlm|ns:Talk}}</tt>
+| {{ns:1}}
+|-
+| <tt>{{/tlm|ns:2}}</tt>或<tt>{{/tlm|ns:User}}</tt>
+| {{ns:2}}
+| <tt>{{/tlm|ns:3}}</tt>或<tt>{{/tlm|ns:User talk}}</tt>
+| {{ns:3}}
+|-
+| <tt>{{/tlm|ns:4}}</tt>或<tt>{{/tlm|ns:Project}}</tt>
+| {{ns:4}}
+| <tt>{{/tlm|ns:5}}</tt>或<tt>{{/tlm|ns:Project talk}}</tt>
+| {{ns:5}}
+|-
+| <tt>{{/tlm|ns:6}}</tt>或<tt>{{/tlm|ns:File}}</tt>或<tt>{{/tlm|ns:Image}}</tt>
+| {{ns:6}}
+| <tt>{{/tlm|ns:7}}</tt>或<tt>{{/tlm|ns:File talk}}</tt>或<tt>{{/tlm|ns:Image talk}}</tt>
+| {{ns:7}}
+|-
+| <tt>{{/tlm|ns:8}}</tt>或<tt>{{/tlm|ns:MediaWiki}}</tt>
+| {{ns:8}}
+| <tt>{{/tlm|ns:9}}</tt>或<tt>{{/tlm|ns:MediaWiki talk}}</tt>
+| {{ns:9}}
+|-
+| <tt>{{/tlm|ns:10}}</tt>或<tt>{{/tlm|ns:Template}}</tt>
+| {{ns:10}}
+| <tt>{{/tlm|ns:11}}</tt>或<tt>{{/tlm|ns:Template talk}}</tt>
+| {{ns:11}}
+|-
+| <tt>{{/tlm|ns:12}}</tt>或<tt>{{/tlm|ns:Help}}</tt>
+| {{ns:12}}
+| <tt>{{/tlm|ns:13}}</tt>或<tt>{{/tlm|ns:Help talk}}</tt>
+| {{ns:13}}
+|-
+| <tt>{{/tlm|ns:14}}</tt>或<tt>{{/tlm|ns:Category}}</tt>
+| {{ns:14}}
+| <tt>{{/tlm|ns:15}}</tt>或<tt>{{/tlm|ns:Category talk}}</tt>
+| {{ns:15}}
+|-
+| <tt>{{/tlm|ns:100}}</tt>或<tt>{{/tlm|ns:Portal}}</tt>
+| {{ns:100}}
+| <tt>{{/tlm|ns:101}}</tt>或<tt>{{/tlm|ns:Portal talk}}</tt>
+| {{ns:101}}
+|-
+| <tt>{{/tlm|ns:118}}</tt>或<tt>{{/tlm|ns:Draft}}</tt>
+| {{ns:118}}
+| <tt>{{/tlm|ns:119}}</tt>或<tt>{{/tlm|ns:Draft talk}}</tt>
+| {{ns:119}}
+|-
+| <tt>{{/tlm|ns:828}}</tt>或<tt>{{/tlm|ns:Module}}</tt>
+| {{ns:828}}
+| <tt>{{/tlm|ns:829}}</tt>或<tt>{{/tlm|ns:Module talk}}</tt>
+| {{ns:829}}
+|-
+| {{N/A}}
+| {{N/A}}
+| <tt>{{/tlm|ns:2600}}</tt>或<tt>{{/tlm|ns:Topic}}</tt>
+| {{ns:2600}}
+|}
+
+===格式===
+<!--Well gosh, with the source of the examples hidden, who can tell what you are inputting without looking here in the source?-->
+{| class="wikitable"
+!用法
+!输入 → 输出
+!描述
+!版本
+|-
+|-
+| <tt>{{/tlm|lc|''字符串''}}</tt>
+| <tt>{{/tlm|lc|DATA CENTER}}</tt> → {{lc:DATA CENTER}}
+| 转换为小写字母输出
+| 1.5+
+|-
+| <tt>{{/tlm|lcfirst|''字符串''}}</tt>
+| <tt>{{/tlm|lcfirst|DATA CENTER}}</tt> → {{lcfirst:DATA CENTER}}
+| 将'''字符串的第一个字符'''转换为小写字母
+| 1.5+
+|-
+| <tt>{{/tlm|uc|''字符串''}}</tt>
+| <tt>{{/tlm|uc|text transform}}</tt> → {{uc:text transform}}
+| 转换为大写字母输出
+| 1.5+
+|-
+| <tt>{{/tlm|ucfirst|''字符串''}}</tt>
+| <tt>{{/tlm|ucfirst|text transform}}</tt> → {{ucfirst:text transform}}
+| 将'''字符串的第一个字符'''转换为大写字母
+| 1.5+
+|-
+| <tt>{{/tlm|formatnum|''无格式数字''}}</tt><br /><tt>{{/tlm|formatnum|''格式化的数字''|R}}</tt>
+| <tt>{{/tlm|formatnum|-987654321.654321}}</tt> → {{formatnum:-987654321.654321}} <br /> <tt>{{/tlm|formatnum|-987,654,321.654321|R}}</tt> → {{formatnum:-987,654,321.654321|R}}
+| 根据本地语言的设置处理空格和逗号等数字分隔符。
+| 1.7+<br />[[rev:32012|1.13+]]
+|-
+|
+{{/tlm|#dateformat|''日期''}}
+{{/tlm|#formatdate|''日期''}}
+{{/tlm|#dateformat|''日期''|''格式''}}
+{{/tlm|#formatdate|''日期''|''格式''}}
+| 
+<tt>{{/tlm|#dateformat|11 seP 2001|ymd}}</tt><br/>
+→ {{#dateformat:11 seP 2001|ymd}}（您的设置），2001 SeP 11（默认）<br/>
+<tt>{{/tlm|#formatdate|sep 11,2001|dmy}}</tt><br/>
+→ {{#formatdate:sep 11,2001|dmy}}（您的设置），11 Sep 2001（默认）<br/>
+<tt>{{/tlm|#dateformat:1941-12-07|mdy}}</tt><br/>
+→ {{#formatdate:1941-12-07|mdy}}（您的设置），12月 7, 1941（默认）<br/>
+<tt>{{/tlm|#formatdate:2001 sep 11|ISO 8601}}</tt><br/>
+→ {{#formatdate:2001 sep 11|ISO 8601}}（您的设置）2001 sep 11（默认）<br/>
+
+| 将日期显示为用户在“日期与时间”中所指定的格式。对于未登录或是未进行设置的用户，可以通过参数指定默认格式：<tt>mdy</tt>, <tt>dmy</tt>, <tt>ymd</tt>, <tt>ISO 8601</tt>（区分大小写）。如果未指定格式或格式无效，则输入格式会被作为默认格式。如果输入的日期无效，则直接输出未处理的结果。
+
+解析器函数[[Help:模板擴展語法#time|time]]提供了更多的格式化控制。
+| [[rev:48249|1.15+]]
+|-
+| <tt>{{/tlm|padleft|xyz|''字符串长度''}}</tt><br /><tt>{{/tlm|padleft|xyz|''字符串长度''|''字符''}}</tt>
+| <tt>{{/tlm|padleft|xyz|5}}</tt> → {{padleft:xyz|5}}<br /> <tt>{{/tlm|padleft:xyz|5|_}}</tt> → {{padleft:xyz|5|_}}
+| 自动在字符串开头用给定的字符（默认为“0”）补足到特定长度。例如{{/tlm|padleft|44|3|0}}生成{{padleft:44|3|0}}。也用于截取字符串的一部分。
+| 1.8+
+|-
+| <tt>{{/tlm|padright|xyz|''字符串长度''}}</tt><br /><tt>{{/tlm|padright:xyz|''字符串长度''|''字符''}}</tt>
+| <tt>{{/tlm|padright|xyz|5}}</tt> → {{padright:xyz|5}}<br /> <tt>{{/tlm|padright:xyz|5|_}}</tt> → {{padright:xyz|5|_}}
+| 与padleft类似，但将字符加入到字符串的结尾。也用于截取字符串的一部分。
+|-
+| <tt>{{/tlm|plural|计数|''单数形式''|''复数形式''}}</tt>
+| <tt>{{/tlm|plural|1|他|他们}}</tt> → {{plural:1|他|他们}}
+| 根据首个参数，输出特定词语的单数或复数形式（根据中文）。
+|}
+
+===杂项===
+{| class="wikitable"
+!魔术字
+!输出
+!描述
+!版本
+|-
+| <tt>{{/tlm|int|''MediaWiki:命名空間下的頁面標題''}}
+| <tt>{{/tlm|int|edit}}</tt> → '''{{int:edit}}''' <br /><small>（根据界面语言而异，尝试：[{{fullurl:{{FULLPAGENAME}}|uselang=fr}}#{{anchorencode:杂项}} fr] •[{{fullurl:{{FULLPAGENAME}}|uselang=ja}}#{{anchorencode:杂项}} ja]）</small>
+| 根据界面语言版本而显示特定MediaWiki命名空间消息的内容。注意：这可能会对缓存产生影响。参见[[bugzilla:14404|bug 14404]]（已处理）。
+| 
+|-
+| <tt>{{/tlm|#language|''语言代码''}}</tt><br /><tt>{{/tlm|#language|zh-hk}}</tt><br /><tt>{{/tlm|#language|th}}</tt><br /><tt>{{/tlm|#language|th|zh}}</tt>
+| {{#language:语言代码}}<br />{{#language:zh-hk}}<br />{{#language:th}}<br />{{#language:th|zh}}
+| 将[[ISO_639|ISO 639]]语言代码转换为此种语言的名称。有第2參數時，以第2參數的語言顯示第1參數的語言名稱。
+| [[rev:14490|1.7+]]
+|-
+| <tt>{{/tlm|#special|''特殊页面名称''}}<br />{{/tlm|#special|UserLogin}}</tt>
+| {{#special:特殊页面名称}}<br />{{#special:userlogin}}
+| 特殊页面的本地名称，可用{{tlx|special|''特殊页面名称''}}替換。
+| [[rev:17321|1.9+]]
+|-
+| <tt>{{/tlm|#tag|''标签名''}}</tt><br /><tt>{{/tlm|#tag|''标签名''|''标签内容''}}</tt><br /><tt>{{/tlm|#tag|''标签名''<br />|''标签内容''|''<nowiki>属性1=值</nowiki>''<br />|''<nowiki>属性2=值</nowiki>''<br />}}</tt>
+| （依据标签名确定）
+| 以XML的方式生成标签，并解析成wiki代码，有属性的按照<code><'''{{color|#008000|tagname}}''' '''{{color|#d0ac29|attribute}}'''='''{{color|#ba2121|"value"}}'''></code><tt>對應{{/tlm|#tag|tagname|3=attribute=value}}</tt>编写，有内容值则按照<code><'''{{color|#008000|tagname}}'''>content</'''{{color|#008000|tagname}}'''></code>对应<tt>{{/tlm|#tag|tagname|content}}</tt>编写，用于解决不能标签嵌套的问题，如ref标签。
+| [[rev:29482|1.12+]]
+|-
+| <tt>{{/tlm|gender|''用户名''<br />|''用户为男性的返回值''<br />|''用户为女性的返回值''<br />|''若用户[[性別中立|未指定其性别]]时的返回值''}}</tt>
+| <tt>{{/tlm|gender|Bencmq|他|她|TA}}</tt> → {{gender:Bencmq|他|她|TA}}
+| 根据[[Special:参数设置|Special:参数设置]]中设置的性别进行判断
+| [[rev:46247|1.15+]]
+|-
+| <tt>{{/tlm|groupconvert|''转换组名称''}}</tt>
+| 
+| 启用'''<nowiki>MediaWiki:Groupconversiontable-''转换组名称''/''语言代码''</nowiki>'''中定义的字词转换。但中文維基百科現使用{{tlx|NoteTA}}，因此無反應。
+| [[rev:48984|1.15+]]
+|-
+|<tt>{{/tlm|PAGEID}}</tt>
+|{{PAGEID}}
+|返回该页面ID
+|1.20+
+|-
+|<tt>{{/tlm|noexternallanglinks}}</tt>
+|{{/tlm|noexternallanglinks|<语言代码，以管道符分隔>}}
+|完全禁止某页面使用维基数据的链接。
+|使用[[:mw:Extension:Wikibase_Client|维基数据库客户端插件]]
+|}
+
+== 借助魔术字呼叫解析器函數  ==
+{{Anchor|借助魔术字进行数值计算}}
+{| class="wikitable"
+!魔术字
+!输出
+!描述
+|-
+| <tt>{{tlxm|#xyz|主參數|副參數}}</tt>
+| 
+| 調用名為xyz的解析器函數。關於中文維基百科能用的所有解析器函數詳見[[Special:版本#mw-version-parser-function-hooks|Special:版本#mw-version-parser-function-hooks]]。另見[[Help:解析器函数|Help:解析器函数]]。
+|-
+| <tt>{{tlxm|#expr|{{CURRENTHOUR}}+8}}</tt>
+| <tt>{{#expr:{{CURRENTHOUR}}+8}}</tt>
+| 使用“#expr”对数值进行计算
+|-
+| <tt>{{tlxm|#expr|floor(100*{{PAGESINCAT:六氟化物}}/{{PAGESINCAT:氟化物}})}}%</tt>
+| <tt>{{#expr:floor(100*{{PAGESINCAT:六氟化物}}/{{PAGESINCAT:氟化物}})}}%</tt>
+| 使用“#expr”及“floor”的计算
+|-
+| <tt>{{tlxm|#if|檢查字串|有值時輸出|無值時輸出}}</tt><br/><tt>{{tlxm|#if||yes|no}}</tt><br/><tt>{{tlxm|#if|foo|yes|no}}</tt>
+| <tt>{{#if:檢查字串|有值時輸出|無值時輸出}}</tt><br/><tt>{{#if:|yes|no}}</tt><br/><tt>{{#if:foo|yes|no}}</tt>
+| 檢查輸入是否有值
+|-
+| <tt>{{tlxm|#ifeq|a|b|相等|不相等}}</tt><br/><tt>{{tlxm|#ifeq|a|a|相等|不相等}}</tt>
+| <tt>{{#ifeq:a|b|相等|不相等}}</tt><br/><tt>{{#ifeq:a|a|相等|不相等}}</tt>
+| 檢查兩輸入是否相等
+|-
+| <tt>{{tlxm|#property|P361}}</tt>
+| <tt>{{#property:P361}}</tt>
+| 使用解析器函數調用維基數據的資料，其中[[d:P361|P361]]代表本頁面的所屬實體，{{#property:P361}}。詳細使用說明見[[d:Wikidata:How_to_use_data_on_Wikimedia_projects#Parser_function|維基數據的相關說明]]
+|-
+| <tt>{{tlxm|#invoke|模塊名稱|函數名稱}}</tt>
+| 
+| 使用解析器函數調用[[WP:Lua|模組命名空間]]中的函數。詳細使用說明見[[WP:Lua|WP:Lua]]。
+|}
+
+== 嵌入包含修飾詞 ==
+<code><nowiki>{{</nowiki>''頁面名稱''|''可選參數''}}</code>通常會嵌入包含其他頁面的內容，預設是嵌入包含自Template:模板命名空間。
+
+嵌入包含修飾詞類的魔術字可以改變嵌入包含時的行為。
+
+以上任何以<code><nowiki>{{</nowiki>魔術字名稱}}</code>或<code><nowiki>{{</nowiki>#魔術字名稱}}</code>調用的魔術字，皆可以使用這些修飾詞進行調整。
+
+{| class="wikitable"
+!用法
+!輸出
+!說明
+!版本
+|-
+| <code><nowiki>{{:xyz}}</nowiki></code>
+| 非來自預設Template:模板命名空間的嵌入包含
+| 表示更改嵌入包含命名空間的語法。單一冒號一般不會視為模板修飾詞，而是條目命名空間的前綴。 由於嵌入包含預設是使用Template命名空間，因此您可以使用<code>{{:UTC}}</code>（s. <code>{{UTC}}</code>）來包含主命名空間條目[[UTC|UTC]]的內文，而不是{{tl|UTC}}。
+|
+|-
+| <code><nowiki>{{int:xyz}}</nowiki></code>
+| 介面語言訊息的內容
+| 表示介面語言版本而顯示特定MediaWiki命名空間訊息的內容。同於<code><nowiki>{{MediaWiki:xyz}}</nowiki></code>, except standard message translation is applied depending on subpages and content/user/uselang language. Another difference is: this doesn't appear under "{{int|templatesused}}". Rendered as {{int:xyz}} if {{Redlink|MediaWiki:xyz}} doesn't exist. See also [[mw:Help:System_message|mw:Help:System message]].
+|
+|-
+| <code><nowiki>{{msg:xyz}}</nowiki></code>
+| 優先引用模板內容
+| 表示以嵌入包含為優先。 若存在一個名為"xyz"的魔術字，僅要使用msg:魔術字修飾詞，則會以[[template:xyz|template:xyz]]為優先（與<code><nowiki>{{template:xyz}}</nowiki></code>等價）。 一般情況下，若無使用本魔術字修飾詞，且模板名稱與魔術字衝突時，會以魔術字為優先。
+|
+|-
+|<code><nowiki>{{raw:xyz}}</nowiki></code>
+| 僅使用模板內容
+| 表示只做嵌入包含。 在中文維基百科的一般情況下，使用msg:與使用raw:魔術字修飾詞相同。然而在[[mw:manual:$wgEnableScaryTranscluding|$wgEnableScaryTranscluding]]有啟用的維基中，此魔術字修飾詞可以實現跨維基引用，並且會引用其他維基媒體網站的維基代碼，而非純粹的HTML碼。
+| {{MW version|version=1.6|compact=y|comment=and after|r=12925}}
+|-
+| <code><nowiki>{{msgnw:xyz}}</nowiki></code>
+| 僅模板原使碼，不做解析
+| 表示只做嵌入包含，不做維基代碼的解析。 使用此魔術字修飾詞會輸出未展開的維基代碼，包含<code><nowiki><nowiki></nowiki></code>、<code><nowiki><noinclude></nowiki></code>、<code><nowiki><includeonly></nowiki></code>、<code><nowiki><onlyinclude></nowiki></code>等代碼都會原封不動地輸出。唯須注意的是，此結果輸入到Lua模塊內會以[[:en:Character_encodings_in_HTML#Character_references|HTML entities]]的方式表示。 （more or less, for details see [[mw:Help:Template#Usage|mw:Help:Template#Usage]]）.
+|
+|-
+| <code><nowiki>{{subst:xyz}}</nowiki></code>
+| 替換引用結果。 
+| In the wikitext, the tag is substituted by the ''content'' (single-level evaluation only), see [[Help:替换引用|Help:替换引用]].
+|
+|-
+| <code><nowiki>{{safesubst:xyz}}</nowiki></code>
+| 替換引用結果或嵌入包含。
+| 有例外處理的替換引用。使用一般subst魔術字修飾詞時，若替換引用失敗則會變為未解析模式如<nowiki>{{subst:xyz}}</nowiki>，然而若使用safesubst魔術字修飾詞替換引用失敗則會變為普通的嵌入包含模式，即若<code><nowiki>{{subst:xyz}}</nowiki></code>失敗了，則會改為輸出<code><nowiki>{{xyz}}</nowiki></code>。另請參考[[mw:Help:Template#Usage|mw:Help:Template#Usage]]。
+|
+|}
+=== 特殊的嵌入包含方式 ===
+{| class="wikitable"
+!用法
+!輸出
+!說明
+!版本
+|-
+| <code><nowiki>{{special:xyz}}</nowiki></code>
+| 顯示特殊頁面內容於目標位置
+| 顯示特殊頁面內容的語法。僅能顯示特殊頁面內容，不支援[[Help:替換引用|Help:替換引用]]。對此類嵌入包含使用msg、raw、msgnw和safesubst的效果與未使用修飾詞時是相同的。目前支援嵌入包含的特殊頁面有[[Special:AllPages|Special:AllPages]]、[[Special:PrefixIndex|Special:PrefixIndex]]、[[Special:NewFiles|Special:NewFiles]]、[[Special:NewPages|Special:NewPages]]、[[Special:RecentChanges|Special:RecentChanges]]以及[[Special:RecentChangesLinked|Special:RecentChangesLinked]]。
+|
+|-
+| <code><nowiki>{{/xyz}}</nowiki></code>
+| 嵌入相對的子頁面
+| 嵌入以此頁面為準的相對路徑之子頁面，以<code><nowiki>{{/xyz}}</nowiki></code>為例，在此頁的效果等同於<code><nowiki>{{Help:魔术字/xyz}}</nowiki></code>。
+|
+|-
+| <code><nowiki>{{#lst:xyz|foo}}</nowiki></code>
+| 嵌入對應頁面中被<nowiki><section></nowiki>標籤標記的內容。
+| 嵌入在對應頁面中，包覆於<nowiki><section begin=foo/></nowiki>與<nowiki><section end=foo/></nowiki>之間的內容，支援替換引用，但不支援模板參數套用。目前用於[[WP:AFD|WP:AFD]]等討論的集中討論區。
+|
+|-
+| <code><nowiki>{{#lstx:xyz|foo}}</nowiki></code>
+| 嵌入對應頁面中除了<code><nowiki>{{#lst:xyz|foo}}</nowiki></code>之外的內容
+| 嵌入在對應頁面中除了<code><nowiki>{{#lst:xyz|foo}}</nowiki></code>之外的內容，並可以透過<code><nowiki>{{#lstx:xyz|foo|要替換的內容}}</nowiki></code>將對應內容以替代內容顯示。支援替換引用，但不支援模板中參數的引用。
+|
+|-
+| <code><nowiki>{{#lsth:xyz|章節1|章節2}}</nowiki></code>
+| 嵌入對應頁面中的特定章節
+| 嵌入在對應頁面中的特定章節，若未填寫章節，則顯示首段或導言。支援替換引用，但不支援模板中參數的引用。
+|
+|}
+
+== 参见 ==
+
+*[[Help:解析器函数|Help:解析器函数]]
+== 註釋 ==
+{{Reflist}}
+
+== 外部链接 ==
+
+*
+*
+*[//svn.wikimedia.org/svnroot/mediawiki/trunk/phase3/includes/MagicWord.php MagicWord.php的源代码]
+
+{{H-f Help}}
+
+[[Category:帮助文档|MSZ]]

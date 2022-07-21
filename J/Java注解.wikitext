@@ -1,0 +1,135 @@
+{{noteTA|G1=IT}}
+'''Java注解'''又称'''Java标注'''，是[[Java|Java]]语言5.0版本开始支持加入[[源代码|源代码]]的特殊语法[[元数据|元数据]]<ref>{{cite web|url = http://java.sun.com/j2se/1.5.0/docs/guide/language/annotations.html|title = JDK 5.0开发者指南：标注|date = 2007-12-18|accessdate = 2008-03-05|publisher = [[Sun_Microsystems|Sun Microsystems]]|archive-date = 2008-03-06|archive-url = https://web.archive.org/web/20080306060928/http://java.sun.com/j2se/1.5.0/docs/guide/language/annotations.html|dead-url = no}}.</ref>。
+
+Java语言中的类、方法、变量、参数和包等都可以被标注。和[[Javadoc|Javadoc]]不同，Java标注可以通过反射获取标注内容。在[[编译器|编译器]]生成[[类文件|类文件]]时，标注可以被嵌入到[[字节码|字节码]]中。[[Java虚拟机|Java虚拟机]]可以保留标注内容，在运行时可以获取到标注内容<ref>{{citation|title = Java (TM)语言规范|edition = 第三版|publisher = Prentice Hall|year = 2005|isbn = 0321246780|url = http://java.sun.com/docs/books/jls/third_edition/html/j3TOC.html|author = [[Sun_Microsystems|Sun Microsystems]]|accessdate = 2009-06-14|archive-date = 2012-02-29|archive-url = https://web.archive.org/web/20120229183526/http://java.sun.com/docs/books/jls/third_edition/html/j3TOC.html|dead-url = no}}.</ref>。
+当然它也支持自定义Java标注<ref>{{cite web 
+ |url=http://www.25hoursaday.com/ 
+ |title=A COMPARISON OF MICROSOFT'S C# PROGRAMMING LANGUAGE TO SUN MICROSYSTEMS' JAVA PROGRAMMING LANGUAGE: Metadata Annotations 
+ |author=Dare Obasanjo 
+ |authorlink= 
+ |year=2007 
+ |work= 
+ |publisher=Dare Obasanjo 
+ |archiveurl=https://web.archive.org/web/20120919093308/http://25hoursaday.com/ 
+ |archivedate=2012-09-19 
+ |accessdate=2012-09-20 
+ |deadurl=yes 
+ }}</ref>。
+
+== 历史 ==
+Java 平台有许多特别的注解，例如 <tt>transient</tt> 修饰符，<code>@deprecated</code> javadoc 标签。2002 年，文案 JSR-175 提出了通用需求的注解（或者说元注解）手段，并在 2004 年 9 月收到许多人的赞赏。<ref>{{cite web|url = http://www.jcp.org/en/jsr/detail?id=175#2|title = JSR 175: A Metadata Facility for the JavaTM Programming Language|date = 2006-11-02|accessdate = 2008-03-05|first = Danny|last = Coward|publisher = [[Java_Community_Process|Java Community Process]]|archive-date = 2011-03-06|archive-url = https://web.archive.org/web/20110306190628/http://jcp.org/en/jsr/detail?id=175#2|dead-url = no}}</ref>从 JDK 1.5 开始，java 开始支持注解。Annotation Processing tool （或者说 <tt>apt</tt> tool） 提供了一个补充性的编译时注解操作的接口。文档 JSR-269 将它规范化，在 JDK 1.6 写入编译器 javac 中。
+
+== 内置的注解 ==
+Java 定义了一套注解，共有 7 个，3 个在 java.lang 中，剩下 4 个在 java.lang.annotation 中<ref>{{cite web
+ | url         = https://docs.oracle.com/javase/tutorial/java/annotations/predefined.html
+ | title         = Predefined Annotation Types
+ | publisher         = [[Oracle_Corporation|Oracle Corporation]]
+ | accessdate         = 2016-12-17
+ | archive-date         = 2020-12-23
+ | archive-url         = https://web.archive.org/web/20201223095839/https://docs.oracle.com/javase/tutorial/java/annotations/predefined.html
+ | dead-url         = no
+ }}</ref><ref>{{cite web
+ | url         = http://www.java2s.com/Tutorial/Java/0020__Language/TheBuiltInAnnotations.htm
+ | title         = The Built-In Annotations : Standard Annotations
+ | accessdate         = 2016-12-17
+ | archive-date         = 2021-01-10
+ | archive-url         = https://web.archive.org/web/20210110151007/http://www.java2s.com/Tutorial/Java/0020__Language/TheBuiltInAnnotations.htm
+ | dead-url         = no
+ }}</ref>
+
+'''作用在代码的注解是'''
+* <tt>@Override</tt> - 检查该方法是否是重写方法。如果发现其父类，或者是引用的接口中并没有该方法时，会报编译错误。
+* <tt>@Deprecated</tt> - 标记过时方法。如果使用该方法，会报编译警告。
+* <tt>@SuppressWarnings</tt> - 指示编译器去忽略注解中声明的警告。
+
+'''作用在其他注解的注解（或者说 元注解）是:'''
+* <tt>@Retention</tt> - 标识这个注解怎么保存，是只在代码中，还是编入class文件中，或者是在运行时可以通过反射访问。
+* <tt>@Documented</tt> - 标记这些注解是否包含在用户文档中。
+* <tt>@Target</tt> - 标记这个注解应该是哪种 Java 成员。
+* <tt>@Inherited</tt> - 标记这个注解是继承于哪个注解类（默认下，注解并没有继承于任何子类）
+
+从 Java 7 开始，额外添加了 3 个注解:
+* <tt>@SafeVarargs</tt> - Java 7 开始支持，忽略任何使用参数为泛型变量的方法或构造函数调用产生的警告。
+* <tt>@FunctionalInterface</tt> - Java 8 开始支持，标识一个匿名函数或函数式接口。
+* <tt>@Repeatable</tt> - Java 8 开始支持，标识某注解可以在同一个声明上使用多次。
+
+== 实例 ==
+
+<syntaxhighlight lang="java">
+  // @Twizzle标注toggle()方法。
+  @Twizzle
+  public void toggle() {
+  }
+
+  // 声明Twizzle标注
+  public @interface Twizzle {
+  }
+</syntaxhighlight>
+
+标注可以包含一个关键字和值的对所构成的列表：
+
+<syntaxhighlight lang="java">
+  //等同于 @Edible(value = true)
+  @Edible(true)
+  Item item = new Carrot();
+
+  public @interface Edible {
+    boolean value() default false;
+  }
+
+  @Author(first = "Oompah", last = "Loompah")
+  Book book = new Book();
+
+  public @interface Author {
+    String first();
+    String last();
+  }
+</syntaxhighlight>
+
+标注声明中可以用标注说明使用方式、时间和对象：
+
+<syntaxhighlight lang="java">
+  @Retention(RetentionPolicy.RUNTIME) // 该标注可以在运行时通过反射访问。
+  @Target({ElementType.METHOD})       // 该标注只用于类内方法。
+  public @interface Tweezable {
+  }
+</syntaxhighlight>
+
+编译器保留一组标注用于特定语法目的 (包括 <tt>@Deprecated</tt>, <tt>@Override</tt>和<tt>@SuppressWarnings</tt>等)。
+
+标注通常用于软件[[框架|框架]]为用户定义的类和方法提供引用外部资源的情形，如XML配置文件、事务环境等。以下是一个标注过的EJB 3.0的类：
+
+<syntaxhighlight lang="java">
+  @Entity                                           // 声明实体类
+  @Table(name = "people")                           // 映射该类到 "people"表
+  class Person implements Serializable {
+    @Id                                             // 映射到主键
+    @GeneratedValue(strategy = GenerationType.AUTO) // 数据库自动生成键值
+    private Integer id;
+
+    @Column(length = 32)                            // 限长32个字符
+    private String name;
+
+    public Integer getId() {
+      return id;
+    }
+
+    public void setId(Integer id) {
+      this.id = id;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+  }
+</syntaxhighlight>
+
+以上代码中标注不执行任何特定行为，而是为在运行时，EJB容器获得足够的信息，生成对象到关系数据库的映射。
+== 参考引用 ==
+<references/>
+
+[[Category:Java|Category:Java]]

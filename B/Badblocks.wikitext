@@ -1,0 +1,37 @@
+{{noteTA|G1=IT}}
+{{orphan|time=2015-01-27T04:05:19+00:00}}
+{{lowercase}}
+'''badblocks'''是[[Unix-like|Unix-like操作系统]]下用来检查类似于磁盘分区这样的[[设备|设备]]上是否存在[[硬碟壞軌|壞軌]]的命令行程序，其功能类似于[[Microsoft_Windows|Microsoft Windows]]或[[DOS|DOS]]操作系统中的[[SCANDISK|SCANDISK]]或[[CHKDSK|CHKDSK]]。运行后badblocks会给出一份设备上存在问题的[[区块|区块]]（block）列表。
+
+badblocks是[[ext2|ext2]]/[[ext3|3]]/[[ext4|4]][[文件系统|文件系统]]工具集[[e2fsprogs|e2fsprogs]]的一部分。
+
+badblocks在大多数情况下需要配合[[e2fsck|e2fsck]]或[[mke2fs|mke2fs]]使用，此时需要专门指定合适的"'''-b'''"参数，也就是badblock所读取的区块大小（block-size）。因此，用户应该通过执行[[e2fsck|e2fsck]]或[[mke2fs|mke2fs]]时加上"'''-c'''"参数来调用badblocks，而不是直接使用badblocks。<ref name="badblocks(8) - Linux man page">[http://linux.die.net/man/8/badblocks badblocks(8) - Linux man page] {{Wayback|url=http://linux.die.net/man/8/badblocks |date=20100428060512 }}, 2010年5月7日查阅</ref>
+
+==e2fsck的 "-c" 參數==
+多數情況下badblocks會透過e2fsck的<code>"-c"</code>參數調用，防止資料被寫入壞軌中。透過掃描時所產生的壞軌清單在分配空間時避免使用到壞軌部份。這項測試可以透過唯讀（<code>"-c"</code>）或非破壞性寫入（<code>"-cc"</code>）進行。<ref>{{man|8|e2fsck|die.net}}</ref>
+
+=== dumpe2fs ===
+執行<code>dumpe2fs -b</code>可以列出由<code>e2fsck</code>或><code>tune2fs</code>所紀錄的壞軌清單。
+
+== 範例 ==
+ badblocks -nvs /dev/sdb
+這個指令將會對 "sdb"進行非破壞性寫入測試以及顯示檢查進度。
+
+ badblocks -wvs /dev/sdb6
+這個指令將會對"sdb"的第6[[硬碟分割|硬碟分割區]]進行破壞性寫入測試（-w = 寫入模式），對分割區寫入4種不同的方式，並寫驗證其正確性。過程中將會顯示檢查進度（-s = 顯示，-v = 詳細資料）. 指令所執行之分區資料將會被覆蓋。
+
+ badblocks -wvsb 4096 /dev/sdb
+這指令行為與上則相同，不過對象為整個硬碟以及指定區塊大小為4096。將會破壞[[MBR|MBR]]分割區及資料。新一點的硬碟並不會顯示損壞的磁區，其原因為在備用磁區尚存時將自動重新定位至備用磁區<ref>{{cite web |url=http://www.ukdatarecovery.com/articles/bad-sector-remapping.html |title=存档副本 |accessdate=2012-06-30 |deadurl=yes |archiveurl=https://web.archive.org/web/20120719000028/http://www.ukdatarecovery.com/articles/bad-sector-remapping.html |archivedate=2012-07-19 }}</ref>，但是執行在新硬碟上會測試硬碟表面，解析[[S.M.A.R.T.|S.M.A.R.T.]]資訊後將會顯示最終所配置的磁區數量。
+
+使用<code>-w</code>參數時，將會把原先硬碟的所有資料抹除掉。
+
+==参考==
+*[[fsck|fsck]]
+*[[e2fsprogs|e2fsprogs]]
+
+==引用==
+<references/>
+
+[[Category:Unix文件系统相关软件|Category:Unix文件系统相关软件]]
+
+{{Linux-stub}}

@@ -1,0 +1,86 @@
+{{noteTA
+|G1=IT
+|1=zh-hans:蒂姆·伯纳斯-李; zh-hant:提姆·柏納李;
+|2=zh-hans:变量; zh-hant:變數;
+}}
+{{Infobox programming language
+| name                   = SPARQL
+| logo                   = W3C Icon.svg
+| logo_caption           = [[万维网联盟|万维网联盟]]的图标
+| paradigm               = [[查詢語言|查詢語言]]
+| year                   = {{Start date and age|2008}}
+| designer               = 
+| developer              = [[W3C|W3C]]
+| latest_release_version = 1.1
+| latest_release_date    = {{Start date and age|2013|03|21}}
+| typing                 =
+| website                = {{url|http://www.w3.org/TR/sparql11-query/}}
+}}
+'''SPARQL'''（讀做「sparkle」<ref>{{cite web | url = http://www.eweek.com/development/sparql-will-make-the-web-shine | title = （英文）SPARQL讓Web閃閃發光 | author = Jim Rapoza | work = [[eWeek|eWeek]] | date = May 2, 2006 | accessdate = 2007-01-17 }} </ref>、「史巴–摳」）是一種用於[[資源描述框架|資源描述框架]]上的[[查詢語言|查詢語言]]，它的名字是一個[[遞迴縮寫|遞迴縮寫]]，代表「'''S'''PARQL '''P'''rotocol '''a'''nd '''R'''DF '''Q'''uery '''L'''anguage（SPARQL協定與RDF查詢語言）」。它的標準化為[[全球資訊網協會|全球資訊網協會]]的''RDF資料存取工作小組（DAWG）''所進行，被認為是[[語意網|語意網]]科技的一個關鍵。2008年1月15日，SPARQL正式成為一項[[W3C推薦標準|W3C推薦標準]]<ref>{{cite web |url=http://www.w3.org/blog/SW/2008/01/15/sparql_is_a_recommendation |title=（英文）W3C語意網活動新聞 - SPARQL已是一個建議標準 |publisher=W3.org |date=2008-01-15 |accessdate=2009-10-01 |archive-date=2012-06-02 |archive-url=https://www.webcitation.org/6879Jhe3N?url=http://www.w3.org/blog/SW/2008/01/15/sparql_is_a_recommendation |dead-url=no }}</ref>。 
+
+一個SPARQL查詢由一些{{le|三元組儲存庫|Triplestore|三體}}組合、[[邏輯與|與邏輯]]、[[邏輯或|或邏輯]]，及選項組合所組成<ref>{{cite web | url = http://www.xml.org/xml/news/archives/archive.10062006.shtml#5 | title = （英文）XML與Web服務新聞 | work = xml.org | date = 6 October 2006 | accessdate = 2007-01-17 | archive-date = 2007-05-22 | archive-url = https://web.archive.org/web/20070522015034/http://www.xml.org/xml/news/archives/archive.10062006.shtml#5 | dead-url = no }}</ref> 。
+
+SPARQL現已有在多個[[程式語言|程式語言]]上的实现了<ref>{{cite web |url=http://esw.w3.org/topic/SparqlImplementations |title=（英文）SPARQL實作 - ESW Wiki |publisher=Esw.w3.org |date= |accessdate=2009-10-01 |archive-date=2009-09-28 |archive-url=https://web.archive.org/web/20090928032039/http://esw.w3.org/topic/SparqlImplementations |dead-url=yes }}</ref>。在一個2006年5月的訪問裡，[[提姆·柏納李|提姆·柏納李]]說到：「SPARQL將會帶來很大的變化」。
+
+==優點== 
+
+SPARQL可以讓使用者寫出廣域上不含糊的詢問。舉例來說，以下的詢問可以取得世界上所有人的姓名與Email：
+<syntaxhighlight lang="sparql">
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT ?name ?email
+WHERE {
+  ?person a foaf:Person.
+  ?person foaf:name ?name.
+  ?person foaf:mbox ?email.
+}
+</syntaxhighlight>
+假設用來描述[[人|人]]的[[本體_(資訊學)|本體]]最終統一為[[FOAF|FOAF]]。注意到所有在SPARQL裡的標示都是[[URI|URI]]都是廣域上不含糊的，與[[SQL|SQL]]常用的欄位名「email」或是「e-mail」有所不同。這是此詢問不含糊的根本原因。 
+
+這個詢問可以被散布到多個SPARQL節點上，被計算之後結果再聚合起來，這個過程被稱作[[聯合式搜尋|聯合式搜尋]]。
+
+==例子== 
+
+另一個SPARQL詢問的例子如下，這模擬了以下的問題「非洲裡有哪些國家首都？」：
+
+<syntaxhighlight lang="sparql">
+PREFIX abc: <http://example.com/exampleOntology#>
+SELECT ?capital ?country
+WHERE {
+  ?x abc:cityname ?capital ;
+     abc:isCapitalOf ?y .
+  ?y abc:countryname ?country ;
+     abc:isInContinent abc:Africa .
+}
+</syntaxhighlight> 
+
+變數的字首是<code>?</code>或<code>$</code>。回傳會包含<code>?captial</code>跟<code>?country</code>的所有可能答案。 
+
+SPARQL詢問處理器會找到所有滿足這4個三體組合的配對，將對應的變數代表的值找出來。很重要的一點是這是「屬性導向」的（類的配對只能從屬性裡找出來。 {{See also|鸭子类型}}
+
+為了讓詢問變得更精簡，SPARQL可以讓使用者定義前輟與[[URI|URI]]底，與[[Turtle|Turtle]]類似。在這個詢問中，「abc」這個前輟代表「<nowiki>http://example.com/exampleOntology#</nowiki>」。
+
+==參考==
+
+{{reflist}} 
+
+==外部連結==
+
+* {{en icon}}[https://www.w3.org/TR/sparql11-overview/ SPARQL 1.1 概述]{{Wayback|url=https://www.w3.org/TR/sparql11-overview/ |date=20180102171645 }} 
+* {{en icon}}[http://www.w3.org/TR/rdf-sparql-query/ SPARQL 1.0 詢問語言規範書]{{WebCite|url=https://www.webcitation.org/6879LE0Gr?url=http://www.w3.org/TR/rdf-sparql-query/ |date=20120602064830 |dateformat=iso }}
+
+公开的 SPARQL Web服务
+* [https://query.wikidata.org 维基数据]{{Wayback|url=https://query.wikidata.org/ |date=20161107202911 }}
+* [http://dbpedia.org/isparql/ DBpedia]{{Wayback|url=http://dbpedia.org/isparql/ |date=20180123190620 }}
+
+
+{{查询语言}}
+{{语义网}}
+{{W3C规范和标准}}
+{{Authority control}}
+
+[[Category:语义网|*]]
+[[Category:数据查询语言|Category:数据查询语言]]
+[[Category:W3C标准|Category:W3C标准]]
+[[Category:Web服务|Category:Web服务]]
+[[Category:宣告式编程语言|Category:宣告式编程语言]]
+[[Category:资源描述架构|Category:资源描述架构]]

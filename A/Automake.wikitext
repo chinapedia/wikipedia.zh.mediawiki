@@ -1,0 +1,79 @@
+{{NoteTA|G1=IT|G2=FL}}
+{{Infobox_Software
+| name                   = Automake 
+| logo                   = Heckert GNU white.svg
+| logo size              = 100px 
+| developer              = [[GNU計劃|GNU計劃]] 
+| latest_release_version = 1.16.5<ref>{{cite web|author=Jim Meyering|title=automake-1.16.5 released [stable]|url=https://lists.gnu.org/archive/html/info-gnu/2021-10/msg00000.html|accessdate=2021-10-03|archive-date=2021-10-04|archive-url=https://web.archive.org/web/20211004232512/https://lists.gnu.org/archive/html/info-gnu/2021-10/msg00000.html}}</ref> 
+| latest_release_date    = {{Release date and age|2021|10|03}}
+| operating_system       = [[跨平台|跨平台]] 
+| genre                  = [[軟體開發工具|軟體開發工具]] 
+| license                = [[GNU通用公共许可证|GNU通用公共许可证]] 
+| website                = https://www.gnu.org/software/automake/
+}}
+[[File:Autoconf-automake-process.svg|thumb]]
+'''GNU Automake'''是一種編程工具，可以產生供[[make|make]]程式使用的Makefile，用來編譯程式。它是[[自由軟體基金會|自由軟體基金會]]發起的[[GNU計劃|GNU計劃]]的其中一項，作為[[GNU构建系统|GNU構建系統]]的一部分。automake所產生的Makefile符合GNU編程標準。
+
+automake是由[[Perl|Perl]]語言所寫的，必須和[[autoconf|GNU autoconf]]一併使用。automake包含了以下命令：
+
+*''aclocal''
+*''automake''
+
+''aclocal''是個泛用的程式，對於autoconf使用者是相當有用的。舉例而言，[[GCC|GNU Compiler Collection]]使用''aclocal''，即使Makefile是手寫的。
+
+就像autoconf，automake並非完全向下相容的。舉例而言，使用automake 1.4的專案可能不能使用automake 1.9。
+
+== 方法 ==
+Automake目標是讓使用者透過高階語言來寫makefile，而不是透過純手工的方式來寫整個makefile。在簡單的情況下，它能提供：
+*源檔案的列表
+*傳給[[編譯器|編譯器]]的命令行選項列表（比如標頭檔置於哪個路徑）
+*傳給[[链接器|链接器]]的命令行選項列表（程式需要哪些程式庫以及它們的路徑）
+
+經由這些資訊，Automake產生makefile能夠讓使用者：
+*編譯程式
+*clean（清除，刪除編譯過程中所產生的檔案）
+*將程式安裝於標準路徑
+*將程式反安裝（從安裝的地方移除）
+*create a source distribution archive (commonly called a tarball)
+*test that this archive is self-sufficient, and in particular that the program can be compiled in a directory other than the one where the sources are deployed
+
+=== 依存性資訊的產生 ===
+Automake能夠自動生成依存性的資訊，因此，當一個源文件被修改，下次呼叫make命令的時候就會知道哪些源文件需要重新編譯。如果編譯器允許，Automake會試著讓依存性系統保持動態：無論何時源文件被編譯，都會要求編譯器重新產生依存性列表更新該文件的依存性。換句話說，依存性追蹤是編譯過程的一種邊際效應。
+
+這企圖避免一些靜態依存性系統的問題，比如依存性只會在程式員開始專案時才會被偵測到。在這種情況下，如果源文件獲得一個新的依存性（例如，如果程式員增加了一個新的<code>#include</code>指令在[[C語言|C語言]]的源文件），這樣在真實的依存性和編譯系統所使用的依存性之間就會產生差異。程式員應該重新產生依存性，但很有可能忘了那樣做。在一般情況下，automake透過隨附的[[depcomp|depcomp]]腳本生成依存性，這會適當的呼叫編譯器或是回到[[makedepend|makedepend]]。如果[[gcc|gcc]]編譯器的版本夠新的話，automake將會inline依存性生成碼，直接呼叫gcc。
+
+=== Libtool ===
+Automake还可用来辅助库的编译，它可以自动生成调用[[Libtool|Libtool]]的Makefile文件，从而使程序员避免了直接调用Libtool,而项目也可以从此可移植的库生成工具获益。
+
+== 參見 ==
+{{portal|Free software|Free Software Portal Logo.svg}}
+
+* [[CMake|CMake]]
+* [[qmake|qmake]]
+* [[imake|imake]]
+* [[Flowtracer|Flowtracer]]
+
+== 參考資料 ==
+{{refbegin}}
+* Gary V. Vaughan, Ben Elliston, Tom Tromey: ''Gnu Autoconf, Automake, and Libtool'', Sams, ISBN 1-57870-190-2
+{{Reflist|2}}
+{{refend}}
+
+== 外部連結 ==
+
+* [https://web.archive.org/web/20090618143105/http://sources.redhat.com/automake/ Automake home page]
+* [http://sources.redhat.com/autobook/ Online version of ''The Goat Book'' aka Autobook]{{Wayback|url=http://sources.redhat.com/autobook/ |date=20101220095404 }}
+* [http://autotoolset.sourceforge.net/ Autotoolset home page]{{Wayback|url=http://autotoolset.sourceforge.net/ |date=20030416234012 }}
+* Article "[https://web.archive.org/web/20060110134958/http://www.openismus.com/documents/linux/automake/automake.shtml Using Automake and Autoconf with C++]" by Murray Cumming
+
+=== 教材 ===
+* Tutorial for beginners "[https://web.archive.org/web/20070205161956/http://www.developingprogrammers.com/index.php/2006/01/05/autotools-tutorial/ Autotools Tutorial]" by Sarah George
+* Tutorial "[https://web.archive.org/web/20060321205403/http://www.amath.washington.edu/~lf/tutorials/autoconf/ Learning Autoconf and Automake]" by Eleftherios Gkioulekas
+* The "[http://www.lrde.epita.fr/~adl/autotools.html Autotools Tutorial]{{Wayback|url=http://www.lrde.epita.fr/~adl/autotools.html |date=20101227173311 }}" by Alexandre Duret-Lutz introduces [[Autoconf|Autoconf]], Automake, [[Libtool|Libtool]], and [[Gettext|Gettext]].
+* [http://autotoolset.sourceforge.net/tutorial.html Learning the GNU Development tools]{{Wayback|url=http://autotoolset.sourceforge.net/tutorial.html |date=20101201015903 }}
+
+{{GNU}}
+
+[[Category:GNU计划软件|Category:GNU计划软件]]
+[[Category:自动化构建|Category:自动化构建]]
+[[Category:編譯工具|Category:編譯工具]]

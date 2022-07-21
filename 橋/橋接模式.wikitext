@@ -1,0 +1,358 @@
+'''橋接模式'''是[[軟件設計模式|軟件設計模式]]中最複雜的模式之一，它把事物對象和其具體行爲、具體特徵分離開來，使它们可以各自独立的变化。事物對象僅是一個抽象的概念。如“圓形”、“三角形”歸于抽象的“形狀”之下，而“畫圓”、“畫三角”歸于實現行爲的“畫圖”類之下，然後由“形狀”調用“畫圖”。
+
+==結構==
+[[File:Bridge_UML_class_diagram.svg|600px]]
+; Abstraction
+: 定義抽象的介面
+: 該介面包含實現具體行爲、具體特徵的Implementor介面
+; Refined Abstraction
+: 抽象介面Abstraction的子類，依舊是一個抽象的事物名
+; Implementor
+: 定義具體行爲、具體特徵的應用介面
+; ConcreteImplementor
+: 實現Implementor介面
+
+==示例==
+下列各語言的代碼都用於寫出兩個不同的圓的坐標和半徑。
+<pre>
+API1.circle at 1:2 7.5
+API2.circle at 5:7 27.5
+</pre>
+
+=== Java ===
+
+
+
+<syntaxhighlight lang="java">
+/** "Implementor" */
+interface DrawingAPI
+{
+    public void drawCircle(double x, double y, double radius);
+}
+
+/** "ConcreteImplementor" 1/2 */
+class DrawingAPI1 implements DrawingAPI
+{
+   public void drawCircle(double x, double y, double radius) 
+   {
+        System.out.printf("API1.circle at %f:%f radius %f\n", x, y, radius);
+   }
+}
+
+/** "ConcreteImplementor" 2/2 */
+class DrawingAPI2 implements DrawingAPI
+{
+   public void drawCircle(double x, double y, double radius) 
+   { 
+        System.out.printf("API2.circle at %f:%f radius %f\n", x, y, radius);
+   }
+}
+
+/** "Abstraction" */
+interface Shape
+{
+   public void draw();                                            // low-level
+   public void resizeByPercentage(double pct);     // high-level
+}
+
+/** "Refined Abstraction" */
+class CircleShape implements Shape
+{
+   private double x, y, radius;
+   private DrawingAPI drawingAPI;
+   public CircleShape(double x, double y, double radius, DrawingAPI drawingAPI)
+   {
+       this.x = x;  this.y = y;  this.radius = radius; 
+       this.drawingAPI = drawingAPI;
+   }
+
+   // low-level i.e. Implementation specific
+   public void draw()
+   {
+        drawingAPI.drawCircle(x, y, radius);
+   }   
+   // high-level i.e. Abstraction specific
+   public void resizeByPercentage(double pct)
+   {
+        radius *= pct;
+   }
+}
+
+/** "Client" */
+class BridgePattern {
+   public static void main(String[] args)
+   {
+       Shape[] shapes = new Shape[2];
+       shapes[0] = new CircleShape(1, 2, 3, new DrawingAPI1());
+       shapes[1] = new CircleShape(5, 7, 11, new DrawingAPI2());
+
+       for (Shape shape : shapes)
+       {
+           shape.resizeByPercentage(2.5);
+           shape.draw();
+       }
+   }
+}
+</syntaxhighlight>
+
+===C#===
+
+
+<syntaxhighlight lang="csharp">
+ using System;
+ 
+ /** "Implementor" */
+ interface IDrawingAPI {
+    void DrawCircle(double x, double y, double radius);
+ }
+ 
+ /** "ConcreteImplementor" 1/2 */
+ class DrawingAPI1 : IDrawingAPI {
+    public void DrawCircle(double x, double y, double radius) 
+    {
+        System.Console.WriteLine("API1.circle at {0}:{1} radius {2}", x, y, radius); 
+    }
+ }
+ 
+ /** "ConcreteImplementor" 2/2 */
+ class DrawingAPI2 : IDrawingAPI 
+ {
+    public void DrawCircle(double x, double y, double radius) 
+    { 
+        System.Console.WriteLine("API2.circle at {0}:{1} radius {2}", x, y, radius); 
+    }
+ }
+ 
+ /** "Abstraction" */
+ interface IShape {
+    void Draw();                             // low-level (i.e. Implementation-specific)
+    void ResizeByPercentage(double pct);     // high-level (i.e. Abstraction-specific)
+ }
+ 
+ /** "Refined Abstraction" */
+ class CircleShape : IShape {
+    private double x, y, radius;
+    private IDrawingAPI drawingAPI;
+    public CircleShape(double x, double y, double radius, IDrawingAPI drawingAPI) 
+    {
+        this.x = x;  this.y = y;  this.radius = radius; 
+        this.drawingAPI = drawingAPI;
+    }
+    // low-level (i.e. Implementation-specific)
+    public void Draw() { drawingAPI.DrawCircle(x, y, radius); }
+    // high-level (i.e. Abstraction-specific)
+    public void ResizeByPercentage(double pct) { radius *= pct; }
+ }
+ 
+ /** "Client" */
+ class BridgePattern {
+    public static void Main(string[] args) {
+        IShape[] shapes = new IShape[2];
+        shapes[0] = new CircleShape(1, 2, 3, new DrawingAPI1());
+        shapes[1] = new CircleShape(5, 7, 11, new DrawingAPI2());
+ 
+        foreach (IShape shape in shapes) {
+            shape.ResizeByPercentage(2.5);
+            shape.Draw();
+        }
+    }
+ }
+</syntaxhighlight>
+
+===用generics類庫的C#===
+
+
+<syntaxhighlight lang="csharp">
+ using System;
+ 
+ /** "Implementor" */
+ interface IDrawingAPI {
+    void DrawCircle(double x, double y, double radius);
+ }
+ 
+ /** "ConcreteImplementor" 1/2 */
+ struct DrawingAPI1 : IDrawingAPI {
+    public void DrawCircle(double x, double y, double radius) 
+    {
+        System.Console.WriteLine("API1.circle at {0}:{1} radius {2}", x, y, radius); 
+    }
+ }
+ 
+ /** "ConcreteImplementor" 2/2 */
+ struct DrawingAPI2 : IDrawingAPI 
+ {
+    public void DrawCircle(double x, double y, double radius) 
+    { 
+        System.Console.WriteLine("API2.circle at {0}:{1} radius {2}", x, y, radius); 
+    }
+ }
+ 
+ /** "Abstraction" */
+ interface IShape {
+    void Draw();                             // low-level (i.e. Implementation-specific)
+    void ResizeByPercentage(double pct);     // high-level (i.e. Abstraction-specific)
+ }
+ 
+ /** "Refined Abstraction" */
+ class CircleShape<T> : IShape
+    where T : struct, IDrawingAPI
+ {
+    private double x, y, radius;
+    private static IDrawingAPI drawingAPI = new T();
+    public CircleShape(double x, double y, double radius) 
+    {
+        this.x = x;  this.y = y;  this.radius = radius;
+    }
+    // low-level (i.e. Implementation-specific)
+    public void Draw() { drawingAPI.DrawCircle(x, y, radius); }
+    // high-level (i.e. Abstraction-specific)
+    public void ResizeByPercentage(double pct) { radius *= pct; }
+ }
+ 
+ /** "Client" */
+ class BridgePattern {
+    public static void Main(string[] args) {
+        IShape[] shapes = new IShape[2];
+        shapes[0] = new CircleShape<DrawingAPI1>(1, 2, 3);
+        shapes[1] = new CircleShape<DrawingAPI2>(5, 7, 11);
+ 
+        foreach (IShape shape in shapes) {
+            shape.ResizeByPercentage(2.5);
+            shape.Draw();
+        }
+    }
+ }
+</syntaxhighlight>
+
+
+===C++===
+
+
+<syntaxhighlight lang="cpp">
+#include <iostream>
+
+using namespace std;
+
+/* Implementor*/
+class DrawingAPI {
+  public:
+   virtual void drawCircle(double x, double y, double radius) = 0;
+   virtual ~DrawingAPI() {}
+};
+
+/* Concrete ImplementorA*/
+class DrawingAPI1 : public DrawingAPI {
+  public:
+   void drawCircle(double x, double y, double radius) {
+      cout << "API1.circle at " << x << ':' << y << ' ' << radius << endl;
+   }
+};
+
+/* Concrete ImplementorB*/
+class DrawingAPI2 : public DrawingAPI {
+public:
+   void drawCircle(double x, double y, double radius) {
+      cout << "API2.circle at " << x << ':' << y << ' ' <<  radius << endl;
+   }
+};
+
+/* Abstraction*/
+class Shape {
+  public:
+   virtual ~Shape() {}
+   virtual void draw() = 0;
+   virtual void resizeByPercentage(double pct) = 0;
+};
+
+/* Refined Abstraction*/
+class CircleShape : public Shape {
+  public:
+   CircleShape(double x, double y,double radius, DrawingAPI *drawingAPI) :
+	   m_x(x), m_y(y), m_radius(radius), m_drawingAPI(drawingAPI)
+   {}
+   void draw() {
+      m_drawingAPI->drawCircle(m_x, m_y, m_radius);
+   }
+   void resizeByPercentage(double pct) {
+      m_radius *= pct;
+   }
+  private:
+   double m_x, m_y, m_radius;
+   DrawingAPI *m_drawingAPI;
+};
+
+int main(void) {
+   DrawingAPI1 dap1;
+   DrawingAPI2 dap2;
+   CircleShape circle1(1,2,3,&dap1);
+   CircleShape circle2(5,7,11,&dap2);
+   circle1.resizeByPercentage(2.5);
+   circle2.resizeByPercentage(2.5);
+   circle1.draw();
+   circle2.draw();
+   return 0;
+}
+</syntaxhighlight>
+
+===Python===
+
+
+<syntaxhighlight lang="python">
+# Implementor
+class DrawingAPI:
+	def drawCircle(x, y, radius):
+		pass
+
+# ConcreteImplementor 1/2
+class DrawingAPI1(DrawingAPI):
+	def drawCircle(self, x, y, radius):
+		print "API1.circle at %f:%f radius %f" % (x, y, radius)
+
+# ConcreteImplementor 2/2
+class DrawingAPI2(DrawingAPI):
+	def drawCircle(self, x, y, radius):
+		print "API2.circle at %f:%f radius %f" % (x, y, radius)
+
+# Abstraction
+class Shape:
+	# low-level
+	def draw(self):
+		pass
+
+	# high-level
+	def resizeByPercentage(self, pct):
+		pass
+
+# Refined Abstraction
+class CircleShape(Shape):
+	def __init__(self, x, y, radius, drawingAPI):
+		self.__x = x
+		self.__y = y
+		self.__radius = radius
+		self.__drawingAPI = drawingAPI
+
+	# low-level i.e. Implementation specific
+	def draw(self):
+		self.__drawingAPI.drawCircle(self.__x, self.__y, self.__radius)
+
+	# high-level i.e. Abstraction specific
+	def resizeByPercentage(self, pct):
+		self.__radius *= pct
+
+def main():
+	shapes = [
+		CircleShape(1, 2, 3, DrawingAPI1()),
+		CircleShape(5, 7, 11, DrawingAPI2())
+	]
+
+	for shape in shapes:
+		shape.resizeByPercentage(2.5)
+		shape.draw()
+
+if __name__ == "__main__":
+	main()
+</syntaxhighlight>
+
+
+{{软件设计模式}}
+[[Category:软件设计模式|Category:软件设计模式]]

@@ -1,0 +1,473 @@
+{{noteTA
+|G1 = IT
+}}
+
+'''语言集成查询'''（{{lang-en|Language Integrated Query}}，[[縮寫|縮寫]]：LINQ），發音"link"，是[[微软|微軟]]的一项技术，新增一種自然查詢的SQL語法到.NET Framework的程式語言中，目前可支援[[C♯|C#]]以及[[Visual_Basic_.NET|Visual Basic .NET]]語言。2007年11月19日随[[.NET_Framework|.NET Framework]] 3.5发布了LINQ技术。
+
+包括LINQ to Objects、LINQ to SQL、LINQ to Datasets、LINQ to Entities、LINQ to Data Source、LINQ to XML/XSD等。
+
+==語言風格==
+LINQ依赖于語言的多項新增風格，來展示出查詢語言的擴充性。例如：C#:
+
+=== 匿名型別===
+
+[[匿名型別|匿名型別]]（Anonymous type）是C# 3.0與Visual Basic 9.0新增的功能，它允許開發人員可以使用不具型別的方式建立新的資料結構，而真正的型別在編譯時期，由C# (或VB) Compiler自動產生，並寫入編譯目的檔中，它可以讓開發人員能夠很簡單利用匿名型別建立物件，LINQ中的select指令即是利用這種特性來建立回傳物件。
+
+匿名类型本质上是表达[[元组|元组]]（tuple），采用值语义。
+
+下列使用匿名型別的程式碼：
+<syntaxhighlight lang="csharp">
+    [WebGet]
+    public IQueryable<Categories> GetCategoryByName(string CategoryName)
+    {
+        try
+        {
+            var query = base.CurrentDataSource.Categories.Where
+　　　　　　　　　("it.CategoryName = @Name", new ObjectParameter[] { new ObjectParameter("Name", CategoryName) });
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        return query;
+    } 
+</syntaxhighlight>
+
+會由編譯器改寫為：
+
+<syntaxhighlight lang="csharp">
+    [WebGet]
+    public IQueryable<Categories> GetCategoryByName(string CategoryName)
+    {
+        IQueryable<Categories> CS$1$0000;　// 由編譯器改寫而成。
+        try
+        {
+            CS$1$0000 = base.CurrentDataSource.Categories.Where
+　　　　　　　　　("it.CategoryName = @Name", new ObjectParameter[] { new ObjectParameter("Name", CategoryName) });
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        return CS$1$0000;
+    }
+</syntaxhighlight>
+
+=== 擴展方法 (Extension method) ===
+
+=== Lambda表達式 (Lambda expression) ===
+=== 表達式樹 (Expression tree) ===
+===查询表达式语法===
+ from RangeVariable in IEnumerable<T>或IQueryable<T>的Collection
+ <Standard Query  Operators> <lambda expression>
+ <select or groupBy operator> <result   formation>
+===流利语法===
+LINQ查询时有两种语法可供选择：查询表达式语法（Query Expression）和流利语法（Fluent Syntax）。前者使用查询运算符；后者利用System.Linq.Enumerable类中定义的扩展方法和Lambda表达式方式进行查询。CLR本身并不理解查询表达式语法，它只理解流利语法。编译器负责把查询表达式语法编译为流利语法。
+
+以下是一个示例LINQ方法语法的查询，返回数组中的偶数：
+<syntaxhighlight lang="csharp">
+int[] ints={1,2,3,4};
+var result = ints.Where(p => p % 2 == 0).ToArray();
+</syntaxhighlight>
+
+对比流利语法和C#的传统语法：
+<syntaxhighlight lang="csharp">
+//   extension methods make LINQ elegant
+            IEnumerable<string> query = names
+                .Where(n => n.Contains("a"))
+                .OrderBy(n => n.Length)
+                .Select(n => n.ToUpper());
+ 
+//   static methods lose query's fluency
+            IEnumerable<string> query2 =
+                Enumerable.Select(
+                    Enumerable.OrderBy(
+                        Enumerable.Where(names, n => n.Contains("a")
+                        ), n => n.Length
+                    ), n => n.ToUpper()
+                );
+</syntaxhighlight>
+
+=== 標準查詢運算子 (Standard query operators) ===
+System.Linq.Enumerable静态类声明了一套标准查询操作符（Standard Query Operators，SQO）方法集合。基本语法如下：
+<syntaxhighlight lang="csharp">
+ using (var db = new EntityContext())
+ {
+     var roles = from o in db.Users
+                where o.Account == "Apollo"
+                select o.Roles;
+     …
+ }
+</syntaxhighlight>
+标准查询操作符和Lambda表达式的关系非常密切。编译器会将上述表达式转化为下述以Lambda表达式为参数的显式扩展方法调用序列：
+<syntaxhighlight lang="csharp">
+ using (var db = new EntityContext())
+ {
+     var roles = db.Users.Where(o => o.Account == "Apollo").Select(o => o.Roles);
+ }
+</syntaxhighlight>
+
+{| class="wikitable"
+|-
+! 操作符 !! 类别 !! 语义 !! 流利语法示例 !! 查询表达式语法示例
+|-
+| Where || 筛选操作符(Restriction) || Predicate→bool || <syntaxhighlight lang="csharp">
+var user = 
+db.Users.Where(
+o => o.Roles != null);</syntaxhighlight> ||<syntaxhighlight lang="csharp"> 
+var users = 
+from o in db.Users
+where o.Roles != null
+select o;</syntaxhighlight>
+|-
+| Select || 投影操作符(Projection) || 将对象投影为一个匿名类型实例<br />TSource→TResult || <syntaxhighlight lang="csharp">
+var users = 
+db.Users.Select
+(o => new { o.Account, o.Password });</syntaxhighlight> || <syntaxhighlight lang="csharp">
+var users = 
+from o in db.Users
+select new { o.Account, o.Password };</syntaxhighlight>
+|-
+| SelectMany || 投影操作符(Projection) || 返回多行结果，用于多表的交叉连接（cross join） || <syntaxhighlight lang="vb">Dim res = Employees.SelectMany(Function(e)
+  e.Family.Select(Function(c)c.name)) </syntaxhighlight>
+|-
+| Skip || 分块操作符(Partitioning) || 跳过前n个元素  || <syntaxhighlight lang="csharp">
+var users = 
+db.Users.OrderBy(
+o => o.Roles.Count
+).Skip(10);</syntaxhighlight> || 
+|-
+| SkipWhile || 分块操作符(Partitioning) || 跳过起始处使条件为真的所有元素 || <syntaxhighlight lang="csharp">
+var users = 
+db.Users.OrderBy(
+o => o.Roles.Count).SkipWhile(
+o => o.Roles == 3);</syntaxhighlight> || 
+|-
+| Take || 分块操作符(Partitioning) || 返回开头之处的n个元素 || <syntaxhighlight lang="csharp">
+var users = 
+db.Users.OrderBy(
+o => o.Roles.Count).Take(5);</syntaxhighlight> || 
+|-
+| TakeWhile || 分块操作符(Partitioning) || 返回起始处使条件为真的所有元素 || <syntaxhighlight lang="csharp">
+var users = 
+db.Users.OrderBy(
+o => o.Roles.Count).TakeWhile(
+o => o.Roles.Count == 3);</syntaxhighlight> || 
+|-
+| Join || 连接操作符 || 内连接两个或多个表，仅限于Equals运算符 || <syntaxhighlight lang="csharp">
+var categoriesProducts = 
+from c in nWEntities.Categories
+join p in nWEntities.Products
+on c.CategoryID equals p.CategoryID
+into productsByCategoryID
+select new
+{
+c.CategoryName,
+productCount = 
+productsByCategoryID.Count()
+};</syntaxhighlight> || 
+|-
+| GroupJoin || 连接操作符 || 类似于LEFT OUTER JOIN，右侧集合匹配于左侧集合键值的元素被分组  || <syntaxhighlight lang="vb">From cust In customers Group 
+Join ord In orders 
+On cust.CustomerID 
+ Equals ord.CustomerID 
+Into CustomerOrders = Group, 
+   OrderTotal = Sum(ord.Total)</syntaxhighlight>
+|-
+| Concat || 合并操作符 || 用于连接两个序列 || returnValue = firstSeq.Concat(secondSeq)
+|-
+| OrderBy || 排序操作符(Ordering) || 升序排列<br />TSource→TKey || <syntaxhighlight lang="csharp">
+var users = 
+db.Users.OrderBy(
+o => o.Roles.Count);</syntaxhighlight> || <syntaxhighlight lang="csharp">
+var users = 
+from o in db.Users
+orderby o.Roles.Count
+select o;</syntaxhighlight>
+|-
+| OrderByDescending || 排序操作符(Ordering) || 降序排列 || <syntaxhighlight lang="csharp">
+var users = 
+db.Users.OrderByDescending(
+o => o.Roles.Count);</syntaxhighlight> || <syntaxhighlight lang="csharp">
+var users = 
+from o in db.Users
+orderby o.Roles.Count descending
+select o;</syntaxhighlight>
+|-
+| ThenBy || 排序操作符(Ordering) || 只能对IOrderedEnumerable接口对象使用 || <syntaxhighlight lang="csharp">
+</syntaxhighlight> || <syntaxhighlight lang="csharp">
+</syntaxhighlight>
+|-
+| ThenByDescending || 排序操作符(Ordering) || 只能对IOrderedEnumerable接口对象使用 || <syntaxhighlight lang="csharp">
+</syntaxhighlight> || <syntaxhighlight lang="csharp">
+</syntaxhighlight>
+|-
+| Reverse || 排序操作符(Ordering) || 只能对IOrderedEnumerable接口对象使用  || <syntaxhighlight lang="csharp">
+</syntaxhighlight> || <syntaxhighlight lang="csharp">
+</syntaxhighlight>
+|-
+| GroupBy || 分组操作符 ||  || <syntaxhighlight lang="csharp">
+var users = 
+db.Users.GroupBy(
+o => o.Roles.Count);</syntaxhighlight> || <syntaxhighlight lang="csharp">
+var users = 
+from o in db.Users
+group o by o.Roles.Count into g
+select new { RoleCount = g.Key, Group = g };</syntaxhighlight>
+|-
+| Distinct || 集合操作符 || 去重复 || <syntaxhighlight lang="csharp">
+var roles = 
+user.Roles.Distinct();</syntaxhighlight> || <syntaxhighlight lang="csharp">
+</syntaxhighlight>
+|-
+| Union || 集合操作符 || 集合并，还去重复 || <syntaxhighlight lang="csharp">
+var roles = 
+user1.Roles.Union(
+user2.Roles);</syntaxhighlight> || <syntaxhighlight lang="csharp">
+</syntaxhighlight>
+|-
+| Intersect || 集合操作符 || 集合交 || <syntaxhighlight lang="csharp">
+var roles = 
+user1.Roles.Intersect(
+user2.Roles);</syntaxhighlight> || <syntaxhighlight lang="csharp">
+</syntaxhighlight>
+|-
+| Except || 集合操作符 || 集合差 || <syntaxhighlight lang="csharp">
+var roles = 
+user1.Roles.Except(
+user2.Roles);</syntaxhighlight> || <syntaxhighlight lang="csharp">
+</syntaxhighlight>
+|-
+| AsEnumerable || 转换操作符 || 用于把一个IEnumerable的派生类型转化为IEnumerable类型  || 
+|-
+| AsQueryable || 转换操作符 || IEnumerable(Of T)转化为IQueryable(Of T). || 
+|-
+| ToArray || 转换操作符 || 转换为数组 || 
+|-
+| ToList || 转换操作符 || 转换为List || 
+|-
+| ToDictionary || 转换操作符 || 转换为一对一的字典（键-值对的集合） || 
+|-
+| ToLookup || 转换操作符 || 转换为一对多的字典（键-值集的集合） || 
+|-
+| OfType || 转换操作符 || 获取指定类型的元素组成一个数组 || <syntaxhighlight lang="csharp">object[] numbers = { null, 1.0,
+ "two", 3, "four", 5, 
+"six", 7.0 };
+var doubles = 
+numbers.OfType<double>();</syntaxhighlight>
+|-
+| Cast || 转换操作符 || 把序列的所有元素转换为指定类型 || 
+|-
+| SequenceEqual || 相等操作符 || 两个序列的元素依次相同返回真。<br />使用元素所属类的IEqualityComparer(Of T) 泛型界面做相等比较 || 
+|-
+| First || 元素操作符 || 返回序列第一个元素（或满足条件第一个元素），没有则异常  || 
+|-
+| FirstOrDefault || 元素操作符 || 返回序列第一个元素，没有则返回空或默认值 ||  <syntaxhighlight lang="csharp">
+var user = 
+db.Users.FirstOrDefault(
+o => o.Roles.Count == 3);</syntaxhighlight> || <syntaxhighlight lang="csharp">
+</syntaxhighlight>
+|-
+| Last || 元素操作符 || 返回序列最后一个元素，没有则异常 || 
+|-
+| LastOrDefault || 元素操作符 ||返回序列最后一个元素，没有则返回空或默认值  ||  <syntaxhighlight lang="csharp">
+var user = 
+db.Users.LastOrDefault(
+o => o.Roles.Count == 3);</syntaxhighlight> || <syntaxhighlight lang="csharp">
+</syntaxhighlight>
+|-
+| Single || 元素操作符 || 返回序列唯一元素，如果没有元素或多个元素则异常 || 
+|-
+| SingleOrDefault || 元素操作符 || 返回序列唯一元素，如果多个元素则异常 ||   <syntaxhighlight lang="csharp">
+var user = db.Users.SingleOrDefault(o => o.Account == "Apollo");</syntaxhighlight> || <syntaxhighlight lang="csharp">
+</syntaxhighlight>
+|-
+| ElementAt || 元素操作符 || 返回序列指定元素，失败则异常 || 
+|-
+| ElementAtOrDefault || 元素操作符 || 返回序列指定元素，失败则空或默认值 || 
+|-
+| DefaultIfEmpty || 元素操作符 || 返回序列，如果序列为空则返回元素的默认值 || <syntaxhighlight lang="vb">For Each number As Integer 
+In numbers.DefaultIfEmpty()   
+output.AppendLine(number)
+Next </syntaxhighlight>
+|-
+| All || 量词操作符|| 序列所有元素满足条件则为真 ||  <syntaxhighlight lang="csharp">
+var result 
+= db.Users.All(
+o => o.Roles.Count == 3);</syntaxhighlight> || <syntaxhighlight lang="csharp">
+</syntaxhighlight>
+|-
+| Any || 量词操作符|| 序列有一个元素满足条件则为真 ||  <syntaxhighlight lang="csharp">
+var result 
+= db.Users.Any(
+o => o.Roles.Count == 3);</syntaxhighlight> || <syntaxhighlight lang="csharp">
+</syntaxhighlight>
+|-
+| Contains || 量词操作符|| 是否包含一个元素 ||  <syntaxhighlight lang="csharp">
+var result = 
+db.Users.Where(
+o => o.Roles.Count == 3
+).Contains(user1);</syntaxhighlight> || <syntaxhighlight lang="csharp">
+</syntaxhighlight>
+|-
+| Count || 聚合统计操作符 || 计数，可选一个谓词 ||  <syntaxhighlight lang="csharp">
+var result 
+= db.Users.Count
+(o => o.Roles.Count == 3);</syntaxhighlight> || <syntaxhighlight lang="csharp">
+</syntaxhighlight>
+|-
+| LongCount || 聚合统计操作符 || 计数，返回Int64类型 || 
+|-
+| Sum || 聚合统计操作符 || 求和，可选对一个lambda函数表达式 ||  <syntaxhighlight lang="csharp">
+var result 
+= db.Users.Sum
+(o => o.Roles.Count);</syntaxhighlight> || <syntaxhighlight lang="csharp">
+</syntaxhighlight>
+|-
+| Min || 聚合统计操作符 || 最小值，可选对一个lambda函数表达式 || <syntaxhighlight lang="csharp">
+var result 
+= db.Users.Min
+(o => o.Roles.Count);</syntaxhighlight> || <syntaxhighlight lang="csharp">
+</syntaxhighlight>
+|-
+| Max || 聚合统计操作符 ||  ||  <syntaxhighlight lang="csharp">
+var result 
+= db.Users.Max
+(o => o.Roles.Count);</syntaxhighlight> || <syntaxhighlight lang="csharp">
+</syntaxhighlight>
+|-
+| Average || 聚合统计操作符 ||  ||  <syntaxhighlight lang="csharp">
+var result 
+= db.Users.Average
+(o => o.Roles.Count);</syntaxhighlight> || <syntaxhighlight lang="csharp">
+</syntaxhighlight>
+|-
+| Aggregate || 聚合统计操作符 || 参数为一个委托，在序列的每个元素上执行该委托。<br />委托的第一个参数为当前累计值，第二个参数为当前元素，<br />返回值为新的累计值 || <syntaxhighlight lang="vb">Dim reversed As String = 
+words.Aggregate(
+Function(ByVal current,
+ ByVal word) 
+word & " " & current)</syntaxhighlight>
+|-
+| equals/Equals || 关键字 || 用于Join子句 || 
+|-
+| from/From || 关键字 ||  || 
+|-
+| in/In || 关键字 || 指出数据源 || 
+|-
+| into/Into || 关键字 || 用于Group By子句 || 
+|-
+| key || 关键字 || 用于Group By子句的无名类型 || 
+|-
+| let || 关键字 || 给表达式定义别名 ||<syntaxhighlight lang="vb">From prod In products 
+Let Discount = 
+prod.UnitPrice * 0.1 
+Where Discount >= 50 
+Select prod.ProductName, 
+prod.UnitPrice, Discount</syntaxhighlight>
+|-
+| Group || 关键字 || 在GroupBy子句的Into中用于辨识分组结果 ||<syntaxhighlight lang="vb">From num In numbers 
+Group num By 
+remainder5 = 
+(num Mod 5) Into Group</syntaxhighlight>
+|-
+||Range ||方法||产生一个整数序列 || <syntaxhighlight lang="vb">From n In 
+Enumerable.Range(100, 50)</syntaxhighlight>
+|-
+||Repeat||方法||产生一个整数序列 || <syntaxhighlight lang="vb">From n In  
+Enumerable.Repeat(7, 10)</syntaxhighlight>
+|}
+
+==LINQ的各式言語支援度==
+下列的言語支持LINQ。
+*[[C_Sharp|C#]] 3.0
+*[[F_Sharp|F#]] 1.1.8.1
+*[[Visual_Basic_2008|Visual Basic 2008]]（9.0）
+註：[[C++/CLI|C++/CLI]]尚未支援LINQ。但是有第三方的C++套件<ref>{{Cite web |url=http://cpplinq.codeplex.com/ |title=LINQ for C++ |accessdate=2014-02-18 |archive-date=2014-02-16 |archive-url=https://web.archive.org/web/20140216194252/http://cpplinq.codeplex.com/ |dead-url=no }}</ref>，以及第三方的[[PHP|PHP]]套件<ref>{{Cite web |url=http://phplinq.codeplex.com/ |title=PHPLinq |accessdate=2014-02-18 |archive-date=2014-02-22 |archive-url=https://web.archive.org/web/20140222015832/http://phplinq.codeplex.com/ |dead-url=no }}</ref>
+
+==LINQ的範例==
+一个简单例子：
+<syntaxhighlight lang="csharp">
+using System;
+using System.Linq;
+
+namespace DuckTyping
+{
+    internal class Program
+    {
+        private static void Main()
+        {
+            int[] array = { 1, 5, 2, 10, 7 };  
+            // Select squares of all odd numbers in the array sorted in descending order
+            var results = from x in array
+                                     where x % 2 == 1
+                                     orderby x descending
+                                     select x * x;
+            foreach (var result in results)
+            {
+                Console.WriteLine(result); 
+            }
+        }
+    }
+}
+</syntaxhighlight>
+输出：
+49
+25
+1
+
+另一个例子：
+<syntaxhighlight lang="csharp">
+// the Northwind type is a subclass of DataContext created by SQLMetal
+// Northwind.Orders is of type Table<Order>
+// Northwind.Customers is of type Table<Customer>
+
+Northwind db = new Northwind(connectionString);
+ 
+// use 'var' keyword because there is no name for the resultant type of the projection
+ 
+var q =  from o in db.Orders
+         from c in db.Customers
+         where o.Quality == "200" && (o.CustomerID == c.CustomerID)
+         select new { o.DueDate, c.CompanyName, c.ItemID, c.ItemName };
+ 
+// q is now an IEnumerable<T>, where T is the anonymous type generated by the compiler
+
+foreach (var t in q)
+{
+    // t is strongly typed, even if we can't name the type at design time
+ 
+    Console.WriteLine("DueDate Type = {0}", t.DueDate.GetType());
+    Console.WriteLine("CompanyName (lowercased) = {0}", t.CompanyName.ToLower());
+    Console.WriteLine("ItemID * 2 = {0}", t.ItemID * 2);
+}
+</syntaxhighlight>
+
+==Visual Studio支持==
+
+LINQ目前由[[Visual_Studio|Visual Studio]] 2008、2010、2012、2013、2015、2017、2019支持。
+
+==语言扩展==
+微软同样提供了LINQExtender，允许使用者在不了解LINQ实现细节的情况下，编写自己的LINQ扩展。
+如：LINQ to Twitter,LINQ to Oracle,LINQ to Active Directory等
+
+== 参考文献 ==
+{{Reflist|30em}}
+
+== 外部連結 ==
+* [https://web.archive.org/web/20061007124738/http://msdn.microsoft.com/netframework/future/linq Official Microsoft LINQ Project]（已失效）
+* [http://msdn.microsoft.com/en-us/vcsharp/aa336746.aspx 101 C# LINQ Samples]{{Wayback|url=http://msdn.microsoft.com/en-us/vcsharp/aa336746.aspx |date=20080914215959 }}
+* [http://msdn.microsoft.com/en-us/vbasic/bb688088.aspx 101 Visual Basic LINQ Samples]{{Wayback|url=http://msdn.microsoft.com/en-us/vbasic/bb688088.aspx |date=20081007020322 }}
+* [https://web.archive.org/web/20071111055117/http://forums.microsoft.com/MSDN/ShowForum.aspx?ForumID=123&SiteID=1 Microsoft LINQ forum]
+* [https://web.archive.org/web/20071017152214/http://www.netfxguide.com/guide/linq.aspx LINQ page on NetFXGuide.com]
+* [http://www.hookedonlinq.com/ LINQ wiki]{{Wayback|url=http://www.hookedonlinq.com/ |date=20080425224159 }}
+* [http://linqextender.codeplex.com/ LINQExtender]{{Wayback|url=http://linqextender.codeplex.com/ |date=20090813171541 }}
+
+== 参见 ==
+* [[物件關聯對映|物件關聯對映]]（ORM）
+
+{{-}}
+{{Database}}
+{{DotNET}}
+
+[[Category:.NET|Category:.NET]]
+[[Category:數據查詢語言|Category:數據查詢語言]]

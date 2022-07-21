@@ -1,0 +1,139 @@
+{{Refimprove|time=2019-09-10T02:32:34+00:00}}
+'''GPRS核心网'''（{{lang-en|GPRS Core Network}}）是[[通用分组无线服务|GPRS]]（通用分组无线业务，{{lang-en|General Packet Radio Service}}）的中心部件，它允许[[2G|2G]]、[[3G|3G]]以及[[宽频码分多址|WCDMA]]移动网络将[[网际协议|IP]]数据包传送至外部网络，例如[[互联网|因特网]]。[[通用分组无线服务|GPRS]]系统是集成于[[GSM|GSM]][[网络交换子系统|网络交换子系统]]的一部分。
+
+==一般支撑功能==
+GPRS核心网提供在[[GSM|GSM]]和[[宽频码分多址|WCDMA]]网络中的[[移动性管理|移动性管理]]、[[会话_(计算机科学)|会话管理]]，以及[[网际协议|IP]]数据包的传输业务。该核心网同时支持包括{{link-en|计费|Telecommunications billing}}和[[合法监听|合法监听]]等其他附加功能。GPRS核心网曾一度被建议要在美国的[[D-AMPS|D-AMPS TDMA]]系统中支持分组无线业务，但事实上，所有这些网络都已经被替换为[[GSM|GSM]]，因此该选项已经不重要了。
+
+PRS模块是一个开放标准驱动的系统。它的标准化主体是[[3GPP|3GPP]]
+
+==GPRS隧道协议（GTP）==
+{{main|GPRS隧道协议}}
+GPRS隧道协议（GPRS Tunnelling Protocol，简称GTP）是GPRS核心网目前定义的基于[[网际协议|IP]]的[[网络传输协议|协议]]。大体上说，这个协议允许[[GSM|GSM]]或[[宽频码分多址|WCDMA]]网络的最终用户可以随处移动，而同时持续地连接到[[互联网|因特网]]，如同只是从[[#网关GPRS支撑节点（GGSN）|GGSN]]的同一个位置进行的。
+
+它通过承载从当前正在为签约用户（subscriber）提供服务的[[#业务GPRS支撑节点（SGSN）|SGSN]]到当前正在处理该签约用户的会话的[[#网关GPRS支撑节点（GGSN）|GGSN]]的签约用户数据来实现。GPRS核心网使用三种形式的GTP。
+
+;GTP-U:用于在多个独立的隧道中为每个[[#PDP上下文|PDP上下文]]（Packet Data Protocol context）传输用户数据。
+;GTP-C:用于控制目的，包括：
+:* PDP上下文的建立和删除
+:* [[#GPRS支撑节点(GSN)|GSN]]可及性（reachability）的验证
+:* 更新；例如，当一个签约用户从一个[[#业务GPRS支撑节点（SGSN）|SGSN]]移动到另一个的时候
+;[[GTP'|GTP']]:用于从各个[[#GPRS支撑节点(GSN)|GSN]]向计费功能（charging function）传输计费数据。
+
+[[#网关GPRS支撑节点（GGSN）|GGSN]]和[[#业务GPRS支撑节点（SGSN）|SGSN]]（合称“GSNs”）在[[用户数据报协议|UDP]]端口2123上监听GTP-C消息，而在端口2152上监听GTP-U消息。这个通信直接在一个单独的网络中进行，或者在漫游的情况下，通过一个[[GPRS漫游交换|GRX]]（GPRS漫游交换，英文：GPRS Roaming Exchange）进行。
+
+计费网关功能（Charging Gateway Function）在[[传输控制协议|TCP]]或[[用户数据报协议|UDP]]端口3386上监听发送自各个[[#GPRS支撑节点(GSN)|GSN]]的GTP'消息。核心网向CGF发送的计费信息，通常包含[[#PDP上下文|PDP上下文]]激活次数和最终用户所传输的数据的使用量和[[QoS|QoS]]等信息。然而，GTP'通信仅发生在同一个运营商网络内部，可能不完全与标准相符，根据供应商和配置选项的不同，可能使用私有的编码甚至完全私有的系统。
+
+GTP版本0支持在同一个消息头下面同时包含信令（signalling）和用户数据（user data）。它可以在已注册的3386端口上同时和[[用户数据报协议|UDP]]或[[传输控制协议|TCP]]一起使用。GTP版本1仅在UDP上使用。控制平面协议（Control Plane Protocol）GTP-C（Control）使用已注册的2123端口，而用户平面协议（User Plane Protocol）GTP-U（User）使用已注册的2152端口。
+
+==GPRS支撑节点（GSN）==
+一个GSN是一个网络节点，它支持在GSM核心网中对GPRS的使用。所有的GSN都应当拥有一个[[#在GPRS网络中的接口|Gn/Gp]]接口，并支持GPRS隧道协议。GSN有两个关键的变种，即网关（gateway）和业务（service）GPRS支撑节点。
+
+===网关GPRS支撑节点（GGSN）===
+网关GPRS支撑节点（Gateway GPRS Support Node，简称GGSN）是[[通用分组无线服务|GPRS]]网络的一个主要组件。GGSN负责GPRS网络和IP网络或[[X.25|X.25]]网络等外部包交换网络之间的互联。
+
+从外部网络的角度来看，GGSN是一个到某个“子网”（sub-network）的[[路由器|路由器]]（router）。GGSN作为GPRS隧道的终点，对外部网络“隐藏”了整个3GPP的核心网结构。当GGSN收到一个目的地址为某个特定用户的数据（下行数据）后，它检查该用户是否仍处活跃状态（active）。如果是的，则GGSN将该数据转发到当前正在为该移动用户提供服务的SGSN；如果该移动用户不处于活跃状态，则该数据被丢弃。而针对从用户设备发出的上行数据，GGSN将其路由到正确的网络。
+
+GGSN是一个锚点（anchor point），它使得在[[通用分组无线服务|GPRS]]/[[通用移动通讯系统|UMTS]]网络中的用户终端具有可移动性（mobility）。在GPRS中，它扮演与[[移动IP|移动IP]]中的归属代理（home agent）相同的角色。它维持与当前正在为一个特定[[移动台|MS]]（移动台，英文：Mobile Station）提供服务的SGSN之间进行[[协议数据单元|协议数据单元]]（Protocol Data Units，简称PDU）隧道连接所必须的路由。
+
+GGSN将来自SGSN的GPRS数据包转换成合适的的包数据协议（Packet Data Protocol，简称PDP）格式（例如，IP或X.25），在相应的的包数据网络中将它们发送出去。在另一个方向上，传入的数据包的PDP地址被转换为目标用户的GSM地址。被更改地址后的数据包被发送给相应负责的SGSN。为了这个目的，GGSN会在它的的本地寄存器中存储用户当前的SGSN地址以及他/她的用户概要。GGSN要负责IP地址的分配，并且是已连接的用户设备（User Equipment，简称：UE）的默认路由器。GGSN还履行鉴权（authentication）和计费（charging）的功能。
+
+其它功能还包括签约用户屏蔽（Subscriber Screening）、IP池管理，以及地址映射、[[QoS|QoS]]和[[#PDP上下文|PDP上下文]]执行。
+
+在[[长期演进技术|LTE]]场景中，GGSN功能被移到[[系统架构演进|SAE]]网关（而SGSN功能则工作在[[系统架构演进#SAE体系结构|MME]]中）。
+
+===业务GPRS支撑节点（SGSN）===
+一个业务{{lang|en|GPRS}}支撑节点（{{lang|en|Serving GPRS Support Node}}，简称：{{lang|en|SGSN}}）负责在它的地理位置服务区域内从移动台接收或向其发送数据包。它的任务包括数据包路由和传输、可移动性管理（{{lang|en|mobility management}}，附着/分离和位置管理）、逻辑链路管理（{{lang|en|logical link management}}）以及鉴权和计费功能。{{lang|en|SGSN}}的位置寄存器存储所有在它上面注册的{{lang|en|GPRS}}用户的位置信息（例如，当前蜂窝、当前[[网络交换子系统#拜访位置寄存器|VLR]]）和用户概要（例如[[国际移动用户识别码|IMSI]]、包数据网络中所使用的地址）。
+
+====SGSN公共功能====
+* 将来自[[#网关GPRS支撑节点（GGSN）|GGSN]]的[[GPRS隧道协议|GTP]]包（下行）去隧道化（{{lang|en|detunnel}}）
+* 将去往[[#网关GPRS支撑节点（GGSN）|GGSN]]的[[网际协议|网际协议]]包（上行）隧道化（{{lang|en|tunnel}}）
+* 当待机（{{lang|en|Standby}}）模式的移动电话从一个路由区域移动到另一个路由区域时，实现可移动性管理（{{lang|en|mobility management}}）
+* 对用户数据进行计费
+
+====SGSN在GSM/EDGE中的特有功能====
+[[GSM增强数据率演进|EDGE]]（{{lang|en|Enhanced Data Rates for GSM Evolution}}）所指定的[[#业务GPRS支撑节点（SGSN）|SGSN]]功能和特征包括：
+* 每签约用户大约60 {{lang|en|Kbps}}（对于{{lang|en|EDGE}}来说约150 {{lang|en|Kpbs}}）的最大数据速率
+* 使用[[#在GPRS网络中的接口|Gb]]协议栈，通过[[帧中继|帧中继]]或[[网际协议|网际协议]]连接到[[基站子系统#数据包控制单元|数据包控制单元]]（{{lang|en|Packet Control Unit}}）
+* 接受上行数据来形成[[网际协议|网际协议]]数据包
+* 加密下行数据，解密上行数据
+* 为处于已连接（{{lang|en|connected}}）模式的移动电话，实现蜂窝级的可移动性管理
+
+====SGSN在WCDMA中的特有功能====
+* 承载最高约42 {{lang|en|Mbps}}的下行流量和5.8{{lang|en|Mbps}}的上行流量（{{lang|en|HSPA+}}）
+* 隧道化/去隧道化面向[[基地台控制站|无线网络控制器]]（{{lang|en|RNC}}）的上行/下行数据包
+* 为处于“已连接”模式的移动电话实现RNC级（{{lang|en|level of an RNC}}）的可移动性管理
+
+==接入点==
+{{main|接入点名称}}
+
+一个“接入点”是：
+* 一个移动机可以连接到的一个[[网际协议|IP]]网络
+* 用于该连接的一系列设置
+* 一个移动电话中的在一系列设置中的一个特定选项
+
+当一个GPRS移动电话建立了一个PDP上下文，则接入点被选择。此时，一个[[接入点名称|接入点名称]]（Access Point Name，简称APN）被确定。
+
+:举例：aricenttechnologies.mnc012.mcc345.gprs
+:举例：Internet
+:举例：mywap
+:举例：hcl.cisco.ggsn
+
+这个接入点随后被在一个[[域名系统|DNS]]查询中使用，这个查询是针对一个私有DNS网络的。这个处理过程（称为APN解析）最终给出应当为该接入点提供服务的[[#网关GPRS支撑节点（GGSN）|GGSN]]的IP地址。此时，可以激活一个PDP上下文。
+
+==PDP上下文==
+包数据协议（Packet Data Protocol，简称PDP，例如：[[网际协议|IP]]、[[X.25|X.25]]、[[帧中继|帧中继]]）上下文（context）是一个[[数据结构|数据结构]]，在[[#业务GPRS支撑节点（SGSN）|SGSN]]和[[#网关GPRS支撑节点（GGSN）|GGSN]]上都会出现。当签约用户拥有一个活跃的会话时，它会包含该签约用户的会话訊息。当一个移动电话想要使用GPRS的时候，它必须首先附着（attach）并随后激活一个PDP上下文。这会在签约用户当前正在拜访的[[#网关GPRS支撑节点（SGSN）|SGSN]]中，以及正在为该签约用户的接入点提供服务的[[#网关GPRS支撑节点（GGSN）|GGSN]]中分配一个PDP上下文数据结构。该数据记录包括：
+* （用户可见）签约用户的[[IP地址|IP地址]]
+* （用户可见）签约用户的[[国际移动用户识别码|IMSI]]
+* （仅在核心网可见）签约用户的
+** 在[[#网关GPRS支撑节点（GGSN）|GGSN]]上的[[GPRS隧道协议#GTP版本1|隧道端点ID]]（TEID）
+** 在[[#业务GPRS支撑节点（SGSN）|SGSN]]上的隧道端点ID (TEID)
+
+隧道端点[[网际协议|IP]]是一个由[[#GPRS支撑节点(GSN)|GSN]]分配的号码，它标识关联到一个特定的PDP上下文的已隧道化的数据（tunnelled data）。
+
+若干个PDP上下文可能使用相同的IP地址。次级PDP上下文激活（Secondary PDP Context Activation）过程可能被用于在重用来自一个已经激活但具有不同的[[QoS|QoS]]概要的PDP上下文的PDP地址或其它PDP上下文信息时，激活一个PDP上下文。<ref>{{Cite web |url=http://www.3gpp.org/ftp/Specs/html-info/23060.htm |title=3GPP TS 23.060, General Packet Radio Service |accessdate=2014-10-10 |archive-date=2008-12-09 |archive-url=https://web.archive.org/web/20081209014543/http://www.3gpp.org/ftp/Specs/html-info/23060.htm |dead-url=no }}</ref>注意，该过程被称为“次级”，不会导致与它们所重用的PDP地址没有这种关系的PDP上下文产生。
+
+总共有11个PDP上下文（以任何主次组合）可以共同存在。网络服务接入点标识符（Network Service Access Point Identifier，简称NSAPI）被用于区分不同的PDP上下文。
+
+==参考点和接口==
+在GPRS核心网标准中，存在一些[[网络接口设备|接口]]和参考点（reference points，逻辑连接点，它们可能与其它的参考点共享一个公共的物理连接）。这些名字中的一些可以在本页中的网络结构图中看到。
+
+===在GPRS网络中的接口===
+;Ga:该接口为CDRs（记账记录，即话单）提供服务，它在[[#GPRS支撑节点(GSN)|GSN]]被写入，并发送给计费网关（Charging Gateway，简称：CG）。这个接口使用一个基于[[GPRS隧道协议|GTP]]的协议，做了一些修改来支持[[呼叫详细记录|CDR]]s（被称为“[[GTP'|GTP']]”）。
+;Gb: [[基站子系统|基站子系统]]和[[#业务GPRS支撑节点（SGSN）|SGSN]]之间的接口，传输协议可以是[[帧中继|帧中继]]（Frame Relay）或[[网际协议|IP]]。
+;Iu:无线网络控制器（Radio Network Controller）与[[#业务GPRS支撑节点（SGSN）|SGSN]]之间的接口。该接口交换信令（signaling）和实载数据（payload）。
+;Gc: [[#网关GPRS支撑节点（GGSN）|GGSN]]和[[网络交换子系统#归属位置寄存器|HLR]]（归属位置寄存器，英文：Home Location Register）之间的接口，这样[[#网关GPRS支撑节点（GGSN）|GGSN]]就可以获取一个移动台（mobile station）的位置明细。为了避免在[[#网关GPRS支撑节点（GGSN）|GGSN]]上实现MAP/SS7，此接口为可选。当不出现时，GGSN将查询通过[[#业务GPRS支撑节点（SGSN）|SGSN]]路由到HLR。
+;Gd: [[#业务GPRS支撑节点（SGSN）|SGSN]]与短信网关（SMS Gateway）之间的接口。可以使用MAP1、MAP2或MAP3。
+;Ge: [[#业务GPRS支撑节点（SGSN）|SGSN]]与[[业务控制点|SCP]]（业务控制点，英文：Service Control Point）之间的接口，使用CAP协议。
+;Gf: [[#业务GPRS支撑节点（SGSN）|SGSN]]与EIR（设备标识寄存器，英文：Equipment Identity Register）之间的接口，用于检查移动电话的设备标识符（IMEI）是否存在被盗电话列表中。
+;Gi:基于[[网际协议|IP]]的、GGSN和公共数据网络（Public Data Network，简称PDN）之间的接口，要么直接连到因特网，要么通过一个[[WAP网关|WAP网关]]。
+;Gmb: [[#网关GPRS支撑节点（GGSN）|GGSN]]与广播-多播业务中心（Broadcast-Multicast Service Center，简称：BM-SC）的接口，用于控制MBMS集合信道（bearers）。
+;Gn:基于[[网际协议|IP]]的、SGSN与其它[[#业务GPRS支撑节点（SGSN）|SGSN]]及（内部）GGSN之间的接口。[[域名系统|DNS]]也共享这个接口。使用[[GPRS隧道协议|GTP]]协议。
+;Gp:基于[[网际协议|IP]]的、内部[[#业务GPRS支撑节点（SGSN）|SGSN]]与外部[[#网关GPRS支撑节点（GGSN）|GGSN]]之间的接口。在[[#业务GPRS支撑节点（SGSN）|SGSN]]与外部[[#网关GPRS支撑节点（GGSN）|GGSN]]之间，存在一个边界网关（border gateway，实际上是一个[[防火墙|防火墙]]）。也使用[[GPRS隧道协议|GTP]]协议。
+;Gr: [[#业务GPRS支撑节点（SGSN）|SGSN]]与HLR之间的接口。通过这个接口的消息使用MAP3协议。
+;Gs: [[#业务GPRS支撑节点（SGSN）|SGSN]]和[[网络交换子系统#移动交换中心|MSC]]（[[网络交换子系统#拜访位置寄存器|VLR]]）之间的接口。使用BSSAP+协议。当它进行数据传输时，这个接口允许寻呼（paging）和移动台可用性（station availability）。当一个移动台被附着到GPRS网络时，SGSN追踪该移动台台被附着到哪个路由区域（routing area，简称RA）。一个RA是一个更大的LA（位置区域，英文：location area）中的一部分。当一个移动台被寻呼（paged）时，这个信息被用于节省网络资源。当该移动台履行一个PDP上下文时，SGSN知道该移动台正在使用的准确BTS。
+;Gx: [[#网关GPRS支撑节点（GGSN）|GGSN]]和计费规则功能（Charging Rules Function，简称：CRF）之间的在线策略接口。它被用于提供基于计费规则的业务数据流。使用Diameter协议。
+;Gy: [[#网关GPRS支撑节点（GGSN）|GGSN]]与[[在线计费系统|在线计费系统]]（Online Charging System，简称：OCS）之间的计费接口。使用Diameter协议及其上承载的DCCA（Diameter信用控制应用，英文：Diameter Credit-Control Application）应用。
+;Gz: [[#GPRS支撑节点(GSN)|GSN]]和CG之间的离线（基于[[呼叫详细记录|CDR]]的）计费接口。使用GTP'。
+;Lg: [[#业务GPRS支撑节点（SGSN）|SGSN]]与[[网关移动电话位置中心|网关移动电话位置中心]]（Gateway Mobile Location Center，简称GMLC）之间的接口，用于基于位置的业务。
+;S6d: [[#业务GPRS支撑节点（SGSN）|SGSN]]与[[IP多媒体子系统#归属用户服务器（HSS_-_Home_Subscriber_Server）|归属签约用户服务器]]（Home Subscriber Server，简称HSS）之间的接口。这是一个基于Diameter的接口，用于向HSS传输用户签约和鉴权数据，以对用户的接入行为进行鉴权和授权。
+
+==参见==
+* [[基站子系统|基站子系统]]
+** [[基站子系统#数据包控制单元|数据包控制单元]]
+* [[网络交换子系统|网络交换子系统]]
+
+==参考文档==
+{{Reflist}}
+
+==外部链接==
+
+* [http://www.3gpp.org 3GPP包含标准的3GPP网页]*{{Wayback|url=http://www.3gpp.org/ |date=20040514205450 }}
+* [https://web.archive.org/web/20050207090121/http://www.gsmworld.com/technology/gprs/intro.shtml GSM世界对GPRS的介绍]
+* [http://www.eventhelix.com/RealtimeMantra/Telecom/gprs_attach_pdp_sequence_diagram.pdf GPRS附着（attache）和PDP上下文激活时序图]{{Wayback|url=http://www.eventhelix.com/RealtimeMantra/Telecom/gprs_attach_pdp_sequence_diagram.pdf |date=20100101083737 }}
+
+{{移动通信标准}}
+
+{{DEFAULTSORT:Gprs Core Network}}
+[[Category:3GPP标准|Category:3GPP标准]]
+[[Category:电信基础设施|Category:电信基础设施]]
+[[Category:移动通信标准|Category:移动通信标准]]

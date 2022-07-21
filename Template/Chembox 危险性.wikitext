@@ -1,0 +1,1 @@
+#REDIRECT [[Template:Chembox Hazards]][[Category:重定向化学信息框]]

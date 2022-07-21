@@ -1,0 +1,33 @@
+{{noteTA
+|G1=IT
+}}
+'''6in4'''是一种[[IPv6|IPv6]]转换传送机制，是将IPv6的数据包直接封装在[[IPv4|IPv4]]数据包中，通过IPv4链路一条明确配置的[[隧道协议|隧道]]中进行传送，相应定义在{{RFC|4213}}中（废除自{{RFC|2893}}和{{RFC|1933}}）。这种IPv4数据包的IP协议号为41，这个协议号专门定义为“IPv6封装（IPv6 encapsulation）”，<ref>{{cite web |url=http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xml |title=Protocol Numbers |accessdate=2018-05-29 |archive-date=2010-05-29 |archive-url=https://web.archive.org/web/20100529122930/http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xml |dead-url=no }}</ref>，在6in4中，其IPv6的数据包比特串直接跟接着IPv4的数据包头，这意味着IPv6数据包的负载量需要腾出至少20字节用于IPv4数据包头作为封装开销。6in4隧道又被称为“proto-41 static”，因为隧道端点是需要手动配置的，虽然如此，但也可以使用{{tsl|en|AICCU|AICCU}}通过隧道信息与控制协议服务器通信获得配置信息来自动配置。
+
+虽然名字相似、封装方法相同，[[6to4|6to4]]是将终端的IPv4地址嵌入到其IPv6地址，代替使用手工配置隧道终端信息，从而实现自动传输，而[[6over4|6over4]]则将IPv4基础网络视为[[数据链路层|数据链路层]]，通过特定的多播地址在IPv4网络进行多播来传输。[[ISATAP|ISATAP]]也同样使用相同的协议号和封装方法来封装数据包。
+
+==网络地址转换==
+當 6in4 穿隧中的一端是在網路地址轉換之後，在某些情況下使用者能使用[[DMZ|DMZ]]。這些網路地址轉換路由路會傳遞所有進入的协议号为41的IPv4包转发到指定DMZ主机上，並使得隧道得以運作。
+
+有些網路地址轉換裝置甚至允許 6in4 的轉換運算。
+
+==心跳和动态组隧道==
+尽管6in4隧道本质上是静态的，但在心跳协议的帮助下，仍然实现动态的隧道端点。<ref name=heartbeat>[http://www.sixxs.net/tools/heartbeat/ Heartbeat Protocol] {{Wayback|url=http://www.sixxs.net/tools/heartbeat/ |date=20090225073512 }}, J. Massar and P. van Pelt</ref>心跳协议以当前的端点位置向隧道另一侧发出信号。然后，AICCU等工具可以更新端点，使端点实际上保持动态，同时仍然使用6in4协议。 这种隧道通常被称为“proto-41 heartbeat”隧道。
+
+==安全问题==
+6in4协议不提供安全特性，所以可以通过伪造IPv4源地址的数据包来侵入到6in4隧道中的IPv6通信中。可以通过在靠近真实源地址处部署网络入口过滤或者使用[[IPsec|IPsec]]来解决。
+
+==参见==
+*[[隧道中间人|隧道中间人]]
+
+==参考文献==
+{{reflist}}
+
+==外部链接==
+*[http://www.sixxs.net/faq/connectivity/?faq=ossetup （英）How do I configure my machine to setup an IPv6 in IPv4 tunnel]{{Wayback|url=http://www.sixxs.net/faq/connectivity/?faq=ossetup |date=20090329044650 }}
+*[http://wiki.debian.org/DebianIPv6 （英）Debian 上 6in4 和其它穿隧的設定]{{Wayback|url=http://wiki.debian.org/DebianIPv6 |date=20090120230756 }}
+*[https://web.archive.org/web/20160304003845/http://www.cs.bell-labs.com/magic/man2html/8/6in4 （英）在 Plan9 上 6in4 設定]
+
+{{IPv6}}
+[[Category:穿隧協議|Category:穿隧協議]]
+[[Category:IPv6|Category:IPv6]]
+[[Category:網路協議|Category:網路協議]]

@@ -1,0 +1,43 @@
+{{Multiple issues|
+{{Copy edit|time=2022-03-05T11:23:39+00:00}}
+{{Refimprove|time=2022-03-05T11:23:39+00:00}}
+}}
+在[[形式语言|形式语言]]理论中，'''Myhill–Nerode 定理'''提供了一个语言是[[正则语言|正则语言]]的[[必要和充分条件|必要和充分条件]]。它近乎专门的被用来证明一个给定语言不是正则的。
+
+这个定理得名于 [[John_Myhill|John Myhill]] 和 [[Anil_Nerode|Anil Nerode]]，他们于1958年在[[芝加哥大学|芝加哥大学]]证明了这个定理<ref>A. Nerode, "Linear automaton transformations", ''Proceedings of the AMS'', '''9''' (1958) pp 541-544.</ref>。
+
+== 定理陈述 ==
+
+给定一个字母集 (alphabet) <math>\Sigma</math> 以及其生成的语言 (language) <math>L\subseteq\Sigma^*</math>，我們先來定義兩個字串 <math>x, y\in\Sigma^*</math> 之間彼此的關係：如果'''對於所有'''的後接字串 <math>z\in \Sigma^*</math> (注意！<math>z</math> 可以是空字串) 都會讓 <math>xz</math> 和 <math>yz</math> 同時屬於或不屬於 <math>L</math>，那麼我們說 <math>x</math> 和 <math>y</math> 不可區分 (indistinguishable)；相反地如果'''存在某個'''後接字串 <math>z\in \Sigma^*</math> 讓 <math>xz</math> 和 <math>yz</math> 其中一個屬於而另外一個不屬於 <math>L</math>，則我們說 <math>x</math> 和 <math>y</math> 是可區分的 (distinguishable)。如果 <math>x</math> 和 <math>y</math> 不可區分，我們說它們滿足關係 (relation) <math>R_L</math>，數學式子寫成 <math>x\ R_L\ y</math>。我們也很容易证明這種關係是種[[等价关系|等价关系]] (equivalence relation)，因此它可以把 <math>\Sigma^*</math> 划分成一个或多个[[等价类|等价类]] (equivalence class)。
+
+Myhill–Nerode 定理声称一套語言 <math>L</math> 是正規的「若且唯若」<math>\Sigma^*</math> 被 <math>R_L</math> 所切分出的等价类数目是有限的，此外這個等價類數量又恰好是可辨識 <math>L</math> 的最小 DFA 的狀態數量。在詳細的證明中「一個等價類會恰好對應到最小 DFA 裡的一個狀態」，如果先給定一个自动机，则任意兩個能驱使它走到同一個状态的字串 <math>x</math> 和 <math>y</math> 必在同一个等价类中；如果先給定一個等价类划分，那可以轻易地构造出一个自动机使其状态恰好對應到等价类。
+
+== 定理證明 ==
+
+*; 方向一：如果 <math>\Sigma^*</math> 被 <math>R_L</math> 所切分出的等价类数目是無限多的，那麼語言 <math>L</math> 無法正規
+這個方向比較簡單，我們只要證明一個引理 (lemma)：可辨識 <math>L</math> 的 DFA 狀態數量必須不小於等價類數目即可，而這可以使用反證法 (鴿籠原理) 說明。如果 DFA 狀態數量少於等價類數量，那代表必定有兩個不屬於同一個等價類的字串 <math>x</math> 和 <math>y</math> 會引導 DFA 到同一個狀態，如果它們又繼續有後接字串 <math>z</math>，就會讓 <math>xz</math> 和 <math>yz</math> 也走到同一個狀態，如此一來根據定義，<math>x</math> 和 <math>y</math> 應該要屬於同一個等價類，造成矛盾，因此 DFA 狀態數量必須不小於等價類數目。由這個結論可以推得，當等价类数目無限多時，這個 DFA 的狀態數量也必須是無限多，和「有限」狀態機的定義矛盾，換句話說我們找不到一台 DFA 可辨識 <math>L</math>，因此 <math>L</math> 不正規。
+
+*; 方向二：如果 <math>\Sigma^*</math> 被 <math>R_L</math> 所切分出的等价类数目是有限的，那麼必存在一台同等數量狀態的 DFA 可辨識 <math>L</math> 使其正規
+我們先構造出一台 DFA，先假設它的每一個狀態都剛好代表一個等價類 (也就是一個狀態承裝一個等價類裡的所有字串，從起點開始輸入該字串務必到達該狀態)，而轉移函數的決定方式就是從一個狀態隨意抓取一個代表字串，看看它吃了一個字母之後的字串會落在哪個狀態裡面，就讓它走去那裏。這個走向會唯一，理由很簡單可以自己想。對於每個狀態和每個轉移字母都窮舉一遍，最後再觀察哪些狀態包含了被接受的字串，直接讓它們變成終點態 (final state)。一個等價類裡如果有一個字串被接受，那同一個類裡的所有其他字串也會通通被接受，因為根據定義，後接字串可以是空字串。到目前為止，我們有了一定數量的狀態 (圓圈圈)、所有的轉移函數、一個唯一的起點 (看空字串在哪裡即可)、所有的終點，是一台合法的 DFA。現在的問題是，要怎麼證明這台 DFA 能確實辨識 <math>L</math>，也就是說對於任意字串輸入都能驅使 DFA 走到我們當初賦予每個狀態必須各自代表一個等價類的任務？
+
+這必須對'''字串輸入的長度'''作數學歸納法才能證明。如果字串輸入長度為 0，也就是空字串，那它必須留在起點，而我們起點的取法就剛好是看空字串的位置，所以輸入為空字串時的狀態落點正確；如果對於所有長度不超過 <math>\ell</math> 的字串輸入，它們的狀態落點皆正確，那麼對於任何長度為 <math>\ell + 1</math> 的字串輸入 <math>w</math>，皆可分解為 <math>w = ua</math>，其中 <math>u</math> 的長度為 <math>\ell</math> 而 <math>a</math> 的長度為 <math>1</math> (字元)，走完 <math>u</math> 之後的落點根據假設是正確的，剩下的一個字元 <math>a</math> 根據我們上述決定轉移函數的方式，自然也會繼續走向我們當初所期望的落點；如此依序遞迴下去，就能說明對於任意字串輸入，這台 DFA 確實能妥善的把 <math>\Sigma^*</math> 裡的每個字串分到正確的類別，並決定接受與否。於是乎我們根據這個 <math>R_L</math> 創造了一台能辨識 <math>L</math> 的 DFA，而且這台 DFA 的狀態數量剛好就是 <math>\Sigma^*</math> 被 <math>R_L</math> 所切分出的等价类數量。<ref>Edmund M. Clarke, ''[http://www.cs.cmu.edu/~emc/flac09/nerode.pdf Myhill-Nerode Handout] {{Wayback|url=http://www.cs.cmu.edu/~emc/flac09/nerode.pdf |date=20180713063826 }}'' (2009)</ref>
+
+== 用途和结论 ==
+
+Myhill–Nerode 定理的一个结论是语言 ''L'' 是正则的(就是说可被[[有限状态机|有限状态机]]接受)，[[当且仅当|当且仅当]] ''R<sub>L</sub>'' 的等价类的数目是有限的。
+
+直接[[推论|推论]]是如果一个语言定义等价类的无限集合，它就不是正则的。这个推论经常被用来证明一个语言不是正则的。
+
+例如，由可以被 3 整除的二进制数组成的语言是正则的。有三个等价类 3 - 被 3 除的时候余数是 0, 1 和 2 的数。接受这个语言的极小自动机有对应于等价类的三个状态。
+
+再給一例，我們想說明 <math>A = \{0^n1^n:n\ge0\}</math> 不是正規的。原因是，給定任意兩個不同長度的 <math>0</math> 字串，我們都能接上一個後接字串將這兩個字串分辨開來，舉例來說，給定 <math>000</math> 和 <math>00000</math>，我們就能接上 <math>111</math> 讓 <math>000111</math> 合法而 <math>00000111</math> 不合法。所以有無限多個字串 <math>0</math>、<math>00</math>、<math>000</math>、<math>0000</math>、... 等彼此之間都是不可分辨的，這意味著需要無限多個狀態的自動機才能辨識這個語言，和正規語言定義矛盾，因此 <math>A</math> 不是正規語言。
+
+== 引用 ==
+===註釋===
+{{reflist}}
+===一般參考===
+* John E. Hopcroft and Jeffrey D. Ullman, ''Introduction to Automata Theory, Languages and Computation'', Addison-Wesley Publishing, Reading Massachusetts, 1979. ISBN 0-201-02988-X. ''(See chapter 3.)''
+*Tom Henzinger, ''[https://web.archive.org/web/20050506184111/http://www-cad.eecs.berkeley.edu/~tah/172/7.pdf Lecture 7: Myhill–Nerode Theorem]'' (2003)
+
+[[Category:形式语言|Category:形式语言]]
+[[Category:数学定理|M]]

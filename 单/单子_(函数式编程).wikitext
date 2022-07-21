@@ -1,0 +1,314 @@
+{{NoteTA|G1=IT}}
+在[[函数式编程|函数式编程]]中，'''单子'''（monad）是一种抽象，它允许以[[泛型编程|泛型]]方式构造程序。支持它的语言可以使用单子来抽象出程序逻辑需要的{{en-link|样板代码|boilerplate code}}。为了达成这个目标，单子提供它们自己的[[数据类型|数据类型]]（每种类型的单子都有特定的类型），它表示一种特殊形式[[计算|计算]]，与之在一起的有两个[[子程序|过程]]，一个过程用来包装单子内“任何”基本类型的值（产生'''单子值'''），另一个过程用来{{en-link|函数复合 (计算机科学)|function composition (computer science)|复合}}那些输出单子值的函数（叫做'''单子函数'''）<ref name="RealWorldHaskell">{{cite book | last1 = O'Sullivan | first1 = Bryan | last2 = Goerzen | first2 = John | last3 = Stewart | first3 = Don | title = Real World Haskell | publisher = O'Reilly Media | location = Sebastopol, California | year = 2009 | isbn = 978-0596514983 | chapter = Monads | at = chapter 14 | chapter-url = http://book.realworldhaskell.org/read/monads.html | url = http://book.realworldhaskell.org/ | access-date = 2021-02-04 | archive-date = 2021-01-14 | archive-url = https://web.archive.org/web/20210114161425/http://book.realworldhaskell.org/ | dead-url = no }}</ref>。
+
+单子的概念和术语二者最初都来自[[范畴论|范畴论]]，这里的[[单子_(范畴论)|单子]]被定义为具有额外结构的[[函子|函子]]{{efn|由于编程中常见在多个[[自由变量|自由变量]]上的函数的事实，本文中描述的单子在技术上是范畴论学者所称谓的{{en-link|强单子|strong monad}}<ref name="Moggi1991" />}}。开始于1980年代晚期和1990年代早期的研究，确立了单子可以将看似完全不同的计算机科学问题置于一个统一的函数式模型之下。范畴论还提供了叫做'''单子定律'''的一些形式要求，任何单子都应当满足它并可以用它来[[形式验证|验证]]单子代码<ref name="Moggi1991">{{cite journal | author-link = Eugenio Moggi | last = Moggi | first = Eugenio | year = 1991 | title = Notions of computation and monads | journal = Information and Computation | volume = 93 | issue = 1 | pages = 55–92 | url = http://www.disi.unige.it/person/MoggiE/ftp/ic91.pdf | doi = 10.1016/0890-5401(91)90052-4 | access-date = 2021-02-04 | archive-date = 2011-03-22 | archive-url = https://web.archive.org/web/20110322151227/http://www.disi.unige.it/person/MoggiE/ftp/ic91.pdf | dead-url = no }}</ref><ref name="Wadler1992">{{cite conference | author-link = Philip Wadler | last = Wadler | first = Philip | title = The essence of functional programming | conference = 19th Annual ACM Symposium on Principles of Programming Languages | location = Albuquerque, New Mexico | date = January 1992 }}</ref>。
+
+通过单子，编程者可以把复杂的函数序列变成简洁的[[管道_(软件)|管道]]，它抽象出了辅助数据管理、[[控制流|控制流]]或[[副作用_(计算机科学)|副作用]]<ref name="RealWorldHaskell" /><ref name="Wadler1990">{{cite conference | author-link = Philip Wadler | last = Wadler | first = Philip | title = Comprehending Monads | conference = ACM Conference on LISP and Functional Programming | location = Nice, France | date = June 1990}}</ref>。单子可以简化范围宽广的问题，比如处理潜在{{en-link|未定义值|undefined value}}（通过<code>Maybe</code>单子），或将值保持在一个灵活而形式正确的[[列表_(抽象数据类型)|列表]]中（使用<code>List</code>单子）。因为单子使得某种计算的[[形式语义学|语义]]明确，它们还可以用来实现便捷的语言特征。一些语言比如[[Haskell|Haskell]]，甚至在它们的核心[[函式库|库]]中为通用单子结构提供预制的定义和常用实例<ref name="RealWorldHaskell" /><ref name="GentleIntroHaskell">{{cite book | author-link1 = Paul Hudak | last1 = Hudak | first1 = Paul | last2 = Peterson | first2 = John | last3 = Fasel | first3 = Joseph | title = A Gentle Introduction to Haskell 98 | year = 1999 | chapter = About Monads | at = chapter 9 | chapter-url = https://www.haskell.org/tutorial/monads.html | url = https://www.haskell.org/tutorial/index.html | access-date = 2021-02-04 | archive-date = 2021-01-26 | archive-url = https://web.archive.org/web/20210126120930/https://www.haskell.org/tutorial/index.html | dead-url = no }}</ref>。
+
+== 概述 ==
+单子可以通过定义一个[[类型构造子|类型构造子]]<code>m</code>和两个运算即<code>return</code>和bind来建立。C. A. McCann解释说：“对于单子<code>m</code>，类型<code>m a</code>的值表示对在这个单子上下文内的类型<code>a</code>的访问。”<ref name=so3322540 >{{Cite web |url=https://stackoverflow.com/questions/3322540/how-and-why-does-the-haskell-cont-monad-work |title=C. A. McCann's answer (Jul 23 '10 at 23:39) How and why does the Haskell Cont monad work? |access-date=2021-02-04 |archive-date=2020-11-26 |archive-url=https://web.archive.org/web/20201126123848/https://stackoverflow.com/questions/3322540/how-and-why-does-the-haskell-cont-monad-work |dead-url=no }}</ref>
+
+<code>return</code>（也叫做<code>unit</code>），接受一个类型<code>a</code>的值，把它们包装成使用这个类型构造子建造的类型<code>m a</code>的“单子值”。bind（典型的表示为<code>>>=</code>），接受一个在类型<code>a</code>上的函数<code>f</code>，并应用<code>f</code>于去包装的值<code>a</code>，转变单体值<code>m a</code>。在后面的[[#导出自函子|导出自函子]]章节有可作为替代的等价构造，使用<code>join</code>函数替代了<code>bind</code>算子。
+
+通过这些元素，编程者可以复合出一个函数调用的序列（[[管道_(软件)|管道]]），在一个表达式中通过一些bind算子把它们链接起来。每个函数调用转变它的输入普通类型值，而bind算子处理返回的单子值，它被填入到序列中下一个步骤。
+
+在每对复合的函数调用之间，bind算子<code>>>=</code>可以向单子值<code>m a</code>注入在函数<code>f</code>内不可访问的额外信息，并沿着管道传递下去。它还可进行细致的执行流控制，比如只在特定条件下调用函数，或以特定次序执行函数调用。
+
+=== 例子：Maybe单子 ===
+<span id="Maybe monad"></span>下面的快捷[[伪代码|伪代码]]例子展示编程者使用单子的动机。未定义值或运算是健壮的软件应当准备和优雅处理的一个特殊问题。
+
+完成这个目标的第一步是建立一个[[可选类型|可选类型]]，它标记一个值要么承载某个类型<code>T</code>（<code>T</code>可以是任何类型）的值要么没有承载值。新的类型将叫做<code>Maybe T</code>，而这个类型的值可以包含要么类型<code>T</code>的值，要么空值<code>Nothing</code>。类型<code>T</code>的值<code>x</code>，若定义并用于<code>Maybe</code>上下文则叫做<code>Just x</code>。这么做是通过区分一个变量承载有定义的值的情况和未定义的情况来避免混淆。
+
+<syntaxhighlight lang="haskell">
+data Maybe T = Just T | Nothing
+</syntaxhighlight>
+
+<code>Maybe T</code>可以被理解为一种“包装”类型，把类型<code>T</code>包装成具有内建异常处理的一种新类型，尽管不承载关于异常成因的信息。
+
+在下列的[[伪代码|伪代码]]中，前缀着<code>m</code>的变量有针对某种类型<code>T</code>的类型<code>Maybe T</code>。例如，如果变量<code>mx</code>包含一个值，它是<code>Just x</code>，这里的变量<code>x</code>有类型<code>T</code>。<code>λx -> ...</code>是[[匿名函数|匿名函数]]，它的形式参数<code>x</code>的类型是[[类型推论|推论]]而来，而<code>∘</code>是[[复合函数|函数复合]]算子。
+
+另一个改进是，函数通过<code>Maybe</code>类型能管理简单的检查异常，一旦某个步骤失败就[[短路求值|短路]]并返回<code>Nothing</code>，如果计算成功则返回正确的值而无需再评论。
+
+加法函数<code>add</code>，在做二个<code>Maybe</code>值<code>mx</code>和<code>my</code>的加法时就实现了上述改进，它可以如下这样定义：
+
+<syntaxhighlight lang="haskell">
+ add :: Maybe Number -> Maybe Number -> Maybe Number
+ add mx my  = ...
+     if mx is Nothing then
+         ... Nothing
+     else if my is Nothing then
+         ... Nothing
+     else
+         ... Just (x + y)
+</syntaxhighlight>
+
+书写函数来逐一处理<code>Maybe</code>值的各种情况可能相当枯燥，并且随着定义更多函数而变得更甚。将多个步骤链接起来的运算是减轻这种状况的一种方式，通过使用[[中缀表示法|中缀算子]]如<code>x >>= y</code>，甚至可以直观的表示将每个步骤得出的（可能未定义的）结果填入下一步骤之中。因为每个结果在技术上被插入到另一个函数之中，这个算子转而接受一个函数作为一个形式参数。由于<code>add</code>已经指定了它的输出类型，保持这个算子的灵活性而接受输出与其输入不同类型的函数应当没有什么伤害：
+
+<syntaxhighlight lang="haskell">
+ >>= :: Maybe T -> (T -> Maybe U) -> Maybe U
+ (mx >>= f) = ...
+     if mx is (Just x) then
+         ... f(x)    -- f返回类型Maybe U的定义值
+     else
+         ... Nothing -- f不返回值
+</syntaxhighlight>
+
+具有<code>>>=</code>可用，<code>add</code>可以被精制为更紧凑的表述：
+
+<syntaxhighlight lang="haskell">
+ add mx my  =  mx >>= λx -> (my >>= λy -> Just (x + y))
+</syntaxhighlight>
+
+这更加简洁，而一点额外的分析就能揭示出它的强大之处。首先，<code>Just</code>在<code>add</code>中扮演的唯一角色就是标记（tag）一个低层值为也是<code>Maybe</code>值。为了强调<code>Just</code>通过包装低层值而在其上施加作用，它也可以被精制为函数，比如叫做<code>eta</code>：
+
+<syntaxhighlight lang="haskell">
+ eta :: T -> Maybe T
+ eta x  =  Just x
+</syntaxhighlight>
+
+整体情况是这两个函数<code>>>=</code>和<code>eta</code>被设计用来简化<code>add</code>，但是他们明显的不以任何方式依赖于<code>add</code>的细节，只是有关于<code>Maybe</code>类型。这些函数事实上可以应用于<code>Maybe</code>类型的任何值和函数，不管底层的值的类型。例如，下面是来自[[斯蒂芬·科尔·克莱尼|Kleene]][[三值逻辑|三值逻辑]]的一个简洁的[[逻辑非|NOT]]算子，也使用了相同的函数来自动化未定义值：
+
+<syntaxhighlight lang="haskell">
+trinot :: Maybe Boolean -> Maybe Boolean
+trinot mp  =  mp >>= λp -> (eta ∘ not) p
+</syntaxhighlight>
+
+可以看出来<code>Maybe</code>类型，和与之一起的<code>>>=</code>和<code>eta</code>，形成了单子。尽管其他单子会具体化不同的逻辑过程，而且一些单子可能有额外的属性，它们都有三个类似的构件（直接或间接的）服从这个例子的纲要<ref name="RealWorldHaskell" /><ref name="Spivey1990">{{cite journal | last1 = Spivey | first1 = Mike | year = 1990 | title = A functional theory of exceptions | journal = Science of Computer Programming | volume = 14 | issue = 1 | pages = 25–42 | url = https://www.cs.tufts.edu/comp/150FP/archive/mike-spivey/functional-exns.pdf | doi = 10.1016/0167-6423(90)90056-J | access-date = 2021-02-04 | archive-date = 2020-08-21 | archive-url = https://web.archive.org/web/20200821035249/https://www.cs.tufts.edu/comp/150FP/archive/mike-spivey/functional-exns.pdf | dead-url = no }}</ref>。
+:
+
+== 定义 ==
+对函数式编程中的单子的更常用的定义，比如上例中用到的，实际上基于了{{en-link|Kleisli范畴|Kleisli category|Kleisli三元组}}而非范畴论的标准定义。两个构造可以证明在数学上是等价的，任何定义都能产生有效的单子。给定任何良好定义的基本类型<code>T</code>、<code>U</code>，单子构成自三个部份：
+* [[类型构造子|类型构造子]] <code>M</code>，建造一个单子类型<code>M T</code>{{efn|Semantically, {{mvar|M}} is not trivial and represents an [[endofunctor|endofunctor]] over the [[category_(mathematics)|category]] of all well-typed values: <math>M: \mathit{Val} \to \mathit{Val}</math>}}
+* [[类型转换|类型转换子]]，经常叫做'''unit'''或'''return'''，将一个对象<code>x</code>嵌入到单子中：{{block indent|1=<code>unit(x) :: T -> M T</code>{{efn|While a (parametrically polymorphic) function in programming terms, {{mvar|unit}} (often called {{mvar|η}} in category theory) is mathematically a [[natural_transformation|natural transformation]], which maps between ''functors'': <math>\eta_{A} : \mathrm{id}(\mathit{Val}_{A}) \to M(\mathit{Val}_{A})</math>}}}}
+* {{anchor|Bind}}[[组合子|组合子]]，典型的叫做'''bind'''（[[约束变量|约束变量]]的那个bind），并表示为[[中缀表示法|中缀算子]]<code>>>=</code>，去包装一个单体变量，接着把它插入到一个单体函数/表达式之中，结果为一个新的单体值：{{block indent|1=<code>(mx >>= f) :: (M T, T -> M U) -> M U</code>{{efn|{{mvar|bind}}, on the other hand, is not a natural transformation in category theory, but rather an extension <math>-^{*}</math> that [[lift_(mathematics)|lift]]s a mapping (from values to computations) into a morphism between computations: <math>\forall f : \mathit{Val}_{A} \to M(\mathit{Val}_{B}),   f^{*}: M(\mathit{Val}_{A}) \to M(\mathit{Val}_{B})</math>}}}}
+
+{{anchor|Monad laws}}
+但要完全具备单子资格，这三部份还必须遵守一些定律：
+* <code>unit</code>是bind的[[单位元|左单位元]]：{{block indent|1=<code>unit(a) >>= λx -> f(x) '''↔''' f(a)</code>}}
+* <code>unit</code>也是bind的右单位元:{{block indent|1=<code>ma >>= λx -> unit(x) '''↔''' ma</code>}}
+* bind本质上符合[[结合律|结合律]]：{{efn|Strictly speaking, {{mvar|bind}} may not be formally associative in all contexts because it corresponds to application within [[lambda_calculus|lambda calculus]], not mathematics. In rigorous lambda-calculus, evaluating a {{mvar|bind}} may require first wrapping the right term (when binding two monadic values) or the bind itself (between two monadic functions) in an [[anonymous_function|anonymous function]] to still accept input from the left.<ref name="MonadLaws">{{cite web | title=Monad laws | url=http://www.haskell.org/haskellwiki/Monad_laws | work=HaskellWiki | publisher=haskell.org | access-date=14 October 2018 | archive-date=2015-01-03 | archive-url=https://web.archive.org/web/20150103102638/https://www.haskell.org/haskellwiki/Monad_laws | dead-url=no }}</ref>}}{{block indent|1=<code>ma >>= λx -> (f(x) >>= λy -> g(y)) '''↔''' (ma >>= λx -> f(x)) >>= λy -> g(y)</code><ref name="RealWorldHaskell" />}}
+
+在代数上，这意味任何单子都引起一个范畴（叫做{{en-link|Kleisli范畴|Kleisli category}}）和在函子（从值到计算）的范畴上的[[幺半群|幺半群]]，具有单子复合作为二元算子和<code>unit</code>作为单位元。
+
+== 用途 ==
+单子模式的价值超出了只是压缩代码和提供到数序推理的联系。不管开发者采用的语言或缺省[[编程范型|编程范型]]是什么，遵从单子模式都会带来[[纯函数式编程|纯函数式编程]]的很多利益。通过[[实化|实化]]特定种类的计算，单子不仅[[封装_(计算机科学)|封装]]了这个计算模式的冗长细节，而且它以[[声明式编程|声明式]]方式来这么做，增进了代码清晰性。因为单子值所显式代表的不只是计算出的值，而是计算出的作用（effect），单子表达式在{{en-link|参照透明性|Referential transparency|参照透明位置}}上可以被替代为它们的值，非常像纯表达式能做到的那样，允许了基于[[重写逻辑|重写]]的很多技术和优化<ref name="Wadler1992" />。
+
+典型的，编程者会使用<code>bind</code>来把单子函数链接成一个序列，这导致了一些人把单子描述为“可编程的分号”，参照众多[[指令式编程|指令式]]语言使用分号来分割[[语句_(程式设计)|语句]]<ref name="RealWorldHaskell" /><ref name="GentleIntroHaskell" />。但是，需要强调单子实际上不确定计算的次序；甚至在使用它们作为中心特征的语言中，更简单的函数复合可以安排程序内的步骤。单子的一般效用准确的说在于简化程序的结构并通过抽象来增进[[关注点分离|关注点分离]]<ref name="Wadler1992" /><ref name="MonadsAreNot">{{cite web | title = What a Monad is not | url = https://wiki.haskell.org/What_a_Monad_is_not | date = 7 October 2018 | access-date = 2021-02-04 | archive-date = 2021-02-09 | archive-url = https://web.archive.org/web/20210209040400/https://wiki.haskell.org/What_a_Monad_is_not | dead-url = no }}</ref>。
+
+单子结构还可以被看作[[修饰模式|修饰模式]]的独特的数学和[[编译期|编译时间]]变种。一些单子可以传载对函数是不可访问的额外数据，而且一些单子甚至具有在执行上的更细致控制，例如只在特定条件下调用一个函数。因为它们让应用程序员实现[[业务逻辑|领域逻辑]]，而卸载样板代码至预先开发的模块，单子甚至可以当作[[面向切面编程|面向切面编程]]的工具<ref name="deMeuter1997">{{cite conference | last = De Meuter | first = Wolfgang | title = Monads as a theoretical foundation for AOP | conference = International Workshop on Aspect Oriented Programming at ECOOP | date = 1997 | location = Jyväskylä, Finland | url = http://soft.vub.ac.be/Publications/1997/vub-prog-tr-97-10.pdf | access-date = 2021-02-04 | archive-date = 2012-04-15 | archive-url = https://web.archive.org/web/20120415110540/http://soft.vub.ac.be/Publications/1997/vub-prog-tr-97-10.pdf | dead-url = no }}</ref>。
+
+单子的另一个值得注意的用途，是在其他方面都纯函数式的代码中，隔离副作用，比如[[I/O|输入/输出]]或可变的{{en-link|状态 (计算机科学)|state (computer science)|状态}}。即使纯函数式语言仍可以不使用单子来实现这些“不纯”计算，特别是通过对函数复合和{{en-link|传递续体风格|continuation-passing style}}（CPS）的错综复杂混合<ref name="Wadler1990" />。但是使用单子，多数这些脚手架可以被抽象出去，本质上通过提取出在CPS代码中每个反复出现的模式并集束到一个独特的单子之中<ref name="Wadler1992" />。
+
+如果一个语言缺省的不支持单子，仍有可能实现这个模式，经常没有多少困难。在从范畴论转换成编程术语的时候，单子结构是{{en-link|概念 (泛型编程)|concept (generic programming)|泛型概念}}并可以在支持[[参数多态#限定的参数多态|限定的多态]]的等价特征的任何语言中直接定义。一个概念在操作底层数据类型时保持对操作细节不可知的能力是强大的，然而单子的独特特征和严格行为将它们同其他概念区别开来<ref name="MonadSansMetaphors">{{cite web | url = https://wiki.haskell.org/Monad_(sans_metaphors) | title = Monad (sans metaphors) | website = HaskellWiki | date = 1 November 2009 | access-date = 24 October 2018 | archive-date = 2020-08-21 | archive-url = https://web.archive.org/web/20200821111953/https://wiki.haskell.org/Monad_%28sans_metaphors%29 | dead-url = no }}</ref>。
+
+==历史==
+在编程中术语“单子”（monad）实际上最早可追溯至[[APL语言|APL]]和[[J语言|J]]编程语言，它们趋向于是纯函数式的。但是，在这些语言中，“monad”仅是只接受一个形式参数的函数的简称（有二个形式参数的函数叫做“dyad”）<ref name="APL">{{cite journal | author-link = Kenneth E. Iverson | last = Iverson | first = Kenneth | date = September 1987 | title = A dictionary of APL | url = http://www.jsoftware.com/papers/APLDictionary.htm | journal = APL Quote Quad | volume = 18 | issue = 1 | pages = 5–40 | doi = 10.1145/36983.36984 | issn = 1088-6826 | access-date = 19 November 2018 | archive-date = 2020-04-25 | archive-url = https://web.archive.org/web/20200425181643/http://www.jsoftware.com/papers/APLDictionary.htm | dead-url = no }}</ref>。
+
+数学家{{en-link|Roger Godement|}}最初在1950年代晚期公式化单子概念（起绰号为“标准构造”），而术语“monad”成为主导要归功于范畴学家[[桑德斯·麥克蘭恩|桑德斯·麥克蘭恩]]。但是，上述的使用bind定义的形式，最初由数学家{{en-link|Heinrich Kleisli|}}在1965年描述，用来证明任何单子都可以特征化为在两个（协变）函子之间的[[伴隨函子|伴随]]<ref name="Kleisli1965">{{cite journal | author-link = Heinrich Kleisli | last = Kleisli | first = Heinrich | date = 1965 | title = Every standard construction is induced by a pair of adjoint functors | url = http://www.ams.org/journals/proc/1965-016-03/S0002-9939-1965-0177024-4/S0002-9939-1965-0177024-4.pdf | journal = Proceedings of the American Mathematical Society | volume = 16 | issue = 3 | pages = 544–546 | doi = 10.1090/S0002-9939-1965-0177024-4 | access-date = 19 November 2018 | archive-date = 2018-07-26 | archive-url = https://web.archive.org/web/20180726165232/https://www.ams.org/journals/proc/1965-016-03/S0002-9939-1965-0177024-4/S0002-9939-1965-0177024-4.pdf | dead-url = no }}</ref>。
+
+开始于1980年代，单子模式的模糊概念在计算机科学社区中浮出水面。依据编程语言研究者[[Philip_Wadler|Philip Wadler]]，计算机科学家{{en-link|John C. Reynolds|}}于1970年代和1980年代早期，在他讨论{{en-link|传递续体风格|continuation-passing style}}的价值的时候，预见到了它的一些方面，范畴论作为形式语义学的丰富来源，和在值和计算之间的类型区别<ref name="Wadler1992" />。研究性语言{{en-link|Opal|Opal programming language|Opal}}，它活跃设计直到1990年，还有效的将I/O基于在单子类型之上，但是这个联系在当时没有实现<ref name="Opal">{{cite techreport | editor = Peter Pepper | institution = Fachbereich Informatik, Technische Universität Berlin | title = The Programming Language Opal | date = November 1997 | edition = 5th corrected}}</ref>。
+
+计算机科学家{{en-link|Eugenio Moggi|}}最早明确的将范畴论的单子联系于函数式编程，在1989年于讨论会论文之中<ref name="Moggi89">{{cite conference | author-link = Eugenio Moggi | last = Moggi | first = Eugenio | title = Computational lambda-calculus and monads | conference = Fourth Annual Symposium on Logic in computer science | location = Pacific Grove, California | date = June 1989 | url = https://www.disi.unige.it/person/MoggiE/ftp/lics89.pdf | access-date = 2021-02-05 | archive-date = 2018-09-24 | archive-url = https://web.archive.org/web/20180924132835/https://www.disi.unige.it/person/MoggiE/ftp/lics89.pdf | dead-url = no }}</ref>，随后在1991年还有更加精制的期刊提交。在早期的工作中，一些计算机科学家使用范畴论推进为[[lambda演算|lambda演算]]提供语义。Moggi的关键洞察是真实世界程序不只是从值到另外的值的函数，而是形成在这些值之上计算的变换。在用范畴论术语形式化的时候，这导致的结果是单子作为表示这些计算的结构<ref name="Moggi1991" />。
+
+其他一些人以这个想法为基础并进行了推广，包括[[Philip_Wadler|Philip Wadler]]和[[Simon_Peyton_Jones|Simon Peyton Jones]]，二者都参与了[[Haskell|Haskell]]规定。特别是，Haskell直到v1.2一直使用有问题的“惰性流”模型来将I/O调和于[[惰性求值|惰性求值]]，然后切换到了更灵活的单子接口<ref name="PeytonWadler1993">{{cite conference | author-link1 = Simon Peyton Jones | author-link2 = Philip Wadler | last1 = Peyton Jones | first1 = Simon L. | last2 = Wadler | first2 = Philip | title = Imperative functional programming | date = January 1993 | conference = 20th Annual ACM Symposium on Principles of Programming Languages | location = Charleston, South Carolina | url = https://www.microsoft.com/en-us/research/wp-content/uploads/1993/01/imperative.pdf | access-date = 2021-02-04 | archive-date = 2020-11-01 | archive-url = https://web.archive.org/web/20201101045308/https://www.microsoft.com/en-us/research/wp-content/uploads/1993/01/imperative.pdf | dead-url = no }}</ref>。Haskell社区继续将单子应用于函数式编程的很多问题中，使用Haskell工作的研究者最终将单子模式推广成广泛的结构层级，包括[[应用式函子|应用式函子]]和{{en-link|箭头 (计算机科学)|arrow (computer science)|箭头}}。
+
+首先，使用单子的编程很大程度上局限于[[Haskell|Haskell]]及其派生者，但是由于函数式编程已经影响了其他编程范型，很多语言结合了单子模式（不这么称呼的话也在精神上）。其公式化现已存在于[[Scheme|Scheme]]、[[Perl|Perl]]、[[Python|Python]]、[[Racket|Racket]]、[[Clojure|Clojure]]、[[Scala|Scala]]和[[F♯|F#]]之中，并已经被考虑用于新的[[ML语言|ML]]标准。
+
+== 分析 ==
+单子模式的利益之一是将数学上的精确性施加到编程逻辑上。不只是单子定律可以用来检查实例的有效性，而且来自有关结构（比如[[函子_(函数式编程)|函子]]）的特征可以通过[[子类型|子类型]]来使用。
+
+===导出自函子<span id="map"></span><span id="join"></span> ===
+尽管在计算机科学中少见，可以直接使用范畴论，它定义单子为有二个额外[[自然变换|自然变换]]的[[函子|函子]]。作为开始，一个结构要求叫做[[Map_(高阶函数)|map]]的[[高阶函数|高阶函数]]（“泛函”）从而具备函子资格：
+{{block indent|<code>map φ :: (a -> b) -> ma -> mb</code>}}
+但是这不总是一个主要问题，尤其是在单子派生自预先存在的[[函子_(函数式编程)|函子]]的时候，单子马上就自动继承<code>map</code>。 出于历史原因，在Haskell中这个<code>map</code>转而叫做<code>fmap</code>。
+
+单子的第一个变换实际上同于来自Kleisli三元组的<code>unit</code>，但是更密切的服从结构的层级，结果是<code>unit</code>特征化一个[[应用式函子|应用式函子]]，这是在单子和基本[[函子_(函数式编程)|函子]]之间的中间结构。在应用式的上下文中，<code>unit</code>有时被称为<code>pure</code>，但是这仍是相同的函数。在这个构造中有不同的地方是定律<code>unit</code>必须满足；因为<code>bind</code>未定义，这个约束转而依据<code>map</code>给出：
+{{block indent|<code>(unit ∘ φ) x ↔ ((map φ) ∘ unit) x</code><ref name="Applicative">{{cite web | title = Applicative functor | url = https://wiki.haskell.org/Applicative_functor | date = 7 May 2018 | website = HaskellWiki | publisher = Haskell.org | archive-url = https://web.archive.org/web/20181030090822/https://wiki.haskell.org/Applicative_functor | archive-date = 2018-10-30 | access-date = 20 November 2018 | dead-url = no }}</ref>}}
+
+从应用式函子到单子的最后跳跃来自于第二个变换<code>join</code>函数，在范畴论中这个自然变换通常叫做{{mvar|μ}}，它扁平化单子的嵌套应用：
+{{block indent|<code>join(mma) :: M (M T) -> M T</code>}}
+
+作为特征性函数，<code>join</code>必须还满足三个单子定律的变体：
+{{block indent|1=<code>join ∘ (map join)  mmma ↔ (join ∘ join)    mmma ↔ ma</code>}}
+{{block indent|1=<code>join ∘ (map unit)  ma   ↔ (join ∘ unit)    ma   ↔ ma</code>}}  
+{{block indent|1=<code>join ∘ (map map φ) mma  ↔ ((map φ) ∘ join) mma  ↔ mb</code>}}
+
+不管开发者是否直接定义单子或Kleisli三元组，底层的结构都是相同的，二者形式可以轻易的相互导出：
+{{block indent|1=<code>(map φ) ma  ↔ ma >>= (unit ∘ φ)</code>}}
+{{block indent|1=<code>join(mma)   ↔ mma >>= id</code>}}
+{{block indent|1=<code>ma >>= f ↔ (join ∘ (map f)) ma</code><ref name="MonadContainers">{{cite web | last = Gibbard | first = Cale | title = Monads as containers | url = https://wiki.haskell.org/Monads_as_containers | date = 30 December 2011 | website = HaskellWiki | publisher = Haskell.org | archive-url = https://web.archive.org/web/20171214235146/https://wiki.haskell.org/Monads_as_containers | archive-date = 2017-12-14 | access-date = 20 November 2018 | dead-url = no }}</ref>}}
+
+=== 例子：List单子<span id="List monad"></span> ===
+[[File:Sixth_root_as_a_composite_function_of_cbrt_and_sqrt.svg|thumb]]多值平方和立方[[方根|方根]]函数可以{{en-link|函数复合 (计算机科学)|Function composition (computer science)|复合}}起来产生六次方根函数。支配输入和输出类型的结构和复合不同行动的结构，二者一起是list单子<ref name="MultivalueEx">{{cite web | last = Piponi | first = Dan | title = You Could Have Invented Monads! (And Maybe You Already Have.) | url = http://blog.sigfpe.com/2006/08/you-could-have-invented-monads-and.html | date = 7 August 2006 | website = A Neighborhood of Infinity | archive-url = https://web.archive.org/web/20090330015442/http://blog.sigfpe.com/2006/08/you-could-have-invented-monads-and.html | archive-date = 2009-03-30 | access-date = 2021-02-08 | dead-url = no }}</ref>。{{pb}}[[项目符号|弹丸符号•]]指示<code>bind</code>算子，<code>z</code>是复数，方括号指示{{en-link|数组数据类型|Array data type|数组}}，而<code>:=</code>含义是[[数学符号表|定义为]]:
+<syntaxhighlight lang="haskell">
+(f•g)(z) := append(map(f,g(z)))
+
+lift(f) = f° := unit•f = f•unit
+
+sqrt°(z) == append(map(unit,sqrt(z)))= append(map(sqrt,unit(z)))
+
+sxrt(z) = (cbrt°•sqrt°)(z) == append(map(cbrt°,sqrt°(z)))
+</syntaxhighlight>]]
+
+<code>List</code>单子天然的展示了如何手工的从更简单的[[函子_(函数式编程)|函子]]导出单子。在很多语言中，[[列表_(抽象数据类型)|列表]]结构与很多基本特征一起是预定义的，所以假定<code>List</code>类型构造子和<code>[[append|append]]</code>算子（用中缀表示法表示为<code>++</code>）已经存在于这里了。
+
+将一个平常的值嵌入到列表中在多数语言中也是微不足道的：
+{{block indent|1=<nowiki /><code>unit(x) =  [x]</code>}}
+
+自此，通过[[列表推导式|列表推导式]]迭代的应用一个函数，看起来就是对<code>bind</code>的一个容易的选择，从而将列表转换成完全的单子。这个方式的困难在于<code>bind</code>预期一个单子函数，它在这种情况下会输出列表自身；随着更多函数的应用，嵌套的列表的层次会累加，要求不止一个基本推导式。
+
+但是，在整个列表上应用任何“简单”函数的过程，也就是<code>map</code>，就直截了当了：
+{{block indent|1=<nowiki /><code>(map φ) xlist  =  [ φ(x1), φ(x2), ..., φ(xn) ]</code>}}
+
+现在，这两个过程已经将<code>List</code>提升为应用式函子。要完全具备单子资格，只需要<code>join</code>的一个正确的表示法来扁平化重复的结构，但是对于列表，这意味着去包装一个外部列表来包含着值的那些内部列表：
+{{block indent|1=<nowiki /><code>join(xlistlist)  =  join([xlist1, xlist2, ..., xlistn])</code><br /><code>{{nbsp|16}}=  xlist1 ++ xlist2 ++ ... ++ xlistn</code>}}
+
+结果的单子不只是一个列表，而且在应用函数的时候可以自动调整大小和压缩自身。<code>bind</code>现在可以从一个公式导出，接着被用来通过单子函数的管道向<code>List</code>填入值：
+{{block indent|1=<nowiki /><code>(xlist >>= f)  =  join ∘ (map f) xlist</code>}}
+
+这种单子列表的一个应用是表示{{en-link|非确定性算法|nondeterministic algorithm|非确定性计算}}。<code>List</code>可以持有一个算法中所有执行路径的结果，接着每一步骤压缩自身来忘记那一步导致了这个结果（有时这是同确定性、[[穷举法|穷举]][[算法|算法]]的重要区别）。另一利益是检查可以嵌入到单子中；特定路径可以透明的在它们第一个失败点上被剪除，而不需要重写管道上的函数<ref name="MonadContainers" />。
+
+突出<code>List</code>的第二种情况是复合[[多值函数|多值函数]]。例如，一个数的<code>n</code>次[[复数_(数学)|复数]][[方根|方根]]将产生<code>n</code>个不同复数，但是如果另个<code>m</code>方根接受了这些结果，最终复合出的<code>m•n</code>的值应当同一于一次<code>m•n</code>次方根的输出。<code>List</code>完全自动化了这个问题的处置，压缩来自每一步骤的结果成一个平坦的、数学上正确的列表<ref name="MultivalueEx" />。
+
+== 技术 ==
+单子为有价值的技术提供了机会，超出了只是组织程序逻辑。单子可以为有用的语法特征奠定基础工作，而它们的高级和数学本质能实现重大的抽象。
+
+=== 语法糖{{visible anchor|do表示法}} ===
+尽管公开的使用<code>bind</code>通常就行得通，很多编程者偏好模仿指令式语句的语法（在Haskell中称为“do表示法”，在[[OCaml|OCaml]]中称为“perform表示法”，在[[F♯|F♯]]中称为“计算表达式”<ref name="F#Expressions">{{cite web | url = https://blogs.msdn.microsoft.com/dsyme/2007/09/21/some-details-on-f-computation-expressions/ | title = Some Details on F# Computation Expressions | access-date = 9 October 2018 | archive-date = 2019-01-30 | archive-url = https://web.archive.org/web/20190130123727/https://blogs.msdn.microsoft.com/dsyme/2007/09/21/some-details-on-f-computation-expressions/ | dead-url = no }}</ref>，在[[Scala|Scala]]中称为“for推导式”）。这只是将单子管道伪装成[[代码块|代码块]]的[[语法糖|语法糖]]；编译器会悄悄的将这些表达式转换成底层的函数式代码。
+
+将上述的<code>Maybe</code>单子例子中的<code>add</code>函数伪码转换成Haskell代码来用行动展示这个特征。非单子版本的<code>add</code>用Haskell写出来如下这样：
+<syntaxhighlight lang="haskell">
+add mx my =
+    case mx of
+        Nothing -> Nothing
+        Just x  -> case my of
+                       Nothing -> Nothing
+                       Just y  -> Just (x + y)
+</syntaxhighlight>
+
+在使用单子的Haskell中，<code>return</code>是<code>unit</code>的标准名字，加上必须显式处置的lambda表达式，即使多了这些技术，<code>Maybe</code>单子使得定义更加清晰：
+<syntaxhighlight lang="haskell">
+add mx my =
+    mx >>= (\x ->
+        my >>= (\y ->
+            return (x + y)))
+</syntaxhighlight>
+
+使用do表示法，可以进一步精炼成非常直观的序列：
+<syntaxhighlight lang="haskell">
+add mx my = do
+    x <- mx
+    y <- my
+    return (x + y)
+</syntaxhighlight>
+
+甚至通用单子定律自身都可以用do表示法来表达：
+<syntaxhighlight lang="haskell">
+do { x <- return v; f x }            ==  do { f v }
+do { x <- m; return x }              ==  do { m }
+do { y <- do { x <- m; f x }; g y }  ==  do { x <- m; y <- f x; g y }
+</syntaxhighlight>
+
+尽管方便，开发者应当记住这种块风格只是语法上的并可外观上替代为单子(甚至非单子的CPS）表达式。使用<code>bind</code>来表达单子管道仍在很多情况下是更加清晰的，一些函数式编程拥戴者提议，由于块风格允许初学者存续来自指令式编程的习惯，应当避免缺省的而只在明显更优越的时候使用它<ref name="DoHarmful">{{cite web | title = Do notation considered harmful | url = https://wiki.haskell.org/Do_notation_considered_harmful | publisher = HaskellWiki | access-date = 12 October 2018 | archive-date = 2020-11-08 | archive-url = https://web.archive.org/web/20201108094712/https://wiki.haskell.org/Do_notation_considered_harmful | dead-url = no }}</ref><ref name="RealWorldHaskell" />。
+
+== 更多例子 ==
+
+=== IO单子（Haskell）<span id="IO monad"></span> ===
+正如提及过的那样，纯粹的代码不应有不可管理的副作用，但是不妨碍程序“显式”的描述和管理各种作用。这个想法是Haskell的'''IO单子'''的中心，在这里一个类型<code>IO a</code>的对象，可以被看作包含了程序外部的世界的当前状态，并计算类型<code>a</code>的一个值。不计算值的计算，也就是过程，有着类型<code>IO ()</code>，它“计算”虚设值<code>()</code>。在编程者bind一个<code>IO</code>值到一个函数的时候，这个函数基于世界的场景（来自用户的输入、文件等）做出决定，接着产生反映新的世界状态（程序输出）的一个单子值<ref name="PeytonWadler1993" />。
+
+例如，Haskell有一些函数作用在宽广的[[文件系统|文件系统]]之上，包括有检查一个文件存在的一个函数和删除一个文件的另一函数。二者的类型签名是：
+<syntaxhighlight lang="haskell">
+doesFileExist :: FilePath -> IO Bool
+removeFile :: FilePath -> IO ()
+</syntaxhighlight>
+
+第一个函数关注一个给定文件是否真的存在，作为结果输出一个[[布尔值|布尔值]]于<code>IO</code>单子之内。第二个函数在另一方面，只关心在文件系统上的起到作用，所以对于<code>IO</code>容器它们的输出为空。
+
+<code>IO</code>不只限于文件I/O；它甚至允许用户I/O，还有指令式语法糖，可以模仿典型的[[Hello_World|Hello World]]程序：
+<syntaxhighlight lang="haskell">
+main :: IO ()
+main = do
+  putStrLn "Hello, world!"
+  putStrLn "What is your name, user?"
+  name <- getLine
+  putStrLn ("Nice to meet you, " ++ name ++ "!")
+</syntaxhighlight>
+
+不加语法糖，代码可以转写为如下单子管道（在Haskell中<code>>></code>是<code>bind</code>的一种变体，用在只有单子作用是紧要的而底层结果可以丢弃的时候）：
+<syntaxhighlight lang="haskell">
+main :: IO ()
+main =
+  putStrLn "Hello, world!" >>
+  putStrLn "What is your name, user?" >> 
+  getLine >>= (\name ->
+    putStrLn ("Nice to meet you, " ++ name ++ "!"))
+</syntaxhighlight>
+
+=== Writer单子（JavaScript）<span id="Writer monad"></span> ===
+另一个常见的情况是保存[[日志文件|日志文件]]或以其他方式报告程序的进度。有时，编程者想要记录更特殊的技术数据用于以后的[[性能分析|性能分析]]或[[调试|调试]]。'''Writer单子'''可以通过生成逐步积累的辅助输出来处理这些任务。
+
+为了展示单子模式不局限于主要的函数式语言，这个例子用[[JavaScript|JavaScript]]实现了<code>Writer</code>单子。首先，数组（具有嵌套的尾部）允许构造<code>Writer</code>类型为[[链表|链表]]。底层的输出值将位于这个数组的位置0，而位置1将隐蔽的持有连成一链的一些辅助注释：
+<syntaxhighlight lang="Javascript">const writer = [value, []];</syntaxhighlight>
+
+定义<code>unit</code>是非常简单的：
+<syntaxhighlight lang="Javascript">const unit = value => [value, []];</syntaxhighlight>
+
+定义输出具有调试注释的<code>Writer</code>对象的简单函数只需要<code>unit</code>：
+<syntaxhighlight lang="Javascript">
+const squared = x => [x * x, [`${x} was squared.`]];
+const halved = x => [x / 2, [`${x} was halved.`]];
+</syntaxhighlight>
+
+真正的单子仍需要<code>bind</code>，但是对于<code>Writer</code>，这简单的相当于将函数的输出附加至单子的链表： 
+<syntaxhighlight lang="Javascript">
+const bind = (writer, transform) => {
+    const [value, log] = writer;
+    const [result, updates] = transform(value);
+    return [result, log.concat(updates)];
+};
+</syntaxhighlight>
+
+样例函数现在可以使用<code>bind</code>链接起来，但是定义单子复合的一个版本（这里叫做<code>pipelog</code>）允许更加简洁的应用这些函数：
+<syntaxhighlight lang="Javascript">
+const pipelog = (writer, ...transforms) =>
+    transforms.reduce(bind, writer);
+</syntaxhighlight>
+
+最终结果是在逐步计算和为以后审查而记录之间的清晰的关注点分离： 
+<syntaxhighlight lang="Javascript">
+pipelog(unit(4), squared, halved);
+// 结果的writer对象 = [8, ['4 was squared.', '16 was halved.']]
+</syntaxhighlight>
+
+==注解==
+{{Div col|2}}
+{{notelist}}
+{{div col end}}
+
+==引用==
+{{reflist|2}}
+
+==参见==
+*[[类型类|类型类]]
+*[[函子_(函数式编程)|函子]]
+*[[应用式函子|应用式函子]]
+
+== 外部链接 ==
+{{Wikibooks|en:Haskell/Understanding monads|理解单子}}
+
+HaskellWiki参考：
+* "[https://wiki.haskell.org/All_About_Monads All About Monads] {{Wayback|url=https://wiki.haskell.org/All_About_Monads |date=20210116143558 }}" (originally by Jeff Newbern) — A comprehensive discussion of all the common monads and how they work in Haskell; includes the "mechanized assembly line" analogy.
+* "[https://wiki.haskell.org/Typeclassopedia Typeclassopedia] {{Wayback|url=https://wiki.haskell.org/Typeclassopedia |date=20210213113437 }}" (originally by Brent Yorgey) — A detailed exposition of how the leading typeclasses in Haskell, including monads, interrelate.
+
+教程：
+* "[http://learnyouahaskell.com/a-fistful-of-monads A Fistful of Monads] {{Wayback|url=http://learnyouahaskell.com/a-fistful-of-monads |date=20201112041612 }}" (from the online Haskell textbook ''[http://learnyouahaskell.com/ Learn You a Haskell for Great Good!] {{Wayback|url=http://learnyouahaskell.com/ |date=20210112141306 }}'' — A chapter introducing monads from the starting-point of functor and applicative functor typeclasses, including examples.
+* "[http://learnyouahaskell.com/for-a-few-monads-more For a Few Monads More] {{Wayback|url=http://learnyouahaskell.com/for-a-few-monads-more |date=20201109001240 }}" — A second chapter explaining more details and examples, including a <code>Probability</code> monad for [[Markov_chain|Markov chain]]s.
+* "[http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html Functors, Applicatives, And Monads In Pictures] {{Wayback|url=http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html |date=20210128032548 }} (by Aditya Bhargava) — A quick, humorous, and visual tutorial on monads.
+
+个案：
+* "[http://okmij.org/ftp/Computation/monadic-shell.html UNIX pipes as IO monads] {{Wayback|url=http://okmij.org/ftp/Computation/monadic-shell.html |date=20201109030741 }}" (by Oleg Kiselyov) — A short essay explaining how [[Pipeline_(Unix)|Unix pipe]]s are effectively monadic.
+* ''[https://github.com/leithaus/XTrace/blob/monadic/src/main/book/content/monadic.pdf Pro Scala: Monadic Design Patterns for the Web] {{Wayback|url=https://github.com/leithaus/XTrace/blob/monadic/src/main/book/content/monadic.pdf |date=20200821053502 }}'' (by Gregory Meredith) — An unpublished, full-length manuscript on how to improve many facets of web development in [[Scala_(programming_language)|Scala]] with monads.
+
+{{软件设计模式}}
+[[Category:函數式編程|Category:函數式編程]]
+[[Category:软件设计模式|Category:软件设计模式]]

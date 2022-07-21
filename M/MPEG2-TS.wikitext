@@ -1,0 +1,242 @@
+{{noteTA
+|G1=IT
+|G2=Communication
+}}
+
+{{Infobox file format
+| name = MPEG2 傳輸串流格式<br/> Transport Stream
+| icon =
+| logo =
+| extension = .ts, .tsv, .tsa
+| mime = video/MP2T{{r|RFC3555|page1=38}}
+| type code =
+| uniform type =
+| magic =
+| owner = [[MPEG|MPEG]]
+| released = {{Start date|1995|df=yes}}{{r|H.222.0}}
+| latest release version =
+| latest release date    = <!-- {{Start date and age|YYYY|mm|dd|df=yes}} -->
+| genre = [[视频文件格式|视频文件格式]]（媒体流格式）
+| container for = 音频、视频、数据
+| contained by =
+| extended from =
+| extended to = [[M2TS|M2TS]], [[MOD_and_TOD_(video_format)|TOD]]
+| standard = ISO/IEC 13818-1, ITU-T Recommendation H.222.0{{r|H.222.0}}
+}}
+
+'''MPEG2-TS 傳輸串流'''（MPEG-2 Transport Stream；又称MPEG-TS、MTS、TS）是一種标准数字封装格式,用来傳輸和儲存視訊、音訊與频道、节目信息，应用于數位電視廣播系統，如[[DVB|DVB]]、[[ATSC|ATSC]]、[[ISDB|ISDB]]{{r|川口|page=118}}、[[IPTV|IPTV]]等。
+
+MPEG2-TS定義於[[MPEG-2|MPEG-2]]第一部份：系統（即[[ISO|ISO]]/[[IEC|IEC]]標準13818-1或[[ITU-T|ITU-T]] Rec. H.222.0）。{{r|H.222.0}}
+
+MPEG2-TS面向的传输介质是[[地面电视|地面]]和[[卫星电视|卫星]]等[[可靠性_(计算机网络)|可靠性]]较低的传输介质，这一点与面向较可靠介质如[[DVD|DVD]]等的{{le|MPEG PS}}不同。{{r|川口|page=117}}
+
+== 传输协议 ==
+[[File:MPEG_Transport_Stream_HL.svg|thumb]]功能的电视机）接收射频信号并解码后进行播放]]
+1个TS（传输流）中封装了多个子TS。通常子TS是{{le|分组化基本流|Packetized elementary stream}}（{{lang|en|PES, Packetized elementary stream}}）；分组化基本流中封装{{link-en|基本流|Elementary Stream}}（{{lang|en|ES，Elementary Stream}}），或者非MPEG的编码流，例如[[杜比数字#杜比數位|AC-3]]、[[DTS|DTS]]音频流，[[MJPEG|MJPEG]]、[[JPEG_2000|JPEG 2000]]视频流、字幕所需要的文本和图像、用于定义基本流的表、乃至电视台定义的[[电子节目表|电子节目表]]（EPG）等。{{r|川口|page=117}}
+
+一些相互独立的流可以被[[多路复用|复用]]在一个TS里，例如几个不同的电视频道或者同一个电影的多个拍摄角度。
+
+每个传输流被分割为大小最大为188字节的TS封包（TS Packet），它是多路复用（multiplexing）的基本单位。多个不同的ES（基本流）的内容会分别被封装到TSP中通过同一个TS传输。由于封包（分组）尺寸较小，复用对各个ES造成的时延也较低，对传输误码的耐受性也强于那些将一帧画面封装到一整个包里的容器格式，如MPEG PS和[[AVI|AVI]]、[[QuickTime文件格式|MOV]]/[[MP4|MP4]]、[[Matroska|MKV]]等{{r|Hytecinter}}。这对于[[视频会议|视频会议]]等对实时性要求高的场景特别有意义，因为单个分组损坏不会造成很大的语音延迟。
+
+TS通常以[[固定码率|固定码率]]传输。固定码率传输时，如果上层待传输内容不足，会发送[[#空分组|空分组]]{{r|Fairhurst}}以占位。[[#蓝光|蓝光光碟中使用的MPEG-2 TS]]也使用了固定码率。
+
+下表为MPEG-2 TS协议的一个实际应用的例子：日本地面数字电视[[ISDB-T|ISDB-T]]。表中列举了TS、PES、ES层次上，ISDB-T这个具体的系统使用的具体标准。{{r|川口|page1=118}}
+{| class="wikitable"
+|-
+!MPEG-2 TS<br/>协议层次划分 
+!colspan=5|ISDB-T的协议栈
+|-
+|rowspan=2|ES/Table || MPEG-2 视频（[[H.262|H.262]]）<br/>（ISO/IEC 13818-2） || MPEG-2 [[AAC|AAC]]<br/>（ISO/IEC 13818-7） || 数据服务（独立PES模式）<br/>（ARIB STD-B24）
+|rowspan=2|PSI/SI<br/>（ISO/IEC 13818-1、[[ARIB|ARIB]] STD-B10）
+|rowspan=2|数据服务（{{le|数据与对象轮播|Data_and_object_carousel|轮播}}模式{{NoteTag|依据ISO/IEC 13818-6{{r|STD-B24 desc}}}}）<br/>（ARIB STD-B24）
+|-
+|colspan=3| {{link-ja|内容权利保护专用方式|コンテンツ権利保護専用方式|TRMP}}（加密）<br/>（[[ARIB|ARIB]] STD-B25）
+|-
+| PES/Section 
+|colspan=3| MPEG-2 PES<br/>（ISO/IEC 13818-1、[[ARIB|ARIB]] STD-B32）
+|colspan=2| 表的分节（Table Section{{NoteTag|参看英文维基百科条目Program-specific_information#Table Sections}}）<br/>（ISO/IEC 13818-1、[[ARIB|ARIB]] STD-B32）
+|-
+| TS 
+|colspan=5| '''MPEG-2 TS'''<br/>（ISO/IEC 13818-1）
+|}
+
+==TS中的主要概念==
+===TS分组===
+TS分组（TS packet）是TS的基本传输单位。在TS范围以外并不存在描述一个TS的属性的全局性的描述体。TS自身的全部信息仅由其自身描述，TS仅由一系列的TS分组构成。
+
+每个TS分组以固定的{{le|同步字|Syncword|同步字节}}起始，这个同步字节的值为0x47，它也是TS分组头的一部分{{r|川口|page1=126}}。TS分组的必选头长度为4字节，其后为可选部分，为[[负载_(计算机)|载荷]]或[[#适配域|适配域]]。TS分组的头部固定以[[字节序#大端序|大端序]]读写。TS分组长度为188字节。
+
+如同所有的传输协议一样，虽然TS分组本身长度为188字节，其底层传输机制可以为每个TS分组附加一些信息以便传输，例如[[前向纠错|前向纠错]]用的校验部分。[[DVB|DVB]]和[[ISDB|ISDB]]数字电视制式的前向纠错信息有16个字节，而[[ATSC|ATSC]]制式有20个字节{{r|FEC}}。
+
+===TS分组格式===
+TS分组包括头部和载荷两部分。头部包括固定长度部分和可选部分，可选部分中包括适配域。适配域有可选的扩展部分。{{r|川口|page=125,126}}
+
+本节介绍TS分组头部中的固定部分和适配域（不包含适配域扩展部分）。
+{|class="wikitable"
+|+TS分组格式{{r|川口|page1=126}}
+!
+!colspan=2|名稱
+![[位元|比特]]數
+!描述
+|-
+|rowspan=8|固定部分<br/>（4字节）
+|同步字节 || sync byte||8||0x47
+|-
+|传输错误指示位||Transport Error Indicator (TEI)||1
+|发送时（调制前）值为0。接收方的解调器在无法成功解调（即使有前向纠错机制）TS分组内容时，将该位设置为1，表示该TS分组损坏。{{r|Coolstf}}
+|-
+|载荷单元开始指示位||Payload Unit Start Indicator||1||负载单元起始标示符，一个完整的数据包开始时标记为1, 表示携带的是[[节目专用信息|PSI]]或{{tsl|en|Packetized Elementary Stream|Packetized Elementary Stream|PES}}第一个包
+|-
+|传输优先级||Transport Priority||1||值为1时，在相同PID的分组中具有更高的优先权。
+|-
+|[[#PID|分组ID]]||[[#PID|PID]]||13||用于识别TS分组的ID。一个PID对应一种特定的PSI消息或者一个特定的PES。
+|-
+|传输加扰控制||Transport Scrambling control (TSC)||2|| 值为'00'时表示载荷未加密。其余值由具体系统定义。以[[DVB|DVB]]的{{le|通用扰码算法|Common Scrambling Algorithm|CSA}}{{r|ETSI TS 100289|page1=8}}和[[ATSC|ATSC]]的[[数据加密标准|DCS]]为例：
+*'01' = 保留 (供未來使用),
+*'10' = 以偶数密钥加密
+*'11' = 以奇数密钥加密
+|-
+|适配域存在标志||Adaptation field exist||2||
+*'00' = 保留 (供未來使用)
+*'01' = 无适配域，仅有载荷
+*'10' = 仅有适配域
+*'11' = 适配域和载荷都存在
+|-
+|连续性计数器||Continuity counter||4|| 取值为0x00到0x0F，循环。用于检查同一个PID的TS分组的连续性。每当一个TS分组中包含载荷时，该计数器加1。
+|-
+|rowspan=2|可选部分
+|适配域||Adaptation field||0或更多||当适配域存在标志为'10'或'11'时存在
+|-
+|[[负载_(计算机)|载荷]]|| Payload Data ||0或更多||当适配域存在标志为'01'或'11'时存在
+|}
+
+====适配域====
+{|class="wikitable"
+|+适配域格式{{r|川口|page1=128}}
+!
+!colspan=2|名稱
+!位元數
+!描述
+|-
+|rowspan=9|固定部分<br/>（2字节）
+|适配域长度||Adaptation Field Length||8||适配域的长度，单位为字节，不包含当前字节。
+|-
+|不连续指示位||Discontinuity indicator||1||如果根据连续性计数器或PCR计算，确认当前分组处于不连续状态，则取值为1。
+|-
+|随机访问指示位||Random Access indicator||1||如果当前分组是一个PES的起始，取值为1。
+|-
+|ES优先级指示位||Elementary stream priority indicator||1||取值为1时ES优先级更高。
+|-
+|PCR标识||PCR flag||1||1表示适配域中有PCR域
+|-
+|OPCR标识||OPCR flag||1||1表示适配域中有OPCR域
+|-
+|接续点标识||Splicing point flag||1||1表示适配域中有接续倒数计数器域
+|-
+|传输私有数据标识||Transport private data flag||1||1表示适配域中有私有数据域
+|-
+|适配域扩展标识||Adaptation field extension flag||1||1表示适配域中有适配域扩展域
+|-
+|rowspan=3|可选部分
+|colspan=2|[[#PCR|PCR]]||33+6+9|| Program Clock Reference。结构为33位的低精度部分+6位的填充部分+9位的高精度部分。具体说明参见[[#PCR|PCR]]一节。
+|-
+|原PCR||OPCR||33+6+9|| Original PCR。格式与PCR相同。在TS复制时使用。
+|-
+|接续倒数计时器||Splice countdown||8||指示从当前分组起多少个分组之后接续点出现（取值可为负）。
+|-
+|colspan=3|填充字节||可变长度||
+|}
+
+===PID===
+每一种PSI表和每个ES都对应一个PID值，它是将TS解复用为ES和PSI表的依据。常见的实现中，多个PES在TS中以[[时分复用|时分复用]]方式存在，故而各ES的PID会轮流出现。
+
+===节目===
+节目（Program）这个概念存在于TS中。每个节目在TS中对应一个[[#PMT|节目映射表]]（[[#PMT|PMT]]），不同的节目的PMT具有不同的PID。PMT中会指定与这个节目相关的所有ES的PID。
+
+数字电视的一个TS中可能包含3个或更多{{NoteTag|日本制式ISDB-T中，1个TS通常含有3个标清节目和1个[[1Seg|1Seg]]节目}}的节目。假设每个节目包含1个视频ES，1到2个音频ES，以及一些对应的PSI、数据服务等，播放电视节目的设备并不需要解析所有节目的视频、音频流，只需要根据PID，选择相应的ES，解析并播放即可，与节目无关的PID对应的[[#TS分组|TS分组]]可以全部丢弃。
+
+包含多个节目的TS称为多节目TS（MPTS），只包含1个节目的TS成为单节目TS（SPTS）。
+
+===PSI===
+{{main article|节目专用信息}}
+节目专用信息（PSI，Program Specific Information），描述特定节目相关的属性。MPEG-2标准规定了4种PSI：节目关联表（PAT，Program Association Table）、节目映射表（PMT，Program Map Table）、条件访问表（CAT，Conditional Access Table）以及网络信息表（NIT，Network Information Table）{{r|13818-1|page=107}}。其中MPEG-2标准规定了PAT和PMT的具体结构。
+
+在基于MPEG-2 TS的一些系统，如[[地面数字电视|地面数字电视]][[DVB|DVB]]{{r|ETSI EN 300468|page1=17,18}}、[[ATSC|ATSC]]{{r|Tvwithoutborders}}{{NoteTag|见{{le|节目与系统信息协议|Program and System Information Protocol}}（PSIP）}}、[[ISDB-T|ISDB-T]]{{r|STD-B10 desc}}等扩展了MPEG2-TS，引入了服务信息（SI，Service Information）这一概念。SI是PSI的补充，在协议层次上与PSI相同{{r|川口|page1=123}}。
+
+====PAT====
+PAT (PAT: Program Association Table)列出该TS内所有节目。其PID固定为0x0000。每个节目由一个16比特的字段program_number指定。每个program_number都有一个对应的PID，用来指定该节目的PMT。PAT中不包含节目信息时，program_number为0x0000，则应从NIT（PID为0x0010）获取节目信息。{{r|川口|page1=128,129}}
+
+====PMT====
+PMT (PMT: Program Map Table)包含特定[[#节目|节目]]相关的信息，每一个节目有一个PMT。虽然MPEG-2协议标准允许多个PMT使用相同的PID，常见的系统中，如ATSC、SCTE中，不同的PMT有各自的PID。
+
+PMT包含的信息有特定节目的program_number，以及该节目对应的所有ES的PID{{NoteTag|准确地说是PES的PID}}。此外还有可选的描述子用来提供整个MPEG-2系统的属性和特定ES的属性。{{r|川口|page1=129}}
+
+====CAT====
+CAT (CAT: Conditional Access Table) 用于节目的加密與解密。CAT对应PID为0x0001。
+
+====NIT====
+NIT (NIT: Network Information Table 网络信息表)提供TS的相关信息，如频率、调制方式。在扫描所有频道的节目时，关键信息来自各频道的TS中的NIT。{{r|川口|page1=130}}
+
+===PCR===
+节目时钟参考（PCR，Program Clock Reference）使得解码后的内容可以正确地同步播放。最多每100ms，接收方会从TS分组的适配域中得到特定节目的PCR值，PCR的PID由该节目的PMT中的PCR_PID域指定。解码系统应当基于PCR生成高精度的系统校时时钟（System Timing Clock，STC），用于同步声音ES和视频ES的内容。STC是MPEG-2系统里校时的基准。例如，{{le|表示时间戳|Presentation timestamp}}（Presentation timestamp，PTS）的值即是以PCR值为基准的偏移量。{{r|13818-1|page=46,47}}
+
+PCR包括一个33比特的低精度部分（90kHz）和一个9比特的高精度部分（27MHz，取值为0-299）{{r|川口|page1=134}}。PCR容许的最大[[抖动|抖动]]{{NoteTag|例如复用、解复用、传输造成的抖动}}为+/-500ns{{r|13818-1|page=12}}。
+
+===空分组===
+空分组（null packet）存在于某些使用MPEG2-TS的系统中，例如[[地面数字电视|地面数字电视]]系统ATSC和DVB，用于保证固定码率。在从ES复用到TS的过程中，如果ES的数据量不足用尽TS的比特率，则[[多路复用器|复用器]]模块会插入空分组。空分组使用保留的PID值0x1FFF。空分组的载荷没有意义，接收者应当丢弃{{r|13818-1|page1=8,19,20}}。
+
+== 数字电视以外的应用 ==
+=== 数码摄像机 ===
+MPEG-2 TS原本的设计用途是数字电视广播，不过后来用在数码摄像机、录像机、播放机上。用于非广播类用途时，其TS分组格式有所不同：在分组上增加了4个字节长的时间码（Time Code），使分组长度变为192字节{{r|Blue-Ray|page1=15|Blue-Ray BD-RE}}。时间码使得播放系统可以在允许[[隨機存取|随机读取]]的存储介质中快速找到特定时间点的视频内容{{r|Videohelp}}。借助时间码也可以用来同步多个摄像机拍摄的内容。
+
+[[JVC|JVC]]在基于[[硬盘|硬盘]]存储的{{link-en|数字摄像机|camcorder}}产品中将这种流称为{{link-en|MOD与TOD|MOD and TOD|TOD}}{{r|JVC}}。
+=== 蓝光 ===
+以前述格式构成的流被[[蓝光光碟联盟|蓝光光碟联盟]]称为“[[M2TS|BDAV MPEG-2 transport stream]]”（字面意思为BDAV版本的MPEG2-TS），其文件扩展名为.m2ts{{r|Blue-Ray|page1=15|Videohelp}}，俗称[[M2TS|M2TS]]流。蓝光的影碟以BDAV（Blu-ray Disc Movie）格式的BDMV容器存储音频、视频以及其他内容，用于BD-R和BD-RE等格式的录制中{{r|BDMV|BDAV}}。由于蓝光的M2TS和标准的MPEG TS格式基本相同，其设备能够以非常小的延迟转录数字电视内容{{r|Blue-Ray BD-RE}}。由于MPEG-2 TS原本就是面向实时播放的格式，使得蓝光的内容可以简单地从流中截取任意一段，降低了视频剪辑的处理成本。此外，这种流格式也使得存储介质的物理损坏对内容的影响降到最小{{r|BD|page=22}}。
+
+== 关联条目 ==
+*{{le|MPEG媒体传输|MPEG media transport}}（MPEG media transport, MMT）
+**{{le|MPEG PS}}
+*[[节目专用信息|节目专用信息]]（PSI）
+*{{le|分组化基本流|Packetized elementary stream}}（PES）
+*[[实时传输协议|实时传输协议]]（RTP）
+*{{le|单向轻量封装|Unidirectional Lightweight Encapsulation}}（Unidirectional Lightweight Encapsulation，ULE）
+
+== 注释 ==
+{{Notefoot}}
+
+== 参考来源 ==
+{{reflist|40em|refs=
+<ref name="RFC3555">{{Cite web|title=[RFC3555]MIME Type Registration of RTP Payload Formats|date=2003-07|publisher=[[IETF|IETF]]|url=https://tools.ietf.org/html/rfc3555#page-38|language=en|accessdate=2018-06-05|archive-date=2017-07-07|archive-url=https://web.archive.org/web/20170707152340/https://tools.ietf.org/html//rfc3555#page-38|dead-url=no}}</ref>
+<ref name="H.222.0">{{Cite web|title=Recommendation H.222.0 Information technology – Generic coding of moving pictures and associated audio information: Systems|url=https://www.itu.int/rec/T-REC-H.222.0|publisher=[[ITU-T|ITU-T]]|language=en|accessdate=2018-06-05|archive-date=2019-12-25|archive-url=https://web.archive.org/web/20191225162617/https://www.itu.int/rec/T-REC-H.222.0|dead-url=no}}</ref>
+<ref name="川口">{{Cite book|script-title=ja:地デジ受信機のしくみ|author1=川口英|author2=辰巳博章|publisher=CQ出版|date=2010-06|isbn=978-4789845434|language=ja}}</ref>
+<ref name="Fairhurst">{{cite web|title=MPEG-2 Transmission|author=Gorry Fairhurst|publisher=[[阿伯丁大学|阿伯丁大学]]|language=en|date=2001-01}}</ref>
+<ref name="STD-B24 desc">{{Cite web|script-title=ja:標準規格概要（STD-B24）|url=https://www.arib.or.jp/kikaku/kikaku_hoso/desc/std-b24.html|language=ja|publisher=[[电波产业会|电波产业会]]|accessdate=2018-06-05|archive-date=2020-08-06|archive-url=https://web.archive.org/web/20200806103340/https://arib.or.jp/kikaku/kikaku_hoso/desc/std-b24.html|dead-url=no}}</ref>
+<ref name="FEC">{{Cite web|title=The Question: To FEC Or Not To FEC?|author=Wes Simpson|date=2013-09-16|publisher=TV Technology|url=https://www.tvtechnology.com/expertise/the-question-to-fec-or-not-to-fec|language=en}}{{Dead link|date=2020年4月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>
+<ref name="Coolstf">{{cite web|url=https://www.coolstf.com/tsrsupport/tsrsupport/faq.html|title=FAQ|publisher=COOLSTF.com|language=en|accessdate=2018-06-05|archive-date=2020-07-05|archive-url=https://web.archive.org/web/20200705002149/http://coolstf.com/tsrsupport/tsrsupport/faq.html|dead-url=no}}</ref>
+<ref name="ETSI TS 100289">{{Cite web|url=https://www.dvb.org/resources/public/standards/a125_dvb-csa3.pdf|title=Support for use of the DVB Scrambling Algorithm version 3 within digital broadcasting systems v1.1.1|date=2013-11|publisher=ETSI|language=en|access-date=2018-06-05|archive-url=https://web.archive.org/web/20190217042838/https://www.dvb.org/resources/public/standards/a125_dvb-csa3.pdf|archive-date=2019-02-17|dead-url=yes}}</ref>
+<ref name="13818-1">{{Cite web|url=http://ecee.colorado.edu/~ecen5653/ecen5653/papers/iso13818-1.pdf|title=ISO/IEC 13818-1: Information technology — Generic coding of moving pictures and associated audio information: Systems 2000(E)|date=2000|publisher=ISO/IEC|language=en|accessdate=2018-06-06|archive-date=2020-12-03|archive-url=https://web.archive.org/web/20201203170400/http://ecee.colorado.edu/~ecen5653/ecen5653/papers/iso13818-1.pdf|dead-url=no}}</ref>
+<ref name="Blue-Ray">{{Cite web|url=http://www.blu-raydisc.com/Assets/Downloadablefile/2b_bdrom_audiovisualapplication_0305-12955-15269.pdf|title=2.B Audio Visual Application Format Specifications for BD-ROM|date=2005-03|publisher=[[藍光光碟聯盟|藍光光碟聯盟]]|language=en|accessdate=2018-06-06|archive-date=2009-07-30|archive-url=https://www.webcitation.org/5idsKC1ZP?url=http://www.blu-raydisc.com/Assets/Downloadablefile/2b_bdrom_audiovisualapplication_0305-12955-15269.pdf|dead-url=yes}}</ref>
+<ref name="Blue-Ray BD-RE">{{Cite web|url=http://www.blu-raydisc.com/Assets/Downloadablefile/BD-RE_Part3_V2.1_WhitePaper_080406-15271.pdf|title=Audio Visual Application Format Specification for BD-RE Version 2.1|date=2008-03|publisher=[[藍光光碟聯盟|藍光光碟聯盟]]|language=en|accessdate=2018-06-06|archive-date=2009-07-30|archive-url=https://www.webcitation.org/5idsN03Hs?url=http://www.blu-raydisc.com/Assets/Downloadablefile/BD-RE_Part3_V2.1_WhitePaper_080406-15271.pdf|dead-url=yes}}</ref>
+<ref name="JVC">{{Cite web|url=http://www3.jvckenwood.com/dvmain/support/check/|script-title=ja:ビデオカメラ＆付属アプリケーションと各種OS動作確認情報|publisher=JVC|language=ja|accessdate=2018-06-06|archive-date=2020-11-27|archive-url=https://web.archive.org/web/20201127030838/https://www3.jvckenwood.com/dvmain/support/check/|dead-url=no}}</ref>
+<ref name="Videohelp">{{Cite web|url=https://forum.videohelp.com/threads/306126-HFS10-AVCHD-how-to-maintain-quality?s=dd5580f24183f7ca3fb5159233d54653#post1881643|title=HFS10 - AVCHD how to maintain quality?|language=en|publisher=videohelp.com|author=poisondeathray|date=2009-06-03|archiveurl=https://web.archive.org/web/20180606075828/https://forum.videohelp.com/threads/306126-HFS10-AVCHD-how-to-maintain-quality?s=dd5580f24183f7ca3fb5159233d54653#post1881643|archivedate=2018-06-06|accessdate=2018-06-06|dead-url=no}}</ref>
+<ref name="BDMV">{{Cite web|url=https://www.afterdawn.com/glossary/term.cfm/bd-mv|title=BDMV|publisher=afterdawn.com|language=en|archiveurl=https://www.webcitation.org/5icX48JmH?url=http://www.afterdawn.com/glossary/terms/bd-mv.cfm|archivedate=2009-07-29|accessdate=2018-06-06|dead-url=no}}</ref>
+<ref name="BDAV">{{Cite web|url=http://www.afterdawn.com/glossary/terms/bdav.cfm|title=BDAV|publisher=afterdawn.com|language=en|archiveurl=https://archive.today/20121209014907/http://www.afterdawn.com/glossary/term.cfm/bdav|archivedate=2012年12月9日|deadurl=yes|df=|accessdate=2018年6月6日}}</ref>
+<ref name="BD">{{Cite web|url=http://www.blu-raydisc.com/Assets/Downloadablefile/general_bluraydiscformat-15263.pdf|title=White Paper Blu-ray Disc™ Format General 2nd edition|date=2010-10|publisher=[[藍光光碟聯盟|藍光光碟聯盟]]|language=en|accessdate=2018-06-06|archive-date=2009-06-12|archive-url=https://web.archive.org/web/20090612042130/http://www.blu-raydisc.com/Assets/Downloadablefile/general_bluraydiscformat-15263.pdf|dead-url=yes}}</ref>
+<ref name="Hytecinter">{{cite web|url=https://hytec.co.jp/useful/video5174|title=MPEG2-TS（トランスポートストリーミング）について解説|publisher=ハイテックインター株式会社|date=2018-01-18|language=ja|archiveurl=https://archive.today/20180606085904/https://hytec.co.jp/useful/video5174|archivedate=2018-06-06|deadurl=yes|df=|accessdate=2018-06-06}}</ref>
+<ref name="ETSI EN 300468">{{Cite web|url=http://www.etsi.org/deliver/etsi_en/300400_300499/300468/01.13.01_40/en_300468v011301o.pdf|title=Final draft ETSI EN 300 468 V1.13.1 Digital Video Broadcasting (DVB); Specification for Service Information (SI) in DVB systems|publisher=ETSI|language=en|accessdate=2018-06-07|archive-date=2020-07-11|archive-url=https://web.archive.org/web/20200711193043/https://www.etsi.org/deliver/etsi_en/300400_300499/300468/01.13.01_40/en_300468v011301o.pdf|dead-url=no}}</ref>
+<ref name="Tvwithoutborders">{{Cite web|url=http://www.tvwithoutborders.com/tutorials/dtv_intro/atsc_psip/|title=Service Information In ATSC And OpenCable Networks|language=en|publisher=TV without borders|archiveurl=https://archive.today/20180607045329/http://www.tvwithoutborders.com/tutorials/dtv_intro/atsc_psip/|archivedate=2018年6月7日|deadurl=yes|df=|accessdate=2018年6月7日}}</ref>
+<ref name="STD-B10 desc">{{Cite web|script-title=ja:標準規格概要（STD-B10）|url=https://www.arib.or.jp/kikaku/kikaku_hoso/desc/std-b10.html|language=ja|publisher=[[电波产业会|电波产业会]]|accessdate=2018-06-07|archive-date=2018-06-12|archive-url=https://web.archive.org/web/20180612143609/https://www.arib.or.jp/kikaku/kikaku_hoso/desc/std-b10.html|dead-url=no}}</ref>
+}}
+
+== 外部連結 ==
+* [http://www.itu.int/rec/T-REC-H.222.0 ITU-T H.222.0 | ISO/IEC 13818-1系统标准文档] {{Wayback|url=http://www.itu.int/rec/T-REC-H.222.0 |date=20120903192809 }}
+** [http://www.itu.int/rec/T-REC-H.222.0-201410-S/en 上述文档的最近免费公开版本（2015年1月）] {{Wayback|url=http://www.itu.int/rec/T-REC-H.222.0-201410-S/en |date=20191225162636 }}
+* [http://kangun.tistory.com/attachment/ik0.pdf 解释TS分组、PES、几种PSI结构的资料]{{Dead link}}
+* [http://mpeg.chiariglione.org/faq/mp4-sys/mp4-sys.htm MPEG-4系统FAQ] {{Wayback|url=http://mpeg.chiariglione.org/faq/mp4-sys/mp4-sys.htm |date=20201027160601 }}
+
+{{Compression Formats}}
+
+[[Category:MPEG|Category:MPEG]]
+
+[[Category:ITU-T建议书|Category:ITU-T建议书]]
+[[Category:數碼電視|Category:數碼電視]]

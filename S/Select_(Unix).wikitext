@@ -1,0 +1,311 @@
+{{cleanup-jargon|time=2012-11-29T12:58:32+00:00}}
+{{unreferenced|time=2010-05-05T08:01:28+00:00}}
+{{lowercase}}
+{{noteTA
+|G1=IT
+}}
+'''select'''是用于I/O多路转接的一个[[系统调用|系统调用]]函数。
+
+在[[C|C]]程序中，该系统调用在 sys/select.h 或 [[unistd.h|unistd.h]] 中声明，语法如下：
+<syntaxhighlight lang="c">
+int select(int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds, struct timeval* timeout);
+</syntaxhighlight>
+
+{| class="wikitable"
+!参数    !! 描述
+|-
+|''nfds''    || sets的文件描述符的最大值 
+|-
+|''readfds'' || <tt>fd_set</tt> 类型，包含了需要检查是否可读的描述符，输出时表示哪些描述符可读。可为 <tt>NULL</tt>。
+|-
+|''writefds''|| <tt>fd_set</tt> 类型，包含了需要检查是否可写的描述符，输出时表示哪些描述符可写。可为 <tt>NULL</tt>。
+|-
+|''errorfds''|| <tt>fd_set</tt> 类型，包含了需要检查是否出错的描述符，输出时表示哪些描述符出错。可为 <tt>NULL</tt>。
+|-
+|''timeout'' || <tt>struct timeval</tt> 类型的结构体，表示等待检查完成的最长时间。
+|}
+
+为了维护fd_set类型的参数，会使用下面四个[[宏|宏]]：FD_SET(), FD_CLR(), FD_ZERO() 和 FD_ISSET()。
+
+'''返回值'''：
+       这个[[函数|函数]]将返回描述符集的个数， 如果[[超时|超时]]返回为0，错误则返回-1。
+
+'''参看'''：
+*select(2) 
+*poll(2)
+
+==select与epoll的区别==
+{| class="wikitable" border="1"
+|-
+!  
+!  epoll
+!  select
+
+|-
+| 概述 
+| [[epoll|epoll]]是个[[模块|模块]]，由三个[[系统调用|系统调用]]组成，内核中由用[[文件系统|文件系统]]实现
+| [[select|select]]是个[[系统调用|系统调用]]
+
+|-
+| 结构体定义 
+| <syntaxhighlight lang="C">typedef union epoll_data {
+  void *ptr;
+  int fd;
+  __uint32_t u32;
+  __uint64_t u64;
+} epoll_data_t;
+
+struct epoll_event { 
+  __uint32_t events; // epoll 监听的事件类型
+  epoll_data_t data; /* User data variable */
+};</syntaxhighlight>
+|  <syntaxhighlight lang="C">struct timeval{
+  long tv_sec;//second
+  long tv_usec;//minisecond
+}
+
+typedef struct fd_set {
+  u_int fd_count;
+  int fd_array[FD_SETSIZE];
+} //fd_array可SIZE*8个socket</syntaxhighlight>
+|-
+|  可用的事件
+|  
+EPOLLIN ：表示对应的文件描述符可以读；<br>
+EPOLLOUT：表示对应的文件描述符可以写；<br>
+EPOLLPRI：  表示对应的文件描述符有紧急的数据可读；<br>
+EPOLLERR： 表示对应的文件描述符发生错误；<br>
+EPOLLHUP：表示对应的文件描述符被挂断；<br>
+EPOLLET：    ET的epoll工作模式；<br>
+
+| fd_set有三种类型： 
+readfds,
+writefds,
+exceptionfds
+
+
+|-
+|  操作函数
+|  三个系统调用：epoll_create   epoll_ctl epoll_wait
+|  一个系统调用：select <br> 四个宏: FD_ZERO FD_SET FD_CLR FD_ISSET  
+
+|-
+|  运行模式
+|  [[中断#边沿触发|边沿触发]] (ET)、[[中断#状态触发|状态触发]] (LT)
+|  状态触发
+|-
+|  运行过程
+|  <syntaxhighlight lang="C">int fd = epoll_create(1); // 创建一个 epoll 实例，参数可以是任意正整数
+struct epoll_event events[xxxB];// epoll 实例将发生的事件写入该数组
+while(1){
+	int nfds = epoll_wait(  );   // 等待事件发生
+	for(int i=0; i<nfds; i++){
+    …
+	}//end for
+}//end while</syntaxhighlight>
+| <syntaxhighlight lang="C">struct timeval tv;
+fd_set rfds;
+tv={5,0}; // 设置超时
+while(1){
+	FD_ZERO(&rfds);
+	if (!select()) continue;
+	for(int i=0;i<maxfds; i++){
+		...
+	} // 结束 for 循环
+} // 结束 while 循环</syntaxhighlight>
+|-
+|  优点
+|  1）epoll_wait返回的都是有效数据，可直接从struct epoll_event[]中获取事件，效率高。
+| 
+|-
+|  缺点
+|  
+| 每次select有数据要遍历全部socket 
+|-
+|  注意事项
+|  每次取事件后，要重新注册此socket的事件epoll。(epoll_ctl)
+| 每次select之前要重置rfds的值。(FD_ZERO)
+
+|}
+'''说明'''：以上无论epoll_create, fd_set都受限于系统中单个进程能够打开的[[文件句柄|文件句柄]]数。
+
+== 示例 ==
+<syntaxhighlight lang="c">
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+
+#include <sys/select.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+
+#define PORT "9421"
+
+/* function prototypes */
+void die(const char*);
+
+int main(int argc, char **argv)
+{
+	int sockfd, new, maxfd, on = 1, nready, i;
+
+	struct addrinfo *res0, *res, hints;
+
+	char buffer[BUFSIZ];
+
+	fd_set master, readfds;
+
+	ssize_t nbytes;
+
+	(void)memset(&hints, '\0', sizeof(struct addrinfo));
+
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+	hints.ai_flags = AI_PASSIVE;
+
+	if(-1 == (getaddrinfo(NULL, PORT, &hints, &res0)))
+		die("getaddrinfo()");
+
+	for(res = res0; res; res = res->ai_next)
+	{
+		if(-1 == (sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)))
+		{
+			perror("socket()");
+			continue;
+		}
+
+		if(-1 == (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (char*)&on, sizeof(int))))
+		{
+			perror("setsockopt()");
+			continue;
+		}
+
+		if(-1 == (bind(sockfd, res->ai_addr, res->ai_addrlen)))
+		{
+			perror("bind");
+			continue;
+		}
+
+		break;
+
+	}
+
+	if(-1 == sockfd)
+		exit(EXIT_FAILURE);
+
+	freeaddrinfo(res0);
+
+	if(-1 == (listen(sockfd, 32)))
+		die("listen()");
+
+	if(-1 == (fcntl(sockfd, F_SETFD, O_NONBLOCK)))
+		die("fcntl()");
+
+	FD_ZERO(&master);
+	FD_ZERO(&readfds);
+	
+	FD_SET(sockfd, &master);
+
+	maxfd = sockfd;
+
+	while(1)
+	{
+		memcpy(&readfds, &master, sizeof(master));
+
+		(void)printf("running select()\n");
+
+		if(-1 == (nready = select(maxfd+1, &readfds, NULL, NULL, NULL)))
+			die("select()");
+
+		(void)printf("Number of ready descriptor: %d\n", nready);
+
+		for(i=0; i<=maxfd && nready>0; i++)
+		{
+			if(FD_ISSET(i, &readfds))
+			{
+				nready--;
+
+				if(i == sockfd)
+				{
+					(void)printf("Trying to accept() new connection(s)\n");
+
+					if(-1 == (new = accept(sockfd, NULL, NULL)))
+					{
+						if(EWOULDBLOCK != errno)
+							die("accept()");
+
+						break;
+					}
+					
+					else
+					{
+
+						if(-1 == (fcntl(new, F_SETFD, O_NONBLOCK)))
+							die("fcntl()");
+
+						FD_SET(new, &master);
+
+						if(maxfd < new)
+							maxfd = new;
+					}
+				}
+
+				else
+				{
+					(void)printf("recv() data from one of descriptors(s)\n");
+
+					nbytes = recv(i, buffer, sizeof(buffer), 0);
+					if(nbytes <= 0)
+					{
+						if(EWOULDBLOCK != errno)
+							die("recv()");
+
+						break;
+					}
+
+					buffer[nbytes] = '\0';
+					printf("%s", buffer);
+					
+					(void)printf("%zi bytes received.\n", nbytes);
+
+					close(i);
+					FD_CLR(i, &master);
+
+				}
+			}
+
+		}
+
+	}
+
+	return 0;
+}
+
+void die(const char *msg)
+{
+	perror(msg);
+	exit(EXIT_FAILURE);
+}
+
+</syntaxhighlight>
+
+== 参见 ==
+*[[Berkeley套接字|Berkeley套接字]]
+*[[轮询|轮询]]
+*[[epoll|epoll]]
+*[[kqueue|kqueue]]
+*[[IOCP|IOCP]]
+
+== 外部链接 ==
+* {{man|2|select|Linux}}
+* {{man|2|select_tut|die.net}}
+
+[[Category:C_POSIX库|Category:C POSIX库]]
+[[Category:事件_(计算机)|Category:事件 (计算机)]]
+[[Category:系统调用|Category:系统调用]]

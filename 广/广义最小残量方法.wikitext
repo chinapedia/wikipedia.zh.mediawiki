@@ -1,0 +1,326 @@
+{{NoteTA
+|1=zh-hans:迭代;zh-hant:疊代;
+|G1 = Math
+}}
+
+在数学上，'''广义最小残量方法'''(一般简称'''GMRES''')是一个求解[[线性方程组|线性方程组]] [[数值分析|数值]]解的[[迭代|迭代]]方法。这个方法利用在[[Krylov子空间|Krylov子空间]]中有着最小[[数值分析|残量]]的向量来逼近解。[[Arnoldi迭代方法|Arnoldi迭代方法]]被用来求解这个向量。
+
+GMRES方法由Yousef Saad和Martin H. Schultz在1986年提出。<ref>Saad和Schultz</ref>
+
+== GMRES方法 ==
+
+需要求解的线性方程组记为
+:<math> Ax = b \, </math>。
+假设矩阵''A''是''n''<math>\times</math>''n''阶的[[可逆矩阵|可逆的]]。进一步，假设''b''是标准化的，即||''b''|| = 1 (在这篇文章中，||·||是Euclidean[[范数|范数]])。 
+
+这个问题的''m''阶[[Krylov序列|Krylov子空间]]是
+:<math> K_m = \operatorname{span} \, \{ b, Ab, A^2b, \ldots, A^{m-1}b \} \, </math>。
+GMRES通过使得残量''Ax''<sub>''m''</sub> − ''b''最小的向量''x''<sub>''m''</sub> ∈ ''K''<sub>''m''</sub>来逼近''Ax'' = ''b''的精确解。
+
+但是，向量''b'', ''Ab'', …, ''A''<sup>''m''−1</sup>''b''几乎是[[线性相关|线性相关]]的。因此，用[[Arnoldi迭代方法|Arnoldi迭代方法]]求得的这组''K''<sub>''m''</sub>的标准正交基
+:<math> q_1, q_2, \ldots, q_m \, </math> 
+来取代上面的那组基。所以，向量''x''<sub>''m''</sub> ∈ ''K''<sub>''m''</sub>写成''x''<sub>''m''</sub> = ''Q''<sub>''m''</sub>''y''<sub>''m''</sub>，其中''y''<sub>''m''</sub> ∈ '''R'''<sup>''m''</sup>且''Q''<sub>''m''</sub>是由''q''<sub>1</sub>, …, ''q''<sub>m</sub>组成的''n''<math>\times</math>''m''矩阵。
+
+Arnoldi过程也产生一个 (''m''+1)<math>\times</math>''m''阶上[[Hessenberg矩阵|Hessenberg矩阵]]<math>\tilde{H}_m</math>满足
+:<math> AQ_m = Q_{m+1} \tilde{H}_m \, </math>。
+因为<math>Q_m</math>是正交的，我们有
+:<math> \| Ax_m - b \| = \| \tilde{H}_my_m - \beta e_1 \| \, </math>，
+其中
+:<math> e_1 = (1,0,0,\ldots,0) \, </math>
+是'''R'''<sup>''m''+1</sup>的标准[[基_(線性代數)|基]]的第一个向量，并且 
+:<math> \beta = \|b-Ax_0\| \, </math> ，
+其中<math>x_0</math>是初始向量(通常是零向量)。因此，求使得残量
+:<math> r_m = \tilde{H}_m y_m - \beta e_1 </math>。
+的范数最小的<math>x_m</math>。这是一个''m''阶线性[[最小二乘法|最小二乘问题]]。
+
+这就是GMRES方法。在迭代的每一步中：
+# 做一步Arnoldi迭代方法；
+# 寻找使得||''r''<sub>''m''</sub>||最小的<math> y_m </math> ；
+# 计算<math> x_m = Q_m y_m </math> ；
+# 如果残量不够小，重复以上过程。
+在每一步迭代中，必须计算一次矩阵向量积''Aq''<sub>''m''</sub>。对于一般的''n''阶稠密矩阵，这要计算复杂度大约2''n''<sup>2</sup>次[[浮点数|浮点运算]]。但是对于[[稀疏矩阵|稀疏矩阵]]，这个计算复杂度能减少到O(''n'')。进一步，关于矩阵向量积，在''m''次迭代中能进行O(''m'' ''n'')次浮点运算。
+
+== 收敛性 ==
+
+第''m''次迭代获得在Krylov子空间''K''<sub>''m''</sub>下的最小残量。因为每个子空间包含于下一个子空间中，所以残量单调递减。在第''n''次迭代后，其中''n''是矩阵''A''的阶数，Krylov空间''K''<sub>''n''</sub>是完整的'''R'''<sup>''n''</sup>。因此，GMRES方法达到精确解。然而，问题在于：在极少的几次迭代后(相对于''n'')，向量''x''<sub>''m''</sub>几乎已经是精确解的一个很好的逼近。
+
+但是，在一般情况下这是不会发生的。事实上，Greenbaum，Pták和Strakoš的理论说明了对于每一个单调减少的序列''a''<sub>1</sub>, …, ''a''<sub>''n''−1</sub>, ''a''<sub>''n''</sub> = 0 ，能够找到一个矩阵''A''对于所有''m''满足||''r''<sub>''m''</sub>|| = ''a''<sub>''m''</sub> ，其中''r''<sub>''m''</sub>是上面所定义的残量。特别的，有可能找到一个矩阵，使得前''n'' − 1次迭代的残量一直保持为常数，而只在最后一次迭代时达到零。
+
+在实验中，GMRES方法经常表现得很好。在特殊的情况下这能够被证明。如果''A''是[[正定矩阵|正定的]]，则
+:<math> \|r_m\| \leq \left( 1-\frac{\lambda_{\mathrm{min}}(A^T + A)}{2 \lambda_{\mathrm{max}}(A^T + A)} \right)^{m/2} \|r_0\| </math>，
+其中<math>\lambda_{\mathrm{min}}(M)</math>和<math>\lambda_{\mathrm{max}}(M)</math>分别为矩阵<math>M</math>的最小和最大[[特征值|特征值]]。
+
+如果''A''是[[对称矩阵|对称的]]并且是正定的，则
+:<math> \|r_m\| \leq \left( \frac{\kappa_2^2(A)-1}{\kappa_2^2(A)} \right)^{m/2} \|r_0\| </math>。
+其中<math>\kappa_2(A)</math>记为''A''在Euclidean范数下的[[条件数|条件数]]。
+
+一般情况下，其中''A''是非正定的，则
+:<math> \|r_m\| \le \inf_{p \in P_m} \|p_m(A)\| \le \kappa_2(V) \inf_{p \in P_m} \max_{\lambda \in \sigma(A)} |p(\lambda)| \, </math>，
+其中''P''<sub>''m''</sub>记为次数不超过''m''且''p''(0) = 1的多项式的集合，''V''是''A''的[[矩阵分解|谱分解]]中的矩阵，而σ(''A'')是''A''的[[矩阵分解|谱]]。粗略的说，当''A''的特征值聚集在远离原点的区域且''A''离[[正规矩阵|正规]]不太远时，收敛速度较快。<ref>Trefethen & Bau, Thm 35.2</ref>
+
+所有的不等式只界定残量，而不是实际误差(精确解和当前迭代''x''<sub>''m''</sub>之间的距离)。
+
+== GMRES方法的拓展( Restarted GMRES ) ==
+
+同其他迭代方法一样，为了加快收敛，GMRES经常结合[[预处理|预处理]]方法。
+
+迭代的开销以O(''m''<sup>2</sup>)增长，其中''m''是迭代次数。然而有时候，GMRES方法在''k''次迭代后重新开始，即''x''<sub>''k''</sub>又变回初始值。这样的方法叫做GMRES(''k'')。
+
+== 与其他解法的比较 ==
+
+对于对称矩阵，Arnoldi迭代方法变成[[Lanczos迭代方法|Lanczos迭代方法]]。对应的Krylov子空间方法叫做Paige和Saunders的[[最小残量方法|最小残量方法]](MinRes)。不像非对称的情况，MinRes方法由三项循环关系(three-term recurrence relation)给出，并且同GMRES一样，使残量的范数最小。而对于一般矩阵，Krylov子空间方法不能由短的循环关系(short recurrence relation)给出。
+
+另一类方法由[[非对称Lanczos迭代方法|非对称Lanczos迭代方法]]给出，特别的是[[双共轭梯度方法|BiCG方法]]。这个利用了three-term recurrence relation，但他们没有达到最小的残量，因此对于这些方法残量不会单调递减。收敛性是不能保证的。
+
+第三类方法由[[共轭梯度平方法|CGS]]和[[稳定双共轭梯度方法|BiCGSTAB]]给出。这些也由three-term recurrence relation给出(因此，非最优)。而且可能过早的终止迭代了而没有达到收敛的目的。这些方法的想法是合适的选择迭代序列所产生的多项式。
+
+对于所有矩阵，这三类方法都不是最好的；总有例使得一类方法好于另一类。因而，各种解法应该进行实际的试验，来决定对于给定的问题哪一种是最优的。
+
+== 求解最小二乘问题 ==
+
+GMRES方法的其中一部分是求解向量<math>y_m</math>使得
+:<math> \| \tilde{H}_m y_m - e_1 \| \, </math>
+最小。这个可以通过计算[[QR分解|QR分解]]来实现：找到一个(''m''+1)<math>\times</math>(''m''+1)阶[[正交矩阵|正交矩阵]]Ω<sub>''m''</sub>和一个(''m''+1)<math>\times</math>''m''上[[三角矩阵|三角矩阵]]<math>\tilde{R}_m</math>满足
+:<math> \Omega_m \tilde{H}_m = \tilde{R}_m </math>。
+三角矩阵的行数比列数多1，所以它的最后一行由零组成。因此，它能被分解为
+:<math> \tilde{R}_m = \begin{bmatrix} R_m \\ 0 \end{bmatrix} </math>，
+其中<math>R_m</math>是一个''m''<math>\times</math>''m''阶三角(方)矩阵。
+
+QR分解能够简单的进行下去(update)，从一步迭代到下一步迭代。因为每次的Hessenberg矩阵只在一行零元素和一列元素上有所不同：
+:<math>\tilde{H}_{m+1} = \begin{bmatrix} \tilde{H}_m & h_m \\ 0 & h_{m+1,m} \end{bmatrix} </math> ，
+其中''h''<sub>''m''</sub> = (''h''<sub>1''m''</sub>, … ''h''<sub>''mm''</sub>)<sup>T</sup>。这意味着，Hessenberg矩阵左乘上Ω<sub>''m''</sub>的扩大矩阵(通过并上零元素和单位元素)，所得到的是类似于三角矩阵的矩阵：
+:<math> \begin{bmatrix} \Omega_m & 0 \\ 0 & 1 \end{bmatrix} \tilde{H}_{m+1} = \begin{bmatrix} R_m & r_k \\ 0 & \rho \\ 0 & \sigma \end{bmatrix} </math>
+这个矩阵可以三角化，如果σ为零。为了修正这个矩阵，需要进行[[Givens旋转|Givens旋转]]
+:<math> G_m = \begin{bmatrix} I_{m-1} & 0 & 0 \\ 0 & c_m & s_m \\ 0 & -s_m & c_m \end{bmatrix} </math>
+其中
+:<math> c_m = \frac{\rho}{\sqrt{\rho^2+\sigma^2}} \quad\mbox{and}\quad s_m = \frac{\sigma}{\sqrt{\rho^2+\sigma^2}} </math>。
+通过这个Givens旋转，我们构造
+:<math> \Omega_{m+1} = G_m \begin{bmatrix} \Omega_m & 0 \\ 0 & 1 \end{bmatrix} </math>。
+事实上，
+:<math> \Omega_{m+1} \tilde{H}_{m+1} = \begin{bmatrix} R_m & r_m \\ 0 & r_{mm} \\ 0 & 0 \end{bmatrix} \quad\text{其 中}\quad r_{mm} = \sqrt{\rho^2+\sigma^2} </math>
+是一个三角矩阵。 
+
+给出了QR分解，最小值问题就容易解决了。注意到
+:<math> \| \tilde{H}_m y_m - e_1 \| = \| \Omega_m (\tilde{H}_m y_m - e_1) \| = \| \tilde{R}_m y_m - \Omega_m e_1 \| </math>。
+记<math>\Omega_me_1</math>为
+:<math> \tilde{g}_m = \begin{bmatrix} g_m \\ \gamma_m \end{bmatrix} </math>
+其中''g''<sub>''m''</sub> ∈ '''R'''<sup>''m''</sub>和γ<sub>''m''</sub> ∈ '''R'''，则
+:<math> \| \tilde{H}_m y_m - e_1 \| = \| \tilde{R}_m y_m - \Omega_m e_1 \| = \left\| \begin{bmatrix} R_m \\ 0 \end{bmatrix} y - \begin{bmatrix} g_m \\ \gamma_m \end{bmatrix} \right\| </math>。
+使得这个表达式最小的向量''y''为
+:<math> y_m = R_m^{-1} g_m </math>。
+再一次，向量<math>g_m</math>能够简单的进行下去(update)。<ref>Stoer and Bulirsch, §8.7.2</ref>
+
+==Example code==
+===Regular GMRES (python3)===
+<syntaxhighlight lang="python3">
+# from "https://github.com/J-N-ch/GMRES_py_restart/blob/master/GMRES_API/GMRES.py"
+import numpy as np
+import math
+
+class GMRES_API(object):
+    def __init__( self,
+                  A_coefficient_matrix: np.array([], dtype = float ),
+                  b_boundary_condition_vector: np.array([], dtype = float ),
+                  maximum_number_of_basis_used: int,
+                  threshold = 1.0e-16 ):
+
+        self.A = A_coefficient_matrix
+        self.b = b_boundary_condition_vector
+        self.maximum_number_of_basis_used = maximum_number_of_basis_used
+        self.threshold = threshold
+
+    def initial_guess_input( self, x_input_vector_initial_guess: np.array([], dtype = float ) ):
+
+        self.x = x_input_vector_initial_guess
+
+        try:
+            assert len( self.x ) == len( self.b )
+
+        except Exception:
+
+            print(" The input guess vector's size must equal to the system's size !\n")
+            print(" The matrix system's size == ", len( self.b ))
+            print(" Your input vector's size == ", len( self.x ))
+            self.x = np.zeros( len( self.b ) ) 
+            print(" Use default input guess vector = ", self.x, " instead of the incorrect vector you given !\n")
+
+
+    def run( self ):
+
+        n = len( self.A )
+        m = self.maximum_number_of_basis_used
+
+        r = self.b - np.dot(self.A , self.x)
+        r_norm = np.linalg.norm( r )
+
+        b_norm = np.linalg.norm( self.b )
+
+        self.error = np.linalg.norm( r ) / b_norm
+        self.e = [self.error]
+        
+        # initialize the 1D vectors 
+        sn = np.zeros( m )
+        cs = np.zeros( m )
+        e1 = np.zeros( m + 1 )
+        e1[0] = 1.0
+
+        beta = r_norm * e1 
+        # beta is the beta vector instead of the beta scalar
+
+        H = np.zeros(( m+1, m+1 ))
+        Q = np.zeros((   n, m+1 ))
+        Q[:,0] = r / r_norm
+
+        for k in range(m):
+
+            ( H[0:k+2, k], Q[:, k+1] )    = __class__.arnoldi( self.A, Q, k)
+            ( H[0:k+2, k], cs[k], sn[k] ) = __class__.apply_givens_rotation( H[0:k+2, k], cs, sn, k)
+            
+            # update the residual vector
+            beta[ k+1 ] = -sn[k] * beta[k]
+            beta[ k   ] =  cs[k] * beta[k]
+
+            # calculate and save the errors
+            self.error = abs(beta[k+1]) / b_norm
+            self.e = np.append(self.e, self.error)
+
+            if( self.error <= self.threshold):
+                break
+
+
+        # calculate the result
+        #y = np.matmul( np.linalg.inv( H[0:k+1, 0:k+1]), beta[0:k+1] )
+        #TODO Due to H[0:k+1, 0:k+1] being a upper tri-matrix, we can exploit this fact. 
+        y = __class__.__back_substitution( H[0:k+1, 0:k+1], beta[0:k+1] )
+
+
+        self.x = self.x + np.matmul( Q[:,0:k+1], y )
+
+        self.final_residual_norm = np.linalg.norm( self.b - np.matmul( self.A, self.x ) )
+
+        return self.x
+
+
+    '''''''''''''''''''''''''''''''''''
+    '        Arnoldi Function         '
+    '''''''''''''''''''''''''''''''''''
+    @staticmethod
+    def arnoldi( A, Q, k ):
+        h = np.zeros( k+2 )
+        q = np.dot( A, Q[:,k] )
+        for i in range ( k+1 ):
+            h[i] = np.dot( q, Q[:,i])
+            q = q - h[i] * Q[:, i]
+        h[ k+1 ] = np.linalg.norm(q)
+        q = q / h[ k+1 ]
+        return h, q 
+
+    '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    '           Applying Givens Rotation to H col           '
+    '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    @staticmethod
+    def apply_givens_rotation( h, cs, sn, k ):
+        for i in range( k-1 ):
+            temp   =  cs[i] * h[i] + sn[i] * h[i+1]
+            h[i+1] = -sn[i] * h[i] + cs[i] * h[i+1]
+            h[i]   = temp
+
+        # update the next sin cos values for rotation
+        cs_k, sn_k, h[k] = __class__.givens_rotation( h[k-1], h[k] )
+        
+        # eliminate H[ k+1, i ]
+        h[k + 1] = 0.0
+
+        return h, cs_k, sn_k
+
+    ##----Calculate the Given rotation matrix----##
+    # From "http://www.netlib.org/lapack/lawnspdf/lawn150.pdf"
+    # The algorithm used by "Edward Anderson"
+    @staticmethod
+    def givens_rotation( v1, v2 ):
+        if( v2 == 0.0 ):
+            cs = np.sign(v1)
+            sn = 0.0
+            r = abs(v1)
+        elif( v1 == 0.0 ):
+            cs = 0.0
+            sn = np.sign(v2)
+            r = abs(v2)
+        elif( abs(v1) > abs(v2) ):
+            t = v2 / v1 
+            u = np.sign(v1) * math.hypot( 1.0, t )  
+            cs = 1.0 / u
+            sn = t * cs
+            r = v1 * u
+        else:
+            t = v1 / v2 
+            u = np.sign(v2) * math.hypot( 1.0, t )  
+            sn = 1.0 / u
+            cs = t * sn
+            r = v2 * u
+        return cs, sn, r
+
+    # From https://stackoverflow.com/questions/47551069/back-substitution-in-python
+    @staticmethod
+    def __back_substitution( A: np.ndarray, b: np.ndarray) -> np.ndarray:
+        n = b.size
+        if A[n-1, n-1] == 0.0:
+            raise ValueError
+
+        x = np.zeros_like(b)
+        x[n-1] = b[n-1] / A[n-1, n-1]
+        for i in range( n-2, -1, -1 ):
+            bb = 0
+            for j in range ( i+1, n ):
+                bb += A[i, j] * x[j]
+            x[i] = (b[i] - bb) / A[i, i]
+        return x
+
+
+    def final_residual_info_show( self ):
+        print( "x  =", self.x, "residual_norm =  ", self.final_residual_norm ) 
+    
+def main():
+
+    A_mat = np.array( [[1.00, 1.00, 1.00],
+                       [1.00, 2.00, 1.00],
+                       [0.00, 0.00, 3.00]] )
+
+    b_mat = np.array( [3.0, 2.0, 1.0] )
+
+    GMRES_test_itr2 = GMRES_API( A_mat, b_mat, 2, 0.01)
+
+    x_mat = np.array( [1.0, 1.0, 1.0] )
+    print("x  =", x_mat)
+
+    # GMRES with restart, 2 iterations in each restart ( GMRES(2) )
+    max_restart_counts = 100
+    for restart_counter in range(max_restart_counts):
+        GMRES_test_itr2.initial_guess_input( x_mat )
+
+        x_mat = GMRES_test_itr2.run()
+        print(restart_counter+1," : x  =", x_mat)
+
+    xx = np.matmul( np.linalg.inv(A_mat), b_mat )
+    print("ANS : xx =", xx) 
+
+
+if __name__ == '__main__':
+    main()
+</syntaxhighlight>
+
+== 注记 ==
+<references/>
+
+== 参考 ==
+
+* A. Meister, ''Numerik linearer Gleichungssysteme'', 2nd edition, Vieweg 2005, ISBN 978-3-528-13135-7.
+* Y. Saad, ''Iterative Methods for Sparse Linear Systems'', 2nd edition, [[Society_for_Industrial_and_Applied_Mathematics|Society for Industrial and Applied Mathematics]], 2003. ISBN 978-0-89871-534-7.
+* Y. Saad and M.H. Schultz, "GMRES: A generalized minimal residual algorithm for solving nonsymmetric linear systems", ''SIAM J. Sci. Stat. Comput.'', '''7''':856-869, 1986. {{doi|10.1137/0907058}}.
+* J. Stoer and R. Bulirsch, ''Introduction to numerical analysis'', 3rd edition, Springer, New York, 2002. ISBN 978-0-387-95452-3. 
+* Lloyd N. Trefethen and David Bau, III, ''Numerical Linear Algebra'', Society for Industrial and Applied Mathematics, 1997. ISBN 978-0-89871-361-9.
+* [http://www.netlib.org/linalg/html_templates/node29.html#SECTION00734000000000000000|J. Dongarra et al. , ''Templates for the Solution of Linear Systems: Building Blocks for Iterative Methods''] {{Wayback|url=http://www.netlib.org/linalg/html_templates/node29.html#SECTION00734000000000000000{{!}}J. |date=20091109055212 }}, 2nd Edition, SIAM, Philadelphia, 1994
+* https://github.com/J-N-ch/GMRES_py_restart {{Wayback|url=https://github.com/J-N-ch/GMRES_py_restart |date=20200910013643 }}
+
+[[Category:数值线性代数|Category:数值线性代数]]
+[[Category:带有Python代码示例的条目|Category:带有Python代码示例的条目]]

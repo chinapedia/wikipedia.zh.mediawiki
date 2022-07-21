@@ -1,0 +1,98 @@
+{{noteTA|G1=IT}}
+{{infobox software
+| logo                   = [[File:METAFONT_logo.svg|200px]]
+| developer              = [[高德納|高德納]]
+| latest_release_version = 2.7182818
+| latest_release_date    = {{Release date and age|2014|01}}
+| operating_system       = [[跨平台|跨平台]]
+| genre                  = 編程語言
+| license                = 自由軟件
+}}
+'''Metafont'''是一種用於定義矢量字體的編程語言。這也是Metafont[[直譯器|直譯器]]的名稱，其生成的點陣字體，可嵌入到[[PostScript|PostScript]]中。Metafont由[[高德納|高德納]]發明，與也是他發明的[[TeX|TeX]]排版軟體相輔相成。
+Metafont的特點之一是所有的字体都是用几何方程定义的，例如，可以用線段及[[貝茲曲線|貝茲曲線]]的相交處來定義點。
+
+==歷史==
+美國計算機科學家[[高德纳|高德纳]]（Donald Knuth）於1977年著手字體製作軟件，並於1979年發佈的第一個版本<code>METAFONT</code>。由於原來語言的缺陷，高德纳於1984年開發一個全新的<code>METAFONT</code>系統。<code>METAFONT</code>有一個與{{TeX}}的相似點 ，就是每一個更新版本都愈接近一個[[數學常數|數學常數]]（每一個更新版本增加一個小數位，<code>METAFONT</code>趋近于[[e_(數學常數)|''e'']]，{{TeX}}趋近于[[圓周率|''π'']]）。
+
+==特点==
+与很多常见的轮廓字体格式如[[TrueType|TrueType]]和[[PostScript#字体处理|PostScript Type 1]]不同，<code>METAFONT</code>字体主要由一定宽度的“笔划”和一些封闭填色区域构成。因此，<code>METAFONT</code>字体文件并不描述字形的轮廓，而是描述“笔划”的路径。
+
+<code>METAFONT</code>的曲线描述采用三次[[样条函数|样条函数]]，而不是[[二次曲线|二次]]的。
+
+==使用==
+虽然一些著名的字体设计师如[[赫尔曼·察普夫|Hermann Zapf]]已经与高德纳合作用<code>METAFONT</code>设计新字体（二者曾合作设计了[[AMS_Euler|AMS Euler]]数学字体），但这个系统并未在业界被广泛使用。高德纳认为这是由于“让一个艺术家变成一个能够理解如何通过60多个参数设计字体的数学家实在太困难”<ref>{{cite journal
+ |journal      = TUGBoat
+ |publisher    = 
+ |location     = 布拉格
+ |title        = Questions and Answers with Prof. Donald E. Knuth
+ |volume       = 17
+ |issue        = 4
+ |page         = 361
+ |url          = http://www.tug.org/TUGboat/Articles/tb17-4/tb53knuc.pdf
+ |language     = en
+ |trans_title  = 与高德纳教授的问答
+ |author       = Karel Horák
+ |accessdate   = 2012-10-25
+ |date         = 1996年3月
+ |archive-date = 2020-09-20
+ |archive-url  = https://web.archive.org/web/20200920213724/http://www.tug.org/TUGboat/Articles/tb17-4/tb53knuc.pdf
+ |dead-url     = no
+}}</ref>。
+
+==例子==
+下列例子為字母B定義一個類似豆子的字型。
+<syntaxhighlight lang="postscript">
+%file name: beta.mf
+%mode_setup;
+% Define a beanlike shape for the character B
+beginchar("B",11pt#,11pt#,0);
+  % Setup coordinates as an equation system
+  y1=y2=y3=0;
+  y4=y5=y6=h;
+  x1=x4=0;
+  x2=x5=w;
+  x3=x6=2*w;
+
+  % Define pen
+  pickup pencircle xscaled 0.2w yscaled 0.04w rotated 45;
+
+  % Draw the character curve
+  draw z1..z3..z6{z2-z6}..z5..{z4-z2}z4..cycle;
+endchar;
+
+end
+</syntaxhighlight>
+這會產生下列字型圖樣：
+
+[[File:metafont-example-output.svg|284px]]
+
+上述例子可由命令列指令來處理
+<ref name=grandsir>{{cite web|url=http://metafont.tutorial.free.fr/|title=METAFONT Tutorial|author=Christophe Grandsir|accessdate=2009-06-28|archive-date=2020-05-30|archive-url=https://web.archive.org/web/20200530234942/http://metafont.tutorial.free.fr/|dead-url=no}}</ref>：
+
+<pre>mf '\mode=ljfour; mode_setup; input beta.mf'; gftopk beta.600gf beta.600pk</pre>
+
+處理後可用於LaTeX檔案<ref  name=grandsir/>（所有檔案應存放在相同目錄下，或是使用適當的方法提示TeX系統相關的資訊）：
+
+<syntaxhighlight lang="latex">
+\documentclass{article}
+
+\newfont{\letterbeta}{beta}
+\newcommand{\otherbeta}{{\letterbeta B}}
+
+\begin{document}
+Let’s try having a strange \otherbeta\ here.
+\end{document}
+</syntaxhighlight>
+最後的PDF檔應如下所示：
+[[File:Tex_mf_beta.pdf|187px]]
+
+==参考==
+{{reflist}}
+
+== 外部連結 ==
+* [http://metafont.tutorial.free.fr/ The Metafont Tutorial: an online guide to using Metafont.] {{Wayback|url=http://metafont.tutorial.free.fr/ |date=20200530234942 }}
+
+{{Free and open-source typography}}
+{{TeX navbox}}
+
+[[Category:字体编辑软件|Category:字体编辑软件]]

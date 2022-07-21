@@ -1,0 +1,63 @@
+{{NoteTA
+|G1=IT
+|1=支=>zh-cn:只
+}}
+'''哲学家就餐问题'''（{{lang-en|Dining philosophers problem}}）是在[[计算机科学|计算机科学]]中的一个经典问题，用来演示在[[Concurrent_computing|并发计算]]中[[多线程|多线程]][[同步|同步]]（{{lang|en|Synchronization}}）时产生的问题。
+
+在1971年，著名的计算机科学家[[艾兹格·迪科斯彻|艾兹格·迪科斯彻]]提出了一个同步问题，即假设有五台计算机都试图访问五份共享的磁带驱动器。稍后，这个问题被[[托尼·霍尔|托尼·霍尔]]重新表述为哲学家就餐问题。这个问题可以用来解释[[死結|死結]]和资源耗尽。<ref>{{cite EWD|1000}}</ref><ref name="formalization">{{cite book|author1=J. Díaz|author2=I. Ramos|title=Formalization of Programming Concepts: International Colloquium, Peniscola, Spain, April 19–25, 1981. Proceedings|url=https://books.google.com/books?id=pl4VJKQlcG4C|year=1981|publisher=Birkhäuser|isbn=978-3-540-10699-9|pages=[https://books.google.com/books?id=pl4VJKQlcG4C&pg=PA323 323 ], [https://books.google.com/books?id=pl4VJKQlcG4C&pg=PA326 326]|access-date=2020-12-16|archive-date=2016-12-19|archive-url=https://web.archive.org/web/20161219010205/https://books.google.com/books?id=pl4VJKQlcG4C|dead-url=no}}</ref><ref>{{cite book|url=http://www.usingcsp.com/cspbook.pdf|title=Communicating Sequential Processes|last=Hoare|first=C. A. R.|authorlink=东尼·霍尔|publisher=usingcsp.com|orig-year=最初由[[普林帝斯霍爾|普林帝斯霍爾]]于1985出版|year=2004|access-date=2020-12-16|archive-date=2016-01-27|archive-url=https://web.archive.org/web/20160127183424/http://www.usingcsp.com/cspbook.pdf|dead-url=no}}</ref>
+
+== 问题描述 ==
+[[File:An_illustration_of_the_dining_philosophers_problem.png|thumb]]
+
+哲学家就餐问题可以这样表述，假设有五位哲学家围坐在一张圆形餐桌旁，做以下两件事情之一：吃饭，或者思考。吃东西的时候，他们就停止思考，思考的时候也停止吃东西。餐桌上有五碗義大利麵，每位哲学家之间各有一支餐叉。因为用一支餐叉很难吃到義大利麵，所以假设哲学家必须用两支餐叉吃东西。他们只能使用自己左右手边的那两支餐叉。哲学家就餐问题有时也用米饭和五根筷子而不是義大利麵和餐叉来描述，因为吃米饭必须用两根筷子。
+
+这个问题不考虑意大利面有多少，也不考虑哲学家的胃有多大。假设两者都是无限大。
+
+问题在于如何设计一套规则，使得在哲学家们在完全不交谈，也就是无法知道其他人可能在什么时候要吃饭或者思考的情况下，可以在这两种状态下永远交替下去。
+
+===进一步说明===
+这个问题旨在说明避免[[死锁|死锁]]的挑战，[[死锁|死锁]]是一种程序无法继续运行的状态。要更好理解这个问题，假设我们要求哲学家遵守以下规则：
+
+*哲学家在左边的叉子可用（没有其他人拿起）之前处于思考状态。如果左边的叉子可用，就拿起来。
+*哲学家等待右边的叉子可用。如果右边的叉子可用，就拿起来。
+*如果两个叉子都已经拿起来，开始吃意大利面，每次吃面都花费同样的时间。
+*吃完后先放下左边的叉子。
+*然后放下右边的叉子。
+*开始思考（进入一个循-{}-环）
+
+这个解法是失败的，当每个哲学家都拿起左侧的叉子，等待右侧的叉子可用时，就会进入死锁状态，每个哲学家将永远都在等待（右边的）另一个哲学家放下叉子。<ref>{{Cite_EWD|310}}</ref>
+
+如果特定的哲学家由于时间问题而无法同时获得两个资源，那么[[饥饿_(操作系统)|资源匮乏]]也可能独立于死锁而发生。例如，假設規定當哲學家等待另一支餐叉超過五分鐘後就放下自己手裡的那一支餐叉，並且再等五分鐘後進行下一次嘗試。這個策略消除了死結（系統總會進入到下一個狀態），但仍然有可能發生「活結」。如果五位哲學家在完全相同的時刻進入餐廳，並同時拿起左邊的餐叉，那麼這些哲學家就會等待五分鐘，同時放下手中的餐叉，再等五分鐘，又同時拿起這些餐叉。 
+
+[[互斥|互斥]]是此问题的基本概念。在实际的计算机问题中，缺乏餐叉可以类比为缺乏共享资源。一种常用的计算机技术是资源加锁，用来保证在某个时刻，资源只能被一个程序或一段代码访问。当一个程序想要使用的资源已经被另一个程序锁定，它就等待资源解锁。当多个程序涉及到加锁的资源时，在某些情况下就有可能发生死锁。例如，某个程序需要访问两个文件，当两个这样的程序各锁了一个文件，那它们都在等待对方解锁另一个文件，而解锁永远不会发生。
+
+复杂的系统（例如[[操作系统|操作系统]][[内核|内核]]）使用成千上万的锁，如果要避免死锁，资源匮乏和数据损坏等问题，就需要遵守更严格的方法和同步协议。
+
+== 解法 ==
+
+=== 服务生解法 ===
+一个简单的解法是引入一个餐厅服务生，哲学家必须经过他的允许才能拿起餐叉。因为服务生知道哪支餐叉正在使用，所以他能够作出判断避免死锁。
+
+为了演示这种解法，假设哲学家依次标号为A至E。如果A和C在吃东西，则有四支餐叉在使用中。B坐在A和C之间，所以两支餐叉都无法使用，而D和E之间有一只空余的餐叉。假设这时D想要吃东西。如果他拿起了第五支餐叉，就有可能发生死锁。相反，如果他征求服务生同意，服务生会让他等待。这样，我们就能保证下次当两把餐叉空余出来时，一定有一位哲学家可以成功的得到一对餐叉，从而避免了死锁。
+
+=== 资源分级解法 ===
+另一个简单的解法是为资源（这里是餐叉）分配一个[[偏序|偏序]]或者分级的关系，并约定所有资源都按照这种顺序获取，按相反顺序释放，而且保证不会有两个无关资源同时被同一项工作所需要。在哲学家就餐问题中，资源（餐叉）按照某种规则编号为1至5，每一个工作单元（哲学家）总是先拿起左右两边编号较低的餐叉，再拿编号较高的。用完餐叉后，他总是先放下编号较高的餐叉，再放下编号较低的。在这种情况下，当四位哲学家同时拿起他们手边编号较低的餐叉时，只有编号最高的餐叉留在桌上，从而第五位哲学家就不能使用任何一支餐叉了。而且，只有一位哲学家能使用最高编号的餐叉，所以他能使用两支餐叉用餐。当他吃完后，他会先放下编号最高的餐叉，再放下编号较低的餐叉，从而让另一位哲学家拿起后边的这只开始吃东西。
+
+尽管资源分级能避免死锁，但这种策略并不总是实用的，特别是当所需资源的列表并不是事先知道的时候。例如，假设一个工作单元拿着资源3和5，并决定需要资源2，则必须先要释放5，之后释放3，才能得到2，之后必须重新按顺序获取3和5。对需要访问大量数据库记录的计算机程序来说，如果需要先释放高编号的记录才能访问新的记录，那么运行效率就不会高，因此这种方法在这里并不实用。
+
+=== Chandy/Misra解法 ===
+1984年，{{le|曼尼·钱迪|K. Mani Chandy}}和{{le|贾亚达夫·米斯拉|J. Misra}}提出了哲学家就餐问题的另一个解法<ref>{{Cite journal|last1=Chandy|first1=K. M.|last2=Misra|first2=J.|date=1984|title=The Drinking Philosophers Problem.|url=//www.cs.utexas.edu/users/misra/scannedPdf.dir/DrinkingPhil.pdf|journal=ACM Transactions on Programming Languages and Systems|archiveurl=https://web.archive.org/web/20120113171222/http://www.cs.utexas.edu/users/misra/scannedPdf.dir/DrinkingPhil.pdf|archivedate=2012-01-13|access-date=2021-01-17|dead-url=no}}</ref> ，允许任意的用户（编号<math>P_1,\cdots,P_n</math>）争用任意数量的资源。与資源分級解法不同的是，这里编号可以是任意的。
+
+* 把餐叉湊成對，讓要吃的人先吃，沒餐叉的人得到一張換餐叉券。
+* 餓了，把換餐叉券交給有餐叉的人，有餐叉的人吃飽了會把餐叉交給有券的人。有了券的人不會再得到第二張券。
+* 保證有餐叉的都有得吃。
+
+这个解法允许很大的并行性，适用于任意大的问题。
+==参考资料==
+{{Reflist}}
+== 延伸阅读 ==
+* {{cite book | author=Silberschatz, Abraham; Peterson, James L. | title=Operating Systems Concepts | publisher=Addison-Wesley | year=1988 | id=ISBN 0-201-18760-4}}
+* Dijkstra, E. W.（1971, June）. [http://www.cs.utexas.edu/users/EWD/ewd03xx/EWD310.PDF Hierarchical ordering of sequential processes]{{WebCite|url=https://www.webcitation.org/6AhUVyqHL?url=http://www.cs.utexas.edu/users/EWD/ewd03xx/EWD310.PDF |date=20120915163906 |dateformat=iso }}. Acta Informatica 1 (2): 115-138.
+* Lehmann, D. J., Rabin M. O,（1981）. On the Advantages of Free Choice: A Symmetric and Fully Distributed Solution to the Dining Philosophers Problem. Principles Of Programming Languages 1981（[[POPL|POPL]]'81）, pages 133-138.
+
+[[Category:并发计算|Category:并发计算]]

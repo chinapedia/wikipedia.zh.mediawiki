@@ -1,0 +1,133 @@
+{{NoteTA
+|G1=IT
+|1=管道}}
+
+在计算机领域，'''重定向'''是大多数命令行解释器所具有的功能，包括各种可以将标准流重定向用户规定地点的[[Unix|Unix]] shells。类[[Unix|Unix]]操作系统的程序可以透過dup2(2)[[系统调用|系统调用]]完成重定向，或者透過缺少一些灵活性但是更高一级层次的freopen(3)和popen(3)来完成。
+
+== 重定向标准输入输出 ==
+重定向一般透過在命令间插入特定的符号来实现。特别的，这些符号的语法如下所示:
+
+<syntaxhighlight lang="bash">
+command1 >file1
+</syntaxhighlight>
+
+上面这个命令执行<tt>command1</tt>然后将输出的内容存入<tt>file1</tt>.注意任何<tt>file1</tt>内的已经存在的内容将被新内容替代。如果要将新内容添加在文件末尾，请使用>>操作符。
+
+<syntaxhighlight lang="bash">
+command1 <file1
+</syntaxhighlight>
+
+执行<tt>command1</tt>，使用<tt>file1</tt>作为用来替代键盘的输入源。
+
+<syntaxhighlight lang="bash">
+command1  <infile > outfile
+</syntaxhighlight>
+
+同时替换输入和输出，执行<tt>command1</tt>，从文件<tt>infile</tt>读取内容，然后将输出写入到<tt>outfile</tt>中。
+
+== 管道 ==
+多个程序可以一起运行，一个程序可以直接将另外一个程序的输出作为其输入，并且不需要借助中间文件：
+<syntaxhighlight lang="bash">
+command1 | command2
+</syntaxhighlight>
+执行<tt>command1</tt>，将其输出作为<tt>command2</tt>的输入。这种方式被称为管道，因为"|"字符被称为"管道"。这种方式的结果和使用2个重定向及一个临时文件的方式相等价：
+
+<syntaxhighlight lang="bash">
+command1 > tempfile
+command2 < tempfile
+rm tempfile
+</syntaxhighlight>
+但是使用管道的时候两个命令是同时执行的，较为省时。
+
+一个使用命令管道的很好例子是使用[[echo|echo]]和另外一个命令达到在一个非交互式shell中达到一定的交互效果：
+<syntaxhighlight lang="bash">
+echo -e "user\npass" | ftp localhost
+</syntaxhighlight>
+
+这个例子运行[[ftp|ftp]]客户端，然后输入用户名，回车，然后再输入密码。
+
+== 标准文件句柄的重定向 ==
+源自[[Bourne_shell|Bourne shell]]的许多[[Unix_shell|Unix shell]]，可以将一个数字（文件描述符）放在重定向符号前，这样可以影响用于重定向的数据流。[[Unix|Unix]]的标准输入输出流是:
+
+{| class="wikitable"
+! Handle !! Name !! Description
+|-
+| 0
+| [[stdin|stdin]] || 标准输入
+|-
+| 1
+| [[stdout|stdout]] || 标准输出
+|-
+| 2
+| [[stderr|stderr]] || 标准错误输出
+|}
+
+例如：
+
+<syntaxhighlight lang="bash">
+command1 2> file1
+</syntaxhighlight>
+
+执行<tt>command1</tt>，然后将标准错误输出重定向到文件<tt>file1</tt>
+
+一些源自[[C_Shell|csh]]的shells，将&符号放在重定向符号后，达到同样的效果。这样做的原因是为了将标准输出与文件名为'1'的文件区分开来。例如对于'cat file 2>1'和'cat file 2>&1'，前者会将错误输出重定向至叫做'1'的文件，后者则将其重定向至标准输出。
+
+另外一个很有用的功能是将一个标准文件句柄重定向到另一个。最流行的一种用法是将标准错误输出融合到标准输出中去，这样错误信息可以和其他普通的输出信息一起处理。例如：
+
+<syntaxhighlight lang="bash">
+find / -name .profile > results 2>&1
+</syntaxhighlight>
+
+上面这个命令会找到所有名字为.profile的文件。如果没有重定向，它会输出结果到标准输出，错误（例如在遍历过程中缺少访问某些受保护目录的权限）到标准错误输出。如果标准输出被重定向到一个文件，那么错误信息就会出现在控制台上。通过使用重定向2>&1，输出的结果和错误信息都被写入了文件<tt>results</tt>.
+
+可以将2>&1放置在">"前，但是这样并不能达到我们想要的效果。因为当解释器读到2>&1， 它并不知道标准输出已经被重定向到哪裡，所以标准错误输出并没有和标准输出融合。
+
+如果融合过的输出通过管道作为另外一个程序的输入，那么这个融合2>&1必须在管道符号之前：
+
+<syntaxhighlight lang="bash">
+find / -name .profile 2>&1 | less
+</syntaxhighlight>
+
+一个命令
+
+<syntaxhighlight lang="bash">
+command > file 2>&1
+</syntaxhighlight>
+
+的简化版本 (不使用于bourne shell)
+<syntaxhighlight lang="bash">
+command &>file
+</syntaxhighlight>
+或者
+<syntaxhighlight lang="bash">
+command >&file
+</syntaxhighlight>
+
+== 连锁管道 ==
+重定向和管道符可以联合使用，这样可以组合出更加复杂的命令， 例如:
+<syntaxhighlight lang="bash">
+ls | grep '\.sh' | sort > shlist
+</syntaxhighlight>
+上面这个命令将当前目录的内容列出来，将其作为[[grep|grep]]命令的输入内容，[[grep|grep]]将过滤掉没有以".sh"结尾的内容，然后将内容输出给[[sort|sort]]命令作为输入参数，[[sort|sort]]将输入内容按照字符的顺序排序以后，将最终的输入内容写入shlist文件。在[[Unix|Unix]]和[[Linux|Linux]]操作系统中，这个样的组合命令非常的常见。
+
+== 重定向到多个输出 ==
+命令[[tee|tee]]可以将一个命令的输出重定向到几个目标:
+<syntaxhighlight lang="bash">
+ls -lrt | tee xyz
+</syntaxhighlight>
+上面这个例子将ls的输出重新定向到标准输出和文件xyz。
+
+== 参见 ==
+* [[Here-document|Here-document]], a way of specifying text for input in command line shells
+
+== 外部链接 ==
+* [http://www.linfo.org/redirection.html Redirection Definition] {{Wayback|url=http://www.linfo.org/redirection.html |date=20201209135904 }} by The Linux Information Project (LINFO)
+* [http://tldp.org/LDP/abs/html/io-redirection.html I/O Redirection] {{Wayback|url=http://tldp.org/LDP/abs/html/io-redirection.html |date=20210505061739 }} in [http://tldp.org/ The Linux Documentation Project] {{Wayback|url=http://tldp.org/ |date=20210513191946 }}
+* [http://technet.microsoft.com/en-us/library/bb490982(en-us).aspx Redirection in Windows] {{Wayback|url=http://technet.microsoft.com/en-us/library/bb490982(en-us).aspx |date=20170826190818 }}
+* [http://msdn.microsoft.com/en-us/library/ms682499(VS.85).aspx Creating a Child Process with Redirected Input and Output] {{Wayback|url=http://msdn.microsoft.com/en-us/library/ms682499(VS.85).aspx |date=20170304084748 }} in Windows
+
+[[Category:带有代码示例的条目|Category:带有代码示例的条目]]
+[[Category:DOS技术|Category:DOS技术]]
+[[Category:Unix软件|Category:Unix软件]]
+[[Category:Unix|Category:Unix]]
+[[Category:Windows管理|Category:Windows管理]]

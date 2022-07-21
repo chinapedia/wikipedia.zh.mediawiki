@@ -1,0 +1,223 @@
+{{noteTA
+|1=zh-hans:加伯变换; zh-hant:加伯轉換;
+|3=zh-hans:信息; zh-hant:資訊;
+}}
+'''加伯轉換'''是[[窗函數|窗函數]]為[[高斯函數|高斯函數]]的[[短時距傅立葉變換|短時距傅立葉變換]]。
+
+==數學定義==
+將[[短時距傅立葉轉換|短時距傅立葉轉換]]中的[[窗函數|窗函數]]代入[[高斯函數|高斯函數]]，即可得下面的標準定義：
+:<math>G_x(t,f)=\int_{-\infty}^{\infty}e^{-\pi (\tau-t)^2} e^{-j2 \pi f \tau}x(\tau)\, d\tau</math>
+以下是幾種常見的替代定義：
+# <math>Gx_1(t,f)=\int_{-\infty}^{\infty}e^{-\pi (\tau-t)^2} e^{-j2 \pi f (\tau-\frac{t}{2})}x(\tau)\, d\tau</math>
+#<math>Gx_2(t,f)=\sqrt[4]{2}\int_{-\infty}^{\infty}e^{-\pi (\tau-t)^2} e^{-j2 \pi f \tau}x(\tau)\, d\tau</math>
+#<math>Gx_3(t,\omega)=\int_{-\infty}^{\infty}e^{-\frac{(\tau-t)^2}{2}} e^{-j \omega\tau}x(\tau)\, d\tau</math>
+#<math>Gx_4(t,\omega)=\sqrt{\frac{1}{2\pi}}\int_{-\infty}^{\infty}e^{-\frac{(\tau-t)^2}{2}} e^{-j \omega(\tau-\frac{t}{2})}x(\tau)\, d\tau</math>
+*註：在文獻上可能會看到不同形式的加伯轉換，但本質上都是一樣的。
+由於實作時，不能計算無限大的積分式子，所以根據[[高斯函數|高斯函數]]會從兩側遞減的性質，我們可以將上式進一步化簡：
+:<math>\because \begin{cases}
+\ e^{-\pi a^2} < 0.00001; & |a|>1.9143 \\
+\ e^{-a^2 /2} <0.00001; & |a| > 4.7985
+\end{cases} </math>
+:<math>\therefore \begin{cases}
+\ G_x(t,f) \simeq \int_{t-1.9143}^{t+1.9143}e^{-\pi (\tau-t)^2} e^{-j2 \pi f \tau}x(\tau)\, d\tau \\
+\ Gx_4(t,\omega) \simeq \sqrt{\frac{1}{2\pi}}\int_{t-4.7985}^{t+4.7985}e^{-\frac{(\tau-t)^2}{2}} e^{-j\omega (\tau-t/2)}x(\tau)\, d\tau
+\end{cases}</math>
+
+==為何選擇高斯函數作為窗函數==
+# 其他[[窗函數|窗函數]]的[[短時距傅立葉變換|短時距傅立葉變換]]，如利用方型窗函數的[[短時距傅立葉變換|短時距傅立葉變換]]，無法同時兼顧時間軸和頻率軸的解析度；一者解析度提升，另一者解析度必定下降。但高斯函數由[[海森堡測不準原理|海森堡測不準原理]]可得知，是最能同時讓兩軸兼顧解析度的窗函數(將於下面章節詳述)。
+# [[高斯函數|高斯函數]]為[[傅立葉轉換|傅立葉轉換]]的特徵函數：
+* <math>\int_{-\infty}^{\infty}e^{-\pi t^2}e^{-j2 \pi f \tau}dt=e^{-\pi f^2}</math>
+* <math>\int_{-\infty}^{\infty}e^{-\frac{t^2}{2}}e^{-j \omega t}dt=e^{-\frac{f^2}{2}}</math>
+因此經過轉換後其性質不變。因此可讓加伯轉換後在時間軸和頻率軸的性質相互對稱。
+
+==由測不準原理了解高斯函數的性質==
+上述提到，[[高斯函數|高斯函數]]是最能兼顧時間與頻率解析度的窗函數。我們利用這個章節來詳細討論。
+*[[海森堡測不準原理|海森堡測不準原理]]:
+:對於一個信號 <math> x(t)</math>，當<math> |t|\to \infty</math>，若<math> \sqrt{t} x(t)=0 </math>，則 
+:<math> \sigma_t \sigma_f \ge 1/4 \pi \, </math>
+:其中 <math> \sigma_t^2 = \int (t-\mu_t)^2 P_x(t)dt, \sigma_f^2 = \int (f-\mu_f)^2 P_X(f)df \,</math>
+:<math>\qquad \mu_t = \int tP_x(t)dt\quad \quad \quad\ ,\mu_f = \int fP_X(f)df</math>
+:<math>\qquad P_x(t) = \frac{|x(t)|^2}{\int |x(t)|^2 dt}\quad\;\;\;,P_X(f) = \frac{|X(f)|^2}{\int |X(f)|^2 df}</math>
+:由於兩者標準差相乘有下限，這個定理說明了我們沒有辦法同時精準量測時間和頻率，其中一者標準差下降(解析度上升)，另一者標準差就上升(解析度下降)。
+[[File:GaborTwoFreq.JPG|thumb]]
+* 當信號<math> x(t)</math>為[[高斯函數|高斯函數]]時
+:<math> x(t) = e^{\pi t^2}, X(f)= e^{-\pi f^2}</math>
+:套用以上函式求得變異數(其中由於[[高斯函數|高斯函數]]為偶對稱函數，所以其<math>\mu_t=0</math>)
+:<math> \because \sigma_t^2 =\frac{\int t^2 |x(t)|^2 dt}{\int |x(t)|^2 dt} = \frac{(\frac{1}{2})^{\frac{5}{2}}\pi}{\frac{1}{\sqrt{2}}} = \frac{1}{4\pi}</math>
+:藉由微積分公式可得：<math> \int_{-\infty}^{\infty}|x(t)|^2dt = \int_{-\infty}^{\infty}e^{-2\pi t}dt = \frac{1}{\sqrt{2}}</math>
+:及<math> \int_{-\infty}^{\infty}t^2|x(t)|^2dt = \int_{-\infty}^{\infty}t^2 e^{-2\pi t^2}dt = \frac{\Gamma(3/2)}{(2\pi )^{\frac{3}{2}}}</math>
+:<math> \therefore \sigma_t \sigma_f =  \frac{1}{4\pi}</math>
+:即高斯函數滿足測不準定理的最下限，所以是所有窗函數中能使時間和頻率兩者解析度都達到最高的函數。
+*變形的高斯函數同樣會滿足測不準原理的下限，如以下例子：
+#<math>e^{-\pi (t-t_0)^2}</math>：對機率分布做位移，標準差不會改變。
+#<math>Ae^{-\pi t^2}</math>：分子與分母同乘A，可消掉。因此標準差不會改變。
+#<math>e^{-\pi t^2}e^{j2\pi f_0t}</math>：在時域乘上<math>e^{j2\pi f_0t}</math>相當於在頻域對頻率做位移，標準差一樣不會改變。
+#<math>e^{-\pi bt^2}</math>：在時域做縮放，頻域會做相反的縮放，因此標準差也不會改變。
+*以下提供一個簡單的例子來做模擬，
+:<math>x(t)=\begin{cases}
+\cos(2  \pi t);  & t < 10 \\
+\cos(6 \pi t);  & 10 \leq t < 20  
+\end{cases}</math>
+:右圖為即加伯轉換的結果，可以看出其時間和頻率都維持相當程度的解析度。
+
+== 高斯窗函數與方形窗函數比較 ==
+以下提供一個簡單的範例來比較加伯轉換以及利用方形窗函數的短時傅立葉轉換：
+:<math>x(t)=\begin{cases}
+\cos(10  \pi t);  & t < 10 \\
+\cos(12 \pi t);  & 10 \leq t < 20  \\
+\cos(9 \pi t);  & 20 \leq t < 30
+\end{cases}</math>
+{|
+|-
+| [[File:RecSTFT_simu.png|none]]
+| [[File:Gabor_transform.png|none]]
+|}
+
+從圖中可以發現方形窗函數的短時傅立葉轉換會有能量擴散的情形，而加伯轉換則是清晰的時頻圖。
+
+== 加伯轉換的縮放==
+:由於高斯[[窗函數|窗函數]]的寬度可以由一常數做調整，因此我們將這個參數加入加伯轉換的數學式子中，讓轉換更加彈性，如下式：
+:<math>G_x(t,f)=\sqrt[4]{\sigma} \int_{-\infty}^{\infty} e^{-\sigma \pi (\tau-t)^2} e^{-j2 \pi f\tau}x(\tau)d\tau </math>
+:而根據前面章節所述。實作時，不能計算無限大的積分式子，所以根據[[高斯函數|高斯函數]]會從兩側遞減的性質，我們可以將上式進一步化簡：
+:<math>G_x(t,f) \simeq \sqrt[4]{\sigma} \int_{t-\frac{1.9143}{\sqrt{\sigma}}}^{t+\frac{1.9143}{\sqrt{\sigma}}} e^{-\sigma \pi (\tau-t)^2} e^{-j2 \pi f\tau}x(\tau)d\tau </math>
+*根據傅立葉轉換的縮放公式，假設<math>w(t)=e^{-\pi \sigma t^2}</math>，則傅立葉轉換後為<math>W(f)=\frac{1}{\sqrt{\sigma}}e^{-\frac{\pi f^2}{\sigma}}</math>，使其能根據需求而調整時域解析度或頻域解析度
+*改變高斯函數的寬度，和改變方形窗函數短時距傅立葉變換的效果類似。若選取較大的<math>\sigma</math>，時域的高斯窗函數較窄，則時域有較高的解析度，而頻域的高斯窗函數較寬，所以頻域的解析度會下降(通常用於需要時域解析度較高的應用，例如：音樂訊號);反之，若選取較小的<math>\sigma</math>，時域的高斯窗函數較寬，則時域的解析度下降，而頻域的高斯窗函數較窄，所以頻域的解析度會上升(通常運用在需要頻域解析度較高的應用，例如：氣候)。雖然還是有兩軸之間的解析度的犧牲，但比起其他無法滿足測不準原理下限的窗函數，加伯轉換的兩軸還是能相對維持較高的解析度。
+*若應用於瞬時頻率改變較劇烈的應用，則可考慮使用窗寬度隨時間而變動的加伯轉換數學式子，如下
+:<math>G_x(t,f)=\sqrt[4]{\sigma (t)} \int_{-\infty}^{\infty} e^{-\sigma (t)\pi (\tau-t)^2} e^{-j2 \pi f\tau}x(\tau)d\tau </math>
+:當瞬時頻率變動非常快時，使用較大的<math>\sigma </math>值，使其時域解析度能較高;當瞬時頻率變動很慢時，使用較小的<math>\sigma </math>值，使其頻域解析度能較高。
+
+==實現方法及注意事項==
+
+===Direct Implementation===
+ <math>X(t,f)=\int_{-\infty}^{\infty}w(t-\tau)x(\tau)e^{-j2 \pi f\tau}d\tau</math>
+<math>w(t)=e^{- \pi \sigma t^2}</math>
+*Discrete Form:
+
+令<math>t = n\Delta_t ,  f = m\Delta_f  ,\tau= p\Delta_t </math>
+可將式子改寫為離散形式:
+ <math>{X}\left( {n{\Delta _t},m{\Delta _f}} \right) = \sum\limits_{p = - \infty }^\infty {w\left( {(n - p){\Delta _t}} \right){x}\left( {p{\Delta _t}} \right)}{e^{ - j2\pi \,mp{\Delta _t}{\Delta _f}}}{\Delta _t}</math>
+
+<math>w(t) \cong 0 \qquad for\left| t\right| >B ,  \frac{B}{\Delta _t} = Q</math>
+<math>w((n-p)\Delta_t)\cong 0 \qquad</math>
+<math>for \left| n-p\right| > \frac{B}{\Delta _t}</math>
+,<math>\left| p-n\right| > Q</math>
+therefore,only when
+<math>-Q<p-n<Q</math>
+<math>w((n-p)\Delta_t)</math> is  nonzero
+可改寫為:
+ <math> {X}\left( {n{\Delta _t},m{\Delta _f}} \right) = \sum\limits_{p = n-Q }^{ n+Q} {w\left( {(n - p){\Delta _t}} \right){x}\left( {p{\Delta _t}} \right)}{e^{ - j2\pi \,mp{\Delta _t}{\Delta _f}}}{\Delta _t} </math>按照此式即可實現
+<math>e^{- \pi \sigma a^2} < 0.00001</math>   <math>when\left| a\right| > 1.9143</math>  
+<math>Q=\frac{1.9143}{\sqrt{\sigma}\Delta t}</math>
+<math>B=\frac{1.9143}{\sqrt{\sigma}}</math>
+====限制====
+*避免贋頻效應(aliasing effect)
+(1)<math>{\Delta_t} < \frac{1}{2\Omega} \qquad {\Omega}  =  {{\Omega_x} +{\Omega_w}}</math>
+====時間複雜度====
+O(TFQ) T:時間取樣點數 F:頻率取樣點數 Q:<math>Q=\frac{1.9143}{\sqrt{\sigma}\Delta t}</math>
+====優缺點====
+:優點:簡單實現,限制條件少
+:缺點:時間複雜度高
+===FFT-Based Method(快速傅立葉轉換)===
+由Direct Implementation可得下式
+ <math>{X}\left( {n{\Delta _t},m{\Delta _f}} \right) = \sum\limits_{p = n-Q }^{ n+Q} {w\left( {(n - p){\Delta _t}} \right){x}\left( {p{\Delta _t}} \right)}{e^{ - j2\pi \,mp{\Delta _t}{\Delta _f}}}{\Delta _t}</math>
+令<math>q=p-(n-Q) \to p=(n-Q)+q</math>且離散傅立葉轉換標準式<math>Y[m]=\sum\limits_{n = 0 }^{ N-1}y[n]e^{-j\frac{2\pi mn}{N}}</math>
+可將式子整理為:
+ <math>{X}\left( {n{\Delta _t},m{\Delta _f}} \right) = {\Delta _t}{e^{ j{\textstyle{{2\pi \,(Q-n)m} \over N}}}}\sum\limits_{q = 0}^{N-1} {x_1\left( {q} \right){e^{ - j{\textstyle{{2\pi \,qm} \over N}}}}}</math>按照此式將<math> {x_1}</math>以fft()算出帶入即可實現
+其中<math> {x_1}\left( q \right) = w\left( {(Q - q ){\Delta _t}} \right) x\left( {(n - Q +  q){\Delta _t}} \right)</math> ,<math>0 \le q \le 2Q</math>,<math>w(t)=e^{- \pi \sigma t^2}</math>
+:<math>{x_1}\left( q \right) = 0,2Q  < q \le N</math>
+:<math>Q=\frac{1.9143}{\sqrt{\sigma}\Delta t}</math>
+:<math>B=\frac{1.9143}{\sqrt{\sigma}}</math>
+*Matlab及python 皆可呼叫fft函式完成<math>Y[m]=\sum\limits_{n = 0 }^{ N-1}y[n]e^{-j\frac{2\pi mn}{N}}</math>
+
+*演算法
+假設<math>t=n_0\Delta_t,(n_0+1)\Delta_t,\cdots \cdots ,(n_0+T-1)\Delta_t</math>
+: <math>\,f=m_0\Delta_f,(m_0+1)\Delta_f,\cdots \cdots,(m_0+F-1)\Delta_f</math>
+
+:step 1：計算<math>n_0,m_0,T,F,N,Q</math>
+:step 2：<math>n=n_0</math>
+:step 3：決定<math>x_1(q)</math>
+:step 4：<math>X_1(m)=FFT[x_1(q)]</math>
+:step 5：轉換<math>X_1(m)</math>成<math>X(n\Delta_t,m\Delta_f)</math>
+:step 6：設<math>n=n+1</math> and return to Step 3 until <math>n=n_0+T+1</math>
+
+====限制====
+*避免贋頻效應(aliasing effect)
+:(1)<math>{\Delta_t} < \frac{1}{2\Omega} \qquad {\Omega}  =  {{\Omega_x} +{\Omega_w}}</math>(基本上任何實現方法都要避免贋頻效應)
+:(2)<math>{\Delta _t}{\Delta _f} = {\textstyle{1 \over {N}}}</math>
+:(3)<math>N=1/{\Delta _t}{\Delta _f} \ge 2Q+1</math>
+
+====時間複雜度====
+<math>O(TN{\log _2}N)</math>
+
+====優缺點====
+:優點:時間複雜度低
+:缺點:限制條件較直接實現法多
+
+===Chirp Z Transform===
+可改寫為:
+由Direct Implementation可得下式
+ <math>{X}\left( {n{\Delta _t},m{\Delta _f}} \right) = \sum\limits_{p = n-Q }^{ n+Q} {w\left( {(n - p){\Delta _t}} \right){x}\left( {p{\Delta _t}} \right)}{e^{ - j2\pi \,mp{\Delta _t}{\Delta _f}}}{\Delta _t}</math>
+<math>e^{- \pi \sigma a^2} < 0.00001</math>   <math>when\left| a\right| > 1.9143</math>  
+<math>Q=\frac{1.9143}{\sqrt{\sigma}\Delta t}</math>
+<math>B=\frac{1.9143}{\sqrt{\sigma}}</math>
+
+令<math>exp( - j2\pi \,mp{\Delta _t}{\Delta _f} ) = exp( -j\pi \, p^2{\Delta _t}{\Delta _f}) exp( j\pi \, {(p-m)}^2{\Delta _t}{\Delta _f}) exp( -j\pi \, m^2{\Delta _t}{\Delta _f})</math>
+可將式子改寫為:
+ <math> {X}\left( {n{\Delta _t},m{\Delta _f}} \right) = {\Delta _t} \sum\limits_{p = n-Q }^{ n+Q} {w\left( {(n - p){\Delta _t}} \right){x}\left( {p{\Delta _t}} \right)}{e^{ - j2\pi \,mp{\Delta _t}{\Delta _f}}} \to {X}\left( {n{\Delta _t},m{\Delta _f}} \right) = {\Delta _t} {e^{ - j\pi \,m^2{\Delta _t}{\Delta _f}}}\sum\limits_{p = n-Q }^{ n+Q} {w\left( {(n - p){\Delta _t}} \right){x}\left( {p{\Delta _t}} \right)}{e^{ - j\pi \,p^2{\Delta _t}{\Delta _f}}}{e^{  j\pi \,{(p-m)}^2{\Delta _t}{\Delta _f}}}</math>按此式即可實現
+*演算法
+:Step1:<math>x_1[p] = w((n-p)\Delta_t)x(p\Delta_t)e^{-j\pi p^2 \Delta_t\Delta_f}</math> <math>\quad \quad n-Q \le p \le n+Q</math>
+:Step2:<math>X_2[n,m] = \sum_{p=n-Q}^{n+Q}x_1[p]c[m-p] \quad \quad c[m]=e^{j\pi m^2 \Delta_t\Delta_f}</math>
+:Step3:<math>X(n\Delta_t,m\Delta_f)=\Delta_t e^{-j\pi m^2 \Delta_t\Delta_f}X_2[m,n]</math>
+====限制====
+*避免贋頻效應(aliasing effect)
+(1)<math>{\Delta_t} < \frac{1}{2\Omega} \qquad {\Omega}  =  {{\Omega_x} +{\Omega_w}}</math>
+====時間複雜度====
+<math>O(TN{\log _2}N)</math>
+====優缺點====
+:優點:限制條件與Direct Implementation法一樣基本上沒有限制
+:缺點:時間複雜度與FFT-Based Method(快速傅立葉轉換)一樣
+*但由於加伯轉換無法使用Recursive Method(遞迴法)所以此不能算是缺點
+==特性==
+加伯轉換的大部分的特性和方形窗函數短時距傅立葉轉換的特性都相似，有些特性甚至更加接近傅立葉轉換的特性。
+
+* 積分特性
+:當<math>k \ne 0, \int_{-\infty}^{\infty}G_x(t,f) e^{j2 \pi ktf} \, df = e^{-\pi (k-1)^2 t^2}x(kt)</math>
+:當<math>k = 0, \int_{-\infty}^{\infty}G_x(t,f) \, df = e^{-\pi t^2}x(0)</math>
+:當<math>k = 1, \int_{-\infty}^{\infty}G_x(t,f) e^{j2 \pi tf} \, df = x(t)</math> (還原成原始信號)
+
+* 位移特性
+:若<math> y(t)=x(t-t_0) \,</math>，則<math>G_y(t,f)=G_x(t-t_0,f)e^{-j2 \pi ft_0} \,</math>
+* 調變特性
+:若<math> y(t)=x(t)e^{j2 \pi f_0 t} \,</math>，則<math>G_y(t,f)=G_x(t,f-f_0) \,</math>
+* 線性特性
+:若有一信號<math>h(t)=\alpha x(t)+\beta y(t) \,</math>，<math> G_h(t,f), G_x(t,f), G_y(t,f) \,</math>分別為<math>h(t),x(t),y(t) \,</math>做加伯轉換的結果，則<math>G_h(t,f)=\alpha G_x(t,f)+\beta G_y(t,f) \,</math>。
+*功率衰減特性
+:若<math>t>t_0</math>時<math>x(t)=0</math>，則
+:<math>\int_{-\infty}^{\infty}|G_x(t,f)|^2 df < e^{-2\pi (t-t_0)^2}\int_{-\infty}^{\infty}|G_x(t_0,f)|^2df</math>
+*能量積分特性
+:<math>\int_{-\infty}^{\infty} |G_x(t, f)|^2\, df = \int_{-\infty}^{\infty} |x(\tau)|^2\,d\tau \simeq \int_{u-1.9143}^{u+1.9143}e^{-2\pi (\tau-u)^2}|x(\tau)|^2\, d\tau </math>
+:<math>\int_{-\infty}^{\infty}\int_{-\infty}^{\infty} G_x(t,f)G_y^*(t,f)\,dfdt =  \int_{-\infty}^{\infty} x(\tau)y^*(\tau)\,d\tau</math>
+*能量總和特性
+:<math>\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}G_x(t,f)G_y(t,f)dfdt=\int_{-\infty}^{\infty}x(\tau)y(\tau)d\tau</math>
+*特殊信號
+:1. 當<math>x(t) =\delta(t) \,</math>，<math>G_x(t,f)= e^{-\pi t^2}</math>
+:2. 當<math>x(t) = 1 \,</math>，<math>G_x(t,f)=e^{j2\pi ft} e^{\pi f^2} \,</math>
+:和方形窗函數[[短時距傅立葉轉換|短時距傅立葉轉換]]不同的是，加伯轉換的結果對於時間和頻率軸較對稱，也比較沒有旁波(sidelobe)；也印證了上述所說的，加伯轉換較能維持兩個軸的解析度。
+
+==優缺點==
+*優點: 時頻圖較清晰
+*缺點: 計算複雜度比方形窗函數短時傅立葉變換來的高，因為需做窗函數內與信號本身的乘法。
+
+== 参见 ==
+* [[闵可夫斯基空间|闵可夫斯基空间]]
+* [[柯西不等式|柯西不等式]]
+* [[三角不等式|三角不等式]]
+* [[完备空间|完备空间]]
+
+== 參考書目、資料來源 ==
+# Jian-Jiun Ding, Time frequency analysis and wavelet transform class notes, the Department of Electrical Engineering, National Taiwan University (NTU), Taipei, Taiwan, 2011.
+# Alan V. Oppenheim, Ronald W. Schafer, John R. Buck : Discrete-Time Signal Processing, Prentice Hall, ISBN 0-13-754920-2
+# S. Qian and D. Chen, Joint Time-Frequency Analysis: Methods and Applications, Chap. 5, Prentice Hall, N.J., 1996.
+# Jian-Jiun Ding, Time frequency analysis and wavelet transform class notes, the Department of Electrical Engineering, National Taiwan University (NTU), Taipei, Taiwan, 2020.
+# S.C.Pei and S.G.Huang, ''STFT with adaptive window width based on the chirp rate''. IEEE Transactions on Signal Processing, vol. 60,issue 8,pp. 4065-4080,2012.
+[[category:信号处理|category:信号处理]]

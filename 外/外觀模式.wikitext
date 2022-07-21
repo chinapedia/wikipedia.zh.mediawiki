@@ -1,0 +1,209 @@
+{{Expert|time=2012-01-24}}
+{{Unreferenced |time=2008-12-01T02:18:30+00:00 }}
+'''外觀模式'''（Facade pattern），是[[軟件工程|軟件工程]]中常用的一種[[軟件設計模式|軟件設計模式]]，它為子系統中的一組介面提供一個統一的高層介面，使得子系統更容易使用。
+
+== 結構 ==
+[[File:FacadeDesignPattern.png|File:FacadeDesignPattern.png]]
+; Facade
+: 這個外觀類為子系統中Packages 1、2、3提供一個共同的對外介面（[[接口|接口]]）
+; Clients
+: [[客戶|客戶]]對象通過一個外觀介面讀寫子系統中各介面的[[數據|數據]][[資源|資源]]。
+; Packages
+: 客戶可以通過外觀介面讀取的内部庫。
+
+== 示例 ==
+
+=== Java ===
+這是一個抽象的範例。一個客戶“you”通過外觀介面“computer”獲取[[計算機|計算機]]内部複雜的[[系統信息|系統信息]]。
+
+<syntaxhighlight lang="java">
+/* Complex parts */
+
+class CPU {
+	public void freeze() { ... }
+	public void jump(long position) { ... }
+	public void execute() { ... }
+}
+
+class Memory {
+	public void load(long position, byte[] data) {
+		...
+	}
+}
+
+class HardDrive {
+	public byte[] read(long lba, int size) {
+		...
+	}
+}
+
+/* Façade */
+
+class Computer {
+	public void startComputer() {
+		cpu.freeze();
+		memory.load(BOOT_ADDRESS, hardDrive.read(BOOT_SECTOR, SECTOR_SIZE));
+		cpu.jump(BOOT_ADDRESS);
+		cpu.execute();
+	}
+}
+
+/* Client */
+
+class You {
+	public static void main(String[] args) {
+		Computer facade = new Computer();
+		facade.startComputer();
+	}
+}
+</syntaxhighlight>
+
+=== C# ===
+
+<syntaxhighlight lang="csharp">
+// Facade pattern -- Structural example 
+
+using System;
+
+namespace DoFactory.GangOfFour.Facade.Structural
+{
+
+  // Mainapp test application 
+
+  class MainApp
+  {
+    public static void Main()
+    {
+      Facade facade = new Facade();
+
+      facade.MethodA();
+      facade.MethodB();
+
+      // Wait for user 
+      Console.Read();
+    }
+  }
+
+  // "Subsystem ClassA" 
+
+  class SubSystemOne
+  {
+    public void MethodOne()
+    {
+      Console.WriteLine(" SubSystemOne Method");
+    }
+  }
+
+  // Subsystem ClassB" 
+
+  class SubSystemTwo
+  {
+    public void MethodTwo()
+    {
+      Console.WriteLine(" SubSystemTwo Method");
+    }
+  }
+
+  // Subsystem ClassC" 
+
+  class SubSystemThree
+  {
+    public void MethodThree()
+    {
+      Console.WriteLine(" SubSystemThree Method");
+    }
+  }
+
+  // Subsystem ClassD" 
+
+  class SubSystemFour
+  {
+    public void MethodFour()
+    {
+      Console.WriteLine(" SubSystemFour Method");
+    }
+  }
+
+  // "Facade" 
+
+  class Facade
+  {
+    SubSystemOne one;
+    SubSystemTwo two;
+    SubSystemThree three;
+    SubSystemFour four;
+
+    public Facade()
+    {
+      one = new SubSystemOne();
+      two = new SubSystemTwo();
+      three = new SubSystemThree();
+      four = new SubSystemFour();
+    }
+
+    public void MethodA()
+    {
+      Console.WriteLine("\nMethodA() ---- ");
+      one.MethodOne();
+      two.MethodTwo();
+      four.MethodFour();
+    }
+
+    public void MethodB()
+    {
+      Console.WriteLine("\nMethodB() ---- ");
+      two.MethodTwo();
+      three.MethodThree();
+    }
+  }
+} 
+</syntaxhighlight>
+=== C++ ===
+<syntaxhighlight lang="cpp">
+class CPU {
+public:
+	void freeze() { ... }
+	void jump(long position) { ... }
+	void execute() { ... }
+}
+
+class Memory {
+public:
+	void load(long position, char* data) {
+		...
+	}
+}
+
+class HardDrive {
+public:
+	char* read(long lba, int size) {
+		...
+	}
+}
+
+/* Façade */
+
+class Computer {
+public:
+	void startComputer() {
+		cpu.freeze();
+		memory.load(BOOT_ADDRESS, hardDrive.read(BOOT_SECTOR, SECTOR_SIZE));
+		cpu.jump(BOOT_ADDRESS);
+		cpu.execute();
+	}
+}
+
+/* Client */
+
+class You {
+public:
+	void start(String[] args) {
+		Computer facade = new Computer();
+		facade.startComputer();
+	}
+}
+</syntaxhighlight>
+
+
+{{软件设计模式}}
+[[Category:软件设计模式|Category:软件设计模式]]

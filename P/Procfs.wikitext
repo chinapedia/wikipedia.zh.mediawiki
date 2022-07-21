@@ -1,0 +1,164 @@
+{{noteTA
+|G1=IT
+}}
+{{lowercase|title=procfs}}
+<!-- -->
+在许多类 [[Unix|Unix]] 计算机系统中， '''procfs''' 是 [[进程|进程]] [[文件系统|文件系统]] (file system) 的缩写，包含一个伪文件系统（启动时动态生成的文件系统），用于通过[[内核|内核]]访问进程信息。这个文件系统通常被挂载到 <code>/proc</code> [[目录_(文件系统)|目录]]。由于 <tt>/proc</tt> 不是一个真正的文件系统，它也就不占用存储空间，只是占用有限的内存。
+
+以下操作系统支持 procfs :
+
+* [[Solaris|Solaris]]
+* [[Berkeley_Software_Distribution|BSD]]
+* [[Linux|Linux]]（将此概念扩展到了非进程相关数据）
+* [[IBM_AIX|IBM AIX]] （其实现基于Linux以提高兼容性）
+* [[QNX|QNX]]
+* [[貝爾實驗室九號計畫|貝爾實驗室九號計畫]]（此概念之源头）
+
+== 历史 ==
+=== UNIX 8 ===
+
+[[Tom_J._Killian|Tom J. Killian]] 实现了 [[Research_Unix|UNIX 8]] 版本的 <code>/proc</code>：他1984年6月向 [[USENIX|USENIX]] 提交了一份题为 "Processes as Files" 的论文。procfs 的设计目标是用来替代进行进程跟踪的 ''[[ptrace|ptrace]]'' 系统调用。 详细文档请参考当时的 proc(4) 用户手册<ref>[http://man.cat-v.org/unix_8th/4/proc proc(4) manual page]{{WebCite|url=https://www.webcitation.org/65rU7bJDP?url=http://man.cat-v.org/unix_8th/4/proc |date=20120302111155 |dateformat=iso }}</ref>。
+
+=== SVR4 ===
+[[Roger_Faulkner|Roger Faulkner]] 和 [[Ron_Gomes|Ron Gomes]] 将 Unix 8 的 <code>/proc</code> 移植到了 [[UNIX_System_V#SVR4|SVR4]]，并在1991年1月的 [[USENIX|USENIX]] 上发表了一篇题为 "The Process File System and Process Model in UNIX System V" 的论文。 此类 procfs 在功能上已经足够实现 <code>[[ps_(Unix)|ps]]</code> 命令了， 但是其中的文件只能通过 <code>read()</code>、 <code>write()</code> 和 <code>[[ioctl|ioctl]]()</code> 系统调用来访问。从1995到1996年， Roger Faulkner 又为 Solaris 2.6 编写了 procfs-2 接口， 提供了一个结构化的， 基于子目录的 <code>/proc</code> 文件系统。
+
+=== Plan 9 ===
+[[貝爾實驗室九號計畫|Plan 9]] 实现了一个进程文件系统，但比 V8 做得更多。V8 的进程文件系统中，对一个进程相关的所有函数都在一个文件进行操作。九號計畫使用单独的文件，提供这些函数，使得 <code>/proc</code> 成为文件系统真正的一部分。
+
+=== 4.4BSD ===
+[[4.4BSD|4.4BSD]] 从 Plan 9 复刻了 <code>/proc</code> 的实现。然而从2011年2月开始， [[FreeBSD|FreeBSD]] 逐步淘汰了 procfs <ref>{{Cite web |url=http://www.freebsd.org/doc/zh_CN.GB2312/articles/linux-users/procfs.html |title=procfs：已是过去式但仍未被遗忘 |accessdate=2011-03-21 |archive-date=2011-04-05 |archive-url=https://web.archive.org/web/20110405215138/http://www.freebsd.org/doc/zh_CN.GB2312/articles/linux-users/procfs.html |dead-url=no }}</ref>，转而使用[[sysctl|sysctl]]接口来获取进程相关信息。默认安装的 base 系统不依赖 procfs，FreeBSD 原生 ports 也不再依赖 procfs。[[macOS|macOS]]则完全弃用了procfs，只支持sysctl接口。<ref>{{cite web |author1=Amit Singh |title=/proc on Mac OS X |url=http://osxbook.com/book/bonus/ancient/procfs/ |website=Mac OS X Internals: The Book |access-date=2021-07-10 |archive-url=https://web.archive.org/web/20120504052329/http://osxbook.com/book/bonus/ancient/procfs/ |archive-date=2012-05-04 |date=2003 }}</ref>
+
+为了提供对Linux用户空间程序的二进制兼容性，FreeBSD内核也提供类似于 Linux /proc/ 的'''linprocfs'''。<ref>{{cite web |title=linprocfs(5) |url=https://www.freebsd.org/cgi/man.cgi?query=linprocfs&apropos=0&sektion=5&manpath=FreeBSD+13.0-RELEASE&arch=default&format=html |website=FreeBSD Manual Pages |publisher=The FreeBSD Project |accessdate=2021-06-12 |language=en |date=2019-11-13 |archive-date=2021-06-12 |archive-url=https://web.archive.org/web/20210612094031/https://www.freebsd.org/cgi/man.cgi?query=linprocfs&apropos=0&sektion=5&manpath=FreeBSD+13.0-RELEASE&arch=default&format=html }}</ref>
+
+=== Solaris ===
+
+Solaris 从一开始就提供对 <code>/proc</code> 的支持。 在1996年， Solaris 2.6 引入了由 Roger Faulkner 编写的 procfs2 。
+
+=== Linux ===
+[[Linux|Linux]]中的 <code>/proc</code>实现也克隆了 [[貝爾實驗室九號計畫|九號計畫]] 中对应的部分。 
+
+每个正在运行的进程对应于<code>/proc</code>下的一个目录，目录名就是进程的PID，每个目录包含:
+* {{Mono|/proc/PID/cmdline}}, 启动该进程的命令行.
+* {{Mono|/proc/PID/cwd}}, 当前[[工作目录|工作目录]]的[[符号链接|符号链接]].
+* {{Mono|/proc/PID/environ}} 影响进程的环境变量的名字和值.
+* {{Mono|/proc/PID/exe}}, 最初的[[可执行文件|可执行文件]]的符号链接, 如果它还存在的话。 
+* {{Mono|/proc/PID/fd}}, 一个目录，包含每个打开的[[文件描述符|文件描述符]]的符号链接.
+* {{Mono|/proc/PID/fdinfo}}, 一个目录，包含每个打开的[[文件描述符|文件描述符]]的位置和标记
+* {{Mono|/proc/PID/maps}}, 一个文本文件包含[[内存映射|内存映射]]文件与块的信息。
+* {{Mono|/proc/PID/mem}}, 一个二进制图像(image)表示进程的[[虚拟内存|虚拟内存]], 只能通过{{tsl|en|ptrace}}化进程访问.
+* {{Mono|/proc/PID/root}}, 该进程所能看到的根路径的符号链接。如果没有[[chroot|chroot监狱]]，那么进程的根路径是/.
+* {{Mono|/proc/PID/status}}包含了进程的基本信息，包括运行状态、内存使用。 
+* {{Mono|/proc/PID/task}}, 一个目录包含了[[硬链接|硬链接]]到该进程启动的任何任务 
+
+(用户可以获得[[进程ID|PID]]使用工具如[[pgrep|pgrep]], [[pidof|pidof]]或[[ps_(Unix)|ps]]:
+<syntaxhighlight lang="console">
+$ ls -l /proc/$(pgrep -n python)/fd        # List all file descriptors of the most recently started `python' process
+samtala 0
+lrwx------ 1 baldur baldur 64 2011-03-18 12:31 0 -> /dev/pts/3
+lrwx------ 1 baldur baldur 64 2011-03-18 12:31 1 -> /dev/pts/3
+lrwx------ 1 baldur baldur 64 2011-03-18 12:31 2 -> /dev/pts/3
+$ readlink /proc/$(pgrep -n python)/exe    # List executable used to launch the most recently started `python' process  
+/usr/bin/python3.1
+</syntaxhighlight>)
+
+[[Linux_kernel|Linux]] 2.6把 <code>/proc</code> 下大量的非進程相關的系统信息移動到一個专门的偽文件系統，稱為 [[sysfs|sysfs]]（該文件系統是掛載到 <code>/sys</code> 上面）:
+
+* 电源管理系统（如果有的话）对应的目录{{Mono|/proc/acpi}}或{{Mono|/proc/apm}} 
+* {{Mono|/proc/buddyinfo}}, 信息关于{{tsl|en|Buddy memory allocation|伙伴内存分配器}}用于处理内存碎片。<ref>{{cite web
+ |url=http://www.centos.org/docs/5/html/5.2/Deployment_Guide/s2-proc-buddyinfo.html
+ |title=3.2.2. /proc/buddyinfo
+ |work=centos.org
+ |access-date=2016-10-02
+ |archive-url=https://web.archive.org/web/20130902032109/http://www.centos.org/docs/5/html/5.2/Deployment_Guide/s2-proc-buddyinfo.html
+ |archive-date=2013-09-02
+ |dead-url=yes
+ }}</ref>
+* {{Mono|/proc/bus}}, 包含对应于计算机上各种总线的目录, 如input/[[PCI|PCI]]/[[USB|USB]]. 在/sys/bus下包含更丰富的信息。
+* {{Mono|/proc/fb}}, 可利用的帧缓冲的列表
+* {{Mono|/proc/cmdline}}, 传递给内核的启动选项。
+* {{Mono|/proc/cpuinfo}}, 包含[[CPU|CPU]]信息, 诸如厂商（vendor），型号 (family, model，model names), 速度, 缓存大小, 逻辑核数 , 物理核数, [[CPU_flags|CPU flags]]，以及[[BogoMips|BogoMips]].对于多核CPU，/proc/cpuinfo的逻辑核数"siblings"与物理核数"cpu cores"分别表示:<ref>{{cite web
+ |last=Baron
+ |first=Jason
+ |title=HT vs. dual-core
+ |url=http://www.redhat.com/archives/nahant-list/2006-January/msg00176.html
+ |accessdate=2016-10-02
+ |archive-date=2016-05-13
+ |archive-url=https://web.archive.org/web/20160513191756/http://www.redhat.com/archives/nahant-list/2006-January/msg00176.html
+ |dead-url=no
+ }}</ref>
+<pre>"siblings" = (HT per CPU package) * (# of cores per CPU package)
+"cpu cores" = (# of cores per CPU package)</pre>
+CPU package是指单独封装的一颗CPU。这可以区分[[超线程|超线程]]与双核，例如每颗CPU超线程数量为''siblings / CPU cores''. 如果二者的值相等，则CPU不支持超线程.<ref>{{cite web
+ |title=Understanding Linux /proc/cpuinfo
+ |url=http://www.richweb.com/cpu_info
+ |archiveurl=https://web.archive.org/web/20120403230159/http://www.richweb.com/cpu_info
+ |accessdate=2015-04-21
+ |archivedate=2012-04-03
+ |website=richweb.com
+ |dead-url=yes
+ }}</ref>   
+* {{Mono|/proc/crypto}}, 可利用的加密模块列表
+* {{Mono|/proc/devices}},  字符设备与块设备列表，按照设备ID排序，但给出了{{Mono|/dev}}名字的主要部分
+* {{Mono|/proc/diskstats}}, 给出了每一块逻辑磁盘设备的一些信息 
+* {{Mono|/proc/filesystems}}, 当前时刻内核支持的文件系统的列表 
+* {{Mono|/proc/interrupts}}, {{Mono|/proc/iomem}}, {{Mono|/proc/ioports}}, {{Mono|/proc/irq}}, 设备的一些与中断、内存访问有关的信息
+* {{Mono|/proc/kmsg}}, 用于跟踪读取内核消息 <ref>{{cite web
+ | url = https://books.google.com/books?id=wLJWBQAAQBAJ
+ | title = Linux Filesystem Hierarchy
+ | last1 = Nguyen
+ | first1 = Binh
+ | author-link1 = 
+ | author-link2 = 
+ | date = 2004-07-30
+ | publisher = Binh Nguyen
+ | page = 63
+ | access-date = 2016-07-18
+ | quote = /proc/kmsg[:] Messages output by the kernel. These are also routed to syslog.
+ | archive-date = 2016-12-14
+ | archive-url = https://web.archive.org/web/20161214124342/https://books.google.com/books?id=wLJWBQAAQBAJ
+ | dead-url = no
+ }}</ref>
+* {{Mono|/proc/meminfo}}, 包含内核管理内存的一些汇总信息 
+* {{Mono|/proc/modules}}, 是{{Mono|/proc}}最重要的文件之一, 包含了当前载入的内核模块列表
+* {{Mono|/proc/mounts}}, 包含了当前安装设备及安装点的符号链接
+* {{Mono|/proc/net/}}, 一个目录包含了当前网络栈的信息，特别是{{Mono|/proc/net/nf_conntrack}}列出了存在的网络连接(对跟踪路由特别有用，因为[[iptables|iptables]]转发被用于重定向网络连接)
+* {{Mono|/proc/partitions}}, 一个设备号、尺寸与{{Mono|/dev}}名的列表，内核用于辨别已存在的[[硬盘分区|硬盘分区]]
+* {{Mono|/proc/scsi}}, 给出任何通过[[SCSI|SCSI]]或[[RAID|RAID]]控制器挂接的设备的信息
+* {{Mono|/proc/self}} (即{{Mono|/proc/PID/}}其中[[进程ID|进程ID]]是当前进程的) 为当前进程的符号链接 
+* {{Mono|/proc/slabinfo}}, Linux内核频繁使用的对象的统计信息 
+* {{Mono|/proc/swaps}}, 活动交换分区的信息，如尺寸、优先级等。 
+* {{Mono|/proc/sys}}，动态可配置的内核选项. 其下的目录对应与内核区域，包含了可读与可写的虚拟文件（virtual file）. 
+* {{Mono|/proc/sysvipc}}, 包括共享内存与[[进程间通信|进程间通信]] (IPC)信息
+* {{Mono|/proc/tty}}, 包含当前终端信息; {{Mono|/proc/tty/driver}}是可利用的[[终端|tty]]类型列表，其中的每一个是该类型的可用设备列表。
+* {{Mono|/proc/uptime}}, 内核启动后经过的秒数与idle模式的秒数 
+* {{Mono|/proc/version}}, 包含Linux内核版本，发布号（distribution number）, 编译内核的[[gcc|gcc]]版本，其他相关的版本 
+* 其他文件依赖于不同的硬件，模块配置与内核改变 
+
+Linux下使用 <code>/proc</code> 的基本工具是 [[procps|procps]] (<code>/proc</code> processes) 中的程序，這個程序只對 procfs 具有意義。procfs 對部分功能從[[核心態|核心態]]移到[[用戶態|用戶態]]的過程中產生重大的意義。像是 GNU 版本的 ps 只需在[[用戶態|用戶態]]底下運作透過 procfs 取得資料便可以完成所有的工作。
+
+相关命令：
+*sysctl 
+*lsdev 收集相关设备的DMA, IRQ, I/O端口信息并汇总显示
+*procinfo
+
+=== Cygwin ===
+Cygwin实现的 <code>/proc</code> 与Linux基本一致。
+
+=== Cobalt ===
+
+== 外部链接 ==
+* [http://osxbook.com/book/bonus/chapter11/procfs/ A MacFUSE-Based Process File System for Mac OS X]{{Wayback|url=http://osxbook.com/book/bonus/chapter11/procfs/ |date=20081002065916 }}
+* [http://www.ibm.com/developerworks/library/l-proc.html Access the Linux kernel using the Procfs]{{Wayback|url=http://www.ibm.com/developerworks/library/l-proc.html |date=20080602171649 }} An IBM developerWorks article by M. Tim Jones
+* [http://tldp.org/LDP/Linux-Filesystem-Hierarchy/html/proc.html Linux-Filesystem-Hierarchy]{{Wayback|url=http://tldp.org/LDP/Linux-Filesystem-Hierarchy/html/proc.html |date=20080915163240 }} Linux Documentation Project
+
+== 参考 ==
+{{Reflist}}
+* [http://www.redhat.com/advice/tips/meminfo.html Red Hat, Inc. ''Tips & Tricks Featured Article: /proc/meminfo Explained'', March 2003.]{{Wayback|url=http://www.redhat.com/advice/tips/meminfo.html |date=20081008030727 }}
+
+{{Filesystem}}
+{{Linux内核}}
+
+[[Category:Unix|Category:Unix]]
+[[Category:Linux|Category:Linux]]
+[[Category:文件系统|Category:文件系统]]
+[[Category:Linux内核功能|Category:Linux内核功能]]

@@ -1,0 +1,564 @@
+{{lead section|time=2020-03-08T19:30:34+00:00}}
+{{NoteTA
+|T=zh-hans:全局唯一标识分区表; zh-hant:GUID磁碟分割表;
+|1=zh-hans:全局唯一标识分区表; zh-hant:GUID磁碟分割表;
+|G1=IT
+}}
+
+'''GUID磁碟分割表'''（'''[[GUID|GUID]] Partition Table'''，[[缩写|缩写]]：'''GPT'''）是一个實體[[硬盘|硬盘]]的[[分区表|分区表]]的结构布局的标准。它是[[可扩展固件接口|可扩展固件接口]]（UEFI）标准（被[[Intel|Intel]]用于替代个人计算机的[[BIOS|BIOS]]）的一部分，被用于替代[[BIOS|BIOS]]系统中的一32bits来存储逻辑块地址和大小信息的[[主開機紀錄|主開機紀錄]]（MBR）分区表。对于那些扇区为512字节的磁盘，[[MBR|MBR]]分区表不支持容量大于2.2[[terabyte|TB]]（2.2×10<sup>12</sup>[[字节|字节]]）<ref name="UEFIDrivePartitionFAQ">{{cite news |url=http://www.uefi.org/learning_center/UEFI_MBR_Limits_v2.pdf |format=pdf |title=FAQ: Drive Partition Limits |publisher=UEFI Forum |accessdate=2010-06-09 |deadurl=yes |archiveurl=https://web.archive.org/web/20130322172831/http://www.uefi.org/learning_center/UEFI_MBR_Limits_v2.pdf |archivedate=2013-03-22 }}</ref>的[[分区|分区]]，然而，一些硬盘制造商（诸如希捷和西部数据）注意到这个局限性，并且将他们的容量较大的磁盘升级到4KB的[[扇区|扇区]]，这意味着MBR的有效容量上限提升到16 TiB。  这个看似“正确的”解决方案，在临时地降低人们对改进磁盘分配表的需求的同时，也给市场带来关于在有较大的块（[[block|block]]）的设备上从BIOS启动时，如何最佳的划分磁盘分区的困惑。GPT分配64bits给逻辑块地址，因而使得最大分区大小在2<sup>64</sup>-1个扇区成为可能。对于每个扇区大小为512字节的磁盘，那意味着可以有9.4[[ZB|ZB]]（9.4×10<sup>21</sup>字节）或8 [[ZiB|ZiB]]个512字节（9,444,732,965,739,290,426,880字节或18,446,744,073,709,551,615（2<sup>64</sup>-1）个扇区×512（2<sup>9</sup>）字节每扇区）<ref name="UEFIDrivePartitionFAQ"/><ref name="Redmondmag64bitQuestion">{{cite news |url=http://redmondmag.com/Articles/2002/07/01/The-64Bit-Question.aspx |title=FAQ: Drive Partition Limits |publisher=Redmondmag.com |author=Bill Boswell |date=2002-07-01 |accessdate=2010-06-09 |quote=GPT disks also support very large partitions thanks to a 64-bit Logical Block Address scheme. A logical block corresponds to one sector, or 512 bytes, yielding a maximum theoretical capacity of eight zettabytes, |archive-date=2010-10-01 |archive-url=https://web.archive.org/web/20101001222207/http://redmondmag.com/Articles/2002/07/01/The-64Bit-Question.aspx |dead-url=no }}</ref>。
+
+截止至2010年，大多数操作系统对GPT均有所支持，尽管包括Mac OS X和Windows在内的一些仅支持在EFI基础上自GPT分区启动，见[[#操作系统支持|#操作系统支持]]。
+[[File:GUID_Partition_Table_Scheme.svg|275px]]
+
+== 特点 ==
+在MBR硬盘中，分区信息直接存储于[[主引导记录|主引导记录]]（MBR）中（主引导记录中还存储着系统的[[引导程序|引导程序]]）。但在GPT硬盘中，分区表的位置信息储存在GPT头中。但出于[[兼容性|兼容性]]考虑，硬盘的第一个扇区仍然用作MBR，之后才是GPT头。
+
+跟现代的MBR一样，GPT也使用[[逻辑区块位址|逻辑区块位址]]（LBA）取代了早期的[[柱面-磁头-扇区|CHS]]寻址方式。传统MBR信息存储于LBA 0，GPT头存储于LBA 1，接下来才是分区表本身。64位[[Microsoft_Windows|Windows]][[操作系统|操作系统]]使用16,384字节（或32[[扇区|扇区]]）作为GPT分区表，接下来的LBA 34是硬盘上第一个分区的开始。
+
+[[苹果公司|苹果公司]]曾经警告说：<ref>{{cite web|publisher=Apple|url=http://developer.apple.com/technotes/tn2006/tn2166.html|title=Technical Note TN2166: Secrets of the GPT|accessdate=2010-06-25|archive-date=2008-05-18|archive-url=https://web.archive.org/web/20080518082924/http://developer.apple.com/technotes/tn2006/tn2166.html|dead-url=no}}</ref>“不要假定所有设备的块大小都是512字节。”一些现代的存储设备如[[固态硬盘|固态硬盘]]可能使用1024字节的块，一些[[磁光盘|磁光盘]]（MO）可能使用2048字节的扇区（但是磁光盘通常是不进行分区的）。一些硬盘生产商在计划生产4096字节一个扇区的硬盘，但截至2010年初，这种新硬盘使用[[固件|固件]]对操作系统伪装成512字节一个扇区。<ref>{{cite web|publisher=Anandtech|url=http://anandtech.com/storage/showdoc.aspx?i=3691|title=Western Digital’s Advanced Format: The 4K Sector Transition Begins|accessdate=2010-06-25|archive-date=2010-03-23|archive-url=https://web.archive.org/web/20100323170253/http://www.anandtech.com/storage/showdoc.aspx?i=3691|dead-url=yes}}</ref>
+
+使用英特尔架构的[[苹果机|苹果机]]也使用GPT。
+
+为了减少分区表损坏的风险，GPT在硬盘最后保存了一份分区表的副本。
+
+== 传统MBR (LBA 0) ==
+
+在GPT分区表的最开头，出于兼容性考虑仍然存储了一份传统的MBR，用来防止不支持GPT的硬盘管理工具错误识别并破坏硬盘中的数据，这个MBR也叫做保护MBR。在支持从GPT启动的[[操作系统|操作系统]]中，这里也用于存储第一阶段的启动代码。在这个MBR中，只有一个标识为0xEE的分区，以此来表示这块硬盘使用GPT分区表。不能识别GPT硬盘的操作系统通常会识别出一个未知类型的分区，并且拒绝对硬盘进行操作，除非用户特别要求删除这个分区。这就避免了意外删除分区的危险。另外，能够识别GPT分区表的操作系统会检查保护MBR中的分区表，如果分区类型不是0xEE或者MBR分区表中有多个项，也会拒绝对硬盘进行操作。
+
+在使用MBR/GPT混合分区表的硬盘中，这部分存储了GPT分区表的一部分分区（通常是前四个分区），可以使不支持从GPT启动的操作系统从这个MBR启动，启动后只能操作MBR分区表中的分区。如[[Boot_Camp|Boot Camp]]就是使用这种方式启动Windows。
+
+== 分区表头（LBA 1） ==
+
+分区表头定义了硬盘的可用空间以及组成分区表的项的大小和数量。在使用64位[[Windows_Server_2003|Windows Server 2003]]的机器上，最多可以创建128个分区，即分区表中保留了128个项，其中每个都是128字节。（EFI标准要求分区表最小要有16,384字节，即128个分区项的大小）
+
+分区表头还记录了这块硬盘的[[GUID|GUID]]，记录了分区表头本身的位置和大小（位置总是在LBA 1）以及备份分区表头和分区表的位置和大小（在硬盘的最后）。它还储存着它本身和分区表的[[CRC32|CRC32]]校验。固件、引导程序和操作系统在启动时可以根据这个校验值来判断分区表是否出错，如果出错了，可以使用软件从硬盘最后的备份GPT中恢复整个分区表，如果备份GPT也校验错误，硬盘将不可使用。所以GPT硬盘的分区表不可以直接使用16进制编辑器修改。
+
+{|class="wikitable" style="margin: 1em auto 1em auto"
+|+分区表头的格式
+! 起始字节 !! 长度 !! 内容
+|-
+|align=right| 0  ||align=right|  8字节 || 签名（"EFI PART", 45 46 49 20 50 41 52 54）
+|-
+|align=right| 8  ||align=right|  4字节 || 修订（在1.0版中，值是00 00 01 00）
+|-
+|align=right| 12 ||align=right|  4字节 || 分区表头的大小（单位是字节，通常是92字节，即5C 00 00 00）
+|-
+|align=right| 16 ||align=right|  4字节 || 分区表头（第0－91字节）的[[CRC32|CRC32]]校验，在计算时，把这个字段作为0处理，需要计算出分区序列的CRC32校验后再计算本字段
+|-
+|align=right| 20 ||align=right|  4字节 || 保留，必须是0
+|-
+|align=right| 24 ||align=right|  8字节 || 当前LBA（这个分区表头的位置）
+|-
+|align=right| 32 ||align=right|  8字节 || 备份LBA（另一个分区表头的位置）
+|-
+|align=right| 40 ||align=right|  8字节 || 第一个可用于分区的LBA（主分区表的最后一个LBA + 1）
+|-
+|align=right| 48 ||align=right|  8字节 || 最后一个可用于分区的LBA（备份分区表的第一个LBA − 1）
+|-
+|align=right| 56 ||align=right| 16字节 || 硬盘GUID（在[[类UNIX|类UNIX]]系统中也叫[[UUID|UUID]]）
+|-
+|align=right| 72 ||align=right|  8字节 || 分区表项的起始LBA（在主分区表中是2）
+|-
+|align=right| 80 ||align=right|  4字节 || 分区表项的数量
+|-
+|align=right| 84 ||align=right|  4字节 || 一个分区表项的大小（通常是128）
+|-
+|align=right| 88 ||align=right|  4字节 || 分区序列的CRC32校验
+|-
+|align=right| 92 ||align=center| * || 保留，剩余的字节必须是0（对于512字节LBA的硬盘即是420个字节）
+|}
+
+主分区表和备份分区表的头分别位于硬盘的第二个扇区（LBA 1）以及硬盘的最后一个扇区。备份分区表头中的信息是关于备份分区表的。
+
+== 分区表项（LBA 2–33） ==
+
+GPT分区表使用简单而直接的方式表示分区。一个分区表项的前16字节是分区类型[[GUID|GUID]]。例如，[[EFI系统分区|EFI系统分区]]的GUID类型是<code>{C12A7328-F81F-11D2-BA4B-00A0C93EC93B}</code>。接下来的16字节是该分区唯一的GUID（这个GUID指的是该分区本身，而之前的GUID指的是该分区的类型）。再接下来是分区起始和末尾的64位LBA编号，以及分区的名字和属性。
+{|class="wikitable" style="margin: 1em auto 1em auto"
+|+ GPT分区表项的格式
+! 起始字节 !! 长度 !! 内容
+|-
+|align=right| 0  ||align=right| 16字节 || 分区类型GUID
+|-
+|align=right| 16 ||align=right| 16字节 || 分区GUID
+|-
+|align=right| 32 ||align=right| 8字节 || 起始LBA（[[小端序|小端序]]）
+|-
+|align=right| 40 ||align=right| 8字节 || 末尾LBA
+|-
+|align=right| 48 ||align=right| 8字节 || 属性标签（如：<code>60</code>表示“只读”）
+|-
+|align=right| 56 ||align=right| 72字节 || 分区名（可以包括36个[[UTF-16|UTF-16]]（小端序）字符）
+|}
+
+== 操作系统支持 ==
+{{See also|统一可扩展固件接口#DISKDEVCOMPAT|l1=UEFI：磁盘设备兼容性}}
+=== 类Unix操作系统 ===
+{|class="wikitable" style="margin: 1em auto 1em auto"
+!操作系统
+!版本
+!平台
+!读写支持
+!启动支持
+!备注
+|-
+|[[FreeBSD|FreeBSD]]
+|7.0以后
+|[[IA-32|IA-32]]、[[x86-64|x86-64]]、[[ARM架构|ARM]]
+|{{Yes}}
+|{{Yes}}
+|在MBR/GPT混合硬盘中，可以同时使用GPT和MBR分区标识。
+|- 
+|[[Linux|Linux]]
+|大多数x86架构的[[Linux发行版|Linux发行版]]<br />
+[[Fedora_(作業系統)|Fedora]] 8+、[[Ubuntu|Ubuntu]] 8.04+<ref>{{cite web |publisher=Ubuntu Community Documentation |url=https://help.ubuntu.com/community/MacBook |title=Ubuntu on MacBook |accessdate=2010-06-25 |archive-date=2021-01-29 |archive-url=https://web.archive.org/web/20210129044752/https://help.ubuntu.com/community/MacBook |dead-url=no }}</ref>
+|IA-32、x86-64
+|{{Yes}}
+|{{Yes}}
+|诸如gdisk、[[GNU_Parted|GNU Parted]]、<ref>{{cite web
+ | url = https://www.gnu.org/software/parted/faq.shtml#features
+ | title = GNU Parted FAQ
+ | accessdate = 2017-09-22
+ | archive-date = 2020-08-09
+ | archive-url = https://web.archive.org/web/20200809151835/http://www.gnu.org/software/parted/faq.shtml#features
+ | dead-url = no
+ }}</ref><ref>{{cite web
+ | url = https://www.gnu.org/software/parted/manual/html_node/mklabel.html
+ | title = mklabel - GNU Parted Manual
+ | accessdate = 2017-09-22
+ | archive-date = 2020-02-20
+ | archive-url = https://web.archive.org/web/20200220163410/http://www.gnu.org/software/parted/manual/html_node/mklabel.html
+ | dead-url = no
+ }}</ref>[[util-linux|util-linux]] v2.23+ [[fdisk|fdisk]]、<ref>{{cite web
+ | url = https://git.kernel.org/cgit/utils/util-linux/util-linux.git/commit/?id=766d5156c43b784700d28d1c1141008b2bf35ed7
+ | title = fdisk: add GPT support
+ | date = 2013-09-27
+ | accessdate = 2013-10-18
+ | publisher = kernel.org
+ | archive-date = 2017-02-22
+ | archive-url = https://web.archive.org/web/20170222103439/http://git.kernel.org/cgit/utils/util-linux/util-linux.git/commit/?id=766d5156c43b784700d28d1c1141008b2bf35ed7
+ | dead-url = no
+ }}</ref><ref>{{cite web
+ | url = http://blog.stgolabs.net/2012/09/fdisk-updates-and-gpt-support.html
+ | title = fdisk updates and GPT support
+ | date = 2013-09-28
+ | accessdate = 2013-10-18
+ | author = Davidlohr Bueso
+ | archive-date = 2013-10-19
+ | archive-url = https://web.archive.org/web/20131019225537/http://blog.stgolabs.net/2012/09/fdisk-updates-and-gpt-support.html
+ | dead-url = no
+ }}</ref>[[SYSLINUX|SYSLINUX]]、[[GNU_GRUB|安装补丁后的GRUB 0.96]]和[[GNU_GRUB|GRUB 2]]等新工具均已支持GPT。
+|- 
+|[[macOS|macOS]]
+|10.4.0以后（一些功能要到10.4.6以后）<ref>{{cite web |url=http://refit.sourceforge.net/myths/ |publisher=rEFIt |title=Myths and Facts About Intel Macs |accessdate=2010-06-25 |archive-date=2019-04-21 |archive-url=https://web.archive.org/web/20190421033618/http://refit.sourceforge.net/myths/ |dead-url=no }}</ref> 
+|IA-32、x86-64、[[PowerPC|PowerPC]]
+|{{Yes}}
+|{{Yes}}
+|只有搭载因特尔芯片的计算机支持GPT启动。
+|-
+| [[MidnightBSD|MidnightBSD]]
+| 0.4-CURRENT以后
+| IA-32、x86-64
+| {{Yes}}
+| {{Partial|需要BIOS支持}}
+| 在MBR/GPT混合硬盘中，可以同时使用GPT和MBR分区标识。
+|-
+|[[Solaris|Solaris]]
+|Solaris 10以后
+|IA-32、x86-64、[[SPARC|SPARC]]
+| {{Yes}}
+| {{Yes}}
+| <ref>{{cite web|url=http://docs.oracle.com/cd/E19963-01/html/821-1448/ggpco.html|title=Booting from a ZFS Root File System|accessdate=2017-09-22|archive-date=2020-04-22|archive-url=https://web.archive.org/web/20200422215818/https://docs.oracle.com/cd/E19963-01/html/821-1448/ggpco.html|dead-url=no}}</ref>
+|-
+| [[HP-UX|HP-UX]]
+| HP-UX 11.20以后
+| [[IA-64|IA-64]]
+| {{Yes}}
+| {{Yes}}
+| <ref>{{cite web|url=http://h20000.www2.hp.com/bc/docs/support/SupportManual/c02256075/c02256075.pdf|publisher=Hewlett-Packard|title=idisk(1M)}}{{dead link|date=2018年2月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>
+|}
+
+=== 32位Windows ===
+
+{|class="wikitable" style="margin: 1em auto 1em auto"
+|+ Microsoft Windows历代32位版本的GPT支持详情<ref name=microsoft>{{cite web|title=Windows and GPT FAQ|publisher=Microsoft|url=https://msdn.microsoft.com/zh-cn/library/windows/hardware/dn640535.aspx|accessdate=2017-09-22|archive-date=2017-09-22|archive-url=https://web.archive.org/web/20170922194229/https://msdn.microsoft.com/zh-cn/library/windows/hardware/dn640535.aspx|dead-url=no}}</ref>
+!系统版本
+!发售日期
+!平台
+!读写支持
+!启动支持
+!备注
+|- 
+| [[Windows_XP|Windows XP]]
+| 2001-10-25
+| [[IA-32|IA-32]]
+| {{No}}
+| {{No}}
+|
+|-
+| [[Windows_Server_2003|Windows Server 2003]]
+| 2003-04-24
+| IA-32
+| {{No}}
+| {{No}}
+|
+|- 
+| [[Windows_Server_2003#SP1|Windows Server 2003 SP1]]
+| 2005-03-30
+| IA-32
+| {{Yes}}
+| {{No}}
+| 在MBR/GPT混合硬盘中优先使用MBR。
+|- 
+| [[Windows_Vista|Windows Vista]]
+| 2006-07-22
+| IA-32
+| {{Yes}}
+| {{No}}
+| 在MBR/GPT混合硬盘中优先使用MBR。
+|- 
+| [[Windows_Server_2008|Windows Server 2008]]
+| 2008-02-27
+| IA-32
+| {{Yes}}
+| {{No}}
+| 在MBR/GPT混合硬盘中优先使用MBR。
+|-
+| [[Windows_7|Windows 7]]
+| 2009-10-22 
+| IA-32
+| {{Yes}}
+| {{No}}
+| 在MBR/GPT混合硬盘中优先使用MBR。
+|- 
+| [[Windows_8|Windows 8]]
+| 2012-08-01
+| IA-32
+| {{Yes}}
+| {{Partial|需要[[UEFI|UEFI]]}}<ref name="technet.microsoft.com">{{Cite web |url=https://technet.microsoft.com/zh-cn/library/hh824898.aspx |title=32位Windows 8支持通过UEFI从GPT硬盘启动。 |accessdate=2017-09-22 |archive-date=2017-09-22 |archive-url=https://web.archive.org/web/20170922194151/https://technet.microsoft.com/zh-cn/library/hh824898.aspx |dead-url=no }}</ref>
+|在MBR/GPT混合硬盘中优先使用MBR。
+|- 
+| [[Windows_8.1|Windows 8.1]]
+| 2013-08-27
+| IA-32
+| {{Yes}}
+| {{Partial|需要UEFI}}<ref name="technet.microsoft.com" />
+|在MBR/GPT混合硬盘中优先使用MBR。
+|-
+| [[Windows_10|Windows 10]]
+| 2015-07-29
+| IA-32
+| {{Yes}}
+| {{Partial|需要UEFI}}<ref name="technet.microsoft.com" />
+| 在MBR/GPT混合硬盘中优先使用MBR。
+|}
+
+=== 64位Windows ===
+{|class="wikitable" style="margin: 1em auto 1em auto"
+|+Microsoft Windows历代64位版本的GPT支持详情<ref name="microsoft" />
+!系统版本
+!发售日期
+!平台
+!读写支持
+!启动支持
+!备注
+|- 
+| [[Windows_XP_Professional_x64_Edition|Windows XP Professional x64 Edition]]<br>[[Windows_Server_2003|Windows Server 2003]]
+| 2005-04-25<ref>{{Cite web |url=http://www.microsoft.com/presspass/press/2005/apr05/04-25Winx64LaunchPR.mspx |title=Microsoft raises the speed limit with the availability of 64-bit editions of Windows Server 2003 and Windows XP Professional |access-date=2017-09-22 |archive-url=https://web.archive.org/web/20101110033856/http://www.microsoft.com/presspass/press/2005/apr05/04-25Winx64LaunchPR.mspx |archive-date=2010-11-10 |dead-url=yes }}</ref>
+| [[x64|x64]]
+| {{Yes}}
+| {{No}}
+| 在MBR/GPT混合硬盘中优先使用MBR。
+|- 
+| [[Windows_Server_2003|Windows Server 2003]]
+| 2005-04-25
+| [[IA-64|IA-64]]
+| {{Yes}}
+| {{Yes}}
+| 在MBR/GPT混合硬盘中优先使用MBR。
+|- 
+| [[Windows_Vista|Windows Vista]]
+| 2006-07-22
+| x64
+| {{Yes}}
+| {{Partial|需要[[UEFI|UEFI]]}}{{Efn|仅SP1、SP2}}
+| 在MBR/GPT混合硬盘中优先使用MBR。
+|- 
+| [[Windows_Server_2008|Windows Server 2008]]
+| 2008-02-27
+| x64
+| {{Yes}}
+| {{Partial|需要UEFI}}
+| 在MBR/GPT混合硬盘中优先使用MBR。
+|- 
+| [[Windows_Server_2008|Windows Server 2008]]
+| 2008-02-27
+| IA-64
+| {{Yes}}
+| {{Yes}}
+| 在MBR/GPT混合硬盘中优先使用MBR。
+|-
+| [[Windows_7|Windows 7]]
+| 2009-10-22
+| x64
+| {{Yes}}
+| {{Partial|需要UEFI}}{{Efn|在多硬盘启动环境下，非UEFI引导需要MBR格式的引导程序（启动分区）；系统分区可使用GPT格式。}}
+| 在MBR/GPT混合硬盘中优先使用MBR。
+|- 
+| [[Windows_Server_2008_R2|Windows Server 2008 R2]]
+| 2009-10-22
+| IA-64
+| {{Yes}}
+| {{Yes}}
+| 在MBR/GPT混合硬盘中优先使用MBR。
+|- 
+| [[Windows_8|Windows 8]]<br>[[Windows_Server_2012|Windows Server 2012]]
+| 2012-08-01
+| x64
+| {{Yes}}
+| {{Partial|需要UEFI}}<ref name="technet.microsoft.com" />
+| 在MBR/GPT混合硬盘中优先使用MBR。
+|- 
+| [[Windows_8.1|Windows 8.1]]
+| 2013-08-27
+| x64
+| {{Yes}}
+| {{Partial|需要UEFI}}<ref name="technet.microsoft.com" />
+| 在MBR/GPT混合硬盘中优先使用MBR。
+|-
+| [[Windows_10|Windows 10]]
+| 2015-07-29
+| x64
+| {{Yes}}
+| {{Partial|需要UEFI}}<ref name="technet.microsoft.com" />
+| 在MBR/GPT混合硬盘中优先使用MBR。
+|-
+| [[Windows_Server_2016|Windows Server 2016]]
+| 2016-10-12
+| x64
+| {{Yes}}
+| {{Partial|需要UEFI}}<ref name="technet.microsoft.com" />
+| 在MBR/GPT混合硬盘中优先使用MBR。
+|-
+|[[Windows_11|Windows 11]]
+|2021-10-05
+|x64、ARM64
+|
+|
+|在MBR/GPT混合硬盘中优先使用MBR。
+|}
+
+== 分区类型GUID ==
+{|class="wikitable" style="margin: 1em auto 1em auto"
+|-
+!bgcolor="#E0F0FF"|相關操作系統
+!bgcolor="#E0F0FF"|分区类型
+!bgcolor="#E0F0FF"|[[GUID|GUID]]{{ref|guidord}}
+|-
+|bgcolor="#F0F0F0" rowspan="4"|''（None）''
+|bgcolor="#F0F0F0"|未使用
+|bgcolor="#F0F0F0"|<tt>00000000-0000-0000-0000-000000000000</tt>
+|- 
+|bgcolor="#F0F0F0"|MBR分区表
+|bgcolor="#F0F0F0"|<tt>024DEE41-33E7-11D3-9D69-0008C781F39F</tt>
+|-
+|bgcolor="#F0F0F0"|[[EFI系统分区|EFI系统分区]]
+|bgcolor="#F0F0F0"|<tt>C12A7328-F81F-11D2-BA4B-00A0C93EC93B</tt>
+|-
+|bgcolor="#F0F0F0"|[[BIOS引导分区|BIOS引导分区]]
+|bgcolor="#F0F0F0"|<tt>21686148-6449-6E6F-744E-656564454649</tt>
+|- <!-- Windows -->
+|rowspan="6"|[[Microsoft_Windows|Windows]]
+|微软保留分区
+|<tt>E3C9E316-0B5C-4DB8-817D-F92DF00215AE</tt>
+|-
+|基本数据分区{{ref label|linwin|2|a}}
+|<tt>EBD0A0A2-B9E5-4433-87C0-68B6B72699C7</tt>
+|-
+|[[逻辑软盘管理工具|逻辑软盘管理工具]]元数据分区
+|<tt>5808C8AA-7E8F-42E0-85D2-E1E90434CFB3</tt>
+|-
+|逻辑软盘管理工具数据分区
+|<tt>AF9B60A0-1431-4F62-BC68-3311714A69AD</tt>
+|-
+|Windows恢复环境
+|<tt>DE94BBA4-06D1-4D40-A16A-BFD50179D6AC</tt>
+|-
+|[[IBM通用并行文件系统|IBM通用并行文件系统]]（GPFS）分区
+|<tt>37AFFC90-EF7D-4e96-91C3-2D7AE055B174</tt>
+|-
+|bgcolor="#F0F0F0" rowspan="2"|[[HP-UX|HP-UX]]
+|bgcolor="#F0F0F0"|数据分区<!--（UFS ?）-->
+|bgcolor="#F0F0F0"|<tt>75894C1E-3AEB-11D3-B7C1-7B03A0000000</tt>
+|-
+|bgcolor="#F0F0F0"|服务分区
+|bgcolor="#F0F0F0"|<tt>E2A1E728-32E3-11D6-A682-7B03A0000000</tt>
+|- <!-- Linux -->
+|rowspan="5"|[[Linux|Linux]]
+|数据分区{{ref label|linwin|2|b}}
+|<tt>EBD0A0A2-B9E5-4433-87C0-68B6B72699C7</tt>
+|-
+|[[RAID|RAID]]分区
+|<tt>A19D880F-05FC-4D3B-A006-743F0F84911E</tt>
+|-
+|[[交换分区|交换分区]]
+|<tt>0657FD6D-A4AB-43C4-84E5-0933C84B4F4F</tt>
+|-
+|[[邏輯捲軸管理員|邏輯捲軸管理員]]（LVM）分区
+|<tt>E6D6D379-F507-44C2-A23C-238F2A3DF928</tt>
+|-
+|保留
+|<tt>8DA63339-0007-60C0-C436-083AC8230908</tt>
+|- <!-- FreeBSD -->
+|bgcolor="#F0F0F0" rowspan="6"|[[FreeBSD|FreeBSD]]
+|bgcolor="#F0F0F0"|启动分区
+|bgcolor="#F0F0F0"|<tt>83BD6B9D-7F41-11DC-BE0B-001560B84F0F</tt>
+|-
+|bgcolor="#F0F0F0"|数据分区
+|bgcolor="#F0F0F0"|<tt>516E7CB4-6ECF-11D6-8FF8-00022D09712B</tt>
+|-
+|bgcolor="#F0F0F0"|交换分区
+|bgcolor="#F0F0F0"|<tt>516E7CB5-6ECF-11D6-8FF8-00022D09712B</tt>
+|-
+|bgcolor="#F0F0F0"|[[UFS|UFS]]分区
+|bgcolor="#F0F0F0"|<tt>516E7CB6-6ECF-11D6-8FF8-00022D09712B</tt>
+|-
+|bgcolor="#F0F0F0"|{{link-en|Vinum volume manager|Vinum volume manager}}分区
+|bgcolor="#F0F0F0"|<tt>516E7CB8-6ECF-11D6-8FF8-00022D09712B</tt>
+|-
+|bgcolor="#F0F0F0"|[[ZFS|ZFS]]分区
+|bgcolor="#F0F0F0"|<tt>516E7CBA-6ECF-11D6-8FF8-00022D09712B</tt>
+|- <!-- Macintosh -->
+| rowspan="14" | [[macOS|macOS]]<br>[[Darwin_(作業系統)|Darwin]]
+| [[HFS|HFS]] (HFS+) 分区
+| {{mono|48465300-0000-11AA-AA11-00306543ECAC}}
+|-
+| [[苹果公司|Apple]] [[Unix_File_System|UFS]] 容器
+| {{mono|55465300-0000-11AA-AA11-00306543ECAC}}
+|-
+| [[APFS|APFS]] 卷宗容器<br>APFS 型 FileVault 卷宗容器
+| {{mono|7C3457EF-0000-11AA-AA11-00306543ECAC}}
+|-
+| [[ZFS|ZFS]]{{Efn|name="solmac"| Solaris 的<code>/usr</code>的 GUID 也用作 macOS 的 ZFS 通用 GUID。}}
+| {{mono|6A898CC3-1DD2-11B2-99A6-080020736631}}
+|-
+| Apple RAID 分区
+| {{mono|52414944-0000-11AA-AA11-00306543ECAC}}
+|-
+| Apple RAID 离线分区
+| {{mono|52414944-5F4F-11AA-AA11-00306543ECAC}}
+|-
+| Apple 开机卷宗 (恢复模式)
+| {{mono|426F6F74-0000-11AA-AA11-00306543ECAC}}
+|-
+| Apple 卷标
+| {{mono|4C616265-6C00-11AA-AA11-00306543ECAC}}
+|-
+| Apple TV 恢复分区
+| {{mono|5265636F-7665-11AA-AA11-00306543ECAC}}
+|-
+| Apple Core Storage 卷宗容器 <br>HFS+ 型 FileVault 卷宗容器
+| {{mono|53746F72-6167-11AA-AA11-00306543ECAC}}
+|-
+| SoftRAID_Status
+| {{mono|B6FA30DA-92D2-4A9A-96F1-871EC6486200}}
+|-
+| SoftRAID_Scratch
+| {{mono|2E313465-19B9-463F-8126-8A7993773801}}
+|-
+| SoftRAID_Volume
+| {{mono|FA709C7E-65B1-4593-BFD5-E71D61DE9B02}}
+|-
+| SoftRAID_Cache
+| {{mono|BBBA6DF5-F46F-4A89-8F59-8765B2727503}}
+|- <!-- Solaris / OpenSolaris -->
+|bgcolor="#F0F0F0" rowspan="13"|[[Solaris|Solaris]]
+|bgcolor="#F0F0F0"|启动分区
+|bgcolor="#F0F0F0"|<tt>6A82CB45-1DD2-11B2-99A6-080020736631</tt>
+|-
+|bgcolor="#F0F0F0"|根分区
+|bgcolor="#F0F0F0"|<tt>6A85CF4D-1DD2-11B2-99A6-080020736631</tt>
+|-
+|bgcolor="#F0F0F0"|交换分区
+|bgcolor="#F0F0F0"|<tt>6A87C46F-1DD2-11B2-99A6-080020736631</tt>
+|-
+|bgcolor="#F0F0F0"|备份分区
+|bgcolor="#F0F0F0"|<tt>6A8B642B-1DD2-11B2-99A6-080020736631</tt>
+|-
+|bgcolor="#F0F0F0"|/usr分区{{ref label|solmac|3|b}}
+|bgcolor="#F0F0F0"|<tt>6A898CC3-1DD2-11B2-99A6-080020736631</tt>
+|-
+|bgcolor="#F0F0F0"|/var分区
+|bgcolor="#F0F0F0"|<tt>6A8EF2E9-1DD2-11B2-99A6-080020736631</tt>
+|-
+|bgcolor="#F0F0F0"|/home分区
+|bgcolor="#F0F0F0"|<tt>6A90BA39-1DD2-11B2-99A6-080020736631</tt>
+|-
+|bgcolor="#F0F0F0"|备用扇区
+|bgcolor="#F0F0F0"|<tt>6A9283A5-1DD2-11B2-99A6-080020736631</tt>
+|-
+|bgcolor="#F0F0F0" rowspan="5"|保留分区
+|bgcolor="#F0F0F0"|<tt>6A945A3B-1DD2-11B2-99A6-080020736631</tt>
+|-
+|bgcolor="#F0F0F0"|<tt>6A9630D1-1DD2-11B2-99A6-080020736631</tt>
+|-
+|bgcolor="#F0F0F0"|<tt>6A980767-1DD2-11B2-99A6-080020736631</tt>
+|-
+|bgcolor="#F0F0F0"|<tt>6A96237F-1DD2-11B2-99A6-080020736631</tt>
+|-
+|bgcolor="#F0F0F0"|<tt>6A8D2AC7-1DD2-11B2-99A6-080020736631</tt>
+|- <!-- [[NetBSD|NetBSD]] -->
+|rowspan="6"|[[NetBSD|NetBSD]]{{ref label|netbsd|4|^}}
+|交换分区
+|<tt>49F48D32-B10E-11DC-B99B-0019D1879648
+|-
+|[[FFS|FFS]]分区
+|<tt>49F48D5A-B10E-11DC-B99B-0019D1879648
+|-
+|{{link-en|Log-structured File System (BSD)|Log-structured File System (BSD)|LFS}}分区
+|<tt>49F48D82-B10E-11DC-B99B-0019D1879648
+|-
+|RAID分区
+|<tt>49F48DAA-B10E-11DC-B99B-0019D1879648
+|-
+|concatenated分区
+|<tt>2DB519C4-B10F-11DC-B99B-0019D1879648
+|-
+|加密分区
+|<tt>2DB519EC-B10F-11DC-B99B-0019D1879648
+|}
+
+# {{note|guidord}}本表中的GUID使用[[小端序|小端序]]表示。例如，EFI系統分區的GUID在這裡寫成C12A7328-F81F-11D2-BA4B-00A0C93EC93B但實際上它對應的16字節的序列是28 73 2A C1 1F F8 D2 11 BA 4B 00 A0 C9 3E C9 3B——只有前3部分的字節序被交換了。
+# {{note label|linwin|2|a}}{{note label|linwin|2|b}} Linux和Windows的数据分区使用相同的GUID。
+# {{note label|solmac|3|a}}{{note label|solmac|3|b}} Solaris系统中<code>/usr</code>分区的GUID在Mac OS X上被用作普通的[[ZFS|ZFS]]分区。
+# {{note label|netbsd|4|^}}具体定义见[http://cvsweb.netbsd.org/bsdweb.cgi/src/sys/sys/disklabel_gpt.h?only_with_tag=MAIN src/sys/sys/disklabel_gpt.h]{{Wayback|url=http://cvsweb.netbsd.org/bsdweb.cgi/src/sys/sys/disklabel_gpt.h?only_with_tag=MAIN |date=20110702083128 }}。NetBSD的GUID在单独定义之前曾经使用过FreeBSD的GUID。
+
+==MBR与GPT互相转换==
+===Windows操作系统===
+在Win10 1703及更高版本，执行命令“mbr2gpt /convert /disk:盘号 /allowfullos”
+
+或者使用[[DiskGenius|DiskGenius]]等軟件將MBR轉換為GPT。
+
+== 参见 ==
+* [[主引导记录|主引导记录]]
+* [[GUID|GUID]]
+* [[硬盘分区|硬盘分区]]
+* [[可扩展固件接口|可扩展固件接口]]
+* [[BIOS|BIOS]]
+
+== 外部链接 ==
+* Microsoft TechNet: [https://web.archive.org/web/20080321063028/http://technet2.microsoft.com/windowsserver/en/library/bdeda920-1f08-4683-9ffb-7b4b50df0b5a1033.mspx?mfr=true Disk Sectors on GPT Disks]
+* Microsoft TechNet: [http://www.microsoft.com/whdc/device/storage/GPT-on-x64.mspx Using GPT Drives on x86-64 Systems]{{Wayback|url=http://www.microsoft.com/whdc/device/storage/GPT-on-x64.mspx |date=20050706074131 }}
+* Apple Developer Connection: [http://developer.apple.com/technotes/tn2006/tn2166.html Secrets of the GPT] {{Wayback|url=http://developer.apple.com/technotes/tn2006/tn2166.html |date=20080518082924 }}
+* [http://www.ibm.com/developerworks/linux/library/l-gpt/ Make the most of large drives with GPT and Linux] {{Wayback|url=http://www.ibm.com/developerworks/linux/library/l-gpt/ |date=20180929042338 }}
+* GPT fdisk : [http://rodsbooks.com/gdisk/ Information on Hybrid GPT-MBR, Converting MBR and BSD disklabels to GPT and Booting from GPT disks] {{Wayback|url=http://rodsbooks.com/gdisk/ |date=20210115054648 }}
+* Microsoft : [http://www.microsoft.com/whdc/device/storage/GPT_FAQ.mspx FAQs on Using GPT disks in Windows]{{Wayback|url=http://www.microsoft.com/whdc/device/storage/GPT_FAQ.mspx |date=20110219111649 }}
+* [https://web.archive.org/web/20091120100508/http://www.insanelymac.com/forum/lofiversion/index.php/t186440.html A forum post describing steps to modify existing Windows x64 BIOS-MBR based installations to boot from UEFI-GPT]
+==备注==
+{{Notelist|30em}}
+== 参考资料 ==
+{{Reflist|35em}}
+
+{{Authority control}}
+[[Category:BIOS|Category:BIOS]]
+[[Category:磁碟分割|Category:磁碟分割]]
+[[Category:統一可延伸韌體介面|Category:統一可延伸韌體介面]]

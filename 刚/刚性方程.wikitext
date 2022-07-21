@@ -1,0 +1,55 @@
+{{Multiple issues|
+{{expert|time=2010-12-26|subject=數學}}
+{{Expand language|1=en|time=2021-09-30T10:00:57+00:00}}
+}}
+
+在[[数学|数学]]領域中，'''剛性方程'''（stiffness equation）是指一个[[微分方程|微分方程]]，其[[數值分析|數值分析]]的解只有在時間間隔很小時才會[[數值穩定性|穩定]]，只要時間間隔略大，其解就會不穩定。目前很難去精确地去定義哪些微分方程是刚性方程，然而粗略而言，若此方程式中包含使其快速變動的項，則其為剛性方程。
+
+在積分微分方程時，若某一區域的{{le|樍分曲線|Integral curve|解曲線}}的變化很大，會希望在這個區域的積分間隔密一些，若另一區域的曲線近似直線，且斜率接近零，會希望在這個區域的積分間隔鬆一些。不過針對一些問題，就算曲線近似直線，仍然需要用非常小的積分間隔來積分，這種現象稱為「剛性」。有時可能會出現兩個不同問題，一個有「剛性」，另一個沒有，但兩個問題卻有同一個解的情形。因此「剛性」不是解本身的特性，而是微分方程的特性，也可以稱為是'''刚性系統'''。
+
+== 範例 ==
+[[Image:StiffEquationNumericalSolvers.svg|thumb]]出現的不穩定情形]]
+
+考虑下面的[[初值问题|初值问题]]：
+:<math>\,y'(t)=-15y(t),\quad t \ge 0,\, y(0)=1</math>
+其精确解是
+:<math>y(t)=e^{-15t}</math>，并且显然当<math>t\to\infty</math>时<math>y(t)\to 0</math>。
+會希望[[数值解|数值解]]能够具有相同的特性。
+
+若以[[歐拉方法|歐拉方法]]來求數值解，則使用不同的步长（step size）將會得到不同的結果。第一种，步长<math>h=1/4</math>的[[欧拉法|欧拉法]]强烈的震荡并且很快离开了图的边界。当将步长减半为<math>h=1/8</math>时，得到的结果在图的范围以内。但是它依然在0附近震荡，并且不可能表示精确的解。
+
+而[[梯形法|梯形法]]，即两阶段{{le|多步方法|Linear multistep method|亚丹士-莫耳吞法}}，表达为
+:<math>y_{n+1}=y_n+{1\over 2}h\left(f(t_n,y_n)+f(t_{n+1},y_{n+1})\right).</math>
+其求得的結果比欧拉法的結果要好很多。如上图所示，数值结果单调地减少到零，如同精确解一样。
+
+== 特征 ==
+剛性系統的特色是該系統所有特征值的实部均为负数，并且其中特征值实部絕對值中，最大和最小的比值远大于1。
+
+== 龙格－库塔法 ==
+{{Main|龍格－庫塔法}}
+將龍格－庫塔法應用至測試方程<math>y'=k\cdot y</math>，可以得到如<math>y_{n+1}=\phi(hk)\cdot y_n</math>的形式，並可歸納出<math>y_n=(\phi(hk))^n\cdot y_0</math>，其中<math>\phi</math>稱為穩定性函數。因此<math>\lim_{n\to\infty}y_n=0</math>的條件等價於<math>|\phi(hk)|<1</math>。這啟發了絕對穩定區域（有時簡稱為穩定區域）的定義，亦即集合<math>\{z\in\mathbb{C}|\,|\phi(z)|<1\}</math>。
+
+若一個方法的穩定區域包含<math>\{z\in\mathbb{C}|\,\mathrm{Re}(z)<0\}</math>（即左半平面），則稱該方法為{{Internal link helper/en|A-穩定|A-stability}}。
+
+== 例子: 欧拉与梯度法 ==
+[[Image:Stability_region_for_Euler_method.svg|thumb]]
+
+[[Image:Stability_region_for_trapezoidal_method.svg|thumb]]
+
+== 参见 ==
+* [[顯式法及隱式法|顯式法及隱式法]]
+* [[条件数|条件数]]
+* [[微分包含式|微分包含式]]
+
+==参考资料==
+{{reflist}}
+* {{citation | first1 = Germund | last1 = Dahlquist | author1-link = Germund Dahlquist | year = 1963 | title = A special stability problem for linear multistep methods | journal = BIT | volume = 3 | pages = 27–43 | doi = 10.1007/BF01963532 }}.
+* {{citation | first1 = B. L. | last1 = Ehle | year = 1969 | title = On Padé approximations to the exponential function and A-stable methods for the numerical solution of initial value problems | publisher = Report 2010, University of Waterloo }}.
+* {{citation | first1 = Ernst | last1 = Hairer | first2 = Gerhard | last2 = Wanner | year = 1996 | title = Solving ordinary differential equations II: Stiff and differential-algebraic problems | edition = second | publisher = Springer Verlag | location = Berlin | isbn = 978-3-540-60452-5 }}.
+* {{citation | first1 = Arieh | last1 = Iserles | first2 = Syvert | last2 = Nørsett | year = 1991 | title = Order Stars | publisher = Chapman and Hall | isbn = 978-0-412-35260-7 }}.
+* {{citation | first1 = Gerhard | last1 = Wanner | first2 = Ernst | last2 = Hairer | first3 = Syvert | last3 = Nørsett | year = 1978 | title = Order stars and stability theory | journal = BIT | volume = 18 | pages = 475–489 | doi = 10.1007/BF01932026 }}.
+
+==外部链接==
+* [http://www.cs.cmu.edu/~baraff/pbm/energons.pdf An Introduction to Physically Based Modeling: Energy Functions and Stiffness]{{Wayback|url=http://www.cs.cmu.edu/~baraff/pbm/energons.pdf |date=20091014094922 }}
+
+[[Category:数值微分方程|Category:数值微分方程]]

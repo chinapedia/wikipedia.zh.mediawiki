@@ -1,0 +1,216 @@
+{{redirect|Vector|[[线性代数|线性代数]]中涉及的英文名同为vector的概念|向量|名稱為Vector的車用軟體工具商|Vector Informatik}}
+{{noteTA|G1=IT}}
+{{C++ Standard library}}
+'''Vector''' 是[[C++標準程式庫|C++標準程式庫]]中的一個[[类_(计算机科学)|類]]，可視為會自動擴展容量的陣列，以循序（Sequential）的方式維護變數集合。vector的特色有支持隨機存取，在集合尾端增刪元素很快，但是在集合中間增刪元素比較費時。vector是[[C++標準程式庫|C++標準程式庫]]中的眾多[[容器_(資料類型)|容器]]之一。 vector以[[模板_(C++)|模板]]方式實現，可以保存任意類型的變數，包括使用者自定義的資料型態，例如：它可以是放置整數（int）型態的vector、也可以是放置字串（string）型態的vector、或者放置使用者自定類別（user-defined class）的vector。
+
+== 設計 ==
+vector 定義於 <vector> 標頭檔中。與其他STL元件一樣，vector 屬於std名稱空間。
+
+vector是[[C++標準程式庫|C++標準程式庫]]裡最基本的容器，大多數狀況下都很有效率。vector設計之初即是為了改善C語言原生陣列的種種缺失與不便，而欲提供一種更有效、更安全的陣列。vector的使用介面刻意模擬C語言原生[[陣列|陣列]]，較明顯的差異在於記憶體管理，原生陣列必須在宣告陣列的時候明確指定陣列長度(例如 int a[5])，但是 vector 不需要指定，而是會在執行期依據狀況自我調整長度，動態增大容量。
+
+vector的表現一如[[資料結構|資料結構]]中的[[陣列|陣列]]，允許隨機存取(Random Access)，以索引值(index)存取任一元素只要花費常數時間 O(1)，在集合尾端增加或刪除元素也是花費常數時間O(1)，若在vector集合中間增加或刪除元素時間複雜度是線性時間O(n)，較為費時。雖然C++標準並沒有規定實作方式，但大多數 vector 內部均使用動態陣列方式實作。
+
+=== 成員函式概觀 ===
+<code>vector</code> 類別是以[[容器_(抽象数据类型)|容器]] 模式為基準設計的，也就是說，基本上它有 <code>begin()</code>，<code>end()</code>，<code>size()</code>，<code>max_size()</code>，<code>empty()</code> 以及 <code>swap()</code> 這幾個方法。
+
+* 存取元素的方法
+**<code>vec[i]</code> - 存取索引值為 i 的元素參照。 (索引值從零起算，故第一個元素是vec[0]。)
+**<code>vec.at(i)</code> - 存取索引值為 i 的元素的參照，以 at() 存取會做陣列邊界檢查，如果存取越界將會拋出一個例外，這是與operator[]的唯一差異。
+**<code>vec.front()</code> - 回傳 vector 第一個元素的參照。
+**<code>vec.back()</code> - 回傳 vector 最尾端元素的參照。
+* 新增或移除元素的方法
+**<code>vec.push_back()</code> - 新增元素至 vector 的尾端，必要時會進行記憶體配置。
+**<code>vec.pop_back()</code> -  刪除 vector 最尾端的元素。
+**<code>vec.insert()</code> - 插入一個或多個元素至 vector 內的任意位置。
+**<code>vec.erase()</code> - 刪除 vector 中一個或多個元素。
+**<code>vec.clear()</code> - 清空所有元素。
+* 取得長度/容量
+**<code>vec.size()</code> - 取得 vector 目前持有的元素個數。
+**<code>vec.empty()</code> - 如果 vector 內部為空，則傳回 true 值。
+**<code>vec.capacity()</code> - 取得 vector 目前可容納的最大元素個數。這個方法與記憶體的配置有關，它通常只會增加，不會因為元素被刪減而隨之減少。
+* 重新配置／重設長度
+**<code>vec.reserve()</code> - 如有必要，可改變 vector 的容量大小（配置更多的記憶體）。在眾多的 STL 實例，容量只能增加，不可以減少。
+**<code>vec.resize()</code> - 改變 vector 目前持有的元素個數。
+* 迭代 (Iterator)
+**<code>vec.begin()</code> - 回傳一個Iterator，它指向 vector 第一個元素。
+**<code>vec.end()</code> - 回傳一個Iterator，它指向 vector 最尾端元素的下一個位置（請注意：它不是最末元素）。
+**<code>vec.rbegin()</code> - 回傳一個反向Iterator，它指向 vector 最尾端元素的。
+**<code>vec.rend()</code> - 回傳一個Iterator，它指向 vector 的第一個元素的前一個位置。
+
+== 使用說明 ==
+
+
+=== 声明 ===
+使用 vector 之前，必須先 #include<vector>。
+
+声明一個 vector 變數的方法如下:
+<syntaxhighlight lang="cpp">
+std::vector<T> v; 
+</syntaxhighlight>
+T 是 vector 要儲存的物件集合的型別，該 vector 的變數名稱是 v。T 可以是任何符合 Copy/Move Assignable 條件的型別，包括使用者自訂型別。如果 T 不符合 Copy / Move Assignable 或者複製 / 移动成本很高昂，可以考慮使用 T* 甚至 std::unique_ptr<T> 來代替 T。
+
+=== 取代陣列使用 ===
+<syntaxhighlight lang="cpp">
+#include <vector>
+#include <iostream>
+int main() {
+    std::vector<int> v;
+
+    v.push_back(1);
+    v.push_back(2);
+    v.push_back(3);
+
+    for(int i=0;i<3;++i)
+        std::cout << v[i] << std::endl;
+    system("pause");
+    return 0;
+} 
+</syntaxhighlight>
+
+=== 長度/容量 ===
+[[File:Vector_size_000.png|thumb]]
+以下程式碼是用來說明 vector 的長度變化。
+<syntaxhighlight lang="cpp">
+//Headers and Macros
+#include <iostream>
+#include <cstdlib>
+#include <vector>
+#include <iomanip>
+#define SETW_1 10
+#define SETW_2 6
+#define SETW_3 10
+
+using namespace std;
+
+typedef vector<int> Vint;
+
+//利用參照取得真正的 capacity 值
+void PrintVectorInfo(Vint& v)
+{
+	cout<<setw(SETW_1)<<"Element"<<setw(SETW_2)<<"Size";
+	cout<<setw(SETW_3)<<"Capacity"<<endl;
+	for ( Vint::iterator it = v.begin(); it != v.end(); it ++)
+	{
+		cout<<setw(SETW_1)<<(*it)<<setw(SETW_2)<<v.size();
+		cout<<setw(SETW_3)<<v.capacity()<<endl;
+	}
+	cout<<endl;
+}
+
+//Main Function
+int main(int argc, char** argv)
+{
+	//==START==//
+	//宣告一個 vector
+	Vint vint;
+	//宣告兩個整數變數
+	int a = 11, b = 22, c = 33;
+	//建立只有一個元素空間的 vint
+	//把變數 a 複製至第一個元素內
+	vint.push_back(a);
+	cout<<"Push Back: a = "<<a<<endl;
+	//建立兩個元素空間的 vint
+	//把變數 a 複製至第一個元素內
+	//把變數 b 複製至第二個元素內
+	//刪除上一次建立的 vint
+	//上一次建立的 vint 只有一個元素空間
+	//依此類推
+	vint.push_back(b);
+	cout<<"Push Back: b = "<<b<<endl;
+	vint.push_back(c);
+	cout<<"Push Back: c = "<<c<<endl;
+	PrintVectorInfo(vint);
+	//移除最後一個元素
+	vint.pop_back();
+	cout<<"Pop Back......"<<endl;
+	PrintVectorInfo(vint);
+	//移除最後一個元素
+	vint.pop_back();
+	cout<<"Pop Back......"<<endl;
+	PrintVectorInfo(vint);
+	//清除所有元素
+	vint.clear();
+	cout<<"Clear All Elements."<<endl;
+	//==END==//
+	system("pause");
+	return 0;
+}
+</syntaxhighlight>
+
+===string 类型 Vector的使用===
+第一种：使用迭代器进行遍历
+<syntaxhighlight lang="cpp">
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+int main()
+{
+	vector<string> v(3, "I Love Wikipedia "); // 元素个数，每个元素的值相同
+	for (vector<string>::const_iterator it = v.begin(); it < v.end(); ++it) // 输出Vector元素
+		cout << *it << endl;
+	system("pause");
+	return 0;
+}
+</syntaxhighlight>
+输出结果为：
+<pre>
+I Love Wikipedia
+I Love Wikipedia
+I Love Wikipedia
+</pre>
+
+第二种，与int类型相同
+<syntaxhighlight lang = "cpp">
+#include<string>
+#include <vector>
+#include <iostream>
+using namespace std;
+
+int main()
+{
+	vector<string> vec;
+	string str;
+	str = "I Love WikiPedia";
+	vec.push_back(str);
+	vec.push_back("123");
+	for(int i = 0; i < vec.size() ; ++i)
+	{
+		cout << vec[i] << endl;
+	}
+	system("pause");
+	return 0;
+}
+</syntaxhighlight>
+输出结果为：
+<pre>
+I Love Wikipedia
+123
+</pre>
+
+== 删除元素==
+vector 的成员函数 clear() 来删除所有的元素。这个操作并没有改变容器的容量，所以容量不變。
+
+使用 vector 的成员函数 pop_back() 来删除容器尾部的元素。
+
+成员函数 swap()，这个函数用来交换两个 vector 容器中的元素。因此可以与一个具有相同数据类型的内容为空的局部变量swap，从而实现彻底删除元素、释放容量的目的。
+
+成员函数 shrink_to_fit()，会造成容器现有的迭代器都失效。
+
+成员函数 erase() 有2个重载版本：
+*删除单个元素，vector 的大小减 1；但容量不变；返回一个迭代器，它指向被删除元素后的一个元素。如果移除了最后一个元素，会返回 std::end(data)。
+*移除一个范围内的元素：传入两个迭代器。返回的迭代器指向被删除元素后的位置，它是 std::begin(data)+1 ；如果删除了最后一个元素，它就是 std::end(data)。
+
+algorithm 头文件中的std::remove()，可以移除一个范围内匹配特定值的元素。remove() 是一个全局函数，所以它不能删除容器中的元素。会保持未移除的元素的顺序。真正删除需要用erase()成员函数，这叫做 '''erase-remove'''。remove() 算法返回的迭代器作为 erase() 的第一个参数，erase() 的第二个参数是所指向容器中最后一个元素后一个位置的迭代器。如：
+    words.erase(std::remove(std::begin(words), std::end(words),"none"), std::end(words));
+
+== 優缺點探討 ==
+
+== 外部链接 ==
+
+* {{en}} [http://www.sgi.com/tech/stl/Vector.html SGI 的 vector 使用說明（SGI STL specification of vector）] {{Wayback|url=http://www.sgi.com/tech/stl/Vector.html |date=20171225103029 }}
+* {{en}} [http://www.cplusplus.com/reference/stl/vector/ C++ 參考：vector（C++ reference: vector）] {{Wayback|url=http://www.cplusplus.com/reference/stl/vector/ |date=20121115073229 }}
+* {{en}} [https://web.archive.org/web/20070927030825/http://www.roguewave.com/support/docs/sourcepro/edition9-update1/html/stdlibref/vector.html C++ 標頭檔說明（C++ Header description）]
+
+[[Category:C++標準函式庫|V]]
+[[Category:带有C++代码示例的条目|V]]

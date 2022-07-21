@@ -1,0 +1,239 @@
+{{noteTA
+|G1=IT
+}}
+'''XML-RPC'''是一個[[远程过程调用|远程过程调用]]（{{lang|en|Remote Procedure Call}}，RPC）的[[分布式计算|分布式计算]][[互聯網協議|協議]]，通过[[XML|XML]]将调用函数封装，並使用[[超文本传输协议|HTTP]]协议作為傳送機制。<ref name="book1">{{cite book |author=Simon St. Laurent, Joe Johnston, Edd Dumbill. |date=2001-06 |title=''Programming Web Services with XML-RPC.'' |publisher=O'Reilly |edition=First Edition}}</ref>
+
+== 歷史 ==
+
+XML-RPC發表於1998年，由[[UserLand_Software|UserLand Software]]（{{link-en|UserLand Software|UserLand Software}}）的[[Dave_Winer|Dave Winer]]及[[Microsoft|Microsoft]]共同發表<ref>{{cite web
+ |last        = Box
+ |first       = Don
+ |title       = A Brief History of SOAP
+ |publisher   = [[O'Reilly|O'Reilly]]
+ |date        = 2001-04-01
+ |url         = http://webservices.xml.com/pub/a/ws/2001/04/04/soap.html
+ |accessdate  = 2008-10-09
+ |deadurl     = yes
+ |archiveurl  = https://web.archive.org/web/20080915090248/http://webservices.xml.com/pub/a/ws/2001/04/04/soap.html
+ |archivedate = 2008-09-15
+}}</ref>。後來在新的功能不斷被引入下，這個標準慢慢演變成為今日的[[SOAP|SOAP]]協定。
+
+XML-RPC協定是已登記的專利項目，由[[Phillip_Merrick|Phillip Merrick]]、Stewart Allen及Joseph Lapp共同持有，於1998年3月提出申請，指其將用於一個構想中的應用程式，並於2006年4月獲得接納。現時這個專利由位於[[美國|美國]][[維珍尼亞州|維珍尼亞州]][[費爾法克斯_(維吉尼亞州)|費爾法克斯]]的[[webMethods|webMethods]]使用<ref name= "merrick01">{{cite web |url=http://www.google.com/patents?id=WFV4AAAAEBAJ |title=US Patent 7,028,312 |accessdate=2008-09-18 |author=Merrick et al. |date=2006-04-11 |archive-date=2011-12-03 |archive-url=https://web.archive.org/web/20111203095836/http://www.google.com/patents?id=WFV4AAAAEBAJ }}</ref>。
+
+== 用法 ==
+XML-RPC透過向裝置了這個協定的伺服器發出HTTP請求。發出請求的用戶端一般都是需要向遠端系統要求呼叫的軟件。
+
+[[JSON-RPC|JSON-RPC]]（[[JSON-RPC|JSON-RPC]]）跟 XML-RPC 相類似。
+
+==数据类型==
+
+以下的例子為日常的[[数据类型|数据类型]]在轉化為等同的XML後的面貌：
+{| class="wikitable"
+! 名稱
+! 標記範例
+! 描述
+|-
+|array
+|
+<syntaxhighlight lang="xml">
+<array>
+  <data>
+    <value><i4>1404</i4></value>
+    <value><string>Something here</string></value>
+    <value><i4>1</i4></value>
+  </data>
+</array>
+</syntaxhighlight>
+|
+|-
+|base64
+|
+<syntaxhighlight lang="xml">
+<base64>eW91IGNhbid0IHJlYWQgdGhpcyE=</base64>
+</syntaxhighlight>
+|
+|-
+|boolean
+|
+<syntaxhighlight lang="xml">
+<boolean>1</boolean>
+</syntaxhighlight>
+|[[布尔型|布尔型]]邏輯值 (0 或 1)
+|-
+|date/time
+|
+<syntaxhighlight lang="xml">
+<dateTime.iso8601>19980717T14:08:55</dateTime.iso8601>
+</syntaxhighlight>
+|
+|-
+|double
+|
+<syntaxhighlight lang="xml">
+<double>-12.53</double>
+</syntaxhighlight>
+|[[雙倍精確浮點數|雙倍精確浮點數]]
+|-
+|integer
+|
+<syntaxhighlight lang="xml">
+<i4>42</i4>
+</syntaxhighlight>
+or
+<syntaxhighlight lang="xml">
+<int>42</int>
+</syntaxhighlight>
+|[[整數|整數]]
+|-
+|string
+|
+<syntaxhighlight lang="xml">
+<string>Hello world!</string>
+</syntaxhighlight>
+|字符串，必須遵守[[XML_encoding|XML encoding]]（[[XML|XML encoding]]）的格式。
+|-
+|struct
+|
+<syntaxhighlight lang="xml">
+<struct>
+  <member>
+    <name>foo</name>
+    <value><i4>1</i4></value>
+  </member>
+  <member>
+    <name>bar</name>
+    <value><i4>2</i4></value>
+  </member>
+</struct>
+</syntaxhighlight>
+|[[结构体|结构体]]
+|-
+|nil
+|
+<syntaxhighlight lang="xml">
+<nil/>
+</syntaxhighlight>
+|
+|}
+
+== 範例 ==
+
+以下為一個尋常的 XML-RPC 請求的範例：
+<syntaxhighlight lang="xml">
+<?xml version="1.0"?>
+<methodCall>
+  <methodName>examples.getStateName</methodName>
+  <params>
+    <param>
+        <value><i4>40</i4></value>
+    </param>
+  </params>
+</methodCall>
+</syntaxhighlight>
+
+相對於上述請求，以下為一個尋常回應的範例：
+<syntaxhighlight lang="xml">
+<?xml version="1.0"?>
+<methodResponse>
+  <params>
+    <param>
+        <value><string>South Dakota</string></value>
+    </param>
+  </params>
+</methodResponse>
+</syntaxhighlight>
+
+以下為一個尋常的 XML-RPC 錯誤：
+<syntaxhighlight lang="xml">
+<?xml version="1.0"?>
+<methodResponse>
+  <fault>
+    <value>
+      <struct>
+        <member>
+          <name>faultCode</name>
+          <value><int>4</int></value>
+        </member>
+        <member>
+          <name>faultString</name>
+          <value><string>Too many parameters.</string></value>
+        </member>
+      </struct>
+    </value>
+  </fault>
+</methodResponse>
+</syntaxhighlight>
+
+== 批評 ==
+
+== 实现 ==
+=== Python ===
+* [https://web.archive.org/web/20100817224346/http://docs.python.org/library/xmlrpclib.html xmlrpclib]
+** Renamed [http://docs.python.org/3.1/library/xmlrpc.client.html xmlrpc.client] {{Wayback|url=http://docs.python.org/3.1/library/xmlrpc.client.html |date=20161206172954 }} in Python 3.
+* [http://twistedmatrix.com/documents/current/web/howto/xmlrpc.html Creating XML-RPC Servers and Clients with Twisted] {{Wayback|url=http://twistedmatrix.com/documents/current/web/howto/xmlrpc.html |date=20220317070213 }}
+=== C++ ===
+* [http://libiqxmlrpc.sourceforge.net/ Libiqxmlrpc] {{Wayback|url=http://libiqxmlrpc.sourceforge.net/ |date=20050329023614 }}
+* [http://ulxmlrpcpp.sourceforge.net/ Ultra lightweight XML-RPC library for C++] {{Wayback|url=http://ulxmlrpcpp.sourceforge.net/ |date=20220501005010 }}
+* [http://xmlrpc-c.sourceforge.net/ XML-RPC for C and C++] {{Wayback|url=http://xmlrpc-c.sourceforge.net/ |date=20220303110154 }}
+* [http://xmlrpcpp.sourceforge.net/ XmlRpc++] {{Wayback|url=http://xmlrpcpp.sourceforge.net/ |date=20220328100821 }}
+* [https://sourceforge.net/projects/xmlrpcc4win/ XmlRpc C++ client for Windows] {{Wayback|url=https://sourceforge.net/projects/xmlrpcc4win/ |date=20220421170450 }}
+* [http://www.cs.fsu.edu/~engelen/soap.html gSOAP toolkit for C and C++ supporting XML-RPC and more] {{Wayback|url=http://www.cs.fsu.edu/~engelen/soap.html |date=20130621044029 }}
+* [http://wiedi.frubar.net/blog/2008/03/08/libmaia-xml-rpc-with-qt4/ libmaia: XML-RPC for Qt/C++] {{Wayback|url=http://wiedi.frubar.net/blog/2008/03/08/libmaia-xml-rpc-with-qt4/ |date=20210623215838 }}
+
+=== Objective-C / GNUstep / Cocoa ===
+* [http://www.mulle-kybernetik.com/software/XMLRPC/ XMLRPC Framework] {{Wayback|url=http://www.mulle-kybernetik.com/software/XMLRPC/ |date=20220314030029 }}
+* [http://divisiblebyzero.com/ Cocoa XML-RPC Framework] {{Wayback|url=http://divisiblebyzero.com/ |date=20220313065425 }}: Open Source XML-RPC framework written for use in Mac OS X Cocoa applications.
+=== Erlang ===
+* [https://web.archive.org/web/20110815192238/http://erlang.stacken.kth.se/contrib/xmlrpc-1.13.tgz XML-RPC for Erlang]: This is an HTTP 1.1 compliant XML-RPC library for Erlang. It is designed to make it easy to write XML-RPC Erlang clients and/or servers. The library is compliant with the XML-RPC specification published by https://web.archive.org/web/20051210031514/http://www.xmlrpc.org/
+=== Java ===
+* [http://ws.apache.org/xmlrpc/ Apache XML-RPC] {{Wayback|url=http://ws.apache.org/xmlrpc/ |date=20220412022415 }}: Open source library for Java
+* [http://delight.opendfki.de/ XML-RPC Delight] {{Wayback|url=http://delight.opendfki.de/ |date=20150627034622 }}: Convenient serialisation/deserialisation for Apache XML-RPC using Java Annotations and Beans
+* [https://web.archive.org/web/20051116090755/http://members.fortunecity.com/neptune42/xmlrpc/index.htm]: Secure Apache XML-RPC
+* [http://xmlrpc.sourceforge.net/ Redstone XML-RPC Library] {{Wayback|url=http://xmlrpc.sourceforge.net/ |date=20210702072602 }}: Redstone's Open Source Library - XML-RPC implementation in Java
+* [http://kxmlrpc.sourceforge.net/ XML-RPC Library for Java ME] {{Wayback|url=http://kxmlrpc.sourceforge.net/ |date=20220330055918 }}: Open source client-side library for Java ME
+
+=== XMPP ===
+* [http://gdr.geekhood.net/gdrwpl/jxmlrpc.php pyJabberXMLRPC] {{Wayback|url=http://gdr.geekhood.net/gdrwpl/jxmlrpc.php |date=20110720180311 }}: Python classes for XMPP
+* [http://xmpp.org/extensions/xep-0009.html Jabber-RPC] {{Wayback|url=http://xmpp.org/extensions/xep-0009.html |date=20220503161500 }}: Over the [[Extensible_Messaging_and_Presence_Protocol|Extensible Messaging and Presence Protocol]] protocol
+
+=== Other ===
+* [http://code.google.com/p/json-xml-rpc/ JSON/XML-RPC Client and Server] {{Wayback|url=http://code.google.com/p/json-xml-rpc/ |date=20160118075354 }}: Abstract away the differences between JSON-RPC and XML-RPC
+* [http://www.remobjects.com/ro RemObjects SDK] {{Wayback|url=http://www.remobjects.com/ro |date=20220412014439 }} Delphi and .NET package for XML-RPC, in addition to [[SOAP_(protocol)|SOAP]] and others
+* [http://www.realthinclient.com RealThinClient SDK] {{Wayback|url=http://www.realthinclient.com/ |date=20180214094628 }}: For Delphi/C++
+* [http://search.cpan.org/~daan/XML-RPC-0.5/lib/XML/RPC.pm XML::RPC] {{Wayback|url=http://search.cpan.org/~daan/XML-RPC-0.5/lib/XML/RPC.pm |date=20180614231017 }}: Perl module implementation
+* [http://xmlrpcflash.mattism.com XML-RPC for ActionScript] {{Wayback|url=http://xmlrpcflash.mattism.com/ |date=20150218202950 }}: For Flash ActionScript 2.0
+* [http://code.google.com/p/as3-rpclib/ as3-rpclib] {{Wayback|url=http://code.google.com/p/as3-rpclib/ |date=20160526134128 }}: For Flex/Actionscript 3
+* [https://web.archive.org/web/20170620152017/http://xml-rpc.net/  XML-RPC.NET]: Open source library for .NET clients and servers
+* [http://code.google.com/p/xmlrpc-light/ XmlRpc-Light] {{Wayback|url=http://code.google.com/p/xmlrpc-light/ |date=20160412210524 }}: Client and server library for OCaml
+* [http://common-lisp.net/project/s-xml-rpc/ S-XML-RPC] {{Wayback|url=http://common-lisp.net/project/s-xml-rpc/ |date=20200220064256 }}: Client and server library for Common Lisp
+* [http://phpxmlrpc.sourceforge.net/ PHP-XML-RPC] {{Wayback|url=http://phpxmlrpc.sourceforge.net/ |date=20130903091655 }}: For PHP
+* [https://web.archive.org/web/20100703071016/http://www.haskell.org/haxr/ HaXR]: Client and server library for Haskell
+* [https://web.archive.org/web/20100823050623/http://www.x2ii.info/x2ii/xi/ xi library with PHP and Javascript XML-RPC]: For PHP and Javascript
+* [https://web.archive.org/web/20101129010057/http://ruby-doc.org/stdlib/libdoc/xmlrpc/rdoc/index.html Ruby XML-RPC library]: For Ruby
+* [https://web.archive.org/web/20100324022719/http://www.keplerproject.org/luaxmlrpc/ XML-RPC interface to Lua]: For [[Lua_(programming_language)|Lua]]
+* [http://code.google.com/p/android-xmlrpc/ android-xmlrpc] {{Wayback|url=http://code.google.com/p/android-xmlrpc/ |date=20160115093538 }}: A light XML-RPC client for Google Android
+* [http://sourceforge.net/projects/xmlrpctcl/ XML-RPC for Tcl] {{Wayback|url=http://sourceforge.net/projects/xmlrpctcl/ |date=20210702194720 }}: A Tcl implementation of XML-RPC providing client and server support
+* [http://earl.strain.at/space/rebXR+Users+Guide] {{Wayback|url=http://earl.strain.at/space/rebXR+Users+Guide |date=20220331031321 }}: RebXR, a full client/server XML-RPC implementation for REBOL.
+
+== 參看 ==
+*[[AJAX|AJAX]]
+*[[Software_componentry#Technologies_for_Software_Components|Component technologies]]
+*[[List_of_Web_service_markup_languages|List of Web service markup languages]]
+*[[OPML|OPML]]
+*[[Web服務|Web服務]]
+
+== 參考資料 ==
+{{reflist}}
+
+== 外部連結 ==
+* [http://www.xmlrpc.com/ XML-RPC Homepage] {{Wayback|url=http://www.xmlrpc.com/ |date=20220425044301 }}
+* [http://groups.yahoo.com/group/xml-rpc/ Forum] {{Wayback|url=http://groups.yahoo.com/group/xml-rpc/ |date=20060812044038 }}
+* [https://web.archive.org/web/20100914031553/http://www.xml.com/pub/rg/XML_RPC_Tutorials Tutorials]
+* [http://xml.coverpages.org/xml-rpc.html Technology Reports] {{Wayback|url=http://xml.coverpages.org/xml-rpc.html |date=20210621002302 }}
+* [http://citeseer.ist.psu.edu/cis?q=XML+RPC&cs=1 Citations from CiteSeer] {{Wayback|url=http://citeseer.ist.psu.edu/cis?q=XML+RPC&cs=1 |date=20090827145323 }}
+
+[[Category:基于XML的标准|Category:基于XML的标准]]
+[[Category:Web服务规范|Category:Web服务规范]]
+[[Category:网际协议|Category:网际协议]]
+[[Category:分布式计算|Category:分布式计算]]
+[[Category:遠端程序呼叫|Category:遠端程序呼叫]]

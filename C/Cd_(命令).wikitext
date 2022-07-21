@@ -1,0 +1,66 @@
+{{noteTA
+|G1=IT
+}}
+{{lowercase}}
+'''{{code|cd}}'''，有时也写作'''{{code|chdir}}'''（'''ch'''ange '''dir'''ectory，改变目录），是在[[Unix|Unix]]、[[类Unix|类Unix]]、[[Microsoft_Windows|Windows]]和[[DOS|DOS]]操作系统下用于改变[[工作目录|工作目录]]的[[命令行界面|命令行]]命令。在Unix的[[Shell脚本|Shell脚本]]与Windows或DOS的[[批处理|批处理文件]]中亦可使用。
+
+== 用法 ==
+
+[[目录_(文件系统)|目录]]是[[文件系统|文件系统]]用于保存文件的逻辑区段，而目录还可以包含有其他的目录。通过<code>cd</code>命令，可以前进到子目录、后退到父目录、回到根目录（Unix下为“<code>/</code>”，DOS下为“<code>\</code>”）或者进入到任何给出的目录中去。
+
+假设下面的这一小段为Unix文件系统，显示的是一位用户的起始目录（以“<code>~</code>”表示），其中有一个文件（“<code>text.txt</code>”）和三个子目录。
+
+[[File:chdir_example.png|center]]{{clear}}
+
+当用户的当前工作目录为起始目录（“<code>~</code>”）时，首先输入命令“<code>ls</code>”，然后输入“<code>cd games</code>”，会产生下列的效果：
+
+<syntaxhighlight lang="console">
+user@wikipedia:~$ ls
+workreports games encyclopedia text.txt
+user@wikipedia:~$ cd games
+user@wikipedia:~/games$
+</syntaxhighlight>
+
+该用户现在的工作目录即为“game”目录。
+
+在DOS中，与之相似的过程（“起始目录”的概念可能会不适用，这取决于该DOS的版本）会像这样显示：
+
+<syntaxhighlight lang=doscon>
+   C:\> dir
+   workreports        <DIR>       Wed Oct 9th   9:01
+   games              <DIR>       Tue Oct 8th  14:32
+   encyclopedia       <DIR>       Mon Oct 1st  10:05
+   text        txt           1903 Thu Oct10th  12:43
+   C:\> cd games
+   C:\games>
+</syntaxhighlight>
+应注意的一点是，在不同的操作系统中，如果不给出变量会让<tt>cd</tt>产生不同的结果。例如，如果在DOS下不给出变量而执行，会显示出当前的[[工作目录|工作目录]]来；而在Unix下不给出变量而执行，则会返回到起始目录去。在脚本或批处理内执行的<tt>cd</tt>，也会产生不同的结果。在DOS中，批处理文件中使用的该命令可以直接改变调用者的当前目录；而在Unix下，使用<tt>cd</tt>命令的脚本则无法改变调用者的当前目录。这是因为在Unix下的脚本通常在子外壳中执行。
+
+== 工作原理 ==
+
+<tt>cd</tt>通常是由[[命令行|命令行]][[解释器|解释器]]内建提供的。绝大多数的[[Unix_shell|Unix shell]]（[[Bourne_shell|Bourne shell]]、[[tcsh|tcsh]]、[[bash|bash]]等）、Windows的<tt>[[cmd.exe|cmd.exe]]</tt>和[[Windows_PowerShell|Windows PowerShell]]、以及DOS的<tt>[[COMMAND.COM|COMMAND.COM]]</tt>均是这种情况。
+
+Windows的命令行外壳通常使用[[Windows_API|Windows API]]来改变当前的工作目录；而Unix系统的'''<tt>cd</tt>'''则是调用[[POSIX|POSIX]] [[C语言|C]]的函数'''<code>chdir()</code>'''：即是，当该命令执行时，不会为前往另一个目录而创建一个新的进程，而是由外壳代为执行这条命令，[[ls|ls]]等其他命令也是这种情况。这是因为，创建新的[[进程|进程]]时，[[子进程|子进程]]会继承[[父进程|父进程]]创建时的目录。而如果<tt>cd</tt>命令继承了父进程的目录，则它永远也不能达到它的目标。
+
+== 参见 ==
+* [[MS-DOS命令列表#cd_或_chdir|CD (DOS命令)]]
+* [[chroot|chroot]]
+
+== 参考文献 ==
+<div class="references-small">
+* {{cite web|url=http://technet2.microsoft.com/WindowsServer/zh-CHS/Library/e13797d0-4fc9-49e1-8749-b4a8e23e77a82052.mspx?mfr=true|title=Chdir|date=2005年|publisher=[[微软|Microsoft TechNet]]|accessdate=2007年10月8日|language=zh-cn}}{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }}
+</div>
+
+==外部链接==
+* [https://technet.microsoft.com/en-us/library/bb490875.aspx Windows XP > Command-line reference A-Z > Chdir (Cd)]{{Wayback|url=https://technet.microsoft.com/en-us/library/bb490875.aspx |date=20180203082335 }} from [[Microsoft_TechNet|Microsoft TechNet]]{{en}}
+* {{man|cu|cd|SUS|change the working directory}}{{en}}
+
+{{-}}
+{{Unix命令}}
+{{视窗指令}}
+
+[[Category:Windows管理|Category:Windows管理]]
+[[Category:Unix_SUS2008实用工具|Category:Unix SUS2008实用工具]]
+[[Category:内部DOS命令|Category:内部DOS命令]]
+[[Category:OS/2|Category:OS/2]]
+[[Category:文件系统目录|Category:文件系统目录]]

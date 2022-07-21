@@ -1,0 +1,99 @@
+{{Inappropriate tone|time=2021-08-10T10:14:32+00:00}}
+{{lowercase}}
+{{noteTA
+|G1=IT
+}}
+'''tmpfs'''（{{lang-en|'''t'''e'''mp'''orary '''f'''ile '''s'''ystem}}） 是[[類Unix系統|類Unix系統]]上暫存檔儲存空間的常見名稱，通常以掛載檔案系統方式實現，並將資料儲存在[[揮發性記憶體|揮發性記憶體]]而非永久儲存裝置中。和[[RAM_disk|RAM disk]]的概念近似，但後者會呈現出具有完整檔案系統的虛擬磁碟。
+
+== 詞語定義 ==
+所有在tmpfs上儲存的資料在理論上都是暫時借放的，那也表示說，檔案不會建立在硬碟上面。一旦重新開機，所有在tmpfs裡面的資料都會消失不見。理論上，記憶體使用量會隨著tmpfs的使用而時有增長或消減。目前有許多Unix的發行版都有啟用tmpfs，預設是把它以[[共享記憶體|共享記憶體]]的方式用在系統的/tmp目錄底下。這個特徵在<tt> Unix </tt>上面會表現像是：
+
+ Filesystem            Size  Used Avail Use% Mounted on
+ tmpfs                 256M  688K  256M   1%  /tmp
+
+== 應用實例 ==
+=== SunOS / Solaris ===
+[[SunOS|SunOS]]是[[Solaris|Solaris]]上一世代的作業系統，裡頭實作了tmpfs的部份功能<ref>{{cite web
+ |url         = http://www.solarisinternals.com/si/reading/tmpfs.pdf
+ |title       = tmpfs: A Virtual Memory File System
+ |accessdate  = 2007-05-07
+ |author      = Peter Snyder
+ |format      = PDF
+ |deadurl     = yes
+ |archiveurl  = https://www.webcitation.org/67KlK2VcP?url=http://www.solarisinternals.com/si/reading/tmpfs.pdf
+ |archivedate = 2012-05-01
+}}</ref>最初在SunOS 4.1上實作，在1990三月釋出。<ref>{{cite web
+  | url = http://www.sun3arc.org/papers/Perf/SunOS_4.1_performance_tuning.ps.gz
+  | title = SunOS 4.1 Performance Tuning
+  | accessdate = 2007-05-07
+  | author = Hal L. Stern
+  | format = [[GZip|GZip]]ped PostScript
+  | archive-url = https://www.webcitation.org/67KlKV11Y?url=http://www.sun3arc.org/papers/Perf/SunOS_4.1_performance_tuning.ps.gz
+  | archive-date = 2012-05-01
+  | dead-url = yes
+  }}</ref> 1994年十一月，Solaris 2.1裡頭<tt>/tmp</tt>採用tmpfs的應用，並被納入預設的檔案系統之一。
+
+=== Linux ===
+tmpfs在[[Linux_kernel|Linux kernel]]從2.4之後的版本都有支援。<ref>{{cite web
+| url = http://www-128.ibm.com/developerworks/library/l-fs3.html
+| title = Advanced filesystem implementor's guide
+| accessdate = 2007-05-07
+| author = Daniel Robbins
+| authorlink = Daniel Robbins
+| date = September 1, 2001
+| quote = 
+| archive-date = 2007-06-22
+| archive-url = https://web.archive.org/web/20070622181556/http://www-128.ibm.com/developerworks/library/l-fs3.html
+| dead-url = no
+}} 
+說明Linux的應用方式的文章</ref> 
+tmpfs（之前比較為人所知的名稱是"shmfs"）和Linux的[[ramdisk|ramdisk]]裝置定位有所不同。Ramdisk是固定劃分一塊記憶體出來使用，且允許比較不常用的頁面可以移動到置換空間去。
+
+[[Sysfs|RAMFS]]相較之下，不會利用[[虛擬記憶體|虛擬記憶體]]的部份（這個特點有利也有弊）。另外，在[[Memory_File_System|MFS]]還有其它ramfs的舊版本，都不會動態的調整大小，只能一直佔用一個固定的大小。
+
+tmpfs的用法，舉例來說是像："<tt>mount -t tmpfs -o size=1G,nr_inodes=10k,mode=0700 tmpfs /space</tt>" 
+這樣就會使用1 [[GiB|GiB]]的置換空間，裡頭有10240 inodes且規定是在<tt>/space</tt>目錄底下存取。這個檔案系統的大小是可以隨時調整的，像是再追加一個指令如：<tt>mount -o remount,size=2G /space</tt>"。
+
+要註記一點，如果／tmp有安全上的顧慮的話，最好追加粘滞位([[sticky_bit|sticky bit)]]上來。<ref>{{cite web
+ |url         = http://www.ciac.org/ciac/bulletins/f-27.shtml
+ |title       = F-27: Incorrect Permissions on /tmp
+ |accessdate  = 2008-11-17
+ |author      = CIAC
+ |date        = August 17, 1995
+ |deadurl     = yes
+ |archiveurl  = https://web.archive.org/web/20081210193830/http://www.ciac.org/ciac/bulletins/f-27.shtml
+ |archivedate = 2008-12-10
+}}常見一個 /tmp底下典型的安全漏洞</ref>，就是權限應該被設作"mode=1777"，而不是"mode=0777或"mode=777"
+
+如果要是开机启用tmpfs那就是在fstab里面加个参数：
+ tmpfs /media/ramdisk tmpfs size=2G,defaults,noatime,mode=1777 0 0
+其中2G是固定大小。
+
+=== BSD ===
+從2005年九月10號之後tmpfs也正式被收錄到[[NetBSD|NetBSD]]的原始碼裡頭<ref>{{cite web
+| url = http://netbsd-soc.sourceforge.net/projects/tmpfs/
+| title = NetBSD-SoC: Efficient memory file-system
+| accessdate = 2007-05-07
+| author = Julio M. Merino Vidal
+| date = February 24, 2006
+| archive-date = 2012-05-01
+| archive-url = https://www.webcitation.org/67KlLrdJs?url=http://netbsd-soc.sourceforge.net/projects/tmpfs/
+| dead-url = no
+}}</ref>，同時在4.0之後的版本啟用了這個功能。
+[[FreeBSD|FreeBSD]]也已經收錄了NetBSD的這項功能，在7.0之後的版本也跟著啟用。
+
+=== 微軟Windows ===
+[[Microsoft_Windows|視窗]]作業系統也有一個類似tmpfs的方式來處理，就是"temporary files"。在系統的低記憶體底下，檔案會以FILE_ATTRIBUTE_TEMPORARY和FILE_FLAG_DELETE_ON_CLOSE（「暫存檔案」與「關閉時刪除該檔」的旗標）標記在記憶體裡面。這種方式的處理相當類似tmpfs，除了這些檔案會被寫入到特定的低記憶體位置而不是置換空間去。這個技術也常用在伺服器傳送檔案的時候，把檔案傳送到客戶端之前先丟到一個緩衝的暫存上面。
+
+== 參考資料 ==
+{{Reflist}}
+
+* [http://lxr.linux.no/source/Documentation/filesystems/tmpfs.txt Documentation/filesystems/tmpfs.txt]{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }} documentation in Linux source tree
+* [https://web.archive.org/web/20090616005843/http://docs.sun.com/app/docs/doc/817-3947/6mjgnrler?l=en&a=view tmpfs (7FS)] Solaris 10 man page
+* [http://netbsd.gw.com/cgi-bin/man-cgi?mount_tmpfs+8+NetBSD-current mount_tmpfs (8)]{{Wayback|url=http://netbsd.gw.com/cgi-bin/man-cgi?mount_tmpfs+8+NetBSD-current |date=20140503151946 }} NetBSD man page
+
+{{Filesystem}}
+
+[[Category:特殊目的文件系统|Category:特殊目的文件系统]]
+[[Category:Linux内核支持的特殊目的文件系统|Category:Linux内核支持的特殊目的文件系统]]
+[[Category:1987年面世|Category:1987年面世]]

@@ -1,0 +1,128 @@
+
+<noinclude>{{pp-semi-protected|reason=頁面將會或正被應用於首頁|small=yes}}</noinclude>
+{{noteTA/MediaWiki}}
+{{Hh}}
+{{shortcut|H:CM}}
+當前[[MediaWiki|維基軟件]]支-{zh-hans:持;zh-hant:援}-自訂首頁。本文会說明如何設定自訂首頁。
+
+== 歷史 ==
+自訂首頁計劃源於[[维基百科讨论:2009年首页改版计划|2009-2010年度首頁改版計劃]]，当时有建議維基百科應容讓用戶自訂首頁，議案最終獲得通過而軟件亦自此引入。
+
+== 個性化現有首頁 ==
+現有首頁採用大量CSS class，允許用戶自訂首頁的風格（但結構無法改變－如需改變首頁結構，請依照「[[#更換至完全不同風格的首頁|更換至完全不同風格的首頁]]」執行）。如需個性化首頁，請進入[[Special:MyPage/common.css|您的CSS設定頁面]]，並按照需要加入下列內容：
+; 將首頁從二欄式改為一欄式
+<syntaxhighlight lang="css">#mp-2012-column-left, #mp-2012-column-right { width: auto; }</syntaxhighlight>
+; 隱藏維基球標誌
+<syntaxhighlight lang="css">#mp-2012-banner-logo { display: none; } </syntaxhighlight>
+; 隱藏某個項目
+<syntaxhighlight lang="css">#mp-2012-<項目名稱> { display: none; } </syntaxhighlight>
+當中，請將<項目名稱>更換為需要隱藏的項目，各項目的項目名稱如下：
+{| 
+|-
+| style="vertical-align:top;"| 
+*左欄：column-left
+** 典範條目：column-feature-block
+** 你知道嗎：column-dyk-block
+** 優良條目：column-good-block
+** 每日圖片：column-featurepic-block
+| style="vertical-align:top;"| 
+*右欄：column-right
+** 第一個框：column-right-block-a
+***新聞動態：column-itn-block
+***歷史上的今天：column-otd-block
+***動態熱門：column-uptrends-block
+** 第二個框：column-right-block-b
+***參與維基百科：column-participate-block
+** 第三個框：column-right-block-c
+***維基百科提醒您：column-tips-block
+|-
+|colspan="2"|
+*站點鏈接：links
+*姊妹計劃：sisters
+|}
+例如，如果要隱藏動態熱門，請加入：<syntaxhighlight lang="css">#mp-2012-column-uptrends-block { display: none; } </syntaxhighlight>
+
+此處僅列出較常被設定的更動，其他請閱讀首頁的原始碼，之後自行修改。如果不懂得修改，請到[[WP:VPT|技術客棧]]尋求協助
+
+== 更換至完全不同風格的首頁 ==
+
+進行以下步驟之前，請確認以下條件經已全部滿足：
+* 目前處於登入狀態。如果未註冊帳戶，你必須先[[Special:UserLogin/signup|註冊]]才能使用這項功能。
+* 已啟用瀏覽器[[JavaScript|JavaScript]]功能。
+確認上述條件全部滿足後，請在[[Special:MyPage/common.js|閣下的common.js]]加入以下內容並按照文中內容修改：
+<syntaxhighlight lang="js">
+/** 啟用自訂首頁/自定义首页 start
+* from https://zh.wikipedia.org/wiki/Help:自訂首頁#更換至完全不同風格的首頁 https://w.wiki/rF8
+* 更改自 https://zh.wikipedia.org/w/index.php?title=MediaWiki:Gadget-mainpage-customization.js&oldid=53992037
+* 改作作者：SunAfterRain
+**/
+/** 
+* 更改這裡
+* 閣下要套用何頁面作為閣下顯示的首頁？
+* 例如：
+var mainpage_customization = 'Wikipedia:沙盒';
+* 即套用[[Wikipedia:沙盒|Wikipedia:沙盒]]做首頁
+**/
+var mainpage_customization = 'Wikipedia:首页';
+/** 以下請勿變更 **/
+mw.loader.using(['ext.gadget.site-lib', 'mediawiki.Uri']).then(function() {
+	var uri = mw.Uri();
+	if (mw.config.get('wgIsMainPage') && mw.config.get('wgAction') == 'view' && !uri.query.oldid && !uri.query.diff) {
+		$('div#mw-content-text').text(wgULS('正在加载自订首页','正在載入自訂首頁')).show().load(mw.config.get('wgScript'), {
+        	action: 'render',
+        	title: mainpage_customization
+    	});
+	} 
+});
+/** 啟用自訂首頁/自定义首页 end **/
+</syntaxhighlight>
+
+=== 早期已失效方式 ===
+{{ombox
+| image = [[File:Historical.svg|35px]]
+| imageright = 
+| text  = '''本章节仅作为历史-{zh-cn:信息; zh-tw:資訊}-保留，实际已经无法操作，原因见[[Special:Diff/39138309|这笔编辑]]。'''<br />如果您想重启关于该主题的讨论，可尝试在[[Wikipedia:互助客栈|互助客栈]]中发起新的讨论。
+}}[[Category:维基百科存档|{{PAGENAME}}]]
+
+進行以下步驟之前，請確認以下條件經已全部滿足：
+* 目前處於登入狀態。如果未註冊帳戶，你必須先[[Special:UserLogin/signup|註冊]]才能使用這項功能。
+* 已啟用瀏覽器[[JavaScript|JavaScript]]功能。
+* 使用Vector面板
+確認上述條件全部滿足後，請根據下列指引完成設定：
+# 按「[[Special:参数设置|參數設置]]」按鈕（對話頁和監視列表連結之間）
+# 選取「小工具」（或[[Special:参数设置#mw-prefsection-gadgets|點此前往]]）
+# 瀏覽「首頁」章節
+# 選取「{{MediaWiki:Gadget-mainpage-customization}}」
+# 選取你喜歡的首頁，點選預覽按鈕可以打開該首頁（將在同一分頁內開啟；如想避免離開參數設定，請打開新分頁）
+#: 沒有你喜歡的首頁？請參考[[#未有你喜歡的首頁|「未有你喜歡的首頁」章節]]
+# 保存設定（按「保存」）
+# [[{{MediaWiki:mainpage}}|按此訪問首頁]]。如未能啟用，請按下Ctrl+F5強制瀏覽器刷新緩存。
+如需取消設定，清除勾選上述選項即可。
+{| style="background: transparent;" align="center"
+|
+{{Clickable button 2|編輯「我的樣式」|url={{fullurl:Special:MyPage/MainPage|action=edit}}|class=mw-ui-progressive}}
+|
+{{Clickable button 2|檢視現時首頁原始碼|url=//zh.wikipedia.org/w/index.php?action=edit|class=mw-ui-progressive}}
+|}
+如有技術問題，歡迎到互助客棧的[[维基百科:互助客栈/技术|技術討論版块]]讨论。
+===== 未有你喜歡的首頁 =====
+未有你喜歡的首頁？請根據下列步驟設定：
+; 方法一
+把自訂首頁版本設為「我的樣式」，並進入「[[Special:MyPage/MainPage|我的樣式]]」，編輯該頁並以模板方式，引用該頁面。
+
+例如想將自訂首頁設定為[[Wikipedia:首页/自订首页设计/2010年版本|Wikipedia:首页/自订首页设计/2010年版本]]，可以在該頁輸入<code><nowiki>{{Wikipedia:首页/自订首页设计/2010年版本}}</nowiki></code>，並保存頁面。
+
+; 方法二
+只勾選「{{MediaWiki:Gadget-mainpage-customization}}」，並保存參數設置。之後進入[[Special:MyPage/common.js|您的JS頁面]]，並加入下列內容：（此例以[[Wikipedia:首頁/自訂首頁設計/2010年版本|Wikipedia:首頁/自訂首頁設計/2010年版本]]作例子，可以改成任意頁面名稱）
+<syntaxhighlight lang="javascript">MainPageCustomization.set('Wikipedia:首頁/自訂首頁設計/2010年版本');</syntaxhighlight>
+並保存頁面。
+
+=== 首頁設計樣本 ===
+还在烦如何设计自定义首页？快来[[:Category:自訂首頁設計|:Category:自訂首頁設計]]找找看吧！
+
+分享你的作品？在作品加<code><nowiki>[[Category:自訂首頁設計|Category:自訂首頁設計]]</nowiki></code>就行了！
+
+== 參見 ==
+* [[Help:用户样式|Help:用户样式]]
+{{H-f Help}}
+[[Category:自訂首頁設計|+]]

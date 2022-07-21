@@ -1,0 +1,297 @@
+{{DISPLAYTITLE:''k''-平均演算法}}
+{{missing information|算法的变体|time=2019-03-14T17:48:27+00:00}}
+{{NoteTA
+| 1 = zh-cn:-均值; zh-tw:-平均; zh-hk:-平均;
+| G1 = IT
+| G2 = Math
+}}
+{{机器学习导航栏}}
+'''''k''-均值算法'''（英文：''k''-means clustering）源于[[信号处理|信号处理]]中的一种[[向量量化|向量量化]]方法，现在则更多地作为一种聚类分析方法流行于[[数据挖掘|数据挖掘]]领域。''k''-平均[[聚类|聚类]]的目的是：把<math>n</math>个点（可以是样本的一次观察或一个实例）划分到''k''个聚类中，使得每个点都属于离他最近的均值（此即聚类中心）对应的聚类，以之作为聚类的标准。这个问题将归结为一个把数据空间划分为Voronoi cells的问题。
+
+这个问题在计算上是[[NP困难|NP困难]]的，不过存在高效的[[启发式算法|启发式算法]]。一般情况下，都使用效率比较高的启发式算法，它们能够快速收敛于一个[[局部最优|局部最优]]解。这些算法通常类似于通过迭代优化方法处理高斯混合分布的[[最大期望算法|最大期望算法]]（EM算法）。而且，它们都使用聚类中心来为数据建模；然而''k''-平均聚类倾向于在可比较的空间范围内寻找聚类，期望-最大化技术却允许聚类有不同的形状。
+
+''k''-平均聚类与[[最近鄰居法|''k''-近邻]]之间没有任何关系（后者是另一流行的机器学习技术）。
+
+== 描述 ==
+已知观测集<math>(x_1,x_2,...,x_n)</math>，其中每个观测都是一个<math>d</math>-维实向量，''k''-平均聚类要把这<math>n</math>个观测划分到''k''个集合中(k≤n),使得组内平方和（WCSS within-cluster sum of squares）最小。换句话说，它的目标是找到使得下式满足的聚类<math>S_i</math>，
+<center><math>\underset{\mathbf{S}} {\operatorname{arg\,min}}  \sum_{i=1}^{k} \sum_{\mathbf x \in S_i} \left\| \mathbf x - \boldsymbol\mu_i \right\|^2 </math></center>
+其中<math>\mu _i</math>是<math>S_i</math>中所有点的均值。
+
+== 历史源流 ==
+虽然其思想能够追溯到1957年的Hugo Steinhaus
+<ref>{{cite journal
+ |first=H. |last=Steinhaus |authorlink=Hugo Steinhaus
+ |title=Sur la division des corps matériels en parties
+ |journal=Bull. Acad. Polon. Sci.
+ |volume=4 |issue=12 |pages=801–804
+ |year=1957
+ |mr=0090073
+ |zbl=0079.16403 |language=fr
+}}</ref> 
+，术语“''k''-均值”于1967年才被James MacQueen
+<ref name="macqueen1967">{{cite conference
+ |first=J. B.
+ |last=MacQueen
+ |year=1967
+ |title=Some Methods for classification and Analysis of Multivariate Observations
+ |url=http://projecteuclid.org/euclid.bsmsp/1200512992
+ |accessdate=2009-04-07
+ |conference=Proceedings of 5th Berkeley Symposium on Mathematical Statistics and Probability
+ |publisher=University of California Press
+ |volume=1
+ |pages=281–297
+ |mr=0214227
+ |zbl=0214.46201
+ |archive-date=2019-10-29
+ |archive-url=https://web.archive.org/web/20191029211213/https://projecteuclid.org/euclid.bsmsp/1200512992
+ |dead-url=no
+ }}</ref> 
+首次使用。标准算法则是在1957年被Stuart Lloyd作为一种脉冲码调制的技术所提出，但直到1982年才被贝尔实验室公开出版
+<ref name="lloyd1957">{{cite journal
+ |first=S. P. |last=Lloyd
+ |title=Least square quantization in PCM
+ |journal=Bell Telephone Laboratories Paper
+ |year=1957
+}} Published in journal much later:
+{{cite journal
+ |first=S. P.
+ |last=Lloyd.
+ |url=http://www.cs.toronto.edu/~roweis/csc2515-2006/readings/lloyd57.pdf
+ |accessdate=2009-04-15
+ |title=Least squares quantization in PCM
+ |journal=[[IEEE_Transactions_on_Information_Theory|IEEE Transactions on Information Theory]]
+ |volume=28
+ |issue=2
+ |pages=129–137
+ |year=1982
+ |doi=10.1109/TIT.1982.1056489
+ |archive-date=2009-06-17
+ |archive-url=https://web.archive.org/web/20090617062822/http://www.cs.toronto.edu/~roweis/csc2515-2006/readings/lloyd57.pdf
+ |dead-url=no
+ }}</ref> 
+。在1965年，E.W.Forgy发表了本质上相同的方法，所以这一算法有时被称为Lloyd-Forgy方法。更高效的版本则被Hartigan and Wong提出（1975/1979）
+<ref name="forgy65">{{Cite journal
+ |author=E.W. Forgy
+ |title=Cluster analysis of multivariate data: efficiency versus interpretability of classifications
+ |url=https://archive.org/details/sim_biometrics_1965-09_21_3/page/768
+ |journal=Biometrics
+ |volume=21
+ |pages=768–769
+ |year=1965}}</ref><ref name="hartigan1975">{{Cite book
+ |title=Clustering algorithms
+ |author=J.A. Hartigan
+ |year=1975
+ |publisher=John Wiley & Sons, Inc.
+}}</ref><ref name="hartigan1979">{{Cite journal
+ | first1 = J. A. |last1=Hartigan
+ | first2 = M. A. |last2=Wong
+ | year = 1979
+ | title =  Algorithm AS 136: A ''k''-Means Clustering Algorithm
+ | journal = [[Journal_of_the_Royal_Statistical_Society,_Series_C|Journal of the Royal Statistical Society, Series C]]
+ | volume = 28
+ | issue = 1
+ | pages = 100–108
+ | jstor = 2346830
+}}</ref>。
+
+== 算法 ==
+=== 标准算法 ===
+最常用的算法使用了迭代优化的技术。它被称为''k''-平均算法而广为使用，有时也被称为Lloyd算法（尤其在计算机科学领域）。已知初始的''k''个均值点<math>m_1^{(1)},...,m_k^{(1)}</math>,算法的按照下面两个步骤交替进行
+<ref>{{Cite book 
+ |last=MacKay 
+ |first=David 
+ |authorlink=David MacKay (scientist) 
+ |title=Information Theory, Inference and Learning Algorithms 
+ |publisher=Cambridge University Press 
+ |year=2003 
+ |url=http://www.inference.phy.cam.ac.uk/mackay/itila/book.html 
+ |isbn=0-521-64298-1 
+ |chapter=Chapter 20. An Example Inference Task: Clustering 
+ |chapterurl=http://www.inference.phy.cam.ac.uk/mackay/itprnn/ps/284.292.pdf 
+ |pages=284–292 
+ |ref=mackay2003 
+ |mr=2012999 
+ |deadurl=yes 
+ |archiveurl=https://web.archive.org/web/20160217105359/http://www.inference.phy.cam.ac.uk/mackay/itila/book.html 
+ |archivedate=2016-02-17 
+ |access-date=2015-04-02 
+ }}</ref>
+：
+* 分配(Assignment)：将每个观测分配到聚类中，使得组内平方和（WCSS）达到最小。
+因为这一平方和就是平方后的欧氏距离，所以很直观地把观测分配到离它最近的均值点即可
+<ref>Since the square root is a monotone function, this also is the minimum Euclidean distance assignment.</ref> 
+。（数学上，这意味依照由这些均值点生成的Voronoi图来划分上述观测）。
+<center><math>S_i^{(t)}=\left \{ x_p:\left \| x_p-m_i^{(t)} \right \|^2\leq \left \| x_p -m_j^{(t)} \right \|^2\forall j,1\leq j\leq k \right \}</math></center>
+其中每个<math>x_p</math>都只被分配到一个确定的聚类<math>S^{t}</math>中，尽管在理论上它可能被分配到2个或者更多的聚类。
+* 更新(Update)：对于上一步得到的每一个聚类，以聚类中观测值的图心，作为新的均值点。
+<center><math>m_i^{(t+1)}=\frac{1}{\left | S_i^{(t)} \right |}\sum_{x_j\in S_i^{(t)}}x_j</math></center>
+因为算术平均是最小平方估计，所以这一步同样减小了目标函数组内平方和（WCSS）的值。
+
+这一算法将在对于观测的分配不再变化时收敛。由于交替进行的两个步骤都会减小目标函数WCSS的值，并且分配方案只有有限种，所以算法一定会收敛于某一（局部）最优解。注意：使用这一算法无法保证得到全局最优解。
+
+这一算法经常被描述为“把观测按照距离分配到最近的聚类”。标准算法的目标函数是组内平方和（WCSS），而且按照“最小平方和”来分配观测，确实是等价于按照最小欧氏距离来分配观测的。如果使用不同的距离函数来代替（平方）欧氏距离，可能使得算法无法收敛。然而，使用不同的距离函数，也能得到''k''-均值聚类的其他变体，如球体''k''-均值算法和''k''-中心点算法。
+
+=== 初始化方法 ===
+通常使用的初始化方法有Forgy和随机划分(Random Partition)方法
+<ref name="hamerly">{{Cite conference
+ |author       = Hamerly, G. and Elkan, C.
+ |year         = 2002
+ |title        = Alternatives to the ''k''-means algorithm that find better clusterings
+ |booktitle    = Proceedings of the eleventh international conference on Information and knowledge management (CIKM)
+ |url          = http://charlotte.ucsd.edu/users/elkan/cikm02.pdf
+ |access-date  = 2015-04-02
+ |archive-date = 2012-08-05
+ |archive-url  = https://web.archive.org/web/20120805022051/http://charlotte.ucsd.edu/users/elkan/cikm02.pdf
+ |dead-url     = yes
+}}</ref>
+。Forgy方法随机地从数据集中选择''k''个观测作为初始的均值点；而随机划分方法则随机地为每一观测指定聚类，然后运行“更新(Update)”步骤,即计算随机分配的各聚类的图心，作为初始的均值点。Forgy方法易于使得初始均值点散开，随机划分方法则把均值点都放到靠近数据集中心的地方。参考Hamerly et al的文章
+<ref name="hamerly"/>
+，可知随机划分方法一般更适用于''k''-调和均值和模糊''k''-均值算法。对于期望-最大化(EM)算法和标准''k''-均值算法，Forgy方法作为初始化方法的表现会更好一些。
+
+这是一个启发式算法，无法保证收敛到全局最优解，并且聚类的结果会依赖于初始的聚类。又因为算法的运行速度通常很快，所以一般都以不同的起始状态运行多次来得到更好的结果。不过，在最差的情况下，''k''-均值算法会收敛地特别慢：尤其是已经证明了存在这一的点集（甚至在2维空间中），使得''k''-均值算法收敛的时间达到指数级（<math>2^{\Omega(n)}</math>）
+<ref>{{cite journal
+ |first=A.
+ |last=Vattani.
+ |url=http://cseweb.ucsd.edu/users/avattani/papers/kmeans-journal.pdf
+ |title=''k''-means requires exponentially many iterations even in the plane
+ |journal=[[Discrete_and_Computational_Geometry|Discrete and Computational Geometry]]
+ |volume=45
+ |issue=4
+ |pages=596–616
+ |year=2011
+ |doi=10.1007/s00454-011-9340-1
+ |access-date=2015-04-02
+ |archive-date=2011-10-08
+ |archive-url=https://web.archive.org/web/20111008113128/http://cseweb.ucsd.edu/users/avattani/papers/kmeans-journal.pdf
+ |dead-url=no
+ }}</ref>
+。好在在现实中，这样的点集几乎不会出现：因为''k''-均值算法的平滑运行时间是多项式时间的
+<ref name="Arthur, D.; Manthey, B.; Roeglin, H. 2009">{{cite conference | author=Arthur, D.; Manthey, B.; Roeglin, H. | year=2009 | title=''k''-means has polynomial smoothed complexity | booktitle=Proceedings of the 50th Symposium on Foundations of Computer Science (FOCS)}}</ref>
+。
+
+注：把“分配”步骤视为“期望”步骤，把“更新”步骤视为“最大化步骤”，可以看到，这一算法实际上是广义期望-最大化算法（GEM）的一个变体。
+
+== 复杂度 ==
+在<math>d</math>维空间中找到''k''-均值聚类问题的最优解的计算复杂度：
+* NP-hard：一般欧式空间中，即使目标聚类数仅为2<ref>{{cite journal
+ |author=Aloise, D.; Deshpande, A.; Hansen, P.; Popat, P.
+ |title=NP-hardness of Euclidean sum-of-squares clustering
+ |journal=[[Machine_Learning_(journal)|Machine Learning]]
+ |year=2009
+ |volume=75 |pages=245–249
+ |doi=10.1007/s10994-009-5103-0}}</ref><ref>
+{{cite journal
+ |title=Random Projection Trees for Vector Quantization
+ |author=Dasgupta, S. and Freund, Y.
+ |journal=Information Theory, IEEE Transactions on
+ |volume=55
+ |pages=3229–3242
+ |date=July 2009
+ |doi=10.1109/TIT.2009.2021326
+ |arxiv=0805.1390}}
+</ref>
+* NP困难：平面中，不对聚类数目''k''作限制<ref>{{cite journal
+ |author=Mahajan, M.; Nimbhorkar, P.; Varadarajan, K.
+ |title=The Planar ''k''-Means Problem is NP-Hard
+ |journal=[[Lecture_Notes_in_Computer_Science|Lecture Notes in Computer Science]]
+ |year=2009
+ |volume=5431 |pages=274–285
+ |doi=10.1007/978-3-642-00202-1_24}}
+</ref>
+* 如果''k''和<math>d</math>都是固定的，时间复杂度为<math>O(n^{dk+1}logn)</math>,其中<math>n</math>为待聚类的观测点数目<ref>
+{{cite conference
+ |author=Inaba, M.; Katoh, N.; Imai, H.
+ |year=1994
+ |title=Applications of weighted Voronoi diagrams and randomization to variance-based ''k''-clustering
+ |conference=[[Symposium_on_Computational_Geometry|Proceedings of 10th ACM Symposium on Computational Geometry]]
+ |pages=332–339
+ |doi= 10.1145/177424.178042}}
+</ref>
+
+相比之下，Lloyds算法的运行时间通常为<math>O(nkdi)</math>,''k''和<math>d</math>定义如上，<math>i</math>为直到收敛时的迭代次数。如果数据本身就有一定的聚类结构，那么收敛所需的迭代数目通常是很少的，并且进行少数迭代之后，再进行迭代的话，对于结果的改善效果很小。鉴于上述原因，Lloyds算法在实践中通常被认为几乎是线性复杂度的。
+
+下面有几个关于这一算法复杂度的近期研究：
+* Lloyd's ''k''-均值算法具有多项式平滑运行时间。对于落在空间<math>[0,1]^d</math>任意的<math>n</math>点集合，如果每一个点都独立地受一个均值为<math>0</math>，标准差为<math>\sigma</math>的正态分布所影响，那么''k''-均值算法的期望运行时间上界为<math>O(n^{34}k^{34}d^{8}log^4(n)/\sigma^6)</math>，即对于<math>n,k,i,d</math>和<math>1/\sigma</math>都是多项式时间的<ref name="Arthur, D.; Manthey, B.; Roeglin, H. 2009"/>。
+* 在更简单的情况下，有更好的上界。例如<ref>{{Cite thesis| author=Arthur; Abhishek Bhowmick | year=2009 | title= A theoretical analysis of Lloyd's algorithm for ''k''-means clustering }}[http://www.cse.iitk.ac.in/users/bhowmick/lloyd.pdf]{{dead link|date=January 2013}}</ref>，在整数网格<math>\left \{ 1,...,M \right \}^d</math>中，''k''-均值算法运行时间的上界为<math>O(dn^4M^2)</math>。
+
+== 算法的变体 ==
+
+== 更多的讨论 ==
+使得''k''-均值算法效率很高的两个关键特征同时也被经常被视为它最大的缺陷：
+* 聚类数目''k''是一个输入参数。选择不恰当的''k''值可能会导致糟糕的聚类结果。这也是为什么要进行特征检查来决定数据集的聚类数目了。
+* 收敛到局部最优解，可能导致“反直观”的错误结果。
+
+''k''-均值算法的一个重要的局限性即在于它的聚类模型。这一模型的基本思想在于：得到相互分离的球状聚类，在这些聚类中，均值点趋向收敛于聚类中心。
+一般会希望得到的聚类大小大致相当，这样把每个观测都分配到离它最近的聚类中心（即均值点）就是比较正确的分配方案。
+
+''k''-均值聚类的结果也能理解为由均值点生成的Voronoi cells。
+
+== 相关应用 ==
+''k''-均值聚类（尤其是使用如Lloyd's算法的启发式方法的聚类）即使是在巨大的数据集上也非常容易部署实施。正因为如此，它在很多领域都得到的成功的应用，如市场划分、机器视觉、 地质统计学<ref>Honarkhah, M and Caers, J, 2010, ''[http://dx.doi.org/10.1007/s11004-010-9276-7 Stochastic Simulation of Patterns Using Distance-Based Pattern Modeling]'', Mathematical Geosciences, 42: 487 - 517</ref>、天文学和农业等。它经常作为其他算法的预处理步骤，比如要找到一个初始设置。
+=== 向量的量化 ===
+{{main|向量量化}}
+''k''-均值起源于信号处理领域，并且现在也能在这一领域找到应用。例如在计算机图形学中，色彩量化的任务，就是要把一张图像的色彩范围减少到一个固定的数目''k''上来。''k''-均值算法就能很容易地被用来处理这一任务，并得到不错的结果。其它得向量量化的例子有非随机抽样，在这里，为了进一步的分析，使用''k''-均值算法能很容易的从大规模数据集中选出''k''个合适的不同观测。
+=== 聚类分析 ===
+{{main|聚类分析}}
+在聚类分析中，''k''-均值算法被用来将输入数据划分到''k''个部分(聚类)中。
+然而，纯粹的''k''-均值算法并不是非常灵活，同样地，在使用上有一定局限（不过上面说到的向量量化，确实是一个理想的应用场景）。特别是，当没有额外的限制条件时，参数''k''是很难选择的（正如上面讨论过的一样）。算法的另一个限制就是它不能和任意的距离函数一起使用、不能处理非数值数据。而正是为了满足这些使用条件，许多其他的算法才被发展起来。
+
+=== 特征学习 ===
+在（半）监督学习或无监督学习中，''k''-均值聚类被用来进行特征学习（或字典学习）步骤<ref name="Coates2012">{{cite encyclopedia
+ |last1        = Coates
+ |first1       = Adam
+ |last2        = Ng
+ |first2       = Andrew Y.
+ |title        = Learning feature representations with ''k''-means
+ |editors      = G. Montavon, G. B. Orr, K.-R. Müller
+ |encyclopedia = Neural Networks: Tricks of the Trade
+ |publisher    = Springer
+ |year         = 2012
+ |url          = http://www.stanford.edu/~acoates/papers/coatesng_nntot2012.pdf
+ |deadurl      = yes
+ |archiveurl   = https://web.archive.org/web/20130706131422/http://www.stanford.edu/~acoates/papers/coatesng_nntot2012.pdf
+ |archivedate  = 2013-07-06
+ |access-date  = 2015-04-02
+}}</ref>。基本方法是，首先使用输入数据训练出一个''k''-均值聚类表示，然后把任意的输入数据投射到这一新的特征空间。
+''k''-均值的这一应用能成功地与自然语言处理和计算机视觉中半监督学习的简单线性分类器结合起来。在对象识别任务中，它能展现出与其他复杂特征学习方法（如自动编码器、受限Boltzmann机等）相当的效果。然而，相比复杂方法，它需要更多的数据来达到相同的效果，因为每个数据点都只贡献了一个特征（而不是多重特征）。
+
+== 与其他统计机器学习方法的关系 ==
+''k''-均值聚类，以及它与EM算法的联系，是高斯混合模型的一个特例。很容易能把''k''-均值问题一般化为高斯混合模型<ref>{{Cite book | last1=Press | first1=WH | last2=Teukolsky | first2=SA | last3=Vetterling | first3=WT | last4=Flannery | first4=BP | year=2007 | title=Numerical Recipes: The Art of Scientific Computing | edition=3rd | publisher=Cambridge University Press | publication-place=New York | isbn=978-0-521-88068-8 | chapter=Section 16.1. Gaussian Mixture Models and ''k''-Means Clustering | chapter-url=http://apps.nrbook.com/empanel/index.html#pg=842 | access-date=2015-04-02 | archive-date=2011-08-11 | archive-url=https://web.archive.org/web/20110811154417/http://apps.nrbook.com/empanel/index.html#pg=842 | dead-url=no }}</ref>。另一个''k''-均值算法的推广则是''k''-SVD算法，后者把数据点视为“编码本向量”的稀疏线性组合。而''k''-均值对应于使用单编码本向量的特殊情形（其权重为1）<ref>{{Cite Journal|last1=Aharon |first1=Michal |last2=Elad |first2=Michael |last3=Bruckstein |first3=Alfred |year=2006 |title=''k''-SVD: An Algorithm for Designing Overcomplete Dictionaries for Sparse Representation |url=http://intranet.daiict.ac.in/~ajit_r/IT530/KSVD_IEEETSP.pdf |deadurl=yes |archiveurl=https://web.archive.org/web/20130620125943/http://intranet.daiict.ac.in/~ajit_r/IT530/KSVD_IEEETSP.pdf |archivedate=2013-06-20 }}</ref>。
+=== Mean Shift 聚类 ===
+基本的Mean Shift聚类要维护一个与输入数据集规模大小相同的数据点集。初始时，这一集合就是输入集的副本。然后对于每一个点，用一定距离范围内的所有点的均值来迭代地替换它。与之对比，''k''-均值把这样的迭代更新限制在（通常比输入数据集小得多的）K个点上，而更新这些点时，则利用了输入集中与之相近的所有点的均值（亦即，在每个点的Voronoi划分内）。还有一种与''k''-均值类似的Mean shift算法，即 似然Mean shift，对于迭代变化的集合，用一定距离内在输入集中所有点的均值来更新集合里的点<ref name="Little2011">{{cite journal|last=Little|first=M.A.|author2=Jones, N.S.|title=Generalized Methods and Solvers for Piecewise Constant Signals: Part I|journal=[[Proceedings_of_the_Royal_Society_A|Proceedings of the Royal Society A]]|url=http://www.maxlittle.net/publications/pwc_filtering_arxiv.pdf|year=2011|access-date=2015-04-02|archive-date=2019-08-19|archive-url=https://web.archive.org/web/20190819140345/http://www.maxlittle.net/publications/pwc_filtering_arxiv.pdf|dead-url=no}}</ref>。Mean Shift聚类与''k''-均值聚类相比，有一个优点就是不用指定聚类数目，因为Mean shift倾向于找到尽可能少的聚类数目。然而，Mean shift会比''k''-均值慢得多，并且同样需要选择一个“宽度”参数。和''k''-均值一样，Mean shift算法有许多变体。
+=== 主成分分析（PCA） ===
+有一些研究<ref>{{cite journal|authors=H. Zha, C. Ding, M. Gu, X. He and H.D. Simon|title=Spectral Relaxation for ''k''-means Clustering|journal=Neural Information Processing Systems vol.14 (NIPS 2001)|pages=1057–1064|location=Vancouver, Canada|date=Dec 2001|url=http://ranger.uta.edu/~chqding/papers/Zha-Kmeans.pdf|access-date=2015-04-02|archive-date=2020-09-30|archive-url=https://web.archive.org/web/20200930064318/http://ranger.uta.edu/~chqding/papers/Zha-Kmeans.pdf|dead-url=no}}</ref><ref>{{cite journal|authors=Chris Ding and Xiaofeng He|title=''k''-means Clustering via Principal Component Analysis|work=Proc. of Int'l Conf. Machine Learning (ICML 2004)|pages=225–232|date=July 2004|url=http://ranger.uta.edu/~chqding/papers/KmeansPCA1.pdf|journal=|access-date=2015-04-02|archive-date=2020-09-30|archive-url=https://web.archive.org/web/20200930054045/http://ranger.uta.edu/~chqding/papers/KmeansPCA1.pdf|dead-url=no}}</ref>表明，''k''-均值的放松形式解（由聚类指示向量表示），可由主成分分析中的主成分给出，并且主成分分析由主方向张成的子空间与聚类图心空间是等价的。不过，主成分分析是''k''-均值聚类的有效放松形式并不是一个新的结果(如，见<ref>{{cite journal | title = Clustering large graphs via the singular value decomposition | journal = Machine learning | year = 2004 | first = P. | last = Drineas | author2 = A. Frieze | author3 = R. Kannan | author4 = S. Vempala | author5 = V. Vinay | volume = 56 | pages = 9–33 | id =  | url = http://www.cc.gatech.edu/~vempala/papers/dfkvv.pdf | accessdate = 2012-08-02 | doi = 10.1023/b:mach.0000033113.59016.96 | archive-date = 2020-10-24 | archive-url = https://web.archive.org/web/20201024154113/https://www.cc.gatech.edu/~vempala/papers/dfkvv.pdf | dead-url = no }}</ref>)，并且还有的研究结果直接揭示了关于“聚类图心子空间是由主成分方向张成的”这一论述的反例<ref>{{cite journal | title = Dimensionality reduction for ''k''-means clustering and low rank approximation (Appendix B) | journal = ArXiv | year = 2014 | first = M. | last = Cohen | author2 = S. Elder | author3 = C. Musco | author4 = C. Musco | author5 = M. Persu | url = http://arxiv.org/abs/1410.6801 | accessdate = 2014-11-29 | archive-date = 2020-08-06 | archive-url = https://web.archive.org/web/20200806140851/https://arxiv.org/abs/1410.6801 | dead-url = no }}</ref>
+。
+=== 独立成分分析(ICA) ===
+有研究表明<ref>{{cite journal
+|authors=Alon Vinnikov and Shai Shalev-Shwartz
+|title=''k''-means Recovers ICA Filters when Independent Components are Sparse
+|work=Proc. of Int'l Conf. Machine Learning (ICML 2014)
+|year=2014
+|url=http://www.cs.huji.ac.il/~shais/papers/KmeansICA_ICML2014.pdf
+|journal=
+|access-date=2015-04-02
+|archive-date=2020-11-26
+|archive-url=https://web.archive.org/web/20201126101445/https://www.cs.huji.ac.il/~shais/papers/KmeansICA_ICML2014.pdf
+|dead-url=no
+}}</ref>，在稀疏假设以及输入数据经过白化的预处理后，''k''-均值得到的解就是独立成分分析的解。这一结果对于解释''k''-均值在特征学习方面的成功应用很有帮助。
+=== 双向过滤 ===
+''k''-均值算法隐含地假设输入数据的顺序不影响结果。双向过滤与''k''-均值算法和Mean shift算法类似之处在于它同样维护着一个迭代更新的数据集（亦是被均值更新）。然而，双向过滤限制了均值的计算只包含了在输入数据中顺序相近的点<ref name="Little2011"/>，这使得双向过滤能够被应用在图像去噪等数据点的空间安排是非常重要的问题中。
+== 相似问题 ==
+目标函数是使得聚类平方误差最小化的算法还有''k''-中心点算法，该方法保持聚类的中心在一个真实数据点上，亦即使用中心而非图心作为均值点。
+== 参考资料 ==
+{{Reflist|2}}
+
+== 外部链接 ==
+* [http://people.revoledu.com/kardi/tutorial/kMean/NumericalExample.htm Numerical Example of ''k''-means clustering] {{Wayback|url=http://people.revoledu.com/kardi/tutorial/kMean/NumericalExample.htm |date=20180809101851 }}
+* [http://www.leet.it/home/lale/clustering/ Application example which uses ''k''-means clustering to reduce the number of colors in images] {{Wayback|url=http://www.leet.it/home/lale/clustering/ |date=20201127053511 }}
+* [http://home.dei.polimi.it/matteucc/Clustering/tutorial_html/AppletKM.html Interactive demo of the ''k''-means-algorithm(Applet)] {{Wayback|url=http://home.dei.polimi.it/matteucc/Clustering/tutorial_html/AppletKM.html |date=20121225102832 }}
+* [https://web.archive.org/web/20130602180344/http://www.javaworld.com/javaworld/jw-11-2006/jw-1121-thread.html An example of multithreaded application which uses ''k''-means in Java]
+* [https://web.archive.org/web/20071023080012/http://www25.brinkster.com/denshade/kmeans.php.htm ''k''-means application in php ]
+* [https://web.archive.org/web/20071104125804/http://alipr.com/ ''k''-means application in image retrieval ]
+* [http://informationandvisualization.de/blog/kmeans-and-voronoi-tesselation-built-processing Another animation of the ''k''-means-algorithm] {{Wayback|url=http://informationandvisualization.de/blog/kmeans-and-voronoi-tesselation-built-processing |date=20201125225034 }}
+
+{{DEFAULTSORT:''k''-Means Clustering}}
+[[Category:聚类分析|Category:聚类分析]]
+[[Category:計算統計學|Category:計算統計學]]
+[[Category:算法|Category:算法]]

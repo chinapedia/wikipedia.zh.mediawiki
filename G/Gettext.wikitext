@@ -1,0 +1,106 @@
+{{Unreferenced|time=2009-09-19}}
+{{NoteTA
+|G1=IT
+|G2=FL
+|1=zh-cn:函数库;zh-tw:函式庫;
+|2=zh-hans:注释;zh-tw:註解;
+}}
+{{lowercase title}}
+
+{{Infobox Software
+| name = gettext
+| developer = [[GNU|GNU项目]]
+| latest release version = 0.21
+| latest release date = {{Release date and age|2020|07|27}}
+| operating system = [[跨平台|跨平台]]
+| genre = [[软件开发|软件开发]]，[[翻译|翻译]]
+| license = [[LGPL|LGPL]]（函数库），[[GPL|GPL]]（工具），[[GFDL|GFDL]]/GPL（文档）
+| website = {{URL|https://www.gnu.org/software/gettext/}}
+}}
+
+'''gettext'''是[[GNU|GNU]][[国际化与本地化|国际化与本地化]]（i18n）函数库。它常被用于编写多语言程序。
+
+==开发==
+程序源代码需要进行修改以响应GNU gettext请求。多数[[编程语言|编程语言]]均已通过字符封装的方式实现了对其的支持。为了减少输入量和-{zh-hans:代码;zh-tw:程式碼;}-量，此功能通常以标记[[别名|别名]]“_”的形式使用，所以例如以下[[C语言|C语言]]-{zh-hans:代码;zh-tw:程式碼;}-：
+<syntaxhighlight lang=c>
+printf(gettext("My name is %s.\n"), my_name);
+</syntaxhighlight>
+应当写作：
+<syntaxhighlight lang=c>
+printf(_("My name is %s.\n"), my_name);
+</syntaxhighlight>
+
+gettext使用其中的字符串寻找对应的其他语言翻译，若没有可用翻译则-{zh-hans:返回;zh-tw:傳回;}-原始内容。
+
+除[[C语言|C语言]]外，GNU gettext还支持[[C++|C++]]、[[Objective-C|Objective-C]]、[[Pascal语言|Pascal]]/[[Object_Pascal|Object Pascal]]、[[Bourne_shell|sh]]脚本、[[bash|bash]]脚本、[[Python语言|Python]]、GNU [[CLISP|CLISP]]，[[Emacs_Lisp|Emacs Lisp]]、ibrep、GNU [[Smalltalk|Smalltalk]]、[[Java语言|Java]]、GNU [[AWK|awk]]、[[wxWidgets|wxWidgets]]（-{zh-hans:通过;zh-tw:透過;}-wxLocale-{zh-hans:类;zh-tw:類別;}-）、YCP（[[YaST2|YaST2]]语言）、[[Tcl|Tcl]]、[[Perl|Perl]]、[[PHP|PHP]]、[[Pike语言|Pike]]、[[Ruby语言|Ruby]]以及[[R语言|R]]。用法均与在[[C语言|C语言]]上类似。
+
+xgettext程序从源代码生成'''.pot'''文件，作为源代码中需翻译内容的模板。一个典型的.pot文件条目应当是这样的：
+<syntaxhighlight lang=gettext>
+#: src/name.c:36
+msgid "My name is %s.\n"
+msgstr ""
+</syntaxhighlight>
+
+[[註解_(程式設計)|註解]]被直接放置在字符串前，用于帮助翻译者理解原文的內容：
+<syntaxhighlight lang=c>
+/// TRANSLATORS: Please leave %s as it is, because it is needed by the program.
+/// Thank you for contributing to this project.
+printf(_("My name is %s.\n"), my_name);
+</syntaxhighlight>
+本例中的-{zh-hans:注释;zh-tw:註解;}-是以 '''///'''开头的，其作用是用于<code>xgettext</code>程序生成<code>.pot</code>模板文件。
+ 
+<syntaxhighlight lang="bash">xgettext --add-comments=///</syntaxhighlight>
+
+在.pot文件中的注释应为以下形式：
+<syntaxhighlight lang=gettext>
+#. TRANSLATORS: Please leave %s as it is, because it is needed by the program.
+#. Thank you for contributing to this project. 
+#: src/name.c:36
+msgid "My name is %s.\n"
+msgstr ""
+</syntaxhighlight>
+
+==翻译==
+翻譯者需要處理的-{對象}-是'''.po'''文件，它是由<tt>msginit</tt>程序从.pot模板文件生成的。例如使用<tt>msginit</tt>初始化法语翻译文件时，我们运行以下命令：
+
+ <syntaxhighlight lang=bash>msginit --locale=fr --input=name.pot</syntaxhighlight>
+
+这将会使用指定的name.pot在当前目录创建一个fr.po，其中的一个条目应该是以下形式的：
+<syntaxhighlight lang=gettext>
+#: src/name.c:36
+msgid "My name is %s.\n"
+msgstr ""
+</syntaxhighlight>
+翻译者需要手工或使用类似[[Poedit|Poedit]]、[[gtranslator|gtranslator]]、[[OmegaT|OmegaT]]或[[Emacs|Emacs]]等工具的相应模式编辑该文件。翻译完成后，文件应为如下的样子：
+<syntaxhighlight lang=gettext>
+#: src/name.c:36
+msgid "My name is %s.\n"
+msgstr "Je m'appelle %s.\n"
+</syntaxhighlight>
+最后.po文件需要使用'''<tt>msgfmt</tt>'''编译为'''.mo'''文件以用作发布。
+
+==執行==
+使用[[Unix|Unix]]类型操作系统的用户只需设置[[环境变量|环境变量]]中的<code>LC_MESSAGES(但是ubuntu linux 是用LANG)</code>{{Citation needed|但是ubuntu linux 是用LANG}}，程序将自动从相应的<code>.mo</code>文件中读取语言信息。
+
+==参考==
+{{reflist}}
+
+==另见==
+{{portal|Free software|Free Software Portal Logo.svg}}
+
+* [[国际化和本地化|国际化和本地化]]
+* [[翻译工具|翻译工具]]
+
+==外部链接==
+* [http://www.gnu.org/software/gettext/gettext.html Gettext主页]{{WebCite|url=https://www.webcitation.org/65W97iAj6?url=http://www.gnu.org/software/gettext/gettext.html |date=20120217103113 |dateformat=iso }}
+* [http://mel.melaxis.com/devblog/2005/08/06/localizing-php-web-sites-using-gettext/ 使用gettext本地化PHP网站] {{Wayback|url=http://mel.melaxis.com/devblog/2005/08/06/localizing-php-web-sites-using-gettext/ |date=20201201231950 }} - 解些和示例。
+* [http://code.google.com/p/gettext-commons/ Gettext Commons - Java gettext工具集] {{Wayback|url=http://code.google.com/p/gettext-commons/ |date=20160112125037 }}
+* [http://www.lrde.epita.fr/~adl/autotools.html Autotools教程]{{Wayback|url=http://www.lrde.epita.fr/~adl/autotools.html |date=20101227173311 }}
+* [https://web.archive.org/web/20181001050711/http://www.gted.org/ gted - GetText EDitor和工具集成]
+* [http://gorm.po.dk/ Gorm PO文件编辑器] {{Wayback|url=http://gorm.po.dk/ |date=20210126042222 }}
+* [http://msdn.microsoft.com/en-us/library/windows/desktop/ms647486(v=vs.85).aspx Windows 下的对应函数为 LoadString，直接读取适合当前 locale/lcid 设置的资源字符串] {{Wayback|url=http://msdn.microsoft.com/en-us/library/windows/desktop/ms647486(v=vs.85).aspx |date=20170715073405 }}
+
+{{GNU}}
+
+[[Category:GNU计划软件|Category:GNU计划软件]]
+[[Category:翻译|Category:翻译]]

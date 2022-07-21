@@ -1,0 +1,141 @@
+{{copyedit}}
+
+{{noteTA
+|G1 = IT
+}}
+
+{{lowercase|title=init}}
+
+'''init'''（为{{lang-en|initialization}}的简写）是 [[Unix|Unix]] 和 [[类Unix|类Unix]] 系统中用来产生其它所有进程的程序。它以[[守护进程|守护进程]]的方式存在，其进程号为1。Linux系統在開機時載入[[Linux內核|Linux內核]]後，便由Linux內核載入init程式，由init程式完成餘下的開機過程，比如載入[[執行級別|執行級別]]，載入服務，啟動Shell/圖形化界面等等。
+
+Unix 系列中(如 [[UNIX_System_III|System III]] 和 [[UNIX_System_V|System V]])'''init'''的作用，和研究中的 [[Unix|Unix]] 和 [[Berkeley_Software_Distribution|BSD]] 衍生版本相比，发生了一些变化。大多数[[Linux发行版|Linux发行版]]是和 System V 相兼容的，但是一些发行版如[[Slackware|Slackware]] 采用的是BSD风格，其它的如 [[Gentoo_Linux|Gentoo]] 是自己定制的。後來[[Ubuntu|Ubuntu]]<ref>{{Cite web |url=http://help.ubuntu.com/community/KnowThyUbuntu |title=存档副本 |accessdate=2009-06-09 |archive-date=2016-03-06 |archive-url=https://web.archive.org/web/20160306194452/https://help.ubuntu.com/community/KnowThyUbuntu |dead-url=no }}</ref><ref>{{Cite web |url=http://www.linuxquestions.org/questions/ubuntu-63/since-we-have-no-etcinittab-506281/ |title=存档副本 |accessdate=2009-06-09 |archive-date=2009-06-02 |archive-url=https://web.archive.org/web/20090602112101/http://www.linuxquestions.org/questions/ubuntu-63/since-we-have-no-etcinittab-506281/ |dead-url=no }}</ref> 和其他一些發行版採用 [[Upstart|Upstart]]<ref>{{cite web |url=http://www.netsplit.com/2006/08/26/upstart-in-universe/ |title=存档副本 |accessdate=2009-09-12 |deadurl=yes |archiveurl=https://web.archive.org/web/20090904110208/http://www.netsplit.com/2006/08/26/upstart-in-universe/ |archivedate=2009-09-04 }}</ref> 來代替<ref>{{Cite web |url=http://linuxplanet.com/linuxplanet/reports/6366/1/ |title=存档副本 |accessdate=2009-06-09 |archive-date=2017-03-14 |archive-url=https://web.archive.org/web/20170314202356/http://www.linuxplanet.com/linuxplanet/reports/6366/1 |dead-url=no }}</ref> 傳統的 init 處理程序。至2015年，大部分[[Linux發行版|Linux發行版]]都已採用新的[[systemd|systemd]]替代[[UNIX_System_V|System V]]和[[Upstart|Upstart]]，但[[systemd|systemd]]向下相容[[UNIX_System_V|System V]]。
+
+== BSD风格 ==
+BSD init 运行存放于<nowiki>'/etc/rc'</nowiki>的初始化 [[Unix_shell|shell]] [[脚本|脚本]]，然后启动基于文本模式的终端([[getty_(Unix)|getty]])或者基于图形界面的终端([[窗口系统|窗口系统]]，如 [[X_Window_System|X]])。 这里没有[[运行模式|运行模式]]的问题，因为文件 <nowiki>'rc'</nowiki>  决定了 init 如何执行。
+
+''优点:'' 简单且易于手动编辑。
+
+''缺点:'' 如果第三方软件需要在启动过程执行它自身的初始化脚本，它必须修改已经存在的启动脚本，一旦这种过程中有一个小错误，都将导致系统无法正常启动。
+
+值得注意的是，现代的 [[BSD|BSD]] 衍生系统一直支持使用 <nowiki>'rc.local'</nowiki> 文件的方式，它将在正常启动过程接近最后的时间以子脚本的方式来执行。这样做减少了整个系统无法启动的风险。然后，第三方软件包可以将它们独立的 start/stop 脚本安装到一个本地的 <nowiki>'rc.d'</nowiki> 目录中(通常这是由 [[ports_collection|ports collection]]/[[pkgsrc|pkgsrc]] 完成的)。 [[FreeBSD|FreeBSD]] 和 [[NetBSD|NetBSD]] 现在默认使用 '''rc.d''' ，该目录中所有的用户启动脚本，都被分成更小的子脚本，和 SysV 类似。'''rcorder''' 通常根据在 '''rc.d'''目录中脚本之间的依赖关系来决定脚本的执行顺序。
+
+== SysV风格 ==
+System V init检查 <nowiki>'/etc/inittab'</nowiki> 文件中是否含有 <nowiki>'initdefault'</nowiki> 项。这告诉init系统是否有一个默认[[运行模式|运行模式]]。如果没有默认的运行模式，那么用户将进入系统控制台，手动决定进入何种运行模式。
+
+=== 运行模式 ===
+[[UNIX_System_V|System V]]中[[运行模式|运行模式]]描述了系统各种可能的状态。通常会有 8 种运行模式，即运行模式0到6和''S''或者''s''。其中运行模式3为"保留的"运行模式：
+* 0.关机
+* 1.[[单用户模式|单用户模式]]
+* 6.重启
+
+除了模式0,1,6外，每种Unix和Unix-like系统对运行模式的定义不太一样。通常在 <tt>/etc/inittab</tt>文件中定义了各种运行模式的工作范围。
+
+目前絕大多數[[Linux發行版|Linux發行版]]已經基於新的[[systemd|systemd]]，systemd一般不再使用<tt>/etc/inittab</tt>檔案，也使用新的target取代System V的執行等級，但仍然相容System V的執行等級。若要設定系統預設的執行模式，需要使用<tt>systemctl default targetname.target</tt>命令。
+
+=== 默认的运行模式 ===
+{| class="wikitable"
+! 操作系统
+! 默认的运行模式
+|-
+| [[IBM_AIX|AIX]]
+| 2
+|-
+| [[Arch_Linux|Arch Linux]]
+| 3
+|-
+| [[CentOS|CentOS]]
+| 3
+|-
+| [[Debian_GNU/Linux|Debian GNU/Linux]]
+| 2 <ref name="#1">{{Cite web |url=http://www.debianadmin.com/debian-and-ubuntu-linux-run-levels.html |title=存档副本 |accessdate=2009-06-09 |archive-date=2021-02-01 |archive-url=https://web.archive.org/web/20210201013803/http://www.debianadmin.com/debian-and-ubuntu-linux-run-levels.html |dead-url=no }}</ref>
+|-
+| [[Gentoo_Linux|Gentoo Linux]]
+| 3
+|-
+| [[Mandriva_Linux|Mandriva Linux]]
+| 5
+|-
+| [[Mac_OS_X|Mac OS X]]
+| 3
+|-
+| [[Red_Hat_Linux|Red Hat Linux]] / [[Fedora_(作業系統)|Fedora]]
+| 3 or 5
+|-
+| [[Slackware_Linux|Slackware Linux]]
+| 3
+|-
+| [[Solaris|Solaris]]
+| 3 <ref>{{cite web |url=http://docs.sun.com/app/docs/doc/817-1985/6mhm8o5ru |title=存档副本 |accessdate=2011-06-13 |deadurl=yes |archiveurl=https://web.archive.org/web/20070818070511/http://docs.sun.com/app/docs/doc/817-1985/6mhm8o5ru |archivedate=2007-08-18 }}</ref>
+|-
+| [[SUSE_Linux|SUSE Linux]]
+| 5 <ref>{{cite web |url=http://www.novell.com/documentation/sles10/pdfdoc/sles_admin/sles_admin.pdf |title=存档副本 |accessdate=2009-06-09 |deadurl=yes |archiveurl=https://web.archive.org/web/20061104235826/http://www.novell.com/documentation/sles10/pdfdoc/sles_admin/sles_admin.pdf |archivedate=2006-11-04 }}</ref>
+|-
+| [[Ubuntu|Ubuntu]]
+| 2 <ref name="#1"/>
+|}
+
+上面的表中有两种Linux发行版默认的运行模式为5，模式5是多用户图形环境([[X_Window_System|X Window System]])，通常还包括[[X显示管理器|X显示管理器]]。然而在[[Solaris|Solaris]]操作系统中，模式5被保留用来执行关机和自动切断电源。 
+
+大多数操作系统的用户可以用下面的命令来判断当前的运行模式是什么：
+<syntaxhighlight lang="bash">
+$ runlevel
+$ who -r
+</syntaxhighlight>
+
+在 [[超级用户|root]] 权限下，运行 <tt>telinit</tt> 或者 <tt>init</tt> 命令可以改变当前的运行模式。 <tt>/etc/inittab</tt> 文件中设置的默认的运行模式在 <tt>:initdefault:</tt> 项中。
+
+== 跳过 init ==
+Linux系统中，现代的[[bootloader|bootloader]](如[[LILO|LILO]]或者[[GRUB|GRUB]])，用户可以在初始化过程中最后启动的进程来取代默认的 <code>/sbin/init</code>。
+
+通常是在bootloader环境中通过执行 <code>init=[[foobar|/foo/bar]]</code> 命令。例如，如果执行 <code>init=/bin/bash</code>，启动单用户root的shell环境，无需用户密码。 
+
+BSD的变种，大多数平台，bootstrap程序是可以被打断的，然后执行<code>boot -s</code>命令进入单用户模式。
+
+单用户模式并不没有跳过init，它仍然可以执行 <code>/sbin/init</code>，但是它将使init询问<code>exec()</code>将要执行的命令 (默认为 <code>/bin/sh</code>) 的路径，而不是采用正常的多用户启动顺序。如果内核启动时在 <code>/etc/ttys</code>文件中被标注为"不安全"(在某些系统中，当前的"安全模式"可能会有些变化)，在允许这种情况(或者回退到单用户模式，如果用户执行 <code>CTRL+D</code>)，init将首先询问[[超级用户|root]]用户的密码。 
+如果该程序退出，内核将在多用户模式下重新执行 init。如果系统从多用户模式切换到单用户模式，还将碰到上述的情况。 
+
+如果内核加载后，init不能被正常启动，这将导致 [[Kernel_panic|panic]] 错误，此时系统将不可使用。想要通过init自身来改变init的路径，不同的版本情况不太一样(NetBSD中可执行<code>boot -a</code>；FreeBSD中利用<code>init_path</code>命令装载变量)。
+
+== 其他风格 ==
+很多人一直努力地从某些方面改进传统的 init 守护进程，使它变得更完善。下面列出的是一些改进（排序不分先后）：
+* [[SystemStarter|SystemStarter]]：用来替代 [[launchd|launchd]] — [[苹果公司|Apple]] [[Mac_OS_X|Mac OS X]]开启进程
+* [[Initng|Initng]]：完全代替 init ，可以异步开启进程
+* [[Upstart|Upstart]]：完全代替 init ，可以异步开启进程，曾由[[Ubuntu|Ubuntu]]等使用
+* [[Service_Management_Facility|Service Management Facility]]：完全代替/重新设计 [[Solaris_(操作系统)|Solaris]] 启动 Solaris 10
+* runit：跨平台的完全代替 init 可以并行启动服务
+* [[GoboLinux#Boot_system|BootScripts]]：[[GoboLinux|GoboLinux]]
+* Mudur：用 [[Python|Python]] 写成的 init 替代品， 可以异步开启进程，[[Pardus_(操作系统)|Pardus]] Linux 发行版
+* [[systemd|systemd]]：完全替代init，可并行启动服务，并能减少在shell上的系统开销，相比传统的[[UNIX_System_V|System V]]是一大革新，已被大多数Linux发行版所使用
+
+下面列出的项目还没有大范围的使用：
+* [[Einit|eINIT]], 完全代替 init ，可以异步开启进程，但是完成这个过程可以不使用 shell 脚本
+* ''svscan'' 来自 [[daemontools|daemontools]] 被用作 1 号进程 - 似乎将被 runit 替代
+* cinit
+* twsinit, 部分用 x86 汇编写成， 只是用来证明一种概念
+* minit
+* OpenRC，由[[Gentoo|Gentoo]]客制
+
+== 参考文献 ==
+{{Reflist|33em}}
+
+== 外部链接 ==
+* [https://web.archive.org/web/20090211024645/http://unixhelp.ed.ac.uk/CGI/man-cgi?init+8 Linux init man page]
+* [http://www.freebsd.org/cgi/man.cgi?query=init&apropos=0&sektion=0&manpath=FreeBSD+6.2-stable&format=html FreeBSD init man page] {{Wayback|url=http://www.freebsd.org/cgi/man.cgi?query=init&apropos=0&sektion=0&manpath=FreeBSD+6.2-stable&format=html |date=20170706063232 }}
+* [https://web.archive.org/web/20090524020300/http://www.atnf.csiro.au/people/rgooch/linux/boot-scripts/ boot-scripts]
+* [http://smarden.org/runit/index.html runit] {{Wayback|url=http://smarden.org/runit/index.html |date=20200705230039 }}
+* [http://www.fefe.de/minit/ minit] {{Wayback|url=http://www.fefe.de/minit/ |date=20210204144416 }}
+* [http://www.netbsd.org/guide/en/chap-rc.html rc.d] {{Wayback|url=http://www.netbsd.org/guide/en/chap-rc.html |date=20070529055411 }}
+* [http://www.busybox.net/downloads/BusyBox.html#item_init busybox]{{Wayback|url=http://www.busybox.net/downloads/BusyBox.html#item_init |date=20100611211247 }}
+* [http://www.sun.com/bigadmin/content/selfheal/smf-quickstart.html smf and milestones in Solaris 10]{{Wayback|url=http://www.sun.com/bigadmin/content/selfheal/smf-quickstart.html |date=20051231110711 }}
+* [https://web.archive.org/web/20090210204946/http://linux.schottelius.org/cinit/ cinit]
+* [http://www.energymech.net/users/proton/ twsinit] {{Wayback|url=http://www.energymech.net/users/proton/ |date=20201017082339 }}
+* [https://web.archive.org/web/20110705091640/http://www.pardus.org.tr/eng/projects/comar/SpeedingUpLinuxWithPardus.html Mudur]
+
+== 参见 ==
+{{Portal box|Linux}}
+* [[pidof|pidof]] 或者 killall5, 从 System V 开始在很多发行版中使用的另一种程序
+
+{{-}}
+{{Unix中的服务管理}}
+
+[[Category:Unix进程和任务管理相关软件|Category:Unix进程和任务管理相关软件]]

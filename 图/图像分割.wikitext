@@ -1,0 +1,101 @@
+在[[计算机视觉|计算机视觉]]领域，'''图像分割'''（segmentation）指的是将[[数字图像|数字图像]]细分为多个图像子区域（像素的[[集合|集合]]）（也被称作超像素）的过程。图像分割的目的是简化或改变图像的表示形式，使得图像更容易理解和分析。<ref name="computervision">Linda G. Shapiro and George C. Stockman (2001):“Computer Vision”, pp 279-325, New Jersey, Prentice-Hall, ISBN 0-13-030796-3</ref>图像分割通常用于定位图像中的物体和[[边界|边界]]（[[线|线]]，[[曲线|曲线]]等）。更精确的，图像分割是对图像中的每个[[像素|像素]]加[[标签|标签]]的一个过程，这一过程使得具有相同标签的像素具有某种共同视觉特性。
+
+图像分割的结果是图像上子区域的集合（这些子区域的全体覆盖了整个图像），或是从图像中提取的[[轮廓|轮廓]]线的集合（例如[[边缘检测|边缘检测]]）。一个子区域中的每个像素在某种特性的度量下或是由计算得出的特性都是相似的，例如[[颜色|颜色]]、[[亮度|亮度]]、[[纹理|纹理]]。[[邻接|邻接]]区域在某种特性的度量下有很大的不同。<ref name="computervision" />
+
+== 图像分割的应用 ==
+图像分割在实际中的应用包括：
+
+* [[医学影像|医学影像]]<ref>Dzung L. Pham, Chenyang Xu, and Jerry L. Prince (2000):“Current Methods in Medical Image Segmentation”, ''Annual Review of Biomedical Engineering'', volume 2, pp 315-337</ref>，包括:
+** 肿瘤和其他病理的定位
+** 组织体积的测量
+** 计算机引导的手术
+** 诊断
+** 治疗方案的定制
+** 解剖学结构的研究
+* 在卫星图像中定位物体（道路、森林等）
+* [[人脸识别|人脸识别]]
+* [[指纹识别|指纹识别]]
+* [[交通控制系统|交通控制系统]]
+* [[Brake_light_detection|Brake light detection]]
+* [[机器视觉|机器视觉]]
+
+现已有许多各种用途的图像分割[[算法|算法]]。对于图像分割问题没有统一的解决方法，这一技术通常要与相关领域的知识结合起来，这样才能更有效的解决该领域中的图像分割问题。
+
+== 二值化 ==
+
+[[二值化|二值化]]（{{lang-en|thresholding}}）是最简单的图像分割方法，会根据特定的限幅值（{{lang-en|clip-value}}）将灰度图转换为黑白图，该值也称阈值（{{lang-en|threshold}}）。
+
+该方法的关键在于如何选取阈值。工业上所采用的方法有很多，如[[大津算法|大津算法]]和[[K-平均算法|K-平均算法]]。
+
+== 聚类法 ==
+{{multiple image
+<!-- Essential parameters -->
+| align     = right
+| direction = horizontal
+| width     = 300
+| image1    = Polarlicht 2.jpg
+| alt1      = Original image
+| caption1  = 源图像。
+| image2    = Polarlicht 2 kmeans 16 large.png
+| alt2      = Processed image
+| caption2  = 执行k-均值聚类（k=16）后的图像。注意：为了提高速度，通常可以先对较大图片进行下采样后再计算聚类。
+}}
+[[K-均值算法|K-均值算法]]是一种将[[聚类分析|图像分割]]成K个聚类的[[迭代|迭代]]技术。基本[[算法|算法]]如下：
+# 首先从n个数据对象任意选择 k 个对象作为初始聚类中心；
+# 对于所剩下其它对象，则根据它们与这些聚类中心的相似度（距离），分别将它们分配给与其最相似的（聚类中心所代表的）聚类；
+# 然后再计算每个所获新聚类的聚类中心（该聚类中所有对象的均值）；
+# 重复第2和3步骤，直至收敛（聚类不再发生变化）。
+
+这里，距离指像素与聚类中心之间绝对偏差或偏差的平方。偏差通常用像素颜色、亮度、纹理、位置，或它们的加权组合。K值可以手动选取、随机选取、或其它方式得到。此算法保证收敛，但它可能不会返回最佳的解决方案。该解决方案的质量取决于最初的一组集群和K值。
+
+== 直方图法 ==
+相对于其他的图像分割算法来说，基于直方图的方法是一种效率非常高的方法，因为通常来说，该方法只需要对整幅图片扫描一遍即可。该方法对于整幅图像建立一张直方图，并通过图中的峰和谷来进行分类。颜色与灰度是通常进行直方图统计的特征。
+
+== 边缘检测 ==
+边缘检测主要是图像的灰度变化的度量、监测和定位，其实质就是提取图像中不连续部分的特征。边缘检测在图像处理中比较重要，边缘检测的结果是图像分割技术所依赖的重要特征，因此边缘检测是图像分割领域的一部分。边缘检测常用于计算机视觉、武器的跟踪控制及自控制式的车船运动研究等领域。
+
+首先介绍图像边缘检测，具体就梯度算子、kirsch算子、laplacian-gauss算子、canny算子、log滤波算子、sobel算子、Robert算子、prewitt算子边缘检测方法介绍检测原理并通过编程实现，比较各种方法的处理结果。
+
+== 区域生长 ==
+区域生长的基本思想是将具有相似性质的像素集合起来构成区域。具体先对每个需要分割的区域找一个种子像素作为生长的起点，然后将种子像素周围邻域中与种子像素具有相同或相似性质的像素（根据某种事先确定的生长或相似准则来判定）合并到种子像素所在的区域中。将这些新像素当做新的种子像素继续进行上面的过程，直到再没有满足条件的像素可被包括进来，这样，一个区域就长成了。
+
+== 水平集方法 ==
+
+水平集方法最初由Osher和Sethian提出，目的是用于界面追踪。在90年代末期被广泛应用在各种图像领域。这一方法能够在隐式有效的应对曲线/曲面演化问题。基本思想是用一个符号函数表示演化中的轮廓（曲线或曲面），其中符号函数的零水平面对应于实际的轮廓。这样对应于轮廓运动方程，可以容易的导出隐式曲线/曲面的相似曲线流，当应用在零水平面上将会反映轮廓自身的演化。水平集方法具有许多优点：它是隐式的，参数自由的，提供了一种估计演化中的几何性质的直接方法，能够改变拓扑结构并且是本质的。
+
+== 小波變換方法 ==
+小波變換常被用來抽取影像的特徵，並能應用在去除雜訊、邊界偵測、辨識等問題，因此也能用來處理圖像分割的問題。Andrea Gavlasova在2006年被提出的Wavelet Based Image Segmentation<ref>{{Cite journal|title=WAVELET BASED IMAGE SEGMENTATION|author=Andrea Gavlasova, Ales Prochazka, and Martina Mudrova|url=|journal=Annual Conference Technical Computing|issue=14th|doi=|others=|year=2006|volume=|page=|pmid=}}</ref>，示範了小波變換用來處理圖像分割的流程，整個演算法的流程如下：
+
+* 令原影像的大小為NxN，對影像中每4x4的區域做使用哈爾變換的離散小波轉換，以抽取出影像的特徵。
+* 計算抽取出的特徵的energy以及contrast，作為新的特徵，計算公式如下:
+** <math>Energy=\sum_{i,j=1}^N C_{i,j}^2</math>
+** <math>Contrast=\sum_{i,j=1}^N (i-j)^2C_{i,j}</math>
+* 對上一步所算出的特徵矩陣，計算縱軸和橫軸像素兩兩之間的差，藉此找出影像中的物體邊界，作為初步的分割結果。
+* 在初步的分割結果會有瑕疵和雜點，這是因為上一步相減兩兩像素的結果。為了讓結果更平滑，就使用circular averaging filter來過濾分割的結果。
+* 將輸出取閾值，變成能夠代表物體邊界的黑白影像，像素值為一的部份即代表物體邊界。
+* 將黑白的分隔影像骨架化(skeletonize)，讓輸出能以白色細線來表示要分割的物體邊界，完成影像分割。
+
+== 请参阅 ==
+* [[计算机视觉|计算机视觉]]
+* [[数据聚类|数据聚类]]
+* [[图论|图论]]
+* [[直方图|直方图]]
+* [[基于图像的网格|基于图像的网格]]
+* [[K-均值算法|K-均值算法]]
+* [[Pulse-coupled_networks|Pulse-coupled networks]]
+* [[Range_image_segmentation|Range image segmentation]]
+* [[区域生长|区域生长]]
+* [[大津算法|大津算法]]
+
+== 参考文献 ==
+{{reflist}}
+
+==外部链接==
+* [https://web.archive.org/web/20100518124644/http://csc.fsksm.utm.my/syed/projects/image-processing.html Some sample code that performs basic segmentation], by Syed Zainudeen. University Technology of Malaysia.
+* [https://rd.springer.com/article/10.1007/s11075-008-9183-x Generalized Fast Marching method]{{Wayback|url=https://rd.springer.com/article/10.1007/s11075-008-9183-x |date=20181215121910 }} by Forcadel et al. [2008] for applications in image segmentation.
+* [http://www.iprg.co.in Image Processing Research Group]{{Wayback|url=http://www.iprg.co.in/ |date=20201228051352 }} An Online Open Image Processing Research Community.
+* [https://www.mathworks.com/discovery/image-segmentation.html Segmentation methods in image processing and analysis]{{Wayback|url=https://www.mathworks.com/discovery/image-segmentation.html |date=20201026194130 }} and [https://blogs.mathworks.com/pick/2017/12/07/minimizing-energy-to-segment-images-or-cluster-data/ Minimizing energy to segment images]{{Wayback|url=https://blogs.mathworks.com/pick/2017/12/07/minimizing-energy-to-segment-images-or-cluster-data/ |date=20201129070856 }} by Mathworks
+* [http://disp.ee.ntu.edu.tw/meeting/%E6%98%B1%E7%BF%94/Segmentation%20tutorial.pdf More image segmentation methods with detailed algorithms]{{Wayback|url=http://disp.ee.ntu.edu.tw/meeting/%E6%98%B1%E7%BF%94/Segmentation%20tutorial.pdf |date=20191101050028 }} by Yu-Hsiang Wang (王昱翔), National Taiwan University, Taipei, Taiwan, ROC
+* [https://ipolcore.ipol.im/demo/clientApp/demo.html?id=295 Online demonstration of piecewise linear image segmentation]{{Wayback|url=https://ipolcore.ipol.im/demo/clientApp/demo.html?id=295 |date=20201027093149 }} by IPOL Journal
+
+[[Category:图像处理|Category:图像处理]]

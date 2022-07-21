@@ -1,0 +1,146 @@
+{{Cleanup-jargon|time=2021-10-06T02:42:47+00:00}}
+{{noteTA
+|G1=IT
+}}
+{{SHA-box}}
+{{Infobox encryption method
+| name = SHA-2
+| image =
+| caption =
+<!-- General -->
+| designers = [[美國國家安全局|美國國家安全局]]
+| publish date = 2001年
+| series = ([[SHA-0|SHA-0]]), [[SHA-1|SHA-1]], SHA-2, [[SHA-3|SHA-3]]
+| derived from =
+| derived to =
+| related to =
+| certification = [[聯邦資料處理標準|FIPS]] PUB 180-4, {{le|CRYPTREC|CRYPTREC}}, {{le|NESSIE|NESSIE}}
+<!-- Detail -->
+| digest size = 224, 256, 384, or 512 bits
+| structure = 配合Davies–Meyer壓縮函數的{{le|默克爾-達姆加德結構|Merkle–Damgård construction}}
+| rounds = 64 or 80
+| cryptanalysis = A 2011 attack breaks [[preimage_resistance|preimage resistance]] for 57 out of 80 rounds of SHA-512, and 52 out of 64 rounds for SHA-256.<ref name=preimage-khov>{{Cite journal | author1=Dmitry Khovratovich, Christian Rechberger | author2=Alexandra Savelieva | lastauthoramp=yes | title=Bicliques for Preimages: Attacks on Skein-512 and the SHA-2 family | year=2011 | journal=IACR Cryptology ePrint Archive | volume=2011:286 | url=http://eprint.iacr.org/2011/286.pdf | access-date=2016-12-15 | archive-date=2016-07-22 | archive-url=https://web.archive.org/web/20160722035610/http://eprint.iacr.org/2011/286.pdf | dead-url=no }}</ref>
+Pseudo-collision attack against up to 46 rounds of SHA-256.<ref name=collision-lamberger>{{Cite journal | author1=Mario Lamberger | author2=Florian Mendel | lastauthoramp=yes | title=Higher-Order Differential Attack on Reduced SHA-256 | year=2011 | journal=IACR Cryptology ePrint Archive | volume=2011:37 | url=http://eprint.iacr.org/2011/037.pdf | access-date=2016-12-15 | archive-date=2017-03-29 | archive-url=https://web.archive.org/web/20170329070654/http://eprint.iacr.org/2011/037.pdf | dead-url=no }}</ref>
+}}
+'''SHA-2'''，名稱來自於'''安全散列演算法2'''（{{lang-en|Secure Hash Algorithm 2}}）的縮寫，一種[[密碼雜湊函數|密碼雜湊函數]]演算法標準，由[[美國國家安全局|美國國家安全局]]研發<ref>{{cite web |url=http://www.staff.science.uu.nl/~werkh108/docs/study/Y5_07_08/infocry/project/Cryp08.pdf |title=On the Secure Hash Algorithm family |deadurl=yes |archiveurl=https://web.archive.org/web/20141014172403/http://www.staff.science.uu.nl/~werkh108/docs/study/Y5_07_08/infocry/project/Cryp08.pdf |archivedate=2014-10-14 |accessdate=2016-12-15 }}</ref>，由[[美國國家標準與技術研究院|美國國家標準與技術研究院]]（NIST）在2001年發布。屬於[[SHA家族|SHA演算法]]之一，是[[SHA-1|SHA-1]]的後繼者。其下又可再分為六個不同的演算法標準，包括了：SHA-224、SHA-256、SHA-384、SHA-512、SHA-512/224、SHA-512/256。
+
+== 开发 ==
+[[File:SHA-2.svg|thumbnail]]
+
+NIST發佈了三個額外的SHA變體，這三個函數都將訊息對應到更長的訊息摘要。以它們的摘要長度（以[[位元|位元]]計算）加在原名後面來命名：SHA-256，SHA-384和SHA-512。它們發佈於2001年的FIPS PUB 180-2草稿中，隨即通過審查和評論。包含SHA-1的FIPS PUB 180-2，於2002年以官方標準發佈。2004年2月，發佈了一次FIPS PUB 180-2的變更通知，加入了一個額外的變種SHA-224，這是為了符合雙金鑰[[3DES|3DES]]所需的金鑰長度而定義<ref>{{cite web|url=http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf|format=PDF|title=FIPS 180-2 with Change Notice 1|website=csrc.nist.gov|accessdate=2017-01-13|archive-date=2012-03-18|archive-url=https://www.webcitation.org/66GOBwst5?url=http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf|dead-url=no}}</ref>。
+
+SHA-256和SHA-512是很新的雜湊函數，前者以定義一個word為32位元，後者則定義一個word為64位元。它們分別使用了不同的偏移量，或用不同的常數，然而，實際上二者結構是相同的，只在迴圈執行的次數上有所差異。SHA-224以及SHA-384則是前述二種雜湊函數的截短版，利用不同的初始值做計算。
+
+{{Fact|這些新的雜湊函數並沒有接受像SHA-1一樣的公眾密碼社群做詳細的檢驗，所以它們的密碼安全性還不被大家廣泛的信任。|time=2019-10-25}}{{Fact|Gilbert和Handschuh在2003年曾對這些新變種作過一些研究，聲稱他們沒有找到弱點。|time=2019-10-25}}
+
+== 演算法 ==
+以下是SHA-256演算法的[[虛擬碼|虛擬碼]]。注意，64個word <code>w[16..63]</code>中的位元比起SHA-1演算法，混合的程度大幅提升。
+
+ <span style="color: green;">注意：全部變量皆是32位元非帶號整數，且溢位時當成2<sup>32</sup>處理</span>
+
+ <span style="color:green;">初始化</span>
+ <span style="color:green;">（以下是前8個質數2..19平方根小數部分的前32位元）：</span>
+ h0 := 0x6a09e667
+ h1 := 0xbb67ae85
+ h2 := 0x3c6ef372
+ h3 := 0xa54ff53a
+ h4 := 0x510e527f
+ h5 := 0x9b05688c
+ h6 := 0x1f83d9ab
+ h7 := 0x5be0cd19
+
+ <span style="color:green;">初始化每輪用的常數</span>
+ <span style="color:green;">（前64個質數2..311的立方根小數部分的前32位元）：</span>
+ k[0..63] :=
+    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+    0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+
+ <span style="color:green;">預處理：</span>
+ 訊息後接上一個位元'1'
+ 再接上k個'0'，其中k為最小的非負整數，使所得的訊息長度（位元數）[[同余|同余]]於448(mod 512)
+ 將預處理前訊息的長度（位元數）寫成64位元[[位元組順序|大端序]]整數，接在最尾
+
+ <span style="color:green;">將訊息分成若干連續段處理，每段512位元：</span>
+ 將訊息分成512位元的分段
+ '''for''' 每段
+     將該段再分成十六個32位元的[[字_(计算机)|字組]]，看成大端序的整數w[0..15]
+
+     <span style="color:green;">從該十六個字組，計算多四十八個同樣長度的字組，得到總共六十四個32位元字組：</span>
+     '''for''' i '''from''' 16 '''to''' 63
+         s0 := (w[i-15] '''rightrotate''' 7) '''xor''' (w[i-15] '''rightrotate''' 18) '''xor'''(w[i-15] '''rightshift''' 3)
+         s1 := (w[i-2] '''rightrotate''' 17) '''xor''' (w[i-2] '''rightrotate''' 19) '''xor'''(w[i-2] '''rightshift''' 10)
+         w[i] := w[i-16] '''+''' s0 '''+''' w[i-7] '''+''' s1
+
+     <span style="color:green;">初始化此段的雜湊值：</span>
+     a := h0
+     b := h1
+     c := h2
+     d := h3
+     e := h4
+     f := h5
+     g := h6
+     h := h7
+
+     <span style="color:green;">主迴圈：</span>
+     '''for''' i '''from''' 0 '''to''' 63
+         s0 := (a '''rightrotate''' 2) '''xor''' (a '''rightrotate''' 13) '''xor'''(a '''rightrotate''' 22)
+         maj := (a '''and''' b) '''xor''' (a '''and''' c) '''xor'''(b '''and''' c)
+         t2 := s0 + maj
+         s1 := (e '''rightrotate''' 6) '''xor''' (e '''rightrotate''' 11) '''xor'''(e '''rightrotate''' 25)
+         ch := (e '''and''' f) '''xor''' (('''not''' e) '''and''' g)
+         t1 := h + s1 + ch + k[i] + w[i]
+         h := g
+         g := f
+         f := e
+         e := d + t1
+         d := c
+         c := b
+         b := a
+         a := t1 + t2
+
+     <span style="color:green;">將此段的雜湊值加進總和：</span>
+     h0 := h0 + a
+     h1 := h1 + b
+     h2 := h2 + c
+     h3 := h3 + d
+     h4 := h4 + e
+     h5 := h5 + f
+     h6 := h6 + g
+     h7 := h7 + h
+
+ <span style="color:green;">輸出最總的雜湊值（大端序）：</span>
+ digest = hash = h0 '''append''' h1 '''append''' h2 '''append''' h3 '''append''' h4 '''append''' h5 '''append''' h6 '''append''' h7
+
+其中<code>ch</code>函數及<code>maj</code>函數可利用前述SHA-1的優化方式改寫。
+
+SHA-224和SHA-256基本上是相同的，除了：
+* <code>h0</code>到<code>h7</code>的初始值不同，以及
+* SHA-224輸出時截掉<code>h7</code>的函數值。
+
+SHA-512和SHA-256的結構相同，但：
+* SHA-512所有的數字都是64位元，
+* SHA-512執行80次加密迴圈而非64次，
+* SHA-512初始值和常數拉長成64位元，以及
+* 二者位元的偏移量和循環位移量不同。
+
+SHA-384和SHA-512基本上是相同的，除了：
+* <code>h0</code>到<code>h7</code>的初始值不同，以及
+* SHA-384輸出時截掉<code>h6</code>和<code>h7</code>的函數值。
+
+==实现==
+Windows操作系统的System32目录下有certutil.exe，可以直接调用，例如：
+ certutil -hashfile yourfilename.ext SHA256
+==参考文献==
+{{reflist}}
+
+{{密碼學|hash}}
+
+[[Category:密码散列函数|Category:密码散列函数]]
+[[Category:密码学|Category:密码学]]
+[[Category:带有伪代码示例的条目|Category:带有伪代码示例的条目]]

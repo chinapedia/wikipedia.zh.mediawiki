@@ -1,0 +1,171 @@
+<div class="editnotice-area" style="clear: both;">
+<small style="margin: 0; padding: 0; line-height: 1em; color: #bbb;">Start editnotice loader template.</small>
+<!-- Show namespace editnotice 
+-->{{#ifexist:MediaWiki:Editnotice/{{
+  #if:{{NAMESPACE}}
+  | {{NAMESPACE}}
+  | Main
+  }}
+| <div class="namespace-editnotice"> {{
+    MediaWiki:Editnotice/{{
+      #if:{{NAMESPACE}}
+      | {{NAMESPACE}}
+      | Main
+      }}
+    }}
+  </div>
+| <!-- No namespace editnotice -->
+}}<!--
+
+  Are we in a user or admin editable namespace?
+-->{{#switch:{{NAMESPACE}}
+| User
+| User talk
+| Template
+| Template talk =    <!-- User editable namespaces -->
+  <!-- Show page group editnotice -->
+  {{#ifexist:{{#titleparts:{{FULLPAGENAME}}|1}}/Editnotice-group
+  | <div class="group-editnotice-view" style="clear: both; float: right; margin: 0px 0.8em; padding: 0; font-size: 88%; line-height: 1em;"> [[{{#titleparts:{{FULLPAGENAME}}|1}}/Editnotice-group|view]] </div>
+    <div class="group-editnotice" style="clear: both;"> {{
+      {{#titleparts:{{FULLPAGENAME}}|1}}/Editnotice-group 
+      }}
+    </div>
+  | <!-- No page group editnotice -->
+  }}<!--
+    Show page editnotice
+  -->{{#ifexist:{{FULLPAGENAME}}/Editnotice
+  | <div class="page-editnotice-view" style="clear: both; float: right; margin: 0px 0.8em; padding: 0; font-size: 88%; line-height: 1em;"> [[{{FULLPAGENAME}}/Editnotice|view]] </div>
+    <div class="page-editnotice" style="clear: both;"> {{
+      {{FULLPAGENAME}}/Editnotice
+      }}
+    </div>
+  | <!-- No page editnotice -->
+  }}
+
+| #default =    <!-- Admin editable namespaces -->
+  <!-- Show page group editnotice -->
+  {{#ifexist:MediaWiki:Editnotice-group/{{
+    #if:{{NAMESPACE}}
+    | {{NAMESPACE}}
+    | Main
+    }}/{{#titleparts:{{PAGENAME}}|1}}
+  | <div class="group-editnotice-view" style="clear: both; float: right; margin: 0px 0.8em; padding: 0; font-size: 88%; line-height: 1em;"> [[MediaWiki:Editnotice-group/{{
+      #if:{{NAMESPACE}}
+      | {{NAMESPACE}}
+      | Main
+      }}/{{#titleparts:{{PAGENAME}}|1}}|view]] </div>
+    <div class="group-editnotice" style="clear: both;"> {{
+      MediaWiki:Editnotice-group/{{
+      #if:{{NAMESPACE}}
+      | {{NAMESPACE}}
+      | Main
+      }}/{{#titleparts:{{PAGENAME}}|1}} 
+      }}
+    </div>
+  | <!-- No page group editnotice -->
+  }}<!--
+    Show page editnotice
+  -->{{
+  #ifexist:MediaWiki:Editnotice/{{
+    #if:{{NAMESPACE}}
+    | {{NAMESPACE}}
+    | Main
+    }}/{{#titleparts:{{PAGENAME}}|0|1}}
+  | <div class="page-editnotice-view" style="clear: both; float: right; margin: 0px 0.8em; padding: 0; font-size: 88%; line-height: 1em;"> [[MediaWiki:Editnotice/{{
+      #if:{{NAMESPACE}}
+      | {{NAMESPACE}}
+      | Main
+      }}/{{#titleparts:{{PAGENAME}}|0|1}}|view]] </div>
+    <div class="page-editnotice" style="clear: both;"> {{
+      MediaWiki:Editnotice/{{
+      #if:{{NAMESPACE}}
+      | {{NAMESPACE}}
+      | Main
+      }}/{{#titleparts:{{PAGENAME}}|0|1}} 
+      }}
+    </div>
+  | <!-- No page editnotice -->
+  }}
+}}<!-- End switch --><!--
+
+  If we are on an editnotice page then show a backlink.
+-->{{#switch:{{NAMESPACE}}
+| User
+| User talk
+| Template
+| Template talk =    <!-- Possible user editable editnotice -->
+  {{#ifeq:{{#titleparts:{{PAGENAME}}|0|2}}|Editnotice-group
+  | {{fmbox
+    | type = editnotice
+    | class = editnotice-backlink
+    | image = none
+    | text = This page is the group editnotice for [[{{#titleparts:{{FULLPAGENAME}}|-1}}]] and all its subpages.
+    }}
+  | <!-- Not a page group editnotice -->
+  }}
+  {{#ifeq:{{#titleparts:{{FULLPAGENAME}}|1|-1}}|Editnotice
+  | {{fmbox
+    | type = editnotice
+    | class = editnotice-backlink
+    | image = none
+    | text = This page is the editnotice for [[{{#titleparts:{{FULLPAGENAME}}|-1}}]].
+    }}
+  | <!-- Not a page editnotice -->
+  }}
+
+| MediaWiki =    <!-- Possible admin editable editnotice -->
+  <!-- Is it a namespace or page editnotice? -->
+  {{#ifeq:{{#titleparts:{{FULLPAGENAME}}|1}}|MediaWiki:Editnotice
+  | {{#if:{{#titleparts:{{PAGENAME}}|0|3}}
+    | <!-- It's a page editnotice -->
+      {{fmbox
+      | type = editnotice
+      | class = editnotice-backlink
+      | image = none
+      | text = This page is the editnotice for [[{{
+        #ifeq:{{#titleparts:{{PAGENAME}}|1|2}}|Main
+        | <!-- Main space has no prefix -->
+        | {{#titleparts:{{PAGENAME}}|1|2}}:
+        }}{{#titleparts:{{PAGENAME}}|0|3}}]].
+      }}
+    | <!-- It's a namespace editnotice -->
+      {{fmbox
+      | type = editnotice
+      | class = editnotice-backlink
+      | image = none
+      | text = This page is the main editnotice for the {{#titleparts:{{PAGENAME}}|1|2}} namespace.
+      }}
+    }}
+  | <!-- Not a namespace or page editnotice -->
+  }}<!-- 
+    Is it a page group editnotice? 
+  -->{{
+  #ifeq:{{#titleparts:{{FULLPAGENAME}}|1}}|MediaWiki:Editnotice-group
+  | {{#if:{{#titleparts:{{PAGENAME}}|0|4}}
+    | <!-- Too long name, we don't have subpage group editnotices -->
+    | {{fmbox
+      | type = editnotice
+      | class = editnotice-backlink
+      | image = none
+      | text = This page is the group editnotice for [[{{
+        #ifeq:{{#titleparts:{{PAGENAME}}|1|2}}|Main
+        | <!-- Main space has no prefix -->
+        | {{#titleparts:{{PAGENAME}}|1|2}}:
+        }}{{#titleparts:{{PAGENAME}}|0|3}}]] and all its subpages.
+      }}
+    }}
+  | <!-- Not a page group editnotice -->
+  }}
+
+| MediaWiki talk =    <!-- Possible talk page of an admin editnotice -->
+  <!-- Probably don't implement this, will mostly be code bloat. -->
+
+| #default =    <!-- Not an editnotice -->
+
+}}<!-- End switch -->
+<small style="margin: 0; padding: 0; line-height: 1em; color: #bbb;">End editnotice loader template.</small>
+</div><!-- End editnotice-area --><noinclude>
+{{active editnotice}} <!-- See [[Wikipedia:Editnotice]] -->
+{{documentation}}
+<!-- Add categories and interwikis to the /doc subpage, not here! -->
+</noinclude>

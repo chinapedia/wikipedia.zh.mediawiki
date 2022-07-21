@@ -1,0 +1,242 @@
+'''扩展巴科斯-瑙尔范式（EBNF, Extended Backus–Naur Form）'''是表达作为描述计算机[[编程语言|编程语言]]和[[形式语言|形式语言]]的正规方式的[[上下文无关文法|上下文无关文法]]的[[元语法|元语法]](metalanguage)符号表示法。它是基本[[巴科斯-瑙尔范式|巴科斯范式]](BNF)元语法符号表示法的一种扩展。
+
+它最初由[[尼克劳斯·维尔特|尼克劳斯·维尔特]]开发，最常用的 EBNF 变体由标准，特别是 ISO-14977 所定义。
+
+== 基本 ==
+扩展巴科斯范式是一种表达形式语言文法的[[代码|代码]]，如由[[终结符|终结符]]即可视字符、数字、标点符号、空白字符等组成的[[计算机程序|计算机程序]]的[[源代码|源代码]]。
+
+EBNF 定义了把各符号序列分别指派到[[非终结符|非终结符]]的[[产生规则|产生规则]]:
+<syntaxhighlight lang="ebnf">
+digit excluding zero = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+digit                = "0" | digit excluding zero ;
+</syntaxhighlight>
+这个产生规则定义了在这个指派的左端的非终结符 ''digit''。竖杠表示可供选择，而终结符被引号包围，最后跟着分号作为终止字符。所以 ''digit'' 是一个 "''0"'' 或可以是 "''1'' 或 ''2'' 或 ''3'' 直到 ''9'' 的一个 ''digit excluding zero"''。
+
+产生规则还可以包括由逗号分隔的一序列终结符或非终结符:
+<syntaxhighlight lang="ebnf">
+twelve                          = "1" , "2" ;
+two hundred one                 = "2" , "0" , "1" ;
+three hundred twelve            = "3" , twelve ;
+twelve thousand two hundred one = twelve , two hundred one ;
+</syntaxhighlight>
+可以省略或重复的表达式可以通过花括号 { ... } 表示:
+<syntaxhighlight lang="ebnf">
+natural number = digit excluding zero , { digit } ;
+</syntaxhighlight>
+在这种情况下，字符串 ''1'', ''2'', ...,''10'',...,''12345'',... 都是正确的表达式。要表示这种情况，于花括号内设立的所有东西可以重复任何次，包括根本不出现。
+
+可选项可以通过方括号 [ ... ] 表示:
+<syntaxhighlight lang="ebnf">
+integer = "0" | [ "-" ] , natural number ;
+</syntaxhighlight>
+所以 integer 是一个零(''0'')或可能前导可选的负号的一个自然数。
+
+EBNF 还包括描述指定次数的重复，和排除产生式的某部分或向 EBNF 文法插入注释的语法。
+
+== 符号表 ==
+{| class="wikitable"
+! 用途
+! 符号表示
+|-
+| 定义
+! =
+|-
+| 串接
+! ,
+|-
+| 终止
+! ;
+|-
+| 分隔
+! <nowiki>|</nowiki>
+|-
+| 可选
+! [ ... ]
+|-
+| 重复
+! { ... }
+|-
+| 分组
+! ( ... )
+|-
+| 双引号
+! " ... "
+|-
+| 单引号
+! ' ... '
+|-
+| 注释
+! (* ... *)
+|-
+| 特殊序列
+! ? ... ?
+|-
+| 除外
+! -
+|}
+
+== 约定 ==
+
+1. 使用了如下约定:
+* 扩展 BNF 每个元标识符都被写为用[[连字号|连字号]]连接起来的一个或多个字；
+* 结束于“-symbol” 的元标识符是扩展 BNF 的终结符的名字。
+2. 表示扩展 BNF 的每个操作符的正常字符和它所蕴涵的优先级(顶部为最高优先级)为:
+ * repetition-symbol
+ - except-symbol
+ , concatenate-symbol
+ | definition-separator-symbol
+ = defining-symbol
+ ; terminator-symbol
+3. 下列括号对超越正常优先级:
+ ´  first-quote-symbol            first-quote-symbol  ´
+ "  second-quote-symbol          second-quote-symbol  "
+ (* start-comment-symbol          end-comment-symbol *)
+ (  start-group-symbol              end-group-symbol  )
+ [  start-option-symbol            end-option-symbol  ]
+ {  start-repeat-symbol            end-repeat-symbol  }
+ ?  special-sequence-symbol   special-sequence-symbol ?
+
+作为例子，下列语法规则展示了表达重复的设施:
+ aa = "A";
+ bb = 3 * aa, "B";
+ cc = 3 * [aa], "C";
+ dd = {aa}, "D";
+ ee = aa, {aa}, "E";
+ ff = 3 * aa, 3 * [aa], "F";
+ gg = {3 * aa}, "D";
+这些规则定义的终结字符串如下:
+ aa: A
+ bb: AAAB
+ cc: C AC AAC AAAC
+ dd: D AD AAD AAAD AAAAD etc.
+ ee: AE AAE AAAE AAAAE AAAAAE etc.
+ ff: AAAF AAAAF AAAAAF AAAAAAF
+ gg: D AAAD AAAAAAD etc.
+
+== 示例 ==
+只允许赋值的简单编程语言可以用 EBNF 定义为:
+<syntaxhighlight lang="ebnf">
+ (* a simple program in EBNF − Wikipedia *)
+ program = 'PROGRAM' , white space , identifier , white space ,
+            'BEGIN' , white space ,
+            { assignment , ";" , white space } ,
+            'END.' ;
+ identifier = alphabetic character , [ { alphabetic character | digit } ] ;
+ number = [ "-" ] , digit , [ { digit } ] ;
+ string = '"' , { all characters − '"' } , '"' ;
+ assignment = identifier , ":=" , ( number | identifier | string ) ;
+ alphabetic character = "A" | "B" | "C" | "D" | "E" | "F" | "G"
+                      | "H" | "I" | "J" | "K" | "L" | "M" | "N"
+                      | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
+                      | "V" | "W" | "X" | "Y" | "Z" ;
+ digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+ white space = ? white space characters ? ;
+ all characters = ? all visible characters ? ;
+</syntaxhighlight>
+一个语法上正确的程序:
+<syntaxhighlight lang="ebnf">
+ PROGRAM DEMO1 
+ BEGIN
+   A0:=3;
+   B:=45;
+   H:=-100023;
+   C:=A;
+   D123:=B34A;
+   BABOON:=GIRAFFE;
+   TEXT:="Hello world!";
+ END.
+</syntaxhighlight>
+这个语言可以轻易的扩展上[[控制流|控制流]]，算术表达式和输入/输出指令。就可以开发出一个小的、可用的编程语言了。
+
+== 比较 EBNF 和 BNF ==
+
+BNF 有着可选项和重复不能直接表达的问题。作为替代，它们需要利用中介规则或两选一规则，对于可选项，定义要么是空的要么是可选的产生式的规则，对于重复，递归的定义要么是被重复的产生式要么是自身的规则。同样的构造仍可用在 EBNF 中。
+
+可选项:
+<syntaxhighlight lang="ebnf">
+signed number = [ sign , ] number ;
+</syntaxhighlight>
+可按 BNF-风格定义为:
+<syntaxhighlight lang="ebnf">
+signed number = sign , number | number ;
+</syntaxhighlight>
+或
+<syntaxhighlight lang="ebnf">
+signed number = optional sign , number ;
+optional sign , = ε | sign , ; (* 使用 ε 来更清晰的指示空产生式 *)
+</syntaxhighlight>
+重复:
+<syntaxhighlight lang="ebnf">
+number = { digit } digit ;
+</syntaxhighlight>
+可按 BNF-风格定义为:
+<syntaxhighlight lang="ebnf">
+number = digit | number digit;
+</syntaxhighlight>
+== EBNF 较 BNF 的优点 ==
+
+EBNF 排除了 BNF 的一些缺陷:
+
+* BNF 为自身使用了符号 (<, >, |, ::=)。当它们出现在要定义的语言中的时候，BNF 不得不加以修改或解释的使用。
+* BNF-语法在一行中只表示一个规则。
+
+EBNF 解决了这些问题:
+
+*[[终结符|终结符]]被严格的包围在引号 ("..." 或 '...') 中。给[[非终结符|非终结符]]的尖括号 ("<...>")可以省略。
+* 通常使用终止字符分号结束一个规则。
+
+进一步还提供了定义重复次数，排除法选择(比如除了引号的所有字符)和注释等的增强机制。
+
+不管所有这些增强，EBNF 在能定义的语言的意义上不比 BNF 更强大。在原理上用 EBNF 定义的任何[[文法|文法]]都可以用 BNF 表达。但是经常导致可观的更多规则的表示。
+
+EBNF 已经被[[国际标准化组织|ISO]]用代码 ''ISO/IEC 14977:1996(E)'' 标准化了。
+
+在某些场合任何扩展的 BNF 都被称为 EBNF。例如 [[W3C|W3C]] 使用 [https://web.archive.org/web/20031203082847/http://www.w3c.org/TR/REC-xml#sec-notation ''one'' EBNF] 来规定 [[XML|XML]]。
+
+== 扩展 ==
+
+依据 ISO 14977 标准，提供了两个设施来扩展 EBNF。其一是在 EBNF 文法部分的特殊序列，它是在问号包围内的任意文本，其解释超出了 EBNF 标准的范围。例如，空格字符可以用如下规则定义:
+<syntaxhighlight lang="ebnf">
+space = ? US-ASCII character 32 ?;
+</syntaxhighlight>
+其二利用圆括号在 EBNF 中不能放置到紧随标识符之后的事实。下列不是有效的 EBNF:
+<syntaxhighlight lang="ebnf">
+something = foo ( bar );
+</syntaxhighlight>
+所以 EBNF 的扩展可以使用这种表示法。例如，在 Lisp 文法中，函数应用可以用如下规则定义:
+<syntaxhighlight lang="ebnf">
+function application = list( symbol , [ { expression } ] );
+</syntaxhighlight>
+== 有关工作 ==
+
+*[[W3C|W3C]] 使用[https://web.archive.org/web/20031203082847/http://www.w3c.org/TR/REC-xml#sec-notation 一种不同的 EBNF] 来指定 [[XML|XML]] 语法。
+*[[British_Standards_Institute|British Standards Institute]] 在1981年出版了一个 EBNF 标准: [[BS_6154|BS 6154]]。
+*[[IETF|IETF]] 使用在 RFC 4234 中规定的[[扩充巴科斯范式|扩充 BNF]] (ABNF)。
+
+==参见==
+* [[扩充巴科斯范式|扩充巴科斯范式]]
+* [[巴科斯范式|巴科斯范式]]
+* [[正则表达式|正则表达式]]
+* [[Spirit_Parser_Framework|Spirit Parser Framework]]
+* [[Wirth_Syntax_Notation|Wirth Syntax Notation]]
+
+==引用==
+{{refbegin}}
+* Niklaus Wirth: [http://doi.acm.org/10.1145/359863.359883 What can we do about the unnecessary diversity of notation for syntactic definitions?] {{Wayback|url=http://doi.acm.org/10.1145/359863.359883 |date=20200719234630 }} CACM, Vol. 20, Issue 11, November 1977, pp. 822-823.
+* Roger S. Scowen: Extended BNF — A generic base standard. Software Engineering Standards Symposium 1993.
+* The [[International_standard|International standard]] ([http://www.iso.org/iso/en/CatalogueDetailPage.CatalogueDetail?CSNUMBER=26153 ISO 14977] {{Wayback|url=http://www.iso.org/iso/en/CatalogueDetailPage.CatalogueDetail?CSNUMBER=26153 |date=20060313170506 }}) that defines the EBNF is now freely available as [http://standards.iso.org/ittf/PubliclyAvailableStandards/s026153_ISO_IEC_14977_1996(E).zip zipped pdf file] {{Wayback|url=http://standards.iso.org/ittf/PubliclyAvailableStandards/s026153_ISO_IEC_14977_1996(E).zip |date=20070311062611 }}.
+{{refend}}
+
+==外部链接==
+
+* Article "[http://www.cs.cmu.edu/~pattis/misc/ebnf.pdf EBNF: A Notation to Describe Syntax (PDF)] {{Wayback|url=http://www.cs.cmu.edu/~pattis/misc/ebnf.pdf |date=20080724120136 }}" by [[Richard_E._Pattis|Richard E. Pattis]] describing the functions and syntax of EBNF
+* Article "[http://www.garshol.priv.no/download/text/bnf.html BNF and EBNF: What are they and how do they work?] {{Wayback|url=http://www.garshol.priv.no/download/text/bnf.html |date=20100211143651 }}" by [[Lars_Marius_Garshol|Lars Marius Garshol]]
+* Article "[http://xml.com/pub/a/2001/07/25/namingparts.html The Naming of Parts] {{Wayback|url=http://xml.com/pub/a/2001/07/25/namingparts.html |date=20080513051031 }}" by [[John_E._Simpson|John E. Simpson]]
+* [http://www.cl.cam.ac.uk/~mgk25/iso-14977.pdf ISO/IEC 14977 : 1996(E)] {{Wayback|url=http://www.cl.cam.ac.uk/~mgk25/iso-14977.pdf |date=20100910120338 }}
+* RFC 4234 - Augmented BNF for Syntax Specifications: ABNF
+* [http://www.cs.man.ac.uk/~pjj/bnf/ebnf.html BNF/EBNF variants] {{Wayback|url=http://www.cs.man.ac.uk/~pjj/bnf/ebnf.html |date=20080524080734 }} - a table by Pete Jinks comparing several syntaxes.
+* [https://web.archive.org/web/20070608041359/http://dotnet.jku.at/applications/Visualizer/ Create syntax diagrams from EBNF]
+{{FOLDOC}}
+
+[[Category:形式语言|K]]
+[[Category:编译原理|Category:编译原理]]

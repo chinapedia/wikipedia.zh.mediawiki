@@ -1,0 +1,48 @@
+{{Expert|subject=電腦|time=2020-04-11T00:05:26+00:00}}
+'''线性一致性'''（Linearizability），或称'''原子一致性'''或'''严格一致性'''指的是程序在执行的历史中在存在可线性化点P的执行模型，这意味着一个操作将在程序的调用和返回之间的某个点P起作用。这里“起作用”的意思是被系统中并发运行的所有其他线程所感知。
+==历史==
+线性一致性是''Maurice P. Herlihy'' 与 ''Jeannette M. Wing''共同提出的关于并行对象行为正确性的一个条件模型。在此之前，[[Lamport|Lamport]]已经提出了[[顺序一致性|顺序一致性]]的概念。
+
+==严格的定义==
+===[[I/O自动机|I/O自动机]]===
+''Herlihy'' 的论文中采用了 ''Nancy A. Lynch'' 和 ''Mark R. Tuttle'' 所发明的 [[I/O自动机|I/O自动机]]（I/O automata） 模型来定义线性一致性的概念。在 I/O automata 中程序的执行用 '''历史'''(History/schedule)来描述。所谓历史就是指一个有限的方法调用和响应事件构成的集合。严格地：我们先定义''执行片段''(Execution fragment)为序列：<math>{s_0, e_1, s_1, . . . . e_n,s_n}</math>，其中<math>s_i</math>为此I/O自动机的状态集，定义''执行序列''(Execution sequence)为<math>s_0</math>是初始状态的执行片段。那么''历史''就是执行序列中的事件子序列。在我们即将研究的[[并发系统|并发系统]]中，''历史''中的输出事件(Output event)和输入事件(Input event)分别对应线程P对对象X的调用(Invoke)和响应(Response)。下面将响应事件记做<math>R(P,res,X)</math>，将调用事件记做<math>I(P,op,X)</math>其中P为线程名称，op为操作名称，X为对象名称，res为返回值。
+
+===基本概念===
+*定义响应事件<math>R(P,res,X)</math>与调用事件<math>I(P',op,X')</math>相匹配(match)，如果P=P',X=X'。
+*顺序历史(Sequential history)：历史H是顺序的，如果满足以下两个条件：
+**H中的第一个成员为调用事件；
+**除了H中的最后一个调用事件之外，H 由相邻的、两两相匹配的调用事件和响应事件组成。
+*并发历史(Concurrent history)：不是顺序历史的历史称为并发历史。
+*在线程P上的子历史(Process subhistory)<math>H|P</math>定义为H在线程P上的射影，即H中所有线程名为P的事件构成的子集。
+*如果对于H中任意的P，H|P 是顺序历史，则称H是良形式的(well-formed)。
+*等价的两个历史H与H'：<math>H \iff H'</math> 定义为 <math>\forall P, H|P=H'|P</math>。
+*操作(Operation) ''e'' 定义为相匹配的一对调用事件和响应事件。
+*完备化函数Complete(H)：Complete(H)的结果是包含在H中的、最大的、仅含有互相匹配的调用事件和响应事件的时间序列。
+*历史集S是前缀闭(prefix-closed)的，如果<math>\forall H\in S,\forall e,H^e\in S</math>，其中<math>H^e</math>代表H中以操作e结尾的一个前缀。
+*对象X顺序性说明(Sequential specification)定义为对象X的前缀闭的顺序历史集。顺序性说明描述了一个对象所有可能的顺序行为。
+*合法的(Legal)顺序历史指的是<math>\forall x,H|x</math>（指H中对象为''x''的那些事件）属于''x''的顺序性说明。
+
+===线性一致性的形式化定义===
+*对于给定的一个历史H，其中必然蕴含着一个非自反的偏序关系<math><_H</math>（可称之为“之前” - precede），其定义如下：<math>e_0 <_H e_1</math>， 若 <math>res(e_0)</math>在<math>inv(e_1)</math>之前。
+
+*如果满足以下条件，则定义''历史'' '''H'''是线性一致的(或''可线性化的''-linearizable)：
+#首先我们将'''H''' ''扩展''为 <math>\mathbf{H'}</math>；
+#<math>Complete(\mathbf{H'})</math>等价于一个合法的顺序历史S；
+#<math><_H\subseteq<_S</math>
+
+==例子==
+==线性一致性的性质==
+*线性一致性最重要的性质就是其“局部性”（Local property, 或可组合性 - Compositional），即数个线性一致单对象历史的组合也是线性一致的。
+*线性一致性的非阻塞性(Non-blocking property)：线程P对[[完全操作|完全操作]](total function)的调用永远不会阻塞。
+==严格一致性==
+
+==相关的话题==
+*[[任务并行|任务并行]]
+*[[内存一致性模型|内存一致性模型]]
+*[[顺序一致性|顺序一致性]]
+
+==参考资料==
+# Linearizability: A Correctness Condition for Concurrent Objects, ''MAURICE P. HERLIHY'' and ''JEANNETTE M. WING'' Carnegie Mellon University
+
+[[Category:一致性模型|Category:一致性模型]]
+[[Category:交易處理|Category:交易處理]]
