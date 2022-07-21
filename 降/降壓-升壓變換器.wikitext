@@ -1,0 +1,204 @@
+[[File:buck_boost.png|thumb]]
+
+'''降壓-升壓變換器'''（buck–boost converter），是一種[[直流-直流轉換器|直流-直流轉換器]]，其輸出電壓大小可以大於輸入電壓，也可以小於輸入電壓。降壓-升壓變換器和[[返馳式變換器|返馳式變換器]]等效，但用單一的[[電感器|電感器]]來取代[[變壓器|變壓器]]<ref>[http://ecee.colorado.edu/~ecen4517/materials/flyback.pdf The Flyback Converter] {{Wayback|url=http://ecee.colorado.edu/~ecen4517/materials/flyback.pdf |date=20170830041617 }} - Lecture notes - ECEN4517 - Department of Electrical and Computer Engineering - University of Colorado, Boulder.</ref>。
+
+有二種不同架構的電路都可以稱為降壓-升壓變換器，兩者輸出電壓的範圍都很大，從（絕對值）較輸出電壓大很多的電壓，到幾乎接近零的電壓。
+
+; 反向架構 
+: 其輸出電壓的{{le|電極性|Electrical polarity|極性}}和輸入電壓相反，這是一種電路類似[[降壓變換器|降壓變換器]]或是[[升壓變換器|升壓變換器]]的[[开关电源|开关电源]]。輸出電壓可以由切換功率晶體的[[占空比|占空比]]調整。<!--One possible drawback of this converter is that the switch does not have a terminal at ground; this complicates the driving circuitry. However, this drawback is of no consequence if the power supply is isolated from the load circuit (if, for example, the supply is a battery) because the supply and diode polarity can simply be reversed.  When they can be reversed, the switch can be on either the ground side or the supply side.-->
+; 結合[[降壓變換器|降壓變換器]]及[[升壓變換器|升壓變換器]]的架構 
+: 輸出電壓的電氣極性和輸入電壓相同，可以比輸入電壓小，也可以比輸入電壓大。這類的非反向式轉換器可以在降壓變換器段及升壓變換器共用一個電感器、用開關代替二極體<ref>{{Cite web |url=http://ecee.colorado.edu/copec/book/slides/Ch6slides.pdf |title="Non-inverting Buck-Boost Regulator" (p.9) |accessdate=2016-12-28 |archive-date=2011-01-13 |archive-url=https://web.archive.org/web/20110113024442/http://ecee.colorado.edu/copec/book/slides/Ch6slides.pdf |dead-url=no }}</ref><ref>{{Cite web |url=http://www.st.com/st-web-ui/static/active/en/resource/technical/document/application_note/CD00116928.pdf |title=ST AN2389: "An MCU-based low cost non-inverting buck-boost converter for battery chargers" |accessdate=2016-12-28 |archive-date=2016-03-04 |archive-url=https://web.archive.org/web/20160304000934/http://www.st.com/st-web-ui/static/active/en/resource/technical/document/application_note/CD00116928.pdf |dead-url=no }}</ref><ref>
+Motorola Semiconductor.
+[http://www.datasheetarchive.com/dataframe.php?file=DSA-457120.pdf&dir=Datasheets-23&part=AN954 "Application note AN954: A Unique Converter Configuration provides step-up/down functions"] {{webarchive|url=https://web.archive.org/web/20160304052057/http://www.datasheetarchive.com/dataframe.php?file=DSA-457120.pdf&dir=Datasheets-23&part=AN954 |date=2016-03-04 }}.
+1985.
+"... a unique step-up/down configuration can be created ... which still employs a single inductor for the voltage transformation."
+</ref>。有時也稱為'''四個開關的降壓-升壓變換器'''（four-switch buck-boost converter）<ref>Haifeng Fan.
+[http://powerelectronics.com/dc-dc-converters/wide-vin-and-high-power-challenges-buck-boost-converters "Wide VIN and High-Power Challenges with Buck-Boost Converters"] {{Wayback|url=http://powerelectronics.com/dc-dc-converters/wide-vin-and-high-power-challenges-buck-boost-converters |date=20180201001532 }}.
+2015.</ref>。也可以用多個電感器，但像[[SEPIC變換器|SEPIC變換器]]或是[[Ćuk转換器|Ćuk转換器]]一樣只用一個開關。
+[[File:Basics_of_the_4-switch_buck-boost_converter.png|thumb]]
+
+==四個開關非反向架構的工作原理==
+
+四個開關的變換器結合了升壓變換器以及降壓變換器，並且將升壓變換器和降壓變換器的二個二極體都用功率晶體配合同步整流代替，可以因為功率晶體的低電壓降讓效率再進一步提昇。
+
+四個開關的變換器可以運作在[[升壓變換器|升壓]]模式或是[[降壓變換器|降壓]]模式。在任一模式中，都只用一個開關控制占空比，另一個只作續流用，其動作恰好和第一個開關相反，另外二個開關則是在固定的位置。
+{{clear}}
+
+==二個開關反向架構的工作原理==
+<!--[[File:Buckboost_conventions.svg|thumb]]-->
+[[File:Buckboost_operating.svg|thumb]]
+
+降壓-升壓變換器的基本原理如下（參考圖2）：
+*在導通（On）狀態下，輸入電壓源直接接到電感器（L），因此電感器L會開始儲能，因此由電容器提供能量給輸出端的負載。
+*在開路（Off）狀態下，電感器連結到輸出端的負載及電容器，因此能量從電感器L及電容器C提供給負載R。
+
+相較於[[降壓變換器|降壓變換器]]及[[升壓變換器|升壓變換器]]，降壓-升壓變換器有以下的特性：
+* 輸出電壓的極性和輸入電壓相反。
+===理想电压===
+ 若假設是理想的轉換器，並假設輸入電壓為正，輸出電壓可以從0到<math>\scriptstyle -\infty</math>。降壓變換器及升壓變換器的輸出電壓範圍則分別是<math>\scriptstyle V_i</math>到0及<math>\scriptstyle V_i</math>到<math>\scriptstyle \infty</math>。
+
+===概念簡介===
+降壓-升壓變換器在原理上類似降壓變換器及升壓變換器，都是利用電感器會避免電流快速變化的特性。一開始時沒有任何元件有帶電，開關開路，流經電感器的電流為0。當開關初次關閉時，二極體讓電流無法從電源流到右側的負載，因此電流都會經過電感器，不過因為通過電感器會避免電流快速變化，因此一開始通過電感器的電流會比較小，之後才緩緩的上昇，此時，電感器也以磁場的方式儲存能量。
+
+===連續模式===
+[[File:Buckboost_chronogram.svg|thumb]]
+
+若在整個週期中，流經電感器''L''的電流都不會降到0，此時會稱變換器運作在連續模式，圖3是理想變換器運作在連續模式的電壓及電流。
+
+從<math>t=0</math>到<math>t=T</math>的時間，轉換器在導通（On）狀態，因此開關''S''閉合，電感器電流''I''<sub>L</sub>的變化率為
+
+:<math>\frac{\operatorname{d}I_L}{\operatorname{d}t}=\frac{V_i}{L}</math>
+
+在導通階段最後，''I''<sub>L</sub>的總增加量為：
+
+:<math>\Delta I_{\text{L}_{\text{On}}}=\int_0^{D\,T}\operatorname{d}I_{\text{L}}=\int_0^{D\, T}\frac{V_i}{L} \, \operatorname{d}t=\frac{V_i\,D\,T}{L}</math>
+
+''D''為占空比，是切換週期中''T''，開關閉合的時間。因此''D''會在0（''S''持續開路）及1 （''S''持續閉合）之間變化。
+
+若在斷路（Off）狀態，開關''S''會開路，因此電感器電流會流到負載端，假設二極體的壓降為0，且電容器夠大，因此電容器電壓可假設為定值，''I''<sub>L</sub>的變化為：
+
+:<math>\frac{\operatorname{d}I_{\text{L}}}{\operatorname{d}t}=\frac{V_o}{L}</math>
+
+因此在斷路狀態下，''I''<sub>L</sub>的總變化量為：
+
+:<math>\Delta I_{\text{L}_{\text{Off}}}=\int_0^{\left(1-D\right) T}\operatorname{d}I_{\text{L}}=\int_0^{\left(1-D\right) T}\frac{V_o\, \operatorname{d}t}{L}=\frac{V_o \left(1-D\right) T}{L}</math>
+
+由於假設變換器是在穩態下運作，因此在切換週期開始時，所有元件的儲能都應該和切換週期結束時相同。而電感器的能量為：
+
+:<math>E=\frac{1}{2}L\, I_{\text{L}}^2</math>
+
+因此可以推得在斷路狀態最後的電流''I''<sub>L</sub>會和導通狀態一開始的電流''I''<sub>L</sub>相等，也就是導通階段的電流變化量加上斷路階段的電流變化量會等於0：
+
+:<math>\Delta I_{\text{L}_{\text{On}}} + \Delta I_{\text{L}_{\text{Off}}}=0</math>
+
+替換<math>\Delta I_{\text{L}_{\text{On}}}</math>及<math>\Delta I_{\text{L}_{\text{Off}}}</math>可得：
+
+:<math>\Delta I_{\text{L}_{\text{On}}} + \Delta I_{\text{L}_{\text{Off}}}=\frac{V_i \, D\, T}{L}+\frac{V_o\left(1-D\right)T}{L}=0</math>
+
+也可以寫作：
+
+:<math>\frac{V_o}{V_i}=\frac{-D}{1-D}</math>
+
+因此可以得到：
+
+:<math>D=\frac{V_o}{V_o-V_i}</math>
+
+由上述的計算可以看到輸出電壓的極性恆為負的（因為占空比會在0到1之間變化），其絕對值會隨著''D''增加而增加，若''D''接近1，輸出電壓理論上會趨近負無限大。降壓-升壓變換器可以作升壓用，也可以做降壓用，因此稱為降壓-升壓變換器
+
+===不連續模式===
+[[File:Buckboost_chronogram_discontinuous.png|thumb]]
+有時負載需要的能量較少，所需要的轉換時間比切換週期要短。因此在整個切換週期中，可能有些時間的電感電流為零。唯一的差異就是在切換週期的最後，有一段時間電感器已經完全放電（參考圖4）。差異看似不大，但是對輸出電壓方程有大的影響。可以計算如下：
+
+因為在切換週期開始時，電感器電流為0，因此<math>I_{L_{\text{max}}}</math>在( <math>t=D\,T</math>)的最大值為
+
+:<math>I_{L_{\text{max}}}=\frac{V_i\, D\, T}{L}</math>
+
+在斷路狀態時，''I''<sub>L</sub>會在δ.T後降到0:
+
+:<math>I_{L_{\text{max}}}+\frac{V_o\, \delta\, T}{L}=0</math>
+
+使用上述二個方程，可以得到δ為：
+
+:<math>\delta=-\frac{V_i\, D}{V_o}</math>
+
+負載電流等於平均的二極體電流<math>I_D</math>。從圖4可以看到，在斷路狀態時，二極體電流等於電感器電流，因此輸出電流可以寫成：
+
+:<math>I_o=\bar{I_D}=\frac{I_{L_{\text{max}}}}{2}\delta</math>
+
+替換<math>I_{L_{\text{max}}}</math>和δ可得：
+
+:<math>I_o=-\frac{V_i\, D\, T}{2L}\frac{V_i\, D}{V_o}=-\frac{V_i^2\, D^2\, T}{2L\, V_o}</math>
+
+因此輸出電壓增益是：
+
+:<math>\frac{V_o}{V_i}=-\frac{V_i\, D^2 \, T}{2L\, I_o}</math>
+
+將上述和連續模式下的輸出電壓增益相比較，這個式子複雜多了。在不連續模式下，輸出電壓增益不只和占空比有關，也和電感器感值、輸入電壓、輸出電流有關。
+
+===連續模式及不連續模式的邊界===
+[[File:Buck-boost_continuous_discontinuous.svg|thumb]]
+
+降壓-升壓變換器的負載電流若比較小，變換器會運作在不連續模式下，若是負載電流比較大，才會運作在連續模式下。兩個模式中間的臨界點出現在電感電流在切換週期最後才變為0的情形下，配合圖4的標示，會對應以下的式子：
+
+:<math>D\, T + \delta \, T=T</math>
+
+:<math>D + \delta = 1\,</math>
+
+此時，輸出電流<math>\scriptstyle I_{o_{\text{lim}}}</math>（臨界狀態下的輸出電流）為：
+
+:<math>I_{o_{\text{lim}}}=\bar{I_D}=\frac{I_{L_{\text{max}}}}{2}\left(1-D\right)</math>
+
+將<math>\scriptstyle I_{L_{\text{max}}}</math>替換為在不連續模式下的式子，可得：
+
+:<math>I_{o_{\text{lim}}}=\frac{V_i\, D\, T}{2L}\left(1-D\right)</math>
+ 
+因為<math>\scriptstyle I_{o_{\text{lim}}}</math>是在連續模式及不連續模式邊界時的電流，因此會同時符合連續模式及不連續模式的式子，代入在連續模式下的式子，可得：
+
+:<math>I_{o_{\text{lim}}}=\frac{V_i\, D\, T}{2L}\frac{V_i}{V_o}\left(-D\right)</math>
+
+然後再導入以下二種導入方式：
+*正規化電壓，定義為<math>\scriptstyle \left|V_o\right|=\frac{V_o}{V_i}</math>。對應變換器的電壓增益。
+*正規化電流，定義為<math>\scriptstyle \left|I_o\right|=\frac{L}{T\, V_i}I_o</math>。 而<math>\scriptstyle \frac{T\, V_i}{L}</math>等於在切換週期下的最大電感電流增加量，也就是當D=1時的電感電流增加量。因此，在變換器穩態運作時，意味著沒有輸出電流時，<math>\scriptstyle \left|I_o\right|</math>=0，此數值為1時表示變換器已經提供其最大可變換的電流。
+
+配合上述表示方式，可得：
+*連續模式下，<math>\scriptstyle \left|V_o\right|=-\frac{D}{1-D}</math>
+*不連續模式下，<math>\scriptstyle \left|V_o\right|=-\frac{D^2}{2\left|I_o\right|}</math>;
+*連續模式及不連續模式邊界時的電流為<math>\scriptstyle I_{o_{\text{lim}}}=\frac{V_i\, T}{2L}D\left(1-D\right)=\frac{I_{o_{\text{lim}}}}{2\left|I_o\right|}D\left(1-D\right)</math>。因此連續模式及不連續模式邊界的軌跡為<math>\scriptstyle \frac{1}{2\left|I_o\right|}D\left(1-D\right)=1</math>。
+
+上述的結論畫在圖5中，可以看出導通模式及不導通模式下的差異。
+
+==非理想元件的影響==
+===雜散電阻的影響===
+[[File:Buckboost_resistance.svg|thumb]]
+上述的分析中均未考慮變換器中有耗散能量的元件（[[電阻器|電阻器]]），意思是變換器會將電源端的功率完全轉換到負載端，不會有能量損耗。不過電子元件中都會存在[[寄生元件|寄生元件]]，例如因為導體材料而產生的寄生電阻。因此變換器需考慮因為寄生電阻而損耗的能量。
+
+為了簡單起見，以下假設只有電感器含有寄生電阻，是唯一的非理想元件，可以等效為電感器上串聯一個電阻。電感器是由長的導體所構成，因此上面的確可能有一個不可忽略的寄生電阻（''R''<sub>L</sub>），而且不論是導通狀態或是斷路狀態，電感器上都有電流流過。
+
+利用狀態空間平均法，可得：
+
+:<math>V_i=\bar V_{\text{L}} + \bar V_S</math>
+
+其中<math>\scriptstyle \bar V_{\text{L}}</math>及<math>\scriptstyle \bar V_S</math> 是切換週期中，電感兩端及開關兩端的平均電壓。若假設變換器是在穩態下運作，電感器的平均電流為定值，則電感器的其平均電壓為：
+
+:<math>\bar V_{\text{L}}=L\frac{\bar{dI_{\text{L}}}}{dt}+R_{\text{L}}\bar I_{\text{L}}=R_{\text{L}}\bar I_{\text{L}}</math>
+
+當開關是在導通狀態，<math>\scriptstyle V_S=0</math>。若開關是在斷路狀態，二極體是在穩向偏壓（假設是工作在連續模式下）。因此<math>\scriptstyle V_S = V_i - V_o</math>，則開關二端的平均電壓為：
+
+:<math>\bar V_S=D\, 0 + (1-D)(V_i-V_o)=(1-D)(V_i-V_o)</math>
+
+在斷路時，輸出電流是電感電流，但符號相反。因此平均電流為：
+
+:<math>\bar I_{\text{L}}=\frac{-I_o}{1-D}</math>
+
+假設輸出電流及漣波電壓都很小，轉換器的負載可以假設為阻值為R純電阻，上式會變為：
+
+:<math>\bar I_{\text{L}}=\frac{-V_o}{(1-D)R}</math>
+
+利用上述式子，輸入電壓為：
+
+:<math>V_i= R_{\text{L}}\frac{-V_o}{(1-D)R}+ (1-D)(V_i-V_o)</math>
+
+可以寫成：
+
+:<math>\frac{V_o}{V_i}=\frac{-D}{\frac{R_{\text{L}}}{R(1-D)}+1-D}</math>
+
+若電感器的電阻值為0，上式就會變成理想下的輸出電壓及輸入電壓關係。不過當''R''<sub>L</sub>增加，輸換器的電壓增益會下降。而且當占空比越大，''R''<sub>L</sub>的影響也越大，圖6就是說明上述的影響。
+
+==參考資料==
+{{reflist}}
+
+==相關條目==
+*[[Ćuk_转換器|Ćuk 转換器]]
+*[[SEPIC變換器|SEPIC變換器]]
+
+==延伸閱讀==
+{{refbegin}}
+* 丹尼尔·W·哈特，《电力电子学导论》，马鞍河上游普伦蒂斯大厅，美国新泽西州，1997。 ISBN 0-02-351182-6
+* 《开关模式电源：SPICE模拟与实用设计》，麦格劳-希尔。ISBN 0-07-150858-9.
+{{refend}}
+
+{{Commons category|Buck-boost converters}}
+
+{{Electronic components}}
+
+[[Category:斩波器|Category:斩波器]]

@@ -1,0 +1,106 @@
+'''信任网络'''（{{lang-en|Web of Trust|}}，缩写：{{lang|en|WoT}}）是[[密码学|密码学]]中的一个概念，可以用来[[身份验证|验证]]一个[[公钥|公钥]]的持有者身份，应用于[[PGP|PGP]]、[[GnuPG|GnuPG]]或其他[[OpenPGP|OpenPGP]]兼容系统中。信任网络用[[去中心化|去中心化]]的概念，不同於依赖[[数字证书认证机构|数字证书认证机构]]的[[公钥基础设施|公钥基础设施]]。在[[计算机网络|计算机网络]]中，可以同时存在许多独立的信任网络，而任何用户均可成为这些网络中的一份子，或者不同网络之间的链接。
+
+信任网络的概念最早由PGP的作者[[菲尔·齐默尔曼|菲尔·齐默尔曼]]在PGP 2.0的使用手册中提出。
+
+{{quotation|随着时间的流逝，你会逐渐收集许多其他人的密钥，你可能会将其中其中一些人视作受信任的介绍者。而其他人也会选择他们自己信任的介绍者。每个人都会逐渐收集并使用他们的密钥分发来自其他人的验证签名集合，期望任何接收它的人都会信任至少一两个签名。这将导致所有公钥的去中心化容错信任网络的涌现。}}
+
+请注意在此上下文中使用了[[涌现|涌现]]一词。信任网络利用了涌现的概念。
+
+== 信任网络的运行 ==
+
+所有符合 OpenPGP 的实现都包含一个证书[[审查|审查]]方案来帮助解决此问题；它的运作被称为信任网络。OpenPGP 证书（包括一个或多个公钥以及所有者信息）可以由其他用户进行数字签名，这些用户通过该行为认可该公钥与证书中列出的个人或实体的关联性。这通常在[[密钥签名聚会|密钥签名聚会]]完成。<ref>{{Cite journal|last=Ulrich|first=Alexander|last2=Holz|first2=Ralph|last3=Hauck|first3=Peter|last4=Carle|first4=Georg|date=2011|editor-last=Atluri|editor-first=Vijay|editor2-last=Diaz|editor2-first=Claudia|title=Investigating the OpenPGP Web of Trust|url=https://link.springer.com/chapter/10.1007/978-3-642-23822-2_27|journal=Computer Security – ESORICS 2011|series=Lecture Notes in Computer Science|language=en|location=Berlin, Heidelberg|publisher=Springer|pages=489–507|doi=10.1007/978-3-642-23822-2_27|isbn=978-3-642-23822-2|access-date=2022-02-27|archive-date=2022-04-06|archive-url=https://web.archive.org/web/20220406155624/https://link.springer.com/chapter/10.1007/978-3-642-23822-2_27}}</ref>
+
+符合 OpenPGP 的实现还包括一个计票方案，该方案可用于确定用户在使用 PGP 时将信任哪个公钥-所有者的关联性。例如，如果三个部分受信任的背书人已经为一个证书做担保（因此它包含的公钥-所有者 [[数据绑定|绑定]]），或者如果一个完全受信任的背书人已经这样做了，那么所有者和公钥之间的关联在该证书将被认为是正确的。这些参数是用户可调整的，如果需要，可以完全绕过。
+
+与大多数公钥基础设施设计不同，该方案很灵活，并且将信任决策留给了个人用户。它并不完美，需要用户谨慎和智能监督。本质上，所有 PKI 设计都不太灵活，并且要求用户遵循 PKI 生成的、证书颁发机构 (CA) 签名的证书的信任背书。
+
+=== 简化解释 ===
+
+有两个与一个人有关的密钥：一个公开共享的公钥和一个由所有者保留的私钥。所有者的私钥将解密使用其公钥加密的任何信息。在信任网络中，每个用户都有一个带有一组人的公钥的环（即密钥环）。
+
+用户用接收者的公钥加密他们的消息，只有接收者的私钥才能解密。然后每个用户使用他们的私钥对消息进行数字签名，因此当接收者根据用户自己的公钥验证信息时，他们可以确认这是有问题的用户。这样做将确保消息来自特定用户并且未被篡改，并且只有预期的接收者才能读取信息（因为只有他们知道他们的私钥）。
+
+== 与典型 PKI 对比 ==
+
+与信任网络不同，典型的 [[X.509|X.509]] PKI 允许每个证书由单方签署：[[证书颁发机构|证书颁发机构]] (CA)。 CA 的证书本身可能由不同的 CA 签名，一直到“自签名”[[根证书|根证书]]。根证书必须可供使用较低级别 CA 证书的人使用，因此通常分布广泛。例如，它们与浏览器和电子邮件客户端等应用程序一起分发。这样就可以对受[[传输层安全性协议|SSL/TLS]]保护的网页、电子邮件等进行身份验证，而无需用户手动安装根证书。应用程序通常包括来自数十个 PKI 的一百多个根证书，因此默认情况下，在返回它们的证书层次结构中赋予信任。
+
+信任网络支持信任的去中心化，以防止单点故障破坏 CA 层次结构。<ref>{{cite web|url=https://blog.mozilla.org/security/2011/08/29/fraudulent-google-com-certificate/|access-date=29 August 2011|last=Nightingale|first=Johnathan|title=Fraudulent *.google.com Certificate|archive-date=2022-05-25|archive-url=https://web.archive.org/web/20220525021658/https://blog.mozilla.org/security/2011/08/29/fraudulent-google-com-certificate/}}</ref> 一个著名的项目是 Monkeysphere 实用程序，它使用信任网络而不是 PKI 来提供 Internet 其他领域的身份验证框架。<ref>{{cite web|url=http://web.monkeysphere.info/|access-date=13 December 2016|title=The Monkeysphere Project|archive-date=2020-10-24|archive-url=https://web.archive.org/web/20201024092540/http://web.monkeysphere.info/}}</ref>
+
+== 存在的问题 ==
+=== 私钥的丢失 ===
+
+OpenPGP 信任网络基本上不受公司倒闭之类的影响，并且在几乎没有变化的情况下继续运行。但是，确实会出现一个相关的问题：丢失了私钥的用户（无论是个人还是组织）无法再解密使用 OpenPGP 证书中的匹配公钥生成的发送给他们的消息。早期的 PGP 证书不包括到期日期，并且这些证书的有效期是无限的。用户必须针对匹配的私钥丢失或泄露的时间准备一份签名的取消证书。一位非常杰出的密码学家仍接收到使用公钥加密的消息，但他们很久以前就失去了私钥的踪迹。<ref>{{cite book|last1=Ferguson|first1=Niels|last2=Schneier|first2=Bruce|title=Practical Cryptography|publisher=Wiley|year=2003|isbn=978-0471223573|pages=333|quote=Bruce lost a PGP key almost a decade ago; he still gets email encrypted with the corresponding certificate.}}</ref> 除了在通知发件人它们不可读并请求使用他们仍然拥有匹配私钥的公钥重新发送之后丢弃它们，他们对这些消息无能为力。后来的 PGP 和所有符合 OpenPGP 的证书都包含到期日期，当明智地使用时，它会自动排除此类麻烦（最终）。使用 1990 年代初引入的“指定撤销者”也可以轻松避免这个问题。密钥所有者可以指定有权撤销密钥所有者的密钥的第三方（以防密钥所有者丢失了自己的私钥，从而失去了撤销自己的公钥的能力）。
+
+=== 公钥真实性检查 ===
+信任网络（如内置于 PGP/OpenPGP 类型系统中的信任网络）的一个非技术性、社会性困难是，没有中央控制者（例如，[[证书颁发机构|CA]]）的每个信任网络都依赖于其他用户相信。那些拥有新证书（即在生成新密钥对的过程中产生）的人不太可能轻易地被其他用户的系统信任，即那些他们没有亲自见过的人，直到他们为新证书找到足够的认可。这是因为许多其他信任网络用户将他们的证书审查设置为在使用该证书中的公钥准备消息、相信签名、相信签名等等。
+
+尽管 OpenPGP 兼容系统得到广泛使用，并且在线多个 [[公钥服务器（密码学）|公钥服务器]] 很容易获得，但在实践中可能无法轻易找到某人（或几个人）来背书新证书（例如，通过将物理标识与密钥所有者信息进行比较，然后对新证书进行数字签名）。例如，偏远地区或未开发地区的用户可能会发现其他用户稀缺。并且，如果对方的证书也是新的（并且没有或很少得到其他人的认可），那么它在任何新证书上的签名只能为获得其他方系统的信任提供边际收益，从而能够与他们安全地交换消息。[[密钥签名聚会|密钥签名聚会]]是一种比较流行的机制，用于解决通过背书找到可以在现有信任网络中安装一个证书的其他用户的问题。还存在网站以方便其他 OpenPGP 用户的位置以安排密钥签名。 [http://www.gswot.org Gossamer Spider Web of Trust] {{Wayback|url=http://www.gswot.org/ |date=20220406155624 }} 还通过分层式信任网络链接 OpenPGP 用户使密钥验证更容易，最终用户可以通过偶然或确定的信任而受益于被认可为介绍人，或者通过明确信任 GSWoT 的顶级密钥作为 2 级介绍人（顶级密钥认可 1 级介绍人）。
+
+找到证书链的可能性通常由“[[small_world_phenomenon|小世界现象]]”来证明：给定两个人，通常可以在他们之间找到一条短链，这样链中的每个人都知道前面的和以下链接。然而，这样的链并不一定有用：加密电子邮件或验证签名的人不仅要找到从他们的私钥到通信者的签名链，还要相信链中的每个人都是诚实和有能力的关于签名密钥（也就是说，他们必须判断这些人是否可能诚实地遵循有关在签名密钥之前验证人的身份的准则）。这是一个更强的约束。
+
+另一个障碍是需要亲自与某人会面（例如，在[[密钥签名聚会|密钥签名聚会]]上）以验证他们的身份以及公钥和电子邮件地址的所有权，这可能涉及影响双方的差旅费用和日程安排限制。软件用户可能需要验证由位于世界各地的数千名开发人员生产的数百个软件组件。由于普通软件用户无法与所有软件开发人员亲自见面以建立直接信任，因此他们必须依靠相对较慢的间接信任传播。{{citation needed|date=January 2018}}
+
+从公钥服务器获取作者（或开发者、发布者等）的 PGP/GPG 密钥也存在风险，因为公钥服务器是第三方 [[中间人攻击|中间人]]，本身就容易受到滥用或攻击。为了避免这种风险，作者可以选择在他们自己的密钥服务器上发布他们的公钥（即，通过他们拥有的域名访问的网络服务器，并且安全地位于他们的私人办公室或家中）并要求使用用于传输其公钥的 HKPS 加密连接。详情请见下文[[#信任网络辅助解决方案|信任网络辅助解决方案]]。
+
+== 强集 ==
+
+'''强集''' 是指[[强连通分量|强连通]] [[OpenPGP|PGP]] 密钥的最大集合。<ref>{{cite web|url=https://people.apache.org/~henkp/trust/|access-date=13 December 2013|last=Penning|first=Henk|archive-url=https://www.webcitation.org/6Lqb2qiaO?url=https://people.apache.org/~henkp/trust/|archive-date=14 December 2013|title=on the apache.org web of trust|url-status=live}}</ref> 这构成了全球信任网络的基础。强集中的任意两个密钥在它们之间都有一条路径；虽然仅在断开连接的组中相互签名的密钥集岛可以并且确实存在，但该组中只有一个成员需要与强集交换签名才能使该组也成为强集的一部分。<ref>{{cite web|url=http://dtype.org/keyanalyze/explanation.php|archive-url=https://web.archive.org/web/20090203235946/http://dtype.org/keyanalyze/explanation.php|archive-date=3 February 2009|last=Streib|first=M. Drew|access-date=13 December 2013|title=Explanation of this Keyring Analysis|url-status=dead}}</ref> 2015年的时候强集大约有55000个密钥。<ref>{{cite web|url=http://pgp.cs.uu.nl/plot/|last=Penning|first=Henk P.|access-date=8 January 2015|title=analysis of the strong set in the PGP web of trust|archive-date=2015-01-01|archive-url=https://web.archive.org/web/20150101131120/http://pgp.cs.uu.nl/plot/}}</ref>
+
+== 平均最短距离 ==
+[[File:MSD-Based_Trust.png|thumb]]
+
+在 [[Pretty_Good_Privacy|PGP]]/[[GnuPG|GnuPG]]/[[OpenPGP|OpenPGP]] 信任网络的统计分析中，“平均最短距离 (MSD)”是给定的 PGP 密钥在构成信任网络的 PGP 密钥的强连接集中的“可信度”程度。
+
+平均最短距离已成为分析 PGP 密钥集的常用指标。很多时候，您会看到针对给定密钥子集计算的平均最短距离并与“全局平均最短距离”进行比较，“全局 平均最短距离”通常是指在全球信任网络的较大密钥分析之一中的密钥排名。
+
+== 信任网络辅助解决方案 ==
+
+与原始开发者或作者进行物理会面，始终是获得和分发、验证和信任最高信任级别的 PGP/GPG 密钥的最佳方式，并将继续作为最佳信任级别的最佳方式。由原作者/开发者在广为人知的（基于物理/纸质材料的）书籍上发布 GPG/PGP 完整密钥或完整密钥指纹，是与用户共享可信密钥的第二种最佳形式。在与开发者或作者见面之前，用户应在图书库和互联网上自行研究开发者或作者，并了解开发者或作者的照片、作品、公钥指纹、电子邮件地址等。
+
+然而，数百万想要安全通信或消息的用户与每个接收用户进行物理会面是不切实际的，对于需要与数百个软件开发人员或作者进行物理会面的数百万软件用户也是不切实际的，他们想要验证和信任并最终在其计算机中使用的软件或文件签名 [[Pretty_Good_Privacy|PGP]]/[[GNU_Privacy_Guard|GPG]] 公钥。因此，一个或多个[[可信第三方|受信任的第三方机构]]（TTPA）类型的实体或组需要可供用户使用并可供用户使用，并且此类实体/组需要能够提供可信[[认证#数字认证|验证]] 或信任-[[Delegation_(computer_security)|delegation]] 随时为全球数百万用户提供服务。
+
+实际上，要验证任何下载或接收的内容或数据或电子邮件或文件的[[消息认证|真实性]]，用户需要验证他们下载的主要内容或主要数据/电子邮件或主要文件的 PGP/GPG [[数字签名|签名]] 代码/文件（ASC、SIG）。因此，用户需要使用原始开发者或原始作者的可信且经过验证的公钥，或者用户需要使用该公钥的原始所有者信任的可信文件签名公钥。并且要真正信任特定的 PGP/GPG 密钥，用户需要与每个特定的原始作者或开发者亲自会面，或者用户需要与文件签名公钥的原始发布者亲自会面，或者，用户需要寻找另一个可信赖的替代用户，该用户位于信任网络的可信链中（又名，另一个用户或另一个开发者或另一个作者，他受到该非常特定的原始作者或开发者的信任），然后与该人实际会面，以验证他们的真实 ID 和他/她的 PGP/GPG 密钥（并且还向其他用户提供您自己的 ID 和密钥，以便双方可以签署/证明并信任彼此的 PGP/GPG 密钥）。无论软件是否流行，软件用户通常分布在世界各地的不同地点。原始作者或开发人员或文件发布者实际上不可能向数百万用户提供公钥或信任或 ID 验证服务。对于数以百万计的软件用户来说，与他们将（使用或）在他们的计算机中使用的每个软件或每个软件库或每个代码的开发人员或作者或发布者进行实际会面也是不切实际的。即使在来自信任网络的可信链中有多个受信任的人/人（由原作者），每个开发人员或作者在物理上或实际上仍然不可能与每个其他用户见面，也不可能每个用户都见面数百名开发人员将使用或开发他们的软件。当这种基于去中心化层次结构的 WoT 链模型将被附近的大多数用户流行并使用时，只有这样，信任网络的物理会面和公钥认证和签名程序才会变得更加容易。
+
+一些“解决方案”是：原始作者/开发者需要首先设置一个信任级别来签署/证明他们自己的文件签名密钥。然后更新的公钥和更新的文件签名公钥也必须通过在线安全和加密媒体发布和分发（或使其可访问）给用户，以便世界上任何位置的任何用户都可以获得正确的和可信且未修改的公钥。为确保每个用户获得正确且受信任的公钥和签名代码/文件，原始开发者/作者或原始发布者必须在自己的 [[公钥服务器（密码学）|公钥服务器]]上发布他们更新的公钥并强制使用 HKPS 加密连接，或在他们自己的 [[HTTPS|HTTPS]] 加密网页上发布他们更新的和完整的公钥（和签名代码/文件），在他们自己的网络服务器下，从他们自己的主域网站，（不来自位于外部服务器中的任何子域，不来自任何镜像，不来自任何外部/共享论坛/wiki 等网站服务器，不来自任何公共或外部/共享云或托管服务服务器)，并且必须位于并安全地保存在他们自己的场所内：自己的家、自己的家庭办公室或自己的办公室。这样，那些原始密钥/代码的小片段将完整地通过互联网传播，并且在传输过程中保持不变（由于加密连接），并且将到达目的地而不被窃听或修改，进入用户侧，并且可以被视为可信公钥，因为基于单通道或多通道 TTPA 的验证。当通过多个基于[[可信第三方|可信第三方]]的安全、验证和加密连接（从原始开发者自己的 Web 服务器）获得公钥时，它更值得信赖。
+
+当原始公钥/签名代码通过加密连接或加密网页显示在原始开发人员或作者自己的 Web 服务器或密钥服务器中时，任何其他文件、数据或内容都可以通过任何类型的非加密连接传输，例如：来自任何子域服务器或任何镜像或任何共享云/托管服务器的 HTTP/FTP 等，因为基于非加密连接的下载项目/数据/文件可以稍后通过使用原始公钥进行身份验证，从原作者/开发者自己的服务器通过安全、加密和可信（也就是验证）的连接/通道获得。
+
+使用加密连接传输密钥或签名/签名代码/文件，允许软件用户通过 [[公钥密码学|PKI]] [[可信第三方|可信第三方]]委托他们的信任，例如公开 [[Certificate_authority|CA]]，随时帮助在原始开发者/作者的 Web 服务器和全球数百万用户的计算机之间提供可信连接。
+
+当原始作者/开发者的域名和名称服务器由 [[域名系统安全扩展|DNSSEC]] 签名，并且在使用 [[传输层安全性协议|SSL/TLS]] 时，公共证书在 TLSA 中声明/显示/[[基于_DNS_的命名实体身份验证|DANE]] DNSSec DNS 资源记录，（以及当 Web 服务器通过 [[HTTP_Public_Key_Pinning|HPKP]] 技术固定和使用信任链中的 SSL/TLS 证书时)，那么 Web 服务器的网页或数据也可以通过另一个 PKI [[可信第三方|可信第三方]]：DNSSEC 和 DNS 命名空间维护者 [[ICANN|ICANN]]，而不是公共 CA 来验证。 DNSSEC 是 PGP/GPG 信任网络的另一种形式，但用于名称服务器；它首先为名称服务器创建一个可信链（而不是人/人），然后人/人的 PGP/GPG 密钥和指纹也可以添加到服务器的 DNSSEC DNS 记录中。因此，任何想要安全通信的用户（或任何软件用户）都可以通过两个（又名双/双）受信任的 PKI TTPA/通道有效地获取/接收他们的数据/密钥/代码/网页等。同时：ICANN (DNSSEC) 和 [[证书颁发机构|CA]] ([[Public_key_certificate|SSL/TLS 证书]])。因此，当使用以下解决方案和技术时，可以信任 PGP/GPG 密钥/签名代码数据（或文件）：HKPS、HKPS+DNSSEC+DANE、[[超文本传输安全协议|HTTPS]]、HTTPS+HPKP 或 HTTPS+HPKP+DNSSEC+DANE。
+
+==参见==
+
+* [[Friend-to-friend|Friend-to-friend]] (F2F) computer network.
+* [[Self-sovereign_identity|Self-sovereign identity]]
+* [[虚拟社区|虚拟社区]]
+
+==参考资料==
+{{reflist}}
+
+==延伸阅读==
+*{{cite book
+  | last = Ferguson
+  | first = Niels
+  | author-link = Niels Ferguson
+  |author2=Bruce Schneier
+   | title = Practical Cryptography
+  | publisher = [[John_Wiley_&_Sons|John Wiley & Sons]]
+  | year = 2003
+  | isbn = 0-471-22357-3 }}
+
+==外部链接==
+*[http://www.rubin.ch/pgp/weboftrust.en.html An explanation of the PGP Web of Trust] {{Wayback|url=http://www.rubin.ch/pgp/weboftrust.en.html |date=20220424225127 }}
+*[https://web.archive.org/web/20200806172139/https://pgp.cs.uu.nl/plot/ analysis of the ''strong set'' in the PGP web of trust], no longer maintained; last archived link from August 2020.
+
+{{Cryptography navbox | public-key}}
+
+{{DEFAULTSORT:Web Of Trust}}
+[[Category:密钥管理|Category:密钥管理]]
+[[Category:公钥基础设施|Category:公钥基础设施]]
+[[Category:OpenPGP|Category:OpenPGP]]
+[[Category:认证|Category:认证]]
+[[Category:可信计算|Category:可信计算]]
+[[Category:身份管理|Category:身份管理]]
+
+[[Category:密码学|Category:密码学]]

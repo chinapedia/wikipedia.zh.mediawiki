@@ -1,0 +1,49 @@
+'''IRQL'''是'''Interrupt Request Level'''的缩写，即中断请求级别。是[[Windows_NT|Windows]]操作系统使用的处理器[[中断|中断]]级别。
+==简介==
+Windows操作系统运行的处理器架构中，硬件产生信号发给{{tsl|en|Programmable Interrupt Controller|可编程中断控制器}}. 中断控制器发送{{tsl|en|Interrupt request (PC architecture)|中断请求}} (IRQ)及相应的优先级给CPU，CPU设置一个掩码(mask)屏蔽低优先级的其他中断请求到挂起状态(pending state),直到CPU释放控制给中断控制器。如果到来的中断有更高优先级，那么当前中断被挂起，CPU处理高优先级的中断。<ref name="russinovich">{{citation|url=http://windowsitpro.com/systems-management/inside-nts-interrupt-handling|title=Inside NT's Interrupt Handling|last=Russinovich|first=Mark|author-link=Mark Russinovich|work=[[Windows_IT_Pro|Windows IT Pro]]|date=October 31, 1997|publisher=[[Penton_Media|Penton Media]]|access-date=2016-08-19|archive-url=https://web.archive.org/web/20160913190926/http://windowsitpro.com/systems-management/inside-nts-interrupt-handling|archive-date=2016-09-13|dead-url=yes}}</ref>
+
+Windows把硬件中断与软件中断都映射到内部的中断表内。这就是中断请求级别IRQL。多核处理器的每个内核有自己单独的IRQL。[[异步过程调用|异步过程调用]]、用户态线程、内核模式操作都可以被中断，因此它们的IRQL低于线程调度器（或称分派器）。<ref name="ms_irql_thead">{{citation|url=http://download.microsoft.com/download/e/b/a/eba1050f-a31d-436b-9281-92cdfeae4b45/irql_thread.doc|title=Scheduling, Thread Context, and IRQL|date=April 26, 2016|publisher=[[Microsoft|Microsoft]]|pages=6–7|access-date=2016-08-19|archive-url=https://web.archive.org/web/20161022141500/http://download.microsoft.com/download/e/b/a/eba1050f-a31d-436b-9281-92cdfeae4b45/irql_thread.doc|archive-date=2016-10-22|dead-url=yes}}</ref>
+
+==级别==
+在[[DDK|DDK]]帮助文档中有IRQL的级别：
+{| class="wikitable"
+|-
+!   !! IRQL !! 宏 !! 描述
+|-
+| rowspan="5" | 软件IRQL  || rowspan="2" | 0 || PASSIVE_LEVEL || rowspan="2" | 最低级别, 没有被屏蔽的中断。线程执行用户模式，可以访问[[分页|分页]]内存。
+|-
+|       LOW_LEVEL   
+|-
+|  0 || intermediate level   || 运行在临界区内的线程。调用KeGetCurrentIrql返回PASSIVE_LEVEL。调用KeAreApcsDisabled来检查是否在临界区内。在本层或更高层的驱动程序不能suspended。
+|-
+|  1 || APC_LEVEL   || 异步调用层。当有[[异步过程调用|异步过程调用]]APC发生时，处理器提升到APC级别，因而就屏蔽了其它APC。可以访问分页内存。用KeAcquireFastMutex与KeReleaseFastMutex函数调用可以进入/退出本层。 
+|-
+|  2 || DISPATCH_LEVEL  || 分发派遣层。DPC和更低的中断被屏蔽，不能访问分页内存，因为缺页中断也是在这个层。线程调度器也在此层，调度时只考虑优先级，因此APC_LEVEL上的线程被阻塞后，可以调度执行PASSIVE_LEVEL线程。
+|-
+| rowspan="8" | 硬件IRQL   || 3-26 || DIRQL (Device IRQL) ||  设备IRQL  几乎所有的中断被屏蔽
+|-
+|  27 || PROFILE_LEVEL || 使用PRILFILE的定时器
+|-
+|  rowspan="3" | 28 || CLOCK1_LEVEL || 未在X86使用
+|-
+|    CLOCK2_LEVEL  || 内部定时器2
+|-
+|    SYNCH_LEVEL || 同步层
+|-
+| 29 || IPL_LEVEL  || 中断内部处理层
+|-
+|  30 || POWER_LEVEL || 电源故障层
+|-
+|  31 || HIGH_LEVEL || 最高中断层 
+|}
+
+==API==
+内核函数KeGetCurrentIRQL取得处理器当前的IRQL。
+==参见==
+* {{tsl|en|Interrupt priority level|中断优先级别}}
+* {{tsl|en|Interrupt handler|中断处理程序}}
+
+==参考文献==
+<references />
+
+[[Category:Microsoft_Windows|Category:Microsoft Windows]]

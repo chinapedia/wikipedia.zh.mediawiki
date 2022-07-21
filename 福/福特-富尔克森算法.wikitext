@@ -1,0 +1,223 @@
+'''福特-富尔克森方法'''（{{lang-en|Ford–Fulkerson method}}），又稱'''福特-富尔克森算法'''（{{lang|en|Ford–Fulkerson algorithm}}），是一类计算[[网络流|网络流]]的[[最大流问题|最大流]]的[[贪心算法|贪心算法]]。之所以称之为“方法”而不是“算法”，是因为它寻找增广路径的方式并不是完全确定的，而是有几种不同[[时间复杂度|时间复杂度]]的实现方式<ref>{{Cite book|title = Electronic Design Automation: Synthesis, Verification, and Test|url = https://archive.org/details/electronicdesign00wang|last = Laung-Terng Wang, Yao-Wen Chang, Kwang-Ting (Tim) Cheng|publisher = Morgan Kaufmann|year = 2009|isbn = 0080922007|location = |pages = [https://archive.org/details/electronicdesign00wang/page/n204 204]}}</ref><ref>{{Cite book|title = Introduction to Algorithms|url = https://archive.org/details/introductiontoal00corm_558|author1=Thomas H. Cormen |author2=Charles E. Leiserson |author3=Ronald L. Rivest |author4=Clifford Stein |publisher = MIT Press|year = 2009|isbn = 0262258102|location = |pages = [https://archive.org/details/introductiontoal00corm_558/page/n734 714]}}</ref>。它在1956年由[[小莱斯特·伦道夫·福特|小莱斯特·伦道夫·福特]]及[[德尔伯特·雷·富尔克森|德尔伯特·雷·富尔克森]]<ref>{{Cite journal | last1 = Ford | first1 = L. R. | authorlink1 = L. R. Ford, Jr.| last2 = Fulkerson | first2 = D. R. | authorlink2 = D. R. Fulkerson| doi = 10.4153/CJM-1956-045-5 | title = Maximal flow through a network | url = https://archive.org/details/sim_canadian-journal-of-mathematics_1956_8_3/page/399 | journal = [[Canadian_Journal_of_Mathematics|Canadian Journal of Mathematics]]| volume = 8 | pages = 399 | year = 1956 | pmid =  | pmc = }}</ref>发表。“福特-富尔克森”这个名词通常也指代[[埃德蒙兹-卡普算法|埃德蒙兹-卡普算法]]，这是一个特殊的福特-富尔克森算法实现。
+
+算法的思想如下：只要有一条从源点（开始节点）到汇点（结束节点）的路径，在路径的所有边上都有可用容量，就沿着这条路径发送一个流，流量由路径上的最小容量限制。 然后再找到另一条路径，一直到网络中不存在这种路径为止。 一条有可用容量的路径被称为一条增广路径。
+
+==算法==
+设<math>G(V,E)</math>为一个图，并且为每条从<math>u</math>到<math>v</math>的边<math>(u,v)</math>设置一个最大流量<math>c(u,v)</math>，并且初始化当前流量<math>f(u,v)=0</math>。下面是该算法每一步的实现：
+
+:{|
+| '''容量限制''': || <math>\forall (u, v) \in E, f(u,v) \le c(u,v)</math> || 每条边上的流都不能超出边的最大流量。
+|-
+| '''反向对称''': || <math>\forall (u, v) \in E, f(u,v) = - f(v,u)</math> || 从<math>u</math>到<math>v</math>的流量一定是从<math>v</math>到<math>u</math>的流量的相反数（见样例）。
+|-
+| '''流量守恒''': || <math style="vertical-align:-125%;">\forall u \in V: u \neq s, u \neq t \Rightarrow \sum_{w \in V} f(u,w) = 0</math> || 除非<math>u</math>是源点<math>s</math>或汇点<math>t</math>，一个节点的净流量为零。
+|-
+| '''f的值''':  || <math>\sum_{(s,u) \in E} f(s, u) = \sum_{(v,t) \in E} f(v, t)</math> || 从源点<math>s</math>流出的流量一定等于汇点<math>t</math>接收的流量。
+|-
+|}
+
+这意味着每轮计算之后通过网络的都是一个流。我们定义'''残留网络''' <math>G_f(V,E_f)</math>是一个网络的剩余流量<math>c_f(u,v) = c(u,v) - f(u,v)</math>。注意残留网络可以设置从<math>v</math>到<math>u</math>的流量，即使在原先的网络中不允许这种情况产生：如果 <math>c(v,u)=0</math> 但 <math>f(u,v)>0</math>，那么<math>c_f(v,u)=c(v,u)-f(v,u)=f(u,v)>0</math>：也即，从<math>u</math>到<math>v</math>的流量给从<math>v</math>到<math>u</math>的流量提供了额外的剩余量。
+
+=== 伪代码 ===
+'''算法''' 福特-富尔克森
+:'''输入''' 给定一张边的容量为<math>c</math>的图<math>G = (V,E)</math>，源点<math>s</math>以及汇点<math>t</math>。
+:'''输出''' 在网络<math>G</math>中，从<math>s</math>到<math>t</math>的最大流<math>f</math>。
+:# 初始化网络流量<math>f\leftarrow 0</math>、残留网络<math>G_f \leftarrow G</math>。对于图的每一条边<math>(u,v)</math>，初始化流量<math>f(u,v) \leftarrow 0</math>。
+:# 只要<math>G_f</math>中还存在一条从<math>s</math>到<math>t</math>的路径<math>p</math>，使对于每一条边<math>(u,v) \in p</math>，都有<math>c_f(u,v) > 0</math>：
+:## 设置路径<math>p</math>本次应发送的流量为路径最小剩余流量：<math>c_f(p) \leftarrow \min_{(u,v)\in p} c_f(u,v)</math>。
+:##更新网络流量<math>f\leftarrow f + c_f(p)</math>。
+:## 对于每一条边<math>(u,v) \in p</math>，更新<math>G_f</math>的剩余流量：
+:### <math>f(u,v) \leftarrow f(u,v) + c_f(p)</math> （''在路径中“发送”流）''
+:### <math>f(v,u) \leftarrow f(v,u) - c_f(p)</math> （''这个流在之后可以被“发送”回来）''
+
+步骤2中的路径<math>p</math>可以用[[广度优先搜索|广度优先搜索]]或[[深度优先搜索|深度优先搜索]]在<math>G_f(V,E_f)</math>中找到。如果使用了[[广度优先搜索|广度优先搜索]]，这个算法就是[[Edmonds–Karp算法|Edmonds–Karp算法]]。
+
+当步骤2中找不到可行路径时，<math>s</math>就无法在残留网络中到达<math>t</math>。设<math>S</math>是在残留网络中<math>s</math>可以到达的节点的集合，然后从<math>S</math>到<math>V</math>的其余部分的网络一方面等于我们找到的从<math>s</math>到<math>t</math>的所有流的总流量，另一方面所有这样的流量组成了一个上限。这说明我们找到的流是最大的。参见[[最大流最小割定理|最大流最小割定理]]。
+
+如果图<math>G(V,E)</math>有多个源点和汇点，可以按如下方法处理：设<math>T=\{t|t \text{为 目 标 点 }\}</math>，<math>S=\{s|s \text{为 源 点 }\}</math>。 添加一个新源点<math> s^*</math>与所有源点有一条边<math>(s^*,s)</math>相连，容量<math>c(s^*,s)=d_s\;(d_s=\sum_{(s,u)\in E}c(s,u))</math>。添加一个新汇点<math> t^*</math>与所有汇点<math>(t, t^*)</math> 有一条边相连，容量<math>c(t, t^*)=d_t\;(d_t=\sum_{(v,t)\in E}c(v,t))</math>。然后执行福特-富尔克森算法。
+
+同样的，如果节点<math>u</math>有通过限制<math>d_u</math>，可将这个节点用两个节点<math>u_{in},u_{out}</math>替换，用一条边<math> (u_{in},u_{out}) </math>相连，容量为<math>c(u_{in},u_{out})=d_u</math>。然后执行福特-富尔克森算法。
+
+==复杂度==
+算法通过添加找到的增广路径的流量增加总流量，当无法找到增广路径时，总流量就达到了最大。当流量是整数时，福特-富尔克森算法的运行时间为<math>O(E f)</math>（参见[[大O符号|大O符号]]）, <math>E</math>图中的边数，<math>f</math>为最大流。 这是因为一条增广路径可以在<math>O(E)</math>的时间复杂度内找到，每轮算法执行后流量的增长至少为<math>1</math>。但是在极端情况下，算法有可能永远不会停止。
+
+福特-富尔克森算法的一个特例是[[埃德蒙兹-卡普算法|埃德蒙兹-卡普算法]]，时间复杂度为<math>O(VE^2)</math>。
+
+==样例==
+下面的样例演示了福特-富尔克森在一张有4个节点，源点为<math>A</math>，汇点为<math>D</math>的图中的第一轮计算。 这个例子显示了算法在最坏情况下的行为。在每一轮算法中，只有<math>1</math>的流量被发送至网络中。如果算法改用宽度优先搜索，那么只需要两轮计算。
+
+{| cellpadding="10"
+|- style="text-align:center"
+! 路径 
+! 容量
+! 网络
+|-
+| colspan="2" style="text-align:center" | 原流
+| [[Image:Ford-Fulkerson_example_0.svg|300px]]
+|-
+| <math>A,B,C,D</math>
+| <math>
+\begin{align}
+  & \min(c_f(A,B), c_f(B,C), c_f(C,D)) \\
+= & \min(c(A,B)-f(A,B) ,c(B,C)-f(B,C), c(C,D)-f(C,D)) \\
+= & \min(1000-0, 1-0, 1000-0) = 1
+\end{align}
+</math>
+| [[Image:Ford-Fulkerson_example_1.svg|300px]]
+|-
+| <math>A,C,B,D</math>
+| <math>
+\begin{align}
+  & \min(c_f(A,C), c_f(C,B), c_f(B,D)) \\
+= & \min(c(A,C)-f(A,C), c(C,B)-f(C,B), c(B,D)-f(B,D)) \\
+= & \min(1000-0, 0-(-1), 1000-0) = 1
+\end{align}
+</math>
+| [[Image:Ford-Fulkerson_example_2.svg|300px]]
+|-
+| colspan="3" style="text-align:center" | 1998轮之后…
+|-
+| colspan="2" style="text-align:center" | 最终流
+| [[Image:Ford-Fulkerson_example_final.svg|300px]]
+|}
+
+注意当找到路径<math>A,C,B,D</math>时，流是如何从<math>C</math>发送至<math>B</math>的。
+==无法终止算法的样例==
+
+[[File:Ford-Fulkerson_forever.svg|right]]
+右图所示的网络中源点为<math>s</math>，汇点为<math>t</math>边<math>e_1</math>、<math>e_2</math>、<math>e_3</math>的容量为<math>1</math>, <math>r=(\sqrt{5}-1)/2</math>和<math>1</math>，使<math>r^2 = 1 - r</math>。其它所有边的容量<math>M \ge 2</math>。 使用福特-富尔克森算法可找到三条增广路径，分别为<math>p_1 = \{ s, v_4, v_3, v_2, v_1, t \}</math>、<math>p_2 = \{ s, v_2, v_3, v_4, t \}</math>、<math>p_3 = \{ s, v_1, v_2, v_3, t \}</math>.
+
+{| class="wikitable" style="text-align: center"
+! rowspan=2 | 步骤 !! rowspan=2 | 增广路径 !! rowspan=2 | 发送流 !! colspan=3 | 剩余容量
+|-
+! <math>e_1</math> !! <math>e_2</math> !! <math>e_3</math>
+|-
+| 0 || || || <math>r^0=1</math> || <math>r</math> || <math>1</math>
+|-
+| 1 || <math>\{ s, v_2, v_3, t \}</math> || <math>1</math> || <math>r^0</math> || <math>r^1</math> || <math>0</math>
+|-
+| 2 || <math>p_1</math> || <math>r^1</math> || <math>r^2</math> || <math>0</math> || <math>r^1</math>
+|-
+| 3 || <math>p_2</math> || <math>r^1</math> || <math>r^2</math> || <math>r^1</math> || <math>0</math>
+|-
+| 4 || <math>p_1</math> || <math>r^2</math> || <math>0</math> || <math>r^3</math> || <math>r^2</math>
+|-
+| 5 || <math>p_3</math> || <math>r^2</math> || <math>r^2</math> || <math>r^3</math> || <math>0</math>
+|}
+
+注意在步骤1和步骤5之后,边<math>e_1</math>、<math>e_2</math>、<math>e_3</math>的残留容量都可以表示为<math>r^n</math>、<math>r^{n+1}</math>或<math>0</math>，同时，对于一些特殊的<math>n \in \mathbb{N}</math>这意味着算法可以通过<math>p_1</math>、<math>p_2</math>、<math>p_1</math>与 <math>p_3</math>无限增广，并且残留容量总处于一个循环。在步骤5之后网络的流为<math>1 + 2(r^1 + r^2)</math>，如果继续用以上的算法增广，总的流将向<math>\textstyle 1 + 2\sum_{i=1}^\infty r^i = 3 + 2r</math>趋近，但最大流为<math>2M + 1</math>。在这个样例中，算法将永远不会停止，且结果也不会向实际的最大流趋近。<ref>{{cite journal| title = The smallest networks on which the Ford–Fulkerson maximum flow procedure may fail to terminate | url = https://archive.org/details/sim_theoretical-computer-science_1995-08-21_148_1/page/165 | first = Uri | last = Zwick | journal = [[Theoretical_Computer_Science_(journal)|Theoretical Computer Science]] | volume = 148 | issue = 1 | date = 21 August 1995 | pages = 165–170 | doi = 10.1016/0304-3975(95)00022-O}}</ref>
+
+{{clear}}
+
+== Python源码  ==
+<syntaxhighlight lang="python">
+class Edge(object):
+    def __init__(self, u, v, w):
+        self.source = u
+        self.sink = v  
+        self.capacity = w
+    def __repr__(self):
+        return "%s->%s:%s" % (self.source, self.sink, self.capacity)
+
+class FlowNetwork(object):
+    def __init__(self):
+        self.adj = {}
+        self.flow = {}
+ 
+    def add_vertex(self, vertex):
+        self.adj[vertex] = []
+ 
+    def get_edges(self, v):
+        return self.adj[v]
+ 
+    def add_edge(self, u, v, w=0):
+        if u == v:
+            raise ValueError("u == v")
+        edge = Edge(u,v,w)
+        redge = Edge(v,u,0)
+        edge.redge = redge
+        redge.redge = edge
+        self.adj[u].append(edge)
+        self.adj[v].append(redge)
+        self.flow[edge] = 0
+        self.flow[redge] = 0
+ 
+    def find_path(self, source, sink, path):
+        if source == sink:
+            return path
+        for edge in self.get_edges(source):
+            residual = edge.capacity - self.flow[edge]
+            if residual > 0 and edge not in path:
+                result = self.find_path( edge.sink, sink, path + [edge]) 
+                if result != None:
+                    return result
+ 
+    def max_flow(self, source, sink):
+        path = self.find_path(source, sink, [])
+        while path != None:
+            residuals = [edge.capacity - self.flow[edge] for edge in path]
+            flow = min(residuals)
+            for edge in path:
+                self.flow[edge] += flow
+                self.flow[edge.redge] -= flow
+            path = self.find_path(source, sink, [])
+        return sum(self.flow[edge] for edge in self.get_edges(source))
+</syntaxhighlight>
+
+===使用样例===
+
+<syntaxhighlight lang="python">
+>>> g = FlowNetwork()
+>>> [g.add_vertex(v) for v in "sopqrt"]
+[None, None, None, None, None, None]
+>>>
+>>> g.add_edge('s','o',3)
+>>> g.add_edge('s','p',3)
+>>> g.add_edge('o','p',2)
+>>> g.add_edge('o','q',3)
+>>> g.add_edge('p','r',2)
+>>> g.add_edge('r','t',3)
+>>> g.add_edge('q','r',4)
+>>> g.add_edge('q','t',2)
+>>> print (g.max_flow('s','t'))
+5
+</syntaxhighlight>
+
+== 应用 ==
+二分图的最大匹配
+
+最大不相交路径
+
+== 参考文献 ==
+
+{{reflist}}
+* {{cite book
+ | first1 = Thomas H.
+ | last1 = Cormen
+ | authorlink1 = Thomas H. Cormen
+ | first2 = Charles E.
+ | last2 = Leiserson
+ | authorlink2 = Charles E. Leiserson
+ | first3 = Ronald L.
+ | last3 = Rivest
+ | authorlink3 = Ronald L. Rivest
+ | first4 = Clifford
+ | last4 = Stein
+ | authorlink4 = Clifford Stein
+ | title = [[Introduction_to_Algorithms|Introduction to Algorithms]]
+ | edition = Second
+ | publisher = MIT Press and McGraw–Hill
+ | year = 2001 
+ | isbn = 0-262-03293-7
+ | chapter = Section 26.2: The Ford–Fulkerson method
+ | pages = [https://archive.org/details/introductiontoal00corm_691/page/n673 651]–664
+}}
+* {{cite book |author1=George T. Heineman |author2=Gary Pollice |author3=Stanley Selkow | title= Algorithms in a Nutshell | publisher=[[Oreilly_Media|Oreilly Media]] | year=2008 | chapter=Chapter 8:Network Flow Algorithms | pages = 226–250 | isbn=978-0-596-51624-6 }}
+* {{cite book |author1=Jon Kleinberg |author2=Éva Tardos | title= Algorithm Design | publisher=
+Pearson Education | year=2006 | chapter=Chapter 7:Extensions to the Maximum-Flow Problem | pages = 378–384 | isbn=0-321-29535-8  }}
+
+{{算法}}
+
+[[Category:图算法|Category:图算法]]
+[[Category:網絡流|Category:網絡流]]
+[[Category:带有Python代码示例的条目|Category:带有Python代码示例的条目]]

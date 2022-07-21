@@ -1,0 +1,36 @@
+
+[[最优化|最优化问题]]中，'''线搜索''' 是一种寻找[[目标函数|目标函数]] <math>f:\mathbb R^n\to\mathbb R</math> 的[[极值|局部最小值]] <math>\mathbf{x}^*</math> 的近似方法。它是最基础的[[迭代|迭代]]近似方法之一，另一种是[[置信域方法|置信域方法]]。
+
+线搜索近似首先找到一个使目标函数 <math>f</math> 下降的方向，然后计算 <math>\mathbf{x}</math> 应该沿着这个方向移动的步长。下降方向可以通过多种方法计算，比如[[梯度下降法|梯度下降法]]，[[牛顿法|牛顿法]]和{{Link-en|拟牛顿法|Quasi-Newton method}}。计算出的步长不一定是精确的。
+
+== 应用举例 ==
+
+以一个梯度法作为例子，其中第四步中使用到了线搜索。
+
+# 令迭代计数器 <math>\displaystyle k=0</math>，为最小值做一个初始估计 <math>\mathbf{x}_0</math>
+# 重复以下步骤：
+#     计算{{Link-en|下降方向|descent direction}} <math>\mathbf{p}_k</math>
+#     选择 <math>\displaystyle \alpha_k</math> 以在 <math>\alpha\in\mathbb R_+</math> 上粗略地最小化 <math>h(\alpha)=f(\mathbf{x}_k+\alpha\mathbf{p}_k)</math>
+#     更新 <math>\mathbf{x}_{k+1}=\mathbf{x}_k+\alpha_k\mathbf{p}_k</math>, 以及 <math>\displaystyle k=k+1</math>
+# 直到 <math>\|\nabla f(\mathbf{x}_k)\|</math> 小于容忍度。
+
+在第四步的线搜索中算法可以通过解方程 <math>h'(\alpha_k)=0</math> 来''精确地''，或者只是通过寻找一个 <math>h</math> 的充分下降来''粗略地''最小化 <math>h</math>。前者的一个例子是[[共轭梯度法|共轭梯度法]]。后者被称作不精确线搜索，有很多种实现方法，比如{{Link-en|回溯线搜索|backtracking line search}}或者是使用{{Link-en|沃尔夫条件|Wolfe conditions}}。
+
+与其它的最优化方法类似，线搜索也可以跟[[模拟退火|模拟退火]]结合以越过一些[[极值|局部最小值]]。
+
+== 算法 ==
+
+=== 直接搜索方法 ===
+这种方法里，必须先把最小值括在一个范围内，也就是说这个算法必须能够找到 <math>x_1</math> 和 <math>x_2</math> 使得要找的最小值在它们之间。接着通过计算这个区间内部的两个点 <math>x_3</math> 和 <math>x_4</math>，把区间分成几个子区间，抛弃掉外面两个点中与 <math>x_3</math> 和 <math>x_4</math> 中函数值更小的那个点不相邻的那一个。接下来的每一步中，只需要计算 额外的一个内部的点。在各种划分区间的方法中，<ref>{{Cite book|first1=M. J. |last1=Box|first2=D. |last2=Davies |first3=W. H. |last3=Swann|title=Non-Linear optimisation Techniques|publisher= Oliver & Boyd|year= 1969}}</ref> [[黄金分割法|黄金分割法]]是一种特别简单而高效的方法，它的划分比例在搜索进行中始终保持不变。
+:<math>\frac{1}{\phi}(x_2-x_1)=x_4-x_1=x_2-x_3=\phi(x_2-x_4)=\phi(x_3-x_1)=\phi^2(x_4-x_3)</math> where <math>\phi=\frac{1}{2}(1+\sqrt 5) \approx 1.618</math>
+
+== 参阅 ==
+* [[割线法|割线法]]
+* [[牛顿法|牛顿法]]
+* [[黄金分割法|黄金分割法]]
+
+== 参考 ==
+<references />
+
+{{DEFAULTSORT:Line Search}}
+[[Category:最优化算法|Category:最优化算法]]

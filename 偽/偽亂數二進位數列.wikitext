@@ -1,0 +1,77 @@
+''偽亂數二進位數列''（英语：pseudorandom binary sequence，简称：PRBS），是一種特別的[[位元流|二進位數列]]<math>a_0,\ldots, a_{N-1}</math>，若二進位數列的位元數為''N''，其中為1的數字有''m'''個，則其其[[自相关函数|自相关函数]]：
+:<math>C(v)=\sum_{j=0}^{N-1} a_ja_{j+v}</math>
+
+只有以下二個值：
+
+:<math>C(v)=
+\begin{cases}
+m, \mbox{ if } v\equiv 0\;\; (\mbox{mod}N)\\ 
+\\
+mc, \mbox{ otherwise }
+\end{cases}</math>
+
+其中
+
+:<math>c=\frac{m-1}{N-1}</math>
+
+稱為偽亂數二進位數列的占空比，類似連續時間信號的[[占空比|占空比]]。
+
+偽亂數二進位數列稱為[[偽亂數|偽亂數]]，雖然它是決定性的，不過其<math>a_j</math>的數值和前後元素的數值無關，看似隨機的，因此稱為偽亂數。
+
+偽亂數二進位數列可以延伸到無限長，方式是在<math>N</math>個元素都出現過之後，再從<math>a_0,\ldots, a_{N-1}</math>再出現一次……，這點和真正的由[[放射性|放射性衰減]]或[[白雜訊|白雜訊]]產生的數列不同，後者在本質上就是無限長的。偽亂數二進位數列比[[M-sequence|最大長度數列]]更普遍，後者是特別的N位元偽亂數二進位數列，是由線性移位暫存器所產生的。最大長度數列的占空比恆為50%，長度為k位元的暫存器，其數列長度為<math>N = 2^k-1</math>。偽亂數二進位數列可以用在[[電信|電信]]、[[密碼學|密碼學]]及[[模擬|模擬]]等應用。
+
+== 實際的實現 ==
+[[File:PRBS_15_generator.png|thumb]]後，做為新的位元]]
+
+偽亂數二進位數列可以用[[线性反馈移位寄存器|线性反馈移位寄存器]]產生<ref>Paul H. Bardell, William H. McAnney, and Jacob Savir, "Built-In Test for VLSI: Pseudorandom Techniques", John Wiley & Sons, New York, 1987.</ref>。
+
+一些常見的的數列產生多項式為
+
+PRBS7  = <math>x^{7} + x^{6} + 1</math>
+
+PRBS15 = <math>x^{15} + x^{14} + 1</math>
+
+PRBS23 = <math>x^{23} + x^{18} + 1</math>
+
+PRBS31 = <math>x^{31} + x^{28} + 1</math>
+
+以下是一個用 PRBS-7 產生偽亂數二進位數列的C語言程式
+
+<syntaxhighlight lang="c">
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+    
+int main(int argc, char* argv[]) {
+    uint8_t start = 0x02;
+    uint8_t a = start;
+    int i;    
+    for(i = 1;; i++) {
+        int newbit = (((a >> 6) ^ (a >> 5)) & 1);
+        a = ((a << 1) | newbit) & 0x7f;
+        printf("%x\n", a);
+        if (a == start) {
+            printf("repetition period is %d\n", i);
+            break;
+        }
+    }
+}
+</syntaxhighlight>
+
+此例中，PRBS-7的週期為127位元。
+
+== 相關條目 ==
+* {{le|偽亂數產生器|Pseudorandom number generator}}
+* {{le|金氏碼|Gold code}}
+* {{le|互补序列|Complementary sequences}}
+* [[比特误码率|比特误码率]]
+* {{le|偽亂數噪音|Pseudorandom noise}}
+
+==參考資料==
+{{reflist}}
+
+== 外部連結 ==
+* https://web.archive.org/web/20131111050840/http://www.scriptwell.net/correlation.htm 
+
+[[Category:偽亂數|Category:偽亂數]]
+[[Category:二進位數列|Category:二進位數列]]

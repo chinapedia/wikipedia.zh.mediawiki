@@ -1,0 +1,34 @@
+{{NoteTA
+|G1=IT
+|1=zh-cn:后台传输;zh-tw:背景傳輸
+}}
+{{校对翻译}}
+'''低额外时延后台传输'''（{{lang-en|Low Extra Delay Background Transport}}，简称'''LEDBAT'''）是一种在[[互联网|互联网]]上快速传输[[数据|数据]]同时不拥塞[[计算机网络|网络]]的方法。<ref>{{Cite web |url=http://www.wired.com/wiredenterprise/2013/06/open-garden/ |title=存档副本 |accessdate=2016-05-14 |archive-date=2014-03-06 |archive-url=https://web.archive.org/web/20140306101520/http://www.wired.com/wiredenterprise/2013/06/open-garden/ |dead-url=no }}</ref>LEDBAT由Stanislav Shalunov发明<ref name="itef">[[rfc:6817|http://tools.ietf.org/html/rfc6817 {{Wayback]]</ref><ref>By Tammy Parker, [http://www.fiercewireless.com/tech/story/open-garden-enable-channel-bonding-over-wi-fi-3g-and-4g/2012-12-10 Open Garden to enable channel bonding over Wi-Fi, 3G and 4G] {{Wayback|url=http://www.fiercewireless.com/tech/story/open-garden-enable-channel-bonding-over-wi-fi-3g-and-4g/2012-12-10 |date=20160512051337 }}, December 10, 2012, Retrieved November 24, 2013</ref>。该技术被[[蘋果公司|蘋果公司]]用于[[软件更新|软件更新]]，也被[[BitTorrent_(协议)|BitTorrent]]协议用于大多数传输<ref name="fastcolabs">[http://www.fastcolabs.com/3014951/why-your-bittorrent-downloads-move-so-fast This Is How Your BitTorrent Downloads Move So Fast] {{Wayback|url=http://www.fastcolabs.com/3014951/why-your-bittorrent-downloads-move-so-fast |date=20151213083425 }}, July 29, 2013, Retrieved November 24, 2013</ref>，它还被[[微軟系统中心配置管理器|微软SCCM]]软件分发点和Windows“传递优化”技术<ref>{{cite web |title=适用于 Windows 10 更新的传递优化 |url=https://docs.microsoft.com/windows/deployment/update/waas-delivery-optimization |website=微软 |accessdate=2021-01-31}}</ref>使用<ref>{{Cite web|url=https://docs.microsoft.com/en-us/sccm/core/plan-design/hierarchy/fundamental-concepts-for-content-management#windows-ledbat|title=Content management fundamentals - Configuration Manager|last=aczechowski|website=docs.microsoft.com|language=en-us|access-date=2019-04-02|archive-date=2019-09-04|archive-url=https://web.archive.org/web/20190904094237/https://docs.microsoft.com/en-us/sccm/core/plan-design/hierarchy/fundamental-concepts-for-content-management#windows-ledbat|dead-url=no}}</ref>。在2013年，该算法预计被13%–20%的互联网流量使用。<ref name="fastcolabs">[http://www.fastcolabs.com/3014951/why-your-bittorrent-downloads-move-so-fast This Is How Your BitTorrent Downloads Move So Fast], July 29, 2013, Retrieved November 24, 2013</ref><ref>By Gabe Stein, [http://www.fastcolabs.com/3014782/former-bittorrent-engineer-thinks-he-can-fix-your-wifi-for-good Former BitTorrent Engineer Thinks He Can Fix Your Wi-Fi--For Good] {{Wayback|url=http://www.fastcolabs.com/3014782/former-bittorrent-engineer-thinks-he-can-fix-your-wifi-for-good |date=20150924010623 }}, July 24, 2013, Retrieved November 24, 2013</ref>LEDBAT是一个基于[[拥塞控制|拥塞控制]]的算法，它在尽可能使用所有可用[[带宽|带宽]]的同时限制[[时延|时延]]的增加；<ref name="itef">[[rfc:6817|http://tools.ietf.org/html/rfc6817]]</ref><ref>BY ROBERT MCMILLAN, [http://www.wired.com/wiredenterprise/2013/06/open-garden/ THE INTERNET OF THINGS] {{Wayback|url=http://www.wired.com/wiredenterprise/2013/06/open-garden/ |date=20140306101520 }}, July 21, 2013, Retrieved November 24, 2013</ref>其测量单向时延，并根据网络中的LEDBAT流本身的测量结果变化来实现拥塞控制。
+
+== 设计目标 ==
+LEDBAT拥塞控制有如下目标：<ref name="itef">[[rfc:6817|http://tools.ietf.org/html/rfc6817]]</ref>
+# 使用所有可用带宽，在没有其他流量时维持低排队时延；
+# 限制因其他流量增加的排队时延；
+# 应快速让位给其他共享同一有限链路的标准[[传输控制协议|TCP]]。
+
+== 实现和部署 ==
+两个主要实现是BitTorrent的[[Micro_Transport_Protocol|uTP]]和苹果公司的TCP部分。BitTorrent使用uTP处理大多数流量，并且代码在[[开源许可证|开源许可证]]下可用。苹果公司将LEDBAT用于软件更新，因此[[Mac_OS_X|Mac OS X]]计算机和[[iOS|iOS]]设备的大体积软件下载不会干扰正常的用户活动；苹果公司也已将代码开源。<ref name=applesource>{{Cite web |url=https://opensource.apple.com/source/xnu/xnu-4570.71.2/bsd/netinet/tcp_ledbat.c.auto.html |title=存档副本 |accessdate=2021-01-31 |archive-date=2018-11-06 |archive-url=https://web.archive.org/web/20181106132612/https://opensource.apple.com/source/xnu/xnu-4570.71.2/bsd/netinet/tcp_ledbat.c.auto.html |dead-url=no }}</ref>
+
+以上两种实现都旨在将网络排队延时限制在100毫秒。这是标准化协议所允许的最大值。如果其中某个使用较低的值，则在使用时另一个将得不到资源。<ref name="itef" /><ref name=applesource />
+
+[[Windows_10|Windows 10]]周年更新通过非文档化的套接字选项引入了LEDBAT，作为实验性的Windows TCP拥塞控制模块<ref>{{Cite web|url=https://datatracker.ietf.org/meeting/100/materials/slides-100-iccrg-ledbat-low-priority-tcp-congestion-control-in-windows
+|title=LEDBAT++: Low priority TCP Congestion Control in Windows
+|author=Microsoft
+|date=2017
+|format=PDF
+}}</ref>
+
+== 例子 ==
+假设：
+# 发送方与接收方的时钟不同步
+# 发送方以固定速率发送
+发送方每10个时钟周期发送5个数据包：10, 20, 30, 40, 50。单位是不重要的。接收方不仅接受此发送方的数据，还接收其他来源的数据。对于这5个被发送的数据包，接收方在下列时钟节点收到数据：112, 135, 176, 250, 326。因此第一阶段发送与接收方的单向时延如下：102, 115, 146, 210, 276。第二阶段（因单向时延改变后）：13 (115 - 102), 31, 64, 66。接收方将根据可能在增加的单向时延推断拥塞增加并相应地调整传输速率。
+
+== 参考资料 ==
+{{Reflist}}
+[[Category:网络协议|Category:网络协议]]

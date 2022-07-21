@@ -1,0 +1,60 @@
+{{NoteTA
+|zh-cn:信号; zh-tw:訊號;
+|zh-cn:信噪比; zh-tw:訊噪比;
+|zh-cn:图像; zh-tw:影像;
+}}
+'''正規化均方根誤差'''（{{lang-en|normalized root-mean-square error}}，縮寫為'''NRMSE'''）是將[[均方根誤差|均方根誤差]]正規化後所得的統計數值。正規化均方根誤差經常被被使用於量測兩個信號，如圖像、影片，及聲音訊號等之間的'''相似度'''。
+
+== 定義==
+在[[影像處理|影像處理]]中，給定兩個單色影像 <math>x[m,n] </math>和<math>y[m,n] </math>，那麼它們的正規化均方根誤差可定義如下：
+
+: <math>\mathrm{NRMSE} = \sqrt{\frac{\sum^{M-1}_{m=0}\sum^{N-1}_{n=0}{|y[m,n]-x[m,n]|}^{2}}{\sum^{M-1}_{m=0}\sum^{N-1}_{n=0}|{x[m,n]}|^{2}}}</math>
+
+==NRMSE於影像辨識常見的缺點==
+NRMSE理論上能夠比較兩個影像的差異，但實際上可能無法反映出人類對於的兩個訊號之間的相似度的直觀感受。NRMSE只是利用兩個影像的差異取絕對值的平方，相加後正規化再開平方，並沒有考慮兩張圖之間的相關性。例子如下圖：
+
+:[[File:NRMSE_structure.jpg|500px]]
+:* 圖三 =  圖一的像素亮度值(intensity) × 0.5 + 255.5 × 0.5  
+:* 圖一和圖二之間的NRMSE 為 0.4411
+:* 圖一和圖三之間的NRMSE 為 0.4460
+
+照理來說，人類會直觀地認為圖一和圖三較相近。然而，圖一和圖二的NRMSE與圖一和圖三的NRMSE數值上的差異卻非常小，無法明顯地表現出圖一和圖三的相似性。有鑑於NRMSE無法完全反映人類視覺上所感受的誤差，2004年有提新的誤差測量方法被提出，名稱為[[結構相似性|結構相似性]]（{{lang|en|structural similarity}}，'''SSIM'''）。若使用SSIM：
+
+:* 圖一和圖二之間的SSIM 為 0.1040
+:* 圖一和圖三之間的SSIM 為 0.7720
+
+結構相似性量測法比NRMSE更能表現圖一、圖三之間存在著的極高的相似度。接下來將舉例3個 NRMSE 無法看出相似度，但是可以用SSIM 看出相似度的情形：
+
+====影子效應====
+:[[File:NRMSE_shahow.jpg|320px]]
+:* 圖四和圖五之間的NRMSE 為 0.4521（大於圖一、圖二之間的NRMSE），SSIM 為 0.6010
+
+====底片效應====
+:[[File:NRMSE_negative.jpg|320px]]
+:* 圖七 =  255 - 圖六的像素亮度值
+:* 圖六和圖七之間的NRMSE 為 0.5616（大於圖一、圖二之間的NRMSE），SSIM 為  -0.8367 （'''高度負相關'''）
+
+====同形，但亮度不同的影像====
+:[[File:NRMSE_shape.jpg|320px]]
+
+:* 圖八和圖九之間的NRMSE 為 0.4978，SSIM 為 0.7333
+
+==其他有類似缺點的相似度量測工具：MSE、PSNR==
+除了NRMSE以外，[[均方误差|均方误差]]（{{lang|en|mean square error}}，'''MSE'''）及[[峰值信噪比|峰值信噪比]]（又稱'''訊噪比'''，'''PSNR'''）皆有著類似的影像辨識缺點，原因在於它們有著相似的定義。
+
+MSE的定義：
+: <math>\mathrm{MSE} = \frac{1}{MN}\;  \sum^{M-1}_{m=0}\sum^{N-1}_{n=0}{|y[m,n]-x[m,n]|}^{2}</math>
+
+PSNR的定義：
+:<math>\mathit{PSNR} = 10  \log_{10} \left( \frac{\mathit{MAX}_x^2}{{\frac{1}{MN}\;  \sum^{M-1}_{m=0}\sum^{N-1}_{n=0}{|y[m,n]-x[m,n]|}^{2}}}\right)</math>
+
+==參見==
+* [[信噪比|信噪比]]（PSNR）
+* [[結構相似性|結構相似性]]（Structural Similarity）
+* [[影像處理|影像處理]]
+
+==參考文獻==
+* {{cite web |author1=國立台灣大學電信工程學研究所丁建均教授 |title=高等數位訊號處理 |url=http://djj.ee.ntu.edu.tw/ADSP.htm |accessdate=2020-07-01 |archive-date=2020-05-08 |archive-url=https://web.archive.org/web/20200508102040/http://djj.ee.ntu.edu.tw/ADSP.htm |dead-url=no }}
+
+[[Category:统计学|Category:统计学]]
+[[Category:图像处理|Category:图像处理]]

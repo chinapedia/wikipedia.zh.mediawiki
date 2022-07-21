@@ -1,0 +1,54 @@
+{{citation style|time=2017-05-04T00:48:27+00:00}}
+{{NoteTA
+|G1=IT
+}}
+'''节点交换'''（{{lang-en|'''Peer exchange'''}}，简称'''PEX'''；或称'''对等端交换'''）是一个增强[[BitTorrent_(协议)|BitTorrent]]文件共享协议的[[网络传输协议|通信协议]]，它使一组用户（或[[對等網路|对等端]]）能更加快速和高效地共享特定的文件。
+
+在BitTorrent文件共享协议的原始设计中，一个文件共享组（也称swarm）中的对等端（用户）依赖一个称为[[BitTorrent_tracker|Tracker]]的中心化跟踪服务器来找到其他人和维持群组。PEX则极大降低了对等端对Tracker的依赖，允许每个对等端直接更新群组中的对等端参与信息。通过降低对集中式跟踪服务器的依赖，PEX提升了速度、效率和BitTorrent协议的健壮性。
+
+== 描述 ==
+节点交换不能用在将一个新对等端介绍到一个swarm。要初始化与swarm的接触，每个对等端必须使用一个“.torrent”文件连接到tracker，或者使用名为[[bootstrap_node|bootstrap node]]的路由计算机来找到一个描述了对等端swarm列表的[[分散式雜湊表|DHT]]。对于大多数BitTorrent用户而言，DHT和PEX将在BitTorrent客户端启动并打开一个.torrent文件后开始工作。另一点值得注意的是“私有种子”，它不会公开可用，且通常将禁用DHT。
+
+=== 节点交换惯例 ===
+根据Azureus与µTorrent的开发者之间达成的一致，任何实现上述两者（之一）机制的客户端在发送PEX消息时应遵守以下限制：<ref name="theory.org">{{cite web|url=http://wiki.theory.org/BitTorrentPeerExchangeConventions|title=BitTorrentPeerExchangeConventions - Theory.org Wiki|work=wiki.theory.org}}</ref>
+* 提供的任何PEX消息中应该不添加超过50个或移除超过50个对等端。
+* 对等端交换消息的发送频率不应超过每分钟一次。
+一些客户端可能选择强制实施这些限制，并且放弃忽视这些规则的客户端的连接。<ref name="theory.org"/>
+
+=== DHT ===
+为创建一个PEX协议，提供均匀分布的对等端选择，其中一个可以对种子形成一个小的DHT本地网络。 For each desired new peer one would look up a (uniformly) random key, and use the node responsible for the key as a new peer.这在概念上很简单，但也需要不小的开销。{{Fact|date=June 2010}}
+
+== 版本 ==
+共有三个互不兼容的PEX实现（形成非互通的网络群组）{{Fact|date=December 2011}}
+* Vuze – 在Azureus中引入
+* BitComet – 专有 – 在BitComet中引入
+* MainLine – 在µTorrent中引入
+
+== 支持对等端交换的客户端 ==
+{{Fact|date=September 2010}}
+
+下列客户端的特定版本已实现对等端交换：
+* [[Ares_Galaxy|Ares Galaxy]]{{Fact|date=September 2010}}<div class="cx-template-editor-target-container" dir="ltr" style="display: none;" lang="zh"><div class="cx-template-editor-close"></div><div class="cx-template-editor-target"></div></div>
+* [[aria2|aria2]]，支持µTorrent PEX<ref>{{cite web |url=http://manpages.ubuntu.com/manpages/utopic/man1/aria2c.1.html |title=存档副本 |accessdate=2015-03-29 |deadurl=yes |archiveurl=https://web.archive.org/web/20150402095141/http://manpages.ubuntu.com/manpages/utopic/man1/aria2c.1.html |archivedate=2015-04-02 }}</ref>
+* [[Vuze|Vuze]]，旧称Azureus，以及基于它的客户端{{what}}（Vuze PEX仅与Transmission客户端兼容。其他客户端的PEX已在Vuze及Azureus 3.0.4.3及以上版本中实现）<ref>{{cite web|url=http://wiki.vuze.com/w/Version_3_Changelog#2008.03.05_-_Azureus_Vuze_3.0.5.0|title=utorrent PEX in Vuze.|accessdate=2010-08-15|publisher=Vuze Wiki website}}</ref>
+* [[BitComet|BitComet]]的旧版本中支持使用专有协议的PEX。<ref>{{cite web|url=http://wiki.bitcomet.com/Peers,_seeds,_torrent,_tracker,_DHT,_Peer_Exchange_%28PEX%29,_Magnet_Links#Peer_Exchange_.28PEX.29|title=PEX in BitComet.|accessdate=2010-02-23|publisher=BitComet Wiki website}}</ref>从v.1.19开始，它也添加了µTorrent/Mainline实现的基于扩展协议的PEX。<ref>{{cite web|url=http://www.bitcomet.com/doc/changelog.htm|title=Release notes for BitComet.|accessdate=2010-02-23|publisher=BitComet official website}}</ref>
+* [[Bitflu|Bitflu]]<ref>{{cite web|url=http://bitflu.workaround.ch/config.html|title=Bitflu configuration example|accessdate=2007-03-30}}</ref>
+* [[BitTorrent_(软件)|BitTorrent]]<ref>[http://www.bittorrent.com/intl/es/help/manual/appendixa040401#Other_Settings.Peer_Exchange BitTorrent User Manual - Appendix A: The BitTorrent Interface - Miscellaneous - Torrent Properties - General - Other Settings - Peer Exchange] {{webarchive|url=https://web.archive.org/web/20140706120625/http://www.bittorrent.com/intl/es/help/manual/appendixa040401 |date=2014-07-06 }}</ref>
+* [[KTorrent|KTorrent]]在2.1 RC1中已实现完整的µTorrent PEX支持。<ref>{{cite web|url=http://ktorrent.org/|title=What's new in 2.1?|accessdate=2007-03-30|publisher=KTorrent official website|archive-date=2006-04-02|archive-url=https://web.archive.org/web/20060402211409/http://ktorrent.org/|dead-url=yes}}</ref>
+* [[libtorrent|libtorrent]]及基于它的客户端（[[Deluge|Deluge]]<ref>{{cite web|url=http://forum.deluge-torrent.org/viewtopic.php?f=14&t=15#p33|title=Deluge 0.5.1 Beta 1 changes|accessdate=2007-09-11|deadurl=yes|archiveurl=https://web.archive.org/web/20081225031718/http://forum.deluge-torrent.org/viewtopic.php?f=14&t=15#p33|archivedate=2008-12-25}}</ref>、[[qBittorrent|qBittorrent]]<ref>{{cite web|url=http://qbittorrent.sourceforge.net/|title=qBittorrent official website|accessdate=2007-05-14}}</ref>、[[MooPolice|MooPolice]]<ref>{{cite web|url=http://www.moopolice.de/|title=MooPolice official website|accessdate=2007-03-30}}</ref>）与[[µTorrent|µTorrent]]兼容
+* [[Tixati|Tixati]]
+* [[µTorrent|µTorrent]]<ref>{{cite web|url=http://forum.utorrent.com/viewtopic.php?pid=46921#p46921|title=μTorrent 1.4.1 beta and 1.4.2 beta changes|accessdate=2007-09-11|deadurl=yes|archiveurl=https://web.archive.org/web/20061125033806/http://forum.utorrent.com/viewtopic.php?pid=46921#p46921|archivedate=2006-11-25}}</ref>
+* [[Opera電腦瀏覽器|Opera]] 9.5，支持µTorrent PEX<ref>{{cite web|url=http://my.opera.com/mitchman2/blog/2007/09/04/opera-9-5-alpha-and-bittorrent|title=Opera 9.5 BitTorrent support|accessdate=2007-09-04}}</ref>
+* [[qBittorrent|qBittorrent]]，支持µTorrent PEX<ref>{{cite web|url=http://packages.debian.org/sid/qbittorrent|title=Details of qBittorrent package|accessdate=2011-04-15|work=Debian Packages|quote=μTorrent-compatible Peer eXchange (PeX)}}</ref>
+* [[rTorrent|rTorrent]]<ref>{{cite web|url=http://rakshasa.no/pipermail/libtorrent-devel/2007-September/001241.html|title=libTorrent 0.11.8 and rTorrent 0.7.8 Changelog|accessdate=2007-09-11|archive-url=https://web.archive.org/web/20071103080110/http://rakshasa.no/pipermail/libtorrent-devel/2007-September/001241.html|archive-date=2007-11-03|dead-url=yes}}</ref>
+* [[Transmission|Transmission]]（μTorrent和Vuze的实现均兼容）<ref>{{cite web|url=http://transmission.m0k.org/trac/browser/trunk/NEWS?rev=1579|title=NEWS (rev 1579)|accessdate=2007-03-30|publisher=Transmission SVN|deadurl=yes|archiveurl=https://web.archive.org/web/20070824141552/http://transmission.m0k.org/trac/browser/trunk/NEWS?rev=1579|archivedate=2007-08-24}}</ref>
+* [[XTorrent|XTorrent]]基于Transmission的源代码，因此在其1.0 (v40)版本中同样兼容Vuze和µTorrent的实现<ref>[http://www.xtorrent.com/ Xtorrent P2P (for Mac OS X)]</ref>
+
+== 参考资料 ==
+{{reflist|2}}
+==外部链接==
+*[http://wiki.vuze.com/w/Peer_Exchange Description on the official Azureus wiki]
+
+{{BitTorrent}}
+
+[[Category:BitTorrent|Category:BitTorrent]]

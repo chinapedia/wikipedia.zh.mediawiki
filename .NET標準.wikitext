@@ -1,0 +1,172 @@
+{{noteTA
+| G1=IT
+| 1= zh-tw:應用程式介面; zh-cn:应用程序接口; zh-hk:應用程式介面; zh-mo:應用程式介面; zh-sg:应用程序接口;
+| 2= zh-tw:函式庫; zh-cn:库; zh-hk:函式庫; zh-mo:函式庫; zh-sg:库;
+}}
+[[File:Netstandard.png|350px]]架構]]
+'''.NET標準'''（{{lang-en|.NET Standard}}），原稱為'''.NET平台標準'''（{{lang-en|.NET Platform Standard}}）是微軟為跨平台所規劃的[[.NET_Framework|.NET Framework]]相關平台於系統之間的相依性標準，在此標準之下，能確保標準的[[应用程序接口|应用程序接口]]與物件能夠跨平台使用{{notetag|應用程式介面，{{lang-en|API，Application Programming Interface}}}}。.NET平台標準是以參考組件的方式存在{{notetag|參考組件，{{lang-en|Reference Assemblies}}}}，其本身並沒有任何實作，真正的實作是由平台擁有者所進行{{notetag|平台擁有者，{{lang-en|Platform Owner}}}}，而用戶端使用簡單的[[NuGet|NuGet]]版本戳記即可獲得正確的平台版本{{notetag|用戶端，也就是應用程式}}。
+
+== 歷史 ==
+.NET Framework長期以來一直是[[Microsoft_Windows|微軟視窗]]平台上的特色與標準，它也成功的實作跨微軟視窗平台的應用程式介面，但最為人詬病的一點是它無法跨出微軟視窗平台，雖然有[[Mono|Mono]]這樣的Framework可跨平台，但是Mono畢竟不是官方實作，在.NET相容性上也無法達到百分之百相容，而在微軟以[[.NET_Core|.NET Core]]與[[ASP.NET_Core|ASP.NET Core]]投入真正跨平台的架構與框架開發時，勢必要面臨這個問題。
+
+.NET平台標準的基礎是.NET Framework上的可攜式類別庫{{notetag|可攜式類別庫，{{lang-en|Portable Library}}}}，但為它賦與了更標準的作法以及更容易識別的版本戳記。
+
+.NET平台標準的原理如下所示<ref name="netstandard">{{Cite web |url=https://github.com/dotnet/corefx/blob/master/Documentation/architecture/net-platform-standard.md |title=.NET Platform Standard |accessdate=2016-05-15 |archive-date=2016-05-19 |archive-url=https://web.archive.org/web/20160519180849/https://github.com/dotnet/corefx/blob/master/Documentation/architecture/net-platform-standard.md |dead-url=no }}</ref>：
+* 平台擁有者自詳細的.NET平台標準版本中實作參考組件。
+* 平台擁有者可能會自詳細的.NET平台標準版本實作參考組件的子集{{notetag|通常是額外的API或物件}}。
+* 任何.NET平台標準參考組件中的API表層變更都會影響版本。
+* 低版本的組件總是會相容於高版本。
+
+== 運作方式 ==
+
+.NET平台標準由微軟提供參考組件，目前的參考組件置於微軟的CoreFX儲存庫<ref>{{Cite web |url=https://github.com/dotnet/corefx |title=CoreFX 儲存庫 |accessdate=2016-05-15 |archive-date=2018-07-03 |archive-url=https://web.archive.org/web/20180703033444/https://github.com/dotnet/corefx |dead-url=no }}</ref>，每一個定義的命名空間與類別都有一個ref資料夾，裡面即是預設的實作碼，所有參與.NET平台標準的實作者都必須要實作這些屬性與方法，才能相容於.NET平台標準，而CoreFX也有提供實作碼，供實作的參考之用，在大多數的情況，各平台的差異性並不高。
+
+當函式庫已實作成.NET平台標準相容的函式庫後，用戶端就可以使用目標平台別稱（{{lang|en|Target Platform Moniker}}，{{lang|en|TPM}}）來加入其參考，其命名規則是portable-a+b+c+d+...，portable表示它是可攜式的類別庫，a, b, c, d則是要支援的平台別：<ref name="targetframeworks">{{Cite web |url=https://docs.nuget.org/Create/TargetFrameworks |title=Target Frameworks |accessdate=2016-05-15 |archive-date=2016-05-13 |archive-url=https://web.archive.org/web/20160513120738/http://docs.nuget.org/create/targetframeworks |dead-url=no }}</ref>
+
+{| class="wikitable"
+|-
+! 平台 !! 定址名稱 !! 說明
+|-
+| .NET Framework || net || 針對Windows與Windows Server的.NET Framework版本，通常是以.NET Framework版本戳記為主，並省略小數點。
+* net11 = .NET Framework 1.1
+* net20 = .NET Framework 2.0
+* net35 = .NET Framework 3.5
+* net40 = .NET Framework 4.0
+* net403 = .NET Framework 4.0.3
+* net45 = .NET Framework 4.5
+* net451 = .NET Framework 4.5.1
+* net452 = .NET Framework 4.5.2
+* net46 = .NET Framework 4.6.1
+* net461 = .NET Framework 4.6.1
+|-
+| .NET Core || netcore || 使用於Windows Store App開發的.NET Framework版本。
+* netcore目前對應於netcore45
+* netcore45 = Windows 8
+* netcore451 = Windows 8.1
+|-
+| .NET Micro Framework || netmf || 對[http://netmf.github.io/ .NET Micro Framework]{{Wayback|url=http://netmf.github.io/ |date=20161211005442 }}的支援。
+|-
+| Windows || win || 使用於Windows Store App開發。
+* win 對應於 win8
+* win8 對應於 netcore45
+* win81 對應於 netcore451
+* 但 win10 並沒有對應到 Windows 10
+|-
+| [[Silverlight|Silverlight]] || sl || 對應於Silverlight。
+* sl4 = 4.0
+* sl5 = 5.0
+|-
+| [[Windows_Phone|Windows Phone]] || wp || 對應於Windows Phone平台。 
+* wp對應於wp7 
+* wp7 = Windows Phone 7 
+* wp75 = Windows Phone 7.5 
+* wp8 = Windows Phone 8 
+* wp81 = Windows Phone 8.1
+|-
+| DNX || dnx || 對應於ASP.NET Core for Windows（但可預見的未來可能會被netcore取代）。
+|-
+| DNX Core || dnxcore || 對應於ASP.NET Core for Core CLR（但可預見的未來可能會被netcore取代）。
+|-
+| [[Universal_Windows_Platform|Universal Windows Platform]] || uap || 對應於Windows 10的UWP平台。uap對應於uap10、uap10 = Windows 10。
+|-
+| 已取消的平台 || aspnet50<br />aspnetcore50<br />winrt || 
+|}
+
+== 版本 ==
+
+.NET平台標準使用netstandard來代表一個平台的標準，用戶端直接使用netstandard來獲取平台的功能，目前各平台對應的.NET平台標準有<ref name="netstandard" />：
+
+{| class="wikitable"
+|-
+! 目標平台 !! 1.0 !! 1.1 !! 1.2 !! 1.3 !! 1.4 !! 1.5 !! 1.6 !! 2.0
+|-
+| .NET Core || 1.0 || 1.0 || 1.0 || 1.0 || 1.0 || 1.0 || 1.0 || 2.0
+|-
+| .NET Framework (使用v1之工具時)<ref>{{Cite web |url=https://docs.microsoft.com/en-us/dotnet/articles/standard/library |title=.NET Standard |accessdate=2017-05-11 |archive-date=2017-02-05 |archive-url=https://web.archive.org/web/20170205065016/https://docs.microsoft.com/en-us/dotnet/articles/standard/library |dead-url=no }}</ref>|| 4.5 || 4.5 || 4.5.1 || 4.6 || 4.6.1 || 4.6.2 || vNext|| 4.6.1
+|-
+| .NET Framework (使用v2之工具時)<ref>{{Cite web |url=https://github.com/dotnet/standard/blob/master/docs/versions.md |title=.NET Standard Versions |accessdate=2017-05-11 |archive-date=2017-08-05 |archive-url=https://web.archive.org/web/20170805114632/https://github.com/dotnet/standard/blob/master/docs/versions.md |dead-url=no }}</ref>|| 4.5 || 4.5 || 4.5.1 || 4.6 || 4.6.1 || 4.6.1 || 4.6.1 || 4.6.1
+|-
+| Mono || 4.6 || 4.6 || 4.6 || 4.6 || 4.6 || 4.6 || 4.6 || vNext
+|-
+| Xamarin.iOS || 10.0 || 10.0 || 10.0 || 10.0 || 10.0 || 10.0 || 10.0 || vNext
+|-
+| Xamarin.Android || 7.0 || 7.0 || 7.0 || 7.0 || 7.0 || 7.0 || 7.0 || vNext
+|-
+| Universal Windows Platform || 10.0 || 10.0 || 10.0 || 10.0 || 10.0 || vNext || vNext || vNext
+|-
+| Windows || 8.0 || 8.0 || 8.1 || || || || || 
+|-
+| Windows Phone || 8.1 || 8.1 || 8.1 || || || || || 
+|-
+| Windows Phone Silverlight || 8.0 || || || || || || || 
+|}
+
+.NET平台標準的版本戳記為netstandardx.y，其中x表示主版號y表示副版號，例如netstandard10 = .NET Standard 1.0、netstandard1.5 = .NET Standard 1.5。
+
+== 對應於可攜式的版本 ==
+
+.NET平台標準對應到之前的可攜式類別庫的版本戳記，若用戶端需要特別針對特定的平台版本進行對應時，可以使用import的功能匯入（這是供.NET Core應用程式的功能）。
+
+{| class="wikitable"
+|-
+! 可攜式版本參考 !! .NET平台標準版本
+|-
+| .NET Framework 4.5, Windows 8 ||  1.1
+|-
+| Windows 8.1, Windows Phone Silverlight 8.1 || 1.0
+|-
+| Windows 8.1, Windows Phone 8.1 || 1.2
+|-
+| .NET Framework 4.5.1, Windows 8.1 || 1.2
+|-
+| .NET Framework 4.5, Windows Phone Silverlight 8 || 1.0
+|-
+| .NET Framework 4.5, Windows 8, Windows Phone Silverlight 8 || 1.0
+|-
+| Windows Phone 8.1, Windows Phone Silverlight 8.1 || 1.0
+|-
+| .NET Framework 4.5, Windows 8, Windows Phone 8.1 || 1.1
+|-
+| .NET Framework 4.5.1, Windows 8.1, Windows Phone 8.1 || 1.2
+|-
+| Windows 8.1, Windows Phone 8.1, Windows Phone Silverlight 8.1 || 1.0
+|-
+| .NET Framework 4.5, Windows 8, Windows Phone 8.1, Windows Phone Silverlight 8 || 1.0
+|}
+
+針對Mono以及Xamarin等平台，平台標準的起始為1.4（版本戳記為netstandard1.4）<ref name="targetframeworks" />
+
+== 支援工具 ==
+目前可使用netstandard版本別稱的平台僅有.NET Core以及ASP.NET Core，但未來會擴及其他工具。
+
+下列工具為預定支援 netstadard 版本別稱的工具：
+* Visual Studio 2015（必須加入NuGet擴充套件）。
+* Visual Studio 2013（必須加入NuGet擴充套件）。
+* Visual Studio 2012（必須加入NuGet擴充套件）。
+* NuGet CLI（指令列介面） 3.x
+* NuGet CLI 2.x
+* .NET CLI 
+* Xamarin Studio
+
+== 注釋 ==
+{{ReflistH|1}}
+{{NoteFoot}}
+{{ReflistF}}
+
+== 參考資料 ==
+{{Reflist|1}}
+
+== 外部链接 ==
+*[https://github.com/dotnet/corefx/blob/master/Documentation/architecture/net-platform-standard.md .NET Platform Standard]{{Wayback|url=https://github.com/dotnet/corefx/blob/master/Documentation/architecture/net-platform-standard.md |date=20160519180849 }}
+
+{{-}}
+{{DotNET}}
+{{Microsoft APIs}}
+{{Microsoft}}
+{{視窗元件}}
+
+{{DEFAULTSORT:.NET Platform Standard}}
+[[Category:微軟|Category:微軟]]
+[[Category:.NET|S]]
+[[Category:微軟開發工具|Category:微軟開發工具]]
+[[Category:微軟API|Category:微軟API]]

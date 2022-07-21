@@ -1,0 +1,253 @@
+{{Copy edit|time=2021-10-30T05:50:11+00:00}}
+
+{{NoteTA
+|G1= IT
+}}
+'''線段樹'''（{{lang-en|Segment tree}}）是一種[[二元樹|二元樹]]形資料結構，1977年由Jon Louis Bentley發明<ref name="Schwarzkopf4">{{Harv |de Berg|van Kreveld|Overmars|Schwarzkopf|2000|p=229}}</ref>，用以儲存[[區間|區間]]或[[線段|線段]]，並且允許快速查詢結構內包含某一點的所有區間。
+
+一個包含<math>n</math>個區間的線段樹，空間複雜度為<math>O(n)</math>，查詢的時間複雜度則為<math>O(\log n+k)</math>，其中<math>k</math>是符合條件的區間數量。
+
+此資料結構亦可推廣到高維度。
+
+==結構==
+線段樹是一個平衡的二叉树，它将每个长度不为1的区间划分成左右两个区间递归求解。令整個區間的長度為N，則其有N個葉節點，每個葉節點代表一個單位區間，每個內部結點代表的區間為其兩個兒子代表區間的聯集。这种数据结构可以方便的进行大部分的区间操作。
+
+本處以一維的線段樹為例。
+[[File:Segment_tree.svg|thumb]]
+令S是一維線段的集合。將這些線段的端點坐標由小到大排序，令其為<math>x_1, x_2, \cdots , x_m</math>。我們將被這些端點切分的每一個區間稱為「單位區間」（每個端點所在的位置會單獨成為一個單位區間），從左到右包含：
+
+:<math>(-\infty, x_1), [x_1,x_1], (x_1, x_2), [x_2, x_2], ..., (x_{m-1}, x_m), [x_m, x_m], (x_m, +\infty)</math>
+
+線段樹的結構為一個[[二元樹|二元樹]]，每個節點都代表一個坐標區間，節點N所代表的區間記為Int(N)，則其需符合以下條件：
+*其每一個葉節點，從左到右代表每個單位區間。
+*其內部節點代表的區間是其兩個兒子代表的區間之聯集。
+*每個節點（包含葉子）中有一個儲存線段的資料結構。若一個線段S的坐標區間包含Int(N)但不包含Int(parent(N))，則節點N中會儲存線段S。
+
+== 基本操作 ==
+線段樹所要提供的是查詢一個區間<math>[l,r)</math>內的資訊<math>f([l,r))</math>，並允許修改操作。要使用線段樹，此資訊必須滿足對於區間<math>[l,r)</math>與位於區間內的一點<math>m</math>，<math>f([l,r))</math>要可以由<math>f([l,m))</math>、<math>f([m,r))</math>求得。例如[[範圍最值查詢|範圍最值查詢]]即符合此條件。线段树维护的信息在很多时候可以认为是满足[[幺半群|含幺半群]]的性质的信息。
+
+代码中, rt指的是root, 当前子树的根节点; l, r指的是当前子树所统计的区间<math>[l, r]</math>利用完全二叉堆的性质来保存节点编号, 所以rt << 1是左子树的节点, rt << 1 | 1是右子树的节点在查询和成端更新操作中的L和R是指修改或者查询的区间
+
+=== 节点数据向上更新 ===
+将子节点的值更新到父节点。
+<syntaxhighlight lang=cpp>
+/* 对于区间求和 */
+void push_up(int rt) {
+    tree[rt] = tree[rt << 1] + tree[rt << 1 | 1];
+}
+
+/* 对于区间求最大值 */
+void push_up(int rt) {
+    tree[rt] = max(tree[rt << 1], tree[rt << 1 | 1]);
+}
+</syntaxhighlight>
+
+=== 节点懒惰标记下推 ===
+对于区间求和, 原子数组值需要加上lazy标记乘以子树所统计的区间长度。
+len为父节点统计的区间长度, 则len - (len >> 1)为左子树区间长度, len >> 1为右子树区间长度。
+<syntaxhighlight lang=cpp>
+void push_down(int rt, int len) {
+    tree[rt << 1] += lazy[rt] * (len - (len >> 1));
+    lazy[rt << 1] += lazy[rt];
+    tree[rt << 1 | 1] += lazy[rt] * (len >> 1);
+    lazy[rt << 1 | 1] += lazy[rt];
+    lazy[rt] = 0;
+}
+</syntaxhighlight>
+对于区间求最大值, 子树的值不需要乘以长度, 所以不需要传递参数len。
+<syntaxhighlight lang=cpp>
+void push_down(int rt) {
+    tree[rt << 1] += lazy[rt];
+    lazy[rt << 1] += lazy[rt];
+    tree[rt << 1 | 1] += lazy[rt];
+    lazy[rt << 1 | 1] += lazy[rt];
+    lazy[rt] = 0;
+}
+</syntaxhighlight>
+
+=== 建树 ===
+新建一棵长度N的线段树。
+<syntaxhighlight lang=cpp>
+#define lchild rt << 1, l, m
+#define rchild rt << 1 | 1, m + 1, r
+void build(int rt = 1, int l = 1, int r = N) {
+    if (l == r) { std::cin >> tree[rt]; return; }
+    int m = (l + r) >> 1;
+    build(lchild); build(rchild);
+    push_up(rt);
+}
+</syntaxhighlight>
+
+=== 更新 ===
+单点更新, 不需要用到lazy标记
+<syntaxhighlight lang=cpp>
+#define lchild rt << 1, l, m
+#define rchild rt << 1 | 1, m + 1, r
+void update(int p, int delta, int rt = 1, int l = 1, int r = N) {
+    if (l == r) {
+        tree[rt] += delta;
+        return;
+    }
+    int m = (l + r) >> 1;
+    if (p <= m) update(p, delta, lchild);
+    else update(p, delta, rchild);
+    push_up(rt);
+}
+</syntaxhighlight>
+成段更新, 需要用到lazy标记来提高时间效率。
+如果要求修改区间，把所有包含在区间中的节点都遍历一次、修改一次，时间复杂度太高。所以要有 '''「懒惰标记」'''（lazy标记） 。
+懒惰标记就是通过延迟对节点信息的更改，从而减少不必要的操作次数。每次执行修改时，通过打标记的方法表明该节点对应的区间在某一次操作中被更改，但不更新该节点的子节点的信息，实质性的修改则在下一次访问带有标记的节点时才进行。
+<syntaxhighlight lang=cpp>
+#define lchild rt << 1, l, m
+#define rchild rt << 1 | 1, m + 1, r
+void update(int L, int R, int delta, int rt = 1, int l = 1, int r = N) {
+    if (L <= l && r <= R) {
+        tree[rt] += delta * (r - l + 1);
+        lazy[rt] += delta;
+        return;
+    }
+    if (lazy[rt]) push_down(rt, r - l + 1);
+    int m = (l + r) >> 1;
+    if (L <= m) update(L, R, delta, lchild);
+    if (R > m)  update(L, R, delta, rchild);
+    push_up(rt);
+}
+</syntaxhighlight>
+=== 区间查询 ===
+<syntaxhighlight lang=cpp>
+#define lchild rt << 1, l, m
+#define rchild rt << 1 | 1, m + 1, r
+int query(int L, int R, int rt = 1, int l = 1, int r = N) {
+    if (L <= l && r <= R) return tree[rt];
+    if (lazy[rt]) push_down(rt, r - l + 1);
+    int m = (l + r) >> 1, ret = 0;
+    if (L <= m) ret += query(L, R, lchild);
+    if (R > m)  ret += query(L, R, rchild);
+    return ret;
+}
+</syntaxhighlight>
+== 变种 ==
+[[zkw线段树|zkw线段树]]是一种自底向上的线段树，由[[清华大学|清华大学]]的张昆玮提出。它相对于传统线段树的优势体现在减少了递归操作和增加了位运算等操作以减少常数<ref>{{Cite web |url = http://wenku.baidu.com/link?url=57dSmipYHQx56SfyjgSXf62-gsRw7Fmg3xrMjLzdu12LroANGLvCWPUW1kOSFsVrmqfOK64xvmYw8MtZkUX49O27ZupjnBo7CD72I0L2Ou3 |title = 统计的力量——线段树全接触 |author = 张昆玮}}</ref>。
+
+== 相关链接 ==
+http://dongxicheng.org/structure/segment-tree/
+https://cp-algorithms.com/data_structures/segment_tree.html Segment Tree – CP-Algorithms
+=== 可直接使用的编程模板 ===
+<syntaxhighlight lang="cpp">
+#include <iostream>
+#include <cstdio>
+#include <cmath>
+#include <cstring>
+using namespace std;
+
+namespace SegTree {
+	#define maxn 1000000
+	class SegmentTree {
+		#define lson (o<<1)
+		#define rson (o<<1|1)
+		#define mid ((l+r)>>1)
+		public :
+			int addv[maxn], maxv[maxn], minv[maxn], sumv[maxn];
+			int arr[maxn];
+			int N;
+		private:int _max(const int& _, const int& __) { return _>__?_:__; }
+		private:int _min(const int& _, const int& __) { return _<__?_:__; }
+		public : int pushup(int o) {
+			minv[o] = _min(minv[lson], minv[rson]);
+			maxv[o] = _max(maxv[lson], maxv[rson]);
+			sumv[o] = sumv[lson] + sumv[rson];
+			return 0;
+		}
+		public : int pushdown(int o, int l, int r) {
+			if(addv[o] == 0) return -1;
+			addv[lson] += addv[o]; addv[rson] += addv[o];
+			minv[lson] += addv[o]; minv[rson] += addv[o];
+			maxv[lson] += addv[o]; maxv[rson] += addv[o];
+			sumv[lson] += addv[o] * (mid-l+1); sumv[rson] += addv[o] * (r-mid);
+			addv[o] = 0;
+		}
+		public : int Build(int o, int l, int r) {
+			addv[o] = 0;
+			if(l == r) {
+				maxv[o] = arr[l];minv[o] = arr[l];sumv[o] = arr[l];
+				return 0;
+			}
+			Build(lson, l, mid);
+			Build(rson, mid+1, r);
+			pushup(o);
+			return 0;
+		}
+		public : int optadd(int o, int l, int r, int ql, int qr, int addval) {
+			if(ql > r or qr < l) return 0;
+			if(ql <= l and r <= qr) {
+				addv[o] += addval;
+				sumv[o] += addval * (r-l+1);
+				return 0;
+			}
+			pushdown(o, l, r);
+			optadd(lson, l, mid, ql, qr, addval);
+			optadd(rson, mid+1, r, ql, qr, addval);
+			pushup(o);
+		}
+		public : int query_sum(int o, int l, int r, int ql, int qr) {
+			if(ql > r or qr < l) return 0;
+			if(ql <= l and r <= qr) {
+				return sumv[o];
+			}
+			pushdown(o, l, r);
+			return query_sum(lson, l, mid, ql, qr) + query_sum(rson, mid+1, r, ql, qr);
+		}
+		public : int query_min(int o, int l, int r, int ql, int qr) {
+			if(ql > r or qr < l) return 0;
+			if(ql <= l and r <= qr) {
+				return minv[o];
+			}
+			pushdown(o, l, r);
+			return _min(query_min(lson, l, mid, ql, qr), query_min(rson, mid+1, r, ql, qr));
+		}
+		public : int query_max(int o, int l, int r, int ql, int qr) {
+			if(ql > r or qr < l) return 0;
+			if(ql <= l and r <= qr) {
+				return maxv[o];
+			}
+			pushdown(o, l, r);
+			return _max(query_max(lson, l, mid, ql, qr), query_max(rson, mid+1, r, ql, qr));
+		}
+	};
+} 
+//End of SegmentTree
+using namespace SegTree;
+</syntaxhighlight>
+
+
+==參考資料==
+{{reflist}}
+
+* {{cite book
+ | last1=de Berg
+ | first1=Mark
+ | last2=van Kreveld
+ | first2=Marc
+ | last3=Overmars
+ | first3=Mark
+ | last4=Schwarzkopf
+ | first4=Otfried
+ | publication-date=2000
+ | year=2000
+ | title=Computational Geometry: algorithms and applications
+ | edition=2nd
+ | publisher=Springer-Verlag Berlin Heidelberg New York
+ | isbn=3-540-65620-0
+ | chapter=More Geometric Data Structures
+ | doi=10.1007/978-3-540-77974-2
+ | ref=harv
+ | url-access=registration
+ | url=https://archive.org/details/computationalgeo00berg
+ }}
+* http://www.cs.nthu.edu.tw/~wkhon/ds/ds10/tutorial/tutorial6.pdf {{Wayback|url=http://www.cs.nthu.edu.tw/~wkhon/ds/ds10/tutorial/tutorial6.pdf |date=20101105230058 }}
+
+{{计算机科学中的树}}
+[[Category:数据结构|X]]
+[[Category:树结构|Category:树结构]]
+[[Category:二叉树|Category:二叉树]]
+[[Category:搜索树|Category:搜索树]]

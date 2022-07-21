@@ -1,0 +1,186 @@
+{{noteTA
+| G1 = IT
+|  1 = zh-cn:赋值;zh-tw:指定
+|  2 = zh-cn:赋值语句;zh-tw:指定敘述
+}}
+在[[程序設計|程序設計]]中，'''指定敘述'''（{{lang-en|assignment statement}}）-{zh-cn:，;zh-tw:，又譯'''指定指述'''，}-會將一個特定的[[值_(電腦科學)|值]]設定到某個特定的[[記憶體位址|儲存位址]]去，這個位置被標記成一個特定的[[变量_(程序设计)|變數]]名稱。換句話說，這個敘述會複製一個值到某個特定變數中。在多數的[[指令式編程|指令式]][[程式語言|程式語言]]中，這種敘述是其中最基礎的結構。
+
+指定敘述的通用表示方法通常是 <code>x = expr</code>（這種表示法最早源自1949年–1951年时的{{en-link|Superplan|}}，因為1957年首版的[[Fortran|Fortran]]與[[C語言|C語言]]而廣為人知），另一種形式則為 <code>x := expr</code>（這種形式最早來自[[ALGOL_58|ALGOL 58]]，因為[[Pascal_(程式語言)|Pascal]]而盛行）。在這兩種表示法之外，仍然存在許多其他的形式。
+
+對多數的指令式程式語言來說，指定敘述允許某個特定變數，在其生命週期與作用域之中，可以被指定為不同的值，或是重複被-{指定}-值。
+
+== 语义 ==
+在[[指令式編程|指令式編程]]中，隨著時間改變，不同的值被關聯到某個特定的變數名稱上。[[变量_(程序设计)|變數]]是數值的容器。可以先指派變數為某個值，在之後再用另一個值來加以取代。在這種模型中，程式的運作，是透過每次成功的指定敘述，來改變其狀態。指令式程式語言，倚靠指定敘述來進行[[迭代|迭代]]。在最低的層級中，指定敘述是以[[組合語言|組合語言]]指令，如 <code>MOVE</code> 或 <code>STORE</code>來實作。
+
+以C語言為例，下列的程式碼段落可以作為指定敘述的例子：
+
+<syntaxhighlight lang="c">
+int x = 10; 
+float y;
+x = 23;
+y = 32.4f;
+</syntaxhighlight>
+
+在第一行程式碼中，變數<code>x</code>先被宣告為int型別，之後將數值10指定給它。在第二行，變數<code>y</code>被宣告為float型別，但沒有-{指定}-值。在第三行，變數<code>x</code>被重新指定為數值23。在第四行中，變數<code>y</code>被指定為浮點數值32.4f。
+
+==单赋值==
+{{See also|静态单赋值形式}}
+任何改变现存值的赋值（比如<code>x := x + 1</code>），在[[纯函数式语言|纯函数式语言]]中都是不允许的<ref name="Bruce Tate">[http://www.ibm.com/developerworks/java/library/j-cb07186.html Crossing borders: Explore functional programming with Haskell] {{webarchive |url=https://web.archive.org/web/20101119190821/http://www.ibm.com/developerworks/java/library/j-cb07186.html |date=November 19, 2010 }}, by Bruce Tate</ref>。在现今的[[函数式编程|函数式编程]]中，赋值是被劝阻的，用以支持也叫做“初始化”的单赋值。单赋值是[[名字绑定|名字绑定]]的用例，不同于本文其他部分描述的赋值之处在于，它只能做一次，通常是在变量被创建的时候，不允许后续的重新赋值。
+
+表达式的求值，如果不改变机器的可察见状态<ref name="Mitchell2003">{{cite book |last=Mitchell |first=John C. |authorlink=John C. Mitchell |title=Concepts in programming languages |url=https://books.google.com/books?id=7Uh8XGfJbEIC&pg=PA23|accessdate=3 January 2011 |year=2003 |publisher=Cambridge University Press |isbn=978-0-521-78098-8 |page=23}}</ref>，并且对相同的输入产生相同的值<ref name="Bruce Tate"/>，就没有[[副作用_(计算机科学)|副作用]]。指令式赋值，在销毁旧值并使之不可获得时，在将旧值替代为新值时，就可能介入了副作用<ref name="csci210">{{cite web|url=http://www.seas.gwu.edu/~bell/csci210/lectures/imperative_languages.pdf|title=Imperative Programming Languages (IPL)|author=|date=|website=gwu.edu|accessdate=20 April 2018|archive-date=2021-01-18|archive-url=https://web.archive.org/web/20210118171507/https://www2.seas.gwu.edu/~bell/csci210/lectures/imperative_languages.pdf|dead-url=no}}</ref>；为此在[[LISP|LISP]]和[[函数式编程|函数式编程]]中，这被称为“破坏性”（destructive）赋值，类似于“破坏性更新”。
+
+在纯函数式语言比如[[Haskell|Haskell]]中，单赋值是赋值的唯一形式，这里没有在指令式语言意义上的变量<ref name="Bruce Tate"/>，而是命名的常量值，并具有可能的合成（compoud）本性，即它们的元素"[[惰性求值|在需要时]]"被逐步的定义。[[纯函数式编程|纯函数式编程]]和与之于此共通的[[数据流程编程|数据流程编程]]，由于值之间相互独立，可以提供在[[并行计算|并行计算]]上的优势，它避免了顺序的一时一步执行的[[冯·诺伊曼瓶颈|冯·诺伊曼瓶颈]]<ref name="Mitchell2003.1">{{cite book |author=John C. Mitchell |title=Concepts in programming languages |url=https://books.google.com/books?id=7Uh8XGfJbEIC&pg=PA81|accessdate=3 January 2011 |year=2003 |publisher=Cambridge University Press |isbn=978-0-521-78098-8 |pages=81–82}}</ref>。
+
+非纯函数式语言，同时提供了单赋值和真赋值（尽管相比指令式编程语言而言真赋值典型的较少使用）。例如，在[[Scheme|Scheme]]中，单赋值（通过<code>let</code>），和真赋值（通过<code>set!</code>），二者都可以用于所有变量上，并提供专门的原语（primitive）用于在列表、向量、字符串等之内做破坏性更新。在[[OCaml|OCaml]]中，只有单赋值，通过<code>let ''name'' = ''value''</code>语法，被允许用于变量；而破坏性更新，可通过单独的<code><-</code>算符，用于数组的元素和字符串，还可用于已经被编程者显式声明为[[不可变对象|可变]]（意味着能够在其初始化声明之后被变更）的记录字段和对象。
+
+使用单赋值的[[函数式编程|函数式编程]]语言，包括[[Clojure|Clojure]]（针对数据结构，而非变量）、[[Erlang|Erlang]]（相比Haskell，它接受多次赋值，如果值相等的话）、[[F♯|F#]]、[[Haskell|Haskell]]、{{en-link|Lava (编程语言)|Lava (programming language)|Lava}}、[[OCaml|OCaml]]、[[Oz_(编程语言)|Oz]]（对用数据流变量，而非cell）、[[Racket|Racket]]（对于一些数据结构如列表，而非符号）、[[SASL_(编程语言)|SASL]]、[[Scala|Scala]]（对于变量）、[[SISAL|SISAL]]、[[Standard_ML|Standard ML]]。非[[回溯法|回溯]]的[[Prolog|Prolog]]代码可以被看作“明显的”单赋值，这里明显的含义为，它的（命名）变量可以显式的处在未赋值状态，或只能准确的被设置一次。相反的，在[[Haskell|Haskell]]中，没有未赋值变量，而所有变量可以看作在创建时就被隐式的设定了它的值（更精确的说是设置了计算对象在“[[惰性求值|在需要时]]”产生它的值）。
+
+== 指定語句的回傳值 ==
+在一些編程語言中，指定敘述的整個語句可能會傳回某種型別的一個值，而在其它語言中則不會。
+
+在 C 編程語言中指定語句只會單純返回-{指定}-值，而允許這樣子的片語 <code>x = y = a</code>，其中指定語句 <code>y = a</code> 返回值 <code>a</code>，然後將值指定到 <code>x</code>。在諸如 <code>while ((ch = getchar()) != EOF) {''…''}</code> 的語句中，函數的返回值可用於控制迴圈，同時將相同的值指定給變量 <code>ch</code>。
+
+在其它編程語言中例如 Scheme，指定語句的返回值是未定義的，而且這些片語無效。
+
+在 Haskell 中沒有變量指定；但類似於指定的操作（如分配給數組的字段或可變數據結構的字段）通常以 <code>unit</code>型別為單位進行求值，<code>unit</code> 型別以 <code>()</code>表示。這種型別只有一個可能的值，因此不包含任何信息。它通常是純粹為了副作用而評估的表達型別。
+
+== 赋值的变体形式 ==
+特定使用模式也非常常见，因此经常有支持它们的特殊语法。这些主要是减少源代码冗长的[[语法糖|语法糖]]，但也能辅助代码读者理解编程者的意图，并提供给编译器进行可能的优化的线索。
+
+===增广赋值===
+{{main|{{en-link|增广赋值|Augmented assignment}}}}
+所赋予的值依赖于先前的值是很常见的，很多指令式语言，尤其是[[C语言|C]]及其主要派生者，提供了叫做{{en-link|增广赋值|Augmented assignment}}的特殊算符，比如<code>*=</code>，则<code>a = 2*a</code>可以转而写为<code>a *= 2</code><ref name="Flaig2008">{{cite book |author=Ruediger-Marcus Flaig |title=Bioinformatics programming in Python: a practical course for beginners |url=https://books.google.com/books?id=kS7Dye-dv54C&pg=PA98 |access-date=25 December 2010 |year=2008 |publisher=Wiley-VCH |isbn=978-3-527-32094-3 |pages=98–99 |archive-date=2017-04-19 |archive-url=https://web.archive.org/web/20170419014237/https://books.google.com/books?id=kS7Dye-dv54C&pg=PA98 |dead-url=no }}</ref>。
+
+===链式赋值===
+语句如<code>w = x = y = z</code>叫做“链式赋值”，其中<code>z</code>的被赋给多个变量<code>w</code>、<code>x</code>和<code>y</code>。链式赋值经常用来初始化多个变量，比如<code>a = b = c = d = f = 0</code>。
+
+===并行赋值===
+一些编程语言，比如[[APL语言|APL]]、[[Common_Lisp|Common Lisp]]<ref>{{cite web |title=CLHS: Macro SETF, PSETF |url=http://www.lispworks.com/documentation/HyperSpec/Body/m_setf_.htm#psetf |website=Common Lisp Hyperspec |publisher=LispWorks |accessdate=23 April 2019 |archive-date=2020-11-30 |archive-url=https://web.archive.org/web/20201130224608/http://www.lispworks.com/documentation/HyperSpec/Body/m_setf_.htm#psetf |dead-url=no }}</ref>、[[Go|Go]]<ref>The Go Programming Language Specification: [http://golang.org/ref/spec#Assignments Assignments] {{Wayback|url=http://golang.org/ref/spec#Assignments |date=20210318133416 }}</ref>、[[JavaScript|JavaScript]]（自从1.7）、[[Lua|Lua]]、[[Maple|Maple]]、[[occam#occam_2|occam 2]]<ref name="occam">{{cite book |last= |first= |editor=INMOS Limited |authorlink= |year=1988 |title=Occam 2 Reference Manual |url=https://archive.org/details/occam2referencem0000unse|location=New Jersey |publisher=Prentice Hall |isbn=0-13-629312-3}}</ref>、[[Perl|Perl]]<ref name="perl">{{cite book |last=Wall |first=Larry |authorlink=Larry Wall |author2=Christiansen, Tom |author3=Schwartz, Randal C. |year=1996 |edition=2 |title=Perl Programming Language |location=Cambridge |publisher=O´Reilly |isbn=1-56592-149-6 |url=https://archive.org/details/programmingperl00wall }}</ref>、[[PHP|PHP]]、[[Python|Python]]<ref name="python">{{cite book |last=Lutz |first=Mark |authorlink= |year=2001 |edition=2 |title=Python Programming Language |location=Sebastopol |publisher=O´Reilly |isbn=0-596-00085-5 |url=https://archive.org/details/programmingpytho00lutz }}</ref>、[[REBOL|REBOL]]、[[Ruby|Ruby]]<ref name="ruby">{{cite book |last=Thomas |first=David |authorlink= |author2=Hunt, Andrew |year=2001 |title=Programming Ruby: The Pragmatic Programmer's Guide |location=Upper Saddle River |publisher=Addison Wesley |isbn=0-201-71089-7 |url=https://archive.org/details/programmingruby000thom }}</ref>、[[Windows_PowerShell|Windows PowerShell]]，允许多个变量被并行的赋值，语法如下：
+
+ a, b := 0, 1
+
+它同时赋值<code>0</code>到<code>a</code>和<code>1</code>到<code>b</code>。这经常叫做'''并行'''（parallel）赋值；它是[[CPL_(程式语言)|CPL]]语言于1963年介入的，当时名字叫做'''同时'''（simultaneous）赋值<ref>D.W. Barron ''et al.'', "The main features of CPL", ''Computer Journal'' '''6''':2:140 (1963). [http://comjnl.oxfordjournals.org/cgi/reprint/6/2/134 full text (subscription)] {{Webarchive|url=https://archive.today/20120707200431/http://comjnl.oxfordjournals.org/cgi/reprint/6/2/134 |date=2012-07-07 }}</ref>，有时也叫做'''多'''（multiple）赋值，但这在与'''单'''（single）赋值一起用时会产生混淆，因为它们不是对比的。如果赋值的右手侧是一个单一变量（比如一个数组或结构），这个特征就叫做'''解包'''（unpacking）<ref>{{cite web|url=http://legacy.python.org/dev/peps/pep-3132/|title=PEP 3132 -- Extended Iterable Unpacking|author=|date=|website=legacy.python.org|accessdate=20 April 2018|archive-date=2016-05-13|archive-url=https://web.archive.org/web/20160513235219/http://legacy.python.org/dev/peps/pep-3132/|dead-url=no}}</ref>或'''解构'''（destructuring）赋值<ref>{{cite web|url=https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment|title=Destructuring assignment|author=|date=|website=MDN Web Docs|accessdate=20 April 2018|archive-date=2021-02-10|archive-url=https://web.archive.org/web/20210210170654/https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment|dead-url=no}}</ref>：
+
+ '''var''' list := {0, 1}
+ a, b := list
+
+这个列表将被解包使得赋值<code>0</code>至<code>a</code>和<code>1</code>至<code>b</code>。进一步的：
+
+ a, b := b, a
+
+对换<code>a</code>和<code>b</code>的值。在没有并行赋值的语言中，这必须通过临时变量来书写：
+
+ '''var''' t := a
+ a := b
+ b := t
+
+因为<code>a := b; b := a</code>将把<code>a</code>和<code>b</code>二者都赋值为<code>b</code>最初的值。
+
+一些语言，比如Go和Python，将并行赋值、元组和自动[[:en:b:Python_Programming/Tuples#Packing_and_Unpacking|元组解包]]结合起来，允许从一个单一函数返回多个值，比如如下Python的例子：
+<syntaxhighlight lang=python>
+def f():
+    return 1, 2
+a, b = f()
+</syntaxhighlight>
+
+而其他语言，比如[[C♯|C#]]，要求使用圆括号的显式元组构造和解构，如下面例子这样：
+<syntaxhighlight lang=csharp>
+(a, b) = (b, a);
+
+(string, int) f() => ("foo", 1);
+var (a, b) = f();
+</syntaxhighlight>
+
+这提供了从一个函数返回多个值要使用[[输出参数|输出参数]]的一种替代方式。这最早见于[[CLU|CLU]]语言（1974年），而CLU推动了一般的并行赋值变得流行。
+
+在C和C++中，[[逗号运算符|逗号运算符]]，在允许多个赋值出现在一个单一语句上类似于并行赋值，写<code>a = 1, b = 2</code>替代<code>a, b = 1, 2</code>。这主要用在for循环中，在其他语言比如Go中，被替代为并行赋值<ref>[http://golang.org/doc/effective_go.html Effective Go] {{Wayback|url=http://golang.org/doc/effective_go.html |date=20210209204944 }}: [http://golang.org/doc/effective_go.html#for for] {{Wayback|url=http://golang.org/doc/effective_go.html#for |date=20210209204944 }},
+"Finally, Go has no comma operator and ++ and -- are statements not expressions. Thus if you want to run multiple variables in a for you should use parallel assignment (although that precludes ++ and --)."</ref>。但是上述C++代码不确保完全的同时性，因为代码<code>a = b, b = a+1</code>的右侧项是在左侧项之后运算的。在语言如Python中，<code>a, b = b, a+1</code>将并发的赋值两个变量，使用最初的<code>a</code>的值来计算新<code>b</code>的值.
+
+== 指定與等式符號 ==
+{{see also|關係運算子#與賦值運算子的混淆情況}}
+
+== 標記法 ==
+{{see also|關係運算子#標準關係運算符}}
+複製分配的兩個最常見的表示形式是等號（<code>=</code>）和冒號等於（<code>:=</code>）。這兩種形式都可以在語義上表示賦值語句或賦值運算符（它也具有值），這取決於語言用法。
+
+:{| class="wikitable"
+|-
+| <code>''variable'' = ''expression''</code> || [[Fortran|Fortran]], [[PL/I|PL/I]], [[C语言|C]] (和[[:Category:C語言家族|派生者]]比如[[C++|C++]], [[Java|Java]]等), [[Bourne_shell|Bourne shell]], [[Python|Python]], [[Go|Go]] (赋值预先声明的变量), [[R语言|R]], [[Windows_PowerShell|Windows PowerShell]]等。
+|-
+| <code>''variable'' := ''expression''</code> || [[ALGOL|ALGOL]] (和派生者), [[Simula|Simula]], [[CPL|CPL]], [[BCPL|BCPL]], [[Pascal语言|Pascal]]<ref name=pascal>{{cite book |last=Moore |first=Lawrie |authorlink= |year=1980 |title=Foundations of Programming with Pascal |url=https://archive.org/details/foundationsofpro0000moor |location=New York |publisher=John Wiley & Sons |isbn=0-470-26939-1}}</ref> (和派生者比如[[Modula|Modula]]), {{en-link|Mary (编程语言)|Mary (programming language)|Mary}}, {{en-link|PL/M}}, [[Ada|Ada]], [[Smalltalk|Smalltalk]], [[Eiffel|Eiffel]]<ref name=eiffel1>{{cite book |last=Meyer |first=Bertrand |authorlink=Bertrand Meyer |year=1992 |title=Eiffel the Language |location=Hemel Hempstead |publisher=Prentice Hall International(UK) |isbn=0-13-247925-7}}</ref><ref name=eiffel2>{{cite book |last=Wiener |first=Richard |authorlink= |year=1996 |title=An Object-Oriented Introduction to Computer Science Using Eiffel |location=Upper Saddle River, New Jersey |publisher=Prentice Hall |isbn=0-13-183872-5}}</ref>, [[Oberon|Oberon]], [[Dylan_(编程语言)|Dylan]]<ref name=dylan>{{cite book |last=Feinberg |first=Neal |authorlink= |author2=Keene, Sonya E.|author3= Mathews, Robert O.|author4= Withington, P. Tucker |year=1997 |title=Dylan Programming |location=Massachusetts |publisher=Addison Wesley |isbn=0-201-47976-1}}</ref>, {{en-link|Seed7}}, [[Go|Go]] (声明和定义变量的快捷方式)<ref>{{cite web|url=http://golang.org/ref/spec#Short_variable_declarations|title=The Go Programming Language Specification - The Go Programming Language|author=|date=|website=golang.org|accessdate=20 April 2018|archive-date=2021-03-18|archive-url=https://web.archive.org/web/20210318133416/https://golang.org/ref/spec#Short_variable_declarations|dead-url=no}}</ref>, [[Io_(编程语言)|Io]], [[AMPL|AMPL]], [[ML语言|ML]]<ref name="ml">{{cite book |last=Ullman |first=Jeffrey D. |authorlink= |year=1998 |title=Elements of ML Programming: ML97 Edition |location=Englewood Cliffs, New Jersey |publisher=Prentice Hall |isbn=0-13-790387-1}}</ref>, [[AutoHotkey|AutoHotkey]]等。 
+|-
+|}
+
+其他可能性包括左箭頭或關鍵字，但還有其他更罕見的變體：
+
+:{| class="wikitable"
+|-
+| <code>''variable'' << ''expression''</code> || {{en-link|Magik (编程语言)|Magik (programming language)|Magik}}
+|-
+| <code>''variable'' <- ''expression''</code> || [[F_Sharp|F#]], [[OCaml|OCaml]], [[R语言|R]], [[S语言|S]]
+|-
+| <code>''variable'' <<- ''expression''</code> || [[R语言|R]]
+|-
+| <code> assign("''variable''", ''expression'')</code> || [[R语言|R]]
+|-
+| <code>''variable'' ← ''expression''</code> || [[APL|APL]]<ref name="aplbook">{{cite book |last=Iverson |first=Kenneth E. |authorlink=Kenneth E. Iverson |title=A Programming Language |publisher=John Wiley and Sons |year=1962 |isbn=0-471-43014-5 |url=http://www.softwarepreservation.org/projects/apl/book/APROGRAMMING%20LANGUAGE/view |deadurl=yes |archiveurl=https://web.archive.org/web/20090604091725/http://www.softwarepreservation.org/projects/apl/book/APROGRAMMING%20LANGUAGE/view |archivedate=2009年6月4日 |df= }}</ref>, [[Smalltalk|Smalltalk]]
+|-
+| <code>''variable'' =: ''expression''</code> || [[J语言|J]]
+|-
+| <code>LET ''variable'' = ''expression''</code> || [[BASIC|BASIC]]
+|-
+| <code>let ''variable'' := ''expression''</code> || {{en-link|XQuery}}
+|-
+| <code>set ''variable'' to ''expression''</code> || [[AppleScript|AppleScript]]
+|-
+| <code>set ''variable'' = ''expression''</code> || [[C_shell|C shell]]
+|-
+| <code>Set-Variable ''variable'' ''(expression)''</code> || [[Windows_PowerShell|Windows PowerShell]]
+|-
+| <code>''variable'' : ''expression''</code> || {{en-link|Macsyma}}, [[Maxima|Maxima]], [[Rebol|Rebol]]
+|-
+| <code>var ''variable'' ''expression''</code> || {{en-link|mIRC脚本语言|mIRC scripting language}}
+|-
+| <code>''reference-variable'' :- ''reference-expression''</code> || [[Simula|Simula]]
+|}
+
+數學偽代碼分配通常用左箭頭表示。有些平台將表達式放在左側，變量放在右側：
+
+:{| class="wikitable"
+|-
+| style="padding-right: 1em" | <code>MOVE ''expression'' TO ''variable''</code> || [[COBOL|COBOL]]
+|-
+| style="padding-right: 1em" | <code>''expression'' → ''variable''</code> || [[TI-BASIC|TI-BASIC]], [[卡西欧图形计算器|Casio]] BASIC
+|-
+| style="padding-right: 1em" | <code>''expression'' -> ''variable''</code> || [[BETA_(编程语言)|BETA]], [[R语言|R]]
+|-
+| style="padding-right: 1em" | <code>put ''expression'' into ''variable''</code> || {{en-link|LiveCode}}
+|}
+
+一些面向運算式的語言比如 Lisp 和 Tcl，對所有語句（包括賦值）統一使用前綴（或後綴）語法。
+
+:{| class="wikitable"
+|-
+| style="padding-right: 1em" | <code>(setf ''variable'' ''expression'')</code> || [[Common_Lisp|Common Lisp]]
+|-
+| <code>(set! ''variable'' ''expression'')</code> || [[Scheme|Scheme]]<ref name="scheme">{{cite book |last=Dybvig |first=R. Kent |authorlink= |year=1996 |title=The Scheme Programming Language: ANSI Scheme |url=https://archive.org/details/schemeprogrammin0000dybv_r2k2 |location=New Jersey |publisher=Prentice Hall |isbn=0-13-454646-6}}</ref><ref name="schemeint">{{cite book |last=Smith |first=Jerry D. |authorlink= |year=1988 |title=Introduction to Scheme |url=https://archive.org/details/introductiontosc0000smit |location=New Jersey |publisher=Prentice Hall |isbn=0-13-496712-7}}</ref><ref name="sussman">{{cite book |last=Abelson |first=Harold |authorlink= |author2=Sussman, Gerald Jay|author3= Sussman, Julie |year=1996 |title=Structure and Interpretation of Computer Programs |location=New Jersey |publisher=McGraw-Hill |isbn=0-07-000484-6}}</ref>
+|-
+| <code>set ''variable'' ''expression''</code> || [[Tcl|Tcl]]
+|-
+| style="padding-right: 1em" | <code>''expression'' ''variable'' !</code> || [[Forth|Forth]]
+|}
+
+== 另見 ==
+* [[設定運算子|設定運算子]]
+* {{en-link|算符 (编程)|Operator (programming)}}
+* [[名字绑定|名字绑定]]
+* [[合一|合一]]
+* [[不可变对象|不可变对象]]
+* {{en-link|常量 (计算机编程)|const (computer programming)}}
+
+==註釋==
+{{reflist|2}}
+
+[[Category:程序架构|Category:程序架构]]
+[[Category:编程语言概念|Category:编程语言概念]]
+[[Category:运算符_(编程)|Category:运算符_(编程)]]

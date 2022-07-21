@@ -1,0 +1,115 @@
+'''关机'''，即受控地正常[[開關|断开]]电脑电力。关机后，[[CPU|CPU]]、[[随机存取存储器|RAM]]部件和[[硬盘|硬盘]]等都会失去电力；而一些内部零件仍会维持电源供应，如[[時鐘|时钟]]。
+
+== 实现 ==
+===Windows===
+在[[Microsoft_Windows|Microsoft Windows]]（PC或服务器）通常选择桌面[[开始菜单|开始菜单]]的<tt>关机</tt>键关机，弹出的菜单提供关机，重新启动与[[待机|待机]]等选项。系统还提供了可以在[[壳层|命令行]]窗口执行的<code>shutdown</code>命令。<code>shutdown.exe</code>是一个可以关闭用户本地计算机或网络中另一台计算机的[[命令行界面|命令行界面]]关机程序，位于'''%windir%\System32\shutdown.exe'''。
+
+命令格式<ref>{{cite web|title=shutdown | Microsoft Docs|url=https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/shutdown|accessdate=2018-06-23|date=2017-10-16|archive-date=2020-11-14|archive-url=https://web.archive.org/web/20201114021946/https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/shutdown|dead-url=no}}</ref>：<syntaxhighlight>shutdown [/i | /l | /s | /r | /a | /p | /h | /e] [/f] [/m \\<计算机名>] [/t <XXX>] [/d [p|u:]<XX>:<YY>] [/c "注释"]]</syntaxhighlight>
+{| class="wikitable"
+!参数
+!功能描述
+|-
+| /i
+|显示远程关机对话框。
+若指定该参数，其必须是该命令后的第一个参数。如果指定该参数，其它选项会被忽略。
+|-
+| /l
+|注销用户。默认参数。
+不能与'''/m'''或'''/t'''一起使用。
+|-
+| /s
+|关闭计算机。
+|-
+| /r
+|关闭并重新启动计算机。
+|-
+| /g ''（部分系统支持）''
+|关闭并重新启动计算机。
+系统重新启动后，重新启动所有注册的应用程序。
+|-
+| /a
+|中止系统关闭。只能在超时期间使用。
+|-
+| /p
+|仅关闭本地计算机，无超时与警告。
+可与'''/d'''与'''/f'''选项连用。
+|-
+| /h
+|休眠本地计算机。
+可与'''/f'''一起使用。
+|-
+| /e
+|记录计算机意外关闭的原因。
+|-
+| /f
+|强制正在运行的应用程序关闭，不前台警告用户。
+当为'''/t'''参数指定大于 0 的值时，则默示'''/f'''参数。
+|-
+| /m [\\ ''计算机名'']
+|关闭网络上的计算机时指定目标计算机。
+|-
+| /t xxx
+|设置关闭前的超时为 xxx 秒，不指定该参数时会默认为30。
+如果超时时间大于0，则默示/f参数。
+会在本地控制台上显示警告。
+|-
+| /d [p|u:]xx:yy
+|提供重新启动或关机的原因。
+p 表明重新启动或关闭是计划内的。
+u 表示原因由用户定义。
+注：如果 p 和 u 均未指定，则是计划外重新启动或关闭。
+xx 是主要原因号(小于 256 的正整数)。
+yy 是次要原因号(小于 65536 的正整数)。
+|-
+| /c "''注释"''
+|重新启动或关闭的原因的注释。
+最多允许511个字符。
+|}
+''注：不同操作系统略有变化，可使用<code>shutdown /?</code>获取帮助信息。''
+
+Windows同其他操作系统一样可以禁止特定的用户关闭计算机。在家庭个人电脑中，每个用户都可以关机。但在大型网络的计算机中（比如[[活动目录|活动目录]]），系统管理员可以撤销特定用户的关机权限。现在有很多可以使Windows系统的关机任务自动化的工具。网站「Windows Shutdown」列出了一些可以自动化关机任务的工具。
+
+在Windows中，程序可以通过调用<code>ExitWindowsEx</code>或<code>NtShutdownSystem</code>函数来关闭计算机<ref>{{cite web 
+ |title=NtShutdownSystem 
+ |url=http://undocumented.ntinternals.net/source/usermode/undocumented%20functions/hardware/ntshutdownsystem.html 
+ |accessdate=2015-04-11 
+ |date=2001-02-25 
+ |deadurl=yes 
+ |archiveurl=https://web.archive.org/web/20140902230507/http://undocumented.ntinternals.net/source/usermode/undocumented%20functions/hardware/ntshutdownsystem.html 
+ |archivedate=2014-09-02 
+ }}</ref>。
+===macOS===
+在[[macOS|macOS]]可以在[[苹果菜单|苹果菜单]]中选择「关机…」或按下电源键唤出电源管理对话框后选择「关机」按钮。系统管理员可以用Unix<code>shutdown</code>命令<ref>{{man|8|shutdown|Darwin}}</ref>。按下[Alt]+[Command]+[弹出光驱]按钮也可以关机，但系统不会对用户有任何提示。
+===Unix与Linux===
+在[[Unix|Unix]]和[[Linux|Linux]]中，可以用<code>shutdown</code>命令来关机或重启计算机。只有[[超级用户|超级用户]]才能关机。
+这条命令的常见用法是<code>shutdown -h now</code>，用来立即关闭计算机。另一个常见用法是<code>shutdown -r now</code>，用来重启计算机。还有一种常见用法能让用户指定确切关机时间或延迟关机时间：<code>shutdown -h 20:00</code>会让计算机在8:00PM关机，<code>shutdown -r -t 60</code>会让计算机在这条命令执行的60秒（一分钟）后重启<ref>{{man|8|shutdown|die.net}}</ref>。要取消正在进行的关机，可使用<code>shutdown -c</code>。
+
+== 另见 ==
+* [[啟動程式|啟動程式]]
+* [[休眠_(電腦)|休眠]]
+* [[待机|待机]]
+* [[Ctrl+Alt+Del|Ctrl+Alt+Del]]
+
+== 参考资料 ==
+{{Reflist}}
+
+==扩展阅读==
+* {{Cite web
+ |title = Choices = Headaches
+ |url = http://www.joelonsoftware.com/items/2006/11/21.html
+ |work = Joel on Software
+ |last = Spolsky
+ |first = Joel
+ |authorlink = Joel Spolsky
+ |date = 21 November 2006
+ |accessdate = 25 August 2010
+ |archive-date = 2016-11-23
+ |archive-url = https://web.archive.org/web/20161123021743/http://www.joelonsoftware.com/items/2006/11/21.html
+ |dead-url = no
+ }}
+
+== 外部链接 ==
+* [http://www.shutdown.cc shutdown.cc] {{Wayback|url=http://www.shutdown.cc/ |date=20201022042235 }} – Windows 系统自动、手动关机的一些技巧
+{{Unix命令}}
+{{視窗指令}}
+[[Category:操作系统技术|Category:操作系统技术]]

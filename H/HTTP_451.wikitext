@@ -1,0 +1,106 @@
+{{noteTA
+| G1 = IT
+}}
+{{HTTP}}
+在[[電腦網路|電腦網路]]領域中，'''HTTP 451 因法律原因不可用'''（{{lang-en|HTTP 451 Unavailable For Legal Reasons}}）是一種[[HTTP|HTTP]]協定的錯誤[[HTTP狀態碼|狀態代碼]]，當使用者請求存取某個經政府審核等查核方法後認定不合法的來源時，就會顯示這個錯誤代碼。
+
+该狀態碼定义于<nowiki/>RFC 7725<nowiki/>中，與HTTP协议其他的狀態碼不同。
+
+==  定义 ==
+[[File:HTTP_451_(Chromium).png|thumb]]
+根据定义，HTTP 451錯誤代碼狀態出現，不代表这个地址是否存在，而代表該網頁可能違反[[基於法律違規主張的要求|基於法律違規主張的要求]]。
+
+该响应代码有如下的性质：
+
+* 除非另外指明，否则这个响应代码是可以被[[缓存|缓存]]的。
+* 必须携带一个带有一个Link头部，列出要求封禁该地址的实体URI；且应带有一个"rel"字段，值应为"blocked-by"<ref>{{cite web|title=RFC 7725 - An HTTP Status Code to Report Legal Obstacles|url=https://datatracker.ietf.org/doc/rfc7725/?include_text=1|website=datatracker.ietf.org|accessdate=2017-08-06|language=en|archive-date=2018-09-14|archive-url=https://web.archive.org/web/20180914073916/https://datatracker.ietf.org/doc/rfc7725/?include_text=1|dead-url=no}}</ref>。
+
+== 引入 ==
+本代碼於2013年由提姆·布雷（{{lang|en|Tim Bray}}）正式提出，主要基於[[部落格|部落格]]{{lang|en|Terence Eden}}的文章所提出的非正式提案<ref name="Byrne">{{cite web|url=http://motherboard.vice.com/read/the-http-451-error-code-for-censorship-is-now-an-internet-standard|title=The HTTP 451 Error Code for Censorship Is Now an Internet Standard|last=Byrne|first=Michael|date=2015-12-21|work=[[Vice_(magazine)|Vice]]|accessdate=2015-12-21|archive-date=2015-12-22|archive-url=https://web.archive.org/web/20151222155906/http://motherboard.vice.com/read/the-http-451-error-code-for-censorship-is-now-an-internet-standard|dead-url=no}}</ref>。2015年12月18日，此代碼由{{link-en|國際網路工程研究團隊|Internet Engineering Steering Group}}通過<ref>{{cite web
+|url=https://www.mnot.net/blog/2015/12/18/451
+|title=Why 451?
+|date=2015-12-18
+|access-date=2015-12-20
+|archive-date=2015-12-29
+|archive-url=https://web.archive.org/web/20151229211231/https://www.mnot.net/blog/2015/12/18/451
+|dead-url=no
+}}</ref>。
+
+451这个代码源於1953年的[[反烏托邦|反烏托邦]][[小說|小說]]《[[華氏451度|華氏451度]]》（紙的燃點為華氏451度），在這部小說中，所有書籍是違禁品<ref>{{cite news| url = http://www.guardian.co.uk/books/2012/jun/22/ray-bradbury-internet-error-message-451| title = Call for Ray Bradbury to be honoured with internet error message| last = Flood| first = Alison| date = 2012-06-22| newspaper = [[The_Guardian|The Guardian]]| accessdate = 2012-06-22| archive-date = 2012-06-22| archive-url = https://web.archive.org/web/20120622210836/http://www.guardian.co.uk/books/2012/jun/22/ray-bradbury-internet-error-message-451| dead-url = no}}</ref>。相比较[[HTTP_403|HTTP 403]]或[[HTTP_404|404]]代碼，451可更好描述一种由于法律规定或受权威部门要求而导致的封禁狀態<ref>{{cite web| url  = http://nakedsecurity.sophos.com/2013/08/19/http-error-code-451-unavailable-for-legal-reasons/| title  = HTTP error code 451: "Unavailable For Legal Reasons"| last  = Ducklin| first  = Paul| date  = 2013-08-19| website  = Naked Security| publisher  = [[Sophos|Sophos]]| accessdate  = | archive-date  = 2016-02-20| archive-url  = https://web.archive.org/web/20160220033253/https://nakedsecurity.sophos.com/2013/08/19/http-error-code-451-unavailable-for-legal-reasons/| dead-url  = no}}</ref>。
+
+== 演示示例 ==
+在本章节中，将对于HTTP 451的响应的返回、缓存的设置和Link头部的设置做出范例。
+
+某地一用户以GET方式请求example.org的/index.php路径：
+<syntaxhighlight lang="http">
+GET /index.php HTTP/1.1
+Host: www.example.org
+</syntaxhighlight>
+
+=== 服务器响应 ===
+由于用户所在地的某项法律规定，网站不可以向该地区用户返回这个页面，所以服务器做出回应，设置了有效期为一年的缓存头部，并在Link头部中加入了指定的法律文本[[URL|URL]]“<nowiki>http://www.xxx.gov.tld/law.html</nowiki>”：
+<syntaxhighlight lang="http">
+HTTP/1.1 451 Unavailable For Legal Reasons
+Link: <http://www.xxx.gov.tld>; rel="blocked-by"
+Cache-control: max-age=31536000; public
+Content-Type: text/html; charset=utf-8
+
+<html>
+<head><title>因法律原因不可用</title></head>
+<body>
+<h1>HTTP/1.1 451 因法律原因，本页面不可用</h1>
+<p>根据《某法》第某条之规定，本网站页面对来自某地的访客不可用。</p>
+</body>
+</html>
+</syntaxhighlight>
+
+=== 非服务器实体 ===
+根据RFC文档第3节和第4节，作出回应的服务器不一定是源服务器，也可能是[[ISP|ISP]]或其他实体的服务器向用户返回HTTP 451。该文档第四节进一步说明，回应中的blocked-by对应之头部应链接至'''实际执行此次封锁的实体'''，而不是作出决定的实体。假设某网络主管部门要求这些运营商的防火墙服务器对所有访问某站点特定内容之请求均返回451，则防火墙服务器可以这样回应用户：
+<syntaxhighlight lang="http">
+HTTP/1.1 451 Unavailable For Legal Reasons
+Link: <https://www.isp-firewall.tld/about.html#filtered_by_451>; rel="blocked-by"
+Cache-control: max-age=86400; public
+Content-Type: text/html; charset=utf-8
+
+<html>
+<head><title>因法律原因不可用</title></head>
+<body>
+<h1>HTTP/1.1 451 因法律原因，本页面不可用</h1>
+<p>应有关部门要求，根据相关法律、法规，网页未予显示。</p>
+</body>
+</html>
+</syntaxhighlight>
+
+== 现实案例 ==
+=== Github ===
+{{See also|编程随想|赵家人#相关事件}}
+[[File:HTTP_451_example.png|thumb]]
+
+2016年6月8日，中国网络空间安全协会用英文致信[[GitHub|GitHub]]，称其平台上的开源项目“[[赵家人#相关事件|Zhao]]”诽谤现任[[中国共产党中央委员会总书记|中国共产党中央委员会总书记]][[习近平|习近平]]，要求立刻删除。三天后，GitHub在专门公布各国政府发出的移除要求的版面上，公布了这封信件<ref>{{cite web|title=gov-takedowns: Text of government takedown notices as received. GitHub does not endorse or adopt any assertion contained in the following notices|url=https://github.com/github/gov-takedowns/blob/78775b09e64d85f08547287cab204b48b2491192/China/2016/2016-06-08-programthink-zhao.md|website=Github|publisher=GitHub|date=2017-08-01|accessdate=2017-08-06|archive-date=2019-02-16|archive-url=https://web.archive.org/web/20190216132354/https://github.com/github/gov-takedowns/blob/78775b09e64d85f08547287cab204b48b2491192/China/2016/2016-06-08-programthink-zhao.md|dead-url=no}}</ref>{{需要非第一手来源}}。
+
+据信件所描述，GitHub用户[[编程随想的博客|Programthink]]创建的代码仓库“Zhao”中出现了一篇用户名为“CMB-news”的帐号发布的“問題”（Issue），声称习近平涉及一桩命案<ref>{{cite web|title=習近平有重大殺人嫌疑！ · Issue #38 · programthink/zhao|url=https://github.com/programthink/zhao/issues/38|website=GitHub|language=en|accessdate=2017-08-06|archive-date=2020-03-06|archive-url=https://web.archive.org/web/20200306123011/https://github.com/programthink/zhao/issues/38|dead-url=no}}</ref><ref>{{Cite web|title=China’s fierce censors try a new tactic with GitHub—asking nicely|url=https://qz.com/718465/chinas-fierce-censors-try-a-new-tactic-with-github-asking-nicely/|access-date=2022-03-21|last=Horwitz|first=Josh|work=Quartz|language=en|archive-date=2022-03-26|archive-url=https://web.archive.org/web/20220326091400/https://qz.com/718465/chinas-fierce-censors-try-a-new-tactic-with-github-asking-nicely/}}</ref>，故引发相关部门“强烈关切”。根据GitHub公布的信息显示，这是2014年10月以来，GitHub公布的第6项“删除特定项目要求”，也是第一个来自中国政府相关方请求，此前5项都来自俄罗斯<ref>{{cite web|title=gov-takedowns: Text of government takedown notices as received. GitHub does not endorse or adopt any assertion contained in the following notices|url=https://github.com/github/gov-takedowns/|website=GitHub|publisher=GitHub|accessdate=2017-08-06|date=2017-08-01|archive-date=2017-09-12|archive-url=https://web.archive.org/web/20170912163703/https://github.com/github/gov-takedowns|dead-url=no}}</ref>{{需要非第一手来源}}。
+
+后来，GitHub对于访问该仓库的中国大陆用户返回451代码，并链接向上述投诉信件；但在海外的用户仍能顺利打开。 GitHub给出的原因是“这个项目被中国政府列入黑名单”{{NoteTag|原文：Repository unavailable because of the Chinese Internet Blacklist}}。GitHub称，虽无法认同政府审查，但为让更多人可以正常使用网站服务，他们会在确认有关要求来自政府之后，在指定区域内满足政府的要求，同时会公开来自政府的要求文件<ref>{{cite web|title=開源「趙家人」名單，GitHub激怒中國網安協會首出拳｜端傳媒|url=https://theinitium.com/article/20160628-mainland-githubcensor/|website=端传媒|accessdate=2017-08-06|language=zh-Hant|archive-date=2020-03-27|archive-url=https://web.archive.org/web/20200327032703/https://theinitium.com/article/20160628-mainland-githubcensor/|dead-url=no}}</ref>。
+
+== 参见 ==
+* [[HTTP|HTTP]]
+* [[HTTP狀態碼|HTTP狀態碼]]
+* [[HTTP_403|HTTP 403]]
+* [[HTTP_404|HTTP 404]]
+* [[防火长城|防火长城]]
+* {{link-en|科技解決|Technological fix}}
+
+== 注释 ==
+<references group="註" />
+
+== 參考文獻 ==
+{{Reflist}}
+
+==外部連結==
+* RFC 7725 - HTTP 451的正式RFC文件
+* [http://www.451unavailable.org/ 451unavailable.org]{{Wayback|url=http://www.451unavailable.org/ |date=20160126124104 }} 一个介绍HTTP 451错误代码的网站
+
+[[Category:HTTP|Category:HTTP]]
+[[Category:互联网审查|Category:互联网审查]]
+[[Category:计算机错误|Category:计算机错误]]
+[[Category:网络术语|Category:网络术语]]

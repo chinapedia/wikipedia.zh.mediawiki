@@ -1,0 +1,176 @@
+{{NoteTA
+|G1=IT
+|G2=FL
+}}
+{{primarysources|time=2016-12-30T10:25:36+00:00}}
+{{Infobox OS
+| name = FreeRTOS
+| logo = Logo freeRTOS.png
+| screenshot = 
+| caption = 
+| developer = Real Time Engineers Ltd.
+| family = [[实时操作系统|实时操作系统]]
+| working state = 活躍
+| source model = 可取得原代碼<!-- The benchmarking prohibition puts it outside of the common "open source" definitions. -->
+| kernel type = [[微內核|微內核]]
+| supported platforms = [[ARM架構|ARM]] (ARM7, ARM9, [[ARM_Cortex-M#Cortex-M3|Cortex-M3]], [[ARM_Cortex-M#Cortex-M4|ARM Cortex-M4]], [[ARM_Cortex-A8|Cortex-A]]), [[Atmel_AVR|Atmel AVR]], {{le|AVR32|AVR32}}, {{le|HCS12|HCS12}}, {{le|MicroBlaze|MicroBlaze}}, {{le|Cortus|Cortus}} (APS1, APS3, APS3R, APS5, FPF3, FPS6, FPS8), [[MSP430|MSP430]], [[PIC微控制器|PIC]], [[Renesas|Renesas]] [[H8系列|H8/S]], [[SuperH|SuperH]], RX, [[x86|x86]], [[英特爾8051#8052|8052]], {{le|Coldfire|Freescale ColdFire}}, {{le|V850|V850}}, 78K0R, Fujitsu MB91460 series, Fujitsu MB96340 series, [[Nios_II|Nios II]], Cortex-R4, TMS570, RM4x
+| ui = 
+| latest release version = 202104.00
+| latest release date = {{Release date and age|2021|04|29}}
+| marketing target = [[嵌入式系統|嵌入式設備]]
+| programmed in = 
+| prog_language = 
+| language = 
+| updatemodel = 
+| package manager = 
+| license = [[MIT许可证|MIT许可证]]
+| website = {{URL|https://www.freertos.org/}}
+}}
+
+'''FreeRTOS'''是一個熱門的<ref name="EETimes2012">{{cite web|url=http://www.eetimes.com/electrical-engineers/education-training/webinars/4214387/2011-Embedded-Market-Study|title=2011 Embedded Market Study|publisher=EE Times|archiveurl=https://web.archive.org/web/20120402223224/http://www.eetimes.com/electrical-engineers/education-training/webinars/4214387/2011-Embedded-Market-Study|archivedate=2012-04-02|accessdate=2016-08-12|dead-url=no}}</ref>[[嵌入式裝置|嵌入式裝置]]用[[即時作業系統|即時作業系統]]核心<ref>{{cite web|url=http://www.embedded.com/design/operating-systems/4425751/Comparing-microcontroller-real-time-operating-systems|title=Comparing microcontroller real-time operating systems|date=2013-12-08|quote=A kernel is not an RTOS, but this can be a confusing issue because of the inappropriate naming chosen for some popular kernels, ‘freeRTOS’ for example.|last1=Kolesnki|first1=Sergey|accessdate=2016-08-12|archive-date=2016-08-20|archive-url=https://web.archive.org/web/20160820034701/http://www.embedded.com/design/operating-systems/4425751/Comparing-microcontroller-real-time-operating-systems|dead-url=no}}</ref><ref>{{cite web|url=http://www.freertos.org/about-RTOS.html|title=Why RTOS and What Is RTOS?|accessdate=29 August 2014|quote=What is FreeRTOS? … The size constraints, and dedicated end application nature, rarely warrant the use of a full RTOS implementation - or indeed make the use of a full RTOS implementation possible. FreeRTOS therefore provides the core real time scheduling functionality, inter-task communication, timing and synchronisation primitives only. This means it is more accurately described as a real time kernel, or real time executive. …|archive-date=2016-08-07|archive-url=https://web.archive.org/web/20160807172124/http://www.freertos.org/about-RTOS.html|dead-url=no}}</ref>，它于2003年由Richard Barry设计，并已被經成功移植到35種不同的[[微控制器|微控制器]]上<ref name="Official Website">{{cite web|url=http://www.freertos.org|title=Official Website|accessdate=2016-08-12|archive-date=2016-08-15|archive-url=https://web.archive.org/web/20160815221433/http://www.freertos.org/|dead-url=no}}</ref>。FreeRTOS採用[[MIT许可证|MIT许可证]]授權。
+
+== 實作 ==
+FreeRTOS的設計小巧且簡易，整個核心程式碼只有3到4個C檔案，為了讓程式碼容易閱讀、移植和維護，大部分的程式碼都是以[[C語言|C語言]]編寫，只有一些函式（多數是架構特定排班副程式）採用[[組合語言|組合語言]]編寫。
+
+FreeRTOS提供許多方法以實現多[[线程|线程]]（threads）、多[[作業_(電腦)|作業]]（task）、[[互斥鎖|互斥鎖]]（mutex）、[[信號標|號誌]]（semaphore）和[[軟體計時器|軟體計時器]]（software timer），有個為低耗電應用程式提供的[[无嘀嗒内核|无嘀嗒]]（tick-less）模式，執行緒的優先權管理也有支援，此外，FreeRTOS提供了四種記憶體配置的模式：
+* 僅配置（allocate only）
+* 以非常簡易但快速的演算法進行配置與釋放
+* 搭配{{le|記憶體合併|Coalescing (computer science)}}，以較複雜但快速的演算法進行配置與釋放
+* 搭配互斥保護，以 C 函式庫配置進行配置與釋放
+FreeRTOS中沒有一些像[[Linux|Linux]]、[[Microsoft_Windows|Microsoft Windows]]等典型作業系統具有的先進特徵，例如{{le|裝置驅動程式|device drivers}}、先進[[記憶體管理|記憶體管理]]機制、使用者管理和網路管理，FreeRTOS著重在執行的簡潔與速度，FreeRTOS有時會被視為是一個『執行緒函式庫』而非『作業系統』，儘管可以找到[[命令列介面|命令列介面]]和類似[[POSIX|POSIX]] I/O 介面的插件。
+
+FreeRTOS實作了多執行緒，主程式會在規律的短時間區間內呼叫一個執行緒時計方法，這個方法會以[[循環制|循環制]]依照任務的優先順序進行任務切換，一般來說，這個短時間區間介於 1/1000 秒與 1/100 秒之間，透過一個硬體時計中斷來計時，但這個區間經常隨著特定的應用而改變。
+
+從FreeRTOS官網（[http://www.freertos.org/ FreeRTOS.org]{{Wayback|url=http://www.freertos.org/ |date=20160815221433 }}）所下載到的程式碼包含準備用來移植或編譯的設定檔和演示程式碼，讓使用者可以快速地進行應用程式設計。
+
+== 主要特色 ==
+* 記憶體足跡非常小，低{{le|負擔 (計算)|Overhead (computing)|負擔}}（overhead）且執行非常快速
+* 提供低電耗應用程式無計時選項
+* 對作業系統新手而言，很適合作為入門教材，對於專業開發者來說則適合用於商業產品開發
+* [[排程器|排程器]]可以設定成[[抢占式多任务处理|可搶先]]（preemptive）或{{le|协作式多任务处理|Cooperative multitasking|共同運作}}（cooperative operation）
+* 提供[[协程|共用副程式]]（coroutine），在FreeRTOS中，共用副程式是一個記憶體[[呼叫堆疊|堆疊]]用量非常有限但非常簡易輕巧的[[作業_(電腦)|任務]]
+* 支援使用（generic [http://www.freertos.org/index.html?http://www.freertos.org/rtos-trace-macros.html trace macros]{{Wayback|url=http://www.freertos.org/index.html?http%3A%2F%2Fwww.freertos.org%2Frtos-trace-macros.html |date=20200802115843 }}. ）
+
+== 支援平台 ==
+{{Div col||15em}}
+*[[Altera|Altera]] [[Nios_II|Nios II]]
+*[[ARM_architecture|ARM architecture]]
+**[[ARM7|ARM7]]
+**[[ARM9|ARM9]]
+**[[ARM_Cortex-M|ARM Cortex-M]]
+** [[ARM_Cortex-A8|ARM Cortex-A]]
+*[[Atmel|Atmel]]
+**[[Atmel_AVR|Atmel AVR]]
+**{{le|AVR32|AVR32}}
+**SAM3
+**SAM4
+**SAM7
+**SAM9
+**SAM D20
+**SAM L21
+*{{le|Cortus|Cortus}}
+**APS1
+**APS3
+**APS3R
+**APS5
+**FPS6
+**FPS8
+*{{le|Cypress半導體|Cypress Semiconductor|Cypress}}
+** [[PSoC|PSoC]]
+*{{le|Energy micro|Energy Micro}}
+** {{le|EFM32|EFM32}}
+*[[Fujitsu|Fujitsu]]
+**FM3 series
+**MB91460 series
+**MB96340
+*[[Freescale|Freescale]]
+**{{le|Coldfire|Freescale ColdFire}} V1
+**Coldfire V2
+**{{le|HCS12|Freescale 68HC12}}
+**Kinetis
+*[[IBM|IBM]]
+** {{le|PowerPC_400|PowerPC 400|PPC405}},PPC404
+*[[Infineon|Infineon]]
+** {{le|TriCore|Infineon TriCore}}
+** {{le|Infineon XMC|Infineon XMC|Infineon XMC4000}}
+*[[Intel|Intel]]
+**[[x86|x86]]
+**[[英特爾8051#8052|8052]]
+*[[PIC微控制器|PIC微控制器]]
+**PIC18
+**PIC24
+**dsPIC
+**PIC32
+*{{le|Microsemi|Microsemi}}
+** {{le|SmartFusion|Actel SmartFusion}}
+*{{le|Multiclet|Multiclet}}
+** Multiclet P1
+*[[NXP|NXP]]（{{le|NXP LPC|NXP LPC}}）
+** LPC1000
+** LPC2000
+** LPC4300
+*[[Renesas|Renesas]]
+**78K0R
+**RL78
+**[[H8系列|H8/S]]
+**RX600
+**RX200
+**[[SuperH|SuperH]]
+**{{le|V850|V850}}
+* [[STMicroelectronics|STMicroelectronics]]
+** [[STM32|STM32]]
+** STR7
+*[[德州儀器|Texas Instruments]]
+** [[MSP430|MSP430]]
+** Stellaris
+** {{le|Hercules處理器|Hercules (processors)|Hercules}}（TMS570LS04 & RM42）
+*[[Xilinx|Xilinx]]
+**{{le|MicroBlaze|MicroBlaze}}
+**[[Xilinx#Zynq|Zynq-7000]]
+{{Div col end}}
+
+==相關系統==
+===SafeRTOS===
+SafeRTOS的功能和FreeRTOS類似，但是是為實現[[安全關鍵系統|安全關鍵系統]]所設計。FreeRTOS的機能模型經過完全的[[危害與可操作性分析|HAZOP]]，其機能模型及API因為使用者誤用或是硬體失效造成的弱點都已經識別且修正。最後的需求經過完整[[IEC_61508|IEC 61508]] SIL 3開發生命週期來實現，也是只有軟體的元件可以達到的最高等級。
+
+SafeRTOS是由WITTENSTEIN high integrity systems開發，原開發者 Real Time Engineers Ltd
+為其合作夥伴<ref name=FreeRTOS >{{cite web |url= http://www.freertos.org/ |title= FreeRTOS |accessdate= 8 Aug 2012 |archive-date= 2016-08-15 |archive-url= https://web.archive.org/web/20160815221433/http://www.freertos.org/ |dead-url= no }}</ref>。SafeRTOS和FreeRTOS有相同的排程演算法，相似的[[API|API]]，其他方面也相當類似<ref name=SmartBotPaper>{{cite web |url=http://www.ece.stevens-tech.edu/~ymeng/publications/IROS08_SMARbot_meng.pdf |title=SmartBotPaper |accessdate=8 Aug 2012 |deadurl=yes |archiveurl=https://web.archive.org/web/20120704013911/http://www.ece.stevens-tech.edu/~ymeng/publications/IROS08_SMARbot_meng.pdf |archivedate=2012-07-04 }}</ref>，不過是因為不同的目標而設計的<ref name="freertos_a">{{Cite web |url=http://www.freertos.org/FreeRTOS-Plus/Safety_Critical_Certified/SafeRTOS.shtml |title=Relationship between FreeRTOS and SAFE'''RTOS''' |accessdate=2016-08-12 |archive-date=2016-08-19 |archive-url=https://web.archive.org/web/20160819163807/http://www.freertos.org/FreeRTOS-Plus/Safety_Critical_Certified/SafeRTOS.shtml |dead-url=no }}</ref>。SafeRTOS只用C語言進行開發，以符合IEC61508的認證需求<ref name=EETimesSafetyCritical >{{cite web |url= http://www.eetimes.com/design/embedded/4007228/How-to-verify-your-compiler-for-use-in-IEC-61508-safety-critical-applications |title= EETimesSafetyCritical |accessdate= 8 Aug 2012 |archive-date= 2011-04-30 |archive-url= https://web.archive.org/web/20110430114841/http://www.eetimes.com/design/embedded/4007228/How-to-verify-your-compiler-for-use-in-IEC-61508-safety-critical-applications |dead-url= no }}</ref>。
+
+在作業系統中，SafeRTOS有其獨特的地方，是只需要放在微處理器中的[[唯讀記憶體|唯讀記憶體]]（ROM）即可，因此可以進行IEC61508或是其他安全或是可靠度相關的完整軟體及硬體預認證<ref name= EmbeddedSystemsDesign >{{cite web  |url= http://www.nxtbook.com/nxtbooks/cmp/esd-europe0607/index.php?startpage=32  |title= Embedded Systems Design Europe  |accessdate= 2012-08-10  |archive-date= 2012-10-23  |archive-url= https://web.archive.org/web/20121023125706/http://www.nxtbook.com/nxtbooks/cmp/esd-europe0607/index.php?startpage=32  |dead-url= no  }}</ref>。若是放在唯讀記憶體中，SafeRTOS代碼只能依照原始的組態來執行，因此用這套作業系統的設備的認證測試，不需在安全認證中重新測試其開發的程式<ref name= TexasInstruments >{{cite web
+|url= http://www.ti.com/lit/wp/spry180/spry180.pdf
+|title= Texas Instruments
+|accessdate= 2012-09-10
+|archive-url= https://web.archive.org/web/20130704175730/http://www.ti.com/lit/wp/spry180/spry180.pdf
+|archive-date= 2013-07-04
+|dead-url= yes
+}}</ref>。
+
+德州儀器會針對其TI Stellaris系列的部份MCU的ROM裡加上SafeRTOS<ref name="TI Stellaris Product range">{{Cite web |url=http://www.ti.com/lsds/ti/microcontroller/arm_stellaris/overview.page |title=TI Stellaris Product range |accessdate=2016-12-30 |archive-date=2013-01-04 |archive-url=https://web.archive.org/web/20130104015346/http://www.ti.com/lsds/ti/microcontroller/arm_stellaris/overview.page |dead-url=no }}</ref>，因此客戶可以將SafeRTOS用在商業應用中，而不用採購其原代碼。在這種使用方式下，會提供一個簡單的C語言標頭檔將SafeRTOS的API函式對映於其在ROM中對應位置內。這種將SafeRTOS放在唯讀記憶體的作法相當理想，因為其中的程式不會被修改，去除了使用者的錯誤，也確保在專案開發過程中，SafeRTOS部份的程式都和認證時的相同。<!--It will not need re-testing as the application code grows and evolves around it. The burden of complex kernel testing is removed as the already certified and approved certification evidence, including the test plan, code and results, can be purchased "off the shelf".-->
+
+=== OpenRTOS ===
+OpenRTOS也是和FreeRTOS有關的專案，其代碼和FreeRTOS完全相同，但是其授權及收費方式不同。OpenRTOS是由WITTENSTEIN Aerospace and Simulation Ltd提供的軟體，其授權要求移除了所有參考[[GNU通用公共许可证|GNU通用公共许可证]]的內容<!--For example: one of the conditions of using FreeRTOS in a commercial product is that the user is made aware of the use of FreeRTOS and the source code of FreeRTOS, but not the commercial product's application code, must be provided upon request.-->。OpenRTOS是商業軟體，需購買後才能使用，也沒有上述的授權要求，購買OpenRTOS的客戶也可以獲得完整的技術支援<ref>{{Cite web |url=http://www.openrtos.com/openrtos/ |title=OpenRTOS |accessdate=2016-08-12 |archive-date=2014-10-28 |archive-url=https://web.archive.org/web/20141028062044/http://www.openrtos.com/openrtos/ |dead-url=yes }}</ref>。
+
+== 参见 ==
+{{Portal|Free software}}
+* [[嵌入式操作系统|嵌入式操作系统]]
+
+== 参考资料 ==
+{{Reflist|25em}}
+
+== 外部链接 ==
+{{commons category}}
+* [http://www.freertos.org/ Official website]{{Wayback|url=http://www.freertos.org/ |date=20160815221433 }}
+*[https://web.archive.org/web/20141028062044/http://www.openrtos.com/openrtos/ OPENRTOS]
+*[http://www.freertos.org/FreeRTOS-Plus/Safety_Critical_Certified/SafeRTOS.shtml SAFERTOS]{{Wayback|url=http://www.freertos.org/FreeRTOS-Plus/Safety_Critical_Certified/SafeRTOS.shtml |date=20160819163807 }}
+*[http://www.percepio.se FreeRTOS+Trace]{{Wayback|url=http://www.percepio.se/ |date=20120505135524 }}
+*[http://www.FreeRTOS.org/FreeRTOS-Plus FreeRTOS ecosystem products]{{Wayback|url=http://www.freertos.org/FreeRTOS-Plus |date=20160819155601 }}
+* [http://wiki.csie.ncku.edu.tw/embedded/freertos 成功大學 FreeRTOS]{{Wayback|url=http://wiki.csie.ncku.edu.tw/embedded/freertos |date=20160814133350 }}
+
+{{实时操作系统}}
+
+[[Category:ARM操作系统|Category:ARM操作系统]]
+[[Category:嵌入式操作系统|Category:嵌入式操作系统]]
+[[Category:自由作業系統|Category:自由作業系統]]
+[[Category:微內核|Category:微內核]]
+[[Category:实时操作系统|Category:实时操作系统]]
+[[Category:Amazon_Web_Services|Category:Amazon Web Services]]

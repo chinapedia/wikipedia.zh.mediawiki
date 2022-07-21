@@ -1,0 +1,36 @@
+{{NoteTA
+|G1=IT
+}}
+{{校对翻译}}
+'''NAT64'''是一种通过[[网络地址转换|网络地址转换]]（NAT）的形式促成[[IPv6|IPv6]]与[[IPv4|IPv4]]主机间通信的[[IPv6过渡机制|IPv6过渡机制]]。NAT64网关是IPv4与IPv6协议间的[[转换_(BDSM)|转换器]]，<ref name="rfc6052">RFC 6052, ''IPv6 Addressing of IPv4/IPv6 Translators'', IETF Standards Track, C.Bao et al.</ref>它需要至少一个IPv4地址和一个包含32位地址空间的IPv6网段。为该服务保留的“知名前缀”是'''64:ff9b::/96'''。
+
+IPv6客户端将希望与之通信的IPv4地址嵌入在IPv6网段的主机部分，构成一个''嵌入IPv4的IPv6地址''（IPv6网段中的32位地址空间），并将数据包发往生成的地址。NAT64网关则创建IPv6与IPv4地址间的映射，这可以是手动配置的，也可以是自动确定的。<ref name="RFC6146">RFC 6146 Stateful NAT64: Network Address and Protocol Translation from IPv6 Clients to IPv4 Servers</ref>
+
+== 工作原理 ==
+[[File:NAT64_1.svg|右]]
+简单的NAT64安装可能只需要一个网关，它的两个接口分别连接到IPv4网络与IPv6网络。IPv6网络的流量经由网关路由，网关对两个网络之间传输的数据包进行所有必要的转换。但是，这种转换并不是对称的，<ref name="AMavrin-Nat64">{{Cite web|url=http://blog.apteriks.com/2012/12/08/ipv6-nat64-power-and-limitations/|title=NAT64 power and limitations|accessdate=6 January 2014|last=Mavrin|first=Alex|work=Blog article|archive-url=https://web.archive.org/web/20140108194726/http://blog.apteriks.com/2012/12/08/ipv6-nat64-power-and-limitations/|archive-date=2014-01-08|dead-url=yes}}</ref>因为[[IP地址#IPv6位址|IPv6地址]]空间比[[IPv4|IPv4地址]]空间大得多，因此就不可能进行一对一的地址映射。网关维护IPv6到IPv4的地址映射，而该映射可以在来自IPv6网络的第一个数据包到达NAT64网关时依据手动配置创建（有状态映射），也可使用自动算法创建（无状态映射）。
+
+如果NAT64转换器是用在仅有IPv4的服务器之前，使其能被远端仅有IPv6的客户端访问，则比较适合使用无状态转换；而有状态转换则适合部署在客户端或服务提供端，使得仅有IPv6的客户端主机能联系到远端仅有IPv4的节点。
+
+通常来说，NAT64被设计为在IPv6主机发起通信时使用。但也存在一些机制允许反向场景，例如静态地址映射。{{Citation needed|date=November 2013}}
+
+不是每种类型的资源都能用NAT64访问。嵌入IPv4文字地址的协议（例如[[会话发起协议|SIP]]和[[会话描述协议|SDP]]、[[文件传输协议|FTP]]、[[WebSocket|WebSocket]]、[[Skype|Skype]]、MSN等）和嵌入任何其他包括IPv4文字内容的协议都不被支持，但双栈[[代理服务器|网页代理]]允许仅有IPv6的客户端访问URL中包括IPv4文字的网页。不过，使用NAT64的[[IPv6转换机制|464XLAT]]（见 RFC 6877）允许在仅有IPv6的连接上使用此类协议。对于SIP和FTP来说，使用[[應用層閘道|應用層閘道]]（ALG）或者支持 RFC 7225 定义的PREFIX64扩展的{{tsl|en|Port Control Protocol|端口控制协议}}也可以解决这个问题。
+
+== 实现 ==
+* [http://ecdysis.viagenie.ca/ Ecdysis]{{Wayback|url=http://ecdysis.viagenie.ca/ |date=20201027093546 }}，NAT64网关，包含DNS64
+* [http://www.litech.org/tayga TAYGA]{{Wayback|url=http://www.litech.org/tayga |date=20201109005900 }}，无状态NAT64实现，面向Linux
+* [https://www.jool.mx/ Jool]{{Wayback|url=https://www.jool.mx/ |date=20141128081553 }}，有状态NAT64实现，面向Linux，{{tsl|en|NIC Mexico}}与[[蒙特雷科技大学|蒙特雷科技大学]]开发
+* [[OpenBSD|OpenBSD]] 5.1带来一个NAT64能力的{{tsl|en|PF (firewall)|PF (防火墙)|PF防火墙过滤器}}<ref>{{cite web|url=http://www.viagenie.ca/pipermail/ecdysis-discuss/2011-October/000173.html|title=[Ecdysis-discuss] NAT64 in OpenBSD|accessdate=2014-01-31|date=|publisher=Viagenie.ca|deadurl=yes|archiveurl=https://web.archive.org/web/20130527142933/http://www.viagenie.ca/pipermail/ecdysis-discuss/2011-October/000173.html|archivedate=2013-05-27}}</ref>
+* {{tsl|en|Microsoft Forefront Unified Access Gateway|Microsoft Forefront统一接入网关}}，一个实现DNS64和NAT64的反向代理和VPN解决方案
+* [http://www.cisco.com/en/US/docs/ios/ios_xe/ipaddr/configuration/guide/iad_stateless_nat64_xe.html 无状态网络地址转换64]{{Wayback|url=http://www.cisco.com/en/US/docs/ios/ios_xe/ipaddr/configuration/guide/iad_stateless_nat64_xe.html |date=20140206083207 }}于Cisco ASR 1000
+* [http://kb.juniper.net/InfoCenter/index?page=content&id=TN123 Stateful NAT64 feature]{{Wayback|url=http://kb.juniper.net/InfoCenter/index?page=content&id=TN123 |date=20170104162413 }}在Juniper MX系列3D通用边缘路由器
+* [http://www.cisco.com/ Cisco]{{Wayback|url=http://www.cisco.com/ |date=20170922105028 }} ASA版本9.0带来了NAT64和DNS64 <ref>{{cite web|url=http://www.cisco.com/en/US/docs/security/asa/asa90/release/notes/asarn90.html|title=Release Notes for the Cisco ASA Series, 9.0(x) [Cisco ASA 5500-X Series Next-Generation Firewalls] - Cisco Systems|accessdate=2014-01-31|author=Worldwide|date=|publisher=Cisco.com|archive-date=2014-01-12|archive-url=https://web.archive.org/web/20140112021233/http://www.cisco.com/en/US/docs/security/asa/asa90/release/notes/asarn90.html|dead-url=no}}</ref>
+* [http://www.fortinet.com/press_releases/110308.html Dual stack architecture that recognizes both IPv4 and IPv6 traffic]{{Wayback|url=http://www.fortinet.com/press_releases/110308.html |date=20130127161400 }}在Fortinet FortiGate®多威胁安全设备
+
+== 参考资料 ==
+{{Reflist|30em}}
+
+{{IPv6}}
+
+[[Category:IPv6过渡技术|Category:IPv6过渡技术]]
+[[Category:路由软件|Category:路由软件]]

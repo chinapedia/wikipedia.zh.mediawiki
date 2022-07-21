@@ -1,0 +1,180 @@
+[[密码学|密码学]]中，'''零知識證明'''（{{lang-en|zero-knowledge proof}}）或'''零知識協議'''（{{lang|en|zero-knowledge protocol}}）是一方（證明者）向另一方（檢驗者）證明某命題的方法，特點是過程中除「該命題為真」之事外，不泄露任何資訊。因此，可理解成「零洩密證明」。<ref>{{cite journal | url = https://www.cw.com.tw/article/5092794 |author = 林之晨| title = 區塊鏈的「零知識證明」是什麼東西？|journal = 天下雜誌 |volume = 660| date = 2018-11-05}}</ref>例如，欲向人證明自己擁有某情報，則直接公開該情報即可，但如此則會將該細節亦一併泄露；零知識證明的精粹在於，如何證明自己擁有該情報而不必透露情報內容。這也是零知識證明的難點。<ref name=":0" />
+
+若該命題的證明，需要知悉某秘密方能作出，則檢驗者單憑目睹證明，而未獲悉該秘密，仍無法向第三方證明該命題（即單單轉述不足以證明）。待證的命題中，必定包含證明者宣稱自己知道該秘密，但過程中不能傳達該秘密本身。否則，協議完結時，已給予檢驗者有關命題的額外的資訊。此類「知識的零知識證明」是零知識證明的特例，其中待證命題僅有「證明者知道某事」。
+
+交互式零知識證明中，需要各方互動，靠通訊過程證明某方具備某知識，而另一方檢驗該證明是否成立。<ref name=":0">{{cite web|url=https://www.expressvpn.com/blog/zero-knowledge-proofs-explained/|title=What is a zero-knowledge proof and why is it useful?|date=16 November 2017|access-date=2021-11-17|archive-date=2019-06-07|archive-url=https://web.archive.org/web/20190607213824/https://www.expressvpn.com/blog/zero-knowledge-proofs-explained/|dead-url=no}}</ref>
+
+也有某種{{le|非交互式零知識證明|non-interactive zero-knowledge proof}}<ref name="noninteractive">{{cite book |first1=Manuel |last1=Blum |first2=Paul |last2=Feldman |first3=Silvio |last3=Micali |title=Non-Interactive Zero-Knowledge and Its Applications |journal=Proceedings of the Twentieth Annual ACM Symposium on Theory of Computing (STOC 1988) |pages=103–112 |year=1988 |doi=10.1145/62212.62222 |url=http://www.dtic.mil/cgi-bin/GetTRDoc?AD=ADA222698 |isbn=978-0897912648 |s2cid=7282320 }}</ref><ref name=noninteractive2>{{cite journal|last1=Wu|first1=Huixin|last2=Wang|first2=Feng|title=A Survey of Noninteractive Zero Knowledge Proof System and Its Applications|journal=The Scientific World Journal|date=2014|volume=2014|pages=560484|doi=10.1155/2014/560484|pmid=24883407|pmc=4032740}}</ref>，但證明之所以成立，依賴計算假設（典型假設是理想的[[密碼雜湊函數|密碼雜湊函數]]）。
+== 生活範例 ==
+{{multiple image
+| align     = right
+| direction = vertical
+| header    = 
+| width     = 150
+| image1    = Zkip alibaba1.png
+| caption1  = 山洞中，小靜隨機選擇A路或B路，阿嚴則在洞外等候
+| image2    = Zkip alibaba2.png
+| caption2  = 阿嚴選一個出口
+| image3    = Zkip alibaba3.png
+| caption3  = 小靜準確出現在阿嚴所選的出口出現
+}}
+<!-- === 阿里巴巴洞 === -->
+以下有一個熟知的故事，總結零知識證明的若干重要概念。故事最早由{{link-en|Jean-Jacques Quisquater}}及同事發表於{{單雙書名號轉換|如何向貴子弟解釋零知識協議}}。<ref>{{cite book |first1=Jean-Jacques |last1=Quisquater |first2=Louis C. |last2=Guillou |first3=Thomas A. |last3=Berson |title=How to Explain Zero-Knowledge Protocols to Your Children |journal=Advances in Cryptology – CRYPTO '89: Proceedings |volume=435 |pages=628–631 |year=1990 |url=http://www.cs.wisc.edu/~mkowalcz/628.pdf |doi=10.1007/0-387-34805-0_60 |series=Lecture Notes in Computer Science |isbn=978-0-387-97317-3 }}</ref>設有小靜（證明者）和阿嚴（驗證者）兩人。{{註|英文文獻中，常稱零知識協議中的證明者為{{lang|en|Peggy}}（取{{lang|en|prover}}的首字母）、驗證者{{lang|en|Victor}}（{{lang|en|verifier}}的首字母），見[[愛麗絲與鮑伯|愛麗絲與鮑伯]]。本文採用的譯名一方面取粵語<!--諸位若想添加地區詞轉換請自便-->諧音，另一方面取證明者對所知秘密守口如瓶、驗證者嚴厲質證之意。}}
+
+故事中，小靜發現洞穴中某扇魔法門的開門暗號。洞穴呈環形，入口在一側，對側則有魔法門隔斷。阿嚴想知小靜是否已知該暗號，但小靜很注重隱私，不希望泄露暗號予阿嚴，也不想全世界知道她有暗號之事。
+
+兩人分別將入口左右兩條通道標示為A路、B路。首先，阿嚴在洞口外，待小靜進入洞內。小靜自行選擇行A路或B路，但阿嚴不准窺視小靜所選為何。然後，阿嚴行入洞穴，[[離散型均勻分佈|均勻隨機]]喊出A路或B路，表明希望小靜由該方向返回。假若小靜確實知道暗號，則很易達成，因為即使起初所選不是同一條路，她也可以開門通過，從另一條路返回。
+
+然而，若她其實不知道暗號，則祗有一半概率能從阿嚴所選的方向返回，因為阿嚴隨機選A路和B路，恰有一半機會選中起初小靜進入的方向。若兩人重複以上過程，比如連續20次，則小靜靠運氣全部碰巧從正確方向返回的概率，將會很小（約一百萬分之一）。
+
+所以，若小靜連續多次從阿嚴所選的方向返回，則阿嚴可以推斷，小靜很可能知道暗號。
+
+以下考慮第三方的觀點。即使假設阿嚴佩戴隱蔽的鏡頭，錄影所見的整個過程，鏡頭所見亦只有阿嚴喊「A！」小靜從A路返回；或阿嚴喊「B！」小靜從B路返回。此種片段極易由兩人共謀偽造（祗需小靜與阿嚴事前商討多次驗證中阿嚴將選該串A、B的次序），從而對第三方而言，不具說服力，即阿嚴無法藉此向第三方證明小靜知道暗號。事實上，即使錄影換成現場在阿嚴身旁監視亦同，因為兩人可能一早已協調綵排好。
+
+但是，若阿嚴在鏡頭前擲硬幣，然後按該硬幣喊A或B，則協議不再零知識。該段錄影可能足以說服第三方，兩人無法偽造，因為阿嚴難以準確擲出預定的AB次序。於是，雖然證明過程沒有泄露暗號予阿嚴，但是阿嚴可藉此說服世人，證明小靜知道暗號，與小靜起初的意欲完全相反。不過，數碼的密碼學中，「擲硬幣」以[[伪随机数生成器|伪随机数生成器]]實作，類似於一枚結果已預定好的硬幣，但該結果（由其{{le|随机种子|Random seed}}決定）僅有硬幣主人知道。若阿嚴的硬幣實際是以此法運作，則協議又回復為零知識協議，因為兩人又有可能共同偽造「實驗」結果，所以使用偽隨機數生成器與擲真硬幣不同，前者不會向世人泄露小靜知道暗號。
+
+還有另一種做法，小靜以獨一次實驗已可向阿嚴證明自己知道暗號，而不泄漏。方法是，兩人一同走入洞口，然後阿嚴目送小靜沿A路走，沒有原路折返，但從B路返回。如此，小靜必然已向阿嚴證明自己知道暗號，而沒有告知阿嚴暗號。不過此種證明亦非零知識：若第三方觀察到過程，或阿嚴有錄影，則該證明對第三方具說服力。換言之，小靜無法宣稱自己與阿嚴串通，所以無法向第三方說該證明無效。如此，小靜無法控制何人得知她擁有暗號之事。
+
+<!--英文此處有另兩例
+=== 色盲朋友與紅綠球 ===
+=== 威利在哪裏？===
+但與阿里巴巴洞相比似乎失色
+-->
+== 定義 ==
+零知識證明要具備下列三種性質：
+
+;[[完備性|完備]]（{{lang|en|complete}}）:若所要證之事為真，則誠實（意即依協議行事）的證明者能說服誠實驗證者。
+;[[可靠性定理|健全]]（{{lang|en|sound}}）:若命題為假，則作弊證明者僅得極小機會能說服誠實驗證者該事為真。
+;零知識（{{lang|en|zero-knowledge}}）: 若命題為真，則驗證者除此之外，過程中沒有得悉任何其他資訊。換言之，僅知命題為真（而不知祕密本身）已足以「想像」出一個交互的情境，其中證明者的確知道該秘密。此性質能嚴格定義為：每個驗證者皆有相應的模擬器，輸入欲證事實時，無需求助於證明者，已可輸出一套通訊謄本，看似誠實驗證者與證明者的通訊記錄。
+
+前兩種性質，更廣義的[[交互式證明系統|交互式證明系統]]亦應具備。第三種性質使該交互證明稱為零知識。
+
+零知識證明不算[[數學證明|數學證明]]，因為尚允許有很少（但非零）概率，令作弊證明者能向驗證者「證明」假命題。該概率稱為可靠度誤差（{{lang|en|soundness error}}）。換言之，零知識證明是概率「證明」，而非決定性。不過，也有技巧將可靠度誤差壓到忽略不計。
+
+零知識的嚴格定義，需要抽象[[計算模型_(數學)|計算模型]]，如常見的[[图灵机|图灵机]]。設<math>P</math>、<math>V</math>、<math>S</math>為三部圖靈機。某語言<math>L</math>的[[交互式证明系统|交互式证明系统]]{{註|即欲證事實為某字串<math>x \in L</math>。}}<math>(P, V)</math>為'''零知識'''，意思是對任意[[PP_(複雜度)|概率多項式時間]]（{{lang|en|PPT}}）驗證者<math>\widehat{V}</math>，皆有PPT模擬器<math>S</math>使得：
+
+: <math>\forall x \in L, z \in \{0, 1\}^{*}, \operatorname{View}_{\widehat V} \left[P(x) \leftrightarrow \widehat V(x, z)\right] = S(x, z)</math>
+
+其中<math> \operatorname{View}_{\widehat V} \left[P(x) \leftrightarrow \widehat V(x, z)\right]</math>是<math>P(x)</math>與<math>\widehat V(x, z)</math>間交互的全記錄。證明者<math>P</math>通常假設具無限計算能力（實踐上，常為[[機率圖靈機|機率圖靈機]]）。直觀理解，某交互證明系<math>(P, V)</math>為零知識，即對任意驗證者<math>\widehat{V}</math>，皆存在某高效模擬器<math>S</math>（視乎<math>\widehat V</math>而定），給定任何輸入，可以重現<math>P</math>與<math>\widehat{V}</math>間的對話。定義中的輔助串<math>z</math>，是用作放置任何「前備知識」（包括預知<math>\widehat V</math>運行時擲得的硬幣結果）。定義推出，<math>\widehat{V}</math>不能利用預知串<math>z</math>從與<math>P</math>的對話中發掘出資訊，因為若給予<math>S</math>該串，則也同樣可以重現<math>\widehat{V}</math>與<math>P</math>間的對話。
+
+以上為完美零知識的定義。若將定義中，驗證者<math>\widehat{V}</math>的視角（{{lang|en|view}}）與模擬相等之要求，改為僅要求{{link-en|計算不可辨|computational indistinguishability|計算上無法分辨}}，則得到'''計算零知識'''的定義。
+
+== 計算範例 ==
+
+=== 離散對數 ===
+
+前段概念適用於較實際的密碼學場景。設小靜欲向阿嚴證明，自己知道某[[群論|群]]某指定元素的[[离散对数|离散对数]]。<ref>{{cite book |first1=David |last1=Chaum |first2=Jan-Hendrik |last2=Evertse |first3=Jeroen |last3=van de Graaf |title=An Improved Protocol for Demonstrating Possession of Discrete Logarithms and Some Generalizations |journal=Advances in Cryptology – EuroCrypt '87: Proceedings |volume=304 |pages=127–141 |year=1987 |doi=10.1007/3-540-39118-5_13 |series=Lecture Notes in Computer Science |isbn=978-3-540-19102-5 }}</ref>
+
+例如，給定數<math>y</math>、[[质数|质数]]<math>p</math>、[[群的生成集合|生成元]]<math>g</math>，小靜希望證明自己知道某數<math>x</math>使<math>g^x \bmod{p} = y</math>，而不泄漏<math>x</math>。事實上，知曉<math>x</math>之事，本身可用作身份證明，即小靜可藉此證明該<math>y</math>值是由她先暗中選某隨機值<math>x</math>，再計算<math>y = g^x \bmod{p}</math>，公諸所有潛在的驗證者。如此，若某人證明自己知道<math>x</math>，則相當於證明自己即小靜，因為學者相信離散對數很難計算，即其他人無法從<math>y</math>倒推出<math>x</math>值。
+
+證明協議如下：每輪，小靜預備隨機數<math>r</math>，計算<math>C = g^r \bmod{p}</math>，將該值傳予阿嚴。收到<math>C</math>後，阿嚴隨機請求下列兩者之一：小靜公開<math>r</math>值，或<math>(x + r) \bmod{(p - 1)}</math>值。單獨看任何一個值，其分佈皆是均勻隨機，所以協議每輪皆不泄露任何機密。
+
+阿嚴可以驗證所得回應。若問<math>r</math>，則可以計算<math>g^r \bmod{p}</math>，檢查是否等於<math>C</math>。若問<math>(x + r) \bmod{(p - 1)}</math>，則可以計算<math>g^{(x + r) \bmod{(p - 1)}} \bmod{p}</math>，而該值應當等於<math>C \cdot y \bmod{p}</math>，所以亦驗證<math>C</math>值是否滿足該條件。若小靜確實知道<math>x</math>值，理應很易回答阿嚴的任一條問題。
+
+若小靜預知阿嚴採用何種盤問，則很易作弊，在不知<math>x</math>的情況下，向阿嚴假裝自己知道<math>x</math>：若她知道阿嚴將要問<math>r</math>，則如常繼續，選<math>r</math>，計算<math>C = g^r \bmod{p}</math>，告知阿嚴<math>C</math>值；她可以答出<math>r</math>值。另一方面，若她知道阿嚴將問<math>(x + r) \bmod{(p - 1)}</math>，則取隨機一個<math>r'</math>值，計算<math>C' = g^{r'} \cdot \left(g^x\right)^{-1} \bmod{p}</math>，然後發送<math>C'</math>值予阿嚴（阿嚴會以為該值為<math>C</math>值）。當阿嚴要求公開<math>(x + r) \bmod{(p - 1)}</math>值時，小靜公開<math>r'</math>，但這足以讓阿嚴驗證結果，因為他計算的值實為<math>g^{r'} \bmod{p}</math>，是等於<math>C' \cdot y</math>，因為<math>C'</math>正是小靜一早乘上<math>y</math>的[[模反元素|逆元]]而計出。
+
+然而，若有某輪驗證中，阿嚴的問題與小靜預估的有出入，則小靜無法計算出要答的結果（假定該群的離散對數問題難解）。若她揀選<math>r</math>並公開<math>C = g^r \bmod{p}</math>，則無法作弊給出服眾的<math>(x + r) \bmod{(p - 1)}</math>值來通過阿嚴的檢查，因為不知道<math>x</math>。又若她揀選<math>r'</math>值，偽裝成<math>(x + r) \bmod{(p - 1)}</math>，則要回答公開值的離散對數，但她無法回答，因為該值是由已知值乘出，而非某已知值以<math>g</math>為底的冪，所以她不能計出其離散對數
+
+所以，作弊的證明者僅得<math>1/2</math>概率通過某輪驗證。重複足夠多輪，成功作弊的概率可壓到任意小。
+
+==== 撮要 ====
+
+小靜要證知道<math>x</math>值（如其密碼）。
+
+#小靜與阿嚴約定某質數<math>p</math>，及[[有限域|域]]<math>\mathbb Z /p\mathbb Z</math>的乘法生成元<math>g</math>。
+#小靜計算<math>y = g^x \bmod{p}</math>，傳送予阿嚴。
+#重複以下步驟若干次：
+##小靜選某個[[離散型均勻分佈|均勻隨機]]數<math>r\in U[0, p-2]</math>，計算<math>C = g^r \bmod{p}</math>，傳送<math>C </math>予阿嚴。
+##阿嚴問小靜<math>(x + r) \bmod{(p-1)}</math>或<math> r </math>，二選其一。若問前者，則阿嚴驗證<math>(C \cdot y) \bmod{p}\equiv g^{(x + r) \bmod{(p - 1)}} \bmod{p} </math>。若問後者，則他驗證<math> C \equiv g^{r} \bmod{p}</math>。
+
+<math>(x + r) \bmod (p-1)</math>之值，可視為<math>x \bmod (p-1)</math>的加密。若<math>r</math>確為隨機，在<math>0</math>至<math>(p-2)</math>間均勻分佈，則<math>(x + r) \bmod{(p-1)}</math>也同樣均勻分佈，所以不會泄漏任何關於<math>x</math>的資訊（見[[一次性密碼本|一次性密碼本]]）。
+
+=== 大圖的哈密頓環 ===
+下列方案是[[曼紐爾·布盧姆|曼紐爾·布盧姆]]提出。<ref name="blum86">{{cite journal |first=Manuel |last=Blum |title=How to Prove a Theorem So No One Else Can Claim It |journal=ICM Proceedings |pages=1444–1451 |year=1986 |citeseerx=10.1.1.469.9048 }}</ref>
+
+此場境中，小靜知道某大[[圖_(數學)|圖]]<math>G</math>的[[哈密頓環|哈密頓環]]。阿嚴知道<math>G</math>但不知該環（比如說小靜將該圖列印給阿嚴）。一般相信，找大圖的哈密頓環，在計算上並不可行，因為相應的決定問題已證為[[NP完全|NP完全]]。小靜欲證自己知道該環，但不想泄漏出去，原因可能是阿嚴打算向小靜買，但付款前希望先驗證小靜知道；也可能是全世界衹得小靜知道該環，所以小靜向阿嚴證明此事，是為向阿嚴核實自己身份。
+
+小靜為證明自己知道哈密頓環，與阿嚴作若干輪驗證。每輪中：
+
+* 一開始，小靜預備圖<math>H</math>，是與<math>G</math>[[图同构|同構]]（即<math>H</math>與<math>G</math>一樣，但頂點的標籤不同）。若小靜知道<math>G</math>的哈密頓環，則因為<math>H</math>與<math>G</math>間的同構由她揀選，她很易找到<math>H</math>中對應的哈密頓環。
+* 小靜秘諾<math>H</math>。此處可選任意密碼學{{link-en|秘諾機制|commitment scheme|秘諾機制}}，甚或直接將<math>H</math>的頂點編號，然後對<math>H</math>的每條邊，將兩端編號寫在小紙片上，反轉蓋在枱面。總之，秘諾目的是使小靜此後無法竄改<math>H</math>，但同時不讓阿嚴提早知道<math>H</math>的資訊。
+* 阿嚴隨機問小靜以下兩事之一：給出<math>H</math>與<math>G</math>間的同構（見{{le|圖同構問題|graph isomorphism problem}}）；或給出<math>H</math>的哈密頓環。
+* 若問兩圖的同構，則小靜先展示<math>H</math>（將枱面全部紙翻開），並給出<math>G</math>頂點與<math>H</math>頂點的對應表。阿嚴可以驗證該對應關係是否滿足圖同構的條件。
+* 若問哈密頓環，則小靜衹翻開在<math>H</math>的哈密頓環上的紙片。如此，阿嚴已可驗證<math>H</math>有哈頓頓環。
+
+秘諾一步必須使阿嚴在第二種情況能驗證該環確實由<math>H</math>的邊構成。一種做法是，逐條邊分別秘諾。
+
+==== 完備 ====
+若小靜確知<math>G</math>中的哈密頓環，則阿嚴詢問同構時，她很易回答（該同構為她所選），而阿嚴問<math>H</math>中的哈密頓環時，她同樣很易回答（<math>G</math>有哈密頓環，<math>G</math>與<math>H</math>間的同構為所她選，所以可以找到<math>H</math>中對應的環）。
+
+==== 健全 ====
+若小靜不知哈密頓環，則衹能預先猜測阿嚴會問何種問題，相應準備某個與<math>G</math>同構的圖，或另一個不相關的哈密頓圖。然而，因為她不知<math>G</math>的哈密頓環，所以無法同時做兩件事。於是，若以上驗證重複<math>n</math>次，則小靜蒙混過關的概率僅得<math>2^{-n}</math>，從而實際意義上，衹需合理多輪驗證，已使造假者寸步難行。
+
+==== 零知識 ====
+小靜的回答不泄漏原圖<math>G</math>的哈密頓環，因為每一輪，阿嚴衹會得悉<math>H</math>與<math>G</math>的同構，或是<math>H</math>的哈密頓環，兩者之一，但他需要對同一個<math>H</math>同時得知兩者，纔能構造出<math>G</math>中的哈密頓環。如此，衹要小靜每輪預備一幅不同的圖<math>H</math>，就能保密。若小靜不知<math>G</math>的哈密頓環，但不知為何已事前得知阿嚴每輪會問的問題，則她可以作弊。例如，若小靜預知阿嚴該輪會問<math>H</math>的哈密頓圖，則大可以祕諾一幅與<math>G</math>無關的哈密頓圖。與之類似，若小靜預知阿嚴會問同構表，則她可以隨便預備一幅與<math>G</math>同構的圖<math>H</math>（其中她不知道任何哈密頓圖）。阿嚴根本無需小靜在場，亦可獨自想像出自己將見的場面，因為他清楚自己將會問甚麼，將見的僅是一個環（而不顯示圖的其他部分）或一幅與<math>G</math>同構的圖，即阿嚴可以自行模擬該協議。因此，阿嚴從每一輪驗證揭露之事，無法得到任何關於<math>G</math>哈密頓環的資訊。
+
+== 零知識條件的變式 ==
+「零知識」的定義有若干變形，分別在於如何嚴謹定義模擬結果「看似」真實的交互記錄：
+
+;完美零知識（{{lang|en|perfect zero-knowledge}}）: 模擬器與真正交互產生的概率分佈完全相等。[[#離散對數|離散對數範例]]即屬此類。
+;統計零知識（{{lang|en|statistical zero-knowledge}}）: 兩個分佈並非完全相等，但{{link-en|統計上接近|statistically close|統計上接近}}，即有某個[[可忽略函數|可忽略函數]]，使該兩列分佈{{註|對不同輸入規模（安全參數），各有模擬器與真正交互此兩個分佈。}}在任意集合取值的概率差，皆小於該函數。<ref>{{cite journal|last1=Sahai|first1=Amit|last2=Vadhan|first2=Salil|title=A complete problem for statistical zero knowledge|journal=Journal of the ACM|date=1 March 2003|volume=50|issue=2|pages=196–249|doi=10.1145/636865.636868|url=http://dash.harvard.edu/bitstream/handle/1/4728406/Vadhan_StatZeroKnow.pdf?sequence=2 |archive-url=https://web.archive.org/web/20150625193124/http://dash.harvard.edu/bitstream/handle/1/4728406/Vadhan_StatZeroKnow.pdf?sequence=2 |archive-date=2015-06-25 |url-status=live|citeseerx=10.1.1.4.3957|s2cid=218593855}}</ref>
+;計算零知識（{{lang|en|computational zero-knowledge}}）:無高效算法分辨兩個分佈。
+
+<!--英文修目Zero knowledge types節部分併入參見，已於內文出現者則自參見刪除-->
+== 應用 ==
+=== 身份驗證 ===
+零知識證明的研究，是受[[身份驗證|身份驗證]]系統啟發。驗證時，一方要向另一方證明自己身份，通常藉賴證明自己持有某種袐密（如通行密碼），但不希望對方知悉該袐密，稱為'''零知識{{le|知識證明|proof of knowledge}}'''。不過，通行密碼一般不是太短，就是不夠隨機，不能用於許多零知識知識證明方案。{{le|零知識通行碼證明|zero-knowledge password proof}}就是有考量密碼長度限制的一類零知識知識證明。{{cn|date=2021-06}}
+
+2015年4月，Sigma協議（「其中之一」證明，{{lang-en|one-out-of-many proofs}}）面世。<ref name=":1" />2021年8月，美國網絡基建、安全公司[[Cloudflare|Cloudflare]]採用該種證明機制，以{{校對翻譯句|<!--原文作vendor hardware-->供應方硬件}}為私人網絡提供驗證服務。<ref>{{Cite web|date=2021-08-12|title=Introducing Zero-Knowledge Proofs for Private Web attestation with Cross/Multi-Vendor Hardware|url=https://blog.cloudflare.com/introducing-zero-knowledge-proofs-for-private-web-attestation-with-cross-multi-vendor-hardware/|access-date=2021-08-18|website=The Cloudflare Blog|language=en|archive-date=2021-12-13|archive-url=https://web.archive.org/web/20211213142236/https://blog.cloudflare.com/introducing-zero-knowledge-proofs-for-private-web-attestation-with-cross-multi-vendor-hardware/|dead-url=no}}</ref>
+
+=== 道德行為 ===
+密碼學協議之中使用零知識證明，可以在不退讓隱私的情況下，確保各方誠實。粗略言之，方法是迫用戶零知識地證明，其所作所為是依足協議。<ref name="knowledgecomplexity">{{Citation | last1=Goldwasser | first1=S. | last2=Micali | first2=S. | last3=Rackoff | first3=C. | title=The knowledge complexity of interactive proof systems | url=http://people.csail.mit.edu/silvio/Selected%20Scientific%20Papers/Proof%20Systems/The_Knowledge_Complexity_Of_Interactive_Proof_Systems.pdf | doi=10.1137/0218012 | year=1989 | journal=SIAM Journal on Computing | issn=1095-7111 | volume=18 | issue=1 | pages=186–208 | accessdate=2021-11-21 | archive-date=2021-10-21 | archive-url=https://web.archive.org/web/20211021134330/https://people.csail.mit.edu/silvio/Selected%20Scientific%20Papers/Proof%20Systems/The_Knowledge_Complexity_Of_Interactive_Proof_Systems.pdf | dead-url=no }}</ref><ref>{{Cite journal|last=Abascal|first=Jackson|last2=Faghihi Sereshgi|first2=Mohammad Hossein|last3=Hazay|first3=Carmit|last4=Ishai|first4=Yuval|last5=Venkitasubramaniam|first5=Muthuramakrishnan|date=2020-10-30|title=Is the Classical GMW Paradigm Practical? The Case of Non-Interactive Actively Secure 2PC|url=https://doi.org/10.1145/3372297.3423366|journal=Proceedings of the 2020 ACM SIGSAC Conference on Computer and Communications Security|series=CCS '20|location=Virtual Event, USA|publisher=Association for Computing Machinery|pages=1591–1605|doi=10.1145/3372297.3423366|isbn=978-1-4503-7089-9}}</ref>由健全性，用戶必先確實跟從協議，纔能服眾。又由於證明是零知識，此過程並無犠牲用戶的隱私。
+
+=== 核裁軍 ===
+2016年，普林斯頓電漿物理實際室與普林斯頓大學展示一個技巧，或許適用於未來的核裁軍談判。其特點是，無需揭露某物件內部的機密構造，亦可允許督查員判斷該物件是否核武器。<ref>{{cite web|url=https://research.princeton.edu/news/pppl-and-princeton-demonstrate-novel-technique-may-have-applicability-future-nuclear|title=PPPL and Princeton demonstrate novel technique that may have applicability to future nuclear disarmament talks - Princeton Plasma Physics Lab|website=www.pppl.gov|access-date=2022-03-22|archive-date=2021-09-21|archive-url=https://web.archive.org/web/20210921132438/https://www.pppl.gov/news/2016/09/pppl-and-princeton-demonstrate-novel-technique-may-have-applicability-future-nuclear|dead-url=no}}</ref>
+
+=== 區塊鏈 ===
+零知識證明用於{{link-en|小零幣協議|Zerocoin protocol|小零幣}}與大零幣協議中，最終於2016年發展成{{link-en|小零幣|Zcoin}}<ref name="Hellwig 2020"/>（2020年改稱{{le|飛熔幣|Firo (cryptocurrency)}}）<ref>{{cite web |last1=Hurst |first1=Samantha |title=Zcoin Announces Rebranding to New Name & Ticker "Firo" |url=https://www.crowdfundinsider.com/2020/10/168504-zcoin-announces-rebranding-to-new-name-ticker-firo/ |publisher=Crowdfund Insider |access-date=4 November 2020 |archive-url=https://web.archive.org/web/20201101141745/https://www.crowdfundinsider.com/2020/10/168504-zcoin-announces-rebranding-to-new-name-ticker-firo/ |archive-date=30 October 2020}}</ref>和[[Zcash|大零幣]]兩種[[加密貨幣|加密貨幣]]。小零幣內置有[[加密貨幣混幣器|混幣]]模型，以確保匿名，且該模型無需信任任何對等用戶或中央集權混幣者。<ref name="Hellwig 2020"/>用戶可以用另一種基準幣交易，也可以將該幣賣出買入小零幣。<ref>{{cite journal|last1=Bonneau|first1=J|last2=Miller|first2=A|last3=Clark|first3=J|last4=Narayanan|first4=A|date=2015|title=SoK: Research Perspectives and Challenges for Bitcoin and Cryptocurrencies|url=https://ieeexplore.ieee.org/document/7163021|journal=2015 IEEE Symposium on Security and Privacy|location=San Jose, Carlifornia|pages=104–121|access-date=2021-11-21|archive-date=2022-02-10|archive-url=https://web.archive.org/web/20220210120938/https://ieeexplore.ieee.org/document/7163021|dead-url=no}}</ref>{{rp|118}}大零幣協議的模型也類似（該變式稱為{{link-en|非交互式零知識證明|Non-interactive zero-knowledge proof}}）<ref>{{cite web|last1=Ben-Sasson|first1=Eli|last2=Chiesa|first2=Alessandro|last3=Garman|first3=Christina|last4=Green|first4=Matthew|last5=Miers|first5=Ian|last6=Tromer|first6=Eran|last7=Virza|first7=Madars|title=Zerocash: Decentralized Anonymous Payments from Bitcoin|url=http://zerocash-project.org/media/pdf/zerocash-extended-20140518.pdf|publisher=IEEE|access-date=26 January 2016|date=18 May 2014|archive-date=2022-02-08|archive-url=https://web.archive.org/web/20220208224145/http://zerocash-project.org/media/pdf/zerocash-extended-20140518.pdf|dead-url=no}}</ref>，而且可以掩蓋交易額，但小零幣則不能。大零幣的交易數據如此隱密，所以與小零幣相比，較不易受到隱私{{le|計時攻擊|Timing attack}}。不過，此層額外隱私，可能導致不能追蹤假幣，倘因此造成大零幣供給的超通漲，可能無法偵測到。<ref name="Hellwig 2020">{{cite book |last1=Hellwig |first1=Daniel |last2=Karlic |first2=Goran |last3=Huchzermeier |first3=Arnd |title=Build your own blockchain - A practical guide to distributed ledger technology |date=3 May 2020 |publisher=SpringerLink |isbn=9783030401429 |page=112 |url=https://link.springer.com/chapter/10.1007/978-3-030-40142-9_5 |access-date=3 December 2020 |chapter=Privacy and Anonymity |doi=10.1007/978-3-030-40142-9_5 |archive-date=2021-11-21 |archive-url=https://web.archive.org/web/20211121183527/https://link.springer.com/chapter/10.1007/978-3-030-40142-9_5 |dead-url=no }}</ref><ref>{{Cite news|url=https://www.technologyreview.com/s/609448/a-mind-bending-cryptographic-trick-promises-to-take-blockchains-mainstream|title=A mind-bending cryptographic trick promises to take blockchains mainstream|last=Orcutt|first=Mike|work=MIT Technology Review|access-date=2017-12-18|language=en|archive-date=2019-08-15|archive-url=https://web.archive.org/web/20190815193321/https://www.technologyreview.com/s/609448/a-mind-bending-cryptographic-trick-promises-to-take-blockchains-mainstream/|dead-url=no}}</ref>
+
+2018年，防彈證明（{{lang|en|bulletproofs}}）面世。其改進自非交互式零知識證明，不再需要可信的安裝環境。<ref>{{cite journal |last1=Bünz |first1=B |last2=Bootle |first2=D |last3=Boneh |first3=A |title=Bulletproofs: Short Proofs for Confidential Transactions and More |journal=IEEE Symposium on Security and Privacy |date=2018 |pages=315–334 |doi=10.1109/SP.2018.00020 |url=https://ieeexplore.ieee.org/document/8418611 |access-date=3 December 2020 |location=San Francisco, Carlifornia |isbn=978-1-5386-4353-2 |s2cid=3337741 |doi-access=free |archive-date=2022-01-21 |archive-url=https://web.archive.org/web/20220121103156/https://ieeexplore.ieee.org/document/8418611/ |dead-url=no }}</ref>其後，實作成「結舌」協議（{{lang|en|Mimblewimble protocol}}，{{lang|en|Grin}}和{{lang|en|Beam}}兩種加密幣皆出自該協議）和[[门罗币|门罗币]]。<ref>{{cite web |last1=Odendaal |first1=Hansie |last2=Sharrock |first2=Cayle |last3=Heerden |first3=SW |title=Bulletproofs and Mimblewimble |url=https://tlu.tarilabs.com/cryptography/bulletproofs-and-mimblewimble/MainReport.html#current-and-past-efforts |publisher=Tari Labs University |access-date=3 December 2020 |archive-url=https://web.archive.org/web/20200929160834/https://tlu.tarilabs.com/cryptography/bulletproofs-and-mimblewimble/MainReport.html |archive-date=29 September 2020}}</ref>2019年，飛熔幣實作{{link-en|知識證明|Proof of knowledge|Sigma協議}}，是對應小零幣協議無可信環境的改進。<ref>{{cite news |last1=Andrew |first1=Munro |title=Zcoin cryptocurrency introduces zero knowledge proofs with no trusted set-up |url=https://www.finder.com.au/zcoin-cryptocurrency-introduces-zero-knowledge-proofs-with-no-trusted-setup |access-date=30 July 2019 |publisher=Finder Australia |date=30 July 2019 |archive-url=https://web.archive.org/web/20190730210721/https://www.finder.com.au/zcoin-cryptocurrency-introduces-zero-knowledge-proofs-with-no-trusted-setup |archive-date=30 July 2019}}</ref><ref name=":1">{{cite journal |last1=Groth |first1=J |last2=Kohlweiss |first2=M |title=One-Out-of-Many Proofs: Or How to Leak a Secret and Spend a Coin |journal=Annual International Conference on the Theory and Applications of Cryptographic Techniques |series=Lecture Notes in Computer Science |date=14 April 2015 |volume=9057 |pages=253–280 |doi=10.1007/978-3-662-46803-6_9 |publisher=EUROCRYPT 2015 |location=Berlin, Heidelberg|isbn=978-3-662-46802-9 }}</ref>同年，飛熔幣引入萊蘭托斯協議<!-- [[WP:外語譯音表/希臘語|WP:外語譯音表/希臘語]]按Λήλαντος譯-->（{{lang|en|Lelantus protocol}}），更自Sigma協議改進，隱去交易的源頭與金額。<ref>{{cite journal |last1=Aram |first1=Jivanyan |title=Lelantus: Towards Confidentiality and Anonymity of Blockchain Transactions from Standard Assumptions |journal=Cryptology ePrint Archive |date=7 April 2019 |issue=Report 373 |url=https://eprint.iacr.org/2019/373 |access-date=14 April 2019 |archive-date=2019-04-14 |archive-url=https://web.archive.org/web/20190414131649/https://eprint.iacr.org/2019/373 |dead-url=no }}</ref>
+
+== 沿革 ==
+零知識證明最早由[[莎菲·戈德瓦塞尔|莎菲·戈德瓦塞尔]]、[[希爾維奧·米卡利|希爾維奧·米卡利]]、{{link-en|查爾斯·拉克福|Charles Rackoff}}<!--沿用[[蒙特利爾工程學院大屠殺|蒙特利爾工程學院大屠殺]]所採譯名-->三人於1985年發表，論文題為{{單雙書名號轉換|交互式證明系統的知識複雜度}}。<ref name="knowledgecomplexity" />該論文引入[[交互式证明系统|交互式证明系统]]的{{le|IP (複雜度)|IP (complexity)|'''IP'''複雜度類}}，並構想出「知識複雜度」概念，衡量證明過程中，由證明者傳遞予驗證者的知識量。三人亦給出首個具體問題的零知識證明，即零知識地證明某數不是模 ''m'' 的[[二次剩余|二次剩余]]。連同{{link-en|鲍鲍伊·拉茲洛|László Babai}}<!--姓Babai按《世界人名翻译大辞典·上》譯-->與{{link-en|什洛莫·莫蘭|Shlomo Moran}}<!--按[[什洛莫·本哈伊姆|什洛莫·本哈伊姆]]和[[達夫·莫蘭|達夫·莫蘭]]拼成-->的另一篇論文，戈-米-拉三氏的論文發明了交互式證明系統。為此，五人同獲1993年首屆[[哥德尔奖|哥德尔奖]]。
+
+引述戈-米-拉三氏：
+
+<blockquote>
+該額外知識基本為0的情況尤其值得關注。我等證明，可以交互地證明某數非模 ''m'' 的二次剩餘，而釋出零額外知識。其出奇之處是，若不給定 ''m'' 的分解，則無高效算法判別某數是否模 ''m'' 的二次剩餘。更甚者，任何已知的[[NP_(複雜度)|'''NP''']]證明皆要表明 ''m'' 的質因數分解。這就表明，在證明過程中添加互動，可能減少證明某定理所必須交流的知識。
+{{註|原文作 "Of particular interest is the case where this additional knowledge is essentially 0 and we show that [it] is possible to interactively prove that a number is quadratic non residue mod ''m'' releasing 0 additional knowledge. This is surprising as no efficient algorithm for deciding quadratic residuosity mod ''m'' is known when ''m''’s factorization is not given. Moreover, all known ''NP'' proofs for this problem exhibit the prime factorization of ''m''. This indicates that adding interaction to the proving process, may decrease the amount of knowledge that must be communicated in order to prove a theorem."}}
+</blockquote>
+
+二次非剩餘問題既有'''[[NP_(複雜度)|NP]]'''算法又有'''[[反NP|反NP]]'''算法，故位處'''NP'''與'''反NP'''兩類之交集中。其後找到有零知識證明的若干個問題，亦具同樣的性質，例如{{link-en|歐迪·戈德賴希|Oded Goldreich}}<!--譯名依[[歐迪·費爾|歐迪·費爾]]拼[[彼得·戈德賴希|彼得·戈德賴希]]-->未經正式出版的證明系統，可以驗證某數（為兩個未知質數之積）不是{{link-en|布盧姆整數|Blum integer}}，即並非兩個模4餘3的質數之積。<ref>{{cite journal |first=Oded |last=Goldreich |title=A zero-knowledge proof that a two-prime moduli is not a Blum integer |journal=Unpublished Manuscript |year=1985 }}</ref>
+
+{{link-en|歐迪·戈德賴希|Oded Goldreich}}、[[希爾維奧·米卡利|希爾維奧·米卡利]]、[[阿维·威格森|阿维·威格森]]更進一步證明，假定存在無懈可擊的加密法，則可以造出[[图着色问题|三色圖着色問題]]的零知識證明系統，而該問題本身為[[NP完全|NP完全]]。又因為每個'''NP'''問題都可以高效化歸成該NP完全問題，所以在前述假定下，所有'''NP'''問題皆有零知識證明。<ref>{{cite journal |first1=Oded |last1=Goldreich |first2=Silvio |last2=Micali |first3=Avi |last3=Wigderson |title=Proofs that yield nothing but their validity |journal=Journal of the ACM |volume=38 |issue=3 |pages=690–728 |doi=10.1145/116825.116852 |year=1991 |citeseerx=10.1.1.420.1478 |s2cid=2389804 }}</ref>需要該假定的原因是，正如[[#大圖的哈密頓環|前節範例]]，需要有秘諾的手段。若存在[[單向函數|單向函數]]，則的確有牢不可破的加密法。此為廣泛引用的充分條件。另外也可能有物理方法實作。
+
+更上一層樓，他們亦證明，{{le|圖不同構問題|graph nonisomorphism problem}}，即{{link-en|圖同構問題|graph isomorphism problem}}之{{link-en|補 (複雜度)|complement (complexity)|補}}，有零知識證明。該問題已知屬於'''反NP'''，但未知是否屬於'''NP'''或其他實際可行的複雜度類。更一般地，{{link-en|羅素·英帕利亞佐|Russell Impagliazzo}}<!--沿用[[聖艾智德團體|聖艾智德團體]]中Marco Impagliazzo的譯名-->、{{link-en|莫迪凱·容|Moti Yung}}{{譯名請求}}二人，與米高·本-奧爾（{{lang|en|Michael Ben-Or}}）及同事，兩組證明：同樣假設存在單向函數或牢不可破的加密，則任何屬於'''IP'''（已證等於'''[[PSPACE|PSPACE]]'''）的問題，皆有零知識證明。換言之，任何命題若可藉交互系統證明，則可零知識證明。<ref>Russell Impagliazzo, Moti Yung: Direct Minimum-Knowledge Computations. CRYPTO 1987: 40-51</ref><ref>{{cite book |first1=Michael |last1=Ben-Or |first2=Oded |last2=Goldreich |first3=Shafi |last3=Goldwasser |first4=Johan |last4=Hastad |first5=Joe |last5=Kilian |first6=Silvio |last6=Micali |first7=Phillip |last7=Rogaway |chapter=Everything provable is provable in zero-knowledge |editor-first=S. |editor-last=Goldwasser |title=Advances in Cryptology—CRYPTO '88 |volume=403 |series=Lecture Notes in Computer Science |pages=37–56 |publisher=Springer-Verlag |year=1990 }}</ref>
+
+許多理論家不希望假設不必要的條件，所以試圖在不假定[[單向函數|單向函數]]的條件之下，證明同樣的結論。有種做法稱為「多證明者交互式證明系統」（見[[交互式证明系统|交互式证明系统]]），即有多個獨立的證明者，而非僅得一個。驗證者可以將證明者逐個孤立，然後詰問，以免被作弊證明者誤導。無需任何難解假設，已可證明在此系統中，任何'''NP'''問題皆有零知識證明。<ref>{{cite journal |first1=M. |last1=Ben-or |first2=Shafi |last2=Goldwasser |first3=J. |last3=Kilian |first4=A. |last4=Wigderson |url=http://theory.lcs.mit.edu/~cis/pubs/shafi/1988-stoc-bgkw.pdf |title=Multi prover interactive proofs: How to remove intractability assumptions |journal=Proceedings of the 20th ACM Symposium on Theory of Computing |pages=113–121 |year=1988 |access-date=2021-11-27 |archive-date=2007-04-17 |archive-url=https://web.archive.org/web/20070417142744/http://theory.lcs.mit.edu/~cis/pubs/shafi/1988-stoc-bgkw.pdf |dead-url=no }}</ref>
+
+後來發現，互聯網等同時執行多個協議的環境中，較難構造零知識證明。研究並行零知識證明的先驅是{{link-en|辛西婭·德沃克|Cynthia Dwork}}<!--譯名見諸[[伯納德·德沃克|伯納德·德沃克]]-->、{{link-en|莫尼·納奧爾|Moni Naor}}<!--按[[WP:外語譯音表/希伯來語|WP:外語譯音表/希伯來語]]-->、{{link-en|阿米特·薩海|Amit Sahai}}。<ref>{{cite journal |first1=Cynthia |last1=Dwork |first2=Moni |last2=Naor |first3=Amit |last3=Sahai |title=Concurrent Zero Knowledge |journal=Journal of the ACM |volume=51 |issue=6 |pages=851–898 |year=2004 |doi=10.1145/1039488.1039489 |citeseerx=10.1.1.43.716 |s2cid=52827731 }}</ref>此類研究之中，重要成果有{{link-en|證據不可辨|witness-indistinguishable proof}}協議。與零知識相比，其性質較弱：可能有多種證據供證明者選擇採用何者作證，此時僅要求驗證者無法分辨證明者選擇為何{{註|即無法分辨該證明者與採用另一證據的證明者。}}，但證明者可以泄漏部分資訊，如全體證據組成的集合。儘管失去零知識性質，但此類協議的好處是，並行時不會遇到此前提及的問題。<ref>{{cite book |first1=Uriel |last1=Feige |first2=Adi |last2=Shamir |title=Witness Indistinguishable and Witness Hiding Protocols |url=https://archive.org/details/proceedingsoftwe0000acms |journal=Proceedings of the Twenty-second Annual ACM Symposium on Theory of Computing (STOC) |pages=[https://archive.org/details/proceedingsoftwe0000acms/page/416 416]–426 |year=1990 |doi=10.1145/100216.100272 |isbn=978-0897913614 |citeseerx=10.1.1.73.3911 |s2cid=11146395 }}</ref>
+
+變式尚有{{link-en|非交互式零知識證明|non-interactive zero-knowledge proof}}。[[曼纽尔·布卢姆|曼纽尔·布卢姆]]、保羅·費爾德曼（{{lang|en|Paul Feldman}}）、米卡利證明，若證明者與驗證者共有一條隨機字串，則可以達成計算零知識，而毋須交互。<ref name="noninteractive" /><ref name="noninteractive2" />
+<!--英文尚有Zero-Knowledge Proof Protocols列表，暫略-->
+== 參見 ==
+* {{link-en|配對式密碼學|Pairing-based cryptography}}：給定<math>f(x)</math>與<math>f(y)</math>，無需知道<math>x</math>、<math>y</math>，已可計算<math>f(x \times y)</math>。 
+* [[安全多方计算|安全多方计算]]：各方的輸入值保密，但共同計算出該些輸入對應的結果。
+* {{link-en|圈子簽名|Ring signature}}：可以簽署某文件，使圈外人無法得悉由圈內何人署名，衹知圈內有某人署名。
+* {{link-en|阿羅資訊悖論|Arrow information paradox}}
+* [[安全协议|密碼學協議]]
+* {{link-en|費蓋-菲亞特-薩莫爾身份認證|Feige–Fiat–Shamir identification scheme}}<!--費蓋按[[WP:外語譯音表/希伯來語|WP:外語譯音表/希伯來語]]譯-->
+* [[密碼學主題列表|密碼學諸主題]]
+
+== 註 ==
+{{備註表}}
+
+== 參考文獻 ==
+{{reflist}}
+
+{{密碼貨幣}}
+
+[[Category:密码学理论|Category:密码学理论]]

@@ -1,0 +1,739 @@
+{{Lua|Module:Location map/multi}}
+
+'''Template:Location map many''' creates a location map as a [[m:Help:composite images|composite image]] of an existing map, with multiple markers and optional labels superimposed onto it.  This template functions in the style of [[Template:Location_map]], but allows multiple markers and labels (rather than just one marker).
+
+See also ''[[Template:Location map+]]'', which specifies points as a coded template list of markers/labels.
+
+== Usage ==
+The first unnamed parameter (shown as <nowiki>{{{1}}}</nowiki> below) specifies a map definition. If <nowiki>{{{1}}}</nowiki> is ''Spain'', the map image and coordinates are based on the values defined for Spain in [[Module:Location map/data/Spain]] if it exists, or in [[Template:Location map Spain]] otherwise.
+{|
+| <pre>
+{{Location map many
+| {{{1}}}
+| width       = 
+| float       = 
+| border      = 
+| caption     = 
+| alt         = 
+| relief      = 
+| AlternativeMap = 
+<!--first label/marker-->
+| label1      =  <!-- or: label -->
+| label1_size =  <!-- or: label_size -->
+| position1   =  <!-- or: position, pos1, pos -->
+| background1 =  <!-- or: background, bg1, bg -->
+| mark1       =  <!-- or: mark -->
+| mark1size   =  <!-- or: marksize -->
+| link1       =  <!-- or: link -->
+| coordinates1=  <!-- {{coord|...}}--><!-- or: coordinates-->
+<!--second label/marker-->
+| label2      = 
+| label2_size = 
+| position2   =  <!-- or: pos2 -->
+| background2 =  <!-- or: bg2 -->
+| mark2       = 
+| mark2size   = 
+| link2       = 
+| coordinates2= <!-- {{coord| }} -->
+<!--repeat as needed-->
+}}
+</pre>
+|}
+
+== Parameters ==
+{| class="wikitable" style="width:100%;"
+! colspan="2" style="background-color:lightblue" | Map display parameters
+|-
+! Parameter
+! Description
+|-
+| {{mono|{{(((}}1{{)))}}}}
+| '''Required'''. Use the name of the map as the first unnamed parameter. For example, specifying ''England'' will use the values for England in [[Module:Location map/data/England]] if it exists, or {{tl|Location map England}} otherwise. See the [[#Examples|examples]] below.
+|-
+| {{mono|width}}
+| Determines the width of the map in [[pixel]]s. The default is 240. '''Do not''' include <code>px</code>, for example: <code>width=300</code>, not <code>width=300px</code>.
+|-
+| {{mono|float}}
+| Specifies the position of the map on the page. Valid values are <code>left</code>, <code>right</code>, <code>center</code> and <code>none</code>. The default is <code>right</code>''.
+|-
+| {{mono|border}}
+|  Specifies the color of the 1px map border. The default is ''lightgrey'' (see [[web colors]]). If set to <code>none</code>, no border will be generated. This parameter is seldom used.
+|-
+| {{mono|caption}}
+| The text of a caption to be displayed below the map. Specifying a caption will cause the map to be displayed with a frame. If <code>caption</code> is defined but is not assigned a value, the map will not be framed and no caption will be displayed. If <code>caption</code> is not defined, the map will not be framed and a default caption will be generated. The default caption is created from the {{mono|label}} parameter (or the current page name if label not defined) and the {{mono|name}} parameter from map definition template. See the [[#Examples|examples]] below.
+|-
+| {{mono|alt}}
+| Alt text for map; used by [[screen reader]]s, see [[WP:ALT]].
+|-
+| {{mono|relief}}
+| Any non-blank value (1, yes, etc.) will cause the template to display the map specified in the map definition template as {{mono|image1}}, which is usually a [[Relief mapping (computer graphics)|relief map]]. See the example at [[Template:Location map+/relief|Location map+/relief]].
+|-
+| {{mono|AlternativeMap}}
+| Allows the use of an alternative map. The image must have the same edge coordinates as the location map template. See the example at [[Template:Location map+/AlternativeMap|Location map+/AlternativeMap]].
+|-
+| {{mono|overlay_image}}
+| Allows an overlay to be superimposed on the map. This parameter is seldom used. See the example at [[Template:Location map+/overlay|Location map+/overlay]].
+|-
+! colspan="2" style="background-color:lightblue" | Label and mark parameters
+|-
+! Parameter
+! Description
+|-
+| {{mono|label1}}<br/>{{mono|label2}}<br/>...
+| The text of the label to display next to the mark. A [[Wiki markup|wiki link]] can be used. The default if not specified is no label, just the marker.
+|-
+| {{mono|label1_size}}<br/>{{mono|label2_size}}<br/>...
+| The font size to use for the label, given as a percentage of the normal font size (<100 = smaller, >100 = larger). The default is 90. Do not include <code>%</code>, for example: <code>label_size=80</code>, not <code>label_size=80%</code>.
+|-
+| {{mono|position1}}<br/>{{mono|position2}}<br/>...
+| The position of the label relative to the mark. Valid values are <code>left</code>, <code>right</code>, <code>top</code> and <code>bottom</code>. The default is <code>right</code>''.
+|-
+| {{mono|background1}}<br/>{{mono|background2}}<br/>...
+| The background color to use for the label. See [[Web colors]]. The default is no background color, which shows the map image behind the label.
+|-
+| {{mono|mark1}}<br/>{{mono|mark2}}<br/>...
+| The name of an image to display as the mark. The default is [[:File:Red pog.svg|Red pog.svg]] ([[File:Red pog.svg|8px]]). See examples at [[Commons:Location markers]] and [[Commons:Category:Map icons]].
+|-
+| {{mono|mark1size}}<br/>{{mono|mark2size}}<br/>...
+| The size of the mark in [[pixel]]s. The default is 8. Do not include <code>px</code>, for example: <code>marksize=10</code>, not <code>marksize=10px</code>.
+|-
+| {{mono|link1}}<br/>{{mono|link2}}<br/>...
+| Specifies a [[Wiki markup|wiki link]] which will be followed if the reader clicks on the mark. The name of the linked article is displayed when the mouse pointer hovers over the mark.
+|-
+| {{mono|coordinates1}}<br/>{{mono|coordinates2}}<br/>...
+| '''Required'''.  The coordinates using a {{tl|coord}} template.  See the [[#Alternative syntax|Alternative syntax]] section below for alternatives.
+|-
+|}
+
+Note: For brevity, parameters "pos" & "bg" are aliases (for "position" & "background"), with pos2, bg2, pos3, bg3, etc.
+
+=== Alternative syntax ===
+The recommend input format for the marker coordinates is to use {{para|coordinatesX|{{tld|coord|...}}}}, where <code>X</code> is the marker number.  However, when used outside of infoboxes, the template supports splitting the coordinates into individual components using the parameters listed below.
+
+{| class="wikitable" style="width:100%;"
+! colspan="2" style="background-color:lightblue" | Alternative map display parameters
+|-
+! Parameter
+! Description
+|-
+| {{mono|lat1_deg}}<br/>{{mono|lat2_deg}}<br/>...
+| The degrees of [[latitude]]. This value can be specified using [[decimal degrees]] and when this format is used minutes and seconds should not be specified.
+|-
+| {{mono|lat1_min}}<br/>{{mono|lat2_min}}<br/>...
+| The minutes of latitude.
+|-
+| {{mono|lat1_sec}}<br/>{{mono|lat2_sec}}<br/>...
+| The seconds of latitude. Usually not necessary.
+|-
+| {{mono|lat1_dir}}<br/>{{mono|lat2_dir}}<br/>...
+| N if north (default value) or S for south of the [[Equator]]. Other values will be disregarded. Not required if using signed decimal degrees (i.e. negative numbers for southern latitude).
+|-
+| {{mono|lon1_deg}}<br/>{{mono|lon2_deg}}<br/>...
+| The degrees of [[longitude]]. This value can be specified using [[decimal degrees]] and when this format is used minutes and seconds should not be specified.
+|-
+| {{mono|lon1_min}}<br/>{{mono|lon2_min}}<br/>...
+| The minutes of longitude.
+|-
+| {{mono|lon1_sec}}<br/>{{mono|lon2_sec}}<br/>...
+| The seconds of longitude. Usually not necessary.
+|-
+| {{mono|lon1_dir}}<br/>{{mono|lon2_dir}}<br/>...
+| E for east (default value) or W for west of the [[IERS Reference Meridian|Prime Meridian]]. Other values will be disregarded. Not required if using signed decimal degrees (i.e. negative numbers for western longitude).
+|}
+
+== Markers ==
+When a marker's mark<small>#</small>size=0, then that marker is skipped and only the related label is displayed, without the marker.
+
+Each mark, mark2, mark3 (etc.) can be another image-symbol, such as [[:File:Diamond_sheer_red_20.gif|Diamond_sheer_red_20.gif]] (marksize=20) to show a red diamond on the image: [[Image:Diamond_sheer_red_20.png|20px]] or use: [[:File:Cercle_rouge_100%.svg|Cercle_rouge_100%.svg]] to show a red circle [[File:Cercle rouge 100%.svg|20px]] or a larger black diamond: [[:File:Diamond_sheer_black_37.gif|Diamond_sheer_black_37.gif]] as sized with a larger marksize=37 or similar number to resize the diamond somewhat: [[File:Diamond_sheer_black_37.png|37px]]
+: ''See Wikimedia pointer symbols:'' [[:commons:Category:Map pointers]].
+
+== Advisory messages ==
+The degrees of latitude/longitude are validated, to show error messages, but location minutes can be set very large to place markers outside the map (with no warnings). Due to the numerous details of specifying multiple markers/labels, the latitude and longitude are checked to lie within the actual map limits specified in ''Template:Location_map_<parameter1>''.  Each marker/label is checked and can list a warning message (under the map), such as:
+:::: Latitude#4 (45.68) < map min(53.74).
+
+Processing continues, with that marker actually placed off-map, and all latitude/longitude parameters are checked.  Only degrees of latitude/longitude are checked, so a value of 63 minutes would be valid to indicate 1 extra degree + 3 minutes, and setting lon_min=200 could still place a marker off-map (right-side) with no warning message.  Also, large markers or long labels can spill over the edges of a map, allowing markers to point inward from outside the map.  In such cases, a map could be centered by itself on the page ("float=center") to avoid overlapping the edge markers onto any surrounding article text.
+
+== Available maps ==
+
+Location maps can be found using these sources:
+
+:[[Special:PrefixIndex/Module:Location map/data/]] - Checked before a map template is searched for. New maps should be created here rather than creating new templates.
+:[[Template:Location map/List|List of templates]] - 1050 templates available when the list was generated.
+:[[:Category:Location map templates]] - templates sorted by category.
+:[[Special:WhatLinksHere/Template:Location map/Info]] - a search that might help.
+:[[Special:Prefixindex/Template:Location_map_]] - another search that might help.
+
+== Creating new map definitions ==
+
+See [[Template:Location map/Creating a new map definition|Creating a new map definition]].
+
+== Examples ==
+
+=== Map with label "Pag" and "Anytown" (degrees) ===
+'''Recommended syntax'''
+{{Location map many | Croatia
+| width = 280
+| float = right
+| label = Pag
+  | marksize = 8
+  | pos = right
+  | bg = yellow
+  | coordinates = {{coord|44|26|N|15|3|E}}
+| label2 = Anytown_Anywhere
+  | mark2 = Rouge-Admin JollyRoger.svg
+  | mark2size = 45
+  | pos2 = top
+  | bg2 = white
+  | coordinates2 = {{coord|46|30|N|17|30|E}}
+}}
+<pre style="width: 35em;">
+{{Location map many | Croatia
+| width = 280
+| float = right
+| label = Pag
+  | marksize = 8
+  | pos = right
+  | bg = yellow
+  | coordinates = {{coord|44|26|N|15|3|E}}
+| label2 = Anytown_Anywhere
+  | mark2 = Rouge-Admin JollyRoger.svg
+  | mark2size = 45
+  | pos2 = top
+  | bg2 = white
+  | coordinates2 = {{coord|46|30|N|17|30|E}}
+}}
+</pre>
+{{clear}}
+'''Alternative syntax'''
+{{Location map many | Croatia
+| width = 280
+| float = right
+| label = Pag
+  | marksize = 8
+  | pos = right
+  | bg = yellow
+  | lat_deg = 44 | lat_min = 26
+  | lon_deg = 15 | lon_min = 3
+| label2 = Anytown_Anywhere
+  | mark2 = Rouge-Admin JollyRoger.svg
+  | mark2size = 45
+  | pos2 = top
+  | bg2 = white
+  | lat2_deg = 46 | lat2_min = 30
+  | lon2_deg = 17 | lon2_min = 30
+}}
+<pre style="width: 35em;">
+{{Location map many | Croatia
+| width = 280
+| float = right
+| label = Pag
+  | marksize = 8
+  | pos = right
+  | bg = yellow
+  | lat_deg = 44 | lat_min = 26
+  | lon_deg = 15 | lon_min = 3
+| label2 = Anytown_Anywhere
+  | mark2 = Rouge-Admin JollyRoger.svg
+  | mark2size = 45
+  | pos2 = top
+  | bg2 = white
+  | lat2_deg = 46 | lat2_min = 30
+  | lon2_deg = 17 | lon2_min = 30
+}}
+</pre>
+{{clear}}
+
+=== Map with 3 labels (decimal) ===
+'''Recommended syntax'''
+{{Location map many | Croatia
+| width = 260
+| float = right
+| label = Pag
+  | pos = right
+  | marksize = 8
+  | coordinates = {{coord|44.44|15.05}}
+| label2 = Anytown
+  | pos2 = bottom
+  | bg2 = yellow
+  | mark2size = 8
+  | coordinates2 = {{coord|45.86|17.50}}
+| label3 = Anytown2
+  | pos3 = top
+  | bg3 = lightgreen
+  | coordinates3 = {{coord|46.23|18.43}}
+}}
+<pre style="width: 35em;">
+{{Location map many | Croatia
+| width = 260
+| float = right
+| label = Pag
+  | pos = right
+  | marksize = 8
+  | coordinates = {{coord|44.44|15.05}}
+| label2 = Anytown
+  | pos2 = bottom
+  | bg2 = yellow
+  | mark2size = 8
+  | coordinates2 = {{coord|45.86|17.50}}
+| label3 = Anytown2
+  | pos3 = top
+  | bg3 = lightgreen
+  | coordinates3 = {{coord|46.23|18.43}}
+}}
+</pre>
+{{clear}}
+'''Alternative syntax'''
+{{Location map many | Croatia
+| width = 260
+| float = right
+| label = Pag
+  | pos = right
+  | marksize = 8
+  | lat_deg = 44.44
+  | lon_deg = 15.05
+| label2 = Anytown
+  | pos2 = bottom
+  | bg2 = yellow
+  | mark2size = 8
+  | lat2_deg = 45.86
+  | lon2_deg = 17.50
+| label3 = Anytown2
+  | pos3 = top
+  | bg3 = lightgreen
+  | lat3_deg = 46.23
+  | lon3_deg = 18.43
+}}
+<pre style="width: 35em;">
+{{Location map many | Croatia
+| width = 260
+| float = right
+| label = Pag
+  | pos = right
+  | marksize = 8
+  | lat_deg = 44.44
+  | lon_deg = 15.05
+| label2 = Anytown
+  | pos2 = bottom
+  | bg2 = yellow
+  | mark2size = 8
+  | lat2_deg = 45.86
+  | lon2_deg = 17.50
+| label3 = Anytown2
+  | pos3 = top
+  | bg3 = lightgreen
+  | lat3_deg = 46.23
+  | lon3_deg = 18.43
+}}
+</pre>
+{{clear}}
+
+=== Example map with red diamond===
+{{Location map many | Jamaica
+| AlternativeMap = LocationJamaica.svg
+| float = right
+| width = 250
+| caption = Site of '''Hispaniola'''
+| label = Hispaniola
+  | position = left
+  | background = #CCDDFF
+  | marksize = 1
+  | coordinates = {{coord|38.2|69.3}}
+| label2 =
+  | mark2 =Diamond_sheer_red_37.png
+  | mark2size = 42
+  | coordinates2 = {{coord|52.2|73.9}}
+| label3 = Cuba
+  | pos3 = left
+  | mark3size = 1
+  | coordinates3 = {{coord|59.2|68.0}}
+}}
+<pre style="width: 35em;">
+{{Location map many | Jamaica
+| AlternativeMap = LocationJamaica.svg
+| float = right
+| width = 250
+| caption = Site of '''Hispaniola'''
+| label = Hispaniola
+  | position = left
+  | background = #CCDDFF
+  | marksize = 1
+  | coordinates = {{coord|38.2|69.3}}
+| label2 =
+  | mark2 =Diamond_sheer_red_37.png
+  | mark2size = 42
+  | coordinates2 = {{coord|52.2|73.9}}
+| label3 = Cuba
+  | pos3 = left
+  | mark3size = 1
+  | coordinates3 = {{coord|59.2|68.0}}
+}}
+</pre>
+{{clear}}
+
+=== Map with some labels outside map ===
+{{Location map many | Croatia
+| width = 260
+| float = right
+| label = Pag | position=right
+  | marksize = 8
+  | coordinates = {{coord|44.44|15.05}}
+| label2 = Anytown
+  | pos2 = bottom
+  | bg2 = yellow
+  | coordinates2 = {{coord|47.40|12.80}}
+  | outside2 = 1 <!-- we know this point is outside the map, so don't warn about it -->
+| label3 = Anytown2
+  | pos3 = top
+  | bg3 = lightgreen
+  | coordinates3 = {{coord|41.98|18.43}}
+  | outside3 = 1 <!-- we know this point is outside the map, so don't warn about it -->
+| label4 = North Croatia
+  | pos4 = left
+  | bg4 = lightgreen
+  | mark4size = 0
+  | coordinates4 = {{coord|46.22|17.7}}
+}}
+<pre style="width: 50em;">
+{{Location map many | Croatia
+| width = 260
+| float = right
+| label = Pag | position=right
+  | marksize = 8
+  | coordinates = {{coord|44.44|15.05}}
+| label2 = Anytown
+  | pos2 = bottom
+  | bg2 = yellow
+  | coordinates2 = {{coord|47.40|12.80}}
+  | outside2 = 1 <!-- we know this point is outside the map, so don't warn about it -->
+| label3 = Anytown2
+  | pos3 = top
+  | bg3 = lightgreen
+  | coordinates3 = {{coord|41.98|18.43}}
+  | outside3 = 1 <!-- we know this point is outside the map, so don't warn about it -->
+| label4 = North Croatia
+  | pos4 = left
+  | bg4 = lightgreen
+  | mark4size = 0
+  | coordinates4 = {{coord|46.22|17.7}}
+}}
+</pre>
+{{clear}}
+
+=== Map with 9 markers (decimal) ===
+{{Location map many | Croatia
+| width = 260
+| float = right
+| label = Pag
+  | position = right
+  | coordinates = {{coord|44.44|15.05}}
+| label2 = Anytown
+  | label2_size = 110
+  | pos2 = bottom
+  | background2 = yellow
+  | coordinates2 = {{coord|45.86|17.50}}
+| label3 = Anytown2
+  | label3_size = 290
+  | pos3 = top
+  | background3 = green
+  | coordinates3 = {{coord|46.23|18.43}}
+| mark4 =Diamond_sheer_black_20.png
+  | mark4size = 19
+  | label4 = 44.0 (latitude)
+  | coordinates4 = {{coord|44.00|13.5}}
+| mark5 =Diamond_sheer_black_20.png
+  | mark5size = 20
+  | label5 = 44.5
+  | coordinates5 = {{coord|44.50|13.5}}
+| mark6 =Diamond_sheer_black_20.png
+  | mark6size = 20
+  | label6 = 45.0
+  | coordinates6 = {{coord|45.00|13.5}}
+| mark7 =Diamond_sheer_black_20.png
+  | mark7size = 20
+  | label7 = 45.5
+  | coordinates7 = {{coord|45.50|13.5}}
+| mark8 =Diamond_sheer_black_20.png
+  | mark8size = 20
+  | label8 = 46.0
+  | coordinates8 = {{coord|46.00|13.5}}
+| label9 = ''CROATIA''
+  | label9_size = 165
+  | mark9size = <!--label only-->1
+  | coordinates9 = {{coord|42.60|14.4}}
+}}
+<pre style="width: 35em;">
+{{Location map many | Croatia
+| width = 260
+| float = right
+| label = Pag
+  | position = right
+  | coordinates = {{coord|44.44|15.05}}
+| label2 = Anytown
+  | label2_size = 110
+  | pos2 = bottom
+  | background2 = yellow
+  | coordinates2 = {{coord|45.86|17.50}}
+| label3 = Anytown2
+  | label3_size = 290
+  | pos3 = top
+  | background3 = green
+  | coordinates3 = {{coord|46.23|18.43}}
+| mark4 =Diamond_sheer_black_20.png
+  | mark4size = 19
+  | label4 = 44.0 (latitude)
+  | coordinates4 = {{coord|44.00|13.5}}
+| mark5 =Diamond_sheer_black_20.png
+  | mark5size = 20
+  | label5 = 44.5
+  | coordinates5 = {{coord|44.50|13.5}}
+| mark6 =Diamond_sheer_black_20.png
+  | mark6size = 20
+  | label6 = 45.0
+  | coordinates6 = {{coord|45.00|13.5}}
+| mark7 =Diamond_sheer_black_20.png
+  | mark7size = 20
+  | label7 = 45.5
+  | coordinates7 = {{coord|45.50|13.5}}
+| mark8 =Diamond_sheer_black_20.png
+  | mark8size = 20
+  | label8 = 46.0
+  | coordinates8 = {{coord|46.00|13.5}}
+| label9 = ''CROATIA''
+  | label9_size = 165
+  | mark9size = <!--label only-->1
+  | coordinates9 = {{coord|42.60|14.4}}
+}}
+</pre>
+{{clear}}
+
+=== Map with a custom label and text background ===
+{{Location map many | Croatia
+| width = 280
+| float = right
+| caption = Imotski in Croatia
+| label = Imotski
+| position = right
+| background = #FFFFDD
+| coordinates = {{coord|43.44|17.21}}
+}}
+<pre style="width: 35em;">
+{{Location map many | Croatia
+| width = 280
+| float = right
+| caption = Imotski in Croatia
+| label = Imotski
+| position = right
+| background = #FFFFDD
+| coordinates = {{coord|43.44|17.21}}
+}}
+</pre>
+{{clear}}
+
+=== Map with enlarged marker and label ===
+{{Location map many | Croatia
+| width = 260
+| float = right
+| caption = Pag Island in Croatia
+| label = Pag
+| label_size = 200
+| position = right
+| marksize = 14
+| background = #FFFFDD
+| coordinates = {{coord|44.44|15.05}}
+}}
+<pre style="width: 35em;">
+{{Location map many | Croatia
+| width = 260
+| float = right
+| caption = Pag Island in Croatia
+| label = Pag
+| label_size = 200
+| position = right
+| marksize = 14
+| background = #FFFFDD
+| coordinates = {{coord|44.44|15.05}}
+}}
+</pre>
+{{clear}}
+
+=== Map with no caption ===
+{{Location map many | Bosnia
+| width = 150
+| float = right
+| caption =
+| label = Brčko
+| position = left
+| coordinates = {{coord|44.87|18.81}}
+}}
+<pre style="width: 35em;">
+{{Location map many | Bosnia
+| width = 150
+| float = right
+| caption =
+| label = Brčko
+| position = left
+| coordinates = {{coord|44.87|18.81}}
+}}
+</pre>
+{{clear}}
+
+=== Western Hemisphere ===
+{{Location map many | United Kingdom
+| width = 180
+| float = right
+| caption = Lockerbie in Scotland
+| label = Lockerbie
+| position = right
+| coordinates = {{coord|55|07|16|N|3|21|19|W}}
+}}
+<pre style="width: 38em;">
+{{Location map many | United Kingdom
+| width = 180
+| float = right
+| caption = Lockerbie in Scotland
+| label = Lockerbie
+| position = right
+| coordinates = {{coord|55|07|16|N|3|21|19|W}}
+}}
+</pre>
+{{clear}}
+
+=== Country that crosses 180° meridian ===
+{{Location map many | Russia
+| width = 400
+| float = right
+| label = Uelen
+| position = left
+| background = #FFFFDD
+| coordinates = {{coord|66|09|N|169|48|W}}
+}}
+<pre style="width: 28em;">
+{{Location map many | Russia
+| width = 400
+| float = right
+| label = Uelen
+| position = left
+| background = #FFFFDD
+| coordinates = {{coord|66|09|N|169|48|W}}
+}}
+</pre>
+{{clear}}
+
+===Marker examples===
+
+{{Location map+|Ukraine|float=left|width=430|caption=Some symbols that show up well
+|places=
+{{Location map~|Ukraine|lat=52  |long=22   |label=Pfeil oben.svg|mark=Pfeil oben.svg}}
+{{Location map~|Ukraine|lat=51  |long=22   |label=Pfeil unten.svg|mark=Pfeil unten.svg}}
+{{Location map~|Ukraine|lat=50  |long=22   |label=Pfeil rechts.svg|mark=Pfeil rechts.svg}}
+{{Location map~|Ukraine|lat=49  |long=22   |label=Pfeil links.svg|mark=Pfeil links.svg}}
+{{Location map~|Ukraine|lat=48  |long=22   |label=Pfeil rechts oben.svg|mark=Pfeil rechts oben.svg}}
+{{Location map~|Ukraine|lat=47  |long=22   |label=Pfeil rechts unten.svg|mark=Pfeil rechts unten.svg}}
+{{Location map~|Ukraine|lat=46  |long=22   |label=Pfeil links oben.svg|mark=Pfeil links oben.svg}}
+{{Location map~|Ukraine|lat=45  |long=22   |label=Pfeil links unten.svg|mark=Pfeil links unten.svg}}
+{{Location map~|Ukraine|lat=52  |long=27   |label=Point carte.svg|mark=Point carte.svg}}
+{{Location map~|Ukraine|lat=51  |long=27   |label=Square city locator.png|mark=Square city locator.png}}
+{{Location map~|Ukraine|lat=50  |long=27   |label=Red.svg|mark=Red.svg}}
+{{Location map~|Ukraine|lat=49  |long=27   |label=Solid blue.svg|mark=Solid blue.svg}}
+{{Location map~|Ukraine|lat=48  |long=27   |label=Fadenkreuz.svg|mark=Fadenkreuz.svg}}
+{{Location map~|Ukraine|lat=47  |long=27   |label=Crosshairs Red.svg|mark=Crosshairs Red.svg}}
+{{Location map~|Ukraine|lat=46  |long=27   |label=Purple pog.svg|mark=Purple pog.svg}}
+{{Location map~|Ukraine|lat=45  |long=27   |label=Yellow pog.svg|mark=Yellow pog.svg}}
+{{Location map~|Ukraine|lat=52  |long=31   |label=Map-Pin.png|mark=Map-Pin.png}}
+{{Location map~|Ukraine|lat=51  |long=31   |label=Dot-yellow.svg|mark=Dot-yellow.svg}}
+{{Location map~|Ukraine|lat=50  |long=31   |label=Blue-circle.gif|mark=Blue-circle.gif}}
+{{Location map~|Ukraine|lat=49  |long=31   |label=Flashspot.gif|mark=Flashspot.gif}}
+{{Location map~|Ukraine|lat=48  |long=31   |label=Location dot blue.svg|mark=Location dot blue.svg}}
+{{Location map~|Ukraine|lat=47  |long=31   |label=Location dot black.svg|mark=Location dot black.svg}}
+{{Location map~|Ukraine|lat=46  |long=31   |label=Arrows 12x12 nw.svg|mark=Arrows 12x12 nw.svg}}
+{{Location map~|Ukraine|lat=45  |long=31   |position=bottom|label=Arrows 12x12 ne.svg|mark=Arrows 12x12 ne.svg}}
+{{Location map~|Ukraine|lat=52  |long=35   |position=right|label=Fire.svg|mark=Fire.svg}}
+{{Location map~|Ukraine|lat=51  |long=35   |position=right|label=Black triangle2.svg|mark=Black triangle2.svg}}
+{{Location map~|Ukraine|lat=50  |long=35   |position=right|label=Blue Fire.svg|mark=Blue Fire.svg}}
+{{Location map~|Ukraine|lat=49  |long=35   |position=right|label=City locator Montagne.svg|
+mark=City locator Montagne.svg}}
+{{Location map~|Ukraine|lat=48  |long=35   |position=right|label=Cercle rouge 100%.svg| 
+mark=Cercle rouge 100%.svg}}
+{{Location map~|Ukraine|lat=47  |long=35   |position=right|label=White flag icon.svg|mark=White flag icon.svg}}
+{{Location map~|Ukraine|lat=46  |long=35   |position=right|label=Legenda miejsce bitwy.svg
+|mark=Legenda miejsce bitwy.svg}}
+{{Location map~|Ukraine|lat=45  |long=35   |position=bottom|label=X solid black 17.gif|mark=X solid black 17.gif}}
+}}
+{{Location map+|Ukraine|float=right|width=420|caption=Random map icons. The "marksize=" option is needed to make some of them show up.
+|places=
+{{Location map~|Ukraine|lat=52  |long=22   |label=City locator 0.svg|mark=City locator 0.svg}}
+{{Location map~|Ukraine|lat=51  |long=22   |label=City locator 1.svg|mark=City locator 1.svg}}
+{{Location map~|Ukraine|lat=50  |long=22   |label=City locator 2.svg|mark=City locator 2.svg}}
+{{Location map~|Ukraine|lat=49  |long=22   |label=City locator 6.svg|mark=City locator 6.svg}}
+{{Location map~|Ukraine|lat=48  |long=22   |label=City locator 7.svg|mark=City locator 7.svg}}
+{{Location map~|Ukraine|lat=47  |long=22   |label=City locator 8.svg|mark=City locator 8.svg}}
+{{Location map~|Ukraine|lat=46  |long=22   |label=City locator 9.svg|mark=City locator 9.svg}}
+{{Location map~|Ukraine|lat=45  |long=22   |label=City locator 10.svg|mark=City locator 10.svg}}
+{{Location map~|Ukraine|lat=52  |long=27   |label=City locator 11.svg|mark=City locator 11.svg}}
+{{Location map~|Ukraine|lat=51  |long=27   |label=City locator 13.svg|mark=City locator 13.svg}}
+{{Location map~|Ukraine|lat=50  |long=27   |label=City locator 21.svg|mark=City locator 21.svg}}
+{{Location map~|Ukraine|lat=49  |long=27   |label=City locator 29.svg|mark=City locator 29.svg}}
+{{Location map~|Ukraine|lat=48  |long=27   |label=Point rouge croix frontier vert green.svg|mark=Point rouge croix frontier vert green.svg}}
+{{Location map~|Ukraine|lat=47  |long=27   |label=Wikipedia-Marker-4.png|mark=Wikipedia-Marker-4.png}}
+{{Location map~|Ukraine|lat=46  |long=27   |label=StarArrowOR.svg|mark=StarArrowOR.svg}}
+{{Location map~|Ukraine|lat=45  |long=27   |label=Castle.svg|mark=Castle.svg
+}}
+{{Location map~|Ukraine|lat=52  |long=31   |label=Crime_symbol_handgun_czeska80px.png|mark=Crime_symbol_handgun_czeska80px.png}}
+{{Location map~|Ukraine|lat=51  |long=31   |label=Gwiazda LnM.svg|mark=Gwiazda LnM.svg}}
+{{Location map~|Ukraine|lat=50  |long=31   |label=Nuclear plant.svg|mark=Nuclear plant.svg}}
+{{Location map~|Ukraine|lat=49  |long=31   |label=Quake pointer.svg|mark=Quake pointer.svg}}
+{{Location map~|Ukraine|lat=48  |long=31   |label=Rotonda S7.svg|mark=Rotonda S7.svg}}
+{{Location map~|Ukraine|lat=47  |long=31   |label=Wikipedia-Marker-isle.svg|mark=Wikipedia-Marker-isle.svg}}
+{{Location map~|Ukraine|lat=46  |long=31   |label=BSicon dB+Slg.svg|mark=BSicon dB+Slg.svg}}
+{{Location map~|Ukraine|lat=45  |long=31   |position=bottom|label=BSicon ANCHOR.svg|mark=BSicon ANCHOR.svg}}
+{{Location map~|Ukraine|lat=52  |long=35   |position=right|label=BSicon fSKRZ-Bu.svg|mark=BSicon fSKRZ-Bu.svg}}
+{{Location map~|Ukraine|lat=51  |long=35   |position=right|label=Xxxx.svg|mark=Xxxx.svg}}
+{{Location map~|Ukraine|lat=50  |long=35   |position=right|label=BSicon xtZOLL.svg |mark=BSicon xtZOLL.svg}}
+{{Location map~|Ukraine|lat=49  |long=35   |position=right|label=Unesco Cultural Heritage logo.svg 
+|mark=Unesco Cultural Heritage logo.svg}}
+{{Location map~|Ukraine|lat=48  |long=35   |position=right|label=Mining symbol.svg| 
+mark=Mining symbol.svg}}
+{{Location map~|Ukraine|lat=47  |long=35   |position=right|label=Zoo icon.jpg|mark=Zoo icon.jpg}}
+{{Location map~|Ukraine|lat=46  |long=35   |position=right|label=Vattenfall blue.svg
+|mark=Vattenfall blue.svg}}
+{{Location map~|Ukraine|lat=45  |long=35   |position=bottom|label=SymbolAirport.svg|mark=
+SymbolAirport.svg}}
+}}
+: ''See Wikimedia pointer symbols:'' [[:commons:Category:Map pointers]].
+
+==Implementation notes==
+The map with markers/labels is implemented as nested HTML divisions. The map-image is in an HTML division, containing each point as a percent-locator division containing a marker-image sub-division plus a label sub-division.  Each point is calculated (for a percent-locator division) with X or Y coordinate "XX.X%" or "YY.Y%" as follows:
+
+* The div-tag is "&lt;div style="position: absolute; z-index: 2; top: XX.X%; left: YY.Y%; ...&gt;"
+* For placing latitude, the calculation is:
+:* XX.X% = 100 * (top - (lat_deg + latmin/60 +latsec/3600) ) / (top - bottom)
+:* If lat_deg is empty, the combined decimal latitude is used from "lat".
+:* If lat_dir is "S" (south), the latitude is multiplied by -1.
+:* (Note latitude is positioned in reverse, from top of map downward.)
+* For placing longitude, the calculation is:
+:* YY.Y% = 100 * ( (lon_deg + lonmin/60 +lonsec/3600) - left ) / (right - left)
+:* If lon_deg is empty, the combined decimal longitude is used as "long".
+:* If lon_dir is "W" (west), the longitude is multiplied by -1.
+* The div-tag is ended as "height: 0; width: 0; margin: 0; padding: 0;"&gt;".
+* Within that division the marker/label sub-divisions are coded as:
+:* &lt;div style="position: relative text-align: center; ..."&gt;.
+* For label position, the options are shifted as:
+:* when position=left, adds "left: -6.5em; text-align: right;"
+:* when position=right, adds "left: 0.5em; text-align: left;"
+:* when position=top, adds "top:-2.65em; left:-3em; text-align: center;"
+:* when position=bottom, adds "top:-0.15em; left: -3em; text-align: center;" to div-tag.
+
+==See also==
+* [[Template:Location map]] - placing one marker/label by latitude/longitude.
+* [[Template:Location map+]] - placing unlimited list of markers/labels.
+* [[:Commons:Category:Map pointers]] - list of the many Wikimedia Commons pointer symbols.
+
+<includeonly>{{#ifeq:{{SUBPAGENAME}}|sandbox |
+| <!--Categories below this line, please; interwikis at Wikidata-->
+[[Category:Location map templates| ]]
+[[Category:Graphics templates]]
+
+}}<!--(end #ifeq)--></includeonly><noinclude>
+
+[[Category:地理位置圖模板]]
+}}</includeonly>

@@ -1,0 +1,93 @@
+
+{{Documentation subpage}}
+This template is intended to be used on feedback pages and talk pages for software deployments. It floats right-aligned next to whichever content it precedes. Imagine we see a comment like the following:
+
+<div style="margin-left:4em;">
+{| class="wikitable" width="500px"
+|-
+| 
+Your software is broken. It doesn't even work on Windows ME. When I try to load it, Bill Gates appears on my screen and laughs manically. --[[Special:Mypage|Dogmaster3000]] 01:17, 14 December 2011 (PST)
+|}
+</div>
+
+Now let's say we want to note that there's a task on Phabricator for this. We'll add the following code: <code><nowiki>{{tracked|T123}}</nowiki></code> (where T123 is the identifier of the task).
+
+<div style="margin-left:4em;">
+'''Sample output:'''
+{| class="wikitable" style="width: 500px;"
+|-
+| 
+{{Tracked|T123}}
+Your software is broken. It doesn't even work on Windows ME. When I try to load it, Bill Gates appears on my screen and laughs manically. --[[Special:Mypage|Dogmaster3000]] 01:17, 14 December 2011 (PST)
+|}
+</div>
+
+We can leave it at that. If we'd like to note the fact that the task's been resolved, we can note its status, via <code><nowiki>{{tracked|T123|resolved}}</nowiki></code>. In addition to <code>resolved</code>, we support <code>invalid</code>, <code>duplicate</code>, <code>declined</code>, <code>stalled</code> and <code>open</code>. Example with the <code>resolved</code> keyword:
+
+<div style="margin-left:4em;">
+'''Sample output:'''
+{| class="wikitable" width="500px"
+|-
+| 
+{{tracked|T123|resolved}}
+Your software is broken. It doesn't even work on Windows ME. When I try to load it, Bill Gates appears on my screen and laughs manically. --[[Special:Mypage|Dogmaster3000]] 01:17, 14 December 2011 (PST)
+|}
+</div>
+
+Of course, feel free to avoid using this template if tracking a comment is not useful.
+
+<div style="margin-left:4em;">
+{| class="wikitable" width="500px"
+|-
+| 
+Your software is broken. It doesn't even work on Windows ME. When I try to load it, Bill Gates appears on my screen and laughs manically. --[[Special:Mypage|Dogmaster3000]] 01:17, 14 December 2011 (PST)
+
+: You appear to be running the new IE toolbar. This is expected behavior. However, if you upgrade, it will show the angry dancing Ballmer instead. --[[Special:Mypage|GNUnicorn]] 01:38, 14 December 2011 (PST)
+|}
+</div>
+
+==Bugzilla tickets==
+For backwards compatibility, this template also accepts the number of a Bugzilla ticket as the first parameter, and the following resolutions: <code>fixed</code>, <code>wontfix</code>, <code>later</code>, <code>invalid</code>. Last but not least, we can mark a bug as critical. We deliberately aren't using this keyword for bugs which are resolved one way or another -- the point of adding this to the template is to note to all readers of the page that the seriousness of a bug has been critical. '''This keyword should only be used if the bug has also been marked as critical in Bugzilla.''' Example usage: <code><nowiki>{{Tracked|300|critical}}</nowiki></code>
+
+<div style="margin-left:4em;">
+'''Sample output:'''
+{| class="wikitable" width="500px"
+|-
+| 
+{{Tracked|300|critical}}
+Your software is broken. It doesn't even work on Windows ME. When I try to load it, Bill Gates appears on my screen and laughs manically. --[[Special:Mypage|Dogmaster3000]] 01:17, 14 December 2011 (PST)
+|}
+</div>
+
+If you need the [[phabricator:|Phabricator]] task for a migrated Bugzilla ticket, add 2000 to the BZ bug number and prefix with '''T''', e.g., [[phabricator:T2300|T2300]] replaced [[bugzilla:300]].
+
+==See also==
+* [[MediaWiki:Gadget-BugStatusUpdate.js|Gadget-BugStatusUpdate.js]] can be enabled in the [[Special:Preferences#mw-prefsection-gadgets|Gadget preferences]] 
+* {{tl|Phab}}, inline link
+* {{tl|Bug}}, inline link (deprecated)
+* {{tl|Bugzilla}}, inline link (multiple items)
+<includeonly>{{#ifeq:{{SUBPAGENAME}}|sandbox|<!-- NOP -->|[[Category:外部资源模板]]}}</includeonly>
+----
+<templatedata>
+{
+	"description": "Link box to a bug report",
+	"params": {
+		"1": {
+			"label": "Bug id.",
+			"description": "Tasknumber T123 or old bugzilla number",
+			"type": "string",
+			"required": true
+		},
+		"2": {
+			"label": "Status",
+			"description": "resolved, stalled, invalid, ...",
+			"type": "string"
+		},
+		"float": {
+			"description": "CSS float+clear right, left, none, both, inherit",
+			"type": "string",
+			"default": "right"
+		}
+	}
+}
+</templatedata>

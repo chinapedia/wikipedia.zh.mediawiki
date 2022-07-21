@@ -1,0 +1,130 @@
+local p = {}
+
+local function errormsg (msg)
+	return require('Module:Error').error{ [1] = '[[Module:Reply_to|Module:Reply_to]]錯誤：' .. msg }
+end
+
+local function nouser (template)
+	return errormsg( '使用[['_..__template_.._'|' ..  template .. ']]時出現錯誤：並無提供-{zh:使用者名稱;zh-tw:使用者名稱;zh-cn:用户名;}-。模板用法見於[['_..__template_.._'|' ..  template .. ']]。' )
+end
+
+local function maxuser (template, count)
+	return errormsg( '[['_..__template_.._'|' ..  template .. ']]最多支持' .. (count or '50') .. '个-{zh-hant:用戶;zh-tw:使用者;zh-hans:用户;}-。如果需要超过' .. (count or '50') .. '个，必须使用多个模板。模板用法見於[['_..__template_.._'|' ..  template .. ']]。' )
+end
+
+function p._replyto(args)
+	local ret = {}
+	local error = ''
+	local format = string.format
+	local template = args['template'] or 'Template:Reply to'
+	local max = tonumber(args['max']) or 50
+	if max > 50 then
+		error = ('受於MediaWiki系統限制，最多只能同時ping50人。')
+		max = 50
+	end
+	local i = 1
+	while true do
+        username = args[i]
+        if (username ~= nil) then
+        	if username == '' then else
+        		ret[#ret + 1] = '[[User:'_.._username_.._'|' .. (args['label' .. i] or username)  .. ']]'
+        	end
+			if #ret >= max then
+				error = maxuser(template,max)
+				break
+			end
+			i = i +1
+		else
+			break
+        end
+	end
+	ret = mw.text.listToText(ret,(args['c'] or '、'),(args['c'] or '、'))
+	if ret == '' then
+		return nouser(template)
+	end
+	ret = (args['@'] or '@') .. '-{' .. ret .. '}-' .. (args['p'] or '：') 
+	return mw.text.tag('span', {['class']='template-ping'}, ret) .. error
+end
+
+function p.replyto(frame)
+	local args = {}
+	if frame.args.parent then
+        args = frame:getParent().args
+    else
+        args = frame.args
+    end
+    args['template'] = frame.args['template']
+	return p._replyto(args)
+end
+
+function p.ping(frame)
+	return p.replyto(frame)
+end
+
+function p._unping(args)
+	local ret = {}
+	local error = ''
+	local format = string.format
+	local i = 1
+	while true do
+        username = args[i]
+        if (username ~= nil) then
+        	if username == '' then else
+        		ret[#ret + 1] = '[[:cmn:User:'_.._username_.._'|' ..  (args['label' .. i] or username) .. ']]'
+        	end
+			if #ret >= 50 then
+				error = maxuser('Template:Unping')
+				break
+			end
+			i = i +1
+		else
+			break
+        end
+	end
+	ret = mw.text.listToText(ret,'、','及')
+	if ret == '' then
+		return nouser('Template:Unping')
+	end
+	ret = (args['@'] or '') .. '-{' .. ret .. '}-' .. (args['p'] or '')
+	return mw.text.tag('span', {['class']='template-unping'}, ret) .. error
+end
+
+function p.unping(frame)
+	local args = frame:getParent().args
+	return p._unping(args)
+end
+
+function p._hidden_ping(args)
+	local ret = {}
+	local error = ''
+	local format = string.format
+	local i = 1
+	while true do
+        username = args[i]
+        if (username ~= nil) then
+        	if username == '' then else
+        		ret[#ret + 1] = '[[User:'_.._username_.._'|' .. (args['label' .. i] or username)  .. ']]'
+        	end
+			if #ret >= 50 then
+				error = maxuser('Template:Noping')
+				break
+			end
+			i = i +1
+		else
+			break
+        end
+	end
+	ret = mw.text.listToText(ret)
+	if ret == '' then
+		return  nouser('Template:Noping')
+	end
+	ret = '<span style="display:none">' .. ret .. '</span>' .. error
+	return ret
+end
+
+function p.hidden_ping(frame)
+	local args = frame:getParent().args
+	return p._hidden_ping(args)
+end
+
+return p

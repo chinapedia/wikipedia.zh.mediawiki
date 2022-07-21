@@ -1,0 +1,47 @@
+'''PSI'''是一套[[从头计算法|从头算]][[量子化学|量子化学]]计算工具。最初由美国[[乔治亚大学|乔治亚大学]]的[[亨利·沙弗尔|亨利·沙弗尔]]课题组开发。目前由[[乔治亚大学|乔治亚大学]]、[[艾默里大学|艾默里大学]]、[[乔治亚理工学院|乔治亚理工学院]]、[[弗吉尼亚理工学院|弗吉尼亚理工学院]]、[[佛罗里达州立大学|佛罗里达州立大学]]等多个课题组参与开发与维护。<ref name=psiref>{{doi|10.1002/wcms.93}}</ref>该软件的目标是使用从头计算法精确计算小分子到中等大小分子的体系。
+
+至2016年，软件的最新版本为'''PSI4'''。为[[开源软件|开源软件]]，使用[[C++|C++]]编写，以[[GNU通用公共许可协议|GNU GPL v2]]发布。<ref>[https://github.com/psi4/psi4public/ PSI4项目的GitHub页面]</ref>
+
+==特性==
+
+PSI支持以下量子化学计算方法：
+
+* [[哈特里－福克方程|Hatree-Fock方法]]
+* [[耦合簇方法|耦合簇方法]]
+* [[多组态自洽场方法#完全活性空间自洽场方法|完全活性空间自洽场方法]]
+* [[多参考组态相互作用方法|多参考组态相互作用方法]]
+
+一些方法可用于计算电子激发态，例如[[组态相互作用方法|单组态相互作用方法]] (Configuration interaction Singles, CIS)，随机相位近似(Random Phase Approximation, RPA), 耦合簇运动方程(Equation-of-motion Coupled Cluster, EOM-CCSD)等。
+===PSI4的新特性===
+====Python语法====
+与之前的版本不同，PSI4使用[[Python|Python]]作为计算脚本。脚本中可运行任意的Python语句，也可调用其它库（例如[[BLAS|BLAS]]）进行在线数据分析。
+以下是一个简单的PSI4输入脚本：
+<syntaxhighlight lang="Python">
+molecule h2o {
+0 1
+O
+H 1 R
+H 1 R 2 A
+}
+set basis = cc-pvdz
+Rvals = [ 0.9, 1.0, 1.1 ]
+Avals = range(100, 104, 1)
+table = Table(rows=["R", "A"], cols=["E(SCF)"])
+for h2o.R in Rvals:
+    for h2o.A in Avals:
+        escf = energy('scf')
+        table[R][A] = escf
+print str(table)
+</syntaxhighlight>
+使用[[自洽场方法|自洽场方法]]，cc-pVDZ基组计算水分子的能量并列表输出。
+====并行与集群计算====
+促使PSI4开发的原因之一是并行计算的流行。为了将量子化学计算应用于多处理器计算环境，程序的改变程序的设计结构。PSI4带有Lib Parallel库提供了并行计算的接口，支持[[MPI|MPI]]和{{en-link|MADNESS|MADNESS|MADNESS}}（多分辨率自适应数值科学仿真环境）。
+==参考资料==
+{{Reflist}}
+
+==外部链接==
+*[http://www.psicode.org PSI4 主页]{{Wayback|url=http://www.psicode.org/ |date=20200531080008 }}
+
+{{DEFAULTSORT:Psi (计算化学)}}
+[[Category:化学软件|Category:化学软件]]
+[[Category:计算化学|Category:计算化学]]

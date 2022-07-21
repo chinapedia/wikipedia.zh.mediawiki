@@ -1,0 +1,279 @@
+{{NoteTA
+|G1=IT
+}}
+{{refimprove|time=2016-04-28T09:52:36+00:00}}
+{{Expand language|time=2016-04-25T12:09:51+00:00}}
+'''最长回文子串'''（{{lang-en|'''Longest palindromic substring'''}}）是计算机科学中的問題，在一个[[字符串|字符串]]中查找一个最长的连续的[[回文|回文]]的子串，例如“banana”最长回文子串是“anana”。最长回文子串并不一定是唯一的，比如在“abracadabra”中，没有超过3个字符的回文子串，但是有两个回文字串长度都是3：“ada”和“aca”。在一些应用中，我们求出全部的极大回文子串（不被其他回文串包含的回文子串）。
+
+Manacher于1975年发现了一种线性时间算法<ref>{{Cite journal|title=A New Linear-Time ``On-Line'' Algorithm for Finding the Smallest Initial Palindrome of a String|url=http://dl.acm.org/citation.cfm?id=321892.321896|last=Manacher|first=Glenn|date=1975-07-01|journal=Journal of the ACM (JACM)|issue=3|doi=10.1145/321892.321896|volume=22|pages=346–351|issn=0004-5411}}</ref>，可以在列出给定字符串中从任意位置开始的所有回文子串。并且，Apostolico, Breslauer & Galil <ref>{{Cite journal|title=Parallel detection of all palindromes in a string|url=http://linkinghub.elsevier.com/retrieve/pii/030439759400083U|last=Apostolico|first=Alberto|last2=Breslauer|first2=Dany|date=1995-04|journal=Theoretical Computer Science|issue=1-2|doi=10.1016/0304-3975(94)00083-u|volume=141|pages=163–173|issn=0304-3975|last3=Galil|first3=Zvi|access-date=2018-07-03|archive-date=2020-07-17|archive-url=https://web.archive.org/web/20200717020549/https://linkinghub.elsevier.com/retrieve/pii/030439759400083U|dead-url=no}}</ref>发现，同样的算法也可以在任意位置查找全部极大回文子串，并且时间复杂度是线性的。因此，他们提供了一种时间复杂度为线性的最长回文子串解法。另外，Jeuring (1994)<ref>{{Cite journal|title=The derivation of on-line algorithms, with an application to finding palindromes|url=http://link.springer.com/10.1007/BF01182773|last=Jeuring|first=Johan|date=1994-02|journal=Algorithmica|issue=2|doi=10.1007/bf01182773|volume=11|pages=146–184|language=en|issn=0178-4617}}</ref>,  Gusfield (1997)<ref>{{Cite book|url=http://ebooks.cambridge.org/ref/id/CBO9780511574931|title=9.2 Finding all maximal palindromes in linear time", Algorithms on Strings, Trees, and Sequences|last=Gusfield|first=Dan|date=1997|publisher=Cambridge University Press|year=|isbn=9780511574931|location=Cambridge|pages=|language=en|chapter=Algorithms on Strings, Trees, and Sequences|doi=10.1017/cbo9780511574931}}</ref>发现了基于后缀树的算法。也存在已知的高效并行算法。
+
+最长回文子串算法不应当与最长回文子序列算法混淆。
+
+== 定义 ==
+=== 回文字符串 ===
+
+如果一个长度为 <math>n</math> 的[[字符串|字符串]] <math>s</math> 当中所有字符依次为 <math>s_0,\,s_1,\,s_2\,\cdots\,s_{n-1}</math>. 且 <math>s</math> 满足 <math>\forall i\in \left[0,\left\lfloor\frac{n}{2}\right\rfloor\right],\;s_i=s_{n-i-1}</math>, 那么则称 <math>s</math> 为一个回文字符串。
+
+=== 最长回文子串 ===
+
+如果字符串 <math>s</math> 的一个[[#回文字符串|回文]][[子串|子串]] <math>s_1</math> 是 <math>s</math> 所有回文子串中长度最长的，那么则称 <math>s_1</math> 为 <math>s</math> 的最长回文子串。
+
+== 暴力循环 ==
+在了解Manacher算法之前，我们先了解一下“笨”办法，也就是暴力循环，或者说死算。
+
+注意到每个回文字符串都是以一个对称点为中心左右对称的，所以暴力运算的方式是我们循环每个字母作对称点，然后在每个对称点查看所能找到的最大回文字符串的长度，最终得到结果。
+
+=== 偶长度回文字符串的处理 ===
+需要注意到的一点，就是如果单纯的把每个字符当作对称点的话，只能得到奇数长度的回文字符串符。而回文字符串可能是偶数长度的，比如“cbaabd”中的“baab”，此时对称点是介于两个字符“a”中间的。这样的话，如果直接处理起来，可能会比较麻烦，比如需要额外定义如何表示字符中间的位置。
+
+这里有一种巧妙的办法，就是在字符串中插入一些定位符，比如“$”，比如字符串“cbaabd”就会变成“$c$b$a$a$b$d$”。
+
+此时我们只需要按照奇长度字符串的处理方式去处理这个字符串（即每次选取对称点只需依次选取字符），最后得到的回文字符串“$b$a$a$b$”中，再把定位符“$”去掉，我们就可以得到原始的偶长度字符串“baab”了。
+
+=== 伪代码 ===
+<syntaxhighlight lang="pascal" line="1">
+将输入字符串s插入定位符，比如"$"
+定义一个数组P[i]，用于存储以i位置为对称中心的最长回文字符串的“半径”
+for c = 0 to len(s) do
+
+    // 找到最长回文字符串“半径”
+    r = 0
+    while c-(r+1) >= 0 and c+(r+1) < len(s) and s[c+(r+1)] == s[c-(r+1)] do
+        r = r + 1
+    end while
+    p[c] = r
+end for
+找到P[i]中的最大值P[x]
+取出返回字符串 ret = substring(s, x-P[x], x+P[x])
+将ret字符串中的定位符去除
+return ret
+    
+</syntaxhighlight>
+
+=== 时间复杂度 ===
+因为我们嵌套循环2次，外循环是n次，内循环平均下来是n/2次，所以时间复杂度是<math>O(n^2)</math>。
+
+== Manacher算法 ==
+要在线性时间内找出字符串的最长回文子串，这个算法必须利用回文字符串和子回文字符串中观察到的一些特点。
+
+首先我们观察一下回文字符串可知，回文字符串都是对称的。而且如果一个长回文字符串的对称点左面包含一个小的回文字符串，那么对称过去到右面也必然会包含一个小的回文字符串，比如“dacabacad”这个字符串中，对称点b左面有一个回文字符串“aca”，右面也会对称出一个回文字符串“aca”。
+
+=== 回文字符串边界的情况讨论 ===
+那么我们观察对称点左面出现的这个小回文字符串，这个字符串有三种情况：
+
+==== 情况1 ====
+如果左侧小回文字符串的左边界在大回文字符串的左边界之内，那么右面对称出的小回文字符串也不会触碰到大回文字符串的右边界。
+
+比如“<u>d'''aca'''x'''aca'''d</u>”这个字符串，左侧的“aca”没有超过这个大回文字符串的左边界，那么右面对称出的“aca”也不会超过右边界。
+
+也就是说，在这种情况下，右面这个小回文字符串的长度与对称的小回文字符串的长度相等，绝对'''不会超过'''这个大回文字符串。
+
+==== 情况2 ====
+如果左侧小回文字符串的左边界超过了大回文字符串的左边界，那这个右面对称出的小回文字符串会正好触碰到大回文字符串的右边界，但是不会超出。
+
+比如观察这个字符串“'''d<u>cbabcd</u>'''<u>xd'''cbabc'''</u>e”。左侧的小回文字符串的边界超出了用下划线标出的大回文字符串的左边界。对称过来的右侧的小回文字符串的边界会刚好卡在大回文字符串的右边界。这是由于大回文字符串右边界之外的下一个字母（此处是“e”）绝对不是左边界的那个字母“d”的对称，所以右边的小回文字符串延申到边界之后也无法继续延申下去了。
+
+也就是说，在这种情况下，右面这个小回文字符串的右边界与大回文字符串的右边界相同，那么这个小回文字符串的长度也绝对'''不会超过'''这个大回文字符串。
+
+==== 情况3 ====
+如果左侧小回文字符串的左边界正好卡在大回文字符串的左边界上，那么右面对称出的小回文字符串有可能会继续延伸下去，超过大回文字符串的右边界。
+
+比如观察这个字符串“abc<u>'''dcbabcd'''xdcbabcd</u>xdcb"，左边的小回文字符串的左边界正好卡在大回文字符串的左边界上，那么对称过来的大回文字符串是有可能继续延申下去的。比如在这个例子中，右面以“a”为对称点的小回文字符串一直能向右延申到整个字符串的结尾。
+
+也就是说，在这种情况下，右面这个小回文字符串的右边界至少与大回文字符串的右边界相同，并且有可能会延申。也就是说这个小回文字符串的长度'''可能会超过'''这个大回文字符串。
+
+=== 总结 ===
+我们考虑了左边的小回文字符串的边界与大回文字符串边界的三种情况，只有'''情况3'''，也就是正好边界在同一位置的时候，右侧的小回文字符串的长度才有可能会超过大回文字符串，而其他两种情况的话，我们可以跳过不去计算。
+
+所以Manacher算法在先找到一个长回文字符串之后，可以选择性的跳过很多字母，无需一一计算，与暴力循环相比极大了提升了算法的效率。
+
+=== 伪代码 ===
+<syntaxhighlight lang="pascal" line="1">
+将输入字符串s插入定位符，比如"$"
+定义一个数组P[i]，用于存储以i位置为对称中心的最长回文字符串的“半径”
+
+// 第一个字母就是以第一个字母为中心的最长回文字符串
+r = 0  
+c = 0
+P[0] = 0
+
+while c < len(s) do
+    // 找到最长回文字符串“半径”
+    while c-(r+1) >= 0 and c+(r+1) < len(s) and s[c+(r+1)] == s[c-(r+1)] do
+        r = r + 1
+    end while
+    p[c] = r
+
+    // 存储最大回文字符串
+    lc = c
+    lr = r
+    // 计算右边界
+    rb = lc + lr
+    
+    // 循环到右边界，看看有哪些能跳过
+    c = c + 1
+    r = 0
+    while c <= rb do
+        // 找到对称的位置mc
+        mc = lc - (c - lc)      
+        if c + P[mc] < rb then
+            // 情况1，可跳过
+            P[c] = P[mc]    // 能跳过的话，不赋值也可以
+        else if c + P[mc] > rb then
+            // 情况2，可跳过
+            P[c] = rb - c   // 能跳过的话，不赋值也可以
+        else
+            // 情况3，无法跳过，需要计算
+            // 不过我们知道“半径”至少能到达右边界
+            r = rb - c
+            break
+        end if
+        
+        c = c + 1
+    end while
+end while
+找到P[i]中的最大值P[x]
+取出返回字符串 ret = substring(s, x-P[x], x+P[x])
+将ret字符串中的定位符去除
+return ret
+</syntaxhighlight>
+
+=== 时间复杂度 ===
+假设我们每次循环能找到的大回文字符串的长度为m，然后我们可以一直跳过计算，直接从该字符串的右边界开始继续循环。如果字符串的总长度为n，那么我们只需n/m次这样的循环即可。而确定ｍ的长度需要内循环ｍ次。这样来说，总时间复杂度是(n/m)*m，也就是<math>O(n)</math>。
+
+== 实现 ==
+=== [[Python|Python]] ===
+注意，以下代码并未完全按照Manacher算法执行，并未分情况讨论，即无论是情况1/2/3中的哪种情况都尝试向外继续探测半径能否延申。
+
+虽然这样会多几次无用的尝试，但是代码会简单一些。
+
+另外需要注意的是，这段代码并非返回最长回文字符串。<syntaxhighlight lang="python">
+def manacher(s0 : str) -> list:
+    T = '$#' + '#'.join(s0) + '#@'
+    l = len(T)
+    P = [0] * l
+    R, C = 0, 0
+    for i in range(1,l-1):
+        if i < R:
+            P[i] = min(P[2 * C - i], R - i)
+        
+        while T[i+(P[i]+1)] == T[i-(P[i]+1)]:
+            P[i] += 1
+        
+        if P[i] + i > R:
+            R = P[i] + i
+            C = i
+    return P
+</syntaxhighlight>
+
+=== [[C++|C++]] ===
+<syntaxhighlight lang=cpp>
+constexpr auto MAXN = (int)7000000;
+
+char s[MAXN << 1], str[MAXN];
+int RL[MAXN];
+
+int Manacher(void) {
+	size_t len = strlen(str); *s = '#';
+	for (int i = 0; i < len; i++) {
+		s[(i << 1) + 1] = str[i]; s[(i << 1) + 2] = '#';
+	}len = (len << 1) + 1;
+
+	int max = 1, pos, maxRight = -1; memset(RL, 0, sizeof(RL));
+	for (int i = 0; i < len; i++) {
+		if (i < maxRight) RL[i] = std::min(RL[(pos << 1) - i], maxRight - i);
+		else RL[i] = 1;
+		while (i - RL[i] >= 0 && i + RL[i] < len && s[i - RL[i]] == s[i + RL[i]])++RL[i];
+		if (i + RL[i] > maxRight) { pos = i; maxRight = i + RL[i]; }
+		max = std::max(max, RL[i] - 1);
+	} return max;
+}
+</syntaxhighlight>
+
+
+=== [[Matlab|Matlab]] ===
+<syntaxhighlight lang=matlab>
+function m = Manacher(a)
+    T = ['$#' reshape([a;ones(size(a))*'#'], 1, '') '@'];
+    l = length(T);
+    P = zeros(1, l);
+    
+    mx = 0; %range
+    id = 0; %center
+    for i = 2:l-1
+        if i < mx
+            P(i) = min(P(2 * id - i), mx - i);
+        else 
+            P(i) = 1;
+        end
+        
+        while T(i+P(i)) == T(i-P(i))
+            P(i) = P(i) + 1;
+        end
+        
+        if P(i) + i > mx
+            mx = P(i) + i;
+            id = i;
+        end
+    end
+    m = max(P)-1;
+</syntaxhighlight>
+=== [[Java|Java]] ===
+<syntaxhighlight lang="java">
+    // 生成新的辅助String, eg: abc123成为#a#b#c#1#2#3#2#1#
+    public static char[] manacherStringString(String str) {
+        char[] c = str.toCharArray();
+        char[] res = new char[c.length * 2 + 1];
+        int index = 0;
+        for (int i = 0; i != res.length; i++) {
+            // 两个一样效果, 填充符号"#"
+            res[i] = (i % 2) == 0 ? '#' : c[index++];
+            // res[i] = (i & 1) == 0 ? '#' : c[index++];
+        }
+        return res;
+    }
+
+    // 返回最长回文串长度
+    public static int maxLcpsLength(String str) {
+        if (str == null || str.length() == 0) {
+            return 0;
+        }
+        char[] charArr = manacherStringString(str);
+        // 辅助回文长度数组, 表示最多能扩充多少
+        int[] pArr = new int[charArr.length];
+        // 中心点
+        int C = -1;
+        // 最右边界
+        int R = -1;
+        int max = Integer.MIN_VALUE;
+        for (int i = 0; i != charArr.length; i++) {
+            // i在右边界内, i`到C的长度和到i到R的距离, 哪个小, 哪个就是起码成为回文的区域
+            // 否则为1, 自身
+            pArr[i] = R > i ? Math.min(pArr[2 * C - i], R - i) : 1;
+            // 检查边界
+            while (i + pArr[i] < charArr.length && i - pArr[i] > -1) {
+                if (charArr[i + pArr[i]] == charArr[i - pArr[i]]) {
+                    // 左右字母相等, 扩1, 直到不能扩为止
+                    pArr[i]++;
+                } else {
+                    // 不能扩
+                    break;
+                }
+            }
+            // 如果大于R, 那更新回文右边界和中心点
+            if ((i + pArr[i]) > R) {
+                R = i + pArr[i];
+                C = i;
+            }
+            // 如果需要, 则更新max
+            max = Math.max(max, pArr[i]);
+        }
+        // 返回最大回文长度
+        return max - 1;
+    }
+</syntaxhighlight>
+
+== 参考资料 ==
+{{reflist}} 
+
+[[Category:字符串算法|Category:字符串算法]]

@@ -1,0 +1,98 @@
+{{NoteTA
+|G1=IT
+|1=zh-cn:地址空间;zh-tw:定址空間
+}}
+{{校对翻译}}
+{{专家}}
+{{lowercase}}
+{{otheruses|other=软件开发之中的Fork概念|分叉_(软件开发)}}
+在[[電腦運算|计算机]]领域中，尤其是[[UNIX|Unix]]及[[类Unix系统|类Unix系统]]操作系统中，'''fork'''（进程复制）是一种创建自身[[行程|行程]]副本的操作。它通常是[[内核|内核]]实现的一种[[系统调用|系统调用]]。Fork是类Unix操作系统上创建进程的一种主要方法，甚至历史上是唯一方法。
+
+== 概述 ==
+在多任务操作系统中，[[行程|行程]]（运行的程序）需要一种方法来创建新进程，例如运行其他程序。Fork及其变种在类Unix系统中通常是这样做的唯一方式。如果进程需要启动另一个程序的可执行文件，它需要先Fork来创建一个自身的副本。然后由该副本即“[[子进程|子进程]]”调用{{tsl|en|Exec (computing)|exec}}系统调用，用其他程序覆盖自身：停止执行自己之前的程序并执行其他程序。
+
+Fork操作会为子进程创建一个单独的[[定址空間|定址空間]]。子进程拥有父进程所有内存段的精确副本。在现代的UNIX变种中，这遵循出自SunOS-4.0的[[虚拟内存|虚拟内存]]模型，根据[[寫入時複製|寫入時複製]]语义，物理内存不需要被实际复制。取而代之的是，两个进程的{{tsl|en|Virtual memory pages|虚拟内存页面}}可能指向[[電腦數據存貯器|物理内存]]中的同一个页，直到它们写入该页时，写入才会发生。在用fork配合exec来执行新程序的情况下，此优化很重要。通常来说，子进程在停止程序运行前会执行一小组有利于其他程序的操作，它可能用到少量的其父进程的[[数据结构|数据结构]]。
+
+当一个进程调用fork时，它被认为是[[父进程|父进程]]，新创建的进程是它的孩子（子进程）。在fork之后，两个进程还运行着相同的程序，都像是调用了该系统调用一般恢复执行。然后它们可以检查调用的{{tsl|en|Return value|返回值}}确定其状态：是父进程还是子进程，以及据此行事。
+
+fork系统调用在第一个版本的Unix就已存在<ref>{{cite encyclopedia|author=[[Ken_Thompson|Ken Thompson]]和[[Dennis_Ritchie|Dennis Ritchie]]|date=3 November 1971|title=SYS FORK (II)|encyclopedia=UNIX Programmer's Manual|publisher=[[Bell_Laboratories|Bell Laboratories]]|url=http://cm.bell-labs.com/cm/cs/who/dmr/man21.pdf|deadurl=yes|archiveurl=https://web.archive.org/web/20150203071127/http://cm.bell-labs.com/cm/cs/who/dmr/man21.pdf|archivedate=2015年2月3日|access-date=2016年12月2日}}</ref>，它借用于更早的{{tsl|en|Project Genie|GENIE}} [[分時系統|分時系統]]。<ref name="Ritchie">{{cite journal|title=The UNIX Time-Sharing System|url=https://www.bell-labs.com/usr/dmr/www/cacm.pdf|last2=Thompson|first2=Ken|date=July 1978|journal=Bell System Tech. J.|publisher=AT&T|accessdate=22 April 2014|issue=6|doi=10.1002/j.1538-7305.1978.tb02136.x|volume=57|pages=1905–1929|last1=Ritchie|first1=Dennis M.|authorlink1=Dennis Ritchie|archive-date=2015-06-11|archive-url=https://web.archive.org/web/20150611114359/https://www.bell-labs.com/usr/dmr/www/cacm.pdf|dead-url=yes}}</ref>Fork是标准化的[[POSIX|POSIX]]的一部分。<ref name="posix">{{man|sh|fork}}</ref>
+
+== 通信 ==
+子进程从父进程的[[文件描述符|文件描述符]]副本开始。{{R|posix}}对于进程间通信，父进程通常会创建一个或多个[[管道_(Unix)|管道]]，在fork进程之后，进程关闭它们不需要的管道端。<ref>{{man|sh|pipe}}</ref>
+
+== 变种 ==
+=== Vfork ===
+Vfork是与fork具有相同[[调用约定|调用约定]]和很多相同语义的一个变种，但只能在有限的情况下使用它。它起源于Unix的[[3BSD|3BSD]]版本<ref name="man|2|vfork|Linux">{{man|2|vfork|Linux}}</ref>{{r|netbsd-vfork}}<ref>{{cite encyclopedia |title={{mono|vfork(2)}} |encyclopedia=UNIX Programmer's Manual, Virtual VAX-11 Version |publisher=University of California, Berkeley |date=December 1979}}</ref>，这是首个支持[[虚拟内存|虚拟内存]]的Unix版本。它已按[[POSIX|POSIX]]标准化，这使得vfork能具有与fork完全相同的行为。但这已在2004年的版本中被标为过时<ref name="posix-vfork">{{man|sh|vfork|SUS6}}</ref>，并在后续版本中被[[posix_spawn|posix_spawn]]()取代（其通常通过vfork实现）。
+
+在发出一个vfork系统调用时，父进程被暂停，直至子进程完成执行或被新的可执行映像取代（通过系统调用之“{{tsl|en|Exec (computing)|exec}}”家族中的一项）。子进程借用父进程的MMU设置和内存页面，在父进程与子进程之间共享，不进行复制，尤其是没有[[寫入時複製|寫入時複製]]语义；<ref name="posix-vfork" />因此，如果子进程在任何共享页面中进行修改，不会创建新的页面，并且修改的页面对父进程同样可见。因为没有页面复制（消耗额外的内存），此技术在纯复制环境中使用exec时较普通fork更优化。在POSIX中，除非是将立即调用exec家族（及其他几个操作）的函数，其他任何目的会导致[[未定义行为|未定义行为]]。<ref name="posix-vfork" />使用vfork时，子进程借用而非复制数据结构，所以vfork仍比使用写时复制语义的fork更快。
+
+[[UNIX_System_V|System V]]在System VR4被引入前不支持此系统函数，因为它的内存共享容易出错：{{Quote|text=''Vfork'' does not copy page tables so it is faster than the System V ''fork'' implementation. But the child process executes in the same physical address space as the parent process (until an ''exec'' or ''exit'') and can thus overwrite the parent's data and stack. A dangerous situation could arise if a programmer uses ''vfork'' incorrectly, so the onus for calling ''vfork'' lies with the programmer. The difference between the System V approach and the BSD approach is philosophical: Should the kernel hide idiosyncrasies of its implementation from users, or should it allow sophisticated users the opportunity to take advantage of the implementation to do a logical function more efficiently?|sign=Maurice J. Bach<ref>{{Cite book |title=The Design of The UNIX Operating System |url=https://archive.org/details/designunixoperat00bach |first=Maurice J. |last=Bach |publisher=Prentice–Hall |year=1986 |pages=[https://archive.org/details/designunixoperat00bach/page/n305 291]–292}}</ref>}}同样，Linux对vfork的手册页面强烈不鼓励它的使用：<ref name="man|2|vfork|Linux" />{{Quote|text=It is rather unfortunate that Linux revived this specter from the past. The BSD man page states: "This system call will be eliminated when proper system sharing mechanisms are  implemented. Users should not depend on the memory sharing semantics of vfork() as it will, in that case, be made synonymous to fork(2)."}}使用vfork的其他问题包括[[死锁|死锁]] ，它可能发生在[[线程|多线程]]程序中，由于与[[Ld.so|动态链接]]交互。{{R|oracle}} 作为vfork接口的替代品，POSIX引入了posix_spawn函数家族，它结合了fork和exec的动作。这些函数可以实现为fork的程序库例程，就像Linux那样{{R|oracle}}，或者为了更好的性能实现为vfork ，就像Solaris那样<ref name="oracle">{{cite web|url=http://www.oracle.com/technetwork/server-storage/solaris10/subprocess-136439.html|title=Minimizing Memory Usage for Creating Application Subprocesses|last=Nakhimovsky|first=Greg|year=2006|publisher=[[Oracle_Corporation|Oracle Corporation]]|website=Oracle Technology Network|accessdate=2016-12-02|archive-date=2016-12-03|archive-url=https://web.archive.org/web/20161203061318/http://www.oracle.com/technetwork/server-storage/solaris10/subprocess-136439.html|dead-url=no}}</ref><ref>The OpenSolaris posix_spawn() implementation: https://sourceforge.net/p/schillix-on/schillix-on/ci/default/tree/usr/src/lib/libc/port/threads/spawn.c {{Wayback|url=https://sourceforge.net/p/schillix-on/schillix-on/ci/default/tree/usr/src/lib/libc/port/threads/spawn.c |date=20161203063029 }}</ref>。不过，POSIX规范中注明它是“为[[系统调用|内核操作]]设计”，尤其是用于运行在受限硬件和[[实时计算|实时系统]]上的操作系统。<ref>{{man|sh|posix_spawn|SUS}}</ref>
+
+虽然4.4BSD的实现中摆脱了vfork的实现，使vfork做到与fork相同的行为，它在[[NetBSD|NetBSD]]操作系统中因性能原因而恢复。<ref name="netbsd-vfork">{{cite web|url=http://www.netbsd.org/docs/kernel/vfork.html|title=NetBSD Documentation: Why implement traditional vfork()|accessdate=16 October 2013|website=NetBSD Project|archive-date=2016-12-22|archive-url=https://web.archive.org/web/20161222190506/http://www.netbsd.org/docs/kernel/vfork.html|dead-url=no}}</ref>
+
+一些嵌入式操作系统（例如[[ΜClinux|uClinux]]）省略fork并只实现vfork，因为它们需要在由于缺乏[[内存管理单元|内存管理单元]]（MMU）而不可能实现写时复制的设备上操作。
+
+=== Rfork ===
+[[貝爾實驗室九號計畫|Plan 9]]操作系统由Unix的设计者创造，包括fork，但也有一个名为“rfork”的变种，它允许父进程与子进程之间资源的细粒度共享，包括地址空间（除了[[调用栈|调用栈]]段，那是每个进程独有的）、[[环境变量|环境变量]]和[[文件系统|文件系统]][[命名空间|命名空间]]；<ref>{{man|2|fork|Plan 9}}</ref>这使它成为了创建进程和其中的[[线程|线程]]的一个统一接口。<ref>{{man|2|intro|Plan 9}}</ref> 在[[FreeBSD|FreeBSD]]<ref>{{man|2|rfork|FreeBSD}}</ref>和[[IRIX|IRIX]]中采用了来自Plan 9的rfork，后者将其更名为“sproc”。{{R|opensources}}
+
+=== Clone ===
+“clone”（克隆）是[[Linux内核|Linux内核]]中的一个系统调用，它创建一个可以与其父共享“执行[[上下文|上下文]]”的子进程。类似FreeBSD的rfork和IRIX的sproc，Linux的clone受到了Plan 9的rfork启发，并可用于实现线程（尽管应用程序的程序员通常使用更高级的接口，例如[[POSIX线程|pthreads]]，实现在clone的顶层）。出自Plan 9和IRIX的“separate stacks”（单独堆栈）特性已被省略，因为其导致了太多开销（据[[林纳斯·托瓦兹|Linus Torvalds]]）。<ref name="opensources">{{cite encyclopedia|title=The Linux edge|first=Linus|last=Torvalds|encyclopedia=Open Sources: Voices from the Open Source Revolution|year=1999|publisher=O'Reilly|url=http://oreilly.com/catalog/opensources/book/linus.html|isbn=1-56592-582-3|access-date=2016-12-02|archive-date=2014-04-21|archive-url=https://web.archive.org/web/20140421161213/http://oreilly.com/catalog/opensources/book/linus.html|dead-url=no}}</ref>
+
+== 其他操作系统中的Fork ==
+在[[OpenVMS|VMS]]操作系统（1977年）的原始设计中，新进程根据当前一些特定地址进行复制来创建被认为是有风险的。当前进程中的错误状态可能被复制给子进程。因此在这里使用了进程“产卵”（spawning）之隐喻：新进程的每个组件的内存布局都是重新创建的。{{tsl|en|Spawn (computing)|spawn}}后来被微软的操作系统采用（1993年）。
+
+[[VM/CMS|VM/CMS]]（OpenExtensions）的POSIX兼容组件提供了一个非常有限的fork实现，其中的父进程在子进程执行时被暂停，并且子与父共享同一地址空间。<ref>{{cite web|url=http://www-01.ibm.com/support/knowledgecenter/SSB27U_6.2.0/com.ibm.zvm.v620.dmsp0/hcsp0c0022.htm%23wq47?lang=en|title=z/VM > z/VM 6.2.0 > Application Programming > z/VM V6R2 OpenExtensions POSIX Conformance Document > POSIX.1 Conformance Document > Section 3. Process Primitives > 3.1 Process Creation and Execution > 3.1.1 Process Creation|accessdate=April 21, 2015|publisher=IBM|5=|archive-date=2019-10-16|archive-url=https://web.archive.org/web/20191016185629/https://www.ibm.com/support/knowledgecenter/en/SSB27U_6.2.0/com.ibm.zvm.v620.dmsp0/hcsp0c0022.htm?origURL=SSB27U_6.2.0%2Fcom.ibm.zvm.v620.dmsp0%2Fhcsp0c0022.htm|dead-url=no}}</ref>这本质上是一个名为fork的vfork。（注意，这只适用于CMS客户机操作系统，其他VM客户机操作系统如Linux提供标准的fork功能。）
+
+== 应用程序范例 ==
+下列[[Hello_World|Hello World]]程序的变种以[[C语言|C语言]]展示了fork系统调用的机理。该程序{{mono|fork}}为两个进程，每个都基于{{mono|fork}}系统调用的返回值决定它们执行什么功能。{{tsl|en|Boilerplate code|样板代码}}中的[[头文件|头文件]]等已被省略。<syntaxhighlight lang="c">
+int main(void)
+{
+   pid_t pid = fork();
+
+   if (pid == -1) {
+      perror("fork failed");
+      exit(EXIT_FAILURE);
+   }
+   else if (pid == 0) {
+      printf("Hello from the child process!\n");
+      _exit(EXIT_SUCCESS);
+   }
+   else {
+      int status;
+      (void)waitpid(pid, &status, 0);
+   }
+   return EXIT_SUCCESS;
+}
+</syntaxhighlight>下面是该程序的解析：<syntaxhighlight lang="c">
+   pid_t pid = fork();
+</syntaxhighlight>调用中的第一句是调用{{mono|fork}}系统调用来分割执行为两个进程。{{mono|fork}}的返回值被记录在类型为pid_t的变量中，其中是POSIX类型的进程标识符（PID）。
+
+在[[電腦運算|计算机]]领域，尤其是[[UNIX|Unix]]及[[类Unix系统|类Unix系统]]操作系统中，'''fork'''是一种创建自身[[行程|行程]]副本的操作。它通常是[[内核|内核]]实现的一种[[系统调用|系统调用]]。Fork是在类Unix操作系统上创建进程的一种主要方法，甚至历史上曾是唯一方法。
+
+-1错误表示{{mono|fork}}出错：没有新进程被创建。因此要印出一条错误消息。
+
+如果{{mono|fork}}成功，那么现在有两个进程。两者都从{{mono|fork}}返回时开始执行{{mono|main}}函数。为了使进程执行不同的任务，程序必须基于{{mono|fork}}的返回值决定其作为子进程或父进程执行某个[[分支_(計算機科學)|分支]]。
+<syntaxhighlight lang="c">
+   else if (pid == 0) {
+      printf("Hello from the child process!\n");
+      _exit(EXIT_SUCCESS);
+   }
+</syntaxhighlight>Fork操作会为子进程创建一个单独的[[定址空間|定址空間]]。子进程拥有父进程所有内存段的精确副本。在现代的UNIX变种中，这遵循出自SunOS-4.0的[[虚拟内存|虚拟内存]]模型，根据[[寫入時複製|寫入時複製]]语义，物理内存不需要被实际复制。取而代之的是，两个进程的{{tsl|en|virtual memory pages|虚拟内存页面}}可能指向[[物理内存|物理内存]]中的同一个页，直至它们写入该页时，写入才会发生。在用{{mono|fork}}配合{{mono|exec}}来执行新程序的情况下，此优化很重要。通常，子进程在停止程序运行前会执行一小组有利于其他程序的操作，它可能用到少量的其父进程的[[数据结构|数据结构]]。<syntaxhighlight lang="c">
+   else {
+      int status;
+      (void)waitpid(pid, &status, 0);
+   }
+</syntaxhighlight>其他进程——即父进程，会收到{{mono|fork}}传来的子进程的进程标识符，其始终为一个正数。父进程将此标识符传递给 waitpid 系统调用来暂停执行，直至子进程退出。当此情况发生后，父进程继续执行并按return语句的含义退出。
+
+== 参见 ==
+* [[Fork炸弹|fork炸弹]]
+* {{tsl|en|Fork–exec}}
+* {{tsl|en|Exit (operating system)|Exit}}
+* [[Wait|Wait]]
+
+== 参考资料 ==
+{{reflist|2}}
+
+{{Reflist|30em}}
+[[Category:C_POSIX_library|Category:C POSIX library]]
+[[Category:进程|Category:进程]]

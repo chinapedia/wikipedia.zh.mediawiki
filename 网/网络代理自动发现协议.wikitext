@@ -1,0 +1,77 @@
+{{NoteTA
+|G1=IT
+}}
+{{校对翻译}}
+'''网络代理自动发现协议'''（'''Web Proxy Auto-Discovery Protocol'''，'''WPAD'''）是一种客户端使用[[动态主机设置协议|DHCP]]和/或[[域名系统|DNS]]发现方法来定位一个配置文件URL的方法。在检测和下载配置文件后，它可以执行配置文件以测定特定URL应使用的代理。
+
+== 历史 ==
+WPAD协议仅概述了发现该文件位置的机制，而最常被部署的文件格式是最初由[[網景|网景]]在1996年为[[网景导航者|Netscape Navigator 2.0]]设计的[[代理自动配置|代理自动配置]]格式。<ref>{{cite web|url=http://wp.netscape.com/eng/mozilla/2.0/relnotes/demo/proxy-live.html|title=Navigator Proxy Auto-Config File Format|accessdate=2015-02-10|date=March 1996|work=[[Netscape_Navigator|Netscape Navigator]] Documentation|archiveurl=https://web.archive.org/web/20070307124216/http://wp.netscape.com/eng/mozilla/2.0/relnotes/demo/proxy-live.html|archivedate=2007-03-07|deadurl=yes}}</ref>WPAD协议由一个包括{{tsl|en|Inktomi Corporation|Inktomi}}、[[微软|微软]]、[[RealNetworks|RealNetworks]]和[[昇陽電腦|太阳微系统]]（现为[[甲骨文公司|甲骨文公司]]）公司组成的联盟起草。WPAD被文档化的互联网草案已在1999年12月到期，<ref>{{cite web|url=https://tools.ietf.org/html/draft-ietf-wrec-wpad-01|title=Web Proxy Auto-Discovery Protocol (INTERNET-DRAFT)|accessdate=2015-02-10|date=1999-07-28|last=Gauthier|first=Paul|work=[[IETF|IETF]]|author2=Josh Cohen|author3=Martin Dunsmuir|author4=Charles Perkins|archive-date=2012-04-23|archive-url=https://www.webcitation.org/678MZvbjq?url=https://tools.ietf.org/html/draft-ietf-wrec-wpad-01|dead-url=no}}</ref>但WPAD仍被所有主要浏览器支持。<ref name="chrome">{{Cite web|url=https://code.google.com/p/chromium/issues/detail?id=18575|title=Chromium #18575: Non-Windows platforms: WPAD (proxy autodetect discovery) does not test DHCP|accessdate=2015-02-10|date=2009-08-05|archive-date=2015-09-12|archive-url=https://web.archive.org/web/20150912050903/https://code.google.com/p/chromium/issues/detail?id=18575|dead-url=no}}</ref><ref name="firefox">{{Cite web|url=https://bugzilla.mozilla.org/show_bug.cgi?id=356831|title=Firefox #356831 - Proxy autodiscovery doesn't check DHCP (option 252|accessdate=2015-02-10|date=2006-10-16|archive-date=2021-04-14|archive-url=https://web.archive.org/web/20210414034346/https://bugzilla.mozilla.org/show_bug.cgi?id=356831|dead-url=no}}</ref>WPAD在[[Internet_Explorer_5|Internet Explorer 5.0]]中被首次引入。
+
+== 上下文 ==
+若要为组织中的所有浏览器提供相同的代理策略，而无需手动配置每个浏览器，需要使用下列两种技术：
+* [[代理自动配置|代理自动配置]]（PAC）标准：创建和发布一个中央代理配置文件。细节详见上述条目。
+* 网络代理自动发现协议（WPAD）标准：确保组织中的浏览器在非手动配置的情况下找到文件。这是本条目的范畴。
+WPAD标准定义了两种备用方法，系统管理员可以用它们发布代理配置文件的位置，它们是使用[[动态主机设置协议|动态主机设置协议]]（DHCP）或[[域名系统|域名系统]]（DNS）：
+
+在获取第一个页面前，实现有此方法的[[网页浏览器|网页浏览器]]给本地DHCP服务器发送一个DHCPINFORM查询，并使用服务器的回复中的WPAD选项。如果DHCP服务器没有提供所需的信息，则再使用DNS。假设用户的计算机网络名称为''pc.department.branch.example.com''，浏览器将依次尝试下列URL，以期成功在客户端的域中找到一个代理配置文件：
+* <nowiki>http://wpad.department.branch.example.com/wpad.dat</nowiki>
+* <nowiki>http://wpad.branch.example.com/wpad.dat</nowiki>
+* <nowiki>http://wpad.example.com/wpad.dat</nowiki>
+* <nowiki>http://wpad.com/wpad.dat</nowiki>（在不正确的实现中。参阅下面的“安全”章节）
+（注意：上述例子不是实际“在线”的URL，其中的域名被采用保留域名“[[example.com|example.com]]”替代。）
+
+在Windows上，如果DNS查询不成功，那么将使用{{tsl|en|Link-Local Multicast Name Resolution|本地链路多播名称解析}}（LLMNR）或NetBIOS。<ref>{{Cite web|url=http://kb.gfi.com/articles/Skynet_Article/KBID003669|title=Troubleshooting Web Proxy Auto Discovery (WPAD) issues|accessdate=2015-02-10|publisher={{tsl|en|GFI Software}}|archive-date=2021-04-14|archive-url=https://web.archive.org/web/20210414034409/http://kb.gfi.com/articles/Skynet_Article/KBID003669|dead-url=no}}</ref><ref>{{Cite web|url=http://www.netresec.com/?page=Blog&month=2012-07&post=WPAD-Man-in-the-Middle|title=WPAD Man in the Middle|accessdate=2015-02-10|date=2012-07-17|last=Hjelmvik|first=Erik|archive-date=2020-08-14|archive-url=https://web.archive.org/web/20200814051544/https://www.netresec.com/?page=Blog&month=2012-07&post=WPAD-Man-in-the-Middle|dead-url=no}}</ref>
+
+== 要点 ==
+DHCP比DNS有着更高的优先级：如果DHCP提供了WPAD URL，则不会进行DNS查询。只能配合DHCPv4使用，WPAD-Option选项没有在DHCPv6中定义。
+应注意Firefox不支持DHCP，只进行DNS查询，并且非Windows、ChromeOS平台以及版本号小于13的Chrome也是如此。<ref name="chrome">{{Cite web|url=https://code.google.com/p/chromium/issues/detail?id=18575|title=Chromium #18575: Non-Windows platforms: WPAD (proxy autodetect discovery) does not test DHCP|accessdate=2015-02-10|date=2009-08-05}}</ref><ref name="firefox">{{Cite web|url=https://bugzilla.mozilla.org/show_bug.cgi?id=356831|title=Firefox #356831 - Proxy autodiscovery doesn't check DHCP (option 252|accessdate=2015-02-10|date=2006-10-16}}</ref>
+
+当构造查询数据包时，DNS查询将剔除域名的首个部分（客户端的主机名）并以''wpad''取代。然后，它通过移除更多域名的部分来在层次结构中“向上移动”，直到它找到一个WPAD PAC文件或者离开当前组织。
+
+浏览器会猜测组织的边界。这种猜测对于“company.com”或“university.edu”等是正确的，但对于“company.co.uk”出错（见下面的“安全”章节）。
+
+对于DNS查询，配置文件的路径始终为''wpad.dat''。对于DHCP协议，任何URL均可。由于传统原因，PAC文件通常名为''proxy.pac''（当然，此名称的文件将被WPAD DNS搜索忽略）{{fact}}
+
+配置文件的[[互联网媒体类型|MIME类型]]必须为“application/x-ns-proxy-autoconfig”。参见[[代理自动配置|代理自动配置]]了解更多信息。
+
+Internet Explorer和[[Konqueror|Konqueror]]是目前唯一同时支持DHCP和DNS方法的浏览器；大多数主要浏览器都支持DNS方法。<ref>{{Cite web|url=http://l10n.kde.org/docs/admin/konqueror.html|title=Konqueror: Automatic Proxy Discovery|accessdate=2015-02-10|date=2013-05-20|work=[[KDE|KDE]]|deadurl=yes|archiveurl=https://web.archive.org/web/20150211100628/http://l10n.kde.org/docs/admin/konqueror.html|archivedate=2015-02-11}}</ref>
+
+== 前提条件 ==
+为使WPAD生效，需要具备几个条件：
+* 为使用DHCP，服务器必须配置为提供“site-local”选项252（“auto-proxy-config”及字符串值“<nowiki>http://example.com/wpad.dat</nowiki>”（无须引号），其中“example.com”是网页服务器的地址（无论[[点分十进制|点分十进制]]格式的[[网际协议|IP]]地址或一个[[域名系统|DNS]]名称）。
+* 为使用仅DNS模式，需要一个主机名为WPAD的DNS项目。
+* 在WPAD地址上的主机必须可以提供[[網頁|網頁]]。
+* 在这两种情况下，网页服务器必须配置为提供[[互联网媒体类型|MIME类型]]为“application/x-ns-proxy-autoconfig”的WPAD文件。
+* 如果使用了DNS方法，名为''wpad.dat''的文件必须位于WPAD网页服务器的[[根目录|根目录]]。
+* PAC文件的细节见[[代理自动配置|代理自动配置]]条目。
+* 在一个[[虚拟主机|虚拟主机]]环境中配置WPAD服务器时请小心使用。在使用自动代理检测时，Internet Explorer 6及更早版本中的WinHTTP和WinINET会发送“Host: <IP address>”头，在IE7+和Firefox中则发送“Host: wpad”头。因此，建议将wpad.dat文件托管在默认虚拟主机而非其自身下。
+* Internet Explorer版本6.0.2900.2180.xpsp_sp2_rtm会向网页服务器请求“wpad.da”而不是“wpad.dat”。
+* 如果您使用Windows Server 2003（及更新版本）作为您的DNS服务器，您可能必须禁用DNS服务器全局查询阻止列表（''DNS Server Global Query Block List''）或修改注册表以编辑阻止查询的列表。<ref>{{Cite web|url=http://www.mpking.com/2010/02/wpad-does-not-resolve-in-dns.html|title=WPAD does not resolve in DNS|accessdate=2015-02-10|date=2010-02-17|last=King|first=Michael|archive-date=2021-04-14|archive-url=https://web.archive.org/web/20210414034429/https://www.mpking.com/2010/02/wpad-does-not-resolve-in-dns.html|dead-url=no}}</ref><ref>{{Cite web|url=https://technet.microsoft.com/en-us/library/cc995158.aspx|title=Removing WPAD from DNS block list|accessdate=2015-02-10|work=[[Microsoft_TechNet|Microsoft TechNet]]|archive-date=2017-02-14|archive-url=https://web.archive.org/web/20170214142557/https://technet.microsoft.com/en-us/library/cc995158.aspx/|dead-url=no}}</ref>
+
+== 安全 ==
+在极大简化组织中浏览器配置的同时，WPAD协议必须被小心使用：简单的疏失就可能留下漏洞，攻击者可以篡改用户浏览器中显示的内容：
+* 网络内部的攻击者可以建立一个DHCP服务器，提供一个恶意PAC脚本的网址。
+* 如果网络是“company.co.uk”并且<nowiki>http://wpad.company.co.uk/wpad.dat</nowiki>文件未提供，浏览器将请求<nowiki>http://wpad.co.uk/wpad.dat</nowiki>。浏览器不会测定这是否仍处在公司内部。参见http://wpad.com/ {{Wayback|url=http://wpad.com/ |date=20060719122101 }}<nowiki/>上的例子。
+* 同样的方法已被<nowiki>http://wpad.org.uk</nowiki>使用。它提供一个wpad.dat文件从而将用户的所有流量重定向到一个互联网拍卖网站。
+* 实施[[DNS劫持|DNS劫持]]的ISP可能阻断WPAD协议的DNS查询，从而将用户引导至非代理服务器的主机。
+* 泄露的WPAD查询可能导致与内部网络命名方案的域名冲突。如果攻击者注册一个域来回答WPAD查询并配置一个有效的代理，这有可能进行跨越互联网的[[中间人攻击|中间人攻击]]。<ref>{{Cite web |url=https://www.us-cert.gov/ncas/alerts/TA16-144A |title=存档副本 |access-date=2016-12-23 |archive-date=2020-06-18 |archive-url=https://web.archive.org/web/20200618084403/https://www.us-cert.gov/ncas/alerts/TA16-144A |dead-url=no }}</ref>
+通过WPAD文件，攻击者可以引导用户的浏览器到他们自己的代理，拦截和修改所有WWW流量。尽管2005年对Windows WPAD的处理应用了一个简单的修复，但它只解决了.com域的问题。在{{tsl|en|Kiwicon}}的一次演讲表示，世界上的许多地方仍有极其脆弱的安全漏洞，在新西兰为测试目的注册的一个示例域名在几秒内收到了来自全国各地的代理请求。几个wpad.tld域名（包括COM, NET, ORG和US）现在指向客户端环回地址以帮助防范此安全漏洞，虽然还有一些名称仍是注册状态（如wpad.co.uk）。
+
+因此，管理员应确保用户可以信任组织中的所有DHCP服务器，并且组织内的所有可能的wpad域都在控制之下。此外，如果没有为组织配置wpad域，用户将转向域层次结构中的下一个（更高层级）wpad站点并使用其配置。这允许能在顶级域注册wpad子域名的人将自己的代理设为对所有流量或特定站点提供服务，从而施行对特定国家或区域的大范围[[中间人攻击|中间人攻击]]。
+
+除了上述“陷阱”，WPAD方法是获取一个JavaScript文件并在所有用户浏览器上执行，即使用户已禁用查看网页时使用的JavaScript。
+
+== 参考资料 ==
+{{reflist|1}}
+
+== 拓展阅读 ==
+* {{Cite web|url=http://jdebp.eu./FGA/web-browser-auto-proxy-configuration.html|title=Automatic proxy HTTP server configuration in web browsers|year=2004|work=Frequently Given Answers|accessdate=2016-12-23|archive-date=2016-08-26|archive-url=https://web.archive.org/web/20160826134107/http://jdebp.eu/FGA/web-browser-auto-proxy-configuration.html|dead-url=no}}
+* {{Cite web|url=https://www.microsoft.com/en-us/download/details.aspx?id=8219|title=DNS Server Global Query Block List|author=Jim Groves|date=November 2007|accessdate=2016-12-23|archive-date=2015-02-16|archive-url=https://web.archive.org/web/20150216113020/http://www.microsoft.com/en-us/download/details.aspx?id=8219|dead-url=no}}
+* {{Cite web|url=http://www.findproxyforurl.com|title=PAC File & WPAD Examples|date=2015-09-18|access-date=2022-03-25|archive-date=2020-12-10|archive-url=https://web.archive.org/web/20201210040800/http://www.findproxyforurl.com/|dead-url=no}}
+
+{{Internet Explorer}}
+{{Web browsers}}
+
+[[Category:Internet_Explorer|Category:Internet Explorer]]
+[[Category:代理服务器|Category:代理服务器]]
+[[Category:網頁瀏覽器|Category:網頁瀏覽器]]

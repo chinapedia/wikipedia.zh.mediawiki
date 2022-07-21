@@ -1,0 +1,36 @@
+<!--
+Beware: The /content subpage MUST NOT output ANY content or HTML unless one ore more edit notices exist so that
+MediaWiki can determine whether or not to show MediaWiki:Editnotice-notext. Otherwise this will incorrectly
+cause the software to think the page has an edit notice when in fact it doesn't. 
+-->
+<!--
+  Namespace notice:
+-->{{#ifeq: {{{notice action|}}} | view
+|   <!--"Viewing the source" of a protected page, don't show namespace notice-->
+| {{#ifexist: Template:Editnotices/Namespace/{{#if:{{NAMESPACE}}|{{NAMESPACE}}|Main}}
+  | {{#if: {{Template:Editnotices/Namespace/{{#if:{{NAMESPACE}}|{{NAMESPACE}}|Main}}}} | <div class="editnotice-namespace" style="width: 100%;"> {{Template:Editnotices/Namespace/{{#if:{{NAMESPACE}}|{{NAMESPACE}}|Main}}}} </div> }}
+  }}
+}}<!--
+  Group and page notice:
+-->{{editnotice load/core
+| notice action = {{{notice action|}}}
+| group allowed = {{ns has subpages}}   <!--"yes" or empty string-->
+| groupnotice = Template:Editnotices/Group/{{FULLROOTPAGENAME}}
+| pagenotice = 
+  <!--If on a user or user talk rootpage, then use /Editnotice,
+      else use normal protected notice-->
+  {{#ifeq: {{SUBJECTSPACE}}#{{PAGENAME}} | {{ns:User}}#{{BASEPAGENAME}}
+  | {{FULLPAGENAME}}/Editnotice
+  | Template:Editnotices/Page/{{FULLPAGENAME}}
+  }}
+| userpage = 
+  <!--If on a user or user talk rootpage, then "yes", else empty string-->
+  {{#ifeq: {{SUBJECTSPACE}}#{{PAGENAME}} | {{ns:User}}#{{BASEPAGENAME}}
+  | yes
+  }}
+| ownuserpage = 
+  <!--If on the user's own user or user talk rootpage, then "yes", else empty string. {{REVISIONUSER}} returns current user when in system messages. -->
+  {{#ifeq: {{SUBJECTSPACE}}#{{PAGENAME}} | {{ns:User}}#{{REVISIONUSER}}
+  | yes
+  }}
+}}

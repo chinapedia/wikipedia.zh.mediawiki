@@ -1,0 +1,100 @@
+{{Translating|time=2018-03-20}}
+{{machine learning bar}}
+{{NoteTA |G1=Math}}
+在[[统计学|统计学]]和[[机器学习|机器学习]]中，'''Lasso算法'''（英语：'''least absolute shrinkage and selection operator'''，又译最小绝对值收敛和选择算子、套索算法）是一种同时进行[[特征选择|特征选择]]和[[正则化|正则化]]（数学）的[[回归分析|回归分析]]方法，旨在增强[[统计模型|统计模型]]的预测准确性和可解释性，最初由[[斯坦福大学|斯坦福大学]]统计学教授{{le|Robert Tibshirani}}于1996年基于[[Leo_Breiman|Leo Breiman]]的[[非负参数推断|非负参数推断]](Nonnegative Garrote, NNG)提出<ref name = "Tibshirani 1996">Tibshirani, Robert. 1996. “Regression Shrinkage and Selection via the lasso”. Journal of the Royal Statistical Society. Series B (methodological) 58 (1). Wiley: 267–88. http://www.jstor.org/stable/2346178 {{Wayback|url=http://www.jstor.org/stable/2346178 |date=20201117162750 }}.</ref><ref>{{Cite journal|title=Better Subset Regression Using the Nonnegative Garrote|url=http://www.tandfonline.com/doi/abs/10.1080/00401706.1995.10484371|last=Breiman|first=Leo|date=1995-11-01|journal=Technometrics|issue=4|doi=10.2307/1269730|volume=37|pages=373–384|issn=0040-1706|access-date=2017-10-06|archive-date=2020-06-08|archive-url=https://web.archive.org/web/20200608032436/https://www.tandfonline.com/doi/abs/10.1080/00401706.1995.10484371|dead-url=no}}</ref>。Lasso算法最初用于计算[[最小二乘法|最小二乘法]]模型，这个简单的算法揭示了很多[[估计量|估计量]]的重要性质，如[[估计量|估计量]]与[[岭回归|岭回归]]（Ridge regression，也叫[[吉洪诺夫正则化|吉洪诺夫正则化]]）和最佳子集选择的关系，Lasso系数[[估计值|估计值]](estimate)和[[软阈值|软阈值]]（soft thresholding）之间的联系。它也揭示了当[[协变量|协变量]][[共線_(幾何)|共线]]时，Lasso系数估计值不一定唯一（类似标准[[線性回歸|线性回归]]）。
+
+虽然最早是为应用最小二乘法而定义的算法，lasso正则化可以简单直接地拓展应用于许多统计学模型上，包括[[廣義線性模型|广义线性模型]]，[[广义估计方程|广义估计方程]]，[[成比例灾难模型|成比例灾难模型]]和[[M-估计|M-估计]]<ref>{{Cite journal|title=Regression Shrinkage and Selection via the Lasso|url=http://www.jstor.org/stable/2346178|last=Tibshirani|first=Robert|date=1996|journal=Journal of the Royal Statistical Society. Series B (Methodological)|issue=1|volume=58|pages=267–288|access-date=2016-07-25|archive-date=2020-11-17|archive-url=https://web.archive.org/web/20201117162750/https://www.jstor.org/stable/2346178|dead-url=no}}</ref><ref>{{Cite journal|title=The Lasso Method for Variable Selection in the Cox Model|url=http://onlinelibrary.wiley.com/doi/10.1002/(SICI)1097-0258(19970228)16:43.0.CO;2-3/abstract|last=Tibshirani|first=Robert|date=1997-02-28|journal=Statistics in Medicine|issue=4|doi=10.1002/(sici)1097-0258(19970228)16:4%3C385::aid-sim380%3E3.0.co;2-3|volume=16|pages=385–395|language=en|issn=1097-0258}}{{Dead link|date=2019年2月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>。Lasso选择子集的能力依赖于限制条件的形式并且有多种表现形式，包括[[几何学|几何学]]，[[贝叶斯统计|贝叶斯统计]]，和[[凸分析|凸分析]]。
+
+Lasso算法与[[基追踪降噪|基追踪降噪]]联系紧密。
+
+==历史来源==
+[[Robert_Tibshirani|Robert Tibshirani]]最初使用Lasso来提高预测的准确性与回归模型的可解释性，他修改了模型拟合的过程，在协变量中只选择一个子集应用到最终模型中，而非用上全部协变量。这是基于有着相似目的，但方法有所不同的Breiman的非负参数推断。
+
+在Lasso之前，选择模型中协变量最常用的方法是[[移步选择|移步选择]]，这种方法在某些情况下是准确的，例如一些协变量与模型输出值有强相关性情况。然而在另一些情况下，这种方法会让预测结果更差。在当时，[[岭回归|岭回归]]是提高模型预测准确性最常用的方法。岭回归可以通过[[缩小|缩小]]大的[[迴歸分析|回归系数]]来减少过拟合从而改善模型预测偏差。但是它并不选择协变量，所以对模型的准确构建和解释没有帮助。
+
+Lasso结合了上述的两种方法，它通过强制让回归系数绝对值之和小于某固定值，即强制一些回归系数变为0，有效地选择了不包括这些回归系数对应的协变量的更简单的模型。这种方法和[[岭回归|岭回归]]类似，在岭回归中，回归系数平方和被强制小于某定值，不同点在于岭回归只改变系数的值，而不把任何值设为0。
+
+==基本形式==
+Lasso最初为了最小二乘法而被设计出来，Lasso的最小二乘法应用能够简单明了地展示Lasso的许多特性。
+
+假设一个样本包括N种事件，每个事件包括''p''个协变量和一个输出值。让<math> y_i </math>为输出值，并且<math> x_i:=(x_1,x_2,\ldots,x_p)^T</math>为第i种情况的协变量向量，那么Lasso要计算的目标方程就是： 
+
+对所有 <math> \sum_{j=1}^p |\beta_j| \leq t </math>，计算 <math> \min_{ \beta_0, \beta } \left\{ \frac{1}{N} \sum_{i=1}^N (y_i - \beta_0 - x_i^T \beta)^2 \right\}  </math><ref name="Tibshirani 1996" /> 
+
+这里 <math>t</math> 是一个决定规则化程度的预定的自由参数。 设<math> X </math>为[[协方差矩阵|协方差矩阵]]，那么 <math> X_{ij} = (x_i)_j </math>，其中 <math>x_i^T</math> 是 <math>X</math>的第 ''i'' 行，那么上式可以写成更紧凑的形式：
+
+: 对所有 <math>  \| \beta \|_1 \leq t </math>，计算 <math> \min_{ \beta_0, \beta } \left\{ \frac{1}{N} \left\| y - \beta_0 - X \beta \right\|_2^2 \right\} </math>
+
+这里 <math> \| \beta \|_p = \left( \sum_{i=1}^N | \beta_i |^p \right)^{1/p} </math> 是标准 [[Lp_space#The_p-norm_in_finite_dimensions|<math> \ell^p </math>]] [[范数|范数]]，<math> 1_N </math>是<math> N \times 1 </math>维的1的向量。
+
+因为 <math> \hat{\beta}_0 = \bar{y} - \bar{x}^T \beta </math>，所以有
+
+: <math> y_i - \hat{\beta}_0 - x_i^T \beta = y_i - ( \bar{y} - \bar{x}^T \beta ) - x_i^T \beta = ( y_i - \bar{y} ) - ( x_i - \bar{x} )^T \beta, </math>
+
+对变量进行中心化是常用的数据处理方法。并且协方差一般规范化为 <math> \textstyle \left( \sum_{i=1}^N x_{ij}^2 = 1 \right) </math> ，这样得到的解就不会依赖测量的规模。
+
+它的目标方程还可以写为：
+
+: <math> \min_{ \beta \in \mathbb{R}^p } \left\{ \frac{1}{N} \left\| y - X \beta \right\|_2^2 \right\} \text{ subject to } \| \beta \|_1 \leq t. </math>
+
+in the so-called Lagrangian form
+
+: <math> \min_{ \beta \in \mathbb{R}^p } \left\{ \frac{1}{N} \left\| y - X \beta \right\|_2^2 + \lambda \| \beta \|_1 \right\} </math>
+
+where the exact relationship between <math> t </math> and <math> \lambda </math> is data dependent.
+
+=== Orthonormal covariates ===
+
+Some basic properties of the lasso estimator can now be considered.
+
+Assuming first that the covariates are [[orthonormal|orthonormal]] so that <math> ( x_i \mid x_j ) = \delta_{ij} </math>, where <math> ( \cdot \mid \cdot ) </math> is the [[inner_product|inner product]] and <math> \delta_{ij} </math> is the [[Kronecker_delta|Kronecker delta]], or, equivalently, <math> X^T X = I </math>, then using [[subgradient_methods|subgradient methods]] it can be shown that
+
+: <math>
+\begin{align}
+\hat{\beta}_j = {} & S_{N \lambda}( \hat{\beta}^\text{OLS}_j ) = \hat{\beta}^\text{OLS}_j \max \left( 0, 1 - \frac{ N \lambda }{ |\hat{\beta}^\text{OLS}_j| } \right) \\
+& \text{ where } \hat{\beta}^\text{OLS} = (X^T X)^{-1} X^T y
+\end{align}
+</math> <ref name = "Tibshirani 1996" />
+
+<math> S_\alpha </math> is referred to as the soft thresholding operator, since it translates values towards zero (making them exactly zero if they are small enough) instead of setting smaller values to zero and leaving larger ones untouched as the hard thresholding operator, often denoted <math> H_\alpha </math>, would.
+
+This can be compared to ridge regression, where the objective is to minimize
+
+: <math> \min_{ \beta \in \mathbb{R}^p } \left\{ \frac{1}{N} \| y - X \beta \|_2^2 + \lambda \| \beta \|_2^2 \right\} </math>
+
+yielding
+
+: <math> \hat{\beta}_j = ( 1 + N \lambda )^{-1} \hat{\beta}^\text{OLS}_j. </math>
+
+So ridge regression shrinks all coefficients by a uniform factor of <math> (1 + N \lambda)^{-1} </math> and does not set any coefficients to zero.
+
+It can also be compared to regression with best subset selection, in which the goal is to minimize
+
+: <math> \min_{ \beta \in \mathbb{R}^p } \left\{ \frac{1}{N} \left\| y - X \beta \right\|_2^2 + \lambda \| \beta \|_0 \right\} </math>
+
+where <math> \| \cdot \|_0 </math> is the "<math> \ell^0 </math> norm", which is defined as <math> \| z \| = m </math> if exactly m components of z are nonzero.  In this case, it can be shown that
+
+: <math> \hat{\beta}_j = H_{ \sqrt{ N \lambda } } \left( \hat{\beta}^\text{OLS}_j \right) = \hat{\beta}^\text{OLS}_j \mathrm{I} \left( \left| \hat{\beta}^\text{OLS}_j \right| \geq \sqrt{ N \lambda } \right) </math>
+
+where <math> H_\alpha </math> is the so-called hard thresholding function and <math> \mathrm{I} </math> is an indicator function (it is 1 if its argument is true and 0 otherwise).
+
+Therefore, the lasso estimates share features of the estimates from both ridge and best subset selection regression since they both shrink the magnitude of all the coefficients, like ridge regression, but also set some of them to zero, as in the best subset selection case.  Additionally, while ridge regression scales all of the coefficients by a constant factor, lasso instead translates the coefficients towards zero by a constant value and sets them to zero if they reach it.
+
+=== Correlated covariates ===
+
+Returning to the general case, in which the different covariates may not be [[Independence_(probability_theory)|independent]], a special case may be considered in which two of the covariates, say ''j'' and ''k'', are identical for each case, so that <math> x_{(j)} = x_{(k)} </math>, where <math> x_{(j),i} = x_{ij} </math>.  Then the values of <math> \beta_j </math> and <math> \beta_k </math> that minimize the lasso objective function are not uniquely determined.  In fact, if there is some solution <math> \hat{\beta} </math> in which <math> \hat{\beta}_j \hat{\beta}_k \geq 0 </math>, then if <math> s \in [0,1] </math> replacing <math> \hat{\beta}_j </math> by <math> s ( \hat{\beta}_j + \hat{\beta}_k ) </math> and <math> \hat{\beta}_k </math> by <math> (1 - s ) ( \hat{\beta}_j + \hat{\beta}_k ) </math>, while keeping all the other <math> \hat{\beta}_i </math> fixed, gives a new solution, so the lasso objective function then has a continuum of valid minimizers.<ref name = "Zou 2005" /> Several variants of the lasso, including the Elastic Net, have been designed to address this shortcoming, which are discussed below.
+
+
+==一般形式==
+
+==算法解释==
+
+==参见==
+* [[降维|降维]]
+* [[特征选择|特征选择]]
+
+==参考文献==
+{{Reflist}}
+
+[[Category:回归分析|Category:回归分析]]
+[[Category:統計方法|Category:統計方法]]

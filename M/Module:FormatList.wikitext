@@ -1,0 +1,22 @@
+local p = {}
+
+function p.data( frame )
+    return p._impl(frame.args[1])
+end
+
+function p.dbg( frame )
+	return mw.text.jsonEncode( mw.ext.data.get( frame.args[1], frame.args[2] ), mw.text.JSON_PRETTY )
+end
+
+function p._impl( page )
+	local result = {}
+	for key, row in pairs(mw.ext.data.get(page).data) do 
+		local v0, v1 = unpack(row)
+		if v0 ~= nil and v1 ~= nil then
+			table.insert(result, "* '''" .. v0 .. "''': " .. v1 .. " in stock<br>" ) 
+		end
+	end
+	return table.concat(result, "\n")
+end
+
+return p

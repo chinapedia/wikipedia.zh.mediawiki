@@ -1,0 +1,175 @@
+{{Documentation subpage}}
+{{Lua|Module:Articles by Quality and Importance}}
+{{NoteTA
+|G1 = IT
+|G2 = MediaWiki
+}}
+
+该模板可以列出专题条目状态统计。专题模版挂载[[Template:WPBannerMeta/hooks/qualimpintersect|质量-重要度复合分类钩子]]后（如[[Wikipedia:ACG專題/評級|ACG專題]]）可自动统计条目数。'''未挂钩子则需手工编辑模板'''，包括借助[[toollabs:catscan3/catscan2.php|catscan]]工具或请机器人自动更新。因Mediawiki的Lua的特性，该模板对简繁体极度敏感。模板底部列有条目平均质量等级，是由质量换算成数字计算平均分。
+
+== 參數及使用方法 ==
+
+参数除<code>project</code>外皆为选填。
+
+; 专题设定
+* '''<code>project</code>'''：專題名稱，和专题横幅<code>PROJECT</code>参数相同，不用加專題二字。注意该参数<u>简繁体敏感</u>。
+* '''<code>taskforce=yes</code>'''：如果是个工作组。（工作组名称本身仍然填在<code>project</code>）
+* '''<code>template</code>'''：對應的專題評級模板，不用加[[WP:名字空間|名字空間]]（如<code>[[:T:ACG專題|ACG專題]]</code>）。注意该参数<u>简繁体敏感</u>。
+* '''<code>trad=yes</code>'''：对应专题横幅<code>category_trad</code>参数指定为<code>yes</code>时请填写此项。
+
+; 等级开关
+* '''<code>manual=yes</code>'''：要手动填写条目数时启用。可能是专题未挂复合分类钩子，也可能是虽挂钩子，但交由机器人更新数字。
+** '''<code>級別_重要度</code>'''：手动填表格各级别的条目数，如<code>fa_mid=9</code>表示典范级中重要度条目有9篇。合计栏自动累加。
+* '''<code>级别_=ture/false</code>'''：启用或禁用等级，如启用乙级列表的专题需输入<code>bl_=true</code>。注意下划线（<code>_</code>）不得省略。
+* '''<code>_重要度=ture/false</code>'''：启用或禁用重要度。
+* '''<code>articleonly=true</code>'''：可禁用非条目等级，可被上面两个参数覆盖。
+* '''<code>linkstyle</code>'''，数字连接格式选项
+** ''<code>disabled</code>''，不生成链接
+** ''<code>catscan</code>''，使用[[toollabs:catscan3/catscan2.php|catscan]]列出<u>讨论页</u>列表
+** ''<code>forced</code>''，连接到对应等级-重要度复合分类页。
+** ''（留空）''：仅在对应等级-重要度复合分类页建立时链接。因简繁体问题，模板可能会误判页面建立与否，必要时请改用上述<code>forced</code>一项。
+* '''<code>dispzero=yes</code>'''：0项目的单元格会显示0，而非直接隐藏。
+
+; 质量指数
+* '''<code>級別_score</code>'''：各級別的加權分數，填<code>no</code>则不对该等级算分。不填用預設值（见下）。
+* '''<code>custom_score</code>'''：用於顯示懸停提示中的文字，提示各級別的加權分數。默认以“特色级条目X分，甲级条目X分……”的方式枚举叙述，可自己整理文字描述。
+
+== 质量指数 ==
+
+质量指数列于表格底部，可以衡量条目的总体质量状况。该构思参照英文维基的[[:en:User:WP_1.0_bot/WikiWork/faq|WikiWork]]功能，不过质量指数和WikiWork思路相反：前者将终极目标FA设为10分，其它条目等级对应0到10之间的数字，后者则是计算到FA的步数，如FA低一等的甲级为1，低两等的GA为2。
+
+质量指数有Σ和σ两项，σ即条目平均质量得分，Σ指专题全体条目到FA的劳动力当量。设某专题有100篇条目，其中20篇特色、80篇优良，若优良设定为8分（即和FA差20%），则Σ = 80 * 0.2 = 16，即专题还要相当16篇条目的劳动才能全盘FA。
+
+默认权重借鉴[[:en:User:Cyberbot_I/Book_Reports|Book Reports]]和[[Wikipedia:英文軍事史專題的評級介紹|英文軍事史專題評級]]的构思，规则如下：
+* <span style="background-color: {{class/colour|FA}};">特色內容</span> － 10
+* <span style="background-color: {{class/colour|A}};">甲級內容</span> － 9
+* <span style="background-color: {{class/colour|GA}};">優良條目</span> － 8
+* <span style="background-color: {{class/colour|Bplus}};">乙上级条目</span> － 7.5
+* <span style="background-color: {{class/colour|B}};">乙級內容</span> － 7
+* <span style="background-color: {{class/colour|C}};">丙級內容</span> - 5
+* <span style="background-color: {{class/colour|Start}};">初級條目</span>／<span style="background-color: {{class/colour|List}};">列-{}-表</span> － 3
+* <span style="background-color: {{class/colour|Stub}};">小作品</span> － 1
+* <span style="background-color: {{class/colour|Unassessed}};">未評</span> － 0
+
+== 範例 ==
+
+=== 常规用法 ===
+
+只使用{{para|project}}参数
+
+; 输入代码
+<pre>{{Articles by Quality and Importance|project=公司}}</pre>
+
+; 顯示效果
+{{Articles by Quality and Importance|project=公司}}
+
+=== 自定义分值 ===
+以下為[[Wikipedia:ACG專題/評級|ACG專題]]的評級表範例。
+
+; 输入代码
+<pre>{{Articles by Quality and Importance
+| project = ACG
+| custom_score = 特色10分，甲級9.5分，優良9分，乙級8分，丙級6分，列表3分，初級3分，小作品0分，未評不計分。
+| fa_score = 10
+| fl_score = 10
+| a_score = 9.5
+| ga_score = 9
+| b_score = 8
+| bl_ = true
+| bl_score = 8
+| c_score = 6
+| cl_ = true
+| cl_score = 6
+| list_score = 3
+| start_score = 3
+| stub_score = 0
+| unassessed_score = no
+}}</pre>
+
+; 顯示效果
+{{Articles by Quality and Importance
+| project = ACG
+| custom_score = 特色10分，甲級9.5分，優良9分，乙級8分，丙級6分，列表3分，初級3分，小作品0分，未評不計分。
+| fa_score = 10
+| fl_score = 10
+| a_score = 9.5
+| ga_score = 9
+| b_score = 8
+| bl_ = true
+| bl_score = 8
+| c_score = 6
+| cl_ = true
+| cl_score = 6
+| list_score = 3
+| start_score = 3
+| stub_score = 0
+| unassessed_score = no
+}}
+
+=== 手工输入 ===
+未启用钩子的专题可手工统计条目，同时启用catscan链接风格。
+
+; 输入代码
+<pre>{{Articles by Quality and Importance
+| project=史克威尔艾尼克斯
+| taskforce = yes
+| template=WikiProject Video games
+| manual = yes
+| linkstyle = catscan
+| fa_top=0 | fa_high=0 | fa_mid=0 | fa_low=0 | fa_unknown=0
+| a_=false
+| ga_top=1 | ga_high=0 | ga_mid=1 | ga_low=0 | ga_unknown=0
+| b_top=4 | b_high=14 | b_mid=17 | b_low=16 | b_unknown=0
+| c_top=4 | c_high=8 | c_mid=17 | c_low=20 | c_unknown=0
+| start_top=4 | start_high=5 | start_mid=33 | start_low=54 | start_unknown=0
+| stub_top=0 | stub_high=5 | stub_mid=16 | stub_low=43 | stub_unknown=0
+| fl_top=0 | fl_high=0 | fl_mid=0 | fl_low=0 | fl_unknown=0
+| bl_top=0 | bl_high=2 | bl_mid=0 | bl_low=0 | bl_unknown=0 | bl_=true
+| cl_top=2 | cl_high=1 | cl_mid=2 | cl_low=2 | cl_unknown=0 | cl_=true
+| list_top=0 | list_high=1 | list_mid=1 | list_low=17 | list_unknown=0
+| category_na=34
+| draft_=false
+| disambig_na=4
+| file_=false
+| portal_na=2
+| project_na=6
+| template_na=16
+| unassessed_top=0 | unassessed_high=0 | unassessed_mid=0 | unassessed_low=0 | unassessed_unknown=0
+| updated = 2016年4月2日 (六) 14:11 (UTC)
+}}</pre>
+
+; 顯示效果
+{{Articles by Quality and Importance
+| project=史克威尔艾尼克斯
+| taskforce = yes
+| template=WikiProject Video games
+| manual = yes
+| linkstyle = catscan
+| fa_top=0 | fa_high=0 | fa_mid=0 | fa_low=0 | fa_unknown=0
+| a_=false
+| ga_top=1 | ga_high=0 | ga_mid=1 | ga_low=0 | ga_unknown=0
+| b_top=4 | b_high=14 | b_mid=17 | b_low=16 | b_unknown=0
+| c_top=4 | c_high=8 | c_mid=17 | c_low=20 | c_unknown=0
+| start_top=4 | start_high=5 | start_mid=33 | start_low=54 | start_unknown=0
+| stub_top=0 | stub_high=5 | stub_mid=16 | stub_low=43 | stub_unknown=0
+| fl_top=0 | fl_high=0 | fl_mid=0 | fl_low=0 | fl_unknown=0
+| bl_top=0 | bl_high=2 | bl_mid=0 | bl_low=0 | bl_unknown=0 | bl_=true
+| cl_top=2 | cl_high=1 | cl_mid=2 | cl_low=2 | cl_unknown=0 | cl_=true
+| list_top=0 | list_high=1 | list_mid=1 | list_low=17 | list_unknown=0
+| category_na=34
+| draft_=false
+| disambig_na=4
+| file_=false
+| portal_na=2
+| project_na=6
+| template_na=16
+| unassessed_top=0 | unassessed_high=0 | unassessed_mid=0 | unassessed_low=0 | unassessed_unknown=0
+| updated = 2016年4月2日 (六) 14:11 (UTC)
+}}
+
+== 参见 ==
+{{Grading scheme/doc/see also}}
+
+<includeonly>
+[[Category:评级模板| ]]
+</includeonly>

@@ -1,0 +1,339 @@
+{{noteTA
+|G1=生命科学
+|G2=IT
+}}
+在[[生物信息学|生物信息学]]中，'''FASTA格式'''是一种用于记录[[核酸序列|核酸序列]]或[[肽序列|肽序列]]的文本[[檔案格式|格式]]，其中的核酸或[[氨基酸|氨基酸]]均以单个字母编码呈现。该格式同时还允许在序列之前定义名称和编写注释。这一格式最初由{{link-en|FASTA|FASTA}}软件包定义，但现今已是[[生物信息学|生物信息学]]领域的一项标准。
+
+FASTA简明的格式降低了序列操纵和分析的难度，令序列可被文本处理工具和诸如[[Python|Python]]、[[Ruby|Ruby]]和[[Perl|Perl]]等[[脚本语言|脚本语言]]处理。
+
+== 格式 ==
+FASTA格式中的一条完整序列，包含开头的单行描述行和多行序列数据。描述行行首前置半角大于号（“>”）以和数据行区分。“>”后紧接的内容为该序列的标识符，该行剩余部分则为序列的描述（标识符与描述均非必须）。“>”和标识符之间不应有空格，且建议将单行内容限制在80字符以内。序列的结束以下一条序列的“>”出现为标识。如下为FASTA评论区格式一条序列的示例：
+
+<syntaxhighlight lang="console">
+>gi|31563518|ref|NP_852610.1 关，瓦斯4 microtubule-associated proteins 1A/1B light chain 3A isoform b [Homo sapiens]
+MKMRFFSSPCGKAAVDPADRCKEVQQIRDQHPSKIPVIIERYKGEKQLPVLDKTKFLVPDHVNMSELVKI
+IRRRLQLNPTQAFFLLVNQHSMVSVSTPIADIYEQEKDEDGFLYMVYASQETFGFIRENE
+</syntaxhighlight>
+
+上例中，“gi|31563518|ref|NP_852610.1|”是序列的名称。
+
+== 历史 ==
+原版FASTA/Pearson格式定义出现在[[FASTA|FASTA]]程序包的文档中。可随FASTA的任一免费版本下载（见fasta20.doc、fastaVN.doc或fastaVN.me，其中VN代表版本号）。
+
+FASTA格式中的一条序列由多行文本组成，每一行的字符数均不能超过120字符，通常不推荐超过80字符。这一限制可能与软件为单行显示预分配固定大小内存有关：当时大部分的用户都使用DEC VT（或其兼容）终端，而这一终端单行支持显示的字符数上限在80到132个之间。大部分人会将他们的终端配置为字号较大的80字符模式，因此在FASTA中每行只包含80字符或更少（通常为70字符）成为了推荐的做法。此外，标准打印页的一行宽度也在70到80字符之间（取决于字体）。
+
+FASTA文件的首行以一个“>”（大于号）或“;”（分号，较不常见）起始，后者是一条注释。然而，后续以分号起始的各行却会被软件忽略。由于软件只会识别第一条注释，早期会在首行注释中编写序列摘要（以唯一的图书馆登录号起始）；但随时间推移，现在的常见做法是只使用“>”（包括首行），不再使用任何“;”注释（因软件会忽略后者）。
+
+在首行（用于唯一描述序列）之后，是以单字母标准编码表达的实际序列数据。有效编码以外的任何字符（包括空格、制表符、星号等）都会被忽略。在结尾以“*”（星号）以示序列结束亦是早期的一种常见做法（与PIR格式序列类似）；同样因为如上原因，描述和序列之间往往还会留有空行。
+
+如下为一些序列文件的样例：
+
+<syntaxhighlight lang="console">
+;LCBO - Prolactin precursor - Bovine
+; a sample sequence in FASTA format
+MDSKGSSQKGSRLLLLLVVSNLLLCQGVVSTPVCPNGPGNCQVSLRDLFDRAVMVSHYIHDLSS
+EMFNEFDKRYAQGKGFITMALNSCHTSSLPTPEDKEQAQQTHHEVLMSLILGLLRSWNDPLYHL
+VTEVRGMKGAPDAILSRAIEIEEENKRLLEGMEMIFGQVIPGAKETEPYPVWSGLPSLQTKDED
+ARYSAFYNLLHCLRRDSSKIDTYLKLLNCRIIYNNNC*
+
+>MCHU - Calmodulin - Human, rabbit, bovine, rat, and chicken
+ADQLTEEQIAEFKEAFSLFDKDGDGTITTKELGTVMRSLGQNPTEAELQDMINEVDADGNGTID
+FPEFLTMMARKMKDTDSEEEIREAFRVFDKDGNGYISAAELRHVMTNLGEKLTDEEVDEMIREA
+DIDGDGQVNYEEFVQMMTAK*
+
+>gi|5524211|gb|AAD44166.1| cytochrome b [Elephas maximus maximus]
+LCLYTHIGRNIYYGSYLYSETWNTGIMLLLITMATAFMGYVLPWGQMSFWGATVITNLFSAIPYIGTNLV
+EWIWGGFSVDKATLNRFFAFHFILPFTMVALAGVHLTFLHETGSNNPLGLTSDSDKIPFHPYYTIKDFLG
+LLILILLLLLLALLSPDMLGDPDNHMPADPLNTPLHIKPEWYFLFAYAILRSVPNKLGGVLALFLSIVIL
+GLMPFLHTSKHRSMMLRPLSQALFWTLTMDLLTLTWIGSQPVEYPYTIIGQMASILYFSIILAFLPIAGX
+IENY
+</syntaxhighlight>
+
+多序列FASTA文件可由单序列FASTA文件字符串连接而成。这并不与FASTA文件要求首行可以“;”或“>”起始的格式相冲突，因为只要后续所有序列都以“>”起始便可被软件视为不同序列（并推而广之要求序列定义行必须使用“>”）。所以，如上的示例在连接后即为合法的多序列文件。
+
+== 描述行 ==
+描述行（定义行）或标题行以“>”开始，紧随着序列的名称和/或唯一标识符，除此还可包含其他信息。在过时的做法中，标题行有时可以有一条以上的标题，并以^A（Control-A）控制符分隔。
+
+在原版的Pearson FASTA格式中，以分号起始的注释可在标题行之后出现。但一些遵守[http://www.ncbi.nlm.nih.gov/blast/fasta.shtml NCBI FASTA规范]{{Wayback|url=http://www.ncbi.nlm.nih.gov/blast/fasta.shtml |date=20150810051301 }}的数据库和生物信息软件不会识别这些注释。如下为多序列FASTA文件的示例：<syntaxhighlight lang="console">
+>SEQUENCE_1
+MTEITAAMVKELRESTGAGMMDCKNALSETNGDFDKAVQLLREKGLGKAAKKADRLAAEG
+LVSVKVSDDFTIAAMRPSYLSYEDLDMTFVENEYKALVAELEKENEERRRLKDPNKPEHK
+IPQFASRKQLSDAILKEAEEKIKEELKAQGKPEKIWDNIIPGKMNSFIADNSQLDSKLTL
+MGQFYVMDDKKTVEQVIAEKEKEFGGKIKIVEFICFEVGEGLEKKTEDFAAEVAAQL
+>SEQUENCE_2
+SATVSEINSETDFVAKNDQFIALTKDTTAHIQSNSLQSVEELHSSTINGVKFEEYLKSQI
+ATIGENLVVRRFATLKAGANGVVNGYIHTNGRVGVVIAAACDSAEVASKSRDLLRQICMH
+</syntaxhighlight>
+
+=== 序列表达 ===
+在标题行和注释之后，是由一行或多行构成的序列数据，其中每行的长度应短于80字符。序列可以是{{link-en|蛋白质序列|Primary structure}}或[[核酸|核酸]]序列，其中可以包含空白占位或比对用字符（见[[序列比對|序列比对]]）。序列应以标准的IUB/IUPAC[[氨基酸|氨基酸]]和[[核酸|核酸]]编码表达，除以下例外：允许小写字母，并会被转作大写字母；一个半角连字符可表示一个空白字符；且在氨基酸序列中，U和*是合法字符（见下文）。标准中不允许数字，但部分数据库使用数字来表示序列的位置。
+
+支持的核酸编码如下：<ref>{{cite web
+| author = Tao Tao
+| date = 2011-08-24
+| title = Single Letter Codes for Nucleotides
+| work = [NCBI Learning Center]
+| publisher = [[美国国家生物技术信息中心|National Center for Biotechnology Information]]
+| url = http://www.ncbi.nlm.nih.gov/staff/tao/tools/tool_lettercode.html
+| accessdate = 2012-03-15
+| archive-date = 2012-07-13
+| archive-url = https://web.archive.org/web/20120713052019/http://www.ncbi.nlm.nih.gov/staff/tao/tools/tool_lettercode.html
+| dead-url = no
+}}</ref><ref>{{cite web |url=http://www.dna.affrc.go.jp/misc/MPsrch/InfoIUPAC.html |title=IUPAC code table |publisher=NIAS DNA Bank |deadurl=yes |archiveurl=https://web.archive.org/web/20110811073845/http://www.dna.affrc.go.jp/misc/MPsrch/InfoIUPAC.html |archivedate=2011-08-11 |accessdate=2016-02-25 }}</ref>
+{| class="wikitable sortable cx-highlight" style="border: 1px solid black; margin-bottom: 10px;"
+!核酸编码
+!含义
+!辅助记忆
+|-
+| A
+| A
+|[[腺嘌呤|腺嘌呤]]（{{lang|en|'''A'''denine}}）
+|-
+| C
+| C
+|[[胞嘧啶|胞嘧啶]]（{{lang|en|'''C'''ytosine}}）
+|-
+| G
+| G
+|[[鸟嘌呤|鸟嘌呤]]（{{lang|en|'''G'''uanine}}）
+|-
+| T
+| T
+|[[胸腺嘧啶|胸腺嘧啶]]（{{lang|en|'''T'''hymine}}）
+|-
+| U
+| U
+|[[尿嘧啶|尿嘧啶]]（{{lang|en|'''U'''racil}}）
+|-
+| R
+| A、G
+|[[嘌呤|嘌呤]]（{{lang|en|pu'''R'''ine}}）
+|-
+| Y
+| C、T、U
+|[[嘧啶|嘧啶]]（{{lang|en|p'''Y'''rimidines}}）
+|-
+| K
+| G、T、U
+|[[酮|酮]]基（{{lang|en|'''K'''etones}}）
+|-
+| M
+| A、C
+|[[氨基|氨基]]（{{lang|en|a'''M'''ino}}）
+|-
+| S
+| C、G
+|强（{{lang|en|'''S'''trong}}）结合力
+|-
+| W
+| A、T、U
+|弱（{{lang|en|'''W'''eak}}）结合力
+|-
+| B
+|非A（如C、G、T、U）
+|{{lang|en|A}}后为{{lang|en|'''B'''}}
+|-
+| D
+|非C（如A、G、T、U）
+|{{lang|en|C}}后为{{lang|en|'''D'''}}
+|-
+| H
+|非G（如A、C、T、U）
+|{{lang|en|G}}后为{{lang|en|'''H'''}}
+|-
+| V
+| 非T非U（如A、C、G）
+|{{lang|en|U}}后为{{lang|en|'''V'''}}
+|-
+|N
+| A C G T U
+|任意核酸（{{lang|en|'''N'''ucleic acid}}）
+|-
+| -
+|不定长度空白占位符
+|
+|}
+支持的蛋白质序列编码（25条氨基酸和3条特殊编码）如下：
+{| class="wikitable sortable" style="border: 1px solid black; margin-bottom: 10px;"
+!氨基酸编码
+!含义
+|-
+| A
+|[[丙氨酸|丙氨酸]]（{{lang|en|Alanine}}）
+|-
+| B
+|[[天冬氨酸|天冬氨酸]]（{{lang|en|Aspartic acid}}，D）或[[天冬酰胺|天冬酰胺]]（{{lang|en|Asparagine}}，N）
+|-
+| C
+| [[半胱氨酸|半胱氨酸]]（{{lang|en|Cysteine}}）
+|-
+| D
+|[[天冬氨酸|天冬氨酸]]（{{lang|en|Aspartic acid}}）
+|-
+| E
+|[[穀氨酸|谷氨酸]]（{{lang|en|Glutamic acid}}）
+|-
+| F
+|[[苯丙氨酸|苯丙氨酸]]（{{lang|en|Phenylalanine}}）
+|-
+| G
+|[[甘氨酸|甘氨酸]]（{{lang|en|Glycine}}）
+|-
+| H
+|[[組氨酸|组氨酸]]（{{lang|en|Histidine}}）
+|-
+| I
+|[[異亮氨酸|异亮氨酸]]（{{lang|en|Isoleucine}}）
+|-
+| J
+|[[亮氨酸|亮氨酸]]（{{lang|en|Leucine}}，L）或[[異亮氨酸|异亮氨酸]]（{{lang|en|Isoleucine}}，I）
+|-
+| K
+|[[離胺酸|赖氨酸]]（{{lang|en|Lysine}}）
+|-
+| L
+|[[亮氨酸|亮氨酸]]（{{lang|en|Leucine}}）
+|-
+| M
+|[[甲硫氨酸|甲硫氨酸]]（{{lang|en|Methionine}}）
+|-
+| N
+|[[天冬酰胺|天冬酰胺]]（{{lang|en|Asparagine}}）
+|-
+| O
+|[[吡咯赖氨酸|吡咯赖氨酸]]（{{lang|en|Pyrrolysine}}）
+|-
+| P
+|[[脯氨酸|脯氨酸]]（{{lang|en|Proline}}）
+|-
+| Q
+|[[穀氨醯胺|谷氨酰胺]]（{{lang|en|Glutamine}}）
+|-
+| R
+|[[精氨酸|精氨酸]]（{{lang|en|Arginine}}）
+|-
+| S
+|[[絲氨酸|丝氨酸]]（{{lang|en|Serine}}）
+|-
+| T
+|[[蘇氨酸|苏氨酸]]（{{lang|en|Threonine}}）
+|-
+| U
+|[[硒半胱氨酸|硒半胱氨酸]]（{{lang|en|Selenocysteine}}）
+|-
+| V
+|[[缬氨酸|缬氨酸]]（{{lang|en|Valine}}）
+|-
+| W
+|[[色氨酸|色氨酸]]（{{lang|en|Tryptophan}}）
+|-
+| Y
+|[[酪氨酸|酪氨酸]]（{{lang|en|Tyrosine}}）
+|-
+| Z
+|[[穀氨酸|谷氨酸]]（{{lang|en|Glutamic acid}}，E）或[[穀氨醯胺|谷氨酰胺]]（{{lang|en|Glutamine}}，Q）
+|-
+| X
+|任意
+|-
+| *
+|翻译终止
+|-
+| -
+| 不定长度空白占位符
+|}
+
+== 序列标识符 ==
+[[美国国家生物技术信息中心|NCBI]]标准定义了标题行中序列唯一标识符（SeqID）的格式。在{{link-en|Formatdb|formatdb}}的[[手册页|手册页]]中有写到：“formatdb可以自动地解析SeqID并创建索引，但在FASTA定义行中的数据库标识符必须遵守FASTA定义行格式的惯例。”
+
+下表为NCBI FASTA定义行的格式（另见[http://www.ncbi.nlm.nih.gov/books/NBK21097/ "The NCBI Handbook", Chapter 16, The BLAST Sequence Analysis Tool]{{Wayback|url=http://www.ncbi.nlm.nih.gov/books/NBK21097/ |date=20140310201524 }}）。
+{| class="wikitable sortable" style="border: 1px solid black; margin-bottom: 10px;"
+|-
+! 数据库 !! 格式
+|-
+| GenBank
+| <code>gb|''accession''|''locus''</code>
+|-
+| EMBL Data Library
+| <code>emb|''accession''|''locus''</code>
+|-
+| DDBJ, DNA Database of Japan
+| <code>dbj|''accession''|''locus''</code>
+|-
+| NBRF PIR
+| <code>pir||''entry''</code>
+|-
+| Protein Research Foundation
+| <code>prf||''name''</code>
+|-
+| SWISS-PROT
+| <code>sp|''accession''|''entry name''</code>
+|-
+| Brookhaven Protein Data Bank
+| <code>pdb|''entry''|''chain''</code>
+|-
+| Patents
+| <code>pat|country|number</code>
+|-
+| GenInfo Backbone Id
+| <code>bbs|number</code>
+|-
+| General database identifier
+| <code>gnl|database|identifier</code>
+|-
+| NCBI Reference Sequence
+| <code>ref|accession|locus</code>
+|-
+| Local Sequence identifier
+| <code>lcl|identifier</code>
+|}
+上表中的管道符（“|”）并不是[[巴科斯范式|巴科斯范式]]中的分隔符，而是格式本身的一部分。多个标识符可以连接，同样使用管道符分隔。
+
+=== 压缩 ===
+FASTA文件的压缩需要特制的压缩工具来处理文件里所包含的两部分信息：标识符与序列。为获取更好的压缩率，压缩工具会将之分为两条独立的压缩流处理。例如使用上下文模型和数学编码进行无损压缩的MFCompress算法<ref name="MFCompress">{{cite journal|last=Pinho|first=A|author2=Pratas, D|title=MFCompress: a compression tool for FASTA and multi-FASTA data.|journal=Bioinformatics|date=2014|volume=30|number=1|pages=117-118|pmid=24132931|doi=10.1093/bioinformatics/btt594}}</ref>。
+
+=== 扩展名 ===
+包含FASTA格式序列的文本文件并无标准的[[文件扩展名|扩展名]]。下表列出了各种扩展名及其含义。
+{| class="wikitable sortable" style="border: 1px solid black; margin-bottom: 10px;"
+!扩展名
+!含义
+!备注
+|-
+| fasta (.fas)
+|普通FASTA
+|任意普通的FASTA文件。此类扩展名还有fa、seq、fsa。
+|-
+|fna
+|核酸FASTA
+|普遍用于表示核酸序列的FASTA文件。
+|-
+|ffn
+|核酸编码区FASTA
+|包含基因组编码区的FASTA文件。
+|-
+|faa
+|氨基酸FASTA
+|包含表示氨基酸序列的FASTA文件。含有多种蛋白质序列的FASTA文件还可使用更具体的mpfa扩展名。
+|-
+|frn
+|非编码RNA FASTA
+|包含以DNA字母编码表示的基因组非编码RNA区（如tRNA、rRNA）的FASTA文件。
+
+|}
+
+== 参见 ==
+* [[FASTA|FASTA]]搜索
+* [[FASTQ格式|FASTQ格式]]
+* {{link-en|斯德哥尔摩格式|Stockholm format}}
+
+== 参考文献 ==
+<references />
+
+== 外部链接 ==
+* [http://zhanglab.ccmb.med.umich.edu/FASTA/ What is FASTA Format?]{{Wayback|url=http://zhanglab.ccmb.med.umich.edu/FASTA/ |date=20110522065018 }} 什么是FASTA格式.
+* [https://web.archive.org/web/20170712112029/http://www.psidev.info/node/363 HUPO-PSI Standard FASTA Format] HUPO-PSI发表的另一种FASTA格式.
+* [ftp://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/ Sequence ID (seqID) Fields in the FASTA Deflines of Sequences from NCBI] {{Wayback|url=ftp://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST/ |date=20220426235857 }} FASTA定义行的格式.
+
+{{Bioinformatics}}
+
+[[Category:生物信息學|Category:生物信息學]]

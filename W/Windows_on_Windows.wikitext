@@ -1,0 +1,53 @@
+{{NoteTA|G1=IT|G2=Windows}}
+{{About|32位Windows NT中的Win16[[子系统|子系统]]|64位Windows中的32位兼容层|WOW64}}
+{{校对翻译}}
+{{Infobox software
+| name = Windows on Windows
+| other_names = WOW
+| developer = [[微软|微软]]
+| released = 1993年
+| operating system = [[Microsoft_Windows|Microsoft Windows]]
+| genre = [[兼容层|兼容层]]
+| license = [[专有软件|专有]][[商业软件|商业软件]]
+}}
+'''Windows on Windows'''，常指'''16位WOW'''<ref>{{Cite web|url=http://support.microsoft.com/kb/153544|title=Starting 16-Bit WOW Subsystem on Windows NT Server|accessdate=11 Feb 2013|date=|publisher=Microsoft|archive-date=2007-05-09|archive-url=https://web.archive.org/web/20070509051612/http://support.microsoft.com/kb/153544|dead-url=no}}</ref>、'''WOWEXEC'''<ref>{{Cite web|url=http://support.microsoft.com/kb/181333|title=Disabling the MSDOS and WOWEXEC Subsystems on Terminal Server|accessdate=13 Feb 2013|date=|publisher=Microsoft|archive-date=2007-10-23|archive-url=https://web.archive.org/web/20071023060218/http://support.microsoft.com/kb/181333|dead-url=no}}</ref>或[[首字母縮略字|简称]]'''WOW'''<ref>{{Cite web|url=http://support.microsoft.com/kb/181333|title=WOW Environment Remains in Memory After Quitting 16-Bit Program|accessdate=13 Feb  2013|date=|publisher=Microsoft|archive-date=2007-10-23|archive-url=https://web.archive.org/web/20071023060218/http://support.microsoft.com/kb/181333|dead-url=no}}</ref>。它是一个[[Microsoft_Windows_NT|Microsoft Windows NT]][[操作系统|操作系统]]家族中[[32位元|32位]]版本的[[兼容层|兼容层]]，目的是扩展{{tsl|en|Virtual_DOS_machine|NTVDM}}以为运行为[[Windows_3.x|Windows 3.x]]编写的[[遗留代码|旧式]][[Win16|Win16]]应用程序提供有限支持。[[64位元|64位]]系统上的“WOW”通常指在64位Windows上支持32位应用程序的[[WoW64|WOW64]]。
+
+== 背景 ==
+许多[[16位元|16位]]Windows（Win16）旧式应用程序可以无需更改运行在较新的[[32位元|32位]]Windows版本。原因是设计者允许应用程序开发者在行业从Windows 3.1x过渡到[[Windows_95|Windows 95]]及更新版本期间纠正他们的应用程序，在所有客户使用的应用程序被妥善解决前，不限制客户升级到新版本的操作系统。
+
+[[Windows_9x|Windows 9x]]系列的操作系统的根基采用[[DOS|DOS]]， 本质上采用16/32位混合的系统，底层的操作系统不完全是32位，因此原生运行Win16应用程序不需要特殊的仿真。而基于[[Windows_NT|Windows NT]]的操作系统与Windows 9x的结构有很大不同，需要一个更复杂的解决方案。为了使16位应用程序能未经修改地运行在基于NT的32位Windows系统上（少许运行时限制），有两个独立策略被采用：形实替换（thunking）和垫片（shimming）。
+
+=== 形实替换 ===
+操作系统的WOWEXEC子系统会形实替换（{{tsl|en|Thunk_(compatibility_mapping)|thunks}}）旧的16位API到较新的32位环境，以提供16位[[指標_(電腦科學)|指针]]、内存模型和[[定址空間|地址空间]]的支持。
+
+所有16位应用程序默认使用共享内存空间运行在一个{{tsl|en|Virtual_DOS_machine|DOS虚拟机}}中。但它们也可以被配置为使用单独的内存空间运行，这种设置下每个16位进程都有自己的专用的虚拟机。单独的内存空间可以增加应用程序稳定性，防止16位应用程序互相干扰，但也增加16位[[行程間通訊|IPC]]和使用更多内存。
+
+Win16子系统在32位版本的[[Windows_NT|Windows NT]], [[Windows_2000|2000]], [[Windows_XP|XP]], [[Windows_Server_2003|Server 2003]], [[Windows_Vista|Vista]], [[Windows_Server_2008|Server 2008]], [[Windows_7|7]]和[[Windows_8|8]]中可用。64位版本的Windows中也有它，但不包括WoW Win16支持的子系统，因此无法运行Win16应用程序，也没有提供NTVDM模拟器。[[DOS|DOS]]和16位Windows应用程序因此不能运行在64位版本的Windows上，除非使用第三方模拟软件（例如[[DOSBox|DOSBox]]）或[[虛擬機器|虚拟机软件]]运行任何32位Windows、[[Windows_Virtual_PC|Windows XP Mode]]或DOS本身。
+
+[[Windows_NT|Windows NT]]系统中的WOWEXEC.EXE进程用于辅助Windows-on-Windows。<ref>{{Cite web|url=http://support.microsoft.com/kb/105992|title=Windows NT Subsystems and Associated Files|accessdate=13 Feb 2013|date=|archive-date=2007-03-16|archive-url=https://web.archive.org/web/20070316022744/http://support.microsoft.com/kb/105992|dead-url=no}}</ref><ref>{{Cite web|url=http://support.microsoft.com/kb/199671|title=PRB: Relocation of Ntvdm.exe Fails on Multiprocessor Computers|accessdate=11 Feb 2013|date=|publisher=Microsoft|archive-date=2009-02-22|archive-url=https://web.archive.org/web/20090222173939/http://support.microsoft.com/kb/199671|dead-url=no}}</ref>此外Windows-on-Windows还模拟了[[Windows_95|Windows 95]]和[[Windows_98|Windows 98]]内核，WIN.COM文件模拟了一个[[Windows_3.x|Windows 3.x]]内核中的{{tsl|en|NTVDM|NTVDM}}，在Windows NT上运行16位基于DOS的Windows应用程序。
+
+=== 垫片 ===
+{{Main|垫片 (计算机)}}
+
+应用程序的兼容性问题，不仅有[[长文件名|长文件名]]、多用户和[[最小权限原则|最小特权]]概念的问题，其他部分也可能导致某些应用程序无法正常运作，例如错误地在[[NTFS|NTFS]]安全情况下认为对整个文件系统有写入权限。
+
+在Windows 95操作系统设计时，一项关键要求就是文件系统要保持对[[8.3|8.3文件名]]的向后兼容，以允许旧款应用程序继续在平台上正常运行。因而Windows 95和之后的操作系统在[[FAT|文件分配表]]（FAT）中支持一个兼容性模式，同时存储长文件名和短文件名。
+
+另外，试图直接访问硬件的旧款应用程序在[[分级保护域|用户模式]]中不能这样做。如果DOS和Windows 9x的系统配置文件在Windows NT为基础的内核中不存在，旧款应用程序也可能失败。因此0字节的[[AUTOEXEC.BAT|AUTOEXEC.BAT]]和{{tsl|en|CONFIG.SYS|CONFIG.SYS}}文件在后续的、不使用它们的操作系统上继续存在。
+
+在之后的Windows版本中，有相当多的[[垫片_(计算机)|垫片]]以拦截和修改旧款应用程序的[[应用程序接口|API]]调用。<ref>{{Cite web|url=http://technet.microsoft.com/en-us/library/ee461265(v=ws.10).aspx|title=Application Compatibility|accessdate=11 Feb 2014|publisher=Microsoft|archive-date=2017-09-10|archive-url=https://web.archive.org/web/20170910104552/https://technet.microsoft.com/en-us/library/ee461265(v=ws.10).aspx}}</ref>这些修复在不断更新，以解决仍在流行的旧款应用程序的问题。<ref>{{Cite web|url=http://support.microsoft.com/kb/2272691|title=Application Compatibility Update for Windows 7 and Windows Server 2008 R2: August 2010|accessdate=11 Feb 2013|publisher=[[Microsoft|Microsoft]]|archive-date=2015-02-22|archive-url=https://web.archive.org/web/20150222040715/http://support.microsoft.com/kb/2272691}}</ref>
+
+== 参见 ==
+* [[Wine|Wine]]
+
+== 参考资料 ==
+{{Reflist}}
+
+== 外部链接 ==
+* [https://web.archive.org/web/20071225171236/http://www.microsoft.com/technet/archive/winntas/training/ntarchitectoview/ntarc_5.mspx?mfr=true Windows NT子系统]{{en}}
+* [https://web.archive.org/web/20120704233800/http://kb.iu.edu/data/acxn.html 什么是NTVDM和WOW?]{{en}}
+* [https://web.archive.org/web/20071225171241/http://www.microsoft.com/technet/prodtechnol/windows2000serv/reskit/prork/preb_mon_ewvl.mspx?mfr=true 监测16位Windows应用程序]{{en}}
+* [http://technet.microsoft.com/en-us/magazine/ff756590.aspx 优化Windows 7如何运行16位和MS-DOS的程序] {{Wayback|url=http://technet.microsoft.com/en-us/magazine/ff756590.aspx |date=20160827063557 }}{{en}}
+
+{{Windows Components}}
+[[Category:Windows组件|Category:Windows组件]]

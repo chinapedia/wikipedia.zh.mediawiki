@@ -1,0 +1,58 @@
+{{#iferror:{{{dot-id|}}}{{{lang|}}}<!--
+-->| {{#iferror:{{{lang|}}}|{{{lang|}}}|{{{dot-id|}}}}}{{main other|[[Category:Unsupported braille input{{!}}{{{input|}}}, {{FULLPAGENAME}}]]}}<!--
+ -->| {{#iferror:{{#expr:{{{dot-id|0}}}}}<!--
+MULTICELL (4x via extra template, b/c we don't know dot-id yet & calculating is too expensive)
+cell1-->|{{braille cell/main2singlecell
+|dot-id={{first word|{{{dot-id|}}}}}
+|type={{{type|}}}
+|size={{{size|}}}
+|caption = {{{caption|}}}
+|bg = {{{bg|}}}
+}}<!--
+cell2-->{{braille cell/main2singlecell
+|dot-id={{remove first word|{{{dot-id|}}}}}
+|type={{{type|}}}
+|size={{{size|}}}
+|caption = {{{caption|}}}
+|bg = {{{bg|}}}
+}}<!--
+cell3&4?-->{{#if:{{{dot-id3&4|}}}<!--
+cell3-->|{{braille cell/main2singlecell
+|dot-id={{str number/trim|{{{dot-id3&4|}}}}}
+|type={{{type|}}}
+|size={{{size|}}}
+|caption = {{{caption|}}}
+|bg = {{{bg|}}}
+|is dot-id3&4=yes
+}}<!--
+cell4-->{{#iferror:{{#expr:{{{dot-id3&4|}}}}}|{{braille cell/main2singlecell
+|dot-id={{remove first word|{{{dot-id3&4|}}}}}
+|type={{{type|}}}
+|size={{{size|}}}
+|caption = {{{caption|}}}
+|bg = {{{bg|}}}
+|is dot-id3&4=yes
+}}
+|}}<!--
+end 3&4-->}}<!--
+SINGLE CELL-->|{{braille cell/core
+ | dot-id = {{{dot-id|}}}
+ | type = {{{type|}}}
+ | size = {{{size|}}}
+ | character = {{braille cell/dot-id2character|dot-id={{{dot-id|}}}}}
+ | character name = braille pattern {{#switch:{{{dot-id|1}}}
+   |0=blank
+   |900=(whitespace)
+   |901=dot numbers
+   |#default=dots-{{{dot-id|}}}}}
+ | caption = {{#ifeq:{{{dot-id|0}}}|900|no-caption
+     |{{#switch:{{{caption|}}}
+     | = no-caption
+     | no-caption | alt-for-caption = {{{caption|}}}
+     | #default = |{{{caption|}}}&#x20;=&#x20;}}}}
+ | bg = {{{bg|}}}
+ | unicode-id = {{#switch:{{{caption|}}}
+     || no-caption | alt-for-caption = 
+     | #default = {{braille cell/dot-id2unicode-id|dot-id={{{dot-id|}}} }}}}
+}}
+}}}}

@@ -1,0 +1,154 @@
+{{NoteTA
+|1=zh-cn:远程过程调用; zh-tw:遠端程序呼叫
+|2=zh-cn:进程间通信; zh-tw:行程間通訊
+|3=zh-cn:进程; zh-tw:行程;
+|G1=IT
+|G2=FL}}
+{{Infobox software
+| logo                   =
+| screenshot             =
+| caption                =
+| developer              = [[紅帽公司|紅帽公司]]及社群
+| latest_release_version = 1.14.0<ref>{{cite web|author1=Simon McVittie|title=Announcing dbus 1.14.0 (new stable branch)|url=https://lists.freedesktop.org/archives/dbus/2022-February/018131.html|date=2022-02-28|accessdate=2022-02-28|archive-date=2022-03-01|archive-url=https://web.archive.org/web/20220301015903/https://lists.freedesktop.org/archives/dbus/2022-February/018131.html}}</ref>
+| latest_release_date    = {{Release date and age|2022|02|28}}
+| latest_preview_version = 1.13.22<ref>{{cite web|author1=Simon McVittie|title=Announcing dbus 1.13.22 (1.14.0 release candidate)|url=https://lists.freedesktop.org/archives/dbus/2022-February/018129.html|accessdate=2022-02-23|date=2022-02-23|archive-date=2022-02-28|archive-url=https://web.archive.org/web/20220228233242/https://lists.freedesktop.org/archives/dbus/2022-February/018129.html}}</ref>
+| latest_preview_date    = {{Release date and age|2022|02|23}}
+| programming_language   = [[C语言|C]]
+| operating_system       = [[跨平台|跨平台]]
+| platform               =
+| genre                  = {{unbulleted list|[[行程間通訊|IPC守護行程]]|[[Linux#个人计算机|桌面應用的Linux]]}}
+| license                = [[GNU通用公共许可证|GNU通用公共许可证]]第二版或更新，或是[[學術自由授權條款|AFL]] 2.1<ref>{{cite web|author1=havoc|title=GPL + AFL|url=http://blog.ometer.com/2007/07/17/gpl--afl/|website=Havoc's Blog|accessdate=2015-08-27|date=2007-07-17|archive-date=2015-09-07|archive-url=https://web.archive.org/web/20150907202930/http://blog.ometer.com/2007/07/17/gpl--afl/|dead-url=yes}}</ref>
+| website                = {{URL|http://www.freedesktop.org/wiki/Software/dbus}}
+}}
+
+'''D-Bus'''是一個[[行程間通訊|行程間通訊]]及[[远程过程调用|远程过程调用]]機制，可以讓多個不同的[[计算机程序|计算机程序]]（即[[行程|行程]]）在同一臺電腦上同時進行通訊<ref name="dbusovw">{{cite web |last1=Cocagne |first1=Tom |title=DBus Overview |url=https://pythonhosted.org/txdbus/dbus_overview.html |accessdate=2015-05-23 |website=pythonhosted.org |archive-date=2015-06-08 |archive-url=https://web.archive.org/web/20150608003515/http://pythonhosted.org/txdbus/dbus_overview.html |dead-url=yes }}</ref>。D-Bus作為[[freedesktop.org|freedesktop.org]]專案的一部份，其設計目的是使[[Linux|Linux]][[桌面环境|桌面环境]]（如[[GNOME|GNOME]]與[[KDE|KDE]]等）提供的服務標準化。
+
+freedesktop.org專案同時也開發了一個稱為libdbus的[[自由及开放源代码软件|自由及开放源代码软件]][[函式庫|函式庫]]，作為規範的參考實作。這個函式庫常與D-Bus本身混淆。也存在著其他的D-Bus實作，像是GDBus (GNOME)<ref name="gdbus">{{cite web|title=gdbus|url=https://developer.gnome.org/gio/stable/gdbus.html|website=GNOME developer|publisher=GNOME project|accessdate=2015-01-04|archive-date=2015-01-05|archive-url=https://web.archive.org/web/20150105133354/https://developer.gnome.org/gio/stable/gdbus.html|dead-url=no}}</ref>，QtDBus ([[Qt|Qt]]/KDE)<ref name="qtdbus">{{cite web|title=QtDBus module|url=http://doc.qt.io/qt-5/qtdbus-index.html|website=Qt專案|publisher=Qt專案|accessdate=2015-06-01|archive-date=2015-05-06|archive-url=https://web.archive.org/web/20150506133035/http://doc.qt.io/qt-5/qtdbus-index.html|dead-url=no}}</ref>，dbus-java<ref>{{cite web|title=DBus-Java Documentation|url=http://dbus.freedesktop.org/doc/dbus-java/|website=FreeDesktop.org|accessdate=2015-01-04|archive-date=2014-12-23|archive-url=https://web.archive.org/web/20141223025957/http://dbus.freedesktop.org/doc/dbus-java/|dead-url=yes}}</ref>以及sd-bus（[[systemd|systemd]]的一部份）<ref name="sd-bus">{{cite web|title=The new sd-bus API of systemd|url=http://0pointer.net/blog/the-new-sd-bus-api-of-systemd.html|date=2015-06-19|accessdate=2015-06-20|archive-date=2015-06-22|archive-url=https://web.archive.org/web/20150622035642/http://0pointer.net/blog/the-new-sd-bus-api-of-systemd.html|dead-url=no}}</ref>。
+
+== 概觀 ==
+{{multiple image
+ | footer = 沒有D-Bus時，如果大量的程序需要彼此進行通訊，其通訊網路將會非常復雜及龐大(因爲大部分程序使用一對一通訊)。使用D-Bus則可以簡化通訊網路。
+ | image1 = Processes without D-Bus.svg
+ | alt1 = 沒有D-Bus時程序間的通訊
+ | caption1 = 沒有D-Bus時程序間的通訊
+ | image2 = Processes with D-Bus.svg
+ | alt2 = 使用D-Bus時程序間的通訊
+ | caption2 = 使用D-Bus時程序間的通訊
+ }}
+D-Bus可用於同一個桌面会话中不同[[桌面环境|桌面]][[应用软件|应用软件]]間的通訊，能整合桌面会话，也解決了行程的生命週期的問題。它也允許桌面会话與[[操作系统|操作系统]]間的通訊，這通常包括了[[内核|内核]]與任何的系統[[守护进程|守护进程]]或一般[[行程|行程]]間的通訊。
+
+當大量的程序進行通訊時，由於程序跟程序之間必須建立起一對一的通訊，則整體的通訊網路將會非常復雜，而通訊效率也會因此低下不可靠。D-Bus提供了一個{{Link-tt|軟體匯流|Software bus}}[[抽象化_(計算機科學)|抽象層]]，能夠匯整所有的訊息到一個虛擬的通訊頻道<ref name="dbusovw" />。連接到D-Bus的程序無法也無需知道D-Bus是如何實做，但是只要遵從D-Bus的標準，就能保證所有連接到D-Bus的程序能進行彼此間的交流。換句話說，D-Bus是一個{{link-en|訊息導向的中介軟體|Message-oriented middleware|訊息匯流排}}系統，即行程間通訊的媒介，讓應用程式間可以通訊並交換訊息。因此，D-Bus为應用程式增加新的功能，簡化已有功能，包含資訊分享、模組化及{{link-en|權限分離|Privilege separation}}。例如透過[[藍牙|藍牙]]或[[Skype|Skype]]所接收到的通話可以傳播到任何目前執行中的音樂播放器，並可使其靜音或暫停播放，直到通話結束<ref name="linux-journal">{{cite web
+ | url = http://www.linuxjournal.com/article/7744
+ | title = Get on the D-BUS
+ | date = 2005-01-05
+ | accessdate = 2014-10-14
+ | author = Robert Love
+ | publisher = ''Linux Journal''
+ | archive-date = 2014-10-20
+ | archive-url = https://web.archive.org/web/20141020181909/http://www.linuxjournal.com/article/7744
+ | dead-url = no
+ }}</ref>。
+
+大多數的系統會實作一個具較高權限的''系統頻道''，連同給每一個已登入的使用者的''專用頻道''，這就可以讓D-Bus中可用的登錄資訊受到限制。因此，D-Bus服務同時包含了[[守护进程|系統守護行程]]（給像是「新增硬體裝置」或是「印表機佇列變更」等事件使用）以及一個給每個使用者的登入会话（給这个使用者啟動的行程間的一般通訊使用）使用的獨有[[守护进程|守护进程]]。應用程式透過[[Unix域套接字|Unix域套接字]]與守護行程通訊。訊息匯流排是建基於通用的一對一訊息傳遞[[軟體框架|框架]]，這讓任意兩個程式間可以不必透過訊息匯流排守護行程而直接通訊<ref>{{cite web
+ | url = http://www.freedesktop.org/wiki/Software/dbus/
+ | title = dbus: What is D-Bus?
+ | date = 2014-01-20
+ | accessdate = 2014-10-14
+ | publisher = [[freedesktop.org|freedesktop.org]]
+ | archive-date = 2014-10-18
+ | archive-url = https://web.archive.org/web/20141018050722/http://www.freedesktop.org/wiki/Software/dbus/
+ | dead-url = no
+ }}</ref>。
+
+== 內部 ==
+[[File:Free_and_open-source-software_display_servers_and_UI_toolkits.svg|thumb]]中扮演相當重要的角色。上面同時也有出現的Binder則是在[[Android|Android]]上的等價軟體。]]
+
+D-Bus有三個[[抽象層|抽象層]]：<ref name="linux-journal" />
+
+* '''<tt>libdbus</tt>''' —— 讓兩個應用程式可以互相連結並交換訊息的函式庫
+* '''<tt>dbus-daemon</tt>''' —— 訊息匯流排的可執行檔，建基於<code>libdbus</code>，可連結到多個應用程式。這個守護行程可以將訊息按特定路徑轉送給零個或更多個應用程式，從而實作[[发布/订阅|发布/订阅]]模式。
+* 基於特定應用程式框架的封裝函式庫
+
+接收到訊息的D-Bus連線會被轉送到一個特定的[[对象_(计算机科学)|物件]]，而非行程。因此，客戶端只知道它們是與物件互動，但並不知道另一側是否真的有物件。
+
+D-Bus為每個物件定義了一個名稱，其看起來像是POSIX檔案系統路徑，但實際上並不是，例如<tt>/org/kde/kspread/sheets/3/cells/4/5</tt>。D-Bus物件的名稱通常會使用[[命名空间|命名空间]]以協助獨立開發程式碼模組<ref>{{cite web|title=D-Bus Tutorial|url=http://dbus.freedesktop.org/doc/dbus-tutorial.html#objects|accessdate=2015-08-28|archive-date=2015-08-28|archive-url=https://web.archive.org/web/20150828095257/http://dbus.freedesktop.org/doc/dbus-tutorial.html#objects|dead-url=yes}}</ref>。命名空間一般會以開發者的保留[[域名|域名]]組件作為前綴（例如<tt>/org/kde</tt>）。
+
+== 採用 ==
+[[KDE|KDE]]第二版與第三版使用的{{link-en|DCOP|DCOP}}系統对D-Bus有深刻影响，后者在[[KDE_4|KDE 4]]中取代了前者。D-Bus的實作支援大多數的[[POSIX|POSIX]]作業系統，也有一個[[Windows|Windows]]的移植。它也在[[Qt|Qt]] 4、[[GNOME|GNOME]]及[[Xfce|Xfce]]中使用。在GNOME中，它已逐漸取代了早期的{{link-en|Bonobo|Bonobo (component model)}}機制。
+
+D-Bus最初用于桌面環境，后来使用範圍逐漸扩展，包含的系統服務越來越多。例如[[NetworkManager|NetworkManager]]網路守護行程、BlueZ藍牙堆疊及[[PulseAudio|PulseAudio]]音訊伺服器都使用D-Bus來提供其部份或全部的服務，[[systemd|systemd]]也正促使傳統的系統守護行程（如logind）轉換到D-Bus服務。{{cn}}
+
+它也用于[[AllJoyn|AllJoyn]]協定在家庭自動化中的{{link-en|導線協定|Wire protocol}}，為AllJoyn加入了探索、工作階段管理、安全、標頭壓縮、嵌入式裝置支援<ref>{{cite web |title=Difference from D-Bus? |url=https://allseenalliance.org/developer-resources/forum/developers/difference-d-bus |website=Allseen Alliance |accessdate=2015-08-27 |date=2013-12-11 |deadurl=yes |archiveurl=https://web.archive.org/web/20150721005141/https://allseenalliance.org/developer-resources/forum/developers/difference-d-bus |archivedate=2015-07-21 }}</ref>。
+
+== 實作 ==
+; {{Anchor|LIBDBUS}}libdbus
+: 雖然已經有多個D-Bus的實作，但其中使用最廣泛的參考實作是libdbus，開發者就是設計規範的freedesktop.org專案。不过libdbus是一個低階的實作，並不會直接被應用程式開發者所使用，但是可作為其他D-Bus實作（像是包含在桌面環境的標準函式庫中或是在[[编程语言|编程语言]]綁紮中的實作）的參考指南。freedesktop.org專案自身建議應用程式的作者「使用較高階的綁紮或是實作」來替代<ref name=whatisdbus>{{cite web|title=What is D-Bus?|url=http://www.freedesktop.org/wiki/Software/dbus/#index1h1|website=FreeDesktop.org|accessdate=2015-01-05|archive-date=2015-01-05|archive-url=https://web.archive.org/web/20150105013117/http://www.freedesktop.org/wiki/Software/dbus/#index1h1|dead-url=no}}</ref>。
+: 因為libdbus是最常被使用的D-Bus實作，術語"D-Bus"與"libdbus"經常互換使用，導致了混亂。
+
+; GDBus
+: GDBus<ref name="gdbus"/>是一個基於包含在[[GLib|GLib]]中的{{link-en|GIO|GIO (software)|GIO串流}}的D-Bus實作，其致力於讓[[GTK+|GTK+]]與[[GNOME|GNOME]]使用。GDBus並不是libdbus的封裝，而是一個完整且獨立的D-Bus規範與協定的重新實作<ref>{{cite web|title=Migrating to GDBus|url=https://developer.gnome.org/gio/stable/ch34.html|website=GNOME Developer|accessdate=2015-06-16|archive-date=2015-09-06|archive-url=https://web.archive.org/web/20150906202739/https://developer.gnome.org/gio/stable/ch34.html|dead-url=no}}</ref>。
+
+; QtDBus
+: QtDBus<ref name="qtdbus"/>是一個自4.2版開始，包含於[[Qt|Qt函式庫]]的D-Bus實作。這個組件也被[[KDE|KDE]]的應用程式、函式庫及組件用於存取在系統中所提供的D-Bus服務。
+
+; sd-bus
+: 2013年時，[[systemd|systemd]]專案重寫了libdbus，並努力簡化程式碼<ref>{{cite web|last1=Poettering|first1=Lennart|title=libsystemd-bus + kdbus plans|url=http://lists.freedesktop.org/archives/systemd-devel/2013-March/009797.html|publisher=systemd-devel mailing list|accessdate=2015-04-24|archive-date=2019-06-24|archive-url=https://web.archive.org/web/20190624071023/https://lists.freedesktop.org/archives/systemd-devel/2013-March/009797.html|dead-url=no}}</ref>，它也使得D-Bus的整體效能有所提升。在先前的測試中，[[BMW|BMW]]發現systemd的D-Bus函式庫效能增長了360%<ref>{{cite web |url=https://lwn.net/Articles/551969/ |title=ALS: Linux inter-process communication and kdbus |publisher=LWN.net |date=2013-05-30 |accessdate=2013-11-13 |archive-date=2013-11-13 |archive-url=https://web.archive.org/web/20131113175320/http://lwn.net/Articles/551969/ |dead-url=no }}</ref>。 而到了221版本的[[systemd|systemd]]，sd-bus的[[应用程序接口|应用程序接口]]（{{lang-en|API}}）已被宣告為穩定<ref>{{cite web |url=http://lists.freedesktop.org/archives/systemd-devel/2015-June/033170.html |title=[systemd-devel] [ANNOUNCE] systemd v221 |publisher=[[freedesktop.org|freedesktop.org]] |date=2015-06-19 |accessdate=2015-06-20 |archive-date=2015-06-20 |archive-url=https://web.archive.org/web/20150620160040/http://lists.freedesktop.org/archives/systemd-devel/2015-June/033170.html |dead-url=no }}</ref>
+
+; {{Anchor|KDBUS}}kdbus
+: 另外還有一個積極開發中的專案，稱為''kdbus''，其致力於重新實作D-Bus為核心中介的點對點[[行程間通訊|行程間通訊]]機制。除了效能的提升，kdbus也受益於已經存在的[[Linux内核|Linux内核]]特性，像是命名空間、審核機制<ref>{{cite web
+ | url = https://lwn.net/Articles/551969/
+ | title = ALS: Linux interprocess communication and kdbus
+ | date = 2013-05-30
+ | accessdate = 2014-04-11
+ | author = Jake Edge
+ | publisher = LWN.net
+ | archive-date = 2014-04-09
+ | archive-url = https://web.archive.org/web/20140409075523/http://lwn.net/Articles/551969/
+ | dead-url = no
+ }}</ref><ref>{{cite web
+ | url = https://lwn.net/Articles/580194/
+ | title = The unveiling of kdbus
+ | date = 2014-01-13
+ | accessdate = 2014-04-11
+ | author = Jonathan Corbet
+ | publisher = LWN.net
+ | archive-date = 2014-04-09
+ | archive-url = https://web.archive.org/web/20140409070929/http://lwn.net/Articles/580194/
+ | dead-url = no
+ }}</ref>、核心傳遞的安全特性、終止競爭條件等，並讓D-Bus可以在開機與關機時使用（此時需要systemd）<ref>{{cite web|author1=Greg Kroah-Hartman|title=[GIT PULL] kdbus for 4.1-rc1|url=http://lkml.iu.edu/hypermail/linux/kernel/1504.1/03936.html|accessdate=2015-08-28|date=2015-04-13|archive-date=2015-07-01|archive-url=https://web.archive.org/web/20150701201418/http://lkml.iu.edu/hypermail/linux/kernel/1504.1/03936.html|dead-url=no}}</ref>。但kdbus在Linux核心的特性中造成了不尋常的爭議<ref>{{cite web|last1=Corbet|first1=Jonathan|title=The kdbuswreck|url=http://lwn.net/Articles/641275/|website=LWN.Net|accessdate=2015-06-29|archive-date=2015-06-24|archive-url=https://web.archive.org/web/20150624085421/http://lwn.net/Articles/641275/|dead-url=no}}</ref>，是以{{as of|2015|06}}都尚未被合併<ref>{{cite web|author1=Michael Larabel|title=It Doesn't Look Like KDBUS Will Make It For Linux 4.1|url=http://www.phoronix.com/scan.php?page=news_item&px=kdbus-missing-linux-4.1|publisher=Phoronix|accessdate=2015-08-28|date=2015-04-26|archive-date=2015-09-05|archive-url=https://web.archive.org/web/20150905121636/http://www.phoronix.com/scan.php?page=news_item&px=kdbus-missing-linux-4.1|dead-url=no}}</ref>。
+
+; 語言綁紮
+: 已經有多個程式語言的D-Bus[[綁紮|綁紮]]被開發出來<ref>{{cite web|title=D-Bus Bindings|url=http://www.freedesktop.org/wiki/Software/DBusBindings/|website=FreeDesktop.org|accessdate=2015-01-05|archive-date=2014-12-24|archive-url=https://web.archive.org/web/20141224100559/http://www.freedesktop.org/wiki/Software/DBusBindings/|dead-url=no}}</ref>，像是 [[Java|Java]]、[[C♯|C♯]]、[[Ruby|Ruby]]以及[[Python|Python]]等的綁紮均已存在。
+
+== 參見 ==
+{{Portal|自由軟體}}
+
+{{Div col||25em}}
+* [[Linux#个人计算机|桌面應用的Linux]]
+* [[通用语言架构|通用语言架构]]
+* [[CORBA|CORBA]]
+* [[组件对象模型|组件对象模型]]
+* [[Distributed_COM|Distributed COM]]
+* [[Java远程方法调用|Java远程方法调用]]
+* [[遠程過程調用|遠程過程調用]]
+* [[XPCOM|XPCOM]]
+{{Div col end}}
+
+== 參考資料 ==
+{{Reflist|30em}}
+
+== 外部連結 ==
+* [http://www.freedesktop.org/Software/dbus D-Bus]{{Wayback|url=http://www.freedesktop.org/Software/dbus |date=20090107100400 }}在Freedesktop.org上的首頁
+* [http://www.freedesktop.org/wiki/IntroductionToDBus D-Bus的簡介]{{Wayback|url=http://www.freedesktop.org/wiki/IntroductionToDBus |date=20150831135741 }}在Freedesktop.org的wiki上
+
+{{-}}
+
+{{Freedesktop.org}}
+{{IPC}}
+{{GTK|state=collapsed}}
+[[Category:应用层协议|Category:应用层协议]]
+[[Category:C++函式庫|Category:C++函式庫]]
+[[Category:自由網路軟體|Category:自由網路軟體]]
+[[Category:GNOME|Category:GNOME]]
+[[Category:进程间通信|Category:进程间通信]]
+[[Category:遠端程序呼叫|Category:遠端程序呼叫]]

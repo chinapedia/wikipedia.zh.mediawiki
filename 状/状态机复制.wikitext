@@ -1,0 +1,41 @@
+在[[计算机科学|计算机科学]]领域，'''状态机复制'''是实现容错服务的一种常规方法，主要通过复制服务器，并协调客户端和这些服务器镜像间的交互来达到目标。这个方法也同时提供了理解和设计复制管理协议的一套基本框架。
+
+== 问题定义 ==
+
+=== 分布式服务 ===
+分布式软件通常由客户端和服务器组成，每个服务包含一到多个服务器，并提供可以由客户端通过请求来调用的操作。尽管使用单个中心化服务器是实现服务的最简单方式，但这种方式使得服务的容错性最多能和运行服务器的处理器相同。假如这种程度的容错性是不可接受的，那么就必须引入多个故障无相关性的服务器。通常而言，单一服务器的多个服务镜像运行在分布式系统的分离处理器上，并通过协议来保障客户端和这些镜像间的交互。在分布式系统中，物理和电子上被隔离开的处理器保障了服务器之间故障没有相关性，彼此独立，这整合需求一致
+
+=== 状态机 ===
+在后文中，状态机被定义为下面这些值元组<ref name="reliable">{{Cite journal|title=The Implementation of Reliable Distributed Multiprocess Systems|url=http://research.microsoft.com/users/lamport/pubs/pubs.html#implementation|last=Lamport|first=Leslie|journal=Computer Networks|accessdate=2008-03-13|doi=10.1016/0376-5075(78)90045-4|year=1978|volume=2|pages=95–114|archive-date=2007-08-16|archive-url=https://web.archive.org/web/20070816121810/http://research.microsoft.com/users/lamport/pubs/pubs.html#implementation|dead-url=no}}</ref>（参见[[米利型有限状态机|Mealy machine]]和[[摩尔型有限状态机|Moore Machine]]）：
+* ''一组状态''
+* ''一组输入''
+* ''一组输出''
+* 一个转换函数（输入 x 状态 → 状态）
+* 一个输出函数（输入 x 状态 → 输出）
+* 被称为“初始”的一个独特状态
+一个状态机从“初始”状态开始，每一个输入都被传入转换函数和输出函数，以生成一个新的状态和输出。在新的输入被接收到前，状态保持不变，而输出同时被传输给恰当的接受者。<span class="cx-segment" data-segmentid="91"></span>
+
+在本文中，状态机必须具备'''确定性'''：多个相同状态机的拷贝，从同样的“初始”状态开始，经历了相同的输入序列后，会达到同样的状态，并且输出同样的结果。
+
+通过恰当输入流，状态机可以实现任意的算法，包括完备图灵机的各种算法（参见[[图灵机|图灵机]]）。通常而言，基于状态机复制的系统都会主动把它们的实现<span class="cx-segment" data-segmentid="97"></span>限制在[[有限状态机|有限状态机]]的范畴，以简化故障恢复。
+
+=== 容错 ===
+决定性是提供容错支持的理想特性。直观而言，假如系统存在多分拷贝，其中一个的故障会因为与其它系统的状态或者输出有差异，而变得明显。
+
+只要简单推理下，就可以知道实现容错性需要最少三份拷贝，在一个系统出错的情况下，其它两个系统可以供我们比较状态和输出。而两份拷贝显然不够，因为我们无从判别出错的是哪一个。<span class="cx-segment" data-segmentid="106"></span>
+
+再进一步推演，就可以知道具备三份拷贝的系统最多能支持单系统故障（随后必须修复或者替换掉故障拷贝）。假如有多余一个拷贝出现故障，那么三份状态或者输出都会互不相同，导致无法判断正确的拷贝。<span class="cx-segment" data-segmentid="109"></span>
+
+通常而言，一个支持F个故障的系统，必须至少包含2F+1份拷贝（也称为镜像）<ref name="lowerbounds">{{Cite web|url=http://research.microsoft.com/users/lamport/pubs/pubs.html#lower-bound|title=Lower Bounds for Asynchronous Consensus|last=Lamport|first=Leslie|year=2004|access-date=2016-06-10|archive-date=2007-08-16|archive-url=https://web.archive.org/web/20070816121810/http://research.microsoft.com/users/lamport/pubs/pubs.html#lower-bound|dead-url=no}}</ref>。多余的拷贝被用作区分正确和故障拷贝的证据。特殊的情况也可以改良这些制约<ref name="cheap">{{Cite journal|title=Cheap Paxos|url=http://research.microsoft.com/users/lamport/pubs/pubs.html#web-dsn-submission|last=Lamport|first=Leslie|journal=Proceedings of the International Conference on Dependable Systems and Networks (DSN 2004)|year=2004|author2=Mike Massa|access-date=2016-06-10|archive-date=2007-08-16|archive-url=https://web.archive.org/web/20070816121810/http://research.microsoft.com/users/lamport/pubs/pubs.html#web-dsn-submission|dead-url=no}}</ref>
+
+目前的推理都预设这些镜像仅仅是面临随机的独立故障，比如内存错误或者硬盘崩溃。但源自某些镜像尝试欺骗系统而带来的问题，也同样能被状态机复制通过隔离变化来处理。
+
+值得一提的是，并不需要停掉故障镜像的运行，它们可以继续运作，即便会产出伪造或者错误的输出。
+
+== 参考资料 ==
+{{Reflist}}
+
+== 外部链接 ==
+* [https://web.archive.org/web/20120516085919/http://techtv.mit.edu/videos/18986 Replicated state machines video on MIT TechTV]
+* [https://web.archive.org/web/20150308214635/http://zookeeper.apache.org/bookkeeper/ Apache Bookkeeper] a replicated log service which can be used to build replicated state machines
+[[Category:数据同步|Category:数据同步]]

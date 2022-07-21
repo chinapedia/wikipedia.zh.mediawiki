@@ -1,0 +1,60 @@
+{{noteTA
+|G1=Math
+|G2=IT
+}}
+
+在[[数学|数学]]，尤其是[[概率论|概率论]]和相关领域中，'''Softmax函数'''，或称'''归一化指数函数'''<ref name="bishop"><cite class="citation book">Bishop, Christopher M. (2006). </cite></ref><sup class="reference" style="white-space:nowrap;">:198</sup>，是[[逻辑函数|逻辑函数]]的一种推广。它能将一个含任意实数的K维向量 <math>\mathbf{z}</math> “压缩”到另一个K维实向量 <math>\sigma(\mathbf{z})</math> 中，使得每一个元素的范围都在<math>(0, 1)</math>之间，并且所有元素的和为1(也可視為一個 (k-1)維的hyperplane或subspace)。该函数的形式通常按下面的式子给出：
+: <math>\sigma(\mathbf{z})_j = \frac{e^{z_j}}{\sum_{k=1}^K e^{z_k}}</math>    for ''j'' = 1, …, ''K''.
+Softmax函数实际上是有限项[[离散概率分布|离散概率分布]]的梯度对数归一化。因此，Softmax函数在包括 多项逻辑回归<ref name="bishop"><cite class="citation book">Bishop, Christopher M. (2006). </cite></ref><sup class="reference" style="white-space:nowrap;">:206–209</sup> ，多项[[線性判別分析|线性判别分析]]，[[朴素贝叶斯分类器|朴素贝叶斯分类器]]和[[人工神经网络|人工神经网络]]等的多种基于機率的[[多元分类|多分类问题]]方法中都有着广泛应用。<ref>ai-faq [http://www.faqs.org/faqs/ai-faq/neural-nets/part2/section-12.html What is a softmax activation function?] {{Wayback|url=http://www.faqs.org/faqs/ai-faq/neural-nets/part2/section-12.html |date=20161112235320 }}</ref> 特别地，在多项逻辑回归和线性判别分析中，函数的输入是从K个不同的[[線性函數|線性函數]]得到的结果，而样本向量 '''x''' 属于第 '''j''' 个分类的機率为：
+: <math>P(y=j|\mathbf{x}) = \frac{e^{\mathbf{x}^\mathsf{T}\mathbf{w}_j}}{\sum_{k=1}^K e^{\mathbf{x}^\mathsf{T}\mathbf{w}_k}}</math>
+这可以被视作K个线性函数<math>\mathbf{x} \mapsto \mathbf{x}^\mathsf{T}\mathbf{w}_1, \ldots, \mathbf{x} \mapsto \mathbf{x}^\mathsf{T}\mathbf{w}_K</math>Softmax函数的[[复合函数|复合]]（<math>\mathbf{x}^\mathsf{T}\mathbf{w}</math><math>\mathbf{x}</math><math>\mathbf{w}</math>）。
+
+== 例子 ==
+输入向量<math>[1,2,3,4,1,2,3]</math>对应的Softmax函数的值为<math>[0.024, 0.064, 0.175, 0.475, 0.024, 0.064, 0.175]</math>。输出向量中拥有最大权重的项对应着输入向量中的最大值“4”。这也显示了这个函数通常的意义：对向量进行归一化，凸显其中最大的值并抑制远低于最大值的其他分量。
+下面是使用Python进行函数计算的範例程式碼：<syntaxhighlight lang="python">
+import math
+z = [1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0]
+z_exp = [math.exp(i) for i in z]  
+print(z_exp)  # Result: [2.72, 7.39, 20.09, 54.6, 2.72, 7.39, 20.09] 
+sum_z_exp = sum(z_exp)  
+print(sum_z_exp)  # Result: 114.98 
+softmax = [round(i / sum_z_exp, 3) for i in z_exp]
+print(softmax)  # Result: [0.024, 0.064, 0.175, 0.475, 0.024, 0.064, 0.175]
+</syntaxhighlight>
+
+Python使用numpy计算的示例代码:
+<syntaxhighlight lang="python">
+import numpy as np
+z = np.array([1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0])
+print(np.exp(z)/sum(np.exp(z)))
+</syntaxhighlight>
+
+
+[[Julia_(编程语言)|Julia]] 的範例：
+<syntaxhighlight lang="jlcon">
+julia> A = [1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0]
+7-element Array{Float64,1}:
+ 1.0
+ 2.0
+ 3.0
+ 4.0
+ 1.0
+ 2.0
+ 3.0
+
+julia> exp.(A) ./ sum(exp.(A))
+7-element Array{Float64,1}:
+ 0.0236405
+ 0.0642617
+ 0.174681
+ 0.474833
+ 0.0236405
+ 0.0642617
+ 0.174681
+
+</syntaxhighlight>
+
+== 參考資料 ==
+<references />
+[[Category:人工神经网络|Category:人工神经网络]]
+[[Category:计算神经科学|Category:计算神经科学]]

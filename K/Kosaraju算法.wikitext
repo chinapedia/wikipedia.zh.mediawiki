@@ -1,0 +1,68 @@
+{{TA
+|G1=IT
+|G2=Math
+|1=zh-hans:强连通分量;zh-hant:強連通元件
+}}
+'''Kosaraju算法'''（也被称为'''Kosaraju–Sharir算法'''）是一个在[[线性时间|线性时间]]内寻找一个[[图_(数学)|有向图]]中的[[强连通分量|强连通分量]]的算法。[[阿尔佛雷德·艾侯|阿尔佛雷德·艾侯]]，[[约翰·霍普克洛夫特|约翰·霍普克洛夫特]]和[[杰弗瑞·乌尔曼|杰弗瑞·乌尔曼]]相信该算法来自{{link-en|S·拉奥·科萨拉朱|S. Rao Kosaraju}}于1978年撰写的一篇未发表论文之中<ref>{{cite book|author=Alfred V. Aho, John E. Hopcroft, Jeffrey D. Ullman |coauthors=|title=Data Structures and Algorithms|year=1983 |publisher=Addison-Wesley|location= |isbn= 978-0201000238|date=1983|accessdate=2016-02-03 }},p222--p230</ref>。{{link-en|米卡·夏尔|Micha Sharir}}也独立发现了该算法并于1981年将其发表<ref>{{cite journal |last=Micha |first=Sharir |authorlink= |coauthors= |year=1981年 |title=A strong-connectivity algorithm and its applications in data flow analysis |journal=Computers & Mathematics with Applications |issue=7 |publisher= |pages=67-72 |url=http://www.sciencedirect.com/science/article/pii/0898122181900080 |date=1981 |accessdate=2016-02-03 |quote= |archive-date=2019-04-13 |archive-url=https://web.archive.org/web/20190413115618/http://www.sciencedirect.com/science/article/pii/0898122181900080 |dead-url=no }}</ref>。该算法巧妙地利用了一个定理：「一个图的反向图和原图具有一样的强连通分量」。
+
+==简介==
+该算法主要用于枚举图中每一个强连通分量内的所有顶点。该算法可由以下四部分组成<ref>{{cite book|author=Robert Sedgewick, Kevin Wayne |coauthors=|title=算法 |year= |publisher=人民邮电出版社|location=北京 |isbn=978-7-115-29380-0|date=2012年10月|accessdate=2016-02-03 }}，p379--p380</ref>：
+# 对有向图<math>G</math>取逆，得到<math>G</math>的反向图<math>G^R</math>
+# 利用[[深度优先搜索|深度优先搜索]]求出<math>G^R</math>的逆后排序
+# 对<math>G</math>按照上述逆后排序的序列进行深度优先搜索
+# 同一个深度优先搜索[[递归_(计算机科学)|递归子程序]]中访问的所有顶点都在同一个强连通分量内
+===Java代码实现===
+<syntaxhighlight lang="java">
+public class KosarajuAlgorithm {
+    private boolean[] marked;
+    private int[] id;
+    private int count=-1;
+    private Stack<Integer> reversePostOrder;
+    public KosarajuAlgorithm(Digraph G){
+        //G.V()返回有向图G的边数
+        marked=new boolean[G.V()];
+        id=new int[G.V()];
+        //G.reverse()返回的为G的反向图
+        Digraph G_reverse=G.reverse();
+        //本遍循环是将G的反向图的逆后序排列存储在reversePostOrder中
+        for(int i=0;i<G_reverse.V();i++){
+            if(!marked[i]){
+                dfs(G_reverse,i);
+            }
+        }
+        count=0;
+        //按照G的反向图的逆后排序进行深度优先搜索
+        for(int i:reversePostOrder){
+            if(!marked[i]){
+                dfs(G,i);
+                count++;
+            }
+        }
+    }
+    //深度优先搜索
+    public void dfs(Digraph G,int v){
+        marked[v]=true;
+        id[v]=count;
+        for(int i:G.adj(v)){
+            if(!marked[i]){
+                dfs(G,i);
+            }
+        }
+        reversePostOrder.push(v);
+    }
+}
+</syntaxhighlight>
+
+==复杂度==
+当图是使用[[邻接表|邻接表]]形式组建的，Kosaraju算法需要对整张图进行了两次的完整的访问，每次访问与顶点数<math>V</math>和边数<math>E</math>之和<math>V+E</math>成正比，所以可以在線性时间<math>O(V+E)</math>内访问完成。该算法在实际操作中要比[[Tarjan算法|Tarjan算法]]和{{link-en|基于路径的强连通分量算法|Path-based strong component algorithm}}要慢，这两种算法都只需要对图进行一次完整的访问。
+
+当图是使用[[邻接矩阵|邻接矩阵]]形式组建的，算法的时间复杂度为<math>O(V^2)</math>。
+
+==参考==
+{{reflist|1}}
+==文献及链接==
+* [http://www.sciencedirect.com/science/article/pii/0898122181900080 {{Wayback|url=http://www.sciencedirect.com/science/article/pii/0898122181900080 |date=20190413115618 }} Micha Sharir.A strong connectivity algorithm and its applications to data flow analysis.  ''Computers and Mathematics with Applications'' 7(1):67–72, 1981]]
+*[http://lcm.csa.iisc.ernet.in/dsa/node171.html Kosaraju's的简要介绍与证明]{{Wayback|url=http://lcm.csa.iisc.ernet.in/dsa/node171.html |date=20111119024907 }}
+
+
+[[Category:图算法|Category:图算法]]

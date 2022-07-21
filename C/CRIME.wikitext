@@ -1,0 +1,32 @@
+{{校对翻译}}
+{{NoteTA|G1=IT}}
+'''CRIME'''（{{lang-en|'''Compression Ratio Info-leak Made Easy'''}}，意思为：压缩率使信息容易泄露）是一种[[Exploit|可攻击安全隐患]]（Exploit），通过它可窃取启用[[数据压缩|数据压缩]]特性的[[超文本传输安全协议|HTTPS]]或[[SPDY|SPDY]]协议传输的私密[[Cookie|Web Cookie]]。<ref name="goodin2012-09-13">{{Cite web|url=http://arstechnica.com/security/2012/09/crime-hijacks-https-sessions/|title=Crack in Internet's foundation of trust allows HTTPS session hijacking|accessdate=September 13, 2012|date=September 13, 2012|last=Goodin|first=Dan|publisher=Ars Technica|archive-date=2014-06-21|archive-url=https://web.archive.org/web/20140621170014/http://arstechnica.com/security/2012/09/crime-hijacks-https-sessions/|dead-url=no}}</ref><ref name="fisher2012-09-13">{{Cite web|url=https://threatpost.com/crime-attack-uses-compression-ratio-tls-requests-side-channel-hijack-secure-sessions-091312/|title=CRIME Attack Uses Compression Ratio of TLS Requests as Side Channel to Hijack Secure Sessions|accessdate=September 13, 2012|date=September 13, 2012|last=Fisher|first=Dennis|publisher=ThreatPost|archive-date=2014-04-10|archive-url=https://web.archive.org/web/20140410121741/http://threatpost.com/crime-attack-uses-compression-ratio-tls-requests-side-channel-hijack-secure-sessions-091312|dead-url=yes}}</ref>在成功解读[[身份验证Cookie|身份验证Cookie]]后，攻击者可以实行[[会话劫持|会话劫持]]和发动进一步攻击。CRIME被分配为CVE-2012-4929。<ref>{{Cite web |url=http://cve.mitre.org/cgi-bin/cvename.cgi?name=cve-2012-4929 |title=存档副本 |accessdate=2016-07-09 |archive-date=2016-08-03 |archive-url=https://web.archive.org/web/20160803181132/http://cve.mitre.org/cgi-bin/cvename.cgi?name=cve-2012-4929 |dead-url=no }}</ref>
+
+== 细节 ==
+此漏洞立足于[[选择明文攻击|选择明文攻击]]配合数据压缩无意间造成的{{tsl|en|Information_leakage|信息泄露}}，类似密码学家{{tsl|en|John_Kelsey_(cryptanalyst)|John Kelsey}}在2002年所述的方式。<ref>{{Cite book|url=http://www.iacr.org/cryptodb/data/paper.php?pubkey=3091|title=Fast Software Encryption|year=2002|isbn=978-3-540-44009-3|series=Lecture Notes in Computer Science|volume=2365|pages=263|chapter=Compression and Information Leakage of Plaintext|doi=10.1007/3-540-45661-9_21|pmc=|pmid=|last1=Kelsey|first1=J.|access-date=2016-07-09|archive-date=2016-03-28|archive-url=https://web.archive.org/web/20160328205607/http://www.iacr.org/cryptodb/data/paper.php?pubkey=3091|dead-url=no}}</ref>它依赖于攻击者能观察浏览器发送的[[密文|密文]]的大小，并在同时诱导浏览器发起多个精心设计的到目标网站的连接。攻击者会观察已压缩请求载荷的大小，其中包括两个浏览器只发送到目标网站的私密Cookie，以及攻击者创建的变量内容。当压缩内容的大小降低时，攻击者可以推断注入内容的某些部分与源内容的某些部分匹配，其中包括攻击者想要发掘的私密内容。使用[[分治法|分治法]]技术可以用较小的尝试次数解读真正秘密的内容，需要恢复的字节数会大幅降低。<ref name="fisher2012-09-13"/><ref>{{Cite web|url=http://security.stackexchange.com/questions/19911/crime-how-to-beat-the-beast-successor/19914|title=CRIME - How to beat the BEAST successor?|accessdate=September 13, 2012|date=September 8, 2012|publisher=StackExchange.com|archive-date=2016-09-13|archive-url=https://web.archive.org/web/20160913004847/https://security.stackexchange.com/questions/19911/crime-how-to-beat-the-beast-successor/19914|dead-url=no}}</ref>
+
+CRIME利用方法由安全研究人员Juliano Rizzo和Thai Duong创建，他们还创建了[[傳輸層安全協議|BEAST]]利用方法。<ref name="goodin2012-09-13"/>此利用方法在2012年{{tsl|en|Ekoparty|ekoparty}}安全会议上完全展示。<ref>{{Cite web|url=https://docs.google.com/presentation/d/11eBmGiHbYcHR9gL5nDyZChu_-lCa2GizeuOfaLU2HOU/edit|title=The CRIME attack|accessdate=September 21, 2012|last=Rizzo|first=Juliano|publisher=Ekoparty|first2=Thai|last2=Duong|via=Google Docs|archive-date=2016-04-21|archive-url=https://web.archive.org/web/20160421195114/https://docs.google.com/presentation/d/11eBmGiHbYcHR9gL5nDyZChu_-lCa2GizeuOfaLU2HOU/edit|dead-url=no}}</ref>Rizzo和Duong指出，CRIME是一种通用攻击，可以对众多协议进行有效攻击，包括但不限于SPDY（始终压缩请求头）、TLS（可能压缩记录）和HTTP（可能压缩响应）。
+
+== 避免 ==
+CRIME可以被禁用压缩挫败，无论是在客户端的浏览器中禁用压缩，还是由网站根据TLS的协商特性阻止使用数据压缩。
+
+=== 漏洞 ===
+
+==== 缓解 ====
+截至2012年9月，针对SPDY和TLS层压缩的CRIME利用方法在最新版本的[[Google_Chrome|Chrome]]和[[Firefox|Firefox]]浏览器中已做缓解。[[微软|微软]]已确认其[[Internet_Explorer|Internet Explorer]]浏览器不会受到此攻击，因为其浏览器不支持SPDY和TLS压缩。<ref name="goodin2012-09-13"/>一些网站已自行应用对策。<ref>{{Cite web|url=http://www.theregister.co.uk/2012/09/14/crime_tls_attack/|title=The perfect CRIME? New HTTPS web hijack attack explained|accessdate=September 16, 2012|date=September 14, 2012|last=Leyden|first=John|work=The Register|archive-date=2016-08-03|archive-url=https://web.archive.org/web/20160803100345/http://www.theregister.co.uk/2012/09/14/crime_tls_attack/|dead-url=no}}</ref>[[nginx|nginx]]网页服务器从使用[[OpenSSL|OpenSSL]] 1.0.0+的1.0.9/1.1.6（2011年10月/11月）和使用所有OpenSSL版本的1.2.2/1.3.2（2012年6月/7月）起不会受到此攻击。<ref>{{Cite web|url=http://mailman.nginx.org/pipermail/nginx/2012-September/035600.html|title=Nginx mailing list: crime tls attack|accessdate=July 11, 2013|date=September 26, 2012|last=Sysoev|first=Igor|publisher=nginx.org|archive-date=2016-07-02|archive-url=https://web.archive.org/web/20160702023216/http://mailman.nginx.org/pipermail/nginx/2012-September/035600.html|dead-url=no}}</ref>
+
+应注意的是，截至2013年12月，针对[[HTTP压缩|HTTP压缩]]的CRIME利用并未完全缓解。Rizzo和Duong已警告此漏洞的适用范围可能比SPDY和TLS压缩更加普遍。
+
+== BREACH ==
+在2013年8月的{{tsl|en|Black_Hat_Briefings|Black Hat}}会议上，研究员Gluck、Harris和Prado宣布了一个CRIME利用方法的变体，它针对HTTP压缩，称之为{{tsl|en|BREACH_(security_exploit)|BREACH}}（全称：Browser Reconnaissance and Exfiltration via Adaptive Compression of Hypertext的缩写，意为“通过自适应超文本压缩做浏览器侦听和渗透”）。它通过攻击网页服务器为减少网络流量内置的HTTP数据压缩来解读HTTPS私密信息。<ref>{{Cite news|url=http://arstechnica.com/security/2013/08/gone-in-30-seconds-new-attack-plucks-secrets-from-https-protected-pages/|title=Gone in 30 seconds: New attack plucks secrets from HTTPS-protected pages|last=Goodin|first=Dan|date=August 1, 2013|accessdate=2016-07-09|archive-date=2014-07-01|archive-url=https://web.archive.org/web/20140701121013/http://arstechnica.com/security/2013/08/gone-in-30-seconds-new-attack-plucks-secrets-from-https-protected-pages/|dead-url=no}}</ref>
+
+== 参考资料 ==
+{{Reflist|30em}}
+
+{{TLS和SSL}}
+
+[[Category:保全漏洞|Category:保全漏洞]]
+[[Category:密码分析|Category:密码分析]]
+[[Category:数据压缩|Category:数据压缩]]
+[[Category:选择明文攻击|Category:选择明文攻击]]
+[[Category:傳輸層安全協議|Category:傳輸層安全協議]]

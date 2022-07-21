@@ -1,0 +1,133 @@
+{{NoteTA
+|G1=IT
+}}
+{{校对翻译}}
+{{专家}}
+在[[计算机网络|计算机网络]]中，'''巨型帧'''（{{lang-en|jumbo frames}}），又稱'''大型帧'''，是指有效负载超过IEEE 802.3标准所限制的1500字节的[[以太网帧格式|以太网帧]]。<ref>{{Cite web|url=http://www.ethernetalliance.org/library/whitepaper/ethernet-jumbo-frames/|title=Ethernet Jumbo Frames|accessdate=2015-06-18|date=2009-11-12|publisher=Ethernet Alliance|archive-date=2019-02-06|archive-url=https://web.archive.org/web/20190206083948/https://ethernetalliance.org/library/whitepaper/ethernet-jumbo-frames/|dead-url=no}}</ref>通常来说，巨型帧可以携带最多9000字节的有效负载，但也存在变化，因此需要谨慎使用该术语。许多[[吉比特以太网|吉比特以太网]]交换机和吉比特以太网网卡可以支持巨型帧。部分{{tsl|en|Fast Ethernet}}交换机和Fast Ethernet网卡也支持巨型帧。<ref name="Cisco24048">{{Cite web|url=http://www.cisco.com/en/US/products/hw/switches/ps700/products_configuration_example09186a008010edab.shtml|title=Jumbo/Giant Frame Support on Catalyst Switches Configuration Example|accessdate=2011-08-22|publisher=Cisco|quote=Catalyst 3750/3560 Series switches support an MTU of 1998 bytes for all 10/100 interfaces|archive-date=2014-01-11|archive-url=https://web.archive.org/web/20140111153844/http://www.cisco.com/en/US/products/hw/switches/ps700/products_configuration_example09186a008010edab.shtml|dead-url=no}}</ref>
+
+== 开端 ==
+每个接收到的以太网帧都需要网络硬件和软件处理。增加帧大小有助于用更少的負載传递更大量的数据，降低CPU使用率（主要是减少中断），以及通过减少需处理的帧来增加吞吐量和减少所发送帧的帧开销总量。
+
+巨型帧最初是由{{tsl|en|Alteon WebSystems}}在其ACEnic[[吉比特以太网|吉比特以太网]]适配器中推出。其他许多厂商也采纳了此大小。
+
+== 采用 ==
+巨型帧或9000字节有效负载帧可以减少开销和CPU使用。<ref>{{Cite journal|title=TCP Performance Re-visited|last=Foong|first=A|journal=In IEEE International Symposium on Performance of Systems and Software|year=2003|last3=H. Hum|last4=J. Patwardhan|last5=G. Regnier}}</ref>最近的工作也证明了，巨型帧对端到端TCP性能有着积极作用。<ref>{{Cite journal|title=Large MTUs and internet performance|journal=13th IEEE Conference on High Performance Switching and Routing (HPSR 2012)|year=2012|last3=K Lee|last4=M Dixon}}</ref> 巨型帧的存在可能对网络延迟有不利影响，尤其是在低带宽链路上。端到端连接使用的帧大小通常受到中间链路中的最小帧大小限制。[[令牌环|802.5 Token Ring]] 可以使用4464字节的帧[[最大传输单元|MTU]]，[[光纤分布式数据接口|FDDI]]可以4352字节，[[异步传输模式|ATM]]可以9180字节，以及[[IEEE_802.11|802.11]]可以传输7935字节MTU。IEEE 802.3以太网标准仅规定支持1500字节的帧[[最大传输单元|MTU]]，总计1518字节的帧大小（1522字节及可选的[[IEEE_802.1Q|IEEE 802.1Q]] [[虚拟局域网|VLAN]]/[[QoS|QoS]]标签）。
+
+巨型帧所采用的9000字节有效负载大小来自[[Internet2|Internet2]]联合工程团队与美国联邦政府网络的讨论。他们的建议已被其他所有国家研究和教育网络采纳。为满足这一强制性购买标准，制造商已将9000字节纳入常规的MTU大小，使巨型帧尺寸至少有9018/9022字节（不含或包含[[IEEE_802.1Q|IEEE 802.1Q]] 字段）。{{Fact|date=December 2011}}大多数以太网设备可支持高达9216字节的巨型帧。<ref>{{Citation|title=Jumbo Frames|date=2013-03-06|url=http://www.networkworld.com/community/blog/jumbo-frames|quote=Most network devices support a jumbo frame size of 9216 bytes.|author=Scott Hogg|publisher=[[Network_World|Network World]]|accessdate=2013-08-05|archive-date=2013-12-19|archive-url=https://web.archive.org/web/20131219012804/http://www.networkworld.com/community/blog/jumbo-frames|dead-url=no}}</ref>
+
+== 错误检测 ==
+巨型帧在使用以太网帧中简单的[[循環冗餘校驗|CRC32]]错误检测时，更容易遭受未检测到的错误——因为更多的数据增加了几个错误互相抵消的概率。正因如此，已经有较高网络层上的额外机制被开发以改进错误检测。
+
+IETF为巨型帧中避免数据完整性降低准备的解决方案是在[[流控制传输协议|SCTP]]传输（RFC 4960）和iSCSI（RFC 7143）中使用[[循環冗餘校驗|Castagnoli CRC polynomial]]。这个多项式的选择基于论文“32-Bit Cyclic Redundancy Codes for Internet Applications”中记录的成果。<ref>[http://www.ece.cmu.edu/~koopman/networks/dsn02/dsn02_koopman.pdf "32-Bit Cyclic Redundancy Codes for Internet Applications"] {{Wayback|url=http://www.ece.cmu.edu/~koopman/networks/dsn02/dsn02_koopman.pdf |date=20120916185941 }} by Philip Koopman, ECE Department & ICES, Carnegie Mellon University</ref>Castagnoli多项式0x1EDC6F41达到了[[汉明距离|汉明距离]]HD=6，在超过一个以太网MTU（16,360位元数据字长）时，以及HD=4（114,663位元），当超过以太网MTU长度的9倍。相比以太网CRC标准的多项式，这为基于MTU大小的数据提供了额外两个比特的错误检测能力，而不牺牲在数据字长超过72kbits时的HD=4的能力。
+
+通过为UDP和TCP传输内部使用CRC校验和而非简单的累加校验和，发生在NIC内部的错误也可以被检测到。由于简单求和时这些误差往往会自我消除，TCP和UDP都已被证明在检测总线特定比特错误上是无效的。在RFC 3309中完成的对真实数据注入模拟误差并对比的测试显示，这些错误有将近2%未被检测到。
+
+采用巨型帧的主要障碍之一是，升级现有的以太网基础设施以避免降低检测错误的能力是困难的。在软件中完成的CRC计算必定会慢于TCP和UDP中那种简单的累加校验和实现。为克服这种性能损失，NIC[[TCP卸載引擎|卸载]]SCTP校验和计算是可能的，并且支持{{tsl|en|SSE4.2}}的CPU可以利用在向量数学指令集中扩展的CRC32指令。
+
+在设计处理数据块的常规目的传输中，以及在设计携带SCSI数据的TCP传输中，支持Castagnoli CRC多项式都可以带来更好的错误检测，尽管使用增加以太网MTU的巨型帧会使错误检测显著减少。
+
+== 配置 ==
+部分厂商在大小设置时包括头的大小，而部分厂商则不是。这即是最大帧大小（包括帧头）与''[[最大传输单元|最大传输单元]]/MTU'' （不包括帧头=最大的第三层包大小）。因此您可能会发现，必须在不同厂商的设备中配置不同的值，以使其设置匹配。{{Fact|date=August 2013}}在网络上同时存在配置为巨型帧的设备与未配置为巨型帧的设备可能导致网络性能问题。<ref>{{Cite web|url=http://kb.netgear.com/app/answers/detail/a_id/222/~/what-is-the-jumbo-frame-supported-by-switches-and-adapters%3F|title=What is the Jumbo Frame Supported by Switches and Adapters?|accessdate=2013-08-05|publisher=[[Netgear|Netgear]]}}</ref>
+
+== 带宽效率 ==
+巨型帧可以减少开销以略微提升以太网效率，例如在IPv4上的TCP：{{Fact|date=October 2015}}
+{| class="wikitable" style="text-align: center; margin-bottom: 10px;"
+! 帧类型
+! [[最大传输单元|MTU]] 
+! colspan="2" | 第一层开销
+! colspan="2" | 第二层开销
+! 第三层开销
+! 第四层开销
+! 有效负载大小
+! 总计传输<ref>总计传输大小是有效负载大小+所有开销大小的总和。</ref> 
+! 效率<ref>效率是有效负载大小除以总传输大小。</ref>
+|-
+| 标准 
+| 1500 
+| {{tsl|en|Syncword|preamble}}<br>
+8字节
+| {{tsl|en|Interpacket gap|分组间隙|IPG}}<br>
+12字节
+| [[以太网帧格式|帧头]]<br>
+14字节
+| [[帧校验序列|FCS]]<br>
+4字节
+| [[IPv4|IPv4头]]<br>
+20字节
+| [[传输控制协议|TCP头]]<br>
+20字节
+| 1460字节
+| 1538字节
+| 94.93%
+|-
+| Jumbo 
+| 9000 
+| preamble<br>
+8字节
+| IPG<br>
+12字节
+| 帧头<br>
+14字节
+| FCS<br>
+4字节
+| IPv4头<br>
+20字节
+| TCP头<br>
+20字节
+| 8960字节
+| 9038字节
+| 99.14%
+|-
+! colspan="12" | 其他帧大小供参考
+|-
+| [[IEEE_802.11|IEEE 802.11]]<ref>{{Cite news|url=http://www.speedguide.net/articles/wireless-network-speed-tweaks-5681|title=Wireless Network Speed Tweaks|last=Philip|date=October 20, 2016|work=speedguide.net|accessdate=October 20, 2016|archive-date=2021-02-24|archive-url=https://web.archive.org/web/20210224164506/https://www.speedguide.net/articles/wireless-network-speed-tweaks-5681|dead-url=no}}</ref><ref>IEEE 802.11-2012 ''8.2.3 General frame format''</ref> 
+| 7935 
+| PLCP前导和头<br>
+24字节
+| IPG<br>
+''varies'' 
+| 帧头和安全ovhd<br>
+52字节
+| FCS<br>
+4字节
+| IPv4头<br>
+20字节
+| TCP头<br>
+20字节
+| 7895字节
+| 8015 + IPG大小字节
+| < 98.5%
+|}
+
+== 小巨型帧 ==
+'''小巨型帧'''（Baby giant或baby jumbo frames；也称'''小巨人帧'''）是只比IEEE以太网标准所限定的体积稍大的以太网帧。<ref name="Cisco24048">{{Cite web|url=http://www.cisco.com/en/US/products/hw/switches/ps700/products_configuration_example09186a008010edab.shtml|title=Jumbo/Giant Frame Support on Catalyst Switches Configuration Example|accessdate=2011-08-22|publisher=Cisco|quote=Catalyst 3750/3560 Series switches support an MTU of 1998 bytes for all 10/100 interfaces}}</ref>小巨型帧是为使IP/[[多协议标签交换|MPLS]]能通过以太网帧直接传输到以太网服务而准备。大多数实现要求将非巨型的用户帧封装为MPLS帧格式以使其可以被封装成适当的以太网帧格式（[[以太类型|以太类型]]值为0x8847和0x8848）。<ref name="RFC-3032">[[rfc:3032#section-5|''RFC-3032, MPLS Label Stack Encoding'']]</ref>额外的MPLS和以太网头开销意味着支持1600字节的帧是{{tsl|en|Carrier Ethernet|运营商以太网}}网络中的一项强制性要求。<ref name="Ceragon">[http://www.ceragon.com/files/Ceragon%20-%20Jumbo%20Frames%20-%20Technical%20Brief.pdf ''Ceragon, Jumbo Frames: The Microwave Perspective, Technical brief''] {{webarchive|url=https://web.archive.org/web/20120915053454/http://www.ceragon.com/files/Ceragon%20-%20Jumbo%20Frames%20-%20Technical%20Brief.pdf |date=2012-09-15 }}</ref>
+
+== 超巨型帧 ==
+'''超巨型帧'''（'''Super jumbo frames'''，简称SJF）通常被认为是[[有效负载|有效负载]]大小超过9000字节的帧。<!-- 网络数据的相对吞吐量 throughput as a function of packet transfer rates is related in a complex manner <ref name="Rutherford">[[doi:10.1016/j.osn.2006.10.001|16 000–64 000 B pMTU experiments with simulation: The case for super jumbo frames at Supercomputing ’05]]</ref> to payload size per packet. 一般来说，随着线路比特率增加，分组的有效载荷大小应当按比例增加以维持等效的定时参数。然而，这意味着沿网络路径的众多中间逻辑电路的协方差缩放，这样才能适应[[最大传输单元|最大传输单元]]（MTU），因此那相对困难并有点冗长。 process to increase the path MTU of high performance national research and education networks from 1518 bytes to 9000 bytes or so, a subsequent increase, possibly to 64000 bytes for example, may take some time.
+
+增加[[最大分段大小|最大分段大小]]（MSS）的主要因素是路径中介入的持久化机制的可用内存缓冲区的增加。这样的主要好处是分组[[比特率|比特率]]的减少，包括[[树_(数据结构)|末端节点]]和中间传输节点。节点一般使用{{tsl|en|reciprocating logic|往复逻辑}}来处理分组，处理分组头花费的[[指令周期|指令周期]]总量随着 decreases as the average MSS of the packets increases given a certain total amount of data transmitted. 随着平均网络线路速率增加到每秒100吉比特或更高，这种关系变得越来越重要。 -->
+
+== 部分过时 ==
+通过使CPU负载与帧大小无关，[[大段卸载|大段卸载]]（LSO）已经消除了巨型帧设计目的中的减少分组开销。<ref>{{Cite web|url=http://codingrelic.geekhold.com/2011/12/requiem-for-jumbo-frames.html|title=Coding Relic: Requiem for Jumbo Frames|accessdate=2011-12-07|date=2011-12-07|archive-date=2012-01-10|archive-url=https://web.archive.org/web/20120110093123/http://codingrelic.geekhold.com/2011/12/requiem-for-jumbo-frames.html|dead-url=no}}</ref>{{tsl|en|Large receive offload|大接收卸载}}（LRO）——接收方的大段卸载，并不能完全消除每个分组导致的CPU开销，因此巨型帧对保证入站流量仍然有益。{{Fact|date=May 2014}}从带宽的角度来说，巨型帧仍然有用，因为它减少了非数据的带宽开销量。
+
+== 参见 ==
+* {{tsl|en|Jumbogram}} – IPv6中的大数据包
+* [[最大傳輸單元|最大傳輸單元]]（MTU）
+
+== 参考资料 ==
+{{Reflist|30em}}
+
+== 外部链接 ==
+* [https://web.archive.org/web/20060127004438/http://sd.wareonearth.com/~phil/jumbo.html Jumbo Frames – Where to use it?]
+* [https://web.archive.org/web/20070127001935/http://www.networkworld.com/forum/0223jumboyes.html Jumbo frames?] , by Selina Lo, Alteon Networks, 2/23/1998 in NetworkWorld
+* [http://www.rutherford-research.ca/rrx/hpc/sc05.php SJF Supercomputing 2005 Demo] {{Wayback|url=http://www.rutherford-research.ca/rrx/hpc/sc05.php |date=20210225093844 }}
+* [https://web.archive.org/web/20071012174515/http://psc.edu/~mathis/MTU/ Pushing up the Internet MTU]
+* [http://www.ieee802.org/3/frame_study/index.html IEEE 802.3as Frame Expansion Task Force] {{Wayback|url=http://www.ieee802.org/3/frame_study/index.html |date=20210224155233 }}
+* [http://www.ece.cmu.edu/~koopman/networks/dsn02/dsn02_koopman.pdf 32-Bit Cyclic Redundancy Codes for Internet Applications] {{Wayback|url=http://www.ece.cmu.edu/~koopman/networks/dsn02/dsn02_koopman.pdf |date=20120916185941 }}
+* [http://www.smallnetbuilder.com/content/view/30201/54/ Need To Know: Jumbo Frames in Small Networks] {{Wayback|url=http://www.smallnetbuilder.com/content/view/30201/54/ |date=20100617130543 }}
+* [http://wiki.archlinux.org/index.php/Jumbo_Frames How to Jumbo Frames in Archlinux] {{Wayback|url=http://wiki.archlinux.org/index.php/Jumbo_Frames |date=20210308200024 }}
+
+{{Ethernet}}
+
+[[Category:網路結構|Category:網路結構]]
+[[Category:封包|Category:封包]]

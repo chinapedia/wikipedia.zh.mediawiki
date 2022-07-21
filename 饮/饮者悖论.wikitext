@@ -1,0 +1,32 @@
+'''饮者悖论'''（也被称为饮者定理，饮者原理，或饮酒原理）是经典[[谓词逻辑|谓词逻辑]]的一个定理。它实际上并不是一个悖论。它的明显的矛盾的性质来自于它通常的在自然语言中的表述：''在酒吧裡会有一个人，对于这个人，如果他在喝酒，那么所有在酒吧裡的人都在喝酒。'' 有两点看起来是反直觉的 1) 这里面有一个人，他会引起其他人喝酒。2）这里有一个人，一整夜他都是最后一个喝酒的。第一个反对的理由是由于混淆了形式的 IF...THEN 陈述与因果关系（见[[相关不蕴涵因果|相关不蕴涵因果]]）。定理的形式化陈述是不受时间限制的，我们可以消除第二个反对理由是因为，在一个时刻使得陈述成立的那个特别的人（见证者），并不需要与在任何其它时刻使得陈述成立的那个人是同一个人。实际的定理是
+
+:<math>\exists x\in P.\ [D(x) \rightarrow \forall y\in P.\ D(y)]. \, </math>
+
+其中 D 是一个任意的{{link-en|谓词 (逻辑)|Predicate_(mathematical_logic)|谓词}}，P是一个任意的集合。这个悖论是因数理逻辑学家[[雷蒙·思木里安|雷蒙·思木里安]]而广为人知的。雷蒙·思木里安在他 1978 年出版的书 ''What is the Name of this Book?''<ref name="Smullyan">{{cite book
+| title = What is the Name of this Book? The Riddle of Dracula and Other Logical Puzzles
+| author= [[Raymond_Smullyan|Raymond Smullyan]]
+| publisher = [[Prentice_Hall|Prentice Hall]]
+| year = 1978
+| isbn = 0-13-955088-7
+| nopp = true
+| pages = chapter 14. How to Prove Anything. (topic) 250. The Drinking Principle. pp. 209-211
+}}</ref> 中称它为 “饮酒原理”。
+
+== 证明 ==
+以下证明为借助 Coq 的 proof script.
+<code>
+ '''Lemma''' drinker (X: Type)(d: X -> Prop):
+ XM -> (exists x: X, True) -> exists x, d x -> forall x, d x.
+ '''Proof'''.
+   intros xm A. assert(s:= xm). specialize (s (exists x, d x -> forall x, d x)). destruct s as [s0 | s1].
+   - exact s0.
+   - exfalso. apply s1. destruct A as [x _]. exists x. intros B x0. specialize (xm (d x0)). destruct xm as [xm0 | xm1].
+     -- exact xm0.
+     -- exfalso. apply s1. exists x0. intros C. exfalso. exact(xm1 C).
+ '''Qed'''.
+</code>
+== 参考资料 ==
+{{reflist}}
+
+[[Category:形式逻辑系统|Category:形式逻辑系统]]
+[[Category:悖论|Category:悖论]]

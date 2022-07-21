@@ -1,0 +1,49 @@
+在[[计算机科学|计算机科学]]中， '''字符串近似匹配'''（通常俗称为'''字符串模糊查询''')，是一种字符串查找技术，用来近似匹配一个模式，而不是完全匹配。
+
+== 概览 ==
+匹配的近似度用如下方法来度量：把字符串转换成完全匹配的字符串所需要的基本操作步数。这个数量被称为[[编辑距离|编辑距离]]。通常基本操作有：{{ref|CRMN01}}
+* 插入: ''cot'' → ''co'''a'''t''
+* 删除:  ''co'''a'''t'' → ''cot''
+* 替换: ''co'''a'''t'' → ''co'''s'''t''
+这三个操作可以泛化为使用NULL字符来替换原来的字符（这里使用*来表示）：
+* 插入: ''co'''*'''t'' → ''co'''a'''t''
+* 删除:  ''co'''a'''t'' → ''co'''*'''t''
+* 替换:  ''co'''a'''t'' → ''co'''s'''t''
+某些近似匹配算法还将''转置''（字符串中的2个字母交换位置）作为一次基本操作来对待。 一个例子是cost → cots。{{ref|CRMN01}}
+
+== 问题表述和算法 ==
+一个可能的字符串近似匹配问题定义如下：给定模式 <math>P = p_1p_2...p_m</math> 和字符串 <math>T = t_1t_2\dots t_n</math>，查找<math>T</math>的一个子字符串 <math>T_{j',j} = t_{j'}\dots t_j</math>，使得在所有的子字符串中，这个子字符串和<math>P</math>的编辑距离最小。
+
+一种暴力的算法是，计算T的所有子字符串和P的编辑距离，然后选择距离最小的那个。 然而，这个算法的运行时间为 [[大O符号|''O'']](''n''<sup>3</sup> ''m'')。
+
+一个更好的解决办法，是由Sellers提出的[[动态规划|动态规划]]方法。
+
+== 在线和离线 ==
+传统上，字符串近似匹配算法被分为两类：在线和离线。
+
+在线算法模式可以被预处理，但是文本没有预处理。换言之，在线技术搜索不需要索引。早期的在线算法是由Wagner和Fisher、Sellers提出的。Sellers算法用来近似搜索文本的子字符串。而Wagner-Fisher算法计算[[萊文斯坦距離|莱文斯坦距离]], 只能适合作字典模糊查询。
+
+在线搜索技术已经被持续改善。 也许最著名改善是{{link-en|Bitap算法|Bitap Algorithm|Bitap算法}}（又称shift-or算法、shift-and算法)，对于较短的模式搜索效率非常高。Bitap算法是[[UNIX|Unix操作系统]]中agrep工具的核心算法。G.Navarro对在线搜索算法做了一个回顾。{{ref|Nav01}}
+
+在线算法对于大量数据是不可接受的。 
+文本预处理、索引使得搜索大幅度加速。
+如今，有各种各样的索引算法，如[[后缀树|后缀树]]，{{link-en|度量树|Metric tree|度量树}}和[[n元语法|n元语法]]。
+
+== 应用 ==
+最常见的应用如[[拼写检查|拼写检查]]，在大量的DNA数据中匹配[[核苷酸|核苷酸]]，还有[[反垃圾邮件技术|垃圾邮件过滤]]。
+
+字符串近似匹配不能应用于大多数二进制数据如图像和声音，它们需要不同的算法，例如[[声学指纹|声学指纹]]。
+
+== 链接 ==
+* [http://flamingo.ics.uci.edu Flamingo工程<br> ] {{Wayback|url=http://flamingo.ics.uci.edu/ |date=20210301065849 }}
+* [https://web.archive.org/web/20160319053237/http://www.cse.unsw.edu.au/~weiw/project/simjoin.html Efficient Similarity Query Processing Project] 
+* [http://rockymadden.com/stringmetric/ StringMetric] {{Wayback|url=http://rockymadden.com/stringmetric/ |date=20160117074926 }} [[Scala|Scala]]工程，字符串度量和语音学算法。
+* [https://github.com/NaturalNode/natural Natural]{{Wayback|url=https://github.com/NaturalNode/natural |date=20130814093414 }} [[JavaScript|JavaScript]]工程，自然语言处理库
+[[Category:动态规划|Category:动态规划]]
+[[Category:字符串匹配算法|Category:字符串匹配算法]]
+
+== 参考文献 ==
+*{{note|CRMN01}}{{cite book |last=Cormen |first=Thomas |authorlink=Thomas Cormen |author2=Leiserson, Rivest |title=Introduction to Algorithms |url=https://archive.org/details/introductiontoal00corm_691 |edition=2nd |year=2001 |publisher=MIT Press |isbn=0-262-03293-7 |pages=[https://archive.org/details/introductiontoal00corm_691/page/364 364]–7}}
+* {{note|Nav01}} {{cite journal |author=Navarro, Gonzalo |title=A guided tour to approximate string matching |url=https://archive.org/details/sim_acm-computing-surveys_2001-03_33_1/page/31 |journal=ACM Computing Surveys |volume=33 |issue=1 |pages=31–88 |year=2001 |id={{citeseerx|10.1.1.96.7225}} |doi=10.1145/375360.375365}}
+
+{{字符串}}

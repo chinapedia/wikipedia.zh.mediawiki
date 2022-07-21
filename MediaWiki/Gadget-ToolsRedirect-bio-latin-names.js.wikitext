@@ -1,0 +1,32 @@
+// <nowiki>
+/* vim: set noexpandtab ft=javascript ts=4 sw=4: */
+
+mw.loader.using( ['ext.gadget.ToolsRedirect'], function() {
+	"use strict";
+	var prefixReg = /[學学]名\s*：?\s*$/,
+		colonReg = /^\s*[:：]?\s*$/,
+		tr = mw.toolsRedirect;
+
+	tr.findRedirectCallback( function ( pagename, $content ) {
+		var surname,
+			retTitles = [];
+
+		$content.find( '> p > [lang="la"], > p > i' ).each( function() {
+			var title, prevNode = this.previousSibling;
+			if ( prevNode && colonReg.test( prevNode.textContent ) ) {
+				prevNode = prevNode.previousSibling;
+			}
+			if ( prevNode && prefixReg.test( prevNode.textContent ) ) {
+				// trim() is not supported by IE<9
+				title = jQuery( this ).text().replace( /^\s+|\s+$/g, '' );
+				retTitles.push( title );
+				tr.setRedirectTextSuffix( title, '\n{{學名重定向}}' );
+			}
+		} );
+
+		return jQuery.unique( retTitles );
+	} );
+
+} );
+
+// </nowiki>

@@ -1,0 +1,74 @@
+{{NoteTA|G1=IT|G2=Windows}}
+'''Windows服务'''是指[[Windows_NT|Windows NT]][[操作系统|操作系统]]中的一种[[后台进程|运行在后台]]的计算机程序。<ref name="Services snap-in">{{Cite web|url=http://technet.microsoft.com/en-us/library/cc783643%28v=ws.10%29.aspx|title=Services overview|accessdate=29 March 2013|work=[[TechNet|TechNet]]|publisher=Microsoft|archive-date=2016-03-05|archive-url=https://web.archive.org/web/20160305193650/https://technet.microsoft.com/en-us/library/cc783643(v=ws.10).aspx}}</ref>它在概念上类似于[[UNIX|Unix]][[守护进程|守护进程]]。<ref name="Services snap-in">{{Cite web|url=http://technet.microsoft.com/en-us/library/cc783643%28v=ws.10%29.aspx|title=Services overview|accessdate=29 March 2013|work=[[TechNet|TechNet]]|publisher=Microsoft}}</ref>Windows服务必须符合[[服务控制管理器|服务控制管理器]]（负责管理Windows服务的组件）的接口规则和协议。<ref name="Service MSDN">{{Cite web|url=http://msdn2.microsoft.com/en-us/library/ms685141.aspx|title=Services|accessdate=29 March 2013|work=[[微软开发者网络|Microsoft Developer Network]]|publisher=Microsoft|archive-date=2008-04-08|archive-url=https://web.archive.org/web/20080408155759/http://msdn2.microsoft.com/en-us/library/ms685141.aspx}}</ref>
+
+Windows服务可以配置为在操作系统启动时运行，并且在Windows运行期间持续在后台运行。服务也可以手动或基于某个事件而启动。<span class="cx-segment" data-segmentid="65"></span>Windows NT操作系统包含众多服务，分别运行在三种[[用户|用户帐户]]环境中：系统、网络服务和本地服务。这些Windows组件通常采用[[Svchost.exe|Windows服务托管进程]]。因为Windows服务运行在其自身的专用用户帐户中，它们可以在用户未登录时活动。
+
+在[[Windows_Vista|Windows Vista]]之前，安装为“交互服务”的服务可以与Windows[[桌面|桌面]]交互和显示图形用户界面。但在Windows Vista中，交互服务已被弃用，并且可能无法正常运行。<ref>{{Cite web|url=http://technet.microsoft.com/en-us/magazine/2008.06.elevation.aspx|title=New Elevation PowerToys for Windows Vista|accessdate=21 June 2013|date=June 2008|work=TechNet Magazine|publisher=[[微软|Microsoft]]|quote=The service CmdAsSystem is configured  as interactive whose support is being deprecated. The service may not function properly. The problem is that this script tries to create and start an interactive service. Interactive services will not function correctly due to Session 0 Isolation in Windows Vista.|archive-date=2016-08-21|archive-url=https://web.archive.org/web/20160821093137/https://technet.microsoft.com/en-us/magazine/2008.06.elevation.aspx}}</ref><ref>{{Cite web|url=http://msdn.microsoft.com/en-us/windows/hardware/gg463428.aspx|title=Services in Windows|accessdate=21 June 2013|date=18 October 2010|work=[[微软开发者网络|MSDN]]|publisher=[[微软|Microsoft]]|archive-date=2013-12-24|archive-url=https://web.archive.org/web/20131224162638/http://msdn.microsoft.com/en-us/windows/hardware/gg463428.aspx}}</ref>
+
+== 管理 ==
+Windows管理员可以管理服务，通过：
+* “服务”扩展（在Windows[[控制面板|控制面板]]的“管理工具”中）
+* Sc.exe
+* [[Windows_PowerShell|Windows PowerShell]]
+
+=== 服务扩展 ===
+服务扩展是基于[[Microsoft管理控制台|Microsoft管理控制台]]提供的一个组件，它可以连接到本地计算机或网络上的远程计算机，用户可以：<ref name="Services snap-in">{{Cite web|url=http://technet.microsoft.com/en-us/library/cc783643%28v=ws.10%29.aspx|title=Services overview|accessdate=29 March 2013|work=[[TechNet|TechNet]]|publisher=Microsoft}}</ref>
+* 查看已安装服务的列表，包括服务名称、说明和配置
+* 开始、停止、暂停或重新启动服务<ref name="technet-start">{{Cite web|url=http://technet.microsoft.com/en-us/library/cc736564%28v=WS.10%29.aspx|title=Start, stop, pause, resume, or restart a service|accessdate=29 March 2013|work=[[TechNet|TechNet]]|publisher=Microsoft|archive-date=2016-07-14|archive-url=https://web.archive.org/web/20160714060439/https://technet.microsoft.com/en-us/library/cc736564(v=ws.10).aspx}}</ref> 
+* 适用时指定服务的参数
+* 更改启动类型。可接受的启动类型有：
+** 自动：服务会在系统登录时启动。
+** 自动(延迟启动)：服务会在系统启动后过一会启动。此选项在[[Windows_Vista|Windows Vista]]中引入，目的是降低系统启动后到达桌面的等待时间。但是，不是所有服务都支持延迟启动。<ref>{{Cite web|url=http://msdn.microsoft.com/en-us/library/system.serviceprocess.serviceinstaller.delayedautostart.aspx|title=ServiceInstaller.DelayedAutoStart Property (System.ServiceProcess)|accessdate=April 2013|publisher=Microsoft|postscript=See Remarks section|archive-date=2017-12-01|archive-url=https://web.archive.org/web/20171201182117/https://msdn.microsoft.com/en-us/library/system.serviceprocess.serviceinstaller.delayedautostart.aspx}}</ref>
+** 手动：服务只会在被明确调用时启动。
+** 已停用：服务被停用，開機時将不会启动，開機後必須要再設定為自動或手動才能將服務啟用。
+* 更改各服务运行的[[用户|用户帐户]]上下文
+* 配置服务发生失败时应采取的恢复操作
+* 查阅服务的依赖关系，了解服务或设备驱动程序依赖于哪些特定服务，或者特定服务依赖于哪些服务或设备驱动程序
+* 导出服务列表为文本文件或[[逗号分隔值|CSV]]文件
+
+=== Sc.exe ===
+服务扩展的[[命令行界面|命令行]]接口是Sc.exe，名为“服务控制”实用工具。<ref>{{Cite web|url=http://support.microsoft.com/kb/251192|title=How to create a Windows service by using Sc.exe|accessdate=29 March 2013|date=11 September 2011|work=Support|publisher=Microsoft|archive-date=2015-03-03|archive-url=https://web.archive.org/web/20150303192857/http://support.microsoft.com/kb/251192}}</ref>此工具在Windows XP<ref>{{Cite web|url=http://technet.microsoft.com/en-us/library/bb490995.aspx|title=Command-line reference A-Z: SC|accessdate=8 January 2014|work=[[TechNet|TechNet]]|publisher=[[微软|Microsoft]]|archive-date=2018-02-03|archive-url=https://web.archive.org/web/20180203082408/https://technet.microsoft.com/en-us/library/bb490995.aspx}}</ref>及更高版本中提供。<ref name="sc.exe">{{Cite web|url=http://technet.microsoft.com/en-us/library/cc754599.aspx|title=Command-Line Reference: Sc|accessdate=8 January 2014|work=[[TechNet|TechNet]]|publisher=[[微软|Microsoft]]|quote=Windows 7, Windows 8, Windows Server 2003, Windows Server 2003 R2, Windows Server 2003 with SP1, Windows Server 2003 with SP2, Windows Server 2008, Windows Server 2008 R2, Windows Server 2012, Windows Vista|archive-date=2017-08-26|archive-url=https://web.archive.org/web/20170826161635/https://technet.microsoft.com/en-us/library/cc754599.aspx}}</ref>
+
+Sc.exe的管理范围仅限于本地计算机。从[[Windows_Server_2003|Windows Server 2003]]开始，Sc.exe不仅能做到“服务扩展”支持的操作，还可以安装和卸载服务。<ref name="sc.exe">{{Cite web|url=http://technet.microsoft.com/en-us/library/cc754599.aspx|title=Command-Line Reference: Sc|accessdate=8 January 2014|work=[[TechNet|TechNet]]|publisher=[[微软|Microsoft]]|quote=Windows 7, Windows 8, Windows Server 2003, Windows Server 2003 R2, Windows Server 2003 with SP1, Windows Server 2003 with SP2, Windows Server 2008, Windows Server 2008 R2, Windows Server 2012, Windows Vista}}</ref>
+
+=== Windows PowerShell ===
+Windows PowerShell本质上可以管理Windows服务，相关命令如下：
+* Get-Service<ref>{{Cite web|url=http://technet.microsoft.com/library/hh849804.aspx|title=Get-Service|accessdate=29 March 2013|work=TechNet|publisher=Microsoft|archive-date=2016-03-08|archive-url=https://web.archive.org/web/20160308201430/https://technet.microsoft.com/library/hh849804.aspx}}</ref>
+* New-Service<ref>{{Cite web|url=http://technet.microsoft.com/en-US/library/hh849830.aspx|title=New-Service|accessdate=29 March 2013|work=TechNet|publisher=Microsoft|archive-date=2016-10-25|archive-url=https://web.archive.org/web/20161025022612/https://technet.microsoft.com/en-us/library/hh849830.aspx}}</ref>
+* Restart-Service<ref>{{Cite web|url=http://technet.microsoft.com/en-US/library/hh849823.aspx|title=Restart-Service|accessdate=29 March 2013|work=TechNet|publisher=Microsoft|archive-date=2016-10-25|archive-url=https://web.archive.org/web/20161025022948/https://technet.microsoft.com/en-us/library/hh849823.aspx}}</ref>
+* Resume-Service<ref>{{Cite web|url=http://technet.microsoft.com/en-US/library/hh849811.aspx|title=Resume-Service|accessdate=29 March 2013|work=TechNet|publisher=Microsoft|archive-date=2016-10-25|archive-url=https://web.archive.org/web/20161025022756/https://technet.microsoft.com/en-us/library/hh849811.aspx}}</ref>
+* Set-Service<ref>{{Cite web|url=http://technet.microsoft.com/en-US/library/hh849849.aspx|title=Set-Service|accessdate=29 March 2013|work=TechNet|publisher=Microsoft|archive-date=2016-10-25|archive-url=https://web.archive.org/web/20161025014441/https://technet.microsoft.com/en-us/library/hh849849.aspx}}</ref>
+* Start-Service<ref>{{Cite web|url=http://technet.microsoft.com/en-US/library/hh849825.aspx|title=Start-Service|accessdate=29 March 2013|work=TechNet|publisher=Microsoft|archive-date=2016-10-25|archive-url=https://web.archive.org/web/20161025022747/https://technet.microsoft.com/en-us/library/hh849825.aspx}}</ref>
+* Stop-Service<ref>{{Cite web|url=http://technet.microsoft.com/en-US/library/hh849790.aspx|title=Stop-Service|accessdate=29 March 2013|work=TechNet|publisher=Microsoft|archive-date=2016-10-25|archive-url=https://web.archive.org/web/20161025022246/https://technet.microsoft.com/en-us/library/hh849790.aspx}}</ref>
+* Suspend-Service<ref>{{Cite web|url=http://technet.microsoft.com/en-US/library/hh849791.aspx|title=Suspend-Service|accessdate=29 March 2013|work=TechNet|publisher=Microsoft|archive-date=2016-10-25|archive-url=https://web.archive.org/web/20161025024319/https://technet.microsoft.com/en-us/library/hh849791.aspx}}</ref>
+
+=== 其他管理工具 ===
+在服务扩展、Sc.exe和PowerShell以外，Windows还包括第三方可以操作的组件。Net.exe可以启动、停止、暂停或恢复一个Windows服务。<ref>{{Cite web|url=http://technet.microsoft.com/en-us/library/cc736564%28v=ws.10%29.aspx|title=Start, stop, pause, resume, or restart a service|accessdate=8 January 2014|work=[[TechNet|TechNet]]|publisher=[[微软|Microsoft]]|archive-date=2016-07-14|archive-url=https://web.archive.org/web/20160714060439/https://technet.microsoft.com/en-us/library/cc736564(v=ws.10).aspx}}</ref>在Windows Vista及更高版本中，[[任务管理器_(Windows元件)|Windows 任务管理器]]可以显示已安装服务的列表和启动与暂停它们。[[MSConfig|MSConfig]]可以启用或禁用Windows服务。
+
+== 开发 ==
+
+=== 编写原生服务 ===
+可以使用如[[Microsoft_Visual_Studio|Microsoft Visual Studio]]或[[Delphi|Embarcadero Delphi]]等开发工具创建一个Windows服务。为了成为一个Windows服务，程序在编写上必须处理“服务控制管理器”的启动、停止和暂停消息。服务控制管理器是负责启动和停止服务的Windows组件。
+
+=== 封装应用程序为服务 ===
+Windows Resource Kit for [[Windows_NT_3.51|Windows NT 3.51]]、[[Windows_NT_4.0|Windows NT 4.0]]和[[Windows_2000|Windows 2000]]提供工具来控制服务的注册和使用：<code>SrvAny.exe</code>作为服务封装器来处理预期的服务接口（例如处理<code>service_start</code>，然后响应<code>service_started</code>或<code>service_failed</code>）并允许配置任何可执行文件或脚本作为一个服务。<code>Sc.exe</code>可以安装、启动、停止和卸载新服务。<ref>{{Cite web|url=http://support.microsoft.com/kb/137890|title=How To Create a User-Defined Service|accessdate=29 March 2013|work=Support|publisher=Microsoft|archive-date=2015-03-02|archive-url=https://web.archive.org/web/20150302000727/http://support.microsoft.com/kb/137890}}</ref>
+
+== 参见 ==
+; Windows服务
+* [[svchost.exe|svchost.exe]]
+; 概念
+* [[后台进程|后台进程]]
+** [[守护进程|守护进程]]
+** [[驱动程序|驱动程序]]
+
+== 参考资料 ==
+{{Reflist|30em}}
+
+== 进一步资料 ==
+* {{Cite web|url=http://windowsitpro.com/windows/what-are-errorcontrol-start-and-type-values-under-services-subkeys|title=What are the ErrorControl, Start and Type values under the Services subkeys?|accessdate=2013-03-29|date=1999-03-05|last=Savill|first=John|work={{tsl|en|Windows IT Pro||Windows IT Pro}}|publisher={{tsl|en|Penton Media||Penton Media}}|archive-date=2013-06-29|archive-url=https://web.archive.org/web/20130629055926/http://windowsitpro.com/windows/what-are-errorcontrol-start-and-type-values-under-services-subkeys|dead-url=yes}}
+* David B. Probert, [http://www.i.u-tokyo.ac.jp/edu/training/ss/lecture/new-documents/Lectures/11-WindowsServices/WindowsServices.ppt Windows Service Processes] {{Wayback|url=http://www.i.u-tokyo.ac.jp/edu/training/ss/lecture/new-documents/Lectures/11-WindowsServices/WindowsServices.ppt |date=20131219024318 }}
+* [https://technet.microsoft.com/en-us/sysinternals/bb963902.aspx Windows Sysinternals: Autoruns for Windows v13.4] {{Wayback|url=https://technet.microsoft.com/en-us/sysinternals/bb963902.aspx |date=20170704052715 }}—An extremely detailed query of services
+{{Microsoft Windows components}}
+
+[[Category:进程|Category:进程]]
+[[Category:Windows组件|Category:Windows组件]]

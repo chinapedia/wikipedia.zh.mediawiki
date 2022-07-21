@@ -1,0 +1,380 @@
+// The Wikipedia Adventure Mission 5
+
+( function ( window, document, $, mw, gt ) {
+ 
+//automatic api:edit function to send yourself messages
+function sendMessage( targetPage, msgPage, linkTo ) {
+	var api = new mw.Api();
+	api.post( {
+		'action' : 'edit',
+		'title' : targetPage,
+		'appendtext' : "\n{{subst:" + msgPage + "}}",
+		'summary' : '新訊息（[[WP:TWA|維基百科大歷險]]自動模擬5）',
+		'token' : mw.user.tokens.get('csrfToken')
+	} ).done( function () {
+		window.location.href = linkTo;
+	} );
+}
+ 
+// Fail gracefully post-save but not postedit
+var postEditButtons = [];
+if ( mw.config.get( 'wgAction' ) === 'view' && !gt.isPostEdit() ) {
+        postEditButtons.push( {
+                name: '按此返回並進行編輯',
+                onclick: function() {
+                        window.location.href = new mw.Uri().extend( { action: 'edit' } ).toString();
+                }
+        } );
+}
+
+// Fail gracefully post-save but not postedit for visual editor
+var postEditButtonsVisual = [];
+if ( mw.config.get( 'wgAction' ) === 'view' && !gt.isPostEdit() ) {
+        postEditButtonsVisual.push( {
+                name: '返回',
+                onclick: function() {
+                        window.location.href = window.location.href +
+"&veaction=edit";
+                }
+        } );
+}
+
+gt.defineTour( {
+        name: 'twa5',
+        shouldLog: true,
+        steps: [ {
+
+                //1
+                title: '我們開始了！',
+                description: '<br><div align="right">[[File:TWA_guide_right_top.png|link=]]</div>蘇格喇低提出了一個困惑的問題：我們怎樣查證維基百科上的內容呢？<br><br>這個特別的問題需要到特別的地方找出明智的答案。<br><br>',
+                overlay: true,
+                onShow: gt.parseDescription,
+                buttons: [ {
+                        name: '查看互助客棧',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/Teahouse' ) + '?tour=twa5&step=2'      
+                } ],
+		allowAutomaticOkay: false
+
+        },  {
+                //2
+                title: '互助客棧是怎樣的呢？',
+                description: '<br><div align="right">[[File:TWA_guide_right_top.png|link=]]</div>作為社交場所，大家可以隨時在互助客棧提出關於維基百科的問題，然後等待聰明、熱心的-{zh-hans:志愿者; zh-hk:義工; zh-tw:志工;}-作出簡潔、清晰的解答。<br><br>',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/5/Start' ) + '?tour=twa5&step=1' 
+                } , { 
+                	    name: '喝點茶吧',
+                        action:'next',          
+                } ],
+
+                allowAutomaticOkay: false,
+                
+        },  {
+                //3
+                title: '互助客棧 = 棒',
+                description: '<br><div align="left">[[File:TWA_guide_left_top.png|link=]]</div>要成為優秀編輯，就該踴躍發問，積極求助。我們要學習的事很多，不過願意幫助您的朋友也一樣多。<br><br>',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+                allowAutomaticOkay: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/Teahouse' ) + '?tour=twa5&step=2' 
+                } , { 
+                	   name: '向互助客棧傾訴',
+                       action: 'next',
+                } ],     
+                
+        },  {
+
+                //4
+                title: '問吧！',
+                description: '<br>事實和維基百科<br><br>「大家好，我剛剛加入這裏，想了解維基百科。我在想，你們是怎樣{{zh-em|查證}}維基百科的內容呢？」<br><br>',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+	            allowAutomaticOkay: false,
+		        buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/Teahouse' ) + '?tour=twa5&step=3' 
+                } , { 
+                        name: '發表',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/Teahouse/1' ) + '?tour=twa5&step=5'
+                        } ],
+},  {
+                //5
+                title: '問得好！',
+                description: '獲得新工具：<b>研究員獎章</b><center>[[File:TWA_badge_7.png|250px]]</center><br>嘿，您有一則新通知：有人在客棧回應了您的問題。<br>',
+                onShow: gt.parseDescription,
+                attachTo: '#content.mw-body',
+                position: 'topRight',
+                autoFocus: 'yes',
+                overlay: false,
+                closeOnClickOutside: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/Teahouse' ) + '?tour=twa5&step=4' 
+                } , { 
+                        name: '查看回覆',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/Teahouse/2' ) + '?tour=twa5&step=6'
+                        } ],
+                allowAutomaticOkay: false,
+                
+        },  {
+                //6
+                title: '這很重要',
+                description: '<br><div align="right">[[File:TWA_guide_right_top.png|link=]]</div>所以我們只能說明已出版來源能證明的事實，僅此而已，個人經驗、原創研究或者個人觀點都不算。<br><br>',
+                onShow: gt.parseDescription,
+                overlay: false,
+                attachTo: '#content.mw-body',
+                position: 'bottomRight',
+                closeOnClickOutside: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/Teahouse' ) + '?tour=twa5&step=5' 
+                } , { 
+                        name: '深入了解可供查證方針*',
+                        onclick: function()  {  if(!mw.config.get('wgUserName')){  alert( "Please login." );   return;   } sendMessage( 'User:' + mw.config.get( 'wgUserName' ), 'Wikipedia:TWA/Badge/7template2' , mw.util.getUrl( 'Wikipedia:TWA/5/V' ) + '?tour=twa5&step=7'); }
+                } ],      
+                allowAutomaticOkay: false
+
+},  {
+                //7
+                title: '請回答下列問題',
+                description: '',
+                overlay: false,
+                closeOnClickOutside: false,
+	            allowAutomaticOkay: false,
+	            buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/Teahouse/2' ) + '?tour=twa5&step=6' 
+                } ]
+
+} , {
+                //8
+                title: '您明白可供查證是甚麼了',
+                description: '獲得新工具：<b>考據者獎章</b><center>[[File:TWA_badge_8.png|250px]]</center><br>好好運用剛學會的知識吧！<br>',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/5/V' ) + '?tour=twa5&step=7' 
+                } , { 
+                        name: '查看您的新訊息*',
+                        onclick: function()  {  if(!mw.config.get('wgUserName')){  alert( "請登入。" );   return;   } sendMessage( 'User talk:' + mw.config.get( 'wgUserName' ) + '/TWA', 'Wikipedia:TWA/MyTalk/5' , mw.util.getUrl( 'Special:MyTalk/TWA' ) + '?tour=twa5&step=9'); }           
+                } ],
+                allowAutomaticOkay: false
+
+} , {
+                //9
+                title: '尋找來源',
+                description: '<br><div align="left">[[File:TWA_guide_left_top.png|link=]]</div>一起看看蓋亞女郎都說了些甚麼？</br>',
+                onShow: gt.parseDescription,
+                overlay: false,
+                attachTo: '#content.mw-body',
+                position: 'bottom',
+                closeOnClickOutside: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/5/Start' ) + '?tour=twa5&step=8' 
+                } , { 
+                        name: '前往地球的討論頁*',
+                        onclick: function()  {  if(!mw.config.get('wgUserName')){  alert( "請登入。" );   return;   } sendMessage( 'User talk:' + mw.config.get( 'wgUserName' ) + '/TWA/Earth', 'Wikipedia:TWA/Earth/Talk/1' , mw.util.getUrl( 'Special:MyTalk/TWA/Earth' ) + '?tour=twa5&step=10'); }           
+                } ],
+                allowAutomaticOkay: false
+				
+} , {
+                //10
+                title: '三種來源',
+                description: '<br><div align="left">[[File:TWA_guide_left_top.png|link=]]</div>看來蓋亞女郎為我們提供了幾個選擇。<br><br>〈可靠來源〉告訴我們，我們需要已出版的可靠來源，這些來源應具有事實查證與正確性的聲譽；也就是我們靠得住的來源。<br><br> ',
+                onShow: gt.parseDescription,
+                overlay: false,
+                attachTo: '#content.mw-body',
+                position: 'bottom',
+                closeOnClickOutside: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/5/Start' ) + '?tour=twa5&step=9' 
+                } , { 
+                        name: '哪個才是最好的呢？',
+                        onclick: function()  {  if(!mw.config.get('wgUserName')){  alert( "Please login." );   return;   } sendMessage( 'User:' + mw.config.get( 'wgUserName' ), 'Wikipedia:TWA/Badge/8template2' , mw.util.getUrl( 'Wikipedia:TWA/5/RS' ) + '?tour=twa5&step=11'); }
+                } ],      
+
+                allowAutomaticOkay: false
+
+},  {
+                //11
+                title: '問答',
+                description: '提示：答對也好，答錯也好，學會的知識都是一樣的。答錯了可以再來，多少次也沒關係！',
+                attachTo:'#contentSub',
+                position: 'bottom',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+                allowAutomaticOkay: false, 
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Special:MyTalk/TWA/Earth' ) + '?tour=twa5&step=10' 
+                }],
+
+}, {
+                //12
+                title: '您越來越可靠了',
+                description: '獲得新工具：<b>舉證者獎章</b><center>[[File:TWA_badge_9.png|250px]]</center><br>',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/5/RS' ) + '?tour=twa5&step=11' 
+                } , { 
+                             name: '回覆蓋亞女郎*',
+                             onclick: function()  {  if(!mw.config.get('wgUserName')){  alert( "Please login." );   return;   } sendMessage( 'User:' + mw.config.get( 'wgUserName' ), 'Wikipedia:TWA/Badge/9template2' , mw.util.getUrl( 'Wikipedia:TWA/5/Start' ) + '?tour=twa5&step=13'); }
+                } ],    
+                allowAutomaticOkay: false
+
+}, {
+                //13
+                title: '現在又怎樣呢？',
+                description: '<br><div align="right">[[File:TWA_guide_right_top.png|link=]]</div>現在我們有來源了，該怎樣做呢？<br><br>首先，我們要到蓋亞女郎的討論頁，告訴她我們怎麼想。<br><br>嗯⋯⋯說甚麼好呢？<br><br>',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Special:MyTalk/TWA/Earth' ) + '?tour=twa5&step=12' 
+                },{
+                        name: '回覆蓋亞女郎',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/5/Reply' ) + '?tour=twa5&step=14'
+                        } ],
+                allowAutomaticOkay: false
+
+} , {
+                //14
+                title: '問答',
+                description: '提示：答對也好，答錯也好，學會的知識都是一樣的。答錯了可以再來，多少次也沒關係！',
+                attachTo:'#contentSub',
+                position: 'bottom',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+                allowAutomaticOkay: false, 
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/5/Start' ) + '?tour=twa5&step=13' 
+                }],
+
+        },  {
+                //15
+                title: '回覆蓋亞女郎',
+                description: '<br>按「編輯」，這樣您就可以回覆蓋亞女郎了。<br><br>',
+                attachTo: '#ca-edit',
+                position: 'bottom',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+                allowAutomaticOkay: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/5/Reply' ) + '?tour=twa5&step=14' 
+                }],
+                shouldSkip: function() {
+                        return gt.hasQuery( { action: 'edit' } );
+                }
+ 
+        },  {
+                //16
+                title: '抄寫回信',
+                description: '<br><div align="right">[[File:TWA_guide_right_top.png|link=]]</div>:看來《科學與自然》期刊信譽不錯，既切題又翔實。我們應該用這個來源（而不是另外兩個）來撰寫這篇條目。做得好！<nowiki>~~~~</nowiki><br>',
+                onShow: gt.parseDescription,
+                overlay: false,
+                attachTo: '#wpTextbox1', 
+                position: 'bottomRight',
+                closeOnClickOutside: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Special:MyTalk/TWA/Earth' ) + '?tour=twa5&step=15' 
+                } , {
+                        name: '抄完了',
+                        action: 'next',
+                        } ],
+ 
+} , {
+                //17
+                title: '寫下編輯摘要和儲存',
+                description: '<br>不如就寫「對可靠來源的意見」吧？然後請按<b>儲存</b>，發表您的見解。<br><br>',
+                attachTo: '#wpSave',
+                position: 'bottomRight',
+                autoFocus: 'yes',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+	            allowAutomaticOkay: false,
+	            buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Special:MyTalk/TWA/Earth' ) + '?tour=twa5&step=16&action=edit' 
+                } ], 
+	            shouldSkip: function() {
+                        return gt.isPostEdit();
+                },
+                buttons: postEditButtons
+
+} , {
+                //18
+                title: '搖滾起來吧！',
+                description: '獲得新工具：<b>建議者獎章</b><center>[[File:TWA_badge_10.png|250px]]</center><br><br>我看到蓋亞女郎在〈地球〉的討論頁留下很棒的內容，一起去看看吧！',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Special:MyTalk/TWA/Earth' ) + '?tour=twa5&step=17&action=edit' 
+                } , {
+                        name: '繼續上路*',
+                        onclick: function()  {  if(!mw.config.get('wgUserName')){  alert( "Please login." );   return;   } sendMessage( 'User:' + mw.config.get( 'wgUserName' ), 'Wikipedia:TWA/Badge/10template2' , mw.util.getUrl( 'Wikipedia:TWA/5/End' ) + '?tour=twa5&step=19'); }
+                } ], 
+                allowAutomaticOkay: false
+
+} , {
+                //19
+                title: '第五關完成！',
+                description: '<br>[[File:Northern_mountains_(short).ogg|File:Northern mountains (short).ogg]]<br><b>向第六關進發⋯⋯</b>',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+	            buttons: [ {
+	            	    name: '恭喜自己！',
+                        action: 'end'
+                } ],
+                allowAutomaticOkay: false
+		         
+}]
+ 
+} );
+ 
+} (window, document, jQuery, mediaWiki, mediaWiki.guidedTour ) ) ;

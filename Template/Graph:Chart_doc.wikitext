@@ -1,0 +1,279 @@
+{{Documentation subpage}}
+<!--本頁底加入模板的分類，跨維基連結加入維基數據（參見[[Wikipedia:維基數據]]）-->
+{{Lua|Module:Graph}}
+{{缺乏中文说明}}
+<!-- Please place categories where indicated at the bottom of this page and interwikis at Wikidata (see [[Wikipedia:Wikidata]]) -->
+==CSV2Chart==
+如果您有来自电子表格文档（例如[[LibreOffice]]Calc）或统计软件[[R语言|R/R-Studio]]的数据，您可以将它们导出为CSV文件。可以使用[[v:en:AppLSAC]]加载CSV文件，该文件能够将CSV转换为图表中的数据。该列的第一行应该有标题。CSV文件的列包含浮点值或整数值。[https://niebert.github.io/csv2wikichart_app/ CSV2WikiChart]是作为维基百科和包含数据的维基学院学习资源的支持工具而创建的。
+
+==參數==
+创建用于显示图表的<code><nowiki><graph></nowiki></code> JSON 对象。在文章命名空间中，应改用模板[[Template:Graph:Chart]]。有关用例，请参阅其页面。
+
+{{#ifeq:{{{1|chart}}}|chart|<!-- Parts to be transcluded from the wrapper Template:Graph:Chart -->
+* '''width''': 图表的宽度
+* '''height''': 图表的高度
+* '''type''': 图表类型：<code>line</code>用于[[折线图]], <code>area</code>用于[[面积图]], 和<code>rect</code>用于(圆柱) [[饼图]], 和 <code>pie</code>用于[[条形图]]。 多个系列可以堆叠使用<code>stacked</code>前缀，例如<code>stackedarea</code>。
+* '''interpolate''': [[插值]]折线图和面积图的方法。建议使用<code>monotone</code>[[单调三次插值]] –进一步支持的值列在{{URL|https://github.com/vega/vega/wiki/Marks#area}}。
+* '''colors''': 圖表的色盤，顏色之間用半形逗號<code>,</code>分隔。顏色的值須以<code>#rgb</code>或<code>#rrggbb</code>或<code>#aarrggbb</code>或[[:en:Web colors#X11 colour names|CSS色名]]表示。<code>#aarrggbb</code>格式中，<code>aa</code>值為[[Alpha合成|Alpha通道]]，即<code>FF</code>表示100%不透明，<code>80</code>表示50%不透明/透明，餘可類推。（預設色盤是[http://github.com/d3/d3-scale/blob/master/README.md#schemeCategory10 <code>category10</code>])。
+* '''xAxisTitle''' 和 '''yAxisTitle''': 分別是x軸和y軸的標題
+* '''xAxisMin''', '''xAxisMax''', '''yAxisMin''', and '''yAxisMax''': x軸和y軸顯示範圍的最小、最大值（棒狀圖未支援）。
+* '''xAxisFormat''' and '''yAxisFormat''': 軸上標示數值的格式。例如，若x軸為date類別，則xAxisFormat設成<code>%Y-%m</code>便可顯示為類似「2021-12」的格式。數的可用格式列舉於 https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#numbers ，而日期/時間的可用格式則見 https://github.com/d3/d3-3.x-api-reference/blob/master/Time-Formatting.md for date/time 。
+* '''xAxisAngle''': 將x軸旋轉多少角度。推薦值為： -45, +45, -90, +90
+* '''xType''' 和 '''yType''': 數據的類型，例如：<code>integer</code>表示整數，<code>number</code>表示實數，<code>date</code>表示日期（如YYYY/MM/DD），<code>string</code>表示字串。
+* '''x''': 要作圖的各數據點的x值，以半形逗號分隔。
+* '''y''' 或 '''y1''', '''y2''', …: 要作圖的一列或多列數據點的值。對於餅狀圖，<code>y2</code>是扇形的半徑。
+* '''legend''': 顯示圖例（僅在有多列數據點時生效）。
+* '''y1Title''', '''y2Title''', …: 定義圖例中，對應數據列的標籤。
+* '''linewidth''': 對折線圖，定義線的粗幼。對餅狀圖，則是餅塊間隙的距離。
+* '''showValues''': 額外將y值輸出為文字。（目前僅支援餅狀圖和（無堆疊的）棒狀圖。）輸出有下列參數可供設置，設置時要按<code>name1:value1, name2:value2</code>格式：
+** '''format''': 輸出的格式，可用數值格式見 https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#numbers ，可用日期/時間格式則見 https://github.com/d3/d3-3.x-api-reference/blob/master/Time-Formatting.md 。
+** '''fontcolor''': 字體顏色
+** '''fontsize''': 字體大小
+** '''offset''': 移動文字的偏移量。對於棒狀圖和有<code>midangle</code>的餅狀圖，偏移量亦決定文字是在圖表內抑或外。
+** '''angle''' （僅限餅狀圖）：文字的角度，可用度數表示，或設為<code>midangle</code> （預設），意思是基於扇形中央方位角的動態角度。
+* '''showSymbols''': 對折線圖，在各數據點顯示符號（圓形）。
+* '''innerRadius''': 對餅狀圖，定義內半徑，以生成「環形圖」。
+}}{{#if:{{{1|}}}||
+* '''formatjson''': 設置JSON物件格式使之更可讀。
+
+=== Template wrappers ===
+The functions <code>mapWrapper</code> and <code>chartWrapper</code> are wrappers to pass all parameters of the calling template to the respective <code>map</code> and <code>chart</code> functions.
+}}
+
+'''Note:''' In the editor preview the graph extension creates a [[Canvas (HTML元素)|canvas element]] with vector graphics. However, when saving the page a [[Portable Network Graphics|PNG]] raster graphics is generated instead.
+{{#if:{{{1|}}}||<!-- Parts not to be transcluded from the wrapper templates -->
+ <nowiki>{{</nowiki>#invoke:{{BASEPAGENAME}}|''function_wrapper_name''<nowiki>}}</nowiki>
+}}
+
+<includeonly>{{#ifeq:{{SUBPAGENAME}}|sandbox | |
+<!-- Categories below this line, please; interwikis at Wikidata -->
+
+}}</includeonly>
+
+==範例==
+===基礎範例===
+折綫圖:<br />
+<tt><nowiki>{{Graph:Chart|width=400|height=100|type=line|x=1,2,3,4,5,6,7,8|y=10,12,6,14,2,10,7,9}}</nowiki></tt><br />{{Graph:Chart|width=400|height=100|type=line|x=1,2,3,4,5,6,7,8|y=10,12,6,14,2,10,7,9}}<br />
+Note: The y-axis starts from the smallest y value, though this can be overridden with the <tt>yAxisMin</tt> parameter.
+
+面積圖:<br />
+<tt><nowiki>{{Graph:Chart|width=400|height=100|type=area|x=1,2,3,4,5,6,7,8|y=10,12,6,14,2,10,7,9}}</nowiki></tt><br />{{Graph:Chart|width=400|height=100|type=area|x=1,2,3,4,5,6,7,8|y=10,12,6,14,2,10,7,9}}<br />
+Note: The y-axis starts from zero
+
+條形圖:<br />
+<tt><nowiki>{{Graph:Chart|width=400|height=100|xAxisTitle=X|yAxisTitle=Y|type=rect|x=1,2,3,4,5,6,7,8|y=10,12,6,14,2,10,7,9}}</nowiki></tt><br />{{Graph:Chart|width=400|height=100|xAxisTitle=X|yAxisTitle=Y|type=rect|x=1,2,3,4,5,6,7,8|y=10,12,6,14,2,10,7,9}}
+
+===多條數據===
+包含多條數據的折綫圖，使用顔色區分：<br />
+<tt><nowiki>{{Graph:Chart|width=400|height=100|xAxisTitle=X|yAxisTitle=Y|legend=Legend|type=line|x=1,2,3,4,5,6,7,8|y1=10,12,6,14,2,10,7,9|y2=2,4,6,8,13,11,9,2|colors=#0000aa,#ff8000}}</nowiki></tt><br />{{Graph:Chart|width=400|height=100|xAxisTitle=X|yAxisTitle=Y|legend=Legend|type=line|x=1,2,3,4,5,6,7,8|y1=10,12,6,14,2,10,7,9|y2=2,4,6,8,13,11,9,2|colors=#0000aa,#ff8000}}
+
+包含多條數據的區域圖，混合交曡展示：<br />
+<tt><nowiki>{{Graph:Chart|width=400|height=100|xAxisTitle=X|yAxisTitle=Y|legend=Legend|type=area|x=1,2,3,4,5,6,7,8|y1=10,12,6,14,2,10,7,9|y2=2,4,6,8,13,11,9,2|colors=#800000aa,#80ff8000}}</nowiki></tt><br />{{Graph:Chart|width=400|height=100|xAxisTitle=X|yAxisTitle=Y|legend=Legend|type=area|x=1,2,3,4,5,6,7,8|y1=10,12,6,14,2,10,7,9|y2=2,4,6,8,13,11,9,2|colors=#800000aa,#80ff8000}}
+
+包含多條數據的條形圖：<br />
+<tt><nowiki>{{Graph:Chart|width=400|height=100|xAxisTitle=X|yAxisTitle=Y|legend=Legend|type=rect|x=1,2,3,4,5,6,7,8|y1=10,12,6,14,2,10,7,9|y2=2,4,6,8,13,11,9,2|colors=#800000aa,#80ff8000}}</nowiki></tt><br />{{Graph:Chart|width=400|height=100|xAxisTitle=X|yAxisTitle=Y|legend=Legend|type=rect|x=1,2,3,4,5,6,7,8|y1=10,12,6,14,2,10,7,9|y2=2,4,6,8,13,11,9,2|colors=#800000aa,#80ff8000}}
+
+數據值平滑后的區域圖：<br />
+<tt><nowiki>{{Graph:Chart|width=400|height=100|xAxisTitle=X|yAxisTitle=Y|legend=Legend|type=stackedarea|x=1,2,3,4,5,6,7,8|y1=10,12,6,14,2,10,7,9|y2=2,4,6,8,13,11,9,2|interpolate=monotone|colors=seagreen, orchid}}</nowiki></tt><br />{{Graph:Chart|width=400|height=100|xAxisTitle=X|yAxisTitle=Y|legend=Legend|type=stackedarea|x=1,2,3,4,5,6,7,8|y1=10,12,6,14,2,10,7,9|y2=2,4,6,8,13,11,9,2|interpolate=monotone|colors=seagreen, orchid}}
+
+堆叠多條數據的條形圖：<br />
+<tt><nowiki>{{Graph:Chart|width=400|height=100|xAxisTitle=X|yAxisTitle=Y|legend=Legend|type=stackedrect|x=1,2,3,4,5,6,7,8|y1=10,12,6,14,2,10,7,9|y2=2,4,6,8,13,11,9,2|y1Title=Data A|y2Title=Data B|colors=seagreen, orchid}}</nowiki></tt><br />{{Graph:Chart|width=400|height=100|xAxisTitle=X|yAxisTitle=Y|legend=Legend|type=stackedrect|x=1,2,3,4,5,6,7,8|y1=10,12,6,14,2,10,7,9|y2=2,4,6,8,13,11,9,2|y1Title=Data A|y2Title=Data B|colors=seagreen, orchid}}
+
+===餅圖===
+<tt><nowiki>{{Graph:Chart|width=100|height=100|type=pie|legend=Legende|x=A,B,C,D,E,F,G,H,I|y1=100,200,150,300,100,100,150,50,200}}</nowiki></tt><br />
+{{Graph:Chart|width=100|height=100|type=pie|legend=Legende|x=A,B,C,D,E,F,G,H,I|y1=100,200,150,300,100,100,150,50,200}}
+
+<tt><nowiki>{{Graph:Chart|width=100|height=100|type=pie|legend=Legende|x=A,B,C,D,E,F,G,H,I|y1=100,200,150,300,100,100,150,50,200|showValues=}}</nowiki></tt><br />
+{{Graph:Chart|width=100|height=100|type=pie|legend=Legende|x=A,B,C,D,E,F,G,H,I|y1=100,200,150,300,100,100,150,50,200|showValues=}}
+
+<tt><nowiki>{{Graph:Chart|width=100|height=100|type=pie|legend=Legende|x=A,B,C,D,E,F,G,H,I|y1=100,200,150,300,100,100,150,50,200|y2=7,8,9,8,8,9,10,9,5|showValues=}}</nowiki></tt><br />
+{{Graph:Chart|width=100|height=100|type=pie|legend=Legende|x=A,B,C,D,E,F,G,H,I|y1=100,200,150,300,100,100,150,50,200|y2=7,8,9,8,8,9,10,9,5|showValues=}}
+
+<tt><nowiki>{{Graph:Chart|width=100|height=100|type=pie|innerRadius=40|legend=Legende|x=A,B,C,D,E,F,G,H,I|y1=100,200,150,300,100,100,150,50,200}}</nowiki></tt><br />
+{{Graph:Chart|width=100|height=100|type=pie|innerRadius=40|legend=Legende|x=A,B,C,D,E,F,G,H,I|y1=100,200,150,300,100,100,150,50,200}}
+
+===散點圖===
+By using a line plot with <code>linewidth=0</code>, it is possible to create a [[scatter plot]]:
+<pre>
+{{Graph:Chart|width=500|height=200|type=line|x=15.7,10.8,68.5,33.4,23.8,42.2,27.1,38.2,13.5,74.3|y1=1517,970,4075,3819,2106,2919,2428,2164,1393,7603|showSymbols=1|linewidth=0|yGrid= |xGrid= }}
+</pre>
+{{Graph:Chart|width=500|height=200|type=line|x=15.7,10.8,68.5,33.4,23.8,42.2,27.1,38.2,13.5,74.3|y1=1517,970,4075,3819,2106,2919,2428,2164,1393,7603|showSymbols=1|linewidth=0|yGrid= |xGrid= }}
+
+===使用百分比===
+*When <code>xAxisFormat</code> or <code>yAxisFormat</code> is set to <code>%</code>, a percentage sign will be added to the scale of the corresponding axis.
+*A value of <code>1</code> equals 100%. A decimal point should be added in front of percentages between 0 and 100, for instance <code>.25</code> for 25%.
+*Including the code <code>| yAxisMin=0 | yAxisMax=1</code> will force the y axis scale to run from 0% to 100%.
+<pre>
+{{Graph:Chart
+| width = 450
+| height = 350
+| x = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23
+| yAxisMin = 0
+| yAxisMax = 1
+| yAxisFormat = %
+| showSymbols = 
+| y1 = , , , .43, , , , .39, .43, .38, .38, .40, .48, .54 , .42, .47, .45, .48, .44, .41, .41, .45, .46
+| y2 = .40, .377, .38, , .39, .38, .419, .55, .60, .63
+| y3 = .27, .311, .31, , .26, .28, .285
+| y4 = {{repeat|7|, }} .40, .44, .42, .47, .44, .43, .42
+}}
+</pre>
+
+{{Graph:Chart
+| width = 450
+| height = 350
+| x = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23
+| yAxisMin = 0
+| yAxisMax = 1
+| yAxisFormat = %
+| showSymbols = 
+| y1 = , , , .43, , , , .39, .43, .38, .38, .40, .48, .54 , .42, .47, .45, .48, .44, .41, .41, .45, .46
+| y2 = .40, .377, .38, , .39, .38, .419, .55, .60, .63
+| y3 = .27, .311, .31, , .26, .28, .285
+| y4 = {{repeat|7|, }} .40, .44, .42, .47, .44, .43, .42
+}}
+
+一個擁有超過100%數值和負值的圖表：
+<pre>
+{{Graph:Chart
+| width = 450
+| height = 350
+| x = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23
+| yAxisFormat = %
+| showSymbols = 
+| y1 = 2, .43, 1.20, .39, .43, .0, -.38, -.20, .18, .54 , 0
+}}
+</pre>
+
+{{Graph:Chart
+| width = 450
+| height = 350
+| x = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23
+| yAxisFormat = %
+| showSymbols = 
+| y1 = 2, .43, 1.20, .39, .43, .0, -.38, -.20, .18, .54 , 0
+}}
+
+===圖例===
+儅有多條數據時，可以添加圖例：
+<pre>
+{{Graph:Chart
+ | width=400
+ | height=150
+ | xAxisTitle=X
+ | yAxisTitle=Y
+ | legend=Legend
+ | y1Title=Blue
+ | y2Title=Orange
+ | type=line
+ | x=1,2,3,4,5,6,7,8
+ | y1=10,12,6,14,2,10,7,9
+ | y2=2,4,6,8,13,11,9,2
+}}
+</pre>{{Graph:Chart
+ | width=400
+ | height=150
+ | xAxisTitle=X
+ | yAxisTitle=Y
+ | legend=Legend
+ | y1Title=Blue
+ | y2Title=Orange
+ | type=line
+ | x=1,2,3,4,5,6,7,8
+ | y1=10,12,6,14,2,10,7,9
+ | y2=2,4,6,8,13,11,9,2
+}}
+
+將legend參數留空可以隱藏圖例標題：
+<pre>
+{{Graph:Chart
+ | width=400
+ | height=150
+ | xAxisTitle=X
+ | yAxisTitle=Y
+ | legend=
+ | y1Title=Blue
+ | y2Title=Orange
+ | type=line
+ | x=1,2,3,4,5,6,7,8
+ | y1=10,12,6,14,2,10,7,9
+ | y2=2,4,6,8,13,11,9,2
+}}
+</pre>{{Graph:Chart
+ | width=400
+ | height=150
+ | xAxisTitle=X
+ | yAxisTitle=Y
+ | legend=
+ | y1Title=Blue
+ | y2Title=Orange
+ | type=line
+ | x=1,2,3,4,5,6,7,8
+ | y1=10,12,6,14,2,10,7,9
+ | y2=2,4,6,8,13,11,9,2
+}}
+
+長圖例看起來比較笨拙。最好將圖例隱藏，並使用 {{tl|Legend}} (或 [[:Category:Legend templates|a similar template]]) 代替:
+<pre>
+{{Graph:Chart
+ | width=400
+ | height=150
+ | xAxisTitle=X
+ | yAxisTitle=Y
+ | colors=darkred, gold
+ | type=line
+ | x=1,2,3,4,5,6,7,8
+ | y1=10,12,6,14,2,10,7,9
+ | y2=2,4,6,8,13,11,9,2
+}}
+{{legend|darkred|This is a long legend entry and wouldn't look so good if it was part of the graph itself.}}
+{{legend|gold|This is another fairly long entry.}}
+</pre>{{Graph:Chart
+ | width=400
+ | height=150
+ | xAxisTitle=X
+ | yAxisTitle=Y
+ | colors=darkred, gold
+ | type=line
+ | x=1,2,3,4,5,6,7,8
+ | y1=10,12,6,14,2,10,7,9
+ | y2=2,4,6,8,13,11,9,2
+}}
+{{legend|darkred|This is a long legend entry and wouldn't look so good if it was part of the graph itself.}}
+{{legend|gold|This is another fairly long entry.}}
+
+
+This method also allows the use of wiki formatting and the insertion of links. Graphs using the default colors need to specify the hex values in the legend templates:
+{{columns-list|colwidth=7em|
+{{legend|#1f77b4|#1f77b4}}
+{{legend|#ff7f0e|#ff7f0e}}
+{{legend|#2ca02c|#2ca02c}}
+{{legend|#d62728|#d62728}}
+{{legend|#9467bd|#9467bd}}
+{{legend|#8c564b|#8c564b}}
+{{legend|#e377c2|#e377c2}}
+{{legend|#7f7f7f|#7f7f7f}}
+{{legend|#bcbd22|#bcbd22}}
+{{legend|#17becf|#17becf}}
+}}
+
+Alternatively, [https://www.w3schools.com/cssref/css_colors.asp CSS color names] (or hex values) can be specified in the graph and the legend templates.
+
+==注意事項==
+如果瀏覽器停用Javascript，將顯示為空白。
+
+==模板編輯說明==
+
+==重定向==
+
+==參見==
+
+
+<includeonly>
+<!--本行下加入模板的分類，跨維基連結加入維基數據-->
+[[CAT:圖表模板]]
+{{#ifeq:{{SUBPAGENAME}}|sandbox||
+<!-- Categories below this line, please; interwikis at Wikidata -->
+
+}}</includeonly>
+{{meta|Template:Graph:Chart}}

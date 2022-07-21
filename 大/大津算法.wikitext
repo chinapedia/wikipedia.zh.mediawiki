@@ -1,0 +1,241 @@
+{{TA
+|G1=IT
+|G2=Math
+}}
+[[Image:Image_processing_post_otsus_algorithm.jpg|thumb]]
+[[Image:Image_processing_pre_otsus_algorithm.jpg|thumb]]
+在[[计算机视觉|计算机视觉]]和[[图像处理|图像处理]]中，'''大津二值化法'''用来自动对基于聚类的图像进行[[二值化|二值化]]，<ref name=Mehmet>{{cite journal
+| author = M. Sezgin and B. Sankur
+| year = 2004
+| title = Survey over image thresholding techniques and quantitative performance evaluation
+| volume = 13
+| issue = 1
+| pages = 146–165
+| journal = Journal of Electronic Imaging
+| doi = 10.1117/1.1631315
+}}</ref> 或者说，将一个[[灰度图像|灰度图像]]退化为二值图像。该算法以大津展之命名。算法假定该图像根据双模直方图（前景像素和背景像素）把包含两类像素，于是它要计算能将两类分开的最佳阈值，使得它们的类内[[方差|方差]]最小；由于两两平方距离恒定，所以即它们的类间方差最大。<ref name=Otsu>{{cite journal
+| author = Nobuyuki Otsu
+| year = 1979
+| title = A threshold selection method from gray-level histograms
+| volume = 9
+| issue = 1
+| pages = 62–66
+| journal = IEEE Trans. Sys., Man., Cyber.
+| doi = 10.1109/TSMC.1979.4310076
+}}</ref>
+因此，大津二值化法粗略的来说就是一维[[線性判別分析|Fisher判别分析]]的离散化模拟。
+
+原始方法的多级阈值扩展称为[[多大津算法|多大津算法]]。<ref name=multi>{{cite journal
+| author  = Ping-Sung Liao and Tse-Sheng Chen and Pau-Choo Chung
+| title   = A Fast Algorithm for Multilevel Thresholding
+| journal = J. Inf. Sci. Eng.
+| volume  = 17
+| year    = 2001
+| pages   = 713–727
+| issue  = 5
+}}</ref>
+
+==方法==
+在大津算法中，我们穷举搜索能使类内方差最小的阈值，定义为两个类的方差的加权和：
+
+:<math>\sigma^2_w(t)=\omega_1(t)\sigma^2_1(t)+\omega_2(t)\sigma^2_2(t)</math>
+权重 <math>\omega_i</math> 是被阈值 <math>t</math> 分开的两个类的概率，而 <math>\sigma^2_ i</math> 是这两个类的方差。
+
+大津证明了最小化类内方差和最大化类间方差是相同的：<ref name=Otsu/>
+
+:<math>\sigma^2_b(t)=\sigma^2-\sigma^2_w(t)=\omega_1(t)\omega_2(t)\left[\mu_1(t)-\mu_2(t)\right]^2</math>
+
+用类概率 <math>\omega_i</math> 和类均值 <math>\mu_i</math> 来表示。
+
+类概率 <math>\omega_1(t)</math> 用阈值为 <math>t</math> 的直方图计算：
+
+:<math>\omega_1(t)=\Sigma_0^t p(i)</math>
+
+而类均值 <math>\mu_1(t)</math> 为：
+
+:<math>\mu_1(t)=\left[\Sigma_0^t p(i)\,x(i)\right]/\omega_1</math>
+
+其中 <math>x(i)</math> 为第 <math>i</math> 个直方图面元中心的值。
+同样的，你可以对大于 <math>t</math> 的面元求出右侧直方图的 <math>\omega_2(t)</math> 与 <math>\mu_2</math>。
+
+类概率和类均值可以迭代计算。这个想法会产生一个有效的算法。
+
+大津算法得出了0:1范围上的一个阈值。这个阈值用于图像中出现的像素强度的动态范围。例如，若图像只包含155到255之间的像素强度，大津阈值0.75会映射到灰度阈值230（而不是192，因为图像包含的像素不是0–255全范围的）。常见的摄影图像往往包含全范围的像素强度，就会让这一点有争论，但其他应用会对这点区别很敏感。<ref>{{cite web|title=Q&A Forum|url=http://stackoverflow.com/questions/31129994/otsu-method-graythresh-function-in-matlab-produces-a-scaled-result-on-which-sc/31180141|website=Stack Overflow|accessdate=2015-10-20|archive-date=2015-11-14|archive-url=https://web.archive.org/web/20151114033408/http://stackoverflow.com/questions/31129994/otsu-method-graythresh-function-in-matlab-produces-a-scaled-result-on-which-sc/31180141|dead-url=no}}</ref>
+
+===算法===
+# 计算每个强度级的直方图和概率
+# 设置 <math>\omega_i(0)</math> 和 <math>\mu_i(0)</math> 的初始值
+# 遍历所有可能的阈值 <math>t = 1 \ldots </math> 最大强度
+## 更新 <math>\omega_i</math> 和 <math>\mu_i</math>
+## 计算 <math>\sigma^2_b(t)</math>
+# 所需的阈值对应于最大的 <math>\sigma^2_b(t)</math>
+# 你可以计算两个最大值（和两个对应的）。<math>\sigma^2_{b1}(t)</math> 是最大值而 <math>\sigma^2_{b2}(t)</math> 是更大的或相等的最大值
+# 所需的阈值 = <math>\frac{\text{threshold}_1 + \text{threshold}_2 }{2}</math>
+
+===JavaScript实现===
+注：输入参数'''total'''是给定图像中的像素数。输入参数'''histogram'''是灰度图像不同灰度级（典型的8位图像）的256元直方图。此函数输出图像的阈值。
+<syntaxhighlight lang="javascript">
+function otsu(histogram, total) {
+    var sum = 0;
+    for (var i = 1; i < 256; ++i)
+        sum += i * histogram[i];
+    var sumB = 0;
+    var wB = 0;
+    var wF = 0;
+    var mB;
+    var mF;
+    var max = 0.0;
+    var between = 0.0;
+    var threshold1 = 0.0;
+    var threshold2 = 0.0;
+    for (var i = 0; i < 256; ++i) {
+        wB += histogram[i];
+        if (wB == 0)
+            continue;
+        wF = total - wB;
+        if (wF == 0)
+            break;
+        sumB += i * histogram[i];
+        mB = sumB / wB;
+        mF = (sum - sumB) / wF;
+        between = wB * wF * (mB - mF) * (mB - mF);
+        if ( between >= max ) {
+            threshold1 = i;
+            if ( between > max ) {
+                threshold2 = i;
+            }
+            max = between;            
+        }
+    }
+    return ( threshold1 + threshold2 ) / 2.0;
+}
+</syntaxhighlight>
+
+===C实现===
+<syntaxhighlight lang="c" line="1">
+unsigned char otsu_threshold( int* histogram, int pixel_total )
+{
+    unsigned int sumB = 0;
+    unsigned int sum1 = 0;
+    float wB = 0.0f;
+    float wF = 0.0f;
+    float mF = 0.0f;
+    float max_var = 0.0f;
+    float inter_var = 0.0f;
+    unsigned char threshold = 0;
+    unsigned short index_histo = 0;
+
+    for ( index_histo = 1; index_histo < 256; ++index_histo )
+    {
+        sum1 += index_histo * histogram[ index_histo ];
+    }
+
+    for (index_histo = 1; index_histo < 256; ++index_histo)
+    {
+        wB = wB + histogram[ index_histo ];
+        wF = pixel_total - wB;
+        if ( wB == 0 || wF == 0 )
+        {
+            continue;
+        }
+        sumB = sumB + index_histo * histogram[ index_histo ];
+        mF = ( sum1 - sumB ) / wF;
+        inter_var = wB * wF * ( ( sumB / wB ) - mF ) * ( ( sumB / wB ) - mF );
+        if ( inter_var >= max_var )
+        {
+            threshold = index_histo;
+            max_var = inter_var;
+        }
+    }
+
+    return threshold;
+}
+</syntaxhighlight>
+
+===MATLAB实现===
+'''total'''为给定图像中的像素数。
+'''histogramCounts'''为灰度图像不同灰度级（典型的8位图像）的256元直方图。
+'''level'''为图像的阈值（double）。
+
+<syntaxhighlight lang="matlab">
+function level = otsu(histogramCounts, total)
+%% OTSU automatic thresholding method
+sumB = 0;
+wB = 0;
+maximum = 0.0;
+threshold1 = 0.0;
+threshold2 = 0.0;
+sum1 = sum((1:256).*histogramCounts.'); % the above code is replace with this single line
+for ii=1:256
+    wB = wB + histogramCounts(ii);
+    if (wB == 0)
+        continue;
+    end
+    wF = total - wB;
+    if (wF == 0)
+        break;
+    end
+    sumB = sumB +  ii * histogramCounts(ii);
+    mB = sumB / wB;
+    mF = (sum1 - sumB) / wF;
+    between = wB * wF * (mB - mF) * (mB - mF);
+    if ( between >= maximum )
+        threshold1 = ii;
+        if ( between > maximum )
+            threshold2 = ii;
+        end
+        maximum = between;
+    end
+end
+level = (threshold1 + threshold2 )/(2);
+end
+</syntaxhighlight>
+
+另一种方法是用'''向量化'''方法（可以很容易地转换为便于GPU处理Python矩阵数组版本）
+<syntaxhighlight  lang="matlab">
+function  [threshold_otsu] = Thredsholding_Otsu( Image)
+%Intuition:
+%(1)pixels are divided into two groups
+%(2)pixels within each group are very similar to each other 
+%   Parameters:
+%   t : threshold 
+%   r : pixel value ranging from 1 to 255
+%   q_L, q_H : the number of lower and higher group respectively
+%   sigma : group variance
+%   miu : group mean
+%   Author: Lei Wang
+%   Date  : 22/09/2013
+%   References : Wikepedia, 
+%   for multi children Otsu method, please visit : https://drive.google.com/file/d/0BxbR2jt9XyxteF9fZ0NDQ0dKQkU/view?usp=sharing
+%   This is my original work
+
+nbins = 256;
+counts = imhist(Image,nbins);
+p = counts / sum(counts);
+
+for t = 1 : nbins
+   q_L = sum(p(1 : t));
+   q_H = sum(p(t + 1 : end));
+   miu_L = sum(p(1 : t) .* (1 : t)') / q_L;
+   miu_H = sum(p(t + 1 : end) .* (t + 1 : nbins)') / q_H;
+   sigma_b(t) = q_L * q_H * (miu_L - miu_H)^2;
+end
+
+[~,threshold_otsu] = max(sigma_b(:));
+end
+</syntaxhighlight>
+该实现有一点点冗余的计算。但由于大津算法快速，这个实现版本是可以接受，并且易于理解的。因为在一些环境中，如果使用向量化的形式，可以更快地运算循环。大津二值化法使用架构最小的'''堆－孩子标签'''（heap-children label）可以很容易地转变成多线程的方法。
+
+==参考文献==
+{{reflist}}
+
+==外部链接==
+* [http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/MORSE/threshold.pdf Lecture notes on thresholding]{{Wayback|url=http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/MORSE/threshold.pdf |date=20160217112553 }} – covers the Otsu method.
+* [http://rsb.info.nih.gov/ij/plugins/otsu-thresholding.html A plugin for ImageJ]{{Wayback|url=http://rsb.info.nih.gov/ij/plugins/otsu-thresholding.html |date=20151104032023 }} using Otsu's method to do the threshold.
+* [http://www.labbookpages.co.uk/software/imgProc/otsuThreshold.html A full explanation of Otsu's method]{{Wayback|url=http://www.labbookpages.co.uk/software/imgProc/otsuThreshold.html |date=20151018141624 }} with a working example and Java implementation.
+* [http://www.itk.org/Doxygen/html/classitk_1_1OtsuThresholdImageFilter.html Implementation of Otsu's method]{{Wayback|url=http://www.itk.org/Doxygen/html/classitk_1_1OtsuThresholdImageFilter.html |date=20151024172318 }} in [[Insight_Segmentation_and_Registration_Toolkit|ITK]]
+* [http://www.codeproject.com/KB/graphics/OtsuSharp.aspx Otsu Thresholding in C#]{{Wayback|url=http://www.codeproject.com/KB/graphics/OtsuSharp.aspx |date=20120104114807 }} A straightforward C# implementation with explanation.
+* [http://www.mathworks.com/discovery/image-thresholding.html Otsu's method using MATLAB]{{Wayback|url=http://www.mathworks.com/discovery/image-thresholding.html |date=20151026191848 }}
+
+[[Category:图像处理|Category:图像处理]]
+[[Category:统计偏差和离散度|Category:统计偏差和离散度]]

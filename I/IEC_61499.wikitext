@@ -1,0 +1,50 @@
+{{dead end|time=2016-12-30T10:31:29+00:00}}
+'''IEC61499''' 标准第一版于2005年正式发布，是基于触发-{}-式功能块、针对工业过程测量和控制系统的国际标准。IEC61499基于[[IEC_61131|IEC 61131]] 标准，为分布式控制系统定义了通用的模型。关于IEC 61499的各种概念请查阅Lewis and Zoitl <ref name="Zoitl Lewis">Alois Zoitl and Robert Lewis: [http://www.theiet.org/resources/books/control/mcsse.cfm Modelling control systems using IEC 61499. 2nd Edition] {{Wayback|url=http://www.theiet.org/resources/books/control/mcsse.cfm |date=20161127153750 }}, Control Engineering Series 95, The Institution of Electrical Engineers, London July 2014.</ref> 和Vyatkin <ref name="Valeriy Vyatkin">Valeriy Vyatkin: IEC 61499 Function Blocks for Embedded and Distributed Control Systems Design, Instrumentation Society of America, USA,  2006, 2011 (second edition), 2014 (third edition in German and English)</ref>。
+
+
+== 第一部分：体系结构 ==
+
+IEC 61499-1定义了[[分布式系统|分布式系统]]的体系结构。在IEC 61499中，[[IEC_61131|IEC61131]]的循环执行模型被事件驱动模型所取代。该模型明确了功能块的执行顺序。如果必要的话，可以通过插入E_CYCLE功能块实现基于循环周期性触发事件的应用，正如在IEC 61499-1的附件A中所提到的。
+
+IEC 61499使以应用''程序为中心''的设计成为可能，即先进行整体系统设计，随后将完成设计的功能块网络可以划分为一个或者多个应用程序被分配到不同的设备上。所有使用该系统的设备都被称为[[设备模型|设备模型]]。系统的拓扑结构反映在[[系统模型|系统模型]]中。关于应用的分布被称为''[[映射模型|映射模型]]''。因此，系统内所有应用程序可被分布部署但仍能连接在一起。
+[[file:IEC_61499_Models_en.png|thumb]]
+
+类似于[[IEC_61131-3|IEC 61131-3]]的功能模块，IEC 61499功能模块类型同时明确了接口与逻辑实现方法。不同于[[IEC_61131-3|IEC 61131-3]]，IEC 61499的界面在''数据''变量输入与输出之外，包含了''事件''输入与输出。各种事件可以通过WITH限制''WITH constraints''与数据输入与输出相关联。IEC 61499规定了几种功能模块类型，所有的功能模块类型均可包含对服务顺序的行为描述：
+[[file:IEC_61499_FBType_en.png|thumb]]
+
+* 服务接口功能模块（简称“SIFB”）：[[源代码|源代码]]被隐藏，而且其功能仅通过服务顺序来描述。
+* 基本功能模块（简称“BFB”）：其功能用术语“执行控制图”（ECC）来描述，这类似于一种状态图（UML）。每一种状态都可能触发一个或者多个执行事件（Action）。每一种执行事件都可以关联零个或者一个算法以及零个或者1个事件。各种算法可依照[[IEC_61131-3|IEC61131-3]]标准规定实现。
+* 复合功能模块（简称“CFB”）：其功能由功能模块网络来定义。
+* 适配器接口：适配器接口不是真正的功能块。它包含了一种连接中的几种事件和数据关联，并且提供了接口概念，以区分定义和实例。
+* 子应用程序：其功能也由功能模块网络来定义。与复合功能模块（CFB）不同，子应用程序可以被分布部署。
+
+为了方便维护设备中的应用程序，IEC 61499提供了''管理模型''。''设备管理器''可以为任何设备资源提供全生命周期维护，并且通过''管理指令''实现软件工具（例如，配置工具，代理技术）之间的信息交互。通过软件工具的接口及管理指令，可以实现IEC 61499应用程序的动态重构。<ref name="Zoitl Diss">Alois Zoitl Real-Time Execution for IEC 61499, Instrumentation Society of America (ISA), USA, ISBN 978-1934394274, November 2008.</ref>
+
+== 第二部分：软件工具要求 ==
+
+IEC 61499-2规定了兼容IEC 61499标准的软件工具的要求。该要求包括IEC 61499各元素的表达及可移植性，以及在不同软件工具间以[[DTD|DTD]]格式传输IEC 61499的元素。如今已有一些兼容IEC 61499标准的软件工具面世。 其中有商业软件，也有用于学术和研究的开源软件工具。通常，IEC 61499开发环境都必须提供兼容的[[运行时系统|运行环境]]。
+
+== 第三部分：教程信息（2008年撤销）==
+
+IEC 61499-3与该标准早期的公共可用规范版本相关，并于2008年被撤销。这一部分回答了与IEC 61499标准有关的常见问题，并且以附实例的形式描述了IEC 61499各元素的用途，旨在解决自动化系统工程中的常见问题。
+
+在其他实例中，IEC 61499-3提供了为远程访问功能模块的实时数据和参数的信息交互功能的服务接口功能模块；介绍了适配器接口的用途为实现面向对象的概念；定义了功能模块网络的初始化算法；介绍了用执行控制图（ECC）实现的简化版的录像机电机控制。此外，映射模块对信息交互模块的影响亦获解释，还有通过管理应用程序进行设备管理及其功能模块、设备管理器功能模块（DEV_MGR)）的原理均有所提及。
+
+== 第四部分：兼容文件的规则 ==
+
+IEC 61499-4描述了IEC61499与其他系统、设备或软件工具的兼容规则。这些规则包''括交互操作性、可移植性''和''可重构性''。如果两种设备可以在同一系统配置下同时工作并实现各自功能，则二者可以交互操作。与IEC 61499兼容的应用程序必须具有''可移植性''，这表示此类应用程序可以在不同供应商的软件工具中传输，只要该软件工具符合IEC 61499-2中的描述。供应商的设备必须达到与IEC 61499相兼容的软件工具的配置。
+
+除了上述一般规则外，IEC 61499-4还规定了''兼容文件的结构''。此兼容文件描述了遵照IEC 61499标准的系统规则。例如，运行某软件的设备的配置由支持管理指令来决定。使用[[XML|可扩展标示语言]]实现IEC 61499兼容的应用程序中的可移植性问题，而该语言的交互格式须遵守61499-2的规定且必须通过[[兼容性|兼容性测试]]，例如必须说明支持文件的扩展名才能交互软件库中的元素。
+
+不同供应商所持设备的交互操作性被规定为开放系统互联模式[[OSI_models|OSI models]]的层次结构。此外，在不同设备之间信息交互所使用的状态输入、[[IP地址|IP地址]]、端口号以及功能块的数据编码（例如：PUBLISH/SUBSCRIBE and CLIENT/SERVER）均需要被考虑。HOLOBLOC股份有限公司提供了IEC 61499兼容文件的定义，<ref>{{cite web | url=http://www.holobloc.com/doc/ita/index.htm | title=IEC 61499 Compliance Profile for Feasibility Demonstrations | accessdate=12 October 2015 | archive-date=2015-08-15 | archive-url=https://web.archive.org/web/20150815135303/http://holobloc.com/doc/ita/index.htm | dead-url=no }}</ref> IEC61499软件工具FBDK 和4DIAC 都支持此兼容文件定义。<ref>{{cite web | url=http://www.holobloc.com/fbdk2/index.htm | title=FBDK – The Function Block Development Kit | accessdate=12 October 2015 | archive-date=2015-09-07 | archive-url=https://web.archive.org/web/20150907170338/http://www.holobloc.com/fbdk2/index.htm | dead-url=no }}</ref> and 4DIAC.<ref>{{cite web | url=http://www.eclipse.org/4diac/ | title=4DIAC – Framework for Distributed Industrial Automation and Control | accessdate=12 October 2015 | archive-date=2015-10-15 | archive-url=https://web.archive.org/web/20151015084422/http://www.eclipse.org/4diac/ | dead-url=no }}</ref>
+
+== 参考文献 ==
+<references />
+
+== 来源 ==
+* {{citation | url=http://www.iec-normen.de/219342/iec-61499-1-2012-11-ed-2-0-zweisprachig.html | title=IEC 61499 Function Blocks – Part 1: Architecture, Edition. 2.0 | accessdate=12 October 2015 | archive-date=2016-12-31 | archive-url=https://web.archive.org/web/20161231170139/https://www.iec-normen.de/219342/iec-61499-1-2012-11-ed-2-0-zweisprachig.html | dead-url=no }}
+* {{citation | url=http://www.iec-normen.de/219343/iec-61499-2-2012-11-ed-2-0-zweisprachig.html | title=IEC 61499 Function Blocks – Part 2: Software tool requirements, Edition. 2.0 | accessdate=12 October 2015 | archive-date=2016-12-31 | archive-url=https://web.archive.org/web/20161231170235/https://www.iec-normen.de/219343/iec-61499-2-2012-11-ed-2-0-zweisprachig.html | dead-url=no }}
+* {{citation | title=IEC 61499 Function Blocks – Part 3: Tutorial information, Edition. 1.0}}
+* {{citation | url=http://www.iec-normen.de/219630/iec-61499-4-2013-01-ed-2-0-zweisprachig.html | title=IEC 61499 Function Blocks – Part 4: Rules for compliance profiles, Edition. 2.0 | accessdate=12 October 2015 | archive-date=2016-12-31 | archive-url=https://web.archive.org/web/20161231170137/https://www.iec-normen.de/219630/iec-61499-4-2013-01-ed-2-0-zweisprachig.html | dead-url=no }}
+
+[[Category:IEC標準|#61499]]

@@ -1,0 +1,177 @@
+<includeonly>{{#tag:templatestyles||src="Graph:Chart/styles.css"}}{{#tag:{{#if:{{{debug|}}}|syntaxhighlight|graph}}|</includeonly><noinclude>{{documentation}}<syntaxhighlight lang=html><graph></syntaxhighlight>{{#tag:syntaxhighlight|</noinclude>
+{
+  //
+  // ATTENTION: This code is maintained at https://www.mediawiki.org/wiki/Template:Graph:Population_history
+  //            Please do not modify it anywhere else, as it may get copied and override your changes.
+  //            Suggestions can be made at https://www.mediawiki.org/wiki/Template_talk:Graph:Population_history
+  //
+
+  "version": 2,
+  "width": {{{width|400}}},
+  "height": {{{height|200}}},
+
+  // The population data could be from Commons dataset, Wikidata, or hardcoded values
+  "data": [
+    {
+      "name": "table",
+{{#if: {{{table|}}}
+|     "url": "tabular:///{{{table|Wikidata/St.Petersburg.tab}}}",
+      "format": {"type": "json", "property": "data"},
+|{{#if: {{{values|}}}
+|     "values": [{{{values|}}}],
+|     "url": "wikidatasparql:///?query=SELECT%20%28MAX%28%3Fpopulation%29%20as%20%3Fpopulation%29%20%3Fyear%20WHERE%20%7B%0A%20%20%20%20%23%20set%20the%20item%20here%20-%20e.g.%20city%2C%20country%0A%09BIND%28wd%3A{{{1|Q84}}}%20as%20%3Fitem%29%0A%20%20%20%20%3Fitem%20p%3AP1082%20%3Fpopstatement%20.%0A%20%20%20%20%3Fpopstatement%20ps%3AP1082%20%3Fpopulation%20.%0A%20%20%20%20OPTIONAL%20%7B%0A%20%20%20%20%20%20%3Fpopstatement%20pq%3AP585%20%3Fdate%20.%0A%20%20%20%20%20%20BIND%28year%28%3Fdate%29%20as%20%3Fyear%29%0A%20%20%20%20%7D%0A%7D%20GROUP%20BY%20%3Fyear%20ORDER%20BY%20ASC%28%3Fyear%29",
+      "format": { "type": "json" },
+}}}}
+      // Convert year integer (2016) into a date object (2016-01-01)
+      "transform": [
+      	// Optionally filter data with an template expression parameter
+      	// e.g.  filter = datum.year > 1900 && datum.year < 2000
+{{#if: {{{filter|}}} | { "type": "filter", "test": "{{{filter}}}" }, }}
+      	{ "type": "formula", "field": "date", "expr": "datetime(datum.year,0,1)" }
+      ]
+    },
+
+    // Each annotation is expected to be an integer year, string text,
+    // and optional string color (e.g. "#4d2800")
+    {
+      "name": "annotations",
+{{#if: {{{atable|}}}
+|     "url": "tabular:///{{{atable|Original/St.Petersburg population annotations.tab}}}",
+      "format": {"type": "json", "property": "data"},
+|     "values": [{{{avalues|}}}],
+}}
+      "transform": [
+        { "type": "formula", "field": "date", "expr": "datetime(datum.year,0,1)" },
+        { "type": "formula", "field": "color", "expr": "datum.color{{!}}{{!}}'#000'" }
+      ]
+    }
+  ],
+
+  "scales": [
+    // The dates are scaled to the "x" axis - the width of the graph
+    {
+      "name": "x",
+      "type": "time",
+      "range": "width",
+      "domain": {"data": "table","field": "date"}
+    },
+    // The population are scaled to the "y" axis - the height of the graph
+    // Optional scale parameter can change "linear" to other scales like log
+    // Optional max parameter can fix the upper bound of the graph
+    {
+      "name": "y",
+      "type": "{{{scale|linear}}}",
+      "range": "height",
+      "domain": {"data": "table","field": "population"},
+      "clamp": true,
+{{ #if: {{{max|}}}
+| "domainMax": {{{max}}},
+}}
+      "nice": true
+    }
+  ],
+
+  // Simple axis with horizontal grid lines
+  "axes": [
+    {"type": "x", "scale": "x", "ticks": 5},
+    {"type": "y", "scale": "y", "ticks": 5, "grid": true, "orient":"{{{orient|right}}}"}
+  ],
+
+  // The graph is drawn with two elements a thick line at the top,
+  // and a semi-transparent area below
+  "marks": [
+    {
+      "type": "area",
+      "from": {"data": "table"},
+      "properties": {
+        "enter": {
+          "x": {"scale": "x", "field": "date"},
+          "y": {"scale": "y", "value": 0},
+          "y2": {"scale": "y", "field": "population"},
+          "fill": {"value": "{{{color|#99B2CC}}}"},
+          "fillOpacity": {"value": 0.35},
+          "interpolate": {"value": "{{{interpolate|monotone}}}"}
+        }
+      }
+    },
+    // If annotations are given, draw dashed line with associated text
+    {
+      "type": "rule",
+      "from": {"data": "annotations"},
+      "properties": {
+        "enter": {
+          "x": {"scale": "x", "field":"date"},
+          "y": {"value": 0},
+          "y2": {"signal": "height"},
+          "stroke": {"field": "color"},
+          "strokeWidth": {"value": 2},
+          "opacity": {"value": 0.6},
+          "strokeDash": {"value": [8,3]}
+        }
+      }
+    },
+    {
+      "type": "line",
+      "from": {"data": "table"},
+      "properties": {
+        "enter": {
+          "x": {"scale": "x","field": "date"},
+          "y": {"scale": "y","field": "population"},
+          "stroke": {"value": "{{{color|#99B2CC}}}"},
+          "strokeWidth": {"value": 3},
+          "interpolate": {"value": "{{{interpolate|monotone}}}"}
+        }
+      }
+    },
+    // The small white circles should be drawn after annotations but before text
+    {
+      "type": "symbol",
+      "from": {"data": "table"},
+      "properties": {
+        "enter": {
+          "x": {"scale": "x","field": "date"},
+          "y": {"scale": "y","field": "population"},
+          "stroke": {"value": "{{{color|#99B2CC}}}"},
+          "fill": {"value": "#fff"},
+          "size": {"value": 30}
+        }
+      }
+    },
+    // Annotation text
+    {
+      "type": "text",
+      "from": {"data": "annotations"},
+      "properties": {
+        "enter": {
+          "x": {"scale": "x", "field":"date"},
+          "y": {"value": 0},
+          "align": {"value": "right"},
+          "baseline": {"value": "bottom"},
+          "angle": {"value": 270},
+          "dx": {"value": -4},
+          "dy": {"value": -2},
+          "text": {"field": "text"},
+          "stroke": {"field": "color"}
+        }
+      }
+    }
+{{#if:{{{title|}}}|
+    // Draw title at the top of the graph
+,   {
+      "type": "text",
+      "properties": {
+        "enter": {
+          "x": {"signal": "width", "mult": 0.5, "offset": 30},
+          "y": {"value": -15},
+          "text": {"value": "{{{title}}}"},
+          "fontWeight": {"value": "bold"},
+          "align": {"value": "center"},
+          "baseline": {"value": "bottom"},
+          "fill": {"value": "#000"}
+        }
+      }
+    }
+}}
+  ]
+}
+<includeonly>}}</includeonly><noinclude>|lang=javascript}}<syntaxhighlight lang=html></graph></syntaxhighlight></noinclude>

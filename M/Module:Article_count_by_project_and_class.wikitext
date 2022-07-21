@@ -1,0 +1,44 @@
+local class = mw.loadData('Module:Class/data')
+
+local getArgs = require('Module:Arguments').getArgs
+local p = {}
+
+local function returnClassName(k)
+	k = string.lower(k)
+	
+	for i, v in pairs(class) do
+		if k == v.code then
+			return v.name, v.name2
+		end
+	end	
+
+end
+
+function p.main(frame)
+	local args = getArgs(frame)
+	return p._main(args)
+end
+
+function p._main(args)
+	local count = 0
+	
+	for i, v in ipairs(args) do
+		local categoryNameS, categoryNameT  = returnClassName(v)
+		
+		if returnClassName(v) then
+			count = count 
+				+ mw.site.stats.pagesInCategory( categoryNameS .. '级' .. (args.project or '') .. '条目', 'pages' ) 
+				+ mw.site.stats.pagesInCategory( categoryNameT .. '級' .. (args.project or '') .. '條目', 'pages' )
+		end
+
+	end
+
+	if tonumber(args.weight) then
+		count = count * args.weight
+		count = math.floor(count)
+	end
+
+	return count
+end
+
+return p

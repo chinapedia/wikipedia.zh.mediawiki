@@ -1,0 +1,69 @@
+{{citation style|time=2020-04-10T00:38:27+00:00}}
+{{primarysources|time=2020-04-10T00:38:27+00:00}}
+{{NoteTA
+|G1=IT
+}}
+{{Internet_security_protocols}}
+'''DNSCrypt'''是由Frank Denis及付业成（Yecheng Fu）主導设计的[[网络协议|网络协议]]，用于用户[[计算机|计算机]]与递归[[域名服务器|域名服务器]]之间的[[域名系统|域名系统]]（DNS）通信的身份验证。<ref>{{cite web |title=[dnscrypt]写了一个 dnscrypt 的服务器端代理 dnscrypt-wrapper |url=https://www.v2ex.com/t/52891?r=Cofyc |website=v2ex |accessdate=2018-07-14 |archive-date=2018-07-15 |archive-url=https://web.archive.org/web/20180715011416/https://www.v2ex.com/t/52891?r=Cofyc |dead-url=no }}</ref>
+
+DNSCrypt将未修改的DNS查询与响应以密码学结构打包来检测是否被伪造。它儘管未使用[[端對端加密|端對端加密]]，但也足夠抵禦針對DNS的[[中間人攻擊|中間人攻擊]]、[[DNS快取侵害|DNS快取投毒攻擊]]、[[DNS劫持|DNS劫持]]等，尤其是在[[區域網路|區域網路]]中。<ref>{{cite web |url= https://github.com/jedisct1/dnscrypt-proxy |title= DNSCrypt Proxy README.markdown |publisher= Github |accessdate= 2017-02-16 |archive-date= 2016-01-20 |archive-url= https://web.archive.org/web/20160120133756/https://github.com/jedisct1/dnscrypt-proxy |dead-url= no }}</ref>除此以外還缓解了基于[[用户数据报协议|UDP]]的请求查询至少与回应一样大的放大攻击。DNSCrypt也可以用于[[访问控制|访问控制]]。
+
+尽管已有数个客户端及服务器实现，这一协议从未以[[RFC|征求意见稿]]（RFC）形式提交到[[互联网工程任务组|互联网工程任务组]]（IETF）。目前DNSCrypt協定已發展至第二個版本。<ref>{{cite web |title=DNSCrypt/dnscrypt-protocol |url=https://github.com/DNSCrypt/dnscrypt-protocol/blob/master/DNSCRYPT-V2-PROTOCOL.txt |website=GitHub |language=en |accessdate=2018-07-14 |archive-date=2018-11-03 |archive-url=https://web.archive.org/web/20181103074847/https://github.com/DNSCrypt/dnscrypt-protocol/blob/master/DNSCRYPT-V2-PROTOCOL.txt |dead-url=no }}</ref><ref>{{cite web |title=Dnscrypt v2 Protocol |url=https://zh.scribd.com/document/362741712/Dnscrypt-v2-Protocol |website=scribd.com |accessdate=2018-07-14 |archive-date=2019-02-15 |archive-url=https://web.archive.org/web/20190215215009/https://zh.scribd.com/document/362741712/Dnscrypt-v2-Protocol |dead-url=no }}</ref>
+
+== 协议概略 ==
+DNSCrypt可以使用UDP端口或TCP端口。尽管与[[HTTPS|HTTPS]]完全不同，但两种情况下的默认[[通訊埠|-{zh-cn:端口号;zh-tw:通訊埠;}-]]均为443。
+
+DNSCrypt客户端必须明确信任所选提供者的[[公钥|公钥]]，而不依赖于常规[[浏览器|浏览器]]中使用的[[证书颁发机构|证书颁发机构]]。
+
+公钥将用于验证一整套以传统DNS查询接收的证书。这些证书包含用于[[密钥交换|密钥交换]]的短期公钥，以及即将使用的密码本标识符。客户端被鼓励为每次查询新建密钥，而服务器被鼓励为每24小时更换短期密钥对。
+
+查询与回应都使用同一算法加密，并使用64字节的倍数填充来防止泄漏封包大小。当使用UDP端口且回应多于查询产生的数据量时，服务器可以使用标记TC（{{lang-en|truncated}}，截短）位元的短封包回应。客户端此时应使用TCP端口重试，并增加后续查询的填充量。
+
+该协议的第一、第二版采用X25519算法（[[Curve25519|Curve25519]]）进行密钥交换，{{tsl|en|EdDSA}}算法进行签名，以及使用[[Salsa20|XSalsa20]]-[[Poly1305|Poly1305]]或[[ChaCha20|XChaCha20]]-Poly1305算法认证加密。
+
+== 基于公钥的客户端认证 ==
+DNSCrypt协议也可以用于访问控制与审计，方法是仅接受一组预先定义的公钥。这可在商用DNS服务中辨识客户而不必依赖于其[[IP地址|IP地址]]。
+
+== 部署實作 ==
+=== 伺服器端 ===
+DNSCrypt-Wrapper是伺服器端程式，需要搭配[[BIND|BIND]]、{{le|unbound|unbound (DNS server)}}等DNS系統方可運行。<ref>{{cite web |title=cofyc/dnscrypt-wrapper |url=https://github.com/cofyc/dnscrypt-wrapper |website=GitHub |language=en |accessdate=2018-07-14 |archive-date=2018-06-11 |archive-url=https://web.archive.org/web/20180611035217/https://github.com/cofyc/dnscrypt-wrapper |dead-url=no }}</ref>
+
+除了私有部署，DNSCrypt协议已经被数个公共DNS解析服务器接纳，现存最大的成员是[[OpenNIC|OpenNIC]]网络，它同时提供[[虚拟专用网|虚拟专用网]]（VPN）服务。
+
+[[OpenDNS|OpenDNS]]（現思科系統的子公司）在2011年12月宣布其公共DNS服務部署DNSCrypt，<ref>{{cite web |title=DNS Security with DNSCrypt |url=https://www.opendns.com/about/innovations/dnscrypt/ |website=OpenDNS |accessdate=2018-07-14 |archive-date=2018-07-15 |archive-url=https://web.archive.org/web/20180715011530/https://www.opendns.com/about/innovations/dnscrypt/ |dead-url=no }}</ref>緊接著奧地利的CloudNS也宣布部署。
+
+2016年3月29日，[[Yandex|Yandex]]宣布在其[[公共域名解析服務|公共域名解析服務]]及[[网络浏览器|网络浏览器]]上支持DNSCrypt协议。<ref>{{cite web |title=Protect: secure DNS requests |url=https://yandex.com/support/browser/security/dnscrypt.html |website=Yandex |language=en |accessdate=2018-07-14 |archive-date=2018-07-15 |archive-url=https://web.archive.org/web/20180715011740/https://yandex.com/support/browser/security/dnscrypt.html |dead-url=no }}</ref>隨後，[[Infoblox|Infoblox]]宣布旗下的ActiveTrust Cloud將部署DNSCrypt服務。
+
+2016年10月，AdGuard宣布為其提供阻擋電信業者追踪廣告推播服務的公共DNS伺服器部署了DNSCrypt。<ref>{{cite web |url= https://blog.adguard.com/en/adguard-dns-now-supports-dnscrypt |title= AdGuard DNS Now Supports DNSCrypt |access-date= 2018-07-14 |archive-url= https://web.archive.org/web/20170912055134/https://blog.adguard.com/en/adguard-dns-now-supports-dnscrypt/ |archive-date= 2017-09-12 |dead-url= yes }}</ref><ref>{{cite web |url= https://kb.adguard.com/en/general/dns-filtering-android |title= DNS Filtering Android |accessdate= 2018-07-14 |archive-date= 2017-09-11 |archive-url= https://web.archive.org/web/20170911204622/https://kb.adguard.com/en/general/dns-filtering-android |dead-url= no }}</ref>
+
+2017年DNSCrypt v2協定公佈，隨後相關的開放原始碼實作專案相繼出現，同時也有更多的公共DNS伺服器加入（包括[[Google_Public_DNS|Google Public DNS]]），所有部署DNSCrypt的DNS伺服器清單可在DNSCrypt的[[GitHub|GitHub]]、[[Bitbucket|Bitbucket]]等原始碼託管站上找到。<ref>{{cite web |url=https://dnscrypt.info/public-servers |title=DNSCrypt Resolvers |accessdate=2018-07-14 |archive-date=2020-06-19 |archive-url=https://web.archive.org/web/20200619223107/https://dnscrypt.info/public-servers/ |dead-url=no }}</ref>
+
+=== 客户端 ===
+DNSCrypt-Proxy v1/v2、Pcap_DNSProxy、YourFriendlyDNS是[[跨平台|跨平台]]、[[命令列|命令列界面]]的客户端程式，起到將本機或區域網路內的DNS請求加密轉發至部署了DNSCrypt的伺服器之功用。其中DNSCrypt-Proxy的v2版還支援[[DNS_over_HTTPS|DoH]]、[[DNS_over_TLS|DoT]]，還可以實現類似[[dnsmasq|dnsmasq]]的DNS指定轉發、黑名單及白名單、[[hosts|hosts]]特性；Pcap_DNSProxy額外支援[[DNSSEC|DNSSEC]]。<ref>{{cite web |title=jedisct1/dnscrypt-proxy |url=https://github.com/jedisct1/dnscrypt-proxy |website=GitHub |language=en |accessdate=2017-02-16 |archive-date=2016-01-20 |archive-url=https://web.archive.org/web/20160120133756/https://github.com/jedisct1/dnscrypt-proxy |dead-url=no }}</ref><ref>{{cite web |title=chengr28/Pcap_DNSProxy |url=https://github.com/chengr28/Pcap_DNSProxy |website=GitHub |language=en |accessdate=2018-07-14 |archive-date=2018-06-11 |archive-url=https://web.archive.org/web/20180611010706/https://github.com/chengr28/Pcap_DNSProxy |dead-url=no }}</ref><ref>{{cite web |title=softwareengineer1/YourFriendlyDNS |url=https://github.com/softwareengineer1/YourFriendlyDNS |website=GitHub |language=en |accessdate=2018-07-14 |archive-date=2018-09-02 |archive-url=https://web.archive.org/web/20180902213828/https://github.com/softwareengineer1/YourFriendlyDNS |dead-url=no }}</ref><ref>{{Cite web |url=http://www.webupd8.org/2014/08/encrypt-dns-traffic-in-ubuntu-with.html |title=在Ubuntu上使用DNSCrypt加密DNS通信 - Web Upd8 |accessdate=2017-02-16 |archive-date=2017-03-15 |archive-url=https://web.archive.org/web/20170315105941/http://www.webupd8.org/2014/08/encrypt-dns-traffic-in-ubuntu-with.html |dead-url=no }}</ref>
+
+[https://web.archive.org/web/20191210085207/https://simplednscrypt.org/ Simple DNSCrypt]是一個[[图形界面|圖形界面]]、基建於DNSCrypt-Proxy的[[前端|前端]]，運行於Windows作業系統。<ref>{{cite web |title=bitbeans/SimpleDnsCrypt |url=https://github.com/bitbeans/SimpleDnsCrypt |website=GitHub |language=en |accessdate=2018-07-14 |archive-date=2018-07-16 |archive-url=https://web.archive.org/web/20180716040949/https://github.com/bitbeans/SimpleDnsCrypt |dead-url=no }}</ref>也有類似的實作專案，如macOS的dnscrypt-osx-client等。<ref>{{cite web |title=stammy/dnscrypt-osx-client |url=https://github.com/stammy/dnscrypt-osx-client |website=GitHub |language=en |accessdate=2018-07-14 |archive-date=2018-06-11 |archive-url=https://web.archive.org/web/20180611025802/https://github.com/stammy/dnscrypt-osx-client |dead-url=no }}</ref>
+
+Yandex則在其[[Yandex_Browser|自家的瀏覽器產品]]上內建了自有的DNSCrypt客户端支援。<ref>{{Cite web |url=https://habrahabr.ru/company/yandex/blog/280380/ |title=Yandex浏览器中的DNSCrypt |accessdate=2017-02-16 |archive-date=2017-03-05 |archive-url=https://web.archive.org/web/20170305011214/https://habrahabr.ru/company/yandex/blog/280380/ |dead-url=no }}</ref>
+
+== 参见 ==
+* [[Curve25519|Curve25519]]
+* [[DNSCurve|DNSCurve]]
+* [[DNS_over_HTTPS|DNS over HTTPS]]（DoH）
+* [[DNS_over_TLS|DNS over TLS]]（DoT）
+* [[域名系统安全扩展|域名系统安全扩展]]（DNSSEC）
+* [[椭圆曲线密码学|椭圆曲线密码学]]
+
+== 参考资料 ==
+{{reflist|30em}}
+
+== 外部链接 ==
+* {{Official|https://dnscrypt.info/}}
+* [https://github.com/DNSCrypt GitHub專案頁面]{{Wayback|url=https://github.com/DNSCrypt |date=20180515131101 }}
+* [https://github.com/DNSCrypt/dnscrypt-protocol/blob/master/DNSCRYPT-V2-PROTOCOL.txt DNSCrypt协议详述]{{Wayback|url=https://github.com/DNSCrypt/dnscrypt-protocol/blob/master/DNSCRYPT-V2-PROTOCOL.txt |date=20181103074847 }}
+* [https://wiki.archlinux.org/index.php/DNSCrypt DNSCrypt - ArchWiki]{{Wayback|url=https://wiki.archlinux.org/index.php/DNSCrypt |date=20170108145703 }}
+* [https://github.com/CNMan/dnscrypt-proxy-config 一套適用於中國大陸境內網路的DNSCrypt-Proxy v2轉發最佳化規則]{{Wayback|url=https://github.com/CNMan/dnscrypt-proxy-config |date=20180908143257 }}
+
+{{突破网络封锁技术}}
+
+[[Category:域名|Category:域名]]
+[[Category:网际协议|Category:网际协议]]

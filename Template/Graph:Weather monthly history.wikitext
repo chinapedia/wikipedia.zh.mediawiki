@@ -1,0 +1,378 @@
+<includeonly>{{#tag:templatestyles||src="Template:Graph:Chart/styles.css"}}{{#tag:{{#if:{{{debug|}}}|syntaxhighlight|graph}}|</includeonly><noinclude><!--
+Insert /doc page if available, otherwise insert itself-->{{#ifexist:{{FULLPAGENAME}}/doc|{{documentation}}|{{ :{{FULLPAGENAME}}}}}}<syntaxhighlight lang=html><graph></syntaxhighlight>{{#tag:syntaxhighlight|</noinclude>
+{
+  //
+  // ATTENTION: This code is maintained at https://www.mediawiki.org/wiki/Template:Graph:Weather_monthly_history
+  //            Please do not modify it anywhere else, as it may get copied and override your changes.
+  //            Suggestions can be made at https://www.mediawiki.org/wiki/Template_talk:Graph:Weather_monthly_history
+  //
+
+  "version": 2,
+  "width": {{{width|500}}},
+  "height": {{{height|400}}},
+
+  "signals": [
+    { "name": "init_years", "init": 7 },
+    { "name": "gapHeight", "init": 26 },
+    {
+      // Hide overview if total height is too small
+      "name": "showOverview",
+      "init": {"expr": "{{#if: {{{hideoverview|}}} | false | true }} {{!}}{{!}} height < (gapHeight + 100)" }
+    },
+    { "name": "overviewHeight", "init": {"expr": "showOverview ? 40 : 0" } },
+    { "name": "detailHeight", "init": {"expr": "height - (showOverview ? overviewHeight + gapHeight : 0)" } },
+    { "name": "overviewYPos", "init": {"expr": "height - overviewHeight" } },
+    {
+      "name": "brush_start",
+      "init": {"expr": "datetime(year(now())-init_years, month(now()))"},
+      "streams": [{
+        "type": "@overview:mousedown, @overview:touchstart", 
+        "expr": "clamp(eventX(), 0, width)",
+        "scale": {"name": "xOverview", "invert": true}
+      }]
+    },
+    {
+      "name": "brush_end",
+      "init": {"expr": "datetime(year(now()), month(now()))"},
+      "streams": [{
+        "type": "@overview:mousedown, [@overview:mousedown, window:mouseup] > window:mousemove, @overview:mouseup, @overview:touchstart, [@overview:touchstart, window:touchend] > window:touchmove, @overview:touchend",
+        "expr": "clamp(eventX(), 0, width)",
+        "scale": {"name": "xOverview", "invert": true}
+      }]
+    },
+    {
+      "name": "min_date", 
+      "init": {"expr": "datetime(year(now())-init_years, month(now()))"},
+      "expr": "time(brush_start) === time(brush_end) ? datetime(year(brush_start)-init_years/2, month(brush_start)) : min(brush_start, brush_end)"
+    },
+    {
+      "name": "max_date", 
+      "init": {"expr": "datetime(year(now()), month(now()))"},
+      "expr": "time(brush_start) === time(brush_end) ? datetime(year(brush_start)+init_years/2, month(brush_start)) : max(brush_start, brush_end)"
+    },
+    {
+      "name": "barwidth", 
+      "init": {"expr": "max(1, (width / (1+12*(year(max_date)-year(min_date))+month(max_date)-month(min_date)) - 2))"},
+      "expr": "max(1, (width / (1+12*(year(max_date)-year(min_date))+month(max_date)-month(min_date)) - 2))"
+    },
+    {
+      "name": "tooltip",
+      "init": {"expr": "{x: 0, y: 0, datum: false }"}, 
+      "streams": [
+        {"type": "@detailBar:mouseout, @overview:touchstart", "expr": "{x: 0, y: 0, datum: false }" },
+        {"type": "@detailBar:mouseover, @detailBar:touchstart", "expr": "{x: eventX(), y: eventY(), datum: eventItem().datum}" }
+      ] 
+    },
+    { "name": "isMetric", "init": {{#if:{{{imperial|}}}|false|true}},
+      "streams": [{"type": "@metricIndicator:click", "expr": "!isMetric"}]
+    },
+    {
+      "name": "degrees", 
+      "init": {"expr": "if(isMetric,'°C','°F')"},
+      "expr": "if(isMetric,'°C','°F')"
+    },
+    {
+      "name": "len", 
+      "init": {"expr": "if(isMetric,'mm','inches')"},
+      "expr": "if(isMetric,'mm','inches')"
+    },
+  ],
+
+  "data": [{
+    "name": "table",
+    "url": "tabular:///{{{table}}}",
+    "format": {"type": "json", "property": "data", "parse": {"date": "date"} },
+    "transform": [
+      {"type": "filter", "test": "datum.avgLowTemp != null && datum.avgHighTemp != null"},
+      {"type": "formula", "field": "avgInC", "expr": "(datum.avgHighTemp+datum.avgLowTemp)/2"},
+      {"type": "formula", "field": "tempHigh", "expr": "if(isMetric,datum.avgHighTemp,datum.avgHighTemp*9/5+32)"},
+      {"type": "formula", "field": "tempLow", "expr": "if(isMetric,datum.avgLowTemp,datum.avgLowTemp*9/5+32)"},
+    ]
+  },{
+    "name": "stats",
+    "source": "table",
+    "transform": [{"type": "aggregate", "summarize": [
+      {"field": "tempHigh", "ops": "max"},
+      {"field": "tempLow", "ops": "min"}
+    ]}]
+  },{
+    "name": "dummyOneValue",
+    "values": [{}]
+  }],
+  
+  "scales": [{
+      "name": "xOverview",
+      "type": "time",
+      "range": "width",
+      "domain": {"data": "table", "field": "date"}
+    },{
+      "name": "yOverview",
+      "type": "linear",
+      "rangeMin": {"signal": "overviewHeight"},
+      "nice": true,
+      "domainMax": {"data": "stats", "field": "max_tempHigh"},
+      "domainMin": {"data": "stats", "field": "min_tempLow"}
+    },{
+      "name": "xDetail",
+      "type": "time",
+      "range": "width",
+      "domainMin": {"signal": "min_date"},
+      "domainMax": {"signal": "max_date"}
+    },{
+      "name": "yDetail",
+      "type": "linear",
+      "rangeMin": {"signal": "detailHeight"},
+      "nice": true,
+      "domainMax": {"data": "stats", "field": "max_tempHigh"},
+      "domainMin": {"data": "stats", "field": "min_tempLow"}
+    },{
+      "name": "c",
+      "type": "linear",
+      "domain": [0, 5.2,7.3,9.4,11.5,13.6,15.7,17.8,19.9,22.0,24.1],
+      "range": ["#313695", "#4575b4", "#74add1", "#abd9e9", "#e0f3f8", "#ffffbf", "#fee090", "#fdae61", "#f46d43", "#d73027", "#a50026"],
+      "zero": false
+  }],
+
+  "marks": [
+    {
+      "name": "metricIndicator",
+      "type": "text",
+      "properties": {
+        "update": {
+          "x": {"value": -46},
+          "y": {"value": 5},
+          "text": {"signal": "degrees"},
+          "fill": {"value": "#00f"},
+          "fontSize":  {"value": 16},
+          "fontWeight": {"value": "bold"}
+        }
+      }
+    },
+
+    {
+      "type": "group",
+      "name": "detail",
+      "properties": {
+        "enter": {
+          "height": {"signal": "detailHeight"},
+          "width": {"signal": "width"}
+        }
+      },
+      "axes": [{
+        "type": "x",
+        
+        "name":"blah",
+        
+        
+        "scale": "xDetail",
+        "ticks": 5
+      },{
+        "type": "y",
+        "scale": "yDetail",
+        "title": "Temperature",
+        "grid": true,
+        "layer": "back",
+        "properties": {
+          "axis": {
+            "stroke": {"value": "#fff"},
+            "strokeWidth": {"value": 0}
+          }
+        }
+      }],
+      "marks": [{
+        "type": "rule",
+        "properties": {
+          "enter": {
+            "y": {"scale": "yDetail", "value": 0},
+            "x": {"value": 0},
+            "x2": {"signal": "width"},
+            "stroke": {"value": "#313695"},
+            "strokeWidth": {"value": 2},
+            "strokeDash": {"value": [8]}
+          }
+        }
+      },{
+        "type": "group",
+        "properties": {
+          "enter": {
+            "height": {"field": {"group": "height"} },
+            "width": {"field": {"group": "width"} },
+            "clip": {"value": true}
+          }
+        },
+        "marks": [{
+          "type": "rect",
+          "name": "detailBar",
+          "from": {"data": "table"},
+          "properties": {
+            "update": {
+              "x": {"scale": "xDetail", "field": "date"},
+              "width": {"signal": "barwidth"},
+              "y": {"scale": "yDetail", "field": "tempLow"},
+              "y2": {"scale": "yDetail", "field": "tempHigh"},
+              "stroke": {"scale": "c", "field": "avgInC"},
+              "fill": {"scale": "c", "field": "avgInC"},
+              "fillOpacity": {"value": 0.4},
+              "strokeWidth": {"value": 1.5}
+             }
+          }
+        }]
+      }]
+    },
+
+    {
+      "type": "group",
+      "name": "overview",
+      "from": {
+        "data": "dummyOneValue",
+        "transform": [{"type": "filter", "test": "showOverview"}]
+      },
+      "properties": {
+        "enter": {
+          "x": {"value": 0},
+          "y": {"signal": "overviewYPos"},
+          "height": {"signal": "overviewHeight"},
+          "width": {"signal": "width"},
+          "fill": {"value": "transparent"}
+        }
+      },
+      "axes": [{
+        "type": "x",
+        "scale": "xOverview",
+        "ticks": 5,
+        "title": "Year selector"
+      }],
+      "marks": [{
+        "type": "rect",
+        "from": { "data": "table" },
+        "properties": {
+          "update": {
+            "x": {"scale": "xOverview", "field": "date"},
+            "y": {"scale": "yOverview", "field": "tempLow"},
+            "y2": {"scale": "yOverview", "field": "tempHigh"},
+            "stroke": {"scale": "c", "field": "avgInC"},
+            "strokeWidth": {"value": 1}
+           }
+        }
+      },{
+        "type": "rect",
+        "properties": {
+          "enter": {
+            "y": {"value": 0},
+            "height": {"signal": "overviewHeight"},
+            "fill": {"value": "#333"},
+            "fillOpacity": {"value": 0.3}
+          },
+          "update": {
+            "x": {"scale": "xOverview", "signal": "min_date"},
+            "x2": {"scale": "xOverview", "signal": "max_date"}
+          }
+        }
+      }]
+    },
+
+    {
+      "type": "group",
+      "from": {
+        "data": "dummyOneValue",
+        "transform": [
+          {"type": "filter", "test": "tooltip.datum"},
+          {"type": "formula", "field": "offsetX", "expr": "5"},
+          {"type": "formula", "field": "offsetY", "expr": "30"},
+          {"type": "formula", "field": "tipWidth", "expr": "200"},
+          {"type": "formula", "field": "tipHeight", "expr": "80"},
+          {"type": "formula", "field": "alignLeft", "expr": "tooltip.x > width - datum.offsetX - datum.tipWidth"},
+          {"type": "formula", "field": "alignTop", "expr": "tooltip.y > height - datum.offsetY - datum.tipHeight"},
+          {"type": "formula", "field": "x", "expr": "max(0, tooltip.x + (datum.alignLeft ? -datum.offsetX-datum.tipWidth : datum.offsetX ))"},
+          {"type": "formula", "field": "y", "expr": "tooltip.y + (datum.alignTop ? -1 : 1) * datum.offsetY"},
+        ]
+      },
+      "properties": {
+        "update": {
+          "x": {"field": "x" }, "y": {"field": "y" },
+          "width": {"field": "tipWidth" },
+          "height": {"field": "tipHeight" },
+          "fill": {"value": "#fff"},
+          "fillOpacity": {"value": 0.85},
+          "stroke": {"value": "#aaa"},
+          "strokeWidth": {"value": 0.5}
+        }
+      },
+
+      "marks": [
+        {
+          "type": "text",
+          "properties": {
+            "update": {
+              "x": {"value": 6}, "y": {"value": 14},
+              "text": {"template": "\u007b{tooltip.datum.date{{!}}time:'%B %Y'}\u007d"},
+              "fill": {"value": "black"},
+              "fontWeight": {"value": "bold"}
+            }
+          }
+        },
+        {
+          "type": "text",
+          "properties": {
+            "update": {
+              "x": {"value": 6}, "y": {"value": 29},
+              "text": {"template": "monthly min/max: \u007b{tooltip.datum.lowTemp{{!}}number:'.1f'}\u007d / \u007b{tooltip.datum.highTemp{{!}}number:'.1f'}\u007d \u007b{degrees}\u007d"},
+              "fill": {"value": "black"},
+            }
+          }
+        },
+        {
+          "type": "text",
+          "properties": {
+            "update": {
+              "x": {"value": 6}, "y": {"value": 44},
+              "text": {"template": "average low/high: \u007b{tooltip.datum.tempLow{{!}}number:'.1f'}\u007d / \u007b{tooltip.datum.tempHigh{{!}}number:'.1f'}\u007d \u007b{degrees}\u007d"},
+              "fill": {"value": "black"},
+            }
+          }
+        },
+        {
+          "type": "text",
+          "properties": {
+            "update": {
+              "x": {"value": 6}, "y": {"value": 59},
+              "text": {"template": "precipitation days / \u007b{len}\u007d: \u007b{tooltip.datum.precipDays{{!}}number:'.1f'}\u007d / \u007b{tooltip.datum.precip{{!}}number:'.1f'}\u007d"},
+              "fill": {"value": "black"},
+            }
+          }
+        },
+        {
+          "type": "text",
+          "properties": {
+            "update": {
+              "x": {"value": 6}, "y": {"value": 74},
+              "text": {"template": "snow days / total \u007b{len}\u007d: \u007b{tooltip.datum.snowfallDays{{!}}number:'.1f'}\u007d / \u007b{tooltip.datum.snowfall{{!}}number:'.1f'}\u007d"},
+              "fill": {"value": "black"},
+            }
+          }
+        }
+      ]
+    }
+{{#if:{{{title|}}}|
+    // Draw title at the top of the graph
+,   {
+      "type": "text",
+      "properties": {
+        "enter": {
+          "x": {"signal": "width", "mult": 0.5, "offset": 30},
+          "y": {"value": -15},
+          "text": {"value": "{{{title}}}"},
+          "fontWeight": {"value": "bold"},
+          "align": {"value": "center"},
+          "baseline": {"value": "bottom"},
+          "fill": {"value": "#000"}
+        }
+      }
+    }
+}}
+
+  ]
+}
+<includeonly>|mode=interactive}}
+<small>See or edit [[{{#ifeq:{{SITENAME}}|Wikimedia Commons||commons:}}data:{{{table}}}|raw graph data]].</small>
+</includeonly><noinclude>|lang=javascript}}<syntaxhighlight lang=html></graph></syntaxhighlight></noinclude>

@@ -1,0 +1,51 @@
+{{expand|time=2016-04-27T02:38:49+00:00}}
+{{Infobox software
+| name = <code>Mosh</code>
+| screenshot = [[File:Mosh_demo_screenshot.png|326px]]
+| caption = 網路暫時中斷，底線字為暫時由本地端顯示。
+| author = [[Keith_Winstein|Keith Winstein]]
+| released = {{Start date and age|2012|03|12}}
+| latest_release_version = 1.3.2
+| latest_release_date = {{start date and age|2017|07|22}}<ref>{{cite mailing list |url=https://mailman.mit.edu/pipermail/mosh-users/2017-July/000357.html |title=mosh 1.3.2 released |date=2017-07-22 |accessdate=2022-03-17 |mailing-list=mosh-users |last=Winstein |first=Keith |archive-date=2019-07-13 |archive-url=https://web.archive.org/web/20190713001951/https://mailman.mit.edu/pipermail/mosh-users/2017-July/000357.html }}</ref>
+| operating_system = [[Unix-like|Unix-like]] systems
+| genre = [[Utility_software|Utility software]]
+| license = GNU [[GPLv3|GPLv3]] with [[OpenSSL_exception#Licensing|OpenSSL]] and [[iOS|iOS]] exceptions
+| website = https://mosh.mit.edu
+}}
+'''Mosh'''（{{lang|en|mobile shell}}）是一套從用戶端連到伺服器端的軟體。類似於[[Secure_Shell|Secure Shell]]<ref>{{Cite web|url=https://www.linux.com/learn/mosh-pit-mobile-shell-replacement-ssh|title=Into the Mosh Pit: A Mobile Shell Replacement for SSH|accessdate=2018-01-18|archive-date=2018-10-26|archive-url=https://web.archive.org/web/20181026025144/https://www.linux.com/learn/mosh-pit-mobile-shell-replacement-ssh|dead-url=no}}</ref>，但還針對對行動環境的特性調整。
+
+== 特性 ==
+* Mosh不綁定使用者端的IP address，這使得使用者從行動網路（像是[[3G|3G]]、[[4G|4G]]）與[[WiFi|WiFi]]之間切換時，不會造成連線中斷。<reF>
+{{Cite web|url=https://www.techopedia.com/2/28746/tech-support/linux/mosh-secure-shell-without-the-pain|title=Mosh: Secure Shell Without the Pain|accessdate=2018-01-18|date=2012-10-19|archive-date=2020-09-27|archive-url=https://web.archive.org/web/20200927102218/https://www.techopedia.com/2/28746/tech-support/linux/mosh-secure-shell-without-the-pain|dead-url=no}}
+</ref>
+* Mosh保持連線開啟，當此用者斷線時，伺服器端只會認定為暫時離線（{{lang|en|sleep}}）讓使用者可以稍候連回來。相對的，SSH因為透過TCP，在使用者斷線時會造成連線中斷。<ref>{{Cite web|url=http://www.networkworld.com/article/2189813/wireless/mit-researchers-chart-a-new-approach-for-mobile-internet-protocols.html|title=MIT researchers chart a new approach for mobile Internet protocols|accessdate=2018-01-18|date=2012-07-06|archive-date=2018-05-25|archive-url=https://web.archive.org/web/20180525150021/https://www.networkworld.com/article/2189813/wireless/mit-researchers-chart-a-new-approach-for-mobile-internet-protocols.html|dead-url=no}}}}</ref>
+* Mosh會試著在本地端馬上顯示使用者所輸入的按鍵，這使得使用者會感覺到更少的延遲。<ref>{{Cite web|url=http://www.linux-magazine.com/Issues/2012/144/Mosh-and-AutoSSH|title=Tools for channeling SSH over an unreliable connection|accessdate=2018-01-18|archive-date=2020-10-21|archive-url=https://web.archive.org/web/20201021160930/https://www.linux-magazine.com/Issues/2012/144/Mosh-and-AutoSSH|dead-url=no}}</ref>
+
+Mosh主要的缺點在於需要額外的設定，以及缺乏某些SSH能提供的功能（像是connection forwarding）。
+
+== 設計 ==
+相較於[[SSH|SSH]]，Mosh運作於不同層。SSH透過[[传输控制协议|TCP]]雙向傳輸資料，Mosh則是在伺服器端模擬終端機，得知終端機上的內容後，再依據用戶端的網路速度計算要更新到用戶端的內容<ref name="usenixatc12">{{Cite web |url=https://www.usenix.org/conference/atc12/technical-sessions/presentation/winstein |title=Mosh: An Interactive Remote Shell for Mobile Clients |accessdate=2016-04-27 |archive-date=2020-08-06 |archive-url=https://web.archive.org/web/20200806052457/https://www.usenix.org/conference/atc12/technical-sessions/presentation/winstein |dead-url=no }}</ref>。這使得Mosh在速度不快的網路表現的很好。
+
+== 支援系統 ==
+Mosh支援大多數的[[Linux|Linux]]套件、[[Mac_OS_X|Mac OS X]]、[[FreeBSD|FreeBSD]]、[[NetBSD|NetBSD]]、[[OpenBSD|OpenBSD]]、[[Android|Android]]、[[Solaris|Solaris]]、[[Cygwin|Cygwin]]，以及[[Chrome_App|Chrome App]]。
+
+== 效能 ==
+=== 漫遊 ===
+Mosh使用了State-Synchronization Protocol（SSP）<ref>{{Cite web |url=https://www.helpnetsecurity.com/2012/07/09/mit-unveils-a-new-internet-protocol-for-mobile-clients/ |title=MIT unveils a new Internet protocol for mobile clients |accessdate=2016-04-30 |archive-date=2018-10-26 |archive-url=https://web.archive.org/web/20181026025052/https://www.helpnetsecurity.com/2012/07/09/mit-unveils-a-new-internet-protocol-for-mobile-clients/ |dead-url=no }}</ref>，這使得Mosh支援單封包漫遊<ref>{{Cite web |url=https://mosh.mit.edu/mosh-paper-draft.pdf |title=Mosh: An Interactive Remote Shell for Mobile Clients |accessdate=2016-04-30 |archive-date=2016-03-14 |archive-url=https://web.archive.org/web/20160314105050/https://mosh.mit.edu/mosh-paper-draft.pdf |dead-url=no }}</ref>。當用戶端切換IP位置時，不需要額外的封包進行認證，而用戶端也不需要知道自己已經切換位置了（這包括了用戶端可能使用NAT，而NAT本身切換IP位置）<ref name="usenixatc12"/>。
+
+=== 封包遺失 ===
+在Mosh作者的研究中，作者測試在29%封包遺失率的情況下，Mosh所使用的SSP比SSH有效降低大約五十倍的平均回應時間（從16.8秒降為0.33秒）<ref name="usenixatc12"/>。另外由[[史丹佛大學|史丹佛大學]]學生的研究則顯示大約30倍，從5.9秒降為0.19秒<ref>{{Cite web |url=https://reproducingnetworkresearch.wordpress.com/2013/03/14/mosh-cs244-13/ |title=CS244 '13: MOSH |accessdate=2016-04-30 |archive-date=2020-11-18 |archive-url=https://web.archive.org/web/20201118034543/https://reproducingnetworkresearch.wordpress.com/2013/03/14/mosh-cs244-13/ |dead-url=no }}</ref>。
+
+== 相關連結 ==
+* [[tmux|tmux]]
+* [[Secure_Shell|Secure Shell]]
+* [[命令行界面|命令行界面]]
+
+== 註解 ==
+{{Reflist|2}}
+
+== 外部連結 ==
+* {{en}} [https://mosh.mit.edu Mosh: the mobile shell]{{Wayback|url=https://mosh.mit.edu/ |date=20201125123851 }}，官方網站。
+
+[[Category:应用层协议|Category:应用层协议]]
+[[Category:Unix软件|Category:Unix软件]]

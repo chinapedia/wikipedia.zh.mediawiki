@@ -1,0 +1,99 @@
+{{NoteTA|G1=IT}}
+{{校对翻译}}
+{{HTTP}}
+'''HTTP压缩'''是一种内置到[[網頁伺服器|网页服务器]]和[[网页浏览器|网页客户端]]中以改进传输速度和带宽利用率的方式。<ref>{{Cite web|url=http://www.microsoft.com/technet/prodtechnol/WindowsServer2003/Library/IIS/d52ff289-94d3-4085-bc4e-24eb4f312e0e.mspx?mfr=true|title=Using HTTP Compression (IIS 6.0)|accessdate=9 February 2010|publisher=Microsoft Corporation|archive-url=https://web.archive.org/web/20111214202410/http://www.microsoft.com/technet/prodtechnol/WindowsServer2003/Library/IIS/d52ff289-94d3-4085-bc4e-24eb4f312e0e.mspx?mfr=true|archive-date=2011-12-14|dead-url=yes}}</ref>
+
+[[超文本传输协议|HTTP]]数据在从服务器发送前就已[[数据压缩|压缩]]：兼容的浏览器将在下载所需的格式前宣告支持何种方法给服务器；不支持压缩方法的浏览器将下载未经压缩的数据。最常见的压缩方案包括[[brotil|brotil]]、[[gzip|gzip]]和[[DEFLATE|Deflate]]，但可用方案的完整列表由[[互联网号码分配局|IANA]]维护。<ref>RFC 2616, Section 3.5: "The Internet Assigned Numbers Authority (IANA) acts as a registry for content-coding value tokens."</ref>此外，第三方可能开发新的方法并纳入到其自身的产品，例如Google的面向HTTP共享字典压缩（SDCH）方案就实现在[[Google_Chrome|Google Chrome]]浏览器和使用在Google的服务器上。
+
+在HTTP中有两种不同的方式可以完成压缩。在较低层级，Transfer-Encoding头可以指示HTTP消息的有效载荷被压缩。在较高层级，Content-Encoding头可以指示一个被转码、缓存或引用的资源已压缩。使用Content-Encoding的压缩比Transfer-Encoding有更广泛的支持，并且某些浏览器不宣告Transfer-Encoding压缩以避免触发服务器的缺陷。<ref>[http://code.google.com/p/chromium/issues/detail?id=94730 'RFC2616 "Transfer-Encoding: gzip, chunked" not handled properly'] {{Wayback|url=http://code.google.com/p/chromium/issues/detail?id=94730 |date=20150906112729 }}, [[Chromium|Chromium]] Issue 94730</ref>
+
+== 压缩方案协商 ==
+在大多数情况中（不包括SDCH），协商使用两个步骤完成，这描述在RFC 2616：
+
+1. [[网页浏览器|网页客户端]]在[[超文本传输协议|HTTP请求]]的头部通告其支持的压缩方案为一个标记列表（tokens）。对于Content-Encoding，这个列表称作Accept-Encoding；对于Transfer-Encoding，该字段被称为TE。<syntaxhighlight lang="http" highlight="3">
+GET /encrypted-area HTTP/1.1
+Host: www.example.com
+Accept-Encoding: gzip, deflate
+</syntaxhighlight>2. 如果服务器支持一种或多种压缩方案，输出的数据可能用一种或多种双方支持的方法压缩。如果是这种情况，服务器将在HTTP响应中添加一个Content-Encoding或Transfer-Encoding字段表明使用的方案，用逗号分隔。
+<syntaxhighlight lang="http" highlight="9">
+HTTP/1.1 200 OK
+Date: Tue, 27 Feb 2018 06:03:16 GMT
+Server: Apache/1.3.3.7 (Unix)  (Red-Hat/Linux)
+Last-Modified: Wed, 08 Jan 2003 23:11:55 GMT
+Accept-Ranges: bytes
+Content-Length: 438
+Connection: close
+Content-Type: text/html; charset=UTF-8
+Content-Encoding: gzip
+</syntaxhighlight>
+[[網頁伺服器|网页服务器]]本身没有义务使用任何压缩方法——这取决于网页服务器的内部设置，并可能依赖于网站的内部架构。
+
+在SDCH的情况下，完成一份字典协商也是必须的，其中可能涉及额外的步骤，比如从外部服务器下载一个合适的字典。
+
+== Content-Encoding标记 ==
+服务器和客户端的标记（token）的官方列表由IANA维护，<ref>{{Cite web|url=http://www.iana.org/assignments/http-parameters/http-parameters.xhtml#content-coding|title=Hypertext Transfer Protocol Parameters - HTTP Content Coding Registry|accessdate=18 April 2014|publisher=IANA|archive-date=2016-05-16|archive-url=https://web.archive.org/web/20160516220547/http://www.iana.org/assignments/http-parameters/http-parameters.xhtml#content-coding|dead-url=no}}</ref>它包括：
+* compress – UNIX的“compress”程序的方法（历史性，不推荐大多数应用使用，应该使用gzip或deflate）
+* deflate – 基于[[DEFLATE|deflate]]算法（定义于RFC 1951）的压缩，使用zlib数据格式（RFC 1950）封装
+* exi – W3C高效XML交换
+* [[gzip|gzip]] – GNU zip格式（定义于RFC 1952）。此方法截至2011年3月，是应用程序支持最广泛的方法。<ref>{{Cite web|url=http://www.vervestudios.co/projects/compression-tests/results|title=Compression Tests: Results|accessdate=19 July 2012|publisher=Verve Studios, Co|deadurl=yes|archiveurl=https://web.archive.org/web/20120321182910/http://www.vervestudios.co/projects/compression-tests/results|archivedate=2012年3月21日}}</ref>
+* identity – 不转换内容。这是内容编码的默认值。
+* [[Pack200|pack200-gzip]] – 传输Java存档文件的网络传输格式<ref>{{Cite web|url=https://jcp.org/en/jsr/detail?id=200|title=JSR 200: Network Transfer Format for Java Archives|publisher=The Java Community Process Program|accessdate=2016-05-15|archive-date=2016-05-06|archive-url=https://web.archive.org/web/20160506025615/https://jcp.org/en/jsr/detail?id=200|dead-url=no}}</ref>
+除此之外，一些非官方或非标准化的标记也已被一些服务器或客户端使用：
+* br – [[Brotli|Brotli]]，一种新的开源压缩算法，专为HTTP内容的编码而设计，已在[[Mozilla_Firefox_44|Mozilla Firefox 44]]中实现，并且[[Chromium|Chromium]]正准备实施。 
+* [[bzip2|bzip2]] – 基于自由格式bzip2的压缩，被[[lighttpd|lighttpd]]<ref>{{Cite web|url=http://redmine.lighttpd.net/projects/1/wiki/Docs_ModCompress|title=ModCompress - Lighttpd|accessdate=18 April 2014|publisher=lighty labs|archive-date=2016-05-10|archive-url=https://web.archive.org/web/20160510124219/http://redmine.lighttpd.net/projects/1/wiki/docs_modcompress|dead-url=no}}</ref>
+* [[LZMA|lzma]] – 基于原始LZMA的压缩，在Opera 20中可用，elinks使用一个编译时选项也可启用<ref>{{Cite web |url=http://elinks.or.cz/documentation/html/manual.html-chunked/ch01s07.html#CONFIG-LZMA |title=elinks LZMA decompression |accessdate=2016-05-15 |archive-date=2016-04-18 |archive-url=https://web.archive.org/web/20160418002549/http://elinks.or.cz/documentation/html/manual.html-chunked/ch01s07.html#CONFIG-LZMA |dead-url=no }}</ref>
+* peerdist<ref>{{Cite web|url=http://msdn.microsoft.com/en-us/library/dd304322%28v=PROT.10%29.aspx|title=[MS-PCCRTP]: Peer Content Caching and Retrieval: Hypertext Transfer Protocol (HTTP) Extensions|accessdate=19 April 2014|publisher=Microsoft|archive-date=2012-03-20|archive-url=https://web.archive.org/web/20120320105605/http://msdn.microsoft.com/en-us/library/dd304322(v=prot.10).aspx|dead-url=no}}</ref> – [[微软|Microsoft]]对等端内容缓存和检索
+* sdch<ref>{{Cite web|url=http://lists.w3.org/Archives/Public/ietf-http-wg/2008JulSep/att-0441/Shared_Dictionary_Compression_over_HTTP.pdf|title=A Proposal for Shared Dictionary Compression Over HTTP|publisher=Google|last1=Butler|first1=Jon|author2=Wei-Hsin Lee|last3=McQuade|first3=Bryan|last4=Mixter|first4=Kenneth|accessdate=2016-05-15|archive-date=2016-04-15|archive-url=https://web.archive.org/web/20160415071632/http://lists.w3.org/Archives/Public/ietf-http-wg/2008JulSep/att-0441/Shared_Dictionary_Compression_over_HTTP.pdf|dead-url=no}}</ref><ref>{{Cite web|url=https://groups.google.com/forum/#!forum/SDCH|title=SDCH Mailing List|publisher=Google Groups|accessdate=2016-05-15|archive-date=2013-03-02|archive-url=https://web.archive.org/web/20130302010412/http://groups.google.com/group/android-building/msg/c0e01b4619a1455a#!forum/SDCH|dead-url=no}}</ref> – [[Google|Google]]的面向HTTP共享字典压缩，基于VCDIFF（RFC 3284）；在最近的[[Google_Chrome|Google Chrome]]、Chromium和Android版本中原生支持，并被Google的网站支持。
+* xpress - [[Windows商店|Windows商店]]（Windows 8及之后版本）的应用程序更新时使用的微软压缩协议。可选使用一个霍夫曼编码的基于LZ77的压缩。<ref>{{Cite web|url=https://msdn.microsoft.com/en-us/library/Hh554002.aspx|title=[MS-XCA]: Xpress Compression Algorithm|accessdate=29 August 2015|archive-date=2016-05-17|archive-url=https://web.archive.org/web/20160517232013/https://msdn.microsoft.com/en-us/library/hh554002.aspx|dead-url=no}}</ref>
+* [[xz|xz]] - 基于LZMA2的内容压缩，Firefox可使用非官方补丁支持；<ref>{{Cite web|url=https://wiki.mozilla.org/LZMA2_Compression|title=LZMA2 Compression - MozillaWiki|accessdate=18 April 2014|archive-date=2016-03-04|archive-url=https://web.archive.org/web/20160304120946/https://wiki.mozilla.org/LZMA2_Compression|dead-url=no}}</ref>mget自从2013年12月31日已完整实现。<ref>{{Cite web|url=https://github.com/rockdaboot/mget|title=mget GitHub project page|accessdate=May 2014|archive-date=2017-04-09|archive-url=https://web.archive.org/web/20170409091412/https://github.com/rockdaboot/mget|dead-url=no}}</ref>
+
+== 支持HTTP压缩的服务器 ==
+* [[NetWeaver|SAP NetWeaver]]
+* [[網際網路資訊服務|Microsoft IIS]]：内置或使用第三方模块
+* [[Apache_HTTP_Server|Apache HTTP Server]]，通过'''[http://httpd.apache.org/docs/2.2/mod/mod_deflate.html mod_deflate]{{Wayback|url=http://httpd.apache.org/docs/2.2/mod/mod_deflate.html |date=20160513142136 }}'''（正如其名，只支持gzip<ref>{{Cite web|url=http://mark.koli.ch/2009/04/howto-use-apache-mod-deflate-to-compress-web-content-obsessed-with-speed-of-kolichcommobi.html|title=HOWTO: Use Apache mod_deflate To Compress Web Content (Accept-Encoding: gzip)|accessdate=23 March 2011|publisher=Mark S. Kolich|archive-date=2011-08-20|archive-url=https://web.archive.org/web/20110820161738/http://mark.koli.ch/2009/04/howto-use-apache-mod-deflate-to-compress-web-content-obsessed-with-speed-of-kolichcommobi.html|dead-url=yes}}</ref><sup class="noprint Inline-Template " style="white-space:nowrap;">[''[[Wikipedia:可供查證|<span title="The material near this tag may rely on a self-published source. (November 2015)">self-published source?</span>]]''</sup><sup class="noprint Inline-Template " style="white-space:nowrap;">]</sup><ref>{{Cite web|url=http://httpd.apache.org/docs/2.4/mod/mod_deflate.html#supportedencodings|title=mod_deflate - Apache HTTP Server Version 2.4 - Supported Encodings|accessdate=2016-05-15|archive-date=2016-05-07|archive-url=https://web.archive.org/web/20160507093936/http://httpd.apache.org/docs/2.4/mod/mod_deflate.html#supportedencodings|dead-url=yes}}</ref>）
+* Hiawatha HTTP server：服务器预先压缩文件<ref>{{Cite web|url=http://www.hiawatha-webserver.org/manpages|title=Extra part of Hiawatha webserver's manual|accessdate=2016-05-15|archive-date=2016-03-22|archive-url=https://web.archive.org/web/20160322103000/https://www.hiawatha-webserver.org/manpages|dead-url=yes}}</ref>
+* [[Cherokee_(Web服务器)|Cherokee HTTP server]]，即时完成gzip和deflate压缩
+* Oracle iPlanet Web Server
+* Zeus Web Server
+* [[lighttpd|lighttpd]]，通过'''mod_compress'''和较新的'''mod_deflate'''（1.5.x）
+* [[nginx|nginx]] – 内置
+* 基于[[Tornado|Tornado]]的应用程序，如果“compress_response”在应用设置中设置为True（对4.0之前的版本，设置“gzip”为True）
+* [[Jetty|Jetty Server]] – 内置到默认的静态内容服务并在servlet过滤器配置中可用
+* GeoServer
+* [[Apache_Tomcat|Apache Tomcat]]
+* IBM Websphere
+* AOLserver
+* [[Ruby|Ruby]] Rack，通过'''Rack::Deflater'''中间件
+* [[Varnish_cache|Varnish]] – 内置。也可配合ESI
+HTTP中的压缩也可以使用服务器脚本语言（例如[[PHP|PHP]]；或者编程语言，例如[[Java|Java]]）来实现。
+
+== 阻碍使用HTTP压缩的问题 ==
+2009年Google工程师Arvind Jain和Jason Glasgow的文章指出，每天有超过99[[人年|人年]]的时间由于用户没有接收到已压缩内容而增加的页面加载时间而浪费<ref name="google-use-compression">{{Cite web|url=https://developers.google.com/speed/articles/use-compression|title=Use compression to make the web faster|accessdate=22 May 2013|publisher=Google Developers|archive-date=2014-06-25|archive-url=https://web.archive.org/web/20140625184918/https://developers.google.com/speed/articles/use-compression|dead-url=yes}}</ref>。这可能发生于：[[反病毒软件|反病毒软件]]检查连接导致内容变为未压缩；使用[[代理服务器|代理服务器]]（网页服务器为保兼容性而放弃压缩）；服务器配置不当；浏览器遇到问题而停止使用压缩。Internet Explorer 6在使用代理服务器时会回退到使用HTTP 1.0（没有压缩、流水线等特性）——这是企业环境中的常见配置——这也是主流浏览器最常遇到的，回落到未压缩HTTP的情况。<ref name="google-use-compression">{{Cite web|url=https://developers.google.com/speed/articles/use-compression|title=Use compression to make the web faster|accessdate=22 May 2013|publisher=Google Developers}}</ref>
+
+另一个大规模部署HTTP压缩遇到的问题是，'''deflate'''编码的定义：HTTP 1.1将'''deflate'''编码定义为将deflate压缩（<nowiki>RFC 1951</nowiki>）的数据放入一个[[zlib|zlib]]格式的数据流（RFC 1950），而微软服务器和客户端产品历来将它实现为“原样”（"raw"）数据流，<ref>{{Cite web|url=http://stackoverflow.com/questions/9170338/why-are-major-web-sites-using-gzip/9186091#9186091|title=deflate - Why are major web sites using gzip?|accessdate=18 April 2014|publisher=Stack Overflow|archive-date=2016-04-12|archive-url=https://web.archive.org/web/20160412031855/http://stackoverflow.com/questions/9170338/why-are-major-web-sites-using-gzip/9186091#9186091|dead-url=no}}</ref>这使其部署是不可靠的。<ref>{{Cite web|url=http://www.vervestudios.co/projects/compression-tests/|title=Compression Tests: About|accessdate=18 April 2014|publisher=Verve Studios|deadurl=yes|archiveurl=https://web.archive.org/web/20150102111552/http://www.vervestudios.co/projects/compression-tests/|archivedate=2015年1月2日}}</ref><ref>{{Cite web|url=http://zoompf.com/blog/2012/02/lose-the-wait-http-compression|title=Lose the wait: HTTP Compression|accessdate=18 April 2014|publisher=Zoompf Web Performance|archive-date=2016-04-04|archive-url=https://web.archive.org/web/20160404012634/https://zoompf.com/blog/2012/02/lose-the-wait-http-compression|dead-url=no}}</ref>出于此原因，部分软件（包括[[Apache_HTTP_Server|Apache HTTP Server]]）只实现'''gzip'''编码。
+
+== 安全问题 ==
+2012年，一种对数据压缩不利的普遍性攻击被公布，被称为[[CRIME|CRIME]]。CRIME攻击可能对大量协议产生效果，包括但不限于TLS以及应用层协议（例如SPDY或HTTP）。只有针对TLS和SPDY的攻击被论证，并且在浏览器和服务器中得到了大幅缓解。CRIME利用的HTTP压缩没有得到全面的缓解，即使CRIME的作者已经警告说，该漏洞的影响范围可能比SPDY和TLS的压缩更广泛。
+
+2013年，涉及HTTP压缩的CRIME攻击新实例被发布，被称为{{le|BREACH}}。BREACH攻击可以在30秒内从TLS加密的网页流量中提取登录令牌、电子邮件地址或其他敏感信息（时间取决于要提取的字节数），这也可能使攻击者诱骗受害者访问恶意的网站链接{{可疑}}。<ref name="Gooin20130801">{{Cite web|url=http://arstechnica.com/security/2013/08/gone-in-30-seconds-new-attack-plucks-secrets-from-https-protected-pages/|title=Gone in 30 seconds: New attack plucks secrets from HTTPS-protected pages|accessdate=2 August 2013|date=1 August 2013|last=Goodin|first=Dan|work=Ars Technica|publisher=Condé Nast|archive-date=2014-07-01|archive-url=https://web.archive.org/web/20140701121013/http://arstechnica.com/security/2013/08/gone-in-30-seconds-new-attack-plucks-secrets-from-https-protected-pages/|dead-url=no}}</ref>TLS和SSL的所有版本都受到了BREACH的影响，无论使用何种加密算法或密码本。<ref>{{Cite web|url=http://www.theregister.co.uk/2013/08/02/breach_crypto_attack/|title=Step into the BREACH: New attack developed to read encrypted web data|accessdate=2 August 2013|date=2 August 2013|last=Leyden|first=John|work=The Register|archive-date=2016-04-30|archive-url=https://web.archive.org/web/20160430012305/http://www.theregister.co.uk/2013/08/02/breach_crypto_attack/|dead-url=no}}</ref> 不同于以往的CRIME实例，那些都可以通过关闭TLS压缩或SPDY头压缩缓解攻击；BREACH利用的HTTP压缩基本上不能关闭，因为几乎所有网页服务器都依赖它提高与用户的数据传输速度。<ref name="Gooin20130801">{{Cite web|url=http://arstechnica.com/security/2013/08/gone-in-30-seconds-new-attack-plucks-secrets-from-https-protected-pages/|title=Gone in 30 seconds: New attack plucks secrets from HTTPS-protected pages|accessdate=2 August 2013|date=1 August 2013|last=Goodin|first=Dan|work=Ars Technica|publisher=Condé Nast}}</ref>
+
+== 参考文献 ==
+{{Reflist}}
+
+== 外部链接 ==
+* RFC 2616: Hypertext Transfer Protocol – HTTP/1.1
+* [http://www.iana.org/assignments/http-parameters HTTP Content-Coding Values]{{Wayback|url=http://www.iana.org/assignments/http-parameters |date=20090207000837 }} by Internet Assigned Numbers Authority
+* [http://redmine.lighttpd.net/projects/lighttpd/wiki/Docs:Modcompress Compression with lighttpd]{{Wayback|url=http://redmine.lighttpd.net/projects/lighttpd/wiki/Docs:Modcompress |date=20120810080353 }}
+* [http://www.codinghorror.com/blog/2004/08/http-compression-and-iis-6-0.html Coding Horror: HTTP Compression on IIS 6.0]{{Wayback|url=http://www.codinghorror.com/blog/2004/08/http-compression-and-iis-6-0.html |date=20140206020708 }}
+* [https://web.archive.org/web/20110716033901/http://www.15seconds.com/Issue/020314.htm 15 Seconds: Web Site Compression]<span contenteditable="false"> at the </span>Wayback Machine  <span contenteditable="false">（2011年7月16日存档）</span>
+* [https://web.archive.org/web/20190921020705/http://www.http-compression.com/ HTTP Compression]: resource page by the founder of VIGOS AG, Constantin Rack
+* [http://www.serverwatch.com/tutorials/article.php/3514866 Using HTTP Compression]{{Wayback|url=http://www.serverwatch.com/tutorials/article.php/3514866 |date=20160314155152 }} by Martin Brown of Server Watch
+* [http://www.devshed.com/c/a/PHP/Using-HTTP-Compression-in-PHP-Make-Your-Web-Pages-Load-Faster/ Using HTTP Compression in PHP]{{Wayback|url=http://www.devshed.com/c/a/PHP/Using-HTTP-Compression-in-PHP-Make-Your-Web-Pages-Load-Faster/ |date=20060411174003 }}
+* [https://web.archive.org/web/20120430023716/https://banu.com/blog/38/dynamic-and-static-http-compression-with-apache-httpd/ Dynamic and static HTTP compression with Apache httpd]
+* [http://david.fullrecall.com/browser-http-compression-test Browser HTTP Compression Test]{{Wayback|url=http://david.fullrecall.com/browser-http-compression-test |date=20160306031644 }}
+* [http://99webtools.com/http_compression.php Check HTTP compression]{{Wayback|url=http://99webtools.com/http_compression.php |date=20150810222822 }}
+*[https://wtools.io/check-gzip-online Check Gzip Compression Online]{{Wayback|url=https://wtools.io/check-gzip-online |date=20180428011754 }}
+
+[[Category:HTTP|Category:HTTP]]
+[[Category:无损压缩算法|Category:无损压缩算法]]
+[[Category:網站開發|Category:網站開發]]

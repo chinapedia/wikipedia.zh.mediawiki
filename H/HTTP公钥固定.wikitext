@@ -1,0 +1,49 @@
+{{noteTA
+|G1=IT
+}}
+'''HTTP公钥固定'''（又称'''HTTP公钥钉扎'''，{{lang-en|HTTP Public Key Pinning}}，缩写'''HPKP'''）<ref name=":0">{{Cite web|title = RFC 7469|url = https://tools.ietf.org/html/rfc7469|website = tools.ietf.org|accessdate = 2016-12-04|publisher = [[IETF|Internet Engineering Task Force]]|language = en|archive-date = 2018-01-05|archive-url = https://web.archive.org/web/20180105223709/https://tools.ietf.org/html/rfc7469|dead-url = no}}</ref>是[[HTTPS|HTTPS]]网站防止攻击者利用[[数字证书认证机构|数字证书认证机构]]（CA）错误签发的[[公開金鑰認證|证书]]进行[[中间人攻击|中间人攻击]]的一种安全机制，用于预防CA遭受入侵或其他会造成CA签发未授权证书的情况。采用公钥固定时，网站会提供已授权[[公钥|公钥]]的[[哈希|哈希]]列表，指示客户端在后续通讯中只接受列表上的公钥。
+
+==工作原理==
+服务器通过<code>Public-Key-Pins</code>（或<code>Public-Key-Pins-Report-Only</code>用于监测）HTTP头向浏览器传递HTTP公钥固定信息。
+
+HTTP公钥固定将网站[[X.509|X.509]]证书链中的一个SPKI（和至少一个备用密钥）以<code>pin-sha256</code>方式进行[[哈希|哈希]]，由参数<code>max-age</code>（单位秒）所指定一段时间，可选参数<code>includeSubDomains</code>决定是否包含所有子域名，另一个可选参数<code>report-uri</code>决定是否回报违反HTTP公钥固定策略的事例。在<code>max-age</code>所指定的时间内，证书链中证书的至少一个公钥须和固定公钥相符，这样客户端才认为该证书链是有效的。<ref>{{Cite web|title=Server and Client Behavior|work=RFC 7469|url=https://tools.ietf.org/html/rfc7469#section-2|accessdate=2016-12-04|publisher=[[IETF|Internet Engineering Task Force]]|language=en|archive-date=2018-01-05|archive-url=https://web.archive.org/web/20180105223709/https://tools.ietf.org/html/rfc7469#section-2|dead-url=no}}</ref>
+
+RFC 7469规范发布时只允许[[SHA-2|SHA-256]]算法。HTTP公钥固定中的哈希算法也可通过RFC 7469规范的附录A中所提到的命令行或其他第三方工具来生成。<ref>{{Cite web|title=Fingerprint Generation|work=RFC 7469|url=https://tools.ietf.org/html/rfc7469#appendix-A|accessdate=2016-12-04|publisher=[[IETF|Internet Engineering Task Force]]|language=en|archive-date=2018-01-05|archive-url=https://web.archive.org/web/20180105223709/https://tools.ietf.org/html/rfc7469#appendix-A|dead-url=no}}</ref>
+
+网站维护者可以选择将特定[[数字证书认证机构|CA]][[根证书|根证书]]公钥固定——只有该CA和其签发的中级证书才视同有效，而且可以选择将一个或多个中级证书固定，或将末端证书固定。但是，至少得固定一个备用密钥以便更换现有的固定密钥。在没有备用密钥（备用密钥须不在现有证书链中）时，HTTP公钥固定并不会生效。<ref>{{Cite web|title = About Public Key Pinning|url = https://noncombatant.org/2015/05/01/about-http-public-key-pinning/|website = noncombatant.org|accessdate = 2015-05-07|language = en|archive-date = 2015-05-15|archive-url = https://web.archive.org/web/20150515151103/https://noncombatant.org/2015/05/01/about-http-public-key-pinning/|dead-url = no}}</ref>
+
+HTTP公钥固定在[[RFC|RFC]] 7469规范中成为标准。<ref name=":0" />把证书公钥的哈希值硬编码在客户端、浏览器中，这被称为“证书固定”，HTTP公钥固定则是“证书固定”的一种扩展。<ref>{{Cite web|title = Certificate and Public Key Pinning - OWASP|url = https://www.owasp.org/index.php/Certificate_and_Public_Key_Pinning#Examples_of_Pinning|website = www.owasp.org|accessdate = 2015-05-07|archive-date = 2015-05-18|archive-url = https://web.archive.org/web/20150518073421/https://www.owasp.org/index.php/Certificate_and_Public_Key_Pinning#Examples_of_Pinning|dead-url = no}}</ref>
+
+[[Chromium|Chromium]]浏览器现已经禁止固定自签名根证书的证书链，这样一些内容嗅探、抓包软件如[[mitmproxy|mitmproxy]]、[[Fiddler|Fiddler]]便无法再利用自签证书嗅探加密内容。<ref>{{Cite web|title = Security FAQ - The Chromium Projects|url = http://www.chromium.org/Home/chromium-security/security-faq#TOC-How-does-key-pinning-interact-with-local-proxies-and-filters-|website = www.chromium.org|accessdate = 2015-07-07|language = en|archive-date = 2015-07-09|archive-url = https://web.archive.org/web/20150709151544/http://www.chromium.org/Home/chromium-security/security-faq#TOC-How-does-key-pinning-interact-with-local-proxies-and-filters-|dead-url = no}}</ref>RFC 7469规范指出，对于此类证书链，建议禁用HTTP公钥固定的违规回报。<ref>{{Cite web|title=Validating Pinned Connections|work=RFC 7469|url=https://tools.ietf.org/html/rfc7469#section-2.6|accessdate=2016-12-04|publisher=[[IETF|Internet Engineering Task Force]]|language=en|archive-date=2018-01-05|archive-url=https://web.archive.org/web/20180105223709/https://tools.ietf.org/html/rfc7469#section-2.6|dead-url=no}}</ref>
+
+== 违规回报 ==
+客户端进行HTTP公钥固定验证失败后，将把此次错误详情以[[JSON|JSON]]格式回报给<code>report-uri</code>参数中指定的服务器。若发生客户端向同域名的服务器端回报失败（如违规本身就是由连接问题引起的），服务器端也可指定另一个域名或采用其他回报服务。<ref>{{Cite web|url = https://report-uri.io|title = HPKP Violation Reporting|date = |accessdate = |website = |publisher = Scott Helme|language = en|archive-date = 2015-09-28|archive-url = https://web.archive.org/web/20150928143214/https://report-uri.io/|dead-url = no}}</ref><ref>{{Cite web|title=Reporting Pin Validation Failure|work=RFC 7469|url=https://tools.ietf.org/html/rfc7469#section-3|accessdate=2016-12-04|publisher=[[IETF|Internet Engineering Task Force]]|language=en|archive-date=2018-01-05|archive-url=https://web.archive.org/web/20180105223709/https://tools.ietf.org/html/rfc7469#section-3|dead-url=no}}</ref>
+
+== 浏览器支持 ==
+[[Firefox|Firefox]]从版本35.0开始支持HPKP<ref>{{Cite web |url = https://developer.mozilla.org/en-US/docs/Web/Security/Public_Key_Pinning |title = Public Key Pinning |date = 2015-12-10 |publisher = mozilla.org |language = en |accessdate = 2015-12-22 |archive-date = 2015-12-04 |archive-url = https://web.archive.org/web/20151204175654/https://developer.mozilla.org/en-US/docs/Web/Security/Public_Key_Pinning |dead-url = no }}</ref>，[[Google_Chrome|Chrome]]从版本46开始<ref>{{Cite web |url = https://developers.google.com/web/updates/2015/09/HPKP-reporting-with-chrome-46 |title = Rolling out Public Key Pinning with HPKP Reporting |date = 2016-11-30 |publisher = Google Developers |language = en |accessdate = 2016-12-05 |archive-date = 2016-12-04 |archive-url = https://web.archive.org/web/20161204175228/https://developers.google.com/web/updates/2015/09/HPKP-reporting-with-chrome-46 |dead-url = no }}</ref>支持，但在Chrome 67中终止了对HPKP的支持<ref name='remove'>{{Cite web |url = https://developers.google.com/web/updates/2018/04/chrome-67-deps-rems#deprecate_http-based_public_key_pinning |title = Deprecations and removals in Chrome 67 |date = 2017-10-29 |publisher = Google Developers |author = Joseph Medley |language = en |accessdate = 2019-01-05 |archive-date = 2019-03-23 |archive-url = https://web.archive.org/web/20190323035523/https://developers.google.com/web/updates/2018/04/chrome-67-deps-rems#deprecate_http-based_public_key_pinning |dead-url = no }}</ref>
+。[[Internet_Explorer|Internet Explorer]]、[[Microsoft_Edge|Microsoft Edge]]目前尚不支持HPKP。<ref>{{cite web|title=The status of public key pinning extension in Microsoft Edge is under consideration|url=https://developer.microsoft.com/en-us/microsoft-edge/platform/status/publickeypinningextensionforhttp/|publisher=Microsoft|accessdate=2016-12-04|language=en|archive-url=https://web.archive.org/web/20161220052157/https://developer.microsoft.com/en-us/microsoft-edge/platform/status/publickeypinningextensionforhttp/|archive-date=2016-12-20|dead-url=yes}}</ref>
+
+==应用现状==
+2016年，{{link-en|Netcraft|Netcraft}}在有关SSL的调研中称，只有0.09%的证书在使用HTTP公钥固定，加上实际运作中不当的配置，实际有效的HTTP公钥固定证书数量低于3000。造成这种现象的原因是：该技术尚处于萌芽期，网站技术人员对其缺乏重视和理解，更重要的是，错误的部署可能带来网站方面无法接受的严重后果——用户在相当长一段时间内（取决于<code>max-age</code>的配置）因新证书公钥与旧HPKP策略不符，对网站的合法-{zh-hans:访问;zh-hant:訪問}-都将遭拒。<ref>{{cite web|title=Secure websites shun HTTP Public Key Pinning|url=https://news.netcraft.com/archives/2016/03/22/secure-websites-shun-http-public-key-pinning.html|date=2016-03-22|publisher=Netcraft|author=Paul Mutton|language=en|accessdate=2016-12-04|archive-date=2016-12-20|archive-url=https://web.archive.org/web/20161220051511/https://news.netcraft.com/archives/2016/03/22/secure-websites-shun-http-public-key-pinning.html|dead-url=no}}</ref>
+
+因为网站部署率过低，Google在2018年5月29日发布的Chrome 67中终止了对HPKP的支持。<ref name='remove' />
+
+由[[Google|Google]]所主导的[[Certificate_Transparency|Certificate Transparency]]提供了一个用于监测、审核证书的开放式框架，以保障证书签发流程的安全。<ref>{{cite web|title=Google透明度报告中的Certificate Transparency|url=https://www.google.com/transparencyreport/https/ct/?hl=zh-CN|publisher=Google|language=zh|accessdate=2016-12-04|archive-date=2016-12-20|archive-url=https://web.archive.org/web/20161220172831/https://www.google.com/transparencyreport/https/ct/?hl=zh-CN|dead-url=no}}</ref>这是一项和HTTP公钥固定有着相同目标的较新项目。
+
+== 参见 ==
+* [[中间人攻击|中间人攻击]]
+* [[HTTP严格传输安全|HTTP严格传输安全]]（HTTP Strict Transport Security，HSTS）
+* {{RFC|7469}}
+
+== 参考资料 ==
+{{reflist|2}}
+
+==外部链接==
+* [https://linux.cn/article-5282-1.html 在Apache、nginx、Lighttpd上启用HPKP]{{Wayback|url=https://linux.cn/article-5282-1.html |date=20150419125952 }} 
+* [https://www.sslchina.com/http-secure-sites-to-avoid-public-fixed/ 安全网站为何对HPKP敬而远之？]{{Wayback|url=https://www.sslchina.com/http-secure-sites-to-avoid-public-fixed/ |date=20161220043257 }}
+* [https://www.certificate-transparency.org/ Certificate Transparency项目网站]{{Wayback|url=https://www.certificate-transparency.org/ |date=20160210011603 }}
+
+{{TLS和SSL}}
+
+[[Category:HTTP|Category:HTTP]]
+[[Category:网络安全|Category:网络安全]]

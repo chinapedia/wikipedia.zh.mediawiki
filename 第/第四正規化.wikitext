@@ -1,0 +1,119 @@
+{{noteTA
+|T=zh-cn:第四范式;zh-tw:第四正規化;zh-hk:第四規範化;
+|1=zh-cn:规范化;zh-tw:正規化;zh-hk:規範化;
+|2=zh-cn:范式;zh-tw:正規化;zh-hk:範式;
+|3=zh-cn:依赖;zh-tw:相依;zh-hk:依賴;
+}}
+{{Proofreader needed|en|Fourth normal form}}
+
+'''第四正規化'''（4NF）是[[資料庫正規化|資料庫正規化]]中所使用的一種[[正規形式|正規形式]]，是BC范式之后的另一层次的规范化。第二范式、第三范式、BC范式关注于属性集合之间的函数依赖；而第四范式关注更一般形式称作[[多值依赖|多值依赖]]。
+
+{{tsl|en|Ronald Fagin}}于1977年提出。 数据库的一个表遵从第四范式，当且仅当对于任意一个非平凡的多值依赖''X'' <math>\twoheadrightarrow</math> ''Y'', ''X''是一个[[超键|超键]]。<ref name="Fagin">"A relation schema R* is in fourth normal form (4NF) if, whenever a nontrivial multivalued dependency X <math>\twoheadrightarrow</math> Y holds for R*, then so does the functional dependency X → A for every column name A of R*. Intuitively all dependencies are the result of keys." {{cite journal|first=Ronald|last=Fagin|title=Multivalued Dependencies and a New Normal Form for Relational Databases|journal=ACM Transactions on Database Systems|volume=2|issue=1|date=September 1977|pages=267|url=http://www.almaden.ibm.com/cs/people/fagin/tods77.pdf|doi=10.1145/320557.320571|deadurl=yes|archiveurl=https://web.archive.org/web/20071129092334/http://www.almaden.ibm.com/cs/people/fagin/tods77.pdf|archivedate=2007-11-29}}</ref>
+
+==多值依赖==
+关系数据库的一个表中的列头分为不相交的三组：''X'', ''Y'', ''Z''。在一行的特定上下文中，称上述列组的数据值为''x'', ''y'', ''z''。[[多值依赖|多值依赖]]''X'' <math>\twoheadrightarrow</math> ''Y''，意味着如果选择表中的任何值''x''（记作''x<sub>c</sub>''），从而确定该表中所有的''x<sub>c</sub>yz''列表，如果''x<sub>c</sub>''关联着同一个''y''的值，不论''z''的任何取值。实质上，z的存在不提供任何信息能约束到''y''的可能值。也可以表述为，定义域的每一个值，都能确定值域中的一个值的集合。
+
+'''平凡多值依赖''' ''X'' <math>\twoheadrightarrow</math> ''Y''是或者''Y''是''X''的子集，或者''X''与''Y''一起形成了该关系的整个属性集合。
+
+[[函数依赖|函数依赖]]是多值依赖的特例。函数依赖''X'' → ''Y''，那么每个''x''确定了''确切一个y''值，而不能是多个。
+==例子==
+考虑下述例子:
+
+{| class="wikitable"
+|+ Pizza Delivery Permutations（披薩配貨組合）
+! <u>Restaurant（餐廳）</u> !! <u>Pizza Variety（披薩口味）</u> !! <u>Delivery Area（配貨地區）</u>
+|-
+|A1 Pizza||Thick Crust||Springfield
+|-
+|A1 Pizza||Thick Crust||Shelbyville
+|-
+|A1 Pizza||Thick Crust||Capital City
+|-
+|A1 Pizza||Stuffed Crust||Springfield
+|-
+|A1 Pizza||Stuffed Crust||Shelbyville
+|-
+|A1 Pizza||Stuffed Crust||Capital City
+|-
+|Elite Pizza||Thin Crust||Capital City
+|-
+|Elite Pizza||Stuffed Crust||Capital City
+|-
+|Vincenzo's Pizza||Thick Crust||Springfield
+|-
+|Vincenzo's Pizza||Thick Crust||Shelbyville
+|-
+|Vincenzo's Pizza||Thin Crust||Springfield
+|-
+|Vincenzo's Pizza||Thin Crust||Shelbyville
+|}
+
+每一行指出一家饭店能提供一种[[披萨饼|披萨]]与一个配货地区。 
+
+该表没有非键属性，因为它仅有的键是{Restaurant, Pizza Variety, Delivery Area}。因此，它满足到[[BC范式|BC范式]]为止的所有范式。如果假设，饭店提供的披萨种类与配货地区无关。也即饭店为所有的供货地区提供它能制作的所有披萨类型。那么，这个表不满足第四范式。因为这个表在{Restaurant}属性（它不是[[超键|超键]]）上提供了两个非平凡的多值依赖:
+
+* {Restaurant} <math>\twoheadrightarrow</math> {Pizza Variety}
+* {Restaurant} <math>\twoheadrightarrow</math> {Delivery Area}
+
+这些在一个非超键上的非平凡多值依赖说明了饭店提供的披萨的多样性独立于饭店的供货地区。这导致了该表中的数据冗余：例如，A1 Pizza供货 Stuffed Crust就重复了3遍；如果A1 Pizza开始生产Cheese Crust pizzas那么向表中增加多行，A1 Pizza的每个供货地区都需要一行。这就可能在给A1 Pizza的每个供货地区增加一行Cheese Crust披萨时，遗漏了一个供货地区，从而导致不满足于多值依赖{Restaurant} <math>\twoheadrightarrow</math> {Pizza Variety}。
+
+为了避免上述的错误发生，需要把披萨的多样性与供货地区放置在不同的表中，产生了两张满足第四范式的表： 
+
+{| class="wikitable" style="margin: 10px; float:left;"
+|+ Varieties By Restaurant
+! <u>Restaurant</u> !! <u>Pizza Variety</u>
+|-
+|A1 Pizza||Thick Crust
+|-
+|A1 Pizza||Stuffed Crust
+|-
+|Elite Pizza||Thin Crust
+|-
+|Elite Pizza||Stuffed Crust
+|-
+|Vincenzo's Pizza||Thick Crust
+|-
+|Vincenzo's Pizza||Thin Crust
+|}
+{| class="wikitable" style="margin: 10px; float:left;"
+|+ Delivery Areas By Restaurant
+! <u>Restaurant</u> !! <u>Delivery Area</u>
+|-
+|A1 Pizza||Springfield
+|-
+|A1 Pizza||Shelbyville
+|-
+|A1 Pizza||Capital City
+|-
+|Elite Pizza||Capital City
+|-
+|Vincenzo's Pizza||Springfield
+|-
+|Vincenzo's Pizza||Shelbyville
+|}
+{{-}}
+
+如果披萨的种类随着供货地区不同而变化，那么最初的三列的表就满足第四范式。 
+
+Ronald Fagin证明总是能够满足第四范式。<ref name="Fagin268">Fagin, p. 268</ref> {{tsl|en|Rissanen's theorem}}总是适用于[[多值依赖|多值依赖]]。
+
+==参见==
+*{{tsl|en|Attribute-value system|属性值系统}}
+<!-- See navigation box at bottom of page. -->
+
+==参考文献==
+{{Reflist}}
+
+==进一步阅读==
+{{Refbegin}}
+*Date, C. J. (1999), ''[https://web.archive.org/web/20050404010227/http://www.aw-bc.com/catalog/academic/product/0,1144,0321197844,00.html An Introduction to Database Systems]'' (8th ed.). Addison-Wesley Longman. ISBN 0-321-19784-4.
+*Kent, W. (1983) ''[http://www.bkent.net/Doc/simple5.htm A Simple Guide to Five Normal Forms in Relational Database Theory] {{Wayback|url=http://www.bkent.net/Doc/simple5.htm |date=20070202060442 }}'', Communications of the ACM, vol. 26, pp. 120–125
+
+ 
+
+ 
+
+{{-}}
+{{資料庫正規化}}
+
+[[Category:資料庫正規化|4NF]]

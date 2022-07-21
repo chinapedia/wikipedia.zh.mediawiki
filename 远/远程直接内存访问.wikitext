@@ -1,0 +1,30 @@
+{{NoteTA
+|G1=IT
+}}
+在数据中心领域，'''远程直接内存访问'''（{{lang-en|'''remote direct memory access'''}}，'''RDMA'''）是一种绕过远程主机操作系统内核访问其内存中数据的技术，由于不经过操作系统，不仅节省了大量CPU资源，同样也提高了系统吞吐量、降低了系统的网络通信[[Latency_(engineering)|延迟]]，尤其适合在大规模并行[[计算机集群|计算机集群]]中有广泛应用。在基于NVMe over Fabric的数据中心中，RDMA可以配合高性能的NVMe SSD构建高性能、低延迟的存储网络。
+
+== 概述 ==
+RDMA支持[[零复制|零复制]]网络传输，通过使[[网卡|网络适配器]]直接在应用程序内存间传输数据，不再需要在应用程序内存与操作系统缓冲区之间复制数据。这种传输不需要[[中央处理器|中央处理器]]、[[CPU缓存|CPU缓存]]或[[上下文交換|上下文交換]]参与，并且传输可与其他系统操作并行。当应用程序执行RDMA读取或写入请求时，应用程序数据直接传输到网络，从而减少延迟并实现快速的消息传输。
+
+但是，这种策略也表现出目标节点不会收到请求完成的通知（单向通信）等相关的若干问题。
+
+== 业界 ==
+如其他[[超级计算机|高性能计算]]（HPC）互连技术一样，{{As of|2013}}，由于需要安装不同的网络基础设施，RDMA已得到了有限的接受。但是，诸如{{tsl|en|iWARP}}等新标准也使[[以太网|以太网]]RDMA被实现于物理层，它使用[[传输控制协议|TCP]]/[[网际协议|IP]]作为传输方式，将基于标准的解决方案相结合，带来了RDMA的性能和低延迟优势以及较低的成本。<ref>{{Cite web|url=http://www.intel.com/content/dam/doc/technology-brief/iwarp-brief.pdf|title=Understanding iWARP|accessdate=17 August 2015|publisher=Intel Corporation|archive-date=2015-11-22|archive-url=https://web.archive.org/web/20151122213647/http://www.intel.com/content/dam/doc/technology-brief/iwarp-brief.pdf|dead-url=no}}</ref>RDMA联盟与DAT Collaborative<ref>{{Cite web|url=http://www.datcollaborative.org/|title=DAT Collaborative website|accessdate=14 October 2014|deadurl=yes|archiveurl=https://web.archive.org/web/20150117180600/http://www.datcollaborative.org/|archivedate=2015-01-17}}</ref>在RDMA协议和[[应用程序接口|API]]的开发中发挥了关键作用，将成果供[[互联网工程任务组|互联网工程任务组]]和互连软件联盟等标准小组考量。<ref>{{Cite web |url=http://www.opengroup.org/icsc/ |title=The Interconnect Software Consortium website |access-date=2017-01-10 |archive-date=2005-08-30 |archive-url=https://web.archive.org/web/20050830201232/http://www.opengroup.org/icsc/ |dead-url=no }}</ref>
+
+硬件供应商已经开始着手更高容量的基于RDMA的网络适配器，例如40Gbit/s速率。<ref>{{Cite web|url=http://www.mellanox.com/page/file_storage/|title=Microsoft Based Solutions - Mellanox Technologies|accessdate=14 October 2014|archive-url=https://web.archive.org/web/20160708073333/http://www.mellanox.com/page/file_storage|archive-date=2016-07-08|dead-url=yes}}</ref><ref name="chelsio">{{Cite web|url=http://www.chelsio.com/chelsio-to-demonstrate-40g-smb-direct-rdma-over-ethernet-for-windows-server-2012/|title=40Gbe SMB Direct RDMA Over Ethernet For Windows Server 2012 - Chelsio Communications|accessdate=14 October 2014|archive-date=2013-09-07|archive-url=https://web.archive.org/web/20130907065805/http://www.chelsio.com/chelsio-to-demonstrate-40g-smb-direct-rdma-over-ethernet-for-windows-server-2012/|dead-url=no}}</ref>诸如[[紅帽公司|Red Hat]]和[[甲骨文公司|甲骨文公司]]等软件供应商已经在其最新产品中支持这些API，{{Fact|date=July 2016}}{{As of|2013}}，工程师也已开始开发基于以太网的RDMA网络适配器。<ref>{{Cite web|url=http://www.chelsio.com/chelsio-to-demonstrate-40g-smb-direct-rdma-over-ethernet-for-windows-server-2012/|title=40Gbe SMB Direct RDMA Over Ethernet For Windows Server 2012 - Chelsio Communications|accessdate=2016-07-15|date=2013-04-02|publisher=Chelsio Communications|quote=The demonstration will show Microsoft's Windows Server 2012 SMB Direct running at line-rate 40Gb using RDMA over Ethernet (iWARP).|archive-date=2013-09-07|archive-url=https://web.archive.org/web/20130907065805/http://www.chelsio.com/chelsio-to-demonstrate-40g-smb-direct-rdma-over-ethernet-for-windows-server-2012/|dead-url=no}}</ref>[[Red_Hat_Enterprise_Linux|Red Hat Enterprise Linux]]和[[紅帽公司|Red Hat Enterprise MRG]]<ref>{{Cite web|url=https://investors.redhat.com/news-and-events/press-releases/2011/06-23-2011|title=Red Hat Enterprise MRG 2.0 Now Available|accessdate=23 June 2011|deadurl=yes|archiveurl=https://web.archive.org/web/20160825215016/https://investors.redhat.com/news-and-events/press-releases/2011/06-23-2011|archivedate=2016年8月25日}}</ref>已支持RDMA。微软已在Windows Server 2012中通过[[伺服器訊息區塊|SMB Direct]]支持RDMA。
+
+常见的RDMA实现包括{{tsl|en|Virtual Interface Architecture|虚拟接口架构}}、[[基于融合以太网的RDMA|基于融合以太网的RDMA]]（RoCE）、<ref>{{Cite web|url=https://community.mellanox.com/docs/DOC-2283|title=RDMA and Storage Solutions|accessdate=October 2015|author=Ophir Maor|publisher=Mellanox|archive-date=2016-12-21|archive-url=https://web.archive.org/web/20161221055603/https://community.mellanox.com/docs/DOC-2283|dead-url=yes}}</ref><ref>[//en.wikipedia.org/wiki/RDMA_over_Converged_Ethernet RDMA over Converged Ethernet]
+</ref>[[InfiniBand|InfiniBand]]、{{tsl|en|iWARP}}。
+
+== 参考资料 ==
+{{Reflist}}
+
+== 外部链接 ==
+* [http://www.rdmaconsortium.org/home RDMA Consortium]{{Wayback|url=http://www.rdmaconsortium.org/home |date=20170424072645 }}
+* [http://www.hpcwire.com/2006/09/15/a_tutorial_of_the_rdma_model-1/ A Tutorial of the RDMA Model]{{Wayback|url=http://www.hpcwire.com/2006/09/15/a_tutorial_of_the_rdma_model-1/ |date=20160304000141 }}
+* [https://web.archive.org/web/20090722111255/http://www.hpcwire.com/features/17888274.html RDMA usage]
+* [http://www.hpcwire.com/hpcwire/2006-08-18/a_critique_of_rdma-1.html A Critique of RDMA]{{Wayback|url=http://www.hpcwire.com/hpcwire/2006-08-18/a_critique_of_rdma-1.html |date=20120314112719 }} for high-performance computing
+
+[[Category:電腦記憶體|Category:電腦記憶體]]
+[[Category:局域网|Category:局域网]]
+[[Category:操作系统技术|Category:操作系统技术]]

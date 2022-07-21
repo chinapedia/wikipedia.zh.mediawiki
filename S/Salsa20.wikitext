@@ -1,0 +1,189 @@
+{{NoteTA
+|G1=IT
+}}
+{{Infobox encryption method
+|name           = Salsa20
+|image          = [[File:Salsa_round_function.svg|250px]]
+|caption        = Salsa的quarter-round函数，每四组形成一轮。
+|designers      = [[丹尼尔·J·伯恩斯坦|丹尼尔·J·伯恩斯坦]]
+|publish date   = 2007年（2005年设计）<ref name="sn-20071225">{{cite journal
+| title=The Salsa20 family of stream ciphers
+| author=Daniel J. Bernstein
+| url=https://cr.yp.to/snuffle/salsafamily-20071225.pdf
+| date=2007-12-24
+| access-date=2016-05-07
+| archive-date=2016-06-11
+| archive-url=https://web.archive.org/web/20160611004557/https://cr.yp.to/snuffle/salsafamily-20071225.pdf
+| dead-url=yes
+}}</ref>
+|series         = 
+|derived from   = 
+|derived to     = ChaCha
+|related to     = Rumba20
+|certification  = {{le|eSTREAM}}密码组合
+|key size       = 128或256位
+|security claim = 
+|state size     = 512位
+|structure      = ARX
+|rounds         = 20
+|speed          = 3.91 {{le|cycles per byte|每字节周期|cpb}}于Intel Core 2 Duo<ref>{{cite web
+ | url=https://cr.yp.to/snuffle.html#speed
+ | title=Salsa 20 speed; Salsa20 software
+ | author=Daniel J. Bernstein
+ | date=2013-05-16
+ | accessdate=2016-05-07
+ | archive-date=2016-04-14
+ | archive-url=https://web.archive.org/web/20160414080103/https://cr.yp.to/snuffle.html#speed
+ | dead-url=yes
+ }}</ref>
+|cryptanalysis  = 2008年的密码分析中，在2<sup>251</sup>次操作中利用2<sup>31</sup>对密钥流，尝试恢复256位的密钥，破解了20轮中的8轮 。<ref name="latin">{{cite journal
+ | title=New Features of Latin Dances
+ | authors=Jean-Philippe Aumasson, Simon Fischer, Shahram Khazaei, Willi Meier, and Christian Rechberger
+ | url=https://eprint.iacr.org/2007/472.pdf
+ | date=2008-03-14
+ | journal=
+ | access-date=2016-05-07
+ | archive-date=2016-04-13
+ | archive-url=https://web.archive.org/web/20160413035036/http://eprint.iacr.org/2007/472.pdf
+ | dead-url=yes
+ }}</ref>
+}}
+'''Salsa20'''是一种[[流加密|流加密]]算法，由[[丹尼尔·J·伯恩斯坦|丹尼尔·J·伯恩斯坦]]提交到{{le|eSTREAM}}。它建立在基于add-rotate-xor（ARX）操作的[[伪随机|伪随机]]函数之上——32位模加、[[异或|异或]]（XOR）和[[位操作|循环移位操作]]。Salsa20映射一个256[[位元|位]]密钥、一个64位[[nonce|nonce]]以及一个64位流位置到一个512位的输出（也存在一个128位密钥的版本）。这使Salsa20具有了不同寻常的优势，用户可以在恒定时间内寻求输出流中的任何位置。它可以在现代[[x86|x86]]处理器中提供约每4–14次循环周期一字节的速度<ref>{{Cite web |url=https://cr.yp.to/snuffle.html |title=Salsa20 home page |accessdate=2016-05-07 |archive-date=2016-04-14 |archive-url=https://web.archive.org/web/20160414080103/https://cr.yp.to/snuffle.html |dead-url=yes }}</ref>，并具有合理的硬件性能。它没有注册专利，并且Bernstein还撰写了几篇对常见[[架构|架构]]优化的[[公有领域|公有领域]]实现。<ref>{{Cite web |url=https://cr.yp.to/salsa20/speed.html |title=Speed of Salsa20 |accessdate=2016-05-07 |archive-date=2016-04-08 |archive-url=https://web.archive.org/web/20160408130829/http://cr.yp.to/salsa20/speed.html |dead-url=no }}</ref>
+
+一个相关的[[密碼_(密碼學)|密码算法]]'''ChaCha'''，具有类似的特点，但有不同的循环移位函数，已在2008年由[[丹尼尔·J·伯恩斯坦|伯恩斯坦]]发布。
+
+== 结构 ==
+在其内部，该算法采用模加⊕（[[逻辑异或|逻辑异或]]），32位模加2<sup>32</sup> ⊞，和在一个内部十六个32位word的state上进行恒定距离循环移位操作（<<<）。只使用[[分组密码|add-rotate-xor操作]]避免了软件实现中[[计时攻击|计时攻击]]的可能性。基本的Salsa20循环函数 <code>R(a,b,c,k)</code>是
+ b ⊕= (a ⊞ c) <<< k;
+初始状态是根据密钥的8个word、流位置的2个word、nonce的两个word（基本上是额外的流位置）和4个固定word制成。20轮循环混合制成16个word的流密码输出。
+
+一个quarter-round会使用四个word的输入并制成四个word的输出。内部的16-word状态被布置为一个4x4矩阵；偶数循环应用quarter-round操作到四行的每项，奇数循环应用quarter-round操作到四列的每项。连续两轮循环（一次行循环和一次列循环）被称为double-round。
+
+更精确的规范已在下方呈现为[[伪代码|伪代码]]，尽管这种行/列模式更难看出⊞是模加2<sup>32</sup>，<<<是左旋操作，及⊕是[[逻辑异或|异或]]。<code>x ⊕= y</code>是<code>x = x ⊕ y</code>的缩写。
+ x[ 4] ⊕= (x[ 0] ⊞ x[12])<<<7;    x[ 9] ⊕= (x[ 5] ⊞ x[ 1])<<<7;
+ x[14] ⊕= (x[10] ⊞ x[ 6])<<<7;    x[ 3] ⊕= (x[15] ⊞ x[11])<<<7;
+ x[ 8] ⊕= (x[ 4] ⊞ x[ 0])<<<9;    x[13] ⊕= (x[ 9] ⊞ x[ 5])<<<9;
+ x[ 2] ⊕= (x[14] ⊞ x[10])<<<9;    x[ 7] ⊕= (x[ 3] ⊞ x[15])<<<9;
+ x[12] ⊕= (x[ 8] ⊞ x[ 4])<<<13;   x[ 1] ⊕= (x[13] ⊞ x[ 9])<<<13;
+ x[ 6] ⊕= (x[ 2] ⊞ x[14])<<<13;   x[11] ⊕= (x[ 7] ⊞ x[ 3])<<<13;
+ x[ 0] ⊕= (x[12] ⊞ x[ 8])<<<18;   x[ 5] ⊕= (x[ 1] ⊞ x[13])<<<18;
+ x[10] ⊕= (x[ 6] ⊞ x[ 2])<<<18;   x[15] ⊕= (x[11] ⊞ x[ 7])<<<18;
+ 
+ x[ 1] ⊕= (x[ 0] ⊞ x[ 3])<<<7;    x[ 6] ⊕= (x[ 5] ⊞ x[ 4])<<<7;
+ x[11] ⊕= (x[10] ⊞ x[ 9])<<<7;    x[12] ⊕= (x[15] ⊞ x[14])<<<7;
+ x[ 2] ⊕= (x[ 1] ⊞ x[ 0])<<<9;    x[ 7] ⊕= (x[ 6] ⊞ x[ 5])<<<9;
+ x[ 8] ⊕= (x[11] ⊞ x[10])<<<9;    x[13] ⊕= (x[12] ⊞ x[15])<<<9;
+ x[ 3] ⊕= (x[ 2] ⊞ x[ 1])<<<13;   x[ 4] ⊕= (x[ 7] ⊞ x[ 6])<<<13;
+ x[ 9] ⊕= (x[ 8] ⊞ x[11])<<<13;   x[14] ⊕= (x[13] ⊞ x[12])<<<13;
+ x[ 0] ⊕= (x[ 3] ⊞ x[ 2])<<<18;   x[ 5] ⊕= (x[ 4] ⊞ x[ 7])<<<18;
+ x[10] ⊕= (x[ 9] ⊞ x[ 8])<<<18;   x[15] ⊕= (x[14] ⊞ x[13])<<<18;
+Salsa20在其输入上实行20轮混合，然后添加最终数组到原数数组来获得64字节输出块。<ref>{{Cite web |url=https://cr.yp.to/snuffle/salsafamily-20071225.pdf |title=存档副本 |accessdate=2016-05-07 |archive-date=2016-06-11 |archive-url=https://web.archive.org/web/20160611004557/https://cr.yp.to/snuffle/salsafamily-20071225.pdf |dead-url=yes }}</ref>但是，使用8轮和12轮的缩减循环的变体Salsa20/8和Salsa20/12也已分别被引入。这些变体被引入以补充原有的Salsa20，但不是取代它，甚至在eSTREAM的基准测量中比Salsa20表现更好<sup class="noprint Inline-Template noprint Template-Fact" style="white-space:nowrap;">[''[[Wikipedia:格式手册/日期和数字|<span title="This term requires quantification. (November 2012)">quantify</span>]]'']</sup>，尽管它相应有着较低的安全余量。
+
+== eSTREAM选用 ==
+Salsa20已被选择作为eSTREAM项目“Profile 1”（软件）的第三阶段设计，其在第二阶段结束时得到了Profile 1中算法中的最高投票得分。<ref>{{Cite web |url=http://www.ecrypt.eu.org/stream/endofphase2.html |title=存档副本 |accessdate=2016-05-07 |archive-date=2016-07-09 |archive-url=https://web.archive.org/web/20160709061231/http://www.ecrypt.eu.org/stream/endofphase2.html |dead-url=no }}</ref> Salsa20先前被选择为Profile 1（软件）的第二阶段设计重点，并作为eSTREAM项目Profile 2（硬件）的第二阶段，<ref>{{Cite web |url=http://www.ecrypt.eu.org/stream/endofphase1.html |title=存档副本 |accessdate=2016-05-07 |archive-date=2016-03-03 |archive-url=https://web.archive.org/web/20160303185106/http://www.ecrypt.eu.org/stream/endofphase1.html |dead-url=no }}</ref>但最终没有晋级到“Profile 2”的第三阶段，因为eSTREAM觉得这对于极其资源受限的硬件环境可能不是一个好的候选。<ref>{{Cite web |url=http://www.ecrypt.eu.org/stream/PhaseIIreport.pdf |title=存档副本 |accessdate=2016-05-07 |archive-date=2016-04-09 |archive-url=https://web.archive.org/web/20160409120900/http://www.ecrypt.eu.org/stream/PhaseIIreport.pdf |dead-url=no }}</ref>
+
+== 密码分析 ==
+截至2015年，没有已知的对Salsa20/12或完整Salsa20/20的攻击被发布；已知的最佳攻击<ref name="latin" />是打破12轮或20轮循环中的8轮。
+
+在2005年，Paul Crowley报告了一个对Salsa20/5的攻击，预计时间复杂度2<sup>165</sup>，并赢得Bernstein的1000[[美金|美金]] “最有趣Salsa20密码分析”奖励。<ref>Paul Crowley, [http://www.ciphergoth.org/crypto/salsa20 Truncated differential cryptanalysis of five rounds of Salsa20] {{Wayback|url=http://www.ciphergoth.org/crypto/salsa20 |date=20160414142139 }}</ref>此次攻击及所有后续的攻击都是基于[[截断差分分析|截断差分分析]]。<span class="cx-segment" data-segmentid="128"></span>在2006年，Fischer、Meier、Berbain、Biasse和Robshaw报告了一个对Salsa20/6的攻击，预计时间复杂度2<sup>177</sup>，以及一个对Salsa20/7的相关密钥攻击，预计时间复杂度2<sup>217</sup>。<ref>Simon Fischer, Willi Meier, Côme Berbain, Jean-Francois Biasse, Matt Robshaw, ''Non-Randomness in eSTREAM Candidates Salsa20 and TSC-4'', Indocrypt 2006</ref>
+
+在2007年，Tsunoo 等人公布了一个Salsa20的密码分析，在2<sup>255</sup>次操作中，使用2<sup>11.37</sup>对密钥流，打破8/20轮来恢复256位的私钥。<ref>{{Cite journal|author=Yukiyasu Tsunoo, Teruo Saito, Hiroyasu Kubo, Tomoyasu Suzaki and Hiroki Nakashima|date=2007-01-02|title=Differential Cryptanalysis of Salsa20/8|url=http://www.ecrypt.eu.org/stream/papersdir/2007/010.pdf|access-date=2016-05-07|archive-date=2021-02-25|archive-url=https://web.archive.org/web/20210225155509/https://www.ecrypt.eu.org/stream/papersdir/2007/010.pdf|dead-url=no}}</ref>但是，这种攻击似乎没有比[[暴力破解法|蛮力攻击]]更好。<span class="cx-segment" data-segmentid="133"></span>
+
+在2008年，Aumasson、Fischer、Khazaei、Meier和Rechberger报告了一个追对Salsa20/7的密码分析攻击，时间复杂度2<sup>153</sup>，并且他们报告了首个对Salsa20/8用预计时间复杂度2<sup>251</sup>的攻击。此攻击使用了对中性密钥位进行截断差分概率检测的新概念。此攻击可以打破使用128位密钥的Salsa20/7。<ref name="latin" />
+
+在2012年，Aumasson 等人的攻击使Shi 等人将Salsa20/7（128位密钥，[[时间复杂度|时间复杂度]]2<sup>109</sup>）改进为Salsa20/8（256位密钥，时间复杂度2<sup>250</sup>）。<ref>Zhenqing Shi, Bin Zhang, Dengguo Feng, Wenling Wu (2012): „Improved Key Recovery Attacks on Reduced-Round Salsa20 and ChaCha“. </ref>
+
+在2013年，Mouha和Preneel发布了一则证明<ref>{{Cite journal|author=Nicky Mouha, Bart Preneel|date=2013|title=A Proof that the ARX Cipher Salsa20 is Secure against Diﬀerential Cryptanalysis|url=https://eprint.iacr.org/2013/328.pdf|access-date=2016-05-07|archive-date=2021-03-08|archive-url=https://web.archive.org/web/20210308143610/https://eprint.iacr.org/2013/328.pdf|dead-url=no}}</ref>，叙述使用15轮循环的Salsa20在128位的安全差分分析。具体来说，它没有比2<sup>−130</sup>更高概率的差分特征，因此差分分析会比用尽128位密钥更困难。<span class="cx-segment" data-segmentid="143"></span>
+
+== ChaCha变种 ==
+{{Infobox encryption method
+|name           = ChaCha
+|image          = [[File:Salsa20_ChaCha_variant.png|250px]]
+|caption        = The ChaCha quarter-round function.  Four parallel copies make a round.
+|designers      = [[丹尼尔·J·伯恩斯坦|丹尼尔·J·伯恩斯坦]]
+|publish date   = 2008
+|series         = 
+|derived from   = Salsa20
+|derived to     = 
+|related to     = Rumba20
+|certification  = 
+|key size       = 128或256位
+|security claim = 
+|state size     = 512 bits
+|structure      = ARX
+|rounds         = 20
+|speed          = 3.95 {{le|cycles per byte|每字节周期|cpb}} on an Intel Core 2 Duo<ref name=ChaCha>{{Citation
+| title=ChaCha, a variant of Salsa20
+| date=28 January 2008
+| url=https://cr.yp.to/chacha/chacha-20080128.pdf
+| first=Daniel
+| last=Bernstein
+| authorlink=Daniel J. Bernstein
+| accessdate=2018-06-03
+| archive-date=2018-05-02
+| archive-url=https://web.archive.org/web/20180502171428/https://cr.yp.to/chacha/chacha-20080128.pdf
+| dead-url=no
+}}</ref>
+|cryptanalysis  = 
+}}
+在2008年，[[丹尼尔·J·伯恩斯坦|丹尼尔·J·伯恩斯坦]]发布了一个密切相关的“'''ChaCha'''”密码家族，其目的是增加每一轮的扩散以实现相同或稍微提升的性能。<ref>{{Cite web |url=https://cr.yp.to/chacha.html |title=ChaCha home page |accessdate=2016-05-07 |archive-date=2016-04-25 |archive-url=https://web.archive.org/web/20160425084256/http://cr.yp.to/chacha.html |dead-url=no }}</ref> Aumasson et al. paper也攻击过ChaCha，实现了少一轮循环：256位ChaCha6有复杂性2<sup>139</sup>，ChaCha7有复杂性2<sup>248</sup>。128位ChaCha6在2<sup>107</sup>以内，但据称攻击128位的ChaCha7失败。<ref name="latin" />
+
+ChaCha替换了基本的Salsa20循环函数<code>R(a,b,c,k)</code>
+ b ⊕= (a ⊞ c) <<< k;
+修改后的计算方法：
+ b ⊞= c;
+ a ⊕= b;
+ a <<<= k;
+循环移位量也被更新。一个完整的quarter-round，<code>QR (a,b,c,d)</code>变为：
+ a ⊞= b; d ⊕= a; d <<<= 16;
+ c ⊞= d; b ⊕= c; b <<<= 12;
+ a ⊞= b; d ⊕= a; d <<<= 8;
+ c ⊞= d; b ⊕= c; b <<<= 7;
+这除了使其在双[[操作数|操作数]][[指令集|指令集]]（如[[x86|x86]]）上更有效率，也使其在每次quarter-round中更新每个word两次。
+
+在事实上，8轮的两次循环允许一些优化。<ref>{{Citation|title=Faster ChaCha implementations for Intel processors|url=https://eden.dei.uc.pt/~sneves/chacha/chacha.html|date=2009-10-07|first=Samuel|last=Neves|accessdate=2011-02-20|quote=two of these constants are multiples of 8; this allows for a 1 instruction rotation in Core2 and later Intel CPUs using the '''pshufb''' instruction|archive-date=2017-03-28|archive-url=https://web.archive.org/web/20170328105321/https://eden.dei.uc.pt/~sneves/chacha/chacha.html|dead-url=yes}}</ref>此外，输入格式可以被重新布置，以支持高效的[[SSE|SSE]]实现优化，这对Salsa20已被发现。相比逐行、逐列下移[[置換|置换]]，还可以沿对角线进行。<ref>{{Citation|first=D. J.|last=Bernstein|authorlink=Daniel J. Bernstein|title=ChaCha, a variant of Salsa20|id=Document ID: 4027b5256e17b9796842e6d0f68b0b5e|url=https://cr.yp.to/chacha/chacha-20080128.pdf|format=pdf|date=2008-01-28|accessdate=2011-02-20|page=4|archive-date=2018-05-02|archive-url=https://web.archive.org/web/20180502171428/https://cr.yp.to/chacha/chacha-20080128.pdf|dead-url=no}}</ref>这样ChaCha中的两轮循环是：
+ QR (0, 4, 8, 12)
+ QR (1, 5, 9, 13)
+ QR (2, 6, 10, 14)
+ QR (3, 7, 11, 15)
+ QR (0, 5, 10, 15)
+ QR (1, 6, 11, 12)
+ QR (2, 7, 8, 13)
+ QR (3, 4, 9, 14)
+其中的数字是十六个32位state word。ChaCha20使用两轮10次迭代。<ref>[https://datatracker.ietf.org/doc/draft-irtf-cfrg-chacha20-poly1305/?include_text=1 ChaCha20 and Poly1305 for IETF protocols] {{Wayback|url=https://datatracker.ietf.org/doc/draft-irtf-cfrg-chacha20-poly1305/?include_text=1 |date=20150513082108 }}, Internet-Draft , Y. Nir, Check Point,  A. Langley, Google Inc., November 9, 2014</ref>
+
+ChaCha是BLAKE哈希算法的基础，NIST哈希算法竞争的一个入围者，并且继任者BLAKE2调整为更高的速度。它还定义了一个使用16个64位word（state的1024位）的变种，具有相应调整的循环移位常数。
+
+=== ChaCha20 ===
+[[Google|Google]]选择了[[丹尼尔·J·伯恩斯坦|伯恩斯坦]]设计的，带[[Poly1305|Poly1305]][[訊息鑑別碼|訊息鑑別碼]]的ChaCha20（即ChaCha20-Poly1305），作为[[OpenSSL|OpenSSL]]中[[RC4|RC4]]的替代品，用以完成互联网的安全通信。<ref name="chacha20poly1305">[//tools.ietf.org/html/draft-ietf-tls-chacha20-poly1305 draft-ietf-tls-chacha20-poly1305 The ChaCha20-Poly1305 AEAD Cipher for Transport Layer Security]</ref>Google最初实现了[[超文本传输安全协议|HTTPS]] ([[傳輸層安全協議|TLS/SSL]])流量在[[Chrome浏览器|Chrome浏览器]]（[[Android|Android]]手机版）与Google网站之间的通信。<ref>[http://www.infosecurity-magazine.com/news/google-swaps-out-crypto-ciphers-in-openssl/ Google Swaps Out Crypto Ciphers in OpenSSL] {{Wayback|url=http://www.infosecurity-magazine.com/news/google-swaps-out-crypto-ciphers-in-openssl/ |date=20181107124824 }}, InfoSecurity, April 24, 2014</ref>
+
+不久之后，Google在TLS中采用它，ChaCha20-Poly1305算法也以<tt>chacha20-poly1305@openssh.com</tt>成为[[OpenSSH|OpenSSH]]中的一个新密码套件。<ref>{{Cite web|url=http://bxr.su/OpenBSD/usr.bin/ssh/PROTOCOL.chacha20poly1305|title=ssh/PROTOCOL.chacha20poly1305|accessdate=2014-12-26|date=2013-12-02|last=Miller|first=Damien|website=BSD Cross Reference, OpenBSD src/usr.bin/|archive-date=2014-12-27|archive-url=https://web.archive.org/web/20141227030418/http://bxr.su/OpenBSD/usr.bin/ssh/PROTOCOL.chacha20poly1305|dead-url=no}}</ref><ref>{{Cite web|url=http://it.slashdot.org/story/13/12/11/173213/openssh-has-a-new-cipher-chacha20-poly1305-from-dj-bernstein|title=OpenSSH Has a New Cipher — Chacha20-poly1305 — from D.J. Bernstein|accessdate=2014-12-26|date=2013-12-11|last=Murenin|first=Constantine A.|publisher=[[Slashdot|Slashdot]]|editor=Unknown Lamer|archive-date=2021-03-09|archive-url=https://web.archive.org/web/20210309013524/https://it.slashdot.org/story/13/12/11/173213/openssh-has-a-new-cipher-chacha20-poly1305-from-dj-bernstein|dead-url=no}}</ref>后来，通过编译时选项避免它依赖于[[OpenSSL|OpenSSL]]也成为可能。<ref>{{Cite web|url=http://it.slashdot.org/story/14/04/30/1822209/openssh-no-longer-has-to-depend-on-openssl|title=OpenSSH No Longer Has To Depend On OpenSSL|accessdate=2014-12-26|date=2014-04-30|last=Murenin|first=Constantine A.|publisher=[[Slashdot|Slashdot]]|editor=Soulskill|archive-date=2016-06-24|archive-url=https://web.archive.org/web/20160624015649/https://it.slashdot.org/story/14/04/30/1822209/openssh-no-longer-has-to-depend-on-openssl|dead-url=no}}</ref>
+
+ChaCha20也被用在[[OpenBSD|OpenBSD]]<ref>{{Cite web|url=http://bxr.su/OpenBSD/lib/libc/crypt/arc4random.c|title=libc/crypt/arc4random.c|accessdate=2015-01-13|date=2014-07-21|last=|first=|quote=ChaCha based random number generator for OpenBSD.|website=BSD Cross Reference, OpenBSD src/lib/|editor=deraadt|editor-link=Theo de Raadt|archive-date=2015-01-14|archive-url=https://web.archive.org/web/20150114081416/http://bxr.su/OpenBSD/lib/libc/crypt/arc4random.c|dead-url=no}}</ref>和[[NetBSD|NetBSD]]<ref>{{Cite web|url=http://bxr.su/NetBSD/lib/libc/gen/arc4random.c|title=libc/gen/arc4random.c|accessdate=2015-01-13|date=2014-11-16|last=|first=|quote=Legacy arc4random(3) API from OpenBSD reimplemented using the ChaCha20 PRF, with per-thread state.|website=BSD Cross Reference, NetBSD src/lib/|editor=riastradh|archive-date=2015-01-14|archive-url=https://web.archive.org/web/20150114100733/http://bxr.su/NetBSD/lib/libc/gen/arc4random.c|dead-url=no}}</ref>操作系统中的arc4random随机数生成器，取代已经脆弱的[[RC4|RC4]]，在[[DragonFly_BSD|DragonFly BSD]]<ref>{{Cite web|url=http://bxr.su/DragonFly/sys/kern/subr_csprng.c|title=kern/subr_csprng.c|accessdate=2015-01-13|date=|last=|first=|quote=<code>chacha_encrypt_bytes</code>|website=BSD Cross Reference, DragonFly BSD src/sys/|editor=|archive-date=2015-01-14|archive-url=https://web.archive.org/web/20150114100716/http://bxr.su/DragonFly/sys/kern/subr_csprng.c|dead-url=no}}</ref>中内核的[[密码学安全伪随机数生成器|CSPRNG]]子程序中也是如此。<ref>{{Cite web|url=https://ianix.com/pub/chacha-deployment.html|title=ChaCha Usage & Deployment|access-date=2016-05-07|archive-date=2021-02-19|archive-url=https://web.archive.org/web/20210219143746/https://ianix.com/pub/chacha-deployment.html|dead-url=no}}</ref><ref>{{Cite web|url=http://netbsd.gw.com/cgi-bin/man-cgi?arc4random++NetBSD-current|title=arc4random - NetBSD Manual Pages|accessdate=6 January 2015|date=|archive-date=2020-07-06|archive-url=https://web.archive.org/web/20200706210612/https://netbsd.gw.com/cgi-bin/man-cgi?arc4random++NetBSD-current|dead-url=yes}}</ref>
+
+ChaCha20已经在{{IETF RFC|7539}}中标准化。它在[[網際網路金鑰交換|IKE]]和[[IPsec|IPsec]]中的使用已在{{IETF RFC|7634}}中标准化。在{{IETF RFC|7905}}中，ChaCha20-Poly1305已经被加入[[TLS|TLS]]扩展标准。
+
+若[[CPU|CPU]]或[[軟件|軟件]]不支援[[AES指令集|AES指令集]]，ChaCha20可提供比[[高級加密標準|AES]]更好的效能。
+
+[[WireGuard|WireGuard]]協定使用了帶[[Poly1305|Poly1305]]訊息鑒別碼的ChaCha20<ref>{{Cite web|title=Protocol & Cryptography - WireGuard|url=https://www.wireguard.com/protocol/|accessdate=2020-04-21|last=Donenfeld|first=Jason A.|work=www.wireguard.com|language=en|archive-date=2020-05-11|archive-url=https://web.archive.org/web/20200511123348/https://www.wireguard.com/protocol/|dead-url=no}}</ref>。
+
+== 另见 ==
+* [[Speck|Speck]] – [[美国国家安全局|美国国家安全局]]开发的一个add-rotate-xor密码算法
+* [[高級加密標準|高級加密標準]]（AES）
+
+== 参考资料 ==
+{{Reflist|30em}}
+
+== 外部链接 ==
+* [https://cr.yp.to/snuffle.html Salsa20 首页]{{Wayback|url=https://cr.yp.to/snuffle.html |date=20160414080103 }}
+* [https://cr.yp.to/snuffle/spec.pdf Specification]{{Wayback|url=https://cr.yp.to/snuffle/spec.pdf |date=20160408131917 }} ([[便携式文档格式|PDF]])
+* [https://cr.yp.to/snuffle/812.pdf Salsa20/8 and Salsa20/12]{{Wayback|url=https://cr.yp.to/snuffle/812.pdf |date=20160408124837 }} ([[便携式文档格式|PDF]])
+* [http://www.ecrypt.eu.org/stream/salsa20pf.html eStream page on Salsa20]{{Wayback|url=http://www.ecrypt.eu.org/stream/salsa20pf.html |date=20160405085821 }}
+* [https://cr.yp.to/chacha.html The ChaCha family of stream ciphers]{{Wayback|url=https://cr.yp.to/chacha.html |date=20160425084256 }}
+* [https://ianix.com/pub/salsa20-deployment.html Salsa20 Usage & Deployment]{{Wayback|url=https://ianix.com/pub/salsa20-deployment.html |date=20170107110349 }}
+
+{{流密码}}
+
+[[Category:互联网标准|Category:互联网标准]]
+[[Category:流密码|Category:流密码]]
+[[Category:带有源代码的公共领域软件|Category:带有源代码的公共领域软件]]

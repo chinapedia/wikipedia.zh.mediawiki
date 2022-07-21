@@ -1,0 +1,62 @@
+{{machine learning bar}}
+在[[机器学习|机器学习]]和[[统计学|统计学]]中，'''特征选择'''（{{lang-en|feature selection}}）也被称为'''变量选择'''、'''属性选择''' 或'''变量子集选择''' 。它是指：为了构建模型而选择相关特征（即属性、指标）子集的过程。使用特征选择技术有三个原因：
+:
+:*简化模型，使之更易于被研究人员或用户理解，<ref name="islr">{{cite book |author1=Gareth James |author2=Daniela Witten |author3=Trevor Hastie |author4=Robert Tibshirani |title=An Introduction to Statistical Learning |publisher=Springer |year=2013 |url=http://www-bcf.usc.edu/~gareth/ISL/ |page=204 |access-date=2016-06-06 |archive-date=2019-06-23 |archive-url=https://web.archive.org/web/20190623150237/http://www-bcf.usc.edu/~gareth/ISL/ |dead-url=no }}</ref>
+:*缩短训练时间，
+:*改善通用性、降低[[過適|过拟合]]<ref name="Bermingham-prolog">{{cite journal |title=Application of high-dimensional feature selection: evaluation for genomic prediction in man |first1=Mairead L. |last1=Bermingham |first2=Ricardo |last2=Pong-Wong |first3=Athina |last3=Spiliopoulou |first4=Caroline |last4=Hayward |first5=Igor |last5=Rudan |first6=Harry |last6=Campbell |first7=Alan F. |last7=Wright |first8=James F. |last8=Wilson |first9=Felix |last9=Agakov |first10=Pau |last10=Navarro |first11=Chris S. |last11=Haley |journal=[[Scientific_Reports|Sci. Rep.]] |volume=5 |year=2015 |url=http://www.nature.com/srep/2015/150519/srep10312/full/srep10312.html |access-date=2016-06-06 |archive-date=2015-05-24 |archive-url=https://web.archive.org/web/20150524135133/http://www.nature.com/srep/2015/150519/srep10312/full/srep10312.html |dead-url=no }}</ref>（即降低方差{{r|islr}} ）
+要使用特征选择技术的关键假设是：训练数据包含许多''冗余'' 或''无关'' 的特征，因而移除这些特征并不会导致丢失信息。<ref name="Bermingham-prolog"></ref> ''冗余'' 或''无关'' 特征是两个不同的概念。如果一个特征本身有用，但如果这个特征与另一个有用特征强相关，且那个特征也出现在数据中，那么这个特征可能是''冗余''的。{{r|guyon-intro}}
+
+特征选择技术与特征提取有所不同。特征提取是从原有特征的功能中创造新的特征，而特征选择则只返回原有特征中的子集。
+特征选择技术的常常用于许多特征但样本（即数据点）相对较少的领域。特征选择应用的典型用例包括：解析书面文本和[[DNA微陣列|微阵列]]数据，这些场景下特征成千上万，但样本只有几十到几百个。
+
+==介绍==
+特征选择算法可以被视为搜索技术和评价指标的结合。前者提供候选的新特征子集，后者为不同的特征子集打分。
+最简单的算法是测试每个特征子集，找到究竟哪个子集的错误率最低。这种算法需要穷举搜索空间，难以算完所有的特征集，只能涵盖很少一部分特征子集。
+选择何种评价指标很大程度上影响了算法。而且，通过选择不同的评价指标，可以把特征选择算法分为三类：包装类、过滤类和嵌入类方法<ref name="guyon-intro">{{cite journal |title=An Introduction to Variable and Feature Selection |first1=Isabelle |last1=Guyon |first2=André |last2=Elisseeff |journal=[[Journal_of_Machine_Learning_Research|JMLR]] |volume=3 |year=2003 |url=http://jmlr.csail.mit.edu/papers/v3/guyon03a.html |access-date=2016-06-06 |archive-date=2019-11-19 |archive-url=https://web.archive.org/web/20191119080344/http://jmlr.csail.mit.edu/papers/v3/guyon03a.html |dead-url=no }}</ref>
+
+* 包装类方法使用预测模型给特征子集打分。每个新子集都被用来训练一个模型，然后用验证数据集来测试。通过计算验证数据集上的错误次数（即模型的错误率）给特征子集评分。由于包装类方法为每个特征子集训练一个新模型，所以计算量很大。不过，这类方法往往能为特定类型的模型找到性能最好的特征集。
+
+* 过滤类方法采用代理指标，而不根据特征子集的错误率计分。所选的指标算得快，但仍然能估算出特征集好不好用。常用指标包括[[互信息|互信息]]<ref name="guyon-intro"/>、逐点互信息<ref name="textcat"/>、皮尔逊积矩相关系数、每种分类/特征的组合的帧间/帧内类距离或[[假設檢定|显著性测试]]评分。<ref name="textcat">{{cite conference |last1=Yang |first1=Yiming |first2=Jan O. |last2=Pedersen |title=A comparative study on feature selection in text categorization |conference=ICML |year=1997}}</ref><ref>{{cite journal |last1=Forman |first1=George |title=An extensive empirical study of feature selection metrics for text classification |journal=Journal of Machine Learning Research |volume=3 |year=2003 |pages=1289–1305}}</ref> 过滤类方法计算量一般比包装类小，但这类方法找到的特征子集不能为特定类型的预测模型调校。由于缺少调校，过滤类方法所选取的特征集会比包装类选取的特征集更为通用，往往会导致比包装类的预测性能更为低下。不过，由于特征集不包含对预测模型的假设，更有利于暴露特征之间的关系。许多过滤类方法提供特征排名，而非显式提供特征子集。要从特征列表的哪个点切掉特征，得靠[[交叉驗證|交叉验证]]来决定。过滤类方法也常常用于包装方法的预处理步骤，以便在问题太复杂时依然可以用包装方法。
+
+* 嵌入类方法包括了所有构建模型过程中用到的特征选择技术。这类方法的典范是构建线性模型的LASSO方法。该方法给回归系数加入了L1惩罚，导致其中的许多参数趋于零。任何回归系数不为零的特征都会被LASSO算法“选中”。LASSO的改良算法有Bolasso<ref name="Bolasso">{{cite journal|last1=Bach|first1=Francis R|title=Bolasso: model consistent lasso estimation through the bootstrap|journal=Proceedings of the 25th international conference on Machine learning|date=2008|pages=33–40|doi=10.1145/1390156.1390161|url=http://dl.acm.org/citation.cfm?id=1390161}}</ref>和FeaLect<ref name="FeaLect">{{cite journal|last1=Zare|first1=Habil|title=Scoring relevancy of features based on combinatorial analysis of Lasso with application to lymphoma diagnosis|journal=BMC Genomics|date=2013|volume=14|pages=S14|doi=10.1186/1471-2164-14-S1-S14|url=http://www.biomedcentral.com/1471-2164/14/S1/S14|access-date=2016-06-06|archive-date=2015-11-21|archive-url=https://web.archive.org/web/20151121182335/http://www.biomedcentral.com/1471-2164/14/S1/S14|dead-url=no}}</ref>。Bolasso改进了样本的初始过程。FeaLect根据回归系数组合分析给所有特征打分。 另外一个流行的做法是递归特征消除（Recursive Feature Elimination）算法，通常用于支持向量机，通过反复构建同一个模型移除低权重的特征。这些方法的计算复杂度往往在过滤类和包装类之间。
+
+传统的统计学中，特征选择的最普遍的形式是逐步回归，这是一个包装类技术。它属于[[贪心法|贪心算法]]，每一轮添加该轮最优的特征或者删除最差的特征。主要的调控因素是决定何时停止算法。在机器学习领域，这个时间点通常通过[[交叉驗證|交叉验证]]找出。在统计学中，某些条件已经优化。因而会导致嵌套引发问题。此外，还有更健壮的方法，如分支和约束和分段线性网络。
+
+==参见==
+* [[数据聚类|群集分析]]
+* [[降维|降维]]
+* [[特征提取|特征提取]]
+* [[数据挖掘|数据挖掘]]
+
+{{More footnotes|date=2010年7月}}
+
+==参考文献==
+
+{{Reflist|30em}}
+
+==扩展阅读==
+
+{{Refbegin}}
+* [http://www.public.asu.edu/~jtang20/publication/feature_selection_for_classification.pdf Feature Selection for Classification: A Review] {{Wayback|url=http://www.public.asu.edu/~jtang20/publication/feature_selection_for_classification.pdf |date=20160314145552 }} (Survey,2014)
+* [http://www.public.asu.edu/~jtang20/publication/FSClustering.pdf Feature Selection for Clustering: A Review] {{Wayback|url=http://www.public.asu.edu/~jtang20/publication/FSClustering.pdf |date=20160304052513 }} (Survey,2013)
+* [https://web.archive.org/web/20150724104926/http://featureselection.asu.edu/featureselection_techreport.pdf Tutorial Outlining Feature Selection Algorithms, Arizona State University]
+* [http://jmlr.csail.mit.edu/papers/special/feature03.html JMLR Special Issue on Variable and Feature Selection] {{Wayback|url=http://jmlr.csail.mit.edu/papers/special/feature03.html |date=20201109215825 }}
+* [http://www.springer.com/west/home?SGWID=4-102-22-33327495-0&changeHeader=true&referer=www.wkap.nl&SHORTCUT=www.springer.com/prod/b/0-7923-8198-X Feature Selection for Knowledge Discovery and Data Mining] {{Wayback|url=http://www.springer.com/west/home?SGWID=4-102-22-33327495-0&changeHeader=true&referer=www.wkap.nl&SHORTCUT=www.springer.com%2Fprod%2Fb%2F0-7923-8198-X |date=20071130125542 }} (Book)
+* [http://jmlr.csail.mit.edu/papers/volume3/guyon03a/guyon03a.pdf An Introduction to Variable and Feature Selection] {{Wayback|url=http://jmlr.csail.mit.edu/papers/volume3/guyon03a/guyon03a.pdf |date=20210225153802 }} (Survey)
+* [http://ieeexplore.ieee.org/iel5/69/30435/01401889.pdf Toward integrating feature selection algorithms for classification and clustering] (Survey)
+* [http://library.utia.cas.cz/separaty/2010/RO/somol-efficient feature subset selection and subset size optimization.pdf Efficient Feature Subset Selection and Subset Size Optimization]{{dead link|date=2018年3月 |bot=InternetArchiveBot |fix-attempted=yes }} (Survey, 2010)
+* [http://www.ijcai.org/papers07/Papers/IJCAI07-187.pdf Searching for Interacting Features] {{Wayback|url=http://www.ijcai.org/papers07/Papers/IJCAI07-187.pdf |date=20120205164048 }}
+* [https://web.archive.org/web/20160328133914/http://autonlab.org/icml_documents/camera-ready/107_Feature_Subset_Selec.pdf Feature Subset Selection Bias for Classification Learning]
+* Y. Sun, S. Todorovic, S. Goodison, [http://plaza.ufl.edu/sunyijun/PAMI2.htm Local Learning Based Feature Selection for High-dimensional Data Analysis] {{Wayback|url=http://plaza.ufl.edu/sunyijun/PAMI2.htm |date=20161018203430 }}, ''IEEE Transactions on Pattern Analysis and Machine Intelligence'' , vol. 32, no. 9, pp. {0}8.{/0} {1}{/1}
+{{Refend}}
+
+==外部链接==
+* [http://www.mathworks.com/matlabcentral/fileexchange/47129-information-theoretic-feature-selection A comprehensive package for Mutual Information based feature selection in Matlab] {{Wayback|url=http://www.mathworks.com/matlabcentral/fileexchange/47129-information-theoretic-feature-selection |date=20191206142654 }} 
+* [http://www.mathworks.com/matlabcentral/fileexchange/54763-infinite-feature-selection Infinite Feature Selection (Source Code) in Matlab] {{Wayback|url=http://www.mathworks.com/matlabcentral/fileexchange/54763-infinite-feature-selection |date=20191206150042 }} 
+* [https://web.archive.org/web/20120511162342/http://featureselection.asu.edu/software.php Feature Selection Package, Arizona State University (Matlab Code)]
+* [http://www.clopinet.com/isabelle/Projects/NIPS2003/ NIPS challenge 2003] {{Wayback|url=http://www.clopinet.com/isabelle/Projects/NIPS2003/ |date=20201109215105 }} (see also NIPS)
+* [https://web.archive.org/web/20090214023159/http://paul.luminos.nl/documents/show_document.php?d=198 Naive Bayes implementation with feature selection in Visual Basic] (includes executable and source code)
+* [https://web.archive.org/web/20160303185402/http://penglab.janelia.org/proj/mRMR/index.htm Minimum-redundancy-maximum-relevance (mRMR) feature selection program]
+* [http://mloss.org/software/view/386/ FEAST] {{Wayback|url=http://mloss.org/software/view/386/ |date=20200813210749 }} (Open source Feature Selection algorithms in C and MATLAB)
+
+[[Category:统计学|Category:统计学]]

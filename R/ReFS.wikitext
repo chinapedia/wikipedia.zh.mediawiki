@@ -1,0 +1,97 @@
+{{更新|time=2021-08-16T22:05:14+00:00}}
+{{校对翻译}}
+{{NoteTA|G1=IT|G2=Windows}}
+{{distinguish|ReiserFS}}
+{{ infobox file system
+| developer               = [[Microsoft|Microsoft]]
+| full_name               = Resilient File System
+| introduction_date       = {{Start date and age|2012|08|01|df=yes}}<ref>{{Cite web |url=http://blogs.technet.com/b/windowsserver/archive/2012/08/01/windows-server-2012-released-to-manufacturing.aspx |title=Windows Server 2012 released to manufacturing! |last=Snover |first=Jeffrey |date=2012-08-01 |website=Windows Server Blog |publisher=Microsoft Corporation |accessdate=2014-09-02 |archive-url=https://web.archive.org/web/20151222121938/http://blogs.technet.com/b/windowsserver/archive/2012/08/01/windows-server-2012-released-to-manufacturing.aspx |archive-date=2015-12-22 |dead-url=yes }}</ref>
+| introduction_os         = [[Windows_Server_2012|Windows Server 2012]]
+| partition_id            =
+| directory_struct        =
+| file_struct             =
+| file_types              =
+| bad_blocks_struct       =
+| bootable                =
+| min_volume_size         =
+| max_volume_size         = 1 [[yottabyte|yottabyte]]
+| max_file_size           = 16 [[exabyte|exabyte]]
+| file_size_granularity   =
+| max_files_no            =
+| max_filename_size       =
+| max_dirname_size        =
+| max_directory_depth     =
+| filename_character_set  =
+| dates_recorded          =
+| date_range              =
+| date_resolution         =
+| forks_streams           =
+| attributes              = 是
+| file_system_permissions =
+| compression             = 否
+| encryption              =
+| data_deduplication      = <!-- (single_instance_storage) -->
+| copy_on_write           = 是
+| OS                      = [[Microsoft_Windows|Microsoft Windows]]
+| website                 = [http://technet.microsoft.com/library/hh831724.aspx Resilient File System Overview]
+}}
+'''弹性文件系统'''（{{lang-en|'''Resilient File System'''}}，简称'''ReFS'''）<ref name="technetReFS1">{{Cite web|url=http://blogs.technet.com/b/askpfeplat/archive/2013/01/02/windows-server-2012-does-refs-replace-ntfs-when-should-i-use-it.aspx|title=Windows Server 2012: Does ReFS replace NTFS? When should I use it?|accessdate=2013-01-20|date=2013-01-01|last=Lucas|first=Martin|work=Ask Premier Field Engineering (PFE) Platforms|publisher=[[Microsoft|Microsoft]]|agency=[[Microsoft_TechNet#Blogs|TechNet blogs]]|archive-url=https://www.webcitation.org/6GdtBVrBz?url=http://blogs.technet.com/b/askpfeplat/archive/2013/01/02/windows-server-2012-does-refs-replace-ntfs-when-should-i-use-it.aspx|archive-date=2013-05-15|dead-url=yes}}</ref>，代号“Protogon”<ref name="zdnetrefsunveiled">{{Cite web|url=http://www.zdnet.com/blog/microsoft/microsoft-goes-public-with-plans-for-its-new-windows-8-file-system/11666|title=Microsoft goes public with plans for its new Windows 8 file system|accessdate=2013-01-21|date=2012-01-16|last=Foley|first=Mary Jo|work=[[ZDNet|ZDNet]]|publisher=[[CBS_Interactive|CBS Interactive]]|archive-date=2013-05-15|archive-url=https://www.webcitation.org/6GdtLZrDv?url=http://www.zdnet.com/blog/microsoft/microsoft-goes-public-with-plans-for-its-new-windows-8-file-system/11666|dead-url=no}}</ref>。这是一个[[微软|微软]]在[[Windows_Server_2012|Windows Server 2012]]中引入的[[专有|专有]][[文件系统|文件系统]]，目的是成为[[NTFS|NTFS]]之后的“下一代”文件系统。
+
+ReFS旨在克服NTFS被构想以来出现的重要问题，面向已改变的数据存储需求。ReFS的关键设计优势包括自动{{tsl|en|File_integrity_monitoring|完整性检查}}和[[数据清理|数据清理]]、避免需要运行[[CHKDSK|chkdsk]]、防止{{tsl|en|Data_degradation|数据衰落}}、内置{{tsl|en|Hard_disk_drive_failure|硬盘驱动器故障}}和[[冗余|冗余]]的处理、集成[[RAID|RAID]]功能、数据和元数据更新切换到[[寫入時複製|写时复制/分配]]、[[长文件名|超长路径和文件名]]的处理，以及[[儲存虛擬化|存储虚拟化]]和存储池、包括几乎任意大小的[[邏輯捲軸管理|逻辑卷]]（与所用驱动器的物理大小无关）。
+
+存储系统和使用情况的需求已发生改变——存储设备的大小（大容量或TB级存储阵列正日益常见）和[[24/7|持续可靠性]]需求。因此，该文件系统需要根据物理磁盘和逻辑卷之间的[[抽象層|抽象层]]或虚拟化完成自我修复，避免介入缓慢或必须中断的磁盘检查）。
+
+ReFS最初只被添加到[[Windows_Server_2012|Windows Server 2012]]，目标是逐步迁移到未来版本的消费者系统中（很快就有爱好者以{{tsl|en|Modding|修改}}方式解锁这点）。最初的版本中移除了一些NTFS功能，例如{{tsl|en|Disk_quota|磁盘配额}}、[[备用数据流|备用数据流]]和[[扩展文件属性|扩展属性]]，因此引发了一定关注。有部分功能已在更高版本的ReFS中重新实现。
+
+在ReFS的早期版本（2012年-2013年）中，它在测试中类似或略高于NTFS的水平<ref name="firstever">{{Cite web|url=http://www.firstever.eu/en/refs-vs-ntfs-benchmark/|title=ReFS vs NTFS Benchmark - First Ever - Exclusive Technology News|work=firstever.eu|deadurl=yes|archiveurl=https://web.archive.org/web/20140708024559/http://www.firstever.eu/en/refs-vs-ntfs-benchmark/|archivedate=2014-07-08|accessdate=2016-06-26}}</ref>，但在完整性检查时远慢于NTFS，这是因为ReFS新采用了奇偶效验。<ref name="bariseris">{{Cite web|url=http://bariseris.wordpress.com/2012/10/22/relative-performance-of-parity-vs-mirror-in-storage-spaces/|title=Relative Performance of Parity .vs. Mirror in Storage Spaces|work=Baris Eris's Blog|accessdate=2016-06-26|archive-date=2014-06-22|archive-url=https://web.archive.org/web/20140622070324/http://bariseris.wordpress.com/2012/10/22/relative-performance-of-parity-vs-mirror-in-storage-spaces/|dead-url=no}}</ref><ref name="jasoneckert">{{cite web |url=http://jasoneckert.triosdevblog01.ca/blog/Entries/2014/2/25_Microsoft_ReFS_vs_Oracle_ZFS_-_FIGHT.html |title=存档副本 |accessdate=2016-06-26 |deadurl=yes |archiveurl=https://archive.is/20140617113303/http://jasoneckert.triosdevblog01.ca/blog/Entries/2014/2/25_Microsoft_ReFS_vs_Oracle_ZFS_-_FIGHT.html |archivedate=2014-06-17 }}</ref>也有用户在预发布版本中提到了到[[Windows_8新功能|存储空间]]，该存储系统旨在支撑ReFS，但据称它可能会导致ReFS自动恢复失败。<ref name="smallnetbuilder1">{{cite web |author=Elena Pakhomova of ReclaiMe.com |date=2012-08-08 |url=http://www.smallnetbuilder.com/nas/nas-features/31836-data-recovery-tales-when-windows-storage-spaces-go-bad |title=Data Recovery Tales: When Windows Storage Spaces Go Bad |access-date=2016-06-26 |archive-date=2016-07-30 |archive-url=https://web.archive.org/web/20160730224238/http://www.smallnetbuilder.com/nas/nas-features/31836-data-recovery-tales-when-windows-storage-spaces-go-bad }}</ref><ref name="helgeklein">{{Cite web|url=http://helgeklein.com/blog/2012/03/windows-8-storage-spaces-bugs-and-design-flaws/|title=Windows 8 Storage Spaces: Bugs and Design Flaws|work=helgeklein.com|accessdate=2016-06-26|archive-date=2016-06-18|archive-url=https://web.archive.org/web/20160618090154/https://helgeklein.com/blog/2012/03/windows-8-storage-spaces-bugs-and-design-flaws/|dead-url=no}}</ref><ref name="refs-data-recovery">{{cite web |url=http://www.refs-data-recovery.com/refs-recovery.aspx |title=存档副本 |accessdate=2014-06-17 |deadurl=yes |archiveurl=https://web.archive.org/web/20140808041457/http://www.refs-data-recovery.com/refs-recovery.aspx |archivedate=2014-08-08 }}</ref>
+
+== 相较NTFS的功能变化 ==
+
+=== 重要新功能 ===
+; 改进磁盘结构可靠性
+: ReFS对所有存储在磁盘上的结构使用[[B+_树|B+ 树]]，包括所有元数据和文件数据。<ref name="B8_ReFS">{{Cite web|url=http://blogs.msdn.com/b/b8/archive/2012/01/16/building-the-next-generation-file-system-for-windows-refs.aspx|title=Building the next generation file system for Windows: ReFS|accessdate=2013-01-20|date=2012-01-16|last=Verma|first=Surendra|work=Building Windows 8|publisher=Microsoft|agency=[[MSDN#Blogs|MSDN blogs]]|editor-first=Steven|editor-last=Sinofsky|editor-link=Steven Sinofsky|archive-date=2013-05-15|archive-url=https://www.webcitation.org/6GdtFDgcn?url=http://blogs.msdn.com/b/b8/archive/2012/01/16/building-the-next-generation-file-system-for-windows-refs.aspx|dead-url=no}}</ref><ref name="zdnetrefs">{{Cite web|url=http://www.zdnet.com/microsoft-takes-wraps-off-new-windows-file-system-3040094832/|title=Microsoft takes wraps off new Windows file system|accessdate=2013-01-20|date=2012-01-17|last=Meyer|first=David|work=[[ZDNet|ZDNet]]|publisher=[[CBS_Interactive|CBS Interactive]]|archive-date=2013-05-15|archive-url=https://www.webcitation.org/6GdtGW2VE?url=http://www.zdnet.com/microsoft-takes-wraps-off-new-windows-file-system-3040094832/|dead-url=no}}</ref>元数据和文件数据被组成一个类似[[关系数据库|关系数据库]]的数据表。文件大小、[[目录_(文件系统)|文件夹]]内的文件数和卷总大小及卷中文件夹数量都采用64位数字；因此，ReFS支持最多16 [[艾字节|EB]]的文件大小，最多18.4 × 10<sup>18</sup>个目录和最大1 [[尧字节|YB]]（64 KB[[簇|簇]]的卷），这允许较大的可扩展性，对文件和目录大小没有实际限制（硬件限制仍适用）。空闲空间是由一个分层分配器计算，其中包括三个单独的表，分别保存大、中、小块。
+
+; 内置复原
+: ReFS对元数据采用[[寫入時複製|allocation-on-write]]更新策略<ref name="B8_ReFS"/>，每次更新时分配新块并采用批次[[I/O|IO]]。所有ReFS元数据都采用独立存储的64位校验和。文件数据可以单独拥有可选的“完整性流”校验和，那种情况下文件更新策略也实现写时复制；新的“完整性”属性可应用到文件和目录。如果文件数据或元数据损坏，文件可以直接删除而无需脱机维护整个卷，并且文件可以从备份恢复。因为内置弹性设计，管理员不需要对ReFS定期运行错误检查工具，例如[[CHKDSK|CHKDSK]]。
+
+; 与现有API和技术兼容
+: ReFS支持NTFS特性的一个子集，并且仅“广泛使用”的Win32 API支持它；但它不需要新的系统API，并且大多数文件系统筛选器可在ReFS卷工作。<ref name="B8_ReFS"/>ReFS支持许多现有的Windows和NTFS特性，例如[[BitLocker驱动器加密|BitLocker]] 加密、[[存取控制串列|访问控制列表]]、[[USN日志|USN日志]]、变更通知<ref>{{Cite web|url=http://msdn.microsoft.com/en-us/library/windows/desktop/aa365465(v=vs.85).aspx|title=ReadDirectoryChangesW function|accessdate=2013-01-21|date=2012-11-08|work=[[MSDN#Library|MSDN Library]]|publisher=Microsoft|archive-date=2013-05-15|archive-url=https://www.webcitation.org/6GdtINgiC?url=http://msdn.microsoft.com/en-us/library/windows/desktop/aa365465(v=vs.85).aspx|dead-url=no}}</ref>、[[NTFS符号链接|符号链接]]、{{tsl|en|NTFS_junction_point|junction点}}、[[挂载点|挂载点]]、[[NTFS重解析点|重解析点]]、[[磁碟區陰影複製服務|卷快照]]、[[NTFS|文件ID]]和[[NTFS|操作锁定]]。ReFS与[[Windows_8新功能|存储空间]]无缝集成<ref name="B8_ReFS"/>，[[儲存虛擬化|存储虚拟化]]层允许数据被镜像或条带化，以及作为机器之间的共享存储池。<ref name="B8_storage_spaces">{{Cite web|url=http://blogs.msdn.com/b/b8/archive/2012/01/05/virtualizing-storage-for-scale-resiliency-and-efficiency.aspx|title=Virtualizing storage for scale, resiliency, and efficiency|accessdate=2013-01-18|date=2012-01-05|last=Nagar|first=Rajeev|work=Building Windows 8|publisher=Microsoft|agency=[[MSDN#Blogs|MSDN blogs]]|editor-first=Steven|editor-last=Sinofsky|editor-link=Steven Sinofsky|archive-date=2013-05-15|archive-url=https://www.webcitation.org/6GdtJ5iqX?url=http://blogs.msdn.com/b/b8/archive/2012/01/05/virtualizing-storage-for-scale-resiliency-and-efficiency.aspx|dead-url=no}}</ref>ReFS的可恢复功能增强了存储空间提供的镜像功能，可以使用[[数据清理|数据清理]]流程检测是否有任何文件的镜像副本已经损坏（可选启用） <ref name="zdnetrefs"/>，它会定期读取所有副本并验证它们的校验和，然后使用良好副本替换损坏副本。
+
+=== 已移除功能 ===
+某些NTFS功能在ReFS的初始版本中已移除或不支持。这包括[[备用数据流|备用数据流]]、[[NTFS重解析点|对象ID]]、[[8.3|8.3文件名]]、[[NTFS|NTFS压缩]]、[[加密文件系统|加密文件系统]]（EFS）、{{tsl|en|Transactional_NTFS|事务性NTFS}}、[[硬链接|硬链接]]、[[扩展文件属性|扩展属性]]和{{tsl|en|Disk_quota|磁盘配额}}。<ref name="B8_ReFS"/><ref name="zdnetrefsunveiled"/><ref name="Lucas">{{Cite web |url=http://blogs.technet.com/b/askpfeplat/archive/2013/01/02/windows-server-2012-does-refs-replace-ntfs-when-should-i-use-it.aspx |title=Windows Server 2012: Does ReFS replace NTFS? |access-date=2016-06-26 |archive-url=https://www.webcitation.org/6GdtBVrBz?url=http://blogs.technet.com/b/askpfeplat/archive/2013/01/02/windows-server-2012-does-refs-replace-ntfs-when-should-i-use-it.aspx |archive-date=2013-05-15 |dead-url=yes }}</ref>ReFS最初不提供[[重复数据删除|重复数据删除]]，<ref name="B8_ReFS"/>在随后的v3.2版本中实现。此外，Windows目前不能从ReFS卷引导启动。<ref name="B8_ReFS"/>镜像或条带化卷的动态磁盘已被“存储空间”提供的镜像或条带化存储池取代；自动纠错仅在镜像空间支持。<span class="cx-segment" data-segmentid="185"></span>
+
+在后续实现的Windows 8.1 64位和Server 2012 R2的ReFS中，文件系统开始支持备用数据流，最大长度128K，以及完整性流在奇偶效验空间上自动纠正损坏数据。<ref>{{Cite web|url=http://technet.microsoft.com/en-us/library/hh831724.aspx|title=Resilient File System Overview|accessdate=2013-12-25|date=2012-02-29|publisher=[[Microsoft|Microsoft]]|website=[[Microsoft_TechNet#Library|TechNet Library]]|archive-date=2017-02-01|archive-url=https://web.archive.org/web/20170201111121/https://technet.microsoft.com/en-us/library/hh831724.aspx|dead-url=no}}</ref>ReFS在缺乏备用数据流的支持时不适合[[Microsoft_SQL_Server|Microsoft SQL Server]]实例分配。<ref>{{Cite web|url=http://sqlmag.com/blog/sql-server-and-windows-server-2012s-refs-file-system|title=SQL Server Pro magazine|date=2012-08-21|last=Cherry|first=Denny|publisher=[[Penton_Media|Penton Media]]|website=Troubleshooting SQL Server Storage Problems|access-date=2016-06-26|archive-url=https://web.archive.org/web/20171010052123/http://sqlmag.com/blog/sql-server-and-windows-server-2012s-refs-file-system|archive-date=2017-10-10|dead-url=yes}}</ref>
+<!-- 截至2015年3月，WIndowsNetworking.com对ReFS状态的评论指出：<ref>{{Cite web|url=http://www.windowsnetworking.com/articles-tutorials/windows-server-2012/refs-what-you-need-know-about-resilient-file-system-part1.html|title=ReFS: What you need to know about the Resilient File System (Part 1)|work=WindowsNetworking.com}}</ref>
+: "You can’t (at least at this time) boot Windows from an ReFS volume and the first versions of ReFS don’t include file-level compression and encryption, disk quotas or hard links, all of which are advantages of NTFS over the FAT file systems. Note that ReFS does support sparse files, reparse points, case-sensitive file names and Unicode in file names and perhaps most important, it preserves and enforces access control lists (ACLs).
+
+: "It’s obvious that ReFS in its current iteration is not a replacement for NTFS ... because some applications that rely on specific NTFS features might not work with ReFS [... however...] Storage of most conventional data doesn’t require the specific NTFS features that aren’t supported by ReFS and so ReFS can handle that duty nicely. Its primary use case is on file servers that store extremely large amounts of data. It has data integrity and recovery mechanisms built into the file system, as well. That means those tools that are designed to detect and repair file corruption in other file systems aren’t necessary, so their incompatibility with ReFS isn’t really an issue. Additionally, although ReFS doesn’t support file level (Encrypting File System) encryption, BitLocker can be used to protect ReFS volumes so that’s not so much of an issue, either [...]
+
+: "ReFS has some distinct advantages over current reigning Windows file system NTFS, but it also has some drawbacks. It boasts self-healing powers, ability to repair files without down time, less risk that data will be lost when there’s a power failure (due to the way it writes metadata), and of course the ability to create huge volumes and files and even give those files names that are longer than 255 characters if you wish. But it’s not quite ready for prime time yet." -->
+
+== 稳定性和已知问题 ==
+一些ReFS与“存储空间”共同运行时的出现问题已被提出或建议<ref name="refs-data-recovery"/>，包括：
+:* 在“存储空间”上添加自动精简配置的ReFS可能以非正常的方式失败，卷会没有警告地变为无法访问或无法管理。<ref name="smallnetbuilder1"/>发生此情况的可能原因是，如果物理磁盘的基本存储空间太慢。{{tsl|en|Smallnetbuilder|Smallnetbuilder}}评论说，这种情况下，修复可能会“望而却步”，因为理论上进展需要需要识别存储空间的布局和恢复它们，而这在开始前需要恢复任何ReFS文件系统内容；因此推荐同时采用备份手段。<ref name="smallnetbuilder1"/>
+
+:* 即使“存储空间”非自动精简配置，ReFS在某些情况下仍可能无法有把握的糾正所有文件错误。因为存储空间以块而非文件操作，如果存储空间的某些部分工作异常，某些文件可能会缺乏必要的块或恢复数据。因此，磁盘和数据的添加和删除可能会受损，以及冗余转换变得困难或不可能。<ref name="helgeklein"/>
+
+:* 因为ReFS不是为应对故障设计，如果它发生故障，目前没有工具来修复它。第三方工具只能[[逆向工程|逆向工程]]该系统，截至2014年只有寥寥几个工具。<ref name="refs-data-recovery"/>
+== 与竞争对手的性能比较 ==
+2014年，一篇对ReFS的评论与准备在生产中使用的评估显示，ReFS在与它的两个主要竞争对手（[[文件系统|文件系统]]）的比较中具有关键优势。[[ZFS|ZFS]]（在[[Solaris|Solaris]]和[[FreeBSD|FreeBSD]]中使用）被广泛批评为使用数GB的[[内存|内存]]用于联机重复数据消除，这影响了它在大量中小型系统上的使用。但是，在关闭ZFS的联机重复数据消除后（因为ReFS不支持此功能），ZFS只占用几百MB内存，与另外两个系统相对持平。{{tsl|en|Drobo|Drobo}}等方案使用[[专有软件|专有]]方法，这意味着如果故障且厂商也无法解决，没有其他解决方案。<ref>{{Cite web|url=http://betanews.com/2014/01/15/windows-storage-spaces-and-refs-is-it-time-to-ditch-raid-for-good/|title=Windows Storage Spaces and ReFS: Is it time to ditch RAID for good?|work=BetaNews|accessdate=2016-06-26|archive-date=2014-01-31|archive-url=https://web.archive.org/web/20140131084448/http://betanews.com/2014/01/15/windows-storage-spaces-and-refs-is-it-time-to-ditch-raid-for-good/|dead-url=no}}</ref>
+
+2012年，[[Phoronix|Phoronix]]撰写了一篇<ref>{{Cite web|url=http://www.phoronix.com/scan.php?page=news_item&px=MTA0NDA|title=Microsoft's ReFS File-System: Competitor To Btrfs? - Phoronix|work=phoronix.com|accessdate=2016-06-26|archive-date=2016-09-08|archive-url=https://web.archive.org/web/20160908221624/http://www.phoronix.com/scan.php?page=news_item&px=MTA0NDA|dead-url=no}}</ref>ReFS对战[[Btrfs|Btrfs]]的分析（Btrfs是适用于Linux的一个[[寫入時複製|写时复制]]文件系统）。两者具有类似的特性，都支持校验和、类[[RAID|RAID]]使用多块磁盘，以及错误检测与纠正。但是，当时的ReFS缺乏[[重复数据删除|重复数据删除]]、写时快照和压缩，而Btrfs和ZFS支持上述技术。
+
+== 参见 ==
+* [[WinFS|WinFS]]
+* [[苹果文件系统|APFS]]
+
+== 参考资料 ==
+{{Reflist|30em}}
+
+== 外部链接 ==
+* [https://web.archive.org/web/20160601063207/http://kx.cloudingenium.com/microsoft/servers/windows-servers/windows-server-2012/windows-server-2012-file-system-resiliency-refs-data-deduplication-ntfs/ Analysis of detailed differences between NTFS and ReFS in Server 2012, and reasons for choosing one or the other]
+
+{{File systems}}
+{{Microsoft Windows components}}
+
+[[Category:2012年软件|Category:2012年软件]]
+[[Category:微软磁盘文件系统|Category:微软磁盘文件系统]]

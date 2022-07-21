@@ -1,0 +1,60 @@
+{{NoteTA
+|G1=IT
+}}
+{{校对翻译}}
+在计算机[[文件系统|文件系统]]领域中，'''fork'''是一个与文件系统对象相关的数据集。没有fork机制的文件系统只允许内容拥有单个数据集，而有fork的文件系统允许多个内容。每个非空的文件至少有一个fork（通常为默认类型）；因文件系统而不同，一个文件可能有一个或多个相关联的fork；fork可能包含有关该文件主体的数据，或者只是[[元数据|元数据]]。不同于通常为固定大小的一个类似的文件系统特性——[[扩展文件属性|扩展文件属性]]，fork可以为可变大小，甚至可能大于文件的主数据fork。一个文件的大小是其各fork大小的总和。因为其是可变大小（不同于固定大小的元数据），Fork也称为数据'''流'''（streams），但它与其他的“[[字串流|流]]”所表现出的“可用性随时间而变动（包括无限期）”不同。
+
+== 方案 ==
+
+在没有fork的文件系统上，用户可以使用彼此互相关联的多个单独文件，尤其是用[[sidecar_file|sidecar file]]来存储元数据。但是，这些文件间的连接不会由文件系统自动保留，并且每个程序都必须支持按这些文件来工作。另一种选择是[[容器文件|容器文件]]，其将额外数据存储在指定的文件格式或者一个[[archive_file|archive file]]中，因此允许在一个文件（单个fork）中存储多个文件及元数据。这将要求程序处理容器文件或压缩文件，而不是由操作系统处理fork。这些替代方案均需要处理数据的程序进行额外的处理，但对不支持fork的文件系统的可移植性更佳。
+
+== 实现 ==
+
+=== 苹果公司 ===
+{{see|{{tsl|en|Resource fork|资源fork}}}}
+[[蘋果公司|蘋果公司]]的[[分层文件系统|分层文件系统]]（HFS）中fork与文件系统关系密切。<ref>{{cite web|url=http://developer.apple.com/documentation/mac/Files/Files-14.html|title=File Forks|accessdate=2006-11-18|author=Apple|date=1996-07-02|publisher=Apple|deadurl=yes|archiveurl=https://web.archive.org/web/20080724120835/http://developer.apple.com/documentation/mac/Files/Files-14.html|archivedate=2008-07-24}}</ref>[[分层文件系统|HFS]]与原有的[[Mac系列|Mac系列]]（麦金塔）的文件系统{{tsl|en|Macintosh File System|麦金塔文件系统}}（MFS）允许一个文件系统对象有多种fork：一个{{tsl|en|Data fork|数据fork}}，一个{{tsl|en|Resource fork|资源fork}}，以及多个命名fork。
+
+资源fork的设计是为存储被系统的[[图形用户界面|图形用户界面]]（GUI）使用的非编译数据，例如可本地化文本字符串，由[[Finder|Finder]]或菜单使用的文件图标，以及应用程序相关的菜单和对话框等。<ref>{{cite web|url=http://folklore.org/StoryView.py?project=Macintosh&story=The_Grand_Unified_Model.txt|title=The Grand Unified Model (1) - Resources|accessdate=2006-11-18|author=Bruce Horn|publisher=Folklore.org|deadurl=yes|archiveurl=https://web.archive.org/web/20061023221041/http://www.folklore.org/StoryView.py?project=Macintosh&story=The_Grand_Unified_Model.txt|archivedate=2006-10-23}}</ref>但这个特性非常灵活，因此也出现了额外的用途，例如将文字处理文档处理为内容和表示法，然后将各个部分存储在单独的资源中。由于编译后的软件代码也存储在资源中，所以应用程序通常只包含一个资源fork，而没有数据fork。
+
+[[HFS_Plus|HFS+]]的一项最晦涩的特性是，一个文件除了传统的数据和资源fork之外，还可以有任意数量的自定义的“命名fork”。此特性很少被使用，因为苹果公司从未在[[Mac_OS_8#Mac_OS_8.1|Mac OS 8.1]]至[[Mac_OS_X_v10.3|10.3.9]]上添加对它的支持。从[[Mac_OS_X_v10.4|10.4]]开始，一个部分实现被完成，以支持苹果的[[扩展文件属性|扩展内联属性]]。
+
+在[[Mac_OS_X_v10.4|Mac OS X v10.4]]之前，用户运行[[Mac_OS_X|Mac OS X]]上所自带的经典的[[Unix|Unix]]命令行实用工具（例如[[tar_(文件格式)|tar]]）可能带来数据丢失风险，因为这些工具未被更新以支持处理文件的资源fork，直到v10.4。<ref>{{cite web |url=http://developer.apple.com/macosx/backuponmacosx.html |title=Command-line Backup Solutions on Mac OS X |date=2005-10-29 |publisher=Apple |accessdate=2006-11-18 |deadurl=yes |archiveurl=https://web.archive.org/web/20080225103633/http://developer.apple.com/macosx/backuponmacosx.html |archivedate=2008-02-25 }}</ref>
+
+=== Novell ===
+从1985年开始，Novell {{tsl|en|NetWare File System}}（NWFS）及其继任者{{tsl|en|Novell Storage Services}}（NSS）就已从头设计多种存储文件元数据的方法。部分元数据存储在{{tsl|en|Novell Directory Services}}（NDS）中，部分元数据存储在磁盘上的目录结构中，部分存储在文件本身的“多项数据流”中。多项数据流还允许Macintosh客户端附加和使用[[NetWare|NetWare]]服务器。
+
+=== 微软===
+在[[Windows_NT_3.1|Windows NT 3.1]]引入的[[NTFS|NTFS]]文件系统支持被称为[[替代数据流|替代数据流]]（ADS）文件系统fork。<ref>{{cite web | url=http://msdn.microsoft.com/library/default.asp?url=/library/en-us/fileio/fs/files_and_clusters.asp | title=Files and Clusters | author=Microsoft | publisher=Microsoft | accessdate=2006-11-18 }}{{Dead link|date=2018年10月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>随[[Windows_Server_2012|Windows Server 2012]]引入的新文件系统[[ReFS|ReFS]]，最初不支持ADS，<ref>{{cite web |url=http://blogs.msdn.com/b/b8/archive/2012/01/16/building-the-next-generation-file-system-for-windows-refs.aspx |title=Building the next generation file system for Windows: ReFS |work=Building Windows 8 |agency=[[微软开发者网络|MSDN blogs]] |publisher=Microsoft |last=Verma |first=Surendra |editor-first=Steven |editor-last=Sinofsky |editor-link=Steven Sinofsky |date=16 January 2012 |accessdate=20 January 2013 |archive-date=2013-05-15 |archive-url=https://www.webcitation.org/6GdtFDgcn?url=http://blogs.msdn.com/b/b8/archive/2012/01/16/building-the-next-generation-file-system-for-windows-refs.aspx |dead-url=no }}</ref><ref>{{cite web |url=http://www.zdnet.com/blog/microsoft/microsoft-goes-public-with-plans-for-its-new-windows-8-file-system/11666 |title=Microsoft goes public with plans for its new Windows 8 file system |work=[[ZDNet|ZDNet]] |publisher=[[CBS互動|CBS互動]] |date=16 January 2012 |accessdate=21 January 2013 |first=Mary Jo |last=Foley |archive-date=2013-05-15 |archive-url=https://www.webcitation.org/6GdtLZrDv?url=http://www.zdnet.com/blog/microsoft/microsoft-goes-public-with-plans-for-its-new-windows-8-file-system/11666 |dead-url=no }}</ref><ref>[http://blogs.technet.com/b/askpfeplat/archive/2013/01/02/windows-server-2012-does-refs-replace-ntfs-when-should-i-use-it.aspx Windows Server 2012: Does ReFS replace NTFS? When should I use it?] {{WebCite|url=https://www.webcitation.org/6GdtBVrBz?url=http://blogs.technet.com/b/askpfeplat/archive/2013/01/02/windows-server-2012-does-refs-replace-ntfs-when-should-i-use-it.aspx |date=20130515211033 |dateformat=iso }} - Martin Lucas, ''[[TechNet|TechNet]]''</ref>，但在[[Windows_8.1|Windows 8.1]] 64位及Server 2012 R2中已支持ADS，唯其长度最多128K的限制被加入到ReFS。<ref>{{cite web|url = http://technet.microsoft.com/en-us/library/hh831724.aspx|title = Resilient File System Overview|date = 29 February 2012|website = [[TechNet|TechNet Library]]|publisher = [[微软|微软]]|accessdate = 25 December 2013|archive-date = 2017-02-01|archive-url = https://web.archive.org/web/20170201111121/https://technet.microsoft.com/en-us/library/hh831724.aspx|dead-url = no}}</ref>
+
+ADS最初是为添加与现有的支持fork的操作系统的兼容性。计算机程序可以直接在文件路径的后面添加一个冒号（:）及指定的ADS名称来打开一个ADS。<ref name=":0">{{Cite web|url = http://blogs.msdn.com/b/ieinternals/archive/2013/09/08/internet-explorer-favicons-png-link-rel-icon-caching.aspx|title = Fun with Favicons|date = 8 September 2013|accessdate = 17 November 2013|website = IEInternals|publisher = [[微软|微软]]|last = Law|first = Eric|archive-date = 2016-01-26|archive-url = https://web.archive.org/web/20160126201234/http://blogs.msdn.com/b/ieinternals/archive/2013/09/08/internet-explorer-favicons-png-link-rel-icon-caching.aspx|dead-url = no}}</ref>尽管有此支持，但包括[[檔案總管|檔案總管]]和[[Dir_(命令)|DIR]]命令（Windows Vista之前）在内的大多数程序都会忽略ADS。Windows檔案總管会复制ADS并在目标文件系统不支持ADS时发出警告，但只计算主流的大小，并且不会列出文件或文件夹的流。[[Windows_Vista|Windows Vista]]中的DIR命令支持显示ADS。<ref>{{cite web | url=http://bartdesmet.net/blogs/bart/archive/2006/07/13/4129.aspx | title=Use Vista's DIR command to display alternate data streams | author=Bart De Smet | date=2006-07-13 | work=B# .NET Blog | accessdate=2007-07-07 | archive-date=2009-05-26 | archive-url=https://web.archive.org/web/20090526113146/http://bartdesmet.net/blogs/bart/archive/2006/07/13/4129.aspx | dead-url=no }}</ref>[[Windows_PowerShell|Windows PowerShell]] v3.0及之后的版本支持操作ADS。<ref>{{cite web|url = http://technet.microsoft.com/en-us/library/hh847764%28v=wps.620%29.aspx|title = FileSystem Provider (Windows PowerShell 3.0)|website = [[TechNet|TechNet]]|publisher = [[微软|微软]]|date = 9 August 2012|deadurl = yes|archiveurl = https://web.archive.org/web/20160624134450/https://technet.microsoft.com/en-us/library/hh847764(v=wps.620).aspx|archivedate = 2016年6月24日|accessdate = 2016年12月20日}}</ref>
+
+====使用====
+
+[[Windows_2000|Windows 2000]]使用ADS以在图像文件中存储[[缩略图|缩略图]]，并且在任何文件中存储摘要信息（诸如标题、作者等），这样不更改主数据流。<ref name=":1">{{cite web|url = http://blogs.msdn.com/b/oldnewthing/archive/2011/05/27/10168422.aspx|title = Why are custom properties created on Windows 2000 lost when I view the file from newer versions of Windows?|date = 27 May 2011|accessdate = 17 November 2013|website = The Old New Thing|publisher = [[微软|微软]]|last = Chen|first = Raymond|archive-date = 2013-07-27|archive-url = https://web.archive.org/web/20130727212715/http://blogs.msdn.com/b/oldnewthing/archive/2011/05/27/10168422.aspx|dead-url = no}}</ref><ref>{{cite web | url=http://support.microsoft.com/kb/319300 | title=Indexing service adds data streams to image files | author=Microsoft | date=2006-10-27 | publisher=Microsoft | accessdate=2006-11-18 | archive-date=2007-02-09 | archive-url=https://web.archive.org/web/20070209000533/http://support.microsoft.com/kb/319300 | dead-url=no }}</ref>在[[Windows_XP|Windows XP]]中，微软已意识到当文件被移出NTFS卷时，其所含的ADS容易丢失；因此Windows XP为只要文件格式支持，就尽量将数据存储在主数据流中。<ref name=":1" />Windows Vista停止支持添加摘要信息，微软认为用ADS操作它过于敏感。<ref>{{cite web|url = http://blogs.msdn.com/b/oldnewthing/archive/2012/05/01/10299322.aspx|title = What happened to the Summary information created on Windows 2000 and Windows XP?|date = 1 May 2012|accessdate = 17 November 2013|website = The Old New Thing|publisher = [[微软|微软]]|last = Chen|first = Raymond|archive-date = 2014-04-13|archive-url = https://web.archive.org/web/20140413043006/http://blogs.msdn.com/b/oldnewthing/archive/2012/05/01/10299322.aspx|dead-url = no}}</ref>但是，用于其他目的的ADS没有停止，Windows XP的Service Pack 2引入了附件执行服务，它将已下载文件的原始来源详情存储在一个名为“区域标识符”的ADS中，以努力保护用户免受下载文件所带来的风险。<ref>{{cite web | url=http://community.bartdesmet.net/blogs/bart/archive/2005/08/19/3485.aspx | title=Demo of "Attachment Execution Service internals" in Windows XP SP2 and Windows Server 2003 SP1 | author=Bart De Smet | date=2005-08-19 | publisher=B# .NET Blog | accessdate=2006-11-18 | archive-date=2006-11-04 | archive-url=https://web.archive.org/web/20061104203911/http://community.bartdesmet.net/blogs/bart/archive/2005/08/19/3485.aspx | dead-url=no }}</ref>[[Internet_Explorer|Internet Explorer]]和Windows 8则是通过[[Microsoft_SmartScreen|Microsoft SmartScreen]]执行此功能。<ref>{{cite web|url = http://blogs.msdn.com/b/oldnewthing/archive/2013/11/05/10463035.aspx|title = Manipulating the zone identifier to specify where a file was download from|date = 4 November 2013|website = The Old New Thing|publisher = [[微软|微软]]|last = Chen|first = Raymond|accessdate = 2016-12-20|archive-date = 2015-06-10|archive-url = https://web.archive.org/web/20150610220027/http://blogs.msdn.com/b/oldnewthing/archive/2013/11/05/10463035.aspx|dead-url = no}}</ref>Internet Explorer也使用ADS来在[[書籤_(瀏覽器)|Internet快捷方式]]文件中存储[[Favicon|Favicon]]。<ref name=":0" />
+
+=== Sun ===
+[[Solaris|Solaris]]第9版及之后的版本允许文件有“扩展属性”，这实际上就是fork；一个扩展属性的最大大小与文件的最大大小相同，并且读写它们是采用与读写文件相同的方式。在内部，它们实际上像普通文件一样存储和访问，因此其所有权和权限可能与父文件的所有权和权限相异。因为路径会与子目录冲突，因此它们的文件名不能包含“/”字符。
+
+[[网络文件系统|网络文件系统]]（NFS）第4版支持扩展文件属性，与Solaris的方式大致相同。
+
+== 可能的安全问题和数据丢失风险 ==
+在文件系统支持某种或多种fork时，应用程序应该感知它们，以及注意数据和安全风险。允许{{tsl|en|Legacy system|经典软件}}访问无适当[[兼容层|兼容层]]的数据是发生此类问题的主要原因。{{fact|date=January 2011}}
+
+如果各类系统实用程序（磁盘资源管理器、防病毒软件、压缩归档程序等）未感知fork，可能导致遇到下列问题：
+* 用户不会得知任何fork的存在，也不知道文件的实际总大小，只能看到文件的主数据流的大小。
+* [[计算机病毒|计算机病毒]]可能在Windows上使用替代数据流（ADS）隐藏而逃脱检测，如果防病毒软件未意识到fork的存在。
+* 在通过fork不敏感的通道发送文件时，数据可能丢失。这些渠道包括例如[[电子邮件|电子邮件]]、不支持fork的文件系统，并也包括在支持fork的文件系统上使用不支持fork的软件复制或打包（压缩、归档）文件。
+
+== 参见 ==
+* [[扩展文件属性|扩展文件属性]]
+
+== 参考资料 ==
+{{Reflist|30em}}
+
+== 外部链接 ==
+* [http://msdn.microsoft.com/en-us/library/windows/desktop/aa364404 MSDN Library: File Streams]{{Wayback|url=http://msdn.microsoft.com/en-us/library/windows/desktop/aa364404 |date=20141221023826 }}
+* [http://2kevin.net/datastreams.html Alternate Data Streams]{{Wayback|url=http://2kevin.net/datastreams.html |date=20080703000539 }}
+* [https://web.archive.org/web/20100413194952/http://www.think-techie.com/2010/04/alternate-data-streams.html Alternate Data Streams in Windows]
+
+{{文件系统}}
+[[Category:文件系统|Category:文件系统]]

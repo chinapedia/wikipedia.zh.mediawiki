@@ -1,0 +1,41 @@
+local p = {}
+
+function p.mysplit(frame)
+	inputstr = frame.args[2]
+    sep = "\n"
+    local t={} ; i=1
+    for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+        t[i] = str
+        i = i + 1
+    end
+    return t
+end
+
+function p.main(frame)
+	local s = '<ul class="nowrap">'
+	local t = p.mysplit(frame)
+	local ps,pe,v1,v2
+	for k,v in pairs(t) do
+		mw.log(v)
+		ps,pe = string.find(v,";")
+		if ps ~=nil then
+			v1, foo= string.sub(v,1,ps):gsub(";"," ")
+			v2, foo= string.sub(v,ps):gsub(";"," ")
+			mw.log(v1,v2)
+		else
+			v1 = "<span style='color:red;'>ERROR here:"
+			v1 = v1.."each entry must contain one semicolon;</span>"
+			v2 = ""
+		end
+ 		s = s .. "<li><span style='display:inline-block;width:"..frame.args[1]
+		s = s .. ";'>"..v1.."</span><span style='display:inline-block;>"..v2
+		s = s .. "</span></li>\n"
+	end
+	s = s..'</ul>'
+	return s
+end
+
+function p.qq(frame)
+    return frame.args[2]
+end
+return p

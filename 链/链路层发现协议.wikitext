@@ -1,0 +1,85 @@
+{{TA
+|G1=IT
+}}
+'''链路层发现协议'''（{{lang|en|Link Layer Discovery Protocol}}，LLDP）是一种[[数据链路层|数据链路层]]协议，网络设备可以通过在本地网络中发送LLDPDU（Link Layer Discovery Protocol Data Unit）来通告其他设备自身的状态。是一种能够使网络中的设备互相发现并通告状态、交互信息的协议。
+
+== 概述 ==
+LLDP协议属于链路层协议，它的[[以太类型|以太类型]]为0x88cc。一个标准的LLDP帧格式如下：
+
+{| class="wikitable"
+|+ 标准LLDP协议帧格式
+! 目的[[MAC地址|MAC地址]] !! 源[[MAC地址|MAC地址]] !! [[以太类型|以太类型]] !! Chassis ID TLV !! Port ID TLV !! Time to live TLV !! 可选 TLV !! End of LLDPDU TLV
+
+|- 
+| 01-80-C2-00-00-0E 或 
+01-80-C2-00-00-03 或 
+
+01-80-C2-00-00-00 
+| 源MAC || 0x88cc || || || || 零或多个可选的TLV || 表示LLDP结束
+|}
+
+
+;目的MAC地址
+:LLDP协议的目的MAC地址总是是固定的几个值之一。<ref name=802.1ab>{{cite web|author1=ieee|title=IEEE Std 802.1AB-2009 ''IEEE Standard for Local and Metropolitan Area Networks -- Station and Media Access Control Connectivity Discovery''|url=http://standards.ieee.org/getieee802/download/802.1AB-2009.pdf|accessdate=2015-09-07|archive-date=2015-11-16|archive-url=https://web.archive.org/web/20151116020809/http://standards.ieee.org/getieee802/download/802.1AB-2009.pdf|dead-url=no}}</ref>{{rp|20}}
+:{| class="wikitable"
+! 名称 !! 目的MAC地址 !! 意义
+|-
+| Nearest bridge || 01-80-C2-00-00-0E || 包被限制在本地网络中，无法被任何桥或路由设备转发
+|-
+| Nearest non-TPMR bridge || 01-80-C2-00-00-03 || 包只被Two-Port MAC Relay (TPMR)转发，其他的任何桥或路由设备都不转发该数据包
+|-
+| Nearest Customer Bridge || 01-80-C2-00-00-00 || 只在两个Customer Bridge之间传播。
+|}
+
+; TLV
+: TLV是type, length, value的缩写<ref name=802.1ab/>{{rp|8}}，是LLDP中主要的数据格式。该数据类型的格式为：<ref name=802.1ab/>{{rp|24}}
+:{| class="wikitable"
+| TLV类型
+(7bits) 
+| TLV数据部分长度 
+(9bits)
+| TLV数据部分
+(0至511字节)
+|}
+
+TLV的类型部分的取值中，0~8以及127是规范中已经明确占用的数值，9~126则是预留的数值，其详细定义如下：<ref name=802.1ab/>{{rp|25}}
+:{| class="wikitable"
+|+ TLV类型部分定义
+! TLV type !! TLV name !! 是否必须存在
+|-
+| 0 || End Of LLDPDU || 必须
+|-
+| 1 || Chassis ID || 必须 
+|-
+| 2 || Port ID || 必须
+|-
+| 3 || Time To Live || 必须
+|-
+| 4 || Port Description || 可选
+|-
+| 5 || System Name || 可选
+|-
+| 6 || System Description || 可选
+|-
+| 7 || System Capabilities || 可选
+|-
+| 8 || Management Address || 可选
+|-
+| 9–126 || Reserved for future standardization || — 
+|-
+| 127 || Organizationally Specific TLVs || 可选
+|}
+
+== 外部链接 ==
+* http://engineerhardy.blogspot.jp/2014/06/lldp-link-layer-discovery-protocol.html {{Wayback|url=http://engineerhardy.blogspot.jp/2014/06/lldp-link-layer-discovery-protocol.html |date=20190701200922 }}
+* https://wiki.wireshark.org/LinkLayerDiscoveryProtocol {{Wayback|url=https://wiki.wireshark.org/LinkLayerDiscoveryProtocol |date=20151116020808 }}
+
+== 参考文献 ==
+{{reflist}}
+
+[[Category:网络协议|Category:网络协议]]
+[[Category:网络技术|Category:网络技术]]
+[[Category:以太网标准|Category:以太网标准]]
+[[Category:IEEE标准|Category:IEEE标准]]
+[[Category:链路协议|Category:链路协议]]
+[[Category:邏輯鏈路控制|Category:邏輯鏈路控制]]

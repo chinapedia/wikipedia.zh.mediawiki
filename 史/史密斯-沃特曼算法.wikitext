@@ -1,0 +1,196 @@
+{{TA|G1=IT|G2=Math}}
+[[File:Smith-Waterman-Algorithm-Example.gif|有框]]）]]
+'''史密斯-沃特曼算法'''（Smith-Waterman algorithm）是一种进行局部序列比对（相对于全局比对）的算法，用于找出两个核苷酸序列或蛋白质序列之间的相似区域。该算法的目的不是进行全序列的比对，而是找出两个序列中具有高相似度的片段。
+
+该算法由[[坦普尔·史密斯|坦普尔·史密斯]]和[[迈克尔·沃特曼|迈克尔·沃特曼]]于1981年提出<ref name="Smith1981">{{cite journal |author=Smith, Temple F.; and Waterman, Michael S. |title=Identification of Common Molecular Subsequences |journal=[[Journal_of_Molecular_Biology|Journal of Molecular Biology]] |volume=147 |pages=195-197 |year=1981 |url=http://dornsife.usc.edu/assets/sites/516/docs/papers/msw_papers/msw-042.pdf |doi=10.1016/0022-2836(81)90087-5 |pmid=7265238 |access-date=2016-04-26 |archive-date=2016-01-21 |archive-url=https://web.archive.org/web/20160121183003/http://dornsife.usc.edu/assets/sites/516/docs/papers/msw_papers/msw-042.pdf |dead-url=no }}</ref>。史密斯-沃特曼算法是[[尼德曼-翁施算法|尼德曼-翁施算法]]的一个变体，二者都是动态规划算法。这一算法的优势在于可以在给定的打分方法下找出两个序列的最优的局部比对（打分方法使用了置换矩阵和空位罚分）。该算法和尼德曼-翁施算法的主要区别在于该算法不存在负分（负分被替换为零），因此局部比对成为可能。回溯从分数最高的矩阵元素开始，直到遇到分数为零的元素停止。分数最高的局部比对结果在此过程中产生。在实际运用中，人们通常使用该算法的优化版本<ref name="Gotoh1982">{{cite journal |author=O. Gotoh |title=An Improved Algorithm For Matching Biological Sequences |journal=[[Journal_of_Molecular_Biology|Journal of Molecular Biology]] |volume=162 |pages=705-708 |year=1982 |doi=10.1016/0022-2836(82)90398-9}}</ref><ref name="Altschul1986">{{cite journal |author=Stephen F. Altschul; and Bruce W. Erickson |title=Optimal Sequence Alignment Using Affine Gap Costs |url=https://archive.org/details/sim_bulletin-of-mathematical-biology_1986_48/page/603 |journal=[[Bulletin_of_Mathematical_Biology|Bulletin of Mathematical Biology]] |volume=48 |pages=603-616 |year=1986 |doi=10.1007/BF02462326 }}</ref><ref name="Myers1988">{{cite journal |author=Eugene W. Myers; and Webb Miller |title=Optimal alignments in linear space |journal=[[Computer_applications_in_the_biosciences|Computer applications in the biosciences]] |volume=4 |pages=11-17 |year=1988 |doi=10.1093/bioinformatics/4.1.11}}</ref>。
+
+== 历史 ==
+生物学上一个基本问题是，一个基因或者蛋白是否和别的基因或者蛋白存在联系。蛋白质在序列层次的关联暗示了其同源性，同时暗示了它们可能有类似的功能。通过分析多个DNA或者蛋白质序列，我们可能会发现一些保守序列和区域。这种基因序列或者蛋白质序列之间关联性的分析就是通过序列比对来完成的。如今，人们完成了许多不同生物体的基因组分析，获得了大量的基因和蛋白质序列数据。序列比对能够向我们揭示某一生物体中蛋白质之间的关联以及蛋白质在不同生物体中的关联，从而进一步理解生命和进化。
+
+序列比对起源于1970年。Saul B. Needleman和Christian D. Wunsch于1970提出了一个启发式的同源算法<ref name="Needleman1970">{{cite journal |author=Saul B. Needleman; and Christian D. Wunsch |title=A general method applicable to the search for similarities in the amino acid sequence of two proteins |journal=[[Journal_of_Molecular_Biology|Journal of Molecular Biology]] |volume=48 |pages=443-453 |year=1970 |doi=10.1016/0022-2836(70)90057-4}}</ref>，称为尼德曼-翁施算法。该算法使用迭代的方法计算出一个矩阵，从而达到全局比对的效果。一些其他的启发式分析方法也在70年代被提出。Sankoff<ref name="Sankoff1972">{{cite journal |author=Sankoff D. |title=Matching Sequences under Deletion/Insertion Constraints |journal=[[Proceedings_of_the_National_Academy_of_Sciences_of_the_United_States_of_America|Proceedings of the National Academy of Sciences of the United States of America]] |volume=69 |pages=4-6 |year=1972 |doi=10.1073/pnas.69.1.4 }}</ref>，Reichert<ref name="Reichert1973">{{cite journal |author=Thomas A. Reichert; Donald N. Cohen; and Andrew K.C. Wong |title=An application of information theory to genetic mutations and the matching of polypeptide sequences |journal=[[Journal_of_Theoretical_Biology|Journal of Theoretical Biology]] |volume=42 |pages=245-261 |year=1973 |doi=10.1016/0022-5193(73)90088-X}}</ref>，Beyer<ref name="Beyer1974">{{cite journal |author=William A. Beyer; Myron L. Stein; Temple F. Smith; and Stanislaw M. Ulam  |title=A molecular sequence metric and evolutionary trees |url=https://archive.org/details/sim_mathematical-biosciences_1974-02_19_1-2/page/9  |journal=[[Mathematical_Biosciences|Mathematical Biosciences]] |volume=19 |pages=9-25 |year=1974 |doi=10.1016/0025-5564(74)90028-5 }}</ref>等人提出了一些严谨的数学的算法用来分析序列。然而这些方法通常难以揭示序列的生物学意义。 Sellers提出了一套测量序列距离的方法<ref name="Sellers1974">{{cite journal |author=Peter H. Sellers |title=On the Theory and Computation of Evolutionary Distances |journal=[[Journal_of_Applied_Mathematics|Journal of Applied Mathematics]] |volume=26 |pages=787-793 |year=1974 |doi=10.1137/0126070}}</ref>。沃特曼等于1976年在该方法的基础上，增加了插入和删除任意长度片段的方法<ref name="Waterman1976">{{cite journal |author=M.S Waterman; T.F Smith; and W.A Beyer |title=Some biological sequence metrics |journal=[[Advances_in_Mathematics|Advances in Mathematics]] |volume=20 |pages=367-387 |year=1976 |doi=10.1016/0001-8708(76)90202-4}}</ref>。该方法解决了如何用最小的基因突变的次数将一个序列转变成另一个序列的问题。之后，坦普尔·史密斯和迈克尔·沃特曼于1981年提出了史密斯-沃特曼算法，解决了局部比对问题。
+
+== 算法 ==
+[[File:Smith-Waterman-Algorithm-Scoring-1.png|有框]]
+设要比对的两序列为<math>A=a_1a_2...a_n</math>和<math>B=b_1b_2...b_m</math>，其中<math>n</math>和<math>m</math>分别为序列<math>A</math>和<math>B</math>的长度。
+# 确定置换矩阵和空位罚分方法
+#* <math>s(a,b)</math> - 组成序列的元素之间的相似性得分
+#* <math>W_k</math> - 长度为<math>k</math>的空位罚分
+# 建立得分矩阵<math>H</math>并初始化其首行和首列。该矩阵的大小为<math>n+1</math>行<math>m+1</math>列（注意计数从0开始）。
+#: <math>H_{k0}=H_{0l}=0, (0\le k\le n, 0\le l\le m)</math>
+# 从左到右，从上到下进行打分，填充得分矩阵<math>H</math>剩余部分
+#: <math>
+H_{ij} = \max\begin{cases} 
+H_{i-1,j-1} + s(a_i,b_j), \\
+\max_{k \ge 1} \{ H_{i-k,j} - W_k \}, \\
+\max_{l \ge 1} \{ H_{i,j-l} - W_l \}, \\
+0
+\end{cases} \qquad (1\le i\le n, 1\le j\le m)
+</math>
+#: 其中，
+#: <math>H_{i-1,j-1} + s(a_i,b_j)</math>表示将<math>a_i</math>和<math>b_j</math>比对的相似性得分，
+#: <math>H_{i-k,j} - W_k</math>表示<math>a_i</math>位于一段长度为<math>k</math>的删除的末端的得分，
+#: <math>H_{i,j-l} - W_l</math>表示<math>b_j</math>位于一段长度为<math>l</math>的删除的末端的得分，
+#: <math>0</math>表示<math>a_i</math>和<math>b_j</math>到此为止无相似性。
+# 回溯。从矩阵<math>H</math>中得分最高的元素开始根据得分的来源回溯至上一位置，如此反复直至遇到得分为<math>0</math>的元素。
+
+== 解释 ==
+史密斯-沃特曼算法通过字母的匹配，删除和插入操作，把两条序列进行排列。实际上插入和删除都是引入空位的操作（在不同序列上）。序列1上某一位置的插入相当于在序列2上对应位置的删除。在实际计算中，只需要考虑何时引入空位即可。
+
+该算法主要分两步，计算得分矩阵和寻找最优比对序列。可以简单描述为：
+# '''确定置换矩阵及空位罚分方法'''。置换矩阵赋予每一碱基对或残基对匹配或错配的分数，相同或类似则赋予正值，不同或不相似赋予0分或者负分。空位罚分决定了引入或延长空位的分值。研究者应当根据比对的目的选择合适的置换矩阵及空位罚分。另外通过比较不同的置换矩阵及空位罚分的组合所带来的比对结果也可以帮助研究者进行选择。
+# '''初始化得分矩阵'''。得分矩阵的长度和宽度分别为两序列的长度+1。其首行和首列所有元素均设为0。额外的首行和首列得以让一序列从另一序列的任意位置开始进行比对，分值为零使其不受罚分。
+# '''打分'''。对得分矩阵的每一元素进行从左到右、从上到下的打分，考虑匹配或错配（对角线得分），引入空位（水平或垂直得分）分别带来的结果，取最高值作为该元素的分值。如果分值低于0，则该元素分值为0。打分的同时记录下每一个分数的来源用来回溯。
+# '''回溯'''。通过动态规划的方法，从得分矩阵的最大分值的元素开始回溯直至分数为0的元素。具有局部最高相似性的片段在此过程中产生。具有第二高相似性的片段可以通过从最高相似性回溯过程之外的最高分位置开始回溯，即完成首次回溯之后，从首次回溯区域之外的最高分元素开始回溯，以得到第二个局部相似片段。
+
+=== 与尼德曼-翁施算法的比较 ===
+[[File:Alignment-Comparison.png|300px]]
+史密斯-沃特曼算法为局部比对算法，用于找出两序列中最相似的区域。尼德曼-翁施算法为全局比对算法，用于完整匹配两个序列。这两种算法的目不同，因此研究者在选择算法时要根据实际需求来决定。
+
+两种算法都使用了置换矩阵，空位罚分，得分矩阵，以及回溯的方法，具有一定的相似度。然而，史密斯-沃特曼算法与尼德曼-翁施算法的三个主要区别在于：
+{| class="wikitable"
+|-
+! !! 史密斯-沃特曼算法 !! 尼德曼-翁施算法
+|-
+| 初始化阶段 || 第一行和第一列全填充为 0 || 首行和首列需要考虑空位罚分
+|-
+| 打分阶段 || 若得分为负，则分数为零 || 得分可以为负
+|-
+| 回溯阶段 || 从最高分开始，回溯直至得分为 0 || 从右下角开始，回溯至左上角
+|}
+其中，打分阶段分数不为负是非常重要的一点区别。它使得对序列局部的比对成为可能。当任何位置分数低于0，即表示此前的序列不具有相似性；而此时将此元素分数设为0，即达到了“重设”的效果，使得从此位置开始的比对不受之前位置的影响。初始化阶段的区别使得史密斯-沃特曼算法中从一序列任意位置开始匹配另一序列不受罚分，而尼德曼-翁施算法因为要匹配完整的序列，所以两端的空位也需要罚分。
+
+=== 置换矩阵 ===
+每一碱基对或残基对匹配或错配的分数通常用一矩阵表示，称为置换矩阵。基本的置换矩阵为匹配则加分，错配则扣分。以核苷酸序列为例，若匹配为+1，错配为-1，则置换矩阵为：
+{| style="font-family: monospace" class="wikitable"
+! !! A !! G !! C !! T
+|- style="text-align: right;"
+! scope="row" | A
+| 1 ||  -1|| -1 || -1 
+|- style="text-align: right;"
+! scope="row" | G
+| -1 || 1 || -1 || -1 
+|- style="text-align: right;"
+! scope="row" | C
+| -1 || -1 || 1 || -1 
+|- style="text-align: right;"
+! scope="row" | T
+| -1 || -1 || -1 ||  1
+|}
+该置换矩阵可以表示为：
+<math>s(a_i,b_j) = \begin{cases}1, \quad a_i=b_j \\ -1, \quad a_i\ne b_j\end{cases}</math>
+
+不同的碱基对或残基对可以有不同的分数以适应于特定的场合。
+
+氨基酸序列比对的置换矩阵一般更加复杂。通常性质相似的残基对具有正分数，反之，不相似的具有负分数。此外，残基对的相似或不相似程度决定了分数的大小。参见{{tsl|en|Point accepted mutation||PAM}}，{{tsl|en|BLOSUM|BLOSUM|BLOSUM}}。
+
+=== 空位罚分 ===
+当碱基对或残基对之间匹配会导致更低分数时，需要空位的引入，即让碱基或残基与空位匹配。空位罚分决定了插入或者删除的分值。最基本的空位罚分方式为每次插入或者删除的得分相同。然而在生物学上，两序列之间一般存在着具有不同相似度的区域。另外，单个基因突变事件可能导致一长串空位的插入。因此，一个连续的较长的空位优于多个分散的小的空位。虽然多个分散的小的空位可以产生更多匹配，但一个连续的较长的空位代表这个区域只在一个序列中出现，使用后者可以避免为了得到高分而过度匹配这段序列。实现该方法只需要引入空位起始罚分和空位延长罚分的概念。空位起始罚分通常高于空位延长罚分。例如[http://www.ebi.ac.uk/Tools/psa/emboss_water/ EMBOSS Water] {{Wayback|url=http://www.ebi.ac.uk/Tools/psa/emboss_water/ |date=20201023172625 }}的默认参数为空位起始罚分=10，空位延长罚分=0.5。
+
+实际应用中空位罚分方法有多种（参见{{tsl|en|Gap_penalty|空位罚分|空位罚分}}），此处详细介绍这两种最常见的方法。设<math>W_k</math>为空位罚分函数，其中<math>k</math>为空位长度：
+
+==== 空位权值恒定模型 ====
+[[File:Smith-Waterman-Algorithm-Scoring-2.png|有框]]
+<math>W_k=kW_1</math>
+
+该模型空位的罚分正比于空位的长度。<math>W_1</math>为单个空位的罚分。使用该模型时，原史密斯-沃特曼算法可简化为：
+
+<math>
+H_{ij}=\max\begin{cases}
+H_{i-1,j-1}+s(a_i,b_j),\\
+H_{i-1,j}-W_1,\\
+H_{i,j-1}-W_1,\\
+0
+\end{cases}
+</math>
+
+此时该算法步数为<math>O(mn)</math>，<math>m</math>和<math>n</math>分别为两序列的长度。在对某一位置考虑空位罚分时，只需考虑相邻的上方的和左侧的位置，而不需考虑整列和整行。
+
+==== 空位延伸罚分模型 ====
+<math>W_k=u(k-1)+v \quad (u>0, v>0)</math>
+
+该模型考虑空位起始罚分和空位延长罚分，其中<math>v</math>为开始空位的罚分，<math>u</math>为每次延长空位的罚分。例如，一个长度为2的空位的罚分为<math>u+v</math>。未经优化的该模型的算法步数为<math>O(m^2n)</math>。Gotoh将该算法的步数优化至<math>O(mn)</math><ref name="Gotoh1982" />，然而，优化后的方法只能找出一个局部比对结果，并且并不保证能成功获得结果<ref name="Altschul1986" />。Altschul进一步优化了Gotoh的算法，在保持复杂度不变的情况下解决了Gotoh算法的不足<ref name="Altschul1986" />。Myers和Miller指出，Gotoh和Altschul的算法忽视了Hirschberg在1975年提出的在线性空间内进行序列比对的方法<ref name="Hirschberg1975">{{cite journal |author=D. S. Hirschberg |title=A linear space algorithm for computing maximal common subsequences |journal=[[Communications_of_the_ACM|Communications of the ACM]] |volume=18 |pages=341-343 |year=1975 |doi=10.1145/360825.360861}}</ref>，并在改进的算法中运用了该方法<ref name="Myers1988" />。Myers和Miller的算法仅使用<math>O(n)</math>空间，<math>n</math>为较短的序列的长度。
+
+==== 空位罚分例子 ====
+以两序列<tt>TACGGGCCCGCTAC</tt>和<tt>TAGCCCTATCGGTCA</tt>进行比对为例，分别考虑两种模型。
+
+当使用空位权值恒定模型时，即不考虑空位起始和延长的区别，得到如下结果（置换矩阵为DNAfull，空位起始和延长均为1.0，其他参数为默认）：
+ <tt>TACGGGCCCGCTA-C</tt>
+ <tt>||   | || ||| |</tt>
+ <tt>TA---G-CC-CTATC</tt>
+ 总得分为39.0
+当使用空位延伸罚分模型时，设空位起始罚分为5.0，空位延长罚分为1.0时，得到如下结果：
+ <tt>TACGGGCCCGCTA</tt>
+ <tt>||   |||  |||</tt>
+ <tt>TA---GCC--CTA</tt>
+ 总得分为27.0
+可以看出，空位延伸罚分模型虽然总分略低，但考虑空位起始罚分和空位延长罚分能够有效避免多个小的空位。
+
+=== 得分矩阵 ===
+得分矩阵的作用是对两序列中两两位置进行打分以逐步记录最优比对。动态编程的思想体现于此。最终的最优局部比对结果是由逐步扩展当前位置最优比对结果来实现的（即通过作出一系列的对如何比对当前位置可以得到更高分数的决定来得到最终结果）。矩阵的长度和宽度分别为两序列长度+1。额外的首行和首列是为了让序列的末端可以和空位匹配。首行和首列均设为0。以<tt>CTCAA</tt>和<tt>GGTCA</tt>为例，初始得分矩阵为：
+{| style="text-align: right;font-family: monospace" class="wikitable"
+|-
+! - !! - !! C !! T !! C !! A !! A
+|-
+! scope="row" | -
+| 0 || 0 || 0 || 0 || 0 || 0
+|-
+! scope="row" | G
+| 0 || || || || ||
+|-
+! scope="row" | G
+| 0 || || || || ||
+|-
+! scope="row" | T
+| 0 || || || || ||
+|-
+! scope="row" | C
+| 0 || || || || ||
+|-
+! scope="row" | A
+| 0 || || || || ||
+|}
+
+== 例子 ==
+以序列<tt>TGTTACGG</tt>和<tt>GGTTGACTA</tt>为例。使用如下参数：
+* 置换矩阵：<math>s(a_i,b_j) = \begin{cases}+3, \quad a_i=b_j \\ -3, \quad a_i\ne b_j\end{cases}</math>
+* 空位罚分：<math>W_k=kW_1, W_1=2</math>
+初始化得分矩阵，并进行打分。如下图所示。该图展示了该得分矩阵前三个元素的打分过程。黄色代表当前正在考虑的两个碱基。红色代表该位置得分的来源。
+[[File:Smith-Waterman-Algorithm-Example-Step1.png|有框]]
+打分完成后的得分矩阵如左下图所示。其中蓝色代表最高分元素。注意某些元素有不止一种得分来源，这样在回溯过程中会产生多个路径。如果有多个相同的最高分，则应当考虑每个最高分的回溯。回溯过程见右下图。局部最相似序列在从最高分回溯的过程中自右向左产生。
+{| class="wikitable"
+|-
+| [[File:Smith-Waterman-Algorithm-Example-Step2.png|无]]
+| [[File:Smith-Waterman-Algorithm-Example-Step3.png|无]]
+|-
+| 完成后的得分矩阵及最高分（蓝色）
+| 回溯过程以及比对结果
+|}
+该例的结果为：
+ <tt>G T T - A C</tt>
+ <tt>| | |   | |</tt>
+ <tt>G T T G A C</tt>
+
+== 相关链接 ==
+*[[生物信息学|生物信息学]]
+*[[序列比对|序列比对]]
+*[[尼德曼-翁施算法|尼德曼-翁施算法]]
+*[[莱文斯坦距离|莱文斯坦距离]]
+*[[BLAST_(生物信息学)|BLAST]]
+
+== 参考资料 ==
+{{reflist|2}}
+
+== 外部链接 ==
+*{{en}}[http://jaligner.sourceforge.net/ JAligner]{{Wayback|url=http://jaligner.sourceforge.net/ |date=20200813231108 }} — 一个Java实现的史密斯-沃特曼算法的开源程序
+*{{en}}[http://baba.sourceforge.net/ B.A.B.A.]{{Wayback|url=http://baba.sourceforge.net/ |date=20111002215457 }} — 一个带源代码并且动态解释该算法的应用
+*{{en}}[http://www.ebi.ac.uk/Tools/fasta FASTA/SSEARCH] {{Wayback|url=http://www.ebi.ac.uk/Tools/fasta |date=20100209032729 }} — [[欧洲生物信息研究所|欧洲生物信息研究所]]提供的在线服务
+*{{en}}[http://diagonalsw.sourceforge.net/ diagonalsw] {{Wayback|url=http://diagonalsw.sourceforge.net/ |date=20170125151451 }} — 一个C/C++实现的史密斯-沃特曼算法的程序，具有并行处理能力
+*{{en}}[https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library SSW] {{Wayback|url=https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library |date=20200911164417 }} — 一个C/C++实现的史密斯-沃特曼算法的程序，具有并行处理能力
+
+{{Bioinformatics}}
+{{字符串}}
+
+[[Category:生物信息学算法|Category:生物信息学算法]]
+[[Category:动态规划|Category:动态规划]]
+[[Category:序列排比算法|Category:序列排比算法]]
+[[Category:计算系统发生学|Category:计算系统发生学]]

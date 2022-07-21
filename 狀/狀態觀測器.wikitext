@@ -1,0 +1,225 @@
+[[File:Luenberger_Observer.svg|thumb]]
+
+'''狀態觀測器'''（{{lang-en|State observer}}）是[[控制理論|控制理論]]中配合受控體的系統，在已知受控體架構的情形下，可以根據受控體的輸入及輸出而估測其內部的[[状态空间|狀態]]，是許多實務應用的基礎。
+
+許多的控制理論都會假設可以知道系統的狀態，例如利用[[全狀態回授|全狀態回授]]來穩定線性系統的例子。不過許多系統都無法直接量測到實際的狀態，只能用狀態對輸出的影響來間接估計狀態。像隧道中的車輛就是一個例子。車輛在隧道中的速度不易直接量測，只可以用隧道中的實際狀態來估計。假如系統[[可觀測性|可觀測]]，可以從輸出配合狀態觀測器來完全估測系統的狀態。
+== 典型的觀測器模型 ==
+針對線性系統的狀態觀測器，最常用的是線性觀測器、[[滑動模式觀測器|滑動模式觀測器]]，也有在線性觀測器中加入立方項的觀測器。以下會說明線性觀測器的結構。
+
+=== 離散系統 ===
+線性非時變離散系統的狀態方程式如下：
+
+: <math>x(k+1) = A x(k) + B u(k)</math>
+
+: <math>y(k) = C x(k) + D u(k)</math>
+
+在時間<math>k</math>時，<math>x(k)</math>是系統狀態，<math>u(k)</math>是輸入，<math>y(k)</math>是輸出。狀態方程式提到系統目前的輸出以及未來的狀態是由目前狀態以及目前輸入所決定。若系統有[[可觀測性|可觀測性]]，可以用系統輸出<math>y(k)</math>來調整狀態觀測器的狀態。
+
+受控體的觀測器模型可以用上式來推導，也可以加入額外的項，確保觀測器在持續收到系統的輸入及輸出時，其狀態可以收斂到受控體的狀態。可以將系統的輸出減去觀測器的輸出，再乘以矩陣<math>L</math>，再加到狀態觀測器的方程式中，以產生如下式定義的Luenberger觀測器。其中的狀態觀測器的變數會加上hat: <math>\hat{x}(k)</math>和 <math>\hat{y}(k)</math>，以區隔實際系統的變數。
+<!-- insert plant with observer systems schematic -->
+
+: <math>\hat{x}(k+1) = A \hat{x}(k) + L \left[y(k) - \hat{y}(k)\right] + B u(k)</math>
+
+: <math>\hat{y}(k) = C \hat{x}(k) + D u(k)</math>
+
+觀測器漸近收斂的條件是觀測器誤差<math>e(k) = \hat{x}(k) - x(k)</math>在<math> k \rightarrow \infty </math>時，可以收斂到0。此離散系統的Luenberger觀測器漸近收斂的條件是矩陣<math> A - LC </math>的特徵值都在單位圓內。
+
+因為控制的需求，觀測器的輸出除了作為觀測器的輸入，也會透過增益矩陣<math>K</math>，成為受控體的輸入。
+: <math>u(k)= -K \hat{x}(k)</math>
+
+觀測器的方程式會變成：
+
+: <math>\hat{x}(k+1) = A \hat{x}(k) + L \left(y(k) - \hat{y}(k)\right) - B K \hat{x}(k)</math>
+
+: <math>\hat{y}(k) = C \hat{x}(k) - D K \hat{x}(k)</math>
+
+或是
+
+: <math>\hat{x}(k+1) = \left(A - B K \right) \hat{x}(k) + L \left(y(k) - \hat{y}(k)\right)</math>
+
+: <math>\hat{y}(k) = \left(C - D K\right) \hat{x}(k)</math>
+
+因為控制理論中的[[分離原理|分離原理]]，可將估測器以及控制器分開設計, 因此可以選擇<math>K</math>和<math>L</math>，以達到系統的整體穩定性。根據經驗法則，會選擇觀測器<math>A-LC</math> 的極點，使其比系統<math>A-BK</math>極點快十倍以上。
+
+=== 連續系統 ===
+
+連續系統中的觀測器和離散系統中的類似。會選擇觀測器增益<math>L</math>使連續系統誤差可以漸近收斂到0（當<math>A-LC</math>為[[赫維茲矩陣|赫維茲矩陣]]時會成立）
+
+針對連續時間線性系統
+
+: <math>\dot{x} = A x + B u, </math>
+
+: <math>y = C x + D u, </math>
+
+其中<math>x \in \mathbb{R}^n, u \in \mathbb{R}^m ,y \in \mathbb{R}^r</math>，觀測器類似以上離散系統的例子：
+
+: <math>\dot{\hat{x}} = A \hat{x}+ B u + L \left(y - \hat{y}\right) </math>.
+
+: <math>\hat{y} = C \hat{x} + D u, </math>
+
+觀測器誤差<math>e=x-\hat{x}</math>會滿足下式
+
+: <math> \dot{e} = (A - LC) e</math>.
+
+若<math>[A,C]</math>有[[可觀測性|可觀測性]]，可以適當選擇觀測器增益<math>L</math>，以調整矩陣<math>A-LC</math>的特徵值。另外，也可以使矩陣<math>A-LC</math>為[[赫維茲矩陣|赫維茲矩陣]]，讓觀測器誤差<math>e(t)</math>可以漸近收斂到0。
+
+=== 峰值現象以及其他的觀測器技術 ===
+
+若觀測器增益<math>L</math>很高，線性的Luenberger觀測器會很快收斂，但大增益會造成峰值現象（peaking phenomenon），初始的觀測器誤差會非常大，在實際使用上不安全<ref name="Khalil02">{{Citation
+ | last = Khalil
+ | first = H.K.
+ | year = 2002
+ | edition = 3rd
+ | url = http://www.egr.msu.edu/~khalil/NonlinearSystems/
+ | isbn = 978-0-13-067389-3
+ | title = Nonlinear Systems
+ | publisher = Prentice Hall
+ | location = Upper Saddle River, NJ
+ | accessdate = 2021-02-19
+ | archive-date = 2017-07-25
+ | archive-url = https://web.archive.org/web/20170725034944/http://www.egr.msu.edu/~khalil/NonlinearSystems/
+ | dead-url = no
+ }}</ref>。因此，會用非線性高增益觀測技術，可以快速收斂，又沒有峰值現象。例如可以在觀測器中使用[[滑動模式控制|滑動模式控制]]技術（[[滑動模式觀測器|滑動模式觀測器]]），使觀測器在有量測誤差的情形下，在有限時間內使觀測器狀態誤差變成零，其他有誤差的狀態，其行為會類似峰值減弱後的Luenberger觀測器。滑動模式觀測器類似[[卡尔曼滤波|卡尔曼滤波]]，有較理想的抗雜訊能力<ref name="UtkinGS99">{{citation|title=Sliding Mode Control in Electromechanical Systems|last1=Utkin|first1=Vadim|last2=Guldner|first2=Jürgen|last3=Shi|first3=Jingxin|year=1999|publisher=Taylor & Francis, Inc.|location=Philadelphia, PA|isbn=978-0-7484-0116-1}}</ref><ref name="Drakunov83">{{citation|title=An adaptive quasioptimal filter with discontinuous parameters|journal=Automation and Remote Control|last1=Drakunov|first1=S.V.|year=1983|volume=44|issue=9|pages=1167–1175}}</ref>。
+
+另一種作法是用多觀測器（multi observer），可以顯著的改善暫態，抑制觀測器的過沖。多觀測器可以適用在所有適用高增益的系統<ref name="MMObserver">{{citation|doi=10.1080/00207179.2014.1000380|bibcode=2015IJC....88.1209B|title=Multi modelling as new estimation schema for High Gain Observers|journal=International Journal of Control|last1=Bernat|last2=Stepien |first1=J.|first2=S.|year=2015|volume=88|issue=6|pages=1209–1222|s2cid=8599596}}</ref>。
+
+== 非線性系統的狀態觀測器 ==
+針對[[非線性系統|非線性系統]]，最常用的是高增益狀態觀測器、[[滑動模式觀測器|滑動模式觀測器]]以及擴展觀測器。
+
+為了說明非線性系統中的狀態觀測器，先考慮以下的無輸入非線性系統：
+
+: <math>\dot{x} = f(x)</math>
+
+其中<math>x \in \mathbb{R}^n</math>，也假設有量測輸出<math>y \in \mathbb{R}</math>如下
+
+: <math>y = h(x).</math>
+
+有許多設計觀測器的非近似式作法。以下提到的觀測器也可以適用於有輸入的系統
+
+: <math>\dot{x} = f(x) + B(x) u, </math>
+: <math>y = h(x), </math> .
+=== 線性化誤差動態系統===
+
+Krener和Isidori<ref name="KrenerIsidori83">{{citation|doi=10.1016/0167-6911(83)90037-3|title=Linearization by output injection and nonlinear observers|journal=System and Control Letters|last1=Krener|first1=A.J.|year=1983|volume=3|pages=47–52|last2=Isidori|first2=Alberto}}</ref>，以及Krener和Respondek<ref name="KrenerRespondek85">{{citation|doi=10.1137/0323016|title=Nonlinear observers with linearizable error dynamics|journal=SIAM Journal on Control and Optimization|last1=Krener|first1=A.J.|last2=Respondek|first2=W.|year=1985|volume=23|pages=197–216|issue=2}}</ref>有針對狀態觀測器的研究，若存在可線性化的轉換（[[微分同胚|微分同胚]]，類似[[回授線性化|回授線性化]]）<math>z=\Phi(x)</math>，使新變數的系統方程如下
+
+: <math>\dot{z} = A z+ \phi(y), </math>
+: <math>y = Cz. </math>
+
+Luenberger觀測器可以設計為
+
+: <math>\dot{\hat{z}} = A \hat{z}+ \phi(y) - L \left(C \hat{z}-y \right) </math>.
+
+轉換後變數<math>e=\hat{z}-z</math>的觀測器誤差可以滿足同一個方程式
+
+: <math> \dot{e} = (A - LC) e</math>.
+
+Gauthier、Hammouri和Othman<ref name="GauthierHammouriOthman92">{{citation|title=A simple observer for nonlinear systems applications to bioreactors |journal=IEEE Transactions on Automatic Control|last1=Gauthier|first1=J.P.|last2=Hammouri|first2=H.|last3=Othman|first3=S.|year=1992|doi=10.1109/9.256352|volume=37|issue=6|pages=875–880}}</ref>
+and Hammouri and Kinnaert<ref name="HammouriKinnaert96">{{citation|title=A New Procedure for Time-Varying Linearization up to Output Injection|journal=System and Control Letters|last1=Hammouri|first1=H.|last2=Kinnaert|year=1996|doi=10.1016/0167-6911(96)00022-9|first2=M.|volume=28|issue=3|pages=151–157}}</ref>已證明，若存在變換<math>z=\Phi(x)</math>，使系統可以轉換為以下的型式
+
+: <math>\dot{z} = A(u(t)) z+ \phi(y,u(t) ), </math>
+: <math>y = Cz, </math>
+
+則觀測器可以設計如下
+
+: <math>\dot{\hat{z}} = A(u(t)) \hat{z}+ \phi(y,u(t) ) - L(t) \left(C \hat{z}-y \right) </math>,
+
+其中<math>L(t)</math>是時變的觀測器增益。
+
+Ciccarella、Dalla Mora和Germani<ref name="CiccarellaDallaMoraGermani93">{{citation|title=A Luenberger-like observer for nonlinear systems |journal=International Journal of Control|last1=Ciccarella|first1=G.|last2=Dalla Mora|first2=M.|last3=Germani|first3=A.|year=1993|doi=10.1080/00207179308934406|volume=57|issue=3|pages=537–556}}</ref>有提供更進階以及一般性的結果，只需要簡單的規律性（regularity）假設，不需要非線性的轉換，證明觀測狀態可以全域收斂到實際狀態。
+
+== 多觀測器 ==
+多觀測器（Multi observer）是高增益觀測器的擴展，由一個觀測器到多個觀測器一起使用，可以讓多個模型同時作用。多觀測器會分為二層：一層包括了多個高增益觀測器，有相關同一組狀態旳不同的估測量，第二層決定第一層各估測量的權重。此演算法很容易實現，其中也沒有微分等有危險性的運算<ref name="MMObserver"/>。多觀測器的概念最早曾應用在適應控制中，用來取得資訊<ref>{{cite journal|last1=Narendra|first1=K.S.|last2=Han|first2=Z.|title=A new approach to adaptive control using multiple models|journal=International Journal of Adaptive Control and Signal Processing|date=August 2012|volume=26|issue=8|pages=778–799|doi=10.1002/acs.2269|issn=1099-1115}}</ref>。
+
+<gallery heights="293px" widths="588px">
+Multi observer.png|Multi Observer Schema
+</gallery>
+
+假設高增益觀測器有n+1個
+
+<math>\dot{\hat{x_k}}(t) = A \hat{x_k}(t)+ B \phi_0(\hat{x}(t), u(t)) - L (\hat{y_k}(t)-y(t)) </math>
+<math> \hat{y_k}(t) = C \hat{x_k}(t) </math>
+
+其中<math> k = 1...n + 1 </math>是觀測器的編號。第一層的觀測器包括了相同的增益<math> L </math>，但其啟始狀態<math> x_k(0) </math>不同。在第二層中會將所有<math> x_k(t) </math>（<math> k = 1...n + 1 </math>）觀測器的結果合併為一個，以得到單一狀態向量的估測值
+
+<math> \hat{y_k}(t) = \sum\limits_{k=1}^{n+1} \alpha_k(t) \hat{x_k}(t) </math>
+
+其中<math> \alpha_k \in \mathbb{R} </math>是加權因子。這些因子會改變，以提供第二層的估測用，並且提昇觀測器的效果。
+
+假設
+
+<math> \sum\limits_{k=1}^{n+1} \alpha_k(t) \xi_k(t) = 0 </math>
+
+且
+
+<math> \sum\limits_{k=1}^{n+1} \alpha_k(t) = 1 </math>
+
+其中<math> \xi_k \in \mathbb{R}^{n \times 1} </math>是某向量，會和第<math> k </math>個估測器的誤差<math> e_k(t) </math>有關。
+
+經過轉換，可以得到以下的線性回歸問題
+
+<math> [- \xi_{n + 1} (t)] = [\xi_{1}(t) - \xi_{n + 1}(t)\dots \xi_{k}(t) - \xi_{n + 1}(t)\dots \xi_{n}(t) - \xi_{n + 1}(t)]^T \begin{bmatrix} \alpha_1(t)\\ \vdots \\ \alpha_k(t)\\ \vdots\\ \alpha_n(t) \end{bmatrix}</math>
+
+根據上式，有可能估算<math> \alpha_k (t) </math>。為了要建構流形，需要映射<math> m:  \mathbb{R}^{n} \rightarrow  \mathbb{R}^{n} </math>在<math> \xi_k (t) = m(e_k(t))</math>之間，並且保證可以用可量測的訊號來計算<math> \xi_k (t) </math>。
+首先要從觀測器誤差中消除<math> \alpha_k(t) </math>的峰值現象
+
+<math> e_{\sigma}(t) =  \sum\limits_{k=1}^{n+1} \alpha_k(t) e_k(t) </math>.
+
+將<math>\eta_k(t)=\hat y_k (t) - y(t)</math>針算<math> n </math>的微分,可以找到以下的值<math> \xi_k(t) </math>
+
+<math> \xi_k (t) = \begin{bmatrix} 
+1 & 0 & 0 & \cdots & 0 \\ 
+CL & 1 & 0 & \cdots & 0 \\
+CAL & CL & 1 & \cdots & 0 \\
+CA^{2}L & CAL & CL & \cdots & 0 \\
+\vdots & \vdots & \vdots & \ddots \\ 
+CA^{n-2}L & CA^{n-3}L & CA^{n-4}L & \cdots & 1
+\end{bmatrix} 
+\begin{bmatrix} 
+\int\limits^t_{t-t_d} {{n-1} \atop \cdots} \int\limits^t_{t-t_d} \eta_k(\tau) d\tau\\ 
+\vdots \\
+\eta(t) - \eta(t-(n-1)t_d)
+\end{bmatrix}
+</math>
+
+其中<math>t_d > 0</math>是某時間常數。<math>\xi_k(t)</math>和<math>\eta_k(t)</math>和其積分有關，因此可以應用在控制系統上。
+而且<math> \alpha_k(t) </math>是在估測律中指定，因此此流形可以量測。第二層<math>\hat\alpha_k(t)</math>，其中<math>k = 1 \dots n + 1</math>是用來估測<math>\alpha_k(t)</math>係數。其映射誤差定義為
+
+<math>e_\xi(t) = \sum\limits_{k=1}^{n+1} \hat\alpha_k(t) \xi_k(t) </math>
+
+其中<math>e_\xi(t) \in \mathbb{R}^{n \times 1}, \hat\alpha_k(t) \in \mathbb{R} </math>。若係數<math>\hat\alpha(t) </math>等於<math>\alpha_k(t)</math>，映射誤差<math> e_\xi(t) = 0</math>。因此可用上式來計算<math> \hat x</math>，因為流形的特形，可以減少峰值現象。所創建的映射提供估測過程中許多的彈性。甚至可以在第二層估計<math>x(t)</math>的值，以計算狀態<math> x</math><ref name="MMObserver" />
+
+== 邊界觀測器 ==
+
+邊界觀測器（Bounding observers）<ref>{{Cite web |url=http://www.nt.ntnu.no/users/skoge/prost/proceedings/ecc03/pdfs/437.pdf |title=存档副本 |access-date=2021-02-19 |archive-date=2015-05-06 |archive-url=https://web.archive.org/web/20150506115226/http://www.nt.ntnu.no/users/skoge/prost/proceedings/ecc03/pdfs/437.pdf |dead-url=no }}</ref>或區間觀測器（Interval observers）<ref>{{Cite web |url=http://www.nt.ntnu.no/users/skoge/prost/proceedings/cdc-2008/data/papers/1446.pdf |title=存档副本 |access-date=2021-02-19 |archive-date=2016-03-04 |archive-url=https://web.archive.org/web/20160304025421/http://www.nt.ntnu.no/users/skoge/prost/proceedings/cdc-2008/data/papers/1446.pdf |dead-url=no }}</ref><ref>{{Cite web |url=https://hal.archives-ouvertes.fr/hal-01276439/ |title=存档副本 |access-date=2021-02-19 |archive-date=2020-03-19 |archive-url=https://web.archive.org/web/20200319195349/https://hal.archives-ouvertes.fr/hal-01276439/ |dead-url=no }}</ref> 是一組特殊的觀測器，會同時提供一個狀態的二個估測值，分別是真實值的上限和下限。真實值會在上下限估測範圍內。
+
+邊界範圍在實際應用上非常重要<ref>{{Cite web |url=http://www.iaeng.org/publication/WCE2010/WCE2010_pp656-661.pdf |title=存档副本 |access-date=2021-02-19 |archive-date=2020-05-18 |archive-url=https://web.archive.org/web/20200518043015/http://www.iaeng.org/publication/WCE2010/WCE2010_pp656-661.pdf |dead-url=no }}</ref><ref>{{cite journal | doi=10.1016/S0959-1524(99)00074-8 | volume=11 | issue=3 | title=Estimation of uncertain models of activated sludge processes with interval observers | journal=Journal of Process Control | pages=299–310| year=2001 | last1=Hadj-Sadok | first1=M.Z. | last2=Gouzé | first2=J.L. }}</ref>，可以知道每一個估測的精準度。
+
+在數學上，若適當的選擇<math> L </math>，可以用二種Luenberger觀測器來達到[[正向系統|正向系統]]特性<ref>Ait Rami, M., Tadeo, F., Helmke, U. (2011),
+"Positive observers for linear positive systems, and their implications",
+International Journal of Control 84
+</ref>：一個是上限<math> \hat{x}_U(k) </math>（在沒有雜訊及[[不確定性|不確定性]]的情形下，確保在<math> k \rightarrow \infty </math>時，<math> e(k) = \hat{x}_U(k) - x(k) </math>在零以上收斂到零），另一個是下限<math> \hat{x}_L(k) </math>（確保在<math> k \rightarrow \infty </math>時，<math> e(k) = \hat{x}_L(k) - x(k) </math>在零以下收斂到零）。因此<math> \hat{x}_U(k) \ge x(k) \ge \hat{x}_L(k) </math>恆成立。
+
+== 參考資料 ==
+{{reflist}}
+{{refbegin}}
+* {{Citation
+ | last = Sontag
+ | first = Eduardo
+ | year = 1998
+ | title = Mathematical Control Theory: Deterministic Finite Dimensional Systems. Second Edition
+ | publisher = Springer
+ | isbn = 0-387-98489-5
+}}
+{{refend}}
+
+== 相關條目 ==
+* [[滾動時域估計|滾動時域估計]]
+* [[卡尔曼滤波|卡尔曼滤波]]
+* {{le|扩展卡尔曼滤波器|Extended Kalman filter}}
+* [[正向系統|正向系統]]
+* [[軟感測器|軟感測器]]
+
+{{控制理論}}
+
+[[Category:控制理論|Category:控制理論]]
+[[Category:时间序列|Category:时间序列]]

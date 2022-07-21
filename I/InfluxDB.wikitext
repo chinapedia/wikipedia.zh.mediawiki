@@ -1,0 +1,50 @@
+{{Infobox_Software
+|name = InfluxDB
+|logo = [[File:Influxdb_logo.svg|320px]]
+|released ={{Start date|2013|09|24}}
+|caption =
+|developer = InfluxData
+|latest release version = 1.7.3
+|latest_release_date = {{Release date and age|2019|01|13}}
+|operating_system = [[跨平台|跨平台]]
+|programming language = [[Go|Go]]
+|genre = [[时序型数据库|时序型数据库]]
+|license = [[MIT许可证|MIT许可证]]
+|website = {{URL|https://influxdata.com/time-series-platform/influxdb/}}
+}}
+
+'''InfluxDB'''是一个由[https://www.influxdata.com/ InfluxData] {{Wayback|url=https://www.influxdata.com/ |date=20210122193128 }}开发的[[开源|开源]][[时序型数据库|时序型数据库]]<ref group="note">InfluxDB的代码托管于[[Github|Github]]。请参见： https://github.com/influxdata/influxdb {{Wayback|url=https://github.com/influxdata/influxdb |date=20201126133513 }}</ref>。它由[[Go|Go]]写成，着力于高性能地查询与存储时序型数据。InfluxDB被广泛应用于存储系统的监控数据，[[物联网|IoT]]行业的实时数据等场景。
+
+== 历史 ==
+
+Errplane公司<ref>{{Cite web|url=http://social.techcrunch.com/2013/03/18/errplane-performance-monitoring-and-alert-service-for-web-apps/|title=Y Combinator-Backed Errplane Launches Comprehensive Performance Monitoring And Alert Service For Web Apps|last=Lardinois|first=Frederic|website=TechCrunch|access-date=2016-09-07|archive-date=2019-10-17|archive-url=https://web.archive.org/web/20191017144105/https://techcrunch.com/2013/03/18/errplane-performance-monitoring-and-alert-service-for-web-apps/|dead-url=no}}</ref>在2013年下半年开始以开源项目的形式开始了InfluxDB的开发。其目的是为了提供一个高性能的监控以及告警的解决方案。在2014年11月，Errplane获得了由{{link-en|梅菲尔德风险投资公司|Mayfield Fund}}与[[Trinity_Ventures|Trinity Ventures]]领投的[[A轮|A轮]]投资，金额高达810万美元<ref>{{Cite web|url=http://social.techcrunch.com/2014/12/08/errplane-snags-8-1m-to-continue-building-open-source-influxdb-time-database/|title=Errplane Snags $8.1M To Continue Building Open Source InfluxDB Time Series Database|last=Miller|first=Ron|website=TechCrunch|access-date=2016-09-07|archive-date=2019-10-17|archive-url=https://web.archive.org/web/20191017144057/https://techcrunch.com/2014/12/08/errplane-snags-8-1m-to-continue-building-open-source-influxdb-time-database/|dead-url=no}}</ref>。在次年的2015年，Errplane正式更名为'''InfluxData Inc.'''，而更名后的InfluxData又分别于2016年9月，2018年2月获得了金额高达1600万美元和3500万美元的{{link-en|B轮|Venture round#Round names}}，C轮投资。<ref>{{cite web|url=https://techcrunch.com/2016/09/21/influxdata-closes-16-million-series-b-led-by-battery-ventures-to-organize-iot-data/|title=InfluxData closes $16 million Series B led by Battery Ventures to organize IOT data|first=John|last=Mannes|website=TechCrunch|access-date=2016-10-13|archive-date=2020-11-24|archive-url=https://web.archive.org/web/20201124134301/https://techcrunch.com/2016/09/21/influxdata-closes-16-million-series-b-led-by-battery-ventures-to-organize-iot-data/|dead-url=no}}</ref> 2019年2月，InfluxData, Inc.完成 Norwest Venture Partners 领投的6000万美元D轮融资，Battery Ventures、Sapphire Ventures、Mayfield Fund、Trinity Ventures等跟投。<ref>{{cite web|url=https://www.mg21.com/influxdata.html|title=开源时间序列数据库InfluxDB开发商：InfluxData, Inc.|publisher=mg21.com|date=2021-08-08|access-date=2021-08-08|archive-date=2021-08-14|archive-url=https://web.archive.org/web/20210814093646/https://www.mg21.com/influxdata.html}}</ref>
+
+== 技术概览 ==
+
+* InfluxDB在技术实现上充分利用了[[Go|Go语言]]的特性，无需任何外部依赖即可独立部署<ref name="Duffy2015">{{cite book|author=Michael Duffy|title=DevOps Automation Cookbook|url=https://books.google.com/books?id=k_SoCwAAQBAJ&pg=PA176|date=26 November 2015|publisher=Packt Publishing|isbn=978-1-78439-839-2|pages=176–}}</ref>。
+* InfluxDB提供了一个类似于[[SQL|SQL]]的查询语言并且一系列内置函数方便用户进行数据查询。
+* InfluxDB存储的数据从逻辑上由 '''Measurement''', '''tag组'''以及 '''field组'''以及一个'''时间戳'''组成的：
+** Measurement： 由一个字符串表示该条记录对应的含义。比如它可以是监控数据"cpu_load"，也可以是测量数据"average_temperature"
+** tag组： 由一组[[键值对|键值对]]组成，表示的是该条记录的一系列属性信息。同样的measurement数据所拥有的tag组不一定相同，它是无模式的(Schema-free)。tag信息是默认被索引的。
+** field组：也是由一组[[键值对|键值对]]组成，表示的是该条记录具体的value信息(有名称)。field组中可定义的value类型包括：64位整型，64位浮点型，字符串以及[[布尔型|布尔型]]。Field信息是无法被索引的。
+** 时间戳：就是该条记录的时间属性。如果插入数据时没有明确指定时间戳，则默认存储在数据库中的时间戳则为该条记录的入库时间。
+* InfluxDB支持基于HTTP的数据插入与查询。同时也接受直接基于TCP或UDP协议的连接.比如下面的示例就显示了一个基于HTTP协议的[[POST|POST]]请求的数据插入操作：
+<syntaxhighlight lang="shell">
+$curl -i -XPOST 'http://localhost:8086/write?db=mydb' --data-binary 'cpu_load_short,host=server01,region=us-west value=0.64 1434055562000000000'
+</syntaxhighlight>
+
+* InfluxDB允许用户定义数据保存策略(Retention Policies)来实现对存储超过指定时间的数据进行删除<ref group="note">作为时序型数据库，InfluxDB不提供用户直接删除或更新数据的途径</ref>或者[[降采样|降采样]]。
+
+== 闭源的集群组件 ==
+
+在向InfluxDB开源社区贡献了一个名为'''InfluxDB-Relay'''<ref group="note">Influx-relay的代码也托管于[[Github|Github]]. 请参见：https://github.com/influxdata/influxdb-relay {{Wayback|url=https://github.com/influxdata/influxdb-relay |date=20201111190210 }}</ref>的[[高可用性|高可用]]套件后。2016年3月，InfluxData宣布他们会将用于支撑InfluxDB集群[[水平扩展|水平扩展]]的组件作为闭源产品单独销售，从而为InfluxDB的持续开发建立一个稳定的收入来源<ref>{{cite web|url=https://influxdata.com/blog/update-on-influxdb-clustering-high-availability-and-monetization/|title=Update on InfluxDB Clustering, High-Availability and Monetization|publisher=influxdata|website=GitHub|accessdate=2016-08-08|date=2016-03-10|archive-date=2020-11-11|archive-url=https://web.archive.org/web/20201111221137/https://www.influxdata.com/blog/update-on-influxdb-clustering-high-availability-and-monetization/|dead-url=no}}</ref>。
+
+== 附注 ==
+<references group="note" />
+
+== 参考资料 ==
+{{Reflist|2}}
+
+[[Category:数据库|Category:数据库]]
+[[Category:開源資料庫管理系統|Category:開源資料庫管理系統]]
+[[Category:用Go編程的自由軟件|Category:用Go編程的自由軟件]]

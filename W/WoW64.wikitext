@@ -1,0 +1,47 @@
+{{NoteTA|G1=IT|G2=Windows}}
+'''WoW64'''（'''W'''indows 32-bit '''o'''n '''W'''indows '''64'''-bit）是[[Microsoft_Windows|Microsoft Windows]][[操作系统|操作系统]]的一个子系统，它提供在所有Windows [[64位|64位]]系统上运行[[32位元|32位元]][[应用程序|应用程序]]的能力——这包括[[Windows_XP_Professional_x64_Edition|Windows XP Professional x64 Edition]]、[[IA-64|IA-64]]和[[Windows_Server_2003|Windows Server 2003]]的64位版本，以及[[Windows_Vista|Windows Vista]]、[[Windows_Server_2008|Windows Server 2008]]、[[Windows_7|Windows 7]]、[[Windows_8|Windows 8]]、[[Windows_Server_2012|Windows Server 2012]]、[[Windows_8.1|Windows 8.1]]和[[Windows_10|Windows 10]]的64位版本。在[[Windows_Server_2008_R2|Windows Server 2008 R2]] Server Core中它成为了可选组件，并在[[Windows_Server_2016|Nano Server]]中不再提供。WoW64旨在解决32位与64位Windows中的许多差异，特别是涉及到Windows本身的结构变化。
+
+== 转换-{zh:库;zh-hans:库;zh-hant:函式庫;}- ==
+WoW64[[系统|子系统]]由一个轻量级[[兼容层|兼容层]]组成，其在所有64位Windows版本上有类似的接口。它的目的是创建一个32位环境，为未修改的32位Windows应用程序在64位系统上运行提供一个必需的接口。在技术上，WoW64使用三个[[动态链接库|-{zh:动态链接库;zh-hans:动态链接库;zh-hant:動態連結函式庫;}-]]（DLL）实现：
+# <code>Wow64.dll</code>，通往[[Windows_NT体系结构|Windows NT内核]]的核心接口，它转换32位与64位调用，包括[[指標_(電腦科學)|指针]]和[[调用栈|调用栈]]操作。
+# <code>Wow64win.dll</code>，为32位应用程序提供适当的入口点。
+# <code>Wow64cpu.dll</code>，负责解决进程从32位切换到64位模式。
+
+== 架构 ==
+尽管表面上看它在所有64位Windows版本上都表现相同，但WoW64的实现取决于目标[[微架構|处理器架构]]。举例来说，面向[[英特尔|Intel]] [[安腾|Itanium 2]]处理器（即[[IA-64|IA-64]]架构）开发的64位Windows版本，会使用<code>Wow64win.dll</code>在Itanium 2的独有[[指令集架構|指令集]]中设置x86指令的仿真。这种仿真会比 <code>Wow64win.dll</code>的函数在[[x86-64|x86-64]]架构（也称“Intel 64”或“AMD64”）上的计算代价更昂贵，因为当有必要执行32位[[线程|线程]]时，处理器硬件必须从64位模式切换到兼容模式，然后再切换回64位模式。
+
+== 注册表和文件系统 ==
+WoW64子系统也处理其他运行32位应用程序所必需的关键问题。它参与32位应用程序与Windows组件的互动，例如[[注册表|注册表]]，64位与32位应用程序会使用不同的键。举例来说，HKEY_LOCAL_MACHINE\Software\Wow6432Node 是 HKEY_LOCAL_MACHINE\Software 的32位环境版本，并且32位应用程序不会感觉到这种重定向。有些注册表键是等效从64位映射到32位，还有些则是内容镜像，这取决于Windows的版本。
+
+操作系统使用<code>[[环境变量|%SystemRoot%]]\system32</code>目录放置其64位函数库和可执行文件。这样做的原因是考虑到向后兼容性，许多旧款程序采用[[寫死|硬编码]]使用该路径。当执行32位应用程序时，WoW64会将32位透明重定向到 <code>%SystemRoot%\SysWoW64</code>，那里放着32位函数库和可执行文件。32位应用程序不会知道自己在64位操作系统上运行。32位应用程序可以通过伪目录<code>%SystemRoot%\sysnative</code>访问真实的存有64位函数库和可执行文件的文件夹<code>%SystemRoot%\System32</code> 。
+
+你会看到有两个Program Files目录可见，里面分别放着32位和64位应用程序。存储32位文件的目录名为 Program Files (x86) 以区分两者，而64位目录使用原有的 Program Files 为名，不附加任何限定名称。
+
+== 应用程序兼容性 ==
+只包含32位内核模式[[驱动程序|驱动程序]]，或者插入组件到仅64位实现的组件进程（例如Windows Explorer）的内存空间的32位应用程序不能在64位平台上执行。32位服务程序是支持的。SysWOW64文件夹位于操作系统所在分区的Windows文件夹，其包含许多支持32位应用程序的程序（例如cmd.exe、odbcad32.exe，为32位应用程序注册[[ODBC|ODBC]]连接等）。面向MS-DOS和Windows早期版本的16位应用程序通常不兼容64位版本的Windows Vista、7和8，但可以通过[[Windows_Virtual_PC|Windows Virtual PC]]或[[DOSBox|DOSBox]]运行在16位或32位的Windows操作系统上。32位版本的Windows XP、Vista、7和8在另一方面通常也可以几乎无问题地运行16位应用程序。16位应用程序不能直接运行在x64版本的Windows上，因为CPU在x64模式下运行时不支持VM86。
+
+[[Internet_Explorer|Internet Explorer]]实现了32位与64位两个应用程序版本，因为互联网上有许多32位[[ActiveX|ActiveX]]组件，而它们不可能在64位版本上运行。Internet Explorer的32位版本被定为默认版本，并且64位版本不能被设置为默认浏览器。<span class="cx-segment" data-segmentid="111"></span>
+
+WoW64 64位版本中透明层的一个[[Bug|程序错误]]<ref>{{Cite web|url=http://zachsaw.blogspot.com/2010/11/wow64-bug-getthreadcontext-may-return.html|title=WOW64 bug: GetThreadContext() may return stale contents|accessdate=2010-11-15|date=November 13, 2010|last=Saw|first=Zach|authorlink=|work=Zach Saw's Blog|archive-date=2021-07-02|archive-url=https://web.archive.org/web/20210702054814/http://zachsaw.blogspot.com/2010/11/wow64-bug-getthreadcontext-may-return.html}}</ref><ref>{{Cite web|url=http://social.msdn.microsoft.com/Forums/en/windowscompatibility/thread/1558e9ca-8180-4633-a349-534e8d51cf3a|title=WOW64 OS bug: Old 32-bit XP apps failing under Win7 WOW64|accessdate=2010-11-15|date=November 11, 2010|work=[[Microsoft_Developer_Network|Microsoft Developer Network]]|archive-url=https://web.archive.org/web/20101121052837/http://social.msdn.microsoft.com/Forums/en/windowscompatibility/thread/1558e9ca-8180-4633-a349-534e8d51cf3a|archive-date=2010-11-21|dead-url=yes}}</ref>导致所有依赖[[Windows_API|Windows API]]函数GetThreadContext的32位应用程序不兼容。此类应用包括应用程序调试器、调用堆栈跟踪器（例如<span class="cx-segment" data-segmentid="115"></span>[[集成开发环境|IDE]]显示调用堆栈）和使用[[垃圾回收_(計算機科學)|垃圾收集]]（GC）引擎的应用程序。受影响最广泛的一个GC引擎是[[貝姆垃圾收集器|Boehm GC]]<ref>{{Cite web|url=http://comments.gmane.org/gmane.comp.programming.garbage-collection.boehmgc/4188|title=Discussions about the Boehm Garbage Collector (Boehm GC).|accessdate=2010-11-25|archive-url=https://web.archive.org/web/20110716055556/http://comments.gmane.org/gmane.comp.programming.garbage-collection.boehmgc/4188|archive-date=2011-07-16|dead-url=yes}}</ref>，它被同样流行的[[Mono|Mono]]作为默认的垃圾收集引擎。虽然Mono截至2010年10月有一种新的、可选的GC（称作SGen-GC），但它与Boehm GC执行堆栈扫描的方式相同，因此它也不兼容WoW64。截至2010年11月15日，微软没有提供修复计划或变通解决方案。
+
+== 性能 ==
+据微软介绍，运行在WOW64下的32位软件与在32位Windows上的执行性能相近，但可能增加少许[[线程|线程]]和其他开销<ref name="VSdocLAA">{{Cite web|url=http://msdn.microsoft.com/en-gb/library/windows/desktop/aa384219(v=vs.85).aspx|title=Performance and Memory Consumption Under WOW64|accessdate=2013-05-06|work=|publisher=Microsoft|quote=|archive-url=https://web.archive.org/web/20130307175614/http://msdn.microsoft.com/en-gb/library/windows/desktop/aa384219(v=vs.85).aspx|archive-date=2013-03-07|dead-url=yes}}</ref>。
+
+一个32位应用程序在64位系统上可以完全使用4GB[[虚拟内存|虚拟内存]]，而在32位系统上，部分可寻址内存无法使用，因为那会被[[内核|内核]]和内存映射的外部设备（如[[显卡|显卡]]）使用。
+
+== 参见 ==
+* [[Windows_on_Windows|Windows on Windows]]
+* [[使用者帳戶控制|使用者帳戶控制]]也有一个机制，将旧款程序写入到特定区域的文件处理到新位置。无管理员权限的进程将文件写入到system32将被重定向到一个虚拟存储目录。
+* [[垫片_(程序设计)|垫片]]
+
+== 参考资料 ==
+{{Reflist|30em}}
+
+== 外部链接 ==
+* [http://msdn.microsoft.com/en-us/library/aa384249(VS.85).aspx 关于在64位Windows上运行32位应用的MSDN页面] {{Wayback|url=http://msdn.microsoft.com/en-us/library/aa384249(VS.85).aspx |date=20160901221741 }}{{en}}
+* [http://csi-windows.com/blog/all/73-windows-64-bit/379-what-is-wow64-windows-64-bit WOW64文件夹、变量、值和参考资料的综合资料] {{Wayback|url=http://csi-windows.com/blog/all/73-windows-64-bit/379-what-is-wow64-windows-64-bit |date=20140621053622 }}{{en}}
+
+{{Windows Components}}
+
+[[Category:Windows_NT|Category:Windows NT]]
+[[Category:兼容层|Category:兼容层]]

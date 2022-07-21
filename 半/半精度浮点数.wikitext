@@ -1,0 +1,71 @@
+{{Floating-point}}
+'''半精度浮点数''' 是一种被计算机使用的二进制[[浮点数|浮点]][[数据类型|数据类型]]。'''半精度浮点数'''使用2个字节（16位）来存储。
+
+在[[IEEE_754|IEEE 754-2008]]中，它被称作'''binary16'''。这种数据类型只适合存储对精度要求不高的数字，不适合用来计算。
+
+半精度浮点数是一种较新的浮点类型。 英伟达在2002年初发布的[[Cg语言|Cg语言]]中称它作 half 类型，并首次在2002年末发布的GeForce FX中实现。<ref>[[Nvidia|Nvidia]]</ref>[[光影魔幻工业|ILM]] 当时正在寻找一种拥有高动态范围，且不需过多消耗硬盘和内存，并且能像[[单精度浮点数|单精度浮点数]]和[[双精度浮点数|双精度浮点数]]那样被用来进行浮点计算的图像格式。<ref name="exr">{{Cite web |url=http://www.openexr.com/about.html |title=存档副本 |accessdate=2015-10-01 |archive-date=2013-05-08 |archive-url=https://web.archive.org/web/20130508221152/http://www.openexr.com/about.html |dead-url=no }}</ref>由[[SGI|SGI]]的John Airey领导的硬件加速可编程着色小组在1997年发明了作为'bali'设计工作的一部分的s10e5数据类型，曾在[[SIGGRAPH|SIGGRAPH]] 2000年的论文<ref name="sgi">{{Cite web |url=http://people.csail.mit.edu/ericchan/bib/pdf/p425-peercy.pdf |title=存档副本 |accessdate=2015-10-01 |archive-date=2017-08-12 |archive-url=https://web.archive.org/web/20170812092249/http://people.csail.mit.edu/ericchan/bib/pdf/p425-peercy.pdf |dead-url=no }}</ref>中介绍过。（见章节 4.3）并且在美国专利7518615<ref name="patent">{{Cite web |url=http://www.google.com/patents/US7518615 |title=存档副本 |accessdate=2015-10-01 |archive-date=2015-09-24 |archive-url=https://web.archive.org/web/20150924154222/http://www.google.com/patents/US7518615 |dead-url=no }}</ref>中被进一步记录。
+
+半精度浮点数可在[[OpenEXR|OpenEXR]]， [[JPEG_XR|JPEG XR]]， [[OpenGL|OpenGL]]， [[Cg语言|Cg语言]]、D3DX等[[计算机图形|计算机图形]]环境中使用。其与8位或16位整数相比具有[[动态范围|动态范围]]高的优点，可以使高对比度图片中更多细节得以保留。与[[单精度浮点数|单精度浮点数]]相比，它的优点是只需要一半的存储空间和[[带宽|带宽]]（但是会牺牲精度和数值范围）。<ref name="exr"/>
+
+== 定义 ==
+
+IEEE 754 标准指定了一个 '''binary16''' 要有如下的格式：
+* Sign bit（符号位）： 1 bit
+* Exponent width（指数位宽）： 5 bits
+* Significand precision（尾数精度）： 11 bits （有10位被显式存储）
+
+按如下顺序排列：
+
+[[Image:IEEE_754r_Half_Floating_Point_Format.svg|Image:IEEE 754r Half Floating Point Format.svg]]
+
+除非指数位全是0，否则就会假定隐藏的起始位是1。因此只有10位尾数在内存中被显示出来，而总精度是11位。据IEEE 754的说法，虽然尾数只有10位，但是尾数精度是11位的(log<sub>10</sub>(2<sup>11</sup>) ≈ 3.311 十进制数).
+
+=== 例子 ===
+
+ 0 01111 0000000000 = 1
+ 0 01111 0000000001 = 1 + 2<sup>−10</sup> = 1.0009765625 （1之后的最接近的数）
+ 1 10000 0000000000 = −2
+ 
+ 0 11110 1111111111 = 65504  （max half precision）
+ 
+ 0 00001 0000000000 = 2<sup>−14</sup> ≈ 6.10352 × 10<sup>−5</sup> （最小正指数）
+ 0 00000 1111111111 = 2<sup>−14</sup> - 2<sup>−24</sup> ≈ 6.09756 × 10<sup>−5</sup> （最大尾数）
+ 0 00000 0000000001 = 2<sup>−24</sup> ≈ 5.96046 × 10<sup>−8</sup> （最小正尾数）
+ 
+ 0 00000 0000000000 = 0
+ 1 00000 0000000000 = −0
+ 
+ 0 11111 0000000000 = infinity
+ 1 11111 0000000000 = −infinity
+ 
+ 0 01101 0101010101 = 0.333251953125 ≈ 1/3
+
+由于尾数的位数是奇数，所以默认情况下，1/3 这类的数会像[[双精度浮点数|双精度浮点数]]一样四舍五入。
+
+== 参阅 ==
+* [[IEEE_754|IEEE 754]]：  IEEE二进制浮点数算数标准 （IEEE 754）
+* ISO/IEC 10967， Language Independent Arithmetic
+* Primitive data type
+* RGBE image format
+
+==引用==
+{{reflist}}
+
+== 外部链接 ==
+* [http://www.mrob.com/pub/math/floatformats.html#minifloat Minifloats]{{Wayback|url=http://www.mrob.com/pub/math/floatformats.html#minifloat |date=20150908020321 }} （in ''Survey of Floating-Point Formats''）
+* [http://www.openexr.org/ OpenEXR site]{{Wayback|url=http://www.openexr.org/ |date=20080724003152 }}
+* [http://technet.microsoft.com/en-us/library/bb147247(v=vs.85).aspx Half precision constants]{{Wayback|url=http://technet.microsoft.com/en-us/library/bb147247(v=vs.85).aspx |date=20160307153132 }} from [[D3DX|D3DX]]
+* [https://web.archive.org/web/20150702114550/http://oss.sgi.com/projects/ogl-sample/registry/ARB/half_float_pixel.txt OpenGL treatment of half precision]
+* [ftp://ftp.fox-toolkit.org/pub/fasthalffloatconversion.pdf Fast Half Float Conversions]
+* [http://www.analog.com/static/imported-files/processor_manuals/ADSP_2136x_PGR_rev1-1.pdf Analog devices variant]{{Wayback|url=http://www.analog.com/static/imported-files/processor_manuals/ADSP_2136x_PGR_rev1-1.pdf |date=20090419063321 }} （four-bit exponent）
+* [http://www.mathworks.com/matlabcentral/fileexchange/23173 C source code to convert between IEEE double, single, and half precision can be found here]{{Wayback|url=http://www.mathworks.com/matlabcentral/fileexchange/23173 |date=20091031135212 }}
+* [http://csharp-half.svn.sourceforge.net/viewvc/csharp-half/ C# source code implementing a half-precision floating-point data type can be found here]{{dead link|date=2018年5月 |bot=InternetArchiveBot |fix-attempted=yes }}
+* [http://stackoverflow.com/a/6162687/237321 Java source code for half-precision floating-point conversion]
+* [http://gcc.gnu.org/onlinedocs/gcc/Half-Precision.html  Half precision floating point for one of the extended GCC features]{{Wayback|url=http://gcc.gnu.org/onlinedocs/gcc/Half-Precision.html |date=20150906183439 }}
+* [http://people.csail.mit.edu/ericchan/bib/pdf/p425-peercy.pdf]{{Wayback|url=http://people.csail.mit.edu/ericchan/bib/pdf/p425-peercy.pdf |date=20170812092249 }}
+
+{{数据类型}}
+
+[[Category:数据类型|Category:数据类型]]
+[[Category:二进制算术|Category:二进制算术]]
+[[Category:計算機算術|Category:計算機算術]]

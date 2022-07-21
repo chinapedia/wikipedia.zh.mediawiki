@@ -1,0 +1,89 @@
+{{NoteTA
+|G1=Communication
+|G2=Signals and Systems
+}}
+'''双边带抑制载波传输'''（'''DSB-SC'''）是通过[[振幅調變|振幅調變]]（AM）使得频率关于{{le|载波频率|carrier frequency}}对称分布，且将载波电平降低到最低程度（理想情况下完全抑制）的[[传输|传输]]方式。
+
+在DSB-SC调制中，与AM不同的是，不会传输载波；因此，大部分功率分布在边带，这意味着相同的功率下，DSB-SC比AM能够传输的基带信号能量更高。
+
+DSB-SC传输是{{le|双边带减幅载波传输|double-sideband reduced carrier transmission}}的一种特殊情况。它用于[[无线电数据广播|无线电数据系统]]。
+
+==频谱==
+DSB-SC从根本上说是无载波的[[振幅調變|调幅]]，因此减少了功率的浪费，让它的效率达到了50%。这相对于最大效率为33.333%的[[振幅調變|普通AM传输]]（DSB）在效率上有所提升，因为功率的2/3用在传输载波和含有相同信息的双边带的另一个边带了。[[单边带|单边带]]（SSB）抑制载波的效率为100%。
+
+DSB-SC信号频谱图：
+[[Image:Spectrum_DSBSC.svg|Image:Spectrum DSBSC.svg]]
+
+==产生==
+DSB-SC由混频器产生的。这是由载波信号乘以消息信号构成的。该过程的数学表示如下所示，其中用到了[[积化和差|积化和差]]公式。
+
+:<math>
+  \underbrace{V_m \cos \left( \omega_m t \right)}_{\mbox{Message}} \times 
+  \underbrace{V_c \cos \left( \omega_c t \right)}_{\mbox{Carrier}} = 
+  \underbrace{\frac{V_m V_c}{2} \left[ 
+    \cos\left(\left( \omega_m + \omega_c \right)t\right) +
+    \cos\left(\left( \omega_m - \omega_c \right)t\right)
+  \right]}_{\mbox{Modulated Signal}}
+</math>
+
+[[Image:DSBSC_Modulation.svg|Image:DSBSC Modulation.svg]]
+
+==解调==
+解调是通过将DSB-SC信号与载波信号相乘得到的。得到的信号然后通过一个低通滤波器以取出低频分量产生原始消息信号。如果{{le|调制指数|modulation index}}小于1，DSB-SC可以像AM一样，用简单的包络检波器解调。全深度调制需要载频重置。
+
+:<math>
+   \overbrace{\frac{V_m V_c}{2} \left[ 
+      \cos\left(\left( \omega_m + \omega_c \right)t\right) + \cos\left(\left( \omega_m - \omega_c \right)t\right)
+   \right]}^{\mbox{Modulated Signal}} \times
+   \overbrace{V'_c \cos \left( \omega_c t \right)}^{\mbox{Carrier}} 
+</math>
+::<math>= \left(\frac{1}{2}V_c V'_c\right)\underbrace{V_m \cos(\omega_m t)}_{\text{original message}} + \frac{1}{4}V_c V'_c V_m \left[\cos((\omega_m + 2\omega_c)t) + \cos((\omega_m - 2\omega_c)t)\right]</math>
+
+上面的公式表明，通过调制信号乘以载波信号，得到的是原始消息信号加上另一项的版本。由于 <math>\omega_c \gg \omega_m</math>，第二项的频率要比原始消息信号高得多。一旦此信号通过低通滤波器，高频率分量被去除，只留下原始消息。
+
+===失真和衰减===
+对于解调，解调振荡器的频率和相位必须与调制振荡器完全相同，否则将发生失真或衰减。 
+
+要得到此效果，需要以下条件：
+*要发送的消息信号：<math>f(t)</math>
+*调制（载波）信号：<math>V_c\cos(\omega_c t)</math>
+*（与调制信号的频率和相位偏差很小的）解调信号：<math>V'_c\cos\left[(\omega_c+\Delta\omega)t + \theta\right]</math>
+
+因此得到的信号为
+:<math>f(t) \times V_c\cos(\omega_c t) \times V'_c\cos\left[(\omega_c+\Delta\omega)t + \theta\right]</math>
+::<math>=\frac{1}{2}V_c V'_c f(t) \cos\left(\Delta\omega\cdot t+\theta\right) + \frac{1}{2}V_c V'_c f(t) \cos\left[(2\omega_c+\Delta\omega)t+\theta\right]</math>
+::<math>\xrightarrow{\text{After low pass filter}} \frac{1}{2}V_c V'_c f(t) \cos\left(\Delta\omega\cdot t+\theta\right)</math>
+
+<math>\cos\left(\Delta\omega\cdot t+\theta\right)</math> 项会导致消息信号的失真与衰减。特别地，若频率正确，但相位错误，<math>\theta</math> 的贡献是恒定衰减因子，而 <math>\Delta\omega\cdot t</math> 表示复原信号的循环反转，是严重的失真。
+
+[[File:Demodulation_distortion_diagram.png|File:Demodulation distortion diagram.png]]
+
+== 工作原理 ==
+最好用图示来说明。下面是一个消息信号，想要调制到载波上，由几个正弦分量组成。
+
+[[Image:DSBSC_Message_Signal.png|Image:DSBSC Message Signal.png]]
+
+这个消息信号的方程是 <math>s(t) = \frac{1}{2}\cos\left(2\pi 800 t\right) - \frac{1}{2}\cos\left( 2\pi 1200 t\right)</math>.
+
+此例中载波为 5 kHz（<math>c(t) = \cos\left( 2\pi 5000 t \right)</math>）正弦波—作图如下。
+
+[[Image:DSBSC_Carrier_Signal.png|Image:DSBSC Carrier Signal.png]]
+
+调制是通过时域乘法实现的，产生一个 5 kHz 载波信号，其振幅变化与消息信号相同。
+
+[[Image:DSBSC_Modulated_Output.png|Image:DSBSC Modulated Output.png]]
+
+<math>x(t) = \underbrace{\cos\left( 2\pi 5000 t \right)}_\mbox{Carrier} \times \underbrace{\left[\frac{1}{2}\cos\left(2\pi 800 t\right) - \frac{1}{2}\cos\left( 2\pi 1200 t\right)\right]}_\mbox{Message Signal}</math>
+
+"抑制载波"的名称是因为载波信号分量被抑制，载波不会出现在输出信号中。观察输出信号频谱就很明显：
+
+[[Image:DSBSC_Spectrum.png|Image:DSBSC Spectrum.png]]
+
+==参考文献==
+{{FS1037C MS188}}
+
+==外部链接==
+*A DSBSC generation and demodulation instrument is described as side application of a commercial lock-in amplifier in [http://www.zhinst.com/blogs/sadik/2013/08/dsb-sc/ Double-sideband Suppressed-carrier Modulation]{{Wayback|url=http://www.zhinst.com/blogs/sadik/2013/08/dsb-sc/ |date=20160709172945 }}.
+
+{{DEFAULTSORT:Double-Sideband Suppressed-Carrier Transmission}}
+[[Category:無線電調製模式|Category:無線電調製模式]]

@@ -1,0 +1,97 @@
+{{Orphan|time=2020-03-14T14:59:29+00:00}}
+在[[计算机科学|计算机科学]]中，'''最长递增子序列'''（'''longest increasing subsequence'''）问题是指，在一个给定的数值序列中，找到一个子序列，使得这个子序列元素的数值依次递增，并且这个子序列的长度尽可能地大。最长递增子序列中的元素在原序列中不一定是连续的。许多与数学、[[算法|算法]]、{{Link-en|随机矩阵理论|random matrix theory}}、[[表示论|表示论]]相关的研究都会涉及最长递增子序列。<ref>{{citation
+ | last1 = Aldous | first1 = David | author1-link = David Aldous
+ | last2 = Diaconis | first2 = Persi | author2-link = Persi Diaconis
+ | doi = 10.1090/S0273-0979-99-00796-X
+ | journal = Bulletin of the American Mathematical Society
+ | pages = 413–432
+ | issue = 04
+ | title = Longest increasing subsequences: from patience sorting to the Baik–Deift–Johansson theorem
+ | volume = 36
+ | year = 1999}}.</ref>解决最长递增子序列问题的算法最低要求O(''n'' log ''n'')的[https://w.wiki/3t6S 時間複雜度]，这里''n''表示输入序列的规模。<ref name="schensted">{{Citation | doi=10.4153/CJM-1961-015-3 | authorlink=Craige Schensted | last1=Schensted | first1=C. | title=Longest increasing and decreasing subsequences | mr = 0121305 | year=1961 | journal=[[Canadian_Journal_of_Mathematics|Canadian Journal of Mathematics]] | volume=13 | pages=179–191}}.</ref>
+
+== 例子 ==
+对于以下的原始序列
+:0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15
+最长递增子序列为
+:0, 2, 6, 9, 11, 15.
+值得注意的是原始序列的最长递增子序列并不一定唯一，对于该原始序列，实际上还有以下三个最长递增子序列
+:0, 4, 6, 9, 11, 15 
+:0, 4, 6, 9, 13, 15
+:0, 2, 6, 9, 13, 15
+:
+
+== 相关算法 ==
+最长递增子序列问题与[[最长公共子序列|最长公共子序列问题]]密切相关，后者具有[[动态规划|动态规划]]解决方案（时间复杂度为O''(n <sup>2</sup>)''）：序列S的最长递增子序列是S和T的最长公共子序列，其中T是对S进行排序的结果。但对于特殊情况，输入是整数 1, 2, ..., ''n'', 的排列，解决方案可以进一步改进，从而使时间复杂度降为O(''n'' log ''n'')<ref>{{Citation |author1=Hunt, J. |author2=Szymanski, T. | title = A fast algorithm for computing longest common subsequences | journal = Communications of the ACM | year = 1977 | pages = 350–353 | doi = 10.1145/359581.359603 | issue = 5 | volume = 20 | postscript = .}}</ref> 。
+
+排列图（permutaion graph)中的最大[[團_(圖論)|团]]是由'定义该图的排列中最长的递减子序列'定义的, 求最长的递减子序列在计算复杂度上（通过对所有数取它的负数）等同于求最长的递增子序列。 因此，最长递增子序列算法可用于有效地解决排列图中的[[分團問題|分团问题]]<ref>{{citation|first=M. C.|last=Golumbic|authorlink=Martin Charles Golumbic|title=Algorithmic Graph Theory and Perfect Graphs|series=Computer Science and Applied Mathematics|publisher=Academic Press|year=1980|page=159}}.</ref>。<br />
+
+== 高效的算法 ==
+下面概述的算法使用数组和[[二分查找算法|二分查找算法]]有效地解决了'''最长递增子序列'''问题。 它依次处理序列元素，保存当前找到的最长的递增子序列， 比如: [X[''0'']，X [''1'']]。在处理X[''i'']之后，算法会将值存储在两个数组中：
+
+:M[''j'']  — 存储值最小的X [''k'']的索引''k''，以使在范围''k≤i''上，以X [''k'']结尾的长度为j的子序列增加。 注意：''j'' ≤ ''(i+1)，''因为''j≥1''表示递增子序列的长度，而''k≥0''表示其终止的索引。
+:P[''k'']  — 将X [''k'']的前任索引存储在以X [''k'']结尾的最长递增子序列中。
+
+另外，该算法还存储了一个变量L，该变量L表示到目前为止找到的最长的递增子序列的长度。 下面的算法使用[[從零開始的編號|基于零的编号]]，为了清楚起见，M用M [''0'']填充，而M [''0'']未使用，因此M [''j'']对应于长度j的子序列。 实际的实现可以跳过M [''0'']并相应地调整索引。
+
+请注意，在算法的任何时候，序列
+
+:X[M[1]], X[M[2]], ..., X[M[''L'']]
+
+是递增的。 因为，如果长度''j≥2''的子序列以X [M [''j'']]结尾，则长度''j-1''的子序列以较小的值结尾：即以X [P [''M'']结尾的子序列 [''j'']]。 因此，我们可以使用二分查找在''O(log n)''时间内完成搜索。
+
+伪代码如下：
+[[File:LISDemo.gif|链接=https://en.wikipedia.org/wiki/File:LISDemo.gif]]
+ P = array of length N
+ M = array of length N + 1
+ 
+ L = 0
+ '''for''' i '''in range''' 0 '''to''' N-1:
+     // Binary search for the largest positive j ≤ L
+     // such that X[M[j]] <= X[i]
+     lo = 1
+     hi = L
+     '''while''' lo ≤ hi:
+         mid = ceil((lo+hi)/2)
+         '''if''' X[M[mid]] < X[i]:
+             lo = mid+1
+         '''else''':
+             hi = mid-1
+ 
+     // After searching, lo is 1 greater than the
+     // length of the longest prefix of X[i]
+     newL = lo
+ 
+     // The predecessor of X[i] is the last index of 
+     // the subsequence of length newL-1
+     P[i] = M[newL-1]
+     M[newL] = i
+     
+     '''if''' newL > L:
+         // If we found a subsequence longer than any we've
+         // found yet, update L
+         L = newL
+ 
+ // Reconstruct the longest increasing subsequence
+ S = array of length L
+ k = M[L]
+ '''for''' i '''in range''' L-1 '''to''' 0:
+     S[i] = X[k]
+     k = P[k]
+ 
+ '''return''' S
+由于该算法对每个序列元素都执行二分查找，因此时间复杂度为O(''n'' log ''n'')。 弗雷德曼 {{harvtxt|Fredman|1975}}讨论了该算法的一种变体，他将其归功于[[高德纳|高德纳]]。 在他研究的变体中，该算法在进行二分查找之前，测试每个值X [i]是否可以在常数时间内扩展当前最长的递增序列。 通过这种修改，算法在最坏的情况下只会进行{{nowrap|''n'' log<sub>2</sub> ''n'' − ''n'' log<sub>2</sub>log<sub>2</sub> ''n'' + O(''n'')}}个比较，对于比较算法（最高为O(''n'') 项中的恒定因子）而言，这是最佳选择<ref>{{citation
+ | last = Fredman | first = Michael L. | authorlink = Michael Fredman
+ | doi = 10.1016/0012-365X(75)90103-X
+ | issue = 1
+ | journal = Discrete Mathematics
+ | pages = 29–35
+ | title = On computing the length of longest increasing subsequences
+ | volume = 11
+ | year = 1975}}.</ref>。
+
+== 参考文献 ==
+{{Reflist}}
+
+[[Category:组合数学|Category:组合数学]]
+[[Category:动态规划|Category:动态规划]]

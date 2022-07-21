@@ -1,0 +1,60 @@
+{{NoteTA
+|G1=IT
+|G2=Windows
+}}
+[[File:Windows_PowerShell_1.0_PD.png|右]]上使用Win32控制台窗口的[[Windows_PowerShell|Windows PowerShell]]。]]
+[[File:GNU_Midnight_Commander_4.1.36_Windows_Vista.png|右]] {{tsl|en|Midnight Commander}}在Win32控制台中使用[[方框绘制字符|方框绘制字符]]。]]
+'''Win32控制台'''（{{lang-en|'''Win32 console'''}}）是[[Windows_API|Windows API]]系统内运行[[控制台应用程序|控制台应用程序]]的{{tsl|en|Text user interface|文本用户界面}}的实现。每个Win32控制台有一个[[屏幕缓冲区|屏幕缓冲区]]和一个[[緩衝器|输入缓冲区]]，并可在[[視窗|視窗]]或[[文本模式|文本模式]]的屏幕下使用，使用Alt+Enter键可在两者间切换。
+
+Win32控制台通常用于不需要显示图像但可能使用颜色的应用程序。以[[命令行界面|命令行界面]]工具举例：命令行解释器有[[命令提示字元|Windows命令行提示符]]、[[Windows_PowerShell|Windows PowerShell]]；[[檔案管理器|文件管理器]]有{{tsl|en|Far Manager}}和{{tsl|en|Midnight Commander}}；编辑器有{{tsl|en|MS-DOS Editor|MS-DOS编辑器}}。
+
+== 窗口与全屏模式 ==
+Win32控制台应用程序可以在两种模式下运行。
+
+一种模式是文字在一个[[視窗|視窗]]中，用户使用操作系统的[[字体光栅化|字体光栅化]]。这种模式下，应用程序的[[人机交互|人机交互]]接口由窗口系统控制。这类似[[X_Window系統|X Window系統]]的应用程序，例如[[xterm|xterm]]。
+
+全屏模式下的Win32控制台使用硬件的文本模式，上传[[计算机字体|计算机字体]]到[[显示卡|显示卡]]。这类似文本{{tsl|en|System console|系统控制台}}。全屏将使用Windows内置的[[视频图形阵列|VGA]]驱动程序，而不会使用任何已安装的显卡驱动程序，除非那个驱动程序为VGA兼容。<ref name="MSDN SVGA">{{cite|url=http://msdn.microsoft.com/en-us/library/windows/hardware/ff570169(v=vs.85).aspx|accessdate=2012-11-14|title=VGA-Compatible Video Miniport Drivers|date=2012-10-16|archive-date=2016-03-15|archive-url=https://web.archive.org/web/20160315033955/https://msdn.microsoft.com/en-us/library/windows/hardware/ff570169(v=vs.85).aspx}}</ref>因此，它只支持VGA兼容的文本模式，最大字符[[显示分辨率列表|分辨率]]为80{{tsl|en|Characters per line|每行字符数|列}}、28行。<ref name="VGA Fundamentals">{{cite|chapter=VGA Fundamentals, Part II: DOS Graphics|title=The PC Graphics Handbook (for C++ Programmers)|author=Julio Sanchez|author2=Maria P. Canton|year=2003|type=Book|page=125|isbn=0849316782|publisher=CRC Press}}</ref>这与其他操作系统中的兼容控制台存在差异（例如{{tsl|en|Linux console|Linux控制台}}），它们可以使用不同的驱动程序显示更高的分辨率。因为已停止支持VGA模式，此模式在[[Windows_Vista|Windows Vista]]的[[Windows_Display_Driver_Model|Windows Display Driver Model]]（WDDM）中已不再使用。<ref name="fullscreen-deprecated">{{cite web|url=http://support.microsoft.com/kb/926657|title=Some 16-bit DOS-based Programs and the Command Prompt will not run in full-screen mode in Windows Vista and in Windows 7|date=2011-09-23|work=Support|publisher=Microsoft|access-date=2017-01-14|archive-date=2021-04-02|archive-url=https://web.archive.org/web/20210402131948/https://support.microsoft.com/en-us/topic/some-16-bit-dos-based-programs-and-the-command-prompt-will-not-run-in-full-screen-mode-in-windows-vista-and-in-windows-7-255d6c86-7c40-6034-8c7e-c4d1c6d471d1}}</ref>通过安装Windows XP的显示驱动程序可能规避此问题，<ref name="fullscreen-deprecated">{{cite web|url=http://support.microsoft.com/kb/926657|title=Some 16-bit DOS-based Programs and the Command Prompt will not run in full-screen mode in Windows Vista and in Windows 7|date=2011-09-23|work=Support|publisher=Microsoft}}</ref>但[[Windows_8|Windows 8]]及之后的版本只接受WDDM驱动程序。<ref>{{cite web|url=http://msdn.microsoft.com/en-us/library/windows/hardware/ff569512.aspx|title=Roadmap for Developing Drivers for the Windows 2000 Display Driver Model (XDDM)|accessdate=16 December 2013|date=16 November 2013|work=Windows Dev Center - Hardware|publisher=[[Microsoft|Microsoft]]|quote=XDDM and VGA drivers will not compile on Windows 8 and later versions|archive-date=2016-03-04|archive-url=https://web.archive.org/web/20160304065505/https://msdn.microsoft.com/en-us/library/windows/hardware/ff569512.aspx}}</ref>
+
+使用{{键盘按钮|Alt|Enter}}组合键可以在这两种模式间切换。在[[类Unix系统|类Unix系统]]系统的文本环境中通常没有这样的功能。
+
+== 细节 ==
+输入缓冲区是一个存储事件的队列，事件来自[[键盘|键盘]]、[[鼠标|鼠标]]等。输出缓冲区是一个存储字符以及其属性的网格矩阵。一个控制台窗口可能有多个输出缓冲区，但同一时刻只有一个能处于活动状态（即显示）。
+
+控制台窗口可能会在桌面上显示为一个正常窗口，或在显卡驱动程序允许所选的屏幕尺寸时切换到全屏以使用真正的硬件文本模式。在后台非活动模式时显示模式会被锁定，因此闪烁不会有效。另外，不能使用下划线属性。
+
+程序可以通过高级函数（例如<code>ReadConsole</code>和<code>WriteConsole</code>）或底层函数（例如<code>ReadConsoleInput</code>和<code>WriteConsoleOutput</code>）访问Win32控制台。这些高级函数比Win32[[图形用户界面|图形用户界面]]（GUI）受到更多限制。例如，程序不可能更改[[调色板|调色板]]，也不可能使用这些函数修改控制台使用的[[字型|字体]]。<ref>A hack is available: [http://www.catch22.net/sites/default/source/files/setconsoleinfo.c SetConsolePalette] {{Wayback|url=http://www.catch22.net/sites/default/source/files/setconsoleinfo.c |date=20161007104120 }}</ref>
+
+Win32控制台程序经常被误认为是[[MS-DOS|MS-DOS]]应用程序，在[[Windows_9x|Windows 9x]]系列上尤为常见。但是，Win32控制台应用程序只是本地Win32应用程序的一种特殊形式。32位元Windows可以通过使用{{tsl|en|Virtual DOS machine|DOS虚拟机|NT DOS虚拟机}}（NTVDM）在Win32控制台中运行MS-DOS程序。
+
+早期版本的Windows中没有对控制台的原生支持，这是因为[[Windows_3.1|Windows 3.1]]及更早版本的Windows只是MS-DOS的一个图形界面，在早期Windows版本上运行的大多数文本程序实质上是在窗口中运行的MS-DOS程序。为简化将应用程序移植到Windows的任务，早期版本的[[Microsoft_Visual_C++|Visual C++]]是随在常规窗口中实现基本控制台的库{{tsl|en|QuickWin}}一起提供。面向Borland C++类似的库被称为EasyWin。
+
+== 实现 ==
+
+=== Windows 9x ===
+与[[Windows_NT|Windows NT]]相比，[[Windows_9x|Windows 9x]]支持较差，因为它的控制台窗口运行在{{tsl|en|Virtual DOS machine|DOS虚拟机}}中，并因此对Win32控制台应用程序的键盘输入是直接由运行DOS虚拟机的'''conagent.exe'''挂钩（Hook）截取。<code>conagent.exe</code>然后调用'''Vcond''' （一个[[VxD|VxD]]）'''，Vcond'''然后必须将键盘输入传递给系统虚拟机，并最终到达Win32控制台应用程序。除了性能问题，这种实现还有一个问题，DOS虚拟机不能看到Win32控制台应用程序本应看到的本地驱动器，这可能引致混乱。
+
+在Windows 9x上，屏幕缓冲区反映了{{tsl|en|VGA-compatible text mode|VGA文本缓冲区}}的结构，每个字符用两个[[字节|字节]]存储：字符代码一个字节，属性一个字节（字符必须在{{tsl|en|OEMCP|OEM字符集}}中，属性表示高强度背景/不闪烁）。如果使用真实的VGA文本模式，操作速度将大大加快。
+
+=== Windows NT和Windows CE ===
+Windows NT家族的操作系统上是由[[客户端/服务器运行时子系统|客户端/服务器运行时子系统]]负责Win32控制台窗口，<ref>{{Cite web |url=http://www.microsoft.com/technet/security/advisory/928604.mspx# |title=Microsoft Security Advisory (930181): Exploit Code Published Affecting Windows Client Server Run-Time Subsystem |access-date=2017-01-14 |archive-url=https://web.archive.org/web/20081213001113/http://www.microsoft.com/technet/security/advisory/928604.mspx |archive-date=2008-12-13 |dead-url=yes }}</ref>但从[[Windows_Vista|Windows Vista]]开始，它已将大部分工作卸任至单独的[[可执行文件|可执行文件]]“conhost.exe”。
+
+在Windows NT和Windows CE上，屏幕缓冲区为每个字符使用四个字节：字符代码两个字节，属性两个字节。字符使用[[Unicode|Unicode]]（[[UTF-16|UCS-2]]）的16位子集编码。<ref>{{cite web|url=http://msdn.microsoft.com/en-us/library/ms682087(VS.85).aspx|title=Console Reference|accessdate=2010-01-01|year=2009|publisher=Microsoft|archive-date=2017-07-04|archive-url=https://web.archive.org/web/20170704005356/https://msdn.microsoft.com/en-us/library/ms682087(VS.85).aspx}}</ref>为了[[向后兼容|向后兼容]]，控制台API有两个版本：Unicode和非Unicode。非Unicode版本API可以使用[[代码页|代码页]]切换以扩展字符显示的范围（但仅在该控制台窗口使用扩展可用代码范围的[[TrueType|TrueType]]字体时）。[[UTF-8|UTF-8]]甚至可以“代码页65001”使用（仅显示完整Unicode的UCS-2子集{{Fact|date=September 2014}}）。
+
+== 参见 ==
+* [[命令行界面|命令行界面]]
+* [[殼層|殼層]]（Shell）
+* {{tsl|en|System console|系统控制台}}
+* {{tsl|en|Linux console|Linux控制台}}
+* {{tsl|en|Text-based (computing)|基于文本 (计算机)}}
+
+== 注释 ==
+{{reflist}}
+
+== 外部链接 ==
+* [http://msdn2.microsoft.com/library/ms682087.aspx MSDN控制台API参考资料]
+
+{{Microsoft APIs}}
+{{Windows Components}}
+
+[[Category:文本用户界面|Category:文本用户界面]]
+[[Category:Windows管理|Category:Windows管理]]

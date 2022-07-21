@@ -1,0 +1,49 @@
+{{NoteTA
+|G1=IT
+}}
+'''DNSCurve'''是[[Daniel_J._Bernstein|Daniel J. Bernstein]]设计的一种[[域名系统|域名系统]]（DNS）的新安全协议。
+
+== 描述 ==
+DNSCurve使用[[Curve25519|Curve25519]]<ref>{{Cite web|url=http://cr.yp.to/ecdh.html|title=Curve25519: high-speed elliptic-curve cryptography|accessdate=30 January 2013|author=D. J. Bernstein|archive-date=2011-07-14|archive-url=https://web.archive.org/web/20110714062415/http://cr.yp.to/ecdh.html|dead-url=no}}</ref>[[椭圆曲线加密算法|椭圆曲线加密算法]]建立[[Salsa20|Salsa20]]使用的密钥，配以MAC函数[[Poly1305|Poly1305]]，用来加密和验证[[域名系统|解析器]]与身份验证服务器之间的DNS[[網路封包|網路封包]]。远端验证服务器的[[公开密钥加密|公钥]]放在NS记录中，以便递归解析器了解服务器是否支持DNSCurve。键值以[[魔术字|魔术字符串]]<code>uz5</code>开头，后随51字节的{{tsl|en|Base32}}编码的服务器的255位公钥。例如，以[[BIND|BIND]]格式来看：
+ example.com. IN NS uz5bcx1nh80x1r17q653jf3guywz7cmyh5jv0qjz0unm56lq7rpj8l.example.com.
+解析器然后向服务器发送一个包含DNSCurve公钥、96位[[nonce|nonce]]和一个包含查询的加密箱的数据包。加密箱为采用解析器的私钥、服务器的公钥和nonce创建。服务器的响应包含不同的96位nonce及其自身的加密箱，其中包含查询的答案。
+
+DNSCurve中使用的加密工具也在'''CurveCP'''中使用，它是基于[[用户数据报协议|UDP]]而非[[传输控制协议|TCP]]协议，使用[[椭圆曲线加密算法|椭圆曲线加密算法]]来加密和认证数据。一个类比是，[[域名系统安全扩展|DNSSEC]]像使用[[良好隱私密碼法|PGP]]加密一个网页，而CurveCP和DNSCurve像是使用[[傳輸層安全協議|SSL]]来加密和身份验证信道。正如PGP签名的网页可以通过SSL加密的信道发送，DNSSEC的数据也可通过DNSCurve保护。
+
+DNSCurve声称优于以前的DNS服务：<ref>{{Cite web|url=https://dnscurve.org/|title=Introduction to DNSCurve|accessdate=16 March 2016|date=22 June 2009|archive-date=2017-01-04|archive-url=https://web.archive.org/web/20170104090700/http://dnscurve.org/|dead-url=no}}</ref>
+* 保密——普通的DNS请求和响应不会加密，并且任何攻击者都可窥视内容。
+* 完整——普通的DNS有一些保护，但有耐心并嗅探的攻击者可以伪造DNS记录。DNSCurve加密并验证的数据则防止这些情况。
+* 可用——普通的DNS没有防护嗅探攻击者发送的一些伪造数据包制造[[阻斷服務攻擊|阻斷服務攻擊]]（DoS）攻击。DNSCurve识别并丢弃伪造的DNS数据包，并为容易受到DoS攻击的SMTP、HTTP和HTTPS提供一些保护。
+
+== 安全 ==
+DNSCurve使用256位[[椭圆曲线加密算法|椭圆曲线加密算法]]，[[國家標準技術研究所|NIST]]估计大致相当于3072比特[[RSA加密演算法|RSA]]。<ref>{{cite web|url=http://www.keylength.com/en/4/|title=NIST Recommendations (2011)|accessdate=2017-01-03|archive-date=2017-03-01|archive-url=https://web.archive.org/web/20170301183147/https://www.keylength.com/en/4/|dead-url=no}}</ref>ECRYPT报告了类似的估计。<ref>{{cite web |url=http://www.ecrypt.eu.org/documents/D.SPA.17.pdf |title=ECRYPT II Yearly Report on Algorithms and Keysizes (2010-2011) |deadurl=yes |archiveurl=https://web.archive.org/web/20120602083834/http://www.ecrypt.eu.org/documents/D.SPA.17.pdf |archivedate=2012-06-02 |accessdate=2017-01-03 }}</ref>它为每个查询都使用公钥加密（类似SSH和SSL），以及96比特nonces以防止重放攻击。Google安全官Adam Langley称：“很大概率上，没有人能在不使用一台大型的[[量子计算机|量子计算机]]的情况下解决curve25519的单个实例。”<ref>{{cite web|url=http://www.quora.com/How-secure-is-djbs-Curve25519|title=Adam Langley on curve25519 security}}</ref>
+
+== 速度 ==
+Adam Langley在他的个人网站上展示了DNSCurve所使用的curve25519的速度测试，它是测试中最快的椭圆曲线加密法。<ref>{{cite web|url=http://www.imperialviolet.org/2010/12/21/eccspeed.html|title=Adam Langley: What a difference a prime makes|accessdate=2017-01-03|archive-date=2016-09-19|archive-url=https://web.archive.org/web/20160919103647/https://www.imperialviolet.org/2010/12/21/eccspeed.html|dead-url=no}}</ref>根据[[美国国家安全局|NSA]]所说，椭圆曲线加密法在增加密钥大小的同时，几何速率方面的性能优于RSA和Diffie-Hellman。<ref>{{cite web|url=http://www.nsa.gov/business/programs/elliptic_curve.shtml|title=The Case for Elliptic Curve Cryptography|accessdate=January 17, 2009|publisher=[[National_Security_Agency|NSA]]|archiveurl=https://web.archive.org/web/20090117023500/http://www.nsa.gov/business/programs/elliptic_curve.shtml|archivedate=2009-01-17|deadurl=yes}}</ref>
+
+== 实现 ==
+DNSCurve通过<ref>{{Cite web|url=http://shinobi.dempsky.org/~matthew/patches/djbdns-dnscurve-20090602.patch|title=DNSCurve patch for dnscache|deadurl=yes|archiveurl=https://archive.is/20121228005750/http://shinobi.dempsky.org/~matthew/patches/djbdns-dnscurve-20090602.patch|archivedate=2012-12-28|accessdate=2017-01-03}}</ref>Matthew Dempsky为dnscache的一个补丁取得了首个递归支持。Dempsky也有一个[[GitHub|GitHub]]代码库，里面包括Python DNS查询工具和一个C语言编写的转发器。<ref>{{Cite web|url=https://github.com/mdempsky/dnscurve|title=Matthew Dempsky's DNSCurve repo on GitHub|accessdate=2017-01-03|archive-date=2015-08-14|archive-url=https://web.archive.org/web/20150814235406/https://github.com/mdempsky/dnscurve/|dead-url=no}}</ref>Adam Langley同样有一个GitHub代码库。<ref>{{Cite web|url=https://github.com/agl/dnscurve|title=Adam Langley's DNSCurve repo|accessdate=2017-01-03|archive-date=2018-06-10|archive-url=https://web.archive.org/web/20180610232446/https://github.com/agl/dnscurve|dead-url=no}}</ref>有一个权威转发器名为CurveDNS<ref>{{Cite web|url=http://curvedns.on2it.net/|title=CurveDNS: A DNSCurve Forwarding Name Server|accessdate=2017-01-03|archive-date=2011-01-02|archive-url=https://web.archive.org/web/20110102041645/http://curvedns.on2it.net/|dead-url=no}}</ref>，它允许DNS管理员保护现有的安装而无须打补丁。OpenDNS已发布DNSCrypt<ref>{{Cite web|url=http://www.opendns.com/technology/dnscrypt/|title=DNSCrypt: Securing a critical piece of Internet infrastructure|deadurl=yes|archiveurl=https://web.archive.org/web/20120510004927/http://www.opendns.com/technology/dnscrypt|archivedate=2012-05-10|accessdate=2017-01-03}}</ref>来保护OpenDNS用户与其递归解析器之间的信道。Jan Mojžíš发布了curveprotect<ref>{{Cite web|url=http://curveprotect.org/|title=curveprotect, a complex collection of tools for protecting wide range of internet services|accessdate=2017-01-03|archive-date=2013-05-26|archive-url=https://web.archive.org/web/20130526043950/http://curveprotect.org/|dead-url=no}}</ref>，这是一个实现DNSCurve和CurveCP的套件，保护DNS、SSH、HTTP和[[SMTP|SMTP]]等常见服务。
+
+== 部署 ==
+[[OpenDNS|OpenDNS]] 服务超过5000万用户的于2010年2月23日宣布其递归解析器支持DNSCurve。<ref>{{cite web|url=http://blog.opendns.com/2010/02/23/opendns-dnscurve/|title=OpenDNS adopts DNSCurve|accessdate=2017-01-03|archive-date=2010-02-26|archive-url=https://web.archive.org/web/20100226102021/http://blog.opendns.com/2010/02/23/opendns-dnscurve|dead-url=no}}</ref>2011年12月6日，OpenDNS宣布名为[[DNSCrypt|DNSCrypt]]的新工具<ref>{{cite web|url=http://blog.opendns.com/2011/12/06/dnscrypt-–-critical-fundamental-and-about-time/|title=OpenDNS unveils DNSCrypt|deadurl=yes|archiveurl=https://web.archive.org/web/20130203105200/http://blog.opendns.com/2011/12/06/dnscrypt-%E2%80%93-critical-fundamental-and-about-time/|archivedate=2013-02-03|accessdate=2017-09-04}}</ref>该工具能保护OpenDNS与其用户之间的信道。<ref>{{cite web|url=http://ports.su/net/dnscrypt-proxy|title=net/dnscrypt-proxy: dnscrypt-proxy-1.4.3 – secure communications between a DNS client and resolver|accessdate=2015-02-09|date=2015-01-06|work=[[OpenBSD_ports|OpenBSD ports]]|archive-date=2018-11-29|archive-url=https://web.archive.org/web/20181129132445/http://ports.su/net/dnscrypt-proxy|dead-url=no}}</ref>尚无其他类似的权威DNS提供商部署DNSCurve。
+
+== 参见 ==
+* [[域名系统安全扩展|域名系统安全扩展]]（DNSSEC）
+* [[椭圆曲线密码学|椭圆曲线密码学]]
+* [[OpenDNS|OpenDNS]]
+
+== 备注 ==
+{{reflist|30em}}
+
+== 外部链接 ==
+* [https://dnscurve.org Official website]{{Wayback|url=https://dnscurve.org/ |date=20170104090700 }}
+* [https://dnscurve.io DNSCurve.io: a community for DNSCurve users]{{Wayback|url=https://dnscurve.io/ |date=20200513003540 }}
+* [http://cr.yp.to/talks/2009.06.27/slides.pdf High-speed cryptography and DNSCurve]{{Wayback|url=http://cr.yp.to/talks/2009.06.27/slides.pdf |date=20130816075533 }}，2009年6月作者的介绍
+* [http://cr.yp.to/talks/2008.08.22/slides.pdf DNSCurve: Usable security for DNS]{{Wayback|url=http://cr.yp.to/talks/2008.08.22/slides.pdf |date=20110607045715 }}，2008年8月作者的介绍
+* [http://tools.ietf.org/html/draft-dempsky-dnscurve-01 draft-dempsky-dnscurve-01]{{Wayback|url=http://tools.ietf.org/html/draft-dempsky-dnscurve-01 |date=20170104090934 }} 提议标准：“DNSCurve: Link-Level Security for the Domain Name System”，M. Dempsky（来自[[OpenDNS|OpenDNS]]）发送给[[互联网工程任务组|IETF]] （更新于2010年2月）
+* [http://blog.opendns.com/2010/02/23/opendns-dnscurve/ OpenDNS adopts DNSCurve]{{Wayback|url=http://blog.opendns.com/2010/02/23/opendns-dnscurve/ |date=20100226102021 }}，OpenDNS官方博文
+* [http://curvedns.on2it.net/ CurveDNS]{{Wayback|url=http://curvedns.on2it.net/ |date=20110102041645 }}，DNSCurve转发名称服务器
+* [http://nacl.cr.yp.to/ NaCl]{{Wayback|url=http://nacl.cr.yp.to/ |date=20170221100416 }}，网络和加密程序库
+
+[[Category:域名|Category:域名]]
+[[Category:橢圓曲線密碼學|Category:橢圓曲線密碼學]]

@@ -1,0 +1,872 @@
+--
+-- This module implements many bracket templates
+--
+
+local p = {}
+local args = {}
+local rows = {}
+local mask = {}
+local numberToChinese = require('Module:NumberToChinese')._numberToChinese
+local rounds
+local maxround
+local legs = {}
+local compact
+local byes
+local hideSeeds
+local showSeeds
+local hideHeadings
+local showThird
+local offsetThird
+local compactFinal
+local sepwidth
+local aggsep
+local aggregate
+local boldwinner
+local hideomittedscores
+local RD1seedmap = {}
+local tcats = ''
+
+local function isnotblank(s)
+	return s and s ~= ''
+end
+
+local function isblank(s)
+	return (not s) or (s == '')
+end
+
+local function sumScores(s1, s2)
+	s1 = mw.ustring.gsub(s1 or '', '^[\'%s]*([%d%.]*).-$', '%1')
+	s2 = mw.ustring.gsub(s2 or '', '^[\'%s]*([%d%.]*).-$', '%1')
+	if s1 ~= '' and s2 ~= '' then
+		return tonumber(s1) + tonumber(s2)
+	end
+	return s1
+end
+
+local function scoreCompare(s1,s2,highwin)
+	local ps1 = mw.ustring.gsub(s1 or '', '^[\'%s]*([%d%.]*)[\'%s]*%([\'%s]*([%d%.]*)[\'%s]*%).-$', '%2')
+	local ps2 = mw.ustring.gsub(s2 or '', '^[\'%s]*([%d%.]*)[\'%s]*%([\'%s]*([%d%.]*)[\'%s]*%).-$', '%2')
+	s1 = mw.ustring.gsub(s1 or '', '^[\'%s]*([%d%.]*).-$', '%1')
+	s2 = mw.ustring.gsub(s2 or '', '^[\'%s]*([%d%.]*).-$', '%1')
+	
+	if s1 ~= '' and s2 ~= '' then
+		s1 = tonumber(s1)
+		s2 = tonumber(s2)
+		if s1 and s2 then
+			if (s1 == s2) then
+				ps1 = tonumber(ps1)
+				ps2 = tonumber(ps2)
+				if ps1 and ps2 then
+					s1 = ps1
+					s2 = ps2
+				end
+			end
+			if highwin then
+				return ((s1 > s2) and 1) or ((s1 < s2) and 2) or 0
+			else
+				return ((s2 > s1) and 1) or ((s2 < s1) and 2) or 0
+			end
+		end
+	end
+	return 0
+end
+
+local function parseArgs(frame)
+	local fargs = frame.args
+	local pargs = frame:getParent().args;
+
+	local r = tonumber(fargs.rounds or '') or tonumber(pargs.rounds or '') or 2
+	local teams = math.pow(2, r)
+	local rdstr = 'RD' .. tostring(r)
+	local rdbstr = 'RD' .. tostring(r) .. 'b'
+	local rdp1str = 'RD' .. tostring(r+1)
+
+	for i=1,2 do
+		local targs = (i == 1) and pargs or fargs
+		for k,v in pairs(targs) do
+			if type(k) == 'string' then
+				if k:find('^[R3][Dr][d1-9]b?%-[a-z][a-z]*00*') then
+					k = mw.ustring.gsub(k, '^([R3][Dr][d1-9]b?%-[a-z][a-z]*)00*', '%1')
+					if (teams < 10) then 
+						tcats = tcats .. '[[Category:Pages_using_sports_table_with_possibly_ignored_parameters|P]]'
+					end
+				end
+				if k:find('^' .. rdp1str) then
+					k = mw.ustring.gsub(k, '^' .. rdp1str, '3rd')
+					tcats = tcats .. '[[Category:Pages_using_sports_table_with_possibly_ignored_parameters|3]]'
+				elseif k:find('^' .. rdbstr) then
+					k = mw.ustring.gsub(k, '^' .. rdbstr, '3rd')
+				elseif k:find('^' .. rdstr .. '%-[a-z][a-z]*3') then
+					k = mw.ustring.gsub(k, '^' .. rdstr .. '(%-[a-z][a-z]*)3', '3rd%11')
+				elseif k:find('^' .. rdstr .. '%-[a-z][a-z]*4') then
+					k = mw.ustring.gsub(k, '^' .. rdstr .. '(%-[a-z][a-z]*)4', '3rd%12')
+				elseif  k:find('^Consol') then
+					k = mw.ustring.gsub(k, '^Consol', '3rd')
+					tcats = tcats .. '[[Category:Pages_using_sports_table_with_possibly_ignored_parameters|3]]'
+				elseif k:find('^group[0-9]') then
+					tcats = tcats .. '[[Category:Pages_using_sports_table_with_possibly_ignored_parameters|G]]'
+				end
+			end
+			args[k] = v
+		end
+	end
+
+	if (args['byes'] and (args['byes'] == 'yes' or args['byes'] == 'y')) then
+		tcats = tcats .. '[[Category:Pages_using_sports_table_with_possibly_ignored_parameters|B]]'
+	end
+end
+
+local function parseSeedmap(s)
+	s = mw.text.split((s or '0') .. '/', '[%s]*/[%s]*')
+	local teams = math.pow(2, rounds)
+	for r=1,teams do
+		RD1seedmap[r] = 1
+	end
+	for r=1,#s do
+		if tonumber(s[r] or 'x') then
+			RD1seedmap[tonumber(s[r])] = 0
+		end
+	end
+	local c = 1
+	for r=1,teams do
+		if RD1seedmap[r] > 0 then
+			RD1seedmap[r] = c
+			c = c + 1
+		end
+	end
+end
+
+local function parseLegs(s)
+	s = mw.text.split((s or '1') .. '/', '[%s]*/[%s]*')
+	if aggregate == 'n' or aggregate == 'no' or aggregate == '0' then
+		aggregate = ''
+	end
+	local n = showThird and (rounds + 1) or (rounds)
+	local lastlegs = nil
+	for r=1,n do
+		if s[r] ~= nil and s[r] ~= '' and tonumber(s[r]) then
+			legs[r] = tonumber(s[r])
+		elseif lastlegs then
+			legs[r] = lastlegs
+		else
+			legs[r] = 1
+		end
+		lastlegs = legs[r]
+		if legs[r] > 1 and aggregate ~= '' then
+			legs[r] = legs[r] + 1
+		end
+	end
+end
+
+local function getSeeds()
+	local seeds = {1, 2}
+	local count = 2
+	local before = false
+	for r = 2, rounds do
+		local max = math.pow(2, r)
+		for i = 1, count do
+			local pos = i * 2
+			if before then pos = pos - 1 end
+			table.insert(seeds, pos, max - seeds[i * 2 - 1] + 1)
+			before = not before
+		end
+		count = count * 2
+	end
+	return seeds
+end
+
+local function addTableRow(tbl)
+	return tbl:tag('tr')
+end
+
+local function addBlank(i, css, rowspan, colspan)
+	local row = rows[i]
+	rowspan = rowspan or 1
+	local jmax = i + rowspan - 1
+	for j = i, jmax do
+		if rows[j] == nil then
+			rowspan = rowspan - 1
+		elseif row == nil then
+			row = rows[j]
+		end
+	end
+	local cell = row and row:tag('td') or mw.html.create('td')
+	if rowspan and rowspan > 1 then
+		cell:attr('rowspan', rowspan)
+	end
+	if colspan and colspan > 1 then
+		cell:attr('colspan', colspan)
+	end
+	if css then
+		cell:css(css)
+	end
+	return cell
+end
+
+local function addBorders(cell, topcell, seedorteam, extrasep)
+	if sepwidth > 1 then topcell = true end
+	if seedorteam then
+		cell:css('border', '1px solid #aaa')
+			:css('border-top-width', topcell and '1px' or '0')
+	else
+		cell:css('border-color', '#aaa')
+			:css('border-style', 'solid')
+			:css('border-top-width', topcell and '1px' or '0')
+			:css('border-left-width', (extrasep and '1px') or ((sepwidth > 1) and '1px') or '0')
+			:css('border-right-width', '1px')
+			:css('border-bottom-width', '1px')
+	end
+end
+
+local function addHeading(row, r, text, pad)
+	pad = (pad == nil or pad < 0) and 0 or pad
+	row:tag('td')
+		:attr('colspan', tonumber(hideSeeds and '1' or '2') + legs[r] + pad)
+		:css('text-align', 'center')
+		:css('border', '1px solid #aaa')
+		:css('background', args['RD-shade'] or '#f2f2f2')
+		:wikitext(text)
+		:newline()
+end
+
+local function getWidth(param, default)
+	local arg = args[param .. '-width']
+	if isblank(arg) then
+		arg = default
+	end
+	if tonumber(arg) ~= nil then
+		arg = arg .. 'px'
+	end
+	return arg
+end
+
+local function getTeamArgName(round, type, team)
+	if round > rounds then
+		return string.format('3rd-%s%d', type, team)
+	else
+		if (round == 1) then
+			team = RD1seedmap[team]
+			if team == 0 then
+				return 'NIL'
+			end
+		end
+		return string.format('RD%d-%s%d', round, type, team)
+	end
+end
+
+local function getShadeArg(round, team, s)
+	local argname = getTeamArgName(round, 'shade', team) .. (s and ('-' .. s) or '')
+	local value = args[argname]
+	if isblank(value) then
+		return '#f9f9f9'
+	end
+	return value
+end
+
+local function getScoreArg(round, team, s)
+	local argname = getTeamArgName(round, 'score', team) .. (s and ('-' .. s) or '')
+	local value = args[argname]
+	return value
+end
+
+local function getTeamArg(round, type, team)
+	local argname = getTeamArgName(round, type, team)
+	local value = args[argname]
+	if isblank(value) then
+		return ''
+	end
+	if mw.ustring.find(value, '[%s]*<[%s/]*[Bb][Rr][%s/]*>[%s ]*&[Nn][Bb][Ss][Pp];[%s]*') then
+		tcats = tcats .. '[[Category:Pages_using_a_team_bracket_with_nbsp|Category:Pages using a team bracket with nbsp]]'
+	end
+	return mw.ustring.gsub(value, '[%s]*<[%s/]*[Bb][Rr][%s/]*>[%s ]*&[Nn][Bb][Ss][Pp];[%s]*', '<br/>')
+end
+
+local function isHidden(r, team)
+	return isblank( getTeamArg(r, 'team', team) )
+end
+
+local function getRoundName(round)
+	local name = args['RD' .. round]
+	if isnotblank(name) then
+		return name
+	end
+	local roundFromLast = rounds - round + 1
+	if roundFromLast == 1 then
+		return "決賽"
+	elseif roundFromLast == 2 then
+		return "準決賽"
+	elseif roundFromLast == 3 then
+		return "半準決賽"
+	else
+		return (numberToChinese(math.pow(2, roundFromLast)) .. "強賽")
+	end
+end
+
+local function addPath(index, round, top, left, w)
+	local prop = top and 'border-bottom-width' or 'border-top-width'
+	if left and round == 1 then
+		if compact then
+			addBlank(index)
+		else
+			addBlank(index, {['height'] = '7px'})
+			addBlank(index+1, {['height'] = '7px'})
+		end
+		return nil
+	else
+		local cell = addBlank(index, 
+			{['border-width'] = '0',
+			['border-style'] = 'solid',
+			['border-color'] = 'black'}, (not compact) and 2 or 1)
+		if left or round < maxround and not left then
+			cell:css(prop, w or '2px')
+		end
+		return cell
+	end
+end
+
+local function renderTeam(row, round, team, top, otherbye, pad)
+	pad = (pad == nil or pad < 0) and 0 or pad
+	tcs = pad + 1
+	local seedCell
+	local seedArg = getTeamArg(round, 'seed', team)
+	-- seed value for the paired team
+	local otherteam = team % 2 == 0 and team-1 or team+1
+	local pairSeedArg = otherbye and '' 
+		or getTeamArg(round, 'seed', otherteam)
+	-- show seed if seed is defined for either or both
+	local showSeed = showSeeds
+		or isnotblank(seedArg)
+		or isnotblank(pairSeedArg)
+	if showSeed and (not hideSeeds) then
+		seedCell = row:tag('td')
+			:css('text-align', 'center')
+			:css('background', '#F2F2F2')
+			:attr('rowspan', (not compact) and '2' or nil)
+			:wikitext(seedArg)
+			:newline()
+		addBorders(seedCell, top or otherbye, true, false)
+	end
+
+	local teamArg = getTeamArg(round, 'team', team)
+	if isblank(teamArg) then
+		teamArg = ' '
+	end
+	
+	if not showSeed and (not hideSeeds) then
+		tcs = tcs + 1
+	end
+
+	local teamCell = row:tag('td')
+		:css('background', '#F9F9F9')
+		:css('padding', '0 2px')
+		:attr('rowspan', (not compact) and '2' or nil)
+		:attr('colspan', (tcs > 1) and tcs or nil)
+		:wikitext(teamArg)
+		:newline()
+	addBorders(teamCell, top or otherbye, true, false)
+
+	local scoreCells = {}
+	local wins, otherwins = 0, 0
+	local sumscore, othersumscore = 0, 0
+	local teamcolspan = tcs
+	local hassum = false
+	for s = 1, legs[round] do
+		local fw = nil
+		local agg = legs[round] > 1 and s == legs[round] and true or false
+		local score1 = (agg and getScoreArg(round, team, 'agg') or nil) or 
+			getScoreArg(round, team, s) or ((legs[round] == 1) and getScoreArg(round, team)) or nil
+		local score2 = (agg and getScoreArg(round, otherteam, 'agg') or nil) or 
+			getScoreArg(round, otherteam, s) or ((legs[round] == 1) and getScoreArg(round, otherteam)) or nil
+		local showscore = true
+		if agg and aggregate ~= '' and score1 == nil and hassum then
+			score1 = (aggregate == 'score')	and sumscore 
+				or ((aggregate == 'legs' or aggregate == 'sets') and wins)
+				or nil
+		end
+		if agg and aggregate ~= '' and score2 == nil and hassum then
+			score2 = (aggregate == 'score')	and othersumscore
+				or ((aggregate == 'legs' or aggregate == 'sets') and otherwins)
+				or nil
+		end
+		if score1 == nil and score2 == nil then
+			if hideomittedscores > 0 and s >= hideomittedscores then
+				teamcolspan = teamcolspan + 1
+				showscore = false
+			end
+		else
+			hassum = true
+		end
+		if showscore then
+			local winner = scoreCompare(score1, score2, boldwinner ~= 'low')
+			sumscore = sumScores(sumscore, score1)
+			othersumscore = sumScores(othersumscore, score2)
+			if winner == 1 then
+				if boldwinner ~= '' or (agg and (aggregate == 'score' or aggregate == 'legs' or aggregate == 'sets')) then 
+					if agg and (aggregate == 'legs' or aggregate == 'sets') and (wins <= (legs[round] - 1)/2) then
+					else
+						fw = 'bold'
+					end
+				end
+				if not agg then wins = wins + 1 end
+			elseif winner == 2 then
+				if not agg then otherwins = otherwins + 1 end
+			end
+			scoreCells[s] = row:tag('td')
+				:css('text-align', 'center')
+				:css('background', getShadeArg(round, team, s))
+				:css('font-weight', fw)
+				:attr('rowspan', (not compact) and '2' or nil)
+				:wikitext(score1)
+				:newline()
+			addBorders(scoreCells[s], top or otherbye, false, s > 1 and s == legs[round] and aggsep or nil)
+		end
+	end
+	if teamcolspan > 1 then
+		teamCell:attr('colspan', teamcolspan)
+	end
+	if boldwinner ~= '' and wins > otherwins then
+		if (aggregate == 'legs' or aggregate == 'sets') and (wins <= (legs[round] - 1)/2) then
+		else
+			if seedCell then
+				seedCell:css('font-weight', 'bold')
+			end
+			if teamCell then
+				teamCell:css('font-weight', 'bold')
+			end
+		end
+	end
+end
+
+local function renderRound(count, r)
+	local teams = math.pow(2, rounds - r + 1)
+	local step = count / teams
+	local topTeam = true -- is top row in match-up
+	local topPair = true -- is top match-up in pair of match-ups
+	local team = 1
+	local group = 1
+
+	for i = 1, count, step do
+		local offset, height, blank
+
+		local hideteam = false
+		local otherhideteam = false
+		local hideleftpath = false
+		local hiderightpath = false
+		if r <= byes then
+			hideteam = isHidden(r, team)
+			otherhideteam = isHidden(r, team % 2 == 0 and team-1 or team+1)
+		end
+		if (r == 1) and (RD1seedmap[team] <= 0) then
+				hideteam = true
+		end
+		if (r > 1) and (r <= (byes + 1)) then
+			hideleftpath = isHidden(r-1, 2*team-1) and isHidden(r-1, 2*team)
+		end
+		if (r == 2) and (RD1seedmap[2*team-1] <= 0 and RD1seedmap[2*team] <= 0) then
+			hideleftpath = true
+		end
+		if compactFinal and (r == rounds) then
+			hideleftpath = true
+		end
+		if (tonumber(args['RD' .. (r-1) .. '-RD' .. (r) .. '-path']) or 2) == 0 then
+			hideleftpath = true
+		end
+		if (tonumber(args['RD' .. (r) .. '-RD' .. (r + 1) .. '-path']) or 2) == 0 then
+			hiderightpath = true
+		end
+
+		-- empty space above or below
+		if compact then
+			offset = topTeam and i or i + 1
+			height = step - 1
+		-- leave room for groups for teams other than first and last
+		elseif team == 1 or team == teams then
+			offset = topTeam and i or i + 2
+			height = step - 2
+		else
+			offset = topTeam and i + 1 or i + 2
+			height = step - 3
+		end
+		if showThird and (r == rounds) and (not topTeam) then
+			height = offset - offsetThird
+		end
+		if compactFinal and (r == (maxround - 1)) then
+			if team == 2 then
+				height = height - 3
+			end
+			if team == 3 then
+				height = height - 1
+				offset = offset + 1
+				addBlank(offset-3, nil, 1, tonumber(hideSeeds and '2' or '3') + legs[r])
+				addBlank(offset-4)
+				addHeading(rows[offset-4], r + 1, getRoundName(r+1), legs[r] - legs[r+1])
+				local b = addBlank(offset-4, {
+					['border-color'] = 'black',
+					['border-style']= 'solid',
+					['border-width']= '0'}, 2)
+				b:css('border-right-width', '2px')
+			end
+		end
+		if height > 0 then
+			local pad = 0
+			local betweenTeams = (topTeam == false and topPair == true) or (topTeam == true and topPair == false)
+			if compactFinal and (r == maxround - 1) then
+				betweenTeams = false
+			end
+			if compactFinal and (r == maxround - 1) and legs[r+1] > legs[r] then
+				pad = legs[r+1] - legs[r]
+			end
+			if compact and betweenTeams then
+				addBlank(offset, nil, height, 1)
+				if topPair then
+					blank = addBlank(offset, nil, 2*height, tonumber(hideSeeds and '1' or '2') + legs[r] + pad)
+					if args['RD' .. r .. '-group' .. group] then
+						blank:wikitext(args['RD' .. r .. '-group' .. group])
+						blank:css('text-align', 'center')
+					end
+					group = group + 1
+				end
+				blank = addBlank(offset, 
+				{['border-width'] = '0',
+				['border-style'] = 'solid',
+				['border-color'] = 'black'},
+				height, 1)
+			else
+				blank = addBlank(offset, 
+				{['border-width'] = '0',
+				['border-style'] = 'solid',
+				['border-color'] = 'black'},
+				height, tonumber(hideSeeds and '3' or '4') + legs[r] + pad)
+			end
+		end
+		-- add bracket
+		local j = topTeam and i + step - (compact and 1 or 2) or i
+		-- add left path
+		addPath(j, r, topTeam, true, hideleftpath and '0' or '2px')
+		if hideteam then
+			addBlank(j, nil, (not compact) and 2 or nil, tonumber(hideSeeds and '1' or '2') + legs[r])
+		elseif rows[j] then
+			if compactFinal and (r == maxround) then
+				renderTeam(rows[j], r, team, topTeam, otherhideteam, legs[r-1] - legs[r])
+			elseif compactFinal and (r == maxround - 1) then
+				renderTeam(rows[j], r, team, topTeam, otherhideteam, legs[r+1] - legs[r])
+			else
+				renderTeam(rows[j], r, team, topTeam, otherhideteam)
+			end
+		end
+		local rightPath = addPath(j, r, topTeam, false, (hiderightpath or hideteam) and '0' or '2px')
+		if not topTeam then topPair = not topPair end
+		if not topPair and r < maxround and (not (hiderightpath or hideteam)) then
+			if blank then blank:css('border-right-width', '2px') end
+			rightPath:css('border-right-width', '2px')
+		end
+		if compactFinal and (r == maxround) then
+			local prop = (team == 1) and 'border-bottom-width' or 'border-top-width'
+			rightPath:css('border-right-width', '2px')
+				:css(prop, '2px')
+		end
+		team = team + 1
+		topTeam = not topTeam
+	end
+end
+
+local function renderGroups(count, round)
+	local roundFromLast = rounds - round + 1
+	local groups = math.pow(2, roundFromLast - 2)
+	local step = count / groups
+	local group = 1
+	local offset = 0
+	local team = 0
+	local wdef = (tonumber(args['RD' .. (round) .. '-RD' .. (round + 1) .. '-path']) or 2) .. 'px'
+	local w = wdef
+
+	for r = 1,round do
+		offset = offset + (hideSeeds and 3 or 4) + legs[r]
+	end
+	for i = step / 2, count, step do
+		local name = 'RD' .. round .. '-group' .. group
+		addBlank(i, {['height'] = '7px'})
+		addBlank(i+1, {['height'] = '7px'})
+		addBlank(i, {['text-align'] = 'center'}, 2, offset-2)
+			:wikitext(args[name])
+			:newline()
+		if (round <= byes) then
+			team = i/(step/2)
+			w = isHidden(round, 2*team-1) and isHidden(round, 2*team) and '0' or wdef
+		end
+		if (round < maxround) then
+			addBlank(i, {
+				['border-color'] = 'black',
+				['border-style'] = 'solid', 
+				['border-width'] = '0 ' .. w .. ' 0 0'})
+		else
+			addBlank(i)
+		end
+		if (round <= byes) then
+			team = team + 1
+			w = isHidden(round, 2*team-1) and isHidden(round, 2*team) and '0' or wdef
+		end
+		if (round < maxround) then
+			addBlank(i+1, {
+				['border-color'] = 'black',
+				['border-style'] = 'solid', 
+				['border-width'] = '0 ' .. w .. ' 0 0'})
+		else
+			addBlank(i+1)
+		end
+		group = group + 1
+	end
+end
+
+local function getThirdOffset()
+	local offset = (compact and 1 or 3) * (math.pow(2, rounds) - math.pow(2, rounds-3)) - (compact and 2 or 4)
+	if rounds < 4 then
+		offset = compact and 8 or 17
+		if rounds < 3 then
+			offset = compact and 6 or 10
+			if rounds < 2 then
+				offset = compact and 4 or 7
+			end
+		end
+	end
+	return offset
+end
+
+local function renderThird(count)
+	local k = offsetThird
+	local row = rows[k]
+	local blank
+	if rounds < 2 then
+		blank = addBlank(k-1, {['height'] = '7px'})
+	end
+	blank = addBlank(k, rounds < 2 and {['height'] = '7px'} or nil)
+	addHeading(row, rounds + 1, args['3rd'] or '季軍戰')
+	if rounds < 2 then
+		for i = 1,(compact and 1 or 2) do
+			blank = addBlank(k+i, {['height'] = '7px'})
+		end
+	end
+	k = k + (compact and 2 or 3)
+	for i = 1,2 do
+		row = rows[k]
+		blank = addBlank(k, rounds < 2 and {['height'] = '7px'} or nil)
+		if row then
+			renderTeam(row, rounds + 1, i, i == 1, false)
+		end
+		if rounds < 2 and not compact then
+			blank = addBlank(k+1, {['height'] = '7px'})
+		end
+		k = k + (compact and 1 or 2)
+	end
+end
+
+local function maskRows(tbl, count, offsetcount)
+	local rmin = 1
+	local rmax = count
+	for i = rmin, rmax do
+		mask[i] = false
+	end
+	if showThird then
+		for i = offsetThird,(offsetThird+ (compact and 3 or 5)) do
+			rmax = (i > rmax) and i or rmax
+			mask[i] = true
+		end
+	end
+	for r = 1, maxround do
+		local teams = math.pow(2, rounds - r + 1)
+		local step = count / teams
+		local topTeam = true -- is top row in match-up
+		local team = 1
+
+		for i = 1, count, step do
+			local offset, height, blank
+			local hideteam = false
+			if r <= byes then
+				hideteam = isHidden(r, team)
+			end
+			if (r == 1) and (RD1seedmap[team] <= 0) then
+				hideteam = true
+			end
+			if not hideteam then
+				local j = topTeam and i + step - (compact and 1 or 2) or i
+				mask[j] = true
+			end
+			team = team + 1
+			topTeam = not topTeam
+		end
+	end
+	
+	for r = 1, maxround do
+		local roundFromLast = rounds - r + 1
+		local groups = math.pow(2, roundFromLast - 2)
+		local step = count / groups
+		local group = 1
+		for i = step / 2, count, step do
+			if args['RD' .. r .. '-group' .. group] then
+				mask[i] = true
+				mask[i+1] = true
+			end
+			group = group + 1
+		end
+	end
+	local mmin, mmax = rmax, rmin
+	for i = rmin, rmax do
+		if mask[i] == true then
+			mmin = (i < mmin) and i or mmin
+			mmax = (i > mmax) and i or mmax
+		end
+	end
+	for i = mmin, mmax do
+		rows[i] = addTableRow(tbl)
+	end
+end
+
+local function renderTree(tbl)
+	-- create 3 or 1 rows for every team
+	local count = math.pow(2, rounds) * (compact and 1 or 3)
+	local offsetcount = 2 * (compact and 1 or 3) + (compact and 2 or 3)
+	offsetThird = getThirdOffset()
+	maskRows(tbl, count, offsetcount)
+	if showThird then
+		for i = (count+1), (offsetcount + offsetThird) do
+			if (rounds > 1) then
+				local blank = addBlank(i, nil, 1, tonumber(hideSeeds and '3' or '4') + legs[1])
+				if compact and (rounds > 2) then
+					blank = addBlank(i, nil, 1, tonumber(hideSeeds and '3' or '4') + legs[1])
+				end
+			end
+		end
+	end
+	if not compact then
+		-- fill rows with groups
+		for r = 1, rounds - 1 do
+			renderGroups(count, r)
+		end
+	end
+	-- fill rows with bracket
+	for r = 1, maxround do
+		renderRound(count, r)
+	end
+	if showThird then
+		renderThird(count, compact)
+	end
+end
+
+local function renderHeadings(tbl)
+	local titleRow = addTableRow((not hideHeadings) and tbl or mw.html.create('table'))
+	local widthRow = addTableRow(tbl)
+	for r = 1, (compactFinal and (maxround-1) or maxround) do
+		titleRow:tag('td')
+		widthRow:tag('td'):css('width', r > 1 and '5px' or '1px')
+		if compactFinal and r == (maxround-1) then
+			addHeading(titleRow, r, getRoundName(r), legs[r+1] - legs[r])
+		else
+			addHeading(titleRow, r, getRoundName(r) )
+		end
+		local seedCell
+		if (not hideSeeds) then
+			seedCell = widthRow:tag('td'):css('width', getWidth('seed', '25px'))
+		end
+		local teamCell = widthRow:tag('td'):css('width', getWidth('team', '150px'))
+		local scoreCells = {}
+		local legsr = legs[r]
+		if compactFinal and r == (maxround-1) then
+			legsr = legs[r+1] > legs[r] and legs[r+1] or legs[r]
+		end
+		for s = 1, legsr do
+			scoreCells[s] = widthRow:tag('td'):css('width', getWidth('score', '25px'))
+		end
+		titleRow:tag('td')
+		widthRow:tag('td'):css('width', r < rounds and '5px' or '1px')
+
+		if compact then
+			teamCell:css('height', '7px')
+		else
+			if seedCell then
+				seedCell:wikitext(' ')
+			end
+			teamCell:wikitext(' ')
+			for s = 1, legs[r] do
+				scoreCells[s]:wikitext(' ')
+			end
+		end
+	end
+end
+
+function p.main(frame)
+	parseArgs(frame)
+	rounds = tonumber(args.rounds) or 2
+	maxround = tonumber(args.maxround) or rounds
+	local teams = math.pow(2, rounds)
+	compact = (args['compact'] and (args['compact'] == 'yes' or args['compact'] == 'y'))
+	compactFinal = ((rounds > 4) and compact and args['compact-final'] and (args['compact-final'] == 'yes' or args['compact-final'] == 'y'))
+	sepwidth = tonumber(args['sepwidth'] or ((args.sets or args.legs) and 1) or (compact and 1) or 2) or 1
+	aggregate = (args['aggregate'] or ''):lower()
+	aggsep = args['aggsep'] or args['aggregate'] or nil
+	boldwinner = args['boldwinner'] or args['bold_winner'] or ''
+	local autoSeeds = (args['autoseeds'] and (args['autoseeds'] == 'yes' or args['autoseeds'] == 'y'))
+	hideSeeds = (args['seeds'] and (args['seeds'] == 'no' or args['seeds'] == 'n'))
+	showSeeds = (args['seeds'] and (args['seeds'] == 'yes' or args['seeds'] == 'y'))
+	byes = (args['byes'] and (args['byes'] == 'yes' or args['byes'] == 'y') and 1) or (tonumber(args['byes'] or '0') or 0)
+	hideomittedscores = (args['hideomittedscores'] and (args['hideomittedscores'] == 'yes' or args['hideomittedscores'] == 'y') and 1) or (tonumber(args['hideomittedscores'] or '0') or 0)
+	hideHeadings = (args['headings'] and (args['headings'] == 'no' or args['headings'] == 'n'))
+	showThird = isnotblank(args['3rd']) or isnotblank(args['3rd-team1']) or isnotblank(args['3rd-team2'])
+	local align = (args['float'] or args['align'] or ''):lower()
+	local clear = args['clear'] or 'none'
+	parseSeedmap(args['RD1-omit'])
+	parseLegs(args.sets or args.legs)
+	
+	if autoSeeds then
+		-- set default seeds for round 1
+		local seeds = getSeeds()
+		for i = 1, table.getn(seeds) do
+			local argname = getTeamArgName(1, 'seed', i)
+			if not args[argname] then
+				args[argname] = seeds[i]
+			end
+		end
+	end
+
+	-- create the table
+	local tbl = mw.html.create('table')
+		:css('border-style', 'none')
+		:css('font-size', '90%')
+		:css('border-collapse', 'separate')
+		:css('border-spacing', '0')
+		:attr('cellpadding', '0')
+
+	if (args['nowrap'] and (args['nowrap'] == 'yes' or args['nowrap'] == 'y')) then
+		tbl:css('white-space', 'nowrap')
+	end
+	
+	if align == 'right' then
+		tbl:css('float', 'right')
+		if clear ~= 'none' and clear ~= 'no' and clear ~= 'n' then
+			tbl:css('clear', 'right')
+		end
+		tbl:css('margin', '1em 0 1em 2em')
+	elseif align == 'left' then
+		tbl:css('float', 'left')
+		if clear ~= 'none' and clear ~= 'no' and clear ~= 'n' then
+			tbl:css('clear', 'left')
+		end
+		tbl:css('margin', '1em 2em 1em 0')
+	elseif align == 'center' or align == 'centre' then
+		tbl:css('margin', '1em auto')
+	else
+		tbl:css('margin', '1em 2em 1em 1em')
+	end
+
+	renderHeadings(tbl)
+	renderTree(tbl)
+	if (args['wide'] and (args['wide'] == 'y' or args['wide'] == 'yes')) then
+		return '<div class="noresize" style="overflow:auto">' .. tostring(tbl) .. '</div>' .. tcats
+	end
+	return tostring(tbl) .. tcats
+end
+
+function p.teamBracket(frame)
+	return p.main(frame)
+end
+
+return p

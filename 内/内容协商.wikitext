@@ -1,0 +1,53 @@
+{{NoteTA
+|G1=IT
+}}
+{{校对翻译}}
+{{HTTP}}
+'''内容协商'''（{{lang-en|Content negotiation}}）是[[超文本传输协议|超文本传输协议]]（HTTP）中定义的一个机制，它使同一个[[统一资源标志符|统一资源标志符]]（URI）上的文档可以根据[[用户代理|用户代理]]中指定的适用信息提供不同的版本。这种机制的传统用法是提供[[GIF|GIF]]或[[PNG|PNG]]格式的图像，为不支持显示PNG图像的浏览器（例如微软Internet Explorer 4）提供GIF版本的图像。
+
+因此，一个资源可以有多种不同版本可用。例如，它可能有不同语言或不同多媒体格式的版本，或者其他用法。选择最合适版本的一种方法是为用户提供一个索引页面，由他们选择所需的版本。但在某些情况下，也可根据一些标准来自动选择。
+
+== 机制 ==
+HTTP提供了多种内容协商机制：服务器驱动（或称主动），用户代理驱动（或称被动），透明，及其他组合、配合。
+
+=== 服务器驱动 ===
+服务器驱动（或称主动）内容协商是根据服务器上执行的算法来选择几种可能的变种。这通常基于用户代理提供的可接受标准来决定。
+
+简单总结它的工作原理：当用户代理向服务器提交请求时，用户代理通告服务器它能理解的[[互联网媒体类型|媒体类型]]以及评级。更具体来说，用户代理在[[HTTP头字段列表|HTTP头]]<code>Accept</code>中列出和提供可接受的媒体类型及相应的质量评级。服务器按照用户代理所提供的这些参数选择提供最适合用户代理的资源版本。
+
+作为其中的重要一环，浏览器在发送每个请求时都会附上它偏好的表示方式。例如，浏览器可能表示它更希望看到德语，否则提供英语。浏览器在请求的头中指明此偏好。例如仅要求（偏好）德语，浏览器可能是发送：
+ <nowiki>Accept-Language: de</nowiki>
+应注意的是，此偏好仅在其是多种表示法可选并且是其中之一时适用，并且因语言而异。
+
+以一个更复杂的请求为例，浏览器已配置为接受德语和英语，但更偏好德语，并且接受几种媒体类型，相较纯文本或其他文本类型而言更偏好HTML，并且在媒体文件方面更偏好GIF和[[JPEG|JPEG]]，但也允许其他媒体类型作为最后的选择：
+ <nowiki>Accept-Language: de; q=1.0, en; q=0.5
+ Accept: text/html; q=1.0, text/*; q=0.8, image/gif; q=0.6, image/jpeg; q=0.6, image/*; q=0.5, */*; q=0.1</nowiki>
+除了按[[互联网媒体类型|内容类型]]或[[IETF语言标签|语言]]完成的服务器驱动的内容协商，还有一个<code>Accept-Datetime</code>头将内容协商扩展为检索以前版本的资源。<ref>[http://www.mementoweb.org/ Memento: Adding Time to the Web] {{Wayback|url=http://www.mementoweb.org/ |date=20180724204353 }}.</ref>
+
+RFC 7231未规定如何解决两难问题（例如在上面的例子中，如果服务器有英语的HTML页面和德语的GIF图像）。
+
+=== 用户代理驱动 ===
+代理驱动（或称被动）内容协商是通过用户代理中的算法执行，由用户代理在可能的变体中选择一项。这通常基于服务器提供的多种表示及元数据来执行。
+
+简单总结它的工作原理：当一个用户代理向服务器提交请求时，服务器通知用户代理它可用的表示法及各个表示法的元数据（例如内容类型、质量、语言等）。然后用户代理将请求重新提交到选定的一种表示法的特定网址。这种方式使用户代理可以自动选择，用户代理也可提供选项使用户手动选择，以及用户可以直接选择、配置。更具体来说，服务器响应300 Multiple Choices或406 Not Acceptable（当服务器驱动时，用户代理提供了接受标准但服务器无法自动选择时）。虽然如此，但HTTP没有规定表示方法及元数据的格式，以及相应的选择机制。
+
+== 内容格式 ==
+用户代理可以从网页服务器或API请求指定格式的数据，例如<tt>application/json</tt>或<tt>application/xml</tt>。
+
+== 参见 ==
+* [[網頁伺服器|網頁伺服器]]
+* [[HTTP压缩|HTTP压缩]]
+
+== 参考文献 ==
+{{Reflist}}
+
+== 外部链接 ==
+* RFC 7231 — ''Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content'' – ([[rfc:7231#section-5.3|Section 5.3: Content Negotiation]])
+* RFC 2295 — ''Transparent Content Negotiation in HTTP''
+* RFC 2296 — ''HTTP Remote Variant Selection Algorithm -- RVSA/1.0''
+* [http://httpd.apache.org/docs/current/content-negotiation.html Apache Content Negotiation] {{Wayback|url=http://httpd.apache.org/docs/current/content-negotiation.html |date=20201204210604 }}
+* [http://ptlis.net/source/php-content-negotiation/ Open source PHP content negotiation library (supports wildcards and q values)] {{Wayback|url=http://ptlis.net/source/php-content-negotiation/ |date=20090314201031 }}
+* [https://web.archive.org/web/20170112181538/http://www.dev-archive.net/articles/xhtml.html#content-negotiation Discussion about XHTML serving with content negotiation and browser concerns requiring this]
+
+<!-- :This article is based in part on [http://httpd.apache.org/docs/1.3/content-negotiation.html this page], which is copyrighted by the Apache Foundation but [http://httpd.apache.org/docs/2.2/ released] under a free license. -->
+[[Category:HTTP|Category:HTTP]]

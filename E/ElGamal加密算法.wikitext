@@ -1,0 +1,47 @@
+在[[密码学|密码学]]中，'''ElGamal加密算法'''是一个基于[[迪菲-赫尔曼密钥交换|迪菲-赫尔曼密钥交换]]的[[非对称加密|非对称加密]]算法。它在1985年由[[塔希尔·盖莫尔|塔希尔·盖莫尔]]提出。<ref>{{cite journal |author=Taher ElGamal |title=A Public-Key Cryptosystem and a Signature Scheme Based on Discrete Logarithms |journal=IEEE Transactions on Information Theory |volume=31 |issue=4 |year=1985 |pages=469–472 |doi=10.1109/TIT.1985.1057074 |url=http://caislab.kaist.ac.kr/lecture/2010/spring/cs548/basic/B02.pdf |access-date=2016-12-14 |archive-date=2011-08-13 |archive-url=https://web.archive.org/web/20110813014106/http://caislab.kaist.ac.kr/lecture/2010/spring/cs548/basic/B02.pdf |dead-url=no }} (conference version appeared in [[CRYPTO|CRYPTO]]'84, pp. 10–18)</ref>[[GnuPG|GnuPG]]和[[PGP|PGP]]等很多密码学系统中都应用到了ElGamal算法。
+
+ElGamal加密算法可以定义在任何[[循环群|循环群]]<math>G</math>上。它的安全性取决于<math>G</math>上的[[离散对数|离散对数]]难题。
+
+== 算法 ==
+ElGamal加密算法由三部分组成：密钥生成、加密和解密。
+
+=== 密钥生成 ===
+密钥生成的步骤如下：
+
+* Alice利用[[群的生成集合|生成元]]<math>g</math>产生一个<math>q\,</math>阶循环群<math>G\,</math>的有效描述。该循环群需要满足一定的安全性质。
+* Alice从<math>\{1, \ldots, q-1\}</math>中随机选择一个<math>x</math>。
+* Alice计算<math>h := g^x</math>。
+* Alice公开<math>h\,</math>以及<math>G, q, g\,</math>的描述作为其'''公钥'''，并保留<math>x</math>作为其'''私钥'''。私钥必须保密。
+
+=== 加密 ===
+使用Alice的公钥<math>(G,q,g,h)</math>向她加密一条消息<math>m</math>的加密算法工作方式如下：
+
+* Bob从<math>\{1, \ldots, q-1\}</math>随机选择一个<math>y</math>，然后计算<math>c_1:=g^y</math>。
+* Bob计算共享秘密<math>s:=h^y</math>。
+* Bob把他要发送的秘密消息<math>m</math>映射为<math>G</math>上的一个元素<math>m'</math>。
+* Bob计算<math>c_2:=m'\cdot s</math>。
+* Bob将密文<math>(c_1,c_2)=(g^y, m'\cdot h^y)=(g^y, m'\cdot(g^x)^y)</math>发送给Alice。
+
+值得注意的是，如果一个人知道了<math>m'</math>，那么它很容易就能知道<math>h^y</math>的值。因此对每一条信息都产生一个新的<math>y</math>可以提高安全性。所以<math>y</math>也被称作{{link-en|临时密钥|ephemeral key}}。
+
+=== 解密 ===
+利用私钥<math>x</math>对密文<math>(c_1,c_2)</math>进行解密的算法工作方式如下：
+
+* Alice计算共享秘密<math>s:=c_1{}^x</math>
+* 然后计算<math>m':=c_2 \cdot s^{-1}</math>，并将其映射回明文<math>m</math>，其中<math>s^{-1}</math>是<math>s</math>在群<math>G</math>上的逆元。（例如：如果<math>G</math>是[[整数模n乘法群|整数模n乘法群]]的一个子群，那么逆元就是[[模逆元|模逆元]]）。
+
+: 解密算法是能够正确解密出明文的，因为
+
+:: <math> c_2 \cdot s^{-1} = m'\cdot h^y \cdot (g^{xy})^{-1} = m'\cdot g^{xy} \cdot g^{-xy} = m'.</math>
+
+=== 实际使用 ===
+ElGamal加密系统通常应用在{{link-en|混合加密系统|hybrid cryptosystem}}中。例如：用对称加密体制来加密消息，然后利用ElGamal加密算法传递密钥。这是因为在同等安全等级下，ElGamal加密算法作为一种非对称密码学系统，通常比对称加密体制要慢。对称加密算法的密钥和要传递的消息相比通常要短得多，所以相比之下使用ElGamal加密密钥然后用对称加密来加密任意长度的消息，这样要更快一些。
+
+== 参考文献 ==
+<references />
+
+
+{{密碼學|public-key}}
+
+[[Category:密码学|Category:密码学]]
+[[Category:算法|Category:算法]]

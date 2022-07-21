@@ -1,0 +1,465 @@
+// The Wikipedia Adventure Mission 2
+
+ 
+( function ( window, document, $, mw, gt ) {
+
+//automatic api:edit function to send yourself messages 
+function sendMessage( targetPage, msgPage, linkTo ) {
+	var api = new mw.Api();
+	api.post( {
+		'action' : 'edit',
+		'title' : targetPage,
+		'appendtext' : "\n{{subst:" + msgPage + "}}",
+		'summary' : '新訊息（[[WP:TWA|維基百科大歷險]]自動模擬2）',
+		'token' : mw.user.tokens.get('csrfToken')
+	} ).done( function () {
+		window.location.href = linkTo;
+	} );
+}
+ 
+// Fail gracefully post-save but not postedit
+var postEditButtons = [];
+if ( mw.config.get( 'wgAction' ) === 'view' && !gt.isPostEdit() ) {
+        postEditButtons.push( {
+                name: '按此返回並進行編輯',
+                onclick: function() {
+                        window.location.href = new mw.Uri().extend( { action: 'edit' } ).toString();
+                }
+        } );
+}
+
+// Fail gracefully post-save but not postedit for visual editor
+var postEditButtonsVisual = [];
+if ( mw.config.get( 'wgAction' ) === 'view' && !gt.isPostEdit() ) {
+        postEditButtonsVisual.push( {
+                name: '返回',
+                onclick: function() {
+                        window.location.href = window.location.href +
+"&veaction=edit";
+                }
+        } );
+}
+
+
+gt.defineTour( {
+        name: 'twa2',
+        shouldLog: true,
+        steps: [ {
+                //1
+                title: '第二關開始！',
+                description: '<br><div align="right">[[File:TWA_guide_right_top.png|link=]]</div>很高興能再和你見面。在這一關，我會教你怎樣跟其他編輯溝通。<br><br>',
+                onShow: gt.parseDescription,
+                overlay: true,
+                closeOnClickOutside: false,
+	            buttons: [ {
+                        name: '一起探索',
+                        action: 'next'
+                         } ],
+                allowAutomaticOkay: false
+ 
+        },  {
+                //2
+                title: '討論頁',
+                description: '<br><div align="right">[[File:TWA_guide_right_top.png|link=]]</div>和用戶頁一樣，每一位編輯都有自己的用戶討論頁，他們可以在這裏給您留言。<br><br>欸，來看看吧⋯⋯有人給你留言了。<br><br>',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+		        buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/2/Start' ) + '?tour=twa2&step=1'          
+                } , {
+                        name: '查看新留言*',
+                        onclick: function()  {  if(!mw.config.get('wgUserName')){  alert( "請登入。" );   return;   } sendMessage( 'User talk:' + mw.config.get( 'wgUserName' ) + '/TWA', 'Wikipedia:TWA/MyTalk/1' , mw.util.getUrl( 'Special:MyTalk/TWA' ) + '?tour=twa2&step=3'); }
+                } ],
+                allowAutomaticOkay: false
+ 
+        },  {
+                //3
+                title: '專人服務',
+                description: '<br><div align="left">[[File:TWA_guide_left_top.png|link=]]</div>哇，這樣不錯啊。來留言的都是活生生的人，就像我一樣。<br><br>一起回覆他吧。<br><br>',
+                onShow: gt.parseDescription,
+                attachTo: '#content.mw-body',
+                position: 'bottom',
+                overlay: false,
+                closeOnClickOutside: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/2/Start' ) + '?tour=twa2&step=2'          
+                } , {
+                         name: '給迎客松回信',
+                         action: 'externalLink',
+                         url: mw.util.getUrl( 'Wikipedia:TWA/2/Will' ) + '?tour=twa2&step=4'
+                } ],
+                allowAutomaticOkay: false				
+ 
+        },  {
+                //4
+                title: '問答',
+                description: '提示：答對也好，答錯也好，學會的知識都是一樣的。答錯了可以再來，多少次也沒關係！',
+                attachTo:'#contentSub',
+                position: 'bottom',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+                allowAutomaticOkay: false, 
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Special:MyTalk/TWA' ) + '?tour=twa2&step=3'          
+                } ],
+
+        },  {
+                //5
+                title: '撰寫回信',
+                description: '<br>按「編輯」，然後您就可以給迎客松回信了。<br><br>',
+                attachTo: '#ca-edit',
+                position: 'bottom',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+                allowAutomaticOkay: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Wikipedia:TWA/2/Will' ) + '?tour=twa2&step=4'          
+                } ],
+                shouldSkip: function() {
+                        return gt.hasQuery( { action: 'edit' } );
+                }
+
+        },  {
+                //6
+                title: '抄寫回信',
+                description: '<br><div align="left">[[File:TWA_guide_left_top.png|link=]]</div>-{zh-hans:复制; zh-hant:複製; zh-tw:拷貝;}-最好的訊息，然後在迎客松的訊息下面-{zh-hans:黏贴; zh-hant:貼上;}-您的回信：<br><br>:<nowiki>衷心感謝[[User:WillKomen|迎客松]]君的熱烈歡迎</nowiki>，我等不及要去做第一次編輯了！<nowiki>~~~~</nowiki><br>',
+                onShow: gt.parseDescription,
+                overlay: false,
+                attachTo: '#wpTextbox1', 
+                position: 'bottomRight',
+                closeOnClickOutside: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Special:MyTalk/TWA' ) + '?tour=twa2&step=5'          
+                } , {
+                        name: '抄好了',
+                        action: 'next',
+                         } ],
+                allowAutomaticOkay: false
+
+},  {
+                //7
+                title: '三個小提示',
+                description: '<br>回覆別人的時候，請在留言前面加一個冒號<code > : </code>，在留言的前方{{ProperNoun|縮進}}一個空位。<br><br> 您可以使用代碼 <code><nowiki>~~~~</nowiki></code> 或 [[File:Signature_icon_april_2018.png|25px]] 簽名按鈕{{ProperNoun|留下大名}}（而不是直接輸入用戶名），表明自己的身份。請注意，我們只會在討論頁上簽名，條目<b>不用</b>。<br><br>您可以在留言前方直接打出他的{{ProperNoun|真實}}用戶名（如<code><nowiki>[[User:WillKomen|迎客松]]</nowiki></code>），{{ProperNoun|告訴}}他您回覆了；如果您直接在迎客松的討論頁回信，系統會自動通知他，甚麼都不用做。',
+                attachTo: '#wpTextbox1', 
+                position: 'bottomRight',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Special:MyTalk/TWA' ) + '?tour=twa2&step=6&action=edit'          
+                } , {
+                	    name: '知道了',
+                        action: 'next'
+                } ],
+                allowAutomaticOkay: false,
+				
+} , {
+                //8
+                title: '寫下編輯摘要和儲存',
+                description: '<br>請在編輯摘要欄輸入「感謝您的盛情邀請。」<br><br>準備好了以後，就<b>儲存</b>。<br><br>',
+                attachTo: '#wpSave',
+                position: 'bottomRight',
+                autoFocus: 'yes',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+	            allowAutomaticOkay: false,
+	            buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Special:MyTalk/TWA' ) + '?tour=twa2&step=7&action=edit'          
+                } ],
+	            shouldSkip: function() {
+                        return gt.isPostEdit();
+                },
+                buttons: postEditButtons
+
+} , {
+                //9
+                title: '縮排增加了，名字簽好了，他也知道了！',
+                description: '獲得新工具：<b>通訊員獎章</b><center>[[File:TWA_badge_3.png|250px]]</center><br>', 
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Special:MyTalk/TWA' ) + '?tour=twa2&step=8&action=edit'          
+                } , {
+                        name: '繼續溝通*',
+                        onclick: function()  {  if(!mw.config.get('wgUserName')){  alert( "請登入。" );   return;   } sendMessage( 'User:' + mw.config.get( 'wgUserName' ), 'Wikipedia:TWA/Badge/3template2' , mw.util.getUrl( 'Wikipedia:TWA/2/Start' ) + '?tour=twa2&step=10'); } 
+                } ],
+               allowAutomaticOkay: false
+		
+} , {
+                //10
+                title: '溝通的力量！',
+                description: '<br><div align="right">[[File:TWA_guide_right_top.png|link=]]</div>嘿，如果您要同時參加多個討論，那該怎麼辦呢？怎樣追蹤這些討論的最新進展呢？<br><br>',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+                allowAutomaticOkay: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Special:MyTalk/TWA' ) + '?tour=twa2&step=9'          
+                } , {
+                	    name: '好問題⋯⋯',
+                        action: 'next'
+               } ],
+
+}, {
+                //11
+                title: '解決辦法',
+                description: '<br>-{zh-hans:监视列表; zh-hant:監視清單;}-。這個-{zh-hans:列表; zh-hant:清單;}-只屬於您，您可以選擇追蹤哪些頁面。它會自動更新，您可以隨時了解這些頁面最近有甚麼變化。<br><br>您可以按下[[File:Vector_skin_-_page_not_in_the_watchlist.png|File:Vector_skin_-_page_not_in_the_watchlist.png]]頁面上方那一顆星星，待星星變成[[File:Vector_skin_-_page_in_the_watchlist.png|File:Vector_skin_-_page_in_the_watchlist.png]]藍色之後，您就可以追蹤這個頁面了！（您也可以調整-{zh-hant:偏好設定; zh-hans:参数设置; zh-sg:设置;}-，讓系統自動追蹤任何自己編輯過的頁面。）<br><br>來看看自己的「-{zh-hans:监视列表; zh-hant:監視清單;}-」吧。',
+                attachTo: '#pt-watchlist',
+                position: 'bottom', 
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+                allowAutomaticOkay: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Special:MyTalk/TWA' ) + '?tour=twa2&step=10'          
+                } ],
+	            shouldSkip: function() {
+                        return gt.isPage( 'Special:监视列表' );
+                }
+                
+ 
+} , {
+                //12
+                title: '檢視-{zh-hans:监视列表; zh-hant:監視清單;}-',
+                description: '<br><div align="left">[[File:TWA_guide_left_top.png|link=]]</div>維基百科有一個{{ProperNoun|很}}好的地方，就是每一筆編輯都會記錄在案，讓別人能夠查看您的貢獻——因為我們會以最佳的狀態幫助其他編輯。<br><br>,
+                onShow: gt.parseDescription,
+                attachTo: '#content.mw-body',
+                position: 'bottom',
+                overlay: false,
+                closeOnClickOutside: false,
+                allowAutomaticOkay: false,
+	            buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Special:MyTalk/TWA' ) + '?tour=twa2&step=11'          
+                } , {
+	            	    name: '我們的理念',
+                        action: 'next'
+               } ],
+
+} , {
+                //13
+                title: '勇於編輯',
+                description: '您可以隨時回復較舊的版本，抹去搗蛋鬼鬧事的痕跡。<br><br>現在可以鬆一口氣了吧？<br><br>所以我們的編輯理念就是<b>「勇於編輯」</b>了！<br><br>',
+                onShow: gt.parseDescription,
+                overlay: true,
+                closeOnClickOutside: false,
+                allowAutomaticOkay: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Special:监视列表' ) + '?tour=twa2&step=12'          
+                } , {
+                	    name: '除了監視列表',
+                        action: 'next'
+               } ],
+ 
+} , {
+                //14
+                title: '追蹤您的貢獻',
+                description: '<br>除了監視列表，您還可以追蹤自己的編輯記錄。<br><br>按「貢獻」。',
+                onShow: gt.parseDescription,
+                overlay: false,
+                attachTo: '#pt-mycontris',
+                position: 'bottomLeft',
+                closeOnClickOutside: false,
+                allowAutomaticOkay: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Special:监视列表' ) + '?tour=twa2&step=13'          
+                } ],
+                shouldSkip: function() {
+                        return gt.isPage( 'Special:用户贡献/' + mw.config.get( 'wgUserName' ).replace(/ /g, '_') );
+                }
+ 
+} , {
+                //15
+                title: '您的貢獻',
+                description: '<br>這就是您到目前為止的貢獻了。除了用戶頁和討論頁就沒別的啊⋯⋯<br><br>來看看我們能做些甚麼吧。<br><br>啊，等等，似乎又有新留言了。<br><br>',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+	            buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl( 'Special:监视列表' ) + '?tour=twa2&step=14'          
+                } , {
+                        name: '查看新訊息*',
+                        onclick: function()  {  if(!mw.config.get('wgUserName')){  alert( "請登入。" );   return;   } sendMessage( 'User talk:' + mw.config.get( 'wgUserName' ) + '/TWA', 'Wikipedia:TWA/MyTalk/2' , mw.util.getUrl( 'Special:MyTalk/TWA' ) + '?tour=twa2&step=16'); }
+                } ],       
+                allowAutomaticOkay: false
+
+} , {
+                //16
+                title: '邀請信',
+                description: '<br><div align="right">[[File:TWA_guide_right_top.png|link=]]</div>又有新任務了，還-{zh-hans:挺; zh-hant:挺; zh-tw:蠻;}-好的⋯⋯<br><br>',
+                onShow: gt.parseDescription,
+                attachTo: '#content.mw-body',
+                position: 'bottom',
+                overlay: false,
+                closeOnClickOutside: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl ('Special:用户贡献/' ) + mw.config.get( 'wgUserName' ) + '?tour=twa2&step=15'          
+                } , {
+                         name: '給蓋亞女郎回信',
+                         action: 'externalLink',
+                         url: mw.util.getUrl( 'Wikipedia:TWA/2/Gaia' ) + '?tour=twa2&step=17'
+                } ],
+                allowAutomaticOkay: false				
+ 
+        },  {
+                //17
+                title: '問答',
+                description: '提示：答對也好，答錯也好，學會的知識都是一樣的。答錯了可以再來，多少次也沒關係！',
+                attachTo:'#contentSub',
+                position: 'bottom',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+                allowAutomaticOkay: false, 
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl ( 'Special:MyTalk/TWA' ) + '?tour=twa2&step=16'          
+                } ],
+				
+        },  {
+                //18
+                title: '回覆',
+                description: '<br>按「編輯」，這樣您就可以給蓋亞女郎回信了。<br><br>',
+                attachTo: '#ca-edit',
+                position: 'bottom',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+                allowAutomaticOkay: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl ( 'Wikipedia:TWA/2/Gaia' ) + '?tour=twa2&step=17'          
+                } ],
+                shouldSkip: function() {
+                        return gt.hasQuery( { action: 'edit' } );
+                }
+				
+        },  {
+                //19
+                title: '回信',
+                description: '<br>-{zh-hans:复制; zh-hant:複製; zh-tw:拷貝;}-您的訊息，然後蓋亞女郎的訊息下面-{zh-hans:黏贴; zh-hant:貼上;}-回信的內容<br><br>:<nowiki>[[User:GaiaGirl86|User:GaiaGirl86]]</nowiki>真棒啊，我最喜歡地球了！你知道怎樣去地球嗎？<nowiki>~~~~</nowiki><br>',
+                onShow: gt.parseDescription,
+                overlay: false,
+                attachTo: '#wpTextbox1', 
+                position: 'bottomRight',
+                closeOnClickOutside: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl ( 'Special:MyTalk/TWA' ) + '?tour=twa2&step=18'          
+                } , {
+                	    name: '抄好了',
+                        action: 'next'
+                } ],
+                allowAutomaticOkay: false
+
+},  {
+                //20
+                title: '寫下編輯摘要和儲存',
+                description: '<br>編輯摘要的話，不如就寫「我喜歡幫忙」吧？<br><br>準備好了，就<b>儲存</b>。<br><br>',
+                onShow: gt.parseDescription,
+                overlay: false,
+	            attachTo: '#wpSave',
+                position:  'bottomRight',
+	            autoFocus: 'yes',
+                closeOnClickOutside: false,
+                allowAutomaticOkay: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl ( 'Special:MyTalk/TWA' ) + '?tour=twa2&step=19&action=edit'          
+                } ],
+	            shouldSkip: function() {
+                        return gt.isPostEdit();
+                },
+                buttons: postEditButtons
+
+} , {
+                //21
+                title: '滴答滴答',
+                description: '<br><div align="right">[[File:TWA_guide_right_top.png|link=]]</div>嘿，來刷新頁面吧。看看蓋亞女郎有沒有回覆您？',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+	            allowAutomaticOkay: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl ( 'Special:MyTalk/TWA' ) + '?tour=twa2&step=20&action=edit'          
+                } , {
+                         name: '翻轉地球*',
+                         onclick: function()  {  if(!mw.config.get('wgUserName')){  alert( "請登入。" );   return;   } sendMessage( 'User talk:' + mw.config.get( 'wgUserName' ) + '/TWA', 'Wikipedia:TWA/MyTalk/3' , mw.util.getUrl( 'Special:MyTalk/TWA' ) + '?tour=twa2&step=22'); }
+                } ],
+
+} , {
+                //22
+                title: '怎麼走？',
+                description: '<br><div align="right">[[File:TWA_guide_right_top.png|link=]]</div>我會教您。跟着我到<b>地球</b>吧！<br><br>',
+                onShow: gt.parseDescription,
+                overlay: false,
+                attachTo: '#content.mw-body',
+                position: 'bottom',
+                closeOnClickOutside: false,
+	            allowAutomaticOkay: false,
+                buttons: [ {
+                        name: '<big>←</big>',
+                        action: 'externalLink',
+                        url: mw.util.getUrl ( 'Special:MyTalk/TWA' ) + '?tour=twa2&step=21'          
+                } , {
+                         name: '向地球進發',
+                         action: 'externalLink',
+                         url: mw.util.getUrl( 'Wikipedia:TWA/2/End' ) + '?tour=twa2&step=23'
+                } ],
+
+} , {
+                //23
+                title: '第二關完成！',
+                description: '<br>[[File:Ringtone_(3).ogg|File:Ringtone (3).ogg]]<br><b>踏入第三關⋯⋯</b>',
+                onShow: gt.parseDescription,
+                overlay: false,
+                closeOnClickOutside: false,
+	            buttons: [ {
+	            	    name: '恭喜自己！',
+                        action: 'end'
+                } ],
+ 
+}]
+ 
+} );
+ 
+} (window, document, jQuery, mediaWiki, mediaWiki.guidedTour ) ) ;

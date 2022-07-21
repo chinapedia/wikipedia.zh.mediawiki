@@ -1,0 +1,464 @@
+{{multiple issues|
+
+{{orphan|time=2016-07-04T13:22:47+00:00}}
+{{refimprove|time=2016-07-04T13:22:47+00:00}}
+{{roughtranslation|time=2016-07-04T13:22:47+00:00}}
+{{expand|time=2018-06-04T14:50:51+00:00}}
+{{expert|time=2018-06-04T14:50:51+00:00}}
+}}
+'''流式接口'''（fluent interface）是[[软件工程|软件工程]]中[[面向对象设计|面向对象]]API的一种实现方式，以提供更为可读的源代码。最早由{{tsl|en|Eric Evans (technologist)|Eric Evans}}与[[Martin_Fowler|Martin Fowler]]于2005年提出。
+
+通常采取{{tsl|en|enmethod cascading|方法瀑布调用}} (具体说是{{tsl|en|method chaining|方法链式调用}})来转发一系列对象方法调用的上下文 <ref>{{cite web|url=http://www.martinfowler.com/bliki/FluentInterface.html|title=bliki: FluentInterface|publisher=|access-date=2016-07-02|archive-date=2021-03-08|archive-url=https://web.archive.org/web/20210308190652/https://www.martinfowler.com/bliki/FluentInterface.html|dead-url=no}}</ref>。这个上下文（context）通常是指：
+* 通过被调方法的返回值定义
+* 自引用，新的上下文等于老的上下文。
+* 返回一个空的上下文来终止。
+
+[[C++|C++]]的[[iostream|iostream]]流式调用就是一个典型的例子。Smalltalk在1970年代就实现了{{tsl|en|enmethod cascading|方法瀑布调用}}。
+ 
+==例子==
+
+===JavaScript===
+
+用于数据库查询的[[jQuery|jQuery]]，例如https://github.com/Medium/dynamite {{Wayback|url=https://github.com/Medium/dynamite |date=20201106122008 }} :
+
+<syntaxhighlight lang="javascript">
+// getting an item from a table
+client.getItem('user-table')
+    .setHashKey('userId', 'userA')
+    .setRangeKey('column', '@')
+    .execute()
+    .then(function(data) {
+        // data.result: the resulting object
+    })
+</syntaxhighlight>
+
+JavaScript使用原型继承与`this`.
+
+<syntaxhighlight lang="javascript">
+// example from http://schier.co/post/method-chaining-in-javascript
+// define the class
+var Kitten = function() {
+  this.name = 'Garfield';
+  this.color = 'brown';
+  this.gender = 'male';
+};
+
+Kitten.prototype.setName = function(name) {
+  this.name = name;
+  return this;
+};
+
+Kitten.prototype.setColor = function(color) {
+  this.color = color;
+  return this;
+};
+
+Kitten.prototype.setGender = function(gender) {
+  this.gender = gender;
+  return this;
+};
+
+Kitten.prototype.save = function() {
+  console.log(
+    'saving ' + this.name + ', the ' +
+    this.color + ' ' + this.gender + ' kitten...'
+  );
+
+  // save to database here...
+
+  return this;
+};
+
+// use it
+new Kitten()
+  .setName('Bob')
+  .setColor('black')
+  .setGender('male')
+  .save();
+</syntaxhighlight>
+
+===Java===
+[[jOOQ|jOOQ]]库模拟了SQL
+
+<syntaxhighlight lang="java">
+Author author = AUTHOR.as("author");
+create.selectFrom(author)
+      .where(exists(selectOne()
+                   .from(BOOK)
+                   .where(BOOK.STATUS.eq(BOOK_STATUS.SOLD_OUT))
+                   .and(BOOK.AUTHOR_ID.eq(author.ID))));
+</syntaxhighlight>
+ 
+===C#===
+
+C#在[[LINQ|LINQ]]中大量使用 ''standard query operators''与[[扩展方法|扩展方法]]。
+
+<syntaxhighlight lang="csharp">
+var translations = new Dictionary<string, string>
+                   {
+                       {"cat", "chat"},
+                       {"dog", "chien"},
+                       {"fish", "poisson"},
+                       {"bird", "oiseau"}
+                   };
+
+// Find translations for English words containing the letter "a",
+// sorted by length and displayed in uppercase
+IEnumerable<string> query = translations
+	.Where   (t => t.Key.Contains("a"))
+	.OrderBy (t => t.Value.Length)
+	.Select  (t => t.Value.ToUpper());
+
+// The same query constructed progressively:
+var filtered   = translations.Where (t => t.Key.Contains("a"));
+var sorted     = filtered.OrderBy   (t => t.Value.Length);
+var finalQuery = sorted.Select      (t => t.Value.ToUpper());
+</syntaxhighlight>
+
+流式接口可用于一系列方法，他们运行在同一对象上。
+<syntaxhighlight lang="csharp">
+// Defines the data context
+class Context
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Sex { get; set; }
+    public string Address { get; set; }
+}
+
+class Customer
+{
+    private Context _context = new Context(); // Initializes the context
+
+    // set the value for properties
+    public Customer FirstName(string firstName)
+    {
+        _context.FirstName = firstName;
+        return this;
+    }
+
+    public Customer LastName(string lastName)
+    {
+        _context.LastName = lastName;
+        return this;
+    }
+
+    public Customer Sex(string sex)
+    {
+        _context.Sex = sex;
+        return this;
+    }
+
+    public Customer Address(string address)
+    {
+        _context.Address = address;
+        return this;
+    }
+
+    // Prints the data to console
+    public void Print()
+    {
+        Console.WriteLine("First name: {0} \nLast name: {1} \nSex: {2} \nAddress: {3}", _context.FirstName, _context.LastName, _context.Sex, _context.Address);
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Object creation
+        Customer c1 = new Customer();
+        // Using the method chaining to assign & print data with a single line
+        c1.FirstName("vinod").LastName("srivastav").Sex("male").Address("bangalore").Print();
+    }
+}
+</syntaxhighlight>
+
+===C++===
+下述代码对比了传统的风格与流式接口的实现风格：
+
+<syntaxhighlight lang="cpp">
+ // Basic definition
+ class GlutApp {
+ private:
+     int w_, h_, x_, y_, argc_, display_mode_;
+     char **argv_;
+     char *title_;
+ public:
+     GlutApp(int argc, char** argv) {
+         argc_ = argc;
+         argv_ = argv;
+     }
+     void setDisplayMode(int mode) {
+         display_mode_ = mode;
+     }
+     int getDisplayMode() {
+         return display_mode_;
+     }
+     void setWindowSize(int w, int h) {
+         w_ = w;
+         h_ = h;
+     }
+     void setWindowPosition(int x, int y) {
+         x_ = x;
+         y_ = y;
+     }
+     void setTitle(const char *title) {
+         title_ = title;
+     }
+     void create(){;}
+ };
+ // Basic usage
+ int main(int argc, char **argv) {
+     GlutApp app(argc, argv);
+     app.setDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_ALPHA|GLUT_DEPTH); // Set framebuffer params
+     app.setWindowSize(500, 500); // Set window params
+     app.setWindowPosition(200, 200);
+     app.setTitle("My OpenGL/GLUT App");
+     app.create();
+ }
+
+ // Fluent wrapper
+ class FluentGlutApp : private GlutApp {
+ public:
+     FluentGlutApp(int argc, char **argv) : GlutApp(argc, argv) {} // Inherit parent constructor
+     FluentGlutApp &withDoubleBuffer() {
+         setDisplayMode(getDisplayMode() | GLUT_DOUBLE);
+         return *this;
+     }
+     FluentGlutApp &withRGBA() {
+         setDisplayMode(getDisplayMode() | GLUT_RGBA);
+         return *this;
+     }
+     FluentGlutApp &withAlpha() {
+         setDisplayMode(getDisplayMode() | GLUT_ALPHA);
+         return *this;
+     }
+     FluentGlutApp &withDepth() {
+         setDisplayMode(getDisplayMode() | GLUT_DEPTH);
+         return *this;
+     }
+     FluentGlutApp &across(int w, int h) {
+         setWindowSize(w, h);
+         return *this;
+     }
+     FluentGlutApp &at(int x, int y) {
+         setWindowPosition(x, y);
+         return *this;
+     }
+     FluentGlutApp &named(const char *title) {
+         setTitle(title);
+         return *this;
+     }
+     // It doesn't make sense to chain after create(), so don't return *this
+     void create() {
+         GlutApp::create();
+     }
+ };
+ // Fluent usage
+ int main(int argc, char **argv) {
+     FluentGlutApp(argc, argv)
+         .withDoubleBuffer().withRGBA().withAlpha().withDepth()
+         .at(200, 200).across(500, 500)
+         .named("My OpenGL/GLUT App")
+         .create();
+ }
+</syntaxhighlight>
+
+===Ruby===
+[[Ruby|Ruby]]语言允许修改核心类，这使得流式接口成为原生易于实现。 <syntaxhighlight lang="ruby">
+# Add methods to String class
+class String
+  def prefix(raw)
+    "#{raw} #{self}"
+  end
+  def suffix(raw)
+    "#{self} #{raw}"
+  end
+  def indent(raw)
+    raw = " " * raw if raw.kind_of? Fixnum
+    prefix(raw)
+  end
+end
+ 
+# Fluent interface
+message = "there"
+puts message.prefix("hello")
+            .suffix("world")
+            .indent(8)
+</syntaxhighlight>
+
+===Scala===
+
+Scala supports a fluent syntax for both method calls and class mixins, using '''trait'''s and the '''with''' keyword.  For example:
+
+<syntaxhighlight lang="scala">
+class Color { def rgb(): Tuple3[Decimal] }
+object Black extends Color { override def rgb(): Tuple3[Decimal] = ("0", "0", "0"); }
+
+trait GUIWindow {
+  // Rendering methods that return this for fluent drawing
+  def set_pen_color(color: Color): this.type
+  def move_to(pos: Position): this.type
+  def line_to(pos: Position, end_pos: Position): this.type
+
+  def render(): this.type = this // Don't draw anything, just return this, for child implementations to use fluently
+
+  def top_left(): Position
+  def bottom_left(): Position
+  def top_right(): Position
+  def bottom_right(): Position
+}
+
+trait WindowBorder extends GUIWindow {
+  def render(): GUIWindow = {
+    super.render()
+      .move_to(top_left())
+      .set_pen_color(Black)
+      .line_to(top_right())
+      .line_to(bottom_right())
+      .line_to(bottom_left())
+      .line_to(top_left())
+   }
+}
+
+class SwingWindow extends GUIWindow { ... }
+
+val appWin = new SwingWindow() with WindowBorder
+appWin.render()
+</syntaxhighlight>
+
+===Perl 6===
+
+In [[Perl_6|Perl 6]], there are many approaches, but one of the simplest is to declare attributes as read/write and use the <code>given</code> keyword. The type annotations are optional, but the native [[gradual_typing|gradual typing]] makes it much safer to write directly to public attributes.
+
+<syntaxhighlight lang="perl6">
+class Employee {
+    subset Salary         of Real where * > 0;
+    subset NonEmptyString of Str  where * ~~ /\S/; # at least one non-space character
+
+    has NonEmptyString $.name    is rw;
+    has NonEmptyString $.surname is rw;
+    has Salary         $.salary  is rw;
+
+    method gist {
+        return qq:to[END];
+        Name:    $.name
+        Surname: $.surname
+        Salary:  $.salary
+        END
+    }
+}
+my $employee = Employee.new();
+
+given $employee {
+    .name    = 'Sally';
+    .surname = 'Ride';
+    .salary  = 200;
+}
+
+say $employee;
+
+# Output:
+# Name:    Sally
+# Surname: Ride
+# Salary:  200
+</syntaxhighlight>
+
+===PHP===
+
+在PHP中，可以使用表示实例的特殊变量$this返回当前对象。因此返回$this将使方法返回实例。下面的示例定义了一个Employee类和三个方法来设置它的名称、姓和薪水。每个Employee类的实例允许调用这些方法。
+
+<syntaxhighlight lang="php">
+<?php
+class Employee
+{
+    public $name;
+    public $surName; 
+    public $salary;
+
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function setSurname($surname)
+    {
+        $this->surName = $surname;
+
+        return $this;
+    }
+
+    public function setSalary($salary)
+    {
+        $this->salary = $salary;
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+        $employeeInfo = 'Name: ' . $this->name . PHP_EOL;
+        $employeeInfo .= 'Surname: ' . $this->surName . PHP_EOL;
+        $employeeInfo .= 'Salary: ' . $this->salary . PHP_EOL;
+
+        return $employeeInfo;
+    }
+}
+
+# Create a new instance of the Employee class, Tom Smith, with a salary of 100:
+$employee = (new Employee())
+                ->setName('Tom')
+                ->setSurname('Smith')
+                ->setSalary('100');
+
+# Display the value of the Employee instance:
+echo $employee;
+
+# Display:
+# Name: Tom
+# Surname: Smith
+# Salary: 100
+</syntaxhighlight>
+
+===Python===
+Python通过在实例方法中返回`self`：
+
+<syntaxhighlight lang="python">
+class Poem(object):
+    def __init__(self, content):
+        self.content = content
+
+    def indent(self, spaces):
+        self.content = " " * spaces + self.content
+        return self
+
+    def suffix(self, content):
+        self.content = self.content + " - " + content
+        return self
+</syntaxhighlight>
+<syntaxhighlight lang="pycon">
+>>> Poem("Road Not Travelled").indent(4).suffix("Robert Frost").content
+'    Road Not Travelled - Robert Frost'
+</syntaxhighlight>
+ 
+
+===Visual Basic.Net===
+{{Empty section}}
+
+
+==参考文献==
+{{reflist}}
+
+==外部链接==
+* [http://martinfowler.com/bliki/FluentInterface.html Martin Fowler's original bliki entry coining the term] {{Wayback|url=http://martinfowler.com/bliki/FluentInterface.html |date=20210308190652 }}
+* [http://17slon.com/blogs/gabr/2009/04/fluent-xml-1.html A Delphi example of writing XML with a fluent interface] {{Wayback|url=http://17slon.com/blogs/gabr/2009/04/fluent-xml-1.html |date=20090405030147 }}
+* [http://tnvalidate.codeplex.com/ A .NET fluent validation library written in C#] {{Wayback|url=http://tnvalidate.codeplex.com/ |date=20171223050720 }}
+* [http://blog.jooq.org/2012/01/05/the-java-fluent-api-designer-crash-course/ A tutorial for creating formal Java fluent APIs from a BNF notation] {{Wayback|url=http://blog.jooq.org/2012/01/05/the-java-fluent-api-designer-crash-course/ |date=20130920165112 }}
+
+{{软件设计模式}}
+
+[[Category:软件设计模式|Category:软件设计模式]]
+[[Category:C++|Category:C++]]

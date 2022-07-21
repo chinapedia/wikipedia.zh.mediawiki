@@ -1,0 +1,116 @@
+<includeonly>{{<!--
+1: if a mandatory field is unspecified, return error, else next test
+-->#ifexpr:
+{{#if:{{{value|{{{2|}}}}}}|0|1}}
+or {{#if:{{{start_year|{{{3|}}}}}}|0|1}}
+|<span class="error">使用{{tl|Inflation}}时出错:<!--
+--> {{Separated entries|separator=,&#32;|conjunction=&#32;and&#32;
+|{{#if:{{{index|{{{1|}}}}}}||{{para|index}} (参数1)}}
+|{{#if:{{{value|{{{2|}}}}}}||{{para|value}} (参数2)}}
+|{{#if:{{{start_year|{{{3|}}}}}}||{{para|start_year}} (参数3)}}
+}} 必须被指定。</span><!--
+-->{{#if:{{{nocat|}}}||{{main other|[[Category:使用Inflation模板时错误的页面]]}}}}<!--
+
+-->|{{<!--
+2: if index code is unrecognized, return error, else next test
+-->#ifexpr:
+not(
+{{#ifexist:Template:Inflation/{{{index|{{{1}}}}}}|1|0}}
+and {{Isnumeric|{{Inflation/year|{{{index|{{{1}}}}}}}}|boolean=true}}
+)
+|<span class="error">使用{{tl|Inflation}}时出错:<!--
+--> {{para|index|'''{{{index|{{{1}}}}}}'''}} (参数1)为无法识别索引.</span><!--
+-->{{#if:{{{nocat|}}}||{{main other|[[Category:使用Inflation模板时错误的页面]]}}}}<!--
+
+-->|{{<!--
+3: if a numeric parameter contain invalid data, return error, else next test
+-->#ifexpr:
+not(
+{{Isnumeric|{{{value|{{{2}}}}}}|boolean=true}}
+and {{Isnumeric|{{{start_year|{{{3}}}}}}|boolean=true}}
+and {{#if: {{{end_year|{{{4|}}}}}} | {{Isnumeric|{{{end_year|{{{4}}}}}}|boolean=true}} | 1 }}
+and {{#if: {{{r|}}} | {{Isnumeric|{{{r}}}|boolean=true}} | 1 }}
+)
+|<span class="error">使用{{tl|Inflation}}时出错:<!--
+--> [[NaN]], 检查参数是否存在非数字值:<!--
+--> {{Separated entries|separator=,&#32;|conjunction=&#32;and&#32;
+|{{Ifnumber|{{formatnum:{{{value|{{{2}}}}}}|R}}||{{para|value|'''{{{value|{{{2}}}}}}'''}} (参数2)}}
+|{{Ifnumber|{{formatnum:{{{start_year|{{{3}}}}}}|R}}||{{para|start_year|'''{{{start_year|{{{3}}}}}}'''}} (参数3)}}
+|{{#if: {{{end_year|{{{4|}}}}}} | {{Ifnumber|{{formatnum:{{{end_year|{{{4}}}}}}|R}}||{{para|end_year|'''{{{end_year|{{{4}}}}}}'''}} (参数4)}} }}
+|{{#if: {{{r|}}} | {{Ifnumber|{{formatnum:{{{r}}}|R}}||{{para|r|'''{{{r}}}'''}}}} }}
+}}.</span><!--
+-->{{#if:{{{nocat|}}}||{{main other|[[Category:使用Inflation模板时错误的页面]]}}}}<!--
+
+-->|{{<!--
+4: if a parameter is out of calculable bounds, return error, else proceed
+-->#ifexpr:
+not(
+( {{{start_year|{{{3}}}}}} >= {{Inflation/{{{index|{{{1}}}}}}/startyear}} )
+and(
+( {{{start_year|{{{3}}}}}} <= {{{end_year|{{{4|{{Inflation/year|{{{index|{{{1}}}}}}}}}}}}}} )
+or ( {{{start_year|{{{3}}}}}} = {{{end_year|{{{4|{{CURRENTYEAR}}}}}}}} )
+)
+and ( {{{end_year|{{{4|{{Inflation/year|{{{index|{{{1}}}}}}}}}}}}}} <= {{Inflation/year|{{{index|{{{1}}}}}}}} )
+)
+|<span class="error">使用{{tl|Inflation}}时出错:<!--
+--> {{Separated entries|separator=,&#32;|conjunction=&#32;and&#32;
+|{{<!-- 4a: [parameter 3/start_year] too low -->
+#ifexpr: {{{start_year|{{{3}}}}}} < {{Inflation/{{{index|{{{1}}}}}}/startyear}}
+|{{para|start_year|'''{{{start_year|{{{3}}}}}}'''}} (参数3)<!--
+--> 低于索引"'''{{{index|{{{1}}}}}}'''"最早可用年('''{{Inflation/{{{index|{{{1}}}}}}/startyear}}''')。}}
+|{{<!-- 4b: [parameter 3/start_year] greater than [parameter 4/end_year]
+...and not equal to {{CURRENTYEAR}} if [parameter 4/end_year] is unspecified -->
+#ifexpr:
+( {{{start_year|{{{3}}}}}} > {{{end_year|{{{4|{{Inflation/year|{{{index|{{{1}}}}}}}}}}}}}} )
+and ( {{{start_year|{{{3}}}}}} != {{{end_year|{{{4|{{CURRENTYEAR}}}}}}}} )
+|{{para|start_year|'''{{{start_year|{{{3}}}}}}'''}} (参数3)<!--
+--> 大于<!--
+--> {{<!--
+-->#if:{{{end_year|{{{4|}}}}}}<!--
+-->|{{para|end_year|'''{{{end_year|{{{4}}}}}}'''}} (参数4)<!--
+-->|索引"'''{{{index|{{{1}}}}}}'''"的最新可用年('''{{Inflation/year|{{{index|{{{1}}}}}}}}''')}}<!--
+-->}}
+|{{<!-- 4c: [parameter 4/end_year] greater than [parameter 1/index] highest year -->
+#ifexpr: {{{end_year|{{{4|{{Inflation/year|{{{index|{{{1}}}}}}}}}}}}}} > {{Inflation/year|{{{index|{{{1}}}}}}}}
+|{{para|end_year|'''{{{end_year|{{{4}}}}}}'''}} (参数4)<!--
+--> 大于索引"'''{{{index|{{{1}}}}}}'''"的最新可用年('''{{Inflation/year|{{{index|{{{1}}}}}}}}''')}}<!--
+-->}}.</span><!--
+-->{{#if:{{{nocat|}}}||{{main other|[[Category:使用Inflation模板时错误的页面]]}}}}<!--
+
+-->|<!--
+begin template proper
+-->{{#ifeq:{{{fmt|raw}}}|eq|相当于}}<!--
+-->{{#ifeq:{{{fmt|raw}}}|eq|<!--
+--> {{<!--
+-->#ifeq:{{{start_year|{{{3}}}}}}|{{CURRENTYEAR}}<!--
+-->|{{CURRENTYEAR}}<!--
+-->|{{{end_year|{{{4|{{Inflation/year|{{{index|{{{1}}}}}}}}}}}}}}<!--
+-->}}年的<!--
+-->}}{{#ifeq:{{{fmt|raw}}}|eq|{{{cursign|$}}}}}<!--
+-->{{formatnum:
+{{
+#iferror:
+{{#invoke:Math|round|1={{
+#expr:
+{{formatnum:{{{value|{{{2}}}}}}|R}}
+{{#ifeq:{{{start_year|{{{3}}}}}}|{{CURRENTYEAR}}
+| * 1
+| {{Inflation/{{{index|{{{1}}}}}}|{{{start_year|{{{3}}}}}}|{{{end_year|{{{4|{{Inflation/year|{{{index|{{{1}}}}}}}}}}}}}}}}
+}}
+round {{{r|0}}}
+}}|2={{{r|0}}}}}
+|<span class="error">使用{{tl|Inflation}}时出错:<!--
+--> [[NaN]]/计算错误，请通知[[Template talk:Inflation]].</span><!--
+-->{{main other|[[Category:使用Inflation模板时错误的页面]]}}<!--
+this error indicates template bug, always categorize
+-->}}
+|{{#ifeq:{{{fmt|raw}}}|raw|R|}}
+}}<!--
+end template proper
+
+-->}}<!-- 4
+-->}}<!-- 3
+-->}}<!-- 2
+-->}}<!-- 1 --></includeonly><noinclude>
+{{Documentation}}
+</noinclude>

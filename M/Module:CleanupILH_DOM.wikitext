@@ -1,0 +1,22 @@
+local p = {}
+
+-- pageTitle: 正在处理的页面
+-- title: 放置重定向的页面
+-- newTitle: 重定向目标页面
+-- db: 其他wiki数据库名，如enwiki
+-- interwiki: 其他wiki查找页面标题
+-- interwikiData: 其他wiki页面标题，解析后，可用字段：interwiki, namespace, dbkey, fragment
+-- ll_title: 其他wiki中的ll_title，其已格式化版本执行findVariantLink后应和newTitle一致
+-- rd: 其他wiki上的重定向信息，nil或包含可用字段rd_from, rd_namespace, rd_title, rd_fragment
+-- 返回：
+-- true: 建立此重定向
+-- (string): 建立重定向至指定的重定向目标页面，若非有效标题，等效于true
+-- false: 不建立此重定向；指向title的链接重写为指向newTitle
+-- nil: 不建立此重定向；跳过此链接清理
+function p.checkRedirect( pageTitle, title, newTitle, db, interwiki, interwikiData, ll_title, rd )
+	-- 对于外语的段落重定向“条目”，按照原文标题重写方式清理。
+	local rdsec = (rd) and rd.rd_fragment or nil
+	return rdsec == nil or rdsec == ''
+end
+
+return p

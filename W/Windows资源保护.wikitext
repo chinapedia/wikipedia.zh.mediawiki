@@ -1,0 +1,40 @@
+{{NoteTA|G1=IT|G2=Windows}}
+'''Windows资源保护'''（{{lang-en|'''Windows Resource Protection'''}}）是[[Windows_Vista|Windows Vista]]的新功能，它取代了Windows 2000/XP/2003的[[Windows文件保护|Windows文件保护]]（WFP），会保护[[注册表|注册表]]键值、文件夹和关键系统文件。它保护资源的方式与Windows文件保护完全不同。<span class="cx-segment" data-segmentid="26"></span>
+
+== 概述 ==
+Windows文件保护基于在[[Winlogon|Winlogon]]中注册文件更改通知。如果检测到任何对受保护系统文件的修改，修改的文件会被恢复为位于压缩文件夹<tt> %WinDir%\System32\dllcache</tt> 的缓存副本。Windows资源保护（WRP）基于对预定义的受保护资源设置自主访问控制列表（DACL）和[[访问控制列表|访问控制列表]]（ACL）工作。完全访问和修改WRP保护的资源被限制到使用Windows模块安装服务（<code>TrustedInstaller.exe</code>）的进程。管理员不再拥有对系统文件的完全访问权，他们必须使用SetupAPI，或者获取资源的所有权并添加适当的访问控制条目（ACE）才能修改或替换它。“Trusted Installer”帐户用于保护核心操作系统文件和[[注册表|注册表]]键值。
+
+== 受保护资源 ==
+Windows资源保护会保护大量文件类型：
+
+<code><nowiki>
+*.acm *.ade *.adp *.app *.asa *.asp *.aspx *.ax *.bas *.bat *.bin *.cer *.chm *.clb *.cmd</nowiki><br>
+<nowiki>*.cnt *.cnv *.com *.cpl *.cpx *.crt *.csh *.dll *.drv *.dtd *.exe *.fxp *.grp *.h1s *.hlp</nowiki><br>
+<nowiki>*.hta *.ime *.inf *.ins *.isp *.its *.js *.jse *.ksh *.lnk *.mad *.maf *.mag *.mam *.man</nowiki><br>
+<nowiki>*.maq *.mar *.mas *.mat *.mau *.mav *.maw *.mda *.mdb *.mde *.mdt *.mdw *.mdz *.msc *.msi</nowiki><br>
+<nowiki>*.msp *.mst *.mui *.nls *.ocx *.ops *.pal *.pcd *.pif *.prf *.prg *.pst *.reg *.scf *.scr</nowiki><br>
+<nowiki>*.sct *.shb *.shs *.sys *.tlb *.tsp *.url *.vb *.vbe *.vbs *.vsmacros *.vss *.vst *.vsw *.ws</nowiki><br>
+<nowiki>*.wsc *.wsf *.wsh *.xsd *.xsl
+</nowiki></code>
+
+WRP还保护几个关键文件夹。只包含WRP保护文件的文件夹可能被锁定，目的是使仅“trusted installer”可以在该文件夹中创建文件和子文件夹。文件夹很可能被锁定为仅管理员可以在文件夹内创建文件和子文件夹。Windows Vista安装的重要[[注册表|注册表]]键值也会受到保护。如果一个键被WRP保护，其所有子键和值也会被保护。另外，WRP只复制重启Windows所需的文件到位于 <tt>%WinDir%\WinSxS\Backup</tt> 的缓存目录。重启Windows时不需要的文件不会复制到缓存目录，这不同于Windows文件保护会在 ''Dllcache'' 文件夹中缓存所有受保护的文件类型。缓存目录的大小和复制到缓存目录的文件类型不能修改。
+
+Windows资源保护采用更严格的措施保护文件。因此，Windows文件保护不再在Windows Vista上使用。为了取代单一保护文件，Windows文件保护已被完全禁用。Windows资源保护可以在各个项目上设置ACL来达成使命。因此，即便获取单个项目的所有权，只有该项会被替换，其他项目仍受保护。
+
+[[系統文件檢查器|系統文件檢查器]]也与WRP集成。在Windows Vista上，sfc.exe可以检查特定文件夹路径，包括Windows文件夹和引导文件夹。
+
+== 参见 ==
+* [[Windows文件保护|Windows文件保护]]
+* [[系統文件檢查器|系統文件檢查器]]
+* [[存取控制串列|存取控制串列]]
+* [[安全标识符|安全标识符]]
+
+== 外部链接 ==
+* [http://msdn2.microsoft.com/en-us/library/aa382503.aspx Windows Resource Protection in Windows Vista] {{Wayback|url=http://msdn2.microsoft.com/en-us/library/aa382503.aspx |date=20080410000247 }}
+* [http://blogs.msdn.com/cjacks/archive/2007/04/20/windows-resource-protection-wrp-and-activex-control-installation-on-windows-vista.aspx More information on WRP and application compatibility] {{Wayback|url=http://blogs.msdn.com/cjacks/archive/2007/04/20/windows-resource-protection-wrp-and-activex-control-installation-on-windows-vista.aspx |date=20070704030746 }}
+
+{{Windows Components}}
+
+[[Category:Windows_Vista|Category:Windows Vista]]
+[[Category:Windows管理|Category:Windows管理]]
+[[Category:Windows组件|Category:Windows组件]]

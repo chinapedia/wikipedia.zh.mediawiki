@@ -1,0 +1,27 @@
+'''積分飽和'''（Integral windup或integrator windup<ref>{{cite web|url=http://ww1.microchip.com/downloads/cn/AppNotes/cn_00532c.pdf|title=Microchip Application Note AN532: Servo Control of a DC Motor|page=4|publisher=Microchip Technology, Inc.|date=1997|accessdate=2014-01-07}}</ref>）是指[[PID控制器|PID控制器]]或是其他有[[積分器|積分器]]的控制器中的現象，是指誤差有大幅變化（例如大幅增加），積分器因為誤差的大幅增加有很大的累計量，因此造成[[過沖|過沖]]，而且當誤差變為負時，其過沖仍維持一段時間之後才恢復正常的情形。
+
+== 成因及特性 ==
+積分飽和常因為實際系統的限制所造成，實際系統和理想系統不同，有些理想系統中的訊號，在實際系統中會有飽和問題，因此系統的輸出會限制在其上限或是下限，例如一個輸出為0-5V的系統，輸出電壓不可能超過5V，也不可能低於0V。
+
+若因為實際系統的限制，控制器的輸出無法再影響控制變數，此時即為積分飽和的情形，例如輸出為0-5V的系統，理想的輸出在5V和6V之間變化，但實際輸出均維持在5V，這段控制器的輸出無法再影響控制變數，即為積分飽和。需要等理想輸出低於5V以下時，實際輸出會隨理想輸出變化，控制器的輸出無法再影響控制變數。控制器中若有積分器，其累計輸出的變化會隨積分時間而不同，若積分時間長時，其變化較慢，因此此現象會很明顯。
+
+積分飽和在類比的控制器中問題更大。若配合[[分散式控制系統|分散式控制系統]]或是用[[可程式邏輯控制器|可程式邏輯控制器]]控制，可以限制內部的控制器輸出或是積分累計量，或是配合外部的積分重置信號，在理想輸出及實際輸出不一致時重置積分，即可避免此情
+形，在[[PID控制器|PID控制器]]中可以用此方式處理來處理欠相。
+
+== 對策 ==
+此問題可以用以下方式處理：
+* 將控制器中積分器的累計值初始化到一理想的值。
+* 若積分飽和因為目標值突然變化而產生，將目標值以適當斜率的斜坡變化可避免此情形
+* 暫停積分機能，等到[[程序變數|程序變數]]回到可控制範圍內再繼續積分。
+* 將積分累計量限制上下限，避免積分累計量超過限制值。
+* 若輸出飽和時，重新計算積分累計量，使輸出恰好為合理的範圍<ref>{{cite web|last=Cooper|first=Douglas|title=Integral (Reset) Windup, Jacketing Logic and the Velocity PI Form|url=http://www.controlguru.com/2008/021008.html|accessdate=2014-02-18}}</ref>。
+
+== 參考資料 ==
+{{reflist}}
+
+{{DEFAULTSORT:Integral Windup}}
+[[Category:控制理论|Category:控制理论]]
+[[Category:控制工程|Category:控制工程]]
+[[Category:经典控制|Category:经典控制]]
+
+{{Tech-stub}}

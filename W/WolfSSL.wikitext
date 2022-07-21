@@ -1,0 +1,411 @@
+{{lowercase}}
+{{Infobox software
+| name                   = wolfSSL
+| logo                   = 
+| screenshot             = 
+| caption                =
+| developer              = Todd Ouska
+| released               = {{Start date|2006|02|19}}<ref name="wolfSSL-ChangeLog">{{cite web |title=wolfSSL ChangeLog |url=https://www.wolfssl.com/wolfSSL/Docs-wolfssl-changelog.html |accessdate=2016-07-15 |archive-date=2016-03-16 |archive-url=https://web.archive.org/web/20160316102447/https://wolfssl.com/wolfSSL/Docs-wolfssl-changelog.html |dead-url=no }}</ref>
+| operating_system       = 多平台
+| programming_language   = [[C語言|C語言]]
+| genre                  = [[函式庫|安全性加密函式庫]]
+| license                = [[GNU通用公共许可证|GNU通用公共许可证]]或商业分销许可证
+| website                = {{URL|https://www.wolfssl.com}}
+}}
+'''wolfSSL''' (原名 '''CyaSSL''' 或 '''yet another SSL''')，是一个提供[[傳輸層安全協議|传输层安全协议]]（SSL/TLS）功能的[[軟體庫|软件库]]，主要针对[[嵌入式系統|嵌入式系系统]]发展。以开放原始码及商用许可两种方式释出，提供SSL/TLS功能(SSL 3.0、TLS 1.0、TLS 1.1、TLS 1.2、TLS 1.3以及DTLS 1.0、DTLS 1.2)，以[[C語言|C语言]]写成。提供了与[[OpenSSL|OpenSSL]]兼容的API界面，让原有使用OpenSSL的软件可以容易的移植过來。
+
+wolfSSL的早期版本, yaSSL，基于C++，为嵌入式环境和资源限制的实时操作系统提供SSL功能库。
+
+
+==平台==
+wolfSSL 现在支持 [[Windows_API|Win32/64]], [[Linux|Linux]], [[macOS|macOS]], [[Solaris_(operating_system)|Solaris]], [[Threadx|Threadx]], [[VxWorks|VxWorks]], [[FreeBSD|FreeBSD]], [[NetBSD|NetBSD]], [[OpenBSD|OpenBSD]], [[embedded_Linux|embedded Linux]], [[WinCE|WinCE]], [[Haiku_os|Haiku]], [[OpenWrt|OpenWrt]], [[iPhone|苹果iPhone]], [[Android_(operating_system)|安卓Android]], [[Wii|Nintendo Wii]] 和 [[Nintendo_GameCube|Gamecube]]系统。通过 DevKitPro 的支持, [[QNX|QNX]], [[MontaVista|MontaVista]], [[TRON_Project|Tron]] variants, [[NonStop|NonStop]], [[OpenCL|OpenCL]], Micrium's [[MicroC/OS-II|MicroC/OS-II]], [[FreeRTOS|FreeRTOS]], [[SafeRTOS|SafeRTOS]], [[MQX|Freescale MQX]], [[Nucleus_RTOS|Nucleus]], [[TinyOS|TinyOS]], [[TI-RTOS|TI-RTOS]], [[HP-UX|HP-UX]], uTasker, 和 embOS.
+
+==版本历史==
+yaSSL, 或 yet another SSL, 始建于2004. [[OpenSSL|OpenSSL]] 当时可用, 并且根据''OpenSSL许可证''和''SSLeay许可证''获得双重许可。<ref>{{Cite web |url=https://www.openssl.org/source/license.html |title=OpenSSL: Source, License<!-- Bot generated title --> |access-date=2018-06-18 |archive-date=2019-01-18 |archive-url=https://web.archive.org/web/20190118094240/https://www.openssl.org/source/license.html }}</ref>  然而，yaSSL是在商业和GPL许可下开发的。<ref>{{Cite web |url=https://www.wolfssl.com/wolfSSL/License.html |title=wolfSSL - License |access-date=2018-06-18 |archive-date=2017-07-12 |archive-url=https://web.archive.org/web/20170712130648/https://www.wolfssl.com/wolfSSL/License.html }}</ref>  yaSSL提供了更现代的API和商业风格的开发人员支持，并含有OpenSSL兼容层。<ref name="compatibility" />  wolfSSL / CyaSSL / yaSSL的第一个主要用户是[[MySQL|MySQL]].<ref>{{Cite web |url=http://dev.mysql.com/doc/refman/5.7/en/building-with-secure-connection-support.html |title=MySQL, Building MySQL with Support for Secure Connections |access-date=2018-06-18 |archive-url=https://web.archive.org/web/20170706085054/https://dev.mysql.com/doc/refman/5.7/en/building-with-secure-connection-support.html |archive-date=2017-07-06 |dead-url=yes }}</ref> 通过捆绑MySQL，yaSSL已经实现了数百万的极高分发量。
+
+==协议==
+{{main|傳輸層安全性協定}}
+wolfSSL 轻量级SSL库实现以下协议:<ref name="protocols">{{Cite news|url=https://www.wolfssl.com/wolfSSL/Docs-cyassl-manual-4-features.html|title=wolfSSL User Manual {{!}} Chapter 4: Features {{!}} Documentation|newspaper=wolfSSL|accessdate=2018-06-18|language=en-US|archive-date=2015-05-29|archive-url=https://web.archive.org/web/20150529032811/https://www.wolfssl.com/wolfSSL/Docs-cyassl-manual-4-features.html}}</ref>
+* SSL 3.0、TLS 1.0、TLS 1.1、TLS 1.2、TLS 1.3
+* DTLS 1.0、DTLS 1.2
+
+'''协议说明:'''
+* '''SSL 2.0''' - SSL 2.0 在2011年被 RFC 6176弃用（禁止）。wolfSSL 不再支持。
+* '''SSL 3.0''' - SSL 3.0 已于2015年被RFC 7568为回应[[POODLE_attack|POODLE 攻击]]而弃用（禁止）。SSL 3.0被wolfSSL 3.6.6 之后的版本默认禁用，但仍可通过编译时选项启用。<ref>[https://www.wolfssl.com/wolfSSL/Blog/Entries/2015/8/24_wolfSSL_3.6.6_is_Now_Available.html "wolfSSL 3.6.6 is Now Available"] {{Wayback|url=https://www.wolfssl.com/wolfSSL/Blog/Entries/2015/8/24_wolfSSL_3.6.6_is_Now_Available.html |date=20170314232113 }}.</ref>
+
+==算法==
+wolfSSL 使用以下加密库:
+
+===wolfCrypt===
+默认情况下，wolfSSL使用wolfCrypt提供的加密服务。<ref>{{Cite web |url=https://www.wolfssl.com/wolfSSL/Docs-wolfssl-manual-10-wolfcrypt-usage-reference.html |title=wolfSSL - Docs {{!}} wolfSSL Manual - Chapter 10 (wolfCrypt Usage Reference) |access-date=2018-06-18 |archive-date=2017-07-03 |archive-url=https://web.archive.org/web/20170703090038/https://wolfssl.com/wolfSSL/Docs-wolfssl-manual-10-wolfcrypt-usage-reference.html }}</ref>  wolfCrypt 提供 [[RSA_(algorithm)|RSA]], [[Elliptic_curve_cryptography|ECC]], [[Digital_Signature_Algorithm|DSS]], [[Diffie–Hellman_key_exchange|Diffie–Hellman]], [[Error_Detection_and_Handling|EDH]], [[NTRU|NTRU]], [[Data_Encryption_Standard|DES]], [[Triple_DES|Triple DES]], [[Advanced_Encryption_Standard|AES]] (CBC, CTR, CCM, GCM), [[Camellia_(cipher)|Camellia]], [[International_Data_Encryption_Algorithm|IDEA]], [[ARC4|ARC4]], [[HC-128|HC-128]], [[ChaCha20|ChaCha20]], [[MD2_(cryptography)|MD2]], [[MD4|MD4]], [[MD5|MD5]], [[SHA-1|SHA-1]], [[SHA-2|SHA-2]], [[BLAKE_(hash_function)|BLAKE2]], [[RIPEMD-160|RIPEMD-160]], [[Poly1305|Poly1305]], 随机数生成，大整数支持和基本16/64编码/解码。还包含一个来自欧盟eSTREAM项目的公共领域软件流密码（[[public_domain_software|public domain software]]）的实验密码，[[Rabbit_(cipher)|Rabbit]]。 Rabbit对于那些在高性能，高需求环境中对流媒体进行加密的潜在用户非常有用。
+
+wolfCrypt 还支持最近的 [[Curve25519|Curve25519]] 和 [[EdDSA|Ed25519]] 算法。
+
+wolfCrypt 充当几个流行软件包和库的后端加密实现，包括[[Kerberos_(protocol)|MIT Kerberos]]<ref>{{Cite web |url=http://web.mit.edu/kerberos/ |title=Kerberos: The Network Authentication Protocol |accessdate=2018-06-18 |archive-date=2019-08-05 |archive-url=https://web.archive.org/web/20190805212356/http://web.mit.edu/kerberos/ |dead-url=no }}</ref>（可使用构建选项启用）。
+
+===NTRU===
+CyaSSL+ 包含 [[NTRUEncrypt|NTRU]]<ref name="securityinnovation">{{Cite web |url=http://securityinnovation.com/cryptolab/ |title=NTRU CryptoLabs |accessdate=2018-06-18 |archive-date=2013-02-02 |archive-url=https://archive.is/20130202075746/http://securityinnovation.com/cryptolab/ |dead-url=no }}</ref> 公钥加密。在CyaSSL + 中增加NTRU是yaSSL和Security Innovation之间合作的结果。<ref name="securityinnovation" /> NTRU在移动电话和嵌入式环境中运行良好，这是因为与其他公钥系统相比，提供相同安全性所需的位数大小减少了。另外，还不知道它易受到量子攻击。CyaSSL + 中含有包括AES-256，RC4和HC-128在内的几种使用NTRU的密码套件。
+
+== 软件防护扩展(SGX) ==
+wolfSSL 支持使用英特尔SGX ([[软件防护扩展|软件防护扩展]]<ref>[[Software_Guard_Extensions|Intel SGX]]</ref>{{Better source|reason=per WP:CIRCULAR|date=October 2016}}). 英特尔SGX Intel SGX 允许更小的攻击表面积，并且已被证明为执行代码提供更高级别的安全性，而对性能没有显着的负面影响。
+
+==硬件加速平台支持==
+:<span style="color:#585858; font-size: 110%">[http://www.intel.com/content/www/us/en/architecture-and-technology/advanced-encryption-standard--aes-/data-protection-aes-general-technology.html 英特尔 AES-NI] {{Wayback|url=http://www.intel.com/content/www/us/en/architecture-and-technology/advanced-encryption-standard--aes-/data-protection-aes-general-technology.html |date=20181118142857 }} (至强和酷睿处理器系列)</span>
+{|
+   !scope="col" | 
+   !scope="col" |
+   |-
+    !scope="row" |
+    | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Galois/Counter_Mode|GCM]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[CCM_mode|CCM]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|ECB]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|CTR]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+|}
+:<span style="color:#585858; font-size: 110%">[[Advanced_Vector_Extensions|AVX1/AVX2]] (英特尔 和 AMD x86)</span>
+{|
+   !scope="col" |
+   |-
+    !scope="row" |
+    | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[SHA-2|SHA-256]]
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[SHA-2|SHA-384]]
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[SHA-2|SHA-512]]
+|}
+:<span style="color:#585858; font-size: 110%">[https://software.intel.com/en-us/blogs/2012/11/17/the-difference-between-rdrand-and-rdseed RDRAND] {{Wayback|url=https://software.intel.com/en-us/blogs/2012/11/17/the-difference-between-rdrand-and-rdseed |date=20200307123602 }} (英特尔 64, IA-32 架构)</span>
+{|
+   !scope="col" |
+   |-
+    !scope="row" |
+    | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[SHA-2|SHA-256]]
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;"| [[SHA-2|SHA-512]]
+|}
+:<span style="color:#585858; font-size: 110%">[https://software.intel.com/en-us/blogs/2012/11/17/the-difference-between-rdrand-and-rdseed RDSEED] {{Wayback|url=https://software.intel.com/en-us/blogs/2012/11/17/the-difference-between-rdrand-and-rdseed |date=20200307123602 }} (英特尔 Broadwell, AMD Zen)</span>
+{|
+   !scope="col" |
+   |-
+    !scope="row" |
+    | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[SHA-2|SHA-256]]
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;"| [[SHA-2|SHA-512]]
+|}
+:<span style="color:#585858; font-size: 110%">[http://www.nxp.com/assets/documents/data/en/application-notes/AN2788.pdf Freescale Coldfire SEC] {{Wayback|url=http://www.nxp.com/assets/documents/data/en/application-notes/AN2788.pdf |date=20170316114001 }} (NXP MCF547X 和 MCF548X)</span>
+{|
+   !scope="col" |
+   !scope="col" |
+   |-
+    !scope="row" |
+    | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Data_Encryption_Standard|DES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 64 bit
+    |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Triple_DES|3DES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 192 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+|}
+:<span style="color:#585858; font-size: 110%">[http://www.nxp.com/assets/documents/data/en/application-notes/AN4307.pdf Freescale Kinetis MMCAU] {{Wayback|url=http://www.nxp.com/assets/documents/data/en/application-notes/AN4307.pdf |date=20170316114203 }} K50, K60, K70 和 K80 (ARM Cortex-M4 核)</span>
+{|
+   !scope="col" |
+   !scope="col" |
+   |-
+    !scope="row" |
+    | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[MD5|MD5]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128 bit 摘要
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[SHA-1|SHA1]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 160 bit 摘要
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[SHA-2|SHA256]] || 
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Data_Encryption_Standard|DES-CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 64 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Triple_DES|3DES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 192 bit
+   |-
+    !scope="row" |
+    | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[CCM_mode|CCM]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Galois/Counter_Mode|GCM]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|ECB]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+|}
+:<span style="color:#585858; font-size: 110%">[[STM32|STMicroelectronics STM32]] F1, F2, F4, L1, W 系列 (ARM Cortex - M3/M4)</span>
+{|
+   !scope="col" |
+   !scope="col" |
+   |-
+    !scope="row" |
+    | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Random_number_generation|RNG]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Data_Encryption_Standard|DES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 64 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Data_Encryption_Standard|DES]]-[[Block_cipher_mode_of_operation|ECB]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 64 bit 加密
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Triple_DES|3DES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 192 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[MD5|MD5]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128 bit
+   |-
+    !scope="row" |
+    | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[SHA-1|SHA1]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 160 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|CTR]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+|}
+
+::<span style="padding-left: 2.5em; line-height: 1.5em; font-size: 80%;">[http://www.st.com/en/development-tools/stm32cubemx.html CubeMX] {{Wayback|url=http://www.st.com/en/development-tools/stm32cubemx.html |date=20220415222158 }} and [http://www.st.com/en/embedded-software/stm32-standard-peripheral-libraries.html?querycriteria=productId=LN1939 Std Per Lib] {{Wayback|url=http://www.st.com/en/embedded-software/stm32-standard-peripheral-libraries.html?querycriteria=productId=LN1939 |date=20210412121308 }}</span>
+
+:<span style="color:#585858; font-size: 110%">[http://cavium.com/processor_security.html Cavium NITROX] {{Wayback|url=http://cavium.com/processor_security.html |date=20171208044844 }} (III/V PX 处理器)</span>
+{|
+   !scope="col" |
+   !scope="col" |
+   |-
+    !scope="row" |
+    | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Random_number_generation|RNG]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" |
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Triple_DES|3DES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 192 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[RC4|RC4]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 2048 bit 上限
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Hash-based_message_authentication_code|HMAC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | [[MD5|MD5]], [[SHA-1|SHA1]], [[SHA-2|SHA256]], [[SHA-3|SHA3]]
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[RSA_(cryptosystem)|RSA]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 512 - 4096 bit
+|-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Elliptic-curve_cryptography|ECC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | NIST Prime 192, 224, 256, 384 and 521
+|}
+:<span style="color:#585858; font-size: 110%">[http://www.microchip.com/design-centers/32-bit Microchip PIC32 MX/MZ] {{Wayback|url=http://www.microchip.com/design-centers/32-bit |date=20190122040809 }} (嵌入式连接)</span>
+{|
+   !scope="col" |
+   !scope="col" |
+   |-
+    !scope="row" |
+    | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[MD5|MD5]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128 bit 摘要
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[SHA-1|SHA1]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 160 bit 摘要
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[SHA-2|SHA256]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Hash-based_message_authentication_code|HMAC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | [[MD5|MD5]], [[SHA-1|SHA1]], [[SHA-2|SHA256]]
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Data_Encryption_Standard|DES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 64 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Triple_DES|3DES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 192 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|CTR]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Galois/Counter_Mode|GCM]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+|}
+:<span style="color:#585858; font-size: 110%">[http://www.ti.com/product/TM4C1294NCPDT 德州仪器 TM4C1294] {{Wayback|url=http://www.ti.com/product/TM4C1294NCPDT |date=20181205132627 }} (ARM Cortex-M4F)</span>
+{|
+   !scope="col" |
+   !scope="col" |
+   |-
+    !scope="row" |
+    | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Data_Encryption_Standard|DES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 64 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Triple_DES|3DES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 192 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|CCM]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Galois/Counter_Mode|GCM]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|ECB]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|CTR]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+|}
+:<span style="color:#585858; font-size: 110%">[https://web.archive.org/web/20180619035750/https://www.nordicsemi.com/Products/nRF51-Series-SoC Nordic NRF51] (Series SoC family, 32-bit ARM Cortex M0 核心处理器)</span>
+{|
+   !scope="col" |
+   !scopt="col" |
+   |-
+    !scope="row" |
+    | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|ECB]] || style="padding-left: 2.5em; line-height: 1.3em; font-size: 90%;" |  128 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Random_number_generation|RNG]] ||
+|}
+:<span style="color:#585858; font-size: 110%">[http://www.microchip.com/wwwproducts/en/ATECC508A Microchip] {{Wayback|url=http://www.microchip.com/wwwproducts/en/ATECC508A |date=20190122092227 }}/[http://www.atmel.com/Images/Atmel-8923S-CryptoAuth-ATECC508A-Datasheet-Summary.pdf Atmel] {{Wayback|url=http://www.atmel.com/Images/Atmel-8923S-CryptoAuth-ATECC508A-Datasheet-Summary.pdf |date=20171215104205 }} ATECC508A (兼容于MPU or MCU)</span>
+{|
+   !scope="col" |
+   !scope="col" |
+   |-
+    !scope="row" |
+    | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Elliptic_curve_cryptography|ECC]] || style="padding-left: 5em; line-height: 1.3em; font-size: 90%;" | 256 bit (NIST-P256)
+|}
+:<span style="color:#585858; font-size: 110%">[https://www.arm.com/files/downloads/ARMv8_Architecture.pdf ARMv8] {{Wayback|url=https://www.arm.com/files/downloads/ARMv8_Architecture.pdf |date=20181109191648 }}</span>
+{|
+   !scope="col" |
+   !scope="col" |
+   |-
+    !scope="row" |
+    | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|CTR]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Galois/Counter_Mode|GCM]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[SHA-2|SHA256]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" |
+|}
+:<span style="color:#585858; font-size: 110%">[https://www.wolfssl.com/docs/intel-quickassist/ 英特尔QuickAssist技术] {{Wayback|url=https://www.wolfssl.com/docs/intel-quickassist/ |date=20190323043027 }}</span>
+{|
+   !scope="col" |
+   !scope="col" |
+   |-
+    !scope="row" |
+    | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[RSA_(cryptosystem)|RSA]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 512 - 4096 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[SHA-1|SHA1]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 160 bit 摘要
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[SHA-2|SHA2]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 224, 256, 384 和 512 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+  |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Galois/Counter_Mode|GCM]] || style="padding-left: 2em; line-   height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+  |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Elliptic_curve_cryptography|ECC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 任意位数
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Hash-based_message_authentication_code|HMAC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | [[SHA-1|SHA1]], [[SHA-2|SHA2]]
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[MD5|MD5]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" |
+|}
+:<span style="color:#585858; font-size: 110%">[https://www.wolfssl.com/nxp-kinetis-k8x-ltc-support-for-pki-rsaecc-with-tls13/ Freescale NXP LTC] {{Wayback|url=https://www.wolfssl.com/nxp-kinetis-k8x-ltc-support-for-pki-rsaecc-with-tls13/ |date=20190323043027 }}</span>
+{|
+   !scope="col" |
+   !scope="col" |
+   |-
+    !scope="row" |
+    | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Curve25519|Curve25519]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[EdDSA|Ed25519]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[CCM_mode|CCM]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|ECB]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+  |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|CBC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Block_cipher_mode_of_operation|CTR]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Advanced_Encryption_Standard|AES]]-[[Galois/Counter_Mode|GCM]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 192, 256 bit
+   |-
+    !scope="row" |
+    | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[SHA-1|SHA1]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 160 bit 摘要
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[SHA2|SHA256]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Elliptic_curve_cryptography|ECC]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128, 256 bit
+   |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[Elliptic_curve_cryptography|ECC]]-[[Diffie–Hellman_key_exchange|DHE]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 128,  256 bit
+  |-
+   !scope="row" |
+   | style="padding-left: 3em; line-height: 1.3em; font-size: 90%;" | [[RSA_(cryptosystem)|RSA]] || style="padding-left: 2em; line-height: 1.3em; font-size: 90%;" | 512 - 4096 bit
+|}
+
+==许可==
+wolfSSL [[开放源代码|开放源代码]], 根据GNU通用公共许可证GPLv2获得许可.<ref>{{Cite web |url=https://www.gnu.org/licenses/license-list.html |title=GNU License |accessdate=2018-06-18 |archive-date=2009-07-16 |archive-url=https://web.archive.org/web/20090716201618/http://www.gnu.org/licenses/license-list.html |dead-url=no }}</ref>
+
+==其他==
+{{Portal|Free software|Cryptography}}
+*[[传输层安全性协议|传输层安全性协议]]
+*[[TLS的应用对比|TLS的应用对比]]
+
+*[[GnuTLS|GnuTLS]]
+*[[网络安全服务|网络安全服务]]
+*[[OpenSSL|OpenSSL]]
+*[[MatrixSSL|MatrixSSL]]
+
+==参考文献==
+{{Reflist|30em}}
+
+==外部链接==
+* [https://web.archive.org/web/20160206033514/https://www.wolfssl.com/wolfSSL/Home.html wolfSSL/CyaSSL Homepage]
+* [http://embedded-computing.com/news/wolfssl-with-chacha20-poly1305 wolfSSL Now With ChaCha20 and Poly1305] {{Wayback|url=http://embedded-computing.com/news/wolfssl-with-chacha20-poly1305 |date=20190323043035 }}
+
+{{Cryptographic software}}
+{{SSL/TLS}}
+
+{{DEFAULTSORT:wolfSSL}}
+[[Category:C_libraries|Category:C libraries]]
+[[Category:Cryptographic_software|Category:Cryptographic software]]
+[[Category:Transport_Layer_Security_implementation|Category:Transport Layer Security implementation]]
+
+==註釋==
+{{reflist}}
+
+{{TLS和SSL}}
+
+[[Category:加密软件|Category:加密软件]]
+[[Category:C函式庫|Category:C函式庫]]
+[[Category:自由安全软件|Category:自由安全软件]]
+[[Category:傳輸層安全協議|Category:傳輸層安全協議]]

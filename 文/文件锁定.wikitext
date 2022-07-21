@@ -1,0 +1,29 @@
+{{多個問題|
+{{Expand English|File locking|time=2016-09-29}}
+{{Primarysources}}
+}}
+文件锁定是一种在特定时间只允许一个用户或[[进程|进程]]拥有对特定计算机[[文件|文件]]的[[访问权限|访问权限]]的机制。<ref>{{Cite web |url = http://blog.csdn.net/ljianhui/article/details/10075795 |title = Linux数据管理——文件锁定 |date = 2013-08-29 |language = zh |accessdate = 2016-09-29 |quote = 这是文件的一种安全的更新方式，当一个程序正在对文件进行写操作时，文件就会进入一种暂时状态，在这个状态下，如果另一个程序尝试读这个文件，它就会自动停下来等待这个状态结束 |archive-date = 2019-12-07 |archive-url = https://web.archive.org/web/20191207065635/https://blog.csdn.net/ljianhui/article/details/10075795 |dead-url = no }}</ref>计算机系统实现该特性以避免竞争读写。以下是竞争写的一个例子：
+
+# 进程A从一个包含顾客账户信息（包括其账户结余和电话号码）的文件中读取一条记录。
+# 进程B从同一个文件中读取同一条记录并有一份自己的拷贝。
+# 进程A在它的那份记录中修改账户结余并将记录写回文件。
+# 进程B自己的记录中仍然包含原有的账户结余数据，它在自己的记录中也修改了它并写回文件。
+# 进程B的写回操作导致进程A的更改丢失。
+
+绝大多数[[操作系统|操作系统]]支持{{tsl|en|record locking|记录锁定}}的概念，也就是任何文件中单个记录可以被锁定，从而增加[[并发|并发]]更新进程的数量。数据库维护需要锁定文件，从而它有权访问数据库的整个物理文件。虽然这确实阻止其他进程访问此文件，但减少每个锁的经常性开销比整体锁定文件中很大数量的区域更高效。
+
+文件锁定的不合理用法可能产生差的性能或[[死锁|死锁]]。文件锁定可能也指用户使用如Windows安全、[[NTFS|NTFS]]访问权限或第三方的文件锁定软件提供文件额外安全性的过程。
+== Microsoft Windows ==
+Microsoft Windows使用三种不同的机制管理对共享文件的访问：
+# 应用程序对整个文件的共享访问方式，包括读、写、删除。<ref>{{Cite web|url=https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-createfilew#parameters|title=CreateFileW function|last=windows-sdk-content|website=docs.microsoft.com|language=en-us|access-date=2018-11-07|archive-date=2019-04-19|archive-url=https://web.archive.org/web/20190419103726/https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-createfilew#parameters|dead-url=no}}</ref>
+# 对单个文件的字节范围锁定<ref>{{Cite web|url=https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-lockfileex|title=LockFileEx function|last=windows-sdk-content|website=docs.microsoft.com|language=en-us|access-date=2018-11-07|archive-date=2019-06-21|archive-url=https://web.archive.org/web/20190621111450/https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-lockfileex|dead-url=no}}</ref>
+# Windows文件系统不允许执行已经按照写或删除方式打开的文件 
+
+Windows继承了[[MS-DOS|MS-DOS]] 3.3引入的文件共享访问控制。如果打开文件时不指定共享访问方式，缺省禁止其他进程按照读、写、删除来打开该文件（但读取文件属性是允许的）。 
+
+操作系统默认锁定正在运行的可执行程序，阻止其他程序修改或删除它。但允许改名、复制。  
+
+
+==参考文献==
+<references/>
+[[Category:文件系统|Category:文件系统]]

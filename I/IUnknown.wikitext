@@ -1,0 +1,49 @@
+{{noteTA
+|G1=IT
+|G2=Windows
+|2=zh-hans:组件对象模型; zh-hant:元件物件模型;
+|3=zh-hans:对象链接与嵌入;zh-hant:物件連結與嵌入;
+|4=zh-hans:对象; zh-hant:物件;
+|5=zh-hans:组件; zh-hant:元件;
+|6=zh-hans:链接; zh-hant:連結;
+|7=zh-hans:程序; zh-hant:程式;
+}}
+在[[程序设计|程序设计]]中，'''IUnknown'''[[介面_(資訊科技)|介面]]是[[组件对象模型|组件对象模型]]（COM）中的基礎介面。COM規格書<ref>{{Cite web |url=http://www.microsoft.com/com/resources/comdocs.asp |title=COM specification |access-date=2016-12-26 |archive-url=https://web.archive.org/web/20161221063614/http://www.microsoft.com/Com/resources/comdocs.asp |archive-date=2016-12-21 |dead-url=yes }}</ref>中規定COM物件至少要實現此一介面，而且其他所有的COM介面都需要衍生自IUnknown介面。IUnknown提供所有COM物件都支援的兩種基本特性：利用[[引用计数|引用计数]]來進行物件生命周期管理，以及存取許多事先定義的介面。
+
+IUnknown介面會包括一個指向{{le|虛擬方法表|virtual method table}}的[[指標_(電腦科學)|指標]]，虛擬方法表是一個有許多[[函数指针|函数指针]]的列表，函数指针會指向許多實現IUnknown介面所宣告的函數，以和介面中宣告順序相同的方式排列。而進程內呼叫產生的{{le|開銷 (程式)|Overhead (computing)|開銷}}大致和[[C++|C++]]中呼叫[[虛擬方法|虛擬方法]]的開銷相近。
+
+==方法==
+IUnknown介面中有三個[[方法_(電腦科學)|方法]]：<code>QueryInterface</code>, <code>AddRef</code>, and <code>Release</code>：<ref name="msdn2">[http://msdn2.microsoft.com/en-us/library/ms680509.aspx IUnknown definition] {{Wayback|url=http://msdn2.microsoft.com/en-us/library/ms680509.aspx |date=20130711070948 }} at [http://microsoft microsoft.com] {{Wayback|url=http://microsoft/ |date=20130711070948 }}; accessed 18-Jan-2008</ref>
+* <code>QueryInterface</code>可以讓呼叫此物件的程式可以確認此物件是否支援特定的介面，若是支援，則參考到此物件在特定介面下的實現。這個方法類似[[C++|C++]]的<code>[[執行期型態訊息|dynamic_cast]]<></code>或是[[Java|Java]]或是[[C♯|C#]]的[[型態轉換|casts]]。此方法在給定一個對應特定介面的[[全局唯一标识符|全局唯一标识符]]（一般也稱為介面标识符或是IID）時，可以提供一個指定特定介面的指標。若COM物件不支援此介面，會回覆E_NOINTERFACE錯誤。
+* <code>AddRef</code>是在新的客戶端程式要存取此物件時，讓計數值加一，會回傳更新後的計數值。
+* <code>Release</code>是在客戶端程式已結束存取此物件，讓計數值減一，會回傳更新後的計數值，若計數值已變為零，會自動刪除此一COM物件。
+
+<syntaxhighlight lang="cpp">
+interface IUnknown {
+  virtual HRESULT QueryInterface (REFIID riid, void **ppvObject) = 0;
+  virtual ULONG   AddRef () = 0;
+  virtual ULONG   Release () = 0;
+};
+</syntaxhighlight>
+
+'''IUnknown'''本身的介面标识符為{00000000-0000-0000-C000-000000000046}，IUnknown的三個方法都是[[虛擬函式|純虛擬方法]]（宣告時都有加上<code>= 0</code>），因此無法定義IUnknown類別的物件，需要由其他類別繼承IUnknown，才能定義對應類別的物件。
+
+==其他 ==
+*以[[ActiveX|ActiveX]]標準設計的元件至少需要實現IUnknown介面<ref name="msdn1">[http://msdn2.microsoft.com/en-us/library/aa751968.aspx ActiveX Controls] {{Wayback|url=http://msdn2.microsoft.com/en-us/library/aa751968.aspx |date=20080124120709 }} at [http://microsoft.com microsoft.com] {{Wayback|url=http://microsoft.com/ |date=20080124120709 }}; accessed 18-Jan-2008</ref>。
+*IUnknown也是[[MacOS|MacOS X]]中{{le|Core Foundation|Core Foundation}} CFPlugIn框架的基礎<ref name="adc1">[http://developer.apple.com/library/mac/documentation/CoreFoundation/Conceptual/CFPlugIns/CFPlugIns.pdf Plug-ins] {{Wayback|url=http://developer.apple.com/library/mac/documentation/CoreFoundation/Conceptual/CFPlugIns/CFPlugIns.pdf |date=20111007063809 }} at [http://apple.com apple.com] {{Wayback|url=http://apple.com/ |date=20110223124708 }}; accessed 18-Sept-2011</ref>
+*在[[Mozilla|Mozilla]]應用程式的開發中，IUnknown介面也稱為nsISupports。
+==參考資料==
+{{reflist}}
+
+==相關條目==
+*[[IDispatch|IDispatch]]
+*[[IFilter|IFilter]]
+*[[IInspectable|IInspectable]]
+*[[IObjectWithSite|IObjectWithSite]]
+*[[IOleObject|IOleObject]]
+
+==外部連結==
+* [http://www.codeproject.com/kb/com/com_in_c1.aspx COM in plain C]{{Wayback|url=http://www.codeproject.com/kb/com/com_in_c1.aspx |date=20151105010714 }}
+
+[[Category:面向对象的程序设计|Category:面向对象的程序设计]]
+[[Category:微軟API|Category:微軟API]]

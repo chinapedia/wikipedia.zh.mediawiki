@@ -1,0 +1,63 @@
+{{NoteTA
+|G1=IT
+}}
+在[[程序设计|程序设计]]中，一个函数的'''缺省参数'''是指不必须指定值的参数。在大多数程序设计语言中，函数可以接受一个或多个参数。通常对于每个参数都需要指定它们的值（例如[[C语言|C语言]]<ref>{{cite web |url=http://elec.uq.edu.au/~comp2303/Leslie_C_ref/CPLUSPLUS/CONCEPT/fundefault.html |title=存档副本 |accessdate=2012-01-13 |deadurl=yes |archiveurl=https://web.archive.org/web/20111009022123/http://elec.uq.edu.au/~comp2303/Leslie_C_ref/CPLUSPLUS/CONCEPT/fundefault.html |archivedate=2011-10-09 }}</ref>）。一些较新的程序设计语言（例如[[C++|C++]]）允许程序员设定缺省参数并指定默认值，当调用该函数并未指定值时，该缺省参数将为缺省值。
+
+== C++中的缺省参数 ==
+考虑如下函数声明：<syntaxhighlight lang="cpp">
+ int my_func(int a, int b, int c=12);
+</syntaxhighlight>该函数有三个参数，最后一个参数的缺省值为12。程序员可以用以下两种方式调用该函数：<syntaxhighlight lang="cpp">
+ result = my_func(1, 2, 3);
+</syntaxhighlight><syntaxhighlight lang="cpp">
+ result = my_func(1, 2);
+</syntaxhighlight>第一种调用方式中，c的值就像一般函数一样被设为3。在第二种调用方式中，c被省略，而被直接赋值为缺省值12。
+
+在函数体中，无法知道参数值是在调用时指定的还是直接使用的缺省值。
+
+这种定义方法在希望不论是否指定参数时都可以调用函数的情况下尤其有用，考虑下面的例子：<syntaxhighlight lang="cpp">
+void printToScreen(istream &input = cin)
+{
+    // this outputs any input to the screen
+    cout << input;
+}
+</syntaxhighlight>函数调用：<syntaxhighlight lang="cpp">
+ printToScreen();
+</syntaxhighlight>这个函数调用会默认将键盘输入打印到屏幕输出。通过这种用法打印到屏幕，比起下面的用法是更为合适的：<syntaxhighlight lang="cpp">
+printToScreen(cin);
+</syntaxhighlight>另一方面，任何一种输入流都可以作为参数传入该函数。此时该函数会将指定输入流的内容输出到屏幕，例如：<syntaxhighlight lang="cpp">
+printToScreen(fileName);
+</syntaxhighlight>fileName是通过文件流ifstream打开的可读文件。
+
+== 重载方法 ==
+在[[Java|Java]]等一些其他语言中，不支持缺省参数。但可以用过[[函数重载|函数重载]]（方法重载）的方式来支持不同数量的参数。通过方法重载，让参数少的方法直接调用参数多的方法并指定缺省值，就可以达到同样的效果。例如：<syntaxhighlight lang="java">
+int MyFunc(int a, int b) { return MyFunc(a, b, 12); }
+int MyFunc(int a, int b, int c) { /* main implementation here */ }
+</syntaxhighlight>
+
+== 评价 ==
+对于每一次使用缺省参数值的函数调用，缺省的函数值都必须要传递一次，相比于函数重载，这造成了[[代码臃肿|代码臃肿]]。
+
+如果缺省参数不是一个值而是一个表达式，何时计算该表达式则是新的问题。究竟是整个程序运行期间计算一次（语法解释时、编译时或运行时）还是每一次调用都计算一次。
+
+Python只在模块载入时计算一次缺省参数表达式的值。如果我们需要每次调用都计算缺省值，则可以将缺省值设置为[[监视哨|监视哨]]，例如设为<code>None</code>。随后在函数第一行，检查监视哨，如果监视哨是默认值，则计算所需表达式的值。
+
+例如我们可以通过以下方法使函数在每一次使用缺省值时都重新获取当前的时间：<syntaxhighlight lang="python">
+ import datetime
+ def f(a, b=None):
+     b = b or datetime.datetime.now()
+</syntaxhighlight>
+
+== 作用域和生存周期 ==
+一般而言，缺省参数就像一个传入的函数参数或一个在函数开头定义的局部变量一样，拥有和局部变量一致的作用域和生存周期。作为一个[[自动变量|自动变量]]会在函数终止时被释放。
+
+在另外一些情况下，缺省参数会被[[静态分配|静态分配]]。就像[[静态变量|静态变量]]，如果缺省参数的值发生了改变，则在所有函数调用中都会发生相应改变。
+
+这种情况在Python中存在。如果缺省参数是可变类型（例如列表），则该缺省参数就会被静态分配。为保证缺省参数为局部变量，可以使用监视哨之方法实现，就例如：<syntaxhighlight lang="python">
+ def f(a, b=None):
+     b = b or []
+</syntaxhighlight>
+
+== 参见 ==
+{{Reflist}}
+
+[[Category:子程序|Category:子程序]]

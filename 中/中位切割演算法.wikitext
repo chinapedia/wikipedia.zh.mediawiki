@@ -1,0 +1,78 @@
+{{Orphan|time=2016-12-20T14:28:16+00:00}}
+
+'''中位切割演算法（Median cut）''' 是Paul Heckbert於1979年提出來的演算法。概念上很簡單，卻也是最知名、應用最為廣泛的減色演算法（{{tsl|en|Color_quantization|Color quantization}}）。常見的影像處理軟體如Photoshop、GIMP...等，都使用了這個演算法或其變種。<ref>{{Cite web|url=http://blog.csdn.net/phg1024/article/details/16839649|title=JavaScript图像处理(6) - 减色算法(Color Reduction) - Peihong's Infinite Dimensional Space - 博客频道 - CSDN.NET|accessdate=2016-06-30|work=blog.csdn.net|archive-date=2016-08-18|archive-url=https://web.archive.org/web/20160818061248/http://blog.csdn.net/phg1024/article/details/16839649|dead-url=no}}</ref>
+
+== 演算法 ==
+
+假如你有任意一張圖片，想要降低影像中的顏色數目到256色。
+# 將圖片內的所有像素加入到同一個區域
+# 對於所有的區域做以下的事：
+## 計算此區域內所有像素的[[RGB|RGB]]三元素最大值與最小值的差。
+## 選出相差最大的那個顏色（R或G或B）
+## 根據那個顏色去排序此區域內所有像素
+## 分割前一半與後一半的像素到二個不同的區域（這裡就是「中位切割」名字的由來）
+# 重複第二步直到你有256個區域
+# 將每個區域內的像素平均起來，於是你就得到了256色
+
+=== 演算法的限制 ===
+因為每次迴圈區域的數量都會加倍，所以最終產生的顏色數量必定為2的[[冪|冪]]次方。假如有特殊需要其它數量的顏色時，可以先產生超過需求的顏色數量，再合併多餘的顏色直到符合所需的數量。
+
+== 實作範例 ==
+
+=== ruby ===
+<syntaxhighlight lang="ruby" line="1">
+class Color
+  attr_reader :R, :G, :B
+
+  def initialize(r = rand(256), g = rand(256), b = rand(256))
+    @R = r
+    @G = g
+    @B = b
+  end
+
+  def inspect
+    return "{R: #{@R}, G: #{@G}, B: #{@B}}"
+  end
+end
+
+def get_colors(image_input, need_num)
+  regions = [image_input.flatten]
+
+  while regions.size < need_num
+    new_regions = []
+    regions.each do |region|
+      max_color = [:R, :G, :B].map do |color|
+        colors = region.map(&color)
+        next [colors.max - colors.min, color]
+      end.max[1]
+
+      new_order = region.sort_by(&max_color).reverse
+      middle = new_order.size / 2
+      new_regions.push(new_order[0, middle], new_order[middle, middle + 1])
+    end
+    regions = new_regions
+  end
+
+  return regions.map do |region|
+    Color.new(*[:R, :G, :B].map{|color| (region.map(&color).inject(&:+) / region.size.to_f).round })
+  end
+end
+
+get_colors(Array.new(10){ Array.new(10){ Color.new } }, 16)
+# => [{ R: 187, G: 226, B: 184 }, { R: 185, G: 169, B: 189 }, ...]
+</syntaxhighlight>
+
+== 另見 ==
+* [[k-d樹|k-d樹]]
+
+== 引用 ==
+
+{{reflist}}
+
+== 外部連結 ==
+*[http://micro.magnet.fsu.edu/primer/java/digitalimaging/processing/colorreduction/index.html Image quantization]{{Wayback|url=http://micro.magnet.fsu.edu/primer/java/digitalimaging/processing/colorreduction/index.html |date=20200918181129 }}
+*[http://www.leptonica.com/papers/mediancut.pdf Median cut + variations]{{Wayback|url=http://www.leptonica.com/papers/mediancut.pdf |date=20190202154003 }}
+*[https://metacpan.org/pod/Image::Pngslimmer Image::Pngslimmer Perl module at CPAN]{{Wayback|url=https://metacpan.org/pod/Image::Pngslimmer |date=20181020082203 }}
+*[https://web.archive.org/web/20160323053348/http://gl.ict.usc.edu/Research/MedianCut/ A Median Cut Algorithm for Light Probe Sampling]
+
+[[Category:Sorting_algorithms|Category:Sorting algorithms]]

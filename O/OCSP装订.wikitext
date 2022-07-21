@@ -1,0 +1,57 @@
+'''OCSP装订'''（{{lang-en|OCSP Stapling}}），正式名称为[[傳輸層安全協議|TLS]][[数字证书|证书]]状态查询扩展，可代替[[在线证书状态协议|在线证书状态协议]]（OCSP）来查询[[X.509|X.509]]证书的状态。<ref name="IETF-TLS-Extensions-Definitions-RFC6066">{{Cite web|url=https://tools.ietf.org/html/rfc6066#section-8|title=Transport Layer Security (TLS) Extensions: Extension Definitions: Certificate Status Request|accessdate=March 2, 2015|author=Eastlake, D.|date=January 2011|publisher=Internet Engineering Task Force (IETF)|archive-date=2016-10-18|archive-url=https://web.archive.org/web/20161018023656/https://tools.ietf.org/html/rfc6066#section-8|dead-url=no}}</ref>服务器在TLS握手时发送事先缓存的OCSP响应，用户只需验证该响应的有效性而不用再向[[数字证书认证机构|数字证书认证机构]]（CA）发送请求。<ref name="CloudFlare-OCSP-Stapling-SSL-Faster">{{Cite web|url=https://blog.cloudflare.com/ocsp-stapling-how-cloudflare-just-made-ssl-30/|title=OCSP Stapling: How CloudFlare Just Made SSL 30% Faster|accessdate=March 2, 2015|author=Prince, Matthew|date=October 29, 2012|publisher=CloudFlare, Inc.|archive-date=2016-07-12|archive-url=https://web.archive.org/web/20160712234216/https://blog.cloudflare.com/ocsp-stapling-how-cloudflare-just-made-ssl-30/|dead-url=no}}</ref><ref name="Gibson-OCSP-Must-Staple">{{Cite web|url=https://www.grc.com/revocation/ocsp-must-staple.htm|title=Security Certificate Revocation Awareness: The case for “OCSP Must-Staple”|accessdate=March 2, 2015|author=Gibson, Steve|publisher=Gibson Research Corporation|archive-date=2016-04-15|archive-url=https://web.archive.org/web/20160415103229/https://www.grc.com/revocation/ocsp-must-staple.htm|dead-url=no}}</ref>
+
+== 动机 ==
+OCSP装订解决了在线证书协议中的大多数问题。<ref name="Gibson-OCSP-Must-Staple">{{Cite web|url=https://www.grc.com/revocation/ocsp-must-staple.htm|title=Security Certificate Revocation Awareness: The case for “OCSP Must-Staple”|accessdate=March 2, 2015|author=Gibson, Steve|publisher=Gibson Research Corporation}}</ref>CA给网站颁发证书之后，网站的每个访问者都会进行OCSP查询。因此使用在线证书协议时，高并发的请求会给CA的服务器带来很大的压力。<ref name="Digital-Ocean-Tutorial-OCSP-Stapling">{{Cite web|url=https://www.digitalocean.com/community/tutorials/how-to-configure-ocsp-stapling-on-apache-and-nginx|title=How To Configure OCSP Stapling on Apache and Nginx|accessdate=March 2, 2015|author=A., Jesin|date=June 12, 2014|work=Community Tutorials|publisher=Digital Ocean, Inc.|archive-date=2016-08-10|archive-url=https://web.archive.org/web/20160810191031/https://www.digitalocean.com/community/tutorials/how-to-configure-ocsp-stapling-on-apache-and-nginx|dead-url=no}}</ref>同时由于必须和CA建立连接，OCSP查询还会影响浏览器打开页面的速度并泄漏用户隐私。<ref name="Digital-Ocean-Tutorial-OCSP-Stapling">{{Cite web|url=https://www.digitalocean.com/community/tutorials/how-to-configure-ocsp-stapling-on-apache-and-nginx|title=How To Configure OCSP Stapling on Apache and Nginx|accessdate=March 2, 2015|author=A., Jesin|date=June 12, 2014|work=Community Tutorials|publisher=Digital Ocean, Inc.}}</ref>此外，当OCSP查询无法得到响应时，浏览器必须选择是否在无法确认证书状态的情况下继续连接，造成安全性和可用性二选一的困局。<ref name="Mozilla-OCSP-Stapling-Firefox">{{Cite web|url=https://blog.mozilla.org/security/2013/07/29/ocsp-stapling-in-firefox/|title=OCSP Stapling in Firefox|accessdate=March 2, 2015|author=Keeler, David|date=July 29, 2013|work=Mozilla Security Blog|publisher=Mozilla Foundation|archive-date=2016-09-11|archive-url=https://web.archive.org/web/20160911071029/https://blog.mozilla.org/security/2013/07/29/ocsp-stapling-in-firefox/|dead-url=no}}</ref>
+
+== 标准 ==
+RFC 6066 第8章中规定了TLS证书状态查询扩展的标准。
+
+RFC 6961 定义了多证书状态查询扩展，允许TLS握手中发送多个证书的OCSP响应。
+
+== 发展 ==
+对OCSP装订的支持正在逐步落实。[[OpenSSL|OpenSSL]]在[[Mozilla基金会|Mozilla基金会]]的协助下发布了支持OCSP装订的0.9.8g版本。
+
+服务器端的支持情况：
+{| class="wikitable"
+|-
+! 软件名!! 版本
+|-
+| [[Apache_HTTP_Server|Httpd]]|| 2.3.3<ref>{{Cite web |url=https://httpd.apache.org/docs/trunk/mod/mod_ssl.html#sslusestapling |title=Apache HTTP Server mod_ssl documentation - SSLUseStapling directive |accessdate=2016-08-27 |archive-date=2016-08-27 |archive-url=https://web.archive.org/web/20160827185945/https://httpd.apache.org/docs/trunk/mod/mod_ssl.html#sslusestapling |dead-url=no }}</ref>
+|-
+| [[Nginx|Nginx]]|| 1.3.7<ref>{{Cite web |url=http://mailman.nginx.org/pipermail/nginx-announce/2012/000095.html |title=nginx-announce mailing list - nginx-1.3.7 |accessdate=2016-08-27 |archive-date=2015-05-31 |archive-url=https://web.archive.org/web/20150531074814/http://mailman.nginx.org/pipermail/nginx-announce/2012/000095.html |dead-url=no }}</ref>
+|-
+| [[網際網路資訊服務|IIS]]|| [[Windows_Server_2008|Windows Server 2008]]<ref>{{Cite web|url=http://news.netcraft.com/archives/2013/07/19/microsoft-achieves-world-domination-in-ocsp-stapling.html|title=Microsoft Achieves World Domination (in OCSP Stapling)|accessdate=28 April 2014|last=Duncan|first=Robert|publisher=Netcraft Ltd|archive-date=2016-06-09|archive-url=https://web.archive.org/web/20160609085542/http://news.netcraft.com/archives/2013/07/19/microsoft-achieves-world-domination-in-ocsp-stapling.html|dead-url=no}}</ref>
+|-
+| [[HAProxy|HAProxy]]|| 1.5.0<ref>{{Cite web |url=http://www.haproxy.org/ |title=HAProxy website |accessdate=2016-08-27 |archive-date=2016-08-26 |archive-url=https://web.archive.org/web/20160826015602/http://www.haproxy.org/ |dead-url=no }}</ref>
+|-
+| LiteSpeed Web Server|| 4.2.4<ref>[http://www.litespeedtech.com/products/litespeed-web-server/release-log Release Log - Litespeed Tech] {{Wayback|url=http://www.litespeedtech.com/products/litespeed-web-server/release-log |date=20160815012625 }}.</ref>
+|-
+| F5 Networks BIG-IP|| 11.6.0<ref>{{Cite web |url=https://support.f5.com/kb/en-us/products/big-ip_ltm/releasenotes/product/relnote-ltm-11-6-0.html |title=Release Note: BIG-IP LTM and TMOS 11.6.0 |accessdate=2016-08-27 |archive-date=2016-09-23 |archive-url=https://web.archive.org/web/20160923050834/https://support.f5.com/kb/en-us/products/big-ip_ltm/releasenotes/product/relnote-ltm-11-6-0.html |dead-url=no }}</ref>
+|}
+
+浏览器的支持情况：
+{| class="wikitable"
+|-
+! 软件名!! 版本
+|-
+| [[Firefox|Firefox]]|| 26<ref>[[mozillawiki:CA:ImprovingRevocation#OCSP_Stapling|Improving Revocation - MozillaWiki]], retrieved 2014-04-28</ref>
+|-
+| [[Internet_Explorer|IE]]|| [[Windows_Vista|Vista]]及以上的Windows。<ref>{{Cite web|url=http://technet.microsoft.com/en-us/library/ee619754%28WS.10%29.aspx|title=How Certificate Revocation Works|accessdate=28 April 2014|date=16 March 2012|work=TechNet|publisher=Microsoft|archive-date=2016-03-07|archive-url=https://web.archive.org/web/20160307213059/https://technet.microsoft.com/en-us/library/ee619754(WS.10).aspx|dead-url=no}}</ref>
+|-
+| [[Google_Chrome|Chrome]]|| Linux、Chrome OS、Vista及以上的Windows<ref>{{Cite web|url=https://code.google.com/p/chromium/issues/detail?id=361820#c7|title=Issue 361820: Check For Server Certificate Revocation checkbox is confusing|date=10 April 2014|work=Google Code|publisher=Google|accessdate=2016-08-27|archive-date=2015-09-09|archive-url=https://web.archive.org/web/20150909112156/https://code.google.com/p/chromium/issues/detail?id=361820#c7|dead-url=no}}</ref>
+|}
+
+SMTP方面，[[Exim|Exim]]在客户端<ref>[http://exim.org/exim-html-4.85/doc/html/spec_html/ch-the_smtp_transport.html The smtp transport] {{Wayback|url=http://exim.org/exim-html-4.85/doc/html/spec_html/ch-the_smtp_transport.html |date=20160304095644 }}, retrieved 2015-01-24</ref>和服务器端<ref>[http://exim.org/exim-html-4.85/doc/html/spec_html/ch-main_configuration.html#SECTalomo Main configuration] {{Wayback|url=http://exim.org/exim-html-4.85/doc/html/spec_html/ch-main_configuration.html#SECTalomo |date=20160324125607 }}, retrieved 2015-01-24</ref>都支持OCSP装订。
+
+== 局限性 ==
+OCSP装订可以降低OCSP验证的成本，特别针对有很多用户的大型网站。但是OCSP装订在同一时间只能发送一个OCSP响应，对有中级证书的证书链来说并不足够。<ref>[https://bugzilla.mozilla.org/show_bug.cgi?id=360420#c10 Mozilla NSS Bug 360420] {{Wayback|url=https://bugzilla.mozilla.org/show_bug.cgi?id=360420#c10 |date=20181115000836 }}, Comment by Adam Langley</ref><ref>{{Cite web |url=https://bugzilla.mozilla.org/show_bug.cgi?id=611836 |title=Mozilla NSS Bug 611836 - Implement multiple OCSP stapling extension |accessdate=2016-08-27 |archive-date=2016-09-23 |archive-url=https://web.archive.org/web/20160923065405/https://bugzilla.mozilla.org/show_bug.cgi?id=611836 |dead-url=no }}</ref>RFC 6961中提出的多证书状态查询扩展解决了这个问题，允许同时发送多个OCSP响应。<ref>{{Cite web|url=https://tools.ietf.org/html/rfc6961|title=The Transport Layer Security (TLS) Multiple Certificate Status Request Extension|accessdate=31 October 2014|author=Pettersen, Yngve N.|date=June 2013|publisher=[[Internet_Engineering_Task_Force|Internet Engineering Task Force]]|archive-date=2016-12-23|archive-url=https://web.archive.org/web/20161223162624/https://tools.ietf.org/html/rfc6961|dead-url=no}}</ref>
+
+== 参考资料 ==
+<references />
+
+{{TLS和SSL}}
+
+[[Category:加密协议|Category:加密协议]]
+[[Category:互联网标准|Category:互联网标准]]
+[[Category:网际协议|Category:网际协议]]
+[[Category:傳輸層安全協議|Category:傳輸層安全協議]]

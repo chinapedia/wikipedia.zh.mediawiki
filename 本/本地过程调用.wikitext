@@ -1,0 +1,50 @@
+{{多個問題|
+{{expand language|1=en|page=|time=2019-09-13T19:31:43+00:00}}
+{{no footnotes|time=2019-09-13T19:31:43+00:00}}
+{{refimprove|time=2019-09-13T19:31:43+00:00}}
+}}
+'''本地过程调用'''（'''LPC'''，'''Local Procedure Call'''，通常也被称为轻量过程调用或者本地[[进程|进程]]间通信） 是一种由[[Windows_NT|Windows NT]][[内核|内核]]提供的内部[[进程间通信|进程间通信]]方式。通过这一方式，同一[[计算机|计算机]]上的进程可以进行轻量的通信。在[[Windows_Vista|Windows Vista]]中，'''ALPC'''（'''Advanced Local Procedure Call，高级本地进程通信'''）替代了LPC。ALPC提供了一个高速可度量的通信机制，这样便于实现需要在用户模式下高速通信的用户模式驱动程序框架（[[UMDF|UMDF]]，User-Mode Driver Framework）。
+
+本地过程调用接口是Windows NT未公开原生[[API|API]]的一部分。这样的API不能够直接使用，但是可以通过如下方式间接使用：
+* 使用[[微软|Microsoft]] [[遠程過程調用|遠程過程調用]] API进行本地通信，例如，在同一计算机上实现不同处理器之间的通信
+* 调用Windows API中由LPC实现的部分（如下）。
+
+== 实现 ==
+LPC由内核的“[[端口|端口]]”对象实现，这样可以确保安全（由[[访问控制表|访问控制表]]规定持有特定的[[安全标识符|安全标识符]]才可以访问）并可以验证链接另一端进程的身份。程序也可以对每一个信息设定安全标识符，并测试对应信息的变化，以实现每一条消息的安全性。
+
+服务端和客户端之间典型的连接由下列过程表示：
+# 服务端进程建立''命名服务器连接端口''对象，并等待客户端连接；
+# 客户端通过向这一端口发送消息来建立连接；
+# 如果服务端同意建立连接，便会建立两个''无名端口''：
+#* ''客户端连接端口：''客户线程由此向服务端发送数据；
+#* ''服务端连接端口：''服务端由此向客户端发送数据；每个客户端都分配一个独立的接口；
+# 服务端持有一个服务连接端口的句柄，同时客户端也持有一个客户连接端口的句柄，这样进程间通信的通道就建立了。
+本地过程调用支持以下三种交换信息的方式：
+* 针对较短信息（小于256字节）：系统内核在进程间直接复制消息，从发送方的[[地址空间|地址空间]]拷贝消息至系统地址空间，之后再将消息拷贝至接收方的地址空间。
+* 针对较长消息（大于256字节）：这需要在发送方和接收方之间建立一个[[共享内存|共享内存]]区域。发送方首先将消息存放在共享内存中，再向接收方发送一个通知（可以通过如上发送短消息的方式实现），之后再由接收方从共享内存中读取这一消息。
+* 当消息的数据量过大，难以放入共享内存时，服务端可以直接读取和写入客户端的地址空间。
+高级本地过程调用（ALPC）拥有比以往的本地过程调用（LPC）更优的性能。因为LPC只能通过同步请求/应答机制通信，而ALPC还可以使用[[IOCP|IOCP]]实现通信。这样，ALPC就可以在消息数量和进程数量间保持一定平衡，保证了端口的高速通信。此外，ALPC还允许信息的批量传输，减少了进程在[[用户模式|用户模式]]和[[内核模式|内核模式]]之间的切换次数。
+
+== 典型应用 ==
+本地过程调用在Windows NT及其衍生系统中得到了广泛应用。在Win32子系统中，LPC应用于客户端和子系统服务器之间的通信（[[CSRSS|CSRSS]]）。在Windows NT 3.51版本中引入了快速LPC以提高调用速度。然而由于NT4.0中将部分关键服务端移入内核模式（win32k.sys）以提高系统效能，这一方法已基本被摒弃。
+
+[[本地安全認證子系統服務|本地安全认证子系统服务]]（LSASS），[[Section_Manager|会话管理器]]（SMSS）以及[[Service_Control_Manager|服务控制管理器]]均使用LPC端口和客户进程直接通信。[[Winlogon|Winlogon]]和[[Security_Reference_Monitor|安全引用监视器]]与LSASS进程之间的通信同样使用了LPC。
+
+正如前文提到的，当消息在同一计算机内传输时，Microsoft RPC将调用LPC进行通信。许多仅在同一计算机内进行通信的服务采用LPC作为唯一的通信方式。远程[[对象连接与嵌入|对象连接与嵌入]]和[[Distributed_COM|分布式组件对象模型]]的实现也在很多地方使用了LPC作为本地通信的方式。
+
+== 参见 ==
+* Doors
+* [[遠程過程調用|Remote procedure call]]
+
+== 附注 ==
+{{Reflist}}
+
+== 参考文献 ==
+* <cite class="citation" id="CITEREFDabakBoratePhadke1999" contenteditable="false">Dabak, Prasad; Borate, Milind; Phadke, Sandeep (1999), ''Undocumented Windows NT'', [[国际数据集团|Hungry Minds]], [[国际标准书号|ISBN]] 0-7645-4569-8</cite><cite class="citation" id="CITEREFDabakBoratePhadke1999" contenteditable="false"></cite><span class="Z3988" title="ctx_ver=Z39.88-2004&rfr_id=info%3Asid%2Fen.wikipedia.org%3ALocal+Procedure+Call&rft.au=Borate%2C+Milind&rft.aufirst=Prasad&rft.aulast=Dabak&rft.au=Phadke%2C+Sandeep&rft.btitle=Undocumented+Windows+NT&rft.date=1999&rft.genre=book&rft.isbn=0-7645-4569-8&rft.pub=Hungry+Minds&rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook" contenteditable="false"> </span>
+* <cite class="citation" id="CITEREFRussinovichSolomonIonescu2009" contenteditable="false">Russinovich, Mark; Solomon, David; Ionescu, Alex (2009), ''Windows® Internals'' (5th ed.</cite><cite class="citation" id="CITEREFRussinovichSolomonIonescu2009" contenteditable="false">), [[微软出版社|Microsoft Press]], [[国际标准书号|ISBN]] 0-7356-2530-1</cite><cite class="citation" id="CITEREFRussinovichSolomonIonescu2009" contenteditable="false"></cite><span class="Z3988" title="ctx_ver=Z39.88-2004&rfr_id=info%3Asid%2Fen.wikipedia.org%3ALocal+Procedure+Call&rft.aufirst=Mark&rft.au=Ionescu%2C+Alex&rft.aulast=Russinovich&rft.au=Solomon%2C+David&rft.btitle=Windows+%AE+Internals&rft.date=2009&rft.edition=5th&rft.genre=book&rft.isbn=0-7356-2530-1&rft.pub=Microsoft+Press&rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook" contenteditable="false"> </span>
+
+== 外部链接 ==
+* [https://web.archive.org/web/20080612141354/http://www.windowsitlibrary.com/Content/356/08/toc.html Local Procedure Call]<span contenteditable="false"> at the </span>Wayback Machine <span contenteditable="false">(archived June 12, 2008)</span> — Includes explanation of undocumented functions
+* [http://www.zezula.net/en/prog/lpc.html LPC Communication] {{Wayback|url=http://www.zezula.net/en/prog/lpc.html |date=20160301004221 }}
+
+[[Category:进程间通信|Category:进程间通信]]

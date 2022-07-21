@@ -1,0 +1,125 @@
+<includeonly><!-- 在這裡加入模板的保護標識 --></includeonly><noinclude>{{Documentation subpage}}</noinclude>
+<!-- 在本行下編輯模板說明 -->
+
+== 概要 ==
+This is a multifunction template. At its simplest, it adds the currency mark "US$", as recommended by [[MOS:CURRENCY]] for many situations. The template can also link to the [[United States dollar]] article and can even calculate inflation. <em>See warnings below.</em>
+
+== 參數及使用方法 ==
+{{tlxi|US$|數目}}
+
+範例：
+* {{tld|US$}} → {{US$}}
+* {{tld|US$|1234.56}} → {{US$|1234.56}}
+* {{tld|US$|1.23千萬}} → {{US$|1.23千萬}}
+
+==== 連結 ====
+The parameter {{para|link|yes}} may be used to link US$ to the article [[United States dollar]]. This is turned off by default, but may be appropriate for the first occurrence of the term in an article.
+
+範例：
+* {{tld|US$|123.45|}} → {{US$|123.45}}
+* {{tld|US$|123.45|3=link=yes}} → {{US$|123.45|link=yes}}
+
+==== 計算通脹 ====
+{{ombox |type= content |imageright= [[File:Emblem-money.svg|42px]] |text= This template is <strong>only capable</strong> of inflating Consumer Price Index values: staples, workers' rent, small service bills (doctor's costs, train tickets). This template is <strong>incapable</strong> of inflating capital expenses, government expenses, or the personal wealth and expenditure of the rich. <strong>Incorrect use of this template would constitute original research. If you yourself do not have economic training, then please consult someone who does before using this template.</strong>}}
+{{ombox |type= content |imageright= [[File:Current event warning.svg|42px]] |text= <strong>Do not assume that using this template will mean that a calculated value is <em>"current"</em></strong>, <em>"as of {{CURRENTYEAR}}"</em>, <em>"as of {{#expr:{{CURRENTYEAR}}-1}}"</em> or even necessarily <em>"recent"</em>. Do not use <code><nowiki>{{CURRENTYEAR}}</nowiki></code> to refer to calculated value, instead {{tlx|Inflation/year|US}} may be used. See also [[MOS:REALTIME]].}}
+
+The template supports inflation calculation, by way of {{tlx|Inflation}}. If the second parameter is used, to specify a year, and this year is within a certain range of available inflation data (specifically, {{nowrap|if {{Inflation/US/startyear}} ≤ <code>{{var|year}}</code> < {{Inflation/year|US}}}}), the equivalent value represented in {{Inflation/year|US}} dollars will be calculated in parentheses. However, this function should only be used in appropriate situations.
+
+* {{tlxi|US$|value|year}}
+* {{tlx|US$|{{var|value}}|{{var|year}}|4=round={{var|round}}|5=about=yes}}
+
+;Examples:
+* {{tld|US$|100|{{#expr:{{Inflation/US/startyear}}-1}}}} → {{US$|100|{{#expr:{{Inflation/US/startyear}}-1}}}}
+* {{tld|US$|100|{{Inflation/US/startyear}}}} → {{US$|100|{{Inflation/US/startyear}}}}
+* {{tld|US$|100|1966}} → {{US$|100|1966}}
+* {{tld|US$|100|1966|4=link=yes}} → {{US$|100|1966|link=yes}}
+* {{tld|US$|100|{{#expr:{{Inflation/year|US}}-1}}}} → {{US$|100|{{#expr:{{Inflation/year|US}}-1}}}}
+* {{tld|US$|100|{{Inflation/year|US}}}} → {{US$|100|{{Inflation/year|US}}}}
+* {{tld|US$|100|{{CURRENTYEAR}}}} → {{US$|100|{{CURRENTYEAR}}}}
+* {{tld|US$|100|{{#expr:{{CURRENTYEAR}}+1}}}} → {{US$|100|{{#expr:{{CURRENTYEAR}}+1}}}}
+
+Additional parameter {{para|about|yes}} will cause the template to calculate to the nearest dollar (instead of the nearest cent), and prefix the calculated value with "about". The rounding can be fine-tuned further by using {{para|round|{{var|integer}}}}. These parameters may be combined.
+
+;Examples:
+* {{tld|US$|10|1935}} → {{US$|10|1935}}
+* {{tld|US$|10|1935|4=round=0}} → {{US$|10|1935|round=0}}
+* {{tld|US$|10|1935|4=about=yes}} → {{US$|10|1935|about=yes}}
+* {{tld|US$|1000|1935|4=round=2}} → {{US$|1000|1935|round=2}}
+* {{tld|US$|1000|1935|4=round=-2}} → {{US$|1000|1935|round=-2}}
+* {{tld|US$|1000|1935|4=round=-2|5=about=yes}} → {{US$|1000|1935|round=-2|about=yes}}
+
+;Caution
+
+The inflation-calculation code causes this template to approach the 40-deep '''[[meta:Help:Expansion depth|expansion depth limit]]''' in the software that makes Wikipedia work. Pages that exceed this limit are placed in [[:Category:Pages where expansion depth is exceeded]].  Using {{para|about|yes}} can reduce the impact somewhat.  If you call this template from within another template and use the inflation feature, consider adding a caution similar to this one to that template's documention page.
+<!--
+== 範例 ==
+-->
+
+== 重定向 ==
+* [[Template:USD]]
+<!--
+== 注意事项 ==
+-->
+== 模板编辑说明 ==
+<templatedata>
+{
+	"params": {
+		"1": {
+			"label": "數目",
+			"description": "美元數目",
+			"type": "number",
+			"required": true
+		},
+		"2": {
+			"label": "年份",
+			"description": "Specify a year and, if this year is between 1800 and the current year minus 1, the inflation-adjusted value will be calculated in parentheses",
+			"type": "number",
+			"suggested": true,
+			"aliases": [
+				"year"
+			]
+		},
+		"link": {
+			"label": "加入連結?",
+			"description": "Link US$ to article",
+			"example": "yes",
+			"type": "boolean",
+			"suggested": true
+		},
+		"about": {
+			"label": "About?",
+			"description": "If yes, calculate to the nearest dollar (instead of the nearest cent) and prefix the calculated value with \"about\"",
+			"example": "yes",
+			"type": "boolean"
+		},
+		"round": {
+			"label": "Decimal points",
+			"description": "Integer, where round to number of decimal points specified, use negative (for example, -2) for significant figures",
+			"example": "2",
+			"type": "number",
+			"suggested": true
+		}
+	},
+	"description": "This is a multifunction template. At its simplest, it adds the currency mark \"US$\", as recommended by MOS:CURRENCY for many situations. The template can also link to the United States dollar article and can even calculate inflation.",
+	"format": "inline"
+}
+</templatedata>
+
+== 參見 ==
+* [[Template:Currency]]
+* [[Template:AUD]]
+* [[Template:BDT]]
+* [[Template:CAD]]
+* [[Template:CNY]]
+* [[Template:GB£]]
+* [[Template:INR]]
+* [[Template:JPY]]
+* [[Template:Philippine peso]]
+* [[Template:PKR]]
+
+<includeonly>{{sandbox other||
+<!-- 本行下加入模板的分類，跨維基連結加入Wikidata（參見[[Wikipedia:Wikidata]]） -->
+[[Category:美国经济模板]]
+[[Category:货币模板]]
+[[Category:美国货币]]
+}}</includeonly>

@@ -1,0 +1,63 @@
+{{TA
+|G1=IT
+|G2=Math
+}}
+'''迪尼茨算法'''是在[[网络流|网络流]]计算[[最大流|最大流]]的[[时间复杂度|强多项式]]复杂度的算法，设想由[[以色列|以色列]]计算机科学家叶菲姆·迪尼茨在1970年提出。<ref>{{Cite journal|title=Algorithm for solution of a problem of maximum flow in a network with power estimation|author=[[Yefim_Dinitz|Yefim Dinitz]]|url=http://www.cs.bgu.ac.il/~dinitz/D70.pdf|journal=Doklady Akademii nauk SSSR|year=1970|volume=11|pages=1277–1280|access-date=2016-08-04|archive-date=2016-08-22|archive-url=https://web.archive.org/web/20160822100324/https://www.cs.bgu.ac.il/~dinitz/D70.pdf|dead-url=no}}</ref>算法<math>O(V^2 E)</math>的时间复杂度类似于[[埃德蒙兹-卡普算法|埃德蒙兹-卡普算法]]，其时间复杂度为<math>O(VE^2)</math>，迪尼茨算法与埃德蒙兹-卡普算法的不同之处在于它每轮算法都选择最短的可行路径进行增广。迪尼茨算法中采用高度标号（level graph）以及阻塞流（blocking flow）实现性能。
+
+== 历史 ==
+[[叶菲姆·迪尼茨|叶菲姆·迪尼茨]]在Adel'son-Vel'sky（[[AVL树|AVL树]]的发明者之一）的算法课的课前活动上发明了这个算法。当时他不知道关于[[福特-富尔克森算法|福特-富尔克森算法]]的基本事实。<ref>{{Cite web|url=http://www.powershow.com/view/c6619-OThkZ/Dinitzs_algorithm_for_finding_a_maximum_flow_in_a_network_powerpoint_ppt_presentation|title=Dinitz's algorithm for finding a maximum flow in a network|date=2009-11-27|author1=Ilan Kadar|author2=Sivan Albagli|accessdate=2016-08-04|archive-date=2016-06-24|archive-url=https://web.archive.org/web/20160624205847/http://www.powershow.com/view/c6619-OThkZ/Dinitzs_algorithm_for_finding_a_maximum_flow_in_a_network_powerpoint_ppt_presentation|dead-url=no}}</ref>
+
+迪尼茨在1969年一月向他人公布了他发明的算法，又在1970年将其发布在《Doklady Akademii nauk SSSR杂志》。在1974年，希蒙·埃文和（他之后的博士学生）Alon Itai在海法的以色列理工学院对迪尼茨的算法以及亚历山大·卡尔扎诺夫的阻塞流的想法很感兴趣。但是杂志上的文章每篇的篇幅被限制在四页以内，很多细节都被忽略，这导致他们很难根据文章还原出算法。但他们没有放弃，在后三天不断地努力，设法了解这两个文件中的分层网络的维护问题。在接下来的几年，Even由于在讲学中将Dinitz念为Dinic，导致Dinic算法反而成为了它的名称。埃文和Itai也将算法与[[广度优先搜索|BFS]]和[[深度优先搜索|DFS]]结合起来，形成了当前版本的算法。<ref>{{Cite journal|title=Dinitz's Algorithm: The Original Version and Even's Version|author=Yefim Dinitz|url=http://www.cs.bgu.ac.il/~dinitz/Papers/Dinitz_alg.pdf|access-date=2016-08-04|archive-date=2016-08-20|archive-url=https://web.archive.org/web/20160820050003/https://www.cs.bgu.ac.il/~dinitz/Papers/Dinitz_alg.pdf|dead-url=no}}</ref>
+
+在[[福特-富尔克森算法|福特-富尔克森算法]]发明后约十年之内，是否有算法能在多项式复杂度之内处理無理數邊權是未知的。这造成缺乏任何已知的多项式复杂度算法解决最大流问题。 迪尼茨算法和[[埃德蒙兹-卡普算法|埃德蒙兹-卡普算法]]在1972年发布，证明在福特-富尔克森算法中，如果每次总选择最短的一条增广路，路径长度将单调增加，且算法总能终止。
+
+==定义==
+设<math>G = ((V,E),c,s,t)</math>为一个每条边的容量为<math>c(u,v)</math>，流为<math>f(u,v)</math>的网络。
+
+:'''残留容量'''<math>c_f\colon V\times V \to R^+</math>的定义为：
+:# 如果<math>(u,v)\in E</math>,
+:#: <math>c_f(u,v) = c(u,v) - f(u,v) </math>
+:#: <math>c_f(v,u) = f(u,v)</math>
+:# 否则<math>c_f(u,v) = 0</math>。
+
+:则'''残留网络'''为<math>G_f = ((V, E_f), c_f|_{E_f}, s, t)</math>，其中
+:: <math>E_f = \{(u,v)\in V \times V : c_f(u,v) > 0\}</math>.
+
+:'''增广路'''指通过残留网络<math>G_f</math>的从源点<math>s</math>到汇点<math>t</math>的一条有效路径。
+
+:定义<math>\operatorname{dist}(v)</math>为<math>G_f</math>中从源点<math>s</math>到点<math>v</math>的最短距离。那么<math>G_f</math>的'''高度标号'''为<math>G_L = (V, E_L, c_f|_{E_L}, s,t)</math>，其中
+:: <math>E_L = \{(u,v)\in E_f : \operatorname{dist}(v) = \operatorname{dist}(u) + 1\}</math>.
+
+:设图<math>G' = (V,E_L', s, t)</math>，其中<math>E_L' = \{(u,v) : f(u,v) < c_f|_{E_L}(u,v)\}</math>不包含从<math>s</math>到<math>t</math>的路径，则'''阻塞流'''为一条从<math>s</math>到<math>t</math>的流<math>f</math>。
+
+==算法==
+'''迪尼茨算法'''
+: ''输入'':网络<math>G = ((V, E), c, s, t)</math>。
+: ''输出'':<math>s-t</math>的流<math>f</math>的最大值。
+# 对每条边<math>e\in E</math>，设<math>f(e) = 0</math>。
+# 在图<math>G</math>的残留网络<math>G_f</math>中计算<math>G_L</math>。如果<math>\operatorname{dist}(t) = \infty</math>停止程序并输出<math>f</math>.
+# 在<math>G_L</math>找到一条阻塞流<math>f\;'</math>。
+# 将<math>\ f</math>增加<math>f\;'</math>并返回第二步。
+
+==分析==
+可以证明每轮算法中找到的阻塞流的边数至少增加1，因此整个网络中最多有<math>n-1</math>条阻塞流, <math>n</math>为网络中顶点的数量。高度标号<math>G_L</math>可以在<math>O(E)</math>的时间复杂度内用[[广度优先搜索|BFS]]构建，一条阻塞流可以在<math>O(VE)</math>的复杂度内构建。因此，算法的时间复杂度为<math>O(V^2 E)</math>.
+
+使用一种叫做[[动态树|动态树]]的数据结构，找到阻塞流的时间复杂度可以降到<math>O(E \log V)</math>，此时迪尼茨算法的复杂度可以降到<math>O(VE \log V)</math>.
+
+=== 特殊情况 ===
+在具有单位容量的网络中，迪尼茨算法可以在更短的时间内输出结果。每条阻塞流可以在<math>O(E)</math>的时间内构建，并且阶段（phases）的数量不超过<math>O(\sqrt{E})</math>或<math>O(V^{2/3})</math>。此时算法的复杂度为<math>O(\min\{V^{2/3}, E^{1/2}\}E)</math>。<ref name="Even1975">{{cite journal|last=Even|first=Shimon|last2=Tarjan|first2=R. Endre|year=1975|title=Network Flow and Testing Graph Connectivity|journal=SIAM Journal on Computing|volume=4|issue=4|pages=507–518|issn=0097-5397|doi=10.1137/0204043}}</ref>
+
+在[[二分图|二分图]]匹配问题的网络中，阶段的数量不超过<math>O(\sqrt{V})</math>，算法的时间复杂度不超过<math>O(\sqrt{V} E)</math>。这种算法又叫[[霍普克罗夫特-卡普算法|霍普克罗夫特-卡普算法]]。同樣的上界也適用於更一般情況，即unit网络——网络中除源點及匯點外的頂點，都僅有一條容量為1的外向邊，或是僅有一條容量為1的內向邊，并且所有的容量限制都是整数。{{sfn|Tarjan|1983|p=102}}
+
+== 参考文献 ==
+{{Reflist}}
+
+* {{cite book | ref=harv | last=Tarjan | first=R. E. |year =1983 | title=Data structures and network algorithms }}
+
+== 参见 ==
+*[[网络流|网络流]]
+*[[福特-富尔克森算法|福特-富尔克森算法]]
+
+{{算法}}
+[[Category:图算法|Category:图算法]]
+[[Category:網絡流|Category:網絡流]]

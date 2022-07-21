@@ -1,0 +1,99 @@
+<includeonly>{{#tag:graph|</includeonly><noinclude>{{documentation}}<syntaxhighlight lang=html><graph></syntaxhighlight>{{#tag:syntaxhighlight|</noinclude>
+{
+  //
+  // ATTENTION: This code is maintained at https://www.mediawiki.org/wiki/Template:Graph:PageViews
+  //            Please do not modify it anywhere else, as it may get copied and override your changes.
+  //            Suggestions can be made at https://www.mediawiki.org/wiki/Template_talk:Graph:PageViews
+  //            The graph uses PageViews API https://wikitech.wikimedia.org/wiki/Analytics/PageviewAPI
+  //
+
+  "version": 2,
+  "width": {{{width|400}}},
+  "height": {{{height|200}}},
+
+  // The data for this graph comes from the PageView API.  The request is made for N days back up to now.
+  "data": [
+    {
+      "name": "pageviews",
+      "url": "wikirest://wikimedia.org/api/rest_v1/metrics/pageviews/{{#ifeq: {{{2|}}} | _ | aggregate | per-article }}/{{trim|{{#ifeq: {{{3|{{SERVERNAME}}}}} | www.mediawiki.org | mediawiki.org | {{{3|{{SERVERNAME}}}}} }}}}/{{{platform|all-access}}}/user/{{#ifeq: {{{2|}}} | _
+| {{{granularity | monthly}}}
+| {{urlencode:{{{2|{{ARTICLEPAGENAME}} }}}|PATH}}/daily
+}}/{{#time: Ymd | -{{{1|30}}} days }}00/{{#time: Ymd }}00",
+      "format": {
+        "type": "json",
+        "property": "items"
+      },
+
+      // The response is parsed here, converting date strings of form "20160223" into date 2016-02-23
+      "transform": [
+        { "type": "formula", "field": "year", "expr": "parseInt(substring(datum.timestamp,0,4))" },
+        { "type": "formula", "field": "month", "expr": "parseInt(substring(datum.timestamp,4,6))" },
+        { "type": "formula", "field": "day", "expr": "parseInt(substring(datum.timestamp,6,8))" },
+        { "type": "formula", "field": "date", "expr": "datetime(datum.year,datum.month-1,datum.day)" }
+      ]
+    }
+  ],
+
+  "scales": [
+    // The dates are scaled to the "x" axis - the width of the graph
+    {
+      "name": "x",
+      "type": "time",
+      "range": "width",
+      "domain": {"data": "pageviews","field": "date"}
+    },
+    // The pageviews are scaled to the "y" axis - the height of the graph
+    // Optional scale parameter can change "linear" to other scales like log
+    // Optional max parameter can fix the upper bound of the graph
+    {
+      "name": "y",
+      "type": "{{{scale|linear}}}",
+      "range": "height",
+      "domain": {"data": "pageviews","field": "views"},
+      "clamp": true,
+{{ #if: {{{max|}}}
+| "domainMax": {{{max}}},
+}}
+      "nice": true
+    }
+  ],
+
+  // Simple axis with horizontal grid lines
+  "axes": [
+    {"type": "x", "scale": "x", "ticks": 5},
+    {"type": "y", "scale": "y", "ticks": 5, "grid": true}
+  ],
+
+  // The graph is drawn with two elements a thick line at the top, and a semi-transparent area below
+  "marks": [
+    {
+      "type": "line",
+      "from": {"data": "pageviews"},
+      "properties": {
+        "enter": {
+          "x": {"scale": "x","field": "date"},
+          "y": {"scale": "y","field": "views"},
+          "stroke": {"value": "{{{color|#00f}}}"},
+          "strokeWidth": {"value": 3},
+          "interpolate": {"value": "monotone"}
+        }
+      }
+    },
+"views"
+    {
+      "type": "area",
+      "from": {"data": "pageviews"},
+      "properties": {
+        "enter": {
+          "x": {"scale": "x","field": "date"},
+          "y": {"scale": "y","value": 0},
+          "y2": {"scale": "y","field": "views"},
+          "fill": {"value": "{{{color|#00f}}}"},
+          "fillOpacity": {"value": 0.35},
+          "interpolate": {"value": "monotone"}
+        }
+      }
+    }
+  ]
+}
+<includeonly>}}</includeonly><noinclude>|lang=javascript}}<syntaxhighlight lang=html></graph></syntaxhighlight></noinclude>

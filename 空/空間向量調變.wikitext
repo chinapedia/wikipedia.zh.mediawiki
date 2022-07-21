@@ -1,0 +1,152 @@
+{{Modulation techniques}}
+'''空間向量調變'''簡稱'''SVM'''或是'''SVPWM'''，是一種控制[[脈衝寬度調變|脈衝寬度調變]]（PWM）的算法<ref name=control>
+{{cite book
+ | author = M.P. Kazmierkowski, R. Krishnan, and F. Blaabjerg
+ | title = Control in Power Electronics: Selected Problems
+ | publisher = San Diego: Academic Press
+ | year = 2002
+ | isbn = 978-0-12-402772-5
+ | url = http://books.google.com/books?id=6_dmMHEyvrkC&pg=PA373&dq=%22space+vector+modulation%22+intitle:%22Control+in+Power+Electronics%22&lr=&as_brr=0&as_pt=ALLTYPES&ei=CBWOSdCVDJO2ygTvxuiXBg
+ }}</ref>，用來產生[[交流|交流]][[波形|波形]]，多半是有直流電壓輸入，利用多組[[D类放大器|D类放大器]]輸出電壓，驅動[[三相|三相]]交流馬達。空間向量調變有許多的變體，其輸出品質及計算需求也隨之不同。目前一個熱門的領域是利用演算法來減少快速切換時產生的[[总谐波失真|总谐波失真]]。
+
+==原理==
+[[File:Three_leg_inverter.gif|240px]]的拓撲圖]]
+
+右圖是一個三相[[逆變器|逆變器]]，用許多開關將直流電源轉換為可以驅動三相馬達的三相交流電。
+
+開關在控制時，同一臂的上臂及下臂開關不能同時投入，同時投入時直流電源會短路。因此上下臂的動作信號需要互相反相（除反相外還需要有延遟，以下先省略不計），也就是A<sup>+</sup> on時，A<sup>−</sup>需為off，反之亦然。因此逆變器會有八種不同的組合，分別是六個有效的向量及二個零向量。
+
+<center>
+{| class="wikitable" border="1"
+|-
+! Vector
+! A<sup>+</sup>
+! B<sup>+</sup>
+! C<sup>+</sup>
+! A<sup>−</sup>
+! B<sup>−</sup>
+! C<sup>−</sup>
+! V<sub>AB</sub>
+! V<sub>BC</sub>
+! V<sub>CA</sub>
+! 
+|-
+| V<sub>0</sub> = {000}
+| align="center"| OFF
+| align="center"| OFF
+| align="center"| OFF
+| align="center"| ON
+| align="center"| ON
+| align="center"| ON
+| align="center"| 0
+| align="center"| 0
+| align="center"| 0
+| 零向量
+|-
+| V<sub>1</sub> = {100}
+| align="center"| ON
+| align="center"| OFF
+| align="center"| OFF
+| align="center"| OFF
+| align="center"| ON
+| align="center"| ON
+| align="center"| +V<sub>dc</sub>
+| align="center"| 0
+| align="center"| −V<sub>dc</sub>
+| 有效向量
+|-
+| V<sub>2</sub> = {110}
+| align="center"| ON
+| align="center"| ON
+| align="center"| OFF
+| align="center"| OFF
+| align="center"| OFF
+| align="center"| ON
+| align="center"| 0
+| align="center"| +V<sub>dc</sub>
+| align="center"| −V<sub>dc</sub>
+| 有效向量
+|-
+| V<sub>3</sub> = {010}
+| align="center"| OFF
+| align="center"| ON
+| align="center"| OFF
+| align="center"| ON
+| align="center"| OFF
+| align="center"| ON
+| align="center"| −V<sub>dc</sub>
+| align="center"| +V<sub>dc</sub>
+| align="center"| 0
+| 有效向量
+|-
+| V<sub>4</sub> = {011}
+| align="center"| OFF
+| align="center"| ON
+| align="center"| ON
+| align="center"| ON
+| align="center"| OFF
+| align="center"| OFF
+| align="center"| −V<sub>dc</sub>
+| align="center"| 0
+| align="center"| +V<sub>dc</sub>
+| 有效向量
+|-
+| V<sub>5</sub> = {001}
+| align="center"| OFF
+| align="center"| OFF
+| align="center"| ON
+| align="center"| ON
+| align="center"| ON
+| align="center"| OFF
+| align="center"| 0
+| align="center"| −V<sub>dc</sub>
+| align="center"| +V<sub>dc</sub>
+| 有效向量
+|-
+| V<sub>6</sub> = {101}
+| align="center"| ON
+| align="center"| OFF
+| align="center"| ON
+| align="center"| OFF
+| align="center"| ON
+| align="center"| OFF
+| align="center"| +V<sub>dc</sub>
+| align="center"| −V<sub>dc</sub>
+| align="center"| 0
+| 有效向量
+|-
+| V<sub>7</sub> = {111}
+| align="center"| ON
+| align="center"| ON
+| align="center"| ON
+| align="center"| OFF
+| align="center"| OFF
+| align="center"| OFF
+| align="center"| 0
+| align="center"| 0
+| align="center"| 0
+| 零向量
+|}
+</center>
+若只考慮有效向量V<sub>1-6</sub>，輸出電壓為脈波的弦波，每隻腳的[[相量|相位差]]為120度。
+
+若要實現空間向量調變，先要有一個參考信號V<sub>ref</sub>依f<sub>s</sub>的頻率取様（T<sub>s</sub> = 1/f<sub>s</sub>）。參考信號可以用三個獨立的相訊號用{{le|克拉克轉換|Alpha beta gamma transform|<math>\alpha\beta\gamma</math>轉換}}轉換。參考信號會用二個有效向量及一個零向量合成。存在多種不同的策略來選擇有效向量及零向量。不同的選擇會影響諧波成份及切換損失。
+
+[[File:Space_Vector_Modulation.gif|center]]
+
+==相關條目==
+* {{le|克拉克轉換|Alpha beta gamma transform|<math>\alpha\beta\gamma</math>轉換}}
+* [[逆變器|逆變器]]
+* [[變頻器|變頻器]]
+* [[脈衝寬度調變|脈衝寬度調變]]
+
+==參考資料==
+{{reflist}}
+
+==外部連結==
+*[http://www.vissim.com/solutions/field_oriented_motor_control.html Model based control of PMSM motor with space vector modulation] {{Wayback|url=http://www.vissim.com/solutions/field_oriented_motor_control.html |date=20161203122227 }} Description and working [[VisSim|VisSim]] source code diagram.
+*[http://www.arpnjournals.com/jeas/research_papers/rp_2010/jeas_0710_362.pdf SIMULATION AND COMPARISON OF SPWM AND SVPWM CONTROL FOR THREE PHASE INVERTER] {{Wayback|url=http://www.arpnjournals.com/jeas/research_papers/rp_2010/jeas_0710_362.pdf |date=20190819040059 }} 
+
+{{DEFAULTSORT:Space Vector Modulation}}
+[[Category:电子工程|Category:电子工程]]
+[[Category:電子學|Category:電子學]]

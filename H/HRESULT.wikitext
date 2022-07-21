@@ -1,0 +1,92 @@
+{{multiple issues|
+{{refimprove|time=2017-02-14T13:37:29+00:00}}
+{{expert|time=2018-11-05}}
+}}
+在[[计算机|计算机]][[编程|编程]]领域中，'''HRESULT'''是一种在 [[Windows|Windows]] 操作系统中使用的数据类型，并且曾更早在 [[IBM|IBM]]/Microsoft [[OS/2|OS/2]] [[操作系统|操作系统]]中使用。用来表示错误和警告的情况。
+
+HRESULT的最初目的是为了防止OS/2操作系统的不同子系统中的错误代码之间的冲突，正式地规定第三方和[[微软|微软]]内部使用的错误代码范围。它是基于数字的错误代码，HRESULT中的各个位编码包含有关错误代码的性质及其来源的信息。
+
+HRESULT 错误码在[[COM|COM]]编程领域很常见，它们构成了标准化的COM错误处理约定的基础。
+
+== HRESULT 格式 ==
+HRESULT值有32位，分为三个字段：严重性[[代码|代码]]、[[设施|设施]]代码和[[错误|错误]]代码。严重性代码指示返回值是表示[[信息|信息]]、[[警告|警告]]还是[[错误|错误]]。设施代码标识负责错误的系统区域。错误代码是分配用于表示异常的唯一编号。 每个异常映射到不同的HRESULT。
+
+HRESULT的结构如下：<ref name="msdnwinerrcode">[http://msdn.microsoft.com/en-us/library/cc231198(PROT.10).aspx MSDN Windows Error Code reference] {{Wayback|url=http://msdn.microsoft.com/en-us/library/cc231198(PROT.10).aspx |date=20101222213740 }}.</ref>
+
+{| class="wikitable" style="text-align: center;"
+|- style="vertical-align: bottom;"
+! Bit
+| 31 || 30 || 29 || 28 || 27 || 26 || 25 || 24 || 23 || 22 || 21 || 20 || 19 || 18 || 17 || 16 || 15 || 14 || 13 || 12 || 11 || 10 || 9 || 8 || 7 || 6 || 5 || 4 || 3 || 2 || 1 || 0
+|-
+! Field
+| S || R || C || N || X ||colspan="11"| Facility ||colspan="16"| Code
+|}
+
+=== 格式细节 ===
+* S - 严重性 - 表示成功或失败
+** 0 - 成功
+** 1 - 失败
+* R - 设施代码的保留部分，对应于NT的第二严重性位。
+** 1 - 严重故障
+* C - 第三方。 此位指定值是第三方定义还是Microsoft定义的。
+** 0 - Microsoft-定义
+** 1 - 第三方定义
+* N - 保留部分设施代码。 用于指示映射的NT状态值。
+* X - 保留部分设施代码。 保留供内部使用。 用于指示不是状态值的HRESULT值，而是用于显示字符串的消息标识。
+* 设施 - 表示引发错误的系统服务. 示例设施代码如下所示（完整列表请参见 ).
+** 1 - [[遠程過程調用|RPC]]
+** 2 - 调度（COM调度）
+** 3 - 存储 ([[OLE|OLE]] 存储)
+** 4 - ITF (COM/OLE 接口管理)
+** 7 - [[Windows_API|Win32]] (原始 Win32 错误代码)
+** 8 - Windows
+** 9 - SSPI
+** 10 - 控制
+** 11 - CERT (客户端或服务器认证)
+** ...
+* Code - 设施的状态代码
+ITF设施代码随后被再次用作COM组件可以定义自己的组件特定错误代码的范围。
+
+== HRESULT 是如何工作的 ==
+HRESULT是一个不透明的结果[[句柄|句柄]]，定义为从[[函数|函数]]成功返回为0或正值，对失败为负值。一般的, 成功的函数返回 <code>S_OK</code> HRESULT 值 (这个HRESULT等于0)。但在极少数情况下，函数可能返回成功代码与附加信息，例如<code>S_FALSE=0x01</code>。
+
+当显示HRESULT时，它们通常呈现为 无符号[[十六进制|十六进制]]值, 通常用 <code>0x</code> 做前缀。在这种情况下，可以通过以十六进制数字8或更高开始来标识指示故障的数字。
+
+HRESULT最初在IBM/Microsoft OS/2操作系统中作为一般目的的错误返回代码，并随后在[[Windows_NT|Windows NT]]中使用。 Microsoft [[Visual_Basic|Visual Basic]] 的大幅度增加HRESULT错误报告机制，通过关联的一个 <code>IErrorInfo</code> 对象错误代码，通过存储指向一个<code>IErrorInfo</code>COM对象的线程本地存储。 <code>IErrorInfo</code>机制允许程序将各种信息与特定的HRESULT错误相关联：引发错误的对象的类，引发错误的对象的接口，错误文本; 以及帮助文件中帮助主题的链接。 此外，HRESULT错误的接收器可以根据需要获得错误消息的本地化文本。
+
+随后，HRESULT和相关联的 <code>IErrorInfo</code> 机制用作COM中的默认错误报告机制。
+
+在Windows中支持IErrorInfo机制是非常不一致的。 较旧的Windows API往往不支持它，返回HRESULTS没有任何 IErrorInfo 数据。 更多的现代Windows COM子系统通常会在IErrorInfo对象的消息描述中提供大量的错误信息。 IErrorInfo错误机制的更高级功能——帮助链接和按需定位，很少使用。
+
+在[[.NET_Framework|.NET Framework]]中，从本机代码转换为[[托管代码|托管代码]]时，HRESULT / <code>IErrorInfo</code>错误代码将转换为[[CLR|CLR]]异常; 当从托管转换为本机COM代码时，CLR异常将转换为HRESULT / IErrorInfo错误代码。
+
+== 使用 HRESULT ==
+winerror.h文件定义了一些通用的HRESULT值。 有些HRESULT值被硬编码在给定子系统的关联头文件（.h文件）中。 这些值也使用Microsoft Windows平台SDK或DDK在相应的标题（.h）文件中定义。
+
+要检查返回HRESULT的调用是否成功，请确保S字段为0（即数字为非负数）或使用<code>FAILED()</code>。要获取HRESULT的代码部分，请使用<code>HRESULT_CODE()</code>。您还可以使用名为ERR.EXE的工具获取值，并将其转换为相应的错误字符串。 另一个名为ERRLOOK.EXE的工具也可用于显示与给定HRESULT值相关联的错误字符串。 可以在[[Visual_Studio|Visual Studio]][[命令提示符|命令提示符]]下运行ERRLOOK.EXE。
+
+Windows 原生的 <code>SetErrorInfo</code> 和 <code>GetErrorInfo</code> API 用于将 HRESULT 返回码与对应的<code>IErrorInfo</code>对象相关联。
+
+<code>FormatMessage</code> [[API|API]][[函数|函数]]可用于将一些非<code>IErrorInfo</code> HRESULT转换为用户可读的字符串。
+
+== 示例 ==
+* <code>0x80070005</code>
+** 8 - 错误
+** 7 - Win32
+** 5 - "E_FAULT"
+* <code>0x80090032</code>
+** 8 - 错误
+** 9 - SSPI
+** 32 - "此请求不被支持"<ref name="msdnwin32errorcodes"> Win32 
+错误代码</ref>
+
+== 引用 ==
+<references />
+
+== 扩展链接 ==
+* [http://msdn.microsoft.com/en-us/library/cc231198.aspx Microsoft Open Protocol Specification - HRESULT Values]{{Wayback|url=http://msdn.microsoft.com/en-us/library/cc231198.aspx |date=20170215114641 }}
+* [http://msdn.microsoft.com/en-us/library/ms526450.aspx Microsoft Developer Network Reference]{{Wayback|url=http://msdn.microsoft.com/en-us/library/ms526450.aspx |date=20170215114431 }}
+* [http://msdn.microsoft.com/en-us/library/aa383751.aspx#ctl00_LibFrame_ctl112 Windows Data Types]{{Wayback|url=http://msdn.microsoft.com/en-us/library/aa383751.aspx#ctl00_LibFrame_ctl112 |date=20170215123503 }}
+* [http://msdn.microsoft.com/en-us/library/ms691242.aspx Using Macros for Error Handling]{{Wayback|url=http://msdn.microsoft.com/en-us/library/ms691242.aspx |date=20170215121946 }}
+* [https://web.archive.org/web/20090503085807/http://www.megos.ch/support/doserrors_e.txt List of DOS, Windows and OS/2 error codes], 包括很多常用的HRESULT
+[[Category:数据类型|Category:数据类型]]

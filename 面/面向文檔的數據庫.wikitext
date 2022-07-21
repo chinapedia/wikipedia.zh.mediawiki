@@ -1,0 +1,317 @@
+{{NoteTA|G1=IT}}
+'''面向文档的数据库'''（{{lang-en|Document-oriented database}}）或'''文档存储'''，是用于存储、检索和管理面向文档的信息的一种[[计算机程序|计算机程序]]。这里称为文档的是{{en-link|半结构化数据|Semi-structured data}}<ref>{{cite web |author=Peter Buneman |title=<!-- Tutorial on --> Semistructured data |journal=Symposium on Principles of Database Systems |date=1997 |url=https://homepages.inf.ed.ac.uk/opb/papers/PODS1997a.pdf |access-date=2019-05-16 |archive-date=2021-04-17 |archive-url=https://web.archive.org/web/20210417070519/https://homepages.inf.ed.ac.uk/opb/papers/PODS1997a.pdf |dead-url=no }}</ref>，它是不完全形式的[[数据模型|结构化数据]]，不服从于与[[关系数据库|关系数据库]]或其他形式[[数据库表|数据表]]有关联之[[数据模型|数据模型]]的形式结构，然而却包含[[标签_(元数据)|标签]]或其他标记，用以在数据内分割语义元素和强制记录和字段的层级，因此它也叫做「自我描述结构」。
+
+==概述==
+面向文档的数据库是[[NoSQL|NoSQL]]数据库的主要类别之一，且“面向文档的数据库”一词的普及程度也因术语NoSQL的使用而有所增长<ref>{{Cite web |url=http://db-engines.com/en/ranking_categories |title=DB-Engines Ranking per database model category |access-date=2016-08-22 |archive-date=2021-05-16 |archive-url=https://web.archive.org/web/20210516141042/https://db-engines.com/en/ranking_categories |dead-url=no }}</ref> 。{{en-link|XML数据库|XML database}}是针对[[XML|XML]]文档做了优化的面向文档的数据库的子类。[[图数据库|图数据库]]与之相似，但其添加了一个连接各文档的“联系”层，以便进行快速遍历。一些[[搜索引擎|搜索引擎]]（也称为[[信息检索|信息检索]]）系统如[[Elasticsearch|Elasticsearch]]提供了足够的对文档的核心操作从而已经满足了面向文档数据库的定义。
+
+[[键-值数据库|键-值数据库]]是NoSQL数据库的另一概念，面向文档的数据库是键-值数据库的子类。它们的差别在于处理数据的方式：在键值数据库中，数据是对数据库不透明的；而面向文档的数据库系统依赖于“文档”的内部结构来获取[[元数据|元数据]]，数据库引擎使用这些元数据进行更深层次的优化。虽然由于系统中的工具使这一差别不甚明显，{{efn|面向文档数据库和键值数据库系统通常能在应用时相互替换。}}但在设计概念上，这种文档存储方式利用了现代程序技术来提供更丰富的体验。现代键-值存储经常包括处理元数据的特征，模糊了它与文档存储之间的界线。
+
+文档数据库{{efn|以及键值数据库（一般来说）。}}与传统的[[关系数据库|关系数据库]]差异显著。关系数据库通常将数据存储在相互独立的表中，这些[[数据库表|表]]由程序开发者定义，一个单一的对象可能散布在若干表中。 对于一个给定对象，文档数据库将其所有信息存储在数据库内某个单一实例中，并且存储的每一个对象可以不同于任一其它对象。这简化了将对象装载入数据库的过程，通常能消除对[[对象关系映射|对象关系映射]]等类似方案的需求。文档数据库不同于关系数据库，关系数据库基于了[[关系模型|关系模型]]，而文档数据库采用了{{en-link|半结构化模型|Semi-structured model}}，没有在数据和[[Schema_(数据库)|模式]]（schema）之间的分离，使用的结构的数量依赖于目标用途。在半结构化数据中，属于相同[[类_(计算机科学)|类]]的[[实体|实体]]可有不同的{{en-link|变量和特性|Variable and attribute (research)|特性}}，即使它们被分组在一起，并且属性的次序是不重要的。
+
+==文档==
+面向文档数据库的中心概念是“文档”这个概念。尽管每个面向文档数据库实现在这个定义的细节上都有所不同，一般而言，它们都假定文档以某种标准[[文档文件格式|格式]]或[[序列化#序列化格式|编码]]来封装和编码数据（或信息）。面向文档数据库使用的编码包括[[XML|XML]]、[[YAML|YAML]]、[[JSON|JSON]]和[[BSON|BSON]]，有的实现还可以存储二进制文档格式如[[PDF|PDF]]和Microsoft Office文档（MS [[Word|Word]]、[[Excel|Excel]]之类）。
+
+在文档存储中的文档粗略的等价于对象这个编程概念。不要求它们遵守标准[[Schema_(数据库)|模式]]（schema），也不要求它们都有同样的章节、插槽（slot）、部分（part）或键。一般地说，使用对象的程序有很多不同的对象类型，而这些对象经常有很多可选的字段（field）。每个对象，即使是同类的，也可以看起来非常不同。文档存储类似于此，它们在一个单一存储中允许不同类型的文档，运行在文档中的字段是可选的，并且经常允许它们使用不同的编码系统来编码。例如，下面是一个文档，采用JSON编码：
+
+<syntaxhighlight lang="javascript">
+{
+    "FirstName": "Bob", 
+    "Address": "5 Oak St.", 
+    "Hobby": "sailing"
+}
+</syntaxhighlight>
+
+第二个文档可以采用XML来编码：
+<syntaxhighlight lang="xml">
+  <contact>
+    <firstname>Bob</firstname>
+    <lastname>Smith</lastname>
+    <phone type="Cell">(123) 555-0178</phone>
+    <phone type="Work">(890) 555-0133</phone>
+    <address>
+      <type>Home</type>
+      <street1>123 Back St.</street1>
+      <city>Boys</city>
+      <state>AR</state>
+      <zip>32225</zip>
+      <country>US</country>
+    </address>
+  </contact>
+</syntaxhighlight>
+
+这两个文档相互共享一些结构性元素，但每个都有唯一性元素。在文档内部的结构和正文及其他数据通常被称为文档的“内容”，并可以通过通过检索或编辑方法（见下文）来引用。关系数据库中，所有记录包含同样的字段，保留未使用字段为空；不同于关系数据库，在上述例子的这两个文档（记录）中都没有空“字段”。这种方式允许向某些记录增加新信息而不要求在数据库中的所有其他记录共享相同结构。
+
+文档数据典型的提供了关联于文档内容并与之一起存储的额外的[[元数据|元数据]]。这种元数据还可以与增进数据存储有关，提供组织文档，提供安全性，或其他特定于实现的特性。
+
+=== CRUD操作===
+面向文档数据对文档提供类似于其他数据库的核心操作，尽管术语未完全标准化，大多数实践者将它们认可为[[建立、讀取、更新、刪除|CRUD]]：
+
+* 建立（或插入）
+* 检索（或查询、查找、读取或寻找）
+* 更新（或编辑）
+* 删除（或移除）
+
+=== 键 ===
+在数据库的文档通过代表这个文档的唯一的“键”来寻址。键是一个简单的[[标识符|标识符]]（简写为ID），典型的是[[字符串|字符串]]、[[URI|URI]]或[[路径|路径]]。键可以用来从数据中检索文档。数据库典型的在键上保有[[数据库索引|索引]]来加速文档检索，并且在某些情况下要求用键来把文档建立或插入到数据库中。
+
+=== 检索 ===
+面向文档数据的另一个定义特征，使之超越可用来检索文档的简单的键到文档查找，就是数据库提供允许用户基于内容（或元数据）来检索文档的API或查询语言。例如，你可能需要一个查询，检索特定字段被设置为特定值的所有文档。可获得的查询API或查询语言的特征的集合，还有查询的预期性能，在不同实现之间有显著差异。类似的，可获得的索引选项和配置的特有集合随着不同实现而有着巨大差异。
+
+文档存储和键-值存储有很大差异。在理论上，在键-值存储中值对于存储是不透明的，它们本质上是黑箱子。它们可以提供类似于文档存储的的查找系统，但是对内容的组织有着更少的理解。文档存储使用在文档中的元数据来分类内容，例如允许它们理解一个数字序列是电话号码，而另一个是邮政编码。这允许它们在这种类型的数据上进行查找，例如，包含555的所有电话号码，但忽略邮编 55555。
+
+=== 编辑 ===
+文档数据典型的提供某种机制来更新或编辑文档的内容（或元数据），替换要么允许在整个文档上，要么在文档的个别结构片段上。
+
+=== 组织 ===
+文档数据库实现提供各种方式来组织文档，包括如下概念：
+* 收集（Collection）：成组的文档，依赖于具体实现，文档可以被强制存留在一个收集内部，也可以被允许存留在多个收集之内。
+* 标签（Tag）和不可见元数据：在文档内容之外的附加数据。
+* 目录层级：组织成树状结构的成组文档，典型的基于路径或URI。
+有时这些组织概念在它们是逻辑的还是物理的、（比如在磁盘上还是在内存中）、表示等方面有一些变化。
+
+== 实现 ==
+<!--Entries in this list should be "notable" and have a sourced Wikipedia article.-->
+{| class="wikitable sortable"
+|-
+! 名称
+! 发行商
+! 许可证
+! 支持语言
+! 注释
+! [[表示层状态转换|REST]]ful API
+|-
+| [[AllegroGraph|AllegroGraph]]
+| Franz, Inc.
+| {{proprietary}}
+| [[Java|Java]], [[Python|Python]], [[Common_Lisp|Common Lisp]], [[Ruby|Ruby]], [[Scala|Scala]], [[.NET|.NET]], [[Perl|Perl]]
+| 数据库平台在一个单一数据内支持文档存储和图数据模型。支持[[JSON|JSON]], [[JSON-LD|JSON-LD]], [[资源描述框架|RDF]], 全文查找, [[ACID|ACID]], [[二阶段提交|二阶段提交]], [[Multi-master_replication|多主复制]], [[Prolog|Prolog]] 和 [[SPARQL|SPARQL]]。
+| {{yes}}<ref>{{cite web|url=https://franz.com/agraph/support/documentation/current/http-protocol.html|title=HTTP Protocol for AllegroGraph|publisher=|access-date=2019-05-15|archive-date=2021-04-14|archive-url=https://web.archive.org/web/20210414042350/https://franz.com/agraph/support/documentation/current/http-protocol.html|dead-url=no}}</ref>
+|-
+| [[ArangoDB|ArangoDB]]
+| ArangoDB
+| {{free|[[Apache_License|Apache License]]}}
+| [[C语言|C]], [[.NET|.NET]], [[Java|Java]], [[Python|Python]], [[Node.js|Node.js]], [[PHP|PHP]], [[Scala|Scala]], [[Go|Go]], [[Ruby|Ruby]], [[Elixir|Elixir]]
+| 数据库系统以一个数据库和统一的查询语言AQL（ArangoDB 查询语言）支持文档存储以及键/值和图数据模型。
+| {{yes}}<ref>{{Cite web |url=https://www.arangodb.com/ |title=存档副本 |access-date=2022-02-13 |archive-date=2021-02-10 |archive-url=https://web.archive.org/web/20210210131143/https://www.arangodb.com/ |dead-url=no }}</ref>
+|-
+| [[BaseX|BaseX]]
+| BaseX Team
+| {{free|[[BSD_License|BSD License]]}}
+| [[Java|Java]], [[XQuery|XQuery]]
+| 支持 XML, JSON 和二进制格式；基于客户/服务器的体系；并发结构化和全文查找及更新。
+| {{yes}}
+|-
+| [[InterSystems_Caché|Caché]]
+| [[InterSystems|InterSystems]] 公司
+| {{proprietary}}
+| [[Java|Java]], [[C#|C#]], [[Node.js|Node.js]]
+| 常用于健康, 商务和政府应用。
+| {{yes}}
+|-
+| [[Cloudant|Cloudant]]
+| Cloudant, Inc.
+| {{proprietary}}
+| [[Erlang|Erlang]], [[Java|Java]], [[Scala|Scala]], 和 [[C语言|C]]
+| 基于[[BigCouch|BigCouch]]的分布式数据库服务，这家公司对[[Apache软件基金会|Apache]]背景的[[CouchDB|CouchDB]]计划的[[开放源代码|开源]]仿制。 使用JSON模型。
+| {{yes}}
+|-
+| [[Clusterpoint|Clusterpoint Database]]
+| Clusterpoint Ltd.
+| {{proprietary}}，有免费下载
+| [[JavaScript|JavaScript]], [[SQL|SQL]], [[PHP|PHP]], [[.NET|.NET]], [[Java|Java]], [[Python|Python]], [[Node.js|Node.js]], [[C语言|C]], [[C++|C++]], 
+| 分布式面向文档XML/JSON数据库平台，有着服从[[ACID|ACID]]的[[事务处理|事务]]；[[高可用性|高可用性]][[data_replication|数据复制]]和[[Shard_(database_architecture)|分片]]；带有[[相关性|相关性]][[排名|排名]]的内建[[全文查找|全文查找]]引擎；JS/SQL[[查询语言|查询语言]]；[[地理信息系统|GIS]]；可获得为每使用付费[[云数据库|云数据库]]或作为一个on-premise免费软件下载。
+| {{yes}}
+|-
+| [[Couchbase_Server|Couchbase Server]]
+| [[Couchbase,_Inc.|Couchbase, Inc.]]
+| {{free|[[Apache_License|Apache License]]}}
+| [[C语言|C]], [[.NET|.NET]], [[Java|Java]], [[Python|Python]], [[Node.js|Node.js]], [[PHP|PHP]], [[SQL|SQL]], [[Go|Go]], [[Spring_Framework|Spring Framework]], [[LINQ|LINQ]]
+|分布式NoSQL文档数据库, JSON模型和基于SQL的查询语言。
+| {{yes}}<ref>[http://www.couchbase.com/docs/ Documentation] {{webarchive|url=https://web.archive.org/web/20120820182153/http://www.couchbase.com/docs/ |date=2012-08-20 }}. Couchbase. Retrieved on 2013-09-18.</ref>
+|-
+| [[CouchDB|CouchDB]]
+| [[Apache软件基金会|Apache软件基金会]]
+| {{free|[[Apache_License|Apache License]]}}
+| 可以发起HTTP请求的任何语言
+| JSON于REST/HTTP上，有着[[多版本并发控制|多版本并发控制]]和有限的[[ACID|ACID]]特性。对视图和查询使用[[map_(高阶函数)|map]]和[[fold_(高阶函数)|reduce]]。<ref>[http://couchdb.apache.org/docs/overview.html CouchDB Overview] {{webarchive |url=https://web.archive.org/web/20111020074113/http://couchdb.apache.org/docs/overview.html |date=October 20, 2011 }}</ref>
+| {{yes}}<ref>{{cite web|url=http://wiki.apache.org/couchdb/HTTP_Document_API|title=HTTP_Document_API - Couchdb Wiki|publisher=|access-date=2019-05-15|archive-url=https://web.archive.org/web/20130301093229/http://wiki.apache.org/couchdb/HTTP_Document_API|archive-date=2013-03-01|dead-url=yes}}</ref>
+|-
+| [[CrateIO|CrateIO]]
+| CRATE Technology GmbH
+| {{free|[[Apache_License|Apache License]]}}
+| [[Java|Java]]
+| 对跨越集群的实时分布式查询使用类似SQL语法。基于了Lucene/Elasticsearch生态系统带有对二进制对象（BLOB）的内建支持。
+| {{yes}}<ref>{{cite web|url=https://crate.io/docs/stable/sql/rest.html |title=Archived copy |accessdate=2015-06-22 |deadurl=yes |archiveurl=https://web.archive.org/web/20150622174526/https://crate.io/docs/stable/sql/rest.html |archivedate=2015-06-22 |df= }}</ref>
+|-
+| [[Cosmos_DB|Cosmos DB]]
+| Microsoft
+| {{proprietary}}
+| [[.NET|.NET]], [[Java|Java]], [[Python|Python]], [[Node.js|Node.js]], [[JavaScript|JavaScript]], [[SQL|SQL]]
+| 提供Platform-as-a-Service，是[[Microsoft_Azure|Microsoft Azure]]的一部分。建造于早期Azure DocumentDB之上并进行了扩展。
+| {{yes}}
+|-
+|[[DocumentDB|DocumentDB]]
+|[[Amazon_Web_Services|Amazon Web Services]]
+| 专有在线服务
+| 各种, [[REST|REST]]
+| 完全管理的MongoDB v3.6-兼容数据库服务
+|{{yes}}
+|-
+|[[Elasticsearch|Elasticsearch]]
+|[[Shay_Banon|Shay Banon]]
+|{{free|[[Apache_License|Apache License]]}}
+|[[Java|Java]]
+|[[JSON|JSON]], 查找引擎。
+|{{yes}}
+|-
+| [[eXist|eXist]]
+| eXist
+| {{free|[[LGPL|LGPL]]}}
+| [[XQuery|XQuery]], [[Java|Java]]
+| XML在REST/HTTP之上, WebDAV, Lucene全文查找, 二进制数据支持, 验证, 版本控制, 集群, 触发器, URL重写, 收集, ACLS, XQuery更新
+| {{yes}}<ref>[http://exist-db.org eXist-db Open Source Native XML Database] {{Wayback|url=http://exist-db.org/ |date=20200527102631 }}. Exist-db.org. Retrieved on 2013-09-18.</ref>
+|-
+| [[Informix|Informix]]
+| IBM
+| 专有, 带有非付费版本<ref>{{cite web|url=http://www.ibm.com/developerworks/data/library/techarticle/dm-0801doe/|title=Compare the Informix Version 12 editions|date=22 July 2016|publisher=|access-date=2019-05-15|archive-date=2020-11-09|archive-url=https://web.archive.org/web/20201109025854/http://www.ibm.com/developerworks/data/library/techarticle/dm-0801doe/|dead-url=no}}</ref>
+| 各种（兼容于 MongoDB API）
+| RDBMS 带有 JSON, 复制, 分片和 ACID遵守。
+| {{yes}}
+|-
+|[[Apache_Jackrabbit|Jackrabbit]]
+|Apache基金会
+|{{free|[[Apache_License|Apache License]]}}
+|[[Java|Java]]
+|[[Java_Content_Repository|Java Content Repository]]实现
+|{{dunno}}
+|-
+| [[Lotus_Notes|Lotus Notes]] ([[IBM_Lotus_Domino|IBM Lotus Domino]])
+| IBM
+| {{proprietary}}
+| [[LotusScript|LotusScript]], [[Java|Java]], Lotus @Formula
+| [[MultiValue|MultiValue]]
+| {{yes}}
+|-
+| [[MarkLogic|MarkLogic]]
+| MarkLogic 公司
+| 免费开发者许可证或商业<ref>{{cite web|url=http://developer.marklogic.com/licensing|title=MarkLogic Licensing|publisher=|access-date=2019-05-15|archive-url=https://web.archive.org/web/20120112032849/http://developer.marklogic.com/licensing|archive-date=2012-01-12|dead-url=yes}}</ref>
+|[[Java|Java]], [[JavaScript|JavaScript]], [[Node.js|Node.js]], [[XQuery|XQuery]], [[SPARQL|SPARQL]], [[XSLT|XSLT]], [[C++|C++]]
+| 分布式面向文档数据库，对于 JSON, XML, 和[[资源描述框架|RDF triples]]。内建[[全文查找|全文查找]], [[ACID|ACID]]事务, [[高可用性|高可用性]]和[[灾难恢复|灾难恢复]], 证书安全性。
+| {{yes}}
+|-
+| [[MongoDB|MongoDB]]
+| MongoDB, Inc
+| 对DBMS为服务器端公共许可证, 对客户驱动程序为[[Apache许可证|Apache2许可证]]<ref>{{cite web|url=http://www.mongodb.org/about/licensing/|title=MongoDB Licensing|publisher=|access-date=2019-05-15|archive-date=2015-09-05|archive-url=https://web.archive.org/web/20150905140449/https://www.mongodb.org/about/licensing/|dead-url=no}}</ref>
+| [[C语言|C]], [[C++|C++]], [[C#|C#]], [[Java|Java]], [[Perl|Perl]], [[PHP|PHP]], [[Python|Python]], [[Go|Go]], [[Node.js|Node.js]], [[Ruby|Ruby]], [[Rust|Rust]]<ref>{{Cite news|url=https://www.mongodb.com/blog/post/the-new-mongodb-rust-driver|title=The New MongoDB Rust Driver|work=MongoDB|access-date=2018-02-01|language=en-us|archive-date=2021-04-14|archive-url=https://web.archive.org/web/20210414021031/https://www.mongodb.com/blog/post/the-new-mongodb-rust-driver|dead-url=no}}</ref>, [[Scala|Scala]]<ref>{{cite web|url=http://docs.mongodb.org/ecosystem/drivers/community-supported-drivers/|title=Community Supported Drivers Reference|publisher=|access-date=2019-05-15|archive-date=2016-04-11|archive-url=https://web.archive.org/web/20160411102205/https://docs.mongodb.org/ecosystem/drivers/community-supported-drivers/|dead-url=no}}</ref>
+| 文档数据库带有复制和分片, [[BSON|BSON]]存储（二进制格式[[JSON|JSON]]）。
+| {{yes}}<ref>{{Cite web |url=http://www.mongodb.org/display/DOCS/Http+Interface#HttpInterface-RESTInterfaces |title=MongoDB REST Interfaces |access-date=2019-05-15 |archive-url=https://web.archive.org/web/20130129134335/http://www.mongodb.org/display/DOCS/Http+Interface#HttpInterface-RESTInterfaces |archive-date=2013-01-29 |dead-url=yes }}</ref>
+|-
+| [[MUMPS|MUMPS]] 数据库
+| {{dunno}}
+| [[proprietary_software|Proprietary]] 和 [[Affero_General_Public_License|Affero GPL]]<ref>{{cite web|url=http://sourceforge.net/projects/fis-gtm/|title=GT.M High end TP database engine|publisher=|access-date=2019-05-15|archive-date=2021-04-17|archive-url=https://web.archive.org/web/20210417153055/https://sourceforge.net/projects/fis-gtm/|dead-url=no}}</ref>
+| [[MUMPS|MUMPS]]
+| 常用于健康应用。
+| {{dunno}}
+|-
+| [[ObjectDatabase++|ObjectDatabase++]]
+| Ekky 软件
+| {{proprietary}}
+| [[C++|C++]], [[C#|C#]], [[TScript|TScript]]
+| 二进制原生C++类结构
+| {{dunno}}
+|-
+|[[Virtuoso_Universal_Server|OpenLink Virtuoso]]
+|OpenLink 软件
+|GPLv2[1]和专有
+|[[C++|C++]], [[C#|C#]], [[Java|Java]], [[SPARQL|SPARQL]]
+|[[中间件|中间件]]和[[数据库引擎|数据库引擎]]混合
+|{{yes}}
+|-
+| [[OrientDB|OrientDB]]
+| Orient 技术
+| {{free|[[Apache_License|Apache License]]}}
+| [[Java|Java]]
+| JSON在HTTP之上, SQL支持, [[ACID|ACID]]事务
+| {{yes}}
+|-
+| [[PostgreSQL|PostgreSQL]]
+| PostgreSQL
+| {{free | PostgreSQL Free License}}<ref>{{Cite web |url=http://www.postgresql.org/about/licence/ |title=存档副本 |access-date=2019-05-15 |archive-date=2021-05-17 |archive-url=https://web.archive.org/web/20210517235957/https://www.postgresql.org/about/licence/ |dead-url=no }}</ref>
+| [[C语言|C]]
+| HStore, JSON存储(9.2+), JSON函数(9.3+), HStore2 (9.4+), JSONB (9.4+)
+|{{no}}
+|-
+| [[Qizx|Qizx]]
+| [[Qualcomm|Qualcomm]]
+| {{proprietary}}
+| [[REST|REST]], [[Java|Java]], [[XQuery|XQuery]], [[XSLT|XSLT]], [[C语言|C]], [[C++|C++]], [[Python|Python]]
+| 分布式面向文档[[XML数据库|XML数据库]]带有集成的[[全文查找|全文查找]]；支持[[JSON|JSON]], 文本和二进制。
+|{{yes}}
+|-
+| [[RethinkDB|RethinkDB]]
+| {{dunno}}
+| {{free|对DBMS为[[Affero_General_Public_License|GNU AGPL]]，对客户驱动程序为[[Apache_2_License|Apache 2 License]]}}
+| [[C++|C++]], [[Python|Python]], [[JavaScript|JavaScript]], [[Ruby|Ruby]], [[Java|Java]]
+| 分布式面向文档[[JSON|JSON]]数据库带有复制和分片。
+|{{no}}
+|-
+|[[SAP_HANA|SAP HANA]]
+|[[SAP_SE|SAP]]
+|{{proprietary}}
+|类[[SQL|SQL]]语言
+|[[ACID|ACID]]事务支持, 唯[[JSON|JSON]]
+|{{yes}}
+|-
+| [[Sedna_(database)|Sedna]]
+|sedna.org
+|{{free|[[Apache_License|Apache License]]}}
+|[[C++|C++]], [[XQuery|XQuery]]
+|[[XML数据库|XML数据库]]
+|{{no}}
+|-
+| [[SimpleDB|SimpleDB]]
+|[[Amazon_Web_Services|Amazon Web Services]]
+| 专有在线服务
+|[[Erlang|Erlang]]
+|
+|{{dunno}}
+|-
+| [[Solr|Solr]]
+| Apache
+|{{free|[[Apache_License|Apache License]]}}
+|[[Java|Java]]
+|查找引擎
+|{{yes}}
+|-
+| [[TokuMX|TokuMX]]
+|Tokutek
+|{{free|[[GNU_Affero_General_Public_License|GNU Affero General Public License]]}}
+|[[C++|C++]], [[C#|C#]], [[Go|Go]]
+|[[MongoDB|MongoDB]]带有[[分形树索引|分形树索引]]
+|{{dunno}}
+|}
+
+===XML数据库实现===
+{{Further information|{{en-link|XML数据库|XML database}}}}
+大多数XML数据库是面向文档数据库。
+
+== 注释 ==
+{{notelist}}
+
+== 参考文献 ==
+{{Reflist|2}}
+
+== 延伸阅读 ==
+* Assaf Arkin. (2007, September 20). [https://web.archive.org/web/20080327222152/http://blog.labnotes.org/2007/09/20/read-consistency-dumb-databases-smart-services/ Read Consistency: Dumb Databases, Smart Services.]
+{{refend}}
+
+== 外部链接 ==
+* [http://db-engines.com/en/ranking/document+store DB-Engines Ranking of Document Stores] {{Wayback|url=http://db-engines.com/en/ranking/document+store |date=20210516141038 }} by popularity, updated monthly
+{{Databases}}
+{{Database models}}
+{{NoSQL}}
+
+[[Category:数据管理|Category:数据管理]]
+[[Category:数据库管理系统|Category:数据库管理系统]]
+[[Category:面向文档的数据库|]]
+[[Category:各類資料庫|Category:各類資料庫]]
