@@ -1,0 +1,401 @@
+{{微積分學}}
+'''均差'''（Divided differences）是[[遞歸|遞歸]][[除法|除法]]過程。在[[数值分析|数值分析]]中，可用於計算[[牛頓多項式|牛頓多項式]]形式的[[多項式插值|多項式插值]]的係數。在[[微积分|微积分]]中，均差与[[导数|导数]]一起合称[[差商|差商]]，是对[[函数|函数]]在一个[[区间|区间]]内的[[平均|平均]]变化率的测量<ref name="WilsonAdamson2008">{{cite book|author1=Frank C. Wilson|author2=Scott Adamson|title=Applied Calculus|url=https://archive.org/details/appliedcalculusa00wils|year=2008|publisher=Cengage Learning|isbn=0-618-61104-5|page=[https://archive.org/details/appliedcalculusa00wils/page/177 177]}}</ref><ref name="RubySellers2014">{{cite book|author1=Tamara Lefcourt Ruby|author2=James Sellers|author3=Lisa Korf |author4=Jeremy Van Horn |author5=Mike Munn|title=Kaplan AP Calculus AB & BC 2015|year=2014|publisher=Kaplan Publishing|isbn=978-1-61865-686-5|page=237}}</ref><ref name="HungerfordShaw2008">{{cite book|author1=Thomas Hungerford|author2=Douglas Shaw|title=Contemporary Precalculus: A Graphing Approach|year=2008|publisher=Cengage Learning|isbn=0-495-10833-2|pages=211–212}}</ref>。
+
+均差也是一种[[算法|算法]]，[[查尔斯·巴贝奇|查尔斯·巴贝奇]]的[[差分机|差分机]]，是他在1822年发表的论文中提出的一种早期的[[机械计算机|机械计算机]]，在历史上意图用来计算[[对数|对数]]表和[[三角函数|三角函数]]表， 它设计在其运算中使用这个算法<ref name="Isaacson2014">{{cite book|last1=Isaacson|first1=Walter|title=The Innovators|url=https://archive.org/details/innovatorshowgro0000isaa_p2p3|date=2014|publisher=Simon & Schuster|isbn=978-1-4767-0869-0|page=[https://archive.org/details/innovatorshowgro0000isaa_p2p3/page/20 20]|ref=Isaacson2014}}</ref>。
+
+== 定義 ==
+給定n+1個數據點
+
+:<math>(x_0, y_0),\ldots,(x_{n}, y_{n})</math>
+
+定義'''前向均差'''為：
+
+:<math>\begin{align}
+ \mathopen[y_\nu] &= y_\nu, \quad \nu \in \{ 0,\ldots,n\} \\
+ \mathopen[y_\nu,\ldots,y_{\nu+j}] &= \frac{[y_{\nu+1},\ldots , y_{\nu+j}] - [y_{\nu},\ldots , y_{\nu+j-1}]}{x_{\nu+j}-x_\nu}, \quad \nu\in\{0,\ldots,n-j\},\ j\in\{1,\ldots,n\} \\
+\end{align}</math>
+
+定義'''後向均差'''為：
+
+:<math>\begin{align}
+ \mathopen[y_\nu] &= y_{\nu},\quad \nu \in \{ 0,\ldots,n\} \\
+ \mathopen[y_\nu,\ldots,y_{\nu-j}] &= \frac{[y_\nu,\ldots , y_{\nu-j+1}] - [y_{\nu-1},\ldots , y_{\nu-j}]}{x_\nu - x_{\nu-j}}, \quad \nu\in\{j,\ldots,n\},\ j\in\{1,\ldots,n\} \\
+\end{align}</math>
+
+==表示法==
+
+假定數據點給出為函數 ƒ，
+
+:<math>(x_0, f(x_0)),\ldots,(x_{n}, f(x_{n}))</math>
+
+其均差可以寫為：
+
+:<math>\begin{align}
+ f[x_\nu] &= f(x_{\nu}), \qquad \nu \in \{ 0,\ldots,n \} \\
+ f[x_\nu,\ldots,x_{\nu+j}] &= \frac{f[x_{\nu+1},\ldots , x_{\nu+j}] - f[x_\nu,\ldots , x_{\nu+j-1}]}{x_{\nu+j}-x_\nu}, \quad \nu\in\{0,\ldots,n-j\},\ j\in\{1,\ldots,n\}
+\end{align}</math>
+
+對函數 ƒ 在節點 ''x''<sub>0</sub>, ..., ''x''<sub>''n''</sub> 上的均差還有其他表示法，如：
+
+: <math>\begin{matrix}
+ \mathopen [x_0,\ldots,x_n]f \\
+\mathopen [x_0,\ldots,x_n;f] \\
+\mathopen D[x_0,\ldots,x_n]f \\
+\end{matrix}</math>
+
+==例子==
+
+給定ν=0：
+:<math>
+\begin{align}
+  \mathopen[y_0] &= y_0 \\
+  \mathopen[y_0,y_1] &= \frac{y_1-y_0}{x_1-x_0} \\
+  \mathopen[y_0,y_1,y_2] &= \frac{\mathopen[y_1,y_2]-\mathopen[y_0,y_1]}{x_2-x_0} \\
+  \mathopen[y_0,y_1,y_2,y_3] &= \frac{\mathopen[y_1,y_2,y_3]-\mathopen[y_0,y_1,y_2]}{x_3-x_0} \\
+  \mathopen[y_0,y_1,\dots,y_n] &= \frac{\mathopen[y_1,y_2,\dots,y_n]-\mathopen[y_0,y_1,\dots,y_{n-1}]}{x_n-x_0}
+\end{align}
+</math>
+
+為了使涉及的遞歸過程更加清楚，以列表形式展示均差的計算過程<ref>
+:<math>
+\begin{array}{lcl}
+{ \begin{matrix} 
+x_0 & x_0^2 &           &               \\
+  &       &  x_0+x_1 &             & \\
+x_1 & x_1^2 &         & 1 & \\
+      & & x_1+x_2 &               & 0 \\
+x_2 & x_2^2 &            & 1 &  \\
+   & & x_2+x_3 &               &  & \\
+x_3 & x_3^2 &           &       & \\
+\end{matrix} } \\
+ \\
+{ \begin{matrix}
+x_0 & x_0^n &    \\
+  &       &  \sum_{i=0}^{n-1}x_0^{n-1-i}x_1^i \\
+x_1 & x_1^n & \\
+\end{matrix} } \\
+\\
+{ \begin{matrix}
+x_0 & x_0^{n+1} &    \\
+  &       &  \frac{x_1^{n+1}-x_1x_0^n+x_1x_0^n-x_0^{n+1}}{x_1-x_0} =x_1\frac {x_1^n-x_0^n}{x_1-x_0}+x_0^n=x_1\sum_{i=0}^{n-1}x_0^{n-1-i}x_1^i+x_0^n=\sum_{i=0}^{n}x_0^{n-i}x_1^i \\
+x_1 & x_1^{n+1} & \\
+\end{matrix} } \\
+\\
+{ \begin{matrix}
+x_0 & x_0^{n+1} &  &  \\
+  &       &  \sum_{i=0}^{n}x_0^{n-i}x_1^i & \\
+x_1 & x_1^{n+1} &  & \frac {\sum_{i=0}^{n}x_1^{n-i}x_2^i - \sum_{i=0}^{n}x_0^{n-i}x_1^i}{x_2-x_0}=\frac{\sum_{i=0}^{n-1}x_1^{i}(x_2^{n-i}-x_0^{n-i})}{x_2-x_0}=\sum_{i+j+k=n-1}{x_0^{i}x_1^{j}x_2^{k}} \\
+  &       &  \sum_{i=0}^{n}x_1^{n-i}x_2^i & \\
+x_2 & x_2^{n+1} &  & \\
+\end{matrix} } \\
+\\
+{ \begin{matrix}
+x_0 & x_0^{n+1} &  &  & \\
+  &       &  \sum_{i=0}^{n}x_0^{n-i}x_1^i & & \\
+x_1 & x_1^{n+1} &  & \sum_{i+j+k=n-1}{x_0^{i}x_1^{j}x_2^{k}} & \\
+  &       &  \sum_{i=0}^{n}x_1^{n-i}x_2^i & & \frac {\sum_{i+j+k=n-1}{x_1^{i}x_2^{j}x_3^{k}} - \sum_{i+j+k=n-1}{x_0^{i}x_1^{j}x_2^{k}}}{x_3-x_0}=\sum_{i+j+k+l=n-2}{x_0^{i}x_1^{j}x_2^{k}x_3^{l}} \\
+x_2 & x_2^{n+1} &  &  \sum_{i+j+k=n-1}{x_1^{i}x_2^{j}x_3^{k}} &  \\
+  &       &  \sum_{i=0}^{n}x_2^{n-i}x_3^i & & \\
+x_3 & x_3^{n+1} &  & & \\
+\end{matrix} } \\
+\\
+{ \begin{matrix} 
+x_0 & x_0^3 &           &               &  & \\
+  &       & x_0^2+x_0x_1+x_1^2 &               & \\
+x_1 & x_1^3 &           & x_0+x_1+x_2 &  & \\
+      & & x_1^1+x_1x_2+x_2^2 &               & 1 & \\
+x_2 & x_2^3 &           & x_1+x_2+x_3 &  & 0 \\
+   & & x_2^2+x_2x_3+x_3^2 &               & 1 & \\
+x_3 & x_3^3 &           &       x_2+x_3+x_4  &  & \\
+    & & x_3^2+x_3x_4+x_4^2 &     &  & \\
+x_4 & x_4^3 &           &               &  & \\
+\end{matrix} } \\
+ \\
+{ \begin{matrix} 
+x_0 & x_0^4 &  &           &               &  & \\
+    & &   x_0^3+x_0^2x_1+x_0x_1^2+x_1^3    &   &             & \\
+x_1 & x_1^4 &  &      x_0^2+x_0x_1+x_1^2 +x_0x_2+x_1x_2+x_2^2   & &  & \\
+      &  & x_1^3+x_1^2x_2+x_1x_2^2+x_2^3   &   & x_0+x_1+x_2+x_3  & \\
+x_2 & x_2^4 &  &      x_1^2+x_1x_2+x_2^2 +x_1x_3 +x_2x_3+x_3^2     &  & 1 &  \\
+   & & x_2^3+x_2^2x_3+x_2x_3^2+x_3^3  &  &  x_1+x_2+x_3+x_4    &  & 0 \\
+x_3 & x_3^4 &  &     x_2^2+x_2x_3+x_3^2 +x_2x_4 +x_3x_4+x_4^2    &      & 1 & \\
+   & &  x_3^3+x_3^2x_4+x_3x_4^2+x_4^3  &  & x_2+x_3+x_4+x_5     &  & \\
+x_4 & x_4^4 &  &    x_3^2+x_3x_4+x_4^2  +x_3x_5 +x_4x_5+x_5^2      &     &  & \\
+    & &  x_4^3+x_4^2x_5+x_4x_5^2+x_5^3  &  &     &  & \\
+x_5 & x_5^4 & &         &               &  & \\
+\end{matrix} } \\
+\\
+{ \begin{matrix} 
+x_0 & x_0^5 &  &           &               &  &  &\\
+    & &  \sum_{i=0}^{4}x_0^{4-i}x_1^i  &   &             & &\\
+x_1 & x_1^5 &  & \sum_{i+j+k=3}x_0^{i}x_1^jx_2^k    & &  & &\\
+      &  & \sum_{i=0}^{4}x_1^{4-i}x_2^i  &   & \sum_{i+j+k+l=2}x_0^{i}x_1^jx_2^kx_3^l  & & &\\
+x_2 & x_2^5 &  &     \sum_{i+j+k=3}x_1^{i}x_2^jx_3^k  &  & \sum_{i=0}^4x_i &  &\\
+   & & \sum_{i=0}^{4}x_2^{4-i}x_3^i  &  &  \sum_{i+j+k+l=2}x_1^{i}x_2^jx_3^kx_4^l   &  & 1 &\\
+x_3 & x_3^5 &  &     \sum_{i+j+k=3}x_2^{i}x_3^jx_4^k     &      &  \sum_{i=1}^5x_i & & 0\\
+   & &  \sum_{i=0}^{4}x_3^{4-i}x_4^i  &  & \sum_{i+j+k+l=2}x_2^{i}x_3^jx_4^jx_5^l      &  &1 &\\
+x_4 & x_4^5 &  &    \sum_{i+j+k=3}x_3^{i}x_4^jx_5^k     &     &  \sum_{i=2}^6x_i & &\\
+    & &  \sum_{i=0}^{4}x_4^{4-i}x_5^i &  &   \sum_{i+j+k+l=2}x_3^{i}x_4^jx_5^kx_6^l   &  & &\\
+x_5 & x_5^5 & &    \sum_{i+j+k=3}x_4^{i}x_5^jx_6^k    &               &  & &\\
+    & &  \sum_{i=0}^{4}x_5^{4-i}x_6^i  &  &     &  & &\\
+x_6 & x_6^5 & &         &               &  & &\\
+\end{matrix} } \\
+\end{array}
+</math></ref>：
+
+:<math>
+\begin{matrix}
+x_0 & [y_0] = y_0 &           &               & \\
+        &       & [y_0,y_1] &               & \\
+x_1 & [y_1] = y_1 &           & [y_0,y_1,y_2] & \\
+        &       & [y_1,y_2] &               & [y_0,y_1,y_2,y_3]\\
+x_2 & [y_2] = y_2 &           & [y_1,y_2,y_3] & \\
+        &       & [y_2,y_3] &               & \\
+x_3 & [y_3] = y_3 &           &               & \\
+\end{matrix}
+</math>
+
+==展開形式==
+用[[數學歸納法|數學歸納法]]可證明<ref>
+:<math>
+\begin{align}
+\mathopen[y_0] &= y_0 \\
+\mathopen[y_0,y_1] &= \frac{y_1-y_0}{x_1-x_0} = \frac{y_0}{x_0-x_1} + \frac{y_1}{x_1-x_0}\\
+ &= \sum_{j=0}^{1}   \frac{y_j} { \prod_{k=0,k\neq j}^{1} (x_j-x_k)}  \\
+\mathopen[y_0,y_1,y_2] &= \frac{\cfrac{y_1}{x_1-x_2} + \cfrac{y_2}{x_2-x_1} - \cfrac{y_0}{x_0-x_1} - \cfrac{y_1}{x_1-x_0}}{x_2-x_0} \\
+ &= \frac{y_0}{(x_0-x_1)(x_0-x_2)} + \frac{y_1}{(x_1-x_0)(x_1-x_2)} + \frac{y_2}{(x_2-x_0)(x_2-x_1)} \\
+ &= \sum_{j=0}^{2}    \frac{y_j} {\prod_{k=0,k\neq j}^{2} (x_j-x_k)} \\
+\mathopen[y_0, y_1,\dots, y_n] &=\sum_{j=0}^{n}  \frac{y_j} {\prod_{k=0,k\neq j}^{n} (x_j-x_k)}  \\
+\mathopen[y_0, y_1,\dots, y_{n+1}] &=\frac{\sum_{j=1}^{n+1} \frac{y_j}{\prod_{k=1,\, k\neq j}^{n+1} (x_j-x_k)} - \sum_{j=0}^{n} \frac{y_j}{\prod_{k=0,\, k\neq j}^{n} (x_j-x_k)}}{x_{n+1}-x_0} \\
+ &= \frac{\frac {y_{n+1}}{\prod_{k=1}^{n} (x_{n+1}-x_k)} + \sum_{j=1}^{n} y_j\left(\frac{1}{\prod_{k=1,\, k\neq j}^{n+1} (x_j-x_k)}-\frac{1}{\prod_{k=0,\, k\neq j}^{n} (x_j-x_k)}\right)  - \frac{y_0}{\prod_{k=1}^{n} (x_0-x_k)}}{x_{n+1}-x_0} \\
+ &= \frac{\frac {y_{n+1}}{\prod_{k=1}^{n} (x_{n+1}-x_k)} + \sum_{j=1}^{n} y_j\left(\frac{x_j-x_0}{\prod_{k=0,\, k\neq j}^{n+1} (x_j-x_k)}-\frac{x_j-x_{n+1}}{\prod_{k=0,\, k\neq j}^{n+1} (x_j-x_k)}\right)  - \frac{y_0}{\prod_{k=1}^{n} (x_0-x_k)}}{x_{n+1}-x_0} \\
+ &= \frac{\frac {y_{n+1}}{\prod_{k=1}^{n} (x_{n+1}-x_k)} + \sum_{j=1}^{n} y_j\left(\frac{x_{n+1}-x_0}{\prod_{k=0,\, k\neq j}^{n+1} (x_j-x_k)}\right)  - \frac{y_0}{\prod_{k=1}^{n} (x_0-x_k)}}{x_{n+1}-x_0} \\
+ &= \frac {y_{n+1}}{\prod_{k=0}^{n} (x_{n+1}-x_k)} + \sum_{j=1}^{n} \frac{y_j}{\prod_{k=0,\, k\neq j}^{n+1} (x_j-x_k)} + \frac{y_0}{\prod_{k=1}^{n+1} (x_0-x_k)}\\
+ &=\sum_{j=0}^{n+1} \frac{y_j}{\prod_{k=0,\, k\neq j}^{n+1} (x_j-x_k)}
+\end{align}
+</math>
+</ref>：
+:<math>
+\begin{align}
+\mathopen[y_0] &= y_0 \\
+\mathopen[y_0,y_1] &= \frac{y_0}{x_0-x_1} + \frac{y_1}{x_1-x_0} \\
+\mathopen[y_0,y_1,y_2] &= \frac{y_0}{(x_0-x_1)(x_0-x_2)} + \frac{y_1}{(x_1-x_0)(x_1-x_2)} + \frac{y_2}{(x_2-x_0)(x_2-x_1)} \\
+\mathopen[y_0, y_1,\dots, y_n] &=\sum_{j=0}^{n} \frac{y_j}{\prod_{k=0,\, k\neq j}^{n} (x_j-x_k)} \\
+\end{align}
+</math>
+此公式體現了均差的對稱性質。<ref>《数值分析及科学计算》 薛毅（编） 第六章 第2节 Newton插值. P200.</ref>故可推知：任意调换數據點次序，其值不变。<ref>《数值分析及科学计算》 薛毅（编） 第六章 第2节 Newton插值. P201.</ref>
+
+==性质==
+*对称性：若<math>\sigma : \{0, \dots, n\} \to \{0, \dots, n\}</math>是一个[[排列|排列]]则 
+:: <math>f[x_0, \dots, x_n] = f[x_{\sigma(0)}, \dots, x_{\sigma(n)}]</math>
+*[[線性函數|線性]]：
+:: <math>\begin{align}
+(f+g)[x_0,\dots,x_n] &= f[x_0,\dots,x_n] + g[x_0,\dots,x_n] \\
+(\lambda\cdot f)[x_0,\dots,x_n] &= \lambda\cdot f[x_0,\dots,x_n] \\
+\end{align}</math>
+*{{le|萊布尼茨法則|General Leibniz rule}}：
+:: <math>(f\cdot g)[x_0,\dots,x_n] = f[x_0]\cdot g[x_0,\dots,x_n] + f[x_0,x_1]\cdot g[x_1,\dots,x_n] + \dots + f[x_0,\dots,x_n]\cdot g[x_n]</math>
+
+*{{le|均差中值定理|Mean value theorem (divided differences)}}：
+::<math> \exists \xi \in (\min\{x_0,\dots,x_n\},\max\{x_0,\dots,x_n\}) \quad  f[x_0,\dots,x_n] = \frac{f^{(n)}(\xi)}{n!} </math>
+
+==等價定義==
+通過對換 n 阶均差中(x<sub>0</sub>,y<sub>0</sub>)与(x<sub>n-1</sub>,y<sub>n-1</sub>)，可得到等價定義：
+:<math>
+\begin{align}
+  \mathopen[y_0,y_1,\dots,y_{n-1},y_n] &= \frac{\mathopen[y_1,y_2,\dots,y_n]-\mathopen[y_0,y_1,\dots,y_{n-1}]}{x_n-x_0} \\
+  &= \frac{\mathopen[y_1,\dots,y_{n-2},y_0,y_n]-\mathopen[y_{n-1},y_1,\dots,y_{n-2},y_0]}{x_n-x_{n-1}} \\
+  &= \frac{\mathopen[y_0,\dots,y_{n-2},y_n]-\mathopen[y_0,y_1,\dots,y_{n-1}]}{x_n-x_{n-1}} \\
+\end{align}
+</math>
+這個定義有著不同的計算次序：
+:<math>
+\begin{align}
+  \mathopen[y_0] &= y_0 \\
+  \mathopen[y_0,y_1] &= \frac{y_1-y_0}{x_1-x_0} \\
+  \mathopen[y_0,y_1,y_2] &=  \frac{\mathopen[y_0,y_2]-\mathopen[y_0,y_1]}{x_2-x_1} \\
+  \mathopen[y_0,y_1,y_2,y_3] &= \frac{\mathopen[y_0,y_1,y_3]-\mathopen[y_0,y_1,y_2]}{x_3-x_2} \\
+  \mathopen[y_0,y_1,\dots,y_n] &= \frac{\mathopen[y_0,\dots,y_{n-2},y_n]-\mathopen[y_0,y_1,\dots,y_{n-1}]}{x_n-x_{n-1}} \\
+ \end{align}
+</math>
+以列表形式展示這個定義下均差的計算過程<ref>
+:<math>
+\begin{matrix}
+x_0 & x_0^3 &           &               &  & \\
+  &       & x_0^2+x_0x_1+x_1^2 &               & \\
+x_1 & x_1^3 &           & x_0+x_1+x_2 &  & \\
+      & & x_0^2+x_0x_2+x_2^2 &               & 1 & \\
+x_2 & x_2^3 &           & x_0+x_1+x_3 &  & 0 \\
+   & & x_0^2+x_0x_3+x_3^2 &               & 1 & \\
+x_3 & x_3^3 &           &       x_0+x_1+x_4  &  & \\
+    & & x_0^2+x_0x_4+x_4^2 &     &  & \\
+x_4 & x_4^3 &           &               &  & \\
+\end{matrix}
+</math></ref>：
+:<math>
+\begin{matrix}
+x_0 & [y_0] = y_0 &           &               & \\
+        &       & [y_0,y_1] &               & \\
+x_1 & [y_1] = y_1 &           & [y_0,y_1,y_2] & \\
+        &       & [y_0,y_2] &               & [y_0,y_1,y_2,y_3]\\
+x_2 & [y_2] = y_2 &           & [y_0,y_1,y_3] & \\
+        &       & [y_0,y_3] &               & \\
+x_3 & [y_3] = y_3 &           &               & \\
+\end{matrix}
+</math>
+
+==牛頓插值法==
+{{more|牛頓多項式}}
+[[File:Principia1846-466.png|thumb]]》的第三編“宇宙體系”的引理五的图例。這裡在橫坐標上有6個點H,I,K,L,M,N，對應著6個值A,B,C,D,E,F，生成一個多項式函數對這6個點上有對應的6個值，計算任意點S對應的值R。牛頓給出了間距為單位值和任意值的兩種情況。]]
+牛頓插值公式，得名於[[伊薩克·牛頓|伊薩克·牛頓]]爵士，最早发表为他在1687年出版的《[[自然哲學的數學原理|自然哲學的數學原理]]》中第三編“宇宙體系”的引理五，此前[[詹姆斯·格雷果里|詹姆斯·格雷果里]]於1670年和牛頓於1676年已經分別獨立得出這個成果。一般稱其為連續[[泰勒級數|泰勒展開]]的離散對應。
+
+使用均差的[[牛顿插值法|牛顿插值法]]為<ref>{{Cite web |url=http://fourier.eng.hmc.edu/e176/lectures/ch7/node4.html |title=The Newton Polynomial Interpolation |accessdate=2019-04-19 |archive-date=2019-04-19 |archive-url=https://web.archive.org/web/20190419135459/http://fourier.eng.hmc.edu/e176/lectures/ch7/node4.html |dead-url=no }}</ref>：
+:<math>\begin{align}
+N_n(x) &= y_0 + (x-{x}_{0})\left([{y}_{0}, {y}_{1}] + (x-{x}_{1})\left([{y}_{0}, {y}_{1},{y}_{2}] + \cdots\right)\right) \\
+ &=[y_0]+[{y}_{0}, {y}_{1}](x-{x}_{0})+\cdots+[{y}_{0},{y}_{1},\ldots,{y}_{n}]\prod_{k=0}^{n-1} (x-{x}_{k})
+\end{align}</math>
+可以在计算过程中任意增添节点如點(x<sub>n+1</sub>,y<sub>n+1</sub>)，只需計算新增的n+1階均差及其插值基函數，而无[[拉格朗日插值法|拉格朗日插值法]]需重算全部插值基函数之虞。
+
+對均差採用展開形式<ref>
+:<math>\begin{array}{lcl}
+\begin{align}
+N_1(x) &=[y_0]+[{y}_{0}, {y}_{1}](x-{x}_{0}) = y_0 + y_0\frac{x-{x}_{0}}{x_0-x_1}+ y_1\frac{x-{x}_{0}}{x_1-x_0} = y_0(1 + \frac{x-{x}_{0}}{x_0-x_1})+ y_1\frac{x-{x}_{0}}{x_1-x_0} \\
+&= y_0\frac{x-{x}_{1}}{x_0-x_1}+ y_1\frac{x-{x}_{0}}{x_1-x_0} = \sum_{j=0}^{1} y_j  \prod_{ k=0 ,k \neq j}^{1} \frac{x-{x}_{k}} { x_j-x_k}  \\
+\end{align} \\
+\begin{align}
+N_n(x) &= \sum_{j=0}^{n} y_j  \prod_{k=0,k\neq j}^{n} \frac{x-{x}_{k}} { x_j-x_k}  \\
+\end{align} \\
+\begin{align}
+N_{n+1}(x) &=N_n(x)+[{y}_{0},{y}_{1},\ldots,{y}_{n+1}]\prod_{k=0}^{n} (x-{x}_{k}) \\
+&= \sum_{j=0}^{n} y_j  \prod_{k=0, k\neq j}^{n} \frac{x-{x}_{k}} { x_j-x_k} + \sum_{j=0}^{n+1} y_j  \frac{\prod_{k=0}^{n} (x-{x}_{k})} {\prod_{k=0,\, k\neq j}^{n+1} (x_j-x_k)} \\
+&= \sum_{j=0}^{n} y_j \left(  \frac{\prod_{k=0, k\neq j}^{n}(x-{x}_{k})} {\prod_{k=0, k\neq j}^{n}(x_j-x_k)} + \frac{\prod_{k=0}^{n} (x-{x}_{k})} {\prod_{k=0,\, k\neq j}^{n+1} (x_j-x_k)} \right) +  y_{n+1}  \frac{\prod_{k=0}^{n} (x-{x}_{k})} {\prod_{k=0}^{n} (x_{n+1}-x_k)} \\
+&= \sum_{j=0}^{n} y_j \left(  \frac{\left(\prod_{k=0, k\neq j}^{n}(x-{x}_{k})\right)(x_j-x_{n+1})} {\prod_{k=0, k\neq j}^{n+1}(x_j-x_k)} + \frac{\left(\prod_{k=0,k \neq j}^{n} (x-{x}_{k})\right)(x-x_j)} {\prod_{k=0,\, k\neq j}^{n+1} (x_j-x_k)} \right) +  y_{n+1}  \frac{\prod_{k=0}^{n} (x-{x}_{k})} {\prod_{k=0}^{n} (x_{n+1}-x_k)} \\
+&= \sum_{j=0}^{n} y_j  \frac{\left(\prod_{k=0, k\neq j}^{n}(x-{x}_{k})\right)(x-x_{n+1})} {\prod_{k=0, k\neq j}^{n+1}(x_j-x_k)} +  y_{n+1}  \frac{\prod_{k=0}^{n} (x-{x}_{k})} {\prod_{k=0}^{n} (x_{n+1}-x_k)} \\
+&= \sum_{j=0}^{n+1} y_j  \prod_{k=0,k\neq j}^{n+1} \frac{x-{x}_{k}} { x_j-x_k}  \\
+\end{align} \\
+\end{array}
+</math></ref>：
+:<math>\begin{align}
+ N_n(x) &= y_0 + y_0\frac{x-{x}_{0}}{x_0-x_1}+ y_1\frac{x-{x}_{0}}{x_1-x_0}+\cdots+ \sum_{j=0}^{n} y_j  \frac{\prod_{k=0}^{n-1} (x-{x}_{k})} {\prod_{k=0,\, k\neq j}^{n} (x_j-x_k)} \\
+\end{align}</math>
+
+以2階均差牛頓插值為例：
+:<math>\begin{align}
+ N_2(x)&=y_0\left(1+ \frac{x-{x}_{0}}{x_0-x_1}+\frac{(x-x_0)(x-x_1)}{(x_0-x_1)(x_0-x_2)}\right) + y_1\left(\frac{x-{x}_{0}}{x_1-x_0}+\frac{(x-x_0)(x-x_1)}{(x_1-x_0)(x_1-x_2)}\right) + y_2\frac{(x-x_0)(x-x_1)}{(x_2-x_0)(x_2-x_1)} \\
+ &=y_0\frac{(x-x_1)(x-x_2)}{(x_0-x_1)(x_0-x_2)} + y_1\frac{(x-x_0)(x-x_2)}{(x_1-x_0)(x_1-x_2)} + y_2\frac{(x-x_0)(x-x_1)}{(x_2-x_0)(x_2-x_1)} \\
+ &= \sum_{j=0}^{2} y_j  \prod_{\begin{smallmatrix} k=0 \\ k\neq j \end{smallmatrix}}^{2} \frac{x-{x}_{k}} { x_j-x_k}  \\
+\end{align}</math>
+
+==前向差分==
+{{details|差分}}
+
+當數據點呈等距分佈的時候，這個特殊情況叫做“前向[[差分|差分]]”。它們比計算一般的均差要容易。
+
+===定義===
+
+給定n+1個數據點
+:<math>(x_0, y_0),\ldots,(x_{n}, y_{n})</math>
+
+有著
+:<math>x_i = x_0 + ih , \quad  h > 0 \mbox{ , } 0 \le i \le n</math>
+
+定義前向[[差分|差分]]為：
+:<math>\begin{align}
+ \triangle^{0}y_{i} &= y_{i} \\
+ \triangle^{k}y_{i} &= \triangle^{k-1}y_{i+1} - \triangle^{k-1}y_{i} , \quad 1 \le k \le n-i\\
+\end{align}</math>
+
+前向差分所对应的均差为<ref>{{cite book|last1=Burden|first1=Richard L.|last2=Faires|first2=J. Douglas|title=Numerical Analysis|url=https://archive.org/details/numericalanalysi00rlbu|date=2011|page=[https://archive.org/details/numericalanalysi00rlbu/page/n146 129]|edition=9th}}</ref>：
+:<math>f[x_0, x_1, \ldots , x_k] = \frac{1}{k!h^k}\Delta^{(k)}f(x_0)</math>
+
+===例子===
+:<math>
+\begin{matrix}
+y_0 &               &                   &                  \\
+    & \triangle y_0 &                   &                  \\
+y_1 &               & \triangle^{2} y_0 &                  \\
+    & \triangle y_1 &                   & \triangle^{3} y_0\\
+y_2 &               & \triangle^{2} y_1 &                  \\
+    & \triangle y_2 &                   &                  \\
+y_3 &               &                   &                  \\
+\end{matrix}
+</math>
+
+===展開形式===
+差分的展開形式是均差展開形式的特殊情況<ref>
+:<math>\begin{align}
+ \triangle^{k}y_{i} &= \sum_{j = 0}^{k} \frac{k!}{\prod_{l=0,\, l\neq j}^{k} (j-l)} y_{i+j}, \quad 0 \le k \le n-i \\
+  &= \sum_{j = 0}^{k} \frac{k!}{j!(-1)^{k-j}(k-j)!} y_{i+j}, \quad 0 \le k \le n-i \\
+  &= \sum_{j = 0}^{k} (-1)^{k-j} \binom{k}{j} y_{i+j}, \quad 0 \le k \le n-i  
+\end{align}</math></ref>：
+:<math>\begin{align}
+  \triangle^{k}y_{i} &= \sum_{j = 0}^{k} (-1)^{k-j} \binom{k}{j} y_{i+j}, \quad 0 \le k \le n-i  
+\end{align}</math>
+這裡的表達式
+:<math>{n \choose k} = \frac{(n)_k}{k!} \quad\quad (n)_k=n(n-1)(n-2)\cdots(n-k+1)</math>
+是[[二項式係數|二項式係數]]，其中的(n)<sub>k</sub>是“[[下降階乘冪|下降階乘冪]]”，[[空積|空積]](n)<sub>0</sub>被定義為1。
+
+===插值公式===
+其對應的牛頓插值公式為：
+:<math>\begin{align}
+f(x) &= y_0 + \frac {x-x_0} {h} \left( \Delta^1y_0 + \frac {x-x_0-h} {2h}\left(\Delta^2y_0 + \cdots \right) \right) \\
+ &= y_0 + \sum_{k=1}^n \frac{\Delta^ky_0}{k!h^k} \prod_{i=0}^{n-1} (x-x_0-ih) \\
+ &= y_0 + \sum_{k=1}^n \frac{\Delta^ky_0}{k!} \prod_{i=0}^{n-1} (\frac{x-x_0}{h}-i) \\
+ &= \sum_{k=0}^n {\frac{x-x_0}{h} \choose k}~ \Delta^k y_0 \\
+\end{align}</math>
+
+===無窮級數===
+[[伊薩克·牛頓|牛頓]]在1665年得出並在1671年寫的《流數法》中發表了ln(1+x)的[[無窮級數|無窮級數]]，在1666年得出了arcsin(x)和arctan(x)的無窮級數，在1669年的《分析學》中發表了sin(x)、cos(x)、arcsin(x)和e<sup>x</sup>的無窮級數；[[萊布尼茨|萊布尼茨]]在1673年大概也得出了sin(x)、cos(x)和arctan(x)的無窮級數。[[布魯克·泰勒|布魯克·泰勒]]在1715年著作《Methodus Incrementorum Directa et Inversa》<ref>[http://www.17centurymaths.com/contents/taylorscontents.html Methodus Incrementorum Directa et Inversa]{{Wayback|url=http://www.17centurymaths.com/contents/taylorscontents.html |date=20140628165536 }}</ref>中研討了“有限差分”方法，其中論述了他在1712年得出的[[泰勒定理|泰勒定理]]，這個成果此前[[詹姆斯·格雷果里|詹姆斯·格雷果里]]在1670年和[[萊布尼茨|萊布尼茨]]在1673年已經得出，而[[約翰·伯努利|約翰·伯努利]]在1694年已經在《教師學報》發表。
+
+他對牛頓的均差的步長取趨於0的[[極限_(數學)|極限]]，得出：
+: <math>
+\begin{align}
+f(x) &= f(a) + \lim_{h \to 0}\sum_{k=1}^\infty \frac{\Delta_h^k[f](a)}{k!h^k} \prod_{i=0}^{k-1} ((x-a)-ih) \\
+ &= f(a) + \sum_{k=1}^\infty \frac{d^k}{dx^k}f(a) \frac{(x-a)^k}{k!} \\
+\end{align} </math>
+
+==冪函數的均差==
+使用普通函數記號表示冪运算，<math>p_n(x) = x^n</math>，有：
+:<math>
+\begin{align}
+p_j[x_0,\dots,x_n] &= 0 \qquad \forall j<n\\
+p_n[x_0,\dots,x_n] &= 1 \\
+p_{n+1}[x_0,\dots,x_n] &= x_0 + \dots + x_n \\
+p_{n+m}[x_0,\dots,x_n]&= \sum_{k_0+\cdots+k_n=m} \begin{matrix} \prod_{t=0}^nx_{t}^{k_{t}} \end{matrix} \\
+\end{align}
+</math>
+此中n+1元m次[[齊次多項式|齊次多項式]]的記法同於[[多項式定理|多項式定理]]。
+
+==泰勒形式==
+[[泰勒級數|泰勒級數]]和任何其他的函數級數，在原理上都可以用來逼近均差。將泰勒級數表示為:
+:<math>f = f(0) p_0 + f'(0) p_1 + \frac{f''(0)}{2!} p_2 + \dots </math>
+
+均差的泰勒級數為：
+:<math>f[x_0,\dots,x_n] = f(0)p_0[x_0,\dots,x_n] + f'(0) p_1[x_0,\dots,x_n] + \dots + \frac{f^{(n)}(0)}{n!} p_n[x_0,\dots,x_n] + \dots </math>
+
+前<math>n</math>項消失了，因為均差的階高於多項式的階。可以得出均差的泰勒級數本質上開始於：
+:<math>\frac{f^{(n)}(0)}{n!}</math>
+依據{{le|均差中值定理|Mean value theorem (divided differences)}}，這也是均差的最簡單逼近。
+
+==皮亞諾形式==
+
+均差還可以表達為
+:<math>f[x_0,\ldots,x_n] = \frac{1}{n!} \int_{x_0}^{x_n} f^{(n)}(t)B_{n-1}(t) \, dt</math>
+這裡的B<sub>n-1</sub>是數據點x<sub>0</sub>,...,x<sub>n</sub>的n-1次[[B樣條|B樣條]]，而f<sup>(n)</sup>是函數f的n階[[導數|導數]]。這叫做均差的'''皮亞諾形式'''，而B<sub>n-1</sub>是均差的[[皮亞諾|皮亞諾]]核。
+
+==註釋與引用==
+{{reflist}}
+
+==参考书目==
+* {{cite book|author=[[L._M._Milne-Thomson|Louis Melville Milne-Thomson]]|title=The Calculus of Finite Differences|year=2000|origyear=1933|publisher=American Mathematical Soc.|isbn=978-0-8218-2107-7|at=Chapter 1:  Divided Differences}}
+* {{cite book|author1=Myron B. Allen|author2=Eli L. Isaacson|title=Numerical Analysis for Applied Science|url=https://archive.org/details/numericalanalysi0000alle|year=1998|publisher=John Wiley & Sons|isbn=978-1-118-03027-1|at=Appendix A}}
+* {{cite book|author=Ron Goldman|title=Pyramid Algorithms: A Dynamic Programming Approach to Curves and Surfaces for Geometric Modeling|year=2002|publisher=Morgan Kaufmann|isbn=978-0-08-051547-2|at=Chapter 4:Newton Interpolation and Difference Triangles}}
+
+==參見==
+*[[差分|差分]]
+*[[差商|差商]]
+*[[插值|插值]]
+*[[牛頓多項式|牛頓多項式]]
+
+[[Category:微分学|Category:微分学]]
+[[Category:数值分析|Category:数值分析]]

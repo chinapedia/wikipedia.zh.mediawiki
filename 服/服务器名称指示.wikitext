@@ -1,0 +1,117 @@
+{{noteTA
+|G1=IT
+|1=zh-tw:清單;zh-cn:列表;
+|2=zh-tw:網域名稱;zh-hk:域名;zh-cn:域名;
+}}
+'''服务器名称指示'''（{{Lang-en|'''S'''erver '''N'''ame '''I'''ndication}}，缩写：'''SNI'''）是[[TLS|TLS]]的一个扩展协议<ref>{{cite IETF |title = Transport Layer Security (TLS) Extensions |rfc = 3546 |sectionname = Server Name Indication |section = 3.1 |page = 8 |publisher = [[互联网工程任务组|IETF]]}}</ref>，在该协议下，在[[握手_(技术)|握手]]过程开始时[[客户端|客户端]]告诉它正在连接的[[服务器|服务器]]要连接的[[主机名称|主机名称]]。这允许服务器在相同的[[IP地址|IP地址]]和[[通訊埠|TCP端口号]]上呈现多个[[電子憑證|证书]]，并且因此允许在相同的IP地址上提供多个安全（[[超文本传输安全协议|HTTPS]]）网站（或其他任何基于TLS的[[服务器|服务]]），而不需要所有这些站点使用相同的证书。它与HTTP/1.1基于名称的[[虚拟主机|虚拟主机]]的概念相同，但是用于HTTPS。
+
+为了使SNI协议起作用，绝大多数访问者必须使用实现它的[[网页浏览器|Web浏览器]]。使用未实现SNI浏览器的用户将被提供默认证书，因此很可能会收到证书警告。
+
+==问题的背景==
+当进行TLS连接时，客户端从Web服务器请求[[電子證書|数字证书]]。服务器一旦发送证书，客户端就会检查这个证书，并将其尝试连接的名称与证书中包含的名称进行对比。如果发生匹配，则连接正常进行。如果没有找到匹配，则可能会向用户警告该差异，并且可能会中止连接，因为该失配可能表明存在[[中间人攻击|中间人攻击]]。不过，某些应用程序允许用户绕过警告继续进行连接，由用户承担信任证书以及连接的责任。
+
+一个证书覆盖多个主机名是可以做到的。[[X.509|X.509]] v3规范引入了<code>subjectAltName</code>字段，该字段允许一个证书指定多个域名，并在通用名和''subjectAltName''字段中使用[[通配符证书|通配符]]。
+
+然而，由于缺少所有名称的完整列表，可能很难甚至不可能获得涵盖服务器将负责的所有名称的单个证书。负责多个主机名的服务器可能需要为每个名称（或一组名称）提供不同的证书。自2005年以来，CAcert已经在虚拟服务器上运行了TLS的不同用法的实验。<ref>{{cite web
+ |url          = http://wiki.cacert.org/wiki/VhostTaskForce
+ |title        = CAcert VHostTaskForce
+ |work         = CAcert Wiki
+ |access-date  = 2017-01-18
+ |archive-url  = https://web.archive.org/web/20090822082355/http://wiki.cacert.org/wiki/VhostTaskForce
+ |archive-date = 2009-08-22
+ |dead-url     = yes
+}}</ref>大多数实验是不理想和不切实际的。例如，可以使用''subjectAltName''来包含单个证书中由一个人控制的多个域名。<ref>{{cite web
+ |url          = https://support.godaddy.com/help/article/3908/what-is-a-multiple-domain-ucc-ssl-certificate?locale=en
+ |title        = What is a Multiple Domain (UCC) SSL Certificate?
+ |access-date  = 2017-01-18
+ |archive-url  = https://web.archive.org/web/20150206060733/https://support.godaddy.com/help/article/3908/what-is-a-multiple-domain-ucc-ssl-certificate?locale=en
+ |archive-date = 2015-02-06
+ |dead-url     = no
+}}</ref>每当域名列表更改时，必须重新发布此类“统一通信证书”。
+
+[[虚拟主机#網址名稱對應（Name-based）|基于名称的虚拟主机]]允许多个DNS主机名由同一IP地址上的单个服务器（通常为Web服务器）托管。为了实现这一点，服务器使用客户端提供的主机名作为协议的一部分（对于HTTP，名称显示在[[HTTP头字段列表|主机头]]中）。但是，当使用HTTPS时，TLS握手发生在服务器看到任何HTTP头之前。因此，服务器不可能使用HTTP主机头中的信息来决定呈现哪个证书，并且因此只有由同一证书覆盖的名称才能由同一IP地址提供。
+
+实际上，这意味着对于安全浏览来说，HTTPS服务器只能是每个IP地址服务一个域名（或一组域名）。为每个站点分配单独的IP地址会增加托管成本，因为对IP地址的请求必须为[[区域互联网注册管理机构|区域互联网注册机构]]提供证据而且[[IPv4位址枯竭|现在IPv4地址已用尽]]。其结果是，许多网站在IPv4上使用安全通信实际上都受到了限制。[[IPv6|IPv6]]地址空间未用完，因此使用IPv6提供的网站不受此问题的影响。
+
+== SNI如何解决此问题 ==
+客户端在SNI扩展中发送要连接的主机名称，作为TLS协商的一部分。<ref name="Paul's Journal">{{cite web
+ |url          = http://journal.paul.querna.org/articles/2005/04/24/tls-server-name-indication/
+ |work         = Paul's Journal
+ |title        = TLS Server Name Indication
+ |access-date  = 2017-01-18
+ |archive-url  = https://web.archive.org/web/20160812014416/https://journal.paul.querna.org/articles/2005/04/24/tls-server-name-indication/
+ |archive-date = 2016-08-12
+ |dead-url     = no
+}}</ref>这使服务器能够提前选择正确的主机名称，并向浏览器提供相应TLS证书。从而，具有单个IP地址的服务器可以在获取公共证书不现实的情况下提供一组域名的TLS连接。
+
+SNI在2003年6月的RFC 3546，《传输层安全（TLS）扩展》中加入到[[IETF|IETF]]的[[RFC|Internet RFCs]]中。最新版本的标准是RFC 6066。
+
+== 实现 ==
+在2004年，EdelKey项目做了一个用于将TLS/SNI添加到[[OpenSSL|OpenSSL]]中的补丁。<ref>{{cite web
+ |url          = http://www.edelweb.fr/EdelKey/
+ |title        = EdelKey Project
+ |access-date  = 2017-01-18
+ |archive-url  = https://web.archive.org/web/20160404221132/http://www.edelweb.fr/EdelKey/
+ |archive-date = 2016-04-04
+ |dead-url     = no
+}}</ref>在2006年，这个补丁被移植到OpenSSL的开发分支，并在2007年由OpenSSL 0.9.8支持（首次发布在0.9.8f<ref name="openssl-098-changelog">{{cite web |url=//www.openssl.org/news/cl098.txt |title=OpenSSL CHANGES |deadurl=yes |archiveurl=https://web.archive.org/web/20160420213610/https://www.openssl.org/news/cl098.txt |archivedate=2016-04-20 }}</ref>）。
+
+一个应用程序要实现SNI，它使用的TLS库必须实现SNI，并且该应用程序必须将主机名传递给TLS库。其他复杂的问题有，TLS库可以包括在应用程序中或者作为底层操作系统的组件。因此，一些浏览器在任何操作系统上运行时都能实现SNI，而其他浏览器仅在某些操作系统上运行时才能实现SNI。
+
+==安全性==
+
+Cloudflare的联合创始人兼首席执行官Matthew Prince曾表示，传统SNI“绝对是加密装甲中的最后缝隙之一”。（really is one of the last chinks in the encryption armor.）<ref>{{cite web |author1=Thomas Claburn |title=Don't panic about domain fronting, an SNI fix is getting hacked out |url=https://www.theregister.co.uk/2018/07/17/encrypted_server_names/ |website=The Register |accessdate=2018-08-25 |language=en |date=2017-07-17 |archive-url=https://web.archive.org/web/20180826043935/https://www.theregister.co.uk/2018/07/17/encrypted_server_names/ |archive-date=2018-08-26 |dead-url=no }}</ref>
+
+由于SNI信息并未加密，审查者可以识别出使用者访问的网站域名。现已被部分国家用于[[互联网审查|互联网审查]]，如[[防火长城|防火长城]]和韩国的KCSC（[[廣播通信審議委員會|廣播通信審議委員會]]）<ref>{{Cite news|url=https://www.bleepingcomputer.com/news/security/south-korea-is-censoring-the-internet-by-snooping-on-sni-traffic/|title=South Korea is Censoring the Internet by Snooping on SNI Traffic|year=2019|website=Bleeping Computer|author=Sergiu Gatlan|language=en-US|accessdate=2021-04-17|archive-date=2021-04-06|archive-url=https://web.archive.org/web/20210406232753/https://www.bleepingcomputer.com/news/security/south-korea-is-censoring-the-internet-by-snooping-on-sni-traffic/|dead-url=no}}</ref>。有两种方法可以解决这个问题。
+===域前置===
+{{Main|域前置}}
+域前置通过SNI中使用虚假无害的域名信息，已经被TLS加密的应用层才使用真实的域名信息，将真实流量隐藏在看似无害的流量中，从而使审查者无法区别出来，对于基于[[CDN|CDN]]的域前置，审查者要么一律放行，要么带有严重附加伤害的一刀切封锁。<ref>{{Cite web|url=https://trac.torproject.org/projects/tor/wiki/doc/meek|title=doc/meek – Tor Bug Tracker & Wiki|accessdate=2017-01-04|archive-url=https://web.archive.org/web/20161213082349/https://trac.torproject.org/projects/tor/wiki/doc/meek|archive-date=2016-12-13|dead-url=no}}</ref><ref>{{Cite web|url=https://whispersystems.org/blog/doodles-stickers-censorship/|title=Open Whisper Systems >> Blog >> Doodles, stickers, and censorship circumvention for Signal Android|accessdate=2017-01-04|archive-url=https://web.archive.org/web/20161228221206/https://whispersystems.org/blog/doodles-stickers-censorship/|archive-date=2016-12-28|dead-url=no}}</ref>
+
+[[Cloudflare|Cloudflare]]在2016年的一些修改让基于其[[CDN|CDN]]的域前置不再工作。<ref>{{cite web |title=#14256 (Clarify whether Cloudflare's Universal SSL thing works with meek) – Tor Bug Tracker & Wiki |url=https://trac.torproject.org/projects/tor/ticket/14256#comment:2 |website=Tor Bug Tracker |access-date=12 May 2020 |archive-date=2020-10-31 |archive-url=https://web.archive.org/web/20201031073927/https://trac.torproject.org/projects/tor/ticket/14256#comment:2 |dead-url=no }}</ref>
+
+[[Google|Google]]和[[CloudFront|CloudFront]]曾经接受域前置，之后停止了，被认为是受到俄罗斯政府的压力，防止[[Telegram|Telegram]]利用该技术来规避审查。<ref>{{Cite news|url=https://www.fastcompany.com/40568177/amazon-and-google-bow-to-russian-censors-in-telegram-battle|title=Amazon and Google bow to Russian censors in Telegram battle|date=2018-05-04|work=Fast Company|access-date=2018-05-09|language=en|archive-url=https://web.archive.org/web/20180510051421/https://www.fastcompany.com/40568177/amazon-and-google-bow-to-russian-censors-in-telegram-battle|archive-date=2018-05-10|dead-url=no}}</ref>
+
+=== 加密服务器名称指示 ===
+作为TLS的标准扩展实现，[[傳輸層安全性協定#TLS_1.3|TLS 1.3]]一开始准备通过支持加密SNI以解决这个问题。[[Cloudflare|Cloudflare]]、[[Mozilla|Mozilla]]、[[Fastly|Fastly]]和[[苹果公司|苹果]]的开发者制定了关于加密服务器名称指示（Encrypted Server Name Indication）的草案。<ref>{{cite web |last1=Kazuho |first1=Oku, |last2=Christopher |first2=Wood, |last3=Eric |first3=Rescorla, |last4=Nick |first4=Sullivan, |title=Encrypted Server Name Indication for TLS 1.3 |url=https://tools.ietf.org/html/draft-rescorla-tls-esni-00 |website=IETF |accessdate=2018-08-25 |language=en |date=2018-07-02 |archive-url=https://web.archive.org/web/20180813033912/https://tools.ietf.org/html/draft-rescorla-tls-esni-00 |archive-date=2018-08-13 |dead-url=no }}</ref>
+
+2018年9月24日，Cloudflare在其网络上支持并默认启用了ESNI。<ref>{{Cite web|url=https://blog.cloudflare.com/esni/|title=Encrypting SNI: Fixing One of the Core Internet Bugs|author=Matthew Prince|date=2018-09-24|access-date=2021-06-15|archive-date=2020-12-12|archive-url=https://web.archive.org/web/20201212025956/https://blog.cloudflare.com/esni/|dead-url=no}}</ref>
+2019年7月，[[Mozilla_Firefox|Mozilla Firefox]]开始提供ESNI的草案性实现支持，但預設關閉<ref>{{Cite web |title=Check if your browser uses Secure DNS, DNSSEC, TLS 1.3, and Encrypted SNI - gHacks Tech News |url=https://www.ghacks.net/2019/04/29/check-if-your-browser-uses-secure-dns-dnssec-tls-1-3-and-encrypted-sni/ |accessdate=2019-07-09 |work=www.ghacks.net |archive-date=2019-09-02 |archive-url=https://web.archive.org/web/20190902000843/https://www.ghacks.net/2019/04/29/check-if-your-browser-uses-secure-dns-dnssec-tls-1-3-and-encrypted-sni/ |dead-url=no }}</ref><ref>{{Cite web |title=Encrypt that SNI: Firefox edition |url=https://blog.cloudflare.com/encrypt-that-sni-firefox-edition/ |accessdate=2019-07-09 |date=2018-10-18 |work=The Cloudflare Blog |language=en |archive-date=2020-02-14 |archive-url=https://web.archive.org/web/20200214223249/https://blog.cloudflare.com/encrypt-that-sni-firefox-edition/ |dead-url=no }}</ref>。2019年8月，研究人员确认ESNI可以有效规避防火长城的SNI审查。<ref>{{cite conference|quote= currently only 66 websites can be unblocked with the help of ESNI.|url= https://www.usenix.org/system/files/foci19-paper_chai_update.pdf|date= 2019-08-05|conference= 9th USENIX Workshop on Free and Open Communications on the Internet (FOCI 19)|publisher= [[USENIX|USENIX]] Association|author1= Zimo Chai|author2= Amirhossein Ghafari|author3= Amir Houmansadr|title= On the Importance of Encrypted-SNI (ESNI) to Censorship Circumvention|location= Santa Clara, CA|conference-url= https://www.usenix.org/conference/foci19|access-date= 2021-10-07|archive-date= 2021-12-02|archive-url= https://web.archive.org/web/20211202204519/https://www.usenix.org/system/files/foci19-paper_chai_update.pdf|dead-url= no}}</ref>
+
+2020年3月，ESNI更名为'''Encrypted Client Hello'''（简称ECHO），把加密扩展至整个Client Hello消息。<ref>{{cite web
+ | url = https://github.com/tlswg/draft-ietf-tls-esni/pull/207
+ | title = ESNI -> ECHO · tlswg/draft-ietf-tls-esni
+ | access-date = 2020-05-22
+ | archive-date = 2021-02-25
+ | archive-url = https://web.archive.org/web/20210225222400/https://github.com/tlswg/draft-ietf-tls-esni/pull/207
+ | dead-url = no
+ }}</ref>2020年5月，简称更改为'''ECH'''。<ref>{{cite web
+ | url = https://github.com/tlswg/draft-ietf-tls-esni/pull/236
+ | title = s/ECHO/ECH · tlswg/draft-ietf-tls-esni
+ | access-date = 2020-06-08
+ | archive-date = 2021-02-24
+ | archive-url = https://web.archive.org/web/20210224231240/https://github.com/tlswg/draft-ietf-tls-esni/pull/236
+ | dead-url = no
+ }}</ref>ECH被认为解决了之前ESNI扩展「突出」（stick out），从而容易被[[互联网服务提供商|互联网服务提供商]]或审查系统识别的问题。<ref>{{Cite web|title=TLS Encrypted Client Hello draft-ietf-tls-esni-11|url=https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-11|website=[[IETF|IETF]] Data Tracker|date=2021-06-14|access-date=2021-06-15|archive-date=2021-12-08|archive-url=https://web.archive.org/web/20211208030136/https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-11|dead-url=no}}</ref>
+
+自2020年7月下旬起，[[防火长城|防火长城]]开始封锁加密服务器名称指示（ESNI）的TLS通信。<ref>{{cite web
+ |url=https://www.iyouport.org/报告：中国的防火长城已经封锁加密服务器名称指/
+ |title=报告：中国的防火长城已经封锁加密服务器名称指示（ESNI）
+ |accessdate=2020-08-10
+ |date=2020-08-08
+ |work=iYouPort
+ |archive-date=2021-03-28
+ |archive-url=https://web.archive.org/web/20210328224013/https://www.iyouport.org/%E6%8A%A5%E5%91%8A%EF%BC%9A%E4%B8%AD%E5%9B%BD%E7%9A%84%E9%98%B2%E7%81%AB%E9%95%BF%E5%9F%8E%E5%B7%B2%E7%BB%8F%E5%B0%81%E9%94%81%E5%8A%A0%E5%AF%86%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%90%8D%E7%A7%B0%E6%8C%87/
+ |dead-url=no
+ }}</ref>但没有封锁ECH的TLS通信。而2020年8月开始，俄罗斯互联网服务运营商{{link-en|Rostelecom|Rostelecom}}及旗下移动手机服务运营商[[Tele2_（俄罗斯）|Tele2]]开始封锁加密服务器名称指示（ESNI）的TLS通信。<ref>{{Cite web|title=Почему Ростелеком блокирует ESNI трафик?|url=https://qna.habr.com/q/862669|language=ru|date=11 October 2020|access-date=30 October 2020|website=qna.habr.com|archive-date=2021-01-29|archive-url=https://web.archive.org/web/20210129095136/https://qna.habr.com/q/862669|dead-url=no}}</ref>
+
+== 参考文献 ==
+{{Reflist}}
+
+== 外部链接 ==
+* RFC 6066 (obsoletes RFC 4366 (which obsoleted RFC 3546))
+
+{{TLS和SSL}}
+
+[[Category:互联网标准|Category:互联网标准]]
+[[Category:网络协议|Category:网络协议]]
+[[Category:傳輸層安全協議|Category:傳輸層安全協議]]

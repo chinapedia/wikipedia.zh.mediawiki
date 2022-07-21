@@ -1,0 +1,91 @@
+{{Infobox software
+| developer = James McCartney 和其他
+| released = {{Start date and age|1996}}
+| latest release version = 3.11.2
+| latest release date = {{Start date and age|2020|11|15|df=yes}}<ref>{{cite web |title=Releases |url=https://github.com/supercollider/supercollider/releases |website=Github |access-date=15 November 2020 |archive-date=2020-12-30 |archive-url=https://web.archive.org/web/20201230011401/https://github.com/supercollider/supercollider/releases }}</ref>
+| operating system = [[Linux|Linux]], [[OS_X|OS X]], [[Microsoft_Windows|Windows]] 
+| type = [[声音编程语言|声音编程语言]]
+| license = [[GNU通用公共许可协议|GNU通用公共许可协议]]
+| website = http://supercollider.github.io/
+}}
+
+'''SuperCollider''' 是一个最初由 James McCartney 在1996年发布的[[编程语言|编程语言]]和声音编程环境，主要用于[[实时|实时]][[合成器|声音合成]]和[[算法作曲|算法作曲]]。<ref name="sc1996">J. McCartney, [http://www.audiosynth.com/icmc96paper.html SuperCollider: A new real time synthesis language] {{Wayback|url=http://www.audiosynth.com/icmc96paper.html |date=20130810034531 }}, in Proc. International Computer Music Conference (ICMC’96), 1996, pp. 257–258.</ref><ref name="sc2002">J. McCartney, [http://dx.doi.org/10.1162/014892602320991383 Rethinking the computer music language: SuperCollider], Computer Music Journal, 26 (2002), pp. 61–68.</ref>
+
+自此之后，它逐步变成一个被科学家与艺术家们共同开发和操作声音的系统。这个高效且有表现力的[[动态语言|动态语言]]，为[[声学|声学]]、 [[算法作曲|算法音乐]]和{{link-en|交互式编程|Interactive programming}}提供了一个框架。<ref name="book">{{cite book|author1=Scott Wilson|author2=David Cottle|author3=Nick Collins|title=The SuperCollider Book|url=http://supercolliderbook.net/|year=2011|publisher=The MIT Press|isbn=978-0-262-23269-2|access-date=2013-10-13|archive-url=https://web.archive.org/web/20110501130100/http://supercolliderbook.net/|archive-date=2011-05-01|dead-url=yes}}</ref>
+
+在2002年以[[GNU通用公共许可协议|GNU通用公共许可协议]]发布，SuperCollider 是[[自由软件|自由软件]]。
+
+==架构==
+从版本3开始，SuperCollider被分为两部分：一个[[服务器|服务器]]，scsynth；一个[[客户端|客户端]]，sclang。两者通过OSC({{link-en|Open Sound Control|Open Sound Control}})通信。
+
+SC 的语言结合了 [[Smalltalk|Smalltalk]] 的面向对象特性、来自函数式编程语言的特性和类C语言的语法。
+
+SC 的服务器支持简单的C扩展API，使它很简单的编写高效的声音算法。因为外界对服务器的操作都经过OSC，所以很方便地使用其他语言或应用操作它。
+
+=== SuperCollider 合成器服务器 (''scsynth'') ===
+
+SuperCollider的声音产生捆绑在一个优化的命令行可执行程序(''scsynth'')。大部分情况下它将被SuperCollider编程语言控制，但也可以被独立地使用。这个音频服务器有下列的特点：<ref name="book"/>
+
+* {{link-en|Open Sound Control|Open Sound Control}} 接入
+* 简单的 [[ANSI_C|ANSI C]] 插件 [[API|API]]
+* 支持任意数量的输入和输出频道<ref>{{Cite web |url=http://www.beast.bham.ac.uk/research/mulch.shtml |title=BEASTmulch tools for multichannel audio |accessdate=2014-01-11 |archive-date=2009-11-06 |archive-url=https://web.archive.org/web/20091106111225/http://www.beast.bham.ac.uk/research/mulch.shtml |dead-url=no }}</ref>
+* 一个以合成节点构成的[[树_(数据结构)|有序树]]结构定义了执行的顺序
+* 能动态重建信号流向的总线系统
+* 可供读写的缓冲块
+* 根据需要以不同的速率计算：音频速率、控制速率和需求速率
+
+=== SuperCollider 编程语言 (''sclang'') ===
+
+SuperCollider 编程语言是一个类似于 [[Smalltalk|Smalltalk]] 的[[动态类型|动态类型]]、 [[垃圾回收_(计算机科学)|垃圾回收]]、 单继承的[[面向对象的程序设计|面向对象]]和[[函数式编程语言|函数式]]编程语言，<ref name="sc2002"/> 它的语法类似[[LISP|LISP]]或者[[C语言|C语言]]。它的架构是在实时计算需求和抽象语言的灵活、简洁性之间的折衷。和许多函数式编程语言类似，它实现了[[函数_(计算机科学)|函数]]作为一级对象，使得函数可以[[复合函数|复合]]。函数和方法支持缺省参数、可变参数，调用时可以使用任意次序的关键词参数。 [[闭包_(计算机科学)|闭包]] 是词法的,  [[作用域|作用域]] 既有词法作用域和动态作用域。也支持函数式编程语言的其他典型特性，包括[[尾调用|尾调用]]优化，{{link-en|列表解析|List comprehension}}和[[协程|协程]]。 它特有功能包括隐式的元组扩展和无状态的模式系统。它的常量时间的消息查找和实时的[[垃圾回收_(计算机科学)|垃圾回收]] 让大型系统保持高效与信号处理的灵活。<ref name="book"/>
+
+
+==示例代码==
+<syntaxhighlight lang="c">
+// 打印 "Hello world!"
+"Hello world!".postln;
+</syntaxhighlight>
+
+<syntaxhighlight lang="c">
+// 播放一个800Hz正弦波与粉噪音的混合
+{ SinOsc.ar(800, 0, 0.1) + PinkNoise.ar(0.01) }.play; 
+</syntaxhighlight>
+
+<syntaxhighlight lang="c">
+// 以一个频率由鼠标的水平位置决定的正弦波调制另外一个正弦波的频率和一个噪音的振幅
+{ 
+ var x = SinOsc.ar(MouseX.kr(1, 100));
+ SinOsc.ar(300 * x + 800, 0, 0.1) 
+ + PinkNoise.ar(0.1 * x + 0.1) 
+}.play; 
+</syntaxhighlight>
+
+<syntaxhighlight lang="c">
+// 列表迭代: 将列表中元素值乘以它们的索引
+[1, 2, 5, 10, -3].collect { |elem, idx| elem * idx };
+</syntaxhighlight>
+
+<syntaxhighlight lang="c">
+// 阶乘函数
+f = { |x| if(x == 0) { 1 } { f.(x-1) * x } };
+</syntaxhighlight>
+
+
+{{Portal|自由软件}}
+==参考资料==
+{{Reflist}}
+
+==外部链接==
+* [http://supercollider.github.io/ SuperCollider 官方网站]{{Wayback|url=http://supercollider.github.io/ |date=20140305052632 }}
+* [https://web.archive.org/web/20081015155331/http://www.beast.bham.ac.uk/research/sc_mailing_lists.shtml SuperCollider 用户邮件列表]
+* [https://web.archive.org/web/20110820003031/http://www.informatics.sussex.ac.uk/users/nc81/courses/cm1/workshop.html  Nick Collins 关于 SuperCollider 的工作坊]
+* [http://doc.sccode.org SuperCollider 在线帮助文件]{{Wayback|url=http://doc.sccode.org/ |date=20200303020146 }}
+
+{{程序设计语言}}
+
+[[Category:自由软件|Category:自由软件]]
+[[Category:面向对象的编程语言|Category:面向对象的编程语言]]
+[[Category:程序设计语言|Category:程序设计语言]]
+[[Category:陣列編程語言|Category:陣列編程語言]]
+[[Category:音频编程语言|Category:音频编程语言]]
+[[Category:電子音樂軟體|Category:電子音樂軟體]]
+[[Category:现场编程|Category:现场编程]]

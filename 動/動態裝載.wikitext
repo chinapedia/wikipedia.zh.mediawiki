@@ -1,0 +1,63 @@
+{{Expand language|en|time=2018-05-27T00:50:11+00:00}}
+{{NoteTA|G1=IT}}
+'''動態裝載'''，别称'''动态加载'''（{{lang-en|'''Dynamic Loading'''}}）是一種程序運行機制，能讓[[計算機|計算機]][[程序|程序]]在運行時（而不是編譯時）裝載[[庫|庫]]（或者其他[[二進制|二進制]]對象）到[[內存|內存]]中，然後檢索庫中[[函數|函數]]和[[變量|變量]]的地址，并執行這些函數或訪問這些變量，且能在不需要時將庫從內存中卸載。動態裝載、[[静态库|靜態鏈接]]（static linking）與[[動態鏈接|動態鏈接]]（dynamic linking）（注意區分動態裝載與動態鏈接的微妙差別）是複用其他軟件代碼的三種機制，不同於靜態鏈接和動態鏈接，這種機制允許計算機程序在沒有某些庫的情況下啟動，然後在運行的過程中發現可用的庫從而獲得額外的功能。
+
+== 歷史沿革 ==
+動態裝載早在1960年代的[[IBM/360|IBM/360]][[操作系統|操作系統]]中就已經廣泛使用，尤其是在[[輸入/輸出|輸入/輸出]]子模塊，以及[[COBOL|COBOL]]和[[PL/I|PL/I]]的[[運行時庫|運行時庫]]中。裝載的過程對於應用程序開發者是透明的，主要由操作系統或者輸入輸出子系統自動處理。這樣做的好處有：
+* 修復子系統漏洞時只需要打一次[[補丁|補丁]]即可，而不需要重新鏈接
+* 程序庫可以免於被胡亂修改而造成嚴重影響
+IBM于1970年代開發的戰略性[[事務處理|事務處理]]操作系統[[CICS|CICS]]中，不僅在普通[[應用程序|應用程序]]級別上使用了動態加載，甚至在[[內核|內核]]級別都廣泛採取這種機制，這使得用戶可以在不用重啟CICS操作系統的前提下，就可以對應用程序做任何級別的漏洞修復。
+
+== 应用 ==
+动态装载经常用于插件。<ref name="autobook">{{Cite web |url=http://sourceware.org/autobook/autobook/autobook_158.html |title=Autoconf, Automake, and Libtool: Dynamic Loading |access-date=2019-12-19 |archive-date=2020-02-24 |archive-url=https://web.archive.org/web/20200224111211/http://sourceware.org/autobook/autobook/autobook_158.html |dead-url=no }}</ref><small>[Apache http服务器的例子待补充翻译]</small>
+
+=== 热部署 ===
+热部署（英：Hot deployment）是，服务器不需要重启的情况下，修改软件或者软件。<ref>{{Cite web|title=Hot deployment and dynamic reloading|url=https://www.ibm.com/support/knowledgecenter/SS7K4U_8.5.5/com.ibm.websphere.zseries.doc/ae/trun_app_hotupgrade.html|accessdate=|author=|date=|format=|publisher=|language=|archive-date=2019-12-19|archive-url=https://web.archive.org/web/20191219004544/https://www.ibm.com/support/knowledgecenter/SS7K4U_8.5.5/com.ibm.websphere.zseries.doc/ae/trun_app_hotupgrade.html|dead-url=no}}</ref>
+
+== 编程语言 ==
+
+=== C/C++ ===
+並非所有[[作業系統|作業系統]]都支持動態裝載。[[類UNIX|類UNIX]]作業系統通過[[C編程語言|C編程語言]]實作而成的'''dl'''庫提供該類功能。在[[微軟|微軟]]的[[視窗|視窗]][[作業系統|作業系統]]採用[[Windows|Windows]]應用程序接口。
+
+{| class="wikitable"
+|- align="center"
+! 
+! 類UNIX系統<ref name="dlfcn.h">{{cite web | author =  | title = dlfcn.h | publisher = The IEEE and The Open Group | date =  | accessdate = 2013-12-15 | language = en | url = http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/dlfcn.h.html | archive-date = 2019-10-08 | archive-url = https://web.archive.org/web/20191008062656/https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/dlfcn.h.html | dead-url = no }}</ref><ref name="Program Library HOWTO">{{cite web | author = David A. Wheeler | title = Program Library HOWTO | publisher = The Linux Documentation Project | date = 2003-04-11 | accessdate = 2013-12-15 | language = en | url = http://tldp.org/HOWTO/Program-Library-HOWTO/dl-libraries.html | archive-date = 2020-11-12 | archive-url = https://web.archive.org/web/20201112025731/https://tldp.org/HOWTO/Program-Library-HOWTO/dl-libraries.html | dead-url = no }}</ref>
+! 視窗系統
+|- align="center"
+| 申明
+|<nowiki>dlfcn.h</nowiki>
+|<nowiki>windows.h</nowiki>
+|- align="center"
+| 定義
+|<nowiki>libdl</nowiki>
+|<nowiki>kernel32.dll</nowiki>
+|- align="center"
+| 裝載庫
+|<nowiki>dlopen</nowiki>
+|<nowiki>LoadLibrary</nowiki><br /><nowiki>LoadLibraryEx</nowiki><br />
+|- align="center"
+| 解析庫
+|<nowiki>dlsym</nowiki>
+|<nowiki>GetProcAddress</nowiki>
+|- align="center"
+| 卸載庫
+|<nowiki>dlclose</nowiki>
+|<nowiki>FreeLibrary</nowiki>
+|}
+
+=== Java ===
+
+对于[[Java|Java语言]]而言，[[类_(计算机科学)|类]]的动态装载是通过类加载器（'''<code>[https://docs.oracle.com/javase/10/docs/api/java/lang/ClassLoader.html ClassLoader]</code>''' ）该对象进行实现的。示例如下：<syntaxhighlight lang="java">
+Class type = ClassLoader.getSystemClassLoader().loadClass(name);
+Object obj = type.newInstance();
+</syntaxhighlight>通过[[反射式编程|反射]]机制的方式，我们可以加载仍旧未被载入[[类_(计算机科学)|类]]。并通过下面例子，进行操作加载成功的[[类_(计算机科学)|类]]。<syntaxhighlight lang="java">
+Class type = Class.forName(name);
+Object obj = type.newInstance();
+</syntaxhighlight>当我们想要卸载一个[[类_(计算机科学)|类]]，很遗憾，至今没有一种简单的并且程序可控制的的方法（不存在原生方法）。打个比方，当开发者有这样的需求时—— 正在使用的类加载器（'''<code>[https://docs.oracle.com/javase/10/docs/api/java/lang/ClassLoader.html ClassLoader]</code>''' ）不是[https://docs.oracle.com/javase/10/docs/api/java/lang/ClassLoader.html#getSystemClassLoader() 系统类加载器] {{Wayback|url=https://docs.oracle.com/javase/10/docs/api/java/lang/ClassLoader.html#getSystemClassLoader() |date=20191221150206 }}，同时该加载器又无法被卸载，而你又想要卸载掉[[类_(计算机科学)|类]]。 此时，开发者就不得不了解机制细节，否则就无法确认类是否真的被卸载。这样的操作十分麻烦。
+
+== 參考資料 ==
+{{reflist | 2}}
+
+[[Category:作業系統技術|Category:作業系統技術]]
+[[Category:计算机编程|Category:计算机编程]]

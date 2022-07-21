@@ -1,0 +1,436 @@
+{{noteTA|G1=IT}}
+{{C++ Standard library}}
+
+'''memory''' 是[[C++標準程式庫|C++標準程式庫]]中的一個[[头文件|头文件]]，定义了C++标准中的智能指针、内存分配器（allocator）、与[[垃圾回收_(計算機科學)|垃圾回收]]有关的函数、临时性的申请与释放动态内存的函数、在内存上创建（构造）对象的函数等等。
+==运算符==
+* operator!= 测试allocator、智能指针是否不等
+* operator==测试allocator、智能指针是否相等
+* operator>= 测试智能指针所指向的数据对象地址
+* operator<   测试智能指针所指向的数据对象地址
+* operator<= 测试智能指针所指向的数据对象地址
+*  operator>   测试智能指针所指向的数据对象地址
+*  operator<< 向流对象输出智能指针所指向的数据对象地址
+==智能指针==
+[[智能指针|智能指针]]是指当指针对象的生命期结束析构时，同时把指针所指的对象也delete或者[[引用计数|引用计数]]减1。
+===unique_ptr===
+unique_ptr是个类模板。unique_ptr指针对象独占式地引用所指的数据对象。不能复制构造（copy ctor），也不能复制赋值，也就是对其无法进行复制，不能得到指向同一个对象的两个unique_ptr；但是可以移动构造和移动赋值。当unique_ptr指针对象离开其作用域，生命期结束时，自动使用内部给定的删除器（deleter）delete所指向的数据对象。unique_ptr十分依赖于[[右值引用|右值引用]]和[[移动语义|移动语义]]。
+<syntaxhighlight lang="cpp">
+template<class Type, class Del = default_delete<Type> >
+    class unique_ptr {
+public:
+        typedef Type element_type; //指针基类型
+        typedef Del deleter_type; //析构类型
+        typedef T1 pointer; //指针类型 为Del::pointer，否则为Type *
+//构造函数
+        unique_ptr ();                         //11 空指针
+        unique_ptr (nullptr_t _Nptr);  //22 空指针
+        explicit unique_ptr (pointer _Ptr); //33
+        unique_ptr (pointer _Ptr, typename conditional<is_reference<Del>::value, Del,typename add_reference<const Del>::type>::type _Deleter);          //44
+        unique_ptr (pointer _Ptr,typename remove_reference<Del>::type&& _Deleter); //55
+        unique_ptr (unique_ptr&& _Right); //66
+        template<class Type2, Class Del2> unique_ptr (unique_ptr<Type2, Del2>&& _Right); //77
+//析构函数
+    ~unique_ptr ();
+//
+    unique_ptr& operator= (unique_ptr&& _Right); //右值赋值
+    template<class Type2, Class Del2> unique_ptr& operator= (unique_ptr<Type2, Del2>&& _Right);//右值赋值
+    void swap (unique_ptr& _Right);     //交换两个unique_ptr对象的内容
+    pointer release ();                              //在stored_ptr中存储pointer的新的值，并返回前一个值，用于放弃对所指数据对象的独占
+    void reset (pointer _Ptr = pointer() ); //delete当前拥有的资源并接受新的资源
+
+    pointer get () const; //返回stored_ptr
+    Type& operator* () const; //返回*stored_ptr
+    pointer operator-> () const; //返回stored_ptr
+    Del& get_deleter ();  //返回stored_deleter的引用
+    const Del& get_deleter () const; //返回stored_deleter
+    explicit operator bool () const; //get() != pointer() 的值
+
+    unique_ptr(const unique_ptr& _Right) = delete;
+    unique_ptr& operator=(const unique_ptr& _Right) = delete;
+
+private:
+    pointer stored_ptr;    // exposition only
+    Del stored_deleter;    // exposition only
+    };
+</syntaxhighlight>
+unique_ptr的主要用途有：
+#  实现资源获取即初始化（RAII）。当程序发生异常时，异常处理机制的栈展开（stack unwinding）会销毁局部变量，包括unique_ptr对象，从而自动释放资源。
+# 实现右值移动语义。例如，unique_ptr类型可作为函数的返回值类型，采用了隐式地移动赋值。
+# 在容器中保存unique_ptr对象。需要显式地移动赋值，即通过std::move()。
+===shared_ptr===
+shared_ptr是一个类模板，包装了使用引用计数的智能指针。当shared_ptr在退出其作用域、生命期结束时，析构函数或自动对所指内存数据对象的引用计数减去1。如果内存数据对象的引用计数为0，则会被自动delete。指向同一资源的shared_ptr共同拥有一个控制块，其中保存了shared_ptr的引用计数、指向这一资源的weak_ptr的数目、资源的析构器（deleter ）地址、对该控制块的可定制的allocator。
+<syntaxhighlight lang="cpp">
+template<class Ty>
+   class shared_ptr {
+public:
+    typedef Ty element_type;  //指针基类型
+//构造函数
+    shared_ptr();                      //11 空指针
+    shared_ptr(nullptr_t);         //22 空指针
+    shared_ptr(const shared_ptr& sp);  //33 拷贝构造
+    shared_ptr(shared_ptr&& sp);         //44 右值移动构造
+    template<class Other> explicit shared_ptr(Other * ptr); //55 由其他指针初始化，构造失败时自动调用delete ptr
+    template<class Other, class D> shared_ptr(Other * ptr, D dtor); //66 由其他指针初始化，dtor是个可调用的函数对象，构造失败时自动调用dtor(ptr)
+    template<class D> shared_ptr(nullptr_t, D dtor); //77 空指针，并指定deleter
+    template<class Other, class D, class A> shared_ptr(Other *ptr, D dtor, A alloc);//88 alloc管理shared_ptr控制块的内存分配与释放，构造失败时自动调用dtor(ptr)
+    template<class D, class A> shared_ptr(nullptr_t, D dtor, A alloc);//99 空指针
+    template<class Other> shared_ptr(const shared_ptr<Other>& sp); //0A  拷贝构造+类型转换
+    template<class Other> shared_ptr(const shared_ptr<Other>&& sp); //0B 移动构造+类型转换
+    template<class Other>  explicit shared_ptr(const weak_ptr<Other>& wp); //0C 由弱指针拷贝构造
+    template<class Other>  shared_ptr(auto_ptr<Other>& ap); //0D 由auto_ptr指针拷贝构造
+    template<class Other, class D> shared_ptr(unique_ptr<Other, D>&& up); //0E 由unique_ptr移动构造
+    template<class Other> shared_ptr(const shared_ptr<Other>& sp, Ty *ptr); //0F 
+    template<class Other, class D>shared_ptr(const unique_ptr<Other, D>& up) = delete;//10 禁用const unique_ptr作为移动构造函数
+    ~shared_ptr(); // 析构函数
+    shared_ptr& operator=(const shared_ptr& sp); //赋值运算符
+    template<class Other> shared_ptr& operator=(const shared_ptr<Other>& sp); //类型转换的赋值运算符
+    shared_ptr& operator=(shared_ptr&& sp); //右值引用的移动语义
+    template<class Other> shared_ptr& operator=(shared_ptr<Other>&& sp); //右值引用+类型转换
+    template<class Other> shared_ptr& operator=(auto_ptr< Other >&& ap); //右值引用+auto_ptr类型转换
+    template <class Other, class D> shared_ptr& operator=(const unique_ptr< Other, D>& up) = delete; //禁止const型unique_ptr移动赋值给shared_ptr
+    template <class Other, class D> shared_ptr& operator=(unique_ptr<Other, D>&& up);//右值引用的移动语义+类型转换
+    void swap(shared_ptr& sp); //交换两个指针的内容
+//reset成员函数，把当前指向的数据对象的引用计数减1，然后指向参数表中新的数据对象
+    void reset(); 
+    template<class Other> void reset(Other *ptr);
+    template<class Other, class D> void reset(Other *ptr, D dtor);
+    template<class Other, class D, class A> void reset(Other *ptr, D dtor, A alloc);
+
+    Ty *get() const;                 //返回所指向的数据对象的地址
+    Ty& operator*() const;     //返回所指向的数据对象
+    Ty *operator->() const;    //返回所指向的数据对象的地址
+    long use_count() const;   //返回引用计数值
+    bool unique() const;        //判断是否独占引用数据对象
+    operator bool() const;     //判断是否指向了一个数据对象
+
+    template<class Other> bool owner_before(shared_ptr<Other> const& ptr) const;
+    template<class Other> bool owner_before(weak_ptr<Other> const& ptr) const;
+    template<class D, class Ty>  D* get_deleter(shared_ptr<Ty> const& ptr);
+};
+</syntaxhighlight>
+===weak_ptr===
+弱指针weak_ptr用于指向、但不拥有（即不参加引用计数）由shared_ptr管理的资源。弱指针并不直接提供对资源的访问。应该通过shared_ptr来访问资源。当资源的引用计数为0（所有拥有该资源的shared_ptr对象都已被销毁），该资源将被delete，这时如果仍然有弱指针指向该资源，则该弱指针将变为expired状态。这实际上避免了资源的循环引用计数。对于循环的引用计数，如果把其中的一个shared_ptr的指针指向改为weak_ptr的指针指向，即打破了循环引用。
+<syntaxhighlight lang="cpp">
+template<class Ty> class weak_ptr {
+public:
+    typedef Ty element_type; //指针基类型
+//构造函数
+    weak_ptr();                               //空指针
+    weak_ptr(const weak_ptr&);    //拷贝构造
+    template<class Other> weak_ptr(const weak_ptr<Other>&); //类型转换的拷贝构造
+    template<class Other> weak_ptr(const shared_ptr<Other>&); //从shared_ptr拷贝构造
+//赋值运算符
+    weak_ptr& operator=(const weak_ptr&);
+    template<class Other> weak_ptr& operator=(const weak_ptr<Other>&);
+    template<class Other> weak_ptr& operator=(shared_ptr<Other>&);
+
+    void swap(weak_ptr&); //交换对象的内容
+    void reset();                   //放弃指向资源，当前对象变为空的弱指针
+
+    long use_count() const; //返回资源的引用计数
+    bool expired() const;     //判断指向的资源是否还存在（或已经被释放）
+    shared_ptr<Ty> lock() const; // 获取对资源的专属拥有
+    };
+</syntaxhighlight>
+===auto_ptr===
+auto_ptr，即自动指针，在C++11标准是过时的类模板。
+==其他Helper类==
+===default_delete=== 
+作为使用<code>operator new</code>分配内存的unique_ptr对象的deleter。有两种形式：
+*为指针： template< class T > struct default_delete; 函数调用成员运算符调用delete
+*为指针数组： template< class T > struct default_delete<T[]>; 函数调用成员运算符模板调用delete[]
+示例：
+<syntaxhighlight lang="cpp">
+#include <memory>
+#include <vector>
+#include <algorithm>
+ 
+int main()
+{
+//    {
+//        std::shared_ptr<int> shared_bad(new int[10]);
+//    } // the destructor calls delete, undefined behavior
+ 
+    {
+        std::shared_ptr<int> shared_good(new int[10], std::default_delete<int[]>
+());
+    } // the destructor calls delete[], ok
+ 
+    {
+        std::unique_ptr<int> ptr(new int(5));
+    } // unique_ptr<int> uses default_delete<int>
+ 
+    {
+        std::unique_ptr<int[]> ptr(new int[10]);
+    } // unique_ptr<int[]> uses default_delete<int[]>
+ 
+   // default_delete can be used anywhere a delete functor is needed
+   std::vector<int*> v;
+   for(int n = 0; n < 100; ++n)
+      v.push_back(new int(n));
+   std::for_each(v.begin(), v.end(), std::default_delete<int>());
+}
+</syntaxhighlight>
+===allocator===
+{{main|分配器 (C++)}}
+allocator是STL中非常常用的类模板，用于定制内存的分配、释放、管理。目的是封装STL容器在内存管理上的低层细节，所以用户程序不应该直接调用allocator去管理内存，除非是正在定制容器。<ref>{{Cite web |url=http://www.drdobbs.com/the-standard-librarian-what-are-allocato/184403759 |title=The Standard Librarian: What Are Allocators Good For?  作者：Matt Austern |accessdate=2013-08-10 |archive-date=2020-07-31 |archive-url=https://web.archive.org/web/20200731144630/https://www.drdobbs.com/the-standard-librarian-what-are-allocato/184403759 |dead-url=no }}</ref>allocator将内存的分配与对象的构造初始化解耦，分别用allocate、construct两个成员函数完成；同样将内存的释放与对象的析构销毁解耦，分别用deallocat、destroy两个成员函数完成。自定义的allocator的实现，必须满足C++11标准的17.6.3.5节中的“Table 28 —— Allocator requirements”，简单说就是要在类中定义若干类型名、模板成员名、成员函数、运算符函数。<code><memory></code>中定义的allocator类模板做一些使用全局malloc/free函数表达式的内存的分配、释放的平常操作：
+<syntaxhighlight lang="cpp">
+template<class _Ty> class  allocator : public _Allocator_base<_Ty>
+	{	 
+public:
+/*类型定义。容器类常常直接从它的allocator提取这些类型——  */
+typedef _Allocator_base<_Ty> _Mybase;                  //基类型
+	typedef typename _Mybase::value_type value_type;//值类型
+	typedef value_type _FARQ *pointer;                         //指针类型
+	typedef value_type _FARQ& reference;                    //引用类型
+	typedef const value_type _FARQ *const_pointer;     //常量指针类型
+	typedef const value_type _FARQ& const_reference;//常量引用类型
+	typedef size_t size_type;                                            //size类型
+	typedef ptrdiff_t difference_type;                                 //地址差值类型
+/*类型操作函数：  */ 
+	template<class _Other>
+		struct rebind //用于'''重绑定'''的成员模板： convert this type to allocator<_Other>。
+                     //因为容器类需要动态申请内存的往往不是value_type，而是诸如List Node这样的其他类型
+		{	
+		typedef allocator<_Other> other;
+		};
+
+	pointer address(reference _Val) const
+		{	// 把mutuable引用变换为地址返回
+		return ((pointer) &(char&)_Val);
+		}
+
+	const_pointer address(const_reference _Val) const
+		{	//把只读引用变换为只读地址返回
+		return ((const_pointer) &(char&)_Val);
+		}
+/*构造函数：*/   
+	allocator() throw( )
+		{	 //缺省构造，不抛出异常
+		}
+
+	allocator(const allocator<_Ty>&) throw()
+		{	// 空的拷贝构造
+		}
+
+	template<class _Other>
+		allocator(const allocator<_Other>&) throw()
+		{	//从相关的allocator做拷贝构造，内容为空
+		}
+
+	template<class _Other>
+		allocator<_Ty>& operator=(const allocator<_Other>&)
+		{	//从相关的allocator做拷贝赋值运算符，内容为空
+		return (*this);
+		}
+/*以下为业务函数： */
+	void deallocate(pointer _Ptr, size_type) //释放内存，并不析构对象。第二个参数为元素的项数
+		{	// deallocate object at _Ptr, ignore size 
+		::operator delete(_Ptr);
+		}
+
+	pointer allocate(size_type _Count) //获取内存资源，并不调用对象的构造函数
+		{	// allocate array of _Count elements
+		return (_Allocate(_Count, (pointer)0)); 
+		 }
+
+	pointer allocate(size_type _Count, const void _FARQ *)
+		{	// allocate array of _Count elements, ignore hint 为高性能而设计的allocator可能会利用第二个参数的提示
+		return (allocate(_Count));
+		}
+
+	void construct(pointer _Ptr, const _Ty& _Val) // construct object at _Ptr with value _Val 
+		{	//实际上调用了“带位置的new运算符表达式”，实现在特定位置上调用构造函数。 
+		_Construct(_Ptr, _Val);
+		}
+
+	void construct(pointer _Ptr, _Ty&& _Val) //construct object at _Ptr with right-value _Val
+		{	 实际上调用了“带位置的new运算符表达式”，以及右值完美转发，实现在特定位置上调用构造函数。
+		::new ((void _FARQ *)_Ptr) _Ty(_STD forward<_Ty>(_Val));
+		}
+
+	template<class _Other>
+		void construct(pointer _Ptr, _Other&& _Val) // construct object at _Ptr with value _Val， 带类型转换
+		{	
+		::new ((void _FARQ *)_Ptr) _Ty(_STD forward<_Other>(_Val));
+		}
+
+	void destroy(pointer _Ptr)
+		{	// 摧毁在地址 _Ptr的对象，但不释放内存
+		_Destroy(_Ptr);
+		}
+
+	_SIZT max_size() const _THROW0()
+		{	// 估计allocator能分配的数据对象的最大可能数目
+		_SIZT _Count = (_SIZT)(-1) / sizeof (_Ty);
+		return (0 < _Count ? _Count : 1);
+		}
+};
+</syntaxhighlight>
+===allocator_traits===
+allocator_traits是对allocator的包装。
+===bad_weak_ptr===
+bad_weak_ptr是个异常类。在用弱指针拷贝构造共享指针时，如果弱指针是expired，那么拷贝构造函数抛出bad_weak_ptr异常。
+===enable_shared_from_this===
+enable_shared_from_this是一个helper类模板，用于作为数据类的基类。当数据类的对象已经被shared_ptr所拥有，如果需要从该数据类对象获得其shared_ptr指针，就需要调用作为基类的enable_shared_from_this的成员函数<code>shared_from_this</code>。例如：
+<syntaxhighlight lang="cpp">
+struct Data : public enable_shared_from_this<Data> { };
+
+int main() {
+    shared_ptr<Data> a (new Data);
+    Data& r = *a;
+    shared_ptr<Data> b = r.shared_from_this();  
+}
+</syntaxhighlight>
+在上例中，b与a共同拥有对数据类对象的同一套引用计数，因此是正确的。如果如此构造b：
+: <code>shared_ptr<Data> b( &r);</code>
+则对同一个数据类对象，弄出了两套引用计数。这会导致当一套引用计数变为0而销毁数据类对象时，另外一套引用计数的shared_ptr成为“[[迷途指针|悬空]]”的错误。
+
+[[Microsoft_Visual_C++|Microsoft Visual C++]] 2010是在enable_shared_from_this类模板中定义一个数据类型<code>_EStype</code>。shared_ptr的对象在调用构造函数时，最后将调用一个函数_Enable_shared(_Ty *_Ptr, _Ref_count_base *_Refptr），其中第一个参数是数据类对象的指针，第二个参数是引用计数控制块的指针。利用模板元编程的参数推导的特性，编译器选择_Enable_shared，或是匹配下述模板函数
+:<code>template<class _Ty> inline void _Enable_shared(_Ty *_Ptr, _Ref_count_base *_Refptr, typename _Ty::_EStype * = 0)</code>
+或是匹配下述普通函数
+:<code>inline void _Enable_shared(const volatile void *, const volatile void *) { }</code>
+前者把enable_shared_from_this类中把一个弱指针指向了shared_ptr的引用计数控制块。从而实现了enable_shared_from_this类的语义。
+
+===pointer_traits===
+pointer_traits是一个类模板，描述指针类型所需要的一些类型的定义。
+*成员类型
+**pointer 指针类型
+**element_type 指针的基类型
+**difference_type 一般是std::ptrdiff_t
+**rebind 成员类模板，指向需要绑定的其它类型
+*静态成员函数
+**pointer_to 从引用类型返回其相应的指针类型，一般为std::addressof(r)
+===raw_storage_iterator===
+raw_storage_iterator是个类模板，用于表示指向内存的一个前向迭代器。其赋值运算符在当前所指向内存上调用值类型的构造函数，生成一个对象。
+==函数==
+*void* align( std::size_t alignment,std::size_t size,void*& ptr,std::size_t& space );在一块内存（ptr所指）中，按照对齐要求slignment，找到一块长度为size的，并重置ptr为该内存起始地址，space为该内存长度。
+*allocate_shared 这是shared_ptr的工厂函数，指定内存分配器allocator与数据对象的初始化参数，创建数据对象及shared_ptr。
+*const_pointer_cast 用于shared_ptr对象的const的类型转换。
+*declare_no_pointers 用于[[垃圾回收_(計算機科學)|垃圾回收]]。告知垃圾收集器在指定的内存范围内不含可跟踪的指针。
+*declare_reachable 用于[[垃圾回收_(計算機科學)|垃圾回收]]。令垃圾收集器知道参数指针是指向一块声明为可达的动态分配内存。声明为可达的（declared reachable）完全对象，<ref>C++11标准20.6.4-1</ref>是指该对象作为形参所指，declare_reachable调用的次数超过undeclare_reachable调用次数。声明为可达的一块动态分配内存不能被垃圾收集器释放，即使它看起来没有可达的访问方法。
+*dynamic_pointer_cast  对shared_ptr对象的运行时动态转换类型。
+*get_deleter 返回shared_ptr对象的deleter。
+*get_pointer_safety 用于[[垃圾回收_(計算機科學)|垃圾回收]]。返回当前的垃圾回收器采用的指针类型。
+*get_temporary_buffer 对给定类型、给定对象数目，分配一块临时的内存存储。
+*make_shared 这是shared_ptr的工厂函数，使用给定的数据对象的初始化参数，创建数据对象及shared_ptr。
+*owner_less 混合比较shared_ptr对象与weak_ptr对象的序关系。
+*pointer_safety 用于[[垃圾回收_(計算機科學)|垃圾回收]]。是<code>get_pointer_safety</code>的返回值的枚举类型。
+*return_temporary_buffer 释放由<code>get_temporary_buffer</code>分配的临时性的内存块。
+*static_pointer_cast 编译时静态转换shared_ptr的值类型。
+*swap 交换两个shared_ptr对象或交换两个weak_ptr对象.
+*undeclare_no_pointers 用于[[垃圾回收_(計算機科學)|垃圾回收]]。告诉垃圾回收器，在指定范围的内存中，存着可跟踪指针。
+*undeclare_reachable 用于[[垃圾回收_(計算機科學)|垃圾回收]]。告诉垃圾回收器，被形参指针所指的动态分配内存块，撤销一次declare_reachable操作。如果动态分配内存块上没有declare_reachable操作，则垃圾收集器如果判断它已经是不可达的状态（即没有手段访问这块内存）就可把它当垃圾回收。 
+*uninitialized_copy 把输入iterator所给出的一个内存范围内的对象数组的每个元素，逐个拷贝构造到前向的目标iterator所指的内存上。 
+*uninitialized_copy_n 把输入iterator所给出的一个内存地址开始的对象数组的n个元素，逐个拷贝构造到前向的目标iterator所指的内存上。 
+*uninitialized_fill 在输入iterator所给出的一个内存范围内，用给定的对象去拷贝构造多个对象。 
+*uninitialized_fill_n 在输入iterator所给出的一个内存开始地址处，用给定的对象去拷贝构造指定的n个对象。
+==例子==
+===共享指针===
+<syntaxhighlight lang="cpp">
+#include <memory>
+#include <iostream>
+class Test
+{
+public:
+    Test()
+    {
+        std::cout << "Test()" << std::endl;
+    }
+    ~Test()
+    {
+        std::cout << "~Test()" << std::endl;
+    }
+};
+int main()
+{
+    std::shared_ptr<Test> p1 = std::make_shared<Test>();
+    std::cout << "1 ref:" << p1.use_count() << std::endl;
+    {
+        std::shared_ptr<Test> p2 = p1;
+        std::cout << "2 ref:" << p1.use_count() << std::endl;
+    }
+    std::cout << "3 ref:" << p1.use_count() << std::endl;
+    return 0;
+}
+</syntaxhighlight>
+===弱指针例子===
+<syntaxhighlight lang="cpp">
+#include <iostream>
+#include <memory>
+class TestB;
+class TestA
+{
+public:
+    TestA()
+    {
+        std::cout << "TestA()" << std::endl;
+    }
+    void ReferTestB(std::shared_ptr<TestB> test_ptr)
+    {
+        m_TestB_Ptr = test_ptr;
+    }
+    void TestWork()
+    {
+        std::cout << "~TestA::TestWork()" << std::endl;
+    }
+    ~TestA()
+    {
+        std::cout << "~TestA()" << std::endl;
+    }
+private:
+    std::weak_ptr<TestB> m_TestB_Ptr;
+};
+class TestB
+{
+public:
+    TestB()
+    {
+        std::cout << "TestB()" << std::endl;
+    }
+    void ReferTestB(std::shared_ptr<TestA> test_ptr)
+    {
+        m_TestA_Ptr = test_ptr;
+    }
+    void TestWork()
+    {
+        std::cout << "~TestB::TestWork()" << std::endl;
+    }
+    ~TestB()
+    {
+  ////把std::weak_ptr类型转换成std::shared_ptr类型
+        std::shared_ptr<TestA> tmp = m_TestA_Ptr.lock();
+        tmp->TestWork();
+        std::cout << "2 ref a:" << tmp.use_count() << std::endl;
+        std::cout << "~TestB()" << std::endl;
+    }
+    std::weak_ptr<TestA> m_TestA_Ptr;
+};
+int main()
+{
+    std::shared_ptr<TestA> ptr_a = std::make_shared<TestA>();
+    std::shared_ptr<TestB> ptr_b = std::make_shared<TestB>();
+    ptr_a->ReferTestB(ptr_b);
+    ptr_b->ReferTestB(ptr_a);
+    std::cout << "1 ref a:" << ptr_a.use_count() << std::endl;
+    std::cout << "1 ref b:" << ptr_a.use_count() << std::endl;
+    return 0;
+}
+</syntaxhighlight>
+===独占指针的例子===
+<syntaxhighlight lang="cpp">
+#include <iostream>
+int main()
+{
+ std::unique_ptr<int> pInt;
+ pInt.reset(new int());
+ int *p = pInt.release(); //释放所有权
+ //由于unique_ptr有std::unique_ptr<T[]>的重载函数，所以它可以用来管理数组资源
+ std::unique_ptr<int[]> pArray(new int[3]{1,3,3}); 
+}
+</syntaxhighlight>
+
+==参考文献==
+<references/>
+* 《Boost程序库完全开发指南——深入C++“准”标准库》第3章 内存管理 3.4 shared_ptr 作者: 罗剑锋  [[电子工业出版社|电子工业出版社]] 2010年9月版 ISBN 9787121115776
+[[Category:C++標準函式庫|V]]

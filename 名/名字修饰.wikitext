@@ -1,0 +1,443 @@
+{{noteTA|G1=IT}}
+'''名字修饰'''（name decoration），也称为'''名字重整'''、'''名字改编'''（name mangling），是现代[[计算机程序设计语言|计算机程序设计语言]]的编译器用于解决由于程序实体的名字必须唯一而导致的问题的一种技术。
+
+它提供了在[[子程序|函数]]、[[结构体_(C语言)|结构体]]、[[类_(计算机科学)|类]]或其它的数据类型的名字中编码附加信息一种方法，用于从[[编译器|编译器]]中向[[链接器|链接器]]传递更多语义信息。
+
+该需求产生于程序设计语言允许不同的条目使用相同的[[标识符|标识符]]，包括它们占据不同的[[命名空间|命名空间]]（典型的命名空间是由一个模块、一个类或显式的<code>namespace</code>指示来定义的）或者有不同的签名（例如[[函数重载|函数重载]]）。
+
+任何由编译器产生的[[目标代码|目标代码]]通常与另一部分的目标代码（产生于同一款或不同款的编译器）通过[[链接器|链接器]]把它们链接起来。链接器需要一大堆每个程序实体信息。例如正确链接一个函数需要它的名字、参数个数和它们的类型，等等。
+
+==C语言的名字修饰==
+
+虽然在不支持[[函数重载|函数重载]]的程序设计语言（例如C语言和经典Pascal语言）中基本上不需要名字修饰，但是它们在一些情况下它们还是用了名字修饰来提供了函数的附加信息。
+例如，目标于微软Windows平台的编译器支持许多[[调用约定|调用约定]]。这用于决定哪个参数传入子程序的方式和结果返回的方式。因为不同的调用约定彼此不兼容，所以编译器根据的调用约定重整了链接符号。
+
+名字修饰方案由微软公司首创，现已许多其它的编译器非正式采用，例如Digital Mars公司、Borland公司以及Windows移植版的GNU GCC。该方案甚至被其它语言采用，例如[[Pascal_(程式語言)|Pascal]]、[[D语言|D语言]]、[[Delphi|Delphi]]、[[Fortran|Fortran]]和[[C♯|C#]]。这允许用这此语言写的子程序使用不同于自身默认的调用约定来调用或被调用于已存在的Windows库。
+
+当编译下列C语言代码的的时候：
+<syntaxhighlight lang="c">
+int _cdecl    f (int x) { return 0; }
+int _stdcall  g (int y) { return 0; }
+int _fastcall h (int z) { return 0; }
+</syntaxhighlight>
+
+32位编译器对其分别进行名字修饰后的结果是：
+
+ _f
+ _g@4
+ @h@4
+
+对于<tt>stdcall</tt>和<tt>fastcall</tt>调用约定的名字修饰方案中，函数分别被编码为<tt>_'''name'''@'''X'''</tt>和<tt>@'''name'''@'''X'''</tt>，其中'''X'''是形参列表的参数中的十进制的字节数，包括用fastcall传入寄存器的。而对于<tt>cdecl</tt>调用约定，简单地在函数名前加上一条下划线。
+
+注意Windows的64位Microsoft C的调用约定中没有前导下划线。在一些很罕见的地方，这个差异可能导致代码移植到64位上的时候产生无法解析的外部符号。例如Fortran代码可以使用'alias'（别名）来链接到C方法，如下所示：
+
+<syntaxhighlight lang="fortran">
+SUBROUTINE f()
+!DEC$ ATTRIBUTES C, ALIAS:'_f' :: f
+END SUBROUTINE
+</syntaxhighlight>
+
+这在32位平台下编译链接得很好，但是在64位的平台将导致无法解析的外部符号'_f'。一个可行的办法是完全不使用'alias'（其中方法名典型的在C语言和Fortran语言中需要大写化），或使用BIND选项：
+
+<syntaxhighlight lang="fortran">
+SUBROUTINE f() BIND(C,NAME="f")
+END SUBROUTINE
+</syntaxhighlight>
+<!--
+*''todo: more stuff about parameter sizes and show mangling for different param lists, maybe variadics too''
+*''todo: try the above with 16 bit compilers: I think those "4"s will become "2"s''
+*''todo: try _pascal, _safecall, and FAR in 16 bit compilers too''
+-->
+
+Visual Basic 6这样的较老的语言，也需要在声明DLL的输出函数时使用Alias，例如：
+<syntaxhighlight lang="VB">
+Public Declare Function test2 Lib "PackingDLL.dll" Alias "_test2@4" (ByVal param As Integer) As Integer
+</syntaxhighlight>
+
+在C语言中，多数编译器还改编在翻译单元中的静态函数和变量（和在C++中的声明为静态或放置在匿名名字空间中的函数和变量），使用与非静态版本相同的修改规则。如果有着相同的名字（和C++中的参数）的函数，也定义和使用在不同的翻译单元中，它也改编为相同的名字，这潜在的会导致冲撞。但是，如果它们分别在自己的翻译单元中被调用，则它们将不是等价的。编译器通常自由的对这些函数施加任意改编，因为直接从其他翻译单元访问这些函数是非法的，所以它们永远不需要在不同的目标代码之间链接。为了防止链接冲突，编译器将使用标准的改编，但使用所谓的'local'符号。在链接很多这种翻译单元的时候，可能出现多个有相同名字的的函数定义，但是结果代码依据调用来自何处而只链接它自己的那个函数。这通常使用{{en-link|重定位 (计算)|Relocation (computing)|重定位}}机制来完成。
+
+==C++语言的名字修饰==
+[[C++|C++]]编译器是名字修饰使用得出名的编译器。第一个C++编译器的-{zh-cn:实现;zh-hant:實作}-是翻译成[[C语言|C语言]]源代码，以便于让C编译器编译成目标代码。正因如此，符号名必须遵守C语言的标识符规则。直至后来，能直接产生机器语言或-{zh-cn:汇编语言;zh-hant:組合語言}-的编译器出现了以后，系统的[[链接器|链接器]]也是基本上不支持C++的符号的，所以仍然需要名字修饰。
+
+[[C++语言|C++语言]]并没有规定一个标准的名字修饰方式，所以各款编译器都使用各自的名字修饰方式。C++还有一套复杂的语言特性，例如[[类_(计算机科学)|类]]、[[模板_(C++)|模板]]、[[命名空间|命名空间]]和[[运算符重载|运算符重载]]。这改变了基于上下文或用法的特定符号的意义。关于这些特性的元数据能够用改编（修饰）调试符号的名字来消除二义性。正因为这些特性的名字修饰系统并没有跨编译器标准化，所以几乎没有链接器可以链接不同编译器产生的目标代码。
+
+===简单样例===
+考虑一个下面的C++程序中的两个<tt>f()</tt>的定义：
+
+<syntaxhighlight lang="cpp">
+int  f (void) { return 1; }
+int  f (int)  { return 0; }
+void g (void) { int i = f(), j = f(0); }
+</syntaxhighlight>
+
+这些是不同的函数，除了函数名相同以外没有任何关系。如果不做任何改变直接把它们当成C代码，结果将导致一个错误——C语言不允许两个函数同名。所以，C++编译器将会把它们的类型信息编码成符号名，结果类似下面的的代码：
+
+<syntaxhighlight lang="c">
+int  __f_v (void) { return 1; }
+int  __f_i (int)  { return 0; }
+void __g_v (void) { int i = __f_v(), j = __f_i(0); }
+</syntaxhighlight>
+
+注意<tt>g()</tt>也被名字修饰了，虽然没有任何名字冲突。名字修饰应用于C++的任何符号。
+
+===复杂样例===
+一个更复杂一点的样例，下面考虑一个现实生活中的例子，该例子被GNU GCC 3.x的名字修饰规则实现过。改编下列的示例类，改编过的符号在各自的标识符名字下面显示。
+
+<syntaxhighlight lang="cpp">
+namespace wikipedia 
+{
+   class article 
+   {
+   public:
+      std::string format (void); 
+         /* = _ZN9wikipedia7article6formatEv */
+
+      bool print_to (std::ostream&); 
+         /* = _ZN9wikipedia7article8print_toERSo */
+
+      class wikilink 
+      {
+      public:
+         wikilink (std::string const& name);
+            /* = _ZN9wikipedia7article8wikilinkC1ERKSs */
+      };
+   };
+}
+</syntaxhighlight>
+
+全部被改编过的符号由<tt>'''_Z'''</tt>开头（注意用下划线加大写英文字母是C语言的[[保留字|保留标识符]]），所以与用户标识符的冲突可以被避免）。嵌套的名字（包括命名空间和类），后面再接一个<tt>'''N'''</tt>，最后一个<tt>'''E'''</tt>。例如<tt>wikipedia::article::format</tt>将成为：
+
+ _ZN·''9'''''wikipedia'''·''7'''''article'''·''6'''''format'''·E  
+
+函数后面接形参的类型信息，例如<tt>format()</tt>是一个形参为<tt>void</tt>的函数，于是就接一个<tt>'''v'''</tt>，结果是：
+
+ _ZN·''9'''''wikipedia'''·''7'''''article'''·''6'''''format'''·E·'''v'''
+
+对于<tt>print_to</tt>，使用了一个标准类型<tt>std::ostream</tt>（或更准确地说是<tt>std::basic_ostream<char, char_traits<char> ></tt>），有着特殊的别名<tt>'''So'''</tt>，所以，这个类型的一个引用类型就是<tt>'''RSo'''</tt>，这个函数的完整名字是：
+
+ _ZN·''9'''''wikipedia'''·''7'''''article'''·''8'''''print_to'''·E·'''RSo'''
+
+===不同编译器如何名字修饰相同的函数===
+无论多么平凡的C++标识符，名字修饰规则都没有标准方式，所以不同的编译器产商（甚至相同编译器的不同版本，或相同编译器在不同平台上）的名字修饰规则都截然不同，也就意味着基本上都不兼容。看看C++编译器是怎么名字修饰相同的函数的：
+
+{| class="wikitable"
+ !编译器
+ !{{codett|void h(int)}}
+ !{{codett|void h(int, char)}}
+ !{{codett|void h(void)}}
+ |-
+ |[[GNU_Compiler_Collection|GCC]] 3.x及更高
+ | rowspan=5 | {{codett|_Z1hi}}
+ | rowspan=5 | {{codett|_Z1hic}}
+ | rowspan=5 | {{codett|_Z1hv}}
+ |-
+ |[[Clang|Clang]]  1.x及更高<ref>{{citation |url=http://clang.llvm.org/features.html#gcccompat |title=Clang - Features and Goals: GCC Compatibility |date=15 April 2013 |accessdate=2020-09-22 |archive-date=2011-10-02 |archive-url=https://web.archive.org/web/20111002032357/http://clang.llvm.org/features.html#gcccompat |dead-url=no }}</ref>
+ |-
+ |Intel C++ 8.0 for Linux
+ |-
+ |HP aC++ A.05.55 IA-64
+ |-
+ |IAR EWARM C++ 5.4 ARM
+ |-
+ |IAR EWARM C++ 7.4 ARM
+ |{{codett|_Z<number>hi}}
+ |{{codett|_Z<number>hic}}
+ |{{codett|_Z<number>hv}}
+ |-
+ |[[GNU_Compiler_Collection|GCC]] 2.9.x
+ | rowspan=2 | {{codett|h__Fi}}
+ | rowspan=2 | {{codett|h__Fic}}
+ | rowspan=2 | {{codett|h__Fv}}
+ |-
+ |HP aC++ A.03.45 PA-RISC
+ |-
+ |[[Microsoft_Visual_C++|Microsoft Visual C++]] v6-v10 ([[:en:v:Visual_C++_name_mangling|修饰详情]])
+ | rowspan=2 | {{codett|?h@@YAXH@Z}}
+ | rowspan=2 | {{codett|?h@@YAXHD@Z}}
+ | rowspan=2 | {{codett|?h@@YAXXZ}}
+ |-
+ |[[Digital_Mars|Digital Mars]] C++
+ |-
+ |Borland C++ v3.1
+ |{{codett|@h$qi}}
+ |{{codett|@h$qizc}}
+ |{{codett|@h$qv}}
+ |-
+ |OpenVMS C++ v6.5 (ARM mode)
+ |{{codett|H__XI}}
+ |{{codett|H__XIC}}
+ |{{codett|H__XV}}
+ |-
+ |OpenVMS C++ v6.5 (ANSI mode)
+ |
+ |{{codett|CXX$__7H__FIC26CDH77}}
+ |{{codett|CXX$__7H__FV2CB06E8}}
+ |-
+ |OpenVMS C++ X7.1 IA-64
+ |{{codett|CXX$_Z1HI2DSQ26A}}
+ |{{codett|CXX$_Z1HIC2NP3LI4}}
+ |{{codett|CXX$_Z1HV0BCA19V}}
+ |-
+ |SunPro CC
+ |{{codett|__1cBh6Fi_v_}}
+ |{{codett|__1cBh6Fic_v_}}
+ |{{codett|__1cBh6F_v_}}
+ |-
+ |Tru64 C++ v6.5 (ARM mode)
+ |{{codett|h__Xi}}
+ |{{codett|h__Xic}}
+ |{{codett|h__Xv}}
+ |-
+ |Tru64 C++ v6.5 (ANSI mode)
+ |{{codett|__7h__Fi}}
+ |{{codett|__7h__Fic}}
+ |{{codett|__7h__Fv}}
+ |-
+ |Watcom C++ 10.6
+ |{{codett|W?h$n(i)v}}
+ |{{codett|W?h$n(ia)v}}
+ |{{codett|W?h$n()v}}
+ |}
+注:
+*在OpenVMS VAX和Alpha（但不是IA-64）和Tru64上的Compaq C++编译器有两套不同的名字修饰方式。原始的，标准前的方式是ARM模式，基于描述于《C++ Annotated Reference Manual (ARM)》中的名字修饰规则。伴随着C++98标准的新特性的到来，尤其是[[模板_(C++)|模板]]，ARM方式变得越来越不合适——它不能编码确定的函数类型，或者对不同函数产生了相同的改编符号。所以它就被新的ANSI模型取代，该模型支持全部的ANSI模板，但是并不能向后兼容。
+*在IA-64中，存在一种标准的[[应用二进制接口|ABI]]（见[[#外部链接|外部链接]]）。它规定了一种标准的名字修饰方式，并且被全部的IA-64编译器使用。此外，GNU GCC 3.x也在其它非Intel架构上采用了在这个标准中规定的名字修饰方式。
+*Visual Studio和Windows SDK包含了能给定一个已被名字修饰过的符号就能输出C风格函数声明的<code>undname</code>程序。
+*在Microsoft Windows中，Intel编译器<ref>{{cite web|url=https://software.intel.com/en-us/forums/intel-c-compiler/topic/303707|title=OBJ differences between Intel Compiler and VC Compiler|first=|last=JBIntel_deleted_06032015|website=software.intel.com|accessdate=2020-09-22|archive-date=2019-03-29|archive-url=https://web.archive.org/web/20190329222925/https://software.intel.com/en-us/forums/intel-c-compiler/topic/303707|dead-url=no}}</ref>和[[Clang|Clang]]<ref>{{cite web|url=http://clang.llvm.org/docs/MSVCCompatibility.html#abi-features|title=MSVC compatibility|accessdate=13 May 2016|archive-date=2020-11-06|archive-url=https://web.archive.org/web/20201106215612/https://clang.llvm.org/docs/MSVCCompatibility.html#abi-features|dead-url=no}}</ref>为了兼容性使用了Visual C++的名字修饰规则。
+
+=== 从C++中链接时的C符号的处理 ===
+最常见的C++惯常的做法：
+
+ <syntaxhighlight lang="cpp">#ifdef __cplusplus 
+extern "C" {
+#endif
+    /* ... */
+#ifdef __cplusplus
+}
+#endif</syntaxhighlight>
+
+这种写法用于确保下符号是未被C++编译器名字修饰过的——这种代码能使得C++编译器编译出的二进制目标代码中的链接符号是未经过C++名字修饰过的，就像C编译器一样。就像C语言定义是未名字修饰过的一样，C++编译器需要防止名字修饰这些标识符。
+
+例如，C标准字符串库<tt><string.h></tt>通常包含了类似这样子的
+
+ <syntaxhighlight lang="cpp">#ifdef __cplusplus
+extern "C" {
+#endif
+
+void *memset (void *, int, size_t);
+char *strcat (char *, const char *);
+int   strcmp (const char *, const char *);
+char *strcpy (char *, const char *);
+
+#ifdef __cplusplus
+}
+#endif</syntaxhighlight>
+
+于是，例如这样的代码
+
+ <syntaxhighlight lang="cpp">if (strcmp(argv[1], "-x") == 0) 
+    strcpy(a, argv[2]);
+else 
+    memset (a, 0, sizeof(a));</syntaxhighlight>
+
+就能使用正确的、未经名字修饰过的<tt>strcmp</tt>和<tt>memset</tt>。如果没有使用<tt>extern "C"</tt>，那么SunPro C++编译器会产生等价于下面的C代码：
+
+ <syntaxhighlight lang="c">if (__1cGstrcmp6Fpkc1_i_(argv[1], "-x") == 0) 
+    __1cGstrcpy6Fpcpkc_0_(a, argv[2]);
+else 
+    __1cGmemset6FpviI_0_ (a, 0, sizeof(a));</syntaxhighlight>
+
+而这些链接符号并不存在于C运行库中（例如 <tt>libc</tt>）。因此将导致链接错误。<!--
+
+有用的一些外部链接 (I dunno which should end up in the finished article)
+* http://www.ucmb.ulb.ac.be/documents/libg++_2.7.1/g++FAQ_35.html
+* http://theoryx5.uwinnipeg.ca/gnu/gcc/gxxint_15.html: This one is ancient, should not be used.
+* http://www.kegel.com/mangle.html: This one describes an old version of Visual C++.
+* http://www.pgroup.com/ppro_docs/pgiws_ug/pgiug_14.htm
+-->
+
+===C++标准化的名字修饰===
+标准化的C++名字修饰规则似乎能够在编译器实现之间带来更大的互操作性，但是事实上，这样的标准化自身并不能保证C++编译器的互操作性，并且它甚至能制造互操作性是可能的并且是安全的一种错觉。名字修饰仅仅是需要C++实现决定的许多[[应用二进制接口|ABI]]细节之一。其它ABI方面例如[[异常处理|异常处理]]、[[虚表|虚表]]的设计、结构体和栈帧[[数据结构对齐|填充]]等等，也导致了不同的互不兼容的C++实现。再者，规定一个特定的名字修饰规则会导致在实现限制（例如：符号长度限制）指挥的名字修饰方式的系统上的一些问题。名字修饰的一个标准化的需求，也会阻碍不完全不需要名字修饰的实现——例如明白C++语言的链接器。
+
+所以，[[ISO/IEC_14882|C++标准]]并没有尝去标准化名字修饰。相反地，《Annotated C++ Reference Manual》（又叫做ARM， ISBN 0-201-51459-1, 第7.2.1c节）主动提倡使用截然不同的名字修饰方式来防止ABI层面不兼容的链接，例如[[异常处理|异常处理]]和[[虚表|虚表]]设计。
+
+虽然如此，在一些平台上<ref>{{cite web|url=https://itanium-cxx-abi.github.io/cxx-abi/abi.html#mangling|title=Itanium C++ ABI, Section 5.1 External Names (a.k.a. Mangling)|accessdate=16 May 2016|archive-date=2021-01-01|archive-url=https://web.archive.org/web/20210101084451/http://itanium-cxx-abi.github.io/cxx-abi/abi.html#mangling|dead-url=no}}</ref>，全部C++ ABI都被标准化了，包括名字修饰。
+
+===C++名字修饰的现实影响===
+当C++符号从[[动态链接库|动态链接库]]和[[共享对象|共享对象]]文件中导出时，名字修饰方式就不再是一个编译器内部的事情的。不同的编译器（或者同一款编译器的不同版本）将产生不同的名字修饰方式的二进制文件。这意味着如果编译器使用了不同方式创建了库和程序经常将导致无法解决的符号。例如，如果一个系统中有多个C++编译器（例如GNU GCC编译器和操作系统供应商的编译器）并且想安装[[Boost_C++_Libraries|Boost C++ Libraries]]，那么它需要编译两次——为操作系统供应商的编译器编译一次，为GCC再编译一次。
+
+为了安全目的，产生不兼容的目标代码（基于不同的ABI，例如类和异常）的编译器最好使用不同的名字修饰方式。这保证了这些不兼容性能够在链接的时候被检测出来，而不是一运行软件的时候被发现（这会导致隐藏的bug和严重的稳定性问题）。
+
+正因如此，名字修饰是对于任何C++相关的[[应用二进制接口|ABI]]都是一个要点。
+
+===通过c++filt去修饰===
+
+<syntaxhighlight lang="console">
+$ c++filt -n _ZNK3MapI10StringName3RefI8GDScriptE10ComparatorIS0_E16DefaultAllocatorE3hasERKS0_
+Map<StringName, Ref<GDScript>, Comparator<StringName>, DefaultAllocator>::has(StringName const&) const
+</syntaxhighlight>
+
+===通过内建GCC ABI去修饰===
+
+<syntaxhighlight lang="cpp">
+#include <stdio.h>
+#include <stdlib.h>
+#include <cxxabi.h>
+
+int main() {
+	const char *mangled_name = "_ZNK3MapI10StringName3RefI8GDScriptE10ComparatorIS0_E16DefaultAllocatorE3hasERKS0_";
+	int status = -1;
+	char *demangled_name = abi::__cxa_demangle(mangled_name, NULL, NULL, &status);
+	printf("Demangled: %s\n", demangled_name);
+	free(demangled_name);
+	return 0;
+}
+</syntaxhighlight>
+
+输出： 
+ {{codett|Demangled: Map<StringName, Ref<GDScript>, Comparator<StringName>, DefaultAllocator>::has(StringName const&) const}}
+
+==Java的名字修饰==
+
+在Java语言中，方法或类的'''签名'''包含了它的名字以及它的参数和可适用的返回值类型。签名的格式是有文档说明的，因为Java语言、编译器和.class文件的格式都是全部一起设计的（并且一开始就是面向对象和互操作性的）。
+
+===为内部和匿名类创建唯一的名字===
+匿名类的作用域局限于它们的父类，所以编译器必须为内部类产生一个“合格”的公开名字，来避免与其它相同命名空间的同名类类冲突。类似的，匿名类必须有“假的”公开名字（因为匿名类的概念仅存在于编译器内，而不存在于运行时）。所以，编译下列的Java程序：
+<syntaxhighlight lang="java">
+public class foo {
+    class bar {
+        public int x;
+    }
+
+    public void zark () {
+        Object f = new Object () {
+            public String toString() {
+                return "hello";
+            }
+        };
+    }
+}
+</syntaxhighlight>
+
+将产生如下三个'''.class'''文件：
+* '''foo.class'''，包含了主类（外面的类）foo
+* '''foo$bar.class'''，包含了命名的内部类foo.bar
+* '''foo$1.class'''，包含了内部的匿名类（局部于foo.zark方法）
+
+这些类名全是合法的（因为$符号允许用于JVM规范）并且这些名字对编译器的产生来说是“安全”的，因为Java语言的定义禁止$符号出现在常规的Java类定义中。
+
+Java的名字解析在运行时更为复杂，因为完全合格的类名在特定的[[Java类加载器|Java类加载器]]的实例中是唯一的。类加载器是分级次序的，并且JVM的每个编程都有一个所谓的上下文类加载器，用来预防两个不同的类加载器实例包含同名的类。系统首先尝试使用根加载器（或系统加载器）来加载类，然后往下针对上下文类加载器分级加载。
+
+===Java本地接口（JNI）===
+'''Java本地接口'''（JNI）允许Java语言的程序调用其它语言写的程序（通常是C或C++）。有两个名称解析与此有关，这两种都没有标准化的实现方式：
+
+* 从Java到本地名字的翻译<ref>{{cite web |title=Design Overview |url=https://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/design.html |website=docs.oracle.com |accessdate=2020-09-22 |archive-date=2020-08-04 |archive-url=https://web.archive.org/web/20200804060011/https://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/design.html |dead-url=no }}</ref>
+* 常规的C++名字修饰
+
+==Python的名字修饰==
+[[Python|Python]]语言的名字修饰用于类的“私有”（private）成员。这种类成员的名字由前导双下划线开头，并且后缀下划线不能多于一个。例如<code>__thing</code>将被名字修饰，<code>___thing</code>和<code>__thing_</code>同样也会被名字修饰，但是<code>__thing__</code>和<code>__thing___</code>就不会被名字修饰。Python运行时库不限制访问这些成员，名字修饰只是用来避免拥有同名成员的派生类发生名字冲突。
+
+遇到需要名字修饰的时候，Python把这些名字改成单下划线加上封闭类的名字，例如：
+
+<syntaxhighlight lang="pycon">
+>>> class Test(object):
+...     def __mangled_name(self):
+...         pass
+...     def normal_name(self):
+...         pass
+... 
+>>> [*Test.__dict__]
+['__module__', '_Test__mangled_name', 'normal_name', '__dict__', '__weakref__', '__doc__']
+</syntaxhighlight>
+
+==Objective-C的名字修饰==
+本质上，Objective-C存在两种形式的方法，'''类方法'''（静态方法）和'''实例化方法'''。Objective-C的方法声明如下：
+ + ''method name'': ''argument'' ''name''<sub>1</sub>:''parameter''<sub>1</sub> ...
+ – ''method name'': ''argument'' ''name''<sub>1</sub>:''parameter''<sub>1</sub> ...
+类方法用+表示，实例化方法用-表示。一个典型的类方法声明是这样子的：
+<syntaxhighlight lang="objc">
+ + (id) initWithX: (int) number andY: (int) number;
+ + (id) new;
+</syntaxhighlight>
+实例化方法是这样子的：
+<syntaxhighlight lang="objc">
+ – (id) value;
+ – (id) setValue: (id) new_value;
+</syntaxhighlight>
+这样方法声明都有一个特定的内部表示法。当编译的时候，任何一个方法都会按照下列类方法的方式来命名：
+ _c_''Class''_''methodname''_''name''<sub>1</sub>_''name''<sub>2</sub>_ ...
+这是实例化方法：
+ _i_''Class''_''methodname''_''name''<sub>1</sub>_''name''<sub>2</sub>_ ...
+
+Objective-C语法中的冒号被翻译成下划线。所以Objective-C的属于<tt>Point</tt>类的类方法<tt> + (id) initWithX: (int) number andY: (int) number;</tt>将会被翻译成<tt>_c_Point_initWithX_andY_</tt>，并且实例化方法（属于同一个类）<tt> - (id) value;</tt>将会被翻译成<tt>_i_Point_value</tt>。
+
+类的每一种方法都用这种方式标出。但是，为了在全部方法都用这种方式来表示的时候，能够查找到一个类能够回应的方法是很繁琐的。每个方法都赋予了唯一的符号（例如整型）。这样的符号一般叫做'''选择器'''。在Objective-C中，选择器可以被直接管理——它们在Objective-C中有特定类型——<tt>SEL</tt>。
+
+在编译期间，建立了一个把文字表述（例如<tt>_i_Point_value</tt>）映射到选择器（类型为SEL）的表。管理选择器比操作方法的文字表述更有效。注意一个选择器只能匹配一个方法名，而不是它属于的类——不同的类对同名方法可以有不同的实现。因此，方法的实现也给定了一个特定的标识符——这就叫实现指针，当然也给定了类型<tt>IMP</tt>。
+
+信息发送由编译器编码，调用<tt>id objc_msgSend (id receiver, SEL selector, ...)</tt>函数，或者它的表亲，其中<tt>receiver</tt>是信息的接收者，并且<tt>SEL</tt>决定需要调用的方法。每个类都有各自的从选择器映射到它们实现的表——实现指针指定实际方法实现的内存地址。类和实现的表是分开的。除了储存在<tt>SEL</tt>中来用<tt>IMP</tt>查找表，函数是本质上是匿名的。
+
+选择器的<tt>SEL</tt>值在类间没有变化。这使得多态成为可能。
+
+Objective-C运行时库负责维护方法的参数和返回值的信息。但是，这信息不是方法名的一部分，不同的类可能有很大的不同。
+
+因为Objective-C不支持[[命名空间|命名空间]]，所以没有必要对类名进行名字修饰（这个在产生的二进制文件中确实发生过）。
+
+==Fortran的名字修饰==
+名字修饰对于[[Fortran|Fortran]]编译器也是必要的，因为原先这个语言是[[大小写敏感性|大小写不敏感]]的。随着语言的发展，产生了更多的名字修饰需求，这是因为Fortran 90标准附加的[[模块_(程序设计)|模块]]和其它特性。名字修饰就成为了需要解决的一个特别常见的问题，因为需要调用来自其它语言（例如[[C语言|C语言]]）的Fortran库（例如[[LAPACK|LAPACK]]）。
+
+由于Fortran编译器大小写不敏感，子程序或函数的名字"FOO"必须被转换成规范的大小写方式，而且要由Fortran编译器来格式化，这样它才能无视大小写地用相同方式被链接。不同的编译器用不同的方式来实现了，没有发生过标准化。[[AIX|AIX]]和[[HP-UX|HP-UX]]的Fortran编译器把标识符全转成小写（"foo"），而[[克雷公司|克雷]]{{tsl|en|Unicos|Unicos}}的Fortran编译器把标识符全转成大写（"FOO"）。[[GNU|GNU]]的[[GNU_Compiler_Collection|g77]]编译器把标识符转成小写后接一个下划线（"foo_"），例外情况是：原先已经有下划线的标识符（"FOO_BAR"）转成后接两个下划线（"foo_bar__"），这是{{tsl|en|f2c|f2c}}设的约定。许多其它的编译器，包括[[硅谷图形公司|SGI]]的[[IRIX|IRIX]]编译器、[[gfortran|gfortran]]和[[Intel|Intel]]的Fortran编译器（不包括在Microsoft Windows上），都把标识符全部转成小写后接一个下划线（"foo_"和"foo_bar_"）。在Microsoft Windows上，Intel Fortran编译器缺省为大写不带下划线<ref>{{cite web|title=Summary of Mixed-Language Issues|url=https://software.intel.com/en-us/node/525345|website=User and Reference Guide for the Intel Fortran Compiler 15.0|publisher=Intel Corporation|accessdate=17 November 2014|archive-date=2016-08-17|archive-url=https://web.archive.org/web/20160817173106/https://software.intel.com/en-us/node/525345|dead-url=no}}</ref>。
+
+Fortran 90模块中的标识符必须被进一步名字修饰，因为相同的子程序同可能在不同的模块提供给不同的例程。
+
+==Pascal的名字修饰==
+===Borland的Turbo Pascal/Delphi系列===
+
+<!--
+todo: Borland Pascal 和 Delphi 是面向对象的，也能调用C动态链接库，所以它们同样也有这个问题
+-->
+
+为了避免Pascal的名字修饰，可以使用：
+
+<syntaxhighlight lang="pascal">
+exports
+  myFunc name 'myFunc',
+  myProc name 'myProc';
+</syntaxhighlight>
+
+===Free Pascal===
+[[Free_Pascal|Free Pascal]]支持[[函数重载|函数重载]]和[[运算符重载|运算符重载]]，所以它也使用名字修饰来支持这些特性。另外，Free Pascal能够调用由其它语言写的的外部模块定义的符号，也能导出自己的符号供其它语言调用。更多信息，详见[http://www.freepascal.org/docs-html/prog/prog.html Free Pascal Programmer's Guide]{{Wayback|url=http://www.freepascal.org/docs-html/prog/prog.html |date=20181211084112 }}的子页面[http://www.freepascal.org/docs-html/prog/progse21.html Chapter 6.2]{{Wayback|url=http://www.freepascal.org/docs-html/prog/progse21.html |date=20181212060139 }}和[http://www.freepascal.org/docs-html/prog/progse27.html Chapter 7.1]{{Wayback|url=http://www.freepascal.org/docs-html/prog/progse27.html |date=20181212071745 }}。
+
+==参见==
+* [[綁紮|语言绑定]]
+* {{tsl|en|Foreign function interface|跨语言函数接口}}
+* [[调用约定|调用约定]]
+* {{tsl|en|Stropping (syntax)|Stropping}}
+* [[应用程序接口|应用程序接口]] – API
+* [[应用二进制接口|应用二进制接口]] – ABI
+* {{tsl|en|Comparison of application virtual machines|应用层虚拟机的比较}}
+* [[Java本地接口|Java本地接口]]
+* [[SWIG|SWIG]] – 产生于多种语言到多种语言的开源接口绑定
+* [[Microsoft_Visual_C++名字修饰|Microsoft Visual C++名字修饰]]
+
+==参考资料==
+{{reflist|2}}
+
+==外部链接==
+*[https://itanium-cxx-abi.github.io/cxx-abi/abi.html#mangling Linux Itanium ABI for C++]{{Wayback|url=https://itanium-cxx-abi.github.io/cxx-abi/abi.html#mangling |date=20210101084451 }}，包含名字修饰方式。
+*[http://developer.apple.com/tools/mpw-tools/compilers/docs/abi_spec.pdf Macintosh C/C++ ABI Standard Specification]{{Wayback|url=http://developer.apple.com/tools/mpw-tools/compilers/docs/abi_spec.pdf |date=20110604215000 }}
+*[http://sources.redhat.com/binutils/docs-2.15/binutils/c--filt.html c++filt]{{Wayback|url=http://sources.redhat.com/binutils/docs-2.15/binutils/c--filt.html |date=20120717012523 }} —— 反向名字修饰被GNU/Intel编译器编码过的C++符号的过滤器
+*[http://msdn2.microsoft.com/en-us/library/5x49w699.aspx undname]{{Wayback|url=http://msdn2.microsoft.com/en-us/library/5x49w699.aspx |date=20060212230025 }} —— 反向名字修饰的微软Visual C++工具
+*[http://developer.apple.com/legacy/mac/library/documentation/Cocoa/Conceptual/OOPandObjC1/Articles/ocRuntimeSystem.html#//apple_ref/doc/uid/TP40005191-CH9-CJBBBCHG The Objective-C Runtime System]{{Wayback|url=http://developer.apple.com/legacy/mac/library/documentation/Cocoa/Conceptual/OOPandObjC1/Articles/ocRuntimeSystem.html#//apple_ref/doc/uid/TP40005191-CH9-CJBBBCHG |date=20121006111357 }} —— 来自苹果的 [http://developer.apple.com/legacy/mac/library/documentation/Cocoa/Conceptual/OOPandObjC1/Introduction/introObjectiveC.html The Objective-C Programming Language 1.0]{{Wayback|url=http://developer.apple.com/legacy/mac/library/documentation/Cocoa/Conceptual/OOPandObjC1/Introduction/introObjectiveC.html |date=20121006111550 }}
+*[http://www.agner.org/optimize/calling_conventions.pdf Calling conventions for different C++ compilers]{{Wayback|url=http://www.agner.org/optimize/calling_conventions.pdf |date=20100815233950 }} Agner Fog 著，包含了多种不同的x86和x64的C++编译器的名字修饰方式的细节描述（2011-06-08版本，第24至42页）。
+*[http://www.kegel.com/mangle.html#operators C++ Name Mangling/Demangling]{{Wayback|url=http://www.kegel.com/mangle.html#operators |date=20200811233517 }} 挺详细地解释了Visual C++编译器的名字修饰方式
+*[http://sourceforge.net/projects/php-ms-demangle/ PHP UnDecorateSymbolName]{{Wayback|url=http://sourceforge.net/projects/php-ms-demangle/ |date=20181210223607 }} 反向名字修饰Microsoft Visual C++的函数名的PHP脚本
+*[https://web.archive.org/web/20140410114817/http://www.parashift.com/c++-faq-lite/mixing-c-and-cpp.html Mixing C and C++ Code]
+*[https://web.archive.org/web/20141018022522/http://www.iecc.com/linker/linker05.html Symbol management – 'Linkers and Loaders' by John R. Levine]
+*[http://www.int0x80.gr/papers/name_mangling.pdf Name mangling demystified by Fivos Kefallonitis]{{Wayback|url=http://www.int0x80.gr/papers/name_mangling.pdf |date=20200805165825 }}
+
+{{DEFAULTSORT:Name Mangling}}
+
+[[Category:编译原理|Category:编译原理]]
+[[Category:计算机程序库|Category:计算机程序库]]
+[[Category:C++|Category:C++]]
+[[Category:Java|Category:Java]]

@@ -1,0 +1,37 @@
+local p = {}
+--p.main 修改自自module:Template:Weighted_page_size
+function p.Weighted_page_size( titleText )
+    if not titleText then
+        return 0
+    end
+    local title = mw.title.new( titleText )
+    if not title then
+        return 0
+    end
+    local content = title:getContent()
+    if not content then
+        return 0
+    end
+    local chars = mw.ustring.len( content )
+    return math.floor( chars * 3.786 + 0.5 )
+end
+
+function p.main( frame )
+    local titleText = frame.args[1]
+    local size
+    local icontext
+    size = p.Weighted_page_size(titleText)
+
+    if size<2000 then
+        icontext='[[File:Qsicon_Ueberarbeiten.svg|16px]]'
+    elseif size<8000 then   
+        icontext='[[File:Qsicon_inArbeit.svg|16px]]'
+    elseif size<16000 then  
+        icontext='[[File:YesCheck_BlueLinear.svg|16px]]'
+    else    
+        icontext='[[File:YesCheck_GreenLinear.svg|16px]]'
+    end
+    return icontext
+end
+
+return p

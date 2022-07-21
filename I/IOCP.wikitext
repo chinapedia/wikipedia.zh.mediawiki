@@ -1,0 +1,44 @@
+{{expand|time=2014-04-11T14:18:14+00:00}}
+{{expert|time=2014-04-11T14:18:14+00:00}}
+'''输入输出完成端口'''（Input/Output Completion Port，IOCP）, 是支持多个同时发生的异步I/O操作的应用程序编程接口，在[[Windows_NT|Windows NT]]的3.5版本以後<ref>{{Cite web |url=http://msdn.microsoft.com/en-us/library/aa365198(VS.85).aspx |title=Windows I/O Completion Ports |accessdate=2014-04-11 |archive-date=2014-03-20 |archive-url=https://web.archive.org/web/20140320180058/http://msdn.microsoft.com/en-us/library/aa365198(VS.85).aspx |dead-url=no }}</ref>，或[[AIX|AIX]] 5版以後<ref>{{Cite web |url=http://publib.boulder.ibm.com/infocenter/db2luw/v9r5/topic/com.ibm.db2.luw.admin.perf.doc/doc/t0054518.html |title=Configuring IOCP on AIX 5 and 6 |accessdate=2014-04-11 |archive-date=2013-06-30 |archive-url=https://web.archive.org/web/20130630215954/http://publib.boulder.ibm.com/infocenter/db2luw/v9r5/topic/com.ibm.db2.luw.admin.perf.doc/doc/t0054518.html |dead-url=no }}</ref>或[[Solaris|Solaris]]第十版以後，開始支持。
+
+IOCP特别适合C/S模式网络服务器端模型。因为，让每一个socket有一个线程负责同步（阻塞）数据处理，one-thread-per-client的缺点是：一是如果连入的客户多了，就需要同样多的线程；二是不同的socket的数据处理都要线程切换的代价。
+==原理==
+通常的办法是，线程池中的工作线程的数量与CPU内核数量相同，以此来最小化线程切换代价。一个IOCP对象，在操作系统中可关联着多个Socket和（或）文件控制端。 IOCP对象内部有一个先进先出（FIFO）队列，用于存放IOCP所关联的输入输出端的服务请求完成消息。请求输入输出服务的进程不接收IO服务完成通知，而是检查IOCP的消息队列以确定IO请求的状态。 （线程池中的）多个线程负责从IOCP消息队列中取走完成通知并执行数据处理；如果队列中没有消息，那么线程阻塞挂起在该队列。这些线程从而实现了负载均衡。
+
+==Windows操作系统==
+IOCP是唯一一个不需要安全属性的[[Windows对象管理|Windows内核对象]]。 这是因为IO完成端口在设计时就是只在一个进程中使用。
+
+使用CreateIoCompletionPort函数创建一个新的IOCP，或把socket或文件句柄与一个已存在的IOCP关联起来。
+
+一个线程，第一次调用GetQueuedCompletionStatus函数时，该线程就成为关联了该IOCP的线程，直到下述三种情形之一发生：
+*该线程退出；
+*该线程调用GetQueuedCompletionStatus函数关联到其他的IOCP；
+*该IOCP被关闭。
+即，一个线程在任何时刻最多关联一个IOCP。
+
+线程调用GetQueuedCompletionStatus函数等待放入IOCP的I/O'''完成包'''（completion packet）。IOCP拥有一个[[线程池|线程池]]。阻塞在IOCP上的线程按照后进先出（LIFO）顺序被释放（这是为了减少线程切换的代价）；而一个线程的完成包按照先进先出（FIFO）顺序从IOCP的队列中取走。IOCP有一个最大允许并发的线程数量上限，在CreateIoCompletionPort函数中指定，每次I/O完成包在从队列取走前检查关联于该IOCP且正在并发执行的线程数量是否达到该限。因其他原因（如调用SuspendThread函数）而挂起的线程不算作正在执行的线程。CompletionKey(完成键)一般作为“单句柄数据”的结构体（PER_HANDLE_DATA），用来标识是哪个设备的I/O完成操作已经完成。IO重叠结构（Overlapped）一般作为“单IO数据”的结构体（PER_IO_DATA），该结构体的第1个成员为OVERLAPPED结构体，用来标识是设备的具体哪个操作。
+
+线程可以用PostQueuedCompletionStatus函数在IOCP上投寄一个完成包。 
+
+关闭IOCP之前，必须先关闭关联在该IOCP之上的所有File Handle或socket。
+
+===内部结构===
+{{tsl|en|Jeffrey Richter}}说：“完成端口可能是最为复杂的内核对象”。<ref>《Windows via C/C++》 Fifth Edition (December 2007) (Jeffrey Richter and Christophe Nasarre) Page292.</ref> Windows中利用CreateIoCompletionPort命令创建完成端口对象时， 操作系统内部为该对象自动创建了5个数据结构，分别是：
+*设备列表（Device List）： 每当调用CreateIoCompletionPort函数时，操作系统会将该设备句柄添加到设备列表中；每当调用CloseHandle关闭了某个设备句柄时，系统会将该设句柄从设备列表中删除
+*IO完成请求队列（I/O Completion Queue-FIFO）：当I/O请求操作完成时，或者调用了PostQueuedCompeltionStatus函数时，操作系统会将I/O请求完成包添加到I/O完成队列中。当操作系统从完成端口对象的等待线程队列中取出一个工作线程时，操作系统会同时从I/O完成队列中取出一个元素（I/O请求完成包。
+*等待线程队列（WaitingThread List-LIFO）：当线程中调用GetQueuedCompletionStatus函数时，操作系统会将该线程压入到等待线程队列中。为了减少线程切换，该队列是LIFO。当I/O完成队列非空，且工作线程并未超出总的并发数时，系统从等待线程队列中取出线程，该线程从自身代码的GetQueuedCompletionStatus函数调用处返回并继续运行。
+*释放线程队列（Released Thread List）：当操作系统从等待线程队列中激活了一个工作线程时，或者挂起的线程重新被激活时，该线程被压入释放线程队列中，也即这个队列的线程处于运行状态。这个队列中的线程有两个出队列的机会：一是当线程重新调用GetQueuedCompletionStatus函数时，线程被添加到等待线程队列中；二是当线程调用其他函数使得线程挂起时，该线程被添加到“暂停线程队列”中。
+*暂停线程队列（Paused Thread List）：释放线程队列中的线程被挂起的时候，线程被压入到“暂停线程队列”中；当挂起的线程重新被唤醒时，从“暂停线程队列”中取出放入到释放线程队列。
+
+==參考資料==
+{{reflist}}
+
+==外部連結==
+*Article {{Cite web |url=http://doc.sch130.nsc.ru/www.sysinternals.com/ntw2k/info/comport.shtml |title="Inside I/O Completion Ports" |access-date=2014-04-11 |archive-url=https://web.archive.org/web/20101101112358/http://doc.sch130.nsc.ru/www.sysinternals.com/ntw2k/info/comport.shtml |archive-date=2010-11-01 |dead-url=yes }} by [[Mark_Russinovich|Mark Russinovich]].
+*[http://sourceforge.net/projects/iocpsock/ IOCPSOCK]{{Wayback|url=http://sourceforge.net/projects/iocpsock/ |date=20140221215002 }} - an IOCP implementation of a channel driver for the [[Tcl|Tcl]] language to run on Windows NT/2K/XP/Vista
+
+
+[[Category:Windows并发API|Category:Windows并发API]]
+[[Category:输入/输出|Category:输入/输出]]
+[[Category:排程|Category:排程]]

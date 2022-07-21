@@ -1,0 +1,131 @@
+{{Distinguish|Enterprise JavaBeans}}
+{{unreferenced|time=2013-07-16T11:00:43+00:00}}
+{{noteTA
+|G1=IT
+|1 = zh-cn:构造器; zh-tw:建構元;
+}}
+'''JavaBeans'''是[[Java|Java]]中一种特殊的[[类_(计算机科学)|类]]，可以将多个[[对象_(计算机科学)|对象]]封装到一个对象（bean）中。特点是可[[序列化|序列化]]，提供{{tsl|en|Nullary constructor|无参构造器}}，提供[[赋值方法|getter方法和setter方法]]访问对象的属性。名称中的“Bean”是用于Java的可重用软件组件的惯用叫法。
+
+==优点==
+* Bean可以控制它的属性、事件和方法是否暴露给其他程序。
+* Bean可以接收来自其他对象的事件，也可以产生事件给其他对象。
+* 有软件可用来配置Bean。
+* Bean的属性可以被序列化，以供日后重用。
+
+==JavaBeans規範==
+要成為JavaBean[[類別_(電腦科學)|類別]]，則必需遵循關於命名、构造器、方法的特定規範。有了這些規範，才能有可以使用、復用、替代和連接JavaBeans的工具。
+
+規範如下：
+
+* 有一個public的無參數建構子。
+* 屬性可以透過''get''、''set''、''is''（可替代get，用在[[布林_(資料類型)|布林型]]属性上）方法或遵循特定命名規則的其他方法存取。
+* 可序列化。
+
+<syntaxhighlight lang=Java>
+
+package player;
+
+public class PersonBean implements java.io.Serializable {
+
+    /**
+     * name 屬性(注意大小寫)
+     */
+    private String name = null;
+
+    private boolean deceased = false;
+
+    /** 無參數建構子(没有參數) */
+    public PersonBean() {
+    }
+
+    /**
+     * name 屬性的 Getter方法
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * name 屬性的Setter方法
+     * @param value
+     */
+    public void setName(final String value) {
+        name = value;
+    }
+
+    /**
+     * deceased 屬性的Getter方法
+     * 布林值屬性Getter方法的不同形式(這裡使用了is而非get)
+     */
+    public boolean isDeceased() {
+        return deceased;
+    }
+
+    /**
+     * deceased 屬性的Setter方法
+     * @param value
+     */
+    public void setDeceased(final boolean value) {
+        deceased = value;
+    }
+}
+</syntaxhighlight>
+
+'''<u><code>TestPersonBean.java</code></u>''':
+<syntaxhighlight lang=Java>
+
+import player.PersonBean;
+
+/**
+ * <code>TestPersonBean</code>类
+ */
+public class TestPersonBean {
+    /**
+     * PersonBean 類型測試方法的main函数
+     * @param ARGS
+     */
+    public static void main(String[] args) {
+        PersonBean person = new PersonBean();
+
+        person.setName("張三");
+        person.setDeceased(false);
+
+        // 輸出: "張三[活著]"
+        System.out.print(person.getName());
+        System.out.println(person.isDeceased() ? " [已故]" : " [活著]");
+    }
+}
+</syntaxhighlight>
+
+'''<u><code>testPersonBean.jsp</code></u>''';
+<syntaxhighlight lang=HTML4Strict>
+<% // 在JSP中使用PersonBean類別 %>
+<jsp:useBean id="person" class="player.PersonBean" scope="page"/>
+<jsp:setProperty name="person" property="*"/>
+
+<html>
+    <body>
+        姓名：<jsp:getProperty name="person" property="name"/><br/>
+        已故與否？<jsp:getProperty name="person" property="deceased"/><br/>
+        <br/>
+        <form name="beanTest" method="POST" action="testPersonBean.jsp">
+            輸入姓名：<input type="text" name="name" size="50"><br/>
+            選擇選項：
+            <select name="deceased">
+                <option value="false">活著</option>
+                <option value="true">已故</option>
+            </select>
+            <input type="submit" value="測試此JavaBean">
+        </form>
+    </body>
+</html>
+</syntaxhighlight>
+
+== 参考文献 ==
+{{reflist}}
+
+== 外部連結 ==
+* [http://download.oracle.com/javase/tutorial/javabeans/ Oracle's JavaBeans tutorials] {{Wayback|url=http://download.oracle.com/javase/tutorial/javabeans/ |date=20111115144414 }}
+* [http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html JavaBeans specification] {{Wayback|url=http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html |date=20200416204724 }}
+
+[[Category:Java|Category:Java]]

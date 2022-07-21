@@ -1,0 +1,280 @@
+{{lowercase}}
+{{noteTA|G1=IT}}
+{{C++ Standard library}}
+
+<tt>'''<string>'''</tt>是[[C++標準程式庫|C++標準程式庫]]中的一個[[头文件|头文件]]，定义了[[C++|C++]]标准中的[[字符串|字符串]]的基本模板类std::basic_string及相关的模板类实例： 
+
+{| class="wikitable"
+|-
+! 模板类实例 !! std::basic_string的模板实参
+|-
+| <code>string</code> || <code>char</code>
+|-
+| <code>wstring</code>|| <code>wchar_t</code>
+|-
+| <code>u16string</code>|| <code>char16_t</code>（[[C++11|C++11]]新增）
+|-
+| <code>u32string</code>|| <code>char32_t</code>（C++11新增）
+|}
+其中的<tt>'''string'''</tt>是以<tt>char</tt>作为模板参数的模板类实例<ref>{{cite web
+ | title=C++ reference for <code>basic_string</code>
+ | url=http://cppreference.com/wiki/string/basic_string/
+ | publisher=Cppreference.com
+ | accessdate=2013-06-21
+ | archive-date=2013-01-20
+ | archive-url=https://archive.is/20130120012809/http://cppreference.com/wiki/string/basic_string/
+ | dead-url=no
+ }}</ref>，把字符串的内存管理责任由<code>string</code>负责而不是由编程者负责，大大减轻了[[string.h|C语言风格的字符串]]的麻烦。
+
+<code>std::basic_string</code>提供了大量的字符串操作函数，如比较、连接、搜索、替换、获得子串等。并可与C语言风格字符串双向转换。<code>std::basic_string</code>属于C++ STL容器类，用户自定义的类也可以作为它的模板参数，因此也适用C++ STL Algorithm库。
+
+<code>string</code>本质上是以字符作为元素的vector特化版本；不存在0字符结尾这个概念，能装入'\0'这种数据。
+==std::basic_string类模板==
+<code>std::basic_string</code>[[类模板|类模板]]存储且操纵类似char的对象的序列。该对象类型的性质由特性类模板std::char_traits的实例来提供，并作为<code>std::basic_string</code>的第二个模板参数。
+
+[[C++11|C++11]]标准规定：basic_string的元素是'''连续'''存储的。即对于basic_string s，有：<code>&*(s.begin() + n) == &*s.begin() + n</code>，其中n属于[0, s.size())。换句话说，指向s[0]的指针即为指向CharT[]数组的首元素指针。C++11已经禁止了[[寫入時複製|寫入時複製]]（copy-on-write)的实现，因为存在多线程安全问题。一般都采用了小字符串优化（SSO）实现，如Visual C++：
+<syntaxhighlight lang="cpp">
+union _Bxty
+    {   // storage for small buffer or pointer to larger one
+    _Elem _Buf[_BUF_SIZE];
+    _Elem *_Ptr;
+    } _Bx; 
+size_type _Mysize;  // current length of string
+size_type _Myres;   // current storage reserved for string
+</syntaxhighlight>
+GCC从版本5开始，std::string不再采用COW策略。
+
+[[C++17|C++17]]标准规定，basic_string是AllocatorAwareContainer, SequenceContainer与ContiguousContainer。
+===模板参数===
+*CharT 	- 	字符类型
+*Traits 	- 	字符的特性类
+*Allocator 	内部存储的分配器类
+===成员类型===
+*traits_type 	模板参数Traits
+*value_type 	即Traits::char_type
+*allocator_type模板参数Allocator
+*size_type 	即Allocator::size_type。C++11改为std::allocator_traits<Allocator>::size_type 
+*difference_type即Allocator::difference_type。C++11改为std::allocator_traits<Allocator>::difference_type 
+*reference 	即Allocator::reference。C++11改为value_type& 
+*const_reference  即Allocator::const_reference。C++11改为const value_type&  
+*pointer 	即Allocator::pointer。C++11改为std::allocator_traits<Allocator>::pointer 
+*const_pointer 	即Allocator::const_pointer。C++11改为std::allocator_traits<Allocator>::const_pointer 
+*iterator 	属于RandomAccessIterator
+*const_iterator 	属于Constant random access iterator
+*reverse_iterator 	即std::reverse_iterator<iterator>
+*const_reverse_iterator 	即std::reverse_iterator<const_iterator>
+===成员函数===
+下面列出所有成员函数，其中 <code>string</code>是 <code>std::basic_string<T></code> 的简写：
+*构造表示
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/basic_string string]</code>（构造）
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/~basic_string ~string]</code>（析构） 
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/operator= operator=]</code> - 赋值
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/assign assign]</code> –赋值
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/get_allocator get_allocator]</code> –获得内存分配器
+*字符访问
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/at at]</code> –访问特定字符，带边界检查
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/operator_at operator<nowiki>[]</nowiki>]</code> –访问特定字符
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/front front]</code> –访问第一个字符
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/back back]</code> –访问最后一个字符
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/data data]</code> –访问基础数组，C++11 后与 c_str() 完全相同
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/c_str c_str]</code> –返回对应于字符串内容的 C 风格零结尾的只读字符串
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/substr substr]</code> –以子串构造一个新串；参数为空时取全部源串
+*迭代器
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/begin begin]</code> –获得指向开始位置的迭代器
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/end end]</code> –获得指向末尾的迭代器
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/rbegin rbegin]</code> –获得指向末尾的逆向迭代器
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/rend rend]</code> –获得指向开始位置的逆向迭代器
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/cbegin cbegin]</code> –获得指向开始位置的只读迭代器
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/cend cend]</code> –获得指向末尾的只读迭代器
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/crbegin crbegin]</code> –获得指向末尾的逆向只读迭代器
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/crend crend]</code> –获得指向开始位置的逆向只读迭代器
+* 容量
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/empty empty]</code> –检查是否为空
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/size size]</code> –返回数据的字符长度
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/length length]</code> –返回数据的字符长度，与 size() 完全相同
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/max_size max_size]</code> –返回可存储的最大的字节容量，在 32 位 Windows 上大概为 43 亿字节。
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/reserve reserve]</code> –改变 string 的字符存储容量，实际获得的存储容量不小于 reserve 的参数值。
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/capacity capacity]</code> –返回当前的字符存储容量
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/shrink_to_fit shrink_to_fit]</code>（[[C++11|C++11]] 新增）–降低内存容量到刚好
+*修改器
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/clear clear]</code> –清空内容
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/insert insert]</code> –插入字符或字符串。目标 string 中的插入位置可用整数值或迭代器表示。如果参数仅为一个迭代器，则在其所指位置插入[[NUL|0]] 值。
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/erase erase]</code> –删除 1 个或 1 段字符
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/push_back push_back]</code> –追加 1 个字符
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/pop_back pop_back]</code> –删除最后 1 个字符，C++11 标准引入
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/append append]</code> –追加字符或字符串
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/operator+= operator+=]</code> –追加，只有一个参数——字符指针、字符或字符串；不像 append() 一样可以追加参数的子串或若干相同字符
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/copy copy]</code> –拷贝出一段字符到 C 风格字符数组；有溢出危险
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/resize resize]</code> –改变（增加或减少）字符串长度；如果增加了字符串长度，新字符缺省为 0 值
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/swap swap]</code> –与另一个 string 交换内容
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/replace replace]</code> –替换子串；如果替换源数据与被替换数据的长度不等，则结果字符串的长度发生改变
+*搜索
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/find find]</code> –前向搜索特定子串的第一次出现
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/rfind rfind]</code> –从尾部开始，后向搜索特定子串的第一次出现
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/find_first_of find_first_of]</code> –搜索指定字符集合中任意字符在 *[[this|this]] 中的第一次出现
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/find_last_of find_last_of]</code> –搜索指定字符集合中任意字符在 *this 中的最后一次出现
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/find_first_not_of find_first_not_of]</code> –*this 中的不属于指定字符集合的首个字符
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/find_last_not_of find_last_not_of]</code> –*this 中的不属于指定字符集合的末个字符
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/compare compare]</code> –与参数字符串比较
+
+===常量值===
+**<code>string::[http://en.cppreference.com/w/cpp/string/basic_string/npos npos]</code> –表示“未找到”，值为<code>static const unsigned -1</code>
+===非成员的有关的全局函数===
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/operator+ operator+]</code> –字符串连接
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp operator!=]</code> –不等比较
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp operator==]</code> –相等比较
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp operator<]</code> –小于比较
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp operator<=]</code> –小于等于比较
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp operator>]</code> –大于比较
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/operator_cmp operator>=]</code> –大于等于比较
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/operator_ltltgtgt operator<<]</code> –字符串内容写到输出流中
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/operator_ltltgtgt operator>>]</code> –从输入流中读取一个字符串
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/getline getline]</code> –从istream中读入一行或一段字符到string中
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/swap2 swap]</code> –交换两个string的内容。是std::swap算法针对std::basic_string的特化版本
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/stol stoi]</code> –字符串转为整形
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/stol  stol]</code> –字符串转为长整形
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/stol  stoll]</code> –字符串转为长长整形 
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/stoul stoul]</code> –字符串转为无符号长整形
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/stoull stoull]</code> –字符串转为无符号长长整形
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/stof stof]</code> –字符串转为单精度浮点形
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/stod stod]</code> –字符串转为双精度浮点形
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/stold stold]</code> –字符串转为长双精度浮点形
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/to_string to_string]</code> –整型、无符号整型、浮点型转化为string
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/to_wstring  to_wstring]</code> –整型、无符号整型、浮点型转化为wstring
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/hash  hash<std::string>]</code> –计算hash值
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/hash  hash<std::wstring>]</code> –计算hash值
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/hash  hash<std::u16string>]</code> –计算hash值
+**<code>std::[http://en.cppreference.com/w/cpp/string/basic_string/hash  hash<std::u32string>]</code> –计算hash值
+===字面量===
+C++14标准定义了如下的std::basic_string[[用户定义字面量|字面量]]：
+*string operator "" s（const char *str, std::size_t len）; 
+*u16string operator "" s（const char16_t *str, std::size_t len）; 
+*u32string operator "" s（const char32_t *str, std::size_t len）; 
+*wstring operator "" s（const wchar_t *str, std::size_t len）;
+
+示例：
+<syntaxhighlight lang="cpp">
+#include <string>
+#include <iostream> 
+int main()
+{
+    using namespace std::string_literals;
+ 
+    std::string s2 = "abc\0\0def"; // forms the string "abc"
+    std::string s1 = "abc\0\0def"s; // form the string "abc\0\0def"
+    std::cout<<s1.size()<<std::endl; //output 8
+    std::cout<<s2<<std::endl;
+    std::cout<<s1<<std::endl;
+}
+</syntaxhighlight>
+===构造hash值的函数===
+C++11标准引入了4个std::hash[[函数模板|函数模板]]的特化。用于以string为键值的hash定址。
+*template<> struct hash<std::string>;
+*template<> struct hash<std::wstring>;
+*template<> struct hash<std::u16string>;
+*template<> struct hash<std::u32string>;
+
+==std::char_traits类==
+char_traits是一个traits[[类模板|类模板]]。用于抽象出给定字符类型的字符特性与字符串操作。char_traits用于明确（explicit）实例化一个<code>std::basic_string</code>类模板。 
+*成员类型
+**char_type 	CharT
+**int_type 	可以保持char_type以及EOF的值的整数类型
+**off_type 	实现定义
+**pos_type 	实现定义
+**state_type 	实现定义
+*成员函数
+**assign[static]赋值一个字符
+**eq[static]     比较两个字符相等
+**lt[static]     比较两个字符小于 
+**move[static]   移动一个字符序列到另一个字符序列 
+**copy[static]   复制一个字符序列 
+**compare[static]词典序比较两个字符序列 
+**length[static]返回一个字符序列的长度 
+**find[static]   在一个字符序列中找到一个字符 
+**to_char_type[static]转化整型值到相等的char_type
+**to_int_type[static]  转化char_type到相等的整型值 
+**eq_int_type[static]  比较两个整型值
+**eof[static]     返回eof值
+**not_eof[static]检查一个字符是否为eof值 
+
+例如，如果需要定义“两个字符相等”[[当且仅当|当且仅当]]“两个字符的大写形式相等”，就可以在std::char_traits<char>之上派生定义一个类，重载定义eq、lt、compare、find四个静态成员函数。再用此特性类作为第二个模板参数去实例化std::basic_string类模板。
+==C++11放弃了COW==
+从C++11开始，明确禁止用“写时复制”（Copy On Write）实现stl::string。因为这在并发时容易引发错误。如下例的注释：
+<syntaxhighlight lang="cpp">
+#include <string>
+int main()
+{
+    std::string str1("hello world\n");
+
+    //p指向str1的数据区
+    const char * p = str1.data();
+
+    {
+        //str2和str1共享数据
+        auto str2( str1);
+
+        //访问导致str1复制数据，此时p和str2直线同一块区域
+        str1[0];
+
+        //str2离开作用域，调用析构函数，此时str2的RefCount为0，因此str2指向的内存被释放
+    }
+
+    //此时p为野指针，这是严重的bug
+    printf(p);
+
+    return 0;
+}
+</syntaxhighlight>
+==小对象优化==
+现在的主流编译器与标准库基本都采用了小对象优化（small objects optimization，又叫 small buffer optimization），以节约动态分配内存开销。
+*Visual C++：0至15个字节
+*GCC >= 5：0至15个字节
+*clang:：0至22个字节
+
+==用法==
+
+<syntaxhighlight lang="cpp">
+#include <iostream>
+#include <string>
+
+int main()
+{
+    std::string foo = "fighters";
+    std::string bar = "stool";
+
+    // "!=" compares string contents for inequality, even though they are different objects.
+    if(foo != bar)
+    {
+        std::cout << "The strings are different." << std::endl;
+    }
+
+    // Prints "stool fighters" by creating a temporary object, which is automatically freed.
+    std::cout << bar + " " + foo << std::endl;
+
+    return 0;
+}
+
+/*
+ Output:
+ The strings are different.
+ stool fighters
+*/
+</syntaxhighlight>
+
+由于字符串的拷贝操作与其字节长度成比例，是''[[大O符号|O]]''（''n''）量级。且创建字符串的临时栈对象的成本开销。因此<code>string</code>一般作为常量引用（reference-to-const）以避免不必要的拷贝：
+
+<syntaxhighlight lang="cpp">
+void print_the_string(const std::string& str)
+{
+    std::cout << str;
+}
+</syntaxhighlight>
+
+<code>c_str()</code>成员函数返回string类的C语言风格字符串（即ASCII-零串）的指针，用于C语言字符串的互操作。如果不需要零结尾的字符串，那么成员函数<code>data()</code>返回不一定是0结尾的字符串的内存地址。
+
+==参考文献==
+<references/>
+
+{{C++}}
+
+[[Category:C++標準函式庫|V]]

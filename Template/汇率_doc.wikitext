@@ -1,0 +1,437 @@
+<noinclude>{{Documentation subpage}}</noinclude>
+{{Ambox
+ |type       = serious
+ |text       = <big>'''免责声明'''</big><br><small>该模板生成的数据可能与各国[[中央银行]]公布的官方数据、市场汇率或者其他渠道的数据不同。在可能造成损失的领域请不要轻易相信该模板生成的数据。</small>
+}}
+
+本文档是为了介绍几个联合运作的模板。
+
+最终的模板为'''{{tl|汇率}}'''，负责在条目中生成需要的数据。
+
+自动更新模板：
+* {{tl|汇率/数据}}：模板，从公共来源收集汇率数据，然后提供给模板{{tl|汇率}}；
+* {{tl|汇率/IMF数据}}：模板，负责收集[[国际货币基金组织]]（IMF）公布的汇率数据，提供给{{tl|汇率/数据}}；
+* {{tl|汇率/ECB数据}}：模板，负责收集[[欧洲中央银行]]（ECB）公布的汇率数据，提供给{{tl|汇率/数据}}；
+* {{tl|汇率/CBR数据}}：模板，负责收集[[俄罗斯中央银行]]（CBR）公布的汇率数据，提供给{{tl|汇率/数据}}。
+
+手动更新模板：
+* {{tl|汇率/固定汇率}}：辅助模板，收集固定汇率数据，提高给{{tl|汇率/数据}}；
+
+总之，该系列模板可以在条目、列表或其他模板中生成几乎所有具有[[ISO 4217]]代码的[[流通貨幣列表|现行货币]]的汇率。
+
+== 范例 ==
+;简单范例
+假如你要得到汇率数据，您需要知道该货币组合的[[ISO 4217]]代码。 
+{| class="wikitable" style="text-align:center; font-size:90%" width="60%"
+! width="30%"| 源代码
+! width="20%"| 生成结果
+! width="50%"| 备注
+|-
+| {{nowrap|<nowiki>{{汇率|CNY|USD}}</nowiki>}}
+| {{汇率|CNY|USD}}
+| 1 [[美元|USD]] = {{汇率|CNY|USD}} [[人民币|CNY]]
+|-
+| {{nowrap|<nowiki>{{汇率|USD|CNY}}</nowiki>}}
+| {{汇率|USD|CNY}}
+| 1 [[人民币|CNY]] = {{汇率|USD|CNY}} [[美元|USD]]
+|-
+| {{nowrap|<nowiki>{{汇率|RUB|EUR}}</nowiki>}}
+| {{汇率|RUB|EUR}}
+| 1 [[欧元|EUR]] = {{汇率|RUB|EUR}} [[俄罗斯卢布|RUB]]
+|-
+| {{nowrap|<nowiki>{{汇率|EUR|RUB}}</nowiki>}}
+| {{汇率|EUR|RUB}}
+| 1 [[俄罗斯卢布|RUB]] = {{汇率|EUR|RUB}} [[欧元|EUR]]
+|-
+| {{nowrap|<nowiki>{{汇率|RUB|GBP}}</nowiki>}}
+| {{汇率|RUB|GBP}}
+| 1 [[英镑|GBP]] = {{汇率|RUB|GBP}} [[俄罗斯卢布|RUB]]
+|-
+| {{nowrap|<nowiki>{{汇率|GBP|RUB}}</nowiki>}}
+| {{汇率|GBP|RUB}}
+| 1 [[俄罗斯卢布|RUB]] = {{汇率|GBP|RUB}} [[英镑|GBP]]
+|-
+| {{nowrap|<nowiki>{{汇率|USD|EUR}}</nowiki>}}
+| {{汇率|USD|EUR}}
+| 1 [[欧元|EUR]] = {{汇率|USD|EUR}} [[美元|USD]]
+|-
+| {{nowrap|<nowiki>{{汇率|EUR|USD}}</nowiki>}}
+| {{汇率|EUR|USD}}
+| 1 [[美元|USD]] = {{汇率|EUR|USD}} [[欧元|EUR]]
+|}
+
+;使用系数或“日期”参数的范例
+本模板可以加入系数，以减少生成结果中“0”的个数。还可以得到数据更新时间。
+{| class="wikitable" style="text-align:center; font-size:90%" width="60%"
+! width="30%"| 源代码
+! width="20%"| 生成结果
+! width="50%"| 备注
+|-
+| {{nowrap|<nowiki>{{汇率|GBP|CNY}}</nowiki>}}
+| {{汇率|GBP|CNY}}
+| 1 [[人民币|CNY]] = {{汇率|GBP|CNY}} [[英镑|GBP]]
+|-
+| {{nowrap|<nowiki>{{汇率|GBP|CNY|1}}</nowiki>}}
+| {{汇率|GBP|CNY|1}}
+| 1 [[人民币|CNY]] = {{汇率|GBP|CNY|1}} [[英镑|GBP]]
+|-
+| {{nowrap|<nowiki>{{汇率|GBP|CNY|10}}</nowiki>}}
+| {{汇率|GBP|CNY|10}}
+| 10 [[人民币|CNY]] = {{汇率|GBP|CNY|10}} [[英镑|GBP]]
+|-
+| {{nowrap|<nowiki>{{汇率|GBP|CNY|100}}</nowiki>}}
+| {{汇率|GBP|CNY|100}}
+| 100 [[人民币|CNY]] = {{汇率|GBP|CNY|100}} [[英镑|GBP]]
+|-
+| {{nowrap|<nowiki>{{汇率|CNY|Date}}</nowiki>}}
+| {{nowrap|{{汇率|CNY|Date}}}}
+| 生成的日期数据
+|}
+
+;使用错误的范例
+如果给出的货币代码（或其他内容）是模板未知的（在{{tl|汇率/数据}}和{{tl|汇率/固定汇率}}中均没有），则返回的结构将是空的。
+{| class="wikitable" style="text-align:center; font-size:90%" width="60%"
+! width="30%"| 源代码
+! width="20%"| 生成结果
+! width="50%"| 备注
+|-
+| {{nowrap|<nowiki>{{汇率|美元|EUR}}</nowiki>}}
+| {{汇率|美元|EUR}}
+| 结果为空
+|-
+| {{nowrap|<nowiki>{{汇率|EUR|美元}}</nowiki>}}
+| {{汇率|EUR|美元}}
+| 结果为空
+|-
+| {{nowrap|<nowiki>{{汇率|XXX|EUR}}</nowiki>}}
+| {{汇率|XXX|EUR}}
+| 结果为空
+|-
+| {{nowrap|<nowiki>{{汇率|EUR|XXX}}</nowiki>}}
+| {{汇率|EUR|XXX}}
+| 结果为空
+|-
+| {{nowrap|<nowiki>{{汇率|美元|日期}}</nowiki>}}
+| {{汇率|美元|日期}}
+| 未知货币返回的日期数据也是空的
+|-
+| {{nowrap|<nowiki>{{汇率|XXX|日期}}</nowiki>}}
+| {{汇率|XXX|日期}}
+| 未知货币返回的日期数据也是空的
+|}
+
+;可以根据需要将该模板使用到条目、列表或模板之中，例如:
+* [[匯率制度]]
+* [[流通貨幣列表]]
+* {{tl|Infobox Currency}}
+
+== 数据源 ==
+=== 模板“汇率/数据” ===
+其数据来源为：
+* [[国际货币基金组织]] — [http://www.imf.org/external/np/fin/data/rms_five.aspx];
+* [[欧洲中央银行]] — [http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml];
+* [[俄罗斯中央银行]] — [http://www.cbr.ru/scripts/XML_daily.asp].
+
+=== 模板“汇率/固定汇率” ===
+模板{{TL|汇率/固定汇率}}主要参考了货币发行方的网站或其他语言维基百科（主要是英语）。这些来源可能并非最新数据，假如您现更新的数据来源，可以在[[Template_talk:汇率|讨论页]]留言，或对模板{{TL|汇率/固定汇率}}进行修改。
+==== 当前固定汇率 ====
+{| class="wikitable" style="text-align:center; font-size:90%" width="100%"
+! 货币
+! [[ISO 4217]]代码
+! 固定汇率的比率
+! 备注、来源
+|-
+! colspan="6" style="background: white;" | 挂靠[[美元]]（USD） 
+|-
+| [[巴拿马巴波亚]]
+| PAB
+| 1 USD = {{汇率|PAB|USD}} PAB
+| [[:en:Panamanian balboa]]
+|-
+| [[萨尔瓦多科郎]]
+| SVC
+| 1 USD = {{汇率|SVC|USD}} SVC
+| [http://www.bcr.gob.sv/?cat=1068&title=US%20Dollars&lang=en 发行方网站]
+|-
+| [[东加勒比元]]
+| XCD
+| 1 USD = {{汇率|XCD|USD}} XCD
+| [http://www.eccb-centralbank.org/Currency/exchange.asp#exchangerates 发行方网站]
+|-
+| [[港元]]
+| HKD
+| 1 USD = {{汇率|HKD|USD}} HKD
+| [http://www.hkma.gov.hk/eng/key-functions/monetary-stability.shtml 发行方网站]
+|-
+| [[吉布提法郎]]
+| DJF
+| 1 USD = {{汇率|DJF|USD}} DJF
+| [http://www.banque-centrale.dj/francs/board 发行方网站]
+|-
+| [[阿鲁巴盾]]
+| AWG
+| 1 USD = {{汇率|AWG|USD}} AWG
+| [[:en:Aruban florin]]
+|-
+| [[巴哈马元]]
+| BSD
+| 1 USD = {{汇率|BSD|USD}} BSD
+| [http://www.centralbankbahamas.com/exchange.php 发行方网站]
+|-
+| [[巴林第纳尔]]
+| BHD
+| 1 USD = {{汇率|BHD|USD}} BHD
+| [http://www.cbb.gov.bh/page-p-exchange_rate_policy.htm 发行方网站]
+|-
+| [[巴巴多斯元]]
+| BBD
+| 1 USD = {{汇率|BBD|USD}} BBD
+| [http://www.centralbank.org.bb/WEBCBB.nsf/webpage/48ABCC1607F95BCE042576820056F4E0 发行方网站]
+|-
+| [[伯利兹元]]
+| BZD
+| 1 USD = {{汇率|BZD|USD}} BZD
+| [https://www.centralbank.org.bz/currency 发行方网站]
+|-
+| [[厄立特里亚纳克法]]
+| ERN
+| 1 USD = {{汇率|ERN|USD}} ERN
+| [[:en:Eritrean nakfa]]
+|-
+| [[特立尼达和多巴哥元]]
+| TTD
+| 1 USD = {{汇率|TTD|USD}} TTD
+| [[:en:Trinidad and Tobago dollar]]
+|-
+| [[阿联酋迪拉姆]]
+| AED
+| 1 USD = {{汇率|AED|USD}} AED
+| [[:en:United Arab Emirates dirham]]
+|-
+| [[约旦第纳尔]]
+| JOD
+| 1 USD = {{汇率|JOD|USD}} JOD
+| [[:en:Jordanian dinar]]
+|-
+| [[黎巴嫩镑]]
+| LBP
+| 1 USD = {{汇率|LBP|USD}} LBP
+| [[:en:Lebanese pound]]
+|-
+| [[荷属安的列斯盾]]
+| ANG
+| 1 USD = {{汇率|ANG|USD}} ANG
+| [http://www.centralbank.an/monetary 发行方网站]
+|-
+| [[阿曼里亚尔]]
+| OMR
+| {{汇率|USD|OMR}} USD = 1 OMR
+| [[:en:Omani rial]]
+|-
+| [[卡塔尔里亚尔]]
+| QAR
+| 1 USD = {{汇率|QAR|USD}} QAR
+| [[:en:Qatari riyal]]
+|-
+| [[沙特里亚尔]]
+| SAR
+| 1 USD = {{汇率|SAR|USD}} SAR
+| [[:en:Saudi riyal]]
+|-
+| [[委内瑞拉玻利瓦尔]]
+| VEF
+| 1 USD = {{汇率|VEF|USD}} VEF
+| [https://www.cia.gov/library/publications/the-world-factbook/fields/2116.html#ve CIA Factbook]
+|-
+| [[开曼群岛元]]
+| KYD
+| {{汇率|USD|KYD}} USD = 1 KYD
+| [[:en:Cayman Islands dollar]]
+|-
+| [[百慕大元]]
+| BMD
+| 1 USD = {{汇率|BMD|USD}} BMD
+| [[:en:Bermudian dollar]]
+|-
+| [[古巴可兑换比索]]
+| CUC
+| 1 USD = {{汇率|CUC|USD}} CUC
+| [http://www.bc.gov.cu/English/exchange_rate.asp 发行方网站]
+|-
+| [[美元|美元 (同日)]]
+| USS
+| 1 USD = {{汇率|USS|USD}} USS
+|
+|-
+| [[美元|美元 (次日)]]
+| USN
+| 1 USD = {{汇率|USN|USD}} USN
+|
+|-
+! colspan="6" style="background: white;" | 挂靠[[欧元]]（EUR）
+|-
+| [[波斯尼亚和黑塞哥维那可兑换马克]]
+| BAM
+| 1 EUR = {{汇率|BAM|EUR}} BAM
+| [[:en:Bosnia and Herzegovina convertible mark]]
+|-
+| [[保加利亚列弗]]
+| BGN
+| 1 EUR = {{汇率|BGN|EUR}} BGN
+| [http://www.bnb.bg/Statistics/StExternalSector/StExchangeRates/StERFixed/index.htm?toLang=_EN 发行方网站]
+|-
+| [[立陶宛立特]]
+| LTL
+| 1 EUR = {{汇率|LTL|EUR}} LTL
+| [http://www.lb.lt/exchange/default.asp?lang=e 发行方网站]
+|-
+| [[拉脱维亚拉特]]
+| LVL
+| 1 EUR = {{汇率|LVL|EUR}} LVL
+| [[:en:Latvian lats]]
+|-
+| [[丹麦克朗]]
+| DKK
+| 1 EUR = {{汇率|DKK|EUR}} DKK
+| [[:en:Danish krone]]
+|-
+| [[佛得角埃斯库多]]
+| CVE
+| 1 EUR = {{汇率|CVE|EUR}} CVE
+| [[:en:Cape Verdean escudo]]
+|-
+| [[科摩罗法郎]]
+| KMF
+| 1 EUR = {{汇率|KMF|EUR}} KMF
+| [[:en:Comorian franc]]
+|-
+| [[中非法郎]]
+| XAF
+| 1 EUR = {{汇率|XAF|EUR}} XAF
+| [[:en:Central African CFA franc]]
+|-
+| [[西非法郎]]
+| XOF
+| 1 EUR = {{汇率|XOF|EUR}} XOF
+| [[:en:West African CFA franc]]
+|-
+| [[太平洋法郎]]
+| XPF
+| 1 EUR = {{汇率|XPF|EUR}} XPF
+| [http://www.ieom.fr/convertisseur/convertisseur_Euro_Xpf_popup.html 发行方网站]
+|-
+! colspan="6" style="background: white;" | 挂靠[[英镑]]（GBP） 
+|-
+| [[福克兰群岛镑]]
+| FKP
+| 1 GBP = {{汇率|FKP|GBP}} FKP
+| [[:en:Falkland Islands pound]]
+|-
+| [[曼島鎊]]
+| (IMP)
+| 1 GBP = {{汇率|IMP|GBP}} IMP
+| [[:en:Manx pound]]
+|-
+| [[根西島鎊]]
+| (GGP)
+| 1 GBP = {{汇率|GGP|GBP}} GGP
+| [[:en:Guernsey pound]]
+|-
+| [[直布罗陀镑]]
+| GIP
+| 1 GBP = {{汇率|GIP|GBP}} GIP
+| [[:en:Gibraltar pound]]
+|-
+| [[泽西岛镑]]
+| (JEP)
+| 1 GBP = {{汇率|JEP|GBP}} JEP
+| [[:en:Jersey pound]]
+|-
+| [[圣赫勒拿镑]]
+| SHP
+| 1 GBP = {{汇率|SHP|GBP}} SHP
+| [[:en:Saint Helena pound]]
+|-
+! colspan="6" style="background: white;" | 挂靠[[南非兰特]]（ZAR） 
+|-
+| [[莱索托罗提]]
+| LSL
+| 1 ZAR = {{汇率|LSL|ZAR}} LSL
+| [[:en:Lesotho loti]]
+|-
+| [[纳米比亚元]]
+| NAD
+| 1 ZAR = {{汇率|NAD|ZAR}} NAD
+| [[:en:Namibian dollar]]
+|-
+| [[斯威士兰里兰吉尼]]
+| SZL
+| 1 ZAR = {{汇率|SZL|ZAR}} SZL
+| [[:en:Swazi lilangeni]]
+|-
+! colspan="6" style="background: white;" | 挂靠[[印度卢比]]（INR） 
+|-
+| [[不丹努尔特鲁姆]]
+| BTN
+| 1 INR = {{汇率|BTN|INR}} BTN
+| [[:en:Bhutanese ngultrum]]
+|-
+| [[尼泊尔卢比]]
+| NPR
+| 1 INR = {{汇率|NPR|INR}} NPR
+| [http://www.nrb.org.np/fxmexchangerate1.php?YY=&&MM=&&DD= Сайт эмитента]
+|-
+! colspan="6" style="background: white;" | 挂靠其他货币
+|-
+| [[南苏丹镑]]
+| SSP
+| 1 [[苏丹镑|SDG]] = {{汇率|SSP|SDG}} SSP
+| 挂靠[[苏丹镑]]（SDG）
+|-
+| [[文莱元]]
+| BND
+| 1 [[新加坡元|SGD]] = {{汇率|BND|SGD}} BND
+| 挂靠[[新加坡元]]（SGD）[http://ambd.gov.bn/index.php/component/content/article/19-publication/97-autoriti-monetari-brunei-darussalam-policy-statement- 发行方网站]
+|-
+| [[澳門幣]]
+| MOP
+| 1 [[港元|HKD]] = {{汇率|MOP|HKD}} MOP
+| 挂靠[[港元]]（HKD）[http://www.amcm.gov.mo/currency/Currency.htm 发行方网站]
+|-
+| [[非洲开发银行|非洲开发银行账户单位]]
+| XUA
+| 1 [[特别提款权|XDR]] = {{汇率|XUA|XDR}} XUA
+| 挂靠[[国际货币基金组织]][[特别提款权]]，[http://www.afdb.org/fileadmin/uploads/afdb/Documents/Legal-Documents/Agreement%20Establishing%20the%20ADB%20final%202011.pdf 非洲开发银行组织章程]
+|-
+| [[图瓦卢元]]
+| (TVD)
+| 1 [[澳大利亚元|AUD]] = {{汇率|TVD|AUD}} TVD
+| 挂靠[[澳大利亚元]]（AUD）
+|}
+
+==== 相当于固定汇率的其他货币 ====
+{{Div col}}
+* [[圭亚那元|GYD]]: 1 USD = {{汇率|GYD|USD}} GYD
+* [[越南盾|VND]]: 1 USD = {{汇率|STD|USD}} VND
+* [[洪都拉斯伦皮拉|HNL]]: 1 USD = {{汇率|HNL|USD}} HNL
+* [[土库曼斯坦马纳特|TMT]]: 1 USD = {{汇率|TMT|USD}} TMT
+* [[圣多美和普林西比多布拉|STD]]: 1 USD = {{汇率|STD|USD}} STD
+* [[柬埔寨瑞尔|KHR]]: 1 USD = {{汇率|KHR|USD}} KHR
+* [[伊拉克第纳尔|IQD]]: 1 USD = {{汇率|IQD|USD}} IQD
+* [[牙买加元|JMD]]: 1 USD = {{汇率|JMD|USD}} JMD
+* [[老挝基普|LAK]]: 1 USD = {{汇率|LAK|USD}} LAK
+* [[马拉维克瓦查|MWK]]: 1 USD = {{汇率|MWK|USD}} MWK
+* [[苏里南元|SRD]]: 1 USD = {{汇率|SRD|USD}} SRD
+* [[尼加拉瓜科多巴|NIO]]: 1 USD = {{汇率|NIO|USD}} NIO
+* [[利比亚第纳尔|LYD]]: 1 XDR = {{汇率|LYD|XDR}} LYD
+* [[马其顿第纳尔|MKD]]: 1 EUR = {{汇率|MKD|EUR}} MKD
+{{Div col end}}
+
+== 参见 ==
+* {{tl|Exchange rate}}
+
+<includeonly>
+<!-- 本行下加入模板的分類 -->
+[[Category:经济模板|{{PAGENAME}}]]
+[[Category:钱币学工具模板|{{PAGENAME}}]]
+</includeonly>

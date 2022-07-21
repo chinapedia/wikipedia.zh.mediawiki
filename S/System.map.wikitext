@@ -1,0 +1,70 @@
+{{NoteTA
+|G1 = IT
+}}
+
+在[[Linux|Linux]]中，'''System.map'''檔案是被[[内核|内核]]所使用的[[符号表|符号表]]。 
+
+符號表是一個在符號名稱與它們的記憶體位置間的查詢表格。符號名稱可能是變數的名稱或是函數名稱。當要查詢符號名稱的位置或是特定位置的符號名稱時，就會需要System.map。對於[[内核错误|内核错误]]及[[Linux内核oops|内核oops]]的除錯特別有用。當<tt>CONFIG_KALLSYMS</tt>啟用時，核心會自行做位置到名稱的轉換，所以像是ksymoops這一類的工具並不是必要的<ref>{{cite web |url = http://kernelnewbies.org/FAQ/System.map |title = FAQ/System.map - Linux Kernel Newbies |publisher = Kernelnewbies.org |date = 2006-04-14 |accessdate = 2014-04-06 |archive-date = 2014-07-12 |archive-url = https://web.archive.org/web/20140712041131/http://kernelnewbies.org/FAQ/System.map |dead-url = no }}</ref>。
+
+== 內部 ==
+以下是<tt>System.map</tt>檔案的一部份內容：<ref>{{cite web |author = Peter Jay Salzman |url = http://rlworkman.net/system.map/ |title = The system.map File |publisher = Rlworkman.net |date = 2003-05-28 |accessdate = 2014-04-06 |archive-date = 2014-04-06 |archive-url = https://archive.is/20140406014203/http://rlworkman.net/system.map/ |dead-url = no }}</ref>
+
+<blockquote>
+{{mono|
+ c041bc90 b packet_sklist<br />
+ c041bc94 b packet_sklist_lock<br />
+ c041bc94 b packet_socks_nr<br />
+ c041bc98 A __bss_stop<br />
+ c041bc98 A _end<br />
+ c041c000 A pg0<br />
+ ffffe400 A __kernel_vsyscall<br />
+ ffffe410 A SYSENTER_RETURN<br />
+ ffffe420 A __kernel_sigreturn<br />
+ ffffe440 A __kernel_rt_sigreturn
+}}
+</blockquote>
+
+因為位置在每次構建時都會變動，所以核心每一次新的構建都會產生新的<tt>System.map</tt><ref>{{cite web |url=http://www.faqs.org/docs/Linux-HOWTO/Kernel-HOWTO.html#systemmap |title=Kernel-HOWTO |publisher=faqs.org |date= |accessdate=2014-04-06 |archive-date=2014-04-06 |archive-url=https://web.archive.org/web/20140406170711/http://www.faqs.org/docs/Linux-HOWTO/Kernel-HOWTO.html#systemmap |dead-url=no }}</ref>。
+
+=== 符號類型 ===
+在位置及符號中間的字符（以空格分開）是符號的''類型''。[[UNIX操作系统|UNIX操作系统]]上的<tt>[[nm_(Unix)|nm]]</tt>工具程式列出了所有目標檔案的符號。而<tt>System.map</tt>則是直接與其相關，因為這個檔案是在整個核心程式上由<tt>nm</tt>所產生的 － 就像<tt>nm</tt>列出任意小的目標程式的符號及它們的類型<ref name="nm-man">{{cite web |url=http://linux.die.net/man/1/nm |title=nm(1): symbols from object files - Linux man page |publisher=Linux.die.net |date= |accessdate=2014-04-06 |archive-date=2014-04-02 |archive-url=https://web.archive.org/web/20140402003409/http://linux.die.net/man/1/nm |dead-url=no }}</ref>。
+
+這些類型的一部份：<ref name="nm-man" />
+
+{{Div col||30em}}
+* <tt>A</tt> 絕對的
+* <tt>B</tt> 或 <tt>b</tt> 未初始化的資料段（稱為BSS）
+* <tt>D</tt> 或 <tt>d</tt> 已初始化的資料段
+* <tt>G</tt> 或 <tt>g</tt> 小目標的已初始化資料段（全域）
+* <tt>i</tt> 特定的DLL段
+* <tt>N</tt> 除錯符號
+* <tt>p</tt> 堆疊展開段
+* <tt>R</tt> 或 <tt>r</tt> 唯讀資料段
+* <tt>S</tt> 或 <tt>s</tt> 小目標的未初始化資料段
+* <tt>T</tt> 或 <tt>t</tt> 文字（代碼）段
+* <tt>U</tt> 未定義
+* <tt>V</tt> 或 <tt>v</tt> 弱目標
+* <tt>W</tt> 或 <tt>w</tt> 尚未被標記的弱目標
+* <tt>-</tt> a.out目標檔案的符號戳
+* <tt>?</tt> 「符號類型未知」
+{{Div col end}}
+
+== 檔案系統位置 ==
+在[[Linux内核|Linux内核]]構建完成後，<tt>System.map</tt>可能位於原始目錄的根。然而，另外一些軟體可能會希望這個檔案位於其他地方：<ref>{{cite web |url = http://linuxmafia.com/faq/Kernel/systemmap.html |title = Peter's Notes: System.map |publisher = Linuxmafia.com |date = 2003-05-29 |accessdate = 2014-04-06 |archive-date = 2015-07-31 |archive-url = https://web.archive.org/web/20150731222641/http://linuxmafia.com/faq/Kernel/systemmap.html |dead-url = no }}</ref>
+
+* 像是 <tt>[[System.map/boot/|System.map//boot/]]System.map-$([[uname|uname]] -r)</tt>
+* 在構建[[SVGALib|SVGALib]]時預期會找到<tt>/lib/modules/$(uname -r)/build/System.map</tt>
+
+== 参考文献 ==
+{{Reflist}}
+
+== 參見 ==
+* [[Linux内核oops|内核oops]]
+* [[内核错误|内核错误]]
+
+{{-}}
+{{Linux}}
+{{Linux内核}}
+ 
+[[Category:可执行文件格式|Category:可执行文件格式]]
+[[Category:Linux內核|Category:Linux內核]]

@@ -1,0 +1,73 @@
+{{Documentation subpage}}
+{{Intricate template}}
+[[File:BadSalzdetfurthBadenburgerStr060529.jpg|right|80px]]
+<!-- PLEASE ADD CATEGORIES WHERE INDICATED AT THE BOTTOM OF THIS PAGE -->
+
+{{tl|Start-date}}, {{tl|Birth-date}}, and {{tl|End-date}} (also used as {{tl|Death-date}})  are easy to read "plain text" date and time templates that emit [[microformat]] dates for events.  These templates are an alternative to the {{tl|Start date}}/{{tl|Birth date}} and {{tl|End date}}/{{tl|Death date}} templates that also emit microformats but require dates to be expressed in standard, unambiguous and international ISO  syntax.  "Fuzzy" dates and times are supported.  For events where the precise time, day or month is not known, the user may omit these details.  Time zones are assumed to be local to the event. If time zone information is specified, the otherwise optional timezone parameter must be set.  
+
+== Examples ==
+
+{| width="100%" xclass="toccolours" style="margin-top:.5em;border:1px solid #a0a0a0;background-color:#f8f8ff;" <!-- no class formatting other than article space -->
+|- style="text-align:left;" colspan=2
+|'''<span style="font-size:110%;">Start-date & End-date usage </span>''' ''(colors for emphasis only)'':
+|- style="text-align:left;line-height:1.4em;font-size:87%;"
+|style="white-space:normal;"|'''Sample below displays <span style="color:#038945;">{{start-date|7 December 1941}}</span>, and microformat date: '''''1941-12-07''<br />
+<code><nowiki>
+{{start-date|</nowiki><span style="color:#705000;">''<nowiki>7 December 1941</nowiki>''</span>}}</code><br />
+|- style="text-align:left;line-height:1.4em;font-size:87%;"
+|style="white-space:normal;"|'''Sample below demonstrating how days, timezones and hours, minutes and seconds can be shown. (Order often not important).  Displays <span style="color:#038945;">{{start-date| 5:43PM HST, December 7th, 1941|tz=y}}</span>, and microformat date (corrected for UTC): '''''1941-12-08T03:43Z''<br />
+<code><nowiki>
+{{start-date|</nowiki><span style="color:#705000;">''5:43PM [[夏威夷-阿留申時區|HST]], December 7th, 1941''|tz=y</span>}}</code><br />
+|- style="text-align:left;line-height:1.4em;font-size:87%;"
+|style="white-space:normal;"|'''Sample below demonstrates providing a location with local time to generate UTC value.  Displays <span style="color:#038945;">{{start-date| December 8, 1941 12:50PM Australia/Adelaide|tz=y}}</span>, and microformat date (corrected for UTC): '''''1941-12-08 T03:20Z''<br />
+<code><nowiki>{{start-date| </nowiki><span style="color:#705000;">'' December 8, 1941 12:50PM 澳洲/[[阿德萊德]]|tz=y''</span>}}</code><br />
+<!-- |- style="text-align:left;line-height:1.4em;font-size:87%;"
+|style="white-space:normal;"|'''Sample below demonstrating use of links with dates. Displays links to day of month and year pages. <span style="color:#038945;">{{start-date|December 7, 1941|December 7, 1941}}</span>, and microformat date: '''''1941-12-07''<br />
+<code><nowiki>
+{{start-date|</nowiki><span style="color:#705000;">''<nowiki>December 7, 1941</nowiki>'''''|'''''<nowiki>December 7, 1941</nowiki>''</span>}}</code><br /> commented out deprecated practice-->
+|- style="text-align:left;line-height:1.4em;font-size:87%;"
+|style="white-space:normal;"|'''Sample below demonstrating use of Julian calendar dates. Displays <span style="color:#038945;">{{start-date|9 June 1672|{{OldStyleDate|9 June|1672|30 May}} }}</span>, and microformat date: '''''1672-06-09''<br />
+<code><nowiki>
+{{start-date|</nowiki><span style="color:#705000;">''<nowiki>9 June 1672</nowiki>'''''|'''''<nowiki>{{OldStyleDate|9 June|1672|30 May}} </nowiki>''</span>}}</code><br />
+
+== Parameters ==
+
+;''parameter 1'': (required)  The date and time to display and to emit as a microformat date.  If year is absent, the current year is assumed.  If day is missing, the first of the month is assumed.  If hour, or minutes are missing, zero is assumed.  If time zone or location is missing, the local time of the event discussed in the article is assumed.  See timezone parameter if [[UTC]] time is desired.  Authors may specify place names ([[Template:Start-date/doc/timezones|see list]]) or time zones such as EDT, PST, HST and so on and these will be properly adjusted to [[協調世界時| UTC (Coordinated Universal Time)]]  for transfer to other applications via microformat encoding.  Gregorian calendar dates are required.  Display in Julian or Chinese calendar date is possible using parameter 2.
+<!--;''parameter 2'' (optional): If present, this wikitext is displayed rather than the date in parameter 1.  These might be links to day of month or year pages.  EG. December 7, 1941
+commenting out deprecated practice -->
+;ISO8601: (optional) if present, this ISO8601 date/time value is emitted instead of the value derived from parameter 1.  
+;BCE: (required for BCE dates) set to yes if the date is BC.
+;timezone
+;tz: (required if timezone information specified) Set to yes if the time is [[UTC]] or if the location, timezone, or timezone offset is specified.
+
+{{TemplateDataHeader}}
+<templatedata>{
+"description": "Date that an event or entity started or was created or born",
+"params": {
+"1": {"label": "date-time", "description": "date and time to display and to emit as a microformat date", "type": "string/line", "required": true},
+"2": {"label": "alternate text", "description": "if present, this wikitext is displayed instead", "inherits": "1", "type": "string", "deprecated": "true"},
+"ISO8601": {"label": "YYYY-MM-DD hh:mm:ss", "description": "if present, this ISO 8601 date/time value is emitted instead", "inherits": "1"},
+"before epoch?": {"label": "HH", "description": "boolean value, true if date is before epoch (i.e. BCE “before common era” or BC “before Christ)", "inherits": "ISO8601"},
+"timezone?": {"label": "MM", "description": "boolean value, true if timezone is specified somehow", "inherits": "ISO8601", "default": "", "aliases": ["tz"]}
+}}</templatedata>
+
+== Ambiguous times and dates ==
+
+For the years 99 BC to 99AD especially, microformats may not be emitted properly unless expressed in the form YYYY-MM-DD.  For users uninterested in microformats, it should be noted that this restriction has no known impacts other than microformat data which are currently invisible to users.  The user of course may express the display form in the second parameter however they would like.  Example: 1-2-3 is interpreted as February 3, 1 A.D, and emitted in that form via microformats when the user may have intended something else.  Other 3 digit years may be misinterpreted as well, so best practice is to use leading zeros to make a 4 digit year for this date range.  For example, February 274 will be interpreted as  February 27, 2004.  Instead, use "February 0274".  Background: There is a good rationale for the behavior of the system function which actually does the hard work of this template.  It is very unusual for people to mention such dates so long ago, so when we really mean this date, we must specify a 4 digit date.  Outside of this period with ambiguous years, users may use free text dates without this restriction.  Bot runs may make a conversion of non 4 digit years to 4 digits (with leading zeros) in order to refine Wikipedia's quality of microformat dates.  These changes will not affect display, but for those curious, this is the rationale for such bot manipulations. 
+
+== Time zones ==
+
+Most time zone abbreviations as well as a large number of place names are recognized. (See [[Template:Start-date/doc/timezones|recognized timezone values table]].)
+
+:<code><nowiki>{{start-date|December 7, 1941 8:43AM Pacific/Honolulu }}</nowiki></code> &rarr; '''{{start-date|December 7, 1941 8:43AM Pacific/Honolulu }}
+:<code><nowiki>{{start-date|December 8, 1941 12:30PM Asia/Manila }}</nowiki></code> &rarr; '''{{start-date|December 8, 1941 12:30PM Asia/Manila }}
+
+|}
+
+== 參見 ==
+{{出生、逝世及日期模板}}
+
+<includeonly>{{#ifeq:{{SUBPAGENAME}}|sandbox |
+| <!--在此線下面填上分類-->
+[[Category:日期計算模板]]
+}}</includeonly>

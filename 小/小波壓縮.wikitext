@@ -1,0 +1,167 @@
+{{NoteTA
+| G1=IT
+}}
+'''小波壓縮'''是一種[[資料壓縮|資料壓縮]]（data compression）的方式，主要的方式是利用離散小波轉換來處理。同時也能適用於[[图像壓縮|图像壓縮]]（image compression）、[[視訊壓縮|視訊壓縮]]（video compression）、[[音訊壓縮|音訊壓縮]]（audio compression）。較廣為人知的影像應用是[[JPEG_2000|JPEG 2000]]、[[DjVu|DjVu]]、[[ECW|ECW]]（Enhanced Compression Wavelet）；在視訊方面則有CineForm。這些方法都是為了將影像資料用更少的空間來儲存檔案，其中依據壓縮方式又可以分成'''失真'''和'''無失真'''。
+
+== 壓縮方法 ==
+以影像來說，是用二維離散的小波轉換做壓縮，以下就針對此方法做介紹。
+[[File:TFW1.png|none]]
+圖一是二維離散小波轉換的結構圖，輸入訊號<math>\mathit{x[m,n]}</math>，由結構圖順序可以得到
+:1.先沿n方向做離散小波轉換得
+::<math>\mathit{v_{1,L}[m,n]} = \sum_{k=0}^{K-1} x[m,2n-k]g[k]</math>
+::<math>\mathit{v_{1,H}[m,n]} = \sum_{k=0}^{K-1} x[m,2n-k]h[k]</math>
+:2.再沿m方向得
+::<math>\mathit{x_{1,L}[m,n]} = \sum_{k=0}^{K-1} v_{1,L}[2m-k,n]g[k]</math>
+::<math>\mathit{x_{1,H_{1}}[m,n]} = \sum_{k=0}^{K-1} v_{1,L}[2m-k,n]h[k]</math>
+::<math>\mathit{x_{1,H_{2}}[m,n]} = \sum_{k=0}^{K-1} v_{1,H}[2m-k,n]g[k]</math>
+::<math>\mathit{x_{1,H_{3}}[m,n]} = \sum_{k=0}^{K-1} v_{1,H}[2m-k,n]h[k]</math>
+
+上述過程即做完一階二維的離散小波轉換。圖二是將影像經過處理的結果，可以看出在高頻部分，左下角為水平方向的邊緣；右上方為垂直方向的邊緣；右下方為圖形的角落。而左上角為低頻，可繼續做小波轉換，分出更粗略、接近原影像的縮圖，來達到壓縮效果。
+[[File:TFW3.png|none]]
+
+== JPEG 2000 ==
+
+在小波壓縮上應用最廣的是在二維的影像處理，其中又以JPEG 2000為主。以下將針對JPEG 2000壓縮流程作介紹。
+[[File:TFW4.png|none]]
+圖三是JPEG 2000壓縮加密的流程圖，用以下步驟來說明：
+=== 向前小波轉換 ===
+在做離散小波轉換前，先將輸入影像分割成磚塊狀格子（tiling），如圖四
+[[File:TFW6.png|none]]
+將影像分成格子狀，這麼做可以增加想要凸顯部分的品質；此外，即使某些方格內的訊號在傳輸的過程中受到雜訊破壞，還是能還原到肉眼所分辨不出來的程度。再用二維離散小波轉換把格子分成許多頻率子帶（subband）組成。依離散小波轉換的方式又可分為'''可逆'''與'''不可逆'''。可逆離散小波轉換是'''Cohen-Daubechies-Feauveau（CDF）5/3小波'''，可分別應用於失真與無失真壓縮，如下表
+{|class="wikitable"
+!''k''
+!Analysis lowpass filter
+''<math>\mathit{h_{L}}(n)</math>''
+!Analysis highpass filter
+''<math>\mathit{h_{H}}(n)</math>''
+!'''Synthesis lowpass filter'''
+''<math>\mathit{g_{L}}(n)</math>''
+!'''Synthesis highpass filter'''
+''<math>\mathit{g_{H}}(n)</math>''
+|----
+| -2
+| -1/8
+| 0
+| 0
+| -1/8
+|----
+| -1
+| 2/8
+| -1/2
+| 1/2
+| -2/8
+|----
+| 0
+| 6/8
+| 1
+| 1
+| 6/8
+|----
+| 1
+| 2/8
+| -1/2
+| 1/2
+| -2/8
+|----
+| 2
+| -1/8
+| 0
+| 0
+| -1/8
+|----
+|}
+
+不可逆離散小波轉換是'''Cohen-Daubechies-Feauveau（CDF）9/7小波'''，只用於失真壓縮，如下表所示
+{|class="wikitable"
+!''k''
+!Analysis lowpass filter
+''<math>\mathit{h_{L}}(n)</math>''
+!Analysis highpass filter
+''<math>\mathit{h_{H}}(n)</math>''
+!'''Synthesis lowpass filter'''
+''<math>\mathit{g_{L}}(n)</math>''
+!'''Synthesis highpass filter'''
+''<math>\mathit{g_{H}}(n)</math>''
+|----
+| -4
+| 0.026748757411
+| 0
+| 0
+| 0.026748757411
+|----
+| -3
+| -0.016864118443
+| 0.091271763114
+| -0.091271763114
+| 0.016864118443
+|----
+| -2
+| -0.078223266529
+| -0.057543526229
+| -0.057543526229
+| -0.078223266529
+|----
+| -1
+| 0.266864118443
+| -0.591271763114
+| 0.591271763114
+| -0.266864118443
+|----
+| 0
+| 0.602949018236
+| 1.11508705
+| 1.11508705
+| 0.602949018236
+|----
+| 1
+| 0.266864118443
+| -0.591271763114
+| 0.591271763114
+| -0.266864118443
+|----
+| 2
+| -0.078223266529
+| -0.057543526229
+| -0.057543526229
+| -0.078223266529
+|----
+| 3
+| -0.016864118443
+| 0.091271763114
+| -0.091271763114
+| 0.016864118443
+|----
+| 4
+| 0.026748757411
+| 0
+| 0
+| 0.026748757411
+|----
+|}
+
+=== 量子化 ===
+
+量子化值會隨著不同子帶有所調整，每個子帶（以<math>\mathit{b}</math>表示）原本的量子化小波係數為<math>\mathit{a_{b}}(u,v)</math>，經過調整後為<math>\mathit{q_{b}}(u,v)</math>，定義如下
+:<math>\mathit{q_{b}}(u,v) = sign[\mathit{a_{b}}(u,v)] </math> <math>\left\lfloor \frac{a_{b}(u,v)}{\triangle_{b}}\right\rfloor </math>
+其中<math>\triangle_{b}</math>為量化步階，且<math>\triangle_{b} = 2^{\mathit{R_{b}} - \mathit{\varepsilon_{b}}}\left(1+\frac{\mu_{b}}{2^{11}} \right)</math> 
+<math>\mathit{R_{b}}</math>代表子帶<math>\mathit{b}</math>標稱動態範圍（nominal  dynamic range），游子袋中的最大值決定
+<math>\mathit{\varepsilon_{b}}</math>和<math>\mu_{b}</math>用來調整量化強度
+:另外，在無失真壓縮，當<math>\mu_{b} = 0</math>且<math>\mathit{R_{b}} = \varepsilon_{b}</math>，量化步階<math>\triangle_{b} = 1</math>
+對失真壓縮而言，<math>0\le\varepsilon_{b}<2^5</math>且<math>0\le\mu_{b}<2^{11}</math>，量化步階<math>\triangle_{b}>1</math>
+
+=== Tier編碼器 ===
+
+tier編碼器將量子化後的資料分成相關的位元及不相關的位元，變成有連貫性的訊息後再經過算術編碼，最後以封包的形式傳送。
+
+=== 效率控制 ===
+
+效率控制將傳輸影像位元速率（bit rate）最佳化達到最小失真，使影像達到最佳品質。
+
+== 參考 ==
+* Jian-Jiun Ding, Time frequency analysis and wavelet transform class note, the Department of Electrical Engineering, National Taiwan University (NTU), Taipei, Taiwan, 2009.[http://djj.ee.ntu.edu.tw/TFW.htm http://djj.ee.ntu.edu.tw/TFW.htm] {{Wayback|url=http://djj.ee.ntu.edu.tw/TFW.htm |date=20170101160000 }}
+* Wei-Yi Wei, “Image Coding by Adaptive Golomb Codes and the information of Adjacent Block,” Graduate Institute of Communication Engineering, College of Electrical Engineering and Computer Science, National Taiwan University, Master Thesis, June 2010.
+* Rafael C. Gonzalez, Richard E. Woods, "Digital Image Processing", 2nd 2002, ISBN 0-20-118075-8
+* N. C. Shen, “Sectioned Convolution for Discrete Wavelet Transform”, Graduate Institute of Communication Engineering, National Taiwan University, 2008.
+
+[[Category:数据压缩|Category:数据压缩]]
+[[Category:小波分析|Category:小波分析]]

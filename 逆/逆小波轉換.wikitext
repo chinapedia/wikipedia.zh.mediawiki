@@ -1,0 +1,101 @@
+{{refimprove|time=2015-01-23T18:58:40+00:00}}
+'''逆小波轉換'''(inverse wavelet transform)為[[小波分析|小波轉換]]的反函數，小波轉換大致分為三類
+# [[連續小波轉換|連續小波轉換]]
+# 離散變數連續小波轉換
+# [[離散小波變換|離散小波轉換]]
+分別介紹此三種的反函數
+==連續小波轉換反函數==
+已知
+
+<math>X_w(a,b)=\frac{1}{\sqrt{|(b)|}} \int_{-\infty}^{\infty} x(t)\psi(\frac{t-a}{b})\, dt</math>
+
+則逆轉換為
+
+<math>x(t)=\frac{1} C_{\psi}\int_{0}^{\infty}\int_{-\infty}^{\infty} \frac{1}{b^{5/2}}X_w(a,b) \psi(\frac{t-a}{b})\, dadb</math>
+
+其中
+
+<math>C_{\psi}=\int_{0}^{\infty}\frac{|\boldsymbol\psi(f)|^2}{|f|} df<\infty</math>
+
+證明:
+
+由於<math>X_w(a,b)=x(t)*\frac{1}\sqrt[]{b}\psi(\frac{-t}{b})</math>
+
+假設<math>y(t)=\frac{1} C_{\psi}\int_{0}^{\infty}\int_{-\infty}^{\infty} \frac{1}{b^{5/2}}X_w(a,b) \psi(\frac{t-a}{b})\, dadb</math>
+
+則<math>y(t)=\frac{1} C_{\psi}\int_{0}^{\infty}x(t)*\psi(\frac{-t}{b})*\psi(\frac{t}{b})\frac{db}{b^3}</math>
+
+經過傅立葉轉換，原本的[[卷积|摺積]]性質變為相乘
+
+<math>Y(f)=\frac{1} C_{\psi}\int_{0}^{\infty}X(f)\boldsymbol\psi(-bf)\boldsymbol\psi(bf)\frac{db}{b}</math>
+
+如果母小波為實函數，則其傅立葉轉換有以下性質
+
+<math>\boldsymbol\psi(-f)=\boldsymbol\psi^*(f),\boldsymbol\psi(-bf)\boldsymbol\psi(bf)=\boldsymbol\psi^*(f)\boldsymbol\psi(bf)=|\boldsymbol\psi(bf)|^2</math>
+
+<math>Y(f)=X(f)\frac{1} C_{\psi}\int_{0}^{\infty}|\boldsymbol\psi(bf)|^2\frac{db}{b}</math>
+
+<math>    =X(f)\frac{1} C_{\psi}\int_{0}^{\infty}|\boldsymbol\psi(f_1)|^2\frac{df_1}{bf}</math>(使用變數代換<math>f_1=bf</math>)
+
+<math>    =X(f)\frac{1} C_{\psi}\int_{0}^{\infty}|\boldsymbol\psi(f_1)|^2\frac{df_1}{bf_1}</math>
+
+<math>    =X(f)</math>
+
+得證<math>y(t)=x(t)</math>
+
+==離散變數連續小波轉換反函數==
+
+<math>x(t)=\sum_{m=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} 2^{m/2} \psi_1(2^m-n) X_w(n,m) </math>
+
+<math>\psi_1(t)</math>為<math>\psi(t)</math>的雙效函數(dual function)，滿足以下[[正交|正交]](orthogonal)特性
+
+<math>\sum_{m=-\infty}^{\infty} \sum_{n=-\infty}^{\infty} 2^m \psi_1(2^m-n)\psi(2^m t_1-n) = \delta(t-t_1) </math>
+
+或是
+
+<math>\int_{-\infty}^{\infty} 2^m \psi_1(2^{m_1}t-n_1)\psi(2^mt-n)\,dt = \delta(m-m_1)\delta(n-n_1)</math>
+
+通常會設計成<math>\psi_1(t)=\psi(t)</math>
+
+因此離散變數連續小波轉換能進行逆轉換的條件為:
+
+<math>\int_{-\infty}^{\infty} 2^m \psi(2^{m_1}t-n_1)\psi(2^mt-n)\,dt = \delta(m-m_1)\delta(n-n_1)</math>
+
+==離散小波轉換反函數==
+在這裡解釋的是如何重建(reconstruction)一個經過離散小波轉換的函數
+
+以進行一階離散小波轉換，升降頻倍率為2為例，可以得到右圖的架構
+[[File:DWT.png|thumb]]
+
+<math>g_1[n],h_1[n]</math>需要滿足一些條件才能使<math>x[n]=x_0[n]</math>
+
+將此流程進行[[Z轉換|Z轉換]]及化簡可得到:
+
+<math>X_0(z)=\frac{1}{2}[G(z)G_1(z)+H(z)H_1(z)]X(z)+\frac{1}{2}[G(-z)G_1(z)+H(-z)H_1(z)]X(-z)</math>
+
+因此為了得到<math>X_0(z)=X(z)</math>，須滿足以下二條件
+# <math>G(z)G_1(z)+H(z)H_1(z)=2</math>
+# <math>G(-z)G_1(z)+H(-z)H_1(z)=0</math>
+
+可轉換為
+<math>\begin{bmatrix}G(z) & H(z)  \\G(-z) & H(-z) \end{bmatrix}\begin{bmatrix}G_1(z)\\H_1(z) \end{bmatrix}=\begin{bmatrix}2\\0 \end{bmatrix}</math>
+
+化簡得到<math>\begin{bmatrix}G_1(z)\\H_1(z) \end{bmatrix}=\frac{2}{det(H_m(z))}\begin{bmatrix}H(-z)\\-G(-z) \end{bmatrix}</math>
+其中<math>det(H_m(z))=G(z)H(-z)-H(z)G(-z)</math>
+
+要滿足上式須滿足以下四個條件，此四條件及上式的關係為若且唯若
+
+#<math>\sum_{p}g[p]g_1[2n-p]=\delta[n]</math>
+#<math>\sum_{p}h[p]h_1[2n-p]=\delta[n]</math>
+#<math>\sum_{p}g[p]h_1[2n-p]=0</math>
+#<math>\sum_{p}g_1[p]h[2n-p]=0</math>
+
+證明於參考條目中
+因此只要<math>g_1[n],h_1[n]</math>符合上述條件就能將經過離散小波轉換的<math>x_{1,L}[n],x_{1,H}[n]</math>重建為x[n]
+==相關條目==
+*[[數值分析|數值分析]]
+*[[訊號處理|訊號處理]]
+==參考==
+# [http://djj.ee.ntu.edu.tw/TFW.htm Jian-Jiun Ding (2014) Time-Frequency Analysis and Wavelet Transform] {{Wayback|url=http://djj.ee.ntu.edu.tw/TFW.htm |date=20170101160000 }}
+
+[[Category:小波分析|Category:小波分析]]

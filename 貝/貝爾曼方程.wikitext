@@ -1,0 +1,86 @@
+{{multiple issues|
+{{Request_translation|time=2013-09-08T02:30:21+00:00}}
+{{expand|time=2013-09-08T02:30:21+00:00}}
+
+}}
+「'''貝爾曼方程（Bellman Equation）'''」也被稱作「'''動態規劃方程（Dynamic Programming Equation）'''」，由[[理查德·貝爾曼|理查·貝爾曼]]（Richard Bellman）發現。貝爾曼方程是[[動態規劃|動態規劃]]（Dynamic Programming）這種數學最佳化方法能夠達到[[最佳化|最佳化]]的[[必要條件|必要條件]]。此方程將「決策問題在特定時間點的值」以「來自初始選擇的報酬 及 由初始選擇衍生的決策問題的值」的形式表示。藉這個方式將動態最佳化問題變成較簡單的子問題，而這些子問題遵守由貝爾曼所提出的「最佳化原理」。
+
+貝爾曼方程最早應用在工程領域的[[控制理論|控制理論]]及其他應用數學領域，而後成為[[經濟學|經濟學]]上的重要工具。
+
+幾乎所有可以用[[最優控制|最佳控制理論]]（Optimal Control Theory）解決的問題也可以透過分析合適的貝爾曼方程得到解決。然而，「貝爾曼方程」通常指離散時間（discrete-time）最佳化問題的動態規劃方程。處理連續時間（continuous-time）最佳化問題上，也有類似的偏微分方程，稱作[[漢彌爾頓-雅各比-貝爾曼方程|漢彌爾頓-雅各比-貝爾曼方程]]（Hamilton–Jacobi–Bellman Equation, HJB Equation）。
+
+== 動態規劃中的解析概念 ==
+想了解貝爾曼方程，要先了解許多相關概念。首先，任何最佳化問題都有目標：旅行時間最小化、成本最小化、利潤最大化、效用最大化等。用來描述目標的數學函數就稱為'''目標函數'''。
+
+動態規劃將多期規劃問題轉為不同時間點上較簡單的步驟，因此，它需要追蹤決策背景情況隨時間的變化。作正確決策所需要當前情況的資訊被稱作是「'''狀態（State）'''」（貝爾曼，1957，Ch. III.2）。<ref name=BellmanDP>Bellman, R.E. 1957. ''Dynamic Programming''. Princeton University Press, Princeton, NJ. Republished 2003: Dover, ISBN 0-486-42809-5.</ref><ref name=dreyfus>S. Dreyfus (2002), [http://www.wu-wien.ac.at/usr/h99c/h9951826/bellman_dynprog.pdf 'Richard Bellman on the birth of dynamic programming'] {{Wayback|url=http://www.wu-wien.ac.at/usr/h99c/h9951826/bellman_dynprog.pdf |date=20050110161049 }} ''Operations Research'' 50 (1), pp. 48–51.</ref>例如，為了決定每個時間要花多少錢，人們必須要知道他們初始財富的量，此例中財富就是一種「'''狀態變數（State Variables）'''」，或簡稱「'''狀態（State）'''」，當然也可能還有其他的種類。
+
+從任意時點上所挑選以操作的變數通常稱為「控制變數」（Control Variables），或簡稱「[[控制_(最佳控制理論|控制]]」（Control）（控制理論中描述輸入的變數）。例如給定現在所具有的財富（狀態），人們便可以用以決定當下的消費（控制變數）。挑選當下的控制變數可被視為挑選下個狀態，廣義而言，下個狀態受到當下控制變數及其他因子的影響。舉個簡單的例子：今天的財富（狀態）及消費（控制變數）會決定明天的財富（新的狀態），雖然通常也還有其他的因素可以影響明天的財富（例如獲得意外之財）。
+
+動態規劃方法中利用「找尋某種規則來求得各可能狀態下的（最佳）控制為何」來達成目標函數最佳化。例如：假設消費（c）只與財富（W）相關，想要找到一套規則<math>c(W)</math>來以財富描述消費。這些「將控制（Controls）表示成狀態（States）的函數」的規則被稱為'''策略函數（Policy Function）'''。<ref name=BellmanDP />
+
+從定義可知，最佳化目標函數的策略乃是所有可能的策略函數中，其對應到目標函數值最佳者。沿用上述的例子，若某人利用給定的財富來消費以最大化快樂的感覺（這裡假定「快樂的感覺」可以被數學函數描述，像是'''效用函數'''等），那麼各種初始的財富便會對應到一個可能的最大快樂，表示成<math>H(W)</math>。這個最大的可能目標函數值（快樂的感覺），即是'''價值函數（Value Function）'''。
+
+== 貝爾曼方程的推導 ==
+=== 动态决策问题 ===
+令 <math>t</math> 时刻的状态为 <math>x_t</math>。对于一个从时刻 0 开始的决策，令<math>x_0</math>为初始状态。在任意时刻，可能的行动集合都取决于当前状态。可以将其写作 <math> a_{t} \in \Gamma (x_t)</math>，其中，<math>a_t</math>代表了一个或者多个控制变量。还可以假定，当采取行动 <math>a</math>时，状态由<math>x</math>变为新状态 <math>T(x,a)</math>，当前收益为<math>F(x,a)</math>。最后假设一个由 <math>0<\beta<1</math>表示的impatience。
+
+在这些假设下，一个无限范围决策问题有以下形式：
+
+:<math> V(x_0) \; = \; \max_{ \left \{ a_{t} \right \}_{t=0}^{\infty} }  \sum_{t=0}^{\infty} \beta^t F(x_t,a_{t}), </math>
+
+服从以下约束：
+
+:<math> a_{t} \in \Gamma (x_t), \; x_{t+1}=T(x_t,a_t), \; \forall t = 0, 1, 2, \dots </math>
+
+注意已经使用了 <math>V(x_0)</math> 来表示可以通过最大化符合约束假设的目标函数得到的最优值。这个函数就是 ''价值函数''。由于最优值取决于初始状态，因此，它是初始状态变量 <math>x_0</math>的函数。
+
+=== 贝尔曼最优化原理 ===
+动态规划方法将决策问题分解为更小的子问题。贝尔曼最优化原理描述了如何做到这点：
+<blockquote>最优化原理：最优化策略有这样的性质，即无论初始状态和初始决策是什么，余下的决策必定构成一个与由初始决策导致的状态有关的最优化策略。 
+(See Bellman, 1957, Chap. III.3.)</blockquote>
+
+在计算机科学领域，一个可以如此分解的问题称作有{{le|最优子结构|Optimal substructure}}。在[[博弈论|博弈论]]中，这个原理与{{le|subgame perfect equilibrium|subgame perfect equilibrium}}的概念类似，尽管在这种情况下，构成最优策略的条件取决于决策者的对手从他们的立场选择类似的最优策略。
+
+正如最优化原理所说，会单独考虑初始决策，将所有将来决策暂放一边。收集右侧括号的将来决策，上述无限尺度决策问题等价于：{{Clarify|date=September 2017}}
+
+:<math> \max_{ a_0 } \left \{ F(x_0,a_0)
++ \beta  \left[ \max_{ \left \{ a_{t} \right \}_{t=1}^{\infty} }
+\sum_{t=1}^{\infty} \beta^{t-1} F(x_t,a_{t}):
+a_{t} \in \Gamma (x_t), \; x_{t+1}=T(x_t,a_t), \; \forall t \geq 1 \right] \right \}</math>
+
+服从以下约束：
+
+:<math> a_0 \in \Gamma (x_0), \; x_1=T(x_0,a_0). </math>
+
+此处选择 <math>a_0</math>, 已知选择会导致时刻1的状态成为 <math>x_1=T(x_0,a_0)</math>. 自时刻1起，该新状态会影响随后决策问题。整个未来的决策问题出现在右边的方括号内。{{Clarify|date=September 2017}}
+
+=== 貝爾曼方程 ===
+子问题和贝尔曼方程
+对于每个t = 0, . . . , T, 子问题对应的子方程: 已知 st = s,
+
+最大化 rt(st, at) + βrt+1(st+1, at+1)+ · · · + β^T −t−1*rT−1(sT−1, aT−1) + β^T−t*rT (sT )
+
+服从于: 对于 k = t, . . . , T − 1, ak ∈ Ak(sk)
+sk+1 − gk(sk, ak) = 0
+
+• 最优值函数, v∗t(s): 子问题（第t行）的最大值
+
+• 由此可得贝尔曼方程的公式: (未知数: v∗t(s))
+
+v∗t(s) = max 【a∈At(s)】 rt(s, a) + βv∗t+1(gt(s, a)), s ∈ S, t = 0, . . . , T − 1
+
+v∗T(s) = rT (s), s ∈ S
+
+=== 貝爾曼方程在隨機問題的應用 ===
+
+== 解法 ==
+== 經濟學上的應用 ==
+== 例子 ==
+
+== 參考資料 ==
+{{Reflist}}
+
+[[Category:數學最佳化|Category:數學最佳化]]
+[[Category:方程|Category:方程]]
+[[Category:动态规划|Category:动态规划]]
+[[Category:控制理论|Category:控制理论]]

@@ -1,0 +1,178 @@
+{{NoteTA
+|G1 = IT
+}}
+
+在[[計算機科學|計算機科學]]中，'''P-code機'''（{{lang-en|P-code machine}}）是一種被設計來執行P-code的[[虛擬機器|虛擬機器]]。P-code是一種被設計來運行在虛擬[[CPU|CPU]]上的[[匯編語言|匯編語言]]，即是我們現代所稱[[Bytecode|Bytecode]]的前身。P-code机这个词可用于形容所有这类机器（例如[[Java虚拟机|Java虚拟机]]和[[MATLAB|MATLAB]]预编译的代码），或者特指最有名的P-code机，來自於[[Pascal_(程式語言)|Pascal]]語言，特別是[[UCSD_Pascal|UCSD Pascal]]實作。
+
+虽然這個概念在1966左右年就已首次实现（于[[BCPL|BCPL]]的O-code与Euler语言的P - a code），<ref>{{cite book |title=EULER: a generalization of ALGOL, and its formal definition: Part II, Communications of the Association for Computing Machinery, Vol.9, No.2, pp.89-99 |url=http://dl.acm.org/citation.cfm?doid=365170.365202, |last1=Wirth |first1=N. |last2=Weber |first2=H. |publisher=ACM |location=New York |year=1966 }}{{Dead link|date=2020年3月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>但P-code这个词直到70年代初才首次出现。
+1973年Nori, Ammann, Jensen, Hageli和Jacobi编写的Pascal-P編譯器<ref>{{cite book 
+|title=The Pascal P Compiler Implementation Notes
+|last1=Nori |first1=K.V. |last2=Ammann| first2=U. |last3=Jensen |first3=K. |last4=Nageli |first4=H.
+|publisher=Eidgen. Tech. Hochschule |location=Zurich |year=1975 }}</ref>
+和1975年[[尼克劳斯·维尔特|尼克劳斯·维尔特]]写的Pascal-S編譯器是早期的两个生成P-code的[[编译器|编译器]]。
+
+P-code可以是一種與特定硬體平台無關的[[中間語言|中間碼]]，一種虛擬[[機器碼|機器碼]]。程式原始碼會先被轉換成P-code；轉換成P-code的程序，之後會由一個軟體來進行[[直譯器|直譯]]。這個軟體可以[[模擬器|模擬]]出一個假想的CPU來讀取p-code，之後將p-code轉換成實體機器碼來執行。但如果有足够的商业利益，可能可以實作做出该规格CPU的硬件实现（例如Pascal MicroEngine和Java处理器）。
+
+==UCSD p-Machine==
+
+===架构===
+如很多其他p-code机一样，UCSD p-Machine是一个[[堆疊結構機器|堆疊結構機器]]，这意味着大多数指令从堆栈中获取它们的操作数，并将结果放回堆栈上面。因此，“add”指令将堆栈最顶部的两个元素替换成它们的和。有几条指令就取一个参数。像Pascal一样，p-code是强类型语言，原生支持boolean (b), character (c), integer (i), real (r), set (s)和pointer (a)类型。
+
+一些简单的指令：
+
+ Insn.   Stack   Stack   Description
+         before  after
+  
+ adi      i1 i2   i1+i2   add two integers
+ adr      r1 r2   r1+r2   add two reals
+ dvi      i1 i2   i1/i2   integer division
+ inn      i1 s1   b1      set membership; b1 = whether i1 is a member of s1
+ ldci     i1      i1      load integer constant
+ mov      a1      a2      move
+ not      b1      ~b1     boolean negation
+
+===环境===
+与其他基于堆栈的环境（如[[Forth|Forth]]和[[Java虚拟机|Java虚拟机]]）不同的是，p-系统非常类似于真正的目标CPU，它只有一个堆栈供过程栈帧（提过[[返回地址|返回地址]]等）和局部指令参数共享。机器的其中三个[[寄存器|寄存器]]指向这个堆栈（向上增加）：
+
+* SP 指向堆栈顶部（[[堆栈指针|堆栈指针]]）。
+* MP 标记活动的栈帧的开始（[[标记指针|标记指针]])。
+* EP 指向当前过程的最高堆栈位置（[[极端指针|极端指针]]）。
+
+<!--Also present is a constant area, and, below that, the [[dynamic_memory_allocation|heap]] growing down towards the stack. The NP (the [[new_pointer|new pointer]]) register points to the top (lowest used address) of the heap. When EP gets greater than NP, the machine's memory is exhausted.
+-->
+第五个寄存器 PC 指向当前指令的代码区。
+
+===调用约定===
+栈帧是这样的：
+
+ EP ->
+       local stack
+ SP -> ...
+       locals
+       ...
+       parameters
+       ...
+       return address (previous PC)
+       previous EP
+       dynamic link (previous MP)
+       static link (MP of surrounding procedure)
+ MP -> function return value
+
+程序调用序列的工作方式如下：下面指令引入调用
+  mst n
+其中 ''n'' 指定嵌套级别的差异（记得Pascal支持过程嵌套）。这个指令会''标记''这个堆栈，即在上述栈帧中保留起始地5个格子，并初始化前面的 EP、动态链接和静态链接。<!--The caller then computes and pushes any parameters for the procedure, and then issues
+  cup n, p
+to call a user procedure (''n'' being the number of parameters, ''p'' the procedure's address). This will save the PC in the return address cell, and set the procedure's address as the new PC.
+
+User procedures begin with the two instructions
+  ent 1, i
+  ent 2, j
+The first sets SP to MP + ''i'', the second sets EP to SP + ''j''. So ''i'' essentially specifies the space reserved for locals (plus the number of parameters plus 5), and ''j'' gives the number of entries needed locally for the stack. Memory exhaustion is checked at this point.
+
+Returning to the caller is accomplished via
+  retC
+with ''C'' giving the return type (i, r, c, b, a as above, and p for no return value). The return value has to be stored in the appropriate cell previously. On all types except p, returning will leave this value on the stack.
+
+Instead of calling a user procedure (cup), standard procedure ''q'' can be called with
+  csp q
+These standard procedures are Pascal procedures like ''readln()'' ("csp rln"), ''sin()'' ("csp sin"), etc. Peculiarly ''eof()'' is a p-Code instruction instead.-->
+
+==范例机器==
+尼克劳斯·维尔特在他1976年出的书《算法+数据结构=程序》中详述了一个简单的P-code机。这个机器有3个寄存器——一个[[程序计数器|程序计数器]] p，一个[[调用栈|基寄存器]] b，和一个[[堆栈|栈顶寄存器]] t。一共有8个指令，其中一个（opr）有多种形式。
+
+这是机器的Pascal代码：
+
+<syntaxhighlight lang="pascal">
+const
+	levmax=3;
+	amax=2047; 
+type 
+	fct=(lit,opr,lod,sto,cal,int,jmp,jpc);
+	instruction=packed record 
+		f:fct;
+		l:0..levmax;
+		a:0..amax;
+	end;
+
+procedure interpret;
+
+  const stacksize = 500;
+
+  var
+    p, b, t: integer; {program-, base-, topstack-registers}
+    i: instruction; {instruction register}
+    s: array [1..stacksize] of integer; {datastore}
+
+  function base(l: integer): integer;
+    var b1: integer;
+  begin
+    b1 := b; {find base l levels down}
+    while l > 0 do begin
+      b1 := s[b1];
+      l := l - 1
+    end;
+    base := b1
+  end {base};
+
+begin
+  writeln(' start pl/0');
+  t := 0; b := 1; p := 0;
+  s[1] := 0; s[2] := 0; s[3] := 0;
+  repeat
+    i := code[p]; p := p + 1;
+    with i do
+      case f of
+        lit: begin t := t + 1; s[t] := a end;
+        opr: 
+          case a of {operator}
+            0: 
+              begin {return}
+                t := b - 1; p := s[t + 3]; b := s[t + 2];
+              end;
+            1: s[t] := -s[t];
+            2: begin t := t - 1; s[t] := s[t] + s[t + 1] end;
+            3: begin t := t - 1; s[t] := s[t] - s[t + 1] end;
+            4: begin t := t - 1; s[t] := s[t] * s[t + 1] end;
+            5: begin t := t - 1; s[t] := s[t] div s[t + 1] end;
+            6: s[t] := ord(odd(s[t]));
+            8: begin t := t - 1; s[t] := ord(s[t] = s[t + 1]) end;
+            9: begin t := t - 1; s[t] := ord(s[t] <> s[t + 1]) end;
+            10: begin t := t - 1; s[t] := ord(s[t] < s[t + 1]) end;
+            11: begin t := t - 1; s[t] := ord(s[t] >= s[t + 1]) end;
+            12: begin t := t - 1; s[t] := ord(s[t] > s[t + 1]) end;
+            13: begin t := t - 1; s[t] := ord(s[t] <= s[t + 1]) end;
+          end;
+        lod: begin t := t + 1; s[t] := s[base(l) + a] end;
+        sto: begin s[base(l)+a] := s[t]; writeln(s[t]); t := t - 1 end;
+        cal: 
+          begin {generate new block mark}
+            s[t + 1] := base(l); s[t + 2] := b; s[t + 3] := p;
+            b := t + 1; p := a
+          end;
+        int: t := t + a;
+        jmp: p := a;
+        jpc: begin if s[t] = 0 then p := a; t := t - 1 end
+      end {with, case}
+  until p = 1;
+  writeln(' end pl/0');
+end {interpret};
+</syntaxhighlight>
+
+这个机器是用来运行维尔特的[[PL/0|PL/0]]的，一个为教学开发的Pascal子集编译器。
+
+== 注释 ==
+{{reflist}}
+
+== 延伸阅读 ==
+* [[Steven_Pemberton|Steven Pemberton]] and Martin Daniels: [http://www.cwi.nl/~steven/pascal/book/ Pascal Implementation: The P4 Compiler and Interpreter]{{Wayback|url=http://www.cwi.nl/~steven/pascal/book/ |date=20170813152711 }}. ISBN 0-85312-358-6; ISBN 0-13-653031-1
+*[http://homepages.cwi.nl/~steven/pascal/ Steven Pemberton关于Pascal的网页]{{Wayback|url=http://homepages.cwi.nl/~steven/pascal/ |date=20150219202544 }}上有P4编译器和解释器的Pascal源代码、使用说明和[https://web.archive.org/web/20020228000352/http://www.cwi.nl/ftp/pascal/pcom.code4.Z 编译器的p-code] （自身生成的）。
+*[http://www.threedee.com/jcm/psystem/ The Jefferson Computer Museum's page on the UCSD p-System]{{Wayback|url=http://www.threedee.com/jcm/psystem/ |date=20150217045428 }}
+*[http://ucsd-psystem-vm.sourceforge.net/ 开源实现]{{Wayback|url=http://ucsd-psystem-vm.sourceforge.net/ |date=20140524054906 }}，包含打包和预编译的二进制文件；[http://www.klebsch.de Klebsch的实现版本]{{Wayback|url=http://www.klebsch.de/ |date=20200225210735 }}的一个友好的fork
+* ''Compiling with C# and Java'', Pat Terry, 2005, ISBN 0-321-26360-X, 624
+* ''[[Algorithms_+_Data_Structures_=_Programs|Algorithms + Data Structures = Programs]]'', Niklaus Wirth, 1975, ISBN 0-13-022418-9
+* ''Compiler Construction'', Niklaus Wirth, 1996, ISBN 0-201-40353-6
+* ''The Byte Book of Pascal'', Blaise W. Liffick, Editor, 1979, ISBN 0-07-037823-1
+* ''PASCAL - The Language and its Implementation'', Edited by D.W. Barron, 1981, ISBN 0-471-27835-1.  尤其参见文章''Pascal-P Implementation Notes''和''Pascal-S: A Subset and its Implementation''.
+
+[[Category:Pascal|Category:Pascal]]
+[[Category:编译器软件|Category:编译器软件]]

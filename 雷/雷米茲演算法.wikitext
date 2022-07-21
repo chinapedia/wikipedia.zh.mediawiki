@@ -1,0 +1,112 @@
+'''雷米茲演算法'''，或稱'''雷米茲交換演算法'''，由[[Evgeny_Yakovlevich_Remez|葉夫根尼·列維奇·雷米茲]]於1934年所發表。
+雷米茲演算法為一尋找函式簡易近似之迭代演算法，特別是定義於[[切比雪夫空間|切比雪夫空間]]的函式效果最佳。
+
+一個在切比雪夫空間的典型例子是 ''n'' 次項[[切比雪夫多项式|切比雪夫多项式]]的子空間，屬於實數連續函式之[[向量空間|向量空間]]，定義於 ''C''[''a'', ''b''] 區間。
+
+給定一子空間，其最佳近似多項式的定義為：可將此近似多項式與原始函式之最大絕對差異最小化者。
+在這個情況下，可由[[equioscillation_theorem|equioscillation theorem]]使其解更精確
+
+==程序==
+
+算法的主要目的是从一个集合<math>X</math>得到一个可以逼近函数<math>f</math>的多项式。集合<math>X</math>由近似的区间上的<math>n+2</math>个取样点<math>x_1, x_2, ...,x_{n+2}</math>组成，通常由[[Chebyshev多项式|Chebyshev多项式]]线性映射至该区间得到。算法步骤如下：
+# 解线性方程组
+:<math> b_0 + b_1 x_i+ ... +b_n x_i ^ n + (-1) ^ i E = f(x_i) </math> (其中 <math> i=1, 2, ... n+2 </math>),
+:未知数为 <math>b_0, b_1,...,b_n</math> 和 <math>E</math>。
+# 使用 <math> b_i </math> 作為多項式 <math>P_n</math> 的係數。
+# 找出<math>|P_n(x) - f(x)| </math>的局部极大误差点，组成集合<math>M</math>。
+# 若所有 <math>m \in M </math> 都是相同大小，仅正负号不同的话，则 <math>P_n</math> 为极小化极大逼近多项式。否则的话，使用<math>M</math>取代<math>X</math>并重复上述步骤。
+此结果称为极小化极大逼近算法的最佳逼近多项式。
+===初始化選擇===
+
+由於切比雪夫節點在多項式插值理論中所扮演的角色，故通常選擇其為初始近似的方法。由拉格朗日插值法 ''L''<sub>n</sub>(''f'') 初始化一函式 ''f'' 之最佳化問題，可以證明此初始近似之邊界限制為:
+
+:<math>\lVert f - L_n(f)\rVert_\infty \le (1 + \lVert L_n\rVert_\infty) \inf_{p \in P_n} \lVert f - p\rVert</math>
+
+其中節點 (''t''<sub>1</sub>, ..., ''t''<sub>''n'' + 1</sub>) 之拉格朗日插值法算子的常數為
+
+:<math>\lVert L_n\rVert_\infty = \overline{\Lambda}_n(T) = \max_{-1 \le x \le 1} \lambda_n(T; x),</math>
+
+''T'' 為切比雪夫多項式的零點，而
+
+:<math>\lambda_n(T; x) = \sum_{j = 1}^{n + 1} \left| l_j(x) \right|, \quad l_j(x) = \prod_{\stackrel{i = 1}{i \ne j}}^{n + 1} \frac{(x - t_i)}{(t_j - t_i)}.</math>
+
+對提供次最佳之切比雪夫節點來說，其漸近線為
+
+:<math>\overline{\Lambda}_n(T) = \frac{2}{\pi} \log(n + 1) + \frac{2}{\pi}\left(\gamma + \log\frac{8}{\pi}\right) + \alpha_{n + 1}</math>
+
+(''γ'' 為 [[欧拉-马歇罗尼常数|欧拉-马歇罗尼常数]])，
+
+:<math>0 < \alpha_n < \frac{\pi}{72 n^2}</math> for <math>n \ge 1,</math>
+
+而上界為
+
+:<math>\overline{\Lambda}_n(T) \le \frac{2}{\pi} \log(n + 1) + 1</math>
+
+Lev Brutman 計算出對 <math>n \ge 3</math> 的邊界，而 <math>\hat{T}</math> 為切比雪夫多項式之零點
+
+:<math>\overline{\Lambda}_n(\hat{T}) - \underline{\Lambda}_n(\hat{T}) < \overline{\Lambda}_3 - \frac{1}{6} \cot \frac{\pi}{8} + \frac{\pi}{64} \frac{1}{\sin^2(3\pi/16)} - \frac{2}{\pi}(\gamma - \log\pi)\approx 0.201.</math>
+
+Rüdiger Günttner由對 <math>n \ge 40</math> 之較粗略的估算計算出
+
+:<math>\overline{\Lambda}_n(\hat{T}) - \underline{\Lambda}_n(\hat{T}) < 0.0196.</math>
+
+==細節討論==
+在此將提供先前簡述步驟的詳細內容，在這個章節令指數 ''i'' 從 0 跑到 ''n''+1.
+
+'''步驟 1:''' 給定 <math>x_0, x_1, ... x_{n+1}</math>, 求 ''n''+2 條等式之線性系統之解
+:<math> b_0 + b_1 x_i+ ... +b_n x_i ^ n + (-1) ^ i E = f(x_i) </math> (其中 <math> i=0, 1, ... n+1 </math>),
+:對於未知的 <math>b_0, b_1, ...b_n</math> 和 ''E''.
+
+可以很清楚地觀察到，在這個式子裡 <math>(-1)^i E</math> 若要成立，只有在節點 <math>x_0, ...,x_{n+1}</math> 為 ''排序'' 的情況下才能達到，無論是嚴格遞增或遞減。這樣一來這個線性系統便有唯一解。(廣為人知的，並非每個線性系統都可以求解)。
+此外，求解之複雜度最少為 <math>O(n^2)</math> ，而一個從函式庫求解的標準計算器需要 <math>O(n^3)</math> 的複雜度，在此有一簡單證明:
+
+計算前''n''+1個節點之 <math>f(x)</math> 標準 ''n'' 階插值 <math>p_1(x)</math>，
+以及對於 <math>(-1)^i</math> 之標準 ''n'' 階插值 <math>p_2(x)</math> 
+
+:<math>p_1(x_i) = f(x_i), p_2(x_i) = (-1)^i, i = 0, ..., n.</math>
+
+至此，需要 <math>O(n^2)</math> 次數值運算。
+
+在 <math>x_{i-1}</math> 與 <math>x_i,\ i=1, ...,n</math> 之間，多項式 <math>p_2(x)</math> 有其 ''i''-階 零點zero between <math>x_{i-1}</math> and <math>x_i,\ i=1, ...,n</math>，因此在 <math>x_n</math> 與 <math>x_{n+1}</math>之間無任何零點，意即 <math>p_2(x_n)</math> 與 <math>p_2(x_{n+1})</math> 正負號 <math>(-1)^n</math> 相同。
+
+線性組合 <math>p(x) := p_1 (x) - p_2(x)\!\cdot\!E</math> 亦為一 ''n'' 次多項式
+:<math>p(x_i) = p_1(x_i) - p_2(x_i)\!\cdot\! E \ = \ f(x_i) - (-1)^i E,\ \ \ \  i =0, \ldots, n.</math>
+選擇任何 ''E'' ，對 <math>i = 0, ... ,n</math> ，下列式子與上述等式相同:
+:<math>p(x_{n+1}) \ = \ p_1(x_{n+1}) - p_2(x_{n+1})\!\cdot\!E \ = \ f(x_{n+1}) - (-1)^{n+1} E</math>
+解 ''E'' 得:
+:<math>E \ := \ \frac{p_1(x_{n+1}) - f(x_{n+1})}{p_2(x_{n+1}) + (-1)^n}.</math>
+如前述所提及，上式分母之兩項有相同正負號，因此
+:<math>p(x) \equiv b_0 + b_1x + \ldots + b_nx^n</math> 
+是完整定義的。
+
+給定 ''n''+2 階節點，其誤差為正負輪流:
+:<math>p(x_i) - f(x_i) \ = \ -(-1)^i E,\ \ i = 0, ... , n\!+\!1. </math>
+
+''de La Vallée Poussin'' 理論說明在這種形況下，沒有誤差少於 ''E'' 之 ''n'' 次多項式存在。
+
+'''步驟 2''' 把多項式表示由<math>b_0 + b_1x + ... + b_nx^n</math> 轉為 <math>p(x)</math>.
+
+'''步驟 3''' 依照以下所述改善輸入節點 <math>x_0, ..., x_{n+1}</math> 的誤差 <math>\pm E</math>。
+
+在每個 P-領域，現在的節點 <math>x_i</math> 將被區域最大 <math>\bar{x}_i</math> 取代，同樣在每個 N-領域， <math>x_i</math> 將被區域最小取代，
+在這部分並不要求高精確律。
+
+令 <math>z_i := p(\bar{x}_i) - f(\bar{x}_i)</math>， 其大小 <math>|z_i|</math> 皆大於或等於 ''E''。''de La Vallée Poussin'' 理論及其證明也可以應用至 <math>z_0, ... ,z_{n+1}</math>，
+而使此 ''n'' 次多項式有最小可能誤差的新下界為 <math>\min\{|z_i|\} \geq E</math>。
+
+
+'''步驟 4:''' 分別以 <math>\min\,\{|z_i|\}</math> 與 <math>\max\,\{|z_i|\}</math> 為新的上下界，此迭代演算法的終止條件為:
+重複上述步驟直到 <math>\max\{|z_i|\} - \min\{|z_i|\}</math> 足夠小且不再遞減。
+
+==變異==
+有時候在最大絕對差異點的附近，會有複數個點同時被取代。
+
+有時候相對誤差會被用來衡量函式與其近似的差異，特別是在電腦上用浮點數做運算的函式。
+
+==外部連結==
+*[https://web.archive.org/web/20140423185007/http://www.bores.com/courses/intro/filters/4_equi.htm Intro to DSP]
+*{{MathWorld|urlname=RemezAlgorithm|title=Remez Algorithm|author=Aarts, Ronald M.; Bond, Charles; Mendelsohn, Phil; and Weisstein, Eric W.}}
+
+[[Category:多項式|Category:多項式]]
+[[Category:逼近理论|Category:逼近理论]]
+[[Category:数值分析|Category:数值分析]]

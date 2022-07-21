@@ -1,0 +1,81 @@
+'''卡拉楚巴算法'''（{{lang-ru|Алгоритм Карацубы}}）是一种快速[[乘法算法|乘法算法]]，它由{{link-en|阿納托利·阿列克謝耶維奇·卡拉楚巴|Anatoly_Karatsuba}}于1960年提出并于1962年发表。<ref name="kara1962">
+  {{cite journal
+  | author = A. Karatsuba and Yu. Ofman
+  | title = Multiplication of Many-Digital Numbers by Automatic Computers
+  | journal = Proceedings of the USSR Academy of Sciences
+  | volume = 145
+  | year = 1962
+  | pages = 293–294}}
+</ref><ref name="kara1995">{{cite journal
+  | author = A. A. Karatsuba
+  | title = The Complexity of Computations
+  | journal = Proceedings of the Steklov Institute of Mathematics
+  | volume = 211
+  | pages = 169–183
+  | year = 1995
+  | url = http://www.ccas.ru/personal/karatsuba/divcen.pdf
+  | access-date = 2013-07-25
+  | archive-date = 2020-03-26
+  | archive-url = https://web.archive.org/web/20200326194847/http://www.ccas.ru/personal/karatsuba/divcen.pdf
+  | dead-url = no
+  }}</ref><ref name="knuthV2">Knuth D.E.（1969）''The art of computer programming. v.2.'' Addison-Wesley Publ.Co., 724 pp.</ref>它将两个<math>n</math>位数字相乘所需的一位数乘法次数减少到了至多<math>3 n^{\log_23}\approx 3 n^{1.585}</math>（如果<math>n</math>是2的乘方，则正好为<math>n^{\log_23}</math>）。因此它比要<math>n^2</math>次个位数乘法的[[乘法算法#長乘法|经典]]算法要快。例如，对于两个1024位的数相乘（<math>n = 1024 = 2^{10}</math>），卡拉楚巴算法需要<math>3^{10} = 59049</math>次个位数乘法，而经典算法需要<math>(2^{10})^2 = 1048576</math>次。[[圖姆-庫克算法|Toom–Cook算法]]是此算法更快速的泛型。对于充分大的<math>n (n \gg 1)</math>，[[Schönhage-Strassen演算法|Schönhage-Strassen演算法]]甚至更快，算法的时间复杂度为<math>O(n\log n\log \log n)</math>。
+
+值得一提的是，卡拉楚巴算法是第一个比小学二次乘法算法渐进快速的算法。
+
+==算法==
+===基本步骤===
+卡拉楚巴算法主要是用于两个大数的乘法，极大提高了运算效率，相较于普通乘法降低了复杂度，并在其中运用了递归的思想。基本的原理和做法是将位数很多的两个大数<math>x</math>和<math>y</math>分成位数较少的数，每个数都是原来<math>x</math>和<math>y</math>位数的一半。这样处理之后，简化为做三次乘法，并附带少量的加法操作和移位操作。
+
+==实现==
+===伪代码实现===
+<syntaxhighlight lang="pli">
+procedure karatsuba(num1, num2)
+  if (num1 < 10) or (num2 < 10)
+    return num1*num2
+  /* calculates the size of the numbers */
+  m = max(size_base10(num1), size_base10(num2))
+  m2 = m/2
+  /* split the digit sequences about the middle */
+  high1, low1 = split_at(num1, m2)
+  high2, low2 = split_at(num2, m2)
+  /* 3 calls made to numbers approximately half the size */
+  z0 = karatsuba(low1,low2)
+  z1 = karatsuba((low1+high1),(low2+high2))
+  z2 = karatsuba(high1,high2)
+  return (z2*10^(2*m2))+((z1-z2-z0)*10^(m2))+(z0)
+</syntaxhighlight>
+
+===Python代码实现===
+<syntaxhighlight lang="python">
+# Python 2 and 3
+def karatsuba(num1, num2):
+    num1Str, num2Str = str(num1), str(num2)
+
+    if num1Str[0] == '-': return -karatsuba(-num1, num2)
+    if num2Str[0] == '-': return -karatsuba(num1, -num2)
+
+    if num1 < 10 or num2 < 10: return num1 * num2
+    
+    maxLength = max(len(num1Str), len(num2Str))
+    num1Str = ''.join(list('0' * maxLength)[:-len(num1Str)] + list(num1Str))
+    num2Str = ''.join(list('0' * maxLength)[:-len(num2Str)] + list(num2Str))
+    
+    splitPosition = maxLength // 2
+    high1, low1 = int(num1Str[:-splitPosition]), int(num1Str[-splitPosition:])
+    high2, low2 = int(num2Str[:-splitPosition]), int(num2Str[-splitPosition:])
+    z0, z2 = karatsuba(low1, low2), karatsuba(high1, high2)
+    z1 = karatsuba((low1 + high1), (low2 + high2))
+    return z2 * 10 ** (2 * splitPosition) + (z1 - z2 - z0) * 10 ** (splitPosition) + z0
+</syntaxhighlight>
+
+==参考文献==
+{{Reflist}}
+* [http://www.cs.pitt.edu/~kirk/cs1501/animations/Karatsuba.html Karatsuba's Algorithm for Polynomial Multiplication]{{Wayback|url=http://www.cs.pitt.edu/~kirk/cs1501/animations/Karatsuba.html |date=20120911081709 }}
+*{{MathWorld|urlname=KaratsubaMultiplication|title=Karatsuba Multiplication}}
+* Bernstein, D. J., "[http://cr.yp.to/papers/m3.pdf Multidigit multiplication for mathematicians]{{Wayback|url=http://cr.yp.to/papers/m3.pdf |date=20060721035521 }}". Covers Karatsuba and many other multiplication algorithms.
+
+{{数论算法}}
+
+[[Category:计算机算术算法|Category:计算机算术算法]]
+[[Category:乘法|Category:乘法]]
+[[Category:带有伪代码示例的条目|Category:带有伪代码示例的条目]]

@@ -1,0 +1,121 @@
+{{noteTA|G1=IT
+|1=zh-cn:类; zh-tw:類別;
+}}
+{{cleanup-jargon|time=2014-05-16T16:06:42+00:00}}
+'''Java类加载器'''（{{lang-en|Java Classloader}}）是[[Java平臺#Java_執行環境|Java运行时环境]]（Java Runtime Environment）的一个部件，负责[[動態裝載|动态加载]][[Java类|Java类]]到[[Java虚拟机|Java虚拟机]]的内存空间中。<ref>{{cite web
+ | url=http://www.javaworld.com/javaworld/jw-10-1996/jw-10-indepth.html
+ | title=The basics of Java class loaders
+ | publisher=[[JavaWorld|JavaWorld]]
+ | first=Chuck
+ | last=Mcmanis
+ | date=1996-10-01
+ | accessdate=2008-01-26
+ | archive-url=https://web.archive.org/web/20080120124025/http://www.javaworld.com/javaworld/jw-10-1996/jw-10-indepth.html
+ | archive-date=2008-01-20
+ | dead-url=yes
+ }}</ref>类通常是[[惰性初始模式|按需加载]]，即第一次使用该类时才加载。由于有了类加载器，Java运行时系统不需要知道文件与文件系统。对学习类加载器而言，掌握Java的委派概念是很重要的。 
+
+每个Java类必须由某个类加载器装入到内存。<ref name="Christudas">{{cite web
+ | url=http://www.onjava.com/pub/a/onjava/2005/01/26/classloading.html
+ | title=Internals of Java Class Loading
+ | publisher=onjava.com
+ | first=Binildas
+ | last=Christudas
+ | date=2005-01-26
+ | accessdate=2009-10-02
+ | archive-date=2018-05-10
+ | archive-url=https://web.archive.org/web/20180510223447/http://www.onjava.com/pub/a/onjava/2005/01/26/classloading.html
+ | dead-url=no
+ }}</ref>Java程序可以通过类加载器来利用外部库（即由其他作者编写的软件库）。
+
+JVM中有3个默认的类加载器：<ref>{{cite web
+ | url=http://java.sun.com/docs/books/tutorial/ext/basics/load.html
+ | title=Understanding Extension Class Loading
+ | publisher=java.sun.com
+ | date=2008-02-14
+ | accessdate=2009-12-08
+ | archive-date=2009-08-03
+ | archive-url=https://web.archive.org/web/20090803155501/http://java.sun.com/docs/books/tutorial/ext/basics/load.html
+ | dead-url=no
+ }}</ref><ref>{{cite web
+ | url=http://www.ibm.com/developerworks/java/library/j-dyn0429/
+ | title=Classes and class loading
+ | publisher=ibm.com
+ | first=Dennis
+ | last=Sosnoski
+ | date=2003-04-29
+ | accessdate=2008-01-26
+ | archive-date=2021-01-08
+ | archive-url=https://web.archive.org/web/20210108162238/https://www.ibm.com/developerworks/java/library/j-dyn0429/
+ | dead-url=no
+ }}</ref>
+# 引导（Bootstrap）类加载器。由原生代码（如C语言）编写，不继承自<code>java.lang.ClassLoader</code>。负责加载核心Java库<ref>存储在[[Jar文件|Jar文件]]中，如''rt.jar'', ''core.jar'', ''server.jar''等。</ref>，存储在<code><JAVA_HOME>/jre/lib</code>目录中。
+# 扩展（Extensions）类加载器。用来在<code><JAVA_HOME>/jre/lib/ext</code>,<ref>{{Cite web |url=http://docs.oracle.com/javase/tutorial/ext/basics/load.html |title=存档副本 |accessdate=2014-05-14 |archive-date=2020-10-24 |archive-url=https://web.archive.org/web/20201024095450/https://docs.oracle.com/javase/tutorial/ext/basics/load.html |dead-url=no }}</ref>或<code>java.ext.dirs</code>中指明的目录中加载 Java的扩展库。Java 虚拟机的实现会提供一个扩展库目录。该类加载器在此目录里面查找并加载 Java 类。该类由<code>sun.misc.Launcher$ExtClassLoader</code>实现。
+# Apps类加载器（也称系统类加载器）。根据 Java应用程序的类路径（<code>java.class.path</code>或CLASSPATH环境变量）来加载 Java 类。一般来说，Java 应用的类都是由它来完成加载的。可以通过 ClassLoader.getSystemClassLoader()来获取它。该类由<code>sun.misc.Launcher$AppClassLoader</code>实现。
+
+每个类装载器通过组合的方式包含一个父装载器（parent class loader）。
+
+JDK 1.2之后引入“双亲委派”方式来实现类加载器的层次调用，以尽可能保证JDK的系统API不会被用户定义的类加载器所破坏，但一些使用场景会打破这个惯例来实现必要的功能。
+
+==自定义类加载器==
+开发可以通过继承<code>java.lang.ClassLoader</code>类的方式实现自己的类加载器，以满足一些特殊的需求而不需要完全了解Java虚拟机的类加载的细节。
+ 
+可用于：
+* 运行时装载或卸载类。这常用于：
+** 实现脚本语言
+** 用于[[JavaBean|bean]]生成器
+** 允许用户定义的{{tsl|en|extensibility|扩展性}}
+** 允许[[命名空间|命名空间]]之间的通信。这是[[CORBA|CORBA]] / [[Java_RMI|RMI]]协议的基础。 
+* 改变Java[[字节码|字节码]]的装入，例如：可用于Java类字节码的加密装入。<ref>{{cite web
+ | url=http://www.javaworld.com/javaworld/javaqa/2003-05/01-qa-0509-jcrypt.html?page=1
+ | title=Cracking Java byte-code encryption
+ | publisher=javaworld.com
+ | first=Vladimir
+ | last=Roubtsov
+ | date=2003-05-09
+ | accessdate=2008-01-26
+ | archive-url=https://web.archive.org/web/20080502141033/http://www.javaworld.com/javaworld/javaqa/2003-05/01-qa-0509-jcrypt.html?page=1
+ | archive-date=2008-05-02
+ | dead-url=yes
+ }}</ref>
+* 修改已装入的字节码（[[Aspect_weaver|weaving]] of aspects when using [[aspect-oriented_programming|aspect-oriented programming]]）。
+
+== JEE的类装载 ==
+
+[[Java_EE|Java EE]] （JEE）应用程序服务器典型地用树状的一组类装载器从已部署的WAR或EAR文档中装入类。这使得应用程序之间彼此隔离，但共享已部署模块。[[Java_Servlet|servlet container]]一般被实现为多个类装载器。<ref name="Christudas"/><ref>{{cite web
+ | url=http://www-128.ibm.com/developerworks/websphere/library/techarticles/0112_deboer/deboer.html
+ | title=J2EE Class Loading Demystified
+ | first1=Tim
+ | last1=deBoer
+ | first2=Gary
+ | last2=Karasiuk
+ | publisher=ibm.com
+ | date=2002-08-21
+ | accessdate=2008-01-26
+ | archive-date=2008-12-11
+ | archive-url=https://web.archive.org/web/20081211211619/http://www-128.ibm.com/developerworks/websphere/library/techarticles/0112_deboer/deboer.html
+ | dead-url=no
+ }}</ref>
+
+== {{anchor|jarhell}} JAR地狱 ==
+{{see also|DLL地獄}}
+和DLL地狱一样，一个组件的特定JAR也存在版本差异，不同版本间的JAR文件的Class文件存在差异（包括Class文件的编译版本、Class的成员结构、Class继承关系等）的话，也会在运行时触发各种因为类文件结果冲突而导致的错误警告。对于Servlet容器，还存在容器所需的JAR与应用内所需的JAR双线冲突的问题。
+
+不同于DLL地狱，Java开发者会使用一些项目管理程序（例如[[Apache_Maven|Apache Maven]]）来解决JAR版本之间的冲突，通过配置依赖关系文件，设定不同组件的JAR版本依赖关系，由项目管理程序自动加载相应合适的JAR，来控制JAR间 的版本关系。而对于Servlet容器，也会通过自己实现类加载器打破JDK的“双亲委派”方式来避免JAR加载冲突。
+
+==参考文献==
+{{reflist|2}}
+
+== 外部链接 ==
+* Chuck McManis, "[https://web.archive.org/web/20110713091503/http://www.javaworld.com/jw-10-1996/jw-10-indepth.html The basics of Java class loaders]", 1996
+* Brandon E. Taylor, "[http://www.developer.com/java/other/article.php/2248831 Java Class Loading: The Basics] {{Wayback|url=http://www.developer.com/java/other/article.php/2248831 |date=20201109091535 }}", 2003
+* Jeff Hanson, "[http://www.devx.com/Java/Article/31614 Take Control of Class Loading in Java] {{Wayback|url=http://www.devx.com/Java/Article/31614 |date=20201204030013 }}", 2006-06-01
+* Andreas Schaefer, "[http://www.onjava.com/pub/a/onjava/2003/11/12/classloader.html Inside Class Loaders] {{Wayback|url=http://www.onjava.com/pub/a/onjava/2003/11/12/classloader.html |date=20180506212821 }}", 2003-11-12
+* Sheng Liang and Gilad Bracha, "[http://citeseer.ist.psu.edu/liang98dynamic.html Dynamic class loading in the Java virtual machine]{{Wayback|url=http://citeseer.ist.psu.edu/liang98dynamic.html |date=20080419163943 }}", In Proceedings of the 13th ACM Conference on Object-Oriented Programming, Systems, Languages, and Applications (OOPSLA'98), ACM SIGPLAN Notices, vol. 33, no. 10, ACM Press, 1998, pp. 36–44
+<!-- dead link:
+* Jeremy Whitlock, "[http://dev2dev.bea.com/blog/jcscoobyrs/archive/2005/05/realworld_use_f.html Real-World Use For Custom ClassLoaders]", May 2005 -->
+* Dr. Christoph G. Jung, "[http://www.roseindia.net/javatutorials/hotdeploy.shtml Classloaders Revisited Hotdeploy] {{Wayback|url=http://www.roseindia.net/javatutorials/hotdeploy.shtml |date=20190613150512 }}", ''Java Specialist Newsletter'', 2001-06-07
+* Don Schwarz, "[http://www.onjava.com/pub/a/onjava/2005/04/13/dependencies.html?page=1 Managing Component Dependencies Using ClassLoaders] {{Wayback|url=http://www.onjava.com/pub/a/onjava/2005/04/13/dependencies.html?page=1 |date=20160303234901 }}", 2005-04-13
+
+
+[[Category:Java|Category:Java]]

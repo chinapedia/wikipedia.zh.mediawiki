@@ -1,0 +1,73 @@
+{{noteTA
+|G1=IT
+}}
+{{Infobox software
+|name = OpenNTPD
+|screenshot = [[File:OpenNTPD.jpg|295px]]
+|caption = "Saving the world again... on time"
+|developer = [[OpenBSD|OpenBSD]]计划
+|latest_release_version = 6.2p3
+|latest_release_date = 2017年10月30日
+|operating_system = 跨平台
+|genre = 时间同步
+|license = [[BSD许可证|BSD]]
+|website = {{URL|www.openntpd.org}}
+}}
+'''OpenNTPD'''是一个[[Unix|Unix]]系统[[网络时间协议|网络时间协议]]（NTP）实现的[[守护进程|守护进程]]，可以使计算机系统的本地时钟与远程NTP服务器同步。它也可以作为一个NTP兼容客户端的NTP服务器。
+
+OpenNTPD作为[[OpenBSD|OpenBSD]]计划的一部分，主要由[[亨宁·布劳尔|亨宁·布劳尔]]负责开发。其设计目标包括安全（不可被[[Exploit|利用]]）、易于配置、在大多数情况足够精确及可在[[BSD许可证|BSD许可证]]下分发[[源代码|源代码]]。如[[OpenSSH|OpenSSH]]，它另有一个单独的子项目来开发[[移植_(軟體)|可移植]]版本，其为OpenBSD的版本添加了兼容性代码，且与主项目分开发布新版本。可移植版由[[达伦·塔克|达伦·塔克]]开发。最新的可移植版发布于2006年。该项目的开发者得到了一些来自[[OpenBSD基金会|OpenBSD基金会]]的资助。
+
+== 历史 ==
+当时NTP守护进程的一系列问题促成了OpenNTPD的开发：难以配置，复杂、难以审计的代码，及不合适的许可<ref>{{cite web |url = http://www.openntpd.org/goals.html |title = OpenNTPD Goals |author = The OpenNTPD Project |date = 22 December 2004 |website = The OpenNTPD Projec |accessdate = 7 June 2014 |archive-date = 2014-10-12 |archive-url = https://web.archive.org/web/20141012184155/http://www.openntpd.org/goals.html |dead-url = no }}</ref>。OpenNTPD的目标就是要解决这些问题，扩大时间同步的用户数量。经过一段时间的开发，OpenBSD 3.6中第一次出现了OpenNTPD<ref>{{cite web |url = http://www.openbsd.org/36.html |title = OpenBSD 3.6 |author = The OpenBSD Project |date = 1 November 2004 |website = The OpenBSD Project |accessdate = 7 June 2014 |archive-date = 2014-05-16 |archive-url = https://web.archive.org/web/20140516064252/http://www.openbsd.org/36.html |dead-url = no }}</ref>。它的第一个版本于2004年11月2日发布<ref>{{cite mailing list |url = http://marc.info/?l=openbsd-announce&m=109941451516444 |title = OpenNTPD 3.6 released |last = Brauer |first = Henning |mailinglist = openbsd-announce |date = 2 November 2004 |website = MARC |accessdate = 7 June 2014 |archive-date = 2015-12-21 |archive-url = https://web.archive.org/web/20151221132802/http://marc.info/?l=openbsd-announce&m=109941451516444 |dead-url = no }}</ref>。
+
+== 目标 ==
+OpenBSD团队计划开发一个安全、易于安全审计、极简的设置和管理、占用较小内存的同时又能足够精确的NTP守护进程实现，这就是OpenNTPD。因此，OpenNTPD的设计目标是：安全、易用及性能<ref>{{cite web |url = http://www.openbsd.org/papers/ntpd_sucon04/mgp00003.html |title = Page 3: OpenNTPD – Design Goals |last1 = Brauer |first1 = Henning |date = September 2004 |website = The OpenBSD Project |accessdate = 16 September 2006 |archive-date = 2016-03-04 |archive-url = https://web.archive.org/web/20160304191017/http://www.openbsd.org/papers/ntpd_sucon04/mgp00003.html |dead-url = no }}</ref>。强力的网络输入路径有效性检查、由[[strlcpy|strlcpy]]保证的有界缓冲区操作、[[权限分离|权限分离]]以防止利用守护进程进行[[权限提升|权限提升]]，减小可能存在的安全漏洞的影响，这些都使得OpenNTPD更加安全。为了简化NTP的使用，较其它如网络时间协议项目所提供的NTP守护进程，OpenNTPD只实现了部分功能。只提供足够的功能的目标对典型的使用已经足够，但却可能无法满足奇怪或或特殊的需求。OpenNTPD通过''ntpd.conf''配置文件进行配置<ref>{{man|5|ntpd.conf|OpenBSD}}. 26 May 2006. Retrieved 16 September 2006.</ref>。其中提供的选项也是最小化的：OpenNTPD监听的IP地址或主机名，将要修改的时间设备，及用于同步时间的一组服务器。OpenNTPD尽力做到精确；守护进程会尽可能精确，但不对具体的精度做出保证。
+
+== 示例 ==
+OpenNTPD逐步调整系统时钟，如在[[64位|64位]][[Arch_Linux|Arch Linux]]系统上运行OpenNTPD输出示例所示：
+<pre>
+[root@nikolai karam]# more /var/log/daemon.log | grep ntp | grep adjusting | tail -20
+Aug  4 02:58:21 nikolai ntpd[4784]: adjusting local clock by -2.134620s
+Aug  4 03:02:38 nikolai ntpd[4784]: adjusting local clock by -1.983869s
+Aug  4 03:06:53 nikolai ntpd[4784]: adjusting local clock by -1.884521s
+Aug  4 03:08:28 nikolai ntpd[4784]: adjusting local clock by -1.819296s
+Aug  4 03:12:46 nikolai ntpd[4784]: adjusting local clock by -1.712934s
+Aug  4 03:15:48 nikolai ntpd[4784]: adjusting local clock by -1.607747s
+Aug  4 03:19:31 nikolai ntpd[4784]: adjusting local clock by -1.535188s
+Aug  4 03:21:05 nikolai ntpd[4784]: adjusting local clock by -1.439628s
+Aug  4 03:24:56 nikolai ntpd[4784]: adjusting local clock by -1.376086s
+Aug  4 03:29:12 nikolai ntpd[4784]: adjusting local clock by -1.271529s
+Aug  4 03:32:20 nikolai ntpd[4784]: adjusting local clock by -1.162333s
+Aug  4 03:36:08 nikolai ntpd[4784]: adjusting local clock by -1.023899s
+Aug  4 03:40:02 nikolai ntpd[4784]: adjusting local clock by -0.902637s
+Aug  4 03:43:43 nikolai ntpd[4784]: adjusting local clock by -0.789431s
+Aug  4 03:47:35 nikolai ntpd[4784]: adjusting local clock by -0.679320s
+Aug  4 03:50:45 nikolai ntpd[4784]: adjusting local clock by -0.605858s
+Aug  4 03:53:31 nikolai ntpd[4784]: adjusting local clock by -0.529821s
+Aug  4 03:56:33 nikolai ntpd[4784]: adjusting local clock by -0.429573s
+Aug  4 03:59:46 nikolai ntpd[4784]: adjusting local clock by -0.312575s
+Aug  4 04:03:14 nikolai ntpd[4784]: adjusting local clock by -0.232646s
+[root@nikolai karam]#
+</pre>
+
+== 批评 ==
+OpenNTPD被批评<ref>{{cite web |url = http://www.openbsd.org/faq/faq6.html#OpenNTPDaccurate |title = 6.12.1 – "But OpenNTPD isn't as accurate as the ntp.org daemon!" |author = The OpenBSD Project |date = 21 August 2006 |website = The OpenBSD Project |accessdate = 16 September 2006 |archive-date = 2014-06-23 |archive-url = https://web.archive.org/web/20140623171828/http://www.openbsd.org/faq/faq6.html#OpenNTPDaccurate |dead-url = no }}</ref>没有网络时间协议项目的NTP守护进程<ref>{{Cite web |url=http://www.ntp.org/ |title=网络时间协议项目官方网站 |accessdate=2014-06-07 |archive-date=2017-09-05 |archive-url=https://web.archive.org/web/20170905141741/http://pool.ntp.org/ |dead-url=yes }}</ref>精确。OpenNTPD项目也承认这种说法的合理性，但它声称这是在微秒精度和OpenNTPD提供的简便性及安全性之间做出的平衡。
+
+OpenNTPD也被批评违反了NTP协议，因为其在传输数据时省略掉了精确性信息：OpenNTPD服务器声明自己是无限精确的（早期版本在第1层声明；虽然前述问题已得到修复<ref name="advogato">{{cite web |url = http://www.advogato.org/person/dtucker/diary/52.html |title = Response to OpenNTPd Considered Harmful |last1 = Tucker |first1 = Darren |date = 12 December 2004 |website = Advogato: Blog for dtucker |accessdate = 7 June 2014 |archive-date = 2012-10-31 |archive-url = https://web.archive.org/web/20121031111036/http://advogato.org/person/dtucker/diary/52.html |dead-url = no }}</ref>，OpenNTPD 3.9p1仍然提供的是零误差时间<ref>{{cite web |url = https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=436995 |title = #436995 - Incorrect values for root delay and dispersion |date = 8 Mar 2012 |website = Debian Bug report logs |accessdate = 7 June 2014 |archive-date = 2019-02-17 |archive-url = https://web.archive.org/web/20190217114140/https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=436995 |dead-url = no }}</ref>）。
+
+在OpenNTPD3.6发布后不久，布拉德·诺尔斯发表了一篇题为《OpenNTPd是有害的》<ref>{{cite web |url = http://bradknowles.typepad.com/considered_harmful/2004/09/openntpd.html |archiveurl = https://web.archive.org/web/20050304032724/http://bradknowles.typepad.com/considered_harmful/2004/09/openntpd.html |archivedate = 2005年3月4日 |title = OpenNTPd Considered Harmful |last1 = Knowles |first1 = Brad |date = 22 September 2004 |website = Considered Harmful |accessdate = 16 September 2006 |deadurl = yes }}</ref>的文章，从各个方面批评了OpenNTPD，以及该项目及[[OpenSSH|OpenSSH]]和[[OpenBGPD|OpenBGPD]]所采用的[[拆分开发|拆分开发]]模式。作为回应，OpenNTPD可移植分支的主要开发者达伦·塔克写了一篇详细的文章<ref name="advogato" />，阐述了一些在OpenNTPD 3.6.1所解决的问题，并认为诺尔斯的一些言论“有误导之嫌”。诺尔斯的文章也使OpenBSD网络常见问题添加了一个章节<ref>{{cite web |url = http://www.openbsd.org/faq/faq6.html#OpenNTPDharmful |title = 6.12.2 - "Someone has claimed that OpenNTPD is 'harmful'!" |author = The OpenBSD Project |date = 21 August 2006 |website = The OpenBSD Project |accessdate = 16 September 2006 |archive-date = 2014-06-23 |archive-url = https://web.archive.org/web/20140623171828/http://www.openbsd.org/faq/faq6.html#OpenNTPDharmful |dead-url = no }}</ref>，解释和反驳其主张。
+
+== 参考 ==
+{{Reflist}}
+
+== 外部链接 ==
+{{Portal|自由软件}}
+* {{official website|http://www.openntpd.org/}}
+* [http://www.openbsd.org/papers/ntpd_sucon04/index.html 亨宁·布劳尔对OpenNTPD的解析]{{Wayback|url=http://www.openbsd.org/papers/ntpd_sucon04/index.html |date=20140307193928 }}
+* [http://www.openbsd.org/faq/faq6.html#OpenNTPD OpenNTPD相关的OpenBSD网络常见问题]{{Wayback|url=http://www.openbsd.org/faq/faq6.html#OpenNTPD |date=20140623171828 }}
+
+{{OpenBSD}}
+
+[[Category:网络时间相关软件|Category:网络时间相关软件]]
+[[Category:BSD软件|Category:BSD软件]]
+[[Category:OpenBSD|NTPD]]

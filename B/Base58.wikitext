@@ -1,0 +1,102 @@
+{{Refimprove|time=2014-01-26T15:48:50+00:00}} 
+'''Base58'''是用于[[比特幣|比特幣]]（Bitcoin）中使用的一种独特的编码方式，主要用于产生Bitcoin的[[钱包地址|钱包地址]]。相比[[Base64|Base64]]，Base58不使用数字"0"，字母大写"O"，字母大写"I"，和字母小写"l"，以及"+"和"/"符号。
+
+设计Base58主要的目的是：
+# 避免混淆。在某些字体下，数字0和字母大写O，以及字母大写I和字母小写l会非常相似。
+# 不使用"+"和"/"的原因是非字母或数字的字符串作为帐号较难被接受。
+# 没有[[标点符号|标点符号]]，通常不会被从中间分行。
+# 大部分的软件支持双击选择整个字符串。
+
+以下引用自其作者[[中本聰|中本聰]]（Satoshi Nakamoto）在base58.h中的注释：
+<syntaxhighlight lang=cpp>
+//
+// Why base-58 instead of standard base-64 encoding?
+// - Don't want 0OIl characters that look the same in some fonts and
+//      could be used to create visually identical looking account numbers.
+// - A string with non-alphanumeric characters is not as easily accepted as an account number.
+// - E-mail usually won't line-break if there's no punctuation to break at.
+// - Doubleclicking selects the whole number as one word if it's all alphanumeric.
+//
+</syntaxhighlight>
+
+== 编码 ==
+一個Base58"字元"可以表示的位元數為Log<sub>2</sub>58<math>\approx</math>5.858 bits</sub>。經過Base58編碼的數據為原始的數據長度的<math>\tfrac{8}{5.858}\approx1.37</math>倍，稍微多於Base64的1.33倍。
+
+編碼符號表：
+{| class="wikitable" style="text-align:center"
+|-
+!scope="col"| 编码 !!scope="col"| 字符
+|rowspan="18"|  
+!scope="col"| 编码 !!scope="col"| 字符
+|rowspan="18"|  
+!scope="col"| 编码 !!scope="col"| 字符
+|rowspan="18"|  
+!scope="col"| 编码 !!scope="col"| 字符
+|-
+|  0 || 1 || 16 || H || 32 || Z || 48 || q
+|-
+|  1 || 2 || 17 || J || 33 || a || 49 || r
+|-
+|  2 || 3 || 18 || K || 34 || b || 50 || s
+|-
+|  3 || 4 || 19 || L || 35 || c || 51 || t
+|-
+|  4 || 5 || 20 || M || 36 || d || 52 || u
+|-
+|  5 || 6 || 21 || N || 37 || e || 53 || v
+|-
+|  6 || 7 || 22 || P || 38 || f || 54 || w
+|-
+|  7 || 8 || 23 || Q || 39 || g || 55 || x
+|-
+|  8 || 9 || 24 || R || 40 || h || 56 || y
+|-
+|  9 || A || 25 || S || 41 || i || 57 || z
+|-
+| 10 || B || 26 || T || 42 || j ||   ||
+|-
+| 11 || C || 27 || U || 43 || k ||   ||
+|-
+| 12 || D || 28 || V || 44 || m ||  ||
+|-
+| 13 || E || 29 || W || 45 || n ||  ||
+|-
+| 14 || F || 30 || X || 46 || o ||  ||
+|-
+| 15 || G || 31 || Y || 47 || p ||  ||
+|}
+
+由於256不能被58所整除，Base58無法像Base64那樣子轉換為8位元的二進位後依次取出6位元，就可以快速完成轉換；因此，Base58編碼演算法需要除法運算實現。如果被編碼的數據較長，則要用特殊的class來處理大數，在Bitcoin使用了[[OpenSSL|OpenSSL]]中的BIGNUM：
+<syntaxhighlight lang=cpp>
+    code_string = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+    x = convert_bytes_to_big_integer(hash_result);
+
+    output_string = "";
+
+    while(x > 0) 
+    {
+        (x, remainder) = divide(x, 58);
+        output_string.append(code_string[remainder]);
+    }
+
+    repeat(number_of_leading_zero_bytes_in_hash)
+    {
+        output_string.append(code_string[0]);
+    }
+    
+    output_string.reverse();
+</syntaxhighlight>
+
+== 外部链接 ==
+* http://www.bitcoin.org {{Wayback|url=http://www.bitcoin.org/ |date=20141031103011 }}
+* https://en.bitcoin.it/wiki/Base58Check_encoding {{Wayback|url=https://en.bitcoin.it/wiki/Base58Check_encoding |date=20140209145132 }}
+
+== 参见 ==
+* [[Base64|Base64]]
+
+{{Data Exchange}}
+
+[[Category:文件格式|Category:文件格式]]
+[[Category:字符编码|Category:字符编码]]
+[[Category:数字|Category:数字]]
+[[Category:比特幣|Category:比特幣]]

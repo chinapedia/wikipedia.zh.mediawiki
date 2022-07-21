@@ -1,0 +1,35 @@
+'''托马苏洛算法'''（{{lang-en|Tomasulo algorithm}}）是[[IBM|IBM]]罗伯特·托马苏洛1967年所研发用来改善处理器[[乱序执行|乱序执行]][[指令层级平行|指令级并行性]]的硬件[[算法|算法]]。
+
+== 概述 ==
+在[[处理器|处理器]]中，先后执行的指令之间经常具有相关性（例如后一条指令用到前一条指令向寄存器写入的结果），因此早期简单的处理器使后续指令停顿，直到其所需的资源已经由前序指令准备就绪。托马苏洛算法则通过动态调度的方式，在不影响结果正确性的前提下，重新排列指令实际执行的顺序（[[乱序执行|乱序执行]]），提高时间利用效率。IBM System/360 Model 91处理器的[[浮点运算器|浮点运算器]]中率先使用了这种算法。{{R|caqa|page=92}}
+
+该算法与之前同样用于实现[[指令管線化|指令流水线]]动态调度的[[计分板_(处理器)|计分板]]不同在于它使用了[[寄存器重命名|寄存器重命名]]机制。指令之间具有[[数据-程序依赖|数据相关性]]（例如后条指令的源寄存器恰好是前条指令要写入的目标寄存器），进行动态调度时必须避免三类[[冒险_(计算机体系结构)|冒险]]：写后读（Read-after-Write, RAW）、写后写（Write-after-Write, WAW）、读后写（Write-after-Read, WAR）。{{R|caqa|page=90}}{{R|ddca|page=319-321}}第一种冒险也被称为真数据相关（true data dependence），而后两种冒险则并没有那么致命，它们可以由寄存器重命名来予以解决。{{R|ddca|page=321-322}}托马苏洛算法使用了一个共享数据总线（common data bus, CDB）将已计算出的值广播给所有需要这个值作为指令源操作数的[[保留站|保留站]]。该算法尽可能降低了使用计分板技术导致的流水线停顿，从而改善了[[并行计算|并行计算]]的效率。
+
+== 具体流程 ==
+在指令的发射（issue）阶段，如果操作数和保留站都准备就绪，那么指令就可以直接发射并执行。如果操作数未就绪，则进入保留站的指令会跟踪即将产生这个所需操作数的那个功能单元。如果连可用的保留站功能单元都已经不够用，那么该指令必须被停顿。为了化解读后写（WAR）和写后写（WAW）冲突，需要在该阶段进行指令的[[寄存器重命名|寄存器重命名]]。从指令队列中取出下一条指令，如果其所用到的操作数目前位于寄存器中，那么如果与指令匹配的功能单元（这类处理器通常具有多个功能单元以发挥指令级并行的优势）当前可用，则发射该指令；否则，由于没有可用的功能单元，指令被停顿，直到保留站或缓存可用。尽管执行时可能并未按照指令代码的先后顺序，但是它们在发射过程还是按照原先的顺序。这是为了确保指令顺序执行时的一些现象，例如[[异常处理|处理器异常]]，能够以顺序执行时的同样顺序出现。{{R|caqa|page=90-91}}下一个阶段为执行阶段。在该阶段，指令对应的操作被执行。执行前需要保证所有操作数可用，同时写后读（RAW）冲突已经被化解。系统通过计算有效地址来避免存储区的冲突，从而保证程序的正确性。最后的阶段为写结果阶段，[[算术逻辑单元|算术逻辑单元]]（ALU）的计算结果被写回到寄存器，以及任何正在等待该结果的保留站中，如果是存储（store）指令，则写回到存储器中。
+
+== 相关条目 ==
+* [[指令级并行|指令级并行]]
+* [[乱序执行|乱序执行]]
+* [[寄存器重命名|寄存器重命名]]
+* [[计分板_(处理器)|计分板 (处理器)]]
+* [[重排序缓冲区|重排序缓冲区]]
+
+== 参考文献 ==
+{{Reflist|refs=
+<ref name = "caqa">{{Cite book|author=John L. Hennessy, David A. Patterson|title=Computer architecture : a Quantitative Approach (Fourth edition)|publisher=Elsevier|isbn=978-0-12-370490-0}}</ref>
+
+<ref name = "ddca">{{Cite book|author=David Money Harris, Sarah L. Harris|title=数字设计和计算机体系结构（原书名：''Digital Design and Computer Architechture''）|publisher=机械工业出版社|location=北京|isbn=978-7-111-25459-1}}</ref>
+}}
+
+== 外部链接 ==
+* [http://www.cs.umd.edu/class/fall2001/cmsc411/projects/dynamic/tomasulo.html Dynamic Scheduling - Tomasulo's Algorithm]{{Wayback|url=http://www.cs.umd.edu/class/fall2001/cmsc411/projects/dynamic/tomasulo.html |date=20140310144302 }}
+* [https://web.archive.org/web/20140202102737/http://www.dgomezpr.com/ece/computer-architecture/73-tomasulo Web based Java demo of Tomasulo's algorithm]
+
+== 学术文献 ==
+* ''[http://domino.research.ibm.com/tchjr/journalindex.nsf/0/ed39cdf7e40549ec85256bfa00683f73?OpenDocument An Efficient Algorithm for Exploiting Multiple Arithmetic Units]{{Wayback|url=http://domino.research.ibm.com/tchjr/journalindex.nsf/0/ed39cdf7e40549ec85256bfa00683f73?OpenDocument |date=20130719061648 }}'',  IBM Journal of Research and Development, 11(1):25-33, January 1967.
+* ''[http://www.dcs.ed.ac.uk/home/hase/webhase/demo/tomasulo.html WebHASE: Tomasulo's Algorithm: HASE Java applet simulation of the Tomasulo's Algorithm]{{Wayback|url=http://www.dcs.ed.ac.uk/home/hase/webhase/demo/tomasulo.html |date=20130911042737 }}'', Institute for Computing Systems Architecture, Edinburgh University.
+* ''[http://www.ecs.umass.edu/ece/koren/architecture/Tomasulo1/tomasulo.htm TOMASULO'S ALGORITHM FOR DYNAMIC SCHEDULING]{{Wayback|url=http://www.ecs.umass.edu/ece/koren/architecture/Tomasulo1/tomasulo.htm |date=20130809083319 }}''
+* ''Computer Architecture: A Quantitative Approach'', John L. Hennessy & David A. Patterson
+
+[[Category:算法|Category:算法]]

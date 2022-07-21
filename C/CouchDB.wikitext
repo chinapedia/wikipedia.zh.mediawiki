@@ -1,0 +1,191 @@
+{{NoteTA|G1=IT|G2=FL}}
+{{Infobox software
+| name                   = Apache CouchDB
+| logo                   = Apache CouchDB logo.svg
+| screenshot             = Apache CouchDB v2.1.1 Fauxton Console.png
+| screenshot size        = 300px
+| caption                = CouchDB's Futon管理界面，用戶數據庫
+| collapsible            =
+| author                 = Damien Katz, Jan Lehnardt, Noah Slater, Christopher Lenz, J. Chris Anderson, Paul Davis, Adam Kocoloski, Jason Davies, Benoît Chesneau, Filipe Manana, Robert Newson
+| developer              = [[Apache软件基金会|Apache软件基金会]]
+| released               = 2005
+| programming language   = [[Erlang|Erlang]]
+| operating system       = [[跨平台|跨平台]]
+| latest release version = {{LSR/wikidata}}
+| language               =
+| genre                  = [[面向文檔的數據庫|面向文檔的數據庫]]
+| license                = [[Apache许可证|Apache许可证]]
+}}
+
+'''Apache CouchDB'''是一个开源[[数据库|数据库]]，专注于易用性和成为"完全拥抱[[万维网|web]]的[[数据库|数据库]]"<ref name="official-website">{{cite web|last=Apache软件基金会|title=Apache CouchDB|url=http://couchdb.apache.org/|accessdate=15 April 2012|archive-date=2011-02-20|archive-url=https://web.archive.org/web/20110220214955/http://couchdb.apache.org/|dead-url=no}}</ref>。它是一个使用[[JSON|JSON]]作为存储格式，[[JavaScript|JavaScript]]作为查询语言，[[MapReduce|MapReduce]]和[[HTTP|HTTP]]作为[[API|API]]的[[面向文档的数据库|面向文档]]的[[NoSQL|NoSQL]]数据库。其中一个显著的功能就是多主复制。CouchDB的第一个版本发布在2005年，在2008年成为了[[Apache|Apache]]的项目。
+
+不同于[[关系型数据库|关系型数据库]]，CouchDB没有将数据和关系存储在表格里。替代的，每个数据库是一个独立的文档集合。每一个文档维护其自己独立的数据和自包涵的schema。一个应用程序可能会访问多个数据库，比如其中一个位于用户的手机上，另一个位于在远程的服务器上。文档的元数据包含版本信息，让其能够合并可能因为数据库链接丢失导致的任何差异。
+
+CouchDB实现了一个[[多版本并发控制|多版本并发控制]]（MVCC）形式，用来避免在数据库写操作的时候对文件进行加锁。冲突留给应用程序去解决。解决一个冲突的通用操作的是首先合并数据到其中一个文档，然后删除旧的数据<ref>{{cite web|last=Smith|first=Jason|title=What is the CouchDB replication protocol? Is it like Git?|url=http://stackoverflow.com/a/4766398/395287|work=StackOverflow|publisher=Stack Exchange|accessdate=14 April 2012|archive-date=2019-09-24|archive-url=https://web.archive.org/web/20190924212007/https://stackoverflow.com/questions/4766391/what-is-the-couchdb-replication-protocol-is-it-like-git/4766398|dead-url=no}}</ref>。
+
+其他功能包括文档级别的[[ACID|ACID]]语义和最终一致性，[[MapReduce|MapReduce]]，复制（Replication）。它还支持通过一个做Futon的内置web应用程序来进行数据库管理。
+
+== 历史 ==
+CouchDB（Couch是 ''cluster of unreliable commodity hardware''的首字母缩写）<ref>[http://www.ibm.com/developerworks/opensource/library/os-couchdb/index.html Exploring CouchDB] {{Wayback|url=http://www.ibm.com/developerworks/opensource/library/os-couchdb/index.html |date=20161222161858 }}, article from IBM Developer Works</ref>是前IBM的[[Lotus_Notes|Lotus Notes]]开发者[[Damien_Katz|Damien Katz]]创建于2005年的一个项目。Damien Katz将其定义为“面向大规模可扩展对象数据库的存储系统”。他对该数据库的目标是让其成为互联网的数据库，其从底层的设计就支持部署web应用程序。他自己通过将近两年的时间创建了该项目同时将其作为开源项目在[[GNU_General_Public_License|GNU General Public License]]下发布。
+
+在2008年2月，其成为[[Apache_Incubator|Apache Incubator]]项目，同时其许可协议变更为[[Apache_License|Apache License]]。几个月后，其升级为顶级项目。这促使了其第一个稳定版在2010年7月发布。
+
+在2012年初期，Damien Katz离开了项目专注于[[Couchbase_Server|Couchbase Server]]。不过该项目还在继续进行中，在2012年4月发布了1.2版本，2013年4月发布了1.3版本。
+
+== 主要功能 ==
+; 文档存储
+: CouchDB将数据存储为“文档”，其为用[[JSON|JSON]]表示的有一个或者多个字段/值的对。字段的值可以是简单的东西比如字符串，数字，或者时间；但是数组和字典同样也可以使用。CouchDB中的每一个文档有一个唯一的id但是没有必须的文档schema。
+; ACID语义
+: CouchDB提供了[[ACID|ACID]]语义，其通过多版本并发控制的形式来实现，意味着CouchDB能够处理大量的并发读写而不会产生冲突。
+; Map/Reduce 视图 和 索引
+: 存储的数据通过视图进行组装。在CouchDB中，每一个视图都是由作为map/reduce操作中的Map部分的[[JavaScript|JavaScript]]函数构成。该函数接受一个文档并且将其转换为一个单独的值来返回。CouchDB能够对视图进行索引，同时在文档新增，修改，删除的时候对这些索引进行更新。
+; 支持复制的分布式架构
+: CouchDB的设计基于支持双向的复制（同步）和离线操作。这意味着多个复制能够对同一数据有其自己的拷贝，可以进行修改，之后将这些变更进行同步。
+; REST API
+: 所有的数据都有一个唯一的通过HTTP暴露出来的URI。[[REST|REST]]使用HTTP方法 POST，GET，PUT和DELETE来操作对应的四个基本[[CRUD|CRUD]](Create，Read，Update，Delete）操作来操作所有的资源。
+; 最终一致性
+: CouchDB保证最终一致性，使其能够同时提供可用性和分割容忍。
+; 离线支持
+: CoucbDB能够同步复制到可能会离线的终端设备（比如智能手机），同时当设置再次在线时处理数据同步。
+
+CouchDB内置了一个的叫做Futon的通过web访问的管理接口。
+
+== 使用案例、产品部署 ==
+CouchDB的复制和同步强大功能让其能够使用在无法保证网络链接但是应用程序必须继续在离线模式工作的移动设备。
+
+=== 使用CouchDB的企业 ===
+一些使用CouchDB的企业示例：
+* [[Ubuntu_(operating_system)|Ubuntu]]，在2009年开始使用其作为同步服务“Ubuntu One”<ref>[http://mail-archives.apache.org/mod_mbox/couchdb-dev/200910.mbox/%3C4AD53996.3090104@canonical.com%3E Email from Elliot Murphy (Canonical)] {{Wayback|url=http://mail-archives.apache.org/mod_mbox/couchdb-dev/200910.mbox/%3C4AD53996.3090104@canonical.com%3E |date=20110505005955 }} to the CouchDB-Devel list</ref> 但是在2011年停止使用<ref>{{Cite web |url=http://linux.slashdot.org/story/11/11/22/171228/canonical-drops-couchdb-from-ubuntu-one |title=Canonical Drops CouchDB From Ubuntu One (Slashdot) |accessdate=2013-08-16 |archive-date=2013-09-26 |archive-url=https://web.archive.org/web/20130926043225/http://linux.slashdot.org/story/11/11/22/171228/canonical-drops-couchdb-from-ubuntu-one |dead-url=no }}</ref>。
+*  [[BBC|BBC]]，用在其动态内容平台<ref>{{Cite web |url=http://www.erlang-factory.com/conference/London2009/speakers/endafarrell |title=CouchDB at the BBC as a fault tolerant, scalable, multi-data center key-value store |accessdate=2013-08-16 |archive-date=2013-11-03 |archive-url=https://web.archive.org/web/20131103040544/http://www.erlang-factory.com/conference/London2009/speakers/endafarrell |dead-url=no }}</ref>。
+* [[Credit_Suisse|Credit Suisse]]，用在其内部的商品部门的市场框架<ref name="couchdbinthewild">[http://wiki.apache.org/couchdb/CouchDB_in_the_wild "CouchDB in the wild"] {{Wayback|url=http://wiki.apache.org/couchdb/CouchDB_in_the_wild |date=20170720124015 }} article of the product's web, a list of software projects and websites using CouchDB</ref>。
+* [[Meebo|Meebo]]，用在其社交平台（web和应用程序），Meebo在2012年7月12日被Google收购同时被关闭。
+
+== 数据操作 ==
+CoucbDB管理JSON文档的集合。文档通过视图进行组织。视图通过Aggregate函数进行定义，过滤查询的时候并行计算，类似[[MapReduce|MapReduce]]。
+
+=== 通过HTTP访问数据 ===
+应用程序通过HTTP与CouchDB进行交互。下面是一些通过[[cURL|cURL]]进行演示的示例。这些示例假设CouchDB运行在本地localhost（127.0.0.1）的5984端口。
+
+{| class="wikitable" 
+|-
+! Action !! Request !! Response
+|-
+| 获取服务器基本信息
+|| <syntaxhighlight lang="bash">curl http://127.0.0.1:5984/</syntaxhighlight> 
+|| <syntaxhighlight lang="javascript">{
+  "couchdb": "Welcome",
+  "version":"1.1.0"
+}</syntaxhighlight>
+|-
+| 创建一个名为'''wiki'''的数据库
+|| <syntaxhighlight lang="bash">curl -X PUT http://127.0.0.1:5984/wiki</syntaxhighlight> 
+|| <syntaxhighlight lang="javascript">{"ok": true}</syntaxhighlight>
+|-
+| 尝试创建第一个名为 '''wiki'''的数据库
+|| <syntaxhighlight lang="bash">curl -X PUT http://127.0.0.1:5984/wiki</syntaxhighlight> 
+|| <syntaxhighlight lang="javascript" enclose="div">{
+  "error":"file_exists",
+  "reason":"The database could not be created, the file already exists."
+}</syntaxhighlight>
+|-
+|| 获取关于'''wiki'''数据库的信息
+|| <syntaxhighlight lang="bash">curl http://127.0.0.1:5984/wiki</syntaxhighlight> 
+|| <syntaxhighlight lang="javascript">{
+  "db_name": "wiki",
+  "doc_count": 0,
+  "doc_del_count": 0,
+  "update_seq": 0,
+  "purge_seq": 0,
+  "compact_running": false,
+  "disk_size": 79,
+  "instance_start_time": "1272453873691070",
+  "disk_format_version": 5
+}</syntaxhighlight>
+|-
+| 删除数据库 '''wiki'''
+| <syntaxhighlight lang="bash">curl -X DELETE http://127.0.0.1:5984/wiki</syntaxhighlight> 
+| <syntaxhighlight lang="javascript">{"ok": true}</syntaxhighlight>
+|-
+| 创建一个文档，请求CoudbDB来生成一个document id
+| <syntaxhighlight lang="bash">curl -X POST -H "Content-Type: application/json" --data \
+'{ "text" : "Wikipedia on CouchDB", "rating": 5 }' \
+http://127.0.0.1:5984/wiki
+</syntaxhighlight>
+| <syntaxhighlight lang="javascript">{
+  "ok": true,
+  "id": "123BAC",
+  "rev": "946B7D1C"
+}</syntaxhighlight>
+|}
+
+== 开源组件 ==
+CouchDB包含了一些其他的开源项目作为其自己的内置包。
+{| class="wikitable sortable" width = "100%"
+! 元件
+! 描述
+! 许可证
+|-
+| [[SpiderMonkey|SpiderMonkey]]
+| SpiderMonkey是一个[[JavaScript引擎|JavaScript引擎]]。
+| [[Mozilla公共许可协议|Mozilla公共许可协议]]
+|-
+| [[jQuery|jQuery]]
+| jQuery是一个轻量级的[[浏览器|浏览器]]函式庫。
+| [[GNU通用公共许可证|GNU通用公共许可证]]和[[MIT许可证|MIT许可证]]
+|-
+| [[International_Components_for_Unicode|ICU]]
+| ICU是成熟的[[开源|开源]]项目。
+| [[MIT许可证|MIT许可证]]
+|-
+| [[OpenSSL|OpenSSL]]
+| OpenSSL是一个开源协议。实现了基本的密码功能，并提供各种实用功能。
+| [[Apache许可证|Apache许可证]]
+|-
+| [[Erlang|Erlang]]
+| Erlang是一种通用的并发[[编程语言|编程语言]]和运行[[系统|系统]]。Erlang的连续子集是[[函数式语言|函数式语言]]，与严格评测，单分配和动态类型。
+| [[Mozilla公共许可协议|Mozilla公共许可协议]]
+|}
+
+== 其他 ==
+{{Portal|Free software}}
+
+* [[BigCouch|BigCouch]]
+* [[Cassandra_(database)|Cassandra (database)]]
+* [[Couchbase_Server|Couchbase Server]]
+* [[Document-oriented_database|Document-oriented database]]
+* [[Lotus_Notes|Lotus Notes]]
+* [[MongoDB|MongoDB]]
+* [[Redis|Redis]]
+* [[Mnesia|Mnesia]]
+* [[OrientDB|OrientDB]]
+* [[Riak|Riak]]
+* [[XML_database|XML database]]
+
+== 参考文献 ==
+{{Reflist}}
+
+== 外部链接 ==
+* {{Official website|http://couchdb.apache.org/}}
+* [https://web.archive.org/web/20090831050402/http://books.couchdb.org/relax/ CouchDB: The Definitive Guide]
+* [https://web.archive.org/web/20130602041727/http://www.nosqldatabases.com/main/tag/couchdb CouchDB articles on NoSQLDatabases.com]
+* [http://nosql.mypopescu.com/tagged/couchdb CouchDB news and articles on myNoSQL]{{Wayback|url=http://nosql.mypopescu.com/tagged/couchdb |date=20130916133327 }}
+* [http://nosql.mypopescu.com/post/683838234/scaling-couchdb Scaling CouchDB]{{Wayback|url=http://nosql.mypopescu.com/post/683838234/scaling-couchdb |date=20130531152306 }}
+* [https://web.archive.org/web/20160303172725/http://wiki.apache.org/couchdb/Complete_HTTP_API_Reference Complete HTTP API Reference]
+* [https://github.com/1999/couchdb-php Simple PHP5 library to communicate with CouchDB]{{Wayback|url=https://github.com/1999/couchdb-php |date=20180611014215 }}
+* [http://code.google.com/p/async-couchdb-client/ Asynchronous CouchDB client for Java]{{Wayback|url=http://code.google.com/p/async-couchdb-client/ |date=20130701065951 }}
+* [https://github.com/KimStebel/sprouch Asynchronous CouchDB client for Scala]{{Wayback|url=https://github.com/KimStebel/sprouch |date=20180611034149 }}
+* [http://nosql.mypopescu.com/post/746667801/3-couchdb-case-studies 3 CouchDB Case Studies]{{Wayback|url=http://nosql.mypopescu.com/post/746667801/3-couchdb-case-studies |date=20140204021154 }}
+* [https://web.archive.org/web/20140417200555/http://userprimary.net/posts/2009/06/13/couchdb-for-access-log-aggregation-and-analysis/ CouchDB for access log aggregation and analysis]
+* {{cite web|last=Lehnardt|first=Jan|title=Couch DB at 10,000 feet|url=http://video.google.com/videoplay?docid=-3714560380544574985&hl=en#|work=Erlang eXchange 2008|accessdate=15 April 2012|year=2008|archive-date=2012-11-09|archive-url=https://web.archive.org/web/20121109191546/http://video.google.com/videoplay?docid=-3714560380544574985&hl=en|dead-url=no}}
+* {{cite web|last=Lenhardt|first=Jan|title=CouchDB for Erlang Developers|work=Erlang Factory London 2009|url=http://www.erlang-factory.com/conference/London2009/speakers/janlehnardt|accessdate=15 April 2012|year=2009|archive-url=https://web.archive.org/web/20110619041527/http://www.erlang-factory.com/conference/London2009/speakers/janlehnardt|archive-date=2011-06-19|dead-url=yes}}
+* {{cite web|last=Katz|first=Damien|title=CouchDB and Me|url=http://www.infoq.com/presentations/katz-couchdb-and-me|work=RubyFringe|publisher=InfoQ|accessdate=15 April 2012|date=January 2009|archive-url=https://web.archive.org/web/20110427212129/http://www.infoq.com/presentations/katz-couchdb-and-me|archive-date=2011-04-27|dead-url=yes}}
+
+{{NoSQL}}
+{{Apache}}
+[[Category:開源資料庫管理系統|Category:開源資料庫管理系統]]
+[[Category:面向文档的数据库|Category:面向文档的数据库]]
+[[Category:分散式計算架構|Category:分散式計算架構]]
+[[Category:NoSQL|Category:NoSQL]]
+[[Category:Apache软件基金会|Category:Apache软件基金会]]
+[[Category:跨平台軟體|Category:跨平台軟體]]
+[[Category:开源网页服务器软件|Category:开源网页服务器软件]]

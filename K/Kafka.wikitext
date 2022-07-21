@@ -1,0 +1,128 @@
+{{Citation style|time=2020-11-02T08:15:29+00:00}}
+{{NoteTA|G1=IT|G2=FL}}
+
+{{Infobox software
+| name                   = Kafka
+| title                  = Kafka<ref>{{Cite web |url=https://github.com/apache/kafka |title=GitHub仓库镜像 |accessdate=2014-04-09 |archive-date=2020-08-16 |archive-url=https://web.archive.org/web/20200816052119/https://github.com/apache/kafka |dead-url=no }}</ref>
+| logo                   = Apache_kafka.svg
+| developer              = Apache软件基金会
+| released               = {{Start date and age|2011|01|df=yes}}<ref>{{cite web | title=Open-sourcing Kafka, LinkedIn's distributed message queue | trans-title=开源的Kafka，LinkedIn的分布式消息队列 | url=https://blog.linkedin.com/2011/01/11/open-source-linkedin-kafka | accessdate=2016-10-27 | archive-date=2021-01-11 | archive-url=https://web.archive.org/web/20210111150456/https://blog.linkedin.com/2011/01/11/open-source-linkedin-kafka | dead-url=no }}</ref>
+| latest release version = 3.0.0
+| latest release date    = {{Start date and age|2021|09|21}}
+| programming language   = [[Scala|Scala]]、[[Java|Java]]
+| operating system       = [[跨平台|跨平台]]
+| status                 = 活跃
+| genre                  = [[流式处理|流式处理]], {{link-en|消息中间件|message broker}}
+| license                = [[Apache许可证|Apache许可证]] 2.0
+| website                = {{URL|https://kafka.apache.org/}}
+| work                   = github.com
+}}
+
+'''Kafka'''是由[[Apache软件基金会|Apache软件基金会]]开发的一个[[开源|开源]][[流处理|流处理]]平台，由[[Scala|Scala]]和[[Java|Java]]编写。该项目的目标是为处理实时数据提供一个统一、高吞吐、低延迟的平台。其持久化层本质上是一个“按照分布式事务日志架构的大规模发布/订阅消息队列”，<ref>{{cite web | url=https://www.datadoghq.com/blog/monitoring-kafka-performance-metrics | title=Monitoring Kafka performance metrics | trans-title=监控Kafka性能数据 | publisher=[[Datadog|Datadog]]官方博客 | accessdate=2016-05-23 | language=en | archive-date=2020-11-08 | archive-url=https://web.archive.org/web/20201108114722/https://www.datadoghq.com/blog/monitoring-kafka-performance-metrics/ | dead-url=no }}</ref>这使它作为企业级基础设施来处理流式数据非常有价值。此外，Kafka可以通过Kafka Connect连接到外部系统（用于数据输入/输出），并提供了Kafka Streams——一个[[Java|Java]]流式处理[[库_(计算机)|库]]。
+
+该设计受{{link-en|事务日志|Transaction log}}的影响较大。<ref>{{cite web | url=http://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying | title=The Log: What every software engineer should know about real-time data's unifying abstraction | trans-title=The Log: What every software engineer should know about real-time data's unifying abstraction | publisher=领英官方博客 | accessdate=2014-05-05 | language=en | archive-date=2014-03-17 | archive-url=https://web.archive.org/web/20140317082022/http://engineering.linkedin.com/distributed-systems/log-what-every-software-engineer-should-know-about-real-time-datas-unifying | dead-url=yes }}</ref>
+
+== Kafka的历史 ==
+
+Kafka最初是由[[领英|领英]]开发，并随后于2011年初开源，并于2012年10月23日由[[Apache_Incubator|Apache Incubator]]孵化出站。2014年11月，几个曾在领英为Kafka工作的工程师，创建了名为[[Confluent|Confluent]]的新公司，<ref>{{Cite web | url=http://fortune.com/2014/11/06/linkedin-kafka-confluent/ | title=LinkedIn engineers spin out to launch 'Kafka' startup Confluent | trans-title=领英工程师推迟发布Kafka启动Confluent | accessdate=2015-02-10 | last=Primack | first=Dan | language=en | archive-date=2020-10-22 | archive-url=https://web.archive.org/web/20201022020356/https://fortune.com/2014/11/06/linkedin-kafka-confluent/ | dead-url=no }}</ref>，并着眼于Kafka。根据2014年Quora的帖子，Jay Kreps似乎已经将它以作家[[弗朗茨·卡夫卡|弗朗茨·卡夫卡]]命名。Kreps选择将该系统以一个作家命名是因为，它是“一个用于优化写作的系统”，而且他很喜欢卡夫卡的作品。<ref>{{Cite web | url=https://www.quora.com/What-is-the-relation-between-Kafka-the-writer-and-Apache-Kafka-the-distributed-messaging-system | title=What is the relation between Kafka, the writer, and Apache Kafka, the distributed messaging system? | trans-title=作家卡夫卡和Apache Kafka那个分布式消息系统之间有什么关系？ | accessdate=2017-06-12 | language=en}}</ref>
+
+== Kafka的架构 ==
+
+[[File:Overview_of_Apache_Kafka.svg|thumb]]
+
+Kafka存储的消息来自任意多被称为“生产者”（Producer）的进程。数据从而可以被分配到不同的“分区”（Partition）、不同的“Topic”下。在一个分区内，这些消息被索引并连同时间戳存储在一起。其它被称为“消费者”（Consumer）的进程可以从分区查询消息。Kafka运行在一个由一台或多台服务器组成的集群上，并且分区可以跨集群结点分布。
+
+Kafka高效地处理实时流式数据，可以实现与Storm、HBase和Spark的集成。作为群集部署到多台服务器上，Kafka处理它所有的发布和订阅消息系统使用了四个API，即生产者API、消费者API、Stream API和Connector API。它能够传递大规模流式消息，自带容错功能，已经取代了一些传统消息系统，如JMS、AMQP等。
+
+Kafka架构的主要术语包括Topic、Record和Broker。Topic由Record组成，Record持有不同的信息，而Broker则负责复制消息。Kafka有四个主要API：
+* '''生产者API'''：支持应用程序发布Record流。
+* '''消费者API'''：支持应用程序订阅Topic和处理Record流。
+* '''Stream API'''：将输入流转换为输出流，并产生结果。
+* '''Connector API'''：执行可重用的生产者和消费者API，可将Topic链接到现有应用程序。
+
+== 相关术语 ==
+
+* Topic  用来对消息进行分类，每个进入到Kafka的信息都会被放到一个Topic下
+* Broker  用来实现数据存储的主机服务器
+* Partition  每个Topic中的消息会被分为若干个Partition，以提高消息的处理效率
+* Producer   消息的生产者
+* Consumer   消息的消费者
+* Consumer Group  消息的消费群组
+
+== 设计目标 ==
+
+== Kafka的性能 ==
+
+由于其广泛集成到企业级基础设施中，监测Kafka在规模运行中的性能成为一个日益重要的问题。监测端到端性能，要求跟踪所有指标，包括Broker、消费者和生产者。除此之外还要监测[[ZooKeeper|ZooKeeper]]，Kafka用它来协调各个消费者。<ref>{{Cite web | url=https://www.datadoghq.com/blog/monitoring-kafka-performance-metrics/#broker-metrics | title=Monitoring Kafka performance metrics | trans-title=监测Kafka性能指标 | accessdate=2016-10-05 | date=2016-04-06 | language=en | archive-date=2020-11-08 | archive-url=https://web.archive.org/web/20201108114722/https://www.datadoghq.com/blog/monitoring-kafka-performance-metrics/#broker-metrics | dead-url=no }}</ref><ref>{{Cite web | url=https://www.datadoghq.com/blog/monitoring-kafka-performance-metrics/#toc-why-zookeeper- | title=Monitoring Kafka performance metrics | trans-title=监测Kafka性能指标 | accessdate=2016-10-05 | date=2016-04-06 | last=Mouzakitis | first=Evan | language=en | archive-date=2020-11-08 | archive-url=https://web.archive.org/web/20201108114722/https://www.datadoghq.com/blog/monitoring-kafka-performance-metrics/#toc-why-zookeeper- | dead-url=no }}</ref>目前有一些监测平台可以追蹤Kafka的性能，有开源的，如[[领英|领英]]的Burrow；也有付费的，如[[Datadog|Datadog]]。除了这些平台之外，收集Kafka的数据也可以使用工具来进行，这些工具一般需要Java，包括JConsole。<ref>{{Cite web | url=https://www.datadoghq.com/blog/collecting-kafka-performance-metrics/#jconsole | title=Collecting Kafka performance metrics - Datadog | trans-title=收集Kafka性能指标－Datadog | accessdate=2016-10-05 | date=2016-04-06 | language=en | archive-date=2020-11-27 | archive-url=https://web.archive.org/web/20201127111338/https://www.datadoghq.com/blog/collecting-kafka-performance-metrics/#jconsole | dead-url=no }}</ref>
+
+== Consumer Group ==
+
+== Kafka文件格式 ==
+
+00000000000000000000.index
+00000000000000000000.log
+00000000000000000000.timeindex
+00000000000000782248.snapshot
+leader-epoch-checkpoint
+
+== 使用Kafka的企业 ==
+
+下面的列表是曾经或正在使用Kafka的知名企业：
+{{Columns-list | colwidth=15em |
+* [[小米|小米]]
+* [[CloudFlare|CloudFlare]]<ref>{{cite web | url=https://blog.cloudflare.com/more-data-more-data/ | title=More data, more data | trans-title=更多数据，更多数据 | language=en | accessdate=2017-12-22 | archive-date=2018-10-21 | archive-url=https://web.archive.org/web/20181021190757/https://blog.cloudflare.com/more-data-more-data/ | dead-url=yes }}</ref>
+* [[EBay|EBay]]<ref>{{cite web | url=https://www.youtube.com/watch?v=Vh2Rcwtz8RY | title=Kafka Usage in Ebay Communications Delivery Pipeline | trans-title=Kafka在Ebay通信传递管道中的用途 | language=en | accessdate=2017-12-22 | archive-date=2019-02-16 | archive-url=https://web.archive.org/web/20190216230238/https://www.youtube.com/watch?v=Vh2Rcwtz8RY | dead-url=no }}</ref>
+* [[Kakao|Kakao]]<ref>{{cite web | url=http://apachebigdata2015.sched.org/event/de6abfbd8f0b9e66b1c03feb2b9e2078?iframe=yes&w=i:100;&sidebar=yes&bg=no | title=S2Graph : A Large-Scale Graph Database with HBase | trans-title=S2Graph：基于HBase的大规模图形数据库 | author=Doyung Yoon | language=en | accessdate=2017-12-22 | archive-date=2016-03-09 | archive-url=https://web.archive.org/web/20160309152319/http://apachebigdata2015.sched.org/event/de6abfbd8f0b9e66b1c03feb2b9e2078?iframe=yes&w=i:100;&sidebar=yes&bg=no | dead-url=yes }}</ref>
+* [[Netflix|Netflix]]<ref>{{cite web | url=http://apachebigdata2015.sched.org/event/3ztw/netflix-integrating-spark-at-petabyte-scale-cheolsoo-park-netflix-and-ashwin-shankar-netflix | title=Netflix: Integrating Spark at Petabyte Scale | trans-title=Netflix：在Pb级规模集成Spark | author=Cheolsoo Park and Ashwin Shankar | language=en | accessdate=2017-12-22 | archive-date=2016-03-04 | archive-url=https://web.archive.org/web/20160304113726/http://apachebigdata2015.sched.org/event/3ztw/netflix-integrating-spark-at-petabyte-scale-cheolsoo-park-netflix-and-ashwin-shankar-netflix | dead-url=yes }}</ref>
+* [[PayPal|PayPal]]<ref>{{cite web | url=http://www.couchbase.com/nosql-resources/presentations/paypal-creating-a-central-data-backbone-couchbase-server-to-kafka-to-hadoop-and-back.html | title=PayPal: Creating a Central Data Backbone: Couchbase Server to Kafka to Hadoop and Back (talk at Couchbase Connect 2015) | trans-title=PayPal：创建中心数据骨干：Couchbase Server到Kafka到Hadoop和Back（在Couchbase Connect 2015上的讲话） | website=Couchbase | author=Shibi Sudhakaran of PayPal | accessdate=2016-02-03 | language=en | archive-date=2016-09-17 | archive-url=https://web.archive.org/web/20160917015449/http://www.couchbase.com/nosql-resources/presentations/paypal-creating-a-central-data-backbone-couchbase-server-to-kafka-to-hadoop-and-back.html | dead-url=no }}</ref>
+* [[Spotify|Spotify]]<ref>{{cite web | url=http://apachebigdata2015.sched.org/event/2a65daf0baa4cfbc227a8cb74a9103a2?iframe=no&w=i:100;&sidebar=yes&bg=no | title=How Apache Drives Spotify's Music Recommendations | trans-title=Apache如何驱动Spotify的音乐推荐 | author=Josh Baer | language=en | accessdate=2017-12-22 | archive-date=2016-03-09 | archive-url=https://web.archive.org/web/20160309152324/http://apachebigdata2015.sched.org/event/2a65daf0baa4cfbc227a8cb74a9103a2?iframe=no&w=i:100;&sidebar=yes&bg=no | dead-url=yes }}</ref> 
+* [[Yelp|Yelp]]<ref>{{cite web | url=https://engineeringblog.yelp.com/2016/10/redshift-connector.html | website=Yelp | title=Streaming Messages from Kafka into Redshift in near Real-Time | trans-title=从Kafka到Redshift的流式消息接近于实时 | accessdate=2017-07-19 | language=en | archive-date=2017-06-03 | archive-url=https://web.archive.org/web/20170603034235/https://engineeringblog.yelp.com/2016/10/redshift-connector.html | dead-url=yes }}</ref>
+* [[纽约时报|纽约时报]]<ref>{{cite web | url=https://www.confluent.io/blog/publishing-apache-kafka-new-york-times/ | title=Publishing with Apache Kafka at The New York Times | trans-title=在纽约时报使用Kafka进行出版 | author=Boerge Svingen | accessdate=2017-09-19 | language=en | archive-date=2017-09-17 | archive-url=https://web.archive.org/web/20170917095534/https://www.confluent.io/blog/publishing-apache-kafka-new-york-times/ | dead-url=yes }}</ref>
+* [[思科系统|思科系统]]<ref>{{cite web | url=http://blogs.cisco.com/security/opensoc-an-open-commitment-to-security | title=OpenSOC: An Open Commitment to Security | trans-title=OpenSOC：一份公开的安全承诺 | website=思科博客 | accessdate=2016-02-03 | language=en | archive-date=2016-03-09 | archive-url=https://web.archive.org/web/20160309152318/http://blogs.cisco.com/security/opensoc-an-open-commitment-to-security | dead-url=yes }}</ref>
+* [[沃尔玛|沃尔玛]]<ref>{{cite web | url=https://medium.com/walmartlabs/apache-kafka-for-item-setup-3fe8f4ba5967 | website=medium.com | title=Apache Kafka for Item Setup | trans-title=Kafka用于项目设置 | accessdate=2017-06-12 | language=en | archive-date=2019-05-03 | archive-url=https://web.archive.org/web/20190503135104/https://medium.com/walmartlabs/apache-kafka-for-item-setup-3fe8f4ba5967 | dead-url=no }}</ref>
+* [[优步|优步]]<ref>{{Cite web | title=Stream Processing in Uber | trans-title=优步的流式处理 | url=http://www.infoq.com/presentations/uber-stream-processing | website=InfoQ | accessdate=2015-12-06 | language=en | archive-date=2015-12-05 | archive-url=https://web.archive.org/web/20151205235622/http://www.infoq.com/presentations/uber-stream-processing | dead-url=no }}</ref>
+}}
+
+== 参见 ==
+
+{{Columns-list|
+* [[Apache_ActiveMQ|Apache ActiveMQ]]
+* [[Apache_Flink|Apache Flink]]
+* {{link-en|Qpid|Apache Qpid}}
+* {{link-en|Samza|Apache Samza}}
+* [[Apache_Spark|Apache Spark]]
+* {{link-en|数据发布服务|Data Distribution Service}}
+* {{link-en|企业集成模式|Enterprise Integration Patterns}}
+* {{link-en|企业消息系统|Enterprise Messaging System}}
+* {{link-en|事件流式处理|Event stream processing}}
+* {{link-en|事件驱动SOA|Event-driven SOA}}
+* {{link-en|面向消息的中间件|Message-oriented middleware}}
+* [[面向服务的架构|面向服务的架构]]
+* {{link-en|StormMQ}}
+|colwidth=15em}}
+
+== 参考资料 ==
+
+{{Reflist}}
+
+== 外部链接 ==
+
+* [http://kafka.apache.org/ Apache Kafka网站]{{Wayback|url=http://kafka.apache.org/ |date=20170421014548 }}{{en}}
+* [http://kafka.apache.org/documentation.html#design 项目设计讨论]{{Wayback|url=http://kafka.apache.org/documentation.html#design |date=20170902004108 }}{{en}}
+* [https://github.com/apache/kafka Github镜像] {{Wayback|url=https://github.com/apache/kafka |date=20200816052119 }}
+* [http://vimeo.com/62298867 Morten Kjetland对Apache Kafka的介绍]{{Wayback|url=http://vimeo.com/62298867 |date=20131216193726 }}{{en}}
+* [http://www.quora.com/RabbitMQ/RabbitMQ-vs-Kafka-which-one-for-durable-messaging-with-good-query-features?share=1 Quora上与RabbitMQ的对比]{{en}}
+* [http://mail-archives.apache.org/mod_mbox/kafka-users/201306.mbox/%3CCACOPnvdd0_Xr3oOy8Dc8pu0z-_u813xnCOb80ZWpjVeUudhK9A@mail.gmail.com%3E Kafka开发者邮件列表中与RabbitMQ的对比]{{Wayback|url=http://mail-archives.apache.org/mod_mbox/kafka-users/201306.mbox/%3CCACOPnvdd0_Xr3oOy8Dc8pu0z-_u813xnCOb80ZWpjVeUudhK9A@mail.gmail.com%3E |date=20140413145954 }}{{en}}
+* [http://stackoverflow.com/questions/731233/activemq-or-rabbitmq-or-zeromq-or Stackoverflow上与RabbitMQ和ZeroMQ的对比]{{Wayback|url=http://stackoverflow.com/questions/731233/activemq-or-rabbitmq-or-zeromq-or |date=20140415202253 }}{{en}}
+* [http://engineering.linkedin.com/kafka/intra-cluster-replication-apache-kafka Apache Kafka中的集群内部响应]{{Wayback|url=http://engineering.linkedin.com/kafka/intra-cluster-replication-apache-kafka |date=20131227164813 }}{{en}}
+* [https://web.archive.org/web/20140202124338/http://qnalist.com/q/incubator-kafka-users Kafka用户邮件列表讨论]{{en}}
+
+{{apache}}
+
+[[Category:2011年软件|Category:2011年软件]]
+[[Category:面向消息的中间件|Category:面向消息的中间件]]
+[[Category:面向服务架构的相关产品|Category:面向服务架构的相关产品]]
+[[Category:企业应用集成|Category:企业应用集成]]
+[[Category:自由软件|Category:自由软件]]
+[[Category:Scala平台軟體|Category:Scala平台軟體]]
+[[Category:Java平台|Category:Java平台]]

@@ -1,0 +1,72 @@
+'''葛立恒扫描法'''（'''Graham's scan'''）是一种计算一组的平面点的[[凸包|凸包]]的[[演算法|演算法]]，[[时间复杂度|时间复杂度]]为<math>O(n\log n)</math>。以在1972年发表该算法的[[葛立恒|葛立恒]]命名<ref name="Graham, R.L. (1972).">Graham, R.L. (1972).[http://www.math.ucsd.edu/~ronspubs/72_10_convex_hull.pdf An Efficient Algorithm for Determining the Convex Hull of a Finite Planar Set] {{Wayback|url=http://www.math.ucsd.edu/~ronspubs/72_10_convex_hull.pdf |date=20170517155529 }}. Information Processing Letters 1, 132-133</ref>。
+
+==算法步骤与图解==
+[[Image:Graham_Scan.svg|frame]]
+
+第一步：找到最下边的点，如果有多个点纵坐标相同的点都在最下方，则选取最左边的。在右图中这个点是P。这一步只需要扫描一遍所有的点即可，时间复杂度为<math>O(n)</math>。
+
+第二步：将所有的点按照相对于第一步中的得到的点P的[[极坐标系#点的表示|极角]]大小进行排序。注意这一步并不需要真的透过计算反三角函数來得到与x轴夹角的大小。可以直接使用该点与P点连线的斜率，或者由P点到该点向量的与沿x轴单位向量的点积来减少计算量。可以使用诸如[[快速排序|快速排序]]、[[堆排序|堆排序]]之类的算法进行排序，时间复杂度为<math>O(n\log n)</math>。
+
+第三步：建立一個堆疊，來儲存当前的凸包。按第二步中排序得到的结果，依次将点加入到堆疊中，如果正在考虑的点与堆疊頂端的两个点不是“向左转”的，就表明当前堆疊頂端的点并不在凸包上，而我们需要将其弹出栈，重复这一个过程直到正在考虑的点与堆疊頂端的两个点是“向左转”的。右边的图解给出了“向左转”和“向右转”的示意：
+* 刚开始的两个点P、A直接放入堆疊。
+* 在点B加入时，P->A->B就构成左转，因此直接加入点B即可。
+* 接下来加入点C，A->B->C还是构成左转，因此直接加入点C。
+* 继续加入点D时，B->C->D就变成右转了，此时可以观察到如果将BD連線，點C會被包含在多邊形的内部，因此必須將点C移出堆疊。注意需要继续检查A->B->D是左转還是右转，如果還是右轉的話，點B需要继续移出堆疊，以此類推。这个例子比较简单，A->B->D已经是左转了，D点可以放入堆疊。
+* 最後回到P点，B->D->P是左轉，算法完成，所求凸包为四边形PABD。
+另外，如果發現三点共線的情况，算法可以考虑将其视为左转或者右转。这取决于究竟只是要求凸包的边界，还是要找到在凸包边界上所有的点。
+
+我们需要简单地计算两个向量的有向面積，即两个向量的叉乘的结果来判断两个向量的相对位置。
+
+假设三个点分别是 <math>p_1(x_1, y_1),  p_2(x_2, y_2), p_3(x_3, y_3)</math> ，则它们的有向面积为 <math>(x_2-x_1)(y_3-y_1)-(y_2-y_1)(x_3-x_1)</math> 。如果其结果为0，这三个点是共线的；如果其结果为正，这三个点是向左转的；如果其结果为负，则它们是向右转的。
+
+==时间复杂度==
+
+排序的复杂度为<math>O(n\log n)</math>。雖然它的主循环看起来是<math>O(n^2)</math>的时间复杂度，但由于每个点要多次在堆疊中查找当且仅当其相对与堆疊頂端的点是“向右转”的，这个过程实际上是<math>O(n)</math>的时间复杂度，并且每一个点至多被考虑两次，而每个点只在点<math>(x_2, y_2)</math>产生一个“向左转”时被访问一次（因为算法进行到点<math>(x_3, y_3)</math>之后，点<math>(x_2, y_2)</math>由于产生了一个“右转”而被删去），因此，總时间复杂度由排序时间决定，即<math>O(n\log n)</math>
+
+==伪代码==
+
+定义：
+
+    # 当ccw函数的值为正的时候，三个点为“左转”（counter-clockwise turn），如果是负的，则是“右转”的，而如果
+    # 为0，则三点共线，因为ccw函数计算了由p1,p2,p3三个点围成的三角形的有向面积
+    function ccw(p1, p2, p3):
+        return (p2.x - p1.x)*(p3.y - p1.y) - (p2.y - p1.y)*(p3.x - p1.x)
+
+然后结果存在<code>points</code>数组内：
+
+    let N           = number of points
+    let points[N+1] = the array of points
+    swap points[1] with the point with the lowest y-coordinate
+    sort points by polar angle with points[1]
+    # points[0] 是结束循环的标记点
+    let points[0] = points[N]
+    # M 是围成凸包的点的个数
+    let M = 1
+    for i = 2 to N:
+        # Find next valid point on convex hull.
+        while ccw(points[M-1], points[M], points[i]) <= 0:
+            if M > 1:
+                M -= 1
+            # All points are collinear
+            else if i == N:
+                break
+            else
+                i += 1
+            # 更新M，并把points[i]放到正确的位置
+        M += 1
+        swap points[M] with points[i]
+
+上面的这段伪代码摘抄自Sedgewick and Wayne's ''Algorithms, 4th edition''.
+
+在循环中应该检查以避免共线的情况
+
+==引用==
+
+<references />
+
+* [[Cormen,_Thomas_H.|Cormen, Thomas H.]];[[Leiserson,_Charles_E.|Leiserson, Charles E.]],[[Rivest,_Ronald_L.|Rivest, Ronald L.]],[[Stein,_Clifford|Stein, Clifford]]《[[算法导论|算法导论]]》第33章计算几何学第三节“寻找凸包”
+
+[[Category:数学概念|Category:数学概念]]
+[[Category:計算幾何|Category:計算幾何]]
+[[Category:带有伪代码示例的条目|Category:带有伪代码示例的条目]]
+[[分类:数学术语|分类:数学术语]]

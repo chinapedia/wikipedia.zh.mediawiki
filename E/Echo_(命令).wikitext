@@ -1,0 +1,96 @@
+{{noteTA
+|G1=IT
+}}
+{{lowercase}}
+在[[计算机技术|计算机技术]]中，'''<code>echo</code>'''是一个[[DOS|DOS]]、[[OS/2|OS/2]]、[[Microsoft_Windows|Microsoft Windows]]、[[Singularity|Singularity]]、[[Unix|Unix]]和[[类Unix系统|类Unix]]系统中的[[命令_(计算机)|命令]]，用来将[[字符串|字符串]]输出到[[终端|终端]]上。它通常在[[shell脚本|shell脚本]]和[[批处理|批处理]]中使用，以将状态信息输出到屏幕或文件中。
+
+== 使用范例 ==
+<syntaxhighlight lang="bash">
+$ echo This is a test.
+This is a test.
+$ echo "This is a test." > ./test.txt
+$ cat ./test.txt
+This is a test.
+</syntaxhighlight>
+
+可以使用[[ANSI转义序列#选择图形再现（SGR）参数|ANSI转义代码图形再现序列（''SGR'' sequences）]]输出彩色文字：
+
+<syntaxhighlight lang="bash">
+FGRED=`echo "\033[31m"`
+FGCYAN=`echo "\033[36m"`
+BGRED=`echo "\033[41m"`
+FGBLUE=`echo "\033[35m"`
+BGGREEN=`echo "\033[42m"`
+#将终端颜色恢复为正常状态
+NORMAL=`echo "\033[m"`
+#然后：
+echo "${FGBLUE} Text in blue ${NORMAL}"
+echo "Text normal"
+echo "${BGRED} Background in red"
+echo "${BGGREEN} Background in Green and back to Normal ${NORMAL}"
+</syntaxhighlight>
+
+有的Unix变种（例如Linux）支持选项<code>-n</code>和<code>-e</code>，且除非提供<code>-e</code>选项，否则不处理转义序列。例如，<code>FGRED=`echo -e "\033[31m"`</code> 可能会在Linux下使用。不幸的是，由于历史上[[BSD|BSD]]和[[System_V|System V]]的不兼容性，这不是标准选项<ref>{{Cite web |url=http://www.opengroup.org/onlinepubs/009695399/utilities/echo.html |title=IEEE Std 1003.1, 2004, documentation for echo |accessdate=2013-04-15 |archive-date=2010-04-01 |archive-url=https://web.archive.org/web/20100401074845/http://www.opengroup.org/onlinepubs/009695399/utilities/echo.html |dead-url=no }}</ref>；有问题时，可以使用<code>[[printf|printf]]</code>命令。因此，建议使用<code>printf</code>，确保转义序列被正确处理。等效的<code>printf</code>代码就是<code>FGRED=`printf "\033[31m"`</code>。
+
+DOS、Microsoft Windows支持选项<code>on</code>和<code>off</code>。例如，<code>echo off</code>可以关闭回显，即不显示命令提示符。
+
+<syntaxhighlight lang="dos">
+C:\>ECHO off
+::注意下一条命令前无命令提示符
+ECHO Hello World!
+Hello World!
+ECHO on
+C:\>
+</syntaxhighlight>
+
+一般，批处理会在首行执行此条命令，以关闭执行过程中的回显。然而，执行此条命令亦会显示命令提示符，需使用<code>'''@'''echo off</code>以关闭该条命令的回显。
+
+<syntaxhighlight lang="dos">
+@ECHO off
+ECHO Hello World!
+PAUSE
+</syntaxhighlight>
+
+== 实现范例 ==
+在[[C语言|C语言]]中，<code>echo</code>命令可以用几行[[源代码|代码]]实现：
+
+<syntaxhighlight lang="c">
+#include <stdlib.h>
+#include <stdio.h>
+/* echo command-line arguments; 1st version */
+int main(int argc, char *argv[])
+{
+  int i;
+  for (i = 1; i < argc-1; i++)
+  {
+      printf("%s%s", argv[i], " ");
+  }
+  printf("%s%s", argv[argc-1], "\n");
+  return EXIT_SUCCESS;
+}
+</syntaxhighlight>
+
+[[Perl|Perl]]中的实现也很简单：
+<syntaxhighlight lang="perl">
+#!/usr/bin/env perl
+print join " ", @ARGV;
+</syntaxhighlight>
+
+== 参考 ==
+{{reflist}}
+
+== 外部链接 ==
+*{{man|cu|echo|SUS|write arguments to standard output}}{{en}}
+*[http://technet.microsoft.com/zh-cn/subscriptions/cc756140(v=ws.10).aspx Microsoft TechNet上的Echo帮助]{{Wayback|url=http://technet.microsoft.com/zh-cn/subscriptions/cc756140(v=ws.10).aspx |date=20191016121534 }}{{zh-cn}}
+
+== 参见 ==
+*[[Unix实用程序列表|Unix实用程序列表]]
+*[[MS-DOS命令列表|MS-DOS命令列表]]
+
+{{Unix命令}}
+{{视窗指令}}
+
+[[Category:Windows管理|Category:Windows管理]]
+[[Category:Unix_SUS2008实用工具|Category:Unix SUS2008实用工具]]
+[[Category:标准Unix程序|Category:标准Unix程序]]
+[[Category:内部DOS命令|Category:内部DOS命令]]

@@ -1,0 +1,23 @@
+{{#ifexpr:{{{2|0}}} > 1114111 |<!--Too large-->| {{#ifexpr:({{{2|0}}} > 55295 AND {{{2|0}}} < 57344) |<!--Surrogate-->|<!-- Check for illegal code points, higher than U+10FFFF or in the Surrogates area U+D800..U+DFFF.
+
+-->{{#ifeq: {{lc:{{{3|}}}}} | yes | <!-- switch for surrogatesonly = yes
+
+-->{{#switch: {{{base|}}}<!--switch for output choice
+
+Decimal output, surrogates only.-->| dec | decimal | 10 ={{#ifexpr:{{{2|0}}} < 65536 | | {{#expr: floor(({{{2|0}}} - 65536) / 1024) + 55296}}  {{#expr: (({{{2|0}}} - 65536) MOD 1024) + 56320}} }}<!--If U+FFFF or lower, UTF-16 is just the scalar value. Otherwise, figure out surrogates.
+
+Lower case hexadecimal output, surrogates only.-->|lchex |lc16 |lower case hex |lower case 16 ={{lc:{{#ifexpr:{{{2|0}}} < 65536 | | {{hexadecimal|{{#expr: floor(({{{2|0}}} - 65536) / 1024) + 55296}} | no}} {{hexadecimal|{{#expr: (({{{2|0}}} - 65536) MOD 1024) + 56320}} | no }} }} }}<!--If U+ffff or lower, UTF-16 is just the scalar value. Otherwise, figure out surrogates.
+
+Default base is hex output, surrogates only.-->| #default ={{uc:{{#ifexpr:{{{2|0}}} < 65536 | | {{hexadecimal|{{#expr: floor(({{{2|0}}} - 65536) / 1024) + 55296}} | no}} {{hexadecimal|{{#expr: (({{{2|0}}} - 65536) MOD 1024) + 56320}} | no }} }} }}<!--If U+FFFF or lower, UTF-16 is just the scalar value. Otherwise, figure out surrogates.
+
+-->}} | <!-- surrogatesonly = no / default
+
+-->{{#switch: {{{base|}}}<!--switch for output choice
+
+Decimal output.-->| dec | decimal | 10 ={{#ifexpr:{{{2|0}}} < 65536 | {{{2|0}}} | {{#expr: floor(({{{2|0}}} - 65536) / 1024) + 55296}}  {{#expr: (({{{2|0}}} - 65536) MOD 1024) + 56320}} }}<!--If U+FFFF or lower, UTF-16 is just the scalar value. Otherwise, figure out surrogates.
+
+Lower case hexadecimal output.-->|lchex |lc16 |lower case hex |lower case 16 ={{lc:{{#ifexpr:{{{2|0}}} < 65536 | {{Str rightc|{{padleft:{{{1|}}}|4}}|4}} | {{hexadecimal|{{#expr: floor(({{{2|0}}} - 65536) / 1024) + 55296}} | no}}  {{hexadecimal|{{#expr: (({{{2|0}}} - 65536) MOD 1024) + 56320}} | no }} }} }}<!--If U+ffff or lower, UTF-16 is just the scalar value. Otherwise, figure out surrogates.
+
+Default base is hex output.-->| #default ={{uc:{{#ifexpr:{{{2|0}}} < 65536 | {{Str rightc|{{padleft:{{{1|}}}|4}}|4}} | {{hexadecimal|{{#expr: floor(({{{2|0}}} - 65536) / 1024) + 55296}} | no}}  {{hexadecimal|{{#expr: (({{{2|0}}} - 65536) MOD 1024) + 56320}} | no }} }} }}<!--If U+FFFF or lower, UTF-16 is just the scalar value. Otherwise, figure out surrogates.
+
+-->}} }} }} }}

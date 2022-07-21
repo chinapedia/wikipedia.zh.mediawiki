@@ -1,0 +1,205 @@
+{{RoughTranslation}}
+
+
+在[[计算机网络|计算机网络]]中，'''网际协议控制协议'''（'''IPCP'''）是一个[[网络控制协议|网络控制协议]]，用来在[[点对点协议|点对点协议]]连接上建立和配置[[网际协议|网际协议]]。IPCP负责在点对点连接的两端配置、使能和去使能IP协议模块。IPCP使用与[[链路控制协议|链路控制协议]]相同的报文交换机制。IPCP报文在PPP达到网络层协议阶段之前不会进行交互，任何在此阶段前收到的IPCP报文都应静默丢弃。
+
+== IP帧 ==
+一旦配置完成，链路就可以将IP数据当做PPP帧的载荷进行传输。
+
+{| class="wikitable"
+|-
+| PPP 头
+| IPCP 头
+| 数据 :::
+|}
+
+'''IPCP头:'''
+
+{| class="wikitable"
+|-
+! style="width:7%; border-bottom:none; border-right:none;"| ''偏移量''
+! style="width:7%; border-left:none;"| [[八位元組|Octet]]
+! colspan="8" | 0
+! colspan="8" | 1
+! colspan="8" | 2
+! colspan="8" | 3
+|-
+! style="border-top: none" | [[八位元組|Octet]]
+! [[比特|比特]]
+!  style="width:2.4%;"|0 
+!  style="width:2.4%;"| 1 
+!  style="width:2.4%;"| 2 
+!  style="width:2.4%;"| 3 
+!  style="width:2.4%;"| 4 
+!  style="width:2.4%;"| 5 
+!  style="width:2.4%;"| 6 
+!  style="width:2.4%;"| 7
+!  style="width:2.4%;"| 8 
+!  style="width:2.4%;"| 9 
+!  style="width:2.4%;"| 10 
+!  style="width:2.4%;"| 11 
+!  style="width:2.4%;"| 12 
+!  style="width:2.4%;"| 13 
+!  style="width:2.4%;"| 14 
+!  style="width:2.4%;"| 15
+!  style="width:2.4%;"| 16 
+!  style="width:2.4%;"| 17 
+!  style="width:2.4%;"| 18 
+!  style="width:2.4%;"| 19 
+!  style="width:2.4%;"| 20 
+!  style="width:2.4%;"| 21 
+!  style="width:2.4%;"| 22 
+!  style="width:2.4%;"| 23
+!  style="width:2.4%;"| 24 
+!  style="width:2.4%;"| 25 
+!  style="width:2.4%;"| 26 
+!  style="width:2.4%;"| 27 
+!  style="width:2.4%;"| 28 
+!  style="width:2.4%;"| 29 
+!  style="width:2.4%;"| 30 
+!  style="width:2.4%;"| 31
+|-
+! 0 
+! 0
+| colspan=8 | 代码
+| colspan=8 | 标识符
+| colspan=16 | 长度
+|}
+
+
+'''代码'''
+
+8位。<br>
+表示LCP包的种类。
+
+{| class="wikitable"
+|-
+! 代码 || 描述 || 参考
+|-
+! 0
+| Vendor Specific. || {{IETF RFC|2153|link=no}}
+|-
+! 1
+| Configure-Request. ||  
+|-
+! 2
+| Configure-Ack. ||  
+|-
+! 3
+| Configure-Nak. ||  
+|-
+! 4
+| Configure-Reject. ||  
+|-
+! 5
+| Terminate-Request. ||  
+|-
+! 6
+| Terminate-Ack. ||  
+|-
+! 7
+| Code-Reject. ||  
+|}
+
+
+'''标识符'''
+8位。
+
+用来匹配请求和回应。
+
+'''长度'''
+16位。<br>
+报文包含首部的长度。
+
+'''数据'''
+变长。<br>
+由长度所指明的零到多个字节数据。
+这个字段可能会包含一个或多个''选项''。
+
+==配置选项==
+IPCP配置选项允许协商期望的IP参数。IPCP使用与LCP相同的配置选项格式，以及一些独立的选项。
+
+'''IPCP配置选项:'''
+
+{| class="wikitable"
+|-
+! 00 || 01 || 02 || 03 || 04 || 05 || 06 || 07
+! 08 || 09 || 10 || 11 || 12 || 13 || 14 || 15
+|-
+| colspan=8 | 选项
+| colspan=8 | 长度
+|-
+| colspan=16 | 数据
+|}
+
+
+'''选项'''
+8位。
+
+{| class="wikitable"
+|-
+! 选项 || 长度 || 描述 || 参考
+|-
+! 1
+| align="center" | 10 || IP-地址（IP-Addresses）（已废除）	 ||{{IETF RFC|1172|link=no}}, {{IETF RFC|1332|link=no}}
+|-
+! 2
+| align="center" | ≥4 || IP-压缩协议 ||{{IETF RFC|1332|link=no}}, {{IETF RFC|3241|link=no}}, {{IETF RFC|3544|link=no}}
+|-
+! 3
+| align="center" | 6 || IP-地址（IP-Address） ||{{IETF RFC|1332|link=no}}
+|-
+! 4
+| align="center" | 6 || 移动-IPv4 ||{{IETF RFC|2290|link=no}}
+|-
+! 129
+| align="center" | 6 || 主DNS服务器地址 ||{{IETF RFC|1877|link=no}}
+|-
+! 130
+| align="center" | 6 || 主NBNS服务器地址 ||{{IETF RFC|1877|link=no}}
+|-
+! 131
+| align="center" | 6 || 次DNS服务器地址 ||{{IETF RFC|1877|link=no}}
+|-
+! 132
+| align="center" | 6 || 次NBNS服务器地址 ||{{IETF RFC|1877|link=no}}
+|}
+
+'''长度'''
+8位。
+
+'''数据'''
+变长。
+
+===IP-压缩协议===
+{| class="wikitable"
+|-
+!类型
+!长度
+!IP-压缩协议
+!数据
+|-
+|1 字节
+|1 字节
+|2 字节
+|变长
+|}
+
+===IP-Address===
+{| class="wikitable"
+|-
+!类型
+!长度
+!IP-地址
+|-
+|1 字节
+|1 字节
+|4 字节
+|}
+
+==参考资料==
+*RFC 1332: 网际协议控制协议（IPCP）
+*RFC 1570: PPP[[链路控制协议|链路控制协议]]（LCP）扩展
+*RFC 1661: [[点对点协议|点对点协议]]（PPP）
+
+[[Category:网际协议|Category:网际协议]]

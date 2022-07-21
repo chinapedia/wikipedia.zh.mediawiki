@@ -1,0 +1,22 @@
+{{NoteTA|G1=IT}}
+'''虛擬局域網擴展（Virtual Extensible LAN, VXLAN）'''是一種網路虛擬化技術，它試圖改善大雲計算部署相關的[[可擴展性|可擴展性]]問題。它採用類似[[VLAN|VLAN]]封裝技術封裝基於[[MAC地址|MAC]]含括第 4 層的[[用户数据报协议|UDP]]封包的 [[OSI|OSI]] 第2層 [[乙太網路|乙太網幀]] ，使用 4789 作為預設分配的 [[IANA|IANA]] 目的地 UDP 埠號。<ref>{{cite web|url = http://blogs.vmware.com/console/2011/08/towards-virtualized-networking-for-the-cloud.html|title = Towards Virtualized Networking for the Cloud|author = Steve Herrod|publisher = VMware|date = August 30, 2011|accessdate = 2013-02-25|archive-date = 2013-05-02|archive-url = https://web.archive.org/web/20130502021837/http://blogs.vmware.com/console/2011/08/towards-virtualized-networking-for-the-cloud.html|dead-url = no}}</ref>
+
+VXLAN 是努力覆蓋封裝協議的演變，它提高了可擴展性達 1600 萬個邏輯網絡，並允許透過[[网际协议|IP]]網路鄰接第 2 層。使用 HER (Head-End Replication)的 [[多播|多播]] 或 [[單播|單播]] 是用來淹沒 BUM ([[廣播_(網路)|broadcast]], unknown destination address, [[多播|multicast]]) 流量
+
+VXLAN 規格一開始是由 [[VMware|VMware]]、[[Arista_Networks|Arista Networks]] 和 [[思科系统|Cisco]] 建立的 <ref>{{cite web|url = http://www.theregister.co.uk/2011/08/30/vmware_cisco_vxlan_spec/|title = VMware, Cisco stretch virtual LANs across the heavens|author = Timothy Prickett Morgan|publisher = The Register|date = 30 August 2011|accessdate = 2013-02-25|archive-date = 2019-12-08|archive-url = https://web.archive.org/web/20191208012651/https://www.theregister.co.uk/2011/08/30/vmware_cisco_vxlan_spec/|dead-url = no}}</ref><ref>{{cite web |url = http://www.aristanetworks.com/media/system/pdf/TechBulletins/VXLAN_Overview.pdf|title = Arista and VMware have coauthored a new standard in cloud networking: the Virtual eXtensible LAN (VXLAN)|accessdate = 2013-12-01}}</ref>，其他的 VXLAN 技術擁護者包括[[华为|Huawei]]、[[博通|Broadcom]]、[[思杰系统|Citrix]]、Pica8、Cumulus Networks、[[戴爾|Dell]]、Mellanox、<ref>{{cite web|url = http://www.theregister.co.uk/Print/2013/04/23/mellanox_connectx_3_server_adapters/|title = Mellanox adds VM-flitting to ConnectX-3 adapters - Going Pro with VXLAN|date = April 23, 2013|publisher = The Register|author = Timothy Pricket Morgan|access-date = 2015-07-03|archive-date = 2018-09-21|archive-url = https://web.archive.org/web/20180921153212/https://www.theregister.co.uk/Print/2013/04/23/mellanox_connectx_3_server_adapters/|dead-url = no}}</ref> [[OpenBSD、|OpenBSD、]]<ref>{{cite web|url = http://permalink.gmane.org/gmane.os.openbsd.cvs/123361|title = OpenBSD vxlan implementation|date = October 14, 2013|publisher = Reyk Floeter|author = Reyk Floeter|access-date = 2015-07-03|archive-url = https://web.archive.org/web/20141029170325/http://permalink.gmane.org/gmane.os.openbsd.cvs/123361|archive-date = 2014-10-29|dead-url = yes}}</ref> [[紅帽公司|Red Hat]]<ref>{{cite web|url = http://datatracker.ietf.org/doc/draft-mahalingam-dutt-dcops-vxlan/|title = VXLAN: A Framework for Overlaying Virtualized Layer 2 Networks over Layer 3 Networks|author = M. Mahalingam et al.|date = February 22, 2013|accessdate = 2013-02-25|archive-date = 2014-08-23|archive-url = https://web.archive.org/web/20140823234449/http://datatracker.ietf.org/doc/draft-mahalingam-dutt-dcops-vxlan/|dead-url = no}}</ref> 和 [[Juniper_Networks|Juniper Networks]]。
+
+VXLAN 正式由 IETF 記錄在 [[rfc:7348|RFC 7348]] 內。Open vSwitch 支持VXLAN覆蓋網絡。
+
+== VXLAN的作用 ==
+VXLAN可以為網路提供以下作用：
+* 突破 [[VLAN|VLAN]]的最多 4096 個終端的數量限制，以滿足大規模雲計算數據中心的需求。目前因為現在虛擬化技術的發展，在數據中心裏的伺服器都模擬成虛擬機 (VM)，而且 VM 一般都會需要分割成組，達成二層隔離，目前大多是透過 VLAN 技術實現的。但 VLAN 技術的缺陷是 VLAN Header 預留的長度只有12 bit，最多只能支持4096個，無法滿足日益增長的需求。目前 VXLAN 的報文 Header 內有 24 bit，可以支持 2的24次方的 VNI 個數。(VXLAN中透過 VNI 來識別，相當於VLAN ID)
+* 解決 [[生成树协议|STP]]在大型網路設備頻寬浪費和收斂性能變慢的缺陷。在數據中心一旦啟動 STP，將導致鏈路頻寬的浪費。此外，當拓撲增加到二百台網路設備時，收斂性能會顯變慢。
+* 解決 ToR (Top of Rack) 交換機 [[MAC表|MAC表]]耗盡問題。二層網路出現後，不僅要記錄數據中心二層設備的 MAC 位址，還得記錄其他數據中心二層範圍內的位址，這包括了海量的虛擬機器的 MAC 位址，這增加了 TOR [[MAC表|MAC表]]的需求。但目前的交換機晶片遠遠無法滿足此一需求。
+
+== 參見 ==
+{{Reflist|30em}}
+
+== 外部連結 ==
+
+[[Category:网络协议|Category:网络协议]]
+[[Category:穿隧協議|Category:穿隧協議]]

@@ -1,0 +1,399 @@
+{{noteTA|G1=IT}}
+{{roughtranslation|time=2014-11-01T10:36:59+00:00}}
+'''JNI''' （'''Java Native Interface，Java本地接口'''）是一种[[编程框架|编程框架]]，使得[[Java虚拟机|Java虚拟机]]中的[[Java|Java]]程序可以调用本地应用/或库，也可以被其他程序调用。 本地程序一般是用其它语言（[[C语言|C]]、[[C++|C++]]或[[汇编语言|汇编语言]]等）编写的，并且被编译为基于本机硬件和操作系统的程序。<ref name="role">{{cite web |url=http://java.sun.com/docs/books/jni/html/intro.html#1811 |title=Role of the JNI |accessdate=2008-02-27 |work=The Java Native Interface Programmer's Guide and Specification |archive-date=2012-06-26 |archive-url=https://web.archive.org/web/20120626120230/http://java.sun.com/docs/books/jni/html/intro.html#1811 |dead-url=no }}</ref>
+
+==设计目的和功能==
+有些事情Java无法处理时，JNI允许程序员用其他编程语言来解决，例如，Java标准库不支持的平台相关功能或者程序库。也用于改造已存在的用其它语言写的程序，供Java程序调用。许多基于JNI的标准库提供了很多功能给程序员使用，例如文件I/O、音频相关的功能。当然，也有各种高性能的程序，以及平台相关的API实现，允许所有Java应用程序安全并且平台独立地使用这些功能。 
+
+JNI框架允许Native方法调用Java对象，就像Java程序访问Native对象一样方便。Native方法可以创建Java对象，读取这些对象，并调用Java对象执行某些方法。当然Native方法也可以读取由Java程序自身创建的对象，并调用这些对象的方法。
+
+==注意事项==
+* 在使用JNI的过程中，可能因为某些微小的BUG，对整个JVM造成很难重现和调试的错误。
+* 仅有应用程序与签名的applet可以调用JNI。
+* 依赖于JNI的应用失去了Java的平台移植性（一种解决办法是为每个平台编写专门的JNI代码，然后在Java代码中，根据操作系统载入正确的JNI代码）。 
+* JNI框架并没有对 non-JVM 内存提供自动垃圾回收机制，Native代码（如汇编语言）分配的内存和资源，需要其自身负责进行显式的释放。
+* [[Linux|Linux]]与[[Solaris|Solaris]]平台，如果Native代码将自身注册为信号处理器（signal handler），就会拦-{截}-发给JVM的[[信号_(计算机科学)|信号]]。可以使用 [[责任链模式|责任链模式]] 让 Native代码更好地与JVM进行交互。<ref name="jniSignal">{{Cite web |url=http://javajiggle.com/2008/01/06/if-jni-based-application-is-crashing-check-signal-handling/ |title=If JNI based application is crashing, check signal handling! |accessdate=2014-05-30 |archive-date=2014-11-09 |archive-url=https://web.archive.org/web/20141109141518/http://javajiggle.com/2008/01/06/if-jni-based-application-is-crashing-check-signal-handling |dead-url=no }}</ref>
+* Windows平台上，在SEH try/catch块中可以将[[结构化异常处理|结构化异常处理]]（SEH）用来包装Native代码，以捕获机器（CPU/[[FPU|FPU]]）生成的软中断（例如：[[NullPointerException|空指针异常]]、被除数为0等），将这些中断在传播到JVM（中的Java代码）之前进行处理，以免造成未捕获的异常。
+* NewStringUTF、GetStringUTFLength、GetStringUTFChars、ReleaseStringUTFChars與 GetStringUTFRegion等编码函数处理的是一种修改的UTF-8，<ref name="jniModifiedUtf">{{Cite web |url=http://docs.oracle.com/javase/1.5.0/docs/guide/jni/spec/types.html#wp16542 |title=Modified UTF-8 Strings |accessdate=2014-05-30 |archive-date=2020-05-03 |archive-url=https://web.archive.org/web/20200503130300/https://docs.oracle.com/javase/1.5.0/docs/guide/jni/spec/types.html#wp16542 |dead-url=no }}</ref>，实际上是一种不同的编码，某些字符并不是标准的[[UTF-8|UTF-8]]。 null字符（U+0000）以及不在[[Unicode字符平面映射|Unicode字符平面映射]]中的字符（codepoints 大于等于 U+10000 的字符，例如UTF-16中的代理对 surrogate pairs），在修改的UTF-8中的编码都有所不同。 许多程序错误地使用了这些函数，将标准UTF-8字符串传入或传出这些函数，实际上应该使用修改后的编码。程序应当先使用NewString、GetStringLength、GetStringChars、ReleaseStringChars、GetStringRegion、GetStringCritical与ReleaseStringCritical等函数，这些函数在[[字节序|小尾序]]机器上使用[[UTF-16|UTF-16LE]]编码，在[[字节序|大尾序]]机器上使用[[UTF-16|UTF-16BE]]编码，然后再通过程序将 [[UTF-16|UTF-16]]转换为 UTF-8。
+* JNI在某些情况下可能带来很大的开销和性能损失：<ref name="StackOverflow: What makes JNI calls slow?">{{cite web|url=https://stackoverflow.com/a/7809300/1068537|title=java - What makes JNI calls slow? - Stack Overflow|publisher=|accessdate=2017-01-22|archive-date=2019-10-17|archive-url=https://web.archive.org/web/20191017191503/https://stackoverflow.com/questions/7699020/what-makes-jni-calls-slow/7809300|dead-url=no}}</ref>
+** 调用 JNI 方法是很笨重的操作，特别是在多次重复调用的情况下。
+** Native 方法不会被 JVM 内联，也不会被 [[即時編譯|即時編譯]] 优化 ，因为方法已经被编译过了。
+** Java 数组可能会被拷贝一份，以传递给 native 方法，执行完之后再拷贝回去. 其开销与数组的长度是线性相关的。
+** 如果传递一个对象给方法，或者需要一个回调，那么 Native 方法可能会自己调用JVM。 访问Java对象的属性、方法和类型时，Native代码需要类似[[反射式编程|反射]]的东西。签名由字符串指定，通常从JVM中查询。这非常缓慢并且容易出错。
+** Java 中的字符串（String） 也是对象，有 length 属性，并且是编码过的. 读取或者创建字符串都需要一次时间复杂度为 O(n) 的复制操作.
+
+==JNI如何工作==
+
+在JNI框架，native方法一般在单独的.c或.cpp文件中实现。当JVM调用这些函数，就传递一个<code>JNIEnv</code>指针，一个<code>jobject</code>的指针，任何在Java方法中声明的Java参数。一个JNI函数看起来类似这样： 
+<syntaxhighlight lang="c">
+JNIEXPORT void JNICALL Java_ClassName_MethodName
+  (JNIEnv *env, jobject obj)
+{
+    /*Implement Native Method Here*/
+}
+</syntaxhighlight>
+''<code>env</code>''指向一个[[结构|结构]]包含了到JVM的界面，包含了所有必须的函数与JVM交互、访问Java对象。例如，把本地数组转换为Java数组的JNI函数，把本地字符串转换为Java字符串的JNI函数，实例化对象，抛出异常等。基本上，Java程序可以做的任何事情都可以用<code>JNIEnv</code>做到，虽然相当不容易。 
+
+例如，下面代码把Java字符串转化为本地字符串：
+
+<syntaxhighlight lang="cpp">
+//C++ code
+extern "C"
+JNIEXPORT void JNICALL Java_ClassName_MethodName
+  (JNIEnv *env, jobject obj, jstring javaString)
+{
+    //Get the native string from javaString
+    const char *nativeString = env->GetStringUTFChars(javaString, 0);
+
+    //Do something with the nativeString
+
+    //DON'T FORGET THIS LINE!!!
+    env->ReleaseStringUTFChars(javaString, nativeString);
+}
+</syntaxhighlight>
+
+<syntaxhighlight lang="c">
+/*C code*/
+JNIEXPORT void JNICALL Java_ClassName_MethodName
+  (JNIEnv *env, jobject obj, jstring javaString)
+{
+    /*Get the native string from javaString*/
+    const char *nativeString = (*env)->GetStringUTFChars(env, javaString, 0);
+
+    /*Do something with the nativeString*/
+
+    /*DON'T FORGET THIS LINE!!!*/
+    (*env)->ReleaseStringUTFChars(env, javaString, nativeString);
+}
+</syntaxhighlight>
+
+<syntaxhighlight lang="objc">
+/*Objective-C code*/
+JNIEXPORT void JNICALL Java_ClassName_MethodName
+  (JNIEnv *env, jobject obj, jstring javaString)
+{
+    /*DON'T FORGET THIS LINE!!!*/
+    JNF_COCOA_ENTER(env);
+
+    /*Get the native string from javaString*/
+    NSString* nativeString = JNFJavaToNSString(env, javaString);
+
+    /*Do something with the nativeString*/
+
+    /*DON'T FORGET THIS LINE!!!*/
+    JNF_COCOA_EXIT(env);
+}
+</syntaxhighlight>
+
+本地[[数据类型|数据类型]]与Java数据类型可以互相映射。对于复合数据类型，如对象，数组，字符串，就必须用<code>JNIEnv</code>中的方法来显示地转换。
+
+第2个参数''obj''引用到一个Java对象，在其中声明了本地方法。 
+
+===类型映射===
+
+下表是Java (JNI)与本地代码之间的数据类型映射：
+
+{| class="wikitable"
+!本地类型
+!Java语言的类型
+!描述
+!类型签名（signature）
+|-
+|unsigned char
+|jboolean
+|unsigned 8 bits
+|Z
+|-
+|signed char
+|jbyte
+|signed 8 bits
+|B
+|-
+|unsigned short
+|jchar
+|unsigned 16 bits
+|C
+|-
+|short
+|jshort
+|signed 16 bits
+|S
+|-
+|long
+|jint
+|signed 32 bits
+|I
+|-
+|
+long long<br/>__int64
+|jlong
+|signed 64 bits
+|J
+|-
+|float
+|jfloat
+|32 bits
+|F
+|-
+|double
+|jdouble
+|64 bits
+|D
+|-
+|void
+|
+|
+|V
+|}
+
+签名<code>"L {{Sic|hide=y|fully|-}}qualified-class ;"</code>是由该名字指明的类。例如，签名<code>"Ljava/lang/String;"</code>是类<code>java.lang.String</code>。带前缀<code>[</code>的签名表示该类型的数组，如<code>[I</code>表示整型数组。<code>void</code>签名使用<code>V</code>代码。
+
+这些类型是可以互换的，如<code>jint</code>也可使用 <code>int</code>，不需任何[[类型转换|类型转换]]。
+
+但是，Java字符串、数组与本地字符串、数组是不同的。如果在使用<code>char *</code>代替了<code>jstring</code>，程序可能会导致JVM崩溃。
+<syntaxhighlight lang="cpp">
+JNIEXPORT void JNICALL Java_ClassName_MethodName
+        (JNIEnv *env, jobject obj, jstring javaString) {
+    // printf("%s", javaString);        // INCORRECT: Could crash VM!
+
+    // Correct way: Create and release native string from Java string
+    const char *nativeString = (*env)->GetStringUTFChars(env, javaString, 0);
+    printf("%s", nativeString);
+    (*env)->ReleaseStringUTFChars(env, javaString, nativeString);
+}
+</syntaxhighlight>
+
+这种情况也适用于Java数组。下例对数组元素求和。
+
+<syntaxhighlight lang="cpp">
+JNIEXPORT jint JNICALL Java_IntArray_sumArray
+        (JNIEnv *env, jobject obj, jintArray arr) {
+    jint buf[10];
+    jint i, sum = 0;
+    // This line is necessary, since Java arrays are not guaranteed
+    // to have a continuous memory layout like C arrays.
+    env->GetIntArrayRegion(arr, 0, 10, buf);
+    for (i = 0; i < 10; i++) {
+        sum += buf[i];
+    }
+    return sum;
+}
+</syntaxhighlight>
+
+=== JNIEnv* ===
+JNI环境指针(<tt>JNIEnv*</tt>)作为每个映射为Java方法的本地函数的第一个参数，使得本地函数可以与JNI环境交互。这个JNI界面指针可以存储，但仅在当前线程中有效。其它线程必须首先调用<tt>AttachCurrentThread()</tt>把自身附加到虚拟机以获得JNI界面指针。一旦附加，本地线程运行就类似执行本地函数的正常Java线程。本地线程直到执行<tt>DetachCurrentThread()</tt>把自身脱离虚拟机。<ref>The Invocation API. Sun Microsystems. http://java.sun.com/j2se/1.5.0/docs/guide/jni/spec/invocation.html {{Wayback|url=http://java.sun.com/j2se/1.5.0/docs/guide/jni/spec/invocation.html |date=20090925164644 }}</ref>
+
+把当前线程附加到虚拟机并获取JNI界面指针：
+ JNIEnv *env;
+ (*g_vm)->AttachCurrentThread (g_vm, (void **) &env, NULL);
+
+当前线程脱离虚拟机：
+ (*g_vm)->DetachCurrentThread (g_vm);
+
+==高级使用==
+
+===本地AWT绘制===
+本地代码不仅可以与Java交互，也可以在Java {{Javadoc:SE|java/awt|Canvas}}绘图，使用{{tsl|en|Java AWT Native Interface}}。 
+
+===访问汇编代码===
+JNI允许直接访问汇编代码。<ref>{{cite web
+ |url         = http://today.java.net/pub/a/today/2006/10/19/invoking-assembly-language-from-java.html
+ |title       = Invoking Assembly Language Programs from Java
+ |publisher   = Java.net
+ |date        = 2006-10-19
+ |accessdate  = 2007-10-06
+ |deadurl     = yes
+ |archiveurl  = https://web.archive.org/web/20080330002620/http://today.java.net/pub/a/today/2006/10/19/invoking-assembly-language-from-java.html
+ |archivedate = 2008-03-30
+}}</ref> 也可以从汇编代码访问Java。<ref>{{cite web
+ |url         = http://today.java.net/pub/a/today/2007/10/04/launch-java-applications-from-assembly-language-programs.html
+ |title       = Launch Java Applications from Assembly Language Programs
+ |publisher   = Java.net
+ |date        = 2006-10-19
+ |accessdate  = 2007-10-04
+ |deadurl     = yes
+ |archiveurl  = https://web.archive.org/web/20071011014140/http://today.java.net/pub/a/today/2007/10/04/launch-java-applications-from-assembly-language-programs.html
+ |archivedate = 2007-10-11
+}}</ref>
+
+==Microsoft的RNI==
+
+Microsoft实现的Java虚拟机——[[Visual_J++|Visual J++]]的类似的访问本地Windows代码的机制'''Raw Native Interface'''（'''RNI'''）。 
+==例子==
+
+===HelloWorld===
+
+make.sh
+<syntaxhighlight lang="bash">
+#!/bin/sh
+
+# openbsd 4.9
+# gcc 4.2.1
+# openjdk 1.7.0
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.
+javac HelloWorld.java
+javah HelloWorld
+gcc -shared libHelloWorld.c -o libHelloWorld.so
+java HelloWorld
+</syntaxhighlight>
+
+build.bat
+<syntaxhighlight lang="dos">
+:: Microsoft Visual Studio 2012 Visual C++ compiler
+SET VC="C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC"
+:: Microsoft Windows SDK for Windows 7 and .NET Framework 4 
+SET MSDK="C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A"
+:: Java 1.7.0 update 21
+SET JAVA_HOME="C:\Program Files (x86)\Java\jdk1.7.0_21"
+
+call %VC%\vcvarsall.bat
+
+javac HelloWorld.java
+javah HelloWorld
+%VC%\bin\cl /I%JAVA_HOME%\include /I%JAVA_HOME%\include\win32 /I%VC%\include /I%VC%\lib /I%MSDK%\Lib libHelloWorld.c /FelibHelloWorld.dll /LD
+java HelloWorld
+</syntaxhighlight>
+
+HelloWorld.java
+
+<syntaxhighlight lang="java">
+class HelloWorld
+{
+	private native void print();
+	public static void main(String[] args)
+	{
+		new HelloWorld().print();
+	}
+	static{
+		System.loadLibrary("HelloWorld");
+	}
+}
+
+</syntaxhighlight>
+
+HelloWorld.h
+
+<syntaxhighlight lang="c">
+/* DO NOT EDIT THIS FILE - it is machine generated */
+#include <jni.h>
+/* Header for class HelloWorld */
+
+#ifndef _Included_HelloWorld
+#define _Included_HelloWorld
+#ifdef __cplusplus
+extern "C" {
+#endif
+/*
+ * Class:     HelloWorld
+ * Method:    print
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_HelloWorld_print
+  (JNIEnv *, jobject);
+
+#ifdef __cplusplus
+}
+#endif
+#endif
+
+</syntaxhighlight>
+
+libHelloWorld.c
+
+<syntaxhighlight lang="c">
+ #include <stdio.h>
+ #include "HelloWorld.h"
+
+ JNIEXPORT void JNICALL
+ Java_HelloWorld_print(JNIEnv *env, jobject obj)
+ {
+     printf("Hello World!\n");
+     return;
+ }
+
+</syntaxhighlight>
+Invocation:
+<syntaxhighlight lang="bash">
+$ chmod +x make.sh
+$ ./make.sh
+</syntaxhighlight>
+
+==参见==
+*{{tsl|en|Java AWT Native Interface}}
+*{{tsl|en|Gluegen}}, a Java tool which automatically generates the Java and JNI code necessary to call C libraries from Java code
+*[[P/Invoke|P/Invoke]], the .NET Framework method of calling native applications
+*[[SWIG|SWIG]], a multilanguage interface-generator for C and C++ libraries that can generate JNI code
+*[[Java_Native_Access|Java Native Access]] provides Java programs easy access to native shared libraries without writing boilerplate code
+
+==参考文献==
+{{reflist|2}}
+ 
+==相关书籍==
+{{refbegin}}
+* {{cite book
+ |first        = Rob
+ |last         = Gordon
+ |date         = March 1998
+ |title        = Essential Jni: Java Native Interface
+ |publisher    = [[Prentice_Hall|Prentice Hall]]
+ |edition      = 1st
+ |pages        = 498
+ |isbn         = 0-13-679895-0
+ |url          = http://www.informit.com/store/product.aspx?isbn=9780136798958
+ |access-date  = 2014-05-30
+ |archive-date = 2012-10-01
+ |archive-url  = https://web.archive.org/web/20121001210024/http://www.informit.com/store/product.aspx?isbn=9780136798958
+ |dead-url     = no
+}}
+* {{cite book
+ |first        = Sheng
+ |last         = Liang
+ |date         = June 20, 1999
+ |title        = Java(TM) Native Interface: Programmer's Guide and Specification
+ |publisher    = [[Prentice_Hall|Prentice Hall]]
+ |edition      = 1st
+ |pages        = 320
+ |isbn         = 0-201-32577-2
+ |url          = http://www.informit.com/store/product.aspx?isbn=9780201325775
+ |access-date  = 2014-05-30
+ |archive-date = 2012-10-01
+ |archive-url  = https://web.archive.org/web/20121001210246/http://www.informit.com/store/product.aspx?isbn=9780201325775
+ |dead-url     = no
+}}
+{{refend}}
+
+==外部链接==
+*[http://java.sun.com/javase/7/docs/technotes/guides/jni/index.html Oracle's JNI page for Java 6, including the JNI Specification] {{Wayback|url=http://java.sun.com/javase/7/docs/technotes/guides/jni/index.html |date=20090917155659 }}
+*[http://java.sun.com/docs/books/jni/ Java Native Interface: Programmer's Guide and Specification]{{Wayback|url=http://java.sun.com/docs/books/jni/ |date=20120728074805 }} - Book, copyright 2002.
+*[http://www.ibm.com/developerworks/java/library/j-jni/index.html Best practices for using the Java Native Interface] {{Wayback|url=http://www.ibm.com/developerworks/java/library/j-jni/index.html |date=20171105154646 }}
+*[https://web.archive.org/web/20140531105330/http://electrofriends.com/articles/jni/jni-part1-java-native-interface/ JNI Complete tutorial with examples]
+*[https://web.archive.org/web/20120829093638/http://gcc.gnu.org/onlinedocs/gcj/About-CNI.html GNU CNI Tutorial]
+*[https://web.archive.org/web/20140531090926/http://www.think-techie.com/2009/08/java-native-interface-jni.html Multi-platform JNI Tutorial at Think-Techie.com]
+<!-- Broken link, doesn't appear to be available anymore:
+*[http://java.sun.com/docs/books/tutorial/native1.1 The JNI Tutorial]
+-->
+*[https://web.archive.org/web/20070930030219/http://www.codeproject.com/java/jnibasics1.asp A JNI Tutorial at CodeProject.com (Microsoft specific)]
+*[http://www.codetoad.com/java_simpleJNI.asp JNI Tutorial at CodeToad.com] {{Wayback|url=http://www.codetoad.com/java_simpleJNI.asp |date=20150518183159 }}
+*[http://java.sun.com/developer/onlineTraining/Programming/JDCBook/jniexamp.html Larger JNI example from Sun] {{Wayback|url=http://java.sun.com/developer/onlineTraining/Programming/JDCBook/jniexamp.html |date=20120626131731 }}
+*[http://codebazaar.blogspot.com/2010/08/package-codebazaar.html JNI video tutorial with Eclipse and Visual Studio]{{Wayback|url=http://codebazaar.blogspot.com/2010/08/package-codebazaar.html |date=20160303210623 }}
+*[http://developer.apple.com/java/jniuniversal.html JNI in XCode from Apple]{{Wayback|url=http://developer.apple.com/java/jniuniversal.html |date=20111014002625 }}
+*[http://www.codeproject.com/KB/debug/jni_ex.aspx Exception handling in JNI ] {{Wayback|url=http://www.codeproject.com/KB/debug/jni_ex.aspx |date=20110805073216 }}
+*[https://web.archive.org/web/20140531105001/http://hawtjni.fusesource.org/documentation/index.html HawtJNI] Simplifies creating JNI libraries by code generating the JNI implementations using declarative annotations placed on your Java code.
+*[http://reference.wolfram.com/mathematica/JLink/tutorial/Overview.html J/Link] {{Wayback|url=http://reference.wolfram.com/mathematica/JLink/tutorial/Overview.html |date=20140406222944 }} lets you call Java from Mathematica in a completely transparent way, and it also lets you use and control the Mathematica kernel from a Java program (Commercial)
+*[http://code.google.com/p/jace/ Jace] {{Wayback|url=http://code.google.com/p/jace/ |date=20160109133650 }} is a toolkit designed to make it easy to write JNI-based programs
+*[http://www.teamdev.com/jniwrapper/ JNIWrapper] {{Wayback|url=http://www.teamdev.com/jniwrapper/ |date=20210113082811 }} provides simplified access to native code from Java applications without using Java Native Interface.
+*[http://jnative.sf.net Java to Native Interface] {{Wayback|url=http://jnative.sf.net/ |date=20081010222846 }} LGPL library to call native functions from Java
+*[http://jna.dev.java.net{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }} Java Native Access]{{Dead link|date=2019年12月 |bot=InternetArchiveBot |fix-attempted=yes }} Access to native libraries from Java without JNI
+*[https://web.archive.org/web/20070728043327/https://nlink.dev.java.net/ NLink] Another library for access to native libraries without JNI
+*[http://johannburkard.de/software/nativecall/ NativeCall – call native methods from Java without JNI] Library to access native code without JNI
+*[http://www.innowhere.com JNIEasy] {{Wayback|url=http://www.innowhere.com/ |date=20171122131824 }} Transparent Native Programming for C/C++, pure Java alternative to JNI using POJOS and JDO/JPA development style
+*[http://jni4net.sf.net/ jni4net]{{Wayback|url=http://jni4net.sf.net/ |date=20191017191504 }} bridge between Java and .NET (intraprocess, fast, object oriented, open-source)
+*[https://web.archive.org/web/20120901042818/http://www.simtel.net/product/view/id/93174 Object-Oriented JNI Advanced Add-in for VC6] Object-Oriented JNI with a number of helpers that includes the standard JNI SDK for regular C++ (Commercial)
+*[https://web.archive.org/web/20121217203258/http://www.simtel.net/product/view/id/95126 Object-Oriented JNI for .NET1.1 (low-level)] Object-Oriented JNI with a number of helpers that includes the standard JNI SDK for C#, Managed C++, VB#, J# (Commercial)
+*[https://web.archive.org/web/20120301053642/http://www.simtel.net/product/view/id/353400 Object-Oriented JNI for .NET2.0 (low-level) ] Object-Oriented JNI with a number of helpers that includes the standard JNI SDK for C#, Managed C++, VB#, J# (Commercial)
+*[https://web.archive.org/web/20120331033141/http://www.simtel.net/product/view/id/348550 OOJNI Add-in (C#,VB#) for VS2005/2008] Generates object-oriented JNI code in C# or VB# for Java classes selected, implements Java interfaces and Java native methods in VB# and C#. Java Class methods and fields (which are represented as .NET Class properties) to be wrapped can be filtered. (Commercial)
+* [http://www.mcobject.com/extremedb-jni ''e''X''treme''DB JNI]{{Wayback|url=http://www.mcobject.com/extremedb-jni |date=20160202055242 }} uses Java {{tsl|en|annotations}} and [[reflection|reflection]] to enable Java applications to call the {{tsl|en|EXtremeDB}} database (written in C) without reliance on an external database definition language
+* [http://home.pacifier.com/~mmead/jni/delphi/JavaToDPR/ JavaToDPR] {{Wayback|url=http://home.pacifier.com/~mmead/jni/delphi/JavaToDPR/ |date=20161003170836 }}, a Delphi Project (.dpr) Stub File Generator that allows one to write an [[Embarcadero_Delphi|Embarcadero Delphi]] DLL to handle the native methods declared in a Java .class file
+
+[[Category:Java|Category:Java]]

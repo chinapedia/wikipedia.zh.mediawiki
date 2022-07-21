@@ -1,0 +1,232 @@
+{{编程范式}}
+'''-{zh-cn:头等函数;zh-tw:一級函式;}-'''（first-class function；第一級函數）是指在[[程序设计语言|程序设计语言]]中，函数被当作[[头等公民|头等公民]]。这意味着，函数可以作为别的函数的参数、函数的返回值，赋值给变量或存储在数据结构中。 <ref>{{cite book|first1=Harold|last1=Abelson|authorlink1=Harold Abelson|first2=Gerald Jay|last2=Sussman|authorlink2=Gerald Jay Sussman|title=[[Structure_and_Interpretation_of_Computer_Programs|Structure and Interpretation of Computer Programs]]|at=Section 1.3 [http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-12.html#call_footnote_Temp_121 Formulating Abstractions with Higher-Order Procedures]|publisher=MIT Press|year=1984|isbn=0-262-01077-1}}</ref> 有人主张应包括支持[[匿名函数|匿名函数]]（函数字面量，function literals）。<ref name="test">[http://www.worldcat.org/oclc/222529448 Programming language pragmatics], by Michael Lee Scott, section 11.2 "Functional Programming".</ref>在这样的语言中，函数的名字没有特殊含义，它们被当作具有函数类型的普通的变量对待。<ref>{{cite journal |title=The Implementation of Lua 5.0 |author1=Roberto Ierusalimschy |author1-link=Roberto Ierusalimschy |author2=Luiz Henrique de Figueiredo |author3=Waldemar Celes |url=http://www.lua.org/doc/jucs05.pdf |journal= |author= |access-date=2015-06-15 |archive-url=https://web.archive.org/web/20170623052107/http://www.lua.org/doc/jucs05.pdf |archive-date=2017-06-23 |dead-url=yes }}</ref>1960年代中期，[[克里斯托弗·斯特雷奇|克里斯托弗·斯特雷奇]]在“functions as first-class citizens”中提出这一概念。<ref name=strachey>{{cite journal |last1=Burstall |first1=Rod |last2=Strachey |first2=Christopher |title=Understanding Programming Languages |journal=[[Higher-Order_and_Symbolic_Computation|Higher-Order and Symbolic Computation]] |date=2000 |volume=13 |issue=52 |pages=11-49 |doi=10.1023/A:1010052305354 |url=http://www.cs.cmu.edu/~crary/819-f09/Strachey67.pdf |deadurl=yes |archiveurl=https://web.archive.org/web/20100216060948/http://www.cs.cmu.edu/~crary/819-f09/Strachey67.pdf |archivedate=2010-02-16 |access-date=2015-06-15 }} (also  on 2010-02-16</ref>
+
+-{zh-cn:头等函数;zh-tw:一級函式;}-是[[函数式程序设计|函数式程序设计]]所必须的。通常要使用[[高阶函数|高阶函数]]。[[map_(高阶函数)|map函数]]就是一个高阶函数，其实参是一个函数及一个list，返回结果是把作为参数的函数作用于list的每个元素后的结果形成的list。 
+
+把函数作为函数参数与函数返回值会遇到特别的困难。特别是存在{{tsl|en|non-local variable|非局部变量}}与{{tsl|en|nested function|嵌套函数}}、[[匿名函数|匿名函数]]。历史上，这被称作{{tsl|en|funarg problem|函数参数问题}}。<ref>[[Joel_Moses|Joel Moses]]. [https://dspace.mit.edu/handle/1721.1/5854 "The Function of FUNCTION in LISP, or Why the FUNARG Problem Should be Called the Environment Problem"] {{Wayback|url=https://dspace.mit.edu/handle/1721.1/5854 |date=20150403010815 }}. MIT AI Memo 199, 1970.</ref> 早期的[[指令式编程|指令式编程]]语言，或者不支持函数作为结果类型（如[[ALGOL_60|ALGOL 60]], [[Pascal_(编程语言)|Pascal]]），或者忽略嵌套函数与非局部变量（如[[C语言|C语言]]）。早期的函数式语言[[Lisp|Lisp]]采取了[[动态作用域|动态作用域]]方法，把非局部变量绑定到函数执行点最近的变量定义。[[Scheme|Scheme]]语言支持[[词法作用域|词法作用域]]的-{zh-cn:头等函数;zh-tw:一級函式;}-，把对函数的引用绑定到[[闭包_(计算机科学)|闭包]]（closure）而不是[[函数指针|函数指针]]，<ref name="strachey"/>这使得[[垃圾收集_(计算机科学)|垃圾收集]]成为必须。
+
+== 概念==
+在这一节，比较把函数视作头等公民的典型的函数式语言[[Haskell|Haskell]]与把函数视作二等公民的[[指令式编程|指令式编程]]的[[C语言|C语言]]的有关概念。 
+
+=== 高阶函数：函数作为实参传递 ===
+{{further|高阶函数}}
+具有函数参数的函数，称为高阶函数。函数式语言如[[Haskell|Haskell]]：
+<syntaxhighlight lang="haskell">
+map :: (a -> b) -> [a] -> [b]
+map f []     = []
+map f (x:xs) = f x : map f xs
+</syntaxhighlight>
+
+函数不是[[头等公民|头等公民]]的程序设计语言可以使用[[函数指针|函数指针]]或[[Delegate_(CLI)|delegate]]，实现函数作为参数。[[C语言|C语言]]例子:
+<syntaxhighlight lang="c">
+void map(int (*f)(int), int x[], size_t n) {
+    for (int i = 0; i < n; i++)
+        x[i] = f(x[i]);
+}
+</syntaxhighlight>
+ 
+=== 匿名与嵌套函数 ===
+{{further|匿名函数|嵌套函数}}
+对于支持匿名函数的语言:
+<syntaxhighlight lang="haskell">
+main = map (\x -> 3 * x + 1) [1, 2, 3, 4, 5]
+</syntaxhighlight>
+
+对于不支持匿名函数的语言，必须把函数绑定到一个名字上:
+<syntaxhighlight lang="c">
+int f(int x) {
+    return 3 * x + 1;
+}
+
+int main() {
+    int list[] = {1, 2, 3, 4, 5};
+    map(f, list, 5);
+}
+</syntaxhighlight>
+
+=== 非局部变量与闭包 ===
+{{further|非局部变量|闭包 (计算机科学)}}
+
+一旦有了匿名函数与嵌套函数，引用函数体之外的变量（非局部变量）就很自然了： 
+<syntaxhighlight lang="haskell">
+main = let a = 3
+           b = 1
+        in map (\x -> a * x + b) [1, 2, 3, 4, 5]
+</syntaxhighlight>
+
+如果函数只能用函数指针表示，如何把函数体之外的值传递给函数就是个问题。可以手工建立一个闭包，但显然这不能算作头等函数：
+<syntaxhighlight lang="c">
+typedef struct {
+    int (*f)(int, int, int);
+    int *a;
+    int *b;
+} closure_t;
+
+void map(closure_t *closure, int x[], size_t n) {
+    for (int i = 0; i < n; ++i)
+        x[i] = (*closure->f)(*closure->a, *closure->b, x[i]);
+}
+
+int f(int a, int b, int x) {
+    return a * x + b;
+}
+
+void main() {
+    int l[] = {1, 2, 3, 4, 5};
+    int a = 3;
+    int b = 1;
+    closure_t closure = {f, &a, &b};
+    map(&closure, l, 5);
+}
+</syntaxhighlight>
+注意这里的<code>map</code>是特化为使用当前环境外的两个<code>int</code>。即使<code>f</code>是个嵌套函数，仍然要面对同样问题，这也是C语言不支持嵌套函数的理由。<ref>"If you try to call the nested function through its address after the containing function has exited, all hell will break loose." ([http://gcc.gnu.org/onlinedocs/gcc-4.1.2/gcc/Nested-Functions.html#Nested-Functions GNU Compiler Collection: Nested Functions] {{Wayback|url=http://gcc.gnu.org/onlinedocs/gcc-4.1.2/gcc/Nested-Functions.html#Nested-Functions |date=20160303224649 }})</ref>
+
+=== 高阶函数：返回函数作为结果 ===
+返回结果为函数时，实际上返回的是该函数的闭包。对于C语言，函数退出时其局部变量也退出了各自的作用域，这使得构建闭包变得困难。这被称为{{tsl|en|upwards funarg problem|函数参数问题|向上的函数参数问题}}。
+
+=== 函数赋值给变量 ===
+把函数赋值给变量面临着把函数当作返回结果一样的困难：构建该函数的闭包： 
+<syntaxhighlight lang="haskell">
+f :: [[Integer]_->_[Integer|Integer] -> [Integer]]
+f = let a = 3
+        b = 1
+     in [map (\x -> a * x + b), map (\x -> b * x + a)]
+</syntaxhighlight>
+
+=== 函数的相等 === 
+判断两个函数是否相等，有不同的判据：<ref>[[Andrew_W._Appel|Andrew W. Appel]] (1995). [http://www.cs.princeton.edu/~appel/papers/conteq.pdf "Intensional Equality ;=) for Continuations"] {{Wayback|url=http://www.cs.princeton.edu/~appel/papers/conteq.pdf |date=20160304023011 }}.</ref>
+
+; [[外延性|外延相等]]: 两个函数''f''与''g''如果是外延相等，当它们对同一输入有相等的输出。即(∀''x''. ''f''(''x'') = ''g''(''x'')). 决定外延相等通常是[[不可判定问题|不可判定问题]]，甚至在函数的定义域是有限时也不可行。 
+: 以数学上的函数来举例：R→R的函数f(x)=√(x²)和g(x)=|x|是外延相等的。
+; [[描述法_(集合论)|内涵相等]]: 判断两个函数''f''与''g''是否相等，可以比较二者编译后的结果。 
+: 例：上面的f(x)和g(x)不是内涵相等的，因为其定义式以及运算过程不同。
+; 引用相等（Reference equality）: 由于外延相等与内涵相等都不切实际，大多数语言支持用两个函数的引用是否同一来判断。函数或闭包绑定到独一的标识符（通常为其内存地址），根据其标识符确定相等。两个分开定义但具有同样内容的函数被判断为不等。
+: 引用相等破坏了{{tsl|en|referential transparency (computer science)|引用透明}}，因此纯函数式语言如Haskell不采用这个方法。而另一方面，非纯函数式的语言（如C++）也只能对函数/闭包对象与“空”判断是否相等、即对象是否有引用到某函数上，而不定义两个函数/闭包对象是否相等。
+
+== 类型论 ==
+{{main|函数类型}}
+对于[[类型论|类型论]]，函数类型接受值类型''A''并返回值类型''B''可写为''A'' → ''B''或''B''<sup>''A''</sup>。根据[[柯里-霍华德对应|柯里-霍华德对应]]，[[函数类型|函数类型]]可对应于[[蕴涵|逻辑蕴涵]]，lambda抽象对应于discharging hypothetical assumptions，函数调用对应于[[肯定前件|肯定前件]]推理规则。类型论还使用头等函数建模[[关联数组|关联数组]]与类似的数据结构。 
+
+对于[[范畴论|范畴论]]，头等函数对应于{{tsl|en|closed category}}设置。例如，[[简单类型λ演算|简单类型λ演算]] 对应于[[笛卡儿闭范畴|笛卡儿闭范畴]](CCC)的内部语言。 
+
+== 语言支持 ==
+函数式程序设计语言，如[[Scheme|Scheme]]、[[ML语言|ML]]、[[Haskell|Haskell]]、[[F#|F#]]、[[Scala|Scala]]，都具有完整的头等函数。[[Lisp|Lisp]]作为最早的函数式语言在当初设计时对头等函数各方面还没有适当的理解，导致了采用动态作用域。后来的[[Common_Lisp|Common Lisp]]已经改为使用词法作用域的头等函数。 
+
+许多脚本语言，如[[Perl|Perl]]、[[Python|Python]]、[[PHP|PHP]]、[[Lua|Lua]]、[[Tcl|Tcl]]/Tk、[[JavaScript|JavaScript]]、[[Io_(编程语言)|Io]]，有头等函数。
+
+指令式程序设计语言，Algol及Pascal族系、C族系，与现代有垃圾收集的语言非常不同。Algol族系允许嵌套函数与高阶函数作为参数，但不允许函数作为返回值（除了Algol 68）。因为当时还不清楚如何处理内嵌函数作为返回值时的非局部变量问题（Algol 68对此会产生运行期错误）。 
+
+C族系允许函数作为参数与函数作为返回值，但由于不支持嵌套函数而避开了相关问题。因为返回嵌套函数并捕获所使用的非局部变量被认为才是真正有用，因此C族系不被认为有头等函数。 
+
+现代指令式编程语言由于有垃圾收集功能而使得头等函数成为可能。很多语言的后续版本开始支持头等函数，如C# 2.0，Apple公司的C、C++与Objective-C的Block扩展。C++11开始支持了匿名函数与闭包。 
+{| class=wikitable width=100% style="font-size: 85%"
+! colspan=2 rowspan=2 | 语言 !! colspan=2 | [[高阶函数|高阶函数]] !! colspan=3 | [[非局部变量|非局部变量]] !! rowspan=2 | {{tsl|en|Partial application|部份应用}} !! rowspan=2 width=25% | 注释
+|-
+! 实参 !! 返回结果 !! [[嵌套函数|嵌套函数]] !! [[匿名函数|匿名函数]] !! [[闭包_(计算机科学)|闭包]]
+|-
+| rowspan=5 | Algol 家族 || [[ALGOL_60|ALGOL 60]] || {{yes}} || {{no}} || {{yes}} || {{no}} || {{no}} || {{no}} || rowspan=4 | 有[[函数类型|函数类型]]
+|-
+| [[ALGOL_68|ALGOL 68]] || {{yes}} || {{yes}}<ref name=compa68pascal>{{cite journal|page=319|title=A comparison of PASCAL and Algol 68|journal=The Computer Journal|volume=21|number=4|year=1977|first=A.S.|last=Tanenbaum|url=http://comjnl.oxfordjournals.org/content/21/4/316.full.pdf|doi=10.1093/comjnl/21.4.316}}</ref> || {{yes}} || {{yes}} || {{no}} || {{no}}
+|-
+| [[Pascal_(程式語言)|Pascal]] || {{yes}} || {{no}} || {{yes}} || {{no}} || {{no}} || {{no}}
+|-
+| [[Oberon|Oberon]] || {{yes}} || {{partial|Non-nested only}} || {{yes}} || {{no}} || {{no}} || {{no}}
+|-
+| [[Delphi|Delphi]] || {{yes}} || {{yes}} || {{yes}} || {{yes|2009}} || {{yes|2009}} || {{no}}
+|-
+| rowspan=9 | C 家族 || [[C语言|C]] || {{yes}} || {{yes}} || {{no}} || {{no}} || {{no}} || {{no}} || 有[[函数指针|函数指针]]
+|-
+| [[C++|C++]] || {{yes}} || {{yes}} || {{yes|C++11 closures<ref>[http://stackoverflow.com/a/4324829 Nested functions using lambdas/closures]</ref>}} || {{yes|C++11}}<ref name=doc1968>Doc No. [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n1968.pdf 1968] {{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n1968.pdf |date=20110728051114 }}: V Samko; J Willcock, J Järvi, D Gregor, A Lumsdaine (February 26, 2006) ''Lambda expressions and closures for C++''</ref> || {{partial|C++11}}<ref name=doc1968/> || {{partial|C++11}} || 有函数指针、[[函数对象|函数对象]]。使用<code>std::bind</code>可显式部份应用。
+|-
+| [[C_Sharp_(programming_language)|C#]] || {{yes}} || {{yes}} || {{yes|7}} || {{yes|2.0 / 3.0}} || {{yes|2.0}} || {{yes|3.0}} || 有[[Delegate_(CLI)|delegate]](2.0)及lambda表达式(3.0)
+|-
+| [[Go|Go]] || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{no}}
+|-
+| [[Objective-C|Objective-C]] || {{yes}} || {{yes}} || {{no}} || {{yes|2.0 + Blocks<ref>{{Cite web |url=http://developer.apple.com/mac/library/documentation/Cocoa/Conceptual/Blocks/Articles/00_Introduction.html |title=存档副本 |accessdate=2015-06-15 |archive-date=2010-08-21 |archive-url=https://web.archive.org/web/20100821123941/http://developer.apple.com/mac/library/documentation/Cocoa/Conceptual/Blocks/Articles/00_Introduction.html |dead-url=no }}</ref>}} || {{yes|2.0 + Blocks}} || {{no}} || 有函数指针
+|-
+| [[Java|Java]] || {{partial}} || {{partial}} || {{no}} || {{yes|Java 8}} || {{yes|Java 8}} || {{no}} || 有[[内部类|匿名内部类]].
+|-
+| [[Limbo|Limbo]] || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{no}}
+|-
+| [[Newsqueak|Newsqueak]] || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{no}}
+|-
+| [[Rust|Rust]] || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{no}}
+|-
+| rowspan=6 | 函数式语言 || [[Lisp|Lisp]] || {{partial|Syntax}} || {{partial|Syntax}} || {{yes}} || {{yes}} || {{partial|Common Lisp}} || {{no}} || (见下)
+|-
+| [[Scheme|Scheme]] || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes|SRFI 26}}<ref>{{Cite web |url=http://srfi.schemers.org/srfi-26/srfi-26.html |title=存档副本 |accessdate=2015-06-15 |archive-date=2015-05-15 |archive-url=https://web.archive.org/web/20150515101433/http://srfi.schemers.org/srfi-26/srfi-26.html |dead-url=no }}</ref> ||
+|-
+| [[Clojure|Clojure]] || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} ||
+|-
+| [[ML语言|ML]] || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} ||
+|-
+| [[Haskell|Haskell]] || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} ||
+|-
+| [[Scala|Scala]] || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} ||
+|-
+| rowspan=5 | 脚本语言 || [[JavaScript|JavaScript]] || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes|ECMAScript 5}} || 用户代码在ES3上有部份应用 <ref>{{Cite web |url=http://ejohn.org/blog/partial-functions-in-javascript/ |title=存档副本 |accessdate=2015-06-15 |archive-date=2015-05-21 |archive-url=https://web.archive.org/web/20150521153227/http://ejohn.org/blog/partial-functions-in-javascript/ |dead-url=no }}</ref>
+|-
+| [[PHP|PHP]] || {{yes}} || {{yes}} || {{yes|5.3 closures}} || {{yes|5.3 closures}} || {{yes|5.3 closures}} || {{no}} || 用户代码可有部份应用
+|-
+| [[Perl|Perl]] || {{yes}} || {{yes}} || {{yes|anonymous, 6}} || {{yes}} || {{yes}} || {{yes|6}}<ref>{{Cite web |url=http://perlgeek.de/blog-en/perl-5-to-6/28-currying.html |title=存档副本 |accessdate=2015-06-15 |archive-date=2011-03-19 |archive-url=https://web.archive.org/web/20110319235612/http://perlgeek.de/blog-en/perl-5-to-6/28-currying.html |dead-url=no }}</ref> || (见下)
+|-
+| [[Python|Python]] || {{yes}} || {{yes}} || {{yes}} || {{partial}} || {{yes}} || {{yes|2.5}}<ref>{{Cite web |url=https://docs.python.org/whatsnew/2.5.html#pep-309-partial-function-application |title=存档副本 |accessdate=2015-06-15 |archive-date=2012-10-22 |archive-url=https://web.archive.org/web/20121022064315/http://docs.python.org/whatsnew/2.5.html#pep-309-partial-function-application |dead-url=no }}</ref> || (见下)
+|-
+| [[Ruby|Ruby]] || {{partial|Syntax}} || {{partial|Syntax}} || {{no|Unscoped}} || {{yes}} || {{yes}} || {{partial|1.9}} || (见下)
+|-
+| rowspan=8 | 其他语言 || [[Io_(编程语言)|Io]] || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{no}}
+|-
+| [[Maple_(software)|Maple]] || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{no}} ||
+|-
+| [[Mathematica|Mathematica]] || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{no}} ||
+|-
+| [[MATLAB|MATLAB]] || {{yes}} || {{yes}} || {{yes}} || {{yes}}<ref>{{Cite web |url=http://www.mathworks.co.uk/help/matlab/matlab_prog/anonymous-functions.html |title=存档副本 |accessdate=2015-06-15 |archive-date=2013-11-02 |archive-url=https://web.archive.org/web/20131102110613/http://www.mathworks.co.uk/help/matlab/matlab_prog/anonymous-functions.html |dead-url=no }}</ref> || {{yes}} || {{yes}} || 新的函数可自动产生部份应用<ref>{{Cite web |url=http://stackoverflow.com/questions/9154271/partial-function-evaluation-in-matlab |title=存档副本 |accessdate=2015-06-15 |archive-date=2015-05-13 |archive-url=https://web.archive.org/web/20150513035839/http://stackoverflow.com/questions/9154271/partial-function-evaluation-in-matlab |dead-url=no }}</ref>
+|-
+| [[Smalltalk|Smalltalk]] || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{partial}} || 通过库可有部份应用
+|-
+| [[Fortran|Fortran]] || {{yes}} || {{yes}} || {{yes}} || {{no}} || {{no}} || {{no}} ||
+|-
+| [[Swift|Swift]] || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} || {{yes}} ||
+|-
+| [[Ada|Ada]]|| {{yes}} || {{yes}} || {{yes}} || {{no}} || {{partial|Downward Closure}} || {{no}} ||
+|}
+; C++: [[C++11|C++11]]闭包可捕获非局部变量通过传引用（不扩展非局部变量的生存期）或者传值的方式。 
+; Java: [[Java_8|Java 8]]闭包仅能捕获[[immutable|immutable]] ("[[effectively_final|effectively final]]")局部变量。Java没有[[函数类型|函数类型]]。Java 8的匿名函数从上下文推导其类型，且必须是"functional interface" （只有一个方法的接口）。
+; Lisp
+: [[词法作用域|词法作用域]]Lisp的变种支持闭包。[[动态作用域|动态作用域]]的变种不支持闭包，需要特别构造闭包。<ref>{{Cite web |url=https://common-lisp.net/project/bknr/static/lmman/fd-clo.xml |title=Closures in ZetaLisp |access-date=2015-06-15 |archive-date=2012-03-19 |archive-url=https://web.archive.org/web/20120319071329/http://common-lisp.net/project/bknr/static/lmman/fd-clo.xml |dead-url=no }}</ref>
+: [[Common_Lisp|Common Lisp]]，函数名字空间的函数的标识符不能用于头等函数的值的引用。必须要特殊运算符<code>function</code>来获取函数的值，如：<code>(function foo)</code>得到一个函数对象。<code>#'foo</code>是一个快捷表示。若想应用这样的函数对象，必须用<code>funcall</code> 函数：<code>(funcall #'foo bar baz)</code>.
+; Perl
+: Perl 5只允许匿名函数被嵌套。
+; Python
+: Python的匿名函数只允许表达式作为函数体。 
+: 从2.5版，使用<code>functools.partial</code>来显式部分应用<ref>{{Cite web |url=https://docs.python.org/library/functools.html#functools.partial |title=functools.partial |access-date=2015-06-15 |archive-date=2012-10-18 |archive-url=https://web.archive.org/web/20121018064010/http://docs.python.org/library/functools.html#functools.partial }}</ref>，或从2.8版的<code>operator.methodcaller</code><ref>{{Cite web |url=https://docs.python.org/library/operator.html#operator.methodcaller |title=operator.methodcaller |access-date=2015-06-15 |archive-date=2012-10-26 |archive-url=https://web.archive.org/web/20121026114230/http://docs.python.org/library/operator.html#operator.methodcaller }}</ref>
+; Ruby
+: 普通函数的标识符不能用作值或传递。必须通过<code>Method</code>或<code>Proc</code>对象来获取头等数据。调用这种函数对象的语法不同于调用普通函数的语法。 
+: 嵌套方法定义并不实际嵌套作用域。
+: 用<code>curry</code>显式currying操作<ref>{{Cite web |url=http://www.ruby-doc.org/core-1.9.3/Proc.html#method-i-curry |title=存档副本 |access-date=2015-06-15 |archive-date=2022-06-03 |archive-url=https://web.archive.org/web/20220603113610/https://ruby-doc.org/core-1.9.3/Proc.html#method-i-curry }}</ref>
+
+== 注释==
+{{reflist|2}}
+
+== 参考文献==
+{{refbegin}}
+* {{tsl|en|Leonidas Fegaras|}}. [https://web.archive.org/web/20110720102933/http://lambda.uta.edu/cse5317/l12.ppt "Functional Languages and Higher-Order Functions"]. CSE5317/CSE4305: Design and Construction of Compilers. University of Texas at Arlington.
+{{refend}}
+
+==参閲==
+* {{tsl|en|Defunctionalization|}}
+* [[eval|eval]]
+* {{tsl|en|First-class message|}}
+* {{en-link|Kappa演算|Kappa calculus}} – 排除了头等函数后的形式化
+* [[编译器递归测试|编译器递归测试]]
+
+==外部链接==
+* [http://rosettacode.org/wiki/First-class_functions First-class functions]{{Wayback|url=http://rosettacode.org/wiki/First-class_functions |date=20100611155449 }} on [[Rosetta_Code|Rosetta Code]].
+* [http://www.ibm.com/developerworks/linux/library/l-highfunc/index.html Higher order functions]{{Wayback|url=http://www.ibm.com/developerworks/linux/library/l-highfunc/index.html |date=20160303222113 }} at {{tsl|en|IBM developerWorks|}}
+{{-}}
+{{数据类型}}
+
+[[Category:数据类型|Category:数据类型]]
+[[Category:函數式編程|Category:函數式編程]]
+[[Category:程序设计语言理论|Category:程序设计语言理论]]
+[[Category:子程序|Category:子程序]]

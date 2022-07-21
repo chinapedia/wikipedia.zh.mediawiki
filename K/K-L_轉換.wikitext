@@ -1,0 +1,121 @@
+K-L轉換(Karhunen-Loève Transform)是建立在統計特性基礎上的一種轉換，它是[[均方差|均方差]](MSE, Mean Square Error)意義下的最佳轉換，因此在[[資料壓縮|資料壓縮]]技術中佔有重要的地位。
+
+K-L轉換名称来自Kari Karhunen和Michel Loève。
+
+K-L轉換是對輸入的向量x，做一個[[正交|正交]]變換，使得輸出的向量得以去除數據的相關性。
+
+然而，K-L轉換雖然具有[[均方差|均方差]](MSE)意義下的最佳轉換，但必須事先知道輸入的訊號，並且需經過一些繁雜的數學運算，例如[[协方差|协方差]](covariance)以及[[特徵向量|特徵向量]](eigenvector)的計算。因此在工程實踐上K-L轉換並沒有被廣泛的應用，不過K-L轉換是理論上最佳的方法，所以在尋找一些不是最佳、但比較好實現的一些轉換方法時，K-L轉換能夠提供這些轉換性能的評價標準。
+
+以處理圖片為範例，在K-L轉換途中，圖片的能量會變得集中，有助於壓縮圖片，但是實際上，KL轉算為input-dependent，即需要對每張輸入圖片存下一個轉換機制，每張圖都不一樣，這在實務應用上是不實際的。
+
+== 原理 ==
+KL轉換屬於正交轉換，其處輸入訊號的原理如下：
+
+對輸入向量<math>\mathbf{x}</math>做KL傳換後，輸出向量<math>\mathbf{X}</math>之元素間(<math>u_1\neq u_2</math>, <math>u_1</math>和<math>u_2</math>為<math>\mathbf{X}</math>之元素的index)的相關性為零，即：<math>E[(X[u_1]-\bar{X}[u_1])(X[u_2]-\bar{X}[u_2])]=0</math>
+
+展開上式並做消去：
+
+<math>E[X[u_1]X[u_2]]-\bar{X}[u_1]\bar{X}[u_2]=0</math>
+
+如果<math>\bar{x}[n]=0</math>，因為KL轉換式線性轉換的關係，<math>\bar{X}[n]=0</math>，則可以達成以下式，所以這裡得輸入向量<math>\mathbf{x}</math>之平均值<math>\bar{x}</math>需為<math>0</math>，所以KLT是專門用於隨機程序的分析：
+
+<math>E[X[u_1]X[u_2]]=0</math>
+
+其中<math>u_1\neq u_2</math>，即輸出向量不同元素相關性為<math>0</math>。
+
+回到矩陣表示形式，令<math>\mathbf{K}</math>為KL轉換矩陣，使：
+
+<math>\mathbf{X}=\mathbf{Kx}</math>
+
+以<math>\mathbf{K}</math>和<math>\mathbf{x}</math>表示<math>\mathbf{X}</math>之covariance矩陣：
+
+<math>E[\mathbf{X}\mathbf{X}^T]=E[\mathbf{K}\mathbf{x}\mathbf{x}^T\mathbf{K}^T]=\mathbf{K}E[\mathbf{x}\mathbf{x}^T]\mathbf{K}^T</math>
+
+因為<math>\bar{x}[n]=0</math>，<math>E[\mathbf{x}\mathbf{x}^T]</math>直接等於covariance矩陣：
+
+<math>E[\mathbf{X}\mathbf{X}^T]=\mathbf{K}\mathbf{C}\mathbf{K}^T</math>
+
+其中<math>\mathbf{C}</math>為<math>\mathbf{x}</math>之covariance矩陣。
+
+如果要使<math>E[X[u_1]X[u_2]]=0</math>，則<math>E[\mathbf{X}\mathbf{X}^T]</math>必須為對角線矩陣，即對角線上之值皆為<math>0</math>，所以<math>\mathbf{K}</math>必須將傳換成對角線矩陣，即<math>\mathbf{K}</math>的每一行皆為<math>\mathbf{C}</math>之特徵向量。
+
+K-L轉換的目的是將原始數據做轉換，使得轉換後資料的相關性最小。若輸入數據為一維：
+
+<math>y[u]=\sum_{n=0}^{N-1}K[u,n]x[n]</math>
+
+<math>K[u,n]=e_{n}[n]</math>
+
+其中e<sub>n</sub>為輸入訊號x[[共變異數|共變異數]]矩陣(covariance matrix)C<sub>x</sub>的[[特徵向量|特徵向量]](eigenvector)
+
+若輸入訊號x為二維：
+
+<math>y[u,v]=\sum_{m=0}^{M-1}\sum_{n=0}^{N-1}K[u,m]K[v,m]x[m,n]</math>
+
+== 與離散餘弦轉換的關係 <ref>  酒井善則，吉田俊之原著，原島博監修，白執善編譯，「影像壓縮術＂，全華印行, 2004. </ref> ==
+二維之K-L轉換推導係自原先輸入信號之自協方矩陣
+
+<math>C_{x_ix_j}=E[x_i,x_j]</math>
+
+亦即
+
+<math>C_{x_ix_j}=\begin{bmatrix} E[x_1,x_1] & E[x_1,x_2] & E[x_1,x_3] & \dots & E[x_1,x_j] & \dots & E[x_1,x_N] \\ E[x_2,x_1] & E[x_2,x_2] & E[x_2,x_3] & \dots & E[x_2,x_j] & \dots & E[x_2,x_N] \\ \vdots & \vdots & \vdots & \ddots & \vdots & \ddots & \vdots \\ E[x_i,x_1] & E[x_i,x_2] & E[x_i,x_3] & \dots & E[x_i,x_j] & \dots & a_{i n}\\ \vdots & \vdots & \vdots & \ddots & \vdots & \ddots & \vdots\\ E[x_M,x_1] & E[x_M,x_2] & E[x_M,x_3] & \dots & E[x_M,x_j] & \dots & E[x_M,x_N]\end{bmatrix}</math>
+
+而得，此處假設輸入信號x已經先減去平均值。
+
+而當輸入彼此具高度相關性，如影像等，則可假設其在水平與垂直方向上得以被分離，並以水平與垂直之相關係數<math>\rho_H, \rho_V</math>加以表示
+
+假設<math>x_i</math> 與 <math>x_j</math> 之水平和垂直距離分別為<math>h,v</math>
+
+則 <math> E[x_i,x_j]=\rho_H^{h} \cdot \rho_V^{v} </math>
+
+以一3x2之輸入 <math>X=\begin{bmatrix} x1 & x2 & x3 \\ x4 & x5 & x6\end{bmatrix}</math> 為例
+
+此時 <math>C_{x_ix_j}=\begin{bmatrix} 1 & \rho_H & \rho_H^{2} & \rho_V & \rho_H\rho_V & \rho_H^{2} \cdot \rho_V \\ \rho_H & 1 & \rho_H  & \rho_H\rho_V & \rho_V & \rho_H\rho_V \\ \rho_H^{2}\rho_V & \rho_H & 1 & \rho_H^{2}\rho_V & \rho_H\rho_V & \rho_V \\ \rho_V & \rho_H\rho_V & \rho_H^{2}\rho_V & 1 & \rho_H & \rho_H^{2} \\ \rho_H\rho_V  & \rho_V & \rho_H\rho_V  & \rho_H & 1 & \rho_H \\ \rho_H^{2}\rho_V & \rho_H\rho_V & \rho_V & \rho_H^{2} & \rho_H & 1   \end{bmatrix}</math>
+
+而對於任意尺寸的水平或垂直方向之協方差矩陣可以表示成
+
+<math>C_{xx} = \begin{bmatrix} \rho & \rho^2  & \dots & \rho^{N-1}  \\ \rho^2 & \rho & \dots & \rho^{N-2} \\ \vdots & \vdots & \ddots & \vdots  \\ \rho^{N-1} & \rho^{N-2} & \dots & \rho \end{bmatrix}</math>
+
+可發現其值僅與 <math>|i-j| </math> 有關，取其閉合形式，其基底元素<math> v_{ij} </math> 為
+
+<math> v_{ij}= \sqrt{\frac{2}{{N+\lambda_j}}}\sin{(\frac{(2i-N-1)\omega}{2}+\frac{j\pi}{2})}</math>
+
+此處 <math> \lambda_j</math> 為 <math> C_{xx} </math> 之特徵值
+
+<math> \lambda_j=\frac{1-\rho^2}{1-2\rho \,  \cos{\omega_j} + \rho^2} </math>
+
+其中 <math> \tan(N\omega_j)=-\frac{(1-\rho^2)\sin{\omega_j}}{\cos{\omega_j}-2\rho+\rho^2\cos{\omega_j}}</math>
+
+對於不同的輸入影像，其<math> \rho </math>會有所不同，而若是令 <math> \rho \rightarrow 1 </math>，則此轉換不必與輸入相關，同時繼承了K-L轉換去除相關性的優異性質。
+
+此時 <math> \lambda_j=\left\{\begin{matrix} N, & \mbox{if }j=1 \\  0, & \mbox{if }j \neq 1 \end{matrix}\right.</math>
+
+代入上式，得 KLT|<math>\rho\rightarrow1</math> ，<math> v_{ij}=\left\{\begin{matrix} \sqrt{\frac{1}{N}}\cos{\frac{(2i-1)(j-1)\pi}{2N}}, & \mbox{if }j=1 \\  \sqrt{\frac{2}{N}}\cos{\frac{(2i-1)(j-1)\pi}{2N}}, & \mbox{if }j \neq 1 \end{matrix}\right.</math>
+
+離散餘弦轉換較K-L轉換在實務上較為有利，因其毋須紀錄會隨輸入而改變的轉換矩陣。
+
+== KLT與PCA的區別 ==
+KLT和[[主成分分析|主成分分析]](PCA, Principle component analysis) 有相似的特性，二者之間有很細微的差異，其中KLT專門處理隨機性的訊號，但PCA則沒有這個限制。對PCA而言，這裡假設輸入訊號為ㄧ向量，輸入向量<math>\mathbf{x}</math>在乘上轉換矩陣<math>\mathbf{W}</math>之前，會先將輸入向量扣去平均值，即:
+
+<math>\mathbf{X}=\mathbf{W}(\mathbf{x}-\bar{x})</math>
+
+PCA會根據<math>\mathbf{x}</math>之covariance矩陣來選擇特徵向量做為轉換矩陣之內容：
+
+<math>E[(\mathbf{x}-\bar{x})(\mathbf{x}-\bar{x})^T]=\mathbf{W\Lambda W}^T</math>
+
+其中<math>\mathbf{\Lambda}</math>為對角線矩陣且對角線值為特徵值。
+
+由上述可見PCA和KLT之差異在於有沒有減去平均值，這是由於輸入資料分布的限制造成的，當輸入向量支平均值為零時，二這者沒有差異。
+
+== 應用 ==
+在影像的壓縮上，目的是要將原始的影像檔用較少的資料量來表示，由於大部分的影像並不是隨機的分布，相鄰的[[像素|像素]](Pixal)間存在一些相關性，如果我們能找到一種可逆轉換(reversible transformation)，它可以去除數據的相關性，如此一來就能更有效地儲存資料，由於K-L轉換是一種[[線性映射|線性轉換]]，並有去除資料相關性的特性，便可以將它應用在影像的壓縮上。此外，由於K-L轉換具有將訊號轉到[[特徵向量|特徵空間]](eigenspace)的特性，因此也可以應用在人臉辨識上。
+
+== 参考文献 ==
+1.  Ding, J. J. (2017). Advanced Digital Signal Processing [Powerpoint slides] [http://djj.ee.ntu.edu.tw/ADSP15.pdf http://djj.ee.ntu.edu.tw/ADSP8.pdf] {{Wayback|url=http://djj.ee.ntu.edu.tw/ADSP15.pdf |date=20190216211857 }}
+
+2.  Gerbrands,  J.J., On the relationships between SVD, KLT, and PCA, Pattern Recogn., 14 (1981), pp. 375-381
+
+[[Category:估计理论|Category:估计理论]]
+[[Category:概率论|Category:概率论]]
+[[Category:信号处理|Category:信号处理]]
+[[Category:随机过程|Category:随机过程]]

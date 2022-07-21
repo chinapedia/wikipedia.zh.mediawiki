@@ -1,0 +1,91 @@
+在[[圖像處理|圖像處理]]上，'''雙邊濾波器'''（英語：Bilateral Filter）為使影像[[平滑|平滑]]化的非線性濾波器，
+這個想法由C. Tomasi在1998年提出。
+和傳統的影像平滑化演算法不同，雙邊濾波器除了使用像素之間幾何上的靠近程度之外，還多考慮了[[像素|像素]]之間的[[光度|光度]]/[[色彩|色彩]]差異，
+使得雙邊濾波器能夠有效的將影像上的[[雜訊|雜訊]]去除，同時保存影像上的邊緣資訊。
+在實作上，雙邊濾波器和[[非等向性擴散|非等向性擴散]]及[[Adaptive_Smoothing|Adaptive Smoothing]]不同，它是非[[迭代|迭代]]、區域性的，
+能夠較以上兩個方法簡化。
+
+==原理==
+
+===定義===
+
+'''雙邊濾波器'''定義如下：
+
+:<math>\vec{h}(\vec{x}) = k^{-1}(\vec{x}) \iint^{\infty}_{\infty} \vec{f}(\vec{\xi})\, c(\vec{\xi},\vec{x})\, s(\vec{f}(\vec{\xi}),\vec{f}(\vec{x})) \, d\vec{\xi}</math>
+
+其中<math>\vec{h}</math>為輸出影像，<math>\vec{f}</math>為輸入影像，函數的值代表給定像素上的色彩資訊。
+我們將輸入影像<math>\vec{f}</math>和輸出影像<math>\vec{h}</math>寫成向量的原因是，操作的影像不限定是只有單一通道的灰階影像，他們也可以是多通道的彩色影像。
+式子中的<math>\vec{x}</math>代表影像中的任意一點，而<math>\vec{\xi}</math>代表在<math>\vec{x}</math>鄰近的點。
+而<math>k</math>為歸一化函數：
+
+:<math>k(\vec{x}) = \iint^{\infty}_{\infty} c(\vec{\xi},\vec{x})\, s(\vec{f}(\vec{\xi}),\vec{f}(\vec{x}))\, d\vec{\xi}</math>
+
+雙邊濾波器的目的是，對於影像中的每一個點，都要對鄰近的所有點進行加權平均，以達到平滑化的目的。
+而對此，雙邊濾波器在<math>\vec{x}</math>鄰近的點<math>\vec{\xi}</math>採取了不同的權重，
+策略包含了兩個核心函數<math>c(\vec{\xi},\vec{x})</math>和<math>s(\vec{f}(\vec{\xi}),\vec{f}(\vec{x}))</math>，
+這兩個式子分別代表了<math>\vec{x}</math>和<math>\vec{\xi}</math>在空間幾何關係上的差異和光度/色彩差異上的差異。
+以下將針對這兩個核心函數進行說明。
+
+===空間幾何關係===
+
+為了使影像[[平滑|平滑]]化，考慮像素之間的空間幾何分布情形，我們可以把[[低通濾波器|低通濾波器]]寫成以下形式：
+
+:<math>\vec{h}(\vec{x}) = k^{-1}_{d}(\vec{x}) \iint^{\infty}_{\infty} \vec{f}(\vec{\xi})\, c(\vec{\xi},\vec{x})\, d\vec{\xi}</math>
+
+其中<math>c(\vec{\xi},\vec{x})</math>為描述影像中任何一點<math>\vec{x}</math>和鄰近的<math>\xi</math>之間幾何距離的函數。
+而<math>k^{-1}_{d}(\vec{x})</math>為歸一化函數，如果這個低通濾波器需要保存影像的直流成分，我們可以把<math>k_d</math>寫成：
+
+:<math>k_d(\vec{x}) = \iint^{\infty}_{\infty} c(\vec{\xi},\vec{x})\, d\vec{\xi}</math>
+
+如果這個濾波器是Shift-invariant的，那麼''c''可以簡化為<math>\xi-\vec{x}</math>的函數，使得<math>k_d</math>為一個和<math>\vec{x}</math>無關的常數。
+''c''在選擇上一個很好的例子是[[高斯函數|高斯函數]]（請見[[高斯模糊|高斯模糊]]），它在影像[[平滑|平滑]]上經常被使用。
+
+===光度/色彩差異===
+
+接著我們考慮像素之間的光度/色彩差異，同樣可以寫出對此的濾波器函數：
+
+:<math>h(\vec{x}) = k^{-1}_{r}(\vec{x}) \iint^{\infty}_{\infty} \vec{f}(\vec{\xi})\, s(\vec{f}(\vec{\xi}),\vec{f}(\vec{x}))\, d\vec{\xi}</math>
+
+和空間關係的濾波器不同的是，光度/色彩差異函數<math>s(\vec{f}(\vec{\xi}),\vec{f}(\vec{x}))</math>描述的是<math>\vec{\xi}</math>和<math>\vec{x}</math>之間的[[光度|光度]]差異。
+因此差異函數<math>s(\vec{f}(\vec{\xi}),\vec{f}(\vec{x}))</math>的輸入為影像在<math>\vec{\xi}</math>和<math>\vec{x}</math>兩點上面的內容，也就是這兩點對於影像函數<math>\vec{f}</math>的輸出。
+對於灰階影像，差異函數''s''的內容很單純，舉例來說，我們可以直接對兩點上的灰階亮度值做相減；而對於彩色影像而言，我們可以使用[[Lab色彩空间|Lab色彩空间]]來求得兩點之間的光度差異。
+而歸一化函數可以寫為：
+
+:<math>k_r(\vec{x}) = \iint^{\infty}_{\infty} s(\vec{f}(\vec{\xi}),\vec{f}(\vec{x}))\, d\vec{\xi}</math>
+
+和空間幾何關係的式子不同，這邊的歸一化函數會和影像內容有關。如果差異函數''s''只和<math>\vec{f}(\vec{\xi})-\vec{f}(\vec{x})</math>有關的話，我們稱''s''為'''未偏差的'''。
+
+對光度/色彩進行低通濾波本身並不具有太大的意義，因為他只不過是將[[影像直方圖|影像直方圖]]中聚集的部份集合在一起，也就是說讓影像直方圖中相似的色彩更向區域的平均靠近，色彩在空間中的分布情形並不會有任何的影響。
+然而，如果同時考慮對空間幾何的濾波行為<math>c(\vec{\xi},\vec{x})</math>，
+<math>s(\vec{f}(\vec{\xi}),\vec{f}(\vec{x}))</math>所代表的意義便成為，將影像平滑化的範圍限制在光度/色彩差異較小的部分，如此便能夠達到邊緣保存的目的。
+
+===離散形式===
+
+一般來說，在[[图像处理|图像处理]]上，影像的[[像素|像素]]在空間上的分佈是離散的，光度/色彩的儲存形式也是離散的。因此，雙邊濾波器常用的為其離散形式：
+
+:<math>BF[I]_\vec{p} = \frac{1}{W_\vec{p}} \sum_{\vec{q}\in S} G_{\sigma_S} (\left \| \vec{p}-\vec{q} \right \|) G_{\sigma_r} (\left \| I_\vec{p} - I_\vec{q} \right \|) I_\vec{q}</math>
+
+==限制==
+
+雙邊濾波器由於核心函數會隨空間不同而變化，它是非[[線性濾波器|線性濾波器]]，因此在實作上無法使用[[傅立葉變換|傅立葉變換]]來幫助運算。
+如果使用暴力演算法需要很大的時間來進行運算，在不同應用上有近似的快速演算法可以大幅加快運算速度。
+
+==應用==
+
+雙邊濾波器可以應用在影像[[降噪|降噪]]、[[色調映射|色調映射]]、圖像重照明和材質編輯。
+
+===[[色調映射|色調映射]]上的應用===
+
+色調映射是在有限動態範圍媒介上近似顯示[[高動態範圍圖像|高動態範圍圖像]]的一項[[7圖形學|7圖形學]]技術。列印結果、CRT 或者 LCD 顯示器以及投影儀等都只有有限的動態範圍。
+本質上來講，色調映射是要解決的問題是進行大幅度的對比度衰減將場景亮度變換到可以顯示的範圍，同時要保持圖像細節與顏色等對於表現原始場景非常重要的信息。
+因此，雙邊濾波器可以藉由對亮度相似區域進行模糊化之後，將高動態範圍圖像的梯度圖像分割成亮度相似區和亮度差異較大的部份，藉由改變兩者的權重，而將高動態範圍圖像映射成可顯示的有限動態範圍。
+
+==參考文獻==
+
+* Carlo Tomasi, Roberto Manduchi, [http://www.cse.ucsc.edu/~manduchi/Papers/ICCV98.pdf Bilateral Filtering for Gray and Color Images] {{Wayback|url=http://www.cse.ucsc.edu/~manduchi/Papers/ICCV98.pdf |date=20080829145313 }} (shorter [http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/MANDUCHI1/Bilateral_Filtering.html HTML] {{Wayback|url=http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/MANDUCHI1/Bilateral_Filtering.html |date=20210507035923 }} version), proceedings of the [http://www.umiacs.umd.edu/users/lsd/iccv/ ICCV 1998] {{Wayback|url=http://www.umiacs.umd.edu/users/lsd/iccv/ |date=20180104110543 }}
+* Fredo Durand, Julie Dorsey, [http://people.csail.mit.edu/fredo/PUBLI/Siggraph2002/DurandBilateral.pdf Fast Bilateral Filtering for the Display of High-Dynamic-Range Images] {{Wayback|url=http://people.csail.mit.edu/fredo/PUBLI/Siggraph2002/DurandBilateral.pdf |date=20210507043701 }} ([http://people.csail.mit.edu/fredo/PUBLI/Siggraph2002/ HTML] {{Wayback|url=http://people.csail.mit.edu/fredo/PUBLI/Siggraph2002/ |date=20210413045840 }}), [https://web.archive.org/web/20070825125712/http://www.siggraph.org/s2002/ SIGGRAPH 2002]
+* Sylvain Paris, Pierre Kornprobst, Jack Tumblin, Frédo Durand, [http://people.csail.mit.edu/sparis/bf_course/ A Gentle Introduction to Bilateral Filtering and its Applications] {{Wayback|url=http://people.csail.mit.edu/sparis/bf_course/ |date=20210501164741 }}, [https://web.archive.org/web/20141210181958/http://www.siggraph.org/s2008/ SIGGRAPH 2008] class
+
+[[Category:非線性濾波器|Category:非線性濾波器]]
+[[Category:图像处理|Category:图像处理]]
+[[Category:计算机图形学|Category:计算机图形学]]

@@ -1,0 +1,48 @@
+---Lexicographic tools for old Hangul text.
+local p = {}
+ 
+p.old_hangul_fonts = {
+	'바탕 옛한글',
+	'Batang Old Hangul',
+	'돋움 옛한글',
+	'Dotum Old Hangul',
+	'궁서 옛한글',
+	'Gungsuh Old Hangul',
+	'굴림 옛한글',
+	'NewGulim Old Hangul',
+	'은 자모 바탕 확장',
+	'Un Jamo Batang Ex',
+	'은 자모 바탕',
+	'Un Jamo Batang',
+	'은 바탕',
+	'Un Batang',
+	'맑은 고딕',
+	'Malgun Gothic',
+	'Code2002',
+	'Code2001',
+	'Code2000',
+}
+ 
+---[[Template:古韓文|Template:古韓文]]
+function p.applyOldHangulFonts(text, size)
+	if type(text) == "table" then
+		text, size = text.args[1], text.args.size
+	end
+ 
+	local css = mw.ustring.format("font-family: '%s', sans-serif;",
+		table.concat(p.old_hangul_fonts, "', '"))
+ 
+	-- Old Hangul letter and dot tone marks
+	text = mw.ustring.gsub(text, "([나랏〮말〯ᄊᆞ미〮])",
+		'<span class="jamocomposed_block" style="' .. css .. '">%1</span>')
+ 
+	css = mw.ustring.format("font-family: '%s', sans-serif;",
+		table.concat(p.old_hangul_fonts, "', '"))
+	if size then
+		css = css .. " font-size: " .. size .. ";"
+	end
+	return mw.ustring.format('<span lang="ko" xml:lang="ko" class="jamocomposed_block" style="%s">%s</span>',
+		css, text)
+end
+ 
+return p

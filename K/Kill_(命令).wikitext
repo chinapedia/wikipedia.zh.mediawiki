@@ -1,0 +1,174 @@
+{{noteTA
+|G1=IT
+}}
+{{lowercase}}
+在[[電腦運算|電腦運算]]中，'''<code>kill</code>'''是一个在多种流行[[操作系统|操作系统]]上都可见到的[[命令_(计算机)|命令]]，可向运行中的[[行程|行程]]发送信号，以请求进程终止。
+
+== 实现 ==
+=== Unix和类Unix ===
+在[[Unix|Unix]]和[[类Unix系统|类Unix]]操作系统中，<code>kill</code>是用于向进程发送[[Unix信号|信号]]的[[命令_(计算机)|命令]]。默认发送的消息是[[SIGTERM|终止信号]]，会要求该进程[[退出_(系统调用)|退出]]。但''kill''（杀）可能会引起误解，发送的信号可能与进程杀死无关。<code>kill</code>命令是一个包装了'''<code>kill()</code>'''[[系统调用|系统调用]]的[[包裝函式|包裝函式]]，该系统调用按[[进程ID|进程ID]]（PID）或[[进程组|进程组]]ID（PGID）数，向系统上的进程或进程组发送[[Unix信号|信号]]。[[POSIX|POSIX]]标准规定<code>kill</code>应作为独立工具提供。然而，大部分[[Unix_shell|shell]]都内置了<code>kill</code>的命令，用法可能与标准略有不同<ref>{{cite web
+  | title = Bash Reference Manual: Job Control Builtins
+  | url = https://www.gnu.org/software/bash/manual/html_node/Job-Control-Builtins.html
+  | website = The GNU Project
+  | accessdate = 2015-02-24
+  | archive-date = 2019-09-18
+  | archive-url = https://web.archive.org/web/20190918073313/http://www.gnu.org/software/bash/manual/html_node/Job-Control-Builtins.html
+  | dead-url = no
+  }}</ref><ref>{{cite web
+  | title = zsh: 17. Shell Builtin Commands
+  | url = http://zsh.sourceforge.net/Doc/Release/Shell-Builtin-Commands.html
+  | website = 
+  | accessdate = 2015-02-24
+  | archive-date = 2019-09-18
+  | archive-url = https://web.archive.org/web/20190918154333/http://zsh.sourceforge.net/Doc/Release/Shell-Builtin-Commands.html
+  | dead-url = no
+  }}</ref>。
+
+可以发送多种不同的信号（参见[[Unix信号|信号]]中的完整列表），而一般用户是最感兴趣的是[[SIGTERM|SIGTERM]]和[[SIGKILL|SIGKILL]]。默认发送的信号是SIGTERM。处理这个信号的程序在退出前可以做一些有用的清理操作（如保存配置信息到文件中）。然而，许多程序并没有专门处理此信号的处理程序，因此会调用默认的信号处理函数。而其他情况下，有特殊处理程序的程序也会出错，从而无法正确处理信号。
+
+除[[SIGKILL|SIGKILL]]和[[SIGSTOP|SIGSTOP]]之外的所有信号可以为进程所“截获”，这意味着程序在接收到这些信号时，可以调用特殊函数。两个例外SIGKILL和SIGSTOP只能由主机系统[[内核|内核]]处理，由其负责提供可靠的控制进程执行的方法。SIGKILL会杀死进程，而SIGSTOP可暂停它，直至[[SIGCONT|SIGCONT]]。<ref>{{cite web
+  | url = http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/signal.h.html
+  | title = <signal.h>
+  | website = The Open Group Base Specifications Issue 7
+  | accessdate = 2015-02-24
+  | archive-date = 2020-12-19
+  | archive-url = https://web.archive.org/web/20201219014034/https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/signal.h.html
+  | dead-url = no
+  }}</ref>
+
+UNIX提供了安全机制，以防止未授权用户杀死其他进程。实质上，若进程欲向另一个进程发送信号，发信进程的所有者必须与收信进程的所有者相同，或是[[超级用户|超级用户]]。
+
+可用信号有着不同的名称，且映射到特定的数字。注意在不同的Unix实现中，数字和信号之间的映射关系可以不同。SIGTERM往往为15，而SIGKILL通常编为9。
+
+==== 示例 ====
+可通过以下四种方式发送[[SIGTERM|SIGTERM]]信号（示例进程ID为“1234”）：
+
+<syntaxhighlight lang="bash">
+kill 1234
+kill -s TERM 1234
+kill -TERM 1234
+kill -15 1234
+</syntaxhighlight>
+
+可通过三种方式发送[[SIGKILL|SIGKILL]]信号：
+
+<syntaxhighlight lang="bash">
+kill -s KILL 1234
+kill -KILL 1234
+kill -9 1234
+</syntaxhighlight>
+
+其它有用的信号包括HUP、TRAP、INT、[[SIGSEGV|SEGV]]及ALRM。HUP发送[[SIGHUP|SIGHUP]]信号。一些守护程序，包括[[Apache|Apache]]和[[Sendmail|Sendmail]]的，在接收到SIGHUP时重新读取[[配置文件|配置文件]]，因此可用kill命令执行这个功能。在大多数[[Unix_shell|Unix外壳]]中，只需按下[[Control-C|{{keypress]]便可以产生[[SIGINT_(POSIX)|SIGINT]]信号。[[Control-Z|{{keypress]]也常映射至[[SIGTSTP|SIGTSTP]]，[[Control-/|{{keypress]]（反斜杠）映射至[[SIGQUIT|SIGQUIT]]，这可强制程序进行[[核心转储|核心转储]]。
+
+==== 相关程序 ====
+* [[killall|killall]] - 一些Unix变种如[[Solaris_(操作系统)|Solaris]]，在[[关机|关机]]时会自动调用该实用程序。它的功能类似上面的kill命令，但不是向单个进程发送信号，而是发送到系统中的所有进程。然而在其它的操作系统中，如[[IRIX|IRIX]]、[[Linux|Linux]]及[[FreeBSD|FreeBSD]]，允许通过参数指定要杀死的进程名称。例如，为了杀死一个进程，如[[XMMS|XMMS]]音乐播放器调用的一个<code>xmms</code>实例，用户可以运行命令<code>killall xmms</code>。这将杀死所有名为<code>xmms</code>的进程，在Solaris系统上等同于<code>kill `pidof xmms`</code>。
+* [[pkill|pkill]] - 根据名称和其他属性向进程发送信号。它最早出现在Solaris 7中，之后又重新为Linux、[[NetBSD|NetBSD]]及[[OpenBSD|OpenBSD]]实现。pkill使得基于名称杀死进程更加方便：如，要杀死名为''firefox''的进程，若不使用pkill（及[[pgrep|pgrep]]），必须键入<code>kill `ps --no-headers -C firefox -o pid`</code>，而有pkill，只需<code>pkill firefox</code>。
+* [[xkill|xkill]] - 如果不带任何参数调用，鼠标光标将从箭头变为“x”图标，用户可以单击一个窗口，强制X服务器关闭与该窗口客户端的连接。这往往会导致进程在检测到它与X服务器的连接已关闭后终止。
+
+===Microsoft Windows===
+
+在微软的命令行解释器[[Windows_PowerShell|Windows PowerShell]]中，预定义的<code>kill</code>是一个<code>Stop-Process</code> cmdlet的[[Alias_(命令)|命令别名]]。
+
+[[Windows_XP|Microsoft Windows XP]]、[[Windows_Vista|Vista]]和[[Windows_7|7]]中附带了<code>taskkill</code>命令<ref>{{cite web
+  | title = Taskkill
+  | url = https://technet.microsoft.com/en-us/library/bb491009.aspx
+  | website = Microsoft TechNet
+  | accessdate = 2015-02-24
+  | archive-date = 2018-02-03
+  | archive-url = https://web.archive.org/web/20180203082412/https://technet.microsoft.com/en-us/library/bb491009.aspx
+  | dead-url = no
+  }}</ref>以终止进程。常见用法为<code>taskkill /im "IMAGENAME"</code>。在[[Microsoft_Windows|Microsoft Windows]]提供给Windows 98[[资源工具包|资源工具包]]中有一个“不受支持”的<code>kill</code>版本<ref>{{cite web
+  | title = Resource Kit Utilities - Windows '98 Resource Kit
+  | url = http://www.activexperts.com/admin/reskit/reskit98/
+  | website = ActiveXperts Software
+  | accessdate = 2015-02-24
+  | archive-date = 2019-05-25
+  | archive-url = https://web.archive.org/web/20190525230705/https://www.activexperts.com/admin/reskit/reskit98/
+  | dead-url = no
+  }}</ref>。
+
+[[GNU|GNU]]版的<code>kill</code>已通过[[Cygwin|Cygwin]]移植，并可以运行在[[Microsoft_Windows_Services_for_UNIX|Microsoft Windows Services for UNIX]]的Unix子环境中（微软于1999年9月17日通过购买Softway Systems及其[[Interix|Interix]]产品获得了Windows Services for UNIX）。<ref>{{cite web
+  | title = GNU utilities for Win32
+  | url = http://unxutils.sourceforge.net/
+  | website = 
+  | accessdate = 2015-02-24
+  | archive-url = https://web.archive.org/web/20060209022842/http://unxutils.sourceforge.net/
+  | archive-date = 2006-02-09
+  | dead-url = yes
+  }}</ref>
+
+==== 示例 ====
+寻找并杀死所有以字母“P”开头、由微软开发、使用内存超过10 MB的进程：
+
+<syntaxhighlight lang="ps1con">
+PS C:\>ps p* | where { $_.Company -like "Microsoft*" -and $_.WorkingSet -gt 10MB } | kill -confirm
+
+Confirm
+Are you sure you want to perform this action?
+Performing operation "Stop-Process" on Target "powershell (6832)".
+[Y] Yes  [A] Yes to All  [N] No  [L] No to All  [S] Suspend  [?] Help (default is "Y"): A
+PS C:\>
+</syntaxhighlight>
+
+下面是一个简单的例子，它要求[[檔案總管|explorer.exe]]进程终止：
+<syntaxhighlight lang="ps1con">PS C:\>taskkill /im explorer.exe</syntaxhighlight>
+强制终止进程：
+<syntaxhighlight lang="ps1con">PS C:\>taskkill /f /im explorer.exe</syntaxhighlight>
+还可按[[进程ID|PID号]]杀死进程，如下所示：
+<syntaxhighlight lang="ps1con">PS C:\>taskkill /pid 3475</syntaxhighlight>
+
+=== Microsoft Singularity ===
+[[微軟研究院|微軟研究院]]的[[微內核|微內核]]操作系统[[Singularity|Singularity]]的标准外壳[[Singularity|Singularity shell]]包含用以终止后台进程的<code>kill</code>命令。
+
+==== 示例 ====
+停止名为“SampleProcess”的进程：
+
+<syntaxhighlight lang="text">
+Singularity>kill SampleProcess
+</syntaxhighlight>
+
+停止进程标识符为“42”的进程：
+
+<syntaxhighlight lang="text">
+Singularity>kill 42
+</syntaxhighlight>
+
+=== 贝尔实验室九号计划 ===
+在[[貝爾實驗室九號計畫|貝爾實驗室九號計畫]]，kill程序不实际执行终止操作，也不需要给予进程ID。相反，它需要进程的实际名称，并输出为[[rc|rc]]（九号计划所使用的[[殼層|殼層]]）的命令来杀死进程。<ref name="plan9wiki">{{cite web
+  | title = UNIX to Plan 9 command translation
+  | url = http://www.plan9.bell-labs.com/wiki/plan9/unix_to_plan_9_command_translation/
+  | website = Plan 9 wiki
+  | accessdate = 2015-02-24
+  | deadurl = yes
+  | archiveurl = https://web.archive.org/web/20080905170211/http://plan9.bell-labs.com/wiki/plan9/UNIX_to_Plan_9_command_translation/
+  | archivedate = 2008-09-05
+  }}</ref>
+
+有一个类似命令<code>slay</code>执行类似操作，但是用于拒绝被这样杀死的进程。<ref name="plan9wiki" />
+
+==== 示例 ====
+杀死所有[[troff|troff]]的实例：
+
+ kill troff | rc
+
+== 参见 ==
+* [[Unix信号|信号]]
+* [[Xkill|Xkill]]
+* [[Killall|Killall]]
+* [[Pkill|Pkill]]
+* [[signal.h|signal.h]]
+
+== 参考 ==
+{{Reflist}}
+
+== 外部链接 ==
+* 命令：{{man|cu|kill|SUS}}
+* 系统调用：{{man|sh|kill|SUS}}
+
+{{Unix命令}}
+{{視窗指令}}
+
+[[Category:Unix_SUS2008实用工具|Category:Unix SUS2008实用工具]]
+[[Category:Unix进程和任务管理相关软件|Category:Unix进程和任务管理相关软件]]
+[[Category:进程|Category:进程]]
+[[Category:Windows管理|Category:Windows管理]]

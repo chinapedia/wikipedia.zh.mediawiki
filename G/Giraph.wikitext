@@ -1,0 +1,91 @@
+{{编修}}
+{{Infobox software
+| name = Apache Giraph
+| logo = [[File:Apache_Giraph_Logo.svg|200px]]
+| screenshot = 
+| caption = 
+| collapsible = yes
+| developer = [[Apache软件基金会|Apache软件基金会]]
+| latest release version = 1.3.0
+| latest release date = {{Start date and age|2020|6|11|df=yes}}
+| latest preview version = 
+| latest preview date = 
+| operating system = [[跨平台|跨平台]]
+| size = 
+| programming language = [[Java|Java]]
+| genre = [[图_(数据结构)|图处理]]
+| license = [[Apache_License_2.0|Apache License 2.0]]
+| website = {{URL|http://giraph.apache.org}}
+}}
+'''Giraph''' 是一个[[迭代|迭代]]的{{tsl|en|Graph_(abstract_data_type)|图计算}}系统。
+Apache Giraph 是一个[[Apache|Apache]]项目，用于对[[大数据|大数据]]执行图形处理。 Giraph 的目的是为了解决大规模图的分布式计算问题，能够通过隐藏分布式和并行计算的细节以及提供一套用于描述图算法的 API，总的来说，Giraph 不仅拥有了相对好的可扩展性，也能够一定程度降低分布式图计算的使用门槛。
+
+==概述==
+Giraph 计算的输入是由点和两点之间直连的边所组成的图，例如，点可以表示人，边可以表示朋友请求。每个[[顶点_(图论)|顶点]]保存一个值，每个边也保存一个值。输入不仅取决于图的[[拓扑|拓扑]]逻辑，也取决于定点和边的初始值。
+
+计算过程由一序列的迭代进行，在[[BSP|BSP]]中叫做supersteps。每个顶点都active。在每个superstep中，每个active的顶点触发用户提供的计算方法。这些方法实现了将要输入的图中执行的图算法。直观说，在设计Giraph算法的时候要像顶点一样思考。计算方法如下：
+
+- 接受上一个superstep发送给顶点的消息;
+
+- 用消息、定点和伸出的边的值，可能导致值被修改，发送消息给其它顶点;
+
+计算方法并没有直接获取其它顶点的值以及他们的伸出的边。顶点之间通过传递消息来通信。
+
+在我们的单源最短路径的例子中，一个计算方法是：
+
+（1）从所有收到的消息中计算最小的值；
+
+（2）确定各个节点的当前值大小；
+
+（3）最小的值被接受作为顶点的值；
+
+（4）值和边的值沿着每一个外出的边发送。
+
+  public void compute(Iterable<DoubleWritable> messages) {
+      double minDist = Double.MAX_VALUE;
+      for (DoubleWritable message : messages) {
+          minDist = Math.min(minDist, message.get());
+      }
+      if (minDist < getValue().get()) {
+          setValue(new DoubleWritable(minDist));
+          for (Edge<LongWritable, FloatWritable> edge : getEdges()) {
+              double distance = minDist + edge.getValue().get();
+              sendMessage(edge.getTargetVertexId(), new DoubleWritable(distance));
+          }
+      }
+      voteToHalt();
+  }
+
+== 系统架构 ==
+系统架构包括Master、Worker、以及Zookeeper。<ref>{{Cite web|url=https://blog.csdn.net/firstdream10/article/details/99293702|title=Giraph 简介 - Ikroal 的博客         - CSDN博客|accessdate=2019-08-12|work=blog.csdn.net}}</ref>
+ 
+-Master
+ 
+Master 实质上运行在 Hadoop 的 MapTask 上， 其主要作用是对输入图进行分区、协调 Worker 的活动、维护一份存活的 Worker 列表（包括 Worker 的标识符、地址信息等）以及更新 Job 的状态。
+
+-Worker
+ 
+Worker 也同样运行在 Hadoop 的 MapTask 上，其主要作用是维护已分配图的状态。
+
+-Zookeeper
+ 
+Zookeeper 在 Giraph 中的主要作用是 Master 选举、命名服务以及协调服务。
+
+== 基础原理 ==
+Giraph基于[[Hadoop|Hadoop]]而建，将[[MapReduce|MapReduce]]中Mapper进行封装，未使用reducer。在Mapper中进行多次迭代，每次迭代等价于BSP模型中的SuperStep。一个Hadoop Job等价于一次BSP作业。<ref>{{Cite web|url=http://blog.csdn.net/xin_jmail/article/details/22194057|title=Giraph 基础介绍 - Hama White 的博客         - CSDN博客|accessdate=2017-10-03|work=blog.csdn.net|archive-date=2017-10-04|archive-url=https://web.archive.org/web/20171004035332/http://blog.csdn.net/xin_jmail/article/details/22194057|dead-url=no}}</ref>
+
+== 參考資料 ==
+{{reflist}}
+
+==外部链接==
+{{官方网站}}
+
+[http://blog.csdn.net/xin_jmail/article/details/22194057 Giraph基础介绍 - Hama White 的博客] {{Wayback|url=http://blog.csdn.net/xin_jmail/article/details/22194057 |date=20171004035332 }}
+ 
+[https://blog.csdn.net/firstdream10/article/details/99293702 Giraph简介 - Ikroal 的博客]
+
+{{Apache Software Foundation}}
+ 
+[[Category:Apache软件基金会|Category:Apache软件基金会]]
+[[Category:Hadoop|Category:Hadoop]]
+[[Category:数据挖掘和机器学习软件|Category:数据挖掘和机器学习软件]]

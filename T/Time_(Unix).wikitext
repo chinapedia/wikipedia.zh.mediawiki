@@ -1,0 +1,52 @@
+{{noteTA
+|G1=IT
+}}
+{{lowercase}}
+{{about|Unix命令|Unix下表示时间点的方法|UNIX时间|Unix函数调用|time.h}}
+{{RoughTranslation|en:time (Unix)}}
+
+<code>'''time'''</code>是一个[[Unix|Unix]][[操作系统|操作系统]]上的命令。它可以用于确定执行特定[[命令_(计算机)|命令]]持续的时间。
+
+== 用法 ==
+要使用该命令，只需在任何命令前加上<code>time</code>，如：
+
+<syntaxhighlight lang="bash">time ls</syntaxhighlight>
+
+当命令完成时，<code>time</code>
+将计算并报告执行<code>[[ls|ls]]</code>命令所花费的用户[[CPU时间|CPU时间]]、系统CPU时间和真实时间。不同版本的命令输出格式不一，有的会给予额外的统计数据，如下面的例子：
+
+<syntaxhighlight lang="bash">
+ $ time host wikipedia.org
+ wikipedia.org has address 207.142.131.235
+ 0.000u 0.000s 0:00.17 0.0%      0+0k 0+0io 0pf+0w
+ $
+</syntaxhighlight>
+
+time(1) 可以作为一个独立的程序存在（如[[GNU|GNU]] time）或作为[[Unix_shell|shell]]内建命令（例如在[[tcsh|tcsh]]或[[zsh|zsh]]中）。
+
+== 用户时间与系统时间 ==
+第一次看到时，术语“用户CPU时间”可以会有点误导。需要明确的是，总CPU时间是指CPU花费在程序执行操作的时间，及CPU花费在[[内核|内核]]为该程序执行[[系统调用|系统调用]]的时间组合。当程序在数组中循环时，将累加到用户CPU时间。相反，当一个程序执行如<code>exec</code>或<code>fork</code>[[系统调用|系统调用]]时，将累加到系统CPU时间。
+
+== 真实时间与CPU时间 ==
+在这里，术语“真实时间”指的是“挂钟”经过的时间，就像用秒表计时一样。总CPU时间（用户时间+系统时间）可能会大于或小于该值。因为一个程序可能会花时间来等待，并且不执行操作（无论是在用户还是系统模式中），实际时间可能大于总CPU时间。因为程序可能会fork子程序，而他们的CPU时间（用户和系统）会被加到<code>time</code>报告的值，总CPU时间可能大于实际的时间。
+
+== 操作方法 ==
+根据<code>time</code>的GNU实现源代码，大多数显示的信息是从<code>wait3</code>系统调用派生的。在没有<code>wait3</code>调用返回状态信息的系统中，将使用<code>times</code>调用代替。
+
+== 参见 ==
+*[[Unix实用程序列表|Unix实用程序列表]]
+*[[系统时间|系统时间]]
+*[[UNIX时间|UNIX时间]]
+*[[Cron|Cron]] 调度作业在特定时间执行的进程。
+*[[TIME_(命令)|TIME]] DOS命令
+
+== 参考 ==
+*{{man|cu|time|SUS|time a simple command}}
+*{{man|1|time|Linux|time a simple command or give resource usage}}
+
+{{GNU}}
+{{Unix命令}}
+{{unix-stub}}
+
+[[Category:Unix_SUS2008实用工具|Category:Unix SUS2008实用工具]]
+[[Category:Unix进程和任务管理相关软件|Category:Unix进程和任务管理相关软件]]

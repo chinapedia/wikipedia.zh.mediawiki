@@ -1,0 +1,34 @@
+'''最大段寿命''' 是一个 [[传输控制协议|TCP]] [[协议数据单元|分段]]可以存在于互联网系统中的最大时间。它被任意地定义为两分钟长。<ref>{{cite web | title=RFC 793 | work=Transmission Control Protocol | url=http://www.rfc-editor.org/rfc/rfc793.txt | accessdate=December 5, 2006 | archive-date=2021-02-27 | archive-url=https://web.archive.org/web/20210227013617/http://www.rfc-editor.org/rfc/rfc793.txt | dead-url=no }}</ref>
+
+最大段寿命的值用来确定 TIME_WAIT 周期（最大段寿命的两倍）
+
+以下的命令在大部分 UNIX 系统下可以用来确定 TIME_WAIT 周期：
+
+    ndd -get /dev/tcp tcp_time_wait_interval
+
+返回的结果以毫秒计数。60000（60 秒）是常见的取值。
+
+在 [[BSD|BSD]] 系统（例如 [[OS_X|OS X]]、[[FreeBSD|FreeBSD]]）上可以使用 [[sysctl|sysctl]] 查看这项的描述和数值：<ref>{{cite web
+ | title=Tuning FreeBSD to serve 100-200 thousands of connections
+ | url=http://rerepi.wordpress.com/2008/04/19/tuning-freebsd-sysoev-rit/
+ | access-date=2014-12-07
+ | archive-date=2021-03-08
+ | archive-url=https://web.archive.org/web/20210308225659/https://rerepi.wordpress.com/2008/04/19/tuning-freebsd-sysoev-rit/
+ | dead-url=no
+ }}</ref>
+    sysctl -d net.inet.tcp.msl ''# OS X 不可用''
+    sysctl net.inet.tcp.msl
+得到的结果将会是：
+    net.inet.tcp.msl: 最大段寿命 ''# Maximum Segment Lifetime''
+    net.inet.tcp.msl: 30000
+
+在一些 [[Linux|Linux]] 系统上，这个数值可以用这两个命令中的一种确认：
+
+    sysctl net.ipv4.tcp_fin_timeout
+    cat /proc/sys/net/ipv4/tcp_fin_timeout
+
+==参考资料==
+
+<references/>
+
+[[Category:TCP/IP|Category:TCP/IP]]

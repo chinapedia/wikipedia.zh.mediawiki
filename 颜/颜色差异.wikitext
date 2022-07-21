@@ -1,0 +1,173 @@
+{{expand German}}
+'''颜色差异'''（{{lang-en|'''Color difference'''}}），亦称'''颜色距离'''，是[[色彩学|色彩学]]上的一个关注点。它量化了一个概念。在未量化之前，人们只能用形容词来大概描述这个概念，这使得对颜色要求严格的工作者们很不方便。颜色差异可以通过色彩空间内的[[欧氏距离|欧氏距离]]简单计算得出，也可以使用[[国际照明委员会|国际照明委员会]]较为复杂、均匀的人类知觉公式计算。
+
+==欧氏距离==
+很多日常使用的“颜色差异”，是直接通过在一个“设备无关”的[[色彩空间|色彩空间]]里，进行[[欧氏距离|欧氏距离]]的计算得到的。给定一个RGB（红绿蓝）的色彩空间，最简单的差异计算方式就是在这个三维空间里求两个点间的距离：
+
+:<math>\mathrm{\Delta_{RGB}} = \sqrt{ (R_2-R_1)^2+(G_2-G_1)^2 + (B_2-B_1)^2 }</math>
+
+如果还要简单一点，经常可以去掉平方根：
+
+:<math>\mathrm{\Delta_{RGB}}^2 = { (R_2-R_1)^2+(G_2-G_1)^2 + (B_2-B_1)^2 }</math>
+
+这样求得的距离可以用来比较两个颜色中哪一个更接近某个给定的颜色。如果把这些平方距离加在一起，会得到一组距离间的[[方差|方差]]。
+
+有不少人尝试将RGB三值加上权重，希望可以让得到的结果更加符合人类感官。一种做法是使用2、4、3：
+:<math>\sqrt{ 2 \times \Delta R^2 + 4 \times \Delta G^2 + 3 \times \Delta B^2 }</math>, 
+对于0~255的数值，有一种近似是：<ref>http://www.compuphase.com/cmetric.htm</ref>
+
+:<math>\bar r = {{C_{1,R}  + C_{2,R} } \over 2}</math>
+:<math>\Delta R = C_{1,R}  - C_{2,R}</math>
+:<math>\Delta G = C_{1,G}  - C_{2,G}</math>
+:<math>\Delta B = C_{1,B}  - C_{2,B}</math>
+:<math>\Delta C = \sqrt {\left( {2 + {{\bar r} \over {256}}} \right) \times \Delta R^2  + 4 \times \Delta G^2  + \left( {2 + {{255 - \bar r} \over {256}}} \right) \times \Delta B^2 }</math>
+
+==Delta E==
+[[国际照明委员会|国际照明委员会]]（CIE）称他们的度量标准为“{{math|1=Δ''E''<sup>*</sup><sub>''ab''</sub>}}”（也作“{{math|1=Δ''E*''}}”，另有“{{math|1=dE*}}”、“{{mvar|dE}}”、“Delta E”）。其中，[[Δ|Δ]] 是一个常用来表示“差异”的[[希腊字母|希腊字母]]，'''E'''表示{{lang|de|Empfindung}}，也就是德文中的“感觉”。富有影响的[[赫尔曼·冯·亥姆霍兹|赫尔曼·冯·亥姆霍兹]]和[[埃瓦尔德·赫林|埃瓦尔德·赫林]]曾使用过它。<ref>http://books.google.com/books?id=DrduOSrOFegC&pg=PA188&lpg=PA188&dq=(grundempfindung%7Cempfindung)+helmholtz+color&source=web&ots=g_T3sFQ7eG&sig=4HBhygBAc3zW-XfGVPlaykl72bA</ref><ref>http://books.google.com/books?id=OoESifAi9ZsC&pg=PA278&lpg=PA278&dq=empfindung+color&source=web&ots=-z6JbcN54V&sig=-Bww3AcNWpnDQp1Lu7yqGBFyUOw</ref> 
+
+两个颜色之间的[[最小可觉差|最小可觉差(JND)]]值，也就是有多大的{{math|1=Δ''E*''}}差距才能刚好被察觉，目前还没有定论。尽管并没有实践经验支持，'1.0'这个值经常被提到并用作[[最小可觉差|JND]]。可是，1994年，Mahy et al研究并评估出了一个2.3{{math|1=Δ''E''}}的[[最小可觉差|JND]]值。然而，支撑该理论的[[CIELAB色彩空间|CIELAB色彩空间]]中，知觉的非均匀特性（换言之，有些颜色在改变时，人眼对其十分敏感，而有的就分辨得不太清楚）导致这种理论不太站得住脚。这使得[[CIE|CIE]]用了接下来的几年时间修缮他们的定义，最终产生了更完善的（据[[CIE|CIE]]）1994年和2000年的公式。<ref>Real World Color Management, Second Edition (Bruce Fraser)</ref> 这些非均匀特性很重要，因为[[颜色视觉#颜色感知的生理学|人眼对某些特定的颜色更敏感]]。一个好用的度量方法，应该把这些因素都考虑在内，才能使“[[最小可觉差|刚刚好能被察觉到的差异]]”这种提法有意义。不然的话，可能出现这样的情况：对于两组分别含有一对不同的颜色、同样适用某个Δ''E''值的颜色组，其中一组颜色的差异能被人眼觉察出来，另一组却不能。<ref>[http://www.aim-dtp.net/aim/evaluation/cie_de/index.htm Evaluation of the CIE Color Difference Formulas] {{webarchive|url=https://archive.is/20121203082912/http://www.aim-dtp.net/aim/evaluation/cie_de/index.htm |date=2012-12-03 }}</ref>
+L、a和b三个值（见下方公式）一般是介于(-1,1)之间的双精度数值。Lab图像在保存时，L被存储为无符号（即“不分正负”）8位元整数，a、b则被存储为有符号的8位元整数，以保持文件大小。
+
+===CIE76===
+1976年的这个色彩差异公式是首个用较为均匀的Lab空间计算色彩差异值的公式。Lab比RGB等空间在感官上均匀一点，所以得到的结果会更好。不过后来人们发现[[Lab色彩空间|Lab色彩空间]]，尤其是在饱和度较高的区域里，并没有设计时预想的那么“感官上均匀”，所以几次更新了{{math|1=Δ''E''}}公式。CIE76公式会高估较为饱和的颜色之间的差异。
+
+应用<math>({L^*_1},{a^*_1},{b^*_1})</math>和<math>({L^*_2},{a^*_2},{b^*_2})</math>两个[[Lab色彩空间|L*a*b*]]色彩空间的颜色：
+
+:<math>\Delta E_{ab}^* = \sqrt{ (L^*_2-L^*_1)^2+(a^*_2-a^*_1)^2 + (b^*_2-b^*_1)^2 }</math>
+
+本公式对应的[[最小可觉差|最小可觉差]]：<math>\Delta E_{ab}^* \approx 2.3</math> <ref>{{cite book|publisher=[[CRC_Press|CRC Press]]|title=Digital Color Imaging Handbook|year=2003|author=Gaurav Sharma|isbn=0-8493-0900-X|url=http://books.google.com/?id=OxlBqY67rl0C&pg=PA31&vq=1.42&dq=jnd+gaurav+sharma|edition=1.7.2}}</ref>
+
+===CIE94===
+在汽车喷漆行业里，人们测量了大量有关人眼容差情况的数据。随着这些“应用特定”的数据的发布，人们将1976年的定义进行了进一步的发展，以更好地应对感知非均匀特性。该公式仍然采用的是Lab色彩空间。<ref>{{cite web|url=http://www.colorwiki.com/wiki/Delta_E:_The_Color_Difference |title=Delta E: The Color Difference |publisher=Colorwiki.com |date= |accessdate=2009-04-16}}</ref>
+
+1994版Δ''E''是在[[L*C*h*色彩空间|L*C*h*色彩空间]]下定义的。它的亮度、色品（或称“浓度”）、色调是从[[CIELAB|L*a*b*坐标系]]里计算来的。对于一个基准色<math>(L^*_1,a^*_1,b^*_1)</math>和另一个颜色<math>(L^*_2,a^*_2,b^*_2)</math>，它们的差异是：<ref>{{cite web|author=Bruce Justin Lindbloom |url=http://www.brucelindbloom.com/Eqn_DeltaE_CIE94.html |title=Delta E (CIE 1994) |publisher=Brucelindbloom.com |date= |accessdate=2011-03-23}}</ref><ref>{{cite web|url=http://www.colorpro.com/info/software/heggie.html |title=Colour Difference Software by David Heggie |publisher=Colorpro.com |date=1995-12-19 |accessdate=2009-04-16}}</ref><ref>{{cite web|url=http://www.physics.kee.hu/cie/newcie/nc/DS014-4_3.pdf|title=CIE 1976 L*a*b* Colour space draft standard|accessdate=2011-03-23|archive-date=2011-07-28|archive-url=https://web.archive.org/web/20110728145100/http://www.physics.kee.hu/cie/newcie/nc/DS014-4_3.pdf|dead-url=yes}}</ref>
+
+:<math>\Delta E_{94}^* = \sqrt{ \left(\frac{\Delta L^*}{k_L S_L}\right)^2 + \left(\frac{\Delta C^*_{ab}}{k_C S_C}\right)^2 + \left(\frac{\Delta H^*_{ab}}{k_H S_H}\right)^2 }</math>
+
+其中：
+
+:<math>\Delta L^* = L^*_1 - L^*_2</math>
+:<math>C^*_1 = \sqrt{ {a^*_1}^2 + {b^*_1}^2 }</math>
+:<math>C^*_2 = \sqrt{ {a^*_2}^2 + {b^*_2}^2 }</math>
+:<math>\Delta C^*_{ab} = C^*_1 - C^*_2</math>
+:<math>\Delta H^*_{ab} = \sqrt{ {\Delta E^*_{ab}}^2 - {\Delta L^*}^2 - {\Delta C^*_{ab}}^2 } = \sqrt{ {\Delta a^*}^2 + {\Delta b^*}^2 - {\Delta C^*_{ab}}^2 }</math>
+:<math>\Delta a^* = a^*_1 - a^*_2</math>
+:<math>\Delta b^* = b^*_1 - b^*_2</math>
+:<math>S_L = 1</math>
+:<math>S_C = 1+K_1 C^*_1</math>
+:<math>S_H = 1+K_2 C^*_1</math>
+
+另外，其中的''k<sub>C</sub>''和''k<sub>H</sub>''一般都取1，系数（权值）''k<sub>L</sub>''、''K''<sub>1</sub>和''K''<sub>2</sub>则依应用场合不同而取不同的值。如：
+{| class="wikitable" border="1"
+|-
+! 
+! 图形艺术
+! 纹理、纺织品
+|-
+| <math>k_L</math>
+| 1
+| 2
+|-
+| <math>K_1</math>
+| 0.045
+| 0.048
+|-
+| <math>K_2</math>
+| 0.015
+| 0.014
+|}
+
+从几何学上讲，<math>\Delta H^*_{ab}</math>这个数量即是这两种颜色的相同色度圈的弦长的算术平均值。
+<ref>Georg A. Klein: Industrial Color Physics: P.147 - ISBN 978-1-4419-1196-4</ref>
+
+===CIEDE2000===
+鉴于1994年的公式并没有充分解决[[感知非均匀特性|感知非均匀特性]]的问题，CIE再次修缮了定义，并加入了5个修订系数：<ref>{{cite journal |title=The CIEDE2000 color-difference formula: Implementation notes, supplementary test data, and mathematical observations |journal=Color Research & Applications |publisher=[[Wiley_Interscience|Wiley Interscience]] |first=Gaurav |last=Sharma |coauthors=Wencheng Wu, Edul N. Dalal |volume=30 |issue=1 |pages=21–30 |doi=10.1002/col.20070 |url=http://www.ece.rochester.edu/~gsharma/ciede2000/ciede2000noteCRNA.pdf |year=2005 |ref=CITEREFSharma2005 |access-date=2013-08-05 |archive-date=2012-02-21 |archive-url=https://www.webcitation.org/65d4ImcRr?url=http://www.ece.rochester.edu/~gsharma/ciede2000/ciede2000noteCRNA.pdf |dead-url=yes }}</ref><ref>{{cite web |author=Bruce Justin Lindbloom |url=http://www.brucelindbloom.com/Eqn_DeltaE_CIE2000.html |title=Delta E (CIE 2000) |publisher=Brucelindbloom.com |date= |accessdate=2009-04-16}}</ref>
+* 色调旋转项(R<sub>T</sub>)，用来应对常出问题的蓝色区域（色相角度275°左右）；<ref>[http://www.brucelindbloom.com/MunsellCalcHelp.html#BluePurple The "Blue Turns Purple" Problem], Bruce Lindbloom</ref>
+* 中性色调补偿（对应L*C*h差异）
+* 亮度补偿（S<sub>L</sub>）
+* 色度补偿（S<sub>C</sub>）
+* 色调补偿（S<sub>H</sub>）
+
+:<math>\Delta E_{00}^* = \sqrt{ \left(\frac{\Delta L'}{k_L S_L}\right)^2 + \left(\frac{\Delta C'}{k_C S_C}\right)^2 + \left(\frac{\Delta H'}{k_H S_H}\right)^2 + R_T \frac{\Delta C'}{k_C S_C}\frac{\Delta H'}{k_H S_H} }</math>
+
+::<small>'''注：'''下面的公式请使用角度而非弧度，尤其在''R<sub>T</sub>''上需要注意。</small>
+::<small>''k<sub>L</sub>''、''k<sub>C</sub>''、''k<sub>H</sub>''一般取1。</small>
+
+:<math>\Delta L^\prime = L^*_2 - L^*_1</math>
+
+:<math>\bar{L} = \frac{L^*_1 + L^*_2}{2} \quad \bar{C} = \frac{C^*_1 + C^*_2}{2}</math>
+
+:<math>
+  a_1^\prime = a_1^* + \frac{a_1^*}{2} \left( 1 - \sqrt{\frac{\bar{C}^7}{\bar{C}^7 + 25^7}} \right) \quad
+  a_2^\prime = a_2^* + \frac{a_2^*}{2} \left( 1 - \sqrt{\frac{\bar{C}^7}{\bar{C}^7 + 25^7}} \right)
+</math>
+
+:<math>
+  \bar{C}^\prime = \frac{C_1^\prime + C_2^\prime}{2} \mbox{ and }
+  \Delta{C'}=C'_2-C'_1 \quad
+  \mbox{where }
+    C_1^\prime = \sqrt{a_1^{'^2} + b_1^{*^2}} \quad
+    C_2^\prime = \sqrt{a_2^{'^2} + b_2^{*^2}} \quad
+</math>
+
+:<math>
+  h_1^\prime=\text{atan2} (b_1^*, a_1^\prime) \mod 360^\circ, \quad
+  h_2^\prime=\text{atan2} (b_2^*, a_2^\prime) \mod 360^\circ
+</math>
+:: <small>'''Note:''' The inverse tangent (tan<sup>−1</sup>) can be computed using a common library routine <code>atan2(b, a′)</code> which usually has a range from −π to π radians; color specifications are given in 0 to 360 degrees, so some adjustment is needed. The inverse tangent is indeterminate if both ''a′'' and ''b'' are zero (which also means that the corresponding ''C′'' is zero); in that case, set the hue angle to zero. See {{harvnb|Sharma|2005|loc=eqn. 7}}.</small>
+
+:<math>
+  \Delta h' = \begin{cases}
+    h_2^\prime - h_1^\prime & \left| h_1^\prime - h_2^\prime \right| \leq 180^\circ \\
+    h_2^\prime - h_1^\prime + 360^\circ & \left| h_1^\prime - h_2^\prime \right| > 180^\circ, h_2^\prime \leq h_1^\prime \\
+    h_2^\prime - h_1^\prime - 360^\circ & \left| h_1^\prime - h_2^\prime \right| > 180^\circ, h_2^\prime > h_1^\prime
+  \end{cases}
+</math>
+:: <small>'''Note:''' When either ''C′''<sub>1</sub> or ''C′''<sub>2</sub> is zero, then Δh′ is irrelevant and may be set to zero. See {{harvnb|Sharma|2005|loc=eqn. 10}}.</small>
+
+:<math>
+  \Delta H^\prime = 2 \sqrt{C_1^\prime C_2^\prime} \sin (\Delta h^\prime/2), \quad \bar{H}^\prime=\begin{cases}
+    (h_1^\prime + h_2^\prime + 360^\circ)/2 & \left| h_1^\prime - h_2^\prime \right| > 180^\circ \\
+    (h_1^\prime + h_2^\prime)/2 & \left| h_1^\prime - h_2^\prime \right| \leq 180^\circ
+  \end{cases}
+</math>
+:: <small>'''Note:''' When either ''C′''<sub>1</sub> or ''C′''<sub>2</sub> is zero, then {{overbar|H}}′ is ''h′''<sub>1</sub>+''h′''<sub>2</sub> (no divide by 2; essentially, if one angle is indeterminate, then use the other angle as the average; relies on indeterminate angle being set to zero). See {{harvnb|Sharma|2005|loc=eqn. 7 and p. 23}} stating most implementations on the internet at the time had "an error in the computation of average hue".</small>
+
+:<math>
+  T = 1 - 0.17 \cos ( \bar{H}^\prime - 30^\circ )
+        + 0.24 \cos (2\bar{H}^\prime)
+        + 0.32 \cos (3\bar{H}^\prime + 6^\circ )
+        - 0.20 \cos (4\bar{H}^\prime - 63^\circ)
+</math>
+
+:<math>
+  S_L = 1 + \frac{0.015 \left( \bar{L} - 50 \right)^2}{\sqrt{20 + {\left(\bar{L} - 50 \right)}^2} } \quad
+  S_C = 1+0.045 \bar{C}^\prime \quad
+  S_H = 1+0.015 \bar{C}^\prime T
+</math>
+
+:<math>R_T = -2 \sqrt{\frac{\bar{C}'^7}{\bar{C}'^7+25^7}} \sin \left[ 60^\circ \cdot \exp \left( -\left[ \frac{\bar{H}'-275^\circ}{25^\circ} \right]^2 \right) \right]</math>
+
+==应用==
+===差异分类===
+在讨论人类感知时，一般使用{{math|Δ''E''}}计算色彩差异。如前所述，一般认为在{{math|Δ''E''}}系统中，1.0是刚好注意得到的量。取决于产品的受众，有时候会改用2.5作为可以接受的限制。<ref>[http://www.color.org/wpaper1.xalter M. Has, T. Newman: ''Color Management: Current Practice and the Adoption of a New Standard'']</ref>例如一般情况下，人们会说“叶子和草地是绿的”，但仔细看就能发现叶子和草地都有从黄绿到蓝绿等不同的差异。
+
+这类差异在很多产品的[[品质控制|品质控制]]中非常重要：在生产和运输中经常会有一些来自内部或外部的随机扰动，造成实际上显示的颜色和之前校准出的结果有一些差异。在最理想的情况下，要做到“一般的观察者”不能察觉这类变化。[[胶印|胶印]]过程中通常允许最高2到4个单位的{{math|Δ''E''}}色彩差异；而家用打印机造成的色差可能更大。<ref>M. Has: ''Regeltechnische Characterisierung von Bogenoffsetmaschinen''. Forschungsbericht 3.279. FOGRA München 1993.</ref><ref>Ralf Kuron, Norbert Stockhausen: ''Ermittlung von Parametern zur Umrechnung von PostScriptfarbdateien in den darstellbaren Farbraum eines Ausgabegerätes''. Forschungsbericht 6.403. Fogra, Muenchen 1992.</ref>
+
+==脚注==
+{{reflist|30em}}
+
+==延伸阅读==
+* {{cite journal|title=Historical development of CIE recommended color difference equations|first=Alan R.|last=Robertson|journal=Color Research & Application|year=1990|volume=15|issue=3|pages=167–170|doi=10.1002/col.5080150308|url=http://www3.interscience.wiley.com/cgi-bin/fulltext/114184816/PDFSTART}}{{Dead link|date=2019年5月 |bot=InternetArchiveBot |fix-attempted=yes }}
+* {{cite journal|title=Uniformity of some recent color metrics tested with an accurate color-difference tolerance dataset|first=M.|last=Melgosa|coauthors=Quesada, J. J. and Hita, E.| url=http://www.opticsinfobase.org/abstract.cfm?URI=ao-33-34-8069|journal=[[Applied_Optics|Applied Optics]]|volume=33|issue=34|pages=8069–8077|doi=10.1364/AO.33.008069|pmid=20963027|date=December 1994}}
+* {{cite book|title=Colour Physics for Industry|last=McDonald|first=Roderick|coauthors=Hill, MacDonald, Nobbs, Rigg, Sinclair, Smith|editor=Roderick McDonald|isbn=0-901956-70-8|publisher=[[Society_of_Dyers_and_Colourists|Society of Dyers and Colourists]]|year=1997|edition=2E}}
+
+==外部链接==
+* [http://www.brucelindbloom.com/ColorDifferenceCalc.html Bruce Lindbloom's color difference calculator]. Uses all metrics defined herein.
+* [http://www.ece.rochester.edu/~gsharma/ciede2000/ The CIEDE2000 Color-Difference Formula], by Gaurav Sharma. Implementations in MATLAB and Excel.
+* [http://kodisha.net/color-names/ Color Similarity Tool] {{Wayback|url=http://kodisha.net/color-names/ |date=20130804211756 }}, by Dragan Bajcic,  Implementations in PHP and Javascript.
+* [http://code.google.com/p/python-colormath/ python-colormath].  Implementation in Python.
+* [http://www2.konicaminolta.eu/eu/Measuring/pcc/en/index.html Precise Color Communication] Konica Minolta Sensing.
+
+[[Category:色彩空间|Category:色彩空间]]
+[[Category:距离|Category:距离]]

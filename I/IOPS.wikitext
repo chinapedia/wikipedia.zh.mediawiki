@@ -1,0 +1,142 @@
+{{noteTA
+|G1=IT
+}}
+'''IOPS'''（[[I/O|Input/Output]] Operations Per Second）是一個用於電腦[[儲存裝置|儲存裝置]]（如[[硬碟|硬碟]]（HDD）、[[固態硬碟|固態硬碟]]（SSD）或[[存储区域网络|存储区域网络]]（SAN））{{link-en|效能測試|Benchmark_(computing)}}的量測方式，可以視為是每秒的讀寫次數。和其他效能測試一様，儲存裝置製造商提出的IOPS不保證就是實際應用下的性能<ref name=Scott_Lowe>{{cite web |url=http://www.techrepublic.com/blog/datacenter/calculate-iops-in-a-storage-array/2182 |title=Calculate IOPS in a storage array |last=Lowe |first=Scott |publisher=techrepublic.com |date=2010-02-12 |accessdate=2011-07-03 |archive-date=2011-06-29 |archive-url=https://web.archive.org/web/20110629042057/http://www.techrepublic.com/blog/datacenter/calculate-iops-in-a-storage-array/2182 |dead-url=no }}</ref><ref name="Symantec">{{cite web |url=http://www.symantec.com/connect/articles/getting-hang-iops-v13 |title=Getting The Hang Of IOPS v1.3 |date=2012-08-03 |accessdate=2013-08-15 |archive-date=2013-08-09 |archive-url=https://web.archive.org/web/20130809105727/http://www.symantec.com/connect/articles/getting-hang-iops-v13 |dead-url=no }}</ref>。
+
+IOPS可以用應用程式來量測，例如一開始由微軟開發的{{link-en|Iometer|Iometer}}，像{{link-en|IOzone|IOzone}}及{{link-en|FIO|FIO (software)}}也有類似功能<ref>{{cite web |url=http://freshmeat.net/projects/fio/ |title=Flexible IO Tester |last=Axboe |first=Jens |accessdate=2010-06-04 |archive-date=2010-05-12 |archive-url=https://web.archive.org/web/20100512010015/http://freshmeat.net/projects/fio/ |dead-url=no }}(source available at http://git.kernel.dk/ {{Wayback|url=http://git.kernel.dk/ |date=20081102100851 }})</ref>，IOPS主要會用在[[伺服器|伺服器]]，以找到最佳的儲存組態。
+
+IOPS的數值會隨系統組態而有很大的不同，依測試者在測試時的控制變因而異，控制變因包括讀取及寫入的比例、其中[[循序存取|循序存取]]及[[隨機存取|隨機存取]]的比例及配置方式、[[线程|线程]]數量及存取佇列深度，以及資料區塊的大小<ref name=Scott_Lowe/>。其他因素也會影響IOPS的結果，例如系統設定、儲存設備的[[驅動程式|驅動程式]]、作業系統背景執行的作業等。若在測試[[固態硬碟|固態硬碟]]時，是否先進行預調（preconditioning）機制也會影響IOPS的結果<ref name=Kent_Smith>{{cite web |url=http://www.flashmemorysummit.com/English/Collaterals/Proceedings/2009/20090811_F2A_Smith.pdf |title=Benchmarking SSDs: The Devil is in the Preconditioning Details |last=Smith |first=Kent |publisher=SandForce.com |date=2009-08-11 |accessdate=2015-05-05 |8= |archive-date=2015-06-29 |archive-url=https://web.archive.org/web/20150629135959/http://www.flashmemorysummit.com/English/Collaterals/Proceedings/2009/20090811_F2A_Smith.pdf |dead-url=no }}</ref>。
+
+==性能特性==
+[[Image:Random_vs_sequential_access.svg|thumb]]
+最常量測的性能特性是[[隨機存取|隨機存取]]及[[循序存取|循序存取]]時的IOPS。循序存取是存取儲存裝置中相鄰位置的資料，一般和較大的資料區塊存取有關，例如128 [[千字节|KB]]，隨機存取是存取儲存裝置中非相鄰位置的資料．一般存取的資料區塊比較少，例如4 KB。
+
+最常見的性能特性如下：
+
+{| class="wikitable"
+|-
+! 量測
+! 說明
+|-
+| 總IOPS
+| 每秒讀寫次數的總和（混合讀取及寫入測試）
+|-
+| 隨機讀取IOPS
+| 每秒平均的隨機讀取次數
+|-
+| 隨機寫入IOPS
+| 每秒平均的隨機寫入次數
+|-
+| 循序讀取IOPS
+| 每秒平均的循序讀取次數
+|-
+| 循序寫入IOPS
+| 每秒平均的循序寫入次數
+|}
+
+對於硬碟或是其他類似的機電儲存裝置，其隨機存取IOPS主要和儲存裝置的尋址時間有關，若是固態硬碟及其他固態電子裝置，其隨機存取IOPS主要和儲存裝置的內部控制器及記億體介面速度有關。這兩種設備的循序存取IOPS（尤其是存取大資料區塊）一般會包括儲存設備可以持續的最大頻寬<ref name=Scott_Lowe/>。一般循序存取的IOPS會用MB/s表示，其公式如下：
+
+<blockquote><math>\text{IOPS} * \text{TransferSizeInBytes} = \text{BytesPerSec}</math>（結果一般會轉換為MB/s）
+</blockquote>
+
+有些硬體會因為其佇列深度增加而提昇其性能，這多半是因為硬碟處理佇列及重新排序（reordering）的先進控制器邏輯的結果，此邏輯一般稱為[[标记命令队列|标记命令队列]]（TCQ）或[[原生指令排序|原生指令排序]]（NCQ）。<!--Most commodity [[SATA|SATA]] drives either cannot do this, or their implementation is so poor that no performance benefit can be seen.{{Citation needed|date=August 2008}}-->企業等級的SATA硬碟，例如{{le|Western Digital Raptor|Western Digital Raptor}}及[[希捷|希捷]]的Barracuda NL配合深佇列可以提昇效能到100%<ref>{{cite web |url=http://www.storagereview.com/articles/200607/500_6.html |title=SATA in the Enterprise - A 500 GB Drive Roundup | StorageReview.com - Storage Reviews |publisher=StorageReview.com |date=2006-07-13 |accessdate=2013-05-13 |archive-url=https://web.archive.org/web/20130505050424/http://www.storagereview.com/articles/200607/500_6.html |archive-date=2013-05-05 |dead-url=yes }}</ref>。較常用在伺服器的高端[[SCSI|SCSI]]硬碟，一般性能有更大的提昇<!--，例如[希捷]]的Savvio超過400 IOPS，性能提昇超過二倍{{Citation needed|date=August 2008}}-->。
+
+傳統的硬碟讀取和寫入的IOPS大約相同，而大部份[[闪存|闪存]]SSD的寫入速度明顯比讀取慢很多，原因是無法寫入一個之前寫過的區域，會強制啟動[[写入放大#垃圾回收|垃圾資料回收功能]]<ref name="IBM_WA">{{cite web |title=Write Amplification Analysis in Flash-Based Solid State Drives |author=Hu, X.-Y. and E. Eleftheriou, R. Haas, I. Iliadis, R. Pletka |year=2009 |publisher=[[IBM|IBM]] | id = {{citeseerx|10.1.1.154.8668}} |accessdate=2010-06-02}}</ref><ref name="OCZ_WA">{{cite web |url=http://www.oczenterprise.com/whitepapers/ssds-write-amplification-trim-and-gc.pdf |title=SSDs - Write Amplification, TRIM and GC |author= |date= |work= |publisher=OCZ Technology |accessdate=2010-05-31 |archive-url=https://web.archive.org/web/20120526033947/http://www.oczenterprise.com/whitepapers/ssds-write-amplification-trim-and-gc.pdf |archive-date=2012-05-26 |dead-url=yes }}</ref><ref>{{cite web |url=http://www.intel.com/cd/channel/reseller/asmo-na/eng/products/nand/feature/index.htm |title=Intel Solid State Drives |author= |date= |work= |publisher=Intel |accessdate=2010-05-31 |archive-date=2010-05-26 |archive-url=https://web.archive.org/web/20100526070908/http://www.intel.com/cd/channel/reseller/asmo-na/eng/products/nand/feature/index.htm |dead-url=no }}</ref>。因此硬體測試開始在測試IOPS性能時，分開測試寫入和讀取。
+
+像Intel X25-E等較新的闪存SSD固態硬碟其IOPS會比傳統的硬碟要高，在Xssist進行的一個測試中，用IOmeter軟體，4 KB隨機存取，讀取/寫入比例為70/30，佇列深度4，Intel X25-E 64 GB G1的IOPS一開始有 10000 IOPs，在八分鐘後快速掉到4000 IOPS，之後的42分鐘持續的下降，自第50分鐘起到第八小時之間，IOPS在3000至4000之間變化<ref>{{cite web |url=http://www.xssist.com/blog/Intel%20X25-E%2064GB%20G1,%204KB%2070%2030%20RW%20Random%20IOPS,%20iometer%20benchmark.htm |title=Intel X25-E 64GB G1, 4KB Random IOPS, iometer benchmark |date=2010-03-27 |accessdate=2010-04-01 |archive-date=2010-05-03 |archive-url=https://web.archive.org/web/20100503012918/http://www.xssist.com/blog/Intel%20X25-E%2064GB%20G1,%204KB%2070%2030%20RW%20Random%20IOPS,%20iometer%20benchmark.htm |dead-url=yes }}</ref>。即使第50分鐘IOPS快速下降，X25-E的IOPS仍較傳統硬碟要高。像[[OCZ|OCZ]]RevoDrive 3 x2 PCIe用[[SandForce|SandForce]]控制器，其持續寫入性能和讀取速度大致相近<ref>{{cite web |url=http://thessdreview.com/our-reviews/ocz-revodrive-3-x2-480-gb-pcie-ssd-review-1-5gb-read1-25gb-write200000-iops-for-699/ |title=OCZ RevoDrive 3 x2 PCIe SSD Review – 1.5GB Read/1.25GB Write/200,000 IOPS As Little As $699 |date=2011-06-28 |accessdate=2011-06-30 |archive-date=2011-07-01 |archive-url=https://web.archive.org/web/20110701102658/http://thessdreview.com/our-reviews/ocz-revodrive-3-x2-480-gb-pcie-ssd-review-1-5gb-read1-25gb-write200000-iops-for-699/ |dead-url=no }}</ref>。
+
+==一些IOPS的範例==
+=== 硬碟機 ===
+隨機存取處理下，一些常見的IOPS平均值，計算方式是1/(寻址時間 + 回應時間) = IOPS:
+{| class="wikitable"
+|-
+!設備
+!形式
+!IOPS
+!介面
+!註解
+|-
+| 7,200 [[每分鐘轉速|RPM]] [[SATA|SATA]]硬碟機
+| [[硬碟機|硬碟機]]
+| ~75-100 IOPS<ref name="Symantec"/>
+| SATA 3 [[資料率單位|Gbit/s]]
+|
+|-
+| 10,000 RPM SATA硬碟機
+| 硬碟機
+| ~125-150 IOPS<ref name="Symantec"/>
+| SATA 3 Gbit/s
+|
+|-
+| 10,000 rpm [[串列SCSI|SAS]]硬碟機
+| 硬碟機
+| ~140 IOPS<ref name="Symantec"/>
+| SAS（串列SCSI）
+|
+|-
+| 15,000 rpm [[串列SCSI|SAS]]硬碟機
+| 硬碟機
+| ~175-210 IOPS<ref name="Symantec"/>
+| SAS（串列SCSI）
+|
+|-
+<!-- | 10,000 rpm [[SATA|SATA]] drives, queue depth 24
+| HDD
+| ~290 IOPS
+| SATA 3 Gb/s
+| <code>fio -readonly -name iops -rw=randread -bs=512 -runtime=20 -iodepth 24 -filename /dev/sda -ioengine libaio -direct=1</code>
+|-  -->
+|}
+
+=== 固態設備 ===
+{| class="wikitable"
+|-
+!設備
+!形式
+!IOPS
+!介面
+!註解
+|-
+| [[英特尔|英特尔]]Intel X25-M G2（[[多階儲存單元|MLC]]）
+| [[固態硬碟|SSD]]
+| ~8,600 IOPS<ref>{{cite web |url=http://www.tomshardware.com/reviews/Intel-x25-m-SSD,2012.html |title=Intel's X25-M Solid State Drive Reviewed                 |last1=Schmid |first1=Patrick |last2=Roos |first2=Achim |date=2008-09-08 |accessdate=2011-08-02}}</ref>
+| SATA 3 Gbit/s
+| 英特尔的{{le|資料表 (技術文件)|datasheet|資料表}}<ref>{{cite web |url=http://download.intel.com/design/flash/nand/mainstream/322296.pdf |title=存档副本 |accessdate=2010-07-20 |deadurl=yes |archiveurl=https://web.archive.org/web/20100812001346/http://download.intel.com/design/flash/nand/mainstream/322296.pdf |archivedate=2010-08-12 }}</ref>聲稱在4 KB資料的寫入及讀取時，分別有有6,600/8,600 IOPS (80 GB/160 GB版本)及35,000 IOPS的速度。
+|-
+| 英特尔 Intel X25-E (SLC)
+| SSD
+| ~5,000 IOPS<ref>{{cite web|author=1. |url=http://www.tomshardware.com/reviews/intel-x25-e-ssd,2158.html |title=Intel’s X25-E SSD Walks All Over The Competition : They Did It Again: X25-E For Servers Takes Off |publisher=Tomshardware.com |date= |accessdate=2013-05-13}}</ref>
+| SATA 3 Gbit/s
+| 英特尔數據表<ref>{{cite web |url=http://download.intel.com/design/flash/nand/extreme/extreme-sata-ssd-datasheet.pdf |title=存档副本 |accessdate=2009-03-18 |deadurl=yes |archiveurl=https://web.archive.org/web/20090206005330/http://download.intel.com/design/flash/nand/extreme/extreme-sata-ssd-datasheet.pdf |archivedate=2009-02-06 }}</ref>聲稱在寫入和讀取的速度為3,300 IOPS及35,000 IOPS。寫入和讀取混和時為5,000 IOPS。英特尔的X25-E G1比X25-M G2快了約三倍<ref>{{cite web |url=http://www.xssist.com/blog/%5BSSD%5D_Comparison_of_Intel_X25-E_G1_vs_Intel_X25-M_G2.htm |title=Intel X25-E G1 vs Intel X25-M G2 Random 4 KB IOPS, iometer |date=May 2010 |accessdate=2010-05-19 |archive-date=2010-05-16 |archive-url=https://web.archive.org/web/20100516231324/http://www.xssist.com/blog/%5BSSD%5D_Comparison_of_Intel_X25-E_G1_vs_Intel_X25-M_G2.htm |dead-url=no }}</ref>
+|-
+| [[G.Skill|G.Skill]] Phoenix Pro
+| SSD
+| ~20,000 IOPS<ref name="tweakpc">{{cite web |url=http://www.tweakpc.de/hardware/tests/ssd/gskill_phoenix_pro/s05.php |title=G.Skill Phoenix Pro 120 GB Test - SandForce SF-1200 SSD mit 50K IOPS - HD Tune Access Time IOPS (Diagramme) (5/12) |publisher=Tweakpc.de |date= |accessdate=2013-05-13 |archive-date=2013-02-12 |archive-url=https://archive.is/20130212120700/http://www.tweakpc.de/hardware/tests/ssd/gskill_phoenix_pro/s05.php |dead-url=yes }}</ref>。
+| SATA 3 Gbit/s
+| [[SandForce|SandForce]]-1200為基礎的固態硬體，配合加強版的韌體，最快可到50,000 IOPS，性能测试的結果是隨機讀取可到~25,000 IOPS，隨機寫入可到~15,000 IOPS<ref name="tweakpc" />。
+|-
+| [[OCZ_Storage_Solutions|OCZ]] Vertex 3
+| SSD
+| 最高可到60,000 IOPS<ref>{{Cite web |url=http://www.ocztechnology.com/res/manuals/OCZ_Vertex3_Product_Sheet.pdf |title=存档副本 |accessdate=2015-06-30 |archive-date=2011-06-26 |archive-url=https://web.archive.org/web/20110626013741/http://www.ocztechnology.com/res/manuals/OCZ_Vertex3_Product_sheet.pdf |dead-url=yes }}</ref>
+| SATA 6 Gbit/s
+| 隨機寫入4 KB (Aligned)
+|-
+| [[Corsair|Corsair]] Force Series GT
+| SSD
+| 最高可到85,000 IOPS<ref>{{cite web |author=Force Series™ GT 240GB SATA 3 6Gb/s Solid-State Hard Drive |url=http://www.corsair.com/us/ssd/force-series-gt-ssd/force-series-gt-240gb-sata-3-6gbps-solid-state-hard-drive.html |title=Force Series™ GT 240GB SATA 3 6Gb/s Solid-State Hard Drive - Force Series GT - SSD |publisher=Corsair.com |date= |accessdate=2013-05-13 |archive-date=2013-01-19 |archive-url=https://archive.is/20130119162651/http://www.corsair.com/us/ssd/force-series-gt-ssd/force-series-gt-240gb-sata-3-6gbps-solid-state-hard-drive.html |dead-url=no }}</ref>
+| SATA 6 Gbit/s
+| 240 GB Drive，循序讀取為555 MB/s，循序寫入為525 MB/s。隨機寫入4 KB (Aligned)
+|}
+
+==相關條目==
+*[[每秒指令|每秒指令]]
+*[[效能功耗比|效能功耗比]]
+
+==參考資料==
+{{reflist}}
+
+
+{{固态硬盘}}
+[[Category:電腦性能|Category:電腦性能]]
+[[Category:資料傳輸|Category:資料傳輸]]
+[[Category:頻率單位|Category:頻率單位]]

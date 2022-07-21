@@ -1,0 +1,116 @@
+{{noteTA|G1=IT}}
+{{Infobox software
+| name                   = Gradle
+| logo                   = gradle_logo_small.png
+| logo size              = 200px
+| screenshot             = 
+| caption                = 
+| developer              = Gradle developers
+| author                 = Hans Dockter
+| status                 = 活跃
+| latest release version = 7.3.3
+| latest release date    = {{Start date and age|2021|12|22}}<ref>{{Cite web|url=https://services.gradle.org/distributions/|title=Gradle Distributions|website=Gradle Services|accessdate=2022-01-09|archive-date=2021-02-03|archive-url=https://web.archive.org/web/20210203071803/https://services.gradle.org/distributions/}}</ref>
+| latest preview version = 7.0.0-M3
+| latest preview date    = {{Start date and age|2021|03|12}}
+| operating system       = [[跨平台|跨平台]]
+| programming language   = [[Java|Java]]、[[Groovy|Groovy]]、[[Kotlin|Kotlin]]
+| genre                  = [[自动化建构|自动化构建工具]]
+| license                = [[Apache许可证|Apache许可证]] 2.0
+| website                = http://www.gradle.org/
+}}
+
+'''Gradle'''是一个基于[[Apache_Ant|Apache Ant]]和[[Apache_Maven|Apache Maven]]概念的项目[[自动化建构|自动化建构]]工具。Gradle 构建脚本使用的是 [[Groovy|Groovy]] 或 [[Kotlin|Kotlin]] 的[[特定领域语言|特定领域语言]]来编写的<ref>{{Cite web|title=Gradle User Manual|url=https://docs.gradle.org/current/userguide/userguide.html|accessdate=2020-02-21|work=docs.gradle.org|archive-date=2021-02-03|archive-url=https://web.archive.org/web/20210203071643/https://docs.gradle.org/current/userguide/userguide.html|dead-url=no}}</ref>，而不是传统的[[XML|XML]]。<ref>{{cite web |url=http://www.gradle.org/overview |title=存档副本 |accessdate=2013-07-03 |deadurl=yes |archiveurl=https://archive.is/20130415020438/http://www.gradle.org/overview |archivedate=2013-04-15 }}</ref>
+
+当前官方支持的语言为[[Java|Java]]、[[Groovy|Groovy]]、[[Scala|Scala]]、[[C++|C++]]、[[Swift_(程式語言)|Swift]]、[[JavaScript|JavaScript]]等以及[[Spring框架|Spring框架]]<ref>{{Cite web|title=Building Java Applications|url=https://guides.gradle.org/building-java-applications/|accessdate=2020-02-21|work=guides.gradle.org|archive-date=2020-10-26|archive-url=https://web.archive.org/web/20201026185309/https://guides.gradle.org/building-java-applications/|dead-url=no}}</ref>。
+
+== 使用 Gradle 的優勢 ==
+* 自動處理套件相依關係 - 取自 Maven Repos 的概念
+* 自動處理佈署問題 - 取自 Ant 的概念
+* 條件判斷寫法直覺 - 使用 Groovy 語言
+
+過去 Java 開發者常用 Maven 和 Ant 等工具進行封裝佈署的自動化，或是兩者兼用，不過這兩個套件彼此有優缺點，如果頻繁改變相依套件版本，使用 Ant 相當麻煩，如果瑣碎工作很多，Maven 功能不足，而且兩者都使用 XML 描述，相當不利於設計 if、switch 等判斷式，即使寫了可讀性也不佳，而 Gradle 改良了過去 Maven、Ant 帶給開發者的問題，至今也成為 Android Studio 內建的封裝佈署工具。
+
+== 概念 ==
+
+=== 插件 ===
+由于Gradle 的核心功能为真实世界提供了很少的自动化，其他实用性功能都是由插件提供<ref>{{Cite web|title=Using Gradle Plugins|url=https://docs.gradle.org/current/userguide/plugins.html|accessdate=2020-02-21|work=docs.gradle.org|archive-date=2020-11-23|archive-url=https://web.archive.org/web/20201123223623/https://docs.gradle.org/current/userguide/plugins.html|dead-url=no}}</ref><ref>{{Cite web|title=Gradle 插件 - Gradle 用户指南官方文档中文版 - UDN开源文档|url=https://doc.yonyoucloud.com/doc/wiki/project/GradleUserGuide-Wiki/gradle_plugins/README.html|accessdate=2020-02-21|work=doc.yonyoucloud.com|archive-date=2020-02-21|archive-url=https://web.archive.org/web/20200221052245/https://doc.yonyoucloud.com/doc/wiki/project/GradleUserGuide-Wiki/gradle_plugins/README.html|dead-url=no}}</ref>，所以往往在使用了Gradle时候，往往都会使用插件以完整自动化操作。在特定的[[上下文_(计算机)|上下文]]语境下，Gradle 插件提供给用户对应合适的默认事项以及标准（[[惯例优先原则|惯例]]）。<ref>{{Cite web|title=Designing Gradle plugins|url=https://guides.gradle.org/designing-gradle-plugins/#convention_over_configuration|accessdate=2020-02-21|work=guides.gradle.org|archive-date=2020-10-26|archive-url=https://web.archive.org/web/20201026190736/https://guides.gradle.org/designing-gradle-plugins/#convention_over_configuration|dead-url=no}}</ref> 换言之，插件是对真实环境和上下文的一个补充和扩展。
+
+使用插件分两步：解析插件、应用插件。<ref name="#1">{{Cite web|title=Using Gradle Plugins|url=https://docs.gradle.org/current/userguide/plugins.html#sec:using_plugins|accessdate=2020-02-23|work=docs.gradle.org|archive-date=2020-11-23|archive-url=https://web.archive.org/web/20201123223623/https://docs.gradle.org/current/userguide/plugins.html#sec:using_plugins|dead-url=no}}</ref>Gradle插件常见的两种关键词<code>apply</code>和<code>plugins</code> ，前者仅仅是应用插件，后者是既分析又应用插件。<ref name="#1"/>
+
+=== 依赖约束 ===
+依赖约束（Dependency constraint），用于帮助模块去获取一个可用的依赖。依赖约束，可以缩小模块的可支持版本的范围。而且这也能适用于传递依赖（transitive dependencies）。<ref>{{Cite web|title=Dependency Management Terminology|url=https://docs.gradle.org/current/userguide/dependency_management_terminology.html#sub:terminology_dependency_constraint|accessdate=2020-02-24|work=docs.gradle.org|archive-date=2020-02-21|archive-url=https://web.archive.org/web/20200221052315/https://docs.gradle.org/current/userguide/dependency_management_terminology.html#sub:terminology_dependency_constraint|dead-url=no}}</ref> 示例如下：<syntaxhighlight lang="groovy">
+dependencies {
+    implementation 'org.apache.httpcomponents:httpclient'
+    constraints {
+        implementation('org.apache.httpcomponents:httpclient:4.5.3') {
+            because '之前的版本有bug，会影响到应用'
+        }
+        implementation('commons-codec:commons-codec:1.11') {
+            because ' 从httpclient获取的 1.9 版本有bug，会影响到应用'
+        }
+    }
+}
+</syntaxhighlight>
+
+== 插件 ==
+
+=== Java ===
+
+==== Java Plugin ====
+Java插件为项目提供了Java编译、测试以及其他一系列功能。同时Java插件是其他[[JVM语言|JVM语言]]插件的基础。官方文档不建议使用者再直接使用Java插件，而应该使用基于Java插件的衍生插件，如：java-library和application。<ref name="#2">{{Cite web|title=The Java Plugin|url=https://docs.gradle.org/current/userguide/java_plugin.html|accessdate=2020-02-21|work=docs.gradle.org|archive-date=2021-02-03|archive-url=https://web.archive.org/web/20210203160243/https://docs.gradle.org/current/userguide/java_plugin.html|dead-url=no}}</ref> 在java插件中，<code>compile</code> 关键词（编译时依赖）已经废弃，取而代之是 <code>implementation</code> 关键词<ref>{{Cite web|title=The Java Plugin|url=https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_plugin_and_dependency_management|accessdate=2020-02-21|work=docs.gradle.org|archive-date=2021-02-03|archive-url=https://web.archive.org/web/20210203160243/https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_plugin_and_dependency_management|dead-url=no}}</ref> ，而在java-library中可使用<code>api</code>和<code>implementation</code>关键词表示依赖。<ref name=":0">{{Cite web|title=The Java Library Plugin|url=https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_separation|accessdate=2020-02-21|work=docs.gradle.org|archive-date=2020-12-23|archive-url=https://web.archive.org/web/20201223172112/https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_separation|dead-url=no}}</ref>
+
+==== Java Application插件 ====
+Application插件，用于创建可执行的 JVM 应用。<ref name="#2"/>
+
+==== Java Library插件 ====
+Java依赖包插件用于提供Java依赖包的专门知识。 java-library插件增加了API的概念。<code>implementation</code> 和<code>api</code>关键词区别在于：<code>api</code>所依赖的依赖包，会作为该项目的API被暴露于调用者；<code>implementation</code> 所依赖的依赖包，不会作为该项目的API而暴露于调用者，调用者如果需要使用该依赖包需要另外声明。<ref name=":0" />
+
+==== Java Platform插件 ====
+Java平台插件为Java生态系统提供平台的功能。平台可用于各种目的，如：<ref>{{Cite web|title=The Java Platform Plugin|url=https://docs.gradle.org/current/userguide/java_platform_plugin.html|accessdate=2020-02-23|work=docs.gradle.org|archive-date=2020-10-28|archive-url=https://web.archive.org/web/20201028090759/https://docs.gradle.org/current/userguide/java_platform_plugin.html|dead-url=no}}</ref>
+
+* 各个子项目使用同一个版本号和描述，进行发布。
+* 为使用者提供一个推荐的版本的依赖包组合。
+* 在不同的子项目中，共享依赖版本。
+
+== Ant迁移示例 ==
+Gradle与Ant有很紧密集成，甚至在构建时可以把Ant构建脚本直接导入。下面的例子展示了一个简单的Ant target被引入为一个Gradle task。                                  
+
+'''build.xml'''
+<syntaxhighlight lang="xml">
+<project>
+  <target name="ant.target">
+    <echo message="Running ant.target!"/>
+  </target>
+</project>
+</syntaxhighlight>
+
+'''build.gradle'''
+<syntaxhighlight lang="groovy">
+ant.importBuild 'build.xml'
+</syntaxhighlight>
+
+运行 '''gradle ant.target''' 将显示如下结果
+
+<syntaxhighlight lang="text" highlight="1">
+> gradle ant.target
+:ant.target
+[ant:echo] Running ant.target!
+
+BUILD SUCCESSFUL
+</syntaxhighlight>
+== 参考文献 ==
+{{Reflist}}
+
+== 参见 ==
+* [[Apache_Ant|Apache Ant]]
+* [[Apache_Maven|Apache Maven]]
+* {{tsl|en|Make||Make}}
+* [[SCons|SCons]]
+
+
+[[Category:自动化构建|Category:自动化构建]]
+[[Category:編譯工具|Category:編譯工具]]
+[[Category:Java开发工具|Category:Java开发工具]]
+[[Category:跨平台軟體|Category:跨平台軟體]]
+[[Category:使用Apache许可证的软件|Category:使用Apache许可证的软件]]
+[[Category:2007年软件|Category:2007年软件]]

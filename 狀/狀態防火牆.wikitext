@@ -1,0 +1,25 @@
+{{TA
+|G1=IT
+}}
+{{信息安全}}
+'''狀態防火牆'''（{{lang-en|Stateful firewall}}），一種能夠提供'''狀態封包檢查'''（{{lang|en|stateful packet inspection}}，縮寫為SPI）或'''狀態檢視'''（{{lang|en|stateful inspection}}）功能的[[防火牆|防火牆]]，能夠持續追蹤穿過這個防火牆的各種網路連線（例如[[传输控制协议|TCP]]與[[用户数据报协议|UDP]]連線）的狀態。這種防火牆被設計來區分不同連線種類下的合法封包。{{clarify|只有符合主動連線的封包才能夠被允許穿過防火牆，其他的封包都會被拒絕。}}
+
+狀態封包檢查也被称为動態封包過濾（Dynamic Packet Filtering）。<ref>{{Cite book|last=Goralski, Walter, author.|url=http://worldcat.org/oclc/986540207|title=The illustrated network : how TCP/IP works in a modern network|isbn=978-0-12-811027-0|oclc=986540207}}</ref>
+
+==原理==
+状态防火墙监视网络连接的“状态”，比如[[传输控制协议|TCP]]流、[[用户数据报协议|UDP]]数据和[[ICMP|ICMP]]消息可能被分为''LISTEN'', ''ESTABLISHED'', 或者''CLOSING''状态<ref>{{Cite web|title=TCP connection status|url=https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.halu101/constatus.htm|access-date=2020-09-06|website=IBM Knowledge Center|archive-date=2020-11-11|archive-url=https://web.archive.org/web/20201111225444/https://www.ibm.com/support/knowledgecenter/en/SSLTBW_2.1.0/com.ibm.zos.v2r1.halu101/constatus.htm|dead-url=no}}</ref>。按照相应的安全策略，状态防火墙在状态表中为各TCP流或者UDP数据创建记录。凡在表中的session，所有相关封包都被允许通过，不再检测，因此比一般的检测使用更少[[CPU|CPU]]。
+
+维持一个session的状态取决于其[[传输层|传输层]]协议。比如TCP是面向连接的协议<ref name="TvU">{{Cite web|last=Mitchell|first=Bradley|date=2020-04-01|title=TCP vs UDP|url=https://www.lifewire.com/tcp-headers-and-udp-headers-explained-817970|access-date=2020-09-06|website=Lifewire|archive-date=2021-10-04|archive-url=https://web.archive.org/web/20211004030539/https://www.lifewire.com/tcp-headers-and-udp-headers-explained-817970|dead-url=no}}</ref>，其session是由[[三路握手|三路握手]]的SYN消息建立，由FIN消息终止。<ref>{{Cite web|title=TCP three-way handshake|url=https://study-ccna.com/tcp-three-way-handshake/|access-date=2020-09-06|website=Study-CCNA|archive-date=2021-12-23|archive-url=https://web.archive.org/web/20211223222401/https://study-ccna.com/tcp-three-way-handshake/|dead-url=no}}</ref>状态防火墙由此可以知道何时从表中移除session，而不必等待超时再移除。UDP是无连接的协议<ref name="TvU"/>，它不会发送特别的连接消息，因此一个UDP的session只有等待超时才会被移除，[[UDP打洞|UDP打洞]]就利用了这一特性设立隧道。<ref>{{Cite web|title=Automatic NAT Traversal for Auto VPN Tunneling between Cisco Meraki Peers|url=https://documentation.meraki.com/MX/Site-to-site_VPN/Automatic_NAT_Traversal_for_Auto_VPN_Tunneling_between_Cisco_Meraki_Peers|access-date=2020-09-06|website=Meraki|archive-date=2021-10-04|archive-url=https://web.archive.org/web/20211004030529/https://documentation.meraki.com/MX/Site-to-site_VPN/Automatic_NAT_Traversal_for_Auto_VPN_Tunneling_between_Cisco_Meraki_Peers|dead-url=no}}</ref> ICMP消息与TCP和UDP不同，它传递网络本身的控制信息，比如[[ping|ping]]命令。<ref>{{Cite web|last=Mitchell|first=Bradley|date=2018-12-03|title=Guide to Internet Control Message Protocol (ICMP)|url=https://www.lifewire.com/icmp-and-icmpv6-ip-networking-818135|access-date=2020-09-06|website=Lifewire|archive-date=2020-11-25|archive-url=https://web.archive.org/web/20201125203610/https://www.lifewire.com/icmp-and-icmpv6-ip-networking-818135|dead-url=no}}</ref>ICMP回复一般会被允许。有时UDP通信会使用ICMP来提供session的状态信息，因此和某UDP session有关的ICMP回复也是允许的。
+
+==歷史==
+{{空章节}}
+==缺點==
+[[Category:网络安全|Category:网络安全]]
+
+*無法處理應用層協定
+
+==参考文献==
+{{reflist}}
+
+==参见==
+*[[入侵检测系统|入侵检测系统]]

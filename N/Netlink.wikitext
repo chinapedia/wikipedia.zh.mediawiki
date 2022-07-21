@@ -1,0 +1,121 @@
+{{noteTA|G1=IT}}
+{{Proofreader needed|en|Netlink}}
+'''Netlink套接字家族'''（{{lang-en|Netlink socket family}}）是一組Linux核心介面（Linux kernel interfaces），可用於[[行程間通訊|行程間通訊]]，Linux内核与[[用户空间|用户空间]]的进程间、用户进程间的通讯。然而它并不像[[网络套接字|网络套接字]]可以用于主机间通讯，Netlink只能用于同一主机上进程通讯，并通过PID来标识它们。
+
+Netlink被设计为在[[Linux内核|Linux内核]]与用户空间进程传送各种网络信息。网络工具[[iproute2|iproute2]]利用
+Netlink从用户空间与内核进行通讯。Netlink由一个在用户空间的标准的Socket接口和内核模块
+提供的内核API组成。Netlink的设计比[[ioctl|ioctl]]更加灵活，Netlink使用了AF_NETLINK Socket
+家族。
+
+[http://tools.ietf.org/html/rfc3549 RFC 3549]{{Wayback|url=http://tools.ietf.org/html/rfc3549 |date=20130331095020 }}详细的描述了Netlink协议。
+
+==历史==
+Netlink用于替代复杂和不够灵活的ioctl通讯方式，ioctl方法主要用设定和取得外部socket，
+为了提供向后兼容，ioctl将一直被Linux内核所支持，用法如下：
+
+ error = ioctl(ip_socket, ioctl_type, &value_result);
+
+Netlink在Linux内核2.0版本中作为字符设备被首次提供使用。这个接口已经过时了，但是作为
+一种ioctl通讯方法，它仍可继续使用。Netlink socket接口从Linux内核2.2开始提供使用。
+
+==包结构==
+不像[[Socket|BSD套接字]]存取互联网协议那样，头信息中的标识和目的地都是自动生成（如[[传输控制协议|TCP]]），
+Netlink消息头（结构体nlmsghdr）必须由发送方准备好，就像socket工作在SOCK_RAW模式下
+一样。尽管SOCK_DGRAM被用于创建它。
+
+{| class="wikitable" style="text-align:center"
+|-
+! width="4%"| Bit offset
+! colspan="16" width="48%" | 0–15
+! colspan="16" width="48%" | 16–31
+|-
+! 0
+| colspan="32" | Message length
+|-
+! 32
+| colspan="16" | Type
+| colspan="16" | Flags
+|-
+! 64
+| colspan="32" | Sequence number
+|-
+! 96
+| colspan="32" | PID
+|-
+! 128+
+| colspan="32" |  <br />Data<br /> 
+|}
+
+然而，数据部分可能进一步嵌套其它特定的子消息系统。
+
+==Netlink套接字簇==
+AF_NETLINK协议家族提供了多个子协议。每个接口连接不同的内核组件并且有各自的消息集。
+如：
+
+ int socket(AF_NETLINK, SOCK_DGRAM or SOCK_RAW, protocol)
+
+由于缺少标准，SOCK_DGRAM和SOCK_RAW并不保证在每个Linux发行版（或其它操作系统）被声
+明。有些源码中声明两种都可以使用，[[红帽|红帽]]的文档中声明SOCK_RAW一直可以被使用，而
+iproute2交换使用两者。
+
+==Netlink协议==
+Netlink所支持的协议如下（并不完全）：
+'''NETLINK_ROUTE'''
+NETLINK_ROUTE提供路由和连接信息。这些信息主要被用户空间的路由守护进程使用。对于这个
+协议，Linux声明了大量的子消息：
+* 链路层：'''RTM_NEWLINK, RTM_DELLINK, RTM_GETLINK, RTM_SETLINK'''
+* 地址设定：'''RTM_NEWADDR, RTM_DELADDR, RTM_GETADDR'''
+* 路由表：'''RTM_NEWROUTE, RTM_DELROUTE, RTM_GETROUTE'''
+* 邻居缓存（Neighbor Cache）：'''RTM_NEWNEIGH, RTM_DELNEIGH, RTM_GETNEIGH'''
+* 路由规则：'''RTM_NEWRULE, RTM_DELRULE, RTM_GETRULE'''
+* Queuing Discipline Settings: '''RTM_NEWQDISC, RTM_DELQDISC, RTM_GETQDISC'''
+* Traffic Classes used with Queues: '''RTM_NEWTCLASS, RTM_DELTCLASS, RTM_GETTCLASS'''
+* 流量过滤：'''RTM_NEWTFILTER, RTM_DELTFILTER, RTM_GETTFILTER'''
+* 其它：'''RTM_NEWACTION, RTM_DELACTION, RTM_GETACTION, RTM_NEWPREFIX, RTM_GETPREFIX, RTM_GETMULTICAST, RTM_GETANYCAST, RTM_NEWNEIGHTBL,RTM_GETNEIGHTBL, RTM_SETNEIGHTBL'''
+
+'''NETLINK_FIREWALL'''
+
+: NETLINK_FIREWALL提供给用户空间用户程序一个接口，用户空间应用程序利用这个接口可以从[[防火墙|防火墙]]接收包。
+
+'''NETLINK_NFLOG'''
+
+: NETLINK_NFLOG提供了一个iptables和Netfilter间通讯的接口。
+
+'''NETLINK_ARPD'''
+
+: NETLINK_ARPD提供了一个接口用于从用户空间来管理ARP表。
+
+'''NETLINK_AUDIT'''
+
+: NETLINK_AUDIT只能在Linux内核2.6.6及以后才可以使用，它提供了一个用户审计子系统的接口。
+
+'''NETLINK_IPV6_FW'''
+
+: NETLINK_IPV6_FW提供了一个将包从netfilter传送到用户空间的接口。
+
+'''NETLINK_ROUTE6'''
+
+'''NETLINK_TAPBASE'''
+
+'''NETLINK_TCPDIAG'''
+
+'''NETLINK_XFRM'''
+
+: NETLINK_XFRM提供了一个接口用于管理IPSec安全组件(IPSec Security association)和安全策略数据库的接口。主要被密钥管理的守护进程用于[[互联网密钥交换|互联网密钥交换]]（Internet Key Exchange）协议。
+
+===用户自定义的Netlink协议===
+用户也可以在自己的内核中添加自定义的Netlink处理器。这允许其它Netlink协议被开发用于连接新的内核模块。<ref>{{Cite web |url=http://www.linuxjournal.com/article/7356 |title=Why and How to Use Netlink Sockets |accessdate=2013-03-26 |archive-date=2013-03-19 |archive-url=https://web.archive.org/web/20130319110814/http://www.linuxjournal.com/article/7356 |dead-url=no }}</ref>
+
+==参考资料==
+<references/>
+
+==外部链接==
+* [https://web.archive.org/web/20110902031641/http://1984.lsi.us.es/~pablo/docs/spae.pdf Pablo Neira Ayuso, Rafael M. Gasca, Laurent Lefèvre. Communicating between the kernel and user-space in Linux using Netlink sockets. Software: Practice and Experience, 40(9):797-810, August 2010]
+* [http://www.linuxjournal.com/article/7356 Why and How to Use Netlink Sockets]{{Wayback|url=http://www.linuxjournal.com/article/7356 |date=20130319110814 }}
+* [http://www.ietf.org/rfc/rfc3549.txt RFC 3549]{{Wayback|url=http://www.ietf.org/rfc/rfc3549.txt |date=20120210014421 }}
+* http://netfilter.org/projects/libmnl{{Wayback|url=http://netfilter.org/projects/libmnl |date=20130211140957 }} — “Minimalist Library for Netlink” — userspace library for construction and parsing of Netlink messages
+* http://www.infradead.org/~tgr/libnl{{Wayback|url=http://www.infradead.org/~tgr/libnl |date=20130420145727 }} = "Netlink Protocol Library Suite" - full functional library covering almost all aspects of working with netlink sockets
+* [http://www.linuxjournal.com/article/8498 Manipulating the Networking Environment Using RTNETLINK]{{Wayback|url=http://www.linuxjournal.com/article/8498 |date=20121225105834 }}
+* [https://web.archive.org/web/20130211014547/http://qos.ittc.ku.edu/netlink/html/index.html Netlink Sockets - Overview]
+
+[[Category:Linux|Category:Linux]]

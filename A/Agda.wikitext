@@ -1,0 +1,200 @@
+{{Infobox programming language
+| name                   = Agda
+| logo                   = Agda's official logo.svg
+| paradigm               = [[函数式编程|函数式编程]]
+| designer               = Ulf Norell（2.0版）<br>Catarina Coquand（1.0版）
+| developer              = Ulf Norell（2.0版）<br>Catarina Coquand（1.0版）
+| year                   = {{Start date and age|2007}}（2.0版）<br>{{Start date and age|1999}}（1.0版）
+| latest release version = 2.6.2
+| latest release date = {{Start date and age|2021|06|19}}
+| latest_test_version    = 
+| latest_test_date       = 
+| typing                 = [[静态类型|静态类型]]、[[强类型|强类型]]、[[依赖类型|依赖类型]]
+| implementations        = 
+| dialects               = 
+| influenced             = [[Idris|Idris]]
+| influenced_by          = [[Coq|Coq]]、{{en-link|Epigram}}、[[Haskell|Haskell]]
+| license                = [[MIT_license|MIT]]、[[BSD_licenses|BSD-like]]<ref>{{Cite web |url=https://github.com/agda/agda/blob/master/LICENSE |title=Agda license file |access-date=2020-01-08 |archive-date=2022-04-26 |archive-url=https://web.archive.org/web/20220426212228/https://github.com/agda/agda/blob/master/LICENSE }}</ref>
+| website                = [http://wiki.portal.chalmers.se/agda/ Agda wiki]
+| file ext               = <code>.agda</code>、<code>.lagda</code>
+| operating_system       = [[跨平台|跨平台]]
+}}
+
+'''Agda''' 是一个[[依赖类型|依赖类型]]的[[纯函数式编程语言|纯函数式编程语言]]。目前的版本，Agda 2，最初由[[瑞典|瑞典]][[查尔摩斯工学院|查尔摩斯工学院]]的 Ulf Norell 作为博士论文课题设计并实现<ref>Ulf Norell. Towards a practical programming language based on dependent type theory. PhD Thesis. Chalmers University of Technology, 2007. [http://www.cse.chalmers.se/~ulfn/papers/thesis.pdf] {{Wayback|url=http://www.cse.chalmers.se/~ulfn/papers/thesis.pdf |date=20130518023142 }}</ref>。先前的版本 Agda 1 由 Catarina Coquand 在 1999 年开发，而现今的版本则是对其的彻底重写，因此可视作一个全新的语言，但保留了 Agda 的命名和传统。
+
+Agda 的类型系统体现了[[柯里-霍华德同构|柯里-霍华德同构]]（Curry-Howard correspondence），因此亦可作为一个构建[[构造性证明|构造性证明]]的{{en-link|证明辅助工具|Proof assistant}}。它的类型理论基于 Zhaohui Luo 提出的 UTT（unified theory of dependent types）<ref>Luo, Zhaohui. ''Computation and reasoning: a type theory for computer science''. Oxford University Press, Inc., 1994.</ref>，与 [[Per_Martin-Löf|Per Martin-Löf]] 的[[直觉类型论|直觉类型论]]相似。
+
+Agda 与另一个基于依赖类型的证明辅助工具 [[Coq|Coq]] 设计上存在着显著的不同之处：它本身并不提供单独的证明策略语言（tactics），所有的证明均以函数式编程的方式书写；Agda 拥有许多常规的函数式程序语言要素，诸如：数据类型（data types）、模式匹配（pattern matching）、记录类型（records）、let表达式和模块（modules）等，而其语法设计则高度仿照 [[Haskell|Haskell]] 语言。
+
+用户可通过 [[Emacs|Emacs]] 或 [[Atom_(文字編輯器)|Atom]] 编辑器的界面与 Agda 系统进行交互<ref name="emacs-mode">{{cite conference|first1=Catarina|last1=Coquand|first2=Dan|last2=Synek|first3=Makoto|last3=Takeyama|title=An Emacs interface for type directed support constructing proofs and programs|conference=European Joint Conferences on Theory and Practice of Software 2005|url=https://mailserver.di.unipi.it/ricerca/proceedings/ETAPS05/uitp/uitp_p05.pdf|deadurl=yes|archiveurl=https://web.archive.org/web/20110722063632/https://mailserver.di.unipi.it/ricerca/proceedings/ETAPS05/uitp/uitp_p05.pdf|archivedate=2011-07-22|access-date=2013-12-24}}</ref>。Agda 系统亦可藉由命令行单独调用。
+
+通过类型检查的 Agda 程序可以被编译到 Haskell，并由 GHC 编译器最终编译为可执行的本地机器码；亦有编译到 [[JavaScript|JavaScript]] 的后端实现。
+
+Agda 的名字来自于一首由音乐家 Cornelis Vreeswijk 创作的瑞典语歌曲“Hönan Agda”，歌词讲述了一只名叫 Agda 的母鸡的故事。这实际上影射了 Coq（Coq 在法语中意为公鸡）。
+
+== 简介 ==
+
+=== 一个简单的“Hello world”程序 ===
+
+将下述程序保存于文件<code>hello-world.agda</code>中：
+
+<syntaxhighlight lang="agda">
+module hello-world where
+
+open import IO
+
+main = run (putStrLn "Hello, World!")
+</syntaxhighlight>
+
+在 Emacs 中可使用 <kbd>C-c C-x C-c</kbd> 来编译此程序；或在命令行中执行<code>agda --compile hello-world.agda</code>进行编译。
+
+几点解释：
+
+* Agda 程序以模块（module）的形式组织而成。每一个文件中的第一个模块称之为最高级别（top-level）模块，其名称必须和文件名相符。模块的内容可以包括数据类型的定义、函数的定义等。
+* 外部模块可以通过<code>import</code>子句导入。例如在上述程序中，<code>open import IO</code>导入 Agda 标准库中的IO（标准输入输出）模块，并将其在当前作用域中打开。
+* 一个导出了函数名及类型签名<code>main : IO a</code>的模块即可以被编译成可执行文件。例如，上述程序中的<code>main</code>函数作用是将字符串“Hello, World!”写到标准输出，之后退出程序。
+
+=== 归纳类型（inductive types） ===
+
+在 Agda 中定义数据类型的方式与其它（非依赖类型）编程语言中的代数数据类型相似。
+例如，在 Agda 中归纳地定义[[皮亚诺公理|皮亚诺数]]：
+
+<syntaxhighlight lang="agda">
+data ℕ : Set where
+  zero : ℕ 
+  succ : ℕ → ℕ
+</syntaxhighlight>
+
+这表明存在两种形式可以用来构造一个自然数：首先，zero 是一个自然数；若已知 n 是一个自然数，则 succ n 也必定是一个自然数。
+
+又如，Agda 中对小于或等于关系的定义：
+
+<syntaxhighlight lang="agda">
+data _≤_ : ℕ → ℕ → Set where
+  z≤n : {n : ℕ} → zero ≤ n
+  s≤s : {n m : ℕ} → n ≤ m → succ n ≤ succ m
+</syntaxhighlight>
+
+第一处构造（<code>z≤n</code>）指出：zero 必定小于或等于任何自然数；第二处构造（<code>s≤s</code>）指出：当 n <= m 时必定有 succ n <= succ m。
+例如，考虑<code>z≤n {succ zero}</code>，依照定义，它是对零小于一的证明；再考虑<code>s≤s {zero} {succ zero} (z≤n {succ zero})</code>，则是对一小于二的证明。
+
+=== 依赖类型模式匹配（dependently typed pattern matching） ===
+
+在类型论中，归纳和递归原则通常被用来证明涉及到归纳类型的定理。Agda 则使用依赖类型模式匹配来达到此目的。例如，自然数的加法可被定义为：
+
+<syntaxhighlight lang="agda">
+add zero n = n
+add (succ m) n = succ (add m n)
+</syntaxhighlight>
+
+比起运用归纳/递归原则，直接定义递归函数更加简单直观。依赖类型模式匹配是 Agda 内置的语言特性之一；其核心类型论并没有包含归纳/递归原则。
+
+=== 记录类型（records） ===
+
+除了归纳类型之外，Agda 还支持记录类型。记录的作用是将若干类型的值包装在一起，并使用不同名称标识不同的域；它可看作是对[[依赖类型#Π-类型|依赖乘积类型]]（dependent product types）的推广。
+例如，在 Agda 中定义一个值对（pair）：
+
+<syntaxhighlight lang="agda">
+record Pair (A B : Set) : Set where
+  field
+    fst : A
+    snd : B
+</syntaxhighlight>
+
+以上代码定义了一个新的数据类型<code>Pair : Set → Set → Set</code>，以及两个投影函数：
+
+<syntaxhighlight lang="agda">
+Pair.fst : {A B : Set} → Pair A B → A
+Pair.snd : {A B : Set} → Pair A B → B
+</syntaxhighlight>
+
+记录类型的值可以使用记录表达式来创建，如：
+
+<syntaxhighlight lang="agda">
+p12 = record { fst = 1; snd = 2 }
+</syntaxhighlight>
+
+若在定义记录类型时使用<code>constructor</code>关键字规定了构造器，则亦可直接使用相应的构造器来创建记录，如：
+
+<syntaxhighlight lang="agda">
+record Pair (A B : Set) : Set where
+  constructor _,_
+  field
+    fst : A
+    snd : B
+
+p34 : Pair Nat Nat
+p34 = 3 , 4
+</syntaxhighlight>
+
+=== 元变量（metavariables） ===
+
+Agda 和其他类似的交互式证明系统（如 Coq）相比，一个显著的特性是在证明构造中对元变量的大量利用。
+
+例如，在 Agda 中可以写出如下函数：
+
+<syntaxhighlight lang="agda">
+add : ℕ → ℕ → ℕ 
+add x y = ?
+</syntaxhighlight>
+
+“?”即是一个元变量。在 Emacs mode 中交互时，系统会提示用户所期望的类型，允许用户进一步添加具体代码到其中。该特性为渐进式程序构造提供了支持，从而达到与 Coq 的证明策略（tactics）类似的意图。
+
+=== 证明自动化和反射（reflection） ===
+
+
+=== 宇宙（universe） ===
+
+
+=== 高阶归纳类型（higher inductive types） ===
+
+
+=== 终止检查（termination checking） ===
+
+作为一个定理证明系统，Agda 语言中的定义必须是完整（total）的。所有的程序必须终止，所有的模式必须得到匹配。若无法保证定义的完整性，其类型论背后所对应的逻辑将失去一致性，导致假命题可以被证明。
+
+目前 Agda 使用 Foetus 终止检查器。
+
+=== Unicode ===
+
+Agda 语言大量吸收了 [[Unicode|Unicode]] 字符集中的数学符号，这使得其证明更具可读性。Agda 的 Emacs mode 中提供了输入这些符号的快捷键；这仿照 [[TeX|TeX]] 中书写数学符号的形式。例如，输入 Σ 可以使用 <code>\Sigma</code>。
+
+=== 标准库 ===
+
+Agda 的标准库包含了一些常见数据结构的定义和相关的定理证明，例如自然数、列表（lists）与矢量（vectors）。
+
+=== 编译器 ===
+
+Agda 目前具备两个官方的编译器后端：编译到 Haskell 的 MAlonzo 后端；和另一个编译到 JavaScript 的后端。
+
+
+
+== 参见 ==
+* [[柯里-霍华德同构|柯里-霍华德同构]]
+* [[依赖类型|依赖类型]]
+* [[直觉类型论|直觉类型论]]
+* [[同伦类型论|同伦类型论]]
+* [[立方类型论|立方类型论]]
+* [[Coq|Coq]]
+* [[Idris|Idris]]
+* [[Haskell|Haskell]]
+
+== 参考文献 ==
+{{reflist}}
+
+== 外部链接 ==
+* [http://wiki.portal.chalmers.se/agda/ The Agda 2 homepage]{{Wayback|url=http://wiki.portal.chalmers.se/agda/ |date=20090831062524 }} (a wiki), including documentation and a link to a bug-report tool
+* [http://hackage.haskell.org/package/Agda Agda at the Hackage repository]{{Wayback|url=http://hackage.haskell.org/package/Agda |date=20131224112252 }}
+* [https://github.com/liamoc/learn-you-an-agda Learn you an Agda]{{Wayback|url=https://github.com/liamoc/learn-you-an-agda |date=20170425170528 }}, a tutorial.
+* [https://web.archive.org/web/20131224094000/http://pnyf.inf.elte.hu/fp/Overview_en.xml A course on Functional Programming], with seven parts on Agda
+* [http://www.youtube.com/playlist?p=B7F836675DCE009C Introduction to Agda]{{Wayback|url=http://www.youtube.com/playlist?p=B7F836675DCE009C |date=20140615001518 }}, a five-part YouTube playlist by Daniel Peebles
+* [http://www.cse.chalmers.se/~ulfn/papers/afp08/tutorial.pdf Dependently Typed Programming in Agda]{{Wayback|url=http://www.cse.chalmers.se/~ulfn/papers/afp08/tutorial.pdf |date=20140401144502 }}, by [[Ulf_Norell|Ulf Norell]]
+* [http://www.cse.chalmers.se/~ulfn/papers/tphols09/tutorial.pdf A Brief Overview of Agda]{{Wayback|url=http://www.cse.chalmers.se/~ulfn/papers/tphols09/tutorial.pdf |date=20130201200503 }}, by Ana Bove, Peter Dybjer, and [[Ulf_Norell|Ulf Norell]]
+* [https://web.archive.org/web/20120331044430/http://ocvs.cfv.jp/Agda/main.pdf An Agda Tutorial], Misao Nagayama, Hideaki Nishihara, Makoto Takeyama (2006)
+
+{{程序设计语言|Agda}}
+
+[[Category:程序设计语言|Category:程序设计语言]]
+[[Category:函数式编程语言|Category:函数式编程语言]]
+[[Category:学术的编程语言|Category:学术的编程语言]]
+[[Category:2007年建立的程式語言|Category:2007年建立的程式語言]]

@@ -1,0 +1,190 @@
+{{Proofreader needed|en|Architecture of Windows NT}}{{noteTA
+| G1 = IT
+| 1 = zh-hans:内核; zh-hant:核心
+| 2 = zh-hans:程序; zh-hant:程式
+}}
+[[File:Windows_2000_architecture.svg|thumb]]
+
+'''Windows NT體系結構'''是指一系列[[微軟|微軟]]設計及製造，由[[Windows_NT|Windows NT]]所衍生出的視窗作業系統架構，採用[[使用者空間|用戶模式]]與[[使用者空間|核心模式]]的分層設計。它是一种是[[抢占式多任务处理|搶佔式]]和[[可重入|可重入]]的操作系统，可運行在單處理器或[[对称多处理|對稱多處理器]]（SMP）上。並利用[[I/O請求包|I/O請求包]]和[[異步I/O|異步I/O]]來處理所有的[[I/O|I/O]]請求。微软从[[Windows_XP|Windows XP]]开始提供64位的Windows版本，之前只有32位版本。
+
+用戶模式下的程式與子系統在它们可以访问的系统资源方面受到限制，而核心模式对系统资源和外部设备的访问不受限制，可以完全访问计算机的硬件和系统资源。Windows NT内核是屬於[[混合核心|混合核心]]；其體系結構包括[[Windows_NT体系结构#內核|簡單內核]]、[[硬體抽象層|硬體抽象層]]（HAL）、驅動程式、服務（總稱為[[Windows_NT体系结构#执行体|執行體]]），它们都存在于内核模式中。{{sfn|Finnel|2000|loc=Chapter 1: Introduction to Microsoft Windows 2000, pp. 7–18}}
+
+构成Windows NT用戶模式的子系统可以透過I/O管理器傳遞I/O請求給核心模式中适当的[[驅動程式|驅動程式]]。Windows NT的用戶模式由環境子系統（執行為不同類型作業系統編寫的應用程式）和集成子系統（Integral subsystem，代表環境子系統執行特定系統的功能）组成。内核模式阻止用户模式的服务和应用程序访问它们不应访问的操作系统关键区域。
+
+執行體與所有的用戶模式子系統處理I/O、对象管理、安全和进程管理。位於硬體抽象層與執行體之間的核心提供了多處理器同步、[[线程|线程]]、中断调度和分派、故障處理和例外分派的功能。内核還負責在啟動時初始化设备驱动程序。内核模式驱动程序分為三個級別：高層驅動程式、中層驅動程式和低層驅動程式。[[Windows_Driver_Model|Windows驅動程式模型]]（WDM）位於中層，主要設計為在[[Windows_98|Windows 98]]與[[Windows_2000|Windows 2000]]之間實現二進位檔與原始碼相容。最底层的驱动程序要么是直接控制设备的旧版Windows NT设备驱动程序，要么是[[隨插即用|即插即用]]硬件总线。
+
+==用戶模式==
+Windows NT作業系統的用戶模式部分包括兩個子系統：環境子系統與集成子系統。
+
+環境子系統執行依據不同作業系統API而寫的程式，有三個環境子系統：[[Win32|Win32]]子系統、[[OS/2|OS/2]]子系統、[[微软POSIX子系统|POSIX子系統]]。<ref name="win2kreskit-appendix">{{cite web|url=https://technet.microsoft.com/library/cc939090.aspx|title=Appendix - Running Nonnative Applications in Windows 2000 Professional|work=Microsoft Windows 2000 Professional Resource Kit|publisher=Microsoft|accessdate=2016-11-18|archive-date=2016-11-18|archive-url=https://web.archive.org/web/20161118163941/https://technet.microsoft.com/library/cc939090.aspx}}</ref>
+
+=== Win32環境子系統 ===
+Win32環境子系統可執行32位元的Windows應用程式，並為其他環境子系統提供具備純文字介面、關閉以及硬體錯誤(hard error)管理的主控台介面(console)，以及支援讓Windows NT執行[[MS-DOS|MS-DOS]]與16位元Windows（[[Win16|Win16]]）程式的{{link-en|Virtual DOS Machine|Virtual DOS Machine}}(VDMs)，其中有一個VDM擁有專屬的位址空間，專門用來模擬在[[Intel_80486|Intel 80486]]平台上運行的MS-DOS 5.0環境。Win32環境子系統行程（[[客戶端/服務器運行時子系統|csrss.exe]]）還包含了[[視窗管理員|視窗管理員]]以處理像是由鍵盤或滑鼠觸發的輸入事件(event)，並將事件訊息(message)傳送至等待輸入回應的應用程式，應用程式則根據事件訊息作出相應的動作，例如繪制或刷新其視窗。
+
+=== OS/2環境子系統 ===
+OS/2環境子系統支援基於文字介面的16位元OS/2應用程式，或虛擬出來的OS/2 1.x。但執行在x86平台上OS/2 2.x及之後的非32位元或圖形化OS/2應用程式則不被支援。<ref name="os2-compatibility">{{cite web|title=Windows NT Workstation Resource Kit Chapter 28 - OS/2 Compatibility|url=http://www.microsoft.com/resources/documentation/windowsnt/4/workstation/reskit/en-us/os2comp.mspx?mfr=true|publisher=Microsoft|language=en|access-date=2014-01-09|archive-date=2016-03-03|archive-url=https://web.archive.org/web/20160303170554/http://www.microsoft.com/resources/documentation/windowsnt/4/workstation/reskit/en-us/os2comp.mspx?mfr=true}}</ref>若要執行圖形化的OS/2 1.x程式，則需要安裝Windows NT Add-On Subsystem for Presentation Manager。<ref name="os2-compatibility" /> 最後一個具有OS/2子系統的是[[Windows_2000|Windows 2000]]，從[[Windows_XP|Windows XP]]開始則不再包含，但可透過在Windows XP上安裝Microsoft Virtual PC 2004取得OS/2程式的執行環境。 <ref name="no-posix-or-os2">{{cite web|title=POSIX and OS/2 are not supported in Windows XP or in Windows Server 2003|url=http://support.microsoft.com/kb/308259|publisher=Microsoft|language=en|access-date=2014-01-09|archive-date=2013-03-28|archive-url=https://web.archive.org/web/20130328171423/http://support.microsoft.com/kb/308259}}</ref><ref>{{cite web|title=The Sad History of the Microsoft POSIX Subsystem|url=http://brianreiter.org/2010/08/24/the-sad-history-of-the-microsoft-posix-subsystem/|date=August 24, 2010|language=en|first1=Brian|last1=Reiter|access-date=2014-01-09|archive-date=2013-05-22|archive-url=https://web.archive.org/web/20130522191537/http://brianreiter.org/2010/08/24/the-sad-history-of-the-microsoft-posix-subsystem/}}</ref> 
+
+=== POSIX環境子系統 ===
+{{Main|微软POSIX子系统}}
+POSIX環境子系統支持嚴格遵照POSIX.1標準及與[[ISO|ISO]]/[[IEC|IEC]]相關標準所寫的程式。這一子系統已經被{{link-en|Interix|Interix}}替代，屬於[[Windows_Services_for_UNIX|Windows Services for UNIX]]的一部分。 <ref name="no-posix-or-os2" />
+
+集成子系統包括安全子系統、工作站服務與伺服器服務。安全子系統處理安全令牌，基於資源許可授予或拒絕用戶帳戶訪問，處理登入請求與初始化登入驗證，以及管理[[Active_Directory|Active Directory]]。工作站服務提供API給{{link-en|network redirector|network redirector}}實作遠端網路存取的功能。<ref>{{cite web|url=https://msdn.microsoft.com/windows/hardware/drivers/ifs/basic-architecture-of-a-network-redirector|title=Basic Architecture of a Network Redirector|publisher=Microsoft|accessdate=2016-11-18|archive-date=2016-11-18|archive-url=https://web.archive.org/web/20161118164546/https://msdn.microsoft.com/windows/hardware/drivers/ifs/basic-architecture-of-a-network-redirector}}</ref>伺服器服務則提供與網路服務相關的API。<ref>{{cite web|url=https://www.microsoft.com/resources/documentation/windowsnt/4/server/reskit/en-us/net/chptr1.mspx?mfr=true|title=Windows NT Networking Architecture|publisher=Microsoft|accessdate=2016-11-18|archive-date=2017-03-07|archive-url=https://web.archive.org/web/20170307232512/https://www.microsoft.com/resources/documentation/windowsnt/4/server/reskit/en-us/net/chptr1.mspx?mfr=true|dead-url=no}}</ref>
+
+==核心模式==
+Windows NT的核心模式能访问所有硬件资源，在保护内存区上执行代码。<ref name="windowsarch-stevenroman">{{cite book
+|last=Roman
+|first=Steven
+|chapter=Windows Architecture
+|chapterurl=http://technet.microsoft.com/en-us/library/cc768129.aspx
+|year=1999
+|isbn=1-56592-631-5
+|title=Win32 API Programming with Visual Basic
+|publisher=O'Reilly and Associates, Inc.
+|access-date=2014-01-09
+|archive-date=2017-08-26
+|archive-url=https://web.archive.org/web/20170826161632/https://technet.microsoft.com/en-us/library/cc768129.aspx
+}}</ref> 控制了调度、线程优先级、内存管理、硬件交互；禁止了用户态的程序与服务访问关键资源，用户态进程必须请求核心态执行这类操作。 
+
+[[x86|x86]]硬件体系结构支持四种CPU优先级：0到3。仅有0与3这两种优先级被Windows操作系统使用。用户态程序运行在优先级3，核心态运行在优先级0（特权级别）。也分别称作「ring 3」与「ring 0」。这使得具有了只有2个优先级的[[RISC|RISC]]平台的可移植性。<ref>{{cite web
+ |url         = http://www.microsoft.com/technet/archive/ntwrkstn/evaluate/featfunc/kernelwp.mspx
+ |title       = MS Windows NT Kernel-mode User and GDI White Paper
+ |work        = Windows NT Workstation documentation
+ |publisher   = [[Microsoft_TechNet|Microsoft TechNet]]
+ |accessdate  = 2007-12-09
+ |archiveurl  = https://web.archive.org/web/20071215042008/http://www.microsoft.com/technet/archive/ntwrkstn/evaluate/featfunc/kernelwp.mspx
+ |archivedate = 2007-12-15
+ |deadurl     = no
+}}</ref>但是打破了[[OS/2|OS/2]]应用程序包含的I/O特权段的兼容性<ref>{{cite web
+ |url         = http://www.microsoft.com/resources/documentation/windowsnt/4/workstation/reskit/en-us/os2comp.mspx?mfr=true
+ |accessdate  = 2009-01-18
+ |title       = Chapter 28 - OS/2 Compatibility
+ |work        = Windows NT Workstation Resource Kit
+ |publisher   = [[Microsoft|Microsoft]]
+ |archiveurl  = https://web.archive.org/web/20090210125723/http://www.microsoft.com/resources/documentation/windowsnt/4/workstation/reskit/en-us/os2comp.mspx?mfr=true
+ |archivedate = 2009-02-10
+ |deadurl     = no
+}}</ref>
+
+核心态的操作系统包含了由许多功能模块组成的执行体服务、内核驱动程序、一个[[内核|（微）内核]]及一个硬件抽象层（HAL）。<ref name="windowsarch-stevenroman" />
+
+===执行体=== 
+Windows执行体服务建立于低层核心态程序之上，包含在文件[[ntoskrnl.exe|NTOSKRNL.EXE]]中。<ref name="windowsarch-stevenroman" /> 负责处理I/O、对象管理、安全、进程管理，划分为几个子系统, 包括缓存管理、配置管理、I/O管理、[[本地过程调用|本地过程调用]]（LPC）、内存管理、[[Windows对象管理|对象管理]]、进程结构与安全引用监视（SRM）。这些子系统一起构成了执行体服务。系统服务，即[[系统调用|系统调用]]也是在这一级别上实现，除了极少特例为了高性能而直接调用了内核层。 
+
+上下文中的术语「service」是指可调用的例程，或一整套可调用的例程。这不同于「服务进程」（service process）。服务进程是用户态下的程序，类似于[[类Unix系统|类Unix系统]]的[[守护进程|守护进程]]。
+
+;对象管理器
+:[[Windows对象管理|对象管理器]]是一个执行体的子系统，所有其他的执行体子系统，特别是系统调用必须通过它来获得对Windows NT资源的访问，这使得对象管理器成为资源管理的基础设施。{{sfn|Russinovich|Solomon|2005|pp=124-125}} 对象管理器用来避免在其他子系统中管理资源带来的冗余与不安全。{{sfn|Russinovich|1997|loc=Introduction}} 在对象管理器视角，每个资源都是一个对象，不论是物理资源（如文件系统或外设），还是逻辑资源（如一个互斥锁）。 
+
+;缓存控制器
+:Windows Cache Manager与内存控制器、I/O控制器、I/O驱动一起为正常的文件I/O提供缓存。这种文件缓存是针对文件块，对本地文件与远程文件提供了一致的服务。实际上这是特殊的文件内存映射。
+
+;配置管理器
+:实现了[[注册表|Windows注册表]]所需的系统调用。 
+
+;I/O管理器
+:允许用户态程序与设备的通信。I/O管理器把用户态程序的读写请求翻译给硬件。例如，I/O管理器接收文件系统I/O请求，翻译为对相关设备的调用，与低层设备驱动程序合作执行硬件读写操作。还包括了I/O操作的cache管理。 
+
+;本地过程调用（LPC）
+:提供了一种进程间通信端口机制。是{{tsl|en|Microsoft RPC}}的基础。 
+
+;内存管理
+:管理[[虚拟内存|虚拟内存]], 控制内存保护，以及物理内存与二级存储之间的[[分页|分页]]调度, 以及物理内存的分配。还能分析[[Portable_Executable|PE格式]]可执行程序，以便映射入或卸载这些程序。 
+
+;进程结构
+:处理[[进程|进程]]与[[线程|线程]]的创建与终止，实现了[[作業_(電腦)|作业]]概念（从[[Windows_2000|Windows 2000]]开始）。
+
+;即插即用管理器
+:处理[[即插即用|即插即用]]，支持在启动时的设备检测与安装，按需停止或启动一个设备。它的大部分实际上是在用户态的 「Plug and Play」服務中实现。 
+
+;电源管理
+:处理电源事件（关机、睡眠stand-by、休眠等），通知受影响的驱动程序。  
+
+;安全引用监视（SRM）
+:强制实行安全规则的子系统。<ref>{{cite web |publisher=Microsoft |url=http://www.microsoft.com/resources/documentation/Windows/2000/server/reskit/en-us/Default.asp?url=/resources/documentation/Windows/2000/server/reskit/en-us/distrib/dsbg_dat_brlr.asp |title=Active Directory Data Storage |accessdate=2021-02-09 |archive-date=2020-02-14 |archive-url=https://web.archive.org/web/20200214042840/http://www.microsoft.com/resources/documentation/Windows/2000/server/reskit/en-us/Default.asp?url=%2Fresources%2Fdocumentation%2FWindows%2F2000%2Fserver%2Freskit%2Fen-us%2Fdistrib%2Fdsbg_dat_brlr.asp |dead-url=no }}</ref> 通过[[访问控制表|访问控制表]]（ACLs）确定一个对象或资源可以被访问。访问控制表由访问控制条目(ACEs)组成。ACE包含了[[安全标识符|安全标识符]]（SID）与授予的操作列表，使得用户帐户、用户组账号、登录会话<ref>{{cite web |publisher=MSDN |url=http://msdn.microsoft.com/library/en-us/secgloss/security/t_gly.asp?FRAME=true#_security_trustee_gly |title=Trustee definition |access-date=2014-01-09 |archive-date=2006-06-22 |archive-url=https://web.archive.org/web/20060622022204/http://msdn.microsoft.com/library/en-us/secgloss/security/t_gly.asp?FRAME=true#_security_trustee_gly }}</ref>具有对资源的允许、不允许、审核（audit）等权限.{{sfn|Siyan|2000}}<ref>{{cite web |publisher=MSDN |url=http://msdn.microsoft.com/library/en-us/secgloss/security/a_gly.asp?FRAME=true#_security_access_control_entry_gly |title=ACE definition |access-date=2014-01-09 |archive-date=2021-02-12 |archive-url=https://web.archive.org/web/20210212225611/https://docs.microsoft.com/en-us/#_security_access_control_entry_gly }}</ref> 
+
+;GDI
+:[[图形设备接口|图形设备接口]]是负责画线、字体绘制、处理调色板等。在[[Windows_NT_3.x|Windows NT 3.x]]系列操作系统，GDI属于用户态。从[[Windows_NT_4.0|Windows NT 4.0]]，GDI移入了核心态，以提高图形性能。<ref>{{cite web
+ |url         = http://technet.microsoft.com/en-us/library/cc750820.aspx#XSLTsection124121120120
+ |title       = The Windows NT 4.0 Kernel mode change
+ |accessdate  = 2009-01-19
+ |work        = MS Windows NT Kernel-mode User and GDI White Paper
+ |publisher   = Microsoft
+ |archiveurl  = https://web.archive.org/web/20090113021015/http://technet.microsoft.com/en-us/library/cc750820.aspx#XSLTsection124121120120
+ |archivedate = 2009-01-13
+ |deadurl     = no
+}}</ref>
+<!-- TODO: mention conspicuous non-subsystem components such as: RTL, LDR, NLS, LSA, FSRTL, DBG, KD, INBV, ZW, CRT, Visual C++ support routines -->
+
+===內核===
+内核（kernel）在HAL与执行体之间，实际上是“微内核”的理念下设计实现出来的。负责多处理器同步，线程与中断的调度与分派，自陷处理，异常分派，在启动时初始化设备驱动程序等。 
+
+=== 核心模式驱动 ===
+Windows NT使用核心态的[[驱动程序|设备驱动程序]]与硬件交互。用户态下的程序看到的设备都是I/O管理器下的文件对象；而I/O管理器自身看到的设备是设备对象。核心态驱动程序分为3个层次： 最高层驱动程序，中层驱动程序，低层驱动程序。最高层驱动程序，如[[FAT|FAT]]或[[NTFS|NTFS]]的文件系统驱动程序，依赖于中层驱动程序。中层驱动程序由功能驱动（function driver）组成。功能驱动依赖于总线驱动，即服务于总线控制器、适配器（adapter）、桥（bridge）的驱动。[[Windows_Driver_Model|Windows Driver Model]] (WDM)存在于中层。低层驱动直接控制硬件，不依赖于任何其他驱动程序。 
+
+===硬件抽象层（HAL）=== 
+硬件抽象是一套软件子程序（routine），模拟了特定平台有关细节，使得程序不必直接访问硬件资源。因而可以写独立于设备的、高性能代码，通过操作系统访问硬件。 例如，编译器屏蔽了CPU指令集的细节，应用程序作者无需考虑与CPU相关的指令。操作系统的硬件抽象使得程序只需调用操作系统级的操作，而屏蔽了硬件具体细节，使得程序具有了可移植性。 
+
+操作系统的硬件抽象层位于硬件与软件之间。对操作系统内核隐藏了硬件的大部分差异，使得核心态代码基本不需要改变即可运行于不同硬件配置的计算机上。硬件抽象大都是硬件驱动程序。被屏蔽的硬件信息包括I/O界面、中断设置、多处理器通信机制等。<ref>{{Cite web |url=http://support.microsoft.com/kb/99588/en-us |title=Windows NT Hardware Abstraction Layer (HAL) |access-date=2014-01-09 |archive-date=2014-01-09 |archive-url=https://web.archive.org/web/20140109044935/http://support.microsoft.com/kb/99588/en-us }}</ref>
+
+==内核源码参考==
+可从下述渠道获得Windows内核的实现源码的参考：
+* [[ReactOS|ReactOS]]：<ref>[[毛德操|毛德操]]：《Windows 内核情景分析—采用开源代码ReactOS(上、下册)》,电子工业出版社, 2009-5 ISBN 9787121081149</ref> 类Windows的开源操作系统，与Windows在 API级别兼容
+* [[wine|wine]]：<ref>wine官网的《Wine Developers Guide》</ref>在非Windows系统上运行Win32程序的开源中间层，逻辑上与Windows在 API 级别兼容
+* [[Windows_Research_Kernel|Windows Research Kernel]]：<ref>[[潘爱民|潘爱民]]:《Windows内核原理与实现》,电子工业出版社,2013年5月第1版ISBN 9787121200564</ref>Microsoft向高校和政府开放的用于研究的部分内核源码
+<!-- * win2K 泄漏源码：2004年发生的事件 --> 
+==参见==
+{{Portal|微软}}
+*[[Windows_NT|Windows NT]]
+*[[Windows系統函式庫|Windows系统库]]
+*{{tsl|en|MinWin||MinWin}}
+*[[Linux内核|Linux內核]]
+*{{tsl|en|Unix architecture|Unix體系}}
+*{{tsl|en|Comparison of operating system kernels|作業系統內核比較}}
+*[[使用者模式驅動程式架構|用户模式驱动程序框架]]
+*[[核心模式驅動程式架構|核心模式驱动程序框架]]
+*[[ReactOS|ReactOS]]
+
+==延伸阅读==
+* Martignetti, E.; ''What Makes It Page?: The Windows 7 (x64) Virtual Memory Manager'' (ISBN 978-1479114290)
+* Russinovich, Mark E.; Solomon, David A.; Ionescu, A.; ''Windows Internals, Part1: Covering Windows Server 2008 R2 and Windows 7'' (ISBN 978-0735648739)
+* Russinovich, Mark E.; Solomon, David A.; Ionescu, A.; ''Windows Internals, Part2: Covering Windows Server 2008 R2 and Windows 7'' (ISBN 978-0735665873)
+
+==注释与参考文献==
+;引用
+{{Reflist|30em}}
+
+;参考
+{{Refbegin}}
+* {{cite book |last=Finnel |first=Lynn |year=2000 |title=MCSE Exam 70-215, Microsoft Windows 2000 Server |publisher=[[Microsoft_Press|Microsoft Press]] |isbn=1-57231-903-8 |ref=harv}}
+* {{cite news |last=Russinovich |first=Mark |authorlink=Mark Russinovich |date=October 1997 |url=http://www.windowsitpro.com/Articles/Index.cfm?ArticleID=299 |title=Inside NT's Object Manager |publisher=Windows IT Pro |ref=harv |access-date=2014-01-09 |archive-url=https://web.archive.org/web/20130517234235/http://windowsitpro.com/Articles/Index.cfm?ArticleID=299 |archive-date=2013-05-17 |dead-url=yes }}
+* {{cite web |publisher=Microsoft |url=http://www.microsoft.com/resources/documentation/Windows/2000/server/reskit/en-us/Default.asp?url=/resources/documentation/Windows/2000/server/reskit/en-us/distrib/dsbg_dat_brlr.asp |title=Active Directory Data Storage |accessdate=2005-05-09 |ref=harv |archive-date=2020-02-14 |archive-url=https://web.archive.org/web/20200214042840/http://www.microsoft.com/resources/documentation/Windows/2000/server/reskit/en-us/Default.asp?url=%2Fresources%2Fdocumentation%2FWindows%2F2000%2Fserver%2Freskit%2Fen-us%2Fdistrib%2Fdsbg_dat_brlr.asp |dead-url=no }}
+* {{cite book |last=Solomon |first=David |authorlink=David A. Solomon |coauthors=[[Mark_Russinovich|Russinovich, Mark E.]] |year=2000 |url=http://mipagina.cantv.net/jjaguilerap/w2k_arq.html |title=Inside Microsoft Windows 2000 |edition=Third Edition |publisher=Microsoft Press |isbn=0-7356-1021-5 |ref=harv |access-date=2014-01-09 |archive-date=2005-03-23 |archive-url=https://web.archive.org/web/20050323090649/http://mipagina.cantv.net/jjaguilerap/w2k_arq.html |dead-url=yes }}
+* {{cite book
+| title = Microsoft Windows Internals
+| url = https://archive.org/details/isbn_9780735619173
+| edition = 4th edition
+| last = Russinovich  | first = Mark | authorlink =Mark Russinovich
+| last2 = Solomon | first2 = David | authorlink2 = David A. Solomon
+| year = 2005
+| publisher = Microsoft Press
+| isbn = 0-7356-1917-4
+| ref = harv
+}}
+* {{cite book
+| title = Undocumented Windows 2000 Secrets
+| last = Schreiber  | first = Sven B. 
+| year = 2001
+| publisher = Addison-Wesley Longman
+| isbn = 978-0201721874
+| ref = harv
+}}
+* {{cite book |last=Siyan |first=Kanajit S.|year=2000 |title=Windows 2000 Professional Reference |url=https://archive.org/details/windows2000serve0000siya |publisher=New Riders |isbn=0-7357-0952-1 }}
+{{Refend}}
+
+==外部链接==
+*[http://www.microsoft.com/windows2000/ Microsoft's official Windows 2000 site] {{Wayback|url=http://www.microsoft.com/windows2000/ |date=20000229142634 }}
+*[http://www.microsoft.com/technet/prodtechnol/windows2000pro/evaluate/featfunc/plugplay.mspx Windows 2000 Plug and Play architecture] {{Wayback|url=http://www.microsoft.com/technet/prodtechnol/windows2000pro/evaluate/featfunc/plugplay.mspx |date=20040808162827 }}
+*[http://www.reactos.org/wiki/Techwiki:Memory_management_in_the_Windows_XP_kernel Memory management in the Windows XP kernel] {{Wayback|url=http://www.reactos.org/wiki/Techwiki:Memory_management_in_the_Windows_XP_kernel |date=20220423034919 }}
+
+{{Windows Components}}
+[[Category:Windows_NT体系结构|Category:Windows NT体系结构]]

@@ -1,0 +1,340 @@
+{{TOCright}}
+
+这份指南介绍在维基百科上开发[[Help:自定义设置|用户脚本]]的基本方法。维基用户脚本是用[[JavaScript|JavaScript]](JS)编写的，但本文不会介绍JS的语法。
+
+==内置脚本 ==
+所有维基百科页面都有[[MediaWiki|MediaWiki]]生成的JS代码。浏览网页时，你的用户脚本可以访问这些内置代码生成的方法和变量。具体哪些页面可用哪些方法和变量，请参见[[:en:Wikipedia:Catalogue_of_CSS_classes#Stylesheets_and_JavaScript|:en:Wikipedia:Catalogue of CSS classes#Stylesheets and JavaScript]]。
+
+用户脚本可以使用[[JQuery|JQuery]]，这是MediaWiki自带的。JQuery的最重要的方法是<code>JQuery()</code>或<code>$()</code>，用法说明请参考[//api.jquery.com/jQuery/ 官方文档] {{en}}。
+
+最感兴趣的是：
+* [[mw:Manual:Interface/JavaScript#mw.config|mw.config变量]]
+* [[mw:ResourceLoader/Default_modules|可用的资源加载模块]]
+* [[MediaWiki:Common.js|MediaWiki:Common.js]]（由中文维基百科的[[Wikipedia:Administrators|管理员]]所管理）
+* 用户的全局脚本：[[Special:MyPage/common.js|/common.js]]
+* 用户的特定皮肤脚本：[[Special:MyPage/skin.js|/vector.js]]（实际名称取决于用户首选项中的皮肤设置）
+
+== 用户脚本的结构 ==
+
+个人”用户“模块（由<tt>/common.js</tt>, <tt>/common.css</tt>  和非必需的当前皮肤的特定文件构建)以及[[Wikipedia:Gadget|小工具]]会被加载到所有页面
+
+大部分脚本都需要访问页面上的[[HTML元素|HTML元素]]，因此需要在页面加载完成后再运行。（实际加载模块时可能并非如此） 
+<syntaxhighlight lang="javascript">
+function myScript() {
+  // ... 
+};
+
+// 在文档加载完成后执行myScript方法。
+jQuery( myScript );
+</syntaxhighlight>
+
+也可以内联myScript。
+<syntaxhighlight lang="javascript">
+jQuery( function () {
+  //... code ...
+} );
+</syntaxhighlight>
+
+== 编辑和加载用户脚本 ==
+=== 预览用户脚本===
+你可以直接在[[Special:MyPage/common.js|/common.js]]编写脚本，“显示预览”时，代码就会执行。
+
+=== 保存用户脚本===
+如果你的脚本的工作页面与预览页面不同，比如你想开发一个针对[[Wikipedia:分類|分类]]的脚本，那么你就要保存脚本，然后去目标页面调试。
+
+这种方法极为不便，也会在维基上产生大量的编辑历史。
+
+===本地HTML文件 ===
+*用浏览器将欲调试的维基页面(HTML)连同该页面调用的CSS和JS保存到本地。
+*用编辑器打开HTML，插入你正在开发的JS代码。
+*用浏览器打开HTML，查看代码的运行情况。
+
+这种方法很节省网络流量，但有以下的缺点：
+* 浏览器一般不会允许你从本地向外地（[//zh.wikipedia.org/ zh.wikipedia.org]）发起[[Ajax|Ajax]]。
+* 您必须根据实际需要测试的页面（历史记录等）来保存不同的页面
+* 您必须定期重新保存所有.js文件，以便与MediaWiki更改同步
+* 需要保存HTML、CSS、JS。如果你只是对别人的脚本进行小修改，这个“前期准备”工作可能有些烦人。
+
+===推荐：从本机服务器上加载用户脚本===
+推荐的方法是从本机服务器上加载用户脚本，而你需要搭建一个本机服务器。在[[Special:Mypage/common.js|/common.js]]加入代码
+<syntaxhighlight lang="javascript">
+mw.loader.load( 'http://localhost/wikipediatest.js' );
+</syntaxhighlight>
+
+然后在你的电脑上运行[[网页服务器|网页服务器]]，创建<tt>wikipediatest.js</tt>。于是，每次刷新维基百科页面时，本机服务器上的<tt>wikipediatest.js</tt>就会运行，如同维基用户脚本。
+
+至于如何编辑<tt>wikipediatest.js</tt>，大家就可以八仙过海各显神通了，比如用简单的记事本、Vim，甚至Visual Studio。如果你的网页服务器设置的好，每次修改wikipediatest.js后，再刷新维基百科，修改就能自动反映出来，甚至不需要[[帮助:绕过浏览器缓存|刷新缓存]]。
+
+[http://www.ritlabs.com/en/products/tinyweb/ TinyWeb]是个不错的网页服务器，不到100KB，也不需要安装。 Save and unzip <tt>tinyweb.zip</tt> for example into <tt>c:\Program Files\Tinyweb</tt>, create a shortcut to <tt>tiny.exe</tt>, and add an argument in shortcut properties — path to your folder with <tt>wikipediatest.js</tt> and any file <tt>index.html</tt> (required). Start TinyWeb with this shortcut; unload it with Task Manager.
+
+[[Opera電腦瀏覽器|Opera]]自9.50版起加强了安全限制，这个方法对Opera不起作用。参见[http://www.opera.com/docs/changelogs/windows/950/ Opera 9.50 Windows更新日志]: ”本地服务器可以调用远程资源，但远程服务器不能调用本地资源“（本地服务器可以使用远程资源，反之亦然)）
+
+=== Browser-specific ===
+有些浏览器（或浏览器插件）允许你浏览网页时执行你自己设置的JS。我们可以利用这个特性来开发维基用户脚本。
+
+最有名的是[[火狐浏览器|火狐浏览器]]的扩展[[Greasemonkey|Greasemonkey]]（油猴子），{{link-en|Scriptish}}也相当不错。[[:en:Greasemonkey#Greasemonkey_compatibility_and_equivalents_for_other_browsers|:en:Greasemonkey#Greasemonkey compatibility and equivalents for other browsers]]列出了Greasemonkey的类似软件。
+
+然而，在浏览器或浏览器插件里能运行不代表能作为维基百科用户脚本运行。
+
+Opera用户注意：
+* Placing your script in a corresponding folder as <code><name>.js</code> file should work for many user scripts.
+* Opera约9.50版本以前不支持[[UTF-8|UTF-8]]编码的本地脚本, meaning you could only use Latin characters.
+
+===代码片段===
+你可以在浏览网页时运行代码片段，如在浏览器地址栏输入<code>javascript: var s = document.title; alert(s); void 0</code>并回车。但在浏览器地址栏里不能输入大段代码。
+
+你可以使用[[bookmarklet|bookmarklet]] JavaScript Shell。它可以打开一个新窗口，在这个窗口里编写并执行的JS代码可以访问原页面。
+* [http://www.squarefree.com/shell/ JavaScript shell，适用于Firefox和Opera]
+* [http://blog.monstuff.com/archives/000287.html JavaScript shell，适用于Internet Explorer]
+
+当然，用一个成熟的JavaScript调试器会更加方便。
+
+== CSS文件==
+用户脚本可以使用CSS代码，甚至可以只用CSS。那么你就需要把JS和CSS一起调试。That can be done in your <tt>/common.css</tt>, but it is slow and messy.
+
+你应该在本地服务器里放置你的CSS文件（见上节），然后从[[Special:Mypage/common.css|/common.css]]里用
+<syntaxhighlight lang="css">
+@import "http://localhost/wikipediatest.css";
+</syntaxhighlight>
+导入。注意，<code>@import</code>语句要写在其他CSS语句之前。
+
+An alternative way is to put this line anywhere in your css instead:
+
+<syntaxhighlight lang="javascript">
+mw.loader.load( 'http://localhost/wikipediatest.css', 'text/css' );
+</syntaxhighlight>
+
+=== 发布CSS文件 ===
+
+当你写完CSS代码时, you either need to paste it into your <tt>/vector.css</tt> if it is only for personal use. Or if it is for use by others then you should upload it to for instance [[Special:Mypage/yourscript.css|User:Yourname/yourscript.css]]. Then other users can import it by putting the following line in their <tt>/common.js</tt> file. 注意，以下语句需要被添加到".js"文件而不是".css"文件中。
+
+<syntaxhighlight lang="javascript">
+importStylesheet( 'User:Yourname/yourscript.css' );
+</syntaxhighlight>
+
+If the CSS should be used together with a user script written in JavaScript then you can make it easy for the users. Simply put the line above in the JavaScript code for your user script, then the users only need to "install" your JavaScript.
+
+For completeness, in case someone wonders, users can import your <tt>User:Yourname/yourscript.css</tt> from their <tt>/common.css</tt> too. This of course has the advantage that it works even if the user has JavaScript disabled. Although it takes this slightly complex line of code:
+<syntaxhighlight lang="css">
+@import "/w/index.php?title=User:Yourname/yourscript.css&action=raw&ctype=text/css";
+</syntaxhighlight>
+
+==软件 ==
+
+=== 编辑器 ===
+[[Windows|Windows]]用户可以使用[[Notepad++|Notepad++]]，它可以
+* 高亮JavaScript代码
+* 快速插入JavaScript关键字和方法。快捷键是 {{keypress|Ctrl|Enter}}。
+* 查看所有JS方法，转到方法。
+* [[代码折叠|代码折叠]]
+
+
+{{nowrap|[[Mac_OS_X|Mac OS X]]}}用户可以使用免费的
+* [[Xcode|Xcode]]
+* [[JEdit|JEdit]] （跨平台）
+* [[Komodo_Edit|Komodo Edit]] （跨平台）
+* [[Aptana_Studio|Aptana Studio]]（跨平台）
+
+或收费的
+* [[TextMate|TextMate]]
+* [[Coda_(web_development_software)|Coda]]
+* [[PhpStorm|PhpStorm]]（跨平台，对MediaWiki开发人员免费<ref>http://lists.wikimedia.org/pipermail/mediawiki-l/2010-June/034396.html</ref>）
+
+Linux用户可以用[[gedit|gedit]]或[[Kate_(text_editor)|Kate]]。
+
+== 调试器 ==
+火狐浏览器：Firefox按钮->Web开发者->Web控制台。[http://getfirebug.com/ Firebug]提供类似的功能。
+
+[[Google_Chrome|Google Chrome]]和[[Chromium_(web_browser)|Chromium]]：菜单->工具->开发者工具。[http://getfirebug.com/ Firebug]提供类似的功能。
+
+[[Internet_Explorer|Internet Explorer]]：按F12键打开开发者工具。
+
+For debugging in [[Safari_(web_browser)|Safari]], open up Safari → Preferences → Advanced and enable the "Show Develop menu in menu bar" option. Afterwards, you can use Develop → Show Web Inspector to open up the development tools.
+
+For debugging in  [[Opera_browser|Opera]], you can use Tools → Advanced → Error Console which shows all JavaScript and CSS errors. [http://dragonfly.opera.com/ Dragonfly] is strongly recommended for convenient debugging.
+
+== DHTML 方法 ==
+
+===检索元素===
+每一个 [[HTML|HTML]] 元素都是[[Document_Object_Model|DOM]]中的节点。因此Javascript脚本可以访问这些元素。for example, on the following HTML page.
+
+<syntaxhighlight lang="html4strict">
+<form name="frmname" id="frmid">
+	<textarea name="txtname" id="txtid"></textarea>
+	<input id="neighbor" />
+</form>
+</syntaxhighlight>
+
+可以通过以下方法访问<tt>textarea</tt>元素:
+* Using its <tt>id</tt>: <code>$( '#txtid' )</code>
+* In the array of all elements with the same <tt>tag</tt>: <code>$( 'textarea' )</code>
+* Using an element next to it: <code>$( '#neighbor').prev()</code>
+* As a child of its parent: <code>$( '#frmid' ).children( 'form' )</code>
+* As a form element, using <tt>name</tt>: <code>$( '#frmid [name="txtname"]')</code>
+
+'' [http://jsfiddle.net/compwhizii/j2QRf/ This example on jsFiddle]
+
+The [http://docs.jquery.com/Main_Page jQuery documentation] and [http://api.jquery.com jQuery API reference] are excellent sources for documentation.
+<!--To see all the elements on the page and their relations simply look at the page source code.-->
+
+===何时执行脚本===
+很多脚本只在特定的维基页面工作。 You can check:
+
+* The page address
+<syntaxhighlight lang="javascript">
+if ( mw.config.get( 'wgAction' ) === 'history' ) {
+  //Continue only on history pages.
+</syntaxhighlight>
+* <tt>wg</tt> variables; many of them have the same meaning as [[Help:Magic_words|Magic words]]
+<syntaxhighlight lang="javascript">
+if ( mw.config.get( 'wgCanonicalNamespace' ) === 'User_talk') {
+  //Continue only on User_talk pages.
+</syntaxhighlight>
+* Presence of elements (only in second and third parts of the script)
+<syntaxhighlight lang="javascript">
+function func_start() {
+   if ( $( '#editForm' ).length == 0  ) return; //No edit form  → exit
+   // …
+</syntaxhighlight>
+
+=== Portlets ===
+Usual places to add your own links — <tt>portlet</tt> blocks with these id's:
+
+<div style="border:1px solid gray">
+{|
+|rowspan=2|<sup>''p-logo''</sup>
+|<sup>''p-personal''</sup> <u>name</u> <u>My talk</u> <u>My preferences</u> …</div>
+|-
+|<div style="border:1px solid gray;float:right">
+<sup>''p-search''</sup>
+<div style="height:10px;width:40px;border:1px solid gray;margin-left:10px;margin-bottom:3px"> </div>
+</div><sup>''p-cactions''</sup> <u>Article</u> <u>Discussion</u> <u>Read</u> <u>Edit</u> <u>History</u> …</div>
+|-
+|
+<br/><div style="border:1px solid gray">
+<sup>''p-navigation''</sup><br/>
+ Main page …</div>
+<br/><div style="border:1px solid gray">
+<sup>''p-interaction''</sup><br/>  …
+</div>
+<br/><div style="border:1px solid gray">
+<sup>''p-tb''</sup><br/> …<br/>Upload file<br/> …
+</div>
+<br/><div style="border:1px solid gray">
+<sup>''p-lang''</sup><br/>(interwikis)
+</div>
+
+|
+<div style='margin-left:50px'>
+Portlet structure:
+
+<syntaxhighlight lang="html4strict">
+<div id="p-myname" class="portlet">
+ <h5>Header</h5>
+ <div class="body">
+  <ul>
+  <li id="…"> <a …>  //Links
+  <li id="…"> <a …>
+  … …
+</syntaxhighlight>
+</div>
+|}
+</div>
+
+There is a special function in [[:mw:ResourceLoader/Default_modules#addPortletLink|mediawiki.util.js]] that simplifies the process of adding your own links into portlets:<br/>
+<tt>mw.util.'''addPortletLink''' (portlet, href, text, id, tooltip, accesskey, nextnode)</tt>
+
+<syntaxhighlight lang="javascript">
+// Several examples of portlet links
+
+// Adds a link to your js file to the toolbox
+mw.util.addPortletLink ( 'p-tb', mw.util.wikiGetlink( 'Special:MyPage/common.js' ),
+	'My JS', 'pt-myvector', 'Visit your js file');
+
+// Add a link to the edit page for your Notes in your personal links
+// Note: We assume that short/pretty URLs are in use with ?action, ideally you
+// would check for that.
+mw.util.addPortletLink ( 'p-personal', mw.util.wikiGetlink( 'Special:MyPage/Notes' ) + '?action=edit',
+	'My notes', 'pt-mynotes', 'Edit your personal notes' );
+
+// Adds a link to prefix index for the current page to the toolbox
+mw.util.addPortletLink ( 'p-tb',
+	mw.util.wikiGetlink( 'Special:Prefixindex/' + mw.config.get( 'wgPageName' ) ),
+	'Prefixindex', 'tb-prefixindex');
+	
+// Adds a link to 
+mw.util.addPortletLink ( 'p-personal',
+	mw.util.wikiGetlink( 'Special:Log/' + mw.config.get( 'wgUserName' ) ),
+	'My logs', 'pt-mylogs');
+</syntaxhighlight>
+
+=== 移除元素 ===
+
+如想移动一个元素，可使用[//api.jquery.com/append/ <code>.append()</code>]或[//api.jquery.com/prepend/ <code>.prepend()</code>]。
+
+如想隐藏一个元素，使用[//api.jquery.com/hide/ <code>.hide()</code>]。
+
+<syntaxhighlight lang="javascript">
+// 举例: 隐藏编辑页面中的“特殊字符”工具栏
+$( '#editpage-specialchars' ).hide();
+
+// 或通过jQuery改CSS
+$( '#editpage-specialchars' ).css( 'display', 'none' );
+</syntaxhighlight>
+
+或在[[Special:Mypage/common.css|您的CSS代码页]]加入:
+
+<syntaxhighlight lang="css">
+#editpage-copywarn {
+	display:none;
+}
+</syntaxhighlight>
+
+== Edit page ==
+
+=== Text manipulation ===
+The most important element on the edit page is a <tt><textarea></tt> with the article text inside. You can reference it with
+
+<syntaxhighlight lang="javascript">
+var $txt = $( '#wpTextbox1' );
+</syntaxhighlight>
+
+You can add new text to the beginning: <code>$txt.prepend( 'new phrase' )</code> or to the end: <code>$txt.append( 'new phrase' )</code>.
+
+There is a function in mediawiki.action.edit.js that can add text to the cursor position:
+
+<syntaxhighlight lang="javascript">
+// This surrounds the cursor with '<pre>' and '</pre>' and pre-fills the selection with 'Test!' highlighted.
+mw.toolbar.insertTags( '<pre>', '</pre>', 'Test!' );
+</syntaxhighlight>
+
+=== Toolbar ===
+The buttons above a text area are located inside <code><nowiki><div id='toolbar'></nowiki></code>.
+
+Buttons are defined with mwEditButtons[] and mwCustomEditButtons[] arrays. Then the second part of your script is called by addOnloadHook. Only after that the buttons are created by the initialization of the <code>mediawiki.action.edit</code> module.
+
+So the easiest way to modify buttons is to work with these arrays:
+
+<syntaxhighlight lang="javascript">
+//Example: modify signature button.
+if (mwEditButtons.length >= 10 && mwEditButtons[9].tagOpen == '--~~~~')
+  mwEditButtons[9].tagOpen = ' — ~~~~';
+</syntaxhighlight>
+
+Also see [[:en:User:MarkS/Extra_edit_buttons|:en:User:MarkS/Extra_edit_buttons]].
+
+=== Edittools ===
+There is another edit panel under textarea. Usually it's generated from [[MediaWiki:Edittools|MediaWiki:Edittools]] by [[mw:Extension:CharInsert|Extension:CharInsert]] and consists of a lot of JavaScript links to the <tt>insertTags()</tt>. In the English Wikipedia, this approach was replaced by [[MediaWiki:Edittools.js|MediaWiki:Edittools.js]].
+
+<syntaxhighlight lang="javascript">
+//Example: adding your own quick insert to Edittools
+var specialchars = document.getElementById ('editpage-specialchars');
+specialchars.innerHTML +=
+"<a onclick=\"insertTags('<div>','</div>','');return false\"
+href='#'><div></a>";
+</syntaxhighlight>
+
+There is no crucial difference between toolbar and edittools, you can insert your own custom links into both.
+
+== 参考资料 ==
+{{reflist}}

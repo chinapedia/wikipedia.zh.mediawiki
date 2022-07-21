@@ -1,0 +1,77 @@
+组合数学的核心是解决计数问题，其中很重要的即为n个元素的排列方案的计数。
+一个常见的将排列问题抽象的方法就是将其抽象为'''棋盘多项式'''。
+首先看一个<math>n\times n</math>的棋盘，n个元素的排列可以看成在这个棋盘上落下n个棋子，其中每一个横行、每一个竖列只允许有一个棋子。
+而其中棋盘的格子是可以任意的<math>n\times n</math>的棋盘的子集，这对应了存在一定限制的排列方案。
+
+每一个棋盘对应着一个母函数代表该棋盘中描述无法攻击的棋子排列数。
+这个母函数即为'''棋盘多项式'''。
+
+== 棋盘多项式 ==
+
+=== 定义 ===
+设C为一棋盘，称<math>\sum_{k=0}^n {r_k}(C){x^k}</math>为C的棋盘多项式，其中<math>{r_k}(C)</math>表示k个棋子布到棋盘C的方案数<ref> {{Cite book | author = 卢开澄、卢华明 | title = 《组合数学》 | location = 北京 | publisher = 清华大学出版社 | ISBN = 9787302139614}} </ref>。
+* 规定<math>{r_0}(C)=1</math>
+
+=== 性质 ===
+* 设<math>{C_i}</math>是棋盘C的某一指定格子所在的行与列都去掉后所得的棋盘，<math>{C_e}</math>是仅去掉该格子后的棋盘，则<math>{r_k}(C)={r_{k-1}}({C_i})+{r_k}({C_e})</math>
+
+* 如果<math>{C}</math>由相互分离的<math>{C_1}</math>和<math>{C_2}</math>组成，即<math>{C_1}</math>的任一格子所在的行和列中都没有<math>{C_2}</math>的格子，则有<math>{r_k}(C)=\sum_{i=0}^k {r_i}({C_1}){r_{k-i}}({C_2})</math>
+
+=== 应用 ===
+结合容斥原理解决受限排列问题。
+
+== 受限排列 ==
+
+=== 定理 ===
+设<math>{r_i}</math>为 i个棋子布入禁区的方案数，i =1,2,3,…,n。有禁区的布子方案数（即禁区内不布棋子的方案数）为 <math>{n!}-{r_1}{(n-1)!}+{r_2}{(n-2)!}-...+{(-1)^n}{r_n}</math>
+
+=== 定理证明 ===
+设事件<math>A_i</math>为棋子<math>i</math>落入禁区且其余棋子不限定是否落入禁区。
+那么布子方案数即可用<math>|\overline{A_1} \cap \overline{A_2} \cap \overline{A_3} \cap \cdots \cap \overline{A_n}|</math>进行表示。该排列数可以用容斥原理求解。
+即<math>|\overline{A_1} \cap \overline{A_2} \cap \overline{A_3} \cap \cdots \cap \overline{A_n}| = |\overline{A_1 \cup A_2 \cup A_3 \cup \cdots \cup A_n}|</math>
+其中，在棋盘上的不受限排列数为<math>n!</math>，那么有
+::<math>
+\begin{align}
+|\overline{A_1} \cap \overline{A_2} \cap \overline{A_3} \cap \cdots \cap \overline{A_n}| = &|\overline{A_1 \cup A_2 \cup A_3 \cup \cdots \cup A_n}| \\
+=&n!-|A_1 \cup A_2 \cup A_3 \cup \cdots \cup A_n| \\
+=&n!-(\sum_{i=1}^{n}|A_i|-\sum_{i=1}^{n}\sum_{j>i}|A_i\cap A_j|+\sum_{i=1}^{n}\sum_{j>i}\sum_{k>j}|A_i\cap A_j \cap A_k|+\cdots+(-1)^{n-1}|A_1\cap A_2 \cap \cdots \cap A_n |)
+\end{align}
+</math>
+其中，至少有一个棋子落入禁区的方案数为<math>\sum_{i=1}^{n}|A_i|={r_1}(n-1!)</math>，至少两个棋子落入进去的方案数为<math>|\sum_{i=1}^{n}\sum_{j>i}A_i\cap A_j|={r_2}(n-2!)</math>，以此类推，可以得到等式
+<math>|\overline{A_1} \cap \overline{A_2} \cap \overline{A_3} \cap \cdots \cap \overline{A_n}|={n!}-{r_1}{(n-1)!}+{r_2}{(n-2)!}-...+{(-1)^n}{r_n}</math>
+
+=== 举例 ===
+1.如下图所示，在<math>4 \times 4</math>的棋盘上，打叉的地方为禁区，求棋子无一落入禁区的排列数。
+
+{| class="wikitable"
+|-
+|   ||   || × ||  
+|-
+| × ||   ||   || ×
+|-
+|   || × ||   || ×
+|-
+|   || × ||   ||  
+|}
+
+首先通过排列多项式的性质得到禁区的棋盘多项式为<math>1+6x+11x^2+7x^3+x^4</math>。
+这样，该棋盘在受限情况下的方案数为<math>4!-6\times 3! + 11\times 2! - 7\times 1! + 1=4</math>。
+
+2.错排问题，即<math>n</math>个元素组成的排列中标号为<math>i</math>的元素不排在第<math>i</math>位的方案数。
+
+该问题即为受限排列问题。
+具体到棋盘中，即为在<math>n \times n</math>的棋盘上，所有的对角线元素都是禁区。
+对于禁区的棋盘多项式的计算，由于该棋盘中所有元素均不在同一行同一列，根据棋盘多项式的性质容易得到为<math>(1+x)^n</math>。
+那么，根据受限排列的性质，得到错排方案数为<math>n!-C(n,1)(n-1)!+C(n,2)(n-2)!+\cdots+(-1)^{n-1}C(n,n)</math>。
+
+== 相关页面 ==
+* [[组合数学|组合数学]]
+* [[容斥原理|容斥原理]]
+* [[错排问题|错排问题]]
+
+== 参考文献 ==
+<div class='references-small'>
+<references/>
+</div>
+
+[[Category:组合数学|Category:组合数学]]

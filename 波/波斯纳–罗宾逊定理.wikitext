@@ -1,0 +1,42 @@
+'''波斯納–羅賓遜定理'''（{{lang-en|Posner–Robinson Theorem}}）是[[可计算性理论|可计算性理论]]中关于[[不可解度|不可解度]]的定理。
+
+== 定理 ==
+设 <math>B\subseteq\mathbb{N}</math> 不可计算，则存在集合 <math>G</math> 令 <math>G\oplus B\ge_T G^\prime</math>。<ref>{{cite book|language=en|author=Robert I. Soare|title=Recursively Enumerable Sets and Degrees: A Study of Computable Functions and Computably Generated Sets|year=2004|publisher=Springer|isbn=9780387152998}}</ref>
+
+== 证明 ==
+这一定理证明如下：令 <math>\Phi_G\subseteq \omega\times\{0,1\}\times2^{<\omega}</math>，则 <math>\Phi_G</math> 可以看作是一个函数 <math>2^\omega\to2^\omega</math>，具体定义为 <math>a\in\Phi_G(X)</math> 当且仅当存在 <math>n\in\omega</math> 使 <math>(a,1,X|n)\in\Phi_G</math>。
+然而 <math>\Phi_G</math> 的每一个元素都可以用自然数编码，因此 <math>\Phi_G</math> 本身也是 <math>2^\omega</math> 的元素，因此可以求出其[[不可解度#图灵跳跃|图灵跳跃]]。显然 <math>\Phi_G(X)</math> 可以从 <math>\Phi_G\oplus X</math> 计算得出，因此假若存在 <math>\Phi_G</math> 使得 <math>\Phi_G(X) = \Phi_G^\prime</math>，则 <math>\Phi_G \oplus X \ge_T \Phi_G^\prime</math>。因此证明过程只需给出构造 <math>\Phi_G</math> 的方法。
+
+为了构造 <math>\Phi_G</math>，我们给出一对序列 <math>(\Phi_p,\bar X_p)_{p\in\omega}</math>，其中：
+
+* <math>\Phi_p\subseteq\omega\times\{0,1\}\times2^{<\omega}</math>
+* <math>\bar X_p\subseteq 2^\omega</math>
+
+该序列满足以下条件，若 <math>q>p</math> 则有：
+
+# <math>\Phi_p\subseteq\Phi_q</math> 且 <math>\bar X_p\subseteq\bar X_q</math>
+# 若 <math>X\in\bar X_p</math> 则 <math>\Phi_q(X)=\Phi_p(X)</math>
+# 若 <math>(x_p,y_p,\eta)\in\Phi_q\backslash\Phi_p</math> 且 <math>(x_q,y_q,\sigma)\in\Phi_p</math> 则 <math>\vert\eta\vert>\vert\sigma\vert</math>
+
+首先令 <math>\Phi_0=\bar X_0=\varnothing</math>，其后对任何 <math>(\Phi_p,\bar X_p)</math> 如下构造 <math>(\Phi_{p+1},\bar X_{p+1})</math>：令 <math>\phi_p := \exists n\,\theta_p(n,Z\vert n)</math> 为编号为 <math>p</math> 的 <math>\Sigma^0_1</math> 公式（详见[[算数阶层|算数阶层]]）。为了让 <math>\Phi_G(B)=\Phi_G^\prime</math>，我们需要让 <math>\phi_p\in\Phi_G(B)</math> 当且仅当 <math>\vDash\exists n\,\theta_p(n,\Phi_G\vert n)</math>。这是一个自引用的定义：我们需要在 <math>\Phi_p</math> 中加入 <math>B</math> 枝上的元素以表达 <math>\phi_p</math> 为真或为假，但是若 <math>\phi_p</math> 需要为假，则加入元素的过程本身却可能将其变为真，这便是需要 <math>\bar X_p</math> 以控制之后可能加入的元素的原因。考虑以下两种情况：
+
+* 若存在 <math>\Psi\supseteq\Phi</math> 满足条件3，且在 <math>\bar X_p\cup\{B\}</math> 上不变（即满足条件2），则令 <math>\Phi_{p+1}:=\Psi\cup\{(p,1,B\vert n)\}</math>、<math>\bar X_{p+1}:=\bar X_p</math>（<math>n</math> 是满足条件3的足够大的自然数）。
+
+* 若不存在如上所述的集合 <math>\Psi</math>，则对任何满足条件3的集合 <math>\Psi\supseteq\Phi</math> 均有 <math>X\in\bar X_p\cup\{B\}</math> 使 <math>\Psi(X)\ne\Phi(X)</math>。定义类 <math>\mathcal{Z}</math> 如下：
+::<math>\bar Z\in\mathcal{Z}</math> 当且仅当存在满足条件3的集合 <math>\Psi\supseteq\Phi</math>，使若存在 <math>n<\vert\Psi\vert</math> 使公式 <math>\theta_p(n,\Psi\vert n)</math> 得以满足，则存在 <math>(a,b,X)\in\Psi\backslash\Phi</math> 使 <math>X\in\bar Z</math>。
+: 显然 <math>\bar X_p\cup\{B\}\in\mathcal{Z}</math>。注意观察 <math>\mathcal{Z}</math> 的定义：这里只有 <math>\Psi</math> 上的全称量词是无界量词，所以 <math>\mathcal{Z}</math> 是 <math>\Pi^0_1</math> 类。因此，根据[[锥不相交定理|锥不相交定理]]，存在 <math>\bar Z\in\mathcal{Z}</math> 使 <math>\bar Z\not\ge_T B</math>，也即 <math>B\not\in\bar Z</math>。因此只需令 <math>\Phi_{p+1}:=\Phi_p\cup\{(p,0,B\vert n)\}</math>、<math>\bar X_{p+1}:=\bar X_p\cup\bar Z</math>。
+
+根据以上描述的序列，显然 <math>\Phi_G:=\bigcup_{i\in\omega}\Phi_i</math> 满足 <math>\Phi_G(B)=\Phi_G^\prime</math>，故定理得证。这一证明方式叫做{{link-ja|隈部正博|隈部正博|隈部}}–{{link-en|西奥多·斯莱曼|Theodore Slaman|斯莱曼}}[[力迫|力迫]]法。<ref>{{cite web|language=en|author=Theodore A. Slaman|title=Turing Degrees and Definability of the Jump|url=http://math.berkeley.edu/~slaman/talks/singapore4.pdf|accessdate=2014-04-18|archive-date=2010-07-30|archive-url=https://web.archive.org/web/20100730081242/http://math.berkeley.edu/%7Eslaman/talks/singapore4.pdf|dead-url=no}}</ref>
+
+== 定理 ==
+* [[波斯特定理|波斯特定理]]
+* [[克莱尼–波斯特定理|克莱尼–波斯特定理]]
+* [[弗里德堡–穆奇尼克定理|弗里德堡–穆奇尼克定理]]
+* [[波斯纳–罗宾逊定理|波斯纳–罗宾逊定理]]
+* [[跳躍逆轉定理|跳躍逆轉定理]]
+
+== 参考资料 ==
+{{references}}
+
+[[Category:递归论|Category:递归论]]
+[[Category:数学定理|Category:数学定理]]

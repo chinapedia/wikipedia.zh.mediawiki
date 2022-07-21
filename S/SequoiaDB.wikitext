@@ -1,0 +1,27 @@
+SequoiaDB是一款文档型（Document-oriented）的[[NoSQL|NoSQL]][[数据库|数据库]]，于2013年发布第一版本。最新版本为V1.12.4版本。SequoiaDB于2014年12月宣布开源<ref name:"CSDN">[http://news.csdn.net/article_preview.html?preview=1&reload=1&arcid=2823212],SequoiaDB宣布正式开源</ref>。
+
+
+== 1.软件协议 ==
+SequoiaDB的数据库引擎使用[[GNU_AGPL|GNU AGPL]]协议，客户端使用的是Apache 2.0协议 <ref>[https://github.com/SequoiaDB/SequoiaDB#license] {{Wayback|url=https://github.com/SequoiaDB/SequoiaDB#license |date=20160115054852 }},GitHub SequoiaDB license</ref>。
+
+== 2.功能特性 ==
+'''数据模型'''<ref>[http://www.sequoiadb.com/document/1.10/introduction/topics/datamodel.html] {{Wayback|url=http://www.sequoiadb.com/document/1.10/introduction/topics/datamodel.html |date=20190130000140 }},SequoiaDB数据模型</ref>
+SequoiaDB 中的文档为 [[JSON|JSON]] 格式，一般又被称为记录。在数据库内部使用 BSON，即二进制的方式存放 JSON 数据。
+
+'''系统架构'''<ref>[http://www.sequoiadb.com/document/1.10/introduction/topics/infrastructure.html] {{Wayback|url=http://www.sequoiadb.com/document/1.10/introduction/topics/infrastructure.html |date=20160304205755 }},SequoiaDB系统架构</ref>
+SequoiaDB 使用分布式架构。在客户机端（或应用程序端），本地或/和远程应用程序都与 SequoiaDB 客户机库链接。本地与远程客户机使用 [[TCP/IP协议|TCP/IP协议]]与协调节点进行通讯。协调节点不保存任何用户数据，仅作为请求分发节点将用户请求分发至相应的数据节点。编目节点保存系统的元数据信息，协调节点通过与编目节点通讯从而了解数据在数据节点中的实际分布。一个或多个编目节点可组成复制组集群。数据节点保存用户的数据信息。
+[[File:SequoiaDBArch.png|thumb]]
+
+'''复制组'''<ref>[http://www.sequoiadb.com/document/1.10/administration/concepts/cluster/topics/replset.html] {{Wayback|url=http://www.sequoiadb.com/document/1.10/administration/concepts/cluster/topics/replset.html |date=20160304202732 }},SequoiaDB复制组</ref>
+一个或多个数据节点可以构成一个复制组（又称分区组）。复制组中每个数据节点都存储该复制组的一份完整数据，又称为复制组实例（或分区组实例）；复制组中的数据节点之间采用[[最终一致性|最终一致性]]同步数据，不同的复制组中保存的数据无重复。每个复制组中可以包含一个或多个数据节点。当存在多个数据节点时，节点间数据进行异步复制。复制组中可以存在最多一个主节点与若干从节点。其中主节点可以进行读写操作，从节点进行只读操作。
+[[File:SequoiaDBReplica.jpg|thumb]]
+
+'''事务'''<ref>[http://www.sequoiadb.com/document/1.10/administration/concepts/database/topics/transaction.html] {{Wayback|url=http://www.sequoiadb.com/document/1.10/administration/concepts/database/topics/transaction.html |date=20160304141110 }},SequoiaDB事务</ref>
+事务作为一个完整的工作单元执行，事务中的操作要么全部执行成功要么全部执行失败。SequoiaDB 事务中的操作只能是插入数据、修改数据以及删除数据，在事务过程中执行的其它操作不会纳入事务范畴，也就是说事务回滚时非事务操作不会被执行回滚。如果一个表或表空间中有数据涉及事务操作，则该表或表空间不允许被删除。
+
+== 3.支持开发语言 ==
+SequoiaDB支持多种开发语言，包括：[[C|C]]，[[C++|C++]]，[[C♯|C#]]，[[Java|Java]]，[[PHP|PHP]]，[[Python|Python]] <ref>[https://github.com/SequoiaDB/SequoiaDB#drivers] {{Wayback|url=https://github.com/SequoiaDB/SequoiaDB#drivers |date=20160115054852 }},GitHub SequoiaDB Driver</ref>
+
+== 参考资料==
+[[Category:2013年软件|Category:2013年软件]]
+[[Category:NoSQL|Category:NoSQL]]

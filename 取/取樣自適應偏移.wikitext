@@ -1,0 +1,81 @@
+'''取樣自適應偏移'''（{{lang-en|'''S'''ample '''A'''daptive '''O'''ffset}}，[[縮寫|縮寫]]：'''SAO'''）為[[High_Efficiency_Video_Coding|H.265/高效率視訊編碼]]<ref name=OverviewHEVCIEEE2012/>內嵌式濾波器的一種，其餘兩種內嵌式迴圈濾波器分別是：去區塊效應濾波器（Deblocking Filter）、調適性迴圈濾波器（Adaptive Loop Filter）。
+
+==介紹==
+高效率視訊編碼使用4x4至32x32大小的轉換單元，而[[H.264/MPEG-4_AVC|H.264/高階視訊編碼]]使用的轉換單元不超過8x8，越大的轉換單元會產生更多的假影（Artifacts）包含量化所造成的振鈴現象；此外，高效率視訊編碼8階分數亮度取樣差值和4階分數彩度取樣差值，而[[H.264/MPEG-4_AVC|H.264/高階視訊編碼]]分別使用6階分數亮度取樣差值和2階的分數彩度取樣差值，越高階的取樣差值會造成越嚴重的振鈴現象（Ringing Artifacts），因此高效率視訊編碼需要引入新的內嵌式迴圈濾波器，除了開發去區塊效應濾波器，更進一步引入全新概念的取樣自適應偏移濾波器。取樣自適應偏移藉由類重建的樣本為數個類來降低取樣的失真，過程中會取得每一類的偏移量，然後再將偏移量分別加到每一類裡的樣本，而每一類的偏移量會在編碼器裡適當地計算出且明確地將資訊給解碼器，以有效降低取樣失真，為了節省邊資訊（Side Information），樣本類會在編碼器和解碼器中實現；為了在只有一[[編碼樹單元|編碼樹單元]]的情況下達到低延遲，基於[[編碼樹單元|編碼樹單元]]的句法被設計成可以指定取樣自適應偏移的係數，此基於[[編碼樹單元|編碼樹單元]]最佳化演算法可以導出每一[[編碼樹單元|編碼樹單元]]的取樣自適應偏移係數，並且將取樣自適應偏移係數交錯放入邊資料（Slide Data）。<ref name=SAO1/>
+
+==取樣處理過程==
+[[File:Four_1-D_directional_patterns_for_EO_sample_classification.png|thumb]]
+取樣自適應偏移會根據樣本的類和適用的區域而使用不同的偏移量，兩種取樣自適應偏移型態可以滿足高效率視訊編碼對於低運算量的要求，分別是：邊緣偏移、帶偏移，邊緣偏移的樣本類是基於比較當前樣本以及鄰近樣本，而帶偏移的樣本類是基於樣本值。為達到低編碼延遲以及減少緩衝區的使用量，類區域的大小會固定成一個編碼樹區塊的大小，若要再降低邊資訊的資料量，可以合併多個[[編碼樹單元|編碼樹單元]]共用取樣自適應偏移參數。<ref name=SAO1/>
+
+===邊緣偏移（Edge Offset）===
+為了保持運算複雜度和編碼效率的平衡，邊緣偏移使用4種樣本類的一維方向圖形，分別為：水平、垂直、135度對角、45度對角，如圖一所示，"c"代表當前的樣本，"a"和"b"則代表鄰近的樣本，每一種模式分別對應圖一的4種圖形。在編碼時，每一編碼樹區塊只能選擇一種邊緣偏移類，且基於優化失真率的考量，最佳的邊緣偏移類會以位元流（Bitstream）當作邊資訊傳送，又因為這些邊緣偏移圖形都是一維，所以類的結果不會確切地和臨界樣本相關。<ref name=SAO1/>
+
+[[File:Positive_offsets_for_EO_categories_1_and_2_and_negative_offsets_for_EO_categories_3_and_4.png|thumb]]
+對於一個給定的邊緣偏移類（Class），在編碼樹區塊內的每個樣本會被分為5種形態（Category）中的其一，當前樣本"a"會根據選擇的一維方向模式和兩相鄰樣本"b"、"c"比較，比較的規則如下表：
+{| class="wikitable"
+|-
+! 型態 !! 條件
+|-
+| 1 || c < a && c < b
+|-
+| 2 ||(c < a && c == b) ||(c == a && c < b)
+|-
+| 3 ||(c > a && c == b) ||(c == a && c > b)
+|-
+| 4 || c > a && c > b
+|-
+| 0 || 不符合以上的條件
+|}
+
+型態1及4分別關聯相對低值和相對峰值，型態2及3分別關聯凹面及凸面，若當前樣本無法歸於上面4種型態，則為型態0且將不適用取樣自適應偏移。這4種型態的意義以及其正負值如圖二表示，在邊緣偏移型態1和2中使用正偏移使得相對低值及凹面更平滑，若是使用負偏移則會使的圖形更尖銳；而在邊緣偏移型態3和4中使用負偏移使得相對峰值及凸面更平滑，使用正偏移則更尖銳。
+
+圖三說明了著名的吉布斯現象（Gibbs Phenomenon），可以用來模擬一些影像壓縮的假象，特別是振鈴現象（Ringing Artifacts），雖然水平軸和垂直軸沒有特別標記，但分別定義沿著一維路徑的樣本位置和樣本值，虛線代表原始的樣本，有色的實心圓代表相對低值、相對峰值、凸面、和凹面，其餘樣本則為空心圓。若在相對峰值、凸面使用負偏移，而在相對低值、凹面使用正偏移，可以有效減少失真。
+
+[[File:Gibbs_phenomenon.png|thumb]]
+
+===帶偏移（Band Offset）===
+帶偏移為增加一偏移量至同一帶上的所有樣本，樣本的值域被等分為32帶，一個8位元樣本的值域為0到255，其寬度為8，取樣值從8k至8k+7屬於帶k，而k的範圍是0至31，而解碼器會得知在同一帶中原始樣本和重建樣本的平均差。解碼器只有4個連續帶和起始帶位置的偏移資訊，為了減少線性緩衝區的需求，這些由解碼器可取得的偏移量數目由16減少至4，而此數目正好相等於解碼器可得到的邊緣偏移量數目；而另一個會選擇只有4個帶的理由是這些區域經由圖片從四元樹分割成編碼樹區塊而減少時，可以有效限制在一個區域中的取樣範圍。<ref name=SAO1/>
+
+==編碼演算法==
+一張圖片會被切割成多層的四元樹區域，為了決定取樣自適應偏移的係數，下列為處理的過程：
+:1.	根據圖片大小，決定最大四元樹階層L。
+:2.	分割圖片至最小四元樹階層L的區域。
+:3.	從每一最小區域收集所有取樣自適應偏移的類型統計資料。
+:4.	使k = L。
+:5.	導出每一區域階層為k的取樣自適應偏移型態參數。
+:6.	選出位元率-失真（Rate-Distortion）最小的取樣自適應偏移型態。
+:7.	結合每一階層為k-1的父區域和階層為k的子區域的統計資料。
+:8.	對於每一階層為k-1的父區域，根據失真率而決定是否合併階層為k的子區域。
+:9.	使k = k – 1，若k大於0則跳至步驟5繼續，否則結束。
+<ref name=SAO2/>
+以下說明如何從取樣自適應偏移編碼器的四元樹切割得到統計資料，N<sub>l,i,t,c</sub>為在階層l、區域i、類t、型態c的像素數目，a<sub>l,i,t,c</sub>為相對應的偏移，e<sub>l,i,t,c</sub>為相對應原始訊號和重建訊號差的合，R<sub>l,i,t</sub>為相關偏移的預測率，藉由使用收集到的統計資料，可以利用簡單的式子計算出預測的失真減少量，D<sub>l,i,t</sub>為階層l、區域i、類t、型態c的預測失真減少量。
+  D<sub>l,i,t</sub> = <math>\sum_{c \in t}</math>(N<sub>l,i,t,c</sub>a<sup>2</sup><sub>l,i,t,c</sub> - 2a<sub>l,i,t,c</sub>e<sub>l,i,t,c</sub>)(1)
+得知預測失真減少量之後，我們可以計算出位元率-失真成本（Rate-Distortion-Cost），λ為[[拉格朗日乘數|拉格朗日乘數]]。
+  J<sub>l,i,t</sub> = D<sub>l,i,t</sub> + λR<sub>l,i,t</sub>(2)
+編碼器會根據式子（4）選擇有最低位元率-失真成本且在階層l、區域i的類，T為取樣自適應偏移類的集合。
+  J<sub>l,i</sub> = <math>\min\limits_{t \in T}</math>(J<sub>l,i,t</sub>)(3)
+  t<sub>l,i</sub> = <math>\arg\min\limits_{t \in T}</math>(J<sub>l,i,t</sub>)(4)
+得到最低位元率-失真成本以及最佳取樣自適應偏移類之後，編碼器會嘗試合併子區域成一個父區域，J’<sub>l,t</sub>和t’<sub>l,i</sub>分別是合併後的位元率-失真成本以及選擇的取樣自適應偏移類，Ω<sub>l,i</sub>是階層l和區域i的集合。
+  J'<sub>l,i</sub> = <math>\min</math>(<math>\sum_{k \in \Omega_l,i}</math> J<sub>l+1,k</sub>，J<sub>l,i</sub>)(5)
+  t'<sub>l,i</sub> = <math>\arg\min</math>(<math>\sum_{t \in T}</math> J<sub>l+1,k</sub>，J<sub>l,i</sub>)(6)
+根據合併子區域後的結果，相關父區域的分離資訊由以下公式決定：<br>
+  <math>S_l,i =
+\begin{cases}
+1, & \mbox{if }\sum_{k \in \Omega_l,i} J'_l+1,k < J'_l,i \\
+0, & \mbox{otherwise }
+\end{cases}
+</math>
+S<sub>l,i</sub>為1代表當前區域會被切割成若干個子區域，為0則代表當前區域不會被切割，處理所有階層k的區域後，編碼器會繼續處理階層k-1的區域直到階層0的區域，最後使用決定的取樣自適應偏參數更新每一區域的解碼器圖像緩衝區。
+
+==參考資料==
+{{reflist|refs=
+<ref name=OverviewHEVCIEEE2012>{{cite news |title=Overview of the High Efficiency Video Coding (HEVC) Standard |author=G.J. Sullivan |author2=J.-R. Ohm |author3=W.-J. Han |author4=T. Wiegand |publisher=IEEE Transactions on Circuits and Systems for Video Technology |url=http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6316136 |date=2012-12 |accessdate=2013-06-25 |archive-date=2019-08-08 |archive-url=https://web.archive.org/web/20190808085215/https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6316136 |dead-url=no }}</ref>
+
+<ref name=SAO1>
+{{cite news |title=Sample Adaptive Offset in the HEVC Standard |author=Chih-Ming Fu |author2=E. Alshina |author3=A. Alshin  |author4=Yu-Wen Huang |author5=Ching-Yeh Chen |author6=Chia-Yang Tsai |author7=Chih-Wei Hsu |author8=Shaw-Min Lei |author9=Jeong-Hoon Park |author10=Woo-Jin Han |publisher=IEEE Transactions on Circuits and Systems for Video Technology |url=http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6324411 |date=2011-10 }}</ref>
+
+<ref name=SAO2>
+{{cite news |title=Sample adaptive offset for HEVC |author=Chih-Ming Fu |author2=Ching-Yeh Chen |author3=Yu-Wen Huang |author4=	Shawmin Lei |publisher=2011 IEEE 13th International Workshop on Multimedia Signal Processing (MMSP) |url=http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6093807 |date=2011-10 }}</ref>
+}}
+
+[[Category:視頻壓縮技術|Category:視頻壓縮技術]]

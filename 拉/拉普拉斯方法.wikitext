@@ -1,0 +1,407 @@
+{{roughtranslation|time=2014-05-19T22:39:45+00:00}}
+在[[数学|数学]]上，以[[皮埃尔-西蒙·拉普拉斯|皮埃尔-西蒙·拉普拉斯]]命名的'''拉普拉斯方法'''是用于得出下列[[积分|积分]]形式的近似解的方法：
+
+:<math> \int_a^b\! e^{M f(x)} \, dx </math>
+
+其中的 ''ƒ''(''x'') 是一個二次[[导数|可微]][[函数|函数]]， ''M'' 是一個很大的數，而積分邊界點 ''a'' 與 ''b'' 則允許為無限大。此外，函數 ''ƒ''(''x'') 在此積分範圍內的 [[极值|全域極大值]] 所在處必須是唯一的並且不在邊界點上。則它的近似解可以寫為:
+
+:<math>\int_a^b\! e^{M f(x)}\, dx\approx \sqrt{\frac{2\pi}{M\left|f''(x_0)\right|}}e^{M f(x_0)}  \text { as } M\to\infty. \,</math>
+
+其中的 ''x''<sub>0</sub> 為極大值所在處。這方法最早是拉普拉斯在 (1774, pp. 366–367) 所發表。(待考查)
+
+== 拉普拉斯方法的想法概論 ==
+{{cot|1. 相對誤差}}
+
+首先，我們得先知道的是，這裡所謂的近似解是以 [[逼近误差|相對誤差]] 在講，而不是指 [[逼近误差|絕對誤差]] 。因此，令
+
+<math> s = \sqrt{\frac{2\pi}{M\left|f''(x_0)\right|}} </math> ，
+
+此 ''s'' 很顯然的當 ''M'' 很大時為一個微小的數，則上述的積分可以寫為
+
+:<math>
+\begin{align} \int_a^b\! e^{M f(x)} \, dx & = se^{Mf(x_0)} \frac{1}{s}\int_a^b\! e^{M(f(x)-f(x_0))}\, dx \\   & = se^{Mf(x_0)} \int_{(a-x_0)/s}^{(b-x_0)/s}\! e^{M(f(sy+x_0)-f(x_0))}\,dy \end{align}
+</math>
+
+因此，我們的相對誤差很顯然的為
+
+:<math>
+\left| \int_{(a-x_0)/s}^{(b-x_0)/s}  e^{M(f(sy+x_0)-f(x_0))} dy-1 \right|
+</math>
+
+現在，讓我們把積分分為 <math> y\in[-D_y,D_y] </math> 的與餘下的部分。 
+
+{{cob}}
+
+{{cot| 2. 函數 <math> e^{M\left(f(sy+x_0)-f(x_0) \right)} </math> 在極大值附近的行為，當 <math> M </math> 很大時會趨近於 <math> e^{-\pi y^2} </math> }}
+
+我们现在来研究 <math> M\left( f(x)-f(x_0) \right)</math> 的 [[泰勒展開|泰勒展開]] 。這裡展開的原點取  ''x''<sub>0</sub> ，並將變數由 ''x'' 換為 ''y'' 因為我們是在對 ''y'' 做積分，再加上 ''x''<sub>0</sub> 為函數極大值所在處，因此，
+
+:<math>
+\begin{align} M\left( f(x)-f(x_0) \right) & = \frac{Mf''(x_0)}{2}s^2y^2 +\frac{Mf''' (x_0)}{6}s^3y^3+ \cdots \\    & = -\pi y^2 +O\left(\frac{1}{\sqrt{M}}\right). \end{align}
+</math>
+
+會發現高於二次微分的部分當 ''M'' 增大時，會被壓抑掉，而此 [[指數函數|指數函數]] 則會越來越接近 [[高斯函數|高斯函數]] <math> e^{-\pi y^2} </math> 且 <math> \int_{-\infty}^{\infty}e^{-\pi y^2} dy =1 </math> 。如下圖所示：
+
+[[File:For_laplace_method_---_with_different_M.png|thumb]]
+
+{{cob}}
+
+{{cot|3. 當 <math> M </math> 增加，則相對應的 <math> x </math> 範圍變小 }}
+
+ <math> y\in[-D_y,D_y] </math> 的部分由上面論述可知當 ''M'' 越大則越接近高斯函數；並且有趣的是，相對應的 ''x'' 區間則越來越小，因為  <math> x\in[-sD_y,sD_y] </math> 與 <math> \sqrt{M} </math> 成反比。
+
+{{cob}}
+
+{{cot|4.若拉普拉斯方法所用的積分會收斂，它的相對誤差相對應的非極大值附近的其餘部分的積分就會隨 <math>M</math> 增大而趨近於0}}
+
+所以，即便 ''D''<sub>y</sub> 取非常大， ''sD''<sub>y</sub> 最後還是會變得非常小，那麼，我們怎麼保證餘下的部分的積分也會趨近到0？
+
+簡單的想法是，設法找一個函數 <math> m(x) </math> ，使它在餘下的區域內 <math> m(x)\ge f(x) </math> ，並且隨著 <math> M </math> 的增大，<math> e^{Mm(x)} </math> 的積分會趨近於0 即可。而指數函數只要指數部分為實數，它就一定大於0，並且當指數變大時，指數函數也會跟著變大。基於這兩個理由， <math> e^{Mf(x)} </math> 的積分也會趨近於0。 在此，我們可以選擇此 <math> m(x) </math> 為過 <math> x=sD_y </math> 的切線函數，如下圖所示：
+
+[[File:For_laplace_method_---_upper_limit_function_m(x).gif|thumb]]
+
+若為有限積分區間，我們可以看出，只要 <math> M </math> 夠大，這切線的斜率就會趨近於0 ，因此，不管 <math> f(x) </math> 在其餘部分是否連續，它們總會在這切線以下，並且很容易證明(後面會證) <math> e^{Mm(x)} </math> 的積分當 <math> M </math> 很大時，就會趨近於0。
+
+然而，若積分範圍是無限大的話，那麼，<math> m(x) </math> 就有可能總是與 <math> f(x) </math> 有相交，若有相交，則表示無法保證 <math> e^{Mf(x)} </math> 的積分最後會趨近於0。比方 <math> f(x)=\frac{sin(x)}{x} </math> 的情形下，不管 <math> M </math> 為多少，它的 <math> \int^{\infty}_{0}e^{Mf(x)} dx </math> 總是會發散。所以，對於積分範圍為無限大的情形，還得要求 <math> \int^{\infty}_{d}e^{Mf(x)} dx </math> 會收斂才行，那麼，只要 <math> d </math> 越來越大，該積分就會趨近於0。而這 <math> d </math> 可選為<math> m(x) </math> 與 <math> f(x) </math> 相交之處即可，即保證所有餘下的部分的積分會趨近於0。
+
+也許您會問說，為何不是要求 <math>\int^{\infty}_{d}e^{f(x)} dx </math> 會收斂？舉個例子，若 <math> f(x) </math> 在餘下區域內為 <math> -\ln x </math> ，則 <math> e^{f(x)}=\frac{1}{x} </math> ，積分會發散，然而，當 <math> M=2 </math> ， <math> e^{Mf(x)}=\frac{1}{x^2} </math> 的積分卻是收斂的。所以，有的函數在 <math> M </math> 小的時候會發散，然而，當 <math> M </math> 夠大時卻會是收斂的。
+
+{{cob}}
+基於上述四點，就有辦法證明拉普拉斯方法的可靠性。而 Fog(2008) 又將此方法推廣到任意精確。 ***待考查***
+
+'''此方法的正式表述與證明：'''
+
+假設 <math> f(x) </math> 是一個在 <math> x_0 \in (a,b) </math> 這點滿足 (1) <math> f(x_0) = \max_{[a,b]} f(x) </math> ，(2)唯一全域最大，(3) <math> x_0 </math>  附近為二階可微且 <math> f''(x_0)<0 </math> (4) 當拉普拉斯方法的積分範圍為無限大時，此積分會收斂，
+
+則，
+
+: <math>
+\lim_{n \to +\infty} \left( \frac{\int_a^b e^{nf(x)} \, dx}{\left( e^{nf(x_0)}\sqrt{\frac{2 \pi}{n (-f''(x_0))}} \right)}  \right) =1
+</math>
+
+{{cot|'''證明：'''}}
+'''下限''' ：
+
+在 <math> f'' </math> 要求連續的條件底下，給定任意大於0的<math> \varepsilon </math> 就能找到一個 <math> \delta >0 </math> 使得在 <math> |x_0-x|< \delta </math> 這區間內所有的 <math> f''(x) \ge f''(x_0) - \varepsilon. </math> 。 由 [[泰勒展開|泰勒展開]] 我們可以得知，在 <math> x \in (x_0 - \delta, x_0 + \delta) </math> 區間內， <math>f(x) \ge f(x_0) + \frac{1}{2}(f''(x_0) - \varepsilon)(x-x_0)^2  </math> 。
+
+這樣，我們就得到本方法的積分下限了：
+
+: <math>
+\int_a^b e^{n f(x) } \, dx \ge \int_{x_0 - \delta}^{x_0 + \delta} e^{n f(x)} \, dx
+\ge  e^{n f(x_0)} \int_{x_0 - \delta}^{x_0 + \delta} e^{\frac{n}{2} (f''(x_0) - \varepsilon)(x-x_0)^2} \, dx
+= e^{n f(x_0)} \sqrt{\frac{1}{n (-f''(x_0) + \varepsilon)}} \int_{-\delta \sqrt{n (-f''(x_0) + \varepsilon)} }^{\delta \sqrt{n (-f''(x_0) + \varepsilon)} } e^{-\frac{1}{2}y^2} \, dy
+</math>
+
+其中最後一個等號來自於變數變換： <math> y= \sqrt{n (-f''(x_0) + \varepsilon)} (x-x_0)</math> 。請記得 <math> f''(x_0)<0 </math> ，所以我們才會對它的負號取開根號。
+
+接著讓我們對上面的不等式兩邊同除以 <math> e^{nf(x_0)}\sqrt{\frac{2 \pi}{n (-f''(x_0))}} </math> 並且對 <math>n</math>取極限，則
+
+: <math>
+\lim_{n \to +\infty} \left( \frac{\int_a^b e^{nf(x)} \,dx}{\left( e^{nf(x_0)}\sqrt{\frac{2 \pi}{n (-f''(x_0))}} \right)}  \right)
+\ge \lim_{n \to +\infty} \frac{1}{\sqrt{2 \pi}} \int_{-\delta\sqrt{n (-f''(x_0) + \varepsilon)} }^{\delta \sqrt{n (-f''(x_0) + \varepsilon)} } e^{-\frac{1}{2}y^2} \, dy \sqrt{\frac{-f''(x_0)}{-f''(x_0) + \varepsilon}}
+= \sqrt{\frac{-f''(x_0)}{-f''(x_0) + \varepsilon}}
+</math>
+
+既然上式是對任意大於0的 <math> \varepsilon </math> 都對，所以我們得到：
+
+: <math>
+\lim_{n \to +\infty} \left( \frac{\int_a^b e^{nf(x)} \, dx}{\left( e^{nf(x_0)}\sqrt{\frac{2 \pi}{n (-f''(x_0))}} \right)}  \right) \ge 1
+</math>
+
+請注意，上面的證明也適用於 <math> a = -\infty </math> 或 <math> b= \infty </math> 或雙雙跑到正負無限大的情況
+
+'''上限''' ：
+
+證明上限的部分其實和證明下限的部分很像，但是會較麻煩。再一次，我們取<math> \varepsilon >0 </math> ，不過，不再是任意而是多了一個要求 <math> \varepsilon </math> 得夠小以致於 <math> f''(x_0) + \varepsilon < 0 </math> 。接著，就如同之前的證明，因著 <math> f'' </math> 被要求連續，並且根據 [[泰勒定理|泰勒定理]] 我們會發現總存在一個 <math> \delta>0 </math> 以至於在 <math> |x-x_0| < \delta </math> 區間裡， <math> f(x) \le f(x_0) + \frac{1}{2} (f''(x_0) + \varepsilon)(x-x_0)^2 </math> 總是可以成立。 最後，在我們的假設裡 (假設 <math> a,b </math> 都是有限值) ，由於 <math>x_0</math> 是全域最大所在處，我們總可以找到一個 <math> \eta >0 </math> 使得所有在 <math> |x-x_0|\ge \delta </math> 這區間裡， <math> f(x) \le f(x_0) - \eta </math> 總是成立。
+
+現在，萬事俱備，東風就在下面啦：
+
+: <math>
+\int_a^b e^{n f(x) } \, dx
+\le \int_a^{x_0-\delta} e^{n f(x) } \, dx + \int_{x_0-\delta}^{x_0 + \delta} e^{n f(x) } \, dx + \int_{x_0 + \delta}^b e^{n f(x) } \, dx
+\le (b-a)e^{n (f(x_0) - \eta)} + \int_{x_0-\delta}^{x_0 + \delta} e^{n f(x) } \, dx
+</math>
+
+: <math>
+\le (b-a)e^{n (f(x_0) - \eta)} + e^{n f(x_0)} \int_{x_0-\delta}^{x_0 + \delta} e^{\frac{n}{2} (f''(x_0)+\varepsilon)(x-x_0)^2} \, dx
+\le (b-a)e^{n (f(x_0) - \eta)} + e^{n f(x_0)} \int_{-\infty}^{+\infty} e^{\frac{n}{2} (f''(x_0)+\varepsilon)(x-x_0)^2} \, dx
+</math>
+
+: <math>
+\le (b-a)e^{n (f(x_0) - \eta)} + e^{n f(x_0)} \sqrt{\frac{2 \pi}{n (-f''(x_0) - \varepsilon)}}
+</math>
+
+如果我們對上面的不等式兩邊皆除以 <math> e^{nf(x_0)}\sqrt{\frac{2 \pi}{n (-f''(x_0))}} </math>  並且順便取極限的話，會得到：
+
+: <math>
+\lim_{n \to +\infty} \left( \frac{\int_a^b e^{nf(x)} \, dx}{\left( e^{nf(x_0)}\sqrt{\frac{2 \pi}{n (-f''(x_0))}} \right)}  \right)
+\le \lim_{n \to +\infty} \left( (b-a) e^{-\eta n} \sqrt{\frac{n (-f''(x_0))}{2 \pi}} + \sqrt{\frac{-f''(x_0)}{-f''(x_0) - \varepsilon}} \right)
+= \sqrt{\frac{-f''(x_0)}{-f''(x_0) - \varepsilon}}
+</math>
+
+再一次，因為 <math> \varepsilon </math> 可以取任意大於0的值，所以我們得到了上限了：
+
+: <math>
+\lim_{n \to +\infty} \left( \frac{\int_a^b e^{nf(x)} \, dx}{\left( e^{nf(x_0)}\sqrt{\frac{2 \pi}{n (-f''(x_0))}} \right)}  \right) \le 1
+</math>
+
+把上限與下限兩個證明同時考慮，整個證明就完成了。
+
+注意，關於上限的證明，很明顯的當我們把它應用在 <math>a</math> 或 <math>b</math> 為正負無限大時，該上限證明會失敗。那怎麼辦呢？我們需要再多假設一些東西。一個充分但非必要的假設是：當 <math> n = 1 </math> 時，此積分 <math> \int_a^b e^{nf(x)} \, dx </math> 為有限值，並且上面所說的 <math> \eta </math> 是存在的 (注意，當 <math> [a,b] </math> 區間是無限的時候，這假設是必要的) 。整個證明過程就如同先前所顯示的那樣，只不過下列的積分部分要做點改變：
+
+: <math>
+\int_a^{x_0-\delta} e^{n f(x) } \, dx + \int_{x_0 + \delta}^b e^{n f(x) } \, dx
+</math>
+
+必須利用上述的假設，而改為：
+
+: <math>
+\int_a^{x_0-\delta} e^{n f(x) } \, dx + \int_{x_0 + \delta}^b e^{n f(x) } \, dx
+\le \int_a^b e^{f(x)}e^{(n-1)(f(x_0) - \eta)} \, dx =  e^{(n-1)(f(x_0) - \eta)} \int_a^b e^{f(x)} \, dx
+</math>
+
+以取代先前會得到的 <math> (b-a)e^{n (f(x_0) - \eta)} </math> ，這樣的話，當我們除以 <math> e^{nf(x_0)}\sqrt{\frac{2 \pi}{n (-f''(x_0))}} </math> ，就會改得到如下的結果：
+
+: <math>
+\frac{e^{(n-1)(f(x_0) - \eta)} \int_a^b e^{f(x)} \, dx }{e^{nf(x_0)}\sqrt{\frac{2 \pi}{n (-f''(x_0))}}} = e^{-(n-1)\eta} \sqrt{n} e^{-f(x_0)} \int_a^b e^{f(x)} \, dx \sqrt{\frac{ -f''(x_0)}{ 2 \pi}}
+</math>
+
+這樣的話，當我們取 <math> n \rightarrow \infty </math> 時，上式的值就會趨近於 <math> 0 </math> 。而剩下的部分的證明就還是如同原先的證明，不做改變。
+
+再強調一次，這裡我們多加給無限大積分範圍的情形的條件，是充分，但非必要。不過，這樣的條件已經可以適用在許多情形了(但非全部)。 這考慮條件簡單來講就是積分區間得是被良好定義的(即不能是無限大的)，並且被積函數在 <math> x_0 </math> 必須是真的極大 (意即 <math> \eta > 0 </math> 必須真的存在) ；如果這積分區間是無限大的話，要求 <math> n =1 </math> 時的此拉普拉斯方法所用的積分值要為有限並非必要的，其實只要當 <math> n </math> 大於某數時，此積分值會是有限的即可。
+
+{{cob}}
+
+== 其他形式 ==
+有時拉普拉斯方法也會被寫成其他形式，如：
+
+:<math>\int_a^b\! h(x) e^{M g(x)}\, dx\approx \sqrt{\frac{2\pi}{M|g''(x_0)|}} h(x_0) e^{M g(x_0)}  \text { as } M\to\infty \,</math>
+
+其中 <math>h</math>為正 (好像不必要)。
+
+重要的是，這方法精確度與函數 <math>g(x)</math> 和 <math>h(x)</math> 有關。 <ref>{{cite book |last=Butler |first=Ronald W |date=2007 |title=Saddlepoint approximations and applications |publisher=Cambridge University Press |isbn=978-0-521-87250-8}}</ref>  ***待考查***
+
+{{cot| 相對誤差的推導 }}
+首先，由於極大值所在設為 <math>x_0=0</math> 並不影響計算結果，所以以下的推導皆如此假設。此外，我們想要的是相對誤差 <math>\left|R \right|</math>，所以
+
+:<math>
+\int_a^b\! h(x) e^{M g(x)}\, dx  = h(0)e^{Mg(0)}s \underbrace{\int_{a/s}^{b/s}\frac{h(x)}{h(0)}e^{M\left[ g(sy)-g(0) \right]} dy}_{1+R}
+</math>
+
+其中 <math> s\equiv\sqrt{\frac{2\pi}{M\left| g'' (0) \right|}}</math> ，所以，若我們令 <math> A\equiv \frac{h(sy)}{h(0)}e^{M\left[g(sy)-g(0) \right]} </math> 且 <math> A_0\equiv e^{-\pi y^2} </math> ，則
+
+:<math> \left| R\right| = \left| \int_{a/s}^{b/s}A\,dy -\int_{-\infty}^{\infty}A_0\,dy   \right|
+</math>
+
+所以，只要我們求得上式的上限為何，即可得相對誤差。注意，這裡的推導還可以再優化，不過，由於此處我只想顯示它會收斂到0，因此，不再細推。
+
+由於 <math> \left| A+B \right| \le |A|+|B| </math> ，因此
+
+:<math>
+|R| < \underbrace{\left| \int_{D_y}^{\infty}A_0 dy \right|}_{(a_1)} +  \underbrace{\left| \int_{D_y}^{b/s}A dy \right|}_{(b_1)}+ \underbrace{\left| \int_{-D_y}^{D_y}\left(A-A_0\right) dy \right|}_{(c)}+ \underbrace{\left| \int_{a/s}^{-D_y}A dy \right|}_{(b_2)} + \underbrace{\left| \int_{-\infty}^{-D_y}A_0 dy \right|}_{(a_2)}
+</math>
+
+其中 <math> (a_1) </math> 與  <math> (a_2) </math> 雷同，所以只算  <math> (a_1) </math> ，經過  <math> z\equiv\pi y^2 </math> 的變換後，得到
+:<math> (a_1) = \left| \frac{1}{2\sqrt{\pi}}\int_{\pi D_y^2}^{\infty} e^{-z}z^{-1/2} dz\right| <\frac{e^{-\pi D_y^2}}{2\pi D_y} </math>
+
+也就是說，只要 <math> D_y </math> 取得夠大，它就會趨近於0。
+
+而 <math> (b_1) </math> 與 <math> (b_2) </math> 也雷同，所以也只算一個：
+
+:<math> (b_1)\le\left| \int_{D_y}^{b/s}\left[\frac{h(sy)}{h(0)}\right]_{\text{max}} e^{Mm(sy)}dy \right|</math>
+
+其中 
+
+:<math> m(x) \ge \frac{1}{M}\ln{\frac{h(x)}{h(0)}}+g(x)-g(0) \,\,\text{as}\,\, x\in [sD_y,b]</math>
+
+並且 <math> h(x) </math> 在此範圍內要與 <math> h(0) </math> 同號。
+這裡讓我們選過 <math> x=sD_y </math> 的切線為 <math> m(x) </math> 吧！即 <math> m(sy)= g(sD_y)-g(0) +g'(sD_y)\left( sy-sD_y \right)</math> ，如圖所示：
+
+[[File:For_laplace_method_---_upper_limit_function_m(x).gif|thumb]]
+
+由圖可以看出，當 <math>s</math> 或者 <math>D_y</math> 變小時，滿足上列不等式的區間會變大，因此，為了涵蓋整個區間， <math>D_y</math> 有了上限。此外，<math> e^{-\alpha x} </math> 的積分也相對容易，因此，很適合用來預估誤差。
+
+由泰勒展開我們得知，
+
+:<math>\begin{align}
+M\left[g(sD_y)-g(0)\right] & = M\left[ \frac{g''(0)}{2}s^2D_y^2 +\frac{g'''(\xi)}{6}s^3D_y^3 \right] \,\, \text{as}\,\, \xi\in[0,sD_y] \\
+    & = -\pi D_y^2 +\frac{(2\pi)^{3/2}g'''(\xi)D_y^3}{6\sqrt{M}|g''(0)|^{3/2}},
+\end{align}</math>
+且
+
+:<math>\begin{align}
+Msg'(sD_y) & = Ms\left(g''(0)sD_y +\frac{g'''(\zeta)}{2}s^2D_y^2\right), \,\, \text{as} \,\,\zeta\in[0,sD_y] \\
+   & = -2\pi D_y +\sqrt{\frac{2}{M}}\left( \frac{\pi}{|g''(0)|} \right)^{3/2}g'''(\zeta)D_y^2
+\end{align}</math>
+
+然後將它們代回 <math> (b_1) </math> 的計算裡，不過，您可以看到，上述的兩個餘項皆與 <math> M </math> 的開根號成反比，為了式子的漂亮，讓我省略它們吧！不省略只是看起來較醜陋而已，不過，那樣子較嚴謹便是。
+
+:<math>\begin{align}
+(b_1)  & \le \left|\left[ \frac{h(sy)}{h(0)} \right]_{\text{max}} e^{-\pi D_y^2}\int_0^{b/s-D_y}e^{-2\pi D_y y} dy \right| \\
+  & \le  \left|\left[ \frac{h(sy)}{h(0)} \right]_{\text{max}} e^{-\pi D_y^2}\frac{1}{2\pi D_y} \right|.
+\end{align}</math>
+所以，原則上也是 <math> D_y </math> 越大則越趨近於0。只不過，在決定 <math> m(x) </math> 的過程，設下了 <math> D_y </math> 的上限。
+
+至於靠近極大值的點的積分，我們一樣可以利用泰勒展開來求，當 <math> h(x) </math> 在此點的一階微分不為0時，
+
+:<math>\begin{align}
+(c) & \le \int_{-D_y}^{D_y} e^{-\pi y^2} \left| \frac{sh'(\xi)}{h(0)}y \right|\, dy \\
+   & < \sqrt{\frac{2}{\pi M |g''(0)|}} \left| \frac{h'(\xi)}{h(0)}y \right|_\text{max} \left( 1-e^{-\pi D_y^2} \right)
+\end{align}</math>
+
+會看到它原則上與 <math> M </math> 的開根號成反比，其實，當 <math>h(x) </math> 為常數時，積分出來的也會有如此的行為。
+
+所以，概括的講，靠近極大點的附近的積分原則上會隨著 <math> \sqrt{M}</math> 的增大而變小，而其餘的部分，只要 <math> D_y </math> 夠大，也會趨近於0，只是這<math> D_y </math> 是有上限的，取決於我們所找的上限函數 <math> m(x) </math> 是否在這區間內總是大於 <math> g(x)-g(0) </math> ；不過，一旦有一個滿足條件的 <math> m(x) </math> 被找到，由於切線的起點為 <math> x=sD_y </math> ，因此，<math> D_y </math> 可以取正比於 <math> \sqrt{M} </math> 即可，所以， <math> M </math> 越大，<math> D_y </math> 也可以設越大。
+{{cob}}
+
+至於多維的情形，讓我們令 <math>\mathbf{x}</math> 是一個 <math>n</math> 維向量，而 <math>f(\mathbf{x})</math> 則是一個純量函數，則此拉普拉斯方法可以寫成
+
+:<math>\int e^{M f(\mathbf{x})}\, d^n x \approx \left(\frac{2\pi}{M}\right)^{n/2} |-H(f)(\mathbf{x}_0)|^{-1/2} e^{M f(\mathbf{x}_0)}  \text { as } M\to\infty \,</math>
+
+其中的 <math>H(f)(\mathbf{x}_0)</math> 是一個在<math>\mathbf{x}_0</math> 取值的 [[海森矩陣|海森矩陣]]，而 <math>|\cdot|</math> 則是指矩陣的 [[行列式|行列式]] ；此外，與單變數的拉普拉斯方法類似，這裡的 [[海森矩陣|海森矩陣]] 必須為 [[正定矩陣|負定矩陣]]，即該矩陣的所有本徵值皆小於0，這樣才會是極大值所在。.<ref>{{cite book
+ |last=MacKay 
+ |first=David J. C. 
+ |title=Information Theory, Inference and Learning Algorithms 
+ |publisher=Cambridge University Press 
+ |date=September 2003 
+ |location=Cambridge 
+ |url=http://www.inference.phy.cam.ac.uk/mackay/itila/book.html 
+ |isbn=9780521642989 
+ |deadurl=yes 
+ |archiveurl=https://web.archive.org/web/20160217105359/http://www.inference.phy.cam.ac.uk/mackay/itila/book.html 
+ |archivedate=2016-02-17 
+}}</ref>
+
+== 拉普拉斯方法的推廣：最速下降法 ==
+
+此拉普拉斯方法可以被推廣到 [[複分析|複分析]] 裡頭使用，搭配 [[留數定理|留數定理]] ，以找出一個過最速下降點的 contour (翻路徑的話，會與path integral 相衝，所以，這裡還是以英文原字稱呼) 的 [[曲線積分|曲線積分]] ，用來取代原有的複數空間的 contour積分。因為有時 <math> f(z) </math> 的一階微分為0的點未必就在實數軸上，而就算真在實數軸上，也未必二階微分在 <math> x </math> 方向上為小於0 的實數；此種情況下，就得使用最速下降法了。由於最速下降法中，已經利用另一條通過最速下降的鞍點來取代原有的 contour 積分，經過變數變換後就會變得有如拉普拉斯方法，因此，我們可以透過這新的 contour ，找到原本的積分的漸進近似解，而這將大大的簡化整個計算。就好像原本的路徑像是在蜿蜒的山路開車，而新的路徑就像乾脆繞過這座山開，反正目的只是到達目的地而已，留數定理已經幫我們把中間的差都算好了。請讀 Erdelyi (2012)與 Arfken & Weber (2005) 的書裡有關 ''steepest descents'' 的章節。
+
+以下就是該方法在''z'' 平面下的形式：  
+:<math>\int_a^b\! e^{M f(z)}\, dz\approx \sqrt{\frac{2\pi}{-Mf''(z_0)}}e^{M f(z_0)}  \text{ as } M\to\infty. \,</math>
+
+其中 ''z''<sub>0</sub> 就是新的路徑通過的鞍點。
+注意，開根號裡的負號是用來指定最速下降的方向，千萬別認為取 <math> f''(z_0) </math> 的絕對值來取代這個負號，若然，那就大錯特錯了。 
+另外要注意的是，如果該被積函數是 [[亚纯函数|-{zh-tw:亞純函數;}-]] ，就有必要將被新舊 contour 包到的極點所貢獻的留數給加入，範例請參考 Okounkov 的文章 arXiv:math/0309074 的第三章。
+
+== 更進一步一般化 ==
+最速下降法還可以更進一步的推廣到所謂的 ''非線性穩定相位/最速下降法'' (nonlinear stationary phase/steepest descent method)。
+這方法主要用在解非線性偏微分方程，透過將非線性偏微分方程轉換為求解柯西變換(Cauchy transform)的積分形式，就可以藉由最速下降法的想法來得到非線性解的漸進解。
+
+以 [[艾里函數|艾里方程]](線性) <math> y'' =xy </math> 為例，它可以寫成積分形式如下：
+
+:<math> y_j(x) =\frac{1}{2\pi i}\int_{\gamma_j} e^{\frac{1}{3}t^3-xt}dt </math>
+
+由這條積分式，我們就可以藉由最速下降法(若 <math>\gamma_j</math> 指的是負實數軸，那麼就回到此拉普拉斯方法了)來得到它的漸進解了。
+
+然而，若方程式如 [[KdV方程|KdV方程]] <math> y_t+6yy_x+y_{xxx}=0 </math> 是個非線性偏微分方程，想要找到它的解相對應的一個複數 contour 積分的話，就沒那麼簡單，在非線性穩定相位/最速下降法裡所用到的概念主要是基於散射逆轉換 (inverse scattering transform) 的處理方式，即先將原本的非線性偏微分方程變成 [[Lax_對|Lax 對]] ，其中一個像是線性的 [[薛丁格方程式|薛丁格方程式]] ，其位能障為我們要找的 <math>y</math> ，本徵值為 <math>\lambda</math> ，波函數為 <math>\phi_\lambda</math> (不過，它並非我們所要的 <math> y</math> )；因此可以解它的散射矩陣，若利用解析延拓將原本的波函數由實數 <math>\lambda</math> 延拓到複數空間時，就可以得到黎曼希爾伯特問題(RHP)的形式。利用這個黎曼希爾伯特問題(RHP) ，我們可以解得 <math>\phi</math> 的柯西變換的積分形式，再利用此線性薛丁格方程的特性，就可以反推出 <math>y</math> 的複數 contour 積分 形式了。
+
+而 [[Lax_對|Lax 對]] 的另一個偏微分方程則是決定每個 <math>\phi_\lambda</math> 隨時間變化的行為，由於 <math>y</math> 在 <math>x\rightarrow \pm\infty </math> 時被要求為0 ，會發現整個偏微分方程會變得十分簡單，並且只決定 <math>c(\lambda,t)\phi_\lambda</math> 裡的 <math>c(\lambda,t) </math> 的值，不過，條件是 <math>\phi_\lambda</math> 必須是指由正負無限遠入射或反射波的解。這樣，我們所得到的這個只與時間與本徵值有關的係數 <math>c(\lambda,t) </math> 就可以直接被應用在上述的黎曼希爾伯特問題(RHP)裡的躍變矩陣裡了。
+
+接著就是非線性穩定相位/最速下降法所要做的工作，即找出 [[鞍點|鞍點]] 來，在該點附近基於最速下降法的精神做近似。不過，這近似因著考慮到收斂性，需要將原本的 contour 變形，與將原本的黎曼希爾伯特問題(RHP)作轉換，所以有再比原本的最速下降法多出一些步驟來。
+
+這整個方法最早由 Deift 與 Zhou 在 1993 基於 Its 之前的工作所提出的，後續又有許多人加以改進，主要的應用則有 [[孤波|孤波]] 理論，可積模型等。
+
+== 複數積分 ==
+以下的積分常用在 [[拉普拉斯變換#拉普拉斯逆變換|拉普拉斯變換#拉普拉斯逆變換]] 裡，
+
+:<math>  \frac{1}{2\pi i}\int_{c-i\infty}^{c+i\infty} g(s)e^{st} \,ds </math>
+
+假定我們想要得到該積分在 <math> t >> 1 </math> 時的結果(若 <math> t</math> 為時間，通常就是在找經過夠久時間後達穩定的結果)，我們可以透過 [[解析延拓|解析延拓]] 的概念，先將這時間換成虛數，如 ''t'' = ''iu'' 並且一併做 <math> s=c+ix</math>  的變換，則我們可以將上式轉換為如下的 [[拉普拉斯變換#雙邊拉普拉斯變換|拉普拉斯變換#雙邊拉普拉斯變換]] 
+
+:<math> \frac{1}{2 \pi}\int_{-\infty}^\infty g(c+ix)e^{-ux}e^{icu} \, dx. </math>
+
+這裡就可以套用此拉普拉斯方法求漸進解，最後，再利用 ''u'' = ''t'' / ''i'' 把 ''t'' 換回來，就可以得到該拉普拉斯逆變換的漸進解了。
+
+== 例子1：斯特靈公式 ==
+拉普拉斯方法可以用在推導 [[斯特靈公式|斯特靈公式]] 上；當 ''N'' 很大時，
+:<math>N!\approx \sqrt{2\pi N} N^N e^{-N}\,</math>
+
+''' 證明： '''
+
+由 [[Γ函数|Γ函数]] 的積分定義，我們可以得到
+:<math>N! = \Gamma(N+1)=\int_0^\infty e^{-x} x^N \, dx. </math>
+
+接著讓我們做變數變換，
+::<math>x = N z \,</math>
+因此
+::<math>dx = N \, dz. </math>
+將這些代回 [[Γ函数|Γ函数]] 的積分定義裡，我們可以得到
+
+: <math>
+\begin{align}
+N! & = \int_0^\infty e^{-N z} \left(N z \right)^N N \, dz \\
+& = N^{N+1}\int_0^\infty e^{-N z} z^N \, dz \\
+& = N^{N+1}\int_0^\infty e^{-N z} e^{N\ln z} \, dz \\
+& = N^{N+1}\int_0^\infty e^{N(\ln z-z)} \, dz.
+\end{align}
+</math>
+
+經由此變數變換後，我們有了拉普拉斯方法所需要的<math> f(x) </math> 為
+:<math>f \left( z \right) = \ln{z}-z </math>
+而它乃為二次可微函數，且
+:<math>f'(z) = \frac{1}{z}-1,\,</math>
+:<math>f''(z) = -\frac{1}{z^2}.\,</math>
+因此， ''ƒ''(''z'') 的極大值出現在 ''z''<sub>0</sub> = 1 而且在該點的二次微分為 <math>-1</math> 。因此，我們得到
+:<math>N! \approx N^{N+1}\sqrt{\frac{2\pi}{N}} e^{-N}=\sqrt{2\pi N} N^N e^{-N}.\,</math>
+
+== 例子2：[[貝氏網路|貝氏網路]] ，參數估計與概率推理 ==
+關於概率推理的簡介，請參考 http://doc.baidu.com/view/e9c1c086b9d528ea81c77989.html 。
+而在 {{harvnb|Azevedo-Filho|Shachter|1994}} 的文章裡，則回顧了如何應用此拉普拉斯方法 (無論是單變數或者多變數) 如何應用在 ''概率推理'' 上，以加速得到系統的 後驗[[矩_(數學)|矩 (數學)]] (posterior moment) ， {{tsl|en|Bayes_factor|貝氏參數}} 等，並舉醫學診斷上的應用為例。
+
+== 相關維基百科文章 ==
+* [[平稳相近似|平稳相近似]]
+
+== 參考文獻 ==
+{{Reflist}}
+* {{Citation
+ | last=Deift
+ | first=P.
+ | last2=Zhou
+ | first2=X.
+ | year=1993
+ | title=A steepest descent method for oscillatory Riemann–Hilbert problems. Asymptotics for the MKdV equation
+ | periodical=Ann. of Math.
+ | volume=137
+ | issue=2
+ | pages=295–368
+ | doi=10.2307/2946540
+}}.
+* {{Citation
+ | last=Azevedo-Filho
+ | first=A.
+ | last2=Shachter
+ | first2=R.
+ | year=1994
+ | chapter=Laplace's Method Approximations for Probabilistic Inference in Belief Networks with Continuous Variables
+ | editor-first=R.
+ | editor-last=Mantaras
+ | editor2-first=D.
+ | editor2-last=Poole
+ | title= Uncertainty in Artificial Intelligence
+ | publisher=Morgan Kauffman
+ | place=San Francisco, CA
+ | id = {{citeseerx|10.1.1.91.2064}}
+}}.
+*{{Citation
+ | title=Asymptotic Expansions
+ | last= Erdelyi
+ | first=A.
+ | isbn= 9780486155050
+ | url= http://books.google.com.tw/books?id=2fRAAQAAQBAJ
+ | year= 2012
+ | publisher= Dover Publications
+}}.
+*{{Citation
+ |title=Mathematical Methods For Physicists International Student Edition
+ | last=Arfken
+ | first=G.B.
+ | last2=Weber
+ | first2=H.J.
+ | isbn=9780080470696
+ | url=http://books.google.com.tw/books?id=tNtijk2iBSMC
+ | year=2005
+ | publisher=Elsevier Science
+}}.
+
+
+[[Category:数学近似|Category:数学近似]]

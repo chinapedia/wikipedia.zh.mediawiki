@@ -1,0 +1,133 @@
+{{noteTA
+|G1=IT
+}}
+{{机器学习导航栏}}
+{{ request translation }}
+
+'''卷积神经网络'''（Convolutional  Neural Network, '''CNN'''）是一种[[前馈神经网络|前馈神经网络]]，它的人工神经元可以响应一部分覆盖范围内的周围单元，<ref name="deeplearning">{{cite web|title=Convolutional Neural Networks (LeNet) - DeepLearning 0.1 documentation|url=http://deeplearning.net/tutorial/lenet.html|work=DeepLearning 0.1|publisher=LISA Lab|accessdate=31 August 2013|archive-date=2017-12-28|archive-url=https://web.archive.org/web/20171228091645/http://deeplearning.net/tutorial/lenet.html|dead-url=no}}</ref>对于大型图像处理有出色表现。
+
+卷积神经网络由一个或多个卷积层和顶端的全连通层（对应经典的神经网络）组成，同时也包括关联权重和池化层（pooling layer）。这一结构使得卷积神经网络能够利用输入数据的二维结构。与其他深度学习结构相比，卷积神经网络在图像和[[语音识别|语音识别]]方面能够给出更好的结果。这一模型也可以使用[[反向传播算法|反向传播算法]]进行训练。相比较其他深度、前馈神经网络，卷积神经网络需要考量的参数更少，使之成为一种颇具吸引力的深度学习结构<ref name="STANCNN">{{cite web|url=http://ufldl.stanford.edu/tutorial/supervised/ConvolutionalNeuralNetwork/|title=Convolutional Neural Network|accessdate=2014-09-16|archive-date=2020-10-29|archive-url=https://web.archive.org/web/20201029000436/http://ufldl.stanford.edu/tutorial/supervised/ConvolutionalNeuralNetwork/|dead-url=no}}</ref>。
+
+==定义==
+{{Expand section|time=2020-03-15T14:49:42+00:00}}
+“卷积神经网络”表示在网络采用称为卷积的数学运算。卷积是一种特殊的线性操作。卷积网络是一种特殊的神经网络，它们在至少一个层中使用卷积代替一般矩阵乘法
+
+==概览==
+{{empty section}}
+
+==发展==
+{{Expand section|time=2020-10-05}}
+
+CNN是根据[[生物|生物]]的视觉处理过程来进行设计的。{{Citation needed}}
+
+=== 大脑中视觉皮层接收视觉信号的过程 ===
+[[Hubel|Hubel]]和[[Wiesel|Wiesel]]在20世纪50年代到20世纪60年代的研究发现，猫和猴子的视觉皮层中包含着能分别对某一小块视觉区域进行回应的神经元。当眼睛不动的时候，在一定区域内的视觉刺激能使单个神经元兴奋，那这个区域就称为这个神经元的感受范围。相邻的细胞具有相似且重叠的感受范围。{{Citation needed}}为了形成一张完整的视觉图像，整个视觉皮层上的神经元的感受范围的大小和位置呈现系统性的变化。{{Citation needed}}左脑和右脑分别对应其对侧的视野。{{Citation needed}}
+他们在其1968年的一篇论文中确定了大脑中有两种不同的基本视觉细胞：
+* 简单细胞
+* 复杂细胞
+
+Hubel和Wiesel还提出了这两种细胞用于模式识别任务的级联模型。
+
+==结构==
+
+===卷積層===
+卷積層可以产生一組平行的特徵圖（feature map），它通過在輸入圖像上滑動不同的卷積核並執行一定的運算而組成。此外，在每一個滑動的位置上，卷積核與輸入圖像之間會執行一個元素對應乘積並求和的運算以將感受野內的信息投影到特徵圖中的一個元素。這一滑動的過程可稱爲步幅 Z_s，步幅 Z_s 是控制輸出特徵圖尺寸的一個因素。卷積核的尺寸要比輸入圖像小得多，且重疊或平行地作用於輸入圖像中，一張特徵圖中的所有元素都是通過一個卷積核計算得出的，也即一張特徵圖共享了相同的權重和偏置項。
+
+===線性整流層===
+線性整流層（Rectified Linear Units layer, ReLU layer）使用[[线性整流函数|線性整流]]（Rectified Linear Units, ReLU）<math alt="function of x equals maximum between zero and x">f(x)=\max(0,x)</math>作为這一層神經的激勵函數（Activation function）。它可以增强判定函数和整个神经网络的非线性特性，而本身并不会改变卷积层。
+
+事实上，其他的一些函数也可以用于增强网络的非线性特性，如[[双曲正切函数|双曲正切函数]] <math alt="f x等于x的双曲正切">f(x)=\tanh(x)</math>, <math alt="f x等于x的双曲正切的绝对值">f(x)=|\tanh(x)|</math>，或者[[S函数|Sigmoid函数]]<math alt="f x 等于 1 加 e的负x次方的倒数">f(x)=(1+e^{-x} )^{-1}</math>。相比其它函数来说，ReLU函数更受青睐，这是因为它可以将神经网络的训练速度提升数倍<ref>{{cite journal|last=Krizhevsky|first=A.|author2=Sutskever, I.|author3=Hinton, G. E.|title=Imagenet classification with deep convolutional neural networks|journal=Advances in Neural Information Processing Systems|volume=1|year=2012|pages=1097–1105|url=http://papers.nips.cc/paper/4824-imagenet|deadurl=yes|archiveurl=https://web.archive.org/web/20150216025624/http://papers.nips.cc/paper/4824-imagenet|archivedate=2015-02-16|access-date=2016-11-20}}</ref>，而并不会对模型的泛化准确度造成显著影响。
+
+===池化層===
+[[File:Max_pooling.png|thumb]]
+
+池化（Pooling）是卷积神经网络中另一个重要的概念，它实际上是一种非线性形式的降采样。有多种不同形式的非线性池化函数，而其中“最大池化（Max pooling）”是最为常见的。它是将输入的图像划分为若干个矩形区域，对每个子区域输出最大值。
+
+直觉上，这种机制能够有效地原因在于，一个特征的精确位置远不及它相对于其他特征的粗略位置重要。池化层会不断地减小数据的空间大小，因此参数的数量和计算量也会下降，这在一定程度上也控制了[[过拟合|过拟合]]。通常来说，CNN的网络结构中的卷积层之间都会周期性地插入池化层。池化操作提供了另一种形式的平移不变性。因为卷积核是一种特征发现器，我们通过卷积层可以很容易地发现图像中的各种边缘。但是卷积层发现的特征往往过于精确，我们即使高速连拍拍摄一个物体，照片中的物体的边缘像素位置也不大可能完全一致，通过池化层我们可以降低卷积层对边缘的敏感性。
+
+池化层每次在一个池化窗口（depth slice）上计算输出，然后根据步幅移动池化窗口。下图是目前最常用的池化层，步幅为2，池化窗口为<math>2\times 2</math>的二维最大池化层。每隔2个元素从图像划分出<math>2 \times 2</math>的区块，然后对每个区块中的4个数取最大值。这将会减少75%的数据量。
+
+<math>f_{X,Y}(S)=\max_{a,b=0}^1S_{2X+a,2Y+b}.</math>
+
+除了最大池化之外，池化层也可以使用其他池化函数，例如“平均池化”甚至“[[Lp空间#.E9.95.BF.E5.BA.A6.E3.80.81.E8.B7.9D.E7.A6.BB.E4.B8.8E.E8.8C.83.E6.95.B0|L2-范数]]池化”等。过去，平均池化的使用曾经较为广泛，但是最近由于最大池化在实践中的表现更好，平均池化已经不太常用。
+
+由于池化层过快地减少了数据的大小，目前文献中的趋势是使用较小的池化滤镜，<ref>{{cite arXiv|title = Fractional Max-Pooling|eprint= 1412.6071|date = 2014-12-18|first = Benjamin|last = Graham|class= cs.CV}}</ref>甚至不再使用池化层。<ref>{{cite arXiv|title = Striving for Simplicity: The All Convolutional Net|eprint= 1412.6806|date = 2014-12-21|first = Jost Tobias|last = Springenberg|first2 = Alexey|last2 = Dosovitskiy|first3 = Thomas|last3 = Brox|first4 = Martin|last4 = Riedmiller|class= cs.LG}}</ref>
+
+RoI池化(Region of Interest)是最大池化的变体，其中输出大小是固定的，输入矩形是一个参数。<ref>{{Cite web
+  | last = Grel
+  | first = Tomasz
+  | title = Region of interest pooling explained
+  | website = deepsense.io
+  | date = 2017-02-28
+  | url = https://deepsense.io/region-of-interest-pooling-explained/
+  | access-date = <!-----5 April 2017----->
+  | language = en
+  | archive-url = https://web.archive.org/web/20170602070519/https://deepsense.io/region-of-interest-pooling-explained/
+  | archive-date = 2017-06-02
+  | dead-url = yes
+  }}</ref>
+
+池化层是基于 Fast-RCNN <ref name="rcnn">{{cite arXiv
+|title = Fast R-CNN
+|eprint= 1504.08083
+|date = 2015-09-27
+|first = Ross
+|last = Girshick
+|class= cs.CV}}</ref>架构的卷积神经网络的一个重要组成部分。
+
+===完全连接层===
+
+最后，在经过几个卷积和最大池化层之后，神经网络中的高级推理通过完全连接层来完成。就和常规的非卷积人工神经网络中一样，完全连接层中的神经元与前一层中的所有激活都有联系。因此，它们的激活可以作为[[仿射变换|仿射变换]]来计算，也就是先乘以一个矩阵然后加上一个偏差(bias)偏移量(向量加上一个固定的或者学习来的偏差量)。
+
+==应用==
+===影像辨識===
+卷积神经网络通常在影像辨識系统中使用。
+
+===視訊分析===
+相比影像辨識问题，視訊分析要难许多。CNN也常被用于这类问题。
+
+===自然语言处理===
+卷积神经网络也常被用于[[自然语言处理|自然语言处理]]。 CNN的模型被证明可以有效的处理各种自然语言处理的问题，如语义分析<ref>{{cite arXiv|title = A Deep Architecture for Semantic Parsing|eprint= 1404.7296|date = 2014-04-29|first = Edward|last = Grefenstette|first2 = Phil|last2 = Blunsom|first3 = Nando|last3 = de Freitas|first4 = Karl Moritz|last4 = Hermann|class= cs.CL}}</ref>、搜索结果提取<ref>{{Cite web|title = Learning Semantic Representations Using Convolutional Neural Networks for Web Search – Microsoft Research|url = http://research.microsoft.com/apps/pubs/default.aspx?id=214617|website = research.microsoft.com|accessdate = 2015-12-17|archive-date = 2016-06-18|archive-url = https://web.archive.org/web/20160618155538/http://research.microsoft.com/apps/pubs/default.aspx?id=214617|dead-url = no}}</ref>、句子建模<ref>{{cite arXiv|title = A Convolutional Neural Network for Modelling Sentences|eprint= 1404.2188|date = 2014-04-08|first = Nal|last = Kalchbrenner|first2 = Edward|last2 = Grefenstette|first3 = Phil|last3 = Blunsom|class= cs.CL}}</ref> 、分类<ref>{{cite arXiv|title = Convolutional Neural Networks for Sentence Classification|eprint= 1408.5882|date = 2014-08-25|first = Yoon|last = Kim|class= cs.CL}}</ref>、预测<ref>Collobert, Ronan, and Jason Weston. "A unified architecture for natural language processing: Deep neural networks with multitask learning."Proceedings of the 25th international conference on Machine learning. ACM, 2008.</ref>、和其他传统的NLP任务<ref>{{cite arXiv|title = Natural Language Processing (almost) from Scratch|eprint= 1103.0398|date = 2011-03-02|first = Ronan|last = Collobert|first2 = Jason|last2 = Weston|first3 = Leon|last3 = Bottou|first4 = Michael|last4 = Karlen|first5 = Koray|last5 = Kavukcuoglu|first6 = Pavel|last6 = Kuksa|class= cs.LG}}</ref>
+等。
+
+===药物发现===
+卷积神经网路已在药物发现中使用。卷积神经网络被用来预测的分子与蛋白质之间的相互作用，以此来寻找靶向位点，寻找出更可能安全和有效的潜在治疗方法。
+
+===围棋===
+{{Seealso|AlphaGo李世乭五番棋}}
+卷积神经网络在计算机围棋领域也被使用。2016年3月，[[AlphaGo|AlphaGo]]对战[[李世乭|李世乭]]的比赛，展示了深度学习在围棋领域的重大突破。
+
+==微调（fine-tuning）==
+卷积神经网络（例如Alexnet、VGG网络）在网络的最后通常为[[softmax|softmax]]分类器。微调一般用来调整softmax分类器的分类数。例如原网络可以分类出2种图像，需要增加1个新的分类从而使网络可以分类出3种图像。微调（fine-tuning）可以留用之前训练的大多数参数，从而达到快速训练收敛的效果。例如保留各个卷积层，只重构卷积层后的全连接层与softmax层即可。
+
+==經典模型==
+*[[LeNet|LeNet]]
+
+*[[AlexNet|AlexNet]]
+
+*[[VGG|VGG]]
+
+*[[GoogLeNet|GoogLeNet]]
+
+*[[ResNet|ResNet]]
+
+*[[DenseNet|DenseNet]]
+
+==可用包==
+* [https://www.ronnie.ai roNNie] {{Wayback|url=https://www.ronnie.ai/ |date=20201128045719 }}: 是一個簡易入門級框架,使用Tensorflow 計算層.可於python下載 pip3 ronnie
+* [[Caffe|Caffe]]: Caffe包含了CNN使用最广泛的库。它由伯克利视觉和学习中心（BVLC）研发，拥有比一般实现更好的结构和更快的速度。同时支持[[CPU|CPU]]和[[GPU|GPU]]计算，底层由[[C++|C++]]实现，并封装了Python和[[MATLAB|MATLAB]]的接口。
+* Torch7（www.torch.ch）
+* OverFeat
+* Cuda-convnet
+* MatConvnet
+* [[Theano|Theano]]：用[[Python|Python]]实现的神经网络包<ref>{{Cite web |url=http://deeplearning.net/software/theano/ |title=深度网络：Theano项目主页。 |accessdate=2015-04-24 |archive-date=2020-11-08 |archive-url=https://web.archive.org/web/20201108233358/http://www.deeplearning.net/software/theano/ |dead-url=yes }}</ref>
+* [[TensorFlow|TensorFlow]]
+* Paddlepaddle([http://www.paddlepaddle.org/ www.paddlepaddle.org] {{Wayback|url=http://www.paddlepaddle.org/ |date=20201208055750 }})
+* [[Keras|Keras]]
+* [[PyTorch|PyTorch]]
+
+==参考==
+{{reflist|2}}
+
+[[Category:人工智能|Category:人工智能]]
+[[Category:人工神经网络|Category:人工神经网络]]

@@ -1,0 +1,77 @@
+'''符号执行'''（{{Lang-en|symbolic execution}}）是一种[[计算机科学|计算机科学]]领域的[[程序分析|程序分析]]技术，通过采用抽象的符号代替精确值作为程序输入变量，得出每个路径抽象的输出结果。这一技术在硬件、底层程序测试中有一定的应用<ref>{{Cite web|title=Dynamic symbolic execution - Visual Studio|url=https://docs.microsoft.com/en-us/visualstudio/test/intellitest-manual/input-generation|access-date=2021-05-09|last=Mikejo5000|work=docs.microsoft.com|language=en-us}}</ref>，能够有效的发现程序中的漏洞。<ref>{{Cite journal|title=符号执行研究综述|author=叶志斌，严波|journal=计算机科学|issue=6A|year=2018|volume=45|page=28-36}}</ref>
+
+这一思想最初由[[IBM|IBM]]托马斯·J·华森研究中心的詹姆斯·C.金（James C. King） 于1976年6月在论文''Symbolic Execution and Program Testing''中提出<ref>{{Cite journal|title=Symbolic Execution and Program Testing|author=James C. Kings|url=http://scholar.google.com.sg/scholar?q=symbolic+execution+King&hl=en&as_sdt=0&as_vis=1&oi=scholart|journal=Communications  of  the ACM|year=1976|volume=19|page=385-394}}</ref>，文中“解析程序的路径后，用符号模拟通过路径并获得输出”的方法如今被称为“经典符号执行”。由于20世纪80年代的研究追求分析的完备性，而大型程序的路径复杂，不可能完全[[图的遍历|遍历]]，符号执行这一研究领域遇冷。21世纪后，该领域研究有了新的进展：2006年，克里斯蒂安·卡达尔（Cristian Cadar）在论文中设计了一种“先进行符号执行，后根据符号执行结果生成测试用例”的“执行生成测试”技术<ref>{{Cite journal|title=EXE: A system for automatically generating inputs of death using symbolic execution|author=Cristian Cadar, Vijay Ganesh, Peter Pawlowski, David Dill, Dawson Engler|url=https://scholar.google.com.sg/scholar?oi=bibs&cluster=2341008490621174390&btnI=1&hl=en|journal=Proceedings of the ACM Conference on Computer and Communications Security|year=2006}}</ref>，并随后将其发展为应用在GNU/Linux内核错误检查中的KLEE<ref>{{Cite journal|title=KLEE: Unassisted and automatic generation of high-coverage tests for complex systems programs|author=Cristian Cadar, Daniel Dunbar, Dawson Engler|url=https://static.usenix.org/events/osdi08/tech/full_papers/cadar/cadar.pdf|journal=USENIX conference on Operating Systems Design and Implementation (OSDI)|year=2008|page=209-224|access-date=2021-05-09|archive-date=2022-02-03|archive-url=https://web.archive.org/web/20220203115237/https://static.usenix.org/events/osdi08/tech/full_papers/cadar/cadar.pdf|dead-url=no}}</ref>；2007年，库希克·森（Koushik Sen）在当年的软件工程自动化（Automated Software Engineering）会议提出将符号执行和实际执行结合的“混合执行（Concolic testing）”方法<ref>{{Cite journal|title=Concolic testing|url=https://doi.org/10.1145/1321631.1321746|last=Sen|first=Koushik|date=2007-11-05|journal=Proceedings of the twenty-second IEEE/ACM international conference on Automated software engineering|publisher=Association for Computing Machinery|doi=10.1145/1321631.1321746|series=ASE '07|location=Atlanta, Georgia, USA|pages=571–572|isbn=978-1-59593-882-4}}</ref>；2009年，维塔利·奇波诺夫（Vitaly Chipounov）提出“选择性符号执行”方法，通过选择“对程序设计者有意义”的执行分支进行符号执行测试来提高对大型程序应用符号执行测试的可行性。
+
+[[符号模拟技术|符号模拟技术]]（{{lang|en|symbolic simulation}}）则把类似的思想用于电路分析<ref>{{Cite journal|title=Symbolic simulation—techniques and applications|url=https://doi.org/10.1145/123186.128296|last=Bryant|first=Randal E.|date=1991-01-03|journal=Proceedings of the 27th ACM/IEEE Design Automation Conference|publisher=Association for Computing Machinery|doi=10.1145/123186.128296|series=DAC '90|location=Orlando, Florida, USA|pages=517–521|isbn=978-0-89791-363-8}}</ref>；[[符号计算|符号计算]]（{{lang|en|Symbolic computation}}）则用于数学[[表达式分析|表达式分析]]<ref>{{Cite web|title=Symbolic Computation {{!}} Subgroup {{!}} Department of Mathematics {{!}} NC State University|url=https://math.sciences.ncsu.edu/people/smsulli2/|access-date=2021-05-09|work=math.sciences.ncsu.edu|language=en|archive-date=2022-01-05|archive-url=https://web.archive.org/web/20220105200413/https://math.sciences.ncsu.edu/people/smsulli2/|dead-url=no}}</ref>。
+
+== 符号执行引擎 ==
+符号执行引擎是符号执行技术的实现产物，可以用于对程序进行符号执行。一个基本的符号执行引擎由下列部分组成：
+
+# 状态信息存储器：存储下列符号执行所需状态信息。
+## <math>pc</math>：指向需要处理的下一条程序语句,其可以是赋值语句、条件分支语句或者是跳转语句；
+## <math>\pi</math>：指代路径约束信息,表示为执行到程序特定语句需要经过的条件分支，以及各分支处关于符号值<math>a_i</math>的表达式;
+## <math>\sigma</math>：表示与程序变量相关的符号值集.
+# 语句执行器：执行每一条语句来获取该程序的控制流程。
+# 约束解算器（{{Lang-en|constraint solver}}）：用于在一条路径的符号执行结束后解算路径约束与符号执行结果，为开发者提供一个可供实际执行（{{Lang-en|concret executino}}）的值
+
+== 实例 ==
+请看下列代码：<syntaxhighlight lang="c" line="1">
+int f() {
+  y = read();
+  z = y * 2;
+  if(z == 12){
+    fail();
+  }else{
+    printf("OK");
+  }
+}
+
+</syntaxhighlight>实际执行时，该方法读入一个值存储于变量'''<code>y</code>'''，当'''<code>y</code>'''的值为6时，该方法调用<code>fail()</code>，反之打印<code>OK</code>。
+
+在符号执行时，程序读入一个符号值{{NoteTag|事实上，大多数程序不接受符号输入。在实现符号执行时，经典符号执行会通过程序分析技术得出程序的控制流程图，然后根据流程图得出符号执行结果。|name=注1}}<code>λ</code>，并将 <code>λ * 2</code> 赋值给 <code>z</code>。当运行到 <code>if</code> 条件判断语句，由于无法判断 <code>λ * 2 == 12</code>是否为真，符号执行引擎将执行“为真”与“为假”两种分支。执行时，引擎将判断语句处的程序环境与路径约束复制一份并应用于两条分支。本例中， <code>fail()</code> 分支的路径约束指的是判断条件 <code>λ * 2 == 12</code> ，而<code>print("OK")</code>分支的路径约束为 <code>λ * 2 != 12</code>。路径结束时，约束解算器计算并得出一个对此路径有意义（即能够完成该分支的）输入变量实际值。该值可供帮助开发者复现错误时进行实际执行使用。本例中，<code>fail()</code>分支的一个约束结算结果是<code>6</code>。
+
+== 局限性 ==
+
+=== 路径爆炸 ===
+大多数符号执行方法不适用于大型程序：随着程序规模的扩大，程序中有意义的路径成指数级扩大{{NoteTag|当程序中每增加一个流程控制语句（如if），程序增加2倍的路径。|name=注2}}。有些程序中存在无尽循环或递归调用，这更大大增加了有意义路径，提高了符号执行难度。<ref>{{cite book|last=Anand|first=Saswat|author2=Patrice Godefroid|author3=Nikolai Tillmann|chapter=Demand-Driven Compositional Symbolic Execution|title=Tools and Algorithms for the Construction and Analysis of Systems|year=2008|volume=4963|pages=367–381|doi=10.1007/978-3-540-78800-3_28|series=Lecture Notes in Computer Science|isbn=978-3-540-78799-0}}</ref>  为解决此问题，马健强（音译，Kin-Keung Ma）等人提出使用启发式路径搜索算法提高代码覆盖率<ref>{{Cite journal|title=Directed symbolic execution|url=https://dl.acm.org/doi/10.5555/2041552.2041563|last=Ma|first=Kin-Keung|last2=Phang|first2=Khoo Yit|date=2011-09-14|journal=Proceedings of the 18th international conference on Static analysis|publisher=Springer-Verlag|doi=10.5555/2041552.2041563|series=SAS'11|location=Venice, Italy|pages=95–111|isbn=978-3-642-23701-0|last3=Foster|first3=Jeffrey S.|last4=Hicks|first4=Michael|access-date=2021-05-09|archive-date=2022-01-21|archive-url=https://web.archive.org/web/20220121140038/https://dl.acm.org/doi/10.5555/2041552.2041563|dead-url=no}}</ref>；马特·斯塔特斯（Matt Staats）等人提出并行执行独立路径的方法来降低符号执行耗时<ref>{{Cite journal|title=Parallel Symbolic Execution for Structural Test Generation∗|author=Matt Staats， Corina Pasareanu|url=https://conservancy.umn.edu/bitstream/handle/11299/217417/p183-staats.pdf?sequence=1&isAllowed=y|journal=International Symposium on Software Testing and Analysis|year=2010|access-date=2021-05-09|archive-date=2021-05-10|archive-url=https://web.archive.org/web/20210510142851/https://conservancy.umn.edu/bitstream/handle/11299/217417/p183-staats.pdf?sequence=1&isAllowed=y|dead-url=no}}</ref>； 库兹涅佐夫等人则提出了合并相似分支的方法缓解路径爆炸问题<ref>{{Cite book|chapter=Efficient State Merging in Symbolic Execution|last1=Kuznetsov|last4=Candea|first4=George|last3=Bucur|first3=Stefan|last2=Kinder|first2=Johannes|first1=Volodymyr|publisher=ACM|doi=10.1145/2254064.2254088|pages=193–204|isbn=978-1-4503-1205-9|location=New York, NY, USA|date=2012-01-01|title=Proceedings of the 33rd ACM SIGPLAN Conference on Programming Language Design and Implementation}}</ref>。
+
+=== 待测程序输入变量的特点 ===
+由于利用路径分析进行程序分析，对于输入变量范围大，但程序分支较少的程序，符号执行方法比对输入变量进行分析的方法（如动态程序分析）具有较强优势。但是对于输入变量变化范围小，程序分支多的程序，符号执行的效率较低。
+
+=== 内存地址存在别名 ===
+由于符号执行根据内存地址分析变量及其变化，对于有内存地址别名{{NoteTag|当有多个变量指向同一个内存地址时，我们称这些变量的变量名为该内存地址的别名|name=注3}}的程序，符号执行引擎将难以区分不同别名，因此执行结果可能有偏差。<ref name="DeMillo1991">{{Cite journal|title=Constraint-Based Automatic Test Data Generation|first1=Rich|last2=Offutt|first2=Jeff|date=1991-09-01|journal=IEEE Transactions on Software Engineering|issue=9|doi=10.1109/32.92910|volume=17|pages=900–910|last1=DeMillo}}</ref>
+
+=== 数组的处理 ===
+由于数组是大量不同值（如内存地址）的集合，符号执行引擎需要选择将数组作为一个单独的完整变量处理还是将每一个数组元素作为单独的变量处理。由于引擎无法得知程序中每个数组的意义{{NoteTag|1=比如某程序中存在两个数组：数组a是某班级全体学生的名单，一经定义便不会发生改变；数组b是某个学生每次考试的成绩，每次考试该数组元素会+1。此种情况下，数组a应当被视作“一个完整变量”，而数组b的每个元素都需要被视作“一个单独变量”|name=注4}}，动态确定每个数组的类型十分具有挑战性。<ref name="DeMillo1991" />
+
+=== 存在运行环境交互 ===
+当某一程序（如下代码所示）与超出符号执行引擎控制的运行环境有交互（如进行系统调用并获取系统调用返回信息等）时，符号执行将难以完成：<syntaxhighlight lang="c" line="1">
+int main()
+{
+  FILE *fp = fopen("doc.txt");
+  ...
+  if (condition) {
+    fputs("some data", fp);
+  } else {
+    fputs("some other data", fp);
+  }
+  ...
+  data = fgets(..., fp);
+}
+</syntaxhighlight>该程序将打开一个文件，并根据条件将不同类型的数据写入该文件，然后回读已写入的数据。 从理论上讲，符号执行引擎将在第5行产生两个路径并在第11行返回与在<code>condition</code>变量中的值一致的数据。然而文件操作被实现为内核中的系统调用，符号执行工具无法控制其行为。 解决这一挑战的主要方法是：
+
+'''在符号执行过程中直接执行系统调用：'''这种方法的优点是实现起来很简单；缺点是这种调用“并不是符号执行”，其返回内容是实际运行的真实值。
+
+'''对运行环境建模：''' 引擎使用模型模拟系统调用，其优点是，能够得到正确的符号执行结果；缺点是需要实现和维护许多可能用到的系统调用模型。 KLEE<ref>{{Cite journal|title=KLEE: Unassisted and Automatic Generation of High-coverage Tests for Complex Systems Programs|url=http://dl.acm.org/citation.cfm?id=1855741.1855756|first1=Cristian|last2=Dunbar|first2=Daniel|date=2008-01-01|journal=Proceedings of the 8th USENIX Conference on Operating Systems Design and Implementation|series=OSDI'08|pages=209–224|last3=Engler|first3=Dawson|last1=Cadar|access-date=2021-05-09|archive-date=2018-12-01|archive-url=https://web.archive.org/web/20181201063508/https://dl.acm.org/citation.cfm?id=1855741.1855756|dead-url=no}}</ref>、Cloud9和Otter<ref>{{cite web|title=MultiOtter: Multiprocess Symbolic Execution|url=https://www.cs.umd.edu/~mwh/papers/multiotter.pdf|first1=Jonathan|last1=Turpie|first2=Elnatan|last2=Reisner|first3=Jeffrey|last3=Foster|first4=Michael|last4=Hicks|access-date=2021-05-09|archive-date=2020-07-20|archive-url=https://web.archive.org/web/20200720142115/https://www.cs.umd.edu/~mwh/papers/multiotter.pdf|dead-url=no}}</ref> 等工具通过实现文件系统操作、套接字、IPC等模型采用了这种方法。
+
+'''创建整个运行环境的状态分支：'''基于虚拟机技术的符号执行工具通过创建整个VM状态的分支来解决环境问题。比如S2E<ref>{{Cite journal|title=The S2E Platform: Design, Implementation, and Applications|first1=Vitaly|last2=Kuznetsov|first2=Volodymyr|date=2012-02-01|journal=ACM Trans. Comput. Syst.|issue=1|doi=10.1145/2110356.2110358|volume=30|pages=2:1–2:49|issn=0734-2071|last3=Candea|first3=George|last1=Chipounov}}</ref>中，每个符号执行状态都是一个独立的虚拟机快照。这种方法的空间复杂度较高，对内存的消耗很大。
+
+== 注释 ==
+{{NoteFoot}}
+
+==参考文献==
+{{reflist|30em|refs=
+<ref name="Schwartz" >Schwartz, Edward J., Thanassis Avgerinos, and David Brumley. "All you ever wanted to know about dynamic taint analysis and forward symbolic execution （but might have been afraid to ask）." Security and Privacy （SP）, 2010 IEEE Symposium on. IEEE, 2010.
+</ref>
+}}
+[[Category:程序分析|Category:程序分析]]

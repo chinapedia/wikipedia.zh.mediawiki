@@ -1,0 +1,106 @@
+{{distinguish|OCaml}}
+{{lowercase title|occam}}{{NoteTA|G1=IT}}
+{{Infobox programming language
+| name = occam
+| logo = File:1983 1988 Trademark occam and occam 2 INMOS Limited.jpg
+| logo size = 200px
+| paradigm = [[指令式编程|指令式]], [[过程式编程|过程式]], [[并发计算|并发]]
+| designer = {{en-link|David May|David May (computer scientist)||David May}}
+| developer = {{en-link|Inmos}}
+| released = {{Start date and age|1983}}
+| latest release version = 2.1 (官方), 2.5 (非官方), 3 (不完全实现)
+| latest release date = {{Start date and age|1994}}
+| typing = 
+| implementations = 
+| dialects = {{en-link|occam-π}}
+| influenced by = [[通信顺序进程|通信顺序进程]]
+| influenced = {{en-link|Ease|Ease (programming language)}}, [[Go|Go]], [[Handel-C|Handel-C]], [[XC_(编程语言)|XC]]
+}}
+'''occam'''，一種[[并发计算|并发]]程式語言，主要基於[[交談循序程式|交談循序程式]]的[[进程演算|程式代數]]<ref name="oc21refman">{{cite book |author=<!--Must be person--> |author-link=Inmos |url=http://www.wotug.org/occam/documentation/oc21refman.pdf |title=occam 2.1 Reference Manual |publisher=SGS-Thomson Microelectronics Ltd |date=1995-05-12 |access-date=2020-05-05 |archive-date=2020-08-01 |archive-url=https://web.archive.org/web/20200801234838/http://www.wotug.org/occam/documentation/oc21refman.pdf |dead-url=no }} Inmos document 72 occ 45 03</ref>，以及它的許多特色而實作。它的名稱來自於[[奥卡姆的威廉|奥卡姆的威廉]]提出的[[奥卡姆剃刀|奥卡姆剃刀]]（Occam's razor）原則。
+
+occam是一種類似於Pascal的[[指令式編程|指令式]][[过程式编程|过程式]][[編程語言|編程語言]]。這個語言於1983年出現，由英國計算機科學家{{en-link|David May|David May (computer scientist)||David May}}，以及{{en-link|Inmos}}公司的科學家，在[[東尼·霍爾|東尼·霍爾]]提供顧問意見後，共同研發而成。
+
+==概述==
+在下列例子中，缩进和格式对于分析代码是关键性的：表达式以行结束来终止，表达式的列表需要在缩进的相同水平上。这个特征叫做[[越位规则|越位规则]]，也能在其他语言比如[[Haskell|Haskell]]和[[Python|Python]]中见到。occam有指令式语言的基本要素和常规构造：变量，数据类型，表达式，条件构造<code>IF</code>，选择构造<code>CASE</code>，重复构造<code>WHILE</code>，作为命名进程的[[子程序|过程]]，和作为值过程的[[函数|函数]]，过程不可以[[递归|递归]]。
+
+在进程之间的通信使用命名的[[通道_(编程)|通道]]完成的。通道是有类型的，定义了两个进程间的[[通信协议|通信协议]]，可以作为参数传递给过程，可以建立通道的[[阵列|阵列]]。一个进程通过<code>!</code>向一个通道输出数据，而另一个进程用<code>?</code>从它输入数据。输入和输出不能进行，直到另一端已经准备好接受或提供数据。进程在不能进行的情况下，经常称呼为它[[阻塞_(计算)|阻塞]]在这个通道之上，它不会阻塞其他独立进程的运行。阻塞行为不会是自旋（spin）或轮询（poll），而会是其他机制如等待（wait）、挂起（hang）或让位（yield）。下举一例，其中<code>c</code>是变量：
+
+  keyboard ? c
+  screen ! c
+
+occam还有对应[[通信顺序进程|通信顺序进程]]的如下构造和机制：
+
+===SEQ===
+<code>SEQ</code> 顺序构造，介入要被顺序求值的表达式的一个列表。顺序执行不是隐含的，大多数其他语言无这种显式构造。例如：
+
+  SEQ
+    x := x + 1
+    y := x * x
+
+===ALT===
+<code>ALT</code>{{en-link|交替 (形式语言理论)|Alternation (formal language theory)|交替}}（alternation）构造，指定有守卫的命令的一个列表。[[卫语句|守卫]]（guard）起源于[[Edsger_W._Dijkstra|Edsger W. Dijkstra]]在1976年提出的[[守卫命令语言|守卫命令语言]]<ref>Edsger W. Dijkstra, [https://dl.acm.org/doi/10.1145/360933.360975 Guarded commands, nondeterminacy and formal derivation of programs.] {{Wayback|url=https://dl.acm.org/doi/10.1145/360933.360975 |date=20220414134708 }} August 1975. Communications of the ACM.<br />{{cite book |first=Edsger W. |last=Dijkstra |title=A Discipline of Programming |url=https://archive.org/details/disciplineofprog0000dijk |publisher=Prentice Hall |location= |year=1976 |isbn=978-0132158718 }}</ref>，是一个布尔条件和一个输入表达式的组合（二者都是可选的）。其条件为真并且输入通道已经就绪的守卫是成功的。选择一个成功的交替者（alternative）来执行，如果没有成功者则等待；如果有多个成功，语言不明确规定会执行其中哪一个，这不同于选择构造。例如：
+
+  ALT
+    count1 < 100 & c1 ? data
+      SEQ
+        count1 := count1 + 1
+        merged ! data
+    count2 < 100 & c2 ? data
+      SEQ
+        count2 := count2 + 1
+        merged ! data
+    status ? request
+      SEQ
+        out ! count1
+        out ! count2
+
+它将从通道c1或c2读取数据（哪个就绪了都行）并把它传递到叫作合并的通道。如果countN达到100，从对应通道的读取将停用。在叫作状态的通道读取要求，将通过输出这些计数来回答。
+
+===PAR===
+<code>PAR</code> 并行（parallel）构造，开始一个可以被并发（concurrent）求值的表达式的列表。并行构造可溯源至[[Edsger_W._Dijkstra|Edsger W. Dijkstra]]在1965年提出的“协同顺序进程”（cooperating sequential processes）<ref>Edsger W. Dijkstra, [https://dl.acm.org/doi/10.1145/360933.360975 Cooperating sequential processes] {{Wayback|url=https://dl.acm.org/doi/10.1145/360933.360975 |date=20220414134708 }}.January 1965.Technical Report EWD-123.</ref>，例如：
+
+  PAR
+    p()
+    q()
+
+===复制===
+构造<code>SEQ IF ALT PAR</code>，都是可以复制的。复制的<code>PAR</code>的例子：
+
+  PAR
+    farmer()
+    PAR i = 0 FOR 4
+      worker(i)
+
+它产生5个并发的求值，等价于：
+
+  PAR
+    farmer()
+    PAR
+      worker(0)
+      worker(1)
+      worker(2)
+      worker(3)
+
+==参见==
+*[[XC_(编程语言)|XC (编程语言)]]，它基于occam但具有C风格语法。
+*[[Handel-C|Handel-C]]
+*[[并发计算#並行性程式語言|并发编程语言]]
+
+==引用==
+{{Reflist|2}}
+
+==延伸阅读==
+*{{cite book |last1=Roscoe |first1=Andrew William |author-link1=Bill Roscoe |last2=Hoare |first2=Charles Antony Richard |author-link2=Tony Hoare |title=The Laws of Occam Programming |year=1986 |publisher=Programming Research Group, Oxford University |url=https://www.sciencedirect.com/science/article/pii/0304397588900497 |access-date=2020-05-05 |archive-date=2012-12-07 |archive-url=https://web.archive.org/web/20121207213443/http://www.sciencedirect.com/science/article/pii/0304397588900497 |dead-url=no }}
+
+== 外部链接 ==
+* [http://www.wotug.org/occam/ Information, compilers, editors and utilities at the WoTUG occam pages]{{Wayback|url=http://www.wotug.org/occam/ |date=20190915072724 }}
+* [http://www.wotug.org/parallel/occam/ Compilers, documentation, examples, projects and utilities at the Internet Parallel Computing Archive]{{Wayback|url=http://www.wotug.org/parallel/occam/ |date=20190915045059 }} (no longer maintained)
+* [http://www.transputer.net/obooks/obooks.asp Occam books on Transputer.net]{{Wayback|url=http://www.transputer.net/obooks/obooks.asp |date=20200206144954 }}
+* [http://www.cs.kent.ac.uk/projects/ofa/kroc/ The occam-pi language]{{Wayback|url=http://www.cs.kent.ac.uk/projects/ofa/kroc/ |date=20200715050231 }}.
+* [http://projects.cs.kent.ac.uk/projects/tock/trac/ Tock occam compiler]{{Wayback|url=http://projects.cs.kent.ac.uk/projects/tock/trac/ |date=20090924060319 }} – (translator from occam to C from Kent) a Haskell-based compiler for occam and related languages.
+
+{{FOLDOC}}
+{{程序设计语言}}
+[[Category:并发编程语言|Category:并发编程语言]]
+[[Category:过程式编程语言|Category:过程式编程语言]]
+[[Category:1983年建立的程式語言|Category:1983年建立的程式語言]]

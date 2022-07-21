@@ -1,0 +1,42 @@
+'''結構相異性'''(structural dissimilarity)，有鑑於最小平方誤差(Mean Square error)和 峰值信噪比(Peak signal-to-noise ratio)無法完全反應人類視覺上所感受的誤差，在 2004 年被提出來的新的誤差測量方法。
+
+==定義==
+
+假設有兩個信號x與y，它們的結構相異性<ref> Jian-Jiun Ding, Time frequency analysis and wavelet transform class note,the Department of Electrical Engineering, National Taiwan University (NTU), Taipei, Taiwan, 2007. </ref>為
+<math>DSSIM(x,y)=\frac{1}{1-SSIM(x,y)}</math>
+
+其中<math>SSIM(x,y)</math>為x與y的結構相似性
+
+==結構相似性<ref> Zhou Wang, Alan C. Bovik, Hamid R. Sheikh, and Eero P. Simoncelli, "Image quality assessment: from error visibility to structural similairty," IEEE Transactions on Image Processing, vol. 13, no. 4, pp. 600−612, Apr. 2004. </ref>==
+
+兩者的結構相似性定義為：
+
+<math>\text{SSIM}(\mathbf{x},\mathbf{y})=[l(\mathbf{x},\mathbf{y})]^\alpha[c(\mathbf{x},\mathbf{y})]^\beta[s(\mathbf{x},\mathbf{y})]^\gamma</math>，
+<br><br>
+<math>l(\mathbf{x},\mathbf{y})=\frac{2\mu_x\mu_y+C_1}{\mu_x^2+\mu_y^2+C_1}</math>，<math>c(\mathbf{x},\mathbf{y})=\frac{2\sigma_x\sigma_y+C_2}{\sigma_x^2+\sigma_y^2+C_2}</math>，<math>s(\mathbf{x},\mathbf{y})=\frac{\sigma_{xy}+C_3}{\sigma_x\sigma_y+C_3}</math>。
+
+其中，<math>l(\mathbf{x},\mathbf{y})</math>比較<math>\mathbf{x}</math>和<math>\mathbf{y}</math>的亮度（[[亮度|luminance]]），<math>c(\mathbf{x},\mathbf{y})</math>比較<math>\mathbf{x}</math>和<math>\mathbf{y}</math>的[[對比度|對比度]]，<math>s(\mathbf{x},\mathbf{y})</math>比較<math>\mathbf{x}</math>和<math>\mathbf{y}</math>的結構（structure），<math>\alpha>0</math>，<math>\beta>0</math>，<math>\gamma>0</math>，為調整<math>l(\mathbf{x},\mathbf{y})</math>、<math>c(\mathbf{x},\mathbf{y})</math>、<math>s(\mathbf{x},\mathbf{y})</math>相對重要性的參數，<math>\mu_x</math>及<math>\mu_y</math>、<math>\sigma_x</math>及<math>\sigma_y</math>分別為<math>\mathbf{x}</math>和<math>\mathbf{y}</math>的[[平均值|平均值]]和[[標準差|標準差]]，<math>\sigma_{xy}</math>為<math>\mathbf{x}</math>和<math>\mathbf{y}</math>的[[共變異數|共變異數]]，<math>C_1</math>、<math>C_2</math>、<math>C_3</math>皆為常數，用以維持<math>l(\mathbf{x},\mathbf{y})</math>、<math>c(\mathbf{x},\mathbf{y})</math>、<math>s(\mathbf{x},\mathbf{y})</math>的穩定。
+
+結構相似性指標的值越大，代表兩個信號的相似性越高。
+
+若使用相同的兩張圖片去做SSIM運算，也就是說<math>\mu_x=\mu_y</math>且<math>\sigma_x=\sigma_y</math>，可以得到
+
+<math>\text{SSIM}(\mathbf{x},\mathbf{x})=\frac{2\mu_x^2+C_1}{\mu_x^2+\mu_x^2+C_1} \times \frac{2\sigma_x^2+C_2}{\sigma_x^2+\sigma_x^2+C_2} \times \frac{\sigma_{xx}+C_3}{\sigma_x\sigma_x+C_3}=1</math>
+
+實際使用時，簡化起見，一般會將參數設為<math>\alpha=\beta=\gamma=1</math>及<math>C_3=C_2/2</math>，得到：
+
+<math>\text{SSIM}(\mathbf{x},\mathbf{y})=\frac{(2\mu_x\mu_y+C_1)(2\sigma_{xy}+C_2)}{(\mu_x^2+\mu_y^2+C_1)(\sigma_x^2+\sigma_y^2+C_2)}</math>。
+
+在計算兩張影像的結構相似性指標時，會開一個局部性的視窗，一般為<math>N</math>×<math>N</math>的小區塊，計算出視窗內信號的結構相似性指標，每次以像素為單位移動視窗，直到整張影像每個位置的局部結構相似性指標都計算完畢。將全部的局部結構相似性指標平均起來即為兩張影像的結構相似性指標。
+
+==結構相異性(DSSIM)的範圍==
+
+當DSSIM越大時，代表兩張圖片越接近，SSIM越接近1，DSSIM的值也越大，當SSIM=1，也就是DSSIM趨近無限時，和原始視訊檔案完全一致，若SSIM>=0.98就是難以與原始視訊檔案分辨區別，而SSIM=0.95的時候大多數人都會對畫面滿意，這個數值可以認為是及格的畫面。SSIM=0.90的時候意味著瑕疵可能要比0.95多一倍，肉眼就會察覺到明顯的畫面劣化，因此低於這個數值時，就可以判定為沒有實際觀賞價值。
+
+==參考資料==
+{{reflist}}
+
+==外部連結==
+* https://cg2010studio.wordpress.com/2013/01/07/%E7%B5%90%E6%A7%8B%E7%9B%B8%E4%BC%BC%E6%80%A7-structural-similarity/ {{Wayback|url=https://cg2010studio.wordpress.com/2013/01/07/%E7%B5%90%E6%A7%8B%E7%9B%B8%E4%BC%BC%E6%80%A7-structural-similarity/ |date=20150915085550 }}
+
+[[Category:误差理论|Category:误差理论]]

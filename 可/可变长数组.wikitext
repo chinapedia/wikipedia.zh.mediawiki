@@ -1,0 +1,94 @@
+{{NoteTA
+|G1 = IT
+}}
+
+'''可变长数组'''是指在[[计算机程序设计|计算机程序设计]]中，[[数组|数组]]对象的长度在[[运行时|运行时]]（而不是[[编译|编译]]时）确定。<ref>{{Cite web |url=http://docs.cray.com/books/004-2179-001/html-004-2179-001/z893434830malz.html |title=存档副本 |access-date=2014-12-19 |archive-date=2018-04-03 |archive-url=https://web.archive.org/web/20180403032433/http://docs.cray.com/books/004-2179-001/html-004-2179-001/z893434830malz.html |dead-url=no }}</ref>
+
+支持可变长数组的程序设计语言有：[[Ada|Ada]], [[Algol_68|Algol 68]] (for non-flexible rows), [[APL|APL]], [[C99|C99]] (以及[[C11|C11]]<ref>http://pic.dhe.ibm.com/infocenter/ratdevz/v8r0/topic/com.ibm.xlcpp111.aix.doc/language_ref/variable_length_arrays.html</ref><ref>{{Cite web |url=http://gcc.gnu.org/onlinedocs/gcc/Variable-Length.html |title=存档副本 |access-date=2014-12-19 |archive-date=2020-12-05 |archive-url=https://web.archive.org/web/20201205155606/https://gcc.gnu.org/onlinedocs/gcc/Variable-Length.html |dead-url=no }}</ref><ref>ISO 9899:2011 Programming Languages - C 6.7.6.2 4</ref> ) ，[[C_Sharp|C#]] <ref>作为unsafe-mode stack-allocated arrays</ref>, [[COBOL|COBOL]], [[Fortran|Fortran 90]], [[J语言|J]]。
+ 
+C/C++的[[灵活数组类型|灵活数组类型]]（又称柔性数组成员）是另外一个语言特性。
+
+== 语言细节==
+===C99===
+下述[[C99|C99]]函数内部创建了一个可变长数组的局部变量。因为该数组被声明为一个局部变量，所以它会在<code>read_and_process</code>函数返回时自动销毁。 
+
+<syntaxhighlight lang="c">
+float read_and_process(int n)
+{
+    float vals[n];
+
+    for (int i = 0; i < n; i++)
+        vals[i] = read_val();
+    return process(vals, n);
+}
+</syntaxhighlight>
+
+在C99中，进行函数调用时，变长数组的长度必须在变长数组本身之前进行传入。在C11中，如果编译器不支持VLA（变长数组）的话，编译器本身会定义一个叫做<code>__STDC_NO_VLA__</code>的宏。在C99之前，GCC就已经把VLA作为一个有用的扩展了。
+
+但是[[Linus_Torvalds|Linus Torvalds]]表达了对可以预见长度的小数组仍然使用VLA（变长数组）的情况不太满意，并写了一个注释如下：“USING VLA'S IS ACTIVELY STUPID! It generates much more code, and much ''slower'' code (and more fragile code), than just using a fixed key size would have done.”(我认为相较于只使用一个预先定义好的、可事后修复的量，使用变长数组的方法很笨，因为它会生成更多的机器码，更慢的代码，而且相对而言更加地不可维护）。作为回应，[[Linux_kernel|Linux kernel]]项目从头到尾都没有使用过一处VLA（变长数组）。
+
+===C++===
+C++0x标准不支持变长数组<ref>https://stackoverflow.com/questions/1887097</ref>。
+
+但是作为一个有用的扩展，g++和clang++对VLA做了一些支持（但请注意，它并不是标准化的一部分）。
+
+作为替代，建议使用C++标准下的STL容器std::vector，或者使用new和delete[]来动态地为数组分配内存。
+
+=== 其他===
+同样的功能用[[Ada|Ada]]表示：
+<syntaxhighlight lang="Ada">
+type Vals_Type is array (Positive range <>) of Float;
+
+function Read_And_Process (N : Integer) return Float is
+   Vals : Vals_Type (1 .. N);
+begin
+   for I in 1 .. N loop
+      Vals (I) := Read_Val;
+   end loop;
+   return Process (Vals);
+end Read_And_Process;
+</syntaxhighlight>
+
+等价的[[Fortran|Fortran 90]]函数：
+<syntaxhighlight lang="fortran">
+function read_and_process(n) result(o)
+    integer,intent(in)::n
+    real::o
+
+    real,dimension(n)::vals
+    real::read_val, process
+    integer::i
+ 
+    do i = 1,n
+       vals(i) = read_val()
+    end do
+    o = process(vals, n)
+end function read_and_process
+</syntaxhighlight>
+
+[[COBOL|COBOL]]代码片段：
+<syntaxhighlight lang="cobol">
+DATA DIVISION.
+WORKING-STORAGE SECTION.
+01  DEPT-PEOPLE.
+    05  PEOPLE-CNT          PIC S9(4) BINARY.
+    05  DEPT-PERSON         OCCURS 0 TO 20 TIMES DEPENDING ON PEOPLE-CNT.
+        10  PERSON-NAME     PIC X(20).
+        10  PERSON-WAGE     PIC S9(7)V99 PACKED-DECIMAL.
+</syntaxhighlight>
+
+[[C_Sharp|C#]]函数： 
+<syntaxhighlight lang="csharp">
+unsafe void declareStackBasedArray(int size)
+{
+    int *pArray = stackalloc int[size];
+    pArray[0] = 123;
+}
+</syntaxhighlight>
+
+== 参考文献==
+{{reflist}}
+
+[[Category:计算机编程|Category:计算机编程]]
+[[Category:C语言|Category:C语言]]
+[[Category:数组|Category:数组]]

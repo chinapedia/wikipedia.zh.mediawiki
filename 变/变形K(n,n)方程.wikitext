@@ -1,0 +1,34 @@
+''' 变形K(n,n)方程 '''(Modified  K(n,n) equation)是一个非线性偏微分方程：<ref>Andrei D. Polyanin,Valentin F. Zaitsev, HANDBOOK OF NONLINEAR PARTIAL DIFFERENTIAL EQUATIONS,（《非线性偏微分方程手册》） SECOND EDITION p892 CRC PRESS</ref>
+
+<math> u_{t}+a*(u^{n+1})_{x}+(u*(u^n)_{xx})_{x}=0   </math>
+
+==解析解==
+:<math> u(x,t)=( \frac{2*c}{a}*sin((1/2)*\sqrt{a}*(x-c*t+b))^2))^{1/n}</math>
+
+:<math> u(x,t)=( \frac{2*c}{a}*sinh((1/2)*\sqrt{-a}*(x-c*t+b))^2))^{1/n}</math>
+:<math> u(x,t)=( \frac{2*c}{a}*cosh((1/2)*\sqrt{-a}*(x-c*t+b))^2))^{1/n}</math>
+
+==行波图==
+{|
+|[[File:Modified_K(n,n)_equation_traveling_wave_plot_1.gif|frame]]
+|[[File:Modified_K(n,n)_equation_traveling_wave_plot_2.gif|frame]]
+|}
+
+==参考文献==
+<references/>
+# *谷超豪 《[[孤立子|孤立子]]理论中的[[达布变换|达布变换]]及其几何应用》 上海科学技术出版社
+# *阎振亚著 《复杂非线性波的构造性理论及其应用》 科学出版社 2007年
+# 李志斌编著 《非线性数学物理方程的行波解》 科学出版社
+#王东明著 《消去法及其应用》 科学出版社 2002
+# *何青 王丽芬编著 《[[Maple|Maple]] 教程》 科学出版社 2010 ISBN 9787030177445
+#Graham W. Griffiths William E.Shiesser Traveling Wave Analysis of Partial Differential p135 Equations Academy Press
+# Richard H. Enns George C. McCGuire, Nonlinear Physics Birkhauser,1997
+#Inna Shingareva, Carlos Lizárraga-Celaya,Solving Nonlinear Partial Differential Equations with Maple Springer.
+#Eryk Infeld and George Rowlands,Nonlinear Waves,Solitons and Chaos,Cambridge 2000
+#Saber Elaydi,An Introduction to Difference Equationns, Springer 2000
+#Dongming Wang, Elimination Practice,Imperial College Press 2004
+# David Betounes, Partial Differential Equations for Computational Science: With Maple and Vector Analysis Springer, 1998 ISBN 9780387983004
+# George Articolo Partial Differential Equations & Boundary Value Problems with Maple V Academic Press 1998 ISBN 9780120644759
+
+{{非线性偏微分方程}}
+[[category:非线性偏微分方程|category:非线性偏微分方程]]

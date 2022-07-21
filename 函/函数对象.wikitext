@@ -1,0 +1,163 @@
+{{noteTA
+|G1=IT
+}}
+
+'''函数对象'''（function object）{{#tag:ref|In C++, a '''functionoid''' is an object that has one major method, and a '''functor''' is a special case of a functionoid.<ref>[http://www.parashift.com/c++-faq-lite/pointers-to-members.html#faq-33.15 33.15: What's the difference between a functionoid and a functor?] {{webarchive|url=https://web.archive.org/web/20041013202445/http://www.parashift.com/c++-faq-lite/pointers-to-members.html |date=2004-10-13 }}</ref> They are similar to a function object, ''but not the same''.|name=a|group=note}}是一个程序设计的对象允许被当作普通函数来调用。 
+
+函数对象与函数指针相比，有两个优点：第一是编译器可以内联执行函数对象的调用；第二是函数对象内部可以保持状态。 
+
+[[函数式程序设计语言|函数式程序设计语言]]还支持[[闭包_(计算机科学)|闭包]]，例如，first-class函数支持在其创建时用到的函数外定义的变量的值保持下来，成为一个函数闭包。 
+==C++函数对象的实例==
+传统的C/C++函数指针：
+<syntaxhighlight lang=C>
+#include <stdlib.h>
+
+/* Callback function, returns < 0 if a < b, > 0 if a > b, 0 if a == b */
+int compareInts(const void* a, const void* b)
+{
+  return *(const int *)a - *(const int *)b;
+}
+...
+// prototype of qsort is
+// void qsort(void *base, size_t nel, size_t width, int (*compar)(const void *, const void *));
+...
+int main(void)
+{
+    int items[] = { 4, 3, 1, 2 };
+    qsort(items, sizeof(items) / sizeof(items[0]), sizeof(items[0]), compareInts);
+    return 0;
+}
+</syntaxhighlight>
+C++中，函数对象是定义了''函数调用运算符''的类对象，称作''class type functor''。
+
+<syntaxhighlight lang=Cpp>
+// comparator predicate: returns true if a < b, false otherwise
+struct IntComparator
+{
+  bool operator()(const int &a, const int &b) const
+  {
+    return a < b;
+  }
+};
+...
+// An overload of std::sort is:
+template <class RandomIt, class Compare>
+void sort(RandomIt first, RandomIt last, Compare comp);
+...
+int main()
+{
+    std::vector<int> items { 4, 3, 1, 2 };
+    std::sort(items.begin(), items.end(), IntComparator());
+    return 0;
+}
+</syntaxhighlight>
+除了类类型函数对象，还有其他类型的函数对象，如使用成员函数指针或模板。[[C++11|C++11]]允许使用具有闭包功能的匿名函数。
+==C++ STL中的函数对象==
+C++的STL中的众多algorithm，非常依赖于函数对象处理容器的元素。因此，STL预定义了许多函数对象、谓词（predicate）、以及用于复合（composite）函数对象的binder、member function adapter、 pointer to function adapters、 negaters、 function objects base structure。由于STL中的algorithm使用函数对象作为参数时，一般都是传值调用，所以函数对象应该仔细设计其''复制构造函数''。
+===预定义的函数对象===
+C++98在头文件functional中定义了下述函数对象:
+plus<type>() 	结果为(param1 + param2)
+minus<type>() 	结果为(param1 - param2)
+multiplies<type>() 	结果为(param1 * param2)
+divides<type>() 	结果为(param1 / param2)
+modulus<type>() 	结果为(param1 % param2)
+===谓词（predicate）===
+返回布尔值（或者可以隐式转换为布尔值）的函数对象。用于STL中的algorithm时，谓词应该是无状态的（ stateless）函数对象，即谓词的结果不依赖于内部的数据成员。这是因为STL中的algorithm不保证内部实现时对传入的谓词要复制多少次。
+C++98在头文件functional中定义了下述谓词:
+*equal_to<type>() 	结果为(param1 == param2)
+*not_equal_to<type>() 	结果为(param1 != param2)
+*less<type>() 	结果为 (param1 < param2)
+*greater<type>() 	结果为(param1 > param2)
+*less_equal<type>() 	结果为 (param1 <= param2)
+*greater_equal<type>() 	结果为 (param1 >= param2)
+*logical_not<type>() 	结果为 (!param1)
+*logical_and<type>() 	结果为 (param1 && param2)
+*logical_or<type>() 	结果为 (param1 || param2)
+===Function Adapter===
+用于组合（combine）、变换（transform）、操作（manipulate）函数对象、特定参数值、或者特定函数。进一步细分为：
+====Binder====
+C++98在头文件functional中定义了两个函数bind1st与bind2nd，返回值为binder1st、binder2nd类型。用于把二元函数对象分别绑定第一个、第二个参数后成为单元函数对象。
+====Negater====
+negate把一个作为谓词的函数对象取反。C++98在头文件functional中定义了两个函数not1与not2，返回值为unary_negate、binary_negate类型。
+====Member function adapter====
+Member function adapter用于把类的成员函数用作STL中的algorithm的参数。C++98在头文件functional中定义了:
+*函数mem_fun，返回值为mem_fun_t类型，用于通过一个类对象指针来调用[[类成员函数指针|成员函数指针]]。
+*函数mem_fun_ref，返回值为mem_fun_ref_t类型，用于通过一个类对象引用来调用成员函数指针。
+
+====Pointer to function adapter====
+'''函数指针适配器'''（Pointer to function adapter）是把函数指针包装为一个函数对象，以便STL中的algorithm用函数对象作为统一的参数类型，不用再考虑以函数指针作为传入参数的情形。C++98在头文件functional中定义了:
+*函数ptr_fun，返回值为pointer_to_unary_function类型，包装了一个单参数的函数指针。
+*重载函数ptr_fun，返回值为pointer_to_binary_function类型，包装了一个双参数的函数指针。
+===Function Object Base===
+函数对象基类（Function Object Base）定义在头文件functional中，用作STL的预定义的与函数对象有关的各个类的基类，其中定义了几个类型，分别表示函数调用的各个参数类型、结果类型。
+*unary_function类，定义了2个类型：argument_type、result_type；
+*binary_function类，定义了3个类型：first_argument_type、second_argument_type、result_type；
+==Python==
+[[Python|Python]]程序设计中，函数是作为头等对象（first-class object），可以如同普通的字符串、数值、list等对象那样操作。这使得大部分编写函数对象都是不必须的。
+
+任何对象定义了<code>__call__()</code>方法，就具有了可以当作函数调用的语法。例如下面的做累加的类<ref>{{Cite web |url=http://www.paulgraham.com/accgen.html |title=Accumulator Generator |accessdate=2013-08-03 |archive-date=2020-11-09 |archive-url=https://web.archive.org/web/20201109003735/http://www.paulgraham.com/accgen.html |dead-url=no }}</ref>
+
+<syntaxhighlight lang=Python>
+class Accumulator(object):
+    def __init__(self, n):
+        self.n = n
+    def __call__(self, x):
+        self.n += x
+        return self.n
+</syntaxhighlight>
+
+一个使用例子：
+<syntaxhighlight>
+ >>> a = Accumulator(4)
+ >>> a(5)
+ 9
+ >>> a(2)
+ 11
+ >>> b = Accumulator(42)
+ >>> b(7)
+ 49
+</syntaxhighlight>
+
+因为函数就是对象，可当作局部变量定义、确定其属性（内部状态）、作为别的函数的返回值。<ref>{{Cite web |url=http://docs.python.org/3/reference/compound_stmts.html#function-definitions |title=Python reference manual - Function definitions |accessdate=2013-08-03 |archive-date=2020-12-15 |archive-url=https://web.archive.org/web/20201215165143/https://docs.python.org/3/reference/compound_stmts.html#function-definitions |dead-url=no }}</ref>例如:
+
+<syntaxhighlight lang=Python>
+def Accumulator(n):
+    def inc(x):
+        inc.n += x
+        return inc.n
+    inc.n = n
+    return inc
+</syntaxhighlight>
+
+Python 3中，可以用函数闭包来创建函数对象：
+
+<syntaxhighlight lang=Python>
+def Accumulator(n):
+    def inc(x):
+        nonlocal n
+        n += x
+        return n
+    return inc
+</syntaxhighlight>
+
+==注释==
+{{reflist|group=note}}
+
+== 参考文献==
+{{Reflist}}
+
+==进一步阅读 ==
+* David Vandevoorde & Nicolai M Josuttis (2006). ''C++ Templates: The Complete Guide'', ISBN 0-201-73484-2: Specifically, chapter 22 is devoted to function objects.
+
+== 外部链接 ==
+* [http://www.codeguru.com/cpp/cpp/cpp_mfc/stl/article.php/c11449/Function-Objects-STL.htm Function Objects (STL) by Gabriel&Andreas Fleseriu&Masur on February 22nd, 2006] {{Wayback|url=http://www.codeguru.com/cpp/cpp/cpp_mfc/stl/article.php/c11449/Function-Objects-STL.htm |date=20200925204413 }}
+* [http://c2.com/cgi/wiki?FunctorObject Description from the Portland Pattern Repository]{{Wayback|url=http://c2.com/cgi/wiki?FunctorObject |date=20041014064058 }}
+* [http://www.two-sdg.demon.co.uk/curbralan/papers/AsynchronousC++.pdf C++ Advanced Design Issues - Asynchronous C++] {{Wayback|url=http://www.two-sdg.demon.co.uk/curbralan/papers/AsynchronousC++.pdf |date=20200922012516 }} by [[Kevlin_Henney|Kevlin Henney]]
+* [http://www.newty.de/fpt/index.html The Function Pointer Tutorials] {{Wayback|url=http://www.newty.de/fpt/index.html |date=20201109060659 }} by Lars Haendel (2000/2001)
+* Article "[https://web.archive.org/web/20050218045631/http://www.cuj.com/documents/s=8464/cujcexp0308sutter/ Generalized Function Pointers]" by [[Herb_Sutter|Herb Sutter]]
+* [http://jga.sourceforge.net/ Generic Algorithms for Java] {{Wayback|url=http://jga.sourceforge.net/ |date=20181215043554 }}
+* [https://web.archive.org/web/20100330073950/http://www.amcgowan.ca/blog/computer-science/php-functors-function-objects-in-php/ PHP Functors - Function Objects in PHP]
+* [https://web.archive.org/web/20130727001627/http://www.parashift.com/c++-faq-lite/pointers-to-members.html#faq-33.10 What the heck is a functionoid, and why would I use one?] (C++ FAQ)
+
+[[Category:面向对象的程序设计|Category:面向对象的程序设计]]
+[[Category:控制流程|Category:控制流程]]

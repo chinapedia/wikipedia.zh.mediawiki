@@ -1,0 +1,57 @@
+{{noteTA
+|G1=IT
+}}
+[[File:crossbar_barrel_shifter.svg|thumb]]
+
+'''桶式移位器'''（barrel shifter）是一種[[數位電路|數位電路]]，可以在一個[[定時器訊號|時脈週期]]內，將[[字_(計算機)|資料字]]進行特定位元數的[[位操作#移位|移位]]。桶式移位器可以用一串的[[数据选择器|数据选择器]]實現，某一個数据选择器的輸出是其他数据选择器的輸入，其關係則視要位移的位元數而定。
+
+例如，以一個四位元的桶式移位器為例，一開始的輸入是A, B, C及D，桶式移位器可以由輸入''ABCD''得到''DABC''、''CDAB''或''BCDA''，所有位元的資訊都會留下來，只是位置以循環組合的方式改變，桶式移位器有許多不同的應用，是[[微處理器|微處理器]]中的一個重要成份。
+
+==實現==
+桶式移位器可以用平行的2×1数据选择器的組合而成。對於8位元的桶式移位器，需要二個中間的訊號，分別表示位移四位元、二位元或是不位移，這是依S[2]和S[1]的值而定，訊號會再經過数据选择器位移一位元，這是由S[0]控制。
+
+  int1  = IN       , if S[2] == 0
+        = IN   << 4, if S[2] == 1
+  int2  = int1     , if S[1] == 0
+        = int1 << 2, if S[1] == 1
+  OUT   = int2     , if S[0] == 0
+        = int2 << 1, if S[0] == 1
+
+較大的桶式移位器會有更多的中間訊號。
+
+==成本==
+''n''位元資料的桶式移位器，需要的数据选择器數量為<math>\scriptstyle n\log_2n</math>.<ref>{{cite book |last=Kroening |first=D. | last2=Strichman |first2=Ofer |year=2008 |title=Decision Procedures |publisher=Springer |quote=p.159.}}</ref>。以下列出五種常見的資料字寬度及其桶式移位器需要的数据选择器數量：
+
+* 128位元 — <math>\scriptstyle 128\times\log_2(128) = 128\times7 = 896</math>
+* 64位元 — <math>\scriptstyle 64\times\log_2(64) = 64\times6 = 384</math>
+* 32位元 — <math>\scriptstyle 32\times\log_2(32) = 32\times5 = 160</math>
+* 16位元 — <math>\scriptstyle 16\times\log_2(16) = 16\times4 = 64</math>
+* 8位元 — <math>\scriptstyle 8\times\log_2(8) = 8\times3 = 24</math>
+
+在{{link-en|FO4|FO4}}中，關鍵路徑的成本為（預估，不考慮線路延遲）：
+* 32位元：從18 FO4到14 FO4<ref>{{cite web|url=http://www.realworldtech.com/page.cfm?ArticleID=RWT081502231107&p=4|title=Revisiting the FO4 Metric|work=realworldtech.com|accessdate=2015-02-08|archive-date=2012-03-13|archive-url=https://web.archive.org/web/20120313163657/http://www.realworldtech.com/page.cfm?ArticleID=RWT081502231107&p=4|dead-url=no}}</ref>
+
+==用途==
+桶式移位器常用的場合是用硬體實現[[浮点数|浮点数]]運算時，若要進行浮點的加法或減法，兩個數字的{{link-en|有效位数|significand}}需要對齊，也就是將較小的數字往右移，增加其次幂，直到兩個數字的次幂相等為止，實際作法是將二數的次幂相減，再利用桶式移位器右位移較小的數字，位移位元數即為二數的次幂的差。若不是用桶式移位器，而是一般較簡單的移位器，位移n位元需要''n''個時脈週期。
+
+==相關條目==
+*{{link-en|環式移位|Circular shift}}
+
+==參考資料==
+{{reflist}}
+
+==外部連結==
+<!--*[http://answers.google.com/answers/threadview?id=388350 Google Answers] has a good explanation, and collection of links-->
+*[https://web.archive.org/web/20130115120055/http://tams-www.informatik.uni-hamburg.de/applets/hades/webdemos/10-gates/60-barrel/shifter8.html University of Hamburg] for a useful Java Barrel shifter.
+*[http://www.xilinx.com/support/documentation/application_notes/xapp195.pdf Xilinx Application Note] {{Wayback|url=http://www.xilinx.com/support/documentation/application_notes/xapp195.pdf |date=20141222125821 }} Implementation of Barrel shifter using Xilinx FPGAs.
+
+==延伸閱讀==
+*{{cite book |first=Daniel |last=Kroening |first2=Ofer |last2=Strichman |title=Decision Procedures |location= |publisher=Springer |year=2008 |isbn=978-3-540-74104-6 }}
+
+{{FOLDOC}}
+
+{{CPU technologies}}
+
+[[Category:数字电路|Category:数字电路]]
+[[Category:二进制算术|Category:二进制算术]]
+[[Category:計算機算術|Category:計算機算術]]

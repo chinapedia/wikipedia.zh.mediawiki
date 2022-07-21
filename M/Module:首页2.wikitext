@@ -1,0 +1,62 @@
+local z = {}
+
+-- from [[模块:Random|模块:Random]]
+local function randomizeArray(t, limit)
+	-- Randomizes an array. It works by iterating through the list backwards, each time swapping the entry
+	-- "i" with a random entry. Courtesy of Xinhuan at http://forums.wowace.com/showthread.php?p=279756
+	-- If the limit parameter is set, the array is shortened to that many elements after being randomized.
+	-- The lowest possible value is 0, and the highest possible is the length of the array.
+	local len = #t
+	for i = len, 2, -1 do
+		local r = math.random(i)
+		t[i], t[r] = t[r], t[i]
+	end
+	if limit and limit < len then
+		local ret = {}
+		for i, v in ipairs(t) do
+			if i > limit then
+				break
+			end
+			ret[i] = v
+		end
+		return ret
+	else
+		return t
+	end
+end
+
+function getItems( frame )
+	local page = mw.title.new( frame.args.title ):getContent()
+	local matches = {}
+	local black = {}
+	if frame.args.black then
+		for b in mw.text.gsplit( frame.args.black, '|', true ) do
+			black[b] = true
+		end
+	end
+	for m in mw.ustring.gmatch ( page, frame.args.pattern ) do
+		if not black[m] then
+			table.insert ( matches, m )
+		end
+	end
+	return matches
+end
+
+function z.count( frame )
+	return #getItems( frame )
+end
+
+function z.list( frame )
+	local d = getItems( frame )
+	math.randomseed(mw.site.stats.edits + mw.site.stats.pages + os.time() + math.floor(os.clock() * 1000000000))
+	local limit = 3
+	if frame.args.limit and tonumber(frame.args.limit) >1 then
+			limit = tonumber(frame.args.limit)
+	end
+	l = randomizeArray(d, limit)
+	x = table.concat(l, "]]－[[")
+	x = '[['.._x.._'|'.. x.. ']]'
+return x
+end
+
+return z

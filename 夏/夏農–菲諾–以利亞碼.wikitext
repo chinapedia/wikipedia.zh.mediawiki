@@ -1,0 +1,80 @@
+在[[消息理論|消息理論]]中，'''夏農–菲諾–以利亞碼'''是[[算術編碼|算術編碼]]的先導，其機率被用於決定碼字。
+
+== 演算法描述 ==
+
+給定一離散隨機變數 ''X'' ，令 <math>p(x)</math> 為 ''X''=''x'' 發生之機率。
+
+定義
+:<math>\bar F(x) = \sum_{x_i < x}p(x_i) + \frac 12 p(x)</math>
+
+演算法如下：
+:對每個 ''X'' 中的 ''x''，
+::令 ''Z'' 為 <math>\bar F(x)</math> 之二次展開
+::令 ''x'' 之編碼長度 <math>L(x)=\left\lceil \log_2 \frac {1}{p(x)} \right\rceil + 1</math>
+::選定 ''x'' 之編碼， <math>code(x)</math> 為 <math>L(x)</math> 在 ''Z'' 之小數點後之第一個最高有效位。
+
+=== 舉例 ===
+
+令 X = {A, B, C, D} ，其發生機率分別為 p = {1/3, 1/4, 1/6, 1/4} 。
+:對於 A
+::<math>\bar F(A) = \frac 12 p(A) = \frac 12 \cdot \frac 13 = 0.1666...</math>
+::在二進位中， Z(A) = 0.'''001'''0101010...
+::L(A) = <math>\left\lceil \log_2 \frac 1 \frac 1 3 \right\rceil + 1</math> = '''3'''
+::code(A) 為 001
+
+:對於 B
+::<math>\bar F(B) = p(A) + \frac 12 p(B) = \frac 13 + \frac 12 \cdot \frac 14 = 0.4583333...</math>
+::在二進位中， Z(B) = 0.'''011'''10101010101...
+::L(B) = <math>\left\lceil \log_2 \frac 1 \frac 1 4 \right\rceil + 1</math> = '''3'''
+::code(B) 為 011
+
+:對於 C
+::<math>\bar F(C) = p(A) + p(B) + \frac 12 p(C) = \frac 13 + \frac 14 + \frac 12 \cdot \frac 16 = 0.66666...</math>
+::在二進位中， Z(C) = 0.'''1010'''10101010...
+::L(C) = <math>\left\lceil \log_2 \frac 1 \frac 1 6 \right\rceil + 1</math> = '''4'''
+::code(C) 為 1010
+
+:對於 D
+::<math>\bar F(D) = p(A) + p(B) + p(C) + \frac 12 p(D) = \frac 13 + \frac 14 + \frac 16 + \frac 12 \cdot \frac 14 = 0.875</math>
+::在二進位中， Z(D) = 0.'''111'''
+::L(D) = <math>\left\lceil \log_2 \frac 1 \frac 1 4 \right\rceil + 1</math> = '''3'''
+::code(D) 為 111
+
+==演算法分析==
+
+===前綴碼===
+
+夏農–菲諾–以利亞碼之輸出為二進位前綴碼，因此可被直接解碼。
+
+令 bcode(x) 為二進位表示法最左側加入小數點而成之小數。舉例而言， code(C)=1010 ，則 bcode(C) = 0.1010 。 對所有 x ，如果沒有任何 y 存在使得 
+:<math>bcode(x) \le bcode(y) < bcode(x) + 2^{-L(x)}</math>
+則所有的碼可構成前綴碼。
+
+
+
+此性質可透過比較 F 和 X 之[[累积分布函数|累積分布函数]]，以圖表示出：
+
+[[File:Shannon_fano_elias_cdf_graph.jpg|The relation of F to the CDF of X]]
+
+由 L 之定義可得
+: <math>2^{-L(x)} \le \frac 12 p(x)</math>
+並且由於 code(y) 是由 F(y) 從 L(y) 之後的位元截短而得，故
+: <math>\bar F(y) - bcode(y) \le 2^{-L(y)}</math>
+因此 bcode(y) 必不比 CDF(x) 小。
+
+上圖說明了 <math>bcode(y) - bcode(x) > p(x) \ge 2^{-L(x)}</math> ，因此前綴碼定理成立。
+
+===編碼長度===
+
+此碼之平均長度為
+<math>LC(X) = \sum_{x \epsilon X}p(x)L(x) = \sum_{x \epsilon X}p(x)(\left\lceil \log_2 \frac {1}{p(x)} \right\rceil + 1)</math> 。<br>
+因隨機變數 X 之 [[熵_(信息论)|熵]] H(X) 滿足
+:<math>H(X) + 1 \le LC(X) < H(X) + 2</math>
+夏農–菲諾–以利亞碼之長度約比代編碼資料之熵長約一到二額外位元，故甚少被實用。
+
+==參考書目==
+T. M. Cover and Joy A. Thomas (2006). Elements of information theory (2nd ed.). John Wiley and Sons. pp. 127–128.
+
+{{压缩方法}}
+[[Category:應用數學|Category:應用數學]]
+[[Category:无损压缩算法|Category:无损压缩算法]]

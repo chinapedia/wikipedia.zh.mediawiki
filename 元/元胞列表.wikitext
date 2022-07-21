@@ -1,0 +1,62 @@
+'''元胞列表'''（Cell lists）是[[分子模拟|分子模拟]]中常用的一种减少粒子间距离计算量的方法，由Quentrec, B.与C. Brot提出。<ref>Quentrec, B. and C. Brot (1973). "New method for searching for neighbors in molecular dynamics computations." Journal of Computational Physics 13(3): 430-432.</ref>此方法使得运算时间与体系粒子数成正比，与另一种方法[[韦尔莱表|韦尔莱表]]相比适合于大尺度的分子模拟。
+==算法==
+<!--[[Image:CellLists.png|thumb]]-->
+元胞列表的思想是将体系分解为更小的元胞单元，只需计算计算相同和相邻元胞中的粒子距离而不再需要对整个体系中所有其他粒子求解，元胞的边长不小于粒子截断半径<math>R_c</math>，以此保证所有相互作用着的粒子作用力计算没有遗漏。
+
+根据元胞列表计算近邻粒子间非键相互作用的基本算法如下：
+
+:'''for all''' 近邻元胞对 <math>(C_\alpha, C_\beta)</math> '''do'''
+::'''for all''' <math>p_\alpha \in C_\alpha</math> '''do'''
+:::'''for all''' <math>p_\beta \in C_\beta</math> '''do'''
+::::<math>r^2 = \| \mathbf x[p_\alpha] - \mathbf x[p_\beta] \|_2^2</math>
+::::'''if''' <math>r^2 \le r_c^2</math> '''then'''
+:::::计算<math>p_\alpha</math>与<math>p_\beta</math>间相互作用。
+::::'''end if'''
+:::'''end for'''
+::'''end for'''
+:'''end for'''
+元胞的个数取决于模拟体系的尺度和粒子截断半径，每个元胞内粒子数<math>\overline{c} = N/m</math>，与体系大小近似无关，两个元胞间粒子作用计算的复杂度为<math>\mathcal O(\overline{c}^2)</math>，整体复杂度为<math>\mathcal O(Nc) \in \mathcal O(N)</math>，与未运用元胞列表时的<math>\mathcal O(N^2)</math>相比有了显著的降低。
+
+以[[Fortran|Fortran]]描述的构建列表的算法如下：<ref>{{Cite book|author = [荷]Frenkel & Smit 汪文川等译|year=2002|origyear=1996|title=Understanding Molecular Simulation -- From Algorithms to Applications|trans_title=分子模拟-从算法到应用|publisher=[[化学工业出版社|化学工业出版社]]|location=北京|isbn=7-5025-3952-2}}</ref>
+<syntaxhighlight lang="fortran">
+subroutine new_nlist
+    rn = box/int(box/rc) ! 计算一个方向上的元胞个数。box为体系长度，rc为截断半径
+    do icel=0 , ncel - 1 
+        hoc(icel) = 0    ! 对每一个元胞的链头置0
+    end do
+    do i = 1 , npart     ! 扫描所有粒子
+        icel = int(x(i)/rn)  ! 确定粒子所在的元胞编号
+        ll(i) = hoc（icel）! 链接icel元胞的链头
+        hoc(icel) = i        ! 将粒子编号i添加到链头
+    end do
+end subroutine
+</syntaxhighlight>
+
+==周期性边界条件==
+在多数情况下，模拟的体系都会引入[[周期性边界条件|周期性边界条件]]以避免不合实际的边界。在朴素的算法中，对于每次粒子间距离计算都要运用此条件：
+<syntaxhighlight lang="fortran">
+dx = dx - Lx*ANINT(dx/Lx)
+dy = dy - Ly*ANINT(dy/Ly)
+dz = dz - Lz*ANINT(dz/Lz)
+</syntaxhighlight>
+造成很大的时间开销。元胞列表的引入可改进这一问题，主要有“幽灵元胞”和校正向量两种优化方案。
+===幽灵元胞===
+幽灵元胞通过在边界以外复制一层元胞解决周期性边界条件问题，这些复制的元胞拥有与原元胞完全相同的信息，这样在计算距离时就不再需要考虑周期性边界条件。此做法导致边界上的粒子的计算量会增加一倍（元胞在三维盒子的面上）甚至更多（元胞在三维盒子的棱或顶角），但这种方法非常直观且易于并行。
+===校正向量===
+由于元胞的边界条件和粒子距离的边界条件是一致的，因此在搜索近邻元胞对时可导出一个向量<math>\mathbf q_{\alpha\beta}</math>来校正粒子间距离的计算。对于属于两个近邻元胞的两个粒子<math>p_\alpha \in C_\alpha</math>与<math>p_\beta \in C_\beta</math>，它们之间的距离按此式得出：
+
+:<math>r^2 = \| \mathbf x[p_\alpha] - \mathbf x[p_\beta] - \mathbf q_{\alpha\beta} \|^2_2</math>.
+
+校正向量可以在扫描元胞时计算，也可在初始化时储存。此方法单核效率通常高于幽灵元胞，但其实现相对复杂，并且将计算距离的开销部分转移到扫描元胞中。
+
+==改进==
+在最初的元胞列表中，每一个粒子会与27个元胞作用，体积为<math>27r_c^3</math>，相较截断半径球<math>\frac{4}{3}\pi r_c^3</math>，有84%的距离计算是不必要的。虽然复杂度从<math>\mathcal O(N^2)</math>降至<math>\mathcal O(N)</math>，但复杂度的系数项不容忽略。一种简单的改进方法是减小元胞长度，取元胞大小为<math>\frac{1}{2} r_c</math>，扫描时计算近邻和次近邻两层元胞共<math>(2*2+1)^3=125</math>个元胞，则距离计算包含的体积降为<math>\frac{125}{8}r_c^3</math>，距离计算的体积下降了将近一倍。然而，元胞的扫描具有<math>O(N_{div}^6)</math>的复杂度，元胞划分数进一步增大带来的性能提升很快被扫描元胞的开销浪费掉。(最早提出：<ref>{{cite book| first=M. P. | last=Allen |author2=D. J. Tildesley | title=Computer Simulation of Liquids | publisher=Clarendon Press | location=Oxford | year=1987}}</ref>，详细讨论：<ref>{{cite journal | last=Mattson | first=W. |author2=B. M. Rice | title=Near-neighbor calculations using a modified cell-linked list method | journal=Computer Physics Communications | year=1999 | volume=119 | issue=2-3 | pages=135 | doi=10.1016/S0010-4655(98)00203-3 |bibcode = 1999CoPhC.119..135M }}</ref><ref>{{cite journal | last=Yao | first=Z. |author2=Wang, J.-S. |author3=Liu, G.-R. |author4= Cheng, M  | title=Improved neighbor list algorithm in molecular simulations using cell decomposition and data sorting method | journal=Computer Physics Communications | year=2004 | volume=161 | pages=27 | doi=10.1016/j.cpc.2004.04.004 |arxiv = physics/0311055 |bibcode = 2004CoPhC.161...27Y }}</ref><ref name="JCC2004">{{cite journal| last=Heinz | first=T. N. |author2=Hünenberger, P. H. | title=A fast pairlist-construction algorithm for molecular simulations under periodic boundary conditions | journal=Journal of Computational Chem istry | year=2004 | volume=25 | pages=1474–86 | doi=10.1002/jcc.20071| pmid=15224391| issue=12}}</ref>)
+
+将韦尔莱表与元胞列表联合，达到进一步的改进。使用元胞列表构建[[韦尔莱表|韦尔莱表]]可使后者更新的复杂度降为<math>O(N)</math>，同时克服了扫描元胞的时间开销。<ref name="JCC2004"/>
+==参见==
+* [[韦尔莱表|韦尔莱表]]
+
+==参考资料==
+{{Reflist}}
+
+[[Category:计算化学|Category:计算化学]]

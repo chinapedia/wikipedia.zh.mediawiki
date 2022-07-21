@@ -1,0 +1,115 @@
+local p = {}
+
+local azupper = mw.text.split('ABCDEFGHIJKLMNOPQRSTUVWXYZ','')
+local azlower = mw.text.split('abcdefghijklmnopqrstuvwxyz','')
+local aejot = mw.text.split('aejot','')
+
+local function main(toc_type)
+	local toc_frame = mw.html.create('div')
+		:addClass('large-cat-toc')
+		:addClass('plainlinks')
+		:addClass('toc')
+		-- :attr('id','toc')
+		
+	-- Contains "Content: Top 0-9 A - Z"
+	local header = toc_frame:tag('div')
+		:attr('class', 'toctitle')
+	
+	-- Contains all the rest
+	local body_wrapper
+	local body = toc_frame:tag('div')
+		:addClass('large-cat-toc-body')
+		
+	local jumpy_collapse = mw.html.create('div')
+		:addClass('large-cat-toc-jumpy-title')
+	
+	if toc_type == 'collapsible' then
+		toc_frame:addClass('mw-collapsible mw-collapsed')
+		body:addClass('mw-collapsible-content')
+		
+	elseif toc_type == 'scrollable' then
+		toc_frame:addClass('large-cat-toc-scroll')
+	end
+	
+	local pageurl = mw.title.getCurrentTitle():fullUrl()
+	local header_content = {
+		string.format(
+			'<span class="large-cat-toc-title">%s：</span>[%s Top] [%s?from=0 0–9]',
+			mw.message.new('Toc'):plain(),
+			pageurl,
+			pageurl
+		)
+	}
+	
+	for _, v in ipairs(azupper) do
+		table.insert(header_content, string.format(
+			' [%s?from=%s %s]', pageurl, v, v
+		))
+	end
+	
+	if toc_type == 'collapsible' then
+		jumpy_collapse:wikitext(table.concat(header_content))
+		header:node(jumpy_collapse)
+	else
+		header:wikitext(table.concat(header_content))
+	end
+	
+	local body_content = {}
+	if toc_type ~= 'collapsible' then
+		table.insert(body_content, '<span class="large-cat-toc-anum">['..pageurl..'?from=* *]</span> ')
+	end
+	
+	table.insert(body_content, '<span class="large-cat-toc-anum">#</span> ')
+	body_wrapper = body:tag('span')
+	
+	for i=0,9 do
+		table.insert(body_content,string.format(' [%s?from=%s %s]',pageurl,i,i))
+	end
+	
+	local function atoz(letter)
+		local azlist = {}
+		local letterlist
+		if toc_type == 'aejot' then
+			letterlist = aejot
+		else
+			letterlist = azlower
+		end
+				
+		if toc_type == 'aejot' or toc_type == 'scrollable' then
+			table.insert(azlist,' • <span class="large-cat-toc-anum">'..letter..'</span> ')
+		else
+			table.insert(azlist,'<br /><span class="large-cat-toc-anum">'..letter..'</span> ')
+		end
+			
+		for _, v in ipairs(letterlist) do
+			table.insert(azlist, string.format(
+				' [%s?from=%s%s %s%s] ', pageurl, letter, v, letter, v
+			))
+		end
+		return table.concat(azlist)
+	end
+	
+	for _, v in ipairs(azupper) do
+		table.insert(body_content, atoz(v))
+	end
+	
+	body_wrapper:wikitext(table.concat(body_content))
+	
+	return '__NOTOC__\n' .. mw.getCurrentFrame():extensionTag{
+		name = 'templatestyles', args = { src = 'Module:Large category TOC/styles.css' }
+	} .. tostring(toc_frame)
+end
+
+function p.scrollable(frame)
+	return main('scrollable')
+end
+
+function p.collapsible(frame)
+	return main('collapsible')
+end
+
+function p.aejot(frame)
+	return main('aejot')
+end
+
+return p

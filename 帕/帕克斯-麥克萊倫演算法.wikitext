@@ -1,0 +1,92 @@
+{{NoteTA
+|G1=IT
+}}
+
+'''帕克斯-麥克萊倫演算法'''（{{lang-en|Parks–McClellan algorithm}}），為一個用以設計最佳化有限脈衝響應[[濾波器|濾波器]]（finite impulse response filter）的[[疊代法|疊代演算法]]，由James McClellan和Thomas Parks於1972年的著作中提出。
+
+此演算法的主要精神，在於利用疊代的方式最小化濾波器在[[带通滤波器|通帶]](pass band)和[[带阻滤波器|止帶]](stop band)的最大誤差，因此有時也稱為最小化最大誤差演算法(Mini-max filter design)。由於帕克斯-麥克萊倫演算法也屬於Remez-exchange algorithm為了設計有限脈衝響應濾波器而產生的一種變形，因此也有人以Remez-exchange algorithm代稱。
+
+==有限脈衝響應濾波器設計==
+有限脈衝響應濾波器(finite impulse response filter)利用有限的點數來表示濾波器的脈衝響應，對於N點有限脈衝響應濾波器
+
+<math>h[n] = 0,\; for\; n<0\; and\; n\ge N, \;N\, is\, a\, finite\; number</math>
+
+有限脈衝響應濾波器的優點在於脈衝響應是有限的，使得設計上較為簡單。然而如何在有限的點數下，設計出效果最近似於理想目標的濾波器，則是帕克斯-麥克萊倫演算法所欲解決的問題。
+
+對於濾波器設計，帕克斯-麥克萊倫演算法的精神在於最小化最大誤差。在忽略通帶與止帶之間轉換帶(transition band)的情況下，最小化通帶與止帶的最大誤差：<math> \underset{f}{\operatorname{Max}} \left| H(f) - H_d(f) \right| </math>
+
+其中<math>H(f) = \sum_{n=-\infty}^{\infty } h[n] e^{-j2\pi Fn} </math>為設計濾波器的頻率響應，F為正規化頻率(normalized frequency)，<math>H_d(f)</math>則為理想目標濾波器的頻率響應。
+
+濾波器設計時，可利用weighting function將較重要的頻帶比重放大。如此一來，在利用帕克斯-麥克萊倫演算法設計濾波器時，則會較重視比重較大頻帶的誤差。
+
+若在加入weighting function情況下，可將帕克斯-麥克萊倫演算法一般化。此時的最大誤差則可表示為：<math> \underset{f}{\operatorname{Max}} \left| W(f) \left[H(f) - H_d(f) \right] \right| </math>
+
+==帕克斯-麥克萊倫演算法==
+下面的文章將說明如何以該演算法設計最佳化濾波器，假設
+*濾波器長度為N，且N為奇數可表示成<math>N = 2k+1</math>
+*目標濾波器的頻率響應<math>H_d(F)</math>為偶函數
+*W(F)用以表示所指定的weighting function
+
+此演算法共分為6個步驟：
+#設定極值點起始值
+#:在範圍<math>0\le F\le 0.5</math>的範圍內，任意選擇<math>k+2</math>點頻率<math>F_0 ,\; F_1,\; F_2,\; \ldots,\; F_{k+1}</math>作為極值點(extreme frequency)的起始值。
+#:將此時的最大誤差<math>E_1</math>設為<math>\infty </math>，但所選擇的<math>k+2</math>點起始值不能落在轉換頻帶(transition band)，也不能將所有的起始直設在止帶(stop band)上。
+#:極端頻率為最後完成設計的濾波器頻率響應中，會出現最大誤差的頻率。一開始所給定的起始值是隨機的，會在此演算法之後的步驟中逐漸收斂。
+#:此時，令在各點極端頻率的誤差為<math> \left[ H(F_m)-H_d(F_m) \right] W(F_m) = (-1)^{m+1} e,\; where\;m=0,1,2 \ldots , k+1</math>
+#計算目前的頻率響應 
+#:為了方便演算法運算之後的進行，我們可稍微整理誤差的表示方式。若令
+#:<math>r[n]=h[n+k],\; k=(N-1)/2</math>
+#:<math>s[0]=r[0],\ \ s[n]=2r[n],\; for\; 0 < n \le k </math>
+#:如此一來，可將在第1步驟中所得到的誤差式表示為：
+#:<math>\left[ R(F_m)-H_d(F_m) \right] W(F_m) = (-1)^{m+1} e,\; where\;m=0,1,2 \ldots , k+1</math>
+#:其中，
+#:<math> R(F) = \sum_{n=0}^k s[n] \cos (2 \pi nF) = e^{j2 \pi Fk} H(F) </math>
+#:經過整理之後可得
+#:<math> \sum_{n=0}^k s[n] \cos (2 \pi F_m n) + (-1)^m W^{-1} (F_m) e = H_d(F_m) </math>
+#:上述的誤差關係式，可表示為矩陣形式<math> Ax = H </math>
+#:<math>
+\begin{bmatrix}
+1  & \cos (2 \pi F_0) &\cos (4 \pi F_0) & \cdots & \cos (2 \pi kF_0)& 1/W(F_0) \\
+1  & \cos (2 \pi F_1) &\cos (4 \pi F_1) & \cdots & \cos (2 \pi kF_1)& -1/W(F_1) \\
+\vdots & \vdots    & \vdots        & \ddots & \vdots       & \vdots   \\
+1  & \cos (2 \pi F_k) &\cos (4 \pi F_k) & \cdots & \cos (2 \pi kF_k)& (-1)^k/W(F_k) \\
+1  & \cos (2 \pi F_{k+1}) &\cos (4 \pi F_{k+1}) & \cdots & \cos (2 \pi kF_{k+1})& (-1)^{k+1}/W(F_{k+1}) \\
+\end{bmatrix}
+\begin{bmatrix}
+S[0] \\ S[1] \\ \vdots \\ S[k] \\e
+\end{bmatrix}
+=
+\begin{bmatrix}
+H_d[F_0] \\ H_d[F_1] \\ \vdots \\ H_d[F_k] \\ H_d[F_{k+1}]
+\end{bmatrix}
+</math>
+#:因此，我們可由<math> x = A^{-1} H</math>計算<math>s[0], s[1], \ldots, s[k] </math>
+#計算誤差函數 
+#:計算誤差函數<math>err(F), \; for 0 \le F \le 0.5 \; , F \notin transition \; band </math>
+#:<math> err(F)= \left[ R(F)-H_d(F) \right] W(F_m) = \left\{ \sum_{n=0}^k s[n] \cos (2 \pi F n) - H_d(F) \right\} W(F) </math>
+#尋找極值點
+#:從<math>err(F)</math>中，找k+2個區域極大或極小值，將區域極大或極小值出現的頻率標示為<math> P_0, P_1, \ldots, P_k, P_{k+1}</math>
+#:區域極大或極小值的判斷規則：
+#:*不是在邊界處的區域高峰(peaks)或低谷(dips)。在此，邊界區域即為<math>F=0, F=0.5 </math>以及頻率轉換帶的兩邊。
+#:*對於在邊界區域的頻率點，可用下列的標準判斷是否為區域極大或極小：<math>Sign(eff(F_d))</math>及<math>Sign(err'(F_d))</math>為同相時，右邊界是極值點；反相時，左邊界是極值點；其他情況非極值點。
+#:若找到多於<math>k+2</math>個極值點，選擇極值點的優先順位為：
+##優先選擇不在邊界的極值點。
+##其次選在邊界的極值點中，<math> \left| err(F) \right| </math>較大的，直到湊足<math>k+2</math>個極值點為止。
+##當邊界的極值點的<math>\left| err(F) \right| </math>一樣大時，優先選擇轉換頻帶兩旁的點。
+#判斷誤差是否收斂 
+#:計算誤差的最大值，令其為<math>E_0 = Max(\left| err(F) \right|) </math>。
+#:若<math>E_0</math>為現在的誤差最大值，<math>E_1</math>為前一輪計算的誤差最大值，則利用下列規則判斷演算法的下一步：
+##若<math>E_1 - E_0 > \Delta, \; or \; E_1 - E_0 < 0 </math>，設定<math> F_n = P_n \; and \; E_1 = E_0 </math>，回到步驟2。
+##若<math> 0 \le E_1 - E_0 \le \Delta </math>，進行步驟6。
+#計算所設計濾波器的脈衝響應<math>\;h[n]</math>
+#:由先前在步驟2中的關係式，我們可得
+#:<math>h[k] = s[0], h[k+n] = s[n]/2, h[k-n]=s[n]/2, \; for \; n=1,2,3, \ldots, k </math>
+
+==參考文獻==
+*Jian-Jiun Ding (2013), [http://djj.ee.ntu.edu.tw/ADSP.htm Advanced Digital Signal Processing] {{Wayback|url=http://djj.ee.ntu.edu.tw/ADSP.htm |date=20200508102040 }} [viewed 27/06/2013]
+* T. W. Parks and J. H. McClellan, “Chebychev approximation for nonrecursive digital filter-linear phase”, IEEE Trans. Circuit Theory, vol. 19, no. 2, pp. 189-194, March 1972. 
+* J. H. McClellan, T. W. Parks, and L. R. Rabiner “A computer program for designing optimum FIR linear phase digital filter”, IEEE Trans. Audio- Electroacoustics, vol. 21, no. 6, Dec. 1973. 
+* F. Mintz and B. Liu, “Practical design rules for optimum FIR bandpass digital filter”, IEEE Trans. ASSP, vol. 27, no. 2, Apr. 1979.
+
+[[Category:滤波器理论|Category:滤波器理论]]
+[[Category:数字信号处理|Category:数字信号处理]]

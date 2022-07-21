@@ -1,0 +1,239 @@
+require('Module:No globals')
+local p = {}
+
+local function items(args, year, oldrange)
+	local itemList = {}
+	
+	-- First loop through is to find the lowest year range, if any. If oldrange is supplied, the year range must also be greater than it.
+	local range = 0;
+	if args[year .. '_to'] or args[year .. 'a_to'] then
+		local newrange = tonumber(args[year .. '_to'] or args[year .. 'a_to'])
+		if newrange and (oldrange == nil or newrange > oldrange) then
+			range = newrange;
+		end
+	end
+	for asciiletter = 98, 106 do -- 98 > b, 106 > j
+		if args[year .. string.char(asciiletter) .. '_to'] then
+			local newrange = tonumber(args[year .. string.char(asciiletter) .. '_to'])
+			if newrange and (oldrange == nil or newrange > oldrange) and (range == 0 or newrange < range) then
+				range = newrange;
+			end			
+		end
+	end
+
+	-- Find items, filtered by range if available.
+	if args[year] or args[year .. 'a'] then
+		local thisrange = tonumber(args[year .. '_to'] or args[year .. 'a_to'])
+		if (range == 0 and thisrange == nil) or (thisrange and thisrange == range) then
+			table.insert(itemList, args[year] or args[year .. 'a'])
+		end
+	end
+	for asciiletter = 98, 106 do -- 98 > b, 106 > j
+		if args[year .. string.char(asciiletter)] then
+			local thisrange = tonumber(args[year .. string.char(asciiletter) .. '_to'])
+			if (range == 0 and thisrange == nil) or (thisrange and thisrange == range) then
+				table.insert(itemList, args[year .. string.char(asciiletter)])
+			end
+		end
+	end
+	return table.maxn(itemList), itemList, range
+end
+
+local function color(args, year, itemNum, to_range)
+
+	if args[year .. '_color'] then
+		return args[year .. '_color'] 
+	end
+	
+	if to_range and args[year .. '_to_' .. to_range .. '_color'] then
+		return args[year .. '_to_' .. to_range .. '_color']
+	end
+
+	for yearrange = 1, 10 do
+		if args['range' .. yearrange] and args['range' .. yearrange .. '_color'] then
+			local _, _, beginyear, endyear = string.find( args['range' .. yearrange], '^(%d%d%d%d)%D+(%d%d%d%d)$' )
+
+			local year = tonumber(year) or 9999 -- For year == 'TBA'
+			beginyear = tonumber(beginyear) or 0
+			endyear =  tonumber(endyear) or 9999
+
+			if year >= beginyear and year <= endyear then
+				local _, _, color1, color2 = string.find( args['range' .. yearrange .. '_color'], '^(%S*)%s*(%S*)$' )
+				color2 = string.find(color2, '^#?%w+$') and color2 or color1
+				return itemNum > 0 and color1 or color2
+			end
+		end
+	end
+
+	return itemNum > 0 and '#0BDA51' or '#228B22'
+end
+
+local function left(builder, args, year, itemNum, range)
+	local yearText = year == 'TBA' and '待定' or year
+	builder = builder:tag('th')
+		:attr('scope', 'row')
+		:css('border-right', '1.4em solid ' .. color(args, year, itemNum, range))
+		:wikitext(range ~= 0 and yearText .. '–' .. range or yearText)
+	if itemNum > 1 then
+		builder = builder:attr('rowspan', itemNum)
+	end
+end
+
+local function right(builder, itemNum, itemList)
+	if itemNum == 0 then return end
+
+	if itemNum == 1 then
+		builder:tag('td')
+			:wikitext(itemList[1])
+		return
+	end
+
+	-- if itemNum >= 2
+	builder:tag('td')
+		:addClass('rt-first')
+		:wikitext(itemList[1])
+
+	for key = 2, itemNum - 1 do
+		builder = builder:tag('tr')
+			:tag('td')
+			:addClass('rt-next')
+			:wikitext(itemList[key])
+	end
+
+	builder = builder:tag('tr')
+		:tag('td')
+		:addClass('rt-last')
+		:wikitext(itemList[itemNum])
+
+end
+
+local function row(builder, args, year, emptyyear, lastyear, highrange)
+	local oldrange = nil
+	
+	repeat
+		local itemNum, itemList, range = items(args, year, oldrange)
+		
+		-- Now check for a new high range and catch it. We need to know what highrange was prior to update though.
+		local oldhighrange = nil
+		if(range > 0 and (highrange == nil or range > highrange)) then
+			oldhighrange = (highrange or range)
+			highrange = range
+		end
+		oldhighrange = (oldhighrange or highrange)
+
+		-- If compressempty is set, check for empty items, track empty years and high ranges, and
+		-- put out a compressed range when next year is found.
+		if args.compressempty and oldrange == nil then
+			-- If we're compressing and there's no items, return this year for tracking.
+			if #itemList < 1 then
+				return year, highrange
+			end
+
+			-- If emptyyear is below or equal the highrange, we need to make adjustments.
+			if(emptyyear and oldhighrange and emptyyear <= oldhighrange) then
+				-- If the current year is highrange or highrange +1, suppress empty row output entirely.
+				-- If the current year is highrange+2 or more, adjust the emptyyear to be above highrange)				
+				if(year <= (oldhighrange+1)) then
+					emptyyear = nil
+				elseif(year > (oldhighrange+1)) then
+					emptyyear = oldhighrange+1
+				end
+			end
+
+			-- If we have items but are tracking an empty year, output compressed range row.
+			if emptyyear ~= nil then
+				builder = builder:tag('tr')
+				if year == 'TBA' then
+					left(builder, args, emptyyear, 0, lastyear)
+				else
+					if year-1 == emptyyear then
+						left(builder, args, emptyyear, 0, 0)
+					else
+						left(builder, args, emptyyear, 0, year-1)
+					end
+				end
+			end
+		end
+		
+		-- We can break out if this is the case. This means we have looped through more than once, but there were no more items remaining.
+		if range == 0 and oldrange and #itemList < 1 then
+			break
+		end
+
+		builder = builder:tag('tr')
+		left(builder, args, year, itemNum, range)
+		right(builder, itemNum, itemList)
+
+		if range ~= 0 then
+			oldrange = range
+		end
+	until range == 0
+	
+	return nil, highrange
+end
+
+function p._main(args)
+	-- Main module code goes here.
+	local currentyear = os.date('%Y')
+
+	local ret
+	local firstyear, lastyear
+	local TBA = items(args, 'TBA') > 0 and true or false
+
+	ret = mw.html.create( 'table' )
+		:addClass('release-timeline wikitable')
+		:addClass(args.align == 'left' and 'rt-left' or nil)
+
+	ret:tag('caption')
+		:wikitext((args.title or '發行時間軸') ..
+			(args.subtitle and ('<div class="rt-subtitle">'..args.subtitle..'</div>') or ''))
+
+	if tonumber(args.first) then
+		firstyear = tonumber(args.first)
+	else
+		for i = 1, currentyear do
+			if items(args, i) > 0 then
+				firstyear = i
+				break
+			end
+		end
+		firstyear = firstyear or (currentyear + 3)
+	end
+
+	if tonumber(args.last) then
+		lastyear = tonumber(args.last)
+	else
+		for i = currentyear + 3, TBA and currentyear or firstyear, -1 do
+			if items(args, i) > 0 then
+				lastyear = i
+				break
+			end
+		end
+		lastyear = lastyear or (currentyear - 1)
+	end
+
+	local emptyyear = nil
+	local highrange = nil
+	for year = firstyear, lastyear do
+		local yearcheck, newhighrange = row(ret, args, year, emptyyear, lastyear, highrange)
+		if (emptyyear == nil and yearcheck ~= nil) or (emptyyear ~= nil and yearcheck == nil) then
+			emptyyear = yearcheck
+		end
+		highrange = newhighrange		
+	end
+
+	if TBA then
+		row(ret, args, 'TBA')
+	end
+
+	return mw.getCurrentFrame():extensionTag{
+		name = 'templatestyles', args = { src = 'Module:Release timeline/styles.css'}
+	} .. tostring(ret)
+end
+
+function p.main(frame)
+	local args = require('Module:Arguments').getArgs(frame)
+	return p._main(args)
+end
+
+return p

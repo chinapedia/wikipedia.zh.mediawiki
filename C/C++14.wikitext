@@ -1,0 +1,277 @@
+{{noteTA|G1=IT}}
+'''C++14'''是[[C++|C++]]的现行标准的非正式名称，正式名称为"'''International Standard ISO/IEC 14882:2014(E) Programming Language C++'''"。C++14旨在作为[[C++11|C++11]]的一个小扩展，主要提供漏洞修复和小的改进。C++14标准的委员会草案（{{lang|en|Committee Draft}}）N3690于2013年5月15日发表。<ref>{{cite web | title=Committee Draft, Standard for Programming Language C++ | url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3690.pdf | accessdate=2013-07-25 | archive-date=2013-08-07 | archive-url=https://web.archive.org/web/20130807041338/http://open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3690.pdf | dead-url=no }}</ref>工作草案（{{lang|en|Working Draft}}）N3936已于2014年3月2日完成。最终的投票期结束于2014年8月15日，结果（一致通过）已于8月18日公布。<ref>{{cite web |title=We have C++14! |first=Herb |last=Sutter |date=August 18, 2014 |url=https://isocpp.org/blog/2014/08/we-have-cpp14 |accessdate=2014-08-18 |archive-date=2014-08-19 |archive-url=https://web.archive.org/web/20140819083101/https://isocpp.org/blog/2014/08/we-have-cpp14 |dead-url=yes }}</ref>
+
+==新的语言特性==
+以下为在C++14中被加入语言核心的特性。
+===泛型的lambda===
+在C++11中，lambda函数的形式参数需要被声明为具体的类型。C++14放宽了这一要求，允许lambda函数的形式参数声明中使用类型说明符<code>auto</code>。<ref>{{cite web|author=josedaniel|title=C++14 is out!|url=http://blog.biicode.com/cpp14/|accessdate=2014-09-20|archive-date=2014-09-20|archive-url=https://web.archive.org/web/20140920143744/http://blog.biicode.com/cpp14/|dead-url=no}}</ref>
+<syntaxhighlight lang="cpp">
+auto lambda = [](auto x, auto y) {return x + y;}
+</syntaxhighlight>
+
+泛型lambda函数遵循模板参数推导的规则。以上代码的作用与下面的代码相同：<ref>{{cite web |title=N3649 Generic (Polymorphic) Lambda Expressions (Revision 3) |url=http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3649.html |accessdate=2013-07-25 |archive-date=2013-08-25 |archive-url=https://web.archive.org/web/20130825022923/http://open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3649.html |dead-url=no }}</ref>
+
+<syntaxhighlight lang="cpp">
+struct unnamed_lambda
+{
+  template<typename T, typename U>
+    auto operator()(T x, U y) const {return x + y;}
+};
+auto lambda = unnamed_lambda{};
+</syntaxhighlight>
+
+=== Lambda捕获部分中使用表达式 ===
+
+C++11的lambda函数通过值拷贝（{{lang|en|by copy}}）或引用（{{lang|en|by reference}}）捕获（{{lang|en|capture}}）已在外层作用域声明的变量。这意味着lambda捕获的变量不可以是move-only的类型。<ref>{{cite web|title=Move capture in Lambda|url=http://stackoverflow.com/questions/8640393/move-capture-in-lambda|accessdate=2013-07-25|archive-date=2013-01-24|archive-url=https://web.archive.org/web/20130124160218/http://stackoverflow.com/questions/8640393/move-capture-in-lambda|dead-url=no}}</ref> C++14允许lambda成员用任意的被捕获表达式初始化。这既允许了capture by value-move，也允许了任意声明lambda的成员，而不需要外层作用域有一个具有相应名字的变量。<ref name=isocpp>{{cite web|last=Sutter|first=Herb|title=Trip Report: ISO C++ Spring 2013 Meeting|url=http://isocpp.org/blog/2013/04/trip-report-iso-c-spring-2013-meeting|accessdate=2013-06-14|archive-date=2017-08-20|archive-url=https://web.archive.org/web/20170820034305/https://isocpp.org/blog/2013/04/trip-report-iso-c-spring-2013-meeting|dead-url=no}}</ref>这称为'''广义捕获'''(Generalized capture)。<ref>MSDN: In C++14, you can introduce and initialize new variables in the capture clause, without the need to have those variables exist in the lambda function’s enclosing scope. The initialization can be expressed as any arbitrary expression; the type of the new variable is deduced from the type produced by the expression. One benefit of this feature is that in C++14 you can capture move-only variables (such as std::unique_ptr) from the surrounding scope and use them in a lambda.</ref>即在捕获子句（capture clause）中增加并初始化新的变量，该变量不需要在lambda表达式所处的闭包域（enclosing scope）中存在；即使在闭包域中存在也会被新变量覆盖(override)。新变量类型由它的初始化表达式推导。用途是可以从外层作用域中捕获只供[[移动语义|移动]]的变量并使用它。
+
+这是通过使用一个初始化表达式完成的：
+
+<syntaxhighlight lang="cpp">
+auto lambda = [value = 1] {return value;}
+</syntaxhighlight>
+
+lambda函数<code>lambda</code>的返回值是1，说明<code>value</code>被初始化为1。被声明的捕获变量的类型会根据初始化表达式推断，推断方式与用<code>auto</code>声明变量相同。
+
+使用标准函数<code>std::move</code>可以使之被用以通过move捕获：
+
+<syntaxhighlight lang="cpp">
+auto ptr = std::make_unique<int>(10); //See below for std::make_unique
+auto lambda = [value = std::move(ptr)] {return *value;}
+</syntaxhighlight>
+
+=== 函数返回类型推导 ===
+
+C++11允许lambda函数根据return语句的表达式类型推断返回类型。C++14为一般的函数也提供了这个能力。C++14还拓展了原有的规则，使得函数体并不是<code>{return ''expression'';}</code>形式的函数也可以使用返回类型推导。<ref name=wong1>{{cite web|last=Wong|first=Michael|title=The View form the C++ Standard meeting April 2013 Part 1|url=https://www.ibm.com/developerworks/community/blogs/5894415f-be62-4bc0-81c5-3956e82276f3/entry/the_view_from_c_standard_meeting_april_2013_part_1?lang=en|work=C/C++ Cafe|accessdate=14 June 2013|archive-date=2013-10-13|archive-url=https://web.archive.org/web/20131013140319/https://www.ibm.com/developerworks/community/blogs/5894415f-be62-4bc0-81c5-3956e82276f3/entry/the_view_from_c_standard_meeting_april_2013_part_1?lang=en|dead-url=no}}</ref>
+
+为了启用返回类型推导，函数声明必须将<code>auto</code>作为返回类型，但没有C++11的后置返回类型说明符：
+
+<syntaxhighlight lang="cpp">
+auto DeduceReturnType();   //返回类型由编译器推断
+</syntaxhighlight>
+
+如果函数实现中含有多个return语句，这些表达式必须可以推断为相同的类型。<ref name=deduce>{{cite web|title=N3638 Return type deduction for normal functions|url=http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3638.html|accessdate=14 June 2013|archive-date=2013-08-25|archive-url=https://web.archive.org/web/20130825003525/http://open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3638.html|dead-url=no}}</ref>
+
+使用返回类型推导的函数可以前向声明，但在定义之前不可以使用。它们的定义在使用它们的翻译单元（{{lang|en|translation unit}}）之中必须是可用的。
+
+这样的函数中可以存在[[递归|递归]]，但递归调用必须在函数定义中的至少一个return语句之后：<ref name=deduce />
+
+<syntaxhighlight lang="cpp">
+auto Correct(int i) {
+  if (i == 1)
+    return i;               // 返回类型被推断为int
+  else
+    return Correct(i-1)+i;  // 正确，可以调用
+}
+
+auto Wrong(int i)
+{
+  if(i != 1)
+    return Wrong(i-1)+i;  // 不能调用，之前没有return语句
+  else
+    return i;             // 返回类型被推断为int
+}
+</syntaxhighlight>
+
+=== 另一种类型推断 ===
+
+C++11中有两种推断类型的方式。<code>auto</code>根据给出的表达式产生具有合适类型的变量。<code>[[decltype|decltype]]</code>可以计算给出的表达式的类型。但是，<code>decltype</code>和<code>auto</code>推断类型的方式是不同的。特别地，<code>auto</code>总是推断出非引用类型，就好像使用了<code>std::remove_reference</code>一样，而<code>auto&&</code>总是推断出引用类型。然而<code>decltype</code>可以根据表达式的[[值分类|值类别]]（{{lang|en|value category}}）和表达式的性质推断出引用或非引用类型：<ref name=wong1 />
+
+<syntaxhighlight lang="cpp">
+int i;
+int&& f();
+auto x3a = i;              // x3a的类型是int
+decltype(i) x3d = i;       // x3d的类型是int
+auto x4a = (i);            // x4a的类型是int
+decltype((i)) x4d = (i);   // x4d的类型是int&
+auto x5a = f();            // x5a的类型是int
+decltype(f()) x5d = f();   // x5d的类型是int&&
+</syntaxhighlight>
+
+C++14增加了<code>decltype(auto)</code>的语法。允许auto的类型声明使用decltype的规则。也即，允许不必显式指定作为<code>decltype</code>参数的表达式，而使用<code>decltype</code>对于给定表达式的推断规则。
+
+<code>decltype(auto)</code>的语法也可以用于[[#函数返回类型推导|返回类型推导]]，只需用<code>decltype(auto)</code>代替<code>auto</code>。<ref name=deduce/>
+
+=== 放松的constexpr函数限制 ===
+
+[[C++11#泛化的常數表示式|C++11]]引入了声明为constexpr的函数的概念。声明为constexpr函数的意义是：如果其参数均为合适的[[编译期|编译期]]常量，则对这个constexpr函数的调用就可用于期望常量表达式的场合（如模板的非类型参数，或枚举常量的值）。如果参数的值在[[运行期|运行期]]才能确定，或者虽然参数的值是编译期常量，但不符合这个函数的要求，则对这个函数调用的求值只能在运行期进行。<!-- 例如
+constexpr int check_positive(int x) { return (x>0)?x:(std::cout << "input is not positive!\n",0); }
+enum { x = check_positive(1), /* ok, the initializer is a constant expression */
+y = check_positive(-1) }; /* error, the initializer is not a constant expression */ -->
+然而C++11要求constexpr函数只含有一个将被返回的表达式（也可以还含有<code>static_assert</code>声明等其它语句，但允许的语句类型很少）。
+
+C++14放松了这些限制。声明为constexpr的函数可以含有以下内容：<ref name=wong1/>
+* 任何声明，除了：
+** <code>static</code>或<code>thread_local</code>变量。
+** 没有初始化的变量声明。
+* 条件分支语句<code>if</code>和<code>switch</code>。
+* 所有的循环语句，包括基于范围的<code>for</code>循环。
+* 表达式可以改变一个对象的值，只需该对象的生命期在声明为constexpr的函数内部开始。包括对有<code>constexpr</code>声明的任何非<code>const</code>非静态成员函数的调用。
+
+<code>goto</code>仍然不允许在constexpr函数中出现。
+
+此外，C++11指出，所有被声明为<code>constexpr</code>的非静态成员函数也隐含声明为<code>const</code>（即函数不能修改*this的值）。这点已经被删除，非静态成员函数可以为非<code>const</code>。<ref>{{cite web|title=N3652 Relaxing constraints on constexpr functions|url=http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3652.html|accessdate=2013-07-25|archive-date=2013-08-25|archive-url=https://web.archive.org/web/20130825070617/http://open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3652.html|dead-url=no}}</ref>
+
+=== 变量模板 ===
+
+在[[C++|C++]]之前的版本中，模板可以是函数模板或类模板（C++11引入了[[C++11#模板的別名|类型别名模板]]）。C++14现在也可以创建变量模板。在提案中给出的示例是变量<code>pi</code>，其可以被读取以获得各种类型的<code>pi</code>的值（例如，当被读取为整数类型时为3;当被读取为<code>float</code>,<code>double</code>,<code>long double</code>时，可以是近似<code>float</code>，<code>double</code>或<code>long double</code>精度的值）包括特化在内，通常的模板的规则都适用于变量模板的声明和定义。<ref name=isocpp/><ref>{{cite web|title=N3651 Variable Templates (Revision 1)|url=http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3651.pdf|accessdate=2013-07-25|archive-date=2013-08-25|archive-url=https://web.archive.org/web/20130825045920/http://open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3651.pdf|dead-url=no}}</ref><syntaxhighlight lang="cpp">
+template<typename T>
+constexpr T pi = T(3.141592653589793238462643383);
+
+// 适用于特化规则 :
+template<>
+constexpr const char* pi<const char*> = "pi";
+</syntaxhighlight>
+
+=== 聚合类成员初始化 ===
+
+[[C++11|C++11]]增加了default member initializer，如果构造函数没有初始化某个成员，并且这个成员拥有default member initializer，就会用default member initializer来初始化成员。聚合类（aggregate type）的定义被改为明确排除任何含有default member initializer的类类型，因此，如果一个类含有default member initializer，就不允许使用聚合初始化。
+
+C++14放松了这一限制，<ref name=wong1 />含有default member initializer的类型也允许聚合初始化。如果在定义聚合体类型的对象时，使用的花括号初始化列表没有指定该成员的值，将会用default member initializer初始化它。<ref>{{cite web|title=N3653 Member initializers and aggregates|url=http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3653.html|accessdate=2013-07-25|archive-date=2013-08-25|archive-url=https://web.archive.org/web/20130825025332/http://open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3653.html|dead-url=no}}</ref>
+
+<syntaxhighlight lang="c++">
+struct CXX14_aggregate {
+    int x;
+    int y = 42;
+};
+
+CXX14_aggregate a = {1}; // C++14允许。a.y被初始化为42
+</syntaxhighlight>
+
+=== 二进制字面量 ===
+
+C++14的数字可以用[[二进制|二进制]]形式指定。<ref name=wong1 />其格式使用前缀<code>0b</code>或<code>0B</code>。这样的语法也被[[Java|Java]]、[[Python|Python]]、[[Perl|Perl]]和[[D语言|D语言]]使用。
+
+=== 数字分位符 ===
+
+C++14引入单引号（'）作为数字分位符号，使得数值型的字面量可以具有更好的可读性。<ref>{{cite web|title=N3781 Single-Quotation-Mark as a Digit Separator|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3781.pdf|date=25 September 2013|first1=Lawrence|last1=Crowl|first2=Richard|last2=Smith|first3=Jeff|last3=Snyder|first4=Daveed|last4=Vandevoorde|accessdate=2014-04-11|archive-date=2014-04-13|archive-url=https://web.archive.org/web/20140413141458/http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3781.pdf|dead-url=no}}</ref>
+
+[[Ada|Ada]]、[[D语言|D语言]]、[[Java|Java]]、[[Perl|Perl]]、[[Ruby|Ruby]]等程序设计语言使用下划线（_）作为数字分位符号，C++之所以不和它们保持一致，是因为下划线已被用在[[C++11#用户定义字面量|用户自定义的字面量]]的语法中。
+<syntaxhighlight lang="cpp">
+auto integer_literal = 100'0000;
+auto floating_point_literal = 1.797'693'134'862'315'7E+308;
+auto binary_literal = 0b0100'1100'0110;
+auto silly_example = 1'0'0'000'00;
+</syntaxhighlight>
+
+=== <nowiki>deprecated</nowiki> 属性 ===
+<code>deprecated</code>属性允许标记[[不推荐使用|不推荐使用]]的实体，该实体仍然能合法使用，但会让用户注意到使用它是不受欢迎的，并且可能会导致在编译期间输出警告消息。 <code>deprecated</code>可以有一个可选的字符串文字作为参数，以解释弃用的原因和/或建议替代者。
+<syntaxhighlight lang="cpp">
+[[deprecated|deprecated]] int f();
+
+[[deprecated("g()_is_thread-unsafe._Use_h()_instead")|deprecated("g() is thread-unsafe. Use h() instead")]]
+void g( int& x );
+
+void h( int& x );
+
+void test() {
+  int a = f(); // 警告：'f'已弃用
+  g(a); // 警告：'g'已弃用：g() is thread-unsafe. Use h() instead
+}
+</syntaxhighlight>
+
+== 新的标准库特性 ==
+
+=== 共享的互斥体和锁 ===
+
+C++14增加了一类共享的互斥体和相应的共享锁<ref name=wong3>{{cite web|last=Wong|first=Michael|title=The View form the C++ Standard meeting April 2013 Part 3|url=https://www.ibm.com/developerworks/community/blogs/5894415f-be62-4bc0-81c5-3956e82276f3/entry/the_view_form_the_c_standard_meeting_april_2013_part_3?lang=en|work=C/C++ Cafe|accessdate=14 June 2013|archive-date=2013-10-13|archive-url=https://web.archive.org/web/20131013175447/https://www.ibm.com/developerworks/community/blogs/5894415f-be62-4bc0-81c5-3956e82276f3/entry/the_view_form_the_c_standard_meeting_april_2013_part_3?lang=en|dead-url=no}}</ref><ref>{{cite web|title=N3659 Shared locking in C++ Revision 2|url=http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3659.html|accessdate=2013-07-25|archive-date=2013-08-19|archive-url=https://web.archive.org/web/20130819073515/http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3659.html|dead-url=no}}</ref>。起初选择的名字是<code>std::shared_mutex</code>，但由于后来增加了与<code>std::timed_mutex</code>相似的特性，<code>std::shared_timed_mutex</code>成为了更适合的名字。<ref>{{cite web|title=N3891: A proposal to rename shared_mutex to shared_timed_mutex|url=http://isocpp.org/files/papers/N3891.htm|accessdate=2014-04-11|archive-date=2014-04-13|archive-url=https://web.archive.org/web/20140413124748/http://isocpp.org/files/papers/N3891.htm|dead-url=no}}</ref>
+
+=== 元函数的别名 ===
+
+C++11定义了一组[[C++#用於元編程的型別屬性|元函数]]，用于查询一个给定类型是否具有某种特征，或者转换给定类型的某种特征，从而得到另一个类型。后一种元函数通过成员类型type来返回转换后的类型，当它们用在模板中时，必须使用[[typename|typename]]关键字，这会增加代码的长度。
+<syntaxhighlight lang=cpp>
+template <class T>
+type_object<
+  typename std::remove_cv<
+    typename std::remove_reference<T>::type
+  >::type
+>get_type_object(T&);
+</syntaxhighlight>
+
+利用[[C++11#模板的別名|类型别名模板]]，C++14提供了更便捷的写法。其命名规则是：如果标准库的某个类模板（假设为<code>std::''some_class''</code>）只含有唯一的成员，即成员类型type，那么标准库提供<code>std::''some_class''_t<T></code>作为<code>typename std::''some_class''::type</code>的别名。
+
+在C++14，拥有类型别名的元函数包括：remove_const、remove_volatile、remove_cv、add_const、add_volatile、add_cv、remove_reference、add_lvalue_reference、add_rvalue_reference、make_signed、make_unsigned、remove_extent、remove_all_extents、remove_pointer、add_pointer、aligned_storage、aligned_union、decay、enable_if、conditional、common_type、underlying_type、result_of、tuple_element。
+
+<syntaxhighlight lang=cpp>
+template <class T>
+type_object<std::remove_cv_t<std::remove_reference_t<T>>>
+get_type_object(T&);
+</syntaxhighlight>
+=== 关联容器中的异构查找 ===
+
+C++标准库定义了四个关联容器类。set和multiset允许使用者根据一个值在容器中查找对应的的同类型的值。map和multimap容器允许使用者指定键（key）和值（value）的类型，根据键进行查找并返回对应的值。然而，查找只能接受指定类型的参数，在map和multimap中是键的类型，而在set和multiset容器中就是值本身的类型。
+
+C++14允许通过其他类型进行查找，只需要这个类型和实际的键类型之间可以进行比较操作。<ref name=wong2>{{cite web|last=Wong|first=Michael|title=The View form the C++ Standard meeting April 2013 Part 2|url=https://www.ibm.com/developerworks/community/blogs/5894415f-be62-4bc0-81c5-3956e82276f3/entry/the_view_form_the_c_standrd_meeting_april_2013_part_2?lang=en|work=C/C++ Cafe|accessdate=14 June 2013|archive-date=2013-10-13|archive-url=https://web.archive.org/web/20131013175358/https://www.ibm.com/developerworks/community/blogs/5894415f-be62-4bc0-81c5-3956e82276f3/entry/the_view_form_the_c_standrd_meeting_april_2013_part_2?lang=en|dead-url=no}}</ref>这允许<code>std::set<std::string></code>使用<code>const char*</code>，或任何可以通过<code>operator< </code>与<code>std::string</code>比较的类型作为查找的参数。
+
+为保证向后兼容性，这种异构查找只在提供给关联容器的比较器允许的情况下有效。标准库的泛型比较器，如<code>std::less<></code>与<code>std::greater<></code>允许异构查找。<ref>{{cite web|title=N3657 Adding heterogeneous comparison lookup to associative containers (rev 4)|url=http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3657.htm|accessdate=2013-07-25|archive-date=2013-08-19|archive-url=https://web.archive.org/web/20130819073503/http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3657.htm|dead-url=no}}</ref>
+
+=== 标准自定义字面量 ===
+
+C++11增加了[[C++11#使用者自訂的字面值|自定义字面量]]（{{lang|en|user-defined literals}}）的特性，使用户能够定义新的字面量后缀，但标准库并没有对这一特性加以利用。C++14标准库定义了以下字面量后缀：<ref name="wong2"/>
+
+* "s"，用于创建各种<code>std::basic_string</code>类型。
+* "h"、"min"、"s"、"ms"、"us"、"ns"，用于创建相应的<code>std::chrono::duration</code>时间间隔。
+* "if"、"i"、"il"用于创建相应的 <code>std::complex<float></code>、 <code>std::complex<double></code> 和 <code>std::complex<long double></code> 复数类型。
+
+<syntaxhighlight lang="cpp">
+auto str = "hello world"s; // 自动推导为 std::string
+auto dur = 60s;            // 自动推导为 chrono::seconds
+auto z   = 1i;             // 自动推导为 complex<double>
+</syntaxhighlight>
+
+两个"s"互不干扰，因为表示字符串的只能对字符串字面量操作，而表示秒的只针对数字。<ref>{{cite web|title=N3642 User-defined Literals for Standard Library Types (part 1 - version 4)|url=http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3642.pdf|accessdate=2013-07-25|archive-date=2013-08-25|archive-url=https://web.archive.org/web/20130825004107/http://open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3642.pdf|dead-url=no}}</ref>
+
+=== 通过类型寻址多元组 ===
+
+C++11引入的<code>std::tuple</code>类型允许不同类型的值的聚合体用编译期整型常数索引。C++14还允许使用类型代替常数索引，从多元组中获取对象。<ref name="wong2"/>若多元组含有多于一个这个类型的对象，将会产生一个编译错误：<ref>{{cite web|title=N3670 Wording for Addressing Tuples by Type: Revision 2|url=http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3670.html|accessdate=2013-07-25|archive-date=2013-08-19|archive-url=https://web.archive.org/web/20130819074158/http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3670.html|dead-url=no}}</ref>
+
+<syntaxhighlight lang="cpp">
+tuple<string, string, int> t("foo", "bar", 7);
+int i = get<int>(t);        // i == 7
+int j = get<2>(t);          // Same as before: j == 7
+string s = get<string>(t);  //Compiler error due to ambiguity
+</syntaxhighlight>
+
+=== 较小的标准库特性 ===
+
+<code>std::make_unique</code>可以像<code>std::make_shared</code>一样使用，用于产生<code>std::unique_ptr</code>对象。<ref name=isocpp/>
+
+<code>std::is_final</code>，用于识别一个class类型是否[[C++11#显式虚函数重载|禁止被继承]]。
+
+<code>std::integral_constant</code>增加了一个返回常量值的<code>operator()</code>。<ref name=wong2/>
+
+全局<code>std::begin/std::end</code>函数之外，增加了<code>std::cbegin/std::cend</code>函数，它们总是返回常量迭代器（{{lang|en|constant iterators}}）。
+
+==已被移除或是不包含在C++14标准的特性==
+因为C++14的主要目的是漏洞修复和小的改进，一些重量级的特性被从C++14中移除，其中有部分将加入[[C++17|C++17]]标准。
+
+=== 关于数组的扩展 ===
+
+在[[C++11|C++11]]和之前的标准中，在堆栈上分配的数组被限制为拥有一个固定的、编译期确定的长度。这一扩展允许在堆栈上分配的一个数组的最后一维具有运行期确定的长度。<ref name=isocpp/>
+
+运行期确定长度的数组不可以作为对象的一部分，也不可以具有全局存储期，他们只能被声明为局部变量。运行期确定长度的数组也可以使用C++11的基于范围的for循环。<ref>{{cite web|title=N3639 Runtime-sized arrays with automatic storage duration (revision 5)|url=http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3639.html|accessdate=2013-06-14|archive-date=2013-06-24|archive-url=https://web.archive.org/web/20130624080441/http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3639.html|dead-url=no}}</ref>
+
+同时还将添加<code>std::dynarray</code>类型，它拥有与<code>std::vector</code>和<code>std::array</code>相似的接口。代表一个固定长度的数组，其大小在运行期构造对象时确定。<code>std::dynarray</code>类被明显地设计为当它被放置在栈上时（直接放置在栈上，或作为另一个栈对象的成员），可以使用栈内存而不是堆内存。
+
+由于一些设计无法达成一致，这一扩展已被放弃。
+
+=== Optional值 ===
+
+类似于[[C_Sharp|C#]]中的可空类型，optional类型可能含有或不含有一个值。这一类型基于[[Boost_C++_Libraries|Boost]]的<code>boost::optional</code>类，而添加了C++11和C++14中的新特性，诸如移动和in-place构造。它不允许用在引用类型上。这个类被专门的设计为一个literal type（如果模板参数本身是一个literal type），因此，它在必要的情况下含有constexpr构造函数。<ref>{{cite web|title=A proposal to add a utility class to represent optional objects (Revision 4)|url=http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3672.html|accessdate=2013-07-25|archive-date=2013-08-25|archive-url=https://web.archive.org/web/20130825001553/http://open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3672.html|dead-url=no}}</ref>
+
+===Concepts Lite===
+
+{{see also|概念 (C++)}}
+被C++11拒绝后，Concepts受到彻底的修改。Concepts Lite是Concepts的一个部分，仅包含类型约束，而不含<code>concept_map</code>和<code>axiom</code><ref>{{cite web|title=Concepts Lite: Constraining Templates with Predicates|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3580.pdf|format=pdf|date=2013-03-17|accessdate=2014-06-26|archive-date=2013-11-10|archive-url=https://web.archive.org/web/20131110090756/http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3580.pdf|dead-url=no}}</ref>。 ISO/IEC TS 19217:2015 Information technology -- Programming languages -- C++ Extensions for concepts已出版。
+
+==另见==
+* [[C++11|C++11]]
+* [[C++17|C++17]]
+
+==参考资料==
+<references />
+
+{{C++}}
+
+[[Category:C++|Category:C++]]
+[[Category:程式語言標準|Category:程式語言標準]]
+[[Category:带有C++代码示例的条目|Category:带有C++代码示例的条目]]

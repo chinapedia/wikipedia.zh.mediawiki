@@ -1,0 +1,109 @@
+{{NoteTA|G1=IT}}
+{{lowercase|title=auto (C++)}}
+'''auto'''是[[C++程序设计语言|C++程序设计语言]]的[[保留字|关键字]]。自[[C++11|C++11]]以来，auto关键字用于两种情况：声明变量时根据初始化表达式自动推断该变量的类型、声明函数时函数返回值的占位符。[[C++98|C++98]]标准中auto关键字用于[[自动变量|自动变量]]的声明，但由于使用极少且多余，在C++11中已删除这一用法。
+
+==简要理解==
+auto可以在声明变量时根据变量初始值的类型自动为此变量选择匹配的类型。C++语言类似的关键字还有[[decltype|decltype]]。
+
+举例：对于值x=1；即可以声明：int x = 1或long x = 1，也可以直接声明auto x = 1。
+
+其它语言的类似功能包括C#的var关键字。
+==用法==
+根据初始化表达式自动推断被声明的变量的类型，如：
+  auto f=3.14;      //double
+  auto s("hello");  //const char*
+  auto z = new auto(9); // int*
+  auto x1 = 5, x2 = 5.0, x3='r';//错误，必须是初始化为同一类型
+但是，这么简单的变量声明类型，不建议用auto关键字，而是应更清晰地直接写出其类型。
+
+auto关键字更适用于类型冗长复杂、变量使用范围专一时，使程序更清晰易读：
+  std::vector<int> vect; 
+  for(auto it = vect.begin(); it != vect.end(); ++it)
+  {  //it的类型是std::vector<int>::iterator
+     std::cin >> *it;
+   }
+或者保存[[匿名函数#C.2B.2B|lambda表达式类型]]的变量声明：
+   auto ptr = [](double x){return x*x;};//类型为std::function<double(double)>函数对象
+
+在[[模板_(C++)|模板函数]]定义时，如果变量的类型依赖于模板参数，使用auto关键字使得在编译期确定这些类型，如：
+  template <class T, class U>void Multiply(T t, U u)
+  {
+       auto v = t * u;
+       std::cout<<v;
+  }
+
+模板函数的返回类型如果也是依赖于从模板参数推导，
+  template <typename _Tx, typename _Ty>
+  auto multiply(_Tx v1, _Ty v2) -> decltype( _Tx * _Ty )
+  {
+      return v1*v2;
+  }
+  auto result = multiply(101, 1.414); // 结果类型是double
+==语义==
+使用auto关键字做类型自动推导时，依次施加以下规则：{{refTag|name="Becker"|1=[http://thbecker.net/articles/auto_and_decltype/section_02.html C++ auto and decltype Explained, by Thomas Becker]}}
+*  首先，如果初始化表达式是引用，首先去除引用；
+*  上一步后，如果剩下的初始化表达式有顶层的const且/或volatile限定符，去除掉。 
+这一组规则同于[[模板_(C++)|模板函数]]的[[模板参数推导|模板参数推导]]（template argument deduction）时的规则。但auto关键字可以从C++11风格的花括号{与}包围的值列表推导出[[b:C++/Initializer_list|std::initializer_list]]；而模板函数的形参推导时不认为这种值列表是一个类型，因此不能由值列表推导出std::initializer_list类型。
+
+因而，使用auto关键字声明变量的类型，不能自动推导出顶层的CV-qualifiers，也不能自动推导出引用类型，需要显式指定。例如：
+    const int v1 = 101;
+    auto v2 = v1;       // v2类型是int，脱去初始化表达式的顶层const
+    v2=102；            // 可赋值
+    auto al = { 10, 11, 12 };//类型是std::initializer_list<int>
+    template<class T> void foo(T arg); // 函数模板声明
+    foo(v2); //函数模板实例化为 void foo<int>(int)
+如果需要具有顶层的CV-qualifiers，或者引用的类型，解决办法是显式指明：
+    const auto& v3=v1;
+    foo<const int&>(v1);//直接指明模板参数类型
+    template<class T> void foo(const T& arg);//或者偏特化模板函数
+
+如果auto关键字还带上&号，声明引用类型，则不执行const剥除（const-stripping），例如：
+    const int c = 0;
+    auto& rc = c;
+    rc = 44; // 编译错误，const int类型
+这是因为如果不抑制const剥除，则得到了一个非常量引用型变量，指向了const变量，这显然是不可接受的。模板参数推导也遵循此规则。
+
+初始化表达式为数组，auto关键字推导的类型为指针。这是因为数组名在初始化表达式中自动隐式转换为首元素地址的右值。例如：
+    int a[9];
+    auto j = a;
+    std::cout << typeid(j).name() << " "<<sizeof(j)<<" "<<sizeof(a)<< std::endl;
+
+由于C++规定字符串字面量是左值，因此可以通过&运算符直接取地址：
+    auto al = &"hello";  // a1的类型是const char(*) [6]  
+
+===auto关键字的类型完美转发===
+C++11使用auto声明变量时，如：<code>auto&& var=initValue;</code>“auto&&”并不意味着这一定是[[右值引用|右值引用]]类型的变量，而是类似于[[模板参数推导|模板函数参数的类型推导]]，既可能是左值引用，也可能是右值引用。其目的是把初始化表达式的[[值_(计算机科学)|值分类]]情况，完美转发给由auto声明的变量。也即：
+*如果初始化值（initializer）是类型A的左值，则声明的变量类型为左值引用A&；
+*如果初始化值是类型A的右值，则声明的变量类型为右值引用A&&。
+<syntaxhighlight lang="cpp">
+ 
+#include<iostream>  
+#include <vector>
+#include <typeinfo>
+using namespace std;
+ 
+struct Widget{};
+Widget makeWidget(){ return Widget(); } // 类工厂函数
+
+int main()
+{
+	Widget&& var1 = Widget(); // var1的类型是右值引用，但是作为左值
+	auto&& var2 = var1;       //var2的类型是左值引用
+	std::vector<int> v = { 1, 2, 3 };
+	auto&& val = v[0]; // std::vector::operator[]的返回值是元素左值，所以val的类型是左值引用
+	Widget&& var3 = makeWidget(); // var3是左值，但它的类型是右值引用 
+	Widget var4 = static_cast<Widget&&>(var1); // var4是左值，但它的类型是右值引用
+
+	std::cout << typeid(var1).name() << std::endl;
+	std::cout << typeid(var2).name() << std::endl;
+	std::cout << typeid(val).name() << std::endl;
+	std::cout << typeid(var3).name()  << std::endl;
+	std::cout << typeid(var4).name() << std::endl;
+}
+</syntaxhighlight>
+
+==参考文献==
+{{ReflistH}}
+{{RefFoot}}
+{{ReflistF}}
+[[Category:C++|Category:C++]]

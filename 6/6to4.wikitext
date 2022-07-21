@@ -1,0 +1,52 @@
+{{noteTA
+|G1=IT
+}}
+'''6to4'''是一种[[IPv6|IPv6]]转换传输机制，是将IPv6的数据包直接封装在[[IPv4|IPv4]]的数据包中，并通过内嵌于IPv6地址的IPv4地址信息实现无需显式配置隧道就可以直接在IPv4网络上传输。同时一种特殊配置的中继路由允许其能与原生IPv6网络进行通信。
+
+在从纯IPv4网络完全过渡到纯IPv6网络完全部署前，6to4技术尤其重要，因为这请求主机和目标主机之间都不需要IPv6网络支持，但是这是一种过渡性的转换传输机制，并不意味永久使用。
+
+6to4可以使用在一台单独主机上，或一个本地网络上。如果是单独主机的话，则该主机需要一个非专用的公开IPv4地址，并且实现对IPv6数据包装解封，如果这台主机是服务于本地网并能转发本地网络其他主机的通信，则其作为该IPv6本地网络的[[路由器|路由器]]。
+
+6to4不利于仅支持IPv4的主机和仅支持IPv6的主机之间的互操作。 6to4只是一个透明机制，用作IPv6节点之间的传输层。
+
+由于大量主机配置错误和性能较差，2011年8月发布了应如何部署6to4的建议。<ref name="rfc6343">{{IETF RFC|6343}} - Advisory Guidelines for 6to4 Deployment</ref>由于6to4的任播前缀操作问题无法解决，该部分标准在2015年已弃用。<ref name="rfc7526">{{IETF RFC|7526}} - Deprecating the Anycast Prefix for 6to4 Relay Routers</ref>
+
+==运作方法==
+6to4解决了以下三个功能：
+* 如何一个公共IPv4地址去为一台独立主机或本地网络申请一个IPv6网络前缀。
+* 使用[[6in4|6in4]]的数据包封装机制封装IPv6数据包。
+* 如何与6to4网络和纯IPv6网络的网络流量路由。
+===地址块申请===
+6to4定义了一个网络前缀<code>2002::/16</code>用于表达这是一个6to4网络整体，任何一个公共IPv4地址将地址的十六进制值加在6to4网络前缀之后，从而产生一个前缀数为48的相应IPv4的6to4子网的网络前缀，而且其仍然可以继续分割至最小前缀数为64的子网段用于区分出这个6to4子网的子网。另外，{{RFC|1918}}所定义的专用网络地址不能用于6to4子网的申请，因为通信回应时无法将按照IPv4专用网络地址送回发起处。
+
+例如，IPv4地址<code>192.0.2.4</code>能够申请到<code>2002:c000:0204::/48</code>网络前缀（<code>c000:0204</code>为<code>192.0.2.4</code>的十六进制值），而48到64之间还有16位的地址空间可用于再划分更小的子网。
+
+===封装与传输===
+6to4的封装是使用6in4的封装，将IPv6的数据包直接跟接着IPv4的数据包头，并且IPv4数据包的协议号为41。IPv4数据包的源地址是派生自封装的IPv6数据包源地址中的内嵌IPv4地址，而目的地址则根据封装的IPv6数据包目的地址而不同。这些6to4的IPv4数据包如普通的IPv4一样在IPv4网络中路由转发。
+
+===与6to4网络和纯IPv6之间的路由===
+[[File:6to4.svg|thumb]]
+为了使6to4网络的主机或网络能够与其他“原生”IPv6网络通信，这需要到“中继路由器（relay routers）”。这些路由器连接着IPv4和IPv6网络，会在IPv6网络对<code>2002::/16</code>进行路由宣告以使其他IPv6网络的流量能够通过这些路由器进行IPv4的封装和转发到相应目标的6to4网络。而6to4网络的IPv4出口侧需要一个[[默认网关|默认网关]]用于将6to4中已封装IPv6数据包的IPv4流量传入到IPv6网络，为了避免用户手工配置的麻烦，{{RFC|3068}}定义了一个[[任播|任播]]IPv4地址<tt>192.88.99.1</tt><ref name="rfc3068">{{IETF RFC|3068}} - An Anycast Prefix for 6to4 Relay Routers</ref>，其可以配置给多个中继路由器，用于接受6to4已封装IPv6数据包的IPv4流量并将其解封后转发至IPv6之中，但由于无法解决的操作问题，此用法已被弃用。<ref name=rfc6343/><ref name=rfc7526/>“6to4中继路由器”不一定就是“6to4边界路由器”。“边界路由器”是支持一个6to4伪接口的IPv6路由器，用于宣告其IPv4对应6to4前缀。“中继路由器”则负责完整6to4网络与纯IPv6网络之间数据包的解封装。“中继路由器”应该对IPv6网络宣告整个<code>2002::/16</code>的路由而不区分基于IPv4的子网区分，避免IPv4的路由污染到IPv6的路由表。
+
+对于6to4子网络之间的路由，则直接根据封装的IPv6包目的地址为6to4地址中内嵌IPv4地址，按照普通的IPv4流量在IPv4网络中直接发送。
+
+==反向DNS委派==
+如果使用6to4的站点有着固定的全域IPv4地址，则其6to4IPv6网络前缀也是固定的。可以通过6to4.nro.net网站向[[号码资源组织|号码资源组织]]申请在<code>2.0.0.2.ip6.arpa</code>{{tsl|en|DNS zone|DNS域}}添加一个前缀48为单位的反向DNS委派域，可以自动化申请。
+
+==安全要点==
+根据{{RFC|3964}}，6to4的边界路由器和中继路由器被要求：
+*任何被封装的IPv6数据包的源地址或目的地址都应该6to4的网络前缀<code>2002::/16</code>。
+*如果IPv6源地址是6to4 IPv6地址，則其對應的6to4路由器IPv4地址與IPv4封裝頭中的IPv4源地址匹配。
+*同樣，如果IPv6目標地址是6to4 IPv6地址，則其對應的6to4路由器IPv4地址與IPv4封裝頭中的IPv4目標地址匹配。
+*任何6to4路由器嵌入的IPv4地址都是全球[[單播|單播]]的。
+
+==参考文献==
+{{reflist}}
+
+==外部链接==
+* [http://www.cisco.com/web/about/ac123/ac147/ac174/ac197/about_cisco_ipj_archive_article09186a00800c830a.html "Routing IPv6 over IPv4" article by Cisco]{{Wayback|url=http://www.cisco.com/web/about/ac123/ac147/ac174/ac197/about_cisco_ipj_archive_article09186a00800c830a.html |date=20151203044705 }}
+* [http://6to4.version6.net/?lang=en_GB IPv6 6to4 tunnel configuration example]{{Wayback|url=http://6to4.version6.net/?lang=en_GB |date=20050204233217 }}
+
+{{IPv6}}
+[[Category:IPv6|Category:IPv6]]
+[[Category:网络协议|Category:网络协议]]

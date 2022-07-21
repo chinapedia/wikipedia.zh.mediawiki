@@ -1,0 +1,137 @@
+'''缺省构造函数'''是[[C++|C++]]及其他一些[[面向对象程序设计语言|面向对象程序设计语言]]中，[[对象_(计算机科学)|对象]]的不需要参数即可调用的[[构造函数|构造函数]]。对象生成时如果没有显式地调用构造函数，则缺省构造函数会被自动调用。C++标准规定，如果构造函数没有参数（nullary），或者构造函数的所有参数都有缺省值（default value），都算作缺省构造函数。<ref>C++ standard, ISO/IEC 14882:1998, 12.1.5</ref>一个[[类_(计算机科学)|类]]只能有一个缺省构造函数。
+
+例如，显式定义、使用“缺省构造函数”：
+<source lang="cpp">
+class MyClass
+{
+  public:
+    MyClass();             // constructor declared
+
+  private:
+    int x;
+};
+
+MyClass :: MyClass()       // constructor defined   
+{
+    x = 100;
+}
+
+int main()
+{
+    MyClass object;        // object created 
+}                          // => default constructor called automatically
+</source> 
+
+下述例子是动态生成对象时，显示调用了缺省构造函数：
+<source lang = 'cpp'>
+int main()
+{
+    MyClass * pointer = new MyClass();  // object created 
+}                                       // => default constructor called automatically
+</source>
+
+<source lang='cpp'>
+    MyClass (int i = 0) {} 
+</source>
+
+C++中，缺省构造函数会在下列情形被自动调用：
+* 对象被定义时无参数，例如：<code>MyClass x;</code>; 或动态分配对象时无参数列表，例如：<code>new MyClass</code>或<code>new MyClass()</code>; 缺省构造函数用于初始化对象。
+* 对象数组被定义时，例如：<code>MyClass x[10];</code>; 或被动态分配时，例如：<code>new MyClass [10]</code>;缺省构造函数初始化数组的每个对象。
+* 当派生类在其初始化列表（initializer list）中没有显式调用其基类对象的构造函数时，基类的缺省构造函数被自动调用。 
+* 当一个类的构造函数的初始化列表中没有显式调用其对象成员（object component或object-valued field）的构造函数时，对象成员的缺省构造函数被自动调用。
+* [[C++标准程序库|C++标准程序库]]中，一些容器的填充值使用了值对象的缺省构造函数，如果这些值没有显式地给出。例如：<code>vector<MyClass>(10);</code>用10个元素初始化vector，这些元素用其缺省构造函数来初始化。 
+
+在上述这些情形中，如果被初始化地对象没有缺省构造函数，则编译时报错。 
+
+如果一个类没有显式定义构造函数，编译器将为其'''隐式'''地定义缺省构造函数（下文给出了例外情形）。隐式定义的缺省构造函数的函数体为空。例如：
+<source lang="cpp">
+class MyClass
+{
+    int x;                 // no constructor          
+};                         // => the compiler produces an (implicit) default constructor
+int main()
+{
+    MyClass object;        // no error: the (implicit) default constructor is called
+}
+</source>  
+ 
+如果类显式地定义了一些构造函数，但不是缺省构造函数，编译器则不会为该类隐式定义缺省构造函数。该类就没有缺省构造函数了。也就是说，并不是所有类都有缺省构造函数。这是很多常见错误的原因。例如：
+<source lang="cpp">
+class MyClass 
+{
+  public:
+    MyClass (int y);         // a constructor     
+
+  private:
+    int x;
+};
+MyClass :: MyClass (int y)
+{
+    x = y;
+}
+int main()
+{
+    MyClass object(100);     // constructor called
+    MyClass *pointer;        // for declaration do not need to know about existing constructors
+    pointer = new MyClass(); // error: no default constructor    
+    return 0;
+}
+</source>  
+
+如果类的基类没有缺省构造函数，那么编译器也不会为该类隐式地定义缺省构造函数。因为该类即使隐式地定义缺省构造函数，也无法初始化其基类。例如：
+<source lang="cpp">
+class A
+{
+public:
+	explicit A(int){}
+};
+
+class B: public A
+{
+};
+
+int main()
+{
+	B b1;         //编译报错
+}
+</source>
+
+如果类的基类的缺省构造函数为私有，那么编译器会为该类隐式地定义缺省构造函数，但编译报错“cannot access private member declared in class 基类名字”。例如：
+<source lang="cpp">
+class A
+{
+   A(){};
+public:
+	
+};
+
+class B: public A
+{
+};
+
+int main()
+{
+	B b1;         //编译报错
+}
+</source>
+
+对于union数据类型，如果它包含了一个成员有非缺省的构造函数，那么这个union类型的构造函数必须显式调用这个成员类型的构造函数。例如：
+<source lang="c++">
+struct bar {
+	bar() {};
+	bar(int) {};
+};
+union foo { 
+	int i;
+	float j;
+	bar b;
+        // foo(): b{ } { };    //只有增加这行，才能成功地构造一个foo类型的对象
+};
+foo vvv;         // syntax error: attempting to reference a deleted function
+</source>
+
+==参考文献==
+<references />
+
+
+[[Category:C++|Default Constructor]]

@@ -1,0 +1,114 @@
+{{lowercase title}}
+{{NoteTA|G1=IT|G2=FL}}
+{{Infobox software
+| name                   = nouveau
+| title                  = nouveau
+| logo                   = 
+| logo caption           = 
+| screenshot             = 
+| caption                = 
+| collapsible            = 
+| author                 = 
+| developer              = 
+| released               = 1.0 / {{Start date and age|2012|06|18}}<ref>{{cite web |url=http://www.h-online.com/open/news/item/Free-NVIDIA-graphics-driver-reaches-version-1-0-1620188.html |title=Free NVIDIA graphics driver reaches version 1.0 |last=von Eitzen |first=Chris |date=18 June 2012 |work=The H - Open |publisher=Heinz Heise |accessdate=2014-07-25 |archive-date=2014-07-28 |archive-url=https://web.archive.org/web/20140728215507/http://www.h-online.com/open/news/item/Free-NVIDIA-graphics-driver-reaches-version-1-0-1620188.html |dead-url=no }}</ref>
+| latest release version = 1.0.17
+| latest release date    = {{Release date and age|2021|01|23|df=yes}}<ref>{{cite mailing list |url=https://lists.freedesktop.org/archives/nouveau/2021-January/037766.html |title=[Nouveau] [ANNOUNCE] xf86-video-nouveau 1.0.17 |last=Mirkin |first=Ilia |date=2021-01-23 |mailinglist=nouveau |access-date=2021-01-23 |archive-date=2021-01-30 |archive-url=https://web.archive.org/web/20210130055525/https://lists.freedesktop.org/archives/nouveau/2021-January/037766.html |dead-url=no }}</ref>
+| latest preview version = 
+| latest preview date    = 
+| programming language   = 
+| operating system       = [[Linux|Linux]]、[[BSD|BSD]]
+| platform               = [[x86|x86]]、[[x86-64|x86-64]]、[[ARM架構|ARM]]
+| size                   = 
+| status                 = 進行中
+| genre                  = [[驱动程序|驱动程序]]及[[韌體|韌體]]
+| license                = [[MIT許可證|MIT許可證]]
+| website                = {{URL|http://nouveau.freedesktop.org}}
+}}
+[[File:The_Linux_Graphics_Stack_and_glamor.svg|thumb]]
+'''nouveau''' ({{IPAc-en|n|u:|ˈ|v|oʊ}}) 是一個{{link-en|自由及開放原始碼顯示卡驅動程式|Free and open-source graphics device driver}}，是為[[英伟达|Nvidia]]的[[显示卡|显示卡]]所編寫，也可用於屬於[[系统芯片|系统芯片]]的[[NVIDIA_Tegra|NVIDIA Tegra]]系列，此驅動程式是由一群獨立的軟體工程師所編寫，Nvidia的員工也提供了少许幫助。
+
+該專案的目標為利用[[逆向工程|逆向工程]]Nvidia的[[专有软件|專有]][[Linux|Linux]]驅動程式來創造一個開放原始碼的驅動程式。由讓[[freedesktop.org|freedesktop.org]]託管的[[X.Org基金会|X.Org基金会]]所管理，並以[[Mesa_3D|Mesa 3D]]的一部份進行散布，該專案最初是基於只有[[二维计算机图形|2D]]繪圖能力的「nv」自由與開放原始碼驅動程式所開發的，但[[紅帽公司|紅帽公司]]的開發者Matthew Garrett及其他人表示原先的程式碼被混淆處理過了<ref>{{cite web|url = http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=383465|title = Debian bug tracker|date = 17 August 2006|accessdate = 7 April 2013|archive-date = 2019-02-17|archive-url = https://web.archive.org/web/20190217102725/https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=383465|dead-url = no}}</ref>。nouveau以[[MIT許可證|MIT許可證]]授權。
+
+專案的名稱是從法文的「nouveau」而來，意思是「新的」<ref>{{cite web|url = http://nouveau.freedesktop.org/wiki/|title = nouveau Wiki|date = 7 July 2009|accessdate = 23 September 2009|archive-date = 2014-07-23|archive-url = https://web.archive.org/web/20140723185723/http://nouveau.freedesktop.org/wiki/|dead-url = yes}}</ref>。這個名字是由原作者的的IRC客戶端的自動取代功能所建議的，當他鍵入「nv」時就被建議改為「nouveau」<ref>{{cite web|url = http://lwn.net/Articles/269558/|title = The state of Nouveau, part I|work = LWN.net|date = 15 February 2008|accessdate = 24 November 2009|archive-date = 2012-03-01|archive-url = https://www.webcitation.org/65pzrR6Rb?url=http://lwn.net/Articles/269558/|dead-url = yes}}</ref>。
+
+== 軟體架構 ==
+[[File:Gallium3D_example_matrix.svg|thumb]]
+Nouveau是一個Gallium3D風格的驅動程式，並以DRI的方式運作。它結合了兩個[[内核|内核]]元件：直接呈現管理員及KMS驅動程式，以及使用者空間元件的libDRM及[[Mesa_3D|Mesa 3D]]。
+
+Nouveau計畫支援所有的Nvidia微架構： [[NVIDIA_Tesla|Tesla]]、Fermi、Kepler、Maxwell及即將釋出的Pascal和Volta。
+
+=== 調整頻率 ===
+由於技術原因，Nvidia的顯示卡都會以一個較低的頻率（稱為「時脈」）啟動，在啟動後，驅動程式就會設定一個較高的頻率。因為缺乏顯示卡的相關文件，nouveau最初並不具備這個功能，這導致了效能的顯著損失<ref>{{cite web |url=http://www.phoronix.com/scan.php?page=article&item=nouveau_nvidia_win81&num=1 |title=Nouveau vs. NVIDIA proprietary Linux vs. NVIDIA Windows 8.1 |date=2013-10-31 |work=[[Phoronix|Phoronix]] |accessdate=2014-07-25 |archive-date=2014-07-31 |archive-url=https://web.archive.org/web/20140731181441/http://www.phoronix.com/scan.php?page=article&item=nouveau_nvidia_win81&num=1 |dead-url=no }}</ref>。在2014年6月終於找到解決的方法，調整頻率功能的支援終於被加入到nouveau中<ref>{{cite web |url=http://www.phoronix.com/scan.php?page=news_item&px=MTY5Mjg |title=Nouveau Re-Clocking Details Discussed Further |date=2014-05-17 |work=[[Phoronix|Phoronix]] |accessdate=2014-07-25 |archive-date=2014-07-03 |archive-url=https://web.archive.org/web/20140703110357/http://www.phoronix.com/scan.php?page=news_item&px=MTY5Mjg |dead-url=no }}</ref><ref>{{cite web |url=http://www.phoronix.com/scan.php?page=article&item=linux316_nouveau_clocks&num=1 |title=Nouveau Re-Clocking Is Way Faster |date=2014-06-20 |work=[[Phoronix|Phoronix]] |accessdate=2014-07-25 |archive-date=2014-07-23 |archive-url=https://web.archive.org/web/20140723044929/http://www.phoronix.com/scan.php?page=article&item=linux316_nouveau_clocks&num=1 |dead-url=no }}</ref><ref>{{cite web |url=http://nouveau.freedesktop.org/wiki/PowerManagement/ |title=Nouveau PowerManagement documentation |work=[[freedesktop.org|freedesktop.org]] |accessdate=2014-07-25 |archive-date=2014-08-09 |archive-url=https://web.archive.org/web/20140809141112/http://nouveau.freedesktop.org/wiki/PowerManagement/ |dead-url=no }}</ref>。
+
+=== 工具 ===
+[[File:Renouveau-screenshot-on-debian-with-kde.png|left]]（REnouveau是左上角的藍色視窗）]]
+與[[超威半导体|AMD]]形成強烈的對比，Nvidia並沒有提供任何關於顯示卡的文件。 nouveau的開發者被迫使用淨室[[逆向工程|逆向工程]]以獲得讓他們可以編寫nouveau的資料。該專案使用多種自訂的程式以協助其逆向工程，像是MmioTrace（記憶體映射I/O追蹤）<ref>{{cite web|url = http://nouveau.freedesktop.org/wiki/MmioTrace|title = MmioTrace (Memory Mapped I/O Trace)|publisher = nouveau Wiki|accessdate = 2014-07-25|archive-date = 2012-03-01|archive-url = https://www.webcitation.org/65pzxmDmf?url=http://nouveau.freedesktop.org/wiki/MmioTrace|dead-url = yes}}</ref>，REnouveau及Valgrind MMT<ref>{{cite web|url = http://nouveau.freedesktop.org/wiki/Valgrind-mmt|title = Valgrind-mmt|publisher = nouveau Wiki|accessdate = 2014-07-25|archive-date = 2015-01-01|archive-url = https://web.archive.org/web/20150101063111/http://nouveau.freedesktop.org/wiki/Valgrind-mmt/|dead-url = no}}</ref>。參見[[Valgrind|Valgrind]]。
+
+==== REnouveau ====
+REnouveau （nouveau逆向工程）<ref>{{cite web|url = http://nouveau.freedesktop.org/wiki/REnouveau|title = REnouveau (Reverse Engineering for nouveau)|publisher = nouveau Wiki|accessdate = 2014-07-25|archive-date = 2012-03-01|archive-url = https://www.webcitation.org/65pzxLa5K?url=http://nouveau.freedesktop.org/wiki/REnouveau|dead-url = yes}}</ref>是一個以[[GNU通用公共许可证|GNU通用公共许可证]]授權（使用[[SDL|SDL]]）的收集大多數nouveau逆向工程資料的程式。NVIDIA專有驅動程式的使用者可以透過REnouveau提供他們的NVIDIA顯示卡的硬體資訊的方式來協助nouveau的開發。REnouveau以複製目前顯示卡[[存储器映射输入输出|MMIO]]標示空間的方式運作，然後繪製一些圖形並取得另一份MMIO的複製品，並輸出差異部份到一個文字檔中。它執行了大約六[[打|打]]不同的測試，並壓縮成[[tar|tar]].[[bzip2|bz2]]壓縮檔，然後以[[电子邮件|电子邮件]]寄送，並自動轉送到專案的FTP伺服器供開發者進行分析。
+
+== 已支援的介面 ==
+只有[[内核|内核]]可以直接存取硬體，包括顯示卡。終端使用者軟體透過多種為特定功能所編寫的[[应用程序接口|应用程序接口]]存取。Nouveau被以Gallium3D風格驅動程式的方式編寫，這就意味著它與其他Gallium3D驅動程式共享大多數的程式碼。多數此種共享程式碼都在[[Mesa_3D|Mesa 3D]]中可看到，並由各[[Linux发行版|Linux发行版]]進行散佈。
+
+=== 渲染API ===
+[[Mesa_3D|Mesa 3D]]及驅動程式都包含了多[[渲染|渲染]]界面的支援，設計則交由使用者空間的程式，像是[[电子游戏|电子游戏]]或[[计算机辅助设计|计算机辅助设计]]軟體等，存取對應的SIP塊。
+
+==== Direct3D ====
+[[Direct3D|Direct3D]]第9版的自由及開放原始碼實做在Mesa 3D可看到。它可以被nouveau所使用。但任何使用Direct3D的軟體都是為Windows所編寫的，所以這個軟體只能在Linux上與[[Wine|Wine]]一起使用。
+
+==== OpenGL ====
+渲染介面[[OpenGL|OpenGL]]是由[[科纳斯组织|科纳斯组织]]開發的。這個API的實做是Nvidia或AMD專有驅動程式的一部份。另一種實做方式是由自由軟體愛好者所編寫的，像是Brian Paul或是Intel及其合作者在Mesa 3D中所實做。因為是Gallium3D風格的驅動程式，Nouveau只需要一點小修改就可以與這個實做一同運作。
+
+=== 視訊加速 ===
+Mesa 3D支援多重呈現界面，所有已設計好的使用者空間程式，像是[[GStreamer|GStreamer]]等程式都可以存取相對應的SIP塊。也可以使用為了這個目的設計的電子電路，雖然這樣做會相對於使用[[NVIDIA_PureVideo|PureVideo]]來說消耗更多的電量。 
+
+Nouveau支援[[NVIDIA_PureVideo|PureVideo]]技術，並提供[[VDPAU|VDPAU]]及XvMC的方式來存取它<ref>{{cite web |url=http://nouveau.freedesktop.org/wiki/VideoAcceleration/ |title=Nouveau Video Acceleration |work=[[freedesktop.org|freedesktop.org]] |accessdate=2014-07-25 |archive-date=2014-07-29 |archive-url=https://web.archive.org/web/20140729212916/http://nouveau.freedesktop.org/wiki/VideoAcceleration/ |dead-url=no }}</ref>。
+
+=== 計算用API ===
+==== OpenCL ====
+[[OpenCL|OpenCL]]
+
+==== CUDA ====
+Nouveau不支援[[CUDA|CUDA]]技術。
+
+==歷史==
+[[File:Gallium3D_vs_DRI_graphics_driver_model.svg|thumb]]的程式碼。]]
+Nouveau原先是使用[[Mesa_3D|Mesa 3D]]的DRI來呈現[[三维计算机图形|三维计算机图形]]，從而允許使用[[圖形處理器|圖形處理器]]直接加速3D應用程式的圖形繪製；但在2008年2月對DRI的支援停止，並轉移到新的Gallium3D<ref>{{cite web|url = http://lwn.net/Articles/270830/|title = The state of Nouveau, part 2|publisher = [[LWN.net|LWN.net]]|date = 26 February 2008|accessdate = 7 March 2008|archive-date = 2012-03-01|archive-url = https://www.webcitation.org/65pzsOjSv?url=http://lwn.net/Articles/270830/|dead-url = yes}}</ref><ref>{{cite web|url = http://nouveau.freedesktop.org/wiki/Nouveau_Companion_36|title = Nouveau Companion 36 - The irregular Nouveau-Development companion|date = 7 March 2008|accessdate = 7 March 2008|deadurl = yes|archiveurl = https://web.archive.org/web/20080511194515/http://nouveau.freedesktop.org/wiki/Nouveau_Companion_36|archivedate = 2008年5月11日}}</ref>。
+
+在2013年9月23日<ref>{{cite web |url=http://lists.freedesktop.org/archives/nouveau/2013-September/014480.html |title=Nvidia offers to release public documentation on certain aspects of their GPUs |date=2013-09-23 |accessdate=2013-09-24 |archive-date=2013-09-25 |archive-url=https://web.archive.org/web/20130925165748/http://lists.freedesktop.org/archives/nouveau/2013-September/014480.html |dead-url=no }}</ref>，Nvidia公開宣佈他們將會釋出一些關於他們的圖形處理器的文件，來解決NVIDIA的圖形處理器在Nouveau上的可用性。
+
+截至2014年1月31日，Nvidia的Alexandre Courbot致力於在一個廣泛的修補程式集中加入nouveau對GK20A（[[NVIDIA_Tegra#Tegra_K1系列|Tegra K1]]）的初步支援<ref>{{cite web |url=http://lists.freedesktop.org/archives/dri-devel/2014-January/053028.html |title=drm/nouveau: initial support for GK20A (Tegra K1) |date=2014-01-31 |accessdate=2014-07-25 |archive-date=2014-09-06 |archive-url=https://web.archive.org/web/20140906222422/http://lists.freedesktop.org/archives/dri-devel/2014-January/053028.html |dead-url=no }}</ref>。
+
+==採用==
+[[File:Linux_Graphics_Stack_2013.svg|thumb]]圖形堆疊的說明：直接呈現管理員、KMS驅動程式、libDRM、[[Mesa_3D|Mesa 3D]]、顯示伺服器皆為視窗型系統的元件，但玩遊戲時並不直接需要這些元件。]]
+
+nouveau驅動程式已被以下Linux發行版作為Nvidia顯示卡的預設開放原始碼驅動程式： [[Fedora|Fedora]] 11<ref>{{cite web|url = http://www.phoronix.com/scan.php?page=news_item&px=NzE3OA|title = Testing Out The Nouveau Driver On Fedora 11|author = Michael Larabel|date = 2009-03-29|publisher = [[Phoronix|Phoronix]]|accessdate = 2014-07-25|archive-date = 2014-08-13|archive-url = https://web.archive.org/web/20140813033048/http://www.phoronix.com/scan.php?page=news_item&px=NzE3OA|dead-url = no}}</ref>及[[openSUSE|openSUSE]] 11.3<ref>{{cite web|url = http://en.opensuse.org/Product_highlights#Base_System|title = Product highlights for openSUSE 11.3 version|publisher = [[openSUSE|openSUSE]]|accessdate = 2010-12-29|archive-date = 2011-03-04|archive-url = https://web.archive.org/web/20110304000101/http://en.opensuse.org/Product_highlights#Base_System|dead-url = no}}</ref>。它也被包含在[[Ubuntu|Ubuntu]] 9.04的套件庫中<ref>{{cite web|url = http://www.phoronix.com/scan.php?page=news_item&px=NjkxNg|title = Ubuntu 9.04 To Get Nouveau Driver|author = Michael Larabel|publisher = [[Phoronix|Phoronix]]|date = 2010-12-09|accessdate = 2014-07-25|archive-date = 2014-07-28|archive-url = https://web.archive.org/web/20140728063938/http://www.phoronix.com/scan.php?page=news_item&px=NjkxNg|dead-url = no}}</ref>，並在Ubuntu 10.04中作為預設的驅動程式<ref>{{cite web|url = https://bugs.edge.launchpad.net/ubuntu/+source/xserver-xorg-video-nv/+bug/454821/comments/2|title = Bug #454821: Bugs: "xserver-xorg-video-nv" package: Ubuntu|accessdate = 2010-02-24|archive-date = 2019-10-18|archive-url = https://web.archive.org/web/20191018231411/https://bugs.launchpad.net/ubuntu/+source/xserver-xorg-video-nv/+bug/454821/comments/2|dead-url = no}}</ref>
+它也包括在[[Debian|Debian]]的套件庫中<ref>{{cite web|url = http://packages.debian.org/search?keywords=nouveau&searchon=names&suite=stable&section=all|title = Nouveau nVidia drivers now available in Debian experimental|author = [[Debian|Debian]]|date = 2011-02-11|accessdate = 2014-07-25|archive-date = 2013-07-21|archive-url = https://web.archive.org/web/20130721081036/http://packages.debian.org/search?keywords=nouveau&searchon=names&suite=stable&section=all|dead-url = no}}</ref>。這個驅動程式包含在這些作業系統中，但是並不允許3D硬體加速。
+
+2009年12月10日被[[Linux內核|Linux內核]]2.6.33版接受成為暫時驅動程式<ref>{{cite web|url = http://www.phoronix.com/scan.php?page=news_item&px=Nzc5NQ|title = Nouveau To Go Into Linux 2.6.33 Kernel!|publisher = [[Phoronix|Phoronix]]|date = 2009-12-11|accessdate = 2014-07-25|archive-date = 2014-08-08|archive-url = https://web.archive.org/web/20140808043146/http://www.phoronix.com/scan.php?page=news_item&px=Nzc5NQ|dead-url = no}}</ref>。
+
+Fedora 13（2010年5月）允許安裝mesa-dri-drivers-experimental軟體包，可以此啟用實驗性的3D圖形硬體加速，若沒有安裝這個軟體包就無法啟用。
+
+3D加速被Ubuntu 10.10包含在「libgl1-mesa-dri-experimental」軟體包中。
+
+[[Compiz|Compiz]]建議使用nouveau而非Nvidia專有驅動程式<ref>{{cite web|url = http://smspillaz.wordpress.com/2010/05/21/beware-the-benchmarks/|title = Beware the benchmarks.|author = Sam Spilsbury, head maintainer of Compiz|date = 2010-05-21|quote = Our recommendation: Use nouveau.|accessdate = 2014-07-25|archive-date = 2014-08-12|archive-url = https://web.archive.org/web/20140812200845/http://smspillaz.wordpress.com/2010/05/21/beware-the-benchmarks/|dead-url = no}}</ref>。
+
+2012年3月26日，nouveau驅動程式被標示為穩定，並從Linux核心的暫時驅動程式提升為核心驅動程式<ref>{{cite web|url=http://lwn.net/Articles/488338/|title=The Nouveau driver graduates from staging|author=Jonathan Corbet|work=LWN.net|date=2012-03-23|accessdate=2014-07-25|archive-date=2014-07-22|archive-url=https://web.archive.org/web/20140722054743/http://lwn.net/Articles/488338/|dead-url=no}}</ref>。
+
+2014年6月，Codethink回報可以在[[Linux內核|Linux內核]] 3.15上與[[Wayland|Wayland]]一同執行，是使用EGL且是[[NVIDIA_Tegra#Tegra_K1系列|Tegra K1]]上的「100%開放原始碼的顯示卡驅動程式堆疊」<ref>{{cite web |url=http://www.phoronix.com/scan.php?page=news_item&px=MTcxODc |title=Codethink Gets The NVIDIA Jetson TK1 Running With Linux 3.15, Wayland |date=2014-06-12 |work=[[Phoronix|Phoronix]] |accessdate=2014-07-25 |archive-date=2014-07-14 |archive-url=https://web.archive.org/web/20140714141023/http://www.phoronix.com/scan.php?page=news_item&px=MTcxODc |dead-url=no }}</ref>。
+
+==參見==
+{{Portal|自由軟體}}
+* {{link-en|自由及開放原始碼顯示卡驅動程式|Free and open-source graphics device driver}}
+* [[NVIDIA顯示核心列表|NVIDIA顯示核心列表]]
+
+==參考資料==
+{{Reflist|2}}
+
+{{Freedesktop.org}}
+
+[[Category:英伟达|Category:英伟达]]
+[[Category:Linux驱动程序|Category:Linux驱动程序]]
+[[Category:三维图像软件|Category:三维图像软件]]
+[[Category:使用C語言的自由軟體|Category:使用C語言的自由軟體]]
+[[Category:使用MIT许可证的软件|Category:使用MIT许可证的软件]]

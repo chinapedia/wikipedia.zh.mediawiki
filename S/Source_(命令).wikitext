@@ -1,0 +1,47 @@
+{{lowercase}}
+{{NoteTA|G1=IT}}
+'''source'''是一个[[殼層內建指令|Shell内置命令]]，用以在当前[[上下文_(计算机)|上下文]]（当前shell环境）中执行某文件中的一组[[命令_(计算机)|命令]]，source命令可简写为一个点（[[._(Unix)|.]]）。<ref>"BASH BUILTIN COMMANDS", the (GNU) Linux man page for "source" in Bash-3.0.  2004 Apr 20 </ref>
+
+[[上下文_(计算机)|上下文]]：一般指的是在交互式会话中，用户当前敲入命令的那个终端。
+
+== 例子 ==
+<code>source 脚本名</code>，是在当前shell环境下执行。
+
+<code>sh 脚本名</code>，是通过创建子shell环境并进行执行。例子如下：<syntaxhighlight lang="shell">
+$ cat modify_a.sh
+a=2
+$ #
+$ echo $a
+
+$ sh modify_a.sh 
+$ echo $a
+
+$ # sh命令并没有影响当前的shell环境（上下文），a没有被赋值
+$ source modify_a.sh # 等价 . modify_a.sh
+$ echo $a
+2
+$ # source命令将影响当前的shell环境（上下文），a被赋值了
+</syntaxhighlight>
+
+== 用法 ==
+<code>source</code>语句更适合'''模块化设计'''，将长代码切割成小模块代码。
+
+例1'''：'''会话开始时，用户配置文件（ profile files） <code>.bashrc</code> and <code>.profile</code>将会被执行。
+
+例2'''：'''通过<code>source</code>语句，可以实现类似导入包的功能。<syntaxhighlight lang="shell">
+#!/bin/sh
+# 本文件名为: echo_a.sh
+# 文件内容为: a=2
+source modify_a.sh
+
+echo $a
+
+</syntaxhighlight>在部署环境时，<code>source</code>也常常被使用，因为它能够影响当前的上下文。
+<br />
+== 参见 ==
+* [[._(Unix)|. (Unix)]]
+
+== 参考文献 ==
+{{reflist}}
+
+[[Category:Unix软件|Category:Unix软件]]

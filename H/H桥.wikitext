@@ -1,0 +1,136 @@
+{{NoteTA|G1=Electronics}}
+[[File:H_bridge.svg|thumb]]
+'''H橋'''是一種[[電子電路|電子電路]]，可使其連接的[[負載|負載]]或輸出端兩端[[電壓|電壓]]反相/[[電流|電流]]反向。這類電路可用於[[機器人|機器人]]及其它實作場合中[[直流電動機|直流電動機]]的順逆向控制及[[轉速|轉速]]控制、步进电机控制（双极型步进电机还必须要包含两个H桥的电机控制器）<ref name="williams_stamp">{{cite book
+ | title = Microcontroller projects using the Basic Stamp
+ | edition = 2nd
+ | author = Al Williams
+ | publisher = Focal Press
+ | year = 2002
+ | isbn = 978-1-57820-101-3
+ | page = 344
+ | url = http://books.google.com/books?id=E0_07GfXo2wC&pg=PA344
+ | access-date = 2014-12-31
+ | archive-date = 2017-02-16
+ | archive-url = https://web.archive.org/web/20170216090218/https://books.google.com/books?id=E0_07GfXo2wC&pg=PA344
+ | dead-url = no
+ }}</ref>，电能变换中的大部分直流-交流变换器（如[[逆变器|逆变器]]及[[变频器|变频器]]）、部分直流-直流变换器（推挽式变换器）等<ref>{{cite book|author=刘凤君|title=环保节能型H桥及SPWM直流电源式逆变器|year=2010-5|publisher=電子工業出版社|isbn=9787121106361|url=http://book.douban.com/subject/4852398/|access-date=2014-12-31|archive-date=2014-12-31|archive-url=https://web.archive.org/web/20141231142032/http://book.douban.com/subject/4852398/|dead-url=no}}</ref>，以及其它的[[功率電子學|功率電子]]裝置。
+
+H橋電路，既可以[[電子元件|分立元器件]]形式搭建，也可以整合到[[積體電路|積體電路]]上。<ref name="williams_stamp" />「H橋」的名稱起源於其電路的形狀：兩個並聯支路和一個負載接入/電路輸出支路，看上去構成了形如「H」字母的電路結構。
+
+== 工作原理 ==
+[[File:H_bridge.svg|thumb]]
+[[File:H_bridge_operating.svg|thumb]]
+
+在一个H桥中有四个[[开关|开关]]（S1~S4）。如H橋電路圖（图2）所示，当开关S1和S4闭合，S2和S3断开时，中間橋接的直流電動機兩端加上正向電壓，<math>V_M = V_\text{in}</math>，电動机M正轉工作；当开关S1和S4断开，S2和S3闭合时，<math>V_M = -V_\text{in}</math>，電動機兩端電壓反相，電動機M反轉工作。H橋也可以使運轉中的電動機停轉：在電動機運轉時，將S1和S2閉合或將S3和S4閉合（即短接電動機兩端），則電動機被剎停；將H橋的全部開關斷開，則電動機自由停轉。
+
+在這個電路的正常工作情況下，一個[[並聯|並聯]]支路側的開關S1和S2不可以同時閉合，同樣另一側支路的開關S3和S4也是如此。如果某一側支路的開關同時閉合，會將供電電源的正負兩極[[短路|短路]]。這個狀態稱為短路直通。短路直通狀態通常會對電源與開關元件造成危險。
+
+下表是H橋的工作狀態表，其中以"1"代表開關接通，"0"代表開關斷路：
+*注：以下的「電動機」均指直流電動機
+*注：短路直通狀態通常被視為不允許的狀態，要避免這些狀態發生。
+{| class="wikitable"
+|-
+! S1
+! S2
+! S3
+! S4
+! '''工作狀態'''
+|-
+| 1
+| 0
+| 0
+| 1
+| 電動機順向（逆向）轉動
+|-
+| 0
+| 1
+| 1
+| 0
+| 電動機逆向（順向）轉動
+|-
+| 0
+| 0
+| 0
+| 0
+| 電動機自由停止
+|-
+| 0
+| 1
+| 0
+| 1
+| 電動機剎停
+|-
+| 1
+| 0
+| 1
+| 0
+| 電動機剎停
+|-
+| 1
+| 1
+| 0
+| 0
+| 短路直通 *危險*
+|-
+| 0
+| 0
+| 1
+| 1
+| 短路直通 *危險*
+|-
+| 1
+| 1
+| 1
+| 1
+| 短路直通 *危險*
+|}
+
+当以频率<math>f_s</math>交替切换开关S1、S4和S2、S3时，即可在负载M上获得正负交替的方波波形，其周期<math>T_s =\frac{1}{f_s}</math>。这样，就将直流电压E变成了交流电压uo。uo含有各次谐波，如果想得到正弦波电压，则可通过滤波器滤波获得{{non sequitur|reason=本段似与前后文无关，可能是在描述主动整流电路而非H桥|date=2022年6月1日}}。
+
+电路中的四个开关可以是机械式开关，也可以是各种半导体[[固態電子元件|固態器件]]。逆变电路中常用的开关器件有快速晶闸管、可关断晶闸管（GTO）、功率晶体管（GTR）、功率场效应晶体管（MOSFET）、绝缘栅晶体管（IGBT）等。在实际运用中，开关器件存在损耗：导通损耗（conduction losses），换相损耗（commutation losses）和门极损耗（gate losses）。其中门极损耗极小可忽略不计，而导通损耗和换相损耗随着开关频率的增加而增加。
+
+三相橋式（可控）整流電路/逆變電路的工作原理和H橋類似：兩者都是通過開關器件的通斷狀態的改變來實現電能變換。但嚴格來說它們並不完全屬於H橋的範圍。
+
+== 工作方式 ==
+H桥的控制主要分为近似方波控制和脉冲宽度调制（PWM）和级联多电平控制。
+
+=== 近似方波控制 ===
+近似方波控制即quasi-square-wave-control, 输出波形比正负交替方波多了一个零电平（3-level），谐波大为减少。优点是开关频率较低，缺点是谐波成分高，需要滤波器的成本大。
+
+=== 脉冲宽度调制 ===
+[[脉冲宽度调制|脉冲宽度调制]]即Pulse width modulation,分为单极性和双极性pwm. 随着开关频率的升高，输出电压电流波形趋于正弦，谐波成分减小，但是高开关频率带来一系列问题：开关损耗大，电机绝缘压力大，发热等等。
+
+=== 级联多电平控制 ===
+级联多电平控制即multi-level inverter，采用级联H桥的方式，使得在同等开关频率下谐波失真降到最小，甚至不需要用滤波器，获得良好的近似正弦输出波形。
+
+== 搭建實作 ==
+[[File:L298_IMGP4533_wp.jpg|thumb]]
+
+
+== 參見 ==
+*[[逆變器|逆變器]]
+
+== 參考資料 ==
+{{reflist}}
+
+== 外部連結 ==
+* [http://afrotechmods.com/tutorials/2014/12/20/h-bridge-motor-speed-controller-tutorial/ Video tutorial on H-bridges and example bidirectional motor speed controller circuit]{{Webarchive|url=https://archive.is/20141220031147/http://afrotechmods.com/tutorials/2014/12/20/h-bridge-motor-speed-controller-tutorial/ |date=2014-12-20 }}
+* [http://www.mcmanis.com/chuck/robotics/tutorial/h-bridge/ H-Bridge Theory and Practice]{{Wayback|url=http://www.mcmanis.com/chuck/robotics/tutorial/h-bridge/ |date=20150103112331 }}
+* [https://www.dprg.org/brief-h-bridge-theory-of-operation/ Brief H-Bridge Theory of Operation]{{Wayback|url=https://www.dprg.org/brief-h-bridge-theory-of-operation/ |date=20190428092135 }}
+* [http://www.modularcircuits.com/h-bridge_secrets1.htm H-bridge tutorial discussing various driving modes and using back-EMF]{{Wayback|url=http://www.modularcircuits.com/h-bridge_secrets1.htm |date=20111024014152 }}
+* [http://www.circuit-projects.com/control/pwm-motor-controller-using-mosfets-and-ir2110-h-bridge-driver.html PWM DC Motor Controller Using MOSFETs and IR2110 H-Bridge Driver]{{Wayback|url=http://www.circuit-projects.com/control/pwm-motor-controller-using-mosfets-and-ir2110-h-bridge-driver.html |date=20110727063159 }}
+<!--* [http://www.acroname.com/robotics/info/ideas/stacking/stacking.html Stacking H Bridges]-->
+* [https://web.archive.org/web/20090514025559/http://www.beam-wiki.org/wiki/H-bridge H-Bridges on the BEAM Robotics Wiki]
+* [http://vamfun.wordpress.com/2012/07/21/derivation-of-formulas-to-estimate-h-bridge-controller-current-vex-jaguarvictor-draft/  Derivation of formulas to estimate  H-bridge controller current (Vex, JAGUAR,Victor).  Discusses why some H-bridges used in robotics have non-linear current and speed responses.]{{Wayback|url=http://vamfun.wordpress.com/2012/07/21/derivation-of-formulas-to-estimate-h-bridge-controller-current-vex-jaguarvictor-draft/ |date=20141231142959 }}
+
+=== 專案 ===
+* [https://web.archive.org/web/20120420092120/http://www.ikalogic.com/build-a-5a-h-bridge-motor-driver-new-version/ Tutorial: Build a 5A H-Bridge motor controller]
+* [https://web.archive.org/web/20100224041125/http://www.sccs.swarthmore.edu/users/06/adem/engin/e72/lab7/ Building an H-bridge-controlled motor with photocells to track light]
+* [https://web.archive.org/web/20080211130913/http://www.izoelektronik.com/4017-entegresi-ve-bir-buton-ile-motor-kontrolu.htm  H-bridge motor control with 4017] (in Turkish)
+* [http://www.parallax.com/dl/docs/cols/nv/vol2/col/nv52.pdf Using the HIP4081A for H-bridge control]{{Wayback|url=http://www.parallax.com/dl/docs/cols/nv/vol2/col/nv52.pdf |date=20120227214531 }}
+* [https://web.archive.org/web/20141231141832/http://luckylarry.co.uk/arduino-projects/control-a-dc-motor-with-arduino-and-l293d-chip/ Using the L293D H bridge for DC motor control]
+* [http://www.robotplatform.com/howto/L293/motor_driver_1.html A simple circuit designed around L293D motor driver IC]{{Wayback|url=http://www.robotplatform.com/howto/L293/motor_driver_1.html |date=20141219105945 }}
+
+{{电桥}}
+
+[[category:電路|category:電路]]

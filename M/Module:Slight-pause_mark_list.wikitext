@@ -1,0 +1,32 @@
+require('Module:No globals')
+
+local getArgs = require('Module:Arguments').getArgs
+local p = {}
+
+function p.main(frame)
+	local args = getArgs(frame)
+	return p._main(args)
+end
+
+function p._main(args)
+	-- Main module code goes here.
+	local _args, countNil = {}, 0
+
+	for i = 1, math.huge do
+		if args[i] then
+			table.insert(_args, args[i])
+			countNil = 0
+		else
+			countNil = countNil + 1
+			if countNil == 4 then break end
+		end
+	end
+
+	if _args == {} then
+		return 
+	end
+	
+	return '<span class="nowrap">' .. table.concat(_args, '</span>、<wbr /><span class="nowrap">') .. '</span>'
+end
+
+return p

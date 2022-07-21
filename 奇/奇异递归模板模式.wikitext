@@ -1,0 +1,232 @@
+{{noteTA|G1=IT}}
+{{Orphan|time=2015-07-16T03:25:22+00:00}}
+
+'''奇异递归模板模式'''（curiously recurring template pattern，'''CRTP'''）是[[C++|C++]][[模板_(C++)|模板编程]]时的一种惯用法（idiom）：把派生类作为基类的模板参数。<ref>{{cite book | first1=David | last1=Abrahams | authorlink1=David Abrahams (computer programmer) | first2=Aleksey | last2=Gurtovoy | title=C++ Template Metaprogramming: Concepts, Tools, and Techniques from Boost and Beyond |publisher=Addison-Wesley | isbn=0-321-22725-5}}</ref>更一般地被称作'''F-bound polymorphism'''，是一类{{tsl|en|F-bounded quantification|''F'' 界量化}}。
+
+==历史==
+1980年代作为{{tsl|en|F-bounded quantification|''F'' 界量化}}被提出。<ref>{{cite web|url=http://staff.ustc.edu.cn/~xyfeng/teaching/FOPL/lectureNotes/CookFBound89.pdf|title=F-Bounded Polymorphism for Object-Oriented Programming|author=William Cook|date=1989|display-authors=etal|accessdate=2015-07-14|archive-date=2015-02-10|archive-url=https://web.archive.org/web/20150210190827/http://staff.ustc.edu.cn/~xyfeng/teaching/FOPL/lectureNotes/CookFBound89.pdf|dead-url=no}}</ref>{{tsl|en|Jim Coplien}}于1995年称之为CRTP。<ref>{{cite journal | author=Coplien, James O. | title=Curiously Recurring Template Patterns | journal=C++ Report | year=February 1995 | pages=24–27 | url=http://sites.google.com/a/gertrudandcope.com/info/Publications/InheritedTemplate.pdf}}</ref>在当时的早期C++[[模板超編程|模板超編程]]已经有所出现。<ref>{{cite book | first=Timothy | last=Budd | authorlink=Timothy Budd | title=[[Multiparadigm_programming_in_Leda|Multiparadigm programming in Leda]] | publisher=Addison-Wesley | isbn=0-201-82080-3 | year=1994}}</ref>
+
+== 一般形式 ==
+
+<syntaxhighlight lang="cpp">
+// The Curiously Recurring Template Pattern (CRTP)
+template<class T>
+class Base
+{
+    // methods within Base can use template to access members of Derived
+};
+class Derived : public Base<Derived>
+{
+    // ...
+};
+</syntaxhighlight> 
+== 静态多态 ==
+C++语言的[[多态|多态]]，原本是用[[虚函数|虚函数]]来实现的，属于动态多态。[[安德烈·亞歷山德雷斯庫|安德烈·亞歷山德雷斯庫]]在{{tsl|en|Modern C++ Design}}<ref>{{cite book | first=Andrei | last=Alexandrescu | authorlink=Andrei Alexandrescu | title=[[Modern_C++_Design|Modern C++ Design]]: Generic Programming and Design Patterns Applied | publisher=Addison-Wesley | isbn=0-201-70431-5 | year=2001}}</ref>中提出了奇异递归模板模式，并称之为'''静态多态'''（static polymorphism）。
+<syntaxhighlight lang="cpp">
+template <class T> 
+struct Base
+{
+    void interface()
+    {
+        // ...
+        static_cast<T*>(this)->implementation();
+        // ...
+    }
+
+    static void static_func()
+    {
+        // ...
+        T::static_sub_func();
+        // ...
+    }
+};
+
+struct Derived : Base<Derived>
+{
+    void implementation();
+    static void static_sub_func();
+};
+</syntaxhighlight>
+基类模板利用了其成员函数体（即成员函数的实现）在声明之后很久都不会被实例化（实际上只有被调用的模板类的成员函数才会被实例化），并利用了派生类的成员函数（通过{{tsl|en|Type conversion|类型转化}}）。
+
+在上例中，Base<Derived>::interface()，虽然是在struct Derived之前就被声明了，但未被编译器实例化直至它被实际调用，这发生于Derived声明之后，此时Derived::implementation()的声明是已知的。
+
+这种技术获得了类似于[[虚函数|虚函数]]的效果，并避免了[[动态多态|动态多态]]的代价。也有人把CRTP称为“模拟的动态绑定”。<ref>{{cite web | url=http://www.pnotepad.org/devlog/archives/000083.html | title=Simulated Dynamic Binding | date=7 May 2003 | accessdate=13 January 2012 | deadurl=yes | archiveurl=https://web.archive.org/web/20120209045146/http://www.pnotepad.org/devlog/archives/000083.html | archivedate=2012年2月9日 }}</ref>
+
+这种模式广泛用于Windows [[Active_Template_Library|ATL]]与[[WTL|WTL]]库，以及[[Boost_C++_Libraries|Boost]].Iterator，Boost.Python或者Boost.Serialization等库中。
+
+考虑一个基类，没有虚函数，则它的成员函数能够调用的其它成员函数，只能是属于该基类自身。当从这个基类派生其它类时，派生类继承了所有未被覆盖（overridden）的基类的数据成员与成员函数。如果派生类调用了一个被继承的基类的函数，而该函数又调用了其它成员函数，这些成员函数不可能是派生类中的派生或者覆盖的成员函数。也就是说，基类中是看不到派生类的。但是，基类如果使用了CRTP，则在[[编译时|编译时]]派生类的覆盖的函数可被选中调用。这效果相当于编译时模拟了虚函数调用但避免了虚函数的尺寸与调用开销（[[VTBL|VTBL]]结构与方法查找、多继承机制）等代价。但CRTP的缺点是不能在[[运行时|运行时]]做出[[动态绑定|动态绑定]]。
+
+不通过虚函数机制，基类访问派生类的私有或保护成员，需要把基类声明为派生类的友元（friend）。如果一个类有多个基类都出现这种需求，声明多个基类都是友元会很麻烦。一种解决技巧是在派生类之上再派生一个accessor类，显然accessor类有权访问派生类的保护函数；如果基类有权访问accessor类，就可以间接调用派生类的保护成员了。这种方法被[[Boost_C++_Libraries|boost]]的多个库使用，如：Boost.Python中的def_visitor_access和Boost.Iterator的iterator_core_access。原理示例代码如下：
+<syntaxhighlight lang="cpp">
+template<class DerivedT> class Base
+{
+  private:
+    struct accessor : DerivedT  
+    {                                      // accessor类没有数据成员，只有一些静态成员函数
+        static int foo(DerivedT& derived)
+        {
+            int (DerivedT::*fn)() = &DeriveT::do_foo; //获取DerivedT::do_foo的成员函数指针  
+            return (derived.*fn)();        // 通过成员函数指针的函数调用
+        }
+    };                                     // accessor类仅是Base类的成员类型，而没有实例化为Base类的数据成员。
+  public:
+    DerivedT& derived()                    // 该成员函数返回派生类的实例的引用
+    {
+       return static_cast<DerivedT&>(*this);
+    }
+    int foo()
+   {                                       //  该函数具体实现了业务功能
+        return accessor::foo( this->derived());
+    }
+};
+ 
+struct Derived : Base<Derived>             //  派生类不需要任何特别的友元声明
+  protected:
+    int do_foo() 
+    {
+         // ... 具体实现 
+         return 1; 
+     }
+};
+</syntaxhighlight>
+
+== 例子1：对象计数 ==
+
+统计一个类的实例对象创建与析构的数据。<ref>{{cite journal | author=Meyers, Scott | title=Counting Objects in C++ | journal=C++ User's Journal | year=April 1998 | url=http://www.drdobbs.com/cpp/counting-objects-in-c/184403484 | access-date=2015-07-14 | archive-date=2015-07-16 | archive-url=https://web.archive.org/web/20150716114131/http://www.drdobbs.com/cpp/counting-objects-in-c/184403484 | dead-url=no }}</ref>可以轻松地利用CRTP实现:
+
+<syntaxhighlight lang="cpp">
+template <typename T>
+struct counter
+{
+    static int objects_created;
+    static int objects_alive;
+
+    counter()
+    {
+        ++objects_created;
+        ++objects_alive;
+    }
+    
+    counter(const counter&)
+    {
+        ++objects_created;
+        ++objects_alive;
+    }
+protected:
+    ~counter() // objects should never be removed through pointers of this type
+    {
+        --objects_alive;
+    }
+};
+template <typename T> int counter<T>::objects_created( 0 );
+template <typename T> int counter<T>::objects_alive( 0 );
+
+class X : counter<X>
+{
+    // ...
+};
+
+class Y : counter<Y>
+{
+    // ...
+};
+</syntaxhighlight>
+
+==例子2：多态复制构造==
+当使用[[多态_(面向对象程序设计)|多态]]时，常需要基于基类指针创建对象的一份拷贝。常见办法是增加clone虚函数在每一个派生类中。使用CRTP，可以避免在派生类中增加这样的虚函数。 
+<syntaxhighlight lang="cpp">
+// Base class has a pure virtual function for cloning
+class Shape {
+public:
+    virtual ~Shape() {}
+    virtual Shape *clone() const = 0;
+};
+// This CRTP class implements clone() for Derived
+template <typename Derived>
+class Shape_CRTP : public Shape {
+public:
+    virtual Shape *clone() const {
+        return new Derived(static_cast<Derived const&>(*this));
+    }
+};
+
+// Nice macro which ensures correct CRTP usage
+#define Derive_Shape_CRTP(Type) class Type: public Shape_CRTP<Type>
+
+// Every derived class inherits from Shape_CRTP instead of Shape
+Derive_Shape_CRTP(Square) {};
+Derive_Shape_CRTP(Circle) {};
+</syntaxhighlight>
+
+This allows obtaining copies of squares, circles or any other shapes by <code>shapePtr->clone()</code>.
+
+==例子3：不可派生的类== 
+一个类如果不希望被继承，类似于Java中的具有finally性质的类，这在C++中可以用虚继承来实现：
+<syntaxhighlight lang="cpp">
+template<typename T> class MakeFinally{
+   private:
+       MakeFinally(){}//只有MakeFinally的友类才可以构造MakeFinally
+       ~MakeFinally(){}
+   friend T;
+};
+
+class MyClass:public virtual  MakeFinally<MyClass>{};//MyClass是不可派生类
+
+//由于虚继承，所以D要直接负责构造MakeFinally类，从而导致编译报错，所以D作为派生类是不合法的。
+class D: public MyClass{};
+//另外，如果D类没有实例化对象，即没有被使用，实际上D类是被编译器忽略掉而不报错
+
+int main()
+{
+MyClass var1;
+// D var2;  //这一行编译将导致错误，因为D类的默认构造函数不合法
+}
+
+</syntaxhighlight>
+== 例子4：std::enable_shared_from_this==
+在[[C++标准程式库|C++标准库]]头文件<code>[[Memory_(C++标准库)|<memory>]]</code>中，<code>std::shared_ptr</code>类封装了可被共享使用的指针或资源。一个被共享的对象不能直接把自身的原始指针（raw pointer）<code>this</code>传递给<code>std::shared_ptr</code>的容器对象（如一个std::vector），因为这会生成该被共享的对象的额外的共享指针控制块。为此，<code>std::shared_ptr</code> API提供了一种类模板设施<code>std::enable_shared_from_this</code>，包含了成员函数<code>shared_from_this</code>，从而允许从this创建一个<code>std::shared_ptr</code>对象。
+
+<syntaxhighlight lang="cpp">
+class mySharedClass:public  std::enable_shared_from_this<mySharedClass>{
+public:
+  // ...
+};
+
+int main()
+{
+  std::vector<std::shared_ptr<mySharedClass>> spv;
+  spv.push_back(new mySharedClass());
+  std::shared_ptr<mySharedClass> p(new mySharedClass());
+  mySharedClass &c=*p;
+  spv.emplace_back(c.shared_from_this());
+}
+
+</syntaxhighlight>
+
+== 其它语言 ==
+
+在[[Java|Java]]与[[.NET_Framework|.NET Framework]]中，常见把一个类作为[[泛型编程|泛型]]超类或interface的类型参数。例如，下述Java类实现了标准库中的泛型界面<code>Comparable</code>:
+
+<syntaxhighlight lang="java">
+public class Item implements Comparable<Item> {
+	private String name;
+	
+	@Override
+	public int compareTo(final Item other) {
+		return name.compareTo(other.name);
+	}
+}
+</syntaxhighlight>
+
+这保证了[[编译时|编译时]]不会比较<code>Item</code>与其它不是<code>Item</code>的对象如<code>String</code>。与C++不同，Java类不能使用不同的类型参数扩展一个超类两次，也不能用不同的类型参数实现同一个interface两次。这是由于Java实用了[[类型擦除|类型擦除]]处理泛型。例如，上例的class <code>Item</code>不能同时实现<code>Comparable<Item></code>与<code>Comparable<Object></code>。详见{{section link|:en:Generics in Java|Problems with type erasure}}。
+==参见==
+
+* {{tsl|en|Barton–Nackman trick}}
+* {{tsl|en|Bounded_quantification#F-bounded_quantification|F-受限量化}}
+
+==参考文献==
+{{reflist}}
+
+[[Category:软件设计模式|Category:软件设计模式]]
+[[Category:C++|Category:C++]]

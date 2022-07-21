@@ -1,0 +1,155 @@
+{{refimprove|time=2013-10-25T05:50:33+00:00}}
+
+'''Pathping'''是[[Windows系统|Windows系统]]中自带的一个网络诊断工具，用于检测本地至目的地之间[[节点|节点]]的[[网络延迟|网络延迟]]和穩定性。<ref>{{Cite web |url=http://www.computerhope.com/pathping.htm |title=MS-DOS pathping command help |accessdate=2013-10-25 |archive-date=2013-11-06 |archive-url=https://web.archive.org/web/20131106135643/http://www.computerhope.com/pathping.htm |dead-url=no }}</ref>
+==原理==
+pathping在一段时间内，从本地至目的地之间发送多个Echo Request消息给中间经过的每个节点，然后基于数据包从每个[[路由器|路由器]]返回的信息来计算结果。所以，pathping可以显示每个节点的数据包丢失的百分比，以便判断具体哪个节点或子网可能出现网络故障。pathping与[[tracert|tracert]]执行相同的路由[[跟踪命令|跟踪命令]]去识别这条路径上有哪些路由器，但它额外多了一个步骤：给每个节点发送100个[[数据包|数据包]]，获取返回信息后去计算每个节点的统计信息。<ref>{{Cite web |url=http://www.microsoft.com/resources/documentation/windows/xp/all/proddocs/en-us/pathping.mspx?mfr=true# |title=微软Windows专业版帮助手册 |access-date=2013-10-25 |archive-url=https://web.archive.org/web/20131105200845/http://www.microsoft.com/resources/documentation/windows/xp/all/proddocs/en-us/pathping.mspx?mfr=true |archive-date=2013-11-05 |dead-url=yes }}</ref>
+==范例==
+ C:\Documents and Settings\User>''pathping''
+ Usage: pathping [-g host-list] [-h maximum_hops] [-i address] [-n]
+ [-p period] [-q num_queries] [-w timeout] [-P] [-R] [-T]
+ [-4] [-6] target_name
+ Options:
+ -g host-list Loose source route along host-list.
+ -h maximum_hops Maximum number of hops to search for target.
+ -i address Use the specified source address.
+ -n Do not resolve addresses to hostnames.
+ -p period Wait period milliseconds between pings.
+ -q num_queries Number of queries per hop.
+ -w timeout Wait timeout milliseconds for each reply.
+ -P Test for RSVP PATH connectivity.
+ -R Test if each hop is RSVP aware.
+ -T Test connectivity to each hop with Layer-2 priority tags.
+ -4 Force using IPv4.
+ -6 Force using IPv6.<ref><syntaxhighlight lang="dos">
+ C:\Documents and Settings\User>ver
+ 
+ Microsoft Windows XP [Version 5.1.2600]
+</syntaxhighlight></ref>
+
+==例子==
+  >''pathping wikipedia.org''
+ Tracing route to wikipedia.com [207.142.131.235]
+ over a maximum of 30 hops:
+ 0 simonslaptop [192.168.0.11]
+ 1 192.168.0.1
+ 2 thus1-hg2.ilford.broadband.bt.net [217.32.64.73]
+ 3 217.32.64.34
+ 4 217.32.64.110
+ 5 anchor-border-1-4-0-2-191.router.demon.net [212.240.162.126]
+ 6 anchor-core-2-g0-0-1.router.demon.net [194.70.98.29]
+ 7 ny1-border-1-a1-0-s2.router.demon.net [194.70.97.66]
+ 8 ge-8-0-153.ipcolo1.NewYork1.Level3.net [209.246.123.177]
+ 9 ae-0-51.bbr1.NewYork1.Level3.net [64.159.17.1]
+ 10 so-2-0-0.mp1.Tampa1.Level3.net [209.247.11.201]
+ 11 ge-6-0.hsa2.Tampa1.Level3.net [64.159.1.10]
+ 12 unknown.Level3.net [63.208.24.2]
+ 13
+ Computing statistics for 325 seconds...
+ Source to Here This Node/Link
+ Hop RTT Lost/Sent = Pct Lost/Sent = Pct Address
+ 0 simonslaptop [192.168.0.11]
+ 0/ 100 = 0% |
+ 1 0ms 0/ 100 = 0% 0/ 100 = 0% 192.168.0.1
+ 0/ 100 = 0% |
+ 2 18ms 1/ 100 = 1% 1/ 100 = 1% thus1-hg2.ilford.broadband.bt.net [217.32.64.73]
+ 0/ 100 = 0% |
+ 3 18ms 0/ 100 = 0% 0/ 100 = 0% 217.32.64.34
+ 0/ 100 = 0% |
+ 4 21ms 0/ 100 = 0% 0/ 100 = 0% 217.32.64.110
+ 0/ 100 = 0% |
+ 5 21ms 1/ 100 = 1% 1/ 100 = 1% anchor-border-1-4-0-2-191.router.demon.net [212.240.162.126]
+ 0/ 100 = 0% |
+ 6 --- 100/ 100 =100% 100/ 100 =100% anchor-core-2-g0-0-1.router.demon.net [194.70.98.29]
+ 0/ 100 = 0% |
+ 7 --- 100/ 100 =100% 100/ 100 =100% ny1-border-1-a1-0-s2.router.demon.net [194.70.97.66]
+ 0/ 100 = 0% |
+ 8 100ms 0/ 100 = 0% 0/ 100 = 0% ge-8-0-153.ipcolo1.NewYork1.Level3.net [209.246.123.177]
+ 0/ 100 = 0% |
+ 9 94ms 0/ 100 = 0% 0/ 100 = 0% ae-0-51.bbr1.NewYork1.Level3.net [64.159.17.1]
+ 0/ 100 = 0% |
+ 10 134ms 1/ 100 = 1% 1/ 100 = 1% so-2-0-0.mp1.Tampa1.Level3.net [209.247.11.201]
+ 0/ 100 = 0% |
+ 11 137ms 0/ 100 = 0% 0/ 100 = 0% ge-6-0.hsa2.Tampa1.Level3.net [64.159.1.10]
+ 0/ 100 = 0% |
+ 12 131ms 0/ 100 = 0% 0/ 100 = 0% unknown.Level3.net [63.208.24.2]
+ 100/ 100 =100% |
+ 13 --- 100/ 100 =100% 0/ 100 = 0% win2000 [0.0.0.0]
+ Trace complete.
+
+ >''pathping wikipedia.org -q 10''<ref>note the shorter wait with only 10 queries per hop instead of the default 100</ref>
+ Tracing route to wikipedia.org [66.230.200.100]
+ over a maximum of 30 hops:
+ 0 Aaron.hsd1.mn.comcast.net. [192.168.11.3]
+ 1 air.setup [192.168.11.1]
+ 2 73.127.68.1
+ 3 ge-1-38-ur01.minnetonka.mn.minn.comcast.net [68.86.234.41]
+ 4 68.86.232.37
+ 5 68.86.232.33
+ 6 * 68.86.232.5
+ 7 68.86.232.1
+ 8 12.116.99.41
+ 9 tbr2.cgcil.ip.att.net [12.122.99.70]
+ 10 * ggr2.cgcil.ip.att.net [12.123.6.69]
+ 11 ar1-a3120s2.wswdc.ip.att.net [192.205.34.6]
+ 12 66.192.247.163
+ 13 ge8-13.csw5-pmtpa.wikimedia.org [66.193.50.242]
+ 14 * rr.pmtpa.wikimedia.org [66.230.200.100]
+ Computing statistics for 35 seconds...
+ Source to Here This Node/Link
+ Hop RTT Lost/Sent = Pct Lost/Sent = Pct Address
+ 0 Aaron.hsd1.mn.comcast.net. [192.168.11.3]
+ 0/ 10 = 0% |
+ 1 0ms 0/ 10 = 0% 0/ 10 = 0% air.setup [192.168.11.1]
+ 0/ 10 = 0% |
+ 2 8ms 0/ 10 = 0% 0/ 10 = 0% 73.127.68.1
+ 0/ 10 = 0% |
+ 3 8ms 0/ 10 = 0% 0/ 10 = 0% ge-1-38-ur01.minnetonka.mn.minn.comcast.net [68.86.234.41]
+ 0/ 10 = 0% |
+ 4 9ms 0/ 10 = 0% 0/ 10 = 0% 68.86.232.37
+ 0/ 10 = 0% |
+ 5 8ms 0/ 10 = 0% 0/ 10 = 0% 68.86.232.33
+ 0/ 10 = 0% |
+ 6 12ms 0/ 10 = 0% 0/ 10 = 0% 68.86.232.5
+ 0/ 10 = 0% |
+ 7 8ms 0/ 10 = 0% 0/ 10 = 0% 68.86.232.1
+ 0/ 10 = 0% |
+ 8 20ms 0/ 10 = 0% 0/ 10 = 0% 12.116.99.41
+ 0/ 10 = 0% |
+ 9 --- 10/ 10 =100% 10/ 10 =100% tbr2.cgcil.ip.att.net [12.122.99.70]
+ 0/ 10 = 0% |
+ 10 --- 10/ 10 =100% 10/ 10 =100% ggr2.cgcil.ip.att.net [12.123.6.69]
+ 0/ 10 = 0% |
+ 11 --- 10/ 10 =100% 10/ 10 =100% ar1-a3120s2.wswdc.ip.att.net [192.205.34.6]
+ 0/ 10 = 0% |
+ 12 --- 10/ 10 =100% 10/ 10 =100% 66.192.247.163
+ 0/ 10 = 0% |
+ 13 63ms 0/ 10 = 0% 0/ 10 = 0% ge8-13.csw5-pmtpa.wikimedia.org [66.193.50.242]
+ 0/ 10 = 0% |
+ 14 63ms 0/ 10 = 0% 0/ 10 = 0% rr.pmtpa.wikimedia.org [66.230.200.100]
+ Trace complete.
+ 
+ 
+ >''pathping wikipedia.org -n''
+ Tracing route to wikipedia-lb.eqiad.wikimedia.org [208.80.154.225]over a maximum of 30 hops:
+ 0 192.168.1.102
+ 1 192.168.1.1
+ 2 10.202.181.110
+ 3 10.202.182.109
+ 4 10.202.181.153
+ 5 10.202.181.49
+ 6 212.72.4.97
+ 7 82.178.32.102
+ 8 63.218.109.117
+ 9 63.218.44.38
+ 10 206.111.0.249
+ 11 216.156.8.189
+ 12 * * *
+ Computing statistics for 275 seconds...
+
+
+==參考來源==
+<references />
+{{視窗指令}}
+[[Category:网络技术|Category:网络技术]]
+[[Category:网路管理软件|Category:网路管理软件]]
+[[Category:網絡分析器|Category:網絡分析器]]

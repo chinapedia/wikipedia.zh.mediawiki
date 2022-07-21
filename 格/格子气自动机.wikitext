@@ -1,0 +1,55 @@
+[[File:Gas_velocity.gif|thumb]]
+
+'''格子气自动机'''或'''格子气细胞自动机'''是一种用来模拟流体流动的[[细胞自动机|细胞自动机]]。它是{{tsl|en|Lattice Boltzmann methods|格子玻尔兹曼方法}}的前身。通过格子气自动机的部分模型可以推导得出宏观的[[纳维－斯托克斯方程|纳维－斯托克斯方程]]<ref>Succi, section 2.3 describes the process</ref>。20世纪90年代初，{{tsl|en|Lattice Boltzmann methods|格子玻尔兹曼方法}}开始兴起<ref>Succi, section 2.6</ref>，对格子气自动机方法的研究则趋缓了。
+
+== 基本思想 ==
+细胞自动机模型中，晶格格点具有有限的离散状态。在格子气自动机模型中，这些离散状态用以表示具有不同速度的粒子。流体模拟在离散的时间序列中演进，在每个时间步长后，格点的状态可由该时间步长前此格点与相邻格点的状态确定。
+
+每个格点以一系列[[布尔值|布尔值]]来描述给定位置上各速度方向是否有粒子存在。
+
+每个时间步长的状态演进都分为两个阶段，即迁移和碰撞。<ref>Buick, section 3.4</ref>
+
+迁移：除非发生碰撞，每个粒子将沿它的速度方向向距离最近的格点移动，并维持该速度。[[泡利不相容原理|泡利不相容原理]]还要求同一格点同一速度方向的粒子最多只能有一个。
+
+碰撞：碰撞规则用于确定多个粒子到达同一格点时粒子的行为方式，并应满足[[质量守恒|质量守恒]]与[[动量守恒|动量守恒]]。<ref>{{citation|last=Wolfram|first=Stephen|authorlink=Stephen Wolfram|year=2002|title=[[A_New_Kind_of_Science|A New Kind of Science]]|pages=[https://archive.org/details/newkindofscience00wolf/page/459 459–464]|publisher=Wolfram Media|isbn=1-57955-008-8}}.</ref> 请注意，[[泡利不相容原理|泡利不相容原理]]并不影响同一格点的两个粒子以相反方向迁移。
+
+==HPP模型==
+[[Image:HPP_small.gif|thumb]]
+
+在1973年和1976年发表的论文中，Hardy，Pomeau和de Pazzis提出了首个格子气自动机模型，后根据三位作者的名字命名为HPP模型。HPP模型是一个二维的流体粒子相互作用模型，其晶格为正方形，粒子以单位速度独立运动。粒子可以移动至相邻的四个晶格而不能沿对角方向移动。
+
+发生对头碰撞时，如一个向左移动的粒子与一个向右移动的粒子到达同一个格点，则两个粒子的速度将分别旋转90°离开该格点。<ref>Buick, section 3.2.1</ref>
+
+HPP模型缺乏[[旋转不变性|旋转不变性]]，从而使模型具有高度[[各向异性|各向异性]]。 例如，HPP模型产生的涡流是正方形的。<ref>Succi, footnote p. 22</ref>
+
+==FHP模型==
+[[File:Fhp_collision.png|thumb]]
+1986年，{{tsl|en|Uriel Frisch|乌里尔·弗里施}}，[[布罗斯·哈斯拉彻|布罗斯·哈斯拉彻]]和{{tsl|en|Yves Pomeau|伊夫·波莫}}在论文中首次提出了以规则六边形为晶格的二维格子气自动机模型，即FHP模型。
+在基本FHP模型（又称FHP-I模型）中，流体粒子具有指向相邻的6个晶格的6种离散速度，碰撞规则包括对头二体碰撞和对称三体碰撞；在此基础上，FHP-II模型引入了代表粒子静止的第七种速度，其碰撞规则相应增加了含静止粒子的碰撞及非对称三体碰撞；FHP-III模型更进一步引入了对称四体碰撞，至此包括了能满足质量和动量守恒的所有碰撞规则。<ref>Buick, section 3.2.2</ref> 碰撞次数的增加会增大[[雷诺数|雷诺数]]，因此与FHP-I模型相比，FHP-II和FHP-III模型可以模拟粘性更小的流体。<ref>Wolf-Gladrow 3.2.6, figure 3.2.3</ref>
+
+与HPP模型不同，FHP模型中满足质量、动量守恒的碰撞规则具有[[不确定性|不确定性]]，部分碰撞类型会产生两种结果，此情况下会随机选择其中一种，相应粒子也将依照两种碰撞结果之一迁移。由于纯计算方法不能[[随机数生成器|生成随机数]]，因此通常采用[[伪随机|伪随机]]算法。<ref>Wolf-Gladrow 3.2.1</ref>
+
+FHP模型比HPP模型具有更好的对称性，但这一结论并不显然。<ref>Succi, footnote p. 23</ref>
+
+==三维模型==
+对于三维晶格，唯一能密铺三维空间的规则[[多胞形|多面体]]是[[立方体|立方体]]，而唯一能密铺三维空间、具有足够大对称性（否则模型将具有和HPP模型类似的缺陷）的多胞形组合是[[正十二面体|十二面体]]和[[正二十面体|二十面体]]。因此，模拟三维流场需要增加晶格的维数，例如1986年D'Humières，Lallemand和Frisch提出的面心[[超立方体|超立方体]]模型。<ref name="WG_3D">Wolf-Gladrow, sections 3.4 - 3.5</ref>
+
+==宏观动力学==
+
+可以通过每个格点的粒子数来计算格点的密度，以对应单位速度加权求和即可获得该位置的动量。<ref>Buick, section 3.5.1</ref>此计算过程会受到大量噪声的影响，在模拟中应在较大区域内取均值以获得更合理的结果。通常使用{{tsl|en|Ensemble average|系综平均}}进一步降低统计噪声。<ref>Buick, section 3.8</ref>
+
+==优势与不足==
+格子气自动机的主要优势是只涉及布尔运算因此避免了舍入误差，且作为细胞自动机具有天然的[[并行计算|并行性]]。<ref>Succi, section 2.4</ref>
+
+其不足之处在于缺乏{{tsl|en|Galilean invariance|伽利略不变性}}和随机因素造成的[[统计噪声|统计噪声]]。<ref>Succi, section 2.5</ref>另外，格子气自动机难以直接扩展至三维情形，需要引入更高维度来维持足够的对称性。<ref name="WG_3D"/>
+==备注==
+{{reflist|2}}
+
+==参考文献==
+*{{cite book|author=Sauro Succi|title=The Lattice Boltzmann Equation, for fluid dynamics and beyond|publisher=Oxford Science Publications|year=2001|isbn=0-19-850398-9}} (Chapter 2 is about lattice gas Cellular Automata)
+*James Maxwell Buick (1997). Lattice Boltzmann Methods in Interfacial Wave Modelling. PhD Thesis, University of Edinburgh. (Chapter 3 is about the lattice gas model.) <!--[http://www-personal.une.edu.au/~jbuick/Publications/PDF/Thesis/tot.html Online] --> ([https://web.archive.org/web/20070902011040/http://www-personal.une.edu.au/~jbuick/Publications/PDF/Thesis/tot.html archive.org]) 2008-11-13
+*{{cite book|author=Dieter A. Wolf-Gladrow|title=Lattice-Gas Cellular Automata and Lattice Boltzmann Models|publisher=Springer|year=2000|isbn=3-540-66973-6}}
+
+[[Category:计算流体力学|Category:计算流体力学]]
+[[Category:计算物理学|Category:计算物理学]]
+[[Category:細胞自動機|Category:細胞自動機]]

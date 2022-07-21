@@ -1,0 +1,66 @@
+'''模板的模板参数'''（template template parameter）是指[[C++|C++]]语言程序设计中，一个[[模板_(C++)|模板]]的参数是模板类型。只有类模板允许其模板参数是模板类型；函数模板不允许具有这样的模板参数（此处有争议<ref>(https://stackoverflow.com/questions/63280883/is-the-code-below-using-template-template-parameters#comment111899635_63280883)</ref>）。
+
+模板的模板参数可以有默认值。<ref>C++11语言标准，§14.1.14: A template-parameter of a template template-parameter is permitted to have a default template-argument.When such default arguments are specified, they apply to the template template-parameter in the scope of the template template-parameter. </ref>例如：
+ template <class T = float> struct B {};
+ template <template <class TT = float> class T> struct A {
+      inline void f();
+      inline void g();
+ };
+ template <template <class TT> class T> void A<T>::f() {
+       T<> t; // error - TT has no default template argument
+ }
+ template <template <class TT = char> class T> void A<T>::g() {
+        T<> t; // OK - T<char>
+ }
+
+模板的模板参数，其实参应当是类模板名字或者[[模板_(C++)#.E5.88.AB.E5.90.8D.E6.A8.A1.E6.9D.BF|别名模板]]（alias template）。当模板的模板参数做“形参实参结合”时，仅考虑把实参的基本（即未特化）类模板与模板的模板形参做匹配；不考虑实参的偏特化类模板，即使偏特化后的参数列表与模板的模板形参匹配得上。<ref>C++11语言标准，§14.3.3.1: When the template-argument names a class template, only primary class templates are considered when matching the template template argument with the corresponding parameter; partial specializations are not considered even if their parameter lists match that of the template template parameter.</ref> 例如：
+ template <typename T, template <typename ELEM, typename ALLOC = std::allocator<ELEM> > 
+                          class CONT = std::deque>   //deque的基本型有2个模板参数 
+ class Stack { 
+   private: 
+     CONT<T> elems;         // OK！
+     //… 
+ }; 
+
+当模板的模板参数被实例化时，考虑采用该模板参数的偏特化版本。如果在实例化之处该偏特化版本仍不可见，且如果它是可见的则应该当采用，这时该程序为病态。<ref>C++11语言标准，§14.3.3.2: If a specialization is not visible at the point of instantiation, and it would have been selected had it been visible, the program is ill-formed; no diagnostic is required.</ref> 例如:
+ template<class T> class A { // primary template
+       int x;
+ };
+ template<class T> class A<T*> { // partial specialization
+        long x;
+ };
+ template<template<class U> class V> class C {
+         V<int> y;
+         V<int*> z;
+ };
+ C<A> c; // V<int> within C<A> uses the primary template, so c.y.x has type int
+         // V<int*> within C<A> uses the partial specialization, so c.z.x has type long
+
+当一个模板的模板形参（称作P）与一个作为实参的模板（称作A）匹配时， 要求P与A各自的模板形参列表的对应成员满足：
+*具有相同种类（类型参数、非类型参数、模板作为参数）；
+*如果二者是非类型的模板参数，则其具体类型应相等;
+*如果二者是模板作为参数，则递归执行上述模板的模板参数形实匹配规则；
+*如果P是一个[[可变参数模板|可变参数模板]]，即P的模板形参列表包含了模板参数包（template parameter pack），则这个模板参数包应该匹配A中0个或者多个模板参数或者匹配A中的对应的模板参数包。<ref>C++11语言标准，§14.3.3.3: When P’s template-parameter-list contains a template parameter pack (14.5.3), the template parameter pack will match zero or more template parameters or template parameter packs in the template-parameter-list of A with the same type and form as the template parameter pack in P (ignoring whether those template parameters are template parameter packs).</ref>例如：
+ template<class T> class A { /* ... */ };
+ template<class T, class U = T> class B { /* ... */ };
+ template <class ... Types> class C { /* ... */ };
+ template<template<class> class P> class X { /* ... */ };
+ template<template<class ...> class Q> class Y { /* ... */ };
+ X<A> xa; // OK
+ X<nowiki><B></nowiki> xb; // ill-formed: default arguments for the parameters of a template argument are ignored
+ X<C> xc; // ill-formed: a template parameter pack does not match a template parameter
+ Y<A> ya; // OK
+ Y<nowiki><B></nowiki> yb; // OK
+ Y<C> yc; // OK  
+ template <class T> struct eval;
+ template <template <class, class...> class TT, class T1, class... Rest>
+ struct eval<TT<T1, Rest...>> { };
+ template <class T1> struct A;
+ template <class T1, class T2> struct B;
+ template <int N> struct C;
+ template <class T1, int N> struct D;
+ template <class T1, class T2, int N = 17> struct E;
+ eval<A<int>> eA; // OK: matches partial specialization of eval
+==参考文献==
+<references/>
+[[Category:C++|Category:C++]]

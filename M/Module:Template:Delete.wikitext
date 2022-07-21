@@ -1,0 +1,177 @@
+local data = require('Module:Template:Delete/data')
+
+local z = {}
+
+function extractAliases(item)
+    allnames = {item['code']}
+    for j, alias in ipairs(item['aliases']) do
+        table.insert(allnames, alias)
+    end
+    return allnames
+end
+
+function extractShortDesc(item)
+    if item['description'] then
+        return item['description']:gsub('{', '{'):gsub('}', '}'):gsub('|', '|')
+    else
+        return ''
+    end
+end
+
+function extractDeleteReason(item)
+    return item['deletereason'] or item['criteria'] or ''
+end
+
+function shortDesc(frame, name)
+    name = mw.text.trim(name):upper()
+    wt = {}
+    for i, item in ipairs(data) do
+        if name == '' or #name == 1 and item['code']:sub(1, 1) == name or item['code'] == name then
+            para = extractShortDesc(item)
+            if para ~= '' then
+                table.insert(wt, para)
+            end
+        end
+    end
+    if short then
+        return table.concat(wt, '\n')
+    else
+        return frame:preprocess(table.concat(wt, '\n'))
+    end
+end
+
+function z.shortDesc(frame)
+    return shortDesc(frame, frame.args[1])
+end
+
+function z.reasons(frame)
+    wt = {}
+    for i, item in ipairs(data) do
+    	if item['code'] == 'G8' then
+    		-- 在提示選單隱藏G8
+    	else
+	        allnames = extractAliases(item)
+	        table.insert(wt, '<tr><td>' .. mw.text.listToText(allnames, '、', '或') .. '<td title="' .. extractShortDesc(item) .. '">' .. item['criteria'] .. '</td>')
+    	end
+    end
+    return '<table class="wikitable">' .. table.concat(wt) .. '</table>'
+end
+
+function z.input(frame)
+    if frame.args.parent then
+        args = frame:getParent().args
+    else
+        args = frame.args
+    end
+    -- precache
+    map = {}
+    for i, item in ipairs(data) do
+        map[item['code']:lower()] = i
+        for j, alias in ipairs(item['aliases']) do
+            map[alias:lower()] = i
+        end
+    end
+    -- parse
+    i = 1
+    rows = {}
+    pretext = {}
+    deletelinks = {}
+    while i < 10 do
+        arg = args[i]
+        if arg and map[mw.text.trim(arg:lower())] then
+            item = data[map[mw.text.trim(arg:lower())]]
+            if frame.args.reasoncode then
+                return item['code']
+            end
+            title = mw.title.getCurrentTitle()
+            checkfunc = item['check']
+            if checkfunc then
+                check = checkfunc(title)
+            else
+                check = nil
+            end
+            rowsuffix2 = ''
+            deletesuffix = ''
+            -- special case for F1/F5
+            if item['code'] == 'F1' or item['code'] == 'F5' then
+                i = i + 1
+                if args[i] then
+                    img = mw.text.trim(args[i])
+                else
+                    img = nil
+                end
+                if img then
+                    imgtitle = mw.title.new(img, 'Media')
+                else
+                    imgtitle = nil
+                end
+                if imgtitle then
+                    deletesuffix = '：[[:File:'_.._imgtitle.text_.._'|:File:' .. imgtitle.text .. ']]'
+                else
+                    if check then
+                        rowsuffix2 = '<br><span class="error">為方便管理員檢查，請加上保留檔案的名稱。</span>'
+                    else
+                        check = '為方便管理員檢查，請加上保留檔案的名稱。'
+                    end
+                end
+            end
+            -- special case for O1/G10 in user namespace, see Wikipedia:机器人/申请/Xiplus-abot/8
+            if title.namespace == 2 and (item['code'] == 'O1' or item['code'] == 'G10') then
+            	rowsuffix2 = args.cat or args.cate or args.category or ('[[Category:O1快速删除候选|Category:O1快速删除候选]]')
+            end
+            
+            if check then
+                rowsuffix = '<br><span class="error">' .. check .. '</span>' .. (args.cat or args.cate or args.category or '[[Category:快速删除候选|错]]')
+            else
+                if frame.args.deletelink then
+                    table.insert(deletelinks, '[[WP:CSD#'_.._item['code']_.._'|' .. item['code'] .. ']]: ' .. extractDeleteReason(item) .. deletesuffix)
+                end
+                rowsuffix = args.cat or args.cate or args.category or ('[[Category:快速删除候选|' .. (item['category'] or '速') .. ']]')
+            end
+            if deletesuffix then
+                row = '* <strong><span id="speedy-delete-' .. item['code'] .. '" title="' .. extractShortDesc(item) .. '">' .. item['criteria'] .. '（[[WP:CSD#'_.._item['code']_.._'|CSD ' .. item['code'] .. ']]' .. deletesuffix .. '）' .. rowsuffix .. rowsuffix2 .. '</span></strong>'
+            else
+                row = '* <strong><span id="speedy-delete-' .. item['code'] .. '" title="' .. extractShortDesc(item) .. '">' .. item['criteria'] .. '（[[WP:CSD#'_.._item['code']_.._'|CSD ' .. item['code'] .. ']]）' .. rowsuffix .. rowsuffix2 .. '</span></strong>'
+            end
+            table.insert(rows, row)
+        elseif arg and mw.text.trim(arg) ~= '' then
+            if frame.args.reasoncode then
+                return ''
+            end
+            -- try to read it as a title
+            title = mw.title.new(mw.text.trim(arg))
+            cat = args.cat or args.cate or args.category or '[[Category:快速删除候选|速]]'
+            if title and title.exists then
+                if frame.args.deletelink then
+                    table.insert(deletelinks, '[[:'_.._arg_.._'|:' .. arg .. ']]')
+                end
+                table.insert(rows, '*<strong>' .. cat .. '[[:'_.._arg_.._'|:' .. arg .. ']]</strong>')
+            else
+                if frame.args.deletelink then
+                    table.insert(deletelinks, arg)
+                end
+                arg = string.gsub(arg, '^([*:#]*)(.*)', '%1<strong>%2</strong>')
+                table.insert(rows, '*' .. cat .. arg)
+            end
+        end
+
+        arg = args['c' .. i]
+        if arg and mw.text.trim(arg) ~= '' then
+            table.insert(rows, '*' .. arg)
+        end
+
+        i = i + 1
+    end
+    -- for use by Twinkle
+    if frame.args.deletelink then
+        local temp = table.concat(deletelinks, '；'):gsub('。；', '；'):gsub('。：', '：')
+        return mw.text.trim(temp)
+    end
+    if #rows > 0 then
+        return mw.text.trim(table.concat(pretext) .. '\n' .. table.concat(rows, '\n'))
+    else
+        return '<span style="font-weight:bold;color:red;">（請填寫理由）</span>' .. (args.cat or args.cate or args.category or '[[Category:快速删除候选|错]]')
+    end
+end
+
+return z

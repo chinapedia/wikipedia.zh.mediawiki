@@ -1,0 +1,427 @@
+{{NoteTA|G1=Signals and Systems}}
+[[File:Voice_Module_Nov.5,2013.jpg|thumb]]
+
+'''語音處理'''（Speech processing），又稱'''語音訊號處理'''、'''人聲處理'''，其目的是希望做出想要的[[訊號|訊號]]，進一步做[[語音|語音]]辨識，應用到[[手機|手機]]介面甚至一般[[生活|生活]]中，使人與[[電腦|電腦]]能進行[[溝通|溝通]]。
+
+==語音的相關常識==
+===一般聲音檔格式===
+*取樣頻率：22050Hz
+*單聲道或雙聲道
+*每筆資料用8個bit來表示
+*電腦中沒有經過任何壓縮的聲音檔：*.wav
+===聲音的頻率===
+*頻率範圍
+人耳可以辨識頻率：20Hz ~ 20000Hz
+
+說話：150~2000Hz
+
+電話系統頻域：小於3500Hz
+
+電腦音效卡取樣頻率：44100Hz (最新技術可達192K)(一般用22050Hz、11025Hz 即可)
+*超音波(ultrasound)與次聲波(infrasound)
+超音波(ultrasound)：> 20000Hz
+
+次聲波(infrasound)：< 20Hz
+
+*人對於頻率的分辨能力，是由於頻率的'''"比"'''決定
+對人類而言，300Hz和400Hz之間的差別，與3000Hz和4000Hz之間的差別是相同的
+
+===聲音的波長===
+*波長較長：傳播距離較遠，但容易散射
+*波長較短：衰減較快，但傳播方向較接近直線
+
+===聲音的速度===
+*聲音在空氣中傳播速度： 每秒340 公尺(15°C 時)
+*一般人，耳翼到鼓膜之間的距離： 2.7公分。所以，人類對3000Hz 左右頻率的聲音最敏感
+*每增加1°C，聲音的速度增加0.6 m/sec
+*聲音在水中的傳播速度是1500 m/sec，在鋁棒中的傳播速度是5000 m/sec
+
+===分貝===
+*分貝(dB)：<math> 10 log_{\text{10}} (P/C) \,\!</math> 
+
+其中P為音強(正比於振福的平方)，C為0dB時的音強
+
+*每增加10dB，音強增加10倍，振幅增加 <math>10^{0.5}  \,\!</math> 倍；每增加3dB ，音強增加2倍，振幅增加 <math>2^{0.5}  \,\!</math>  倍
+
+===音樂訊號===
+*電子琴Do 的頻率：
+低音Do: 131.32 Hz
+
+中音Do: 261.63 Hz
+
+高音Do: 523.26 Hz
+
+更高音Do: 1046.52 Hz
+
+*音樂每增加八度音，頻率變為2 倍
+*每一音階有12個半音。增加一個半音，頻率增加<math>2^{1/12}  \,\!</math> 倍(1.0595 倍)
+*音樂通常會出現「和弦」(chord) 的現象。除了基頻<math> f_{\text{0}} \,\!</math> Hz 之外，也會出現2<math> f_{\text{0}} \,\!</math>Hz, 3<math> f_{\text{0}} \,\!</math>Hz, 4<math> f_{\text{0}} \,\!</math>Hz , …… 的頻率
+
+===語音處理的工作===
+*語音編碼(Speech Coding)
+*語音合成(Speech Synthesis)
+*語音增強(Speech Enhancement)
+*語音辨認(Speech Recognition)
+音素→音節→詞→句→整段話
+*說話人辦認(Speaker Recognition)
+*其他：語意、語言、情緒
+
+===子音和母音===
+*母音： 依唇型而定。母音的能量大，頻率偏低，時間較長，出現在子音後或獨立出現
+*子音： 在口腔，鼻腔中某些部位將氣流暫時堵住後放開。子音的能量小，頻率偏高，時間較短，出現在母音前
+
+===語意學的角色===
+*以「語意學」或「機率」來補足語音辨識的不足
+例如：經過判定，一個聲音可能是
+
+ㄅㄧ ㄖㄢ  ㄆㄧ ㄖㄢ
+
+ㄅㄧ ㄌㄢ  ㄆㄧ ㄌㄢ
+
+這個聲音是「必然」的機率比較大。
+
+ㄅㄛ ㄅㄛ  ㄆㄛ ㄆㄛ
+
+可能是「伯伯」，也可能是「婆婆」，看上下文
+
+*當前主流的語音辨識技術：
+梅爾頻率倒頻譜(Mel-Frequency Cepstrum) + 語意分析 + 機器學習(Machine Learning)
+
+==語音檔的處理(Matlab)==
+===讀取聲音檔===
+*電腦中，沒有經過壓縮的聲音檔都是*.wav 的型態，有經過壓縮的聲音檔是*.mp3的型態
+*讀取： audioread (2015版本以後的Matlab，'''wavread''' 將改為'''audioread''')
+*例： ['''x''', '''fs'''] = audioread('C:\WINDOWS\Media\ringin.wav');
+
+可以將ringin.wav 以數字向量'''x'''來呈現。'''fs''':取樣頻率(sampling frequency)
+
+這個例子當中size('''x''') = 122868 2 (2指的是雙聲道('''Stereo'''，俗稱立體聲))，'''fs''' = 22050
+*.wav 檔中所讀取的資料，值都在 -1 和 +1 之間
+*畫出聲音的波型
+
+time = [0:size(x,1)-1]/fs;  (x 是用audioread 所讀出的向量)
+
+subplot(2,1,1); '''plot(time, x(:,1))'''; xlim([time(1),time(end)])
+
+subplot(2,1,2); '''plot(time, x(:,2))'''; xlim([time(1),time(end)])
+
+===繪出頻譜===
+X = fft(x(:,1));
+
+X=X.';
+
+N=length(X); N1=round(N/2);
+
+dt=1/fs;
+
+X1=[X(N1+1:N),X(1:N1)]*dt;  (shifting for spectrum)
+
+f=[[N1:N-1]-N,0:N1-1]/N*fs;  (valid f)
+
+plot(f, abs(X1));
+
+===聲音的播放===
+*sound('''x'''): 將'''x'''以8192Hz 的頻率播放
+*sound('''x''', '''fs'''): 將'''x'''以'''fs''' Hz 的頻率播放
+註：'''x'''必須是1 個column (或2個columns)，且'''x'''的值應該介於 -1 和 +1 之間
+*soundsc('''x''', '''fs'''): 自動把'''x'''的值調到 -1 和 +1 之間再播放
+
+===製作.wav檔：audiowrite===
+audiowrite(filename, x, fs)
+
+將數據'''x'''變成一個*.wav 檔，取樣頻率為'''fs'''Hz
+
+註：'''x'''必須是1 個column (或2個columns)，且'''x'''的值應該介於 -1 和 +1
+
+===錄音的方式===
+====基本指令說明====
+以下這三個指令要並用才可以錄音
+*recorder = audiorecorder(Fs, nb, nch); (提供錄音相關的參數)
+Fs: sampling frequency
+
+nb: using nb bits to record each data
+
+nch: number of channels (1 or 2)
+
+*recordblocking(recorder, Sec); (錄音的指令)
+recorder: the parameters obtained by the command  '''audiorecorder'''
+
+Sec: the time length for recording
+
+*audioarray = getaudiodata(recorder);
+(將錄音的結果，變成audioarray 這個column vector，如果是雙聲道，則audioarray 是兩個column vectors)
+
+====範例====
+Sec = 3; (錄音的時間為三秒)
+
+Fs = 8000; (sampling frequency 為8000 Hz)
+
+recorder = audiorecorder(Fs, 16, 1);
+
+recordblocking(recorder, Sec);
+
+audioarray = getaudiodata(recorder); (錄音結果為audioarray，是一個column vector (如果是雙聲道，則是兩個column vectors))
+
+sound(audioarray, Fs); (播放錄音的結果)
+
+t = [0:length(audioarray)-1]./Fs;
+
+plot (t, audioarray); (將錄音的結果用圖畫出來)
+
+xlabel('sec','FontSize',16);
+
+audiowrite('test.wav', audioarray, Fs)  (將錄音的結果存成*.wav 檔)
+
+
+==語音檔的處理(Python)==
+===安裝模組===
+*pip install numpy
+*pip install scipy
+*pip install matplotlib # plot
+*pip install pipwin
+*pipwin install simpleaudio # vocal files
+*pipwin install pyaudio
+
+===讀音訊檔===
+要先import 相關模組: import wave
+
+====讀取音檔====
+wavefile = wave.open('C:/WINDOWS/Media/Alarm01.wav', 'rb')
+
+獲得音檔取樣頻率和音訊長度:
+
+fs =wavefile.getframerate()  # sampling frequency
+
+num_frame = wavefile.getnframes()  # length of the vocal signal
+
+>>> fs
+
+22050
+
+>>> num_frame
+
+122868
+
+====讀取波形與數據====
+要先import 相關模組: import numpy as np
+*str_data = wavefile.readframes(num_frame)
+*wave_data = np.frombuffer(str_data, dtype=np.int16) # 轉成整數型態
+*wave_data = wave_data / max(abs(wave_data))  # normalization
+*n_channel = 2
+*wave_data = np.reshape(wave_data, (num_frame, n_channel)) # 若為雙聲道音檔需要做reshape
+
+====畫出音訊波形圖====
+要先import 相關模組: import matplotlib.pyplot as plt
+*time = np.arange(0, num_frame)*1/fs
+*plt.plot(time, wave_data)
+*plt.show()
+
+===畫出頻譜===
+要先import 相關模組: from scipy.fftpack import fft
+*fft_data = abs(fft(wave_data[:,1]))/fs # only choose the 1st channel # 注意要乘上1/fs
+*n0=int(np.ceil(num_frame/2))
+*fft_data1=np.concatenate([fft_data[n0:num_frame],fft_data[0:n0]]) # 將頻譜後面一半移到前面
+*freq=np.concatenate([range(n0-num_frame,0),range(0,n0)])*fs/num_frame # 頻率軸跟著調整
+*plt.plot(freq,fft_data1)
+*plt.xlim(-1000,1000) # 限制頻率的顯示範圍
+*plt.show()
+
+===播放聲音===
+要先import 相關模組: import simpleaudio as sa
+*n_bytes =2  # using two bytes to record a data
+*wave_data = (2**15-1)* wave_data  # change the range to -215 ~ 215
+*wave_data = wave_data.astype(np.int16)
+*play_obj = sa.play_buffer(wave_data, n_channel, n_bytes, fs)
+*play_obj.wait_done()
+
+===製作音檔===
+*f = wave.open('testing.wav', 'wb')
+*f.setnchannels(2) # 設定聲道數
+*f.setsampwidth(2) # 每個samples 有幾個位元組
+*f.setframerate(fs) # 設定取樣頻率
+*f.writeframes(wave_data.tobytes())
+*f.close()
+
+===錄音===
+要先import 相關模組: import pyaudio
+
+import pyaudio
+
+pa=pyaudio.PyAudio()
+
+fs = 44100
+
+chunk = 1024
+
+stream = pa.open(format=pyaudio.paInt16, channels=1,rate=fs, input=True, frames_per_buffer=chunk)
+
+vocal=[]
+
+count=0
+
+==時頻分析結果分析==
+
+===Matlab===
+====畫出時頻分析結果====
+可採行兩種方式：
+*使用mesh 指令畫出立體圖(但結果不一定清楚，且執行時間較久)
+*將amplitude 變為gray-level，用顯示灰階圖的方法將結果表現出來
+假設y 是時頻分析計算的結果
+
+image(abs(y)/max(max(abs(y)))*C) % C 是一個常數，可以選C=400
+
+或image(t, f, abs(y)/max(max(abs(y)))*C)
+
+colormap(gray(256)) % 變成gray-level 的圖
+
+set(gca,'Ydir','normal') % 若沒這一行, y-axis 的方向是倒過來的
+
+set(gca,'Fontsize',12) % 改變橫縱軸數值的font sizes
+
+xlabel('Time (Sec)','Fontsize',12) % x-axis
+
+ylabel('Frequency (Hz)','Fontsize',12) % y-axis
+
+title('STFT of x(t)','Fontsize',12) % title
+
+====計算程式執行時間的指令====
+tic (這指令如同按下碼錶)
+
+toc (show 出碼錶按下後已經執行了多少時間)
+
+註：通常程式執行第一次時，由於要做程式的編譯，所得出的執行時間會比較長。程式執行第二次以後所得出的執行時間，是較為正確的結果
+
+===Python===
+====事前安裝模組====
+*pip install numpy
+*pip install matplotlib
+
+====畫出時頻分析結果====
+假設y為時頻分析結果(應為二維的矩陣數列)，將y 以灰階方式畫出來
+
+import numpy as np
+
+import matplotlib.pyplot as plt
+
+C = 400
+
+y = np.abs(y) / np.max(np.abs(y)) * C
+
+plt.imshow(y, cmap='gray', origin='lower') # 加上origin='lower' 避免上下相反
+
+plt.xlabel('Time (Sec)')
+
+plt.ylabel('Frequency (Hz)')
+
+plt.show()
+
+若要加上座標軸數值(在plt.show()之前加上以下程式碼)
+
+x_label = ['0', '10', '20', '30'] # 橫軸座標值
+
+y_label = ['-5', '0', '5'] # 縱軸座標值
+
+plt.xticks(np.arange(0, x_max, step=int(x_max/(len(x_label)-1)), x_label)
+
+plt.yticks(np.arange(0, y_max, step=int(y_max/(len(y_label)-1)), y_label)
+
+
+==語音訊號的來源==
+[[人聲|人聲]]是由於[[聲帶|聲帶]]震動，而產生[[聲音|聲音]]。當[[運動|運動]][[肌肉|肌肉]]擠壓，使[[肺|肺]]臟中的[[空氣|空氣]]通過[[聲帶|聲帶]]時，[[空氣|空氣]]流動使得聲帶做周期性的震動，又再一次震動了[[空氣|空氣]]，接著，帶著[[動能|動能]]的[[空氣|空氣]]離開[[氣管|氣管]]到達[[口腔|口腔]]或鼻腔，在腔室中震動，最後離開在[[嘴唇|嘴唇]]傳到人耳變成聲音。
+
+若調整口腔中舌頭的位置，會產生不同種類的聲音，如果舌頭沒有做太多的動作，空氣只有在口腔中[[共振|共振]]，接著直接流出[[嘴唇|嘴唇]]，會產生[[母音|母音]]，若提起舌頭，使口鼻腔相通，則會出現鼻音。
+
+==語音訊號分類==
+從中文發音的觀點來說，聲音仍可分為子音與母音，母音和子音可以用兩種方式區分：
+* 發聲方式：一般而言，母音跟嘴唇形狀有關，而且不與鼻腔共振。相對而言，在發出子音時，就會運用到鼻腔配合發聲。
+* 頻譜分析：從頻譜上觀察可以發現子音的訊號頻率較高，持續時間較短，且會在母音之前出現。而母音的頻率較低，持續時間較長，在子音後或獨立出現，另外，母音的能量也會比子音大。
+
+下面列出中文注音符號中的母音、子音及其拼音。
+*母音：ㄚ ㄛ ㄜ ㄝ ㄞ ㄟ ㄠ ㄡ ㄢ ㄣ ㄤ ㄥ ㄦ 一 ㄨ ㄩ
+{| class="wikitable"
+|-
+! 母音 !! ㄚ !! ㄛ !! ㄜ !! ㄝ !! ㄞ !! ㄟ !! ㄠ !! ㄡ
+|-
+| 漢語拼音 || a || o || e || e || ai || ei || ao || ou
+|-
+| 通用拼音 || a || o || e || e || ai || ei || ao || ou
+|-
+! 母音 !! ㄢ !! ㄣ !! ㄤ !! ㄥ !! ㄦ !! 一 !! ㄨ !! ㄩ  
+|-
+| 漢語拼音 || an || en || ang || eng || er || i,y || u,w || yu,ju
+|-
+| 通用拼音 || an || en || ang || eng || er || i,y || u,w || yu,ju
+|}
+
+*子音：ㄅ ㄆ ㄇ ㄈ ㄉ ㄊ ㄋ ㄌ ㄍ ㄎ ㄏ ㄐ ㄑ ㄒ ㄓ ㄔ ㄕ ㄖ ㄗ ㄘ ㄙ
+{| class="wikitable"
+|-
+! 子音 !! ㄅ !! ㄆ !! ㄇ !! ㄈ !! ㄉ !! ㄊ !! ㄋ
+|-
+| 漢語拼音 || b || p || m || f || d || t || n
+|-
+| 通用拼音 || b || p || m || f || d || t || n 
+|-
+! 子音 !! ㄌ !! ㄍ !! ㄎ !! ㄏ !! ㄐ !! ㄑ !! ㄒ
+|-
+| 漢語拼音 || l || g || k || h || j || q || x
+|-
+| 通用拼音 || l || g || k || h || j || q || x
+|-
+! 子音 !! ㄓ !! ㄔ !! ㄕ !! ㄖ !! ㄗ !! ㄘ !! ㄙ
+|-
+| 漢語拼音 || zh || ch || sh || r || z || c || s
+|-
+| 通用拼音 || zh || ch || sh || r || z || c || s
+|}
+
+==語音的架構==
+要分析語音訊號前，必須先了解其架構，語音的要素從小到大分別是：音素→[[音節|音節]]→[[詞彙|詞彙]]→句子→整段話。
+
+[[音素|音素]]是聲音的最小單位，例如「呵」這個字的音素，就是「ㄏ」和「ㄜ」，但是音素和注音符號並不相等，例如「鷗」雖然只有「ㄡ」這個母音，但是由於是雙母音，所以會把他拆成兩個音素。音節在中文而言，就是只一個字，例如：「天天開心」就有四個音節。詞彙是文字組成的有意義片段，各種不同的詞彙集結成句子，最後變成整段話，這就是語音的架構。
+
+==語音處理方法==
+用麥克風或其他裝置收到的類音聲音訊號，經由類比數位轉換裝置，將資料數據化進行處理，最後再經過數位類比轉換裝置輸出。因此，我們在處理時是針對數位訊號，語音訊號是一種離散時間訊號。其訊號處理流程如下：
+
+# 收取並取樣訊號：利用麥克風或各種收音裝置，收取類比語音訊號，再用ADC裝置(如類比數位轉換卡)把類比訊號變成數位訊號，接著根據奈奎斯特理論作取樣，若不符合理論則會造成訊號失真。
+# 量化及編碼：由於電腦中的記憶都是0和1，因此要將所收到的數據用一段適合的0跟1去儲存，這個動作就稱為量化，所使用的0與1越多，所需的記憶體越多。接著利用編碼器將數值以波形呈現，因此雖然是數位訊號，但是在電腦中所見到的是類比。
+# 訊號標準化：將語音訊號標準化，使其數值都落在同一個範圍。
+# 音框選擇：由於語音訊號是一段很長的訊號，因此會針對想要處理的部分取音框。
+# 端點偵測：端點偵測的目的是使訊號處理的範圍更精確，只要設定一個音量[[閾值|閾值]]，若訊號小於閾值，則將其視為沒訊號，但是若雜訊過高，則會產生誤差。
+# 去雜訊：由於雜訊多集中在高頻的部分，因此利用簡單的高頻濾波器，就可以去掉部分雜訊。
+
+==基本處理方法==
+語音訊號是屬於離散時間系統，因此會用離散時間的傅立葉轉換去做處理，除此之外，[[摺積|摺積]]、[[窗函數|窗函數]]都是一定會使用到的處理方法。
+* 離散時間傅立葉轉換：
+:<math>
+x[n] = \frac{1}{2\pi}\int\limits_{-\pi}^\pi X(\omega) e^{-j\omega n}\,d\omega.
+</math>
+
+:<math>X(\omega) = \sum_{k=0}^{N-1} x[n] e^{-j \omega n} </math>
+
+* 摺積：
+兩訊號做convolution等於，兩訊號先做傅立葉轉換，相乘後再做反傅立葉轉換，藉此可以更快速的處理訊號。
+: <math>\mathcal{F}\{h*x\} = \mathcal{F}\{h\} \cdot \mathcal{F}\{x\}</math>
+
+==語音處理的應用==
+語音處理主要有兩個目的：
+* 減少訊號雜訊，做出想要的訊號模組。
+* 進行語音辨識，使人可以利用語言與電腦溝通。
+
+
+
+==參見==
+* [[語音識別|語音識別]]
+
+==參考文獻==
+{{refbegin}}
+* J. Benesty, M. M. Sondhi, Y. Huang (ed). ''Springer Handbook of Speech Processing''. Springer, 2007. ISBN 978-3-540-49125-5.
+* J. Benesty, S. Makino, J. Chen (ed). ''Speech Enhancement''. Springer, 2005. ISBN 978-3-540-24039-6.
+* Jian-Jiun Ding, “Advanced Digital Signal Processing”, NTU, 2021. 
+* Jian-Jiun Ding, “Time Frequency Analysis and Wavelet Transforms ”, NTU, 2021. 
+{{refend}}
+
+{{DSP}}
+{{Authority control}}
+[[Category:音訊工程|Y]]
+[[Category:語音學|Y]]

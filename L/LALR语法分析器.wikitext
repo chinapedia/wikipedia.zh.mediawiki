@@ -1,0 +1,63 @@
+
+{{语法分析器}}
+
+在计算机科学中，'''LALR分析器'''是一种{{Link-en|规范LR分析方法|Canonical_LR_parser}}的简化形式。它可以对上下无关文法进行语法分析。'''LALR'''即“'''L'''ook-'''A'''head '''LR'''”。其中，Look-Ahead为“向前看”，L代表对输入进行从左到右的检查，R代表反向构造出最右推导序列。
+'''LALR分析器'''可以根据一种程序设计语言的正式语法的{{Link-en|产生式|Production_(computer_science)}}而对一段文本程序输入进行[[语法分析|语法分析]]，从而在语法层面上判断输入程序是否合法。
+实际应用中的LALR分析器并不是由人手工写成的，而是由类似于[[yacc|yacc]]和[[GNU_Bison|GNU Bison]]之类的{{Link-en|LALR语法分析器生成工具|LALR_parser_generator}}构成。由机器自动生成的代码相比较于程序员手工的代码，拥有更好的运行效率而且减少了程序员的工作量。
+
+==历史==
+
+1965年,[[Donald_Knuth|Donald Knuth]]发明了[[LR剖析器|LR分析器]]。LR分析器可以在[[线性时间|线性时间]]里分析一个确定的[[上下文无关文法|上下文无关文法]]的输入<ref>{{cite journal|url=http://linkinghub.elsevier.com/retrieve/pii/S0019995865904262|pages=607–639|title=On the translation of languages from left to right|journal=Information and Control|volume=8|issue=6|accessdate=2018-04-02|doi=10.1016/s0019-9958(65)90426-2|author=Donald E. Knuth|archive-date=2020-06-07|archive-url=https://web.archive.org/web/20200607142205/https://linkinghub.elsevier.com/retrieve/pii/S0019995865904262|dead-url=no}}</ref>。但是，最右推导技术所需的分析表需要一个巨大的内存空间，所以在那个内存空间紧缺的年代，LR分析技术被认为是不可行的。
+为了解决这个缺点，在1969年，Frank DeRemer提出了两种LR分析方法的简化版，即LALR分析器和{{Link-en|SLR分析器|Simple_LR_parser}}。这两种方法所需的内存空间较LR分析法减少了许多。即使在后来的1977年，LR分析器的空间优化方式被提出，但是其空间效率依然比不过LALR这种简化版本。
+1979年，Frank DeRemer和Tom Pennello宣布了对于LALR分析器的新的优化方法，这再一次提高了LALR分析器的空间使用效率<ref>{{citation|title=Efficient Computation of LALR(1) Look-Ahead Sets|author=Frank DeRemer, Thomas Pennello|work=Sigplan Notices - SIGPLAN, vol. 14, no. 8|pages=176–187|year=1979}}</ref> 。
+
+==概括==
+
+通常来说，LALR分析器是指LALR(1)分析器。其中(1)代表了向前看一个字符，分析器可以根据这前面的一个字符确定分析时使用的产生式。相类似的，还有向前看两个字符的LALR(2)分析器、甚至向前看k个字符的LALR(''k'')分析器，但是实际使用中很少使用这类分析器。
+LALR分析方法基于LR(0)分析法演化而来，因此对于一个LALR(''k'')分析法可以看成LA(''k'')LR(0)分析法。实际上考虑到LR分析法，有两种参数存在的LA(''k'')LR(''j'')分析法族。对于所有的''k''和''j''的组合，都可以由LR(''j''+''k'')分析法导出<ref>''Parsing Techniques: A Practical Guide,'' by Dick Grune and Ceriel J. H. Jacobs, "9.7 LALR(1)", [http://books.google.com/books?id=05xA_d5dSwAC&pg=PA302 p. 302] {{Wayback|url=http://books.google.com/books?id=05xA_d5dSwAC&pg=PA302 |date=20170618071418 }}</ref>。但是这种观点没有任何的实际意义。
+相比较与其他的LR分析器，LALR分析器在一次简单的对输入流进行从左到右扫描时，可以更直接的根据向前看的那个字符确定一个[[从下至上|从下至上]]的分析方法。这些是归功于LALR分析器不需要[[回溯|回溯]]。作为一个定位于向前看的语法分析器，LALR(1)即为最常用的形式。
+
+==关于实现==
+由于LALR分析器采用了最右推导而不是采用最左推导，因此，理解LALR分析器的工作方法变得十分困难。而这导致了手动构造一个LALR分析器是一个消耗巨大而且费时的工作。而且当出现语法错误时，LALR分析器可能并不会马上报错，而是执行几次归约动作。
+无论如何，任意的LR(''k>0'')分析器中，由于要在出错时枚举每一个可能的字符， 让错误恢复这项工作变得十分繁琐。
+由于这个原因，在一些时候[[LL分析器|递归下降分析器]]比LALR分析器更实用。由于其较低的语法分析功能，一个递归下降分析器需要更多的手写代码。但是为一个递归下降分析器编写代码并不像LALR分析器那样的困难，这是因为递归下降分析器使用了最左推导。一个值得注意的例子就是[[GCC|Gnu Compiler Collection]]中的[[C语言|C]]和[[C++|C++]]语言的语法分析器。其中语法分析器起始是LALR分析器，但是之后却被改写成递归下降分析器。<ref>[http://gcc.gnu.org/gcc-3.4/changes.html#cplusplus "GCC 3.4 Release Series Changes, New Features, and Fixes"] {{Wayback|url=http://gcc.gnu.org/gcc-3.4/changes.html#cplusplus |date=20100710060842 }}, GCC.gnu.org.</ref><ref>[http://gcc.gnu.org/gcc-4.1/changes.html "GCC 4.1 Release Series Changes, New Features, and Fixes] {{Wayback|url=http://gcc.gnu.org/gcc-4.1/changes.html |date=20201109023618 }}", GCC.gnu.org.</ref>
+
+==与其他语法分析器的关系==
+
+===LR分析器===
+严格的来说，LALR(1)分析器的功能比LR(1)分析器要弱一些；但是却比SLR(1)分析器强。由LALR引入的对LR的简化在于存在'''相同核心的项集'''；但是在LR分析法中，下个字符是未知的。而这种简化导致了LALR的分析功能的下降：不知道下个字符导致了语法分析器不知道选择哪个产生式，从而产生了归约/归约冲突。而SLR(1)分析法采用了更多的合并，导致了相较于LALR(1)更多的额外冲突。
+下述是一个标准的LR(1)文法，但是并不能由LALR(1)分析器进行分析<ref>"[http://www.cse.ohio-state.edu/~gurari/course/cse756/cse756su56.xht 7.9 LR(1) but not LALR(1)] {{Wayback|url=http://www.cse.ohio-state.edu/~gurari/course/cse756/cse756su56.xht |date=20100804231352 }}", ''[http://www.cse.ohio-state.edu/~gurari/course/cse756/cse756.xht CSE 756: Compiler Design and Implementation] {{Wayback|url=http://www.cse.ohio-state.edu/~gurari/course/cse756/cse756.xht |date=20100723153301 }},'' Eitan Gurari, Spring 2008</ref><ref>"[http://stackoverflow.com/questions/8496065/why-is-this-lr1-grammar-not-lalr1 Why is this LR(1) grammar not LALR(1)?] {{Wayback|url=http://stackoverflow.com/questions/8496065/why-is-this-lr1-grammar-not-lalr1 |date=20170328011429 }}"</ref>。
+<syntaxhighlight lang="java">
+S -> a E c
+  -> a F d
+  -> b F c
+  -> b E d
+E -> e
+F -> e</syntaxhighlight>
+
+在LALR分析表的构造中，有两个状态将会被合并成一个状态。而之后的下个字符将会出现歧义。这个状态如下
+<syntaxhighlight lang="java">
+E -> e. {c,d}
+F -> e. {c,d}</syntaxhighlight>
+
+对于一个LR(1)分析器，将产生两个不同的状态而不会产生冲突。但是一个LALR(1)分析器，只会产生一个状态，从而产生冲突（若下个输入字符为c或d，可以归约成E或F）。因此，上述文法对于LALR(1)是二义的。
+
+===LL分析器===
+LALR(''k'')分析器无法与LL(''k'')分析器进行比较。对于任意的''k''和''j''，都存在有某种LALR(''k'')文法，但该文法却不是LL(''j'')文法，反之亦然。实际上，一个给定的LL(1)文法是否能由一个LALR(''k'')分析器进行分析都是不确定的（其中<math>k \geq 0</math>）。
+
+称每一个LL(1)都是SLR(1)或者LALR(1)的说法经常是错误的；确实存在一些LL(1)文法不是LALR(1)的。但实际上，给一个LL(1)文法附加一系列的技术条件就可以是LALR(1)的；而这些条件仅仅是避免了一系列确实无用的产生式规则。所以，实际中用到的LL(1)文法通常都是LALR(1)的。
+
+== 参考 ==
+{{reflist|2}}
+{{refbegin}}
+{{cite journal|title=On the relationship between LL(1) and LR(1) grammars|date=1982-10-01|journal=Journal of the ACM (JACM)|volume=29|issue=4|doi=10.1145/322344.322350|pages=1007–1022|issn=0004-5411|url=http://dl.acm.org/citation.cfm?id=322344.322350|accessdate=2018-04-02|author=John C. Beatty}}
+{{refend}}
+
+==参见==
+*[[编译器|编译器]]
+*[[语法分析器|语法分析器]]
+
+{{Computer Science}}
+
+[[Category:编译原理|Category:编译原理]]
+[[Category:算法|Category:算法]]

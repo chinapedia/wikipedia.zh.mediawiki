@@ -1,0 +1,180 @@
+<includeonly><!-- _ __ ___ ____ _____ ____ ___ __ _ __ ___ ____ _____ ____ ___ __ _
+  Checks to see if the image part should be shown or not.
+  Checks for:
+
+    if( marker_size > 0 ) {
+        if( defined show_image || defined showimage ) {
+            if( show_image = yes || showimage = yes ) {
+                <show the image>
+            } else {
+                <don't show the image>
+            }
+        }
+        else {
+            <nothing overrides the 'marker_size > 0', so show the image>
+        }
+    } else {
+        <'marker_size <= 0', so don't show the image>
+    }
+
+  Looking for an easier solution...
+
+  Either way, if you don't want the image part you should maybe
+  consider using another template?
+-->{{#ifexpr:
+  {{#ifexpr: {{{marker_size |{{{marker-size |7 }}} }}} > 0
+  |<!--  Maybe show the image since 'marker_size > 0'.  Check if 'show_image' or 'showimage' has a value.  -->
+    {{#if: {{{show_image |{{{showimage |{{{show-image | }}} }}} }}}
+    |<!--  Either 'show_image' or 'showimage' has a value.  Check what it is.  -->
+      {{#ifeq: {{lc: {{{show_image |{{{showimage |{{{show-image | }}} }}} }}} }} |yes
+      |  1  <!--  value is yes = show the image.  -->
+      | -1  <!--  value is anything else = don't show the image.  -->
+      }}
+    | 1  <!--  Neither 'show_image' nor 'showimage' has a value.  Show the image since 'marker_size > 0'.  -->
+    }}
+  | -1  <!--  'marker_size <= 0'.  Don't show the image  -->
+  }}
+> 0
+|<!-- _ __ ___ ____ _____ ____ ___ __ _ __ ___ ____ _____ ____ ___ __ _
+
+  Image is going to be shown, calculating position.
+
+--><div
+style="position:absolute; float:left;
+<!--  x_relative = x_marker_orig / x_orig * x_scaled - marker_size / 2 + x_adjust  -->
+left:{{#expr:
+      {{{x |{{{x_marker_orig |{{{x-marker-orig |1 }}} }}} }}}
+    / {{{x_orig |{{{width_orig |{{{x-orig |{{{width-orig |1 }}} }}} }}} }}}
+    * {{{scale |{{{width |{{{x_scaled |{{{x-scaled |250 }}} }}} }}} }}}
+  -   {{{marker_size |{{{marker-size |7 }}} }}}
+    / 2
+  +   {{{x_adjust |{{{x-adjust |0 }}} }}}
+}}px;
+<!--  y_relative = y_marker_orig / y_orig * y_scaled - marker_size / 2 + y_adjust
+        where
+      y_scaled = x_scaled / x_orig * y_orig  -->
+top:{{#expr:
+      {{{y |{{{y_marker_orig |{{{y-marker-orig |1 }}} }}} }}}
+    / {{{y_orig |{{{height_orig |{{{y-orig |{{{height-orig |1 }}} }}} }}} }}}
+    * {{{height |{{{y_scaled |{{{y-scaled |
+        {{{scale |{{{width |{{{x_scaled |{{{x-scaled |250 }}} }}} }}} }}}
+      / {{{x_orig |{{{width_orig |{{{x-orig |{{{width-orig |1 }}} }}} }}} }}}
+      * {{{y_orig |{{{height_orig |{{{y-orig |{{{height-orig |1 }}} }}} }}} }}}
+      }}} }}} }}}
+  -   {{{marker_size |{{{marker-size |7 }}} }}}
+    / 2
+  +   {{{y_adjust |{{{y-adjust |0 }}} }}}
+}}px;
+">[[Image:{{{image|Red pog.svg}}}|{{{marker_size |{{{marker-size |7 }}} }}}px]]</div>
+|<!-- _ __ ___ ____ _____ ____ ___ __ _ __ ___ ____ _____ ____ ___ __ _
+  Don't want to show an image.  Do nothing, but marker size should be set to 0.
+-->}}<!--
+  End of show image test.
+  Start of show text test.
+-->{{#if: {{{text|}}}
+|<!-- _ __ ___ ____ _____ ____ ___ __ _ __ ___ ____ _____ ____ ___ __ _
+
+  Text is going to be shown, calculating position.
+
+--><div style="position:absolute; float:left;
+<!--  x_relative = x_marker_orig / x_orig * x_scaled + marker_size / 2 + x_adjust + x_textadjust  -->
+left:{{#expr: 
+      {{{x |{{{x_marker_orig |{{{x-marker-orig |1 }}} }}} }}}
+    / {{{x_orig |{{{width_orig |{{{x-orig |{{{width-orig |1 }}} }}} }}} }}}
+    * {{{scale |{{{width |{{{x_scaled |{{{x-scaled |250 }}} }}} }}} }}}
+
+  <!--  Was the image shown or not?  Copy and paste from "code" further up. -->
+  {{#ifexpr:
+    {{#ifexpr: {{{marker_size |{{{marker-size |7 }}} }}} > 0
+    |<!--  Maybe show the image since 'marker_size > 0'.  Check if 'show_image' or 'showimage' has a value.  -->
+      {{#if: {{{show_image |{{{showimage |{{{show-image | }}} }}} }}}
+      |<!--  Either 'show_image' or 'showimage' has a value.  Check what it is.  -->
+        {{#ifeq: {{lc: {{{show_image |{{{showimage |{{{show-image | }}} }}} }}} }} |yes
+        |  1  <!--  value is yes = show the image.  -->
+        | -1  <!--  value is anything else = don't show the image.  -->
+        }}
+      | 1  <!--  Neither 'show_image' nor 'showimage' has a value.  Show the image since 'marker_size > 0'.  -->
+      }}
+    | -1  <!--  'marker_size <= 0'.  Don't show the image  -->
+    }}
+  > 0
+  | +   {{{marker_size |{{{marker-size |7 }}} }}}
+      / 2
+    +   {{{x_textadjust |{{{x-textadjust |3 }}} }}}
+  | +   0
+    +   {{{x_textadjust |{{{x-textadjust |0 }}} }}}
+  }}
+
+  +   {{{x_adjust |{{{x-adjust |0 }}} }}}
+}}px;
+<!--  y_relative = y_marker_orig / y_orig * y_scaled - marker_size / 2 + y_adjust + y_textadjust
+        where
+      y_scaled = x_scaled / x_orig * y_orig  -->
+top:{{#expr:
+      {{{y |{{{y_marker_orig |{{{y-marker-orig |1 }}} }}} }}}
+    / {{{y_orig |{{{height_orig |{{{y-orig |{{{height-orig |1 }}} }}} }}} }}}
+    * {{{height |{{{y_scaled |{{{y-scaled |
+        {{{scale |{{{width |{{{x_scaled |{{{x-scaled |250 }}} }}} }}} }}}
+      / {{{x_orig |{{{width_orig |{{{x-orig |{{{width-orig |1 }}} }}} }}} }}}
+      * {{{y_orig |{{{height_orig |{{{y-orig |{{{height-orig |1 }}} }}} }}} }}}
+      }}} }}} }}}
+
+  <!--  Was the image shown or not?  Copy and paste from "code" further up. -->
+  {{#ifexpr:
+    {{#ifexpr: {{{marker_size |{{{marker-size |7 }}} }}} > 0
+    |<!--  Maybe show the image since 'marker_size > 0'.  Check if 'show_image' or 'showimage' has a value.  -->
+      {{#if: {{{show_image |{{{showimage |{{{show-image | }}} }}} }}}
+      |<!--  Either 'show_image' or 'showimage' has a value.  Check what it is.  -->
+        {{#ifeq: {{lc: {{{show_image |{{{showimage |{{{show-image | }}} }}} }}} }} |yes
+        |  1  <!--  value is yes = show the image.  -->
+        | -1  <!--  value is anything else = don't show the image.  -->
+        }}
+      | 1  <!--  Neither 'show_image' nor 'showimage' has a value.  Show the image since 'marker_size > 0'.  -->
+      }}
+    | -1  <!--  'marker_size <= 0'.  Don't show the image  -->
+    }}
+  > 0
+  | -   {{{marker_size |{{{marker-size |7 }}} }}}
+      / 2
+  | +   0
+  }}
+
+  +   {{{y_adjust |{{{y-adjust |0 }}} }}}
+  +   {{{y_textadjust |{{{y-textadjust |0 }}} }}}
+}}px;
+<!--  The rest of the css-options.
+      Clumsy way to do it because of unwanted extra spaces and broken CSS otherwise.  -->
+  color:{{#if: {{{text_color |{{{text-color |{{{color | }}} }}} }}}
+    | {{#if: {{{text_color|}}} |{{{text_color}}}
+      |{{#if: {{{text-color|}}} |{{{text-color}}}
+        |{{#if: {{{color|}}} |{{{color}}}
+      }} }} }}
+    |black }};
+  text-align:{{#if: {{{text_align |{{{text-align | }}} }}}
+    | {{#if: {{{text_align|}}} |{{{text_align}}}
+      |{{#if: {{{text-align|}}} |{{{text-align}}}
+      }} }}
+    |left }};
+  {{#if: {{{text_width |{{{text-width | }}} }}}
+    |width:{{#if: {{{text_width|}}} |{{{text_width}}}
+      |{{#if: {{{text-width|}}} |{{{text-width}}}
+      }}
+    }}; }}
+  {{#if: {{{font_size |{{{font-size | }}} }}}
+    |font-size:{{#if: {{{font_size|}}} |{{{font_size}}}
+      |{{#if: {{{font-size|}}} |{{{font-size}}}
+      }}
+    }}; }}
+  {{#if: {{{style | }}}
+    |{{{style}}}
+    }}
+">{{{text|}}}</div>
+|<!-- _ __ ___ ____ _____ ____ ___ __ _ __ ___ ____ _____ ____ ___ __ _
+  No text entered.  Do nothing.
+-->}}</includeonly><noinclude><!--
+  _ __ ___ ____ _____ ____ ___ __ _ __ ___ ____ _____ ____ ___ __ _
+  Text to be shown when the template is viewed directly as a page.
+  _ __ ___ ____ _____ ____ ___ __ _ __ ___ ____ _____ ____ ___ __ _
+-->
+{{Documentation|Template:Image label marker/doc}}
+</noinclude>

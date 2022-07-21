@@ -1,0 +1,122 @@
+{{noteTA|G1=IT}}{{多态}}
+
+'''参数多态'''在[[程序设计语言|程序设计语言]]与[[类型论|类型论]]中是指声明与定义函数、复合类型、变量时不指定其具体的类型，而把这部分类型作为参数使用，使得该定义对各种具体类型都适用。参数化多态使得语言更具表达力，同时保持了完全的静态[[类型安全|类型安全]]。{{sfn|Pierce|2002}} 这被称为[[泛化函数|泛化函数]]、泛化数据类型、泛型变量，形成了[[泛型编程|泛型编程]]的基础。
+
+==概述==
+参数多态允许函数或数据类型被一般性的书写，从而它可以“统一”的处理值而不用依赖于它们的类型<ref name="bjpierce">Pierce, B. C. 2002 ''Types and Programming Languages.'' MIT Press.</ref>。参数多态是使语言更加有表现力而仍维持完全的静态[[类型安全|类型安全]]的一种方式。
+
+例如，可以构造连接两个列表的一个函数<code>append</code>，它不关心元素的类型：它可以附加整数的列表、实数的列表、字符串的列表等等。设定“类型变量<code>a</code>”来指定这个列表中元素的类型。接着<code>append</code>可以确定类型： 
+:<code>forall a. [a] × [a] -> [a]</code>
+这里的<code>[a]</code>指示具有类型<code>a</code>的元素的列表类型。我们称对于<code>a</code>的所有的值，<code>append</code>的类型“由<code>a</code>参数化”。结果的列表必须由相同类型的元素组成。对于应用<code>append</code>的每个位置，都要为<code>a</code>确定一个值。
+
+参数多态与[[特设多态|特设多态]]相对。特设多态是指一个多态函数有多个不同的实现，依赖于其实参而调用相应版本的函数。因此，特设多态仅支持有限数量的不同类型。
+
+== 历史 ==
+[[克里斯托弗·斯特雷奇|克里斯托弗·斯特雷奇]]于1967年8月在[[哥本哈根|哥本哈根]]的计算机程序设计暑期学校发表了著名论文《{{tsl|en|Fundamental Concepts in Programming Languages|编程语言中的基础概念}}》中首次提出了'''参数多态'''、[[特设多态|特设多态]]、[[左值|左值]]、[[右值|右值]]等概念。{{sfn|Strachey|1967}}1975年[[ML语言|ML语言]]首次实现了参数多态。<ref>Milner, R., Morris, L., Newey, M. "A Logic for Computable Functions with reflexive and polymorphic types", <em>Proc. Conference on Proving and Improving Programs</em>, Arc-et-Senans (1975)</ref> 
+
+现在，[[Standard_ML|Standard ML]], [[OCaml|OCaml]], [[F_Sharp|F#]], [[Ada语言|Ada]], [[Haskell|Haskell]], [[Mercury_(编程语言)|Mercury]], [[Visual_Prolog|Visual Prolog]], [[Scala|Scala]], [[Julia_(编程语言)|Julia]]等。[[Java|Java]], [[C_Sharp_(programming_language)|C#]], [[Visual_Basic_.NET|Visual Basic .NET]] and [[Object_Pascal|Delphi]]引入了泛型作为参数多态。
+
+[[C++|C++]]的[[泛型编程#模板特殊化|模板特殊化]]这样的类型多态（type polymorphism）表面上类似于参数多态并同时引入了特设多态。
+
+== 直谓与非直谓 ==
+
+=== 直谓多态 ===
+直谓参数多态（predicative parametric polymorphism）是指，类型<math>\tau</math>包含类型变量<math>\alpha</math>不能用在<math>\alpha</math>被实例化为一个多态类形。直谓类型理论包括[[直觉类型论|直觉类型论]]与{{tsl|en|Nuprl|NuPRL}}
+
+=== 非直谓多态 ===
+非直谓多态（Impredicative polymorphism），也称“头等多态”（first-class polymorphism）是最强有力的参数多态形式。{{sfn|Pierce|2002|p=340}}[[非直谓性|非直谓]]是指自引用（self-referential），[[类型论|类型论]]中允许实例化类型<math>\tau</math>的变量为任何类型，包括参数化类型，如<math>\tau</math>自身。一个例子是[[系统F|系统F]]在类型变量''X''下，类型<math>T = \forall X. X \to X</math>，其中''X''可以为''T''自身。
+
+[[类型论|类型论]]中，最常被研究的非直谓[[有类型λ演算|有类型λ演算]]是基于[[λ立方体|λ立方体]]，特别是[[系统F|系统F]]。{{sfn|Pierce|2002}}
+
+== 限定的参数多态 ==
+{{main|{{en-link|限定量化|Bounded quantification}}}}
+1985年{{tsl|en|Luca Cardelli|卢克·卡德利}}与{{tsl|en|Peter Wegner|彼得·瓦格纳}}提出类型参数允许限定（bounds）的益处。{{sfn|Cardelli|Wegner|1985}}限定量化（bounded quantification）也称作“限定多态”（bounded polymorphism）或“约束泛型”（constrained genericity）。许多操作要求数据类型的某些知识，但仍可以把类型参数化。例如，判断一项是否出现在列表中，需要比较项的相等。在[[Standard_ML|Standard ML]]中，类型参数''’’a''被限定有相等判断可用，因此具有如下类型的函数：''’’a'' × ''’’a'' list → bool且''’’a''可译为任何定义了任何定义了相等判断的类形。在[[Haskell|Haskell]]中，限定是通过要求类型属于某个[[类型类|类型类]]，因此同样的函数在Haskell中可写为：<math>{\scriptstyle Eq \, \alpha \, \Rightarrow \alpha \, \rightarrow \left[\alpha \right] \rightarrow Bool}</math>。大多数支持参数多态的面向对象语言可以把参数限定为给定类型的[[子类型|子类型]]。(见[[子类型多态|子类型多态]])
+
+下述Java例子中，类型参数T被限于I的子类：
+<syntaxhighlight lang="java">
+class I {
+}
+
+class A <T extends I> {
+    public T id(T x) {
+        return x;
+    }
+}
+</syntaxhighlight>
+
+== 参见 ==
+* {{le|多态递归|Polymorphic recursion}}
+* [[类型类#高种类多态|高种类多态]]
+
+== 注释 ==
+{{reflist|2}}
+
+== 参考文献 ==
+* {{citation|first=Christopher|last=Strachey|authorlink=Christopher Strachey|year=1967|title=[[Fundamental_Concepts_in_Programming_Languages|Fundamental Concepts in Programming Languages]]|type=Lecture notes|publisher=International Summer School in Computer Programming|location=Copenhagen|ref=harv}}. Republished in: {{cite journal|title=[[Higher-Order_and_Symbolic_Computation|Higher-Order and Symbolic Computation]]|volume=13|pages=11–49|year=2000|doi=10.1023/A:1010000313106}}
+* {{citation
+ | last = Hindley | first = J. Roger
+ | author-link = J. Roger Hindley
+ | year = 1969
+ | title = The principal type scheme of an object in combinatory logic
+ | journal = [[Transactions_of_the_American_Mathematical_Society|Transactions of the American Mathematical Society]]
+ | volume = 146
+ | pages = 29–60
+ | publisher = American Mathematical Society
+ | doi = 10.2307/1995158
+ | jstor = 1995158
+ | mr = 0253905
+ | ref = harv
+}}.
+* {{cite conference
+ | first = Jean-Yves | last = Girard | authorlink = Jean-Yves Girard
+ | title = Une Extension de l'Interpretation de Gödel à l'Analyse, et son Application à l'Élimination des Coupures dans l'Analyse et la Théorie des Types
+ | booktitle = Proceedings of the Second Scandinavian Logic Symposium
+ | year = 1971
+ | location = Amsterdam
+ | pages = 63–92
+ | language = fr
+ | doi = 10.1016/S0049-237X(08)70843-7
+ | ref = harv
+}}
+* {{citation
+ | last = Girard | first = Jean-Yves
+ | author-link = Jean-Yves Girard 
+ | year = 1972
+ | title = Interprétation fonctionnelle et élimination des coupures de l’arithmétique d’ordre supérieur
+ | type = Ph.D. thesis
+ | publisher = Université Paris 7
+ | language = fr
+ | ref = harv
+}}.
+* {{citation
+ | last = Reynolds | first = John C.
+ | authorlink = John C. Reynolds
+ | year = 1974
+ | title = Towards a Theory of Type Structure
+ | journal = Colloque sur la programmation
+ | location = Paris
+ | series = [[Lecture_Notes_in_Computer_Science|Lecture Notes in Computer Science]]
+ | volume = 19
+ | pages = 408–425
+ | doi = 10.1007/3-540-06859-7_148
+ | ref = harv
+}}.
+* {{cite journal
+ | last = Milner | first = Robin
+ | author-link = Robin Milner
+ | year = 1978
+ | title = A Theory of Type Polymorphism in Programming
+ | journal = [[Journal_of_Computer_and_System_Sciences|Journal of Computer and System Sciences]]
+ | volume = 17
+ | issue = 3
+ | pages = 348—375
+ | doi = 10.1016/0022-0000(78)90014-4
+ | ref = harv
+}}
+* {{cite journal|last1 = Cardelli|first1 = Luca|authorlink1 = Luca Cardelli|last2 = Wegner|first2 = Peter|authorlink2 = Peter Wegner|title = On Understanding Types, Data Abstraction, and Polymorphism|url = http://lucacardelli.name/Papers/OnUnderstanding.A4.pdf|journal = [[ACM_Computing_Surveys|ACM Computing Surveys]]|date = December 1985|volume = 17|issue = 4|issn = 0360-0300|pages = 471–523|doi = 10.1145/6041.6042|publisher = [[Association_for_Computing_Machinery|ACM]]|location = New York, NY, USA|ref = harv|access-date = 2015-06-13|archive-date = 2019-10-14|archive-url = https://web.archive.org/web/20191014052030/http://lucacardelli.name/Papers/OnUnderstanding.A4.pdf|dead-url = yes}}
+* {{cite book|first=Benjamin C.|last=Pierce|authorlink=Benjamin C. Pierce|year=2002|title=Types and Programming Languages|publisher=MIT Press|isbn=978-0-262-16209-8 | ref = harv}}
+ 
+{{数据类型}}
+[[Category:泛型程序设计|Category:泛型程序设计]]
+[[Category:多态|Category:多态]]
+[[Category:类型论|Category:类型论]]

@@ -1,0 +1,79 @@
+local rv = {}
+
+function rv.main(frame)
+    local args = frame:getParent().args
+    local ids = {}
+    local page = args["page"] or args["article"]
+    page = page:gsub('^:', '')
+    local set = args["set"]
+    local reason = args["reason"]
+    local status = args["status"]
+    local statustext = args["statustext"]
+    local review = args["review"]
+
+    local i = 1
+    while true do --frame的args不是完全table实现，无法用#args查表长，只能死循环试探结束。
+        t_id = args['id' .. i]
+        if (t_id ~= nil) then
+            if t_id ~= '' then
+                table.insert(ids, t_id)
+            end
+            i = i + 1
+        else
+            break
+        end
+    end
+    local code = "\n"
+
+    if (page == nil) then
+        page = "頁面名"
+    end
+
+    local is_log = false
+    if mw.ustring.match(page, "^Special:") then
+        is_log = true
+    end
+    
+    code = code .. "* [[:"_.._page_.._"|:" .. page .. "]]"
+    if not is_log then
+        code = code .. "（[" .. tostring(mw.uri.fullUrl(page, "action=edit")) .. " 編輯]"
+            .. " · [["_.._tostring(mw.title.makeTitle("",_page).talkPageTitle)_.._"|討論]]"
+            .. " · [" .. tostring(mw.uri.fullUrl("Special:Whatlinkshere/" .. page)) .. " 鏈入]"
+            .. " · [" .. tostring(mw.uri.fullUrl(page, "action=history&hilight=" .. table.concat(ids, ","))) .. " 歷史]"
+            .. " · [" .. tostring(mw.uri.fullUrl(page, "action=watch")) .. " 監視]"
+            .. " · [" .. tostring(mw.uri.fullUrl("Special:Log", "page=" .. mw.uri.encode(page, "PATH"))) .. " 日志]）"
+    end
+    code = code .. "\n"
+
+    code = code .. "** " .. frame:expandTemplate{title = "status", args = {frame:callParserFunction{name = "#if", args = {status, status, "处理中"}}, statustext}} .. "\n"
+
+    local ids_t = {}
+    for i = 1, #ids do
+        ids_t["ids[" .. ids[i] .. "]"] = 1
+    end
+
+    if is_log then
+        code = code .. "** 请求删除日誌（[//zh.wikipedia.org/w/index.php?action=revisiondelete&type=logging&" .. mw.uri.buildQueryString(ids_t) .. " 全部删除]）" 
+        for i = 1, #ids do
+            code = code .. frame:expandTemplate{title = "ar-rev/log", args = {page, ids[i]}}
+        end
+    else
+        code = code .. "** 请求删除版本（[" .. tostring(mw.uri.fullUrl(page, "action=revisiondelete&type=revision&" .. mw.uri.buildQueryString(ids_t))) .. " 全部删除]）"
+        for i = 1, #ids do
+            code = code .. frame:expandTemplate{title = "ar-rev", args = {page, ids[i]}}
+        end
+    end
+
+    code = code .. "\n"
+
+    code = code .. "** 刪除內容：" .. ((set ~= nil and set) or frame:expandTemplate{title = "red", args = {"'''请提供所要刪除的內容（編輯內容/編輯者/編輯摘要，可選多於一個）'''"}}) .. "\n"
+        .. "** 理由：" .. ((reason ~= nil and frame:expandTemplate{title = "revdel/core", args = {reason}}) or frame:expandTemplate{title = "red", args = {"'''请提供理由'''"}}) .. "\n"
+    code = mw.text.tag('div',{
+    	["class"] = "plainlinks",
+    	["id"] = page
+    }, code) .. "\n"
+
+    return code
+end
+
+return rv

@@ -1,0 +1,28 @@
+local getArgs = require('Module:Arguments').getArgs
+local p = {}
+ 
+function p.main(frame)
+	local args = getArgs(frame)
+	local text = ''
+	
+	if args.image then
+		text = '[[File:'_.._args.image_.._'|' .. (args.size or '24px') .. ']]'
+	end
+	if args.text  then
+		local temptext = args.text
+		if args.fontsize then
+			temptext = tostring( mw.html.create( 'span' ):css( 'font-size', args.fontsize ):wikitext( args.text ) )
+		end
+		text = text .. temptext
+	end
+	
+	text = tostring( mw.html.create( 'div' ):attr{title=args.title, class=args.class}:wikitext( text ) )
+	
+	return text  == '' and '' or frame:extensionTag{
+		name = 'indicator',
+		content = text,
+		args = { name = string.format( '%x', require( 'Module:Crc32lua' ).crc32( text ) ) },
+	}
+end
+
+return p

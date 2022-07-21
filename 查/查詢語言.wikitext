@@ -1,0 +1,98 @@
+{{noteTA|G1=IT}}
+'''查询语言'''或'''数据查询语言'''（Data Query Language, DQL）是用于从[[数据库|数据库]]或[[信息系统|信息系统]]中查询[[数据|数据]]的[[计算机语言|计算机语言]]。例如[[SQL|SQL]]语言是查询语言里比较知名的一种。
+
+==查詢語言範例==
+{{div col|colwidth=20em}}
+*{{en-link|Contextual Query Language}}
+*DMX（{{en-link|Data Mining Extensions}}），在{{en-link|Microsoft Analysis Services}}用於[[数据挖掘|数据挖掘]]
+*[[轻型目录访问协议|LDAP]]
+*[[LINQ|LINQ]]
+*[[分子查询语言|MQL]]
+*OQL（{{en-link|Object Query Language}}）
+*[[SPARQL|SPARQL]]
+*[[SMARTS|SMARTS]]
+*[[SQL|SQL]]
+**DDL（[[資料定義語言|資料定義語言]]）
+**DML（[[資料操縱語言|資料操作语言]]）
+**DCL（[[資料控制語言|資料控制语言]]）
+*[[XPath|XPath]]為[[XML|XML]]路徑語言
+*[[雅虎查詢語言|YQL]]
+{{div col end}}
+
+==数据查询语言==
+'''數據查詢語言'''泛指向[[資料庫|資料庫]]或[[信息系统|信息系统]]查詢的各種[[编程语言|编程语言]]。数据查询语言必须要能表达所有[[关系代数_(数据库)|关系代数]]所能表达的查询，这样才被称为'''关系完整的'''（{{lang-en|Relational complete}}）。<ref>{{cite book|author=Carlo Zaniolo|title=Advanced Database Systems|url=https://archive.org/details/advanceddatabase00zani|year=1997|publisher=Morgan Kaufmann Publishers|isbn=1-55860-443-X|pages=[https://archive.org/details/advanceddatabase00zani/page/n193 183]}}</ref>
+
+DQL的主要功能是查询数据，本身核心指令为SELECT，为了进行精细的查询，加入了各类辅助指令。<code>SELECT</code>是查询的指令，例如：
+
+<syntaxhighlight lang="sql">
+SELECT p.Name, sod.SalesOrderID
+FROM Production.Product p
+INNER JOIN Sales.SalesOrderDetail sod ON p.ProductID = sod.ProductID
+ORDER BY p.Name 
+</syntaxhighlight>
+
+==扁平化数据分析查询语言==
+'''[https://github.com/Agile-Data/flat-ql Flat-QL]'''是一种类SQL 查询语言，但其对使用者屏蔽了[[关系代数_(数据库)|关系代数]]，以及复杂的结构，使得数据分析更容易与各种编程语言进行结合，虽然它不能称为'''关系完整的'''的数据查询语言，但它适用于绝大多数数据分析场景，能够有效提高编程效率。
+
+<syntaxhighlight lang="sql">
+-- 扁平化查询语言示例
+SELECT Store.city                   AS "City",
+       COUNT(Product.name)          AS "Count Of Product",
+       SUM(Sales.sales)             AS "Total Sales",
+       AVG(Sales.quantityPurchased) AS "Average Of Quantity Purchased"
+FROM sales
+WHERE Store.city IN ('New York', 'Chicago')
+ORDER BY "City" LIMIT 10 OFFSET 1
+</syntaxhighlight>
+
+<syntaxhighlight lang="sql">
+-- 编译后的SQL
+SELECT "qu_0"."co_1" AS "City",
+       "qu_0"."co_3" AS "Count Of Product",
+       "qu_1"."co_7" AS "Total Sales",
+       "qu_1"."co_8" AS "Average Of Quantity Purchased"
+FROM (SELECT "qu_2"."co_1" AS "co_1", SUM("qu_3"."co_2") AS "co_3"
+      FROM (SELECT "ta_0"."id" AS "co_0", "ta_1"."city" AS "co_1"
+            FROM "db"."sales" AS "ta_2"
+                     INNER JOIN "db"."products" AS "ta_0" ON "ta_0"."id" = "ta_2"."productId"
+                     INNER JOIN "db"."stores" AS "ta_1" ON "ta_1"."id" = "ta_2"."storeId"
+            WHERE "ta_1"."city" IN ('New York', 'Chicago')
+            GROUP BY "co_0", "co_1") AS "qu_2"
+               LEFT JOIN (SELECT "ta_0"."id" AS "co_0", COUNT("ta_0"."name") AS "co_2"
+                          FROM "db"."products" AS "ta_0"
+                          GROUP BY "co_0") AS "qu_3" ON "qu_2"."co_0" = "qu_3"."co_0"
+      GROUP BY "co_1") AS "qu_0"
+         INNER JOIN (SELECT "qu_4"."co_1" AS "co_1", SUM("qu_5"."co_5") AS "co_7", AVG("qu_5"."co_6") AS "co_8"
+                     FROM (SELECT "ta_2"."id" AS "co_4", "ta_1"."city" AS "co_1"
+                           FROM "db"."sales" AS "ta_2"
+                                    INNER JOIN "db"."stores" AS "ta_1" ON "ta_1"."id" = "ta_2"."storeId"
+                           WHERE "ta_1"."city" IN ('New York', 'Chicago')
+                           GROUP BY "co_4", "co_1") AS "qu_4"
+                              LEFT JOIN (SELECT "ta_2"."id"                     AS "co_4",
+                                                SUM("ta_2"."sales")             AS "co_5",
+                                                AVG("ta_2"."quantityPurchased") AS "co_6"
+                                         FROM "db"."sales" AS "ta_2"
+                                         GROUP BY "co_4") AS "qu_5" ON "qu_4"."co_4" = "qu_5"."co_4"
+                     GROUP BY "co_1") AS "qu_1" ON "qu_0"."co_1" = "qu_1"."co_1"
+ORDER BY "City" ASC LIMIT 10 OFFSET 1
+</syntaxhighlight>
+
+==引用==
+{{reflist}}
+
+==參考資料==
+# [https://github.com/Agile-Data/flat-ql Flat-QL 项目网站]
+# [https://web.archive.org/web/20100304063252/http://structedtext.appspot.com/db/sql.html 完整的SQL中文參考網站]
+# [http://dev.mysql.com/doc/refman/6.0/en/sql-syntax.html MySQL SQL Syntax] {{Wayback|url=http://dev.mysql.com/doc/refman/6.0/en/sql-syntax.html |date=20090615193105 }}
+# [http://68.142.116.68/docs/cd/B28359_01/server.111/b28286/toc.htm Oracle® Database SQL Language Reference]{{dead link|date=2017年12月 |bot=InternetArchiveBot |fix-attempted=yes }}
+# [http://msdn.microsoft.com/zh-tw/library/ms189826(sql.90).aspx Transact-SQL Reference] {{Wayback|url=http://msdn.microsoft.com/zh-tw/library/ms189826(sql.90).aspx |date=20160527002414 }}
+# [http://www.postgresql.org/docs/8.3/interactive/index.html PostgreSQL SQL Commands] {{Wayback|url=http://www.postgresql.org/docs/8.3/interactive/index.html |date=20100113003849 }}
+# [https://web.archive.org/web/20131102155241/http://otto.cs.uni-magdeburg.de/otto/index.html 一种新的查询语言：OttoQL Reference]
+
+{{查询语言}}
+{{database}}
+{{计算机语言}}
+
+[[category:資料庫|category:資料庫]]
+[[category:SQL|category:SQL]]
+[[Category:计算机语言|Category:计算机语言]]

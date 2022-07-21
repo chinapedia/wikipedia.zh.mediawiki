@@ -1,0 +1,132 @@
+{{multiple issues|
+{{no footnotes|time=2014-06-27T06:45:30+00:00}}
+{{copyedit|time=2014-06-27T06:38:17+00:00}}
+}}
+'''格倫布編碼'''是一種無失真資料壓縮方法，由數學家[[所羅門·格倫布|所羅門·格倫布]]在1960年代提出。其優點為易於編碼與解碼，另外對於擁有機率分布為[[幾何分佈|幾何分佈]]<math>G(p),p=0.5,</math>的資料，格倫布編碼是最佳的[[前缀码|前綴碼]]，且能無限逼近該資料的[[熵_(信息论)|熵]]，目前廣泛用於[[无损数据压缩|無損影像壓縮]]。
+
+==編碼的建立==
+
+[[Image:golomb_rice_code.svg|Image:golomb rice code.svg]]
+
+令輸入值 為正整數<math>n</math>，參數值為正整數 <math>M</math>，輸出之格倫布碼為 <math>c</math>，其中<math>c</math>由兩種編碼組合而成，
+
+<math>c=(u,b)</math>，<math>u</math>：[[一进制|一进制]]編碼，<math>b</math>：[[截斷二進制編碼|截斷二進制編碼]]。
+
+計算 <math>u</math> 與 <math>b</math>。
+
+<math>q=\lfloor \frac nm   \rfloor ,</math> <math>   r=n-q</math>。
+
+將 <math>q</math> 做[[一进制|一进制]]編碼，<math>r</math> 做[[截斷二進制編碼|截斷二進制編碼]]即可得到<math>(u,b)</math>。
+
+哥倫布-萊斯編碼中的商數<math>q</math>指示了所在區塊，而<math>   r</math>指示所在區塊內部的位置。如上圖，對整數 <math>   N</math>做哥倫布-萊斯編碼，''<math>q</math>''代表區塊、''<math>   r</math>''表示區塊內部位置、<math>M</math>為參數，每個區塊的大小皆相等且長度為<math>M</math>，特別注意當編碼方式為哥倫布-萊斯編碼時，即<math>M</math>為<math>   2</math>的整數次方，所有''<math>   r</math>的''編碼長度相等。
+
+參數<math>   M</math>是[[伯努利过程|伯努利過程]]的函數，其中[[伯努利过程|伯努利過程]]的參數<math>   p</math>定義為<math>p=P(X=0)</math>，則<math>   M</math>的所在區間為此[[伯努利过程|伯努利過程]]的[[中位數|中位數]]-1到中位數+1之間。如下式：
+
+<math>(1-p)^M + (1-p)^{M+1} \leq 1 < (1-p)^{M-1} + (1-p)^M.</math>
+
+當<math>   M</math>足夠大時，我們可以將其表示成，<math>M = \left\lfloor \frac{-1}{\log_2(1-p)}\right\rfloor</math>。
+
+=== 使用[[有符號數處理|符號整數]] ===
+哥倫布編碼主要是針對非負整數進行編碼，但也可以使用重疊(Overlap)與交錯(Interleave)擴展至對所有整數進行編碼。令一串用於編號的數列，(0,1,2,...)，給予非負整數偶數編號，給予負整數奇數編號，使得排列方式如下，(0,-1,1,-2,2,...)，即非負整數<math>x</math> [[映射|映射]]至 <math>\{x^\prime|x^\prime=2|x|, x\ge0\}</math>，負整數 <math>y</math> [[映射|映射]]至 <math>\{y^\prime |y^\prime=2|y|-1, y<0\}</math>。
+
+==萊斯編碼== 
+
+萊斯編碼(Rice coding，由Robert F. Rice所提出)，為一種[[前缀码|前綴碼]]，歸屬於哥倫布編碼的子集合，參數<math>M</math>為<math>2</math>的整數次方，即<math>M=2^R,R\in N</math>。此種特例未必是所有格倫布編碼中的最佳編碼方式，但由於目前電腦為二進位運算，萊斯編碼能快速且有效地以二進位運算實現。
+
+==性質==
+===[[范氏霍夫曼編碼|范氏霍夫曼編碼]]===
+
+格倫布編碼為一種[[范氏霍夫曼編碼|范氏霍夫曼編碼]]。
+
+== 演算法 ==
+1.選擇參數<math>M</math>
+
+2.待編碼數值為<math>n</math>，計算：
+
+# 商數: <math>q=\lfloor \frac nm   \rfloor ,</math>
+# 餘數: <math>   r=n-q</math>。
+
+3.編碼
+
+# 商數編碼，對<math>q</math>進行一进制編碼，得到<math>u</math>。
+# 餘數編碼，對 <math>r</math>進行[[截斷二進制編碼|截斷二進制編碼]]，得到<math>b</math>。
+# 合併，<math>c=(u,b)</math>。
+
+4.輸出<math>c=(u,b)</math>
+
+== 範例 ==
+
+設''M'' = 10.  則 <math>b = \lceil\log_2(10)\rceil = 4</math>. <math>2^b-M = 16-10 = 6</math>
+
+{|border="0" cellspacing="8" cellpadding="0"
+|-valign="top"
+|
+{|border="1" class="wikitable"
+|-
+!colspan="2"|商數編碼
+|-
+!''q''||輸出位元
+|-
+|0||0
+|-
+|1||10
+|-
+|2||110
+|-
+|3||1110
+|-
+|4||11110
+|-
+|5||111110
+|-
+|6||1111110
+|-
+|<math>\vdots</math>||<math>\vdots</math>
+|-
+|N||<math>\underbrace{111\cdots111}_N 0</math>
+|}
+|
+{|border="1" class="wikitable"
+|-
+!colspan="4"|餘數編碼
+|-
+!''r''||偏移||二進位||輸出位元
+|-
+|0||0||0000||000
+|-
+|1||1||0001||001
+|-
+|2||2||0010||010
+|-
+|3||3||0011||011
+|-
+|4||4||0100||100
+|-
+|5||5||0101||101
+|-
+|6||12||1100||1100
+|-
+|7||13||1101||1101
+|-
+|8||14||1110||1110
+|-
+|9||15||1111||1111
+|}
+|}
+
+選擇42作為編碼時，42會被拆成<math>q=4</math>及<math>r=2</math>，編碼為11110010，而商數編碼尾數必為0，能標示商數編碼位元的結束。
+
+==參考來源==
+
+* Golomb, S.W. (1966). [http://urchin.earth.li/~twic/Golombs_Original_Paper/ , Run-length encodings. IEEE Transactions on Information Theory, IT--12(3):399--401 ] {{Wayback|url=http://urchin.earth.li/~twic/Golombs_Original_Paper/ |date=20200220023658 }}
+* R. F. Rice (1971) and R. Plaunt, [http://dx.doi.org/10.1109/TCOM.1971.1090789 , "Adaptive Variable-Length Coding for Efficient Compression of Spacecraft Television Data, " IEEE Transactions on Communications, vol. 16(9), pp. 889–897, Dec. 1971.] {{Wayback|url=http://dx.doi.org/10.1109/TCOM.1971.1090789 |date=20200610204902 }}
+* R. F. Rice (1979), "Some Practical Universal Noiseless Coding Techniques, " Jet Propulsion Laboratory, Pasadena, California, JPL Publication 79—22, Mar. 1979.
+* Witten, Ian  Moffat, Alistair  Bell, Timothy.  "Managing Gigabytes: Compressing and Indexing Documents and Images."  Second Edition.  Morgan Kaufmann Publishers, San Francisco CA.  1999  ISBN 1-55860-570-3
+* David Salomon. "Data Compression",ISBN 0-387-95045-1.
+* S. Büttcher, C. L. A. Clarke, and G. V. Cormack. [http://www.ir.uwaterloo.ca/book/ Information Retrieval: Implementing and Evaluating Search Engines] {{Wayback|url=http://www.ir.uwaterloo.ca/book/ |date=20201005195805 }}. MIT Press, Cambridge MA, 2010.
+* https://en.wikipedia.org/wiki/Golomb_coding {{Wayback|url=https://en.wikipedia.org/wiki/Golomb_coding |date=20210211172735 }}
+
+<br>
+{{压缩方法}}
+
+[[Category:无损压缩算法|Category:无损压缩算法]]

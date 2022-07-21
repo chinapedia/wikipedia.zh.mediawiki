@@ -1,0 +1,222 @@
+{{noteTA
+|G1=IT
+|G2=FL
+}}
+{{Confused|zram}}
+{{Lowercase title}}
+{{Infobox software
+| name                   = zswap
+| title                  = zswap
+| logo                   = <!-- Image name is enough -->
+| logo caption           =
+| logo_size              =
+| logo_alt               =
+| screenshot             = <!-- Image name is enough -->
+| caption                =
+| screenshot_size        =
+| screenshot_alt         =
+| collapsible            =
+| author                 =
+| developer              = 塞思·詹宁斯（Seth Jennings）及其他
+| released               = <!-- {{Start date and age|YYYY|MM|DD|df=yes/no}} -->
+| discontinued           =
+| latest release version =
+| latest release date    = <!-- {{Start date and age|YYYY|MM|DD|df=yes/no}} -->
+| latest preview version =
+| latest preview date    = <!-- {{Start date and age|YYYY|MM|DD|df=yes/no}} -->
+| status                 =
+| programming language   = [[C语言|C]]
+| operating system       = [[Linux|Linux]]
+| platform               =
+| size                   =
+| language               =
+| language count         = <!-- DO NOT include this parameter unless you know what it does -->
+| language footnote      =
+| genre                  = [[:Category:Linux内核功能|Linux内核功能]]
+| license                = [[GNU通用公共许可证|GNU通用公共许可证]]
+| website                = {{URL|https://kernel.org/}}
+}}
+
+'''zswap'''是一项[[Linux内核|Linux内核]]的[[虚拟内存压缩|虚拟内存压缩]]功能，可为将要[[分頁|交换]]的页面提供压缩[[回写|回写]][[缓存|缓存]]。当[[内存页|内存页]]将要交换出去时，zswap不将其移动到交换设备，而是对其执行[[数据压缩|压缩]]，然后存储到系统[[随机存取存储器|RAM]]内动态分配的[[記憶池|内存池]]中。回写到实际交换设备的动作则会延迟，甚至能完全避免，从而显著减少Linux系统用于交换的[[I/O|I/O]]；副作用则是压缩所需的额外[[CPU|CPU]]周期。<ref name="lwn-537422">{{Cite web
+ | url = https://lwn.net/Articles/537422/
+ | title = The zswap compressed swap cache
+ | date = {{date|2013-02-12|mdy}}
+ | accessdate = {{date|2014-01-22|mdy}}
+ | author = Seth Jennings
+ | publisher = [[LWN.net|LWN.net]]
+ | archive-date = 2021-11-28
+ | archive-url = https://web.archive.org/web/20211128115231/https://lwn.net/Articles/537422/
+ | dead-url = no
+ }}</ref><ref name="ibm-44a4f27eba32">{{Cite web
+ | url = https://www.ibm.com/developerworks/community/blogs/fe313521-2e95-46f2-817d-44a4f27eba32/entry/new_linux_zswap_compression_functionality7?lang=en
+ | title = New Linux zswap compression functionality
+ | date = {{date|2012-12-11|mdy}}
+ | accessdate = {{date|2014-01-31|mdy}}
+ | author = Jenifer Hopper
+ | publisher = [[IBM|IBM]]
+ | archive-date = 2014-10-14
+ | archive-url = https://web.archive.org/web/20141014143549/https://www.ibm.com/developerworks/community/blogs/fe313521-2e95-46f2-817d-44a4f27eba32/entry/new_linux_zswap_compression_functionality7?lang=en
+ | dead-url = no
+ }}</ref><ref name="phoronix-MTQwODI">{{Cite web
+ | url = http://www.phoronix.com/scan.php?page=news_item&px=MTQwODI
+ | title = Zswap Merged Into The Linux 3.11 Kernel
+ | date = {{date|2013-07-11|mdy}}
+ | accessdate = {{date|2014-02-05|mdy}}
+ | author = Michael Larabel
+ | publisher = [[Phoronix|Phoronix]]
+ | archive-date = 2021-05-09
+ | archive-url = https://web.archive.org/web/20210509050028/https://www.phoronix.com/scan.php?page=news_item&px=MTQwODI
+ | dead-url = no
+ }}</ref>
+
+zswap能减少I/O，因而有利于使用[[固态存储|固态存储]]的设备，包括[[嵌入式设备|嵌入式设备]]、[[上网本|上网本]]及其它相似的低端硬件设备，也包括其它使用[[固态硬盘|SSD]]存储的设备。由于其[[写入放大|固有性质]]，[[闪存|闪存]]的寿命有限，因而避免以其提供[[Linux_swap|交换空间]]可防止其迅速磨损。<ref name="kernel-docs">{{Cite web
+ | url = https://www.kernel.org/doc/Documentation/vm/zswap.txt
+ | title = Linux kernel documentation: Documentation/vm/zswap.txt
+ | date = {{date|2013-11-22|mdy}}
+ | accessdate = {{date|2014-01-22|mdy}}
+ | publisher = [[kernel.org|kernel.org]]
+ | archive-date = 2022-01-07
+ | archive-url = https://web.archive.org/web/20220107182041/https://www.kernel.org/doc/Documentation/vm/zswap.txt
+ | dead-url = no
+ }}</ref>
+
+== {{Anchor|FRONTSWAP|ZBUD}}内部机制 ==
+zswap通过使用由''frontswap''提供的[[API|API]]集成入Linux内核[[虚拟内存|虚拟内存]]子系统的剩余部分中，该接口是Linux内核中的一种机制，能对各类可用作交换空间的存储进行抽象<ref>{{Cite web
+ | url = http://article.gmane.org/gmane.linux.kernel.mm/47394
+ | title = Frontswap [PATCH 0/4] (was Transcendent Memory): Overview
+ | date = {{date|2010-04-22|mdy}}
+ | accessdate = {{date|2014-12-23|mdy}}
+ | author = Dan Magenheimer
+ | website = gmane.org
+ | archive-url = https://web.archive.org/web/20170426031356/http://article.gmane.org/gmane.linux.kernel.mm/47394
+ | archive-date = 2017-04-26
+ | dead-url = yes
+ }}</ref>。因此，zswap可通过提供内部可见的伪-RAM设备，以frontswap后端驱动的身份运作。换句话说，frontswap API使得zswap可在[[内存页|内存页]]交换出的时候拦截它，及已交换页面的[[页缺失|页缺失]]；在获取这两个通路后，zswap便可充当交换页面的压缩回写缓存<ref name="lwn-537422" /><ref>{{Cite web
+ | url = https://lwn.net/Articles/386090/
+ | title = Cleancache and Frontswap
+ | date = {{date|2010-05-04|mdy}}
+ | accessdate = {{date|2014-03-26|mdy}}
+ | author = Jonathan Corbet
+ | publisher = [[LWN.net|LWN.net]]
+ | archive-date = 2021-11-08
+ | archive-url = https://web.archive.org/web/20211108085406/https://lwn.net/Articles/386090/
+ | dead-url = no
+ }}</ref>。
+
+在内部，zswap使用由内核[[加密API_(Linux)|加密API]]提供的压缩[[可載入核心模組|模块]]，从而使其有可能（比如说）使用受内核支持的硬件压缩[[硬件加速|加速器]]，将压缩任务搬离主CPU。使用[[Linux内核引导参数|内核引导参数]]{{Mono|zswap.compressor}}，开机时可以动态地选择要使用的压缩模块；缺省值为{{Mono|deflate}}，表示使用[[LZO|Lempel-Ziv-Oberhumer]]（LZO）压缩。此外，截止Linux 3.13，zswap需要通过显式指定内核引导参数{{Mono|zswap.enabled}}为{{Mono|1}}以启用。<ref name="lwn-537422" /><ref name="ibm-44a4f27eba32" /><ref name="kernel-docs" />
+
+zswap可使用的内存池最大大小可由{{Mono|[[sysfs|sysfs]]}}参数{{Mono|max_pool_percent}}配置，它指定池可占用的总系统RAM的最大百分比。内存池并非预先分配到所配置的最大尺寸；相反，它会根据要求增加和缩小。当在交换的过程中达到了配置的最大池大小，或者由于[[内存不足|内存不足]]无法分配更多的池时，将会根据[[最近最少使用|最近最少使用]]（LFU）原则，从内存池[[缓存逐出|逐出]]交换页面到交换设备上。这种方式使zswap成为真正的交换缓存，因为一旦缓存已满，最旧的缓存页面将会被逐出到交换设备中去，因而较新的交换页面就能有空间压缩并缓存。<ref name="lwn-537422" /><ref name="kernel-docs" /><ref>{{Cite web
+ | url = http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=2b2811178e85553405b86e3fe78357b9b95889ce
+ | title = kernel/git/torvalds/linux.git: zswap: add to mm/
+ | work = Linux kernel source tree
+ | date = {{date|2013-07-11|mdy}} | accessdate = {{date|2014-02-05|mdy}}
+ | publisher = [[kernel.org|kernel.org]]
+}}</ref>
+
+'''zbud'''是由zswap内部使用的专用[[記憶體管理|内存分配器]]，用于存储压缩页面；它是[[甲骨文公司|Oracle]] zcache内部使用的zbud分配器的重写。zbud的工作原理是，在每张物理内存页中存储至多两张压缩页面（“buddies”，分配器因而得名），这既有优势（简单的空间收集及空闲空间复用）也有劣势（潜在的低内存利用率）。然而，由于它的设计，zbud分配的内存空间不会比最初未压缩页面所使用的还多。<ref name="phoronix-MTQwODI" /><ref>{{Cite web
+ | url = http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=4e2e2770b1529edc5849c86b29a6febe27e2f083
+ | title = kernel/git/torvalds/linux.git: zbud: add to mm/
+ | work = Linux kernel source tree
+ | date = {{date|2013-07-11|mdy}} | accessdate = {{date|2014-02-05|mdy}}
+ | publisher = [[kernel.org|kernel.org]]
+}}</ref>
+
+== 历史 ==
+
+===Recent developments===
+* In early 2008, a [[Linux|Linux]] project named [[zram|zram]] (originally called compcache) was released; in a 2013 update, it was incorporated into [[Chrome OS|Chrome OS]]<ref name="zram-google-page" /> and [[Android|Android]] 4.4
+* In 2010, IBM released Active Memory Expansion (AME) for [[AIX|AIX]] 6.1 which implements virtual memory compression.<ref name="IBM-AIX-AME" />
+* In 2012, some versions of the [[POWER7|POWER7]]+ chip included the AME hardware accelerator for data compression support, used on AIX, for virtual memory compression.<ref name="IBM-POWER7+" />
+* In December 2012, the zswap project was announced; it was merged into the [[Linux_kernel_mainline|Linux kernel mainline]] in September 2013.
+* In June 2013, Apple announced that it will include virtual memory compression in [[OS X_Mavericks|OS X Mavericks]], using the WKdm algorithm.<ref>{{Cite web |url=http://arstechnica.com/apple/2013/10/os-x-10-9/17/#compressed-memory |title=存档副本 |access-date=2015-08-24 |archive-date=2017-01-17 |archive-url=https://web.archive.org/web/20170117071832/http://arstechnica.com/apple/2013/10/os-x-10-9/17/#compressed-memory |dead-url=no }}</ref><ref>{{Cite web |url=https://www.usenix.org/legacy/publications/library/proceedings/usenix01/cfp/wilson/wilson_html/node23.html |title=存档副本 |accessdate=2015-08-24 |archive-date=2016-03-05 |archive-url=https://web.archive.org/web/20160305072601/https://www.usenix.org/legacy/publications/library/proceedings/usenix01/cfp/wilson/wilson_html/node23.html |dead-url=no }}</ref>
+* An August 10, 2015 "[[Windows_Insider|Windows Insider]] Preview" update for [[Windows 10|Windows 10]] added support for RAM compression.<ref>{{cite web |last=Aul |first=Gabe |url=http://blogs.windows.com/bloggingwindows/2015/08/18/announcing-windows-10-insider-preview-build-10525/ |title=Announcing Windows 10 Insider Preview Build 10525 |work=Blogging Windows |publisher=Microsoft |date=August 18, 2015 |accessdate=August 19, 2015 |archive-date=2015-08-19 |archive-url=https://web.archive.org/web/20150819025226/http://blogs.windows.com/bloggingwindows/2015/08/18/announcing-windows-10-insider-preview-build-10525/ |dead-url=no }}</ref>
+zswap和zbud都由塞思·詹宁斯开发。2012年，此时代码库已经成熟，但仍标记为实验性内核功能。<ref>{{Cite web
+ | url = http://article.gmane.org/gmane.linux.kernel/1408711
+ | title = [PATCH 0/8] zswap: compressed swap caching
+ | date = {{date|2012-12-11|mdy}}
+ | accessdate = {{date|2014-01-05|mdy}}
+ | website = gmane.org
+ | archive-url = https://web.archive.org/web/20160309052948/http://article.gmane.org/gmane.linux.kernel/1408711
+ | archive-date = 2016-03-09
+ | dead-url = yes
+ }}</ref><ref>{{Cite web
+ | url = http://article.gmane.org/gmane.linux.kernel/1487788
+ | title = [PATCHv10 0/4] zswap: compressed swap caching
+ | date = {{date|2013-05-08|mdy}}
+ | accessdate = {{date|2014-01-05|mdy}}
+ | website = gmane.org
+ | archive-url = https://web.archive.org/web/20170426011225/http://article.gmane.org/gmane.linux.kernel/1487788
+ | archive-date = 2017-04-26
+ | dead-url = yes
+ }}</ref>
+
+zswap（连同zbud）于Linux 3.11（发布于2013年9月2日）合并入[[Linux内核主线|Linux内核主线]]。<ref name="kernel-docs" /><ref>{{cite web
+ | url = http://kernelnewbies.org/Linux_3.11#head-e34ed8623c5b96a292064848451d3a7f85faa449
+ | title = Linux kernel 3.11, Section 9. Zswap: A compressed swap cache
+ | date = {{date|2013-09-02|mdy}}
+ | accessdate = {{date|2014-01-22|mdy}}
+ | website = kernelnewbies.org
+ | archive-date = 2021-11-14
+ | archive-url = https://web.archive.org/web/20211114204425/https://kernelnewbies.org/Linux_3.11#head-e34ed8623c5b96a292064848451d3a7f85faa449
+ | dead-url = no
+ }}</ref>
+
+自Linux 3.15（发布于2014年6月8日）起，zswap支持多种交换设备。<ref>{{cite web
+ | url = http://kernelnewbies.org/Linux_3.15#head-73741bc00ce13369767b5a47dfbcfe07ad68f507
+ | title = Linux kernel 3.15, Section 4. Memory management
+ | date = {{date|2014-06-08|mdy}}
+ | accessdate = {{date|2014-06-15|mdy}}
+ | website = kernelnewbies.org
+ | archive-date = 2018-06-11
+ | archive-url = https://web.archive.org/web/20180611135106/https://kernelnewbies.org/Linux_3.15#head-73741bc00ce13369767b5a47dfbcfe07ad68f507
+ | dead-url = no
+ }}</ref><ref>{{Cite web
+ | url = https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=60105e1248f571aa3b895cd63bef072ed9d90c77
+ | title = kernel/git/torvalds/linux.git: mm/zswap: support multiple swap devices
+ | work = Linux kernel source tree
+ | date = {{date|2014-04-07|mdy}} | accessdate = {{date|2014-06-15|mdy}}
+ | publisher = [[kernel.org|kernel.org]]
+}}</ref>
+
+== {{Anchor|VS-OTHERS}}替代 ==
+其中一个zswap的替代是[[zram|zram]]，它向Linux内核提供了类似但有所不同的“压缩交换页面到RAM”机制。
+
+主要区别在于，zram提供以RAM存储数据的压缩[[块设备|块设备]]，作为独立的一般交换设备。使用zram需要额外的[[用户空间|用户空间]]配置（通过使用{{Mono|[[mkswap|mkswap]]}}和{{Mono|[[swapon|swapon]]}}），这样zram提供的基于RAM的交换设备才能被初始化并配置使用。正如设计的那样，zram可提供交换空间，即使是没有其他可用的交换设备，从而更适合用于未提供交换空间的系统，如嵌入式设备。<ref name="lwn-545244">{{cite web
+ | url = https://lwn.net/Articles/545244/
+ | title = In-kernel memory compression
+ | date = {{date|2013-04-03|mdy}}
+ | accessdate = {{date|2014-03-08|mdy}}
+ | author = Dan Magenheimer
+ | publisher = [[LWN.net|LWN.net]]
+ | archive-date = 2021-10-09
+ | archive-url = https://web.archive.org/web/20211009005751/https://lwn.net/Articles/545244/
+ | dead-url = no
+ }}</ref>
+
+相比之下，zswap则作为基于RAM的一般交换设备的压缩缓存，运行透明，不需要用户空间额外配置。zswap提供最少使用交换页面的[[缓存逐出|逐出]]机制，而zram不支持。尽管如此，因其设计的缘故，至少需要一个已存在的交换设备，以便为其所用。<ref name="lwn-545244" />
+
+== 参见 ==
+{{Portal|自由软件|Linux}}
+
+* [[缓存|缓存]]
+* [[Linux_swap|Linux swap]]
+* [[固态硬盘#交换分区|固态硬盘上的交换分区]]
+
+== 参考 ==
+{{Reflist|30em}}
+
+== 外部链接 ==
+* {{YouTube|jYLzokeRtd0|Linux Transparent Memory Compression}}, September 30, 2013, by Seth Jennings, IBM
+* [https://web.archive.org/web/20140202233144/http://queen.run.montefiore.ulg.ac.be/~martin/wordpress/wp-content/uploads/2013/02/os-zswap.pdf Zswap – a compressed page add-on for the Linux kswapd], March 15, 2013, University of Liege
+* [http://www.cs.princeton.edu/~mfreed//docs/6.033/compression.pdf The Compression Cache: Virtual Memory Compression for Handheld Computers] {{Wayback|url=http://www.cs.princeton.edu/~mfreed//docs/6.033/compression.pdf |date=20150923212935 }}, March 16, 2000, by Michael J. Freedman
+
+{{-}}
+
+{{Linux内核}}
+{{内存管理}}
+{{操作系统}}
+
+[[Category:用C編程的自由軟體|Category:用C編程的自由軟體]]
+[[Category:Linux内核功能|Category:Linux内核功能]]
+[[Category:記憶體管理|Category:記憶體管理]]
+[[Category:虚拟内存|Category:虚拟内存]]

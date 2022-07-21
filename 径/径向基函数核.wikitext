@@ -1,0 +1,42 @@
+在[[机器学习|机器学习]]中，（'''高斯'''）'''[[径向基函数|径向基函数]]核'''（{{lang-en|Radial basis function kernel}}），或称为'''RBF核'''，是一种常用的[[支持向量机|核函数]]。它是[[支持向量机|支持向量机]][[统计分类|分类]]中最为常用的核函数。<ref name="Chang2010">Yin-Wen Chang, Cho-Jui Hsieh, Kai-Wei Chang, Michael Ringgaard and Chih-Jen Lin (2010). ''Training and testing low-degree polynomial data mappings via linear SVM''. J. Machine Learning Research '''11''': 1471–1490.</ref>
+
+关于两个样本'''x'''和'''x''''的RBF核可表示为某个“输入空间”（input space）的特征向量，它的定义如下所示：<ref name="primer">Vert, Jean-Philippe, Koji Tsuda, and Bernhard Schölkopf (2004). "A primer on kernel methods." Kernel Methods in Computational Biology.</ref>
+
+:<math>K(\mathbf{x}, \mathbf{x'}) = \exp\left(-\frac{||\mathbf{x} - \mathbf{x'}||_2^2}{2\sigma^2}\right)</math>
+
+<math>\textstyle||\mathbf{x} - \mathbf{x'}||_2^2</math>可以看做两个特征向量之间的[[欧几里得距离#平方欧几里得距离|平方欧几里得距离]]。<math>\sigma</math>是一个自由参数。一种等价但更为简单的定义是设一个新的参数<math>\gamma</math>，其表达式为<math>\textstyle\gamma = \tfrac{1}{2\sigma^2}</math>：
+
+:<math>K(\mathbf{x}, \mathbf{x'}) = \exp(-\gamma||\mathbf{x} - \mathbf{x'}||_2^2)</math>
+
+因为RBF核函数的值随距离增大而减小，并介于0（极限）和1（当'''x''' = '''x''''的时候）之间，所以它是一种现成的[[相似性度量|相似性度量]]表示法。<ref name="primer"/>
+核的[[特徵_(机器学习)|特征空间]]有无穷多的维数；对于<math>\sigma = 1</math>，它的展开式为：<ref>{{cite arXiv
+|last=Shashua
+|first=Amnon
+|eprint=0904.3664
+|title=Introduction to Machine Learning: Class Notes 67577
+|class=cs.LG
+|year=2009
+}}</ref>
+
+:<math>\exp\left(-\frac{1}{2}||\mathbf{x} - \mathbf{x'}||_2^2\right) = \sum_{j=0}^\infty \frac{(\mathbf{x}^\top \mathbf{x'})^j}{j!} \exp\left(-\frac{1}{2}||\mathbf{x}||_2^2\right) 
+\exp\left(-\frac{1}{2}||\mathbf{x'}||_2^2\right)</math>
+
+==近似==
+因为支持向量机和其他模型使用了{{link-en|核技巧|Kernel trick}}，它在处理输入空间中大量的训练样本或含有大量特征的样本的时表现不是很好。所以，目前已经设计出了多种RBF核（或相似的其他核）的近似方法。<ref>Andreas Müller (2012). [http://peekaboo-vision.blogspot.de/2012/12/kernel-approximations-for-efficient.html Kernel Approximations for Efficient SVMs (and other feature extraction methods)] {{Wayback|url=http://peekaboo-vision.blogspot.de/2012/12/kernel-approximations-for-efficient.html |date=20180507181450 }}.</ref>
+典型的情况下，这些方法使用''z''('''x''')的形式，也就是用一个函数对一个与其他向量（例如支持向量机中的支持向量）无关的单向量进行变换，例如：
+
+:<math>z(\mathbf{x})z(\mathbf{x'}) \approx \varphi(\mathbf{x})\varphi(\mathbf{x'}) = K(\mathbf{x}, \mathbf{x'})</math>
+
+其中<math>\textstyle\varphi</math>是RBF核中植入的隐式映射。
+
+一种建构这样的''z''函数的方法，是对核函数作[[傅里叶变换|傅里叶变换]]，然后从中随机抽出所需函数。<ref>Ali Rahimi and Benjamin Recht (2007). Random features for large-scale kernel machines. Neural Information Processing Systems.</ref>
+
+==参见==
+* [[多项式核|多项式核]]
+* [[径向基函数网络|径向基函数网络]]
+
+==参考资料==
+{{reflist}}
+
+
+[[Category:机器学习|Category:机器学习]]

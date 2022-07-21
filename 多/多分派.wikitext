@@ -1,0 +1,655 @@
+{{多态}}
+{{编程范式}}
+'''多分派'''或译'''多重派发'''（multiple dispatch）或'''多方法'''（multimethod），是某些[[编程语言|编程语言]]的一个特性，其中的函数或者方法，可以在运行时间（动态的）基于它的实际参数的类型，或在更一般的情况下于此之外的其他特性，来[[动态分派|动态分派]]<ref>{{cite book |url=https://books.google.com/books?id=Dd7nyto72sUC&q=%22multiple+dispatch+languages%2C+more+than+one+polymorphic+arguments%22&pg=PA260 |title=Contemporary Computing: Second International Conference, IC3 2010, Noida, India, August 9–11, 2010. Proceedings |last1=Ranka |first1=Sanjay |last2=Banerjee |first2=Arunava |last3=Biswas |first3=Kanad Kishore |last4=Dua |first4=Sumeet |last5=Mishra |first5=Prabhat |last6=Moona |first6=Rajat |publisher=Springer |date=2010-07-26 |isbn=9783642148248 |access-date=2021-03-23 |archive-date=2021-04-27 |archive-url=https://web.archive.org/web/20210427130803/https://books.google.com/books?id=Dd7nyto72sUC&q=%22multiple+dispatch+languages,+more+than+one+polymorphic+arguments%22&pg=PA260 |dead-url=no }}</ref>。这是对[[动态分派|单分派]][[多态_(计算机科学)|多态]]的推广， 那里的函数或方法调用，基于在其上调用方法的对象的派生类型，而动态分派。多分派使用一个或多个实际参数的组合特征，路由动态分派至实现函数或方法。
+
+==理解分派==
+
+软件工程师通常把代码写进代码块中，代码块通常称作过程、函数、方法。代码通过被调用来执行，调用时将控制权传入函数中，当函数执行完成后将控制权返回给调用者。
+
+函数名通常用来描述函数的目的。有时会将多个函数起同样的名称。比如同名函数在逻辑上处理相同的任务，但是操作在不同类型的输入值上。在这种情况下，无法仅仅通过函数名，来判断目标代码块。那么，函数的实际参数的个数和类型，也就被用来判断。
+
+通常，单分派面向对象语言，在调用一个方法时，方法参数中一个参数会被特殊对待，并用来决定哪一个方法（如果有多个同名方法）会被调用。在许多语言中，这个特殊的参数是在语法上指明的，许多编程语言在调用方法时，把特殊参数放在小圆点（<code>.</code>）之前。例如 <code>special.method(other, arguments, here)</code>，这样 <code>lion.sound()</code> 将会发出狮吼，同时 <code>sparrow.sound()</code> 只会吱吱地叫。一般来说，对于面向对象的编程语言，这个小圆点之前的参数（上例中的<code>lion</code>和<code>sparrow</code>）被称为接收者<ref>{{cite web |author1=Igor Wojda |title=Programmer dictionary: Receiver |url=https://blog.kotlin-academy.com/programmer-dictionary-receiver-b085b1620890 |website=Kt.Academy |accessdate=2020-02-27 |language=en |date=2018-02-08}}</ref>。
+
+相反，在实现了多分派的语言中，被调用的函数，即是那些参数个数一样多，并且类型也匹配的调用。在调用中并没有特殊参数，来决定那个方法被调用。也就是说，所有参数的运行时类型都参与分派。[[Common_Lisp对象系统|CLOS]]是早期和著名的多分派语言。
+
+=== 数据类型 ===
+
+对于编译时间可以区分数据类型的编程语言，在{{en-link|交替 (形式语言理论)|Alternation (formal language theory)|交替}}（alternative）函数中进行选择，可以发生在编译时间，创建交替函数用于编译时间选择的活动，通常被叫做[[函数重载|函数重载]]。
+
+在有些编程语言中，这种数据类型的识别，可以被延后至运行时间（{{en-link|后期绑定|Late binding}}）。交替函数的选择发生在运行时间，并依据动态确定的函数实际参数的类型。以这种方式选择交替实现的函数，通常被称为多方法。
+
+== 例子 ==
+可以通过例子更加清晰的区分多分派和单一分派。假想一个游戏，它有两种（用户可见的）物体：飞船和小行星。当两个物体要相撞的时候，程序需要依据什么物体要相撞而做不同的事情。
+
+=== 具有内建多分派的语言 ===
+
+==== Common Lisp ====
+在具有多分派的[[Common_Lisp|Common Lisp]]语言中，可以在[[Common_Lisp对象系统|Common Lisp对象系统]]中如下这样实现：
+
+<syntaxhighlight lang="lisp">
+(defgeneric collide (x y))
+(defclass asteroid () ())
+(defclass spaceship () ())
+(defmethod collide-with ((x asteroid) (y asteroid))
+  ;; deal with asteroid hitting asteroid
+  )
+(defmethod collide-with ((x asteroid) (y spaceship))
+  ;; deal with asteroid hitting spaceship
+  )
+(defmethod collide-with ((x spaceship) (y asteroid))
+  ;; deal with spaceship hitting asteroid
+  )
+(defmethod collide-with ((x spaceship) (y spaceship))
+  ;; deal with spaceship hitting spaceship
+  )
+</syntaxhighlight>
+
+并且对其他方法也是类似的。没有使用显式测试和“动态转换”。
+
+由于多分派的存在，方法要定义在类中并包含在对象中的传统想法，变得不再吸引人了，上述每个<code>collide-with</code>方法，都附属于两个不同的类而非一个类。因此方法调用的特殊语法，一般会消失，从而方法调用看起来完全就像正常的函数调用，并且方法被组织入[[泛化函数|泛化函数]]而非类中。
+
+==== Julia ====
+[[Julia_(编程语言)|Julia]]有内建的多分派，并且它是语言设计的中心<ref name=julia-review>{{cite journal |last1=Bezanson |first1=Jeff |last2=Edelman |first2=Alan |last3=Karpinski |first3=Stefan |last4=Shah |first4=Viral B. |title=Julia: A fresh approach to numerical computing |journal=SIAM Review |volume=59 |issue=1 |pages=65–98 |date=7 February 2017 |doi=10.1137/141000671 |arxiv=1411.1607 }}</ref>。Julia版本的例子如下：
+
+<syntaxhighlight lang="julia">
+collide_with(x::Asteroid, y::Asteroid) = ... # deal with asteroid hitting asteroid
+collide_with(x::Asteroid, y::Spaceship) = ... # deal with asteroid hitting spaceship
+collide_with(x::Spaceship, y::Asteroid) = ... # deal with spaceship hitting asteroid
+collide_with(x::Spaceship, y::Spaceship) = ... # deal with spaceship hitting spaceship
+</syntaxhighlight>
+
+==== C# ====
+[[C♯|C#]]在版本4（2010年4月），使用关键字<code>dynamic</code>，介入了对动态多方法的支持<ref>{{cite web
+ |url=https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/types/using-type-dynamic
+ |title=Using type dynamic (C# Programming Guide)
+ |access-date=2020-05-14
+ |archive-date=2021-05-26
+ |archive-url=https://web.archive.org/web/20210526084438/https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/types/using-type-dynamic
+ |dead-url=no
+ }}</ref>。下面的例子展示多方法协同于在版本8（2019年9月）中介入的<code>switch</code>表达式<ref>{{cite web
+ |url=https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/switch-expression
+ |title=switch expression (C# reference)
+ |access-date=2020-05-14
+ |archive-date=2021-06-28
+ |archive-url=https://web.archive.org/web/20210628002431/https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/switch-expression
+ |dead-url=no
+ }}</ref>。像很多其他静态类型的语言语言一样，C#还支持静态方法重载<ref>{{cite web
+ |url=https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/basic-concepts#signatures-and-overloading
+ |title=Basic concepts
+ |access-date=2020-05-14
+ |archive-date=2021-04-16
+ |archive-url=https://web.archive.org/web/20210416152849/https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/basic-concepts#signatures-and-overloading
+ |dead-url=no
+ }}</ref>，Microsoft预期开发者在多数场景下会选用静态类型超过动态类型<ref>{{cite web
+ |url=https://docs.microsoft.com/en-us/archive/msdn-magazine/2011/february/msdn-magazine-dynamic-net-understanding-the-dynamic-keyword-in-csharp-4
+ |title=Dynamic .NET - Understanding the Dynamic Keyword in C# 4
+ |access-date=2020-05-14
+ |archive-date=2021-05-24
+ |archive-url=https://web.archive.org/web/20210524180229/https://docs.microsoft.com/en-us/archive/msdn-magazine/2011/february/msdn-magazine-dynamic-net-understanding-the-dynamic-keyword-in-csharp-4
+ |dead-url=no
+ }}</ref>。<code>dynamic</code>关键字支持COM对象和动态类型的.NET语言的互操作。
+
+<syntaxhighlight lang="c#">
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine(Collider.Collide(new Asteroid(101),  new Spaceship(300)));
+        Console.WriteLine(Collider.Collide(new Asteroid(10),   new Spaceship(10)));
+        Console.WriteLine(Collider.Collide(new Spaceship(101), new Spaceship(10)));
+    }
+}
+
+static class Collider
+{
+    public static string Collide(SpaceObject x, SpaceObject y) =>
+        ((x.Size > 100) && (y.Size > 100)) ?
+            "Big boom!" : CollideWith(x as dynamic, y as dynamic);
+    private static string CollideWith(Asteroid x, Asteroid y) => "a/a";
+    private static string CollideWith(Asteroid x, Spaceship y) => "a/s";
+    private static string CollideWith(Spaceship x, Asteroid y) => "s/a";
+    private static string CollideWith(Spaceship x, Spaceship y) => "s/s";
+}
+
+abstract class SpaceObject
+{
+    public SpaceObject(int size) => Size = size;
+
+    public int Size { get; }
+}
+
+class Asteroid : SpaceObject
+{
+    public Asteroid(int size) : base(size) { }
+}
+
+class Spaceship : SpaceObject
+{
+    public Spaceship(int size) : base(size) { }
+}
+</syntaxhighlight>
+
+输出：
+<syntaxhighlight lang="text">
+big-boom
+a/s
+s/s
+</syntaxhighlight>
+
+==== Groovy ====
+[[Groovy|Groovy]]是通用的[[Java|Java]]兼容/互用的[[Java虚拟机|JVM]]语言，它对立于Java，使用后期绑定/多分派<ref>{{Cite web |url=https://groovy-lang.org/differences.html#_multi_methods |title=Groovy - Multi-methods |access-date=2021-04-15 |archive-date=2021-04-16 |archive-url=https://web.archive.org/web/20210416152736/https://groovy-lang.org/differences.html#_multi_methods |dead-url=no }}</ref>。
+
+<syntaxhighlight lang="groovy">
+/*
+    Groovy implementation of C# example above
+    Late binding works the same when using non-static methods or compiling class/methods statically
+    (@CompileStatic annotation)
+*/
+class Program {
+    static void main(String[] args) {
+        println Collider.collide(new Asteroid(101), new Spaceship(300))
+        println Collider.collide(new Asteroid(10), new Spaceship(10))
+        println Collider.collide(new Spaceship(101), new Spaceship(10))
+    }
+}
+
+class Collider {
+    static String collide(SpaceObject x, SpaceObject y) {
+        (x.size > 100 && y.size > 100) ? "big-boom" : collideWith(x, y)  // Dynamic dispatch to collideWith method
+    }
+
+    private static String collideWith(Asteroid x, Asteroid y) { "a/a" }
+    private static String collideWith(Asteroid x, Spaceship y) { "a/s" }
+    private static String collideWith(Spaceship x, Asteroid y) { "s/a" }
+    private static String collideWith(Spaceship x, Spaceship y) { "s/s"}
+}
+
+class SpaceObject {
+    int size
+    SpaceObject(int size) { this.size = size }
+}
+
+@InheritConstructors class Asteroid extends SpaceObject {}
+@InheritConstructors class Spaceship extends SpaceObject {}
+</syntaxhighlight>
+
+=== 用多分派库扩展的语言 ===
+在不于语言定义或语法层次支持多分派的语言中，可能经常使用[[函式库|库]]扩展来增加多分派。
+
+==== JavaScript ====
+[[JavaScript|JavaScript]]和[[TypeScript|TypeScript]]不在语言语法层次上支持多方法，但可以通过库来增加多分派。例如，使用multimethod包<ref name="multimethod_package">[https://www.npmjs.com/package/@arrows/multimethod @arrows/multimethod] {{Wayback|url=https://www.npmjs.com/package/@arrows/multimethod |date=20210429173110 }} Multiple dispatch in JavaScript/TypeScript with configurable dispatch resolution by Maciej Cąderek.</ref>，它提供了多分派、泛化函数的实现。[[JavaScript|JavaScript]]的动态类型版本：
+
+<syntaxhighlight lang="javascript">
+import { multi, method } from '@arrows/multimethod'
+
+class Asteroid {}
+class Spaceship {}
+
+const collideWith = multi(
+  method([Asteroid, Asteroid], (x, y) => {
+    // deal with asteroid hitting asteroid
+  }),
+  method([Asteroid, Spaceship], (x, y) => {
+    // deal with asteroid hitting spaceship
+  }),
+  method([Spaceship, Asteroid], (x, y) => {
+    // deal with spaceship hitting asteroid
+  }),
+  method([Spaceship, Spaceship], (x, y) => {
+    // deal with spaceship hitting spaceship
+  }),
+)
+</syntaxhighlight>
+
+[[TypeScript|TypeScript]]有对应的静态类型版本。{{efn|
+TypeScript的多方法示例：
+<syntaxhighlight lang="typescript">
+import { multi, method, Multi } from '@arrows/multimethod'
+
+class Asteroid {}
+class Spaceship {}
+
+type CollideWith = Multi & {
+  (x: Asteroid, y: Asteroid): void
+  (x: Asteroid, y: Spaceship): void
+  (x: Spaceship, y: Asteroid): void
+  (x: Spaceship, y: Spaceship): void
+}
+
+const collideWith: CollideWith = multi(
+  method([Asteroid, Asteroid], (x, y) => {
+    // deal with asteroid hitting asteroid
+  }),
+  method([Asteroid, Spaceship], (x, y) => {
+    // deal with asteroid hitting spaceship
+  }),
+  method([Spaceship, Asteroid], (x, y) => {
+    // deal with spaceship hitting asteroid
+  }),
+  method([Spaceship, Spaceship], (x, y) => {
+    // deal with spaceship hitting spaceship
+  }),
+)
+</syntaxhighlight>}}
+
+==== Python ====
+可以使用[[函式库|库]]扩展来向[[Python|Python]]增加多分派。例如，最早的模块multimethods.py<ref name="multimethods_module">[https://gnosis.cx/download/gnosis/magic/multimethods.py multimethods.py] {{Wayback|url=https://gnosis.cx/download/gnosis/magic/multimethods.py |date=20210608192853 }}, Multiple dispatch in Python with configurable dispatch resolution by David Mertz, et al.</ref>，它为[[Python|Python]]提供了CLOS风格的多方法而不用变更语言的底层语法或关键字。在功能上，这非常类似于CLOS例子，但是语法是常规Python的。{{efn|
+Python的multimethods.py示例：
+<syntaxhighlight lang="python">
+from multimethods import Dispatch
+from game_objects import Asteroid, Spaceship
+from game_behaviors import as_func, ss_func, sa_func
+collide = Dispatch()
+collide.add_rule((Asteroid, Spaceship), as_func)
+collide.add_rule((Spaceship, Spaceship), ss_func)
+collide.add_rule((Spaceship, Asteroid), sa_func)
+def aa_func(a, b):
+    """Behavior when asteroid hits asteroid."""
+    # ...define new behavior...
+collide.add_rule((Asteroid, Asteroid), aa_func)
+</syntaxhighlight>
+<syntaxhighlight lang="pycon">
+# ...later...
+collide(thing1, thing2)
+</syntaxhighlight>
+}}
+[[Guido_van_Rossum|Guido van Rossum]]使用Python 2.4介入的修饰器（decorator），出品了多方法的具有简化了的语法的一个简单实现，他为此定义了<code>multimethod</code>修饰器<ref>{{Cite web | url=http://www.artima.com/weblogs/viewpost.jsp?thread=101605 | title=Five-minute Multimethods in Python | access-date=2014-07-13 | archive-date=2021-05-29 | archive-url=https://web.archive.org/web/20210529174954/https://www.artima.com/weblogs/viewpost.jsp?thread=101605 | dead-url=no }}</ref>。{{efn|
+Python的van Rossum最初的多方法实现：
+<syntaxhighlight lang="python">
+@multimethod(Asteroid, Asteroid)
+def collide(a, b):
+    """Behavior when asteroid hits a asteroid."""
+    # ...define new behavior...
+@multimethod(Asteroid, Spaceship)
+def collide(a, b):
+    """Behavior when asteroid hits a spaceship."""
+    # ...define new behavior...
+# ... define other multimethod rules ...
+</syntaxhighlight>
+}}
+multipledispatch<ref name="mdsp">{{Cite web |url=https://github.com/mrocklin/multipledispatch |title=multipledispatch |access-date=2021-04-15 |archive-date=2020-11-11 |archive-url=https://web.archive.org/web/20201111190544/https://github.com/mrocklin/multipledispatch/ |dead-url=no }}</ref>采用的形式与之一致。
+
+模块multimethod<ref name="multimethod_module">{{Citation|last=Coady|first=Aric|title=multimethod: Multiple argument dispatching.|url=https://github.com/coady/multimethod|access-date=2021-01-28|archive-date=2020-12-31|archive-url=https://web.archive.org/web/20201231211035/https://github.com/coady/multimethod|dead-url=no}}</ref>，采用了修饰器和Python 3.5介入的类型提示实现多方法：
+<syntaxhighlight lang="python">
+from multimethod import multimethod
+
+class Asteroid(): pass
+
+class Spaceship(): pass
+
+@multimethod
+def collide_with(x: Asteroid, y: Asteroid):
+    '''deal with asteroid hitting asteroid'''
+    print("asteroid hitting asteroid")
+
+@multimethod
+def collide_with(x: Asteroid, y: Spaceship):
+    '''deal with asteroid hitting spaceship'''
+    print("asteroid hitting spaceship")
+
+@multimethod
+def collide_with(x: Spaceship, y: Asteroid):
+    '''deal with spaceship hitting asteroid'''
+    print("spaceship hitting asteroid")
+
+@multimethod
+def collide_with(x: Spaceship, y: Spaceship):
+    '''deal with spaceship hitting spaceship'''
+    print("spaceship hitting spaceship")
+
+</syntaxhighlight>
+<syntaxhighlight lang="pycon">
+>>> a = Asteroid()
+>>> b = Spaceship()
+>>> collide_with(a, b)
+asteroid hitting spaceship
+</syntaxhighlight>
+
+此外，还有PEAK-Rules包提供语法类似上述例子的多分派<ref name="PEAK-Rules">{{cite web |title=PEAK-Rules 0.5a1.dev |url=https://pypi.python.org/pypi/PEAK-Rules |website=Python Package Index |access-date=21 March 2014 |archive-date=2017-03-14 |archive-url=https://web.archive.org/web/20170314111233/https://pypi.python.org/pypi/PEAK-Rules/ |dead-url=no }}</ref>，它后来被替代为PyProtocols<ref name="pyp">{{cite web |title=PyProtocols |url=http://peak.telecommunity.com/protocol_ref/module-protocols.html |website=Python Enterprise Application Kit |access-date=26 April 2019 |archive-date=2021-05-05 |archive-url=https://web.archive.org/web/20210505054828/http://peak.telecommunity.com/protocol_ref/module-protocols.html |dead-url=no }}</ref>。Reg库也支持多分派和谓词分派<ref name="reg">{{cite web |title=Reg |url=https://reg.readthedocs.io/en/latest/ |website=Read the docs |access-date=26 April 2019 |archive-date=2021-03-05 |archive-url=https://web.archive.org/web/20210305110256/https://reg.readthedocs.io/en/latest/ |dead-url=no }}</ref>。
+
+==== C ====
+[[C语言|C]]语言使用C Object System库<ref name="COS">{{Cite web | url=https://github.com/CObjectSystem/COS | title=C Object System: A framework that brings C to the level of other high level programming languages and beyond: CObjectSystem/COS | date=2019-02-19 | access-date=2021-03-30 | archive-date=2021-05-01 | archive-url=https://web.archive.org/web/20210501145045/https://github.com/CObjectSystem/COS | dead-url=no }}</ref>，可以支持类似于CLOS的动态分派。它是完全可扩展的并且方法不需要任何的手工处理。动态消息（方法）通过COS分派器来分派，它比[[Objective-C|Objective-C]]更快。下面是使用COS的例子：
+
+<syntaxhighlight lang="c">
+#include <stdio.h>
+#include <cos/Object.h>
+#include <cos/gen/object.h>
+
+/* 类 */
+defclass (Asteroid)
+/* 数据成员 */
+endclass
+
+defclass (Spaceship)
+/* 数据成员 */
+endclass
+
+/* 泛化函数 */
+defgeneric (_Bool, collide_with, _1, _2);
+
+/* 多方法 */
+defmethod (_Bool, collide_with, Asteroid, Asteroid)
+ /* deal with asteroid hitting asteroid */
+endmethod
+
+defmethod (_Bool, collide_with, Asteroid, Spaceship)
+ /* deal with asteroid hitting spaceship */
+endmethod
+
+defmethod (_Bool, collide_with, Spaceship, Asteroid)
+ /* deal with spaceship hitting asteroid */
+endmethod
+
+defmethod (_Bool, collide_with, Spaceship, Spaceship)
+ /* deal with spaceship hitting spaceship */
+endmethod
+
+/* 用例 */
+int main(int argc, char *argv[])
+{
+  OBJ a = gnew(Asteroid);
+  OBJ s = gnew(Spaceship);
+
+  printf("<a,a> = %d\n", collide_with(a, a));
+  printf("<a,s> = %d\n", collide_with(a, s));
+  printf("<s,a> = %d\n", collide_with(s, a));
+  printf("<s,s> = %d\n", collide_with(s, s));
+
+  grelease(a);
+  grelease(s);
+}
+</syntaxhighlight>
+
+== 编程语言支持 ==
+=== 主范型 ===
+{{div col|colwidth=30em}}
+* [[Julia_(编程语言)|Julia]]<ref name="juliaManual">{{cite web
+ |url=http://docs.julialang.org/en/release-0.4/manual/methods/
+ |title=Methods
+ |publisher=Julialang
+ |work=The Julia Manual
+ |access-date=11 May 2014
+ |archive-url=https://web.archive.org/web/20160717192005/http://docs.julialang.org/en/release-0.4/manual/methods/
+ |archive-date=2016-07-17
+ |dead-url=yes
+ }}</ref>
+{{div col end}}
+
+=== 支持通用的多方法 ===
+{{div col|colwidth=30em}}
+* {{en-link|C♯ 4.0|C# 4.0|C# 4.0}}<ref>{{cite web
+ |url=http://blogs.msdn.com/laurionb/archive/2009/08/13/multimethods-in-c-4-0-with-dynamic.aspx
+ |title=Multimethods in C# 4.0 With 'Dynamic'
+ |access-date=2009-08-20
+ |archive-date=2009-08-25
+ |archive-url=https://web.archive.org/web/20090825025229/http://blogs.msdn.com/laurionb/archive/2009/08/13/multimethods-in-c-4-0-with-dynamic.aspx
+ |dead-url=no
+ }}</ref>
+* {{en-link|Cecli (编程语言)|Cecil (programming language)|Cecil}}<ref>{{cite web
+ |url=http://www.cs.washington.edu/research/projects/cecil/www/cecil.html
+ |title=Cecil Language
+ |access-date=2008-04-13
+ |archive-date=2016-09-01
+ |archive-url=https://web.archive.org/web/20160901183335/http://www.cs.washington.edu/research/projects/cecil/www/cecil.html
+ |dead-url=no
+ }}</ref>
+* [[Clojure|Clojure]]<ref>{{cite web
+ |url=http://clojure.org/multimethods
+ |title=Multimethods in Clojure
+ |access-date=2008-09-04
+ |archive-date=2015-09-20
+ |archive-url=https://web.archive.org/web/20150920054255/http://clojure.org/multimethods
+ |dead-url=no
+ }}</ref>
+* [[Common_Lisp|Common Lisp]]（通过[[Common_Lisp对象系统|Common Lisp对象系统]]）<ref>{{cite book
+ |last=Steele
+ |first=Guy L.
+ |title=Common LISP: The Language
+ |publisher=Digital Press
+ |location=Bedford, MA, U.S.A
+ |year=1990
+ |chapter=28
+ |isbn=978-1-55558-041-4
+ |chapter-url=https://books.google.com/books?id=8Hr3ljbCtoAC
+ |access-date=2021-03-30
+ |archive-date=2017-12-17
+ |archive-url=https://web.archive.org/web/20171217022856/https://books.google.com/books?id=8Hr3ljbCtoAC
+ |dead-url=no
+ }}</ref>
+* [[Dylan_(编程语言)|Dylan]]<ref>{{cite web
+ |url=http://www.opendylan.org/books/drm/Background_and_Goals
+ |title=Background and Goals
+ |access-date=2008-04-13
+ |archive-date=2020-04-04
+ |archive-url=https://web.archive.org/web/20200404211823/https://opendylan.org/books/drm/Background_and_Goals
+ |dead-url=no
+ }}</ref>
+<!-- [[Elixir|Elixir]]不原生支持多分派 -->
+* {{en-link|Fortress (编程语言)|Fortress (programming language)|Fortress}}<ref>{{cite web
+ |url=http://research.sun.com/projects/plrg/Publications/fortress.1.0.pdf
+ |title=The Fortress Language Specification, Version 1.0
+ |access-date=2010-04-23
+ |archive-url=https://web.archive.org/web/20130120063452/http://research.sun.com/projects/plrg/Publications/fortress.1.0.pdf
+ |archive-date=2013-01-20
+ |dead-url=yes
+ }}</ref>
+* [[Groovy|Groovy]]<ref>{{cite web
+ |url=http://blogs.oracle.com/sundararajan/entry/multimethods_in_groovy
+ |title=Multimethods in Groovy
+ |access-date=2008-04-13
+ |archive-date=2011-08-12
+ |archive-url=https://web.archive.org/web/20110812025334/http://blogs.oracle.com/sundararajan/entry/multimethods_in_groovy
+ |dead-url=no
+ }}</ref>
+* {{en-link|Lasso (编程语言)|Lasso (programming language)|Lasso}}<ref>{{cite web
+ |url=http://lassoguide.com/language/methods.html#multiple-dispatch
+ |title=Methods – LassoGuide 9.2
+ |access-date=2014-11-11
+ |archive-date=2021-06-13
+ |archive-url=https://web.archive.org/web/20210613133617/http://lassoguide.com/language/methods.html#multiple-dispatch
+ |dead-url=no
+ }}</ref><ref>{{cite web
+ |url=http://nice.sourceforge.net/visitor.html
+ |title=Visitor Pattern Versus Multimethods
+ |access-date=2008-04-13
+ |archive-date=2021-02-05
+ |archive-url=https://web.archive.org/web/20210205184636/http://nice.sourceforge.net/visitor.html
+ |dead-url=no
+ }}</ref>
+* [[Nim|Nim]]，在v0.20之后泛化方法被废止，使用多方法需要加编译指令<ref>{{cite web
+ |url=https://nim-lang.org/docs/manual.html#methods-multiminusmethods
+ |title=Nim Manual: Multi-methods
+ |access-date=2020-09-11
+ |archive-date=2021-06-15
+ |archive-url=https://web.archive.org/web/20210615140143/https://nim-lang.org/docs/manual.html#methods-multiminusmethods
+ |dead-url=no
+ }}</ref>
+* [[Raku|Raku]]<ref>{{cite web
+ |url=http://dev.perl.org/perl6/faq.html
+ |title=Perl 6 FAQ
+ |access-date=2008-04-13
+ |archive-date=2012-03-13
+ |archive-url=https://web.archive.org/web/20120313001205/http://dev.perl.org/perl6/faq.html
+ |dead-url=no
+ }}</ref>
+* [[R语言|R]]<ref>{{cite web
+ |url=http://developer.r-project.org/howMethodsWork.pdf
+ |title=How S4 Methods Work
+ |access-date=2008-04-13
+ |archive-date=2021-05-10
+ |archive-url=https://web.archive.org/web/20210510032332/https://developer.r-project.org/howMethodsWork.pdf
+ |dead-url=no
+ }}</ref>
+* {{en-link|Seed7}}<ref>{{cite web
+ |url=http://seed7.sourceforge.net/manual/objects.htm#multiple_dispatch
+ |title=Multiple Dispatch in Seed7
+ |access-date=2011-04-23
+ |archive-date=2021-01-29
+ |archive-url=https://web.archive.org/web/20210129141420/http://seed7.sourceforge.net/manual/objects.htm#multiple_dispatch
+ |dead-url=no
+ }}</ref>
+* {{en-link|TADS}}<ref>{{cite web
+ |url=http://tads.org/t3doc/doc/sysman/multmeth.htm
+ |title=TADS 3 System Manual
+ |access-date=2012-03-19
+ |archive-date=2017-02-14
+ |archive-url=https://web.archive.org/web/20170214071026/http://www.tads.org/t3doc/doc/sysman/multmeth.htm
+ |dead-url=no
+ }}</ref>
+* [[Visual_Basic_.NET|VB.Net]]<ref>{{cite web
+ |url=https://www.infoq.com/news/2007/06/VB-Multiple-Dispatch/
+ |title=VB.Net Multiple Dispatch
+ |access-date=2020-03-31
+ |archive-date=2021-04-11
+ |archive-url=https://web.archive.org/web/20210411024944/https://www.infoq.com/news/2007/06/VB-Multiple-Dispatch/
+ |dead-url=no
+ }}</ref>，通过后期绑定，还通过.Net DLR<ref>{{cite web
+ |url=https://www.red-gate.com/simple-talk/dotnet/visual-studio/the-new-features-in-c4-0/
+ |title=New Features in C#4.0 and VB.Net 10.0
+ |access-date=2020-03-31
+ |archive-date=2021-02-01
+ |archive-url=https://web.archive.org/web/20210201112222/https://www.red-gate.com/simple-talk/dotnet/visual-studio/the-new-features-in-c4-0/
+ |dead-url=no
+ }}</ref>
+* [[Wolfram语言|Wolfram语言]]<ref>{{cite web
+ |url=https://www.wolfram.com/language/for-experts/
+ |title=Notes for Programming Language Experts
+ |access-date=2016-08-21
+ |archive-date=2021-06-26
+ |archive-url=https://web.archive.org/web/20210626034759/https://www.wolfram.com/language/for-experts/
+ |dead-url=no
+ }}</ref>，通过符号模式匹配
+* {{en-link|Xtend}}<ref>{{cite web
+ |url=https://www.eclipse.org/xtend/documentation/202_xtend_classes_members.html#polymorphic-dispatch
+ |title=Multiple dispatch
+ |access-date=2021-03-30
+ |archive-date=2021-05-08
+ |archive-url=https://web.archive.org/web/20210508031336/https://www.eclipse.org/xtend/documentation/202_xtend_classes_members.html#polymorphic-dispatch
+ |dead-url=no
+ }}</ref>
+{{div col end}}
+
+=== 通过扩展 ===
+{{div col|colwidth=30em}}
+* 任何[[.NET框架|.NET]]语言（通过库MultiMethods.NET<ref>{{Cite web |url=http://www.codeplex.com/multimethods |title=MultiMethods.NET |access-date=2014-07-13 |archive-date=2010-02-26 |archive-url=https://web.archive.org/web/20100226133020/http://www.codeplex.com/multimethods |dead-url=no }}</ref>）
+* [[C语言|C]]（通过库C Object System<ref name="COS"/>）
+* [[C♯|C#]]（通过库multimethod-sharp<ref>{{Cite web |url=https://code.google.com/p/multimethod-sharp/ |title=multimethod-sharp |access-date=2021-03-30 |archive-date=2016-01-23 |archive-url=https://web.archive.org/web/20160123084004/https://code.google.com/p/multimethod-sharp/ |dead-url=no }}</ref>）
+* [[C++|C++]]（通过库yomm2<ref>{{Cite web |url=https://github.com/jll63/yomm2 |title=yomm2 |access-date=2021-03-30 |archive-date=2020-11-12 |archive-url=https://web.archive.org/web/20201112032323/https://github.com/jll63/yomm2 |dead-url=no }}</ref>和multimethods<ref>{{Cite web |url=https://github.com/IgorNikitin/multimethods |title=multimethods |access-date=2021-03-30 |archive-date=2020-11-22 |archive-url=https://web.archive.org/web/20201122085725/https://github.com/IgorNikitin/multimethods |dead-url=no }}</ref>）
+* [[D语言|D]]（通过库openmethods<ref>[https://github.com/jll63/methods.d openmethods]</ref>）
+* [[Factor_(编程语言)|Factor]]（通过标准multimethods词汇表<ref>{{Cite web |url=http://docs.factorcode.org/content/vocab-multi-methods.html |title=multimethods vocabulary |access-date=2014-07-13 |archive-date=2021-04-29 |archive-url=https://web.archive.org/web/20210429234913/https://docs.factorcode.org/content/vocab-multi-methods.html |dead-url=no }}</ref>)
+* [[Java|Java]]（使用扩展MultiJava<ref>{{Cite web |url=http://multijava.sourceforge.net/ |title=MultiJava |access-date=2014-07-13 |archive-date=2021-04-11 |archive-url=https://web.archive.org/web/20210411031652/http://multijava.sourceforge.net/ |dead-url=no }}</ref>）
+* [[JavaScript|JavaScript]]（通过包@arrows/multimethod<ref name="multimethod_package"/>）
+* [[Perl|Perl]]（通过模块Class::Multimethods<ref>{{Cite web |url=https://metacpan.org/module/Class::Multimethods |title=Class::Multimethods |access-date=2014-07-13 |archive-date=2013-10-21 |archive-url=https://web.archive.org/web/20131021134522/https://metacpan.org/module/Class::Multimethods |dead-url=no }}</ref>）
+* [[Python|Python]]（模块multimethod<ref name="multimethod_module" />、multipledispatch<ref name="mdsp" />或Reg库<ref name="reg" />）
+* [[Racket|Racket]]（通过库multimethod-lib<ref>{{Cite web |url=https://docs.racket-lang.org/multimethod/index.html |title=multimethod-lib |access-date=2021-03-30 |archive-date=2021-04-29 |archive-url=https://web.archive.org/web/20210429085619/https://docs.racket-lang.org/multimethod/index.html |dead-url=no }}</ref>）
+* [[Ruby|Ruby]]（通过Multiple Dispatch库<ref>{{Cite web |url=https://rubygems.org/gems/multi/ |title=The Multiple Dispatch Library |access-date=2021-03-30 |archive-date=2021-04-30 |archive-url=https://web.archive.org/web/20210430014741/https://rubygems.org/gems/multi/ |dead-url=no }}</ref>、Multimethod包<ref>{{Cite web |url=https://rubygems.org/gems/multimethod |title=Multimethod Package |access-date=2021-03-30 |archive-date=2021-04-29 |archive-url=https://web.archive.org/web/20210429185143/https://rubygems.org/gems/multimethod |dead-url=no }}</ref>和Vlx-Multimethods包<ref>{{Cite web |url=https://rubygems.org/gems/vlx-multi/ |title=Vlx-Multimethods Package |access-date=2021-03-30 |archive-date=2021-04-27 |archive-url=https://web.archive.org/web/20210427130804/https://rubygems.org/gems/vlx-multi/ |dead-url=no }}</ref>）
+* [[Scheme|Scheme]]（通过TinyCLOS<ref>{{Cite web |url=http://community.schemewiki.org/?tiny-clos |title=TinyCLOS |access-date=2014-07-13 |archive-date=2008-12-11 |archive-url=https://web.archive.org/web/20081211190914/http://community.schemewiki.org/?tiny-clos |dead-url=no }}</ref>）
+* [[TypeScript|TypeScript]]（通过包@arrows/multimethod<ref name="multimethod_package"/>）
+{{div col end}}
+
+== 模拟多分派 ==
+=== C ===
+[[C语言|C]]语言没有动态分派，也可以不使用C Object System库，而以某种形式手工实现。动态分派经常使用<code>enum</code>来标识一个对象的子类型，然后可通过在[[函数指针|函数指针]]{{en-link|分支表|branch table}}中查找这个值来完成。C语言模拟多方法的简单例子：
+
+<syntaxhighlight lang="c">
+typedef void (*CollisionCase)(void);
+
+void collision_AA(void) { /* handle Asteroid-Asteroid collision  */ };
+void collision_AS(void) { /* handle Asteroid-Spaceship collision */ };
+void collision_SA(void) { /* handle Spaceship-Asteroid collision */ };
+void collision_SS(void) { /* handle Spaceship-Spaceship collision*/ };
+
+typedef enum {
+    THING_ASTEROID = 0,
+    THING_SPACESHIP,
+    THING_COUNT /* not a type of thing itself, instead used to find number of things */
+} Thing;
+
+CollisionCase collisionCases[THING_COUNT][THING_COUNT] = {
+    {&collision_AA, &collision_AS},
+    {&collision_SA, &collision_SS}
+};
+
+void collide(Thing a, Thing b) {
+    (*collisionCases[a][b])();
+}
+
+int main(void) {
+    collide(THING_SPACESHIP, THING_ASTEROID);
+}
+</syntaxhighlight>
+
+=== Java ===
+在只有单一分派的语言比如[[Java|Java]]中，多分派可以用多层单一分派来模拟：
+
+<syntaxhighlight lang="java">
+interface Collideable {
+    void collideWith(final Collideable other);
+
+    /* These methods would need different names in a language without method overloading. */
+    void collideWith(final Asteroid asteroid);
+    void collideWith(final Spaceship spaceship);
+}
+
+class Asteroid implements Collideable {
+    public void collideWith(final Collideable other) {
+        // Call collideWith on the other object.
+        other.collideWith(this);
+   }
+
+    public void collideWith(final Asteroid asteroid) {
+        // Handle Asteroid-Asteroid collision.
+    }
+
+    public void collideWith(final Spaceship spaceship) {
+        // Handle Asteroid-Spaceship collision.
+    }
+}
+
+class Spaceship implements Collideable {
+    public void collideWith(final Collideable other) {
+        // Call collideWith on the other object.
+        other.collideWith(this);
+    }
+
+    public void collideWith(final Asteroid asteroid) {
+        // Handle Spaceship-Asteroid collision.
+    }
+
+    public void collideWith(final Spaceship spaceship) {
+        // Handle Spaceship-Spaceship collision.
+    }
+}
+</syntaxhighlight>
+
+运行时间<code>instanceof</code>检查可以在一个或两个层次上使用。
+
+==代码示例==
+{{Div col|2}}
+{{notelist}}
+{{div col end}}
+
+==引用==
+{{reflist|2}}
+
+== 外部链接 ==
+* {{cite conference
+ |last1=Stroustrup
+ |first1=Bjarne
+ |last2=Solodkyy
+ |first2=Yuriy
+ |last3=Pirkelbauer
+ |first3=Peter
+ |title=Open Multi-Methods for C++
+ |conference=ACM 6th International Conference on Generative Programming and Component Engineering
+ |year=2007
+ |url=http://www.stroustrup.com/multimethods.pdf
+ |access-date=2014-07-13
+ |archive-date=2021-04-29
+ |archive-url=https://web.archive.org/web/20210429155236/https://www.stroustrup.com/multimethods.pdf
+ |dead-url=no
+ }}
+*{{cite web |url=https://docs.racket-lang.org/multimethod/ |title=Dynamic multiple dispatch |website=docs.racket-lang.org |access-date=2018-03-12 |archive-date=2021-04-29 |archive-url=https://web.archive.org/web/20210429053405/https://docs.racket-lang.org/multimethod/ |dead-url=no }}
+
+[[Category:方法_(電腦科學)|Category:方法 (電腦科學)]]
+[[Category:多态|Category:多态]]

@@ -1,0 +1,78 @@
+{{NoteTA|G1=IT}}
+{{Infobox file format
+| name = Java ARchive
+| icon = [[Image:Nuvola_mimetypes_java_jar.png|[[KDE]] JAR文件图标]]
+| extension = <tt>.jar</tt>
+| mime = application/java-archive<ref>{{cite web|title=File Extension .JAR Details|url=http://filext.com/file-extension/JAR|accessdate=29 November 2012|archive-date=2018-07-18|archive-url=https://web.archive.org/web/20180718093546/http://filext.com/file-extension/JAR|dead-url=no}}</ref><ref>{{cite web|title=MIME : Java Glossary|url=http://mindprod.com/jgloss/mime.html|accessdate=29 November 2012|archive-date=2019-03-21|archive-url=https://web.archive.org/web/20190321025246/http://mindprod.com/jgloss/mime.html|dead-url=no}}</ref>
+| type code =
+| uniform type = com.sun.java-archive
+| owner = [[網景|網景]]、[[昇陽電腦|昇陽電腦]]、[[甲骨文公司|甲骨文公司]]
+| genre = [[文件格式|文件格式]]、[[数据压缩|数据压缩]]
+| container for =
+| contained by =
+| extended from = [[ZIP|ZIP]]
+| extended to =
+| standard =
+}}
+
+在[[软件|软件]]领域，'''JAR文件'''（Java归档，{{lang-en|'''J'''ava '''AR'''chive}}）是一种[[软件包格式|软件包]][[文件格式|文件格式]]，通常用于聚合大量的[[Java类文件|Java类文件]]、相关的[[元数据|元数据]]和资源（文本、图片等）文件到一个文件，以便分发Java平台[[应用软件|应用软件]]或[[函式庫|库]]。<ref>{{Cite web |url=http://java.sun.com/javase/6/docs/technotes/guides/jar/index.html |title=Java Archive (JAR) Files |accessdate=2014-05-10 |archive-date=2009-08-26 |archive-url=https://web.archive.org/web/20090826092325/http://java.sun.com/javase/6/docs/technotes/guides/jar/index.html |dead-url=no }}</ref>
+
+JAR文件是一种[[归档文件|归档文件]]，以[[ZIP格式|ZIP格式]]构建，以<code>.jar</code>为[[文件扩展名|文件扩展名]]。用户可以使用[[JDK|JDK]]自带的jar命令创建或提取JAR文件。也可以使用其他<code>zip</code>压缩工具，不过压缩时zip文件头里的条目顺序很重要，因为[[Manifest文件|Manifest文件]]常需放在首位。JAR文件内的文件名是Unicode文本。<ref>{{Cite web |url=http://download.java.net/jdk8/docs/technotes/guides/jar/jar.html#JAR_Index |title=存档副本 |accessdate=2014-05-10 |archive-date=2013-01-08 |archive-url=https://web.archive.org/web/20130108105404/http://download.java.net/jdk8/docs/technotes/guides/jar/jar.html#JAR_Index |dead-url=yes }}</ref>
+
+== 设计 ==
+
+一个JAR文件允许Java运行时高效地部署一组类和它们相关的资源。JAR文件中的元素可以被压缩，这样一来，在单个请求中下载整个应用程序，使得下载一个JAR文件比对构成一个Java应用的许多未压缩的文件单独下载更方便。包java.util.zip包含读写JAR文件的类。 
+
+JAR文件在路径META-INF/MANIFEST.MF下有一个可选的[[清单文件|Manifest文件]]。Manifest文件中的条目定义这个JAR文件如何被使用。例如，类路径条目由其他JAR文件的绝对或相对路径的列表组成，用于指定在加载本JAR文件时同时加载的其他JAR文件。虽然旨在简化JAR的使用，但在实践中证明Manifest文件是非常脆弱的，因为入口点JAR在创建时依赖于所有相关的JAR的确切位置。一旦需要更改版本或库的位置，必需重建Manifest文件。
+
+为了提取JAR文件的内容，用户可以使用任何标准的unzip解压缩软件，或者每个[[Java虚拟机|Java虚拟机]]都带有的<code>jar</code>命令：“<code>jar -xf foo.jar</code>”。
+
+开发者可以对JAR文件进行[[数字签名|数字签名]]。在这种情况下，签名信息成为嵌入的Manifest文件的一部分。JAR本身并没有被签名，而是归档内的每一个文件的校验和连同其名字作为签名，被记录在Manifest文件中。多个实体可能签署一个JAR文件，并在每次签名时改变这个JAR文件，虽然签署文件本身仍然有效。当Java运行时加载签名的JAR文件时，它可以验证签名并拒绝加载签名不匹配的类。Java运行时也支持“密封”的包（Sealed Packages）。类加载器一旦成功装载密封包中的某个类后，其后加载的类必须是由同一实体签名，才被允许加载到同一个包。这可以防止恶意代码被插入到现有的软件包，以至于接触到包范围内的类和数据。
+
+开发者可以对JAR文件进行[[代码混淆|混淆]]，这样该JAR文件的用户无法得到关于该JAR文件所包含的代码的太多信息，并且能够压缩文件大小。这在空间受限的[[嵌入式系统|嵌入式系统]]开发中很有用。
+
+=== 可执行JAR文件 ===
+一个可执行Java程序以及其使用的[[函式庫|库]]文件可以打包在一个JAR文件中。
+
+可执行的JAR文件中的Manifest文件用代码<code>Main-Class: myPrograms.MyClass</code>指定了入口点类，注意要指明该类的路径（-cp参数将被忽略）。有些操作系统可以在点击后直接运行可执行JAR文件。而更典型的调用则是通过命令行执行“<code>java -jar foo.jar</code>”。
+
+在多数平台上可以使用封装器封装可执行JAR文件。例如，对于更喜欢使用Windows [[EXE|EXE]]的[[Microsoft_Windows|Microsoft Windows]]用户而言，可以使用工具（如{{tsl|en|JSmooth}}、{{tsl|en|Launch4J}}、{{tsl|en|WinRun4J}}、[[Nullsoft脚本安装系统|Nullsoft脚本安装系统]]等），将单个JAR文件转换为可执行文件。
+
+== Manifest ==
+{{Main|Manifest文件}}
+在[[Java平臺|Java平台]]中, [[Manifest文件|Manifest文件]]是JAR归档中所包含的特殊文件。<ref>{{cite web |url=http://java.sun.com/developer/Books/javaprogramming/JAR/basics/manifest.html |title=Understanding the Manifest |publisher=Java.sun.com |date=2003-03-21 |accessdate=2012-07-31 |archive-date=2012-06-26 |archive-url=https://web.archive.org/web/20120626125503/http://java.sun.com/developer/Books/javaprogramming/JAR/basics/manifest.html |dead-url=no }}</ref><ref>{{cite web |url=http://download.oracle.com/javase/6/docs/technotes/guides/jar/jar.html#JAR%20Manifest |title=JAR File Specification |publisher=Download.oracle.com |date= |accessdate=2012-07-31 |archive-date=2011-11-02 |archive-url=https://web.archive.org/web/20111102065209/http://download.oracle.com/javase/6/docs/technotes/guides/jar/jar.html#JAR%20Manifest |dead-url=no }}</ref>Manifest文件被用来定义扩展或档案打包相关数据。Manifest文件是一个[[元数据|元数据]]文件，它包含了不同部分中的{{tsl|en|Attribute–value pair|键-值对}}数据。如果一个JAR文件被当作可执行文件，则其中的Manifest文件需要指出该程序的主类文件。通常Manifest文件的文件名为<code>MANIFEST.MF</code>。
+
+通常Manifest文件都与Java档案相关，其他的情况比较少见。
+
+== Apache Ant的Zip/JAR支持 ==
+在[[Apache_Ant|Apache Ant]]构建工具中有其自己的包——org.apache.tools.zip，用来读写Zip和JAR归档文件，并包括对[[Unix|Unix]][[文件系统|文件系统]]的支持。org.apache.tools.zip包发布在Apache软件基金会许可下，并被设计成在Ant之外使用。
+
+== 相关格式 ==
+几种相关的文件格式建立在JAR格式的基础上：
+
+* [[WAR_(文件格式)|WAR]] （Web应用程序归档，{{lang-en|Web application archive}})，也是一种Java归档，存储[[XML|XML]]文件、Java类、[[JSP|JSP]]和Web应用程序中的其他文件。
+* [[Java_EE连接器架构|RAR]]（资源适配器归档，{{lang-en|Resource adapter archive}}），这里不是指[[RAR|RAR]]文件格式），也是一种Java归档，存储[[XML|XML]]文件、Java类和[[Java_EE连接器架构|Java EE连接器架构]]（JCA）应用中的其他文件。
+* {{tsl|en|EAR (file format)|EAR (文件格式)}} （{{lang-en|Enterprise archive}}），是一种复合式Java归档文件，包含了[[XML|XML]]文件、Java类和针对Java EE应用的其他Java归档文件，例如JAR、WAR和RAR。
+* [[SAR|SAR]]（{{lang-en|Service archive}}），与EAR类似。它提供了<tt>service.xml</tt>文件和相应的JAR文件。
+* [[APK|APK]] (Android应用程序包文件，{{lang-en|Android application package}}）Java归档格式的一个变种，用于[[Android|Android]]应用程序。<ref>{{Cite web |url=http://developer.android.com/guide/appendix/glossary.html |title=Android Developer's Guide |accessdate=2014-05-10 |archive-date=2017-11-10 |archive-url=https://web.archive.org/web/20171110232318/https://developer.android.com/guide/appendix/glossary.html |dead-url=no }}</ref>
+
+== 参见 ==
+{{Portal|Java}}
+* [[Java类加载器#JAR地狱|JAR hell]]
+* [[Open_Packaging_Conventions|Open Packaging Conventions]]
+* {{tsl|en|JAD (file format)|Java应用程序描述符}}
+
+== 参考文献 ==
+{{reflist}}
+
+== 外部链接 ==
+* [http://download.oracle.com/javase/6/docs/technotes/guides/jar/jarGuide.html JAR文件概览] {{Wayback|url=http://download.oracle.com/javase/6/docs/technotes/guides/jar/jarGuide.html |date=20111109013550 }}
+* [http://download.oracle.com/javase/6/docs/technotes/guides/jar/jar.html JAR文件定义] {{Wayback|url=http://download.oracle.com/javase/6/docs/technotes/guides/jar/jar.html |date=20111102065209 }}
+* [http://www.cse.yorku.ca/tech/other/jdk1.2.1/docs/guide/jar/manifest.html JAR文件的初始定义] {{Wayback|url=http://www.cse.yorku.ca/tech/other/jdk1.2.1/docs/guide/jar/manifest.html |date=20200217023908 }}
+* [http://www.ibm.com/developerworks/cn/java/j-jar/ IBM developmentWorks：JAR文件揭密] {{Wayback|url=http://www.ibm.com/developerworks/cn/java/j-jar/ |date=20161230001303 }}
+
+{{Archive formats}}
+{{Compression Software Implementations}}
+
+[[Category:归档格式|Category:归档格式]]
+[[Category:Java平台|Category:Java平台]]

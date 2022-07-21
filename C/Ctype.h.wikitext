@@ -1,0 +1,111 @@
+{{noteTA
+|G1=IT
+|1=zh-hans:宏; zh-hant:巨集;
+}}
+{{lowercase|title=ctype.h}}
+{{C_Standard_library}} <!-- to edit this template go to [[template:C_Standard_library|template:C_Standard_library]] -->
+'''<code>ctype.h</code>'''是[[C標準函数庫|C標準函数庫]]中的[[头文件|头文件]]，定义了一批[[C语言|C语言]]字符分类函数（C character classification functions），用于测试字符是否属于特定的字符类别，如字母字符、控制字符等等。既支持单字节字符，也支持[[宽字符|宽字符]]。<ref>{{cite book  | url=http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1124.pdf  | title=ISO/IEC 9899:1999 specification  | at=p. 193, § 7.4  | access-date=2013-06-20  | archive-date=2011-01-24  | archive-url=https://web.archive.org/web/20110124052108/http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1124.pdf  | dead-url=yes  }}</ref>
+ 
+== 实现 ==
+现代的C库中，字符分类函数一般不用比较测试（comparison tests）实现，而是静态查表来实现。
+
+例如，创建一个由256个8位宽整数组成的数组，每个整数的每位对应字符的特定的分类性质，如属于数字、属于字母等等。如果最低位表示属于数字性质，那么可以写成如下代码：
+
+ <syntaxhighlight lang="c">#define isdigit(x) (TABLE[x] & 1)</syntaxhighlight>
+
+早期版本的[[Linux|Linux]]使用了潜在犯错的方法，类似于：
+
+ <syntaxhighlight lang="c">#define isdigit(x) ((x) >= '0' && (x) <= '9')</syntaxhighlight>
+
+这会产生问题，如宏参数<code>x</code>具有[[函数副作用|副作用]]---例如，如果调用<code>isdigit(x++)</code>或<code>isdigit(run_some_program())</code>，可能不是很显然，<code>isdigit</code>的参数将被求值两次。所以，查表的方法被广泛使用。
+
+== 函数 ==
+
+单字节字符处理函数在<code>ctype.h</code>(C++的<code>cctype</code> )中声明。宽字节字符处理函数在<code>wctype.h</code>(C++的<code>cwctype</code>)中声明.
+ 
+{| class="wikitable" style="font-size:0.85em;"
+! 单字节
+! 宽字节
+! 描述
+|-
+| {{anchor|isalnum}}<code>[http://en.cppreference.com/w/c/string/byte/isalnum isalnum]</code>
+| {{anchor|iswalnum}}<code>[http://en.cppreference.com/w/c/string/wide/iswalnum iswalnum]</code>
+| 是否为字母数字
+|-
+| {{anchor|isalpha}}<code>[http://en.cppreference.com/w/c/string/byte/isalpha isalpha]</code>
+| {{anchor|iswalpha}}<code>[http://en.cppreference.com/w/c/string/wide/iswalpha iswalpha]</code>
+| 是否为字母
+|-
+| {{anchor|islower}}<code>[http://en.cppreference.com/w/c/string/byte/islower islower]</code>
+| {{anchor|iswlower}}<code>[http://en.cppreference.com/w/c/string/wide/iswlower iswlower]</code>
+| 是否为小写字母
+|-
+| {{anchor|isupper}}<code>[http://en.cppreference.com/w/c/string/byte/isupper isupper]</code>
+| {{anchor|iswupper}}<code>[http://en.cppreference.com/w/c/string/wide/iswupper iswupper]</code>
+| 是否为大写字母
+|-
+| {{anchor|isdigit}}<code>[http://en.cppreference.com/w/c/string/byte/isdigit isdigit]</code>
+| {{anchor|iswdigit}}<code>[http://en.cppreference.com/w/c/string/wide/iswdigit iswdigit]</code>
+| 是否为数字
+|-
+| {{anchor|isxdigit}}<code>[http://en.cppreference.com/w/c/string/byte/isxdigit isxdigit]</code>
+| {{anchor|iswxdigit}}<code>[http://en.cppreference.com/w/c/string/wide/iswxdigit iswxdigit]</code>
+| 是否为16进制数字
+|-
+| {{anchor|iscntrl}}<code>[http://en.cppreference.com/w/c/string/byte/iscntrl iscntrl]</code>
+| {{anchor|iswcntrl}}<code>[http://en.cppreference.com/w/c/string/wide/iswcntrl iswcntrl]</code>
+| 是否为控制字符
+|-
+| {{anchor|isgraph}}<code>[http://en.cppreference.com/w/c/string/byte/isgraph isgraph]</code>
+| {{anchor|iswgraph}}<code>[http://en.cppreference.com/w/c/string/wide/iswgraph iswgraph]</code>
+| 是否为图形字符（例如，空格、控制字符都不是）
+|-
+| {{anchor|isspace}}<code>[http://en.cppreference.com/w/c/string/byte/isspace isspace]</code>
+| {{anchor|iswspace}}<code>[http://en.cppreference.com/w/c/string/wide/iswspace iswspace]</code>
+| 是否为[[空格字符|空格字符]]（包括制表符、回车符、换行符等）
+|-
+| {{anchor|isblank}}<code>[http://en.cppreference.com/w/c/string/byte/isblank isblank]</code>
+| {{anchor|iswblank}}<code>[http://en.cppreference.com/w/c/string/wide/iswblank iswblank]</code>
+| 是否为[[空白字符|空白字符]] ([[C99|C99]]/[[C++11|C++11]]新增)（包括水平制表符）
+|-
+| {{anchor|isprint}}<code>[http://en.cppreference.com/w/c/string/byte/isprint isprint]</code>
+| {{anchor|iswprint}}<code>[http://en.cppreference.com/w/c/string/wide/iswprint iswprint]</code>
+| 是否为可打印字符
+|-
+| {{anchor|ispunct}}<code>[http://en.cppreference.com/w/c/string/byte/ispunct ispunct]</code>
+| {{anchor|iswpunct}}<code>[http://en.cppreference.com/w/c/string/wide/iswpunct iswpunct]</code>
+| 是否为标点
+|-
+| {{anchor|tolower}}<code>[http://en.cppreference.com/w/c/string/byte/tolower tolower]</code>
+| {{anchor|towlower}}<code>[http://en.cppreference.com/w/c/string/wide/towlower towlower]</code>
+| 转换为小写
+|-
+| {{anchor|toupper}}<code>[http://en.cppreference.com/w/c/string/byte/toupper toupper]</code>
+| {{anchor|towupper}}<code>[http://en.cppreference.com/w/c/string/wide/towupper towupper]</code>
+| 转换为大写
+|-
+| {{n/a}}
+| {{anchor|iswctype}}<code>[http://en.cppreference.com/w/c/string/wide/iswctype iswctype]</code>
+| 检查一个<code>wchar_t</code>是否是属于指定的分类
+|-
+| {{n/a}}
+| {{anchor|towctrans}}<code>[http://en.cppreference.com/w/c/string/wide/towctrans towctrans]</code>
+| 使用指定的变换映射来转换一个<code>wchar_t</code>（实际上是大小写的转换）
+|-
+| {{n/a}}
+| {{anchor|wctype}}<code>[http://en.cppreference.com/w/c/string/wide/wctype wctype]</code>
+| 返回一个宽字符的类别，用于<code>iswctype</code>函数
+|-
+| {{n/a}}
+| {{anchor|wctrans}}<code>[http://en.cppreference.com/w/c/string/wide/wctrans wctrans]</code>
+| 返回一个变换映射，用于 <code>towctrans</code>
+|}
+
+==参考文献==
+{{reflist}}
+
+== 外部链接 ==
+{{Wikibooks|A Little C Primer|C Character Class Test Library}}
+{{Wikibooks|C Programming|C character classification|C Programming/C Reference}}
+
+[[Category:C标准库头文件|V]]

@@ -1,0 +1,207 @@
+{{NoteTA
+|G1=IT
+}}
+'''统一诊断服务'''（{{lang-en|'''Unified Diagnostic Services'''}}，簡稱UDS）是[[車用電子|車用電子]]的通訊協定，是[[电子控制器|电子控制器]]（ECU）中設備診斷用的[[网络传输协议|网络传输协议]]，對應的標準是ISO 14229-1<ref>{{Cite web |url=https://www.iso.org/standard/72439.html |title=ISO 14229 |accessdate=2020-06-12 |archive-date=2020-03-03 |archive-url=https://web.archive.org/web/20200303094945/https://www.iso.org/standard/72439.html |dead-url=no }}</ref>。此標準是衍生自ISO 14230-3（[[KWP2000|KWP2000]]）以及目前已不使用的[[ISO_15765|ISO 15765]]-3 （[[控制器區域網路|控制器區域網路]]上的診斷通訊，DoCAN<ref>{{Cite web |url=https://www.iso.org/standard/33618.html |title=ISO 15765-3:2004 |accessdate=2020-06-12 |archive-date=2020-06-12 |archive-url=https://web.archive.org/web/20200612100920/https://www.iso.org/standard/33618.html |dead-url=no }}</ref>）。「统一诊断服务」中的「统一」是指此標準是國際性標準，不是特定公司的專用標準。目前所有一階供應商新生產的ECU都已支援此通訊協定，也已整合到其他標準中，例如[[AUTOSAR|AUTOSAR]]。現代汽車中的电子控制器控制了非常多的機能，包括[[燃料噴射裝置|燃料噴射裝置]]（EFI）、[[发动机控制器|发动机控制器]]、傳動、[[防鎖死剎車系統|防鎖死剎車系統]]（ABS）、門鎖、剎車、窗戶動作等。
+
+診斷工具可以連接車上所有支援统一诊断服务功能的电子控制器。車上常用的[[控制器區域網路|控制器區域網路]]只用到[[OSI模型|OSI模型]]的第一層及第二層，而统一诊断服务整合了OSI模型的第五層及第七層。服務識別碼（Service ID、SID）及服務相關的參數都放在8個位元組的訊息框內。
+
+現今的車輛有配合離線診斷的診斷介面，讓電腦或是診斷工具（作為測試設備）可以連接到汽車上的通訊系統。因此可以傳送统一诊断服务的請求到控制器，控制器必須回覆（可能是正面或是負面的回覆），這樣可以確認個別控制單元中的故障記憶體、更新控制單元的韌體、和硬體進行低階的互動（例如開啟或關閉特定的輸出）、或是進行特定的機能，目的是了瞭解電子控制器的環境或是操作條件，以[[診斷_(工程)|診斷]]故障或是不希望出現的行為。
+
+== 服務 ==
+{| Class = "wikitable sortable"
+|-
+! 功能群 !! 請求  SID !! 回覆  SID !! 服務 !! 說明
+|-
+| Rowspan = 11 | 診斷及通訊管理
+| Style = "text-align: center" | 0x10
+| Style = "text-align: center" | 0x50
+| 診斷會話控制<br/>Diagnostic Session Control
+| UDS會使用不同的會話（session），可以用診斷會話控制（Diagnostic Session Control）來切換。可用的服務會依照目前有效的會話而不同。在一開始，控制單元預設是在「預設會話」（Default Session），有定義其他的會話，需要實現的會話會依照設備的種類而不同。
+
+* 「程式會話」（Programming Session）可以用來上傳韌體到設備，並更新設備的韌體。
+* 「擴充診斷會話」（Extended Diagnostic Session）可解鎖特定的診斷功能，例如調整感測器等。
+* 「安全系統診斷會話」（Safety system diagnostic session）用來測試安全相關的診斷機能，例如安全氣囊的測試。
+
+此外，也有一些保留的會話識別符，為了汽車生產者及供應商的特殊需求而設計。
+|-
+| Style = "text-align: center" | 0x11
+| Style = "text-align: center" | 0x51
+| ECU重置<br/>ECU Reset 
+| ECU重置的服務是要重新啟動ECU。依照控制單元硬體以及實現方式的不同，有以下幾種不同的重置：
+
+* 「硬重置」模擬電源關閉的重置。
+* 「關閉鎖匙重置」模擬用鎖匙將汽車熄火，再開啟汽車的[[點火開關|點火開關]]。
+* 「軟重置」初始化特定程式單元以及儲存結構。
+
+也有一些汽車生產者及供應商定義的特殊數值。
+|-
+| Style = "text-align: center" | 0x27
+| Style = "text-align: center" | 0x67
+| 安全性存取<br/>Security Access
+| 可以用安全性檢查（Security check）來啟動大部份的安全關鍵性服務（security-critical services）。此情形下控制單元會傳送「密碼種子（seed）」到客戶端（電腦或是診斷工具）。客戶端再用密碼種子計算金鑰（key）送回控制單元，以此來解安全關鍵性服務
+|-
+| Style = "text-align: center" | 0x28
+| Style = "text-align: center" | 0x68
+| 通訊控制<br/>Communication Control 
+| 此服務可以關閉控制單元傳送以及接收訊息的功能。
+|-
+| Style = "text-align: center" | 0x29
+| Style = "text-align: center" | 0x69
+| 認證<br/>Communication Control 
+| 標準在2020年的更新版本，提供一種標準化的方式，可以提供一些安全性存取（0x27）服務無法支援的現代認證方式，包括以[[公開金鑰基礎建設|PKI]]為基礎的認證交換，以及雙向的[[身份驗證|驗證]]機制。
+|-
+| Style = "text-align: center" | 0x3E
+| Style = "text-align: center" | 0x7E
+| 測試者存在<br/>Tester Present
+| 若客戶端長時間沒有交換通訊資料，控制單元會自動離開目前的會話，回到「預設會話」，也可能會進入休眠模式。而此一服務的目的就是讓控制單元知道客戶端仍存在。
+|-
+| Style = "text-align: center" | 0x83
+| Style = "text-align: center" | 0xC3
+| 存取時序參數<br/>Access Timing Parameters
+| 在控制器及從機的通訊中，需要觀察一定的時間，若時間超過此限制，仍沒有送出訊息，就會假設連接已有問題。可以讀取及修改此時間。
+|-
+| Style = "text-align: center" | 0x84
+| Style = "text-align: center" | 0xC4
+| 安全資料傳輸<br/>Secured Data Transmission
+|
+|-
+| Style = "text-align: center" | 0x85
+| Style = "text-align: center" | 0xC5
+| 控制DTC設定<br/>Control DTC Settings
+| 啟動或關閉部份（或所有）錯誤的偵測。若診斷工作是在車內進行的，這個機能格外重要，因為診斷工作有可能造成部份零件的異常行為。
+|-
+| Style = "text-align: center" | 0x86
+| Style = "text-align: center" | 0xC6
+| 事件回覆<br/>Response On Event
+|
+|-
+| Style = "text-align: center" | 0x87
+| Style = "text-align: center" | 0xC7
+| 鏈結控制<br/>Link Control
+| 服務鏈結控制是用來設定診斷存取的位元率。多半只在中間閘道器上實現此一機能。
+|-
+| Rowspan = 7 | 資料傳輸
+| Style = "text-align: center" | 0x22
+| Style = "text-align: center" | 0x62
+| 根據識別碼讀取資料<br/>Read Data By Identifier
+| 透過此服務可以讀取控制單元中一個或多個的資料。這些資料的種類不限，也可以有不同的長度，例如料號或是軟體版本等。也可以讀取像是感測器狀態之類會變動的值。每一個值會對一個資料識別碼（Data Identifier、簡稱DID），數值從0到65535。會用正常的CAN信號來傳送特定ECU使用的資料。DID資料只用在資料請求上，也可以用一些沒有ECU使用的DID來傳送資訊，雖ECU不會使用，但服務工具或軟體測試程式可以使用這類的資訊。
+|-
+| Style = "text-align: center" | 0x23
+| Style = "text-align: center" | 0x63
+| 根據位址讀取記憶體<br/>Read Memory By Address
+| 依給定位址讀取實體記憶體中的值。測試工具可以用此機能來讀取軟體內部的行為。
+|
+|-
+| Style = "text-align: center" | 0x24
+| Style = "text-align: center" | 0x64
+| 根據識別碼讀取縮放比例資料<br/>Read Scaling Data By Identifier
+|
+|-
+| Style = "text-align: center" | 0x2A
+| Style = "text-align: center" | 0x6A
+| 周期性根據識別碼讀取資料<br/>Read Data By Identifier Periodic
+| 透過此服務可以讓控制單元週期性傳送資料。只能傳送透過「動態定義資料識別碼」定義的識別碼
+|-
+| Style = "text-align: center" | 0x2C
+| Style = "text-align: center" | 0x6C
+| 動態定義資料識別碼<br/>Dynamically Define Data Identifier
+| 此服務提供一個修正設備資料識別碼（DID）的方式，可以重新調整資料識別碼。這個通常是不同資料識別碼的組合，或者單純是所有DID的串接。
+
+請求資料可以依以下的原則規劃組態：
+
+* 原始資料識別碼、位置、長度（依位元組表示）、子功能位元組：defineByIdentifier
+* 記憶體位置、長度（依位元組表示）、子功能位元組：defineByMemoryAddress
+* 可以結合上述二種方式
+
+|-
+| Style = "text-align: center" | 0x2E
+| Style = "text-align: center" | 0x6E
+| 根據識別碼寫入資料<br/>Write Data By Identifier
+| 可以更改資料識別碼中的數值，命令中除了資料識別碼外，也要同時提供要修改的數值
+|-
+| Style = "text-align: center" | 0x3D
+| Style = "text-align: center" | 0x7D
+| 根據位址寫入到記憶體<br/>Write Memory By Address
+| 「根據位址寫入到記憶體」可以讓外面診斷工具寫資訊到ECU裡的特定位址，或特定的連續位址
+|-
+| Rowspan = 2 | 儲存資料傳送
+| Style = "text-align: center" | 0x14
+| Style = "text-align: center" | 0x54
+| 清除診斷資訊<br/>Clear Diagnostic Information
+| 清除已儲存的診斷問題碼（Diagnostic Trouble Code，簡稱DTC）
+|-
+| Style = "text-align: center" | 0x19
+| Style = "text-align: center" | 0x59
+| 讀取DTC資訊<br/>Read DTC Information
+| DTC是診斷問題碼。每一個DTC對應一個控制單元的故障，會以其編碼儲存在錯誤記憶體中，可以在任意時候讀取。除了錯誤外，也可能會記錄一些相關的資訊，也可以一併讀取。
+|-
+| 輸入／輸出控制
+| Style = "text-align: center" | 0x2F
+| Style = "text-align: center" | 0x6F
+| 根據識別碼的輸入／輸出控制<br/>Input Output Control By Identifier
+| 此服務可以讓外部系統介面透過診斷介面控制輸入／輸出信號
+
+透過設定選擇位元組，可以設定有關請求的特殊條件，可以設定以下的值：
+
+ReturnControlToECU：設備需將信號的控制權送回
+
+ResetToDefault：測試者試圖重置信號，回到系統的預設值
+
+Freeze Current State：設備需凍結目前的信號，不允許變化
+
+ShortTermAdjustment：設備需使用目前提供的信號值
+|-
+| 遠端啟動程序
+| Style = "text-align: center" | 0x31
+| Style = "text-align: center" | 0x71
+| 遠端控制<br/>Routine Control
+| 此控制服務程序可以進行各種的服務，有三種不同的信息種類：
+* 配合啟始信息，可以開始服務。可以定義此信息來確認要執行各動作，或是提示服務已經完成。
+* 配合停止信息，運行中的服務可以在任何時間下中斷。
+* 第三個選項是查詢服務狀態的信息
+可以特別標示啟始及結束的信息參數，因此可以實現每一種專案特定的服務。
+|-
+| Rowspan = 5 | 上傳／下載
+| Style = "text-align: center" | 0x34
+| Style = "text-align: center" | 0x74
+| 請求下載<br/>Request Download
+| 利用「請求下載」服務，可以下載新的軟體或是其他資料到控制單元內。需標示資料的位置以及長度，因此，控制器可以知道資料封包的大小。
+|-
+| Style = "text-align: center" | 0x35
+| Style = "text-align: center" | 0x75
+| 請求上傳<br/>Request Upload
+| 「請求上傳」服務和「請求下載」服務是類似的，此服務可以將控制單元的軟體傳送給測試者。也需標示資料的位置以及長度，測試者需指定資料封包的大小。
+|-
+| Style = "text-align: center" | 0x36
+| Style = "text-align: center" | 0x76
+| 傳送資料<br/>Transfer Data
+| 在真正傳送資料時，會用到此一服務，不論是上傳或是下載都是使用此一服務。傳送的方向則視之前是「請求上傳」服務或「請求下載」服務而不同。此一服務會用之前指定的最大封包長度傳送資料，若資料長度超過最大封包長度，需要用數個封包來傳送，直到傳送完成為止。
+|-
+| Style = "text-align: center" | 0x37
+| Style = "text-align: center" | 0x77
+| 請求結束傳送<br/>Request Transfer Exit
+| 可以用此服務中止資料傳送。此服務用在測試著和控制單元比較時。在執行時，控制單元可以負面回應來中止資料傳送請求。若指定的資料量還沒傳送完，也可以用此服務中止傳送。
+|-
+| Style = "text-align: center" | 0x38
+| Style = "text-align: center" | 0x78
+| 請求檔案傳送<br/>Request File Transfer
+| 此服務用來啟始客戶端到伺服器的檔案下載，或是伺服器到客戶端的檔案上傳。也可以提供一些檔案系統的相關資訊。
+|-
+|
+|
+| Style = "text-align: center" | 0x7F
+| 否定回應<br/>Negative Response
+| 此回應會在服務無法進行時回覆，例如不支援的資料識別符。此時會加上否定的回應碼。
+|}
+
+==相關條目==
+*[[車上診斷系統|車上診斷系統]]，廣義的車上診斷服務
+*[[OBD-II_PID|OBD-II PID]]，類似功能的美國標準
+
+==參考資料==
+{{REFLIST}}
+==外部链接==
+*[https://automotive.softing.com/fileadmin/sof-files/pdf/de/ae/poster/UDS_Faltposter_softing2016.pdf Unified Diagnostic Services - ISO 14229] {{Wayback|url=https://automotive.softing.com/fileadmin/sof-files/pdf/de/ae/poster/UDS_Faltposter_softing2016.pdf |date=20161120131351 }} (poster by softing.com)
+{{自動化通訊協定}}
+[[Category:汽车工程技术|Category:汽车工程技术]]
+[[Category:嵌入式系统|Category:嵌入式系统]]

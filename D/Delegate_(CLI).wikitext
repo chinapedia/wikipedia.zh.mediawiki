@@ -1,0 +1,101 @@
+{{noteTA
+|G1=IT
+}}
+'''委托'''（delegate）是一种类型安全的[[函数指针|函数指针]]，用于[[通用语言运行库|通用语言运行库]](CLI)。在[[C_Sharp|C#]]中，delegate是一种class，包装了一个或多个函数指针及绑定的类实例。Delegate用来实现函数回调与事件接收（event listener）。Delegate对象可以作为参数传递给其他函数，以引用（referenced）封装在delegate对象中的函数，而无需在编译时刻就绑定被调用函数。 <ref>{{cite web
+| url=http://www.sturmnet.org/blog/2005/09/01/delegate-interface-speed
+| title=Delegate calls vastly sped up in .NET 2
+| last=Sturm
+| first=Oliver
+| date=2005-09-01
+| accessdate=2007-09-09
+| archive-date=2011-07-27
+| archive-url=https://web.archive.org/web/20110727200054/http://www.sturmnet.org/blog/2005/09/01/delegate-interface-speed
+| dead-url=no
+}}</ref>
+
+一旦为委托分配了函数方法，委托将与该函数方法具有完全相同的行为。 与委托的'''[[类型特征|类型特征]]'''（由返回类型和参数组成）匹配的任何方法都可以分配给该委托。
+
+== C#例子 ==
+声明一个<code>delegate</code>类型，称作<code>SendMessageDelegate</code>, 以一个<code>Message</code>类型为参数，返回类型为<code>void</code>: 
+
+<syntaxhighlight lang=csharp>
+delegate void SendMessageDelegate(Message message);
+</syntaxhighlight>
+
+下述代码定义了一个函数，以一个实例化的delegate类型作为形参: 
+
+<syntaxhighlight lang=csharp>
+void SendMessage(SendMessageDelegate sendMessageDelegateReference)
+{
+  // call the delegate and any other chained delegates synchronously
+  sendMessageDelegateReference(new Message("hello this is a sample message"));
+}
+</syntaxhighlight>
+
+将要封装入delegate中的一个函数的定义：
+<syntaxhighlight lang=csharp>
+void HandleSendMessage(Message message)
+{
+  // the implementation for the Sender and Message classes are not relevant to this example
+  Sender.Send(message);
+}
+</syntaxhighlight>
+
+函数SendMessage，以SendMessageDelegate作为委托的实例作为实参： 
+<syntaxhighlight lang=csharp>
+SendMessage(new SendMessageDelegate(HandleSendMessage));
+</syntaxhighlight>
+
+委托实例可以封装多个函数：
+<syntaxhighlight lang=csharp>
+delegateType de1=fun1;
+delegateType de2=fun2;
+delegateType de3=de1+de2;//de3中有fun1、fun2两个函数的引用
+</syntaxhighlight>
+
+== 技术实现细节 ==
+“委托”作为类，继承自System.MulticastDelegate（抽象类）。“委托”至少0个参数，至多32个参数，可以无返回值，也可以指定返回值类型。可以认为包含：一个类对象实例的地址（Target属性），该类的一个方法的地址（Method属性），以及另一个“委托”实例的引用（reference）。因此引用一个“委托”对象，可能实际上引用了多个“委托”的实例。“委托”对象被调用时，依次调用里面的多个“委托”的实例。这对于[[事件驱动的程序|事件驱动的程序]]比较有用。  
+
+如果“委托”封装了一个静态函数，则其内部的绑定的类对象地址为null。
+
+可以通过Delegate类的GetInvocationList()取出这些委托，并查看其Target和Method属性，获取所引用的方法名等信息。
+==泛型委托==
+关键字<code>Action</code>定义了无返回值的泛型委托。<code>Action</code>从0个参数，至多16个参数。例如：
+ public Action<int> cwdelegate; //定义一个委托cwdelegate，参数是int，无返回值。
+ 
+关键字<code>Func</code>定义了有返回值的泛型委托。从0个参数，至多16个参数。其中最右侧的泛型类型是返回值类型。
+
+关键字<code>Predict</code>定义了返回值为bool的泛型委托。
+
+在委托实例前，不加event，那这个委托就是一个普通的委托，可以在别的函数中调用，也可以直接用对象调用。但加上event关键字之后，只能用成员函数调用
+
+==用途==
+一个常用的用途是事件处理。CLI定义了控件的标准的事件处理函数是一个“委托”，声明如下：
+<syntaxhighlight lang=csharp>
+ public delegate void EventHandler(object sender, EventArgs e)
+</syntaxhighlight>
+这里第一个参数是发出该事件的控件的基类型object；后一个参数是事件数据的基类型EventArgs。以Button控件类为例，它有一个属性Click，定义为一个EventHandle类型的delegate:
+<syntaxhighlight lang=csharp>
+ public event EventHandle Click;
+</syntaxhighlight>
+至此，我们对一个具体的button实例变量，可以给它的Click事件追加上一个或多个事件处理函数：
+<syntaxhighlight lang=csharp>
+ this.button1.Click += new System.EventHandler(this.button1_click);
+</syntaxhighlight>
+对于Visual Basic，上述语句的写法是：
+<syntaxhighlight lang="vb.net">
+ AddHandler button1.click, AddressOf button1_Click
+</syntaxhighlight>
+==参考文献==
+{{reflist}}
+
+== 外部链接 ==
+*[http://msdn2.microsoft.com/en-us/library/system.delegate.aspx MSDN documentation for Delegates]{{Wayback|url=http://msdn2.microsoft.com/en-us/library/system.delegate.aspx |date=20081201223025 }}
+*[http://net-informations.com/faq/net/delegates.htm Delegates with sample code]{{Wayback|url=http://net-informations.com/faq/net/delegates.htm |date=20140116134150 }}
+*[https://web.archive.org/web/20120627043929/http://java.sun.com/docs/white/delegates.html Sun's White Paper on Delegates]
+*[http://msdn.microsoft.com/en-us/vjsharp/bb188664.aspx Microsoft answer to Sun]{{Wayback|url=http://msdn.microsoft.com/en-us/vjsharp/bb188664.aspx |date=20090923235014 }}
+*[http://blog.monstuff.com/archives/000037.html Inner workings of Delegates]{{Wayback|url=http://blog.monstuff.com/archives/000037.html |date=20070918125945 }}
+*[http://perfectjpattern.sourceforge.net/dp-delegates.html PerfectJPattern Open Source Project]{{Wayback|url=http://perfectjpattern.sourceforge.net/dp-delegates.html |date=20120209140635 }}, Provides componentized i.e. context-free and type-safe implementation of the Delegates Pattern in Java
+ 
+[[Category:子程序|Category:子程序]]
+[[Category:.NET|Category:.NET]]

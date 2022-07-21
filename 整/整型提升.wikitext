@@ -1,0 +1,48 @@
+'''整型提升'''是[[C程序设计语言|C程序设计语言]]中的一项规定：在表达式计算时，各种整形首先要提升为int类型，如果int类型不足以表示则要提升为unsigned int类型；然后执行表达式的运算。<ref>[https://msdn.microsoft.com/en-us/library/fc9te331.aspx {{Wayback|url=https://msdn.microsoft.com/en-us/library/fc9te331.aspx |date=20141027021828 }} Integral promotion in [[MSDN|MSDN]]]</ref>
+
+这一规则是由C语言的发明人[[丹尼斯·里奇|丹尼斯·里奇]]与[[肯·汤普逊|肯·汤普逊]]创设的：<ref>[[Brian_Kernighan|Brian Kernighan]], [[Dennis_Ritchie|Dennis Ritchie]]: ''[[C程序设计语言_(书)|The C Programming Language]]''. Also known as "K&R C".  2nd ed., Prentice Hall 1988; ISBN 0-13-110362-8. </ref>
+{{quote|"A character, a short integer, or an integer bit-field, all either signed or not, or an object of enumeration type, may be used in an expression wherever an integer maybe used. If an int can represent all the values of the original type, then the value is converted to int; otherwise the value is converted to unsigned int. This process is called integral promotion."}}
+这段话的大意是：表达式中可以使用整数的地方，就可以使用枚举类型，或有符号或无符号的字符、短整数、整数位域。如果一个int可以表示上述类型，则该值被转化为int类型的值；否则，该值被转化为unsigned int类型的值。这一过程被称作integral promotion。
+
+整型提升的意义在于：表达式的整型运算要在CPU的相应运算器件内执行，CPU内整型运算器(ALU)的操作数的字节长度一般就是int的字节长度，同时也是CPU的通用寄存器的长度。因此，即使两个char类型的相加，在CPU执行时实际上也要先转换为CPU内整型操作数的标准长度。通用CPU（general-purpose CPU）是难以直接实现两个8比特字节直接相加运算（虽然机器指令中可能有这种字节相加指令）。所以，表达式中各种长度可能小于int长度的整型值，都必须先转换为int或unsigned int，然后才能送入CPU去执行运算。 
+
+C语言标准中仅规定了：
+ char的长度 ≤ short int的长度 ≤ int的长度
+这意味着short int与int的长度相等的可能。这种情形下，unsigned short就无法提升为int表示，只能提升为unsigned int。<ref>{{Cite web |url=http://stackoverflow.com/questions/10660758/integral-promotion |title=Integral promotion question in stackoverflow |access-date=2015-01-27 |archive-date=2016-05-31 |archive-url=https://web.archive.org/web/20160531130724/http://stackoverflow.com/questions/10660758/integral-promotion |dead-url=no }}</ref>
+
+示例程序如下：
+<source lang="c">
+#include <stdio.h>
+int main()
+{
+char a = 0xb6;
+short b = 0xb600;
+int c = 0xb6000000;
+
+if ( a == 0xb6)  printf("a");   
+if ( b == 0xb600) printf("b");  
+if ( c == 0xb6000000) printf("c");  
+}
+</source>
+在[[x86|x86]]架构上的[[Visual_C++|Visual C++]]或[[gcc|gcc]]编译下，上述程序输出为 c 。这是因为在这些环境下，[[编译器|编译器]]把char定义为signed char（C语言标准没有规定char类型是有符号还是无符号）；表达式<code>a==0xb6</code>被整型提升，其中char类型的a提升为int类型并为一个负值，因此这个表达式的结果为false；表达式<code>b==0xb600</code>被整型提升，其中short类型的b提升为int类型并为一个负值，因此这个表达式的结果为false；表达式<code>c == 0xb6000000</code>没有做整型提升，==运算符的两段都是int类型的负值，其结果为true。
+
+C语言的单操作数的+运算符（即“前缀+”），一个主要作用就是实现对操作数的整型提升。例如：
+<source lang="c">
+#include <stdio.h>
+int main()
+{
+ char a = 1; 
+
+ printf("%u", sizeof(a) );   
+ printf("\n");  
+ printf("%u", sizeof( +a ) );  
+}
+</source>
+在x86的32位gcc编译后，输出为：
+  1
+  4
+==参考文献==
+<references/>
+
+[[Category:C语言|Category:C语言]]
+[[Category:编程原则|Category:编程原则]]

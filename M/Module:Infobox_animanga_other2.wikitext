@@ -1,0 +1,38 @@
+local function _main(frame)
+    local args=frame:getParent().args
+
+    --local key_model="\n|-\n| style=\"background: #e6e9ff;\" nowrap | "
+    --local val_model="| "
+    local body_list={}
+    local entry={}
+    
+    local i=1
+    while true do--frame的args不是完全table实现，无法用#args查表长，只能死循环试探结束。
+        t_key=args['key'..i]
+        t_val=args['value'..i] or ""
+        
+        if (t_key~=nil) then   
+            t_item={
+                    ["key"]=t_key,
+                    ["val"]=t_val
+                    }
+            table.insert(entry,t_item)
+            i=i+1
+        else
+            break
+        end 
+    end    
+    
+    for k,v in ipairs(entry) do
+        local key=v.key
+        local val=v.val
+        
+        table.insert(body_list,frame:expandTemplate{ title = "Infobox_animanga/Item", args = {key,val} })
+    end   
+    
+    local out=table.concat(body_list,"")
+
+    return out;
+end 
+
+return {["main"]=_main}

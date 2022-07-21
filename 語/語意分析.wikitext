@@ -1,0 +1,57 @@
+{{disputed|time=2015-07-16T09:03:37+00:00}}
+'''語意分析'''（semantic analysis）技術是指將一長串的文字或內容，從其中分析出該個段落的摘要以及大意，甚至更進一步，將整篇文章的文意整理出來。此項技術可以應用在解讀影片、音訊等檔案，使得[[搜尋引擎|搜尋引擎]]能夠搜尋到文字以外的物件，方便使用者省去大量時間觀看影片、聆聽音訊，同時也可以幫助使用者提前了解影片與音訊的內容。
+
+語意分析技術在早期基於[[奇異值分解|奇異值分解]]（Singular Value Decomposition, SVD）、非負矩陣拆解法（Non-negative matrix factorization,NMF）等方式，近年來則有用各種型態的[[類神經網絡|類神經網絡]]（Neural Network, NN）來完成語意分析的目的。
+
+== 實作方式 ==
+
+===奇異值分解（Singular Value Decomposition, SVD） ===
+
+在線性代數的領域裡，'''奇異值分解'''（'''SVD'''）將一個大的矩陣拆解成三個小的矩陣。
+
+正常的情況下，將[[奇異值分解|奇異值分解]]（Singular Value Decompositiob, SVD）套用在一個{{math|''m''×''n''}}複數矩陣{{math|'''M'''}}，可以矩陣{{math|'''M'''}}表示為{{math|'''M''' {{=}} '''UΣV'''<sup>∗</sup>}}，其中{{math|'''U'''}}是{{math|''m''×''m''}}複數么正矩陣（unitary matrix），而{{math|'''Σ'''}}則是一個{{math|''m''×''n''}}的對角矩陣（diagonal matrix)，而在對角線上的所有直接為非負的值,{{math|'''V'''<sup>∗</sup>}}（共軛轉置矩陣（conjugate transpose matrix）{{math|'''V'''}},倘若所有元素皆為實數，則可視為{{math|'''V''的轉置矩陣'}}）則是一個{{math|''n''×''n''}}複數么正矩陣。在對角矩陣中，{{math|'''Σ'''<sub>''i'',''i''</sub>}} of {{math|'''Σ'''}}便是所謂的{{math|'''M'''}}的'''奇異值（singular value）'''。而{{math|'''U'''}}的{{mvar|m}}欄則被稱做是{{math|'''M'''}}的左奇異向量（left-singular vectors），{{math|'''V'''}}的{{mvar|n}}欄則被稱做是{{math|'''M'''}}的右奇異向量（right-singular vectors）。
+
+奇異值分解與特徵分解（eigendecomposition）實現息息相關，具體如下：
+:*  {{math|'''M'''}}的左奇異向量（left-singular vectors）是{{math|'''MM'''<sup>∗</sup>}}的特徵向量。
+:* {{math|'''M'''}}的右奇異向量（right-singular vectors）是{{math|'''M'''<sup>∗</sup>'''M'''}}的特徵向量。
+:* {{math|'''M'''}}的非零奇異值 (在{{math|'''Σ'''}}的對角列上)之平方根則是{{math|'''M'''<sup>∗</sup>'''M'''}} and {{math|'''MM'''<sup>∗</sup>}}共同的特徵值。
+
+透過SVD便可以將一個矩陣拆解成R（非負奇異值之數量）種不同的矩陣，每一種矩陣分別代表一種主題（topic），而相對應的奇異值越大則代表此種主題與原本的矩陣所代表的主題較為相關，越小則越非相關，由此我們可以得到簡單的語意分析。
+
+===非負矩陣拆解法（Non-negative matrix factorization,NMF） ===
+[[File:NMF.png|350px]]
+
+由於透過[[奇異值分解|奇異值分解]]（Singular Value Decompositiob, SVD）  存在一些缺點，因此使用非負矩陣拆解法（Non-negative matrix factorization,NMF）來得到更好的效果，首先，由於奇異值分解（Singular Value Decompositiob, SVD）所得到的左奇異向量（left-singular vectors）與右奇異向量（right-singular vectors）並無法保證皆為非負之數值，因此在衡量相關性上，負數可能並沒有直觀的物理意義。同時透過奇異值分解（Singular Value Decompositiob, SVD）  所產生的三個矩陣，在選擇過濾掉一些較小的奇異值後，在重新組合回來，會直接失去這些資訊，太過於武斷、直接的拆解方式，可能會導致部分訊息也因此而被移除了。因此使用非負矩陣拆解法（Non-negative matrix factorization,NMF）便能解決上述兩個問題。非負矩陣拆解法（Non-negative matrix factorization,NMF）將{{math|''m''×''n''}}的原始矩陣{{math|'''V'''}}拆解為{{math|''m''×''d''}}的{{math|'''W'''}}與{{math|''d''×''n''}}的{{math|'''H'''}}，其中的d便為給定的數值。與奇異值分解（Singular Value Decompositiob, SVD）的差別在於，非負矩陣拆解法（Non-negative matrix factorization,NMF）可以自訂分類的多寡，而將整個矩陣完整的分配到d種主題之中（topic），不若前者，若要取得d種主題，便會直接選取前d大的奇異值，將矩陣還原回來。而是將其妥善分配至各個主題中，使得最後的結果較為完整。
+
+===類神經網絡（Neural Network, NN） ===
+[[File:Colored_neural_network.svg|300px]]
+[[類神經網路|類神經網路]]係以一張有方向性的圖論模擬人類神經細胞之間的溝通關係。人類神經細胞從輸入到輸出，主要有三個部分，第一個部分為[[樹突|樹突]]，乃神經接受另一神經之訊號的所在之處，而神經本體則綜合輸入訊號之後產生一個輸出訊號，透過軸突將訊號往外傳出。這樣的架構，可以透過矩陣的建置來模擬出神經連結的情形。同時，透過建置矩陣模擬各個神經結之間相連的關係，透過給訂的輸入與輸出作為測資，不斷的優化各個節點之間的關係，直到輸入與輸出能夠互相吻合，達到此目標的類神經網絡模型便可作為一個語意分析器，只要輸入待測的資料，便可以得到一個系統分析之後預測的結果。相較於前述兩種方法，類神經網絡（Neural Network, NN）通常都可以得到較佳的結果。相關的理論自1980年便已經被提出，不過直至2010年後，硬體運算速度才足以在使用者可接受的時間內，產生出一個完整的結果，才使得類神經網絡（Neural Network, NN）開始蓬勃發展，同時也逐漸有些成果開花結果。
+
+====自動編碼器（Autoencoder） ====
+自動編碼器（Autoencoder）為類神經網絡（Neural Network, NN）的其中一種應用，目標在將大量的資量壓縮、分配至較小維度的向量之中。一般的類神經網絡（Neural Network, NN）需要確切的輸出與輸入才能建立出完整的類神經網絡（Neural Network, NN），因此常需要花大量的成本在建立足夠量的訓練用測資，而自動編碼器（Autoencoder）在訓練用測資的要求簡單的許多，由於其目標之特性是將大量的資量壓縮、分配至較小維度的向量，其輸入與輸出可以使用同一份資料，而在隱藏層（hidden layers）中，一層接著一層，逐漸縮小每個隱藏層（hidden layers）的層級數，直到需要的d種分類後，再逐漸擴展每個隱藏層（hidden layers）的維度，直到最後輸出與原本訓練用測資的維度。當經過足夠次數的迴圈後，必可以得到一個模型，使得輸入資料與輸出資料差異不大，此時，只要將前半段，輸入端至d維的隱藏層（hidden layers）切開並獨立出來，這份模型便可以作為語意分析器。
+
+== 應用 ==
+有鑒於社群平台的興盛，影片、聲音等多媒體資訊逐漸成為網路上常見的檔案形式，如何用低成本的方式解讀其中所擁有的資訊在未來會是一個日益重要的議題。傳統上，若要能夠提前理解一段聲音中所擁有的資訊，往往需要使用高成本人力事先解讀整段音訊後，在將其所見所聞轉換為文字檔，在影片、聲音等多媒體資訊日益興盛的現代，如此高成本的建置方式早已不敷使用。因此語意分析絕對有其必要性。
+
+而在人機介面上，裝置能夠解讀人類的訊息，並做出相對應的決策，亦可以增加人機之間溝通的效率。
+
+===語意分析的多種應用<ref>{{Cite web|title=大數據專題報導（三）：不是只有數字才是數據，語意分析讓電腦掌握文字背後的情感|url=https://scitechvista.nat.gov.tw/c/skew.htm|accessdate=|author=科技大觀園|date=2016-01-21|format=|work=|publisher=|language=|archive-date=2022-01-10|archive-url=https://scitechvista.nat.gov.tw/Article/C000003/detail?ID=7cd73506-3f63-42c5-ae5a-4dc049c4a7bd|dead-url=no}}</ref>===
+'''自動摘要'''：語意分析技術可找出文章中的重要字詞、摘要，讓人能短時間快速瞭解內文。 
+
+'''以文找文'''：語意分析能透過文章中的重要、關鍵字詞，進而並找出相關文章，Google新聞把相關性、類似的文章聚集，便是利用語意分析的技術。
+
+'''廣告信偵測'''：以 Gmail 為例，語意分析能判斷一封信中是否包含廣告信的常用字詞，協助信箱進行篩選。
+
+'''意見分析與情感分析'''：根據提到相關企業或產品的文章進行分析，篩選通篇文裡的正負面字詞，分析企業在網路上的口碑、評價，分析網友的觀點與情感。這項功能也能運用在企業客服中，偵測消費者的抱怨內容。
+
+'''寫作輔助'''：機器與人工能共同創作，語意分析技術能幫忙選詞、校正文法。
+
+'''電腦問答'''：如同 Siri，語意分析可應用在人工智能對話，協助使用者利用問答的方式找尋所需的資訊。
+
+'''文本標記/分類'''：過去研究單位在處理大量文本資料時，必須雇請大量的人力進行標記、分類，才能進行分析，但隨著資料處理的技術不斷革新，現在藉由[[機器學習|機器學習]]、[[深度學習|深度學習]]等，透過模型訓練後，自動對每篇文章分類、標記出其屬性詞彙<ref>{{Cite web |url=https://www.opview.com.tw/portfolio_item/20160831 |title=研究調查新利器，深度語意分析 |access-date=2019-12-11 |archive-date=2019-12-11 |archive-url=https://web.archive.org/web/20191211102454/https://www.opview.com.tw/portfolio_item/20160831 |dead-url=no }}</ref>。
+
+== 參考資料 ==
+<references />
+
+[[Category:語意|Category:語意]]
+[[Category:人工智能|Category:人工智能]]

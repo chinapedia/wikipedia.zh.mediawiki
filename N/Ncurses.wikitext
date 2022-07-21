@@ -1,0 +1,162 @@
+{{cleanup-jargon|time=2013-10-16T12:20:10+00:00}}
+{{refimprove|time=2013-10-16T12:20:10+00:00}}
+{{NoteTA
+ |1  = zh-cn:库;zh-tw:函式庫;
+ |2  = zh-cn:编程;zh-tw:程式;
+ |3  = zh-cn:克隆;zh-tw:複製品;
+ |G1 = IT
+ |G2 = FL
+}}
+{{lowercase}}
+{{Infobox software
+| name                   = ncurses
+| screenshot             = Linux-menuconfig.png
+| screenshot size        = 300px
+| caption                = 基于ncurses的{{le|menuconfig|Menuconfig}}
+| developer              = [[GNU计划|GNU计划]]
+| latest release version = 6.3
+| latest release date    = {{Release date and age|2021|11|08|df=yes}}
+| operating system       = [[POSIX|POSIX]]
+| genre                  = [[部件工具箱|部件工具箱]]
+| license                = [[MIT許可證|X11授權條款]]
+| website                = {{URL|https://invisible-island.net/ncurses/}}
+}}
+<tt>'''ncurses'''</tt>（'''n'''ew '''curses'''）是一个[[库_(计算机)|程序库]]，它提供了[[应用程序接口|API]]，可以允许程序员编写独立于终端的{{le|基于文本的用户界面|Text-based_user_interface}}。它是一个[[虚拟终端|虚拟终端]]中的“类[[图形用户界面|GUI]]”[[应用软件|应用软件]]工具箱。它还优化了屏幕刷新方法，以减少使用远程[[Unix_shell|shell]]时遇到的[[延迟_(工程学)|延迟]]。
+
+== 历史 ==
+'''n'''curses中的''n''来源于单词'''''n'''ew''。这是因为ncurses是System V第4.0版（SVr4）中<tt>[[curses_(库)|curses]]</tt>的[[自由软件|自由软件]]克隆, 而那又是停止开发的4.4 BSD curses的增强版。<ref name="ncurses Raymond"/>System V严格遵守了[[X/Open|X/Open]]发布的XSI Curses标准。
+
+=== curses ===
+{{main|Curses (库)}}
+
+1980年左右，加州大学伯克利分校为[[BSD|BSD]]操作系统开发了最初的curses库，以支持面向屏幕的游戏。它最初使用了[[termcap|termcap]]库，其他程序，如[[vi|vi]]编辑器中也使用了这个库。<ref name="ncurses Raymond">{{Cite web
+    |url=http://www.linuxjournal.com/article/1124
+    |title=ncurses: Portable Screen-Handling for Linux
+    |author=Eric S. Raymond
+    |publisher=Linux Journal
+    |date=September 1995
+    |accessdate=2013-05-10
+    |archive-date=2012-02-26
+    |archive-url=https://www.webcitation.org/65jfnrFoU?url=http://www.linuxjournal.com/article/1124
+    |dead-url=no
+    }}</ref>
+
+BSD curses库的成功促使贝尔实验室在他们的System III和System V第1版[[Unix|Unix]]系统中，发布增强的curses库。这个库功能更强大，而且它用[[terminfo|terminfo]]代替了termcap。然而，由于[[美国电话电报公司|AT&T]]的源代码分发政策，改进的curses库并没有被BSD社区广泛接受。<ref name="ncurses Raymond"/>
+
+=== pcurses ===
+约1982年时，帕维尔·柯蒂斯（Pavel Curtis）开发了贝尔实验室curses的[[免费软件|免费软件]]克隆，名为'''pcurses'''。它由其他人维护到了1986年。<ref name="ncurses Dickey">{{Cite web
+    |url=http://invisible-island.net/ncurses/
+    |title=NCURSES - New Curses
+    |author=Thomas E. Dickey
+    |date=December 1996
+    |accessdate=2013-05-10
+    |archive-date=2019-05-08
+    |archive-url=https://web.archive.org/web/20190508185622/https://invisible-island.net/ncurses/
+    |dead-url=no
+    }}</ref>
+
+=== ncurses ===
+1991年年底时，在Zeyd Ben-Halim的努力下，pcurses库得到了进一步改善。<ref name="ncurses Raymond"/><ref name="ncurses Dickey"/><ref>The [[README|README]] file in ncurses 1.8.1 states "v0.1 July 31, 1992" and "v1.8.1 November 5, 1993", which agrees with the [http://invisible-island.net/ncurses/NEWS.gz NEWS (changelog) file] {{Wayback|url=http://invisible-island.net/ncurses/NEWS.gz |date=20170613025220 }}</ref>
+1993年11月，新库以名字'''ncurses'''发布了，它的首个主版本为1.8.1。
+随后版本1.8.8（1995）的工作由[[埃里克·雷蒙|埃里克·雷蒙]]主导，他添加了Juergen Pfeifer编写的表单和菜单库。<ref>{{Cite web |url=http://invisible-island.net/ncurses/ncurses.faq.html#who_did_it |title=NCURSES - Frequently Asked Questions (FAQ): Who wrote NCURSES? |accessdate=2013-05-10 |archive-date=2018-08-21 |archive-url=https://web.archive.org/web/20180821220741/http://invisible-island.net/ncurses/ncurses.faq.html#who_did_it |dead-url=yes }}</ref>1996年起，它一直由[[Thomas_Dickey|Thomas E. Dickey]]维护。<ref name="ncurses Dickey"/>
+
+大多数ncurses调用可以很方便地移植到旧的curses上。只需[[编译器|重新编译]]，System V的curses实现就可以支持BSD的curses程序。<ref>{{Cite web |url=http://invisible-island.net/ncurses/hackguide.html#abstract |title=A Hacker's Guide to Ncurses Internals |accessdate=2013-05-10 |archive-date=2018-03-21 |archive-url=https://web.archive.org/web/20180321230408/http://invisible-island.net/ncurses/hackguide.html#abstract |dead-url=no }}</ref>然而，一些地方却存在问题，如在处理终端缩放上，因为旧的curses没有对应的功能。
+
+== 终端数据库 ==
+Ncurses可以使用[[terminfo|terminfo]]（与可扩展数据）或[[termcap|termcap]]。其它[[Curses_(库)|curses]]的实现一般使用terminfo；少数使用termcap。有极少数实现（mytinfo是一个时间较久的例外<ref>{{Cite web
+ |url         = http://www.isc.org/index.pl?/sources/utils/terminal/mytinfo.php
+ |author      = Ross Ridge
+ |title       = '''mytinfo''' posting to '''comp.sources.unix''' newsgroup
+ |publisher   = Internet Systems Consortium, Inc
+ |date        = December 27, 1992
+ |deadurl     = yes
+ |archiveurl  = https://web.archive.org/web/20110516153514/http://www.isc.org/index.pl?%2Fsources%2Futils%2Fterminal%2Fmytinfo.php
+ |archivedate = 2011年5月16日
+ |accessdate  = 2017年11月12日
+}}</ref>）都可以使用。
+
+== 许可 ==
+Ncurses是[[GNU计划|GNU计划]]的一部分。
+它是极少数不在[[GNU通用公共许可证|GNU GPL]]或[[GNU宽通用公共许可证|LGPL]]下分发的GNU文件；它是在一个类似于[[MIT许可证|MIT许可证]]的[[宽自由软件许可证|宽自由软件许可证]]下分发的。<ref name="Is it GPL">{{Cite web |url=http://invisible-island.net/ncurses/ncurses.faq.html#is_it_gpl |title=NCURSES - Frequently Asked Questions (FAQ): Is it GPL'd? |accessdate=2013-05-10 |archive-date=2018-08-21 |archive-url=https://web.archive.org/web/20180821220741/http://invisible-island.net/ncurses/ncurses.faq.html#is_it_gpl |dead-url=yes }}</ref>
+这是由于在开发者指定版权时，协议是由[[自由软件基金会|自由软件基金会]]起草的。
+
+在签署协议以将权利交给FSF时，有条款写道：
+<blockquote>
+The Foundation promises that all distribution of the Package, or of any work "based on the Package", that takes place under the control of the Foundation or its agents or assignees, shall be on terms that explicitly and perpetually permit anyone possessing a copy of the work to which the terms apply, and possessing accurate notice of these terms, to redistribute copies of the work to anyone on the same terms.<ref name="Is it GPL"/>
+</blockquote>
+<blockquote>
+本基金会承诺，在本基金会、或其控制的代理人或受让人中，所分发的任何本软件包，或“基于本软件包”的任何作品，应在条款中明确，永久允许任何人拥有一份适用此条款的作品副本，且在条款中明确声明，以相同条款重分发此作品。
+</blockquote>
+
+据维护者Thomas E. Dickey说，这排除了以任何版本的GPL重授权程序，因为它会对链接到这个库的程序产生限制。<ref name="Is it GPL"/>
+
+== 使用ncurses的程序 ==
+有成百的程序使用ncurses。<ref>{{Cite web
+ |url         = http://freshmeat.net/search/?q=ncurses&section=projects&Go.x=0&Go.y=0
+ |title       = Search results: +ncurses
+ |publisher   = freshmeat.net
+ |deadurl     = yes
+ |archiveurl  = https://web.archive.org/web/20120218074708/http://freshmeat.net/search/?q=ncurses&section=projects&Go.x=0&Go.y=0
+ |archivedate = 2012-02-18
+ |accessdate  = 2013-05-10
+}}</ref><ref>{{Cite web
+   |url=http://www.ohloh.net/tags/ncurses
+   |title=Projects tagged ‘ncurses’
+   |publisher=ohloh
+   |accessdate=2013-05-10
+   |archive-date=2013-05-15
+   |archive-url=https://web.archive.org/web/20130515124809/http://www.ohloh.net/tags/ncurses
+   |dead-url=yes
+   }}</ref>一些程序，如[[GNU_Screen|GNU Screen]]和[[w3m|w3m]]，只使用termcap接口执行屏幕管理。另一些，如[[Midnight_Commander|GNU Midnight Commander]]和[[YaST|YaST]]，使用curses编程接口。
+
+== 参见 ==
+{{Portal|自由软件}}
+
+* [[SMG$|SMG$]]。[[OpenVMS|OpenVMS]]中可用的屏幕管理[[应用程序接口|库]]。
+* [[conio.h|conio]]。一个C头文件，用于在MS-DOS编译器中创建文本用户界面。
+* [[Curses_Development_Kit|Curses Development Kit]]
+* [[Dialog_(软件)|Dialog (软件)]]
+
+== 参考资料 ==
+{{Reflist}}
+
+== 外部链接 ==
+<!-- This list is excessive. It needs to be simplified or included in the article -->
+* {{Official website|http://www.gnu.org/software/ncurses/ncurses.html}}
+* [http://invisible-island.net/ncurses/ncurses.faq.html NCURSES — Frequently Asked Questions (FAQ)]{{Wayback|url=http://invisible-island.net/ncurses/ncurses.faq.html |date=20180821220741 }}，Thomas Dickey
+
+=== 编程介绍 ===
+* “[http://invisible-island.net/ncurses/ncurses-intro.html Writing Programs with NCURSES]{{Wayback|url=http://invisible-island.net/ncurses/ncurses-intro.html |date=20130425070129 }}”，[[埃里克·雷蒙|埃里克·雷蒙]]和[[Zeyd_M._Ben-Halim|Zeyd M. Ben-Halim]]
+* [http://tldp.org/HOWTO/NCURSES-Programming-HOWTO/ ncurses Programming HOWTO]{{Wayback|url=http://tldp.org/HOWTO/NCURSES-Programming-HOWTO/ |date=20130501101147 }}（[http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/pdf/NCURSES-Programming-HOWTO.pdf PDF版本]{{Wayback|url=http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/pdf/NCURSES-Programming-HOWTO.pdf |date=20130513004829 }}）
+* [https://web.archive.org/web/20130605233520/http://writeka.com/ed/ncurses_library.html ncurses Beginner's Tutorial]
+* [http://invisible-island.net/ncurses/hackguide.html A Hacker's Guide to NCURSES]{{Wayback|url=http://invisible-island.net/ncurses/hackguide.html |date=20180321230408 }}
+
+=== 工具箱 ===
+* [http://ndk-xx.sourceforge.net/ NDK++]{{Wayback|url=http://ndk-xx.sourceforge.net/ |date=20130327025851 }} C++开发工具包
+
+=== 语言绑定 ===
+* [http://invisible-island.net/ncurses/Ada95.html '''Ada95'''绑定]{{Wayback|url=http://invisible-island.net/ncurses/Ada95.html |date=20130303080109 }}
+* [[:sourceforge:projects/curses-sharp/|'''C#'''绑定]]
+* [http://common-lisp.net/project/cl-ncurses/ ANSI '''Common Lisp'''绑定]{{Wayback|url=http://common-lisp.net/project/cl-ncurses/ |date=20130122085726 }}
+* [https://web.archive.org/web/20130313160546/http://www.freepascal.org/packages/ncurses.html '''Free Pascal'''绑定]
+* [https://web.archive.org/web/20121226064552/http://logik.li/projects/gocurses '''Go'''绑定]
+* [http://www.gnu.org/software/guile-ncurses/ GNU '''Guile'''绑定]{{Wayback|url=http://www.gnu.org/software/guile-ncurses/ |date=20130510113031 }}
+* [http://hackage.haskell.org/cgi-bin/hackage-scripts/package/hscurses/ '''Haskell'''绑定]{{Wayback|url=http://hackage.haskell.org/cgi-bin/hackage-scripts/package/hscurses/ |date=20120212082858 }}
+* [[:sourceforge:projects/javacurses/|'''Java'''绑定]]
+* [http://SpiderApe.sourceforge.net/plugins/ncurses/ '''JavaScript'''绑定]{{Wayback|url=http://spiderape.sourceforge.net/plugins/ncurses/ |date=20200804105810 }}
+* [http://www.t2-project.org/packages/lua-curses.html '''Lua'''绑定]{{Wayback|url=http://www.t2-project.org/packages/lua-curses.html |date=20130521050936 }}
+* [http://github.com/mscdex/node-ncurses/ '''Node.js'''绑定]{{Wayback|url=http://github.com/mscdex/node-ncurses/ |date=20140802143108 }}
+* [http://search.cpan.org/~giraffed/Curses-1.28/ '''Perl'''绑定]{{Wayback|url=http://search.cpan.org/~giraffed/Curses-1.28/ |date=20130301050440 }}
+* [http://www.php.net/manual/en/ref.ncurses.php '''PHP'''终端屏幕控制功能]{{Wayback|url=http://www.php.net/manual/en/ref.ncurses.php |date=20130424130722 }}
+** [https://web.archive.org/web/20130803010851/http://devzone.zend.com/173/using-ncurses-in-php/ 在PHP中使用Ncurses]
+* [https://web.archive.org/web/20080914134336/http://docs.python.org/lib/module-curses.html '''Python'''绑定]
+* [https://web.archive.org/web/20121014012701/http://ncurses-ruby.berlios.de/ '''Ruby'''模块]
+
+=== 分发和-{zh-hans:包;zh-hant:封裝}- ===
+* [http://gnuwin32.sourceforge.net/packages/ncurses.htm Ncurses package for Windows]{{Wayback|url=http://gnuwin32.sourceforge.net/packages/ncurses.htm |date=20130309045725 }} – [[GnuWin32|GnuWin32]]
+
+[[Category:GNU计划软件|Category:GNU计划软件]]
+[[Category:Ncurses|]]
+[[Category:使用MIT许可证的软件|Category:使用MIT许可证的软件]]
+[[Category:用C編程的自由軟體|Category:用C編程的自由軟體]]
+[[Category:C函式庫|Category:C函式庫]]

@@ -1,0 +1,253 @@
+在[[电子学|电子学]]中，'''二极体模型'''指的是用于近似的真实二极体的实际行为，以便计算和电路分析的数学模型。[[二极体|二极体]]的[[电压|伏]][[电流|安]]曲线是[[非线性|非线性]]的 ([[肖克利二极体方程|肖克利二极体定律]]可以很好地描述这一特性). 这种非线性让涉及二极体的电路计算起来相当复杂，
+所以通常需要更简单的模型。
+
+本文讨论[[PN结|PN结]]二极体的建模，但该技术可以被推广到其它[[固态电子器件|固态]]二极体。
+
+==大信号模型==
+
+===肖克利二极体模型===
+[[肖克利二极体方程|肖克利二极体方程]]建立了[[PN结|PN结]]二极体的电流<math>I</math>和电压<math>V_D</math> 的关系。这个关系是在二极体的''伏安特性''：
+
+::<math>I=I_S\left(e^{V_D/(nV_T)}-1\right)</math>,
+
+其中<math>I_S</math>是二极体的[[饱和电流|饱和电流]] 或''界电流''  （其大小为电压<math>V_D</math>在负方向超过<math>V_T</math>的几倍时流过电流的大小，通常为10 <sup>-12</sup> A）。反向饱和电流正比于二极体的横截面面积。其余符号的意思： <math>V_ T</math>是热电压 （ <math>kT/q</math> ，在常温下大约是26 mV），而<math>n</math>被称为二极体理想因子（对于硅二极体<math>n</math>约是1~2）。
+
+当<math>V_D\gg nV_ T</math>时，该公式可以简化为：
+
+::<math>I \approx I_S \cdot e^{V_D/(nV_T)}</math>.
+
+然而这个表达式只是更复杂的伏安特性的近似。在超浅结的情况下适用性特别受到限制，对于这种情况有更好的分析模型存在。<ref name=Popadic>.
+{{cite journal
+|doi=10.1109/TED.2008.2009028
+|last1=Popadic
+|first1=Miloš
+|last2=Lorito
+|first2=Gianpaolo
+|last3=Nanver
+|first3=Lis K.
+|title=Analytical Model of I – V Characteristics of Arbitrarily Shallow p-n Junctions
+|year= 2009 
+|pages=116–125
+|volume=56
+|journal=IEEE Transactions on Electron Devices 
+|url=http://ieeexplore.ieee.org/search/srchabstract.jsp?arnumber=4717238&isnumber=4723893&punumber=16&k2dockey=4717238@ieeejrns&query=%28+%28%28electron+devices%29%3Cin%3Emetadata+%29+%3Cand%3E+%28%28popadic%29%3Cin%3Emetadata+%29+%29&pos=0&access=no
+}}
+</ref>
+
+====二极体 - 电阻器电路的例子====
+为了说明在使用该法的复杂性，考虑求图1中二极体两端的电压这个问题。
+
+[[File:Diode_Modelling_Image2.svg|frame]]
+
+因为流过二极体的电流与流过整个电路的是相同的电流，我们可以列另一个方程。通过[[基爾霍夫電路定律#基爾霍夫電流定律|基尔霍夫定律]]知道，流过电路的电流
+
+::<math>I= \frac{V_S-V_D}{R}  </math>.
+ 
+这两个方程可以确定二极体的电流和二极体的电压。为了求解这两个方程，我们可以把第二个方程的<math>I</math>代入第一个方程，然后尝试重新整理所得的方程来得到<math>V_D</math>关于<math>V_S</math>的函数。这种方法的一个困难是，在二极体定律是非线性的，可以使用[[朗伯W函数|朗伯W函数]] 得到一个不涉及<math>V_D</math>的直接用<math>V_S</math>表示<math>I</math>的式子。
+
+=====顯式解=====
+將<math>V_D=V_S-IR</math>帶入第一式
+
+::<math>I=I_S\left(e^\frac{V_S-IR}{nV_T}-1\right)</math>.
+
+將其以[[朗伯W函数|朗伯W函数]]的形式<math>we^w</math>整理後得:
+
+::<math>  \frac{(I+I_S)R}{nV_T} e^{\frac{(I+I_S)R}{nV_T}} = \frac {I_S R}{n V_T} e^\frac{V_S+I_S R}{nV_T} </math>
+
+對上式使用[[朗伯W函数|朗伯W函数]]，依其性質<math>W(we^w)=w</math>將左式轉換:
+
+::<math>  W\left(\frac{(I+I_S)R}{nV_T} e^{\frac{(I+I_S)R}{nV_T}}\right) = \frac{(I+I_S)R}{nV_T} = W\left(\frac {I_S R}{n V_T} e^\frac{V_S+I_S R}{nV_T}\right) </math>
+
+整理後可得二極體電流:
+
+::<math> I= \frac{nV_T}{R} W\left(\frac {I_S R}{n V_T} e^\frac{V_S+I_S R}{nV_T}\right) - I_S </math>,
+
+確定電流後就可以知道二極體的電壓:
+
+::<math> V_D=V_S+I_SR-nV_T W\left(\frac {I_S R}{n V_T} e^\frac{V_S+I_S R}{nV_T}\right) </math>.
+
+在導通的情況下 <math>V_S \gg I_sR</math> 且 <math>I \gg I_S</math>，二極體的電壓與電流可近似成
+
+::<math> I \approx \frac{nV_T}{R} W\left(\frac {I_S R}{n V_T} e^\frac{V_S}{nV_T}\right)</math>,
+
+::<math> V_D \approx V_S-nV_T W\left(\frac {I_S R}{n V_T} e^\frac{V_S}{nV_T}\right) </math>.
+
+當<math> x </math>很大時，可以被近似為<math>W(x)=\ln x-\ln\ln x+o(1)</math>。對於常見的物理參數和電阻而言，<math>\frac{I_S R}{n V_T} e^{V_s/(n V_T)}</math>通常在10<sup>40</sup>左右。
+
+電流位於<math>d^3 I/d {V_S}^3=0</math>處有一個轉折點。在<math>V_S</math>小於此點時為一條接近<math>I=0</math>的水平線；<math>V_S</math>大於此點時則會變成斜率為<math>1/R</math>的斜直線。
+
+此時的<math> W\left(\frac {I_S R}{n V_T} e^\frac{V_S+I_S R}{nV_T}\right)=\frac{1}{2}</math>，計算後得:
+
+::<math> V_S=nV_T ln\left(\frac {\sqrt{e}}{2} \frac {n V_T}{I_S R}\right)-I_S R \approx nV_T ln\left(\frac {n V_T}{I_S R}\right) </math>。
+
+<!--
+=====Iterative solution=====
+The diode voltage <math>V_D</math> can be found in terms of <math>V_S</math> for any particular set of values by an [[iterative_method|iterative method]] using a calculator or computer <ref name=Sedra2>.
+{{cite book 
+|author=A.S. Sedra and K.C. Smith
+|title=Microelectronic Circuits 
+|year= 2004 
+|edition=Fifth 
+|publisher=Oxford 
+|location=New York 
+|isbn=0-19-514251-9 
+|pages=Example 3.4 p. 154 
+|url=http://worldcat.org/isbn/0195142519 
+|nopp=true}}
+</ref> The diode law is rearranged by dividing by <math>I_S</math>, and adding 1. The diode law becomes
+
+::<math>\frac {I}{I_S}+1=e^{V_D/(nV_T)}</math>.
+
+By taking natural logarithms of both sides the exponential is removed, and the equation becomes
+
+::<math>\frac{V_D}{nV_T} = \ln \left(\frac {I}{I_S}+1\right)  </math>.
+
+For any <math>I</math>, this equation determines <math>V_D</math>. However, <math>I</math> also must satisfy the Kirchhoff's law equation, given above. This expression is substituted for <math>I</math> to obtain
+
+::<math>\frac{V_D}{nV_T} = \ln \left(\frac {(V_S-V_D)/R}{I_S}+1\right)  </math>,
+
+or
+
+::<math>V_D = nV_T \ln \left(\frac {V_S-V_D}{R I_S}+1\right)  </math>.
+
+The voltage of the source <math>V_S</math> is a known given value, but <math>V_D</math> is on both sides of the equation, which forces an iterative solution: a starting value for <math>V_D</math> is guessed and put into the right side of the equation. Carrying out the various operations on the right side, we come up with a new value for <math>V_D</math>. This new value now is substituted on the right side, and so forth. If this iteration ''converges'' the values of <math>V_D</math> become closer and closer together as the process continues, and we can stop iteration when the accuracy is sufficient. Once <math>V_D</math> is found, <math>I</math> can be found from the Kirchhoff's law equation.
+
+Sometimes an iterative procedure depends critically on the first guess. In this example, almost any first guess will do, say <math>V_D = 600\,\mathrm{mV}</math>. Sometimes an iterative procedure does not converge at all: in this problem an iteration based on the exponential function does not converge, and that is why the equations were rearranged to use a logarithm. Finding a convergent iterative formulation is an art, and every problem is different.
+-->
+
+=====图解法=====
+图解分析法是一种简单的方法来得出一个数值解描述了二极体的[[超越函數|超越]]方程。与大多数图解法一样，它具有简单、可视化的优点。通过绘制在''伏安'' 曲线，因此能够得到的近似解的精度的任意程度。这个过程就是前面两种方法的图形等价，更适合于计算机实现。
+
+这种方法在图上绘制两个电流 - 电压方程，两条曲线的交点同时满足这两个方程，从而得出流过电路的电流和二极体两端的电压的值。下图演示了这种方法。
+
+[[File:Diode_Modelling_Image3.jpg|thumb]]
+
+===分段线性模型===
+在实践中，图形方法对于复杂电路是复杂且不切实际的。二极体的另一种建模方法被称为'''分段线性'''  （PWL） '''模型'''  。在数学上，这意味着把一个函数分解成若干直线段。这个方法用一系列线性段来近似二极体特性曲线。模型将真正的二极体表示为3部分串联：理想二极体、电压源和[[電阻器|电阻器]] 。下图显示了一个真正的二极体的伏安曲线被近似为两段分段线性模型。通常会选择与二极体曲线相切于[[Q点|Q点]]（静态工作点）的倾斜线段。于是该线的斜率可以通过在Q点的二极体的小信号电阻的倒数给出。
+
+[[File:Diode_Modelling_Image10.jpg|thumb]]
+
+====数学理想化二极体====
+首先，让我们考虑一个数学理想化二极体。在这样一种理想的二极体中，如果二极体被反向偏置时，流过它的电流是零。这个理想二极体开始导通，在0 V和为任意的正电压无限流过电流，二极体的作用类似于短路。一个理想二极体的伏安特性如下所示：
+
+[[File:Diode_Modelling_Image5.png|thumb]]
+
+====与电压源串联的理想二极体====
+现在让我们考虑添加一个以如下方式与二极体串联的电压源的情况：
+
+[[File:Diode_Modelling_Image6.jpg|thumb]]
+
+理想的二极体正向偏置时是短路，而反向偏置时形成开路。
+如果上述二极体的[[陽極|阳极]]连接到0V，[[陰極|阴极]]处的电压将为''Vt'' ，那么阴极电位会高于阳极电位，二极体会被反向偏置。为了让该二极体导通，阳极上的电压应取''Vt'' 。这个电路近似了存在于真实二极体的导通电压（也成开启电压）。该电路组合起来的伏安特性如下所示：
+
+[[File:Diode_Modelling_Image8.png|thumb]]
+
+肖克莱二极体模型可以用于估算<math>V_t</math>的近似值。
+
+::<math>I = I_S \left( e^{V_D/(n \cdot V_T)}-1 \right) \Leftrightarrow</math>
+::<math>\ln \left( 1 + \frac{I}{I_S} \right) = \frac{V_D}{n \cdot V_T} \Leftrightarrow</math>
+::<math>V_D = n \cdot V_T \ln\left(1+\frac{I}{I_S}\right) \approx n \cdot V_T \ln \left( \frac{I}{I_S} \right)  \Leftrightarrow</math>
+::<math>V_D \approx n \cdot V_T \cdot \ln{10} \cdot \log_{10}{\left( \frac{I}{I_S} \right)}
+</math>
+
+使用<math>n = 1</math>和<math>T = 25 \,^\circ\!\text{C}</math> ：
+::<math>V_D \approx 0.05916 \cdot \log_{10}{\left( \frac{I}{I_S} \right)}</math>
+
+饱和电流在室温下的典型值是：
+*<math>I_S = 10^{-12}</math>硅二极体;
+*<math>I_S = 10^{-6}</math>锗二极体。
+
+由于<math>V_D</math>会随着<math>\frac{I}{I_S}</math>的对数变化而变化，在这个比值变化比较大的时候<math>V_D</math>的值变化非常小。利用10为底的对数可以更容易地
+看出数量级的差异。
+
+对于1.0 mA的电流：
+*硅二极体的<math>V_D \approx 0.53 V</math>（9个数量级）；
+*锗二极体的<math>V_D \approx 0.18 V</math>（3个数量级）。
+
+对于100 mA的电流：
+*硅二极体的<math>V_D \approx 0.65 V</math>（11个数量级）;
+*锗二极体的<math>V_D \approx 0.30 V</math>（5个数量级）。
+
+常用的硅二极体的值为0.6或0.7伏特<ref name="Kal"> 。
+{{cite book
+  | last = Kal
+  | first = Santiram
+  | title = Basic Electronics: Devices, Circuits and IT Fundamentals
+  | chapter = Chapter 2
+  | year = 2004
+  | publisher = Prentice-Hall of India Pvt.Ltd
+  | isbn = 81-203-1952-4
+  | edition = Section 2.5: Circuit Model of a P-N Junction Diode }}</ref>
+
+====二极体与电压源和限流电阻====
+
+需要做的最后一件事是用一个电阻来限制电流，如下图所示：
+
+[[File:Diode_Modelling_Image9.jpg|thumb]]
+
+最终电路的''伏安'' 特性如下：
+
+[[File:Diode_Modelling_Image11.png|thumb]]
+
+真正的二极体，现在可以被替换的组合理想二极体、电压源和电阻器，然后就可以仅仅使用线性元素对电路建模。如果倾斜线段与真实二极体曲线相切于[[Q点|Q点]]，该近似电路具有与在Q点（静态工作点）的真实二极体相同的[[小信号模型|小信号]]电路。
+
+==== 雙PWL二極體模型/三線段線性模型 ====
+
+當對二極體的導通特性需要更加精確的模型時，可以將兩個PWL模型並聯，以更準確的對單個二極體建模。
+
+[[File:Diode_2piece_linear_model.png|thumb]]
+
+[[File:PWL_diode_characteristic.PNG|thumb]]
+
+[[File:Piecewise_diode_vs_shockley1.PNG|thumb]]
+<br clear="all" />
+
+==小信号模型==
+
+===电阻===
+
+运用肖克莱方程，可以导出二极体在某工作点（[[Q点|Q点]]）的小信号二极体电阻<math>r_D</math>，其中的直流偏置电流为<math>I_Q</math>和Q点施加的电压<math>V_Q</math> 。 <ref name="jaeger">{{cite book | title = Microelectronic Circuit Design | edition= second | author = R.C. Jaeger and T.N. Blalock | publisher = McGraw-Hill | year = 2004 | isbn = 0-07-232099-0 | url = http://books.google.com/?id=u6vH4Gsrlf0C&pg=PA883&dq=%22Microelectronic+Circuit+Design%22+inauthor:Jaeger+small-signal+diode }}</ref> 首先，可以算出二极体''的小信号电导''  <math>g_D</math>，也就是二极体两端的电压的变化较小时引起的二极体电流的变化，除以电压的变化量为：
+
+::<math> g_D=\frac{\mathrm{d}I}{\mathrm{d}V}\Big|_Q = \frac{I_s}{V_T} e^{V_Q/V_T}  \approx \frac{I_Q}{V_T} </math>.
+
+上式中最后的近似是由于假定偏置电流<math>I_Q</math>足够大，可以使的肖克莱二极体方程的括号内的系数1忽略不计。这种逼近即使在相当低的电压时也是准确的，因为在300K的[[热电压|热电压]] <math>V_T \approx 25\,\mathrm{mV}</math>，所以<math>V_Q/V_T</math>就会比较大，这意味着该指数函数是非常大的。
+
+注意到小信号电阻<math>r_D</math>是刚才得到的小信号电导的倒数，二极体的电阻是独立于交流电流的，但却取决于直流电流，写作
+
+::<math>r_D=\frac {n \cdot V_T}{I_Q}</math>.
+<!--
+===Capacitance===
+
+The charge in the diode carrying current <math>I_Q</math> is known to be
+
+:<math>Q=I_Q\tau_F +Q_J</math>,
+
+where <math>\tau_F</math> is the forward transit time of charge carriers:<ref name=jaeger></ref> The first term in the charge is the charge in transit across the diode when the current <math>I_Q</math> flows. The second term is the charge stored in the junction itself when it is viewed as a simple [[capacitance|capacitor]]; that is, as a pair of electrodes with opposite charges on them. It is the charge stored on the diode by virtue of simply having a voltage across it, regardless of any current it conducts.
+
+In a similar fashion as before, the diode capacitance is the change in diode charge with diode voltage:
+
+::<math> C_D = \frac{dQ}{dV_Q} =\frac{dI_Q}{dV_Q} \tau_F + \frac {dQ_J}{dV_Q} \approx \frac {I_Q}{V_T} \tau_F+ C_J </math>,
+
+where <math> C_J = \begin{matrix}\frac {dQ_J}{dV_Q}\end{matrix}</math> is the junction capacitance and the first term is called the [[diffusion_capacitance|diffusion capacitance]], because it is related to the current diffusing through the junction.
+
+== Variation of Forward Voltage with Temperature ==
+
+The above equation has an exponential of  <math>V_D/(kT/q)</math>, which would lead one to expect that the forward-voltage increases with temperature. In fact, this is generally not the case: As temperature rises, the saturation current <math>I_S </math> rises, and this effect dominates. So as the diode becomes ''hotter'', the forward-voltage (for a given current) ''decreases''. 
+
+Here is some detailed experimental [http://www.cliftonlaboratories.com/1n400x_diode_family_forward_voltage.htm#Forward_Drop_versus_Temperature_and_Current experimental data], which shows this for a 1N4005 silicon diode. In fact, some silicon diodes are used as temperature sensors, for example the CY7 series ([http://www.omega.com/Temperature/pdf/CY7.pdf datasheet]) has a forward voltage of 1.02V in liquid nitrogen (77K), 0.54V at room temperature, and 0.29V at 100 degC.
+
+In addition there is a small change of the material parameter bandgap with temperature. 
+For LEDs, this bandgap change also changes their colour: they move towards the blue end of the spectrum when cooled.
+
+Since the diode forward-voltage drops as its temperature rises,  this can lead to [[Thermal_runaway|thermal runaway]], especially in bipolar-transistor circuits, where a change in bias leads to an increase in power-dissipation, which in turn changes the bias even further.
+-->
+
+==参考文献==
+{{reflist}}
+
+==参见==
+* [[雙極性晶體管|晶体三极体]]
+* {{link-en|半导体器件建模|Semiconductor device modeling}}
+
+[[Category:電子設計|Category:電子設計]]
+[[Category:电子器件建模|Category:电子器件建模]]

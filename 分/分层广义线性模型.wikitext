@@ -1,0 +1,86 @@
+
+在[[统计学|统计学]]中，'''分层广义线性模型'''（hierarchical generalized linear models (HGLM)）可视为[[广义线性模型|广义线性模型]]的推广。在广义线性模型中，误差分量是[[统计独立性|统计独立的]]，<ref>{{cite book|title=Generalized Linear Models|year=1989|publisher=Chapman and Hall/CRC|isbn=0-412-31760-5}}</ref> 然而这一假设并非总是成立的。即在有些情况下，[[误差|误差]]项之间有函数关系。分层广义线性模型允许有不同的误差分量，误差分量可以统计[[相關_(概率論)|相關]]的，并不必要满足[[正态分布|正态分布]]。当有不同的[[聚类分析|聚类]]存在时，同一聚类中的观测值是相关的，并且是正相关的。在这种情况下，广义线性模型是不适用的，忽略这些关联会引起造成一些问题<ref name=CDA>{{cite book|last=Agresti|first=Alan|title=Categorical Data Analysis|year=2002|publisher=John Wiley & Sons, Inc.|location=Hoboken, New Jersey|isbn=0-471-36093-7}}</ref>  。
+
+==概论==
+===模型===
+在分层模型中，观测值可进行聚类，并且观测值的分布不仅由所有聚类的共同结构决定，也由聚类的具体结构决定。于是，模型要引入随机效应分量，并且不同的聚类有不同的随机效应分量。设<math>y</math>为响应变量，<math>u</math>为随机效应，<math>g</math> 为连结函数。在分层广义线性模型中，需要假设<math>y|u</math> 和 <math>u</math>满足：<ref name=paper1996></ref> <math> 
+y\mid u \sim\ f(\theta,\,\phi)
+</math> and <math>
+u \sim\ f_u(\alpha).
+</math>
+
+线性预测器形式为：
+
+: <math>
+g(E(y)) = g(\mu) = \eta = X \beta + v \,
+</math>
+其中，<math> \mu = E(y)  </math>，  <math> \eta = X \beta + v  </math>， <math>v = v(u)</math> 为<math>u</math>的严格[[单调函数|单调函数]]。在分层广义线性模型中，固定效应为<math> \beta </math>，对所有观测值都相同。随机分量<math>u</math> 是不可观测的，不同聚类对应的随机分量取值是随机的。于是，同一聚类的观测值对应的<math>u</math>的取值相同，不同聚类的观测值对应的<math>u</math>的取值也不同。<ref name=CDA></ref>
+
+===可识别性===
+为了进行参数推断，有必要保证满足{{link-en|可识别性|Identifiability}}<ref name=identifiability>{{cite journal|coauthors=Elizabeth S. Allman, Catherine Matias, and John A. Rhodes|title=Identifiability of Parameters in Latent Structure Models with Many Observed Variables|journal=The Annals of Statistics|year=2009|volume=Vol. 37, No. 6A,|pages=3099–3132|arxiv=0809.5032|bibcode=2008arXiv0809.5032A|author1=Allman|first1=Elizabeth S.|last2=Matias|last3=Rhodes|doi=10.1214/09-AOS689|issue=6A}}</ref> 。在以上模型中，v是不可识别的，因为
+
+: <math>
+X \beta + v = (X \beta + a) + (v - a) \,
+</math>
+其中<math>a</math>为常数。<ref name=paper1996></ref> 要使模型可识别，需要对参数另加约束。约束常加在随机效应上，比如<math>E(v)=0</math>。<ref name=paper1996></ref>
+===不同分布函数和链接函数的模型===
+假设不同的分布函数<math>y\mid u</math>  和 <math>u</math>，采用不同的链接函数<math>g</math> 和 '<math>v</math>，可以得到不同的模型。另外，{{link-en| 广义线性混合模型|generalized linear mixed model}}是分层广义线性模型的一个特例。在分层广义线性模型中， 随机效应的分布函数<math>u</math>不必要满足正态分布。如果<math>u</math>的分布为正态分布，<math>v</math>的链接函数为[[恆等函數|恆等函數]]，此时的分层广义线性模型即为广义线性混合模型。<ref name=paper1996></ref> 
+
+<math>y\mid u</math> 和<math>u</math>的分布可取为共轭分布，此时分层广义线性模型有一些特殊的性质，并且易于计算和理解<ref name=paper1996></ref>。比如，如果<math>y\mid u</math> 的分布为平均值一定的[[泊松分布|泊松分布]]，<math>u</math>的分布为[[伽玛分布|伽玛分布]]，并取标准对数连接函数，则此时分层广义线性模型为泊松共轭分层广义线性模型。如果<math>y\mid u</math>的分布为平均值一定的[[二项分布|二项分布]]，<math>u</math> 的分布为共轭[[贝塔分布|贝塔分布]]，采用标准罗吉特连接函数，则此时分层广义线性模型为贝塔共轭模型。另外，广义线性混合模型其实就是正态共轭分层广义线性模型。<ref name=paper1996>{{cite journal|authors=Y. Lee and J. A. Nelder|title=Hierarchical Generalized Linear Models|journal=Journal of the Royal Statistical Society, Series B|year=1996|volume=Vol. 58, No. 4|pages=619–678|jstor=2346105}}</ref>  
+
+常见的模型总结如下：<ref>{{cite journal|authors=Lars Rönnegård, Xia Shen and Moudud Alam|title=hglm: A Package for Fitting Hierarchical Generalized Linear Models|journal=The R Journal|date=Dec 2010|volume=Vol. 2/2}}</ref>  
+{| class="wikitable" style="background:white;"
+|+ Commonly used models 
+! 模型名字 !! y的分布 !! y 和 u的连接函数 !! u的分布 !!  u 和 v 的连接函数
+|-
+| 正态共轭 
+| [[正态分布|正态分布]] || [[恒等函数|恒等函数]]
+| [[正态分布|正态分布]] || [[恒等函数|恒等函数]]
+|-
+| 二项共轭
+| [[二项分布|二项分布]] || {{link-en|邏吉特函數|logit|罗吉特}}
+| [[贝塔分布|贝塔分布]] || {{link-en|邏吉特函數|logit|罗吉特}}
+|-
+| 泊松共轭
+| [[泊松分布|泊松分布]] || [[对数|对数]]
+| [[伽玛分布|伽玛分布]] || [[对数|对数]]
+|-
+| 伽玛共轭
+| [[伽玛分布|伽玛分布]] || [[倒数|倒数]]
+| [[逆伽玛分布|逆伽玛分布]] || [[倒数|倒数]]
+|-
+| 二项GLMM
+| [[二项分布|二项分布]] || {{link-en|邏吉特函數|logit|罗吉特}}
+| [[正态分布|正态分布]] || [[恒等函数|恒等函数]]
+|-
+| 泊松 GLMM
+| [[泊松分布|泊松分布]] || [[对数|对数]]
+| [[正态分布|正态分布]] || [[恒等函数|恒等函数]]
+|-
+| 伽玛 GLMM
+| [[伽玛分布|伽玛分布]] || [[对数|对数]]
+| [[正态分布|正态分布]] || [[恒等函数|恒等函数]]
+|}
+
+==拟合==
+分层广义线性模型适用条件是观测值可归为不同的聚类。[[估计函数|估计函数]]有两类：固定效应估计函数和随机效应估计函数，分别相应于 <math>
+\eta = \mathbf{x}\boldsymbol\beta
+ </math> 
+和 <math>
+\mathbf{v(u)}
+ </math> 中的参数。有多种方法进行分层广义线性模型中的[[参数估计|参数估计]]。如果只对固定效应估计函数感兴趣，可以采用总体平均模型。如果要推断个体，就需要估计随机效应。<ref name=CDA></ref> 拟合分层广义线性模型有多种技术。
+
+==应用==
+分层广义线性模型在实际生活中有诸多应用。
+===工程===
+这一模型可用于分析半导体制造中相互关联的过程形成的负载的层级过程<ref name=engg>{{cite journal|author1=Naveen Kumar|author2 = Christina Mastrangelo|author3=Doug Montgomery|title=Hierarchical Modeling Using Generalized Linear Models|journal=Quality and Reliability Engineering International|year=2011}}</ref><ref>{{cite journal|author1 = Chung Kwan Shin |author2 = Sang Chan Park|title=A machine learning approach to yield management in semiconductor manufacturing|journal=International Journal of Production Research|year=2000|volume=38|pages=4261–4271|doi=10.1080/00207540050205073|issue=17}}</ref>。工程师可以应用此模型发现和分析重要的次过程，同时评估这些次过程对最终性能的影响 <ref name=engg></ref>。
+
+
+===商业===
+市场问题也可以用分层广义线性模型来分析。研究者应用此模型研究了一国范围内的消费者，以解决国际市场研究中的嵌套数据结构问题<ref name=mktresearch>{{cite journal|coauthors=Burcu Tasoluk, Cornelia Dröge, Roger J. Calantone|title=Interpreting interrelations across multiple levels in HGLM models: An application in international marketing research|journal=International Marketing Review|year=2011|volume=Vol. 28 Iss: 1,|pages=pp. 34–56|url=http://www.emeraldinsight.com/journals.htm?articleid=1911622&show=abstract|doi=10.1108/02651331111107099|last1=Tasoluk|first1=Burcu}}</ref>。
+
+==参考文献==
+{{reflist}}
+
+[[Category:回归分析|Category:回归分析]]
+[[Category:统计模型|Category:统计模型]]

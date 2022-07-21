@@ -1,0 +1,98 @@
+{{多個問題|
+{{Inappropriate tone|time=2016-05-20T12:02:59+00:00}}
+{{unreferenced|time=2015-06-28T13:23:15+00:00}}
+{{cleanup-jargon}}
+}}
+==非累贅取樣編碼法==
+以下將探討兩類'''非累贅取樣編碼法'''：多項式預測器及多項式內插法
+
+多項式預測器所採取的方法是：測試下一個取樣看看他是不是落在一個n次多項市所展開的範圍內。最常被使用的是0次及1次多項式。著名的串長編碼(run-length coding)則是0次多項式的一個特別版本。
+
+多項式內插法與多項式預測器類似，唯一的不同是他允許的機動的改變其所展開的範圍。一次多項式內插法，又名善行演算法，是用許多線段來取代原波形。
+
+=== 多項式預測器 ===
+
+非累贅取樣壓縮法中多項是預測器算是相當早期的發明。早在60年代早期便有許多論文在討論他並且實際應用在許多實驗上，其中在常被使用到的是0階預測器及1階預測器。
+
+在多項式預測器裡，下一個取樣被預測是在一個n次多項式的範圍內。數學上我們可以表示如下，其中<math>\hat{x}_t</math>表示所預測的下一個取樣值，<math>x_{t-i}</math>為<math>x_t</math>之前的第<math>i</math>個取樣
+
+
+                               </big>'''<math>\hat{x}_t=x_{t-1}+{\Delta}x_{t-1}+{\Delta}^2x_{t-1}+\ldots\ldots+{\Delta}^nx_{t-1}\ldots\ldots\ldots\ldots\ldots(a)</math>式'''</big>
+
+其中
+
+                               <math>{\Delta}x_{t-1}=x_{t-1}-x_{t-2}</math>
+                               <math>{\Delta}x_{t-2}=x_{t-2}-x_{t-3}</math>
+
+以此類推，並且
+
+                               <math>{\Delta}^nx_{t-1}={\Delta}^{n-1}x_{t-1}-{\Delta}^{n-1}x_{t-2}</math>
+
+我們可以看出，不同階次的多項式會產生不同的預測值。如果下一個取樣值落在n次多項式之預測值得附近，那麼他將會被認為是多餘的、累贅的而不會被送出，否則他會被認為是非累贅取樣而將其送出。
+
+以下我們將更詳細的介紹多項是預測器中最常見的兩種：0次預測器及1次預測器。
+
+==== 0次預測器 ====
+
+0次預測器的式子為：
+
+                               <math>\hat{x}_t=x_{t-1}</math>
+
+換句話說，我們預測下一個取樣值是和前一個取樣值一樣。在實際的設計上，我們得在這個預測值的上下個加上一個誤差容忍範圍，亦即<math>\hat{x}_t</math>這個預測值並不是單一個<math>\hat{x}_{t-1}</math>值，而是介於<math>\hat{x}_{t-1}-\lambda</math>到<math>\hat{x}_{t-1}+\lambda</math>的一個範圍，其中<math>\lambda</math>的值由設計人自行根據能容許的誤差程度及所需要的壓縮比來設定。只要<math>x_t</math>是落在<math>(x_t-\lambda,x_{t-1}+\lambda)</math>這個範圍之內，<math>x_t</math>便會被當成是累贅取樣。
+
+以下為0次預測器之演算法：
+<br />
+'''演算法：0次預測器'''
+
+''第一步：''儲存便傳送第一個取樣<math>x_1</math>：<math>i</math>←<math>1</math>；<br />
+''第二步：''讀入下一個取樣，<math>x_{+1}</math><br />
+''第三步：''如果<math>x_{t-1}-\lambda<x_{t+1}<x_{t-1}+\lambda</math>則<math>i</math>←<math>i+1</math>；回到第二步；否則儲存並傳送<math>(i+1,x_{i+1})</math>；<math>i</math>←<math>i-1</math>；回到第二步；<br />
+
+==== 1次預測器 ====
+
+一次預測器的式子為：
+
+                               <math>\hat{x}_t=x_{t-1}+{\delta}x_{t-1}</math>
+
+其中<math>{\delta}x_{t-1}=x_{t-1}-x_{t-2}</math>。請注意，<math>{\delta}x_{t-1}</math>可以解釋為<math>x_{t-1}</math>與<math>x_{t-2}</math>所構成之線段的斜率(相鄰兩個取樣之間隔為1，因使分母可以省略)。一次預測器因此可以解釋為"假設斜率固定"。
+
+實際上的演算法也必須加上一個誤差容忍範圍<math>\lambda</math>。
+<br />
+'''演算法：1次預測器'''
+
+''第一步：''儲存便傳送第一個取樣<math>x_1</math>：<math>i<-1</math>；<br />
+''第二步：''儲存並傳送第二個取樣，<math>x_2</math>；<br />
+''第三步：''如果<math>n\leftarrow{1}</math>；<math>j<i+1</math>；讀入下一取樣<math>x_j</math>；<br />
+''第三步：''若<math>x_{i+1}+n\times(x_{i+1}-x_i)-\lambda<x_j<x_{i+1}+n\times(x_{i+1}-x_i)+\lambda</math>，則<br />          
+<math>n\leftarrow{n+1}</math>；<math>j\leftarrow{j+1}</math><br />
+讀入下一個取樣<math>x_j</math>並回到第四步；<br />
+否則<br />
+儲存並傳送<math>x_i</math>及其發生時間；<br />
+儲存並傳送<math>x_{j+1}</math>；<br />
+<math>i\leftarrow{j}</math>回到第三步；
+
+=== 多項式內插法 ===
+
+我們也討論0次與1次的內插法。0次內插法與0次預測器除了前者的<math>\lambda</math>可以改變外，其餘完全一樣。機動性調整<math>\lambda</math>值可以讓累贅取樣更多。
+
+一次內插法又稱為扇形演算法(fan algorithm)，從60年代被提出以來即受到很大的注意，也有很多成功的應用。基本上他和一次預測器類似。不同的是他的<math>\lambda</math>值根據取樣的情況而改變。
+
+<br />
+'''演算法：扇形演算法'''
+
+''第一步：''<math>i\leftarrow{1}</math>；<math>j\leftarrow{2}</math>；<br />
+設定第一個取樣<math>x_i</math>為非累贅取樣：
+''第二步：''以<math>x_i</math>為心向<math>x_i+\lambda</math>及<math>x_i-\lambda</math>展開一扇形；<br />
+''第三步：''如果<math>n\leftarrow{1}</math>；<math>j<i+1</math>；讀入下一取樣<math>x_j</math>；<br />
+''第三步：''若<math>x_{j+1}</math>落在扇形內，則，則<br />
+<math>i\leftarrow{j}</math>；<br />
+回到第二步；<br />
+否則；<br />
+設定<math>x_j</math>為非累贅取樣；
+<math>i\leftarrow{j}</math>；<math>j\leftarrow{i+1}</math>；<br />
+回到第二步；<br />
+''第四步：''重複以上的步驟直到編碼完所有取樣點；<br />
+''第五步：''送出每個非累贅取樣及其發生時間；<br />
+''第六步：''接收端收到非累贅取樣後以線段將相鄰之非累贅取樣連起來即可。<br />
+
+[[Category:编码理论|Category:编码理论]]

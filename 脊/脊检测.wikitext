@@ -1,0 +1,140 @@
+{{TA
+|G1=IT
+|G2=Math
+}}
+{{FeatureDetectionCompVisNavbox}}
+
+'''脊检测'''（{{lang-en|Ridge detection}}）為試圖尋找相片中的脊的位置之方法。在[[數學|數學]]及[[電腦視覺|電腦視覺]]等領域中，一個雙變數[[光滑函數|光滑函數]]的脊（或是稱作為脊集合）是所有至少在一個維度中是[[局部最大值|局部最大值]]的點所形成的曲線的集合，就如同地理上山脊的概念。而一個<math>N</math>變數函數的脊，是所有在<math>N-1</math>個維度中是[[局部最大值|局部最大值]]的點所形成的曲線的集合。脊可以看作是[[極值|局部最大值]]的延伸。相對的，一個函數的谷可以以類似的方式定義，只要以[[局部最小值|局部最小值]]取代脊定義中的局部最大值的部份。
+
+脊集合與谷集合表現了一個函數直覺上的幾何資訊，因此可以提供一種對於函數特徵的簡潔呈現。[[圖像分析|圖像分析]]及[[電腦視覺|電腦視覺]]為了獲得相片中物件延伸特性的資訊，利用了脊集合與谷集合的特性而有脊检测及谷检测。相關的應用像是在[[分水嶺_(演算法)|分水嶺]]演算法中被使用以進行[[圖像分割|圖像分割]]，或是利用相片中的脊與谷去計算物件可能的形狀等等。此種幾何資訊的表示方式，若只有進行單一尺度的計算，容易會受到雜訊的干擾。根據[[尺度空間|尺度空間]]理論，多重尺度的脊與谷可以透過相片經過[[高斯金字塔|高斯金字塔]]的預先處理獲得，藉此應該可以產生對於物件更穩定的描述。
+
+==二維相片中單一尺度的脊與谷的微分幾何定義==
+
+令 <math>f(x, y)</math>為一個二維函數，而<math>L</math>為<math>f(x, y)</math>的[[尺度空間|尺度空間表示]]，此種表示可以透過<math>f(x, y)</math>與高斯函數的[[摺積|摺積]]獲得。
+
+在單一尺度下，高斯函數中的<math>t</math>為一定值。
+:<math>g(x, y, t) = \frac{1}{2 \pi t} e^{-(x^2+y^2)/2t}</math>.
+透過旋轉的方式，可以找到一組直角座標<math>(p,q)</math>使得 <math>L_{pq} = 0</math>，其中的方向導數運算子，
+:<math>\partial_p = \sin \beta \partial_x - \cos \beta \partial_y, \partial_q = \cos \beta \partial_x + \sin \beta \partial_y </math>
+進一步帶入[[海森矩陣|海森矩陣]]中。
+:<math>H = \begin{bmatrix}
+L_{xx} & L_{xy} \\  
+L_{xy} & L_{yy}
+\end{bmatrix} = \begin{bmatrix}
+\sin \beta & -\cos \beta \\  
+\cos \beta & \sin \beta
+\end{bmatrix}\begin{bmatrix}
+L_{pp} & L_{pq} \\  
+L_{pq} & L_{qq}
+\end{bmatrix}\begin{bmatrix}
+\sin \beta & \cos \beta \\  
+-\cos \beta & \sin \beta
+\end{bmatrix}
+</math>
+不難看出<math>L_{pp}, L_{qq}</math>即為海森矩陣的[[特徵值|特徵值]]，而旋轉矩陣的旋轉角度可以由海森矩陣的[[特徵向量|特徵向量]]所決定。
+:<math>\cos \beta = \sqrt{\frac{1}{2} \left( 1 + \frac{L_{xx}-L_{yy}}{\sqrt{(L_{xx}-L_{yy})^2 + 4 L_{xy}^2}} \right)}</math>,<math> \sin \beta = \sgn(L_{xy}) \sqrt{\frac{1}{2} \left( 1 - \frac{L_{xx}-L_{yy}}{\sqrt{(L_{xx}-L_{yy})^2 + 4 L_{xy}^2}} \right)} </math>.
+有了恰當的旋轉後，便可以正式的定義函數<math>f(x, y)</math> 在單一尺度下的脊，脊包含所以符合以下條件的點。
+<ref>{{cite journal
+| author=T. Lindeberg
+| title=Scale-space
+| journal=Encyclopedia of Computer Science and Engineering (Benjamin Wah, ed), John Wiley and Sons
+| volume=IV
+| pages=2495–2504
+| year=2008/2009
+| doi=10.1002/9780470050118.ecse609
+| url=http://www.nada.kth.se/~tony/abstracts/Lin08-EncCompSci.html
+| access-date=2015-07-01
+| archive-date=2019-09-07
+| archive-url=https://web.archive.org/web/20190907121454/http://www.nada.kth.se/~tony/abstracts/Lin08-EncCompSci.html
+| dead-url=no
+}}</ref>
+:<math>L_{p} = 0, L_{pp} \leq 0, |L_{pp}| \geq |L_{qq}|.</math>
+相對應的谷，谷包含所有符合以下條件的點。
+:<math>L_{q} = 0, L_{qq} \geq 0, |L_{qq}| \geq |L_{pp}|.</math>
+相似的，也可以將座標旋轉，使得新座標<math>(u, v)</math>中，<math>v</math>的方向平行相片的梯度，而<math>u</math>的方向垂直相片的梯度。
+:<math>\partial_u = \sin \alpha \partial_x - \cos \alpha \partial_y, \partial_v = \cos \alpha \partial_x + \sin \alpha \partial_y </math>
+此時的旋轉角度為，
+:<math>\cos \alpha = \frac{L_x}{\sqrt{L_x^2 + L_y^2}},  \sin \alpha = \frac{L_y}{\sqrt{L_x^2 + L_y^2}} </math>
+以下的定義可以被證明與前述的是等價的<ref>{{cite journal |author=Lindeberg, T |title=Scale-space theory: A basic tool for analysing structures at different scales |journal=J. of Applied Statistics |volume=21 |issue=2 |pages=224–270 |year=1994 |url=http://www.nada.kth.se/~tony/abstracts/Lin94-SI-abstract.html |doi=10.1080/757582976 |access-date=2015-07-01 |archive-date=2019-09-07 |archive-url=https://web.archive.org/web/20190907133258/http://www.nada.kth.se/~tony/abstracts/Lin94-SI-abstract.html |dead-url=no }}</ref> 
+:<math> L_{uv} = 0, L_{uu}^2 - L_{vv}^2 \geq 0 </math>
+其中
+:<math>L_v^2 L_{uu} = L_x^2 L_{yy} - 2 L_x L_y L_{xy} + L_y^2 L_{xx},</math>
+:<math>L_v^2 L_{uv} = L_x L_y (L_{xx} - L_{yy})  - (L_x^2 - L_y^2) L_{xy}, </math>
+:<math>L_v^2 L_{vv} = L_x^2 L_{xx} + 2 L_x L_y L_{xy} + L_y^2 L_{yy} </math>
+由<math>L_{uu}</math>的正負號決定一個點是脊或是谷，<math>L_{uu}<0</math>是脊而<math>L_{uu}>0</math>是谷.
+
+==計算二維相片在變化尺度下的脊==
+
+單一尺度脊的主要問題是對於雜訊非常敏感，實驗證實尺度的選擇需要特別的調整才能得到一組能夠反應相片中結構的脊。為了在缺乏過往經驗時處理這個問題，而有了'''尺度空間脊'''的概念，此時尺度大小這個變數被當作是脊定義的固有特性，尺度可以在尺度空間中變化。此種概念使得尺度可以被自動的調整到反應相片結構的大小，以下有多種方法皆是基於此。
+
+令<math>R(x, y, t)</math>為一個描述脊強度的函數（底下有詳細定義）。則對於一個二維相片，尺度空間脊包含所有符合以下條件的點，
+:<math>L_{p} = 0, L_{pp} \leq 0, \partial_t(R) = 0,  \partial_{tt}(R) \leq 0,</math>
+其中 <math>t</math> 為[[尺度空間|尺度空間表示]]中的尺度. 相似的，'''尺度空間谷'''包含所有符合以下條件的點，
+:<math>L_{q} = 0, L_{qq} \geq 0, \partial_t(R) = 0,  \partial_{tt}(R) \leq 0.</math>
+
+如此定義下，可以想像尺度空簡脊為三維空間中一些一維曲線的集合（原本相片的二維加上尺度空間一維），而最後呈現的脊便是這些曲線在相片平面上的投影。
+
+當初Lindeberg (1996, 1998)<ref>{{cite journal |doi=10.1023/A:1008097225773 |author=Lindeberg, T. |title=Edge detection and ridge detection with automatic scale selection |journal=International Journal of Computer Vision |volume=30 |issue=2 |pages=117–154 |year=1998 |url=http://www.nada.kth.se/cvap/abstracts/cvap191.html |access-date=2015-07-01 |archive-date=2006-07-09 |archive-url=https://web.archive.org/web/20060709044024/http://www.nada.kth.se/cvap/abstracts/cvap191.html |dead-url=no }} Earlier version presented at IEEE Conference on Pattern Recognition and Computer Vision, CVPR'96, San Francisco, California, pages 465–470, june 1996</ref> 提出了尺度空間脊時，他考慮了三個描述脊強度的函數。
+
+*主曲率
+::<math>L_{pp, \gamma-norm} = \frac{t^{\gamma}}{2} \left( L_{xx}+L_{yy} - \sqrt{(L_{xx}-L_{yy})^2 + 4 L_{xy}^2} \right)</math>
+*特徵值差的平方經<math>\gamma</math>-標準化後的平方
+::<math>N_{\gamma-norm} = \left( L_{pp, \gamma-norm}^2 - L_{qq, \gamma-norm}^2 \right)^2 = t^{4 \gamma} (L_{xx}+L_{yy})^2 \left( (L_{xx}-L_{yy})^2 + 4 L_{xy}^2 \right). </math>
+*特徵值差經<math>\gamma</math>-標準化後的平方
+::<math>A_{\gamma-norm} = \left( L_{pp, \gamma-norm} - L_{qq, \gamma-norm} \right)^2 = t^{2 \gamma} \left( (L_{xx}-L_{yy})^2 + 4 L_{xy}^2 \right). </math>
+
+<math>L_{pp, \gamma-norm}</math>是一個通用性的描述函數，常被用在血管偵測及道路提取等應用中，而<math>A_{\gamma-norm}</math>則被用在指紋的增強<ref>{{cite journal |author=Almansa, A., Lindeberg, T. |title=Fingerprint Enhancement by Shape Adaptation of Scale-Space Operators with Automatic Scale-Selection |journal=IEEE Transactions on Image Processing |volume=9 |issue=12 |pages=2027–42 |year=2000 |url=http://www.nada.kth.se/cvap/abstracts/cvap226.html |pmid=18262941 |doi=10.1109/83.887971 |access-date=2015-07-01 |archive-date=2019-09-07 |archive-url=https://web.archive.org/web/20190907134031/http://www.nada.kth.se/cvap/abstracts/cvap226.html |dead-url=no }}</ref>，即時手部追蹤及手勢辨識<ref>{{Cite web |url=http://www.nada.kth.se/cvap/abstracts/BreLapLin-FG02.html |title=L. Bretzner, I. Laptev and T. Lindeberg: Hand Gesture Recognition using Multi-Scale Colour Features, Hierarchical Models and Particle Filtering, Proc. IEEE Conference on Face and Gesture 2002, Washington DC, 423–428. |access-date=2015-07-01 |archive-date=2019-07-22 |archive-url=https://web.archive.org/web/20190722174219/http://www.nada.kth.se/cvap/abstracts/BreLapLin-FG02.html |dead-url=no }}</ref>，以及利用局部影像統計偵測追蹤影像或影片中的人。<ref>{{cite journal |author=Sidenbladh, H., Black, M. |title=Learning the statistics of people in images and video |journal=International Journal of Computer Vision |volume=54 |issue=1–2 |pages=183–209 |year=2003 |url=http://www.csc.kth.se/~hedvig/publications/ijcv_03.pdf |format=PDF |access-date=2015-07-01 |archive-date=2017-07-05 |archive-url=https://web.archive.org/web/20170705113229/http://www.csc.kth.se/~hedvig/publications/ijcv_03.pdf |dead-url=no }}</ref>
+
+==歷史==
+
+脊與谷第一次被使用在數位影像的領域中是在由[[Haralick|Haralick]]於1983<ref>{{cite journal |doi=10.1016/0734-189X(83)90094-4 |author=Haralick, R. |title=Ridges and Valleys on Digital Images |journal=Computer Vision, Graphics, and Image Processing  |volume=22 |issue=10 |pages=28–38 |date=April 1983 }}</ref>及Crowley於1984對於[[高斯金字塔|高斯金字塔]]的想法<ref>{{cite journal |doi=10.1109/TPAMI.1984.4767500 |author=Crowley, J.L., Parker, A.C. |title=A Representation for Shape Based on Peaks and Ridges in the Difference of Low Pass Transform |journal=IEEE Trans Pattern Anal Mach Intell |volume=6 |issue=2 |pages=156–170 |date=March 1984 |url=http://www-prima.inrialpes.fr/Prima/Homepages/jlc/papers/Crowley-Parker84.pdf |format=PDF |pmid=21869180 |access-date=2015-07-01 |archive-date=2016-03-03 |archive-url=https://web.archive.org/web/20160303195549/http://www-prima.inrialpes.fr/Prima/Homepages/jlc/papers/Crowley-Parker84.pdf |dead-url=no }}</ref><ref>{{cite journal |doi=10.1109/TPAMI.1987.4767876 |author=Crowley, J.L., Sanderson, A. |title=Multiple Resolution Representation and Probabilistic Matching of 2-D Gray-Scale Shape |journal=IEEE Trans Pattern Anal Mach Intell |volume=9 |issue=1 |pages=113–121 |date=January 1987 |url=http://www-prima.inrialpes.fr/Prima/Homepages/jlc/papers/Crowley-Sanderson-PAMI87.pdf |format=PDF |access-date=2015-07-01 |archive-date=2017-08-30 |archive-url=https://web.archive.org/web/20170830032237/http://www-prima.inrialpes.fr/Prima/Homepages/jlc/papers/Crowley-Sanderson-PAMI87.pdf |dead-url=no }}</ref> ，脊在醫學影像中的應用則有Pizer及其同事的深入研究<ref>{{cite journal |doi=10.1109/34.216734 |author=Gauch, J.M., Pizer, S.M. |title=Multiresolution Analysis of Ridges and Valleys in Grey-Scale Images |journal=IEEE Trans Pattern Anal Mach Intell |volume=15 |issue=6 |pages=635–646 |date=June 1993 }}</ref><ref>{{cite journal |doi=10.1007/BF01262402 |author=Eberly D., Gardner R., Morse B., Pizer S., Scharlach C. |title=Ridges for image analysis |journal=Journal of Mathematical Imaging and Vision |volume=4 |issue=4 |pages=353–373 |date=December 1994 }}</ref><ref>{{cite journal |doi=10.1006/cviu.1997.0563 |author=Pizer, Stephen  M., Eberly, David, Fritsch, Daniel S. |title=Zoom-invariant vision of figural shape: the mathematics of cores |journal=Computer Vision and Image Understanding |volume=69 |issue=1 |pages=55–71 |date=January 1998 }}</ref> 及他們所提出的M-reps。<ref>{{Cite web |url=http://citeseer.ist.psu.edu/pizer01segmentation.html |title=S. Pizer, S. Joshi, T. Fletcher, M. Styner, G. Tracton, J. Chen (2001) "Segmentation of Single-Figure Objects by Deformable M-reps", Proceedings of the 4th International Conference on Medical Image Computing and Computer-Assisted Intervention, Springer Lecture Notes In Computer Science; Vol. 2208, pp. 862–871 |accessdate=2015-07-01 |archive-date=2007-03-10 |archive-url=https://web.archive.org/web/20070310222641/http://citeseer.ist.psu.edu/pizer01segmentation.html |dead-url=no }}</ref> 脊检测因Lindeberg加入了<math>\gamma</math>-標準化導數及尺度空間脊等概念而有所提昇。這些概念之後由Steger等人使用在道路提取<ref>{{cite journal |author=Steger C. |title=An unbiased detector of curvilinear structures |journal=IEEE Trans Pattern Anal Mach Intell |volume=20 |issue=2 |pages=113–125 |year=1998 |doi=10.1109/34.659930 |url=http://csdl2.computer.org/persagen/DLAbsToc.jsp?resourcePath=/dl/trans/tp/&toc=comp/trans/tp/1998/02/i2toc.xml&DOI=10.1109/34.659930 |access-date=2022-03-26 |archive-date=2012-02-05 |archive-url=https://web.archive.org/web/20120205014928/http://csdl2.computer.org/persagen/DLAbsToc.jsp?resourcePath=%2Fdl%2Ftrans%2Ftp%2F&toc=comp%2Ftrans%2Ftp%2F1998%2F02%2Fi2toc.xml&DOI=10.1109%2F34.659930 |dead-url=no }}</ref><ref>{{cite journal |doi=10.1007/s001380050121 |author=Laptev I., Mayer H., Lindeberg T., Eckstein W., Steger C., Baumgartner A. |title=Automatic extraction of roads from aerial images based on scale-space and snakes |journal=Machine Vision and Applications |volume=12 |issue=1 |pages=23 |year=2000 |url=http://www.irisa.fr/vista/Papers/2000_mva_laptev.pdf |format=PDF |access-date=2015-07-01 |archive-date=2021-04-15 |archive-url=https://web.archive.org/web/20210415044227/http://www.irisa.fr/vista/Papers/2000_mva_laptev.pdf |dead-url=no }}</ref> ，由Frangi等人使用在血管的分割<ref>{{cite journal |author=Frangi AF, Niessen WJ, Hoogeveen RM, van Walsum T, Viergever MA |title=Model-based quantitation of 3-D magnetic resonance angiographic images |journal=IEEE Trans Med Imaging |volume=18 |issue=10 |pages=946–56 |date=October 1999 |pmid=10628954 |doi=10.1109/42.811279 }}</ref> 以及由Satos等人及Krissian等人使用在曲線及管狀結構的偵測中。<ref>{{cite journal |author=Sato Y, Nakajima S, Shiraga N, Atsumi H, Yoshida S, ''et al'' |title=Three-dimensional multi-scale line filter for segmentation and visualization of curvilinear structures in medical images |journal=Medical Image Analysis |volume=2 |issue=2 |pages=143–168 |year=1998 |url=http://www.image.med.osaka-u.ac.jp/member/yoshi/paper/linefilter.pdf |doi=10.1016/s1361-8415(98)80009-1 |access-date=2015-07-01 |archive-date=2018-03-24 |archive-url=https://web.archive.org/web/20180324191705/http://www.image.med.osaka-u.ac.jp/member/yoshi/paper/linefilter.pdf |dead-url=no }}</ref><ref>{{cite journal |doi=10.1006/cviu.2000.0866 |author=Krissian K., Malandain G., Ayache N., Vaillan R., Trousset Y. |title=Model-based detection of tubular structures in 3D images |journal=Computer Vision and Image Understanding |volume=80 |issue=2 |pages=130–171 |year=2000 |url=http://portal.acm.org/citation.cfm?id=363419.363423}}</ref> 
+
+==N維空間中脊與谷的定義==
+
+脊的概念，推廣了實數函數的局部最大值。一個在 <math>f:\mathbb{R}^n \rightarrow \mathbb{R}</math>定義域中的點<math>\mathbf{x}_0</math>，若存在一個距離<math>\delta>0</math>使得所有在這個距離內的都符合<math>f(\mathbf{x}) < f(\mathbf{x}_0)</math>，則點<math>\mathbf{x}_0</math>是一個局部最大值。
+
+稍微放寬一下這個條件，若所有在<math>\mathbf{x}_0</math>的附近的點<math>\mathbf{x}</math>中<math>n-1</math>維的子集合，皆符合<math>f(\mathbf{x}) < f(\mathbf{x}_0)</math>，則<math>\mathbf{x}_0</math>便是脊上的一個點。這樣的放寬，給予了脊一個維度的自由，也就是說脊會是一個一維的曲線。同樣的概念套用到局部最小值上，可以得到一維的谷曲線。
+
+以下的定義是根據Eberly的著作<ref>{{cite book |author=Eberly, D. |title=Ridges in Image and Data Analysis |publisher=Kluwer |year=1996 |isbn=0-7923-4268-2 }}</ref>，可以被當作是之前的脊的定義的推廣。令<math>U \subset \mathbb{R}^n</math>為一個開放集合，且<math>f:U \rightarrow \mathbb{R}</math>是一個光滑函數。令<math>\mathbf{x}_0 \in U</math>。令<math>\nabla_{\mathbf{x}_0}f</math>為<math>f</math>在點<math>\mathbf{x}_0</math>的梯度。令<math>H_{\mathbf{x}_0}(f)</math>為函數<math>f</math>在點<math>\mathbf{x}_0</math>的<math>n \times n</math>海森矩陣。令<math>\lambda_1 \leq \lambda_2 \leq \cdots \leq \lambda_n</math>為<math>n</math>個<math>H_{\mathbf{x}_0}(f)</math>的排序好的特徵值，並令<math>\mathbf{e}_i</math>為對應到<math>\lambda_i</math>的單位特徵向量。(在此，假設所有特徵值是相異的)
+
+點<math>\mathbf{x}_0</math>在一維的脊上若:
+
+#<math>\lambda_{n-1}<0</math>且
+#<math>\nabla_{\mathbf{x}_0} f \cdot \mathbf{e}_i=0</math> for <math>i=1, 2, \ldots, n-1</math>.
+
+這精確地限制了<math>f</math>在特定的<math>n-1</math>維中在點 <math>\mathbf{x}_0</math>有局部最大值。
+
+這樣的定義很自然的可以被推廣到成''k''維的脊，一個點<math>\mathbf{x}_0</math>在''k''維脊上若
+
+#<math>\lambda_{n-k}<0</math>且
+#<math>\nabla_{\mathbf{x}_0} f \cdot \mathbf{e}_i=0</math> for <math>i=1, 2, \ldots, n-k</math>.
+
+==最大尺度脊==
+
+以下的定義可以被追溯到Fritsch<ref>Fritsch, DS, Eberly,D., Pizer, SM, and McAuliffe, MJ. "Stimulated cores and 
+their applications in medical imaging."   Information Processing in Medical Imaging, Y. Bizais, C Barillot, R DiPaola, eds., Kluwer Series in Computational Imaging and Vision, pp. 365–368.</ref>，當初他對如何從二維灰階相片中提取幾何資訊十分感興趣，他使用了''medialness''濾鏡處理相片，得到了一種類似各點到邊緣距離在尺度空間的資料，而這種資料的脊若是再疊加回原本的相片上，與原本相片的形狀骨骼（如Blum的中軸）十分相似。
+
+最大尺度脊定義在一個三維的函數上，其中二維是相片平面，一維是尺度空間。其中我們想要以下的條件為真，若<math>(\mathbf{x},\sigma)</math>是一個在最大尺度脊上的點，則函數在這個點上的值在尺度軸上是極大值。令<math>f(\mathbf{x},\sigma)</math>為一個光滑可微分的函數於<math>U \subset \mathbb{R}^2 \times \mathbb{R}_{+}</math>。則<math>(\mathbf{x},\sigma)</math>是在最大尺度脊上的點若且唯若 
+
+# <math>\frac{\partial f}{\partial \sigma}=0</math> and <math>\frac{\partial^2 f}{\partial \sigma^2}<0</math>, and
+# <math>\nabla f \cdot \mathbf{e}_1=0</math> and <math>\mathbf{e}_1^t H(f) \mathbf{e}_1 <0</math>.
+
+==參見==
+
+*[[尺度空間|尺度空間]]
+*[[特征检测|特征检测]]
+*[[边缘检测|边缘检测]]
+*[[興趣點检测|興趣點检测]]
+*[[斑點检测|斑點检测]]
+*[[電腦視覺|電腦視覺]]
+
+==參考資料==
+
+<references/>
+
+
+
+[[Category:特征检测_(计算机视觉)|Category:特征检测 (计算机视觉)]]
+[[Category:多变量微积分|Category:多变量微积分]]
+[[Category:光滑函数|Category:光滑函数]]
+[[Category:Singularity_theory|Category:Singularity theory]]

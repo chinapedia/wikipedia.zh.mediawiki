@@ -1,0 +1,42 @@
+
+'''处理器间中断'''（{{lang-en|Inter-Processor Interrupt}}，IPI）是一种特殊类型的[[中斷|中斷]]，即在[[多元处理|多处理器]]系统中，如果中断处理器需要来自其它处理器的动作，一个处理器向另一个处理器发出的中断行为。可能要求采取的行动包括：
+
+* 刷新其它处理器的[[内存管理单元|内存管理单元]]缓存，如[[转译后备缓冲器|转译后备缓冲器]]，当一个处理器更改内存映射时；
+* 停机，当系统被一个处理器关闭时。
+
+== 机制 ==
+[[OS/360及后继者|OS/360]]的[[OS/360及后继者#M65MP|M65MP]]选件使用[[IBM_System/360|S/360]]的直接控制功能生成另一个处理器上的中断；在[[IBM_System/370|S/370]]及其后继者，包括[[z/Architecture|z/Architecture]]上，SIGNAL PROCESSOR指令提供了一个更正式的接口。
+
+在使用[[高级可编程中断控制器|高级可编程中断控制器]]（APIC）的[[IBM_PC兼容机|IBM PC兼容机]]上，常借助APIC发出IPI信号。当CPU希望向另一个CPU发送中断时，它会将中断向量和目标的本地APIC标识符存储在自己的本地APIC中断命令寄存器（ICR）中。消息随后经由APIC总线发送到目标的本地APIC，它因此发出一个相应的中断至它自己的CPU。
+
+== 示例 ==
+在运行[[Microsoft_Windows|Microsoft Windows]]的多处理器系统中，除了上面列出的，处理器还可以出于下列原因中断另一个处理器：
+
+# 排队轮候DISPATCH_LEVEL中断，以调度执行特定线程；
+# 内核调试器断点。
+
+IPI的[[IRQL_(Windows)|IRQL]]为29。<ref>{{cite web
+ |author = Matt
+ |title = Understanding IRQL
+ |url = http://ext2fsd.sourceforge.net/documents/irql.htm
+ |accessdate = 2014-12-06
+ |date = 2002-04-28
+ |archive-date = 2019-10-14
+ |archive-url = https://web.archive.org/web/20191014125625/http://ext2fsd.sourceforge.net/documents/irql.htm
+ |dead-url = no
+ }}</ref>
+
+== 参见 ==
+* [[中斷|中斷]]
+* [[中断处理程序|中断处理程序]]
+* [[非可屏蔽中断|非可屏蔽中断]]（NMI）
+
+== 参考 ==
+{{Reflist}}
+
+== 外部链接 ==
+*[http://linux.linti.unlp.edu.ar/images/0/0c/ULK3-CAPITULO4-UNNOBA.pdf 中断和异常] {{Wayback|url=http://linux.linti.unlp.edu.ar/images/0/0c/ULK3-CAPITULO4-UNNOBA.pdf |date=20200924083404 }}
+
+[[Category:中断|Category:中断]]
+
+{{Compu-hardware-stub}}

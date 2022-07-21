@@ -1,0 +1,76 @@
+{{about|信源编码的数据压缩理论|计算机编程术语|源代码}}{{NoteTA
+| G1 = Communication
+}}
+在[[信息论|信息论]]中，香农的'''信源编码定理'''（或'''无噪声编码定理'''）确立了[[数据压缩|数据压缩]]的限度，以及[[香农熵|香农熵]]的操作意义。
+
+'''信源编码定理'''表明（在极限情况下，随着[[独立同分布随机变量|独立同分布随机变量]]数据流的长度趋于无穷）不可能把数据压缩得码率（每个符号的比特的平均数）比信源的香农熵还小，又不丢失信息。但是有可能使码率任意接近香农熵，且损失的概率极小。
+
+'''码符号的信源编码定理'''把码字的最小可能期望长度看作输入字（看作[[随机变量|随机变量]]）的[[熵_(信息论)|熵]]和目标编码表的大小的一个函数，给出了此函数的上界和下界。
+
+== 陈述 ==
+信源编码是从信息源的符号（序列）到码符号集（通常是bit）的映射，使得信源符号可以从二进制位元（无损信源编码）或有一些失真（有损信源编码）中准确恢复。这是在[[数据压缩|数据压缩]]的概念。
+
+=== 信源编码定理 ===
+在信息论中，'''信源编码定理'''<ref name="Shannon"/>非正式地陈述<ref name="MacKay"/><ref name="Cover"/>为：
+
+<blockquote>{{mvar|N}} 个[[熵_(信息论)|熵]]均为 {{math|''H''(''X'')}} 的[[独立同分布的随机变量|独立同分布的随机变量]]在 {{math|''N'' → ∞}} 时，可以很小的信息损失风险压缩成多于 {{math|''N H''(''X'')}} [[位元|bit]]；但相反地，若压缩到少于 {{math|''N H''(''X'')}} bit，则信息几乎一定会丢失。</blockquote>
+
+=== 码符号的信源编码定理 ===
+令 {{math|Σ<sub>1</sub>, Σ<sub>2</sub>}} 表示两个有限编码表，并令 {{math|Σ{{su|b=1|p=∗}}}} 和 {{math|Σ{{su|b=2|p=∗}}}} （分别）表示来自那些编码表的[[克莱尼星号|所有有限字的集合]]。
+
+设 {{mvar|X}} 为从 {{math|Σ<sub>1</sub>}} 取值的随机变量，令 {{math| ''f'' }} 为从 {{math|Σ{{su|b=1|p=∗}}}} 到 {{math|Σ{{su|b=2|p=∗}}}} 的唯一可译码，其中 {{math|{{!}}Σ<sub>2</sub>{{!}} {{=}} ''a''}}。令 {{mvar|S}} 表示字长 {{math| ''f'' (''X'')}} 给出的随机变量。
+
+如果 {{math| ''f'' }} 是对 {{mvar|X}} 拥有最小期望字长的最佳码，那么(Shannon 1948)：
+
+:<math> \frac{H(X)}{\log_2 a} \leq \mathbb{E}S < \frac{H(X)}{\log_2 a} +1 </math>
+
+== 证明：码符号的信源编码定理 ==
+对于 {{math|1 ≤ ''i'' ≤ ''n''}} 令 {{math|''s<sub>i</sub>''}} 表示每个可能的 {{math|''x<sub>i</sub>''}} 的字长。定义 <math>q_i = a^{-s_i}/C</math>，其中 {{mvar|C}} 会使得 {{math|''q''<sub>1</sub> + ... + ''q<sub>n</sub>'' {{=}} 1}}。于是
+
+:<math>\begin{align}
+H(X) &=    -\sum_{i=1}^n p_i \log_2 p_i \\
+     &\leq -\sum_{i=1}^n p_i \log_2 q_i \\
+     &=    -\sum_{i=1}^n p_i \log_2 a^{-s_i} + \sum_{i=1}^n p_i \log_2 C \\
+     &=    -\sum_{i=1}^n p_i \log_2 a^{-s_i} + \log_2 C \\
+     &\leq -\sum_{i=1}^n - s_i p_i \log_2 a \\
+     &\leq  \mathbb{E} S \log_2 a \\
+\end{align}</math>
+
+其中第二行由[[吉布斯不等式|吉布斯不等式]]推出，而第五行由[[克拉夫特不等式|克拉夫特不等式]]推出：
+
+:<math>C = \sum_{i=1}^n a^{-s_i} \leq 1</math>
+
+因此 {{math|log ''C'' ≤ 0}}.
+
+对第二个不等式我们可以令
+
+:<math>s_i = \lceil - \log_a p_i \rceil </math>
+
+于是
+
+:<math> - \log_a p_i \leq s_i < -\log_a p_i + 1 </math>
+
+因此
+
+:<math> a^{-s_i} \leq p_i</math>
+
+并且
+
+:<math> \sum  a^{-s_i} \leq \sum p_i = 1</math>
+
+因此由克拉夫特不等式，存在一种有这些字长的无前缀编码。因此最小的 {{mvar|S}} 满足
+
+:<math>\begin{align}
+\mathbb{E} S & = \sum p_i s_i \\
+& < \sum p_i \left( -\log_a p_i +1 \right) \\
+& = \sum - p_i \frac{\log_2 p_i}{\log_2 a} +1 \\
+& = \frac{H(X)}{\log_2 a} +1 \\
+\end{align}</math>
+
+==参考资料==
+{{Reflist|refs=
+<ref name="Shannon">[[香农|C.E. Shannon]], "[http://plan9.bell-labs.com/cm/ms/what/shannonday/shannon1948.pdf A Mathematical Theory of Communication] {{WebCite|url=https://www.webcitation.org/5StCRobTg?url=http://plan9.bell-labs.com/cm/ms/what/shannonday/shannon1948.pdf |date=20071026232554 |dateformat=iso }}", ''[[Bell_System_Technical_Journal|Bell System Technical Journal]]'', vol. 27, pp. 379–423, 623-656, July, October, 1948</ref>
+<ref name="MacKay">David J. C. MacKay. ''[http://www.inference.phy.cam.ac.uk/mackay/itila/book.html Information Theory, Inference, and Learning Algorithms] {{Wayback|url=http://www.inference.phy.cam.ac.uk/mackay/itila/book.html |date=20160217105359 }}'' Cambridge: Cambridge University Press, 2003. ISBN 0-521-64298-1</ref>
+<ref name="Cover">{{cite book | last = Cover | first = Thomas M. | title = Elements of Information Theory | chapter = Chapter 5: Data Compression | year = 2006  | publisher = John Wiley & Sons | isbn = 0-471-24195-4 }}</ref>}}
+
+[[Category:信息论|Category:信息论]]

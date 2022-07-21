@@ -1,0 +1,162 @@
+'''依赖于实参的名字查找'''是[[C++|C++]][[程序设计语言|程序设计语言]]中的[[名字查找|名字查找]]机制之一。英文为“argument-dependent lookup”，因此缩写为'''ADL'''。<ref>{{cite web | url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1905.pdf | title=Working Draft, Standard for Programming Language C++ | at=Chapter 3.4.2 - ''Argument-dependent name lookup'' - p. 2 | publisher=[[SC22|JTC1/SC22/WG21]] | date=19 October 2005 | accessdate=13 March 2012 | archive-date=2005-12-14 | archive-url=https://web.archive.org/web/20051214034042/http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1905.pdf | dead-url=yes }}</ref>ADL依据[[子程序|函数调用]]中的{{tsl|en|Parameter (computer programming)|实参}}的[[數據類型|数据类型]]查找未限定（unqualified）的函数名（或者函数模板名）。这也被称作“克尼格查找”（Koenig lookup），虽然{{tsl|en|Andrew Koenig (programmer)|安德鲁·克尼格}}并不是它的发明者。<ref name="dobbs_personal_note">{{cite web | url=http://www.drdobbs.com/cpp/a-personal-note-about-argument-dependent/232901443 | title=A Personal Note About Argument-Dependent Lookup | accessdate=7 February 2014 | archive-date=2018-03-17 | archive-url=https://web.archive.org/web/20180317070215/http://www.drdobbs.com/cpp/a-personal-note-about-argument-dependent/232901443 | dead-url=no }}</ref>
+
+
+==语义==
+
+===依赖于实参的名字查找的先决条件===
+如果通常的未限定（unqualified）名字查找所产生的候选集包括下述情形，则不会启动依赖于实参的名字查找：
+# 类成员声明（此种情形仅指普通的类成员函数，不指类成员运算符函数）
+# 块作用域内的函数的声明，不含(using-declaration)
+# 任何不是函数或者函数模板的声明（例如函数对象或者另一个变量其名字与被查询的函数名字冲突）
+===命名空间与类的相关集合 ===
+函数调用表达式的每个实参的类型用于确定命名空间与类的相关集合（associated set of namespaces and classes）并用于函数名字查找：<ref>《C++14语言标准》3.4.2.2: For each argument type T in the function call, there is a set of zero or more associated namespaces and a set of zero or more associated classes to be considered. The sets of namespaces and classes is determined entirely by the types of the function arguments (and the namespace of any template template argument). </ref>
+# 基本类型（fundamental type）实参的命名空间与类的相关集合为空。
+# 类类型（class type，指struct, class, union类型）, 相关集合包括
+## 类类型自身
+## 如果类类型是另一个类的成员，则那个包含了类类型的类；
+## 该类型的所有的直接或间接基类；
+## 该类类型的所有相关类的最内部包含命名空间。
+# 如果实参是类模板特化后得到的类型，除了应用类类型规则，还要包括下述规则提及的类型的相关命名空间与类的集合：
+## 类型模板形参（type template parameter）所对应的模板实参的类型，不包括非类型的模板形参、[[模板的模板参数|模板的模板形参]]；
+## [[模板的模板参数|模板的模板实参]]（template template argument）所在的命名空间；
+## [[模板的模板参数|模板的模板实参]]所在的类（如果这个类包含了这个成员模板）。 
+# 对于枚举类型的实参，枚举类型所在的命名空间；如果枚举类型是一个类的成员类型，则该类加入相关集合。
+# 如果实参是类型T的指针或者是类型T的数组的指针，则类型T的相关集合被加入该实参类型的相关集合。 
+# 如果实参是函数类型，那么该函数的形参类型与函数返回值的类型的相关集合被加入到该实参类型的相关集合。
+# 如果实参是类X的成员函数F的[[类成员函数指针|类成员函数指针]]，那么该成员函数的形参类型、该成员函数返回值的类型、该成员函数所属类X的相关集合都被加入到该实参类型的相关集合。
+# 如果实参是类X的数据成员T的类数据成员指针，那么该成员类型、该数据成员所属类X的相关集合都被加入到该实参类型的相关集合。
+# 如果实参是一套重载函数（或者函数模板）的名字或者取地址表达式(address-of expression)，那么重载集中的每个函数的相关集合都被加入到该实参类型的相关集合。 
+## 此外，如果重载集是template-id (模板名字与模板实参), 则所有的类型模板实参与模板的模板实参（不含非类型模板实参）的相关集合都被加入到该实参类型的相关集合。 
+# 如果相关集合中的任何命名空间是内联命名空间（inline namespace）, 则包含它的命名空间被增加到相关集合中。 
+# 如果相关集合中的一个命名空间直接包含了内联命名空间，则内联命名空间被增加到相关集合中。 
+# 相关命名空间中的using-directives被忽略
+
+通常的未限定查找发现的结果与ADL查找发现的结果应该合并，并遵从如下特别规则：
+# 通过ADL查找到的相关类内的友函数与函数模版是可见的
+# 所有的名字，如果不是函数或者函数模版，将被忽略（不与变量名字冲突）
+
+== 例子 ==
+一个简单示例：
+<syntaxhighlight lang="cpp">
+namespace NS 
+{
+   class A {};
+   void f( A *&, int ) {}
+}
+int main() 
+{
+   NS::A *a;
+   f( a, 0 );    //calls NS::f
+   (f)(a,0);     //error: NS::f not considered; parentheses prevent argument-dependent lookup
+}
+—end
+}
+</syntaxhighlight>
+
+更为复杂、精致的例子：
+<syntaxhighlight lang="cpp">
+namespace N2 { struct DS; };
+
+namespace N1 {
+	struct S {
+                void operator+( S) {}
+        };
+	template<int X> void f(S) {};
+	void fDS(N2::DS* v) {  };
+}
+
+namespace N2 {
+	struct DS :N1::S {};
+
+	template<class T> void f(T t) {};
+}
+
+void g() {	 
+	N2::DS sv;
+	fDS(&sv);    // sv的类型N2::DS的基类型N1::S所在的命名空间N1的函数N1::fDS
+        sv+sv;       // 调用N1::S::operator+(S)运算符成员函数
+}
+</syntaxhighlight>
+
+另一个示例：
+<syntaxhighlight lang="cpp">
+namespace N1 {
+	struct S { };
+	template<int X> void f(S) {};
+	void bar(S) {};
+}
+namespace N2 {	 
+	template<class T> void f(T t) {};
+}
+
+void g(N1::S s) { 	
+	bar(s);          // lookup N1::bar
+	 //f<3>(s);      // Syntax error: unqualified lookup finds no f, so it understands as arithematic expression " f < 3 "
+	N1::f<3>(s);  // OK, qualified lookup finds the template 'f'
+	//N2::f<3>(s);  // Error: N2::f does not take a non-type parameter
+				  //        N1::f is not looked up because ADL only works with unqualified names
+	using N2::f;
+	f<3>(s); // OK: Unqualified lookup now finds N2::f
+			 //     then ADL kicks in because this name is unqualified and finds N1::f
+}
+</syntaxhighlight>
+
+关于内联命名空间的示例：
+<syntaxhighlight lang="cpp">
+namespace ADL{
+	inline namespace v101 {              // 下述代码中，命名空间名字v101都可以忽略
+		class foo {
+		public:
+			class bar { };
+		};
+	};
+	void func1(foo::bar v) {
+		int i = 101;
+	};
+}
+ 
+int main()
+{
+	ADL::foo::bar v1;
+	func1(v1);               // lookup to ADL::func1  
+}
+</syntaxhighlight>
+
+
+== 接口 ==
+ADL能查询到的函数被认为是类的接口之一。[[标准模板库|标准模板库]]的几个<code>std</code>命名空间的算法使用未限定的<code>swap</code>调用。使用时，如果名字查找没找到其它结果，则使用<code>[[:b:C++/Utility|std::swap]]</code>函数；如果这些算法使用第三方类，如<code>Foo</code>，在另一个命名空间中发现包含了<code>swap(Foo&, Foo&)</code>, 则重载版的<code>swap</code>被优先使用。
+
+[[C++標準程式庫|C++標準程式庫]]常见模式是用ADL查找程序声明的重载运算符。例如，下述程序如果没有ADL将无法编译通过：<ref name="dobbs_personal_note" />
+<syntaxhighlight lang="cpp">
+#include<iostream>
+
+int main() 
+{
+  string hello = "Hello World, where did operator<<() come from?";
+  std::cout << hello << std::endl;
+}
+</syntaxhighlight>
+运算符<code><<</code>等价于调用函数<code>operator<<</code>，但没有给出<code>std</code>限定符。通过ADL查找到函数<code>std::ostream& std::operator<<(std::ostream&, const char*)</code>。
+
+==批评==
+ADL使得类之外定义的函数就如同类的接口一样被调用，这使得命名空间不是过于严格。例如，C++标准模板库使用未限定的<code>swap</code>调用，允许用户定义自己的<code>swap</code>供标准模板库的算法使用。换句话说，
+<syntaxhighlight lang="cpp">std::swap(a, b);</syntaxhighlight>
+的效果可能相同与或不同于
+<syntaxhighlight lang="cpp">
+using std::swap;
+swap(a, b);
+</syntaxhighlight>
+（其中<code>a</code>与<code>b</code>的类型是<code>N::A</code>）。因为如果<code>N::swap(N::A&, N::A&)</code>存在，上述第二段代码将调用它，而上述第一段代码将不调用它。 
+ 
+
+==参考文献==
+{{Reflist}}
+
+==外部链接==
+* [http://en.cppreference.com/w/cpp/language/adl ''Argument-dependent lookup''] {{Wayback|url=http://en.cppreference.com/w/cpp/language/adl |date=20201129174417 }}
+* [http://www.gotw.ca/publications/mill02.htm ''What's In a Class? - The Interface Principle''] {{Wayback|url=http://www.gotw.ca/publications/mill02.htm |date=20180628050226 }} by [[Herb_Sutter|Herb Sutter]]
+* [http://www.gotw.ca/publications/mill08.htm ''Namespaces and the Interface Principle''] {{Wayback|url=http://www.gotw.ca/publications/mill08.htm |date=20201109021304 }} by [[Herb_Sutter|Herb Sutter]]
+* [http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=286 Why I Hate Namespaces] {{Wayback|url=http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=286 |date=20160709115609 }} by Danny Kalev
+* [http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n2103.pdf "A Modest Proposal: Fixing ADL (revision 2)"] {{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n2103.pdf |date=20150924061741 }} by [[Herb_Sutter|Herb Sutter]]
+
+[[Category:C++|Category:C++]]

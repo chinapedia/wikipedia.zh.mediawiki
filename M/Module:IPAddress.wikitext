@@ -1,0 +1,64 @@
+local p = {}
+
+function p._isIpV6(s)
+	local dcolon, groups
+	if type(s) ~= "string"
+		or s:len() == 0
+		or s:find("[^:%x]") -- only colon and hex digits are legal chars
+		or s:find("^:[^:]") -- can begin or end with :: but not with single :
+		or s:find("[^:]:$")
+		or s:find(":::")
+	then
+		return false
+	end
+	s, dcolon = s:gsub("::", ":")
+	if dcolon > 1 then return false end -- at most one ::
+	s = s:gsub("^:?", ":") -- prepend : if needed, upper
+	s, groups = s:gsub(":%x%x?%x?%x?", "") -- remove valid groups, and count them
+	return ( (dcolon == 1 and groups < 8) or (dcolon == 0 and groups == 8) )
+		and ( s:len() == 0 or (dcolon == 1 and s == ":") ) -- might be one dangling : if original ended with ::
+end
+
+function p._isIpV4(s)
+	local function legal(n) return (tonumber(n) or 256) < 256  and not n:match("^0%d") end
+	if type(s) ~= "string" then return false end
+	local p1, p2, p3, p4 = s:match("^(%d+)%.(%d+)%.(%d+)%.(%d+)$")
+	return legal(p1) and legal(p2) and legal(p3) and legal(p4)
+end
+
+function p._isIp(s)
+	return p._isIpV4(s) and "4" or p._isIpV6(s) and "6"
+end
+
+function p._isIpOrRange(s)
+	local modip = require('Module:IP')
+	local success, ip = pcall(modip.IPAddress.new, s)
+	if success then
+		return 'ip'
+	end
+	success, ip = pcall(modip.Subnet.new, s)
+	if success then
+		return 'range'
+	end
+	return ''
+end
+
+local function input(frame)
+	-- Return input parameter after replacing any of following directional markers.
+	-- LRM : LEFT-TO-RIGHT MARK (U+200E)         : hex e2 80 8e = 226 128 142
+	-- LRE : LEFT-TO-RIGHT EMBEDDING (U+202A)    : hex e2 80 aa = 226 128 170
+	-- PDF : POP DIRECTIONAL FORMATTING (U+202C) : hex e2 80 ac = 226 128 172
+	-- This is required for MediaWiki:Blockedtext message.
+	return (frame.args[1] or ''):gsub('\226\128[\142\170\172]', ' ')  -- replace LRM, LRE, PDF with space delimiter
+end
+
+function p.isIpV6(frame) return p._isIpV6(input(frame)) and "1" or "0" end
+function p.isIpV4(frame) return p._isIpV4(input(frame)) and "1" or "0" end
+function p.isIp(frame) return p._isIp(input(frame)) or "" end
+
+function p.isIpOrRange(frame)
+	-- {{#invoke:IPAddress|isIpOrRange|x}} → 'ip' (IPv4/IPv6) or 'range' (CIDR IPv4/IPv6) or '' (invalid)
+	return p._isIpOrRange(input(frame))
+end
+
+return p

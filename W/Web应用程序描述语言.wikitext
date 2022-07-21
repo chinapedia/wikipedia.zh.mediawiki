@@ -1,0 +1,121 @@
+{{noteTA
+ |G1 = IT
+}}
+'''Web应用程序描述语言'''（'''{{lang|en|Web Application Description Language}}，WADL'''）是一个可用计算机处理的表达基于[[HTTP|HTTP]]的[[Web|Web]]应用（如[[REST|REST]][[Web服务|Web服务]]）的XML词汇。{{r|submission}} WADL描述了Web服务提供的资源及他们的联系。{{r|submission}} WADL试图简化重用基于HTTP架构的Web服务。{{r|submission|teamcomment}}它是一个平台，且与语言无关，并试图推动除Web浏览器的基本使用外的应用重用。{{r|submission}}
+
+WADL于2009年8月31日由[[昇陽電腦|昇陽電腦]]提交至[[万维网联盟|万维网联盟]]{{r|submission}}，但联盟目前没有标准化它的计划{{r|teamcomment}}并且它并没有被广泛地支持。WADL依照描述基于[[SOAP|SOAP]]的RPC式服务的XML词汇[[WSDL|WSDL]]定义，用于描述REST服务{{r|rest_b1}}，而WSDL也可用于描述RESTWeb服务。{{r|ibm_wsdl2}}
+
+== 格式 ==
+服务用一系列的[[Web资源|资源（resource）]]标签描述。每一个resource包含参数（param）元素描述输入，而方法（method）元素描述对一个resource的请求（request）和回应（response）。request标签定义了如何表达输入，它要求定义对应的类型和特定的HTTP头。response标签定义了服务的回应及所有错误信息，用于处理错误。
+
+== 例子 ==
+下列是一个以WADL描述的雅虎新闻搜索程序。
+<syntaxhighlight lang="xml">
+ <application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://wadl.dev.java.net/2009/02 wadl.xsd" 
+  xmlns:tns="urn:yahoo:yn" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  xmlns:yn="urn:yahoo:yn" 
+  xmlns:ya="urn:yahoo:api" 
+  ns="http://wadl.dev.java.net/2009/02"> 
+   <grammars> 
+     <include 
+       href="NewsSearchResponse.xsd"/> 
+     <include 
+       href="Error.xsd"/> 
+   </grammars> 
+ 
+   <resources base="http://api.search.yahoo.com/NewsSearchService/V1/"> 
+     <resource path="newsSearch"> 
+       <method name="GET" id="search"> 
+         <request> 
+           <param name="appid" type="xsd:string" 
+             style="query" required="true"/> 
+           <param name="query" type="xsd:string" 
+             style="query" required="true"/> 
+           <param name="type" style="query" default="all"> 
+             <option value="all"/> 
+             <option value="any"/> 
+             <option value="phrase"/> 
+           </param> 
+           <param name="results" style="query" type="xsd:int" default="10"/> 
+           <param name="start" style="query" type="xsd:int" default="1"/> 
+           <param name="sort" style="query" default="rank"> 
+             <option value="rank"/> 
+             <option value="date"/> 
+           </param> 
+           <param name="language" style="query" type="xsd:string"/> 
+         </request> 
+         <response status="200"> 
+           <representation mediaType="application/xml" 
+             element="yn:ResultSet"/> 
+         </response> 
+         <response status="400"> 
+           <representation mediaType="application/xml" 
+             element="ya:Error"/> 
+         </response> 
+       </method> 
+     </resource> 
+   </resources> 
+</syntaxhighlight>
+
+== 参考来源 ==
+{{reflist|refs=
+
+<ref name="submission">
+{{cite web
+ |title      = Web Application Description Language: W3C Member Submission 31 August 2009
+ |author     = [[Sun_Microsystems|Sun Microsystems]]
+ |date       = 31 August 2009
+ |publisher  = [[World_Wide_Web_Consortium|World Wide Web Consortium]]
+ |accessdate = 12 August 2012
+ |url        = http://www.w3.org/Submission/wadl/
+}}
+</ref>
+
+<ref name="teamcomment">
+{{cite web
+ |title      = Team Comment on the "Web Application Description Language" Submission
+ |author     = [[World_Wide_Web_Consortium|World Wide Web Consortium]]
+ |date       = 14 October 2009
+ |publisher  = [[World_Wide_Web_Consortium|World Wide Web Consortium]]
+ |accessdate = 12 August 2012
+ |url        = http://www.w3.org/Submission/2009/03/Comment
+}}
+</ref>
+
+<ref name="ibm_wsdl2">
+{{cite web
+ |title      = Describe REST Web services with WSDL 2.0: A how-to guide
+ |author     = Lawrence Mandel
+ |date       = 29 May 2008
+ |publisher  = [[IBM|IBM]]
+ |accessdate = 12 August 2012
+ |url        = http://www.ibm.com/developerworks/webservices/library/ws-restwsdl/
+}}
+</ref>
+
+<ref name="rest_b1">
+{{cite book
+ |last      = Richardson
+ |first     = Leonard
+ |coauthors = Sam Ruby
+ |others    = 徐涵、李红军、胡伟译
+ |title     = RESTful Web Services
+ |origyear  = 2008
+ |date      = 2008年5月
+ |publisher = 电子工业
+ |language  = 中文
+ |isbn      = 978-7-121-06227-8
+ |pages     = 290
+}}
+</ref>
+}}
+
+== 外部链接 ==
+* {{en}}[http://wadl.java.net WADL于java.net上的主页] {{Wayback|url=http://wadl.java.net/ |date=20120412091818 }}
+* {{en}}[http://java.net/projects/wadl/sources/svn/content/trunk/www/wadl20090202.pdf WADL的当前标准] {{Wayback|url=http://java.net/projects/wadl/sources/svn/content/trunk/www/wadl20090202.pdf |date=20110722105727 }}
+* {{en}}[https://web.archive.org/web/20130706033544/http://bitworking.org/news/193/Do-we-need-WADL 《我们需要WADL么？》]乔·格雷戈里奥的博客文章
+
+[[Category:Web服务|Category:Web服务]]
+[[Category:万维网|Category:万维网]]

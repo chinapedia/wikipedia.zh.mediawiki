@@ -1,0 +1,147 @@
+{{unreferenced|time=2014-08-05T01:58:03+00:00}}
+{{NoteTA
+|G1 = IT
+|1 = zh-cn:异或; zh-tw:XOR
+|2 = zh-cn:链表; zh-tw:鏈結串列
+|3 = zh-cn:结点; zh-tw:節點
+}}
+
+'''异或链表'''（{{lang-en|XOR linked list}}）是[[数据结构|数据结构]]里面的一种链式存储结构,可以在降低空间复杂度的情况下达到和[[双向链表|双向链表]]一样的目的，使得在任何一个结点都能方便地访问它的前驱结点和后继结点。
+
+== 概述 ==
+普通[[双向链表|双向链表]]的每个结点有三个域 ，分别存储着前一个结点的地址、后一个点的地址，以及数据
+
+  ...  A       B         C         D         E  ...
+           –>  next –>  next  –>  next  –>
+           <–  prev <–  prev  <–  prev  <–
+
+异或链表通过异或操作（这里用⊕表示）把前一个结点的地址和后一个结点的地址变成一个地址
+
+  ...  A         B               C                D            E  ...
+           <–>  A⊕C     <->    B⊕D     <->      C⊕E  <->
+   
+       link(B) = addr(A)⊕addr(C), link(C) = addr(B)⊕addr(D), …
+
+当从左往右遍历的时候，如果当前结点是C，指针域是内容是B⊕D,通过和前一个结点B的地址做异或操作就能得到下一个结点D的地址，如此重复便能遍历整个链表。
+
+== C语言示例（异或指针双向链表） ==
+=== 异或链表结点结构 ===
+<syntaxhighlight lang="cpp">
+typedef struct XorNode {
+    char data;
+    struct XorNode *LRPtr;
+}
+XorNode, *XorPointer;
+</syntaxhighlight>
+
+=== 异或指针双向链表结构 ===
+<syntaxhighlight lang="cpp">
+typedef struct XorLinkedList {
+    XorPointer left, right;
+}
+XorLinkedList;
+</syntaxhighlight>
+
+=== 异或操作 ===
+<syntaxhighlight lang="cpp">
+XorPointer xor(XorPointer a, XorPointer b) {
+    return (XorPointer)((unsigned long)(a) ^ (unsigned long)(b));
+}
+</syntaxhighlight>
+
+=== 创建异或双向链表 ===
+<syntaxhighlight lang="cpp">
+void createXorLinkedList(XorLinkedList *list) {
+    char ch;
+    XorPointer lastNode = NULL;
+    int isFirstNode = 1;
+    while ((ch = getchar()) != '\n') {
+        XorPointer newNode = (XorPointer) malloc(sizeof(XorNode));
+        newNode -> data = ch;
+        newNode -> LRPtr = NULL;
+        if (lastNode) {
+            newNode -> LRPtr = xor(lastNode, NULL);
+            lastNode -> LRPtr = xor(xor(lastNode -> LRPtr, NULL), newNode);
+        }
+        lastNode = newNode;
+        if (isFirstNode) {
+            isFirstNode = 0;
+            list -> left = newNode;
+        }
+    }
+    list -> right = lastNode;
+}
+</syntaxhighlight>
+
+=== 按任意方向依次输出各结点值 ===
+<syntaxhighlight lang="cpp">
+void print(XorPointer a, XorPointer b) {
+    XorPointer nullFirst = a == NULL ? a : b;
+    XorPointer nonNullFirst = a != NULL ? a : b;
+    XorPointer tmp = NULL;
+    do {
+        printf("%c ", nonNullFirst -> data);
+        tmp = nonNullFirst;
+        nonNullFirst = xor(nullFirst, nonNullFirst -> LRPtr);
+        nullFirst = tmp;
+    } while (nonNullFirst != NULL);
+}
+</syntaxhighlight>
+
+=== 在第i个结点之前插入一个结点 ===
+<syntaxhighlight lang="cpp">
+void XorLinkedListInsert(XorLinkedList *list, int pos, char data) {
+    XorPointer node = list -> left, tmp = NULL;
+    XorPointer last = NULL;
+    XorPointer newNode = NULL;
+    int i = 1;
+    while (i < pos && node != NULL) {
+        tmp = node;
+        node = xor(last, node -> LRPtr);
+        last = tmp;
+        i++;
+    }
+    newNode = (XorPointer) malloc(sizeof(XorNode));
+    newNode -> data = data;
+    newNode -> LRPtr = xor(last, node);
+    if (node != NULL) {
+        node -> LRPtr = xor(newNode, xor(last, node -> LRPtr));
+    }
+    if (last != NULL) {
+        last -> LRPtr = xor(xor(last -> LRPtr, node), newNode);
+    }
+    if (pos == 1) {
+        list -> left = newNode;
+    }
+}
+</syntaxhighlight>
+
+=== 删除第i个结点 ===
+<syntaxhighlight lang="cpp">
+void XorLinkedListDelete(XorLinkedList *list, int pos) {
+    XorPointer node = list -> left, last = NULL, next = NULL, tmp = NULL;
+    int i = 1;
+    while (i < pos && node != NULL) {
+        i++;
+        tmp = node;
+        node = xor(last, node -> LRPtr);
+        last = tmp;
+    }
+    next = xor(last, node -> LRPtr);
+    if (last != NULL) {
+        last -> LRPtr = xor(xor(last -> LRPtr, node), next);
+    }
+    if (next != NULL) {
+        next -> LRPtr = xor(last, xor(node, next -> LRPtr));
+    } else {
+        list -> right = last; //删除了最后一个结点
+    }
+    if (pos == 1) {
+        list -> left = next;
+    }
+    free(node);
+}
+</syntaxhighlight>
+
+[[Category:数据结构|Category:数据结构]]
+[[Category:二进制算术|Category:二进制算术]]

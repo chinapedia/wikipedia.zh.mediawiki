@@ -1,0 +1,41 @@
+---Lexicographic tools for old Hangul text with Private Use Area.
+local p = {}
+ 
+p.hanyang_pua_fonts = {
+	'New Gulim',
+	'새굴림',
+	'New Dotum',
+	'새돋움',
+	'Haansoft Dotum',
+	'한컴돋움',
+	'Naver Dictionary',
+	'네이버사전',
+	'Haansoft Batang',
+	'한컴바탕',
+	'New Batang',
+	'새바탕',
+}
+ 
+---[[Template:汉阳造字|Template:汉阳造字]]
+function p.applyHanyangFonts(text, size)
+	if type(text) == "table" then
+		text, size = text.args[1], text.args.size
+	end
+ 
+	local css = mw.ustring.format("font-family: '%s', sans-serif;",
+		table.concat(p.hanyang_pua_fonts, "', '"))
+ 
+	-- U+E0BC - U+F8F7
+	text = mw.ustring.gsub(text, "([나랏말미)",
+		'<span class="oldhanyang" style="' .. css .. '">%1</span>')
+ 
+	css = mw.ustring.format("font-family: '%s', sans-serif;",
+		table.concat(p.hanyang_pua_fonts, "', '"))
+	if size then
+		css = css .. " font-size: " .. size .. ";"
+	end
+	return mw.ustring.format('<span lang="ko" xml:lang="ko" class="oldhanyang" style="%s">%s</span>',
+		css, text)
+end
+ 
+return p

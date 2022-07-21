@@ -1,0 +1,33 @@
+{{noteTA
+|T = zh-cn:返回导向编程; zh-tw:返回導向程式設計;
+|G1=IT
+}}
+{{各地中文名
+|cn=返回导向编程、面向返回程序设计、面向返回编程
+|tw=返回導向程式設計
+|hk=返回導向程式設計、返回導向編程
+}}
+{{expand|time=2013-09-21T16:40:16+00:00}}
+'''返回导向编程'''（{{lang-en|Return-Oriented Programming}}，缩写：{{lang|en|ROP}}）是计算机安全中的一种[[Exploit|漏洞利用]]技术，该技术允许攻击者在程序启用了安全保护技术（如[[資料執行防止|堆栈不可执行]]）的情况下控制程序执行流，执行恶意代码<ref>{{Cite web|url=https://www.pentest.es/checkpoint_hack.pdf|title=Check Point Secure Platform Hack|last=Vázquez|first=Hugo|date=October 1, 2007|website=Pentest|publisher=Pentest Consultores|location=Barcelona, Spain|pages=219|language=en|lay-url=https://www.cpug.org/forums/showthread.php/5980-CheckPoint-Secure-Platform-Multiple-Buffer-Overflows|access-date=2021-02-21|archive-date=2021-03-07|archive-url=https://web.archive.org/web/20210307221106/http://www.pentest.es/checkpoint_hack.pdf|dead-url=no}}</ref>。其核心思想是通过[[棧緩衝區溢出|棧緩衝區溢出]]等方式控制[[堆栈|堆栈]]调用以劫持程序控制流并执行针对性的机器语言指令序列（称为'''Gadgets'''）<ref>{{Cite book | doi = 10.1145/1455770.1455776 | chapter = When Good Instructions Go Bad: Generalizing Return-Oriented Programming to RISC | title = Proceedings of the 15th ACM conference on Computer and communications security - CCS '08 | pages = 27–38 | date = October 2008 | last1 = Buchanan | first1 = E. | last2 = Roemer | first2 = R. | last3 = Shacham | first3 = H. | last4 = Savage | first4 = S. | isbn = 978-1-59593-810-7 | chapter-url = http://cseweb.ucsd.edu/~hovav/dist/sparc.pdf | access-date = 2021-02-21 | archive-date = 2017-08-11 | archive-url = https://web.archive.org/web/20170811155838/https://cseweb.ucsd.edu/~hovav/dist/sparc.pdf | dead-url = no }}</ref>。所谓 gadgets 就是以 ret 结尾的指令序列，通过这些指令序列，我们可以修改某些地址的内容，方便控制程序的执行流程。<ref>{{Cite web |url=https://ctf-wiki.org/pwn/linux/stackoverflow/basic-rop/ |title=存档副本 |access-date=2021-04-19 |archive-date=2021-04-23 |archive-url=https://web.archive.org/web/20210423193057/https://ctf-wiki.org/pwn/linux/stackoverflow/basic-rop/ |dead-url=no }}</ref>
+
+== 分类 ==
+依据对于 gadget 利用的形式，返回导向编程主要有以下几种类型：
+* ret2text
+* ret2shellcode
+* ret2syscall
+* [[ret2libc|ret2libc]]
+* ret2dl_resolve
+* ret2VDSO
+* SROP
+* BROP
+
+==背景==
+===堆栈溢出攻击===
+ROP是一种高级的[[堆栈溢出攻击|堆栈溢出攻击]]。这类攻击往往利用操作堆栈调用时的程序漏洞，通常是[[缓冲区溢出|缓冲区溢出]]。在缓冲区溢出中，在将数据存入内存前未能正确检查适当范围的函数会收到多于正常承受范围的数据，如果数据将写入栈，多余的数据会溢出为函数变量分配的空间并覆盖替换返回地址（return address）。在原本用以重定向控制流并返回给调用者的地址被覆盖替换后，控制流将改写到新分配的地址。
+
+标准的缓冲区溢出攻击，攻击者只需要写出针对堆栈部分的代码（有效载荷）。直到1990年代后期，主流操作系统没有为该类攻击作出任何防范，微软直到2004年才提供了缓冲区溢出保护。操作系统最终使用[[数据执行保护|数据执行保护]]技术来修补这个漏洞，该技术标记内存数据不可执行。 启用数据执行保护，机器将拒绝执行任何内存中user级别可写区域的代码。该技术的硬件支持不久用以加强该防范。
+
+== 相關條目 ==
+* [[Return-to-libc攻击|Return-to-libc攻击]]
+
+[[Category:保全漏洞|Category:保全漏洞]]

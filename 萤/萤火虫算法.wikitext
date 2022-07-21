@@ -1,0 +1,80 @@
+{{expand|time=2013-05-19T03:39:42+00:00}}
+'''萤火虫算法'''（Firefly Algorithm）是一种[[元启发算法|启发式算法]]，灵感来自于[[螢火蟲|萤火虫]]闪烁的行为。萤火虫的闪光，其主要目的是作为一个信号系统，以吸引其他的萤火虫。[[剑桥大学|剑桥大学]]的[[杨新社|Xin-She Yang]]（音译：[[杨新社|杨新社]]）教授提出了萤火虫算法，其假设为<ref> Yang, X. S. (2008). Nature-Inspired Metaheuristic Algorithms. Frome: Luniver Press, UK</ref>：
+* 萤火虫不分性别，这样一个萤火虫将会吸引到所有其他的萤火虫;
+* 吸引力与它们的亮度成正比，对于任何两个萤火虫，不那么明亮的萤火虫被吸引，因此移动到更亮的一个，然而，亮度又随着其距离的增加而减少;
+* 如果没有比一个给定的萤火虫更亮的萤火虫，它会随机移动。
+亮度应与目标函数联系起来。萤火虫算法是以自然为灵感的启发式优化算法。<ref>{{Cite web |url=http://www.mathworks.com/matlabcentral/fileexchange/29693-firefly-algorithm/content/fa_mincon.m |title=存档副本 |accessdate=2013-05-18 |archive-date=2013-05-21 |archive-url=https://web.archive.org/web/20130521225656/http://www.mathworks.com/matlabcentral/fileexchange/29693-firefly-algorithm/content/fa_mincon.m |dead-url=no }}</ref>
+
+==算法描述==
+萤火虫算法的伪代码可以概括为：
+ Begin
+ 1）目标函数<math> f(\mathbf{x}) \quad \mathbf{x}=(x_1, x_2, ..., x_d)^T </math>
+ 2）生成一个萤火虫的初始人口<math> \mathbf{x}_i, \quad (i=1,2,...,n) </math>
+ 3）制定光照强度<math>I</math>，因此，它与<math>f(\mathbf{x})</math>
+    （例如，对于最大化问题<math>I \propto </math>或<math>I=f(\mathbf{x})</math>;
+ 4）定义吸收系数<math>\gamma </math>
+ while(T < MaxGeneration)
+    for i =1:n(所有n萤火虫)
+       for j =1:n(n萤火虫)
+          if(<math> I_j > I_i</math>)，
+             移动萤火虫i向j;
+          end if
+          吸引力与距离<math>r =\exp[ - \gamma r^2]</math>;
+          评估新的解决方案和更新的光强度;
+       end for j
+    end  for i
+    排名萤火虫和找到当前最佳;
+ end while
+ 处理后的结果和可视化;
+ end
+
+对于任何一两只萤火虫的主要更新公式<math>\mathbf{x}_i </math> and <math>\mathbf{x}_j </math>是
+:: <math>\mathbf{x}_i^{t+1}=\mathbf{x}_i^t + \beta \exp[-\gamma r_{ij}^2] (\mathbf{x}_j^t - \mathbf{x}_i^t) +\alpha_t \boldsymbol{\epsilon}_t </math>
+其中<math>\alpha_t </math>是步长参数, e <math>\boldsymbol{\epsilon}_t </math>是一个矢量（服从高斯或其他的分布）。
+
+可以证明在<math>\gamma \rightarrow 0 </math>的情况，FA可以简化为 准粒子群优化(PSO).事实上，，如果内环（j）条被删除，亮度
+<math>I_j</math>替换为当前的全球最佳<math>g^*</math>，FA基本上成为标准PSO。
+
+==萤火虫算法的变种==
+===离散萤火虫算法（DFA）===
+
+离散形式的萤火虫算法（Discrete Firefly Algorithm，DFA）<ref>{{cite journal |first=M. K. |last=Sayadi |first2=R. |last2=Ramezanian |first3=N. |last3=Ghaffari-Nasab |title=A discrete firefly meta-heuristic with local search for makespan minimization in permutation flow shop scheduling problems |journal=Int. J. of Industrial Engineering Computations |volume=1 |issue= |pages=1–10 |year=2010 |url=http://growingscience.com/ijiec/VOL1/IJIEC_2010_7.pdf |access-date=2013-05-21 |archive-date=2013-10-13 |archive-url=https://web.archive.org/web/20131013153351/http://growingscience.com/ijiec/VOL1/IJIEC_2010_7.pdf |dead-url=no }}</ref>
+DFA优于现有算法如蚁群算法。
+
+对于图像分割，基于FA-方法比Otsu的方法更为有效.<ref>T. Hassanzadeh, H. Vojodi and A. M. E. Moghadam, An image segmentation approach based on maximum variance intra-cluster method and firefly algorithm, in: Proc. of 7th Int. Conf. on Natural Computation (ICNC), pp. 1817-1821 (2011).</ref>
+同时， 离散萤火虫算法对QAP问题，Durkota已进很好的实现行<ref>K. Durkota,
+Implementation of a discrete firefly algorithm for the QAP problem within the sage framework, BSc thesis, Czech Technical University, (2011).
+{{cite web |url=http://cyber.felk.cvut.cz/research/theses/papers/189.pdf |title=存档副本 |accessdate=2013-05-21 |deadurl=yes |archiveurl=https://web.archive.org/web/20120425080037/http://cyber.felk.cvut.cz/research/theses/papers/189.pdf |archivedate=2012-04-25 }}</ref>
+
+针对负荷预测中的特征选择问题，应用FA实现Wrapper特征选择算法. <ref>Hu, Z., Bao, Y., Xiong, T., & Chiong, R. (2015). Hybrid filter–wrapper feature selection for short-term load forecasting. Engineering Applications of Artificial Intelligence, 40, 17-27.</ref>
+
+===多目标萤火虫算法===
+Apostolopoulos and Vlachos对FA进行了一个重要的多目标研究<ref>{{cite journal |first=T. |last=Apostolopoulos |first2=A. |last2=Vlachos |title=Application of the Firefly Algorithm for Solving the Economic Emissions Load Dispatch Problem |journal=International Journal of Combinatorics |volume=2011 |year=2011 |page=Article ID 523806 |url=http://www.hindawi.com/journals/ijct/2011/523806.html }}</ref>。同时，Yang提出了多目标萤火虫算法（Multiobjective Firefly Algorithm，MOFA），对连续优化问题有很好的效果<ref>X. S. Yang, Multiobjective firefly algorithm for continuous optimization, Engineering with Computers, vol. 29, No. 2, pp. 175-184 (2013). </ref>。
+
+===拉格朗日FA===
+拉格朗日萤火虫算法用来解决电力系统优化单元承诺问题<ref>Rampriya B., Mahadevan K. and Kannan S., Unit commitment in deregulated power system using Lagrangian firefly algorithm, Proc. of IEEE Int. Conf. on Communication Control and Computing Technologies (ICCCCT), pp. 389-393 (2010).</ref>。
+
+===混沌FA===
+混沌萤火虫算法（Chaotic Firefly Algorithm，CFA）也显示了算法的有效性<ref>L. dos Santos Coelho, D. L. de Andrade Bernert, V. C. Mariani, a chaotic firefly algorithm applied to reliability-redundancy optimization, in: 2011 IEEE Congress on Evolutionary Computation (CEC'11), pp. 517-521 (2011).</ref>。
+
+===混合算法===
+萤火虫算法与蚁群优化算法相结合的混合算法，能够解决金融投资组合优化
+<ref>G. Giannakouris, V. Vassiliadis and G. Dounias, Experimental study on a hybrid nature-inspired algorithm for financial portfolio optimization, SETN 2010, LNAI 6040, pp. 101-111 (2010).</ref>。
+
+=== 基于萤火虫算法的 Memetic 算法===
+
+一种基于萤火虫算法（FA）的Memetic算法（FA-MA）被用来优化支持向量机（SVR）预测模型的参数。在该FA-MA中，FA用来搜索全局解空间，而模式搜索（pattern Search） 被用来进行个体学习和局部解空间搜索。<ref name="#1">Zhongyi Hu, Yukun Bao, and Tao Xiong, Electricity Load Forecasting using Support Vector Regression with Memetic Algorithms, The Scientific World Journal, 2014, http://www.hindawi.com/journals/tswj/aip/292575/ {{Wayback|url=http://www.hindawi.com/journals/tswj/aip/292575/ |date=20131220084924 }}</ref>
+
+== 实际应用 ==
+萤火虫算法已被应用到几乎所有领域科学和工程，如数字图像压缩和图像处理<ref>Horng M.-H. and Jiang T. W., The codebook design of image vector quantization based on the firefly algorithm, in: Computational Collective Intelligence, Technologies and Applications, LNCS, Vol. 6423, pp. 438-447 (2010).</ref><ref>M.-H. Horng, vector quantization using the firefly algorithm for image compression, Expert Systems with Applications, Vol. 38,  (article in press) 12 Aug. (2011).</ref>,特征值优化<ref>R. Dutta, R. Ganguli and V. Mani, Exploring isospectral spring-mass systems with firefly algorithm, Proc. Roy. Soc. A.,
+Vol. 467, (2011)http://rspa.royalsocietypublishing.org/content/early/2011/06/16/rspa.2011.0119.abstract {{Wayback|url=http://rspa.royalsocietypublishing.org/content/early/2011/06/16/rspa.2011.0119.abstract |date=20160304071525 }}</ref>,特征提取和故障检测<ref>H. Banati and M. Bajaj, Firefly based feature selection approach, Int. J. Computer Science Issues, vol. 8, No. 2, 473-480 (2011).</ref><ref>R. Falcon, M. Almeida and A. Nayak, Fault identification with binary adaptive fireflies in parallel and distributed systems, IEEE Congress on Evolutionary Computation, (2011).</ref>,天线设计<ref>B. Basu and G. K. Mahanti, Firefly and artificial bees colony algorithm for synthesis of scanned and broadside linear array antenna, Progress in Electromagnetic Research B., Vol. 32, 169-190 (2011).</ref><ref>A. Chatterjee, G. K. Mahanti, and A. Chatterjee, Design of a fully digital controlled reconfigurable switched beam conconcentric ring array antenna using firefly and particle swarm optimization algorithm, Progress in Elelectromagnetic Research B, Vol. 36, 113-131(2012)</ref>,工程结构设计<ref>A. H. Gandomi, X. S. Yang, A. H. Alavi, Mixed variable structural optimization using firefly algorithm, Computers and Structures, Vol. 89, No. 23-24, pp. 2325-2336 (2011). {{doi|10.1016/j.compstruc.2011.08.002}}</ref>, 
+调度和旅行商问题<ref>U. Hönig, A firefly algorithm-based approach for scheduling task graphs in homogenous systems, Proceeding Informatics, {{doi|10.2316/P.2010.724-033}}, 724 (2010).</ref><ref>A. Khadwilard, S. Chansombat, T. Thepphakorn, P. Thapatsuwan, W. Chainat, P. Pongcharoen, Application of firefly algorithm and its parameter setting for job shop scheduling, First Symposius on
+ Hands-On Research and Development, (2011).</ref><ref>G. K. Jati and S. Suyanto, Evolutionary discrete firefly algorithm for travelling salesman problem, ICAIS2011, Lecture Notes in Artificial Intelligence (LNAI 6943), pp.393-403 (2011).</ref>,语义组成<ref>C. B. Pop, V. R. Chifu, I. Salomie,R. B. Baico, M. Dinsoreanu, G. Copil, A hybrid firefly-inspired approach for optimal semantic web service composition, in: Proc. of 2nd Workshop on Software Services: Cloud Computing and Applications, June, 2011.</ref>,化学相平衡<ref>S. E. Fateen, A. Bonilla-Petrociolet, G. P. Rangaiah, Evaluation of covariance matrix adaptation evolution strategy, shuffled complex evolution and firefly algorithms for phase stability, phase equilibrium and chemical equilibrium problems, Chemical Engineering Research and Design, May (2012). http://dx.doi.org/10.1016/j.cherd.2012.04.011</ref>， 聚类<ref>J. Senthilnath,  S. N. Omkar and V. Mani, Clustering using firefly algorithm: Performance study, Swarm and Evolutionary Computation, June (2011). {{doi|10.1016/j.swevo.2011.06.003}}</ref>,动态问题<ref>S. M. Farahani, B. Nasiri and M. R. Meybodi, A multiswarm based firefly algorithm in dynamic environments, Third Int. Conference on Signal Processing Systems (ICSPS2011), Aug 27-28, Yantai, China, pp. 68-72 (2011)</ref><ref>A. A. Abshouri, M. R. Meybodi and A. Bakhtiary, New firefly algorithm based on multiswarm and learning automata in dynamic environments, Third Int. Conference on Signal Processing Systems (ICSPS2011), Aug 27-28, Yantai, China, pp. 73-77 (2011).</ref>, 
+刚性图像配准问题<ref>Yudong Zhang and Lenan Wu, A Novel Method for Rigid Image Registration based on Firefly Algorithm, International Journal of Research and Reviews in Soft and Intelligent Computing, vol.2, no.2, pp. 141-146 (2012).</ref>,参数选择<ref>Tao Xiong, Yukun Bao, Zhongyi Hu: Multiple-output support vector regression with a firefly algorithm for interval-valued stock price index forecasting. Knowl.-Based Syst. 55: 87-100 (2014), http://www.sciencedirect.com/science/article/pii/S0950705113003237 {{Wayback|url=http://www.sciencedirect.com/science/article/pii/S0950705113003237 |date=20150924182004 }}</ref><ref name="#1"/>，蛋白质折叠问题<ref>Yudong Zhang, Lenan Wu, Shuihua Wang. [http://downloads.hindawi.com/journals/mpe/2013/398141.pdf Solving Two-Dimensional HP model by Firefly Algorithm and Simplified Energy Function] {{Wayback|url=http://downloads.hindawi.com/journals/mpe/2013/398141.pdf |date=20140429190313 }}. Mathematical Problems in Engineering. 2013. doi:10.1155/2013/398141</ref>等等。
+
+== 参考文献 ==
+{{Reflist}}
+
+[[Category:數學最佳化|Category:數學最佳化]]
+[[Category:算法|Category:算法]]
+[[Category:图像处理|Category:图像处理]]

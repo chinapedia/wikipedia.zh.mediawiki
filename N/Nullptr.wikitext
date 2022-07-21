@@ -1,0 +1,102 @@
+{{lowercase|title=nullptr}}
+{{noteTA
+|G1=IT
+|1=zh-cn:引用;zh-tw:參考;
+|2=zh-cn:解引用;zh-tw:反參考;
+}}
+{{Infobox
+|name         = 
+|bodystyle    = 
+|title        = nullptr
+|titlestyle   = 
+|above        = 
+|abovestyle   = 
+|image        = 
+|imagestyle   = 
+|caption      = 
+|captionstyle = 
+|headerstyle  = 
+|labelstyle   = 
+|datastyle    = 
+
+|header1  = 基本資料
+|label1   = 
+|data1    = 
+|header2  = 
+|label2   = 所屬概念
+|data2    = [[空指標|空指標]]
+|header3  = 
+|label3   = 種類
+|data3    = [[字面常量_(C语言)|字面常數]]
+|header4  = 
+|label4   = [[程式語言|語言]]
+|data4    = [[C++|C++]]
+|header5  = 詳細資料
+|label5   = 
+|data5    = 
+|header6  = 
+|label6   = 語法
+|data6    = nullptr
+|header7  = 
+|label7   = 型態
+|data7    = std::nullptr_t
+|header8  = 
+|label8   = 標頭檔
+|data8    = nullptr.h （C++11之前）
+|header9  = 
+|label9   = 首次出現
+|data9    = [[C++11|C++11]]
+
+|belowstyle =
+|below = 
+}}
+{{C++_Standard_library}} 
+{{About|[[C++11|C++11]]語言標準的[[保留字|關鍵字]]|null pointer|空指標}}
+'''nullptr'''是[[C++11|C++11]]语言标准用来表示[[空指针|空指针]]的[[常量|常量值]]<ref name="stroustrup.com nullptr">{{Cite web | title = A name for the null pointer: nullptr | url = http://www.stroustrup.com/N1488-nullptr.pdf | date =2003-09-10| accessdate = 2018-09-09 | website = stroustrup.com | archive-url = https://web.archive.org/web/20170705130851/http://www.stroustrup.com/N1488-nullptr.pdf | archive-date = 2017-07-05 | dead-url = no }}</ref>，可以指派給任意類型的[[指標_(電腦科學)|指標]]變數<ref name="Embedded Template Library nullptr">{{cite web | url = https://www.etlcpp.com/nullptr.html | title = nullptr | publisher = Embedded Template Library | accessdate = 2018-09-09 | archive-url = https://web.archive.org/web/20180909112840/https://www.etlcpp.com/nullptr.html | archive-date = 2018-09-09 | dead-url = no }}</ref>。部分[[編譯器|編譯器]]將之視為一個關鍵字，例如[[Visual_Studio|Visual Studio]]<ref>{{cite web | url = https://msdn.microsoft.com/zh-tw/library/4ex65770.aspx | title = nullptr (C++ Component Extensions) | accessdate = 2018-09-09 | archive-url = https://web.archive.org/web/20180909150420/https://msdn.microsoft.com/zh-tw/library/4ex65770.aspx | archive-date = 2018-09-09 | dead-url = no }}</ref>，部分使用舊標準的[[C++|C++]]編譯器則未實作需要自行定義<ref name="Imperfect C++ --- Practical Solutions for Real-Life Programming"/>或引入額外的標頭檔<ref name="Embedded Template Library nullptr"/>。
+
+== 定義 ==
+在C语言中，[[空指標|空指標]]可以使用<code>(void *)0;</code>來表示，且標準庫中也是如此定義，但在C++语言中，由于对语法的类型检查更为严格，因而空指针的值就不能表示为<code>(void *)0;</code>。例如，空指针的值表示为<code>FILE *fp=(void *)0;</code>编译报错。所以至少自[[C++98|C++98]]开始<code>#define NULL 0</code>。 但这会在函数重载时遇到新的困难。例如
+<syntaxhighlight lang="cpp">
+void foo(char c, void *p);
+void foo(char c, int i);
+int main()
+{
+    foo('x',NULL);//匹配哪个版本的foo()？
+}
+</syntaxhighlight>
+
+[[C++11|C++11]]开始，定义了空指针的常值为<code>nullptr</code>，解决了上述函数重载问题。
+
+在没有C++11的nullptr时，可以自己实现一个<ref name="Imperfect C++ --- Practical Solutions for Real-Life Programming">《Imperfect C++ --- Practical Solutions for Real-Life Programming》 作者: 威尔逊 译者: 荣耀 / 刘未鹏
+人民邮电出版社 2006年1月 ISBN 9787115136848</ref>：
+<syntaxhighlight lang="cpp">const class nullptr_t
+{
+public:
+    template<class T>
+    inline operator T*() const
+        { return 0; }
+
+    template<class C, class T>
+    inline operator T C::*() const
+        { return 0; }
+ 
+private:
+    void operator&() const;
+} nullptr = {};
+</syntaxhighlight>
+
+C++语言标准规定：<ref>《C++14语言标准》4.10.1</ref> 值0或std::nullptr_t类型的纯右值是空指针常量（null pointer constant）。可以通过空指针转换(null pointer conversion)成为某个类型的空指针值(null pointer value)。
+
+C++语言标准还规定，<ref>《C++14语言标准》5.2.2.7</ref>在实参个数多于形参个数时（即可变参数个数的函数调用，可用va_arg来访问），多出来的实参如果是std::nullptr_t类型，则转化为(void *)0供函数访问。
+
+std::nullptr_t定义在标准头文件<code><[[cstddef|cstddef]]></code>中。但实际上在源程序中不包含该头文件仍可以正常使用nullptr_t类型与nullptr对象。
+
+== nullptr_t ==
+nullptr_t是[[字面常量_(C语言)|字面常數]]nullptr的資料型態<ref>{{cite web | title = std::nullptr_t | url = http://www.cplusplus.com/reference/cstddef/nullptr_t/ | publisher = cplusplus.com | access-date = 2018-09-09 | archive-url = https://web.archive.org/web/20180324153608/http://www.cplusplus.com/reference/cstddef/nullptr_t/ | archive-date = 2018-03-24 | dead-url = no }}</ref>。它是一種特殊的類型，並不是一種指標類型也不是指向任何種變數型態的指標類型。nullptr_t位於std命名空間中，且定義於<cstddef>標頭檔中<ref>{{cite web | title = Null pointers | url = https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_73/rzarg/nullpt.htm | publisher = IBM | access-date = 2018-09-09 | archive-url = https://web.archive.org/web/20180909112329/https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_73/rzarg/nullpt.htm | archive-date = 2018-09-09 | dead-url = no }}</ref>。可透過is_null_pointer來檢查物件是否為這種型態<ref>{{cite web | title = std::is_null_pointer | url = http://www.cplusplus.com/reference/type_traits/is_null_pointer/ | publisher = cplusplus.com | access-date = 2018-09-09 | archive-url = https://web.archive.org/web/20180312023615/http://www.cplusplus.com/reference/type_traits/is_null_pointer/ | archive-date = 2018-03-12 | dead-url = no }}</ref>。
+
+== 參見 ==
+*[[空指標|空指標]]
+
+==参考文献==
+<references/>
+[[Category:C++|Category:C++]]

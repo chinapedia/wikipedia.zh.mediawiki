@@ -1,0 +1,109 @@
+{{NoteTA|G1=IT|G2=FL}}
+{{Infobox software
+| name                   = NumPy
+| title                  = 
+| logo = NumPy logo 2020.svg
+| screenshot             = 
+| caption                = 
+| collapsible            = 
+| author                 = {{en-link|Travis Oliphant}}
+| developer              = 社群專案
+| released               = Numeric, {{Start date|1995}}; <br>NumPy, {{Start date|2006}}
+| discontinued           = 
+| latest release version = {{LSR/wikidata}}
+| latest preview version = 
+| latest preview date    = 
+| programming language   = [[Python|Python]], [[C語言|C語言]]
+| operating system       = [[跨平台|跨平台]]
+| platform               = 
+| size                   = 
+| language               = 
+| genre                  = [[数值分析|数值分析]]
+| license                = [[BSD授權條款|BSD授權條款]]
+| website                = {{URL|http://www.numpy.org/}}
+}}
+
+'''NumPy'''是[[Python|Python語言]]的一個擴充程式庫。支援高-{}-階大量的[[維度|維度]][[陣列|陣列]]與[[矩陣|矩陣]]運算，此外也針對陣列運算提供大量的[[數學|數學]][[函數|函數]][[函式庫|函式庫]]。NumPy的前身'''Numeric'''最早是由Jim Hugunin與其它協作者共同開發，2005年，Travis Oliphant在Numeric中結合了另一個同性質的程式庫Numarray的特色，並加入了其它擴充功能而開發了NumPy。NumPy為開放原始碼並且由許多協作者共同維護開發。
+
+== 特色 ==
+NumPy參考[[CPython|CPython]]（一個使用[[位元組碼|位元組碼]]的[[直譯器|直譯器]]），而在這個Python實作直譯器上所寫的數學[[演算法|演算法]]程式碼通常遠比[[編譯|編譯]]過的相同程式碼要來得慢。為了解決這個難題，NumPy引入了多維陣列以及可以直接有效率地操作多維陣列的[[函式|函式]]與運算子。因此在NumPy上只要能被表示為針對陣列或矩陣運算的演算法，其執行效率幾乎都可以與編譯過的等效[[C語言|C語言]]程式碼一樣快<ref>{{cite web | title = SciPy PerformancePython | url = http://wiki.scipy.org/PerformancePython?highlight=%28performance%29 | accessdate = 2006-06-25 | archive-url = https://web.archive.org/web/20150113033530/http://wiki.scipy.org/PerformancePython?highlight=%28performance%29 | archive-date = 2015-01-13 | dead-url = yes }}</ref>。
+
+NumPy提供了與[[MATLAB|MATLAB]]相似的功能與操作方式，因為兩者皆為直譯語言，並且都可以讓使用者在針對陣列或矩陣運算時提供較[[純量|純量]]運算更快的效能。兩者相較之下，MATLAB提供了大量的擴充工具箱（例如[[Simulink|Simulink]]）；而NumPy則是根基於Python這個更現代、完整並且開放原始碼的程式語言之上。此外NumPy也可以結合其它的Python擴充函式庫。例如[[SciPy|SciPy]]，這個函式庫提供了更多與MATLAB相似的功能；以及[[Matplotlib|Matplotlib]]，這是一個與MATLAB內建繪圖功能類似的函式庫。而從本質上來說，NumPy與MATLAB同樣是利用[[BLAS|BLAS]]與[[LAPACK|LAPACK]]來提供高效率的線性代數運算。
+
+=== ndarray 数据結構 ===
+
+NumPy的核心功能是ndarray（即''n''-dimensional array，多維陣列）数据結構。這是一個表示多維度、同質並且固定大小的陣列物件。而由一個與此陣列相關聯的資料型態物件來描述其陣列元素的資料格式（例如其字元組順序、在記憶體中佔用的字元組數量、整數或者浮點數等等）。
+
+== 語法 ==
+;格点
+<syntaxhighlight lang="numpy">
+>>> import numpy as np
+>>> x = np.array([1, 2, 3])
+>>> x
+array([1, 2, 3])
+>>> y = np.arange(10)  # 類似 Python 的 range, 但是回傳 array
+>>> y
+array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+</syntaxhighlight>
+
+;基本運算
+<syntaxhighlight lang="numpy">
+>>> a = np.array([1, 2, 3, 6])
+>>> b = np.linspace(0, 2, 4)  # 建立一個array, 在0與2的範圍之間讓4個點3等分
+>>> c = a - b
+>>> c
+array([ 1.        ,  1.33333333,  1.66666667,  4.        ])
+>>> a**2
+array([ 1,  4,  9, 36])
+</syntaxhighlight>
+
+;全域方法
+<syntaxhighlight lang="numpy">
+>>> a = np.linspace(-np.pi, np.pi, 100) 
+>>> b = np.sin(a)
+>>> c = np.cos(a)
+</syntaxhighlight>
+
+;線性代數
+<syntaxhighlight lang="numpy">
+>>> from numpy.random import rand
+>>> from numpy.linalg import solve, inv
+>>> a = np.array([[1,_2,_3],_[3,_4,_6.7],_[5,_9.0,_5|1, 2, 3], [3, 4, 6.7], [5, 9.0, 5]])
+>>> a.transpose()
+array([[ 1. ,  3. ,  5. ],
+       [ 2. ,  4. ,  9. ],
+       [ 3. ,  6.7,  5. ]])
+>>> inv(a)
+array([[-2.27683616,  0.96045198,  0.07909605],
+       [ 1.04519774, -0.56497175,  0.1299435 ],
+       [ 0.39548023,  0.05649718, -0.11299435]])
+>>> b =  np.array([3, 2, 1])
+>>> solve(a, b)  # 解方程式 ax = b
+array([-4.83050847,  2.13559322,  1.18644068])
+>>> c = rand(3, 3)  # 建立一個 3x3 隨機矩陣
+>>> c
+array([[  3.98732789,   2.47702609,   4.71167924],
+       [  9.24410671,   5.5240412 ,  10.6468792 ],
+       [ 10.38136661,   8.44968437,  15.17639591]])
+>>> np.dot(a, c)  # 矩陣相乘
+array([[  53.61964114,   38.8741616 ,   71.53462537],
+       [ 118.4935668 ,   86.14012835,  158.40440712],
+       [ 155.04043289,  104.3499231 ,  195.26228855]])
+</syntaxhighlight>
+
+==参考资料==
+{{Reflist}}
+
+==扩展阅读==
+* {{cite book|last=Bressert|first=Eli|title=Scipy and Numpy: An Overview for Developers|year=2012|publisher=O'Reilly Media|isbn=978-1-4493-0546-8}}
+* {{cite book |first=Wes |last=McKinney |title=Python for Data Analysis: Data Wrangling with Pandas, NumPy, and IPython |location=Sebastopol |publisher=O'Reilly |year=2017 |edition=2nd |isbn=978-1-4919-5766-0 }}
+* {{cite book |first=Jake |last=VanderPlas |chapter=Introduction to NumPy |pages=33–96 |title=Python Data Science Handbook: Essential Tools for Working with Data |location= |publisher=O'Reilly |year=2016 |isbn=978-1-4919-1205-8 }}
+
+== 外部連結 ==
+* {{官方網站|http://www.numpy.org/}}
+* [https://scipy.github.io/old-wiki/pages/History_of_SciPy History of NumPy]{{Wayback|url=https://scipy.github.io/old-wiki/pages/History_of_SciPy |date=20200917153613 }}
+{{SciPy ecosystem}}
+
+[[Category:陣列編程語言|Category:陣列編程語言]]
+[[Category:Python库|Category:Python库]]
+[[Category:Python科学库|Category:Python科学库]]

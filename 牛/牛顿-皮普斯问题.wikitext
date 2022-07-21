@@ -1,0 +1,51 @@
+'''牛顿-皮普斯问题'''是一个掷骰子的概率问题。[[塞缪尔·皮普斯|塞缪尔·皮普斯]]1693年向[[艾萨克·牛顿|艾萨克·牛顿]]咨询怎样在赌局中下注赢面更大，在信中他问道：下列三种情形哪一种概率最高：
+*A.6个正常的骰子独立投掷，至少出现1个6.
+*B.12个正常的骰子独立投掷，至少出现2个6.
+*C.18个正常的骰子独立投掷，至少出现3个6.<ref>[http://galton.uchicago.edu/faculty/stigler/pubs/IsaacNewtonProb-final.html Isaac Newton as a Probabilist] {{webarchive|url=https://web.archive.org/web/20070918230919/http://galton.uchicago.edu/faculty/stigler/pubs/IsaacNewtonProb-final.html |date=2007-09-18 }}, Stephen Stigler, University of Chicago</ref>
+
+== 概率解 ==
+利用[[二项分布|二项分布]]，三个投掷实验的概率分别为：<ref name="wolfram">{{MathWorld|urlname=Newton-PepysProblem |title=Newton-Pepys Problem}}</ref>
+
+:<math>P(A)=1-\left(\frac{5}{6}\right)^{6} = \frac{31031}{46656} \approx 0.6651\, ,</math>
+
+:<math>P(B)=1-\sum_{x=0}^1\binom{12}{x}\left(\frac{1}{6}\right)^x\left(\frac{5}{6}\right)^{12-x}
+= \frac{1346704211}{2176782336} \approx 0.6187\, ,</math>
+
+:<math>P(C)=1-\sum_{x=0}^2\binom{18}{x}\left(\frac{1}{6}\right)^x\left(\frac{5}{6}\right)^{18-x}
+= \frac{15166600495229}{25389989167104} \approx 0.5973\, .</math>
+
+该类问题的通项公式，一般的，若P(''N'')是投掷6''n''个骰子得到至少''n''个6的概率，则：
+:<math>P(N)=1-\sum_{x=0}^{n-1}\binom{6n}{x}\left(\frac{1}{6}\right)^x\left(\frac{5}{6}\right)^{6n-x}\, .</math>
+''n''变大时，P(''N'')会逐渐趋近于极限值1/2.
+== 编程计算法 ==
+在[[R语言|R语言]]中，该问题可以用如下方法解：
+
+<syntaxhighlight lang = "rsplus">
+p <- as.numeric(1/6)
+s <- c(1, 2, 3)
+for (i in s)
+{
+   x <- 0
+   n <- 6*i
+   for(j in 0:(i-1)) {x <- x + dbinom(j, n, p) }
+   print(paste("Probability of at least ", i, " six in ", n, " fair dice: ", 1-x, sep=""))
+}
+</syntaxhighlight>
+
+结果会显示为：
+<syntaxhighlight lang = "rsplus">
+[1] "Probability of at least 1 six in 6 fair dice: 0.665102023319616"
+[1] "Probability of at least 2 six in 12 fair dice: 0.618667373732309"
+[1] "Probability of at least 3 six in 18 fair dice: 0.597345685947723"
+</syntaxhighlight>
+
+== 牛頓的解释 ==
+
+牛頓設想將B和C的骰子每六粒分為一組，A只可分為一組；B和C分別可分成兩組和三組，每組需要在其中一次投擲中出現6。如此可見，A的機率是最大的，因为A只需要在其中一次投擲中出現6，而B和C則分别需要重复A的過程两次和三次。
+
+==参考文献==
+{{reflist}}
+
+[[Category:概率论|Category:概率论]]
+[[Category:赌博|Category:赌博]]
+[[Category:骰子游戏|Category:骰子游戏]]

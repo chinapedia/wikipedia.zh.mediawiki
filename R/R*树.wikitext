@@ -1,0 +1,82 @@
+{{roughtranslation|time=2017-12-02T14:46:05+00:00}}
+在[[数据处理|数据处理]]中，'''R*树'''是[[R树|R树]]的一种变体，可用来索引{{le|空间信息|Spatial database}}。R*树的构造花费比标准R树略高，因为数据可能需要被重新插入，但生成的树通常能获得更好的查询性能。像标准R树一样，它能存储点和空间数据。它在1990年由Norbert Beckmann，Hans-Peter Kriegel，Ralf Schneider，和Bernhard Seeger提出。<ref name="rstar">{{Cite journal 
+| last1 = Beckmann 
+| first1 = N. 
+| last2 = Kriegel 
+| first2 = H. P. 
+| authorlink2 = Hans-Peter Kriegel 
+| last3 = Schneider 
+| first3 = R. 
+| last4 = Seeger 
+| first4 = B. 
+| chapter = The R*-tree: an efficient and robust access method for points and rectangles 
+| doi = 10.1145/93597.98741 
+| title = Proceedings of the 1990 ACM SIGMOD international conference on Management of data  - SIGMOD '90 
+| pages = 322 
+| year = 1990 
+| isbn = 0897913655 
+| pmid =  
+| pmc =  
+| url = http://dbs.mathematik.uni-marburg.de/publications/myPapers/1990/BKSS90.pdf 
+| journal =  
+| access-date = 2018-04-03 
+| archive-date = 2018-04-17 
+| archive-url = https://web.archive.org/web/20180417071129/http://dbs.mathematik.uni-marburg.de/publications/myPapers/1990/BKSS90.pdf 
+| dead-url = no 
+}}</ref>
+
+==R*树和R树的不同==
+[[Image:RTree_2D.svg|thumb]])。 这颗树的重叠较少，因此有很好的查询性能。 红的和蓝的MBRs是索引页，绿的MBRs是叶节点。]]
+覆盖和重叠的最小化对于R树的性能至关重要。重叠意味着，在数据查询和插入时，需要扩展树的多个分支（由于数据会被拆分到许多可能重叠的区域）。覆盖率的最小化提高了修剪性能，允许更频繁地从搜索中排除整个页面，特别是负范围查询。
+
+R*树通过结合修改后的节点拆分算法和在节点溢出时强制重新插入的概念，去尝试减少覆盖和重叠。这是基于观察到 R-tree 结构非常容易受到其条目插入顺序的影响，因此插入构建（而不是批量加载）结构可能不是最优的。条目的删除和重新插入可能让它们“找到”树中比其原始位置更合适的位置。
+
+当一个节点溢出时，它的一部分条目会从节点中删除并重新插入到树中。（为了避免由后续节点溢出导致的无限级联重新插入，在插入任何新条目时，在树的每一级中，重新插入的例程可能只被调用一次。）这带来了在节点中生成更多聚集良好的条目组的效果，从而减少节点覆盖。此外，实际的节点拆分经常被推迟，导致平均节点占用率上升。重新插入可以看作是节点溢出触发的增量树优化的一种方法。
+
+==性能==
+*改进的启发式拆分可以生成更矩形的分页，因此更适合许多应用程序。
+*重插方法优化了现有树，但增加了复杂性。
+*同时高效地支持点和空间数据。
+{{clear}}
+
+{{Gallery
+|title=在德国邮区数据库上不同拆分尝试的效果
+|width=300 | height=300 | align=center | lines=6
+|File:Zipcodes-Germany-GuttmanRTree.svg|R树，采用Guttman二次拆分方式。<ref name="guttman">{{cite journal|title=R-trees: a dynamic index structure for spatial searching, R-trees: a dynamic index structure for spatial searching|date=1984-06-18|journal=ACM SIGMOD Record|volume=14|issue=2|doi=10.1145/602259.602266|pages=47, 47–57, 57|issn=0163-5808|url=http://dl.acm.org/citation.cfm?id=602259.602266,%20http://dl.acm.org/citation.cfm?id=971697.602266|accessdate=2018-04-02|author=Antonin Guttman, Antonin Guttman}}{{Dead link|date=2018年8月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref><br /> 有很多从东延伸到西的页，它们跨越整个德国，并且页重叠很多。这无益于那些经常只需要一个与许多切片相交的小矩形区域的大多数应用。
+|File:Zipcodes-Germany-AngTanSplit.svg|R树，采用Ang-Tan线性拆分。<ref name="ang-tan">{{cite journal|title=New linear node splitting algorithm for R-trees|isbn=3540632387|url=https://link.springer.com/chapter/10.1007/3-540-63238-7_38|date=1997-07-15|publisher=Springer, Berlin, Heidelberg|doi=10.1007/3-540-63238-7_38|language=en|pages=337–349|accessdate=2018-04-02|author=C. H. Ang, T. C. Tan|archive-date=2018-06-06|archive-url=https://web.archive.org/web/20180606013101/https://link.springer.com/chapter/10.1007%2F3-540-63238-7_38|dead-url=no}}</ref><br /> 尽管条形区域的延伸不像Guttman拆分那样远，条形切割的问题影响几乎每一个叶页。叶页重叠很少，但目录页重叠却很多。
+|File:Zipcodes-Germany-RStarTree.svg|'''R*树'''拓扑拆分。<ref name="rstar" /><br /> 由于R*树尝试最小化页重叠，使得页重叠非常少，并且重插进一步优化此树，拆分策略亦尽量避免产生条形区域，因而结果页对于通常的地图应用有用得多。
+}}
+
+==算法和复杂性==
+* R*树的查询和删除操作使用和常规[[R树|R树]]一样的算法。
+* 插入时，R*树使用一种组合策略。对于叶节点，重叠被最小化，而对于内节点，则最小化放大和面积。
+* 拆分时，R*树使用一种拓扑拆分，根据周长选择拆分轴，然后最小化重叠。
+* 除改良的拆分策略外，R*树还尝试通过将对象和子树重新插入树中来避免拆分，这受到[[B树|B树]]平衡概念的启发。
+
+因此，最坏情况下R*树的查询和删除复杂度与R树相当。R*树的插入策略的<math>\mathcal{O}(M \log M)</math>比R树线性拆分策略的复杂度高（<math>\mathcal{O}(M)</math>），但比R树取页大小为<math>M</math>时的二次拆分策略（<math>\mathcal{O}(M^2)</math>）复杂度低，并且对总复杂度没有太大的影响。R*树总的插入复杂性仍与R树相当。重插至多影响一个树支，因此重插操作具有<math>\mathcal{O}(\log n)</math>的复杂度，这与正规R树的拆分操作相当。总体而言，R*树的复杂度与正规R树处于同一数量级。
+
+一个完整的算法实现必须考虑诸多未在此处涉及的[[邊角案例|邊角案例]]与特殊情况。
+
+==参考资料==
+{{reflist}}
+
+==外部链接==
+{{commons category|R* tree}}
+包含R*树的库：
+*[http://www.boost.org/doc/libs/release/libs/geometry/doc/html/geometry/reference/spatial_indexes/boost__geometry__index__rtree.html Boost.Geometry rtree documentation] (C++, maybe R-tree only)
+*[http://elki.dbs.ifi.lmu.de/releases/release0.6.0/doc/de/lmu/ifi/dbs/elki/index/tree/spatial/rstarvariants/rstar/package-summary.html ELKI R*-tree package documentation]{{Wayback|url=http://elki.dbs.ifi.lmu.de/releases/release0.6.0/doc/de/lmu/ifi/dbs/elki/index/tree/spatial/rstarvariants/rstar/package-summary.html |date=20140419200910 }} (Java)
+*[http://libspatialindex.github.io/ Spatial Index Library]{{Wayback|url=http://libspatialindex.github.io/ |date=20140814231603 }} (C++)
+*[http://sqlite.org/rtree.html SQLite R*-tree module]{{Wayback|url=http://sqlite.org/rtree.html |date=20140725112444 }} (C)
+*[http://www.madalgo.au.dk/tpie TPIE Library]{{Wayback|url=http://www.madalgo.au.dk/tpie |date=20141012221408 }} (C++)
+*[https://code.google.com/p/xxl/ XXL Library]{{Wayback|url=https://code.google.com/p/xxl/ |date=20140521101111 }} (Java, maybe R-tree only)
+
+示例代码：
+*[http://www.virtualroadside.com/blog/index.php/2008/10/04/r-tree-implementation-for-cpp/ A header-only C++ R* Tree Implementation]{{Wayback|url=http://www.virtualroadside.com/blog/index.php/2008/10/04/r-tree-implementation-for-cpp/ |date=20140628154629 }} (probably buggy and it does not generate a R*-tree, but a freely defined (by the code author) variation of the original definition)
+*[https://archive.is/20140726151319/http://www.ics.uci.edu/~salsubai/rstartree.html A 2D R*-tree implementation (C/C++)]
+*[http://donar.umiacs.umd.edu/quadtree/points/rtrees.html R-tree Demo Applet (requires Java)]{{Wayback|url=http://donar.umiacs.umd.edu/quadtree/points/rtrees.html |date=20141008162115 }}
+
+{{Data structures}}
+{{计算机科学中的树}}
+{{DEFAULTSORT:R*树}}
+[[Category:R树|Category:R树]]
+[[Category:数据库索引技术|Category:数据库索引技术]]

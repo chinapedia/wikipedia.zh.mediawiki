@@ -1,0 +1,649 @@
+-- This is a meta-module for producing message box templates, including {{mbox}}, {{ambox}}, {{imbox}}, {{tmbox}}, {{ombox}}, {{cmbox}} and {{fmbox}}.
+
+-- Require necessary modules.
+local getArgs = require('Module:Arguments').getArgs
+local categoryHandler = require('Module:Category handler').main
+local yesno = require('Module:Yesno')
+
+-- Load the configuration page.
+local cfgTables = mw.loadData('Module:Message box/configuration')
+
+-- Get a language object for formatDate and ucfirst.
+local lang = mw.language.getContentLanguage()
+
+-- Set aliases for often-used functions to reduce table lookups.
+local format = mw.ustring.format
+local tinsert = table.insert
+local tconcat = table.concat
+local trim = mw.text.trim
+
+--------------------------------------------------------------------------------
+-- Helper functions
+--------------------------------------------------------------------------------
+
+local function getTitleObject(page, ...)
+	if type(page) == 'string' then
+		-- Get the title object, passing the function through pcall 
+		-- in case we are over the expensive function count limit.
+		local success, title = pcall(mw.title.new, page, ...)
+		if success then
+			return title
+		end
+	end
+end
+
+local function union(t1, t2)
+	-- Returns the union of two arrays.
+	local vals = {}
+	for i, v in ipairs(t1) do
+		vals[v] = true
+	end
+	for i, v in ipairs(t2) do
+		vals[v] = true
+	end
+	local ret = {}
+	for k in pairs(vals) do
+		tinsert(ret, k)
+	end
+	table.sort(ret)
+	return ret
+end
+
+local function getArgNums(args, prefix)
+	local nums = {}
+	for k, v in pairs(args) do
+		local num = mw.ustring.match(tostring(k), '^' .. prefix .. '([1-9]%d*)$')
+		if num then
+			tinsert(nums, tonumber(num))
+		end
+	end
+	table.sort(nums)
+	return nums
+end
+
+--------------------------------------------------------------------------------
+-- Box class definition
+--------------------------------------------------------------------------------
+
+local box = {}
+box.__index = box
+
+function box.new()
+	local obj = {}
+	setmetatable(obj, box)
+	return obj
+end
+
+function box.getNamespaceId(ns)
+	if not ns then return end
+	if type(ns) == 'string' then
+		ns = lang:ucfirst(mw.ustring.lower(ns))
+		if ns == 'Main' then
+			ns = 0
+		end
+	end
+	local nsTable = mw.site.namespaces[ns]
+	if nsTable then
+		return nsTable.id
+	end
+end
+
+function box.getMboxType(nsid)
+	-- Gets the mbox type from a namespace number.
+	if nsid == 0 then
+		return 'ambox' -- main namespace
+	elseif nsid == 6 then
+		return 'imbox' -- file namespace
+	elseif nsid == 14 then
+		return 'cmbox' -- category namespace
+	else
+		local nsTable = mw.site.namespaces[nsid]
+		if nsTable and nsTable.isTalk then
+			return 'tmbox' -- any talk namespace
+		else
+			return 'ombox' -- other namespaces or invalid input
+		end
+	end
+end
+
+function box:addCat(ns, cat, sort)
+	if type(cat) ~= 'string' then return end
+	local nsVals = {'main', 'template', 'all'}
+	local tname
+	for i, val in ipairs(nsVals) do
+		if ns == val then
+			tname = ns .. 'Cats'
+		end
+	end
+	if not tname then
+		for i, val in ipairs(nsVals) do
+			nsVals[i] = format('"%s"', val)
+		end
+		error('無效的ns參數傳送到box:addCat；有效的數值為' .. mw.text.listToText(nsVals, '、', '或'))
+	end
+	self[tname] = self[tname] or {}
+	if type(sort) == 'string' then
+		tinsert(self[tname], format('[[Category:%s|%s]]', cat, sort))
+	else
+		tinsert(self[tname], format('[[Category:%s|Category:%s]]', cat))
+	end
+end
+
+function box:addClass(class)
+	if type(class) ~= 'string' then return end
+	self.classes = self.classes or {}
+	tinsert(self.classes, class)
+end
+
+function box:setTitle(args)
+	-- Get the title object and the namespace.
+	self.pageTitle = getTitleObject(args.page ~= '' and args.page)
+	self.title = self.pageTitle or mw.title.getCurrentTitle()
+	self.demospace = args.demospace ~= '' and args.demospace or nil
+	self.nsid = box.getNamespaceId(self.demospace) or self.title.namespace
+end
+
+function box:getConfig(boxType)
+	-- Get the box config data from the data page.
+	if boxType == 'mbox' then
+		boxType = box.getMboxType(self.nsid)
+	end
+	local cfg = cfgTables[boxType]
+	if not cfg then
+		local boxTypes = {}
+		for k, v in pairs(dataTables) do
+			tinsert(boxTypes, format('"%s"', k))
+		end
+		tinsert(boxTypes, '"mbox"')
+		error(format('無效的訊息框類型「%s」；有效的類型為%s', tostring(boxType), mw.text.listToText(boxTypes)), 2)
+	end
+	return cfg
+end
+
+function box:removeBlankArgs(cfg, args)
+	-- Only allow blank arguments for the parameter names listed in cfg.allowBlankParams.
+	local newArgs = {}
+	for k, v in pairs(args) do
+		if v ~= '' then
+			newArgs[k] = v
+		end
+	end
+	for i, param in ipairs(cfg.allowBlankParams or {}) do
+		newArgs[param] = args[param]
+	end
+	return newArgs
+end
+
+function box:setBoxParameters(cfg, args)
+	-- Get type data.
+	self.type = args.type
+	local typeData = cfg.types[self.type]
+	self.invalidTypeError = cfg.showInvalidTypeError and self.type and not typeData and true or false
+	typeData = typeData or cfg.types[cfg.default]
+	self.typeClass = typeData.class
+	self.typeImage = typeData.image
+
+	-- Find if the box has been wrongly substituted.
+	if cfg.substCheck and args.subst == 'SUBST' then
+		self.isSubstituted = true
+	end
+
+	-- Find whether we are using a small message box.
+	if cfg.allowSmall and (
+		cfg.smallParam and args.small == cfg.smallParam
+		or not cfg.smallParam and yesno(args.small)
+	)
+	then
+		self.isSmall = true
+	else
+		self.isSmall = false
+	end
+
+	-- Add attributes, classes and styles.
+	if cfg.allowId then
+		self.id = args.id
+		self.name = args.name
+		if self.name then
+			self:addClass('box-' .. string.gsub(self.name,' ','_'))
+		end
+	end
+	self:addClass(cfg.usePlainlinksParam and yesno(args.plainlinks or true) and 'plainlinks')
+	for _, class in ipairs(cfg.classes or {}) do
+		self:addClass(class)
+	end
+	if self.isSmall then
+		self:addClass(cfg.smallClass or 'mbox-small')
+	end
+	if yesno(args.hidden) then
+		self:addClass('infobox editsection')
+	end
+	self:addClass(self.typeClass)
+	self:addClass(args.class)
+	self.style = args.style
+
+	-- Set text style.
+	self.textstyle = args.textstyle
+
+	-- Find if we are on the template page or not. This functionality is only used if useCollapsibleTextFields is set,
+	-- or if both cfg.templateCategory and cfg.templateCategoryRequireName are set.
+	self.useCollapsibleTextFields = cfg.useCollapsibleTextFields
+	if self.useCollapsibleTextFields or cfg.templateCategory and cfg.templateCategoryRequireName then
+		self.name = args.name
+		if self.name then
+			local templateName = mw.ustring.match(self.name, '^[tT][eE][mM][pP][lL][aA][tT][eE][%s_]*:[%s_]*(.*)$') or self.name
+			templateName = 'Template:' .. templateName
+			self.templateTitle = getTitleObject(templateName)
+		end
+		self.isTemplatePage = self.templateTitle and mw.title.equals(self.title, self.templateTitle) or false
+	end
+
+	-- Process data for collapsible text fields. At the moment these are only used in {{ambox}}.
+	if self.useCollapsibleTextFields then
+		-- Get the self.issue value.
+		if self.isSmall and args.smalltext then
+			self.issue = args.smalltext
+		else
+			local sect
+			if args.sect == '' then
+				sect = '此' .. (cfg.sectionDefault or '頁面')
+			elseif type(args.sect) == 'string' then
+				sect = '此' .. args.sect
+			end
+			local issue = args.issue
+			issue = type(issue) == 'string' and issue ~= '' and issue or nil
+			local text = args.text
+			text = type(text) == 'string' and text or nil
+			local issues = {}
+			tinsert(issues, sect)
+			tinsert(issues, issue)
+			tinsert(issues, text)
+			self.issue = tconcat(issues)
+		end
+
+		-- Get the self.talk value.
+		local talk = args.talk
+		if talk == '' -- Show talk links on the template page or template subpages if the talk parameter is blank.
+			and self.templateTitle 
+			and (mw.title.equals(self.templateTitle, self.title) or self.title:isSubpageOf(self.templateTitle))
+		then
+			talk = '#'
+		elseif talk == '' then
+			talk = nil
+		end
+		if talk then
+			-- If the talk value is a talk page, make a link to that page. Else assume that it's a section heading,
+			-- and make a link to the talk page of the current page with that section heading.
+			local talkTitle = getTitleObject(talk)
+			local talkArgIsTalkPage = true
+			if not talkTitle or not talkTitle.isTalkPage then
+				talkArgIsTalkPage = false
+				talkTitle = getTitleObject(self.title.text, mw.site.namespaces[self.title.namespace].talk.id)
+			end
+			if talkTitle and talkTitle.exists then
+				local talkText = '相關討論可見於'
+				if talkArgIsTalkPage then
+					talkText = format('%s[[%s|%s]]。', talkText, talk, talkTitle.prefixedText)
+				else
+					talkText = format('%s[[%s#%s|討論頁]]。', talkText, talkTitle.prefixedText, talk)
+				end
+				self.talk = talkText
+			end
+		end
+
+		-- Get other values.
+		local date
+		if args.date and args.date ~= '' then
+			date = args.date
+		elseif args.time == '' and self.isTemplatePage then
+			date = lang:formatDate('Y年n月j日')
+		elseif args.time and args.time ~= '' then
+			date = lang:formatDate('Y年n月j日', args.time)
+		end
+		if date then
+			local ok, tempdate = pcall(lang.formatDate, lang, 'Y年n月j日', date) -- 正規化日期
+			if ok then
+				date = tempdate
+			end
+		end
+		if date then
+			self.date = string.format(" <small class='date-container'>''(<span class='date'>%s</span>)''</small>", date)
+		end
+		if args.fix and args.fix ~= '' then
+			self.fix = format("<br /><small>%s</small>", args.fix)
+		else
+			self.fix = ''
+		end
+		self.info = args.info
+	end
+
+	-- Set the non-collapsible text field. At the moment this is used by all box types other than ambox,
+	-- and also by ambox when small=yes.
+	if self.isSmall then
+		self.text = args.smalltext or args.text
+	else
+		self.text = args.text
+	end
+
+	-- Set the below row.
+	self.below = cfg.below and args.below
+
+	-- General image settings.
+	self.imageCellDiv = not self.isSmall and cfg.imageCellDiv and true or false
+	self.imageEmptyCell = cfg.imageEmptyCell
+	if cfg.imageEmptyCellStyle then
+		self.imageEmptyCellStyle = 'border:none;padding:0px;width:1px'
+	end
+
+	-- Left image settings.
+	local imageLeft = self.isSmall and args.smallimage or args.image
+	if cfg.imageCheckBlank and imageLeft ~= 'blank' and imageLeft ~= 'none'
+		or not cfg.imageCheckBlank and imageLeft ~= 'none'
+	then
+		self.imageLeft = imageLeft
+		if not imageLeft then
+			local imageSize = self.isSmall and (cfg.imageSmallSize or '30x30px') or '40x40px'
+			self.imageLeft = format('[[File:%s|%s]]', self.typeImage or 'Imbox notice.png', imageSize)
+		end
+	end
+
+	-- Right image settings.
+	local imageRight = self.isSmall and args.smallimageright or args.imageright
+	if not (cfg.imageRightNone and imageRight == 'none') then
+		self.imageRight = imageRight
+	end
+
+	-- Add mainspace categories. At the moment these are only used in {{ambox}}.
+	if cfg.allowMainspaceCategories then
+		if args.cat then
+			args.cat1 = args.cat
+		end
+		self.catNums = getArgNums(args, 'cat')
+		if args.category then
+			args.category1 = args.category
+		end
+		self.categoryNums = getArgNums(args, 'category')
+		if args.all then
+			args.all1 = args.all
+		end
+		self.allNums = getArgNums(args, 'all')
+		self.categoryParamNums = union(self.catNums, self.categoryNums)
+		self.categoryParamNums = union(self.categoryParamNums, self.allNums)
+		-- The following is roughly equivalent to the old {{Ambox/category}}.
+		local date
+		local sortDay
+		local dayName = {
+			[1] = '㏠',
+			[2] = '㏡',
+			[3] = '㏢',
+			[4] = '㏣',
+			[5] = '㏤',
+			[6] = '㏥',
+			[7] = '㏦',
+			[8] = '㏧',
+			[9] = '㏨',
+			[10] = '㏩',
+			[11] = '㏪',
+			[12] = '㏫',
+			[13] = '㏬',
+			[14] = '㏭',
+			[15] = '㏮',
+			[16] = '㏯',
+			[17] = '㏰',
+			[18] = '㏱',
+			[19] = '㏲',
+			[20] = '㏳',
+			[21] = '㏴',
+			[22] = '㏵',
+			[23] = '㏶',
+			[24] = '㏷',
+			[25] = '㏸',
+			[26] = '㏹',
+			[27] = '㏺',
+			[28] = '㏻',
+			[29] = '㏼',
+			[30] = '㏽',
+			[31] = '㏾'
+		}
+		if args.date and args.date ~= '' then
+			date = args.date
+			local ok, tempdate = pcall(lang.formatDate, lang, 'Y年n月', date) -- 正規化日期
+			if ok then
+				date = tempdate
+			end
+		elseif args.time and args.time ~= '' then
+			date = lang:formatDate('Y年n月', args.time)
+			sortDay = lang:formatDate('j', args.time)
+			sortDay = tonumber(sortDay)
+			sortDay = dayName[sortDay]
+		end
+		date = type(date) == 'string' and date
+		local preposition = '自'
+		for _, num in ipairs(self.categoryParamNums) do
+			local mainCat = args['cat' .. tostring(num)] or args['category' .. tostring(num)]
+			local allCat = args['all' .. tostring(num)]
+			mainCat = type(mainCat) == 'string' and mainCat
+			allCat = type(allCat) == 'string' and allCat
+			if mainCat and date and date ~= '' then
+				local catTitle = format('%s%s%s', preposition, date, mainCat)
+				if sortDay then
+					self:addCat('main', catTitle, sortDay)
+				else
+					self:addCat('main', catTitle)
+				end
+				catTitle = getTitleObject('Category:' .. catTitle)
+				if not catTitle or not catTitle.exists then
+					self:addCat('main', '模板中使用无效日期参数的条目')
+				end
+			elseif mainCat and (not date or date == '') then
+				self:addCat('main', mainCat)
+			end
+			if allCat then
+				self:addCat('main', allCat)
+			end
+		end
+	end
+
+	-- Add template-namespace categories.
+	if cfg.templateCategory then
+		if cfg.templateCategoryRequireName then
+			if self.isTemplatePage then
+				self:addCat('template', cfg.templateCategory)
+			end
+		elseif not self.title.isSubpage then
+			self:addCat('template', cfg.templateCategory)
+		end
+	end
+
+	-- Add template error category.
+	if cfg.templateErrorCategory then
+		local templateErrorCategory = cfg.templateErrorCategory
+		local templateCat, templateSort
+		if not self.name and not self.title.isSubpage then
+			templateCat = templateErrorCategory
+		elseif self.isTemplatePage then
+			local paramsToCheck = cfg.templateErrorParamsToCheck or {}
+			local count = 0
+			for i, param in ipairs(paramsToCheck) do
+				if not args[param] then
+					count = count + 1
+				end
+			end
+			if count > 0 then
+				templateCat = templateErrorCategory
+				templateSort = tostring(count)
+			end
+			if self.categoryNums and #self.categoryNums > 0 then
+				templateCat = templateErrorCategory
+				templateSort = 'C'
+			end
+		end
+		self:addCat('template', templateCat, templateSort)
+	end
+
+	-- Categories for all namespaces.
+	if self.invalidTypeError then
+		local allSort = (self.nsid == 0 and 'Main:' or '') .. self.title.prefixedText
+		self:addCat('all', '需要修复的信息框', allSort)
+	end
+	if self.isSubstituted then
+		self:addCat('all', '錯誤使用替換引用的頁面')
+	end
+
+	-- Convert category tables to strings and pass them through [[Module:Category_handler|Module:Category handler]].
+	self.categories = categoryHandler{
+		main = tconcat(self.mainCats or {}),
+		template = tconcat(self.templateCats or {}),
+		all = tconcat(self.allCats or {}),
+		nocat = args.nocat,
+		demospace = self.demospace,
+		page = self.pageTitle and self.pageTitle.prefixedText or nil
+	}
+end
+
+function box:export()
+	local root = mw.html.create()
+
+	-- Add the subst check error.
+	if self.isSubstituted and self.name then
+		root
+			:tag('b')
+				:addClass('error')
+				:wikitext(format(
+					'模板<code>%s[[Template:%s|%s]]%s</code>被錯誤地替代。',
+					mw.text.nowiki('{{'), self.name, self.name, mw.text.nowiki('}}')
+				))
+	end
+
+	-- Create the box table.
+	local boxTable = root:tag('table')
+	boxTable
+		:attr('id', self.id)
+	for i, class in ipairs(self.classes or {}) do
+		boxTable
+			:addClass(class)
+	end
+	boxTable
+		:cssText(self.style)
+		:attr('role', 'presentation')
+
+	-- Add the left-hand image.
+	local row = boxTable:tag('tr')
+	if self.imageLeft then
+		local imageLeftCell = row:tag('td'):addClass('mbox-image')
+		if self.imageCellDiv then
+			-- If we are using a div, redefine imageLeftCell so that the image is inside it.
+			-- Divs use style="width: 52px;", which limits the image width to 52px. If any
+			-- images in a div are wider than that, they may overlap with the text or cause
+			-- other display problems.
+			imageLeftCell = imageLeftCell:tag('div'):css('width', '52px') 
+		end
+		imageLeftCell
+			:wikitext(self.imageLeft)
+	elseif self.imageEmptyCell then
+		-- Some message boxes define an empty cell if no image is specified, and some don't.
+		-- The old template code in templates where empty cells are specified gives the following hint:
+		-- "No image. Cell with some width or padding necessary for text cell to have 100% width."
+		row:tag('td')
+			:addClass('mbox-empty-cell') 
+			:cssText(self.imageEmptyCellStyle)
+	end
+
+	-- Add the text.
+	local textCell = row:tag('td'):addClass('mbox-text')
+	if self.useCollapsibleTextFields then
+		-- The message box uses advanced text parameters that allow things to be collapsible. At the
+		-- moment, only ambox uses this.
+		textCell
+			:cssText(self.textstyle)
+		local textCellSpan = textCell:tag('span')
+		textCellSpan
+			:addClass('mbox-text-span')
+			:wikitext(self.issue)
+		if not self.isSmall then
+			textCellSpan
+				:tag('span')
+					:addClass('hide-when-compact')
+					:wikitext(self.talk and self.talk)
+		end
+		textCellSpan
+			:wikitext(self.date and self.date)
+		if not self.isSmall and self.fix ~= '' then
+			textCellSpan
+				:tag('span')
+					:addClass('hide-when-compact')
+					:wikitext(self.fix and self.fix)
+		end
+		if not self.isSmall then
+			textCellSpan
+				:tag('span')
+				:addClass('hide-when-compact')
+				:wikitext(self.info and self.info)
+		end
+	else
+		-- Default text formatting - anything goes.
+		textCell
+			:cssText(self.textstyle)
+			:wikitext(self.text)
+	end
+
+	-- Add the right-hand image.
+	if self.imageRight then
+		local imageRightCell = row:tag('td'):addClass('mbox-imageright')
+		if self.imageCellDiv then
+			imageRightCell = imageRightCell:tag('div'):css('width', '52px') -- If we are using a div, redefine imageRightCell so that the image is inside it.
+		end
+		imageRightCell
+			:wikitext(self.imageRight)
+	end
+
+	-- Add the below row.
+	if self.below then
+		boxTable:tag('tr')
+			:tag('td')
+				:attr('colspan', self.imageRight and '3' or '2')
+				:addClass('mbox-text')
+				:cssText(self.textstyle)
+				:wikitext(self.below)
+	end
+
+	-- Add error message for invalid type parameters.
+	if self.invalidTypeError then
+		root
+			:tag('div')
+				:css('text-align', 'center')
+				:wikitext(format('此訊息框使用無效的「type=%s」參數，需要修復。', self.type or ''))
+	end
+
+	-- Add categories.
+	root
+		:wikitext(self.categories)
+
+	return tostring(root)
+end
+
+local function main(boxType, args)
+	local outputBox = box.new()
+	outputBox:setTitle(args)
+	local cfg = outputBox:getConfig(boxType)
+	args = outputBox:removeBlankArgs(cfg, args)
+	outputBox:setBoxParameters(cfg, args)
+	return outputBox:export()
+end
+
+local function makeWrapper(boxType)
+	return function (frame)
+		local args = getArgs(frame, {trim = false, removeBlanks = false})
+		return main(boxType, args)
+	end
+end
+
+local p = {
+	main = main,
+	mbox = makeWrapper('mbox')
+}
+
+for boxType in pairs(cfgTables) do
+	p[boxType] = makeWrapper(boxType)
+end
+
+return p

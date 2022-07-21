@@ -1,0 +1,60 @@
+{{noteTA
+|G1 = IT
+}}
+
+'''PDO'''（PHP Data Objects）是一種在[[PHP|PHP]]裡連接資料庫的使用介面<ref>{{cite web |title=PHP: PDO - Manual |url=http://php.net/manual/en/book.pdo.php |accessdate=2014-02-18 |archive-date=2014-02-23 |archive-url=https://web.archive.org/web/20140223123854/http://php.net/manual/en/book.pdo.php |dead-url=no }}</ref>。PDO與mysqli<ref>{{cite web |title=MySQL Improved Extension |url=http://tw1.php.net/manual/en/book.mysqli.php |accessdate=2014-02-18 |deadurl=yes |archiveurl=https://web.archive.org/web/20140223124310/http://tw1.php.net/manual/en/book.mysqli.php |archivedate=2014-02-23 |df= }}</ref>曾經被建議用來取代原本PHP在用的mysql<ref>{{cite web |title=Original MySQL API |url=http://tw1.php.net/manual/en/book.mysql.php |accessdate=2014-02-18 |archive-date=2014-02-23 |archive-url=https://web.archive.org/web/20140223124512/http://tw1.php.net/manual/en/book.mysql.php |dead-url=yes }}</ref>相關函數，基於資料庫使用的安全性，因為後者欠缺對於[[SQL資料隱碼攻擊|SQL資料隱碼]]的防護<ref>{{cite web |title = PHP-DEV deprecating ext/mysql' - MARC |url = http://marc.info/?l=php-internals&m=131031747409271&w=2 |accessdate = 2014-02-18 |archive-date = 2014-10-14 |archive-url = https://web.archive.org/web/20141014100742/http://marc.info/?l=php-internals&m=131031747409271&w=2 |dead-url = no }}</ref>。
+
+== 範例 ==
+以下是一個簡單的 PDO 更新交易資料庫的程式碼，其中採用了預處理的方式將執行語句與參數隔離：
+<syntaxhighlight lang="php">
+<?php
+    $query = "UPDATE `payment` SET `status` = '2', `id` = ?, `method` = ? WHERE `payment_id` = ? and `status` = '1'";
+    $stmt = $this -> pdo -> prepare($query);
+    $stmt -> bindParam(1, $id);
+    $stmt -> bindParam(2, $type);
+    $stmt -> bindParam(3, $payment_id);
+    $result = $stmt -> execute();
+?></syntaxhighlight>
+<br />
+
+PDO默认会把数据库中查询的数据全部缓存下来，这在查询的结果集特别大时会有各种问题，比如消耗太多服务器资源，或造成运行的脚本因内存超限而终止。<br />
+下面的代码使用PDO对象的setAttribute方法来禁用缓存。<br/>
+<syntaxhighlight lang="php">
+<?php
+$dsn = "mysql:host=" . DATABASE_HOST . ";port=" . DATABASE_PORT . ";dbname=" . DATABASE_NAME;
+$username = DATABASE_USERNAME;
+$passwd = DATABASE_PASSWORD;
+$pdoConn = new PDO($dsn, $username, $passwd);
+
+$sql = "select * from big_table"; //假设这个表行数超多
+
+$pdoConn->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false); //禁用缓存
+$stmt = $pdoConn->query($sql);
+$i = -1;
+while ($row = $stmt->fetch()) {
+    $i ++;
+    if ($i % 10000) { //每一万个数据采样显示一下
+        continue;
+    }
+    var_dump($i);
+    var_dump($row);
+}
+?></syntaxhighlight>
+
+==資料庫支援==
+*firebird
+*informix
+*mysql
+*mssql
+*odbc
+*pgsql
+*sqlite
+
+== 参考文献 ==
+{{Reflist}}
+
+== 外部連結 ==
+* [http://micmap.org/php-by-example/zh/function/pdo 测试PDO函数在线]{{Wayback|url=http://micmap.org/php-by-example/zh/function/pdo |date=20150209154015 }}
+
+{{Database}}
+[[Category:PHP|Category:PHP]]

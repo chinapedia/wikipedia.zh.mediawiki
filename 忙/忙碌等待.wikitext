@@ -1,0 +1,87 @@
+{{NoteTA
+|G1=IT
+}}
+{{refimprove|time=2014-12-01T16:37:41+00:00}}
+{{expert|time=2014-11-28T16:13:27+00:00}}
+在[[软件工程|软件工程]]中，'''忙碌等待'''（也称'''自旋'''；{{lang-en|Busy waiting}}、busy-looping、spinning）是一种以[[进程|进程]]反复检查一个条件是否为真为根本的技术，条件可能为[[键盘|键盘]]输入或某个锁是否可用。忙碌等待也可以用来产生一个任意的时间延迟，若系统没有提供生成特定时间长度的方法，则需要用到忙碌等待。不同的计算机处理器速度差异很大，特别是一些[[中央处理器|处理器]]设计为可能根据外部因素（例如[[操作系统|操作系统]]上的负载）动态调整速率。因此，忙碌等待这种时间延迟技术容易产生不可预知、甚至不一致的结果，除非实现代码来确定处理器执行“什么都不做”循环的速度，或者循环代码明确检查[[实时时钟|实时时钟]]。
+
+在某些情况下，忙碌等待是有效的策略，特别是实现[[自旋锁|自旋锁]]设计的[[操作系统|操作系统]]上运行[[對稱多處理|對稱多處理]]。不過一般来说，忙碌等待是应该避免的[[反模式|反模式]]<ref>[http://www.kernel.org/doc/Documentation/volatile-considered-harmful.txt Why the "volatile" type class should not be used] {{webarchive|url=https://web.archive.org/web/20131102214310/https://www.kernel.org/doc/Documentation/volatile-considered-harmful.txt |date=2013-11-02 }}</ref>，处理器时间應該用来执行其他[[任务|任务]]，而不是浪费在无用的活动上。
+
+{{fact|对于[[多核CPU|多核CPU]]，忙碌等待的优点是不切换[[线程|线程]]，避免了由此付出的代价。因此一些[[多线程|多线程]]同步机制不使用切换到[[内核态|内核态]]的同步对象，而是以用户态的自旋锁或其衍生机制（如轻型[[读写锁|读写锁]]）来做同步，付出的时间复杂度相差3个数量级。忙碌等待可使用一些机制来降低CPU功耗，如Windows系统中调用YieldProcessor，实际上是调用了[[SIMD|SIMD]]指令_mm_pause。}}
+==C語言的範例程式==
+以下的[[C語言|C語言]]程式示範二個[[線程|線程]]共享一個全域[[變數|變數]]'''i'''，第一個線程用忙碌等待來確認變數'''i'''的值是否有改變。
+<syntaxhighlight lang="c" line="1">
+#include <stdio.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+volatile int i = 0; /* i is global, so it is visible to all functions.
+                       It's also marked volatile, because it
+                       may change in a way which is not predictable by the compiler,
+                       here from a different thread. */
+
+/* f1 uses a spinlock to wait for i to change from 0. */
+static void *f1(void *p) {
+    while (i == 0) {
+        /* do nothing - just keep checking over and over */
+    }
+    printf("i's value has changed to %d.\n", i);
+    return NULL;
+}
+
+static void *f2(void *p) {
+    sleep(60);   /* sleep for 60 seconds */
+    i = 99;
+    printf("t2 has changed the value of i to %d.\n", i);
+    return NULL;
+}
+
+int main() {
+    int rc;
+    pthread_t t1, t2;
+    rc = pthread_create(&t1, NULL, f1, NULL);
+    if (rc != 0) {
+        fprintf(stderr, "pthread f1 failed\n");
+        return EXIT_FAILURE;
+    }
+    rc = pthread_create(&t2, NULL, f2, NULL);
+    if (rc != 0) {
+        fprintf(stderr, "pthread f2 failed\n");
+        return EXIT_FAILURE;
+    }
+    pthread_join(t1, NULL);
+    pthread_join(t2, NULL);
+    puts("All pthreads finished.");
+    return 0;
+}
+</syntaxhighlight>
+上述的程式也可以用C11標準中的[[監視器_(程序同步化)#條件變數|條件變數]]達成。
+
+==忙碌等待的替代品==
+大多数操作系统和线程库提供了各种各樣可以阻止事件过程的[[系统调用|系统调用]]，如锁获取、计时器变化，I/O可用性或信號。使用系统调用來產生延遲會有最简单、最有效、公平且沒有[[競爭危害|競爭危害]]的結果。一个调用會检查、通知事件等待的调度程序，插入一个适用的记忆障碍，也可以在返回之前执行所请求的I / O操作。當调用者被堵住時，其他进程可以使用CPU。调度器有实现[[优先级继承|优先级继承]]所需的信息或其他机制，来避免{{link-en|资源衰竭|Resource starvation}}的問題。<!--以下的尚未check-->
+
+在大部份操作系统中，也可以在忙碌等待中加入延迟函数（sleep()），以減少忙碌等待浪费的CPU資源。这可以讓[[线程|线程]]暫停指定的时间，在此期间线程不会浪费CPU时间。如果循环检查只是檢查一些简单的事務，将大部分时间花费在延迟函数，则不太會浪费太多CPU时间。
+
+若程序永远不会结束（如操作系统），可以通过无条件跳转（例如[[Netwide_Assembler|NASM]]語法中的<tt>jmp $</tt>）实现无限次的忙碌等待。CPU会永远无条件跳转到程式現在執行到的位置。因此可以用以下的程式取代忙碌等待：
+
+<syntaxhighlight lang="asm">
+sleep:
+hlt
+jmp sleep
+</syntaxhighlight>
+
+==适当的使用忙碌等待==
+一些底层编程中可能需要用到需忙碌等待。對每個[[硬體|硬體]]設備（尤其是偶爾才使用到的硬體）設置[[中斷|中斷]]可能不切实际甚至不可能。有时需要將某种的控制数据写入硬件，在写入後获取设备状态，但状态可能要在寫入後數個機器週期後才有效。[[程序员|程序员]]可以调用操作系统延迟函数，不過这样做可能要耗費更多的时钟周，此時就可以使用忙碌等待。
+==相關條目==
+*[[BogoMips|BogoMips]]
+*[[Volatile變數|Volatile變數]]
+*[[輪詢|輪詢]]
+*[[自旋锁|自旋锁]]
+*[[同步_(计算机科学)|同步 (计算机科学)]]
+
+==參考資料==
+{{reflist}}
+
+[[Category:反模式|Category:反模式]]
+[[Category:協同控制|Category:協同控制]]

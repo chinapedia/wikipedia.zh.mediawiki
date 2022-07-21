@@ -1,0 +1,445 @@
+{{noteta|G1=IT}}
+{{Wikipedia how-to|H:SCORE}}
+{{ombox|type=content|text=由于安全问题，LilyPond和<nowiki><score></nowiki>标签的部分功能已被禁用，包括但不限于 vorbis=1 的设定。参见[[:phab:T257066|Phabricator工单T257066]]。}}
+标签{{tag|score}}可以生成乐谱（[[五线谱|五线谱]]）。默认使用GNU [[LilyPond|LilyPond]]标记语言，也可以用[[ABC记谱法|ABC记谱法]]。详见[[mw:Extension:Score|Extension:Score]]。
+
+本文就LilyPond的语法作简单说明，关于LilyPond的语法细节，参见[http://www.lilypond.org/manuals.zh.html LilyPond文档]。语法错误的文档被归类在[[:Category:有乐谱生成错误的页面|:Category:有乐谱生成错误的页面]]。
+
+== 标签属性 ==
+{| class="wikitable"
+! 属性|| 描述
+|-
+| <code>lang="ABC"</code> || 使用ABC记谱法
+|-
+| <code>lang="lilypond"</code> || 使用LilyPond（默认）
+|-
+| <code>midi="1"</code> || 在曲谱图片上生成链接，链接至其自动生成的[[MIDI|MIDI]]文件
+|-
+| <code>vorbis="1"</code> || 在曲谱下方生成播放器，播放自动生成的[[Ogg_Vorbis|Ogg Vorbis]]文件
+|-
+| <code>raw="1"</code> || 作为完整的LilyPond文件编译（要求lang属性为lilypond）
+|-
+| <code>override_midi="…"</code> || 在曲谱图片上生成链接，链接至指定的MIDI文件
+|-
+| <code>override_ogg="…"</code> || 在曲谱下方生成播放器，播放指定的Ogg文件
+|}
+
+== 案例==
+'''简单'''
+<pre>
+<score>
+{c' d' e' f' f' fes' eis' e'}
+</score>
+</pre>
+
+生成
+
+<score>
+{c' d' e' f' f' fes' eis' e'}
+</score>
+
+<br />
+'''略复杂'''
+
+<pre>
+<score>
+  \transpose c g \relative c' {
+  \key c \minor
+  \time 4/4
+    c4 e8 e g4 g              % -{zh-hans:百分比号后是注释; zh-hant:百分比號後是註釋}-
+    <c es g>2 <c es g>        % -{zh-hans:单书名号生成和弦; zh-hant:單書名號生成和弦}-
+    es4 d( ces b)             % -{zh-hans:括号生成连结线; zh-hant:括號生成連結線}-
+    a4. r8 a4 a               % r 代表休止
+    e-- e-> e-. g\fermata     % 重音和其他音乐符号
+    \bar "|."
+  }
+</score>
+</pre>
+生成
+
+<score>
+  \transpose c g \relative c'{
+  \key c \minor
+  \time 4/4
+    c4 e8 e g4 g          % (text after the % is just a comment)
+    <c es g>2 <c es g>    % angle brackets create chords
+    es4 d( ces b)         % parentheses create ties
+    a4. r8 a4 a           % r creates rests
+    e-- e-> e-. g\fermata % accents and other signs
+    \bar "|."
+  }
+% This is just a comment line
+</score>
+
+== 语法==
+LilyPond代码衍生自[[LaTeX|LaTeX]]，大小写敏感，无视连续空格和换行。代码必须用{{tag|score}}围起来。音符必须放在大括号里面 <code>{...}</code>。百分比号 <code>%</code> 后的代码视为[[注釋_(計算機語言)|注释]]。
+
+=== 音高 ===
+输入字母音名来表示音高（如<code>a b c</code> ），中间用空格隔开。
+<br />
+后缀 -<code>is</code>表示升半音（<code>ais</code>、<code>bis</code>、<code>cis</code>、<code>dis</code>、<code>eis</code>、<code>fis</code>、<code>gis</code>）。
+<br />
+后缀 -<code>es</code>表示降半音 (<code>aes</code>、<code>bes</code>、<code>ces</code>、<code>des</code>、<code>ees</code>、<code>fes</code>、<code>ges</code>)。
+
+所有音符默认是在[[中央C|中央C]]{{link-en|亥姆霍茲音調記號法|Helmholtz pitch notation|向下一个八度中}}。如'''<code>c</code>''' 会生成<score>\new Staff \with { \remove "Time_signature_engraver" }{c}</score>或<score>\new Staff \with { \remove "Time_signature_engraver" }{\clef bass c}</score>。
+
+上撇号(<code>'</code>)用来升八度，逗号(<code>,</code>)用来降八度。如中央C的表示方法是'''<code>c'</code>'''  <score>\new Staff \with { \remove "Time_signature_engraver" }{ c'}</score>。
+
+<pre>
+ <score>
+  {
+   a,, c, e, a,
+   c e a c'
+   e' a' c'' e''
+   a'' c''' e''' g'''
+   \bar "||"
+   aes'' bes'' gis'' dis''
+  }
+ </score>
+</pre>
+
+<score>
+ {a,, c, e, a, c e a c' %Middle C
+  e' a' c'' e'' a'' c''' e''' g''' \bar "||" aes'' bes'' gis'' dis''}
+</score>
+
+用相对音高可以减轻工作量。在大括号前加上<code>\relative</code>进入相对音高模式，根据前一个音符来推算八度。全谱第一个音符的八度则从<code>\relative</code> 标签后的标识音推算。如 <code>\relative c''</code>。
+
+相对音高模式计算八度时，默认视为前音符上下三度的内的八度（不计算半音），并使用 <code>'</code>和 <code>,</code> 来跨八度。
+
+<pre>
+ <score>
+ \relative c' {
+  e f <c e g>2
+  a'4( b c) c,
+  d8 e f16 g a b
+  c4. a8 e' f g, f r \autoBeamOff e d c
+  b4 a g b-> c2.-> r4
+  \bar "|."
+  }
+ </score>
+</pre>
+
+<score>
+ \relative c' {
+  e f <c e g>2
+  a'4( b c) c,
+  d8 e f16 g a b
+  c4. a8 e' f g, f r \autoBeamOff e d c
+  b4 a g b-> c2.-> r4
+  \bar "|."
+  }
+ </score>
+
+==== 注明音调 ====
+乐谱默认为C大调。用<code>\key g \major</code>、<code>\key c \minor</code>或直接写上[[调式|调式]]如<code>\key c \dorian</code> 或<code>\key c \mixolydian</code>来转调。任何地方都可以转调。
+
+需要注意一点，调式与音高无关。转调只会影响[[变音记号|变音记号]]的显示，不会改变音高。在转调的音高上的每一个音符仍必须用 (-is) 和 (-es) 来表示半音升降。如果不写，会被当成还原音。举一个升C大调上的例子：
+
+<pre>
+<score>
+ \relative c' {
+   \key cis \major
+   \time 6/8
+
+% -is 后缀代表升半音
+   cis8 dis eis fis gis ais
+
+% 不带后缀代表还原音
+   b c d e f g
+  }
+</score>
+</pre>
+<score>
+ \relative c' {
+   \key cis \major
+   \time 6/8
+% Notes with -is suffixes indicating sharps
+   cis8 dis eis fis gis ais
+% Notes without accidentals (naturals)
+   b c d e f g
+  }
+</score>
+
+=== 节奏 ===
+字母音名后的数字代表音符时值，中间不加空格 (<code>a4 b8</code>)。1代表全音符，2代表二分音符，4是四分音符，8是八分音符，以此类推。如果不写明时值，默认用和前一个音符一样的时值。如果前面没有音符，则默认为4分音符。
+
+字母 <code>r</code> 代表休止符。小数点代表附点（将音符时值延长一半） (<code>c4.</code>)。
+
+<pre>
+ <score>
+   \relative c''{b1 b2 b4 b8 c r4 b4. b}
+ </score>
+</pre>
+
+<score>
+\relative c''{b1 b2 b4 b8 c r4 b4. b}
+</score>
+
+==== 拍号 ====
+乐谱默认[[拍号|拍号]]是4/4拍。 用 <code>\time</code> 命令来设定其他的拍号。 若要设置成二二拍，输入<code>\time 2/2</code>，三四拍（华尔兹节奏）则输入<code>\time 3/4</code>。大多数时候拍号可以随便改。
+
+===== 隐藏拍号 =====
+有些音乐的谱例中，拍号可能多余。输入<code>\remove "Time_signature_engraver"</code> 隐藏拍号。
+
+<pre>
+<score>
+{
+  \new Staff \with { \remove "Time_signature_engraver" }
+  <d' fis' a'>2
+}
+</score>
+</pre>
+
+<score>{ \new Staff \with { \remove "Time_signature_engraver" } <d' fis' a'>2 }</score>
+
+==== 速度 ====
+如果需要用<code>vorbis = "1"</code>等属性来提供试听功能，则需要定义乐曲速度。使用<code>\tempo</code>来定义速度。<code>\tempo 4= 135</code>定义为每分钟135个四分音符，每分钟播放音符越多，乐曲速度越快。乐曲中间可以改变速度。
+
+试听不同速度的欢乐颂。
+<pre>
+<score vorbis="1">
+\relative c' {
+  \tempo 4 = 70
+  e4 e f g g f e d
+  \tempo 4 = 160
+   c c d e d4. c8 c2
+}
+</score>
+</pre>
+
+<score vorbis ="1"> \relative c'  {  \tempo 4 = 70  e4 e f g g f e d   \tempo 4 = 160  c c d e d4. c8 c2 } </score>
+
+==== 弱起小节 ====
+<code>\partial 4</code>会生成一个包括一个四分音符的弱起小节。<code>\partial 4*2</code> 会生成一个包括两个四分音符的弱起小节。以此类推。[[Help:乐谱#添加歌词|Help:乐谱#添加歌词]]里有一个例子。
+
+==== 自定义符杆 ====
+<score>
+\relative c'' {
+   \time 3/4
+   r4. g8 a8 b8
+}
+</score>
+程序会自动生成符杠。如果觉得自动生成的符杠不好看或者不想要，可以把<code>\noBeam</code>放在被划杠的音符中间来删除，如<code>g a b \noBeam g</code>。若要在一段区间内完全关闭自动划杠，用<code>\autoBeamOff</code> 和 <code>\autoBeamOn</code> 开关。
+
+<pre>
+<score>
+  \relative c'' {
+     \time 3/4
+     r4. g8 \noBeam a8 b8
+  }
+</score>
+</pre>
+
+<score>
+\relative c'' {
+   \time 3/4
+   r4. g8 \noBeam a8 b8
+}
+</score>
+
+若要手动划杠，在符杠开始和结束的音符'''后'''输入一对方括号。<code>a8 b[ c d e] f</code>这样把最先和最后的两个音符撇开，b、c、 d和e划成一杠。
+
+<score> \relative c''{a8 b[ c d e] f}</score>
+
+=== 添加歌词 ===
+用 <code>\addlyrics</code>可以添加歌词。读[http://www.lilypond.org/doc/v2.18/Documentation/learning/aligning-lyrics-to-a-melody LilyPond文档]详细了解歌词的对齐方式。
+
+<pre>-{}-
+<score>
+  \relative g' {
+    \key g \major \time 3/4
+    \partial 4 d
+     e d g
+     fis2 d4
+     e d a'
+     g2 d4
+     d' b g
+     fis e c'
+     b g a
+     g2 \fermata
+     \bar "|."
+   }
+   \addlyrics {
+     祝你 生 日 快 乐
+     祝你 生 日 快 乐
+     祝你 生 日 快 乐 _
+     祝你 生 日 快 乐
+   }
+  </score>
+</pre>
+{{lan
+|zh-hans=<score>
+  \relative g' {
+    \key g \major \time 3/4
+    \partial 4 d
+     e d g
+     fis2 d4
+     e d a'
+     g2 d4
+     d' b g
+     fis e c'
+     b g a
+     g2 \fermata
+     \bar "|."
+   }
+   \addlyrics {
+     祝你 生 日 快 乐
+     祝你 生 日 快 乐
+     祝你 生 日 快 乐 _
+     祝你 生 日 快 乐
+   }
+  </score>
+|zh-hant=<score>
+  \relative g' {
+    \key g \major \time 3/4
+    \partial 4 d
+     e d g
+     fis2 d4
+     e d a'
+     g2 d4
+     d' b g
+     fis e c'
+     b g a
+     g2 \fermata
+     \bar "|."
+   }
+   \addlyrics {
+     祝你 生 日 快 樂
+     祝你 生 日 快 樂
+     祝你 生 日 快 樂 _
+     祝你 生 日 快 樂
+   }
+  </score>
+}}
+对齐中文歌词比英文略简单。因为中文一个字符对应一个音节，所以一般用空格将每个字隔开即可，不需要用到<code>--</code>来连接单词。<code>_</code>用来跳过一个音符。
+
+=== 和弦名 ===
+和弦名可以加在单独的<code>ChordNames</code>谱中，附在五线谱边（上述至此讲的都是五线谱），方法如下：
+
+<pre>
+<score>
+<<
+  \new ChordNames \chordmode {
+    \set chordChanges = ##t       % 设置只在和弦变化时显示（本例中为不重复显示Am）
+    a4:m a4:m         |                         % 第一小节 - A7的话是 a:7
+    g2                       |                          % 第二小节
+  }
+  \new Staff \relative c''{
+    \key a \dorian
+    \time 2/4
+    a8 a16 a a8 a16 a |   % 第一小节
+    b8 a g4           |           % 第二小节
+  }
+>>
+</score>
+</pre>
+
+<score>
+<<
+\new ChordNames \chordmode {
+  \set chordChanges = ##t
+  a4:m a4:m         |% measure 1
+  g2                |% measure 2
+}
+\new Staff \relative c''{
+  \key a \dorian
+  \time 2/4
+  a8 a16 a a8 a16 a |% measure 1
+  b8 a g4           |% measure 2
+}
+>>
+</score>
+
+注:
+在<code>ChordNames</code>谱中可以用字母 '''<code>s</code>''' 而不是 '''<code>r</code>''' （休止符）表示没有和弦。
+'''<code>r</code>''' 会把“没有和弦”直接<score><<\new ChordNames \chordmode {r2} \new Staff \with { \remove "Time_signature_engraver" } \relative c''{c}>></score> 写出来。而 '''<code>s</code>''' 只空出和弦名，不会显示。
+在五线谱中用 '''<code>s</code>''' 表示一个不印刷的休止符。
+
+=== 强调和其他符号 ===
+
+LilyPond中还能用各种符号，如<code>\fermata</code> （自由延长符号）。还有 <code>{e-> f-- g-+ a-. b-^ c-_ d-|}</code>等。<code>^</code>、<code>-</code>、<code>_</code>表示符号的位置，后面直接输入要标注的文字。
+
+<pre>
+<score>
+  \relative c' {
+  e-> f-- g-^ a-.
+  b_"Joyfully" c^"渐强" d-! e\fermata
+  }
+</score>
+</pre>
+生成
+
+<score>
+  \relative c' {
+  e-> f-- g-^ a-.
+  b_"Joyfully" c^"渐强" d-! e\fermata
+  }
+</score>
+
+== 简谱使用者 ==
+维基媒体不直接支持用代码显示简谱，但是针对习惯写简谱的编辑使用本标签，可以利用以下几个技巧。
+
+=== 首调唱名 ===
+对于习惯使用首调而不是固定调的编辑，写移调后的乐谱可能遇到困难。如E大调中的七个音符需要写成<code>e fis gis a b cis dis e</code>，必须正确地写上固定调中变化半音的后缀<code>-is</code>和<code>-es</code>，否则会被当成还原音。
+
+用<code>\transpose</code>可以减轻工作量。<code>\transpose</code>本为直接移调，利用这个语法可以在没有变化音的C大调上写上首调，再转到其他调上。如
+
+<pre>
+<score>
+\relative e' {
+   \key e \major     
+  e fis gis a b cis dis e   %固定调写法
+}
+</score>
+</pre>
+<pre>
+<score>
+\transpose c e {   %将C调转为E调，显示效果与固定调写法相同
+  \relative c' {
+     \key c \major     
+     c d e f g a b c 
+  }                                 
+}
+</score>
+</pre>
+
+生成
+
+<score>
+\relative e' {
+   \key e \major     
+  e fis gis a b cis dis e   %固定调写法
+}
+</score>
+
+<score>
+\transpose c e {   %将C调转为E调，显示效果与固定调写法相同
+  \relative c' {
+     \key c \major     
+     c d e f g a b c 
+  }                                 
+}
+</score>
+
+<!--  该段落描述内容在目前（2015.3.30）维基媒体中使用的LilyPond 2.16版本中暂不支持。
+=== 易读符头 ===
+[http://www.lilypond.org/doc/v2.19/Documentation/notation/note-heads#easy-notation-note-heads]
+
+-->
+
+== 参见 ==
+{{wikisourcehas2| 
+* [[:en:s:Help:Sheet_music|Help:Sheet music（英文）]]
+* [[:en:s:Help:LilyPond|Help:LilyPond（英文）]]
+}}
+* [[维基百科:關注度_(音樂)|维基百科:關注度 (音樂)]]
+* [[维基百科:不要包含原始资料的副本|维基百科:不要包含原始资料的副本]]
+* [[Special:PagesWithProp/score|Special:PagesWithProp/score]]，查看使用了{{Tag|score}}的页面
+<!-- * [[Help:Music|Help:Music]] -->
+* {{tl|Music}}
+
+{{维基帮助导航}}
+
+<!-- [[Category:Wikipedia_editor_handbook|Category:Wikipedia editor handbook]] -->
+[[Category:帮助文档|Category:帮助文档]]

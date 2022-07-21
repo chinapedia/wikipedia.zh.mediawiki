@@ -1,0 +1,20 @@
+local z = {}
+
+function z.convert( frame )
+    local args = frame.args
+    s = '{{Otd/format'
+    s = s .. '\n| date = ' .. ( args.date or '' )
+    s = s .. '\n| ldate = ' .. ( args.ldate or '' )
+    s = s .. '\n| festival = ' .. ( args.festival or '' )
+    s = s .. '\n| image = ' .. mw.text.trim( mw.text.split( mw.text.split( args.image or '', '|', true )[1], ':', true )[2] )
+    s = s .. '\n| border = ' .. ( args.border or '' )
+    s = s .. '\n| wide = ' .. ( args.wide or '' )
+    for i = 1, 5 do
+        local pieces = mw.text.split( args['event' .. i] or '', '，' )
+        s = s .. '\n| year' .. i .. ' = ' .. mw.text.trim( pieces[1] )
+        s = s .. '\n| event' .. i .. ' = ' .. mw.text.trim( table.concat( pieces, '，', 2, #pieces ) )
+    end
+    return s .. '\n}}'
+end
+
+return z

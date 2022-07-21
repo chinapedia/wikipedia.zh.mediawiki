@@ -1,0 +1,175 @@
+{{NoteTA
+|G1=Communication
+|G2=Electronics
+}}
+在[[數位信號處理|數位信號處理]]和離散時間的[[控制理論|控制理論]]中，'''雙線性變換''' (即 '''[[Arnold_Tustin|Tustin]]變換''')被用來在連續時間系統與離散時間系統做轉換。
+
+雙線性變換是一種特別的[[共行映射|共行映射]](即[[莫比烏斯變換|莫比烏斯變換]])，常被用來將[[线性时不变系统理论|線性非時變系統]]濾波器在連續時域的[[傳遞函數|傳遞函數]] <math> H_a(s) \ </math>轉換成線性且平移不變濾波器在離散時域的[[傳遞函數|傳遞函數]] <math> H_d(z) \ </math>。將[[S平面|S平面]]中位置在<math> j \omega \ </math>軸的點映射到[[複數平面|複數平面]]上的[[單位圓|單位圓]] <math> |z| = 1 \ </math>。其他的應用還有扭曲任何的離散時間線性系統的[[頻率響應|頻率響應]](例如用來估計人類聽覺系統的非線性頻率解析度)或是被用在離散域以取代一個系統經過一階全通濾波器的單位延遲<math> \left( z^{-1} \right) \ </math>。
+
+這種變換保有[[有界輸入有界輸出穩定性|穩定性]]且將連續時間濾波器的[[頻率響應|頻率響應]] <math> H_a(j \omega_a) \ </math>中每一點映射到離散時間濾波器的頻率響應<math> H_d(e^{j \omega_d T}) \ </math>中所對應的點，雖然頻率會有點不同，這部分會在之後的[[#頻率扭曲|頻率扭曲]]中解釋。對於類比濾波器的頻率響應中所看到的特徵，在數位濾波器的頻率響應中都有相同增益和相位平移的對應特徵，雖然頻率可能會有點不同，在低頻時很難觀察到但在頻率接近[[奈奎斯特頻率|奈奎斯特頻率]]時就相當明顯。
+
+== 離散時間估計 ==
+
+雙線性變換是自然對數函數的一階估計法，也就是將''z''平面映射到''s''平面，當[[拉普拉斯變換|拉普拉斯變換]]被用在離散時間信號上(將離散時間序列中的每個元素附在對應的延遲[[狄拉克δ函數|狄拉克δ函數]])，其結果確實為將離散時間序列的Z轉換替代成
+
+:<math>
+\begin{align}
+z &= e^{sT}   \\
+  &= \frac{e^{sT/2}}{e^{-sT/2}} \\
+  &\approx \frac{1 + s T / 2}{1 - s T / 2}
+\end{align}
+</math>
+
+其中<math> T \ </math>是用在推导雙線性變換的[[梯形公式|梯形公式]]中[[數值積分|數值積分]]每階的大小<ref>{{cite book |title=Discrete Time Signal Processing Third Edition |last=Oppenheim |first=Alan |year=2010 |publisher=Pearson Higher Education, Inc. |location=Upper Saddle River, NJ |isbn=978-0-13-198842-2 |page=504}}</ref>，換句話說就是取樣間距。上述的雙線性估計可以透過<math> s \ </math>來解或是產生一個近似估計<math> s = (1/T) \ln(z) \  \ </math>。
+
+逆映射則為
+
+:<math>
+\begin{align}
+s &= \frac{1}{T} \ln(z)  \\
+  &= \frac{2}{T} \left[\frac{z-1}{z+1} + \frac{1}{3} \left( \frac{z-1}{z+1} \right)^3  + \frac{1}{5} \left( \frac{z-1}{z+1} \right)^5  + \frac{1}{7} \left( \frac{z-1}{z+1} \right)^7 + \cdots \right] \\
+  &\approx  \frac{2}{T} \frac{z - 1}{z + 1} \\
+  &=  \frac{2}{T} \frac{1 - z^{-1}}{1 + z^{-1}}
+\end{align}
+</math>
+
+雙線性變換的本質是使用這種一階估計法且將連續時間傳遞函數<math> H_a(s) \ </math>中的<math> s \ </math>替換成
+
+:<math>s \leftarrow \frac{2}{T} \frac{z - 1}{z + 1}.</math>
+
+也就是說
+
+:<math>H_d(z) = H_a(s) \bigg|_{s = \frac{2}{T} \frac{z - 1}{z + 1}}= H_a \left( \frac{2}{T} \frac{z-1}{z+1} \right). \ </math>
+
+== 保留穩定性及最小相位性質 ==
+
+如果有一個連續時間且有因果性的濾波器，其傳遞函數的[[极点_(复分析)|極點]]落在[[复数_(数学)|複數]][[S平面|S平面]]的左半邊，此濾波器則為穩定的。如果有一個離散時間且有因果性的濾波器，其傳遞函數的[[极点_(复分析)|極點]]落在[[复数_(数学)|複數]]Z平面的單位圓內，此濾波器則為穩定的。雙線性變換將複數S平面的左半邊映射到複數Z平面的單位圓內，因此穩定的連續時間濾波器被轉變成離散時間濾波器後也保有穩定性。
+
+同樣地，如果有一個連續時間的濾波器，其傳遞函數的[[零點|零點]]落在複數[[S平面|S平面]]的左半邊，此濾波器則有[[最小相位|最小相位]]性質。如果有一個離散時間且有因果性的濾波器，其傳遞函數的[[零點|零點]]落在複數Z平面的單位圓內，此濾波器則有最小相位性質。透過相同的映射性質，可以保證有最小相位性質的連續時間濾波器被轉換成離散時間濾波器後也保有最小性質。
+
+== 例子 ==
+
+以一個簡單的[[低通濾波器|低通]][[RC電路|RC電路]]當例子，這種連續時間濾波器的傳遞函數為
+
+:<math>\begin{align}
+H_a(s) &= \frac{1/sC}{R+1/sC} \\
+&= \frac{1}{1 + RC s}.
+\end{align}</math>
+
+如果我們想將這種濾波器應用成數位濾波器，我們可以將上式中的<math>s</math>做替換，因此可以得到下列表示式
+:{|
+|-
+|<math>H_d(z) \ </math>
+|<math> =H_a \left( \frac{2}{T} \frac{z-1}{z+1}\right) \ </math>
+|-
+|
+|<math>= \frac{1}{1 + RC \left( \frac{2}{T} \frac{z-1}{z+1}\right)} \ </math>
+|-
+|
+|<math>= \frac{1 + z}{(1 - 2 RC / T) + (1 + 2RC / T) z} \ </math>
+|-
+|
+|<math>= \frac{1 + z^{-1}}{(1 + 2RC / T) + (1 - 2RC / T) z^{-1}}. \ </math>
+|}
+
+在應用在即時[[數位濾波器|數位濾波器]]時，分母的係數為’回饋係數’而分子的係數為’前饋係數’。
+
+== 一般的雙二階變換 ==
+
+將連續時間的類比濾波器的係數對應到由雙線性變換展成的相似的離散時間數位濾波器是有可能的，假設有一個傳遞函數為下式的一般二階連續時間濾波器
+
+:<math>H_a(s) = \frac{b_0 s^2 + b_1 s + b_2}{a_0 s^2 + a_1 s + a_2} = \frac{b_0 + b_1 s^{-1} + b_2 s^{-2}}{a_0 + a_1 s^{-1} + a_2 s^{-2}}</math>
+
+利用下列替換方法做雙線性變換
+
+:<math>s \leftarrow K \frac{1 - z^{-1}}{1 + z^{-1}}</math>
+
+其中<math>K \triangleq \frac{2}{T} </math>.
+
+其結果為一個離散時間的數位雙二階濾波器，且由原本連續時間濾波器的係數所組成的表達式如
+
+:<math>H_d(z)=\frac{(b_0 K^2 + b_1 K + b_2) + (2b_2 - 2b_0 K^2)z^{-1} + (b_0 K^2 - b_1 K + b_2)z^{-2}}{(a_0 K^2 + a_1 K + a_2) + (2a_2 - 2a_0 K^2)z^{-1} + (a_0 K^2 - a_1 K + a_2)z^{-2}}</math>
+
+一般而言，在推導對應的差分方程式前，分母的常數項會被標準化為1
+
+:<math>H_d(z)=\frac{\frac{b_0 K^2 + b_1 K + b_2}{a_0 K^2 + a_1 K + a_2} + \frac{2b_2 - 2b_0 K^2}{a_0 K^2 + a_1 K + a_2}z^{-1} + \frac{b_0 K^2 - b_1 K + b_2}{a_0 K^2 + a_1 K + a_2}z^{-2}}{1 + \frac{2a_2 - 2a_0 K^2}{a_0 K^2 + a_1 K + a_2}z^{-1} + \frac{a_0 K^2 - a_1 K + a_2}{a_0 K^2 + a_1 K + a_2}z^{-2}}. </math>
+
+差分方程式則為
+
+:<math>
+\begin{align}
+y[n] ={} & \frac{b_0 K^2 + b_1 K + b_2}{a_0 K^2 + a_1 K + a_2} \cdot x[n] + \frac{2b_2 - 2b_0 K^2}{a_0 K^2 + a_1 K + a_2} \cdot x[n-1] \\[8pt]
+& {} + \frac{b_0 K^2 - b_1 K + b_2}{a_0 K^2 + a_1 K + a_2} \cdot x[n-2] - \frac{2a_2 - 2a_0 K^2}{a_0 K^2 + a_1 K + a_2} \cdot y[n-1] \\[8pt]
+& {} - \frac{a_0 K^2 - a_1 K + a_2}{a_0 K^2 + a_1 K + a_2} \cdot y[n-2].
+\end{align}
+</math>
+
+== 頻率扭曲 ==
+
+為了要計算連續時間濾波器的頻率響應，會去計算[[傳遞函數|傳遞函數]] <math> H_a(s) \ </math>在<math> j \omega \ </math>軸上的值(<math>s = j \omega \ </math>)。相同地，為了要計算離散時間濾波器的頻率響應，會去計算在單位圓上[[傳遞函數|傳遞函數]] <math> H_d(z) \ </math>的值(<span style="vertical-align:+30%;"><math>z = e^{ j \omega T} \ </math></span>，<math> |z| = 1 \ </math>)。當真正的頻率<math> \omega \ </math>被代入由雙線性變換產生的離散時間濾波器，可以透過下列式子得到連續時間濾波器的頻率<math> \omega_a \ </math>
+
+:<math>H_d(z) = H_a \left( \frac{2}{T} \frac{z-1}{z+1}\right) \ </math>
+
+:{|
+|-
+|<math>H_d(e^{ j \omega T}) \ </math>
+|<math>= H_a \left( \frac{2}{T} \frac{e^{ j \omega T} - 1}{e^{ j \omega T} + 1}\right) \ </math>
+|-
+|
+|<math>= H_a \left( \frac{2}{T} \cdot \frac{e^{j \omega T/2} \left(e^{j \omega T/2} - e^{-j \omega T/2}\right)}{e^{j \omega T/2} \left(e^{j \omega T/2} + e^{-j \omega T/2 }\right)}\right) \ </math>
+|-
+|
+|<math>= H_a \left( \frac{2}{T} \cdot \frac{\left(e^{j \omega T/2} - e^{-j \omega T/2}\right)}{\left(e^{j \omega T/2} + e^{-j \omega T/2 }\right)}\right) \ </math>
+|-
+|
+|<math>= H_a \left(j \frac{2}{T} \cdot \frac{ \left(e^{j \omega T/2} - e^{-j \omega T/2}\right) /(2j)}{\left(e^{j \omega T/2} + e^{-j \omega T/2 }\right) / 2}\right) \ </math>
+|-
+|
+|<math>= H_a \left(j \frac{2}{T} \cdot \frac{ \sin(\omega T/2) }{ \cos(\omega T/2) }\right) \ </math>
+|-
+|
+|<math>= H_a \left(j \frac{2}{T} \cdot \tan \left( \omega T/2 \right) \right) \ </math> 
+|}
+
+由此可知，離散時間濾波器在z平面單位圓中的每一點(<span style="vertical-align:+30%;"><math>z = e^{ j \omega T} \ </math></span>)可以被映射到連續時間濾波器在s平面<math>j \omega \ </math>軸上的一點(<math>s = j \omega_a \ </math>)。也就是說，雙線性變換將離散時間濾波器的頻率映射到連續時間濾波器的方法為下式
+
+:<math> \omega_a = \frac{2}{T} \tan \left( \omega \frac{T}{2} \right) </math>
+
+反之則為
+
+:<math> \omega = \frac{2}{T} \arctan \left( \omega_a \frac{T}{2} \right). </math>
+
+離散時間濾波器在頻率為<math>\omega \ </math>的表現和連續時間濾波器在頻率為<math> (2/T) \tan(\omega T/2) \ </math>的表現相同，具體來說，離散時間濾波器在頻率為<math>\omega \ </math>的增益和相位平移與連續時間濾波器在頻率為<math> (2/T) \tan(\omega T/2) \ </math>的增益和相位平移相同。也就是說，在連續時間濾波器的頻率響應所看到的每一個特徵，都可以在離散時間濾波器得頻率響應中看到，但頻率位置可能會不同。對於低頻而言(也就是當<math>\omega \ll 2/T</math> 或 <math>\omega_a \ll 2/T</math>)，<math>\omega \approx \omega_a \ </math>。
+
+連續時間濾波器的頻率範圍是
+
+: <math> -\infty < \omega_a < +\infty \ </math>
+
+對應到在離散時間濾波器的頻率區間是
+
+: <math> -\frac{\pi}{T} < \omega < +\frac{\pi}{T}. \ </math>
+
+當連續時間濾波器的頻率<math> \omega_a = 0 \ </math>，對應到離散時間濾波器的頻率<math> \omega = 0 \ </math>；當連續時間濾波器的頻率< <math> \omega_a = \pm \infty \ </math>，對應到離散時間濾波器的頻率<math> \omega = \pm \pi / T. \ </math>
+
+可以看到<math> \omega_a \ </math> 和 <math> \omega. \ </math>之間是非線性的關係，這個由雙線性變換產生的影響稱為'''''頻率扭曲'''''。設計連續時間濾波器時可以透過設定<math> \omega_a = \frac{2}{T} \tan \left( \omega \frac{T}{2} \right) \ </math>來補償頻率扭曲，這在濾波器設計中稱作為預先扭曲。
+
+當設計一個數字濾波器去估計連續時間濾波器時，如果將下列轉換式代入連續時間濾波器的傳遞函數中，這個數位濾波器的頻率響應(包含振幅跟相位)可以被做成符合連續時間濾波器在<math> \omega_0 </math>的頻率響應，這是一種修改過的Tustin變換。然而，當<math> \omega_0 \to 0 </math>時，這種變換方式就會變成上面所說的Tustin變換。也就是說，上面的轉換使得數位濾波器的響應在直流分量時會對應到類比濾波器響應
+
+:<math>s \leftarrow \frac{\omega_0}{\tan(\frac{\omega_0 T}{2})} \frac{z - 1}{z + 1}.</math>
+
+這種扭曲現象的主要優點是去除頻率響應的混疊失真。然而，還需要透過預先扭曲給定的連續時間系統頻率能補償所造成的頻率扭曲，這些被預先扭曲的頻率用在雙線性變換上可以得到想要的離散時間系統。
+
+== 參見 ==
+
+* [[Z轉換|Z轉換]]
+* [[S轉換|S轉換]]
+
+== 參考資料 ==
+{{reflist}}
+
+{{DSP}}
+
+{{DEFAULTSORT:雙線性變換}}
+[[Category:數字信號處理|Category:數字信號處理]]
+[[Category:變換|Category:變換]]
+[[Category:控制理論|Category:控制理論]]

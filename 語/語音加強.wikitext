@@ -1,0 +1,78 @@
+{{Multiple issues|
+{{copyedit|time=2013-06-20T18:32:57+00:00}}
+{{no footnotes|time=2013-06-20T18:32:57+00:00}}
+{{Expert|time=2019-12-26T09:26:45+00:00}}
+{{Disputed|time=2019-12-26T09:26:45+00:00}}
+}}
+一個語音辨識系統主要分成訓練(training)和測試(testing)。訓練多半在實驗室把較為理想的訓練語料(training data)訓練成一個聲學模型(acoustic model)，而在實際應用上，測試則不像訓練一樣是在一個理想的環境進行，因此造成與訓練出來的模型無法吻合的很好，導致辨識準確度下降。<br />
+也因為上述原因，在進行辨識前進行語音加強則成為一個很重要的步驟，也就是希望能夠在辨識前，盡量減少環境雜訊對語音信號的影響，進而提升辨識率。
+== 應用 ==
+* 提升語音辨識率
+::語音信號轉成文字
+* 提升語者辨識系統辨識率
+::辨識講話的人是誰，或者是否與模型吻合<br />
+== 語音加強演算法 ==
+依據通道的多寡可分為兩類：單通道語音加強演算法、多通道語音加強演算法<br />
+=== 單通道語音加強演算法 ===
+語音訊號的取得由一個通道而來，例如家用電話、手機、錄音檔，屬於這類的演算法有<br />
+:* Spectral Subtraction Process
+:*Spectral Subtraction With Oversubtraction Model
+:*Non-Linear Spectral Subtraction
+==== Spectral Subtraction Process ====
+使用這個方法的一些假設:
+* 把雜訊當作與原訊號不相干(uncorrelated)
+* 把原訊號與雜訊當作stationary，這部分可藉由在短時間上進行而達到
+這個方法的概念就是以下的式子，X為欲得到的加強語音，Y為收到包含雜訊的語音訊號，R為雜訊<br />
+<math>
+\left \|  X \left(\boldsymbol{\omega} \right)\right \|^2=
+\begin{cases} 
+\left \|  Y \left(\boldsymbol{\omega} \right)\right \|^2-\left \|  R \left(\boldsymbol{\omega} \right)\right \|^2,  & \mbox{if } \left \|  Y\left(\boldsymbol{\omega} \right)\right \|^2-\left \|  R \left(\boldsymbol{\omega} \right)\right \|^2>0 \\
+0, & \mbox{otherwise }
+\end{cases}
+</math>
+<br />
+在實做上R可藉由估計未講話時的訊號取得,但由於
+<math>
+\begin{smallmatrix}
+\left \|  Y\left(\boldsymbol{\omega} \right)\right \|^2-\left \|  R \left(\boldsymbol{\omega} \right)\right \|^2>0
+\end{smallmatrix}
+</math>
+的條件，使得所有
+<math>
+\begin{smallmatrix}
+\left \|  Y\left(\boldsymbol{\omega} \right)\right \|^2-\left \|  R \left(\boldsymbol{\omega} \right)\right \|^2<0
+\end{smallmatrix}
+</math>
+的估計都被設為0，這顯然是不合理的，因此造成加強的語音訊號聽起來會在一些時候有些不舒服，這個問題稱為'''musical noise'''
+==== Spectral Subtraction With Oversubtraction Model ====
+這個方法的產生主要就是為了解決由Spectral Subtraction Process所產生的'''musical noise'''的問題，作法是將模型修正為<br />
+<math>
+\left \|  X \left(\boldsymbol{\omega} \right)\right \|^2=
+\begin{cases} 
+\left \|  Y \left(\boldsymbol{\omega} \right)\right \|^2-\boldsymbol{\alpha}\cdot\left \|  R \left(\boldsymbol{\omega} \right)\right \|^2,  & \mbox{if } \left \|  Y\left(\boldsymbol{\omega} \right)\right \|^2-\left \|  R \left(\boldsymbol{\omega} \right)\right \|^2>\boldsymbol{\beta}\cdot\left \|  R \left(\boldsymbol{\omega} \right)\right \|^2 \\
+0, & \mbox{otherwise }
+\end{cases}
+</math>
+<br />
+==== Non-Linear Spectral Subtraction ====
+這個方法主要是將兩種方法給結合<br />
+(i) oversubtraction model<br />
+(ii) 扣除雜訊的過程是非線性的，在高SNR的時候扣除的較多，而低SNR的時候則扣除較少。
+=== 多通道語音加強演算法 ===
+語音訊號的取得由兩個或以上通道而來，由於訊號的取得較多元，提供更多語音加強的可能性，屬於這類的演算法有<br />
+:*Adaptive Noise Cancellation
+:*Multisensor beamforming
+==== Adaptive Noise Cancellation ====
+需要有兩個輸入訊號<br />
+(i)被雜訊污染的主要訊號<br />
+(ii)跟主要訊號中雜訊有關(correlated)<br />
+這個方法是把參考雜訊經過一個濾波器(希望濾波出來的結果接近主要訊號中的雜訊)，再把這個訊號從主要訊號中扣除，來估計加強的語音訊號。然而其實在這個過程中無法事先知道主要訊號的雜訊與參考訊號雜訊的關係，因此這個濾波器的設計是藉由'''adaptive algorithm'''調整濾波器參數來逼近主要訊號的雜訊，進而達到語音加強的效果。
+==== Multisensor beamforming ====
+使用麥克風陣列(多個感測器)來達到這個效果，由於各個麥克風所接收到的訊號方向不盡相同，導致每個接收訊號相位差不同，可藉由對準項位的方法('''phase alignment''')加強語音訊號。
+== 參考資料 ==
+* OVERVIEW OF SPEECH ENHANCEMENT TECHNIQUES FOR AUTOMATIC SPEAKER RECOGNITION Javier Ortega-García and Joaquín González-Rodríguez
+* SINGLE CHANNEL ENHANCEMENT OF NOISY SPEECH Kotta Manohar
+* S. F. Boll, “Suppression of Acoustic Noise in Speech Using Spectral Subtraction”, IEEE Trans. ASSP 27(2):113-120, April 1979.
+* Adaptive Noise Cancellation Aarti Singh 1/ECE/97 Dept. of Electronics & Communication Netaji Subhas Institute of Technology
+
+[[Category:语音识别|Category:语音识别]]

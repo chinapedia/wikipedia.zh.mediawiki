@@ -1,0 +1,61 @@
+{{lowercase}}
+{{NoteTA|G1=IT}}
+<tt>'''ln'''</tt> 是用来为文件创建链接的[[Unix实用程序列表|标准 Unix 命令]]。
+
+== 链接文件 ==
+通过链接文件，不同的文件名可以指向同一个文件。
+
+<tt>ln</tt> 可以创建两种类型的链接文件：
+#[[符号链接|符号链接]]，也称软链接，这是指向另一个不同路径文件的一个符号路径。
+#[[硬链接|硬链接]]，这是一个存储了链接建立时它所指向文件的实际数据的文件副本。
+
+==参数==
+*源文件：指定链接的源文件。如果使用-s选项创建符号链接，则“源文件”可以是文件或者目录。创建硬链接时，则“源文件”参数只能是文件；
+*目标文件：指定源文件的目标链接文件。
+
+从以下命令示例可看出两种链接文件的区别：
+
+<syntaxhighlight lang="bash">
+$ echo '文件内容' > oringinal.file
+$ ln oringinal.file hardlink.file
+$ ln -s oringinal.file softlink.file
+$ cat softlink.file
+文件内容
+$ rm oringinal.file
+$ cat softlink.file
+cat: softlink.file: 没有那个文件或目录
+$ cat hardlink.file
+文件内容
+</syntaxhighlight>
+
+原始文件被删除后，符号链接将失效，访问软链接时，会提示找不到文件，但硬链接文件还在，而且还保存有原始文件的内容。按照[[inode|inode]]的设计理论，硬链接的文件和原始文件对应相同的inode号，共享同一个数据储存区，而符号链接是一个独立的特殊文件，有自己的文件inode号，而内容为指向原始文件的路径。
+
+== 规范 ==
+[[单一Unix规范|单一Unix规范]]（SUS）规定了创建一个原始文件（或目录）的链接（不管是符号链接还是硬链接）文件时的行为。
+
+<tt>ln</tt> 可以用两种方式使用。第一种，是第一个参数指定原始文件，第二个参数指定链接文件；第二种，指定多于两个选项，应该先是多个原始文件（或目录），最后指定一个目录，所有原始文件（或目录）的链接将会被创建于最后指定的目录里。在后一种方式中，ln 命令的行为和具体的程序实现有关。
+
+<tt>ln</tt> 和标准的 <tt>unlink()</tt> 和 <tt>link()</tt> 函数执行完全一致的操作，详细的 <tt>ln</tt> 命令用法，可以执行以下两个命令查询：
+
+<syntaxhighlight lang="bash">
+ $ man ln
+ $ ln --help
+</syntaxhighlight>
+
+== 参见 ==
+*[[Unix实用程序列表|Unix实用程序列表]]
+*[[NTFS_junction_point|NTFS junction point]]
+
+== 外部链接 ==
+* 单一 Unix 规范里的 [http://www.opengroup.org/onlinepubs/009695399/utilities/ln.html ln] {{Wayback|url=http://www.opengroup.org/onlinepubs/009695399/utilities/ln.html |date=20091216142314 }} 命令
+* [http://en.wikibooks.org/wiki/Guide_to_Unix/Commands/File_System_Utilities#ln ln] {{Wayback|url=http://en.wikibooks.org/wiki/Guide_to_Unix/Commands/File_System_Utilities#ln |date=20201227203122 }} 命令简要指南
+
+=== 手册页 ===
+* [[GNU|GNU]] 网站上的 [http://www.gnu.org/software/coreutils/manual/html_node/ln-invocation.html ln] {{Wayback|url=http://www.gnu.org/software/coreutils/manual/html_node/ln-invocation.html |date=20150116054209 }} 手册页
+* [[OpenBSD|OpenBSD]] 网站上的 [http://www.openbsd.org/cgi-bin/man.cgi?query=ln ln] 手册页
+
+{{-}}
+{{Unix命令}}
+
+[[Category:标准Unix程序|Category:标准Unix程序]]
+[[Category:Unix_SUS2008实用程序|Category:Unix SUS2008实用程序]]

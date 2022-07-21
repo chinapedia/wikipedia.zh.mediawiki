@@ -1,0 +1,85 @@
+{{multiple issues|
+{{disputed|time=2015-07-03T08:30:59+00:00}}
+{{original research|time=2015-07-03T08:30:59+00:00}}
+{{refimprove|time=2015-07-03T08:30:59+00:00}}
+{{review|time=2015-07-03T08:30:59+00:00}}
+}}
+在编译程序优化理论中，'''逃逸分析'''是一种确定[[指標_(電腦科學)|指针]]动态范围的方法——分析在程序的哪些地方可以访问到指针。它涉及到指针分析和形状分析。
+
+当一个变量(或对象)在子程序中被分配时，一个指向变量的指针可能逃逸到其它执行线程中，或是返回到调用者子程序。如果使用[[尾递归优化|尾递归优化]]（通常在[[函数编程语言|函数编程语言]]中是需要的），对象也可以看作逃逸到被调用的子程序中。如果一种语言支持第一类型的[[计算续体|计算续体]]在[[Scheme|Scheme]]和[[新泽西Standard_ML|新泽西Standard ML]]中同样如此），部分[[调用栈|调用栈]]也可能发生逃逸。
+
+如果一个子程序分配一个对象并返回一个该对象的指针，该对象可能在程序中被访问到的地方无法确定——这样指针就成功“逃逸”了。如果指针存储在全局变量或者其它数据结构中，因为全局变量是可以在当前子程序之外访问的，此时指针也发生了逃逸。
+
+逃逸分析确定某个指针可以存储的所有地方，以及确定能否保证指针的生命周期只在当前进程或线程中。
+
+==优化==
+编译器可以使用逃逸分析的结果作为优化的基础：<ref name=":0">T. Kotzmann and H. Mössenböck, “Escape analysis in the context of dynamic compilation and deoptimization,” in Proceedings of the 1st ACM/USENIX international conference on Virtual execution environments, New York, NY, USA, 2005, pp. 111–120.</ref>
+
+* 将堆分配转化为栈分配。如果某个对象在子程序中被分配，并且指向该对象的指针永远不会逃逸，该对象就可以在分配在栈上，而不是在堆上。在有垃圾收集的语言中，这种优化可以降低垃圾收集器运行的频率。
+* 同步消除。如果发现某个对象只能从一个线程可访问，那么在这个对象上的操作可以不需要同步。
+* 分离对象或标量替换。如果某个对象的访问方式不要求该对象是一个连续的内存结构，那么对象的部分（或全部）可以不存储在内存，而是存储在CPU寄存器中。
+
+==实际问题==
+在面向对象的编程语言中，动态编译器特别适合使用逃逸分析。在传统的静态编译中，方法重写使逃逸分析变得不可能，任何调用方法可能被一个允许指针逃逸的版本重写。动态编译器可以使用重载信息来执行逃逸分析，并且当相关方法被动态代码加载重写时，会重新执行分析。<ref name=":0">T. Kotzmann and H. Mössenböck, “Escape analysis in the context of dynamic compilation and deoptimization,” in Proceedings of the 1st ACM/USENIX international conference on Virtual execution environments, New York, NY, USA, 2005, pp. 111–120.</ref>
+
+Java编程语言的流行使得逃逸分析成为一个研究热点。Java的堆分配、内置线程和Sun HotSpot动态编译器的结合创建了一个关于逃逸分析优化的候选平台。逃逸分析最早是在Java标准版6中实现的。
+
+==例子 (Java)==
+<syntaxhighlight lang="java">
+class Main {   
+  public static void main(String[] args) {     
+    example();   
+  }   
+  public static void example() {     
+    Foo foo = new Foo(); //alloc     
+    Bar bar = new Bar(); //alloc     
+    bar.setFoo(foo);   
+  }
+}  
+class Foo {}  
+class Bar {   
+  private Foo foo;   
+  public void setFoo(Foo foo) {     
+    this.foo = foo;   
+  }
+}
+</syntaxhighlight>
+在这个示例中，创建了两个对象(用alloc注释)，其中一个作为方法的参数。方法setFoo()接收到foo参数后，保存Foo对象的引用。如果Bar对象保存在堆中，那么Foo的引用将逃逸。但在这种情况下，编译器可以使用逃逸分析确定Bar对象本身并没有逃逸example()的调用。这意味着Foo引用无法逃逸。因此，编译器可以安全地在栈上分配两个对象。
+
+==例子（Scheme）==
+在接下来的例子中，向量p不逃入g，所以它可以分配在栈上，然后在调用g之前从栈中删除。
+<syntaxhighlight lang="scheme">
+(define (f x)
+    (let ((p (make-vector 10000)))
+       (fill-vector-with-good-stuff p)
+       (g (vector-ref p 7023))))
+</syntaxhighlight>
+然而，如果有
+<syntaxhighlight lang="scheme">
+(define (f x)
+    (let ((p (make-vector 10000)))
+       (fill-vector-with-good-stuff p)
+       (g p)))
+</syntaxhighlight>
+然后p需要分配在堆上或(如果当f被编译时，编译器知道g )分配在栈上，如此需要做出改变，即在g被调用时，可以保持g。
+如果计算续体（continuations）用于实现异常控制结构，逃逸分析通常可以发现以避免必须分配一个计算续体（continuation）并复制调用栈。例如，在
+<syntaxhighlight lang="scheme">
+;;读取用户输入的scheme对象。如果所有的数字,
+;;返回一个列表,有序包含所有。如果用户输入一个
+;;不是一个数字,立即返回#f。
+(define (getnumlist)
+   (call/cc (lambda (continuation)
+     (define (get-numbers)
+        (let ((next-object (read)))
+           (cond
+              ((eof-object? next-object) '())
+              ((number? next-object) (cons next-object (get-numbers)))
+              (else (continuation #f)))))
+     (get-numbers))))
+</syntaxhighlight>
+逃逸分析确定，被call/cc捕获的continuation不会逃逸，所以没有continuation结构需要被分配，唤醒continuation可以通过删除栈来实现。
+[[Category:静态程序分析|Category:静态程序分析]]
+==参考资料==
+{{reflist}}
+
+{{编译器优化}}

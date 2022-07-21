@@ -1,0 +1,75 @@
+<noinclude><div></noinclude><div style="clear: both;"></div><!--So right or left floating items don't stick out of the doc box.-->
+</div><!--End of green doc box--><!--
+  Link box below for the doc meta-data:
+-->{{#if: 
+  <!--Check if we should show the link box-->
+  {{#ifeq: {{{link box|}}} | off
+  |
+  | {{{doc exist|yes}}}{{
+    #switch: {{SUBJECTSPACE}}
+    | {{ns:User}}
+    | {{ns:Template}} = yes
+    }}
+  }}
+
+| {{fmbox
+  | id = documentation-meta-data
+  | image = none
+  | style = background-color: #ecfcf4;
+  | textstyle = 
+  | text = 
+    {{#if: {{{link box|}}}
+    | {{{link box}}}   <!--Use custom link box content-->
+    | {{#if: {{{doc exist|yes}}}
+      | <!--/doc exists, link to it-->
+        上述[[Wikipedia:模板文档頁模式|-{zh-cn:文档; zh-tw:文件;}-]][[Wikipedia:嵌入包含|嵌入]]自[[{{{docpage|{{FULLPAGENAME}}/doc}}}]]。<small style="font-style: normal">（[{{fullurl:{{{docpage|{{FULLPAGENAME}}/doc}}}|action=edit}} 编辑] &#124; [{{fullurl:{{{docpage|{{FULLPAGENAME}}/doc}}}|action=history}} -{zh-hans:页面历史; zh-hant:頁面歷史; zh-cn:页面历史; zh-sg:页面历史; zh-hk:頁面歷史; zh-mo:頁面歷史; zh-tw:修訂記錄;}-]）</small> <br />
+      }}<!-- 
+        Add links to /sandbox and /testcases when appropriate:
+   -->{{#switch: {{SUBJECTSPACE}}
+      | {{ns:User}}
+      | {{ns:Template}} = 
+        编辑者可以在本模板的{{
+        #ifexist: {{{sandbox| {{FULLPAGENAME}}/sandbox }}}
+        | [[{{{sandbox| {{FULLPAGENAME}}/sandbox }}}|沙盒]]<small style="font-style: normal">（[{{fullurl: {{{sandbox| {{FULLPAGENAME}}/sandbox }}} | action=edit }} 编辑] <nowiki>|</nowiki> [{{fullurl:Special:ComparePages | page1={{urlencode:{{{template page|{{FULLPAGENAME}}}}}}}&page2={{urlencode:{{{sandbox|{{FULLPAGENAME}}/sandbox}}}}}}} 差异]）</small> 
+        | 沙盒<small style="font-style: normal">（[{{fullurl: {{{sandbox| {{FULLPAGENAME}}/sandbox }}} | action=edit&preload=Template:Documentation/preload-sandbox }} -{zh-cn:创建; zh-tw:建立;}-] <nowiki>|</nowiki> [{{fullurl: {{{sandbox| {{FULLPAGENAME}}/sandbox }}} | action=edit&preload={{urlencode:{{{template page|{{FULLPAGENAME}}}}}}}&summary={{urlencode:Create sandbox version of [[{{{template page|{{FULLPAGENAME}}}}}]]}} }} 镜像]）</small> 
+        }}和{{
+        #ifexist: {{{testcases| {{FULLPAGENAME}}/testcases }}}
+        | [[{{{testcases| {{FULLPAGENAME}}/testcases }}}|测试样例]]<small style="font-style: normal">（[{{fullurl: {{{testcases| {{FULLPAGENAME}}/testcases }}} | action=edit }} 编辑]）</small>
+        | 测试样例<small style="font-style: normal">（[{{fullurl: {{{testcases| {{FULLPAGENAME}}/testcases }}} | action=edit&preload=Template:Documentation/preload-testcases }} -{zh-cn:创建; zh-tw:建立;}-]）</small>
+        }}页面进行实验。<br />
+      }}<!--
+        Show the cats text, but not 
+        if "content" fed or "docname fed" since then it is 
+        unclear where to add the cats.
+   -->{{#if: {{{content|}}} {{{docname fed|}}}
+      | 
+      | 请在[[{{{docpage|{{FULLPAGENAME}}/doc}}}|/doc]]子页面中-{zh-tw:新增;zh-cn:添加;}-分类。
+      }}<!--
+        Show the "Subpages" link:
+   -->{{#switch: {{SUBJECTSPACE}}
+      | {{ns:File}} =   <!--Don't show it-->
+      | {{ns:Template}} = [[Special:PrefixIndex/{{{template page|{{FULLPAGENAME}}}}}/|本模板的子页面]]。
+      | #default = [[Special:PrefixIndex/{{{template page|{{FULLPAGENAME}}}}}/|本页面的子页面]]。
+      }}
+    }}{{#ifexist:{{FULLPAGENAME}}/Print
+     |<br />A [[Help:Books/for experts#Improving the book layout|print version]] of this template exists at [[/Print]]. If you make a change to this template, please update the print version as well.[[Category:Templates with print versions]]
+    }}
+  }}
+}}<!--End link box--><!--
+
+  Detect and report strange usage:
+-->{{#if:
+
+  <!--Check if {{documentation}} is transcluded 
+      on a /doc or /testcases page-->
+  {{#switch: {{SUBPAGENAME}}
+  | doc
+  | testcases = strange
+  }}
+  <!--More checks can be added here, just return anything
+      to make the surrounding if-case trigger-->
+
+| <includeonly>[[Category:Wikipedia pages with strange ((documentation)) usage|{{main other|Main:}}{{FULLPAGENAME}}]]<!-- Sort on namespace --></includeonly>
+
+}}<noinclude>
+</noinclude>

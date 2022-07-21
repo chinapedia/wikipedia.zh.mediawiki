@@ -1,0 +1,26 @@
+{{Lowercase title}}
+{{noteTA
+|G1=IT
+}}
+{{lang|en|'''readahead'''}}（[[英語|英語]]，意思就是提前讀入）是[[Linux內核|Linux內核]]的一個-{zh-hans:一[[系统调用|系统调用]]; zh-hant:[[系統呼叫|系統呼叫]];}-功能，透過把所需要的系統檔案預先讀入[[檔案緩存|檔案緩存]]（{{lang|en|page cache}}）裡，解決磁碟存取速度的瓶頸問題<ref name=nutsfactory>{{cite web |url=http://blog.nutsfactory.net/2008/09/09/readahead-on-eeepc/ |title=readahead 加速 Linux 開機速度 ? |date=2008-09-09 |accessdate=2014-11-27 |language=zh-hant |author=[http://blog.nutsfactory.net/author/chihchun/ Rex Tsai] |archive-date=2014-12-04 |archive-url=https://web.archive.org/web/20141204202026/http://blog.nutsfactory.net/2008/09/09/readahead-on-eeepc/ |dead-url=no }}</ref>，從而加快啟動時的速度。因為系統所需檔案已從硬碟提早讀進了主記憶，而主記憶的管線頻寬比週邊系統的管線頻寬為高，令系統耗費在存取週邊設備的時間減少了<ref>{{cite web | url = https://lwn.net/Articles/155510/ | title = Adaptive file readahead | date = 2005-10-12 | accessdate = 2014-08-20 | author = Jonathan Corbet | publisher = [[LWN.net|LWN.net]] | language = en | archive-date = 2014-08-01 | archive-url = https://web.archive.org/web/20140801171539/http://lwn.net/Articles/155510/ | dead-url = no }}</ref><ref>{{cite web | url = http://man7.org/linux/man-pages/man2/readahead.2.html | title = readahead(2) - Linux manual page | accessdate = 2014-04-09 | website = man7.org | language = en | archive-date = 2014-05-25 | archive-url = https://web.archive.org/web/20140525042559/http://man7.org/linux/man-pages/man2/readahead.2.html | dead-url = no }}</ref>。
+
+很多的[[Linux发行版|Linux发行版]]都透過readahead程式來加速系統啟動。在這種設定裡，系統的[[內核|內核]]在啟動時在提供相關的啟動參數之下，會記錄啟動時需要啟用的檔案。這個檔案列表會用來製作新的readahead壓縮包，令額外安裝的服務得以較快啟動，即使最初系統安裝時，這些服務並未列於readahead的列表內<ref>{{cite web | url = http://free-electrons.com/pub/readahead/doc/ols2007-readahead-paper.pdf | title = Readahead: time-travel techniques for desktop and embedded systems | date = 2007-06-15 | accessdate = 2014-05-01 | author = Michael Opdenacker | website = free-electrons.com | format = PDF | pages = 5–6 | language = en | archive-date = 2013-09-20 | archive-url = https://web.archive.org/web/20130920155932/http://free-electrons.com/pub/readahead/doc/ols2007-readahead-paper.pdf | dead-url = no }}</ref>。部份實驗性的系統會透過[[分頁表|記憶分頁]][[預先提取|預先提取]][[高速缓存文件置换机制|高速缓存置换机制]]再令系統表現提升<ref>{{cite web | url = http://prefetch.googlecode.com/files/gsoc-prefetching-presentation.pdf | title = Linux solution for prefetching necessary data during application and system startup | year = 2008 | accessdate = 2014-07-28 | author = Krzysztof Lichota | website = code.google.com | format = PDF | language = en | deadurl = yes | archiveurl = https://web.archive.org/web/20091211124530/http://prefetch.googlecode.com/files/gsoc-prefetching-presentation.pdf | archivedate = 2009-12-11 }}</ref>。
+
+隨着電腦硬件及軟件的進步，readahead的做法亦跟隨轉變。在使用[[systemd|systemd]]的Linux发行版（例如：[[Fedora|Fedora]]、[[OpenSUSE|OpenSUSE]]等），readahead的功能與systemd結合了成為一個叫作「systemd-readahead」的執行檔<ref>{{cite web | url = https://fedorahosted.org/readahead/ | title = Readahead | accessdate = 2014-04-09 | website = fedorahosted.org | language = en | archive-date = 2014-04-09 | archive-url = https://web.archive.org/web/20140409172639/https://fedorahosted.org/readahead/ | dead-url = no }}</ref><ref>{{cite web |url=http://www.freedesktop.org/software/systemd/man/systemd-readahead.html |title=systemd-readahead-replay.service |date=2014-03-26 |accessdate=2014-04-09 |website=freedesktop.org |language=en |deadurl=yes |archiveurl=https://web.archive.org/web/20140409235938/http://www.freedesktop.org/software/systemd/man/systemd-readahead.html |archivedate=2014-04-09 }}</ref>。而在以[[debian|debian]]為基礎的平台（例如：[[Ubuntu|Ubuntu]]），在釋出官方版本時，會內建一組預先較調的檔案列表，再把相關檔案壓縮到一個壓縮包，到系統啟動時從啟動磁碟載入<ref name=nutsfactory />。這個以debian為基礎的Linux版本的readahead經歷過下列的轉變：
+* 原來的readahead功能在[[Ubuntu_9.10|Ubuntu 9.10]]推出時被取代；
+* [[sreadahead|sreadahead]]取代了原來的readahead，但後來亦被取代；
+* [[ureadahead|ureadahead]]：全稱為{{lang|de|über-readahead}}，源自德語，意思就是「超越readahead」的意思。現時的版本號碼是0.100.0-17<ref>{{Launchpad |id=ureadahead |title=über-readahead}}</ref>。
+
+==參看==
+* [[systemd|systemd]]
+* [[Upstart|Upstart]]
+
+==參考資料 ==
+{{Reflist|30em}}
+
+==外部連結==
+* [http://ubuntuforums.org/showthread.php?t=1343542 Ubuntu Forum: sreadahead/ureadahead updates]{{Wayback|url=http://ubuntuforums.org/showthread.php?t=1343542 |date=20141204202317 }}
+* [https://wiki.archlinux.org/index.php/Ureadahead Ureadahead in ArchLinux Wiki]{{Wayback|url=https://wiki.archlinux.org/index.php/Ureadahead |date=20140519131936 }}
+{{Linux}}
+
+[[Category:Linux文件系统相关软件|Category:Linux文件系统相关软件]]

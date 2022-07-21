@@ -1,0 +1,49 @@
+{{NoteTA|G1=IT}}
+{{IPstack}}
+'''DHCPv6'''是一个用来配置工作在[[IPv6|IPv6]]网络上的IPv6[[主机|主机]]所需的[[IP地址|IP地址]]、IP前缀和/或其他配置的[[网络协议|网络协议]]。
+
+IPv6主机可以使用[[IPv6#無狀態地址自動組態（SLAAC）|無狀態地址自动配置]]（SLAAC）或DHCPv6来获得IP地址。DHCP倾向于被用在需要集中管理主机的站点，而无状态自动配置不需要任何集中管理，因此后者更多地被用在典型家庭网络这样的场景下。
+
+使用无状态自动配置的IPv6主机可能会需要除了IP地址以外的其他信息。DHCPv6可被用来获取这样的信息，哪怕这些信息对于配置IP地址毫无用处。配置[[域名系统|DNS]]服务器无需使用DHCPv6，它们可以使用无状态自动配置所需的[[邻居发现协议|邻居发现协议]]来进行配置<ref>RFC 4339, ''IPv6 Host Configuration of DNS Server Information Approaches'', J. Jeong (February 2006)</ref>。
+
+IPv6路由器，如家庭路由器，必须在无需人工干预的情况下被自动配置。这样的路由器不仅需要一个IPv6地址用来与上游路由器通信，还需要一个IPv6前缀用来配置下游的设备。DHCPv6 [[前缀代理|前缀代理]]提供了配置此类路由器的机制。
+
+==实现==
+===端口号===
+DHCPv6客户端使用UDP端口号546，服务器使用端口号547。
+
+===DHCP唯一标识符===
+DHCP唯一标识符（DUID）用于客户端从DHCPv6服务器获得IP地址。最小长度为12个字节（96位），最大长度为20字节（160位）。实际长度取决于其类型。服务器将DUID与其数据库进行比较，并将配置数据（地址、租期、DNS服务器，等等）发送给客户端。DUID的前16位包含了DUID的三种类型之一。剩余的96位取决于DUID类型。
+
+===举例===
+本例中，服务器的链路本地地址是<code>fe80::0011:22ff:fe33:5566</code>，客户端的链路本地地址是<code>fe80::aabb:ccff:fedd:eeff</code>。
+* DHCPv6客户端从<code>[fe80::aabb:ccff:fedd:eeff]:546</code>发送'''Solicit'''至<code>[ff02::1:2]:547</code>。
+* DHCPv6服务器从<code>[fe80::0011:22ff:fe33:5566]:547</code>回应一个'''Advertise'''给<code>[fe80::aabb:ccff:fedd:eeff]:546</code>。
+* DHCPv6客户端从<code>[fe80::aabb:ccff:fedd:eeff]:546</code>回应一个'''Request'''给<code>[ff02::1:2]:547</code>。（依照[http://tools.ietf.org/html/rfc8415 RFC 8415]{{Wayback|url=http://tools.ietf.org/html/rfc8415 |date=20191127185120 }}的[http://tools.ietf.org/html/rfc8415#section-14 section 14]{{Wayback|url=http://tools.ietf.org/html/rfc8415#section-14 |date=20191127185120 }}，所有客户端消息都发送到多播地址)
+* DHCPv6服务器以<code>[fe80::0011:22ff:fe33:5566]:547</code>到<code>[fe80::aabb:ccff:fedd:eeff]:546</code>的'''Reply'''结束。
+
+==IETF标准==
+* RFC 3315, "Dynamic Host Configuration Protocol for IPv6 (DHCPv6)"
+* RFC 3319, "Dynamic Host Configuration Protocol (DHCPv6) Options for Session Initiation Protocol (SIP) Servers"
+* RFC 3633, "IPv6 Prefix Options for Dynamic Host Configuration Protocol (DHCP) version 6"
+* RFC 3646, "DNS Configuration options for Dynamic Host Configuration Protocol for IPv6 (DHCPv6)"
+* RFC 3736, "Stateless Dynamic Host Configuration Protocol (DHCP) Service for IPv6"
+* RFC 5007, "DHCPv6 Leasequery"
+* RFC 6221, "Lightweight DHCPv6 Relay Agent"
+* RFC 6355, "Definition of the UUID-Based DHCPv6 Unique Identifier (DUID-UUID)"
+* RFC 6939, "Client Link-Layer Address Option in DHCPv6"
+* RFC 8415, "Dynamic Host Configuration Protocol for IPv6 (DHCPv6)" - Obsoletes RFC 3315, RFC 3633, RFC 3736, RFC 4242, RFC 7083, RFC 7283, RFC 7550.
+
+==参考资料==
+{{Reflist}}
+
+==外部链接==
+* [http://ipv6int.net/software/index.html#dhcpv6 IPv6 Intelligence: DHCPv6]{{Wayback|url=http://ipv6int.net/software/index.html#dhcpv6 |date=20130507060919 }}, comparison of DHCPv6 packages and implementations (Last updated: April, 2009)
+* [https://www.ipv6ready.org/db/index.php/public/search/?l=&c=&ds=&de=&pc=&ap=2&oem=&etc=D&fw=&vn=&do=1&o=6 IPv6 Ready: DHCPv6]{{Wayback|url=https://www.ipv6ready.org/db/index.php/public/search/?l=&c=&ds=&de=&pc=&ap=2&oem=&etc=D&fw=&vn=&do=1&o=6 |date=20140201185746 }}, list of IPv6 Phase II Certified DHCPv6 implementations (Last updated: December, 2012)
+
+{{IPv6}}
+
+[[Category:IPv6|Category:IPv6]]
+[[Category:应用层协议|Category:应用层协议]]
+
+[[de:Dynamic_Host_Configuration_Protocol#DHCPv6|de:Dynamic Host Configuration Protocol#DHCPv6]]

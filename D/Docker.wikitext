@@ -1,0 +1,262 @@
+{{Multiple issues|
+{{Copy edit|time=2022-01-12T05:19:34+00:00}}
+{{Rough translation|time=2022-01-13T03:44:45+00:00}}
+}}
+{{NoteTA
+|G1 = IT
+|G2 = FL
+}}
+
+{{Infobox software
+| name                   = Docker
+| title                  = Docker
+| logo                   = Docker (container engine) logo.svg
+| logo size              = 250px
+| screenshot             = 
+| caption                = 
+| collapsible            = 
+| author                 = Solomon Hykes
+| developer              = Docker, Inc.
+| released               = {{Start date|2013|03|13|df=yes/no}}
+| latest release version = 20.10.17
+| latest release date    = {{Release date and age|2022|06|07}}
+| latest preview version = 22.06.0-beta.0
+| latest preview date    = {{Release date and age|2022|06|03}}
+| programming language   = [[Go|Go]]
+| operating system       = [[Linux|Linux]]、[[Windows|Windows]]、[[macOS|macOS]]
+| platform               = [[x86-64|x86-64]]、[[ARM架構|ARM]]、s390x、[[ppc64|ppc64le]]
+| language               = 
+| genre                  = [[作業系統層虛擬化|作業系統層虛擬化]]
+| license                = '''可執行檔：'''[[免費增值|免費增值]][[软件即服务|软件即服务]]<br />'''原始碼：'''[[Apache许可证|Apache许可证]] 2.0
+| website                = {{URL|https://www.docker.com/}}
+}}
+'''Docker''' 是一个[[開放原始碼|開放原始碼]][[軟體|軟體]]，是一個[[開放平臺|开放平台]]，用于开发应用、交付（shipping）应用、运行应用。 Docker允许用户将基础设施（Infrastructure）中的应用单独分割出来，形成更小的颗粒（容器），从而提高交付软件的速度。<ref>{{Cite web|title=Get Docker|url=https://docs.docker.com/get-docker/|accessdate=2020-03-22|date=2020-03-20|work=Docker Documentation|language=en|archive-date=2020-03-22|archive-url=https://web.archive.org/web/20200322041440/https://docs.docker.com/get-docker/|dead-url=no}}</ref> 
+
+'''Docker容器'''与虚拟机类似，但二者在原理上不同。容器是将[[作業系統層虛擬化|操作系统层虚拟化]]，虚拟机则是虚拟化硬件，因此容器更具有便携性、高效地利用服务器。 容器更多的用于表示 软件的一个标准化单元。由于容器的标准化，因此它可以无视基础设施（Infrastructure）的差异，部署到任何一个地方。另外，Docker也为容器提供更强的业界的隔离兼容。<ref>{{Cite web|title=What is a Container? {{!}} App Containerization {{!}} Docker|url=https://www.docker.com/resources/what-container|accessdate=2020-03-22|work=www.docker.com|language=en|archive-date=2018-08-06|archive-url=https://web.archive.org/web/20180806120942/https://www.docker.com/what-container|dead-url=yes}}</ref>
+
+'''Docker''' 利用[[Linux核心|Linux核心]]中的資源分離機制，例如[[cgroups|cgroups]]，以及Linux核心{{le|Linux命名空間|Linux namespaces|命名空間}}（namespaces），來建立獨立的[[作業系統層虛擬化|容器]]（containers）。這可以在單一Linux實體下運作，避免啟動一個[[虛擬機器|虛擬機器]]造成的額外負擔<ref name="#1">{{cite web 
+ |url=http://docker.readthedocs.org/en/v0.7.3/installation/kernel/ 
+ |title=Docker Documentation 
+ |date=2014-01-04 
+ |accessdate=2014-08-20 
+ |website=docker.readthedocs.org 
+ |deadurl=yes 
+ |archiveurl=https://web.archive.org/web/20140821065734/http://docker.readthedocs.org/en/v0.7.3/installation/kernel/ 
+ |archivedate=2014-08-21 
+ }}</ref>。Linux核心對命名空間的支援完全隔離了工作環境中應用程式的視野，包括行程樹、[[计算机网络|網路]]、用户ID與掛載檔案系統，而核心的cgroup提供资源隔離，包括[[CPU|CPU]]、[[電腦記憶體|記憶體]]、block I/O與網路。從0.9版本起，Dockers在使用抽象虛擬是經由[[libvirt|libvirt]]的[[LXC|LXC]]與systemd - nspawn提供界面的基礎上，開始包括libcontainer函式庫做為以自己的方式開始直接使用由Linux核心提供的虛擬化的設施， 
+
+依據行業分析公司「451研究」：「Dockers是有能力打包應用程式及其虛擬容器，可以在任何Linux伺服器上執行的依賴性工具，這有助於實現靈活性和便攜性，應用程式在任何地方都可以執行，無論是[[公用雲端伺服器|公用雲端伺服器]]、[[私有雲端伺服器|私有雲端伺服器]]、單機等。」 <ref name="#1"/>
+
+== 基础架构 ==
+专业名词Docker有两个意思：<ref name="#2">{{Cite web|title=Glossary|url=https://docs.docker.com/glossary/|accessdate=2020-02-29|date=2020-02-25|work=Docker Documentation|language=en|archive-date=2019-12-28|archive-url=https://web.archive.org/web/20191228150735/https://docs.docker.com/glossary/|dead-url=no}}</ref>
+
+* 代指整个Docker项目。
+* 代指Docker引擎。
+
+=== Docker引擎 ===
+'''Docker引擎'''(Docker Engine)是一个服务端-客户端结构的应用，主要有这些部分：Docker守护进程、[https://docs.docker.com/develop/sdk/ Docker Engine API]{{Wayback|url=https://docs.docker.com/develop/sdk/ |date=20200218205320 }}、Docker客户端。<ref name=":0">{{Cite web|title=Docker overview|url=https://docs.docker.com/engine/docker-overview/|accessdate=2020-02-16|date=2020-02-14|work=Docker Documentation|language=en|archive-date=2020-01-06|archive-url=https://web.archive.org/web/20200106071031/https://docs.docker.com/engine/docker-overview/|dead-url=no}}</ref>
+
+*'''Docker守护进程'''(Docker daemons)，也叫 <code>dockerd</code> ，是一个持久化的进程，用户管理容器。守护进程会监听[https://docs.docker.com/develop/sdk/ Docker Engine API]{{Wayback|url=https://docs.docker.com/develop/sdk/ |date=20200218205320 }} 的请求。<ref name="#3">{{Cite web|title=dockerd|url=https://docs.docker.com/engine/reference/commandline/dockerd/|accessdate=2020-02-16|date=2020-02-14|work=Docker Documentation|language=en|archive-date=2020-02-18|archive-url=https://web.archive.org/web/20200218205320/https://docs.docker.com/engine/reference/commandline/dockerd/|dead-url=no}}</ref>
+*[https://docs.docker.com/develop/sdk/ '''Docker Engine API''']{{Wayback|url=https://docs.docker.com/develop/sdk/ |date=20200218205320 }}是用于与Docker守护进程交互用的的API。它是一个RESTful API，因此它不仅可以被Docker客户端调用，也可以被<code>wget</code> 和 <code>curl</code>等命令调用。<ref>{{Cite web|title=Develop with Docker Engine SDKs and API|url=https://docs.docker.com/develop/sdk/|accessdate=2020-02-16|date=2020-02-14|work=Docker Documentation|language=en|archive-date=2020-02-18|archive-url=https://web.archive.org/web/20200218205320/https://docs.docker.com/develop/sdk/|dead-url=no}}</ref>
+*'''Docker客户端'''，也叫<code>docker</code>，是大部分用户与Docker交互的主要方式。用户通过客户端将命令发送给守护进程。命令会遵循[https://docs.docker.com/develop/sdk/ Docker Engine API]{{Wayback|url=https://docs.docker.com/develop/sdk/ |date=20200218205320 }}<ref name="#3"/>
+
+=== Docker注册中心 ===
+Docker注册中心(Docker registry)是用于存储Docker的镜像。Docker Hub 是一个公共的注册中心，任何人都可以使用，默认配置下，Docker将会在这里寻找镜像。<ref name=":0" />
+
+另外，用户可以自行构建私有注册中心。Docker Datacenter (DDC)的用户，可以直接使用 Docker Trusted Registry (DTR)。<ref name=":0" />
+
+=== 对象 ===
+Docker的对象是指Images、Containers、Networks、Volumes、Plugins等等。<ref name=":0" />
+
+*'''容器'''（Containers）是镜像的可运行的实例。容器可通过API或CLI（命令行）进行操控。<ref name=":0" />
+*'''镜像'''（Images）是一个只读模板，用于指示创建容器。<ref name=":0" /> 镜像分层(layers)构建的，而定义这些层次的文件叫'''Dockerfile'''。<ref>{{Cite web|title=About storage drivers|url=https://docs.docker.com/storage/storagedriver/|accessdate=2020-02-16|date=2020-02-14|work=Docker Documentation|language=en|archive-date=2020-02-18|archive-url=https://web.archive.org/web/20200218205357/https://docs.docker.com/storage/storagedriver/|dead-url=no}}</ref>
+*'''服务'''（Services）允许使用者跨越不同的Docker守护进程（Docker daemons）的情况下增加容器，并将这些容器分为管理者（managers）和工作者（workers），让他们为swarm共同工作。<ref name=":0" />
+
+== 扩展架构 ==
+
+===Docker Compose===
+Compose可译为组合物。<ref>{{Cite web|title=What is the noun for compose?|url=https://www.wordhippo.com/what-is/the-noun-for/compose.html|accessdate=2020-02-16|work=WordHippo|language=en|archive-date=2020-02-16|archive-url=https://web.archive.org/web/20200216131044/https://www.wordhippo.com/what-is/the-noun-for/compose.html|dead-url=no}}</ref>Compose 是用于定义和运行 多个容器Docker应用程序 的工具。通过Compose，你可以使用[[YAML|YAML文件]]来配置应用程序需要的所有服务，然后通过使用一个命令，就可以创建并启动所有服务。<ref>{{Cite web|title=Docker Compose {{!}} 菜鸟教程|url=https://www.runoob.com/docker/docker-compose.html|accessdate=2020-02-16|work=www.runoob.com|archive-date=2020-02-16|archive-url=https://web.archive.org/web/20200216131044/https://www.runoob.com/docker/docker-compose.html|dead-url=no}}</ref><ref>{{Cite web|title=Overview of Docker Compose|url=https://docs.docker.com/compose/|accessdate=2020-02-16|date=2020-02-14|work=Docker Documentation|language=en|archive-date=2020-02-18|archive-url=https://web.archive.org/web/20200218114942/https://docs.docker.com/compose/|dead-url=no}}</ref>Compose对应的命令为<code>docker-compose</code>。<ref>{{Cite web|title=Compose command-line reference|url=https://docs.docker.com/compose/reference/|accessdate=2020-02-16|date=2020-02-14|work=Docker Documentation|language=en|archive-date=2020-04-01|archive-url=https://web.archive.org/web/20200401092033/https://docs.docker.com/compose/reference/|dead-url=no}}</ref>
+
+===Swarm Mode===
+当说到 Docker Swarm 时，一般是指单独项目 Docker Swarm。而在Docker 1.12时，将swarm mode集成到Docker 引擎中，可用Docker引擎API 和 CLI 命令直接使用。官方推荐用户使用集成的 swarm mode <ref>{{Cite web|title=Docker Swarm overview|url=https://docs.docker.com/swarm/overview/|accessdate=2020-02-29|date=2020-02-25|work=Docker Documentation|language=en|archive-date=2020-04-23|archive-url=https://web.archive.org/web/20200423133823/https://docs.docker.com/swarm/overview/|dead-url=no}}</ref>。
+
+Swarm Mode 内置 kv 存储功能，提供了众多的新特性，比如：具有容错能力的去中心化设计、内置服务发现、负载均衡、路由网格、动态伸缩、滚动更新、安全传输等。使得 Docker 原生的 <code>Swarm</code> 集群具备与 Mesos、[[Kubernetes|Kubernetes]] 竞争的实力。<ref>{{Cite web|title=Swarm mode · Docker —— 从入门到实践|url=https://yeasy.gitbooks.io/docker_practice/swarm_mode/|accessdate=2020-03-05|work=yeasy.gitbooks.io|archive-date=2020-03-20|archive-url=https://web.archive.org/web/20200320093446/https://yeasy.gitbooks.io/docker_practice/swarm_mode/|dead-url=no}}</ref>
+
+cluster(中文：[[计算机集群|集群]])，Docker将集群定义为：一群共同作业并提供高可用性的机器<ref name="#2"/> 。swarm(中文：群<ref>{{Cite web|title=swarm漢語(繁體)翻譯：劍橋詞典|url=https://dictionary.cambridge.org/zht/%E8%A9%9E%E5%85%B8/%E8%8B%B1%E8%AA%9E-%E6%BC%A2%E8%AA%9E-%E7%B9%81%E9%AB%94/swarm|accessdate=2020-02-24|work=dictionary.cambridge.org|language=zh-Hant|archive-date=2020-04-23|archive-url=https://web.archive.org/web/20200423095040/https://dictionary.cambridge.org/zht/%E8%A9%9E%E5%85%B8/%E8%8B%B1%E8%AA%9E-%E6%BC%A2%E8%AA%9E-%E7%B9%81%E9%AB%94/swarm|dead-url=no}}</ref>)，是指一个集群的Docker引擎以swarm mode形式运行<ref name="#2"/>。swarm mode是指Docker引擎内嵌的集群管理和编排功能。当你初始化了一个swarm(cluster)或者将节点加入一个swarm时，其Docker引擎就会以swarm mode的形式运行。<ref name="#2"/>
+
+==== 原理 ====
+swarm中的Docker机器中分为 managers（管理者） 和 workers（员工），管理者用于处理集群的关系和委派，员工则用于执行 swarm服务。<ref name=":3">{{Cite web|title=Swarm mode key concepts|url=https://docs.docker.com/engine/swarm/key-concepts/|accessdate=2020-02-24|date=2020-02-20|work=Docker Documentation|language=en|archive-date=2020-02-24|archive-url=https://web.archive.org/web/20200224154538/https://docs.docker.com/engine/swarm/key-concepts/|dead-url=no}}</ref> 当你创建swarm服务时，你可以为其增加各种额外的状态（如：数量、网络、端口、存储资源等等）。Docker会去维持用户想要的状态。如：一个工作节点如果挂了，那么Docker会去把这个节点的任务给另外一个节点。此处的任务（task）是指：被swarm管理者管理的一个运行中的容器。<ref name=":3" />
+
+swarm服务比单独容器好在，修改swarm服务的配置之后不用重启。同时，Docker以swarm mode形式运行时，也可以选择直接启动单独的容器。另外，swarm mode下，你也可以通过 <code>docker stack deploy</code> 使用 Compose file 部署应用栈。<ref>{{Cite web|title=Deploy a stack to a swarm|url=https://docs.docker.com/engine/swarm/stack-deploy/|accessdate=2020-02-29|date=2020-02-25|work=Docker Documentation|language=en|archive-date=2020-02-29|archive-url=https://web.archive.org/web/20200229134326/https://docs.docker.com/engine/swarm/stack-deploy/|dead-url=no}}</ref><ref name=":3" /> swarm服务分为两种，一种是replicated services ，可以指定节点任务的总数量；global services，则是每个节点都会运行一个指定任务。<ref>{{Cite web|title=services-and-tasks|url=https://docs.docker.com/engine/swarm/key-concepts/#services-and-tasks#services-and-tasks|accessdate=2020-02-29|author=|date=2020-02-25|format=|work=Docker Documentation|publisher=|language=en|archive-date=2020-02-24|archive-url=https://web.archive.org/web/20200224154538/https://docs.docker.com/engine/swarm/key-concepts/#services-and-tasks|dead-url=no}}</ref> swarm管理员使用 ingress  负载均衡使服务可被外部接触。 swarm管理员会自动地给服务分配PublishedPort（或者手动配置）。外部组件，如云负载均衡器能通过集群中任何节点上的PublishedPort去接入服务（不管该服务是否启动）。另外 swarm mode有内部DNS组件，它会为每个服务分配一个DNS条目。swarm管理员使用 internal load balancing 去分发请求时，就是依靠这个DNS组件。<ref>{{Cite web|title=load-balancing|url=https://docs.docker.com/engine/swarm/key-concepts/#services-and-tasks#services-and-tasks#load-balancing|accessdate=2020-02-29|author=|date=2020-02-25|format=|work=Docker Documentation|publisher=|language=en|archive-date=2020-02-24|archive-url=https://web.archive.org/web/20200224154538/https://docs.docker.com/engine/swarm/key-concepts/#services-and-tasks|dead-url=no}}</ref>
+
+swarm mode的功能是由swarmkit(一个独立项目)提供的，它实现了Docker的编排层。swarm可以直接被Docker使用。<ref name=":3" />
+
+== 文件格式 ==
+Docker有两种文件格式，Dockerfile和Compose file。Dockerfile定义了单个容器的内容和启动时候的行为。Compose file定义了一个多容器应用。<ref>{{Cite web|title=Reference documentation|url=https://docs.docker.com/reference/|accessdate=2020-02-17|date=2020-02-14|work=Docker Documentation|language=en|archive-date=2020-02-17|archive-url=https://web.archive.org/web/20200217165424/https://docs.docker.com/reference/|dead-url=no}}</ref>
+
+=== Dockerfile ===
+Docker 可以依照 Dockerfile 的内容，自动化地构建镜像。 Dockerfile 是包含着用户想要如何构建镜像的所有命令的文本。<ref>{{Cite web|title=dockerfile-reference|url=https://docs.docker.com/engine/reference/builder#dockerfile-reference|accessdate=|author=|date=|format=|publisher=|language=|archive-date=2020-02-18|archive-url=https://web.archive.org/web/20200218205347/https://docs.docker.com/engine/reference/builder/#dockerfile-reference|dead-url=no}}</ref><syntaxhighlight lang="dockerfile">
+FROM ubuntu:18.04
+COPY . /app
+RUN make /app
+CMD python /app/app.py
+</syntaxhighlight>关键词：
+
+* <code>RUN</code>。<code>RUN</code>会在当前镜像的顶层上添加新的一层(layer)，并在该层上执行命令，执行结果将会被提交。提交后的结果将会用于<code>Dockerfile</code>的下一步。<ref>{{Cite web|title=run|url=https://docs.docker.com/engine/reference/builder/#run|accessdate=2020-02-18|author=|date=|format=|publisher=|language=|archive-date=2020-02-18|archive-url=https://web.archive.org/web/20200218205347/https://docs.docker.com/engine/reference/builder/#run|dead-url=no}}</ref>
+* <code>ENTRYPOINT</code>，[[入口点|入口点]]。<code>ENTRYPOINT</code>允许你配置容器，使之成为可执行程序。<ref>{{Cite web|title=entrypoint|url=https://docs.docker.com/engine/reference/builder/#dockerfile-reference#entrypoint|accessdate=2020-02-27|author=|date=|format=|publisher=|language=|archive-date=2020-02-21|archive-url=https://web.archive.org/web/20200221063102/https://docs.docker.com/engine/reference/builder/#dockerfile-reference|dead-url=no}}</ref>即，<code>ENTRYPOINT</code>允许你为容器增加一个[[入口点|入口点]]。<code>ENTRYPOINT</code>和<code>CMD</code>类似，均在容器启动时执行，但是<code>ENTRYPOINT</code>为了提供稳定且不可被覆盖的操作。<ref>{{Cite web|title=entrypoint-default-command-to-execute-at-runtime|url=https://docs.docker.com/engine/reference/run/#entrypoint-default-command-to-execute-at-runtime|accessdate=|author=|date=|format=|publisher=|language=|archive-date=2020-02-02|archive-url=https://web.archive.org/web/20200202185913/https://docs.docker.com/engine/reference/run/#entrypoint-default-command-to-execute-at-runtime|dead-url=no}}</ref>通过在命令行中指定<code>--entrypoint 命令</code>的方式，可在运行时将Dockerfile文件中的<code>ENTRYPOINT</code>覆盖。
+* <code>CMD</code>，是command的缩写。<code>CMD</code>用于为已创建的镜像提供默认的操作，当不想要用默认操作时候，可用<code>docker run  IMAGE[:TAG|@DIGEST] [COMMAND]</code> 进行替换 。但当Dockerfile拥有入口点时，<code>CMD</code>用于赋予入口点参数。<ref>{{Cite web|title=cmd-default-command-or-options|url=https://docs.docker.com/engine/reference/run/#cmd-default-command-or-options|accessdate=|author=|date=|format=|publisher=|language=|archive-date=2020-02-02|archive-url=https://web.archive.org/web/20200202185913/https://docs.docker.com/engine/reference/run/#cmd-default-command-or-options|dead-url=no}}</ref>
+
+=== Compose文件 ===
+Compose文件 是一个[[YAML|YAML文件]]，定义了服务（service）、网络、[[卷(计算机)|卷]]（volume）。
+
+* '''服务（service）'''定义 各容器的配置，定义内容将以命令行参数的方式 传给 <code>docker run</code> 命令。
+* '''网络（network）'''，类似地，将定义内容传给 <code>docker network create</code> 命令 。
+* '''卷（volume）'''，类似地，将定义内容传给 <code>docker volume create</code> 命令。
+
+<code>docker run</code> 命令中有一些选项，和 [[Docker#Dockerfile|Dockerfile文件]]中的指令效果一样（如：<code>CMD</code>, <code>EXPOSE</code>, <code>VOLUME</code>, <code>ENV</code>），如果[[Docker#Dockerfile|Dockerfile文件]]中使用这些指令，那么这些指令就会被视为默认参数，所以开发者无需特意在 [[Docker#Compose文件|Compose文件]]中再指定一次。<ref>{{Cite web|title=service-configuration-reference|url=https://docs.docker.com/compose/compose-file/#service-configuration-reference|accessdate=2020-02-19|author=|date=|format=|publisher=|language=|archive-date=2020-02-16|archive-url=https://web.archive.org/web/20200216234856/https://docs.docker.com/compose/compose-file/#service-configuration-reference|dead-url=no}}</ref> 
+
+[[Docker#Compose文件|Compose文件]] 可使用 Shell变量（Variable），如：<ref>{{Cite web|title=variable-substitution|url=https://docs.docker.com/compose/compose-file/#variable-substitution|accessdate=|author=|date=|format=|publisher=|language=|archive-date=2020-02-16|archive-url=https://web.archive.org/web/20200216234856/https://docs.docker.com/compose/compose-file/#variable-substitution|dead-url=no}}</ref><syntaxhighlight lang="yaml">
+db:
+  image: "postgres:${POSTGRES_VERSION}"
+</syntaxhighlight>[[Docker#Compose文件|Compose文件]] 可通过自身的<code>ARGS</code>变量，将参数传给[[Docker#Dockerfile|Dockerfile]]的 <code>ARGS</code> 指令。<ref>{{Cite web|title=args|url=https://docs.docker.com/compose/compose-file/#args|accessdate=2020-04-13|author=|date=2020-04-09|format=|work=Docker Documentation|publisher=|language=en|archive-date=2020-04-11|archive-url=https://web.archive.org/web/20200411102905/https://docs.docker.com/compose/compose-file/#args|dead-url=no}}</ref>
+
+== 网络 ==
+参考文档：[https://docs.docker.com/network/ Docker文档-网络概要]{{Wayback|url=https://docs.docker.com/network/ |date=20200415060005 }}
+
+=== bridge ===
+在Docker裡，[[网桥|网桥]]网络 使用的是 软件形式的网桥。使用相同的网桥的容器连接进入该网络，而非该网络的容器刷故无法接入。Docker网桥驱动会自动地在Docker主机上安装规则，这些规则让不同桥接网络之间不能直接通信。<ref name=":4">{{Cite web|title=Use bridge networks|url=https://docs.docker.com/network/bridge/|accessdate=2020-03-20|date=2020-03-19|work=Docker Documentation|language=en|archive-date=2020-02-23|archive-url=https://web.archive.org/web/20200223114458/https://docs.docker.com/network/bridge/|dead-url=no}}</ref> 桥接经常用于：在单独容器上运行应用时，可通过 网桥 进行通信。<ref name=":5">{{Cite web|title=network-drivers 章节的|url=https://docs.docker.com/network/#network-drivers|accessdate=2020-03-20|author=|date=2020-03-19|format=|work=Docker Documentation|publisher=|language=en|archive-date=2020-04-15|archive-url=https://web.archive.org/web/20200415060005/https://docs.docker.com/network/#network-drivers|dead-url=no}}</ref> 网桥网络 适用于容器运行在相同地Docker守护进程的主机上。不同Docker守护进程主机上的容器，它们之间的通信需要依靠操作系统层次的路由，或者你应该使用 overlay网络 进行代替。<ref name=":4" />
+
+<code>bridge</code> 是网桥驱动，是Docker默认的网络驱动（接口名为 <code>docker0</code><ref>{{Cite web|title=配置 docker0 网桥 · Docker —— 从入门到实践|url=https://yeasy.gitbooks.io/docker_practice/advanced_network/docker0.html|accessdate=2020-03-20|work=yeasy.gitbooks.io|archive-date=2020-03-20|archive-url=https://web.archive.org/web/20200320093315/https://yeasy.gitbooks.io/docker_practice/advanced_network/docker0.html|dead-url=no}}</ref>），当你不为容器指定一个网络时候，Docker将会使用该驱动。<ref name=":5" />  可通过 <code>[https://docs.docker.com/config/daemon/#configure-the-docker-daemon daemon.json]</code> 文件修改相关配置。<ref>{{Cite web|title=Use bridge networks - configure-the-default-bridge-network|url=https://docs.docker.com/network/bridge/#configure-the-default-bridge-network|accessdate=2020-03-20|author=|date=2020-03-19|format=|work=Docker Documentation|publisher=|language=en|archive-date=2020-02-23|archive-url=https://web.archive.org/web/20200223114458/https://docs.docker.com/network/bridge/#configure-the-default-bridge-network|dead-url=no}}</ref>
+
+自定义网桥可通过 <code>brctl</code> 命令进行配置。<ref>{{Cite web|title=BridgeNetworkConnections - Debian Wiki|url=https://wiki.debian.org/BridgeNetworkConnections|accessdate=2020-03-20|work=wiki.debian.org|archive-date=2020-03-20|archive-url=https://web.archive.org/web/20200320095105/https://wiki.debian.org/BridgeNetworkConnections|dead-url=no}}</ref><ref>{{Cite web|title=自定义网桥 · Docker —— 从入门到实践|url=https://yeasy.gitbooks.io/docker_practice/advanced_network/bridge.html|accessdate=2020-03-20|work=yeasy.gitbooks.io|archive-date=2020-03-20|archive-url=https://web.archive.org/web/20200320093322/https://yeasy.gitbooks.io/docker_practice/advanced_network/bridge.html|dead-url=no}}</ref>
+
+=== host ===
+主机模式
+
+<code>host</code> 用于单独容器，该网络下容器只能和Docker主机进行直接连接。<code>host</code> 只适用于 Docker 17.06或以上版本的swarm服务。
+
+host网络和VirtualBox的 仅主机网络（Host-only Networking） 类似。<ref>{{Cite web|title=vbox_host-only_setup|url=https://condor.depaul.edu/glancast/443class/docs/vbox_host-only_setup.html|accessdate=2020-03-09|author=|date=|format=|work=condor.depaul.edu|publisher=|language=|archive-date=2019-07-25|archive-url=https://web.archive.org/web/20190725100420/http://condor.depaul.edu/glancast/443class/docs/vbox_host-only_setup.html|dead-url=no}}</ref>
+
+=== overlay ===
+<code>overlay</code> （中文：[[覆盖网络|覆盖网络]]）网络驱动将会创建分布式网络，该网络可以覆盖若干个 Docker守护进程主机。该网络是基于 主机特定网络（host-specific networks），允许 swarm服务 和 容器 进行安全通信（当加密功能开启时）。在该网络下，Docker能够清晰地掌握 数据包的路由 以及 发送接收容器。<ref name=":1">{{Cite web|title=Use overlay networks|url=https://docs.docker.com/network/overlay/|accessdate=2020-03-20|date=2020-03-19|work=Docker Documentation|language=en|archive-date=2020-03-20|archive-url=https://web.archive.org/web/20200320114935/https://docs.docker.com/network/overlay/|dead-url=no}}</ref>
+
+<code>overlay</code> 有两种网络类型网络：<ref name=":1" />
+
+* <code>ingress</code> 网络，可掌控 swarm服务 的[[网络流量|网络流量]] 。该网络是 <code>overlay</code>  的默认网络。
+* <code>docker_gwbridge</code> 网络是 网桥网络。该网络会将 单独的Docker守护进程 连接至 swarm里的另外一个守护进程。
+
+在 <code>overlay</code> 网络下，单独的容器 和 swarm服务 的行为和配置概念 是不一样的。<ref name=":1" />
+
+该策略不需要 容器们 具有操作系统级别的路由，因为Docker负责路由。<ref name=":5" />
+
+=== macvlan ===
+<code>Macvlan</code> 网络允许你赋予容器 MAC地址 ，在该网络里，容器会被认为是物理设备。Docker守护进程会路由
+
+=== none ===
+该策略下，容器不使用任何网络。<code>none</code> 常常用于连接自定义网络驱动的情况下。
+
+=== 其他 ===
+其他第三方插件。
+
+== 数据管理 ==
+Docker默认下，所有文件将会存储在容器里的可写的容器层（container layer）。<ref name=":02">{{Cite web|title=Manage data in Docker|url=https://docs.docker.com/storage/|accessdate=2020-03-21|date=2020-03-20|work=Docker Documentation|language=en|archive-date=2020-03-16|archive-url=https://web.archive.org/web/20200316015553/https://docs.docker.com/storage/|dead-url=no}}</ref>
+
+* 数据与容器为一体。随着容器消失，数据将消失；难以与其他程序（容器）共享。
+* 由于容器的写入层是与宿主机器紧紧耦合。所以你难以移动数据到其他机器。
+* 容器的写入层的是通过 [https://docs.docker.com/storage/storagedriver/ 存储驱动]{{Wayback|url=https://docs.docker.com/storage/storagedriver/ |date=20200218205357 }}（storage driver） 管理文件系统。[https://docs.docker.com/storage/storagedriver/ 存储驱动]{{Wayback|url=https://docs.docker.com/storage/storagedriver/ |date=20200218205357 }} 会使用Linux内核的 链合文件系统（union filesystem）进行挂载。相比起直接操作于宿主机器文件系统的 数据卷，这额外的抽象层将会降低性能。
+
+容器有两种永久化存储方式：'''卷（volumes）'''和 '''绑定挂载（bind mounts）'''。另外，Linux用户还可使用 [[tmpfs|tmpfs]] 进行挂载；Window用户还可以使用 '''命名管道（named pipe）'''<!-- Docker has two options for containers to store files in the host machine, so that the files are persisted even after the container stops: volumes, and bind mounts. If you’re running Docker on Linux you can also use a tmpfs mount. If you’re running Docker on Windows you can also use a named pipe.
+
+ -->。在容器中，不管是哪种永久化存储，表现形式都是一样的。<ref name=":02" />
+
+=== 卷 ===
+卷（volumes）是[[主機#宿主机器|宿主机器]]的文件系统的一部分，由Docker进行管理（ 在Linux，存储于<code>/var/lib/docker/volumes/</code>）。非Docker程序不应该去修改这些文件。Docker推荐使用 卷 进行持久化数据。 卷 可支持 卷驱动（volume drivers），该驱动允许用户将数据存储到 远程主机 或 云服务商（cloud provider）或 其他。<ref name=":02" />
+
+没有名字的卷叫匿名卷（anonymous volume），有名字的卷叫命名卷（named volume）。匿名卷没有明确的名字，当被初始化时，会被赋予一个随机名字。<ref name=":02" />
+
+=== 绑定挂载 ===
+绑定挂载（bind mounts）通过将宿主机器的路径挂载到容器里的这种方式，从而数据持续化，因此绑定挂载可将数据存储在宿主机器的文件系统的任何地方。非Docker程序可修改这些文件。 绑定挂载是Docker早期就存在的，相比起卷，绑定挂载十分简单明了。<ref name=":02" /> 在开发Docker应用时，应使用命名卷（named volume）代替绑定挂载，因为用户不能对绑定挂载进行 Docker CLI 命令操作。<ref name=":02" />
+
+绑定挂载常用于：<ref name=":12">{{Cite web|title=good-use-cases-for-bind-mounts|url=https://docs.docker.com/storage/#good-use-cases-for-bind-mounts|accessdate=2020-03-21|author=|date=2020-03-20|format=|work=Docker Documentation|publisher=|language=en|archive-date=2020-03-16|archive-url=https://web.archive.org/web/20200316015553/https://docs.docker.com/storage/#good-use-cases-for-bind-mounts|dead-url=no}}</ref>
+
+* 同步配置文件，如： 将 宿主主机的[[Resolv.conf文件|DNS配置文件]]（<code>/etc/resolv.conf</code>）同步至容器中
+* 在开发程序时，将 源代码 或 [[Artifact_(计算机)|Artifact]] 同步至容器中。<ref name=":12" /> 这种用法与 [[Vagrant|Vagrant]] 类似。
+
+=== tmpfs ===
+<code>tmpfs</code> 挂载（tmpfs mounts），仅仅存储于内存中，并不操作 宿主机器的文件系统（不持久化于磁盘）。它可用于存储一些 非持久化状态、敏感数据。 举例，swarm服务 通过<code>tmpfs</code> 将 [https://docs.docker.com/engine/swarm/secrets/ secrets]{{Wayback|url=https://docs.docker.com/engine/swarm/secrets/ |date=20200321112911 }}（密码、密钥、证书等）存储到swarm服务。 <ref name=":02" />
+
+=== 命名管道 ===
+[[命名管道|命名管道]]（named pipes），通过 <code>npipe</code> 挂载的形式，使 Docker主机 和 容器 之间能互相通讯。常见用例是在容器内运行第三方工具，并使用命名管道连接到Docker Engine API。<ref name=":02" /><ref>{{Cite web|title=Docker中的数据管理 - 掘金|url=https://juejin.im/post/5e4e83ec6fb9a07cd52bd86e|accessdate=2020-03-21|work=juejin.im|archive-date=2020-03-21|archive-url=https://web.archive.org/web/20200321112913/https://juejin.im/post/5e4e83ec6fb9a07cd52bd86e|dead-url=no}}</ref>
+
+=== 覆盖问题 ===
+当挂载 空的卷 至一个目录中，目录中的内容会被复制于卷中（不会覆盖）。如果挂载 非空的卷 或 绑定挂载 至一个目录中，那么该目录的内容将会被隐藏（obscured ），当卸载后内容将会恢复显示。<ref>{{Cite web|title=using-bind-mounts-or-volumes|url=https://docs.docker.com/storage/#tips-for-using-bind-mounts-or-volumes|accessdate=2020-03-21|author=|date=2020-03-20|format=|work=Docker Documentation|publisher=|language=en|archive-date=2020-03-16|archive-url=https://web.archive.org/web/20200316015553/https://docs.docker.com/storage/#tips-for-using-bind-mounts-or-volumes|dead-url=no}}</ref>
+
+== 日志 ==
+在[[UNIX|UNIX]]和[[类Unix系统|类Unix系统]]中，常见的 I/O流（{{Lang-en|I/O streams}}） 分为三种：<code>STDIN</code>（输入 ）、 <code>STDOUT</code>（正常输出）、<code>STDERR</code>（错误输出）。<ref name=":03">{{Cite web|title=View logs for a container or service|url=https://docs.docker.com/config/containers/logging/|accessdate=2020-04-17|date=2020-04-17|work=Docker Documentation|language=en|archive-date=2020-04-16|archive-url=https://web.archive.org/web/20200416210155/https://docs.docker.com/config/containers/logging/|dead-url=no}}</ref>
+
+默认配置下，Docker的日志（如：<code>docker logs</code>、<code>docker service log</code>）所记载的是命令行的输出结果（<code>STDOUT</code>和<code>STDERR</code>）。而<code>STDOUT</code> 和 <code>STDERR</code> 对应的文件路径分别是 <code>/dev/stderr</code>和<code>/dev/stdout</code>。<ref name=":03" /> 另外，也可以在宿主主机上查看容器的日志，使用以下命令可以查看到容器的日志位置。<ref>{{Cite web|title=get-an-instances-log-path|url=https://docs.docker.com/engine/reference/commandline/inspect/#get-an-instances-log-path|accessdate=2020-04-18|author=|date=2020-04-17|format=|work=Docker Documentation|publisher=|language=en|archive-date=2020-04-15|archive-url=https://web.archive.org/web/20200415061430/https://docs.docker.com/engine/reference/commandline/inspect/#get-an-instances-log-path|dead-url=no}}</ref><syntaxhighlight lang="console">
+$ docker inspect --format='{{.LogPath}}' $INSTANCE_ID
+</syntaxhighlight>
+
+== Kubernetes in docker ==
+kind（全称：Kubernetes IN Docker）是部署本地Kubernetes集群的工具，而集群的节点是由Docker生成的。<!-- kind is a tool for running local Kubernetes clusters using Docker container "nodes".
+
+--><ref name=":04">{{Citation|title=kubernetes-sigs/kind|url=https://github.com/kubernetes-sigs/kind|publisher=Kubernetes SIGs|date=2020-05-04|accessdate=2020-05-04|archive-date=2022-02-11|archive-url=https://web.archive.org/web/20220211183913/https://github.com/kubernetes-sigs/kind|dead-url=no}}</ref>
+
+== 操作细节 ==
+在安装完kind之后，通过<code>kind create cluster</code>命令生成集群。<ref name=":04" /> 生成Kubernetes集群后，可以通过Docker命令进行查看节点概览：<syntaxhighlight lang="console">
+
+$ docker container ls
+
+CONTAINER ID        IMAGE                  COMMAND                  CREATED             STATUS              PORTS                       NAMES
+
+99c96c1f21ab        kindest/node:v1.17.0   "/usr/local/bin/entr…"   4 minutes ago       Up 4 minutes        127.0.0.1:32769->6443/tcp   kind-control-plane
+
+</syntaxhighlight>
+
+== 历史 ==
+Docker命令在过去的发展中诞生了40种以上的命令，过多的命令导致混乱以及难以使用tab自动补充，因此在docker 1.13版本（2017.1.19）中，命令行被重构，根据逻辑对象进行划分。官方建议用户使用新的语法进行操作。<ref>{{Cite web|title=Introducing Docker 1.13|url=https://www.docker.com/blog/whats-new-in-docker-1-13/|accessdate=2020-03-05|date=2017-01-19|work=Docker Blog|language=en-US|archive-date=2020-01-09|archive-url=https://web.archive.org/web/20200109142213/https://www.docker.com/blog/whats-new-in-docker-1-13/|dead-url=no}}</ref>
+
+== 已过时 ==
+
+=== Docker Swarm ===
+参考[[Docker#Swarm_Mode|Swarm Mode]]章节。
+
+=== Docker Machine ===
+Docker Machine 是一个工具，它允许你在虚拟宿主机上安装 Docker引擎，并使用 docker-machine 命令管理这些宿主机。你可以使用 Machine 在你本地的 Mac 或 Windows box、公司网络、数据中心、或像 AWS 或 Digital Ocean 这样的云提供商上创建 Docker 宿主机。<ref name="#4">{{Cite web|title=Docker Machine Overview|url=https://docs.docker.com/machine/overview/|accessdate=2020-03-02|date=2020-02-25|work=Docker Documentation|language=en|archive-date=2020-03-02|archive-url=https://web.archive.org/web/20200302041921/https://docs.docker.com/machine/overview/|dead-url=no}}</ref><ref>{{Cite web|title=Docker(五)：Docker 三剑客之 Docker Machine|url=https://zhuanlan.zhihu.com/p/35102874|accessdate=2020-03-02|work=知乎专栏|language=zh|archive-date=2020-03-02|archive-url=https://web.archive.org/web/20200302041917/https://zhuanlan.zhihu.com/p/35102874|dead-url=no}}</ref>
+
+Docker Machine 最后更新时间是在0.16.0 (2018-11-08)版本<ref>{{Cite web|title=Docker Machine release notes|url=https://docs.docker.com/release-notes/docker-machine/|accessdate=2020-03-02|date=2020-02-25|work=Docker Documentation|language=en|archive-date=2020-03-02|archive-url=https://web.archive.org/web/20200302041918/https://docs.docker.com/release-notes/docker-machine/|dead-url=no}}</ref>。官方建议在1.12以及之后版本使用Docker Desktop for Mac和Docker Desktop for Windows进行代替。<ref name="#4"/>
+
+=== Docker Toolbox ===
+Docker Toolbox是用于帮 Windows系统和Mac系统 安装Docker环境。新版本建议使用Docker Desktop for Mac和Docker Desktop for Windows进行安装。<ref>{{Cite web|title=Docker Toolbox overview|url=https://docs.docker.com/toolbox/overview/|accessdate=2020-03-02|date=2020-02-25|work=Docker Documentation|language=en|archive-date=2020-04-15|archive-url=https://web.archive.org/web/20200415060100/https://docs.docker.com/toolbox/overview/|dead-url=no}}</ref>最后更新版本是 19.03.1(2019-08-01)。<ref>{{Cite web|title=docker/toolbox|url=https://github.com/docker/toolbox|accessdate=2020-03-02|work=GitHub|language=en|archive-date=2020-06-11|archive-url=https://web.archive.org/web/20200611135617/https://github.com/docker/toolbox|dead-url=no}}</ref>
+==安全性爭議==
+2021年，安全公司Palo Alto Networks研究人員Aviv Sasson，在Docker Hub上發現的惡意容器映像檔，分別來自10個不同帳號，總下載次數超過2000萬次，其中內含的挖礦軟體。<ref>{{cite news |author1=林妍溱 |title=下載超過2千萬次的Docker映像檔被爆含有挖礦軟體 |url=https://www.ithome.com.tw/news/143546 |accessdate=2021-03-31 |publisher=ithome |date=2021-03-31 |archive-date=2021-04-07 |archive-url=https://web.archive.org/web/20210407063731/https://www.ithome.com.tw/news/143546 |dead-url=no }}</ref>
+
+== 参考文献 ==
+{{Reflist}}
+
+== 外部連結 ==
+* {{Official website|https://www.docker.com}}
+* [https://github.com/docker/docker-ce Source code repository]{{Wayback|url=https://github.com/docker/docker-ce |date=20190201052505 }}
+* [http://www.slideshare.net/AaterSuleman/docker-at-flux7/ Multi-tenancy using Docker]{{Wayback|url=http://www.slideshare.net/AaterSuleman/docker-at-flux7/ |date=20141110083528 }}
+* [http://www.youtube.com/watch?v=VeiUjkiqo9E#t=60 Docker 101 Tutorial]{{Wayback|url=http://www.youtube.com/watch?v=VeiUjkiqo9E#t=60 |date=20141012120005 }}
+* [https://github.com/docker/libcontainer/ libcontainer git repo]{{Wayback|url=https://github.com/docker/libcontainer/ |date=20140816072508 }}
+* [https://www.ytyzx.org/index.php/%E5%A6%82%E4%BD%95%E5%9C%A8Linux%E4%B8%8B%E5%AE%89%E8%A3%85Docker 如何在Linux下安装Docker]{{Wayback|url=https://www.ytyzx.org/index.php/%E5%A6%82%E4%BD%95%E5%9C%A8Linux%E4%B8%8B%E5%AE%89%E8%A3%85Docker |date=20170102080531 }}
+* [https://docs.microsoft.com/zh-tw/virtualization/windowscontainers/about/ Windows 容器]{{Wayback|url=https://docs.microsoft.com/zh-tw/virtualization/windowscontainers/about/ |date=20180305063147 }} - 在 Windows 10 部署 Docker
+
+== 参见 ==
+{{Portal box|Linux}}
+* [[作業系統層虛擬化|作業系統層虛擬化]]
+* [[cgroups|cgroups]]
+* [[LXC|LXC]]
+* [[Dotcloud|Dotcloud]]
+
+{{-}}
+{{虛擬化技術}}
+{{Linux Containers}}
+
+[[Category:操作系统技术|Category:操作系统技术]]
+[[Category:自由软件|Category:自由软件]]
+[[Category:虛擬化軟體|Category:虛擬化軟體]]
+[[Category:Linux容器化|Category:Linux容器化]]
+[[Category:用Go編程的自由軟件|Category:用Go編程的自由軟件]]

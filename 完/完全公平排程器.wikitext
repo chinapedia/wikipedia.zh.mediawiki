@@ -1,0 +1,33 @@
+{{noteTA
+|1 = zh-tw:排程; zh-cn:调度;
+|2 = zh-tw:行程; zh-cn:进程;
+}}
+'''完全公平排程器'''（{{lang-en|Completely Fair Scheduler}}，縮寫為CFS），[[Linux內核|Linux內核]]的一部份，負責行程[[排程|排程]]。參考了[[康恩·科里瓦斯|康恩·科里瓦斯]]（Con Kolivas）提出的排程器原始碼後，由[[匈牙利|匈牙利]]程式員[[英格·蒙內|英格·蒙內]]（Ingo Molnar）所提出。在Linux kernel 2.6.23之後採用，取代先前的[[O(1)排程器|O(1)排程器]]，成為系統預設的排程器。它負責將CPU資源，分配給正在執行中的行程，目標在於最大化程式互動效能與整體CPU的使用率。使用[[紅黑樹|紅黑樹]]來實作，演算法效率為[[大O符号|O(log(n))]]。
+
+==背景==
+CFS 是首支以公平佇列（fair queuing）的排程器可應用於一般用途作業系統（general-purpose operating system）.<ref name="dwrr">{{Cite web |url=http://happyli.org/tongli/papers/dwrr.pdf |title=Efﬁcient and Scalable Multiprocessor Fair Scheduling Using Distributed Weighted Round-Robin |accessdate=2013-10-18 |archive-date=2013-10-19 |archive-url=https://web.archive.org/web/20131019132350/http://happyli.org/tongli/papers/dwrr.pdf |dead-url=no }}</ref>
+
+CFS排程器參考了[[康恩·科里瓦斯|康恩·科里瓦斯]]（Con Kolivas）所開發的楼梯调度算法（staircase scheduler）與RSDL（The Rotating Staircase Deadline Schedule）的經驗<ref>{{cite mailing list
+       | last=Molnár
+       | first=Ingo
+       | authorlink=Ingo Molnár
+       | title=[patch] Modular Scheduler Core and Completely Fair Scheduler [CFS]
+       | url=http://lwn.net/Articles/230501/
+       | mailinglist=linux-kernel
+       | date=2007-04-13
+       | access-date=2013-10-18
+       | archive-date=2013-10-09
+       | archive-url=https://web.archive.org/web/20131009054957/http://lwn.net/Articles/230501/
+       | dead-url=no
+       }}</ref>
+，選取花費CPU執行時間最少的行程來進行排程。CFS主要由sched_entity 內含的 vruntime所決定，不再跟踪process的sleep time，並揚棄active/expire的概念, runqueue裡面所有的进程都平等对待，CFS使用“虚拟运行时”（virtual running time）來表示某个任务的时间量。
+
+CFS改使用[[紅黑樹|紅黑樹]]演算法，將執行時間越少的工作（即 sched_entity）排列在紅黑樹的左邊<ref name="kt8059">{{cite web |last=Andrews |first=Jeremy |date=2007-04-18 |url=http://kerneltrap.org/node/8059 |title=Linux: The Completely Fair Scheduler |publisher=KernelTrap |archiveurl=https://archive.is/20120629173940/http://kerneltrap.org/node/8059 |archivedate=2012-06-29 |deadurl=yes |access-date=2013-10-18 }}</ref>，时间复杂度是O(log N)，節點（即rb_node）的安插工作則由dequeue_entity()和enqueue_entity（）來完成。当前執行的task通过呼叫 put_prev_task 返回红黑树，下一個待執行的task則由pick_next_task來呼叫。蒙內表示, CFS在百分之八十時間都在確實模拟处理器的處理時間。
+
+==爭議==
+因為在Linux 2.6.23 将CFS 合并到mainline。放棄了RSDL，引起[[康恩·科里瓦斯|康恩·科里瓦斯]]的不滿，一度宣布脫離Linux開發團隊。數年後, Con Kolivas 捲土重來, 重新開發[[腦殘排程器|腦殘排程器]]來對決 CFS, Jens Axboe 寫了一個名为 Latt.c 的程序進行比對，Jens 發現BFS 確實稍稍優於 CFS<ref>{{Cite web |url=http://thread.gmane.org/gmane.linux.kernel/886319/focus=887636 |title=存档副本 |access-date=2013-10-22 |archive-url=https://web.archive.org/web/20170331214854/http://thread.gmane.org/gmane.linux.kernel/886319/focus=887636 |archive-date=2017-03-31 |dead-url=yes }}</ref>，而且CFS 的 sleeper fairness 在某些情況下會出現調度延遲。<ref>{{Cite web |url=http://lwn.net/Articles/352875/ |title=存档副本 |accessdate=2013-10-22 |archive-date=2013-10-23 |archive-url=https://web.archive.org/web/20131023061825/http://lwn.net/Articles/352875/ |dead-url=no }}</ref>Ingo不得不暫時關閉該特性，很快的在一周內提出新的 Gentle Fairness，徹底解決該問題。
+
+==注釋==
+{{reflist}}
+
+[[Category:Linux内核功能|Category:Linux内核功能]]

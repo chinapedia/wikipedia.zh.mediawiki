@@ -1,0 +1,82 @@
+{{Infobox software
+| name                   = ANTLR
+| logo                   =
+| screenshot             =
+| caption                =
+| author                 = {{link-en|Terence Parr|Terence Parr}} 與其他參與者
+| developer              =
+| released               = 1992年2月
+| latest release version = 4.7.1 / 3.5.2
+| latest release date    = {{start date and age|2017|12|10}} / {{start date and age|2014|03|25}} 
+| programming language   = [[Java|Java]]
+| operating system       =
+| platform               = [[Cross-platform|Cross-platform]]
+| language               =
+| status                 = in active development
+| genre                  =
+| license                = [[BSD_License|BSD License]]
+| website                = {{URL|http://www.antlr.org}}
+}}
+'''ANTLR'''（全名：'''AN'''other '''T'''ool for '''L'''anguage '''R'''ecognition）是基于LL(*)算法实现的语法解析器生成器（parser generator），用[[Java|Java]]语言编写，使用自上而下（top-down）的递归下降[[LL剖析器|LL剖析器]]方法。由[[旧金山大学|旧金山大学]]的[[Terence_Parr|Terence Parr]]博士等人於1989年開始發展。
+
+ANTLR最初叫做'''PCCTS'''，'''P'''urdue '''C'''ompiler '''C'''onstruction '''T'''ool '''S'''et，是Terence Parr在[[普渡大学|普渡大学]]攻讀碩士學位時的創作，在Hank Dietz教授的指导下，开始研究构造自动化的分析器。1993年，Parr取得博士學位，並於同年发布ANTLR 1.10版。最早的ANTLR只支持Java, 直到ANTLR 3以後開始支持[[Ada|Ada95]]、[[C语言|C]]、[[C＃|C＃]]、[[JavaScript|JavaScript]]、[[Objective-C|Objective-C]]、[[Perl|Perl]]、[[Python|Python]]、[[Ruby|Ruby]]、[[C++|C++]]和[[Standard_ML|Standard ML]]<ref>{{Cite web |url=http://www.classes.cs.uchicago.edu/archive/2007/winter/22610-1/docs/lpt-manual.pdf |title=SML/NJ Language Processing Tools: User Guide |accessdate=2015-02-17 |archive-date=2014-12-01 |archive-url=https://web.archive.org/web/20141201011822/http://www.classes.cs.uchicago.edu/archive/2007/winter/22610-1/docs/lpt-manual.pdf |dead-url=no }}</ref>。
+
+如同一般的[[詞法分析器|詞法分析器]]（lexer）和語法分析器（parser），ANTLR可以用來產生樹狀分析器（tree parsers）。ANTLR 文法定义使用類似EBNF（Extended Backus-Naur Form）的定义方式，形象十分簡潔直观。例如: ANTLR用A : a;来表示规则，舊式的方法則是以 A=>a 表示，所以ANTLR是以“:”代替了“=>”。ANTLR的规则要以分号“;”结束。又如其他ANTLR符號“|”代表“或”的关系，又如“*，+”表示可以出现0次或多次。
+
+ANTLR本身使用switch-case来匹配token，形成记号序列记号流，舊式的[[Yacc|Yacc]]則利用符号表（parser table）。ANTLR是完全exception-driven，LL(k)语法比目前流行的[[LR剖析器|LR剖析器]](包含SLR, LALR等）强大，更可以避免LR剖析器既有的位移-歸約（shift-reduce）或歸約-歸約（reduce-reduce）之类的语法冲突，产生的代码清楚易懂，便於程序员阅读和理解。同時更支持[[Unicode|Unicode]]。
+
+==ANTLR v4==
+早期Antlr的LL(*)文法仍不支持“左递归”（left-recursion）<ref>ANTLR会提示:“rule is left-recursive”错误。</ref>，這是所有[[LL剖析器|LL剖析器]]的侷限，在左递归过程没有消耗掉任何token, LL剖析器很容易造成stack overflow。至於如何消除左递归問題，在ANTLR 3中会将parsing策略退化为LL(1) + 回溯的形式。ANTLRWorks則提供一些自动消除左递归的功能，但不實用。接下來的ANTLR v4大力支持Kleene Closure表示法，透過kleene star(*)和kleene cross(+)的語法糖（syntax sugar），直接以while语句取代遞歸，總算可以順利解決LL分析法所不允许的左递归（但仍不能应付间接左递归，比如兩條分支拥有共同的递归规则作为前缀），因此可兼容Yacc的文法。再者，ANTLR对于LL(*)不能正确分析的情况，還支持语义断言（Semantic Predicate）来辅助判断, Semantic Predicate可以是任何逻辑，只需返回bool值。
+
+目前[[Hibernate|Hibernate]]與[[WebLogic|WebLogic]]都是使用ANTLR做為来解析[[HQL|HQL]]。在NetBeans IDE中更以ANTLR解析C++。[[Twitter|Twitter]]搜索使用ANTLR解析，一天超過200億次查詢。
+
+雖然ANTLR本身是免費的，但《The Definitive ANTLR Reference》這本參考書則屬於使用者付費。目前免費文件極少。
+
+== 用於何處 ==
+
+下列為ANTLR的使用列表:
+
+* [[Groovy|Groovy]]
+* [[Jython|Jython]]
+* [[Hibernate|Hibernate]]
+* [http://openjdk.java.net/projects/compiler-grammar/ OpenJDK Compiler Grammar project]{{Wayback|url=http://openjdk.java.net/projects/compiler-grammar/ |date=20150225223231 }} experimental version of the [[javac|javac]] compiler based upon a grammar written in ANTLR
+* Apex, [[Salesforce.com|Salesforce.com]]'s programming language
+* The expression evaluator in [[Numbers_(spreadsheet)|Numbers]], Apple's spreadsheet
+* [[Twitter|Twitter]]'s search query language
+* Weblogic server
+* [http://confluence.jetbrains.com/display/IDEADEV/Third-Party+Software+Used+by+IntelliJ+IDEA IntelliJ IDEA]{{Wayback|url=http://confluence.jetbrains.com/display/IDEADEV/Third-Party+Software+Used+by+IntelliJ+IDEA |date=20150217083919 }} and [http://confluence.jetbrains.com/display/CLION/Third-Party+Software+Used+by+CLion Clion.]{{Wayback|url=http://confluence.jetbrains.com/display/CLION/Third-Party+Software+Used+by+CLion |date=20150217083917 }}
+* [[Apache_Cassandra|Apache Cassandra]]
+* [[Processing|Processing]]
+
+== 參見 ==
+{{Portal|Free software}}
+* [[JavaCC|JavaCC]]
+* [[SableCC|SableCC]]
+* [[DMS_Software_Reengineering_Toolkit|DMS Software Reengineering Toolkit]]
+* [[Coco/R|Coco/R]]
+* [[Modular_Syntax_Definition_Formalism|Modular Syntax Definition Formalism]]
+* [[Parboiled_(Java)|Parboiled (Java)]]
+
+== 注釋 ==
+{{reflist}}
+
+== 文獻 ==
+{{Refbegin}}
+* {{citation | first1=Terence | last1=Parr | date=May 17, 2007 | title=The Definitive Antlr Reference: Building Domain-Specific Languages | edition=1st | publisher=[[Pragmatic_Bookshelf|Pragmatic Bookshelf]] | pages=376 | isbn=0-9787392-5-6 | url=http://www.pragprog.com/titles/tpantlr/the-definitive-antlr-reference | accessdate=2015-02-17 | archive-date=2016-04-03 | archive-url=https://web.archive.org/web/20160403181542/https://pragprog.com/titles/tpantlr/the-definitive-antlr-reference | dead-url=no }}
+* {{citation | first1=Terence | last1=Parr | date=December 2009 | title=Language Implementation Patterns: Create Your Own Domain-Specific and General Programming Languages | edition=1st | publisher=[[Pragmatic_Bookshelf|Pragmatic Bookshelf]] | pages=374 | isbn=978-1-934356-45-6 | url=http://www.pragprog.com/titles/tpdsl/language-implementation-patterns | accessdate=2015-02-17 | archive-date=2016-02-24 | archive-url=https://web.archive.org/web/20160224111125/https://pragprog.com/titles/tpdsl/language-implementation-patterns | dead-url=no }}
+* {{citation | first1=Terence | last1=Parr | date=January 15, 2013 | title=The Definitive ANTLR 4 Reference | edition=1st | publisher=[[Pragmatic_Bookshelf|Pragmatic Bookshelf]] | pages=328 | isbn=978-1-93435-699-9 | url=http://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference | accessdate=2015-02-17 | archive-date=2015-04-18 | archive-url=https://web.archive.org/web/20150418223945/https://pragprog.com/book/tpantlr2/the-definitive-antlr-4-reference | dead-url=no }}
+{{Refend}}
+
+==深入閱讀==
+{{refbegin}}
+* {{cite journal |first1=T.J. |last1=Parr |first2=R.W. |last2=Quong |title=ANTLR: A Predicated-LL(k) Parser Generator |url=https://archive.org/details/sim_software-practice-experience_1995-07_25_7/page/789 |journal=Software: Practice and Experience |volume=25 |issue=7 |pages=789–810 |date=July 1995 |doi=10.1002/spe.4380250705 }}
+{{refend}}
+
+== 外部連結 ==
+* {{official website|http://www.antlr.org}}
+* [http://tunnelvisionlabs.com/products/demo/antlrworks ANTLRWorks]{{Wayback|url=http://tunnelvisionlabs.com/products/demo/antlrworks |date=20150217084519 }}
+* [http://www.placidsystems.com/antlrstudio.aspx ANTLR Studio]{{Wayback|url=http://www.placidsystems.com/antlrstudio.aspx |date=20150316073241 }}
+* [http://supportweb.cs.bham.ac.uk/docs/tutorials/docsystem/build/tutorials/antlr/antlr.html ANTLR tutorial]{{Wayback|url=http://supportweb.cs.bham.ac.uk/docs/tutorials/docsystem/build/tutorials/antlr/antlr.html |date=20150223140607 }} at the University of Birmingham
+* [http://www.bearcave.com/software/antlr/antlr_expr.html Why Use ANTLR?]{{Wayback|url=http://www.bearcave.com/software/antlr/antlr_expr.html |date=20141227082857 }}
+* [https://web.archive.org/web/20070813022556/http://mojo.codehaus.org/antlr-maven-plugin/ Antlr plugin] for [[Maven|Maven]] 
+[[category:编译器软件|category:编译器软件]]

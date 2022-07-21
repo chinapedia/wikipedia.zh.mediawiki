@@ -1,0 +1,1189 @@
+{{documentation subpage}}
+{{Template shortcut|Wd}}
+{{Lua sidebar|template=Wikidata|module=Wd}}
+{{Lua|Module:Wd}}
+{{Hatnote|For a version of this template with an opt-in toggle, see {{tl|WikidataOI}}}}
+
+此{{NS1}}旨在从'''[[维基数据]]'''获取数据链接至维基百科条目，附带多个功能。{{{intro|}}}
+
+== 用法 ==
+{{tnull|{{{prename|}}}{{lcfirst:{{ROOTPAGENAME}}}}{{0|&ensp;}}{{Background color|#cddae3|<nowiki>|命令1|标记1a|标记1b|标记1c</nowiki>}}{{0|&ensp;}}{{Background color|#dce5ec|<nowiki>|命令2|标记2a|标记2b|标记2c</nowiki>}}{{0|&ensp;}}{{Background color|#c1debf|<nowiki>|标记0a|标记0b|标记0c</nowiki>}}{{0|&ensp;}}{{Background color|#ffdfc4|<nowiki>|参数1|参数2|参数3</nowiki>}}}}
+
+== 命令 ==
+命令（<code>{{Background color|#cddae3|命令1}}</code>, <code>{{Background color|#dce5ec|命令2}}</code>, ...）确定返回值的类型。一次调用只能包含单个类的命令。
+
+=== 声称类 ===
+
+声称类命令可以组合，意味着可以一次给出该类不同类型的多个命令。
+
+将多个命令组合到一个对此{{lcfirst:{{NAMESPACE}}}}的调用中，而非使用单个命令多次调用此{{lcfirst:{{NAMESPACE}}}}，以确保所有返回的信息属于彼此。
+{| class="wikitable"
+|-
+! 类型
+! 命令
+! 返回
+! 基本用法
+! 描述
+|-
+| rowspan="2" style="text-align:right;" | I
+! style="text-align:left;" | <code>property</code>
+| <small>首个匹配{{efn|仅返回单个值而不是多个（如果多个声称或语句匹配）。返回的值是从等级最高的声称中找到的第一个匹配项。|name=fmc}}</small>
+| {{tnull|{{{prename|}}}{{lcfirst:{{ROOTPAGENAME}}}}|property|P1|{{{extraparams|}}}}}
+| rowspan="2" | 从当前项目-实体或给定实体返回请求的属性或属性列表。
+|-
+! style="text-align:left;" | <code>properties</code>
+| <small>所有匹配</small>
+| {{tnull|{{{prename|}}}{{lcfirst:{{ROOTPAGENAME}}}}|properties|P1|{{{extraparams|}}}}}
+|-
+| colspan="5" |
+|-
+| rowspan="2" style="text-align:right;" | II
+! style="text-align:left;" | <code>qualifier</code>
+| <small>首个匹配{{efn|name=fmc}}</small>
+| {{tnull|{{{prename|}}}{{lcfirst:{{ROOTPAGENAME}}}}|qualifier|P1|P2|{{{extraparams|}}}}}
+| rowspan="2" | 从当前项目-实体的给定属性或给定实体返回请求的限定符或限定符列表。
+与其他声称类命令不同，此命令可以多次给出以便在一次调用中检索不同的限定符。
+|-
+! style="text-align:left;" | <code>qualifiers</code>
+| <small>所有匹配</small>
+| {{tnull|{{{prename|}}}{{lcfirst:{{ROOTPAGENAME}}}}|qualifiers|P1|P2|{{{extraparams|}}}}}
+|-
+| colspan="5" |
+|-
+| rowspan="2" style="text-align:right;" | III
+! style="text-align:left;" | <code>reference</code>
+| <small>首个匹配{{efn|name=fmc}}</small>
+| {{tnull|{{{prename|}}}{{lcfirst:{{ROOTPAGENAME}}}}|reference|P1|{{{extraparams|}}}}}
+| rowspan="2" | 从当前项目-实体的给定属性或给定实体返回参考或参考列表。{{efn|仅返回根据[[d:Help:Sources|维基数据来源指南]]有效的参考（即至少具有 {{wpl|P248}} 或 {{wpl|P854}} 属性的参考）}}
+|-
+! style="text-align:left;" | <code>references</code>
+| <small>所有匹配</small>
+| {{tnull|{{{prename|}}}{{lcfirst:{{ROOTPAGENAME}}}}|references|P1|{{{extraparams|}}}}}
+|-
+| colspan="5" |
+|-
+| colspan="5" style="text-align:left;" | {{notelist}}
+|}
+
+=== 通用类 ===
+通用类命令无法组合。
+
+{| class="wikitable"
+|-
+! 类型
+! 命令
+! 返回
+! 基本用法
+! 描述
+|-
+| style="text-align:right;" | I
+! style="text-align:left;" | <code>label</code>
+|
+| {{tnull|{{{prename|}}}{{lcfirst:{{ROOTPAGENAME}}}}|label|{{{extraparams|}}}}}
+| 如果存在的话，返回当前项目-实体或给定实体的标签。
+|-
+| colspan="5" |
+|-
+| style="text-align:right;" | II
+! style="text-align:left;" | <code>title</code>
+|
+| {{tnull|{{{prename|}}}{{lcfirst:{{ROOTPAGENAME}}}}|title|{{{extraparams|}}}}}
+| 如果存在此类页面的话，返回链接到当前项目实体或给定项目实体的页面标题。
+|-
+| colspan="5" |
+|-
+| style="text-align:right;" | III
+! style="text-align:left;" | <code>description</code>
+|
+| {{tnull|{{{prename|}}}{{lcfirst:{{ROOTPAGENAME}}}}|description|{{{extraparams|}}}}}
+| 如果存在的话，返回当前项目-实体或给定实体的描述。
+|-
+|-
+| colspan="5" |
+|-
+| rowspan="2" style="text-align:right;" | IV
+! style="text-align:left;" | <code>alias</code>
+| <small>首个匹配{{efn|如果存在多个值的话，仅返回单个值。|name=fmg}}</small>
+| {{tnull|{{{prename|}}}{{lcfirst:{{ROOTPAGENAME}}}}|alias|{{{extraparams|}}}}}
+| rowspan="2" | 如果存在的话，返回当前项目-实体或给定实体的别名或别名列表。
+|-
+! style="text-align:left;" | <code>aliases</code>
+| <small>所有匹配</small>
+| {{tnull|{{{prename|}}}{{lcfirst:{{ROOTPAGENAME}}}}|aliases|{{{extraparams|}}}}}
+|-
+| colspan="5" |
+|-
+| rowspan="2" style="text-align:right;" | V
+! style="text-align:left;" | <code>badge</code>
+| <small>首个匹配{{efn|name=fmg}}</small>
+| {{tnull|{{{prename|}}}{{lcfirst:{{ROOTPAGENAME}}}}|badge|{{{extraparams|}}}}}
+| rowspan="2" | 如果存在此类页面的话，返回链接到当前项目-实体或给定项目-实体的徽章或徽章列表。
+|-
+! style="text-align:left;" | <code>badges</code>
+| <small>所有匹配</small>
+| {{tnull|{{{prename|}}}{{lcfirst:{{ROOTPAGENAME}}}}|badges|{{{extraparams|}}}}}
+|-
+| colspan="5" |
+|-
+| colspan="5" style="text-align:left;" | {{notelist}}
+|}
+{{{section|}}}
+
+== 标记 ==
+以下（可选）标记可用于更改此{{lcfirst:{{NAMESPACE}}}}的行为。它们必须在（第一个）{{Background color|#cddae3|命令}}和另一个{{Background color|#ffdfc4|参数}}之前给出。
+
+为方便起见，允许使用空标志（即<code>||</code>），这种写法会被忽略。
+
+=== 命令标记 ===
+这些标记（<code>{{Background color|#cddae3|标记1*}}</code>, <code>{{Background color|#dce5ec|标记2*}}</code>, ...）适用于直接位于它们前面的命令。
+{| class="wikitable"
+|-
+! 标记
+! 描述
+|-
+! style="text-align:left;" | <code>linked</code>
+| 如果存在的话，创建指向维基百科条目的链接，该条目连接到属性或限定符。还可链接至度量单位（可附加值）。
+如果省略此参数，则将返回纯属性或限定符值。
+|-
+! style="text-align:left;" | <code>short</code>
+| '''<code>{{color|red|[昂贵]}}</code>''' 如果存在的话，返回任意实体的 {{wpl|P1813}}。 
+如果不是这种情况，则默认返回实体的标签。
+|-
+! style="text-align:left;" | <code>raw</code>
+| 如果适用，返回原始值。
+
+如果此标记与项目或属性数据类型一起使用，则返回Q标识符或P标识符。
+
+对于数量数据类型，此标记将移除任何度量单位，除非给出 <code>unit</code> 标记，在这种情况下将返回原始度量单位（其Q标识符）。
+
+如果此标记与时间数据类型一起使用，则返回的日期将采用 <code>yyyy-mm-dd</code>（如 <code>1731-02-11</code> ）或 <code>yyyy-mm</code> 或 <code>yyyy</code> 格式，具体取决于日期的精度。要使用儒略历日期可将 <code>/Julian</code> 附加到输出（如 <code>1731-02-11/Julian</code>，可以使用[[mw:Help:Extension:ParserFunctions#.23titleparts|{{tlf|#titleparts}} 模板功能]]分成几个部分）。
+
+如果它与地球坐标数据类型一起使用，则它将在返回值中用正斜杠替换各种符号（如 <code>52/5/3/N/4/19/3/E</code>，可以使用[[mw:Help:Extension:ParserFunctions#.23titleparts|{{tlf|#titleparts}} 模板功能]]分成几个部分）。
+|-
+! style="text-align:left;" | <code>multilanguage</code>
+| 返回任何一种可用语言的文本值，不局限于当前维基语言。
+|-
+! style="text-align:left;" | <code>unit</code>
+| 仅返回数量数据类型的度量单位。
+|}
+
+=== 配置标记 ===
+这些标记（<code>{{Background color|#c1debf|flag0*}}</code>）是通用配置标记，可以在第一个命令之后的任意地方给出（但需在其他参数前）。
+
+{| class="wikitable"
+|-
+!
+! 标记
+! {{nowrap|命令类}}
+! 描述
+|-
+| rowspan="4" style="text-align:right;" | 组合
+! style="text-align:left;" | <code>preferred</code>
+| rowspan="4" | [[#声称类|声称]]
+| rowspan="4" | 为所选声称设定等级约束。
+
+前三个标记设定将选择约束的等级，可选择在后面添加 <code>+</code> 或 <code>-</code>，例如 <code>normal+</code> 或 <code>preferred-</code>，其中前者选择具有“正常”（normal）等级“或更高”等级的声称，后者选择具有“首选”（preferred）等级“或更低”等级的声称。要得到各个等级的声称，使用 <code>preferred-</code> 或 <code>deprecated+</code>。
+
+如果另外给出 <code>best</code> 标记，那么只返回所选声称中等级最高的声称。
+
+默认为 <code>normal+|best</code>（因此默认情况下，永远不会返回具有“已弃用”（deprecated）等级的声称）。
+
+无论是否设置了这些标记，始终按从高到低的等级输出。
+|-
+! style="text-align:left;" | <code>normal</code>
+|-
+! style="text-align:left;" | <code>deprecated</code>
+|-
+! style="text-align:left;" | <code>best</code>
+|-
+| rowspan="3" style="text-align:right;" | 组合
+! style="text-align:left;" | <code>future</code>
+| rowspan="3" | 声称
+| rowspan="3" | 为所选声称设置时间约束。使用 {{wpl|P580}} 和 {{wpl|P582}} 声称限定符来确定声称是否对所选时间段有效。
+
+默认为 <code>future|current|former</code>（因此默认情况下，返回对任何时间段有效的声称）。
+|-
+! style="text-align:left;" | <code>current</code>
+|-
+! style="text-align:left;" | <code>former</code>
+|-
+|
+! style="text-align:left;" | <code>single</code>
+| 声称
+| 如果有多个声称匹配的话，仅返回单个声称。如果给出了 <code>property</code>/<code>properties</code> 命令，则此标记无效。在这种情况下，该标记是多余的。
+|-
+|
+! style="text-align:left;" | <code>sourced</code>
+| 声称
+| 仅返回至少具有一个有效参考的声称。
+|-
+| rowspan="2" style="text-align:right;" | 单一
+! style="text-align:left;" | <code>edit</code>
+| rowspan="2" | 声称、[[#通用类|通用]]
+| rowspan="2" | 在输出后添加可点击图标，读者可以使用该图标编辑维基数据上返回的声称。
+
+如果使用 <code>edit@end</code> ，则图标将放置于行尾，以便在信息框中整齐排列。
+|-
+! style="text-align:left;" | <code>edit@end</code>
+|}
+
+== 参数 ==
+参数确定抓取的所有返回值的来源。
+
+=== 位置参数 ===
+下表按固定顺序显示了可用的位置参数（<code>{{Background color|#ffdfc4|参数*}}</code>）。对于每个命令，都会标记适用的参数集。如果给出了多个命令，则适用的参数集是各集合的并集。例如，如果已给出命令 <code>properties</code> 和 <code>qualifiers</code>，那么至少应给出 <code>property_id</code> 和 <code>qualifier_id</code> 两个参数。
+
+可以给出多个 <code>qualifier</code>/<code>qualifiers</code> 命令。这些带有标记的命令的顺序与给定的相应 <code>qualifier_id</code> 参数的顺序相匹配。
+{| class="wikitable" style="background:none;border:none;"
+|- style="text-align:center;"
+| rowspan="2" style="background:none;border:none;" |
+| colspan="2" | <small>''(必要)''</small>
+| <small style="color:#777;">''(可选)''</small>
+| <small style="color:#777;">(可选)</small>
+| <small>(必要)</small>
+| <small style="color:#777;">(可选)</small>
+| <small>(必要)</small>
+| <small>(必要)</small>
+| rowspan="2" style="background:none;border:none;" |
+|-
+| colspan="2" |
+|
+|
+|
+|
+|
+|
+|-
+| style="border-right:2px solid #000;" | ''<code><nowiki>{{</nowiki>{{{prename|}}}{{lcfirst:{{ROOTPAGENAME}}}}</code>''
+| colspan="2" style="border-right:2px solid #000;" | ''<code>命令</code>''
+| style="border-right:2px solid #000;" | ''<code style="color:#777;">标记</code>''
+! style="border-right:2px solid #000;background-color:#ffdfc4;" | <code style="color:#777;">entity_id</code>
+! style="border-right:2px solid #000;background-color:#ffdfc4;" | <code>property_id</code>
+! style="border-right:2px solid #000;background-color:#ffdfc4;" | <code style="color:#777;">raw_value</code>
+! style="border-right:2px solid #000;background-color:#ffdfc4;" | <code>qualifier_id</code>
+! style="background-color:#ffdfc4;" | <code>qualifier_id</code>
+| ''<code><nowiki>}}</nowiki></code>''
+|-
+| rowspan="12" colspan="2" style="background:none;border:none;" |
+| rowspan="2" colspan="2" style="border-style:dashed;border-left-color:blue;border-bottom-color:blue;" |
+|
+|
+|
+|
+|
+| rowspan="12" style="background:none;border:none;" |
+|- style="text-align:center;"
+| rowspan="2" | <code>label</code>, <code>title</code>,<br /><code>description</code>,<br /><code>alias</code>/<code>aliases</code>,<br /><code>badge</code>/<code>badges</code>
+| rowspan="2" style="border-top:none;border-bottom:none;" |
+| rowspan="2" style="border-top:none;border-bottom:none;" |
+| rowspan="2" style="border-top:none;border-bottom:none;" |
+| rowspan="2" style="border-top:none;border-bottom:none;" |
+|-
+| rowspan="2" colspan="2" style="border-style:dashed;border-left-color:blue;border-bottom-color:blue;" |
+|- style="text-align:center;"
+| rowspan="2" colspan="2" style="border-top:none;" | <code>property</code>/<code>properties</code>
+| rowspan="2" style="border-top:none;border-bottom:none;" |
+| rowspan="2" style="border-top:none;border-bottom:none;" |
+| rowspan="2" style="border-top:none;border-bottom:none;" |
+|-
+| rowspan="2" colspan="2" style="border-style:dashed;border-left-color:blue;border-bottom-color:blue;" |
+|- style="text-align:center;"
+| rowspan="2" colspan="3" style="border-top:none;" | <code>reference</code>/<code>references</code>
+| rowspan="2" style="border-top:none;border-bottom:none;" |
+| rowspan="2" style="border-top:none;border-bottom:none;" |
+|-
+| rowspan="2" colspan="2" style="border-style:dashed;border-left-color:blue;border-bottom-color:blue;" |
+|- style="text-align:center;"
+| rowspan="2" colspan="4" style="border-top:none;" | <code>qualifier</code>/<code>qualifiers</code>
+| rowspan="2" style="border-top:none;border-bottom:none;" |
+|-
+| rowspan="2" colspan="2" style="border-style:dashed;border-left-color:blue;border-bottom-color:blue;" |
+|- style="text-align:center;"
+| rowspan="2" colspan="5" style="border-top:none;" | <code>qualifier</code>/<code>qualifiers</code> ''(可选 2<sup>nd</sup>, 3<sup>rd</sup> 等)''
+|-
+| rowspan="2" colspan="2" style="border:none;" |
+|-
+| colspan="5" style="border:none;" |
+|}
+
+下面是所有位置参数的描述。
+
+{| class="wikitable"
+|-
+! 参数
+! 描述
+|-
+! style="text-align:left;" | <code style="color:#777;">entity_id</code>
+
+<small style="font-weight:normal;">(optional)</small>
+| '''<code>{{color|red|[昂贵]}}</code>''' 要访问的项目实体的'''Q标识符'''（如 <code>Q55</code>）或要访问的属性-实体的带由前缀<code>Property:</code>的'''P标识符'''（或是可用的'''[[#属性别名|别名]]'''）（如 <code>Property:P38</code>）。
+
+如果是[[#通用类|通用类命令]]，可以省略P标识符前缀<code>Property:</code>（如 <code>P38</code>）。
+
+如果省略此参数，则使用连接到当前页面的项目-实体（除非给出 <code>eid=</code>，见下文）。如果给出此参数但为空（如 <code>&#124;&#124;</code>），那么依据它的位置，此字段会被解释为[[#标记|空标记]]，因此被忽略。另见下面的[[#命名参数|<code>eid=</code> 命名参数]]，也可用于提供实体ID，但不会出现连接到当前页面的项目-实体被用作此特定情况的结果。
+|-
+! style="text-align:left;" | <code>property_id</code>
+| 要访问的实体内的属性的'''P标识符'''（或是可用的'''[[#属性别名|别名]]'''），无前缀 <code>Property:</code>（如 <code>P35</code>）。
+|-
+! style="text-align:left;" | <code style="color:#777;">raw_value</code>
+
+<small style="font-weight:normal;">(optional)</small>
+| Either the '''Q标识符''' equal to the property value (e.g. <code>Q29574</code>) or a '''literal value''' (i.e. string or quantity etc., ''no entity label'') equal to the raw property value of the particular claim to be accessed.
+
+Dates as literal values must be formatted <code>yyyy-mm-dd</code> (e.g. <code>1731-02-11</code>) for dates with a precision of days, <code>yyyy-mm</code> (e.g. <code>1731-02</code>) for dates with a precision of months, and <code>yyyy</code> (e.g. <code>1731</code>) for dates of lesser precision. Dates BCE require a minus sign in front of the year (e.g. <code>-2950-01-31</code>). Dates stored in the Julian calendar must have <code>/Julian</code> attached to the end (e.g. <code>1731-02-11/Julian</code>). Decades like the 2010s must be given as <code>2010</code> (but the 2010s BCE as <code>-2019</code>), centuries like the 20th century as <code>1901</code> (but the 20th century BCE as <code>-2000</code>), and millenniums like the 3rd millennium as <code>2001</code> (but the 3rd millennium BCE as <code>-3000</code>).
+
+Globe coordinates as literal values must be formatted with forward slashes (i.e. <code>/</code>) between the parts and no symbols (e.g. <code>52/5/3/N/4/19/3/E</code>) ''without any spaces or leading zeros''.
+
+The special type &#39;'''no value'''&#39; can be given by entering the empty string (i.e. <code>&#124;&#124;</code>) and the special type &#39;'''unknown value'''&#39; can be given by entering a single underscore (i.e. <code>&#124;_&#124;</code>). To get a literal underscore, escape it by placing a backslash <code>\</code> directly in front of it (i.e. <code>\_</code>); the same holds for a literal backslash (i.e. <code>\\</code>).
+
+要获得竖线 <code>|</code>，使用 <code>{{tl|!}}</code> 或 <code>&amp;#124;</code>。
+
+如果省略此参数, 将访问该属性中的所有声称（匹配任何其他约束）。
+|-
+! style="text-align:left;" | <code>qualifier_id</code>
+| 要访问的实体内的限定符的'''P标识符'''（或是可用的'''[[#属性别名|别名]]'''），无前缀 <code>Property:</code>（如 <code>P580</code>）。
+|}
+
+=== 命名参数 ===
+下面是对所有命名参数的描述，这些参数是name-value对（即 <code>|name=value</code>）。这些都是可选的，可以在任何地方给出 {{module other|after the first command|inside the call}}。
+
+{| class="wikitable"
+|-
+! 参数
+! 描述
+|-
+! style="text-align:right;" | <code>eid=</code>
+| '''<code>{{color|red|[EXPENSIVE]}}</code>''' 该参数提供与 [[#Positional arguments|positional argument <code>entity_id</code>]] 相同的功能（如 <code>&#124;eid=Q55</code>）, 有一点不同：如果给出了参数但是它的值是空的（如 <code>&#124;eid=</code>），那么不会有任何实体，而不是连接到当前页面的项目实体。这在需要变量entity-ID的某些情况下很有用，但是不应将连接到当前页面的项目实体作为默认值进行访问。
+
+此外对于所有命令的P标识符，可以省略前缀 <code>Property:</code>（如 <code>&#124;eid=P38</code>）。
+
+仅当省略位置参数 <code>entity_id</code> 时，此参数才有效。
+|-
+! style="text-align:right;" | <code>''<qualifier>''=</code>
+| The <code>''<qualifier>''</code> is a placeholder for a set of arguments that determine which claims should be accessed based on qualifier value, analogous to the pair of [[#Positional arguments|positional arguments <code>property_id</code> and <code>raw_value</code>]] that determine access based on property value.
+
+As such, <code>''<qualifier>''</code> is any qualifier's '''P-identifier''' (or an available '''[[#Property aliases|alias]]''') without the <code>Property:</code> prefix (e.g. <code>P518</code>). Its value is either the '''Q-identifier''' equal to one of the qualifier values (e.g. <code>Q27561</code>) or a '''literal value''' (i.e. string or quantity etc., ''no entity label'') equal to one of the raw qualifier values of the particular claim to be accessed. The value format is the same as for the positional argument <code>raw_value</code>. The special type &#39;'''no value'''&#39; given by the empty string also matches the total absence within the claim of the particular qualifier.
+
+Example: <code>|P518=Q27561</code>
+
+Multiple arguments of this type can be given to match multiple qualifier values simultaneously for each claim.
+|}
+
+=== 属性别名 ===
+属性别名是可以替代使用的P标识符的名称。以下属性别名（[[大小写敏感性|大小写敏感]]）目前可用：
+
+{| class="wikitable"
+|-
+! 别名
+! <sub>转<br /></sub><sup>为</sup>
+! P标识符
+|- <!-- property aliases purely for convenience -->
+| coord ||style="text-align: center;"| → || [[d:Property:P625|P625]]
+|-
+!colspan="3"|
+|- <!-- property aliases used by the module itself -->
+| image ||style="text-align: center;"| → || [[d:Property:P18|P18]]
+|-
+| author ||style="text-align: center;"| → || [[d:Property:P50|P50]]
+|-
+| publisher ||style="text-align: center;"| → || [[d:Property:P123|P123]]
+|-
+| importedFrom ||style="text-align: center;"| → || [[d:Property:P143|P143]]
+|-
+| statedIn ||style="text-align: center;"| → || [[d:Property:P248|P248]]
+|-
+| pages ||style="text-align: center;"| → || [[d:Property:P304|P304]]
+|-
+| language ||style="text-align: center;"| → || [[d:Property:P407|P407]]
+|-
+| publicationDate ||style="text-align: center;"| → || [[d:Property:P577|P577]]
+|-
+| startTime ||style="text-align: center;"| → || [[d:Property:P580|P580]]
+|-
+| endTime ||style="text-align: center;"| → || [[d:Property:P582|P582]]
+|-
+| chapter ||style="text-align: center;"| → || [[d:Property:P792|P792]]
+|-
+| retrieved ||style="text-align: center;"| → || [[d:Property:P813|P813]]
+|-
+| referenceURL ||style="text-align: center;"| → || [[d:Property:P854|P854]]
+|-
+| sectionVerseOrParagraph ||style="text-align: center;"| → || [[d:Property:P958|P958]]
+|-
+| archiveURL ||style="text-align: center;"| → || [[d:Property:P1065|P1065]]
+|-
+| title ||style="text-align: center;"| → || [[d:Property:P1476|P1476]]
+|-
+| formatterURL ||style="text-align: center;"| → || [[d:Property:P1630|P1630]]
+|-
+| quote ||style="text-align: center;"| → || [[d:Property:P1683|P1683]]
+|-
+| shortName ||style="text-align: center;"| → || [[d:Property:P1813|P1813]]
+|-
+| archiveDate ||style="text-align: center;"| → || [[d:Property:P2960|P2960]]
+|-
+| inferredFrom ||style="text-align: center;"| → || [[d:Property:P3452|P3452]]
+|-
+| typeOfReference ||style="text-align: center;"| → || [[d:Property:P3865|P3865]]
+|-
+| column ||style="text-align: center;"| → || [[d:Property:P3903|P3903]]
+|}
+
+== 高级用法 ==
+
+可以通过使用多个命名标志来定制具有单数和复数形式(e.g. <code>property</code>/<code>properties</code>)的（组合）命令的输出布局，这些标志是name-value对（即 <code>|flag=value</code> ），可以在调用内部的任意地方给出。下表列出了可用的命名标志。  
+
+要在 <code>value</code> 的开头或结尾插入空格，使用下划线 <code>_</code>。要获得文字下划线，请通过在其前面(i.e. <code>\_</code>)直接放置反斜杠<code>\</code>；对于文字反斜杠(i.e. <code>\\</code>)也是如此。要获得文字竖线<code>|</code>，使用<code>{{tl|!}}</code> or <code>&amp;#124;</code>。
+
+{| class="wikitable"
+|-
+! 命名标志
+! 默认值
+! 默认条件
+! 描述
+|-
+! rowspan="6" style="text-align:right;" | <code>format=</code>
+| <code>%p[%s][%r]</code>
+| 如果 <code>property</code>/<code>properties</code> 命令 '''was''' given and the <code>qualifier</code>/<code>qualifiers</code> command '''was not''' given
+| rowspan="6" | 单一声称的格式。可用参数如下。
+
+{| class="wikitable"
+|-
+! 参数
+! 描述
+|-
+| <code>%p</code>
+| 声称属性值由 <code>property</code>/<code>properties</code> 命令施加。
+|-
+| <code>%q1</code>, <code>%q2</code>, <code>%q3</code>, ...
+| 声称的限定符值或限定符值列表由相应的 <code>qualifier</code>/<code>qualifiers</code> 命令施加。
+|-
+| <code>%q</code>
+| The collection of the qualifier values applied by each <code>qualifier</code>/<code>qualifiers</code> command (i.e. <code>%q1</code> + <code>%q2</code> + <code>%q3</code> + ...). If only one <code>qualifier</code>/<code>qualifiers</code> command was given, then this parameter is equivalent to <code>%q1</code>.
+|-
+| <code>%r</code>
+| 声称的参考资料值或参考资料值列表由 <code>reference</code>/<code>references</code> 命令施加。
+|-
+| <code>%a</code>
+| 实体的别名由 <code>alias</code>/<code>aliases</code> 命令施加。
+|-
+| <code>%b</code>
+| 实体的页面badge <code>badge</code>/<code>badges</code> 命令施加。
+|-
+| <code>%s</code>
+| 可移动的分隔符占位符。这是一个特殊参数，不由命令施加，但是在每对声称之间自动填写（如果返回索赔列表）。This is handy in case a reference is returned as well, since it allows the reference to be placed after the punctuation mark as prescribed by [[Wikipedia:Manual of Style#Punctuation and footnotes|Wikipedia's manual of style]]. 默认值为顿号（<code>、</code>），可以使用 <code>sep%s</code> 标志覆盖（见下文）。
+|}
+
+可选参数可以通过将它们封装在方括号之间来给出： <code>[...]</code>。仅当找到在相同括号之间定义的每个可选参数的值时，才会显示方括号之间的所有内容。可选内容也可以嵌套。
+
+使用两个直接相互对应的开口方括号（i.e. <code>{{!((}}</code>），使用use <code>{{tl|!((}}</code>。
+
+必须至少给出一个非可选参数，同时 <code>%s</code> 参数必须始终定义为可选参数。
+
+To get a literal <code>[</code>, <code>]</code>, <code>%</code> or <code>\</code>, escape the character by placing a backslash <code>\</code> directly in front of it (e.g. <code>\%</code>). 有关更多信息，另请参阅此表正上方的说明。
+|-
+| <code>%q[%s][%r]</code>
+| 如果 <code>property</code>/<code>properties</code> command '''was not''' given and the <code>qualifier</code>/<code>qualifiers</code> command '''was''' given
+|-
+| <code>%r</code>
+| 如果 '''only''' the <code>reference</code>/<code>references</code> command was given
+|-
+| <code><nowiki>%p[ <span style="font-size:85\%">(%q)</span>][%s][%r]</nowiki></code>
+| 如果 <code>property</code>/<code>properties</code> command '''was''' given and the <code>qualifier</code>/<code>qualifiers</code> command '''was''' given
+|-
+| <code>%a[%s]</code>
+| 如果 <code>alias</code>/<code>aliases</code> command was given
+|-
+| <code>%b[%s]</code>
+| 如果 <code>badge</code>/<code>badges</code> command was given
+|-
+| colspan="4" |
+|-
+! rowspan="2" style="text-align:right;" | <code>sep=</code>
+| <code>{{dfn|_|title=space}}</code>
+| <span style="color:#777;">''default''</span>
+| rowspan="2" | The fixed separator between each pair of claims.
+|-
+| {{dfn|<code>{{0|&ensp;}}</code>|title=empty}}
+| if '''only''' the <code>reference</code>/<code>references</code> command was given '''without''' the <code>raw</code> flag
+|-
+| colspan="4" |
+|-
+! rowspan="2" style="text-align:right;" | <code>sep%s=</code>
+| <code>,</code>
+| <span style="color:#777;">''default''</span>
+| rowspan="2" | The movable separator between each pair of claims. This will be the value of the <code>%s</code> parameter applied to all claims except for the last in the list.
+|-
+| <code>;</code>
+| 如果 <code>property</code>/<code>properties</code> command '''was not''' given and the <code>qualifier</code>/<code>qualifiers</code> command '''was''' given
+|-
+| colspan="4" |
+|-
+! style="text-align:right;" | <code>sep%q1=</code>, <code>sep%q2=</code>, <code>sep%q3=</code>, ...
+| <code>{{dfn|,_|title=comma space}}</code>
+| <span style="color:#777;">''default''</span>
+| 单个声称的每对限定符之间的分隔符。These are the value separators for the <code>%q1</code>, <code>%q2</code>, <code>%q3</code>, ... parameters.
+If only one <code>qualifier</code>/<code>qualifiers</code> command was given, then the <code>sep%q1</code> flag is equivalent to <code>sep%q</code>.
+|-
+| colspan="4" |
+|-
+! rowspan="2" style="text-align:right;" | <code>sep%q=</code>
+| <code>{{dfn|,_|title=comma space}}</code>
+| 如果'''只有一个''' <code>qualifier</code>/<code>qualifiers</code> 命令已经给出
+| rowspan="2" | The separator between each set of qualifiers of a single claim. This is the value separator for the <code>%q</code> parameter.
+If only one <code>qualifier</code>/<code>qualifiers</code> command was given, then this flag is equivalent to <code>sep%q1</code>.
+|-
+| <code>{{dfn|{{;}}_|title=semicolon space}}</code>
+| 如果'''超过一个''' <code>qualifier</code>/<code>qualifiers</code> 命令已经给出
+|-
+| colspan="4" |
+|-
+! rowspan="2" style="text-align:right;" | <code>sep%r=</code>
+| {{dfn|<code>{{0|&ensp;}}</code>|title=empty}}
+| <span style="color:#777;">''default''</span>
+| rowspan="2" | 单个声称的每对引用之间的分隔符。这是值分隔符，为 <code>%r</code> 参数。
+|-
+| <code>{{dfn|_|title=space}}</code>
+| 如果 <code>raw</code> flag '''was''' given for the <code>reference</code>/<code>references</code> 命令
+|-
+| colspan="4" |
+|-
+! style="text-align:right;" | <code>punc=</code>
+| {{dfn|<code>{{0|&ensp;}}</code>|title=empty}}
+| <span style="color:#777;">''default''</span>
+| 标点符号位于输出的末尾。这将放在 <code>%s</code> 参数上，适用于列表中的最后一个声称。
+当输出用作句子的一部分时，这允许在标点符号后面放置任何引用。
+|}
+
+== 范例 ==
+<!--
+Original documentation located at [[:en:Module:Wd/doc]].
+
+This documentation is included by wrapper templates like [[:en:Template:Wikidata]] and [[:en:Template:WikidataOI]] as well, where these examples also function as a way to verify that those templates are working correctly. This is done by calling the respective PAGENAME.
+
+It makes the examples section a bit bloated, though. For a bit of convenience, the following table row can be used as a basic template for any new example (note the 'xxx' that need to be substituted):
+
+|-
+| style="color:#777;font-size:small;" | Pxxx = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Pxxx|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|xxx}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|Pxxx{{{extraparams|}}}}}<br />
+:↓<br />
+:{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Pxxx|fetch=true}}
+| Description...
+
+-->
+{| class="wikitable"
+|-
+! 参数和输出类型
+! 例子
+! style="width:20%"|描述
+|-
+| style="color:#777;font-size:small;" | [[d:Q55|Q55]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", [[d:Property:P395|P395]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P395|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|string}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|Q55|P395|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|Q55|P395|fetch=true}}
+| 获取文字字符串值。    
+|-
+| style="color:#777;font-size:small;" | P395 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P395|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|string}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|P395|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|Q55|P395|fetch=true}}
+| 如果 {{lcfirst:{{NAMESPACE}}}} is transcluded on the {{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|title|linked|Q55|fetch=true}} 页面（链接到Q55），那么 <code>Q55</code> 可被忽略。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P395 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|Q55|P395|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|string}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|'''eid{{=}}Q55'''|P395|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|eid=Q55|P395|fetch=true}}
+| 也可以使用 <code>eid=</code> 参数给出entity-ID。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P395 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P395|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|string}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|'''edit'''|Q55|P395|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|edit|Q55|P395|fetch=true}}
+| 添加可点击的图标，用于编辑维基数据上的返回值。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P395 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P395|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|string}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|'''edit@end'''|Q55|P395|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|edit@end|Q55|P395|fetch=true}}
+| 将编辑图标置于行尾。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", [[d:Property:P1082|P1082]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P1082|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|quantity}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|'''property'''|'''normal+'''|Q55|P1082|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|normal+|Q55|P1082|fetch=true}}
+| 从具有“normal”等级或更高等级的声称中获取单个属性值。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P1082 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P1082|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|quantity}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|'''properties'''|normal+|Q55|P1082|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|normal+|Q55|P1082|fetch=true}}
+| 从具有“normal”等级或更高等级的声称中获取多个属性值。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P1082 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P1082|fetch=true}}", [[d:Property:P585|P585]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P585|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|quantity}}], [{{smallcaps|time}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|'''qualifier'''|normal+|Q55|P1082|'''P585'''|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifier|normal+|Q55|P1082|P585|fetch=true}}
+| 获取每个声称的单个限定符值，属性值除外。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P1082 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P1082|fetch=true}}", P585 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P585|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|quantity}}], [{{smallcaps|time}}], [{{smallcaps|reference}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifier|'''references'''|normal+|Q55|P1082|P585|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifier|references|normal+|Q55|P1082|P585|fetch=true}}
+| 获取每个声称的引用。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P1082 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P1082|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|quantity}}], [{{smallcaps|reference}}]
+| <code>A total of {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|references|Q55|P1082|{{{extraparams|}}}}} people live in the Netherlands.</code><br />
+:↓<br />
+:A total of {{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|references|Q55|P1082|fetch=true}} people live in the Netherlands.
+| 获取具有引用的属性。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P1082 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P1082|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|quantity}}], [{{smallcaps|reference}}]
+| <code>The Netherlands has a population of {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|references|Q55|P1082|'''punc{{=}}.'''|{{{extraparams|}}}}}</code>
+:↓<br />
+:The Netherlands has a population of {{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|references|Q55|P1082|punc=.|fetch=true}}
+| 在输出的末尾添加一个标点符号，位于引用之前。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P1082 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P1082|fetch=true}}", P585 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P585|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|quantity}}], [{{smallcaps|time}}], [{{smallcaps|reference}}]
+| <code>'''<nowiki><ul></nowiki>'''{{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifier|references|normal+|Q55|P1082|P585|'''<nowiki>format=<li>%p[%r][<ul><li>%q</li></ul>]</li></nowiki>'''|{{{extraparams|}}}}}'''<nowiki></ul></nowiki>'''</code><br />
+:↓<br />
+<ul>{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifier|references|normal+|Q55|P1082|P585|format=<li>%p[%r][<ul><li>%q</li></ul>]</li>|fetch=true}}</ul>
+| 以自定义格式返回输出。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P1082 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P1082|fetch=true}}", P585 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P585|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|time}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|'''qualifier'''|normal+|Q55|P1082|P585|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|qualifier|normal+|Q55|P1082|P585|fetch=true}}
+| 默认情况下，为每个声称获取一个限定符，用于多个匹配的声称。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P1082 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P1082|fetch=true}}", P585 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P585|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|time}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|qualifier|normal+|'''single'''|Q55|P1082|P585|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|qualifier|normal+|single|Q55|P1082|P585|fetch=true}}
+| 要仅针对单个声称获得单个限定符，需同时提供 <code>single</code> 标志，以便仅访问单个声称。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P1082 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P1082|fetch=true}}", P585 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P585|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|time}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|qualifier|Q55|P1082|'''{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|raw|normal|Q55|P1082|fetch=true}}'''|P585|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|qualifier|Q55|P1082|{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|raw|normal|Q55|P1082|fetch=true}}|P585|fetch=true}}
+| 从与给定文字值匹配的（原始）属性值的声称中获取限定符。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P1082 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P1082|fetch=true}}", P585 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P585|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|time}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|qualifier|'''mdy'''|Q55|P1082|{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|raw|normal|Q55|P1082|fetch=true}}|P585|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|qualifier|mdy|Q55|P1082|{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|raw|normal|Q55|P1082|fetch=true}}|P585|fetch=true}}
+| 以月 - 日 - 年获取日期。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P1082 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P1082|fetch=true}}", P585 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P585|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|time}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|qualifier|'''raw'''|Q55|P1082|{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|raw|normal|Q55|P1082|fetch=true}}|P585|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|qualifier|raw|Q55|P1082|{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|raw|normal|Q55|P1082|fetch=true}}|P585|fetch=true}}
+| 获取原始日期值。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P1082 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P1082|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|reference}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|'''references'''|Q55|P1082|'''{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|raw|normal|Q55|P1082|fetch=true}}'''|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|references|Q55|P1082|{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|raw|normal|Q55|P1082|fetch=true}}|fetch=true}}
+| 获取特定声称的引用。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P1082 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P1082|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|reference}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|'''references'''|'''raw'''|Q55|P1082|'''{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|raw|normal|Q55|P1082|fetch=true}}'''|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|references|raw|Q55|P1082|{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|raw|normal|Q55|P1082|fetch=true}}|fetch=true}}
+| 以原始形式获取特定声称的引用。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", [[d:Property:P1081|P1081]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P1081|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|quantity}}], [{{smallcaps|reference}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|'''references'''|normal+|Q55|P1081|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|references|normal+|Q55|P1081|fetch=true}}
+| 从每个声称中获取属性以及它们具有的任何引用。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P1081 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P1081|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|quantity}}], [{{smallcaps|reference}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|references|normal+|'''sourced'''|Q55|P1081|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|references|normal+|sourced|Q55|P1081|fetch=true}}
+| 仅从具有至少一个引用的声称中获取属性。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", [[d:Property:P2855|P2855]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P2855|fetch=true}}", [[d:Property:P518|P518]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P518|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|'''qualifier'''|Q55|P2855|P518|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|qualifier|Q55|P2855|P518|fetch=true}}
+| 获取单个限定符值（对于每个匹配的声称）。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P2855 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P2855|fetch=true}}", P518 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P518|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|'''qualifiers'''|Q55|P2855|P518|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|qualifiers|Q55|P2855|P518|fetch=true}}
+| 获取多个限定符值（对于每个匹配的声称）。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P2855 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P2855|fetch=true}}", P518 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P518|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|quantity}}], [{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|'''properties'''|qualifiers|Q55|P2855|P518|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifiers|Q55|P2855|P518|fetch=true}}
+| 获取多个属性值以及多个限定符值。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P2855 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P2855|fetch=true}}", P518 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P518|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|quantity}}], [{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifiers|Q55|P2855|P518|'''sep{{=}}_+_'''|'''sep%s{{=}}'''|'''sep%q{{=}}_/_'''|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifiers|Q55|P2855|P518|sep=_+_|sep%s=|sep%q=_/_|fetch=true}}
+| 使用自定义分隔符返回输出。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", [[d:Property:P35|P35]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P35|fetch=true}}", [[d:Property:P580|P580]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P580|etch={{{fetch|}}}}}", [[d:Property:P582|P582]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P582|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}], [{{smallcaps|time}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|'''qualifier'''|'''qualifier'''|normal+|Q55|P35|'''P580'''|'''P582'''|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifier|qualifier|normal+|Q55|P35|P580|P582|fetch=true}}
+| 为每个声称获取两个不同的限定符值。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P35 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P35|fetch=true}}", P580 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P580|etch={{{fetch|}}}}}", P582 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P582|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}], [{{smallcaps|time}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifier|qualifier|normal+|Q55|P35|P580|P582|'''sep%q{{=}}_–_'''|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifier|qualifier|normal+|Q55|P35|P580|P582|sep%q=_–_|fetch=true}}
+| 使用自定义分隔符返回输出。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P35 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P35|fetch=true}}", P580 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P580|etch={{{fetch|}}}}}", P582 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P582|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}], [{{smallcaps|time}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifier|qualifier|normal+|Q55|P35|P580|P582|'''<nowiki>format=%p[ <span style="font-size:85\%">(%q1[ – %q2])</span>][%s][%r]</nowiki>'''|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifier|qualifier|normal+|Q55|P35|P580|P582|format=%p[ <span style="font-size:85\%">(%q1[ – %q2])</span>][%s][%r]|fetch=true}}
+| 以自定义格式而不是自定义分隔符返回输出。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P35 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P35|fetch=true}}", P580 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P580|etch={{{fetch|}}}}}", P582 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P582|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}], [{{smallcaps|time}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifier|qualifier|normal+|Q55|P35|P580|P582|<nowiki>format=%p[ <span style="font-size:85\%">(</nowiki>'''<nowiki>[<![]--%q2]since [%q2--[]>]</nowiki>'''<nowiki>%q1[ – %q2])</span>][%s][%r]</nowiki>|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifier|qualifier|normal+|Q55|P35|P580|P582|format=%p[ <span style="font-size:85\%">([<![]--%q2]since [%q2--[]>]%q1[ – %q2])</span>][%s][%r]|fetch=true}}
+| 要仅在某个值不存在时添加文本，例如如果没有结束时间，则添加单词“'since'，需将其包装在包含HTML注释标签和相关参数的两个可选块之间（这也可以防止将文本添加到页面源中）。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P35 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P35|fetch=true}}", [[d:Q29574|Q29574]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q29574}}", P580 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P580|fetch=true}}", P582 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P582|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}], [{{smallcaps|time}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifier|'''raw'''|qualifier|normal+|Q55&#124;P35|'''Q29574'''|P580&#124;P582|<nowiki>format=%p[ <span style="font-size:85\%">(%q1[ – %q2])</span>][%s][%r]</nowiki>|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifier|raw|qualifier|normal+|Q55|P35|Q29574|P580|P582|format=%p[ <span style="font-size:85\%">(%q1[ – %q2])</span>][%s][%r]|fetch=true}}
+| 获取具有限定符的属性，来自声称，其属性与给定的Q标识符匹配，其中一个限定符值采用其原始形式。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", [[d:Property:P38|P38]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P38|fetch=true}}", P518 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P518|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifiers|normal+|'''current'''|Q55|P38|P518|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifiers|normal+|current|Q55|P38|P518|fetch=true}}
+| 获取当前有效的声称。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P38 = {{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P38|fetch=true}}", P518 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P518|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|'''linked'''|qualifiers|normal+|current|Q55|P38|P518|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|linked|qualifiers|normal+|current|Q55|P38|P518|fetch=true}}
+| 获取具有链接属性值的声称。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P38 = {{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P38|fetch=true}}", P518 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P518|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifiers|'''linked'''|normal+|current|Q55|P38|P518|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|qualifiers|linked|normal+|current|Q55|P38|P518|fetch=true}}
+| 获取具有链接限定符值的声称。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P38 = {{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P38|fetch=true}}", P518 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P518|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|'''linked'''|'''short'''|qualifiers|'''linked'''|normal+|current|Q55|P38&#124;P518|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|linked|short|qualifiers|linked|normal+|current|Q55|P38|P518|fetch=true}}
+| 获取具有链接属性和限定符值的声称，并在可用时使用短属性值。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P38 = {{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P38|fetch=true}}", [[d:Q4917|Q4917]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q4917|fetch=true}}", P518 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P518|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|qualifiers|normal+|current|Q55|P38|'''Q4917'''|P518|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|qualifiers|normal+|current|Q55|P38|Q4917|P518|fetch=true}}
+| 获取限定符，来自与给定Q标识符匹配的（原始）属性值的声称。Gets qualifiers from claims for which the (raw) property value matches a given Q-identifier.
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P38 = {{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P38|fetch=true}}", P518 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P518|fetch=true}}", [[d:Q27561|Q27561]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q27561|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|normal+|current|Q55|P38|'''P518{{=}}Q27561'''|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|normal+|current|Q55|P38|P518=Q27561|fetch=true}}
+| Gets properties from claims for which a (raw) qualifier value matches a given Q-identifier.
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P38 = {{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P38|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|normal+|'''former'''|Q55|P38|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|normal+|former|Q55|P38|fetch=true}}
+| 获取过去有效的声称。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P38 = {{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P38|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|'''raw'''|normal+|former|Q55|P38|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|raw|normal+|former|Q55|P38|fetch=true}}
+| 获取原始属性值。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P38 = {{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P38|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|raw|'''linked'''|normal+|former|Q55|P38|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|properties|raw|linked|normal+|former|Q55|P38|fetch=true}}
+| 获取链接到维基数据的原始属性值。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", [[d:Property:P1549|P1549]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P1549|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|monolingual text}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|Q55|P1549|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|Q55|P1549|fetch=true}}
+| 获取当前维基语言的单语言文本值。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P1549 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P1549|fetch=true}}", [[d:Property:P407|P407]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P407|fetch=true}}", [[d:Q36846|Q36846]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q36846|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|monolingual text}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|'''multilanguage'''|Q55|P1549|P407{{=}}Q36846|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|multilanguage|Q55|P1549|P407=Q36846|fetch=true}}
+| 获取任何可用语言的单语言文本值。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", [[d:Property:P2884|P2884]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P2884|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|quantity}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|Q55|P2884|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|Q55|P2884|fetch=true}}
+| 获取数量值及其关联的度量单位。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P2884 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P2884|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|quantity}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|'''linked'''|Q55|P2884|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|linked|Q55|P2884|fetch=true}}
+| 获取具有链接测量单位的数量值。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P2884 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P2884|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|quantity}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|'''raw'''|Q55|P2884|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|raw|Q55|P2884|fetch=true}}
+| 获取原始数量值。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P2884 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P2884|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|quantity}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|'''unit'''|Q55|P2884|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|unit|Q55|P2884|fetch=true}}
+| 仅获取测量单位。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P2884 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P2884|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|quantity}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|unit|'''raw'''|Q55|P2884|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|unit|raw|Q55|P2884|fetch=true}}
+| 获取原始测量单位。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", [[d:Property:P625|P625]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P625|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|globe coordinate}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|Q55|P625|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|Q55|P625|fetch=true}}
+| 获取globe坐标值。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P625 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P625|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|globe coordinate}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|'''linked'''|Q55|P625|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|linked|Q55|P625|fetch=true}}
+| 获取链接的globe坐标值。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P625 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P625|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|globe coordinate}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|'''raw'''|Q55|P625|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|raw|Q55|P625|fetch=true}}
+| 获取原始globe坐标值。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P625 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P625|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|globe coordinate}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|Q55|'''coord'''|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|Q55|coord|fetch=true}}
+| 可以使用属性别名代替P标识符。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", [[d:Property:P41|P41]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P41|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|commons media}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|'''linked'''|Q55|P41|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|linked|Q55|P41|fetch=true}}
+| 获取媒体文件名并将其链接至共享资源。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}", P41 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P41|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|commons media}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|'''raw'''|Q55|P41|'''<nowiki>format=\[\[File:%p {{!}} thumb {{!}} left\]\]</nowiki>'''|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|raw|Q55|P41|format=\[\[File:%p{{!}} thumb {{!}} left\]\]|fetch=true}}
+| 可以在页面上包含共享资源媒体文件通过省略 <code>linked</code> 和 <code>raw</code> 标志，但通过使用  <code>raw</code> 标志 它可以自由格式化。
+|-
+| style="color:#777;font-size:small;" | [[d:Q915684|Q915684]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q915684|fetch=true}}", [[d:Property:P2534|P2534]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P2534|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|math}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|Q915684|P2534|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|Q915684|P2534|fetch=true}}
+| 获取一个数学表达式。
+|-
+| style="color:#777;font-size:small;" | [[d:Q6256|Q6256]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q6256|fetch=true}}", [[d:Property:P3896|P3896]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P3896|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|geographic shape}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|'''linked'''|Q6256|P3896|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|property|linked|Q6256|P3896|fetch=true}}
+| 获取地理形状数据文件名并将其链接至共享资源。
+|-
+| style="color:#777;font-size:small;" | Q4917 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q4917|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|'''label'''|Q4917|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q4917|fetch=true}}
+| 获取item的标签。
+|-
+| style="color:#777;font-size:small;" | Q4917 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q4917|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|'''short'''|'''linked'''|Q4917|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|short|linked|Q4917|fetch=true}}
+| 获取item的简短链接标签。
+|-
+| style="color:#777;font-size:small;" | P38 = {{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P38|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P38|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P38|fetch=true}}
+| 获取属性的标签。
+|-
+| style="color:#777;font-size:small;" | P38 = {{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|P38|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|'''linked'''|P38|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|linked|P38|fetch=true}}
+| 获取链接到维基数据的属性标签。
+|-
+| style="color:#777;font-size:small;" | [[d:Q776|Q776]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q776|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q776|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q776|fetch=true}}
+| 获取item的标签。
+|-
+| style="color:#777;font-size:small;" | Q776 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q776|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|'''linked'''|Q776|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|linked|Q776|fetch=true}}
+| 获取item的链接标签。
+|-
+| style="color:#777;font-size:small;" | <br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q776|fetch=true}}
+| 如果 {{lcfirst:{{NAMESPACE}}}} is transcluded on the {{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|title|linked|Q776|fetch=true}} page (which is linked to Q776), then the <code>Q776</code> can be omitted.
+|-
+| style="color:#777;font-size:small;" | <br />
+:↓<br />
+[{{smallcaps|entity label}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|'''raw'''|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|raw|Q776|fetch=true}}
+| 如果只给出 <code>label</code> 命令与 <code>raw</code> 标志, 那么返回连接到当前页面的item的Q标识符。
+|-
+| style="color:#777;font-size:small;" | Q776 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q776|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|page title}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|'''title'''|Q776|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|title|Q776|fetch=true}}
+| 获取当前Wiki上页面的标题，链接到给定项目。
+|-
+| style="color:#777;font-size:small;" | Q776 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q776|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|page title}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|title|'''linked'''|Q776|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|title|linked|Q776|fetch=true}}
+| 获取当前Wiki上页面的链接标题，链接到给定项目。
+|-
+| style="color:#777;font-size:small;" | <br />
+:↓<br />
+[{{smallcaps|page title}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|title|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|title|Q776|fetch=true}}
+| 如果 {{lcfirst:{{NAMESPACE}}}} is transcluded on the {{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|title|linked|Q776|fetch=true}} page (which is linked to Q776), then the <code>Q776</code> can be omitted.
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity description}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|'''description'''|Q55|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|description|Q55|fetch=true}}
+| 获取item的描述。
+|-
+| style="color:#777;font-size:small;" | <br />
+:↓<br />
+[{{smallcaps|entity description}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|description|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|description|Q55|fetch=true}}
+| 如果 {{lcfirst:{{NAMESPACE}}}} is transcluded on the {{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|title|linked|Q55|fetch=true}} 页面（链接至Q55），那么 <code>Q55</code> 可以忽略。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity alias}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|'''alias'''|Q55|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|alias|Q55|fetch=true}}
+| 获取item的别名之一。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity alias}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|'''aliases'''|Q55|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|aliases|Q55|fetch=true}}
+| 获取item的所有别名。
+|-
+| style="color:#777;font-size:small;" | Q55 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q55|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|entity alias}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|alias|'''linked'''|Q55|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|alias|linked|Q55|fetch=true}}
+| 获取链接别名从item。
+|-
+| style="color:#777;font-size:small;" | <br />
+:↓<br />
+[{{smallcaps|entity alias}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|alias|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|alias|Q55|fetch=true}}
+| If the {{lcfirst:{{NAMESPACE}}}} is transcluded on the {{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|title|linked|Q55|fetch=true}} page (which is linked to Q55), then the <code>Q55</code> can be omitted.
+|-
+| style="color:#777;font-size:small;" | [[d:Q2|Q2]] = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q2|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|page badge}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|'''badges'''|Q2|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|badges|Q2|fetch=true}}
+| 获取当前Wiki上页面的raw badges，链接到给定item。
+|-
+| style="color:#777;font-size:small;" | Q2 = "{{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|label|Q2|fetch=true}}"<br />
+:↓<br />
+[{{smallcaps|page badge}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|badges|'''raw'''|Q2|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|badges|raw|Q2|fetch=true}}
+| 获取当前Wiki上页面的raw badges，链接到给定item。
+|-
+| style="color:#777;font-size:small;" | <br />
+:↓<br />
+[{{smallcaps|page badge}}]
+| {{tnull|{{{prename|}}}{{lcfirst:{{BASEPAGENAME}}}}|badges|{{{extraparams|}}}}}<br />
+:↓<br />
+:{{ {{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|badges|Q2|fetch=true}}
+| If the {{lcfirst:{{NAMESPACE}}}} is transcluded on the {{{{{prename_code|}}}{{lcfirst:{{BASEPAGENAME}}}}|title|linked|Q2|fetch=true}} page (which is linked to Q2), then the <code>Q2</code> can be omitted.
+|}
+
+=== 示例参考 ===
+{{Reflist}}
+
+== 参见 ==
+{{module other|*{{tl|Wikidata}}，此模块用户友好的包装模板。
+*{{tl|WikidataOI}}，此模块的包装模板that adds an opt-in toggle.|{{{seealso|}}}
+*{{tl|Wikidata entity link}}或重定向{{tl|Q}})，将维基数据实体链接添加到维基百科页面
+*{{tl|Wikidata property link}}或重定向{{tl|Property}}，将维基数据属性链接添加到维基百科页面
+*{{tl|Wikidata property}}，将维基数据属性{{tl|side box}}添加到维基百科页面或模板文档
+*{{tl|Uses Wikidata}}，将维基数据property box添加到模板或模块文档
+*{{tl|Tracks Wikidata}}，将维基数据property box添加到模板、模块或分类文档
+*[[Module:Wd]]，此模板调用的源模块。}}
+*{{tl|Pageid to title}}，使用本地页面ID而非维基数据获取页面标题
+
+{{#ifeq:{{PAGENAME}}|{{ROOTPAGENAME}}|{{module other|[[Category:維基數據模組]][[Category:使用维基数据信息的模块]]|[[Category:維基數據模板]]}}}}

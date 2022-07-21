@@ -1,0 +1,56 @@
+'''自由能微扰''' （{{lang-en|'''F'''ree '''E'''nergy '''P'''erturbation}}, [[縮寫|縮寫]]：'''FEP'''）是用来计算[[自由能|自由能]]的一种常用方法。最早由R. W. Zwanzig在1954年提出<ref>Zwanzig, R. W. J. Chem. Phys. 1954, 22, 1420-1426. {{doi|10.1063/1.1740409}}</ref>。以[[正则系综|正则系综]]为例，从状态A到状态B的[[自由能|自由能]]变化可以由下式算出：
+:<math>\Delta F(A \rightarrow B) = F_B - F_A = -k_B T \ln \left \langle \exp \left ( - \frac{H_B - H_A}{k_B T} \right ) \right \rangle _A
+</math>
+其中T为温度，<math>H_A</math>和 <math>H_B</math>分别为状态A和状态B的[[哈密顿量|哈密顿量]]，<math>k_B</math>为[[玻尔兹曼常数|玻尔兹曼常数]]，<math>\langle\rangle</math>表示在状态A的[[系综|系综]]中取系综平均。简单而言，为了计算状态A与状态B之间的自由能差，只需通过在状态A的系综中对两状态之间的能量差采样，然后求平均即可。采样可以使用[[分子动力学|分子动力学]]或者[[蒙特卡洛方法|蒙特卡洛方法]]模拟。
+
+==原理==
+以正则系综为例，已知状态A的[[配分函数|配分函数]]为<math>Q_A</math>
+:<math>Q_A = \int d\textbf{r}^N \textbf{p}^N e^{-\beta H_A(\textbf{r}^N,\textbf{p}^N)},
+</math>
+其中<math>\beta = 1/k_BT</math>。那么状态B的[[配分函数|配分函数]]<math>Q_B</math>可以做如下改写
+:<math> \begin{align}
+                  Q_B& = \int d\textbf{r}^N \textbf{p}^N e^{-\beta H_B(\textbf{r}^N,\textbf{p}^N)}  \\
+                        & =  \int d\textbf{r}^N \textbf{p}^N e^{-\beta H_A(\textbf{r}^N,\textbf{p}^N)}  
+                                    e^{-\beta [H_B(\textbf{r}^N,\textbf{p}^N) - H_A(\textbf{r}^N,\textbf{p}^N)]} \\
+                         & = Q_A \int d\textbf{r}^N \textbf{p}^N\frac{e^{-\beta [H_B(\textbf{r}^N,\textbf{p}^N) - H_A(\textbf{r}^N,\textbf{p}^N)]}}{Q_A}\\
+                         & = Q_A \langle e^{-\beta [H_B- H_A]}\rangle_A
+           
+                 \end{align}
+</math>
+即
+:<math> \frac{Q_B}{Q_A} = \langle e^{-\beta [H_B- H_A]}\rangle_A </math>.
+而状态B与A之间的自由能差
+:<math>
+\begin{align}
+\Delta F(A \rightarrow B) &= F_B - F_A \\
+              & = - (k_BT \ln Q_B - k_BT\ln Q_A) \\
+              & = -k_BT \ln \frac{Q_B}{Q_A}
+\end{align}
+</math>
+故有
+:<math>\Delta F(A \rightarrow B) = F_B - F_A = -k_B T \ln \left \langle \exp \left ( - \frac{H_B - H_A}{k_B T} \right ) \right \rangle _A
+</math>。
+
+==应用==
+自由能微扰被广泛应用于各种自由能的计算，并被集成到各种分子模拟软件中，包括：
+*[[AMBER|AMBER]]<ref>{{Cite web |url=http://www.ambermd.org/ |title=存档副本 |access-date=2020-01-12 |archive-url=https://web.archive.org/web/20191210041819/http://ambermd.org/ |archive-date=2019-12-10 |dead-url=yes }}</ref>
+*[[BOSS_(molecular_mechanics)|BOSS]]
+*[[CHARMM|CHARMM]]
+*[[Desmond_(software)|Desmond]]
+*[[GROMACS|GROMACS]]
+*[[MacroModel|MacroModel]]
+*[[MOLARIS|MOLARIS]]
+*[[NAMD|NAMD]]
+*[[Tinker|Tinker]]
+
+在使用自由能微扰进行自由能计算的时候，需要注意由于状态A与B之间能量差太大而导致的采样不足问题<ref>Pohorille A, Jarzynski C, Chipot C  J Phys Chem B. 2010 Aug 19;114(32):10235-53. {{doi| 10.1021/jp102971x}}.</ref>。在这种情况下，需要把A到B之间划分成多个窗口进行采样，或者采用其他自由能计算方法，比如{{tsl|en|Bennett acceptance ratio|}} 以及{{tsl|en|Umbrella sampling |}}。存在对 FEP 的改编，试图将自由能变化分配给化学结构的子部分。<ref>Irwin, B. W. J., J. Chem. Theory Comput. 2018, 14, 6, 3218-3227. {{doi|10.1021/acs.jctc.8b00027}}</ref>
+
+== 参考资料 ==
+<references />
+
+
+
+
+<!--- 分类 --->
+[[Category:计算化学|Category:计算化学]]
+[[Category:统计力学|Category:统计力学]]

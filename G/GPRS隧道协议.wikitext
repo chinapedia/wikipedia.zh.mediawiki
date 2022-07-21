@@ -1,0 +1,224 @@
+{{IPstack}}
+'''GPRS隧道协议'''（{{lang-en|GPRS Tunnelling Protocol}}，简称：GTP）是一组基于[[网际协议|IP]]的[[网络传输协议|通信协议]]，用于在[[GSM|GSM]]、[[通用移动通讯系统|UMTS]]和[[长期演进技术|LTE]]网络中承载[[通用分组无线服务|GPRS]]（通用分组无线业务，{{lang-en|General Packet Radio Service}}）。
+
+GTP协议目前有3个版本：version 2使用于LTE核心网；version 1使用于GSM和UMTS网络，也应用于LTE网络中以传输用户面数据；version 0是早期版本，被1999年标准化的version 1替代<ref>{{Cite web|url=http://www.3gpp.org/ftp/Specs/archive/29_series/29.060/29060-330.zip|title=3GPP TS 29.060 V3.3.0 General Packet Radio Service (GPRS); GPRS Tunnelling Protocol (GTP) across the Gn and Gp Interface|accessdate=2016-06-15|date=1999-12-15|language=英语|archive-date=2020-06-22|archive-url=https://web.archive.org/web/20200622022558/https://www.3gpp.org/ftp/Specs/archive/29_series/29.060/29060-330.zip|dead-url=no}}</ref>。
+
+==GTP协议的用途==
+===GSM和UMTS网络===
+====GPRS核心网====
+{{See also|GPRS核心网}}
+GTP是[[GPRS核心网|GPRS核心网]]中使用的主要协议。它使得[[GSM|GSM]]或[[UMTS|UMTS]]网络的终端能够在网络中移动位置，同时能持续的通过同一个GGSN连接到因特网。为了实现这一功能，GTP协议总是将用户面数据从用户位置所属的SGSN传输到它开户信息所对应的GGSN。
+
+[[GPRS核心网|GPRS核心网]]使用三种 GTP协议。
+* GTP-U用于为每个[[GPRS核心网#PDP上下文|PDP上下文]]提供一个或多个隧道，用以传输用户数据
+* GTP-C用于控制目的，包括：
+** [[GPRS核心网#PDP上下文|PDP上下文]]的建立和删除
+** [[GPRS核心网#GPRS支撑节点（GSN）|GSN]]可及性验证
+** 位置更新。例如，当签约用户从一个[[GPRS核心网#业务GPRS支撑节点（SGSN）|SGSN]]移动到另一个SGSN
+* [[GTP'|GTP']]用于从各个[[GPRS核心网#GPRS支撑节点(GSN)|GSN]]传送计费数据到计费网关功能（CGF，{{lang-en|Charging Gateway Function}}）。
+
+[[GPRS核心网#网关GPRS支撑节点（GGSN）|GGSN]]和[[GPRS核心网#业务GPRS支撑节点（SGSN）|SGSN]]（合称为“[[GPRS核心网#GPRS支撑节点（GSN）|GSN]]”）在[[用户数据报协议|UDP]]端口2123上监听GTP-C消息，在端口2152上监听GTP-U消息。GTP协议通信可以通过[[GPRS漫游交换|GPRS漫游交换]]（{{lang-en|GPRS Roaming Exchange}}）发生在不同运营商之间。
+
+''计费网关功能''（CGF，英文：Charging Gateway Function）在[[传输控制协议|TCP]]/[[用户数据报协议|UDP]]端口3386上监听发送自[[GPRS核心网#GPRS支撑节点（GSN）|GSN]]的GTP'消息。核心网发送计费信息到CGF，计费信息至少包含[[GPRS核心网#PDP上下文|PDP上下文]]激活次数以及终端用户传送的数据量。与GTP-C和GTP-U不同，GTP'协议承载的报文通常只在单个运营商网络内部使用，因此并不那么标准化。运营商可以做特殊的配置，使用特别的编码，甚至使用完全不同的系统来完成计费。
+
+====UMTS的核心网和接入网之间（Iu-PS接口）====
+[[GPRS核心网|GPRS核心网]]和UMTS[[无线电接入网|接入网]]之间的Iu-PS接口上，用户面也使用GTP-U协议。然而在控制面上并不使用GTP-C，而是用[[无线接入网应用部分|RANAP]]协议。GTP-U的隧道在Iu-PS接口上也是以RANAP协议管理的。
+
+===LTE网络===
+LTE网络中的GTP协议功能与GSM/UMTS网络中基本相同。在控制面上LTE网络使用GTPv2-C，用户面上使用GTP-U，计费相关功能使用GTP'。
+
+在S1接口（eNodeB和SGW之间）上，用户面使用GTP-U协议。在接入网X2接口（两个eNodeB之间）上，用户面也使用GTP-U协议，控制面使用X2AP。<ref name=36.423>{{Cite web|url=http://www.3gpp.org/dynareport/36423.htm|title=3GPP TS 36.423 Evolved Universal Terrestrial Radio Access Network (E-UTRAN); X2 Application Protocol (X2AP)|accessdate=2016-07-22|archive-date=2016-08-14|archive-url=https://web.archive.org/web/20160814180006/http://www.3gpp.org/dynareport/36423.htm|dead-url=no}}</ref><ref name=36.424>{{Cite web|url=http://www.3gpp.org/dynareport/36424.htm|title=3GPP TS 36.424 Evolved Universal Terrestrial Radio Access Network (E-UTRAN); X2 data transport|accessdate=2016-07-22|archive-date=2016-07-25|archive-url=https://web.archive.org/web/20160725100818/http://www.3gpp.org/dynareport/36424.htm|dead-url=no}}</ref>
+
+==协议特性==
+所有的GTP变种都有一些共有的特性。消息的结构都是相同的，GTP消息头在[[用户数据报协议|UDP]]/[[传输控制协议|TCP]]头之后。
+
+===消息头===
+====GTP版本1====
+GTPv1消息头包含如下的字段：<ref>{{Cite web |url=http://www.3gpp.org/ftp/Specs/html-info/29060.htm |title=3GPP TS 29.060 section 6 |accessdate=2014-10-08 |archive-date=2008-12-09 |archive-url=https://web.archive.org/web/20081209044236/http://www.3gpp.org/ftp/Specs/html-info/29060.htm |dead-url=no }}</ref>
+
+{| class="wikitable" style="text-align:center"
+|-
+! width="4%"|+
+! colspan="3" width="9%"| 0-2
+! colspan="1" width="3%"| 3
+! colspan="1" width="3%"| 4
+! colspan="1" width="3%"| 5
+! colspan="1" width="3%"| 6
+! colspan="1" width="3%"| 7
+! colspan="8" width="24%"| 8-15
+! colspan="8" width="24%"| 16-23
+! colspan="8" width="24%"| 24-31
+|-
+! 0
+| colspan="3"| 版本号（Version）
+| colspan="1"| 协议类型（Protocol type）
+| colspan="1"| 保留（Reserved）
+| colspan="1"| 扩展消息头标志位（Extension Header Flag）
+| colspan="1"| 序列号标志位（Sequence Number Flag）
+| colspan="1"| N-PDU号标志位（Number Flag）
+| colspan="8"| 消息类型（Message Type）
+| colspan="16"| 总长度（Total length）
+|-
+! 32
+| colspan="32"| TEID
+|-
+! 64
+| colspan="16" bgcolor="#FFDDDD"| 序列号（Sequence number）
+| colspan="8" bgcolor="#FFDDDD"| N-PDU号（number）
+| colspan="8" bgcolor="#FFDDDD"| 下一扩展消息头类型（Next extension header type）
+|}
+
+;版本（Version）:长度为3位，对于GTPv1来说，这个值始终是“1”。
+;协议类型（PT，全称：Protocol Type）:长度为1位，取值为1表示GTP，0表示GTP'。
+;保留（Reserved）:长度为1位，保留字段（必须为0）。
+;扩展消息头标志位（E，全称：Extension header flag）:长度为1位，标记是否存在一个可选的扩展消息头字段。
+;序列号标志位（S，全称：Sequence number flag）:长度为1位，标记是否存在一个可选的序列号字段。
+; N-PDU号标志位（PN，全称：N-PDU number flag）:长度为1位，标记是否存在一个可选的N-PDU号字段。
+;消息类型（Message Type）:长度为8位，指示GTP消息的类型。关于消息类型的定义，请参考3GPP TS 29.060第7.1节。
+;总长度（Total Length）:长度为16位，指示消息体长度，单位为字节，不包括GTP头前8字节的必选字段。
+;隧道端点标识（TEID，全称：Tunnel endpoint identifier）:长度为32位（4个[[八位元组|八位元组]]），用于区分GTP隧道中的不同连接。
+;序列号（Sequence number）:可选字段，长度为16位。当E、S或PN位中的任意一个取值为1时，这个字段存在。仅当S位为1时，这个字段必须被解析。
+; N-PDU号（N-PDU number）:可选字段，长度为8位。当E、S或PN位中的任意一个取值为1时，这个字段存在。仅当PN位为1时，这个字段必须被解析。
+;下一扩展消息头类型（Next extension header type）:可选字段，长度为8位。当E、S或PN位中的任意一个取值为1时，这个字段存在。仅当E位为1时，这个字段必须被解析。
+
+下一扩展消息头如下：
+
+{| class="wikitable" style="text-align:center"
+|-
+! width="4%"|+
+! colspan="8" width="24%"| Bits 0-7
+! colspan="16" width="24%"| 8-23
+! colspan="8" width="24%"| 24-31
+|-
+! 0
+| colspan="8"| 总长度（Total length）
+| colspan="24"| 内容（Contents）
+|-
+! ...
+| colspan="32"| ...
+|-
+! ...
+| colspan="24"| 内容（Contents）
+| colspan="8"| 下一扩展消息头（Next extension header）
+|}
+
+;长度（Length）:长度为8位。这个字段指出本扩展消息头的长度，包括长度（这个字段本身）、内容和下一扩展消息头字段，以4个[[八位元组|八位元组]]为单位，因此扩展消息头的长度必须是4的倍数。
+;内容（Contents）:扩展消息头内容。
+;下一扩展消息头（Next extension header）:长度为8位。它指出下一扩展消息头的类型，取值为0表示不存在下一个扩展消息头。通过该字段可以实现多个扩展消息头的串联。
+
+====GTP版本2====
+它也被称为“进化版GTP”（evolved-GTP）或“eGTP”。GTPv2-C消息头包含如下的字段：<ref>{{Cite web |url=http://www.3gpp.org/ftp/Specs/html-info/29274.htm |title=3GPP TS 29.274 section 5 |accessdate=2014-10-08 |archive-date=2008-10-11 |archive-url=https://web.archive.org/web/20081011182236/http://www.3gpp.org/ftp/Specs/html-info/29274.htm |dead-url=no }}</ref> 
+
+{| class="wikitable" style="text-align:center"
+|-
+! width="4%"|+
+! colspan="3" width="9%"| Bit 0-2
+! colspan="1" width="3%"| 3
+! colspan="1" width="3%"| 4
+! colspan="3" width="9%"| 5-7
+! colspan="8" width="24%"| 8-15
+! colspan="8" width="24%"| 16-23
+! colspan="8" width="24%"| 24-31
+|-
+! 0
+| colspan="3"| 版本号（Version）
+| colspan="1"| 捎带消息标志位（Piggybacking flag，简称P）
+| colspan="1"| TEID标志位（T）
+| colspan="3"| 剩余（Spare）
+| colspan="8"| 消息类型（Message Type）
+| colspan="16"| 总长度（Total length）
+|-
+! 32
+| colspan="32" bgcolor="#FFDDDD" | TEID（只有在T=1时才出现）
+|-
+! 64（有TEID）/32（无TEID）
+| colspan="24"| 序列号（Sequence number）
+| colspan="8"| 剩余（Spare）
+|}
+
+注意：不存在GTPv2-U协议。在LTE中的GTP-U仍使用GTPv1-U。
+
+;版本号：长度为3位，对于GTPv2来说，这个值始终是“2”。
+;捎带消息标志位（Piggybacking flag）:如果被置为1，则在这条消息后面会有另外一条带有完整消息头的GTP消息。协议里具体规定了每种消息可以携带的消息类型。
+; TEID标志位（TEID flag）:如果被置为1，则TEID字段存在。只有Echo Request和Echo Response消息不携带TEID字段。
+;总长度（Total length）:包括消息头和消息体的消息总长度（除去必选字段所在的前4个八位元组）。
+
+===连接机制===
+除了共同的消息结构之外，GTP协议还有一个共同的机制来验证两个节点之间的连接。这种机制依靠以下两种消息实现：
+* Echo Request
+* Echo Response
+
+每隔60秒，一个网元可以向每个有活跃连接的对端发送一个Echo Request，来确认连接有效。如果对端不回复Echo Response，则它可以被视为宕机，而该活跃连接将被删除。
+
+各种 GTP协议除了上述2个消息之外，没有共通的消息类型。<ref>{{Cite web |url=http://www.3gpp.org/ftp/Specs/html-info/29060.htm |title=3GPP TS 29.060 section 7 |accessdate=2014-10-08 |archive-date=2008-12-09 |archive-url=https://web.archive.org/web/20081209044236/http://www.3gpp.org/ftp/Specs/html-info/29060.htm |dead-url=no }}</ref>也就是说，GTP-C，GTP-U和GTP'基本上是3种独立的协议。
+
+===GTP-C - GTP控制面===
+GTP-C协议是GTP标准的“'''控制'''”部分。当一个签约用户请求一个[[GPRS核心网#PDP上下文|PDP上下文]]，[[GPRS核心网#业务GPRS支撑节点（SGSN）|SGSN]]将发送一个“''创建PDP上下文请求''”（Create PDP Context Request）的消息给[[GPRS核心网#网关GPRS支撑节点（GGSN）|GGSN]]，给出该签约用户的请求的明细。该[[GPRS核心网#网关GPRS支撑节点（GGSN）|GGSN]]将发送一个“''创建PDP上下文响应''”（Create PDP Context Response）消息，这个消息会要么给出被激活的[[GPRS核心网#PDP上下文|PDP上下文]]内容，要么指出一个失败，及该失败的原因。版本1和版本2的GTP-C消息使用UDP端口2123。
+
+在LTE核心网中，'''GTPv2-C'''协议负责在S1、S5/S8等接口上创建、维持和删除隧道。它被用于控制面路径管理（control plane path management）、隧道管理（tunnel management）和移动性管理（mobility management）。它也控制转发位置变更消息、SRNS上下文、并在[[长期演进技术|LTE]]的网间切换中创建转发隧道。
+
+===GTP-U - GTP用户数据隧道===
+GTP-U是一个比较简单的基于[[网际协议|IP]]的隧道协议，它允许在各个端点集之间建立多个隧道。[[UMTS|UMTS]]网络中，每个签约用户拥有至少一个隧道。每一个激活的[[GPRS核心网#PDP上下文|PDP上下文]]拥有至少一个隧道，当隧道多于1个时，多出来的隧道为特定的服务提供特定的端到端[[QoS|QoS]]。
+
+每个隧道由一个GTP-U消息中的TEID（隧道端点标识符，{{lang-en|Tunnel Endpoint Identifier}）标识。TEID应当是一个动态分配的随机数。如果这个随机数能达到[[密码学|密码]]级水平，则可以抵御一定程度的攻击。即使这样，[[3GPP|3GPP]]标准仍然要求所有的GTP流量，包括用户数据，都应当在安全私有网络中被发送，不能直接连接到因特网。GTP-U使用[[用户数据报协议|UDP]]端口2152。
+
+在LTE核心网中，使用'''GTPv1-U'''协议在GTP隧道上跨S1、S5/S8等接口上交换用户数据。UE所收发的[[网际协议|IP]]包被打包在GTPv1-U的包中，并在P-GW和eNodeB之间的各段隧道中传输。LTE网络的X2接口，即eNodeB之间的接口上，用户面协议使用的也是GTPv1-U<ref name="36.424 8.2.0">{{cite web|url=http://www.3gpp.org/ftp/Specs/archive/36_series/36.424/36424-820.zip|title=3GPP TS 36.424 V8.2.0 Evolved Universal Terrestrial Radio Access Network (E-UTRAN); X2 data transport|date=2008-06|accessdate=2016-06-15|pages=6|archive-date=2020-07-20|archive-url=https://web.archive.org/web/20200720143930/https://www.3gpp.org/ftp/Specs/archive/36_series/36.424/36424-820.zip|dead-url=no}}</ref>。
+
+===GTP' - 计费传输===
+[[GTP'|GTP']]协议被用于向CGF（计费网关功能，{{lang-en|Charging Gateway Function}}）传输计费数据。GTP'使用[[传输控制协议|TCP]]/[[用户数据报协议|UDP]]端口3386。
+
+===协议栈===
+{| class="wikitable" cellpadding="4" cellspacing="0" style="float: right; margin-left: 1em; margin-bottom: 1em; background: #f9f9f9; border: 1px #aaa solid; border-collapse: collapse; font-size: 140%; width:4em; font-family:serif"
+|- align="center"
+| 应用层协议
+|- align="center"
+| [[网际协议|IP]]（用户）
+|- align="center"
+| GTP
+|- align="center"
+| [[用户数据报协议|UDP]]
+|- align="center"
+| [[网际协议|IP]]
+|- align="center" style="font-size: 70%"
+| 二层（例如, WAN or以太网）
+|- style="font-size: 65%"
+| <br>GTP-U协议栈
+|}
+GTP协议需要被承载在UDP协议上。早期版本GTPv0也允许TCP传输。
+
+GTPv0是最早的GTP协议，控制面和用户面使用相同的端口。
+
+GTPv1于1999年在3GPP TS 29060版本3.3.0中被标准化。它实际上是两个协议，一个用于控制面（被称为“GTP-C”），而另一个则用于用户数据隧道（被称为“GTP-U”）。
+
+GTP-U在[[UMTS|UMTS]]网络中也被用于从RNC往[[GPRS核心网#业务GPRS支撑节点（SGSN）|SGSN]]（即Iu-PS接口上）传送用户数据。然而，此时控制面使用的是[[无线接入网应用部分|RANAP]]协议而不是GTP-C。
+
+==GTP的历史版本==
+GTP的原始版本（版本0）与3G/LTE核心网中使用中的版本1和版本2有显著的不同：
+* 隧道标识符（TEID）是非随机的；
+* 除了IP协议，也支持传输[[X.25|X.25]]协议的数据；
+* 所有的功能都使用固定的3386端口（不像在GTPv1中仅仅用于计费）；
+* 除了[[用户数据报协议|UDP]]以外，也可以使用[[传输控制协议|TCP]]协议作为传输层；
+* 与签约用户相关的字段，例如[[QoS|QoS]]，相对较少。
+
+版本0中的非随机TEID在有安全性问题：当一个攻击者对任一漫游合作伙伴网络有访问权限时，或可以找到其它一些方式来远程地向GPRS骨干网发送消息包的时候，就可以干扰网络运行。版本0现在几乎已完全被版本1所替代。即使这样，新版本的标准仍声明，GSN必须支持更旧的版本。但幸运的是，可以用简单的IP访问列表来禁止v0使用的3386端口，从而封锁版本0。
+
+==GTP标准化==
+GTP原本是在[[ETSI|ETSI]]（{{lang|en|European Telecommunications Standards Institute}}）的GSM标准09.60中被标准化的。<ref>{{Cite web|url=http://standards.globalspec.com/std/904008/etsi-3gpp-ts-09-60|title=Standard: ETSI - 3GPP TS 09.60|date=2002-12-11|accessdate=2016-06-15|archive-date=2016-08-13|archive-url=https://web.archive.org/web/20160813220752/http://standards.globalspec.com/std/904008/etsi-3gpp-ts-09-60|dead-url=no}}</ref>随着[[UMTS|UMTS]]标准的创建，它被移动到[[3GPP|3GPP]]。到2005年，3GPP将其做为3GPP标准29.060来维护。GTP'使用相同的消息格式，但是它的使用独立的标准32.295，并且定义了它所传输的计费数据的标准化格式。
+
+TS 29.060的后续版本取消了对GTPv1和v0互联的支持，因此如果网络中有[[GPRS核心网#GPRS支撑节点(GSN)|GSN]]只支持v0的话，使用v1协议的其他网元也不会降到v0去配合。
+
+GTPv2（用于EPC，即LTE核心网）在2008年进入起草阶段，并在同年12月发布。使用GTPv1的“版本不支持”机制，GTPv2支持到GTPv1的降级运行，但不提供到GTPv0的降级运行。
+
+==参见==
+* [[代理移动IPv6|代理移动IPv6]]（Proxy Mobile IPv6）
+* [[移动IP|移动IP]]（Mobile IP）
+
+==参考资料==
+{{reflist}}
+
+==外部链接==
+* [http://www.3gpp.org 3GPP官方网站]{{Wayback|url=http://www.3gpp.org/ |date=20040514205450 }}
+* [http://sourceforge.net/projects/nwgtpv2 GPRS隧道协议版本2（GTPv2）或进化版GTP（eGTP）的免费和开源的实现] {{Wayback|url=http://sourceforge.net/projects/nwgtpv2 |date=20190422103534 }}
+* [http://www.queryhome.com/tag/gtp GTP问答] {{Wayback|url=http://www.queryhome.com/tag/gtp |date=20150509212057 }}
+[[Category:网络协议|Category:网络协议]]
+[[Category:应用层协议|Category:应用层协议]]

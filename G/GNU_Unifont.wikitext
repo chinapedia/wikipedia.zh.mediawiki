@@ -1,0 +1,102 @@
+{{NoteTA|G1=IT|G2=FL}}
+{{Infobox font
+| name = GNU Unifont
+| familyname = 
+| image = [[File:GNUUnifontDemonstration.png|250px]]
+| style = [[Unicode|Unicode]]、[[等宽字体|等寬]]、[[位图|點陣]]
+| classifications = 
+| creator = Roman Czyborra, Paul Hardy
+| commissioned_by = 
+| foundry = 
+| foundries = 
+| license = [[GNU通用公共许可证|GNU通用公共许可证]]
+| creationdate = 1998
+| releasedate = {{Release date and age|2021|02|13}}
+| trademark = 
+| based_on =
+| aka = 
+| variations = 
+| sample = 
+| shown_here =
+| sample_fullimage = Unifont-6.3.20131006.png
+}}
+{{Portal|自由軟體}}
+'''GNU Unifont'''是一個由Roman Czyborra所製作的，自由且免費的點陣字型，涵蓋了[[Unicode|Unicode]]中的[[基本多文種平面|基本多文種平面]]，使用了中型的點陣字型格式。见于大多數的自由[[操作系统|操作系统]]及一些視窗系統中，如[[Linux|Linux]]、[[XFree86|XFree86]]、[[X.Org_Server|X.Org Server]]，及一些嵌入式韌體，如{{link-en|RockBox|RockBox}}。此字型以[[GNU通用公共许可证|GNU通用公共许可证]]第二版或更新釋出，但加入了一個字型嵌入的例外條款（在文件中嵌入字型並不構成違反授權條款的條件）。
+
+它在2013年10月成為了GNU軟體包。
+
+== 狀態 ==
+[[Unicode|Unicode]]的[[基本多文種平面|基本多文種平面]]涵蓋了2<sup>16</sup> = 65,536 個碼位，其中2048个是保留給特殊用途的代理對，6400个保留給私人用途，剩餘大約57,000個碼位可供分配。其中多數位置都已分配字形，而一些特殊的碼位没有。
+
+{{As of|2013|10}}，GNU Unifont已經完整涵蓋了Unicode 6.3版定義的基本多文種平面。
+
+平面中，[[中日韓統一表意文字|中日韓統一表意文字]]大約有20,000個，[[字形|字形]]是從[[文泉驿|文泉驿]]的Unibit字形複製過來的（獲得授權）<ref name="unifont-unibit">{{citation|url=http://unifoundry.com/unifont.html|title=Wen Quan Yi: Spring of Letters|accessdate=2014-07-09|archive-date=2013-11-12|archive-url=https://web.archive.org/web/20131112112358/http://unifoundry.com/unifont.html|dead-url=no}}</ref>。
+
+== .hex字型格式 ==
+GNU Unifont 的 .hex 格式定義了它的[[字形|字形]]大小，寬度8或16像素，高度為16像素。多數西方字母的寬度定義為8像素，而其他語言的字母（特別是中日韓文字）通常是16像素。 
+
+unifont.hex檔案的每一個字形都包含一行。每行都包含四位數的Unicode[[十六进制|十六進位]]碼位，一個冒號及點陣字串。一個寬度為8像素的字母的位元串有32個十六進位的位數，而寬度為16像素的字母的位元串有64個十六進位的位數。
+
+一個在位元字串中'1'的位元對應到一個'開'的像素。像素位元由上到下，由左到右儲存。
+
+然後字型會轉換成BDF格式的檔案以在[[X_Window系統|X Window系統]]上使用。
+
+=== 範例 ===
+[[File:GNU_Unifont_Chinese_language_(Taiwan)_Sample.PNG|thumb]]与[[日语|日语]]範例]]
+這是包含了一個ASCII大寫'A'字形的範例。  
+<pre><nowiki>
+0041:0000000018242442427E424242420000
+</nowiki></pre>
+第一個數字是十六進位的Unicode碼位，範圍從0000到FFFF。十六進位的0041是[[十进制|十進位]]的65，也就是字母'A'的碼位。冒號分隔了點陣字的碼位。在這個範例中，字形是8像素寬，所以位元串有32個十六進位的位數。 
+
+位元串以8個零開始，所以前4行是空的（每8位元是2個十六进制的數字，而寬度為8位元的字形則為每行8個位數）。位元串也以4個零結尾，所以最後兩行也是空的。因為如此，預設的字形會比基線低2行，大寫的字母高於基線10行。這是GNU Unifont的拉丁字母範例。
+
+Perl的hexdraw指令稿按照上述的一行字形定義產生以下的輸出： 
+{{Col-begin}}
+{{Col-2}}
+ 0041:
+        --------
+        --------
+        --------
+        --------
+        ---##---
+        --#--#--
+        --#--#--
+        -#----#-
+        -#----#-
+        -######-
+        -#----#-
+        -#----#-
+        -#----#-
+        -#----#-
+        --------
+        --------
+{{Col-end}}
+
+這可以在[[文本编辑器|文本编辑器]]中編輯，再使用同樣的工具轉換回十六進位的字串。其目標是創造一個中間格式以方便加入新字形。
+
+== 向量 ==
+Luis Alejandro Gonzalez Miranda寫了指令稿以進行向量化及使用[[FontForge|FontForge]]轉換BDF格式（unifont.bdf）至[[TrueType|TrueType]]格式<ref name="unifont-ttf">{{citation|url=http://www.lgm.cl/trabajos/unifont/index.en.html|title=GNU Unifont in TrueType format|accessdate=2014-07-09|archive-date=2009-03-07|archive-url=https://web.archive.org/web/20090307013921/http://www.lgm.cl/trabajos/unifont/index.en.html|dead-url=no}}</ref>。Paul Hardy調整了這些指令稿以處理最新的TrueType版本的組合字母，像是重音符號等<ref>{{Citation |url=http://unifoundry.com/unifont.html |title=GNU Unifont Glyphs |accessdate=2014-07-09 |archive-date=2013-11-12 |archive-url=https://web.archive.org/web/20131112112358/http://unifoundry.com/unifont.html |dead-url=no }}</ref>。
+
+== 歷史 ==
+Roman Czyborra在1998年創造了Unifont格式<ref>{{Cite web |url=http://czyborra.com/unifont/ |title=Roman Czyborra's GNU Unifont page |accessdate=2014-07-09 |archive-date=2011-08-27 |archive-url=https://web.archive.org/web/20110827194122/http://czyborra.com/unifont/ |dead-url=no }}</ref>，更早期的可以追溯至1994年。
+
+2008年，Luis Alejandro González Miranda寫了把這個字型轉換成TrueType字型的程式。Paul Hardy后来修改它以支援在新版TrueType中的組合字母。
+
+最後，[[理查德·斯托曼|理查德·斯托曼]]在2013年10月接受Unifont成為一個GNU軟體包。Paul Hardy是它的維護者。
+
+== 參考資料 ==
+{{Reflist}}
+{{refbegin}}
+* Unicode協會： ''The Unicode 5.0 Standard''. 5th, Addison Wesley 2007; ISBN 0-321-48091-0.
+{{refend}}
+
+== 外部連結 ==
+{{Commons category|GNU Unifont}}
+*[https://ftp.gnu.org/gnu/unifont/ GNU專案檔案庫] {{Wayback|url=https://ftp.gnu.org/gnu/unifont/ |date=20210128123537 }}
+*[http://unifoundry.com/unifont.html 在Unifoundry.com上的GNU Unifont頁面]{{Wayback|url=http://unifoundry.com/unifont.html |date=20131112112358 }}
+
+{{Free and open-source typography}}
+
+[[Category:GNU计划软件|Category:GNU计划软件]]
+[[Category:開源字型|Category:開源字型]]

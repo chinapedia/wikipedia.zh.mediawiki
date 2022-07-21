@@ -1,0 +1,109 @@
+{{unreferenced|time=2013-11-15T06:45:41+00:00}}
+{{NoteTA
+|G1 = IT
+}}
+'''Trait'''在[[面向对象程序设计|面向对象程序设计]]中，是一个不可实例化（uninstantiable）的方法与类型的集合，为一个对象或算法提供了策略（policy）或实现自身接口的细节功能。trait为类提供了一套方法，同时也意味着类必须实现这么一套方法。
+
+在[[面向对象程序设计|面向对象程序设计]]中，[[协议_(面向对象编程)|protocol]]、interface、trait、[[mixin|mixin]]具有类似的涵义。protocol/interface定义了[[函数原型|函数原型]]；trait还定义了方法的完全实现；mixin除了方法的完整实现，还可以通过成员变量保存了状态信息，而trait通常不会如此。理论上，traits支持一批符合（composition）操作：
+*合并不相交的traints（symmetric sum）产生一个新的traits
+*覆盖（asymmetric sum）:对一个已有的trait增加方法，可以覆盖已有的方法 
+*别名（alias）: 对已有方法增加别名，从而产生一个新的trait
+*排除（exclusion）：从已有trait中删除方法从而产生一个新的trait 
+*嵌套的trait自动平面化。例如 给定trait S = A + X, 其中 X = B + C, 那么trait T = A + B + C 等价于 S
+
+==C++编程中的traits==
+C++标准模板库中大量使用了traits。将因为模板形参（包括类型形参、非类型形参）不同而导致的不同抽取到新的模板（即traits）中去；然后通过traits的模板特化来实现针对具体情况的优化实现。Traits作为模板类，既声明了统一的接口（包括类型、枚举、函数方法等），又可以通过模板特化，针对不同数据类型或其他模板参数，为类、函数或者通用算法在因为使用的数据类型不同而导致处理逻辑不同时，提供了区分不同类型的具体细节，从而把这部分用Traits实现的功能与其它共同的功能区分开来。例如，容器的元素的不同数据类型，或者iostream是使用char还是wchar_t。一个traits包括了enum、typedef、模板偏特化（template partial specialization）。其中，enum定义了各种类的标识的统一表示；typedef定义了各个类的各自不同的类型定义，这对于使用模板元编程（template meta-programming）的灵活性非常重要；模板偏特化用于实现各个类的不同功能。
+===示例===
+假设有一个容器模板类，其包含元素的值类型可以是内生（built-in）的数据类型，也可以是自定义的类。因此，有的值类型支持move操作，有的值类型不支持move操作。该容器模板类具有统一的界面，但对不同的值类型实现了不同的语义功能。为此：
+<syntaxhighlight lang="cpp">
+#include <iostream>
+
+struct no_move{};//两个marker类型
+struct has_move{};
+
+struct myValueType{
+  public: void move(){std::cout<<"move a myValueType obj."<<std::endl;}
+};
+
+template <typename T> struct traits{
+  typedef no_move move_method; //对于traits模板类，默认为无move方法
+  void move(T* p){}//默认为无move方法
+};
+
+template <> struct traits<myValueType>{
+  typedef has_move move_method;//对于myValueType，traits模板偏特化，定义了有move方法
+  void move(myValueType* p){p->move();} //模板特化，有move方法
+};
+
+template <typename T> struct Container{
+  void move(T* p){traits<T>().move(p);};
+};
+
+int main()
+{
+  int i=101;
+  int *p1=&i;
+  myValueType v1;
+  myValueType *pv=&v1;
+  Container<int> c1;
+  Container<myValueType> c2;
+  c1.move(p1);
+  c2.move(pv);
+}
+</syntaxhighlight>
+==C#的支持==
+从C# 8.0开始，支持“缺省接口方法”（ default interface methods）。
+
+<syntaxhighlight lang="csharp">
+using System;
+
+namespace CSharp8NewFeatures
+{
+    interface ILogger
+    {
+        // Traditional interface methods
+        void Log(string message);
+        void LogError(Exception exception);
+
+        // Default interface method
+        void LogWarning(string message)
+        {
+            Console.WriteLine(message);
+        }        
+    }
+
+    class Logger : ILogger
+    {
+        public void Log(string message)
+        {
+            Console.WriteLine(message);
+        }
+
+        public void LogError(Exception exception)
+        {
+            Console.WriteLine(exception.ToString());
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            ILogger logger = new Logger();
+
+            logger.LogWarning("Some warning message");
+        }
+    }
+}
+</syntaxhighlight>
+==Haskell==
+Haskell中，traits称作[[类型类|类型类]]（Type classes）.
+==Java==
+从Java 8开始，支持缺省方法（default method）
+==JavaScript==
+可以通过functions与delegations实现，或者通过支持traits的库。
+==Python==
+通过第三方库py3traits，或者高阶mixin类。
+
+[[Category:面向对象的程序设计|Category:面向对象的程序设计]]
+[[Category:C++|Category:C++]]

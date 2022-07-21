@@ -1,0 +1,206 @@
+<noinclude>{{Documentation subpage}}</noinclude>
+{{High-use|5752}}
+<!-- 在本行下編輯模板說明 -->
+{{Lua|模块:Routemap}}
+從俄語維基百科移植的模板，原製作者為[[:ru:User:KPu3uC B Poccuu]]。
+== 模板介紹 ==
+[[Wikipedia:铁路系统标示]]從前使用{{tl|BS}}、{{tl|BS2}}、{{tl|BS-startCollapsible}}等大量模板堆疊構成路線圖，為了節約建立再多的模板而使用一個Lua模塊（[[module:routemap]]）來取代以上的眾多模板，其中最大的好處是提升計算速度和減少讀取時間，而且水平圖標個數和圖標重疊層數理論上可以無限增加而不須再建立新模板或改寫現有模板。
+
+== 使用方法 ==
+{|class="wikitable" 
+!代碼!!實際效果
+|-
+!colspan=2|基本使用例
+|-
+|<pre>{{Routemap
+|title=高鐵接駁線路圖|
+BUS\KBHFa~~始發站
+\BHF~~1.0~~中途站~~待2020年擴建成交通樞紐
+LDER\KBHFe~~2.5~~終點站~~ ~~換乘高鐵
+}}</pre>
+|valign=top|{{Routemap
+|title=高鐵接駁線路圖|
+BUS\KBHFa~~始發站
+\BHF~~1.0~~中途站~~待2020年擴建成交通樞紐
+LDER\KBHFe~~2.5~~終點站~~ ~~換乘高鐵
+}}
+|-
+!colspan=2|圖標重疊，可無限重疊
+|-
+|<pre>{{Routemap|
+BHF!~uSTRq!~ACC~~ACC重疊於uSTRq重疊於BHF之上
+}}</pre>
+|valign=top|{{Routemap|
+STR!~uSTRq!~ACC~~ACC重疊於uSTRq重疊於STR之上
+}}
+|-
+!colspan=2|摺疊部分線路圖
+|-
+|<pre>{{Routemap
+|collapsible=0|
+uKBHFa~~!~width{{=}}200px
+-startCollapsible-
+LUECKE~~開始摺疊
+BHF~~被摺疊部分
+-endCollapsible-
+uKBHFe}}</pre>
+|valign=top|{{Routemap
+|collapsible=0|
+uKBHFa~~!~width{{=}}200px
+-startCollapsible-
+LSTR~~開始摺疊
+BHF~~被摺疊部分
+-endCollapsible-
+uKBHFe}}
+|-
+!colspan=2|開始摺疊行被取代
+|-
+|<pre>{{Routemap
+|collapsible=0|
+uKBHFa~~!~width{{=}}200px
+-startCollapsible-collapsed-replace
+LSTR~~開始摺疊
+STR~~取代開始摺疊
+BHF~~被摺疊部分
+-endCollapsible-
+uKBHFe}}</pre>
+|valign=top|{{Routemap
+|collapsible=0|
+uKBHFa~~!~width{{=}}200px
+-startCollapsible-collapsed-replace
+LSTR~~開始摺疊
+STR~~取代開始摺疊
+BHF~~被摺疊部分
+-endCollapsible-
+uKBHFe}}
+|-
+!colspan=2|其他功能示範
+|-
+|<pre>{{Routemap|navbar=模板名
+|title=改標題顏色、加模板鏈接、自動摺疊
+|collapse=collapsed
+|style=float:none;margin:auto
+|title color=white
+|title bg color=#974
+|nolegend=1|1=
+BUS!@公共汽車~~BUS圖標鏈接到[[公共汽車]]條目
+utBHF~~圖標欄背景染成橙色!~bg=orange
+|footnote=線路圖置中、沒有圖例鏈接
+}}</pre>
+|valign=top|{{Routemap|navbar=模板名
+|title=改標題顏色、加模板鏈接、自動摺疊
+|collapse=collapsed
+|style=float:none;margin:auto
+|title color=white
+|title bg color=#974
+|nolegend=1|1=
+BUS!@公共汽車~~BUS圖標鏈接到[[公共汽車]]條目
+utBHF~~圖標欄背景染成橙色!~bg=orange
+|footnote=線路圖置中、沒有圖例鏈接
+}}
+|}
+* 注意由於圖標文字欄闊度和圖標背景染色使用到等號=來接駁'''模塊'''（module）參數<code>!~bg</code>和輸入值，為免被誤解為'''模板'''（template）參數而需要使用<code>1=</code>特定線路圖的模板參數名、或者用<code><nowiki>{{=}}</nowiki></code>接駁模塊參數和輸入值。
+
+== 參數 ==
+{{templatedataheader}}
+<templatedata>{
+        "description": "Routemap模板參數.",
+        "params": {
+                "style": {
+                        "label": "CSS風格定義",
+                        "type": "string",
+                        "required": false,
+                        "description": "額外的CSS定義改變表格的風格如排位和顏色等，如須表格置中請在此輸入float:none;margin:auto",
+                        "aliases": [""]
+                },
+                "collapsible": {
+                        "label": "是否允許模板摺疊",
+                        "type": "string",
+                        "required": false,
+                        "description": "預設允許摺疊，如不想顯示摺疊按鈕可以輸入no或0隱藏",
+                        "aliases": []
+                },
+                "collapse": {
+                        "label": "模板摺疊狀態",
+                        "type": "string",
+                        "required": false,
+                        "description": "模板摺疊狀態，預設為不摺疊，如須條目讀取時自動摺疊可填寫本參數collapsed",
+                        "aliases": []
+                },
+                "float": {
+                        "label": "表格浮動",
+                        "type": "string",
+                        "required": false,
+                        "default": "right",
+                        "description": "表格浮動，與大部分info模板一樣預設右邊，可輸入left來改為左邊，如須置中請使用style參數",
+                        "aliases": [""]
+                },
+                "title": {
+                        "label": "標題文字",
+                        "type": "string",
+                        "required": false,
+                        "default": "線路圖",
+                        "description": "表格頂的標題文字",
+                        "aliases": [""]
+                },
+                "title color": {
+                        "label": "標題文字顏色",
+                        "type": "string",
+                        "required": false,
+                        "default": "#000000",
+                        "description": "標題文字顏色，預設為黑色",
+                        "aliases": [""]
+                },
+                "title bg color": {
+                        "label": "標題背景顏色",
+                        "type": "string",
+                        "required": false,
+                        "default": "#FFFFFF",
+                        "description": "標題背景顏色，預設為白色",
+                        "aliases": ["title color2"]
+                },
+                "navbar": {
+                        "label": "模板鏈接工具",
+                        "type": "string",
+                        "required": false,
+                        "default": "",
+                        "description": "如果線路圖是建立在一個獨立的模板中，可以在此參數輸入模板名，在線路圖標題的左邊顯示模板鏈接工具",
+                        "aliases": []
+                },
+                "legend": {
+                        "label": "圖例鏈接",
+                        "type": "string/wiki-page-name",
+                        "required": false,
+                        "default": "维基百科:铁路系统标示图例",
+                        "description": "可以輸入其他其他圖例鏈接，或使用輸入值track來更改成路軌及月台配置圖例",
+                        "aliases": [""]
+                },
+                "nolegend": {
+                        "label": "隱藏圖例",
+                        "type": "string",
+                        "required": false,
+                        "default": "",
+                        "description": "輸入任何數值即可令線路圖不顯示圖例鏈接",
+                        "aliases": [""]
+                },
+                "1": {
+                        "label": "線路圖構建區",
+                        "description": "由Lua模塊特定標記來輸入圖標代號和文字描述逐行構建線路圖",
+                        "required": true,
+                        "type": "string"
+                },
+                "footnote": {
+                        "label": "腳註",
+                        "type": "string",
+                        "required": false,
+                        "description": "顯示在表格底部右邊的腳註文字",
+                        "aliases": [""]
+                }
+        }
+}</templatedata>
+
+
+<includeonly>
+<!-- 本行下加入模板的分類 -->
+[[category:鐵路系統標示|L]]
+</includeonly>

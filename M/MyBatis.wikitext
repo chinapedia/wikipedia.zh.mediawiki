@@ -1,0 +1,174 @@
+{{noteTA
+|G1=IT
+}}
+{{Infobox Software
+| name                   = MyBatis 
+| logo                   = 
+| screenshot             = 
+| caption                = 
+| developer              = MyBatis团队
+| status                 = 活跃
+| latest release version = 3.4.6
+| latest release date    = {{Start date and age|2018|03|11}}
+| latest preview version = 
+| latest preview date    = 
+| operating system       = [[跨平台|跨平台]]
+| programming language   = [[Java|Java]]
+| genre                  = [[持久化框架|持久化框架]]
+| license                = [[Apache许可证|Apache许可证]] 2.0
+| website                = http://www.mybatis.org/mybatis-3/zh/
+}}
+
+'''MyBatis'''是一个[[Java|Java]][[持久化框架|持久化框架]]，它通过[[XML|XML]]描述符或注解把[[对象_(计算机科学)|对象]]与[[存储过程|存储过程]]或[[SQL|SQL]]语句关联起来，映射成資料庫內對應的紀錄。{{R|:0|p=226}}
+
+MyBatis是在[[Apache许可证|Apache许可证]] 2.0下分发的[[自由软件|自由软件]]，是[[iBATIS|iBATIS]] 3.0的[[复刻_(软件工程)|分支版本]]，其维护团队也包含[[iBATIS|iBATIS]]的初创成员。<ref>{{Cite web |title=iBATIS Home |url=https://ibatis.apache.org/ |accessdate=2020-11-11 |work=ibatis.apache.org |archive-date=2020-07-11 |archive-url=https://web.archive.org/web/20200711001947/http://ibatis.apache.org/ |dead-url=no }}</ref>
+
+
+
+==功能概况==
+
+与其他[[对象关系映射|对象关系映射]]框架不同，MyBatis没有将[[Java|Java]][[对象_(计算机科学)|对象]]与[[数据库|数据库]]表关联起来，而是将Java方法与[[SQL|SQL]]语句关联。MyBatis允许用户充分利用[[数据库|数据库]]的各种功能，例如存储过程、[[视图|视图]]、各种复杂的查询以及某数据库的专有特性。如果要对遗留数据库、不规范的数据库进行操作，或者要完全控制SQL的执行，MyBatis是一个不错的选择。
+
+与[[JDBC|JDBC]]相比，MyBatis简化了相关代码：SQL语句在一行代码中就能执行。MyBatis提供了一个映射引擎，声明式的把SQL语句执行结果与对象树映射起来。通过使用一种内建的类XML表达式语言，或者使用[[Apache_Velocity|Apache Velocity]]集成的插件，SQL语句可以被动态的生成。
+
+MyBatis与[[Spring_Framework|Spring Framework]]和{{tsl|en|Google Guice}}集成，这使开发者免于依赖性问题。
+
+MyBatis支持声明式数据缓存（declarative data caching）。当一条SQL语句被标记为“可缓存”后，首次执行它时从数据库取得的所有数据会被存储在一段[[高速缓存|高速缓存]]中，今后执行这条语句时就会从高速缓存中读取结果，而不是再次命中数据库。MyBatis提供了基于 Java HashMap 的默认缓存实现，以及用于与{{tsl|en|OSCache}}、{{tsl|en|Ehcache}}、{{tsl|en|Hazelcast}}和[[Memcached|Memcached]]连接的默认连接器。MyBatis还提供[[API|API]]供其他缓存实现使用。
+
+==用法==
+[[SQL|SQL]]语句存储在[[XML|XML]]文件或[[Java_注解|Java 注解]]中。一个MyBatis映射的示例（其中用到了[[接口_(Java)|Java接口]]和MyBatis[[Java_注解|注解]]）：
+
+<syntaxhighlight lang="java">
+package org.mybatis.example;
+
+public interface BlogMapper {
+    @Select("select * from Blog where id = #{id}")
+    Blog selectBlog(int id);
+}
+</syntaxhighlight>
+
+执行的示例：
+
+<syntaxhighlight lang="java">
+BlogMapper mapper = session.getMapper(BlogMapper.class);
+Blog blog = mapper.selectBlog(101);
+</syntaxhighlight>
+
+[[SQL|SQL]]语句和映射也可以外化到一个XML文件中：
+
+<syntaxhighlight lang="xml">
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.mybatis.example.BlogMapper">
+    <select id="selectBlog" parameterType="int" resultType="Blog">
+        select * from Blog where id = #{id}
+    </select>
+</mapper>
+</syntaxhighlight>
+
+也可以使用MyBatis API执行语句：
+
+<syntaxhighlight lang="java">
+Blog blog = session.selectOne("org.mybatis.example.BlogMapper.selectBlog", 101);
+</syntaxhighlight>
+
+详细信息可以参考MyBatis网站所提供的用户手册。参见外部链接。
+
+==与Spring集成==
+MyBatis与[[Spring_Framework|Spring Framework]]集成。Spring Framework允许MyBatis参与Spring事务，建立了MyBatis映射器和会话，并把他们注入到其他[[JavaBeans|bean]]中。
+
+如下所示是一个基本的XML配置示例：建立了映射器，并注入到“BlogService”[[JavaBeans|bean]]中。
+
+<syntaxhighlight lang="xml">
+<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <property name="dataSource" ref="dataSource" />
+</bean>
+
+<bean id="blogMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+    <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    <property name="mapperInterface" value="org.mybatis.example.BlogMapper" />
+</bean>
+
+<bean id="blogService" class="org.mybatis.example.BlogServiceImpl">
+    <property name="blogMapper" ref="blogMapper" />
+</bean>
+</syntaxhighlight>
+
+现在调用MyBatis只需要调用一个[[JavaBeans|bean]]:
+
+<syntaxhighlight lang="java">
+public class BlogServiceImpl implements BlogService {
+
+    private BlogMapper blogMapper;
+
+    public void setBlogMapper(BlogMapper blogMapper) {
+        this.blogMapper = blogMapper;
+    }
+
+    public void doSomethingWithABlog(int blogId) {
+        Blog blog = blogMapper.selectBlog(blogId);
+        ...
+    }
+} 
+</syntaxhighlight>
+
+==Velocity语言==
+Velocity语言[[驱动程序|驱动程序]]允许用户使用[[Apache_Velocity|Apache Velocity]]来快速生成动态SQL查询。
+
+<syntaxhighlight lang="xml">
+<select id="findPerson" lang="velocity">
+  #set( $pattern = $_parameter.name + '%' )
+  SELECT *
+  FROM person
+  WHERE name LIKE @{pattern, jdbcType=VARCHAR}
+</select>
+</syntaxhighlight>
+
+==MyBatis生成器==
+MyBatis提供了代码生成器。MyBatis生成器（MyBatis Generator）能对数据库表内省，生成执行的{{tsl|en|Create, read, update and delete|增删改查}}（CRUD）时所需的MyBatis代码。有相关的[[Eclipse|Eclipse]]插件可供使用。
+
+==MyBatis Migrations==
+MyBatis Migrations{{notetag|可译作“MyBatis数据库迁移管理工具”。}}是一个[[Java|Java]][[控制台应用程序|控制台应用程序]]，它通过管理[[数据定义语言|数据定义语言]]（DDL）文件来跟踪{{tsl|en|Database schema|数据库模式}}的变更。{{notetag|即{{tsl|en|Schema migration|模式迁移}}}}
+
+Migrations可以查询当前数据库的状态，应用或恢复对{{tsl|en|Database schema|数据库模式}}的变更。它也有助于发现和解决由多个开发人员并行修改数据库模式的情况。
+
+==历史==
+
+MyBatis项目继承自[[iBATIS|iBATIS]] 3.0，其维护团队也包含[[iBATIS|iBATIS]]的初创成员。
+
+2010年5月19日项目创建。当时Apache [[iBATIS|iBATIS]] 3.0发布，其开发团队宣布会在新的名字、新的站点中继续开发<ref>{{cite web|url=http://mail-archives.apache.org/mod_mbox/ibatis-user-java/201005.mbox/%3CAANLkTimXoLiHwI-3kbW6It7mH0771xJP4RqT609VKCXC@mail.gmail.com%3E|title=iBATIS Project Team Moving to Google Code|accessdate=2014-04-08|archive-date=2016-03-04|archive-url=https://web.archive.org/web/20160304113639/http://mail-archives.apache.org/mod_mbox/ibatis-user-java/201005.mbox/%3CAANLkTimXoLiHwI-3kbW6It7mH0771xJP4RqT609VKCXC@mail.gmail.com%3E|dead-url=no}}</ref>。
+
+2013年11月10日，项目迁移到了[[GitHub|GitHub]]。<ref>{{cite web|url=http://blog.mybatis.org/2013/11/bye-google-code-welcome-github.html|title=Bye Google Code welcome Github|accessdate=2014-04-08|archive-date=2013-11-10|archive-url=https://web.archive.org/web/20131110093554/http://blog.mybatis.org/2013/11/bye-google-code-welcome-github.html|dead-url=no}}</ref>
+
+==参见==
+*[[Hibernate|Hibernate]]
+*[[iBATIS|iBATIS]]
+*[[JDBC|JDBC]]
+*[[Java持久化API|Java持久化API]]（JPA）
+*{{tsl|en|EclipseLink}}
+*{{tsl|en|Ebean}}
+*[[面向Java对象查询|面向Java对象查询]]（jOOQ）
+*{{tsl|en|Apache Cayenne}}
+*[[pureQuery|pureQuery]]
+*{{tsl|en|NHydrate}}
+*[http://hydrate.sourceforge.net/ Hydrate]{{Wayback|url=http://hydrate.sourceforge.net/ |date=20190123020736 }}
+*{{tsl|en|OpenJPA}}
+*[[Spring_Framework|Spring Framework]]
+*{{tsl|en|Google Guice}}
+*[https://web.archive.org/web/20160111210342/http://orbroker.org/ O/R Broker]
+*[https://github.com/braisdom/ObjectiveSql ObjectiveSql] {{Wayback|url=https://github.com/braisdom/ObjectiveSql |date=20201229135311 }}
+
+==注脚==
+{{notefoot}}
+
+==参考文献==
+{{Reflist|refs=
+<ref name=":0">{{cite book|author=周冠亞、黃文毅|title=Spring 5企業級開發實戰|publisher=清華大學出版社|date=2019|isbn=9787302531029}}</ref>
+}}
+
+==外部链接==
+*{{Official website|http://www.mybatis.org/mybatis-3/zh/}}
+
+[[Category:对象关系映射|Category:对象关系映射]]
+[[Category:持久化框架|Category:持久化框架]]

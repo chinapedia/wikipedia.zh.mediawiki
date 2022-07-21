@@ -1,0 +1,38 @@
+'''音樂人聲分離'''除了可以運用在普羅大眾的[[卡拉OK|卡拉OK]]系統，對於學術方面也有相當重要的價值。將[[人聲|人聲]]獨立出來，可以做為歌詞辨識、歌手辨識、音樂情緒辨識等相關研究的基礎。
+目前市面上的消除人聲軟體仍然無法達到完全去除人聲。
+音樂人聲分離主要有兩個步驟:
+# 人聲偵測
+# 人聲分離
+
+== 人聲偵測原理 ==
+在確實進行[[音樂|音樂]]與[[人聲|人聲]]分離之前，必須先找出音樂中具有人聲的片段。
+就單聲道的音樂來說，一個聲道只具有配樂，此處將配樂資訊假定為{{Smallmath|f=  m_t }}，而另一個聲道混合了人聲與配樂，將人聲設為{{Smallmath|f=  s_t }}而配樂設為{{Smallmath|f=  m^\prime _t }}，另一聲道為{{Smallmath|f=  c=m^\prime_t+ s_t }}。由於m與{{Smallmath|f=  m^\prime_t }}通常極為相似，利用最小均方演算法(least mean square algorithm)，將聲音從{{Smallmath|f=  c=m^\prime_t+ s_t }}中分離出來，此處將分離出的人聲定為{{Smallmath|f=  s^\prime_t }}。假設{{Smallmath|f=  m^\prime_t= a_t + m_{t+bt} }}<br />
+解下列方程式:<br />
+<math> min_{ a_t , b_t } E \left\{   \mid m^\prime_t - a_t * m_{t+bt} \mid ^2 \right\} = min_{ a_t, b_t } E \left\{   \mid s_t + m^\prime_t - a_t * m_{t+bt} \mid ^2 \right\}</math><br />
+{{Smallmath|f=  where -B \leqslant b_t \leqslant B }}
+
+除此之外，亦可以將歌曲切割成許多重疊的小片段，對每個小片段抽取音樂特徵，此處只需要關注梅爾倒頻譜(MFCC)。梅爾倒頻譜廣泛被應用在語音辨識領域之中，由於梅爾倒頻譜的頻帶分析是根據人耳聽覺特性設計。因為人耳對頻率的分辨是由頻率的比值決定，不同於倒頻譜對訊號在頻譜上的值取對數，梅爾倒頻譜是對訊號的能量取對數，因此比倒頻譜更接近人耳對聲音的分析特性。
+
+接著，利用偵測的結果，可以利用機器學習，如Support Vector Machine，訓練出一個能夠預測出某一個音樂片段是否包含人聲的模型。是真的吗？
+
+== 人聲分離原理 ==
+藉由利用人聲偵測的結果，找出音樂中具有人聲的部分，使用Robust principle component analysis(RPCA)將人聲與配樂加以分離。
+分離的步驟為:
+* 計算歌曲的N-point short-time Fourier Transform(STFT)，得到光譜圖(spectrogram){{Smallmath|f=  X = Me^{j*p} }}。此處{{Smallmath|f=  M \in R^{f*t} }}為強度，而{{Smallmath|f=  P \in R^{f*t} }}為相位。
+* 根據RPCA，將矩陣M分解成低階(low-rank)的矩陣L，以及一個稀疏(sparse)的矩陣S。其原因是，樂器的聲音叫人聲固定，且伴奏通常具有重複的音樂架構，因此將其視為低階的訊號。而人聲的變化較大，相較於伴奏為高階訊號，不論是在時域(time domain)及頻域(frequency domain)皆具有較大的稀疏性。因此所得的矩陣S將大部分由人聲所組成，矩陣L大都由背景音樂組成。
+分解方法是解下列方程式:<br />
+<math> min_{M=L+S} \mid\mid L \mid\mid_{*} + \lambda\mid\mid L \mid\mid_{1} </math><br />
+其中<br />
+{{Smallmath|f=  \mid\mid . \mid\mid_{*} :nuclear norm}} <br />
+{{Smallmath|f=  \mid\mid L \mid\mid_{1} :l_1 norm}} <br />
+
+* inverse-STFT(ISTFT)
+由於得到的矩陣L與S是在頻域(frequency domain)之上，最後需要對矩陣做inverse-STFT，方能真正得到結果。
+
+== 參考文獻 ==
+# P. S. Huang, S. D. Chen, P. Smaragdis, and M. Hasegawa-Johnson, "Singing-voice separation from monaural recordings using robust principal component analysis," in Proc. IEEE Int. Conf. Acoustics, Speech, & Signal Proc., pp. 57-60, 2012.
+# H. M. Yu, W. H. Tsai, and H. M. Wang, "A query-by-singing system for retrieving karaoke music," IEEE Trans. Multimedia, vol. 10, pp. 1626–1637, 2008
+# M. Rocamora and P. Herrera, "Comparing audio descriptors for singing voice detection in music audio files," in Brazilian Symposium on Computer Music, 11th. San Pablo, Brazil, 2007
+
+[[Category:音乐术语|Category:音乐术语]]
+[[Category:音乐学|Category:音乐学]]

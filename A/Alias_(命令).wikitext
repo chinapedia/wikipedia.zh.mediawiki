@@ -1,0 +1,201 @@
+{{NoteTA
+|G1=IT
+}}
+{{for|编程语言內的变量别名|Aliasing}}
+{{Lowercase}}
+在[[计算机运算|计算机运算]]中，'''alias''' 是许多命令行界面的命令，比如 [[Unix_shell|Unix shell]]，[[4DOS|4DOS]]/[[4NT|4NT]] 和 [[Windows_PowerShell|Windows PowerShell]] 等，它给用户提供了别名——也就是用自定义字符串替换指定命令的功能，通常用于简写系统命令，或给常用命令添加默认选项，[[MS-DOS|MS-DOS]] 和 [[Microsoft_Windows|Microsoft Windows]] 操作系统內，通常使用 <code>DOSKey</code> 命令定义别名。
+
+alias 命令的作用时间是命令运行之后到 shell 会话结束，经常使用的别名可在 shell 的配置文件比如 [[C_Shell|C Shell]]（csh）的 <code>~/.cshrc</code> 或 [[Bash|Bourne Again Shell]] 的 <code>~/.bashrc</code> 里定义，如此当相应的 shell 会话启动后就可以使用这些自定义的别名了。alias 命令可以直接写入这些配置文件，或单独放在一个文件，比如 .alias 里，或依用户使用的解释器分别定义于 .alias-bash，.alias-csh 等文件，然后使用 source 命令执行该文件来设定。
+
+==定义别名==
+
+别名可以使用给 alias 命令指定键值对参数的方式定义，在 Bash 內，语法如下：
+
+ alias copy='cp'
+
+同样的别名，在 csh 或 [[tcsh|tcsh]] 里可以这样指定：
+
+ alias copy "cp"
+
+这个别名的作用，是当用户在命令行內输入 copy 时，命令行解释器会把该命令替换为 cp 命令来执行。
+
+在 4DOS/4NT 命令行內，可以使用以下命令把 cp 定义为 4DOS 的 <code>copy</code> 命令的别名：
+
+ alias cp copy
+
+要在 Windows PowerShell 內定义别名，可以使用以下命令：
+
+ new-alias ci copy-item
+
+以上命令给 Windows PowerShell 的 <code>copy-item</code> 命令定义了一个别名 <code>ci</code>，因此用户在 Windows PowerShell 里输入 ci 时，实际执行的是 <code>copy-item</code> 命令。
+
+==历史==
+
+Unix 內，alias 命令是由 C shell 引入的，之后也被加入到 tcsh 和 Bash 內。C shell 的别名被严格限制在一行里，复杂的 shell 语言则需要多行，不过单行别名对建立快捷的命令仍然很有用。[[Bourne_shell|Bourne shell]]（sh）內没有别名功能，但它有更强大的 shell 函数方式。Bash 和 [[Korn_shell|Korn shell]]（ksh）则同时支持函数和别名，并建议在可能时尽量使用函数。
+
+==查看當前已定義的别名==
+
+要查看當前命令行已定義的别名，可以用以下命令：
+
+ alias          # 不帶參數運行 alias 命令，可顯示當前已定義的别名列表
+ alias -p       # 同上，但在 4DOS/4NT 和 PowerShell 里無效
+ alias ''myAlias''  # 顯示指定别名取代的實際命令
+
+==忽略别名==
+
+在 Unix shells 里，如果别名已经指定过，可以把命令放在引号里，或在前面添加一个反斜杠来使别名定义失效。比如，若已定义了以下别名：
+
+ alias ls='ls -la'
+
+要使以上别名失效并强制执行原始的 <code>ls</code> 命令，可使用以下语法：
+
+ 'ls'
+
+或
+
+ \ls
+
+在 4DOS/4NT 命令行里，则可以在命令前面添加星号来使已定义的别名失效，比如，可用以下方式定义别名：
+
+ alias dir = *dir /2/p
+
+第二个 dir 命令前的星号，确保其运行的是原始的 dir 命令，避免递归地别名展开，用户还可以运行以下命令，确保运行的是原始（未设定别名的）dir 命令：
+
+ *dir
+
+==更改别名==
+
+在 Windows PowerShell 里，可使用以下命令更改一个已经存在的别名：
+
+ set-alias ci cls
+
+运行以上命令后，<code>ci</code> 将变成 <code>cls</code> 命令的别名。
+
+<!-- 4DOS/4NT 命令行里，<code>eset</code> 命令提供了一个可交互的命令行来编辑已经存在的别名：
+
+ eset /a cp
+
+The <code>/a</code> causes the alias <code>cp</code> to be edited, as opposed to an environment variable of the same name. -->
+
+==删除别名==
+
+在 Unix shell 和 4DOS/4NT 里，别名可以通过 <code>unalias</code> 命令清除：
+<syntaxhighlight lang="bash">
+ unalias copy          # 删除 copy 别名
+ unalias -a            # -a 选项会清除所有已定义的别名，此选项在 4DOS/4NT 里无效
+</syntaxhighlight>
+ unalias *             # 4DOS/4NT 的清除别名命令，支持通配符
+在 Windows PowerShell 里，别名可用以下命令删除：
+<syntaxhighlight lang="powershell">
+ remove-item alias:ci  # 删除别名 ci
+</syntaxhighlight>
+
+==特性==
+
+===Chaining===
+别名通常只替换第一个词，但有些命令行解释器，比如 Bash 和 ksh 允许替换一个字符序列或几个单词，这个特性使用 shell 函数方式是做不到的。
+
+通常的语法是在第一个定义的别名所替换的命令后加一个空格，比如定义以下两个别名：
+
+ alias list='ls '      # 注意 ls 后面的空格
+ alias long='-Flas'    # ls 的选项
+
+然后可运行
+
+ list long myfile      # 运行时被解释为 <code>ls -Flas myfile</code>
+
+来列出文件详细信息，可见命令行解释器对 long 也进行了别名展开。
+
+===别名里的引用===
+
+要使用单引号定义一个里面带有单引号的别名，比如要给以下 perl 脚本定义别名：
+<syntaxhighlight lang="pcre">
+ $ perl -pe 's/^(.*) foo/$1 bar/;'
+</syntaxhighlight>
+
+你不能这样简单转义：
+<syntaxhighlight lang="pcre">
+ $ alias foo2bar='perl -pe \'s/^(.*) foo/$1 bar/;\'' # 错误：反斜杠并不会对后一个字符进行转义
+</syntaxhighlight>
+
+不过，可以这样：
+<syntaxhighlight lang="pcre">
+ $ alias foo2bar='perl -pe '\''s/^(.*) foo/$1 bar/;'\''' # 把反斜杠放在引号里使之成为 '\'
+</syntaxhighlight>
+
+但你可以在双引号里使用单引号。<ref>{{Cite web |url=http://stackoverflow.com/questions/1250079/bash-escaping-single-quotes-inside-of-single-quoted-strings#1250279 |title=StackOverflow 上的解释 |accessdate=2014-03-23 |archive-date=2013-07-03 |archive-url=https://web.archive.org/web/20130703044338/http://stackoverflow.com/questions/1250079/bash-escaping-single-quotes-inside-of-single-quoted-strings#1250279 |dead-url=no }}</ref>
+
+<syntaxhighlight lang="pcre">
+ $ alias foo2bar='perl -pe '"'"'s/^(.*) foo/$1 bar/;'"'"''
+</syntaxhighlight>
+
+你也可以使用 shell 函数方式，而非使用别名。
+
+===命令参数===
+
+在 C Shell 里，命令的参数可以通过字符串 <tt>\!*</tt> 嵌入到别名定义里，比如定义以下别名：
+ alias l-less 'ls \!* | less'
+然后执行 <tt>l-less /etc /usr</tt>，命令会被展开成 <tt>ls /etc /usr | less</tt>，即列出 /etc 和 /usr 两个目录的文件，且满屏后暂停，若没有 <tt>\!*</tt>，
+ alias l-less 'ls | less'
+会被展开成 <tt>ls | less /etc /usr</tt>，这将会错误的试图用 less 打开后两个目录。<ref>{{Cite web |url=http://unixhelp.ed.ac.uk/shell/alias_csh2.1.html |title=给别名传递参数的示例 |accessdate=2014-03-23 |archive-date=2012-11-25 |archive-url=https://web.archive.org/web/20121125074502/http://unixhelp.ed.ac.uk/shell/alias_csh2.1.html |dead-url=no }}</ref>
+
+Bash 和 Korn shell 里，可以使用 shell 函数做到，参见下文的'''备选'''段落。
+
+==典型别名==
+
+Bash 里一些常用的别名：
+
+ alias ls='ls --color=auto' # 输出显示为彩色
+ alias la='ls -Fa'          # 列出所有文件
+ alias ll='ls -Fls'         # 列出文件详细信息
+ 
+ alias rm='rm -i'           # 删除前需确认
+ alias cp='cp -i'           # 覆盖前需确认
+ alias mv='mv -i'           # 覆盖前需确认
+ 
+ alias vi='vim'             # 输入 vi 命令时使用 vim 编辑器
+
+Windows PowerShell 的标准别名：
+
+ new-alias cd set-location
+ 
+ new-alias ls get-childitem
+ new-alias dir get-childitem
+ 
+ new-alias echo write-output
+ new-alias ps get-process
+ new-alias kill stop-process
+
+==备选==
+
+别名应保持简单，否则应考虑以下备选方式：
+
+* [[命令脚本|命令脚本]]，通过脚本可以创建新的系统命令。
+
+* [[符号链接|符号链接]]，可放在 <tt>/usr/local/bin</tt> 给所有用户使用，或放在用户自己的 <tt>$HOME/bin</tt> 目录，只供自己使用。这提供了一个调用命令的新方式，并在某些情况下，对少数支持使用调用名选择操作模式的命令，允许使用其隐含的命令函数。
+
+* Shell 函数，特别是如果命令需要修改 shell 内部运行环境（如[[环境变量|环境变量]]）、改变当前[[工作目录|工作目录]]、或在非交互 shell 使用情况下出现在搜索路径里面（特别是“较安全的” <tt>rm</tt>，<tt>cp</tt>，<tt>mv</tt> 版本等等）。
+
+别名最常见的使用方式，是给命令添加常用的选项，这可以使用定义简单 Shell 函数的方式代替：
+<syntaxhighlight lang="bash">
+ alias ll='ls -Flas'              # 列出文件详细信息，别名方式
+ ll () { ls -Flas "$@" ; }        # 列出文件详细信息，Shell 函数方式
+</syntaxhighlight>
+把 '''ls''' 本身定义成函数，可以用以下方式定义（注意这是 Bash 的 ls 命令，较老的 Bourne shell 需要使用 /bin/ls 代替）：
+<syntaxhighlight lang="bash">
+ ls () { command ls --color=auto "$@" ; }
+</syntaxhighlight>
+
+== 参考资料 ==
+<references />
+
+== 外部链接 ==
+*{{man|cu|alias|SUS|定义或显示别名}}
+*[http://www.ss64.com/bash/alias.html Bash 的 alias 手册页]{{Wayback|url=http://www.ss64.com/bash/alias.html |date=20140323121703 }}
+*The Linux 信息项目（LINFO）上的 [https://web.archive.org/web/20100218165830/http://www.bellevuelinux.org/alias.html alias 命令]
+*[https://www.ytyzx.org/index.php/%E5%9C%A8Linux%E4%B8%8B%E5%88%9B%E5%BB%BA%E5%88%AB%E5%90%8D%EF%BC%88alias%EF%BC%89 在Linux中设置Alias别名]{{Wayback|url=https://www.ytyzx.org/index.php/%E5%9C%A8Linux%E4%B8%8B%E5%88%9B%E5%BB%BA%E5%88%AB%E5%90%8D%EF%BC%88alias%EF%BC%89 |date=20190215122822 }}
+{{Unix commands}}
+
+[[Category:标准Unix程序|Alias]]
+[[Category:Unix_SUS2008实用工具|Category:Unix SUS2008实用工具]]
+[[Category:Windows管理|Category:Windows管理]]

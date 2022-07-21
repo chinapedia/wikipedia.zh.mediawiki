@@ -1,0 +1,319 @@
+local p = {}
+
+--Template:Gallery
+function p.gallery(frame)
+	local origArgs
+	-- If called via #invoke, use the args passed into the invoking template.
+	-- Otherwise, for testing purposes, assume args are being passed directly in.
+	if type(frame.getParent) == 'function' then
+		origArgs = frame:getParent().args
+	else
+		origArgs = frame
+	end
+	
+	-- ParserFunctions considers the empty string to be false, so to preserve the previous 
+	-- behavior of {{gallery}}, change any empty arguments to nil, so Lua will consider
+	-- them false too.
+	local args = {}
+	for k, v in pairs(origArgs) do
+		if v ~= '' then
+			args[k] = v
+		end
+	end
+
+	local tbl = mw.html.create('table')
+	
+	if args.state then
+		tbl
+			:addClass('gallery-mod-collapsible')
+			:addClass('collapsible')
+			:addClass(args.state)
+	end
+	
+	if args.style then
+		tbl:cssText(args.style)
+	else
+		tbl
+			:addClass('gallery-mod')
+	end
+	
+	if args.align then
+		if args.align == 'center' then
+			tbl
+				:addClass('gallery-mod-center')
+		else
+			tbl:css('float', args.align)
+		end
+	end
+	
+	if args.title then
+		tbl
+			:tag('tr')
+				:tag('th')
+					:addClass('title')
+					:wikitext(args.title)
+	end
+	
+	local mainCell = tbl:tag('tr'):tag('td'):addClass('body')
+	
+	local imageCount = math.ceil(#args / 2)
+	local cellWidth = tonumber(args.cellwidth) or tonumber(args.width) or 180
+	local imgHeight = tonumber(args.height) or 180
+	local lines = tonumber(args.lines) or 2
+	local captionstyle = args.captionstyle
+	
+	for i = 1, imageCount do
+		local img = mw.text.trim(args[i*2 - 1] or '')
+		local caption = mw.text.trim(args[i*2] or '')
+		local imgWidth = tonumber(args['width' .. i]) or tonumber(args.width) or 180
+		local alt = args['alt' .. i] or ''
+		
+		local textWidth
+		if cellWidth < 30 then
+			textWidth = imgHeight + 27
+		else
+			textWidth = cellWidth + 7
+		end
+
+		if img ~= '' then
+			local imgTbl = mainCell:tag('table')
+			
+			imgTbl
+				:css('width', (cellWidth + 20) .. 'px')
+				:addClass('gallery-mod-box')
+				:tag('tr')
+					:tag('td')
+						:addClass('thumb')
+						:css('height', (imgHeight + 20) .. 'px')
+						:wikitext(string.format('[[%s|center]]', img, imgWidth, imgHeight, alt, mw.text.unstrip(caption)))
+						:done()
+					:done()
+				:tag('tr')
+					:addClass('gallery-mod-text')
+					:tag('td')
+						:tag('div')
+							:addClass('caption')
+							:css('min-height', (0.1 + 1.5*lines) .. 'em')
+							:cssText(captionstyle)
+							:wikitext(caption .. ' ')
+		end
+	end
+	
+	if args.footer then
+		tbl
+			:tag('tr')
+				:tag('td')
+					:addClass('footer')
+					:wikitext(args.footer)
+	end
+	if args.perrow then
+		tbl:css('width', 8 + (cellWidth + 20 + 6)*tonumber(args.perrow) .. 'px')
+	end
+
+	return frame:extensionTag{ name = 'templatestyles', args = { src = 'Template:Gallery/styles.css'} } .. tostring(tbl)
+end
+
+--Template:Gallery2
+local yesno = require('Module:Yesno')
+
+function p.gallery2(frame)
+	-- If called via #invoke, use the args passed into the invoking template.
+	-- Otherwise, for testing purposes, assume args are being passed directly in.
+	local origArgs = (type(frame.getParent) == 'function') and frame:getParent().args or frame
+    
+    -- ParserFunctions considers the empty string to be false, so to preserve the previous 
+    -- behavior of {{gallery}}, change any empty arguments to nil, so Lua will consider
+    -- them false too.
+    local args = {}
+    local tracking, preview = {}, {}
+    
+    local function checkarg(k,v)
+		if k and type(k) == 'string' then
+			if k == 'align' or k == 'state' or k == 'style' or k == 'title' or k == 'class' or
+				k == 'width' or k == 'height' or k == 'lines' or k == 'whitebg' or
+				k == 'mode' or k == 'footer' or k == 'perrow' or k == 'noborder' or
+				k:match('^alt%d+$') or k:match('^%d+$') then
+				-- valid
+			elseif k == 'captionstyle' then
+				if not v:match('^text%-align%s*:%s*center[;%s]*$') then
+					table.insert(tracking, '[[Category:Gallery2錯誤|廢]]')
+				end
+			else
+				-- invalid
+				local vlen = mw.ustring.len(k)
+				k = mw.ustring.sub(k, 1, (vlen < 25) and vlen or 25) 
+				k = mw.ustring.gsub(k, '[^%w\-_ ]', '?')
+				table.insert(tracking, '[[Category:Gallery2錯誤|' .. k .. ']]')
+				table.insert(preview, '"' .. k .. '"')
+			end
+		end
+	end
+
+    for k, v in pairs(origArgs) do
+    	if v ~= '' then
+    		args[k] = v
+    		checkarg(k,v)
+    	end
+	end
+	
+	if (args.mode or '') == 'packed' and (args.align or '') == '' then
+		args.align = 'center'
+	end
+
+	local tbl = mw.html.create('div')
+	tbl:addClass('mod-gallery')
+    
+	if args.state then
+		tbl
+			:addClass('mod-gallery-collapsible')
+			:addClass('collapsible')
+			:addClass(args.state)
+	end
+	
+	if args.style then
+		tbl:cssText(args.style)
+	else
+		tbl:addClass('mod-gallery-default')
+	end
+	
+	if args.clads then
+		tbl:addClass(args.class)
+	end
+	
+	if args.align then
+		tbl:addClass('mod-gallery-' .. args.align:lower())
+	end
+	
+	if args.title then
+		tbl:tag('div')
+			:addClass('title')
+				:tag('div')
+					:wikitext('<dl><dd>' .. args.title .. '</dd></dl>')
+	end
+	
+	local gargs = {}
+	gargs['class'] = 'nochecker' .. (args.noborder and '' or ' bordered-images')
+	gargs['widths'] = tonumber(args.width) or 180
+	gargs['heights'] = tonumber(args.height) or 180
+	gargs['style'] = args.captionstyle
+	gargs['perrow'] = args.perrow
+	gargs['mode'] = args.mode
+	if yesno(args.whitebg or 'yes') then
+		gargs['class'] = gargs['class'] .. ' whitebg'
+	end
+	
+	local gallery = {}
+	
+	local imageCount = math.ceil(#args / 2)
+
+    for i = 1, imageCount do
+		local img = mw.text.trim(args[i*2 - 1] or '')
+		local caption = mw.text.trim(args[i*2] or '')
+		local alt = mw.text.trim(args['alt' .. i] or '')
+		if img ~= '' then
+			table.insert(gallery, img .. (alt ~= '' and ('|alt=' .. alt) or '') .. '|' .. caption )
+		end
+	end
+	
+	tbl:tag('div')
+		:addClass('main')
+		:tag('div')
+			:wikitext(
+				frame:extensionTag{ name = 'gallery', content = '\n' .. table.concat(gallery,'\n'), args = gargs}
+				)
+    
+	if args.footer then
+		tbl:tag('div')
+			:addClass('footer')
+				:tag('div')
+					:wikitext('<dl><dd>' .. args.footer .. '</dd></dl>')
+	end
+
+	local trackstr = (#tracking > 0) and table.concat(tracking, '') or ''
+	if #preview > 0 and frame:preprocess( "{{REVISIONID}}" ) == "" then
+		trackstr = tostring(mw.html.create('div')
+			:addClass('hatnote')
+			:css('color','red')
+			:tag('strong'):wikitext('[[Template:Gallery2|Template:Gallery2]]錯誤：'):done()
+			:wikitext('帶有無法識別的參數<code>' .. table.concat(preview, '、') .. '</code>'))
+	end
+	
+	return frame:extensionTag{ name = 'templatestyles', args = { src = 'Template:Gallery2/styles.css'} } .. tostring(tbl) .. trackstr
+end
+
+--Template:Gallery3
+function p.gallery3(frame)
+	local origArgs
+	if frame == mw.getCurrentFrame() then
+		if (frame:getParent().args) then
+			origArgs = frame:getParent().args
+		else
+			origArgs = frame.args
+		end
+	else
+		args = frame
+		if type(args) ~= type({}) then args = {frame} end
+	end
+	
+	local args = {}
+	for k, v in pairs(origArgs) do
+		if v ~= '' then
+			args[k] = v
+		end
+	end
+	
+	local size = tonumber(mw.ustring.gsub((args.size or 220), "(%d{1,4})px", "%1") or 220) or 220
+	
+	local box = mw.html.create('div'):addClass('ImageGroup')
+	
+	if (args.align == 'left') then
+		box:addClass('ImageGroup-align-left')
+	elseif (args.align == 'center') then
+		box:addClass('ImageGroup-align-center')
+	else
+		box:addClass('ImageGroup-align-right')
+	end
+	
+	if args.cycle then
+		box:attr('data-cycle', 'true')
+	end
+	
+	local boxstyle = 'border: 1px solid ' .. (args.border or 'transparent') .. ';'
+		.. 'max-width:' .. ( size + 15 ) .. 'px;'
+		.. (args.background and ('background-color:' .. args.background .. ';') or '')
+	
+	box:cssText(boxstyle)
+	
+	if args.Name then
+		box
+			:newline()
+			:tag('div')
+				:cssText('font-weight:bold;')
+				:wikitext(args.Name)
+			:done()
+	end
+	
+	local image = box:newline():tag('div'):addClass('ImageGroupUnits'):newline()
+	
+	local i = 1
+	while true do
+		local img = mw.text.trim(args[i * 2 - 1] or '')
+		local alt = mw.text.trim(args[i * 2] or '')
+		if img ~= '' then
+			local imgTbl = image:tag('div'):attr('id', 'ImageGroup_' .. i)
+			imgTbl
+				:wikitext('[['_.._img_.._'|' .. size .. 'px]]')
+				:done()
+				:newline()
+		else
+			break
+		end
+		i = i + 1
+	end
+	box:done()
+		:newline()
+		:done()
+	return mw.getCurrentFrame():extensionTag{ name = 'templatestyles', args = { src = 'Template:Gallery3/styles.css'} } .. tostring(box)
+end
+
+return p

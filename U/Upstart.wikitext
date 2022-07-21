@@ -1,0 +1,81 @@
+{{noteTA
+|G1=IT
+}}
+{{Infobox software
+| name = Upstart
+| logo = [[File:Logo_for_Upstart_daemon.png|250px]]
+| screenshot = 
+| caption = 
+| collapsible = 
+| author = [[Scott_James_Remnant|Scott James Remnant]]
+| developer = [[Canonical公司|Canonical公司]]
+| released = {{release date and age|2006|8|24}}
+| latest release version = 1.13.2<ref>{{cite web |url=http://freecode.com/projects/upstart/releases |title=All releases of upstart |publisher=Freecode.com |date= |accessdate=2014-09-04 |archive-date=2016-03-04 |archive-url=https://web.archive.org/web/20160304191029/http://freecode.com/projects/upstart/releases }}</ref>
+| latest release date = {{release date and age|2014|09|04}}
+| latest preview version = 
+| latest preview date = 
+| frequently updated = 
+| programming language = [[C语言|C]]
+| operating system = [[Linux|Linux]]
+| platform = 
+| size = 
+| language = 
+| status = 
+| genre = 初始化-{zh:守护进程;zh-hans:守护进程;zh-hant:常驻程式;zh-cn:守护进程;zh-tw:常驻程式;zh-hk:常驻程式;zh-sg:守护进程;zh-mo:常驻程式;}-
+| license = [[GNU通用公共许可证|GPLv2]]
+| website = {{URL|http://upstart.ubuntu.com}}
+}}
+
+'''Upstart'''是一个[[事件驅動程式設計|基于事件]]的[[init|init]]程式 ，用于替代传统的[[init|init]]（多种[[类Unix|类Unix]]计算机[[操作系统|操作系统]]启动时用于执行任务的程序）。它是由[[Canonical公司|Canonical公司]]前雇员[[Scott_James_Remnant|Scott James Remnant]]所写。
+
+== 解释 ==
+传统的init进程原本只负责在开机后将计算机带入正常运行状态，并且在正常关机前关闭服务。因此，它的设计是严格[[同步_(计算机科学)|同步]]的，且会[[阻塞_(计算机)|阻塞]]未来的任务，直到完成当前任务。因为受限于准备或清除函数，它的任务也是事先定义的。这使得它无法简洁地处理现代[[桌面计算机|桌面计算机]]上的各种非启动任务，其中包括：
+
+* 机器运行时添加或删除[[U盘|U盘]]和其他便携式存储/网络设备
+* 发现并扫描新存储设备而不锁定系统，尤其是当磁盘没被扫描就不运行时
+* [[固件|固件]]需要在检测设备之后、在它可用之前加载
+
+Upstart的事件驱动模型允许它以异步方式对生成的事件作出回应。<ref>{{cite web | url = http://www.netsplit.com/2006/08/26/upstart-in-universe/ | first = Scott James | last = Remnant | title = Upstart in Universe | publisher = Netsplit | date = 2006-08-26 | accessdate = 2009-09-12 | deadurl = yes | archiveurl = https://web.archive.org/web/20090904110208/http://www.netsplit.com/2006/08/26/upstart-in-universe/ | archivedate = 2009-09-04 }}</ref>
+
+== 设计 ==
+Upstart是异步工作的；它在系统运行时监督服务，并且在开关机时启动和关闭任务和服务。
+
+对[[sysvinit|sysvinit]]简单的过渡和完善的[[向下兼容|向后兼容]]是明确的设计目标；<ref>{{citation | url = https://bugs.launchpad.net/ubuntu/+source/upstart/+bug/605007 | publisher = Ubuntu | title = Launch Pad | section = Upstart | number = 605007 | accessdate = 2014-01-27 | archive-date = 2020-06-12 | archive-url = https://web.archive.org/web/20200612003307/https://bugs.launchpad.net/ubuntu/+source/upstart/+bug/605007 | dead-url = no }}.</ref>因此，Upstart能运行未经修改的sysvinit脚本。因此，与大多数其他的init替代（除了[[systemd|systemd]]和[[OpenRC|OpenRC]]）不同，它们通常假设并要求彻底的过渡，以正常运行，且不支持新旧启动方法混合的环境。<ref>{{citation | url = https://wiki.ubuntu.com/ReplacementInit | chapter = Discussion of design and implementation of Upstart | publisher = Canonical | title = Ubuntu Wiki | accessdate = 2014-01-27 | archive-date = 2020-05-26 | archive-url = https://web.archive.org/web/20200526060137/https://wiki.ubuntu.com/ReplacementInit | dead-url = no }}.</ref>
+
+通过使用initctl输入自定义的单一事件，或整合更多更复杂事件的事件桥，Upstart允许扩展其事件模型。<ref>{{cite web|title=The Upstart Cookbook|chapter=initctl emit|url=http://upstart.ubuntu.com/cookbook/#initctl-emit|publisher=Canonical|accessdate=26 January 2014|archive-url=https://web.archive.org/web/20140214014326/http://upstart.ubuntu.com/cookbook/#initctl-emit|archive-date=2014-02-14|dead-url=yes}}</ref>默认情况下，Upstart包括接口（socket）、dbus、udev、文件及dconf事件桥；另外，可以有更多种桥（例如[[Mach|Mach]]端口桥，或devd（[[FreeBSD|FreeBSD]]系统上）桥）。<ref>{{cite web|title=The Upstart Cookbook|chapter=Bridges|publisher=Canonical|url=http://upstart.ubuntu.com/cookbook/#bridges|accessdate=26 January 2014|archive-url=https://web.archive.org/web/20140214014326/http://upstart.ubuntu.com/cookbook/#bridges|archive-date=2014-02-14|dead-url=yes}}</ref>
+
+== 采用 ==
+
+使用Upstart作为默认init系统的[[Linux发行版|Linux发行版]]及其他基于[[Linux内核|Linux内核]]的操作系统：
+* Upstart被用于[[谷歌|谷歌]]的[[Chrome_OS|Chrome OS]]。<ref name = "chrome-os">{{citation |url=https://sites.google.com/a/chromium.org/dev/chromium-os/chromiumos-design-docs/software-architecture |title=Software Architecture: Chromium OS design documents |publisher=Google |accessdate=25 January 2014 |archive-date=2022-04-09 |archive-url=https://web.archive.org/web/20220409203000/https://sites.google.com/a/chromium.org/dev/chromium-os/chromiumos-design-docs/software-architecture }}</ref>
+
+支持或已在一定程度上支持Upstart，但弃用它作为默认init系统的Linux发行版：
+* [[Debian|Debian]]在考虑切换至Upstart后，<ref>{{citation |author=Petter Reinholdtsen |url=http://lists.debian.org/debian-devel-announce/2009/09/msg00003.html |title=The future of the boot system in Debian |publisher=Debian.org |date=2009-09-05 |accessdate=2014-01-27 |archive-date=2022-01-09 |archive-url=https://web.archive.org/web/20220109174053/https://lists.debian.org/debian-devel-announce/2009/09/msg00003.html }}</ref>决定systemd将从''[[Debian|jessie]]''版（Debian 8）开始作为默认init系统。<ref>{{citation |url=http://lwn.net/Articles/585363/ |title=The Debian technical committee vote concludes |publisher=Lwn.net |date=2014-02-11 |accessdate=2014-02-11 |archive-date=2014-02-22 |archive-url=https://web.archive.org/web/20140222145737/http://lwn.net/Articles/585363/ |dead-url=no }}</ref>
+* [[Ubuntu|Ubuntu]]首次在2006年底''[[Ubuntu发行版列表#Ubuntu_6.10_(Edgy_Eft)|6.10 (Edgy Eft)]]''版中包含Upstart，以取代[[sysvinit|sysvinit]]。Ubuntu 9.10(Karmic Koala) Alpha 6中推出可原生启动的Upstart。<ref>{{citation |url=http://www.ubuntulinux.org/testing/karmic/alpha6#Upstart |title=Upstart |work=About |publisher=Ubuntu }}{{Dead link|date=2020年4月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>反过来，在2014年Debian项目决定在Debian 8版本中使用[[systemd|systemd]]后，Ubuntu在15.04起亦改用systemd，以保持与上游一致。<ref>{{cite web |last=Shuttleworth |first=Mark |title=Losing graciously |url=http://www.markshuttleworth.com/archives/1316 |accessdate=14 February 2014 |archive-date=2014-03-22 |archive-url=https://web.archive.org/web/20140322130122/http://www.markshuttleworth.com/archives/1316 |dead-url=no }}</ref><ref>{{cite web|url=https://wiki.ubuntu.com/VividVervet/ReleaseNotes#Boot_and_service_management|title=VividVervet/ReleaseNotes - Ubuntu Wiki|accessdate=2017-10-17|archive-date=2015-06-11|archive-url=https://web.archive.org/web/20150611043849/https://wiki.ubuntu.com/VividVervet/ReleaseNotes#Boot_and_service_management|dead-url=no}}</ref>
+* 在[[Fedora_(作業系統)|Fedora]] 9中，Upstart替换了[[sysvinit|sysvinit]]，然而，systemd在Fedora15版本替代了Upstart。<ref>{{citation |url=https://fedoraproject.org/wiki/Releases/14/FeatureList |title=Fedora 14 Accepted Features |date=2010-07-13 |accessdate=2010-07-13 |archive-date=2022-03-27 |archive-url=https://web.archive.org/web/20220327191742/https://fedoraproject.org/wiki/Releases/14/FeatureList }}</ref><ref>{{cite web |url=http://lwn.net/Articles/405100/ |title=Fedora defers systemd to F15 |date=2010-09-14 |accessdate=2010-09-17 |publisher=Linux Weekly News |archive-date=2022-04-09 |archive-url=https://web.archive.org/web/20220409203001/https://lwn.net/Articles/405100/ }}</ref>
+* 红帽在他们的[[Red_Hat_Enterprise_Linux|Red Hat Enterprise Linux]] 6中包含了Upstart。<ref>{{cite web |url=https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Technical_Notes/deployment.html |publisher=[[红帽公司|红帽公司]] |title=Deployment |work=Red Hat Enterprise Linux 6: Technical Notes |accessdate=2013-12-31 |archive-date=2013-12-31 |archive-url=https://web.archive.org/web/20131231200612/https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Technical_Notes/deployment.html }}</ref>因此，它也被用于RHEL 6的变体，如[[CentOS|CentOS]]、[[Scientific_Linux|Scientific Linux]]和[[Oracle_Linux|Oracle Linux]]。RHEL 7使用[[systemd|systemd]]取代upstart。<ref>{{citation |url=https://plus.google.com/+LennartPoetteringTheOneAndOnly/posts/cBYAcrNZcz9 |title=Red Hat Summit talk about systemd in RHEL 7 is now available online |author=Lennart Poettering |publisher=Google Plus |date=2013-06-19 |accessdate=2013-12-31 |archive-date=2017-03-03 |archive-url=https://web.archive.org/web/20170303235042/https://plus.google.com/+LennartPoetteringTheOneAndOnly/posts/cBYAcrNZcz9 }}</ref><ref>{{citation |author=Tim Burke |title=Red Hat Enterprise Linux Roadmap Highlights |work=presentation |url=http://rhsummit.files.wordpress.com/2012/03/burke_rhel_roadmap.pdf |date=2012-06-27 |format=PDF |accessdate=2014-04-09 |archive-date=2013-01-18 |archive-url=https://web.archive.org/web/20130118084956/http://rhsummit.files.wordpress.com/2012/03/burke_rhel_roadmap.pdf |dead-url=yes }}</ref>
+* [[openSUSE|openSUSE]]在11.3 Milestone 4版包含了upstart，但未作为默认。<ref>{{citation |url=http://www.h-online.com/open/news/item/OpenSUSE-gets-an-Upstart-964636.html |archiveurl=https://web.archive.org/web/20131208184815/http://www.h-online.com/open/news/item/OpenSUSE-gets-an-Upstart-964636.html |archivedate=2013-12-08 |title=OpenSUSE gets an Upstart |publisher=The H |date=2010-03-26 |accessdate=2010-04-04 |deadurl=yes }}</ref>在openSUSE 12.1版中，systemd取代Upstart作为默认init系统。<ref>{{citation |url=http://h-online.com/-1380033 |archiveurl=https://web.archive.org/web/20120420063250/http://www.h-online.com/open/news/item/openSUSE-12-1-arrives-with-systemd-and-Btrfs-1380033.html |archivedate=2012-04-20 |title=openSUSE 12.1 arrives with systemd and Btrfs |author=Chris von Eitzen |publisher=The H |date=2011-11-16 |accessdate=2011-11-16 |deadurl=yes }}</ref>
+* Upstart被用于[[惠普|惠普]][[Palm_Pre|Palm Pre]]、[[Palm_Pixi|Palm Pixi]]（在Palm被惠普收购之前）、[[HP_Veer|HP Veer]]、[[HP_Pre_3|HP Pre 3]]智能手机[[HP_TouchPad|HP TouchPad]]和[[平板电脑|平板]]中的[[webOS|webOS]]<ref>{{citation|url=http://mjg59.livejournal.com/111453.html|title=Palm Pre|date=|accessdate=2009-07-09|publisher=Live Journal|archive-date=2009-12-23|archive-url=https://web.archive.org/web/20091223142117/http://mjg59.livejournal.com/111453.html|dead-url=no}}</ref>并为N9和N950手机上的[[MeeGo|MeeGo]]保留，尽管MeeGo与[[Moblin|Moblin]]合并后正向systemd过渡。{{Citation needed|date=April 2014}}
+* {{fact|[[Kindle|Kindle]] 在固件也使用 Upstart 来控制设备的启动及服务。}}
+
+== 参见 ==
+{{Portal|自由软件}}
+* [[服务管理工具|服务管理工具]]
+* [[OpenRC|OpenRC]]
+* [[systemd|systemd]]
+
+== 参考 ==
+{{Reflist|30em}}
+
+== 外部链接 ==
+* [http://upstart.ubuntu.com/ 主页] {{Wayback|url=http://upstart.ubuntu.com/ |date=20220509135211 }}
+* {{launchpad|id=upstart |title=Upstart}}
+* [http://upstart.ubuntu.com/cookbook Upstart Cookbook] {{Wayback|url=http://upstart.ubuntu.com/cookbook |date=20121103152333 }}
+* [http://upstart.ubuntu.com/cookbook/upstart_cookbook.pdf Upstart Cookbook] {{Wayback|url=http://upstart.ubuntu.com/cookbook/upstart_cookbook.pdf |date=20121018133515 }}
+* 初始化系统比较：[https://lwn.net/Articles/578209/ part 1] {{Wayback|url=https://lwn.net/Articles/578209/ |date=20201116130258 }}和[https://lwn.net/Articles/578210/ part 2] {{Wayback|url=https://lwn.net/Articles/578210/ |date=20201116173548 }} ([[LWN.net|LWN.net]])
+
+{{Ubuntu}}
+{{Unix中的服务管理}}
+
+[[Category:Unix进程和任务管理相关软件|Category:Unix进程和任务管理相关软件]]
+[[Category:Ubuntu|Category:Ubuntu]]

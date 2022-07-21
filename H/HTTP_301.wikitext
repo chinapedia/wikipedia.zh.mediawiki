@@ -1,0 +1,59 @@
+{{NoteTA
+|G1=IT
+}}
+{{HTTP}}
+
+'''301 Move Permanently''' 是[[HTTP协议|HTTP协议]]中的一个状态码（Status Code）。可以简单地理解为该资源已经被永久改变了位置<ref>{{cite web|url=http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html|title=HTTP/1.1: Status Code Definitions|accessdate=2014-06-01|archive-date=2010-03-16|archive-url=https://web.archive.org/web/20100316011642/http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html|dead-url=no}}</ref>，通常会发送[[HTTP_Location|HTTP Location]]来[[重定向|重定向]]到正确的新位置。
+
+返回301状态码进行跳转被[[Google|Google]]认为是将网站地址由HTTP迁移到[[HTTPS|HTTPS]]的最佳方法。<ref>{{cite web|title=Secure your site with HTTPS|url=https://support.google.com/webmasters/answer/6073543?hl=en|website=Google 用户中心|publisher=Google|accessdate=6 February 2016|archive-date=2017-12-15|archive-url=https://web.archive.org/web/20171215041903/https://support.google.com/webmasters/answer/6073543?hl=en|dead-url=no}}</ref> 
+
+==定义==
+根据定义： <ref name="h1">{{cite web|last1=T.|first1=Fielding, Roy|last2=Tim|first2=Berners-Lee,|last3=Henrik|first3=Frystyk,|title=Hypertext Transfer Protocol -- HTTP/1.0|url=https://tools.ietf.org/html/rfc1945#section-9.3|language=en|accessdate=2017-07-04|archive-date=2010-11-30|archive-url=https://web.archive.org/web/20101130120327/http://tools.ietf.org/html/rfc1945#section-9.3|dead-url=no}}</ref><ref name="h1.1">{{cite web|last1=C.|first1=Mogul, Jeffrey|last2=Jim|first2=Gettys,|last3=Tim|first3=Berners-Lee,|last4=Henrik|first4=Frystyk,|title=Hypertext Transfer Protocol -- HTTP/1.1|url=https://tools.ietf.org/html/rfc2068#section-10.3.2|website=IETF|language=en|accessdate=2017-07-04|archive-date=2018-06-07|archive-url=https://web.archive.org/web/20180607164335/https://tools.ietf.org/html/rfc2068#section-10.3.2|dead-url=no}}</ref><ref>{{cite web|last1=J.|first1=Leach, Paul|last2=Tim|first2=Berners-Lee,|last3=C.|first3=Mogul, Jeffrey|last4=Larry|first4=Masinter,|last5=T.|first5=Fielding, Roy|last6=James|first6=Gettys,|title=Hypertext Transfer Protocol -- HTTP/1.1|url=https://tools.ietf.org/html/rfc2616#section-10.3.2|language=en|accessdate=2017-07-04|archive-date=2011-03-07|archive-url=https://web.archive.org/web/20110307142107/http://tools.ietf.org/html/rfc2616#section-10.3.2|dead-url=no}}</ref>
+* 如果一个客户端有链接编辑能力，其应当把所有的引用链接重定向到新的URL上。
+* 这个响应代码是可以被缓存的。<ref>{{cite web|title=How long do browsers cache HTTP 301s?|url=http://stackoverflow.com/questions/9130422/how-long-do-browsers-cache-http-301s|website=StackOverflow|accessdate=2016-01-21|archive-date=2016-01-27|archive-url=https://web.archive.org/web/20160127030845/http://stackoverflow.com/questions/9130422/how-long-do-browsers-cache-http-301s|dead-url=no}}</ref><ref>{{cite web|last1=Mark|first1=Nottingham,|last2=Roy|first2=Fielding,|last3=Julian|first3=Reschke,|title=Hypertext Transfer Protocol (HTTP/1.1): Caching|url=https://tools.ietf.org/html/rfc7234#section-4.2.2|language=en|accessdate=2017-07-04|archive-date=2017-07-07|archive-url=https://web.archive.org/web/20170707155139/https://tools.ietf.org/html//rfc7234#section-4.2.2|dead-url=no}}</ref>
+* 除非请求方法是HEAD，否则响应实体应该包含一个小型的超文本，标注一个超链接到新的URL。
+* 如果是除了GET和HEAD之外的请求方法，客户端必须在重定向之前询问用户。
+
+==例子==
+客户端发出请求:
+<syntaxhighlight lang="http">
+GET /blog HTTP/1.1
+Host: www.example.com
+</syntaxhighlight>
+服务器回应，不带Cache-Control头部:
+<syntaxhighlight lang="http">
+HTTP/1.1 301 Moved Permanently
+Location: http://www.example.org/index.asp
+</syntaxhighlight>
+服务器回应，带Cache-Control头部:
+<syntaxhighlight lang="http">
+HTTP/1.1 301 Moved Permanently
+Location: http://www.example.org/index.asp
+Cache-control: private; max-age=600
+</syntaxhighlight>
+
+==客户端实现问题==
+当某些HTTP/1.0客户端收到该状态码时，可能会将POST方法改为GET方法，继续向新地址发出请求，这是错误的实现——故而后续标准引入了[[HTTP_307|HTTP 307]]。<ref>{{cite web|last1=Roy|first1=Fielding,|last2=Julian|first2=Reschke,|title=Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content|url=https://tools.ietf.org/html/rfc7231#section-6.4.2|language=en|accessdate=2017-07-04|archive-date=2017-05-25|archive-url=https://web.archive.org/web/20170525004653/https://tools.ietf.org/html/rfc7231#section-6.4.2|dead-url=no}}</ref>
+
+==搜索引擎优化==
+由于该代码表示页面地址发生了较长久的改变，故[[必应|Bing]]<ref>{{cite web|title=How to Use the Site Move Tool|url=https://www.bing.com/webmaster/help/how-to-use-the-site-move-tool-bb8f5112|website=Bing Webmaster Tools|accessdate=2017-07-04|archive-date=2016-03-07|archive-url=https://web.archive.org/web/20160307042000/https://www.bing.com/webmaster/help/how-to-use-the-site-move-tool-bb8f5112|dead-url=no}}</ref>和[[谷歌|Google]]<ref>{{cite web|title=Change page URLs with 301 redirects - Search Console Help|url=https://support.google.com/webmasters/answer/93633?hl=en|website=Google Help|language=en|accessdate=2017-07-05|archive-date=2017-07-24|archive-url=https://web.archive.org/web/20170724151015/https://support.google.com/webmasters/answer/93633?hl=en|dead-url=no}}</ref>等搜索引擎都推荐使用301重定向，以改变搜索引擎中的实际页面地址。
+
+== 相關條目 ==
+* [[.htaccess|.htaccess]]
+* [[HTTP狀態碼|HTTP狀態碼]]
+* [[URL重寫|URL重寫]]
+* [[HTTP_302|HTTP 302]]
+* [[HTTP_303|HTTP 303]]
+* [[HTTP_307|HTTP 307]]
+* [[HTTP_Location|HTTP Location]]
+
+== 参考文献 ==
+<references />
+
+== 外部連結 ==
+* [http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html HTTP/1.1 Error codes in RFC 2616]{{Wayback|url=http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html |date=20100316011642 }} {{en icon}}
+* RFC 1945
+* RFC 2068
+
+[[Category:計算機錯誤|Category:計算機錯誤]]
+[[Category:HTTP|Category:HTTP]]

@@ -1,0 +1,104 @@
+{{noteTA|G1=IT}}{{RoughTranslation|en:UTF-1}}
+{{Infobox character encoding
+| name = UTF-1
+| mime = 
+| alias = 
+| image = 
+| caption = 
+| standard = 
+| lang = 国际
+| status = 已废弃
+| classification = [[Unicode转换格式|Unicode转换格式]]<br>[[EASCII|EASCII]]<br>{{tsl|en|variable-width encoding|变长编码}}
+| encodes = [[ISO_10646|ISO 10646]] （[[Unicode|Unicode]]）
+| extends = [[ASCII|ASCII]]
+| prev = 
+| next = [[UTF-8|UTF-8]]
+}}
+'''UTF-1'''是一种将ISO 10646 / [[Unicode|Unicode]]转化成[[字節流|字节流]]的方式。由于其本身的设计问题，如果自中间的一个字符开始解码，UTF-1將無法重新同步（這造成擷取的困難），而且UTF-1也沒辦法進行可靠的字节搜索。又因为UTF-1使用的除数不是2的幂，所以转化得也相当缓慢。由于以上这些问题，UTF-1从来没有得到广泛採用，并已被[[UTF-8|UTF-8]]所取代。
+
+== 设计 ==
+UTF-1是一个类似于[[UTF-8|UTF-8]]的多字节编码；一个单一的[[Unicode|Unicode]]代码点可以被编码成一个、两个、三个或五个[[八字节|八位字节]]。而如同[[UTF-8|UTF-8]]，[[ASCII|ASCII]]码系列可被编码为一个八位字节，[[ASCII|ASCII]]码的八位字节0X21 - 0x7E（十进制数33-126）也被用于UTF-1多字节编码；所以UTF-1不适合于许多互联网协议，包括[[MIME|MIME]]。 
+
+UTF-1在其他编码里不使用C0和C1控制码-任何[[十六进制|0x]]00-0X20或0x7F-0x9F的八位字节代表相应的在[[ISO-8859-1|ISO-8859-1]]的编码位置（分别为U+0000-0020和U+007F-009F）。这种设计有66个八位字节的保护力求與[[ISO/IEC_2022|ISO 2022]]兼容。 
+
+UTF-1编码系统使用190的求模运算（256-66=190），它被設計用来对完整的31位原版[[通用字符集|通用字符集]]（UCS-4）进行编码。相比较而言，UTF-8保护所有128个ASCII八位字节，而且需要两个跟踪字节的多字节编码才能达成这个目的，它构成对64的求模运算（8-2=6, 2<sup>6</sup>=64）。[[Binary_Ordered_Compression_for_Unicode|BOCU-1]]只保护所需的兼容MIME的极小集（0x00，0X07-0X0F，0X1A-0X1B和0X20），构成对243的求模运算（256-13=243）。
+
+{| <!-- legacy: --> border="1" cellspacing="3" cellpadding="3" <!-- modern: --> class="wikitable" style=
+! 编码位置 !! UTF-16BE !! UTF-16LE !! UTF-8    !! UTF-1
+|-
+|    U+007F || 007F     || 7F00     || 7F       || 7F
+|-
+|    U+0080 || 0080     || 8000     || C280     || 80
+|-
+|    U+009F || 009F     || 9F00     || C29F     || 9F
+|-
+|    U+00A0 || 00A0     || A000     || C2A0     || A0A0
+|-
+|    U+00BF || 00BF     || BF00     || C2BF     || A0BF
+|-
+|    U+00C0 || 00C0     || C000     || C380     || A0C0
+|-
+|    U+00FF || 00FF     || FF00     || C3BF     || A0FF
+|-
+|    U+0100 || 0100     || 0001     || C480     || A121
+|-
+|    U+015D || 015D     || 5D01     || C59D     || A17E
+|-
+|    U+015E || 015E     || 5E01     || C59E     || A1A0
+|-
+|    U+01BD || 01BD     || BD01     || C6BD     || A1FF
+|-
+|    U+01BE || 01BE     || BE01     || C6BE     || A221
+|-
+|    U+07FF || 07FF     || FF07     || DFBF     || AA72
+|-
+|    U+0800 || 0800     || 0008     || E0A080   || AA73
+|-
+|    U+0FFF || 0FFF     || FF0F     || E0BFBF   || B548
+|-
+|    U+1000 || 1000     || 0010     || E18080   || B549
+|-
+|    U+4015 || 4015     || 1540     || E48095   || F5FF
+|-
+|    U+4016 || 4016     || 1640     || E48096   || F62121
+|-
+|    U+D7FF || D7FF     || FFD7     || ED9FBF   || F72FC3
+|-
+|    U+E000 || E000     || 00E0     || EE8080   || F73A79
+|-
+|    U+F8FF || F8FF     || FFF8     || EFA3BF   || F75C3C
+|-
+|    U+FDD0 || FDD0     || D0FD     || EFB790   || F762BA
+|-
+|    U+FDEF || FDEF     || EFFD     || EFB7AF   || F762D9
+|-
+| [[字节顺序标记|U+FEFF]] || FEFF     || FFFE     || EFBBBF   || F7644C
+|-
+|    U+FFFD || FFFD     || FDFF     || EFBFBD   || F765AD
+|-
+|    U+FFFE || FFFE     || FEFF     || EFBFBE   || F765AE
+|-
+|    U+FFFF || FFFF     || FFFF     || EFBFBF   || F765AF
+|-
+|   U+10000 || D800DC00 || 00D800DC || F0908080 || F765B0
+|-
+|   U+38E2D || D8A3DE2D || A3D82DDE || F0B8B8AD || FBFFFF
+|-
+|   U+38E2E || D8A3DE2E || A3D82EDE || F0B8B8AE || FC21212121
+|-
+|   U+FFFFF || DBBFDFFF || BFDBFFDF || F3BFBFBF || FC2137B27A
+|-
+|  U+100000 || DBC0DC00 || C0DB00DC || F4808080 || FC2137B27B
+|-
+|  U+10FFFF || DBFFDFFF || FFDBFFDF || F48FBFBF || FC21396E6C
+|}
+
+== 参见 ==
+* [[通用字符集|通用字符集]]
+
+== 参考文献 ==
+* [https://web.archive.org/web/20130423014856/http://www.itscj.ipsj.or.jp/ISO-IR/178.pdf ISO IR 178] （PDF，256 KB，不再被使用的UTF-1规范）
+
+{{Character encoding}}
+
+[[Category:Unicode轉換格式|Category:Unicode轉換格式]]

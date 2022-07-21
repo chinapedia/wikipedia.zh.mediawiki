@@ -1,0 +1,61 @@
+{{noteTA
+|G1=IT
+}}
+在[[密碼學|密碼學]]的領域裡，'''初始向量'''（{{lang-en|initialization vector}}，縮寫為IV），或譯初向量，又稱'''初始變數'''（{{lang|en|starting variable}}，縮寫為SV）<ref>ISO/IEC 10116:2006 ''Information technology — Security techniques — Modes of operation for an ''n''-bit block cipher''</ref>，是一個固定長度的輸入值。一般的使用上會要求它是[[亂數|亂數]]或偽亂數（pseudorandom）。使用亂數產生的初始向量才能達到[[語義安全|語義安全]]（[[訊息驗證碼|訊息驗證碼]]也可能用到初始向量），並讓攻擊者難以對原文一致且使用同一把[[金鑰|金鑰]]生成的密文進行破解。在[[塊密碼|區塊加密]]中，使用了初始向量的加密模式被稱為[[塊密碼的工作模式|區塊加密模式]]。
+
+有些密碼運算只要求初始向量不要重覆，並只要求它用是內部求出的亂數值（這類亂數實際上不夠亂）。在這類應用下，初始向量通常被稱為[[nonce|nonce]]（臨時使用的數值），是可控制的（stateful）而不是亂數。這種作法是因為初始向量不會被寄送到密文的接收方，而是收發兩方透過事前約定的機制自行計算出對應的初始向量（不過，實作上還是經常會把nonce送過去以便檢查訊息的遺漏）。[[計數器模式|計數器模式]]中使用序列的方式來作為初始向量，它就是一種可控制之初始向量的加密模式。
+
+初始向量的長度依密碼運算的所需決定。在區塊加密中，初始向量的長度通常就等於一個區塊的大小。值得一提的是，對加密而言，一組難以預期並且與金鑰等長的初始向量能夠避免遭受TMD破譯法（簡單的說，是花'''時間'''（Time）觀察被攻擊者的密文，並將可能的密文預先算出來放在'''記憶體'''（Memory）中與之比對，然後推導出被攻擊者的'''明文或金鑰資料'''（Data）；這種破譯法比起用每一把金鑰試誤還來得快；不過只要密文的產生中伴隨機的因子就可以避免此類攻擊）<ref>{{cite journal|author=Alex Biryukov|title=Some Thoughts on Time-Memory-Data Tradeoffs|journal=IACR Eprint archive|year=2005|url=http://eprint.iacr.org/2005/207|access-date=2014-04-28|archive-date=2013-07-28|archive-url=https://web.archive.org/web/20130728150156/http://eprint.iacr.org/2005/207|dead-url=yes}}</ref><ref>{{cite journal|author1=Jin Hong|author2=Palash Sarkar|title=Rediscovery of Time Memory Tradeoffs|journal=IACR Eprint archive|year=2005|url=http://eprint.iacr.org/2005/090|access-date=2014-04-28|archive-date=2014-06-01|archive-url=https://web.archive.org/web/20140601162328/http://eprint.iacr.org/2005/090|dead-url=yes}}</ref><ref>{{cite journal|author1=Alex Biryukov|author2=Sourav Mukhopadhyay|author3=Palash Sarkar|title=Improved Time-Memory Trade-Offs with Multiple Data|journal=LNCS|issue=3897|pages=110–127|publisher=Springer|year=2007}}</ref><ref name="ECRYPT">{{cite techreport|author1=Christophe De Cannière|author2=Joseph Lano|author3=Bart Preneel|title=Comments on the Rediscovery of Time/Memory/Data Trade-off Algorithm|institution=ECRYPT Stream Cipher Project|number=40|year=2005|url=http://www.ecrypt.eu.org/stream/papersdir/040.pdf|access-date=2014-04-28|archive-date=2015-07-06|archive-url=https://web.archive.org/web/20150706134858/http://www.ecrypt.eu.org/stream/papersdir/040.pdf|dead-url=yes}}</ref>。使用亂數作為初始向量時，還必須考量碰撞的問題以避免生日攻擊法（簡單來說，就是一群人中兩個人生日相同的機率要高於50%只需要23個人，這意味著成功猜出這些人生日的次數可以被降的很低；同樣的狀況也發生在密碼學中，會影響密文的強度）。對於傳統、不支援初始向量的[[流加密|資料流加密法]]，實作上是將原金鑰與初始向量先運算後，計算出新的金鑰。然而有些實作已被認為不安全；比如[[有線等效加密|有線等效加密]]（WEP）協議就遭受到{{tsl|en|related-IV attack|關連式鑰匙攻擊}}。
+
+==動機==
+{{see also|块密码的工作模式}}
+
+[[File:Tux_ecb.jpg|thumb]]（ECB）下加密的結果並不安全，即使未經破解我們仍幾乎可以看得出原圖的輪廓。]]
+區塊加密在密碼學的領域裡是最基本的加密運算方式之一。然而它的限制是只能對一個預先定義、固定大小資料進行加密。比如在[[高級加密標準|高級加密標準]]（AES）裡，若使用長度為128位元的金鑰，加密的過程就是將整個明文切割成多個128位元長度的子明文，然後依前後順序用同一把金鑰轉換成對應的多個128位元長度的子密文，這些子密文依產生的順序連接起來便是完整的密文。這種作法其實就是把甲資料轉換成固定的乙資料，這樣的對應關係是絕對的，因此攻擊者在收集足夠的明文與密文的組合後可以輕易的比對並推導出明文或金鑰。
+
+為了要隱藏明文與密文的組合被攻擊者收集，並且不重新建立金鑰來混淆輸入的明文，在1980年由美國[[NIST|國家標準與技術中心]]提出了四種區塊加密模式。第一種稱為[[电子密码本|電子密碼書模式]]（ECB mode），描述了最基本的運作模式（前述較有疑慮的運算方式）。為了要避免ECB模式的問題，文中提出了[[密码块链接|密碼塊連結模式]]（CBC mode）。CBC模式的作法是對第一塊明文投入隨機的初始向量，然後將明文與向量運算的結果加密，加密的結果再作為下一塊明文的向量。這種做法的最終目的是要達到語義上的安全，讓攻擊者無法從密文中獲取能助其破譯的相關線索，避免遭受選擇明文攻擊法。
+
+==取值==
+初始向量的值依密碼演算法而不同。最基本的要求是「唯一性」，也就是說同一把金鑰不重覆使用同一個初始向量。這個特性無論在區塊加密或串流加密中都非常重要。
+
+:'''''範例：''''' 對明文''P''做串流加密，轉換成密文''C''。所使用的是串流金鑰''K''，它來自金鑰與初始向量。我們可以得到等式：''C'' = ''P'' xor ''K''。假如攻擊者得知密文''C''<sub>1</sub>與''C''<sub>2</sub>來自同一把金鑰與初始向量。那麼攻擊者就能透過底下公式得到明文''P''<sub>1</sub>與''P''<sub>2</sub>：
+::''C''<sub>1</sub> xor ''C''<sub>2</sub> = (''P''<sub>1</sub> xor K) xor (''P''<sub>2</sub> xor K) = ''P''<sub>1</sub> xor ''P''<sub>2</sub>.
+
+許多要求初始向量必須讓攻擊者無法預測。這種要求一般使用亂數或擬亂數來達到。在這種應用中，重覆的初始向量是可以被忽略的，但是[[生日問題|生日攻擊的問題]]依然得列入考量，因為若向量可以被預測，會讓攻擊者找到復原明文的線索。
+
+:'''''範例：''''' 比如[[艾莉絲|A]]使用CBC模式加密訊息，而有一位攻擊者E能截看所有密文並指定特定的明文給A，讓A進行加密（即，E有辦法執行''選擇明文攻擊''）。接著，我們假設A用明文''P<sub>Alice</sub>''與初始向量''IV''<sub>1</sub>做出密文''C<sub>Alice</sub>''。然後E設計了明文''P<sub>Eve</sub>''，並能控制或得知初始向量''IV''<sub>2</sub>的出現。那麼E就可以反覆測試，直到E設計的明文被加密後等於密文''C<sub>Alice</sub>''。自此，E用以下公式得知自己設計的明文''P<sub>Eve</sub>''等於明文''P<sub>Alice</sub>''
+::''C<sub>Alice</sub>'' = ''E''(''IV''<sub>1</sub> xor ''P<sub>Alice</sub>'') = ''E''(''IV''<sub>2</sub> xor (''IV''<sub>2</sub> xor ''IV''<sub>1</sub> xor ''P<sub>Alice</sub>'')).<ref>CWE-329: Not Using a Random IV with CBC Mode http://cwe.mitre.org/data/definitions/329.html {{Wayback|url=http://cwe.mitre.org/data/definitions/329.html |date=20110723014311 }}</ref>
+
+初始向量的值主要還是取決於密碼演算法。其做法不外乎就是隨機或指定（stateful）。使用隨機的方式則取值由發送方計算，並要將向量值送交給接收方。指定的方式則是讓收發兩方分享初始向量所能指定的所有值（state），這些值收發雙方必須預先就定義好。
+
+==區塊加密==
+
+區塊加密常被用做[[身份驗證|身份驗證]]的加密。之後亦有所謂的身份驗證加密模式（authenticated encryption modes）。在這種模式中會使用到初始向量。這類應用中一般求出的結果都是固定值，因此使用固定結果的方式（deterministic algorithms）進行驗證，所以初始向量亦使用固定值或是全部填零。
+
+==串流加密==
+
+串流加密中的初始向量被計入那些被用來加密的金鑰的資訊（secret state）裡，然後每次算出後的密文再滾入下一輪（round）的密文計算之中。由於效能的要求，串流加密的設計都希望輪的總數能愈小愈好；但實際的應用上，要定義出總數是十分困難的（not a trivial task）。再著，我們也必須考量其他議題，如：[[熵_(資訊理論)|傳輸過程中損失的資訊量]]、密文的獨一性、初始向量的相關性以及造成串流加密許多安全議題的相關初始向量攻擊法。這類攻擊議題對串流加密的安全性造成嚴重的隱憂，並且有許多持續進行的研究。
+
+== WEP的初始向量 ==
+在無線傳輸規格[[802.11|802.11]]的[[有線等效加密|有線等效加密]]演算法中使用24位元的初始向量來與同一把金鑰做加密運算，這使得密文容易被破譯。<ref name="Intercepting_Mobile_Comm_Nik_Ian_Dav">{{cite paper| author=Nikita Borisov, Ian Goldberg, David A. Wagner| title=Intercepting Mobile Communications: The Insecurity of 802.11| url=http://www.isaac.cs.berkeley.edu/isaac/mobicom.pdf| accessdate=2006-09-12| archive-date=2019-03-03| archive-url=https://web.archive.org/web/20190303190659/http://www.isaac.cs.berkeley.edu/isaac/mobicom.pdf| dead-url=no}}</ref>使用封包插入的方式可以在數秒內將WEP破解。這個嚴重的缺陷使得此演算法不被推薦使用。
+
+==參見==
+* [[Nonce|Nonce]]
+* [[隨機數|隨機數]]
+* [[盐_(密码学)|盐 (密码学)]]
+* [[塊密碼的工作模式|塊密碼的工作模式]]
+* [[RC4|RC4]]
+
+==參考文獻==
+{{reflist|1}}
+
+==延伸==
+*{{cite book |first=B. |last=Schneier |authorlink=布魯斯·施奈爾 |title=Applied Cryptography |location=New York |publisher=Wiley |year=1996 |edition=2nd |isbn=0-471-12845-7 }}
+*{{cite book |first=N. |last=Ferguson |first2=B. |last2=Schneier |title=Practical Cryptography |location=New York |publisher=Wiley |year=2003 |edition= |isbn=0-471-22894-X }}
+
+{{分组密码}}
+{{流密码}}
+
+[[Category:密码学|M]]
+[[Category:密碼演算法|Category:密碼演算法]]
+[[Category:分组密码工作模式|Category:分组密码工作模式]]

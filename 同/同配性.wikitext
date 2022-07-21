@@ -1,0 +1,78 @@
+'''同配性'''（'''Assortativity'''）, 用作考察[[度|度]]值相近的[[顶点_(图论)|顶点]]是否倾向于互相连接。
+
+如果总体上度大的[[顶点_(图论)|顶点]]倾向于连接度大的顶点，那么就称[[网络|网络]]的度正相关的，或者成网络是'''同配'''的；如果总体上度大的顶点倾向于连接度小的顶点，那么就称网络的度负相关的，或者成网络是'''异配'''的。<ref name="daolun">{{cite book|author=汪小帆 陈关荣|title=网络科学导论}}</ref>
+
+==同配性计算==
+===联合度分布===
+网络的[[度分布|度分布]]<math>P(k)=\frac{n(k)}{N}</math>为一阶度分布，'''联合度分布'''可理解为二阶度分布，或网络度的[[联合概率分布|联合概率分布]]。
+
+联合度分布<math>e_{jk}=P(j,k)=\frac{m(j,k)\mu(j,k)}{2M}</math>为两个端点的度分别为j和k的概率，<math>m(j,k)</math>为对应连边数，如果j=k，<math>\mu(j,k)=2</math>，否则<math>\mu(j,k)=1</math>
+
+余度分布<math>q_k=P_n(k)=\sum_{j=k_{min}}^{k_{max}} P(j,k)</math>，即网络度的[[边缘分布|边缘分布]]，表示随机[[顶点_(图论)|顶点]]的邻居顶点为k的概率。
+
+如果二阶度分布是完全随机的，即恒有<math>e_{jk}=q_jq_k</math>，则网络'''不具有度相关性'''。<ref name="daolun"/>
+===余平均度===
+'''余平均度'''是[[顶点_(图论)|顶点]]i的邻居顶点的平均度，记为<math><k_{nn}>_i=\frac{1}{k_i}\sum_{j=1}^{k_i}k_{i_j}</math>，度为k的顶点的余平均度记为<math><k_{nn}>(k)=\frac{1}{i_k}\sum_{v_i=1}^{i_k}<k_{nn}>_{v_i}</math>。
+
+:<math> <k_{nn}>(k) = \sum_{k'=k_{min}}^{k_{max}} k'P_c(k'|k)= \frac{1}{q_k} \sum_{k'=k_{min}}^{k_{max}} k'e_{kk'}</math>
+
+如果<math><k_{nn}>(k)</math>是k的增函数，那么就意味着平均而言，度大的[[顶点_(图论)|顶点]]倾向于与度大的顶点连接，从而表明网络是'''同配'''的；反之，如果<math><k_{nn}>(k)</math>是k的减函数，那么就意味着平均而言，度大的顶点倾向于与度小的顶点连接，从而表明网络是'''异配'''的；如果网络不具有度相关性，那么<math><k_{nn}>(k)</math>是一个与k无关的[[常数|常数]]：
+
+:<math><k_{nn}>(k)=\frac{\sum_j je_{jk}}{\sum_j e_{jk}}=\frac{\sum_j jq_jq_k}{q_k}=\sum_j jq_j=\sum_j j\frac{jp_j}{<k>}=\frac{<k^2>}{<k>}</math><ref name="daolun"/>
+
+===同配系数===
+网络是度相关的就意味着<math>e_{jk}</math>与<math>q_jq_k</math>之间不恒等。可以考虑用两者之间的差的大小刻画网络的同配或者异配程度，即如下定义的度相关函数：
+
+:<math><jk>-<j><k>=\sum_{j,k} jk(e_{jk}-q_jq_k)</math>
+
+当网络为完全同配时，<math>e_{jk}=q_k\delta_{jk}</math>，<math><jk>-<j><k></math>达到最大值，即为余度分布<math>q_k</math>的方差：
+
+:<math>\sigma_q^2=\sum_k k^2q_k-(\sum_k kq_k)^2</math>
+
+于是得到归一化的相关系数，即'''同配系数'''，记为'''r'''：
+
+:<math>r=\frac{\sum_{j,k} jk(e_{jk}-q_jq_k)}{\sigma_{q}^2}</math>
+
+其中r>0代表网络'''同配'''，r<0代表网络'''异配'''，|r|的大小反映了网络同配或异配的强弱程度。
+
+令属性值<math>x_i</math>为度值<math>k_i</math>，可从[[皮尔逊积矩相关系数|皮尔逊积矩相关系数]]计算同配系数：
+
+:<math>\displaystyle r=\frac{cov(x_i,x_j)}{\sigma_x^2}=\frac{\displaystyle\sum_{i,j}(a_{ij}-\frac{k_ik_j}{2M})x_ix_j}{\displaystyle\sum_{i,j}(k_i\delta_{ij}-\frac{k_ik_j}{2M})x_ix_j}=\frac{\displaystyle\sum_{i,j}(a_{ij}-\frac{k_ik_j}{2M})k_ik_j}{\displaystyle\sum_{i,j}(k_i\delta_{ij}-\frac{k_ik_j}{2M})k_ik_j}</math>
+
+:<math>\displaystyle =\frac{S_1S_e-S_2^2}{S_1S_3-S_2^2}=\frac{\displaystyle(\sum_ik_i)(2\sum_{(i,j)\in E}k_ik_j)-(\sum_ik_i^2)^2}{\displaystyle(\sum_ik_i)(\sum_ik_i^3)-(\sum_ik_i^2)^2}</math>
+
+对于[[有向图|有向图]]，也可以利用皮尔逊积矩相关系数<math>r=\frac{\sum_{xy} xy(e_{xy}-a_xb_y)}{\sigma_a \sigma_b}</math>计算，即<math>r=\frac{\sum_{j,k} jk(e_{jk}-q_j^{in}q_k^{out})}{\sigma_{in}\sigma_{out}}</math><ref name="daolun"/><ref>{{cite web|url=http://arxiv.org/pdf/cond-mat/0205405.pdf?origin=publication_detail|author=M. E. J. Newman|title=Assortative mixing in networks|access-date=2014-05-02|archive-date=2019-12-07|archive-url=https://web.archive.org/web/20191207110238/https://arxiv.org/pdf/cond-mat/0205405.pdf?origin=publication_detail}}</ref><ref>{{cite web|url=http://arxiv.org/abs/condmat/0209450|author=M. E. J. Newman|title=Mixing patterns in networks}}</ref>
+
+===例子===
+N点星型网络，其中包括度为N-1的1个点，度为1的N-1个点
+
+<math>P(N-1,1)=P(1,N-1)=\dfrac{1}{2}</math>
+
+<math>q_1=\dfrac{1}{2},q_{N-1}=\dfrac{1}{2}</math>
+
+<math>\displaystyle \sum_{j,k}jk(e_{jk}-q_j q_k)=(1)^2(-\frac{1}{4})+2(1)(N-1)(\frac{1}{4})+(N-1)^2(-\frac{1}{4})=\frac{-(N-2)^2}{4}</math>
+
+<math>\displaystyle \sigma_q^2=\sum_k k^2 q_k-(\sum_k kq_k)^2=(1)^2(\frac{1}{2})+(N-1)^2(\frac{1}{2})-(\frac{N}{2})^2=\frac{(N-2)^2}{4}</math>
+
+<math>r=\frac{\sum_{j,k} jk(e_{jk}-q_jq_k)}{\sigma_{q}^2}=-1</math>
+
+所以星型网络是异配的。
+
+用另外一个公式会得到一样的值。
+
+<math>S_1=2(N-1),S_2=N(N-1),S_3=(N-1)[(N-1)^2+1],S_e=2(N-1)^2</math>
+
+<math>r=\dfrac{S_1 S_e-S_2^2}{S_1 S_3-S_2^2}=\dfrac{4(N-1)^3-N^2 (N-1)^2}{2(N-1)^2[(N-1)^2+1]-N^2 (N-1)^2}</math>
+
+<math>=\dfrac{4(N-1)-N^2}{2[(N-1)^2+1]-N^2}=\dfrac{-(N-2)^2}{(N-2)^2}=-1</math>
+
+
+
+==算法==
+*同配系数的算法：[http://www.pudn.com/downloads148/sourcecode/math/detail638498.html get_assortative_coefficient] {{Wayback|url=http://www.pudn.com/downloads148/sourcecode/math/detail638498.html |date=20160304230330 }}
+
+==参考资料==
+<references/>
+
+[[Category:网络|Category:网络]]
+[[Category:图论|Category:图论]]

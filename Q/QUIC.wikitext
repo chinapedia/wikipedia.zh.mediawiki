@@ -1,0 +1,189 @@
+{{多個問題|
+{{copyedit|time=2019-04-11T02:51:36+00:00}}
+{{refimprove|time=2018-12-14T17:31:40+00:00}}
+{{expand|time=2018-12-14T17:31:40+00:00}}
+{{Rough translation}}
+}}
+{{noteTA
+|G1 = IT
+|1 = zh-cn:通过; zh-tw:透過; zh-hk:通過; 
+}}
+{{网络协议}}
+
+'''QUIC'''（读作“quick”）是一个通用<ref name="transport draft" />的[[传输层|传输层]]<ref name="LWN" />[[网络传输协议|网络协议]]，最初由[[Google|Google]]的[[Jim_Roskind|Jim Roskind]]设计<ref name="QUIC Design Doc" />，2012年实现并部署<ref name="Chromium Code Merging QUIC"/>，2013年随着实验范围的扩大而公开发布<ref name="chromium_announcement" /><ref name="Google Working on QUIC" /><ref name="quic_youtube" />，并向[[IETF|IETF]]描述<ref name="IETF QUIC Intro" />。虽然长期处于{{le|互联网草案|Internet Draft}}阶段，但在从Chrome浏览器到Google服务器的所有连接中，超过一半的连接都使用了QUIC<ref name="TechCrunch" />。[[Microsoft_Edge|Microsoft Edge]]<ref>{{cite web|url=https://www.windowslatest.com/2018/04/03/microsoft-to-add-support-for-googles-quic-fast-internet-protocol-in-windows-10-redstone-5/|title=Microsoft to add support for Google's QUIC fast internet protocol in Windows 10 Redstone 5|author=Christopher Fernandes|date=April 3, 2018|access-date=2020-05-08|archive-date=2020-11-23|archive-url=https://web.archive.org/web/20201123160745/https://www.windowslatest.com/2018/04/03/microsoft-to-add-support-for-googles-quic-fast-internet-protocol-in-windows-10-redstone-5/|dead-url=no}}</ref>、[[Firefox瀏覽器|Firefox]]<ref name=Bram>{{cite web|url=https://www.bram.us/2020/04/08/how-to-enable-http3-in-chrome-firefox-safari/|title=How to enable HTTP3 in Chrome / Firefox / Safari|date=April 8, 2020|website=bram.us|accessdate=2021-02-02|archive-date=2021-01-28|archive-url=https://web.archive.org/web/20210128203317/https://www.bram.us/2020/04/08/how-to-enable-http3-in-chrome-firefox-safari/|dead-url=no}}</ref>和[[Safari|Safari]]<ref>{{Cite web|title=The state of QUIC and HTTP/3 2020|url=https://www.fastly.com/blog/state-of-quic-and-http3-2020|access-date=2020-10-21|website=www.fastly.com|archive-date=2020-11-13|archive-url=https://web.archive.org/web/20201113164502/https://www.fastly.com/blog/state-of-quic-and-http3-2020|dead-url=no}}</ref>都支持它，但默认情况下没有启用。其于RFC9000中正式推出标准化版本<ref name=":1">{{Cite web|title=rfc9000|url=https://tools.ietf.org/html/rfc9000|access-date=2021-06-01|work=tools.ietf.org|language=en}}</ref>。
+
+虽然它的名字最初是作为 “快速UDP互联网连接”的首字母缩写提出的<ref name="QUIC Design Doc" /><ref name="IETF QUIC Intro" />，但IETF使用的QUIC一词并不是首字母缩写，它只是协议的名称<ref name="transport draft" />。QUIC提高了目前使用[[传输控制协议|TCP]]的面向连接的[[网络应用程序|网络应用]]的性能<ref name="LWN" /><ref name="TechCrunch">{{Cite web|url=https://techcrunch.com/2015/04/18/google-wants-to-speed-up-the-web-with-its-quic-protocol/|title=Google Wants To Speed Up The Web With Its QUIC Protocol|last=Lardinois|first=Frederic|website=TechCrunch|access-date=2016-10-25|archive-date=2020-12-14|archive-url=https://web.archive.org/web/20201214135016/https://techcrunch.com/2015/04/18/google-wants-to-speed-up-the-web-with-its-quic-protocol/|dead-url=no}}</ref>。它通过使用[[用户数据报协议|用户数据报协议]]（UDP）在两个端点之间建立若干个[[多路复用|多路连接]]来实现这一目标，其目的是为了在网络层淘汰TCP，以满足许多应用的需求，因此该协议偶尔也会获得 “TCP/2”的昵称<ref name="Call it TCP/2. One More Time." />。
+
+QUIC与[[HTTP/2|HTTP/2]]的多路复用连接协同工作，允许多个数据流独立到达所有端点，因此不受涉及其他数据流的[[丢包|丢包]]影响。相反，HTTP/2建立在[[传输控制协议|传输控制协议]]（TCP）上，如果任何一个TCP数据包延迟或丢失，所有多路数据流都会遭受[[队头阻塞|队头阻塞]]延迟。
+
+QUIC的次要目标包括降低连接和传输[[时延|时延]]，以及每个方向的[[带宽_(计算机)|带宽]]估计以避免[[网络拥塞|拥塞]]。它还将[[拥塞控制|拥塞控制]]算法移到了两个端点的[[使用者空間|使用者空間]]，而不是内核空间，据称这将使这些算法得到更快的改进。此外，该协议还可以扩展[[纠错码|前向纠错]]（FEC），以进一步提高预期错误时的性能，这被视为协议演进的下一步。
+
+2015年6月，QUIC规范的{{le|互联网草案|Internet Draft}}提交给[[IETF|IETF]]进行标准化<ref>{{Cite web|url=https://www.infoq.com/news/2015/04/google-quic-ietf-standard|title=Google Will Propose QUIC As IETF Standard|website=InfoQ|access-date=2016-10-25|archive-date=2020-10-24|archive-url=https://web.archive.org/web/20201024183627/https://www.infoq.com/news/2015/04/google-quic-ietf-standard/|dead-url=no}}</ref><ref>{{cite mailing list |url=https://www.ietf.org/mail-archive/web/i-d-announce/current/msg66052.html |title=I-D Action: draft-tsvwg-quic-protocol-00.txt |date=17 Jun 2015 |mailing-list=i-d-announce |access-date=2018-12-10 |archive-date=2016-05-26 |archive-url=https://web.archive.org/web/20160526205312/https://www.ietf.org/mail-archive/web/i-d-announce/current/msg66052.html |dead-url=no }}</ref>。2016年，成立了QUIC工作组<ref>{{Cite web|url=https://datatracker.ietf.org/wg/quic/documents/|title=QUIC - IETF Working Group|website=datatracker.ietf.org|access-date=2016-10-25|archive-date=2021-02-05|archive-url=https://web.archive.org/web/20210205204903/https://datatracker.ietf.org/wg/quic/documents/|dead-url=no}}</ref>。2018年10月，IETF的HTTP工作组和QUIC工作组共同决定将QUIC上的HTTP映射称为 "[[HTTP/3|HTTP/3]]"，以提前使其成为全球标准<ref name=":0">{{cite news |url=https://www.zdnet.com/article/http-over-quic-to-be-renamed-http3/ |title=HTTP-over-QUIC to be renamed HTTP/3 |website=ZDNet |date=12 November 2018 |first=Catalin |last=Cimpanu |accessdate=2018-12-10 |archive-date=2018-11-13 |archive-url=https://web.archive.org/web/20181113020115/https://www.zdnet.com/article/http-over-quic-to-be-renamed-http3/ |dead-url=no }}</ref>。2021年5月IETF公布RFC9000，QUIC规范推出了标准化版本<ref name=":1" />。
+
+== 背景 ==
+[[传输控制协议|传输控制协议]] (TCP) 旨在为两个端点之间发送数据流提供一个接口。数据交给TCP系统，TCP系统确保数据以完全相同的形式传到另一端，否则连接将提示存在错误<ref name="ARSnext">{{cite web|title=The next version of HTTP won't be using TCP|url=https://arstechnica.com/gadgets/2018/11/the-next-version-of-http-wont-be-using-tcp/|date=12 November 2018|last=Bright|first=Peter|website=Arstechnica|accessdate=2019-04-10|archive-date=2019-04-10|archive-url=https://web.archive.org/web/20190410100857/https://arstechnica.com/gadgets/2018/11/the-next-version-of-http-wont-be-using-tcp/|dead-url=no}}</ref>。
+
+为此，TCP将数据分解成[[網路封包|網路封包]]，并在每个数据包中添加少量数据。这些附加数据包括一个序列号，用于检测丢失或到达顺序不正确的数据包，以及一个[[校验和|校验和]]，可以检测数据包数据内的错误。当其中任何一个问题发生时，TCP使用[[自动重传请求|自动重传请求]]（ARQ）告诉发送方重新发送丢失或损坏的数据包<ref name="ARSnext" />。
+
+在大多数实现中，TCP会将连接上的任何错误视为阻塞，停止进一步传输，直到错误得到解决或连接被视为失败。如果使用单个连接来发送多个数据流，就像在HTTP/2协议中那样，所有这些数据流都会被阻止，尽管其中只有一个可能有问题。例如，如果在下载用于收藏夹图标的GIF图像时出现一个错误，页面的其余部分将等待问题得到解决<ref name="ARSnext" />。
+
+由于TCP系统被设计成看起来像一个“数据管道”，或流，它故意包含很少的对它传输的数据的理解。如果数据有额外的要求，如使用TLS加密，这必须由运行在传输控制协议之上的系统设置，使用传输控制协议与连接另一端的类似软件进行通信。每种设置任务都需要自己的握手过程。这通常需要多次往返请求和响应，直到建立连接。由于长距离通信的固有延迟，这会给整个传输增加大量开销<ref name="ARSnext"/>。
+
+== 介绍 ==
+QUIC旨在提供几乎等同于TCP连接的[[可靠性_(计算机网络)|可靠性]]，但[[來回通訊延遲|延迟]]大大减少。它主要通过两个理解[[HTTP|HTTP]]流量的行为来实现这一点<ref name='ARSnext' />。
+
+第一个变化是在连接建立期间大大减少{{Link-en|开销|Overhead (computing)}}。由于大多数HTTP连接都需要[[TLS|TLS]]，因此QUIC使协商[[傳輸層安全性協定#密钥交换和密钥协商|密钥]]和支持的协议成为初始[[握手_(技术)|握手]]过程的一部分。
+当客户端打开连接时，[[服务器|服务器]]响应的[[数据包|数据包]]包括将来的数据包[[加密|加密]]所需的数据。这消除了TCP上的先连接并通过附加数据包协商安全协议的需要。其他协议可以以相同的方式进行服务，并将多个步骤组合到一个请求中。
+然后，这些数据既可用于初始设置中的后续请求，也可用于未来的请求。<ref name='ARSnext'/>
+
+QUIC使用UDP协议作为其基础，不包括[[丢包|丢失]]恢复。相反，每个QUIC流是单独控制的，并且在QUIC级别而不是UDP级别重传丢失的数据。这意味着如果在一个流中发生错误，[[协议栈|协议栈]]仍然可以独立地继续为其他流提供服务。
+这在提高易出错链路的性能方面非常有用，因为在大多数情况下TCP协议通知数据包丢失或损坏之前可能会收到大量的正常数据，但是在纠正错误之前其他的正常请求都会等待甚至重发。
+QUIC在修复单个流时可以自由处理其他数据，也就是说即使一个请求发生了错误也不会影响到其他的请求。<ref>{{cite web|last1=Behr|first1=Michael|last2=Swett|first2=Ian|title=Introducing QUIC support for HTTPS load balancing|url=https://cloudplatform.googleblog.com/2018/06/Introducing-QUIC-support-for-HTTPS-load-balancing.html|website=Google Cloud Platform Blog|publisher=Google|accessdate=16 June 2018|archive-date=2019-04-10|archive-url=https://web.archive.org/web/20190410100858/https://cloudplatform.googleblog.com/2018/06/Introducing-QUIC-support-for-HTTPS-load-balancing.html|dead-url=no}}</ref>
+
+QUIC包括许多其他更普通的更改，这些更改也可以优化整体延迟和[[吞吐量|吞吐量]]。例如，每个数据包是单独加密的，因此加密数据时不需要等待部分数据包。
+在TCP下通常不可能这样做，其中加密记录在[[字节流|字节流]]中，并且协议栈不知道该流中的更高层边界。这些可以由运行在更上层的协议进行协商，但QUIC旨在通过单个握手过程完成这些。<ref name='IETF QUIC Intro'/>
+
+QUIC的另一个目标是提高网络切换期间的性能，例如当移动设备的用户从[[Wi-Fi|WiFi热点]]切换到[[移动网络|移动网络]]时发生的情况。
+当这发生在TCP上时，一个冗长的过程开始了：每个现有连接一个接一个地{{Link-en|超时|Timeout (computing)}}，然后根据需要重新建立。期间存在较高延迟，因为新连接需要等待旧连接超时后才会建立。
+为解决此问题，QUIC包含一个连接标识符，该标识符唯一地标识客户端与服务器之间的连接，而无论源[[IP地址|IP地址]]是什么。这样只需发送一个包含此ID的数据包即可重新建立连接，因为即使用户的IP地址发生变化，原始连接ID仍然有效。<ref name='QUICoverview'>{{cite web|url=https://docs.google.com/document/d/1gY9-YNDNAB1eip-RTPbqphgySwSNSDHLq9D5Bty4FSU/edit|title=QUIC at 10,000 feet|website=Chromium|accessdate=2019-04-10|archive-date=2019-04-10|archive-url=https://web.archive.org/web/20190410100900/https://docs.google.com/document/d/1gY9-YNDNAB1eip-RTPbqphgySwSNSDHLq9D5Bty4FSU/edit|dead-url=no}}</ref>
+
+QUIC在{{Link-en|应用程序空间|Application domain}}中实现，而不是在[[内核|操作系统内核]]中实现。当数据在应用程序之间移动时，这通常会由于上下文切换而调用额外的开销。
+但是在QUIC下协议栈旨在由单个应用程序使用，每个应用程序使用QUIC在UDP上托管自己的连接。最终差异可能非常小，因为整个[[HTTP/2|HTTP/2]]堆栈的大部分已经存在于应用程序（或更常见的库）中。
+将剩余部分放在这些库中，基本上是纠错，对HTTP/2堆栈的大小或整体复杂性几乎没有影响。<ref name='IETF QUIC Intro'/>
+
+QUIC允许更容易地进行未来更改，因为它不需要更改内核就可以进行更新。
+QUIC的长期目标之一是添加[[前向纠错|前向纠错]]和改进的[[拥塞控制|拥塞控制]]。<ref name='QUICoverview'/>
+
+关于从TCP迁移到UDP的一个问题是TCP被广泛采用，并且互联网基础设施中的许多中间设备被调整为UDP速率限制甚至阻止UDP。
+Google进行了一些探索性实验来描述这一点，发现只有少数连接存在此问题。<ref name='QUIC Design Doc' />所以Chromium的网络堆栈同时打开QUIC和传统TCP连接，并在QUIC连接失败时以零延迟回退到TCP连接。<ref>{{cite web|url=https://quicwg.org/ops-drafts/draft-ietf-quic-applicability.html|title=Applicability of the QUIC Transport Protocol|date=22 October 2018|website=IETF Network Working Group|accessdate=2019-04-10|archive-date=2019-06-07|archive-url=https://web.archive.org/web/20190607061611/https://quicwg.org/ops-drafts/draft-ietf-quic-applicability.html|dead-url=no}}</ref>
+
+=== gQUIC与iQUIC ===
+由Google创建并以QUIC的名称提交给IETF的协议与随后在IETF中创建的QUIC完全不同（尽管名称相同）。
+最初的Google QUIC（也称为gQUIC）严格来说是通过加密UDP发送HTTP/2帧的协议，而IETF创建的QUIC是通用传输协议，也就是说HTTP以外的其他协议（如[[SMTP|SMTP]]、[[DNS|DNS]]、[[Secure_Shell|SSH]]、[[Telnet|Telnet]]、[[網路時間協定|NTP]]）也可以使用它。重要的是要注意并记住其差异。
+自2012年以来，Google在其服务及Chrome中使用的QUIC版本（直到2019年2月）为Google QUIC。随着时间的推移，它正在逐渐变得类似于IETF QUIC（也称为iQUIC）。
+== 流量控制 ==
+與大多數傳輸協議一樣，QUIC 具有流量控制以保護接收端免受緩衝區overflow的影響。QUIC 是基於 UDP 傳輸，而 UDP 沒有流量控制，因此 QUIC 實現了自己的流量控制機制。與TCP不同，QUIC並非透過ACK回應目前接收到第幾筆資料，而是透過control frame實現類似於 HTTP/2 的基於信用的方案。
+
+== 实现 ==
+=== 客户端 ===
+[[Google_Chrome|Google Chrome]]于2012年开始开发QUIC协议并且于[[Chromium|Chromium]]版本 29 (2013年8月20日释出) 发布。QUIC协议在当前Chrome版本中被默认开启，活跃的会话列表在<code>''chrome://net-internals/#quic''</code>中可见。
+
+=== 服务端 ===
+截至2017年，有三种活跃维护中的实现。谷歌的服务器及谷歌发布的[https://code.google.com/p/chromium/codesearch#chromium/src/net/tools/quic/quic_server.cc 原型服务器] {{Wayback|url=https://code.google.com/p/chromium/codesearch#chromium/src/net/tools/quic/quic_server.cc |date=20160603023823 }}使用Go语言编写的[https://github.com/lucas-clemente/quic-go quic-go] {{Wayback|url=https://github.com/lucas-clemente/quic-go |date=20210122101044 }}及[[Caddy|Caddy]]的试验性QUIC支持。在2017年7月11日，LiteSpeed科技正式在他们的[[负载均衡|负载均衡]]（[https://www.litespeedtech.com/products/litespeed-web-adc WebADC] {{Wayback|url=https://www.litespeedtech.com/products/litespeed-web-adc |date=20201204001422 }}）及 LiteSpeed 服务器中支持QUIC。截止 17 年 12 月， 97.5%的使用 QUIC 协议的网站在 LiteSpeed 服务器中运行<ref>{{Cite web|url=https://w3techs.com/technologies/segmentation/ce-quic/web_server|title=Distribution of Web Servers among websites that use QUIC|accessdate=2018-12-10|work=w3techs.com}}</ref>。
+
+另有几种不再维护的社区产品，基于Chromium实现并且减少使用依赖的[https://github.com/devsisters/libquic libquic] {{Wayback|url=https://github.com/devsisters/libquic |date=20201207195815 }}、提供libquic的Go语言绑定的[https://github.com/devsisters/goquic goquic] {{Wayback|url=https://github.com/devsisters/goquic |date=20201203225947 }}、打包为[[Docker|Docker]]镜像的用来转换为普通HTTP请求的反向代理[https://hub.docker.com/r/devsisters/quic-reverse-proxy/ quic-reverse-proxy] {{Wayback|url=https://hub.docker.com/r/devsisters/quic-reverse-proxy/ |date=20200413011828 }}。
+
+2020年12月，支持DNS-over-QUIC协议的公共[[DNS|DNS]]解析器，由[[AdGuard|AdGuard]]首次公開推出服務<ref>{{cite web |author1=Darya Bugayova |title=AdGuard 成为世界第一个 DNS-over-QUIC 解析器 |url=https://adguard.com/zh_cn/blog/dns-over-quic.html |publisher=AdGuard |language=zh-cn |format=html |date=2020-12-16 |accessdate=2020-12-18 |archive-date=2020-12-17 |archive-url=https://web.archive.org/web/20201217095635/https://adguard.com/zh_cn/blog/dns-over-quic.html |dead-url=no }}</ref>。
+
+== 参见 ==
+* [[HTTP/3|HTTP/3]]
+*[[HTTP/2|HTTP/2]]
+* [[SPDY|SPDY]]
+* [[流控制传输协议|-{zh-tw:串流控制傳輸協定; zh-cn:流控制传输协议;}-]]
+* [[UDT|UDT]]
+* [[TLS|TLS]]
+* [[DTLS|DTLS]]
+* [[握手_(技术)|三方交握]]
+
+==参考资料==
+{{reflist|30em|refs=
+<ref name="Google Working on QUIC">{{cite web
+  | url        = https://plus.google.com/u/0/100132233764003563318/posts/b36wVornPtD
+  | title      = QUIC, Google wants to make the web faster
+  | publisher  = François Beaufort, Chromium Evangelist
+  }}</ref>
+
+<ref name="QUIC Design Doc">{{cite web
+  | url        = https://docs.google.com/document/d/1RNHkx_VvKWyWg6Lr8SZ-saqsQx7rFV-ev2jRFUoVD34/edit
+  | title        = QUIC: Design Document and Specification Rationale
+  | publisher        = Jim Roskind, Chromium Contributor
+  | accessdate        = 2015-04-29
+  | archive-date        = 2014-11-10
+  | archive-url        = https://web.archive.org/web/20141110231834/https://docs.google.com/document/d/1RNHkx_VvKWyWg6Lr8SZ-saqsQx7rFV-ev2jRFUoVD34/edit
+  | dead-url        = no
+  }}</ref>
+
+<ref name="Chromium Code Merging QUIC">{{cite web
+  | url        = https://chromiumcodereview.appspot.com/11125002
+  | title        = First Chromium Code Landing: CL 11125002: Add QuicFramer and friends.
+  | access-date        = 2012-10-16
+  | archive-date        = 2020-04-13
+  | archive-url        = https://web.archive.org/web/20200413153749/https://chromiumcodereview.appspot.com/11125002/
+  | dead-url        = no
+  }}</ref>
+
+<ref name="chromium_announcement">{{cite web
+  | url        = https://blog.chromium.org/2013/06/experimenting-with-quic.html
+  | title        = Experimenting with QUIC
+  | publisher        = Chromium Official Blog
+  | access-date        = 2013-07-16
+  | archive-date        = 2021-02-05
+  | archive-url        = https://web.archive.org/web/20210205044854/https://blog.chromium.org/2013/06/experimenting-with-quic.html
+  | dead-url        = no
+  }}</ref>
+
+<ref name="quic_youtube">{{cite web
+  | url        = https://www.youtube.com/watch?v=hQZ-0mXFmk8
+  | title        = QUIC: next generation multiplexed transport over UDP
+  | publisher        = YouTube
+  | access-date        = 2014-04-04
+  | archive-date        = 2020-11-18
+  | archive-url        = https://web.archive.org/web/20201118054720/https://www.youtube.com/watch?v=hQZ-0mXFmk8
+  | dead-url        = no
+  }}</ref>
+
+<ref name="LWN">{{cite web
+ |url          = https://lwn.net/Articles/558826/
+ |title        = Connecting on the QUIC
+ |author       = Nathan Willis
+ |publisher    = Linux Weekly News
+ |access-date  = 2013-07-16
+ |archive-date = 2020-10-16
+ |archive-url  = https://web.archive.org/web/20201016235245/https://lwn.net/Articles/558826/
+ |dead-url     = no
+}}</ref>
+
+<ref name="IETF QUIC Intro">{{cite web
+  | url        = http://www.ietf.org/proceedings/88/slides/slides-88-tsvarea-10.pdf
+  | title        = QUIC: IETF-88 TSV Area Presentation
+  | publisher        = Jim Roskind, Google
+  | access-date        = 2013-11-07
+  | archive-date        = 2014-02-11
+  | archive-url        = https://web.archive.org/web/20140211161417/http://www.ietf.org/proceedings/88/slides/slides-88-tsvarea-10.pdf
+  | dead-url        = no
+  }}</ref>
+
+<ref name="transport draft">{{cite IETF
+  | title = QUIC: A UDP-Based Multiplexed and Secure Transport
+  | draft = draft-ietf-quic-transport-22
+  | section = 1
+  | publisher = [[Internet_Engineering_Task_Force|IETF]]
+  }}</ref>
+
+<ref name="Call it TCP/2. One More Time.">{{cite web
+ |url          = https://github.com/ngtcp2/ngtcp2
+ |title        = ngtcp2
+ |author       = Tatsuhiro Tsujikawa
+ |publisher    = GitHub
+ |access-date  = 2020-10-17
+ |archive-date = 2021-01-22
+ |archive-url  = https://web.archive.org/web/20210122100734/https://github.com/ngtcp2/ngtcp2
+ |dead-url     = no
+}}</ref>
+}}
+
+== 外部連結 ==
+* [[Chromium|Chromium]]: [https://www.chromium.org/quic QUIC, a multiplexed stream transport over UDP] {{Wayback|url=https://www.chromium.org/quic |date=20210204235928 }}
+* [https://docs.google.com/document/d/1RNHkx_VvKWyWg6Lr8SZ-saqsQx7rFV-ev2jRFUoVD34/edit QUIC: Design Document and Specification Rationale]{{Wayback|url=https://docs.google.com/document/d/1RNHkx_VvKWyWg6Lr8SZ-saqsQx7rFV-ev2jRFUoVD34/edit |date=20141110231834 }}, Jim Roskind's original document (2012/2013)
+* {{link-en|Daniel Stenberg|Daniel Stenberg}}: [https://http3-explained.haxx.se/en/ HTTP/3 explained] {{Wayback|url=https://http3-explained.haxx.se/en/ |date=20210205160252 }}
+* [[LWN.net|Linux Weekly News]]: [https://lwn.net/Articles/558826/ Connecting on the QUIC] {{Wayback|url=https://lwn.net/Articles/558826/ |date=20201016235245 }} (2013)
+* [https://www.ietf.org/proceedings/88/slides/slides-88-tsvarea-10.pdf QUIC:] {{Wayback|url=https://www.ietf.org/proceedings/88/slides/slides-88-tsvarea-10.pdf |date=20201026224514 }}, IETF-88 TSV Area Presentation (2013-11-07)
+* Chromium Blog: [https://blog.chromium.org/2013/06/experimenting-with-quic.html Experimenting with QUIC] {{Wayback|url=https://blog.chromium.org/2013/06/experimenting-with-quic.html |date=20210205044854 }}  (2013)
+* [https://www.youtube.com/watch?v=hQZ-0mXFmk8 QUIC: next generation multiplexed transport over UDP] {{Wayback|url=https://www.youtube.com/watch?v=hQZ-0mXFmk8 |date=20201118054720 }} (Google Developers, 2014)
+* [http://c3lab.poliba.it/images/3/3b/QUIC_SAC15.pdf HTTP over UDP: an Experimental Investigation of QUIC]{{Wayback|url=http://c3lab.poliba.it/images/3/3b/QUIC_SAC15.pdf |date=20150518071710 }}
+* [http://www.multipath-quic.org Multipath QUIC] {{Wayback|url=http://www.multipath-quic.org/ |date=20201128020245 }} (extension to QUIC)
+* [https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7867726 Innovating Transport with QUIC: Design Approaches and Research Challenges]{{Wayback|url=https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7867726 |date=20200916071655 }} (2017)
+
+[[Category:传输层协议|Category:传输层协议]]
+[[Category:网际协议|Category:网际协议]]
+[[Category:Google軟體|Category:Google軟體]]

@@ -1,0 +1,151 @@
+{{noteTA
+|1=zh-cn:最大公约数;zh-tw:最大公因數;
+}}
+
+'''扩展欧几里得算法'''（{{lang-en|Extended Euclidean algorithm}}）是[[欧几里得算法|欧几里得算法]]（又叫辗转相除法）的扩展。已知整数a、b，扩展欧几里得算法可以在求得a、b的[[最大公约数|最大公约数]]的同时，能找到整数x、y（其中一个很可能是负数），使它们满足[[貝祖等式|貝祖等式]]
+: <math>ax + by = \gcd(a, b).</math>
+
+如果a是负数，可以把问题转化成
+:<math>\left | a \right |(-x) + by = \gcd(|a|, b)</math>（<math>\left | a \right |</math>为a的[[绝对值|绝对值]]），然后令<math>x'=(-x)</math>。
+
+通常談到[[最大公因數|最大公因數]]時，我們都會提到一個非常基本的事實（由[[貝祖等式|貝祖等式]]给出）：'''給定二个整數a、b，必存在整數x、y使得ax + by = gcd(a,b)'''<ref>{{Cite web |url= http://web.math.sinica.edu.tw/math_media/d294/29408.pdf |title= 數論輕鬆遊 |author= 沈淵源 |language= zh-TW |accessdate= 2017-09-25 |archive-date= 2021-01-24 |archive-url= https://web.archive.org/web/20210124031657/https://web.math.sinica.edu.tw/math_media/d294/29408.pdf |dead-url= no }}</ref>。
+
+众所周知，已知两个数<math>a</math>和<math>b</math>，对它们进行辗转相除（[[欧几里得算法|欧几里得算法]]），可得它们的最大公约数。不过，在欧几里得算法中，我们仅仅利用了每步带余除法所得的余数。扩展欧几里得算法还利用了带余除法所得的商，在辗转相除的同时也能得到貝祖等式<ref>{{cite book |author1=Kenneth H.Rosen |coauthors=徐六通 杨娟 吴斌 译 |title=离散数学及其应用 |isbn=978-7-111-45382-6 |page=232页 |edition=原书第七版}}</ref>（[[貝祖定理|貝祖定理]]中描述的等式）中的x、y两个系数。以扩展欧几里得算法求得的系数是满足裴蜀等式的最简系数。
+
+另外，扩展欧几里得算法是一种自验证算法，最后一步得到的<math>s_{i+1}</math>和<math>t_{i+1}</math>（<math>s_{i+1}</math>和<math>t_{i+1}</math>的含义见下文）乘以<math>\gcd(a,b)</math>后恰为<math>a</math>和<math>b</math>，可以用来验证计算结果是否正确。
+
+扩展欧几里得算法可以用来计算[[模反元素|模反元素]](也叫模逆元)，求出模反元素是[[RSA加密算法|RSA加密算法]]中获得所需公钥、私钥的必要步骤。
+
+== 算法和举例 ==
+在标准的[[欧几里得算法|欧几里得算法]]中，我们记欲求最大公约数的两个数为<math>a,b</math>，第<math>i</math>步带余除法得到的商为<math>q_i</math>，余数为<math>r_{i+1}</math>，则欧几里得算法可以写成如下形式：
+:<math>
+\begin{align}
+r_0 & =a \\
+r_1 & =b \\
+& \,\,\,\vdots \\
+r_{i+1} & =r_{i-1}-q_i r_i \quad \text {and} \quad 0\le r_{i+1} < |r_i| \\
+& \,\,\, \vdots
+\end{align}
+</math>
+
+当某步得到的<math>r_{i+1}=0</math>时，计算结束。上一步得到的<math>r_i</math>即为<math>a,b</math>的最大公约数。
+
+扩展欧几里得算法在<math>q_i</math>，<math>r_i</math>的基础上增加了两组序列，记作<math>s_i</math>和<math>t_i</math>，并令<math>s_0=1</math>，<math>s_1=0</math>，<math>t_0=0</math>，<math>t_1=1</math>，在欧几里得算法每步计算<math>r_{i+1}=r_{i-1}-q_i r_i</math>之外额外计算<math>s_{i+1}=s_{i-1}-q_i s_i</math>和<math>t_{i+1}=t_{i-1}-q_i t_i</math>，亦即：
+:<math>
+\begin{align}
+r_0 & =a & r_1 & =b \\
+s_0 & =1 & s_1 & =0 \\
+t_0 & =0 & t_1 & =1 \\
+& \,\,\,\vdots & & \,\,\,\vdots \\
+r_{i+1} & =r_{i-1}-q_i r_i & \text {and } 0 & \le r_{i+1} < |r_i| \\
+s_{i+1} & =s_{i-1}-q_i s_i \\
+t_{i+1} & =t_{i-1}-q_i t_i \\
+& \,\,\, \vdots
+\end{align}
+</math>
+算法结束条件与欧几里得算法一致，也是<math>r_{i+1}=0</math>，此时所得的<math>s_i</math>和<math>t_i</math>即满足等式<math>\gcd(a,b)=r_i=as_i+bt_i</math>。
+
+下表以<math>a=240</math>，<math>b=46</math>为例演示了扩展欧几里得算法。所得的最大公因数是<math>2</math>，所得[[贝祖等式|贝祖等式]]为<math>\gcd(240,46)=2=-9*240+47*46</math>。同时还有自验证等式<math>|23|*2=46</math>和<math>|-120|*2=240</math>。
+
+{| class="wikitable" style="text-align:right;"
+! 序号 ''i''!! {{blue|商 ''q''<sub>''i''−1</sub> }}!! {{purple|余数 ''r''<sub>''i''</sub>}}!! {{brown|''s''<sub>''i''</sub> }}!! ''t''<sub>''i''</sub>
+|-
+| 0 || ||{{green|240}}||{{brown|1}} || 0
+|-
+| 1 || ||{{green|46}} || {{brown|0}} || 1
+|-
+| 2 ||{{green|240}} ÷ {{green|46}} = {{blue|5}}
+||{{green|240}} − {{blue|5}} × {{green|46}} = {{purple|10}}
+||{{brown|1}} − {{blue|5}} × {{brown|0}} = {{brown|1}}
+|| 0 − {{blue|5}} × 1 = −5
+|-
+| 3 ||{{green|46}} ÷ {{purple|10}} = {{blue|4}}
+||{{green|46}} − {{blue|4}} × {{purple|10}} = {{purple|6}}
+||{{brown|0}} − {{blue|4}} × {{brown|1}} = {{brown|−4}}
+|| 1 − {{blue|4}} × −5 = 21
+|-
+| 4 ||{{purple|10}} ÷ {{purple|6}} = {{blue|1}}
+||{{purple|10}} − {{blue|1}} × {{purple|6}} = {{purple|4}}
+||{{brown|1}} − {{blue|1}} × {{brown|−4}} = {{brown|5}}
+|| −5 − {{blue|1}} × 21 = −26
+|-
+| 5 ||{{purple|6}} ÷ {{purple|4}} = {{blue|1}}
+||{{purple|6}} − {{blue|1}} × {{purple|4}} = {{red|2}}
+||{{brown|−4}} − {{blue|1}} × {{brown|5}} = {{orange|−9}}
+|| 21 − {{blue|1}} × −26 = {{orange|47}}
+|-
+| 6 ||{{purple|4}} ÷ {{purple|2}} = {{blue|2}}
+||{{purple|4}} − {{blue|2}} × {{purple|2}} = {{red|0}}
+||{{brown|5}} − {{blue|2}} × {{brown|−9}} = {{orange|23}}
+|| −26 − {{blue|2}} × 47 = {{orange|−120}}
+|}
+
+== 证明 ==
+由于<math> 0\le r_{i+1}<|r_i| </math>，<math> r_i </math>序列是一个递减序列，所以本算法可以在有限步内终止。又因为<math> r_{i+1}= r_{i-1} - r_i q_i</math>， <math>(r_{i-1}, r_i)</math>和<math>(r_{i}, r_{i+1})</math>的最大公约数是一样的，所以最终得到的<math> r_k </math>是<math>a</math>，<math>b</math>的最大公约数。
+
+在欧几里得算法正确性的基础上，又对于<math> a=r_0</math>和<math> b=r_1</math>有等式<math>as_i+bt_i=r_i</math>成立（''i'' = 0 或 1）。这一关系由下列递推式对所有<math>i>1</math>成立：
+
+:<math>r_{i+1} = r_{i-1} - r_i q_i = (as_{i-1}+bt_{i-1}) - (as_i+bt_i)q_i = (as_{i-1}-as_iq_i) + (bt_{i-1}-bt_iq_i) = as_{i+1}+bt_{i+1}</math> 
+
+因此<math>s_i</math>和<math>t_i</math>满足裴蜀等式，这就证明了扩展欧几里得算法的正确性。
+== 实现 ==
+以下是扩展欧几里德算法的[[Python|Python]]实现：
+<syntaxhighlight lang="python">
+def ext_euclid(a, b):
+    old_s, s = 1, 0
+    old_t, t = 0, 1
+    old_r, r = a, b
+    if b == 0:
+        return 1, 0, a
+    else:
+        while(r!=0):
+            q = old_r // r
+            old_r, r = r, old_r-q*r
+            old_s, s = s, old_s-q*s
+            old_t, t = t, old_t-q*t
+    return old_s, old_t, old_r
+</syntaxhighlight>
+扩展欧几里得算法[[C++|C++]]实现：
+<syntaxhighlight lang="c">
+#include <bits/stdc++.h>
+using namespace std;
+
+int ext_euc(int a, int b, int &x, int &y)
+{
+    if (b == 0)
+    {
+        x = 1, y = 0;
+        return a;
+    }
+
+    int d = ext_euc(b, a % b, y, x);
+    y -= a / b * x;
+
+    return d;
+}
+
+int main()
+{
+    int a, b, x, y;
+    cin >> a >> b;
+
+    ext_euc(a, b, x, y);
+    cout << x << ' ' << y << endl;
+    return 0;
+}
+</syntaxhighlight>
+
+== 参考资料 ==
+{{reflist}}
+
+== 參考文獻 ==
+* [[Thomas_H._Cormen|Thomas H. Cormen]], [[Charles_E._Leiserson|Charles E. Leiserson]], [[Ronald_L._Rivest|Ronald L. Rivest]], and [[Clifford_Stein|Clifford Stein]]. ''[[算法导论|算法导论]]'', Second Edition. MIT Press and McGraw-Hill, 2001. ISBN 0-262-03293-7. Pages 859–861 of section 31.2: Greatest common divisor.
+* [[Christof_Paar|Christof Paar]],[[Jan_Pelzl|Jan Pelzl]]著 马小婷 译. ''[[深入浅出密码学|深入浅出密码学]]'', 清华大学出版社, ISBN 9787302296096. Pages 151-155 6.3.2 扩展的欧几里得算法
+== 外部連結 ==
+* [http://mathforum.org/library/drmath/view/51675.html Source for the form of the algorithm used to determine the multiplicative inverse in GF(2^8)] {{Wayback|url=http://mathforum.org/library/drmath/view/51675.html |date=20210225011113 }}
+
+{{数论算法}}
+
+[[Category:数论算法|Category:数论算法]]
+[[Category:带有伪代码示例的条目|Category:带有伪代码示例的条目]]
+[[Category:欧几里得|Category:欧几里得]]

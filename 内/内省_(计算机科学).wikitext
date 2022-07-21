@@ -1,0 +1,83 @@
+{{NoteTA
+|G1=IT
+}}
+在[[计算机科学|计算机科学]]中，'''内省'''是指[[计算机程序|计算机程序]]在[[运行时|运行时]]（{{lang|en|Runtime}}）检查[[对象|对象]]（{{lang|en|Object}}）类型的一种能力，通常也可以称作“运行时类型检查"。一些[[编程语言|编程语言]]如[[C++|C++]]、[[Java|Java]]、[[Ruby|Ruby]]、[[PHP|PHP]]、[[Objective-C|Objective-C]]、[[Perl|Perl]]等等具有这种特性。
+
+不应该将内省和[[反射式编程|反射]]混淆。相对于内省，反射更进一步，是指[[计算机程序|计算机程序]]在[[运行时|运行时]]（{{lang|en|Runtime}}）可以访问、检测和修改它本身状态或行为的一种能力。一些[[编程语言|编程语言]]比如[[Java|Java]]具有[[反射式编程|反射]]特性，而[[C++|C++]]不具有[[反射式编程|反射]]特性只具有内省特性。
+
+==例子==
+===C++===
+[[C++|C++]]通过[[執行期型態訊息|執行期型態訊息]]（RTTI）的<code>typeid</code>和<code>dynamic_cast</code>关键字支持类型内省。<code>dynamic_cast</code>的例子：
+<syntaxhighlight lang="cpp">
+Person* p = dynamic_cast<Person *>(obj);
+if (p != nullptr) {
+  p->walk();
+}
+</syntaxhighlight>
+<code>typeid</code>的例子：
+<syntaxhighlight lang="cpp">
+if (typeid(Person) == typeid(*obj)) {
+  serialize_person( obj );
+}
+</syntaxhighlight>
+
+===Java===
+[[Java|Java]]中最简单的类型自省的例子是<code>instanceof</code>算符<ref>{{Cite web |url=http://java.sun.com/docs/books/jls/third_edition/html/expressions.html#15.20.2 |title=Java Language Specification:  instanceof |accessdate=2020-09-27 |archive-date=2012-02-13 |archive-url=https://web.archive.org/web/20120213061430/http://java.sun.com/docs/books/jls/third_edition/html/expressions.html#15.20.2 |dead-url=no }}</ref>。例如：
+<syntaxhighlight lang="java">
+if (obj instanceof Person) {
+    Person p = (Person)obj;
+    p.walk();
+}
+</syntaxhighlight>
+
+<code>java.lang.Class</code>类是更高级自省的基础<ref>{{Cite web |url=http://java.sun.com/javase/6/docs/api/java/lang/Class.html |title=Java API:  java.lang.Class |accessdate=2020-09-27 |archive-date=2009-09-11 |archive-url=https://web.archive.org/web/20090911045816/http://java.sun.com/javase/6/docs/api/java/lang/Class.html |dead-url=no }}</ref>。例如:
+
+<syntaxhighlight lang="java">
+System.out.println(obj.getClass().getName());
+</syntaxhighlight>
+
+===Python===
+在[[Python|Python]]中最常用的自省的方法是<code>dir</code>函数，它详细的列出一个对象的特性。例如：
+<syntaxhighlight lang="pycon">
+>>> class Foo:
+...     def __init__(self, val):
+...         self.x = val
+... 
+>>>     def bar(self):
+...         return self.x
+...
+>>> dir(Foo(5))
+['__class__', '__delattr__', '__dict__', '__doc__', '__getattribute__',
+'__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__',
+'__repr__', '__setattr__', '__str__', '__weakref__', 'bar', 'x']
+</syntaxhighlight>
+
+还可以使用内建函数<code>type</code>和<code>isinstance</code>来确定一个对象是什么，用<code>hasattr</code>确定一个对象做什么。例如：
+
+<syntaxhighlight lang="pycon">
+>>> a = Foo(10)
+>>> b = Bar(11)
+>>> type(a)
+<type 'Foo'>
+>>> isinstance(a, Foo)
+True
+>>> isinstance(a, type(a))
+True
+>>> isinstance(a, type(b))
+False
+>>> hasattr(a, 'bar')
+True
+</syntaxhighlight>
+
+在Python 2而非Python 3中，声明<code>class Foo</code>而非<code>class Foo(object)</code>将导致<code>type</code>返回通用的<code>instance</code>类型而非这个类<ref>{{Cite web |url=https://www.python.org/download/releases/2.2/descrintro/ |title=Unifying types and classes in Python 2.2 |accessdate=2020-09-27 |archive-date=2020-11-30 |archive-url=https://web.archive.org/web/20201130055420/https://www.python.org/download/releases/2.2/descrintro/ |dead-url=no }}</ref>。
+
+== 参见 ==
+* [[实化|实化]]
+
+== 引用 ==
+{{Reflist}}
+
+==外部链接==
+*[http://rosettacode.org/wiki/Introspection Introspection] {{Wayback|url=http://rosettacode.org/wiki/Introspection |date=20200528014539 }} on [http://rosettacode.org/ Rosetta Code] {{Wayback|url=http://rosettacode.org/ |date=20090106202220 }}
+
+[[Category:面向对象的程序设计|Category:面向对象的程序设计]]

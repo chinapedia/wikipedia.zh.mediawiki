@@ -1,0 +1,52 @@
+<noinclude><!--
+Must start with a blank line in order to create a new table line using wiki markup.
+Why is #titleparts: needed?
+-->{| class="wikitable </noinclude>
+{{#titleparts:
+
+{{#switch:{{Taxobox/displayed cell|{{taxon info|{{{1|Acacia}}}|parent}} }}
+|A=<noinclude><!-- The taxon does exist, but do we want to display it?  If we've been passed a "force" (due to display parents = n); or the taxon has always_display set to true/yes; or it's a major taxon (see list), then we'll generate a taxon row for a wikitable. --></noinclude>
+  {{#switch:
+   {{#switch:{{lc:{{{fc|{{{force|}}} }}} }}
+   |true|yes = true
+   |#default =
+    {{#switch:{{taxon info|{{{1}}}|always_display}}
+    |true | yes = true
+    |#default={{lc:{{taxon info|{{{1|Acacia}}}|rank}} }}
+    }}<!--end switch on always_display-->
+   }}<!--end switch on fc
+"true" is passed into the switch if there's a force or always_display set true; otherwise we're branching by taxonomic rank (in lowercase) -->
+  |true
+  |regnum |phylum |divisio |classis |ordo |familia |genus |species
+  |virus_group
+  |ichnoclassis |ichnoordo |ichnofamilia |ichnogenus |ichnospecies
+  |ooclassis |oordo |oofamilia |oogenus |oospecies
+  = <!--
+Here's where the taxon row is actually produced:
+  -->{{!}} {{nowrap|{{sinolize rank|{{taxon info|{{{1|Acacia}}}|rank}}}}：}}{{!!}} {{nowrap|{{Taxon link|{{{1|Acacia}}}|bold={{#ifeq:{{{format|link}}}|bold|yes|no}}}} {{ #ifeq:{{{format|name}}}|bold|<b>|}}{{ #switch: {{lc:{{taxon info|{{{1|Acacia}}}|rank}}}}
+    | genus|species|oogenus|oospecies|sectio|subgenus|subsectio|series|subseries = {{taxon italics|{{taxon info|{{{1|Acacia}}}|scientific_name}}}}<!-- non italic 
+  -->|{{taxon info|{{{1|Acacia}}}|scientific_name}} }}{{ #ifeq:{{{format|name}}}|bold|</b>|}}}}<!--
+----------------------------------------- Authority -->{{
+  #if:{{{authority|}}}
+    |<br /><small>{{{authority}}}</small>
+  }}
+{{!}}-<!--put row token after newline
+-->
+ }}
+|0=<!--We've hit a top level taxon (e.g. "Life").  Display nothing. -->
+|X=<!--The page doesn't exist:  
+           We don't want to display dud templates, but otherwise will
+           provide a link to create the missing taxonomy page.
+-->{{#ifeq: {{padleft:|1|{{{1}}} }} | { |{{ns:0}}|
+     {{#ifeq:{{NAMESPACE:{{{1}}} }}|Template|{{ns:0}}|
+       {{#ifeq:{{substr|{{{1}}}|3|8}}|Template|{{ns:0}}|
+{{!}} colspan=2 {{!}} {{create taxonomy|{{{1}}}}}
+{{!-}}
+       }}
+     }}
+   }}
+}}<!--endswitch {..cell/display}-->
+|1}}<noinclude>
+|}
+{{documentation}}
+[[Category:未使用的生物学分类信息框模板]]</noinclude>

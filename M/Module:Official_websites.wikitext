@@ -1,0 +1,39 @@
+local makeUrl = require('Module:URL')._url
+local getArgs = require('Module:Arguments').getArgs
+local p = {}
+
+function p.main(frame)
+	local args = getArgs(frame)
+	return p._main(args)
+end
+
+function p._main(args)
+	local arg, linkArg = {}, {}
+	local i, j, leadStr
+
+	for i, v in ipairs(args) do
+		table.insert(arg, v)
+	end
+	
+	if table.getn(arg) <= 1 then
+		return require('Module:Official_website')._main(args)
+	end
+	
+	if table.getn(arg) % 2 == 0 then
+		i, j = 1, 2
+		leadStr = "官方网站"
+	else
+		i, j = 2, 3
+		leadStr = args[1]
+	end
+	
+	while (arg[i] and arg[j]) do
+		local str = makeUrl(arg[i], arg[j])
+		table.insert(linkArg, str)
+		i, j = i + 2, j + 2
+	end
+
+	return leadStr .. '：' .. table.concat(linkArg, '、')
+end
+
+return p

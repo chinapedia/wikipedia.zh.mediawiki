@@ -1,0 +1,184 @@
+{{howto|time=2018-07-15T08:13:07+00:00}}
+{{noteTA
+|G1=IT
+}}
+{{lowercase}}
+'''dd'''是一个[[Unix|Unix]]和[[类Unix系统|类Unix]][[操作系统|系统]]上的命令，主要功能为转换和复制文件。<ref name="Unix-V7-man">{{cite web | url=http://www.orangetide.com/Unix/V7/usr/man/man1/dd.1 | title=dd man page | author=Bell Laboratories | accessdate=2009-02-25 | deadurl=yes | archiveurl=https://web.archive.org/web/20110208160759/http://www.orangetide.com/Unix/V7/usr/man/man1/dd.1 | archivedate=2011-02-08 }}</ref>
+
+在Unix上，硬件的设备驱动（如[[硬盘|硬盘]]）和特殊[[设备文件系统|设备文件]]（如[[Dd_(Unix)/dev/zero|Dd_(Unix)//dev/zero]]和[[Dd_(Unix)/dev/random|Dd_(Unix)//dev/random]]）就像普通文件一样，出现在文件系统中；只要在各自的驱动程序中实现了对应的功能，<code>dd</code>也可以读取自和/或写入到这些文件。这样，<code>dd</code>也可以用在备份硬件的[[引导扇区|引导扇区]]、取得一定数量的随机数据等任务中。<code>dd</code>程序也可以在复制时处理数据，例如转换[[字节序|字节序]]、或在[[ASCII|ASCII]]与[[EBCDIC|EBCDIC]]编码间互换。<ref name="tfl-dd">{{cite web | url=http://www.codecoffee.com/tipsforlinux/articles/036.html | title=How and when to use the dd command? | author=Sam Chessman | publisher=CodeCoffee | accessdate=2008-02-19 | archive-date=2008-02-14 | archive-url=https://web.archive.org/web/20080214125249/http://www.codecoffee.com/tipsforlinux/articles/036.html | dead-url=yes }}</ref> 
+
+<code>dd</code>的名字可能来源于[[IBM|IBM]]的[[工作控制语言|工作控制语言]]（JCL）中的DD语句，<ref name="jargon-dd">{{cite web | url=http://www.catb.org/jargon/html/D/dd.html | title=dd | author=Eric S. Raymond | accessdate=2008-02-19 | archive-date=2018-12-13 | archive-url=https://web.archive.org/web/20181213051044/https://www.catb.org/jargon/html/D/dd.html | dead-url=no }}</ref>意为“Data Description”（数据描述）的缩写。<ref>参见旧讨论{{cite web | url=http://www.djmnet.org/lore/dd-origin.txt | title=The Unix "dd" command | publisher=alt.folklore.computers | accessdate=2011-07-05 | deadurl=yes | archiveurl=https://web.archive.org/web/20110709114314/http://www.djmnet.org/lore/dd-origin.txt | archivedate=2011-07-09 }}</ref>该命令的语句与JCL中的相似，而与其他Unix命令较不同，因此这可能是个玩笑。<ref name="jargon-dd"/>另一种解释是“cc”（根据命令自身的描述，为“convert and copy”（转换和复制））已经被C语言编译器（C compiler）所占。{{citation needed|date=2012年10月}}
+
+<code>dd</code>命令由[[单一UNIX规范|单一UNIX规范]]的一部分，[[电气电子工程师学会|IEEE]]标准1003.1-2008所规定。
+
+== 用法 ==
+<code>dd</code>的[[命令行界面|命令行]]语句与其他的Unix程序不同，因为它的命令行选项格式为<code>''选项''=''值''</code>，而不是更标准的<code>--''选项 值''</code>或<code>-''选项''=''值''</code>。<code>dd</code>默认从[[标准输入|标准输入]]中读取，并写入到[[标准输出|标准输出]]中，但可以用选项<code>if</code>（input file，输入文件）和<code>of</code>（output file，输出文件）改变。
+
+由于[[操作系统|操作系统]]的不同，用法会有出入。另外，<code>dd</code>的一些特定功能取决于计算机系统的能力，例如直接访问内存。向运行中的<code>dd</code>进程发送[[SIGINFO|SIGINFO]]信号（Linux上为USR1）可以使它将I/O统计信息打印到[[标准流#标准错误输出_(stderr)|标准错误]]一次，然后继续复制（注意在OS X上，信号可能导致进程终止）。<code>dd</code>可以从键盘中读取[[标准流#标准输入_(stdin)|标准输入]]。到达[[文件结尾|文件结尾]]时，<code>dd</code>将会退出。信号和EOF是由软件决定。例如，移植到[[Microsoft_Windows|Windows]]的Unix工具使用不同的EOF：[[Cygwin|Cygwin]]使用<ctrl-d> （通常的Unix EOF），而[[MKS工具箱|MKS工具箱]]使用<ctrl-z>（通常的Windows EOF）。
+
+正如[[Unix哲学|Unix哲学]]一样，<code>dd</code>只做好一件事（并被认为做得“好”<!-- 当然，这取决于实现 -->）。与复杂的和高度抽象的实用程序不同，除了为不同的选项做底层决定，<code>dd</code>没有其它的算法。一般在每一次运行时，会改变<code>dd</code>的选项以分步处理一个计算机问题。
+
+== 输出消息 ==
+Linux上GNU coreutils提供的变种没有描述运行结束时，<code>dd</code>输出到标准输出消息的格式。然而，其他的实现描述了它，例如BSD上的。
+
+“记录读入”和“记录写出”行显示了已完整传输的块数+不完整的块数，例如物理介质以不完整的块结尾，或是一个物理错误使得一个完整的块无法被读取。
+
+== 块大小 ==
+[[块_(数据存储)|块]]是衡量一次读取、写入和转换[[字节|字节]]的单位。命令行选项可以为输入/读取（<code>ibs</code>）和输出/写入（<code>obs</code>）指定一个不同的块大小，尽管块大小（<code>bs</code>）选项会覆盖<code>ibs</code>和<code>obs</code>选项。输入和输出的默认块大小为512字节（传统的磁盘块及POSIX规定的“块”大小）复制的<code>count</code>选项、读取的<code>skip</code>选项和写入的<code>seek</code>选项都是以块为单位。转换操作也受“转换块大小”（<code>cbs</code>）影响。
+
+在<code>dd</code>的一些用途中，块大小可能会影响表现。例如，当转换硬盘中数据时，较小的块大小通常会导致更多的字节被转换。发出许多小块的读取是一种开销的浪费，且可能会对执行性能有负面影响。较大的块大小可能会提高复制速度。但是，由于要复制的字节量是由bs×count给出的，因此不可能在一次<code>dd</code>命令中复制[[素数|素数]]个字节，除非使用两个糟糕选项之一：<code>bs=N count=1</code>（消耗内存）或<code>bs=1 count=N</code>（大量读请求开销）。替代程序（见下文）允许指定字节，而不是块。在用作网络传输时，根据使用的[[网络传输协议|网络协议]]，块大小可能会与[[分组|包]]大小冲突。
+
+提供给块大小的值会被解释成十进制整数，也可以加入后缀指定倍数。后缀<code>w</code>表示2倍，<code>b</code>表示512倍，<code>k</code>表示1024倍，<code>M</code>表示1024 × 1024倍，<code>G</code>表示1024 × 1024 × 1024倍，等等。另外，在块大小和计数参数中，一些实现也可以使用<code>x</code>表示乘运算。
+
+例如，块大小<code>bs=2x80x18b</code>表示2 × 80 × 18 × 512 = 1474560字节，也就是一张1440 KiB[[软盘|软盘]]的确切大小。
+
+== 用途 ==
+<code>dd</code>命令可用于各种用途。
+
+=== 数据转换 ===
+<code>dd</code>可以在文件、设备、分区和卷之间复制数据。数据可以从其中任何地方输入或输出；但输出到分区时有重要差异。此外在传输过程中，数据可以用<code>conv</code>选项修改以适应介质。
+
+如果最后一个块有意外长度，试图使用<code>[[cp_(Unix)|cp]]</code>复制整个磁盘可能会忽略掉它{{Citation needed|date=2011年2月}}；然而<code>dd</code>却可能成功。源和目标磁盘应该具有相同的大小。
+
+{| class="wikitable"
+|+不同情况的<code>dd</code>格式
+|-
+| <code>dd if=/dev/sr0 of=myCD.iso bs=2048 conv=noerror,sync</code> || 从CD-ROM中创建[[ISO|ISO]][[磁盘镜像|磁盘镜像]]。
+|-
+| <code>dd if=/dev/sda2 of=/dev/sdb2 bs=4096 conv=noerror</code> || [[硬盘克隆|克隆]]一个[[分区|分区]]到另一个。
+|-
+| <code>dd if=/dev/ad0 of=/dev/ad1 bs=1M conv=noerror</code> || 克隆硬盘“ad0”到“ad1”。
+|}
+
+<code>noerror</code>选项意味着如果发生错误，程序也将继续运行。<code>sync</code>选项表示填充每个块到指定字节。
+
+=== 备份和恢复主引导记录 ===
+可以修复主引导记录。主引导记录可以转移到文件，或从中转移出来。
+
+要复制软盘的前两个扇区：
+<syntaxhighlight lang="bash">
+dd if=/dev/fd0 of=MBRboot.img bs=512 count=2
+</syntaxhighlight>
+要创建整个x86[[主引导记录|主引导记录]]的镜像（包括MS-DOS[[分区表|分区表]]和MBR魔法字节）：
+<syntaxhighlight lang="bash">
+dd if=/dev/sda of=MBR.img bs=512 count=1
+</syntaxhighlight>
+要创建仅含[[主引导记录|主引导记录]]引导代码的镜像（不包括[[分区表|分区表]]和开机所需的魔法字节）：
+<syntaxhighlight lang="bash">
+dd if=/dev/sda of=MBR_boot.img bs=446 count=1
+</syntaxhighlight>
+
+=== 数据修改 ===
+<code>dd</code>可以原地修改数据。
+
+用空字节覆盖文件的前512个字节：
+<syntaxhighlight lang="bash">
+dd if=/dev/zero of=path/to/file bs=512 count=1 conv=notrunc
+</syntaxhighlight>
+转换选项<code>notrunc</code>意味着不缩减输出文件，也就是说，如果输出文件已经存在，只改变指定的字节，然后退出，并保留输出文件的剩余部分。没有这个选项，<code>dd</code>将创建一个512字节长的文件。
+
+在不同的分区中复制磁盘分区到磁盘映像文件中：
+<syntaxhighlight lang="bash">
+dd if=/dev/sdb2 of=partition.image bs=4096 conv=noerror
+</syntaxhighlight>
+
+=== 磁盘擦除 ===
+{{main|数据擦除}}
+出于安全方面的考虑，有时需要擦除丢弃的磁盘。
+
+检查驱动器上是否有数据，并将其输出到标准输出：
+<syntaxhighlight lang="bash">
+dd if=/dev/sda 
+</syntaxhighlight>
+用零擦除磁盘：
+
+<syntaxhighlight lang="bash">
+dd if=/dev/zero of=/dev/sda bs=4k
+</syntaxhighlight>
+
+相较于[[#数据修改|上面]]数据修改的例子，不需要使用转换选项<code>notrunc</code>，因为当<tt>dd</tt>的输出文件为块设备时，它没有效果。<ref>{{cite web |url=http://stackoverflow.com/questions/20526198/why-using-conv-notrunc-when-cloning-a-disk-with-dd |title=linux - Why using conv=notrunc when cloning a disk with dd? |publisher=Stack Overflow |date=2013-12-11 |accessdate=2014-03-24 |archive-date=2014-03-24 |archive-url=https://web.archive.org/web/20140324201126/http://stackoverflow.com/questions/20526198/why-using-conv-notrunc-when-cloning-a-disk-with-dd |dead-url=no }}</ref>
+
+<code>bs=4k</code>选项使<code>dd</code>一次读取或写入4[[千字节|千字节]]。在现代系统中，由于传输容量（如RAID系统），一个更大的块大小可能更有利。注意用随机数据填充磁盘总是比用零慢的多，因为随机数据必须先由CPU和/或[[硬件随机数发生器|HWRNG]]生成，且不同的设计有不同的性能特点。（后面PRNG的/dev/urandom可能比libc中的要慢。）在大多数较现代的磁盘中，用零擦除会使其中的数据永久丢失。<ref>{{cite journal|last1=Wright|first1=Craig|last2=Kleiman|first2=Dave|last3=Sundhar R.S.|first3=Shyaam|title=Overwriting Hard Drive Data: The Great Wiping Controversy|journal=Lecture Notes in Computer Science|year=2008|volume=5352|series=Information Systems Security|pages=243–257|doi=10.1007/978-3-540-89862-7_21|url=http://www.springerlink.com/content/408263ql11460147/|accessdate=2012-03-07|author=|archive-url=https://web.archive.org/web/20190924231659/https://rd.springer.com/chapter/10.1007/978-3-540-89862-7_21|archive-date=2019-09-24|dead-url=yes}}</ref>
+
+用零擦除磁盘会使它的数据无法被软件恢复。然而数据仍可能用[[数据剩磁|特殊的实验室技术]]恢复。
+
+[[shred_(Unix)|shred]]程序提供了完成相同任务的替代方法，最后，目前许多Linux发行版还提供了一个精心制作的工具<tt>wipe</tt><ref>{{cite web|url=http://wipe.sf.net/ |title=Wipe: Secure File Deletion |publisher=Wipe.sf.net |date= |accessdate=2014-03-24}}</ref>（做得“好”，如上面的Unix哲学），提供了更多方法擦除。
+
+=== 数据恢复 ===
+1984年，GNU <code>dd</code>开启了[[开源软件|开源软件]]（OSS）[[数据恢复|恢复]]数据、文件、驱动器和分区的历史。<code>dd</code>进程一次处理一个块，它的算法只是在用户界面显示运行状态。1999年10月，一个C语言的程序<code>''[http://www.garloff.de/kurt/linux/ddrescue/ dd_rescue]''</code>发布了。它的算法一次能处理两个块。但改进<code>dd_rescue</code>的数据恢复算法、2003年的shell脚本<code>[http://www.kalysto.org/utilities/dd_rhelp/index.en.html dd_rhelp]</code>作者现在推荐<code>[http://www.gnu.org/software/ddrescue/ddrescue.html GNU ddrescue]</code>。<ref>{{cite web|url=http://www.kalysto.org/utilities/dd_rhelp/index.en.html|title=dd_rhelp author's repository|last1=|author=LAB Valentin|date=2011-09-19|quote=Important note : For some times, dd_rhelp was the only tool (AFAIK) that did this type of job, but since a few years, it is not true anymore: Antonio Diaz did write a ideal replacement for my tool: GNU 'ddrescue'.|accessdate=2013-04-20|archive-date=2008-05-16|archive-url=https://web.archive.org/web/20080516231947/http://www.kalysto.org/utilities/dd_rhelp/index.en.html|dead-url=no}}</ref>它是一个发布于2004年的C++程序，与大多数的Linux发行版一起发行。在开源软件中，GNU <code>ddrescue</code>有最先进的块大小变换算法。<ref>{{cite web | url=http://www.cgsecurity.org/wiki/Damaged_Hard_Disk | title=Damaged Hard Disk | publisher=www.cgsecurity.org | accessdate=2008-05-20 | archive-date=2008-05-10 | archive-url=https://web.archive.org/web/20080510140438/http://www.cgsecurity.org/wiki/Damaged_Hard_Disk | dead-url=no }}</ref>（<code>ddrescue</code>和<code>dd_rescue</code>尽管名字相近，但却是不同的程序。因为如此，区分更为明确的备用名称也有使用；使用的名称有“addrescue”（freecode.com），“gddrescue”（[[Debian|Debian]]包名）和“gnu_ddrescue”（[[openSUSE|openSUSE]]包名）。）
+
+GNU <code>ddrescue</code>既稳定又安全。<ref>{{cite web |url=http://blue-gnu.biz/content/interview_gnu_ddrescue_039_s_antonio_diaz_diaz |archiveurl=https://web.archive.org/web/20080415135125/http://blue-gnu.biz/content/interview_gnu_ddrescue_039_s_antonio_diaz_diaz |archivedate=2008-04-15 |title=Interview with GNU ddrescue's Antonio Diaz Diaz |publisher=Blue-GNU |accessdate=2008-12-06 |deadurl=yes }}</ref>
+
+另一个开源程序<code>''savehd7''</code>使用更复杂的算法，但它需要安装自己的语言解释器。
+
+=== 驱动器性能基准测试 ===
+对驱动器进行基准测试（通常是单线程），使用1024字节块分析连续系统读取和写入的性能：
+<syntaxhighlight lang="bash">
+dd if=/dev/zero bs=1024 count=1000000 of=file_1GB
+dd if=file_1GB of=/dev/null bs=1024
+</syntaxhighlight>
+
+=== 用随机数据生成文件 ===
+使用内核随机数驱动，用100个随机字节生成文件：
+<syntaxhighlight lang="bash">
+dd if=/dev/urandom of=myrandom bs=100 count=1
+</syntaxhighlight>
+
+=== 将文件转换为大写 ===
+将文件转换为大写：
+<syntaxhighlight lang="bash">
+dd if=filename of=filename1 conv=ucase
+</syntaxhighlight>
+
+=== 创建任意大小的空文件 ===
+创建1GiB的[[稀疏文件|稀疏文件]]，或增加现有文件的大小：
+<syntaxhighlight lang="bash">
+dd if=/dev/zero of=mytestfile.out bs=1 count=0 seek=1G
+</syntaxhighlight>
+
+（更先进的工具是GNU coreutils中的''fallocate''或''truncate''。）
+
+== 局限 ==
+[[希捷科技|希捷]]的文档警告说，“一些依赖底层硬盘访问的硬盘工具（如DD）可能不支持48位[[逻辑区块地址|逻辑区块地址]]（LBA），除非进行升级”。<ref>[https://web.archive.org/web/20070316080228/http://www.seagate.com/support/kb/disc/tp/137gb.pdf Windows 137GB (128 GiB) Capacity Barrier - Seagate Technology] (March 2003)</ref>使用超过128 GiB的ATA硬盘时需要48位LBA。然而在[[Linux|Linux]]中，<code>dd</code>使用内核读取或写入原始[[设备文件系统|设备文件]]。{{Efn|这可以用[[strace|strace]]检查。}}2003年释出的2.4.23版本内核已经实现了对48位LBA的支持。<ref>{{cite web | url=http://www.kernel.org/pub/linux/kernel/v2.4/ChangeLog-2.4.23 | title=ChangeLog-2.4.23 | publisher=www.kernel.org | accessdate=2009-12-07 | archive-date=2009-10-08 | archive-url=https://web.archive.org/web/20091008103024/http://www.kernel.org/pub/linux/kernel/v2.4/ChangeLog-2.4.23 | dead-url=no }}</ref><ref>[http://lkml.indiana.edu/hypermail/linux/kernel/0311.3/0942.html Linux-2.4.23 released] {{Webarchive|url=https://archive.is/20121214210423/http://lkml.indiana.edu/hypermail/linux/kernel/0311.3/0942.html |date=2012-12-14 }} Linux kernel mailing list, 2003.</ref>
+
+有人开玩笑说，<code>dd</code>意为“destroy disk”（破坏硬盘）或“delete data”（删除数据），因为在对硬盘进行底层操作时，类似颠倒输入和输出文件的一个小错误都可能造成部分或全部硬盘数据的丢失。<ref name="tfl-dd" />
+
+== dcfldd ==
+''<code>dcfldd</code>''是<code>dd</code>的一个分支，由前[[美国国防部网络犯罪中心|美国国防部计算机取证实验室]]雇员尼克·哈勃（Nick Harbour）开发的增强版本。<ref>{{cite web | url=http://dcfldd.sourceforge.net/ | title=DCFLDD at Source Forge | publisher=Source Forge | accessdate=2013-08-17 | archive-date=2013-08-02 | archive-url=https://web.archive.org/web/20130802114625/http://dcfldd.sourceforge.net/ | dead-url=no }}</ref><ref>{{cite book|last=Jeremy Faircloth, Chris Hurley|title=Penetration Tester's Open Source Toolkit|year=2007|publisher=Syngress|isbn=9780080556079|pages=470 - 472}}</ref><ref>{{cite book|last=Jack Wiles, Anthony Reyes|title=The Best Damn Cybercrime and Digital Forensics Book Period|year=2011|publisher=Syngress|isbn=9780080556086|pages=408 - 411}}</ref>与<code>dd</code>相比，<code>dcfldd</code>允许一个以上的输出文件，同时支持多种校验计算方法，还提供了验证模式以匹配文件，并能显示操作进度百分比。
+
+== 参见 ==
+* [[备份|备份]]
+* [[硬盘克隆|硬盘克隆]]
+* [[硬盘复制|硬盘复制]]
+* [[硬盘镜像|硬盘镜像]]
+* [[Unix实用程序列表|Unix实用程序列表]]
+
+== 注释 ==
+{{notelist|iger=}}
+
+== 参考文献 ==
+{{Reflist|30em}}
+
+== 外部链接 ==
+{{Div col||30em}}
+* {{man|cu|dd|SUS|convert and copy a file}}
+* [http://www.gnu.org/software/coreutils/manual/html_node/dd-invocation.html dd]{{Wayback|url=http://www.gnu.org/software/coreutils/manual/html_node/dd-invocation.html |date=20150116050030 }}：[[GNU核心工具组|GNU核心工具组]]手册页。
+* {{man|1|dd|Darwin}}
+* [http://www.chrysocome.net/dd dd for Windows]{{Wayback|url=http://www.chrysocome.net/dd |date=20130524132626 }}
+* [http://seed7.sourceforge.net/scrshots/savehd7.htm savehd7 - Save a potentially damaged harddisk partition]{{Wayback|url=http://seed7.sourceforge.net/scrshots/savehd7.htm |date=20130515021928 }}
+* [http://www.gnu.org/software/ddrescue/ddrescue.html GNU ddrescue]{{Wayback|url=http://www.gnu.org/software/ddrescue/ddrescue.html |date=20130417032439 }}
+* [http://www.gnu.org/software/ddrescue/manual/ddrescue_manual.html GNU ddrescue手册页]{{Wayback|url=http://www.gnu.org/software/ddrescue/manual/ddrescue_manual.html |date=20131114193124 }}
+* [http://www.garloff.de/kurt/linux/ddrescue/ dd_rescue]{{Wayback|url=http://www.garloff.de/kurt/linux/ddrescue/ |date=20010516091650 }}
+* [http://www.kalysto.org/utilities/dd_rhelp/index.en.html dd_rhelp]{{Wayback|url=http://www.kalysto.org/utilities/dd_rhelp/index.en.html |date=20080516231947 }}
+* [http://www.softpanorama.org/Tools/dd.shtml Softpanorama dd page]{{Wayback|url=http://www.softpanorama.org/Tools/dd.shtml |date=20130517235659 }}
+* [http://wiki.linuxquestions.org/wiki/Dd DD at Linux Questions Wiki]{{WebCite|url=https://www.webcitation.org/64qfOLjf6?url=http://wiki.linuxquestions.org/wiki/Dd |date=20120121040345 |dateformat=iso }}
+* [https://web.archive.org/web/20130917155902/http://www.myfixlog.com/fix.php?fid=21 How to use ddrescue to image a damaged harddisk partition and mount it in Windows.]
+* [https://web.archive.org/web/20111206091733/http://www.forensicswiki.org/wiki/Dcfldd Forensics (DD) Dcfldd]
+{{Div col end}}
+
+
+{{光盘制作软件}}
+{{Unix命令}}
+
+[[Category:Unix_SUS2008实用工具|Category:Unix SUS2008实用工具]]
+[[Category:标准Unix程序|Category:标准Unix程序]]

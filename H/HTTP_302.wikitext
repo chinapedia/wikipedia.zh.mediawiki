@@ -1,0 +1,81 @@
+{{noteTA|G1=IT}}
+{{HTTP}}
+'''302 Found'''，原始描述短语为'''Moved Temporarily'''，是[[HTTP协议|HTTP协议]]中的一个状态码（Status Code）。可以简单的理解为该资源原本确实存在，但已经被'''临时'''改变了位置；换而言之，就是请求的资源暂时驻留在不同的URI下<ref>{{cite web|url=http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html|title=W3C: 10 Status Code Definitions|accessdate=2014-06-01|archive-date=2010-03-16|archive-url=https://web.archive.org/web/20100316011642/http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html|dead-url=no}}</ref>，故而除非特别指定了缓存头部指示，该状态码不可缓存。
+
+对于服务器，通常会给浏览器发送[[HTTP_Location|HTTP Location]]头部来重定向到新的新位置。
+
+==定义==
+根据定义<ref name="h1">{{cite web|last1=T.|first1=Fielding, Roy|last2=Tim|first2=Berners-Lee,|last3=Henrik|first3=Frystyk,|title=Hypertext Transfer Protocol -- HTTP/1.0|url=https://tools.ietf.org/html/rfc1945#section-9.3|website=tools.ietf.org|language=en|accessdate=2017-07-04|archive-date=2010-11-30|archive-url=https://web.archive.org/web/20101130120327/http://tools.ietf.org/html/rfc1945#section-9.3|dead-url=no}}</ref><ref name="h1.1">{{cite web|last1=C.|first1=Mogul, Jeffrey|last2=Jim|first2=Gettys,|last3=Tim|first3=Berners-Lee,|last4=Henrik|first4=Frystyk,|title=Hypertext Transfer Protocol -- HTTP/1.1|url=https://tools.ietf.org/html/rfc2068#section-10.3.2|website=tools.ietf.org|language=en|accessdate=2017-07-04|archive-date=2018-06-07|archive-url=https://web.archive.org/web/20180607164335/https://tools.ietf.org/html/rfc2068#section-10.3.2|dead-url=no}}</ref><ref>{{cite web|last1=J.|first1=Leach, Paul|last2=Tim|first2=Berners-Lee,|last3=C.|first3=Mogul, Jeffrey|last4=Larry|first4=Masinter,|last5=T.|first5=Fielding, Roy|last6=James|first6=Gettys,|title=Hypertext Transfer Protocol -- HTTP/1.1|url=https://tools.ietf.org/html/rfc2616#section-10.3.2|website=tools.ietf.org|language=en|accessdate=2017-07-04|archive-date=2011-03-07|archive-url=https://web.archive.org/web/20110307142107/http://tools.ietf.org/html/rfc2616#section-10.3.2|dead-url=no}}</ref>，该响应代码的使用场景是，请求的资源暂时驻留在不同的URI下。
+
+其特征被定义为：
+* 客户端收到的新的URI，不是原始请求资源的替代引用。
+* 只有当服务器发出Cache-Control或Expires头字段进行指示，此响应才能被缓存，否则不能被缓存。
+* 临时URI应该由响应头部中的Location字段给出。
+* 除非请求方法是HEAD ，否则响应的实体应该包含一个带有超链接到新的URI的短HTML注释。
+* 如果在除GET或HEAD两种请求方法之外的请求时，接收到302状态码，客户端不得自动重定向请求，除非用户可以确认；否则可能会更改发出请求的条件。
+* 如果一个客户端有链接编辑能力，其应当把所有的引用链接重定向到新的URL上。
+* 重定向到新地址时，客户端必须使用GET方法请求新地址。
+
+==例子==
+客户端请求:
+<syntaxhighlight lang="http">
+GET /blog HTTP/1.1
+Host: www.example.com
+</syntaxhighlight>
+第一种服务器回应，不带缓存头:
+<syntaxhighlight lang="http">
+HTTP/1.1 302 Found
+Location: https://www-temp.example.org/
+</syntaxhighlight>
+
+第二种服务器回应，带缓存头:
+<syntaxhighlight lang="http">
+HTTP/1.1 302 Found
+Location: https://www-temp.example.org/
+Cache-control: private; max-age=600
+</syntaxhighlight>
+
+== 服务器配置 ==
+这是一个例子，展示如<pre>^www\.(.*)$ [NC]
+RewriteRule ^
+RewriteRule ^(.*)$ https://example.com/$1{{Dead link|date=2019年10月 |bot=InternetArchiveBot |fix-attempted=yes }} [R,L] </pre>
+
+等价的[[NGINX|Nginx]]配置方式：
+<pre>location /old/url/ {
+    return 302 /new/url;
+}</pre>
+
+这是使用[[PHP|PHP]]实现HTTP 302重定向的方式：<syntaxhighlight lang="php">
+<?php 
+header("HTTP/1.1 302 Found"); 
+header("Location: http://example.com/newpage.html%5B%5D"); 
+exit();
+?>
+</syntaxhighlight>
+
+== 客户端实现问题 ==
+虽然<nowiki/>RFC 1945<nowiki/>和<nowiki/>RFC 2068<nowiki/>两个规范不允许客户端在重定向时改变请求的方法，但是很多现存的浏览器将302响应视作为[[HTTP_303|303]]响应 ，并且径自使用GET方式访问在Location中规定的 URI，而无视原先请求的方法，这是不规范的实现。<ref name="ruby-on-rails-ActionController-Redirecting-redirect_to">{{cite web|url = http://api.rubyonrails.org/classes/ActionController/Redirecting.html#method-i-redirect_to|title = Reference of method redirect_to in Ruby Web Framework "Ruby on Rails". It states: The redirection happens as a "302 Moved" header unless otherwise specified.|accessdate = 2012-06-30|archive-date = 2012-07-05|archive-url = https://web.archive.org/web/20120705235048/http://api.rubyonrails.org/classes/ActionController/Redirecting.html#method-i-redirect_to|dead-url = yes}}</ref>
+
+因此状态码303和[[HTTP_307|307]]被添加了进来，用以明确服务器期待客户端进行何种反应。<ref name="RFC7230-10">{{cite web|url = http://tools.ietf.org/html/rfc7231#section-6.4|title = Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content, Section 6.4|publisher = [[IETF|IETF]]|accessdate = 2014-06-12|archive-date = 2017-05-25|archive-url = https://web.archive.org/web/20170525004653/https://tools.ietf.org/html/rfc7231#section-6.4|dead-url = no}}</ref>
+
+== 相關條目 ==
+* [[.htaccess|.htaccess]]
+* [[HTTP狀態碼|HTTP狀態碼]]
+* [[URL重寫|URL重寫]]
+* [[HTTP_301|HTTP 301]]
+* [[HTTP_303|HTTP 303]]
+* [[HTTP_307|HTTP 307]]
+* [[HTTP_Location|HTTP Location]]
+
+== 参考来源 ==
+{{reflist}}
+
+== 外部連結 ==
+* [http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html HTTP/1.1 Error codes in RFC 2616]{{Wayback|url=http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html |date=20100316011642 }} {{en icon}}
+* RFC 1945
+* RFC 2068
+* RFC 7230
+* RFC 7231
+
+[[Category:計算機錯誤|Category:計算機錯誤]]
+[[Category:HTTP|Category:HTTP]]

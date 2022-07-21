@@ -1,0 +1,65 @@
+'''主機名稱'''（{{lang-en|hostname}}），又稱'''節點名稱'''（{{lang|en|nodename}}），在連上[[電腦網路|電腦網路]]時，特定裝置使用的名稱。在進行電子通訊時，可以用來識別某個裝置之用，諸如[[全球資訊網|全球資訊網]]、[[電子郵件|電子郵件]]、[[Usenet|Usenet]]中都使用主機名稱來當成識別之用。
+
+在[[網際網路|網際網路]]中，主機名稱被附在[[域名系統|域名系統]]（DNS）的[[域名|域名]]之後，形成[[完整網域名稱|完整網域名稱]]。
+
+== Linux ==
+
+=== 定义 ===
+
+==== systemd项目 ====
+所谓"主机名"，其实有三种不同的含义：<ref>{{Cite web|title=hostnamectl(1) — manpages-zh — Debian buster — Debian Manpages|url=https://manpages.debian.org/buster/manpages-zh/hostnamectl.1.zh_CN.html.gz|accessdate=2020-03-12|work=manpages.debian.org}}</ref><ref name=":0">{{Cite web|title=hostnamectl(1) — systemd — Debian buster — Debian Manpages|url=https://manpages.debian.org/buster/systemd/hostnamectl.1.en.html.gz|accessdate=2020-03-12|work=manpages.debian.org}}</ref>
+
+* pretty主机名，仅供人类阅读，可以包含各种特殊字符， 例如"Lennart's Laptop"(必须是UTF-8编码)。 pretty主机名、chassis(设备类型)、icon(图标名称)存储在 <code>/etc/machine-info</code> 文件中， 详见 [https://manpages.debian.org/buster/manpages-zh/machine-info.5.zh_CN.html machine-info(5)] {{Wayback|url=https://manpages.debian.org/buster/manpages-zh/machine-info.5.zh_CN.html |date=20200925043301 }} 手册。
+* static主机名（静态主机名），在主机启动时，将会使用它初始化内核主机名。静态主机名，存储在 <code>/etc/hostname</code> 文件中， 详见 [https://manpages.debian.org/buster/manpages-zh/machine-info.5.zh_CN.html hostname(5)] {{Wayback|url=https://manpages.debian.org/buster/manpages-zh/machine-info.5.zh_CN.html |date=20200925043301 }} 手册。
+* transient主机名（临时主机名），是一个备用的数值，以供网络配置搜索时使用。如果配置了静态主机名且该值是可用时（不为localhost时），临时主机名将不会被使用。<ref name=":0" /> 临时主机名是映射内核主机的。<ref>{{Cite web|title=hostnamed|url=https://www.freedesktop.org/wiki/Software/systemd/hostnamed/|accessdate=2020-03-12|work=www.freedesktop.org|archive-date=2020-08-18|archive-url=https://web.archive.org/web/20200818190946/https://www.freedesktop.org/wiki/Software/systemd/hostnamed/|dead-url=no}}</ref>
+
+==== 内核主机名 ====
+内核主机名（kernel hostname），是该机器的机器名，可通过 <code>/proc/sys/kernel/hostname</code> 文件查看<ref name=":1">{{Cite web|title=uname(2) — manpages-dev — Debian jessie — Debian Manpages|url=https://manpages.debian.org/jessie/manpages-dev/uname.2.en.html.gz|accessdate=2020-03-12|work=manpages.debian.org}}</ref>，主机在启动时，将会 <code>/etc/hostname</code> 读取主机名，可通过<code>hostname</code> 命令和<code>hostnamectl</code> 命令设置临时主机名，但设置的临时主机名在重启时将会消失；也可以通过 <code>hostnamectl</code> 命令设置静态主机名，重启后不会消失。
+
+=== 相关工具 ===
+
+==== hostname (net-tools项目) ====
+<code>hostname</code> 命令通过<code>gethostname</code> 函数和 <code>sethostname</code> 函数进行主机名的读写。<ref>{{Cite web|title=hostname(1) — manpages-zh — Debian jessie — Debian Manpages|url=https://manpages.debian.org/jessie/manpages-zh/hostname.1.zh_CN.html.gz|accessdate=2020-03-12|work=manpages.debian.org}}</ref><ref>{{Cite web|title=sethostname(2) — manpages-dev — Debian jessie — Debian Manpages|url=https://manpages.debian.org/jessie/manpages-dev/sethostname.2.en.html.gz|accessdate=2020-03-12|work=manpages.debian.org}}</ref>而该主机名存储在内核内存中 <code>utsname</code> 数据结构中。<ref name=":1" /> <code>hostname</code> 命令实质操作的对象是临时主机名。
+
+==== hostnamectl(systemd项目) ====
+<code>hostnamectl</code> 用于控制系统的主机名。
+
+该命令可 查询与修改系统主机名以及其他相关设置。它可操作pretty主机名、静态主机名以及临时主机名。<ref name=":0" />
+
+=== 主機名稱的操作 ===
+<syntaxhighlight lang="shell">
+$ hostname
+localhost
+
+# 設置臨時主機名稱
+$ hostname manger1
+$ hostname
+manger1
+
+# 設置靜態主機名稱,同時內核主機名稱也會被更新
+$ sudo hostnamectl set-hostname manager2
+$ hostnamectl status 
+   Static hostname: manager2
+         Icon name: computer-vm
+           Chassis: vm
+        Machine ID: c0fddf681459441c980f6f25e80e9976
+           Boot ID: 4265c546e7cd4542bc832e41d6ae0788
+    Virtualization: kvm
+  Operating System: CentOS Linux 7 (Core)
+       CPE OS Name: cpe:/o:centos:centos:7
+            Kernel: Linux 3.10.0-957.12.2.el7.x86_64
+      Architecture: x86-64
+$ cat /etc/hostname 
+manager2
+
+</syntaxhighlight>
+
+== 相关网站 ==
+
+* [https://access.redhat.com/documentation/zh-cn/red_hat_enterprise_linux/7/html/networking_guide/sec_configuring_host_names_using_hostnamectl redhat -  使用 HOSTNAMECTL 配置主机名] {{Wayback|url=https://access.redhat.com/documentation/zh-cn/red_hat_enterprise_linux/7/html/networking_guide/sec_configuring_host_names_using_hostnamectl |date=20201028125755 }}
+*[https://wiki.archlinux.org/index.php/Network_configuration_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E8%AE%BE%E7%BD%AE%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%90%8D Archlinux - 设置计算机名] {{Wayback|url=https://wiki.archlinux.org/index.php/Network_configuration_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E8%AE%BE%E7%BD%AE%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%90%8D |date=20210122200735 }}
+
+== 参考文献 ==
+{{DEFAULTSORT:Hostname}}
+[[Category:電腦網路|Category:電腦網路]]
+[[Category:識別符|Category:識別符]]

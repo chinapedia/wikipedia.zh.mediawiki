@@ -1,0 +1,36 @@
+{{Merge from|快閃記憶體轉換層|discuss=Talk:闪存控制器#请求与快閃記憶體轉換層合并}}
+{{noteTA
+|G1=IT
+}}
+'''快闪记忆体控制器'''或称'''闪存控制器'''、'''闪存主控芯片'''（英語：{{lang|en|Flash Memory Controller}}）管理存储在闪存中的数据，并与计算机或电子设备进行通信。一般快闪记忆体控制器可设计为工作在低占空比的环境，如[[SD卡|SD卡]]，[[CF卡|CF卡]]，或其他类似的媒体，[[数码相机|数码相机]]，个人数位助理（[[PDA|PDA]]），[[移动电话|移动电话]]等使用闪存控制器与[[个人电脑|个人电脑]]通过USB低占空比端口沟通。闪存控制器也可以设计为高占空比的环境，如用于电脑系统作为关键数据存储、清理任务等企业级存储阵列的[[固态硬盘|固态硬盘]]（SSD）上。<ref name="kingston">{{cite web|title=Flash Memory Guide|url=http://media.kingston.com/pdfs/FlashMemGuide.pdf|publisher=kingston.com|accessdate=7 March 2013|archive-date=2021-02-24|archive-url=https://web.archive.org/web/20210224050509/https://media.kingston.com/pdfs/FlashMemGuide.pdf|dead-url=no}}</ref>
+
+== 初始设置 ==
+在闪存存储设备最初被制造出来的时候，闪存控制器首先会格式化闪存才能投入到工作中。因制作工艺问题，任何闪存制成时都或多或少有坏的记忆体单元，为确保设备运行正常，控制器能检测出已坏不能工作的快闪记忆体单元，并分配备用单元将坏的单元取代。控制器会指定某些部分的单元用于存储固件驱动、特定存储设备的操作格式和控制器其它特殊功能等。闪存控制器接着会创建的目录结构，控制器管理[[逻辑|逻辑]]扇区的请求转换为实际的闪存芯片的[[物理|物理]]位置上。<ref name="kingston"/>
+
+== 读取写入和擦除规范 ==
+{{Main|快閃記憶體#運作原理}}
+当系统或设备需要读取数据或将数据写入到闪存，它会与闪存控制器进行沟通。一些结构简单的设备，如SD卡和[[USB|USB]]闪存驱动器通常有一个闪速存储器芯片同时连接数的限制操作，其会限制各个闪速存储器芯片的速度。相反，一个高性能的固态硬盘将有多达100个或更多的控制器模组在矩阵组织并行通信路径里，使可能比一个单一的闪存芯片的速度快许多倍。{{Citation needed|date=August 2010}}
+
+==均衡损耗和闪存使用寿命==
+闪存有可承受有限数目的擦除周期，就是说闪存有擦写次数限制。如果一个[[程序|程序]]去反复擦除写入同一闪存单元，会过早地结束该单元的生命，从而出现[[坏道|坏道]]故障。出于这个原因，闪存控制器使用的技术称为均衡损耗法，在SSD闪存块的所有写入动作尽可能有序地均匀于每一个闪存单元上。在一个完美的理论方案里，这将使每一块被写入的闪存单元最后同时到达其最大的寿命。闪存控制器会监察每一个闪存单元的使用次数，当文件需要写入时，使用次数较少的闪存单元会被优先选用。当用户删除文件时，实际上并没有删除只是在分区表等记录删除标识以提高寿命。<ref name="Li-Pin Chang">{{cite web |id = {{citeseerx|10.1.1.103.4903}} |title=On Efficient Wear Leveling for Large Scale Flash Memory Storage Systems |author=Chang, Li-Pin |date=2007-03-11 |work= |publisher=National ChiaoTung University, HsinChu, Taiwan |accessdate=2010-05-31}}</ref>任何对闪存的写入操作就是在减少其寿命，闪存控制器限制不能通过一般方法重复写入同一闪存单元，其会轮流让闪存单元被执行写入动作，我们可以根据生产厂家给出的默认参数得出大致的可使用时长
+
+*计算：一个闪存大储存盘有128GB实际容量，查看该产品的闪存颗粒为1000次刷写寿命<ref name="mydrivers">{{cite web|url=http://news.mydrivers.com/1/247/247188.htm|title=TLC闪存寿命再探|author=|date=|work=|publisher=mydrivers.com|accessdate=2012-11-19|archive-date=2019-09-10|archive-url=https://web.archive.org/web/20190910111133/http://news.mydrivers.com/1/247/247188.htm|dead-url=no}}</ref>
+*则：总可刷写量 = 128GB x 1000 = 128000GB
+*假设：平均每日日常使用会刷写50GB容量
+*估算使用寿命  = 128000GB ÷ 50GB/天 = 2560天 ≈ 7年
+
+当然这只是估算，不过也可以看出使用寿命与闪存容量、闪存颗粒和工作环境有关。
+
+== 碎片文件整理 ==
+{{main|碎片回收機能 (固態硬盤)}}
+一般使用闪存盘时，是不需要定时对闪存盘里的碎片文件进行整理的，因为闪存盘的闪存控制器会自主完成该操作。一旦每块闪存单元都已被写入一次，闪存控制器将会标记[[碎片文件|碎片文件]]做成的文件间隙所占用的单元为陈旧单元，即不再有当前的数据。这些单元中的数据换成正等待被删除，新的数据可以被写入。这是一个过程被称为碎片回收（GC）。所有的SSD、[[CF卡|CF卡]]和其他闪存设备将包括某种程度的垃圾收集。不同的闪存控制器所整理的速度不同。<ref name="OCZ_WA">{{cite web |url=http://www.oczenterprise.com/whitepapers/ssds-write-amplification-trim-and-gc.pdf |title=SSDs - Write Amplification, TRIM and GC |author= |date= |work= |publisher=OCZ Technology |accessdate=2010-05-31 |archive-url=https://web.archive.org/web/20120526033947/http://www.oczenterprise.com/whitepapers/ssds-write-amplification-trim-and-gc.pdf |archive-date=2012-05-26 |dead-url=yes }}</ref>相对于一般机械硬盘，乱序储存的文件并不影响闪存盘的读写速度，因为闪存盘不使用磁头读写，没有频繁划动磁头导致读写速度减慢这一影响因素。
+
+==注释==
+{{Reflist}}
+
+==参看==
+*[[内存控制器|内存控制器]]
+*[[闪存|闪存]]
+* [[固态硬盘|固态硬盘]]
+
+[[Category:電腦儲存技術|Category:電腦儲存技術]]

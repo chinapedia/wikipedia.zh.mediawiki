@@ -1,0 +1,53 @@
+{{noteTA
+|G1=IT
+}}
+{{lowercase}}
+在[[计算机技术|计算机技术]]中，'''<code>wait</code>'''是一个[[命令_(计算机)|命令]]，可以暂停当前会话，直至[[后台进程|后台进程]]执行完毕。
+
+== 用法 ==
+<syntaxhighlight lang="bash">
+ wait [n]
+</syntaxhighlight>
+
+其中'''n'''是当前正在执行的后台进程的[[进程ID|pid]]，或工作的[[工作控制_(Unix)#工作ID|工作ID]]。如果没有给定'''n'''，命令会等待shell调用的所有工作终止。
+
+'''wait'''一般返回最后一个工作的[[退出状态|退出状态]]。如果'''n'''所指的工作不存在，或没有工作要等待，它会返回127。
+
+因为<code>wait</code>需要知道当前shell执行环境的工作表，它通常为[[壳层内建指令|shell内建命令]]。
+
+== 范例 ==
+当脚本后部分要求前部分成功执行，此命令可以让前部分并行执行，以节省时间。
+
+下面是一个例子，使用[[rsync|rsync]]获取'''iona'''上的'''src/'''目录，同时更新这个程序所依赖的库，然后组合编译。
+
+<syntaxhighlight lang="bash">
+#!/usr/bin/env bash
+
+# 使用wait命令的并行更新脚本
+
+# 更新本地副本
+rsync iona:src/ . &
+# 升级所需的库，或如果出于某种原因失败时，返回1并退出
+make -C lib || exit 1
+
+# 等待rsync终止（可能已启动），并完成工作，除非rsync失败
+wait && make
+</syntaxhighlight>
+
+等待指定的工作控制id号：
+<syntaxhighlight lang="bash">
+$ ls -R / > /dev/null 2>&1 & # 启动长时间运行的后台进程
+[2] 1986
+$ wait %2 # 等待2号后台工作终止，然后返回
+</syntaxhighlight>
+
+== 参见 ==
+* [[等待_(系统调用)|等待 (系统调用)]]
+
+== 外部链接 ==
+* [http://www.gnu.org/software/bash/manual/bashref.html GNU bash参考手册] {{WebCite|url=https://www.webcitation.org/618xRKJBw?url=http://www.gnu.org/software/bash/manual/bashref.html |date=20110823034505 |dateformat=iso }}
+
+{{Unix命令}}
+
+[[Category:Unix_SUS2008实用工具|Category:Unix SUS2008实用工具]]
+[[Category:Unix进程和任务管理相关软件|Category:Unix进程和任务管理相关软件]]

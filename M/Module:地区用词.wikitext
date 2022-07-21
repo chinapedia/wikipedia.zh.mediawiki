@@ -1,0 +1,121 @@
+local p = {}
+local variants = {
+	cn = 'hans',
+	hk = 'hant',
+	mo = 'hant',
+	my = 'hans',
+	sg = 'hans',
+	tw = 'hant',
+}
+local lc = require( 'Module:WikitextLC' )
+
+function p._main( args, frame )
+	local values = {}	-- dict<region:string> => <script:string, term:int>,
+						-- where "term" is the index of the relevant string in "terms"
+	local terms = {}	-- table of term objects:
+						--		regions: table<region:string>, regions that use this term
+						--		hans, hant: string, term in different scripts
+
+	-- fill region values, simp and trad, from explicit definitions
+	for region, defaultScript in pairs( variants ) do
+		if args['zh-hans-' .. region] ~= '' or args['zh-hant-' .. region] ~= '' or args['zh-' .. region] ~= '' then
+			local term = { regions = { region } }
+
+			if args['zh-hans-' .. region] ~= '' then
+				term.hans = args['zh-hans-' .. region]
+			elseif args['zh-' .. region] ~= '' then
+				term.hans = lc.converted( args['zh-' .. region], 'zh-hans' )
+			else
+				term.hans = lc.converted( args['zh-hant-' .. region], 'zh-hans' )
+			end
+
+			if args['zh-hant-' .. region] ~= '' then
+				term.hant = args['zh-hant-' .. region]
+			elseif args['zh-' .. region] ~= '' then
+				term.hant = lc.converted( args['zh-' .. region], 'zh-hant' )
+			else
+				term.hant = lc.converted( args['zh-hans-' .. region], 'zh-hant' )
+			end
+
+			table.insert( terms, term )
+			values[region] = { script = defaultScript, term = #terms }
+		end
+	end
+
+	-- link up "equiv" aliases for missing regions
+	for region, defaultScript in pairs( variants ) do
+		if values[region] == nil and values[args['equiv-' .. region]] ~= nil then
+			table.insert( terms[values[args['equiv-' .. region]].term].regions, region )
+			values[region] = { script = defaultScript, term = values[args['equiv-' .. region]].term }
+		end
+	end
+
+	local localName = {}
+	for region, value in pairs( values ) do
+		localName['zh-' .. region] = terms[value.term][value.script]
+	end
+	localName = args.beforeTerm .. lc.selective( localName ) .. args.afterTerm
+
+	local foreignName = {}
+	for region, script in pairs( variants ) do
+		local snippets = {}
+		for _, term in pairs( terms ) do
+			local termRegions = {}
+			for _, termRegion in pairs( term.regions ) do
+				if not args.stripLocal or args.stripLocal == '' or termRegion ~= region and not (values[termRegion] and values[region] and values[termRegion].term == values[region].term) then
+					table.insert( termRegions, termRegion )
+				end
+			end
+			if #termRegions > 0 then
+				table.sort( termRegions )
+				local maybeNameKey = 'name-' .. table.concat( termRegions, '-' )
+				local name
+				if args[maybeNameKey] and args[maybeNameKey] ~= '' then
+					name = args[maybeNameKey]
+				else
+					local names = {}
+					for _, termRegion in pairs( termRegions ) do
+						table.insert( names, args['name-' .. termRegion] )
+					end
+					name = mw.text.listToText( names, args.nameComma, args.nameLastComma )
+				end
+				name = lc.converted( name .. args.colon, 'zh-' .. region )
+				table.insert( snippets, name .. args.beforeTerm .. term[script] .. args.afterTerm )
+			end
+		end
+		foreignNameText = mw.text.listToText( snippets, lc.converted( args.comma, 'zh-' .. region ), lc.converted( args.lastComma, 'zh-' .. region ) )
+		if foreignNameText ~= '' then
+			local openBracket = ""
+			local closeBracket = ""
+			if args.showLocal and args.showLocal ~= 'no' then
+				openBracket = lc.converted( args.openBracket, 'zh-' .. region )
+				closeBracket = lc.converted( args.closeBracket, 'zh-' .. region )
+			end
+			foreignNameText = openBracket .. foreignNameText .. closeBracket
+		end
+		foreignName['zh-' .. region] = foreignNameText
+	end
+	foreignName = lc.selective( foreignName )
+
+	ret = ''
+	if args.showLocal and args.showLocal ~= 'no' then
+		ret = ret .. localName .. args.afterLocal
+	end
+	if args.showForeign and args.showForeign ~= 'no' then
+		ret = ret .. foreignName
+	end
+	return ret
+end
+
+function p.main( frame )
+	local args = {}
+	for k, v in pairs( frame:getParent().args ) do
+		args[k] = v
+	end
+	for k, v in pairs( frame.args ) do
+		args[k] = v
+	end
+	return p._main( args, frame )
+end
+
+return p

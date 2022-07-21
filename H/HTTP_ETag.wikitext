@@ -1,0 +1,68 @@
+{{HTTP}}
+'''ETag'''或'''实体标签'''（'''{{lang|en|entity tag}}'''）是[[万维网|万维网]]协议[[HTTP|HTTP]]的一部分。
+
+ETag是HTTP协议提供的若干机制中的一种Web[[缓存|缓存]]验证机制，并且允许客户端进行缓存协商。这就使得缓存变得更加高效，而且节省带宽。如果资源的内容没有发生改变，Web服务器就不需要发送一个完整的响应。ETag也可用于[[乐观并发控制|乐观并发控制]]<ref>{{cite web | url = http://www.w3.org/1999/04/Editing/ | title = Editing the Web - Detecting the Lost Update Problem Using Unreserved Checkout | work = W3C Note | date = 10 May 1999 | accessdate = 2014-05-22 | archive-date = 2013-06-03 | archive-url = https://www.webcitation.org/6H6Phn81S?url=http://www.w3.org/1999/04/Editing/ | dead-url = no }}</ref>，作为一种防止资源同步更新而相互覆盖的方法。
+
+ETag是一个不透明的标识符，由Web服务器根据[[URL|URL]]上的资源的特定版本而指定。如果那个URL上的资源内容改变，一个新的不一样的ETag就会被分配。用这种方法使用ETag即类似于[[指纹_(计算机)|指纹]]，并且他们能够被快速地被比较，以确定两个版本的资源是否相同。ETag的比较只对同一个URL有意义——不同URL上的资源的ETag值可能相同也可能不同，从他们的ETag的比较中无从推断。
+
+== 部署风险 ==
+
+ETag在HTTP头字段中的使用是可选的（不像HTTP/1.1的其他头字段是强制性的）。HTTP规范从未指定生成ETag的方法。
+
+生成ETag常用的方法包括对资源内容使用抗碰撞[[散列|散列]]函数，使用最近修改的时间戳的哈希值，甚至只是一个[[版本控制|版本号]]。
+
+为了避免使用过时的缓存数据，用于生成ETag的方法应保证（同时尽可能的实用）每一个ETag都是唯一的。然而，只要ETag的生成函数可以用数学证明，即使生成的ETag可能重复，其概率也是可接受范围内的无穷小，那么就可以判断这个函数是可用的。
+
+一些早期的[[校验和|校验和]]函数，如[[CRC32|CRC32]]和CRC64，常会碰到哈希碰撞问题。正因如此，他们并不是用于生成ETag的好选择。
+
+== 强校验和弱校验 ==
+
+ETag机制同时支持强校验和弱校验。它们通过ETag标识符的开头是否存在“W/”来区分，如：
+
+ "123456789"   -- 一个强ETag验证符
+ W/"123456789"  -- 一个弱ETag验证符
+
+强校验的ETag匹配要求两个资源内容的每个字节需完全相同，包括所有其他实体字段（如<code>Content-Language</code>）不发生变化。强ETag允许重新装配和缓存部分响应，以及[[字节服务|字节范围请求]]。弱校验的ETag匹配要求两个资源在[[语义相等|语义上相等]]，这意味着在实际情况下它们可以互换，而且缓存副本也可以使用。不过这些资源不需要每个字节相同，因此弱ETag不适合字节范围请求。当Web服务器无法生成强ETag的时候，比如[[动态网页|动态生成的内容]]，弱ETag就可能发挥作用了。
+
+== 典型用法 ==
+
+在典型用法中，当一个URL被请求，Web服务器会返回资源和其相应的ETag值，它会被放置在HTTP的“ETag”字段中：
+
+ ETag: "686897696a7c876b7e"
+
+然后，客户端可以决定是否缓存这个资源和它的ETag。以后，如果客户端想再次请求相同的URL，将会发送一个包含已保存的ETag和“If-None-Match”字段的请求。
+
+ If-None-Match: "686897696a7c876b7e"
+
+客户端请求之后，服务器可能会比较客户端的ETag和当前版本资源的ETag。如果ETag值匹配，这就意味着资源没有改变，服务器便会发送回一个极短的响应，包含HTTP “304 未修改”的状态。304状态告诉客户端，它的缓存版本是最新的，并应该使用它。
+
+然而，如果ETag的值不匹配，这就意味着资源很可能发生了变化，那么，一个完整的响应就会被返回，包括资源的内容，就好像ETag没有被使用。这种情况下，客户端可以用新返回的资源和新的ETag替代先前的缓存版本。
+
+ETag值可用于[[变化监测和通知|网页监视]]系统。大多数站点没有为网页设置ETag头信息，这一事实阻碍了高效的网页监测。当Web监视器不知道网站内容是否发生变化的时候，它不得不被检索和分析所有的内容，这不仅占用发布者的计算资源，还有订阅者的。
+
+== 用ETag来跟踪用户 ==
+
+由于[[HTTP_cookie|HTTP cookie]]被越来越多的注重隐私保护的用户删除，可以将ETag用来追踪唯一用户<ref>{{cite web | url = http://www.arctic.org/~dean/tracking-without-cookies.html | title = tracking without cookies | date = 17 February 2003 | accessdate = 2014-05-22 | archive-date = 2013-06-03 | archive-url = https://www.webcitation.org/6H6PiOpZi?url=http://www.arctic.org/~dean/tracking-without-cookies.html | dead-url = no }}</ref>。2011年7月，[[Ashkan_Soltani|Ashkan Soltani]]和[[加州大学伯克利分校|加州大学伯克利分校]]的一组研究者，包括[[Hulu.com|Hulu.com]]将ETag用于追踪用途。<ref>{{cite web | url = http://papers.ssrn.com/sol3/papers.cfm?abstract_id=1898390 | title = Flash Cookies and Privacy II: Now with HTML5 and ETag Respawning | date = 29 July 2011 | accessdate = 2014-05-22 | archive-date = 2013-06-03 | archive-url = https://www.webcitation.org/6H6PizBPE?url=http://papers.ssrn.com/sol3/papers.cfm?abstract_id=1898390 | dead-url = no }}</ref>Hulu和KISSmetrics在2011年7月29日停止了这样的追踪，<ref>{{cite web | url = http://ashkansoltani.org/docs/respawn_redux.html | title = Respawn Redux | date = 11 August 2011 | accessdate = 2014-05-22 | archive-date = 2013-06-03 | archive-url = https://www.webcitation.org/6H6PjuVRU?url=http://ashkansoltani.org/2011/08/11/respawn-redux-flash-cookies/ | dead-url = yes }}</ref>而KISSmetrics和超过20位其用户面临关于“无法删除”的cookie的集体诉讼，其中包括了ETag的使用。<ref>{{Cite web |url=http://www.extremetech.com/internet/91966-aol-spotify-gigaom-etsy-kissmetrics-sued-over-undeletable-tracking-cookies |title=AOL, Spotify, GigaOm, Etsy, KISSmetrics sued over undeletable tracking cookies |accessdate=2014-05-22 |archive-date=2014-05-22 |archive-url=https://web.archive.org/web/20140522123819/http://www.extremetech.com/internet/91966-aol-spotify-gigaom-etsy-kissmetrics-sued-over-undeletable-tracking-cookies |dead-url=no }}</ref>
+
+因为ETag由浏览器保存，并且在访问统一资源时随之后请求返回，一个追踪服务器可以轻松地重复设定任何从浏览器收到的ETag，以保持ETag不变，类似于持久cookie。额外的缓存头部也能增强ETag的持久性。<ref>{{Cite web |url=https://github.com/lucb1e/cookielesscookies |title=Cookieless cookies (using ETags as cookies) |accessdate=2014-05-22 |archive-date=2013-08-27 |archive-url=https://web.archive.org/web/20130827114358/https://github.com/lucb1e/cookielesscookies |dead-url=no }}</ref>
+
+根据实现，ETag可以通过清除浏览器缓存清除。
+
+== 参考资料==
+
+{{Reflist}}
+
+== 外部链接 ==
+
+*[http://httpd.apache.org/docs/2.2/mod/core.html#fileETag Apache HTTP Server Documentation - FileETag Directive]{{Wayback|url=http://httpd.apache.org/docs/2.2/mod/core.html#fileETag |date=20140522123325 }}
+*''[http://www.w3.org/1999/04/Editing/ Editing the Web: Detecting the Lost Update Problem Using Unreserved Checkout]{{WebCite|url=https://www.webcitation.org/6H6Phn81S?url=http://www.w3.org/1999/04/Editing/ |date=20130603151353 |dateformat=iso }},'' W3C Note, 10 May 1999.
+*[http://devel.squid-cache.org/old_projects.html#ETag Old SQUID Development projects - ETag support]{{Wayback|url=http://devel.squid-cache.org/old_projects.html#ETag |date=20120923060622 }} (completed in 2001)
+*[http://www.infoq.com/articles/ETags Using ETags to Reduce Bandwidth & Workload with Spring & Hibernate]{{Wayback|url=http://www.infoq.com/articles/ETags |date=20140522122516 }}
+*[https://web.archive.org/web/20130811125909/http://noc.to/ Live demo of zombie cookie using ETags]
+*[http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.19 ETag in HTTP/1.1 specification]{{Wayback|url=http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.19 |date=20140520073003 }}
+*[https://web.archive.org/web/20110722001110/http://iwaw.europarchive.org/04/Clausen.pdf Concerning ETags and Datestamps] by Lars R. Clausen (2004)
+
+[[Category:超文本传输协议头部|Category:超文本传输协议头部]]
+[[Category:互联网隐私|Category:互联网隐私]]
+[[Category:缓存_(计算机)|Category:缓存 (计算机)]]
+[[Category:代理服务器|Category:代理服务器]]

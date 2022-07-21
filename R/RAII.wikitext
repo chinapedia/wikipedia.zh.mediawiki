@@ -1,0 +1,190 @@
+{{noteTA
+|G1=IT
+}}
+'''RAII'''，全称'''资源获取即初始化'''（{{Lang-en|'''R'''esource '''A'''cquisition '''I'''s '''I'''nitialization}}），它是在一些[[面向对象语言|面向对象语言]]中的一种{{link-en|慣用法|Programming idiom}}。RAII源于[[C++|C++]]，在[[Java|Java]]，[[C♯|C#]]，[[D语言|D]]，[[Ada|Ada]]，[[Vala|Vala]]和[[Rust|Rust]]中也有应用。1984-1989年期间，[[比雅尼·斯特勞斯特魯普|比雅尼·斯特勞斯特魯普]]和{{link-en|安德鲁·柯尼希|Andrew Koenig (programmer)}}在设计C++异常时，为解决{{link-en|資源管理|Resource management (computing)}}时的{{link-en|異常安全|Exception safety}}性而使用了该用法<ref>[http://www.stroustrup.com/except89.pdf Exception Handling for C++] {{Wayback|url=http://www.stroustrup.com/except89.pdf |date=20141006075431 }}, 5 Handling of Destructors</ref>，后来[[比雅尼·斯特勞斯特魯普|比雅尼·斯特勞斯特魯普]]将其称为RAII{{sfn|Stroustrup |1994|loc=chpt. 16.5 Resource Management|ps=. I called this technique “resource acquisition is initialization.”}}。
+
+RAII要求，资源的有效期与持有资源的{{link-en|对象的生命期|Object lifetime}}严格绑定，即由对象的[[构造函数|构造函数]]完成{{link-en|资源的分配|Resource allocation (computer)}}（获取），同时由[[析构函数|析构函数]]完成资源的释放。在这种要求下，只要对象能正确地析构，就不会出现{{link-en|资源泄露|Resource leak}}问题。
+
+==作用==
+
+RAII的主要作用是在不失代码简洁性<ref>C++ FAQ, [http://www.parashift.com/c++-faq/too-many-trycatch-blocks.html "I have too many try blocks; what can I do about it?"] {{Wayback|url=http://www.parashift.com/c++-faq/too-many-trycatch-blocks.html |date=20140511183603 }}</ref>的同时，可以很好地保证代码的异常安全性。
+
+下面的C++实例说明了如何用RAII访问文件和互斥量：
+
+<syntaxhighlight lang="cpp">
+#include <string>
+#include <mutex>
+#include <iostream>
+#include <fstream>
+#include <stdexcept>
+ 
+void write_to_file(const std::string & message)
+{
+    // 创建关于文件的互斥锁
+    static std::mutex mutex;
+ 
+    // 在访问文件前进行加锁
+    std::lock_guard<std::mutex> lock(mutex);
+ 
+    // 尝试打开文件
+    std::ofstream file("example.txt");
+    if (!file.is_open())
+        throw std::runtime_error("unable to open file");
+ 
+    // 输出文件内容
+    file << message << std::endl;
+ 
+    // 当离开作用域时，文件句柄会被首先析构 (不管是否抛出了异常)
+    // 互斥锁也会被析构 (同样地，不管是否抛出了异常)
+}
+</syntaxhighlight>
+
+C++保证了所有栈对象在生命周期结束时会被销毁(即调用析构函数){{sfn|Stroustrup|2000|loc=chpt. 14.4.1 Using Constructors and Destructors}}，所以该代码是异常安全的。无论在write_to_file函数正常返回时，还是在途中抛出异常时，都会引发write_to_file函数的[[堆栈回退|堆栈回退]]，而此时会自动调用lock和file对象的析构函数。
+
+当一个函数需要通过多个局部变量来管理资源时，RAII就显得非常好用。因为只有被构造成功(构造函数没有抛出异常)的对象才会在返回时调用析构函数{{sfn|Stroustrup|2000|loc=chpt. 14.4.1 Using Constructors and Destructors}}，同时析构函数的调用顺序恰好是它们构造顺序的反序<ref>C++ FAQ,  [http://www.parashift.com/c++-faq/order-dtors-for-locals.html "What's the order that local objects are destructed?"] {{Wayback|url=http://www.parashift.com/c++-faq/order-dtors-for-locals.html |date=20141009151329 }}</ref>，这样既可以保证多个资源(对象)的正确释放，又能满足多个资源之间的依赖关系。
+
+由于RAII可以极大地简化资源管理，并有效地保证程序的正确和代码的简洁，所以通常会强烈建议在C++中使用它。
+
+==典型用法==
+
+RAII在C++中的应用非常广泛，如[[标准模板库|C++标准库]]中的[http://en.cppreference.com/w/cpp/thread/lock_guard lock_guard]{{Wayback|url=http://en.cppreference.com/w/cpp/thread/lock_guard |date=20140804062820 }}便是用RAII方式来控制互斥量:
+
+<syntaxhighlight lang="cpp">
+template <class Mutex> class lock_guard {
+private:
+    Mutex& mutex_;
+
+public:
+    lock_guard(Mutex& mutex) : mutex_(mutex) { mutex_.lock(); }
+    ~lock_guard() { mutex_.unlock(); }
+
+    lock_guard(lock_guard const&) = delete;
+    lock_guard& operator=(lock_guard const&) = delete;
+};
+</syntaxhighlight>
+
+程序员可以非常方便地使用lock_guard，而不用担心异常安全问题
+
+<syntaxhighlight lang="cpp">
+extern void unsafe_code();  // 可能抛出异常
+
+using std::mutex;
+using std::lock_guard;
+
+mutex g_mutex;
+
+void access_critical_section()
+{
+    lock_guard<mutex> lock(g_mutex);
+    unsafe_code();
+}
+</syntaxhighlight>
+
+实际上，[[标准模板库|C++标准库]]的实现就广泛应用了RAII，典型的如[[集合_(计算机科学)|容器]]、[[智能指针|智能指针]]等。
+
+==RRID==
+
+RAII还有另外一种被称为RRID(Resource Release Is Destruction)的特殊用法{{sfn|Wilson|2004|loc=chpt. 3.4 RRID}}，即在构造时没有“获取”资源，但在析构时释放资源。ScopeGuard<ref>Andrei Alexandrescu, [http://www.drdobbs.com/cpp/generic-change-the-way-you-write-excepti/184403758 Change the Way You Write Exception-Safe Code] {{Wayback|url=http://www.drdobbs.com/cpp/generic-change-the-way-you-write-excepti/184403758 |date=20141024040741 }}</ref>和[http://www.boost.org/doc/libs/1_56_0/libs/scope_exit/doc/html/index.html Boost.ScopeExit]{{Wayback|url=http://www.boost.org/doc/libs/1_56_0/libs/scope_exit/doc/html/index.html |date=20140925044557 }}就是RRID的典型应用：
+
+<syntaxhighlight lang="cpp">
+#include <functional>
+
+class ScopeGuard {
+private:
+    typedef std::function<void()> destructor_type;
+
+    destructor_type destructor_;
+    bool dismissed_;
+
+public:
+    ScopeGuard(destructor_type destructor) : destructor_(destructor), dismissed_(false) {}
+
+    ~ScopeGuard()
+    {
+        if (!dismissed_) {
+            destructor_();
+        }
+    }
+
+    void dismiss() { dismissed_ = true; }
+
+    ScopeGuard(ScopeGuard const&) = delete;
+    ScopeGuard& operator=(ScopeGuard const&) = delete;
+};
+</syntaxhighlight>
+
+ScopeGuard通常用于省去一些不必要的RAII封装，例如
+
+<syntaxhighlight lang="cpp">
+void foo()
+{
+    auto fp = fopen("/path/to/file", "w");
+    ScopeGuard fp_guard([&fp]() { fclose(fp); });
+
+    write_to_file(fp);                     // 异常安全
+}
+</syntaxhighlight>
+
+在[[D语言|D语言]]中，scope关键字也是典型的RRID用法，例如
+
+<syntaxhighlight lang="d">
+void access_critical_section()
+{
+    Mutex m = new Mutex;
+    lock(m); 
+    scope(exit) unlock(m);
+
+    unsafe_code();                  // 异常安全
+}
+
+Resource create()
+{
+    Resource r = new Resource();
+    scope(failure) close(f);
+
+    preprocess(r);                  // 抛出异常时会自动调用close(r)
+    return r;
+}
+</syntaxhighlight>
+
+==與finally的比較==
+
+虽然RAII和finally都能保证资源管理时的异常安全，但相对来说，使用RAII的代码相对更加简洁。
+如[[比雅尼·斯特劳斯特鲁普|比雅尼·斯特劳斯特鲁普]]所说，“在真实环境中，调用资源释放代码的次数远多于资源类型的个数，所以相对于使用finally来说，使用RAII能减少代码量。”<ref>[http://www.stroustrup.com/bs_faq2.html Bjarne Stroustrup's C++ Style and Technique FAQ] {{Wayback|url=http://www.stroustrup.com/bs_faq2.html |date=20200702224848 }}. [http://www.stroustrup.com/bs_faq2.html#finally "Why doesn't C++ provide a "finally" construct?"] {{Wayback|url=http://www.stroustrup.com/bs_faq2.html#finally |date=20200702224848 }}</ref>
+
+例如在[[Java|Java]]中使用finally来管理Socket资源
+
+<syntaxhighlight lang="java">
+void foo() {
+    Socket socket;
+    try {
+        socket = new Socket();
+        access(socket);
+    } finally {
+        socket.close();
+    }
+}
+</syntaxhighlight>
+
+在采用RAII后，代码可以简化为
+
+<syntaxhighlight lang="java">
+void foo() {
+    try (Socket socket = new Socket()) {
+        access(socket);
+    }
+}
+</syntaxhighlight>
+
+特别是当大量使用Socket时，重复的finally就显得没有必要。
+
+==参考资料==
+{{refbegin}}
+* {{cite isbn|0201700735|ref=harv}}
+* {{cite isbn|0201543303|ref=harv}}
+* {{cite isbn|0321228774|ref=harv}}
+{{refend}}
+
+{{reflist}}
+
+[[Category:面向对象的程序设计|Category:面向对象的程序设计]]

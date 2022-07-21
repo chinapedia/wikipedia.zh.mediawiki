@@ -1,0 +1,67 @@
+<includeonly><!--
+This is where the list of parent taxa with "edit" links is generated:
+-->{{#invoke:Autotaxobox|taxonomyList|{{#titleparts:{{{pgname|{{PAGENAME}}}}}||2}} }}
+{| class="infobox biota" style="text-align: left; font-size:100%" 
+|-
+|{{add new taxon}}
+|}
+{{#ifexist:Template:Taxonomy/{{{parent|{{ {{PAGENAME}}|parent}} }}}
+|{{#ifexist:{{{link_target|{{ {{PAGENAME}}|link_target}} }}}|__NOINDEX__<!-- then it looks like we're in the clear.  Google can show the article, rather than this page. -->
+|维基百科还没有关于{{{link|{{{{PAGENAME}}|link}} }}}的条目。您可以帮助我们[{{Create taxonomy/link|{{{link_target|{{ {{PAGENAME}}|link_target}} }}} }} 创建这个条目]。你当前浏览的页面包含有关于{{{link|{{{{PAGENAME}}|link}} }}}的分类学-{zh-cn:信息; zh-tw:資訊;}-。}}
+|{{error|取得进展。}}如果下述的表格正确无误，那么您已经正确输入了关于“{{{link|{{{{PAGENAME}}|link}} }}}”的分类学-{zh-cn:信息; zh-tw:資訊;}-。谢谢您！
+
+如果指定父类“[[{{{parent|{{ {{PAGENAME}}|parent}} }}}]]”的分类学-{zh-cn:信息; zh-tw:資訊;}-仍然缺失，您还需要完成如下步骤：首先请检查拼写，检查是否使用了正确的学名（而非俗名或中文名）。如果上述检测无误，那么您还需要重复相同步骤来创立相应父类。[{{Create taxonomy/link|{{{parent|{{ {{PAGENAME}}|parent}} }}} }} 点击这里]创建相应的模版页面……希望没有使用您太多时间来完善维基百科的生命之树！
+}}
+
+不知道怎么操作？[[Template:Automatic taxobox/doc/Step-by-step|开始学习]]編輯維基百科生物分類信息框。
+{| class="wikitable"
+|-
+|父类（<code>parent</code>）：
+|{{Taxon info|{{{parent|}}}|link}} <code>{{{parent|{{{{PAGENAME}}|parent}}}}}</code>（[[Template:Taxonomy/{{{parent|{{{{PAGENAME}}|parent}}}}}|生物分类]] · <span class=plainlinks>[{{Create taxonomy/link|{{{parent|{{{{PAGENAME}}|parent}}}}}}} 编辑]）</span>
+|-
+|级别（<code>rank</code>）：
+|<code>{{{rank|{{{{PAGENAME}}|rank}}}}}</code>（显示作{{sinicize rank|{{{rank|{{{{PAGENAME}}|rank}}}}}}}）
+|-
+|链接（<code>link</code>）：
+|'''[[{{#if:{{{link_target|{{{link_text|{{{extinct|}}} }}} }}}|<!--
+This link should point to the right place...
+-->{{{link_target|{{{link|{{ {{PAGENAME}}|link_target}} }}} }}}{{!}}}}<!--
+Now generate link text, including extinction dagger
+-->{{#if:{{{extinct|}}}|&dagger;}}{{{link_text|{{{link|{{{{PAGENAME}}|link}} }}} }}}]]'''（链接到{{{link_target|{{{link| {{ {{PAGENAME}}|link_target}} }}} }}}）
+|-
+|学名（<code>scientific_name</code>）：
+|{{#if:{{{scientific_name|}}}|<code>{{{scientific_name|{{{{PAGENAME}}|scientific_name}}}}}</code>|{{error|缺失}} }}
+|-
+|是否灭绝（<code>extinct</code>）：
+|{{#if:{{{extinct|}}}|'''<code>{{{extinct|{{{{PAGENAME}}|extinct}}}}}</code>'''|否}}
+|-
+|始终显示（<code>always_display</code>）：
+|{{#if:{{{always_display|{{{{PAGENAME}}|always_display}}}}}|是（手动／自动覆盖）[[Category:使用了always_display的自动生物分类信息框]]|{{#switch:{{lc:{{{rank|{{{{PAGENAME}}|级别}} }}} }}
+  | virus_group | realm
+  | regnum | phylum | divisio | classis | ordo | familia | genus | species = 是（主要级别）
+  | 否
+}} }}
+|-
+|生物分类引用：
+|{{#ifeq:{{#titleparts:{{PAGENAME}}|1|2}}|Incertae sedis|不适用（地位未定）|{{#iferror:{{get refs|{{#titleparts:{{PAGENAME}}||2}}}}|{{get refs|{{#titleparts:{{PAGENAME}}|1|2}}}}|{{get refs|{{#titleparts:{{PAGENAME}}||2}} }} }} }} 
+|-
+|父级生物分类引用：
+|{{#ifeq:{{#titleparts:{{{parent|}}}|1|2}}|Incertae sedis|不适用（地位未定）|{{#iferror:{{get refs|{{{parent|}}} }}|{{get refs|{{#titleparts:{{{parent|}}}|1|2}}}}|{{get refs|{{{parent|}}} }} }} }} 
+|-
+{{#if:{{{same_as|{{{same as|}}}}}}|
+{{!}}相同生物分类{{!}}{{!}}<code>{{{same_as|{{{same as|}}}}}}</code> &#x5B;[[Template:Taxonomy/{{{same_as|{{{same as}}}}}}|Taxonomy]]; <span class=plainlinks>[{{Create taxonomy/link|{{{same_as|{{{same as|}}}}}}}} edit]&#x5D;</span>
+{{!}}-
+}}
+{{#if:{{Str endswith|{{{pgname|{{PAGENAME}}}}}|/skip}}|
+{{!}} colspan=2 {{!}}关于带后缀“/skip”的模板，详见[[:en:Wikipedia:Automated_taxobox_system/advanced_taxonomy#Skip_taxonomy_templates|Skip taxonomy templates]].<br>关于被省略的分类，详见[[Template:{{Str crop|{{{pgname|{{PAGENAME}}}}}|5}}]].|
+{{#if:{{Str endswith|{{{pgname|{{PAGENAME}}}}}|/?}}|
+{{!}} colspan=2 {{!}}关于带后缀“/?”的模板，详见[[Wikipedia:Automated_taxobox_system/advanced_taxonomy#Questionable_assignments|Questionable assignments]].|
+{{#ifeq:{{#titleparts:{{{pgname|{{PAGENAME}}}}}|1|2}}|Incertae sedis|
+{{!}} colspan=2 {{!}}关于地位未定的分类（Incertae sedis），详见[[:en:Wikipedia:Automated_taxobox_system/advanced_taxonomy#Incertae_sedis_taxonomy_templates|''Incertae sedis'' taxonomy templates]].|
+}}}}}}
+|-
+| colspan=2 style="font-size:smaller" | 本-{zh-cn:信息; zh-tw:資訊;}-由{{lts|Taxonomy key}}生成。所列分类已过时？{{null edit|点击此处}}更新。
+|}
+
+<!--[[Category:Immediate step-children/{{#titleparts:{{{parent|unspecified parent}}}|1|1}}|{{{link|{{#titleparts:{{PAGENAME}}|1|2}}}}}]][[Category:Immediate step-children/{{{parent|unspecified parent}}}|{{{link|{{#titleparts:{{PAGENAME}}|1|2}}}}}]][[Category:Immediate children/{{{parent|unspecified parent}}}|{{{link|{{#titleparts:{{PAGENAME}}|1|2}}}}}]]-->
+</includeonly><noinclude>{{Documentation}}</noinclude>

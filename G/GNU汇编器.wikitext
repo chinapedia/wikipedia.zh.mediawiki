@@ -1,0 +1,103 @@
+{{noteTA
+|G1=IT
+|G2=FL
+}}
+{{Infobox software
+| name                   = GNU汇编器
+| latest release version = 2.37
+| developer              = [[GNU计划|GNU计划]]
+| latest release date    = {{release date and age|2021|07|18}}
+| programming language   = [[C语言|C]]
+| platform               = [[跨平台|跨平台]]
+| genre                  = [[汇编器|汇编器]]
+| license                = [[GNU通用公共许可证|GNU通用公共许可证]] v3
+| website                = {{url|http://www.gnu.org/software/binutils/}}
+}}
+'''GNU汇编器'''（{{lang-en|'''GNU assembler'''}}），是由[[GNU计划|GNU计划]]所使用的[[汇编器|汇编器]]，一般称为'''gas'''，或依其可执行文件名称简称为'''as'''。它是[[GCC|GCC]]的默认[[后端|后端]]。它用于汇编[[GNU|GNU操作系统]]、[[Linux内核|Linux内核]]以及其他各种软件。它是[[GNU_Binutils|GNU Binutils]]包的一部分。
+
+GAS的[[可执行文件|可执行文件]]被命名为<tt>[[As_(Unix)|as]]</tt>，[[Unix|Unix]]汇编器的标准名称。GAS是[[跨平台|跨平台]]的，可以运行或为不同的[[计算机系统结构|计算机系统结构]]编译。GAS依据[[GNU通用公共许可证|GNU通用公共许可证]]第三版发布，为[[自由软件|自由软件]]。
+
+== 通用语法 ==
+GAS支持适用于所有支持架构的通用语法。通用语法包括汇编指令和注释方法。
+
+=== 指令 ===
+GAS使用汇编器[[编译程式定向|指令]]（也被称为伪操作），它们作为关键字指示开始一个时期，与[[C语言|C语言]]中的预处理指令表现相同。虽然无论目标架构如何，大多数可用的汇编指令都是有效的，但一些指令仍然因机器不同而不同。<ref>{{cite web | title = The GNU Assembler - Assembler Directives | url = http://sources.redhat.com/binutils/docs-2.12/as.info/Pseudo-Ops.html#Pseudo%20Ops | accessdate = 2013-10-08 | archive-date = 2012-02-22 | archive-url = https://web.archive.org/web/20120222005603/http://sources.redhat.com/binutils/docs-2.12/as.info/Pseudo-Ops.html#Pseudo%20Ops | dead-url = no }}</ref>
+
+=== 注释 ===
+GAS支持两种注释风格：<ref>{{cite web|last=Red Hat Inc.|title=Using as|url=http://sources.redhat.com/binutils/docs-2.12/as.info/Comments.html#Comments|accessdate=1012-03-11|archive-date=2011-06-20|archive-url=https://web.archive.org/web/20110620054223/http://sources.redhat.com/binutils/docs-2.12/as.info/Comments.html#Comments|dead-url=no}}</ref>
+
+多行注释：
+
+与[[C语言|C语言]]类似，以一对[[斜线|斜线]]-[[星号|星号]]对开始和结束：
+<pre><nowiki>
+/* 
+注释
+*/
+</nowiki></pre>
+
+单行注释：
+
+在不同的架构中汇编时，单行注释有几种不同的格式。
+* [[井号|#]]用于以下平台中：i386，x86-64，i960，68HC11，68HC12，VAX, V850，m32r，M880x0。
+* [[分号|;]]用于以下平台中：AMD 29k family，ARC，H8/300 family，HPPA,PDP-11，picoJava，Motorola，PowerPC。
+* [[@|@]]用于ARM平台。
+* [[竖线|{{!}}]]用于[[680x0|680x0]]平台。
+* [[叹号|!]]用于Renesas SH平台。
+
+== 用法 ==
+
+作为流行编译器套件GCC的后端，GNU汇编器在编译现代开源软件中有非常广泛的应用。在Linux系统上，GAS经常用作与其他GNU软件结合的汇编器。因为[[OS_X|OS X]],修改后版本的GAS也可以在[[麦金塔|麦金塔]]操作系统的开发工具包中找到。
+
+== 示例程序 ==
+一个标准的“Hello, world!”程序，运行于[[Linux|Linux]] [[IA-32|IA-32]]：
+
+<syntaxhighlight lang="asm">
+.globl _start
+
+.text
+_start:
+ movl $len, %edx
+ movl $msg, %ecx
+ movl $1, %ebx
+ movl $4, %eax
+ int $0x80
+
+ movl $0, %ebx
+ movl $1, %eax
+ int $0x80
+.data
+msg:
+ .ascii "Hello, world!\n"
+ len = . - msg
+</syntaxhighlight>
+
+== 批评 ==
+那些更习惯于Intel语法的人认为，比起其他汇编器，在[[x86|x86]]和[[x86-64|x86-64]]平台上不支持使用Intel语法就是一大败笔。
+
+然而，自从2.10版本，Intel语法可以通过使用<code>.intel_syntax</code>指令使用。<ref>{{cite web| title = GNU Assembler News| url = http://sourceware.org/cgi-bin/cvsweb.cgi/src/gas/NEWS?rev=1.93&content-type=text/x-cvsweb-markup&cvsroot=src}}{{Dead link|date=2020年4月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref><ref>{{cite web| title = AT&T Syntax versus Intel Syntax| work = Using as, the GNU Assembler| url = http://www.redhat.com/docs/manuals/enterprise/RHEL-3-Manual/gnu-assembler/i386-syntax.html| accessdate = 2013-10-08| archive-date = 2010-05-29| archive-url = https://web.archive.org/web/20100529053424/http://www.redhat.com/docs/manuals/enterprise/RHEL-3-Manual/gnu-assembler/i386-syntax.html| dead-url = no}}</ref><ref>{{cite web| title = Linux assemblers: A comparison of GAS and NASM| author = Ram Narayan| date = 2007-10-17| publisher = [[IBM_DeveloperWorks|IBM DeveloperWorks]]| url = http://www.ibm.com/developerworks/linux/library/l-gas-nasm.html| accessdate = 2007-10-17| archive-date = 2009-03-03| archive-url = https://web.archive.org/web/20090303224539/http://ibm.com/developerworks/linux/library/l-gas-nasm.html| dead-url = no}}</ref>
+
+== 参见 ==
+{{Portal|自由软件}}
+
+* [[GNU_toolchain|GNU toolchain]]
+* [[二进制文件描述库|二进制文件描述库]]
+* [[组合语言列表|汇编器列表]]
+
+== 参考文献 ==
+{{Reflist}}
+
+== 外部链接 ==
+{{Wikibooks|en:X86 Assembly/GAS Syntax}}
+* {{official|http://www.gnu.org/software/binutils/}}
+* [http://sourceware.org/binutils/docs/as/ Gas手册] {{Wayback|url=http://sourceware.org/binutils/docs/as/ |date=20201216025106 }}
+* [http://www.ibm.com/developerworks/linux/library/l-gas-nasm.html A comparison of GAS and NASM]{{Wayback|url=http://www.ibm.com/developerworks/linux/library/l-gas-nasm.html |date=20090303224539 }}，位于[[IBM|IBM]]
+* {{man|1|as||the portable GNU assembler}}
+
+{{GNU}}
+{{X86汇编话题}}
+
+[[Category:汇编器|Category:汇编器]]
+[[Category:GNU计划软件|汇编器]]
+[[Category:自由編譯器與直譯器|Category:自由編譯器與直譯器]]
+[[Category:Linux编程工具|Category:Linux编程工具]]
+[[Category:Unix编程工具|Category:Unix编程工具]]

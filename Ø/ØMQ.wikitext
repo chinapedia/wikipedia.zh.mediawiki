@@ -1,0 +1,88 @@
+{{update|time=2018-10-18T10:45:59+00:00}}
+{{TA
+|G1=IT
+}}
+{{primary sources|date=2010年7月}}
+{{Infobox software
+| name                   =
+| title                  = ØMQ
+| logo                   = <!-- [[File:|File:]] -->
+| author                 =
+| developer              = iMatix公司
+| released               = <!-- {{Start date|YYYY|MM|DD}} -->
+| discontinued           =
+| latest release version = 4.3.4
+| latest release date    = {{Start date and age|2021|01|17}}
+| latest preview version = 
+| latest preview date    = {{Start date and age|}}
+| frequently updated     = <!-- DO NOT include this parameter unless you know what it does -->
+| programming language = [[C++|C++]]
+| operating system       =
+| platform               = [[跨平台|跨平台]]
+| language               =
+| status                 =
+| genre                  = [[消息队列|消息队列]]
+| license                = [[GNU_Lesser_General_Public_License|LGPL]] with static linking [http://www.zeromq.org/area:licensing exception]
+| website                = [http://www.zeromq.org/ www.zeromq.org]
+}}
+'''ØMQ''' （也拼写作'''ZeroMQ'''，'''0MQ'''或'''ZMQ''')是一个为可伸缩的[[分布式计算|分布式]]或并发应用程序设计的高性能异步消息库。它提供一个[[消息队列|消息队列]], 但是与[[面向消息的中间件|面向消息的中间件]]不同，ZeroMQ的运行不需要专门的[[消息代理|消息代理]]（{{link-en|message broker|message broker}}）。该库设计成常见的[[Berkeley套接字|套接字]]风格的[[应用程序接口|API]]。
+
+ZeroMQ是由iMatix公司和大量贡献者组成的社群共同开发的。ZeroQ通过许多第三方软件支持大部分流行的编程语言，从[[Java|Java]]和[[Python|Python]]到[[Erlang|Erlang]]和[[Haskell|Haskell]]。
+
+== 技术 ==
+类库提供一些套接字（对传统[[Berkeley套接字|Berkeley套接字]]和[[Unix_domain_socket|Unix domain socket]]的泛化），每一个套接字可以代表一个[[通讯端口|端口]]之间的{{link-en|多对多|many-to-many}}连接。以消息的粒度进行操作，套接字需要使用一种[[消息模式|消息模式]]（{{link-en|message pattern|message pattern}}）,然后专门为那种模式进行了优化。
+
+基本的ZeroMQ模式有:
+
+; '''[[请求响应|请求响应]]'''模式
+: 将一组客户端连接到一组服务器。这是一种[[远程过程调用|远程过程调用]]和任务分发模式。
+; '''[[发布/订阅|发布/订阅]]'''模式
+: 将一组发布者连接到一组订阅者。这是一种数据分发模式。
+; '''管道'''模式
+: 以扇出/扇入模式连接节点，可以有多个步骤，可以有循环。这是一种[[并行计算|并行]]的任务分发和收集模式。
+; '''排他对'''模式
+: 在一个排他对中连接两个套接字。 （这是一种高级的为某种用例而设计的低级别模式）
+
+任何通过套接字的消息被看作不透明的数据[[二進位大型物件|块]]。发送给订阅者的消息可以自动地通过块最开始的字符串进行过滤。ZeroMQ提供多种消息传输协议，包括[[传输控制协议|TCP]]，[[实际通用多播|PGM]]（可靠的多播），[[进程间通信|进程间通信]]（IPC） 以及线程间通讯（ITC）。
+
+由于内部线程模型，ZeroMQ的性能非常好，通过利用一种自动消息批处理技术，它甚至在吞吐量上超过了TCP的性能。<ref>{{cite web|title=How come ØMQ has higher throughput than TCP although it's built on top of TCP?|url=http://www.zeromq.org/area:faq#toc6|work=ZeroMQ FAQ|accessdate=2013-06-08|archive-date=2019-07-16|archive-url=https://web.archive.org/web/20190716155745/http://zeromq.org/area:faq#toc6|dead-url=no}}</ref><ref name=cern>{{cite web|title=Middleware Trends And Market Leaders 2011|url=http://cds.cern.ch/record/1391410?ln=en|accessdate=2013-06-08|archive-date=2020-11-03|archive-url=https://web.archive.org/web/20201103214926/http://cds.cern.ch/record/1391410?ln=en|dead-url=no}}</ref>
+
+ZeroMQ实现了ZMTP, ZeroMQ消息传输协议。<ref>{{cite web|title=ZeroMQ Message Transfer Protocol|url=http://rfc.zeromq.org/spec:23|accessdate=2013-06-08|archive-date=2019-11-22|archive-url=https://web.archive.org/web/20191122020621/https://rfc.zeromq.org/spec:23/|dead-url=no}}</ref> ZMTP定义了向后兼容性的规则，可扩展的安全机制，命令和消息分帧，连接元数据，以及其他传输层功能。不使用完整的ZeroMQ实现，而是直接实现ZMTP协议的项目不断增加。<ref>{{cite web|title=GitHub Search: ZMTP|url=https://github.com/search?q=zmtp&ref=cmdform|accessdate=2013-06-08|archive-date=2020-08-14|archive-url=https://web.archive.org/web/20200814180731/https://github.com/search?q=zmtp&ref=cmdform|dead-url=no}}</ref>
+
+== 历史 ==
+2010年3月30日，[[Advanced_Message_Queuing_Protocol|AMQP]]的最初设计者iMatix公司的首席执行官[[Pieter_Hintjens|Pieter Hintjens]]宣布iMatix将退出AMQP工作组，而且为了简单得多，快的多的ZeroMQ，将不支持 可能发布的AMQP/1.0<ref>{{cite web|title=iMatix will end OpenAMQ support by 2011|publisher=openamq-dev maillist|url=http://lists.openamq.org/pipermail/openamq-dev/2010-March/001598.html|accessdate=14 July 2012|deadurl=yes|archiveurl=https://web.archive.org/web/20121010015604/http://lists.openamq.org/pipermail/openamq-dev/2010-March/001598.html|archivedate=2012年10月10日}}</ref><ref>{{cite web|title=What is wrong with AMQP (and how to fix it)|url=http://www.imatix.com/articles:whats-wrong-with-amqp|publisher=iMatix Corporation|accessdate=14 July 2012|archive-url=https://web.archive.org/web/20120717131917/http://www.imatix.com/articles:whats-wrong-with-amqp|archive-date=2012-07-17|dead-url=yes}}</ref>
+
+2011年，[[欧洲核子研究组织|欧洲核子研究组织]] （CERN）调查了统一用于操作CERN加速器的中间件解决方案的方式，欧洲核子研究组织的研究比较了[[CORBA|CORBA]]，[[Internet_Communications_Engine|Ice]]，[[Apache_Thrift|Thrift]]，ZeroMQ, YAMI4，[[Run-Time_Infrastructure_(simulation)|RTI]]和 [[Apache_Qpid|Qpid]] (AMQP) ，ZeroMQ得到了最高的分数。<ref name=cern />
+
+2012年3月，由于在项目控制权上的分歧，一些ZeroMQ的最初开发者建立了ZeroMQ的[[复刻|分支]]，Crossroads I/O. Crossroads I/O<ref>{{cite web|title=Crossroads I/O|url=http://www.crossroads.io/|accessdate=14 July 2012|deadurl=yes|archiveurl=https://web.archive.org/web/20120713140548/http://www.crossroads.io/|archivedate=2012年7月13日}}</ref>计划使用更常见的“[[仁慈独裁者|仁慈独裁者]]”模式，Martin Sustrik将充当仁慈独裁者。<ref>{{cite web|title=ZeroMQ and Crossroads I/O: Forking over trademarks|url=http://lwn.net/Articles/488732/|publisher=[[LWN.net|LWN.net]]|accessdate=14 July 2012|archive-date=2022-03-05|archive-url=https://web.archive.org/web/20220305150210/https://lwn.net/Articles/488732/|dead-url=no}}</ref>
+
+2012年8月，Dongmin Yu宣布了他的纯Java的ZeroMQ实现，JeroMQ.<ref>{{cite web|title=jeromq - java pojo zeromq|publisher=zeromq-dev mailing list|url=http://lists.zeromq.org/pipermail/zeromq-dev/2012-August/018265.html|accessdate=23 May 2013|deadurl=yes|archiveurl=https://web.archive.org/web/20130731225620/http://lists.zeromq.org/pipermail/zeromq-dev/2012-August/018265.html|archivedate=2013年7月31日}}</ref> 这激发了更多的ZeroMQ全本地化的移植，例如C#的NetMQ。<ref>{{cite web|title=NetMQ|publisher=GitHub|url=https://github.com/zeromq/netmq|accessdate=23 May 2013|archive-date=2021-09-18|archive-url=https://web.archive.org/web/20210918013436/https://github.com/zeromq/netmq|dead-url=no}}</ref> 
+
+2013年3月, Pieter Hintjens宣布了ZMTP线级协议的新的草案，为ZeroMQ提供了安全机制的可扩展性。<ref>{{cite web|title=Securing ZeroMQ: draft ZMTP v3.0 Protocol|publisher=Hintjens.com|url=http://hintjens.com/blog:39|accessdate=23 May 2013|archive-date=2022-02-23|archive-url=https://web.archive.org/web/20220223191958/http://hintjens.com/blog:39|dead-url=no}}</ref>
+
+== 参见 ==
+{{Portal|Free software|left=yes}}
+
+
+
+
+
+== 参考文献 ==
+{{reflist}}
+
+== 外部链接 ==
+* {{official website|http://www.zeromq.org}}
+* [http://www.infoq.com/cn/news/2010/09/introduction-zero-mq ØMQ(ZeroMQ)简介] {{Wayback|url=http://www.infoq.com/cn/news/2010/09/introduction-zero-mq |date=20180116035402 }}. InfoQ。
+* [http://lwn.net/Articles/370307/ 0MQ: A new approach to messaging] {{Wayback|url=http://lwn.net/Articles/370307/ |date=20220321201536 }}. Linux Weekly News.
+* [http://vimeo.com/20605470 ZeroMQ is the Answer] {{Wayback|url=http://vimeo.com/20605470 |date=20220325085412 }} (a talk at PHP UK conference 2012)
+* [https://web.archive.org/web/20100708013634/http://nichol.as/zeromq-an-introduction ZeroMQ an introduction]
+* [https://web.archive.org/web/20100820232306/http://bhavin.directi.com/selecting-a-message-queue-amqp-or-zeromq/ Selecting a Message Queue – AMQP or ZeroMQ]
+* [http://www.youtube.com/watch?v=_JCBphyciAs Why ZeroMQ?] {{Wayback|url=http://www.youtube.com/watch?v=_JCBphyciAs |date=20201212083055 }} (introductory video)
+* [http://www.igvita.com/2010/09/03/zeromq-modern-fast-networking-stack/ ZeroMQ: Modern & Fast Networking Stack] {{Wayback|url=http://www.igvita.com/2010/09/03/zeromq-modern-fast-networking-stack/ |date=20201203235025 }} (overview with Ruby examples)
+* [http://www.250bpm.com/concepts ØMQ: The Theoretical Foundation] {{Wayback|url=http://www.250bpm.com/concepts |date=20200630103228 }}
+
+{{DEFAULTSORT:Omq}}
+
+[[Category:自由系統軟體|Category:自由系統軟體]]
+[[Category:进程间通信|Category:进程间通信]]
+[[Category:面向消息的中间件|Category:面向消息的中间件]]

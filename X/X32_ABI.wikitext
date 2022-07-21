@@ -1,0 +1,72 @@
+{{noteTA
+|G1=IT
+}}
+{{lowercase}}
+{{Portal|Linux}}
+'''x32 ABI'''（{{lang-en|x32 Application Binary Interface}}）是一种[[应用二进制接口|ABI]]及[[Linux内核接口|Linux内核接口]]之一。它允许程序得到[[x86-64|x86-64]]的优点（较大的[[寄存器|CPU寄存器]]号码，更佳的浮点性能，更快的[[地址无关代码|地址无关代码]][[函式庫#共享库|共享库]]，通过寄存器传递函数参数，更快的[[系统调用|系统调用]]指令），而使用32位[[指標_(電腦科學)|指针]]，从而避免了对64位指针的开销。<ref name="x32ABIHOnline">{{cite news |url=http://www.h-online.com/open/features/Kernel-Log-x32-ABI-gets-around-64-bit-drawbacks-1342061.html |archiveurl=https://web.archive.org/web/20111028081253/http://www.h-online.com/open/features/Kernel-Log-x32-ABI-gets-around-64-bit-drawbacks-1342061.html |archivedate=2011-10-28 |title=Kernel Log: x32 ABI gets around 64-bit drawbacks |publisher=www.h-online.com |author=Thorsten Leemhuis |date=2011-09-13 |accessdate=2011-11-01 |deadurl=yes }}</ref><ref name="x32ABILinuxPlumbers">{{cite news |url=http://linuxplumbersconf.org/2011/ocw/sessions/531 |title=x32 - a native 32-bit ABI for x86-64 |publisher=linuxplumbersconf.org |accessdate=2012-06-12 |archive-date=2012-05-05 |archive-url=https://web.archive.org/web/20120505022446/http://www.linuxplumbersconf.org/2011/ocw/sessions/531 }}</ref><ref name="x32ABIDevelopmentGroup">{{cite news |url=http://sites.google.com/site/x32abi/ |title=x32-abi |publisher=Google Sites |accessdate=2011-11-01 |archive-date=2011-10-30 |archive-url=https://web.archive.org/web/20111030054600/http://sites.google.com/site/x32abi/ }}</ref>
+
+== 细节 ==
+尽管x32 ABI限制了程序的[[虚拟地址|虚拟地址]]为4 GB，它也减小了程序的内存占用量，且在某些情况下，能使它运行得更快<ref name="x32ABIHOnline"/><ref name="x32ABILinuxPlumbers"/><ref name="x32ABIDevelopmentGroup"/>。在181.mcf [[SPEC|SPEC]] CPU 2000基准测试中，x32 ABI版本比x86-64版本最多能快40%<ref name="x32ABIDevelopmentGroup"/><ref name="181mcfBenchmark">{{cite news |url=http://www.spec.org/cpu2000/CINT2000/181.mcf/docs/181.mcf.html |title=181.mcf SPEC CPU2000 Benchmark Description File |publisher=Standard Performance Evaluation Corporation |date=1999-10-14 |accessdate=2011-11-01 |archive-date=2018-09-08 |archive-url=https://web.archive.org/web/20180908191756/http://www.spec.org/cpu2000/CINT2000/181.mcf/docs/181.mcf.html }}</ref>。一般而言，x32在SPEC CPU整数基准比x86-64快5-8%。在SPEC CPU浮点基准上，x86-64则毫无速度优势<ref name="x32anative32bitabi">{{cite news |url=http://www.linuxplumbersconf.net/2011/ocw//system/presentations/531/original/x32-LPC-2011-0906.pptx |title=X32 - A Native 32bit ABI For X86-64 |author=H.J. Lu, H Peter Anvin, Milind Girkar |date=September 2011 |accessdate=2015-02-16 |archive-date=2017-03-11 |archive-url=https://web.archive.org/web/20170311201034/http://www.linuxplumbersconf.net/2011/ocw/system/presentations/531/original/x32-LPC-2011-0906.pptx }}</ref>。
+
+{|border="1" class="wikitable" style="width:40%;"
+|+ ABI比较
+! 特性
+! [[IA-32|i386]]
+! x32
+! [[x86-64|x86-64]]
+|-
+| [[虚拟地址|进程最大内存]]
+| colspan="2" {{no|4 GiB}}
+| {{yes|128 TiB}}
+|-
+| [[寄存器|整数寄存器]]
+| {{no|6 (PIC)}}
+| colspan="2" {{yes|16}}
+|-
+| [[寄存器|浮点寄存器]]
+| {{no|8}}
+| colspan="2" {{yes|16}}
+|-
+| [[指標_(電腦科學)|指针]]
+| colspan="2" {{yes|4位}}
+| {{no|8位}}
+|-
+| [[64位元|64位元]]运算
+| {{no|否}}
+| colspan="2" {{yes|是}}
+|-
+| [[浮点数|浮点数]]
+| {{no|[[x87|x87]]}}
+| colspan="2" {{yes|[[SSE|SSE]]}}
+|-
+| [[调用约定|调用约定]]
+| {{no|[[電腦記憶體|内存]]}}
+| colspan="2" {{yes|[[寄存器|寄存器]]}}
+|-
+| [[地址无关代码|PIC]]序言
+| {{no|2-3 insn}}
+| colspan="2" {{yes|无}}
+|}
+
+== 历史 ==
+大多数情况下执行以[[ILP32|ILP32]]模式编译的程序，但又能使用主要的64位CPU指令，这样的用户空间并非少见，特别是在“经典RISC”芯片领域中。例如，[[Solaris_(操作系统)|Solaris操作系统]]在[[SPARC|SPARC]]和x86-64上就是这么做的。而对于[[Linux|Linux]]，SPARC和PowerPC上的Linux发行版，如[[Aurora_SPARC_Linux|Aurora SPARC Linux]]和[[Debian|Debian]]，也有ILP32用户空间。根本原因是[[LP64|LP64]]代码“更贵”<ref>{{cite web|url=http://www.osnews.com/story/5768/Are_64-bit_Binaries_Really_Slower_than_32-bit_Binaries_|title=Are 64-bit Binaries Really Slower than 32-bit Binaries?|date=2004-01-22|accessdate=2014-03-25|author=Tony Bourke|archive-date=2018-04-16|archive-url=https://web.archive.org/web/20180416012900/http://www.osnews.com/story/5768/Are_64-bit_Binaries_Really_Slower_than_32-bit_Binaries_}}</ref>，正如上文x86-64所述。就这方面而言，x32是“64位ILP32”概念在x86-64平台的延伸。
+
+自从2003年[[AMD_Athlon_64|Athlon 64]]发布以来，一些人就在讨论32位指针x86-64 ABI的好处，特别是2008年[[高德纳|高德纳]]的研究<ref>{{cite web |url=http://www-cs-faculty.stanford.edu/~uno/news08.html |title=Recent News: A Flame About 64-bit Pointers |author=Donald Knuth |date=February 2008 |accessdate=15 May 2012 |archive-date=2012-09-26 |archive-url=https://www.webcitation.org/6AxKHoFm6?url=http://www-cs-faculty.stanford.edu/~uno/news08.html |dead-url=no }}</ref>。然而，在实现这种模式上，外界并没有看到有显著进展，直至2011年8月27日，汉斯·彼得·昂万在[[Linux内核邮件列表|Linux内核邮件列表]]上宣布，他和H·J·鲁一直在x32-ABI上努力<ref>{{cite web |url=http://thread.gmane.org/gmane.linux.kernel/1184876 |title=RFD: x32 ABI system call numbers |author=H. Peter Anvin |date=27 August 2011 |accessdate=15 May 2012 |archive-url=https://www.webcitation.org/6AxKIQkip?url=http://thread.gmane.org/gmane.linux.kernel/1184876 |archive-date=2012-09-26 |dead-url=yes }}</ref>。
+
+就在同一天，[[林纳斯·托瓦兹|林纳斯·托瓦兹]]回应道，在x32 ABI中使用32位时间值，将来可能会导致问题<ref name="x32ABIsystemcall">{{cite news |url=http://lwn.net/Articles/456731/ |title=The x32 system call ABI |publisher=LWN.net |author=Jonathan Corbet |date=2011-08-29 |accessdate=2011-11-01 |archive-date=2022-05-07 |archive-url=https://web.archive.org/web/20220507165404/https://lwn.net/Articles/456731/ }}</ref><ref name="x32ABIsystemcallLinusTorvalds">{{cite news |url=http://lwn.net/Articles/456750/ |title=Re: RFD: x32 ABI system call numbers |publisher=LWN.net |author=Linus Torvalds |date=2011-08-26 |accessdate=2011-11-01 |archive-date=2017-12-01 |archive-url=https://web.archive.org/web/20171201035306/https://lwn.net/Articles/456750/ }}</ref>。这是因为，使用32位时间值，将导致[[UNIX时间|时间值]]在[[2038年问题|2038年]]溢出<ref name="x32ABIsystemcall"/><ref name="x32ABIsystemcallLinusTorvalds"/>。根据这一要求，x32 ABI的开发者将时间值变为了64位<ref>{{cite web |url=http://www.sourceware.org/ml/libc-alpha/2011-11/msg00086.html |title=X32 project status update |author=H.J. Lu |date=2011-11-24 |access-date=2015-02-16 |archive-date=2015-09-24 |archive-url=https://web.archive.org/web/20150924104455/http://www.sourceware.org/ml/libc-alpha/2011-11/msg00086.html }}</ref>。
+
+2011年9月7日一个[[Linux会议|Linux Plumbers Conference]]上的演讲提及了x32 ABI<ref name="x32ABILinuxPlumbers"/>。
+
+x32 ABI于Linux 3.4起合并入内核，[[GNU_C_函式庫|GNU C 函式庫]] 2.16中添加了相应支持。
+
+==参考==
+{{reflist|30em}}
+
+==外部链接==
+* [http://sites.google.com/site/x32abi/ X32 ABI开发网站] {{Wayback|url=http://sites.google.com/site/x32abi/ |date=20111030054600 }}
+* [http://www.linuxplumbersconf.org/2011/ocw/sessions/531 Linux Plumbers Conference上的X32 ABI演示幻灯片] {{Wayback|url=http://www.linuxplumbersconf.org/2011/ocw/sessions/531 |date=20180503005939 }}
+
+{{Linux内核}}
+
+[[Category:Linux内核接口|Category:Linux内核接口]]
+[[Category:X86架構|Category:X86架構]]

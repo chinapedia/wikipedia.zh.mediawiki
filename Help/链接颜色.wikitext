@@ -1,0 +1,131 @@
+{{Wikipedia how-to}}
+{{Warning|1={{big|'''链接应当易于读者识别'''。}}<!-- <br />Refrain from implementing colored links that may impede user ability to distinguish links from regular text, or color links for purely aesthetic reasons. See the guides to editing articles for accessibility at [[WP:CONTRAST|contrast]] and [[WP:NAVBOXCOLOUR|navbox colors]]. -->}}
+{{noteTA
+|G1=MediaWiki
+|G2=IT
+}}
+
+在维基百科中，[[WP:LINK|链接]]颜色和目标页面状态相对应。（[[Help:皮肤|Vector皮肤]]的）默认颜色有如下含义：
+
+{| class="wikitable" border="1"
+|-
+! style="width:10%" | 链接样式
+! 类型
+! style="width:15%" | 颜色
+! style="width:5%" | 颜色
+|-
+| <span style="color: #0645AD;">蓝色链接</span> || 指向当前存在的页面 || #0645AD = rgb(6,69,173) || {{color box|#0645AD}}
+|-
+| <span style="color: #0B0080;">深蓝色链接</span> || 指向已经访问过的存在页面 || #0B0080 = rgb(11,0,128) || {{color box|#0B0080}}
+|-
+| <span style="color: #DD3333;">红色链接</span> || 指向维基百科中[[Wikipedia:REDLINK|未建立的页面]] || #DD3333 = rgb(221,51,51) || {{color box|#DD3333}}
+|-
+| <span style="color: #007000;">绿色链接</span> || 在未建立的页面下，指向维基百科其它语言的页面 || #007000 = rgb(0,128,0) || {{color box|#007000}}
+|-
+| <span style="color: #A55858">浅红色链接</span> || 指向未连接但访问过的页面 || #A55858 = rgb(165,88,88) || {{color box|#A55858}}
+|-
+| <span style="color: #772233">棕色链接</span> || 指向维基百科中[[WP:STUB|很短的条目]]，但只有用户在参数设置里启用“短页面链接”选项才有效 || #772233 = rgb(119,34,51) || {{color box|#772233}}
+|-
+| <span style="color: #3366BB">淡蓝色链接</span> || 指向[[Help:跨语言链接|其它wiki]]<br />注意这个页面无论是否在目标wiki上存在，链接都显示为淡蓝色。比如对于中文维基上的条目[[喬治亞州|喬治亞州]]，日语维基不存在[[:ja:喬治亞州|这个名称相同的页面]]，他们的对应页面是[[:ja:ジョージア州|ジョージア州]]。[[WP:EL|外部链接]]也是用[//outreach.wikimedia.org/ <span style="color: #3366BB">这种颜色</span>]。 || #3366BB = rgb(51,102,187) || {{color box|#3366BB}}
+|-
+| <span style="color: #663366">紫色链接</span> || 指向其它站点但访问过的链接 || #663366 = rgb(102,51,102) || {{color box|#663366}}
+|}
+
+登录用户可以通过更换皮肤或[[:en:Wikipedia:Customisation|自定义CSS]]改变颜色。
+
+== 自定义链接颜色 ==
+
+=== 让内部链接对所有人都显示为不同颜色 ===
+
+你可以这样将链接改为不同颜色：
+* <code><nowiki>[[维基百科|<span style="color:green">这个页面存在</span>]]</nowiki></code>
+* <code><nowiki>[[喂鸡百科|<span style="color:green">这个页面不存在</span>]]</nowiki></code>
+
+这会显示为：
+* [[维基百科|<span style="color: green;">这个页面存在</span>]]
+* [[喂鸡百科|<span style="color: green;">这个页面不存在</span>]]
+
+如果你想让页面自动检查是否存在，可以：
+* <code><nowiki>[[维基百科|{{#ifexist: 维基百科]]</nowiki></code>
+* <code><nowiki>[[喂鸡百科|{{#ifexist: 喂鸡百科]]</nowiki></code>
+
+这会显示为：
+* [[维基百科|{{#ifexist: 维基百科]]
+* [[喂鸡百科|{{#ifexist: 喂鸡百科]]
+
+=== 仅改变自己看到的链接顏色 ===
+
+你可以通过编辑自己的[[Special:MyPage/skin.css|CSS文件]]来自定义链接颜色。
+
+标准的链接选择器有：
+* a:link—定义常规的未访问链接的样式
+* a:visited—定义已访问链接的样式
+* a:active—定义激活链接的样式；激活指的是点击过一次链接
+* a:hover—定义悬浮链接的样式；悬浮指当鼠标移动到链接上面
+
+颜色由十六进制计数法表示：见[[网页颜色|网页颜色]]
+<syntaxhighlight lang="css">
+/* standard link colors */
+.mw-body a:link {color: #0000FF} /* 常规未访问链接 */
+.mw-body a:link:visited {color: #7F007F} /* 已访问链接 */
+.mw-body a:link:active {color: #FF0000} /* 激活链接 */
+.mw-body a:link.new {color: #FF0000} /* 新链接 */
+.mw-body a:link.interwiki {color: #3366BB} /* 跨wiki链接 */
+.mw-body a:link.external {color: #3366BB} /* 外部链接 */
+.mw-body a:link.stub {color: #772233} /* 悬浮链接 */
+
+.mw-body a:link {color: #FF0000}
+.mw-body a:visited {color: #00FF00}
+.mw-body a:hover {color: #FF00FF}
+.mw-body a:active {color: #0000FF}
+</syntaxhighlight>
+
+注意：
+* a:hover必定后于a:link和a:visited显示
+* a:active必定后于a:hover显示
+* 你需要在标准链接定以前加上“.mw-body”，否则网站默认定义会优先于你的定义。
+
+; 重定向链接
+将重定向链接改为绿色链接：
+<syntaxhighlight lang="css">
+.mw-body a.mw-redirect {color:#308050}
+.mw-body a.mw-redirect:visited {color:#3070A0}
+</syntaxhighlight>
+
+; 外部链接
+<syntaxhighlight lang="css">
+.mw-body a.external {color: #008000}
+</syntaxhighlight>
+
+=== 其他改变 ===
+
+你还可以改变文本的其它格式
+
+; 文字修饰
+这可以修改文本格式。比如添加下划线：
+
+<syntaxhighlight lang="css">
+.mw-body a:link {color: #000000;text-decoration: underline}
+</syntaxhighlight>
+
+可选值有：
+* none
+* underline
+* overline
+* line-through
+
+; 字体类型
+这会改变链接字体：
+
+<syntaxhighlight lang="css">
+.mw-body a:link {font-family: monospace}
+</syntaxhighlight>
+
+== 参见 ==
+
+* [[Template:Internal_link_helper|Template:Internal link helper]]－通过此模板，可能以<span style="color: #099;">绿色链接</span>提示显示不存在条目对应的外语版条目。
+* [[User:LTSB/linkclassifier|User:LTSB/linkclassifier]]－可以定义已删除页面、非自由媒体、重定向、保护页面等链接颜色的脚本。
+
+{{Help navigation}}
+
+[[Category:帮助文档|Category:帮助文档]]
