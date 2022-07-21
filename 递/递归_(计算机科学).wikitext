@@ -1,0 +1,139 @@
+{{noteTA
+|G1=IT
+|1=zh-cn:斐波那契数列;zh-tw:費氏數列;
+|2=zh-cn:汉诺塔;zh-tw:河內塔;
+}}
+{{编程范式}}
+
+'''遞迴'''（{{lang-en|recursion}}）在[[電腦科學|電腦科學]]中是指一種通過重複將問題分解為同類的子問題而解決問題的方法。<ref>{{cite book
+  | last = Graham
+  | first = Ronald
+  | coauthors = Donald Knuth, Oren Patashnik
+  | title = Concrete Mathematics
+  | year=1990
+  | url=http://www-cs-faculty.stanford.edu/~knuth/gkp.html
+  | nopp = true
+  | page=Chapter 1: Recurrent Problems
+  | language=en
+}}</ref> 遞迴式方法可以被用於解決很多的電腦科學問題，因此它是電腦科學中十分重要的一個概念。<ref>{{cite book
+  | last = Epp
+  | first = Susanna
+  | title = Discrete Mathematics with Applications
+  | url = https://archive.org/details/discretemathema000epps
+  | year=1995
+  | edition=2nd
+  | page=[https://archive.org/details/discretemathema000epps/page/427 427]
+  | language=en
+}}</ref> 絕大多數[[程式語言|程式語言]]支援[[函式|函式]]的自呼叫，在這些語言中函式可以通過呼叫自身來進行遞迴。[[計算理論|計算理論]]可以證明遞迴的作用可以完全取代[[迴圈|迴圈]]，因此有很多在[[函數程式語言|函數程式語言]]（如[[Scheme|Scheme]]）中用递归来取代循环的例子。
+
+[[電腦科學家|電腦科學家]][[尼克勞斯·維爾特|尼克勞斯·維爾特]]如此描述遞迴：
+{{quote|遞迴的強大之處在於它允許使用者用有限的語句描述無限的物件。因此，在電腦科學中，遞迴可以被用來描述無限步的運算，儘管描述運算的程式是有限的。|[[尼克勞斯·維爾特|尼克勞斯·維爾特]]<ref>{{cite book
+  | last = Wirth
+  | first = Niklaus
+  | title = Algorithms + Data Structures = Programs
+  | url = https://archive.org/details/algorithmsdatast00wirt_267
+  | publisher=Prentice-Hall
+  | year =1976
+  | page = [https://archive.org/details/algorithmsdatast00wirt_267/page/n140 126]
+  | quote = The power of recursion evidently lies in the possibility of defining an infinite set of objects by a finite statement. In the same manner, an infinite number of computations can be described by a finite recursive program, even if this program contains no explicit repetitions.
+  | language=en
+}}</ref>|''Algorithms + Data Structures = Programs''}}
+
+==遞迴程式==
+
+=== java ===
+<syntaxhighlight lang="java">
+public void recursiveTest(){
+    recursiveTest();  //自己调用自己，就叫递归
+}
+</syntaxhighlight>
+
+=== python ===
+<syntaxhighlight lang="python3">
+def RecursiveTest():
+    RecursiveTest()  # 自己调用自己
+</syntaxhighlight>以上两个程式是最简单的递归，但因为无限地调用自己而不会停下，就会因为[[栈缓冲区溢出|栈空间溢出]]而导致程序产生异常而强制停止，而python会因为自身设置的保护措施（限定递归的循环次数，但该次数可更改）而不断抛出异常。
+
+所以如果想要设计一个递归程式，就必须注意设定一个表达式判断（例如if语句）来告诉程序是否应该继续递归下去。<ref>{{Cite web|url=https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/001431756044276a15558a759ec43de8e30eb0ed169fb11000|title=递归函数|accessdate=2018年8月18日11:19:21|author=廖雪峰|date=|publisher=}}</ref>
+
+== 应用 ==
+在支援自呼叫的程式語言中，遞迴可以通過簡單的函式呼叫來完成，如計算[[階乘|階乘]]的程式在數學上可以定義為：
+
+:<math> \operatorname{fact}(n) =
+ \begin{cases}
+ 1 & \mbox{if } n = 0 \\
+ n \cdot \operatorname{fact}(n-1) & \mbox{if } n > 0 \\
+ \end{cases}
+</math>
+
+這一程式在[[Scheme|Scheme]]語言中可以寫作：
+
+<syntaxhighlight lang="Scheme">
+(define (factorial n)
+  (if (= n 0)
+      1
+      (* n (factorial (- n 1)))))
+</syntaxhighlight>
+
+===不動點組合子===
+{{main|不動點組合子}}
+即使一個程式語言不支援自呼叫，如果在這語言中[[函式|函式]]是[[頭等物件|頭等物件]]（即可以在[[執行期|執行期]]創建並作為[[變數|變數]]處理），遞迴可以通過[[不動點組合子|不動點組合子]]（{{lang-en|Fixed-point combinator}}）來產生。以下Scheme程式沒有用到自呼叫，但是利用了一個叫做[[不動點組合子|Z 算子]]（{{lang-en|Z combinator}}）的不動點組合子，因此同樣能達到遞迴的目的。
+
+<syntaxhighlight lang="Scheme">
+(define Z
+  (lambda (f)
+    ((lambda (recur) (f (lambda arg (apply (recur recur) arg))))
+     (lambda (recur) (f (lambda arg (apply (recur recur) arg)))))))
+
+(define fact
+  (Z (lambda (f)
+       (lambda (n)
+         (if (<= n 0)
+             1
+             (* n (f (- n 1))))))))
+</syntaxhighlight>
+
+這一程式思路是，既然在這裡函式不能呼叫其自身，我們可以用 Z 組合子應用(application)這個函式後得到的函式再應用需計算的參數。
+
+===尾端遞迴===
+{{main|尾端遞迴}}
+尾端遞迴是指遞迴函式在呼叫自身後直接傳回其值，而不對其再加運算。尾端遞迴與[[迴圈|迴圈]]是等價的，而且在一些語言（如[[Scheme|Scheme]]中）可以被優化為迴圈指令。
+因此，在這些語言中尾端遞迴不會佔用[[呼叫堆疊|呼叫堆疊]]空間。以下[[Scheme|Scheme]]程式同樣計算一個數字的階乘，但是使用[[尾端遞迴|尾端遞迴]]：<ref name="sicp">
+{{Cite book | author = Harold Abelson and Gerald Jay Sussman with Julie Sussman | title = Structure and Interpretation of Computer Programs | location = Cambridge, MA | publisher = MIT Press | date = 1996 | ISBN = 0-262-01153-0 | accessdate = 2011 | url = http://mitpress.mit.edu/sicp/full-text/book/book-Z-H-4.html#%_toc_start | language = en | deadurl = yes | archiveurl = https://web.archive.org/web/20180309173822/https://mitpress.mit.edu/sicp/full-text/book/book-Z-H-4.html#%_toc_start | archivedate = 2018-03-09 }}
+</ref>
+<syntaxhighlight lang="Scheme">
+(define (factorial n)
+  (define (iter product counter)
+    (if (> counter n)
+        product
+        (iter (* counter product)
+              (+ counter 1))))
+  (iter 1 1))
+</syntaxhighlight>
+
+== 能够解决的问题 ==
+1、数据的定义是按递归定义的。如[[费氏数列|费氏数列]]。
+
+2、问题解法按递归算法实现。如[[汉诺塔|汉诺塔]]。
+
+3、数据的结构形式是按递归定义的。如[[二叉树|二叉树]]、广义表等。
+
+==遞迴資料==
+{{main|递归数据类型}}
+
+資料型別可以通過遞迴來進行定義，比如一個簡單的遞迴定義為[[自然數|自然數]]的定義：「一個自然數或等於0，或等於另一個自然數加上1」。[[Haskell|Haskell]]中可以定義[[連結串列|連結串列]]為：
+
+<syntaxhighlight lang="Haskell">
+data ListOfStrings = EmptyList | Cons String ListOfStrings
+</syntaxhighlight>
+
+這一定義相當於宣告「一個連結串列或是空串列，或是一個連結串列之前加上一個字串」。可以看出所有連結串列都可以通過這一遞迴定義來達到。
+
+== 参考文献 ==
+{{Reflist}}
+
+[[Category:電腦科學|Category:電腦科學]]
+[[Category:控制流程|Category:控制流程]]
+[[Category:计算机编程|Category:计算机编程]]
+[[Category:递归|Category:递归]]
+[[Category:带有代码示例的条目|Category:带有代码示例的条目]]

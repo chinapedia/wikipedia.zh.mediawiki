@@ -1,0 +1,84 @@
+{{noteTA
+|G1=Math
+|T=zh-cn:马尔可夫决策过程;zh-tw:馬可夫決策過程;
+|1=zh-cn:马尔可夫;zh-tw:馬可夫;
+}}
+
+在數學中，'''馬可夫決策過程'''（{{lang-en|Markov decision process}}，'''MDP'''）是[[離散時間|離散時間]][[隨機|隨機]][[最佳控制|控製]]過程。 它提供了一個數學框架，用於在結果部分[[隨機|隨機]]且部分受決策者控制的情況下對[[決策|決策]]建模。 MDP對於研究通過[[動態規劃|動態規劃]]解決的[[最佳化問題|最佳化問題]]很有用。 MDP至少早在1950年代就已為人所知；<ref>{{cite journal|first=R.|last=Bellman|author-link=Richard E. Bellman|url=http://www.iumj.indiana.edu/IUMJ/FULLTEXT/1957/6/56038|title=A Markovian Decision Process|journal=Journal of Mathematics and Mechanics|volume=6|year=1957|issue=5|pages=679–684|jstor=24900506|access-date=2021-04-30|archive-date=2021-04-30|archive-url=https://web.archive.org/web/20210430065537/http://www.iumj.indiana.edu/IUMJ/FULLTEXT/1957/6/56038|dead-url=no}}</ref> 一個對馬可夫決策過程的核心研究是
+{{link-en|羅納德·A·霍華德|Ronald A. Howard|羅納德·霍華德}}於1960年出版的《動態規劃和馬可夫過程》<ref>{{cite book|first=Ronald A.|last=Howard|title=Dynamic Programming and Markov Processes|publisher=The M.I.T. Press|year=1960|url=http://web.mit.edu/dimitrib/www/dpchapter.pdf|access-date=2021-04-30|archive-date=2011-10-09|archive-url=https://web.archive.org/web/20111009101353/http://web.mit.edu/dimitrib/www/dpchapter.pdf|dead-url=no}}</ref>。 它們被用於許多領域，包括[[機器人學|機器人學]]，[[自動化|自動化]]，[[經濟學|經濟學]]和[[製造業|製造業]]。 MDP的名稱來自俄羅斯數學家[[安德雷·馬可夫|安德雷·馬可夫]]，因為它們是[[馬可夫鏈|馬可夫鏈]]的推廣。
+
+在每個時間步驟中，隨機過程都處於某種狀態<math>s</math>，決策者可以選擇在狀態<math>s</math>下可用的動作<math>a</math>。 該隨機過程在下一時間步驟會隨機進入新狀態<math>s'</math>，並給予決策者相應的回饋<math>R_a(s,s')</math>。 
+
+隨機過程進入新狀態<math>s'</math>的機率受所選操作影響。 具體來說，它是由狀態轉換函數<math>P_a(s,s')</math>給出的。 因此，下一個狀態<math>s'</math>取決於當前狀態<math>s</math>和決策者的動作<math>a</math>。 但是給定<math>s</math>和<math>a</math>，它條件獨立於所有先前的狀態和動作； 換句話說，MDP的狀態轉換滿足馬可夫性質。
+
+马尔可夫决策过程是[[马尔可夫链|马尔可夫链]]的推广，不同之处在于添加了行动（允许选择）和奖励（给予动机）。反過來說，如果每个状态只存在一个操作和所有的奖励都是一样的，一个马尔可夫决策过程可以归结为一个马尔可夫链。
+==定义==
+[[File:Markov_Decision_Process.svg|thumb]]
+马尔可夫决策过程是一个4[[多元组|元组]]<math>(S, A, P_a, R_a)</math>，其中:
+*<math>S</math>是状态空间的集合，
+*<math>A</math>是动作的集合，也被称为动作空间（比如说<math>A_s</math>是状态<math>s</math>中可用的动作集合），
+*<math>P_a(s, s') = \Pr(s_{t+1}=s' \mid s_t = s, a_t=a)</math>是<math>t</math>时刻<math>s</math>状态下的动作<math>a</math>导致<math>t+1</math>时刻进入状态<math>s'</math>的概率，
+*<math>R_a(s, s')</math>状态<math>s</math>经过动作<math>a</math>转换到状态<math>s'</math>后收到的即时奖励（或预期的即时奖励）。
+
+状态和行动空间可能是有限的，也可能是无限的。一些具有可数无限状态和行动空间的过程可以简化为具有有限状态和行动空间的过程。<ref name="Wrobel 1984">{{cite journal |last1=Wrobel |first1=A. |title=On Markovian Decision Models with a Finite Skeleton |journal=Mathematical Methods of Operations Research (ZOR) |date=1984 |volume=28 |issue=February |pages=17–27 |doi=10.1007/bf01919083 |s2cid=2545336 }}</ref>
+
+策略函数<math>\pi</math>是从状态空间（<math>S</math>）到动作空间（<math>A</math>）的（潜在概率）映射。
+=== 優化目標 ===
+马尔可夫决策过程的目标是为决策者找到一个好的“策略”：一个函数<math>\pi</math>，它指定决策者在状态<math>s</math>时将选择的动作<math>\pi(s)</math>。一旦以这种方式将马尔可夫决策过程与策略组合在一起，就可以确定在每个状态的动作，并且生成的组合行为类似于马尔可夫链（因为在状态<math>s</math>的动作都由<math>\pi(s)</math>决定，<math>\Pr(s_{t+1}=s' \mid s_t = s, a_t=a)</math>简化为<math>\Pr(s_{t+1}=s' \mid s_t = s)</math>，成为一个马尔可夫[[轉移矩陣|轉移矩陣]]）。
+
+目标是选择一个策略<math>\pi</math>，使随机奖励的累积函数最大化，通常是在潜在的无限范围内的预期贴现总和:
+
+:<math>E\left[\sum^{\infty}_{t=0} {\gamma^t R_{a_t} (s_t, s_{t+1})}\right] </math>（我们选择<math>a_t = \pi(s_t)</math>也就是策略给出的动作）。并且期望值为<math>s_{t+1} \sim P_{a_t}(s_t,s_{t+1})</math>。
+
+其中<math>\ \gamma \ </math>是折现因子，满足<math>0 \le\ \gamma\ \le\ 1</math>，通常接近于1（例如，对于贴现率r，存在<math> \gamma = 1/(1+r) </math>）。较低的折扣率促使决策者倾向于尽早采取行动，而不是无限期地推迟行动。
+
+使上述函数最大化的策略称为''<dfn>最优策略</dfn>''，通常用<math>\pi^*</math>表示。一个特定的MDP可能有多个不同的最佳策略。由于馬可夫決策過程的性质，可以证明最优策略是当前状态的函数，就像上面所叙述的那样。
+
+=== 模拟模型 ===
+在许多情况下，很难明确地表示转移概率分布<math>P_a(s, s')</math>。在这种情况下，可以使用模拟器通过提供来自转换发行版的示例来隐式地对MDP建模。隐式MDP模型的一种常见形式是情景环境模拟器，它可以从初始状态启动，生成后续状态，并在每次接收到操作输入时给予奖励。通过这种方式，我们可以模拟出目标经过的状态、采取的行动以及获得的奖励（统称“轨迹”）。
+
+另一种形式的模拟器是生成模型，即能够生成下一个状态的样本并提供所有状态和行动奖励的单步骤模拟器。<ref name="Kearns Sparse">{{cite journal |last1=Kearns |first1=Michael |last2=Mansour |first2=Yishay |last3=Ng |first3=Andrew |title=A Sparse Sampling Algorithm for Near-Optimal Planning in Large Markov Decision Processes |journal=Machine Learning |date=2002 |volume=49 |issue=193–208 |pages=193–208 |doi=10.1023/A:1017932429737 |doi-access=free }}</ref>在用[[伪代码|伪代码]]表示的算法中，<math>G</math>通常用来表示生成模型。例如，表达式<math>s', r \gets G(s, a)</math>可以表示从生成模型中取样的动作，其中<math>s</math>和<math>a</math>是当前状态和动作，<math>s'</math>和<math>r</math>是下一步的状态和奖励。与情景模拟器相比，生成模型的优势在于它可以从任何状态获取数据，而不仅仅是在轨迹中遇到的状态。
+
+這些模型類形成了信息內容的層次結構：顯式模型通過從分佈中採樣簡單地生成生成模型，並且生成模型的重複應用生成軌跡模擬器。在相反的方向上，只能通過[[迴歸分析|迴歸分析]]研究近似模型。可用於特定MDP的模型類型在確定哪種解決方案算法合適方面起著重要作用。例如，下一節中描述的[[動態規划|動態規划]]算法需要一個顯式模型，而蒙[[蒙地卡羅樹搜尋|蒙地卡羅樹搜尋]]需要一個生成模型（或可以在任何狀態下複製的情景模擬器），而大多數強化學習算法只需要一個軌跡模擬器 。
+==算法==
+可以通過各種方法（例如動態規劃）找到具有有限狀態和動作空間的MDP的解決方案。本節中的算法適用於具有有限狀態和動作空間並明確給出轉移概率和獎勵函數的MDP，但基本概念可以擴展到處理其他問題類別，例如使用函數趨近。
+
+為有限狀態和動作MDP計算最優策略的標準算法系列需要存儲兩個按狀態索引的數列：第一個數列是<math>V</math>，用來儲存實數，以及策略<math>\pi</math>，用來存動作。在算法結束時，<math>\pi</math>將存儲每一個狀態時的解決方案，而<math>V(s)</math>將存儲從狀態<math>s</math>遵循該解決方案獲得的獎勵的折扣總和（平均）。
+
+:<math> V(s) := \sum_{s'} P_{\pi(s)} (s,s') \left( R_{\pi(s)} (s,s') + \gamma V(s') \right) </math>
+
+:<math> \pi(s) := \operatorname{argmax}_a \left\{ \sum_{s'} P(s' \mid s, a) \left( R(s'\mid s,a) + \gamma V(s') \right) \right\} </math>
+
+它們的順序取決於你所採用的算法的變體，可以一次或逐個狀態地對所有狀態執行它們，並且對某些狀態比其他狀態更頻繁。 只要沒有狀態被永久排除在任何一個步驟之外，算法最終將得出正確的解決方案。<ref>{{Cite book|title=Reinforcement Learning: Theory and Python Implementation|publisher=China Machine Press|year=2019|isbn=9787111631774|location=Beijing|pages=44}}</ref>
+
+=== 著名的變體 ===
+==== 數值迭代 ====
+數值迭代也稱為反向歸納，不使用<math>\pi</math>函數.相反，<math>\pi(s)</math>的值在需要時在<math>V(s)</math>內計算。 將<math>\pi(s)</math>的計算代入<math>V(s)</math>的計算得出組合步驟：
+:<math> V_{i+1}(s) := \max_a \left\{ \sum_{s'} P_a(s'|s) \left( R_a(s,s') + \gamma V_i(s') \right) \right\}, </math>
+
+其中<math>i</math>是迭代数，值迭代从<math>i = 0</math>和<math>V_0</math>开始，作为[[价值函数|价值函数]]的猜测。
+
+==参见==
+* [[马尔可夫链|马尔可夫链]]
+* [[半马尔可夫过程|半马尔可夫过程]]
+* [[随机漫步|随机漫步]]
+* [[布朗运动|布朗运动]]
+* [[马尔可夫模型|马尔可夫模型]]
+* [[隱馬爾可夫模型|隱馬爾可夫模型]]
+* [[學習自動機|學習自動機]]
+* [[部分可觀察馬可夫決策過程|部分可觀察馬可夫決策過程]]
+
+== 参考文献 ==
+{{Reflist}}
+{{refbegin}}
+* Yosida, K. “Functional Analysis”, Ch XIII, § 3, Springer-Verlag, 1968. ISBN 3-540-58654-7
+* Ribarič.M. and I.Vidav, “An inequality for concave functions.” Glasnik Matematički 8 (28), 183–186 (1973).
+{{refend}}
+
+==外部链接==
+{{Refbegin}}
+* {{mathworld|urlname=MarkovProcess|title=Markov process}}
+{{Refend}}
+
+{{DEFAULTSORT:Markov Process}}
+[[Category:隨機控制|Category:隨機控制]]

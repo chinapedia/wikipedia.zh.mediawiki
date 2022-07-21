@@ -1,0 +1,106 @@
+{{NoteTA
+| 1= zh-hans:知识表示; zh-hant:知識呈現;
+| 2= zh-hans:面向对象程序设计; zh-hant:物件導向程式設計;
+| 3= zh-hans:面向对象设计; zh-hant:物件導向設計;
+| 4= zh-hans:类; zh-hant:類別;
+| 5= zh-hans:继承; zh-hant:繼承;
+| 6= zh-hans:苹果; zh-hant:蘋果;
+| 7= zh-hans:计算机程序; zh-hant:電腦程式;
+<!--| N= zh-hans:（中国简体）内容; zh-hant:（台灣正體）內容;-->
+}}
+
+在[[知识表示|知识表示]]、[[面向对象程序设计|面向对象程序设计]]與[[面向对象设计|面向对象设计]]的領域裡，'''is-a'''（{{Lang-en|subsumption}}，包容）指的是在[[抽象化|抽象]]（比如[[类_(计算机科学)|類別]]或[[类型|类型]]）之间體現的包容關係。例如類別D是另一個類別B的[[继承_(计算机科学)|子類別]]（類別B是類別D的[[继承_(计算机科学)|父類別]]），則D被包容在B內。換句話說，通常"D '''is a''' B"指的是，概念體D物是概念體B物的[[特殊化|特殊化]]，而概念體B物是概念體D物的[[广义化|广泛化]]<ref>{{cite web|title=Subtypes and Subclasses|url=http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-170-laboratory-in-software-engineering-fall-2005/lecture-notes/lec14.pdf|publisher=MIT OCW|accessdate=2 October 2012|archive-date=2020-08-26|archive-url=https://web.archive.org/web/20200826123209/https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-170-laboratory-in-software-engineering-fall-2005/lecture-notes/lec14.pdf|dead-url=no}}</ref>。舉例來說，[[水果|水果]]是[[苹果|苹果]]、[[橘|橘子]]、[[杧果属|芒果]]與其他水果的广泛化。
+
+在[[面向对象程序设计|面向对象程序设计]]裡，is-a類別關係是在[[继承_(计算机科学)|繼承]]概念的背景之下所形成的。比如說，[[苹果|苹果]]繼承（{{Lang-en|inherit}}）水果的所有的屬性。is-a對比於[[has-a|has-a]]，後者是以[[整体词|整體]]-[[分体词|附屬]]階層關係所組成的。在真實世界裡設計一個模型時（例如[[计算机程序|计算机程序]]），尤其是物件與它的下一層從屬物件，在has-a與is-a兩者的關係上容易產生概念上的錯誤。is-a還可以是對比於[[instance-of|instance-of]]，详情可參考[[类型和个例的区别|类型和个例的区别]]。
+
+==子类型的例子==
+
+[[子类型|子类型]]确使一个给定的类型被用于替换其他的类型或抽象。子类型被称为建立了在子类型和某种现存抽象之间的'''is-a'''联系，要么隐式要么显式，依赖于语言支持。这个联系在支持继承作为子类型机制的语言中可以通过继承来显式表达。
+
+===C++===
+下列[[C++|C++]]代码建立在类'''B'''和'''A'''之间的显式继承联系，这里的'''B'''是'''A'''的子类和子类型二者，并且在指定了'''B'''的任何地方（通过引用、指针或对象自身）'''B'''都可以作为'''A'''使用。
+
+<syntaxhighlight lang=cpp>class A
+{ public:
+   void DoSomethingALike() const {}
+};
+
+class B : public A
+{ public:
+   void DoSomethingBLike() const {}
+};
+
+void UseAnA(A const& some_A)
+{
+   some_A.DoSomethingALike();
+}
+
+void SomeFunc()
+{
+   B b;
+   UseAnA(b); // b可以用于替换A.
+}
+</syntaxhighlight><ref name="Mitchell2002">
+{{cite book
+ | last=Mitchell
+ | first=John
+ | authorlink=John C. Mitchell
+ | title=Concepts in programming language
+ | year=2002
+ | publisher=Cambridge University Press
+ | location=Cambridge, UK
+ | isbn=0-521-78098-5
+ | page=287
+ | chapter=10 "Concepts in object-oriented languages"}}
+</ref>
+
+===Python===
+下列[[Python|Python]]代码建立在类<code>B</code>和<code>A</code>之间的显式继承联系，这里的<code>B</code>是<code>A</code>的子类和子类型二者，并且在要求了<code>B</code>的任何地方<code>B</code>都可以作为<code>A</code>使用。
+
+<syntaxhighlight lang="python">
+class A:
+    def do_something_a_like(self):
+        pass
+
+class B(A):
+    def do_something_b_like(self):
+        pass
+
+def use_an_a(some_a):
+    some_a.do_something_a_like()
+
+def some_func():
+    b = B()
+    use_an_a(b)  # b可以被用来替代A.
+</syntaxhighlight>
+
+在下列例子中，<code>type(a)</code>是一个“正规”类型，而<code>type(type(a))</code>是一个元类型（metatype）。尽管所有类型都分配了相同的元类型（<code>PyType_Type</code>，它还是自身的元类型），这不是必需的。旧式的类，叫作<code>types.ClassType</code>，也可以被当作不同的元类型<ref>{{cite web|author=Guido van Rossum|title=Subtyping Built-in Types|url=https://www.python.org/dev/peps/pep-0253/|accessdate=2 October 2012|archive-date=2020-05-14|archive-url=https://web.archive.org/web/20200514034406/https://www.python.org/dev/peps/pep-0253/|dead-url=no}}</ref>。
+
+<syntaxhighlight lang="pycon">
+>>> a = 0
+>>> type(a)
+<type 'int'>
+>>> type(type(a))
+<type 'type'>
+>>> type(type(type(a)))
+<type 'type'>
+>>> type(type(type(type(a))))
+<type 'type'>
+</syntaxhighlight>
+
+== 参见 ==
+* [[继承_(计算机科学)|繼承]]
+* [[子类型|子类型]]
+* [[Liskov代換原則|Liskov代換原則]]
+* [[整体词|整体词]]
+* [[分体词|分体词]]
+
+==引用==
+{{reflist}}
+
+== 參考資料 ==
+* [[Ronald_J._Brachman|Ronald J. Brachman]]; [http://dblp.uni-trier.de/rec/bibtex/journals/computer/Brachman83 What IS-A is and isn't. An Analysis of Taxonomic Links in Semantic Networks] {{Wayback|url=http://dblp.uni-trier.de/rec/bibtex/journals/computer/Brachman83 |date=20200630035007 }}. IEEE Computer, 16 (10); October 1983
+* Jean-Luc Hainaut, Jean-Marc Hick, Vincent Englebert, Jean Henrard, Didier Roland: [https://web.archive.org/web/20070211062250/http://www.informatik.uni-trier.de/~ley/db/conf/er/HainautHEHR96.html Understanding Implementations of IS-A Relations]. ER 1996: 42-57
+
+[[Category:面向对象的程序设计|Category:面向对象的程序设计]]
+[[Category:知识表示|Category:知识表示]]

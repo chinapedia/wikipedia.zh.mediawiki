@@ -1,0 +1,143 @@
+{{noteTA
+|T=zh-hans:马尔可夫链蒙特卡洛; zh-hant:馬可夫鏈蒙地卡羅;
+|1=zh-hans:蒙特卡罗方法; zh-hant:蒙地卡羅方法;
+|2=zh-hans:蒙特卡洛; zh-hant:蒙地卡羅;
+|3=zh-hans:马尔可夫; zh-hant:馬可夫;
+|G1=IT
+|G2=Math
+}}
+
+'''[[马尔可夫链|马尔可夫链]][[蒙地卡羅方法|蒙特卡洛]]'''（{{lang-en|'''M'''arkov '''c'''hain '''M'''onte '''C'''arlo}}，{{lang|en|'''MCMC'''}}）方法（含'''[[随机游走|随机游走]]蒙特卡洛'''方法）是一组用马氏链从[[随机分布|随机分布]]取样的[[算法|算法]]，之前步骤的作为底本。步数越多，结果越好。
+
+建立一个具有期望属性的马氏链并非难事，难的是如何决定通过多少步可以达到在许可误差内的稳定分布。一个好的马氏链具有''快速混合''——从开始阶段迅速获得的一个稳定状态——请参考[[马氏链最大时间|马氏链最大时间]]。
+
+因于初始样本，最常见的MCMC取样只能近似得到分布。复杂的MCMC改进算法如[[过往耦合|过往耦合]]，但是会消耗更多的计算资源和时间。
+
+典型用法是模拟一个随机行走的行人来进行路径优化等。每一步都算作是一个状态。而统计经过次数最多的地方将在下一步中更有可能为目的地。马氏蒙特卡洛方法是一种结合了[[蒙特卡罗法|蒙特卡罗法]]的解决方案。但不同于以往的蒙特卡洛integration是[[统计独立|统计独立]]的，MCMC中的是''统计相关的''。
+
+本方法的相关应用包括：[[贝叶斯统计|贝叶斯统计]]、[[计算物理|计算物理]]、[[计算生物|计算生物]]以及[[计算语言学|计算语言学]]，此外还有Gill先生的一些著作。
+
+{{cite book
+|author=Jeff Gill
+|title=Bayesian methods: a social and behavioral sciences approach
+|edition=Second Edition
+|year=2008
+|publisher=Chapman and Hall/CRC
+|location=London
+|isbn=1-58488-562-9
+|url=http://worldcat.org/isbn/1-58488-562-9
+|access-date=2012-02-07
+|archive-date=2009-05-23
+|archive-url=https://web.archive.org/web/20090523114203/http://www.worldcat.org/isbn/1-58488-562-9
+|dead-url=no
+}}
+</ref> and Robert & Casella.<ref name=Casella>{{cite book
+|author=Christian P Robert & Casella G
+|title=Monte Carlo statistical methods
+|edition=Second Edition
+|year=2004
+|publisher=Springer
+|location=New York
+|isbn=0-387-21239-6
+|url=http://worldcat.org/isbn/0-387-21239-6
+|access-date=2012-02-07
+|archive-date=2010-01-12
+|archive-url=https://web.archive.org/web/20100112161825/http://www.worldcat.org/isbn/0-387-21239-6
+|dead-url=no
+}}</ref>
+
+== 随机游走算法 ==
+马氏链性质决定了下一个方位取决于当前状态和随机变量。这样的性质决定了最终所有的空间将被覆盖但是却需要花费较长时间。下面给出MCMC方法：
+
+* [[Metropolis–Hastings算法|Metropolis–Hastings算法]]：给出预见密度和回绝按照给出方向前进的方法。
+* [[吉布斯采样|吉布斯采样]]：取目标区域所有的[[条件分布|条件分布]]样本。
+* [[平滑取样|平滑取样]]
+* [[多重实验Metropolis|多重实验Metropolis]]：[[Metropolis–Hastings算法|Metropolis–Hastings算法]]的改良版本。
+
+== 基本步骤 ==
+
+MCMC方法是使用马尔科夫链的蒙特卡洛积分，其基本思想是：构造一条Markov链使其平稳分布为待估参数的后验分布<math>\pi(x)</math>，通过这条马尔科夫链产生后验分布的样本，并基于马尔科夫链达到平稳分布时的样本（有效样本）进行蒙特卡罗积分。设<math>n</math>为产生的总样本数，<math>m</math>为Markov链达到平稳时的样本数则MCMC方法的基本思路可概括为：
+
+* 构造Markov链。构造一条Markov链，给定马尔科夫链状态转移矩阵<math>Q</math>，使其收敛到平稳分布<math>\pi(x)</math>；
+* 产生样本：从初始状态<math>x_0\sim p_0</math>出发，利用从条件概率分布<math>Q(x|x_t)</math>生成样本，并通过转移条件判断是否转移，通过<math>m</math>次更新达到平稳，此后生成的即为<math>\pi(x)</math>的样本，我们记为<math>x^{(1)},\cdots,x^{(n)}</math>；
+* 蒙特卡罗积分。任一函数<math>f(x)</math>的期望估计为：<math>\frac{1}{n}\sum_{i=1}^{n} f(x^{(i)})</math>
+
+在采用MCMC方法时马尔科夫链转移核的构造至关重要，不同的转移核构造方法将产生不同的MCMC方法，目前常用的MCMC方法主要有两种Gibbs抽样和Metropolis-Hastings算法。
+
+== 抽样算法 ==
+
+l  '''Gibbs ''''''抽样'''
+
+Gibbs抽样是现实中最简单应用最广泛的MCMC方法，由Geman最初命名提出其基础思路如下：
+
+给定任意的初始向量<!-- 檔案不存在 [[File:.wmz|119px]] -->；
+
+从<!-- 檔案不存在 [[File:.wmz|119px]] -->中抽取样本<!-- 檔案不存在 [[File:.wmz|24px]] -->
+
+从<!-- 檔案不存在 [[File:.wmz|121px]] -->中抽取样本<!-- 檔案不存在 [[File:.wmz|24px]] -->
+
+…
+
+从<!-- 檔案不存在 [[File:.wmz|121px]] -->中抽取样本<!-- 檔案不存在 [[File:.wmz|24px]] -->
+
+…
+
+从<!-- 檔案不存在 [[File:.wmz|121px]] -->中抽取样本<!-- 檔案不存在 [[File:.wmz|24px]] -->
+
+至此，完成<!-- 檔案不存在 [[File:.wmz|69px]] -->的转移。经过n次迭代，可得后验样本<!-- 檔案不存在 [[File:.wmz|101px]] -->。根据后验样本可计算后验分布的各阶矩，进行相应的统计推断。
+
+* '''Metropolis-Hastings ''''''算法'''
+
+Metropolis-Hastings算法是较早出现且比较一般化的MCMC方法，最初由Metropolis等人在1953年提出之后由Hastings对其加以推广形成了，Metropolis-Hastings方法。该方法的基本思路是：选择一转移函数<!-- 檔案不存在 [[File:.wmz|68px]] -->和初始值<!-- 檔案不存在 [[File:.wmz|25px]] -->，若第<!-- 檔案不存在 [[File:.wmz|9px]] -->次迭代开始时的参数值为
+
+<!-- 檔案不存在 [[File:.wmz|33px]] -->，则第<!-- 檔案不存在 [[File:.wmz|29px]] -->次迭代过程为：
+
+* 从<!-- 檔案不存在 [[File:.wmz|68px]] -->中抽取一个备选值<!-- 檔案不存在 [[File:.wmz|15px]] -->
+
+* 计算接受概率<!-- 檔案不存在 [[File:.wmz|253px]] -->
+
+* 以概率<!-- 檔案不存在 [[File:.wmz|73px]] -->，置<!-- 檔案不存在 [[File:.wmz|52px]] -->，以概率<!-- 檔案不存在 [[File:.wmz|93px]] -->，置<!-- 檔案不存在 [[File:.wmz|69px]] -->；
+* 重复'''i –iii '''次，则可得后验样本<!-- 檔案不存在 [[File:.wmz|101px]] -->。根据后验样本可计算后验分布的各阶矩，进行相应的统计推断。
+== 参见 ==
+*[[贝叶斯推理|贝叶斯推理]]
+* [[圖模式|圖模式]]
+* [[马尔可夫链|马尔可夫链]]
+* [[马尔可夫逻辑网络|马尔可夫逻辑网络]]
+
+== 注释==
+{{reflist}}
+
+== 参考文献==
+{{refbegin}}
+* Christophe Andrieu et al., [http://www.cs.princeton.edu/courses/archive/spr06/cos598C/papers/AndrieuFreitasDoucetJordan2003.pdf "An Introduction to MCMC for Machine Learning"] {{Wayback|url=http://www.cs.princeton.edu/courses/archive/spr06/cos598C/papers/AndrieuFreitasDoucetJordan2003.pdf |date=20210224195232 }}, 2003
+* Bernd A. Berg. "Markov Chain Monte Carlo Simulations and Their Statistical Analysis". Singapore, World Scientific 2004.
+* George Casella and Edward I. George. "Explaining the Gibbs sampler". ''The American Statistician'', 46:167–174, 1992. ''（Basic summary and many references.）''
+* A.E. Gelfand and A.F.M. Smith. "Sampling-Based Approaches to Calculating Marginal Densities". ''J. American Statistical Association'', 85:398–409, 1990.
+* [[Andrew_Gelman|Andrew Gelman]], John B. Carlin, Hal S. Stern, and Donald B. Rubin. ''Bayesian Data Analysis''. London: Chapman and Hall. First edition, 1995. ''（See Chapter 11.）''
+* S. Geman and D. Geman. "Stochastic Relaxation, Gibbs Distributions, and the Bayesian Restoration of Images". ''IEEE Transactions on Pattern Analysis and Machine Intelligence'', 6:721–741, 1984.
+* Radford M. Neal, [http://www.cs.utoronto.ca/~radford/review.abstract.html Probabilistic Inference Using Markov Chain Monte Carlo Methods] {{Wayback|url=http://www.cs.utoronto.ca/~radford/review.abstract.html |date=20210224214844 }}, 1993.
+* Gilks W.R., Richardson S. and Spiegelhalter D.J. "Markov Chain Monte Carlo in Practice". ''Chapman & Hall/CRC'', 1996.
+* C.P. Robert and G. Casella. "Monte Carlo Statistical Methods"（second edition）. New York: Springer-Verlag, 2004.
+* R. Y. Rubinstein and D. P. Kroese. ''Simulation and the Monte Carlo Method''（second edition）. New York: John Wiley & Sons, 2007. ISBN 978-0470177945
+* R. L. Smith "Efficient Monte Carlo Procedures for Generating Points Uniformly Distributed Over Bounded Regions", ''Operations Research'', Vol. 32, pp. 1296–1308, 1984.
+* Asmussen and Glynn "Stochastic Simulation: Algorithms and Analysis", Springer.  Series: Stochastic Modelling and Applied Probability, Vol. 57,  2007.
+* P. Atzberger, "An Introduction to Monte-Carlo Methods." [https://web.archive.org/web/20090220065530/http://www.math.ucsb.edu/~atzberg/spring2006/monteCarloMethod.pdf].
+* Bolstad, William M.（2010）Understanding Computational Bayesian Statistics, John Wiley ISBN 0-470-04609-8
+
+==延展阅读==
+* [[Persi_Diaconis|Diaconis, Persi]], [http://www.ams.org/bull/2009-46-02/S0273-0979-08-01238-X/S0273-0979-08-01238-X.pdf "The Markov chain Monte Carlo revolution"], Bull. Amer. Math. Soc.（2009）
+*{{Citation | last1=Press | first1=WH | last2=Teukolsky | first2=SA | last3=Vetterling | first3=WT | last4=Flannery | first4=BP | year=2007 | title=Numerical Recipes: The Art of Scientific Computing | edition=3rd | publisher=Cambridge University Press | publication-place=New York | isbn=978-0-521-88068-8 | chapter=Section 15.8. Markov Chain Monte Carlo | chapter-url=http://apps.nrbook.com/empanel/index.html#pg=824 | accessdate=2012-02-07 | archive-date=2011-08-11 | archive-url=https://web.archive.org/web/20110811154417/http://apps.nrbook.com/empanel/index.html#pg=824 | dead-url=no }}
+*[[Matthew_Richey|Richey, Matthew]], "The Evolution of Markov Chain Monte Carlo Methods", The American Mathematical Monthly, May 2010, 383-413
+{{refend}}
+
+==外部链接==
+*[https://web.archive.org/web/20110531150413/http://www.bioss.ac.uk/students/alexm/MCMCintroPresentation.pdf MCMC sampling and other methods in a basic overview], by Alexander Mantzaris
+*[http://www.lbreyer.com/classic.html Visual demonstration of MCMC sampling methods (Java applet)] {{Wayback|url=http://www.lbreyer.com/classic.html |date=20200727115838 }}, by Laird Breyer
+*[https://web.archive.org/web/20120316212706/http://www.ece.sunysb.edu/~zyweng/MCMCexample.html A Toy Example of MCMC sampling], by Zhiyuan Weng
+*[http://micans.org/mcl/ MCL - a cluster algorithm for graphs] {{Wayback|url=http://micans.org/mcl/ |date=20210225044635 }}, by Stijn van Dongen
+
+{{DEFAULTSORT:Markov Chain Monte Carlo}}
+[[Category:Monte_Carlo_methods|Category:Monte Carlo methods]]
+[[Category:Markov_chain_Monte_Carlo|]]
+[[Category:Computational_statistics|Category:Computational statistics]]
+[[Category:Markov_models|Category:Markov models]]

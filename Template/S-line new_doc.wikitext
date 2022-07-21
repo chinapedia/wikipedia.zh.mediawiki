@@ -1,0 +1,225 @@
+<noinclude>{{Documentation subpage}}</noinclude><!-- PLEASE ADD CATEGORIES AND INTERWIKIS AT THE BOTTOM OF THIS PAGE -->
+== 用法 ==
+=== 数据模块 ===
+本模板需要在[[模块:RailSystems]]内存在相应子模块页面 (例如[[模块:RailSystems/BJS]]) 的前提下才能正确显示。子模块须遵照指定格式，并包含系统名称，路线名称，起迄站，标识色等路线数据。
+
+有关子模块的建立与修改，或确认所编辑的铁路系统是否存在对应的子模块，请参阅[[模块:RailSystems]]的模块文档。注意并不是所有参数都用于本模板。
+
+=== 调用模板 ===
+S-line必須用於{{tl|s-rail-start}}及{{tl|s-end}}之間。強烈建議使用{{tl|s-rail}}，但並非必要使用。
+
+'''注意'''：在{{tl|Infobox station}}模板的<code>services</code>或<code>adjacent</code>参数中使用本模板时，不需要声明{{tl|s-rail-start}}及{{tl|s-end}}。因为{{tl|Infobox station}}中已内嵌{{tl|s-rail-start}}及{{tl|s-end}}语句。
+
+对于多条路线或系统，每一条路线均需声明一次<code>{{S-line|</code>方可正确显示。
+
+=== 参数 ===
+S-line有以下參數：
+
+{| class="wikitable"
+!參數!!描述!!備註
+|-
+|system||路線所屬的路網||此參數應對應[[:Template:S-rail/lines]]其中一項
+|-
+|line||路線名稱||
+|-
+|previous||上一站名稱||
+|-
+|next||下一站名稱||
+|-
+|type||路線左側支線||''選填''
+|-
+|type2||路線右側支線||''選填''
+|-
+|note||路線左側支線資訊||''選填''
+|-
+|note2||路線右側支線資訊||''選填''
+|-
+|notemid||有關車站本身資訊||''選填''
+|-
+|oneway1||顥示列車不前往上一站||''選填''
+|-
+|oneway2||顥示列車不前往下一站||''選填''
+|-
+|rows1, hide1||用於上一站的同一個方格內顯示多條路線。參見下面||''選填''
+|-
+|rows2, hide2||用於下一站的同一個方格內顯示多條路線。參見下面||''選填''
+|-
+|rowsmid, hidemid||用於中央（路線）方格內顯示多條路線。參見下面||''選填''
+|-
+|transfer||顯示鄰站可進行轉乘。參見下面||''選填''
+|-
+|branch||用於顯示特定支線資料。可代替或補充<code>type</code>參數||''選填''
+|-
+|state1, state2||容許將直通運行作為額外車站參數。常用於消歧義||''選填''
+|-
+|through1, through2||容許顯示直通運行車站而非下一站||''選填''
+|}
+
+==示例==
+=== 普通车站 ===
+在使用本模版的情况下，要生成一个最简单的显示相邻车站的表格，所需要填写的参数仅有系统名称<code>system</code>，路线名<code>line</code>，上一站<code>previous</code>及下一站<code>next</code>。起迄站名称不需要手动输入。本模板会自动从对应的数据模块中获取起迄站数据，并分别显示于上一站及下一站站名的下方。如果所输入的上一站或下一站的名称与数据模块内的起迄站相同，本模板也能自动判断，并在站名下方标示<var>终点站</var>字样。如果上一站或下一站即为终点站，只需将对应参数留空。
+
+下面是该情况下的例子。
+{{Markup
+| <nowiki>{{s-rail-start}}
+{{s-rail|title=HZM}}
+{{s-line|system=HZM|line=1|previous=定安路|next=凤起路}}
+{{s-end}}</nowiki>
+| {{s-rail-start}}
+{{s-rail|title=HZM}}
+{{s-line|system=HZM|line=1|previous=定安路|next=凤起路}}
+{{s-end}}
+}}
+
+=== 换乘站 ===
+如果想表示两条及以上的路线，只需要在前一条路线的下方再次调用本模板，加入所需路线的信息即可。
+
+下面是该情况下的例子。
+{{Markup
+| <nowiki>{{s-rail-start}}
+{{s-rail|title=BJS}}
+{{s-line|system=BJS|line=1|previous=南礼士路|next=西单}}
+{{s-line|system=BJS|line=2|previous=阜成门|next=长椿街}}
+{{s-end}}</nowiki>
+| {{s-rail-start}}
+{{s-rail|title=BJS}}
+{{s-line|system=BJS|line=1|previous=南礼士路|next=西单}}
+{{s-line|system=BJS|line=2|previous=阜成门|next=长椿街}}
+{{s-end}}
+}}
+
+对于拥有两个及以上不同的铁路系统的换乘站，需要先输入另一个铁路系统的{{tl|s-rail}}，再使用不同的system参数的本模板。
+
+下面是该情况下的例子。
+{{Markup
+| <nowiki>{{s-rail-start}}
+{{s-rail|title=SHMetro}}
+{{s-line|system=SHMetro|line=11|previous=光明路}}
+{{s-rail|title=SuzhouRT}}
+{{s-line|system=SuzhouRT|line=S1|previous=花溪公园}}
+{{s-end}}</nowiki>
+| {{s-rail-start}}
+{{s-rail|title=SHMetro}}
+{{s-line|system=SHMetro|line=11|previous=光明路}}
+{{s-rail|title=SuzhouRT}}
+{{s-line|system=SuzhouRT|line=S1|previous=花溪公园}}
+{{s-end}}
+}}
+
+=== 主线与支线 ===
+主线与支线的名称与起迄站数据保存在数据模块内。如果想显示各支线不同的起迄站，在<code>branch</code>参数内输入对应支线的名称即可。
+
+下面是该情况下的例子。
+{{Markup
+| <nowiki>{{s-rail-start}}
+{{s-rail|title=GZM}}
+{{s-line|system=GZM|line=14|rows1=2|previous=马沥|next=太平|branch=主线}}
+{{s-line|system=GZM|line=14|hide1=yes|next=红卫|branch=知识城支线}}
+{{s-end}}</nowiki>
+| {{s-rail-start}}
+{{s-rail|title=GZM}}
+{{s-line|system=GZM|line=14|rows1=2|previous=马沥|next=太平|branch=主线}}
+{{s-line|system=GZM|line=14|hide1=yes|next=红卫|branch=知识城支线}}
+{{s-end}}
+}}
+
+=== 备注信息 ===
+使用<code>note</code>，<code>note2</code>及<code>notemid</code>参数可在前后站及路线名单元格内加入通车情况，前后车站间距等备注信息。
+
+下面是该情况下的例子。
+{{Markup
+| <nowiki>{{s-rail-start}}
+{{s-rail|title=NJM}}
+{{s-line|system=NJM|line=1|previous=南京站|note=1.69km|next=玄武门|note2=1.06km}}
+{{s-end}}</nowiki>
+| {{s-rail-start}}
+{{s-rail|title=NJM}}
+{{s-line|system=NJM|line=1|previous=南京站|note=1.69km|next=玄武门|note2=1.06km}}
+{{s-end}}
+}}
+
+=== 直通运行 ===
+使用<code>through1</code>及<code>through2</code>参数可显示直通运行信息。
+
+下面是该情况下的例子。
+{{Markup
+| <nowiki>{{s-rail-start}}
+{{s-rail|title=KunmingRT}}
+{{s-line new|system=KunmingRT|line=1|previous=2|next=昆明火车站|through1=yes}}
+{{s-line new|system=KunmingRT|line=2|previous=塘子巷|next=1|through2=yes}}
+{{s-end}}</nowiki>
+| {{s-rail-start}}
+{{s-rail|title=KunmingRT}}
+{{s-line new|system=KunmingRT|line=1|previous=2|next=昆明火车站|through1=yes}}
+{{s-line new|system=KunmingRT|line=2|previous=塘子巷|next=1|through2=yes}}
+{{s-end}}
+}}
+
+===One Way Operation===
+For rail lines that operate in only one direction (such as going around a loop), the ''oneway1'' or ''oneway2'' parameters are used, to indicate that the Previous or Next station, respectively, does not have service going towards it. When these parameters are present with any non-null value, the ''toward [Terminal]'' line is replaced with ''One-way Operation''. For example, for a CTA station in the Chicago Loop:
+<pre>{{s-rail-start}}
+{{s-rail|title=CTA}}
+{{s-line new|system=CTA|line=Brown|previous=Clark/Lake|next=Randolph/Wabash|type=Kimball|oneway2=true}}
+{{s-line new|system=CTA|line=Green|previous=Clark/Lake|next=Randolph/Wabash|type2=Both}}
+{{s-line new|system=CTA|line=Orange|previous=Clark/Lake|next=Randolph/Wabash|oneway1=true|type2=Midway|rows1=3}}
+{{s-line new|system=CTA|line=Purple|previous=Clark/Lake|next=Randolph/Wabash|oneway1=true|type2=Linden|hide1=true}}
+{{s-line new|system=CTA|line=Pink|previous=Clark/Lake|next=Randolph/Wabash|oneway1=true|type2=54|hide1=true}}
+{{s-end}}</pre>
+Produces the box:
+{{s-rail-start}}
+{{s-rail|title=CTA}}
+{{s-line new|system=CTA|line=Brown|previous=Clark/Lake|next=Randolph/Wabash|type=Kimball|oneway2=true}}
+{{s-line new|system=CTA|line=Green|previous=Clark/Lake|next=Randolph/Wabash|type2=Both}}
+{{s-line new|system=CTA|line=Orange|previous=Clark/Lake|next=Randolph/Wabash|oneway1=true|type2=Midway|rows1=3}}
+{{s-line new|system=CTA|line=Purple|previous=Clark/Lake|next=Randolph/Wabash|oneway1=true|type2=Linden|hide1=true}}
+{{s-line new|system=CTA|line=Pink|previous=Clark/Lake|next=Randolph/Wabash|oneway1=true|type2=54|hide1=true}}
+{{s-end}}
+
+===Parallel Lines===
+For lines that operate on the same tracks and serve the same next station and final terminal, the ''rows1'', ''rows2'', ''hide1'', and ''hide2'' optional parameters can be used to have the Previous (the 1s) or Next (the 2s) Station boxes cover more than one line. The rows parameters specify how many lines the station should cover, while the hide parameters ensure that the table formatting remains intact. The two parameters must be used together, with hide specified for every line that is being covered by the first line. An example of this use can be seen in the above CTA box. Note that, in the above CTA example, the ''previous'' and ''oneway1'' parameters could have been omitted from the Purple and Pink line entries, but were left in for consistency's sake.
+
+Another example of this:
+<pre>{{S-start}}
+{{S-rail|title=LUL}}
+{{S-line new|system=LUL|line=Circle|previous=Westbourne Park|next=Paddington|type2=Aldgate|rows1=2}}
+{{S-line new|system=LUL|line=Hammersmith & City|previous=Westbourne Park|next=Paddington|hide1=yes}}
+{{S-end}}
+</pre>
+'''Produces''':
+{{S-start}}
+{{S-rail|title=LUL}}
+{{S-line new|system=LUL|line=Circle|previous=Westbourne Park|next=Paddington|type2=Aldgate|rows1=2}}
+{{S-line new|system=LUL|line=Hammersmith & City|previous=Westbourne Park|next=Paddington|hide1=yes}}
+{{S-end}}
+
+===Transfers===
+The <code>transfer</code> parameter makes it possible to show within the box lines available at a different station with which there's a direct transfer from the current station. This snippet is taken from the article about the [[Finchley Road tube station]]. The [[North London Line]] does not actually serve the station itself, but there's an official out of system transfer designated between [[London Underground]] services at Finchley Road and [[London Overground]] services at the nearby [[Finchley Road & Frognal railway station|Finchley Road & Frognal]] station:
+<pre>{{s-start}}
+{{s-rail|title=LUL}}
+{{s-line new|system=LUL|line=Jubilee|previous=West Hampstead|next=Swiss Cottage|type2=one}}
+{{s-line new|system=LUL|line=Metropolitan|previous=Wembley Park|next=Baker Street|type=Four|rowsmid=2|rows2=2}}
+{{s-line new|system=LUL|line=Metropolitan|previous=Harrow-on-the-Hill|next=Finchley Road|type=Four|hidemid=yes|hide2=yes|note=Peak periods only}}
+{{s-note|text=Out-of-system interchange}}
+{{s-rail|title=LOG}}
+{{s-line new|system=LOG|line=North London|previous=West Hampstead|next=Hampstead Heath|transfer=Finchley Road & Frognal}}
+{{s-end}}</pre>
+'''Produces''':
+{{s-start}}
+{{s-rail|title=LUL}}
+{{s-line new|system=LUL|line=Jubilee|previous=West Hampstead|next=Swiss Cottage|type2=one}}
+{{s-line new|system=LUL|line=Metropolitan|previous=Wembley Park|next=Baker Street|type=Four|rowsmid=2|rows2=2}}
+{{s-line new|system=LUL|line=Metropolitan|previous=Harrow-on-the-Hill|next=Finchley Road|type=Four|hidemid=yes|hide2=yes|note=Peak periods only}}
+{{s-note|text=Out-of-system interchange}}
+{{s-rail|title=LOG}}
+{{s-line new|system=LOG|line=North London|previous=West Hampstead|next=Hampstead Heath|transfer=Finchley Road & Frognal}}
+{{s-end}}
+
+===參見===
+* {{tiw|s-rail-start}}
+* {{tiw|s-rail}}
+* {{tiw|s-rail-next}}
+* {{tiw|s-note}}
+* {{tiw|s-end}}
+
+<includeonly>
+</includeonly>

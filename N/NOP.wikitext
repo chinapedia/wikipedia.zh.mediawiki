@@ -1,0 +1,110 @@
+{{noteTA|G1=IT}}
+[[计算机科学|计算机科学]]中，'''NOP'''或'''NOOP'''（'''No Operation'''或'''No Operation Performed'''的缩写，意为'''无操作'''）是[[汇编语言|汇编语言]]的一个[[指令|指令]]，一系列编程语句，或[[网络传输协议|网络传输协议]]中的表示不做任何有效操作的命令。
+
+==NOP机器指令==
+有的计算机[[指令集|指令集]]包含一条指令，其主要目的是不改变任何程序可访问的[[寄存器|寄存器]]，[[处理器状态标志|处理器状态标志]]或[[主存|主存]]，而且可能需要特定的时钟周期来执行。在其它指令集中，NOP是用执行一条具有操作数，具有相同效果的指令来模拟的（例如[[SPARC|SPARC]]处理器推荐使用<code>sethi 0, %g0</code>模拟NOP）。
+
+NOP指令通常用于控制时序的目的，强制[[内存对齐|内存对齐]]，防止[[流水线灾难|流水线灾难]]，占据[[分支指令延迟|分支指令延迟]]），或是作为占位符以供程序的改善（或替代被移除的指令）。在某些情况中，NOP指令会产生副作用；例如在[[摩托罗拉_68000|摩托罗拉 68000]]处理器中，NOP操作码会产生[[流水线|流水线]]同步<ref>{{cite web|url=http://www.freescale.com/files/archives/doc/ref_manual/M68000PRM.pdf|title=Motorola 68000 Programmer's Reference Manual|accessdate=2010-09-18|archive-date=2015-09-24|archive-url=https://web.archive.org/web/20150924015505/http://www.freescale.com/files/archives/doc/ref_manual/M68000PRM.pdf|dead-url=no}}</ref>。
+
+下表显示了部分CPU架构上NOP指令的特征：
+
+{| class="wikitable" border="1"
+|-
+! CPU架构
+! [[助憶碼|助憶碼]]
+! [[字节|字长]]
+! [[操作码|操作码]]
+! 备注
+|-
+| [[Intel|Intel]][[x86|x86]]系列[[CPU|CPU]]
+| <code>NOP</code>
+| 1; i686中为1–9
+| [[十六进制|0x]]90; 0x0f 0x1f <ref>{{cite web|url=http://developer.intel.com/design/pentiumii/manuals/243191.htm|title=Intel Architecture Software Developer's Manual, Volume 2: Instruction Set Reference Manual|accessdate=2007-07-13|archive-url=https://web.archive.org/web/20070702003233/http://developer.intel.com/design/PentiumII/manuals/243191.htm|archive-date=2007-07-02|dead-url=yes}}</ref>
+| x86 CPU上的NOP指令实质上是''XCHG EAX, EAX''（操作码同为0x90）--无任何作用的指令。
+|-
+| [[Intel|Intel]] [[8051|8051]] / [[MCS-51|MCS-51]]系列
+| <code>NOP</code>
+| 1
+| 0x00
+| 
+|-
+| [[MIPS|MIPS]]
+| <code>NOP</code>
+| 4
+| 0x00000000
+| 
+|-
+| [[MOS科技_65xx|MOS科技 65xx]]
+| <code>NOP</code>
+| 1
+| 0xea
+| [[65C02|65C02]]处理器发布时，之前多数的[[无效指令|无效指令]]都被定义成了具有不同字长和需时的NOP指令。
+|-
+| [[PowerPC|PowerPC]]
+| <code>NOP</code>
+| 4
+| 0x60000000 (<code>ori r0,r0,0</code>的扩展操作码)
+|
+|}
+
+==NOP代码==
+NOP有时可以描述函数或一系列编程语句的作用，若部分没有作用（也可以称为[[冗余代码|冗余代码]]）。常见的[[编译器优化|编译器优化]]的作用就包括检测和去除这样的代码。
+
+下面是一个起NOP作用的C语言语句的例子（评判标准在于语句是否影响程序输出，而非[[编译器|编译器]]是否为语句产生代码）：
+<syntaxhighlight lang="C">
+     i+1;
+</syntaxhighlight>
+（该语句执行了一个加法，但结果被丢弃。）
+
+C语言中最简单的NOP块被称为''空语句''；其只包括一个分号。（标准没有要求编译器在这个例子中生成NOP指令；通常这个语句会直接为编译器所忽略。）
+<syntaxhighlight lang="C">
+   ;
+</syntaxhighlight>
+
+虽然空语句自身没有用处，但在某些情况下可以启动占位符的作用，例如在循环中：
+<syntaxhighlight lang="C">
+   while (ReadChar() != '\n')
+      ;
+</syntaxhighlight>
+
+以上代码一直调用<code>ReadChar</code>函数，直到函数返回一个\n（NL，新行）字符。
+
+[[Python|Python]]中的<code>pass</code>语句不会产生作用，可以作为NOP使用。它的主要目的是保证语法正确，由于Python的[[Python#縮排|缩进敏感语法]]。
+
+==NOP协议命令==
+许多[[网络传输协议|协议]]，比如[[telnet|telnet]]，包含NOP指令，该指令允许客户端可以在不会引起其它操作的情况下向服务器请求回应。NOP指令可以用于检测连接是否断开，或服务器是否可以响应操作。下列协议中包含NOOP指令（''不完全列表''）：
+*[[telnet|telnet]]
+*[[FTP|FTP]]
+*[[SMTP|SMTP]]
+*[[X_Window核心协议|X11]]
+*[[POP3|POP3]]
+*[[NNTP|NNTP]]
+*[[finger|finger]]
+*[[IMAP4|IMAP4]]
+*[[BitTorrent|BitTorrent]]
+注意：与其它协议不同，IMAP4的NOP命令允许客户端响应服务器发送由其它客户端反应的操作信息。
+
+虽然大多数telnet和FTP服务器用''OK''或''+OK''回应NOOP指令，有的程序员在对客户端的回应中加入了特别的内容。例如[[MINIX|MINIX]]的<code>ftpd</code>[[守护进程|守护进程]]会以以下消息回应NOOP：<ref name="minix_ftpd">{{cite web|url=http://www.google.com/codesearch/p?hl=en#EhJUfTR8NNs/src/commands/ftpd/ftpd.c&q=%22NOOP%20to%20you%20too!%22%20lang:C&exact_package=http://www.minix3.org/previous-versions/Intel-1.7.3/new34.tar|title=ftpd.c|accessdate=2009-01-22|archive-date=2009-01-16|archive-url=https://web.archive.org/web/20090116193049/http://google.com/codesearch/p?hl=en#EhJUfTR8NNs/src/commands/ftpd/ftpd.c&q=%22NOOP%20to%20you%20too!%22%20lang:C&exact_package=http://www.minix3.org/previous-versions/Intel-1.7.3/new34.tar|dead-url=no}}</ref>
+ [[FTP|200]] NOOP to you too!
+
+==破解==
+NOP通常在[[软件破解|破解]]软件时有特殊用途，例如检查序列号，特定硬件或软件需求，[[加密狗|加密狗]]等的软件。这是通过更改函数和/或[[子程序|子程序]]以跳过安全检查，直接返回期望的检测值实现的。由于大多数安全检查子程序中的指令会被废弃，它们会被NOP所代替。
+
+==安全问题==
+NOP操作码可以被用于组成一个[[NOP_slide|NOP slide]]，允许在指令指针值未定义时执行代码，例如[[缓存溢出|缓存溢出]]导致栈上的函数返回地址被更改。
+
+==参见==
+*[[计算机系统结构|计算机系统结构]]
+*[[HLT|HLT]]
+*[[指令集|指令集]]
+*[[x86|x86]]
+*[[恒等函数|恒等函数]]，[[函数式编程语言|函数式编程语言]]中NOOP的等效函数
+*[[xyzzy|xyzzy]]，一个有时用来代替NOOP的命令
+
+==参考文献==
+{{reflist}}
+
+[[Category:机器码|Category:机器码]]
+[[Category:X86架構|Category:X86架構]]
+[[Category:无|Category:无]]
+[[Category:X86指令|Category:X86指令]]

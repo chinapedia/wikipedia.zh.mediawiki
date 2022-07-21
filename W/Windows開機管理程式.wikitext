@@ -1,0 +1,90 @@
+{{NoteTA
+|G1 = IT
+|1 = zh-cn:启动管理器; zh-tw:開機管理程式; zh-hk:開機管理程式;
+}}
+'''{{lang|en|Windows}}開機管理程式'''（{{lang-en|'''Windows Boot Manager'''}}）是從[[Windows_Vista|Windows Vista]]開始引進的新一代開機管理程式，用以取代<tt>[[NTLDR|NTLDR]]</tt>。當電腦執行完[[加电自检|POST]]後，傳統型[[BIOS|BIOS]]會根據[[啟動磁區|啟動磁區]]尋找開機硬碟中標記"啟動"分割區下的<code>BOOTMGR</code>檔案；[[UEFI|UEFI]]則是ESP分割區中的<code>Bootmgfw.efi</code>檔案（即UEFI中的「Windows Boot Manager」開機裝置，檔案名係「Boot Manager Firmware」的缩写）或<code>bootx64.efi</code>檔案，接著Windows Boot Manager會讀取開機組態資料庫（{{lang|en|Boot Configuration Database}}，{{lang|en|BCD}}）下的啟動資料，接著根據其中的資料載入與預設或使用者所選擇的[[作業系統|作業系統]]。如果選擇啟動Windows NT 5.x系列作業系統（Windows 2000/XP/2003），則BOOTMGR會先啟動NTLDR檔案，再由NTLDR啟動Windows NT 5.x。
+
+==開機組態資料庫（{{lang|en|BCD}}）==
+開機組態資料庫是一個儲存啟動組態且獨立於硬體的[[資料庫|資料庫]]。它替代了由舊版{{lang|en|Windows}}使用的<tt>[[NTLDR|NTLDR]]</tt>之開機組態檔案<tt>[[boot.ini|boot.ini]]</tt>。
+
+開機組態資料庫的檔案結構是與{{lang|en|Windows}}登錄資料庫完全相同的。
+<ref name="like registry">{{cite news 
+|last=Russinovich 
+|first=Mark 
+|title=Fixing Disk Signature Collisions 
+|url=http://blogs.technet.com/b/markrussinovich/archive/2011/11/08/3463572.aspx 
+|work=Mark's Blog 
+|agency=Microsoft TechNet 
+|publisher=Microsoft Corporation 
+|accessdate=9 November 2011 
+|authorlink=Mark Russinovich 
+|date=8 November 2011 
+|archive-url=https://web.archive.org/web/20170824120420/https://blogs.technet.microsoft.com/markrussinovich/2011/11/06/fixing-disk-signature-collisions/ 
+|archive-date=2017-08-24 
+|dead-url=yes 
+}}</ref>在使用了[[統一可延伸韌體介面|統一可延伸韌體介面]]（{{lang|en|UEFI}}）開機方式的電腦上，BCD檔案儲存在[[EFI系统分區|EFI系统分區]]（ESP）；在使用Legacy BIOS開機方式的電腦上，有可能儲存在系统分割區下的"<tt>\Boot"目錄下的bcd檔案中</tt>，如果是[[Windows_7|Windows 7]]與後續版本，也有可能儲存在一個隱藏的開機分割區（200MB左右）中（尤其是在沒有任何磁碟分割的硬碟中安裝Windows 7/8/10的情況下）。
+
+內建於Windows，用於設定BCD的公用程式為"<tt>bcdedit.exe</tt>"<ref name="bcdedit">{{Cite web |url=https://technet.microsoft.com/zh-tw/library/cc709667(v=ws.10).aspx |title=BCDedit 命令列選項 |access-date=2016-02-15 |archive-date=2017-06-21 |archive-url=https://web.archive.org/web/20170621232418/https://technet.microsoft.com/zh-tw/library/cc709667(v=ws.10).aspx }}</ref>；若要快速設定系統分割區或是修復錯誤的開機選項則使用"<tt>bcdboot.exe</tt>"<ref name="bcdboot">{{Cite web |url=https://technet.microsoft.com/zh-tw/library/dd744347(v=ws.10).aspx |title=BCDboot 命令列選項 |access-date=2016-02-15 |archive-date=2017-06-21 |archive-url=https://web.archive.org/web/20170621124100/https://technet.microsoft.com/zh-tw/library/dd744347(v=ws.10).aspx }}</ref>公用程式；其他用於管理{{lang|en|BCD}}的工具還有[[EasyBCD|EasyBCD]]、[[Visual_BCD|Visual BCD]]、[[Bootice|Bootice]]或是[[WMI|WMI]]等工具修改{{lang|en|BCD}}。
+
+開機組態資料庫包含{{lang|en|Windows}}開機管理程式的選單及控制管理程式的行為，就像包含{{lang|en|NTLDR}}所使用<tt>boot.ini</tt>。這些選單的內容是：
+* 透過呼叫<tt>winload.exe</tt>或<tt>winload.efi</tt>启动{{lang|en|Windows}}的選項。
+* 透過呼叫<tt>winresume.exe</tt>或<tt>winresume.efi</tt>使{{lang|en|Windows}}從休眠中啟動的選項。
+* 透過呼叫<tt>NTLDR</tt>来启动{{lang|en|Windows}}先前版本的選項。
+* 載入和執行一個[[分割區啟動紀錄|分割區啟動紀錄]]的選項。
+
+== {{lang|en|OS Loader}} ==
+=== winload.exe ===
+{{lang|en|Windows}}開機管理程式-{zh-hant:透過;zh-hans:通过;}-呼叫<tt>winload.exe</tt>程式（在[[UEFI|UEFI]]系統下則是<code>winload.efi</code>程式），作業系统的[[啟動程式|啟動程式]]来載入作業系統的核心（<tt>[[ntoskrnl.exe|ntoskrnl.exe]]</tt>）和基本系統應用程式。<tt>winload.exe</tt>是用來替代先前{{lang|en|Windows}}中[[NTLDR|NTLDR]]程式。
+
+=== winresume.exe ===
+当电脑从休眠模式恢复至正常模式时，<code>bootmgr</code>則调用<tt>winresume.exe</tt>。并使用与以往有别的启动模式和页面（Windows 7 系统则显示「正在恢复Windows」）以快速恢复系统先前並的工作进度。在UEFI系统中，應用程序套件名为<code>winresume.efi</code>，通常位于<code>\windows\system32</code> 。
+
+== 进阶启动 ==
+從[[Windows_Vista|Windows Vista]][[作业系统|作业系统]]開始，[[微软|微软]]公司引進的新一代開機管理程式，其内部囊括了众多[[进阶|进阶]]工具，以便用以[[除错|除错]]和解决[[系统|系统]]无法正常启动问题<ref>{{Cite web |url = https://support.microsoft.com/zh-tw/help/17419/windows-7-advanced-startup-options-safe-mode |title = 進階啟動選項 (包括安全模式) - Windows 說明 |publisher = [[微軟|微軟]] |access-date = 2019-03-15 |archive-date = 2020-04-06 |archive-url = https://web.archive.org/web/20200406031956/https://support.microsoft.com/zh-tw/help/17419/windows-7-advanced-startup-options-safe-mode }}</ref>。
+
+從[[Windows_8|Windows 8]]開始，由於Windows預設採用快速啟動（Fast Startup）技術，進階啟動選項預設被隱藏（但用户仍然可以手动开启進階啟動選項，效果和Windows 7完全相同{{注|只有在系统完全关闭的情况下，才能在下次开机时显示進階啟動選項。}}）。
+=== 工具 ===
+* 修復您的電腦
+啟動系統內建的Windows RE進階復原選項([[Windows_8|Windows 8]]或更新則出現選擇選項），系統會呼叫winre.wim內的[[Windows預先安裝環境|Windows PE]]，並顯示所有進階修復工具。
+*安全模式
+以[[安全模式|安全模式]]啟動系統，並加载系统必需组件和驱动程序。
+*安全模式 (含網路功能)
+以安全模式啟動系統，並加載存取網際網路或網路上其他電腦所需的網路驅動程式和服務。
+*安全模式 (含命令提示字元)
+以安全模式啟動系統，並運行於以往有別的[[命令提示字元|命令提示字元]]。
+*啟用開機記錄。 
+对系統进行测试并记录相关日志，日志文件名称为<code>ntbtlog.txt</code>
+*啟用低解析度視訊 (640×480)
+使用當前的[[視訊|視訊]]驅動程式及[[低解析度|低解析度]]和低重新[[整理頻率|整理頻率]]來啟動系統。
+*上次的正確設定(進階)
+使用上次正常[[登錄|登錄]]和[[驅動程式|驅動程式]]設定來啟動系統。
+*目錄服務還原模式
+啟動執行Active Directory的Windows網域控制站，以便還原目錄服務。
+*偵錯模式
+以進階疑難排解模式來啟動系統。
+*停用系統失敗時自動重新啟動
+禁止系統在遇到錯誤（包括[[蓝屏死机|蓝屏死机]]）時自動[[重啓|重啓]]動作。
+*停用驅動程式強制簽章。 
+允許用户使用並安裝具有不受信任或無簽章的[[驅動程式|驅動程式]]。
+*正常啟動 Windows
+以正常模式啟動系統。
+
+== 注释 ==
+{{NoteFoot}}
+{{-}}
+
+==引用==
+{{Reflist}}
+
+==参见==
+{{Refbegin}}
+*{{cite web |url=http://homepage.ntlworld.com./jonathan.deboynepollard/FGA/windows-nt-6-boot-process.html |title=The Windows NT 6 boot process |work=Frequently Given Answers |author=Jonathan de Boyne Pollard |deadurl=yes |archiveurl=https://web.archive.org/web/20121023051627/http://homepage.ntlworld.com/jonathan.deboynepollard/FGA/windows-nt-6-boot-process.html |archivedate=2012-10-23 |accessdate=2013-02-23 }}
+{{Refend}}
+
+{{Windows Components}}
+
+{{DEFAULTSORT:Windows Vista Startup Process}}
+[[Category:Windows_NT|Startup Process]]
+[[Category:引导|Category:引导]]
+[[Category:Windows组件|Category:Windows组件]]
+[[Category:引导程序|Category:引导程序]]

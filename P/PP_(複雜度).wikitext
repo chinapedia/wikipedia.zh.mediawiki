@@ -1,0 +1,94 @@
+在[[計算複雜度理論|計算複雜度理論]]內，'''PP'''是一個[[複雜度類|複雜度類]]，包含可以在[[多項式時間|多項式時間]]裡面以[[概率圖靈機|概率圖靈機]]解決，無論輸入如何錯誤率均小於1/2的[[決定型問題|決定型問題]]。'''PP'''這個縮寫即代表了概率多項式時間(probabilistic polynomial time)。這個複雜度類是由Gill於1977年定義<ref>J. Gill, "Computational complexity of probabilistic Turing machines." ''SIAM Journal on Computing'', 6 (4), pp. 675–695, 1977.</ref>。
+
+<!--If a decision problem is in '''PP''', then there is an algorithm for it that is allowed to flip coins and make random decisions. It is guaranteed to run in polynomial time. If the answer is YES, the algorithm will answer YES with probability more than 1/2. If the answer is NO, the algorithm will answer YES with probability less than or equal to 1/2. In more practical terms, it is the class of problems that can be solved to any fixed degree of accuracy by running a randomized, polynomial-time algorithm a sufficient (but bounded) number of times.
+
+An alternative characterization of '''PP''' is the set of problems that can be solved by a [[nondeterministic_Turing_machine|nondeterministic Turing machine]] in polynomial time where the acceptance condition is that a majority (more than half) of computation paths accept. Because of this some authors have suggested the alternative name ''Majority-P''.<ref>Lance Fortnow. Computational Complexity: Wednesday, September 4, 2002: Complexity Class of the Week: PP. http://weblog.fortnow.com/2002/09/complexity-class-of-week-pp.html</ref>
+
+==Definition==
+A language ''L'' is in '''PP''' if and only if there exists a probabilistic Turing machine ''M'', such that
+* ''M'' runs for polynomial time on all inputs
+* For all ''x'' in ''L'', ''M'' outputs 1 with probability strictly greater than 1/2
+* For all ''x'' not in ''L'', ''M'' outputs 1 with probability less than or equal to 1/2.
+
+Alternatively, '''PP''' can be defined using only deterministic Turing machines. A language ''L'' is in '''PP''' if and only if there exists a polynomial ''p'' and deterministic Turing machine ''M'', such that
+* ''M'' runs for polynomial time on all inputs
+* For all ''x'' in ''L'', the fraction of strings ''y'' of length ''p''(|''x''|) which satisfy ''M(x,y)'' = 1 is strictly greater than 1/2
+* For all ''x'' in not in ''L'', the fraction of strings ''y'' of length ''p''(|''x''|) which satisfy ''M(x,y)'' = 1 is less than or equal to 1/2.
+
+==PP vs BPP==
+'''[[Bounded-error_probabilistic_polynomial|BPP]]''' is a subset of '''PP'''; it can be seen as the subset for which there are efficient probabilistic algorithms. The distinction is in the error probability that is allowed: in '''BPP''', an algorithm must give correct answer (YES or NO) with probability exceeding some fixed constant ''c'' greater than 1/2, such as 2/3 or 501/1000. If this is the case, then we can run the algorithm a polynomial number of times and take a majority vote to achieve any desired probability of correctness less than 1, using the [[Chernoff_bound|Chernoff bound]]. This number of repeats increases if ''c'' becomes closer to 1/2, but it does not depend on the input size ''n''.
+
+The important thing is that this constant ''c'' is not allowed to depend on the input. On the other hand, a '''PP''' algorithm is permitted to do something like the following:
+* On a YES instance, output YES with probability 1/2 + 1/2<sup>''n''</sup>, where ''n'' is the length of the input.
+* On a NO instance, output YES with probability 1/2 - 1/2<sup>''n''</sup>.
+
+Because these two probabilities are so close together, especially for large ''n'', even if we run it a large number of times it is very difficult to tell whether we are operating on a YES instance or a NO instance. Attempting to achieve a fixed desired probability level using a majority vote and the Chernoff bound requires a number of repetitions that is exponential in ''n''.
+
+==PP compared to other complexity classes==
+
+'''PP''' contains '''BPP''', since probabilistic algorithms described in the definition of '''BPP''' form a subset of those in the definition of '''PP'''. 
+
+'''PP''' also contains '''[[NP_(complexity_class)|NP]]'''. To prove this, we show that the [[NP-complete|NP-complete]] [[Boolean_satisfiability_problem|satisfiability]] problem belongs to '''PP'''. Consider a probabilistic algorithm that, given a formula ''F''(''x''<sub>1</sub>, ''x''<sub>2</sub>, ..., ''x''<sub>''n''</sub>)'' chooses an assignment ''x''<sub>1</sub>, ''x''<sub>2</sub>, ..., ''x''<sub>''n''</sub> uniformly at random. Then, the algorithm checks if the assignment makes the formula ''F'' true. If yes, it outputs YES. Otherwise, it outputs YES with probability 1/2 and NO with probability 1/2.
+
+If the formula is unsatisfiable, the algorithm will always output YES with probability 1/2. If there exists a satisfying assignment, it will output YES with probability more than 1/2 (exactly 1/2 if it picked an unsatisfying assignment and 1 if it picked a satisfying assignment, averaging to some number greater than 1/2). Thus, this algorithm puts satisfiability in '''PP'''. As '''SAT''' is NP-complete, and we can prefix any deterministic [[polynomial-time_many-one_reduction|polynomial-time many-one reduction]] onto the '''PP''' algorithm, '''NP''' is contained in '''PP'''. Because '''PP''' is closed under complement, it also contains '''co-NP'''.
+
+'''PP''' also contains '''[[BQP|BQP]]''', the class of decision problems solvable by efficient polynomial time [[quantum_computer|quantum computer]]s. In fact, BQP is [[low_(complexity)|low]] for '''PP''', meaning that a '''PP''' machine achieves no benefit from being able to solve '''BQP''' problems instantly. The class of polynomial time on quantum computers with [[postselection|postselection]], '''[[PostBQP|PostBQP]]''', is equal to '''PP'''<ref name="PostBQP = PP">{{cite journal|last=Aaronson|first=Scott|date=2005|title=Quantum computing, postselection, and probabilistic polynomial-time|journal=Proceedings of the Royal Society A|volume=461|issue=2063|pages=3473–3482|doi=10.1098/rspa.2005.1546}}.  Preprint available at [http://arxiv.org/abs/quant-ph/0412187]</ref> (see [[#Quantum_computation_reformulation|#Quantum computation reformulation]] below).
+
+A polynomial time Turing machine with a PP [[oracle_machine|oracle]] ('''P<sup>PP</sup>''') can solve all problems in  '''[[PH_(complexity)|PH]]''', the entire [[polynomial_hierarchy|polynomial hierarchy]]. This result was shown by [[Seinosuke_Toda|Seinosuke Toda]] in 1989 and is known as [[Toda's_theorem|Toda's theorem]]. This is evidence of how hard it is to solve problems in '''PP'''. The class [[Sharp-P|#P]] is in some sense about as hard, since '''P'''<sup>'''#P'''</sup> = '''P<sup>PP</sup>'''and therefore '''P'''<sup>'''#P'''</sup> contains '''PH''' as well.
+
+'''PP''' strictly contains '''[[TC0|TC<sup>0</sup>]]''', the class of constant-depth, unbounded-fan-in [[boolean_circuit|boolean circuit]]s with [[majority_gate|majority gate]]s. (Allender 1996, as cited in Burtschick 1999).
+
+'''PP''' is contained in '''[[PSPACE|PSPACE]]'''. This can be easily shown by exhibiting a polynomial-space algorithm for '''MAJSAT''', defined below; simply try all assignments and count the number of satisfying ones.
+
+==Complete problems and other properties==
+Unlike '''BPP''', '''PP''' is a syntactic, rather than semantic class. Any polynomial-time probabilistic machine recognizes some language in '''PP'''. In contrast, given a description of a polynomial-time probabilistic machine, it is undecidable in general to determine if it recognizes a language in '''BPP'''. 
+
+'''PP''' has natural complete problems, for example, '''MAJSAT'''. '''MAJSAT''' is a decision problem in which one is given a Boolean formula F. The answer must be YES if more than half of all assignments ''x''<sub>1</sub>, ''x''<sub>2</sub>, ..., ''x''<sub>''n''</sub> make F true and NO otherwise.
+
+{{Anchor|complement}}
+===Proof that PP is closed under [[complement_(set_theory)|complement]]===
+Let ''L'' be a language in '''PP'''. Let <math>L^c</math> denote the complement of ''L''. By the definition of '''PP''' there is a polynomial-time probabilistic algorithm ''A'' with the property that <math>x \in L \Rightarrow \mathrm{Pr}[A\,\mathrm{accepts}\,x] > 1/2</math> and <math>x \not\in L \Rightarrow \mathrm{Pr}[A\,\mathrm{accepts}\,x] \le 1/2</math>. We claim that [[without_loss_of_generality|without loss of generality]], the latter inequality is always strict; once we do this the theorem can be proved as follows. Let <math>A^c</math> denote the machine which is the same as ''A'' except that <math>A^c</math> accepts when ''A'' would reject, and vice-versa. Then <math>x \in L^c \Rightarrow \mathrm{Pr}[A^c\,\mathrm{accepts}\,x] > 1/2</math> and <math>x \not\in L^c \Rightarrow \mathrm{Pr}[A^c\,\mathrm{accepts}\,x] < 1/2</math>, which implies that <math>L^c</math> is in '''PP'''.
+
+Now we justify our without loss of generality assumption. Let <math>f(|x|)</math> be the polynomial upper bound on the running time of ''A'' on input ''x''. Thus ''A'' makes at most <math>f(|x|)</math> random coin flips during its execution. In particular, <math>x \in L \Rightarrow \mathrm{Pr}[A\,\mathrm{accepts}\,x] \ge 1/2 + 1/2^{f(|x|)}</math> since the probability of acceptance is an integer multiple of <math>1/2^{f(|x|)}</math>. Define a machine ''A' '' as follows: on input ''x'', ''A' '' runs ''A'' as a subroutine, and rejects if ''A'' would reject; otherwise, if ''A'' would accept, ''A' '' flips <math>f(|x|)+1</math> coins and rejects if they are all heads, and accepts otherwise. Then 
+<math>x \not\in L \Rightarrow \mathrm{Pr}[A'\,\mathrm{accepts}\,x] \le 1/2 \cdot (1-1/2^{f(|x|)+1}) < 1/2</math>
+and <math>x \in L \Rightarrow \mathrm{Pr}[A'\,\mathrm{accepts}\,x] \ge (1/2+1/2^{f(|x|)})\cdot (1-1/2^{f(|x|)+1}) > 1/2</math>. This justifies the assumption (since ''A' '' is still a polynomial-time probabilistic algorithm) and completes the proof.
+
+David Russo proved in his 1985 Ph.D. thesis<ref>{{cite journal
+  | title = Structural Properties Of Complexity Classes
+  | publisher = University of California, Santa Barbara
+  | journal = Ph.D Thesis
+  | year = 1985
+  | author = David Russo}}</ref> that '''PP''' is closed under [[symmetric_difference|symmetric difference]]. It was an [[open_problem|open problem]] for 14 years whether '''PP''' was closed under [[union_(set_theory)|union]] and [[Intersection_(set_theory)|intersection]]; this was settled in the affirmative by Beigel, Reingold, and Spielman.<ref>R. Beigel, N. Reingold, and D. A. Spielman, "[http://citeseer.ist.psu.edu/152946.html PP is closed under intersection]", ''Proceedings of ACM Symposium on Theory of Computing 1991'', pp. 1–9, 1991.</ref> Alternate proofs were later given by Li<ref>{{cite journal 
+  | title = On the Counting Functions
+  | publisher = University of Chicago
+  | journal = Ph.D Thesis
+  | year = 1993
+  | author = Lide Li}}</ref> and Aaronson (see [[#Quantum_computation_reformulation|#Quantum computation reformulation]] below).
+
+==Other equivalent complexity classes==
+===PostBQP===
+The quantum complexity class '''[[BQP|BQP]]''' is the class of problems solvable in [[polynomial_time|polynomial time]] on a [[quantum_Turing_machine|quantum Turing machine]]. By adding [[postselection|postselection]], a larger class called '''[[PostBQP|PostBQP]]''' is obtained. Informally, postselection gives the computer the following power: whenever some event (such as measuring a qubit in a certain state) has nonzero probability, you are allowed to assume that it takes place.<ref>{{cite web|url=http://www.scottaaronson.com/talks/postselect.ppt|title=The Amazing Power of Postselection|last=Aaronson|first=Scott|accessdate=2009-07-27}}</ref> [[Scott_Aaronson|Scott Aaronson]] showed in 2004 that '''PostBQP''' is equal to '''PP'''.<ref name="PostBQP = PP"/><ref>{{cite web|url=http://weblog.fortnow.com/2004/01/complexity-class-of-week-pp-by-guest.html|title=Complexity Class of the Week: PP|last=Aaronson|first=Scott|date=2004-01-11|work=Computational Complexity Weblog|accessdate=2008-05-02}}</ref> This reformulation of '''PP''' makes it easier to show certain results, such as that '''PP''' is closed under intersection (and hence, under union), that '''BQP''' is [[low_(complexity)|low]] for '''PP''', and that '''[[QMA|QMA]]''' is contained in '''PP'''.
+
+===PQP===
+'''PP''' is also equal to another quantum complexity class known as '''PQP''', which is the unbounded error analog of '''BQP'''. It denotes the class of decision problems solvable by a quantum computer in polynomial time, with an error probability of less than 1/2 for all instances.
+-->
+== 相關條目 ==
+* [[PostBQP|PostBQP]]
+
+==註釋==
+{{reflist}}
+
+==參考資料==
+{{refbegin}}
+*{{Cite book|first=C.|last=Papadimitriou|authorlink=Christos Papadimitriou|title=Computational Complexity|chapter=chapter 11|publisher=Addison-Wesley|year=1994}}.
+*{{Cite book|first=E.|last=Allender|contribution=A note on uniform circuit lower bounds for the counting hierarchy|title=Proceedings 2nd International Computing and Combinatorics Conference (COCOON)|volume=1090|publisher=Springer-Verlag|series=Lecture Notes in Computer Science|pages=127–135|year=1996}}.
+*{{Cite journal | last1 = Burtschick | first1 = Hans-Jörg | first2 = Heribert | last2= Vollmer | title = Lindström Quantifiers and Leaf Language Definability | id={{ECCC|1996|96|005}}| year = 1999}}.
+{{refend}}
+
+==外部連結==
+*[https://complexityzoo.uwaterloo.ca/Complexity_Zoo:P#pp Complexity Zoo: PP]{{Wayback|url=https://complexityzoo.uwaterloo.ca/Complexity_Zoo:P#pp |date=20180119121055 }}
+
+{{複雜度類}}
+
+[[Category:概率複雜度類|Category:概率複雜度類]]
+[[Category:量子複雜度理論|Category:量子複雜度理論]]

@@ -1,0 +1,238 @@
+{{noteTA|G1=IT}}
+{{编程范式}}
+在[[计算机科学|计算机科学]]中，'''交-{}-談循序程式'''（{{lang-en|Communicating sequential processes}}，縮寫為CSP），又譯為'''通-{}-信顺序进程'''、'''交換訊息的循序程式'''，是一種[[形式語言|形式語言]]，用來描述[[并发性|並行性系統]]間進行互動的[[模式|模式]]<ref name="roscoe">{{cite book|first=A. W.|last=Roscoe|authorlink=Bill Roscoe|title=The Theory and Practice of Concurrency|publisher=[[Prentice_Hall|Prentice Hall]]|isbn=978-0-13-674409-2|year=1997|url=https://archive.org/details/theorypracticeof00rosc}}</ref>。它是叫做进程代数或[[进程演算|进程演算]]的关于[[并发计算|并发]]的数学理论家族的一员，基于了通过[[通道_(编程)|通道]]的[[消息传递|消息传递]]。CSP高度影響了[[Occam|Occam]]的設計<ref name="roscoe" /><ref>{{cite book|last=INMOS|authorlink=INMOS|url=http://www.wotug.org/occam/documentation/oc21refman.pdf|title=occam 2.1 Reference Manual|publisher=SGS-THOMSON Microelectronics Ltd.|date=1995-05-12|access-date=2020-05-03|archive-date=2020-08-01|archive-url=https://web.archive.org/web/20200801234838/http://www.wotug.org/occam/documentation/oc21refman.pdf|dead-url=no}}, INMOS document 72 occ 45 03</ref>，也影響了程式語言如[[Limbo_(程式语言)|Limbo]]<ref>{{cite web|title=Resources about threaded programming in the Bell Labs CSP style|url=http://swtch.com/~rsc/thread/|accessdate=2010-04-15|archive-date=2013-04-26|archive-url=https://web.archive.org/web/20130426081645/http://swtch.com/~rsc/thread/|dead-url=yes}}</ref>、{{en-link|RaftLib}}、[[Go|Go]]<ref name="golang">{{cite web |title=Language Design FAQ: Why build concurrency on the ideas of CSP? |url=http://golang.org/doc/go_faq.html#csp |accessdate=2020-05-03 |archive-date=2013-01-02 |archive-url=https://web.archive.org/web/20130102205822/http://golang.org/doc/go_faq.html#csp |dead-url=no }}</ref>、 {{en-link|Crystal (编程语言)|Crystal (programming language)|Crystal}}和[[Clojure|Clojure]]的core.async<ref name="clojure-core-async">{{cite web |title=Clojure core.async Channels |url=https://clojure.org/news/2013/06/28/clojure-clore-async-channels#_history |accessdate=2020-05-03 |archive-date=2019-07-05 |archive-url=https://web.archive.org/web/20190705174207/https://www.clojure.org/news/2013/06/28/clojure-clore-async-channels#_history |dead-url=no }}</ref>等。
+
+CSP最早出現於[[東尼·霍爾|東尼·霍爾]]在1978年發表的論文<ref name="hoare1978">{{cite journal
+|last=Hoare
+|first=C. A. R.
+|authorlink=C. A. R. Hoare
+|title=Communicating sequential processes
+|journal=[[Communications_of_the_ACM|Communications of the ACM]]
+|volume=21
+|issue=8
+|pages=666–677
+|year=1978
+|url=https://www.cs.cmu.edu/~crary/819-f09/Hoare78.pdf
+|doi=10.1145/359576.359585
+|access-date=2020-05-03
+|archive-date=2020-12-30
+|archive-url=https://web.archive.org/web/20201230025637/http://www.cs.cmu.edu/~crary/819-f09/Hoare78.pdf
+|dead-url=no
+}}</ref>，但在之後又經過一系列的改善<ref name="25years">{{cite book
+|last=Abdallah | first = Ali E.| last2 = Jones | first2 = Cliff B. | last3 = Sanders | first3 = Jeff W.
+|title=Communicating Sequential Processes: The First 25 Years
+|series=[[LNCS|LNCS]]
+|volume=3525
+|publisher=Springer
+|year=2005
+|url=https://www.springer.com/computer/theoretical+computer+science/foundations+of+computations/book/978-3-540-25813-1
+| isbn = 9783540258131}}</ref>。CSP已经实际的应用在工业之中，作为一种工具去{{en-link|形式规定|Formal specification|规定和验证}}各种不同系统的并发状况，比如T9000 [[晶體電腦|Transputer]]<ref name="barrett">{{cite journal|last=Barrett
+|first=G.
+|title=Model checking in practice: The T9000 Virtual Channel Processor
+|journal=IEEE Transactions on Software Engineering
+|volume=21
+|issue=2
+|pages=69–78
+|year=1995
+|doi=10.1109/32.345823}}</ref>，还有安全电子商务系统<ref name="hall">{{cite journal
+|last=Hall
+|first=A
+|first2=R.
+|last2=Chapman
+|url=http://www.anthonyhall.org/c_by_c_secure_system.pdf
+|title=Correctness by construction: Developing a commercial secure system
+|journal=IEEE Software
+|volume=19
+|issue=1
+|pages=18–25
+|year=2002
+|doi=10.1109/52.976937
+|access-date=2020-05-03
+|archive-date=2020-12-02
+|archive-url=https://web.archive.org/web/20201202131145/http://www.anthonyhall.org/c_by_c_secure_system.pdf
+|dead-url=no
+}}</ref>。CSP的理论自身仍是活跃研究的主题，包括了增加它的实际可应用性的范围（比如增大可以跟踪分析的系统的规模）<ref>{{Cite journal| last = Creese | first = S.|title=Data Independent Induction: CSP Model Checking of Arbitrary Sized Networks|version=D. Phil.|publisher=[[Oxford_University|Oxford University]]|year=2001}}</ref>。
+
+== 历史 ==
+在Hoare的1978年论文中提出的CSP版本在本质上不是一种[[进程演算|进程演算]]，而是一种[[并发计算|并发]][[编程语言|编程语言]]，它有四类命令：并行命令，赋值命令，输入和输出命令，交替（alternation）和重复命令。它有着与后来版本的CSP在实质上不同的[[语法|语法]]，不拥有数学上定义的语义<ref name="hoare">{{cite book|last=Hoare|first=C. A. R.|authorlink=C. A. R. Hoare|title=Communicating Sequential Processes|publisher=Prentice Hall|isbn=978-0-13-153289-2|year=1985}}</ref>，不能体现{{en-link|无界非确定性|unbounded nondeterminism}}<ref name="clinger1981">{{Cite journal| first = William | last = Clinger | authorlink = William Clinger (computer scientist) | title=Foundations of Actor Semantics|publisher=MIT|version=Mathematics Doctoral Dissertation|date=June 1981| hdl = 1721.1/6935 }}</ref>。最初的CSP程序被写为一组固定数目的顺序进程的并行复合（composition），它们相互之间严格通过同步消息传递来进行通信。与后来版本的CSP相对比，每个进程都被赋予了一个显式的名字，通过指定意图发送或接收的进程的名字，定义消息的来源和目标，没有采用等价的命名的[[通道_(编程)|通道]]方式。例如，定义进程：
+
+ COPY = *[c:character; west?c → east!c]
+
+它是重复的从叫作<code>west</code>的进程接收一个字符，再将这个字符发送到叫作<code>east</code>的进程。接着定义逐行读取[[打孔卡|打孔卡]]再输出字符[[串流|串流]]到叫作<code>X</code>的进程的<code>DISASSEMBLE</code>进程，和从叫作<code>X</code>的进程读取字符串流再逐行打印到[[行式打印机|行式打印机]]的<code>ASSEBLE</code>进程。并行复合：
+ [west::DISASSEMBLE || X::COPY || east::ASSEMBLE]
+
+它赋予名字<code>west</code>至<code>DISASSEMBLE</code>进程，名字<code>X</code>至<code>COPY</code>进程，名字<code>east</code>至<code>ASSEMBLE</code>进程，并发的执行这三个进程<ref name="hoare1978" />。
+
+在最初版本的CSP出版之后，Hoare、Stephen Brookes和[[Bill_Roscoe|A. W. Roscoe]]发展并精炼了CSP的理论，使之成为现代的[[进程代数|进程代数]]形式。将CSP发展成进程代数的方式受到[[Robin_Milner|Robin Milner]]关于{{en-link|通信系统演算|Calculus of Communicating Systems}}（CCS）的工作的影响，反之亦然。最初提出CSP的理论上的版本的是Brookes、Hoare和Roscoe的1984年的文章<ref>{{cite journal|first=Stephen|last=Brookes|author2-link=C. A. R. Hoare|first2=C. A. R.|last2=Hoare|author3-link=Bill Roscoe|author3-first=A. W.|author3-last=Roscoe|title=A Theory of Communicating Sequential Processes|journal=[[Journal_of_the_ACM|Journal of the ACM]]|volume=31|issue=3|pages=560–599|year=1984|url=https://dl.acm.org/doi/pdf/10.1145/828.833?download=true|doi=10.1145/828.833|access-date=2020-05-03|archive-date=2021-06-23|archive-url=https://web.archive.org/web/20210623100325/https://dl.acm.org/doi/pdf/10.1145/828.833?download=true}}</ref>，和后来Hoare的1985年出版的书籍《通信顺序进程》<ref name="hoare" />。CSP的理论在Hoare的书籍出版之后仍继续有细小的变更。这些变更大多由CSP进程分析和验证的自动工具的出现所推动。Roscoe在1997年出版的《并发的理论和实践》描述了更新版本的CSP<ref name="roscoe" />。
+
+== 非形式描述 ==
+如其名字所提示的那样，CSP允许依据构件进程来描述系统，它们独立运作，并只通过[[消息传递|消息传递]]通信来相互交互。但是CSP名字中“顺序”这个词有时导致误解，因为现代CSP允许构件进程被定义为二者：顺序进程和多个更原始的进程的并行复合。在不同进程之间的关系，和每个进程与它的环境通信的方式，是使用各种[[进程演算|进程代数]]算符（operator）描述的。使用这种代数方式，可以从原始元素轻易的构造出非常复杂的进程描述。
+
+=== 原语 ===
+CSP在它的进程代数中提供两类原语（primitive）：
+;事件
+:事件表示通信或交互。它们被假定为是不可分的和瞬时的。它们可以是原子名字（比如<code>on</code>、<code>off</code>），复合名字（比如<code>valve.open</code>、<code>valve.close</code>），输入/输出事件（比如<code>mouse?xy</code>、<code>screen!bitmap</code>）。
+;原始进程
+:原始进程表示基本的行为：例子包括<math>\mathrm{STOP}</math>（什么都不通信的进程，也叫作[[死锁|死锁]]）和<math>\mathrm{SKIP}</math>（它表示成功终止）。
+
+=== 代数算符 ===
+CSP有范围广泛的代数算符。主要的有：
+
+;前缀
+:前缀算符，将一个事件和一个进程结合起来产生一个新进程。例如：
+
+::<math>a \rightarrow P</math>
+
+:是想要与它的环境通信<math>a</math>的进程，而且在<math>a</math>之后，表现得如同进程<math>P</math>。
+
+;确定性选择
+:确定性（或外部）选择算符，允许将进程的将来演变定义为，在两个构件进程之间进行选择，并允许环境通过通信这两进程之一的初始事件，来解决这个选择。例如：
+
+::<math>\left(a \rightarrow P\right) \Box \left(b \rightarrow Q\right)</math>
+
+:是想要通信初始事件<math>a</math>和<math>b</math>的进程，并依据环境决定与之通信的是哪个初始事件，随后表现为要么<math>P</math>要么<math>Q</math>。如果<math>a</math>和<math>b</math>二者同时被通信，则选择将被非确定性的解决。
+
+;非确定性选择
+:非确定性（或内部）选择算子，允许将进程的将来演变定义为，在两个构件进程之间的选择，但是不允许环境对哪个构件进程将被选择的任何控制。例如：
+
+::<math>\left(a \rightarrow P\right) \sqcap \left(b \rightarrow Q\right)</math>
+
+:可以表现得如同要么<math>\left(a \rightarrow P\right)</math>要么<math>\left(b \rightarrow Q\right)</math>。它可以拒绝接受<math>a</math>或<math>b</math>，并只在环境提供了<math>a</math>和<math>b</math>二者时，被强制去通信。如果要选择的两边的初始事件是同一的，非确定性也可能被介入到确定性选择中。例如：
+
+::<math>\left(a \rightarrow a \rightarrow \mathrm{STOP}\right) \Box \left(a \rightarrow b \rightarrow \mathrm{STOP}\right)</math>
+
+:等价于
+
+::<math>a \rightarrow \left(\left(a \rightarrow \mathrm{STOP}\right) \sqcap \left(b \rightarrow \mathrm{STOP}\right)\right)</math>
+
+;交错
+:交错（interleaving）算符，代表完全独立的并发活动。进程：
+
+::<math>P \;\vert\vert\vert\; Q</math>
+
+:表现为<math>P</math>和<math>Q</math>二者同时。来自二者进程的事件在时间上是任意交错的。
+
+;接口并行
+:接口（interface）或广义（generalized）并行算符，代表并发活动要求在构件进程之间的同步：在接口集合中的任何事件，只能在所有进程都能应允（engage）这个事件的时候出现。例如，进程：
+
+::<math>P \left\vert\left[ \left\{ a \right\} \right]\right\vert Q</math>
+
+:要求<math>P</math>和<math>Q</math>必须在事件<math>a</math>可以发生前能够进行这个事件。例如，进程：
+
+::<math>\left(a \rightarrow P\right) \left\vert\left[ \left\{ a \right\} \right]\right\vert \left(a \rightarrow Q\right)</math>
+
+:可以应允事件<math>a</math>，而变成进程：
+
+::<math>P \left\vert\left[ \left\{ a \right\} \right]\right\vert Q</math>
+
+:然而
+
+::<math>\left (a \rightarrow P\right ) \left\vert\left[ \left\{ a, b \right\} \right]\right\vert \left(b \rightarrow Q\right)</math>
+
+:将会简单的死锁。
+
+;隐藏
+:隐藏算符，通过使某些事件不可察见，提供了一种抽象进程的方式。隐藏的一个平凡的例子是：
+
+::<math>\left(a \rightarrow P\right) \setminus \left\{ a \right\}</math>
+
+:假定事件<math>a</math>不出现在<math>P</math>中，它简单的归约成：
+
+::<math>P</math>
+
+=== 例子 ===
+一个原型的CSP例子是，一个巧克力售货机和它与一个想要买巧克力的人之间交互的抽象表示。这个售货机可以执行两个不同事件，<math>\mathrm{coin}</math>和<math>\mathrm{choc}</math>，分别表示插入硬币和投递巧克力。这个机器在提供巧克力之前想要货款（现金）可以写为：
+
+:<math>\mathrm{VendingMachine} = \mathrm{coin} \rightarrow \mathrm{choc} \rightarrow \mathrm{STOP}</math>
+
+一个人可以选择投币或刷卡支付可以建模为：
+
+:<math>\mathrm{Person} = (\mathrm{coin} \rightarrow \mathrm{STOP}) \Box (\mathrm{card} \rightarrow \mathrm{STOP})</math>
+
+这两个进程可以放置为并行，这样它们可以相互交互。这种复合进程的行为依赖于这两个进程必须同步于其上的那些事件。因此：
+
+:<math>\mathrm{VendingMachine} \left\vert\left[\left\{ \mathrm{coin}, \mathrm{card} \right\}\right]\right\vert \mathrm{Person} \equiv \mathrm{coin} \rightarrow \mathrm{choc} \rightarrow \mathrm{STOP}</math>
+
+然而如果同步只要求<math>coin</math>，我们会得到：
+
+:<math>\mathrm{VendingMachine} \left\vert\left[\left\{ \mathrm{coin} \right\}\right]\right\vert \mathrm{Person} \equiv \left (\mathrm{coin} \rightarrow \mathrm{choc} \rightarrow \mathrm{STOP}\right ) \Box \left (\mathrm{card} \rightarrow \mathrm{STOP}\right )</math>
+
+如果我们通过隐藏<math>coin</math>和<math>card</math>来抽象后者这个复合进程，也就是：
+
+:<math>\left (\left (\mathrm{coin} \rightarrow \mathrm{choc} \rightarrow \mathrm{STOP}\right ) \Box \left (\mathrm{card} \rightarrow \mathrm{STOP}\right )\right ) \setminus \left\{\mathrm{coin, card}\right\}</math>
+
+我们得到非确定性进程：
+
+:<math>\left (\mathrm{choc} \rightarrow \mathrm{STOP}\right ) \sqcap \mathrm{STOP}</math>
+
+这是一个要么提供<math>\mathrm{choc}</math>事件并接着停止，或者就地停止的进程。换句话说，如果我们把这个抽象当作对这个系统的外部查看（比如未看到这个人的做出如何决定的某个人），{{en-link|非确定性算法|Nondeterministic algorithm|非确定性}}就已经介入了。
+
+== 形式定义 ==
+=== 语法 ===
+CSP的语法定义了进程和事件可以组合的“合法”方式。设<math>e</math>是一个事件，<math>X</math>是一个事件集合。CSP的基本语法可以定义为：
+
+:<math>
+\begin{array}{lcll}
+{Proc} & ::= & \mathrm{STOP} & \; \\
+&|& \mathrm{SKIP} & \; \\
+&|& e \rightarrow {Proc} & (\text{prefixing})\\
+&|& {Proc} \;\Box\; {Proc} & (\text{external} \; \text{choice})\\
+&|& {Proc} \;\sqcap\; {Proc} & (\text{nondeterministic} \; \text{choice})\\
+&|& {Proc} \;\vert\vert\vert\; {Proc} & (\text{interleaving}) \\
+&|& {Proc} \;|[ \{ X \} ]| \;{Proc} & (\text{interface} \; \text{parallel})\\
+&|& {Proc} \setminus X & (\text{hiding})\\
+&|& {Proc} ; {Proc} & (\text{sequential} \; \text{composition})\\
+&|& \mathrm{if} \; b \; \mathrm{then} \; {Proc}\; \mathrm{else}\; Proc & (\text{boolean} \; \text{conditional})\\
+&|& {Proc} \;\triangleright\; {Proc} & (\text{timeout})\\
+&|& {Proc} \;\triangle\; {Proc} & (\text{interrupt})
+\end{array}
+</math>
+
+注意：为得到简要性，上述提供的语法省略了<math>\mathbf{div}</math>进程，它表示{{en-link|分歧 (计算机科学)|Divergence (computer science)|分岐}}，还有各种算符，比如字母化并行、管道、索引选择。
+
+== 有关的形式化 ==
+从经典无时序的CSP已经派生出一些其他的规定语言和形式化，包括：
+{{div col|2}}
+* Timed CSP<ref>[https://link.springer.com/chapter/10.1007/BFb0032011 Timed CSP] {{Wayback|url=https://link.springer.com/chapter/10.1007/BFb0032011 |date=20180612172125 }}</ref>，它结合了时序信息用于关于实时系统的推理。
+* Receptive Process Theory<ref>[https://dx.doi.org/10.1007/BF01178564 Receptive Process Theory]</ref>，专门化的CSP，假定了异步（就是{{en-link|非阻塞算法|Non-blocking algorithm|非阻塞}}）发送操作。
+* CSPP<ref>[https://web.archive.org/web/20110514085953/http://www.wotug.org/paperdb/show_pap.php?f=1&num=394 CSPP]</ref>
+* HCSP<ref>[https://web.archive.org/web/20110514085958/http://www.wotug.org/paperdb/show_pap.php?f=1&num=395 HCSP]</ref>
+* TCOZ<ref>[http://www.comp.nus.edu.sg/~dongjs/tcoz.html TCOZ]{{Wayback|url=http://www.comp.nus.edu.sg/~dongjs/tcoz.html |date=20110514234220 }}</ref>，集成有时序的CSP于{{en-link|对象Z|Object-Z}}。
+* Circus<ref name="#1">[http://www.cs.york.ac.uk/circus/ Circus]{{Wayback|url=http://www.cs.york.ac.uk/circus/ |date=20110514234221 }}</ref>，集成CSP和基于{{en-link|编程的统一理论|Unifying Theories of Programming}}的{{en-link|Z表示法|Z notation}}。
+* CML<ref>[http://www.compass-research.eu/approach.html CML] {{Wayback|url=http://www.compass-research.eu/approach.html |date=20200219205126 }}</ref>（COMPASS建模语言），合并了为{{en-link|多系统的系统|System of systems}}（SoS）开发的Circus<ref name="#1"/>和{{en-link|维也纳开发方法|Vienna Development Method|VDM}}。
+* CspCASL<ref>[https://web.archive.org/web/20110514234221/http://www.cs.swan.ac.uk/~csmarkus/Papers/cspcasl.ps CspCASL]</ref>，集成了CSP的{{en-link|公共代数规定语言|Common Algebraic Specification Language|CASL}}扩展。
+* {{en-link|时态次序规定语言|Language Of Temporal Ordering Specification|LOTOS}}，结合了CSP与{{en-link|通信系统演算|Calculus of Communicating Systems|CCS}}特征的国际标准<ref>{{en-link|时态次序规定语言|Language Of Temporal Ordering Specification|ISO 8807，时态次序规定语言}}</ref>。
+{{div col end}}
+
+==参见==
+{{div col|2}}
+* {{en-link|跟踪理论|Trace theory}}，跟踪的一般性理论。
+* {{en-link|跟踪幺半群|Trace monoid}}和{{en-link|历史幺半群|history monoid}}
+* {{en-link|Ease (编程语言)|Ease (programming language)|Ease}}
+* [[XC_(编程语言)|XC]]
+* [[VerilogCSP|VerilogCSP]]，向[[Verilog_HDL|Verilog HDL]]增加的一组[[宏|宏]]，用来支持通信顺序进程通道通信。
+* {{en-link|Joyce (编程语言)|Joyce (programming language)|Joyce}}，是[[Brinch_Hansen|Brinch Hansen]]在大约1989年开发的基于CSP原理的编程语言。
+* {{en-link|SuperPascal}}，是[[Brinch_Hansen|Brinch Hansen]]开发的编程语言，受到CSP和他早期创作的Joyce的影响。
+* [[Ada|Ada]]，实现了CSP特征比如约会。
+* [[DirectShow|DirectShow]]，是[[DirectX|DirectX]]内的视频框架，它使用了CSP概念来实现音频和视频过滤器。
+* {{en-link|OpenComRTOS}}，是正式开发的网络为中心分布式[[RTOS|RTOS]]，基于了CSP的务实超集。
+* {{en-link|输入/输出自动机|Input/output automaton}}
+* [[并行编程模型|并行编程模型]]
+{{div col end}}
+
+== 延伸阅读 ==
+* {{cite book |last=Hoare |first=C. A. R. |authorlink=C. A. R. Hoare |title=Communicating Sequential Processes |origyear=1985 |year=2004 |publisher=Prentice Hall International |url=http://www.usingcsp.com/ |isbn=978-0-13-153271-7 |access-date=2011-08-13 |archive-date=2021-02-01 |archive-url=https://web.archive.org/web/20210201151713/http://usingcsp.com/ |dead-url=no }}
+** 本书已经被{{en-link|牛津大学计算实验室|Department of Computer Science, University of Oxford}}的{{en-link|Jim Davies|Jim Davies (computer scientist)|Jim Davies}}更新，新版可以于网站Using CSP<ref>[http://www.usingcsp.com/ Using CSP] {{Wayback|url=http://www.usingcsp.com/ |date=20210201151713 }}</ref>自由的下载获取为PDF文件。应用了版权限制，下载前参看页面文本。
+* {{cite book|first=A. W.|last=Roscoe|authorlink=Bill Roscoe|title=The Theory and Practice of Concurrency|publisher=[[Prentice_Hall|Prentice Hall]]|isbn=978-0-13-674409-2|year=1997|url=https://dl.acm.org/doi/book/10.5555/550448|access-date=2022-01-18|archive-date=2022-01-18|archive-url=https://web.archive.org/web/20220118024336/https://dl.acm.org/doi/book/10.5555/550448}}
+** 一些与本书有关的链接可见于网站<ref>[http://web.comlab.ox.ac.uk/oucl/publications/books/concurrency/ The Theory and Practice of Concurrency] {{Wayback|url=http://web.comlab.ox.ac.uk/oucl/publications/books/concurrency/ |date=20071010053714 }}</ref>。全文可从Bill Roscoe的学术出版列表<ref>{{Cite web |url=http://www.cs.ox.ac.uk/people/publications/personal/Bill.Roscoe.html |title=Bill Roscoe : Publications |access-date=2022-04-05 |archive-date=2022-02-18 |archive-url=https://web.archive.org/web/20220218231052/http://www.cs.ox.ac.uk/people/publications/personal/Bill.Roscoe.html }}</ref>下载获取为PS<ref>[http://web.comlab.ox.ac.uk/oucl/work/bill.roscoe/publications/68b.ps PS] {{Wayback|url=http://web.comlab.ox.ac.uk/oucl/work/bill.roscoe/publications/68b.ps |date=20070824043949 }}</ref>或PDF<ref>[http://web.comlab.ox.ac.uk/oucl/work/bill.roscoe/publications/68b.pdf PDF] {{Wayback|url=http://web.comlab.ox.ac.uk/oucl/work/bill.roscoe/publications/68b.pdf |date=20071129164828 }}</ref>文件。
+
+==引用==
+{{reflist|2}}
+
+== 外部链接 ==
+* [http://www.wotug.org/ WoTUG] {{Wayback|url=http://www.wotug.org/ |date=20201124224644 }}, CSP和occam风格系统的用户组，包含了关于CSP和有用链接的一些信息。
+
+{{DEFAULTSORT:CSP}}
+
+[[Category:并发计算|Category:并发计算]]
+[[Category:进程演算|Category:进程演算]]

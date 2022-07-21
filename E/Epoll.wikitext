@@ -1,0 +1,62 @@
+{{Lowercase}}
+{{noteTA
+|G1 = IT
+|1 = zh:描述子; zh-cn:描述符; zh-tw:描述子;
+|2 = zh:内核; zh-cn:内核; zh-tw:核心;
+}}
+'''<code>epoll</code>'''是[[Linux|Linux]]核心的可擴展I/O事件通知機制<ref>{{cite web |url=http://www.kernel.org/doc/man-pages/online/pages/man4/epoll.4.html |title=存档副本 |accessdate=2012-03-08 |deadurl=yes |archiveurl=https://web.archive.org/web/20080225110826/http://www.kernel.org/doc/man-pages/online/pages/man4/epoll.4.html |archivedate=2008-02-25 }}</ref>。於Linux 2.5.44首度登場，它設計目的旨在取代既有[[POSIX|POSIX]] [[Select_(Unix)|<code>select(2)</code>]]與<code>poll(2)</code>[[系统调用|系統函式]]，讓需要大量操作[[檔案描述子|檔案描述子]]的程式得以發揮更優異的性能（舉例來說：舊有的系統函式所花費的時間複雜度為O(n)，<code>epoll</code>的時間複雜度O(log n)）。epoll 实现的功能与 poll 类似，都是监听多个文件描述符上的事件。
+
+<code>epoll</code>與[[FreeBSD|FreeBSD]]的[[Kqueue|<code>kqueue</code>]]類似，底層都是由可組態的作業系統核心物件建構而成，並以檔案描述符(file descriptor)的形式呈現於[[使用者空間|使用者空間]]。<code>epoll</code> 通過使用[[红黑树|紅黑樹]](RB-tree)搜索被監視的檔案描述符(file descriptor)。
+
+在 epoll 实例上注册事件时，epoll 会将该事件添加到 epoll 实例的红黑树上并注册一个回调函数，当事件发生时会将事件添加到就绪链表中。
+
+==程式介面==
+<syntaxhighlight lang="c">int epoll_create(int size);</syntaxhighlight> 
+在內核中創建<code>epoll</code>實例並返回一個<code>epoll</code>文件描述子。
+在最初的实现中，调用者通过 <code>size</code> 参数告知内核需要监听的文件描述符数量。如果监听的文件描述符数量超过 size, 则内核会自动扩容。而现在 size 已经没有这种语义了，但是调用者调用时 size 依然必须大于 0，以保证后向兼容性。
+<syntaxhighlight lang="c">int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);</syntaxhighlight>
+向 epfd 对应的內核<code>epoll</code> 实例添加、修改或刪除對 fd 上事件 event 的監聽。op 可以為 <code>EPOLL_CTL_ADD</code>, <code>EPOLL_CTL_MOD</code>, <code>EPOLL_CTL_DEL</code> 分別對應的是添加新的事件，修改文件描述符上监听的事件类型，从实例上删除一个事件。如果 event 的 events 属性设置了 <code>EPOLLET</code> flag，那么监听该事件的方式是边缘触发。
+<syntaxhighlight lang="c">int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout);</syntaxhighlight>
+當 timeout 為 0 時，epoll_wait 永遠會立即返回。而 timeout 為 -1 時，epoll_wait 會一直阻塞直到任一已注册的事件变为就绪。當 timeout 為一正整數時，epoll 會阻塞直到計時 timeout 毫秒終了或已註冊的事件变为就绪。因为内核调度延迟，阻塞的时间可能会略微超过 timeout 毫秒。
+
+==觸發模式==
+<code>epoll</code>提供[[中断#边沿触发|边沿触发]]及[[中断#状态触发|状态触发]]模式。在边沿触发模式中，<code>epoll_wait</code>僅會在新的事件首次被加入<code>epoll</code>队列時返回；於level-triggered模式下，<code>epoll_wait</code>在事件狀態未變更前將不斷被觸發。狀態觸發模式是默認的模式。
+
+狀態觸發模式與邊沿觸發模式有讀和寫兩種情況，我們先來考慮讀的情況。假設我們註冊了一個讀事件到<code>epoll</code>實例上，<code>epoll</code>實例會通過<code>epoll_wait</code>返回值的形式通知我們哪些讀事件已经就緒。簡單地來說，在狀態觸發模式下，如果讀事件未被處理，該事件對應的內核讀緩衝區非空，則每次調用 <code>epoll_wait</code> 時返回的事件列表都會包含該事件。直到該事件對應的內核讀緩衝區為空為止。而在邊沿觸發模式下，讀事件就緒後只會通知一次，不會反復通知。
+
+然後我們再考慮寫的情況。水平觸發模式下，只要文件描述符對應的內核寫緩衝區未滿，就會一直通知可寫事件。而在邊沿觸發模式下，內核寫緩衝區由滿變為未滿後，只會通知一次可寫事件。
+
+舉例來說，倘若有一個已經於<code>epoll</code>註冊之[[Anonymous_pipe|管線]]接獲資料，<code>epoll_wait</code>將返回，並發出資料讀取的信號。現假設緩衝區的資料僅有部份被讀取並處理，在level-triggered模式下，任何對<code>epoll_wait</code>之呼叫都將即刻返回，直到緩衝區中的資料全部被讀取；然而，在edge-triggered的情境下，<code>epoll_wait</code>僅會於再次接收到新資料(亦即，新資料被寫入管線)時返回。
+
+===边沿触发模式===
+
+邊沿觸發模式使得程序有可能在用戶態緩存 IO 狀態。nginx 使用的是邊沿觸發模式。
+
+文件描述符有两种情况是推荐使用边沿触发模式的。
+
+# read 或者 write 系统调用返回了 EAGAIN。
+# 非阻塞的文件描述符。
+
+可能的缺陷：
+
+# 如果 IO 空间很大，你要花很多时间才能把它一次读完，这可能会导致饥饿。举个例子，假设你在监听一个文件描述符列表，而某个文件描述符上有大量的输入（不间断的输入流），那么你在读完它的过程中就没空处理其他就绪的文件描述符。（因为边沿触发模式只会通知一次可读事件，所以你往往会想一次把它读完。）一种解决方案是，程序维护一个就绪队列，当 <code>epoll</code> 实例通知某文件描述符就绪时将它在就绪队列数据结构中标记为就绪，这样程序就会记得哪些文件描述符等待处理。Round-Robin 循环处理就绪队列中就绪的文件描述符即可。
+# 如果你缓存了所有事件，那么一种可能的情况是 A 事件的发生让程序关闭了另一个文件描述符 B。但是内核的 <code>epoll</code> 实例并不知道这件事，需要你从 <code>epoll</code> 删除掉。
+
+==相關條目==
+* [[kqueue|kqueue]]
+* [[libevent|libevent]]
+* [[IOCP|I/O Completion Ports]]
+
+==參考資料==
+{{Reflist}}
+
+==外部連結==
+* [https://web.archive.org/web/20111116155750/https://banu.com/blog/2/how-to-use-epoll-a-complete-example-in-c/ How to use epoll? A complete example in C]
+* [http://www.cppentry.com/bencandy.php?fid-56-id-1083-page-1.htm/ ET or LT ]{{Wayback|url=http://www.cppentry.com/bencandy.php?fid-56-id-1083-page-1.htm%2F |date=20160304120848 }}
+* [http://www.xmailserver.org/linux-patches/nio-improve.html epoll patch]{{Wayback|url=http://www.xmailserver.org/linux-patches/nio-improve.html |date=20120306144954 }}
+
+{{Linux内核}}
+
+[[Category:Linux内核功能|Category:Linux内核功能]]
+[[Category:输入/输出|Category:输入/输出]]
+[[Category:排程|Category:排程]]

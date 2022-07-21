@@ -1,0 +1,115 @@
+{{Unreferenced|time=2019-02-21T18:08:20+00:00}}
+{{noteTA|G1=IT}}
+'''DOT語言'''是一種文本[[图|图形]]描述语言。它提供了一种简单的描述图形的方法，并且可以为人类和[[计算机|计算机]]程序所理解。DOT语言文件通常是具有''.gv''或是''.dot''的[[文件扩展名|文件扩展名]]。
+
+很多程序都可以处理DOT文件。其中的一些，例如''dot''，''neato''，''twopi''，''circo'', ''fdp''与''sfdp''，会读取DOT文件并将之渲染成为图形格式。其它的一些，比如''gvpr''，''gc''，''accyclic''，''ccomps''，''sccmap''和''tred''，可以读取DOT文件并对它代表的图形进行一些处理。类似于''GVedit''，''lefty''，''dotty''和''grappa''则提供了交互式的界面。以上程序大部分都包括在了[[Graphviz|Graphviz]]软件包中。
+
+== 语法 ==
+=== 图形类别 ===
+==== 无向图 ====
+[[Image:DotLanguageUndirected.svg|right]]
+在最简单的应用中，DOT语言可以用来描述一张[[图_(数学)#有/无_向图|无向图]]。无向图显示了对象间最简单的关系，例如人之间的友谊。使用关键字''graph''开始一张无向图的定义，并用大括号包含要描述的节点，双连字号（--）被用来描述节点间的关系。另外，一行的末尾需要加上分号（;）。
+<syntaxhighlight lang="mscgen">  graph graphname {
+     a -- b -- c;
+     b -- d;
+ }
+</syntaxhighlight>
+
+==== 有向图 ====
+[[Image:DotLanguageDirected.svg|right]]
+类似于无向图，DOT语言也可以用来描述一张[[图_(数学)#有/无_向图|有向图]]，类似于[[流程图|流程图]]和[[树_(图论)|树状图]]。其语法与无向图相似，但要在图的最开始使用关键字'digraph'，并用箭头（->）表示节点直接的关系。
+<syntaxhighlight lang="mscgen">
+ digraph graphname {
+    a -> b -> c;
+    b -> d;
+}
+</syntaxhighlight>
+
+=== 属性 ===
+[[Image:DotLanguageAttributes.svg|right]]
+DOT语言中，可以对节点和边添加不同的属性。这些属性可以控制节点和边的显示样式，例如颜色，形状和线形。可以在语句和句尾的分号间放置一对方括号，并在其中中放置一个或多个[[键-值对|属性-值对]]。多个属性可以被逗号和空格（, ）分开。节点的属性被放置在只包含节点名称的表达式后。
+<syntaxhighlight lang="mscgen">
+ graph graphname {
+     // label属性可以改变节点的显示名称
+     a [label="Foo"];
+     // 节点形状被改变了
+     b [shape=box];
+     // a-b边和b-c边有相同的属性
+     a -- b -- c [color=blue];
+     b -- d [style=dotted];
+ }
+</syntaxhighlight>
+
+=== 注释 ===
+DOT语言支持[[C语言|C语言]]与[[C++|C++]]风格的单行与多行[[注释_(计算机语言)|注释]]。另外，也支持[[Shell脚本|Shell脚本]]风格的以#开头的注释。
+<syntaxhighlight lang="mscgen">
+ // 单行注释
+ /* 多行
+    注
+    释 */
+ # 如此的行也会被忽略。
+</syntaxhighlight>
+
+== 一个简单的例子 ==
+以下是一个描述了[[乙烷|乙烷]]化学键结构的示例脚本。这是一个无向图，包括了上述解释的节点属性。
+<syntaxhighlight lang="mscgen">
+ graph ethane {
+     C_0 -- H_0 [type=s];
+     C_0 -- H_1 [type=s];
+     C_0 -- H_2 [type=s];
+     C_0 -- C_1 [type=s];
+     C_1 -- H_3 [type=s];
+     C_1 -- H_4 [type=s];
+     C_1 -- H_5 [type=s];
+ }
+</syntaxhighlight>
+
+== 支持的程序 ==
+DOT语言定义了图，但没有提供渲染图的工具。这里列出了一些可以用来渲染，查看与修改DOT图的程序：
+* [[Graphviz|Graphviz]] - 一组用来修改和渲染图的软件库和程序。
+* [[OmniGraffle|OmniGraffle]] 可以导入DOT语言的一个子集，生成一个可编辑的文档，但转换结果不能被导出成为DOT文件。
+
+== 限制 ==
+[[image:Commutative_diagram_bad.svg|thumb]]
+可以用DOT定义图形的位置细节，虽然不是所有实现了DOT语言的工具都可以适当的处理位置属性。因此，取决于所使用的工具，用户必须依赖于自动布局算法（可能造成非预期的输出）或者繁琐的手工布局节点属性。
+
+例如：
+<syntaxhighlight lang="mscgen">
+digraph g {
+	node [shape=plaintext]
+	A1 -> B1
+	A2 -> B2
+	A3 -> B3
+	
+	A1 -> A2 [label=f]
+	A2 -> A3 [label=g]
+	B2 -> B3 [label="g'"]
+	B1 -> B3 [label="(g o f)'" tailport=s headport=s]
+
+	{ rank=same; A1 A2 A3 }
+	{ rank=same; B1 B2 B3 } 
+}
+</syntaxhighlight>
+[[image:commutative_diagram_fixed.svg|thumb]]
+上图有两个问题。右边的方形不是完美的[[正方形|正方形]]，而且标签''(g o f)''的位置有问题。
+
+这些问题可以用[[Inkscape|Inkscape]]或其它的[[SVG|SVG]]编辑器修正。在某些情况下，也可以利用''pos''属性定义位置来修正这样的问题。
+
+== 参见 ==
+* [[Graphviz|Graphviz]]
+* [[图|图]]
+* [[lisp2dot|lisp2dot]] 将类似[[Lisp|Lisp]]的程序树转换成DOT语言，可以用于[[遗传编程|遗传编程]]。
+
+== 外部链接 ==
+* [http://www.graphviz.org/documentation/ DOT语言入门和特性]{{Wayback|url=http://www.graphviz.org/documentation/ |date=20200319071308 }}
+* [http://www.graphviz.org/gallery/ 示例画廊]{{Wayback|url=http://www.graphviz.org/gallery/ |date=20200314081239 }}
+* [http://bloodgate.com/graph-demo 图形示范]{{Wayback|url=http://bloodgate.com/graph-demo |date=20100822004104 }}
+* [http://www.boost.org/libs/graph/doc/index.html Boost Graph Library]{{Wayback|url=http://www.boost.org/libs/graph/doc/index.html |date=20081202234015 }}
+* [https://web.archive.org/web/20101012210307/http://www2.research.att.com/~john/Grappa/ Grappa Drawing Package]
+* [https://web.archive.org/web/20100420000948/http://graph.gafol.net/ 在线SVG, PNG, GIF, JPG图形发布器]
+
+[[Category:数学软件|Category:数学软件]]
+[[Category:图形描述语言|Category:图形描述语言]]
+[[Category:计算机语言|Category:计算机语言]]
+[[Category:计算机语言列表|Category:计算机语言列表]]
+[[Category:计算机程序库|Category:计算机程序库]]

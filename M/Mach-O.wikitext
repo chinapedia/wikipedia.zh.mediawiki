@@ -1,0 +1,63 @@
+{{NoteTA
+| G1 = IT
+| 1 = zh-cn:可执行文件;zh-tw:可執行檔;
+| 2 = zh-cn:二进制文件;zh-tw:二進位檔案;
+| 3 = zh-tw:檔案;zh-cn:文件;
+| 4 = zh-tw:資訊;zh-cn:信息;
+| 5 = zh-tw:作業系統;zh-cn:操作系统;
+| 6 = zh-tw:程式碼;zh-cn:代码;
+| 7 = zh-tw:位元;zh-cn:位;
+| 8 = zh-tw:連結器;zh-cn:连接器;
+| 9 = zh-cn:动态库;zh-tw:動態函式庫;
+}}
+{{Infobox file format
+| name = Mach-O
+| icon = [[Image:ExecutableBinaryIcon.png|128px]]
+| extension = 无, <tt>.o</tt>, <tt>.dylib</tt>
+| mime = 
+| type code = 
+| uniform type = com.apple.mach-o-binary
+| owner = [[卡内基梅隆大学|卡内基梅隆大学]]/[[蘋果公司|蘋果公司]]
+| genre = [[二进制文件|二进制文件]]，[[可执行文件|可执行文件]]，[[目标代码|目标代码]]，[[函式庫|-{zh-cn:动态库;zh-tw:動態函式庫}-]]，[[核心文件|内核转储]]
+| container for = [[ARM|ARM]]，[[SPARC|SPARC]]，[[PA-RISC|PA-RISC]]，[[PowerPC|PowerPC]]以及[[x86|x86]]的[[可执行文件|可执行文件]]，内存转储
+| contained by = 
+| extended from = 
+| extended to = 
+| standard = 
+}}
+
+
+'''Mach-O'''为'''[[Mach|Mach]]''' [[目标文件|'''O'''bject]]文件格式的[[缩写|缩写]]，它是一种用于[[可执行文件|可執行檔]]，[[目标代码|目标代码]]，[[函式庫|-{zh-cn:动态库;zh-tw:動態函式庫}-]]，[[核心文件|内核转储]]的檔案格式。作为[[a.out|a.out]]格式的替代者，Mach-O提供了更强的扩展性，并提升了[[符号表|符号表]]中資訊的-{zh-hans:访问;zh-hant:存取}-速度。
+
+Mach-O曾经为大部分基于[[Mach|Mach]]核心的作業系統所使用。[[NeXTSTEP|NeXTSTEP]]，[[Apple_Darwin|Darwin]]和[[Mac_OS_X|Mac OS X]]等系统使用这种格式作为其原生可執行檔，-{zh-hans:库;zh-hant:函式庫}-和目标代码的格式。而同样使用[[GNU_Mach|GNU Mach]]作为其[[微核心|微内核]]的[[GNU_Hurd|GNU Hurd]]系统则使用[[可執行與可鏈接格式|ELF]]而非Mach-O作为其标准的二进制檔案格式。
+
+== Mach-O文件结构 ==
+每个Mach-O檔案包括一个Mach-O-{zh-hans:头;zh-hant:標頭}-，然后是一系列的载入命令，再是一个或多个'''區塊'''，每个块包括0到255个'''段'''。Mach-O使用REL再-{定位}-格式控制对符号的引用。Mach-O在两级命名空间中将每个符号编码成“对象-符号名”对，在查找符号时则采用线性搜索法。
+
+Mach-O的基本结构，引用了檔案中数据页的变长「載入指令」表，也用于[[Accent|Accent]]核心的可执行檔格式中，而这种格式则是基于来自[[Spice_Lisp|Spice Lisp]]的理念。
+
+== 多重架构二进制 ==
+在[[NeXTSTEP|NeXTSTEP]]，[[OPENSTEP|OPENSTEP]]和[[Mac_OS_X|Mac OS X]]中，可以将多个Mach-O檔案组合进一个[[胖二进制|多重架构二进制]]檔案中，以用一个单独的二进制檔案-{zh-hans:支持;zh-hant:支援}-多种架构的指令集。例如，一个Mac OS X中的多重架构二进制可以包含[[32位|32位元]]和[[64位|64位元]]的[[PowerPC|PowerPC]]程式碼，或PowerPC和[[x86|x86]]的32位元程式碼，甚至包含32位元的PowerPC程式碼，64位元PowerPC程式碼，32位元x86程式碼和64位元x86（AMD64）。
+
+== Mach-O的未来 ==
+由于[[Apple_Darwin|Darwin 10.0]]（对应[[Mac_OS_X_10.6|Mac OS X 10.6]]）中对Mach-O-{zh-hans:文件;zh-hant:檔案}-的结构定义进行了一些重要的修改，因此在Mac OS X 10.6中以-{zh-hans:默认;zh-hant:預設}-选项编译的二进制-{zh-hans:文件;zh-hant:檔案}-只能在10.6平台中运行。其差异之一在于Mac OS X的连接器（<code>[[dyld|dyld]]</code>）产生的载入命令无法为早期版本的Mac OS X所理解。另外一个重要改变是Link Edit表（__LINKEDIT段）的作用。在10.6中，新的Link Edit表中的无用資訊会被去除，从而起到压缩的作用，而Mac OS X 10.5及以前的版本无法识别这种新格式。为解决这个问题，在-{zh-cn:连接;zh-tw:連結}-时常常需要使用<code>-mmacosx-version-min=</code>连接器标志。苹果公司作为Mach-O格式的维护者，推荐开发者在建立二进制-{zh-hans:应用程序;zh-hant:應用程式}-的时候使用与其所用的對應SDK版本标志。
+
+==参见==
+* [[胖二进制|胖二进制]]
+* [[通用二进制|通用二进制]]
+* [[Xcode|Xcode]]
+
+==外部链接==
+*[https://web.archive.org/web/20090819232456/http://developer.apple.com/documentation/DeveloperTools/Conceptual/MachORuntime/index.html Mach-O File Format Reference] (Apple Inc.)
+*[https://archive.is/20091227035309/http://channelu.com/NeXT/NeXTStep/3.3/nd/DevTools/14_MachO/MachO.htmld/index.html Mach Object Files]
+*[http://www.fileinfo.com/extension/dylib Mach-O Dynamic Library Reference] {{Wayback|url=http://www.fileinfo.com/extension/dylib |date=20190626141209 }}
+*[http://developer.apple.com/documentation/Darwin/Reference/ManPages/man5/Mach-O.5.html Mach-O Manual Page] {{Wayback|url=http://developer.apple.com/documentation/Darwin/Reference/ManPages/man5/Mach-O.5.html |date=20090809123823 }}
+*[http://sourceforge.net/projects/machoview Mach-O Viewer] {{Wayback|url=http://sourceforge.net/projects/machoview |date=20201105054250 }}
+
+{{Executables}}
+{{OS X}}
+
+[[Category:MacOS開發|Category:MacOS開發]]
+[[Category:NeXT|Category:NeXT]]
+[[Category:Mach|Category:Mach]]
+[[Category:可执行文件格式|Category:可执行文件格式]]

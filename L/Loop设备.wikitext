@@ -1,0 +1,86 @@
+{{noteTA|G1=IT}}
+'''/dev/loop'''（或称'''vnd''' (vnode disk)、'''lofi'''（循环文件接口））在[[类Unix系统|类Unix系统]]中是一种[[设备文件系统|伪设备]]，这种设备使得[[计算机文件|文件]]可以如同[[设备文件系统|块设备]]一般被访问。
+
+在使用之前，循环设备必须与现存文件系统上的文件相关联。这种关联将提供给用户一个[[应用程序接口|应用程序接口]]，接口将允许文件视为块特殊文件（参见[[设备文件系统|设备文件系统]]）使用。因此，如果文件中包含一个完整的[[文件系统|文件系统]]，那么这个文件就能如同磁盘设备一般被[[挂载|挂载]]。
+
+这种设备文件经常被用于光碟或是磁盘镜像。通过[[循环挂载|循环挂载]]来挂载包含文件系统的文件，便使处在这个文件系统中的文件得以被访问。这些文件将出现在[[挂载点|挂载点]]目录。如果挂载目录中本身有文件，这些文件在挂载后将被禁止使用。
+
+一个循环设备或许能允许在重定向过程中进行一些数据处理。例如，设备可能是一个被加密文件的解密形式。在这种情况下，与循环设备相关的文件可能是另一种伪设备。当设备包含加密文件系统时，这种数据处理十分有用。如果数据处理得到支持且原文件被加密，循环设备将是此加密文件的解密形式并且设备可以如同普通文件系统一般被挂载。
+
+== 循环挂载的使用 ==
+
+在挂载了含有文件系统的文件之后，存储于该文件系统中的文件不需要特殊函数的支持便可以被常规的文件系统接口或是系统访问。例如在应用程序中读写光盘镜像文件。
+
+应用包括管理与编辑文件系统镜像以提供日后使用（尤其是CD、DVD镜像或是安装系统）或是在实际应用中永久隔离一些数据（例如在可移动媒体上模拟一个更快，更方便的硬盘或封装加密的文件系统）。
+
+循环设备提供了在单个文件中安装操作系统一种便捷方法，使得安装操作系统不必为磁盘驱动器重新分区。
+
+== 可用性 ==
+在各种操作系统中循环设备的命名存在着一些混乱。各种类Unix操作系统中，功能性的循环设备被以不同的名字命名。
+
+在Linux中，设备名按照相应设备驱动程序的符号表项进行命名。这些设备被叫做“loop”设备，设备节点通常命名为<tt>/dev/loop0</tt>, <tt>/dev/loop1</tt>之类。
+静态设备目录可以用[[makedev|makedev]]脚本创建，或者动态地由设备文件系统([[udev|udev]])设施创建。 循环设备的管理界面是 <tt>losetup</tt>，这是[[util-linux|util-linux]]软件包的一部分。
+
+有时，循环设备被错误地认为是回环设备，但是这个术语在Linux内核中是为网络设备保留的（参见[[回环网卡|回环网卡]]）。循环设备的概念和回环设备不同，虽然在名字上有相似的地方。
+
+在[[NetBSD|NetBSD]]和[[OpenBSD|OpenBSD]]等BSD所衍生的系统中，循环设备被称为“虚拟节点设备”或“vnd”，并且设备被置于 <tt>/dev/vnd0</tt>, <tt>/dev/rvnd0</tt> 或 <tt>/dev/svnd0</tt>等处。在文件系统中，使用<tt>vnconfig</tt>程序来进行配置。
+
+[[FreeBSD|FreeBSD]]在发行版5之前和其他BSD系统一样遵守约定，之后循环设备便被纳入记忆磁盘设备（"md"）。目前使用<tt>mdconfig</tt><ref>{{Cite web |url=http://www.freebsd.org/cgi/man.cgi?mdconfig |title=mdconfig—configure and enable memory disks,  FreeBSD manual page |accessdate=2011-02-01 |archive-date=2020-10-23 |archive-url=https://web.archive.org/web/20201023062948/https://www.freebsd.org/cgi/man.cgi?mdconfig |dead-url=no }}</ref>程序进行配置。
+
+在[[Solaris|Solaris]]/[[OpenSolaris|OpenSolaris]]中，循环设备被称为 "回环文件接口" 或 lofi,<ref>{{cite web |url=http://docs.sun.com/app/docs/doc/819-2254/lofi-7d |title=存档副本 |accessdate=2009-09-28 |deadurl=yes |archiveurl=https://web.archive.org/web/20101230183509/http://docs.sun.com/app/docs/doc/819-2254/lofi-7d |archivedate=2010-12-30 }}</ref> 位于 <tt>/dev/lofi/1</tt>等处。SunOS 拥有 <tt>lofiadm</tt> 配置程序。"lofi"驱动程序支持只读压缩和可读写的加密。
+自从1988年夏季开始更有SunOS/Solaris平台的第三方驱动 "fbk"<ref>{{cite web |url=ftp://ftp.berlios.de/pub/schily/kernel/fbk/ |title=存档副本 |accessdate=2011-02-01 |deadurl=yes |archiveurl=https://web.archive.org/web/20040825155234/http://ftp.berlios.de/pub/schily/kernel/fbk/ |archivedate=2004-08-25 }}</ref> (文件模拟块设备,英文:File emulates Blockdevice) 
+
+[[Mac_OS_X|Mac OS X]]实现了一个原生的镜像挂载机制并作为其随机访问磁盘设备的抽象。这些设备如同普通设备一样出现在 <tt>/dev</tt> 中，读写操作被送往一个用户模式的辅助进程，并由辅助进程负责读取和写入的操作。在用户界面中当打开磁盘镜像的时候自动被启用。这可以处理多种格式的盘片、CD-ROM 或 DVD 镜像。
+
+在[[Microsoft_Windows|Microsoft Windows]]操作系统上并不能原生支持循环挂载（直到[[Windows_7|Windows 7]]，这个功能才被原生实现，并通过工具[[diskpart|diskpart]]进行工作)。
+<ref>See for example: 
+   [http://blogs.msdn.com/7/archive/2009/10/08/diskpart-exe-and-managing-virtual-hard-disks-vhds-in-windows-7.aspx DiskPart: vdisk create select attach] {{Wayback|url=http://blogs.msdn.com/7/archive/2009/10/08/diskpart-exe-and-managing-virtual-hard-disks-vhds-in-windows-7.aspx |date=20100126045955 }}, 
+   [http://www.sevenforums.com/tutorials/2953-virtual-hard-drive-vhd-file-create-start-boot.html install and boot Windows 7 from virtual disk drive] {{Wayback|url=http://www.sevenforums.com/tutorials/2953-virtual-hard-drive-vhd-file-create-start-boot.html |date=20200724063140 }} and 
+   [http://www.google.com/search?num=100&hl=en&lr=&q=%22Diskpart%22+%22vdisk%22+create+select+attach+detach+site%3Atechnet.microsoft.com+-site%3Asocial.technet.microsoft.com&aq=f&aqi=&aql=&oq=&gs_rfai= other] 
+relative articles on this thematics.</ref> 然而，这项能力经常通过第三方程序得以实现，例如''[[Daemon_Tools|Daemon Tools]]'' 和 ''[[Alcohol_120%|Alcohol 120%]]''
+[http://www.vmware.com/download/eula/diskmount_ws_v55.html VMware] {{Wayback|url=http://www.vmware.com/download/eula/diskmount_ws_v55.html |date=20130822074316 }}的免费工具以及[http://www.ltr-data.se/opencode.html#ImDisk LTR Data] {{Wayback|url=http://www.ltr-data.se/opencode.html#ImDisk |date=20100311015043 }} ([[ImDisk|ImDisk]])都可以实现类似的功能。
+
+== 实例 ==
+在目录上挂载包含文件系统的文件一般需要两步：
+# 用一个循环[[设备文件系统|设备节点]]连接文件。
+# 在目录上挂载该循环设备
+
+这两个操作既可以用两条命令来完成，也可以通过加上特殊的挂载符号的挂载命令来完成。第一个操作可以通过如[[Linux|Linux]]平台下的<tt>losetup</tt><ref>{{Cite web |url=http://www.cl.cam.ac.uk/cgi-bin/manpage?8+losetup |title=losetup manual page |accessdate=2011-02-01 |archive-date=2016-03-13 |archive-url=https://web.archive.org/web/20160313083018/http://www.cl.cam.ac.uk/cgi-bin/manpage?8+LOSETUP |dead-url=no }}</ref>或者是SunOS上的<tt>lofiadm</tt><ref>{{Cite web |url=http://docs.sun.com/app/docs/doc/819-2240/lofiadm-1m?a=view |title=lofiadm, Sun System Administration Command manual |accessdate=2011-02-01 |archive-date=2009-05-02 |archive-url=https://web.archive.org/web/20090502024151/http://docs.sun.com/app/docs/doc/819-2240/lofiadm-1m?a=view |dead-url=no }}</ref>命令完成。
+
+例如，如果 <code>example.img</code> 是一个包含文件系统的常规文件，并且 <code>/home/you/dir</code> 是 Linux用户的目录，[[超级用户|超级用户]]（root）或许可以通过执行如下的命令来将文件挂载在目录上：
+
+ losetup /dev/loop0 example.img
+ mount /dev/loop0 /home/you/dir
+
+其中第二条命令将设备挂载于目录 <code>/home/you/dir</code>。执行上述语句的效果便是文件被作为文件系统挂载，文件的内容出现在被挂载的目录中（以被挂载的目录作为根目录）。
+
+此外 mount 工具常常可以胜任整个挂载的程序：
+
+ mount -o loop example.img /home/you/dir
+
+之后设备便能用下列命令实现卸载：
+
+ umount /home/you/dir
+ # 或者通过诸如 mount | grep "/home/you/dir" 
+ # 或是 losetup -a | grep example.img 的查找找到与文件相关联的loop设备号码
+ # 并执行下列命令：（<N>代表设备号）
+ umount /dev/loop<N> 
+
+在较底层的[[应用程序接口|应用程序接口]]中，文件的关联与解除关联通过在循环设备上的[[ioctl|ioctl]] [[系统调用|系统调用]]来实现。
+
+== 参见 ==
+* [[设备文件系统|设备文件系统]]
+* [[虚拟硬盘|虚拟硬盘]]
+* [[网络块设备|网络块设备]]
+* [[磁盘镜像|磁盘镜像]]
+
+== 引用 ==
+{{Reflist|2}}
+
+== 外部链接 ==
+* [https://archive.is/20040210140744/http://www.linux.org/docs/ldp/howto/Cryptoloop-HOWTO/loopdevice-setup.html 配置循环设备] from the [[cryptoloop|cryptoloop]] [[HOWTO|HOWTO]].
+* [http://bochs.sourceforge.net/doc/docbook/user/loop-device-usage.html 使用循环设备挂载磁盘镜像] {{Wayback|url=http://bochs.sourceforge.net/doc/docbook/user/loop-device-usage.html |date=20060129032856 }} from the ''[[Bochs|Bochs]] User Manual''
+
+[[Category:设备文件|l]]
+[[Category:Unix|Category:Unix]]
+[[Category:Linux内核功能|l]]

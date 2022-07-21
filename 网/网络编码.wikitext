@@ -1,0 +1,67 @@
+{{expand|time=2011-06-14T08:48:34+00:00}}
+'''网络编码'''是一种通过中继节点对接收到的信息进行编码来达到提高[[多播|多播]]网络容量的技术。Rudolf Ahlswede, Ning Cai, Shuo-Yen Robert Li, Raymond W. Yeung<ref>{{cite journal|author=Rudolf Ahlswede|coauthors=Ning Cai, Shuo-Yen Robert Li, Raymond W. Yeung|title=Network information flow|journal=IEEE TRANSACTIONS ON INFORMATION THEORY|volume=46|url=http://pdos.csail.mit.edu/decouto/papers/ahlswede00.pdf|accessdate=2013-10-29|date=2000年6月}}</ref>在2000年首次提出网络编码的概念。
+
+[[File:Network_coding_classical_example.svg|thumb]]
+在右图的网络拓扑中，s节点试图向<math>t_{1}, t_{2}</math>组播两条消息x,y。设每条消息占用的带宽为1，每个节点之间的网络带宽也为1，那么每个节点之间只能同时传输一条消息。线路cd上会需要同时传输x,y，这在一般的传输方案中是行不通的，所以需要网络编码在c处将x,y异或，合成一条消息然后发送。
+
+* 在传统的数据传输技术中，中继节点只负责数据的存储转发，而基于网络编码技术的网络的中继节点在具备传统中继功能的基础上，会根据网络编码规则将接收到的信息进行线性或非线性处理再进行传播，这种做法最直观的优势是减少了传输次数。利用[[图论|图论]]中最大流最小割原理论证了网络编码可以达到网络最大信息流。
+* 网络编码的相关领域：[[信息论|信息论]]、[[图论|图论]]、[[编码理论|编码理论]]
+
+== 线性网络编码 ==
+假设网络是[[有向图|有向]]的，执行线性网络编码时每个节点收到所有连入线路的数据后，再执行编码，然后把数据从连出线路发出。新的数据包括执行线性编码所用的系数以及合成后的数据。
+
+例如组播源发送三条封包，<math>p_{1}=1</math>，<math>p_{2}=2</math>，<math>p_{3}=3</math>。封包经过一系列的中间节点，目标节点收到的封包是<math>((5,8,1),24),((2,3,7),29),((9,6,5),36)</math>。目标节点对下列矩阵求解，可得<math>p_{1},p_{2},p_{3}</math>的值。
+
+<math>
+\begin{bmatrix}
+24\\ 
+29\\ 
+36
+\end{bmatrix}
+=
+\begin{bmatrix}
+5 & 8 & 1\\ 
+2 & 3 & 7\\ 
+9 & 6 & 5
+\end{bmatrix}
+\begin{bmatrix}
+p_{1}\\ 
+p_{2}\\ 
+p_{3}
+\end{bmatrix}
+\Rightarrow 
+\begin{cases}
+24=5p_{1}+8p_{2}+p_{3} &  \\ 
+29=2p_{1}+3p_{2}+7p_{3} & \\ 
+36=9p_{1}+6p_{2}+5p_{3} & 
+\end{cases}
+</math>或<math>\begin{bmatrix}
+p_{1}\\ 
+p_{2}\\ 
+p_{3}
+\end{bmatrix}
+=
+\begin{bmatrix}
+5 & 8 & 1\\ 
+2 & 3 & 7\\ 
+9 & 6 & 5
+\end{bmatrix}^{-1}
+\begin{bmatrix}
+24\\ 
+29\\ 
+36
+\end{bmatrix}</math>
+
+=== 随机线性网络编码 ===
+随机线性网络编码可以取得更好的组播传输速率，较为实用。在实际网络中，节点会将来自连入线路的封包缓存起来，当节点需要发送封包时再将缓存的封包执行网络编码，然后发出。
+
+例如节点A有2个上游节点X,Y，X向A发送了封包<math>((2,2,1),2x_{1}+2x_{2}+x_{3})</math>(<math>2x_{1}+2x_{2}+x_{3}</math>是数据体，（2,2,1）是对数据体执行线性编码时所用的系数）,Y向A发送了封包<math>((1,5,4),x_{1}+5x_{2}+4x_{3})</math>。当A需要发送数据时，便把缓存的这两个封包取出来，随机选择2个系数（如2和1），获得新的数据体<math>(2x_{1}+2x_{2}+x_{3}) \times 2+(x_{1}+5x_{2}+4x_{3}) \times 1 =5x_{1}+9x_{2}+6x_{3}</math>和新的合成系数<math>(2,2,1)\times 2+(1,5,4) \times 1 =(5,9,6)</math>。所以A就把合成后的数据体<math>5x_{1}+9x_{2}+6x_{3}</math>连同合成系数(5,9,6)，向下游节点发送出去。<ref>{{cite journal|author=Yunnan Wu|title=Network Coding for Multicasting|pages=37|url=http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.84.1916&rep=rep1&type=pdf|accessdate=2013-10-25|date=2006年1月}}</ref>
+
+== 参考文献 ==
+{{Reflist|}}
+
+[[Category:图论|Category:图论]]
+[[Category:编码理论|Category:编码理论]]
+[[Category:电脑网络|Category:电脑网络]]
+[[Category:信息论|Category:信息论]]
+[[Category:有限域|Category:有限域]]

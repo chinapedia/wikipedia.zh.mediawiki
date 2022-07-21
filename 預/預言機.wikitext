@@ -1,0 +1,56 @@
+在[[计算复杂度理论|计算复杂度理论]]与[[递归论|可计算性理论]]中，'''预言机'''（{{lang-en|Oracle Machine}}），又称'''谕示机'''，是一种[[抽象电脑|抽象电脑]]，用来研究[[决定型问题|决定型问题]]。可以被视为一个或多个黑盒子（预言者）的[[图灵机|图灵机]]，这个黑盒子的功能是可以在单一运算之內解答特定问题。预言者可以解答的问题，根据给定可以是任何[[复杂度类|复杂度类]]之內的问题。甚至可以使用[[不可判定问题|不可判定问题]]，像是[[停机问题|停机问题]]。
+
+==定義==
+一部'''預言機'''可以視為是與一個'''預言者'''（{{lang|en|oracle}}）相連接的[[圖靈機|圖靈機]]。所謂預言者的概念，是一個可以回答特定問題集合的一個實體，而且常常使用特定的自然數子集''A''來表示這個問題。我們可以很自然的發現，一部預言機可以執行很多對一般圖靈機來說很特殊的操作，並且可以藉由詢問預言者來獲得"''x''是否在''A''內?"這種特定形式問題的解答。
+
+一部預言機，基本上必定包含一整個圖靈機。除了這個圖靈機之外，一部預言機還包含了：
+
+* 一條'''預言紙帶'''（{{lang|en|oracle tape}}），印上了一個包含許多B（代表空白）和1的無限序列，代表了一個可以計算預言集合（{{lang|en|oracle set}}）''A''的函式; 
+* 一個'''預言讀取頭'''（{{lang|en|oracle head}}），像是圖靈機的讀寫頭一樣可以在紙帶上左右移動來讀取資料，不同的是它不能寫入，而且跑的紙帶是預言紙帶。
+
+這裡給出的定義只是幾種預言的其中一種方式。不過這一些定義大同小異，因為所有這一些定義都是表示這部機器做了某個能夠運算''A''的特定函式''f''。
+
+===正式定義===
+一部預言機是由四個[[多元組|多元組]]<math>M= \langle Q, \delta, q_0, F \rangle</math>構成如下：
+* <math>Q</math>是有限多個「狀態」
+* <math>\delta: Q \times \{B,1\}^2 \rightarrow Q \times \{B,1\} \times \{L,R\}^2</math>是一個叫做轉化函數（transition function）的[[偏函数|部分函數]]（partial function），這裡L代表左移，R代表右移。
+* <math>q_0 \in Q</math>代表「起始狀態」
+* <math>F \subseteq Q</math>是「停止狀態」的集合。
+
+預言機以包含有限但許多的1、其餘為空白的一些輸入訊號的工作帶（work tape）開始，包含預言獨特功能的預言帶''A''，和處於''q''<sub>0</sub>狀態的圖靈機，其讀寫頭正讀著工作帶第一個非空格的格子，而預言讀取頭則讀著相當於<math>\chi_A(0)</math>的預言帶的格子。
+
+==與預言機相關的複雜度類==
+我們以A<sup>L</sup>這個符號，代表一個[[複雜度類|複雜度類]]裡面的[[決定性問題|決定性問題]]可以使用包含在A類別裡面的演算法，加上帶有針對L語言之預言的預言機。舉例來說，P<sup>SAT</sup>這個複雜度類，裡面的問題以一個帶有[[布爾可滿足性問題|布爾可滿足性問題]]預言的預言機，以多項式时间可以解決。A<sup>B</sup>這種表示法也可以引申成令B是一個問題的集合或者是一個複雜度類，使用的定義如下：<math>A^B = \bigcup_{L \in B} A^L</math>
+
+當語言L是複雜度類B裡面的[[完備_(複雜度)|完備]]問題時，如果這個完備定義內所使用的[[歸約|歸約]]過程是在A複雜度裡面，則A<sup>L</sup>=A<sup>B</sup>。例如，因為SAT在多項式歸約裡面是[[NP-完全|NP-完全]]，P<sup>SAT</sup>=P<sup>NP</sup>。然而，要是A = [[DLOGTIME|DLOGTIME]]，因為SAT在DLOGTIME裡面並不一定是NP-完全，那麼A<sup>SAT</sup>並不一定等於A<sup>NP</sup>。
+
+很顯然的，NP ⊆ P<sup>NP</sup>，但是NP<sup>NP</sup>，P<sup>NP</sup>，NP和P要相等則僅在最佳狀況才有可能。一般相信這些複雜度類不相等，並且導出了[[多項式譜系|多項式譜系]]這個定義。
+
+利用預言機，研究像是針對某種預言者A，P<sup>A</sup>和NP<sup>A</sup>之間的關係，對於研究[[P/NP問題|P/NP問題]]非常的有幫助。舉例來說，已經證明出分別存在語言A和B，滿足P<sup>A</sup>=NP<sup>A</sup>與P<sup>B</sup>≠NP<sup>B</sup>。<ref>T. P. Baker, J. Gill, [[Robert_M._Solovay|R. Solovay]]. ''Relativizations of the P =? NP Question''. [[SIAM_Journal_on_Computing|SIAM Journal on Computing]], 4(4): 431-442 (1975)</ref>
+P = NP問題證偽與證明具有相對性被是為要證明這個問題是非常困難的一個佐證。因為這表示如果證明方法帶有''相對性''（這意思是說，增加了預言並不影響證明本身）都不可能解出P = NP問題。舉例來說，要是證明了P = NP，則這方法一定會被增加預言者所影響，否則無法解釋存在預言者B令P<sup>B</sup>≠NP<sup>B</sup>，但是多數證明方式都帶有相對性。
+
+探討從所有可能的預言機中（一個無限大的集合）任意選擇預言機A時，會對複雜度類產生怎樣的變化是一個很有趣的問題。我們已經知道，任意選擇預言機A的話，P<sup>A</sup>≠NP<sup>A</sup><ref>C. H. Bennett, J. Gill. ''Relative to a Random Oracle A, P<sup>A</sup> != NP<sup>A</sup> != co-NP<sup>A</sup> with Probability 1''. SIAM Journal on Computing, 10(1): 96-113 (1981)</ref>。當一個陳述對幾乎所有預言機成立時，我們可以說「對[[隨機預言機|隨機預言機]]也成立」。這個術語的成立基於隨機預言機選擇支持陳述的機率僅可能是零或一（根據[[零一律|零一律]]）。這被視為P≠NP的一個佐證。不過，一個陳述可以同時對隨機預言機成立，但是對一般圖靈機不成立；例如，對任意預言A，IP<sup>A</sup>≠PSPACE<sup>A</sup>，但是[[IP_(複雜度)|IP]] = [[PSPACE|PSPACE]].<ref>Richard Chang, Benny Chor, Oded Goldreich, Juris Hartmanis, Johan Hastad, Desh Ranjan, Pankaj Rohatgi. The Random Oracle Hypothesis is False. ''Journal of Computer and System Sciences'', volume 49, issue 1, pp.24–39. August 1994. ISSN 0022-0000. http://citeseer.ist.psu.edu/282397.html {{Wayback|url=http://citeseer.ist.psu.edu/282397.html |date=20200122191915 }}</ref>
+
+== 預言以及停機問題 ==
+即使一個問題是不可計算的，我們還是可以定義一個解答這類問題的預言者，像是回答[[停機問題|停機問題]]或者同類問題的預言者。一部帶有這類預言者的機器又被叫做[[超計算機|超計算機]]。
+
+有趣的是，停機問題的矛盾還是存在於這種機器上面；即使一個機器可以知道圖靈機的停機問題，但是它必定不能解決自己這類機器的停機問題。這個事實創造出了''[[算術譜系|算術譜系]]''，對每個解決停機問題更強的機器都會有難到不能解決的停機問題。
+
+== 参见 ==
+* [[黑箱|黑盒]]
+* [[图灵机|图灵机]]
+* [[图灵归约|图灵归约]]
+* [[交互式证明系统|交互式证明系统]]
+* [[隨機預言機|隨機預言機]]
+
+==参考文献==
+{{reflist}}
+
+==参考书目==
+* Alan Turing, ''Systems of logic based on ordinals'', Proc. London math. soc., '''45''', 1939
+* C. Papadimitriou. ''Computational Complexity''. Addison-Wesley, 1994. Section 14.3: Oracles, pp. 339 – 343.
+* {{cite book|author = [[Michael_Sipser|Michael Sipser]] | year = 1997 | title = Introduction to the Theory of Computation |url = https://archive.org/details/introductiontoth00sips | publisher = PWS Publishing | isbn = 0-534-94728-X}} Section 9.2: Relativization, pp.318 – 321.
+* [[Martin_Davis|Martin Davis]], editor: ''The Undecidable, Basic Papers on Undecidable Propositions, Unsolvable Problems And Computable Functions'', Raven Press, New York, 1965. Turing's paper is in this volume. Papers include those by Godel, Church, Rosser, Kleene, and Post.
+
+[[Category:递归论|Category:递归论]]
+[[Category:计算模型|Category:计算模型]]

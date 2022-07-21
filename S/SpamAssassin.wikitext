@@ -1,0 +1,82 @@
+{{NoteTA|G1=IT|G2=FL}}
+{{ RoughTranslation |en:SpamAssassin }}
+{{Infobox software
+| name = SpamAssassin
+| logo = SpamAssassin logo.svg
+| logo size = 210px
+| screenshot = Reco spam.png
+| screenshot size = 200px
+| caption =
+| developer = [[Apache软件基金会|Apache软件基金会]]
+| latest release version = 3.4.6
+| latest release date = {{release date|2020|04|12}}
+| latest preview version =
+| latest preview date =
+| operating system = [[跨平台|跨平台]]
+| programming language = [[Perl|Perl]]
+| genre = 電子郵件過濾器
+| license = [[Apache許可證|Apache許可證]]2.0
+| website = {{URL|https://spamassassin.apache.org/}}
+}}'''Apache SpamAssassin'''是一套[[反垃圾邮件技术|垃圾邮件过滤]]软件。它採用多種垃圾郵件檢測技術，包括基於[[域名系统|DNS]]和[[校验和|校驗和]]模糊匹配的垃圾郵件檢測、[[貝葉斯垃圾郵件過濾|貝葉斯過濾]]、外部程序、黑名單和在線資料庫檢測。它在[[Apache许可证|Apache许可证]]2.0下发行，2004年起也是[[Apache软件基金会|Apache软件基金会]]的一员。
+
+該程序可被整合到郵件伺服器以為網站自動過濾所有郵件。它也可以由個人用戶在自己的郵箱運行，同時與一些郵件程序有集成。Apache SpamAssassin可配置性很高，即使作為全系統過濾器也仍然可以對每個用戶的偏好進行個性化配置。
+
+2006年SpamAssassin被Linux新媒體獎（New Media Award）授予“最佳的基於Linux的反垃圾郵件解決方案<ref>{{cite web |url=http://www.linux-magazine.com/issue/74/Linux_New_Media_Awards_2006.pdf |title=Linux New Media Awards 2006 |work=Linux Magazine |format=PDF |accessdate=2008-07-10 |archive-date=2008-11-20 |archive-url=https://web.archive.org/web/20081120141735/http://www.linux-magazine.com/issue/74/Linux_New_Media_Awards_2006.pdf |dead-url=yes }}</ref>。”
+
+== 歷史 ==
+Apache SpamAssassin項目由賈斯汀·梅森創建，他對先前Mark Jeftovic自1997年8月起開發的一個早期程序filter.plx進行大量補丁更新。梅森幾乎改寫所有Jeftovic的代碼，並於2001年4月20日將最終的代碼庫上傳到[[SourceForge|SourceForge]]。
+
+2004年夏天該項目成為[[Apache软件基金会|Apache軟件基金會]]的項目，后官方更名为''Apache SpamAssassin''。
+
+在超过三年的时间里，SpamAssassin 3.4.2都没有更新过，但开发表明“项目已更换一批新的开发人员，正在继续前进。”2019下半年，SpamAssassin 3.4.3发布。
+
+2020年1月后期，SpamAssassin 3.4.4发布。这主要是一个安全性更新，而目前项目主要工作是发布4.0.0预览版。
+
+== 用法 ==
+SpamAssassin是一個基于Perl的應用程式（[[CPAN|CPAN]]名称：<code>Mail::SpamAssassin</code>），通常用于为一个或多个用户过滤全部入站邮件。它可以作為一個獨立運行的應用程序或另一個應用程序（如Milter、SA-Exim、Exiscan、[[MailScanner|MailScanner]]、[[MIMEDefang|MIMEDefang]]、[[Amavis|Amavis]]）的子程序或作為与守護行程（<code>spamd</code>）通信的[[客户端|客戶端]]（<code>spamc</code>）。客户端/服务器或嵌入操作模式具有性能优势，但某些情况下也可能造成更多安全风险。
+
+一般地，此程序的任一变种可被配置为通用邮件过滤程序，或者由支持这项功能的邮件程序用户代理在新邮件到达时直接调用。调整用户的<code>procmailrc</code>配置文件，邮件过滤程序（如[[procmail|procmail]]）可以将所有入站邮件通过[[管道_(Unix)|管道]]传输到Apache SpamAssassin。
+
+== 基于網絡的過濾方法 ==
+Apache SpamAssassin還支持：
+* [[DNSBL|基于DNS的黑名单]]和[[DNSWL|基于DNS的白名单]]
+* 基于工作量证明的[[Hashcash|Hashcash]]邮件戳
+* [[发件人策略框架|發件人策略框架]]和[[域名密钥识别邮件|域名密鑰識別郵件]]
+*URI黑名單，例如追踪垃圾邮件站点的[[SURBL|SURBL]]或URIBL
+通过为Apache SpamAssassin编写Perl插件，更多过滤方法可以相当容易地添加。
+
+== 貝葉斯過濾 ==
+在用户或管理员“投喂”非垃圾邮件（ham）和垃圾邮件（spam）样本以让过滤系统了解两者的差异时，Apache SpamAssassin借助[[貝葉斯垃圾郵件過濾|贝叶斯过滤]]增强自己的过滤规则。为此，SpamAssassin提供命令行工具<code>sa-learn</code>，可以在用户指导下训练SpamAssassin识别单个邮件或整个信箱是否为垃圾邮件。
+
+will help score future e-mails based on this learning to improve the accuracy.
+
+一般地，用户会将未识别的垃圾邮件移至一个独立的文件夹，然后分别对非垃圾邮件与垃圾邮件文件夹运行<code>sa-learn</code>。如果邮件用户代理有支持，<nowiki>{{mono>sa-learn}}</nowiki>可以为单个邮件被调用。不论通过哪种方式执行学习，SpamAssassin的贝叶斯测试有助于为之后的邮件基于这种学习评分，以提高精度。
+
+== 许可证 ==
+Apache SpamAssassin是免费开源软件, 在[[Apache许可证|Apache许可证]]2.0下授权。3.0之前的版本在[[艺术许可协议|艺术许可协议]]与[[GNU通用公共许可证|GNU通用公共许可证]]下双重授权。
+
+== sa-compile ==
+<code>sa-compile</code>是一個Apache SpamAssassin的內置實用程序。它将一個SpamAssassin規則集編譯為[[確定有限狀態自動機|確定有限狀態自動機]]，讓SpamAssassin更高效地利用處理器算力。
+
+== 测试Apache SpamAssassin ==
+Apache SpamAssassin被设计由[[GTUBE|GTUBE]]，一个类似于[[EICAR标准反病毒测试文件|EICAR反病毒测试文件]]的68字节字符串触发。如果这个字符串被插入一封<nowiki/>RFC 5322<nowiki/>格式化的邮件信息且被传过Apache SpamAssassin引擎，则会触发Apache SpamAssassin，权重标记为1000。
+
+== 注釋 ==
+{{reflist}}
+
+== 外部連結 ==
+{{Portal|Free software}}
+* [http://spamassassin.apache.org/ SpamAssassin official homepage]{{Wayback|url=http://spamassassin.apache.org/ |date=20110628033513 }}
+* [http://wiki.apache.org/spamassassin/ SpamAssassin Wiki]{{Wayback|url=http://wiki.apache.org/spamassassin/ |date=20110621011406 }}
+* [http://wiki.apache.org/spamassassin/RuleUpdates#head-b6f1953fb1dc659b7de160effffbe95e9e00d3b1 sa-update]{{Wayback|url=http://wiki.apache.org/spamassassin/RuleUpdates#head-b6f1953fb1dc659b7de160effffbe95e9e00d3b1 |date=20110615015546 }} Automatically updating SA
+* [https://web.archive.org/web/20060827144224/http://www.rulesemporium.com/ SpamAssassin Rules Emporium (SARE)] containing many very good rules for filtering with SA（[https://web.archive.org/web/20060827144224/http://www.rulesemporium.com/ not updated any more] since early 2008）。
+* [https://web.archive.org/web/20061030025059/http://saupdates.openprotect.com/ OpenProtect's SpamAssassin sa-update channel] to automatically update SA with the newest and best SARE rules（not updated any more, see above）。
+* [https://web.archive.org/web/20061205191334/http://www.linuxnewmedia.com/Press/Press_Releases/Awards_2006 Linux New Media Awards 2006] showing that SpamAssassin received 69% of the vote for "best Linux-based anti-spam solution."
+* [http://razor.sourceforge.net/ Vipul's Razor (SourceForge)]{{Wayback|url=http://razor.sourceforge.net/ |date=20130328202325 }}
+* [https://web.archive.org/web/20060209035953/http://pyzor.sourceforge.net/ Pyzor (SourceForge)]
+* [https://web.archive.org/web/20100421233449/http://www.christopherlewis.com/ExchangeSpamAssassin.htm Exchange-SpamAssassin Sink]
+* [http://www.nabble.com/forum/ViewPost.jtp?post=9428488&framed=y Questions about sa-compile]{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }}
+
+{{Apache}}
+[[category:垃圾郵件過濾|category:垃圾郵件過濾]]
+[[category:跨平台軟件|category:跨平台軟件]]

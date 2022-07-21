@@ -1,0 +1,134 @@
+{{noteTA|G1=IT}}
+{{otheruses|原型模式}}
+{{编程范式}}
+'''基于原型编程'''（{{lang-en|prototype-based programming}}）或称为'''-{zh-cn:原型程序设计; zh-tw:基於原型的編程;}-'''、'''原型编程'''，是[[面向对象编程|面向对象编程]]的一种风格和方式。在原型编程中，行为重用（在基于类的语言通常称为[[继承_(计算机科学)|继承]]），是通过复制已经存在的[[原型_(工程)|原型]]对象的过程实现的。这个模型一般被认为是无类的、面向原型、或者是基于实例的编程。
+
+原型编程最初的（也是最经典的）例子是编程语言[[Self|Self]]，它是由{{en-link|David Ungar|David Ungar}}和Randall Smith开发的。但是无类编程方式最近变得越来越受欢迎，并且被[[JavaScript|JavaScript]]、{{en-link|Cecil|Cecil (programming language)|Cecil}}、[[NewtonScript|NewtonScript]]、[[Io_(编程语言)|Io]]、[[REBOL|REBOL]]，还有一些其他的程序语言所采纳。
+
+==与基于类编程的比较==
+在[[基于类编程|基于类编程]]当中，对象总共有两种类型：[[类_(计算机科学)|类]]和[[介面_(資訊科技)#物件導向語言中的介面|接口]]。类包含存储数据的结构和操纵数据的行为，结构是用[[数据_(计算机)|数据]][[字段|字段]]描述的，而行为是通过[[方法_(计算机科学)|方法]]定义的。接口是不包含字段的[[抽象类型|抽象类型]]，通常定义类必须实现的行为，接口不能[[实例化|实例化]]而必须被实现。所有的类通过提供结构和行为来实现一个接口。类可以从现存的类继承而来，从而建立一种类层级。
+
+原型编程的主张者经常争论说，基于类的语言提倡使用一个关注分类和类之间关系的开发模型。与此相对，原型编程看起来提倡程序员，关注一系列对象实例的行为，而之后才关心如何将这些对象划分到最近的使用方式相似的原型对象，而不是分成类。因为如此，很多基于原型的系统提倡运行时原型的修改，而只有极少数基于类的物件導向系统（比如第一个动态物件導向的系统[[Smalltalk|Smalltalk]]），允许类在程序运行时被修改。
+
+原型编程常与[[认知心理学|认知心理学]]的特定思想流派有关，同样强调“prototypes”和“exemplars”作为学习过程中的关键词。
+
+考虑到绝大多数基于原型的系统，是基于解释型的和动态类型程序语言，这里要重点指出的是，静态类型语言实现基于原型从技术上是可行的。用基于原型编程描述的Omega语言<ref>{{cite book | chapter = Section 2.8 | page = 177 | first = Günther | last = Blaschek | title = Omega: Statically Typed Prototypes }}</ref>，就是这样系统的一个例子。尽管根据Omega网站所述，Omega也不是完全的静态，但是可能的时候，它的编译器有时会使用静态绑定来改进程序的效率。
+
+==对象构造==
+在基于类的语言中，一个新的实例通过类构造器和给构造器的可选的参数来构造。在基于原型的语言中，没有显式的类，对象直接通过一个原型属性从其他对象进行继承，这个原型属性，在[[JavaScript|JavaScript]]中叫做<code>prototype</code>，在[[Io_(编程语言)|Io]]中叫做<code>proto</code>。在基于原型的系统中，构造对象有两种方法，通过[[克隆_(编程)|复制]]（cloning）已有的对象，或者通过扩展空（nihilo）对象创建，因为大多数系统提供了不同的复制方法，扩展空对象的方式并不显著<ref>{{cite book | chapter = Section 1.2 | page = 17 | first1 = Chistophe | last1 = Dony | first2 = Jacques | last2 = Malenfan | first3 = Daniel | last3 = Bardou | chapterurl = http://www.lirmm.fr/~dony/postscript/proto-book.pdf | title = Classifying Prototype-based Programming Languages | access-date = 2020-10-10 | archive-date = 2013-06-15 | archive-url = https://web.archive.org/web/20130615194310/http://www.lirmm.fr/~dony/postscript/proto-book.pdf | dead-url = no }}</ref>。
+
+提供扩展空对象创建的系统允许对象从空白中创建，而无需从已有的原型中复制。这样的系统提供特殊的文法，用以指定新对象的行为和属性，无须参考已存在的对象。在很多原型语言中，通常有一个Object原型，其中有普遍需要的方法。它被用作所有其它对象的最终原型。扩展空对象创建可以保证新对象不会被顶级对象的命名空间污染。例如在JavaScript中，可以利用<code>null</code>原型來做到，比如<code>Object.create(null)</code>。
+
+复制指一个新对象通过复制一个已经存在的对象（就是他的原型）来构造自己的过程。于是新的对象拥有原来对象的所有属性，从这一点出发新对象的属性可以被修改。在某些系统中，子对象持有一个到它原型的直接链接（经由授权或类似方式）。并且原型的改变同样会导致它的副本的变化。其他系统中，如类[[Forth|Forth]]的程序语言Kevo，在此情况下不传播原型的改变，而遵循一个更加连续的模型，其中被复制的对象改变不会通过他的副本传播<ref name="Taivalsaari">{{cite book | chapter = Section 1.1 | page = 14 | first = Antero | last = Taivalsaari | title = Classes vs. Prototypes: Some Philosophical and Historical Observations }}</ref>。
+
+<syntaxhighlight lang="javascript">
+// JavaScript中真实的原型继承样式的例子。 
+
+// 使用文字对象记号{}建立的“无中生有”对象。
+var foo = {name: "foo", one: 1, two: 2};
+
+// 另一个“无中生有”对象。
+var bar = {three: 3};
+
+// Gecko和Webkit JavaScript引擎可以直接的操纵内部的原型链接。
+// 为了简单起见，我们假装下面几行代码可以工作而不考虑使用的引擎：
+bar.__proto__ = foo; // foo现在是bar的原型。
+
+// 如果我们尝试从bar访问foo的属性，从此以后会成功。 
+bar.one // 解析为1。
+
+// 子对象的属性也是可访问的。
+bar.three // 解析为3。
+
+// 自身的属性遮蔽原型属性。
+bar.name = "bar";
+foo.name; // 无影响，解析为"foo"。
+bar.name; // 解析为"bar"。
+</syntaxhighlight>
+
+下面是个在 JavaScript 1.8.5 以上版本的例子（参见ECMAScript 5兼容性表格<ref>[http://kangax.github.com/es5-compat-table/ ECMAScript 5 compatibility table] {{Wayback|url=http://kangax.github.com/es5-compat-table/ |date=20130403174408 }}</ref>）
+<syntaxhighlight lang="javascript">
+var foo = {one: 1, two: 2};
+
+// 等价于上例的bar.[[prototype|prototype]] = foo
+var bar = Object.create( foo );
+
+bar.three = 3;
+
+bar.one; // 1
+bar.two; // 2
+bar.three; // 3
+</syntaxhighlight>
+
+==委托==
+在使用[[委托_(面向对象编程)|委托]]的基于原型的语言中，运行时语言可以仅仅通过循着一个序列的指针直到找到匹配这样的方式，来定位属性或者寻找正确的数据。所有这些建立行为共享的行为需要的是委托指针。不像是基于类的物件導向语言中类和接口的关系，原型和他的分支之间的关系，并不要求子对象有相似的内存结构，因为如此，子对象可以随着时间推移而继续被修改，而无须像基于类的系统那样整理结构。还有一个要提到的地方是，不仅仅是数据，方法也能被修改。因为这个原因，一些基于原型的语言把数据和方法二者合称为“槽”（slot）。
+
+==串接==
+在[[串接编程语言|串接]]原型中，以Kevo语言为例，没有到被复制的原型对象的指针或链接。原型对象以重新给定名字（或引用）的方式被确实的复制了。这个过程类似于生物学上的分裂，属性和方法被原样复制<ref name=Taivalsaar>{{cite web | url = https://webpages.tuni.fi/livelykernel/publications/TR6-JavaScriptConcatenation-Taivalsaari.pdf | title = Simplifying JavaScript with Concatenation-Based Prototype Inheritance | author = Antero Taivalsaar | authorlink =  | language = en | publisher = Tampere University of Technology | date = 2009 | quote = Kevo implemented a pure concatenation-based object model in which new objects were created by copying and the namespaces of all the objects were always fully self-contained. … Furthermore, Kevo had an internal ''clone family'' mechanism that made it possible to track the “genealogy” of changes among groups of objects, so that changes to individual objects could be propagated to other objects when necessary. | accessdate = 2015-03-11 | dead-url = no | archive-date = 2021-04-14 | archive-url = https://web.archive.org/web/20210414073955/https://webpages.tuni.fi/livelykernel/publications/TR6-JavaScriptConcatenation-Taivalsaari.pdf }}</ref>。
+
+这样做的好处包括，对象的作者可以修改这份副本，而无须担心对此父类的其他子类产生副作用。进一步的优点，是查找属性运算的消耗同授权相比大大降低了，授权查找必须遍历整个委托链才能判定不存在。
+
+串接的坏处包括传播变化到整个系统的难度；如果一个变化作用到某个原型，它不会立即或者自动的对它的所有副本生效。然而Kevo提供了额外的在对象系统中传播变化的方式。这种方式是基于他们的相似性（所谓的family相似）<ref name=Taivalsaar />，而非像委托模型具有代表性的那样源自分类学。
+
+另外一个坏处是在这个模型的大多数自然的实现下，每一个副本上都有额外的内存被浪费掉了（相对委托模型而言），因为副本和原型之间有相同的部分存在。然而，在共享的实现和后台数据中提供串接行为的编程编程是可行的。这种做法为Kevo所遵从<ref>{{cite journal | first = Antero | last = Taivalsaari | title = Kevo, a prototype-based object-oriented programming language based on concatenation and module operations | journal = Technical Report Report LACIR 92-02 | publisher = University of Victoria | year = 1992 }}</ref>。
+
+==批评==
+那些经常批评基于原型系统而支持基于类的对象模型的人，通常有类似[[静态类型|静态类型]]系统相对于[[动态类型|动态类型]]系统的担心。通常这些担心是：正确性、安全性、可预测性以及效率。
+
+在前三点上，类可以看作和类型等效（多数静态语言遵守此规则），而且提供保证他们实例的契约，而对这些实例的使用者保证特定场景中的行为。
+
+在最后一点上，效率，类的声明简化了编译器的组织，允许开发高效的方法以及实例变量查找。对Self语言来说，大多开发时间都消耗在开发、编译以及解释技术，用以改进基于原型的系统相对于基于类的系统的性能。举例来说Lisaac产生的代码速度几乎跟C一样快。测试是由MPEG-2编码器的Lisaac版本得出的，它由一个C语言版本复制而来。测试显示，Lisaac版本比C版本慢1.9%，但代码行数少了37%。然而C语言并非物件導向语言，而是一个过程式语言。Lisaac跟C++版本相比可能更说明问题。
+
+最普遍的对基于原型的语言的批评，来自不喜欢它的软件开发者社区，僅管JavaScript有着人气和市场。对基于原型系统的了解程度，似乎因为JavaScript框架的廣泛應用，以及JavaScript针对web 2.0的复杂应用而改变<ref>{{Cite news|url=https://alistapart.com/article/prototypal-object-oriented-programming-using-javascript|title=Prototypal Object-Oriented Programming using JavaScript|date=2016-04-26|work=A List Apart|access-date=2018-10-21|language=en-US|archive-date=2021-01-03|archive-url=https://web.archive.org/web/20210103040033/https://alistapart.com/article/prototypal-object-oriented-programming-using-javascript/|dead-url=no}}</ref>。很可能由于这些原因，在ECMAScript标准的第四版开始，尋求使JavaScript提供基于类的构造，且ECMAScript第六版，提供“類”作為原有的原型架構之上的[[語法糖|語法糖]]，提供建構物件與處理繼承時的另一種語法<ref>{{cite web|title=Classes|url=https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes|website=JavaScript reference|publisher=Mozilla Developer Network|accessdate=9 February 2016|archive-date=2021-01-14|archive-url=https://web.archive.org/web/20210114144758/https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes|dead-url=no}}</ref>。
+
+==支持基于原型编程的语言==
+{{div col|colwidth=15em}}
+*{{en-link|基于演员并发语言|Actor-Based Concurrent Language|ABCL}}: ABCL/1, ABCL/R, ABCL/R2, ABCL/c+
+*{{en-link|Agora (编程语言)|Agora (programming language)|Agora}}
+*[[AutoHotkey|AutoHotkey]]
+*{{en-link|Cecil (编程语言)|Cecil (programming language)|Cecil}}
+*ColdC
+*[[ECMAScript|ECMAScript]]/[[JavaScript|JavaScript]]
+*{{en-link|Etoys (编程语言)|Etoys (programming language)|Etoys}}
+*[[Falcon|Falcon]]
+*[[Io_(编程语言)|Io]]
+*Ioke<ref>{{cite web |url=https://ioke.org/ |title=Ioke is a folding language. It is a prototype-based programming language that is inspired by Io, Smalltalk, Lisp and Ruby |access-date=2021-02-25 |archive-date=2021-01-30 |archive-url=https://web.archive.org/web/20210130190643/https://ioke.org/ |dead-url=no }}</ref>
+*Lisaac<ref>{{cite web |url=http://www.lisaac.org/ |title=Lisaac － The power of simplicity at work for you |access-date=2021-02-25 |archive-date=2010-10-12 |archive-url=https://web.archive.org/web/20101012034916/http://www.lisaac.org/ |dead-url=no }}</ref>
+*{{en-link|Logtalk}}
+*[[LPC_(程式語言)|LPC]]
+*[[Lua|Lua]]
+*{{en-link|MOO}}
+*{{en-link|NekoVM|NekoVM|Neko}}
+*[[NewtonScript|NewtonScript]]
+*[[Nix_包管理器|Nix]]
+*{{en-link|Obliq}}
+*{{en-link|Object Lisp}}
+*Omega<ref>[https://www.pervasive.jku.at/About_Us/Staff/_Blaschek/Omega/_Report/ Omega] {{Wayback|url=https://www.pervasive.jku.at/About_Us/Staff/_Blaschek/Omega/_Report/ |date=20160410083422 }}</ref>
+*{{en-link|OpenLaszlo}}
+*[[Perl|Perl]], 通过Class::Prototyped模块
+*[[R语言|R]], 通过proto包
+*[[REBOL|REBOL]]
+*[[Self|Self]]
+*Seph
+*{{en-link|SmartFrog}}
+*{{en-link|TADS}}
+*[[Tcl|Tcl]]，通过snit扩展
+{{div col end}}
+
+==引用==
+{{reflist|2}}
+
+==參考來源==
+*{{cite book|editor=James Noble (ed.), Antero Taivalsaari (ed.), Ivan Moore (ed.)|year=1999|title=Prototype-Based Programming: Concepts, Languages and Applications|publisher=Springer-Verlag|isbn=981-4021-25-3}}
+*{{cite book|first=Martin|last=Abadi|authorlink=Martin Abadi|coauthors=[[Luca_Cardelli|Luca Cardelli]]|year=|title=A Theory of Objects|publisher=Springer-Verlag|isbn=0-387-94775-2}}
+
+==外部链接==
+*[http://www.laputan.org/reflection/warfare.html Class Warfare: Classes vs. Prototypes] {{Wayback|url=http://www.laputan.org/reflection/warfare.html |date=20130929034809 }}, by Brian Foote
+*[http://brianodell.net/?page_id=516 Essential Object Oriented JavaScript] {{Wayback|url=http://brianodell.net/?page_id=516 |date=20110723032320 }}, by Brian O'Dell
+
+{{编程语言类别}}
+
+[[分類:物件導向的程序設計|分類:物件導向的程序設計]]
+[[分類:編程典範|分類:編程典範]]
+[[分類:基于原型编程|分類:基于原型编程]]
+[[分類:類型論|分類:類型論]]

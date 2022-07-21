@@ -1,0 +1,43 @@
+{{Orphan|time=2011-12-06T05:42:15+00:00}}
+'''雙向轉發偵測'''（{{lang-en|Bidirectional Forwarding Detection}}，縮寫為 BFD）是一個用于侦测两个[[轉送引擎|轉送引擎]]之间数据链路錯誤的[[網路協議|網路協議]]。BFD可做到全程路徑的偵測，不管中間經過多少[[交換器|交換器]]。<ref name="#1">[http://www.ringline.com.tw/zh/support/techpapers/network-security/516-bfd.html BFD(Bidirectional Forwarding Detection)偵測網路斷線應用] {{Wayback|url=http://www.ringline.com.tw/zh/support/techpapers/network-security/516-bfd.html |date=20111127095601 }}, 紀志欣</ref>它为不支援任何錯誤偵測類型的實體媒介（如：[[乙太網路|乙太網路]]、[[虛電路|虛電路]]（Virtual Circuits）、[[穿隧協議|穿隧協議]] （Tunnel）和[[MPLS|MPLS]] LSP）提供一种低成本的偵測錯誤事件的能力。
+
+==運作原理==
+BFD在某個鏈結的兩個端點建立了一個[[會話_(電腦科學)|會話]]，如果超過一個連線存在於兩個系統，多重BFD會話也能建立以監視其中的每一個連線。會話使用三路握手（three-way handshake）的方式建立和拆除。会话的建立支持鉴权，鉴权方式可以为较简易的密碼方式，或MD5、SHA1安全驗證。
+
+BFD不俱備对端發現的機制，必须在通信双方设置对端的信息。BFD可以被多种不同的底層傳輸機制所承载，因此BFD需要能够被各种传输层封包传输。例如，当其传输层为[[MPLS|MPLS]]，监控MPLS的LSP时，BFD会话的建立要通过LSP-Ping封包捎帶（piggybacking）。支持鄰接关系建立的通訊協定，如[[OSPF|OSPF]]和[[IS-IS|IS-IS]]，也可用於建立BFD會話；而這些通訊协议可以使用BFD的鏈接失敗通知来更快捷地确认链路故障（它们自身也有定时{{le|保活|keepalive}}机制）。
+
+===链路状态确认机制===
+会话有以下2种模式：非同步模式（asynchronous mode）和按需模式（demand mode）。
+
+在非同步模式中，兩端周期性地发送Hello封包。如果无响应次数超过一定限度，[[會話_(電腦科學)|會話]]即判定为中斷。
+
+在按需模式中，在會話建立後不需要交換''Hello''封包。它假設链路的两端有其他的方法来驗證彼此之間的可达性。不过任意一端仍可按照自己的需要发送Hello封包。
+
+無論使用哪種模式，兩個端點也可以使用Echo功能：當此功能被開啟時，一段發送Echo封包流，另一端則透過轉發面寄送回寄送者，从而測試对端系統的傳送路徑。
+
+==實際應用==
+===产品功能===
+网络设备供应商[[思科系统|Cisco]]和[[Juniper_Networks|Juniper]]的路由器產品都支援BFD。以Cisco的路由器來說，依設備等級不同，BFD可支援的路由協定有所差異：[[EIGRP|EIGRP]]、[[OSPF|OSPF]]、[[IS-IS|IS-IS]]、[[边界网关协议|BGP]]和[[MPLS|MPLS]] TE。<ref name="#1"/>
+
+===组网应用===
+由於BFD能快速的切換網路備援，因此非常適用在大型網路的骨幹網路，如學術骨幹網路或是Tier1/Tier2的[[網際網路服務供應商|網際網路服務供應商]]（ISP）骨幹網路。
+
+[[下一代网络|下一代网络]]（Next Generation Network）的Layer 1傳輸設備大量採用[[同步光网络|同步光网络]]（SONET）設備，在Layer 2/3的網路設備也漸漸開始會採用[[乙太網路|乙太網路]]介面來當骨幹網路設備，但[[乙太網路|乙太網路]]無法像傳統的[[Packet_over_SONET/SDH|Packet over SONET/SDH]]或是Serial T1/E1/T3專線可直接快速偵測斷線狀態，此時就可以利用BFD協助快速偵測網路是否有斷線狀況。<ref name="#1"/>
+
+==標準化==
+BFD通訊協議在2010年6月標準化，定义于RFC 5880。<ref>RFC 5880, ''Bidirectional Forwarding Detection'', D. Katz, D. Ward (June 2010)</ref>标准中定义了偵測MPLS LSP錯誤、監視多端網路跳躍（Hop）的連線、与OSPF和IS-IS共用的机制。而其对[[IPv4|IPv4]]和[[IPv6|IPv6]]的支持定义于RFC 5881。<ref>RFC 5881, ''BFD for IPv4 and IPv6 (Single Hop)'', D. Katz, D. Ward (June 2010)</ref>
+
+==參考==
+{{reflist}}
+
+==外部連結==
+
+* [https://web.archive.org/web/20090710124640/http://www.ietf.org/html.charters/bfd-charter.html IETF BFD Working Group]
+* [http://www.ripe.net/ripe/meetings/ripe-48/presentations/ripe48-eof-bfd.pdf BFD presentation by Juniper Networks] {{Wayback|url=http://www.ripe.net/ripe/meetings/ripe-48/presentations/ripe48-eof-bfd.pdf |date=20091229111622 }}
+* RFC 5880
+* [https://web.archive.org/web/20111231074022/http://www.ipinfusion.com/whitepapers/whitepaper-form.php?paper=resilient BFD white paper from IP Infusion]
+* NetworkWorld article: [http://www.networkworld.com/community/node/23380 Reducing Link Failure Detection Time with BFD] {{Wayback|url=http://www.networkworld.com/community/node/23380 |date=20130617072018 }}
+
+[[Category:網路管理|Category:網路管理]]
+[[Category:网际协议|Category:网际协议]]
+[[Category:互联网标准|Category:互联网标准]]

@@ -1,0 +1,126 @@
+{{NoteTA
+|G1=IT
+|G2=FL
+}}
+{{Infobox Filesystem
+ |name = XFS
+ |full_name = XFS
+ |developer = [[Silicon_Graphics|Silicon Graphics]] Inc.
+ |introduction_os = [[IRIX|IRIX]] v5.3
+ |introduction_date = 1994年
+ |partition_id =
+ |directory_struct = [[B+树|B+树]]
+ |file_struct = [[B+树|B+树]]
+ |bad_blocks_struct =
+ |max_filename_size = 255 [[byte|byte]]s
+ |max_files_no =
+ |max_volume_size = 16 [[exabyte|exabyte]]s
+ | max_file_size = 8 [[exabyte|exabyte]]s <br/>（减1字节）
+ |filename_character_set = 除NUL（'\0'）和 '/'以外的字节
+ |dates_recorded = 支持
+ |date_range =
+ |date_resolution = 1ns
+ |forks_streams =
+ |attributes = 支持
+ |file_system_permissions = 支持
+ |compression = 不支持
+ |single_instance_storage = 不支持
+ |encryption = 不支持（在块设备层上实现）
+ |OS = [[IRIX|IRIX]], [[Linux|Linux]], [[FreeBSD|FreeBSD]] （试验性）
+}}
+'''XFS'''，一种高性能的[[日志文件系统|日志文件系统]]，最早於1993年，由[[Silicon_Graphics|Silicon Graphics]]为他们的[[IRIX|IRIX]][[操作系统|操作系统]]而开发，是IRIX 5.3版的預設檔案系統。2000年5月，[[Silicon_Graphics|Silicon Graphics]]以[[GNU通用公共许可证|GNU通用公共许可证]]釋出這套系統的原始碼，之後被移植到[[Linux内核|Linux内核]]上。XFS特别擅长处理大文件，同时提供平滑的[[数据传输|数据传输]]。
+
+==历史==
+XFS的开发始于1993年，在1994年被首次部署在IRIX 5.3上。2000年5月，XFS在[[GNU通用公共许可证|GNU通用公共许可证]]下发布，并被移植到Linux上。2001年XFS首次被[[Linux发行版|Linux发行版]]所支持，现在所有的Linux发行版上都可以使用XFS。
+
+XFS最初被合并到[[Linux内核|Linux]] 2.4主线中，这使得XFS几乎可以被用在任何一个Linux系统上。[[Arch_Linux|Arch]], [[Debian|Debian]], [[Fedora|Fedora]], [[openSUSE|openSUSE]], [[Gentoo_Linux|Gentoo]], [[Kate_OS|Kate OS]], [[Mandriva|Mandriva]], [[Slackware|Slackware]], [[Ubuntu_Linux|Ubuntu]], [[VectorLinux|VectorLinux]]和[[Zenwalk|Zenwalk]]的安装程序中都可选择XFS作为文件系统，但由于預設的启动管理器[[GNU_GRUB|GRUB]]中存在bug<ref>{{Cite web |url=https://bugzilla.redhat.com/show_bug.cgi?id=250843 |title=Redhat.com |access-date=2011-02-23 |archive-date=2021-04-20 |archive-url=https://web.archive.org/web/20210420175101/https://bugzilla.redhat.com/show_bug.cgi?id=250843 }}</ref>，以上发行版中只有少数几个允许用户在 /boot [[挂载点|挂载点]]（引导目录）上使用XFS文件系统。
+
+[[FreeBSD|FreeBSD]]在2005年12月获得了对XFS的只读支持，并在次年6月引入了试验性的写入支持。不过这些只是为了方便用户从Linux上迁移到FreeBSD上，并不是为了把XFS作为主打文件系统使用。[[Red_Hat_Enterprise_Linux|Red Hat Enterprise Linux]] 5.4 [[64位|64位]]版的内核完整支持XFS，但未包含创建和使用XFS的命令行工具（[[CentOS|CentOS]]正在进行这方面的尝试），原因是这些软件包还不够稳定<ref>{{Cite web |url=https://bugzilla.redhat.com/show_bug.cgi?id=521173 |title=Red Hat Linux Bugzilla entry on XFS implementation |access-date=2011-02-23 |archive-date=2019-03-08 |archive-url=https://web.archive.org/web/20190308170124/https://bugzilla.redhat.com/show_bug.cgi?id=521173 }}</ref>。Red Hat Enterprise Linux 7/CentOS預設使用XFS檔案系統。<ref>[https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/7.0_Release_Notes/chap-Red_Hat_Enterprise_Linux-7.0_Release_Notes-File_Systems.html 　Release Notes for Red Hat Enterprise Linux 7.0]</ref>
+
+==规范==
+===容量===
+XFS是一个[[64位|64位]]文件系统，最大支持8[[exbibyte|exbibyte]]s减1字节的单个文件系统，实际部署时取决于宿主操作系统的最大块限制。对于一个[[32位|32位]]Linux系统，文件和文件系统的大小会被限制在16[[tebibyte|tebibyte]]s。
+
+===文件系统日志===
+[[日志文件系统|日志文件系统]]是一种即使在断电或者是操作系统崩溃的情况下保证文件系统一致性的途径。XFS对文件系统[[元数据|元数据]]提供了日志支持。当文件系统更新时，元数据会在实际的磁盘块被更新之前顺序写入日志。XFS的日志被保存在磁盘块的循环缓冲区上，不会被正常的文件系统操作影响。XFS日志大小的上限是64k个块和128MB中的较大值，下限取决于已存在的文件系统和目录的块的大小。在外置设备上部署日志会浪费超过最大日志大小的空间。XFS日志也可以被存在文件系统的数据区（称为内置日志），或者一个额外的设备上（以减少磁盘操作）。
+
+XFS的日志所保存的是“逻辑”条目，以人类更加容易理解的方式来描述当前正在进行的操作（“物理”日志与其相反，保存的是每次操作中被修改的块）。日志的更新以异步的方式进行，避免影响整体性能。
+
+如果发生系统崩溃，可以根据日志中的记录来重做并完成崩溃的前一时刻发生的系统操作。崩溃之后首次挂载文件系统时，会自动进行恢复。恢复的速度不受文件系统大小的影响，取决于需要重做的系统操作的数量。
+
+对于最近被修改但未完全写入磁盘的数据，XFS保证在重启时清零所有未被写入的数据块，以防止任何有可能的、由剩余数据导致的安全隐患（因为虽然从文件系统接口无法访问这些数据，但不排除裸设备或裸硬件被直接读取的可能性）。
+
+===分配组===
+XFS文件系统内部被分为多个“分配组”，它们是文件系统中的等长线性存储区。每个分配组各自管理自己的[[inode|inode]]和剩余空间。文件和文件夹可以跨越分配组。这一机制为XFS提供了可伸缩性和并行特性——多个线程和进程可以同时在同一个文件系统上执行I/O操作。这种由分配组带来的内部分区机制在一个文件系统跨越多个物理设备时特别有用，使得优化对底层存储部件的吞吐量利用率成为可能。
+
+===条带化分配===
+在条带化[[RAID|RAID]]阵列上创建XFS文件系统时，可以指定一个“条带化[[数据单元|数据单元]]”。这可以保证数据分配、[[inode|inode]]分配、以及内部日志被对齐到该条带单元上，以此最大化吞吐量。
+
+===基于Extent的分配方式===
+XFS文件系统中的文件用到的块由变长[[Extent_(文件系统)|Extent]]管理，每一个Extent描述了一个或多个连续的块。与那些把文件所有块都单独列出来的文件系统相比，extent大幅缩短了列表。<br>
+有些文件系统用一个或多个面向块的位图管理空间分配——在XFS中这种结构被由一对[[B+树|B+树]]组成的、面向Extent的结构替代了；每个文件系统分配组（AG）包含这样的一个结构。其中，一个[[B+树|B+树]]用于索引未被使用的Extent的长度，另一个索引这些Extent的起始块。这种双索引策略使得文件系统在定位剩余空间中的Extent时十分高效。
+
+===可变块尺寸===
+块是文件系统中的最小可分配单元。XFS允许在创建文件系统时指定块的大小，从512字节到64KB，以适应专门的用途。比如，对于有很多小文件的应用，较小的块尺寸可以最大化磁盘利用率；但对于一个主要处理大文件的系统，较大的块尺寸能提供更好的性能。...
+
+===延迟分配===
+{{Main|延迟分配}}
+
+XFS在文件分配上使用了惰性计算技术。当一个文件被写入缓存时，XFS仅在内存中对该文件保留适当数量的块，并不立即给数据分配Extent。实际的块分配仅在这段数据被冲刷到磁盘时才发生。这一机制提高了将该文件写入一组连续块中的机会，减少[[文件系统碎片|碎片]]的同时提升了性能。
+
+===稀疏文件===
+XFS对每个文件提供了一个64位的稀疏地址空间，使得大文件中的“洞”（空白数据区）不被实际分配到磁盘上。因为文件系统对每个文件使用一个Extent表，文件分配表就可以保持一个较小的体积。对于太大以至于无法存储在[[inode|inode]]中的分配表，这张表会被移动到[[B+树|B+树]]中，继续保持对该目标文件在64位地址空间中任意位置的数据的高效访问。
+
+===扩展属性===
+XFS通过实现[[扩展文件属性|扩展文件属性]]给文件提供了多个数据流，使文件可以被附加多个名/值对。文件名是一个最大长度为256字节的、以NULL字符结尾的可打印字符串，其它的关联值则可包含多达64KB的二进制数据。这些数据被进一步分入两个名字空间中，<code>root</code>和<code>user</code>。保存在root名字空间中的扩展属性只能被超级用户修改，user名字空间中的可以被任何对该文件拥有写权限的用户修改。扩展属性可以被添加到任意一种 XFS inode上，包括符号链接、设备节点、目录，等等。可以使用<code>attr</code>这个命令行程序操作这些扩展属性。<code>xfsdump</code>和<code>xfsrestore</code>工具在进行备份和恢复时会一同操作扩展属性，而其它的大多数备份系统则会忽略扩展属性。
+
+===Direct I/O===
+对于需要高吞吐量的应用，XFS实现了直接的I/O，允许未缓存的I/O操作直接应用到用户空间。数据在应用程序的缓冲区和磁盘间利用[[直接内存存取|DMA]]进行传输，以此提供底层磁盘设备全部的I/O带宽。
+
+===确定速率I/O===
+XFS确定速率I/O系统给应用程序提供了预留文件系统带宽的[[API|API]]。XFS会动态计算底层存储设备能提供的性能，并在给定的时间内预留足够的带宽以满足所要求的性能。此项特性是XFS所独有的。确定方式可以是硬性的或软性的，前者提供了更高性能，而后者相对更加可靠。不过只要底层存储设备支持硬性速率确定，XFS就只允许硬性模式。这一机制最常被用在实时应用中，比如视频流。
+
+===DMAPI===
+XFS实现了[[DMAPI|数据管理应用程序接口]]（DMAPI）以支持[[高阶存储管理|高阶存储管理]]（HSM）。到2010年10月为止，Linux上的XFS实现已经支持DMAPI所要求的的磁盘元数据规范，但有报告称内核支持仍处于不稳定状态。此前SGI曾提供了一个包含DMAPI钩子的内核源码树，但这个支持未被合并进主代码树。不过现在内核开发者们已经注意到了它并对其做了更新<ref>{{Cite web |url=http://oss.sgi.com/archives/xfs/2010-10/msg00025.html |title=XFS mailing list post regarding state of DMAPI support |access-date=2011-02-24 |archive-url=https://web.archive.org/web/20110927020239/http://oss.sgi.com/archives/xfs/2010-10/msg00025.html |archive-date=2011-09-27 |dead-url=yes }}</ref>。
+
+===快照===
+XFS并不直接提供对[[文件系统快照|文件系统快照]]的支持，因为XFS认为快照可在卷管理器中实现。对一个XFS文件系统做快照需要调用<code>xfs_freeze</code>工具冻结文件系统的I/O，然后等待卷管理器完成实际的快照创建，再解冻I/O，继续正常的操作。之后这个快照可以被当作备份，以只读方式挂载。在IRIX上发布的XFS包含了一个整合的卷管理器，叫XLV。这个卷管理器无法被移植到Linux上，不过XFS可以和Linux上标准的[[逻辑卷管理器|LVM]]正常工作。在最近发布的Linux内核中，<code>xfs_freeze</code>的功能被实现在了VFS层，当卷管理器的快照功能被唤醒时将自动启动<code>xfs_freeze</code>。相对于无法挂起，卷管理器也无法对其创建“热”快照的[[ext3|ext3]]文件系统<ref>{{Cite web |url=http://www.linuxquestions.org/questions/linuxquestions-org-member-intro-24/how-to-freeze-ext3-file-system-229914/ |title=Linux questions about freezing Ext3 |access-date=2011-02-24 |archive-date=2016-01-13 |archive-url=https://web.archive.org/web/20160113042414/http://www.linuxquestions.org/questions/linuxquestions-org-member-intro-24/how-to-freeze-ext3-file-system-229914/ }}</ref>，XFS的快照功能具有很大优势。幸运的是，现在这种情况已经改观。从Linux 2.6.29内核开始，[[ext3|ext3]], [[ext4|ext4]], [[gfs2|gfs2]]和[[jfs|jfs]]文件系统也获得了冻结文件系统的特性<ref>[http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commit;h=c4be0c1dc4cdc37b175579be1460f15ac6495e9a Freeze Feature Commit to Linux kernel]{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>。
+
+===在线碎片整理===
+虽然XFS基于Extent的特征和延迟分配策略显著提高了文件系统对碎片问题的抵抗力，XFS还是提供了一个文件系统[[defragmentation|碎片整理]]工具，<code>xfs_fsr</code>（XFS filesystem reorganizer的简称）。这个工具可以对一个已被挂载、正在使用中的XFS文件系统进行碎片整理<ref>{{Cite web |url=http://bitubique.com/content/defragment-xfs-file-system |title=Bitubique.com |accessdate=2011-02-24 |archive-date=2009-04-01 |archive-url=https://web.archive.org/web/20090401211105/http://bitubique.com/content/defragment-xfs-file-system |dead-url=no }}</ref>。
+
+===在线尺寸调整===
+XFS提供了<code>xfs_growfs</code>工具，可以在线调整XFS文件系统的大小。XFS文件系统可以向保存当前文件系统的设备上的未分配空间延伸。这个特性常与[[逻辑卷轴管理|卷管理]]功能结合使用，因为后者可以把多个设备合并进一个逻辑卷组，而使用[[硬盘分区|硬盘分区]]保存XFS文件系统时，每个分区需要分别扩容。到2010年8月为止，XFS分区不可以原位收缩<ref>[http://xfs.org/index.php/XFS_FAQ#Q:_Is_there_a_way_to_make_a_XFS_filesystem_larger_or_smaller.3F XFS.org] {{Wayback|url=http://xfs.org/index.php/XFS_FAQ#Q:_Is_there_a_way_to_make_a_XFS_filesystem_larger_or_smaller.3F |date=20090105174540 }}, FAQ</ref>，不过有一些方法可以变相处理这个问题<ref>{{Cite web |url=http://oss.sgi.com/archives/xfs/2002-01/msg02379.html |title=SGI.com |access-date=2011-02-24 |archive-url=https://web.archive.org/web/20110607181552/http://oss.sgi.com/archives/xfs/2002-01/msg02379.html |archive-date=2011-06-07 |dead-url=yes }}</ref>。
+
+===原生备份/恢复工具===
+XFS提供了<code>xfsdump</code>和<code>xfsrestore</code>工具协助备份XFS文件系统中的数据。<code>xfsdump</code>按[[inode|inode]]顺序备份一个XFS文件系统。与传统的UNIX文件系统不同，XFS不需要在dump前被卸载；对使用中的XFS文件系统做dump就可以保证镜像的一致性。这与XFS对快照的实现不同，XFS的dump和restore的过程是可以被中断然后继续的，无须冻结文件系统。<code>xfsdump</code>甚至提供了高性能的多线程备份操作——它把一次dump拆分成多个数据流，每个数据流可以被发往不同的目的地。不过到目前为止，Linux尚未完成对多数据流dump功能的完整移植。
+
+===原子磁盘配额===
+XFS的磁盘配额在文件系统被初次挂载时启用。这解决了一个在其它大多数文件系统中存在的一个竞争问题：要求先挂载文件系统，但直到调用quotaon (8)之前配额不会生效。
+
+==性能考虑==
+===写入屏障===
+XFS文件系统默认在挂载时启用“写入屏障”的支持。该特性会一个合适的时间冲刷底层存储设备的回写缓存，特别是在XFS做日志写入操作的时候。这个特性的初衷是保证文件系统的一致性，具体实现却因设备而异——不是所有的底层硬件都支持缓存冲刷请求。在带有电池供电缓存的硬件RAID控制器提供的逻辑设备上部署XFS文件系统时，这项特性可能导致明显的性能退化，因为文件系统的代码无法得知这种缓存是非易失性的。如果该控制器又实现了冲刷请求，数据将被不必要地频繁写入物理磁盘。为了防止这种问题，对于能够在断电或发生其它主机故障时保护缓存中数据的设备，应该以<code>nobarrier</code>选项挂载XFS文件系统。
+
+===日志的放置===
+XFS文件系统创建时默认使用内置日志，把日志和文件系统数据放置在同一个块设备上。由于在所有的文件系统写入发生前都要更新日志中的元数据，内置日志可能导致磁盘竞争。在大多数负载下，这种等级的竞争非常低以至于对性能没有影响。但对于沉重的随机写入负载，比如在忙碌的数据块服务器上，XFS可能因为这种 I/O竞争无法获得最佳性能。另一个可能提高这个问题的严重性的因素是，日志写入被要求以同步方式提交——它们必须被完全写入，之后对应实际数据的写入操作才能开始。
+
+如果确实需要最佳的文件系统性能，XFS提供了一个选项，允许把日志放置在一个分离的物理设备上。这只需要很小的物理空间。分离的设备有自己的I/O路径，如果该设备能对同步写入提供低延迟的路径，那么它将给整个文件系统的操作带来显著的性能提升。[[固态硬盘|SSD]]，或带有写回缓存的RAID系统是日志设备的合适候选，它们能满足这种性能要求。不过后者在遭遇断电时可能降低数据的安全性。要启用外部日志，只须以<code>logdev</code>选项挂载文件系统，并指定一个合适的日志设备即可。
+
+==缺点==
+* XFS文件系统的卷无法被直接收缩，只能通過「備份->重灌->還原」的方式間接進行容量縮減（這也是雲端主機供應商會告知存儲空間只能增加不能縮減的其中一個原因），在準備多一組存儲卷的情況下，有工具可對XFS卷進行上述操作：<code>xfsdump</code>和<code>xfsrestore</code>。
+* 历史上XFS上的元数据操作曾比其它文件系统都慢，表现为在删除大量小文件时性能糟糕。该性能问题是被[[Red_Hat|Red Hat]]的XFS开发者Dave Chinner在代码中定位到的。使用一个叫“延迟记录”的挂载选项可以成数量级地提升元数据操作的性能。该选项几乎把日志整个存在内存中。Linux内核主线版本2.6.35中作为一个试验性特性引入了这个补丁，在2.6.37中使它成为了一个稳定的特性，并在2.6.39中把它作为預設的日志记录方法。早期测试显示在有少量线程的环境中其性能接近EXT4，在大量线程的环境下超过了EXT4<ref>{{Cite web |url=http://xfs.org/index.php/Improving_Metadata_Performance_By_Reducing_Journal_Overhead |title=and http://oss.sgi.com/archives/xfs/2010-05/msg00329.html |accessdate=2011-02-24 |archive-date=2011-10-06 |archive-url=https://web.archive.org/web/20111006152854/http://xfs.org/index.php/Improving_Metadata_Performance_By_Reducing_Journal_Overhead |dead-url=no }}</ref>。
+* 缺少透明壓縮的支援
+* 缺少校驗保護，校驗保護在對付{{le|資料損毀#靜態型|Data_corruption#Silent|靜態型資料損毀}}方面有幫助
+
+==参考文献==
+{{Reflist}}
+*[https://web.archive.org/web/20160120053200/http://techpubs.sgi.com/library/tpl/cgi-bin/getdoc.cgi?coll=linux&db=bks&srch=&fname=%2FSGI_Admin%2FLX_XFS_AG%2Fsgi_html%2Fch01.html XFS for Linux Administration（SGI Document Number: 007-4273-003）]
+
+{{文件系统}}
+
+{{DEFAULTSORT:Xfs}}
+[[Category:磁盘文件系统|Category:磁盘文件系统]]
+[[Category:Linux檔案系統|Category:Linux檔案系統]]
+
+<!--Interlanguage links-->

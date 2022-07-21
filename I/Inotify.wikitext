@@ -1,0 +1,101 @@
+{{lowercase}}
+{{NoteTA
+| G1=IT
+| 1=zh-cn:掩码; zh-tw:遮罩;
+}}
+
+{{Proofreader needed|en|inotify}}
+{{expert-subject}}
+'''inotify'''是[[Linux核心|Linux核心]]子系統之一，做為[[檔案系統|檔案系統]]的附加功能，它可監控檔案系統並將異動通知應用程式。本系統的出現取代了舊有Linux核心裡，擁有類似功能之[[dnotify|dnotify]]模組。
+
+inotify的原始開發者為[[John_McCutchan|John McCutchan]]、[[羅伯特·拉姆|羅伯特·拉姆]]與[[Amy_Griffis|Amy Griffis]]。於Linux核心2.6.13發行時(2005年六月十八日)，被正式納入Linux核心<ref>{{Cite web |url=http://kernelnewbies.org/Linux_2_6_13 |title=Linux 2.6.13, kernelnewbies.org |accessdate=2012-03-06 |archive-date=2020-10-19 |archive-url=https://web.archive.org/web/20201019213140/https://kernelnewbies.org/Linux_2_6_13 |dead-url=no }}</ref>。儘管如此，它仍可透過[[修補程式|修補程式]]的方式與2.6.12甚至更早期的Linux核心整合。
+
+inotify的主要應用於[[桌面搜索|桌面搜索]]軟體，像：[[Beagle|Beagle]]，得以針對有變動的檔案重新[[索引|索引]]，而不必沒有效率地每隔幾分鐘就要掃描整個檔案系統。相較於主動輪詢檔案系統，透過作業系統主動告知檔案異動的方式，讓Beagle等軟體甚至可以在檔案更動後一秒內更新索引。
+
+此外，諸如：更新目錄檢視、重新載入設定檔、追蹤變更、備份、同步甚至上傳等許多自動化作業流程，都可因而受惠。
+
+== 優點 ==
+相較於被inotify取代較舊的 [[dnotify|dnotify]]模組，inotify有諸多益處。<ref>{{Cite web |url=http://www.developertutorials.com/tutorials/linux/monitor-linux-inotify-050531/page2.html |title=Why inotify? |accessdate=2012-03-06 |archive-date=2010-01-16 |archive-url=https://web.archive.org/web/20100116105916/http://www.developertutorials.com/tutorials/linux/monitor-linux-inotify-050531/page2.html |dead-url=no }}</ref><ref>{{Cite web |url=http://www.kernel.org/pub/linux/kernel/people/rml/inotify/README |title=''inotify'' README file |accessdate=2012-03-06 |archive-date=2016-12-29 |archive-url=https://web.archive.org/web/20161229103708/https://www.kernel.org/pub/linux/kernel/people/rml/inotify/README |dead-url=no }}</ref>在舊的模組中，程式必須為每一個被監控的目錄建立[[文件描述符|file descriptor]]，這種作法很容易讓行程擁有的file descriptor逼近系統允許的上限，進而形成瓶頸。dnotify產生的file decriptor也會導致系統資源忙碌，使可移除裝置無法被[[umount|移除]]，徒增使用上的困擾。
+
+由於dnotify只能讓程式設計師監控目錄層級的變化，「精細度」亦是“dnotify”的劣勢之一。為此，程式設計師必須付出額外的心力，自行撰寫程式碼以期追蹤更細微的檔案系統事件。
+
+inotify相較之下使用較少的file descriptor，亦允許select()與poll()介面，優於[[dnotify|dnotify]]使用的[[signal_notification_system|信號系統]]。這也使得inotify與既有以select()或poll()為基礎之函式庫(如：[[Glib|Glib]])整合更加便利。
+
+== 運作方式 ==
+
+inotify擁有專為其設計的系統函式。十分容易上手。
+<syntaxhighlight lang="c">
+ #include <sys/inotify.h>
+</syntaxhighlight>
+要使用inotify必須先引用上面的標頭檔。
+<syntaxhighlight lang="c">
+ int inotify_init(void)
+</syntaxhighlight>
+建立一個inotify的實體並回傳一個file descriptor，此檔案描述子可供讀取檔案事件。隨後，可透過read()接收事件，為了避免不斷輪詢檔案，read()預設將採用同步I/O的模式，直到事件發生後才會返回。
+<syntaxhighlight lang="c">
+ int inotify_add_watch(int fd, const char* pathname, int mask)
+</syntaxhighlight>
+透過路徑名稱(pathname)並選定遮罩(mask)以監控[[inode|inode]]。inotify_add_watch()會回傳一個監控器（watch descriptor），它代表pathname指向的inode(不同的pathname有可能指向相同的inode)。
+<syntaxhighlight lang="c">
+ int inotify_rm_watch(int fd, int wd)
+</syntaxhighlight>
+取消對某個路徑之監控。
+
+如同之前所描述的，當檔案系統異動時，核心將會依據程式設定的條件，觸發相應的事件。事件的結構如下：
+{| class="wikitable"
+|-
+! 欄位名稱
+! 內容描述
+|-
+| <tt>wd</tt>
+| 監控子 
+|-
+| <tt>mask</tt>
+| 事件遮罩
+|-
+| <tt>cookie</tt>
+| 用來辨別<tt>IN_MOVED_FROM</tt>與<tt>IN_MOVED_TO</tt>事件
+|-
+| <tt>len</tt>
+| name欄位長度
+|-
+| <tt>name</tt>
+| 觸發該事件的檔案名稱(以上層目錄為基準)
+|}
+
+可供應用程式追蹤的事件有:
+* <tt>IN_ACCESS</tt> - 讀取檔案
+* <tt>IN_MODIFY</tt> - 檔案被修改
+* <tt>IN_ATTRIB</tt> - 檔案屬性變更
+* <tt>IN_OPEN</tt> - 檔案被開啟
+* <tt>IN_CLOSE_WRITE</tt> - 被開啟為「可寫入」狀態的檔案遭關閉
+* <tt>IN_CLOSE_NOWRITE</tt> - 被開啟為「非寫入」狀態的檔案遭關閉
+* <tt>IN_MOVED_FROM</tt> and <tt>IN_MOVED_TO</tt> - 檔案被搬動或更名
+* <tt>IN_DELETE</tt> - 檔案或目錄被刪除
+* <tt>IN_CREATE</tt> - 監控中的目錄下有新檔案產生
+* <tt>IN_DELETE_SELF</tt> - 監控中的檔案遭刪除
+
+== 缺點 ==
+inotify無法監控软链接型的子目錄。
+
+== 歷史沿革 ==
+* August 2005 - 整合至Linux 2.6.13
+* July 2004 - [http://groups.google.com/group/fa.linux.kernel/browse_thread/thread/6366aaa10cb23bcc/a54e97d545ad66fe 首次發表] {{Wayback|url=http://groups.google.com/group/fa.linux.kernel/browse_thread/thread/6366aaa10cb23bcc/a54e97d545ad66fe |date=20121104100935 }}
+
+== 相關條目 ==
+* [[File_alteration_monitor|File alteration monitor]]
+* [[Gamin|Gamin]]
+* [[DMAPI|DMAPI]]
+* [[kqueue|kqueue]]
+* [[FSEvents|FSEvents]]
+
+==參考資料==
+{{reflist}}
+
+== 外部連結 ==
+* [http://www.linuxjournal.com/article/8478 Kernel Korner ] {{Wayback|url=http://www.linuxjournal.com/article/8478 |date=20200921161518 }}  - Intro to inotify by Robert Love (2005)
+* [http://lwn.net/Articles/104343/ LWN Article on Inotify] {{Wayback|url=http://lwn.net/Articles/104343/ |date=20200401141326 }} Watching filesystem events with inotify (partly out of date)
+* [http://www.ibm.com/developerworks/linux/library/l-ubuntu-inotify/index.html?ca=drs- IBM Article] {{Wayback|url=http://www.ibm.com/developerworks/linux/library/l-ubuntu-inotify/index.html?ca=drs- |date=20170310174633 }} Monitor Linux file system events with inotify.
+
+[[Category:Linux内核功能|Category:Linux内核功能]]
+[[Category:操作系统技术|Category:操作系统技术]]

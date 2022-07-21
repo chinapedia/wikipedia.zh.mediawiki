@@ -1,0 +1,510 @@
+{{多個問題|
+{{refimprove|date=2013年4月}}
+{{Expert|time=2015-12-14T03:28:39+00:00}}
+}}
+{{noteTA|G1=IT}}
+
+'''S.M.A.R.T.'''，全称为“{{lang|en|'''S'''elf-'''M'''onitoring '''A'''nalysis and '''R'''eporting '''T'''echnology}}”，即“自我监测、分析及报告技术”，是一种自动的[[硬盘|硬盘]]状态检测与预警系统和规范。通过在硬盘[[硬件|硬件]]内的检测指令对硬盘的硬件如[[磁头|磁头]]、盘片、[[马达|马达]]、电路的运行情况进行监控、记录并与厂商所设定的预设安全值进行比较，若监控情况将要或已超出预设安全值的安全范围，就可以通过主机的监控硬件或软件自动向用户作出警告并进行轻微的自动修复，以提前保障硬盘数据的安全。除一些出厂时间极早的硬盘外，现在大部分硬盘均配备该项技术。
+
+== 功能 ==
+该技术能使硬盘更稳定的运行。作用如下：
+
+* 当硬盘的损坏程度还能在软件可修复的范围内（通常由厂商决定），软件就会自动修理，防止数据的进一步损坏。同时报告异常值，异常程度为'''警告'''；
+* 当硬盘的损坏程度已经超出软件的修复承载范围（通常由厂商决定），软件则会尽最大能力防止再次写入数据的丢失（如避开已损坏扇区），同时会报告异常值，异常程度为'''危险'''；
+* BIOS自检时，主板会检测硬盘的S.M.A.R.T.信息，如果硬盘的异常程度为危险时，会提醒用户及时备份数据（如嗡鸣声或显示文字）。
+* Windows 7或以上的Windows系統，如果檢測到硬碟的S.M.A.R.T.錯誤，也會彈出警告視窗，提示用戶備份資料。
+
+==历史==
+最早期的硬盘监控技术起源于1992年[[IBM|IBM]]在为[[AS/400|AS/400]]计算机的IBM9337[[硬盘阵列|硬盘阵列]]中的IBM 0662 [[SCSI|SCSI]]2代硬盘驱动器之中，后来该技术被命名为[[Predictive_Failure_Analysis|Predictive Failure Analysis]]（故障预警分析技术），它是通过在[[固件|固件]]中测量几个重要的硬盘安全参数和评估他们的情况。从物理硬盘发送到监控软件的结果中被限定两种结果：“硬盘安全”和“硬盘不久后会发生故障”。
+
+不久，由[[個人電腦|個人電腦]]制造商[[Compaq|Compaq]]和硬盘制造商[[Seagate|Seagate]]、[[昆騰|Quantum]]和{{link-en|Conner|Conner}}提出了名为[[IntelliSafe|IntelliSafe]]的类似技术。通过该技术，硬盘会测量自身的的健康指标并将参量值传送给操作系统和用户的监控软件中，每个硬盘生产商有权决定哪些指标需要被监控和它们的安全阈值。
+
+[[Compaq|Compaq]]于1995年早期将该项技术方案提交到[[Small_Form_Factor|Small Form Factor]]委员会进行标准化，该方案得到[[IBM|IBM]]、[[Seagate|Seagate]]、[[昆騰|Quantum]]、{{link-en|Conner|Conner Peripherals}}和[[Western_Digital|Western Digital]]所支持。由于IntelliSafe技术的灵活性，委员会接受了该方案，并正式更名'''S.M.A.R.T.'''技术，将其标准化并推广至ATA-3行业标准中。
+
+==运作原理==
+该技术所需数据被存放在硬盘物理盘面最前面的磁道中，由硬盘制作商将相关管理程序和数据该磁道中，包括加解密程序，自监控程序，自修复程序等，主机的监控软件可以通过“SMART RETURN STATUS”的命令读取'''S.M.A.R.T.'''信息，且这些信息不允许被用户直接修改。
+
+==检测属性==
+下面将列出一些'''S.M.A.R.T.'''的原始检测属性和含义。普遍为检测值越高性能越好。即使所有制造商都必须遵守共同的规则，但由于有些检测值在不同硬盘制造商中用不全相同的定义和计量方法而对于不同制作商来说检测值不全是越高越好，所以下面属性的指标只作一般参考。除外，各制造商也会根据自己需要添加一些自己专有的检测属性。
+
+{| class="wikitable" border="1" style="margin:auto; text-align:center;"
+|+ 说明
+|-
+| [[Image:Dark_Green_Arrow_Up.svg|center]] ||表示数值越高越好
+|-
+| [[Image:Dark_Green_Arrow_Down.svg|center]] ||表示数值越低越好
+|-style="background:#FFC0CB;"
+| 重要项：粉色底|| 当超出安全范围会对性能严重影响，甚至导致数据丢失。
+|}
+
+{| class="wikitable sortable" border="1"
+! ID !! ID十六进制值!!英文名 !!中文译名!!最优!!说明
+|-style="background:#FFC0CB;"
+| 1 
+|0x01
+|style="text-align:center;width:220px;"| '''Read Error Rate'''
+|style="text-align:center;"|底层数据读取错误率
+|style="text-align:center;width:50px;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|存储器从一个硬盘表面读取数据时发生的错误率。原始值由于不同厂商的不同计算方法而有所不同，其十进制值往往无意义的。
+|-
+| 2 
+|0x02
+|style="text-align:center;width:50px;"| '''Throughput Performance'''
+|style="text-align:center;"|读写通量性能
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Up.svg|center]]
+|通常是硬盘读写性能的测量值，如果其值有变动，有可能硬盘出现了问题。
+|-
+| 3 
+|0x03
+|style="text-align:center;width:50px;"| '''Spin-Up Time'''
+|style="text-align:center;"|盘片启动时间
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|盘片由静止启动加速到稳定正常运行速度的平均所需时间。
+|-
+| 4 
+|0x04
+|style="text-align:center;width:50px;"| '''Start/Stop Count'''
+|style="text-align:center;"|电机起停次计数
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|一个盘片启动关闭周期的统计值，只有硬盘从完全断电中启动或从睡眠模式恢复，盘片主轴电机被启动时才会记一次数。
+|-style="background:#FFC0CB;"
+| 5 
+|0x05
+|style="text-align:center;width:50px;"| '''Reallocated Sector Count'''
+|style="text-align:center;"|重定位磁区计数
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|记录由于损坏而被映射到无损的后备区的磁區计数。当硬盘出现损坏磁區时，可以通过将其物理空间指向到特定的无损区域进行重映射修复，从而出现坏磁區的硬盘仍可使用。但当高过一定数值后，后磁區消耗殆尽而无法再重映射修复时，这些坏磁區就会显现出来且无法自行修复。除外由于要要求磁头读取这些坏磁區时专门再移动到后备区读写数据，对硬盘读写性能也有影响。
+|-
+| 6 
+|0x06
+|style="text-align:center;width:50px;"| '''Read Channel Margin'''
+|style="text-align:center;"|信道读取余量
+|style="text-align:center;"|
+|读取数据时信道可用的余量，该属性没制定任何功用。
+|-
+| 7 
+|0x07
+|style="text-align:center;width:50px;"| '''Seek Error Rate'''
+|style="text-align:center;"|寻道错误率
+|style="text-align:center;"|
+|（该属性是特定制造商才有的）磁头寻找磁道由于机械问题而出错几率，有多种原因可能引致出错，如：磁头伺服构件，盘体过热，或损坏。于不同厂商的不同计算方法而有所不同，其十进制值往往无意义的。
+|-
+| 8 
+|0x08
+|style="text-align:center;width:50px;"| '''Seek Time Performance'''
+|style="text-align:center;"|寻道性能
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Up.svg|center]]
+|每次寻道时间的平均值，该值短期内迅速减少，有可能硬盘出现了问题。
+|-
+| 9 
+|0x09
+|style="text-align:center;width:50px;"| '''Power-On Hours'''
+|style="text-align:center;"|硬盘加电时间
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|硬盘自出厂以来加电启动的统计时间，单位为小时（或根据制造商设定为分钟或秒），一般用户以该值判定硬盘是否被使用过。
+|-style="background:#FFC0CB;"
+| 10 
+|0x0a
+|style="text-align:center;width:50px;"| '''Spin Retry Count'''
+|style="text-align:center;"|电机起转重试
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|S.M.A.R.T参数电机起转重试，表明了主轴电机的启动尝试次数。这个属性存储了关于主轴电机尝试加速到完全可操作速度的次数（在这种情况下，意味着主轴电机的第一次启动尝试没有成功）。主轴电机频繁的尝试启动，意味着硬盘驱动器的寿命可能将近实际限值。
+|-
+| 11 
+|0x0b
+|style="text-align:center;width:50px;"| '''Recalibration Retries'''
+|style="text-align:center;"|磁头校准重试
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|磁头在一次运行失败时尝试校准至正常状态的统计数，该值改变时意味着硬盘的机械部件已经出现问题了。
+|-
+| 12 
+|0x0c
+|style="text-align:center;width:50px;"| '''Power Cycle Count'''
+|style="text-align:center;"|设备开关计数
+|style="text-align:center;"|
+|该属性表示硬盘电源充分开/关循环计数。
+|-
+| 13 
+|0x0d
+|style="text-align:center;width:50px;"| '''Soft Read Error Rate'''
+|style="text-align:center;"|软件读取错误率
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|操作系统读取数据时的出错率。
+|-
+| 183 
+|0xb7
+|style="text-align:center;width:50px;"| '''SATA Downshift Error Count'''
+|style="text-align:center;"|SATA降级运行计数
+|style="text-align:center;"|
+|Western Digital 和 Samsung 特有属性，记录由于兼容问题导致降低SATA传输级别运行的计数。
+|-style="background:#FFC0CB"
+| 184 
+|0xb8
+|style="text-align:center;width:50px;"| '''End-to-End error'''
+|style="text-align:center;"|终端校验出错
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|HP专有S.M.A.R.T.（'''SMART IV'''）技术的一个特有属性，记录硬盘从盘片读取数据到高速缓存后再传输到主机时数据校验出错的次数。
+|-
+| 185 
+|0xb9
+|style="text-align:center;width:50px;"| '''Head Stability'''
+|style="text-align:center;"|磁头稳定性
+|style="text-align:center;"|
+|Western Digital特有属性
+|-
+| 186 
+|0xba
+|style="text-align:center;width:50px;"| '''Induced Op-Vibration Detection'''
+|style="text-align:center;"|
+|style="text-align:center;"|
+|Western Digital特有属性
+|-
+| 187 
+|0xbb
+|style="text-align:center;width:50px;"| '''Reported Uncorrectable Errors'''
+|style="text-align:center;"|报告不可纠正错误
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|硬件ECC无法恢复的错误计数。
+|-style="background:#FFC0CB"
+|188
+|0xbc
+|style="text-align:center;width:50px;"| '''Command Timeout'''
+|style="text-align:center;"|通信超时
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|由于无法连接至硬盘而终止操作的统计数，一般为0，如果远超过0，则可能电源问题，数据线接口氧化或更严重的问题。
+|-
+|189
+|0xbd
+|style="text-align:center;width:50px;"| '''High Fly Writes'''
+|style="text-align:center;"|磁头写入高度
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|硬盘进行写入时对磁头高度进行监控以提供额外的保障。当磁头处于不正常高度进行写入时，写入操作会被终止，原有数据重写入或者将该扇区重映射到安全区域。该属性是统计值。
+|-
+|190
+|0xbe
+|style="text-align:center;width:50px;"| '''Airflow Temperature'''
+|style="text-align:center;"|气流温度
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|Western Digital特有属性，计量硬盘内气流温度，和检测项0xc2相似。
+|-
+|191
+|0xbf
+|style="text-align:center;width:50px;"| '''G-sense Error Rate'''
+|style="text-align:center;"|加速度错误率
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|计量可能对硬盘做成损害的冲击次数。
+|-
+|192
+|0xc0
+|style="text-align:center;width:50px;"| '''Power-off Retract Count'''
+|style="text-align:center;"|电源关闭磁头收回计数
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|计量磁头在没有加电时不移进硬盘的值。
+|-
+|193
+|0xc1
+|style="text-align:center;width:50px;"| '''Load Cycle Count '''
+|style="text-align:center;"|磁头升降计数
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|计量磁头在加电时移进/移出硬盘周期的值。
+|-
+|194
+|0xc2
+|style="text-align:center;width:50px;"| '''Temperature '''
+|style="text-align:center;"|温度
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|如果有合适的传感器的话，这里会显示硬盘温度。请注意该温度并非直接的摄氏度或华氏度。通常来说，将原始值的最低两位字节转化成十进制，即为精确的温度值（单位：摄氏度）。例如：原始值为0x003600090023，将0x23转换为十进制为35，则硬盘温度为35度。<ref>{{cite web |url=http://www.z-a-recovery.com/manual/smart.aspx |title=S.M.A.R.T. basics |accessdate=2017-11-19 |archive-date=2017-09-22 |archive-url=https://web.archive.org/web/20170922193933/http://www.z-a-recovery.com/manual/smart.aspx |dead-url=no }}</ref>
+|-
+|195
+|0xc3
+|style="text-align:center;width:50px;"| '''Hardware ECC Recovered '''
+|style="text-align:center;"|硬件ECC恢复
+|style="text-align:center;"|
+|（特定原始值）
+|-style="background:#FFC0CB"
+|196
+|0xc4
+|style="text-align:center;width:50px;"| '''Reallocation Event Count'''
+|style="text-align:center;"|重定位事件计数
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|记录已重映射扇区和可能重映射扇区的事件计数。
+|-style="background:#FFC0CB"
+|197
+|0xc5
+|style="text-align:center;width:50px;"| '''Current Pending Sector Count'''
+|style="text-align:center;"|等候重定的扇区计数
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|记录了不稳定的扇区的数量。
+|-style="background:#FFC0CB"
+|198
+|0xc6
+|style="text-align:center;width:50px;"| '''Uncorrectable Sector Count'''
+|style="text-align:center;"| 无法校正的扇区计数
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|记录肯定出错的扇区数量。
+|-
+|199
+|0xc7
+|style="text-align:center;width:50px;"| '''UltraDMA CRC Error Count'''
+|style="text-align:center;"| UltraDMA通讯CRC错误
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|记录硬盘通讯时发生的CRC错误。
+|-
+|200
+|0xc8
+|style="text-align:center;width:50px;"| '''Multi-Zone Error Rate'''
+|style="text-align:center;"| 多区域错误率
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|写入一个区域时发现的错误的计数。
+|-
+|200
+|0xc8
+|style="text-align:center;width:50px;"| '''Write Error Rate '''
+|style="text-align:center;"| 写入错误率
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|Fujitsu的特别属性，写入一个区域时发现的错误的计数。
+|-style="background:#FFC0CB;"
+|201
+|0xc9
+|style="text-align:center;width:50px;"| '''Soft Read Error Rate'''
+|style="text-align:center;"| 逻辑读取错误率
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|记录脱轨错误。
+|-
+|202
+|0xca
+|style="text-align:center;width:50px;"| '''Data Address Mark errors'''
+|style="text-align:center;"| 数据地址标记错误
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|记录数据地址标记错误（或制造商特定的计数）
+|-
+|203
+|0xcb
+|style="text-align:center;width:50px;;"| '''Run Out Cancel'''
+|style="text-align:center;"| 用完取消
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|ECC错误计数
+|-
+|204
+|0xcc
+|style="text-align:center;width:50px;"| '''Soft ECC Correction'''
+|style="text-align:center;"| 逻辑ECC纠正
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|记录由软件ECC更正的错误计数。
+|-
+|205
+|0xcd
+|style="text-align:center;width:50px;"| '''Thermal Asperity Rate '''
+|style="text-align:center;"| 热嘈率
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|记录高温导致的出错记数。
+|-
+|206
+|0xce
+|style="text-align:center;width:50px;"| '''Flying Height'''
+|style="text-align:center;"| 飞行高度
+|style="text-align:center;"|
+|记录磁头的飞行高度。飞得太低会增加磁头撞毁的机会，飞得太高增加读写错误的机会。
+|-
+|207
+|0xcf
+|style="text-align:center;width:50px;"| '''Spin High Current'''
+|style="text-align:center;"| 主轴电机浪涌电流计数
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|记录主轴电机运转时浪涌电流的次数。
+|-
+|208
+|0xd0
+|style="text-align:center;width:50px;"| '''Spin Buzz'''
+|style="text-align:center;"|
+|style="text-align:center;"|
+|记录由于电力不足而启动主轴电机的蜂鸣声次数。
+|-
+|209
+|0xd1
+|style="text-align:center;width:50px;"| '''Offline Seek Performance'''
+|style="text-align:center;"| 离线寻址效能
+|style="text-align:center;"|
+|在其内部测试硬盘的寻址能力表现。
+|-
+|210
+|0xd2
+|style="text-align:center;width:50px;"| '''？'''
+|style="text-align:center;"| ？
+|style="text-align:center;"|
+|（没定性，出现在Maxtor 6B200M0 200GB 和Maxtor 2R015H1 15GB 的硬盘中）
+|-
+|211
+|0xd3
+|style="text-align:center;width:50px;"| '''Vibration During Write'''
+|style="text-align:center;"| 写操作震动
+|style="text-align:center;"|
+|记录写入操作的震动数。
+|-
+|212
+|0xd4
+|style="text-align:center;width:50px;"| '''Shock During Write'''
+|style="text-align:center;"| 写操作冲击
+|style="text-align:center;"|
+|记录写入操作时的冲击数。
+|-
+|220
+|0xdc
+|style="text-align:center;width:50px;"| '''Disk Shift'''
+|style="text-align:center;"| 盘体偏移
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|记录盘体由于冲击或温度导致偏离主轴的相对距离。
+|-
+|221
+|0xdd
+|style="text-align:center;width:50px;"| '''G-Sense Error Rate'''
+|style="text-align:center;"| 加速计出错率
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|从外部诱发的冲击和振动产生的错误计数。
+|-
+|222
+|0xde
+|style="text-align:center;width:50px;"| '''Loaded Hours'''
+|style="text-align:center;"| 数据加载时间
+|style="text-align:center;"|
+|数据读取时所花费的时间。（磁头移动时间）
+|-
+|223
+|0xdf
+|style="text-align:center;width:50px;"| '''Load/Unload Retry Count'''
+|style="text-align:center;"| 加载/卸载重试次数
+|style="text-align:center;"|
+|磁头改变位置时所需时间。
+|-
+|224
+|0xe0
+|style="text-align:center;width:50px;"| '''Load Friction'''
+|style="text-align:center;"| 负载摩擦
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|读写时由于机械摩擦做成的阻力。
+|-
+|225
+|0xe1
+|style="text-align:center;width:50px;"| '''Load/Unload Cycle Count'''
+|style="text-align:center;"| 加载/卸载循环计数
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|总负载周期计数。
+|-
+|226
+|0xe2
+|style="text-align:center;width:50px;"| '''Load 'In'-time'''
+|style="text-align:center;"| 磁头
+|style="text-align:center;"|
+|磁头加载所需总时间（不包括在停泊区的花费）。
+|-
+|227
+|0xe3
+|style="text-align:center;width:50px;"| '''Torque Amplification Count'''
+|style="text-align:center;"| 扭矩放大计数
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|尝试来补偿盘片的速度变化的计数。
+|-
+|228
+|0xe4
+|style="text-align:center;width:50px;"| '''Power-Off Retract Cycle'''
+|style="text-align:center;"| 断电缩回周期
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|切断电源后电磁枢自动缩回的时间计数。
+|-
+|230
+|0xe6
+|style="text-align:center;width:50px;"| '''GMR Head Amplitude'''
+|style="text-align:center;"| GMR磁头振幅
+|style="text-align:center;"|
+|磁头振幅计数（磁头反复正反向运动距离）。
+|-
+|231
+|0xe7
+|style="text-align:center;width:50px;"| '''Temperature'''
+|style="text-align:center;"| 硬盘温度
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|记录硬盘温度。
+|-
+|232
+|0xe8
+|style="text-align:center;width:50px;"| '''Endurance Remaining'''
+|style="text-align:center;"| 耐久性剩余
+|style="text-align:center;"|
+|磁盘可使用周期与设计可使用周期的百分比。
+|-
+|232
+|0xe8
+|style="text-align:center;width:50px;"| '''Available Reserved Space'''
+|style="text-align:center;"| 可用保留空间
+|style="text-align:center;"|
+|Intel固态硬盘报告的可提供的预留空间占作为一支全新的固态硬盘预留空间的百分比。
+|-
+|233
+|0xe9
+|style="text-align:center;width:50px;"| '''Power-On Hours'''
+|style="text-align:center;"| 加电时间
+|style="text-align:center;"|
+|处于开机状态的小时数。
+|-
+|233
+|0xe9
+|style="text-align:center;width:50px;"| '''Media Wearout Indicator'''
+|style="text-align:center;"| 介质耗损指标
+|style="text-align:center;"|
+|Intel固态硬盘报告的NAND刷写寿命，全新时值为100，最低值为1，其跌幅随NAND的擦除周期增加而在0到最大额定周期范围减少。
+|-
+|240
+|0xf0
+|style="text-align:center;width:50px;"| '''Head Flying Hours'''
+|style="text-align:center;"| 磁头飞行时间
+|style="text-align:center;"|
+|磁头处于定位中的时间。
+|-
+|240
+|0xf0
+|style="text-align:center;width:50px;"| '''Transfer Error Rate'''
+|style="text-align:center;"| 传输错误率
+|style="text-align:center;"|
+|在数据传输时连接被重置的次数计数。（Fujitsu特有属性）
+|-
+|241
+|0xf1
+|style="text-align:center;width:50px;"| '''Total LBAs Written'''
+|style="text-align:center;"| LBA写入总数
+|style="text-align:center;"|
+|LBA写入总数计数。
+|-
+|242
+|0xf2
+|style="text-align:center;width:50px;"| '''Total LBAs Read'''
+|style="text-align:center;"| LBA读取总数
+|style="text-align:center;"|
+|LBA读取总数计数，部分S.M.A.R.T.检测程序会把原始值显示为负数，这是因为该原始值为48位，而不是32位的。
+|-
+|250
+|0xfa
+|style="text-align:center;width:50px;"| '''Read Error Retry Rate'''
+|style="text-align:center;"| 读取错误重试率
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|从磁盘读取时的错误计数。
+|-
+|254
+|0xfe
+|style="text-align:center;width:50px;"| '''Free Fall Protection'''
+|style="text-align:center;"| 自由跌落保护
+|style="text-align:center;"|[[Image:Dark_Green_Arrow_Down.svg|center]]
+|对“自由落体事件”检测计数。
+|}
+
+==在非ATA平台上的实现==
+===SCSI===
+硬盘的传输端口平台主要分为ATA和[[SCSI|SCSI]]两个平台。作为一种硬盘的检测技术，理论上都能在两个平台上实现的，但由于两个平台也存在巨大的不同，S.M.A.R.T.在SCSI上的实现和在ATA的实现上也有所不同。首先，作为ATA上的专有规范，S.M.A.R.T.对ATA系统的干预要比SCSI更明显，S.M.A.R.T.对SCSI更多是起到检测的作用，即使在检测到磁盘有故障时，其只是报告监控端，要人为地处理故障。其次，由于SCSI平台的硬盘比ATA的更为复杂，所以其检测属性也比ATA的多和复杂准确，如包括对盘片和驱动电路版的温度检测（ATA多僅对盘片温度检测），对电压的检测等。
+===USB===
+在[[USB|USB]]标准中，USB不能用于计算机内部储存设备的基本总线（如ATA，SCSI等），其本身没有为S.M.A.R.T.提供传输数据的途径。在使用ATA硬盘，以USB为传输端口的移动硬盘中，即使硬盘内S.M.A.R.T.仍然运作，但没办法直接向系统提供S.M.A.R.T.的数据。现在新的移动硬盘的内部驱动转换电路已经能以一些方法将硬盘内S.M.A.R.T.的数据通过USB传输到系统或监控程序中读取。
+
+==参考文献==
+# {{Cite web |url=http://forums.seagate.com/t5/Barracuda-XT-Barracuda-Barracuda/Seagate-s-Seek-Error-Rate-Raw-Read-Error-Rate-and-Hardware-ECC/td-p/122382 |title=Seagate's Seek Error Rate, Raw Read Error Rate, & Hardware ECC Recovered SMART attributes |language=en |accessdate=2013-02-01 |archive-date=2013-07-07 |archive-url=https://web.archive.org/web/20130707105811/http://forums.seagate.com/t5/Barracuda-XT-Barracuda-Barracuda/Seagate-s-Seek-Error-Rate-Raw-Read-Error-Rate-and-Hardware-ECC/td-p/122382 |dead-url=no }}
+
+{{Reflist}}
+
+[[Category:電腦貯存裝置|Category:電腦貯存裝置]]

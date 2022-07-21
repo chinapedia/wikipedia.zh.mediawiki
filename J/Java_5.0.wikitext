@@ -1,0 +1,178 @@
+{{expand|time=2010-09-27T00:01:10+00:00}}
+{{noteTA
+|G1=IT
+|1=zh-hans:面向对象; zh-hant:物件導向;
+|2=zh-hans:编程; zh-hant:程式設計;
+|3=zh-hans:智能化; zh-hant:智慧型;
+|4=zh-hans:指针; zh-hant:指標;
+|5=zh-hans:引用; zh-hant:參照;
+|6=zh-hans:接口; zh-hant:介面;
+|7=zh-hans:太阳;zh-hk:太陽電腦;zh-tw:昇陽;
+|8=zh-hans:接口; zh-tw:介面;
+|9=zh-hans:调用; zh-tw:呼叫;
+|10=zh-hans:代码; zh-tw:程式碼;
+|11=zh-hans:远程; zh-tw:遠端;
+}}
+
+'''[[Java|Java]]'''從'''5.0'''版本開始，加入許多新特性，是[[Java|Java]]歷史中修改最大的版本，許多特點模仿自[[C_Sharp|C#]]，因而被認為是為了與C#對抗。
+
+==新的特性<ref name="new_features">{{Cite web |url=http://docs.oracle.com/javase/1.5.0/docs/relnotes/features.html#lang |title=New Features and Enhancements J2SE 5.0 |accessdate=2013-05-14 |archive-date=2021-01-26 |archive-url=https://web.archive.org/web/20210126105947/https://docs.oracle.com/javase/1.5.0/docs/relnotes/features.html#lang |dead-url=no }}</ref>==
+===自動裝箱／拆箱（Auto-Boxing/Unboxing）===
+将Java中8个基本类型实现自动对象化和值化转换，通过编译器自动完成相关转换代码的生成。
+
+沒有自動裝箱／拆箱：
+<syntaxhighlight lang="java">
+ int int1 = 1;
+ Integer integer2 = new Integer(int1);
+ int int3 = integer2.intValue();
+</syntaxhighlight>
+
+有自動裝箱／拆箱：
+<syntaxhighlight lang="java">
+ int int1 = 1;
+ Integer integer2 = int1;     // 自動裝箱 
+ int int3 = integer2;         // 自動拆箱
+</syntaxhighlight>
+
+实际上将相关字节码反编译后，会还原出其隐式调用的转换方法：
+<syntaxhighlight lang="java">
+ int int1 = 1;
+ Integer integer2 = Integer.valueOf(int1);     // 自動裝箱的本质，通过调用valueOf将值对象化
+ int int3 = integer2.intValue();               // 自動拆箱的本质，通过调用xxxValue将对象值化
+</syntaxhighlight>自動裝箱的新功能，可能是從[[C＃|C#]]語言身上學習來的，Java已經越來越像C#。然而Java對自動裝箱／拆箱的支援，僅是利用編譯器實現，在Java Bytecode中，並無自動裝箱／拆箱的操作碼（opcode）。
+
+=== 泛型（Generic Types） ===
+[[泛型编程|泛型]]就像是C++的模板。原有的Collection API加上泛型支援後，增加對型別的檢查，減少程式錯誤的機會。
+
+沒有泛型：
+<syntaxhighlight lang="java">
+ HashMap hm = new HashMap();
+ int i=1;
+ String tt="test";
+ hm.put(new Integer(i), tt);
+</syntaxhighlight>
+
+使用Generic：
+<syntaxhighlight lang="java">
+ HashMap <Integer, String>hm = new HashMap<Integer, String>();
+ int i=1;
+ String tt = "test";
+ hm.put(i, tt);      // 在這裏對int自動裝箱成Integer，也使用了參數的型別檢查
+</syntaxhighlight>
+
+=== [[Java注解|注解]]（Annotation） ===
+Annotation全名是Program Annotation Facility，是Java SE 5.0的新功能。Java的Annotation類似於.NET的屬性（Attribute）。Java的注解是一種接口（interface），繼承自java.lang.annotation.Annotation。Class File則貼上ACC_ANNOTATION標籤。
+
+從5.0開始，javadoc的<code>@deprecated</code>（代表不建議使用的方法或類別）也被Annotation中的<code>@Deprecated</code>取代；另外，使用Java實作SOP的[[AspectJ|AspectJ]]與[[Spring_Framework|Spring]]也使用了大量的Annotation。
+
+<syntaxhighlight lang="java">
+ // JDK 1.4
+ /**
+  * @todo to be implemented
+  **/
+ void gimmeSomeLoving() {
+   throw new Exception("not implemented");
+ }
+</syntaxhighlight>
+
+<syntaxhighlight lang="java">
+ // JDK 1.5
+ @todo 
+ void gimmeSomeLoving() {
+   throw new Exception("not implemented");
+ }
+</syntaxhighlight>
+
+=== 枚举类型（enum） ===
+[[枚举|枚举]]类型也是J2SE 5.0的新功能。過去Java認為enum的關鍵字是不必要的功能，因為用public static int field就可以取代enum，因此過去一直不用。J2SE 5.0中的class如果是enum，在class file中會被貼上一個ACC_ENUM標籤。
+
+Enum 一般用来表示一组相同类型的常量。如性别、日期、月份、颜色等。对这些属性用常量的好处是显而易见的，不仅可以保证单例，且比较时候可以用 “==” 来替换 equals 。是一种好的习惯。 JDK1.5 之前没有 Enum 这个类型，那时候一般用接口常量来替代。Java有了Enum 之后，可以更贴近的表示这种常量。
+<syntaxhighlight lang="java">
+ // JDK 1.4
+ class JavaTech {
+        public static final int J2ME = 1;
+        public static final int J2SE = 2;
+        public static final int J2EE = 3;
+ }
+</syntaxhighlight>
+<br/>
+<syntaxhighlight lang="java">
+ // JDK 1.5
+ public enum NewJavaTech {
+        J2ME, J2SE, J2EE
+ }
+</syntaxhighlight>
+<br/>
+
+=== 国际化 ===
+Java语言严格区分[[字节|字节]]和[[字符|字符]]。字符的存储格式为[[UCS-2|UCS-2]]，也就是只能使用位於[[基本多文種平面|基本多文種平面]]的字元，从Java 5开始支持[[UTF-16|UTF-16]]字符。
+
+另外，從5.0開始Java的程式也開始可以使用[[Unicode|Unicode]]字元進行命名。
+
+下面就是一個合法的Java程式，裡面包含了[[汉语|中文]]字符作為字串的名稱，這個程式可以在编譯器中通過編譯。
+
+<syntaxhighlight lang="java">
+public class HelloWorld {
+   private String文本 = "HelloWorld";
+}
+</syntaxhighlight>
+<br/>
+
+=== 輸入輸出 ===
+在jdk1.5及其以後版本中，<code>java.util.Scanner</code>和<code>java.util.Formatter</code>類別被应用到輸入輸出中。另外，也出現了類似[[C語言|C語言]]的<code>printf()</code>函式。
+
+=== foreach迴圈 ===
+foreach迴圈，有時又稱forin迴圈，在許多程式語言（包括[[C_Sharp|C#]]、[[Ruby|Ruby]]、[[JavaScript|JavaScript]]）中都有出現，可以直接將一個Array或Map展開，而不必由程式設計師自行檢查邊界，可以有效減少錯誤的機會。
+<syntaxhighlight lang='Java'>
+ int[] array1 = {1, 3, 5};
+ 
+ for(int i : array1){ // foreach迴圈
+     System.out.println("Number: "+i);
+ }
+</syntaxhighlight>
+
+=== 可變長度的引數 ===
+長久以來一直有使用者要求加入<code>printf()</code>函式，受限於Java函式必須要有固定引數的限制，始終無法實現，在加入這個功能之後，連帶<code>printf()</code>也變為可能。
+
+=== static引入 ===
+這個特性允許程式設計師將一個類別中的靜態內容引入到程式中。
+
+<syntaxhighlight lang="java">
+static import java.lang.System.*;
+
+public class HelloWorld {
+    public static void main(String args[]){
+        out.println("Hello World.");
+    }
+}
+</syntaxhighlight>
+
+== 批評 ==
+Java 5.0雖然加入許多的新特性，但為了與舊版本相容，JVM並沒有隨之改變，而僅只是從編譯器動手腳，因而引發許多問題。討論Java語言問題的專書《Java Puzzle》就有專門的篇幅討論5.0之後造成的問題。
+
+=== 自動裝箱／拆箱的矛盾 ===
+自動裝箱這功能也造成了一些矛盾，例如：
+
+<syntaxhighlight lang="java">
+ Integer int1 = new Integer(1);
+ Integer int2 = new Integer(1);
+ 
+ System.out.println(int1 >= int2); // 檢查兩者的值，     true
+ System.out.println(int1 <= int2); // 檢查兩者的值，     true
+ System.out.println(int1 != int2); // 檢查兩者的參考位置，true！
+ System.out.println(int1 == int2); // 实际为檢查兩者的參考位置，false！ 不能认为这是int值类型间的对比，此时还没有发生自动拆箱行为。
+</syntaxhighlight>
+
+=== 泛型擦除 ===
+和C#，C++的泛型不同，Java的泛型只用在型別檢查，使用的時候還要再做一次轉型和类型检查。泛型信息在编译时会从代码中抹除（只保留作为元数据给反射功能获得），泛型对应的值类型在字节码中为java.lang.Object类型，这是为了降低JVM的修改难度和保证老旧代码的运行兼容。
+
+== 注释 ==
+{{Reflist|2}}
+
+{{Java (Sun)}}
+{{Sun Microsystems}}
+{{程序设计语言|Java}}
+
+[[Category:Java|Category:Java]]
+
+[[en:Java_version_history#J2SE_5.0_(September_30,_2004)|en:Java version history#J2SE 5.0 (September 30, 2004)]]

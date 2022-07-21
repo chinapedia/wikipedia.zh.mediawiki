@@ -1,0 +1,34 @@
+{{NoteTA|G1=IT|G2=FL}}
+{{Infobox software
+| name = GlusterFS
+| author = Gluster
+| developer = [[Red_Hat|Red Hat]]公司
+| latest release version = 10.1<ref>{{cite web|url=https://lists.gluster.org/pipermail/packaging/2022-January/000982.html|title=[gluster-packaging] glusterfs-10.1 released|access-date=2022-01-19}}</ref>
+| latest release date = {{release date|df=yes|2022|01|19}}
+| operating system = [[Linux|Linux]], [[OS X|OS X]], [[FreeBSD|FreeBSD]], [[NetBSD|NetBSD]], [[OpenSolaris|OpenSolaris]]
+| genre = [[分布式文件系统|分布式文件系统]]
+| license = [[GPLv3|GNU通用公共许可证第三版]]<ref>{{cite web |url=https://gluster.org/community/documentation/index.php/Gluster_3.1:_Understanding_the_GlusterFS_License |title=Gluster 3.1: Understanding the GlusterFS License |work=Gluster Documentation |publisher=Gluster.org |access-date=30 April 2014 |archive-date=2016-05-03 |archive-url=https://web.archive.org/web/20160503143527/http://www.gluster.org/community/documentation/index.php/Gluster_3.1:_Understanding_the_GlusterFS_License }}</ref>
+| website = {{URL|https://www.gluster.org}}
+}}
+'''Gluster'''是一个大尺度文件系统。它是各种不同的存储[[服务器|服务器]]之上的组合，这些服务器由以太网或无限带宽技术Infiniband<ref>[http://en.wikipedia.org/wiki/Infiniband Infiniband] {{Wayback|url=http://en.wikipedia.org/wiki/Infiniband |date=20201230223030 }}</ref>以及远程直接内存访问RDMA<ref>[http://en.wikipedia.org/wiki/Remote_direct_memory_access RDMA] {{Wayback|url=http://en.wikipedia.org/wiki/Remote_direct_memory_access |date=20210126125901 }}</ref>互相融汇，最终所形成的一个大的并行文件系统网络。它有包括[[云计算|云计算]]在内的多重应用，诸如：[[生物信息学|生物信息学]]，文档存储。Gluster是由GNU托管的自由软件，许可证是AGPL<ref>[http://en.wikipedia.org/wiki/Affero_General_Public_License AGPL]{{Wayback|url=http://en.wikipedia.org/wiki/Affero_General_Public_License |date=20121015124513 }}</ref>。Gluster公司<ref>{{Cite web |url=https://www.gluster.org/ |title=Gluster公司 |access-date=2022-02-21 |archive-date=2022-05-12 |archive-url=https://web.archive.org/web/20220512102756/https://www.gluster.org/ }}</ref>，是Gluster的首要商业赞助商，且提供商业产品以及基于Gluster的解决方案。
+
+==设计==
+Gluster是Client/Server架构。服务器典型的布置在存储卷上，每一台服务器运行一个名为glusterfsd 的守护进程，将本地文件系统作为卷进行输出。Gluster的客户端进程通过TCP/IP，InfiniBand或SDP一类客户协议连接到服务器，将远端卷组成一个大的所谓折叠式翻译器。最终的卷通过一种叫做FUSE<ref>[http://en.wikipedia.org/wiki/Filesystem_in_Userspace FUSE] {{Wayback|url=http://en.wikipedia.org/wiki/Filesystem_in_Userspace |date=20210125000411 }}</ref>的用户空间文件机制机载到客户机。有大量文件应用的I/O同样可以用libglusterfs 客户端库来直接连接服务器并内在的运行翻译器，而无需经过文件系统以及FUSE.大多数GlusterFS功能被实现为翻译器，包括了：
+*基于文件的镜像<ref>[http://en.wikipedia.org/wiki/Mirror_(computing) 镜像] {{Wayback|url=http://en.wikipedia.org/wiki/Mirror_(computing) |date=20210126061609 }}</ref>与赋值<ref>[http://en.wikipedia.org/wiki/Replication_(computer_science) 赋值] {{Wayback|url=http://en.wikipedia.org/wiki/Replication_(computer_science) |date=20201203224249 }}</ref>技术
+*基于文件的数据存储计算领域的数据带<ref>[http://en.wikipedia.org/wiki/Data_striping 数据带] {{Wayback|url=http://en.wikipedia.org/wiki/Data_striping |date=20210125161452 }}</ref>技术
+*基于文件的负载平衡<ref>[http://en.wikipedia.org/wiki/Load_balancing_(computing) 负载平衡] {{Wayback|url=http://en.wikipedia.org/wiki/Load_balancing_(computing) |date=20210201015852 }}</ref>技术
+*卷的双机备份<ref>[http://en.wikipedia.org/wiki/Failover 双机备份] {{Wayback|url=http://en.wikipedia.org/wiki/Failover |date=20210126073936 }}</ref>技术
+*磁盘高速缓存<ref>[http://en.wikipedia.org/wiki/Cache#Disk_cache 磁盘高速缓存] {{Wayback|url=http://en.wikipedia.org/wiki/Cache#Disk_cache |date=20210110213121 }}</ref>技术以及排产<ref>[http://en.wikipedia.org/wiki/I/O_scheduling 排产] {{Wayback|url=http://en.wikipedia.org/wiki/I/O_scheduling |date=20200424221559 }}技术
+*[http://en.wikipedia.org/wiki/Disk_quota 存储分配技术] {{Wayback|url=http://en.wikipedia.org/wiki/Disk_quota |date=20201202034515 }}</ref>
+Gluster的设计遵循[[:奥卡姆剃刀|:奥卡姆剃刀]]原則的简单性：尽管它导出一已存在，但是构建存储的决定权在于客户端翻译器。客户端自身都是没有状态的，互相之间没有交互。但是期望相互间的翻译器配置是一致的。这会引发[[:内存一致性模型|:内存一致性模型]]问题，但这种设计允许Gluster用商用硬件在规模上能达到数个[[:Petabyte|拍字节]]，避免了通常影响分布式文件系统的紧内聚松耦合瓶颈。
+
+==另见==
+* [[分布式文件系统|分布式文件系统]]
+
+==引用==
+{{reflist|2}}
+
+[[Category:分散式檔案系統|Category:分散式檔案系統]]
+[[Category:Linux檔案系統|Category:Linux檔案系統]]
+[[Category:用户空间文件系统|Category:用户空间文件系统]]
+[[Category:分布式数据存储|Category:分布式数据存储]]

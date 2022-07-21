@@ -1,0 +1,128 @@
+{{lowercase|title=stdlib.h}}
+
+{{C_Standard_library}}
+
+'''stdlib.h'''是[[C标准函数库|C标准函数库]]的[[头文件|头文件]]，声明了数值与字符串转换函数, 伪随机数生成函数, 动态内存分配函数, 进程控制函数等公共函数。 [[C++|C++]]程序应调用等价的<code>cstdlib</code>头文件.
+
+== 常量==
+<code>stdlib.h</code>中定义的常量:
+{| {{prettytable}}
+|- bgcolor=#e9e9e9
+! 名字!! 值!! 描述
+|-
+|<code>[[NULL|NULL]]</code> || 一般定义为<code>0</code>, 或<code>0L</code>, 或<code>(void*)0</code> || 表示[[空指针|空指针]]常量的[[巨集|巨集]]; 换句话说，一个常量用来表示一个总是指向无效的内存地址的指针值。
+|-
+|<code>EXIT_FAILURE</code>  || 一个非<code>0</code>值 || 用来指示程序失败的结束，一般用于<code>exit()</code>. 
+|-
+|<code>EXIT_SUCCESS</code>  || <code>0</code> || 用来指示程序成功的结束，一般用于<code>exit()</code>.. 
+|-
+|<code>RAND_MAX</code>  || <code>>= 32767</code> || 函数<code>rand()</code>所能返回的最大的值.
+|-
+|<code>MB_CUR_MAX</code>||   ||当前locale中多字节字符的最大字节数目
+|}
+
+== 数据类型 ==
+<code>stdlib.h</code>中定义的[[数据类型|数据类型]]：
+{| {{prettytable}}
+|- bgcolor=#e9e9e9
+! 名字||描述
+|-
+| <code>size_t</code> || 算子<code>[[sizeof|sizeof]]</code>返回结果的数据类型，实际上是无符号整型.
+|-
+| <code>div_t</code> ， <code>ldiv_t</code>，<code>lldiv_t</code>|| 函数<code>div</code>, <code>ldiv</code>, <code>lldiv</code>的返回结果的数据类型，实际上是包含两个整数的结构类型.
+|}
+== 函数==
+<code>stdlib.h</code>中声明的库函数可分为六类：类型转换、伪随机数、动态内存分配与回收管理、进程控制、搜索及排序、简单数学。
+
+{| {{prettytable}}
+|- bgcolor=#e9e9e9
+! 名字|| 描述
+|- bgcolor=#f2f2f2
+|colspan=2 align=center| 类型转换
+|-
+|<code>atof</code>||把[[字符串|字符串]]转换为双精度浮点数。相当于<code>strtod(s, (char**)NULL)</code>.
+|-
+|<code>atoi</code>|| 把字符串转换为整型. 相当于<code>(int)strtol(s, (char**)NULL, 10)</code>.
+|-
+|<code>atol</code>|| 把字符串转换为长整型. Equivalente a <code>strtol(s, (char**)NULL, 10)</code>.
+|-
+|<code>atoll</code>|| 把字符串转换为长长整型. Equivalente a <code>strtol(s, (char**)NULL, 10)</code>. 这是[[C99|C99]]新增加的库函数。
+|-
+|<code>strtod</code>|| 把字符串转换为双精度浮点数，检查结果是否溢出，并返回字符串不能转换部分的地址.
+|-
+|<code>strtof</code>|| 把字符串转换为单精度浮点数，检查结果是否溢出，并返回字符串不能转换部分的地址.
+|-
+|<code>strtold</code>|| 把字符串转换为长双精度浮点数，检查结果是否溢出，并返回字符串不能转换部分的地址.
+|-
+|<code>strtol</code>|| 把字符串转换为长整型，检查结果是否溢出，并返回字符串不能转换部分的地址.
+|-
+|<code>strtoll</code>||把字符串转换为<code>long long int</code>，检查结果是否溢出，并返回字符串不能转换部分的地址.
+|-
+|<code>strtoul</code>||把字符串转换为无符号长整形，检查结果是否溢出，并返回字符串不能转换部分的地址.
+|-
+|<code>strtoull</code>||把字符串转换为<code>unsigned long long int</code>，检查结果是否溢出，并返回字符串不能转换部分的地址.
+|- bgcolor=#f2f2f2
+|colspan=2 align=center| 伪随机数序列生成
+|-
+|<code>rand</code>|| 返回在0到RAND_MAX之间的伪随机数. 不接受参数作为随机数种子，因此产生的伪随机数列相同，有利于程序调试。
+|-
+|<code>srand</code>|| 初始化<code>rand()</code>接受无符号整型参数作为伪随机数种子.如果种子相同，伪随机数列也相同。
+|- bgcolor=#f2f2f2
+|colspan=2 align=center|  内存的分配与释放
+|-
+|<code>aligned_alloc</code>||边界对齐的动态内存分配.
+|-
+|<code>calloc</code>|| 数组的动态内存分配，且初始化为全零
+|-
+|<code>malloc</code>|| 动态内存分配，其内容不初始化
+|-
+|<code>realloc</code>|| 释放老的动态内存块，按照给出的尺寸分配新的动态内存块，老的内存块的内容尽量复制到新的内存块
+|-
+|<code>free</code>|| 系统释放动态分配的内存. 如果是空指针，则无动作发生；如果指针所指不是动态分配的内存块或者是已释放的内存块，则行为是未定义的。
+|- bgcolor=#f2f2f2
+|colspan=2 align=center|  进程控制/与运行环境的沟通
+|-
+|<code>abort</code>||导致程序非正常的结束，各种流缓冲区与临时文件直接放弃。实际上抛出<code>raise(SIGABRT)</code>，缺省的信号处理行为是使用退出代码3执行终止（terminate）操作。如果<code>SIGABRT</code>被捕捉且信号处理程序不返回，则程序将不终止. 
+|-
+|<code>atexit</code>|| 登记一个函数，当程序使用<code>exit</code>正常退出时被登记的函数自动被调用. 
+|-
+|<code>exit</code>|| 程序正常终止。首先<code>atexit()</code>登记的函数按照登记的逆序被调用；如果多次调用<code>atexit</code>登记了多个函数，按照登记的逆序调用这些函数。如果一个函数被登记了多次，则程序正常退出时该函数也将被调用多次。然后所有缓冲区中的数据被写回(flushed)；所有打开着的流被关闭；<code>tmpfile</code>函数创建的文件被删除。最后，控制权返回给调用环境，返回数值表示程序返回时的状态，0表示<code>EXIT_SUCCESS</code>, 1表示<code>EXIT_FAILURE</code>.
+|-
+|<code>at_quick_exit</code>|| 登记一个函数，当程序使用<code>quick_exit</code>正常退出时被登记的函数自动被调用. 
+|-
+|<code>_Exit</code>|| 程序正常终止, 但<code>atexit()</code>, <code>at_quick_exit()</code>, <code>signal()</code>登记的函数不被调用; 打开的流、文件是否被关闭，由编译器的实现者决定
+|-
+|<code>getenv</code>|| 获得某一个环境变量的字符串值，如果该环境变量不存在，返回<code>NULL</code>.
+|-
+|<code>quick_exit</code>|| 程序正常终止, 但<code>atexit()</code>, 登记的函数不被调用; <code>at_quick_exit()</code>登记的函数按登记顺序的逆序被调用。
+|-
+|<code>system</code>||把参数作为外部环境的命令执行。 如果参数为空，则判断外部环境是否有命令解释器。
+|- bgcolor=#f2f2f2
+|colspan=2 align=center|  搜索与排序 
+|-
+|<code>bsearch</code>||折半搜索.
+|-
+|<code>qsort</code>||快速排序.
+|- bgcolor=#f2f2f2
+|colspan=2 align=center|  整数算术
+|-
+|<code>abs, labs, llabs</code> || 计算整数的绝对值.
+|-
+|<code>div, ldiv, lldiv</code> || 计算整数除法的商与余数.
+|- bgcolor=#f2f2f2
+|colspan=2 align=center|  多字节字符/宽字符转换
+|-
+|<code>mblen</code> || 计算多字节字符的长度并确定是否为有效字符  .
+|-
+|<code> mbtowc</code> || 多字节字符转换为宽字符.
+|-
+|<code> wctomb</code> || 宽字符转换为多字节字符.
+|- bgcolor=#f2f2f2
+|colspan=2 align=center|  多字节字符串/宽字符串转换
+|-
+|<code> mbstowcs</code> || 多字节字符串转换为宽字符串.
+|-
+|<code> wcstombs</code> || 宽字符串转换为多字节字符串.
+|}
+
+[[Category:C标准库头文件|Category:C标准库头文件]]

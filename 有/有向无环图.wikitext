@@ -1,0 +1,201 @@
+{{NoteTA
+|G1=IT
+|G2=Math
+}}
+[[File:Directed_acyclic_graph_3.svg|right]]
+在[[图论|图论]]中，如果一个[[有向图|有向图]]从任意[[顶点_(图论)|顶点]]出发无法经过若干条[[邊_(圖論)|边]]回到该[[顶点_(图论)|点]]，则这个图是一个'''有向无环图'''（'''DAG''', '''D'''irected '''A'''cyclic '''G'''raph）。<ref>{{Cite book|title=Introduction to Algorithms|isbn=978-7-111-40701-0|pages=1172|trans-title=算法导论}}</ref>
+
+因为有向无环图中从一个点到另一个点有可能存在两种路线，因此有向无环图未必能转化成树，但任何有向树均为有向无环图。
+
+==定义==
+[[图_(数学)|图]]由[[顶点_(图论)|顶点]]和连接这些顶点的[[边_(图论)|边]]所构成。每条边都带有从一个顶点指向另一个顶点的方向的图为[[有向图|有向图]]。有向图中的[[道路_(图论)|道路]]为一系列的边，系列中每条边的终点都是下一条边的起点。如果一条路径的起点是这条路径的终点，那么这条路径就是一个环。有向无环图即为没有环出现的有向图。<ref name="thul">{{citation|title=Graphs: Theory and Algorithms|first1=K.|last1=Thulasiraman|first2=M. N. S.|last2=Swamy|publisher=John Wiley and Son|year=1992|isbn=978-0-471-51356-8|contribution=5.7 Acyclic Directed Graphs|page=118}}.</ref><ref name="bang">{{citation|title=Digraphs: Theory, Algorithms and Applications|first1=Jørgen|last1=Bang-Jensen|series=Springer Monographs in Mathematics|edition=2nd|publisher=Springer-Verlag|year=2008|isbn=978-1-84800-997-4|contribution=2.1 Acyclic Digraphs|pages=32–34}}.</ref><ref>{{citation|title=Graph theory: an algorithmic approach|first=Nicos|last=Christofides|author-link=Nicos Christofides||publisher=Academic Press|year=1975|pages=170–174}}.</ref>
+
+[[File:Transitive_Closure.svg|thumb]]]]当存在一条从顶点{{mvar|u}}到顶点{{mvar|v}}的路径时，顶点{{mvar|v}}被称作是从顶点{{mvar|u}}{{link-en|可达性|Reachability|可达}}的。每个顶点都是从自身可达的（通过一条没有边的路径）。如果一个顶点可以从一个非平凡路径（一条由一个或更多边组成的路径）到达自身，那么这条路径就是一个环。因此，有向无环图也可以被定义为没有顶点可以通过非平凡路徑到达自身的图。<ref>{{citation|title=Simulation Techniques for Discrete Event Systems|volume=14|series=Cambridge Computer Science Texts|first=I.|last=Mitrani|year=1982|publisher=Cambridge University Press|isbn=9780521282826|page=27|url=https://books.google.com/books?id=CF04AAAAIAAJ&pg=PA27|accessdate=2020-01-18|archive-date=2021-03-10|archive-url=https://web.archive.org/web/20210310230119/https://books.google.com/books?id=CF04AAAAIAAJ&pg=PA27|dead-url=no}}.</ref>
+
+== 数学性质 ==
+
+=== 可达性，传递闭包和传递归约 ===
+有向无环图的[[可达性|可达性]]可以用其顶点的[[偏序关系|偏序关系]]{{math|≤}}来表示。在偏序关系中，如果存在一条路径从顶点{{mvar|u}}指向顶点{{mvar|v}}，它们的偏序关系可被写作{{math|''u'' ≤ ''v''}}。这也被称作{{mvar|v}}是从{{mvar|u}}可达的。<ref>{{citation|title=The Design and Analysis of Algorithms|series=Monographs in Computer Science|first=Dexter|last=Kozen|authorlink=Dexter Kozen|publisher=Springer|year=1992|isbn=978-0-387-97687-7|page=9|url=https://books.google.com/books?id=L_AMnf9UF9QC&pg=PA9|accessdate=2020-01-14|archive-date=2021-03-10|archive-url=https://web.archive.org/web/20210310230449/https://books.google.com/books?id=L_AMnf9UF9QC&pg=PA9|dead-url=no}}.</ref>不同的有向无环图可以有着相同的可达关系和偏序关系。<ref>{{citation|title=Loop Transformations for Restructuring Compilers: The Foundations|first=Utpal|last=Banerjee|publisher=Springer|year=1993|isbn=978-0-7923-9318-4|page=19|contribution=Exercise 2(c)|url=https://books.google.com/books?id=Cog7zSSlqFwC&pg=PA19|accessdate=2020-01-14|archive-date=2021-03-10|archive-url=https://web.archive.org/web/20210310230619/https://books.google.com/books?id=Cog7zSSlqFwC&pg=PA19|dead-url=no}}.</ref>例如，有两条边{{math|''a'' → ''b''}}，{{math|''b'' → ''c''}}的有向无环图，和有三条边的{{math|''a'' → ''b''}}, {{math|''b'' → ''c''}}，{{math|''a'' → ''c''}}的有向无环图有着相同的偏序关系{{math|''a'' ≤ ''b'' ≤ ''c''}}。
+
+对于一个有向无环图{{mvar|G}}，它的[[传递闭包|传递闭包]]等同于一个在保持与其相同可达性的情况下，边数最多的图。在这个图中，当{{mvar|u}}可达{{mvar|v}}的时候，边{{math|''u'' → ''v''}}必定存在。换句话说，每个{{mvar|G}}中的非相同元素<!-- distinct elements -->偏序关系对{{math|''u'' ≤ ''v''}}都在这个图中有一条边。这可以被视作用图来可视化图{{mvar|G}}的可达性关系。
+
+{{multiple image|image1=Tred-G.svg|width1=175|image2=Tred-Gprime.svg|width2=124|caption1=有向无环图{{mvar|G}}|caption2={{mvar|G}}的传递规约}}
+有向无环图{{mvar|G}}的[[传递规约|传递规约]]为和其有着相同可达性，边数最少的图。它是{{mvar|G}}的一个子图。构造方法为当{{mvar|G}}有着一条更长的路径连接顶点{{mvar|u}}和{{mvar|v}}的时候，消去边{{math|''u'' → ''v''}}。
+传递约简和传递闭包都是有向无环图的特有概念<!-- is uniquely defined 唯一的？ -->。相反的，对于有向有环图，可以存在多个与原图有着相同可达性的最简子图。<ref>{{citation|title=Digraphs: Theory, Algorithms and Applications|series=Springer Monographs in Mathematics|first1=Jørgen|last1=Bang-Jensen|first2=Gregory Z.|last2=Gutin|publisher=Springer|year=2008|isbn=978-1-84800-998-1|url=https://books.google.com/books?id=4UY-ucucWucC&pg=PA36|contribution=2.3 Transitive Digraphs, Transitive Closures and Reductions|pages=36–39|accessdate=2020-01-14|archive-date=2021-03-10|archive-url=https://web.archive.org/web/20210310230336/https://books.google.com/books?id=4UY-ucucWucC&pg=PA36|dead-url=no}}.</ref>
+
+[[File:Hasse_diagram_of_powerset_of_3.svg|thumb]]按[[子集|包含]]偏序排序得到的[[哈斯图|哈斯图]]]]
+对于有向无环图{{mvar|G}}和表达其可达性的偏序关系{{math|≤}}，它的传递规约也可以看作包含{{mvar|G}}的{{link-en|覆盖关系|covering relation}}中每一条边的{{mvar|G}}的子图。传递规约在图示有向无环图的偏序关系时十分有用，因为它们比其他具有相同偏序关系的图的边数要少，这简化了[[绘图|绘图]]。偏序关系的[[哈斯图|哈斯图]]由将传递规约中的每条边的起点绘制在其终点的下方而得到。<ref>{{citation|title=Graphs, Networks and Algorithms|volume=5|series=Algorithms and Computation in Mathematics|first=Dieter|last=Jungnickel|publisher=Springer|year=2012|isbn=978-3-642-32278-5|pages=92–93|url=https://books.google.com/books?id=PrXxFHmchwcC&pg=PA92|accessdate=2020-01-15|archive-date=2021-03-10|archive-url=https://web.archive.org/web/20210310230422/https://books.google.com/books?id=PrXxFHmchwcC&pg=PA92|dead-url=no}}.</ref>
+
+=== 拓扑排序===
+有向无环图的[[拓扑排序|拓扑排序]]为所有边的起点都出现在其终点之前的排序。能构成拓扑排序的图一定没有环，因为环中的一条边必定从排序较后的顶点指向比其排序更前的顶点。<ref name="bang"/>基于此，拓扑排序可以被用来定义有向无环图：当且仅当一个有向图有拓扑排序，它是有向无环图。一般情况下，拓扑排序并非唯一。有向无环图仅仅在存在一条路径可以包含其所有顶点的情况下，有唯一的拓扑排序方式，这时，拓扑排序与它们在这条路径中出现的顺序相同。<ref>{{citation|title=Algorithms|first1=Robert|last1=Sedgewick|author1-link=Robert Sedgewick (computer scientist)|first2=Kevin|last2=Wayne|edition=4th|publisher=Addison-Wesley|year=2011|isbn=978-0-13-276256-4|url=https://books.google.com/books?id=idUdqdDXqnAC&pg=PA598|pages=598–599|contribution=4,2,25 Unique topological ordering|accessdate=2020-01-17|archive-date=2021-03-10|archive-url=https://web.archive.org/web/20210310230452/https://books.google.com/books?id=idUdqdDXqnAC&pg=PA598|dead-url=no}}.</ref>
+
+有向无环图的拓扑排序族等同于其可达性的{{link-en|线性拓展|linear extension}}族。 <ref>{{citation|title=A Short Course in Discrete Mathematics|series=Dover Books on Computer Science|first1=Edward A.|last1=Bender|first2=S. Gill|last2=Williamson|publisher=Courier Dover Publications|year=2005|isbn=978-0-486-43946-4|page=142|url=https://books.google.com/books?id=iuEoAwAAQBAJ&pg=PA142|contribution=Example 26 (Linear extensions – topological sorts)|accessdate=2020-01-17|archive-date=2021-03-10|archive-url=https://web.archive.org/web/20210310225843/https://books.google.com/books?id=iuEoAwAAQBAJ&pg=PA142|dead-url=no}}.</ref>因此，偏序关系相同的任意两个图会有相同的拓扑排序集。
+
+=== 组合计数 ===
+{{harvtxt|罗宾逊|1973}}研究了有向无环图的{{link-en|图计数|graph enumeration}}问题。<ref name="enum">{{citation|first=R. W.|last=Robinson|contribution=Counting labeled acyclic digraphs|pages=239–273|editor-first=F.|editor-last=Harary|editor-link=Frank Harary|title=New Directions in the Theory of Graphs|publisher=Academic Press|year=1973}}. See also {{citation
+|last1 = Harary | first1 = Frank | author1-link = Frank Harary | first2 = Edgar M. | last2 = Palmer | year =  1973| title = Graphical Enumeration  | publisher = [[Academic_Press|Academic Press]] | isbn = 978-0-12-324245-7 | page=19}}.</ref>
+如标号顶点在拓扑排序中出现的顺序不受限制，有{{mvar|n}}个顶点的标号有向无环图的数量为
+:1, 1, 3, 25, 543, 29281, 3781503, … {{OEIS|id=A003024}}。
+其中{{math|1=''n'' = 0, 1, 2, 3,……}}。这个数列的[[递推关系式|递推关系式]]是
+:<math>a_n = \sum_{k=1}^n (-1)^{k-1} {n\choose k}2^{k(n-k)} a_{n-k}.</math><ref name="enum" />
+[[埃里克·韦斯坦因|埃里克·韦斯坦因]]推测<ref>{{MathWorld | urlname=WeissteinsConjecture | title=Weisstein's Conjecture}}</ref>，{{mvar|n}}个顶点的标号有向无环图的数量与其中所有[[特征值和特征向量|特征值]]都为正实数的{{math|n*n}}[[逻辑矩阵|逻辑矩阵]]的数量相同。这一点随后被证实，证明采用了[[双射法|双射法]]：一个矩阵{{mvar|A}}是有向无环图的一个[[邻接矩阵|邻接矩阵]]，当且仅当{{math|''A'' + ''I''}}是一个所有特征值都为正数的逻辑矩阵，其中{{mvar|I}}为[[单位矩阵|单位矩阵]]。因为一个有向无环图不允许[[自环|自环]]，它的邻接矩阵的对角线必定全为0。因此，加上{{mvar|I}}保持了所有矩阵因子都是0或1的特性。<ref>{{citation|last1=McKay|first1=B. D.|author1-link=Brendan McKay|last2=Royle|first2=G. F.|author2-link=Gordon Royle|last3=Wanless|first3=I. M.|last4=Oggier|first4=F. E.|author4-link=Frédérique Oggier|last5=Sloane|first5=N. J. A.|author5-link=Neil Sloane|last6=Wilf|first6=H.|author6-link=Herbert Wilf|title=Acyclic digraphs and eigenvalues of (0,1)-matrices|journal=[[Journal_of_Integer_Sequences|Journal of Integer Sequences]]|volume=7|year=2004|url=http://www.cs.uwaterloo.ca/journals/JIS/VOL7/Sloane/sloane15.html|accessdate=2020-01-19|archive-date=2021-02-24|archive-url=https://web.archive.org/web/20210224212408/https://cs.uwaterloo.ca/journals/JIS/VOL7/Sloane/sloane15.html|dead-url=no}}, Article 04.3.3.</ref>
+
+=== 相关概念 ===
+{{multiple image
+|image1=Polytree.svg|caption1=一颗多重树
+|image2=Butterfly multitree.svg|caption2={{link-en|强明确树|multitree}}
+|width2=254<!---adjust to make both images the same height-->
+}}
+{{link-en|多重树|polytree}}由将[[树_(图论)|自由树]]的边{{link-en|定向 (图论)|orienting|定向}}而得到。<ref>{{citation
+ | last1 = Rebane
+ | first1 = George
+ | last2 = Pearl
+ | first2 = Judea
+ | author2-link = Judea Pearl
+ | contribution = The recovery of causal poly-trees from statistical data
+ | pages = 222–228
+ | title = in Proc. 3rd Annual Conference on Uncertainty in Artificial Intelligence (UAI 1987), Seattle, WA, USA, July 1987
+ | url = ftp://ftp.cs.ucla.edu/tech-report/198_-reports/870031.pdf
+ | year = 1987
+ }}{{Dead link|date=July 2019 |bot=InternetArchiveBot |fix-attempted=yes }}.</ref> 多重树必定是有向无环图。对于有根树，将其所有边赋予指离根的方向也可以得到有向无环图，即[[树状图|树状图]]。
+<!--- rough translation & ref needed --->
+
+{{link-en|强明确树|multitree}}<!---原创翻译--->是每两个顶点最多被一条路径所连接的有向无环图。等价的说，它是满足以下性质的一个有向无环图：对于图中每个顶点{{mvar|v}}，从{{mvar|v}}可达的顶点组成一颗树。<ref>{{citation
+ | last1 = Furnas | first1 = George W. | author1-link = George Furnas
+ | last2 = Zacks | first2 = Jeff
+ | contribution = Multitrees: enriching and reusing hierarchical structure
+ | doi = 10.1145/191666.191778
+ | pages = 330–336
+ | title = Proc. SIGCHI conference on Human Factors in Computing Systems (CHI '94)
+ | year = 1994| isbn = 978-0897916509 }}.</ref>
+
+== 相关计算问题 ==
+
+=== 拓扑排序和识别 ===
+{{Main|拓扑排序}}
+可以用[[时间复杂度|线性时间复杂度]]的卡恩算法来找到一个有向无环图的拓扑排序。<ref name="clrs">{{Introduction to Algorithms|edition=2}}  Section 22.4, Topological sort, pp. 549–552.</ref>简单来说，开设一个存放结果的列表{{mvar|L}}，先将入度为零的节点放到{{mvar|L}}中，因为这些节点没有任何的父节点。将与这些节点相连的边从图中去掉，再寻找图中入度为零的节点。对于新找到的节点来说，他们的父节点已经都在{{mvar|L}}中了，所以也可以从末端插入{{mvar|L}}。重复上述操作，直到找不到入度为零的节点。<ref name="j50" /> 另外一种构造拓扑排序的算法是将[[深度优先搜索|深度优先搜索]]的[[树的遍历|后序遍历]]结果翻转。<ref name="clrs" />
+
+检查一个有向图是否为有向无环图亦可在线性时间内完成。一种方法是先找到一个拓扑排序，然后测试这个排序是否能符合图中每条边所连顶点在排序中应该出现的顺序。<ref>For [[深度优先搜索|depth-first search]] based topological sorting algorithm, this validity check can be interleaved with the topological sorting algorithm itself; see e.g. {{citation|title=The Algorithm Design Manual|first=Steven S.|last=Skiena|publisher=Springer|year=2009|isbn=978-1-84800-070-4|pages=179–181|url=https://books.google.com/books?id=7XUSn0IKQEgC&pg=PA179|accessdate=2020-01-21|archive-date=2021-03-10|archive-url=https://web.archive.org/web/20210310225826/https://books.google.com/books?id=7XUSn0IKQEgC&pg=PA179|dead-url=no}}.</ref> 对于卡恩算法在内的部分拓扑排序算法，通过在算法终止时判断是否满足一定条件即可知道图是否有环。<ref name="j50">{{harvtxt|Jungnickel|2012}}, pp. 50–51.</ref>如果有环，卡恩算法最终获得的{{mvar|L}}中节点个数会与图的节点总数不同。
+
+=== 从其他图构建===
+任意无向图都可以被转化为有向无环图。构造方法是选定一个顶点的[[全序关系|全序关系]]，并将无向图中所有边从全序关系中较前的顶点指向较后的顶点。这种方法是{{tsl|en|Orientation (graph theory)|定向 (图论)|定向}}方法中的{{tsl|en|acyclic orientation|无环定向}}。不同的全序关系可能推出相同的无环定向，因此一个包含{{mvar|n}}个顶点的图的无环定向数量小于{{math|''n''!}}<!---全序关系数量？--->。如果定义{{mvar|χ}}为给定图的[[色多项式|色多项式]]，无环定向数量等于{{math|{{!}}''χ''(−1){{!}}}}。<ref>{{citation|first=Richard P.|last=Stanley|authorlink=Richard P. Stanley|title=Acyclic orientations of graphs|journal=Discrete Mathematics|volume=5|issue=2|pages=171–178|year=1973|doi=10.1016/0012-365X(73)90108-8|url=http://math.mit.edu/~rstan/pubs/pubfiles/18.pdf|accessdate=2020-01-22|archive-date=2021-02-24|archive-url=https://web.archive.org/web/20210224100813/http://math.mit.edu/~rstan/pubs/pubfiles/18.pdf|dead-url=no}}.</ref>
+
+任意有环有向图都可以被转化为有向无环图。只要从图中移除{{tsl|en|feedback vertex set|反馈节点集}}或{{tsl|en|feedback arc set|反馈边集}}，即对于图中每个环，至少包括环中一个顶点或边的集合。不过，找到反馈节点或边的最小集合是[[NP困难|NP困难]]问题。<ref>{{citation | last1=Garey | first1=Michael R. | authorlink1=Michael Garey | last2=Johnson | first2=David S. | authorlink2=David S. Johnson | year=1979| title=[[Computers_and_Intractability|Computers and Intractability: A Guide to the Theory of NP-Completeness]]| publisher=[[W._H._Freeman_and_Company|W. H. Freeman]]| isbn=0-7167-1045-5| chapter = Problems GT7 and GT8| pages = 191–192}}</ref> 另外一种方法将有环有向图去环的方法是将每个强连通分量[[边收缩|收缩]]为一个顶点。<ref>{{citation|title=Structural Models: An Introduction to the Theory of Directed Graphs|last1=Harary|first1=Frank|author1-link=Frank Harary|last2=Norman|first2=Robert Z.|last3=Cartwright|first3=Dorwin|publisher=John Wiley & Sons|year=1965|page=63}}.</ref> 对于无环图，它的最小反馈顶点或边集为[[空集|空集]]，它的强连通分量则为自身。
+
+=== 传递闭包和传递约简 ===
+有向无环图的传递闭包可以通过[[广度优先搜索|广度优先搜索]]或[[深度优先搜索|深度优先搜索]]对每个节点测试可达性来构建。算法对于一个有着{{mvar|n}}个顶点和{{mvar|m}}条边的有向无环图的复杂度为{{math|''O''(''mn'')}}。<ref>{{harvtxt|Skiena|2009}}, p. 495.</ref>也可以使用{{tsl|en|matrix multiplication algorithm|矩阵乘法算法}}中最快的{{tsl|en|Coppersmith–Winograd algorithm|Coppersmith–Winograd算法}}，其复杂度为{{math|''O''(''n''<sup>''2.3728639''</sup>)}}。这个算法理论上在{{tsl|en|dense graph|稠密图}}中快过{{math|''O''(''mn'')}}。<ref>{{harvtxt|Skiena|2009}}, p. 496.</ref>
+
+不论在哪种传递闭包算法中，那些被一条长度至少为2的路径所连接的顶点对，都可以和只有一条长度为1的路径所连接的顶点对区分开。由于传递约简包含后者，传递约简可以在和传递闭包相同的{{tsl|en|Asymptotic computational complexity|渐进时间复杂度}}中被构建。<ref>{{harvtxt|Bang-Jensen|Gutin|2008}}, p. 38.</ref>
+
+=== 闭包问题 ===
+闭包是一个图中没有出边的顶点子集，即不存在从子集中顶点指向子集外顶点的边。{{tsl|en|closure problem|闭包问题}}是则是找到带权图中使得权之和最大或最小的子集。闭包问题可以看作[[最大流问题|最大流问题]]的简化版，在[[多项式时间|多项式时间]]内被解决。实际上，是否有环对于找到闭包没有影响。<ref>{{citation
+ | last = Picard | first = Jean-Claude
+ | doi = 10.1287/mnsc.22.11.1268
+ | issue = 11
+ | journal = {{tsl|en|Management Science (journal)||Management Science}}
+ | mr = 0403596
+ | pages = 1268–1272
+ | title = Maximal closure of a graph and applications to combinatorial problems
+ | volume = 22
+ | year = 1976}}.</ref>
+
+=== 最短或最长路径问题 ===
+基于拓扑排序的性质，有向无环图的[[最短路问题|最短路问题]]和[[最长路径问题|最长路径问题]]可以在线性时间内解决。将顶点拓扑排序后，从前到后遍历每一个顶点，对于遍历到的顶点，更新其所有出边所到达顶点的长度值。如果求最短路，则在本边是更短路径的一部分时更新。求最长路则反之。<ref>Cormen et al. 2001, Section 24.2, Single-source shortest paths in directed acyclic graphs, pp. 592–595.</ref>对于非有向无环图，最短路需要用复杂度为<math>O(|E|+|V|\log|V|)</math>的[[戴克斯特拉算法|戴克斯特拉算法]]或<math>O (|V| |E|)</math>的[[贝尔曼-福特算法|贝尔曼-福特算法]]等。<ref>Cormen et al. 2001, Sections 24.1, The Bellman–Ford algorithm, pp. 588–592, and 24.3, Dijkstra's algorithm, pp. 595–601.</ref>最长路径则是一个[[NP困难|NP困难问题]]。<ref>Cormen et al. 2001, p. 966.</ref>
+
+==应用==
+=== 调度 ===
+有向无环图的偏序关系可以在[[時間表|调度]]有着先后顺序限制的系统任务中发挥作用。<ref>{{harvtxt|Skiena|2009}}, p. 469.</ref>调度问题的一个重要种类是串联需要更新的对象，如[[電子試算表|電子試算表]]中某个单元格的计算公式依赖于其他单元格，或在程序的[[源代码|源代码]]被修改后重新编译[[目标代码|目标文件]]。{{tsl|en|dependency graph|依赖图}}则记录了这种更新依赖关系。其每个顶点对应一个需要被更新的对象，边则表示更新的关系。依赖图中的环被称为{{tsl|en|circular dependency|环状依赖}}。环状依赖通常是不被允许出现的，因为不能保证圈内任务排定顺序的一致性。无环的依赖图即为有向无环图。<ref>{{citation | last1=Al-Mutawa | first1=H. A. | last2=Dietrich | first2=J. | last3=Marsland | first3=S. | last4=McCartin | first4=C. | contribution=On the shape of circular dependencies in Java programs | doi=10.1109/ASWEC.2014.15 | pages=48–57 | publisher=IEEE | title=23rd Australian Software Engineering Conference | year=2014| isbn=978-1-4799-3149-1 }}.</ref>
+
+举例来说，当电子表格中一个单元格的数值发生改变，其他直接或间接依赖于该单元格的所有单元格的值都需要被重新计算。被调度的任务为重新计算某个特定单元格的值。当一个单元格的值取决于另外一个单元格时，两个单元格之间则有依赖关系。每个被依赖单元格的值的计算过程都必须先于使用它的表达式执行。使用依赖图的拓扑排序来调度任务使得在每个单元格的值都仅被重新计算一次的情况下，整个工作表都能被更新。<ref name="hgt1181">{{citation |title=Handbook of Graph Theory |first1=Jonathan L. |last1=Gross |first2=Jay |last2=Yellen |first3=Ping |last3=Zhang |author3-link=Ping Zhang (graph theorist) |edition=2nd |publisher=CRC Press |year=2013 |isbn=978-1-4398-8018-0 |page=1181 |url=https://books.google.com/books?id=cntcAgAAQBAJ&pg=PA1181 |accessdate=2020-01-30 |archive-date=2021-03-10 |archive-url=https://web.archive.org/web/20210310230346/https://books.google.com/books?id=cntcAgAAQBAJ&pg=PA1181 |dead-url=no }}.</ref>相似的任务调度场景出现在程序源代码编译的{{tsl|en|makefile|makefile}}，<ref name="hgt1181" />和优化计算机程序底层执行的[[指令调度|指令调度]]中。<ref>{{citation |title=The Compiler Design Handbook: Optimizations and Machine Code Generation |first1=Y. N. |last1=Srikant |first2=Priti |last2=Shankar |edition=2nd |publisher=CRC Press |year=2007 |isbn=978-1-4200-4383-9 |pages=19–39 |url=https://books.google.com/books?id=1kqAv-uDEPEC&pg=SA19-PA39 |accessdate=2020-01-30 |archive-date=2021-03-10 |archive-url=https://web.archive.org/web/20210310225827/https://books.google.com/books?id=1kqAv-uDEPEC&pg=SA19-PA39 |dead-url=no }}.</ref>
+
+[[File:Pert_chart_colored.svg|thumb]]]]
+[[计划评审技术|计划评审技术]]是一种基于有向无环图的计划排定技术，通常用于组织大型的人工项目。在计划评审技术中，每个顶点表示项目的一个{{tsl|en|Milestone (project management)|里程碑 (项目管理)|里程碑}}，每条有向边表示任务或者活动，连接着表示任务开始或结束的两个节点。每条边则被标注上预估需时。图中的[[最长路径问题|最长路径]]即为项目的[[关键路径|关键路径]]。关键路径决定了项目所需的总时间，里程碑的完成时间取决于结束于本顶点的最长路径。<ref>{{citation |title=What Every Engineer Should Know About Decision Making Under Uncertainty |first=John X. |last=Wang |publisher=CRC Press |year=2002 |isbn=978-0-8247-4373-4 |page=160 |url=https://books.google.com/books?id=C3yKML0dUVIC&pg=PA160 |accessdate=2020-01-31 |archive-date=2021-03-10 |archive-url=https://web.archive.org/web/20210310230231/https://books.google.com/books?id=C3yKML0dUVIC&pg=PA160 |dead-url=no }}.</ref>
+
+=== 数据处理网络 ===
+有向无环图可以用于表示处理数据的元素网络。在网络中，数据从一个元素顶点的入边进入，处理后从出边离开。
+
+在电子电路设计中，静态[[组合逻辑电路|组合逻辑电路]]块可以被表示为由[[邏輯閘|邏輯閘]]组成的有向无环系统。每个逻辑门对输入做一次函数处理，输入和输出均为一个[[位元|位元]]组。通常，这些电路块的输出不能够再作为输入，除非它们被存储在寄存器或者状态单元中，以保证图不出现环。<ref>{{citation|title=Timing|first=Sachin|last=Sapatnekar|publisher=Springer|year=2004|isbn=978-1-4020-7671-8|page=133|url=https://books.google.com/books?id=fL9k-VkZVr0C&pg=PA133|accessdate=2020-02-03|archive-date=2021-03-10|archive-url=https://web.archive.org/web/20210310230334/https://books.google.com/books?id=fL9k-VkZVr0C&pg=PA133|dead-url=no}}.</ref>
+
+{{tsl|en|Dataflow programming|数据式编程}}语言描述针对{{tsl|en|data stream|数据流}}的操作，以及操作的输出和其他操作的输入之间的关系。这类型的语言使得描绘高重复率数据处理任务的变得更加简单，因为同样的数据操作可以应用于许多数据项。数据操作可以用有向无环图来表示。这些数据操作可以被[[平行演算法|并发]]执行，从而高效利用多核心[[中央处理器|处理器]]。<ref>{{citation|title=Programming Symposium|series=Lecture Notes in Computer Science|volume=19|year=1974|pages=362–376|contribution=First version of a data flow procedure language|first=Jack B.|last=Dennis|doi=10.1007/3-540-06859-7_145|isbn=978-3-540-06859-4}}.</ref>
+
+在[[編譯器|編譯器]]中，直线码（不含条件分支和循环的代码段）可以使用有向无环图表示。图标示出每个算术运算的输入和输出。这种表示法让编译器能执行{{tsl|en|common subexpression elimination|通用子表达式删除}}，使得代码更高效。<ref>{{citation|title=Advanced Backend Optimization|first1=Sid|last1=Touati|first2=Benoit|last2=de Dinechin|publisher=John Wiley & Sons|year=2014|isbn=978-1-118-64894-0|page=123|url=https://books.google.com/books?id=nO2-AwAAQBAJ&pg=PA123|accessdate=2020-02-04|archive-date=2021-03-10|archive-url=https://web.archive.org/web/20210310230450/https://books.google.com/books?id=nO2-AwAAQBAJ&pg=PA123|dead-url=no}}.</ref>
+
+=== 因果结构 ===
+{{main|贝叶斯网络}}
+
+用顶点表示事件，边表示[[因果关系|因果关系]]的图通常是无环的。<ref>{{citation|title=Causal Learning|first1=Alison|last1=Gopnik|first2=Laura|last2=Schulz|publisher=Oxford University Press|year=2007|isbn=978-0-19-803928-0|page=4|url=http://books.google.com/books?id=35MKXlKoXIUC&pg=PA4|accessdate=2020-06-01|archive-date=2021-03-10|archive-url=https://web.archive.org/web/20210310230620/https://books.google.com/books?id=35MKXlKoXIUC&pg=PA4|dead-url=no}}.</ref>事件由时间上的先后顺序来排列，所有箭头遵循从先发生事件指向后发生事件的原则，因此也不存在环。
+
+举例来说，[[貝氏網路|貝氏網路]]表示多个概率事件的关联网络。顶点表示事件，后续事件的发生可能性则可以通过其在有向无环图的前驱节点的发生概率计算出来。<ref>{{citation|title=Probabilistic Boolean Networks: The Modeling and Control of Gene Regulatory Networks|publisher=Society for Industrial and Applied Mathematics|first1=Ilya|last1=Shmulevich|first2=Edward R.|last2=Dougherty|year=2010|isbn=978-0-89871-692-4|page=58|url=http://books.google.com/books?id=RfshqEgO7KgC&pg=PA58|accessdate=2020-06-01|archive-date=2021-03-10|archive-url=https://web.archive.org/web/20210310230338/https://books.google.com/books?id=RfshqEgO7KgC&pg=PA58|dead-url=no}}.</ref>在此基础上，一个有向无环图的{{tsl|en|moral graph|端正图}}通过以下方法而得到：将单个顶点的所有父节点之间添加一条无向边，再将所有的有向边换成无向边。<ref>{{citation |last1= Cowell |first1= Robert G. |author2-link=Philip Dawid|last2=Dawid|first2=A. Philip|author3-link=Steffen Lauritzen|last3=Lauritzen|first3=Steffen L.|author4-link=David Spiegelhalter|last4=Spiegelhalter|first4=David J.|title= Probabilistic Networks and Expert Systems |publisher= Springer |year= 1999 |isbn= 0-387-98767-3 |chapter= 3.2.1 Moralization|pages= 31–33 }}.</ref>
+
+另外一种具有相似因果结构的图是{{tsl|en|influence diagram|影响图}}。其顶点表示决策或不确定的事件，边表示两个顶点之间的因果关系。<ref>{{citation|title=The Technology Management Handbook|first=Richard C.|last=Dorf|publisher=CRC Press|year=1998|isbn=978-0-8493-8577-3|page=9-7<!-- Do not conver this hyphen into a dash! It is a section-page number, not a range of page numbers. -->|url=http://books.google.com/books?id=C2u8I0DFo4IC&pg=SA9-PA7|accessdate=2020-06-01|archive-date=2021-03-10|archive-url=https://web.archive.org/web/20210310225844/https://books.google.com/books?id=C2u8I0DFo4IC&pg=SA9-PA7|dead-url=no}}.</ref>在[[流行病学|流行病学]]中，这些表示因果关系的图表常常用来评估不同干预手段的效果。<ref>{{citation|title=Encyclopedia of Epidemiology, Volume 1|first=Sarah|last=Boslaugh|publisher=SAGE|year=2008|isbn=978-1-4129-2816-8|page=255|url=http://books.google.com/books?id=wObgnN3x14kC&pg=PA255|accessdate=2020-06-01|archive-date=2021-03-10|archive-url=https://web.archive.org/web/20210310230035/https://books.google.com/books?id=wObgnN3x14kC&pg=PA255|dead-url=no}}.</ref><ref name=pearl:95>{{cite journal|last1=Pearl|first1=Judea|authorlink= Judea Pearl|title=Causal diagrams for empirical research|journal=Biometrika|date=1995|volume=82|issue=4|pages=669–709|doi=10.1093/biomet/82.4.669}}</ref>
+
+=== 系谱学和版本历史 ===
+[[File:EgyptianPtolemies2.jpg|thumb]]的谱系图。]]
+
+[[谱系图|谱系图]]可以看作是有向无环图，顶点代表家族成员，边代表亲子关系。<ref>{{citation|journal=Algorithms for Molecular Biology|date=April 2011|volume=6|issue=10|pages=10|title=Haplotypes versus genotypes on pedigrees|first=Bonnie B.|last=Kirkpatrick|doi=10.1186/1748-7188-6-10|pmc=3102622|pmid=21504603}}.</ref>虽然谱系图也被称作为家族“树”, 但近亲结婚导致的{{tsl|en|pedigree collapse|血统崩溃}}会违反树的性质。即一个孩子的祖先既可以从父亲向上追溯，也可以从母亲一侧。<ref>{{citation
+ | last1 = McGuffin
+ | first1 = M. J.
+ | last2 = Balakrishnan
+ | first2 = R.
+ | contribution = Interactive visualization of genealogical graphs
+ | contribution-url = http://profs.etsmtl.ca/mMcGuffin/research/genealogyVis/genealogyVis.pdf
+ | doi = 10.1109/INFVIS.2005.1532124
+ | pages = 16–23
+ | title = IEEE Symposium on Information Visualization (INFOVIS 2005)
+ | year = 2005
+ | isbn = 978-0-7803-9464-3
+ | accessdate = 2020-02-07
+ | archive-date = 2021-02-24
+ | archive-url = https://web.archive.org/web/20210224132723/http://profs.etsmtl.ca/mMcGuffin/research/genealogyVis/genealogyVis.pdf
+ | dead-url = no
+ }}.</ref>图中的[[母系制度|母系血统]]和[[父系制度|父系血统]]则可以看作为树。因为没有人可以是自己的祖先，谱系图是无环的。<ref>{{citation
+ | last1 = Bender
+ | first1 = Michael A.
+ | last2 = Pemmasani
+ | first2 = Giridhar
+ | last3 = Skiena
+ | first3 = Steven
+ | last4 = Sumazin
+ | first4 = Pavel
+ | contribution = Finding least common ancestors in directed acyclic graphs
+ | contribution-url = http://dl.acm.org/citation.cfm?id=365411.365795
+ | isbn = 978-0-89871-490-6
+ | location = Philadelphia, PA, USA
+ | pages = 845–854
+ | publisher = Society for Industrial and Applied Mathematics
+ | title = Proceedings of the Twelfth Annual ACM-SIAM Symposium on Discrete Algorithms (SODA '01)
+ | year = 2001
+ | accessdate = 2020-02-08
+ | archive-date = 2018-12-01
+ | archive-url = https://web.archive.org/web/20181201080652/https://dl.acm.org/citation.cfm?id=365411.365795
+ | dead-url = no
+ }}.</ref>
+
+基于相同的原因， 一个[[分散式版本控制|分散式版本控制]]系统的版本历史的结构也是有向无环图。在系统中，每个版本对应一个节点。边连接起有直接衍生关系的两个版本。由于分支合并的存在，这个结构并不能用树来表示。<ref>{{citation|title=Architecture and Methods for Flexible Content Management in Peer-to-Peer Systems|first=Udo|last=Bartlang|publisher=Springer|year=2010|isbn=978-3-8348-9645-2|page=59|url=https://books.google.com/books?id=vXdEAAAAQBAJ&pg=PA59|accessdate=2020-05-31|archive-date=2021-03-10|archive-url=https://web.archive.org/web/20210310230335/https://books.google.com/books?id=vXdEAAAAQBAJ&pg=PA59|dead-url=no}}.</ref>
+
+在[[计算几何|计算几何]]领域，许多随机化算法都会维护一个“历史有向无环图”，用以记录结构变动中的旧几何结构。例如，在[[德勞內三角化|德勞內三角化]]的随机增量算法中，在添加每个点时，通过用三个较小的三角形替换一个三角形，以及通过“翻转”操作将三角形对替换为另一对三角形，来改变三角剖分。在该算法的历史有向无环图中，每个在算法中构建出的三角形对应一个顶点，边则将每个三角形和替代它的两个或三个三角形连接起来。这种图结构可以高效地处理{{tsl|en|point location|点定位}}问题，即对于一个查询点{{mvar|q}}，找到它在德勞內三角剖分中的位置。在历史有向无环图中，从起点开始，不断移动到包含{{mvar|q}}的替代三角形组，最后到达的终点必定代表包含{{var|q}}的德劳内三角形。<ref>{{citation|title=Combinatorial Geometry and Its Algorithmic Applications: The Alcalá Lectures|volume=152|series=Mathematical surveys and monographs|first1=János|last1=Pach|author1-link=János Pach|first2=Micha|last2=Sharir|author2-link=Micha Sharir|publisher=American Mathematical Society|isbn=978-0-8218-7533-9|pages=93–94|url=https://books.google.com/books?id=-fguzNaYoqcC&pg=PA93|accessdate=2020-06-01|archive-date=2021-03-10|archive-url=https://web.archive.org/web/20210310230419/https://books.google.com/books?id=-fguzNaYoqcC&pg=PA93|dead-url=no}}.</ref>
+
+=== 引用图 ===
+在{{tsl|en|citation graph|引用图}}中， 每个顶点代表单篇著作，边代表著作之间的[[參考文獻|引用]]关系。1965年[[德瑞克·约翰·德索拉·普莱斯|普莱斯]]的文章“科学文献的网络”是使用引用图的一个经典例子。<ref>{{citation | last = Price | first = Derek J. de Solla | date = July 30, 1965 | doi = 10.1126/science.149.3683.510 | issue = 3683 | journal = [[科学_(期刊)|Science]] | pages = 510–515 | pmid = 14325149 | title = Networks of Scientific Papers | url = http://garfield.library.upenn.edu/papers/pricenetworks1965.pdf | volume = 149 | bibcode = 1965Sci...149..510D | accessdate = 2020-06-01 | archive-date = 2019-05-20 | archive-url = https://web.archive.org/web/20190520130807/http://www.garfield.library.upenn.edu/papers/pricenetworks1965.pdf | dead-url = no }}.</ref>在引用图中，每篇论文的{{tsl|en|Citation impact|引用影响|引用次数}}为对应顶点的入度。这是[[引文分析|引文分析]]中的一种重要的展示方式。另一个例子是[[裁判_(法律)|法律裁判]]中，法官通过引用过往案例中的判决来支持他们的结论。引用图亦可以用来描绘[[专利|专利]]，因为专利必须要提及[[现有技术|现有技术]]，即已经公开的并且和本专利有关的先前专利。
+
+相较于[[网络科学|网络科学]]中对一般图的研究，有向无环图的独特性质可以被用来作深层次分析。例如，传递规约可以呈现引用在不同应用领域的分布情况，这突出了不同领域中不同的引用网构造机制。<ref>{{citation | last1 = Clough | first1 = James R. | last2 = Gollings | first2 = Jamie | last3 = Loach | first3 = Tamar V. | last4 = Evans | first4 = Tim S. | doi = 10.1093/comnet/cnu039 | issue = 2 | journal = Journal of Complex Networks | pages = 189–203 | title = Transitive reduction of citation networks | volume = 3| arxiv = 1310.8224 | year = 2015 }}.</ref>引用图的衍生概念还有{{tsl|en|Main path analysis|主干道路分析}}，即对引用图中最显著的一条路径的分析。
+
+=== 数据压缩 ===
+[[Image:Trie-vs-minimal-acyclic-fa.svg|thumb]]
+有向无环图也可以用于对一系列序列的[[数据压缩|压缩]]中。在这里，有向无环图中的路径代表这些序列。当多个序列有共同的子序列时，子序列可以被表示为这些序列对应路径的公共边。比起直接列出所有序列，这种方法占用更少空间。例如，{{tsl|en|Deterministic acyclic finite state automaton|无环确定有限状态自动机|有向无环词图}}为仅含单个源（入度为0的顶点）的有向无环图，其每条边附有一个或多个字符。每条其源到汇（出度为0的节点）的路径均代表一个[[字符串|字符串]]，字符串可以是英文单词。<ref>{{citation | first1=Maxime | last1=Crochemore | first2=Renaud | last2=Vérin | contribution=Direct construction of compact directed acyclic word graphs | series=Lecture Notes in Computer Science | publisher=Springer | title=Combinatorial Pattern Matching | volume=1264 | year=1997 | pages=116–129 | doi=10.1007/3-540-63220-4_55 | isbn=978-3-540-63220-7 | citeseerx=10.1.1.53.6273 }}.</ref>与其结构不同但功能相似的树称为[[trie|trie]]。相比于trie，有向无环词图允许多条边指向同一个顶点，使得具有相同后缀的一些词的词头可以被相同的顶点所表示，因而更省空间。<ref>{{citation|title=Applied Combinatorics on Words|volume=105|series=Encyclopedia of Mathematics and its Applications|first=M.|last=Lothaire|authorlink=M. Lothaire|publisher=Cambridge University Press|year=2005|isbn=9780521848022|page=18|url=https://books.google.com/books?id=fpLUNkj1T1EC&pg=PA18|accessdate=2020-06-01|archive-date=2021-03-10|archive-url=https://web.archive.org/web/20210310230345/https://books.google.com/books?id=fpLUNkj1T1EC&pg=PA18|dead-url=no}}.</ref>
+
+[[二元决策图|二元决策图]]是基于有向无环图的一种数据结构，用于表示[[布尔函数|布尔函数]]<ref>{{citation|first=C. Y.|last=Lee|title=Representation of switching circuits by binary-decision programs|journal=Bell System Technical Journal|volume=38|issue=4|pages=985–999|year=1959|doi=10.1002/j.1538-7305.1959.tb01585.x}}.</ref><ref>{{citation|first=Sheldon B.|last=Akers|doi=10.1109/TC.1978.1675141|title=Binary decision diagrams|journal=IEEE Transactions on Computers|volume=C-27|issue=6|pages=509–516|year=1978}}.</ref>。在二元决策图中，每个非汇节点对应一个布尔变量，每个汇和边则表示0或1。要找到一个[[解释_(逻辑)|解释]]的真值，只要从唯一的源顶点出发，沿着该顶点代表的布尔变量的实际真值所对应的出边一直前进，到达的汇则为其真值。如同有向无环词图可以被看作是trie的一种压缩形式一样，二元决策图可以被看作是[[决策树|决策树]]的压缩形式。它通过将导向相同结果的边重新汇合到一个顶点来节省空间。<ref>{{citation
+ | last1 = Friedman | first1 = S. J.
+ | last2 = Supowit | first2 = K. J.
+ | contribution = Finding the optimal variable ordering for binary decision diagrams
+ | doi = 10.1145/37888.37941
+ | isbn = 978-0-8186-0781-3
+ | location = New York, NY, USA
+ | pages = 348–356
+ | publisher = ACM
+ | title = Proc. 24th ACM/IEEE Design Automation Conference (DAC '87)
+ | year = 1987}}.</ref>
+
+==参考文献==
+{{Reflist|30em}}
+{{圖論}}

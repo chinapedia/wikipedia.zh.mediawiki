@@ -1,0 +1,69 @@
+{{NoteTA
+|G1=IT
+}}
+'''IPv6过渡机制'''指那些用来促进[[Internet|Internet]]从[[IPv4|IPv4]]架构向下一代地址系统——[[IPv6|IPv6]]过渡的技术。具体来说，就是那些允许仅与IPv4或IPv6网络连接的主机能够访问与之不同协议下资源的方法。
+
+为了达到IPv6的技术标准，必须有简单有效的过渡方案从现有的IPv4过渡到IPv6。[[互联网工程任务组|互联网工程任务组]]（IETF）通过IETF的[[Internet_Draft|Internet草案]]和[[RFC|RFC]]来指导相关工作组讨论开发这些方法。一些基础的IPv6过渡机制定义在 RFC 4213 中。
+
+==无状态IP/ICMP转换==
+'''无状态IP/ICMP转换（SIIT）'''是在[[IPv6|IPv6]]和[[IPv4|IPv4]]报文头格式之间进行转换。SIIT方法定义一类被称为''IPv4转换''（IPv4-translated）地址的IPv6地址。这类地址的前缀为''::ffff:0:0/96''，也可被写作''::ffff:a.b.c.d''，其中IPv4格式的地址''a.b.c.d''表示一个''使能IPv6''（IPv6-enabled）的节点。选择这个前缀是为了生成一个为0的校验值，以此来避免改变传输协议头中的校验值。<ref name=RFC2765>RFC 2765 - ''无状态IP/ICMP转换算法(SIIT)'', E. Normark (February 2000)</ref>
+
+此算法可以使IPv6主机无需拥有一个永久的IPv4地址就能与仅有IPv4的主机通信。地址分配和路由的细节并没有在此规范中被提及。
+
+这个规范由NGTRANS IETF工作组制订，草案由[[Sun_Microsystems|Sun Microsystems]]的E. Nordmark于2000年2月作为RFC 2765发布。2011年，RFC 2765被RFC 6145代替<ref name=RFC6145>RFC 6145 IP/ICMP Translation Algorithm</ref>。RFC 2765的地址格式化部分被定义在RFC 6052中<ref name=RFC6052>RFC 6052 - ''IPv6 Addressing of IPv4/IPv6 Translators''</ref>。
+
+RFC 6144定义IPv4/IPv6转换的框架<ref name=RFC6144>RFC 6144 - ''Framework for IPv4/IPv6 Translation''</ref>。
+
+==隧道中间人==
+[[隧道中间人|隧道中间人]]将IPv6流量封装在IPv4互联网的传输链接中（通常使用[[6in4|6in4]]），从而提供IPv6连接。也就是在IPv4互联网上建立IPv6隧道，而这些隧道可以通过[[Tunnel_Setup_Protocol|隧道设置协议]]（TSP）或[[AYIYA|AYIYA]]来管理。<ref name=first>[[RFC:3053|RFC:3053]]</ref>
+
+==6rd==
+{{Main|IPv6 rapid deployment}}
+6rd是一种在[[ISP|ISP]]的[[IPv4|IPv4]]架构上实现快速部署IPv6服务的机制。它使用[[IPv4|IPv4]]与[[IPv6|IPv6]]之间的无状态地址映射，在用户节点之间建立自动隧道，以[[IPv4|IPv4]]报文的形式传输[[IPv6|IPv6]]报文。
+
+此方案第一次被大规模部署是在2007年末（RFC 5569 <ref name=RFC5569>RFC 5569 IPv6 Rapid Deployment on IPv4 Infrastructures (6rd)</ref>）。
+RFC 5969<ref name=RFC5969>RFC 5969 IPv6 Rapid Deployment on IPv4 Infrastructures (6rd) -- Protocol Specification</ref>详述了此协议。
+
+==传输中继转换==
+RFC 3142 定义'''传输中继转换（TRT）'''方法。这是最常见的NAT-PT/NAPT-PT形式，只不过其依赖于在AAAA与A记录之间的DNS转换，这种转换机制被称为''DNS-ALG''，定义在 RFC 2694。
+
+==NAT64==
+{{main article|NAT64}}
+[[Image:NAT64.svg|thumb]]
+NAT64是一种可以让IPv6主机与IPv4服务器通信的机制。NAT64服务器需要至少一个IPv4地址和一个32位的IPv6网段（例如：''64:ff9b::/96''，见 RFC 6052 和 RFC 6146 ）。IPv6客户端将希望与之通信的IPv4地址嵌入在这32位之中，并将数据包发往生成的地址。NAT64服务器则创建IPv6与IPv4地址间的[[网络地址转换|NAT]]映射，使得它们可以彼此通信。<ref name=RFC6146>RFC 6146 Stateful NAT64: Network Address and Protocol Translation from IPv6 Clients to IPv4 Servers</ref>
+
+==DNS64==
+'''DNS64'''是指一种专门的[[DNS_server|DNS服务器]]，当它处理某个域的[[AAAA_record|AAAA记录]]查询时，如果只找到了[[A_record|A记录]]，那么它会用A记录来合成AAAA记录。合成的IPv6地址的第一部分指向一个IPv6/IPv4的转换器，而第二部分则嵌入了A记录的IPv4地址。指向的转换器通常是一个NAT64服务器。DNS64的标准在RFC 6147中规定。<ref name=RFC6147>RFC 6147 DNS64: DNS Extensions for Network Address Translation from IPv6 Clients to IPv4 Servers</ref>
+
+这种过渡机制存在两个值得注意的问题：
+*它只适合使用DNS查找远程主机地址的情形，如果直接使用IPv4地址，DNS64将不会参与。
+*因为DNS64服务器需要返回并非域所有者所指定的记录，因此如果执行转换的DNS服务器不是域所有者的服务器，对[[DNSSEC#Deployment_at_the_DNS_root|根]]的[[DNSSEC|DNSSEC]]校验将会失败。
+
+==ISATAP==
+{{main|ISATAP}}
+
+ISATAP是一种IPv6过渡机制，在双栈节点之间通过IPv4网络传输IPv6数据包。
+
+不同于[[6over4|6over4]]（较早的基于IPv4多播的类似协议），ISATAP将IPv4用作虚拟的[[非广播多路访问网络|非广播多路访问网络]]（NBMA）的[[数据链路层|数据链路层]]，因此底层的IPv4网络架构无需支持多播。
+
+==464XLAT==
+464XLAT（RFC 6877）可以使仅有IPv6网络上的客户端访问仅有IPv4的互联网服务（例如 Skype）。<ref>{{cite web|title=Video: 464XLAT Live Demo at World IPv6 Congress in Paris|date=3 April 2013|publisher=[[Internet_Society|Internet Society]]|url=http://www.internetsociety.org/deploy360/blog/2013/04/video-464xlat-live-demo-at-world-ipv6-congress-in-paris/|accessdate=2020-10-10|archive-date=2017-09-13|archive-url=https://web.archive.org/web/20170913134101/http://www.internetsociety.org/deploy360/blog/2013/04/video-464xlat-live-demo-at-world-ipv6-congress-in-paris/|dead-url=no}}</ref><ref>{{cite web|title=464XLAT -- A Solution for Providing IPv4 Services Over and IPv6-only Network|publisher=[[T-Mobile_USA|T-Mobile USA]]|accessdate=5 August 2013|url=https://sites.google.com/site/tmoipv6/464xlat|archive-date=2020-11-12|archive-url=https://web.archive.org/web/20201112031924/https://sites.google.com/site/tmoipv6/464xlat|dead-url=no}}</ref>
+
+客户端（例如Skype）通过SIIT转换器将IPv4数据包转换成IPv6，然后（通过仅有IPv6的网络）发送到[[NAT64|NAT64]]转换器。NAT64转换器将IPv6数据包重新转换回IPv4，最后（通过支持IPv4的网络）发送到仅有IPv4的服务器（例如Skype服务器）。SIIT转换器（客户端转换器，CLAT：<u>c</u>ustomer-side trans<u>lat</u>or）可以由客户端自己实现，也可以在支持IPv4的中间网络上实现（如果互联网也支持IPv4，那就不需要464XLAT了）；NAT64转换器（服务端转换器，PLAT：<u>p</u>rovider-side trans<u>lat</u>or）必须可以同时联系到服务器和客户端（通过CLAT）。
+
+==网站==
+===SixXS===
+SixXS（Six Access）是一个免费的、非盈利性、提供零成本服务的网站。SixXS提供[[IPv6|IPv6]]通道，通过IPv6服务访问网站，因通讯数据被加密，因此可以避免遭到[[互联网审查|互联网审查]]。后缀“.sixxs.org”代表使用sixxs.org提供的IPv6[[网关|网关]]，该网关将来自IPv6网络的[[http|http]]访问请求转换成[[IPv4|IPv4]]的http请求，访问任何其他IPv4的http都可以使用这个网关，在地址后面加上“.sixxs.org”即可。不过该项目已于2017-06-06停止服务，2017-07-01正式结束。
+
+==参考文献==
+{{Reflist}}
+*''IPv6 in Practice'', Benedikt Stockebrand (2006), ISBN 3-540-24524-3
+*RFC 2767, ''Bump-in-the-Stack''
+*RFC 3338, ''Bump-in-the-API''
+*RFC 3089, ''Socks-based Gateway''
+*RFC 6219, ''The China Education and Research Network (CERNET) IVI Translation Design and Deployment for the IPv4/IPv6 Coexistence and Transition''
+
+{{IPv6}}
+
+[[Category:IPv6|Category:IPv6]]
+[[Category:IPv6过渡机制|*]]

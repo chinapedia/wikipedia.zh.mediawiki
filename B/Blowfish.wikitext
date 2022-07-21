@@ -1,0 +1,108 @@
+{{noteTA|G1=IT}}
+{{區塊加解密方塊
+| name          = Blowfish
+| image         = [[Image:BlowfishFFunction.svg|250px]]
+| caption       = The round function (Feistel function) of Blowfish
+| designers     = [[布鲁斯·施奈尔|布鲁斯·施奈尔]]
+| publish date  = 1993
+| derived from  =
+| derived to    = [[Twofish|Twofish]]
+| key size      = 32-448位
+| block size    = 64位
+| structure     = [[费斯妥密码|费斯妥密码]]
+| rounds        = 16
+| cryptanalysis = Four rounds of Blowfish are susceptible to a second-order [[differential_attack|differential attack]] (Rijmen, 1997);<ref name="rijmen-phd">{{cite journal
+| author=[[Vincent_Rijmen|Vincent Rijmen]]
+| year=1997
+| title=Cryptanalysis and Design of Iterated Block Ciphers
+| work=Ph.D thesis
+| url=https://www.cosic.esat.kuleuven.be/publications/thesis-4.ps
+| format=[[PostScript|PostScript]]
+| access-date=2015-03-16
+| archive-date=2013-05-08
+| archive-url=https://web.archive.org/web/20130508181935/http://www.cosic.esat.kuleuven.be/publications/thesis-4.ps
+| dead-url=yes
+}}</ref> for a class of [[weak_key|weak key]]s, 14 rounds of Blowfish can be distinguished from a [[pseudorandom_permutation|pseudorandom permutation]] (Vaudenay, 1996).
+}}
+'''Blowfish'''是一个[[對稱密鑰加密|對稱密鑰加密]][[分组密码|分组密码]]算法，由[[布魯斯·施奈爾|布魯斯·施奈爾]]於1993年设计，现已应用在多种加密产品。Blowfish算法由於分組長度太小已被認為不安全，施奈尔更建议在现代应用中使用[[Twofish|Twofish]]密码。<ref name="schneier-interview-dec-2007">{{cite web
+| url = https://www.computerworld.com.au/article/46254/bruce_almighty_schneier_preaches_security_linux_faithful/?pp=3
+| title = Bruce Almighty: Schneier preaches security to Linux faithful
+| last = Dahna
+| first = McConnachie
+| date = 2007-12-27
+| accessdate = 2018-01-26
+| work = [[Computerworld|Computerworld]]
+| page = 3
+| archiveurl = https://web.archive.org/web/20161202063854/https://www.computerworld.com.au/article/46254/bruce_almighty_schneier_preaches_security_linux_faithful/?pp=3
+| archivedate = 2016-12-02
+| quote = At this point, though, I'm amazed it's still being used. If people ask, I recommend Twofish instead.
+| dead-url = no
+}}</ref>
+
+施奈爾设计的Blowfish算法用途广泛，意在替代老舊的[[DES|DES]]及避免其他算法的問題與限制。Blowfish刚刚研发出的时候，大部分其他加密算法是专利所有的或属于商业(政府)机密，所以发展起来非常受限制。施奈爾则声明Blowfish的使用没有任何限制，任何国家任何人任何时候都可以随意使用Blowfish算法。 
+
+Blowfish主要包括关键的几个[[S盒|S盒]]和一个复杂的核心变换函数。
+
+== Blowfish的伪代码 ==
+<syntaxhighlight lang="cpp">
+uint32_t P[18];
+uint32_t S[4][256];
+
+uint32_t f (uint32_t x) {
+   uint32_t h = S[0][x >> 24] + S[1][x >> 16 & 0xff];
+   return ( h ^ S[2][x >> 8 & 0xff] ) + S[3][x & 0xff];
+}
+
+void encrypt (uint32_t & L, uint32_t & R) {
+   for (int i=0 ; i<16 ; i += 2) {
+      L ^= P[i];
+      R ^= f(L);
+      R ^= P[i+1];
+      L ^= f(R);
+   }
+   L ^= P[16];
+   R ^= P[17];
+   swap (L, R);
+}
+
+void decrypt (uint32_t & L, uint32_t & R) {
+   for (int i=16 ; i > 0 ; i -= 2) {
+      L ^= P[i+1];
+      R ^= f(L);
+      R ^= P[i];
+      L ^= f(R);
+   }
+   L ^= P[1];
+   R ^= P[0];
+   swap (L, R);
+}
+
+  // ...
+  // initializing the P-array and S-boxes with values derived from pi; omitted in the example
+  // ...
+{
+   for (int i=0 ; i<18 ; ++i)
+      P[i] ^= key[i % keylen];
+   uint32_t L = 0, R = 0;
+   for (int i=0 ; i<18 ; i+=2) {
+      encrypt (L, R);
+      P[i] = L; P[i+1] = R;
+   }
+   for (int i=0 ; i<4 ; ++i)
+      for (int j=0 ; j<256; j+=2) {
+         encrypt (L, R);
+         S[i][j] = L; S[i][j+1] = R;
+      }
+}
+</syntaxhighlight>
+
+== 参考资料 ==
+{{Reflist}}
+{{Refbegin}}
+{{Refend}}
+
+{{分组密码}}
+
+[[Category:数据加密标准|Category:数据加密标准]]
+[[Category:已攻破的分组密码|Category:已攻破的分组密码]]
+[[Category:带有伪代码示例的条目|Category:带有伪代码示例的条目]]

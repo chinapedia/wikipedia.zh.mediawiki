@@ -1,0 +1,142 @@
+<!--
+-==============================================================
+- Template:Convert/Dgen - Convert & display any separator
+-==============================================================
+-                                   (see NOTES at bottom)
+-->{{#ifeq:{{{1}}}|6.1955|<!--then debug--><br>DEBUG/LxAx: <!--
+-->d={{{d}}} r={{{r}}} sep={{{sep}}}<br>comma={{{comma}}} round={{{round}}} u1={{{u1}}} v={{{v}}}.&#32;<!--
+-->}}<!--endifeq {1}=6.1955--
+-->{{
+#ifeq:{{{disp|x}}}|output number only|<!--then skip-->|<!--
+-->{{#ifeq:{{{disp|x}}}|output only|<!--then skip-->|<!--
+--else continue =================================== SHOW INPUT
+-->{{#switch: {{{comma|on}}}
+  | on|in = <!--
+    then-put-commas-->{{formatnum: {{
+      #ifeq: {{{round|out}}}|out|<!--
+        then no input-rounding-->{{{1}}}<!--
+        else-->|{{#expr: ( {{{1}}} ) round {{{round|0}}} }}<!--
+      -->}}<!--endifeq round=out--
+    -->}}<!--endformatnum-->
+  | #default = <!--
+    otherwise input as is-->{{{1}}}<!--
+  -->}}<!--endswitch comma--
+-->{{#ifeq:{{{adj|{{{sing|x}}}}}}|on|<!--then hyphen-->-<!--
+  --else-nonbreaking-space-->|&nbsp;}}<!--
+=========================================== Check Abbreviated
+-->{{#switch:{{{abbr|on}}}
+| off|none|out = <!--non-abbreviated-->
+{{#switch:{{{lk}}}<!--
+------------------------------------ Wikilinked-->
+ | on|in = <!--
+  -->{{#ifeq:{{{adj|{{{sing|x}}}}}}|off|<!--
+------------------------- link/non-hyphen
+  then-adject-off-->[[{{{t|{{{n}}}}}}|{{
+    #ifexpr:( {{{1|0}}} ) < 1.0001 and ( {{{1|0}}} ) > 0 |<!--
+    --then-singular-->{{{n}}}|<!--
+    --else-plural-->{{{l|{{{n}}}s}}}<!--ifexpr-->}}]]|<!--
+------------------------- link/hyphen
+  else-adject-on-->[[{{{t|{{{n}}}}}}|{{{h|{{{n|unitname}}}}}}]]<!--
+  -->}}<!--endif adj=off--
+------------------------------------ Non-wikilinked-->
+ | off|out = <!--
+  -->{{#ifeq:{{{adj|{{{sing|x}}}}}}|off|<!--
+------------------------- non-hyphen
+  then-adject-off-->{{
+    #ifexpr:( {{{1|0}}} ) < 1.0001 and ( {{{1|0}}} ) > 0 |<!--
+    --then-singular-->{{{n}}}|<!--
+    --else-plural-->{{{l|{{{n}}}s}}}<!--ifexpr-->}}|<!--
+------------------------- hyphenated
+  else-adject-on-->[[{{{t|{{{n}}}}}}|{{{h|{{{n|unitname}}}}}}]]<!--
+  -->}}<!--endif adj=off--
+-->}}<!--endswitch lk--
+------------------------------------------ ABBREVIATED-->
+| on|in = <!--when-abbreviated--
+-->{{#switch:{{{lk|x}}}
+  | on|in = [[{{{t|{{{n}}}}}}|{{{u}}}]]<!--wikilinked-->
+  | #default = {{{u}}}<!--non-wikilinked-->
+}}<!--endswitch lk-->
+| #default=Invalid value in abbr={{{abbr}}}
+}}<!--endswitch abbr--><!--
+============================================= MID-TEXT
+-->{{#if:{{{mid|}}}|<!--if midtext--
+  --then-->{{
+    #ifeq:{{padleft:|1|{{{mid|xradius}}} }}|-|<!--
+    --then-append-suffix-->{{{mid|-radius}}}<!--
+    --else-space-midtext-->|&#32;{{{mid|xtext}}}<!--
+  -->}}<!--endif mid[0]=hyphen--
+-->}}<!--endif midtext--
+============================================= SEPARATOR
+-->{{{sep|xx}}}<!--show separator
+----------------------------- End output only
+  -->}}<!--endifeq disp=output only--
+-->}}<!--endifeq disp=output number only--
+--
+============================================= CONVERT RESULT
+-->{{#ifeq:{{{disp|x}}}|output number only|<!--
+then-numout-->{{convert/{{#if:{{{2|}}}|{{{o}}}|{{{3}}}<!--if{2}-->}}|{{{1}}}|{{{1}}}*{{{b}}}|{{#if:{{{2|}}}|{{{3|}}}|{{{4|}}}<!--if{2}-->}}|{{{s|}}}|r={{{r}}}|j={{{j}}}|d=Numout <!--(see NOTE R4)--
+  -->}}<!--endConvert/if{2}--
+else-convert-by-using-options-->|<!--   -(see NOTE R4)-
+-->{{#switch:{{{comma|on}}}
+  | on|out = <!--then leave commas--
+  -->{{convert/{{#if:{{{2|}}}|{{{o}}}|{{{3}}}<!--if{2}-->}}<!--
+    -->|{{{1}}}|{{{1}}}*{{{b}}}|{{#if:{{{2|}}}|{{{3|}}}|<!--
+      else-->{{{4|}}}<!--if{2}-->}}|{{{s|}}}|r={{{r}}}<!--
+      -->|j={{{j}}}|d=<!--set as LoffAoffSoff (etc.)
+      -->L{{{lk|off}}}{{#switch:{{{abbr|on}}}<!--
+        -->| off|none|in =Aoff<!--
+        -->| on|out =Aon<!--
+        -->| #default =A{{{abbr|off}}}<!--use whatever name-part--
+        -->}}<!--endswitch abbr
+      -->S{{{adj|off}}}<!--
+      -->}}<!--endConvert/if{2} #2-->
+  | #default = {{uncomma|<!--remove any commas--
+  -->{{convert/{{#if:{{{2|}}}|{{{o}}}|{{{3}}}<!--if{2}-->}}<!--
+    -->|{{{1}}}|{{{1}}}*{{{b}}}|{{#if:{{{2|}}}|{{{3|}}}|<!--
+      else-->{{{4|}}}<!--if{2}-->}}|{{{s|}}}|r={{{r}}}<!--
+      -->|j={{{j}}}|d=<!--set as LoffAoffSoff (etc.)
+      -->L{{{lk|off}}}{{#switch:{{{abbr|on}}}<!--
+        -->| off|none|in =Aoff<!--
+        -->| on|out =Aon<!--
+        -->| #default =A{{{abbr|off}}}<!--use whatever name-part--
+        -->}}<!--endswitch abbr
+      -->S{{{adj|off}}}<!--
+      -->}}<!--endConvert/if{2} #3--
+    -->}}<!--enduncomma--
+  -->}}<!--endswitch comma
+-->}}<!--endifeq disp=output number only--
+--
+-->{{#ifeq:{{{disp|b}}}|b|<!--then-show-closing-paren-->)}}<!--
+--><noinclude>
+<hr>
+The display-formatter '''Template:Convert/Dgen''' (DgenVxx) shows the formatted input amount & unit, with any separator, and then converts the result, using the same user-specified options passed from the main Template:Convert.
+<!--
+===============================================================
+--NOTES:
+--   This template replaces 250 similar display-subtemplates
+--   for [[Template:Convert]] (it performs the same basic
+--   formatting as templates named "Convert/LoffAoffDbSoff"
+--   or "..DorSoff" or "DsSoff" or "DcommaSoff" or similar).
+--   However, it allows new options: to suppress adding commas
+--   (comma=off) or display a semicolon separating the amounts,
+--   or to abbreviate just the input (abbr=in) or abbr=out.
+--
+--NOTE R4: The template-call to Convert/if{2} had to be coded
+--     twice, for both d=Numout & d=LoffAoffSoff because the
+--     if-logic would not, could not, choose between the 2
+--     values of "d=" when coded inside the template-call, in
+--     any way, shape, or fashion, no way Jose, at all at all.
+--     This wretched, error-prone MediaWiki [[markup language]]
+--     is full of treacherous complications that often require
+--     alternative logic in a template.
+--
+-----------------------------------------------------------
+--HISTORY:
+--05Dec09 Created to reduce hundreds of Convert subtemplates.
+--05Dec09 Parameter: comma=in, comma=out, or comma=off.
+--05Dec09 Parameter: round=out, round=1, round=2, etc.
+--05Dec09 Parameter: mid=xxx to show midtext before result.
+--
+-->
+[[Category:Convert子模板]]
+</noinclude>

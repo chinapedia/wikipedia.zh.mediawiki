@@ -1,0 +1,1 @@
+#REDIRECT [[Template:國家基礎資訊]]

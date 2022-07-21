@@ -1,0 +1,149 @@
+{{Infobox programming language
+|name = Miranda
+|logo = 
+|paradigm = [[惰性求值|惰性求值]], [[纯函数式编程|纯函数式]], [[宣告式編程|声明式]]
+|year = {{start date and age|1985}}
+|designer = {{en-link|大衛·特納|David Turner (computer scientist)}}
+|developer = Research Software Ltd
+|latest release version = 2.066
+|latest release date = {{start date and age|2020|01|31}}
+|typing = [[强类型|强类型]], [[静态类型|静态]]
+|implementations = Miranda
+| license = [[BSD许可证|二条款BSD许可证]]
+|dialects = 
+|influenced_by = [[肯特递归计算器|KRC]], [[ML語言|ML]], [[SASL_(编程语言)|SASL]], [[Hope_(编程语言)|Hope]] 
+|influenced = [[Clean_(编程语言)|Clean]], [[Haskell|Haskell]], {{en-link|Orwell|Orwell (programming language)|Orwell}}
+|website = [https://www.cs.kent.ac.uk/people/staff/dat/miranda/ Miranda homepage]
+}}
+'''Miranda'''，是一種[[惰性求值|惰性求值]]的[[纯函数式编程|纯函数式]][[編程語言|編程語言]]，由英國學者{{en-link|大衛·特納|David Turner (computer scientist)}}所設計。採用來自[[ML语言|ML]]與[[Hope_(编程语言)|Hope]]语言的概念，他用此來作為他先前所設計的[[SASL_(编程语言)|SASL]]與[[肯特递归计算器|KRC]]语言的後繼者<ref>{{cite web|last1=Turner|first1=D. A.|title=Some History of Functional Programming Languages|url=https://www.cs.kent.ac.uk/people/staff/dat/tfp12/tfp12.pdf|accessdate=2020-04-25|archive-date=2020-04-15|archive-url=https://web.archive.org/web/20200415053847/https://www.cs.kent.ac.uk/people/staff/dat/tfp12/tfp12.pdf|dead-url=no}}</ref>。這個程式語言由英國的研究軟體公司出品，這間公司擁有這個程式語言的商標權。
+
+Miranda在1985年首次發表以[[C語言|C語言]]寫成的[[直譯器|直譯器]]，能夠在[[類UNIX系統|類UNIX系統]]上運作。隨後在1987年與1989年發行了更新版。Miranda強烈的影響了後來發展出的[[Haskell|Haskell]]語言<ref>{{cite web|last1=Hudak|first1=Paul|last2=Hughes|first2=John|title=A History of Haskell: being lazy with class|url=http://research.microsoft.com/en-us/um/people/simonpj/papers/history-of-haskell/|date=2007|access-date=2021-02-27|archive-date=2016-12-26|archive-url=https://web.archive.org/web/20161226184127/http://research.microsoft.com/en-us/um/people/simonpj/papers/history-of-haskell/|dead-url=no}}</ref>。
+
+== 概述 ==
+Miranda是[[惰性求值|惰性]]、[[纯函数式编程|纯函数式]]编程语言。就是说，它缺少[[副作用_(计算机科学)|副作用]]和[[指令式编程|指令式编程]]特征。一个Miranda程序（叫做脚本）定义数学[[函数|函数]]和{{en-link|代数数据类型|algebraic data type}}的一组[[等式|等式]]。[[集合_(数学)|集合]]的概念在这里是重要的，即等式的次序一般而言是无关紧要的，并且不需要在使用之前定义一个实体。
+
+===词法===
+因为[[语法分析|解析]]算法可以智能的利用[[越位规则|布局]]（缩进），很少需要将语句用括号包围起来，并且不要求语句终止符。这个特征受到了[[ISWIM|ISWIM]]的启发，也被用于[[occam|occam]]和[[Haskell|Haskell]]中，后来经由[[Python|Python]]而流行起来。
+
+[[注释_(计算机语言)|注释]]通过字符<code>||</code>介入到正规的脚本中并持续到此行结束。一种可作为替代的注释约定影响整个源代码文件，叫做“[[文学编程|文学脚本]]”，在其中所有的行都被当作注释，除非它开始于<code> > </code>符号。
+
+===数据类型===
+Miranda的基本[[数据类型|数据类型]]是<code>char</code>、<code>num</code>和<code>bool</code>。字符串简单的就是<code>char</code>的列表，而<code>num</code>在两种底层形式之间静默转换：缺省的[[高精度计算|任意精度]]整数（又名bignum），和需要时的正规[[浮点数|浮点]]值。
+
+[[元组|元组]]是潜在混合类型的元素的序列，类似于类[[Pascal_(程式语言)|Pascal]]语言的[[记录|记录]]，用圆括号来界定：
+<syntaxhighlight lang="haskell">
+this_employee = ("Folland, Mary", 10560, False, 35)
+</syntaxhighlight>
+
+[[列表_(抽象数据类型)|列表]]是Miranda中最常用的数据结构。列表用方括号来界定并具有用逗号分隔的元素，它们都必须有着相同类型：
+
+<syntaxhighlight lang="haskell">
+week_days = ["Mon","Tue","Wed","Thur","Fri"]
+</syntaxhighlight>
+列表串接是<code>++</code>，删减是<code>--</code>，构造是<code>:</code>，大小是<code>#</code>而索引是<code>!</code>，比如：
+
+<syntaxhighlight lang="haskell">
+days = week_days ++ ["Sat","Sun"]
+days = "Nil":days
+days!0
+⇒ "Nil"
+days = days -- ["Nil"]
+#days
+⇒ 7
+</syntaxhighlight>
+
+有一些列表建造捷径：<code>..</code>用于其元素形成算数序列的列表，具有指定不是1的增量的可能：
+
+<syntaxhighlight lang="haskell">
+fac n   = product [1..n]
+odd_sum = sum [1,3..100]
+</syntaxhighlight>
+
+更一般性和更强力的列表建造设施是[[列表推导式|列表推导式]]（以前叫做“ZF表达式”)，它以两种主要形式提供：应用于一系列项目的一个表达式，比如：
+<syntaxhighlight lang="haskell">
+squares = [ n * n | n <- [1..] ]
+</syntaxhighlight>
+
+它可以读作：<code>n</code>的平方的列表，这里的<code>n</code>取自所有正数的列表；和其中每个项目都是前一项目的函数的一个系列，比如：
+
+<syntaxhighlight lang="haskell">
+powers_of_2 = [ n | n <- 1, 2*n .. ]
+</syntaxhighlight>
+
+如这两个例子所蕴含的那样，Miranda允许无限数目元素的列表，其中最简单的是所有正数的列表：<code>[1..]</code>。
+
+===函数===
+函数应用的表示法是简单的并列，比如<code>sin x</code>这样。
+
+在Miranda中，如同大多数其他纯函数式语言，函数是[[头等函数|头等]]公民，就是说它们可以作为[[参数_(计算机科学)|实际参数]]传递给其他函数，作为结果返回，被包括为数据结构的元素。进一步的，通过提供少于形式参数数目的实际参数，有两个或更多形式参数的函数可以部份的“参数化”，或[[柯里化|柯里化]]。这给出了另一个函数，接受余下的形式参数，并返回一个结果。例如：
+
+<syntaxhighlight lang="haskell">
+add a b = a + b
+increment = add 1
+</syntaxhighlight>
+
+是建立向它的实际参数加<code>1</code>的一个函数“增加”的迂回方式。在现实中，<code>add 4 7</code>接受两个形式参数，函数<code>add</code>应用于<code>4</code>将得到一个单一形式参数的函数，它向它的实际参数加<code>4</code>，接着应用它于<code></code>得到结果<code>7</code>。
+
+任何有两个形式参数（操作数）的函数都可以转变成中缀算符，例如，给出上述的<code>add</code>函数定义，项目<code>$add</code>在所有方式下都等价于<code>+</code>算符，而所有接受两个形式参数的中缀算符也可以转变成对应的函数。因此如下这样：
+
+<syntaxhighlight lang="haskell">
+increment = (+) 1
+</syntaxhighlight>
+
+是建立向其实际参数加<code>1</code>的最简洁方式。类似的，在下列中：
+
+<syntaxhighlight lang="haskell">
+half = (/ 2)
+reciprocal = (1 /)
+</syntaxhighlight>
+
+生成了两个单一形式参数的函数。解释器理解提供除法算符的两个形式参数的每种情况，分别给出将一个数除以<code>2</code>和返回它的倒数的函数。
+
+它有着建立和操纵程序[[模块化编程|模块]]的机制，其内部函数对于调用这些模块的程序是不可见的。
+
+===类型推论和多态===
+尽管Miranda是[[强类型|强类型]]编程语言，它不坚持于显式的类型{{en-link|声明（计算机编程）|declaration (computer science)|声明}}。如果一个函数的类型没有明确的声明，解释器会从它的形式参数和它们在函数内如何使用来[[类型推论|推论]]出它的类型。除了基本类型（<code>char</code>、<code>num</code>和<code>bool</code>）之外，它包括了“任何事物”类型，这里一个形式参数的类型是无关紧要的，例如在列表反转函数中：
+
+<syntaxhighlight lang="haskell">
+rev [] = []
+rev (a:x) = rev x ++ [a]
+</syntaxhighlight>
+
+它可以应用于有任何数据类型的列表，给它的显式的函数类型声明将是：
+
+<syntaxhighlight lang="haskell">
+rev :: [*] -> [*]
+</syntaxhighlight>
+
+==样例代码==
+
+下列的Miranda脚本确定一个数的集合的所有子集的集合：
+
+<syntaxhighlight lang="haskell">
+subsets []     = [[]]
+subsets (x:xs) = [[x] ++ y | y <- ys] ++ ys
+                 where ys = subsets xs
+</syntaxhighlight>
+
+和函数<code>primes</code>的文学脚本，它给出所有素数的列表：
+<syntaxhighlight lang="doscon">
+> || The infinite list of all prime numbers.
+
+The list of potential prime numbers starts as all integers from 2 onwards;
+as each prime is returned, all the following numbers that can exactly be
+divided by it are filtered out of the list of candidates.
+
+> primes = sieve [2..]
+> sieve (p:x) = p : sieve [n | n <- x; n mod p ~= 0]
+</syntaxhighlight>
+
+==引用==
+{{reflist}}
+
+==外部連結==
+*[http://miranda.org.uk 官方首頁] {{Wayback|url=http://miranda.org.uk/ |date=20200928124921 }}
+{{程序设计语言|Miranda}}
+{{DEFAULTSORT:Miranda}}
+[[Category:程序设计语言|Category:程序设计语言]]
+[[Category:函数式编程语言|Category:函数式编程语言]]
+[[Category:模式匹配编程语言|Category:模式匹配编程语言]]

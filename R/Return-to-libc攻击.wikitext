@@ -1,0 +1,35 @@
+{{TA
+|G1=IT
+}}
+
+
+{{校对翻译}}
+'''Return-to-libc攻击'''（缩写：{{lang|en|ret2libc}}），即“返回至[[C标准库|C标准库]]攻击”，是一种[[电脑安全|电脑安全]]攻击。这种攻击方式一般应用于[[缓冲区溢出|缓冲区溢出]]中，其[[堆栈|堆栈]]中的[[返回地址|返回地址]]被替换为另一条指令的地址，并且堆栈的一部分被覆盖以提供其参数。这允许攻击者调用现有函数而无需注入恶意代码到程序中。
+
+缩写为<code>[[libc|libc]]</code>的共享库是[[C标准函数库|C标准函数库]]，提供了[[类UNIX|类UNIX]][[操作系统|操作系统]]中的[[C运行时|C运行时]]支持。尽管攻击者可以让代码返回到任意位置，但绝大多数情况下的目标都是<code>libc</code>。这是因为<code>libc</code>总是会被链接到程序中，并且它提供了对攻击者而言一些相当有用的函数（如<code>[[system_(C_standard_library)|system]]()</code>调用可以只附加一个参数即执行外部程序）。这即是尽管返回地址可以指向另一个完全不同的区域，但这种攻击仍被称为return-to-libc的原因。
+
+==对 return-to-libc 攻击的防护==
+
+一个被标记了[[NX位|不可执行位]]的堆栈可以阻止一些缓冲区溢出攻击，但无论如何它无法防止return-to-libc攻击。因为return-to-libc攻击只用到了标记为可执行的代码（libc中的函数均为可执行）。当然，攻击者也只能够调用已存在的函数。[[Stack-smashing_防护|Stack-smashing 防护]]能够阻止这种溢出，因为它可以检测到损坏的堆栈并且有可能移除被攻击的[[X86記憶體區段|段]]（segment）。[[地址空间布局随机化|地址空间布局随机化]] (ASLR)使这种攻击在64位平台上变得几乎不可能成功，因为所有函数的内存地址都是随机的。在32位系统中，ASLR能够提供部分防护，因为只有16位地址可供用于随机化，这可以用暴力攻击在很少的几分钟内破解。<ref>{{cite conference |last=Shacham |first=Hovav |coauthors=Page, Matthew; Pfaff, Ben; Goh, Eu-Jin; Modadugu, Nagendra; and Boneh, Dan |url=http://www.stanford.edu/~blp/papers/asrandom.pdf |title=On the Effectiveness of Address-Space Randomization |booktitle=Proceedings of Computer and Communications Security (CCS'04), October 25–29, 2004, Washington (DC) |access-date=2011-07-22 |archive-date=2011-09-15 |archive-url=https://web.archive.org/web/20110915204131/http://www.stanford.edu/~blp/papers/asrandom.pdf |dead-url=no }}</ref>
+
+== 相关攻击 ==
+[[面向返回编程|面向返回编程]] 是这种攻击使用的精心完成的技术，并且，通过串联起每次单独的小型攻击以执行小数目的指令，可被用于进行更一般的操作。
+
+==参见==
+
+* [[缓冲区溢出|缓冲区溢出]]
+* [[堆栈溢出|堆栈溢出]]
+* [[Stack-smashing防护|Stack-smashing防护]]
+* [[NX位|不可执行位]]
+* [[地址空间布局随机化|地址空间布局随机化]]
+* [[面向返回编程|面向返回编程]]
+
+==参考资料==
+
+{{reflist}}
+
+==外部链接==
+* [http://www.infosecwriters.com/text_resources/pdf/return-to-libc.pdf Bypassing non-executable-stack during exploitation using return-to-libc]{{Wayback|url=http://www.infosecwriters.com/text_resources/pdf/return-to-libc.pdf |date=20110725175932 }} by c0ntex at InfoSecWriters.com
+
+[[Category:电脑安全攻击|Category:电脑安全攻击]]
+[[Category:C标准库|Category:C标准库]]

@@ -1,0 +1,146 @@
+{{Infobox Software
+|name = 3Delight
+|genre = [[三维计算机图形|三维计算机图形]]
+|developer = DNA Research
+|latest_release_version = 11.0.159
+|latest_release_date = {{release date|2015|4|20}} <ref name='changelog'>{{Cite web |url=https://3delight.atlassian.net/wiki/display/3DSP/Changelog |title=3Delight 更新日志 |accessdate=2014-11-27 |archive-date=2016-03-04 |archive-url=https://web.archive.org/web/20160304104949/https://3delight.atlassian.net/wiki/display/3DSP/Changelog |dead-url=no }}</ref>
+|operating_system = [[Linux|Linux]], [[Mac_OS_X|Mac OS X]], [[Microsoft_Windows|Windows]]
+|licence = [[专有软件|专有软件]]
+|website = [http://www.3delight.com/ www.3delight.com]
+}}
+'''3Delight''' 是一个专有的，符合 [[RenderMan规范|RenderMan 规范]]的逼真图像渲染器，和[[皮克斯|皮克斯]]的 [[PRMan|PRMan]] 有一样高的渲染质量和效率，由 Taarna 工作室的子公司 DNA Research 开发。
+
+==特性==
+3Delight 主要使用 [[Reyes渲染架构|Reyes 渲染架构]]，但也支持光线追踪和全局照明渲染，完全支持[[多线程|多线程]]和[[分布式渲染|分布式渲染]]，因此可以有效利用计算机的多核处理器，以及拥有众多计算机的渲染农场的计算资源进行渲染。
+
+3Delight 拥有以下特性<ref>{{Cite web |url=http://www.3delight.com/en/uploads/docs/3delight/3delight_tech_specs.pdf |title=3Delight 技术规范 |accessdate=2011-01-29 |archive-date=2008-08-27 |archive-url=https://web.archive.org/web/20080827233109/http://www.3delight.com/en/uploads/docs/3delight/3delight_tech_specs.pdf |dead-url=no }}</ref>：
+
+*可编程着色，使用 [[RenderMan着色语言|RSL]] 编写着色器
+*面光源
+*[[景深|景深]]
+*[[置换|置换]]
+*[[反射贴图|环境贴图]]
+*[[全局照明|全局照明]]
+*[[细节层次|细节层次]]
+*[[运动模糊|运动模糊]]
+*特殊[[镜头映射|镜头映射]]（通过 ''ray trace hider''）
+*[[光线跟踪|光线跟踪]]
+*[[深度阴影|深度阴影]]
+*[[实体造型|实体模型]]
+*[[纹理映射|纹理映射]]
+*[[体积着色|体积着色]]
+
+此外，3Delight 还支持以下特性：
+*[[光子映射|光子映射]]
+*[[点云|点云]]
+*多级[[细分曲面|细分曲面]]
+*NURBS 曲线
+*[[砖图|砖图]]（三维 Mipmap 纹理）
+*[[RIB判决|RIB判决]]，允许仅在满足特定条件下才解析指定的 RIB 片段。<ref>{{Cite web |url=http://www.renderpixie.com/pixiewiki/Documentation/Conditional_RIB |title=Conditional RIB |accessdate=2011-01-29 |archive-date=2011-10-03 |archive-url=https://web.archive.org/web/20111003125849/http://www.renderpixie.com/pixiewiki/Documentation/Conditional_RIB |dead-url=no }}</ref>
+*[[类着色器|类着色器]]
+*[[协程|Co-shaders]]
+
+===模块化===
+3Delight 是模块化的，其主模块实现了 Reyes 渲染算法。其他的模块，被称为「Sabretooth」，通过 {{lang|en|shaderop}}，用于光线跟踪和全局照明计算。
+通过选择不同的 {{link-en|hider|hider}}，明确指定进行光线跟踪渲染，使之从一个 Reyes/光线跟踪杂交的渲染器变成完全的光线跟踪渲染器。
+
+其他的特性包括：
+*支持 [[Autodesk_Maya|Maya]] Hypershade 的多数材质，3Delight 可以自动转换 Maya 材质为 RenderMan 材质。
+*支持 Maya、[[3ds_Max|3ds Max]]、[[Softimage|Softimage]]、[[Houdini|Houdini]]、Massive 等三维软件。
+*扩展的显示子集（display subset），允许渲染出来的几何原型写入相同的显示变量（display variable），并写到不同的图像里。比如，使用显示子集，可以把一个动物的皮肤和毛发渲染成分开的图像，并且毛发通道（pass）不会遮挡皮肤通道。
+*快速高效的点云，存储砖图和点云的数据结构被设计成仅在必要的时候加载所需的部分，这样可以尽量减少渲染所需的内存。
+*程序化几何模型在光线跟踪也是按需生成，尽量减少渲染所需的内存。
+*置换着色器可以嵌套。
+*置换着色器可在模型着色前对几何原型的[[頂點_(電腦圖學)|顶点]]进行运算。
+*gather() shaderop 可用于产生点云，以从 [[高动态范围成像|HDR 图像]]生成取样分布，如此可以方便的把光子映射和[[图像照明|图像照明]]结合起来。
+*磁盘读写缓存，在大场景渲染时优化大量数据传输，减少网络阻塞。
+*一个允许对任何数据运行 RSL 代码的 C 语言 API，比如，对模型的[[頂點_(電腦圖學)|顶点]]属性数据进行处理。
+
+==历史==
+3Delight 的开发开始于 1999 年，于 2000 年首次公开发布。<ref>{{Cite web |url=https://groups.google.ca/group/comp.graphics.rendering.renderman/msg/fb13237fd2bf20ad |title=3Delight 首次公开发布的公告 |accessdate=2015-04-21 |archive-date=2010-06-30 |archive-url=https://web.archive.org/web/20100630225803/http://groups.google.ca/group/comp.graphics.rendering.renderman/msg/fb13237fd2bf20ad |dead-url=no }}</ref>3Delight 是首个结合 Reyes 算法和光线跟踪的 RenderMan 渲染器，当时能够进行光线跟踪的 RenderMan 渲染器是 [[BMRT|BMRT]]，但 BMRT 并非一个Reyes 渲染器。3Delight 从一开始就是一个商业渲染器，但在 2000 年 8 月到 2005 年 3 月，开发商允许人们免费使用，以便建立用户群。
+
+从 2011 年 10 月发布的 10.0 开始，名字改成了 3Delight Studio Pro，从这个版本开始，开发商允许用户使用整个 3Delight 所带的套件，包括命令行工具、程序库，以及 Maya 和 Softimage 插件。<ref name='release_notes'>{{Cite web |url=https://3delight.atlassian.net/wiki/display/3DSP/Release+Notes |title=3Delight 发布注记 |accessdate=2014-11-27 |archive-date=2016-03-04 |archive-url=https://web.archive.org/web/20160304074255/https://3delight.atlassian.net/wiki/display/3DSP/Release+Notes |dead-url=no }}</ref>
+
+从 2013 年 10 月发布的 11.0 版开始，使用免费许可证的用户可以使用四个 CPU 核心来渲染（之前只能使用两个核心），并且能获取之前只有付费用户才能得到的小版本更新。<ref name='release_notes' />
+
+目前的许可方式，依然是基于线程数量，年度技术支持的费用也和线程数有关。<ref>{{Cite web |url=http://www.3delight.com/en/index.php?page=3DSP_pricing |title=3Delight 许可证策略 |access-date=2011-02-13 |archive-url=https://web.archive.org/web/20110211174424/http://www.3delight.com/en/index.php?page=3DSP_pricing |archive-date=2011-02-11 |dead-url=yes }}</ref>
+
+==主版本历史==
+自从 4.0 到 10.0，基本上每个 3Delight 主版本都以一个电影行业名词作为名称。
+* [https://web.archive.org/web/20120326132440/http://www.3delight.com/en/index.php?page=news 3Delight 10.0.4]，"[[银翼杀手|Blade Runner]]"，名字改为 3Delight Studio Pro，2011 年 10 月
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/e1f4c1a9891aede7 3Delight 9.0.0]{{Wayback|url=https://groups.google.com/group/comp.graphics.rendering.renderman/msg/e1f4c1a9891aede7 |date=20121108044136 }}，"[[米开朗基罗·安东尼奥尼|Antonioni]]"，2009 年 12 月
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/a8615ea70c31b587 3Delight 8.5.0]{{Wayback|url=https://groups.google.com/group/comp.graphics.rendering.renderman/msg/a8615ea70c31b587 |date=20121107080543 }}，"[[查尔斯·布朗森|Bronson]]"，2009 年 5 月
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/ab754ad521d41035 3Delight 8.0.0]{{Wayback|url=https://groups.google.com/group/comp.graphics.rendering.renderman/msg/ab754ad521d41035 |date=20121106152815 }}，"[[午夜快车|Midnight Express]]"，2008 年 10 月
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/c389d5e90c943d24 3Delight 7.0.0]{{Wayback|url=https://groups.google.com/group/comp.graphics.rendering.renderman/msg/c389d5e90c943d24 |date=20121104010826 }}，"[[迪亚戈_(电影)|Django]]"，2007 年 11 月
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/8f4d252ff97b8aaa 3Delight 6.5.0]{{Wayback|url=https://groups.google.com/group/comp.graphics.rendering.renderman/msg/8f4d252ff97b8aaa |date=20121025220441 }}，"[[恩尼奥·莫里科内|Ennio]]"，2007 年 2 月
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/8454e655e24588c8 3Delight 6.0.1]{{Wayback|url=https://groups.google.com/group/comp.graphics.rendering.renderman/msg/8454e655e24588c8 |date=20121025133440 }}，"{{link-en|Dario Argento|Dario_Argento}}"，2006 年 11 月
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/96054503e7fd242a 3Delight 5.0.0]{{Wayback|url=https://groups.google.com/group/comp.graphics.rendering.renderman/msg/96054503e7fd242a |date=20121022033921 }}，"[[乔吉奥·莫罗德尔|Moroder]]"，2006 年 2 月
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/22cac22ce089a235 3Delight 4.5.0]{{Wayback|url=https://groups.google.com/group/comp.graphics.rendering.renderman/msg/22cac22ce089a235 |date=20121022044019 }}，"{{link-en|Lucio Fulci|Lucio_Fulci}}"，2005 年 8 月
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/c8c7c6337e998e55 3Delight 4.0.0]{{Wayback|url=https://groups.google.com/group/comp.graphics.rendering.renderman/msg/c8c7c6337e998e55 |date=20121022033933 }}，"[[印第安那·琼斯|Indiana]]"，2005 年 3 月
+* 3Delight 3.0.0
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/8b7f2b432aad4e21 3Delight 2.1.0]{{Wayback|url=https://groups.google.com/group/comp.graphics.rendering.renderman/msg/8b7f2b432aad4e21 |date=20121022044217 }}，2004 年 6 月
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/6ed1bad3e15a9c07 3Delight 2.0.0]{{Wayback|url=https://groups.google.com/group/comp.graphics.rendering.renderman/msg/6ed1bad3e15a9c07 |date=20121022033944 }}，2004 年 1 月
+* 3Delight 1.0.6beta
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/8857c89e2856a1de 3Delight 1.0.0]{{Wayback|url=https://groups.google.com/group/comp.graphics.rendering.renderman/msg/8857c89e2856a1de |date=20121022044243 }}，beta，2003 年 1 月
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/e0b9c83a8ef7e433 3Delight 0.9.6]{{Wayback|url=https://groups.google.com/group/comp.graphics.rendering.renderman/msg/e0b9c83a8ef7e433 |date=20121022044322 }}，2002 年 8 月
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/c292a7283ae98b0d 3Delight 0.9.4]{{Wayback|url=https://groups.google.com/group/comp.graphics.rendering.renderman/msg/c292a7283ae98b0d |date=20121022044441 }}，2002 年 6 月
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/c9a112d87632314c 3Delight 0.9.2]{{Wayback|url=https://groups.google.com/group/comp.graphics.rendering.renderman/msg/c9a112d87632314c |date=20121022044454 }}，2001 年 12 月
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/0b2cbf41ec7f1c95 3Delight 0.9.0]{{Wayback|url=https://groups.google.com/group/comp.graphics.rendering.renderman/msg/0b2cbf41ec7f1c95 |date=20121022044420 }}，2001 年 8 月
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/ffd884b847b3f7cc 3Delight 0.8.0]，2001 年 3 月
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/fb1bf705bb874588 3Delight 0.6.0]{{Wayback|url=https://groups.google.com/group/comp.graphics.rendering.renderman/msg/fb1bf705bb874588 |date=20121022044523 }}，2000 年 9 月
+* [https://groups.google.com/group/comp.graphics.rendering.renderman/msg/fb13237fd2bf20ad 3Delight 0.5.1]{{Wayback|url=https://groups.google.com/group/comp.graphics.rendering.renderman/msg/fb13237fd2bf20ad |date=20121022044305 }} ，2000 年 8 月
+
+==支持的平台==
+3Delight 既有 32 位平台也有 64 位平台版本，目前支持的平台主要有
+*[[苹果公司|苹果公司]] [[PowerPC|PowerPC]] 和 [[x86|x86]] 平台上的 [[Mac_OS_X|Mac OS X]]
+*x86，[[x86-64|x86-64]] 和 [[Cell|Cell]] 平台上的 [[Linux|GNU/Linux]]
+*[[微软|微软]] x86 和 x86-64 平台上的 [[Windows|Windows]]
+===停止开发的平台===
+*[[迪吉多|迪吉多]]公司 [[DEC_Alpha|Alpha]] 平台的 {{link-en|Digital UNIX|Digital_UNIX}}
+*[[硅谷图形公司|硅谷图形公司]] [[MIPS架構|MIPS 平台]]的 [[IRIX|IRIX]]
+*[[升阳电脑|升阳电脑]][[SPARC|SPARC]] 平台的 [[Solaris|Solaris]]
+
+==使用 3Delight 的影视项目<ref name='film_credit'>{{Cite web |url=http://www.3delight.com/en/index.php?page=projects |title=电影和剧集 |access-date=2015-04-21 |archive-url=https://web.archive.org/web/20150417000304/http://www.3delight.com/en/index.php?page=projects |archive-date=2015-04-17 |dead-url=yes }}</ref>==
+<!-- 若有空，请把此列表格式更新 -->
+*[[Assault_on_Precinct_13|Assault on Precinct 13]]
+*[[Bailey's_Billions|Bailey's Billions]]
+*[[黑色圣诞_(电影)|黑色圣诞]]
+*[[荣誉之刃|荣誉之刃]]
+*[[血钻_(电影)|血钻]]
+*[[夏洛特的网_(2006年电影)|夏洛特的网]]
+*[[长江七号|长江七号]]
+*[[纳尼亚传奇：狮子·女巫·魔衣橱|纳尼亚传奇：狮子·女巫·魔衣橱]]
+*[[The_Chronicles_of_Riddick|The Chronicles of Riddick]]
+*[[Cube_Zero|Cube Zero]]
+*[[第九区|第九区]]
+*[[神奇四侠_(电影)|神奇四侠]]
+*[[神奇四侠：银魔现身|神奇四侠：银魔现身]]
+*[[死神来了3|死神来了3]]
+*[[哈利·波特与“混血王子”|哈利·波特与“混血王子”]]
+*[[哈利·波特与凤凰社|哈利·波特与凤凰社]]
+*[[绿巨人_(电影)|绿巨人]]
+*[[神奇绿巨人|神奇绿巨人]]
+*[[The_Last_Mimzy|The Last Mimzy]]
+*[[The_Ruins|The Ruins]]
+*[[The_Seeker:_The_Dark_is_Rising|The Seeker: The Dark is Rising]]
+*[[终结者之救赎|终结者之救赎]]
+*[[超人归来|超人归来]]
+*[[野兽冒险乐园_(电影)|野兽冒险乐园]]
+*[[The_Woods|The Woods]]
+*[[X战警3：最后之战|X战警3：最后之战]]
+*[[X战警前传：金刚狼|X战警前传：金刚狼]]
+
+以下全 CG 电影使用了 3Delight：
+*Adventures in Animation ([[IMAX|IMAX]] 3D featurette)
+*Free Jimmy
+
+==参考链接==
+{{reflist}}
+
+==外部链接==
+* [http://www.3delight.com/ 3Delight 官方网站]{{Wayback|url=http://www.3delight.com/ |date=20080827233646 }}
+
+{{Renderman软件}}
+
+{{DEFAULTSORT:3delight}}
+[[Category:RenderMan|Category:RenderMan]]

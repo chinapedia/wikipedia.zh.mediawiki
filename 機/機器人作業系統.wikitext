@@ -1,0 +1,74 @@
+{{Infobox software
+| author = [[Willow_Garage|Willow Garage]]<br/>[[Stanford_Artificial_Intelligence_Laboratory|Stanford Artificial Intelligence Laboratory]]
+| logo = ROS Lunar Loggerhead.png
+| logo caption = ROS Lunar Loggerhead logo
+| logo size = 150px
+| screenshot = Cart_pushing_rviz_holonomic.jpg
+| caption = Cart pushing simulation in RVIZ
+| operating system = [[Linux|Linux]]
+| released = {{Start date and age|2007}}
+| latest release version = Galactic Geochelone
+| latest release date = {{Start date and age|df=yes|2021|05|23}}
+| programming_language = [[C++|C++]]或[[Python|Python]]
+| genre = [[Robotics_suite|Robotics suite]], [[operating_system|OS]], [[library_(computing)|library]]
+| license = [[BSD_license|BSD license]]
+| website = {{URL|www.ros.org}}
+}}
+'''ROS'''（{{Lang-en|Robot Operating System}}，一般译为'''机器人操作系统'''），是專為[[機器人|機器人]]軟體開發所設計出來的一套電腦[[作業系統|作業系統]]架構。它是一个开源的元级操作系统（后操作系统），提供类似于操作系统的服务，包括硬件抽象描述、底层驱动程序管理、共用功能的执行、程序间消息传递、程序发行包管理，它也提供一些工具和库用于获取、建立、编写和执行多机融合的程序。
+
+ROS的运行架构是一种使用ROS通信模块实现模块间[[對等網路|P2P]]的松耦合的网络连接的处理架构，它执行若干种类型的通讯，包括：
+# 基于服务的同步[[遠程過程調用|RPC]]（远程过程调用）通讯；
+# 基于Topic的异步数据流通讯，还有参数服务器上的数据存储。
+
+== 發展目标 ==
+ROS的首要设计目标是在机器人研发领域提高代码复用率。ROS是一种分布式处理框架（又名Nodes）。这使可执行文件能被单独设计，并且在运行时松散耦合。这些过程可以封装到数据包（Packages）和[[堆栈|堆栈]]（Stacks）中，以便于共享和分发。ROS还支持代码库的联合系统。使得协作亦能被分发。这种从文件系统级别到社区一级的设计让独立地决定发展和实施工作成为可能。上述所有功能都能由ROS的基础工具实现。
+
+为了实现“共享与协作”这一首要目标，人们制订了ROS架构中的其他支援性目标：
+
+* “轻便”：ROS是设计得尽可能方便简易。不必替换主框架与系统，因为ROS编写的代码可以用于其他机器人软件框架中。毫无疑问的，ROS更易于集成与其他机器人软件框架。事实上ROS已完成与OpenRAVE、Orocos和Player的整合。
+* ROS-agnostic库：【agnostic：不可知论】建议的开发模型是使用clear的函数接口书写ROS-agnostic库。
+* 语言独立性：ROS框架很容易在任何编程语言中执行。目前已经能在Python和C++中顺利运行，同时添加有[[LISP|Lisp]]、[[GNU_Octave|Octave]]和Java语言库。
+* 测试简单：ROS有一个内建的单元/组合集测试框架，称为“rostest”。这使得集成调试和分解调试很容易。
+* 扩展性：ROS适合于大型实时系统与大型的系统开发项目。
+
+== ROS的概念 ==
+ROS有三个层次的概念：分别为Filesystem level，Computation graph level， 以及Communication level。 以下内容具体的总结了这些层次及概念。除了这三个层次的概念， ROS也定义了两种名称-- Package资源名称和Graph资源名称。同样会在以下内容中提及。
+
+=== ROS 的 Filesystem Level ===
+文件系统层概念就是碟片里的资源，例如：
+* [http://www.ros.org/wiki/Packages Packages] {{Wayback|url=http://www.ros.org/wiki/Packages |date=20130528150703 }}：ROS的基本组织，可以包含任意格式文件。一个Package 可以包含ROS执行时处理的文件（nodes），一个ROS的依赖库，一个数据集合，配置文件或一些有用的文件在一起。
+* [http://www.ros.org/wiki/Manifest Manifests] {{Wayback|url=http://www.ros.org/wiki/Manifest |date=20130516012241 }}：Manifests (manifest.xml) 提供关于Package元数据，包括它的许可信息和Package之间依赖关系，以及语言特性信息像编译旗帜（编译优化参数）。
+* [http://www.ros.org/wiki/Stacks Stacks] {{Wayback|url=http://www.ros.org/wiki/Stacks |date=20130518205902 }}: Stacks 是Packages的集合，它提供一个完整的功能，像“navigation stack” Stack与版本号关联，同时也是如何发行ROS软件方式的关键。
+* [http://www.ros.org/wiki/Stack Manifest Stack Manifests]{{dead link|date=2018年3月 |bot=InternetArchiveBot |fix-attempted=yes }}: Stack manifests (stack.xml) 提供关于Stack元数据，包括它的许可信息和Stack之间依赖关系。
+* [http://www.ros.org/wiki/msg Message (msg) types] {{Wayback|url=http://www.ros.org/wiki/msg |date=20130115093850 }}: 信息描述, 位置在路径：my_package/msg/MyMessageType.msg, 定义数据类型在ROS的 messages ROS里面。
+* [http://www.ros.org/wiki/srv Service (srv) types] {{Wayback|url=http://www.ros.org/wiki/srv |date=20100626010530 }}: 服务描述,位置在路径：my_package/srv/MyServiceType.srv, 定义这个请求和相应的数据结构 在ROS services 里面。
+
+=== ROS 的 Computation Graph Level ===
+Computation Graph Level（计算图）就是用ROS的P2P（peer-to-peer网络传输协议）网络集中处理所有的数据。基本的Computation Graph的概念包括Node， Master， Parameter Server，messages, services, topics， 和bags， 以上所有的这些都以不同的方式给Graph传输数据。
+* [http://www.ros.org/wiki/Nodes Nodes] {{Wayback|url=http://www.ros.org/wiki/Nodes |date=20130731070219 }}: Nodes（节点）是一系列运行中的程序。ROS被设计成在一定颗粒度下的模块化系统。一个机器人控制系统通常包含许多Nodes。比如一个Node控制激光雷达，一个Node控制车轮马达，一个Node处理定位，一个Node执行路径规划，另外一个提供图形化界面等等。一个ROS节点是由[http://www.ros.org/wiki/Client Libraries ROS client library]{{dead link|date=2018年3月 |bot=InternetArchiveBot |fix-attempted=yes }}写成的, 例如 [http://www.ros.org/wiki/roscpp roscpp] {{Wayback|url=http://www.ros.org/wiki/roscpp |date=20130124102005 }} 和 [http://www.ros.org/wiki/rospy rospy] {{Wayback|url=http://www.ros.org/wiki/rospy |date=20130729051729 }}. 
+* [http://www.ros.org/wiki/Master Master] {{Wayback|url=http://www.ros.org/wiki/Master |date=20130731063310 }}: ROS Master 提供了登记列表和对其他计算图的查找。没有Master，节点将无法找到其他节点，交换消息或调用服务。
+* [http://www.ros.org/wiki/Parameter Server Parameter Server]{{dead link|date=2018年3月 |bot=InternetArchiveBot |fix-attempted=yes }}: 参数服务器使数据按照键的方式存储。目前，参数服务器是Master的组成部分。
+* [http://www.ros.org/wiki/Messages Messages] {{Wayback|url=http://www.ros.org/wiki/Messages |date=20130811063107 }}:节点之间通过messages来传递消息。一个message是一个简单的数据结构，包含一些归类定义的区。支持标准的原始数据类型（整数、浮点数、布尔数，等）和原始数组类型。message可以包含任意的嵌套结构和数组（很类似于C语言的结构structs）
+* [http://www.ros.org/wiki/Topics Topics] {{Wayback|url=http://www.ros.org/wiki/Topics |date=20130501202116 }}: Messages以一种发布/订阅的方式传递。一个node可以在一个给定的topic中发布消息。Topic是一个name被用于描述消息内容。一个node针对某个topic关注与订阅特定类型的数据。可能同时有多个node发布或者订阅同一个topic的消息；也可能有一个node同时发布或订阅多个topic。总体上，发布者和订阅者不了解彼此的存在。主要的概念在于将信息的发布者和需求者解耦、分离。逻辑上，topic可以看作是一个严格规范化的消息bus。每个bus有一个名字，每个node都可以连接到bus发送和接受符合标准类型的消息。
+* [http://www.ros.org/wiki/Services Services] {{Wayback|url=http://www.ros.org/wiki/Services |date=20130501195259 }}:发布/订阅模型是很灵活的通讯模式，但是多对多，单向传输对于分布式系统中经常需要的“请求/回应”式的交互来说并不合适。因此，“请求/回应” 是通过services来实现的。这种通讯的定义是一种成对的消息：一个用于请求，一个用于回应。假设一个节点提供了一个服务提供下一个[http://www.ros.org/wiki/Names name] {{Wayback|url=http://www.ros.org/wiki/Names |date=20120823225830 }}和客户使用服务发送请求消息并等待答复。ROS的客户库通常以一种远程调用的方式提供这样的交互。
+* [http://www.ros.org/wiki/Bags Bags] {{Wayback|url=http://www.ros.org/wiki/Bags |date=20130806091409 }}: Bags是一种格式，用于存储和播放ROS消息。对于储存数据来说Bags是一种很重要的机制。例如传感器数据很难收集但却是开发与测试中必须的。
+
+在ROS的计算图中，ROS的Master以一个name service的方式工作。它给ROS的节点存储了topics和service的注册信息。Nodes 与Master通信从而报告它们的注册信息。当这些节点与master通信的时候，它们可以接收关于其他以注册节点的信息并且建立与其它以注册节点之间的联系。当这些注册信息改变时Master也会回馈这些节点，同时允许节点动态创建与新节点之间的连接。
+
+节点之间的连接是直接的； Master仅仅提供了查询信息，就像一个DNS服务器。节点订阅一个topic将会要求建立一个与发布该topics的节点的连接，并且将会在同意连接协议的基础上建立该连接。ROS里面使用最广的连接协议是TCPROS，这个协议使用标准的TCP/IP 接口。
+
+这样的架构允许解耦操作（decoupled operation），通过这种方式大型或是更为复杂的系统得以建立，其中names方式是一种行之有效的手段。names方式在ROS系统中扮演极为重要的角色： topics, services, and parameters 都有各自的names。每一个ROS客户端库都支持重命名，这等同于，每一个编译成功的程序能够以另一种形似【名字】运行。
+
+例如，为了控制一个北阳激光测距仪（Hokuyo laser range-finder），可以启动hokuyo_node 驱动，这个驱动可以给与激光仪进行对话并且在"扫描"topic下可以发布sensor_msgs/LaserScan 的信息。为了处理数据，也许会写一个使用laser_filters的node来订阅"扫描"topic的信息。订阅之后，过滤器将会自动开始接收激光仪的信息。注意两边是如何脱钩工作的。 所有的hokuyo_node的节点都会完成发布"扫描"，不需要知道是否有节点被订阅了。所有的过滤器都会完成"扫描"的订阅，不论知道还是不知道是否有节点在发布"扫描"。 在不引发任何错误的情况下，这两个nodes可以任何的顺序启动，终止，或者重启。
+
+以后也许会给机器人加入另外一个激光器，系统因此需要重新设置，所需要做的就是重新映射已经使用过的names。当开始的第一个hokuyo_node时，可以说它用base_scan代替了映射扫描，并且和过滤器节点做相同的事。现在，这些节点将会用base_scan的topic来通信从而代替,并且将不再监听"扫描"topic的信息。然后就可以为新激光测距仪启动另外一个hokuyo_node。
+
+== 参考文献 ==
+# http://www.ros.org/wiki/ros {{Wayback|url=http://www.ros.org/wiki/ros |date=20130815074658 }}
+
+== 外部链接 ==
+[http://www.ros.org/wiki/ ROS官方网站] {{Wayback|url=http://www.ros.org/wiki/ |date=20171123064622 }}
+
+[[Category:自由作業系統|Category:自由作業系統]]
+[[Category:机器人操作系统|Category:机器人操作系统]]
+[[Category:2007年软件|Category:2007年软件]]

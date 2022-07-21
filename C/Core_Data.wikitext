@@ -1,0 +1,115 @@
+{{noteTA|G1=IT}}
+{{Infobox software
+|name = Core Data
+|logo= [[Image:Macosx_data_coredata_20090925.png|Core Data]]
+|developer = [[苹果公司|苹果公司]]
+|latest release version = 3.2.0
+|operating_system = [[macOS|macOS]]、[[iOS|iOS]]
+|license = [[专有软件|专有]]
+|website = [https://developer.apple.com/documentation/coredata Apple Developer Documentation]
+}}
+'''Core Data'''是[[蘋果公司|蘋果公司]]所開發的[[macOS|macOS]][[作業系統|作業系統]]（舊稱：Mac OS X及OS X）中[[Cocoa|Cocoa]] [[API|API]]的一部分，首次在[[Mac_OS_X_v10.4|Mac OS X 10.4 ''Tiger'']]与[[iOS|iOS]] 3.0系统中出现<ref name=iphonetut> Apple, "Core Data Tutorial for iPhone OS".</ref>。它允许按照[[实体-属性-值模型|实体-属性-值模型]]组织数据，并以[[XML|XML]]，[[二进制文件|二进制文件]]或[[SQLite|SQLite]]数据文件的格式将其[[序列化|序列化]]。Core Data允许用户使用代表实体和实体间关系的高层对象来操作数据。它也可以管理序列化的数据，提供[[对象生存期|对象生存期]]管理与[[object_graph|object graph]]管理，包括存储。Core Data直接与[[SQLite|SQLite]]交互，避免开发者使用原本的[[SQL|SQL]]语句<ref name=coredataref> Apple, "Core Data Programming Guide".</ref>。
+
+就像[[Cocoa绑定|Cocoa绑定]]在[[模型-视图-控制器|模型-视图-控制器]]设计中做了很多控制器的工作一样，Core Data做了很多数据模型的工作。它的主要任务是负责数据更改的管理，序列化到磁盘，最小化内存占用，以及查询数据。
+
+專長於Core Data及Cocoa軟體開發的資訊圖書作家Marcus Zarra曾說：
+{{cquote|简单的说，Core Data就是可以存储到磁盘的对象图，[...]Core Data可以帮我们做很多工作。它可以作为软件的整个[[MVC|模型层]]。它不仅仅在磁盘上存储数据，也把我们需要的数据对象读取到内存中。<ref name=Zarra2009>Zarra, ''Core Data''.</ref>}}
+
+==使用方法==
+Core Data使用包括实体和实体间关系，以及查找符合某些条件的实体的请求等内容的高层数据模型描述数据。开发者可以在纯对象层上查找与管理这些数据，而不必担心存储和查找的实现细节。[[Interface_Builder|Interface Builder]]中的控制器对象可以直接获取与管理实体，若与Cocoa绑定结合，则可以在不写自定义代码的情况下让用户界面显示、修改与管理数据模型中的大部分内容。
+
+例如：开发者希望开发一个管理[[vCard|vCard]]的程序。作者希望使用Core Data将一些vCard读入对象中，然后把它们存入一个大XML文件中。开发者需要在Xcode中建立数据模型，然后到Interface Builder中加入''Core Data Entity''项以创建其数据模型对应的GUI。然后，开发者可以加入标准的[[Objective-C|Objective-C]]代码以读取vCard，并将数据写入由Core Data管理的实体中。在此，开发者的代码是管理Core Data对象，而非其对应的vCard。最后，将<code>Save</code>菜单项连接到控制器对象对应的方法上，使得控制器在接到''存储''消息后自动的检查数据堆栈，确认数据是否合法，最后利用当前更改重写对应的Core Data文档。在整个过程中，开发者只需要专注于将vCard文件转换为Core Data实体的过程，而不需关心例如数据的显示、合法性检查、存储等其它部分，提高了开发效率。
+
+Core Data is organized into a large hierarchy of classes, though interaction is only prevalent with a small set of them. 
+Core Data由相对庞大的类继承体系组成，但开发者需要关注的接口只是其中的一个相对小的子集。
+
+{| class="wikitable"
+|-
+! 类名 !! 用途 !! 关键方法
+|-
+| NSManagedObject 
+| 
+* 数据对象
+* 管理属性
+|
+* -entity
+* -valueForKey:
+* -setValue: forKey:
+|-
+| NSManagedObjectContext
+| 
+* 数据库
+* 获取与存储
+|
+* -executeFetchRequest: error:
+* -save
+|-
+| NSManagedObjectModel 
+|
+* 数据模型
+| 
+* -entities
+* -fetchRequestTemplateForName:
+* -setFetchRequestTemplate: forName:
+|-
+| NSFetchRequest 
+| 
+* 请求数据
+|
+* -setEntity:
+* -setPredicate:
+* -setFetchBatchSize:
+|-
+| NSPersistentStoreCoordinator 
+|  
+* 中介
+* 存储数据
+| 
+* -addPersistentStoreWithType: configuration: URL: options: error:
+* -persistentStoreForURL:
+|-
+| NSPredicate
+|
+* 确定查询条件
+|
+* +predicateWithFormat:
+* -evaluateWithObject:
+|}
+<ref name=Zarra2009/><ref name=coredataref/><ref name=stevensonclasses> Stevenson, "Core Data类总览"</ref><ref name=jurewitzvideo> Jurewitz, "使用Core Data"</ref>
+
+==存储格式==
+Core Data可以将数据存储为XML，二进制文件或SQLite文件<ref name=coredataref/>。在[[Mac_OS_X_v10.5|Mac OS X 10.5 ''Leopard'']]及以后的版本中，开发者也可以通过继承NSPersistentStore类以创建自定义的存储格式。每种方法都有其优缺点，例如XML的可读性，SQLite的节约空间等。Core Data的这一方面类似于原始的[[Enterprise_Objects_Framework|Enterprise Objects Framework]]（EOF）系统，但EOF中开发者可以使用相对简洁的查询方式，而在Core Data中，只能使用一个语法类似SQL子集的查询语言，称为[[Predicate|Predicate]]<ref>Apple, ''Predicate Programming Guide''</ref>。
+
+Core Data是标准化的，可以自由的读写Xcode数据模型文件（通常是.xcdatamodel文件）。与EOF不同，Core Data目前没有设计多用户或多线程访问模式。模型迁移通常也需要代码，若其它开发者依赖于某个数据模型，则该数据模型的设计者可能在模型发生改变时需要与新数据模型一起提供版本转换代码。
+
+==历史与发展==
+
+Core Data的很大一部分设计都归功于早期的[[NeXT|NeXT]]产品，[[Enterprise_Objects_Framework|Enterprise Objects Framework]]（EOF）<ref name=eof> Apple, "EOModeler User Guide"</ref>。
+
+== 脚注 ==
+{{Reflist|2}}
+
+== 参考文献 ==
+* 苹果公司 (2009年9月17日). "Core Data Programming Guide". Retrieved from [http://developer.apple.com/mac/library/documentation/cocoa/conceptual/CoreData/cdProgrammingGuide.html http://developer.apple.com/iphone/library/documentation/Cocoa/Conceptual/CoreData/cdProgrammingGuide.html]{{Wayback|url=http://developer.apple.com/mac/library/documentation/cocoa/conceptual/CoreData/cdProgrammingGuide.html |date=20100905100839 }}
+* 苹果公司 (2009年9月). "Core Data Tutorial for iPhone OS". Retrieved from [https://web.archive.org/web/20100323200755/http://developer.apple.com/iPhone/library/documentation/DataManagement/Conceptual/iPhoneCoreData01/Introduction/Introduction.html https://web.archive.org/web/20100323200755/http://developer.apple.com/iPhone/library/documentation/DataManagement/Conceptual/iPhoneCoreData01/Introduction/Introduction.html]
+* 苹果公司 (2010年6月14日). ''Predicate Programming Guide''. 来自[http://developer.apple.com/library/ios/#documentation/Cocoa/Conceptual/Predicates/predicates.html%23//apple_ref/doc/uid/TP40001789]{{Wayback|url=http://developer.apple.com/library/ios/#documentation/Cocoa/Conceptual/Predicates/predicates.html%23//apple_ref/doc/uid/TP40001789 |date=20160818224729 }}
+* 苹果公司 (2006年). "EOModeler User Guide". Retrieved from [http://developer.apple.com/legacy/mac/library/documentation/WebObjects/UsingEOModeler/Introduction/Introduction.html#//apple_ref/doc/uid/TP30001018-CH201-TP1 http://developer.apple.com/legacy/mac/library/documentation/WebObjects/UsingEOModeler/Introduction/Introduction.html#//apple_ref/doc/uid/TP30001018-CH201-TP1]{{Wayback|url=http://developer.apple.com/legacy/mac/library/documentation/WebObjects/UsingEOModeler/Introduction/Introduction.html#//apple_ref/doc/uid/TP30001018-CH201-TP1 |date=20100509183658 }}
+* Jurewitz, M. & Apple Inc. (2010). "iPhone Development Videos: Working With Core Data". Retrieved from [http://developer.apple.com/videos/iphone/#video-advanced-coredata http://developer.apple.com/videos/iphone/#video-advanced-coredata]{{Wayback|url=http://developer.apple.com/videos/iphone/#video-advanced-coredata |date=20100926204452 }}
+* Stevenson, S. (2005). "Core Data Class Overview". Retrieved from [http://cocoadevcentral.com/articles/000086.php http://cocoadevcentral.com/articles/000086.php]{{Wayback|url=http://cocoadevcentral.com/articles/000086.php |date=20060908041938 }}
+* Zarra, M. S. (2009). ''Core Data Apple's API for Persisting Data on Mac OS X''. The Pragmatic Programmers.
+* LaMarche, J., & Mark, D. (2009).  ''More iPhone 3 Development: Tackling iPhone SDK 3''. Apress.
+
+== 外部链接 ==
+* Apple Inc. (2006). "Developing With Core Data". Retrieved from [http://developer.apple.com/macosx/coredata.html http://developer.apple.com/macosx/coredata.html]{{Wayback|url=http://developer.apple.com/macosx/coredata.html |date=20100819130521 }}
+* Apple Inc. (2009). "Web Objects Tutorial". Retrieved from [http://developer.apple.com/legacy/mac/library/documentation/DeveloperTools/Conceptual/WOTutorial/Introduction/Introduction.html http://developer.apple.com/legacy/mac/library/documentation/DeveloperTools/Conceptual/WOTutorial/Introduction/Introduction.html]{{Wayback|url=http://developer.apple.com/legacy/mac/library/documentation/DeveloperTools/Conceptual/WOTutorial/Introduction/Introduction.html |date=20100906221404 }}
+* CocoaDev. (n.d.). Retrieved from [https://web.archive.org/web/20080801025517/http://www.cocoadev.com/ https://web.archive.org/web/20080801025517/http://www.cocoadev.com/]
+* Stevenson, S. (2005). "Build A Core Data Application". Retrieved from [http://cocoadevcentral.com/articles/000085.php http://cocoadevcentral.com/articles/000085.php]{{Wayback|url=http://cocoadevcentral.com/articles/000085.php |date=20060903073259 }}
+
+{{Core Foundation}}
+{{MacOS}}
+
+[[Category:NeXT|Category:NeXT]]
+[[Category:Mac_OS介面|Category:Mac OS介面]]
+[[Category:数据建模|Category:数据建模]]
+[[Category:数据管理|Category:数据管理]]
+[[Category:苹果手机|Category:苹果手机]]

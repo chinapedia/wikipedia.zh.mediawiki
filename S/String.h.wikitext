@@ -1,0 +1,150 @@
+{{Merge from|C字串函式庫|time=2022-05-27T02:19:52+00:00}}
+{{unreferenced|time=2020-04-27T07:28:14+00:00}}
+{{noteTA|G1=IT}}
+{{C_Standard_library}} <!-- to edit this template go to [[template:C_Standard_library|template:C_Standard_library]] -->
+{{lowercase|title=string.h}}
+'''string.h'''是[[C标准库|C标准库]]的[[头文件|头文件]]，其中包含了[[宏|宏]](巨集)定义、常量以及函数和类型的声明，涉及的内容除了[[字符串|字符串]]处理之外，还包括大量的内存处理函数；因此，<code>string.h</code>这个命名是不恰当的。
+
+在<code>string.h</code>中定义的函数十分常用，作为[[C标准库|C标准库]]的一部分，它们被强制要求可以在任何支持C语言的平台上运行。但是，部分函数存在一些安全隐患，例如[[缓存溢出|缓存溢出]]等，导致程序员宁愿使用一些更安全的函数而放弃一定的可移植性。同时，这些字符串函数只能处理[[ASCII|ASCII]]字符集或兼容ASCII的字符集，如[[ISO-8859-1|ISO-8859-1]]；在处理存在多字节字符的字符集，如[[UTF-8|UTF-8]]时，会产生一个警告，指出对字符串“长度”的计算是以字节而不是以[[Unicode|Unicode]]字符为单位。非ASCII兼容字符集的字符串处理函数一般位于<code>[[wchar.h|wchar.h]]</code>中。
+
+==常量和类型==
+
+{| class="wikitable"
+|-
+! 名称 !! 说明
+|-
+|<code>NULL</code>  || 表示[[空指针|空指针]]常量的宏，即表示一个'''不'''指向任何有效内存单元地址的指针常量。
+|-
+|<code>size_t</code> || 无符号[[整型|整型]]，被用于<code>[[sizeof|sizeof]]</code>运算符的返回值类型。
+|}
+
+==函数==
+
+{| class="wikitable"
+|-
+! 名称 !! 说明
+|-
+|<code>void    *[[memcpy|memcpy]](void *dest, const void *src, size_t n);</code>
+|将n字节长的内容从一个内存地址复制到另一个地址；如果两个地址存在重叠，则最终行为未定义
+|-
+|<code>void    *memmove(void *dest, const void *src, size_t n);</code>
+|将n字节长的内容从一个内存地址复制到另一个地址；与<code>memcpy</code>不同的是它可以正确作用于两个存在重叠的地址
+|-
+|<code>void    *memchr(const void *s, char c, size_t n);</code>
+|在从s开始的n个字节内查找c第一次出现的地址并返回，若未找到则返回NULL
+|-
+|<code>int      memcmp(const void *s1, const void *s2, size_t n);</code>
+|对从两个内存地址开始的n个字符进行比较
+|-
+|<code>void    *memset(void *, int, size_t);</code>
+|用某种字节内容覆写一段内存空间
+|-
+|<code>char    *[[strcat|strcat]](char *dest, const char *src);</code>
+|在字符串dest之后连接上src
+|-
+|<code>char    *[[strncat|strncat]](char *dest, const char *src, size_t n);</code>
+|从src截取n个字符连接在字符串dest之后，返回dest字符串
+|-
+|<code>char    *[[strchr|strchr]](const char* str, int ch);</code>
+|从字符串str头开始查找字符ch首次出现的位置
+|-
+|<code>char    *[[strrchr|strrchr]](const char* str,int ch);</code>
+|从字符串str尾开始查找字符ch首次出现的位置
+|-<nowiki><nowiki>请在这里插入非格式化文字</nowiki></nowiki>
+|<code>int      [[strcmp|strcmp]](const char *, const char *);</code>
+|基于字典顺序比较两个字符串
+|-
+|<code>int      [[strncmp|strncmp]](const char *, const char *, size_t n);</code>
+|基于字典顺序比较两个字符串，最多比较n个字节
+|-
+|<code>int      [[strcoll|strcoll]](const char *, const char *);</code>
+|基于当前[[区域设置|区域设置]]的{{link-en|字符顺序|collating order}}比较两个字符串
+|-
+|<code>char    *[[strcpy|strcpy]](char* str1, const char* str2);</code>
+|将str2拷贝给str1
+|-
+|<code>char    *[[strncpy|strncpy]](char* str1, const char* str2, size_t n);</code>
+|截取str2的n个字符拷贝给str1
+|-
+|<code>char    *[[strerror|strerror]](int);</code>
+|返回错误码对应的解释字符串，参见[[errno.h|errno.h]]（非线程安全函数）
+|-
+|<code>size_t   [[strlen|strlen]](const char *);</code>
+|返回一个字符串的长度
+|-
+|<code>size_t   [[strspn|strspn]](const char *s, const char *strCharSet);</code>
+|从字符串s的起始处开始，寻找第一个'''不'''出现在strCharSet中的字符，返回其位置索引值。换句话说，返回从字符串s的起始位置的完全由strCharSet中的字符构成的子串的最大长度。strspn为string span的缩写。不支持多字节字符集。
+|-
+|<code>size_t   [[strcspn|strcspn]](const char *s, const char *strCharSet);</code>
+|从字符串s的起始处开始，寻找第一个出现在strCharSet中的字符，返回其位置索引值。换句话说，返回从字符串s的起始位置的完全由不属于strCharSet中的字符构成的子串的最大长度。strcspn为string complement span的缩写。不支持多字节字符集。
+
+|-
+|<code>char    *[[strpbrk|strpbrk]](const char *s, const char *breakset);</code>
+|在字符串s中查找breakset中任意字符第一次出现的位置的指针值。strpbrk为string pointer break缩写。通常，breakset是分隔符的集合。不支持多字节字符集。
+|-
+|<code>char    *[[strstr|strstr]](const char *haystack, const char *needle);</code>
+|在字符串haystack中查找字符串needle第一次出现的位置，heystack的长度必须长于needle
+|-
+|<code>char    *[[strtok|strtok]](char *strToken, const char *strDelimit );</code>
+|将一个字符串strToken依据分界符（delimiter）分隔成一系列字串。此函数非线程安全，且不可重入；但MSVC实现时使用了thread-local static variable因而是线程安全的但仍然是不可重入，即在单线程中不能对两个源字符串交替调用该函数来分析token，应当对一个字符串分析完成后再处理别的字符串。
+|-
+|<code>size_t   [[strxfrm|strxfrm]](char *dest, const char *src, size_t n);</code>
+|根据当前locale转换一个字符串为strcmp使用的内部格式
+|}
+
+===ISO C扩展函数===
+{| class="wikitable"
+|-
+! 名称 !! 说明 !! 标准
+|-
+|<code>void    *[[memccpy|memccpy]](void *dest, const void *src, int c, size_t n
+);</code>
+|在两块不重叠的内存地址间复制内容，直至复制了n字节或遇到内容为c的字节
+|UNIX 98?
+|-
+|<code>void *[[mempcpy|mempcpy]](void *dest, const void *src, size_t n);</code>
+|<code>memcpy</code>的变体，返回写入的最后一个字节的地址指针
+|[[GNU|GNU]]
+|-
+|<code>errno_t [[strcat_s|strcat_s]](char *s1, size_t s1max, const char *s2);</code>
+|<code>strcat</code>的变体，带边界检查
+|ISO/IEC WDTR 24731
+|-
+|<code>errno_t [[strcpy_s|strcpy_s]](char *s1, size_t s1max, const char *s2);</code>
+|<code>strcpy</code>的变体，带边界检查
+|ISO/IEC WDTR 24731
+|-
+|<code>char *[[strdup|strdup]](const char *);</code>
+|将字符串的内容复制到一段新分配的内存空间
+|[[POSIX|POSIX]]；源于一个BSD扩展标准
+|-
+|<code>int     [[strerror_r|strerror_r]](int, char *, size_t);</code>
+|将strerror()的结果放入一段给定的内存缓冲，此函数是线程安全的
+|POSIX:2001
+|-
+|<code>char *[[strerror_r|strerror_r]](int, char *, size_t);</code>
+|使用线程安全的方式返回strerror()的结果。在必要的时候才使用给定的内存缓冲 (与POSIX中的定义不一致).
+|GNU
+|-
+|<code>size_t [[strlcat|strlcat]](char *dest, const char *src, size_t n);</code>
+|<code>strcat</code>的变体，带边界检查
+|首先定义于[[OpenBSD|OpenBSD]]，现在也可以在[[FreeBSD|FreeBSD]]、[[Solaris|Solaris]]、[[Mac_OS_X|Mac OS X]]中找到
+|-
+|<code>size_t [[strlcpy|strlcpy]](char *dest, const char *src, size_t n);</code>
+|<code>strcpy</code>的变体，带边界检查
+|首先定义于[[OpenBSD|OpenBSD]]，现在也可以在[[FreeBSD|FreeBSD]]、[[Solaris|Solaris]]、[[Mac_OS_X|Mac OS X]]中找到
+|-
+|<code>char    *[[strsignal|strsignal]](int sig);</code>
+|与<code>strerror</code>类似，返回[[有符号数|有符号数]]<code>sig</code>对应的错误解释字符串（非线程安全函数）
+|BSDs, Solaris, Linux
+|-
+|<code>char    *[[strtok_r|strtok_r]](char *, const char *, char **);</code>
+|strtok的线程安全且可重入的版本
+|POSIX
+|}
+
+==外部链接==
+*[http://linux.die.net/man/3/string Linux库函数手册：字符串操作]{{Wayback|url=http://linux.die.net/man/3/string |date=20101121094443 }}
+
+[[Category:字符串|Category:字符串]]
+[[Category:C标准库头文件|Category:C标准库头文件]]

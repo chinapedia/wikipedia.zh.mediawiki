@@ -1,0 +1,111 @@
+{{noteTA
+|T=zh-hans:Io (编程语言); zh-hant:Io (程式語言);
+|skin=黑白分明
+|G1=IT
+}}
+{{Infobox programming language
+|name = Io
+|logo = [[Image:Io-logo.svg|64px]]
+|paradigm = [[面向对象编程|面向对象]]、[[基于原型编程|基于原型]]、[[同像性|同像性]]
+|year = {{Start date and age|2002}}
+|latest release version = 20170906
+|latest release date = {{Start date and age|2017|08|11}}<ref name="Releases">{{cite web |url=https://github.com/IoLanguage/io/releases |title=Io Releases |access-date=2020-02-06 |archive-date=2020-11-24 |archive-url=https://web.archive.org/web/20201124111045/https://github.com/IoLanguage/io/releases |dead-url=no }}</ref>
+|designer = Steve Dekorte
+|developer = Steve Dekorte, Jonathan Wright, Jeremy Tregunna
+|typing = [[类型系统|动态]], [[类型系统|强类型]]
+|implementations = Io, Io.NET
+|influenced_by = [[Smalltalk|Smalltalk]], [[NewtonScript|NewtonScript]], [[Self|Self]], [[Lua|Lua]], [[LISP|LISP]], {{en-link|演员模型历史|Actor_model_middle_history#Actor_programming_languages|Act1}}
+|influenced = Ioke, Potion
+}}
+'''Io语言'''是一门计算机高级编程语言，其发展历史并不长，2002年3月7日由Steve Dekorte研发出来。 Io语言因为没有关键字，因而很容易进行扩展，并很灵活。
+
+== 特点 ==
+Io语言并非主流编程语言，但其学习价值和启发价值都很高。这门语言吸收了[[LISP|LISP]]、[[Lua|Lua]]、[[Smalltalk|Smalltalk]]等语言的特点。
+
+Io语言是纯面向对象的原型继承语言，它的创造过程是综合了[[Smalltalk|Smalltalk]]、[[Self|Self]]、[[NewtonScript|NewtonScript]]、[[演员模型|Act1]]、[[LISP|LISP]]和[[Lua|Lua]]等语言的特点<ref>{{Cite web |url=http://iolanguage.org/scm/io/docs/IoGuide.html#Introduction |title=Io Programming Guide |accessdate=2013-08-16 |archive-date=2013-08-06 |archive-url=https://web.archive.org/web/20130806153742/http://iolanguage.org/scm/io/docs/IoGuide.html#Introduction |dead-url=no }}</ref>；
+
+Io语言主要吸取了这些语言的如下特点：
+
+* [[Smalltalk|Smalltalk]]，所有的变量均为对象、所有的消息都是动态的。
+* [[Self|Self]]，基于原型的面向对象设计。
+* [[NewtonScript|NewtonScript]]，差异化继承。
+* [[演员模型|Act1]]，并发行为和特征。
+* [[LISP|LISP]]，代码是运行时间可内省/可修改的树。
+* [[Lua|Lua]]，小巧且具有可嵌入能力。
+
+== 历史 ==
+
+Io语言大约是由Steve Dekorte在2002年3月7日创造的，创造初衷则是Steve Dekorte为了帮助他的朋友Dru Nelson，改造另一门称作“Cel”的语言，Steve Dekorte发现自己对编程语言的原理并不是很了解，于是决定写一个简单的语言，来帮助自己理解相关的问题<ref name="Tate_2010">{{cite book |last=Tate |first=Bruce |year=2010 |title=Seven Languages in Seven Weeks: A Pragmatic Guide to Learning Programming Languages |location=Raleigh, North Carolina |chapter=Chapter 3: Io |publisher={{en-link|务实的程序员|The Pragmatic Programmer|Pragmatic Bookshelf}} |page=[https://archive.org/details/sevenlanguagesin00tate/page/60 60, 72] |isbn=978-1934356593 |edition=1st |chapter-url-access=registration |chapter-url=https://archive.org/details/sevenlanguagesin00tate/page/60 }}</ref>。
+
+==语法==
+在它的最简单形式下，它可以构成自一个单一标识符：
+<syntaxhighlight lang="io">
+ doStuff
+</syntaxhighlight>
+假定上述<code>doStuff</code>是一个[[方法_(计算机科学)|方法]]，它被以零个实际参数来调用，因而不需要显式的圆括号。
+
+如果<code>doStuff</code>有实际参数，它可能如下这样调用：
+<syntaxhighlight lang="io">
+ doStuff(42)
+</syntaxhighlight>
+
+===消息===
+Io是一种[[消息传递|消息传递]]语言，因为在Io中所有东西都是一个消息（不包括[[注释_(计算机语言)|注释]]），每个消息都被发送给一个接收者。上述例子展示的并不完全。要更好的描述这一点，请看下面的例子：
+<syntaxhighlight lang="io">
+ System version
+</syntaxhighlight>
+这个例子展示了Io中的消息传递，<code>version</code>消息被发送到<code>System</code>对象。
+
+===运算符===
+[[运算符_(编程)|运算符]]是特殊情况，这里的语法不像上述例子那样业已定型。Io的[[语法分析|解析器]]检视由解释器定义的一组运算符，并把它们转译成方法调用，例如：
+<syntaxhighlight lang="io">
+ 1 + 5 * 8 + 1
+</syntaxhighlight>
+被转译成：
+<syntaxhighlight lang="io">
+ 1 + (5 *(8)) +(1)
+</syntaxhighlight>
+在Io中所有运算符都是方法，它们不需要显式圆括号的事实是一种方便。如你所见，这里仍存在一点[[运算次序|运算符优先级]]，它们同于[[C和C++運算子|C运算符优先级]]。
+
+===对象===
+新对象是通过[[克隆_(信息学)|克隆]]其他对象来创建的。特别是在Io中，一个新的空对象在创建后，其中只保存了与其父对象的不同之处，这种行为被称为{{en-link|差别继承|Differential inheritance}}。下面是一个例子：
+<syntaxhighlight lang="io">
+ A := Object clone         // 创建一个新的空对象，命名为"A"
+</syntaxhighlight>
+
+===方法和块===
+在Io语言中有两种方法来创建匿名函数：[[方法_(计算机科学)|方法]]和[[块_(编程)|块]]。这两种方法除了[[作用域|作用域]]不同外，几乎是没有区别的。块拥有[[词法作用域|词法作用域]]，方法拥有[[动态作用域|动态作用域]]。方法和块都是[[高阶函数|高阶函数]]。
+
+==示例==
+===Hello, World!===
+经典的[[Hello_World|Hello, World!]]程序：
+<syntaxhighlight lang="io">
+ "Hello, world!" println
+</syntaxhighlight>
+
+===非递归的阶乘===
+Io语言中一个简单的非递归的阶乘方法：
+<syntaxhighlight lang="io">
+factorial := method(n,
+    if(n == 0, return 1)
+    res := 1
+    Range 1 to(n) foreach(i, res = res * i)
+)
+</syntaxhighlight>
+由于将<code>res * i</code>赋值给<code>res</code>是方法的最后一个操作，这个函数会隐式地返回这个结果，因此不需要显式地加上一个返回语句。上面这段代码展示了<code>{{en-link|范围 (编程)|Range (computer programming)|Range}}</code>的用法，而没有用<code>for()</code>，后者会更快一些。
+
+==引用==
+{{reflist}}
+
+== 外部链接 ==
+* [http://iolanguage.com/ Io] {{Wayback|url=http://iolanguage.com/ |date=20201221230214 }} 官方网站
+* [https://web.archive.org/web/20120204202552/http://iota.flowsnake.org/ Io Notes]
+* [https://web.archive.org/web/20110716175739/http://synrc.com/io/index.htm Io at Synrc Research Center]
+* {{dmoz|Computers/Programming/Languages/Io|Io}}
+
+{{程序设计语言}}
+[[Category:动态类型编程语言|Category:动态类型编程语言]]
+[[Category:基于原型的编程语言|Category:基于原型的编程语言]]
+[[Category:同像性编程语言|Category:同像性编程语言]]
+[[Category:脚本语言|Category:脚本语言]]
+[[Category:2002年建立的程式語言|Category:2002年建立的程式語言]]

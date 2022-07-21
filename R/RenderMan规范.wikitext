@@ -1,0 +1,150 @@
+'''RenderMan规范'''<ref name="rispec"/>，简称RISpec，是一个开放的[[应用程序接口|应用程序接口]]（API），由[[皮克斯|皮克斯]]开发，用于描述[[三维模型|三维模型]]并把它转换成逼真的数字图像。RenderMan规范作为建模程序和渲染程序之间的通信协议（或称为接口），用于生成逼真的数字图像。规范类似于[[PostScript|PostScript]]，不过是用来描述三维场景而非二维页面布局。因此，理解RenderMan接口的建模软件，可以输出场景数据到符合规范的渲染器（以下简称RenderMan渲染器），而无需关心后者使用什么[[算法|算法]]来[[渲染|渲染]]出图像。
+
+RenderMan规范最初发布于1988年，版本号为3.0，3.1版发布于1989年，并在1995年进行了修订，2000年7月，规范发布3.2版。规范的当前版本是3.2.1版，发布于2005年11月<ref name="rispec"/>。后来的事实证明了规范的前瞻性，规范在多年之后也无需过多改动就能引入新技术。
+
+RenderMan规范和当时的其他标准的不同之处在于它允许使用高级的几何图元，比如[[二次曲面|二次曲面]]或[[双三次曲面|双三次曲面]]来表示图形，而非依赖于建模程序事先生成多边形逼近模型，规范的另一个创新之处是引入[[着色语言|着色语言]]。
+
+RenderMan和[[OpenGL|OpenGL]]有很多相同之处，虽然两个[[API|API]]是针对不同的用户（OpenGL用于实时硬件辅助渲染，而RenderMan规范则用于逼真图像的离线渲染），两个API都是基于栈的[[状态机|状态机]]机制直接渲染出几何图形。
+
+==RenderMan接口规范内容==
+
+RenderMan渲染接口，主要包括两大部分，第一部分是RenderMan Interface，定义了着色计算所必须的一些基本数据类型，和RenderMan接口字节流协议（RenderMan Interface Bytestream Protocol），简写为RIB，''rib''也是RenderMan场景描述文件的扩展名；规范的第二部分，是RenderMan着色语言，RenderMan Shading Language，简称RSL，使用RenderMan着色语言编写的源程序，其源代码文件扩展名通常是''sl''。
+
+===RenderMan接口===
+
+RenderMan接口，定义了一些基本的数据类型，以规范的[[C语言|C语言]]实现为例，规范把C语言的short、int、float、char数据类型，分别映射至其RtBoolean、RtInt、RtFloat和*RtToken类型，另外，规范还定义了RtColor、RtPoint、RtVector、RtMatrix等特定于图形学着色计算必要的数据类型。
+
+规范的图形状态（graphics state），包括了渲染一个模型所需的全部信息，RenderMan接口的命令，要么改变图形状态，要么渲染一个模型。图形状态又分为两部分，其一是全局状态，在渲染一幅图像或序列中的一帧时，保持不变；其二是当前状态，针对不同待渲染的模型，可以发生改变。全局状态中的参数，称为选项（Options）；当前状态中的参数，称为属性（Attributes）。选项包括相机和显示（指输出像素的）参数，还有其他影响渲染质量的参数；属性包括控制模型外观和材质的参数（比如颜色、透明度、着色模型等），还有模型的位置、朝向和细分程度等参数。
+
+RenderMan规范支持{{link-en|多边形 (计算机图形)|Polygon (computer graphics)|多边形}}、[[非均匀有理B样条|曲面片]]、[[细分曲面|细分曲面]]、[[二次曲面|二次曲面]]、[[点|点]]和曲线、[[元球|元球]]、[[程序图元|程序图元]]等多样的几何模型
+
+===RenderMan着色语言（RSL）===
+
+RenderMan规范引入了RenderMan着色语言，使三维场景的外观不只用很少的参数来描述，而是允许使用类似C语言的程序来编写任意复杂的着色函数，通常称之为[[程序纹理|程序纹理]]和[[着色器|着色器]]（shader）。光照以及[[置换|表面置换]]也是可编程的，能用着色语言编程来修改。RSL允许每个语句以[[单指令流多数据流|单指令流多数据流]]的方式执行，但不强制使用此方式。另一个使RenderMan渲染器区别于许多其他渲染器的功能是它允许输出着色函数里的任意信息，不管是表面法线、单独的灯光通道还是什么别的信息，都可以使用RenderMan渲染器输出到单独的通道里。
+
+一个RSL编写的着色器，可以用于任何符合RenderMan渲染规范的RenderMan渲染器，比如皮克斯的[[PRMan|PRMan]]、DNA Research的[[3Delight|3Delight]]，以及开源的[[Pixie_(渲染器)|Pixie]]和[[Aqsis|Aqsis]]。
+
+RSL可以编写独立的函数和RenderMan渲染规范定义的五种类型的着色器：surface，light，volume，imager和displacement着色器。
+
+以下是定义塑料表面材质的一个示例着色器：
+<syntaxhighlight lang="c">
+surface plastic (float Ka = 1, Kd = 0.5, Ks = 0.5, roughness = 0.1;
+                 color specularcolor = 1;) {
+        normal Nf = faceforward (normalize(N),I);
+        Ci = Cs * (Ka*ambient() + Kd*diffuse(Nf)) + specularcolor * Ks*specular(Nf,-normalize(I),roughness);
+        Oi = Os;
+        Ci *= Oi;
+}
+</syntaxhighlight>
+着色器通过接收一些可以由艺术家调节的变量比如Cs（表面颜色），Os（表面透明度）等，结合RenderMan渲染规范定义的内置变量N（着色点的法线），P（着色点位置）等，依据一定的算法计算出Ci（最终表面颜色），Oi（最终表面透明度）或任意所需信息，从而完成着色过程。
+
+一个着色器可以用于不同的三维几何模型，每个着色器实例的参数数值可不一样。着色器没有返回值，而是利用“输出变量”存储计算的数值。但函数可以接受参数，并返回一个值。比如，以下函数通过[[点积|点积]]操作符“.”计算矢量的长度并将之返回。
+<syntaxhighlight lang="c">
+float length(vector v) {
+  return sqrt(v . v);
+}
+</syntaxhighlight>
+
+===必备功能===
+一个RenderMan渲染器，必须实现以下功能：
+*完全层级化的图形状态（graphics state），包括属性、变换栈（transformation stacks）和有效光源列表。
+*[[正交投影|正交投影]]和[[透视投影|透视投影]]视角变换。
+*基于深度的[[隐面判别|隐面]]消除。
+*[[像素过滤|像素过滤]]和[[反锯齿|反走样]]。
+*[[图像量化|图像量化]]前的[[伽马校正|伽马校正]]和[[dithering|dithering]]。
+*输出图像包括RGB、A和Z的任意组合，并且分辨率可由用户指定。
+*所有规范里描述的几何图元，以及各图元的标准图元变量。
+*支持可编程着色。
+*支持索引[[纹理贴图|纹理贴图]]、[[反射贴图|环境贴图]]和[[阴影贴图|阴影贴图]]。
+*须提供规范所要求的十五种标准的着色器，包括light source，surface，volume，displacement和imager等类型。任一新增的和由规范标准衍生的着色器，都必须提供一个等效的RenderMan着色语言描述作为该着色器的文档。
+
+===可选功能===
+此外，渲染器还可以实现以下的某项功能：
+* [[面光源|面光源]]
+* [[景深|景深]]
+* [[置换贴图|置换贴图]]
+* [[反射贴图|环境贴图]]
+* [[全局照明|全局照明]]
+* [[细节层次|细节层次]]
+* [[运动模糊|运动模糊]]
+* [[特殊镜头映射|特殊镜头映射]]
+* [[谱色|谱色]]（Spectral colors）
+* [[光线跟踪|光线跟踪]]
+* [[实体造型|实体建模]]
+* [[体着色|体着色]]
+
+==工具==
+<!--建议这部分改为模板-->
+* [http://www.3delight.com/ RenderMan 3delight]{{Wayback|url=http://www.3delight.com/ |date=20080827233646 }},支持免费下载学习 主流的rendemran 渲染软件
+* [https://web.archive.org/web/20110902061207/http://renderman.pixar.com/products/tools/rms.html RenderMan Studio]
+* [https://web.archive.org/web/20110829233229/http://renderman.pixar.com/products/tools/index.html RenderMan Pro Server]
+* [http://ribkit.sourceforge.net/ RIBKit]{{Wayback|url=http://ribkit.sourceforge.net/ |date=20110726010009 }}，开源的RenderMan工具集，包括一个图形界面的材质编辑器——SLer。
+* [https://web.archive.org/web/20100128174805/http://www.3delight.com/en/uploads/docs/3delight/3delight_16.html RIBShrink]和[https://web.archive.org/web/20100128174813/http://www.3delight.com/en/uploads/docs/3delight/3delight_17.html RIBDepends]，3Delight渲染器附带的RIB精简工具和依赖处理工具。
+* [http://code.google.com/p/shaderman/ ShaderMan.Next]{{Wayback|url=http://code.google.com/p/shaderman/ |date=20111116183924 }}，开源的材质编辑器，[https://web.archive.org/web/20110916032410/http://dream.com.ua/thetool.html ShaderMan]的重写。
+
+===RIB导出工具===
+<!--建议这部分改为模板-->
+* [[3Delight|3Delight]]：[http://www.3delight.com/]{{Wayback|url=http://www.3delight.com/ |date=20080827233646 }}，支持MAYA XSI  即将支持MAX 的版本
+
+* [[3ds_Max|3ds Max]]：[https://web.archive.org/web/20110904071859/http://www.archonus.com/ PaxRendus]，已停止开发
+* [[Blender|Blender]]：开源的[https://archive.is/20121225081934/http://ribmosaic.wiki.sourceforge.net/ ribMosaic]
+
+* [[Lightwave|Lightwave]]:
+** Tim Dapper的[http://www.td-grafik.de/softw/lightman.php?lang=en LightMan]{{Wayback|url=http://www.td-grafik.de/softw/lightman.php?lang=en |date=20110719093234 }}
+** Felipe Esquivel的[https://web.archive.org/web/20051217215043/http://www.garagepost.tv/renderman.htm Light-R]，免费软件
+
+* [[Maya|Maya]]：
+** [https://web.archive.org/web/20101228025221/http://www.3delight.com/en/index.php/products/3delight_for_maya/3delight_maya_overview 3Delight for Maya]
+** [https://web.archive.org/web/20050622053002/http://liquidmaya.sourceforge.net/ liquidmaya]，开源软件
+** AnimalLogic的[http://www.animallogic.com/?link=Products,MayaMan MayaMan]{{Wayback|url=http://www.animallogic.com/?link=Products,MayaMan |date=20110904022849 }}
+** 皮克斯的[https://web.archive.org/web/20110829233229/http://renderman.pixar.com/products/tools/index.html RenderMan for Maya]
+
+* [[Softimage|Softimage]]：
+** [https://web.archive.org/web/20101228025751/http://www.3delight.com/en/index.php/products/3delight_for_maya/3delight_xsi_overview 3Delight for XSI]
+** {{link-en|Rising Sun Pictures|Rising Sun Pictures}}的[https://web.archive.org/web/20080723135351/http://affogato.sf.net/ Affogato]，开源软件
+** Graphic Primitives的[https://web.archive.org/web/20060402202654/http://graphicprimitives.com/ XSIMan]
+
+==编程语言实现==
+* [http://cgkit.sourceforge.net/ Python计算机图形工具集]{{Wayback|url=http://cgkit.sourceforge.net/ |date=20111007180636 }}，[[Python_(编程语言)|Python]]实现
+* [https://archive.is/20130415172430/http://rubyforge.org/projects/rubyman/ RubyMan]，[[Ruby|Ruby]]实现
+* [http://grt.luaforge.net G&RT]{{Wayback|url=http://grt.luaforge.net/ |date=20160806104656 }}，[[Lua_(编程语言)|Lua]]实现
+
+==参见==
+* [[Reyes渲染架构|Reyes渲染架构]]
+
+== 参考书目 ==
+* {{cite book | authorlink = Anthony Apodaca | first = Anthony A. | last = Apodaca | coauthors = Larry Gritz, Ronen Barzel | title = Advanced RenderMan: Creating CGI for Motion Pictures | url = https://archive.org/details/advancedrenderma00apod_0 | year = 1999 | location = San Francisco | publisher = Morgan Kaufmann Publishers | isbn = 1-55860-618-1 | oclc = 42621055 }}
+* {{cite book | authorlink = David S. Ebert | first = David S. | last = Ebert | coauthors = F. Kenton Musgrave, Darwyn Peachey, Ken Perlin, Steven Worley | title = Texturing and modeling: a procedural approach, 3rd ed. | year = 2003 | location = Burlington, MA | publisher = Morgan Kaufmann Publishers | isbn = 1-55860-848-6 | oclc = 52689816 }}
+* {{cite book | authorlink = Saty Raghavachary | first = Saty | last = Raghavachary | title = Rendering for Beginners: Image synthesis using RenderMan | year = 2005 | location = Burlington, MA | publisher = Focal Press | isbn = 0-240-51935-3 | oclc = 57670361 }}
+* {{cite book | authorlink = Ian Stephenson (programmer)| first = Ian | last = Stephenson | title = Essential RenderMan Fast | year = 2002 | location = London, New York | publisher = Springer | isbn = 1-85233-608-0 | oclc = 50494960 }}
+* {{cite book | first = Steve | last = Upstill | authorlink = Steve Upstill | title = The RenderMan Companion: A Programmer's Guide to Realistic Computer Graphics | url = https://archive.org/details/rendermancompani00upst | year = 1990 | location = Reading, Mass| publisher = Addison-Wesley | isbn = 0-201-50868-0 | oclc = 19741379 }}
+* {{cite book | authorlink = Rudy Cortes | first = Rudy | last = Cortes | coauthors = Saty Raghavachary | title = The RenderMan Shading Language Guide | year = 2007 | publisher = Course Technology PTR | isbn = 1-598-63286-8 }}
+
+
+==参考资料==
+{{Reflist |refs=
+
+<ref name="rispec">{{cite web 
+ |url=https://renderman.pixar.com/products/rispec/index.htm 
+ |title=RenderMan规范主页 
+ |accessdate=2012-12-22 
+ |deadurl=yes 
+ |archiveurl=https://web.archive.org/web/20121223074542/http://renderman.pixar.com/products/rispec/index.htm 
+ |archivedate=2012-12-23 
+ }}</ref>
+}}
+
+==外部链接==
+*[https://web.archive.org/web/20110725222410/https://renderman.pixar.com/products/rispec/index.htm RenderMan规范]，——规范的官方页面
+*[https://web.archive.org/web/20040327030245/http://www.renderman.org/ RenderMan仓库]
+*Malcolm Kesson教授的[http://www.fundza.com/ CG参考和教程]{{Wayback|url=http://www.fundza.com/ |date=20110903091108 }}
+*[https://web.archive.org/web/20070320223326/http://accad.osu.edu/~smay/RManNotes/RManNotes.html RenderMan笔记]
+*Dominik Susmel的[https://web.archive.org/web/20110721102813/http://www.vga.hr/resources/tutorials/3d/rsl/index.htm RenderMan 着色语言教程]
+*[http://www.smartcg.com/tech/cg/books/RfB Rendering for Beginners]{{Wayback|url=http://www.smartcg.com/tech/cg/books/RfB |date=20110809141332 }}里用到的 RIB文件和材质
+
+{{模板:Renderman软件}}
+
+{{DEFAULTSORT:RenderMan规范}}
+[[Category:计算机图形学|Category:计算机图形学]]
+[[Category:三维图像软件|Category:三维图像软件]]
+[[Category:RenderMan|Category:RenderMan]]

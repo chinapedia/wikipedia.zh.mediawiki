@@ -1,0 +1,192 @@
+{{NoteTA
+|G1 = IT
+}}
+'''平攤分析'''在[[計算機科學|计算机科学]]中，是用於[[算法分析|算法分析]]中的方法，平攤分析常用於分析資料結構（動態的資料結構），在使用平攤分析前須知道資料結構各種操作所可能發生的時間，並計算出最壞情况下的操作情況並加以平均，得到操作的平均耗费时間。平摊分析只能確保最坏情况性能的每次操作耗费的平均时间，並不能確認平均情况性能。
+
+一個簡單的例子，一個長度為n的list，在list的最後要加入一筆新的資料此時要花費的操作時間為O(n)，此時也是加入新的資料的最糟糕的情況。但是，一个 ''n'' 个插入的操作序列仍然可以在 O(''n'') 的时间内完成，因为剩下的插入可以在常数时间内完成，因此''n'' 个插入可以在 O(''n'') 的时间内完成。因此每操作的平摊耗费为O(''n'') / ''n'' = O(1)。
+
+注意平摊分析与平均时间分析和概率算法的概率分析不同。在平均时间分析中，我们平均化所有可能的输入；在概率算法的概率分析中，我们平均化所有可能的随机选择；在平摊分析中，我们平均化一系列操作的耗费。平摊分析假设的是最坏情况输入并且通常不运行随机选择。<ref name="Lecture 20">{{cite web|url=http://www.cs.cornell.edu/courses/cs3110/2011sp/lectures/lec20-amortized/amortized.htm|title=CS 3110 Lecture 20: Amortized Analysis|last=Kozen|first=Dexter|date=Spring 2011|publisher=[[Cornell_University|Cornell University]]|archive-url=https://web.archive.org/web/20181003143236/http://www.cs.cornell.edu/courses/cs3110/2011sp/Lectures/lec20-amortized/amortized.htm|archive-date=2018-10-03|dead-url=no|accessdate=14 March 2015}}</ref>
+
+平摊分析中几种常用的技术:
+*聚合分析决定 ''n'' 个操作序列的耗费上界''T''(''n'')，然后计算平均耗费为 ''T''(''n'') / ''n''。<ref name="Lecture 20"/>
+*记账方法确定每个操作的耗费，结合它的直接执行时间及它在对运行时中未来操作的影响。通常来说，许多短操作增量累加成「债」，而通过减少长操作的次数来「偿还」。<ref name="Lecture 20"/>
+*势能方法类似记账方法，但通过预先储蓄「势能」而在需要的时候释放。<ref name="Lecture 20"/>
+
+== 平攤分析種類 ==
+
+=== 聚集法(Aggregate method) ===
+計算n個操作的時間複雜度上限T(n)
+平攤T(n)至每一個操作，每一個操作的平攤成本是T(n)/n
+
+=== 記帳法(Accounting method) ===
+執行花費較低的operations時先存credit未雨綢繆, 供未來花費較高的operations使用
+
+對每個操作定義一個合法的平攤成本(amortized cost)
+假設<math>c_i</math>為第i個操作的actual cost，<math>\hat{c_i}</math>為第i個操作的amortized cost
+
+若<math>c_i<\hat{c_i}</math>，則credit=<math>\hat{c_i}-c_i</math>，我們把credit存起來(deposited)，未來可以提取(withdraw)
+若<math>c_i>\hat{c_i}</math>，則提取credit
+
+設定每個操作的平攤成本(amortized cost)後，要做valid check確保credit不可以是0，也就是說
+<math> \sum_{k=1}^n \hat{c_i} \ge \sum_{k=1}^n c_i </math>
+
+=== 位能法(Potential method) ===
+定義一個位能函數(potential function)<math> \Phi(D) </math>，將資料結構D(例如: 堆疊)的狀態對應到一個實數
+
+:<math> D_0 </math>: 資料結構D的初始狀態
+
+:<math> D_i </math>: 資料結構D經過<math> i </math>個操作後的狀態
+
+:<math> c_i </math>: 第<math> i </math>個操作的actual cost
+
+:<math> \hat{c_i} </math>: 第<math> i </math>個操作的amortized cost
+
+定義<math> \hat{c_i}=c_i+\Phi(D_i)-\Phi(D_{i-1}) </math>
+
+<math> \sum_{k=1}^n \hat{c_i}=\sum_{k=1}^n (c_i+\Phi(D_i)-\Phi(D_{i-1}))= (\sum_{k=1}^n c_i)+\Phi(D_n)-\Phi(D_0) </math>
+
+為了滿足<math> \sum_{k=1}^n \hat{c_i} \ge \sum_{k=1}^n c_i </math>
+
+我們定義<math> \Phi(D_n)-\Phi(D_0) \ge 0 </math> , 通常令<math> \Phi(D_0)=0 </math> 和 <math> \Phi(D_n) \ge 0 </math>
+
+==例子==
+
+===堆疊(stack)的平攤分析===
+我們定義一個堆疊有下列操作
+{| class="wikitable"
+|-
+! 操作(operation) !! 說明 !! actual cost
+|-
+| S.push(x) || 將一個元素x放入堆疊S中 || <math> O(1) </math>
+|-
+| S.pop() || 把堆疊S中最上面的元素取出 || <math> O(1) </math>
+|-
+| S.multi-pop(k) || 一次pop k個元素 || <math> O(\min(\left\vert S \right\vert, k) </math>
+
+|}
+S.mult-pop(k)的程式碼如下
+<syntaxhighlight lang="python">
+def multi_pop(k):
+	while (not S.empty()) and (k>0):
+		S.pop()
+		k -= 1
+
+</syntaxhighlight>
+
+接下來我們分別使用聚集法(aggregate method), 記帳法(Accounting method), 位能法(Potential method)求出"堆疊一個操作的平攤成本是O(1)"
+==== 使用聚集法(aggregate method)分析堆疊操作的平攤成本 ====
+令<math> n_{push} </math>是S.push(x)的執行次數，<math> n_{pop} </math>是S.pop()的執行次數，<math> n_{multi-pop} </math>是S.multi-pop(k)的執行次數
+
+:<math> n=n_{push}+n_{pop}+n_{multi-pop} </math>為總執行次數
+
+{| class="wikitable"
+|-
+! 操作(operation) !! actual cost !! 執行次數
+|-
+| S.push(x) || <math> O(1) </math> || <math> n_{push} </math>
+|-
+| S.pop() || <math> O(1) </math> || <math> n_{pop} </math>
+|-
+| S.multi-pop(k) || <math> O(\min(\left\vert S \right\vert, k) </math> || <math> n_{multi-pop} </math>
+|}
+
+因為一個堆疊S如果是空的，就不能執行pop了，也就是說可以pop或multi-pop的元素個數不會超過S中push進去的元素個數
+
+所以<math> n_{pop}+n_{multi-pop} \le n_{push} </math>
+
+假設<math> T(n) </math>是執行<math> n </math>個操作的時間複雜度上限
+
+:<math> T(n) = O(1)\times n_{push}+O(1)\times n_{push}=O(n) </math>
+
+所以堆疊一個操作的平攤成本為<math> O(n)/n=O(1)</math>
+
+==== 使用記帳法(Accouting method)分析堆疊操作的平攤成本 ====
+我們假設S.push(x), S.pop(), S.multi-pop(k)的amortized cost分別為2, 0, 0，如下表所示
+{| class="wikitable" 
+|-
+! 操作(operation) !! actual cost <math> c_i </math> !! amortized cost <math> \hat{c_i} </math>
+|-
+| S.push(x) || 1 || 2
+|-
+| S.pop() || 1 || 0
+|-
+| S.multi-pop(k) || <math> O(\min(\left\vert S \right\vert, k) </math> || 0
+|}
+
+{| class="wikitable"
+|-
+! Valid Check 
+:證明: <math> \sum_{k=1}^n \hat{c_i} \ge \sum_{k=1}^n c_i </math>
+|-
+| <math> {\color{Red}proof:} </math> 
+:push進入堆疊S的元素會存入credit $1
+:pop(S), multi-pop(S, k) 會取出這些元素的credit $1
+
+|}
+因此每個操作的平攤成本是O(1)
+
+
+==== 使用位能法(potential method)分析堆疊操作的平攤成本 ====
+我們定義位能函數<math> \Phi(D) </math>為執行i個操作後，堆疊內的元素個數
+
+:<math> \Phi(D_0)=0 </math> ，因為堆疊一開始是空的
+
+:<math> \Phi(D_i)\ge 0 </math> ，因為堆疊的元素個數一定<math> \ge 0 </math>
+
+計算堆疊S每一個操作的平攤成本
+{| class="wikitable"
+|-
+! 操作(operation) !! 平攤成本(amortized cost) <math> \hat{c_i} </math>
+|-
+| S.push(x) || <math> \hat{c_i}=c_i+\Phi(D_i)-\Phi(D_{i-1})=1+(\left\vert S \right\vert+1)-\left\vert S \right\vert=2 </math>
+|-
+| S.pop() || <math> \hat{c_i}=c_i+\Phi(D_i)-\Phi(D_{i-1})=1+(\left\vert S-1 \right\vert)-\left\vert S \right\vert=0 </math>
+|-
+| S.multi-pop(k) || <math>\hat{c_i}=c_i+\Phi(D_i)-\Phi(D_{i-1})=k+(\left\vert S-k \right\vert)-\left\vert S \right\vert=k-k=0 </math>
+|}
+
+總平攤成本 <math> \sum_{k=1}^n \hat{c_i}= 2\times n_{push} = O(n)</math>，所以堆疊單一個操作的平攤成本是<math> O(n)/n=O(1) </math>
+
+===动态数组===
+ [[File:AmortizedPush.png|thumb]]
+考虑一个随元素个数增加而增长的[[动态数组|动态数组]]，比如[[Java|Java]]的<tt>ArrayList</tt>或者[[C++|C++]]的<tt>std::vector</tt>。如果我们的数组大小从4开始，那么来向其中增加四个元素的时间就是一个常数。然而，若要将第五个元素加入其中，那么会花费更多时间，因为我们此时必须要创建一个两倍于当前数组大小的数组（8个元素），把老元素拷贝到新数组中，然后增加一个新元素。接下来的三次加入操作也同样会花费常数时间，然后在数组被填满后则又需要一轮新的加倍扩充。
+
+一般地，如果我们考虑任意一个任意的''n''大小的数组并对其进行''n'' + 1次加入操作。我们注意到，所有的加入操作都是常数时间的，除了最后一个，它会花费[[Big_O_notation|{{tmath]]时间在大小加倍上。因为我们进行了''n'' + 1次加入操作，我们可以将数组加倍的时间平摊到所有的加入操作上，因此得到加入操作的平均时间是<math>\tfrac{nO(1)+O(n)}{n+1} = O(1)</math>。它是一个常数。<ref name="Lecture 20" />
+
+===队列===
+使用Ruby實現的佇列，一个[[先進先出|先進先出]]資料結構: 
+<syntaxhighlight lang="ruby">
+class Queue
+  def initialize
+    @input = []
+    @output = []
+  end
+
+  def enqueue(element)
+    @input << element
+  end
+
+  def dequeue
+    if @output.empty?
+      while @input.any?
+        @output << @input.pop
+      end
+    end
+
+    @output.pop
+  end
+end
+</syntaxhighlight>
+
+佇列操作及特性參考佇列條目，enqeue及deqeue操作時間複雜度為常數，
+否則，dequeue需要{{tmath | O(n)}}時間將所有元素從輸入數組添加到輸出數組中，其中''n''是輸入數組的當前長度。 從輸入複製''n''元素後，我們可以在輸出數組再次為空之前執行''n''出隊操作，每次操作都需要一個恆定的時間。 因此，我們可以僅在{{tmath|o(n)}}時間執行一系列''n''出列操作，這意味著每個出列操作的攤銷時間是{{tmath |O(1)}} 。<ref name="Grossman">{{cite web | last1=Grossman | first1=Dan | title=CSE332：Data Abstractions | url=http://courses.cs.washington.edu/courses/cse332/10sp/lectures/lecture21.pdf | website=cs.washington.edu | accessdate=2015年3月14日 | archive-date=2015年4月2日 | archive-url=https://web.archive.org/web/20150402120258/http://courses.cs.washington.edu/courses/cse332/10sp/lectures/lecture21.pdf | dead-url=no }}</ref>
+
+或者，我們可以收取將任何項目從輸入數組複製到輸出數組的成本，以及該項目的早期排隊操作。 該計費方案將入隊的攤還時間加倍，但將出列的攤還時間減少到{{tmath | O(1)}}。
+
+== 通常用法 ==
+* 在常见场合，我们把能很好平摊分析的算法称为“平摊算法”。
+* [[在线算法|在线算法]]通常使用平摊分析。
+
+==参考资料==
+<ref name="MIT 6.046J Design and Analysis of Algorithms, Spring 2015">{{cite web |title=MIT 6.046J Design and Analysis of Algorithms, Spring 2015 |url=https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-046j-design-and-analysis-of-algorithms-spring-2015/index.htm |publisher=MIT |accessdate=2018-10-21|archive-date=2018-11-25 |archive-url=https://web.archive.org/web/20181125191316/https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-046j-design-and-analysis-of-algorithms-spring-2015/index.htm |dead-url=no }}</ref>
+[[Category:算法分析|Category:算法分析]]

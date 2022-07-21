@@ -1,0 +1,98 @@
+{{Infobox software
+|name                   = LevelDB
+|title                  = LevelDB
+|logo                   = <!-- [[File:|File:]] -->
+|screenshot             = <!-- [[File:|File:]] -->
+|caption                = 
+|collapsible            = 
+|author                 = 
+|developer              = [[Google|Google]]
+|released               = {{Start date and age|2012|05}}
+|discontinued           = 
+|latest release version = {{LSR/wikidata}}
+|programming language   = [[C++|C++]]
+|operating system       = [[跨平台|跨平台]]
+|platform               =
+|size                   = 
+|language               = 
+|genre                  = 嵌入[[數據庫|數據庫]]編程庫
+|license                = [[BSD许可证|BSD许可证]]
+}}
+
+'''{{lang|en|LevelDB}}'''是一個由[[Google公司|Google公司]]所研發的[[键-值存储|键-值存储]][[嵌入式系統|嵌入式]][[數據庫管理系統|數據庫管理系統]]編程庫，<ref>{{Cite web |url=http://rdc.taobao.com/blog/cs/wp-content/plugins/leveldb%E5%AE%9E%E7%8E%B0%E8%A7%A3%E6%9E%90.pdf |title=leveldb實現解析 |accessdate=2017-09-05 |archive-date=2012-01-31 |archive-url=https://web.archive.org/web/20120131105110/http://rdc.taobao.com/blog/cs/wp-content/plugins/leveldb%E5%AE%9E%E7%8E%B0%E8%A7%A3%E6%9E%90.pdf |dead-url=no }}</ref> 以[[開源軟體|開源]]的[[BSD許可證|BSD許可證]]發佈。<ref>{{Cite web |url=http://google-opensource.blogspot.com/2011/07/leveldb-fast-persistent-key-value-store.html |title=LevelDB: A Fast Persistent Key-Value Store |accessdate=2011-08-07 |archive-date=2016-03-26 |archive-url=https://web.archive.org/web/20160326154020/http://google-opensource.blogspot.com/2011/07/leveldb-fast-persistent-key-value-store.html |dead-url=no }}</ref>
+
+== 特徵 ==
+* 高性能 <ref>{{Cite web |url=http://leveldb.googlecode.com/svn/trunk/doc/benchmark.html |title=LevelDB Benchmarks |accessdate=2011-08-07 |archive-date=2011-08-20 |archive-url=https://web.archive.org/web/20110820001028/http://leveldb.googlecode.com/svn/trunk/doc/benchmark.html |dead-url=yes }}</ref>
+* 簡單的體系結構：只支持API调用，不支持[[SQL|SQL]]語言
+* [[自由軟件|自由軟件]]和[[開放原始碼軟件|開放原始碼軟件]]
+* 數據支持被Snappy函式庫壓縮<ref>{{Cite web |url=http://code.google.com/p/snappy/ |title=A fast compressor/decompressor |accessdate=2011-07-30 |archive-date=2015-08-22 |archive-url=https://web.archive.org/web/20150822162211/https://code.google.com/p/snappy/ |dead-url=no }}</ref>，以減少Disk I/O提升效能
+
+== 例子 ==
+儲存鍵／值對，和查詢鍵的值：
+
+<syntaxhighlight lang=cpp>
+#include "leveldb/db.h"
+#include <iostream>
+
+using namespace std;
+
+int main(){
+  leveldb::DB *db;
+  leveldb::Options options;
+
+  options.create_if_missing = true;
+
+  // 開啟數據庫
+  leveldb::DB::Open(options, "/tmp/testdb", &db);
+
+  // 鍵 = MyKey29，值 = "Hello World!"
+  string key = "MyKey29", value = "Hello World!", result;
+
+  // 儲存 鍵／值對
+  db->Put(leveldb::WriteOptions(), key, value);
+
+  // 查詢 MyKey29 鍵的值
+  db->Get(leveldb::ReadOptions(), key, &result);
+
+  // 輸出值到屏幕
+  cout << "result = " << result << endl;
+
+  // 關閉數據庫
+  delete db;
+
+  return 0;
+}
+</syntaxhighlight>
+
+=== 執行結果 ===
+(LevelDB安裝目錄為：leveldb-read-only)<ref>{{Cite web |url=http://code.google.com/p/leveldb/source/checkout |title=Source Checkout - LevelDB |accessdate=2011-08-06 |archive-date=2015-03-18 |archive-url=https://web.archive.org/web/20150318200509/http://code.google.com/p/leveldb/source/checkout |dead-url=no }}</ref>
+<pre>
+% g++ test.cc -Ileveldb-read-only/include -Lleveldb-read-only -lleveldb -lpthread
+% ./a.out 
+result = Hello World!
+</pre>
+
+== RocksDB ==
+2013年[[Facebook|Facebook]]基於LevelDB開發出RocksDB，特別針對伺服器負載而優化。<ref>{{Cite web |url=http://rocksdb.org/ |title=RocksDB |accessdate=2014-01-25 |archive-date=2021-02-05 |archive-url=https://web.archive.org/web/20210205060559/https://rocksdb.org/ |dead-url=no }}</ref>
+
+== 语言的绑定 ==
+* [https://github.com/reeze/php-leveldb PHP LevelDB Extension] {{Wayback|url=https://github.com/reeze/php-leveldb |date=20201015052114 }}
+* [https://github.com/carlopires/cpy-leveldb Python LevelDB Binding] {{Wayback|url=https://github.com/carlopires/cpy-leveldb |date=20201130083754 }}
+
+== 參見 ==
+* [[Berkeley_DB|Berkeley DB]]
+* [[Apache_Derby|Apache Derby]]
+
+== 参考文献 ==
+{{Reflist|2}}
+
+== 外部連結 ==
+* [https://archive.is/20130426121503/http://leveldb.googlecode.com/ LevelDB 開放原始碼計劃主頁]
+
+{{-}}
+{{NoSQL}}
+[[Category:2011年软件|Category:2011年软件]]
+[[Category:Google|Category:Google]]
+[[Category:開源資料庫管理系統|Category:開源資料庫管理系統]]
+[[Category:跨平台軟體|Category:跨平台軟體]]
+[[Category:键-值数据库|Category:键-值数据库]]

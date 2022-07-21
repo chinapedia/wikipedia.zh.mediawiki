@@ -1,0 +1,71 @@
+{{NotChineseTitle|time=2015-12-14T04:28:42+00:00}}
+{{Refimprove|time=2012-02-06T07:13:44+00:00 }}
+Chaocipher是John F. Byrne于1918年设计出的一套[[加密|加密]]系统。 1954年，他在他的自传《Silent Year》中加入了一个用Chaocipher加密后的消息作为谜题来挑战读者。2010年5月，Byrne家族将所有与Chaocipher相关的文件和物件捐献给美国[[国家密码博物馆|国家密码博物馆]]（[http://en.wikipedia.org/wiki/National_Cryptologic_Museum 英版维基百科资料]{{Wayback|url=http://en.wikipedia.org/wiki/National_Cryptologic_Museum |date=20120206140932 }}），Chaocipher的加密方式才就此大白于天下，书中的谜题也由此得到[http://www.mountainvistasoft.com/chaocipher/Chaocipher-ASCII-versions.htm 破解]{{Wayback|url=http://www.mountainvistasoft.com/chaocipher/Chaocipher-ASCII-versions.htm |date=20190301075610 }}。
+
+==加密方式==
+===实体模型===
+实体的加密机'''模型'''由两个密码盘和基座组成，基座内有齿轮，保证与密码盘连接的两个齿轮旋转方向相反，转速相同。密码盘分为左盘和右盘，左盘为加密后的字母（[[密文|密文]]），右盘为加密前的字母（[[明文|明文]]）。密码盘可从齿轮上快速卸下。密码盘上各有26个字母，每个字母可从密码盘上快速卸下。
+
+标准的Chaocipher密码字母盘如下：<br/>
+ 左盘（按逆时针方向排列）: HXUCZVAMDSLKPEFJRIGTWOBNYQ<br/>
+ 右盘（按顺时针方向排列）: PTLNBQDEOYSFAVZKGJRIHWXUMC<br/>
+
+各个人可以指定各自的字母盘
+
+定义两个位置：高点（+），低点（*）（在密码盘上位置相对）。在我们用字符串表示出的密码盘状态里，两个位点分别对应第一位和第十四位。
+
+==加密过程==
+===准备工作===
+1、选定一个初始状态：这里我们简单点，就以上面给出的标准盘的顺序。当然我们也可以比如说让左盘从W开头（WOBNYQ...）。加密的文字我们用WELLDONEISBETTERTHANWELLSAID（说得好不如做得好）
+===获取密文===
+2、在右盘中找到要加密的字母，这里是W。
+
+3、找出W对应的密文（实物模型上相当于将右盘旋转使W在高点，因为会带动左盘，左盘高点对应的字母就是密文。在字符串里我们先直接用感叹号表示出来），这里是O，记下来。<br/>
+ 标识：+            *       !<br/>
+ 左：  HXUCZVAMDSLKPEFJRIGTW'''O'''BNYQ<br/>
+ 右：  PTLNBQDEOYSFAVZKGJRIH'''W'''XUMC<br/>
+
+===更改码盘===
+这里是Chaocipher的精髓，通过对码盘的时时变换，把简单的[单字母表对应]转变成了随机关键词对应。
+
+4、刚才在实体模型上我们已经把那两个字符都转到了高位上，但是字符串这儿还没有。转一下。<br/>
+ 标识：+            *       <br/>
+ 左：  OBNYQHXUCZVAMDSLKPEFJRIGTW<br/>
+ 右：  WXUMCPTLNBQDEOYSFAVZKGJRIH<br/>
+
+5、把左盘高位字母逆时针方向的第一个字母取下来（字符串的第二个字母）<br/>
+ 标识：+            *       <br/>
+ 左：  O.NYQHXUCZVAMDSLKPEFJRIGTW<br/>
+ 右：  WXUMCPTLNBQDEOYSFAVZKGJRIH<br/>
+
+6、把从逆时针第二个字母（字符串第三个字母）到低位的所有字母前移一位，并把刚才取下的字母放到低位<br/>
+ 标识：+            *     <br/>
+ 左：  ONYQHXUCZVAMD'''B'''SLKPEFJRIGTW<br/>
+ 右：  WXUMCPTLNBQDEOYSFAVZKGJRIH<br/>
+
+7、现在是右盘。'''转变方式和左盘不同！'''先将右盘向逆时针方向旋转一位（对于实体模型，要把右盘卸下来，因为这一步'''不能带动左盘旋转'''），也就是在字符串上将右盘每个字符前移一位，第一个字符放到最后。<br/>
+ 标识：+            *       <br/>
+ 左：  ONYQHXUCZVAMDBSLKPEFJRIGTW（左盘不动）<br/>
+ 右：  XUMCPTLNBQDEOYSFAVZKGJRIHW<br/>
+
+8、把右盘高位字母顺时针方向的第二个字母取下来（字符串的第三个字母）<br/>
+ 标识：+            *       <br/>
+ 左：  ONYQHXUCZVAMDBSLKPEFJRIGTW<br/>
+ 右：  XU.CPTLNBQDEOYSFAVZKGJRIHW<br/>
+
+9、把从逆时针第三个字母（字符串第四个字母）到低位的所有字母前移一位，并把刚才取下的字母放到低位<br/>
+ 标识：+            *       <br/>
+ 左：  ONYQHXUCZVAMDBSLKPEFJRIGTW<br/>
+ 右：  XUCPTLNBQDEOY'''M'''SFAVZKGJRIHW<br/>
+
+10、重复获取密文和更改码盘这两个部分直到加密完成。
+
+==解码过程==
+跟加密大同小异，只是要从左盘的密文找到右盘对应的明文罢了，码盘更改方式是一样的。
+
+==参考资料==
+*[http://www.mountainvistasoft.com/chaocipher/ActualChaocipher/Chaocipher-Revealed-Algorithm.pdf ''Chaocipher Revealed Algorithm'']{{Wayback|url=http://www.mountainvistasoft.com/chaocipher/ActualChaocipher/Chaocipher-Revealed-Algorithm.pdf |date=20120308192415 }}-by Rubin, Moshe (July 2, 2010).
+
+{{Cryptography navbox|classical}}
+
+[[Category:古典密码|Category:古典密码]]

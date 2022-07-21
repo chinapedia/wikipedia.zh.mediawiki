@@ -1,0 +1,111 @@
+{{Expert|time=2011-08-21}}
+{{noteTA
+|G1=IT
+<!--|1=zh-cn:大陆;zh-tw:台灣;zh-hk:香港;zh-sg:新马;
+|2=zh-cn:大陆;zh-tw:台灣;zh-hk:香港;zh-sg:新马;-->
+}}
+在[[计算机科学|计算机科学]]中, '''动态内存分配'''（Dynamic memory allocation）又称为'''堆内存分配'''，是指[[计算机程序|计算机程序]]在[[运行期|运行期]]中分配使用[[内存|内存]]。它可以当成是一种分配有限内存资源所有权的方法。
+
+动态分配的内存在被程序员明确释放或被[[垃圾回收_(计算机科学)|垃圾回收]]之前一直有效。与[[静态内存分配|静态内存分配]]的区别在于没有一个固定的生存期。这样被分配的对象称之为有一个「动态生存期」。
+
+== 细节 ==
+分配过程包括寻找一块足够大未被使用的内存。
+
+* 分配过程当中的问题
+** 内部和外部[[碎片（计算机）|碎片]]。
+*** 减少碎片需要特别处理，从而导致更复杂的实现(参考 [[算法效率|算法效率]])。
+** 分配器的[[元数据|元数据]]需要占用额外的空间。
+*** 尝试[[组块|组块]]来减轻这个效应。
+
+通常，内存是从一个被称为'''堆'''的内存池中分配出来的。高级语言封装了内存地址的概念，内存通常是通过[[指针|指针]]来间接访问的。分配算法经常将组织分配释放组块等操作封装成抽象的接口供上层函数调用。
+
+== 效率 ==
+堆分配的效率与分配算法的优劣关系很大。
+
+== 实现 ==
+=== 定长分配 ===
+{{main|内存池}}
+
+定长分配通常被称为内存池分配，使用一个[[链表|链表]]来保存空闲内存块信息(通常每块内存大小相同)。这种方法在简单的[[嵌入式系统|嵌入式系统]]中效果很好。
+
+=== 伙伴系统 ===
+{{details|Buddy memory allocation}}
+在这种分配方式下，内存从一个2的N次幂大的内存块中分配。当内存块比要分配的长度大两倍以上，内存块平均分裂成两块。选中其中一半，重复这个过程（检查长度，满足条件则分裂）直到内存块刚好等于需要的长度。
+
+所有的块信息保存在一个排序过的[[链表|链表]]或者[[二叉树|二叉树]]中。当一个块被释放的时候与他的相邻块进行比较。如果他们都被释放，就合并成一个大块放进更大的一个块列表
+中。每当分配结束，分配器会从尽量小的块重新开始分配，以避免产生不必要的碎片。
+
+==参见==
+* [[自动内存分配|自动内存分配]]
+* [[Dynamic_array|Dynamic array]]
+* [[垃圾回收_(计算机科学)|垃圾回收]]
+* [[Hazard_pointer|Hazard pointer]]
+* [[Heap_overflow|Heap overflow]]
+* [[Hoard_memory_allocator|Hoard memory allocator]]
+* [[Java_Virtual_Machine_heap|Java Virtual Machine heap]]
+* <code>[[malloc|malloc]]</code>
+* [[内存池|内存池]]
+* <code>[[mmap|mmap]]</code>
+* [[new_(C++)|new (C++)]]
+* [[obstack|obstack]]
+* [[Slab_allocation|Slab allocation]]
+* [[SLOB|SLOB]]
+* [[栈内存分配|栈内存分配]]
+
+==外部链接==
+* [http://code.google.com/p/arena-memory-allocation/downloads/list Sample bit-mapped arena memory allocator in C] {{Wayback|url=http://code.google.com/p/arena-memory-allocation/downloads/list |date=20151223022734 }}
+* [https://web.archive.org/web/20110426050202/http://rtportal.upv.es/rtmalloc/ TLSF: a constant time allocator for real-time systems]
+* [https://users.cs.jmu.edu/bernstdh/web/common/lectures/slides_cpp_dynamic-memory.php Slides for knowing about Dynamic memory allocation]{{Wayback|url=https://users.cs.jmu.edu/bernstdh/web/common/lectures/slides_cpp_dynamic-memory.php |date=20100614164828 }}
+* [http://www.flounder.com/inside_storage_allocation.htm Inside A Storage Allocator] {{Wayback|url=http://www.flounder.com/inside_storage_allocation.htm |date=20210607034012 }}
+
+== 补充阅读 ==
+* [http://www.cs.northwestern.edu/~pdinda/icsclass/doc/dsa.pdf "Dynamic Storage Allocation: A Survey and Critical Review"]{{Wayback|url=http://www.cs.northwestern.edu/~pdinda/icsclass/doc/dsa.pdf |date=20100611115641 }}, Department of Computer Sciences [[University_of_Texas_at_Austin|University of Texas at Austin]]
+
+== 参考文献 ==
+{{reflist}}
+{{No footnotes|date=2009年9月}}
+* [[Donald_Knuth|Donald Knuth]]. ''Fundamental Algorithms'', Third Edition. Addison-Wesley, 1997. ISBN 0-201-89683-4. Section 2.5: Dynamic Storage Allocation, pp. 435–456.
+* [https://web.archive.org/web/20060409094110/http://www.osdcom.info/content/view/31/39/ Simple Memory Allocation Algorithms] on OSDEV Community
+* {{cite journal
+ | author = Wilson, P.R.
+ | coauthors = Johnstone, M.S.; Neely, M.; Boles, D.
+ | year = 1995
+ | title = Dynamic Storage Allocation: A Survey and Critical Review
+ | journal = Memory Management: International Workshop, Iwmm'95, Kinross, Uk, September 27-29, 1995: Proceedings
+ | url = http://books.google.com/?id=m0yZN2bA3TcC&pg=PA1&dq=paul+wilson
+ | accessdate = 2008-01-06
+ | publisher = Springer
+ | isbn = 9783540603689
+}}
+* {{cite journal
+ | author = Berger, E.D.
+ | coauthors = Zorn, B.G.; McKinley, K.S.
+ | year = 2001
+ | title = Composing high-performance memory allocators
+ | journal = ACM SIGPLAN Notices
+ | volume = 36
+ | issue = 5
+ | pages = 114–124
+ | url = http://portal.acm.org/citation.cfm?id=381694.378821
+ | doi = 10.1145/381694
+}}
+* {{cite conference
+ | author = Berger, E.D.
+ | coauthors = Zorn, B.G.; McKinley, K.S.
+ | year = 2002
+ | title = Reconsidering custom memory allocation
+ | conference =
+ | booktitle = Proceedings of the 17th ACM SIGPLAN conference on Object-oriented programming, systems, languages, and applications
+ | pages = 1–12
+ | publisher = ACM Press New York, NY, USA
+ | url = http://portal.acm.org/citation.cfm?id=582419.582421
+ | conferenceurl =
+}}
+
+
+{{DEFAULTSORT:Dynamic Memory Allocation}}
+[[Category:記憶體管理|Category:記憶體管理]]
+
+'''
+
+[[en:Memory_management#Dynamic_memory_allocation|en:Memory management#Dynamic memory allocation]]

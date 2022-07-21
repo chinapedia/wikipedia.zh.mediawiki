@@ -1,0 +1,18 @@
+(function($, mw) {
+    // don't be too aggresive. just fix some obvious typos
+    var searchTerm = mw.util.getParamValue('search');
+    if (searchTerm !== null && mw.util.getParamValue('fulltext') === null) {
+        // namespace names
+        var colonIdx = searchTerm.indexOf('：');
+        if (colonIdx != -1) {
+            var ns = searchTerm.substring(0, colonIdx);
+            var page = searchTerm.substring(colonIdx + 1);
+            if (mw.config.get('wgNamespaceIds')[ns.toLowerCase()]) {
+                // valid namespace
+                var url = mw.config.get('wgScript') + '?search=' + encodeURIComponent(ns + ':' + page);
+                mw.notify('Redirecting to ' + mw.html.escape(url));
+                window.location.href = url;
+            }
+        }
+    }
+})(jQuery, mediaWiki);

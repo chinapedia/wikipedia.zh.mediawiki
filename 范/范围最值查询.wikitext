@@ -1,0 +1,61 @@
+{{noteTA|G1=IT}}
+'''范围最值查询'''（{{lang-en|Range Minimum Query}}），是针对[[数据集|数据集]]的一种条件查询。若给定一个数组<math>A[1, n]</math>，范围最值查询指定一个范围条件<math>i</math>到<math>j</math>，要求取出<math>A[i, j]</math>中最大／小的元素。
+
+若<math>A = [3, 5, 2, 5, 4, 3, 1, 6, 3]</math>，条件为<math>[3, 8]</math>的范围最值查询返回1，它是子数组<math>A[3, 8] = [2, 5, 4, 3, 1, 6]</math>中最小的元素。
+
+通常情况下，数组A是静态的，即元素不会变化，例如插入、删除和修改等，而所有的查询是以[[在线|在线]]的方式给出的，即预先并不知道所有查询的参数。
+
+RMQ问题有预处理<math>O(n)</math>之后每次查询<math>O(1)</math>的算法<ref>Fischer, Johannes; Heun, Volker (2007), "A New Succinct Representation of RMQ-Information and Improvements in the Enhanced Suffix Array.", Proceedings of the International Symposium on Combinatorics, Algorithms, Probabilistic and Experimental Methodologies, Lecture Notes in Computer Science, 4614, Springer-Verlag, pp. 459–470, [http://dx.doi.org/10.1007%2F978-3-540-74450-4_41 doi:10.1007/978-3-540-74450-4_41]</ref>。
+
+范围最值查询问题（RMQ）与[[最近公共祖先_(图论)|最近公共祖先 (图论)]]（LCA）问题有直接联系，它们可以互相转化。RMQ的算法常常应用在严格或者近似子串匹配等问题的处理中。
+
+== 算法 ==
+
+=== Sparse Table ===
+建立一个二维数组 <math>F[1 \dots N][0 \dots O(\log_2 N)]</math> 的整数值。
+
+在这个数组中 <math>F[i][j]</math> 表示范围 <math>[i, i+2^j-1]</math> 中的最大值（例如 <math>[2, 5]</math> 中的最大值被计为 <math>F[2][2]</math>）。
+
+建立数组的过程可以在 <math>O(N \log N)</math> 时间内完成。具体算法类似于动态规划。以下是 C++ 语言描述的代码，数组约定从 0 开始：<syntaxhighlight lang="c++">
+void Initialise(vector<int> &Array)
+{
+	int Length = (int)Array.size();
+
+	// 长度为 0 时，表示数据自身。
+	for (int i = 0; i < Length; ++i) F[i][0] = Array[i];
+	
+	for (int j = 1; (1 << j) <= Length; ++j)
+		for (int i = 0; i + (1 << j) - 1 < Length; ++i)
+			F[i][j] = min(
+				F[i][j - 1], F[i + (1 << (j - 1))][j - 1]
+			); // 分成长度相等的两段
+}
+</syntaxhighlight>当我们需要计算一个区间中的最大值（例如 <math>[3, 8]</math> 时），我们先求出这个区间的长度（即 8 - 3 + 1 = 6）。
+
+然后我们算出不大于它的最大 <math>2^k</math> 值的指数（即 2）。我们要查询分别以 3 开头，和以 8 结尾的两个长度为 <math>2^2</math> 的区间的最大值。
+
+显然 <math>F[3][2]</math> 和 <math>F[5][2]</math> 也就是（<math>[3, 6]</math> 和 <math>[5, 8]</math>）的最大值就是 <math>[3,8]</math> 的最大值。查询的时间是常数，代码如下：<syntaxhighlight lang="c++">
+int Query(int Left, int Right)
+{
+	int i = 0;
+	
+	while (1 << (i + 1) <= Right - Left + 1) ++i;
+	
+	return min(
+		F[Left][i], F[Right - (1 << i) + 1][i]
+	);
+}
+</syntaxhighlight>整个程序的时间复杂度是 <math>O(N \log N + Q)</math>，Q 为查询数。
+
+=== {{Tsl|en|Method_of_Four_Russians}} ===
+
+== 数据结构 ==
+
+=== [[线段树_(区间查询)|线段树]] ===
+
+=== [[树状数组|树状数组]] ===
+
+== 参考资料 ==
+{{reflist}}
+
+[[Category:搜尋演算法|Category:搜尋演算法]]

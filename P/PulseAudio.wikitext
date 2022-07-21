@@ -1,0 +1,96 @@
+{{Rough translation|en:PulseAudio}}
+{{NoteTA|G1=IT|G2=FL}}
+{{Infobox software
+| name                   = PulseAudio
+| logo                   = PulseAudio-logo.png
+| logo size              = 250px
+| logo alt               = PulseAudio logo
+| collapsible            =
+| author                 =
+| developer              = Lennart Poettering, Pierre Ossman, Shahms E. King, Tanu Kaskinen, Colin Guthrie
+| released               =
+| latest release version = 16.1
+| latest release date    = {{Release date and age|2022|06|22}}
+| latest preview version = 15.99.1
+| latest preview date    = {{Release date and age|2022|02|21}}
+| programming language   = [[C語言|C]]<ref name="ohloh">{{cite web |url=http://www.ohloh.net/p/pulseaudio |title=Ohloh Analysis Summary - PulseAudio |publisher=[[Ohloh|Ohloh]] |archiveurl=https://www.webcitation.org/5kcZM6U9w?url=http://www.ohloh.net/p/pulseaudio |archivedate=2009-10-18 |accessdate=2009-10-18 |deadurl=yes }}</ref>
+| operating system       = [[跨平台|跨平台]]
+| platform               =
+| language               =
+| genre                  = {{link-en|音效伺服器|Sound server}}
+| license                = [[GNU宽通用公共许可证|GNU宽通用公共许可证]] 2.1<ref name="license">{{Cite web |url=http://git.0pointer.de/?p=pulseaudio.git;a=blob_plain;f=LICENSE |title=LICENSE |publisher=Pulseaudio git |accessdate=14 May 2010 |deadurl=yes |archiveurl=https://web.archive.org/web/20100107050203/http://git.0pointer.de/?p=pulseaudio.git |archivedate=2010年1月7日 }}</ref>
+| website                = {{URL|https://www.freedesktop.org/wiki/Software/PulseAudio/}}
+}}
+'''PulseAudio'''（以前叫''Polypaudio''）是一个[[跨平台|跨平台]]的、可通过网络工作的[[声音服务|声音服务]]，其一般使用于[[Linux|Linux]]和[[FreeBSD|FreeBSD]]操作系统。它可以用来作为一种简易改进的[[开放声音后台|开放声音后台]]（ESD）替换。
+
+PulseAudio主要运行于[[POSIX|POSIX]]兼容系统（如Linux和FreeBSD）。PulseAudio是[[自由软件|自由软件]]，基于[[GNU宽通用公共许可证|GNU宽通用公共许可证]] （LGPL）2.1协议<ref name="license" />
+
+==描述==
+[[File:Pulseaudio-diagram.svg|thumb]]
+
+PulseAudio是一个声音服务器，一个后台进程从一个或多个音源（进程或输入设备）接受声音输入 然后重定向声音到一个或多个槽（声卡，远程网络PulseAudio服务，或其他进程）。
+
+PulseAudio的一个目的通过它是重定向所有声音流，包括那些试图访问硬件的进程（像那些遗留的基于[[OSS|OSS]]的软件）。PulseAudio通过提供适配器给那些使用不同的声音系统，像[[aRts|aRts]]和[[ESounD|ESounD]]。
+
+在Linux下的典型方案，用户提供配置[[ALSA|ALSA]]来使用PulseAudio提供的虚拟设备。尽管应用使用ALSA会将输出的声音输出到PulseAudio，然后PulseAudio会使用[[ALSA|ALSA]]它自己来访问真正的声卡. PulseAudio同样提供它自己的接口给应用程序，用来直接支持PulseAudio，就像那些遗留的基于[[ESD|ESD]]的软件，这样使得PulseAudio适合作为[[ESD|ESD]]的替代品。
+
+对于[[Open_Sound_System|OSS]]的软件, PulseAudio提供<code>padsp</code>工具，用来代替硬件文件夹像<code>/dev/dsp</code>，欺骗应用程序，使程序以为它们有声卡的完全控制权。在事实上，它们的输出被PulseAudio重定向。
+
+==特点==
+PulseAudio的主要特点包括:
+
+*可对每一个应用程序进行音量控制Per-application volume controls<ref>{{cite web |url=http://fedoraproject.org/wiki/Interviews/LennartPoettering |title=Interviews/LennartPoettering - FedoraProject |publisher=FedoraProject |date= |accessdate=2009-07-03 |archive-date=2009-10-18 |archive-url=https://www.webcitation.org/5kcZc9icl?url=http://fedoraproject.org/wiki/Interviews/LennartPoettering |dead-url=no }}</ref>
+*可扩展的插件与支持可装载模块架构
+*兼容性许多流行的音频应用程序<ref>{{cite web |url=http://pulseaudio.org/wiki/PerfectSetup#ThirdPartyApplications |title=Pulse Audio wiki |publisher=PulseAudio |archiveurl=https://www.webcitation.org/5kcZc9icl?url=http://fedoraproject.org/wiki/Interviews/LennartPoettering#ThirdPartyApplications |archivedate=2009-10-18 |accessdate=2009-07-19 |deadurl=yes }}</ref>
+*支持多重音源和多重输出
+*低延时操作{{Citation needed|date=December 2008}}和支持延迟测量
+*一个对处理器资源效率零拷贝内存架构
+*能够发现本地网络上使用PulseAudio的其他计算机并通过其扬声器直接播放声音
+*能够改变一个应用程序的声音输出设备，就算这个应用程序在播放声音（程序不需要支持这特性，而事实上，程序甚至没有意识到改变）
+*带有脚本功能的命令行界面
+*一个功能完善且带有命令行重新配置功能的守护进程
+*内置采样转换和重采样功能
+*能够合并多块声卡成一个声卡
+*能够同步播放多个音频流
+*动态检测蓝牙音频设备
+*使全系统均衡的能力
+
+==使用==
+PulseAudio被几个主要[[Linux发行版|Linux发行版]]使用，例如[[Fedora|Fedora]]、[[Ubuntu|Ubuntu]]、[[Mandriva_Linux|Mandriva]]、[[Linux_Mint|Linux Mint]]、[[openSUSE|openSUSE]]和[[OpenWRT|OpenWRT]]。[[GNOME|GNOME]]项目中还有越来越多的对Pulseaudio的支持。
+
+PulseAudio已经被多款基于[[Linux|Linux]]的移动电话设备当作声音系统，包括[[Nokia_N900|Nokia N900]]和[[Palm_Pre|Palm Pre]].<ref>{{Citation |url=http://www.techworld.com.au/article/320807/open_source_identity_pulseaudio_creator_lennart_poettering |title=Open source identity: PulseAudio creator Lennart Poettering |work=TechWorld |date=8 October 2009 |accessdate=2010-11-10 |archive-date=2011-04-06 |archive-url=https://web.archive.org/web/20110406184237/http://www.techworld.com.au/article/320807/open_source_identity_pulseaudio_creator_lennart_poettering/ |dead-url=no }}.</ref>
+
+当PulseAudio第一次公开发布时, PulseAudio开发者[[Lennart_Poettering|Lennart Poettering]]描述它为"the software that currently breaks your audio".<ref>{{cite web |url=http://lwn.net/Articles/299211/ |title=LPC: Linux audio: it's a mess |archiveurl=https://www.webcitation.org/5kcZfOb4l?url=http://lwn.net/Articles/299211/ |archivedate=2009-10-18 |publisher=Lwn.net |date= |accessdate=2009-07-03 |deadurl=yes }}</ref>  Poettering later claimed that "Ubuntu didn't exactly do a stellar job. They didn't do their homework" in adopting PulseAudio<ref>{{cite web |url=http://0pointer.de/blog/projects/jeffrey-stedfast.html |title=PulseAudio FUD |author=Lennart Poettering |archiveurl=https://www.webcitation.org/5kcZiAcoS?url=http://0pointer.de/blog/projects/jeffrey-stedfast.html |archivedate=2009-10-18 |publisher=0pointer.de |date=18 July 2008 |accessdate=2009-12-30 |deadurl=yes }}</ref> for [[Ubuntu|Ubuntu]] "Hardy Heron" (8.04), a problem which was then improved with subsequent Ubuntu releases.<ref>{{cite web |url=http://ubuntuforums.org/showthread.php?t=789578 |title=HOWTO: PulseAudio Fixes & System-Wide Equalizer Support |date=2008-05-10 |publisher=Ubuntu Forums |accessdate=2009-10-18 |archiveurl=https://www.webcitation.org/5kcZp2FZL?url=http://ubuntuforums.org/showthread.php?t=789578 |archivedate=2009-10-18 |deadurl=yes }}</ref> However, on October 2009, Poettering reported that he was still not happy with Ubuntu's integration of PulseAudio.<ref>{{Cite web |url=http://0pointer.de/blog/projects/pa-in-ubuntu.html |title=I'll Break Your Audio |publisher=Lennart Poettering Blog |date=19 October 2009 |accessdate=26 December 2009 |archive-date=2009-10-22 |archive-url=https://web.archive.org/web/20091022065331/http://0pointer.de/blog/projects/pa-in-ubuntu.html |dead-url=no }}</ref>
+
+某些程序，包括Linux上的旧版的[[Adobe_Flash|Adobe Flash]]，在PulseAudio上造成不稳定.<ref>{{cite web |url=http://ubuntuforums.org/showthread.php?t=772632 |title=No sound after running Flash, YouTube, etc. (pulseaudio solution) |publisher=Ubuntu Forums |accessdate=2009-10-18 |archiveurl=https://www.webcitation.org/5kcZukzEL?url=http://ubuntuforums.org/showthread.php?t=772632 |archivedate=2009-10-18 |deadurl=yes }}</ref><ref>{{cite web |url=https://wiki.ubuntu.com/PulseAudio |title=PulseAudio - Ubuntu Wiki |publisher=Ubuntu Wiki |accessdate=2009-10-18 |archiveurl=https://www.webcitation.org/5kcZznLCM?url=https://wiki.ubuntu.com/PulseAudio |archivedate=2009-10-18 |deadurl=yes }}</ref>幸运的是较新的Flash插件的不引起冲突，因此Flash和PulseAudio的是兼容的。
+
+==替代品==
+[[ALSA|ALSA]]提供一个软件调音台叫[[dmix|dmix]]，它是在PulseAudio前开发的。这是几乎可以在所有的Linux发行版使用的一个简单的PCM音频混合的解决方案。但它不提供PulseAudio的高级功能（如高品质的重采样，聚合装置，定时的调度和网络音频）。
+
+[[JACK_Audio_Connection_Kit|JACK]]是一个提供相比PulseAudio更专业的服务的体系，提供实时和[[低延时|低延时]]的表现。
+和自从JACK2开始支持对称多处理，使得所有的音频客户端能有效平衡负载于多个处理器。音频客户端可以彼此之间任意连接。在JACK的所有客户之间的图新连接，可以被多种应用程序可视化和编辑，例如Qjackctl。这使得它非常直观地概述了整体音频控制流，可以在任何时候修改所有的音频应用程序和硬件路由。JACK对专业音频软件来说是首选的专业音频应用服务，例如[[Ardour_(软件)|Ardour]]、[[Rezound|Rezound]]和[[LinuxSampler|LinuxSampler]]。
+
+在OSS V4的声音系统，如4Front，可提供软件混音，重采样和改变对每个应用程序的基础量，与PulseAudio对比，这些功能是在内核中实现。PulseAudio的还可以与现有的音响系统互操作，包括那些设计成独占声卡的程序（OSS V3）
+
+==参见==
+* [[JACK_Audio_Connection_Kit|JACK Audio Connection Kit]]
+* [[aRts|aRts]]
+* [[Network_Audio_System|Network Audio System]]
+* [[List_of_Linux_audio_software|List of Linux audio software]]
+
+==注释==
+{{Reflist|colwidth=30em}}
+
+==外部链接==
+{{Portal|自由軟體}}
+* {{Official site|http://pulseaudio.org/}}
+* [http://0pointer.de/blog/projects/pulse.html The Project Formerly Known as Polypaudio]{{Wayback|url=http://0pointer.de/blog/projects/pulse.html |date=20070107145127 }}, a blog entry by one of the PulseAudio developers discussing the name change
+
+{{Freedesktop.org}}
+{{GTK|state=collapsed}}
+
+{{DEFAULTSORT:Pulseaudio}}
+[[Category:自由音讯软体|Category:自由音讯软体]]
+[[Category:用C编程的自由软体|Category:用C编程的自由软体]]
+[[Category:音频库|Category:音频库]]
+[[Category:应用程序接口|Category:应用程序接口]]

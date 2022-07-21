@@ -1,0 +1,48 @@
+{{NoteTA|G1=IT|G2=FL}}
+{{Infobox software
+| name = JACK Audio Connection Kit
+| logo                   = [[File:LogoJack.png|250px]]
+| author                 = Paul Davis, Stéphane Letz
+| developer              = JACK團隊<ref>{{cite web |url=http://jackaudio.org/developers |title=JACK Developer Information |publisher=jackaudio.org |accessdate=2010-01-02 |deadurl=yes |archiveurl=https://web.archive.org/web/20100108064444/http://jackaudio.org/developers |archivedate=2010-01-08 }}</ref>
+| released               = <!-- {{start date|YYYY|MM|DD}} -->
+| frequently updated = yes
+| operating system       = [[BSD|BSD]]、[[Linux|Linux]]、[[Mac_OS_X|Mac OS X]]、[[Solaris|Solaris]]、[[Microsoft_Windows|Windows]] 
+| programming language   = [[C语言|C]]<ref>{{cite web |url=http://www.ohloh.net/p/jack |title=Ohloh Analysis Summary - JACK |publisher=[[Ohloh|Ohloh]] |accessdate=2010-02-02 |archive-date=2012-06-06 |archive-url=https://www.webcitation.org/68DlwHASt?url=http://www.ohloh.net/p/jack |dead-url=no }}</ref>, [[C++|C++]]
+| genre                  = {{tsl|en|Sound server|Sound server}}
+| license                = [[GNU_General_Public_License|GNU GPL]], [[GNU_Lesser_General_Public_License|GNU LGPL]]
+| website                = [http://jackaudio.org/ jackaudio.org]
+}}
+
+'''JACK''' （'''JACK Audio Connection Kit''' 的[[递归缩写|递归缩写]]）是一个专业级的[[声音服务|声音服务]]（[[守护进程|守护进程]]），它為声音和[[MIDI|MIDI]]数据提供实时的、[[低延时|低延时]]的连接，有關的程式使用JACK的[[API|API]]。
+
+它是由{{link-en|保羅·戴維斯 (程序員)|Paul Davis (programmer)|保羅·戴維斯}}（他凭着这项工作赢得了2004年的开源奖<ref>{{cite web |url=http://articles.techrepublic.com.com/5100-10878_11-5136755.html |title=Open Source Awards 2004: Paul Davis for JACK |publisher=techrepublic.com.com |accessdate=2010-02-16 |archiveurl=https://archive.is/20120701171907/http://www.techrepublic.com/article/open-source-awards-2004-paul-davis-for-jack/5136755 |archivedate=2012-07-01 |deadurl=yes }}</ref>）带领的一个[[开源|开源]]社区开发。自从2002年初以来一直是[[Linux|Linux]]下的关键的基础设施和事实上的专业音频软件标准。这个服务是在[[GNU_GPL|GNU GPL]]协议下的[[开源软件|开源软件]]，它的库則採用更宽松的[[GNU_LGPL|GNU LGPL]]协议。
+
+== 实现 ==
+JACK 能使用[[ALSA|ALSA]]、[[PortAudio|PortAudio]]、[[CoreAudio|CoreAudio]]、[[FFADO|FFADO]]和[[Open_Sound_System|OSS]]作为硬件层的后端。此外，还有一个虚拟的驱动（当不需要声音输出时是很有用的，例如离线渲染）和一个通过UDP协议的音频驱动（Audio-over-UDP driver）。它可以运行在[[Linux|Linux]]、 [[Mac_OS_X|Mac OS X]]、 [[Solaris_(作業系統)|Solaris]]、 [[Microsoft_Windows|Windows]]、 [[FreeBSD|FreeBSD]]、 [[OpenBSD|OpenBSD]] 和 [[NetBSD|NetBSD]]上。JACK的API被标准化，并且存在两种可融合的实现：jack1，由简单的C实现并且已经维护了一段时间；至于jack2（原来的jackdmp），由Stéphane Letz领导的用C++重写的实现，jack2在积极开发中，目标是支持多处理器和对其它非Linux操作系统。<ref>{{cite web |url=http://lad.linuxaudio.org/events/2009_cdm/Thursday/01_Letz/index.html |title=What's new in JACK2? - Linux Audio Conference 2009 paper by primary JACK2 author Stephane Letz |publisher=linuxaudio.org |accessdate=2010-02-17 |archive-date=2010-03-17 |archive-url=https://web.archive.org/web/20100317034944/http://lad.linuxaudio.org/events/2009_cdm/Thursday/01_Letz/index.html |dead-url=no }}</ref>
+
+== 低延时调度 ==
+JACK为达到足够的低延时的调度要求是目前[[Linux内核|Linux 2.6 内核]]的实时操作系统优化的动力<ref>{{cite web |url=http://lkml.org/lkml/2004/7/9/138 |title=Original annoucement of a voluntary pre-emption patch for the Linux 2.6 kernel series by Ingo Molnar, 2004 |publisher=lkml.org |accessdate=2010-02-17 |archive-date=2016-08-18 |archive-url=https://web.archive.org/web/20160818042006/https://lkml.org/lkml/2004/7/9/138 |dead-url=no }}</ref><ref>{{cite web |url=http://lwn.net/images/conf/rtlws11/papers/proc/p02.pdf |title=Finding Origins of Latencies Using Ftrace, paper by Steven Rostedt from the Real-time Workshop 2009 |accessdate=2010-02-17 |archive-date=2012-10-21 |archive-url=https://web.archive.org/web/20121021165728/http://lwn.net/images/conf/rtlws11/papers/proc/p02.pdf |dead-url=no }}</ref>。Linux 2.6 内核最初的延时表现和老的2.4内核对比是让人失望的。<ref>{{cite web |url=http://lac.zkm.de/2006/papers/lac2006_lee_revell.pdf |title=Real-time audio vs. 2.6, Linux Audio Conference 2006 paper by Lee Revell |accessdate=2010-02-17 |archive-date=2020-11-10 |archive-url=https://web.archive.org/web/20201110045534/http://lac.zkm.de/2006/papers/lac2006_lee_revell.pdf |dead-url=no }}</ref>实时操作系统的调整工作已经在众多的对主线内核和一个对2.6.24版本的插入优化的 -rt分支中的调度调整中达到顶峰，最后成为一个<code>CONFIG_PREEMPT_RT</code>（配置优先）补丁。
+<ref>{{cite web | url = http://rt.wiki.kernel.org/ | title = Real-Time Linux Wiki | publisher = [[kernel.org|Linux Kernel Organization]] | accessdate = 2010-06-08 | archive-date = 2012-02-06 | archive-url = https://web.archive.org/web/20120206044421/https://rt.wiki.kernel.org/ | dead-url = no }}</ref>
+
+== 参见 ==
+{{Portal|Free software}}
+* [[Ardour_(软件)|Ardour]]
+* [[LADSPA|LADSPA]]
+* [[PulseAudio|PulseAudio]]
+* [[aRts|aRts]]
+
+==參考資料==
+{{reflist|2}}
+
+==外部連結==
+* [http://jackaudio.org/ 官方网站]*{{Wayback|url=http://jackaudio.org/ |date=20110127062649 }}
+* [http://www.linuxjournal.com/article/8354 Linux日志] {{Wayback|url=http://www.linuxjournal.com/article/8354 |date=20210130012423 }}
+* [https://web.archive.org/web/20120606050919/http://www.grame.fr/~letz/jackdmp.html 连接到OSX和Windows二进制文件的Jackdmp]
+* [http://apps.linuxaudio.org/apps/categories/jack 支持JACK的软件列表]{{Wayback|url=http://apps.linuxaudio.org/apps/categories/jack |date=20090327125326 }}
+* [https://web.archive.org/web/20130614005531/http://w3.linux-magazine.com/issue/67/JACK_Audio_Server.pdf 其他关于JACK的文章 (只有PDF)]
+
+[[Category:自由音訊軟體|Category:自由音訊軟體]]
+[[Category:应用程序接口|Category:应用程序接口]]
+[[Category:音乐软件插件体系结构|Category:音乐软件插件体系结构]]
+[[Category:字首缩写|Category:字首缩写]]
+[[Category:音频库|Category:音频库]]

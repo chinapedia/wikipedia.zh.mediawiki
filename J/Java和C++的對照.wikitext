@@ -1,0 +1,429 @@
+{{noteTA
+|G1 = IT
+|1 = 编程=>zh-tw:程式設計; 编程=>zh-hk:程式設計; 编程=>zh-mo:程式設計;
+|2 = 編程=>zh-tw:程式設計; 編程=>zh-hk:程式設計; 編程=>zh-mo:程式設計;
+|3 = 函数=>zh-cn:函数; zh-tw:函式; zh-hk:函數;
+|4 = 过程=>zh-cn:过程; zh-tw:程序; zh-hk:程式;
+}}
+{{roughtranslation}}
+本条目为'''[[Java语言|Java语言]]和[[C++语言|C++语言]]之间的比较'''。
+
+== 設計目標 ==
+C++和Java语言之间的不同可以追溯到它們各自的傳統，它們有着不同的設計目標。
+* '''C++''' 被設計成主要用在系統性應用程式設計上的語言，对[[C語言|C語言]]進行了擴展。基于C語言這個為執行效率設計的[[过程式编程|過程式程式設計]]語言，C++添加了对这些特性的支持：[[靜態類型|靜態類型]]的[[面向对象程序設計|面向对象程序設計]]的支持、[[異常處理|異常處理]]、[[資源獲取即是初始化|RAII]]以及[[泛型|泛型]]。另外它還添加了一個包含泛型容器和算法的[[C++庫函數|C++庫函數]]。
+* '''Java''' 最初被設計用来支持[[網絡計算|網絡計算]]。它依賴一個[[虛擬機|虛擬機]]來保證[[計算機安全|安全]]和[[移植_(軟體)|可移植性]]。Java包含一個可擴展的庫以提供一個完整的下層平台抽象。Java是一種靜態面向對象語言，它使用的語法和C++类似，但并不与之兼容。為了使更多的人到使用更易用的語言，它進行了全新的設計。
+
+不同的開發目標導致C++和Java這兩種語言的不同的規則以及設計上的平衡點不同。
+如下列出不同點：
+
+{| class="wikitable"
+! style="width:50%;"| C++
+! style="width:50%;"| Java
+|-
+| 除了一些比較少見的情況之外和[[C語言|C語言]]相容
+| 沒有對任何之前的語言向前相容。但在語法上受C/C++的影響很大
+|-
+| 一次編寫多處編譯
+| 一次編寫多處運行
+|-
+|允許[[过程式编程|過程式程式設計]]和[[面向對象程序設計|面向對象程序設計]]
+|必須使用面向對象的程式設計方式
+|-
+| 允許直接调用原生的系統庫
+| 要通過[[Java_Native_Interface|JNI]]調用，或者[[Java_Native_Access|JNA]]
+|-
+| 能直接使用底層系統接口
+| 在一個保護模式下的虛擬機中運行
+|-
+| 只提供物件的類型和類型名
+| 是[[反射式编程|反射的]]，允許[[元程式設計|元程式設計]]和運行時的動態生成代碼
+|-
+| 有多種二進制相容標準（例如：微軟和Itanium/GNU）
+| 一種二進制相容標準，允許運行時庫的正確性檢查
+|-
+| 可選的自動[[邊界檢查|邊界檢查]].（例如：<tt>vector</tt> 和 <tt>string</tt> 这两个容器的 <tt>at()</tt> 方法）
+| 一般都有做邊界檢查。[[HotSpot_(java)|HotSpot (java)]]（Sun 的虛擬機實現）可以去掉邊界檢查
+|-
+| 支持原生的無符號數學運算
+| 不支持原生的無符號數學運算
+|-
+| 對所有的數字類型有標準的範圍限制，但字節長度是跟實現相關的。標準化的類型可以用 typdef 定義 (uint8_t, ..., uintptr_t)
+| 在所有平台上對所有的基本類型都有標準的範圍限制和字節長度
+|-
+| 支持指针，引用，傳值調用
+| 基本類型總是使用傳值調用。物件以可以為空的引用的方式傳遞（相當於在C++里使用指向 <code>class</code> 或者 <code>struct</code> 參數的指標）。<ref name="Java is Pass-By-Value">{{Cite web |url=http://javadude.com/articles/passbyvalue.htm |title=Java is Pass-By-Value |access-date=2010-10-21 |archive-url=https://web.archive.org/web/20080515170930/http://javadude.com/articles/passbyvalue.htm |archive-date=2008-05-15 |dead-url=yes }}</ref>
+|-
+| 顯式的記憶體管理，但有第三方的框架可以提供垃圾搜集的支持。支持析搆函式。
+| 自動垃圾搜集（可以手動觸發）。沒有析構函式的概念，對 <code>finalize()</code> 的使用是不推荐的
+|-
+| 支持類class，結構struct，聯合union，可以在[[堆疊|堆疊]]或者[[動態記憶體分配|堆]]里為它們動態分配記憶體
+| 只支持類別，只在[[動態記憶體分配|堆]]中為物件分配記憶體。[[J2SE|Java SE 6]]在棧為一些物件分配記憶體的使用了[[逃逸分析|逃逸分析]]的優化方法
+|-
+| 允許顯示的覆蓋（也叫重寫）類型
+| 嚴格的[[類型安全|類型安全]]，除了變寬的類型轉換。Java 1.5開始支持自動類型包裝和解包裝(Autoboxing/Unboxing)
+|-
+| [[C++函式庫|C++函式庫]]包括：語言支持，診斷工具，常用工具，字符串，本地化，容器，算法，迭代器，數值，輸入/輸出，C函式庫。Boost庫提供了更多的功能，包括執行緒和網絡I/O。使用者必須在一大堆（大部分互相不相容）第三方GUI或者其他功能庫中進行選擇
+| 函式庫在每次 Java 發布新版本的時候都會更新并增強功能。1.6版本支持：本地化，日誌系統，容器和迭代器，算法，GUI 程式設計（但沒有用到系統的GUI），圖形，多執行緒，網絡，平台安全，自省機制，動態類別加載，阻塞和非阻塞的I/O，對於[[XML|XML]]、[[XSLT|XSLT]]、[[MIDI|MIDI]]也提供了相關接口或者支持類別，數據庫，命名服務（例如 [[LDAP|LDAP]]），密碼學，安全服務（例如 [[Kerberos|Kerberos]]），打印服務，WEB 服務。SWT 提供了一個系統相關的GUI的抽象
+|-
+| 大部分運算符可以[[運算符重載|運算符重載]]
+| 運算子的意義一般來說是不可變的，例外是<code>+</code>和<code>+=</code>運算子被字符串多載了
+|-
+| 完全的多重繼承，包括虛擬繼承
+| 類別只允許單繼承，需要多繼承的情況要使用接口
+|-
+| 支持編譯期模板
+| {{link-en|Java中的泛型|Generics in Java|泛型}}被用來達到和C++模板類似的效果，但由於{{link-en|类型消除|Type Erasure}}它們不能在編譯期間從代碼被編譯成字節碼
+|-
+| 支持函式指標，函式物件，lambda(C++11)和接口
+| 沒有函式指標機制。替代的概念是接口，Adapter 和 Listener也是被廣泛使用的
+|-
+| 沒有標準的代碼內嵌文檔機制。不過有第三方的軟體（例如 [[Doxygen|Doxygen]]）
+| [[Javadoc|Javadoc]] 標準文檔生成系統
+|-
+| <code>const</code> 關鍵字用來定義不可改變的常量和成員函式
+| <code>final</code> 提供了一個限制版本的 <code>const</code>，等價於 type* <code>const</code> 的物件指標或者 <code>const</code>的基本類型數據。沒有 <code>const</code> 成員函式，也沒有<code>const</code> type* 指標的等價物
+|-
+| 支持 <code>goto</code> 語句
+| 支持循環標簽(label)和語句塊
+|-
+| 源代碼可以寫成平台無關的（可以被 [[Windows|Windows]]、[[BSD|BSD]]、[[Linux|Linux]]、[[Mac_OS_X|Mac OS X]]、[[Solaris_(操作系統)|Solaris]]等編譯，不用修改），也可以寫成利用平台特有的特性。通常被編譯成原生的機器碼
+| 被編譯成[[Java虛擬機|Java虛擬機]]的字節碼。和Java平台相關，但是源代碼一般來說是不依賴[[操作系統|操作系統]]特有的特性的
+|}
+
+C++ 是一門強大的語言，設計用在系統程式設計方面。Java語言是設計成簡單易用易學習，并有一個強大的跨平台的庫。Java[[函式庫|函式庫]]對一個函式庫來說相當的大。但Java并不會提供所在平台的所有特性和接口。C++函式庫簡單健壯，提供[[集合_(計算機科學)|容器]]和[[關聯數組|關聯數組]]的支持。<ref>{{Cite web |url=http://en.wikibooks.org/wiki/C++_Programming/Programming_Languages/Comparisons/Java#Libraries |title=Java and C++ Library |accessdate=2010-10-21 |archive-date=2020-09-30 |archive-url=https://web.archive.org/web/20200930195626/https://en.wikibooks.org/wiki/C%2B%2B_Programming/Programming_Languages/Comparisons/Java#Libraries |dead-url=no }}</ref>
+
+== 语言特性 ==
+=== 語法 ===
+* Java[[語法|語法]]是[[上下文無關文法|上下文無關文法]]，可以用一個簡單的[[LALR語法分析器|LALR語法分析器]]來分析.而分析C++就複雜多了；例如 <code>Foo<1>(3);</code> ，如果 Foo 是一個變數，那麼它是一個比較的運算式，但如果 Foo 是一個類範本的名字，那麼它會創建一個物件.
+* C++允許名字空間級別的常量，變數和函數. 而所有這樣的 Java 聲明必須在一個類或者介面當中.
+* 在 C++ 的聲明中，一個類名可以用來聲明一個此類物件的值. Java 裡沒辦法做到這點. 在Java裡對象不是值. 在 Java 的聲明中，一個類名聲明的是對此類的一個物件的''引用''. 而在 C++ 裡與之等價的做法是用 "*" 來聲明一個指標.
+* 在 C++ 裡，"."操作符將一個物件作為一個左指令引數來訪問這個物件的成員. 因為對象在 Java 裡不是值，所有的對象都通過引用來訪問，剛才的做法在 Java 裡是無法實現的. 在 Java 裡，"." 操作符是將一個物件的引用作為左指令引數來訪問這個物件的成員.在C++中和這種做法等價的是 "->".
+
+{| class="wikitable"
+! style="width:400px;"| C++
+! style="width:400px;"| Java
+|-
+| <syntaxhighlight lang="cpp">
+class Foo {          // 定義 Foo 類
+public:
+    int x;           // 成員變量
+
+    Foo(): x(0) {    // Foo 的建構函數Constructor for Foo,
+    }                //  初始化 x
+
+    int bar(int i) { // 成員函數 bar()
+        return 3*i + x;
+    }
+};</syntaxhighlight>
+| <syntaxhighlight lang="java">
+class Foo {               // 定義類 Foo
+    public int x = 0;     // 成員變數,
+                          //  以及其值的初始化
+    public Foo() {        // Foo的 建構函數
+    }
+
+    public int bar(int i) {// 成員方法 bar()
+        return 3*i + x;
+    }
+}</syntaxhighlight>
+|-
+| <syntaxhighlight lang="cpp">
+Foo a;
+// 定義 a 為一個 Foo 類的物件值,
+// 使用其缺省的建構函數
+// 如果你想要用其他的建構函數,
+// 你可以用 "Foo a(args);" </syntaxhighlight>
+| <syntaxhighlight lang="java">
+Foo a;
+// 定義 a 為一個 Foo 類的物件的引用
+a = new Foo();
+// 使用缺省的構造函數初始化
+// 如果你想要用其他的構造函數,
+// 你可以用 "Foo a = new Foo(args);" </syntaxhighlight>
+|-
+| <syntaxhighlight lang="cpp">
+Foo b = a;
+// 拷貝 a 的內容到一個新的 Foo 類的變數 b 當中;
+// 另一種可以選擇的語法是 "Foo b(a)"</syntaxhighlight>
+| <syntaxhighlight lang="java">
+Foo b = a.clone();
+// 拷貝所有a這個實例的成員到b,當且僅當,
+// Foo 實現了一個 public 的 clone() 方法,
+// 並且 clone() 返回一個新的這個物件的拷貝
+</syntaxhighlight>
+|-
+| <syntaxhighlight lang="cpp">a.x = 5; // 修改 a 對象</syntaxhighlight>
+| <syntaxhighlight lang="java">a.x = 5; // 修改 a 對象</syntaxhighlight>
+|-
+| <syntaxhighlight lang="cpp">
+cout << b.x << endl;
+// 輸出 0,因為 b 和 a 是兩個物件</syntaxhighlight>
+| <syntaxhighlight lang="java">
+System.out.println(b.x);
+// 輸出 0,因為 b 和 a 是兩個物件</syntaxhighlight>
+|-
+| <syntaxhighlight lang="cpp">
+Foo *c;
+// 定義 c 為指向一個 Foo 類物件的指標(初始值是
+// 未定義的;可能指向任何地方)</syntaxhighlight>
+| <syntaxhighlight lang="java">
+Foo c;
+// 定義 c 為一個指向 Foo 物件的指標
+// (如果 c 是一個類的成員,那麼初始值為空;
+// 如果 c 是一個區域變數那麼你在使用之前必須
+// 對它進行初始化)</syntaxhighlight>
+|-
+| <syntaxhighlight lang="cpp">
+c = new Foo();
+// 將 c 綁定為一個新的 Foo 物件的引用</syntaxhighlight>
+| <syntaxhighlight lang="java">
+c = new Foo();
+// 將 c 綁定為一個新的 Foo 物件的引用</syntaxhighlight>
+|-
+| <syntaxhighlight lang="cpp">
+Foo *d = c;
+// 將 d 綁定為和 c 同一個對象的引用</syntaxhighlight>
+| <syntaxhighlight lang="java">
+Foo d = c;
+// 將 d 綁定為和 c 同一個對象的引用</syntaxhighlight>
+|-
+| <syntaxhighlight lang="cpp">
+c->x = 5;
+// 修改 c 指向的對象</syntaxhighlight>
+| <syntaxhighlight lang="java">
+c.x = 5;
+// 修改 c 指向的對象</syntaxhighlight>
+|-
+| <syntaxhighlight lang="cpp">
+a.bar(5);  // 對 a 調用 Foo::bar()
+c->bar(5); // 對 *c 調用 Foo::bar()
+</syntaxhighlight>
+| <syntaxhighlight lang="java">
+a.bar(5); // 對 a 調用 Foo.bar()
+c.bar(5); // 對 c 調用 Foo.bar()
+</syntaxhighlight>
+|-
+| <syntaxhighlight lang="cpp">
+cout << d->x << endl;
+// 輸出 5,因為 d 引用的物件和 c 一樣</syntaxhighlight>
+| <syntaxhighlight lang="java">
+System.out.println(d.x);
+// 輸出 5,因為 d 引用的物件和 c 一樣</syntaxhighlight>
+|}
+* 在 C++ 裡，定義一個指向[[常量|常量]]的指標（唯讀指標）是可能的，也就是說，你不能修改這個指標指向的物件的內容. 函數和方法也都保證不會修改用 "const" 關鍵字的指標指向的物件的內容,是強制{{link-en|常量正確性|const-correctness}}的.  在 Java 裡這是不可能做到的. 你可以定義一個引用為 "final"（就像在 C++ 裡定義一個指標"常量"），但這只是阻止你重新綁定這個引用；你還是可以修改這個 "final" 引用指向的物件的.
+{| class="wikitable"
+! style="width:400px;"| C++
+! style="width:400px;"| Java
+|-
+| <syntaxhighlight lang="cpp">
+const Foo *a; // 你不能通過 a 修改 a 指向的對象</syntaxhighlight>
+|<syntaxhighlight lang="java">
+final Foo a; // 你可以通過 a 修改 a 指向的物件</syntaxhighlight>
+|-
+| <syntaxhighlight lang="cpp">a = new Foo();</syntaxhighlight>
+| <syntaxhighlight lang="java">a = new Foo(); // 只能在構造函數裡</syntaxhighlight>
+|-
+| <syntaxhighlight lang="cpp">a->x = 5;
+// 非法</syntaxhighlight>
+| <syntaxhighlight lang="java">a.x = 5;
+// 合法, 你仍然可以修改這個物件</syntaxhighlight>
+|-
+| <syntaxhighlight lang="cpp">Foo *const b = new Foo();
+// 你可以定義一個 "const" 指標</syntaxhighlight>
+| <syntaxhighlight lang="java">final Foo b = new Foo();
+// 你可以定義一個 "final" 引用</syntaxhighlight>
+|-
+| <syntaxhighlight lang="cpp">b = new Foo();
+// 非法, 你不能對它再次綁定</syntaxhighlight>
+| <syntaxhighlight lang="java">b = new Foo();
+// 非法, 你不能對它再次綁定</syntaxhighlight>
+|-
+| <syntaxhighlight lang="cpp">b->x = 5;
+// 合法,你還是可以修改這個物件</syntaxhighlight>
+| <syntaxhighlight lang="java">b.x = 5;
+// 合法,你還是可以修改這個物件</syntaxhighlight>
+|}
+* C++ 支持 <code>[[GOTO|goto]]</code> 語句；Java 強制[[結構化程式設計|結構化流程控制]]({{lang|en|structured control flow}})，依賴[[break標籤|break標籤]] 和 [[continue標籤|continue標籤]] 語句來提供類似於 </code>goto</code> 的部分功能. 一些評論者指出這些標籤化的流程控制打破了結構化程式設計的單退出點的特點.<ref name="Martin">{{Cite web|url=http://www.objectmentor.com/resources/articles/javacpp.pdf|format=PDF|title=Java vs. C++: A Critical Comparison|author=Robert C. Martin|date=January 1997|access-date=2010-10-21|archive-url=https://web.archive.org/web/20080511205821/http://www.objectmentor.com/resources/articles/javacpp.pdf|archive-date=2008-05-11|dead-url=yes}}</ref>
+* C++ 提供了一些 Java 缺乏的低級特性. 在 C++ 裡，指標可以用來操作特定的記憶體位置，這是在寫低級[[作業系統|作業系統]]模組的時候必須用到的. 類似的，許多 C++ 編譯期支持[[內聯彙編|內聯彙編]]，在 Java 裡，這樣的代碼只能放在外來的庫中，而且在調用的時候只能通過[[JNI|JNI]]來訪問這些外來庫提供的介面.
+
+=== 語意 ===
+* C++ 允許給函數/方法的參數設置預設值，Java 不提供這個特性. 但是[[方法重载|方法重载]]可以達到同樣的效果.
+* C++ 里最小的編譯單位是一個函數；Java 里最小的編譯單位是一個類. 在 C++ 里，函數可以被單獨編譯. 在 Java 里，要編譯和維護單獨的方法需要把它們移到[[超類|超類]]或[[子類|子類]]或者使用其他的[[代碼重構|代碼重構]]的技巧.
+* C++ 允許基本類型之間的一些隱式的轉換，也允許程式設計師對於用戶自定義類型相關的隱式轉換規則. 在 Java 里，只有基本類型之間變寬類型的轉換可以是隱式的；其餘的轉換需要顯式的類型轉換語法.
+** 這造成的一個後果是，雖然在 Java 和 C++ 里循環的條件（<code>if</code>、<code>while</code> 和 <code>for</code> 里的退出条件）預期的都是一個布爾表達式，但 <code>if(a = 5)</code> 這樣的代碼在 Java 里會導致編譯錯誤，因為沒有從整型到布爾的隱式變窄轉換. 如果代碼是 <code>if(a == 5)</code> 的輸錯的情況那麼是很方便發現這個錯誤的. 而目前的 C++ 編譯器一般來說只會針對這種情況產生一個警告.
+* 對於傳參數給函數的情況，C++ 支持[[求值策略#传引用调用|引用傳遞]]和[[求值策略#传值调用|值傳遞]]. 在 Java 里，參數總是值傳遞的.<ref>[[James_Gosling|James Gosling]], [[Bill_Joy|Bill Joy]], [[Guy_L._Steele,_Jr.|Guy Steele]], and [[Gilad_Bracha|Gilad Bracha]], ''The Java language specification'', third edition. Addison-Wesley, 2005. ISBN 0-321-24678-0 (see also [http://java.sun.com/docs/books/jls/third_edition/html/j3TOC.html online edition of the specification] {{Wayback|url=http://java.sun.com/docs/books/jls/third_edition/html/j3TOC.html |date=20120229183526 }}).</ref>  但在 Java 里，所有的非基本類型的值都只是對於對象的引用（用 C++ 的術語來說，它們是智能指針）. 對象在 Java 里不是作為值直接被使用的，只有對象的引用可以被直接操作；習慣於將對象當做值直接使用的 C++ 開發者經常會把這個跟引用傳遞搞混.
+* Java 內建的類型在字節寬度和取值範圍上是被虛擬機定義好的；在 C++ 里，內建的類型有定義一個最小取值範圍，但是其他的部分（字節寬度）可以被映射成具體平台上支持的原生類型.
+** 舉個例子，Java 字符是16位的[[Unicode|Unicode]]字符，字符串是由這樣的字符組成的序列. C++ 提供窄和寬兩種字符，但實際的字符寬度是和平台相關的，視所用的字符集而定. 字符串可以由這兩種字符中的一種組成.
+* 浮點數及其操作的精度和舍入方式在 C++ 里是平台相關的. Java 提供了一個可選的{{link-en|strictfp|strictfp|严格的浮点数模型}}，保證跨平台的一致性，不過可能會導致運行時效率比較差.
+* 在 C++ 里，[[指針|指針]]可以作為內存地址直接操作. Java 沒有指針 — 它只有對象引用和數組引用，這兩者都不允許直接用來訪問內存地址. 在 C++ 里可以構造一個指向指針的指針，而 Java 的引用只能指向對象.
+* 在 C++ 里，指針可以指向函數或者方法（[[函數指針|函數指針]]）. 在在 Java 里的等價物是對象或者接口的引用.
+* 雖然有使用棧內存分配的對象，C++ 還是支持[[RAII|區域資源管理]]，一個用來自動管理內存和其他系統資源的技術，此技術支持確定性對象銷毀(deterministic object destruction). 不過，區域資源管理在 C++ 里是不被保證的；它只是一個設計模式，所以需要依賴程式設計師遵守相關的規則. Java 通過使用[[垃圾回收_(計算基科學)|垃圾搜集]]來支持自動內存管理，但對於其他的系統資源（窗口，通訊埠，執行緒），如果垃圾搜集器無法決定它們是否不再被用到，那通常還是需要顯式的釋放的.
+* C++ 的用戶可自定義[[操作符重载|操作符重载]]的特性在 Java 里是不支持的. 唯一在 Java 里可以重載的操作符是 "<code>+</code>" 和 "<code>+=</code>" 操作符，在字符串里重载为连接字符串.
+* Java 的標準[[應用程序接口|應用程序接口]]支持[[反射式编程|反射]]和[[動態加載|動態加載]]任意代碼.
+* C++ 支持靜態和動態的庫連接.
+* Java 支持[[泛型|泛型]]，其主要目的是提供類型安全的容器. C++ 支持[[模板_(C++)|模板]]，在泛型编程方面提供了更強的支持.
+* Java 和 C++ 都對基本類型（也叫"内建"類型）和用戶自定義類型（也叫"複合"類型）. 在 Java 里，基本類型只有值的語義，複合類型只有引用的語義. 在 C++ 里所有的值都有值語義，可以創建對於任何類型的引用，這樣就允許通過引用語義來操作對象.
+* C++ 支持任意類型的[[多重繼承|多重繼承]]. 在 Java 里一個類只能從單個的類繼承而來，但一個類可以實現多個的[[接口_(Java)|接口]]（換句話說，它支持類型的多重繼承，但對於實現只能單繼承(it supports multiple inheritance of types, but only single inheritance of implementation)）。
+* Java 對於類和接口是顯式區分的. 在 C++ 里多重繼承和純虛函數使得定義出類似於 Java 的接口的類是可能的，不過會有少許區別.
+* Java 在語言和標準庫都對[[多執行緒|多執行緒]]有良好的支持. <code>synchronized</code> 這個 Java 的關鍵字為了支持多執行緒應用提供了簡單而安全的的[[互斥|互斥鎖]]，但同步(synchronized)區只能用 LIFO 的順序離開. Java 也為更高階的多執行緒同步提供了健壯而複雜的庫. 在 C++ 里沒有專門為多執行緒定義的內存模型；但第三方庫提供了和 Java 差不多的功能；不過這些 C++ 庫之間差異較大，一致性不好.
+* C++ 方法可以聲明為[[虚函數_(程序語言)|虚函數]]，虚函數是在運行期根據對象的類型才確定的. C++ 方法缺省情況下不是虚的. 在 Java 里，方法缺省情况下是虚的，但可以使用<code>final</code>關鍵字使之聲明為非虚的.
+* C++ 枚舉屬於基本類型，支持和其他整數類型之間的轉換和比較. Java 枚舉實際上是類的實例（它們從 <code>java.lang.Enum<E></code> 擴展而來），象其他的類一樣可以定義構造函數，數據成員及方法.
+
+=== 資源管理 ===
+* Java 提供了自動化的[[垃圾回收_(計算機科學)|垃圾搜集]]. 在 C++ 里内存管理通常通過構造函數，析構函數以及[[智能指針|智能指針]]。C++ 標準允許垃圾搜集，但並不強制要求；實際使用上垃圾搜集極少被用到. 強制使用自動垃圾搜集導致了在 Java 里編寫[[實時計算|實時軟體]]是困难的.<ref name="Martin"/>
+* C++ 可以申請任意的內存塊.Java 只能通過對象實例化來申請內存. （注意：在 Java 里，程序員可以通過創建一個字節數組模擬申請任意的內存塊. 不過 Java [[數組|數組]]仍然是對象.）
+* Java 和 C++ 在資源管理上使用不同的習語. Java 主要依賴只能回收內存的垃圾搜集機制，因為該機制如果用於回收使用中的非內存的系統資源可能是非常危險的。而 C++ 主要依賴 [[RAII|RAII (资源的获取就是初始化)]]. 這反映了這兩種語言的幾方面的不同：
+** 在 C++ 里在棧里申請複合類型的對象是很平常的，一旦退出棧的範圍就會被銷毀. 在 Java 里複合類型的對象總是在堆里申請的內存，而後被垃圾搜集器搜集（除非在虛擬機裡使用了[[逃逸分析|逃逸分析]]技術來將堆的內存申請轉成棧的.
+** C++ 有析構函數，而 Java 有[[finalizer|finalizer]]({{lang|en|finalizer}}). 兩者都會在對象釋放之前被調用，但是它們有顯著的不同. 一個 C++ 對象的析構函數必須被隱式（棧變量對象的情況）或者顯式地調用來釋放對象. 析構函數在對象釋放之前同步地執行. 同步，協調的反初始化以及釋放在 C++ 里滿足 RAII 的要求. 在 Java 里，對象的釋放是被垃圾搜集器隱式處理的. 一個 Java 對象的 finalizer 在它被最後一次訪問之後和在實際釋放之前的某個時間點被[[異步|異步]]（[[非同步|非同步]]）地調用，這個調用有可能一直不產生. 非常少的對象需要 finalizer；只有那些在釋放前必須保證一些清理工作一定要做的對象來說才是需要的 — 典型的情況是：釋放對 JVM 來說是外部的資源. 在 Java 里，企圖安全同步的釋放某些系統資源，只能用顯式的 try/finally 結構來進行.
+** 在 C++ 里是有可能有一個[[迷途指針|迷途指針]]的 – 過時的對一個已釋放的對象的[[引用_(計算機科學)|引用]]（[[參照|參照]]）；試圖使用一個迷途指針的結果是導致程序錯誤. 在 Java 里，垃圾搜集器不會銷毀一個正在被引用的對象.
+** 在 C++ 里未初始化過的基本類型對象是有可能存在的，Java 强制要做缺省初始化.
+** 在 C++ 里有可能申請了一個對象，但對它沒有任何引用. 這樣的[[不可達對象|不可達對象]]（[[不可訪問內存|不可訪問內存]]）是無法被銷毀的，導致了[[內存泄漏|內存泄漏]]. 作為對比，在 Java 里一個對象不會被回收直到它變得不可達（對於用戶程序來說）. （注意: ''[[弱引用|弱引用]]''([[弱引用|弱引用]]）是被支持的，這個特性讓 Java 的垃圾搜集器能夠識別不同 程度的可達性.）在 Java 里垃圾搜集阻止了很多內存泄漏的情況，但某些情況下泄漏仍然是可能的.<ref>[http://www-128.ibm.com/developerworks/rational/library/05/0816_GuptaPalanki/ "Java memory leaks -- Catch me if you can"] {{Wayback|url=http://www-128.ibm.com/developerworks/rational/library/05/0816_GuptaPalanki/ |date=20120722095536 }} by Satish Chandra Gupta, Rajeev Palanki, IBM DeveloperWorks, 16 Aug 2005</ref>
+** Java 更容易泄漏非內存資源，而 C++ 的慣用做法更不會導致這種泄漏.
+
+=== 库 ===
+* C++ 对于许多平台相关的特性提供了[[跨平台|跨平台]]的访问方式. 从 Java 到原生的操作系统和硬件相关的函数的直接访问需要用到[[JNI|JNI]]([[Java本地接口|Java本地接口]]).
+
+=== 運行時 ===
+* C++ 通常來說會直接被编译成[[机器码|机器码]]，被[[操作系统|操作系统]]直接执行. Java 通常会被编译成[[字节码|字节码]]，被[[Java虚拟机|Java虚拟机]]和[[解释器|解释器]]或者[[即时编译|即时编译器]]编译成机器码然后执行.
+* 因为表达方式不受限制，低级的 C++ 语言特性（例如：不被检查的数组访问，原始指针，[[类型双关语|类型双关语]]({{link-en|type punning|type punning}})不能在编译期间或者运行期间可靠地被检查. 相关的编程错误会导致低级的[[缓存溢出|缓存溢出]]和[[段错误|段错误]]（[[記憶體區段錯誤|記憶體區段錯誤]]）. [[标准模板库|标准模板库]] 提供了高级的抽象（例如 vector,list 和 map）来帮助避免这样的错误.在 Java 里，低级错误不会发生或者会被[[JVM|JVM]]检测到并以[[异常|异常]]的形式报告给应用.
+* Java 语言在越界访问数组的时候一般来说会对数组进行[[边界检查|边界检查]]({{lang|en|bounds checking}}). 这消除了导致程序不稳定的一个可能因素，但这是以执行速度更慢一些作为代价的. 在一些情况下,[[编译器分析|编译器分析]]({{link-en|compiler analysis|compiler analysis}})可以检测到不必要的边界检查并去掉. C++ 对于原生数组的越界访问没有要求特定的处理，所以需要对于原生数组确认不越界. 但C++ 标准库里的一部分库象 std::vector 也提供了可选的边界检查. 总的来说，Java 数组是"总是安全；严格限制；开销较多" ，而 C++ 原生数组是"可选的开销； 完全不限制；有潜在的不安全."
+
+=== 模板 vs. 泛型 ===
+C++ 和 Java 都提供[[泛型|泛型编程]]的能力，分别是[[模板_(C++)|模板]] 和 [[Java的泛型|泛型]]({{link-en|Generics in Java|Generics in Java}}). 虽然它们被创造用来解决类似的问题，有类似的语法，但实际上很不一样.
+
+:{| class="wikitable"
+! C++ 模板
+! Java 泛型
+|-
+| 类和函数都可以使用模板.
+| 类和方法都可以使用泛型.
+|-
+| 参数可以是任意类型或者整型.
+| 参数只能是能被引用的类型（非基本类型）.
+|-
+| 在编译的时候对于每种类型生成类或者函数的拷贝.
+| 对于所有类型的参数，只有一个版本的类或者函数生成.
+|-
+| 同一个类用不同类型生成的对象在运行期也是不同类型的
+| 编译完成以后类型参数的类型是被消除的；同一个类用不同类型参数生成的对象在运行期是相同类型的.
+|-
+| 想要用到模板类或者函数的实现代码的话必须 include 它（只是声明是不够的）.
+| 有一个编译好的类文件里的类或者函数的签名就足以使用泛型了
+|-
+| 模板可以被具体化 -- 可以为某个特定的模板参数提供单独的实现.
+| 泛型不能被具体化.
+|-
+| 模板参数可以有[[缺省参数|缺省参数]]({{lang|en|default argument}})（只针对对于模板类，模板函数是没有此特性的）.
+| 泛型类参数无法拥有缺省参数.
+|-
+| 不支持通配符. 返回的类型经常是嵌套的 typedef 形式的.
+| 如果只用一次,那么支持通配符作为类型参数.
+|-
+| 不直接支持设置类型参数的边界（即，不允许说明类型参数必须为某个类型的子类/父类），但[[模板超编程|超编程]]提供了这个特性<ref>{{Cite web |url=http://www.boost.org/libs/type_traits/doc/html/boost_typetraits/reference.html |title=Boost type traits library<!-- Bot generated title --> |accessdate=2010-10-21 |archive-date=2008-12-02 |archive-url=https://web.archive.org/web/20081202191101/http://www.boost.org/libs/type_traits/doc/html/boost_typetraits/reference.html |dead-url=no }}</ref>
+| 支持类型参数边界，分别以 "extends" 和 "super" 来定义上界和下界；同时允许定义类型参数之间的继承关系
+|-
+| 允许生成有参模板的类的实例（如 foo = new Foo<T>, T 为参数）
+| 不允许生成有参模板类的实例（除非使用[[反射式编程|反射]]）
+|-
+| 泛型类的类型参数无法用在 static 方法和变量上.
+|-
+| static 变量不在在不同的类型参数生成的类之间共享.
+| static 变量在不同类型参数生成的类的对象之间是共享的.
+|-
+| 泛型类和函数在声明时不强制类参数的类限制. 使用错误的类参数会导致模板代码"不工作". 值得注意的是，如果使用了错误的参数，则错误信息将出现在定义模板的代码处（而非调用模板的代码处）， 说明 "不支持以该类型作为参数来实例化模板". 这种错误信息往往难以帮助人们找出真正的问题所在（编程时究竟使用了何种 "错误的" 参数）. 因此，模板类或者函数的正确使用更依赖于正确的文档. [[模板超编程|超编程]]以额外的代价提供了这些特性.
+| 泛型类和函数在声明的时候强制了类参数的类限制(Generic classes and functions can enforce type relationships for type parameters in their declaration). 使用一个错误的参数会在使用它的时候导致一个类错误. 在泛型代码里操作和参数化类型只能按声明的时候保证安全的方式来使用. 这用失去弹性的代价来换取好得多的类型方面的安全性.
+|-
+| 模板是[[图灵完全|图灵完全]]的（参见 [[模板超编程|模板超编程]]）.
+| 泛型不是图灵完全的.
+|}
+
+=== 杂项 ===
+* Java 和 C++ 在使代码在不同的文件分开方面使用了不同的技术. Java 使用了一个包系统，这个系统对所有的程序都要指定了文件名和路径. 在 Java 里，编译器负责导入可执行的类文件. C++ 使用了[[头文件|头文件]][[源代码|源代码]]的包含系统来在不同的文件共享声明.
+* 编译好的 Java 代码一般来说比 C++ 文件小，因为[[Java字节码|Java字节码]]({{lang|en|Java bytecode}})一般来说比机器码要更紧凑{{Citation needed|date=February 2007}}，Java 程序都不是静态链接的.
+* C++ 编译多了一个文本[[预处理器|预处理]]过程，Java 是没有的. 因此一些使用者在他们的编译过程之前增加了一个预处理的过程，这样能更好的支持需要条件编译的情况.
+* 两个语言里[[数组|数组]]都是定长的. 在 Java 里，数组是[[頭等对象|頭等对象]]，而在 C++ 里它们只是它们的基本类型元素的连续的序列，经常用一个指向第一个元素的指针和一个可选的长度来引用. 在 Java 里，数组是被边界检查的，而且知道它们的长度，而在 C++ 里你可以将任意的序列当成一个数组. C++ 和 Java 都提供了相关的容器类（分别为'''std::vector''' 和 '''java.util.ArrayList'''），可以改变大小.
+* Java 的除法和模除操作符是定义成零截断的. C++ 没有定义这两个操作符是零截断的还是"负无穷截断"的. 在 Java 里-3/2 总是得到 -1，但一个 C++ 编译器可能会返回 -1 或 -2，视平台而定. [[C99|C99]] 定义了和 Java 一样的除法方式. 两种语言都保证对于所有的 a 和 b(b!=0)（当 a 和 b都是整型的时候）<code>(a/b)*b + (a%b) == a</code>. C++ 版本有时候会更快，因为它允许直接使用处理器的截断方式.
+* 整型的长度在 Java 里是已定义好的(int 为 32-bit, long 为 64-bit)，而在 C++ 里整型和指针的长度是和编译器以及[[应用二进制接口|应用二进制接口]]相关的. 因此仔细编写的 C++ 代码可以利用64位处理器的能力而又可以在32位处理器上工作. 但是需要很仔细的用可移植的方式编写. 作为对比，Java 的固定整型大小使得程序员无法做到这样，没办法利用处理器的字长会导致 Java 在64位处理器上表现较差.
+
+== 性能 ==
+想运行一个编译好的 Java 程序，计算机上要运行[[JVM|JVM]]；而编译好的 C++ 程序不需要额外的应用。比较早期的 Java 版本在性能上比静态编译的语言如 C++ 差得很多，这是因为用 C++ 是直接编译成一些机器指令，而当 Java 编译成字节码以后用 JVM 解释执行的时候又牵涉了不少额外的机器指令。
+例如：
+{| class="wikitable"
+! Java/C++ 语句
+! C++ 生成的代码 (x86)
+! Java 生成的字节码
+|-
+| vector[i]++;
+| mov edx,[ebp+4h]<br/>
+mov eax,[ebp+1Ch]<br/>
+inc dword ptr [edx+eax*4]
+| aload_1<br/>
+iload_2<br/>
+dup2<br/>
+iaload<br/>
+iconst_1<br/>
+iadd<br/>
+iastore
+|}
+
+C++ 在大部分的情况下都比 Java 要快，<ref>{{Cite web
+| author=Cherrystone Software Labs
+| title=Algorithmic Performance Comparison Between C, C++, Java and C# Programming Languages
+| url=http://www.cherrystonesoftware.com/doc/AlgorithmicPerformance.pdf
+| date=2010-03-29
+| accessdate=2010-08-24
+| deadurl=yes
+| archiveurl=https://web.archive.org/web/20100331155325/http://www.cherrystonesoftware.com/doc/AlgorithmicPerformance.pdf
+| archivedate=2010-03-31
+}}</ref>
+有几个数值方面的基准测试的研究争辩说 Java 在某些情况下可能会比 C++ 的性能好得多。<ref>{{Cite web
+| last=Bruckschlegel
+| first=Thomas
+| title=Microbenchmarking C++, C# and Java
+| url=http://www.ddj.com/184401976
+| publisher=Dr. Dobbs
+| date=2005-06-17
+| accessdate=2010-10-24
+| archive-date=2007-04-29
+| archive-url=https://web.archive.org/web/20070429184629/http://www.ddj.com/184401976
+| dead-url=no
+}}</ref><ref>[http://scribblethink.org/Computer/javaCbenchmark.html "Performance of Java versus C++"] {{WebCite|url=https://www.webcitation.org/67NAmMY1x?url=http://scribblethink.org/Computer/javaCbenchmark.html |date=20120503012337 |dateformat=iso }} by J.P. Lewis and Ulrich Neuman, USC, Jan. 2003 (updated 2004)</ref><ref>[http://trs-new.jpl.nasa.gov/dspace/bitstream/2014/18351/1/99-1827.pdf "Java will be faster than C++"] {{Wayback|url=http://trs-new.jpl.nasa.gov/dspace/bitstream/2014/18351/1/99-1827.pdf |date=20100527193426 }} by Kirk Reinholtz, JPL, Apr 2001</ref> 但有人说数值方面的基准测试对于语言的评估是不合适的，因为编译器都可以做相关的优化，甚至可能将被测试的代码彻底删除。<ref>{{Cite web |url=http://www.ibm.com/developerworks/java/library/j-jtp02225.html#2.0 |title=存档副本 |accessdate=2010-10-21 |archive-date=2014-04-27 |archive-url=https://web.archive.org/web/20140427115636/http://www.ibm.com/developerworks/java/library/j-jtp02225.html#2.0 |dead-url=no }}</ref><ref>{{Cite web |url=http://www.irrlicht3d.org/pivot/entry.php?id=446 |title=存档副本 |accessdate=2010-10-21 |archive-date=2020-04-20 |archive-url=https://web.archive.org/web/20200420042847/http://www.irrlicht3d.org/pivot/entry.php?id=446 |dead-url=no }}</ref><ref>[http://bruscy.republika.pl/pages/przemek/java_not_really_faster_than_cpp.html "Java (not really faster) than C++ benchmark] {{Wayback|url=http://bruscy.republika.pl/pages/przemek/java_not_really_faster_than_cpp.html |date=20171127213414 }} illustrates</ref> 如果涉及到一个真正现实应用的程序，Java 会因为很多原因导致性能变差：<ref>{{cite web |url=http://www.jelovic.com/articles/why_java_is_slow.htm |title=存档副本 |accessdate=2008-02-15 |deadurl=yes |archiveurl=https://web.archive.org/web/20080211111923/http://www.jelovic.com/articles/why_java_is_slow.htm |archivedate=2008-02-11 }}</ref><ref>{{Cite web |url=http://warp.povusers.org/grrr/java.html |title=存档副本 |accessdate=2010-10-21 |archive-date=2020-11-08 |archive-url=https://web.archive.org/web/20201108102751/http://warp.povusers.org/grrr/java.html |dead-url=no }}</ref><ref>{{cite journal | url=http://page.mi.fu-berlin.de/prechelt/Biblio//jccpprtTR.pdf | title=An empirical comparison of C, C++, Java, Perl, Python, Rexx, and Tcl for a search/string-processing program | page=18 | journal= | access-date=2012-12-13 | archive-date=2020-10-26 | archive-url=https://web.archive.org/web/20201026204936/http://page.mi.fu-berlin.de/prechelt/Biblio/jccpprtTR.pdf | dead-url=no }}</ref>
+* 所有的对象都在堆里被申请。对于使用小对象的函数来说会导致很大的性能损失，因为在栈里申请内存几乎没有性能损失。
+* 方法缺省是虚的。这对于小对象来说会因为虚表增加好几倍的内存使用。它也会引起性能损失，因为 JIT 编译器不得不对查虚表的过程做额外的优化。
+* 即使使用标准的容器依然会有很多的类型转换，这会引起性能损失，因为需要遍历整个继承树。
+* 虚拟机更进一步增加了内存的使用，因此降低了内存的局部性，增加了缓存命中失败率，从而导致整个程序变慢。
+* 缺乏低级细节的操作方式使得开发者无法将程序进一步优化，因为编译器不支持。<ref>{{cite journal | first =Nathan | last = Clark | coauthors = Amir Hormati, Sami Yehia, Scott Mahlke
+| title = Liquid SIMD: Abstracting SIMD hardware using lightweight dynamic mapping | journal = HPCA’07 | pages=216–227 | year = 2007}}</ref>
+
+有人争论说，和 Java 相比 C++也有很多劣势：
+
+* 指针使得优化变得困难，因为它们可能指向任意的数据。当然现在这一点也并非完全正确，因为一些现代的编译器引入了 "严格别名" 的规则 <ref>{{Cite web |url=http://cellperformance.beyond3d.com/articles/2006/06/understanding-strict-aliasing.html |title=存档副本 |accessdate=2010-10-21 |archive-date=2013-05-08 |archive-url=https://web.archive.org/web/20130508212125/http://cellperformance.beyond3d.com/articles/2006/06/understanding-strict-aliasing.html |dead-url=no }}</ref> 并且支持 [[C99|C99]] 的关键字 ''[[restrict|restrict]]''，从而严格限制了指针的使用，使其只能用于指向已知的变量 <ref>{{Cite web |url=http://www.cellperformance.com/mike_acton/2006/05/demystifying_the_restrict_keyw.html |title=Demystifying the Restrict Keyword |access-date=2010-10-21 |archive-url=https://web.archive.org/web/20080619120934/http://www.cellperformance.com/mike_acton/2006/05/demystifying_the_restrict_keyw.html |archive-date=2008-06-19 |dead-url=yes }}</ref>
+* Java 的[[垃圾回收_(计算机科学)|垃圾搜集]]和使用''[[malloc|malloc]]''/''[[new_(C++)|new]]''来申请内存相比能拥有更好的缓存连贯性，因为它的申请一般来说是顺序的。然而，始终有争论认为二者同样会导致内存的“零碎化”（即多次分配和回收之后内存空间会变得不连续），且并没有哪一个比对方有更明显的缓存优势。
+* 运行时编译可能可以更好的优化代码，因为可以利用运行时的额外的信息，例如知道代码是在什么样的处理器上运行。然而当今的情况也并非完全如此，因为目前最先进的 C++ 编译器也会针对不同系统生成不同的目标代码，以期充分利用该系统的计算能力 <ref>{{Cite web |url=http://www.slac.stanford.edu/comp/unix/.../icc/.../optaps_dsp_qax.htm |title=Targeting IA-32 Architecture Processors for Run-time Performance Checking |access-date=2010-10-21 |archive-date=2020-09-29 |archive-url=https://web.archive.org/web/20200929080449/https://www.slac.stanford.edu/comp/unix/.../icc/.../optaps_dsp_qax.htm |dead-url=yes }}</ref>
+
+此外，有争议的是，花在更复杂的 C++ 代码上的 debug 时间太多，用 Java 开发完全可以把这些时间用来优化 Java 代码。当然对于一个给定的程序来说两种语言能优化到什么程度也是一方面。最后，对于处理器负担很重的情况，例如视频渲染，C++ 能直接访问硬件，在同样一个硬件规格下 C++ 总是会比 Java 的表现好很多。
+
+== 所有权控制 ==
+C++不是任何一个公司或者组织的商标，不被任何个人拥有。<ref>{{Cite web |url=http://www.research.att.com/~bs/bs_faq.html#revenues |title=Bjarne Stroustrup's FAQ: Do you own C++? |accessdate=2010-10-21 |archive-date=2008-06-17 |archive-url=https://web.archive.org/web/20080617183013/http://www.research.att.com/~bs/bs_faq.html#revenues |dead-url=no }}</ref>
+Java原是[[Sun|Sun]]的商标，现在由[[甲骨文公司|甲骨文公司]]拥有。<ref>[http://blogs.zdnet.com/BTL/?p=16598 ZDNet: Oracle buys Sun; Now owns Java] {{Wayback|url=http://blogs.zdnet.com/BTL/?p=16598 |date=20100410145901 }}.</ref>
+
+C++语言由 ''ISO/IEC 14882'' 定义，是一个[[ISO|ISO]]标准，由 ''ISO/IEC JTC1/SC22/WG21'' 委员会发布。
+Java语言由 ''Java Language Specification'' 定义，这是一本Sun公司（已被甲骨文收購）出版的书。<ref>{{Cite web |url=http://docs.oracle.com/javase/specs/ |title=Java SE Specifications |accessdate=2014-09-04 |archive-date=2021-02-01 |archive-url=https://web.archive.org/web/20210201164010/https://docs.oracle.com/javase/specs/ |dead-url=no }}</ref>
+
+== 其他 ==
+两者的对象访问格式也不一样。
+
+== 参考文献 ==
+{{Reflist|32em}}
+
+== 外部链接 ==
+{{wikibooks|C++ Programming|Programming Languages/Comparisons/Java}}
+* [https://web.archive.org/web/20101103032846/http://task3.cc/289/object-oriented-memory-management/ Java and C++ Memory Management] — 一本详尽的关于面向对象内存管理方面的出版物,在内存模型上对 Java 和 C++ 做了比较.
+* [https://web.archive.org/web/20020402093228/http://www.ora.com/catalog/javanut/excerpt/index.html#except How Java Differs from C] — excerpt from [[Java_in_a_Nutshell|Java in a Nutshell]] by [[David_Flanagan|David Flanagan]]
+* [https://web.archive.org/web/20070523171523/http://www.fatalmind.com/papers/java_vs_cplusplus/resource.html Java vs. C++ resource management comparison] - 一份有例子的综合论文
+* [https://web.archive.org/web/20100630201919/http://www.azulsystems.com/blog/cliff-click/2009-09-06-java-vs-c-performanceagain Java vs C performance... again...] - 深入讨论 Java 和 C++ 性能方面的差别
+
+{{DEFAULTSORT:Comparison Of Java And C++}}
+[[Category:程序语言比较|Category:程序语言比较]]
+[[Category:Java|Category:Java]]
+[[Category:C++|Category:C++]]

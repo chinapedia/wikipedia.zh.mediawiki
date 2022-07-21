@@ -1,0 +1,97 @@
+{{NoteTA
+|G1=IT
+|1=zh-cn:解释器;zh-tw:直譯器;
+}}
+{{Infobox file format
+| icon = [[File:JSONP_logo.png|File:JSONP logo.png]]
+| mime = application/json-p
+| extension = .jsonp
+| genre = 数据交换
+| extended from = [[JSON|JSON]]与[[JavaScript|JavaScript]]
+| standard = RFC 7159, RFC 4329
+| url = {{URL|http://www.json-p.org/}}<br />(失效链接，参见[https://web.archive.org/web/20160304044218/http://www.json-p.org/ 网页存档])
+}}
+'''JSONP'''（'''JSON with Padding'''）是資料格式[[JSON|JSON]]的一種“使用模式”，可以讓網頁從別的網域获取資料。另一個解決這個問題的新方法是[[跨來源資源共享|跨來源資源共享]]。
+
+由於[[同源策略|同源策略]]，一般來說位於server1.example.com的網頁無法與
+server2.example.com的伺服器溝通，而[[HTML|HTML]]的
+[[HTML元素#script_tag|<code><script></code>]]元素是一個例外。利用
+[[HTML元素#script_tag|<code><script></code>]]元素的這個開放策略，網頁可以得到從其他來源動態產生的JSON資料，而這種使用模式就是所謂的
+JSONP。用JSONP抓到的資料並不是JSON，而是任意的JavaScript，用
+JavaScript直譯器執行而不是用JSON解析器解析。
+
+== 原理 ==
+
+為了理解這種模式的原理，先想像有一個回傳JSON文件的URL，而JavaScript
+程式可以用[[XMLHttpRequest|XMLHttpRequest]]跟這個URL要資料。假設我們的URL是
+<nowiki>http://server2.example.com/RetrieveUser?UserId=xxx</nowiki> 。假設小明的UserId
+是1823，且當瀏覽器透過URL傳小明的UserId，也就是抓取<nowiki>http://server2.example.com/RetrieveUser?UserId=1823</nowiki>，得到：
+
+<syntaxhighlight lang="javascript">
+   {"Name": "小明", "Id" : 1823, "Rank": 7}
+</syntaxhighlight>
+
+這個JSON資料可能是依據傳過去URL的查詢參數動態產生的。
+
+這個時候，把
+[[HTML元素#script_tag|<code><script></code>]]元素的src屬性設成一個回傳JSON的URL是可以想像的，這也代表從HTML頁面透過script元素抓取
+JSON是可能的。
+
+然而，一份JSON文件並不是一個JavaScript程式。為了讓瀏覽器可以在
+[[HTML元素#script_tag|<code><script></code>]]元素執行，從src裡URL
+回傳的必須是可執行的JavaScript。在JSONP的使用模式裡，該URL回傳的是由函數呼叫包起來的動態生成JSON，這就是JSONP的“填充（padding）”或是“前輟（prefix）”的由來。
+
+慣例上瀏覽器提供[[回調函數|回調函數]]的名稱當作送至伺服器的請求中命名查詢參數的一部份，例如：
+
+<syntaxhighlight lang="html4strict">
+ <script type="text/javascript"
+         src="http://server2.example.com/RetrieveUser?UserId=1823&jsonp=parseResponse">
+ </script>
+</syntaxhighlight>
+
+伺服器會在傳給瀏覽器前將JSON数据填充到回调函数（parseResponse）中。瀏覽器得到的回應已不是單純的資料敘述而是一個腳本，这样浏览器就可以调用该函数进行处理。在本例中，瀏覽器得到的是：
+
+<syntaxhighlight lang="javascript">
+   parseResponse({"Name": "小明", "Id" : 1823, "Rank": 7})
+</syntaxhighlight>
+
+== 填充 ==
+
+雖然這個填充（前輟）“通常”是瀏覽器執行背景中定義的某個回調函數，它也可以是變數賦值、if敘述或者是其他JavaScript敘述。JSONP要求（也就是使用JSONP模式的請求）的回應不是JSON也不被當作JSON解析——回傳內容可以是任意的運算式，甚至不需要有任何的JSON，不過慣例上填充部份還是會觸發函數调用的一小段JavaScript片段，而這個函數呼叫是作用在JSON格式的資料上的。
+
+另一種說法—典型的JSONP就是把既有的JSON API用函數呼叫包起來以達到跨域存取的解法。
+
+== Script元素“注入”==
+
+為了要啟動一個JSONP呼叫（或者說，使用這個模式），你需要一個script
+元素。因此，瀏覽器必須為每一個JSONP要求加（或是重用）一個新的、有所需
+src值的
+[[HTML元素|<code><script></code>]]元素到HTML DOM裡—或者說是「注入」這個元素。瀏覽器執行該元素，抓取src裡的URL，並執行回傳的
+JavaScript。
+
+也因為這樣，JSONP被稱作是一種“讓使用者利用script元素注入的方式繞開同源策略”的方法。
+
+== 安全問題 ==
+
+使用遠端網站的script標籤會讓遠端網站得以注入'''任何'''的內容至網站裡。如果遠端的網站有JavaScript注入漏洞，原來的網站也會受到影響。
+
+現在有一個正在進行計畫在定義所謂的[https://web.archive.org/web/20160304044218/http://www.json-p.org/ JSON-P嚴格安全子集]，使瀏覽器可以對MIME類別是“application/json-p”請求做強制處理。如果回應不能被解析為嚴格的JSON-P，瀏覽器可以丟出一個錯誤或忽略整個回應。
+
+== 跨站请求伪造 ==
+
+粗略的JSONP部署很容易受到[[跨站请求伪造|跨站请求伪造]]（CSRF/XSRF）的攻擊<ref>{{cite web |url=http://jeremiahgrossman.blogspot.com/2006/01/advanced-web-attack-techniques-using.html |title=Advanced Web Attack Techniques using GMail |first=Jeremiah |last=Grossman |date=2006-01-27 |accessdate=2009-07-03 |language=en |archive-date=2013-01-17 |archive-url=https://www.webcitation.org/6Djo5ri6Y?url=http://jeremiahgrossman.blogspot.com/2006/01/advanced-web-attack-techniques-using.html |dead-url=no }}</ref>。因為HTML [[HTML元素#script_tag|<code><script></code>]]標籤在瀏覽器裡不遵守[[同源策略|同源策略]]，惡意網頁可以要求並取得屬於其他網站的JSON資料。當使用者正登入那個其他網站時，上述狀況使得該惡意網站得以在惡意網站的環境下操作該JSON資料，可能洩漏使用者的密碼或是其他敏感資料。
+
+只有在該JSON資料含有不該洩漏給第三方的隱密資料，且伺服器僅靠瀏覽器的同源策略阻擋不正常要求的時候這才會是問題。若伺服器自己決定要求的專有性，並只在要求正常的情況下輸出資料則沒有問題。只靠[[Cookie|Cookie]]並不夠決定要求是合法的，這很容易受到[[跨站请求伪造|跨站请求伪造]]攻擊。
+
+== 歷史 ==
+
+2005年夏天，喬治·詹姆提（George Jempty）建議在JSON前面選擇性的加上變數賦值<ref>{{cite web |url=http://htmatters.net/htm/1/2005/07/evaling-JSON.cfm |title=eval'ing JSON |date=2005-07-19 |language=en |deadurl=yes |archiveurl=https://web.archive.org/web/20060212113746/http://htmatters.net/htm/1/2005/07/evaling-JSON.cfm |archivedate=2006-02-12 |accessdate=2011-06-27 }}</ref><ref>{{cite web|url=http://tech.groups.yahoo.com/group/json/message/82|title=json : Message: Re: Comments|date=2005-08-17|language=en|deadurl=yes|archive-url=https://web.archive.org/web/20081022182148/http://tech.groups.yahoo.com/group/json/message/82|archive-date=2008-10-22|accessdate=2011-06-27}}</ref>。鮑勃·伊波利托（Bob Ippolito）於2005年12月提出了JSONP最原始的提案，其中填充部份已經是回調函數<ref>{{cite web |url=http://bob.pythonmac.org/archives/2005/12/05/remote-json-jsonp/ |work=from __future__ import * |title=Remote JSON - JSONP |publisher=Bob.pythonmac.org |date=2005-12-05 |accessdate=2008-09-08 |language=en |deadurl=yes |archiveurl=https://web.archive.org/web/20091204053053/http://bob.pythonmac.org/archives/2005/12/05/remote-json-jsonp/ |archivedate=2009-12-04 |df= }}</ref>，而現在已有很多[[Web_2.0|Web 2.0]]應用程式使用這份提案，像是[[Dojo_Toolkit|Dojo Toolkit]]應用程式、[[Google_Web_Toolkit|Google Web Toolkit]]應用程式<ref>{{cite web |url=http://www.gwtapps.com/?p=42 |title=GWT Tutorial: How to Read Web Services Client-Side with JSONP |date=February 6, 2008 |work=Google Web Toolkit Applications |accessdate=2009-07-03 |language=en |deadurl=yes |archiveurl=https://www.webcitation.org/6Djo88laj?url=http://www.gwtapps.com/?p=42 |archivedate=2013-01-17 }}</ref>與[[Web服務|Web服務]]。
+
+== 參考文獻 ==
+{{Reflist|2}}
+
+== 外部連結 ==
+* {{cite web|language=en|url=http://www.json-p.org/|title=JSONP首頁|archiveurl=https://web.archive.org/web/20160304044218/http://www.json-p.org/|deadurl=yes|archivedate=2016-03-04|accessdate=2011-06-27}}
+
+[[Category:AJAX|Category:AJAX]]
+[[Category:JSON|Category:JSON]]

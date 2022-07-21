@@ -1,0 +1,223 @@
+{{noteTA
+|G1=IT
+}}
+
+'''控制流程'''（也稱為'''流程控制'''）是[[電腦運算|電腦運算]]領域的用語，意指在[[電腦程式|程式]]執行時，個別的指令（或是[[陳述_(程式)|陳述]]、[[子程序|子程序]]）{{le|執行|Execution (computing)}}或求值的順序<!--微處理器原理與應用: C語言與PIC18微控制器，曾百由，p71，http://books.google.com.tw/books?id=YZwim28cfD0C&pg=PA71&dq=%22%E6%8E%A7%E5%88%B6%E6%B5%81%E7%A8%8B%22%E8%AA%9E%E8%A8%80&hl=zh-TW&ei=ANJ3Tba6CY7fcbz37PwE&sa=X&oi=book_result&ct=result&resnum=1&ved=0CEgQ6AEwAA#v=onepage&f=false-->。不論是在[[宣告式編程|宣告式程式語言]]或是[[函數程式語言|函數程式語言]]中，都有類似的概念。
+
+在宣告式的[[程式語言|程式語言]]中，'''流程控制指令'''是指會改變程式執行順序的指令，可能是執行不同位置的指令，或是在二段（或多段）程式中選擇一個執行。
+
+不同的程式語言所提供的流程控制指令也會隨之不同，但一般可以分為以下四種：
+* 繼續執行位在不同位置的一段指令（無條件分支指令）。
+* 若特定條件成立時，執行一段指令，例如C語言的switch指令，是一種有條件分支指令。
+* 執行一段指令若干次，直到特定條件成立為止，例如C語言的for指令，仍然可視為一種有條件分支指令。
+* 執行位在不同位置的一段指令，但完成後會繼續執行原來要執行的指令，包括[[子程序|子程序]]、[[协程|协程]]（coroutine）及[[计算续体|计算续体]]（continuation）。
+* 停止程式，不執行任何指令（無條件的終止）。
+
+[[中斷|中斷]]以及[[Unix|Unix]]系統中的[[信号_(计算机科学)|信号]]等較低階的機制也可以造成類似子程序的效果，不過通常這類機制會用來回應外部的事件或是輸入。[[程序自修改|程序自修改]]因為其對程式碼的影響，也會影響控制流程，但多半不會有明顯的流程控制指令。
+
+在[[机器语言|机器语言]]或[[汇编语言|汇编语言]]中，流程控制是藉由修改[[程式計數器|程式計數器]]數值來達到。一些[[中央處理器|中央處理器]]只支援條件[[分支_(計算機科學)|分支]]（branch）或是無條件分支（有時會稱為jump）。
+
+==基本概念==
+===標記===
+<!---{{main|標記 (程式語言)}}--->
+[[標記_(程式語言)|標記]]是一個標示在[[源代码|源代码]]固定位置中的名稱或數字，其他位置的流程控制指令可以參考標記的位置，執行標記位置所對應的程式。標記本身不影響程式的進行，除了標示位置外，對程式執行沒有其他的作用。
+
+有一些程式語言（像[[Fortran|Fortran]]及[[BASIC|BASIC]]等）利用[[行號_(程式語言)|行號]]作為標記。行號是標示在每一行程式最前面的[[自然數|自然數]]，不一定要是連續的數字，在不受流程控制指令影響的情形下，程式會從最小的行號依序執行，而流程控制指令需指定對應的行號。以下是一個BASIC的例子:
+
+<syntaxhighlight lang="qbasic">
+10 LET X = 3
+20 PRINT "*"
+30 LET X = X - 1
+40 IF X > 0 THEN GOTO 20
+50 END
+</syntaxhighlight>
+
+在像是[[C语言|C]]及[[Ada|Ada]]等程式語言中，標記是一個[[標識符|標識符]]，一般出現在一行的最前面，後面會加一個[[冒號|冒號]]作為識別，以下是C語言的例子：
+
+<syntaxhighlight lang="c">
+Success: printf ("The operation was successful.\n");
+</syntaxhighlight>
+
+[[Algol_60|Algol 60]]語言同時支持整數（類似行號）及標識符的標記（二者後面都要加上冒號），不過其他Algol語言幾乎都不支援整數的標記。
+
+===Goto===
+{{main|Goto}}
+
+goto 指令（來自英文[[wiktionary:go|go]]和[[wiktionary:to|to]]的組合）是無條件流程控制指令中最基本的型式。一般在程式中會用以下的方式出現（指令大小寫可能會依程式語言而不同）
+
+    '''goto''' ''label''
+goto 指令的效果是調整程式的控制流程，後續就執行標記位置的程式。
+
+goto 指令是許多的计算机科学家[[視為有害|視為有害]]的指令，像荷兰计算机科学家[[艾茲格·迪科斯徹|艾茲格·迪科斯徹]]（Edsger Wybe Dijkstra）就提出了[[goto有害論|goto有害論]]<ref name="dijkstra1968">{{cite journal 
+| author = [[Edsger_Dijkstra|Edsger Dijkstra]] 
+| url = http://www.cs.utexas.edu/users/EWD/ewd02xx/EWD215.PDF 
+| format = PDF 
+| title = Go To Statement Considered Harmful 
+| journal = Communications of the ACM 
+| volume = 11 
+| issue = 3 
+| pages = 147–148 
+| doi = 10.1145/362929.362947 
+| date = March 1968 
+| access-date = 2011-02-23 
+| archive-date = 2014-05-13 
+| archive-url = https://web.archive.org/web/20140513014557/http://www.cs.utexas.edu/users/EWD/ewd02xx/EWD215.PDF 
+| dead-url = no 
+}}</ref>。
+
+===子程序===
+
+{{main|子程序}}
+
+[[子程序|子程序]]（subroutine）可以用許多不同的術語來表示，例如程序、函數（尤其是有傳回值時）或是[[方法_(電腦科學)|方法]]（特別是子程序屬於一個[[类_(计算机科学)|类]]的一部份）等。
+
+子程序是是完成一项特定工作的代码序列，其他程式可以將流程移轉到子程序中，執行特定工作後再回到原來的程式，若程式中有許多部份都需要執行一特定工作，利用子程序的方式可以利用一段程式達到上述的功能，可以減少程式碼的長度。
+
+如今子程序也常用來使得程式更加的結構化，例如可以將一些特殊的演算法或特殊的資料存取方式放在子程序中，和其他代碼隔離。子程序也是程式[[模組_(程式設計)|模組]]的一種，若許多程式設計師共同開發一個程式，子程序也有助於其工作的分割及分工。
+
+==最簡結構化控制流程==
+
+{{See also|結構化程式理論}}
+1966年5月Corrado Böhm及Giuseppe Jacopini在《Communications of the ACM》期刊發表論文<ref>Böhm, Jacopini. "Flow diagrams, turing machines and languages with only two formation rules" Comm. ACM, 9(5):366-371, May 1966.</ref>，說明任何一個有goto指令的程式，可以改為完全不使用goto指令的程式，goto指令可以用選擇指令（IF THEN ELSE）及迴圈（WHILE 特定條件 DO 特定程序）取代，可能會再多一些重覆的程式碼及額外的布林變數。後來的研究者已證明選擇指令也可以用迴圈取代，不過需要更多的布林變數。Böhm及Jacopini的論文說明程式可以完全不使用goto，但是在實務上大家不一定會想要這麼進行。
+
+其他的研究說明若控制結構只有一個進入點（entry）及一個結束點（exit），這樣的程式會比其他型式的程式容易理解。因此這樣的程式可以像一個指令一樣放在程式的任何部份，不必擔心會破壞其結構，換句話說，這種程式是「可组成的」（composable）。<!--（後來的發展）(Later developments, such as [[non-strict_programming_language|non-strict programming language]]s - and more recently, composable [[software_transactional_memory|software transactions]] - have continued this line of thought, making components of programs even more freely composable.)--->
+
+==常用的控制結構==
+若一程式語言支援控制結構，控制結構開始時多半都會有特定的關鍵字，以標明是使用哪一種控制結構。但只有部份程式語言在控制結構結束時會有特定的關鍵字表示結束，因此可以依控制結構結束時是否有特定關鍵字來將程式語言分為二類。
+*沒有特定關鍵字的語言：[[Algol_60|Algol 60]]、[[C语言|C]]、[[C++|C++]]、[[Haskell|Haskell]]、[[Java|Java]]、[[Pascal_(程式語言)|Pascal]]、[[Perl|Perl]]、[[PHP|PHP]]、[[PL/I|PL/I]]、[[Python|Python]]、[[Windows_PowerShell|Windows PowerShell]]。這類語言需要有關鍵字可以將group程式指令together：
+** Algol 60及 Pascal：<code>begin</code> ... <code>end</code>
+** C, C++, Java, Perl, PHP, and PowerShell：利用大括號<code>{</code> ... <code>}</code>
+** PL/1：<code>DO</code> ... <code>END</code>
+** Python：利用[[縮排|縮排]]的層次，詳細內容請參考[[Off-side規則|Off-side規則]]
+** Haskell：可以利用縮排或大括號，兩者可以混用
+*有特定關鍵字的語言：[[Ada|Ada]]、[[Algol_68|Algol 68]]、 [[Modula-2|Modula-2]]、[[Fortran|Fortran 77]]、[[Visual_Basic|Visual Basic]]，使用的特定關鍵字依程式語言而不同：
+** Ada: 其關鍵字為 <code>end</code> + ''space'' + 啟始控制結構的關鍵字，如<code>if</code> ... <code>end if</code>, <code>loop</code> ... <code>end loop</code>
+** Algol 68, Bourne shell, Mythryl：將啟始關鍵字反寫，如<code>if</code> ... <code>fi</code>, <code>case</code> ... <code>esac</code>
+** Fortran 77: 其關鍵字為 <code>end</code> + initial keyword，如<code>IF</code> ... <code>ENDIF</code>, <code>DO</code> ... <code>ENDDO</code>
+** Modula-2: 不論何種控制結構，其關鍵字均為<code>END</code>
+** Visual Basic: 每種控制結構均有各自的結尾關鍵字，如<code>If</code> ... <code>End If</code>; <code>For</code> ... <code>Next</code>; <code>Do</code> ... <code>Loop</code>
+*没有任何特征的语言:logo
+
+==條件判斷==
+{{main|條件判斷}}
+[[條件判斷|條件判斷]]是依指定變數或運算式的結果，決定後續執行的程序，最常用的是if-else指令，可以根據指定條件是否成立，決定後續的程序。也可以組合多個if-else指令，進行較複雜的條件判斷。
+許多程式語言也提供多選一的條件判斷，例如C語言的switch-case指令。<ref>{{cite book |author= 施威銘
+|title= TURBO C語言實務
+|year= 79
+|publisher= 旗標出版社
+|location= 台北
+|pages= p274
+|isbn= 957717017X
+}}</ref>
+
+==迴圈==
+{{main|程式迴圈}}
+
+迴圈是指一段在程式中只出現一次，但可能會連續執行多次的程式碼。常見的迴圈可以分為二種，指定執行次數的迴圈（如C語言的for迴圈）以及指定繼續執行條件（或停止條件）的迴圈（如C語言的while迴圈）。
+
+在一些[[函數程式語言|函數程式語言]]（例如[[Haskell|Haskell]]和[[Scheme|Scheme]]）中會使用[[递归_(计算机科学)|递归]]或[[不动点组合子|不动点组合子]]來達到迴圈的效果，其中[[尾部递归|尾部递归]]是一種特別的递归，很容易轉換為迭代。
+
+==結構化的非區部控制流程==
+有些程式語言<!--Many programming languages, particularly those which favor more dynamic styles of programming,-->會提供非區部的控制流程（non-local control flow），會允許流程跳出目前的程式碼，進入一段事先指定的程式碼。常用的結構化非區部控制流程可分為[[异常处理|條件處理]]、[[异常处理|异常处理]]及[[計算續體|計算續體]]（Continuation）三種。
+
+=== 條件處理 ===
+
+[[PL/I|PL/I]]程式語言中有22種標準的條件（如 ZERODIVIDE SUBSCRIPTRANGE ENDFILE），可以在程式中設定，當特定條件成立時需進行的指令，程式設計者也可以定義自己的條件，並在程式中使用。
+
+條件成立時，只能設定一個需進行的指令（類似未結構化的if指令），大部份的應用中，都會指定執行goto指令，跳到其他程式碼執行對應的流程。
+
+不過因為有些條件處理的實現會增加許多程式碼及執行時間（特別SUBSCRIPTRANGE），所以許多程式設計者會儘量不使用條件處理。
+
+條件處理的語法如下:
+
+  '''ON''' ''條件'' '''GOTO''' ''label''
+
+=== 異常處理 ===
+{{main|異常處理}}
+
+有些程式語言可提供不需要使用<code>GOTO</code>的結構化異常處理程式：
+
+<syntaxhighlight lang="cpp">
+try {
+    xxx1                                  // Somewhere in here
+    xxx2                                  //     use: '''throw''' someValue;
+    xxx3
+} catch (someClass& someId) {             // catch value of someClass
+    actionForSomeClass 
+} catch (someType& anotherId) {           // catch value of someType
+    actionForSomeType
+} catch (...) {                           // catch anything not already caught
+    actionForAnythingElse
+}
+</syntaxhighlight>
+
+在<code>try{...}</code>的區塊中，若有異常情形時，程式就會離開try的區塊，由後續的一個或多個<code>catch</code>子句判斷需執行何種異常處理。在D、Java、C#及Python程式語言中，<code>try{...}</code>區塊中還可以加入一個<code>finally</code>子句，不管程式流程是否離開<code>try{...}</code>區塊，<code>finally</code>子句中的程式都一定會執行，常用在當程式結束處理時，需要放棄一些外部資源（檔案或資料庫連結）的情形下：
+
+<syntaxhighlight lang="csharp">
+FileStream stm = null;                    // C# example
+try {
+    stm = new FileStream ("logfile.txt", FileMode.Create);
+    return ProcessStuff(stm);             // may throw an exception
+} finally {
+    if (stm != null)
+        stm. Close();
+}
+</syntaxhighlight>
+
+由於上述情形相當普遍，C#提供一種特殊的語法進行相同的處理：
+
+<syntaxhighlight lang="csharp">
+using (FileStream stm = new FileStream ("logfile.txt", FileMode.Create)) {
+    return ProcessStuff(stm);             // may throw an exception
+}
+</syntaxhighlight>
+
+只要離開 <code>using</code>區塊，編譯器會自動釋放<code>stm</code>物件，Python的 <code>with</code>指令及也有類似的功能<!--Ruby的's block argument to <code>File.open</code> are used to similar effect.-->。
+
+這些語言都有定義標準的異常情形及其出現的條件，程式設計者也可以丟出自己產生的異常（其實C++及Python的throw和catch支援絕大多數形態的物件）。
+
+若某一個<code>throw</code>指令找不到對應的<code>catch</code>，控制流程會離開目前的副程式或控制結構，設法找到對應的<code>catch</code>，若到主程式的結尾還是找不到對應的<code>catch</code>，程式會強制結束，並顯示適當的錯誤訊息。
+
+[[AppleScript|AppleScript]][[脚本语言|脚本语言]]可以將"<code>try</code>"區塊分為幾個部份，提供不同的訊息及異常：
+
+<syntaxhighlight lang = "applescript">
+try
+    set myNumber to myNumber / 0
+
+on error e  number n  from f  to t  partial result pr
+
+    if ( e = "Can't divide by zero" ) then display dialog "You idiot!"
+
+end try
+</syntaxhighlight>
+
+===續體===
+{{main|計算續體}}
+續體（Continuation）[[實化|實化]]了延續性，它可以將目前子程序的執行狀態（包括目前的堆疊，區部變數及執行到的位置）儲存成一個物件，後續在其他子程序中可以利用此物件回到此子程序現在的執行狀態。
+
+續體一詞也可以指第一類續體（first-class continuation），是指程式語言可以在任意時間點儲存目前的執行狀態，並在之後回到之前儲存的執行狀態。
+
+程式需要分配空間給子程序用到的區域變數，而且在子程序結束時需釋出這些變數用到的空間。許多程式語言利用[[調用堆疊|調用堆疊]]來存放這些變數，可以簡單快速的分配及釋出空間。也有一些程式語言使用[[動態記憶體分配|動態記憶體分配]]來儲存變數，可以較靈活的分配變數，但分配及釋出空間較不方便。這二個架構下續體的處理方式也會不同，各有其優點及缺點。
+
+[[Scheme|Scheme]]語言利用<code>call-with-current-continuation</code>函數（縮寫為call/cc） 可提供續體功能。
+
+==參考資料==
+{{reflist}}
+
+==相關條目==
+*[[分支_(計算機科學)|分支 (計算機科學)]]
+*[[控制流圖|控制流圖]]
+*[[控制流程圖|控制流程圖]]
+*[[控制表|控制表]]
+*[[协程|协程]]
+*[[循環複雜度|循環複雜度]]
+*[[流程图|流程图]]
+*[[Goto|Goto]]
+*[[事件迴圈|事件迴圈]]
+*[[递归_(计算机科学)|递归 (计算机科学)]]
+*[[面条式代码|面条式代码]]
+*[[結構化程式設計|結構化程式設計]]
+*[[子程序|子程序]]
+*{{le|Switch指令|Switch statement}} 
+
+[[Category:控制流程|*]]

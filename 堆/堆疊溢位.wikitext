@@ -1,0 +1,109 @@
+{{noteTA
+|G1=IT
+|1=zh-hans:內核;zh-hant:核心;
+}}
+{{各地中文名
+|cn = 堆栈溢出
+|tw = 堆疊溢位
+|hk = 堆疊溢位
+}}
+'''-{zh-hans:堆栈溢出; zh-hant:堆疊溢位}-'''（{{lang-en|stack overflow}}）在[[電腦科學|電腦科學]]中是指使用過多的[[隨機存取存儲器|記憶體]]时導致[[呼叫堆疊|呼叫堆疊]]產生的溢位<ref>{{Cite book|author=Chris Anley, John Heasman, Felix Lindner, Gerardo Richarte|title=The Shellcoder's Handbook: Discovering and Exploiting Security Holes|publisher=John Wiley & Sons|date=2011|ISBN=1118079124|language=en}}</ref>，也是[[缓冲区溢出|缓冲区溢出]]中的一種。堆疊溢位的產生是由於過多的函數呼叫，導致使用的[[呼叫堆疊|呼叫堆疊]]大小超過事先規畫的大小，覆蓋其他記憶體內的資料，一般在[[遞迴_(電腦科學)|遞迴]]中產生。堆疊溢位很可能由[[無限|無限]][[遞迴_(電腦科學)|遞迴]]（Infinite recursion）產生，但也可能僅僅是過多的堆疊層級。
+
+堆疊溢位在[[內核|核心]]設計中尤其危險，因此很多入門核心設計教程建議使用者不要嘗試使用[[遞迴_(電腦科學)|遞迴]]程式；而是基於安全和效能考量，改用[[迴圈|迴圈]]處理問題。<ref name="apple1">{{cite web
+ |publisher   = [[Apple_Inc|Apple Inc]].
+ |title       = Kernel Programming Guide: Performance and Stability Tips
+ |url         = http://developer.apple.com/DOCUMENTATION/Darwin/Conceptual/KernelProgramming/style/chapter_5_section_5.html
+ |date        = 2006-11-07
+ |language    = en
+ |deadurl     = yes
+ |archiveurl  = https://web.archive.org/web/20081207013401/http://developer.apple.com/DOCUMENTATION/Darwin/Conceptual/KernelProgramming/style/chapter_5_section_5.html
+ |archivedate = 2008-12-07
+}}</ref><ref name="xenotime">{{cite web
+ |last        = Dunlap
+ |first       = Randy
+ |title       = Linux Kernel Development: Getting Started
+ |url         = http://www.xenotime.net/linux/mentor/linux-mentoring.pdf
+ |date        = 2005-05-19
+ |language    = en
+ |deadurl     = yes
+ |archiveurl  = https://web.archive.org/web/20120227142532/http://www.xenotime.net/linux/mentor/linux-mentoring.pdf
+ |archivedate = 2012-02-27
+}}</ref><ref name="google1">{{cite web
+  | first = James O.
+  | last = Coplien
+  | publisher = SIGS Publications Group
+  | work = C++ Report Vol 10. No.7
+  | title = To Iterate is Human, to Recurse, Divine
+  | url = https://sites.google.com/a/gertrudandcope.com/info/Publications/Patterns/C--Report/SpaceIII
+  | pages = 43-51
+  | language = en
+  | date = 1998年7月
+  | access-date = 2011-12-20
+  | archive-date = 2020-10-19
+  | archive-url = https://web.archive.org/web/20201019035850/https://sites.google.com/a/gertrudandcope.com/info/Publications/Patterns/C--Report/SpaceIII
+  | dead-url = no
+  }}</ref>
+
+在[[POSIX|POSIX]]相容平台上，堆疊溢位通常會造成[[作業系統|作業系統]]產生[[SIGSEGV|SIGSEGV]][[信号_(计算机科学)|訊號]]。
+
+==遞迴溢位==
+===無限遞迴===
+無限遞迴是堆疊溢位的最常見原因，如以下的[[C/C++|C/C++語言]]程式會產生堆疊溢位：
+<syntaxhighlight lang="C">
+int foo()
+{
+    return foo();  //這裡出現无限重复的自我调用
+}
+</syntaxhighlight>
+
+然而有些語言（如[[Scheme|Scheme]]）支援[[尾端遞迴|尾端遞迴]]優化，在這些語言中只有一般遞迴會產生堆疊溢位，而尾端遞迴不會：
+<syntaxhighlight lang="Scheme">
+(define (foo) (foo))
+(define (foo) (+ (foo) 1))
+</syntaxhighlight>
+
+这段代码中，前者（第一句）进入[[無窮迴圈|無窮迴圈]]（Infinite loop），但不会产生堆疊溢位；后者（第二句）则会产生堆疊溢位。
+
+===防止堆疊溢位===
+多數無限遞迴出現原因，都是基於程式本身沒有[[異常處理|錯誤檢測]]機制：
+<syntaxhighlight lang="C">
+int factorial( const int *const n ){
+    if ( *n == 0 )
+        return 1;
+    else
+        return *n * factorial( *n-- );  //這裡出現自我呼叫
+};
+</syntaxhighlight>
+如果在這裡的<code>n</code>是負數則會出現無限遞迴。其實，這段程式可以簡單地加以修改，把<code>n</code>的型別由整數改為非負整數即可解決：
+<syntaxhighlight lang="C">
+unsigned int factorial( const unsigned int *const n ){
+    if ( *n == 0 )
+        return 1;
+    else
+        return *n * factorial( *n-- );
+};
+</syntaxhighlight>
+或者使用[[迴圈|迴圈]]處理：
+<syntaxhighlight lang="C">
+unsigned int factorial( const unsigned int *const n ){
+    unsigned int i, result;
+    for ( i = *n, result = 1; i > 0 ; --i )
+        result *= i;
+  //自我呼叫部份改為迴圈處理
+    return result;
+};
+</syntaxhighlight>
+
+==参看==
+*[[溢位|溢位]]
+*[[缓冲区溢出|缓冲区溢出]]
+*[[呼叫堆疊|呼叫堆疊]]
+*[[棧緩衝區溢出|棧緩衝區溢出]]
+
+==註釋==
+{{reflist}}
+
+{{内存管理}}
+
+[[Category:计算机编程|Category:计算机编程]]
+[[Category:程式錯誤|Category:程式錯誤]]

@@ -1,0 +1,102 @@
+{{NoteTA|G1=Math}}
+'''拉默-道格拉斯-普克演算法'''（{{lang-en|Ramer–Douglas–Peucker algorithm}}），又称'''道格拉斯-普克演算法'''（{{lang-en|Douglas–Peucker algorithm}}）和'''迭代端点拟合算法'''（{{lang-en|iterative end-point fit algorithm}}），是一种将线段组成的曲线[[降采样|降采样]]为点数较少的类似曲线的算法。它是最早成功地用于{{le|制图综合|cartographic generalization}}的算法之一。
+
+== 思路 ==
+该算法的目的是，给定一条{{le|多边形链|Polygonal chain|由线段构成的曲线}}（在某些情况下也称为折线），找到一条点数较少的相似曲线。该算法根据原曲线与简化曲线之间的最大距离（即曲线之间的[[豪斯多夫距离|豪斯多夫距离]]）来定义 "不相似"。简化曲线由定义原始曲线的点的子集组成。
+
+== 算法 ==
+[[Image:Douglas-Peucker_animated.gif|thumb]]
+起始曲线是一组有序的点或线，距离维度 ''ε'' > 0。
+
+<!--不同的实现：该算法使用一个布尔标志数组，最初设置为不保留，每个点一个。-->
+该算法[[递归|递归]]划分线。最初，它被赋予了第一点和最后一点之间的所有点。它自动标记要保留的第一点和最后一点。然后它找到离以第一点和最后一点为终点的线段最远的点；这个点显然是曲线上离终点之间的近似线段最远的点。如果这个点离线段的距离比 ''ε'' 更近，那么在简化曲线不比 ''ε'' 差的情况下，可以舍弃任何当前没有标记保留的点。
+
+如果离线段最远的点大于近似值 ''ε''，那么该点必须保留。该算法以第一点和最远点递归调用自身，然后以最远点和最后一点调用自身，其中包括最远点被标记为保留。
+
+当递归完成后，可以生成一条新的输出曲线，该曲线由所有且仅由那些被标记为保留的点组成。
+
+[[File:RDP,_varying_epsilon.gif|thumb]]
+
+=== 非参数化的拉默-道格拉斯-普克演算法 ===
+''ε'' 的选择通常由用户定义。像大多数线拟合/多边形逼近/主点检测方法一样，它可以通过使用数字化/量化引起的误差边界作为终止条件来实现非参数化。<ref>{{cite journal |last1 = Prasad |first1 = Dilip K. |first2 = Maylor K.H. |last2 = Leung |first3 = Chai |last3 = Quek |first4 = Siu-Yeung |last4 = Cho |title = A novel framework for making dominant point detection methods non-parametric |journal = Image and Vision Computing |year = 2012 |volume = 30 |issue = 11 |pages = 843–859 |doi = 10.1016/j.imavis.2012.06.010 }}</ref>
+
+=== 伪代码 ===
+（假设输入是一个索引从1开始的数组）
+ '''function''' DouglasPeucker(PointList[], epsilon)
+     // Find the point with the maximum distance
+     dmax = 0
+     index = 0
+     end = length(PointList)
+     '''for''' i = 2 to (end - 1) {
+         d = perpendicularDistance(PointList[i], Line(PointList[1], PointList[end]))
+         '''if''' (d > dmax) {
+             index = i
+             dmax = d
+         }
+     }
+     
+     ResultList[] = empty;
+     
+     // If max distance is greater than epsilon, recursively simplify
+     '''if''' (dmax > epsilon) {
+         // Recursive call
+         recResults1[] = DouglasPeucker(PointList[1...index], epsilon)
+         recResults2[] = DouglasPeucker(PointList[index...end], epsilon)
+ 
+         // Build the result list
+         ResultList[] = {recResults1[1...length(recResults1) - 1], recResults2[1...length(recResults2)]}
+     } '''else''' {
+         ResultList[] = {PointList[1], PointList[end]}
+     }
+     // Return the result
+     '''return''' ResultList[]
+ '''end'''
+
+链接：https://karthaus.nl/rdp/
+
+== 应用 ==
+该算法用于处理[[矢量图形|矢量图形]]和{{le|制图综合|cartographic generalization}}。它并不总是保留曲线的非自交属性，这导致了变体算法的发展。<ref>{{cite book |doi = 10.1109/SIBGRA.2003.1240992 |chapter = A non-self-intersection Douglas-Peucker algorithm |year = 2003 |last1 = Wu |first1 = Shin-Ting |title = 16th Brazilian Symposium on Computer Graphics and Image Processing (SIBGRAPI 2003) |last2 = Marquez |first2 = Mercedes |book-title = 16th Brazilian Symposium on Computer Graphics and Image Processing (SIBGRAPI 2003) |pages = 60–66 |place = Sao Carlos, Brazil |publisher= IEEE|isbn = 978-0-7695-2032-2 |citeseerx = 10.1.1.73.5773 }}</ref>
+
+该算法广泛应用于机器人技术<ref>{{cite conference |doi = 10.1007/s10514-007-9034-y |title = A comparison of line extraction algorithms using 2D range data for indoor mobile robotics |year = 2007 |last1 = Nguyen |first1 = Viet |last2 = Gächter |first2 = Stefan |last3 = Martinelli |first3 = Agostino |last4 = Tomatis |first4 = Nicola |last5 = Siegwart |first5 = Roland |journal = Autonomous Robots |volume = 23 |issue = 2 |pages = 97–111 | url = http://doc.rero.ch/record/320492/files/10514_2007_Article_9034.pdf }}</ref>中，对旋转式[[激光测距仪|测距扫描仪]]获取的测距数据进行简化和去噪处理；在这个领域，它被称为分割合并算法，归功于[[Richard_O._Duda|Duda]]和[[Peter_E._Hart|Hart]]。<ref>{{cite book |first1=Richard O. |last1=Duda |authorlink1=Richard O. Duda |first2=Peter E. |last2=Hart |authorlink2=Peter E. Hart |title=Pattern classification and scene analysis |url=https://archive.org/details/patternclassific0000duda |url-access=registration |publisher=Wiley |location=New York |year=1973 |isbn=0-471-22361-1}}</ref>
+
+== 复杂度 ==
+
+该算法在由 <math>n-1</math> 段和 <math>n</math> 个顶点组成的折线上运行时的时间由递归 <math>T(n)=T(i+1)+T(n-i) + O(n)</math> 给出，其中 <math>i\in\{1,\ldots,n-2\}</math> 是伪代码中的索引值。在最坏的情况下，每次递归调用时，<math>i=1</math> 或 <math>i=n-2</math>，该算法的运行时间为 <math>\Theta(n^2)</math>。在最好的情况下，在每次递归调用时，<math>i=\lfloor n/2\rfloor</math> 或 <math>i=\lceil n/2\rceil</math>，在这种情况下，运行时间具有 <math>O(n\log n)</math> 的众所周知的解（通过分治法的[[主定理|主定理]]）。
+
+使用（全或半）{{le|动态凸包|Dynamic convex hull}}数据结构，算法所进行的简化可以在 <math>O(n\log n)</math> 时间内完成。<ref>{{cite techreport |last1 = Hershberger |first1 = John |first2 = Jack |last2 = Snoeyink |title = Speeding Up the Douglas-Peucker Line-Simplification Algorithm |date = 1992 | url = http://www.bowdoin.edu/~ltoma/teaching/cs350/spring06/Lecture-Handouts/hershberger92speeding.pdf}}</ref>
+
+==类似算法==
+
+线简化的替代算法包括：
+* [[Visvalingam–Whyatt_algorithm|Visvalingam–Whyatt]]
+* [[Reumann–Witkam_algorithm|Reumann–Witkam]]
+* [[Opheim_simplification_algorithm|Opheim simplification]]
+* [[Lang_simplification_algorithm|Lang simplification]]
+* [[Zhao_Saalfeld_algorithm|Zhao-Saalfeld]]
+
+== 参见 ==
+* [[曲線擬合|曲線擬合]]
+
+== 延伸阅读 ==
+* Urs Ramer, "An iterative procedure for the polygonal approximation of plane curves", Computer Graphics and Image Processing, 1(3), 244–256 (1972) {{doi|10.1016/S0146-664X(72)80017-0}}
+* David Douglas & Thomas Peucker, "Algorithms for the reduction of the number of points required to represent a digitized line or its caricature", The Canadian Cartographer 10(2), 112–122 (1973) {{doi|10.3138/FM57-6770-U75U-7727}}
+* John Hershberger & Jack Snoeyink, "Speeding Up the Douglas–Peucker Line-Simplification Algorithm", Proc 5th Symp on Data Handling, 134–143 (1992). UBC Tech Report TR-92-07 available at http://www.cs.ubc.ca/cgi-bin/tr/1992/TR-92-07
+* R.O. Duda and P.E. Hart, "Pattern classification and scene analysis", (1973), Wiley, New York (https://web.archive.org/web/20110715184521/http://rii.ricoh.com/~stork/DHS.html)
+* {{cite techreport |title = Line Generalisation by Repeated Elimination of the Smallest Area |series = Discussion Paper |number = 10 |first1 = M |last1 = Visvalingam |first2 = JD |last2 = Whyatt |year = 1992 |institution = Cartographic Information Systems Research Group (CISRG), The University of Hull |url = https://hydra.hull.ac.uk/assets/hull:8338/content }}
+
+== 参考文献 ==
+{{reflist}}
+
+==外部链接==
+* [https://www.boost.org/doc/libs/1_67_0/libs/geometry/doc/html/geometry/reference/algorithms/simplify/simplify_3.html Boost.Geometry支持Douglas-Peucker简化算法。]
+* [http://www.codeproject.com/Articles/114797/Polyline-Simplification Ramer-Douglas-Peucker等简化算法的C++开源实现]
+* [http://idea.ed.ac.uk/data/kmz/ 用于KML数据的算法的XSLT实现。]
+* [http://www.bdcc.co.uk/Gmaps/Services.htm 您可以在本页底部看到应用于自行车骑行的GPS日志的算法。]
+* [http://karthaus.nl/rdp/ 此算法的交互式可视化]
+* [http://fssnip.net/kY F#实现]
+* [https://github.com/odlp/simplify_rb Ruby gem实现]
+* [https://github.com/locationtech/jts JTS, Java Topology Suite]，包含了许多算法的Java实现，包括[https://locationtech.github.io/jts/javadoc/org/locationtech/jts/simplify/DouglasPeuckerSimplifier.html Douglas-Peucker算法]。
+
+[[Category:计算机图形学算法|Category:计算机图形学算法]]
+[[Category:数字信号处理|Category:数字信号处理]]
+[[Category:带有伪代码示例的条目|Category:带有伪代码示例的条目]]

@@ -1,0 +1,46 @@
+{{lowercase|title=pkg-config}}
+{{NoteTA
+|G1=IT
+|1=zh-cn:库;zh-hant:函式庫
+}}
+'''pkg-config''' 是一个在[[源代码|源代码]][[编译|编译]]时查询已安装的[[库|库]]的使用接口的计算机工具[[软件|软件]]。pkg-config原本是设计用于[[Linux|Linux]]的，但现在在各个版本的[[BSD|BSD]]、[[windows|windows]]、[[Mac_OS_X|Mac OS X]]和[[Solaris|Solaris]]上都有着可用的版本。
+
+它输出已安装的库的相关信息，包括：
+* [[C|C]]/[[C++|C++]][[编译器|编译器]]需要的输入参数
+* [[链接器|链接器]]需要的输入参数
+* 已安装软件包的版本信息
+
+== 工作原理 ==
+当安装一个库时（例如从[[RPM套件管理員|RPM]]，[[deb|deb]]或其他二进制包管理系统），会包括一个后缀名为pc的文件，它会放入某个文件夹下（依赖于你的系统设置）。例如，在Linux为该软件的库文件所在文件夹lib之下的子文件夹pkgconfig。并把该子文件夹加入pkg-config的环境变量PKG_CONFIG_PATH作为搜索路径，例如在bash配置文件中加入一行：
+  $ export PKG_CONFIG_PATH=/usr/local/`库的名字`/lib/pkgconfig:$PKG_CONFIG_PATH
+
+在这个.pc文件里包含有数个条目。这些条目通常包含用于其他使用这个库的程序编译时需要的库设置，以及[[头文件|头文件]]的位置，版本信息和一个简介。
+
+这是一个用于[[libpng|libpng]]的.pc文件的样例:
+<poem> 
+prefix=/usr/local
+ exec_prefix=${prefix}
+ libdir=${exec_prefix}/lib
+ includedir=${exec_prefix}/include
+  
+ Name: libpng12 
+ Description: Loads and saves PNG files
+ Version: 1.2.8
+ Libs: -L${libdir} -lpng12 -lz
+ Cflags: -I${includedir}/libpng12
+</poem>
+这个文件告诉我们这些库可以在/usr/local/lib找到，头文件可以在/usr/local/include里找到，库的名字是libpng12并且版本号是1.2.8。它也提供了用于编译依赖于libpng的源代码时需要的链接器参数。
+
+这儿是一个编译时使用pkg-config的样例:
+<syntaxhighlight lang="bash">
+gcc -o test test.c $(pkg-config --libs --cflags libpng)
+</syntaxhighlight>
+
+== 参考链接 ==
+*[http://pkg-config.freedesktop.org/ pkg-config项目位于freedesktop.org的主页]{{Wayback|url=http://pkg-config.freedesktop.org/ |date=20200714211721 }}
+*[http://www.die.net/doc/linux/man/man1/pkg-config.1.html pkg-config的手册]{{Wayback|url=http://www.die.net/doc/linux/man/man1/pkg-config.1.html |date=20070625053920 }}
+
+{{linux-stub}}
+
+[[Category:Freedesktop.org|Category:Freedesktop.org]]
+[[Category:Computer_libraries|Category:Computer libraries]]

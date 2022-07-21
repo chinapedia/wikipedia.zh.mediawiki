@@ -1,0 +1,78 @@
+{{NoteTA
+| G1 = IT
+}}
+在计算机领域， '''清单文件'''（Manifest files）通常是[[元数据|元数据]]文件，这些元数据通常是固定值，用于描述程序的相关信息。清单文件可以是一个文件，也可以是多个文件<ref>{{Cite web|title=Creating GitHub Apps from a manifest|url=https://developer.github.com/apps/building-github-apps/creating-github-apps-from-a-manifest/|accessdate=2020-02-26|work=GitHub Developer|language=en|archive-date=2020-10-28|archive-url=https://web.archive.org/web/20201028050311/https://developer.github.com/apps/building-github-apps/creating-github-apps-from-a-manifest/|dead-url=no}}</ref>。
+
+== Android ==
+清单文件，描述了关于应用的必要信息。这些信息用于Android构建工具、Android系统、[[Google_Play|Google Play]]。<ref>{{Cite web|title=App Manifest Overview|url=https://developer.android.com/guide/topics/manifest/manifest-intro|accessdate=2020-02-26|work=Android Developers|language=en|archive-date=2021-03-14|archive-url=https://web.archive.org/web/20210314114719/https://developer.android.com/guide/topics/manifest/manifest-intro|dead-url=no}}</ref>
+
+== Docker ==
+Docker中，镜像的清单数据并不是以文件的形式展示，而是通过命令行<code>docker manifest</code>方式在控制台展示。manifest包含的是镜像信息，如：层数、大小、摘要码。<ref>{{Cite web|title=docker manifest|url=https://docs.docker.com/engine/reference/commandline/manifest/|accessdate=2020-02-26|date=2020-02-25|work=Docker Documentation|language=en|archive-date=2021-03-26|archive-url=https://web.archive.org/web/20210326200403/https://docs.docker.com/engine/reference/commandline/manifest/|dead-url=no}}</ref>
+
+== Java ==
+在[[Java平臺|Java平台]]中, '''清单文件'''（Manifest file）是[[JAR_(文件格式)|JAR档案]]<ref>{{Cite web |url=http://java.sun.com/developer/Books/javaprogramming/JAR/basics/manifest.html |title=存档副本 |access-date=2011-11-17 |archive-date=2012-06-26 |archive-url=https://web.archive.org/web/20120626125503/http://java.sun.com/developer/Books/javaprogramming/JAR/basics/manifest.html |dead-url=no }}</ref><ref>{{Cite web |url=http://download.oracle.com/javase/6/docs/technotes/guides/jar/jar.html#JAR%20Manifest |title=存档副本 |access-date=2011-11-17 |archive-date=2011-11-02 |archive-url=https://web.archive.org/web/20111102065209/http://download.oracle.com/javase/6/docs/technotes/guides/jar/jar.html#JAR%20Manifest |dead-url=no }}</ref>中包含的特殊文件。'''Manifest'''文件被用来定义扩展或档案打包相关数据，是一个[[元数据|元数据]]文件，它包含了不同部分中的{{link-en|名/值对|Attribute–value_pair}}数据。如果一个JAR文件被用来作为可执行文件，那么其中的Manifest文件需要指出该程序的主类文件。通常Manifest文件的文件名为<code>MANIFEST.MF</code>。
+
+通常Manifest文件都与Java档案相关，其他的情况比较少见。
+
+===文件规范===
+JAR档案文件在规定位置包含<code>META-INF/MANIFEST.MF</code> <ref name="jarspec">{{Cite web |url=http://download.oracle.com/javase/6/docs/technotes/guides/jar/jar.html |title=存档副本 |access-date=2011-11-17 |archive-date=2011-11-02 |archive-url=https://web.archive.org/web/20111102065209/http://download.oracle.com/javase/6/docs/technotes/guides/jar/jar.html |dead-url=no }}</ref>。在一个档案文件中，只能有一个Manifest文件，而且必须在规定的<code>[[JAR_(file_format)|META-INF]]</code>文件夹中。  
+
+由[[Java软件开发包|JDK]]1.0创建的Manifest文件内容如下：
+
+ Manifest-Version: 1.0
+
+其中包含的所有条目均为名/值对。文件头的名和值由冒号分隔。默认的Manifest文件显示它遵从Manifest资源配置文件规范1.0。
+Manifest文件还可以包含该档案文件中所打包的其他文件的信息。具体Manifest文件中记录的文件信息由该JAR文件的预期使用对象决定。默认的Manifest文件并不包含其他文件的信息，因此只包含唯一一行关于该Manifest文件自身的数据。
+
+===特殊用法的Manifest文件头===
+默认Manifest文件可以根据JAR文件的用处而作相应修改。如果JAR文件仅仅是用作存档，那么<code>MANIFEST.MF</code>文件则只包含默认信息。
+然而，大多数JAR文件都不仅仅是用作压缩存档，相应的Manifest的文件也包含了特定的信息。下面列出了一些主要的特殊用法的Manifest文件头：
+
+'''JAR应用程序''': 
+如果JAR文件被用作可执行的应用程序，那么应用程序需要告诉Java虚拟机入口点位置。任意包含<code>public static void main(String[] args)</code>方法的类即为入口点。该信息由文件头Main-Class提供，基本格式如下： 
+
+ Main-Class: classname
+
+classname值可由应用程序的入口点代替。
+
+'''可下载扩展''':  
+可下载扩展文件是由其他JAR文件中的Manifest文件所提及的JAR文件。通常情况下，JAR文件可以包含一个Applet小应用程序，该JAR文件的Manifest文件则指向一系列的JAR文件作为可下载扩展来支持该小应用程序。扩展之间也可以使用相同方法来进行指向。
+可下载扩展信息是由小应用程序或另一扩展中的Manifest文件的Class-Path文件头提供的。通常可见的Class-Path文件头内容如下：
+
+ Class-Path: servlet.jar infobus.jar acme/beans.jar
+
+在该文件头信息中，servlet.jar，infobus.jar以及acme/beans.jar中的类将作为可下载扩展为Applet小应用程序或Java应用程序服务。Class-Path中给出的超链接是该Applet小应用程序或Java应用程序的相对地址。
+
+'''封装加封''': 
+JAR文件中的封装可以选择进行加封，即该封装中所定义的类必须被存档在相同的JAR文件中。封装加封可以用来确保类版本的连贯性或作为安全措施。
+要对封装进行加封，需要对该封装加入文件头Name，然后加入文件头Sealed，如下：
+
+ Name: myCompany/myPackage/
+ Sealed: true
+
+文件头Name的值为该封装的相对路径名。注意，该路径名由‘/’结束以区别于文件名。在文件头Name之后未采用空行隔开的文件头，一律作用于该Name文件头制定的文件或封装。在上述例子中，由于Sealed紧接在<code>Name: myCompany/myPackage header</code>之后且没有空行隔开，那么该Sealed文件头仅作用于myCompany/myPackage封装。该代码无法执行。
+
+'''封装版本''': 
+封装版本规范定义了一系列Manifest文件头来记录版本信息。每个封装都可以应用一系列Manifest文件头。版本文件头应当直接跟随在Name文件头。下面的例子展示了所有的版本文件头：
+
+ Name: java/util/
+ Specification-Title: "Java Utility Classes" <br />
+ Specification-Version: "1.2"<br />
+ Specification-Vendor: "Sun Microsystems, Inc.".<br />
+ Implementation-Title: "java.util" <br />
+ Implementation-Version: "build57"<br />
+ Implementation-Vendor: "Sun Microsystems, Inc."<br />
+
+'''指定从属文件''':
+
+<code>MANIFEST.MF</code>文件可以用来指定应用程序运行所必须加载的所有类文件。
+
+== 参见 ==
+* [[Classpath_(Java)|Classpath (Java)]]
+
+== 参考文献 ==
+<references/>
+
+[[Category:Java|Category:Java]]
+[[Category:扩展名|Category:扩展名]]
+[[Category:文件格式|Category:文件格式]]

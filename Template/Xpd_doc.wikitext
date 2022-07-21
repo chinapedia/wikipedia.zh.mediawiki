@@ -1,0 +1,131 @@
+<includeonly><!-- 在這裡加入模板的保護標識 --></includeonly><noinclude>{{template doc page viewed directly}}</noinclude>
+<!-- 在本行下編輯模板說明 -->
+<!--
+     PLEASE ADD CATEGORIES AND INTERWIKIS AT THE BOTTOM OF THIS PAGE
+-->
+The [[m:help:expansion demo templates|expansion demo templates]] (see [http://en.wikipedia.org/w/index.php?title=Special%3APrefixIndex&prefix=xpd&namespace=10]) show, for documentation:
+*some wikitext
+*its rendering
+*a link to ExpandTemplates applied to the wikitext; thus it shows:
+**The expanded wikitext.
+**The rendering of this expanded wikitext
+
+{{tiw|xpd}} selects one of the following four templates based on the number of unnamed parameters
+*{{tiw|xpd0}} - simplified version of {{tim|xpdoc}}
+*{{tiw|xpd1}} - simplified version of {{tim|xpdopec}}
+*{{tiw|xpd2}} - simplified version of {{tim|xpdopepec}}
+*{{tiw|xpd3}} - simplified version of {{tim|xpdopepepec}}
+
+==Examples==
+<nowiki>{{xpd|CURRENTDAY}}</nowiki> gives:
+
+{{xpd|CURRENTDAY}}
+
+<nowiki>{{xpd|#expr:2+2}}</nowiki> gives:
+
+{{xpd|#expr:2+2}}
+
+For more examples see the separate templates.
+
+==Separator parameter==
+
+The default separator is "gives". With <tt>gives=<nowiki>{{!}}{{!}}</nowiki></tt> to get "||" for use in a table, the same separator is used before the ExpandTemplates link.
+
+Example:
+
+<pre>
+{| class="wikitable"
+!wikitext!!result!!ExpandTemplates
+|-
+|{{xpd|CURRENTDAY|gives={{!}}{{!}}}}
+|-
+|{{xpd|#expr:2+2|gives={{!}}{{!}}}}
+|}
+</pre>
+
+gives
+
+{| class="wikitable"
+!wikitext!!result!!ExpandTemplates
+|-
+|{{xpd|CURRENTDAY|gives={{!}}{{!}}}}
+|-
+|{{xpd|#expr:2+2|gives={{!}}{{!}}}}
+|}
+
+==Quotes==
+The quotation marks are needed to see spaces and newlines at the start and end of the result. In other expand demo templates they are also needed to see spaces and newlines at the start and end of the wikitext, and to get a result independent of whether it starts on a line due to parameter {{{gives}}}.
+
+==Limitations==
+This Template:Xpd is a simplified version of some [[m:help:expansion demo templates|expansion demo templates]]. If necessary use the proper extended version.
+
+===Named parameters and parameter values with equals signs===
+Named parameters are not supported. Neither are equals signs in parameter values of the template or parser function demonstrated. 
+
+Examples:
+*<nowiki>{{xpd|1x| p{{=}}q }}</nowiki> gives {{xpd|1x| p{{=}}q }} - wrong result due to the template call in the parameter; is corrected by substitution and putting nowiki tags in the lefthand side (see below), giving {&#123;<code>1x<b>&#124;</b><nowiki> p{{=}}q</nowiki> </code>&#125;} gives {{1x| p{{=}}q }} [{{fullurl:special:ExpandTemplates|input=%7B%7B{{urlencode:1x{{!}} p{{=}}q } }}%7D}}].
+*<nowiki>{{xpd|1x|2= p=q }}</nowiki> gives {{xpd|1x|2= p=q }} - wrong result because the lefthand side would be expanded interpreting p as named parameter, while the righthand side shows the result if the unnamed parameter of 1x has the given value; use <nowiki>{{xpdopec|1x|1|3= p=q }}</nowiki> giving {{xpdopec|1x|1|3= p=q }} or <nowiki>{{xpdnp|1x|1n=1|1v= p=q }}</nowiki> giving {{xpdnp|1x|1n=1|1v= p=q }} (spaces and newlines are trimmed).
+*<nowiki>{{xpd|t np|q=s}}</nowiki> gives: {{xpd|t np|q=s}} ("q=s" is ignored); instead, use <nowiki>{{xpdopec|t np|q|s}}</nowiki> giving {{xpdopec|t np|q|s}} or <nowiki>{{xpdnp|t np|1n=q|1v=s}}</nowiki> giving {{xpdnp|t np|1n=q|1v=s}}.
+
+Even in the case of a parser function called with a parameter containing an equals sign the template for named parameters should be used:
+*<nowiki>{{xpd|#if:x|p=q}}</nowiki> gives: {{xpd|#if:x|p=q}} ("p=q" is ignored); instead, use  <nowiki>{{xpdnp|#if:x|1n=p|1v=q}}</nowiki> giving {{xpdnp|#if:x|1n=p|1v=q}}.
+
+===Rendering of left side===
+If no value for parameter p is given, the left-hand side, before "gives", does not show the literal wikitext of the parameters of the template or parser function demonstrated, but the rendering. This affects e.g. sequences of more than two spaces, and single newlines. Also link code is shown as a link. Furthermore, any templates and parser functions in the parameters are expanded; {{tim|xpdn}} covers the simpler of such cases.
+
+Examples:
+----
+<pre>
+{{xpd|1x|[[Help:L{{tc}}k]]}}
+
+{{xpd|t1|p
+q}}
+</pre>
+----
+
+gives:
+
+----
+{{xpd|1x|[[Help:L{{tc}}k]]}}
+
+{{xpd|t1|p
+q}}
+----
+
+With substitution of xpd1 etc. (see below) and putting nowiki tags around the list of parameters the left hand side is corrected.
+
+Also the input text of ExpandTemplates in the supplied link is the result of expanding the parameters.
+
+==Spaces and newlines==
+If parameters start or end with a space or newline, these are preserved. Even if the left-hand side, as mentioned, does not show the raw wikitext of the parameters but the rendering, the right-hand side gives the correct result.
+
+==Substitution==
+*<nowiki>{{subst:xpd|substnp=subst:|tc}}</nowiki> gives the wikitext <nowiki>{{xpd0|tc}}</nowiki>
+*<nowiki>{{subst:xpd|substnp=subst:|t1|p}}</nowiki> gives the wikitext <nowiki>{{xpd1|t1|p}}</nowiki>
+*<nowiki>{{subst:xpd|substnp=subst:|t2|p|q}}</nowiki> gives the wikitext <nowiki>{{xpd2|t2|p|q}}</nowiki>
+*<nowiki>{{subst:xpd|substnp=subst:|concat|p|q|r}}</nowiki> gives the wikitext <nowiki>{{xpd3|concat|p|q|r}}</nowiki>
+
+Note that except in the case of long and complicated parameters, adding the number of parameters after "xpd" is easier than adding "subst:" and "|substnp=subst:".
+
+With substitution of xpd1 etc. and putting nowiki tags around the list of parameters the left hand side is given literally without conversions, see also above.
+
+
+
+==See also==
+*{{tiw|xpd0}} - simplified version of {{tim|xpdoc}}
+*{{tiw|xpd1}} - simplified version of {{tim|xpdopec}}
+*{{tiw|xpd2}} - simplified version of {{tim|xpdopepec}}
+*{{tiw|xpd3}} - simplified version of {{tim|xpdopepepec}}
+*{{tim|xpdt1}} for table row templates
+*{{tim|xpdnp}} for named parameters
+*[http://meta.wikimedia.org/w/index.php?title=Special%3APrefixIndex&from=Xpd&namespace=10 Xpd templates]
+
+*{{tim|tlx}} - produces just the template call, with the template name linked to the template, but not the result, e.g. {{xpd|tlx|t2|b|c}}
+
+*{{tim|xpd}}
+*{{tiw|no|Xpd}}
+
+<includeonly><!-- CATEGORIES AND INTERWIKIS HERE, THANKS -->
+[[Category:Expand demo templates|xpd]]
+[[ar:قالب:Evd]]
+</includeonly>

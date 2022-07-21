@@ -1,0 +1,72 @@
+{{Documentation subpage}}
+该模版在条件{{{1}}}下调用模版{{{2}}}并使用参数{{{3}}}，且在结尾添加一个换行符。
+
+该模板用于避免两次写出条件：一次用于模板调用，一次用于换行。[[Template:If]]可用于保留换行符。
+
+==用法==
+===Sample 1===
+Example using [[Template:2x]], which simply repeats its argument twice, so <code><nowiki>{{2x|Pizza}}</nowiki></code> produces {{2x|Pizza}}.  One can combine this with {{tld|Conditional template call with newline}} in the following code
+
+<code><nowiki>{{#tag:pre|{{Conditional template call with newline|1|2x|Pizza}}{{Conditional template call with newline|0|2x|Bora}}{{Conditional template call with newline|1|2x|Bang}}}}</nowiki></code>
+
+:which produces
+
+{{#tag:pre|{{Conditional template call with newline|1|2x|Pizza}}{{Conditional template call with newline|0|2x|Bora}}{{Conditional template call with newline|1|2x|Bang}}}}
+
+Notice how {{2x|Bora}} is suppressed, and there is a newline between {{2x|Pizza}} and {{2x|Bang}}.
+
+===Sample 2===
+Example using {{tl|Table row Dutch municipality}}
+ 
+<pre style="overflow:auto">
+{| class="wikitable sortable"
+!Municipality!!Population
+{{Conditional template call with newline|1|Table row Dutch municipality|Delft}}{{Conditional template call with newline|0|Table row Dutch municipality|Hoorn}}{{Conditional template call with newline|1|Table row Dutch municipality|Rotterdam}}|}
+</pre>
+
+gives
+
+{| class="wikitable sortable"
+!Municipality!!Population
+{{Conditional template call with newline|1|Table row Dutch municipality|Delft}}{{Conditional template call with newline|0|Table row Dutch municipality|Hoorn}}{{Conditional template call with newline|1|Table row Dutch municipality|Rotterdam}}|}
+
+The template is typically called by another table row template, which has as parameter {{{1}}} the identification of the potential item (in this template: {{{3}}}), and some parameter {{{2}}} related to the condition. That template provides the condition in terms of {{{1}}} and {{{2}}}.
+
+===Sample 3===
+Sample usage with full substitution of the template to create a newline in wikitext.
+
+1. Create a sample template : "[[Template:testnewline]]"
+<pre style="overflow:auto">
+ABC{{<includeonly>subst:</includeonly>Conditional template call with newline|{{<includeonly>subst:</includeonly>#ifeq:{{{align|}}}|{{{align}}}|1|0}}|void|1|substctc=subst:|subst=subst:}}
+DEF
+</pre>
+
+2. When called empty (<nowiki>{{subst:testnewline}}</nowiki>), it generates the following wikitext:
+<pre>
+ABC
+DEF
+</pre>
+
+3. When called as <nowiki>{{subst:testnewline|align=somevalue}}</nowiki>, it generates the following wikitext (note the newline):
+<pre>
+ABC
+
+DEF
+</pre>
+
+==参数==
+===必选参数===
+;<tt>1</tt>: 第一个未命名参数，用于判断条件。其中1代表真（True），而0代表假（False）。如果条件为真，那么第二个模板将被调用，并在结尾添加一个换行符。可直接输入0或1。<br />示例：<nowiki>{{#ifeq:{{{align|}}}|{{{align}}}|1|0}}</nowiki>。当一个模板被调用，且使用align为任意值的参数时条件为真：而align未包含时条件为假。
+;<tt>2</tt>: 第二个未命名参数，为需要调用模板的名称。<br />可使用[[Template:!]]代替“!”，[[Template:Void]]代替“void”。
+
+===可选参数===
+;<tt>3</tt>: 3rd unnamed parameter, value to be assigned to {{{1}}} when calling template {{{2}}}
+;<tt>substctc</tt>: for substitution of some parser functions and auxiliary templates called inside the template, use the value "subst:"; recommended when the template is substituted; note that in that case any parser functions or templates in the condition have to be substituted too.
+;<tt>subst</tt>: for substitution of template {{{2}}}, use the value "subst:"
+;<tt>p1n</tt>: name of an additional parameter used by template {{{2}}}
+;<tt>p1v</tt>: value to be assigned to {{{p1n}}} when calling template {{{2}}}
+
+<includeonly><!--
+++++ PLEASE ADD CATEGORIES AND INTERWIKIS BELOW THIS LINE, THANK YOU. -->
+[[en:Template:Conditional template call with newline]]
+</includeonly>

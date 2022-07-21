@@ -1,0 +1,137 @@
+{{noteTA
+|G1 = IT
+}}
+{{Infobox software
+| name = GNU Multiple Precision Arithmetic Library
+| logo = Gmplogo2.svg
+| screenshot = 
+| caption = 
+| developer = [[GNU计划|GNU计划]]
+| released = {{Start date|1991}}<ref>{{cite web|title=The GNU Multiple Precision Arithmetic Library|url=http://gmplib.org/|accessdate=29 October 2011|archive-date=2021-01-28|archive-url=https://web.archive.org/web/20210128190624/https://gmplib.org/|dead-url=no}}</ref>
+| latest_release_version = {{wikidata|property|preferred|references|edit|Q1205818|P348|P548=Q2804309}}
+| latest_release_date = {{wikidata|qualifier|preferred|single|Q1205818|P348|P548=Q2804309|P577}}
+| programming language = [[C语言|C语言]]
+| operating system = [[跨平台|跨平台]]
+| genre = [[数学软件|数学软件]]
+| license = [[LGPL|LGPL]]
+| website = {{url|http://gmplib.org/}}
+}}
+
+'''GNU多重精度运算库'''（{{lang-en|GNU Multiple Precision Arithmetic Library}}，简称'''GMP'''或gmpal）是一个[[开源|开源]]的任意精度运算库，支持正负数的[[整数|整数]]、[[有理数|有理数]]、[[浮点数|浮点数]]。它没有任何精度限制，只受限于可用内存。GMP有很多函数，它们都有一个规则的接口。它是C语言写成的，但用为其他很多语言做包装，包括[[Ada|Ada]]，[[C++|C++]]，[[C♯|C#]]，[[OCaml|OCaml]]，[[Perl|Perl]]，[[PHP|PHP]]，[[python|python]] 和 [[R|R]]。GMP主要运用于加密应用和研究、互联网安全应用、[[计算机代数系统|计算机代数系统]]和计算代数研究。GMP的目标是成为最快的大数运算库，GMP是[[GNU|GNU]]项目的一部分，它在[[GNU宽通用公共许可证|GNU宽通用公共许可证]]下发表。GMP在许多计算机辅助代数系统中用于整数运算，如[[Mathematica|Mathematica]]和[[Maple|Maple]]。GMP需要使用[[GCC|GCC]]（[[GNU|GNU]]编译器套装）编译。
+
+== 示例 ==
+
+这是一个C语言示例，它展示了如何使用GMP做乘法运算并输出。
+
+<syntaxhighlight lang="C">
+#include <stdio.h>
+#include <stdlib.h>
+#include <gmp.h>
+
+int main(void)
+{
+ mpz_t x;
+ mpz_t y;
+ mpz_t result;
+
+ mpz_init(x);
+ mpz_init(y);
+ mpz_init(result);
+
+ mpz_set_str(x, "7612058254738945", 10);
+ mpz_set_str(y, "9263591128439081", 10);
+
+ mpz_mul(result, x, y);
+ gmp_printf("\n    %Zd\n*\n    %Zd\n--------------------\n%Zd\n\n", x, y, result);
+
+ /* free used memory释放内存*/ 
+ mpz_clear(x);
+ mpz_clear(y);
+ mpz_clear(result);
+ return EXIT_SUCCESS;
+}
+</syntaxhighlight>
+
+这段代码计算7612058254738945和9263591128439081的乘积。
+
+编译运行，获得这样的输出：（在UNIX类系统上，需要 -lgmp） 
+
+<syntaxhighlight lang="text">
+
+    7612058254738945
+*
+    9263591128439081
+--------------------
+70514995317761165008628990709545
+
+</syntaxhighlight>
+
+我们可以使用C++完成相同的运算。（如果在类Unix系统下编译，需要使用 -lgmpxx -lgmp）
+
+<syntaxhighlight lang="cpp">
+#include <iostream>
+#include <gmpxx.h>
+
+int main()
+{
+  mpz_class x("7612058254738945");
+  mpz_class y("9263591128439081");
+
+  std::cout << "\n    " << x << "\n*\n    " << y;
+  std::cout << "\n--------------------\n" << x * y << "\n\n";
+}
+</syntaxhighlight>
+== 语言支持 ==
+{| class="wikitable"
+|-
+! Library name
+! 语言
+! 许可证
+|-
+| [http://gmplib.org/ GNU Multi-Precision Library] {{Wayback|url=http://gmplib.org/ |date=20210128190624 }}
+| [[C|C]], [[C++|C++]]
+| [[GNU_Lesser_General_Public_License|LGPL]]
+|-
+| [http://search.cpan.org/~chipt/Math-GMP/lib/Math/GMP.pm Math::GMP] {{Wayback|url=http://search.cpan.org/~chipt/Math-GMP/lib/Math/GMP.pm |date=20170422083905 }}
+| [[Perl|Perl]]
+| 
+|-
+| [https://web.archive.org/web/20130225114124/http://www.emilstefanov.net/Projects/GnuMpDotNet/ GNU Multi-Precision Library for .NET]
+| [[C_sharp|C#]], [[.NET|.NET]]
+| LGPL
+|-
+| [http://www.aleax.it/gmpy.html General Multiprecision Python Project] {{Wayback|url=http://www.aleax.it/gmpy.html |date=20200730151746 }}
+| [[Python|Python]]
+|
+|-
+| [http://rubygems.org/gems/gmp The RubyGems project] {{Wayback|url=http://rubygems.org/gems/gmp |date=20201112200444 }}
+| [[Ruby|Ruby]]
+| 
+|-
+| [http://php.net/gmp GNU Multi-Precision Library for PHP] {{Wayback|url=http://php.net/gmp |date=20210204131808 }}
+| [[PHP|PHP]]
+| [[PHP许可证|PHP]]
+|-
+| [http://www.math.uni.wroc.pl/~hebisch/prog/ GNU Multi-Precision Routines for SBCL] {{Wayback|url=http://www.math.uni.wroc.pl/~hebisch/prog/ |date=20201119052521 }}
+| [[Common_Lisp|Common Lisp]]
+| 
+|-
+| [http://chgmp.sourceforge.net/ Ch GMP]{{Wayback|url=http://chgmp.sourceforge.net/ |date=20110813124343 }}
+| [[Ch|Ch]]
+|-
+| [[Glasgow_Haskell_Compiler|Glasgow Haskell Compiler]]<br /><small>(The implementation of <code>Integer</code><br />is basically a binding to GMP)</small>
+| [[Haskell|Haskell]]
+| [[BSD许可证|BSD]]
+|}
+
+==参考资料==
+{{reflist}}
+
+==外部链接==
+* [http://gmplib.org/ gmplib官方主页] {{Wayback|url=http://gmplib.org/ |date=20210128190624 }}
+
+{{GNU}}
+[[Category:数学软件|Category:数学软件]]
+[[Category:GNU计划软件|Category:GNU计划软件]]
+[[Category:C函式庫|Category:C函式庫]]
+[[Category:用C編程的自由軟體|Category:用C編程的自由軟體]]

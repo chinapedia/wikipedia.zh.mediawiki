@@ -1,0 +1,84 @@
+{{NoteTA
+|G1=IT
+}}
+{{圖算法}}
+'''Tarjan算法''' （以發現者[[羅伯特·塔揚|Robert Tarjan]]<ref>{{citation|first=RE|last=Tarjan|authorlink=Robert Tarjan|title=Depth-first search and linear graph algorithms|journal=SIAM Journal on Computing|volume=1|year=1972|issue=2|pages=146–160|doi=10.1137/0201010}}</ref>命名）是一個在[[圖|圖]]中尋找[[強連通分量|強連通分量]]的算法。雖然發表時間更早，它仍可以被視為[[Kosaraju算法|Kosaraju算法]]的一個改進。它的效率跟{{link-en|Gabow算法|Gabow's algorithm}}差不多。
+
+== 概述 ==
+
+此算法以一個[[有向圖|有向圖]]作為輸入，並按照所在的強連通分量給出其頂點集的一個[[集合劃分|劃分]]。圖中的每個節點只在一個強連通分量中出現，即使是在有些節點單獨構成一個強連通分量的情況下（比如圖中出現了樹形結構或孤立節點）。
+
+算法的基本思想如下：任選一節點開始進行[[深度優先搜索|深度優先搜索]]（若深度優先搜索結束後仍有未訪問的節點，則再從中任選一點再次進行）。搜索過程中已訪問的節點不再訪問。搜索樹的若干子樹構成了圖的強連通分量。
+
+節點按照被訪問的順序存入[[堆疊|堆疊]]中。從搜索樹的子樹返回至一個節點時，檢查該節點是否是某一強連通分量的根節點（見下）並將其從堆疊中刪除。如果某節點是強連通分量的根，則在它之前出堆疊且還不屬於其他強連通分量的節點構成了該節點所在的強連通分量。
+
+=== 根節點的性質 ===
+
+算法的關鍵在於如何判定某節點是否是強連通分量的根。注意“強連通分量的根”這一說法僅針對此算法，事實上強連通分量是沒有特定的“根”的。在這裡根節點指深度優先搜索時強連通分量中首個被訪問的節點。
+
+為找到根節點，我們給每個節點<tt>v</tt>一個深度優先搜索標號<tt>v.index</tt>，表示它是第幾個被訪問的節點（时间戳）。此外，每個節點<tt>v</tt>還有一個值<tt>v.lowlink</tt>，表示從<tt>v</tt>出發經[[有向邊|有向邊]]可到達的所有節點中最小的<tt>index（追溯值）</tt>。顯然<tt>v.lowlink</tt>總是不大於<tt>v.index</tt>，且當從<tt>v</tt>出發經[[有向邊|有向邊]]不能到達其他index值更小的節點時，這兩個值相等。 <tt>v.lowlink</tt>在深度優先搜索的過程中求得，<tt>v</tt>是強連通分量的根當且僅當<tt>v.lowlink = v.index</tt>。
+
+== 偽代碼 ==
+ '''algorithm''' tarjan '''is'''
+    '''input:''' 图 ''G'' = (''V'', ''E'')
+    '''output:''' 以所在的强连通分量划分的[[顶点_(图论)|顶点]]集合
+  
+    ''index'' := 0
+    ''S'' = empty ''// 初始化栈S为空栈''
+    '''for each''' ''v'' '''in''' ''V'' '''do'''
+      '''if''' (''v''.index is undefined)
+        strongconnect(''v'')
+      '''end if'''
+  
+    '''function''' strongconnect(''v'')
+      ''// 将未使用的最小index值作作为节点v的index''
+      ''v''.index := ''index''
+      ''v''.lowlink = ''index''
+      ''index'' := ''index'' + 1
+      ''S''.push(''v'')
+  
+      ''// 考虑节点v的后继节点''
+      '''for each''' (''v'', ''w'') '''in''' ''E'' '''do'''
+        '''if''' (''w''.index is undefined) '''then'''
+          ''// 后继节点w未访问，递归调用''
+          strongconnect(''w'')
+          ''v''.lowlink = min(''v''.lowlink, ''w''.lowlink)
+        '''else if''' (''w'' is in ''S'') '''then'''
+          ''// w已在栈S中，则其也在当前的强连通分量中''
+          ''v''.lowlink := min(''v''.lowlink, ''w''.index)
+        '''end if'''
+  
+      ''// 若v是根则出栈，并得到一个强连通分量''
+      '''if''' (''v''.lowlink = ''v''.index) '''then'''
+        start a new strongly connected component
+        '''repeat'''
+          ''w'' = ''S''.pop()
+          add ''w'' to current strongly connected component
+        '''until''' (''w'' = ''v'')
+        output the current strongly connected component
+      '''end if'''
+    '''end function'''
+
+變量<tt>index</tt>是深度優先搜索的節點計數器。 <tt>S</tt>是堆疊，初始為空，用於存儲已經訪問但未被判定屬於任一強連通分量的節點。注意這並非一個一般深度優先搜索的堆疊，節點不是在以它為根的子樹搜索完成後出堆疊，而是在整個強連通分量被找到時。
+
+最外層循環用於查找未訪問的節點，以保證所有節點最終都會被訪問。 <tt>strongconnect</tt>進行一次深度優先搜索，並找到節點<tt>v</tt>的後繼節點構成的子圖中所有的強連通分量。
+
+當一個節點完成遞迴時，若它的<tt>lowlink</tt>仍等於<tt>index</tt>，那麼它就是強連通分量的根。算法將在此節點之後入堆疊（包含此節點）且仍在堆疊中的節點出堆疊，並作為一個強連通分量輸出。
+
+== 備註 ==
+# 複雜度:對每個節點，過程<tt>strongconnect</tt>只被調用一次；整個程序中每條邊最多被考慮一次。因此算法的運行時間關於圖的邊數是線性的，即<math>O(|V|+|E|)</math>。
+# 判斷節點<tt>v'</tt>是否在堆疊中應在常數時間內完成，例如可以對每個節點保存一個是否在堆疊中的標記。
+# 同一個強連通分量內的節點是無序的，但此算法具有如下性質：每個強連通分量都是在它的所有後繼強連通分量被求出之後求得的。因此，如果將同一強連通分量收縮為一個節點而構成一個[[有向無環圖|有向無環圖]]，這些強連通分量被求出的順序是這一新圖的[[拓撲排序|拓撲序]]的逆序<ref>{{cite web|last=Harrison|first=Paul|title=Robust topological sorting and Tarjan's algorithm in Python|url=http://www.logarithmic.net/pfh/blog/01208083168|accessdate=2011-02-09|archive-date=2011-02-15|archive-url=https://web.archive.org/web/20110215064923/http://www.logarithmic.net/pfh/blog/01208083168|dead-url=yes}}</ref>。
+
+== 參考 ==
+<references />
+
+== 外部連結 ==
+*[http://www.byvoid.com/blog/scc-tarjan/ BYVoid對Tarjan算法的講解]{{Wayback|url=http://www.byvoid.com/blog/scc-tarjan/ |date=20110413004720 }}
+
+{{算法}}
+
+[[Category:圖算法|Category:圖算法]]
+[[Category:圖的連通性|Category:圖的連通性]]
+[[Category:图论|Category:图论]]
+[[Category:带有伪代码示例的条目|Category:带有伪代码示例的条目]]

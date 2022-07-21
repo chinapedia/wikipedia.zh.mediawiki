@@ -1,0 +1,1 @@
+#REDIRECT [[Template:线粒体蛋白质]]

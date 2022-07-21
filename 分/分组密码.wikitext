@@ -1,0 +1,99 @@
+{{NoteTA|G1=IT}}
+在[[密码学|密码学]]中，'''分组加密'''（{{lang-en|'''Block cipher'''}}），又称'''分块加密'''或'''块密码'''，是一种[[对称密钥算法|对称密钥算法]]。它将明文分成多个等长的模块（block），使用确定的算法和[[对称密钥|对称密钥]]对每组分别加密解密。分组加密是极其重要的[[加密协议|加密协议]]组成，其中典型的如[[高級加密標準|AES]]和[[3DES|3DES]]作为美国政府核定的标准加密算法，应用领域从电子邮件加密到银行交易转帐，非常广泛。
+
+现代分组加密建立在[[迭代|迭代]]的思想上产生密文。其思想由[[克劳德·香农|克劳德·香农]]在他1949年的重要论文《保密系统的通信理论》（Communication Theory of Secrecy Systems）中提出，作为一种通过简单操作如替代和排列等以有效改善保密性的方法。<ref name="shannon">{{cite journal|last1=Shannon|first1=Claude|title=Communication Theory of Secrecy Systems|journal=[[Bell_System_Technical_Journal|Bell System Technical Journal]]|volume=28|issue=4|pages=656–715|year=1949|url=http://netlab.cs.ucla.edu/wiki/files/shannon1949.pdf|access-date=2013-09-24|archive-date=2007-06-05|archive-url=https://web.archive.org/web/20070605092733/http://netlab.cs.ucla.edu/wiki/files/shannon1949.pdf|dead-url=yes}}</ref> 迭代产生的密文在每一轮加密中使用不同的'''子密钥'''，而子密钥生成自原始密钥。
+
+[[DES|DES]]加密在1977年由前[[美国国家标准局|美国国家标准局]]（今“美国国家标准与技术研究所”）颁布，是现代分组加密设计的基础思想。它同样也影响了[[密码分析|密码分析]]的学术进展。
+
+== 简述 ==
+分组加密包含两个成对的算法：加密算法''E''和解密算法''D''，两者互为[[反函数|反函数]]。每个算法有两个输入：长度为''n''[[位元|位]]的组，和长度为''k''位的密钥；两组输入均生成''n''位输出。将两个算法看作函数，''K''表示长度为''k''的密钥（密钥长度），''P''表示长度为''n''的分组，''P''也被表示为[[明文|明文]]，''C''表示[[密文|密文]]，则满足：
+:<math>E_K(P) = C \; ; \quad E_K^{-1}(C)=P</math>
+:<math>E_K(P) := E(K,P): \{0,1\}^k \times \{0,1\}^n \rightarrow \{0,1\}^n,</math>
+
+对于任意密钥''K''，''E<sub>K</sub>(P)''是输入的组的一个[[双射|置换函数]]，且可逆地落在{0,1}<sup>''n''</sup>区间。''E''的反函数（解密算法）定义为：
+:<math>E_K^{-1}(C) := D_K(C) = D(K,C): \{0,1\}^k \times \{0,1\}^n \rightarrow \{0,1\}^n,</math>
+例如，一个分组加密算法使用一段 128 位的分组作为明文，相应输出 128 位的密文；而其转换则受加密算法中第二个输入的控制，也就是密钥''k''。解密算法类似，使用 128 位的密文和对应的密钥，得到原 128 位的明文。
+
+* 每一个密钥实际上是选择了''n''位输入排列的<math>(2^n)!</math>种组合中的一种<ref name="bishop">{{cite book
+| author = Matt Bishop
+| title = Introduction to Computer Security
+| isbn = 0321247442
+| publisher = Addison-Wesley Professional
+| edition = First Edition
+| year = 2004
+| language = en}}</ref>。
+
+大多数的分组密码在在加密算法中会重复使用某一函数进行多轮运算，典型的轮数在4-32次之间，每一轮的函数''R''使用不同的子密钥''K<sub>i</sub>''，由原密钥生成，作为输入：
+:<math>M_i = R_{K_i}(M_{i-1})</math>
+其中<math>M_0</math>是最初的明文，<math>M_i</math>是第''i''轮加密后的密文。
+
+== 历史 ==
+{{le|路西法 (密碼)|Lucifer (cipher)|Lucifer}}一般被认为是第一个现代分组密码，由[[IBM|IBM]]在1970年代基于霍斯特·費斯妥（{{lang|en|Horst Feistel}}）的工作完成。它的一个修改版本是[[DES|数据加密标准]]，被美国政府纳入[[联邦资料处理标准|联邦资料处理标准]]，并于1976年正式发布，至今仍被广泛应用。
+
+当时设计DES密码的最初目的是为了抵抗某些[[美国国家安全局|美国国家安全局]]（{{lang|en|NSA}}）和IBM知道的密码分析方法，直到1980年代末期，这种被称为[[差分密码分析|差分密码分析]]的方法才被毕汉姆（{{Lang|en|Eli Biham}}）和萨莫尔（{{lang|en|Adi Shamir}}）独立重新发现<ref>{{cite journal
+|title = Differential cryptanalysis of DES-like cryptosystems 
+|doi = 10.1007/BF00630563
+|author = Eli Biham and Adi Shamir
+|journal = Journal of Cryptology
+|year = 1991
+|volume = 4
+|number = 1
+|language = en}}</ref>。{{le|線性密碼分析|Linear cryptanalysis}}是另一种方法，{{lang|en|NSA}}在{{tsl|en|Mitsuru Matsui|松井充}}发布这种实验性的密码分析方法<ref>{{cite conference
+| title = The First Experimental Cryptanalysis of the Data Encryption Standard
+| author = Mitsuru Matsui
+| year = 1994
+| conference = CRYPTO
+| doi = 10.1007/3-540-48658-5_1}}</ref>之前还并不知道。DES作为早期的分组密码，最早成为密码标准，由于在最初DES并未公布其实现细节，其S盒设计被怀疑包含后门，因此学界对其进行了大量的研究，提高了学界对分组密码的了解，客观上促进了密码学及密码分析的发展，引领了很多密码学和密码分析的研究。另一种分组密码标准[[高级加密标准|高级加密标准]]（AES）被[[美国国家标准与技术研究院|美国国家标准与技术研究院]]（NIST）采纳，即将逐渐取代DES目前的位置。
+
+== 优缺点 ==
+
+== 设计原则 == 
+[[混淆與擴散|混淆與擴散]]（confusion and diffusion）是影响密码安全的主要因素<ref>{{cite journal 
+| author = [[克劳德·香农|C.E. Shannon]]
+| title = Communication theory of secrecy systems. 
+| journal = Bell System Technology Journal
+| year =  1949
+| volume = 28 
+| page = 656-715
+| language = en}}</ref>。扩散的目的是让明文中的单个数字影响密文中的多个数字，从而使明文的统计特征在密文中消失，相当于明文的统计结构被扩散<ref>{{cite web
+|author = 黄皓
+|title = 分组加密的原理
+|work = 《计算机系统信息安全》课程讲义
+|publisher = 南京大学
+|url = http://cs.nju.edu.cn/huanghao/Security/ch01-Block.pdf
+|date = 2010年9月28日
+|language = zh
+|accessdate = 2011-07-29
+|archive-date = 2018-10-07
+|archive-url = https://web.archive.org/web/20181007005409/http://cs.nju.edu.cn/huanghao/Security/ch01-Block.pdf
+|dead-url = no
+}}</ref>。例如，最简单的方法让明文中的一个数字影响密文中的''k''个数字，可以用：
+:<math>c_n = \sum^k_{i=1}m_{n+i}</math>
+扰乱是指让密钥与密文的统计信息之间的关系变得复杂，从而增加通过统计方法进行攻击的难度。扰乱可以通过各种代换算法实现。
+
+设计安全的分组加密算法，需要考虑对现有密码分析方法的抵抗，如差分分析、线性分析等，还需要考虑密码安全强度的稳定性。此外，用软件实现的分组加密要保证每个组的长度适合软件编程（如8、16、32……），尽量避免位置换操作，以及使用加法、乘法、移位等处理器提供的标准指令；从硬件实现的角度，加密和解密要在同一个器件上都可以实现，即加密解密硬件实现的相似性<ref>{{cite book
+| author = 冯登国，吴文玲，张文涛
+| title = 《分组密码的设计与分析》
+| publisher = [[清华大学出版社|清华大学出版社]]
+| edition = 第二版
+| isbn = 9787302204602
+| year = 2009年
+| language = zh}}</ref>。
+
+== 工作模式 ==
+{{Main|分组密码工作模式}}
+
+== 参考文献 ==
+{{Reflist|30em}}
+
+== 参见 ==
+{{Portal box|密码学}}
+* [[密码学|密码学]]
+* [[流密码|流密码]]
+
+{{-}}
+{{分组密码}}
+{{密码学}}
+
+[[Category:分组密码|]]
+[[Category:密碼原語|Category:密碼原語]]

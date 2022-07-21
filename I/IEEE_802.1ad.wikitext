@@ -1,0 +1,54 @@
+{{expand|time=2011-06-14T08:58:16+00:00}}
+
+'''IEEE 802.1ad'''或稱為'''QinQ'''、'''vlan stacking'''。是一種以[[IEEE_802.1Q|802.1Q]]為基礎衍生出來的通訊協定。
+
+原始[[IEEE_802.1Q|802.1Q]]為允許加入單一Vlan header。QinQ允許兩個Vlan header被放置在同一個frame中。
+
+主要用途為電信供應商可以放置一個vlan標籤作為通過外部網路的辨識，而不需變動客戶的封包所帶出的vlan標籤。
+
+==優點==
+1. 擴充原始的vlan個數4094 -> 4094(inner)*4094(outer)。
+
+2. ISP可以針對單一客戶設置單一vlan tag，而不需變更客戶的封包資訊。
+
+3. 不需要客戶的相互配合及合作，即可進行供應商橋樑的配置。
+
+==端口角色==
+1. Normal port : for 802.1Q訊框通行的port
+
+
+2. Access port : SP邊緣裝置的入口port，在vlan stacking中被視為untagged，因此加入第二個vlan tag(outer)。
+
+
+3. Tunnel port : SP邊緣裝置的出口port，同一個客戶端皆被帶入同一個vlan tagged(使用SPVID)。
+
+
+== 訊框格式 ==
+
+[[File:TCPIP_802.1ad_DoubleTag.svg|center]]
+
+==範例==
+[[File:QinQ-example-simple-SP-cloud.JPG|thumbnail]]
+
+Acme及XYZ分別在Seattle及Tacoma有一間分公司，並藉由SP的L2 VPN網路連線，而他們的子公司都使用相同的LAN。
+換句話說，我們可以假設，Acme使用VLAN 100-200並透過SP連結兩間子公司的網路；XYZ也使用VLAN 100-200並使用SP的網路連結子公司。
+
+
+而對SP而言，則必須想辦法區隔Acme及XYZ的資料，使其有辦法通過SP的網路並分別送至各自的子公司。
+
+
+解決辦法就是，使用VLAN STACKING來區隔Acme及XYZ的資料。
+
+當Acme送出資料時，SP使用QinQ並給予該資料一個獨特的SPVID 1001，使其能通過SP的網路並流向另外一間子公司，當到達子公司則移除該SPVID，該資料便能依照原始的VLAN ID進行傳送。而XYZ送出資料時，SP則使用SPVID 1002來區隔。
+
+==參考文獻==
+# Standard approved 8 December 2005 and published May 26, 2006.
+
+==外部連結==
+*[http://www.ieee802.org/1/pages/802.1ad.html IEEE 802.1AD]{{Wayback|url=http://www.ieee802.org/1/pages/802.1ad.html |date=20141007084832 }}
+
+{{IEEE標準}}
+
+{{Reflist|group=note}}
+[[Category:IEEE_802|Category:IEEE 802]]
+[[Category:以太网标准|Category:以太网标准]]

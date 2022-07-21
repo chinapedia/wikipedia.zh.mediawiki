@@ -1,0 +1,105 @@
+{{NoteTA|G1=IT}}
+{{Program execution}}
+在[[计算_(计算机科学)|计算机技术]]中，'''即时编译'''（{{lang-en|just-in-time compilation}}，缩写为'''JIT'''；又译'''及时编译'''<ref>丁宇新, 梅嘉, & 程虎. (1999). 国产开放系统平台 Java 及时编译器的设计与实现 (Doctoral dissertation). http://www.cnki.com.cn/Article/CJFDTotal-JSJX199912010.htm {{Wayback|url=http://www.cnki.com.cn/Article/CJFDTotal-JSJX199912010.htm |date=20190421020509 }}</ref>、'''实时编译'''<ref>[https://www.microsoft.com/zh-cn/language/Search 微软语言门户术语搜索] {{Wayback|url=https://www.microsoft.com/zh-cn/language/Search |date=20190421012726 }}中英语Just-in-time compilation到简体中文</ref>），也称为'''动态翻译'''或'''运行时编译'''<ref>{{citation|title=Languages, Compilers, and Runtime Systems|accessdate=2018-03-15|publisher=University of Michigan, Computer Science and Engineering|url=https://www.eecs.umich.edu/eecs/research/area.html?areaname=languages-compilers|archive-url=https://web.archive.org/web/20180326105004/http://eecs.umich.edu/eecs/research/area.html?areaname=languages-compilers|archive-date=2018-03-26|dead-url=no}}</ref>，是一种执行[[计算机代码|计算机代码]]的方法，这种方法涉及在程序执行过程中（在[[執行期|執行期]]）而不是在执行之前进行[[編譯器|编译]]。{{sfn|Aycock|2003}}通常，这包括[[源代码|源代码]]或更常见的[[字节码|字节码]]到[[机器语言|机器码]]的转换，然后直接执行。实现JIT编译器的系统通常会不断地分析正在执行的代码，并确定代码的某些部分，在这些部分中，编译或重新编译所获得的加速将超过编译该代码的开销。
+
+JIT编译是两种传统的机器代码翻译方法——{{le|提前编译|ahead-of-time compilation}}（AOT）和[[直譯器|解释]]——的结合，它结合了两者的优点和缺点。{{sfn|Aycock|2003}}大致来说，JIT编译将编译代码的速度与解释的灵活性、解释器的开销以及额外的编译开销（而不仅仅是解释）结合起来。JIT编译是[[動態編譯|動態編譯]]的一种形式，允许{{le|自适应优化|adaptive optimization}}，比如[[动态重编译|动态重编译]]和特定于[[微架構|微架構]]的加速{{refn|group=nb|提前编译器也可以针对特定的微体系结构，但AOT和JIT之间的区别在于可移植性。JIT可以在运行时生成为当前运行的CPU量身定制的代码，而AOT必须事先知道目标CPU，而不是为微架构的广义子集进行优化，这样的代码不仅不能在其他CPU类型上执行，而且可能完全不稳定。}}<ref>{{Cite news|url=https://blogs.msdn.microsoft.com/davidnotario/2005/08/15/does-the-jit-take-advantage-of-my-cpu/|title=Does the JIT take advantage of my CPU?|work=David Notario's WebLog|access-date=2018-12-03|archive-url=https://web.archive.org/web/20181204053813/https://blogs.msdn.microsoft.com/davidnotario/2005/08/15/does-the-jit-take-advantage-of-my-cpu/|archive-date=2018-12-04|dead-url=no}}</ref>——因此，在理论上，JIT编译比静态编译能够产生更快的执行速度。解释和JIT编译特别适合于[[动态语言|动态编程语言]]，因为运行时系统可以处理{{le|后期绑定|Late binding}}的数据类型并实施安全保证。
+
+==应用==
+JIT编译可以应用于某些程序，也可以用于某些能力，特别是动态能力，如[[正则表达式|正则表达式]]。例如，一个文本编辑器可以把运行时提供的正则表达式编译成机器码，从而更快地进行匹配——这不能提前完成，因为pattern只在运行时提供。一些现代的[[运行时系统|运行时环境]]依赖JIT编译来实现高速代码执行，包括大多数[[Java|Java]]实现，以及[[微软|微软]]的[[.NET框架|.NET框架]]。类似地，许多正则表达式库都具有对正则表达式进行JIT编译的功能，可以编译成字节码，也可以编译成机器码。JIT编译也用于一些模拟器中，以便将机器代码从一个CPU体系结构转换到另一个CPU体系结构。
+
+JIT编译的一个常见实现是首先进行AOT编译，把源代码编译成字节码（[[虛擬機器|虚拟机]]代码），称为'''字节码编译'''，然后将JIT编译为机器码（动态编译），而不是解释字节码。与解释相比，这提高了运行时性能，但代价是编译造成的延迟。与解释器一样，JIT编译器不断地进行翻译，但是对编译后的代码进行缓存可以最大限度地减少在给定运行期间将来执行相同代码的延迟。
+
+==概述==
+在字节码编译的系统中，[[源代码|源代码]]被转换为称为[[字节码|字节码]]的中间表示形式。字节码不是任何特定计算机的机器代码，可以在计算机体系结构之间移植。然后可以在[[虛擬機器|虚拟机]]上解释或运行字节码。JIT编译器在许多部分（或全部、很少）读取字节码，并将它们动态编译成机器代码，以便程序能够更快地运行。这可以针对每个文件、每个函数甚至任何任意代码片段进行编译; 代码可以在即将执行时进行编译（因此称为“即时”），然后缓存并在以后重用，无需重新编译。
+
+相比之下，传统的'''解释型虚拟机'''只解释字节码，通常性能要低得多。有些'''解释器'''甚至不需要首先编译成字节码就可以解释源代码，但性能更差。'''静态编译的代码'''或'''本地代码'''在部署之前编译。动态编译环境是在执行期间可以使用编译器的环境。
+使用JIT技术的一个共同目标是达到或超过静态编译的性能，同时保持字节码解释的优势：解析原始源代码和执行基本优化的许多“繁重工作”通常是在编译时处理的，在部署之前：从字节码编译到机器码要比从源代码编译快得多。与本地代码不同，部署的字节码是可移植的。由于运行时可以控制编译，比如解释字节码，所以它可以在安全的沙箱中运行。从字节码到机器码的编译器更容易编写，因为便携式字节码编译器已经完成了大部分工作。
+
+JIT代码通常比解释器性能更好。另外，在某些情况下，它的性能可以比静态编译更好，因为许多优化只在运行时可行：<ref>{{Cite web|url=https://www.cs.columbia.edu/~aho/cs6998/Lectures/14-09-22_Croce_JIT.pdf|title=Just in Time Compilation|last=Croce|first=Louis|date=|website=Columbia University|access-date=|archive-url=https://web.archive.org/web/20180503145240/http://www.cs.columbia.edu/~aho/cs6998/Lectures/14-09-22_Croce_JIT.pdf|archive-date=2018-05-03|dead-url=yes}}</ref><ref>{{Cite web|url=https://stackoverflow.com/q/2106380|title=What are the advantages of JIT vs. AOT compilation|last=|first=|date=2010-01-21|website=Stack Overflow|access-date=|archive-date=2020-04-24|archive-url=https://web.archive.org/web/20200424234406/https://stackoverflow.com/questions/2106380/what-are-the-advantages-of-just-in-time-compilation-versus-ahead-of-time-compila|dead-url=no}}</ref>
+
+#编译可以针对目标CPU和应用程序运行的操作系统模型进行优化。例如，JIT可以在检测到CPU支持[[SSE2|SSE2]]矢量CPU指令时选择它们。要使用静态编译器获得这种优化级别的特殊性，必须为每个预期的平台/体系结构编译一个二进制文件，或者在一个二进制文件中包含多个版本的部分代码。 
+#该系统能够收集关于程序在其所在环境中实际运行情况的统计信息，并且能够重新排列和重新编译以获得最佳性能。但一些静态编译器也可以将概要信息作为输入。
+#该系统可以进行全局代码优化（例如[[内联展开|内联]]库函数），同时不失去动态链接的优点，也不会失去静态编译器和链接器固有的开销。具体来说，在进行全局内联替换时，静态编译过程可能需要运行时检查，并确保如果对象的实际类重写了内联方法，就会发生虚拟调用，并且对数组访问的边界条件检查可能需要在循环中处理。在许多情况下，使用即时编译，这种处理可以从循环中移出，通常会大大提高速度。
+#尽管使用静态编译的垃圾收集语言可以做到这一点，但字节码系统可以更容易地重新排列执行的代码，以获得更好的缓存利用率。
+
+由于JIT必须在运行时呈现和执行本地二进制映像，因此真正的机器代码JIT需要允许在运行时执行数据的平台，这使得在基于[[哈佛结构|哈佛结构]]的机器上使用这种JIT成为不可能的事情——对于某些操作系统和虚拟机也是如此。然而，一种特殊类型的“JIT”可能并不针对物理机器的CPU体系结构，而是一种优化的VM字节码，在这种情况下，对原始机器代码的限制占了上风，特别是在字节码的VM最终将JIT用于本机代码的情况下。<ref>{{Cite web|url=https://stackoverflow.com/q/42919339|title=javascript - Compile a JIT based lang to Webassembly|website=Stack Overflow|access-date=2018-12-04|archive-date=2019-12-14|archive-url=https://web.archive.org/web/20191214214511/https://stackoverflow.com/questions/42919339/compile-a-jit-based-lang-to-webassembly|dead-url=no}}</ref>
+
+== 启动延迟和优化 ==
+由于加载和编译字节码所需的时间，JIT在应用程序的初始执行中会导致轻微到明显的延迟。有时这种延迟被称为“启动时间延迟”或“预热时间”。一般来说，JIT执行的优化越多，生成的代码就越好，但是初始延迟也会增加。因此，JIT编译器必须在编译时间和希望生成的代码质量之间进行权衡。除了JIT编译之外，IO绑定操作也会增加启动时间：例如，JVM的“rt.jar”类数据文件为40 MB，JVM必须在这个巨大的上下文文件中寻找大量数据。<ref>{{cite web
+| url=http://java.sun.com/developer/technicalArticles/javase/consumerjre#Quickstarter
+| title=Consumer JRE: Leaner, Meaner Java Technology
+| publisher=Sun Microsystems
+| last=Haase
+| first=Chet
+| quote=''At the OS level, all of these megabytes have to be read from disk, which is a very slow operation. Actually, it's the seek time of the disk that's the killer; reading large files sequentially is relatively fast, but seeking the bits that we actually need is not.  So even though we only need a small fraction of the data in these large files for any particular application, the fact that we're seeking all over within the files means that there is plenty of disk activity. ''
+| date=May 2007
+| accessdate=2007-07-27
+| archive-url=https://web.archive.org/web/20070812204409/http://java.sun.com/developer/technicalArticles/javase/consumerjre/#Quickstarter
+| archive-date=2007-08-12
+| dead-url=no
+}}</ref>
+
+Sun的[[HotSpot|HotSpot]] Java虚拟机使用的一种可能的优化方法是将解释和JIT编译结合起来。应用程序代码最初是被解释的，但JVM监视哪些字节码序列经常被执行，并将它们转换为机器代码，以便在硬件上直接执行。对于只执行几次的字节码，这节省了编译时间并减少了初始延迟；对于频繁执行的字节码，JIT编译用于在缓慢解释的初始阶段之后以高速运行。此外，由于程序花费大量时间执行的其实只是一小部分代码，因此减少的编译时间非常重要。最后，在初始代码解释期间，可以在编译之前收集执行统计信息，这有助于执行更好的优化。<ref>{{cite web |url=http://www.oracle.com/technetwork/java/whitepaper-135217.html |title=The Java HotSpot Performance Engine Architecture |publisher=Oracle.com |date= |accessdate=2013-07-05 |archive-url=https://web.archive.org/web/20130721110529/http://www.oracle.com/technetwork/java/whitepaper-135217.html |archive-date=2013-07-21 |dead-url=no }}</ref>
+
+正确的权衡可以根据具体情况而变化。例如，Sun的Java虚拟机有两种主要模式: 客户机和服务器。在客户端模式下，执行最小程度的编译和优化，以减少启动时间。在服务器模式下，将执行大量的编译和优化，以牺牲启动时间来最大限度地提高应用程序运行时的性能。其他Java即时编译器使用一个方法执行次数的运行时度量，结合方法的字节码大小作为一种启发式方法来决定何时编译。<ref>{{cite journal |title=The simplest heuristics may be the best in Java JIT compilers |last=Schilling |first=Jonathan L. |journal=[[SIGPLAN_Notices|SIGPLAN Notices]] |volume=38 |issue=2 |date=February 2003 |pages=36–46 |doi=10.1145/772970.772975 |url=http://www.sco.com/developers/java/news/jit-heur.pdf |dead-url=yes |archiveurl=https://web.archive.org/web/20150924095409/http://www.sco.com/developers/java/news/jit-heur.pdf |archivedate=2015-09-24 |access-date=2020-04-18 }}</ref>还有的使用执行的次数与检测循环相结合。<ref>Toshio Suganuma, Toshiaki Yasue, Motohiro Kawahito, Hideaki Komatsu, Toshio Nakatani, "A dynamic optimization framework for a Java just-in-time compiler", ''Proceedings of the 16th ACM SIGPLAN conference on Object-oriented programming, systems, languages, and applications'' (OOPSLA '01), pp. 180–195, October 14–18, 2001.</ref>一般来说，在短期运行的应用程序中准确预测要优化的方法要比在长期运行的应用程序中准确得多。<ref>Matthew Arnold, Michael Hind, Barbara G. Ryder, "An Empirical Study of Selective Optimization", ''Proceedings of the 13th International Workshop on Languages and Compilers for Parallel Computing-Revised Papers'', pp. 49–67, August 10–12, 2000.</ref>
+
+[[微软|微软]]的{{le|本地镜像生成器|Native Image Generator}}（Ngen）是另一种减少初始延迟的方法。<ref>{{cite web |url=http://msdn2.microsoft.com/en-us/library/6t9t5wcf(VS.80).aspx |title=Native Image Generator (Ngen.exe) |publisher=Msdn2.microsoft.com |date= |accessdate=2013-07-05 |archive-url=https://web.archive.org/web/20080405180923/http://msdn2.microsoft.com/en-us/library/6t9t5wcf(VS.80).aspx |archive-date=2008-04-05 |dead-url=no }}</ref>Ngen将{{le|通用中间语言映像|Common Intermediate Language}}中的字节码预编译成机器本机代码。因此，不需要运行时编译。Visual Studio 2005附带的[[.NET_Framework|.NET Framework]] 2.0在安装之后立即在所有微软库dll上运行Ngen。预JIT提供了一种提高启动时间的方法。但是，它生成的代码质量可能不如JIT生成的代码质量好，原因与静态编译的代码（没有{{le|按配置优化|profile-guided optimization}}）在极端情况下不如JIT编译的代码的原因相同：缺乏分析数据来驱动，例如，内联缓存。<ref>Matthew R. Arnold, Stephen Fink, David P. Grove, Michael Hind, and Peter F. Sweeney, "[http://researcher.ibm.com/researcher/files/us-hindm/RC23429.pdf A Survey of Adaptive Optimization in Virtual Machines] {{Wayback|url=http://researcher.ibm.com/researcher/files/us-hindm/RC23429.pdf |date=20160629150108 }}", ''Proceedings of the IEEE'', 92(2), February 2005, pp. 449–466.</ref>
+
+还有一些Java实现将AOT编译器与JIT编译器（[[Excelsior_JET|Excelsior JET]]）或解释器（[[GNU_Compiler_for_Java|GNU Compiler for Java]]）结合起来。
+
+== 历史 ==
+最早发布的JIT编译器通常归功于[[约翰·麦卡锡|约翰·麦卡锡]]在1960年对[[LISP|LISP]]的研究。{{sfn|Aycock|2003|loc=2. JIT Compilation Techniques, 2.1 Genesis, p. 98}}在他的重要论文《符号表达式的递归函数及其在机器上的计算》（{{lang|en|Recursive functions of symbolic expressions and their computation by machine, Part I}}）第一部分中，他提到了在运行时被转换的函数，因此不需要保存编译器输出来[[打孔卡|打孔卡]]<ref name="McCarthy1960">{{cite journal|last=McCarthy|first=J.|authorlink=John McCarthy (computer scientist)|title=Recursive functions of symbolic expressions and their computation by machine, Part I|journal=Communications of the ACM|date=April 1960|volume=3|issue=4|pages=184–195|doi=10.1145/367177.367199|citeseerx = 10.1.1.111.8833}}<!--|accessdate=24 May 2010--></ref>（虽然更准确的说法是“{{le|编译并执行系统|Compile and go system}}”）。另一个早期的应用来自[[肯·汤普逊|肯·汤普逊]]，他在文本编辑器[[QED_(text_editor)|QED]]的[[正则表达式|正则表达式]]模式匹配中使用了JIT。{{sfn|Thompson|1968}}为了提高速度，Thompson在[[相容分時系統|相容分時系統]]上通过JIT到[[IBM_7090|IBM 7090]]代码实现了正则表达式匹配。{{sfn|Aycock|2003|loc=2. JIT Compilation Techniques, 2.1 Genesis, p. 98}}1970年，Mitchell首创了一种有影响力的从解释中获取编译代码的技术，他在实验语言LC²中实现了这种技术。{{sfn|Aycock|2003|loc=2. JIT Compilation Techniques, 2.2 LC², p. 98–99}}<ref name=Mitchell1970>{{Cite journal|last=Mitchell|first=J.G.|title=The design and construction of flexible and efficient interactive programming systems|year=1970 }}</ref>
+
+[[Smalltalk|Smalltalk]]（1983年）开创了JIT编译的新领域。例如，按需翻译为机器代码，缓存结果以供以后使用。当内存不足时，系统会删除部分代码，并在需要时重新生成。{{sfn|Aycock|2003}}<ref name="Schiffman1984">{{Cite journal |last=Deutsch |first=L.P. |last2=Schiffman |first2=A.M. |title=Efficient implementation of the Smalltalk-80 system |journal=POPL '84: Proceedings of the 11th ACM SIGACT-SIGPLAN Symposium on Principles of Programming Languages |year=1984 |pages=297–302 |doi=10.1145/800017.800542 |url=http://webpages.charter.net/allanms/popl84.pdf |isbn=0-89791-125-3 |dead-url=yes |archiveurl=https://web.archive.org/web/20040618105930/http://webpages.charter.net/allanms/popl84.pdf |archivedate=2004-06-18 |access-date=2020-04-18 }}</ref>Sun的[[Self|Self]]语言广泛地改进了这些技术，一度是世界上速度最快的Smalltalk系统；运用完全面向对象的语言实现了高达优化C语言一半的速度。<ref>{{Cite web |url=http://research.sun.com/jtech/pubs/97-pep.ps |title=存档副本 |accessdate=2020-04-18 |archive-date=2006-11-24 |archive-url=https://web.archive.org/web/20061124224739/http://research.sun.com/jtech/pubs/97-pep.ps |dead-url=yes }}</ref>
+
+Self被Sun抛弃了，但是研究转向了Java语言。“即时编译”这个术语是从制造术语“[[及時制度|及时]]”中借来的，并由Java普及，James Gosling从1993年开始使用这个术语。{{sfn|Aycock|2003|2.14 Java, p. 107, footnote 13}}目前，大多数[[Java虚拟机|Java虚拟机]]的实现都使用JIT技术，因为[[HotSpot|HotSpot]]建立在这个研究基础之上，而且使用广泛。
+
+HP的项目Dynamo<ref>[http://cseweb.ucsd.edu/classes/sp00/cse231/dynamopldi.pdf "Dynamo: A Transparent Dynamic Optimization System"] {{Wayback|url=http://cseweb.ucsd.edu/classes/sp00/cse231/dynamopldi.pdf |date=20120602223051 }}
+Vasanth Bala, Evelyn Duesterwald, Sanjeev Banerjia - 
+PLDI '00 Proceedings of the ACM SIGPLAN 2000 conference on Programming language design and implementation - pages 1 to 12 - 
+{{DOI|10.1145/349299.349303}}.
+Retrieved March 28, 2012</ref>是一个实验性的JIT编译器，其字节码格式和机器代码格式是相同的；该系统将PA-6000机器代码转换为[[PA-8000|PA-8000]]机器代码。与直觉相反，这导致了速度的提高，在某些情况下是30%，因为这样做允许在机器代码级别进行优化，例如，内联代码以更好地使用缓存，优化对动态库的调用，以及许多其他常规编译器无法尝试的运行时优化。<ref>{{cite web |author=John Jannotti |url=https://arstechnica.com/reviews/1q00/dynamo/dynamo-1.html |title=HP's Dynamo - Page 1 - (3/2000) |website=Ars Technica |accessdate=2013-07-05 |archive-url=https://web.archive.org/web/20120205021624/http://arstechnica.com/reviews/1q00/dynamo/dynamo-1.html |archive-date=2012-02-05 |dead-url=no }}</ref><ref>{{cite web |url=http://www.hpl.hp.com/cambridge/projects/Dynamo/ |title=The HP Dynamo Project |accessdate=2016-04-12 |dead-url=yes |archiveurl=https://web.archive.org/web/20021019114947/http://www.hpl.hp.com/cambridge/projects/Dynamo/ |archivedate=2002-10-19 }}</ref>
+
+2019年3月30日，PHP宣布JIT将于2021年加入PHP 8<ref>{{Cite web | url=https://blog.krakjoe.ninja/2019/03/php-gr8.html | title=PHP Gr8 | access-date=2020-04-18 | archive-url=https://web.archive.org/web/20200223074054/https://blog.krakjoe.ninja/2019/03/php-gr8.html | archive-date=2020-02-23 | dead-url=no }}</ref>。<ref>{{Cite web|url = https://hub.packtpub.com/php-8-and-7-4-to-come-with-just-in-time-jit-to-make-most-cpu-intensive-workloads-run-significantly-faster/|title = PHP 8 and 7.4 to come with Just-in-time (JIT) to make most CPU-intensive workloads run significantly faster|date = April 2019|access-date = 2020-04-18|archive-date = 2020-10-07|archive-url = https://web.archive.org/web/20201007113845/https://hub.packtpub.com/php-8-and-7-4-to-come-with-just-in-time-jit-to-make-most-cpu-intensive-workloads-run-significantly-faster/}}</ref>
+
+==安全==
+JIT编译从根本上使用可执行数据，因此带来了安全挑战和可能的漏洞。
+
+JIT编译的实现包括将源代码或字节码编译成机器码并执行它。这通常是直接在内存中完成的——JIT编译器将机器代码直接输出到内存中并立即执行，而不是像通常的提前编译那样将其输出到磁盘，然后作为单独的程序调用代码。在现代的体系结构中，由于{{le|可执行空间保护|executable space protection}}，这会遇到一个问题——无法执行任意内存，否则就存在潜在的安全漏洞。因此，必须将内存标记为可执行；出于安全原因，应在代码写入内存并标记为只读之后执行，因为可写/可执行内存是一个安全漏洞（参见[[W^X|W^X]]）。<ref>"[http://eli.thegreenplace.net/2013/11/05/how-to-jit-an-introduction/ How to JIT – an introduction] {{Wayback|url=http://eli.thegreenplace.net/2013/11/05/how-to-jit-an-introduction/ |date=20190317144310 }}", Eli Bendersky, November 5th, 2013 at 5:59 am</ref>例如Firefox的JavaScript的JIT编译器在Firefox 46版本中引入了这种保护。<ref>{{cite web|last1=De Mooij|first1=Jan|title=W^X JIT-code enabled in Firefox|url=http://jandemooij.nl/blog/2015/12/29/wx-jit-code-enabled-in-firefox/|website=Jan De Mooij|accessdate=2016-05-11|archive-url=https://web.archive.org/web/20160514224256/http://jandemooij.nl/blog/2015/12/29/wx-jit-code-enabled-in-firefox/|archive-date=2016-05-14|dead-url=no}}</ref>
+
+{{le|JIT喷射|JIT spraying}}是一种利用[[漏洞利用|漏洞利用]]的技术，它使用JIT编译进行{{le|堆喷射|heap spraying}}——生成的内存然后是可执行的，如果执行可以移动到堆中，这就允许利用。
+
+==参见==
+{{Portal|電腦程式設計}} 
+* [[二进制翻译|二进制翻译]]
+* [[HotSpot|HotSpot]]
+* [[通用語言運行庫|通用語言運行庫]]
+* {{le|Transmeta Crusoe|Transmeta Crusoe|Crusoe}}，一种微处理器，基本上执行从x86代码到微处理器内部微码的即时编译
+* [[GNU_lightning|GNU lightning]] — 一个在运行时生成汇编语言代码的库
+* [[LLVM|LLVM]]
+* [[自修改代码|自修改代码]]
+* {{le|跟踪即时编译|Tracing just-in-time compilation}}
+* [[動態編譯|動態編譯]]
+
+==注释==
+{{reflist|group=nb}}
+
+== 参考文献 ==
+=== 引用 ===
+{{Reflist}}
+
+=== 来源 ===
+{{refbegin}}
+* {{Cite journal | last = Aycock | first = J. | title = A brief history of just-in-time | doi = 10.1145/857076.857077 | journal = ACM Computing Surveys | volume = 35 | issue = 2 | pages = 97–113 | date = June 2003  | citeseerx = 10.1.1.97.3985 | ref = harv }}
+* {{Cite journal | last = Thompson | first = K. | authorlink = Ken Thompson | title = Programming Techniques: Regular expression search algorithm | doi = 10.1145/363347.363387 | journal = Communications of the ACM | volume = 11 | issue = 6 | pages = 419–422 | year = 1968 | ref = harv }}
+{{refend}}
+
+== 外部链接 ==
+* [https://web.archive.org/web/20020905042721/http://foldoc.doc.ic.ac.uk/foldoc/foldoc.cgi?just-in-time 自由在线计算机词典的词条]
+*[https://developer.mozilla.org/En/Nanojit Mozilla Nanojit] {{Wayback|url=https://developer.mozilla.org/En/Nanojit |date=20120509215101 }} — 一个小型的可以产生机器码的跨平台C++库。它被用作Mozilla [[Tamarin_(軟體)|Tamarin]]和[[SpiderMonkey|SpiderMonkey]] Javascript引擎的JIT。
+*{{le|OVPsim}}，一种嵌入式核心JIT工具，它将ARM、MIPS和其他ISA指令转换为x86进行执行/模拟
+*[http://software.intel.com/sites/products/documentation/hpc/vtune/windows/jit_profiling.pdf 使用“VTune性能分析器”评测运行时生成和解释的代码]{{Wayback|url=http://software.intel.com/sites/products/documentation/hpc/vtune/windows/jit_profiling.pdf |date=20120127080207 }}
+
+[[Category:编译原理|Category:编译原理]]
+[[Category:仿真软件|Category:仿真软件]]
+[[Category:虛擬化軟體|Category:虛擬化軟體]]

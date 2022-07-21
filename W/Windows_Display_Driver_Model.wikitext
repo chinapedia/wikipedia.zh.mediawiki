@@ -1,0 +1,93 @@
+{{多個問題|
+{{request translation}}
+{{RoughTranslation}}
+{{untranslated-jargon}}
+}}
+{{noteTA|G1=IT}}
+'''Windows Display Driver Model'''（{{lang|en|'''WDDM'''}}），是[[微軟|微軟]]新一代的圖形驅動程式模型。
+
+WDDM是改良舊有的[[Windows_XP|Windows XP]]上的[[XPDM|XPDM]]架構，XPDM是使用2D 的[[GDI|GDI]]（Graphics Device Interface）或 [[GDI+|GDI+]]。與XPDM相比，WDDM是3D加速桌面，最早適用於[[Windows_Vista|Windows Vista]]之上<ref name="WDDMIntro">{{Cite web |url=https://msdn.microsoft.com/en-us/library/aa480220.aspx |title=Windows Vista Display Driver Model |access-date=2017-10-28 |archive-date=2019-02-11 |archive-url=https://web.archive.org/web/20190211175444/https://msdn.microsoft.com/en-us/library/aa480220.aspx }}</ref> 。[[Windows_7|Windows 7]]支援 WDDM 1.1。
+
+==功能==
+WDDM 使用户能够同时运行多个 GPU 密集型应用程序。
+
+一個[[Direct3D|Direct3D]]的圖形表面（surface）的內存區域，包含紋理網格（textured meshes）用於呈現2D或3D場景。WDDM允許不同的行程（process）共享整個Direct3D表面<ref>{{Cite web |url=https://msdn.microsoft.com/en-us/library/dd327290.aspx |title=Cross Process Resource Sharing |access-date=2017-10-28 |archive-date=2017-10-28 |archive-url=https://web.archive.org/web/20171028200651/https://msdn.microsoft.com/en-us/library/dd327290.aspx }}</ref>。在WDDM推出之前，進程之間共享紋理是困難的，因為這將需要複製的數據，從顯存到系統內存，然後返回到視頻內存的新設備。
+
+一旦某個WDDM驅動程式故障時，圖形堆疊（stack）將重新啟動驅動程式。圖形硬件故障時也會被攔截，必要時驅動程式將被重新設定。
+
+WDDM還允許圖形硬件重置或拔出不正確的重新啟動。
+
+==限制==
+新的驅動程序模型要求有圖形硬件支持Shader Model 2.0。根據微軟2009年的調查，大約只有1-2％的硬件使用的XPDM，其餘已具備WDDM的能力。
+
+WDDM 1.0版不支持多個驅動器在多適配器，多顯示器設置。如果一個多監控系統有多個圖形適配器供電的顯示器，無論是適配器必須使用相同的WDDM驅動程序。WDDM 1.1沒有這種限制。
+
+==版本歷史==
+
+===WDDM 1.0===
+在[[Windows_Vista|Windows Vista]]引入了WDDM 1.0作為新的顯示驅動程序架構，旨在更好的執行並支援包括[[HDCP|HDCP]]在內的新技術。
+
+===WDDM 1.1===
+[[Windows_7|Windows 7]] 支援了 WDDM 1.1，最早在 [[WinHEC|WinHEC]] 2008發布此一訊息。新功能有：<ref name=W7Guidelines>{{cite web|url=https://www.microsoft.com/whdc/device/display/GraphicsGuideWin7.mspx|title=WHDC: Graphics Guide for Windows 7|publisher=Microsoft|date=12-06-2009|access-date=2017-10-28|archive-url=https://web.archive.org/web/20110103055644/http://www.microsoft.com/whdc/device/display/graphicsguidewin7.mspx|archive-date=2011-01-03|dead-url=yes}}</ref>
+* [[DXGI|DXGI]] 1.1，可用GDI 支援硬體 [[2D電腦圖形|2D]] 加速<ref name=GDI>{{cite web|url=https://msdn.microsoft.com/en-us/library/ff566559.aspx|title=Windows DDK - GDI Hardware Acceleration|publisher=MSDN|accessdate=2009-06-14|archive-date=2014-04-26|archive-url=https://web.archive.org/web/20140426081737/http://msdn.microsoft.com/en-us/library/ff566559.aspx}}</ref>（無 GDI+）以及 [[Direct2D|Direct2D]]/[[DirectWrite|DirectWrite]] 
+** {{link-en|BitBlt|Bit blit}}、StretchBlt、TransparentBlt
+** [[Alpha合成|AlphaBlend]]、ColorFill
+** [[ClearType|ClearType]] 字型支援
+* [[Direct3D_11|Direct3D 11]] 裝置驅動介面 ([[驱动程序|DDI]]) 
+* [[DxVA|DXVA-HD]] DDI <ref name="DXVA-HD DDI">{{cite web|url=https://msdn.microsoft.com/en-us/library/ff568661.aspx|title=Windows DDK - DXVA-HD DDI|publisher=MSDN|accessdate=2009-06-13|archive-date=2016-05-27|archive-url=https://web.archive.org/web/20160527000836/https://msdn.microsoft.com/en-us/library/ff568661.aspx}}</ref>
+* [[Hardware_overlay|Hardware video overlay]] DDI <ref name="Overlay DDI">{{cite web|url=https://msdn.microsoft.com/en-us/library/ff563972.aspx|title=Windows DDK - Overlay DDI|publisher=MSDN|accessdate=2009-06-13|archive-date=2014-04-26|archive-url=https://web.archive.org/web/20140426091248/http://msdn.microsoft.com/en-us/library/ff563972.aspx}}</ref>
+* 可選用 [[高级加密标准|AES 128]] 加密
+* 可選用加密後的影像壓縮
+* 支援 multiple drivers 在於一個 multi-adapter 以及 multi-monitor 的設定之上<ref name="W7Guidelines"/> <ref name=multimonitor>{{cite web|url=https://msdn.microsoft.com/en-us/library/ff568500(v=VS.85).aspx|title=Windows DDK - Multiple Monitors and Video Present Networks|publisher=MSDN|accessdate=2010-07-14|archive-date=2014-04-26|archive-url=https://web.archive.org/web/20140426074908/http://msdn.microsoft.com/en-us/library/ff568500(v=vs.85).aspx}}</ref>
+
+[[DXGI|DXGI]] 1.1、[[Direct3D|Direct3D]] 11、[[Direct2D|Direct2D]]和[[DirectWrite|DirectWrite]]也將提供與Windows Vista平臺更新。GDI / GDI+ 在Vista將繼續依靠軟件渲染。
+
+WDDM 1.1向後兼容WDDM 1.0規範，1.0和1.1的驅動程序可直接用於Windows Vista。
+
+===WDDM 1.2===
+Windows 8 includes WDDM 1.2<ref name=wddm12wdk>{{cite web |url=https://msdn.microsoft.com/en-us/library/windows/hardware/hh439731 |title=Windows Developer Preview - New for Display devices |work=[[MSDN|MSDN]] |publisher=[[Microsoft|Microsoft]] |date=16 November 2013 |accessdate=9 December 2013 |archive-date=2012-02-24 |archive-url=https://www.webcitation.org/65hNDqaMQ?url=http://msdn.microsoft.com/en-us/library/windows/hardware/hh439731 |dead-url=no }}</ref><ref name=wddm_w8>{{cite web |url=https://msdn.microsoft.com/en-us/library/windows/hardware/br259098 |title=Windows Display Driver Model Enhancements in Windows Developer Preview |work=[[MSDN|MSDN]] |publisher=[[Microsoft|Microsoft]] |date=28 September 2012 |accessdate=9 December 2013 |archive-date=2012-02-24 |archive-url=https://www.webcitation.org/65hNRJhOC?url=http://msdn.microsoft.com/en-us/library/windows/hardware/br259098 |dead-url=no }}</ref> and DXGI 1.2.<ref name=wddm_w8/><ref name=dxgi12>{{cite web |url=https://msdn.microsoft.com/en-us/library/windows/desktop/hh404490 |title=DXGI 1.2 Improvements |work=[[MSDN|MSDN]] |publisher=[[Microsoft|Microsoft]] |date=16 November 2013 |accessdate=9 December 2013 |archive-date=2012-02-24 |archive-url=https://www.webcitation.org/65hNSoK4O?url=http://msdn.microsoft.com/en-us/library/windows/desktop/hh404490 |dead-url=no }}</ref> New features were first previewed at the [[Build_(developer_conference)|Build]] 2011 conference and include performance improvements as well as support for [[stereoscopy|stereoscopic 3D]] rendering and video playback.
+
+Other major features include [[preemptive_multitasking|preemptive multitasking]] of the GPU with finer [[granularity#Computing|granularity]] (DMA buffer, primitive, triangle, pixel, or instruction-level),<ref>{{cite web |url=https://msdn.microsoft.com/en-us/library/windows/desktop/hh404504 |title=DXGI_Graphics_Preemption_Granularity Enumeration |work=[[MSDN|MSDN]] |publisher=[[Microsoft|Microsoft]] |date=16 November 2013 |accessdate=9 December 2013 |archive-date=2012-02-24 |archive-url=https://www.webcitation.org/65hNwM4Rg?url=http://msdn.microsoft.com/en-us/library/windows/desktop/hh404504 |dead-url=no }}</ref> reduced memory footprint, improved resource sharing, and faster timeout detection and recovery. 16-bit color surface formats (565, 5551, 4444) are mandatory in Windows 8, and Direct3D 11 Video supports YUV [[chroma_subsampling|4:4:4/4:2:2/4:2:0/4:1:1]] video formats with 8, 10, and 16-bit precision, as well as 4 and 8-bit palettized formats.<ref>{{cite web |url=https://msdn.microsoft.com/en-us/library/windows/desktop/bb173059 |title=DXGI_FORMAT enumeration |work=[[MSDN|MSDN]] |publisher=[[Microsoft|Microsoft]] |date=16 November 2013 |accessdate=9 December 2013 |archive-date=2012-02-24 |archive-url=https://www.webcitation.org/65hOMWr7T?url=http://msdn.microsoft.com/en-us/library/windows/desktop/bb173059 |dead-url=no }}</ref>
+
+WDDM 1.2 supports display-only and render-only WDDM drivers, such as ''Microsoft Basic Display Driver''<ref>{{Cite web |url=https://msdn.microsoft.com/en-us/library/windows/hardware/dn653353(v=vs.85).aspx |title=存档副本 |access-date=2017-10-28 |archive-date=2016-10-19 |archive-url=https://web.archive.org/web/20161019075940/https://msdn.microsoft.com/en-us/library/windows/hardware/dn653353(v=vs.85).aspx }}</ref> and [[Windows_Advanced_Rasterization_Platform|WARP]]-based ''Microsoft Basic Render Driver'' which replaced kernel-mode [[VGA|VGA]] driver.
+
+WDDM 1.0/1.1 only allows rudimentary task scheduling using "batch queue" granularity; improvements to multitasking, as well as fast context switching and support for [[virtual_memory|virtual memory]], were initially expected in versions tentatively named WDDM 2.0 and WDDM 2.1, which were announced at [[WinHEC|WinHEC]] 2006.<ref>{{cite web |first=Nabeel |last=Al-Kady |url=http://download.microsoft.com/download/5/b/9/5b97017b-e28a-4bae-ba48-174cf47d23cd/PRI023_WH06.ppt |title=Display Driver Logistics And Testing |work=[[WinHEC|WinHEC 2006]] |publisher=[[Microsoft|Microsoft]] |date= |accessdate=9 December 2013 |archive-date=2020-06-06 |archive-url=https://web.archive.org/web/20200606231221/http://download.microsoft.com/download/5/b/9/5b97017b-e28a-4bae-ba48-174cf47d23cd/PRI023_WH06.ppt }}</ref><ref>{{cite web |first=Steve |last=Pronovost |url=http://download.microsoft.com/download/5/b/9/5b97017b-e28a-4bae-ba48-174cf47d23cd/PRI103_WH06.ppt |title=Windows Display Driver Model (WDDM) v2 And Beyond |work=[[WinHEC|WinHEC 2006]] |publisher=[[Microsoft|Microsoft]] |date= |accessdate=9 December 2013 |archive-date=2022-05-07 |archive-url=https://web.archive.org/web/20220507162806/https://download.microsoft.com/download/5/b/9/5b97017b-e28a-4bae-ba48-174cf47d23cd/PRI103_WH06.ppt }}</ref><ref>{{cite web|url=http://www.apcmag.com/windows_graphics_system_to_be_overhauled.htm/|title=Windows graphics system to be overhauled|author=Dan Warne|publisher=APC Magazine|date=June 1, 2006|accessdate=20 February 2015|archive-date=2019-01-05|archive-url=https://web.archive.org/web/20190105004746/http://www.apcmag.com/windows_graphics_system_to_be_overhauled.htm/}}</ref>
+
+暫譯：Windows 8包含WDDM 1.2 [8] [9]和DXGI 1.2。[9] [10]新功能首次在Build 2011大會上進行了預覽，其中包括性能改進以及對立體3D渲染和視頻播放的支持。
+
+其他主要功能包括具有更精細粒度（DMA緩衝區，原始，三角形，像素或指令級）的搶先式多任務GPU，[11]減少了內存佔用，改善了資源共享，並加快了超時檢測和恢復的速度。在Windows 8中必須使用16位彩色表面格式（565、5551、4444），並且Direct3D 11 Video支持YUV 4：4：4/4：2：2/4：2：0/4：1：1視頻格式具有8位，10位和16位精度，以及4位和8位調色板化格式。[12]
+
+WDDM 1.2支持僅顯示和僅渲染的WDDM驅動程序，例如Microsoft Basic Display Driver [13]和基於WARP的Microsoft Basic Render Driver，它們取代了內核模式VGA驅動程序。
+
+WDDM 1.0 / 1.1僅允許使用“批處理隊列”粒度進行基本任務調度；最初期望在WinHEC 2006上宣布的暫定名為WDDM 2.0和WDDM 2.1的版本中對多任務進行改進，並提供快速的上下文切換和對虛擬內存的支持。[14] [15] [16]
+
+===WDDM 1.3===
+[[Windows_8.1|Windows 8.1]] includes WDDM 1.3<ref name=wddm1.3>{{cite web |url=https://msdn.microsoft.com/en-us/library/windows/hardware/dn265512 |title=What's new for Windows 8.1 Preview display drivers (WDDM 1.3) |work=[[MSDN|MSDN]] |publisher=[[Microsoft|Microsoft]] |date=16 November 2013 |accessdate=9 December 2013 |archive-date=2016-03-04 |archive-url=https://web.archive.org/web/20160304051843/https://msdn.microsoft.com/en-us/library/windows/hardware/dn265512 }}</ref> and DXGI 1.3.<ref name=dxgi1.3>{{cite web |url=https://msdn.microsoft.com/en-us/library/windows/desktop/dn280344(v=vs.85).aspx |title=DXGI 1.3 Improvements |work=[[MSDN|MSDN]] |publisher=[[Microsoft|Microsoft]] |date=16 November 2013 |accessdate=9 December 2013 |archive-date=2018-06-20 |archive-url=https://web.archive.org/web/20180620001233/https://msdn.microsoft.com/en-us/library/windows/desktop/dn280344(v=vs.85).aspx }}</ref> New additions include the ability to trim DXGI adapter memory usage, multi-plane overlays, overlapping swap chains and swap chain scaling, select backbuffer subregion for swap chain and lower-latency swap chain presentation. Driver feature additions include wireless displays ([[Miracast|Miracast]]), [[YUV|YUV]] format ranges, cross-adapter resources and GPU engine enumeration capabilities.
+
+暫譯：Windows 8.1包括WDDM 1.3 [17]和DXGI 1.3。[18] 新增加的功能包括以下功能：修整DXGI適配器的內存使用量，多平面覆蓋，重疊的交換鍊和交換鏈縮放，為交換鍊和較低延遲交換鍊錶示選擇backbuffer子區域。 驅動程序功能的增加包括無線顯示（Miracast），YUV格式範圍，跨適配器資源和GPU引擎枚舉功能。
+
+===WDDM 2.0===
+2006年又有WDDM 2.0的消息，WDDM2.0版能夠解決GPU多工處理問題，但需要新一代GPU硬體支援才可以完成。
+2014年，微軟於Build 2014 開發者大會公佈下一代[[DirectX|DirectX]] API Direct X 12。與此同時DirectX 12需要建基於WDDM 2.0上，Direct X 12及WDDM 2.0 將內建於[[Windows_10|Windows 10]]內<ref>{{cite web|last1=Smith|first1=Ryan|title=The DirectX 12 Performance Preview: AMD, NVIDIA, & Star Swarm|url=https://anandtech.com/show/8962/the-directx-12-performance-preview-amd-nvidia-star-swarm|website=AnandTech|publisher=Purch|date=6 February 2015|access-date=2017-10-28|archive-date=2022-05-13|archive-url=https://web.archive.org/web/20220513221719/https://www.anandtech.com/show/8962/the-directx-12-performance-preview-amd-nvidia-star-swarm}}</ref>
+DirectX 12將廢除自動資源管理和任務管線管理，允許開發人員可低階控制顯示卡的記憶體和渲染狀態。WDDM 2.0 降低支援虛擬記憶體尋扯的 GPU 於核心模式的驅動程式工作量。<ref>{{Cite web |url=https://msdn.microsoft.com/en-us/library/windows/hardware/dn932171(v=vs.85).aspx |title=存档副本 |accessdate=2015-04-04 |archive-date=2015-07-01 |archive-url=https://web.archive.org/web/20150701133800/https://msdn.microsoft.com/en-us/library/windows/hardware/dn932171(v=vs.85).aspx |dead-url=no }}</ref>並且使用者模式的驅動程式可並列執行多執行緒，從而降低CPU使用率。<ref>https://channel9.msdn.com/Events/Build/2014/3-564 {{Wayback|url=https://channel9.msdn.com/Events/Build/2014/3-564 |date=20211112200923 }} Max McMullen. Direct3D 12 API Preview. Build 2014, session 3-564</ref><ref name="blogs-nvidia-20140320">{{cite web |last=Moreton |first=Henry |url=https://blogs.nvidia.com/blog/2014/03/20/directx-12/ |title=DirectX 12: A Major Stride for Gaming | NVIDIA Blog |publisher=Blogs.nvidia.com |date=2014-03-20 |accessdate=2014-03-26 |archive-date=2021-08-04 |archive-url=https://web.archive.org/web/20210804175436/https://blogs.nvidia.com/blog/2014/03/20/directx-12/ }}</ref><ref>{{cite web |url=https://blogs.msdn.com/b/directx/archive/2014/03/20/directx-12.aspx |title=DirectX 12 - DirectX Developer Blog - Site Home - MSDN Blogs |publisher=Blogs.msdn.com |date=2014-03-20 |accessdate=2014-03-26 |archive-date=2016-02-27 |archive-url=https://web.archive.org/web/20160227000313/http://blogs.msdn.com/b/directx/archive/2014/03/20/directx-12.aspx }}</ref>
+
+===WDDM 2.1===
+[[Windows_10|Windows 10]]周年更新中包含WDDM 2.1，它支援[[Shader_Model|Shader Model]] 6.0 (mandatory for [[Direct3D_feature_level|feature levels]] 12_0 and 12_1),<ref name="MSDN_SM6">{{Cite web |url=https://msdn.microsoft.com/en-us/library/mt733232(v=vs.85).aspx |title=存档副本 |access-date=2017-10-28 |archive-date=2018-06-19 |archive-url=https://web.archive.org/web/20180619213808/https://msdn.microsoft.com/en-us/library/mt733232(v=vs.85).aspx }}</ref> 和DXGI 1.5它支援 [[高动态范围成像|HDR10]] - a 10-bit high dynamic range, wide gamut format<ref>{{Cite web |url=https://msdn.microsoft.com/en-us/library/mt742103(v=vs.85).aspx |title=存档副本 |access-date=2017-10-28 |archive-date=2018-06-19 |archive-url=https://web.archive.org/web/20180619213921/https://msdn.microsoft.com/en-us/library/mt742103(v=vs.85).aspx }}</ref> defined by ITU-T [[Rec._2100|Rec. 2100]]/[[Rec.2020|Rec.2020]] - and variable refresh rates.<ref>{{Cite web |url=https://msdn.microsoft.com/en-us/library/mt742104(v=vs.85).aspx |title=存档副本 |access-date=2017-10-28 |archive-date=2018-06-19 |archive-url=https://web.archive.org/web/20180619214057/https://msdn.microsoft.com/en-us/library/mt742104(v=vs.85).aspx }}</ref>
+
+===WDDM 2.2===
+Windows 10 創作者更新中包含WDDM 2.2，它是為了[[Windows_Holographic|Windows Holographic]]平臺上[[虚拟现实|VR]]、[[擴增實境|AR]]及[[混合现实|MR]]的[[3D眼鏡|立體渲染]]和DXGI 1.6<ref>{{Cite web |url=https://channel9.msdn.com/Events/WinHEC/WinHEC-December-2016/PC-Gaming |title=存档副本 |access-date=2017-10-28 |archive-date=2021-11-07 |archive-url=https://web.archive.org/web/20211107092218/https://channel9.msdn.com/Events/WinHEC/WinHEC-December-2016/PC-Gaming }}</ref>而打造。
+
+===WDDM 2.3===
+在Windows 10 [[秋季創作者更新|秋季創作者更新]]中包含WDDM 2.3。
+===WDDM 2.7===
+Windows 10 v2004包含WDDM 2.7<ref>{{Cite web |url=https://www.hkepc.com/18950/%E9%AB%98_CPU_%E4%BD%94%E7%94%A8%E7%8E%87%E5%95%8F%E9%A1%8C%E5%8D%B3%E5%B0%87%E8%A7%A3%E6%B1%BA_Win_10_v2004_%E5%A4%A7%E6%9B%B4%E6%96%B0%E4%BB%8A%E5%B9%B4_5_%E6%9C%88%E4%BB%BD%E7%99%BC%E4%BD%88 |title=存档副本 |access-date=2020-02-25 |archive-date=2021-08-14 |archive-url=https://web.archive.org/web/20210814105440/https://www.hkepc.com/18950/%E9%AB%98_CPU_%E4%BD%94%E7%94%A8%E7%8E%87%E5%95%8F%E9%A1%8C%E5%8D%B3%E5%B0%87%E8%A7%A3%E6%B1%BA_Win_10_v2004_%E5%A4%A7%E6%9B%B4%E6%96%B0%E4%BB%8A%E5%B9%B4_5_%E6%9C%88%E4%BB%BD%E7%99%BC%E4%BD%88 }}</ref>。
+
+===WDDM 3.0===
+Windows 10 Build 21390 / Windows 11包含WDDM 3.0
+
+===預覽版本===
+給[[Oculus_Rift|Oculus Rift]] 頭戴式顯示器的軟體開發者套件中包含在Windows 10上DXGI 2的預覽版本。
+
+== 注釋 ==
+{{reflist}}
+[[Category:驅動程序|Category:驅動程序]]

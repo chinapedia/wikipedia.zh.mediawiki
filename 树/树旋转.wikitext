@@ -1,0 +1,141 @@
+{{unreferenced|time=2015-03-05T19:50:27+00:00}}
+{{copyedit|time=2011-10-13T06:54:55+00:00}}
+{{NoteTA
+|G1 = IT
+}}
+[[File:BinaryTreeRotations.svg|thumb]]
+在[[数据结构|数据结构]]中，'''树旋转'''（{{lang-en|Tree rotation}}）是对[[二叉树|二叉树]]的一种操作，不影响元素的顺序，但会改变树的结构，将一个节点上移、一个节点下移。树旋转会改变树的形状，因此常被用来将较小的子树下移、较大的子树上移，从而降低树的高度、提升许多树操作的效率。
+
+树的'''旋转方向'''有很多不同的定义，有些定义彼此之间还存在冲突。有些人认为旋转方向应该反映节点的移动方向（左子树旋转到父节点的位置为右旋），有些人则认为旋转方向应该反映被旋转的子树是哪棵（左子树旋转到父节点的位置为左旋，与前一种说法相反）。这篇维基文章采用前者的定义：旋转方向为节点的移动方向。
+
+== 图示 ==
+[[File:Tree_rotation.svg|File:Tree rotation.svg]]
+
+[[Image:Tree_rotation_animation_250x250.gif|right]]
+
+[[Image:Tree_Rotations.gif|thumb]]
+
+对一棵树进行旋转时，这棵树的根节点是被旋转的两棵子树的父节点，称为旋转时的'''根'''（{{lang-en|root}}）；如果节点在旋转后会成为新的父节点，则该节点为旋转时的'''转轴'''（{{lang-en|pivot}}）。
+
+上图中，树的右旋操作以 ''Q'' 为根、''P'' 为转轴，会将树顺时针旋转。相应的逆操作为左旋，会以 ''Q'' 为转轴，将树逆时针旋转。
+
+理解树旋转过程的关键，在于理解其中不变的约束。旋转操作不会导致叶节点顺序的改变（可以理解为旋转操作前后，树的[[树的遍历|中序遍历]]结果是一致的），旋转过程中也始终受[[二叉搜索树|二叉搜索树]]的主要性质约束：右子节点比父节点大、左子节点比父节点小。尤其需要注意的是，进行右旋转时，旋转前根的左节点的右节点（例如上图中以 ''Q'' 为根的 ''B'' 节点）会变成根的左节点，根本身则在旋转后会变成新的根的右节点，而在这一过程中，整棵树一直遵守着前面提到的几个约束。相反的左旋转操作亦然。
+
+如果将根记为 '''Root'''、转轴记为 '''Pivot'''、子节点中与旋转方向相同的一侧记为 '''RS'''（旋转侧，{{lang-en|Rotation Side}}）、旋转对侧记为 '''OS'''（{{lang-en|Opposite Side}}），则上图中 ''Q'' 节点的 '''RS''' 为 ''C''、'''OS''' 为 ''P''，将其右旋转的伪代码为：
+
+ Pivot = Root.OS
+ Root.OS = Pivot.RS
+ Pivot.RS = Root
+ Root = Pivot
+
+该操作为[[常数时间|常数时间]]复杂度。
+
+== 中序不变 ==
+
+二叉树旋转前后，中序遍历的结果[[不变量|不变]]。因此树的任何部分旋转，对整棵树的元素顺序没有影响。上图中两棵树的中序遍历结果为：
+
+<pre>-{}-
+左侧的树: ((A, P, B), Q, C)        右侧的树: (A, P, (B, Q, C))
+</pre>
+
+由两者其中之一计算另一个很简单：
+
+如果要将节点 ''Q'' 右旋：
+
+<pre>-{}-
+设 P 为 Q 的左子树。
+将 Q 的左子树设为 P 的右子树。
+[将 P 的右子树的父节点设为 Q]
+将 P 的右子树设为 Q。
+[将 Q 的父节点设为 P]
+</pre>
+
+如果要将节点 ''P'' 左旋：
+
+<pre>-{}-
+设 Q 为 P 的右子树。
+将 P 的右子树设为 Q 的左子树。
+[将 Q 的左子树的父节点设为 P]
+将 Q 的左子树设为 P。
+[将 P 的父节点设为 Q]
+</pre>
+
+其余节点间的连接不变。
+
+树的左右旋转操作还可以组合执行，称作'''双旋转'''（{{lang-en|double rotation}}）。先将 X 的右子树右旋、再将 X 本身左旋，就是 X 的'''双左旋转'''（{{lang-en|double left rotation}}）。同理，先将 X 的左子树左旋、再将 X 本身右旋，就是 X 的'''双右旋转'''（{{lang-en|double right rotation}}）。
+
+很多树形[[数据结构|数据结构]]中都用到了树的旋转操作，例如[[AVL树|AVL树]]、[[红黑树|红黑树]]、[[伸展树|伸展树]]、[[树堆|树堆]]等。因为是局部变形，只涉及5个节点，不需要检查整棵树，所以操作只需要常数时间。
+
+== 实现 ==
+上面的图示仅描述了如何进行局部变换, 在实际应用中, 还需要将原有父节点的父节点纳入考虑范围. 以上述右旋转为例, 如果 Q 是其父节点 root 的左子节点, 则在旋转完后 root 的左子节点需要修改指向节点 P. 但这一点并没有体现在上面的图示中.
+
+在接下来的实现中, 假设从树中任一节点 N 能够藉由 N.left 访问其左子节点, N.right 访问其右子节点, N.parent 访问其父节点.
+此外, 称旋转后变为父亲的节点为'''转轴''' pivot, 称 pivot 在旋转前的父节点为 parent, 而 parent 在旋转前的父节点为 root. 则右旋转过程可用伪代码表示为
+ func rotate_right(pivot):
+   let parent = pivot.parent
+   let root = parent.parent
+   // R0
+   parent.left = pivot.right
+   if pivot.right != nil: pivot.right.parent = parent
+   // R1
+   pivot.parent = root
+   if parent == root.left:
+     root.left = pivot
+   else:
+     root.right = pivot
+   pivot.right = parent
+   parent.parent = pivot
+而左旋转可表示为
+ func rotate_left(pivot):
+   let parent = pivot.parent
+   let root = parent.parent
+   // L0
+   parent.right = pivot.left
+   if pivot.left != nil: pivot.left.parent = parent
+   // L1
+   pivot.parent = root
+   if parent == root.left:
+     root.left = pivot
+   else:
+     root.right = pivot
+   pivot.left = parent
+   parent.parent = pivot
+
+上述过程并'''不'''适用于当 parent 节点本身就是树的根节点的情况. 这种情况下, 需要以其它方式重设树的根节点为 pivot. 一种无需在根节点的某一子节点为转轴时进行特殊处理的替代方案是让树的实际的根节点是一个特殊入口节点, 而逻辑上的根节点作为该入口节点的某个子节点存在, 并避免任何以逻辑根节点为转轴的旋转.
+
+如果从节点出发, 只能访问其两个子节点, 而无法访问其父节点, 那么上述方法也不适用. 这种情况下, root 节点亦是旋转的必要参数之一. 旋转过程的伪代码表示如下
+ func rotate_right(root, parent):
+   assert root.left == parent || root.right == parent
+   let pivot = parent.left
+   // R0
+   parent.left = pivot.right
+   // R1
+   if parent == root.left:
+     root.left = pivot
+   else:
+     root.right = pivot
+   pivot.right = parent
+
+ func rotate_left(root, parent):
+   assert root.left == parent || root.right == parent
+   let pivot = parent.right
+   // L0
+   parent.right = pivot.left
+   // L1
+   if parent == root.left:
+     root.left = pivot
+   else:
+     root.right = pivot
+   pivot.left = parent
+
+== 旋转距离 ==
+两棵二叉树之间的旋转距离指的是, 其中一棵树通过尽可能少的树旋转变换到另一棵树的过程中所需要的旋转次数.
+对于一个包含相同个数节点的二叉树集合, 它们两两之间的距离可以构成一个[[度量空间|度量空间]].
+是否存在一个[[算法|算法]], 能在[[多项式时间|多项式时间]]内计算两个二叉树之间的旋转距离, 目前还是一个[[未解决问题|未解决问题]].
+
+==参考文献==
+<references />Cormen, Leiserson, Rivest, Stein. ''Introduction to Algorithms.'' Massachusetts: The MIT Press, 2002. pp273-77. ISBN 0-07-013151-1<references />
+[[Category:數據結構|E]]
+[[Category:樹結構|Category:樹結構]]
+[[Category:圖論|Category:圖論]]
+[[Category:计算机科学中未解决的问题|Category:计算机科学中未解决的问题]]

@@ -1,0 +1,62 @@
+{{noteTA
+|G1=IT
+|1=zh-hans:程序; zh-hant:程式;
+}}
+'''快速通用网关接口'''（'''Fast''' '''C'''ommon '''G'''ateway '''I'''nterface／'''FastCGI'''）是一种让交互程序与Web服务器通信的协议。FastCGI是早期[[通用网关接口|通用网关接口]]（CGI）的增強版本。
+
+FastCGI致力於減少[[網頁伺服器|網頁伺服器]]與[[通用网关接口|CGI]][[计算机程序|程式]]之間互動的開銷，從而使[[伺服器|伺服器]]可以同時處理更多的網頁請求。
+
+== 歷史 ==
+
+[[通用网关接口|通用网关接口]]协议（CGI）是一种对接应用程序和网络服务器的接口协议。CGI使外部程式與Web伺服器之間交互成為可能。CGI程式運行在獨立的進程中，並對每個Web請求建立一個進程，這種方法非常容易實現，但效率较差，難以擴展。
+
+CGI程式運行在獨立的進程中，並對每個Web請求建立一個進程，在结束时销毁。这种“每个请求一个新进程”的模型使得CGI程序非常容易實現，但效率较差，難以擴展。在高负载情况下，进程创建和销毁进程的开销变得很大。此外，由於地址空間無法共享，CGI进程模型限制了资源重用方法，如重用数据库连接、内存缓存等。
+
+为了解决CGI的可伸缩性缺点，{{Translink|en|Open Market}}开发了FastCGI，并在20世纪90年代中期首次在他们的网络服务器产品中引入了它。Open Market最初开发FastCGI的部分原因是作为对网景公司开发网络应用程序的专有、进程内API(网景服务器API)的竞争回应。
+
+虽然FastCGI最初是由Open Market开发的，但后来被其他几家网络服务器制造商实施。然而，它的方法与其他加速和简化服务器-子程序通信的方法相竞争。像mod_perl和mod_php这样的Apache HTTP服务器模块几乎是同时出现的，并且很快流行起来。截至2019年，包括CGI在内的所有这些不同方法仍在普遍使用。
+
+== 實現 ==
+与为每个请求创建一个新的进程不同，FastCGI使用持续的进程来处理一连串的请求。这些进程由FastCGI服务器管理，而不是web服务器。<ref name="FastCGI Specification">{{cite web|title=FastCGI Specification|url=http://www.fastcgi.com/drupal/node/6?q=node/22|year=1996|url-status=dead|archive-url=https://web.archive.org/web/20160119141816/http://www.fastcgi.com/drupal/node/6?q=node%2F22|archive-date=2016-01-19|website=Open Market, Inc.|accessdate=2020-03-24|dead-url=no}}</ref>
+
+当进来一个请求时，web服务器把[[环境变量|环境变量]]和这个页面请求通过一个[[socket|socket]]比如FastCGI进程与web服务器（都位于本地）或者一个[[传输控制协议|TCP]] 请求（FastCGI进程在远端的[[server_farm|server farm]]）传递给FastCGI进程。<ref name="FastCGI Specification" />
+
+服务传入请求时，网络服务器通过[[Unix域套接字|Unix域套接字]]、[[命名管道|命名管道]]或[[传输控制协议|TCP]]连接向FastCGI进程发送环境变量信息和页面请求。响应通过相同的连接从进程返回到网络服务器，然后网络服务器将该响应传递给最终用户。连接可能在响应结束时关闭，但是web服务器和FastCGI服务进程都将持续，不会被销毁。<ref name="FastCGIwhitepaper">{{cite web|title=FastCGI:A High-Performance Web Server Interface|url=http://www.fastcgi.com:80/drupal/node/6?q=node/15|year=1996|website=Open Market, Inc|url-status=dead|archive-url=https://web.archive.org/web/20101001152455/http://www.fastcgi.com/drupal/node/6?q=node%2F15|archive-date=2010-10-01|accessdate=2020-03-24|dead-url=no}}</ref>
+
+每个单独的FastCGI进程在其生命周期内可以处理许多请求，从而避免了每个请求进程创建和终止的开销。并发处理多个请求可以通过几种方式来完成:通过内部多路复用使用一个连接(即一个连接上的多个请求)；通过使用多个连接；或者通过这些方法的混合。可以配置多个FastCGI服务器，提高稳定性和可扩展性。
+
+==优点==
+网站管理员和程序员可以发现，在FastCGI中将网络应用程序与网络服务器分离比嵌入式解释器(mod_perl、mod_php等)有许多优点。这种分离允许服务器和应用程序进程独立重启——这是繁忙网站的一个重要考虑因素。它还能够实现每个应用程序的托管服务安全策略，这是对ISPs和网络托管公司的一个重要要求。<ref name="LinuxJournalFastCGIreview">{{cite web|title=FastCGI: Persistent Applications for Your Web Server|url=http://www.linuxjournal.com/article/2607|date=1 November 1998|last=Heinlein|first=Paul|website=Linux Journal|access-date=4 October 2010|archive-date=2020-03-24|archive-url=https://web.archive.org/web/20200324073830/https://www.linuxjournal.com/article/2607|dead-url=no}}</ref>不同类型的传入请求可以分发到特定的FastCGI服务器，这些服务器已被配置为高效地处理这些类型的请求。
+
+==  -{zh:实现;zh-hans:实现;zh-hant:實作;}-FastCGI的網頁伺服器 ==
+* [[Apache_HTTP_Server|Apache HTTP Server]] ''(部分)''
+** 通過<code>[http://httpd.apache.org/mod_fcgid/ mod_fcgid]</code>模塊實現。這個模塊曾屬於第三方，但是在2009年被授予[[Apache_Software_Foundation|ASF]]，成為[[Apache_HTTP_Server|Apache]]的一個子項目<ref>{{Cite web |url=http://httpd.apache.org/mod_fcgid/ |title=FastCGI apache module mod_fcgid |accessdate=2020-03-24 |archive-date=2020-03-28 |archive-url=https://web.archive.org/web/20200328170104/http://httpd.apache.org/mod_fcgid/ |dead-url=no }}</ref>。它只支持Unix域套接字，不支持TCP套接字。<ref>{{Cite web |url=http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=450748 |title=Debian bug #450748: Please add support for TCP/IP FastCGI servers |accessdate=2020-03-24 |archive-date=2020-05-28 |archive-url=https://web.archive.org/web/20200528193503/https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=450748 |dead-url=no }}</ref>
+** 一個較早的第三方模塊 <code>mod_fastcgi</code> 。但是这个模块从Apache 2.4.x 开始就不再被一同编译了。<ref>{{Cite web |url=http://danielhe.com/2012/03/issues-with-apache-2-4-and-php-fpm/ |title=Issues with Apache 2.4 and PHP-FPM |accessdate=2012-03-27 |archive-date=2012-03-27 |archive-url=https://web.archive.org/web/20120327033316/http://danielhe.com/2012/03/issues-with-apache-2-4-and-php-fpm/ |dead-url=no }}</ref> 虽然这个模块相关的bug早就被解决了。<ref>{{Cite web |url=https://github.com/ByteInternet/libapache-mod-fastcgi/ |title=libapache-mod-fastcgi on Github |accessdate=2020-03-24 |archive-date=2020-05-28 |archive-url=https://web.archive.org/web/20200528193505/https://github.com/ByteInternet/libapache-mod-fastcgi/ |dead-url=no }}</ref>
+**Apache 1.x 在设计上禁止多路复用单个连接接收请求<ref>{{Cite web|title=FastCGI – The Forgotten Treasure/ Section 2.3.|url=http://cryp.to/publications/fastcgi/#AEN147|access-date=2006-02-21|archive-url=https://web.archive.org/web/20100208215702/http://cryp.to/publications/fastcgi/#AEN147|archive-date=2010-02-08|dead-url=yes}}</ref>，因此Aapache 1.x是不支持的。
+**在 Aapache 2.4 中，添加了新的<code>[http://httpd.apache.org/docs/2.4/mod/mod_proxy_fcgi.html mod_proxy_fcgi]</code>模块，支持TCP FastCGI服务器。
+*[[Caddy_(web_server)|Caddy]]<ref>{{Cite web |url=https://caddyserver.com/docs/fastcgi |title=Caddy User Guide – FastCGI |accessdate=2020-03-24 |archive-date=2019-07-01 |archive-url=https://web.archive.org/web/20190701120728/https://caddyserver.com/docs/fastcgi |dead-url=no }}</ref>
+* [[Cherokee_(Web服务器)|Cherokee HTTP Server]] 
+* {{link-en|Hiawatha Webserver|Hiawatha_(web_server)}}
+** 支持FastCGI的負載平衡
+** 支持[[chroot|chrooted]] FastCGI [[伺服器|伺服器]]
+* [[Lighttpd|Lighttpd]]<ref>{{Cite web |url=http://trac.lighttpd.net/trac/wiki/Docs:ModFastCGI |title=FastCGI for Lighttpd |accessdate=2020-03-24 |archive-date=2008-12-05 |archive-url=https://web.archive.org/web/20081205034434/http://trac.lighttpd.net/trac/wiki/Docs:ModFastCGI |dead-url=no }}</ref>
+* [[Nginx|Nginx]]<ref>{{cite web|title=FastCGI Extension for IIS6.0 – RTM|url=http://www.iis.net/fastcgi|date=2008-02-28|work=FastCGI for IIS|publisher=Microsoft|access-date=2008-02-29|archive-date=2007-11-14|archive-url=https://web.archive.org/web/20071114195247/http://www.iis.net/fastcgi|dead-url=no}}</ref>
+* [[LiteSpeed_Web_Server|LiteSpeed Web Server]]
+* [[Microsoft_IIS|Microsoft IIS]]
+*[[Jetty_(web_server)|Jetty]]<ref name="jetty-fastcgi">{{Cite web |url=http://www.eclipse.org/jetty/documentation/current/fastcgi.html |title=FastCGI Support in Jetty |accessdate=2020-03-24 |archive-date=2020-03-24 |archive-url=https://web.archive.org/web/20200324073821/http://www.eclipse.org/jetty/documentation/current/fastcgi.html |dead-url=no }}</ref>
+*[[Kerio_WebSTAR|Kerio WebSTAR]]
+*[[OpenBSD|OpenBSD]] 的 <code>[http://man.openbsd.org/OpenBSD-current/man8/httpd.8 httpd(8)]</code><ref>{{Cite web |url=http://marc.info/?l=openbsd-cvs&m=140520832128782&w=2 |title=OpenBSD's httpd(8) initial commit |accessdate=2020-03-24 |archive-date=2020-05-28 |archive-url=https://web.archive.org/web/20200528193547/https://marc.info/?l=openbsd-cvs&m=140520832128782&w=2 |dead-url=no }}</ref>
+*[[Open_Market|Open Market]] 网络服务器
+
+== 参见 ==
+* [[通用网关接口|CGI]]
+* [[IIS|IIS]]
+* [[nginx|nginx]]
+
+==参考资料==
+{{refs}}
+
+{{網頁技術與標準}}
+
+[[Category:網頁技術|Category:網頁技術]]
+[[Category:全球資訊網|Category:全球資訊網]]

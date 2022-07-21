@@ -1,0 +1,114 @@
+{{noteTA
+|G1=IT
+|1=zh-cn:通过;zh-tw:透過;zh-hk:通過;
+}}
+{{區塊加解密方塊
+| name          = 三重数据加密算法
+| publish date  = 1998 (ANS X9.52)
+| derived from  = [[DES|DES]]
+| key size      = 168，112或56 位 (对应[[#密钥选项|密钥选项]] 1, 2, 3)
+| block size    = 64位
+| structure     = [[Feistel网络|Feistel网络]]
+| rounds        = 相当于DES的48
+| cryptanalysis = Lucks：2<sup>32</sup>组已知明文，2<sup>113</sup>次操作，包括2<sup>90</sup>次DES加密，2<sup>88</sup>位内存；
+Biham：以每个密钥对应的少数选择平文和2<sup>84</sup>次加密操作找到2<sup>28</sup>个目标密钥中的一个}}
+
+[[密码学|密码学]]中，'''三重数据加密算法'''（{{lang-en|Triple Data Encryption Algorithm}}，縮寫為TDEA，Triple DEA），或稱'''3DES'''（{{lang|en|Triple DES}}），是一種[[對稱密鑰加密|對稱密鑰加密]][[块密码|块密码]]，相当于是对每个数据块应用三次[[資料加密標準|資料加密標準]]（DES）算法。由于计算机运算能力的增强，原版DES由於[[密钥长度|密钥长度]]過低容易被[[暴力破解|暴力破解]]；3DES即是设计用来提供一种相对简单的方法，即通过增加DES的密钥长度来避免类似的攻击，而不是设计一种全新的块密码算法。
+
+== 标准中的定义 ==
+TDEA算法在以下标准中被定义：
+* ANS{{NoteTag|X9.52有时被错误的写作ANSI X9.52，然而标准自身的名称为ANS X9.52.}} X9.52-1998 ''三重数据加密算法的工作模式''{{NoteTag|X9.52将TDEA定义为[[DEA|DEA]]（定义于ANSI X3.92-1981中，''数据加密算法''）的一种复合操作，并没有包含DEA的算法内容。因此，X9.52必须与X3.92一起阅读。}} (已失效)
+* [http://csrc.nist.gov/publications/fips/fips46-3/fips46-3.pdf FIPS PUB 46-3 ''数据加密标准 (DES)'']{{WebCite|url=https://www.webcitation.org/66kuhPhSB?url=http://csrc.nist.gov/publications/fips/fips46-3/fips46-3.pdf |date=20120407214436 |dateformat=iso }} (PDF) (已失效<ref>Federal Register vol 70, number 96, [http://csrc.nist.gov/publications/fips/05-9945-DES-Withdrawl.pdf ''宣告联邦信息处理标准（FIPS）46-3，“数据加密标准”（DES）；FIPS 74，“实现和使用NBS数据加密标准指导”；FIPS 81，“DES的工作模式”的失效''] {{Wayback|url=http://csrc.nist.gov/publications/fips/05-9945-DES-Withdrawl.pdf |date=20080625202735 }} (PDF)</ref>)
+* {{PDFlink|[http://csrc.nist.gov/publications/nistpubs/800-67/SP800-67.pdf NIST Special Publication 800-67 ''使用三重数据加密算法（TDEA）块密码的建议'']|483 KB}}
+* [http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=37972 ISO/IEC 18033-3:2005 ''信息技术—安全技术—加密算法—第三部分：块密码'']{{Wayback|url=http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=37972 |date=20160918105920 }}
+
+== 算法的名称 ==
+最早的定义了该算法的标准（ANS X9.52，1998年发布）将其描述为“三重数据加密算法（TDEA）” — 即ANSI X3.92中定义的数据加密算法（[[DEA|DEA]]）的三次重复操作 — 而完全没有使用术语“3DES”或“DES”。FIPS PUB 46-3（1999）定义了“三重数据加密算法”（TDEA），也使用了术语“Triple DES”和“DES”。该标准中互换的使用“数据加密算法”（DEA）和“DES”的概念，其中以此开始DES的定义：
+{{quote|数据加密标准（DES）应当包括下文中的数据加密算法（DES{{NoteTag|疑为笔误，数据加密算法应为DEA。}}）与三重数据加密算法（TDEA，如ANSI X9.52中所描述的）}}
+NIST SP 800-67（2004，2008{{NoteTag|NIST SP 800-67第一版于2004年5月发布，并于2008年5月修订为1.1版，对弱密钥和半弱密钥的定义进行了修正和澄清。两个版本使用了相同的术语。}}）主要使用术语TDEA，但也提到了“Triple DES（TDEA）”。ISO/IEC 18033-3（2005）使用“TDEA”，但其中提到：
+{{quote|TDEA通称Triple DES（数据加密标准）。}}
+
+没有一个定义了本算法的标准使用术语“3DES”。
+
+==算法==
+3DES使用“密钥包”，其包含3个DES[[密钥|密钥]]，K<sub>1</sub>，K<sub>2</sub>和K<sub>3</sub>，均为56位（除去[[奇偶校验位|奇偶校验位]]）。加密算法为：
+:密文 = E<sub>K3</sub>(D<sub>K2</sub>(E<sub>K1</sub>(明文)))
+也就是说，使用K<sub>1</sub>为密钥进行DES加密，再用K<sub>2</sub>为密钥进行DES“解密”，最后以K<sub>3</sub>进行DES加密。
+
+而解密则为其反过程：
+:明文 = D<sub>K1</sub>(E<sub>K2</sub>(D<sub>K3</sub>(密文)))
+即以K<sub>3</sub>解密，以K<sub>2</sub>“加密”，最后以K<sub>1</sub>解密。
+
+每次加密操作都只处理64位数据，称为一块。
+
+无论是加密还是解密，中间一步都是前后两步的逆。这种做法提高了使用[[#密钥选项|密钥选项]]2时的算法强度，并在使用密钥选项3时与DES[[向下兼容|兼容]]。
+
+== 密钥选项 ==
+标准定义了三种密钥选项（Keying option），“密钥选项''n''”是标准中(X9.52, FIPS PUB 46-3, SP 800-67, ISO/IEC 18033-3)定义的TDEA的术语。然而，其它标准中，推荐和通用描述中也使用了其它术语。
+*密钥选项1：
+**三个密钥是独立的。常用名称为3TDEA或“三倍长度密钥”（triple-length keys）<ref name=cryptography_world>{{cite web
+  | url=http://www.cryptographyworld.com/des.htm
+  | title=密码学指导：3DES
+  | publisher=Cryptography World
+  | accessdate=2010-07-11
+  | deadurl=yes
+  | archiveurl=https://web.archive.org/web/20100311225658/http://www.cryptographyworld.com/des.htm
+  | archivedate=2010-03-11
+  }}</ref><ref name=IBM>{{cite web
+  | url=http://publib.boulder.ibm.com/infocenter/zos/v1r9/index.jsp?topic=/com.ibm.zos.r9.csfb400/tdes1.htm
+  | title=Triple DES Encryption
+  | publisher=IBM
+  | accessdate = 2010-07-11}}</ref>
+**密钥选项1的强度最高，拥有3 x 56 = 168个独立的密钥位。在NIST SP 800-57<ref name=NIST_SP_800-57>[http://csrc.nist.gov/publications/nistpubs/800-57/sp800-57-Part1-revised2_Mar08-2007.pdf NIST Special Publication 800-57 ''密钥管理的建议&mdash；第一部分：综述 (修订版)'', 2007年3月] {{Wayback|url=http://csrc.nist.gov/publications/nistpubs/800-57/sp800-57-Part1-revised2_Mar08-2007.pdf |date=20140606050814 }} (PDF)</ref>与SP 800-78-2<ref name=NIST_SP_800-78>[http://csrc.nist.gov/publications/nistpubs/800-78-2/sp800-78-2.pdf NIST Special Publication 800-78-2, ''个人身份认证的密码学算法与密钥长度'', 2010年2月] {{Wayback|url=http://csrc.nist.gov/publications/nistpubs/800-78-2/sp800-78-2.pdf |date=20101008061407 }} (PDF)</ref>中定义。
+*密钥选项2（已弃用）：
+**K<sub>1</sub>和K<sub>2</sub>是独立的，而K<sub>3</sub>=K<sub>1</sub>。常用名称为2TDEA，或“双倍长度密钥”（double-length keys）<ref name=cryptography_world/><ref name=IBM/>
+**密钥选项2的安全性稍低，拥有2 x 56 = 112个独立的密钥位。该选项比简单的应用DES两次的强度较高，即使用K<sub>1</sub>和K<sub>2</sub>，因为它可以防御[[中途相遇攻击|中途相遇攻击]]。 这是对“双重DES”（double DES）的改进，双重DES仅需要2<sup>56</sup>步即可进行攻击。 [[國家標準技術研究所|國家標準技術研究所]]（NIST）已弃用此选项。<ref name="NIST57r4">{{cite web
+| url=http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r4.pdf
+| title=NIST Special Publication 800-57: Recommendation for Key Management Part 1: General
+| first=Elaine
+| last=Barker
+| edition=4
+| date=January 2016
+| publisher=[[NIST|NIST]]
+| accessdate=2017-09-05
+| archive-date=2020-12-10
+| archive-url=https://web.archive.org/web/20201210063855/https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-57pt1r4.pdf
+| dead-url=no
+}}</ref>在NIST SP 800-57<ref name=NIST_SP_800-57/>和SP 800-78-1<ref name=NIST_SP_800-78/>中定义。
+*密钥选项3（已弃用）：
+**三个密钥均相等，即K<sub>1</sub>=K<sub>2</sub>=K<sub>3</sub>
+**密钥选项3等同与DES，只有56个密钥位。这个选项提供了与DES的兼容性，因为第1和第2次DES操作相互抵消了。该选项不再为NIST所建议<ref>NIST SP 800-67</ref>，亦不为ISO/IEC 18033-3所支持。
+
+==对多于一个块的加密==
+与其它的块密码一样，对多个数据块的加密和解密可以使用多种[[块密码的工作模式|工作模式]]进行，而模式的定义可以与块密码算法相独立。然而，ANS X9.52和NIST SP 800-67（通过SP 800-38A<ref>[http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf NIST Special Publication 800-38A, ''块密码工作模式的建议，方法和技术'', 2001版] {{Wayback|url=http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf |date=20170722092206 }} (PDF)</ref>）确定了某些模式只能在特定限制下应用，而无需普遍的应用。例如，ANS X9.52提出对于[[CBC|CBC]]模式，[[初始化向量|初始化向量]]每次应当不同，而ISO/IEC 10116没有类似规定<ref>{{Cite web |url=http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=38761 |title=ISO/IEC 10116:2006 ''信息技术 — 安全技术 — n位块密码的工作模式'' |accessdate=2010-09-23 |archive-date=2012-03-17 |archive-url=https://web.archive.org/web/20120317153312/http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=38761 |dead-url=no }}</ref>。FIPS PUB 46-3和ISO/IEC 18033-3只定义了单块密码，而并没有对多块的工作模式做出限制。
+
+==安全性==
+普遍而言，有3个独立密钥的3DES（[[#密钥选项|密钥选项]]1）的密钥长度为168位（三个56位的DES密钥），但由於[[中途相遇攻击|中途相遇攻击]]，它的有效安全性仅为112位。密钥选项2将密钥长度缩短到了112位，但该选项对特定的[[选择明文攻击|选择明文攻击]]和[[已知明文攻击|已知明文攻击]]的强度较弱<ref>[[Ralph_Merkle|Ralph Merkle]], [[Martin_Hellman|Martin Hellman]]: [http://www.cs.purdue.edu/homes/ninghui/courses/Spring04/homeworks/p465-merkle.pdf ''关于多加密的安全性''] {{Wayback|url=http://www.cs.purdue.edu/homes/ninghui/courses/Spring04/homeworks/p465-merkle.pdf |date=20110927011526 }} ([[PDF|PDF]]), [[Communications_of_the_ACM|Communications of the ACM]], Vol 24, No 7, pp 465–467, July 1981.</ref><ref>[[Paul_van_Oorschot|Paul van Oorschot]], [[Michael_J._Wiener|Michael J. Wiener]], ''一种针对双密钥三次加密的已知明文攻击'', [[EUROCRYPT|EUROCRYPT]]'90, LNCS 473, 1990, pp 318–325.</ref>，因此NIST认定它只有80位的安全性<ref name=NIST_SP_800-57/>。
+
+对密钥选项1的已知最佳攻击需要约2<sup>32</sup>组已知明文，2<sup>113</sup>部，2<sup>90</sup>次DES加密以及2<sup>88</sup>位内存<ref>[[Stefan_Lucks|Stefan Lucks]]: [http://th.informatik.uni-mannheim.de/People/Lucks/papers/pdf/3des.pdf.gz ''攻击三次加密''] {{Wayback|url=http://th.informatik.uni-mannheim.de/People/Lucks/papers/pdf/3des.pdf.gz |date=20051109071329 }} ([[PDF|PDF]]), [[Fast_Software_Encryption|Fast Software Encryption]] 1998, pp 239–253.</ref>（该论文提到了时间和内存的其它分配方案）。这在现在是不现实的，因此NIST认为密钥选项1可以使用到2030年<ref name=NIST_SP_800-57/>。若攻击者试图在一些可能的（而不是全部的）密钥中找到正确的，有一种在内存效率上较高的攻击方法可以用每个密钥对应的少数选择明文和约2<sup>84</sup>次加密操作找到2<sup>28</sup>个目标密钥中的一个<ref>[[Eli_Biham|Eli Biham]]: [http://www.cs.technion.ac.il/users/wwwb/cgi-bin/tr-get.cgi/1996/CS/CS0884.ps.gz ''如何使用2<sup>28</sup>步解密DES加密的消息''] {{Wayback|url=http://www.cs.technion.ac.il/users/wwwb/cgi-bin/tr-get.cgi/1996/CS/CS0884.ps.gz |date=20051210220928 }} ([[PostScript|PostScript]]), 1996.</ref>。
+
+==使用==
+[[电子货币|电子货币]]业界和電子貨幣標準（如[[EMV|EMV]]）過往普遍使用3DES<ref>{{Cite web |url=http://www.emvco.com/specifications.aspx?id=155 |title=EMV 4.2 Specifications, ''第二部 - 安全性和密钥管理'', 4.2版, 2008年6月 |accessdate=2010-09-23 |archive-date=2017-07-18 |archive-url=https://web.archive.org/web/20170718005134/http://emvco.com/specifications.aspx?id=155 |dead-url=no }}</ref><ref>{{Cite web |url=http://www.visa.com/cisp |title=VISA |accessdate=2010-09-23 |archive-date=2019-07-09 |archive-url=https://web.archive.org/web/20190709144120/http://www.visa.com/cisp/ |dead-url=no }}</ref>，但3DES已經逐漸被更安全的[[高級加密標準|AES]]代替。
+
+[[Microsoft_OneNote|Microsoft OneNote]]和[[Microsoft_Outlook|Microsoft Outlook]] 2007使用3DES以密码保护用户数据<ref>{{Cite web |url=http://blogs.msdn.com/descapa/archive/2006/11/09/encryption-for-password-protected-sections.aspx |title=Daniel Escapa's OneNote Blog - Encryption for Password Protected Sections, November 2006 |accessdate=2010-09-23 |archive-date=2007-02-23 |archive-url=https://web.archive.org/web/20070223175826/http://blogs.msdn.com/descapa/archive/2006/11/09/encryption-for-password-protected-sections.aspx |dead-url=no }}</ref><ref>{{Cite web |url=http://office.microsoft.com/en-us/outlook/HP012305361033.aspx |title=Microsoft - Encrypt E-mail Messages, Outlook 2007 |accessdate=2010-09-23 |archive-date=2010-03-28 |archive-url=https://web.archive.org/web/20100328113050/http://office.microsoft.com/en-us/outlook/HP012305361033.aspx |dead-url=yes }}</ref>。
+
+== 注释 ==
+{{NoteFoot}}
+
+== 参考文献 ==
+{{Reflist|30em}}
+
+== 参见 ==
+{{Portal box|密码学}}
+* [[DES|DES]]
+* [[DES-X|DES-X]]
+* [[AES|AES]]
+* [[Horst_Feistel|Horst Feistel]]
+* [[Walter_Tuchman|Walter Tuchman]]
+
+{{Cryptography navbox | block}}
+
+[[Category:已攻破的分组密码|Category:已攻破的分组密码]]
+[[Category:数据加密标准|Category:数据加密标准]]
+
+[[de:Data_Encryption_Standard#Triple-DES|de:Data Encryption Standard#Triple-DES]]

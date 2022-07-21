@@ -1,0 +1,58 @@
+<includeonly><!-- /ajax --></includeonly><noinclude>{{Documentation subpage}}</noinclude>
+<!-- 在本行下編輯模板說明 -->
+== 用法 ==
+添加一项通告时，请将通告填写在源代码内的{{tl|AdvancedSiteNotices/core}}模板内。假如修改前的源代码为：
+<pre style="background: #F9F9F9; border: 1px dashed #2F6FAB;">
+&#123;{AdvancedSiteNotices/core|
+&nbsp;&nbsp;&#123;{AdvancedSiteNotices/item|-{zh-cn:欢迎来到维基百科; zh-tw:歡迎來到維基百科;}-}&#125;
+}&#125;
+</pre>
+
+修改后的源代码将类似于下面的代码：
+ -{}-&#123;{AdvancedSiteNotices/core{{!}}
+ &nbsp;&nbsp;&#123;{AdvancedSiteNotices/item{{!}}欢迎来到维基百科}&#125;
+ <span style="color:darkgreen;">&nbsp;&nbsp;'''&#123;{AdvancedSiteNotices/item{{!}}你好，世界}&#125;'''</span>
+ }&#125;<!-- |style="background: #F9F9F9; border: 1px dashed #2F6FAB;"|class=mw-code -->
+
+=== &#123;{AdvancedSiteNotices/item}&#125;的参数 ===
+&#123;{AdvancedSiteNotices/item}&#125;有两个匿名参数和一个命名参数：'''<span style="color:#FF00FF;">{&#123;{1}&#125;}</span>'''为必填参数，填写通告的实际内容；'''<span style="color:#FF00FF;">{&#123;{2}&#125;}</span>'''和'''<span style="color:#FF00FF;">{&#123;{criteria}&#125;}</span>'''为选填参数，可以定义通告面向的人群：
+<!--<pre style="background: #F9F9F9; border: 1px dashed #2F6FAB">-->
+ &nbsp;&nbsp;&#123;{AdvancedSiteNotices/item|'''<span style="color:#F-F00FF;">{&#123;{1}&#125;}</span>'''|'''<span style="color:#FF00FF;">{&#123;{2}&#125;}</span>'''|'''criteria=<span style="color:#FF00FF;">{&#123;{criteria}&#125;}</span>'''}&#125;
+
+参数'''<span style="color:#FF00FF;">{&#123;{criteria}&#125;}</span>'''应为一个有效的JavaScript表达式，在执行时提供以下测试函数。当没有填写时，将使用参数'''<span style="color:#FF00FF;">{&#123;{2}&#125;}</span>'''。
+<div style="background: #F9F9F9; border: 1px dashed #2F6FAB; padding: 0.3em 1em;">
+* <span style="color:blue;">in_country</span> - 测试用户所在[[ISO 3166-1|国家或地区]]
+* <span style="color:blue;">in_region</span> - 测试用户所在[[ISO 3166-2|主要行政区]]
+* <span style="color:blue;">in_city</span> - 测试用户所在城市
+* <span style="color:blue;">in_group</span> - 测试用户所在用户组
+</div>
+
+参数'''<span style="color:#FF00FF;">{&#123;{2}&#125;}</span>'''有多种模式，各种模式可以混用，并以空格分隔：
+<div style="background: #F9F9F9; border: 1px dashed #2F6FAB; padding: 0.3em 1em;">
+* <span style="color:blue;">only_sysop</span> - 只对管理员显示
+* <span style="color:blue;">only_logged</span> - 只对登录用户显示
+* <span style="color:blue;">only_anon</span> - 只对匿名用户显示
+* <span style="color:blue;">only_zh_cn</span> - 只对大陆用户显示
+* <span style="color:blue;">only_zh_hk</span> - 只对香港和澳门用户显示
+* <span style="color:blue;">only_zh_sg</span> - 只对新加坡和马来西亚用户显示
+* <span style="color:blue;">only_zh_tw</span> - 只对台湾用户显示
+</div>
+
+实际用例：
+<pre style="background: #F9F9F9; border: 1px dashed #2F6FAB">-{}-
+{&#123;AdvancedSiteNotices/item|[&#91;Wikipedia:聚会/2010年台灣秋聚|'&#39;'2010年台灣維基人秋聚'&#39;'&#93;]與[&#91;Wikipedia_talk:聚会/2010上海夏聚|'&#39;'2010年上海维基人夏聚'&#39;'&#93;]圓滿落幕。|criteria=in_country('TW') {&#123;!!&#125;} in_country('CN') && in_city('Shanghai')&#125;}
+{&#123;AdvancedSiteNotices/item|维基媒体基金会推出了“只有权限较高的好孩子知道的功能”。|criteria=in_group('rollbacker') {&#123;!!&#125;} in_group('patroller') {&#123;!!&#125;} in_group('sysop') {&#123;!!&#125;} in_group('autoreviewer')&#125;}
+</pre>
+
+== 注意事項 ==
+* 如在公告'''包含其他模板，而該模板的內容會在{{color|red|不用編輯}}的情況下自動更新'''（如倒數），您可能'''需要清除[[Template:AdvancedSiteNotices/ajax|ajax頁面]]的緩存'''，內容才會更新。要'''清除緩存，請點選[[Special:Purge/Template:AdvancedSiteNotices/ajax|<span class="plainlinks">此處</span>]]'''。
+* 如需查詢目前公告的顯示性質，請至[[Template:AdvancedSiteNotices/viewer]]。
+* 本頁面目前被全保護－需要在公告中加入內容的用戶請到[[Template_talk:AdvancedSiteNotices]]提出請求，由管理員代為加入。
+
+== 參見 ==
+* [[MediaWiki:Gadget-AdvancedSiteNotices.js]]
+<includeonly>
+<!-- 本行下加入模板的分類 -->
+[[category:公告栏|模]]
+[[Category:辅助模板|{{PAGENAME}}]]
+</includeonly>

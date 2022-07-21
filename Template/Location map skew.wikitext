@@ -1,0 +1,612 @@
+<noinclude><!--
+-- Template:Location_map_skew - generates Y skewing longitude limits
+--
+--   This template overlays 4 specified markers/labels on a given
+--   map (in the manner of "Template:Location_map") but can skew
+--   longitude from map center based on latitude & various skew
+--   factors < 1.0 to narrow or > 1.0 to widen top longitudes.
+--
+--  Warning: Code multi-nested 18 levels across 605+ lines.
+--  Warning: {{Might}}{{{appear|become}}}{{unreadable}}?
+--  Warning: This template might exceed wiki-template resources.
+--  Warning: Adding spaces can kill results.
+----------------------------------------------- Begin box division
+-->
+</noinclude><includeonly>
+<div style="width: {{#expr: {{{width|240}}} + 2 }}px; {{#if: {{{caption|}}} 
+  | padding: 3px; border: 1px solid {{#if: {{{border|}}} 
+    | {{{border|none}}} 
+    | #CCCCCC 
+  }}; margin: 3px;
+}} float:{{#switch:{{{float|}}}
+|  "center"=none | center=none  | "left"=left   | left=left
+|  "right"=right | right=right  | "none"=none   | none=none
+|right}}; clear:{{#switch:{{{float|}}}
+|  "center"=both | center=both | "left"=left | left=left
+|  "right"=right | right=right | "none"=none | none=none
+|right}}; {{#if: {{{caption|}}}
+   | ;background:#F9F9F9"|"
+   }}><!--
+---------------------------------------------- Begin Map division
+--><div style="position: relative;{{#ifeq: {{{border|}}} | none | 
+  |border: 1px solid {{#if: {{{border|}}} 
+    | {{{border}}} 
+    | {{#if:{{{caption|}}}|#CCCCCC|none}}
+  }};
+}} padding: 0px; width: {{{width|240}}}px">[[image:{{#if: {{{AlternativeMap|}}}
+    | {{{AlternativeMap}}}
+    | {{Location map {{{1}}}|image}}
+  }}|{{{width|240}}}px|{{{width|240px}}}|{{ <!--width "70" or "70px"-->
+  #if: {{{label|}}} 
+    | {{{label}}}
+    | {{PAGENAME}}
+  }}<!-- endif label--> ({{Location map {{{1}}}|name}})]]<br /><!--
+================================================= Marker/Label #1
+-->{{#if: {{{lat|{{{lat_deg|}}} }}} | <!--
+   --then latitude-1 exists --------------- Verify lat./longitude 
+-->{{
+  #ifexpr:{{{lat|{{{lat_deg|}}}}}}<{{Location map {{{1}}}|bottom}}
+  |<!--then-->Latitude#1 ({{{lat|{{{lat_deg|}}}}}}) < map<!--
+  --> min({{#expr:{{Location map {{{1}}}|bottom}} round 2}}).| }}
+{{#ifexpr: {{{lat|{{{lat_deg|}}}}}} > {{Location map {{{1}}}|top}}
+  |<!--then-->Latitude#1 ({{{lat|{{{lat_deg|}}}}}}) > map<!--
+       --> max({{#expr:{{Location map {{{1}}}|top}} round 2}}).| }}
+{{#ifexpr:{{{long|{{{lon_deg|}}}}}} <{{Location map {{{1}}}|left}}
+  |<!--then-->Longitude#1({{{long|{{{lon_deg|}}}}}}) < map<!--
+       --> min({{#expr:{{Location map {{{1}}}|left}} round 2}}).| }}
+{{#ifexpr: {{{long|{{{lon_deg|}}}}}}
+                > {{Location map {{{1}}}|right}}
+  |<!--then-->Longitude#1({{{long|{{{lon_deg|}}}}}}) > map<!--
+       --> max({{#expr:{{Location map {{{1}}}|right}} round 2}}).|}}
+<!-- --------------------------------- Begin point division #1 -->
+  <div style="position: absolute; z-index: 2;
+  top: {{#expr: <!--To DEBUG, add ">" above to show calc below-->
+    100 * ({{Location map {{{1}}}|top}} -
+    {{#expr: {{#ifeq: {{{lat_dir|}}}|S|-1|1}}
+        * ( {{{lat_deg|{{{lat|0}}} }}} + ({{{lat_min|0}}} / 60)
+          + ( {{{lat_sec|0}}} / 3600) ) }}<!--endexpr-->
+    ) / ( {{Location map {{{1}}}|top}}
+          - {{Location map {{{1}}}|bottom}} ) round 1
+  }}<!--endexpr-->%; left: {{#expr:
+  {{#expr:{{#if:{{Location map {{{1}}}|crosses180}}
+    |{{#ifeq: {{{lon_dir|}}}|W|-36000/({{Location map {{{1}}}|left}}
+          - {{Location map {{{1}}}|right}})|}}|}}
+  }} + 100 * (<!--paren7--> {{
+  <!-- ------------------------------- Check for skew-->
+  #if: {{{skew|{{#expr:{{Location map {{{1}}}|skew}}}}<!--expr-->}}}
+  |<!--then-->
+    {{#expr: {{#expr: ( <!-- ----------------- skewed Y -->
+      {{#ifeq: {{{lon_dir|}}}|W|-1|1}}
+        * ( {{{lon_deg|{{{long|0}}} }}} + ({{{lon_min|0}}} / 60)
+          + ({{{lon_sec|0}}} / 3600) )
+    - 0.5*( <!-- -----minus mid-longitude-->
+       {{Location map {{{1}}}|right}}+{{Location map {{{1}}}|left}})
+      + {{{lon_shift|0}}} <!--plus longitude-center shift-->
+    ) <!--end skewed Y-->
+    * ( <!----------------------- apply skewfactor for latitude -->
+      <!--skewfactor = --> (1 -
+     {{{skew|{{#expr:{{Location map {{{1}}}|skew}}}}<!--expr-->}}} )
+      * ( {{Location map {{{1}}}|top}} -
+          {{#expr: {{#ifeq: {{{lat_dir|}}}|S|-1|1}}
+            * ( {{{lat_deg|{{{lat|0}}} }}} + ({{{lat_min|0}}} / 60)
+              + ({{{lat_sec|0}}} / 3600) )}} 
+        ) / ( {{Location map {{{1}}}|top}}
+              - {{Location map {{{1}}}|bottom}} )
+        + {{{skew|{{#expr:{{Location map {{{1}}}|skew}} }} }}}
+        ) <!--endapply skewfactor-->
+    + 0.5*( <!-- ----------------------------readd mid-longitude-->
+      {{Location map {{{1}}}|right}}+{{Location map {{{1}}}|left}} )
+      - {{{lon_shift|0}}} <!--minus longitude-center shift-->
+    }}<!--endexpr--> }}<!--endexpr-->
+  |<!--else-NOT-skew ---------------------- begin rectangular Y-->
+      {{#expr: {{#ifeq: {{{lon_dir|}}}|W|-1|1}}
+        * ( {{{lon_deg|{{{long|0}}} }}} + ({{{lon_min|0}}} / 60)
+          + ({{{lon_sec|0}}} / 3600) ) }}<!--endexpr-->
+  }}<!--endif skew -->
+      - {{Location map {{{1}}}|left}} )<!--endparen7-->
+  <!-- ----------------------------- Divide by longitude range -->
+    / ({{Location map {{{1}}}|right}} - {{Location map {{{1}}}|left}}) round 1
+}}%; height: 0; width: 0; margin: 0; padding: 0;"><!--
+------------------------------------------------ Marker#1 division
+--><div style="position: relative; text-align: center; {{#if: {{{marksize|}}} 
+  | left: -{{#expr: {{{marksize}}} / 2 round 0 }}px; top: -{{#expr: {{{markhigh|8}}} / 2 round 0 }}px; width: {{{marksize}}}px; font-size: {{{marksize}}}px; 
+  | left: -{{#expr: {{#if: {{Location map {{{1}}}|marksize}}
+      |{{Location map {{{1}}}|marksize}}
+      |<!--else-->8}} / 2 round 0 }}px; top: -{{#expr:
+    {{#if: {{Location map {{{1}}}|markhigh}}
+      |{{Location map {{{1}}}|markhigh}}
+      |<!--else-->8}} / 2 round 0 }}px; width: {{
+    #if: {{Location map {{{1}}}|marksize}}
+      |{{Location map {{{1}}}|marksize}}
+      |<!--else-->8}}px; font-size: {{
+    #if: {{Location map {{{1}}}|marksize}}
+      |{{Location map {{{1}}}|marksize}}
+      |<!--else-->8}}px;
+}}"><!-- specify marker#1 -->[[Image:{{#if: {{{mark|}}} 
+  | {{{mark}}} 
+  | {{#if: {{Location map {{{1}}}|mark}}|{{Location map {{{1}}}|mark}}|Locator Dot.gif}}
+}}|{{#if: {{{marksize|}}} 
+  | {{{marksize}}} 
+  | <!--else-->{{#if: {{Location map {{{1}}}|marksize}}
+    |{{Location map {{{1}}}|marksize}}|<!--else-->8}}
+  }}<!--endif-->px|{{#if: {{{label|}}} 
+  | {{{label}}} 
+  | {{PAGENAME}} 
+}}<!--endif label-->]]</div><!-- end-div marker1
+---------------------------------------------- Label #1
+-->{{#ifeq: {{{position|{{{pos|}}}}}} | none 
+  |
+  |<div style="font-size: {{{label_size|90}}}%; line-height: 110%; 
+    position: relative; top: -1.5em; width: 6em;
+    {{#switch: {{{position|{{{pos|right}}}}}}
+      |left = top:-{{#expr: {{{markhigh|{{{marksize|8}}}}}}*0.76
+               + {{{label_size|90}}}*.15 - 2.5 round 0}}px;
+             left: -{{#expr: 6.05 + {{{marksize|8}}}/21
+               + {{{label_size|90}}}/1855 }}em; text-align: right;
+      |right = top: -{{#expr: {{{markhigh|{{{marksize|8}}}}}}*0.76
+               + {{{label_size|90}}}*.15 - 2.5 round 0}}px;
+             left: {{#expr: 0.37 + {{{marksize|8}}}/165
+               + {{{label_size|90}}}/505 }}em; text-align: left;
+      |top = top:-{{#expr: {{{markhigh|{{{marksize|8}}}}}}*1.78
+                + {{{label_size|90}}}*.15 + 1.5 round 0}}px;
+             left: -3em; text-align: center;
+      |bottom = top: {{#expr: -{{{markhigh|{{{marksize|8}}}}}}*.50
+                - {{{label_size|90}}}*.02 + 3.9 round 0}}px;
+             left: -3em; text-align: center;
+    |<!--out-->}}"><span style="padding: 1px;
+    {{#if: {{{background|{{{bg|}}}}}} 
+      | background-color: {{{background|{{{bg}}}}}};
+  }}">{{{label|}}}</span></div><!-- end-div label1 -->
+}}</div><!--end-div point#1-->
+|<!--else, no latitude1 -->}}<!--endif lat* --
+================================================= Marker/Label #2
+-->{{#if: {{{lat2|{{{lat2_deg|}}} }}} | <!--
+   --then latitude-2 exists --------------- Verify lat./longitude 
+-->{{
+  #ifexpr:{{{lat2|{{{lat2_deg|}}} }}}<{{Location map {{{1}}}|bottom}}
+  |<!--then-->Latitude#2 ({{{lat2|{{{lat2_deg|}}}}}}) < map<!--
+  --> min({{#expr:{{Location map {{{1}}}|bottom}} round 2}}).| }}
+{{#ifexpr: {{{lat2|{{{lat2_deg|}}}}}} > {{Location map {{{1}}}|top}}
+  |<!--then-->Latitude#2 ({{{lat2|{{{lat2_deg|}}}}}}) > map<!--
+       --> max({{#expr:{{Location map {{{1}}}|top}} round 2}}).| }}
+{{#ifexpr:{{{long2|{{{lon2_deg|}}}}}} <{{Location map {{{1}}}|left}}
+  |<!--then-->Longitude#2({{{long2|{{{lon2_deg|}}}}}}) < map<!--
+       --> min({{#expr:{{Location map {{{1}}}|left}} round 2}}).| }}
+{{#ifexpr:{{{long2|{{{lon2_deg|}}}}}}>{{Location map {{{1}}}|right}}
+  |<!--then-->Longitude#2({{{long2|{{{lon2_deg|}}}}}}) > map<!--
+       --> max({{#expr:{{Location map {{{1}}}|right}} round 2}}).|}}
+<!-- --------------------------------- Begin point division #2 -->
+  <div style="position: absolute; z-index: 2;
+  top: {{#expr: <!--To DEBUG, add ">" above to show calc below-->
+    100 * ( {{Location map {{{1}}}|top}} -
+      {{#expr: {{#ifeq: {{{lat2_dir|}}}|S|-1|1}}
+      * ( {{{lat2_deg|{{{lat2|0}}} }}} + ({{{lat2_min|0}}}/60)
+        + ( {{{lat2_sec|0}}} / 3600) ) }}<!--endexpr-->
+    ) / ( {{Location map {{{1}}}|top}}
+          - {{Location map {{{1}}}|bottom}} ) round 1
+  }}<!--endexpr-->%; left: {{#expr:
+  {{#expr:{{#if:{{Location map {{{1}}}|crosses180}}
+    |{{#ifeq:{{{lon2_dir|}}}|W|-36000/({{Location map {{{1}}}|left}}
+               - {{Location map {{{1}}}|right}})|}}|}}
+  }} + 100 * (<!--paren87--> {{
+  <!-- ------------------------------- Check for skew2-->
+  #if: {{{skew2|{{{skew|}}}}}}
+  |<!--then-->
+    {{#expr: {{#expr: ( <!-- ----------------- skewed Y -->
+      {{#ifeq: {{{lon2_dir|}}}|W|-1|1}}
+        * ( {{{lon2_deg|{{{long2|0}}} }}} + ({{{lon2_min|0}}}/60)
+          + ({{{lon2_sec|0}}} / 3600) )
+    - 0.5*( <!-- -----minus mid-longitude-->
+       {{Location map {{{1}}}|right}}+{{Location map {{{1}}}|left}})
+      + {{{lon_shift|0}}} <!--plus longitude-center shift-->
+    ) <!--end skewed Y-->
+    * ( <!----------------------- apply skewfactor for latitude -->
+      <!--skewfactor = --> (1 - {{{skew2|{{{skew|1.0}}}}}} )
+      * ( {{Location map {{{1}}}|top}} -
+          {{#expr: {{#ifeq: {{{lat2_dir|}}}|S|-1|1}}
+            * ( {{{lat2_deg|{{{lat2|0}}} }}} + {{{lat2_min|0}}}/60
+              + ({{{lat2_sec|0}}} / 3600) )}}<!--endexpr-->
+        ) / ( {{Location map {{{1}}}|top}}
+              - {{Location map {{{1}}}|bottom}} )
+        + {{{skew2|{{{skew|1.0}}}}}} ) <!--endapply skewfactor-->
+    + 0.5*( <!-- ----------------------------readd mid-longitude-->
+      {{Location map {{{1}}}|right}}+{{Location map {{{1}}}|left}} )
+      - {{{lon_shift|0}}} <!--minus longitude-center shift-->
+    }}<!--endexpr2--> }}<!--endexpr-->
+  |<!--else-NOT-skew2 ---------------------- begin rectangular Y-->
+    {{#expr: {{#ifeq: {{{lon2_dir|}}}|W|-1|1}}
+      * ( {{{lon2_deg|{{{long2|0}}} }}} + ({{{lon2_min|0}}}/60)
+        + ({{{lon2_sec|0}}} / 3600) ) }}<!--endexpr-->
+  }}<!--endif skew2 -->
+      - {{Location map {{{1}}}|left}} )<!--endparen87-->
+  <!-- ----------------------------- Divide by longitude range -->
+    / ({{Location map {{{1}}}|right}} - {{Location map {{{1}}}|left}}) round 1
+}}%; height: 0; width: 0; margin: 0; padding: 0;"><!--
+------------------------------------------------ Marker#2 division
+--><div style="position: relative; text-align: center; {{#if: {{{mark2size|}}} 
+  | left: -{{#expr: {{{mark2size}}} / 2 round 0 }}px;
+    top: -{{#expr: {{{mark2high|{{{mark2size|8}}} }}} / 2 round 0 }}px;
+    width: {{{mark2size}}}px; font-size: {{{mark2size}}}px; 
+  | <!--else, hunt mark2size@template--> left: -{{#expr:
+    {{#if: {{Location map {{{1}}}|mark2size}}
+      |{{Location map {{{1}}}|mark2size}}
+      |8}} / 2 round 0 }}px; top: -{{#expr:
+    {{#if: {{Location map {{{1}}}|mark2high}}
+      |{{Location map {{{1}}}|mark2high}}
+      |<!--else-->{{{mark2size|8}}} }} / 2 round 0 }}px; width:
+    {{#if: {{Location map {{{1}}}|mark2size}}
+      |{{Location map {{{1}}}|mark2size}}
+      |<!--else-->8}}px; font-size:
+    {{#if: {{Location map {{{1}}}|mark2size}}
+      |{{Location map {{{1}}}|mark2size}}
+      |<!--else-->8}}px; 
+}}"><!-- specify marker#2 --><!--
+-->[[Image:{{#if: {{{mark2|}}} 
+   | {{{mark2}}}
+   | <!--else-->{{#if: {{Location map {{{1}}}|mark2}}
+     |{{Location map {{{1}}}|mark2}}|<!--else-->Locator Dot.gif}}
+}}|<!--
+----- set image size as 'mark2size'x'mark2high' with defaults --
+--    ("x" between values, defaults from named-map template or 8)
+-->{{#if: {{{mark2size|}}} <!--SENT--><!--
+-->  |{{{mark2size}}}x{{#if: {{{mark2high|}}}  <!--
+-->    |{{{mark2high}}}  <!--
+-->    |{{#if: {{Location map {{{1}}}|mark2high}} <!--
+-->      |{{Location map {{{1}}}|mark2high}}      <!--
+-->      |<!--else-->{{{mark2size|8}}}}}<!--eif-1/mark2high--> <!--
+-->  }}<!--eif-mark2high-A-->px <!--
+-->  |<!--else-->{{#if: {{Location map {{{1}}}|mark2size}}  <!--
+    -->|{{Location map {{{1}}}|mark2size}}|<!--else-->8<!--
+    -->}}x{{#if: {{{mark2high|}}}<!--B
+      -->|{{{mark2high}}}   <!--
+      -->|{{#if: {{Location map {{{1}}}|mark2high}}   <!--
+      -->  |{{Location map {{{1}}}|mark2high}}   <!--
+      -->  |<!--else-->{{#if: {{Location map {{{1}}}|mark2size}}<!--
+      -->    |{{Location map {{{1}}}|mark2size}}|<!--else-->8}}<!--
+      -->}}<!--eif-Loc..mark2high--
+    -->}}<!--eif-mark2high-B-->px<!--
+-->}}<!--endif mark2size-SENT-->|{{#if: {{{label2|}}}<!--
+  --> | {{{label2}}}<!--set mouseover alt-text-->
+  --> | <!--else-->{{PAGENAME}}
+  }}<!--endif label2-->]]</div><!-- end-div marker2
+---------------------------------------------- Label #2
+-->{{#ifeq: {{{position2|{{{pos2|}}}}}} | none 
+  |
+  |<div style="font-size: {{{label2_size|90}}}%; line-height: 110%;
+    position: relative; top: -1.5em; width: 6em;
+    {{#switch: {{{position2|{{{pos2|right}}}}}}
+      |left = top:-{{#expr: {{{mark2high|{{{mark2size|8}}}}}}*0.76
+               + {{{label2_size|90}}}*.15 - 2.5 round 0}}px;
+             left: -{{#expr: 6.05 + {{{mark2size|8}}}/21
+               + {{{label2_size|90}}}/1855 }}em; text-align: right;
+      |right = top: -{{#expr: {{{mark2high|{{{mark2size|8}}}}}}*0.76
+               + {{{label2_size|90}}}*.15 - 2.5 round 0}}px;
+             left: {{#expr: 0.37 + {{{mark2size|8}}}/165
+               + {{{label2_size|90}}}/505 }}em; text-align: left;
+      |top = top:-{{#expr: {{{mark2high|{{{mark2size|8}}}}}}*1.78
+                + {{{label2_size|90}}}*.14 + 1.5 round 0}}px;
+             left: -3em; text-align: center;
+      |bottom = top: {{#expr: -{{{mark2high|{{{mark2size|8}}}}}}*.50
+                - {{{label2_size|90}}}*.02 + 3.9 round 0}}px;
+             left: -3em; text-align: center;
+    |<!--otherwise-->}}"><span style="padding: 1px;
+    {{#if: {{{background2|{{{bg2|}}}}}} 
+      | background-color: {{{background2|{{{bg2}}}}}}; 
+      }}">{{{label2|}}}</span><!--
+--></div><!-- end-div label2 -->
+}}</div><!--end-div point#2-->
+|<!--else, no latitude2 -->}}<!--endif lat2* --
+================================================= Marker/Label #3
+-->{{#if: {{{lat3|{{{lat3_deg|}}} }}} | <!--
+   --then latitude-3 exists --------------- Verify lat./longitude 
+-->{{
+  #ifexpr:{{{lat3|{{{lat3_deg|}}} }}}<{{Location map {{{1}}}|bottom}}
+  |<!--then-->Latitude#3 ({{{lat3|{{{lat3_deg|}}}}}}) < map<!--
+  --> min({{#expr:{{Location map {{{1}}}|bottom}} round 2}}).| }}
+{{#ifexpr: {{{lat3|{{{lat3_deg|}}}}}} > {{Location map {{{1}}}|top}}
+  |<!--then-->Latitude#3 ({{{lat3|{{{lat3_deg|}}}}}}) > map<!--
+       --> max({{#expr:{{Location map {{{1}}}|top}} round 2}}).| }}
+{{#ifexpr:{{{long3|{{{lon3_deg|}}}}}} <{{Location map {{{1}}}|left}}
+  |<!--then-->Longitude#3({{{long3|{{{lon3_deg|}}}}}}) < map<!--
+       --> min({{#expr:{{Location map {{{1}}}|left}} round 2}}).| }}
+{{#ifexpr:{{{long3|{{{lon3_deg|}}}}}}>{{Location map {{{1}}}|right}}
+  |<!--then-->Longitude#3({{{long3|{{{lon3_deg|}}}}}}) > map<!--
+       --> max({{#expr:{{Location map {{{1}}}|right}} round 2}}).|}}
+<!-- --------------------------------- Begin point division #3 -->
+  <div style="position: absolute; z-index: 2;
+  top: {{#expr: <!--To DEBUG, add ">" above to show calc below-->
+    100 * ( {{Location map {{{1}}}|top}} -
+      {{#expr: {{#ifeq: {{{lat3_dir|}}}|S|-1|1}}
+      * ( {{{lat3_deg|{{{lat3|0}}} }}} + ({{{lat3_min|0}}}/60)
+        + ( {{{lat3_sec|0}}} / 3600) ) }}<!--endexpr-->
+    ) / ( {{Location map {{{1}}}|top}}
+          - {{Location map {{{1}}}|bottom}} ) round 1
+  }}<!--endexpr-->%; left: {{#expr:
+  {{#expr:{{#if:{{Location map {{{1}}}|crosses180}}
+    |{{#ifeq:{{{lon3_dir|}}}|W|-36000/({{Location map {{{1}}}|left}}
+               - {{Location map {{{1}}}|right}})|}}|}}
+  }} + 100 * (<!--paren87--> {{
+  <!-- ------------------------------- Check for skew3-->
+  #if: {{{skew3|{{{skew|}}}}}}
+  |<!--then-->
+    {{#expr: {{#expr: ( <!-- ----------------- skewed Y -->
+      {{#ifeq: {{{lon3_dir|}}}|W|-1|1}}
+        * ( {{{lon3_deg|{{{long3|0}}} }}} + ({{{lon3_min|0}}}/60)
+          + ({{{lon3_sec|0}}} / 3600) )
+    - 0.5*( <!-- -----minus mid-longitude-->
+       {{Location map {{{1}}}|right}}+{{Location map {{{1}}}|left}})
+      + {{{lon_shift|0}}} <!--plus longitude-center shift-->
+    ) <!--end skewed Y-->
+    * ( <!----------------------- apply skewfactor for latitude -->
+      <!--skewfactor = --> (1 - {{{skew3|{{{skew|1.0}}}}}} )
+      * ( {{Location map {{{1}}}|top}} -
+          {{#expr: {{#ifeq: {{{lat3_dir|}}}|S|-1|1}}
+            * ( {{{lat3_deg|{{{lat3|0}}} }}} + {{{lat3_min|0}}}/60
+              + ({{{lat3_sec|0}}} / 3600) )}}<!--endexpr-->
+        ) / ( {{Location map {{{1}}}|top}}
+              - {{Location map {{{1}}}|bottom}} )
+        + {{{skew3|{{{skew|1.0}}}}}} ) <!--endapply skewfactor-->
+    + 0.5*( <!-- ----------------------------readd mid-longitude-->
+      {{Location map {{{1}}}|right}}+{{Location map {{{1}}}|left}} )
+      - {{{lon_shift|0}}} <!--minus longitude-center shift-->
+    }}<!--endexpr2--> }}<!--endexpr-->
+  |<!--else-NOT-skew3 ---------------------- begin rectangular Y-->
+    {{#expr: {{#ifeq: {{{lon3_dir|}}}|W|-1|1}}
+      * ( {{{lon3_deg|{{{long3|0}}} }}} + ({{{lon3_min|0}}}/60)
+        + ({{{lon3_sec|0}}} / 3600) ) }}<!--endexpr-->
+  }}<!--endif skew3 -->
+      - {{Location map {{{1}}}|left}} )<!--endparen87-->
+  <!-- ----------------------------- Divide by longitude range -->
+    / ({{Location map {{{1}}}|right}} - {{Location map {{{1}}}|left}}) round 1
+}}%; height: 0; width: 0; margin: 0; padding: 0;"><!--
+------------------------------------------------ Marker#3 division
+--><div style="position: relative; text-align: center; {{#if: {{{mark3size|}}} 
+  | left: -{{#expr: {{{mark3size}}} / 2 round 0 }}px;
+    top: -{{#expr: {{{mark3high|{{{mark3size|8}}} }}} / 2 round 0 }}px;
+    width: {{{mark3size}}}px; font-size: {{{mark3size}}}px; 
+  | <!--else, hunt mark3size@template--> left: -{{#expr:
+    {{#if: {{Location map {{{1}}}|mark3size}}
+      |{{Location map {{{1}}}|mark3size}}
+      |8}} / 2 round 0 }}px; top: -{{#expr:
+    {{#if: {{Location map {{{1}}}|mark3high}}
+      |{{Location map {{{1}}}|mark3high}}
+      |<!--else-->{{{mark3size|8}}} }} / 2 round 0 }}px; width:
+    {{#if: {{Location map {{{1}}}|mark3size}}
+      |{{Location map {{{1}}}|mark3size}}
+      |<!--else-->8}}px; font-size:
+    {{#if: {{Location map {{{1}}}|mark3size}}
+      |{{Location map {{{1}}}|mark3size}}
+      |<!--else-->8}}px; 
+}}"><!-- specify marker#3 --><!--
+-->[[Image:{{#if: {{{mark3|}}} 
+   | {{{mark3}}}
+   | <!--else-->{{#if: {{Location map {{{1}}}|mark3}}
+     |{{Location map {{{1}}}|mark3}}|<!--else-->Locator Dot.gif}}
+}}|<!--
+----- set image size as 'mark3size'x'mark3high' with defaults --
+--    ("x" between values, defaults from named-map template or 8)
+-->{{#if: {{{mark3size|}}} <!--SENT--><!--
+-->  |{{{mark3size}}}x{{#if: {{{mark3high|}}}  <!--
+-->    |{{{mark3high}}}  <!--
+-->    |{{#if: {{Location map {{{1}}}|mark3high}} <!--
+-->      |{{Location map {{{1}}}|mark3high}}      <!--
+-->      |<!--else-->{{{mark3size|8}}}}}<!--eif-1/mark3high--> <!--
+-->  }}<!--eif-mark3high-A-->px <!--
+-->  |<!--else-->{{#if: {{Location map {{{1}}}|mark3size}}  <!--
+    -->|{{Location map {{{1}}}|mark3size}}|<!--else-->8<!--
+    -->}}x{{#if: {{{mark3high|}}}<!--B
+      -->|{{{mark3high}}}   <!--
+      -->|{{#if: {{Location map {{{1}}}|mark3high}}   <!--
+      -->  |{{Location map {{{1}}}|mark3high}}   <!--
+      -->  |<!--else-->{{#if: {{Location map {{{1}}}|mark3size}}<!--
+      -->    |{{Location map {{{1}}}|mark3size}}|<!--else-->8}}<!--
+      -->}}<!--eif-Loc..mark3high--
+    -->}}<!--eif-mark3high-B-->px<!--
+-->}}<!--endif mark3size-SENT-->|{{#if: {{{label3|}}}<!--
+  --> | {{{label3}}}<!--set mouseover alt-text-->
+  --> | <!--else-->{{PAGENAME}}
+  }}<!--endif label3-->]]</div><!-- end-div marker3
+---------------------------------------------- Label #3
+-->{{#ifeq: {{{position3|{{{pos3|}}}}}} | none 
+  |
+  |<div style="font-size: {{{label3_size|90}}}%; line-height: 110%;
+    position: relative; top: -1.5em; width: 6em;
+    {{#switch: {{{position3|{{{pos3|right}}}}}}
+      |left = top:-{{#expr: {{{mark3high|{{{mark3size|8}}}}}}*0.76
+               + {{{label3_size|90}}}*.15 - 2.5 round 0}}px;
+             left: -{{#expr: 6.05 + {{{mark3size|8}}}/21
+               + {{{label3_size|90}}}/1855 }}em; text-align: right;
+      |right = top: -{{#expr: {{{mark3high|{{{mark3size|8}}}}}}*0.76
+               + {{{label3_size|90}}}*.15 - 2.5 round 0}}px;
+             left: {{#expr: 0.37 + {{{mark3size|8}}}/165
+               + {{{label3_size|90}}}/505 }}em; text-align: left;
+      |top = top:-{{#expr: {{{mark3high|{{{mark3size|8}}}}}}*1.78
+                + {{{label3_size|90}}}*.14 + 1.5 round 0}}px;
+             left: -3em; text-align: center;
+      |bottom = top: {{#expr: -{{{mark3high|{{{mark3size|8}}}}}}*.50
+                - {{{label3_size|90}}}*.02 + 3.9 round 0}}px;
+             left: -3em; text-align: center;
+    |<!--otherwise-->}}"><span style="padding: 1px;
+    {{#if: {{{background3|{{{bg3|}}}}}} 
+      | background-color: {{{background3|{{{bg3}}}}}}; 
+      }}">{{{label3|}}}</span><!--
+--></div><!-- end-div label3 -->
+}}</div><!--end-div point#3-->
+|<!--else, no latitude3 -->}}<!--endif lat3* --
+================================================= Marker/Label #4
+-->{{#if: {{{lat4|{{{lat4_deg|}}} }}} | <!--
+   --then latitude-4 exists --------------- Verify lat./longitude 
+-->{{
+  #ifexpr:{{{lat4|{{{lat4_deg|}}} }}}<{{Location map {{{1}}}|bottom}}
+  |<!--then-->Latitude#4 ({{{lat4|{{{lat4_deg|}}}}}}) < map<!--
+  --> min({{#expr:{{Location map {{{1}}}|bottom}} round 2}}).| }}
+{{#ifexpr: {{{lat4|{{{lat4_deg|}}}}}} > {{Location map {{{1}}}|top}}
+  |<!--then-->Latitude#4 ({{{lat4|{{{lat4_deg|}}}}}}) > map<!--
+       --> max({{#expr:{{Location map {{{1}}}|top}} round 2}}).| }}
+{{#ifexpr:{{{long4|{{{lon4_deg|}}}}}} <{{Location map {{{1}}}|left}}
+  |<!--then-->Longitude#4({{{long4|{{{lon4_deg|}}}}}}) < map<!--
+       --> min({{#expr:{{Location map {{{1}}}|left}} round 2}}).| }}
+{{#ifexpr:{{{long4|{{{lon4_deg|}}}}}}>{{Location map {{{1}}}|right}}
+  |<!--then-->Longitude#4({{{long4|{{{lon4_deg|}}}}}}) > map<!--
+       --> max({{#expr:{{Location map {{{1}}}|right}} round 2}}).|}}
+<!-- --------------------------------- Begin point division #4 -->
+  <div style="position: absolute; z-index: 2;
+  top: {{#expr: <!--To DEBUG, add ">" above to show calc below-->
+    100 * ( {{Location map {{{1}}}|top}} -
+      {{#expr: {{#ifeq: {{{lat4_dir|}}}|S|-1|1}}
+      * ( {{{lat4_deg|{{{lat4|0}}} }}} + ({{{lat4_min|0}}}/60)
+        + ( {{{lat4_sec|0}}} / 3600) ) }}<!--endexpr-->
+    ) / ( {{Location map {{{1}}}|top}}
+          - {{Location map {{{1}}}|bottom}} ) round 1
+  }}<!--endexpr-->%; left: {{#expr:
+  {{#expr:{{#if:{{Location map {{{1}}}|crosses180}}
+    |{{#ifeq:{{{lon4_dir|}}}|W|-36000/({{Location map {{{1}}}|left}}
+               - {{Location map {{{1}}}|right}})|}}|}}
+  }} + 100 * (<!--paren87--> {{
+  <!-- ------------------------------- Check for skew4-->
+  #if: {{{skew4|{{{skew|}}}}}}
+  |<!--then-->
+    {{#expr: {{#expr: ( <!-- ----------------- skewed Y -->
+      {{#ifeq: {{{lon4_dir|}}}|W|-1|1}}
+        * ( {{{lon4_deg|{{{long4|0}}} }}} + ({{{lon4_min|0}}}/60)
+          + ({{{lon4_sec|0}}} / 3600) )
+    - 0.5*( <!-- -----minus mid-longitude-->
+       {{Location map {{{1}}}|right}}+{{Location map {{{1}}}|left}})
+      + {{{lon_shift|0}}} <!--plus longitude-center shift-->
+    ) <!--end skewed Y-->
+    * ( <!----------------------- apply skewfactor for latitude -->
+      <!--skewfactor = --> (1 - {{{skew4|{{{skew|1.0}}}}}} )
+      * ( {{Location map {{{1}}}|top}} -
+          {{#expr: {{#ifeq: {{{lat4_dir|}}}|S|-1|1}}
+            * ( {{{lat4_deg|{{{lat4|0}}} }}} + {{{lat4_min|0}}}/60
+              + ({{{lat4_sec|0}}} / 3600) )}}<!--endexpr-->
+        ) / ( {{Location map {{{1}}}|top}}
+              - {{Location map {{{1}}}|bottom}} )
+        + {{{skew4|{{{skew|1.0}}}}}} ) <!--endapply skewfactor-->
+    + 0.5*( <!-- ----------------------------readd mid-longitude-->
+      {{Location map {{{1}}}|right}}+{{Location map {{{1}}}|left}} )
+      - {{{lon_shift|0}}} <!--minus longitude-center shift-->
+    }}<!--endexpr2--> }}<!--endexpr-->
+  |<!--else-NOT-skew4 ---------------------- begin rectangular Y-->
+    {{#expr: {{#ifeq: {{{lon4_dir|}}}|W|-1|1}}
+      * ( {{{lon4_deg|{{{long4|0}}} }}} + ({{{lon4_min|0}}}/60)
+        + ({{{lon4_sec|0}}} / 3600) ) }}<!--endexpr-->
+  }}<!--endif skew4 -->
+      - {{Location map {{{1}}}|left}} )<!--endparen87-->
+  <!-- ----------------------------- Divide by longitude range -->
+    / ({{Location map {{{1}}}|right}} - {{Location map {{{1}}}|left}}) round 1
+}}%; height: 0; width: 0; margin: 0; padding: 0;"><!--
+------------------------------------------------ Marker#4 division
+--><div style="position: relative; text-align: center; {{#if: {{{mark4size|}}} 
+  | left: -{{#expr: {{{mark4size}}} / 2 round 0 }}px;
+    top: -{{#expr: {{{mark4high|{{{mark4size|8}}} }}} / 2 round 0 }}px;
+    width: {{{mark4size}}}px; font-size: {{{mark4size}}}px; 
+  | <!--else, hunt mark4size@template--> left: -{{#expr:
+    {{#if: {{Location map {{{1}}}|mark4size}}
+      |{{Location map {{{1}}}|mark4size}}
+      |8}} / 2 round 0 }}px; top: -{{#expr:
+    {{#if: {{Location map {{{1}}}|mark4high}}
+      |{{Location map {{{1}}}|mark4high}}
+      |<!--else-->{{{mark4size|8}}} }} / 2 round 0 }}px; width:
+    {{#if: {{Location map {{{1}}}|mark4size}}
+      |{{Location map {{{1}}}|mark4size}}
+      |<!--else-->8}}px; font-size:
+    {{#if: {{Location map {{{1}}}|mark4size}}
+      |{{Location map {{{1}}}|mark4size}}
+      |<!--else-->8}}px; 
+}}"><!-- specify marker#4 --><!--
+-->[[Image:{{#if: {{{mark4|}}} 
+   | {{{mark4}}}
+   | <!--else-->{{#if: {{Location map {{{1}}}|mark4}}
+     |{{Location map {{{1}}}|mark4}}|<!--else-->Locator Dot.gif}}
+}}|<!--
+----- set image size as 'mark4size'x'mark4high' with defaults --
+--    ("x" between values, defaults from named-map template or 8)
+-->{{#if: {{{mark4size|}}} <!--SENT--><!--
+-->  |{{{mark4size}}}x{{#if: {{{mark4high|}}}  <!--
+-->    |{{{mark4high}}}  <!--
+-->    |{{#if: {{Location map {{{1}}}|mark4high}} <!--
+-->      |{{Location map {{{1}}}|mark4high}}      <!--
+-->      |<!--else-->{{{mark4size|8}}}}}<!--eif-1/mark4high--> <!--
+-->  }}<!--eif-mark4high-A-->px <!--
+-->  |<!--else-->{{#if: {{Location map {{{1}}}|mark4size}}  <!--
+    -->|{{Location map {{{1}}}|mark4size}}|<!--else-->8<!--
+    -->}}x{{#if: {{{mark4high|}}}<!--B
+      -->|{{{mark4high}}}   <!--
+      -->|{{#if: {{Location map {{{1}}}|mark4high}}   <!--
+      -->  |{{Location map {{{1}}}|mark4high}}   <!--
+      -->  |<!--else-->{{#if: {{Location map {{{1}}}|mark4size}}<!--
+      -->    |{{Location map {{{1}}}|mark4size}}|<!--else-->8}}<!--
+      -->}}<!--eif-Loc..mark4high--
+    -->}}<!--eif-mark4high-B-->px<!--
+-->}}<!--endif mark4size-SENT-->|{{#if: {{{label4|}}}<!--
+  --> | {{{label4}}}<!--set mouseover alt-text-->
+  --> | <!--else-->{{PAGENAME}}
+  }}<!--endif label4-->]]</div><!-- end-div marker4
+---------------------------------------------- Label #4
+-->{{#ifeq: {{{position4|{{{pos4|}}}}}} | none 
+  |
+  |<div style="font-size: {{{label4_size|90}}}%; line-height: 110%;
+    position: relative; top: -1.5em; width: 6em;
+    {{#switch: {{{position4|{{{pos4|right}}}}}}
+      |left = top:-{{#expr: {{{mark4high|{{{mark4size|8}}}}}}*0.76
+               + {{{label4_size|90}}}*.15 - 2.5 round 0}}px;
+             left: -{{#expr: 6.05 + {{{mark4size|8}}}/21
+               + {{{label4_size|90}}}/1855 }}em; text-align: right;
+      |right = top: -{{#expr: {{{mark4high|{{{mark4size|8}}}}}}*0.76
+               + {{{label4_size|90}}}*.15 - 2.5 round 0}}px;
+             left: {{#expr: 0.37 + {{{mark4size|8}}}/165
+               + {{{label4_size|90}}}/505 }}em; text-align: left;
+      |top = top:-{{#expr: {{{mark4high|{{{mark4size|8}}}}}}*1.78
+                + {{{label4_size|90}}}*.14 + 1.5 round 0}}px;
+             left: -4em; text-align: center;
+      |bottom = top: {{#expr: -{{{mark4high|{{{mark4size|8}}}}}}*.50
+                - {{{label4_size|90}}}*.02 + 3.9 round 0}}px;
+             left: -4em; text-align: center;
+    |<!--otherwise-->}}"><span style="padding: 1px;
+    {{#if: {{{background4|{{{bg4|}}}}}} 
+      | background-color: {{{background4|{{{bg4}}}}}}; 
+      }}">{{{label4|}}}</span><!--
+--></div><!-- end-div label4 -->
+}}</div><!--end-div point#4-->
+|<!--else, no latitude4 -->}}<!--endif lat4* --
+================================================ End All Markers
+--></div><div style="font-size: 90%">{{{caption|{{#if: {{{label|}}} 
+  | {{{label}}} 
+  | {{PAGENAME}} 
+}} ({{Location map {{{1}}}|name}})}}}</div><!-- end-div caption --
+--></div><!-- end-div overall box -->
+<!-- </div></div> <!--force any divisions closed -->
+</includeonly><noinclude><!--
+--
+-- NOTES:
+--  This code generates nested HTML divisions for a box-division
+--  containing a map-division with nested point-divisions, each
+--  having a nested marker-image division & label division (for
+--  each marker/label point), following by a caption-division.
+--
+--  The "map image" can be any image, allowing markers/labels to
+--  annotate any picture. Set each markXsize=0 to show labels only.
+--
+--  [ These comments take < 1 second per 5,000 comment lines. ]
+--  [ Be sure to close comments: primitive editors don't check. ]
+--
+--HISTORY:
+-- 06Sep07 Created/debugged to allow 3 markers.
+-- 08Sep07 Expanded with more markers.
+-- 09Sep07 Rewrote to auto-position markers by marksize/markhigh.
+-- 10Sep07 Rewrote to require latitudes, avoid oversized pages.
+-- 11Sep07 Verified latitudes/longitudes (expanded template 16%).
+-- 15Sep07 Adjusted 24 label positions for markers 1-6.
+-- 20Sep07 Allowed width "NN" or "NNpx"; indented map code.
+-- 20Sep07 Put marker-3 skew calculation.
+-- 20Sep07 Skewed markers 1-7 longitudes by latitude-related ratio.
+-- 01Oct07 Removed markers 5-7 due to MediaWiki resource limits.
+-- 07Oct07 Set label 1-4 bottom = -mark*.50 - label*.02 + 4.9.
+-- 04Nov07 New lon_shift for longitude-center shift of map center.
+-- 04Nov07 Cut 40 lines at 16 lat./longitude by defaulting lat/long
+-->
+{{Documentation}}
+<!-- PLEASE ADD THIS TEMPLATE'S CATEGORIES AND INTERWIKIS TO THE /doc SUBPAGE, THANKS -->
+{{DEFAULTSORT:{{PAGENAME}}}}
+</noinclude>

@@ -1,0 +1,159 @@
+{{noteTA
+|G1=IT
+}}
+{{C_Standard_library}} <!-- to edit this template go to [[template:C_Standard_library|template:C_Standard_library]] -->
+{{lowercase|title=setjmp.h}}
+'''setjmp.h'''是[[C标准函数库|C标准函数库]]中提供“非本地跳转”的[[头文件|头文件]]：[[控制流|控制流]]偏离了通常的子程序调用与返回序列。互补的两个函数setjmp与longjmp提供了这种功能。
+ 
+setjmp/longjmp的典型用途是[[异常处理|异常处理]]机制的实现：利用longjmp恢复程序或线程的状态，甚至可以跳过栈中多层的函数调用。
+
+==成员函数==
+
+{| class = wikitable
+|-
+|<code>int setjmp(jmp_buf env)</code> || 建立本地的<code>jmp_buf</code>缓冲区并且初始化，用于将来跳转回此处。这个子程序<ref name="macro">ISO C标准要求<code>setjmp</code>必须是宏实现，但POSIX明确称未定义<code>setjmp</code>是宏实现还是函数实现。</ref> 保存程序的调用环境于<code>env</code>参数所指的缓冲区，<code>env</code>将被<code>longjmp</code>使用。如果是从<code>setjmp</code>直接调用返回，<code>setjmp</code>返回值为0。如果是从<code>longjmp</code>恢复的程序调用环境返回，<code>setjmp</code>返回非零值。
+|-
+|<code>void longjmp(jmp_buf env, int value)</code> || 恢复<code>env</code>所指的缓冲区中的程序调用环境上下文，<code>env</code>所指缓冲区的内容是由<code>setjmp</code>子程序<ref name="macro"/>调用所保存。<code>value</code>的值从<code>longjmp</code>传递给<code>setjmp</code>。<code>longjmp</code>完成后，程序从对应的<code>setjmp</code>调用处继续执行，如同<code>setjmp</code>调用刚刚完成。如果<code>value</code>传递给<code>longjmp</code>零值，<code>setjmp</code>的返回值为1；否则，<code>setjmp</code>的返回值为<code>value</code>。
+|-
+|}
+
+<code>setjmp</code>保存当前的环境（即程序的状态）到平台相关的一个数据结构 (<code>jmp_buf</code>)，该数据结构在随后程序执行的某一点可被 <code>longjmp</code>用于恢复程序的状态到<code>setjmp</code>调用所保存到<code>jmp_buf</code>时的原样。这一过程可以认为是"跳转"回<code>setjmp</code>所保存的程序执行状态。<code>setjmp</code>的返回值指出控制是正常到达该点还是通过调用<code>longjmp</code>恢复到该点。因此有编程的惯用法: <code>if( setjmp(x) ){/* handle longjmp(x) */}</code>。
+
+==成员类型==
+
+{| class = wikitable
+|-
+|<code>jmp_buf</code> || 数组类型，例如<code>struct int[16]</code><ref>Visual Studio 2008用法</ref>或<code>struct __jmp_buf_tag</code><ref>[[GNU_C_函式庫|GNU C 函式庫]] 2.7的用法</ref>，用于保存恢复调用环境所需的信息。
+|}
+
+==告诫与限制==
+<code>longjmp</code>实现了非本地跳转，微软的IA32程序设计环境中正常的"栈卷回"("stack unwinding")因而没有发生，所以诸如栈中已定义的局部变量的析构函数的调用（用于销毁该局部变量）都没有执行。所有依赖于栈卷回调用析构函数所做的扫尾工作，如关闭文件、释放堆内存块等都没有做。但在微软的X64程序设计环境，<code>longjmp</code>启动了正常的"栈卷回"。<ref>Microsoft Visual C++ 2010 x32或x64与Intel ICC 2011 (version 12) x32或x64，编译结果都是<code>longjmp</code>启动了正常的"栈卷回"。但GCC 4.4 x32版编译的<code>longjmp</code>不执行"栈卷回"。可见，是否“栈卷回”不具有移植性。</ref>
+
+如果<code>setjmp</code>所在的函数已经调用返回了，那么<code>longjmp</code>使用该处<code>setjmp</code>所填写的对应<code>jmp_buf</code>缓冲区将不再有效。这是因为<code>longjmp</code>所要返回的"栈帧"(stack frame)已经不再存在了，程序返回到一个不再存在的执行点，很可能覆盖或者弄坏程序栈.<ref>{{Cite web |url=http://www.cs.utk.edu/~mbeck/classes/cs560/360/notes/Setjmp/lecture.html |title=CS360 Lecture Notes — Setjmp and Longjmp |accessdate=2011-06-06 |archive-date=2010-07-04 |archive-url=https://web.archive.org/web/20100704192041/http://www.cs.utk.edu/~mbeck/classes/cs560/360/notes/Setjmp/lecture.html |dead-url=no }}</ref><ref>{{Cite web |url=http://www.uwm.edu/cgi-bin/IMT/wwwman?topic=setjmp(3)&msection= |title=setjmp(3) |accessdate=2011-06-06 |archive-date=2009-07-26 |archive-url=https://web.archive.org/web/20090726081425/http://www.uwm.edu/cgi-bin/IMT/wwwman?topic=setjmp%283%29&msection= |dead-url=no }}</ref>
+
+==使用例子==
+===简单例子===
+
+<syntaxhighlight lang="c">
+#include <stdio.h>
+#include <setjmp.h>
+
+static jmp_buf buf;
+
+void second(void) {
+    printf("second\n");         // 打印
+    longjmp(buf,1);             // 跳回setjmp的调用处 - 使得setjmp返回值为1
+}
+
+void first(void) {
+    second();
+    printf("first\n");          // 不可能执行到此行
+}
+
+int main() {   
+    if ( ! setjmp(buf) ) {
+        first();                // 进入此行前，setjmp返回0
+    } else {                    // 当longjmp跳转回，setjmp返回1，因此进入此行
+        printf("main\n");       // 打印
+    }
+
+    return 0;
+}
+</syntaxhighlight>
+上述程序将输出: 
+ second
+ main
+注意到虽然<code>first()</code>子程序被调用，"<code>first</code>"不可能被打印。"<code>main</code>"被打印，因为条件语句<code>if ( ! setjmp(buf) )</code>被执行第二次。
+
+=== 异常处理 ===
+在下例中，<code>setjmp</code>被用于包住一个例外处理，类似[[异常处理|<code>try</code>]]。<code>longjmp</code>调用类似于<code>throw</code>语句，允许一个异常返回给<code>setjmp</code>一个异常值。下属代码示例遵从[[C99|1999 ISO C standard]]与[[Single_UNIX_Specification|Single UNIX Specification]]：仅在特定范围内引用<code>setjmp</code>
+*<code>if</code>，<code>switch</code>或它们的嵌套使用的条件表达式
+*上述情况下与<code>!</code>一起使用或者与整数常值比较
+*作为单独的语句(不使用其返回值)
+遵从上述规则使得创建程序环境缓冲区更为容易。更一般的使用<code>setjmp</code>可能引起[[未定义行为|未定义行为]]，如破坏局部变量；编译器被要求保护或警告这些用法。但轻微的复杂用法如<code>switch ((exception_type = setjmp(env))) { }</code>在文献与实践中是常见的，并保持了相当的可移植性。
+
+<syntaxhighlight lang="c">
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <setjmp.h>
+ 
+void first(void);
+void second(void);
+ 
+/* This program's output is:
+ 
+calling first
+calling second
+entering second
+second failed with type 3 exception; remapping to type 1.
+first failed, exception type 1
+ 
+*/
+ 
+/* Use a file scoped static variable for the exception stack so we can access
+ * it anywhere within this translation unit. */
+static jmp_buf exception_env;
+static int exception_type;
+ 
+int main() {
+    void *volatile mem_buffer;
+ 
+    mem_buffer = NULL;
+    if (setjmp(exception_env)) {
+        /* if we get here there was an exception */
+        printf("first failed, exception type %d\n", exception_type);
+    } else {
+        /* Run code that may signal failure via longjmp. */
+        printf("calling first\n");
+        first();
+        mem_buffer = malloc(300); /* allocate a resource */
+        printf("%s",strcpy((char*) mem_buffer, "first succeeded!")); /* ... this will not happen */
+    }
+    if (mem_buffer)
+        free((void*) mem_buffer); /* carefully deallocate resource */
+    return 0;
+}
+ 
+void first(void) {
+    jmp_buf my_env;
+ 
+    printf("calling second\n");
+    memcpy(my_env, exception_env, sizeof(jmp_buf));
+    switch (setjmp(exception_env)) {
+        case 3:
+            /* if we get here there was an exception. */
+            printf("second failed with type 3 exception; remapping to type 1.\n");
+            exception_type = 1;
+
+        default: /* fall through */
+            memcpy(exception_env, my_env, sizeof(jmp_buf)); /* restore exception stack */
+            longjmp(exception_env, exception_type); /* continue handling the exception */
+
+        case 0:
+            /* normal, desired operation */
+            second();
+            printf("second succeeded\n");  /* not reached */
+    }
+    memcpy(exception_env, my_env, sizeof(jmp_buf)); /* restore exception stack */
+}
+ 
+void second(void) {
+    printf("entering second\n" ); /* reached */
+    exception_type = 3;
+    longjmp(exception_env, exception_type); /* declare that the program has failed */
+    printf("leaving second\n"); /* not reached */
+}
+</syntaxhighlight>
+
+==用于信号处理==
+在[[Signal.h|信号处理机制]]中，进程在检查收到的信号，会从原来的系统调用中直接返回，而不是等到该调用完成。这种进程突然改变其上下文的情况，就是通过使用setjmp和longjmp来实现的。setjmp将保存的上下文载入用户空间，并继续在旧的上下文中继续执行。这就是说，进程执行一个系统调用，当因为资源或其他原因要去睡眠时，内核为进程作了一次setjmp，如果在睡眠中被信号唤醒，进程不能再进入睡眠时，内核为进程调用longjmp，该操作是内核为进程将现在的上下文切换成原先通过setjmp调用保存在进程用户区的上下文，这样就使得进程可以恢复等待资源前的状态，而且内核为setjmp返回1，使得进程知道该次系统调用失败。
+
+==参考文献==
+{{reflist}}
+
+==外部链接==
+* [http://www.di.unipi.it/~nids/docs/longjump_try_trow_catch.html Exceptions in C with Longjmp and Setjmp]{{Wayback|url=http://www.di.unipi.it/~nids/docs/longjump_try_trow_catch.html |date=20110615175107 }}
+
+[[Category:C标准库头文件|Category:C标准库头文件]]
+[[category:控制流程|category:控制流程]]

@@ -1,0 +1,405 @@
+{{NoteTA
+|G1 = IT
+}}
+[[File:For-loop-diagram.png|thumb]]
+{{循环结构}}
+'''for迴圈'''（{{lang-en|for loop}}）在計算機科學是一種[[程式語言|程式語言]]的[[迭代|迭代]][[陳述_(程式)|陳述]]，能夠讓程式碼反覆的執行。
+
+它跟其他的[[迴圈|迴圈]]，如[[while迴圈|while迴圈]]，最大的不同，是它擁有一個[[迴圈計數器|迴圈計數器]]，或是迴圈變數。這使得for迴圈能夠知道在迭代過程中的執行順序。
+
+==for 迴圈的種類==
+=== 傳統的 for 迴圈 for-loops ===
+[[C語言|C語言]]中傳統的for-loop包含三個部分：初始化、條件、遞增，這三個部分都是可有可無的。<ref>{{cite web|url=http://www.learncpp.com/cpp-tutorial/57-for-statements/|title=For loops in C++|accessdate=2016-03-06|archive-date=2016-03-05|archive-url=https://web.archive.org/web/20160305130454/http://www.learncpp.com/cpp-tutorial/57-for-statements/|dead-url=no}}</ref>
+:以Java為例： 
+<syntaxhighlight Lang="java">
+for (INITIALIZATION; CONDITION; AFTERTHOUGHT) 
+{
+    // Code for the for-loop's body goes here.
+}
+</syntaxhighlight>
+初始化是宣告（或者賦值）任何需要的變數的動作。如果你要使用多個變數，則變數的種類要一致。條件的部分則是檢查是否離開這個迴圈，也就是讓程式碼往下執行。如果條件判斷為假，則離開迴圈。遞增在每跑一次迴圈都會重複執行一次。 
+:在此以Java為例：
+<syntaxhighlight Lang="java">
+for (int i=0; i<100; i++)   // Prints the numbers 0 to 99 (and not 100), each separated by a space.
+{
+    System.out.print(i);
+    System.out.print(' ');
+}
+System.out.println();
+</syntaxhighlight>
+=== 使用指標的for迴圈 ===
+這種形式的for迴圈是大多數其他for迴圈的變革：他允許除了數字以外的計數方式。他通常用隱含或外顯指標的方式呈現，而在此迴圈變數會依序表示。以下是一個代表性的例子(語言：[[Python|Python]])：
+ 
+<syntaxhighlight Lang="python">
+for item in some_iterable_object:
+    do Something
+    do Something Else
+</syntaxhighlight>
+
+=== 矩陣化for迴圈 ===
+有一些語言支援比較特別的for迴圈，如同它可以同時處理所有的指標[[Automatic_vectorization|in parallel]]，像是在[[FORTRAN_95|FORTRAN 95]]中的<code>for all</code>語法。
+舉例來說，在以下的for迴圈[[虛擬碼|虛擬碼]]片段，當計算<code>A(i)</code>的新的值，除了第一個(也就是 <code>i = 2</code>)，<code>A(i - 1)</code>的參照會得到新的值。
+然而，在<code>for all</code> 版本，每個計算都會使用一開始的值，不會更改 <code>A</code>.
+ '''for'''     i := 2 : N - 1 '''do''' A(i) := [A(i - 1) + A(i) + A(i + 1)] / 3; '''next''' i;
+ '''for all''' i := 2 : N - 1 '''do''' A(i) := [A(i - 1) + A(i) + A(i + 1)] / 3;
+和一般的for迴圈可能差距比較大。
+==應用範例==
+以c語言為例：
+===作為[[無窮迴圈|無窮迴圈]]===
+<syntaxhighlight lang=C>
+for (;;)
+   printf("just keep going on!");
+</syntaxhighlight>
+這個程式碼會不斷的印出"just keep going on!"。
+===配合[[矩陣|矩陣]]===
+矩陣賦值：
+<syntaxhighlight lang=C>
+for(int i=0;i<bound_of_matrix;i++)
+   matrix[i] = i;
+</syntaxhighlight>
+以上給予矩陣 matrix 依序從0到bound_of_matrix-1 的值。
+===[[巢狀迴圈|巢狀迴圈]]===
+就像巢穴一樣，一層包覆一層，所以以下這個程式碼一共會執行(bound_of_x)乘上(bound_of_y)次。
+<syntaxhighlight lang=C>
+for(int i=0;i<bound_of_x;i++)
+   for(int j=0;j<bound_of_y;j++)
+      matrix[i][j] = j;
+</syntaxhighlight>
+
+==常見的錯誤==
+===無窮迴圈===
+這裡指的是無意產生的無窮迴圈，容易導致當機。
+:以C語言為例： 
+<syntaxhighlight lang=C>
+for (int i=0;i<10;i--)
+   printf("confused");
+</syntaxhighlight>
+
+===超出界限===
+[[編譯器|編譯器]]會顯示out of bound，通常是指嘗試取矩陣界限外的值。
+
+===迴圈內的變數===
+迴圈內的變數在出迴圈之後，便無法使用。
+==發展概論==
+主要緣起為許多需要重複執行的程式碼，而不一樣的程式語言也會有不一樣的語法型式。
+
+===1957: FORTRAN===
+在Fortran 的<code>DO</code> 迴圈 同等於for迴圈。
+Fortran的 <CODE>DO</CODE> 迴圈語法為：
+ <syntaxhighlight lang=FORTRAN>
+         DO label counter = first, last, step
+         statements
+  label  statement
+  </syntaxhighlight> 
+接下來的兩個例子做出來的結果等同於其他語言的三個參數的for迴圈。其中變數COUNTER被初始化為1，以1遞增，並且到5的時候停下。
+<syntaxhighlight lang=FORTRAN>
+   DO 9, COUNTER = 1, 5, 1
+     WRITE (6,8) COUNTER
+8    FORMAT( I2 )
+9  CONTINUE
+</syntaxhighlight>
+Fortran 77 或之後的版本，也可能寫成： 
+<syntaxhighlight lang=FORTRAN>
+do counter = 1, 5
+  write(*, '(i2)') counter
+end do
+</syntaxhighlight>
+如果遞增為1，則遞增的部分可以省略。例如：
+<syntaxhighlight lang=FORTRANfixed>
+* DO loop example.
+       PROGRAM MAIN
+         SUM SQ = 0
+         DO 199 I = 1, 9999999
+           IF (SUM SQ.GT.1000) GO TO 200
+199        SUM SQ = SUM SQ + I**2
+200      PRINT 206, SUMSQ
+206      FORMAT( I2 )
+       END
+</syntaxhighlight>
+
+===1958: Algol===
+[[ALGOL|Algol]] 在Algo158首次正式格式化。
+
+===1960: COBOL===
+[[COBOL|COBOL]]在許多努力之下，在1959年終正式格式化。他使用PERFORM 動詞，而PERFORM動詞有很多功能，像是後來加上的＂結構化＂的語法，像是 END-PERFORM。忽略宣告和初始化變數的必要，類似for迴圈的語法為：
+<syntaxhighlight lang=COBOL>
+      PERFORM VARYING I FROM 1 BY 1 UNTIL I > 1000
+             ADD I**2 TO SUM-SQ.
+      END-PERFORM
+</syntaxhighlight>
+如果PERFORM有TEST AFTER，這個迴圈的執行的結果會有點不同：迴圈內的程式會被執行至少一次。
+===1964: BASIC===
+[[BASIC|BASIC]] 中的迴圈有時稱為 for-next迴圈。
+
+<syntaxhighlight lang="freebasic">
+For I = 1 to 5;
+ Print I;
+Next I
+</syntaxhighlight>
+
+===1964: PL/I===
+由IBM公司在1950年代發明的第三代高級程式語言， 有些類似[[PASCAL|PASCAL]]語言。 
+:以下為[[PLI|PLI]]使用例： 
+<syntaxhighlight lang=PLI>
+do counter = 1 to 5 by 1; /* "by 1" is the default if not specified */
+  /*statements*/;
+  end;
+</syntaxhighlight>
+
+''LEAVE'' 指令可以用來結束迴圈，像c語言的break，而''ITERATE''則像continue。
+
+===1968: Algol 68===
+[[Algol68|Algol68]] 很類似現在的for語言了：
+<syntaxhighlight lang=Algol68>
+FOR i FROM 1 BY 2 TO 3 WHILE i≠4 DO ~ OD
+</syntaxhighlight>
+
+
+
+===1970: Pascal===
+<syntaxhighlight lang=Pascal>
+for Counter := 1 to 5 do
+  (*statement*);
+</syntaxhighlight>
+
+===1972: C/C++===
+{{further|C syntax#Iteration statements}}
+<syntaxhighlight lang=C>
+for (initialization; condition; increment/decrement)
+    statement
+</syntaxhighlight>
+
+===1972: Smalltalk===
+
+===1980: Ada===
+<syntaxhighlight lang="ada">
+for Counter in 1 .. 5 loop
+   -- statements
+end loop;
+</syntaxhighlight>
+
+===1980: Maple===
+Maple有兩種型式的for迴圈，一個是指標一定範圍的值，另一個是指標一定大小的容器。
+第一種：
+
+
+ '''for''' ''i'' '''from''' ''f'' '''by''' ''b'' '''to''' ''t'' '''while''' ''w'' '''do'''
+     ''# loop body''
+ '''od''';
+
+第二種：
+
+ '''for''' ''e'' '''in''' ''c'' '''while''' ''w'' '''do'''
+     ''# loop body''
+ '''od''';
+
+
+
+===1982: PostScript===
+他的for迴圈 <code>[initial] [increment] [limit] { ... } for</code> 初始化一個內部的變數, 並且執行到他不大於限制的值(若遞增為負則以此類推)。<ref>{{cite book|title=PostScript Language Reference|publisher=Addison-Wesley Publishing Company|page=596|isbn=0-201-37922-8}}</ref>
+<syntaxhighlight lang=AppleScript>
+1 1 6 {STATEMENTS} for
+</syntaxhighlight>
+
+===1983: Ada 83 and above===
+<syntaxhighlight lang=ADA>
+procedure Main is
+  Sum_Sq : Integer := 0;
+begin
+  for I in 1 .. 9999999 loop 
+    if Sum_Sq <= 1000 then
+      Sum_Sq := Sum_Sq + I**2
+    end if;
+  end loop;
+end;
+</syntaxhighlight>
+
+===1984: MATLAB===
+<syntaxhighlight lang=MATLAB>
+for i = 1:5 
+     -- statements
+end</syntaxhighlight>
+
+===1987: Perl===
+<syntaxhighlight lang=Perl>
+for ($counter = 1; $counter <= 5; $counter++) { # implictly or predefined variable
+  # statements;
+}
+for (my $counter = 1; $counter <= 5; $counter++) { # variable private to the loop
+  # statements;
+}
+for (1..5) { # variable impicitly called $_; 1..5 creates a list of these 5 elements
+  # statements;
+}
+statement for 1..5; # almost same (only 1 statement) with natural language order
+for my $counter (1..5) { # variable private to the loop
+  # statements;
+}
+</syntaxhighlight>
+
+
+===1988: Mathematica===
+
+
+<syntaxhighlight lang=Ruby>
+Do[f[x], {x, 0, 1, 0.1}]
+</syntaxhighlight>
+
+
+<syntaxhighlight lang=Ruby>
+For[x= 0 , x <= 1, x += 0.1,
+    f[x]
+]
+</syntaxhighlight>
+
+===1989: Bash===
+<syntaxhighlight lang="bash">
+*第一種
+for i in 1 2 3 4 5
+do
+    # must have at least one command in loop
+    echo $i  # just print value of i
+done
+</syntaxhighlight>
+
+<syntaxhighlight lang="bash">
+*第二種
+for (( i = 1; i <= 5; i++ ))
+do
+    # must have at least one command in loop
+    echo $i  # just print value of i
+done
+</syntaxhighlight>
+
+===1990: Haskell===
+<syntaxhighlight lang="haskell">
+forM_ [1..5] $ \indx -> do statements
+</syntaxhighlight>
+
+
+如果你想要用更正式的方式存 [1..5]的內容，一個比較官方的方式為：
+
+<syntaxhighlight lang="haskell">
+import Control.Monad as M
+
+forLoopM_ :: Monad m => a -> (a -> Bool) -> (a -> a) -> (a -> m ()) -> m ()
+forLoopM_ indx prop incr f = do
+        f indx
+        M.when (prop next) $ forLoopM_ next prop incr f
+  where      
+    next = incr indx    
+</syntaxhighlight>
+並且可以這樣使用：
+<syntaxhighlight lang="haskell">
+  forLoopM_ (0::Int) (< len) (+1) $ \indx -> do -- whatever with the index
+</syntaxhighlight>
+
+===1991: Oberon-2, Oberon-07, or Component Pascal===
+<syntaxhighlight lang=Oberon2>
+FOR Counter := 1 TO 5 DO
+  (* statement sequence *)
+END
+</syntaxhighlight>
+
+===1991: Python===
+<syntaxhighlight lang=Python>
+for counter in range(1, 6):  # range(1, 6) gives values from 1 to 5 inclusive (but not 6)
+  # statements
+</syntaxhighlight>
+
+===1993: AppleScript===
+<syntaxhighlight lang=AppleScript>
+repeat with i from 1 to 5
+	-- statements
+	log i
+end repeat
+</syntaxhighlight>
+
+===1993: Lua===
+<syntaxhighlight lang=Lua>
+for i = start, stop, interval do
+     -- statements
+end</syntaxhighlight>
+
+這個程式碼 <syntaxhighlight lang=Lua>
+for i = 1, 5, 2 do
+     print(i)
+end</syntaxhighlight>即會印出：
+<syntaxhighlight lang=Lua>1 3 5</syntaxhighlight>
+
+
+=== 1995: Java ===
+<syntaxhighlight lang=Java>
+for (int i = 0; i < 5; i++) {
+    //perform functions within the loop;
+    //can use the statement 'break;' to exit early;
+    //can use the statement 'continue;' to skip the current iteration
+}
+</syntaxhighlight>
+
+===1995: JavaScript===
+JavaScript 支援像是C語言的三個參數的迴圈，並且支援break和continue。
+<syntaxhighlight lang=JavaScript>
+for (let i = 0; i < 5; i++) {
+    // ...
+}
+</syntaxhighlight>
+
+===1995: PHP===
+<syntaxhighlight lang=PHP>
+for ($i = 0; $i <= 5; $i++)
+{
+  for ($j = 0; $j <= $i; $j++)
+  {
+    echo "*";
+  }
+  echo "<br>";
+}
+</syntaxhighlight>
+
+===1995: Ruby===
+<syntaxhighlight lang=Ruby>
+for counter in 1..5
+  # statements
+end
+
+5.times do |counter|  # counter iterates from 0 to 4
+  # statements
+end
+
+1.upto(5) do |counter|
+  # statements
+end
+</syntaxhighlight>
+
+===1996: OCaml===
+請參考<ref>{{Cite web |url=http://caml.inria.fr/pub/docs/manual-ocaml-4.00/expr.html |title=OCaml expression syntax |accessdate=2016-03-06 |archive-date=2013-04-12 |archive-url=https://archive.is/20130412180254/http://caml.inria.fr/pub/docs/manual-ocaml-4.00/expr.html |dead-url=no }}</ref>
+<syntaxhighlight lang="ocaml">
+ (* for_statement := "for" ident '='  expr  ( "to" ∣  "downto" ) expr "do" expr "done" *)
+
+for i = 1 to 5 do
+    (* statements *)
+  done ;;
+
+for j = 5 downto 0 do
+    (* statements *)
+  done ;;
+</syntaxhighlight>
+
+===1998: ActionScript 3===
+<syntaxhighlight lang="actionscript3">
+for (var counter:uint = 1; counter <= 5; counter++){
+  //statement;
+}
+</syntaxhighlight>
+== 參考文獻 ==
+{{Reflist}}
+https://web.archive.org/web/20180906124543/http://terms.naer.edu.tw/detail/2337520/
+
+==參見==
+*[[Foreach循环|Foreach循环]]
+
+{{DEFAULTSORT:For loop}}
+[[Category:控制流程|Category:控制流程]]
+[[Category:编程中的迭代|Category:编程中的迭代]]
+[[Category:带有代码示例的条目|Category:带有代码示例的条目]]

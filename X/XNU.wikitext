@@ -1,0 +1,75 @@
+{{Infobox OS
+| name                   = XNU kernel
+| logo                   =
+| caption                =
+| developer              = [[蘋果公司|蘋果公司]]
+| family                 = [[类Unix|类Unix]]
+| working state          = 开发中
+| source model           = [[開放原始碼|開放原始碼]]
+| released               = {{Start date and age|1996|12}}
+| programmed in          = [[C语言|C]], [[C++|C++]]
+| language               = 英文, 其他
+| supported platforms    = [[IA-32|IA-32]], [[x86-64|x86-64]], [[ARM架构|ARM]]
+| genre                  = [[操作系统|操作系统]][[内核|内核]]
+| kernel_type            = [[混合核心|混合]]
+| license                = [[苹果公共源代码许可证|苹果公共源代码许可证]] 2.0
+| website                = {{URL|https://opensource.apple.com/source/xnu}}
+}}
+
+'''XNU'''是一个由[[苹果电脑|苹果电脑]]开发用于[[macOS|macOS]]操作系统的[[操作系统|操作系统]][[内核|内核]]。它是[[Darwin_(操作系统)|Darwin]]操作系统的一部分，跟随着Darwin一同作为[[自由及开放源代码软件|自由及开放源代码软件]]被发布。它还是[[iOS|iOS]]、[[tvOS|tvOS]]和[[watchOS|watchOS]]操作系统的内核。XNU是'''X is Not Unix'''的缩写<ref>{{cite web |year=2005 |url=https://developer.apple.com/documentation/Porting/Conceptual/PortingUnix/glossary/glossary.html |title=Porting UNIX/Linux Applications to Mac OS X: Glossary |publisher=Apple Computer |accessdate=March 27, 2009 |deadurl=yes |archiveurl=https://www.webcitation.org/69tH6UvBx?url=https://developer.apple.com/library/mac/documentation/Porting/Conceptual/PortingUnix/glossary/glossary.html |archivedate=2012年8月13日 }}</ref><!-- Please read the footnote before making changes to the last line. XNU is NOT a recursive abbreviation, and it does NOT stand for "XNU is not Unix."-->。
+
+XNU最早是[[NeXT|NeXT]]公司为了[[NeXTSTEP|NeXTSTEP]]操作系统而发展的。它是一种[[混合式核心|混合式核心]]（Hybrid kernel），结合了由[[卡内基美隆大学|卡内基美隆大学]]发展的[[Mach|Mach]] 2.5版，[[BSD|4.3BSD]]，与称为Driver Kit的[[面向对象程序设计|面向对象程序设计]][[应用程序接口|应用程序界面]]。
+
+在苹果电脑收购NeXT公司之后，XNU的Mach微内核被升级到Mach 3.0，BSD的部分升级至[[FreeBSD|FreeBSD]]，Driver Kit则改成[[I/O_Kit|I/O Kit]]，一套以[[C++|C++]]撰写的应用程序界面。
+
+== 内核设计 ==
+XNU是一个[[混合核心|混合内核]]，将[[宏内核|宏内核]]与[[微内核|微内核]]两者的特性兼收并蓄，以期同时拥有两种内核的优点————比如在微内核中提高操作系统模块化程度以及让操作系统更多的部分接受[[内存保护|内存保护]]的[[訊息傳遞_(軟體)|消息传递]]机制，和宏内核在高负荷下表现的高性能。
+
+到2007年为止，XNU支持单核和具有[[对称多处理|对称多处理]]的[[ARM|ARM]]<ref>[http://www.engadget.com/2007/07/01/iphone-processor-found-620mhz-arm/ iPhone processor found: 620MHz ARM CPU] {{Wayback|url=http://www.engadget.com/2007/07/01/iphone-processor-found-620mhz-arm/ |date=20090123013252 }} (July 1, 2007) Retrieved January 6, 2008</ref>，[[IA-32|IA-32]]和[[x86-64|x86-64]]处理器。在第10版（即[[Mac_OS_X_Snow_Leopard|Mac OS X 10.6]]）之后，不再支持[[PowerPC|PowerPC]]。
+
+=== Mach ===
+XNU内核以一个被深度定制的[[Mach|Mach]]3.0内核作为基础。如此这般，它便可以把操作系统的核心部分作为独立的进程运行，由此带来极大的灵活性（Mach核心之上可平行运行多个操作系统）。但是因为内核态/用户态的上下文切换会额外消耗时间，同时内核与服务进程之间的消息传递也会降低运行效率，所以这种设计通常会降低性能。为了提高效率，在 Mac OS X 中BSD部分与Mach一起内建于核心部分。深度定制的「混合」Mach3.0内核与传统BSD内核融合一体的产物就是一个「混合」内核，同时具有两者的优点与缺点。
+=== BSD ===
+
+内核的[[BSD|伯克利软件套件]]（BSD）部分提供了[[POSIX|POSIX]]应用程序接口（BSD系统称为API）：基于Mach的[[作業_(電腦)|任务]]之上的[[Unix|Unix]]进程模型，基本安全策略，用户和用户组，权限，[[协议栈|网络协议栈]]，[[虚拟文件系统|虚拟文件系统]]（包括一个文件系统无关的[[日志|日志]]层），几个本地文件系统（例如[[HFS|HFS]]/[[HFS+|HFS+]]），[[网络文件系统|网络文件系统]]（NFS）客户端与服务器，加密框架，[[UNIX_System_V|UNIX System V]][[进程间通信|进程间通信]]（IPC），审计机制，[[强制访问控制|强制访问控制]]，和一些锁原语<ref>{{cite mailing list|url=http://lists.freebsd.org/pipermail/freebsd-advocacy/2008-August/003674.html|title=Re: freebsd-advocacy Digest, Vol 248, Issue 1|last=Watson|first=Robert|authorlink=Robert Watson (computer scientist)|mailinglist=freebsd-advocacy|date=August 2, 2008|accessdate=October 24, 2013|archive-date=2021-02-25|archive-url=https://web.archive.org/web/20210225134829/https://lists.freebsd.org/pipermail/freebsd-advocacy/2008-August/003674.html}}</ref>。XNU中的BSD代码来自[[FreeBSD|FreeBSD]]内核。尽管其中相当一部分代码都被深度修改过，苹果和FreeBSD项目之间依然会交换代码<ref>{{cite web|url=http://www.freebsd.org/news/status/report-2009-04-2009-09.html#Grand-Central-Dispatch---FreeBSD-port|title=FreeBSD Quarterly Status Report (Grand Central Dispatch - FreeBSD port)|date=April 2009|accessdate=October 24, 2013|archive-date=2009-10-14|archive-url=https://web.archive.org/web/20091014031730/http://www.freebsd.org/news/status/report-2009-04-2009-09.html#Grand-Central-Dispatch---FreeBSD-port}}</ref>。
+
+=== K32/K64 ===
+
+XNU在[[Mac_OS_X_Snow_Leopard|Mac OS X 10.6 Snow Leopard]]（[[Darwin_(操作系统)|Darwin]]版本号10）及之后演化为两个分支，称为K32的[[32位|32位]]版和称为K64的[[64位|64位]]版<ref>{{Cite web |url=http://arstechnica.com/apple/reviews/2009/08/mac-os-x-10-6.ars/5 |title=Mac OS X 10.6 Snow Leopard: the Ars Technica review, page 5 |accessdate=2017-04-08 |archive-date=2012-08-13 |archive-url=https://www.webcitation.org/69swuj0Ua?url=http://arstechnica.com/apple/2009/08/mac-os-x-10-6/5/ |dead-url=no }}</ref>。K32可以在用户态运行64位应用。Mac OS X 10.6 的新特性是在64位[[使用者空間|用户空间]]运行XNU。在除2008年及之后的[[Mac_Pro|Mac Pro]]和[[Xserve|Xserve]]外的所有设备上，K32是10.6 Server系统的默认内核，并且可以运行64位应用<ref>{{Cite web |url=http://support.apple.com/kb/HT3770 |title=Mac OS X Server v10.6: Macs that use the 64-bit kernel |accessdate=2017-04-08 |archive-date=2010-12-05 |archive-url=https://web.archive.org/web/20101205233913/http://support.apple.com/kb/HT3770 |dead-url=no }}</ref>。K64相比K32有如下几点优势<ref>{{Cite web |url=http://developer.apple.com/mac/library/releasenotes/MacOSX/WhatsNewInOSX/Articles/MacOSX10_6.html |title=What's New in Mac OS X: Mac OS X v10.6 |accessdate=2017-04-08 |archive-date=2009-12-08 |archive-url=https://web.archive.org/web/20091208151435/http://developer.apple.com/Mac/library/releasenotes/MacOSX/WhatsNewInOSX/Articles/MacOSX10_6.html |dead-url=no }}</ref>：
+
+* 可以管理超过32GB的内存，内存地址空间相比32位内核有巨大增长。
+* 缓存容量可以超过32位内核空间的限制，潜在提升I/O性能。
+* 当使用高性能网络设备或多个[[GPU|GPU]]时性能会提升，因为即使在[[直接存储器访问|直接存储器访问]]DMA缓存很大的情况下内核也可以把所有设备映射在64位地址空间中。
+
+在支持64位内核的机器启动时按下6和4按键会使机器使用K64启动。K64可以运行32位应用，但不会运行32位的内核模块，所以这些内核模块需要移植到K64才能被加载。
+
+=== I/O Kit ===
+I/O Kit 是一个[[驱动程序|设备驱动]]框架，用基于[[Embedded_C++|Embedded C++]]的[[C++|C++]]子集编写<ref>{{Cite web |url=http://osxbook.com/book/bonus/ancient/whatismacosx/arch_xnu.html |title=I/O Kit uses a restricted subset of C++ |accessdate=2017-04-08 |archive-date=2019-04-19 |archive-url=https://web.archive.org/web/20190419152142/http://osxbook.com/book/bonus/ancient/whatismacosx/arch_xnu.html |dead-url=no }}</ref>。借助它的[[面向对象程序设计|面向对象]]设计，框架提供每种设备驱动需要的常见特性，以使驱动程序可以用更少的时间和代码完成。I/O Kit 具有多线程设计，[[对称多处理|对称多处理]]安全，支持热拔插设备和自动动态配置设备等特性。
+很多设备驱动可以编写运行于[[用户态|用户态]]，进一步提升了系统的稳定性。如果用户态的驱动崩溃，内核不会因此崩溃。但是，内核态的驱动崩溃会导致内核崩溃。磁盘适配器和网络适配器驱动、显卡驱动、[[USB|USB]]驱动和[[IEEE_1394|火线控制器]]驱动以及[[虚拟机|虚拟机]]软件如[[VirtualBox|VirtualBox]]，Parallels Desktop for Mac和[[VMware|VMware Fusion]]等的驱动都是典型的内核态驱动。
+
+== 共享资源保护 ==
+为了在多核设备上安全运行，对共享资源（文件、数据结构等） 的访问必须被序列化，这样线程和进程就无法在同一时间修改同一资源。原子操作、自旋锁、[[臨界區段|临界区块]]、[[互斥锁|互斥锁]]（"mutexes"）和序列化标记（serializing tokens）都可以实现防止访问冲突发生。从Mac OS X 10.4与Darwin8.0开始，XNU如较新版本的Linux与FreeBSD一样使用一种折中的互斥模型来获得在[[多核心處理器|多处理器]]系统上的高性能表现。
+
+== 参见 ==
+{{Portal|自由软件}}
+*[[内核|内核]]
+*[[A/UX|A/UX]]
+*[[mkLinux|mkLinux]]
+*[[Darwin_(操作系统)|Darwin]]{{snd}}苹果公司以XNU为内核发布的开源操作系统
+*[[macOS|macOS]]{{snd}}苹果公司以XNU为内核发布的操作系统
+
+== 参考资料 ==
+{{Reflist|30em}}
+
+== 外部链接 ==
+* http://opensource.apple.com/source/xnu/ {{Wayback|url=http://opensource.apple.com/source/xnu/ |date=20220308121457 }}
+* [https://github.com/opensource-apple/xnu Unofficial mirror of XNU at GitHub] {{Wayback|url=https://github.com/opensource-apple/xnu |date=20180924043346 }}
+* [http://osxbook.com/book/bonus/ancient/whatismacosx/arch_xnu.html XNU: The Kernel] {{Wayback|url=http://osxbook.com/book/bonus/ancient/whatismacosx/arch_xnu.html |date=20190419152142 }}{{snd}} Amit Singh 于 2003年12月写的对XNU结构组成的概述
+* [http://www.derchris.eu/ccc/24C3/mp4/24c3-2303-en-inside_the_macosx_kernel-COMPATIBLE.mp4 Inside the Mac OS X Kernel] {{Wayback|url=http://www.derchris.eu/ccc/24C3/mp4/24c3-2303-en-inside_the_macosx_kernel-COMPATIBLE.mp4 |date=20160407134037 }}{{snd}} "This talk intends to clear up the confusion by presenting details of the Mac OS X kernel（这次演讲旨在通过深入介绍Mac OS X 内核来澄清误解）"
+{{移动操作系统}}
+{{macOS}}
+{{FreeBSD}}
+{{DEFAULTSORT:Xnu}}
+[[Category:Mach|Category:Mach]]
+[[Category:宏内核|Category:宏内核]]
+[[Category:macOS|Category:macOS]]

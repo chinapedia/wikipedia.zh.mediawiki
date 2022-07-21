@@ -1,0 +1,107 @@
+{{noteTA
+|G1=IT
+|T=zh-cn:二项堆;zh-tw:二項式堆積;zh-hk:二項堆積;
+|1=zh-cn:斐波那契堆;zh-tw:斐波那契堆積;zh-hk:斐波那契堆積;
+|2=zh-cn:二项堆;zh-tw:二項式堆積;zh-hk:二項堆積;
+}}
+在[[计算机科学|计算机科学]]中，'''二项堆'''（{{lang|en|binomial heap}}）是一种类似于[[二叉堆|二叉堆]]的[[堆_(数据结构)|堆结构]]。与二叉堆相比，其优势是可以快速合并两个堆，因此它属于可合并堆（{{lang|en|mergeable heap}}）[[抽象数据类型|抽象数据类型]]的一种。
+
+== 二项树 ==
+二项树递归定义如下：
+* 度数为0的二项树只包含一个结点
+* 度数为k的二项树有一个根结点，根结点下有<math>k</math>个子女，每个子女分别是度数分别为<math>k-1, k-2, ..., 2, 1, 0</math>的二项树的根
+
+[[File:Binomial_Trees.svg|center]]
+
+度数为k的二项树共有<math>2^k</math>个结点，高度为<math>k</math>。在深度d处有<math>\tbinom k d</math>（[[二项式系数|二项式系数]]）个结点。
+
+度数为k的二项树可以很容易从两颗度数为k-1的二项树合并得到：把一颗度数为k-1的二项树作为另一颗原度数为k-1的二项树的最左子树。这一性质是二项堆用于堆合并的基础。
+
+== 二项堆 ==
+二项堆是指满足以下性质的二项树的集合：
+* 每棵二项树都满足[[最大-最小堆|最小堆性质]]，即结点关键字大于等于其父结点的值
+* 不能有两棵或以上的二项树有相同度数（包括度数为0）。换句话说，具有度数k的二项树有0个或1个。
+
+以上第一个性质保证了二项树的根结点包含了最小的关键字。第二个性质则说明结点数为<math>n</math>的二项堆最多只有 <math>\log{n}</math> 棵二项树。实际上，包含n个节点的二项堆的构成情况，由n的二进制表示唯一确定，其中每一位对应于一颗二项树。例如，13的二进制表示为1101, <math>2^3 + 2^2 + 2^0</math>, 因此具有13个节点的二项堆由度数为3, 2, 0的三棵二项树组成： 
+
+<center>[[Image:Binomial-heap-13.svg|325px]]<br>示例：一个含13个结点的二项堆</center>
+
+== 二项堆的操作 ==
+由于并不需要对二项树的根结点进行[[随机存取|随机存取]]，因而这些结点可以存成[[链表|链表]]结构。
+
+=== 合并 ===
+[[Image:Binomial_heap_merge1.svg|right]]
+[[Image:Binomial_heap_merge2.svg|right]]
+最基本的为二个分支度相同的二项树的合并。由于二项树根節點包含最小的关键字，因此在二棵树合并时，只需比较二个根節點关键字的大小，其中含小关键字的節點成为结果树的根節點，另一棵树则变成结果树的子树。
+
+ '''function''' mergeTree(p, q)
+     '''if''' p.root <= q.root
+         '''return''' p.addSubTree(q)
+     '''else'''
+         '''return''' q.addSubTree(p)
+
+
+两个二项堆的合并则可按如下步骤进行：分支度<math>j</math>从小取到大，在两个二项堆中如果其中只有一棵树的分支度为<math>j</math>，即将此树移动到结果堆，而如果只两棵树的分支度都为<math>j</math>，则根据以上方法合并为一个分支度为<math>j+1</math>的二项树。此后这个分支度为<math>j+1</math>的树将可能会和其他分支度为<math>j+1</math>的二项树进行合并。因此，对于任何分支度j，可能最多需要合并3棵二项树。
+
+此操作的时间复杂度为<math>{O}(\log n)</math>。
+
+ '''function''' merge(p, q)
+     '''while''' '''not''' (p.end() '''and''' q.end())
+         tree = mergeTree(p.currentTree(), q.currentTree())
+         
+         '''if''' '''not''' heap.currentTree().empty()
+             tree = mergeTree(tree, heap.currentTree())
+         
+         heap.addTree(tree)
+         heap.next(); p.next(); q.next()
+
+=== 插入 ===
+创建一个只包含要插入元素的二项堆，再将此堆与原先的二项堆进行合并，即可得到插入后的堆。由于需要合并，插入操作需要<math>{O}(\log n)</math>的时间。平摊分析的时间复杂度为<math>{O}(1)</math>。
+
+=== 查找最小关键字所在结点 ===
+由于满足最小堆性质，只需查找二项树的的根结点即可，因为一共有<math>\log n</math>棵子树，所以用所时间为<math>{O}(\log n)</math>。
+
+可以保存一个指向最小元素的指针，使得查找最小关键字所在结点需要<math>{O}(1)</math>的时间。在执行其他操作时，需要修改该指针。
+=== 删除最小关键字所在结点 ===
+先找到最小关键字所在结点，然后将它从其所在的二项树中删除，并获得其子树。将这些子树看作（合并为）一个独立的二项堆，再将此堆合并到原先的堆中即可。由于每棵树最多有<math>\log n</math>棵子树，创建新堆的时间为<math>{O}(\log n)</math>。同时合并堆的时间也为<math>{O}(\log n)</math>，故整个操作所需时间为<math>{O}(\log n)</math>。
+
+ '''function''' deleteMin(heap)
+     min = heap.trees().first()
+     '''for each''' current '''in''' heap.trees()
+         '''if''' current.root < min '''then''' min = current
+     '''for each''' tree '''in''' min.subTrees()
+         tmp.addTree(tree)
+     heap.removeTree(min)
+     merge(heap, tmp)
+=== 减小特定結點(關鍵字)的值(Decreasing a key) ===
+在减小特定結點（關鍵字）的值后，可能会不满足最小堆積性质。此时，将其所在结点与父结点交换，如还不满足最小堆性质则再与祖父结点交换……直到最小堆性质得到满足。操作所需时间为<math>{O}(\log n)</math>。
+
+=== 删除 ===
+将需要删除的结点的关键字的值减小到负无穷大（比二项堆中的其他所有关键字的值都小即可），执行“减小关键字的值”算法，使其调整到当前二项树的根节点位置，再删除最小关键字的根结点即可。
+
+== 运行时间 ==
+以下对于二项堆操作的运行时间都为<math>{O}(\log n)</math>（結點数为<math>n</math>）：
+* 在二项堆中插入新结点
+* 查找最小关键字所在结点
+* 从二项堆中删除最小关键字所在结点
+* 减小给定结点关键字的值
+* 删除给定结点
+* 合并两个二项堆
+
+== 参见 ==
+* [[斐波那契堆|斐波那契堆]]
+
+== 参考资料 ==
+* {{cite book|author=Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, Clifford Stein（潘金贵等译）|title=《算法导论》|publisher=机械工业出版社}}
+* Vuillemin, J. (1978). [http://portal.acm.org/citation.cfm?id=359478 A data structure for manipulating priority queues.] ''Communications of the ACM'' '''21''', 309–314.
+
+== 外部链接 ==
+* {{en}}[https://web.archive.org/web/20160303184730/http://www.cs.yorku.ca/~aaw/Sotirios/BinomialHeap.html 二项堆的Java applet摸拟]
+* {{en}}[http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/511508 二项堆的Python实现]{{Wayback|url=http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/511508 |date=20070513232303 }}
+* {{en}}[http://www.cs.unc.edu/~bbb/#binomial_heaps 二项堆的C实现]{{Wayback|url=http://www.cs.unc.edu/~bbb/#binomial_heaps |date=20200701162822 }}
+* {{en}}[https://web.archive.org/web/20100216131938/http://niketanpansare.com/MinBinHeap.aspx 二项堆的Java实现]
+
+{{Data structures}}
+{{计算机科学中的树}}
+
+[[Category:堆|Category:堆]]

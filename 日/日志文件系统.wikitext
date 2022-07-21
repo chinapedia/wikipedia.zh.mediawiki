@@ -1,0 +1,50 @@
+{{noteTA
+|G1=IT
+|1=zh-hans:文件; zh-hant:檔案;
+|2=zh-hans:日志; zh-hant:日誌;
+}}
+'''日志文件系统'''（{{lang-en|Journaling file system}}）是一種[[文件系統|文件系統]]。在发生变化时，它先把相关的信息写入一个被称为[[日志文件|日志]]的区域，然后再把变化写入主文件系统。在文件系统发生故障（如内核崩溃或突然停电）时，日志文件系统更容易保持一致性，并且可以较快恢复。<ref name="ibm">{{cite web |url=http://www.ibm.com/developerworks/cn/linux/l-journaling-filesystems/ |title=Linux 日志文件系统剖析 |author=M. Tim Jones |date=2008-07-07 |publisher=IBM |accessdate=2011-01-15 |archive-date=2020-03-28 |archive-url=https://web.archive.org/web/20200328192809/https://www.ibm.com/developerworks/cn/linux/l-journaling-filesystems/ |dead-url=no }}</ref>
+
+== 概述 ==
+对文件系统进行修改时，需要进行很多操作。这些操作可能中途被打断，也就是说，這些操作不是“不可中斷”(atomic)的。如果操作被打断，就可能造成文件系统出现不一致的状态。<ref name="ibm" />
+
+例如：删除文件时，先要从目录树中移除文件的标示，然后收回文件占用的空间。如果在这两步之间操作被打断，文件占用的空间就无法收回。文件系统认为它是被占用的，但实际上目录树中已经找不到使用它的文件了。
+
+在非日志文件系统中，要检查并修复类似的错误就必须对整个文件系统的数据结构进行检查。一般在挂载文件系统前，[[操作系统|操作系统]]会检查它上次是否被成功卸载，如果没有，就会对其进行检查。如果文件系统很大或者[[I/O|I/O]][[带宽|带宽]]有限，这个操作可能会花费很长时间。
+
+为了避免这样的问题，日志文件系统分配了一个称为日志（{{lang|en|journal}}）的区域来提前记录要对文件系统做的更改。在崩溃后，只要读取日志重新执行未完成的操作，文件系统就可以恢复一致。这种恢复是原子的，因为只存在几种情况：
+* 不需要重新执行：这个事务被标记为已经完成
+* 成功重新执行：根据日志，这个事务被重新执行
+* 无法重新执行：这个事务会被撤销，就如同这个事务从来没有发生过
+* 日志本身不完整：事务还没有被完全写入日志，它会被简单忽略
+
+== 日志的三个级别 ==
+在很多日志文件系统（如：[[ext3|ext3]], [[ReiserFS|ReiserFS]]）中，可以选择三个级别的日志：回写（{{lang|en|writeback}}）、顺序（{{lang|en|ordered}}）和数据（{{lang|en|data}}）。
+
+=== 回写 ===
+在回写模式中，只有[[元数据|元数据]]被记录到日志中，数据会被直接写入主文件系统。这种模式能提供较好的性能，不过有较大的风险。例如：在增大文件时，数据还未写入就发生崩溃，那么文件系统恢复后，文件后面就可能出现垃圾数据。
+
+=== 顺序 ===
+在顺序模式中，只有[[元数据|元数据]]被记录到日志中，但在日志被标记为提交前，数据会被写入文件系统。在这种模式下，如果在增大文件时，数据还未写入就发生崩溃，那么在恢复时这个事务会被简单的撤销，文件保持原来的状态。
+
+=== 数据 ===
+在数据模式中，[[元数据|元数据]]和文件内容都先被写入日志中，然后在提交到主文件系统。这提高了安全性，但损失性能，因为所有数据要写入两次<ref name="ibm" />。在这种模式下，如果在增大文件时，发生崩溃，那么可能有两种情况：
+* 日志完整：这时事务会被重新执行，修改会被提交到主文件系统
+* 日志不完整：这时主文件系统还未被修改，只需要简单放弃这个事务
+
+== 常见的日志文件系统 ==
+* [[JFS_(文件系统)|JFS]]：[[IBM|IBM]]的 Journaled File System, 最早的日志文件系统<ref name="ibm" />。
+* [[Ext4|Ext4]]/[[Ext3|Ext3]]文件系统：由[[Ext2|Ext2]]文件系统演化而成的日志文件系统，广泛用于[[Linux|Linux]]系统。
+* [[XFS|XFS]]檔案系統：廣泛用於[[Linux|Linux]]系統，自 [[Red_Hat_Enterprise_Linux|Red Hat Enterprise Linux 7]] 起取代Ext4成为Red Hat Enterprise Linux的默认文件系统（包括其衍生版及[[CentOS|CentOS]]）<ref>{{Cite web|title=Chapter 4. File Systems Red Hat Enterprise Linux 7|url=https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/7.0_release_notes/chap-red_hat_enterprise_linux-7.0_release_notes-file_systems|access-date=2022-03-18|work=Red Hat Customer Portal|language=en|archive-date=2022-03-01|archive-url=https://web.archive.org/web/20220301140102/https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/7.0_release_notes/chap-red_hat_enterprise_linux-7.0_release_notes-file_systems}}</ref>。
+* [[ReiserFS|ReiserFS]]：用[[B+树|B+树]]作为数据结构的日志文件系统，在处理小文件时有较好的性能。
+* [[Btrfs|Btrfs]]：用[[B树|B树]]作为数据结构，被认为是下一代Linux文件系统<ref>{{cite web |url=http://www.ibm.com/developerworks/cn/linux/l-cn-btrfs/ |title=新一代 Linux 文件系统 btrfs 简介 |author=刘明 |publisher=IBM |date=2010-09-20 |accessdate=2010-01-15 |archive-date=2010-01-25 |archive-url=https://web.archive.org/web/20100125062354/http://www.ibm.com/developerworks/cn/linux/l-cn-btrfs/ |dead-url=no }}</ref>。
+* [[NTFS|NTFS]]：[[微软|微软]]的[[NTFS|NTFS]]也是日志文件系统，也是[[Windows|Windows]]下最常用的文件系统。
+* [[HFS+|HFS+]]：[[蘋果公司|蘋果公司]]發展的[[OS_X|OS X]]作業系統下主要使用的文件系統。
+
+== 参见 ==
+* [[数据库|数据库]]
+
+== 参考资料 ==
+{{reflist}}
+
+[[Category:文件系统|Category:文件系统]]

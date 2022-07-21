@@ -1,0 +1,171 @@
+{{noteTA|G1=IT}}
+'''BogoMips''' ("[[bogus|bogus]]" 和[[MIPS|MIPS]]，伪MIPS) 是一种衡量CPU速度的不科学方法。当计算机内核启动时，将执行一个计数循环。
+
+对于特定的CPU，BogoMips可用来查看它是否个合适的值.它的时钟频率和它潜在的CPU缓存。但是它不可在不同的CPU间进行比较演示。<ref name="howto">{{cite web | first = Wim | last = Van Dorst | url = http://www.clifton.nl/bogomips.html | title = BogoMips Mini-Howto | edition = V38 | date = 2 March 2006 | accessdate = 2008-08-22 | archive-date = 2013-08-27 | archive-url = https://www.webcitation.org/6JAzWvwZk?url=http://www.clifton.nl/bogomips.html | dead-url = no }}</ref>
+
+== 合适的BogoMips比率==
+作为一个参考向导，BogoMips可以用下列的表格进行预计算。给出的比率是以应用到LINUX版本的CPU作为例子。指数是指其它CPU同Intel 386DX CPU的BogoMips/clock speed比率.
+{| class="sortable wikitable"
+!CPU!!比率!!指数
+|-
+|[[Intel_8088|Intel 8088]] ||clock * 0.004||0.02
+|-
+|[[Intel_80386|Intel/AMD 386SX]] ||clock * 0.14||0.8
+|-
+|[[Intel_80386|Intel/AMD 386DX]] ||clock * 0.18||1 (definition)
+|-
+|[[Motorola_68030|Motorola 68030]]||clock * 0.25||1.4
+|-
+|[[Cyrix|Cyrix]]/[[IBM|IBM]] 486||clock * 0.34||1.8
+|-
+|Intel [[Intel_P5|Pentium]]||clock * 0.40||2.2
+|-
+|[[Intel_80486|Intel 486]] ||clock * 0.50||2.8
+|-
+|[[AMD_5x86|AMD 5x86]]||clock * 0.50||2.8
+|-
+|[[MIPS_Technologies|MIPS]] R4000/R4400||clock * 0.50||2.8
+|-
+|[[ARM9|ARM9]]||clock * 0.50||2.8
+|-
+|[[Motorola_8081|Motorola 8081]]||clock * 0.65||3.6
+|-
+|[[Motorola_68040|Motorola 68040]]||clock * 0.67||3.7
+|-
+|[[PowerPC|PowerPC]] 603||clock * 0.67||3.7
+|-
+|Intel [[StrongARM|StrongARM]]||clock * 0.66||3.7
+|-
+|[[NexGen|NexGen]] Nx586||clock * 0.75||4.2
+|-
+|[[PowerPC|PowerPC]] 601||clock * 0.84||4.7
+|-
+|[[Alpha_21064|Alpha 21064]]/21064A||clock * 0.99||5.5
+|-
+|[[Alpha_21064|Alpha 21066]]/21066A||clock * 0.99||5.5
+|-
+|[[Alpha_21164|Alpha 21164]]/21164A||clock * 0.99||5.5
+|-
+|Intel [[Pentium_Pro|Pentium Pro]]||clock * 0.99||5.5
+|-
+|[[Cyrix_Cx5x86|Cyrix 5x86]]/[[Cyrix_6x86|6x86]] ||clock * 1.00||5.6
+|-
+|Intel [[Pentium_II|Pentium II]]/[[Pentium_III|III]]||clock * 1.00||5.6
+|-
+|[[Athlon|AMD K7/Athlon]]||clock * 1.00||5.6
+|-
+|Intel [[Celeron|Celeron]]||clock * 1.00||5.6
+|-
+|Intel [[Itanium|Itanium]]||clock * 1.00||5.6
+|-
+|[[R4600|R4600]]||clock * 1.00||5.6
+|-
+|[[Hitachi,_Ltd.|Hitachi]] SH-4||clock * 1.00||5.6
+|-
+|Intel [[Itanium_2|Itanium 2]]||clock * 1.49||8.3
+|-
+|[[Alpha_21264|Alpha 21264]]||clock * 1.99||11.1
+|-
+|[[VIA_Technologies|VIA Centaur]]||clock * 1.99||11.1
+|-
+|[[AMD_K6|AMD K5/K6/K6-2/K6-III]]||clock * 2.00||11.1
+|-
+|AMD [[Duron|Duron]]/[[Athlon|Athlon]] XP||clock * 2.00||11.1
+|-
+|AMD [[Sempron|Sempron]]||clock * 2.00||11.1
+|-
+|[[SPARC|UltraSparc]] II||clock * 2.00||11.1
+|-
+|Intel [[Pentium_MMX|Pentium MMX]]||clock * 2.00||11.1
+|-
+|Intel [[Pentium_4|Pentium 4]]||clock * 2.00||11.1
+|-
+|Intel [[Pentium_M|Pentium M]]||clock * 2.00||11.1
+|-
+|Intel [[Core_Duo|Core Duo]]||clock * 2.00||11.1
+|-
+|Intel [[Core_2_Duo|Core 2 Duo]]||clock * 2.00||11.1
+|-
+|Intel [[Intel_Atom|Atom]] N455||clock * 2.00||11.1
+|-
+|Centaur C6-2||clock * 2.00||11.1
+|-
+|[[PowerPC|PowerPC]] 604/604e/750||clock * 2.00||11.1
+|-
+|Intel [[Pentium_III#Coppermine|Pentium III Coppermine]]||clock * 2.00||11.1
+|-
+|Intel [[Xeon#Pentium_III_Xeon|Pentium III Xeon]]||clock * 2.00||11.1
+|-
+|[[Motorola_68060|Motorola 68060]]||clock * 2.01||11.2
+|-
+|Intel [[Xeon#Xeon_.28DP.29_.26_Xeon_MP_.2832-bit.29|Xeon MP (32-bit)]] ([[hyper-threading|hyper-threading]])||clock * 3.97||22.1
+|-
+|[[IBM_eServer_zSeries|IBM S390]]||not enough data (yet)||
+|-
+|[[ARM_architecture|ARM]]||not enough data (yet)||
+|}
+
+== BogoMIPS 怎么计算的? ==
+在当前内核(2.6.x),BogoMIPS实现在内核源文件<code>/usr/src/linux/init/calibrate.c</code>。它计算了Linux内核定时参数<code>loops_per_jiffy</code> (see [[Jiffy_(time)|Jiffy (time)]] ) 值。源码解释如下：
+<pre><nowiki>
+ /*
+   * A simple loop like
+   *  while ( jiffies < start_jiffies+1)
+   *    start = read_current_timer();
+   * will not do. As we don't really know whether jiffy switch
+   * happened first or timer_value was read first. And some asynchronous
+   * event can happen between these two events introducing errors in lpj.
+   *
+   * So, we do
+   * 1. pre_start <- When we are sure that jiffy switch hasn't happened
+   * 2. check jiffy switch
+   * 3. start <- timer value before or after jiffy switch
+   * 4. post_start <- When we are sure that jiffy switch has happened
+   *
+   * Note, we don't know anything about order of 2 and 3.
+   * Now, by looking at post_start and pre_start difference, we can
+   * check whether any asynchronous event happened or not
+   */
+</nowiki></pre>
+
+<code>loops_per_jiffy</code> is used to implement <code>udelay</code> (delay in microseconds) and <code>ndelay</code> (delay in nanoseconds) functions. These functions are needed by some drivers to wait for hardware. Note that a [[busy_waiting|busy waiting]] technique is used, so the kernel is effectively blocked when executing <code>ndelay/udelay</code> functions. For i386 architecture <code>delay_loop</code> is implemented in <code>/usr/src/linux/arch/i386/lib/delay.c</code> as:
+<syntaxhighlight lang="c">
+/* simple loop based delay: */
+static void delay_loop(unsigned long loops)
+{
+  int d0;
+
+  __asm__ __volatile__(
+    "\tjmp 1f\n"
+    ".align 16\n"
+    "1:\tjmp 2f\n"
+    ".align 16\n"
+    "2:\tdecl %0\n\tjns 2b"
+    :"=&a" (d0)
+    :"0" (loops));
+}
+</syntaxhighlight>
+
+用C语言重写的代码如下：
+<syntaxhighlight lang="c">
+static void delay_loop(long loops)
+{
+  long d0 = loops;
+  do {
+    --d0;
+  } while (d0 >= 0);
+}
+</syntaxhighlight>
+
+关于BogoMips更丰富更全的信息和数百篇相关文章可参见 BogoMips mini-Howto.<ref name=howto/>
+
+==参考==
+{{Reflist}}
+
+== 外部链接 ==
+* [http://www.clifton.nl/bogomips.html BogoMips Mini-Howto, V38]{{WebCite|url=https://www.webcitation.org/6JAzWvwZk?url=http://www.clifton.nl/bogomips.html |date=20130827035444 |dateformat=iso }}
+
+{{DEFAULTSORT:Bogomips}}
+
+[[Category:Linux|Category:Linux]]
+[[Category:计算机科学|Category:计算机科学]]

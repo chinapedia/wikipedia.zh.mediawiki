@@ -1,0 +1,138 @@
+{{noteTA
+|G1=IT
+}}
+在[[计算机科学|计算机科学]]中，'''关联数组'''（{{Lang-en|'''Associative Array'''}}），又称'''映射'''（{{Lang|en|'''Map'''}}）、'''字典'''（{{Lang|en|'''Dictionary'''}}）是一个抽象的[[数据结构|数据结构]]，它包含着类似于（键，值）的有序对。一个关联数组中的有序对可以重复（如C++中的multimap）也可以不重复（如C++中的map）。
+
+这种数据结构包含以下几种常见的操作：
+* 向关联数组添加配对
+* 从关联数组内删除配对
+* 修改关联数组内的配对
+* 根据已知的键寻找配对<ref name="gt">{{citation|contribution=9.1 The Map Abstract Data Type|title=Data Structures & Algorithms in Java|last1=Goodrich|first1=Michael T.|author1-link=Michael T. Goodrich|last2=Tamassia|first2=Roberto|author2-link=Roberto Tamassia|publisher=Wiley|edition=4th|year=2006|pages=368–371}}.</ref><ref name="ms">{{citation|contribution=4 Hash Tables and Associative Arrays|title=Algorithms and Data Structures: The Basic Toolbox|first1=Kurt|last1=Mehlhorn|author1-link=Kurt Mehlhorn|first2=Peter|last2=Sanders|publisher=Springer|year=2008|pages=81–98}}</ref>
+
+'''字典问题'''是设计一种能够具备关联数组特性的[[数据结构|数据结构]]。解决字典问题的常用方法，是利用[[散列表|散列表]]或查找树<ref name="gt"/><ref name="ms"/><ref name="clrs">{{citation | last1 = Cormen | first1 = Thomas H. | author1-link=Thomas H. Cormen | coauthors = [[Charles_E._Leiserson|Leiserson, Charles E.]]; [[Ron_Rivest|Rivest, Ronald L.]]; [[Clifford_Stein|Stein, Clifford]] | title = [[Introduction_to_Algorithms|Introduction to Algorithms]] | edition = 2nd | year = 2001 | publisher = [[MIT_Press|MIT Press]] and [[McGraw-Hill|McGraw-Hill]] | isbn=0-262-03293-7 | chapter = 11 Hash Tables | pages = 221–252}}.</ref><ref name="dietzfelbinger">Dietzfelbinger, M., Karlin, A., Mehlhorn, K., Meyer auf der Heide, F., Rohnert, H., and Tarjan, R. E. 1994.
+[http://www.arl.wustl.edu/~sailesh/download_files/Limited_Edition/hash/Dynamic%20Perfect%20Hashing-%20Upper%20and%20Lower%20Bounds.pdf "Dynamic Perfect Hashing: Upper and Lower Bounds"] {{Webarchive|url=https://web.archive.org/web/20160304094014/http://www.arl.wustl.edu/~sailesh/download_files/Limited_Edition/hash/Dynamic%20Perfect%20Hashing-%20Upper%20and%20Lower%20Bounds.pdf |date=2016-03-04 }}.
+SIAM J. Comput. 23, 4 (Aug. 1994), 738-761.
+http://portal.acm.org/citation.cfm?id=182370
+{{doi|10.1137/S0097539791194094}}</ref>。有些情况下，也可以使用直接寻址的数组、二叉查找树或其他专门的结构。
+
+关联数组有许多应用，包括诸如[[记忆化|记忆化]]和[[修饰模式|修饰模式]]的[[设计模式_(计算机)|编程模式]]。<ref name="修饰模式">{{harvtxt|Goodrich|Tamassia|2006}}, pp. 597–599.</ref>
+
+许多程序设计语言内置基本的[[数据类型|数据类型]]，提供对关联数组的支持。而{{tsl|en|Content-addressable memory|内容定址存储器}}则是硬件层面上实现对关联数组的支持。
+
+== 操作 ==
+关联数组中，[[鍵-值對|键与值]]的关联通常称作“映射”，“映射”一词也指创建新的关联的过程。
+
+关联数组所定义的操作有：<ref name="gt"/><ref name="ms"/>
+* '''添加'''或'''插入'''：添加一个新的键值对，建立从新键到新值的映射。该操作的参数是要添加的键和值。
+* '''重新赋值'''：更改一已有的键值对的值，把原有的键映射到新的值。和插入一样，参数为键和值。
+* '''删除'''：移除一个键值对，取消从该键到该值的映射。参数为要删除的键。
+* '''查询'''：查找到给出键对应的值（如果该键存在）。这个操作的参数是要查找的键，返回的是对应的值。如果没有相应的键值对，有些实现会引发[[异常处理|异常]]，而另外一些则会使用所给的键创建并添加新的键值对，其中的“值”为其类型的默认值（零、空容器等）
+
+添加和重新赋值的操作常作为一个'''赋值'''的操作出现，即如果存在键值对则更新它，反之添加。
+
+关联数组也可能包括其他操作，比如查询已有的映射数目和构造[[迭代器|迭代器]]以遍历所有映射。遍历的顺序通常由关联数组的实现决定。
+
+{{Tsl|en|Multimap|多重关连数组}}是关联数组的推广，它允许多个值与一个键关联。<ref>{{harvtxt|Goodrich|Tamassia|2006}}, pp. 389–397.</ref>
+
+== 示例 ==
+假设需要在一种数据结构中表示图书馆的借书情况。一本书一次只能借给一位读者，但一位读者同时可以借阅多本书。因此有关哪本书被哪位读者借出的信息可以用关联数组表示。这个数据结构用[[Python|Python]]或[[JSON|JSON]]的记法可以表示如下：
+
+<syntaxhighlight lang="javascript">{
+    "傲慢与偏见": "小红",
+    "呼啸山庄": "小红",
+    "远大前程": "小李"
+}</syntaxhighlight>
+
+对键“远大前程”的查询操作会返回“小李”。如果小李还了书，就需要一个删除操作。如果小陈外借了一本书，就需要一个插入操作，导致关联数组更新：
+
+<syntaxhighlight lang="javascript">{
+    "傲慢与偏见": "小明",
+    "卡拉马佐夫兄弟": "小陈",
+    "呼啸山庄": "小红"
+}</syntaxhighlight>
+
+== 实现 ==
+对于非常小的关联数组来说，使用关联列表，即以映射为节点的[[链表|链表]]实现较为合理。在这种实现下，进行[[关联数组#操作|基本操作]]的时间与映射的总数呈线性关系。但是这样的实现难度低、运行时间中的常数小，因此仍为较好的选择。<ref name="gt"/><ref>{{cite web
+|url=http://www.faqs.org/faqs/lisp-faq/part2/section-2.html
+|title=When should I use a hash table instead of an association list?
+|publisher=lisp-faq/part2
+|date=1996-02-20
+|access-date=2021-08-26
+|archive-date=2022-03-31
+|archive-url=https://web.archive.org/web/20220331120325/http://www.faqs.org/faqs/lisp-faq/part2/section-2.html
+|dead-url=no
+}}</ref>
+
+在键仅限于较窄范围时，还有另外一种简单的实现技巧。可以将键直接用于数组的寻址：比如键''k''对应的值就储存在数组元素''A''[''k'']，如果''k''还没有映射，那么在''A''[''k'']存储一个特殊的{{Tsl|en|Sentinel value|哨兵值}}来表示。这种实现既简单又很快，每个操作只需要常数时间。其不足之处在于需要相当于整个键空间的储存空间，这意味着除非键空间很小，这种方法并不实用。
+
+实现关联数组的主要方法是[[散列表|散列表]]和搜索树。<ref name="gt"/><ref name="ms"/><ref name="clrs"/><ref name="dietzfelbinger"/>
+
+=== 散列表实现 ===
+{{main | 散列表}}
+[[File:Hash_table_average_insertion_time.png|thumb]]在大型散列表（远大于缓存容量）中查询元素分别所需要的[[CPU缓存|CPU缓存]]不命中次数。线性探测的表现更好，是因为它有更好的访问局部性，尽管在散列表快填满时其性能急剧下降。]]
+关联数组最常用的通用实现是使用散列表——[[数组|数组]]和[[散列函数|散列函数]]的结合。该散列函数把每个键分散到各自的“桶”中。散列表背后的基本原理是：用下标访问数组是一个简单的常数时间的操作。因此对散列表的操作所需的平均开销只包括计算散列值，和在数组中访问对应的“桶”。正因如此，使用散列表的时间复杂度通常为O(1)，大多数情况下优于其他方法。
+
+散列表需要能处理[[碰撞_(计算机科学)|冲突]]——散列函数把两个不同的键映射到同一个“桶”的情况。解决这个问题的两个最普遍的方法是单独链表法和开放定址法。<ref name="gt"/><ref name="ms"/><ref name="clrs"/><ref name="fklm">{{citation|contribution=Pathfinders for associative maps|title=Ext. Abstracts GIS-l 2006|last1=Klammer|first1=F.|author1-link=F. Klammer|last2=Mazzolini|first2=L.|author2-link=L. Mazzolini|publisher=GIS-I|year=2006|pages=71–74}}.</ref>单独链表法中，数组不是直接储存值本身，而是储存一个指向另一个[[容器_(数据类型)|容器]]的[[指標_(電腦科學)|指针]]。这个容器常常是一个关联表，储存着对应同个散列值的所有值。而在开放定址法中如果出现散列冲突，散列表会在数组中决定性地找到一个空位，通常就是查看邻近的下一个位置。
+
+当散列表大部分空着时，开放定址法比单独链表法有着更低的[[CPU缓存|缓存]]不命中率。但是随着散列表被更多的元素填充，开放定址法的性能指数级地下降。此外，单独链表法使用的内存在多数情况下更少，除非值的大小非常小（小于四倍的指针大小）。
+
+=== 树实现 ===
+{{main | 搜索树}}
+
+==== 自平衡二叉搜索树 ====
+实现关联数组另一个常用的方法是使用[[平衡树|自平衡二叉搜索树]]，例如[[AVL树|AVL树]]或[[红黑树|红黑树]]。<ref>Joel Adams and Larry Nyhoff.
+[http://cs.calvin.edu/books/c++/intro/3e/WebItems/Ch15-Web/STL-Trees.pdf "Trees in STL"] {{Wayback|url=http://cs.calvin.edu/books/c++/intro/3e/WebItems/Ch15-Web/STL-Trees.pdf |date=20160303233209 }}.
+Quote:
+
+"The Standard Template library ... some of its containers -- the set<T>, map<T1, T2>, multiset<T>, and multimap<T1, T2> templates -- are generally built using a special kind of ''self-balancing binary search tree'' called a ''red–black tree''."</ref>
+
+与使用散列表相比，使用树有其优点和不足。就最坏情况而言，自平衡二叉搜索树远好于散列表。使用自平衡二叉树的最坏情况的时间复杂度用[[大O符号|大O表示法]]表示，为O(log ''n'')。相比之下，使用散列表的最坏情况的时间复杂度则为O(''n'')。此外，和所有二叉搜索树一样，自平衡二叉搜索树中的元素始终按顺序排列。因此，对使用树实现的关联数组的遍历是按从小到大的顺序进行的，而遍历散列表则会呈现看似随机的序列。然而，散列表平均情况的时间复杂度（O(1)）比树要好得多，而且若[[散列函数|散列函数]]选择恰当，最坏情况出现的概率很小。
+
+值得注意的是，自平衡二叉搜索树也可以用来实现采用单独链表法的散列表的“桶”。这种实现保留了散列表的常数查询时间，且保证最坏情况也有O(log ''n'')的表现。但是这种做法给实现增添了额外的复杂性且可能降低小型散列表的性能，因为在较小的散列表里，在树中插入元素并维护树的平衡所需的时间会长于直接对链表或类似数据结构中进行线性搜索所需的时间。<ref name="knuth">{{cite book| first=Donald |last=Knuth |author1-link=Donald Knuth| title = The Art of Computer Programming| volume = 3: ''Sorting and Searching''| edition = 2nd| publisher = Addison-Wesley| year = 1998| isbn = 0-201-89685-0| pages = 513–558}}</ref><ref>{{cite web |url=https://schani.wordpress.com/2010/04/30/linear-vs-binary-search/ |title=Linear vs Binary Search |last=Probst |first=Mark |date=2010-04-30 |access-date=2016-11-20 |archive-date=2016-11-20 |archive-url=https://web.archive.org/web/20161120154213/https://schani.wordpress.com/2010/04/30/linear-vs-binary-search/ |dead-url=no }}</ref>
+
+== 各语言 / 库中的支持 ==
+关联数组的内置语法上的支持是在1969年由[[SNOBOL|SNOBOL4]]最早介入的，当时名字叫做“表格”。[[TMG_(语言)|TMG]]提供带有字符串键和整数值的表格。[[MUMPS|MUMPS]]将多维关联数组作为它的关键数据结构，带有可选的持久性。[[SETL|SETL]]支持它们作为集合和映射的一种可能实现。
+ 
+=== [[C++|C++]]（[[标准模板库|标准模板库]]） ===
+STL 提供了 8 个关联数组[[容器_(抽象数据类型)|容器]]模板：
+{| class="wikitable"
+|-
+! 类模板 !! 说明
+|-
+| std::map<K, V> <br/> std::unordered_map<K, V> || 从 K 到 V 类型的一对一字典<br />不带 unordered_ 前缀的为根据 K 排序的[[红黑树|红黑树]]、带前缀的为[[散列表|散列表]]（即不排序，故名）
+|-
+| std::multimap<K, V> <br /> std::unordered_multimap<K, V> || 从 K 到 V 的一对多字典
+|-
+| std::set<T> <br /> std::unordered_set<T> || T 的[[集合_(数学)|集合]]
+|-
+| std::multiset<T> <br /> std::unordered_multiset<T> || T 的[[多重集|多重集]]
+|}
+
+=== [[.Net_Framework|.Net Framework]] ===
+[[C++/CLI|C++/CLI]] 中另有 .Net 所提供的托管实现，见下。
+{| class="wikitable"
+|-
+! 类 / [[接口_(计算机软件)|接口]] !! 说明
+|-
+| System.Collections.IDictionary <br /> System.Collections.Generic.IDictionary<K, V> || 字典的接口<br />System.Collections [[命名空间|命名空间]]中为非泛型版本，即其内容类型为 System.Object 类型
+|-
+| System.Collections.HastTable <br /> System.Collections.Generic.Dictionary<K, V> || 散列表实现的字典
+|-
+| System.Collections.Generic.SortedDictionary<K, V> || 二叉搜索树
+|-
+| System.Collections.SortedList <br /> System.Collections.Generic.SortedList<K, V> || 按键排序的数组
+|}
+
+== 参考 ==
+{{reflist}}
+
+==外部链接==
+{{wiktionary|associative array}}
+*[http://www.nist.gov/dads/HTML/assocarray.html NIST's Dictionary of Algorithms and Data Structures: Associative Array] {{Wayback|url=http://www.nist.gov/dads/HTML/assocarray.html |date=20090130054426 }}
+
+{{Data structures}}
+{{数据类型}}
+
+[[Category:关联数组|*]]
+[[Category:数据结构|Category:数据结构]]
+[[Category:抽象数据类型|Category:抽象数据类型]]

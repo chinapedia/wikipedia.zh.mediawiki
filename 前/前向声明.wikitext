@@ -1,0 +1,63 @@
+在[[程序设计|程序设计]]中，'''前向声明'''（'''Forward Declaration'''）是指提前声明，但还没有给出完整的定义的[[标识符|标识符]](表示编程的实体，如数据类型、变量、函数)。
+
+==例子==
+一個簡單的C/C++例子：
+<syntaxhighlight lang="c">
+void printThisInteger(int);
+</syntaxhighlight>
+
+在[[C++|C++]]中, 上行代码是一个函数的前向声明，也是该函数的原型。编译器处理该行源码后，允许程序员在随后的程序中引用函数<code>printThisInteger</code>; 不过程序员必须在某处提供这个被声明的函数的定义:
+
+<syntaxhighlight lang="c">
+void printThisInteger(int x) {
+   printf("%d\n", x);
+}
+</syntaxhighlight>
+
+在[[Pascal_(编程语言)|Pascal]]与其它[[尼克劳斯·维尔特|Wirth]]型的编程语言中, 一般规则是所有实体必须在使用前被声明. [[C语言|C语言]]适用同样的规则, 但存在未声明的函数与不完备的数据类型这样的特例. 因此，C语言允许(虽然不够明智)实现一对[[互递归|互递归]]函数:
+
+<syntaxhighlight lang="c">
+// 前向声明
+
+int second(int);
+
+int first(int x) {
+   if (x == 0)
+      return 1;
+   
+   return second(x-1);
+}
+
+int second(int x) {
+   if (x == 0)
+      return 0;
+   
+   return first(x-1);
+}
+</syntaxhighlight>
+
+在Pascal程序中, 同样的实现要求在<code>first</code>引用<code>second</code>前，必须有一个<code>second</code>的前向声明. 如果没有这个前向声明, 编译器将产生编译错误，指出标识符<code>second</code>未经声明即被使用.
+
+==前向引用==
+'''前向引用'''({{lang-en|forward reference}})有时被用作前向声明的同义词<ref>{{Cite web |url=http://msdn2.microsoft.com/en-us/library/15k227ta(VS.71).aspx |title=MSDN: Converting to a Forward-Reference Class Type |accessdate=2011-08-01 |archive-date=2008-03-28 |archive-url=https://web.archive.org/web/20080328171958/http://msdn2.microsoft.com/en-us/library/15k227ta(VS.71).aspx |dead-url=no }}</ref>。但是，它更经常被用作一个实体在声明前即被实际使用; 例如, 上述代码中<code>second</code>第一次使用就是前向引用<ref>{{Cite web |url=http://pages.cs.wisc.edu/~fischer/cs536.s07/lectures/Lecture25.4up.pdf |title=存档副本 |accessdate=2011-08-01 |archive-date=2016-03-03 |archive-url=https://web.archive.org/web/20160303165142/http://pages.cs.wisc.edu/~fischer/cs536.s07/lectures/Lecture25.4up.pdf |dead-url=no }}</ref><ref>{{Cite web |url=http://www.codeguru.com/cpp/tic/tic0103.shtml |title=Thinking in C++: Inlines & the compiler |accessdate=2011-08-01 |archive-date=2011-07-09 |archive-url=https://web.archive.org/web/20110709225233/http://www.codeguru.com/cpp/tic/tic0103.shtml |dead-url=no }}</ref>。因此，可以说在Pascal中, 前向声明是强制要求，前向引用是被禁止的.
+
+C++中前向引用的例子:
+
+<syntaxhighlight lang="cpp">
+class C {
+public:
+   void mutator(int x) { myValue = x; }
+   int accessor() { return myValue; }
+private:
+   int myValue;
+};
+</syntaxhighlight>
+
+在此例中，对<code>myValue</code>的两次引用早于它的声明. C++一般禁止前向引用, 但是允许在类成员的特殊场合下使用前向引用。因此，成员函数<code>accessor</code>不能被编译直到编译器获知成员变量<code>myValue</code>的类型, 编译器有责任记住<code>accessor</code>的定义直到它看到<code>myValue</code>的声明.
+
+允许前向引用大大增加了编译器的复杂度与内存需求，并且使它不能成为一次通过型的编译器。
+
+==参考资料==
+<references/>
+
+[[Category:计算机编程|Category:计算机编程]]

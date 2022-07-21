@@ -1,0 +1,37 @@
+{{noteTA|G1=IT}}
+{{多個問題|
+{{expand|time=2011-09-17T17:51:35+00:00}}
+{{unreferenced|time=2011-09-17T17:51:35+00:00}}
+{{expert-subject|time=2011-09-17T17:51:35+00:00}}
+}}
+在[[計算機科學|計算機科學]]中，'''纖程'''（{{lang-en|Fiber}}）是一種最輕量化的[[線程|線程]]（lightweight threads）。它是一種用户态線程（user thread），讓[[應用程式|應用程式]]可以獨立決定自己的線程要如何運作。作業系統[[內核|內核]]不能看見它，也不會為它進行[[排程|排程]]。
+
+就像一般的綫程，纖程有自己的[[定址空間|定址空間]]。但是纖程採取合作式多工（Cooperative multitasking），而線程採取先佔式多工（Pre-emptive multitasking）。應用程式可以在一個線程環境中建立多個纖程，然後手動執行它。纖程不會被自動執行，必須要由[[應用程式|應用程式]]自己指定讓它執行，或換到下一個纖程。 
+
+跟線程相比，纖程較不需要[[作業系統|作業系統]]的支援。
+==Windows纤程==
+一个用户态线程拆分成多个纤程，通过用户态代码来调度纤程，从而让各个纤程“非抢占”地工作。相关Windows API：
+*PVOID ConvertThreadToFiber(PVOID pvParam); //把当前线程转换为纤程，系统为纤程执行环境分配大概200字节的存储空间，包括：1、由参数pvParam参数指定的用户定义的值，2、结构化异常处理链头。3、纤程的运行栈的最高和最低地址。4、各种CPU寄存器信息。
+*PVOID ConvertThreadToFiberEx(PVOID pvParam,DWORD dwFlags);//默认情况下，x86系统的CPU的浮点数状态信息在纤程看来不属于CPU寄存器，因此会导致在纤程中执行一些相关的浮点运算会破坏数据。为了克服这一问题，调用本函数并且传递FIBER_FLAG_FLOAT_SWITCH给它的第2个参数dwFlags
+*PVOID CreateFiber(DWORD dwStackSize,PFIBER_START_ROUTINE pfnStartAddress,PVOID pvParam);     // 在同一个线程中再创建一个纤程
+*PVOID CreateFiberEx(SIZE_T dwStackCommitSize,SIZE_T dwStackReserveSize,DWORD dwFlags, PFIBER_START_ROUTINE pStartAddress, PVOID pvParam);     // 一个线程包含多个纤程
+*VOID WINAPI FiberFunc(PVOID pvParam);//纤程函数的规格
+*VOID SwitchToFiber(PVOID pvFiberExecutionContext);//调度纤程的执行。参数是ConverThreadToFiber(Ex)或CreateFiber(Ex)返回值。 
+* VOID DeleteFiber(PVOID pvFiberExecutionContext);//纤程完成了任务，删除它. 该函数首先清除纤程运行栈，然后删除纤程执行环境。一般是由一个纤程调用来删除另一个纤程。
+*ConvertFiberToThread //当所有纤程结束了运行，需要从纤程转换为线程
+*IsThreadAFiber //是否正在一个纤程执行环境中运行
+*PVOID GetCurrentFiber();// 正在执行的纤程的执行环境
+*PVOID GetFiberData();//用户定义的一个数据，这个数据由CreateFiber(Ex)或ConvertThreadToFiber(Ex)的pvParam参数指定
+*纤程局部存储（FLS）机制。这个机制和“线程局部存储”（TLS）类似
+**FlsAlloc函数分配FLS槽来存放数据，这个FLS槽可以被当前进程内所有纤程共同使用 
+**FlsSetValue函数来保存数据到FLS槽中
+**FlsGetValue函数来取得FLS槽中对应的数据
+**FlsFree来释放FLS槽
+
+==参见==
+* [[绿色线程|绿色线程]]
+* [[GNU可移植线程库|GNU可移植线程库]]
+
+{{DEFAULTSORT:Fiber}}
+[[Category:操作系统技术|Category:操作系统技术]]
+[[Category:執行緒|Category:執行緒]]

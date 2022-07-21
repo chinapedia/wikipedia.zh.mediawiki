@@ -1,0 +1,186 @@
+{{NoteTA
+| G1 = IT
+| G2 = FL
+}}
+{{ infobox programming language
+| name                   = Less
+| logo                   = LESS Logo.svg
+| logo size              = 200px
+| year                   = 2009
+| designer               = [[Alexis_Sellier|Alexis Sellier]]
+| developer              = [[Alexis_Sellier|Alexis Sellier]], [[Dmitry_Fadeyev|Dmitry Fadeyev]]
+| latest_release_version = 3.13.0
+| latest_release_date    = {{release date and age|2020|09|29}}
+| typing                 = [[动态类型|动态类型]]
+| influenced_by          = [[CSS|CSS]], [[Sass_(样式表语言)|Sass]]
+| influenced             = [[Sass_(样式表语言)|Sass]], Less Framework
+| operating_system       = [[跨平台|跨平台]]
+| license                = [[Apache许可证|Apache许可证]] 2
+| website                = [http://lesscss.org/ lesscss.org]
+| file_ext               = .less
+}}
+{{CSS}}
+'''Less'''（或寫作'''LESS'''）是一种由Alexis Sellier设计的动态[[层叠样式表|层叠样式表]]语言，受[[Sass|Sass]]所影响，同时也影响了Sass的新语法：SCSS。<ref name="compare">[http://nex-3.com/posts/83-sass-and-less Sass and Less] {{Wayback|url=http://nex-3.com/posts/83-sass-and-less |date=20090621074106 }} Sass and Less</ref>
+
+LESS是开源的，其第一个版本由[[Ruby|Ruby]]写成，但在后续的版本当中，Ruby逐渐被替换为[[JavaScript|JavaScript]]。受益于JavaScript，LESS可以在客户端上运行（IE6+、[[Webkit|Webkit]]、[[Firefox|Firefox]]），也可以在服务端运行（[[Node.js|Node.js]]、[[Rhino|Rhino]]）。<ref name="main" />
+
+在语法方面，LESS与CSS较为接近，一个合法的CSS代码段本身也是一段合法的LESS代码段。LESS提供[[变量|变量]]、嵌套、混合、[[操作符|操作符]]、[[函数|函数]]等一般编程所需的抽象机制。<ref name="main">[http://lesscss.org/ Official LESS website] {{Wayback|url=http://lesscss.org/ |date=20210130041335 }} Official LESS website</ref>
+
+==变量==
+
+LESS支持自定义变量。在LESS中，变量以“@”开头，赋值时以“:”进行赋值。经过LESS的翻译，这些变量最终会转换为符合CSS标准的值。<ref name="main" />
+
+<syntaxhighlight lang="css" style="overflow:hidden;margin:30px 0 1em">
+@color: #4D926F;
+
+#header {
+  color: @color;
+}
+h2 {
+  color: @color;
+}
+</syntaxhighlight>
+
+上面的代码最终会转化为下面的代码：
+
+<syntaxhighlight lang="css">
+#header {
+  color: #4D926F;
+}
+h2 {
+  color: #4D926F;
+}
+</syntaxhighlight>
+
+==混合==
+
+混合允许开发者仅仅通过包含类名将一个类当中的所有属性全部应用于另一个类，同时也可以像函数一样提供参数使用。
+
+CSS3并不支持混合，任何重复的代码必须在每个使用的地方重复编写，而通过LESS，你可以将代码进行复用。<ref name="main" />
+
+<syntaxhighlight lang="css">
+.rounded-corners (@radius: 5px) {
+  border-radius: @radius;
+  -webkit-border-radius: @radius;
+  -moz-border-radius: @radius;
+}
+
+#header {
+  .rounded-corners;
+}
+#footer {
+  .rounded-corners(10px);
+}
+</syntaxhighlight>
+
+上面的代码将产生下面的代码：
+
+<syntaxhighlight lang="css">
+#header {
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+}
+#footer {
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+}
+</syntaxhighlight>
+
+==嵌套==
+
+CSS支持逻辑上的嵌套，但在代码本身并不是嵌套的。LESS提供了代码的嵌套。<ref name="main" />
+
+<syntaxhighlight lang="css">
+#header {
+  h1 {
+    font-size: 26px;
+    font-weight: bold;
+  }
+  p { font-size: 12px;
+    a { text-decoration: none;
+      &:hover { border-width: 1px }
+    }
+  }
+}
+</syntaxhighlight>
+
+将产生：
+<syntaxhighlight lang="css">
+#header h1 {
+  font-size: 26px;
+  font-weight: bold;
+}
+#header p {
+  font-size: 12px;
+}
+#header p a {
+  text-decoration: none;
+}
+#header p a:hover {
+  border-width: 1px;
+}
+</syntaxhighlight>
+
+==函数与操作符==
+
+LESS提供了函数用以支持复杂的属性间关系，其函数与JavaScript代码中的函数一一对应，允许JavaScript代码直接操纵传达过去的值。同时，LESS内置了基本的操作符，涵盖了基本加、减、乘、除，能够对属性值或颜色进行计算。
+
+<syntaxhighlight lang="css">
+@the-border: 1px;
+@base-color: #111;
+@red:        #842210;
+
+#header {
+  color: @base-color * 3;
+  border-left: @the-border;
+  border-right: @the-border * 2;
+}
+#footer { 
+  color: @base-color + #003300;
+  border-color: desaturate(@red, 10%);
+}
+</syntaxhighlight>
+
+将产生：
+
+<syntaxhighlight lang="css">
+#header {
+  color: #333;
+  border-left: 1px;
+  border-right: 2px;
+}
+#footer { 
+  color: #114411;
+  border-color: #7d2717;
+}
+</syntaxhighlight>
+
+==相较于Sass==
+
+Sass与LESS都属于CSS的预处理器，都允许通过一定的抽象手段将开发者的意图转化为CSS代码。
+
+LESS受启发于Sass<ref name="about">[http://lesscss.org/about About LESS] {{Wayback|url=http://lesscss.org/about |date=20200718063750 }} About</ref>，但Sass被设计为简化、扩展CSS，因此诸如大括号等语法都被移除，但流程控制、继承等概念被引入其中；相反，LESS被设计为更接近于CSS，其语法与CSS本身非常接近，因此一段合法的CSS代码也是一段合法的LESS代码。<ref name="whats-wrong-with-css">[http://www.codinghorror.com/blog/2010/04/whats-wrong-with-css.html What's Wrong With CSS] {{Wayback|url=http://www.codinghorror.com/blog/2010/04/whats-wrong-with-css.html |date=20140131030742 }} What's Wrong With CSS</ref>不过新版本的Sass同样将CSS式语法引入了其中，命名为SCSS（Sassy CSS）。<ref name="compare" />
+
+更多两者异同可见：[https://gist.github.com/674726 https://gist.github.com/674726（英文）] {{Wayback|url=https://gist.github.com/674726 |date=20191018040127 }}
+
+==相较于ZUSS==
+
+ZUSS受启发于LESS，但其目的是与[[Java|Java]]进行结合，因此混合当中不允许使用JavaScript函数，取而代之的是Java函数。
+
+==应用于网站==
+
+LESS由于以JavaScript实现，因此既可以在浏览器上进行实时翻译，也可以首先在服务器上翻译为CSS之后再传送给浏览器。
+
+== 参考文献 ==
+{{Reflist|2}}
+
+==外部链接==
+* {{Official website|http://lesscss.org/}}
+* [https://github.com/less/less.js LESS源码（GitHub）] {{Wayback|url=https://github.com/less/less.js |date=20210123071915 }}
+
+{{样式表语言}}
+
+[[Category:网页设计|Category:网页设计]]
+[[Category:层叠样式表|*]]

@@ -1,0 +1,125 @@
+{{roughtranslation|time=2011-11-17T01:32:08+00:00}}
+
+'''随机抽样一致算法'''（'''RAN'''dom '''SA'''mple '''C'''onsensus，'''RANSAC'''）。它采用迭代的方式从一組包含[[離群|離群]]的被觀測數據中估算出數學模型的參數。
+RANSAC是一個非[[确定性算法|确定性算法]]，在某種意義上說，它會產生一個在一定概率下合理的結果，而更多次的迭代会使这一概率增加。此RANSAC算法在1981年由Fischler和Bolles首次提出。
+
+RANSAC的基本假設是
+#「[[內群|內群]]」(inlier,  似乎譯為內點群更加妥當，即正常數據，正確數據)數據可以通過幾組模型的參數來敘述其分佈，而｢[[離群|離群]]」(outlier,似乎譯為外點群更加妥當，異常數​​據)數據則是不適合模型化的數據。 
+#數據會受雜訊影響，雜訊指的是離群，例如從極端的雜訊或錯誤解釋有關數據的測量或不正確的假設。
+#RANSAC假定，給定一組（通常很小）的內點群，存在一個程序，這個程序可以估算最佳解釋或最適用於這一數據模型的參數。 
+
+==範例==
+這裡用一個簡單的例子來說明，在一組數據點中找到一條最適合的線。假設，此有一組集合包含了內點群以及外點群，其中內點群包含可以被擬合到線段上的點，而外點群則是無法被擬合的點。如果我們用簡單的最小二乘法來找此線，我們將無法得到一條適合於內點群的直線，因為最小二乘法會受外點群影響而影響其結果。而用RANSAC，可以只由內點群來計算出模型，而且概率還夠高。然而，RANSAC無法保證結果一定最好，所以必須小心選擇參數，使其能有足夠的概率。
+
+<gallery widths="286" heights="255" perrow="2">
+Image:Line_with_outliers.svg|包含許多離群的一組數據，要找一條最適合的線。
+Image:Fitted_line.svg|RANSAC找到的線，離群值對結果沒影響（藍色點為內群，紅色點為離群）
+</gallery>
+
+==概述==
+#在數據中隨機選擇若干個點設定為內點群
+#計算拟合內點群的模型
+#把其它剛才沒選到的點帶入剛才建立的模型中，計算是否屬於內點群
+#記下內點群數量
+#重複以上步驟
+#比較哪次計算中內點群數量最多，內點群最多的那次所建的模型就是我們所要求的解
+
+這裡有幾個問題
+#一開始的時候我們要隨機選擇多少點（n）
+#以及要重複做多少次（k）
+
+==參數決定==
+假設每個點是真正內點群的機率是 <math>w</math>，则：
+
+:<math>w</math> = 真正內點群的數目 / 數據總數
+
+通常我們不知道 <math>w</math> 是多少，<math>w^n</math> 是所選擇的 <math>n</math> 個點都是內點群的機率，<math>1-w^n</math> 是所選擇的 <math>n</math> 個點至少有一個不是內點群的機率，<math>(1-w^n)^k</math> 是表示重複 <math>k</math> 次都沒有全部的 <math>n</math> 個點都是內點群的機率，假設算法跑 <math>k</math> 次以後成功的機率是 <math>p</math>，那麼：
+
+:<math>
+1-p=(1-w^n)^k \,
+</math>
+
+:<math>
+p=1-(1-w^n)^k \,
+</math>
+
+:<math>
+k = \frac{\log(1 - p)}{\log(1 - w^n)}
+</math>
+
+所以如果希望成功機率高，<math>p=0.99</math>，
+當 <math>n</math> 不變時，<math>k</math> 越大，<math>p</math> 越大，
+當 <math>w</math> 不變時，<math>n</math> 越大，所需的 <math>k</math> 就越大，
+通常 <math>w</math> 未知，所以 <math>n</math> 選小一點比較好。
+
+==應用==
+RANSAC算法经常用在[[计算机视觉|计算机视觉]]领域，例如，对于一对立体相机，同时求解其{{link-en|对应点问题|Correspondence_problem}}和估计它们之间的[[基础矩阵|基础矩阵]]。
+
+==参考资料==
+
+* {{cite journal
+| author=Martin A. Fischler and Robert C. Bolles
+| title=Random Sample Consensus: A Paradigm for Model Fitting with Applications to Image Analysis and Automated Cartography
+| journal=Comm. of the ACM
+| volume=24
+| pages=381–395
+| doi=10.1145/358669.358692
+| issue=6
+|date=June 1981}}
+*{{cite book
+| author=David A. Forsyth and Jean Ponce
+| title=Computer Vision, a modern approach
+| year=2003
+| publisher=Prentice Hall
+| isbn= 0-13-085198-1
+}}
+*{{cite book
+| author=Richard Hartley and [[Andrew_Zisserman|Andrew Zisserman]]
+| title=Multiple View Geometry in Computer Vision
+| year=2003
+| publisher=Cambridge University Press
+| edition=2nd
+}}
+* {{cite journal
+| author=P.H.S. Torr and D.W. Murray
+| title=The Development and Comparison of Robust Methods for Estimating the Fundamental Matrix
+| journal=International Journal of Computer Vision
+| volume=24
+| pages=271–300
+| year=1997
+| doi=10.1023/A:1007927408552
+| issue=3
+}}
+*{{Cite journal
+ |author      = Ondrej Chum
+ |title       = Two-View Geometry Estimation by Random Sample and Consensus
+ |year        = 2005
+ |url         = http://cmp.felk.cvut.cz/~chum/Teze/Chum-PhD.pdf
+ |journal     = PhD Thesis
+ |postscript  = <!--None-->
+ |deadurl     = yes
+ |archiveurl  = https://web.archive.org/web/20090816055122/http://cmp.felk.cvut.cz/~chum/Teze/Chum-PhD.pdf
+ |archivedate = 2009-08-16
+}}
+*{{Cite journal
+| author=Sunglok Choi, Taemin Kim, and Wonpil Yu
+| title=Performance Evaluation of RANSAC Family
+| journal=In Proceedings of the British Machine Vision Conference (BMVC)
+| year=2009
+| url=http://www.bmva.org/bmvc/2009/Papers/Paper355/Paper355.pdf
+| access-date=2011-11-17
+| archive-date=2020-08-31
+| archive-url=https://web.archive.org/web/20200831001552/http://www.bmva.org/bmvc/2009/Papers/Paper355/Paper355.pdf
+| dead-url=no
+}}
+
+==外部链接==
+* [http://vision.ece.ucsb.edu/~zuliani/Code/Code.html RANSAC Toolbox for MATLAB] {{Wayback|url=http://vision.ece.ucsb.edu/~zuliani/Code/Code.html |date=20150307132545 }}.  A research (and didactic) oriented toolbox to explore the RANSAC algorithm in [[MATLAB|MATLAB]].  It is highly configurable and contains the routines to solve a few relevant estimation problems.
+* [http://www.mrpt.org/RANSAC_C++_examples Implementation in C++] {{Wayback|url=http://www.mrpt.org/RANSAC_C++_examples |date=20111129030145 }} as a generic template.
+* [http://vision.ece.ucsb.edu/~zuliani/Research/RANSAC/docs/RANSAC4Dummies.pdf RANSAC for Dummies] {{Wayback|url=http://vision.ece.ucsb.edu/~zuliani/Research/RANSAC/docs/RANSAC4Dummies.pdf |date=20150403023133 }} A simple tutorial with many examples that uses the RANSAC Toolbox for MATLAB.
+* [http://cmp.felk.cvut.cz/ransac-cvpr2006/ 25 Years of RANSAC Workshop] {{Wayback|url=http://cmp.felk.cvut.cz/ransac-cvpr2006/ |date=20200223104426 }}
+* [http://www.csse.uwa.edu.au/~pk/Research/MatlabFns/#robust {{Wayback|url=http://www.csse.uwa.edu.au/~pk/Research/MatlabFns/#robust |date=20150515081026 }} Source code for RANSAC in [[MATLAB|MATLAB]]]
+
+[[Category:計算機視覺|Category:計算機視覺]]
+[[Category:演算法|Category:演算法]]
+[[Category:穩健統計學|Category:穩健統計學]]

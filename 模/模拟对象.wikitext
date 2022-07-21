@@ -1,0 +1,80 @@
+在[[面向对象程序设计|面向对象程序设计]]中，'''模拟对象'''（{{lang-en|mock object}}，也译作'''模仿对象'''）是以可控的方式模拟真实对象行为的假的对象。[[程序员|程序员]]通常创造模拟对象来测试其他对象的行为，很类似汽车设计者使用[[碰撞测试假人|碰撞测试假人]]来[[模擬|模拟]]车辆碰撞中人的动态行为。
+
+== 为什么要使用模拟对象 ==
+
+在[[单元测试|单元测试]]中，模拟对象可以[[模擬|模拟]]复杂的、真实的（非模拟）对象的行为， 如果真实的对象无法放入单元测试中，使用模拟对象就很有帮助。
+
+在下面的情形，可能需要使用模拟对象来代替真实对象<ref>Tim Mackinnon, Steve Freeman, Philip Craig Endo-Testing: Unit Testing with Mock Objects, eXtreme Programming and Flexible Processes in Software Engineering - XP2000</ref>：
+
+* 真实对象的行为是[[非确定性算法|不确定]]的（例如，当前的时间或当前的温度）；
+* 真实对象很难搭建起来；
+* 真实对象的行为很难触发（例如，网络错误）；
+* 真实对象速度很慢（例如，一个完整的[[数据库|数据库]]，在测试之前可能需要初始化）；
+* 真实的对象是用户界面，或包括用户界面在内；
+* 真实的对象使用了回调机制；
+* 真实对象可能还不存在；
+* 真实对象可能包含不能用作测试（而不是为实际工作）的信息和方法。
+
+例如，一个可能会在特定的时间响铃的闹钟程序可能需要外部世界的当前时间。要测试这一点，测试一直要等到闹铃时间才知道闹钟程序是否正确地响铃。如果使用一个模拟对象替代真实的对象，可以变成提供一个闹铃时间（不管是否实际时间）,这样就可以隔离地测试闹钟程序。
+
+== 技术细节 ==
+
+模拟对象具有和要模拟的真实对象的相同的[[介面_(程式設計)|接口]]，可以让调用该接口的对象不知道在使用真实对象还是模拟对象。
+
+现有的许多模拟对象框架允许程序员指定模拟对象上的哪些[[方法_(電腦科學)|方法]]，将按照什么顺序被调用，以及传入什么[[参数|参数]]，将返回什么值。这样，复杂对象（例如网络套接字）的行为将可以使用模拟对象来模拟，允许程序员来发现被测对象在可能各种存在的状态是否响应正确。
+
+=== 模拟对象，虚拟对象和桩 ===
+一些作者<ref>{{cite book |last=Feathers |first=Michael |title=Working effectively with legacy code |year=2005 |publisher=Prentice Hall |location=NJ |isbn=0-13-117705-2 |chapter=Sensing and separation |page=23 et seq }}</ref> 明确区分虚拟对象（fake）和模拟对象。虚拟对象比较简单，简单实现所代表的对象相同的接口，并返回预先安排好的应答。这样一来虚拟对象仅仅提供了一组[[桩_(计算机)|方法桩]]。
+
+在“单元测试的艺术”<ref>{{cite book |last=Osherove |first=Roy |title=The art of unit testing |year=2009 |publisher=Manning |isbn=978-1933988276 |chapter=Interaction testing with mock objects et seq }}</ref>一书中，模拟对象被描述为帮助决定测试通过与否的虚拟对象，通过验证对象上是否发生了交互。其他的都被定义为桩。在该书中，“虚拟对象”（fake）是指所有非真实的对象。基于使用，或者是桩，或者是模拟对象。
+
+从这个角度讲，模拟对象多做了一些工作：它们方法实现中包括[[斷言_(程式)|断言]]。这就是说，这个意义上的真正的模拟对象将会检查每个调用的上下文— 可能会检查器上方法的调用顺序，可能对方法调用的参数数据进行检验。
+
+=== 设定预期结果 ===
+考虑一个授权子系统被模拟的例子。模拟对象与真正的授权类相同，实现了<code>isUserAllowed(task : Task) : '''boolean'''</code><ref>这些示例使用了类似[[统一建模语言|统一建模语言]]中使用的命名法</ref> 方法。如果暴露一个真实对象中没有的属性 <code>isAllowed : boolean</code>就会带来许多便利，测试代码可以很容易地设置预期的结果，用户通过授权，或没有通过，这样，两种情况下可以很容易地测试系统的行为。
+
+同样，只有模拟对象才有的设置可以确保对子系统的后续调用将会导致[[异常处理|异常抛出]]，或没有反应的[[假死机|挂起]]，或返回<code>[[Null_(編程)|null]]</code>等。这样，开发[[主從式架構|客户端]]的行为时，可以对[[前端和后端|后端]]子系统中的所有实际的故障的条件以及预期的响应进行测试。没有这样简单而灵活的模拟系统，对于每一种情形进行测试将是十分费力的。
+
+=== 记录日志字符串 ===
+一个模拟的数据库对象的保存方法<code>save(person : Person)</code>可能包含许多（如果有）实现代码。可能检查存在与否，可能[[数据验证|验证]]要保存的Person对象（参见上述的虚拟对象与模拟对象的讨论），但是除此以外可能没有其他的实现代码。
+
+这就错过了机会，模拟方法可以记录一条日志到公共的的日志字符串。日志可以简单地写“Person saved”<ref>{{cite book |last=Beck |first=Kent |title=Test-Driven Development By Example |year=2003 |publisher=Addison Wesley |location=Boston |isbn=0-321-14653-0 |pages=146–7 }}</ref>，也可以写person对象的详细信息，如名字或ID。这样，如果测试代码在对模拟数据库进行了一系列操作后检查日志字符串的最终内容，就能够验证数据库保存方法的执行次数是否与预期相符。 这种方法可以发现不可见的性能问题，例如一个开发人员对丢失数据感到紧张，编写了多次对 <code>save()</code>的调用，而一次调用就已经足够了。
+
+== 在测试驱动开发中的使用 ==
+
+使用[[测试驱动开发|测试驱动开发]] (TDD)方法的程序员在编写软件时会使用模拟对象。模拟对象满足更复杂的真实对象的[[介面_(程式設計)|接口]]需求，并代替真实对象的位置，有了模拟对象，程序员就可以对一个领域的功能性进行[[单元测试|单元测试]]，而不需要实际调用复杂的下层或协作的[[类_(计算机科学)|类]]。<ref>{{cite book |last=Beck |first=Kent |title=Test-Driven Development By Example |year=2003 |publisher=Addison Wesley |location=Boston |isbn=0-321-14653-0 |pages=144–5 }}</ref>  使用模拟对象使得开发人员可以关注与被测系统（SUT）的行为的测试，而不需要担心被测系统的依赖关系。例如，测试在特定状态下一个基于多个对象的复杂算法，如果使用模拟对象代替真实对象可以很容易地表达出来。
+
+除了复杂性问题和[[关注点分离|关注点分离]]带来的好处，还有实际的速度问题。使用[[测试驱动开发|测试驱动开发]] (TDD)开发一段实际的软件很容易就有数百个单元测试。如果这些单元测试中许多都涉及到与数据库，Web服务和其他[[行程間通訊|进程间通讯]]或[[计算机网络|网络]]系统的通讯，单元测试的组合会很快会慢到无法执行例行测试。而这会导致坏的习惯以及程序员不愿意维护测试驱动开发的基本原则。
+
+当模拟对象被替换为真实对象，端到端的功能仍需要进一步的测试。这将不再是单元测试，而是[[集成测试|集成测试]]。
+
+== 局限性 ==
+模拟对象的使用可能会将单元测试与被测代码的实现耦合得很紧。例如，许多模拟对象框架允许开发人员指定模拟对象上方法被调用的次序和调用的次数，这样，测试通过后对代码进行[[重构|重构]]，即使方法依然遵守以前实现的契约，也可能会造成测试失败。这说明单元测试应当测试方法的外部行为，而非其内部实现。在单元测试测试用例中过度使用模拟对象可能导致随着系统的发展，不断进行的重构会造成维护测试本身的工作量出现显著的增长。在发展过程中，这种测试的不正确地维护可能会漏报错误，而在使用真实对象进行的测试中会捕捉到。相反，与设置好整个真实对象相比，简单地模拟一个方法可能需要更少的配置，因此减少了需要的维护工作。
+
+模拟对象必须要准确地建模它们要模拟的对象的行为，然而，如果要模拟的对象来自另一个开发人员或项目，或者如果还没有开发出来，准确的建模是很难做到。如果没有正确建模行为，那么可能会单元测试记录通过，而真正运行时，在同样条件下可能会造成测试失败。<ref>[http://www.onjava.com/pub/a/onjava/2004/02/11/mocks.html#Approaches InJava.com] {{Wayback|url=http://www.onjava.com/pub/a/onjava/2004/02/11/mocks.html#Approaches |date=20180427021403 }} to Mocking | O'Reilly Media</ref>
+
+== 参见 ==
+* [[抽象方法|抽象方法]]
+* [[虛設代碼|虛設代碼]]
+* [[模拟对象框架列表|模拟对象框架列表]]
+* [[Hamcrest|Hamcrest]]
+* [[桩_(计算机)|方法桩]]
+* [[测试替身|测试替身]]
+
+== 参考文献 ==
+{{Reflist}}
+
+== 外部链接 ==
+*[http://www.ibm.com/developerworks/cn/java/j-lo-mockobject/?ca=drs-cn-1212 使用模拟对象技术进行测试驱动开发] {{Wayback|url=http://www.ibm.com/developerworks/cn/java/j-lo-mockobject/?ca=drs-cn-1212 |date=20160304083319 }}
+*[http://msdn.microsoft.com/zh-cn/magazine/cc163358.aspx 深入了解模拟测试的后续发展] {{Wayback|url=http://msdn.microsoft.com/zh-cn/magazine/cc163358.aspx |date=20090628092425 }}
+*[http://www.infoq.com/cn/news/2008/06/mocks-q-of-when 何时应该使用Mock对象？] {{Wayback|url=http://www.infoq.com/cn/news/2008/06/mocks-q-of-when |date=20181012181635 }}
+*[http://www.infoq.com/cn/articles/thoughtworks-practice-partvi Mock不是测试的银弹] {{Wayback|url=http://www.infoq.com/cn/articles/thoughtworks-practice-partvi |date=20181006163806 }}
+*[http://martinfowler.com/articles/mocksArentStubs.html 模拟对象不是桩（英文）] {{Wayback|url=http://martinfowler.com/articles/mocksArentStubs.html |date=20080319115429 }} （[[马丁·福勒|马丁·福勒]]）关于使用模拟对象开发测试的文章。
+
+
+{{软件设计模式}}
+[[Category:软件设计模式|Category:软件设计模式]]
+[[Category:面向对象的程序设计|Category:面向对象的程序设计]]
+[[Category:软件测试|Category:软件测试]]
+[[Category:极限编程|Category:极限编程]]
+[[Category:源代码|Category:源代码]]

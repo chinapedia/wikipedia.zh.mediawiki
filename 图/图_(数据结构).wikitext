@@ -1,0 +1,118 @@
+{{about|抽象数据类型|圖論中的基本研究對象|图 (数学)|數學函數的圖|函数图形|其他主題|图}}
+[[File:Directed.svg|160px]]和3条[[边_(图论)|边]]的[[有向图|有向图]]]]
+
+在[[计算机科学|计算机科学]]中，'''图'''（{{lang-en|graph}}）是一种[[抽象数据类型|抽象数据类型]]，用于实现[[数学|数学]]中[[图论|图论]]的[[图_(数学)|无向图]]和[[有向图|有向图]]的概念。
+
+图的数据结构包含一个有限（可能是可变的）的[[集合_(计算机科学)|集合]]作为'''节点'''集合，以及一个无序对（对应无向图）或有序对（对应有向图）的集合作为'''边'''（有向图中也称作'''弧'''）的集合。节点可以是图结构的一部分，也可以是用整数下标或[[引用_(程序设计)|引用]]表示的外部实体。
+
+图的数据结构还可能包含和每条边相关联的数值（{{lang|en|edge value}}），例如一个标号或一个数值（即权重，{{lang|en|weight}}；表示花费、容量、长度等）。
+
+==操作==
+图数据结构''G''支持的基本操作通常包括：<ref name="gt-ops">参见{{harvtxt|Goodrich|Tamassia|2015}}, Section 13.1.2: Operations on graphs, p. 360。更多细节也可参见{{citation|contribution=Chapter 6: Graphs and their data structures|pages=240–282|title=LEDA: A platform for combinatorial and geometric computing|first1=K.|last1=Mehlhorn|first2=S.|last2=Näher|publisher=Cambridge University Press|year=1999}}.</ref>
+* <code>adjacent</code>(''G'', ''x'', ''y'')：查看是否存在从节点''x''到''y''的边；
+* <code>neighbors</code>(''G'', ''x'')：列出所有从''x''出发的边的另一个顶点''y''；
+* <code>add_vertex</code>(''G'', ''x'')：如果不存在，将节点''x''添加进图；
+* <code>remove_vertex</code>(''G'', ''x'')：如果存在，从图中移除节点''x''；
+* <code>add_edge</code>(''G'', ''x'', ''y'')：如果不存在，添加一条从节点''x''到''y''的边；
+* <code>remove_edge</code>(''G'', ''x'', ''y'')：如果存在，从图中移除从节点''x''到''y''的边；
+* <code>get_vertex_value</code>(''G'', ''x'')：返回节点''x''上的值；
+* <code>set_vertex_value</code>(''G'', ''x'', ''v'')：将节点''x''上的值赋为''v''。
+
+如果该数据结构支持和边关联的数值，则通常也支持下列操作<ref name="gt-ops"/>：
+* <code>get_edge_value</code>(''G'', ''x'', ''y'')：返回边(''x'', ''y'')上的值；
+* <code>set_edge_value</code>(''G'', ''x'', ''y'', ''v'')：将边(''x'', ''y'')上的值赋为''v''。
+
+==图的常见数据结构==
+; [[邻接表|邻接表]]{{sfn|Cormen|Leiserson|Rivest|Stein|2001|pp=528–529}}{{sfn|Goodrich|Tamassia|2015|pp=361-362}}
+: 节点存储为[[记录|记录]]或[[对象_(计算机科学)|对象]]，且为每个节点创建一个[[列表_(抽象数据类型)|列表]]。这些列表可以按节点存储其余的信息；例如，若每条边也是一个对象，则将边存储到边起点的列表上，并将边的终点存储在边这个的对象本身。
+; [[邻接矩阵|邻接矩阵]]{{sfn|Cormen|Leiserson|Rivest|Stein|2001|pp=529–530}}{{sfn|Goodrich|Tamassia|2015|p=363}}
+: 一个二维矩阵，其中行与列分别表示边的起点和终点。顶点上的值存储在外部。矩阵中可以存储边的值。
+; {{tsl|en|incidence matrix|关联矩阵}}{{sfn|Cormen|Leiserson|Rivest|Stein|2001|loc=Exercise 22.1-7, p. 531}}
+: 一个二维矩阵，行表示顶点，列表示边。矩阵中的数值用于标识顶点和边的关系（是起点、是终点、不在这条边上等）。
+
+下表给出了在图上进行各种操作的[[计算复杂性理论|复杂度]]。其中，用|''V''|表示节点数量，|''E''|表示边的数量。同时假设存储的信息是边上对应的值，如果没有对应值则存储∞。
+{| class="wikitable"
+|-
+!
+! scope="col" | 邻接表
+! scope="col" | 邻接矩阵
+! scope="col" | 关联矩阵
+|-
+| colspan="4" style="text-align: center;" | 空间复杂度 {{sfn|Cormen|Leiserson|Rivest|Stein|2001|pp=589-591}}
+|-
+! scope="row" {{rh2|align=left}} | 存储一张图
+| <math>O(|V|+|E|)</math>
+| <math>O(|V|^2)</math>
+| <math>O(|V|\cdot|E|)</math>
+|-
+| colspan="4" style="text-align: center;" | 时间复杂度 {{sfn|Goodrich|Tamassia|2015|loc=§13.1.3}}
+|-
+! scope="row" {{rh2|align=left}} | 添加节点
+| <math>O(1)</math>
+| <math>O(|V|^2)</math>
+| <math>O(|V|\cdot|E|)</math>
+|-
+! scope="row" {{rh2|align=left}} | 添加边
+| <math>O(1)</math>
+| <math>O(1)</math>
+| <math>O(|V|\cdot|E|)</math>
+|-
+! scope="row" {{rh2|align=left}} | 移除节点
+| <math>O(|E|)</math>
+| <math>O(|V|^2)</math>
+| <math>O(|V|\cdot|E|)</math>
+|-
+! scope="row" {{rh2|align=left}} | 移除边
+| <math>O(|V|)</math>
+| <math>O(1)</math>
+| <math>O(|V|\cdot|E|)</math>
+|-
+! scope="row" {{rh2|align=left}} | 检查节点''x''和''y''是否邻接（假设已知两个节点对应的存储位置）
+| <math>O(|V|)</math>
+| <math>O(1)</math>
+| <math>O(|E|)</math>
+|-
+! scope="row" {{rh2|align=left}} | 注释
+| 移除节点或边速度较慢，因为需要找到相连的边或节点
+| 增减节点速度较慢，因为需要修改矩阵的大小
+| 增减节点或边速度较慢，因为需要修改矩阵的大小
+|}
+
+邻接表在{{tsl|en|sparse graph|稀疏图}}上比较有效率。邻接矩阵则常在图比较稠密的时候使用，判断标准一般为边的数量|''E'' |接近于节点的数量的平方|''V'' |<sup>2</sup>；邻接矩阵也在查找两节点邻接情况较为频繁时使用。<ref name="clrs">{{citation |first1=Thomas H. |last1=Cormen |first2=Charles E. |last2=Leiserson |first3=Ronald L. |last3=Rivest |first4=Clifford |last4=Stein |year=2001 |title=[[Introduction_to_Algorithms|Introduction to Algorithms]] |edition=Second |publisher=MIT Press and McGraw-Hill |isbn=0-262-03293-7 |chapter=Section 22.1: Representations of graphs |pages=527–531 }}.</ref><ref name="gt">{{citation|title=Algorithm Design and Applications|first1=Michael T.|last1=Goodrich|first2=Roberto|last2=Tamassia|publisher=Wiley|year=2015|contribution=Section 13.1: Graph terminology and representations|pages=355–364}}.</ref>
+
+其它表示和存储图的数据结构还包括[[链式前向星|链式前向星]]、[[十字链表|十字链表]]、{{tsl|en|adjacency multilist|邻接多重表}}等。
+
+== 并行计算 ==
+图问题的并行计算主要存在如下几种困难：处理大量的数据、求解非常规的问题、数据不分散、数据存取对计算的比例很高等。<ref name=":1">{{Cite book|last1=Bader|first1=David|url=https://www.ams.org/conm/588/|title=Graph Partitioning and Graph Clustering|last2=Meyerhenke|first2=Henning|last3=Sanders|first3=Peter|last4=Wagner|first4=Dorothea|date=January 2013|publisher=American Mathematical Society|isbn=978-0-8218-9038-7|series=Contemporary Mathematics|volume=588|language=en|doi=10.1090/conm/588/11709}}</ref><ref>{{Cite journal|last1=LUMSDAINE|first1=ANDREW|last2=GREGOR|first2=DOUGLAS|last3=HENDRICKSON|first3=BRUCE|last4=BERRY|first4=JONATHAN|title=Challenges in Parallel Graph Processing|date=March 2007|journal=Parallel Processing Letters|volume=17|issue=1|pages=5–20|doi=10.1142/s0129626407002843|issn=0129-6264}}</ref>面对这些困难，并行计算中图的表示和存储方式很重要。如果选取了不合适的表示方式，可能带来不必要的通讯花费，进而影响算法的[[可扩展性|可扩展性]]。在本节中，并行计算的[[共享内存|共享]]和{{tsl|en|distributed memory|分布式内存|分布式}}存储模型都在考虑之列。
+
+===共享存储===
+在[[共享内存|共享存储]]模型下，图的表示和非并行计算中的场景是相同的，<ref name=":0">{{Cite book|last1=Sanders|first1=Peter|url=https://www.springer.com/gp/book/9783030252083|title=Sequential and Parallel Algorithms and Data Structures: The Basic Toolbox|last2=Mehlhorn|first2=Kurt|last3=Dietzfelbinger|first3=Martin|last4=Dementiev|first4=Roman|date=2019|publisher=Springer International Publishing|isbn=978-3-030-25208-3|language=en|access-date=2021-08-14|archive-date=2021-08-17|archive-url=https://web.archive.org/web/20210817105142/https://www.springer.com/gp/book/9783030252083|dead-url=no}}</ref>，因为在此模型下，对[[#图的常见数据结构|图表示]]（如邻接表）的并行读取操作效率已经足够高了。
+
+=== 分布式存储 ===
+在{{tsl|en|distributed memory|分布式内存|分布式存储}}模型下，通常会采用{{tsl|en|graph partition|图划分|划分}}点集<math>V</math>为<math>p</math>个集合<math>V_0, \dots, V_{p-1}</math>的方式，其中<math>p</math>是并行处理器的数量。随后，这些点集划分及相连的边按照标号分配给每个并行处理器。每个处理器存储原图的一个[[图论术语#子图|子图]]，而那些两个顶点分属两个子图的边则需额外特殊处理。在分布式图算法中，处理这样的边往往意味着处理器之间的通讯。<ref name=":0" />
+
+图的划分需要谨慎地在降低通讯复杂度和使划分均匀之间取舍。<ref>{{Cite web|url=https://www.graphengine.io/downloads/papers/ParallelProcessingOfGraphs.pdf|title=Parallel Processing of Graphs|access-date=2021-08-14|archive-date=2021-08-25|archive-url=https://web.archive.org/web/20210825121127/https://www.graphengine.io/downloads/papers/ParallelProcessingOfGraphs.pdf|dead-url=no}}</ref>但图划分本身就是NP难问题。因此，实践中会使用[[启发式算法|启发式]]方法。
+
+==图的压缩存储==
+
+[[机器学习|机器学习]]、[[社会网络#社会网络分析|社会网络分析]]等领域中，有时会处理数万亿条边的图。图的[[数据压缩|压缩]]存储可以减少存取和内存压力。[[霍夫曼编码|霍夫曼编码]]等一些数据压缩的常见方法是可行的。同时，邻接表、邻接矩阵等也有专门的压缩存储方法以提高效率。<ref>{{cite journal |last1=Besta |first1=Maciej |last2=Hoefler |first2=Torsten |title=Survey and Taxonomy of Lossless Graph Compression and Space-Efficient Graph Representations |arxiv=1806.01799 |date=27 April 2019}}</ref>
+
+==参见==
+* [[图遍历|图遍历]]
+* [[图数据库|图数据库]]
+* {{tsl|en|Graph drawing|图绘制}}
+
+==参考资料==
+{{reflist|45em}}
+
+==外部链接==
+*[http://www.boost.org/libs/graph Boost Graph Library] {{Wayback|url=http://www.boost.org/libs/graph |date=20080517081717 }}，一个C++的图程序库，例如[[Boost_C%2B%2B_Libraries|Boost_C%2B%2B_Libraries]]。
+*[https://networkx.org/ Networkx] {{Wayback|url=https://networkx.org/ |date=20210811193302 }}，一个Python图程序库。
+*[http://graphblas.org GraphBLAS] {{Wayback|url=http://graphblas.org/ |date=20160921202606 }}，一个图操作的应用程序接口说明。特别关注了稀疏图。
+ 
+{{Data structures}}
+
+[[Category:图论|Category:图论]]
+[[Category:图数据结构|]]
+[[Category:抽象数据类型|Category:抽象数据类型]]
+[[Category:图|Category:图]]

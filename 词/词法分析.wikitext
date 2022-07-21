@@ -1,0 +1,85 @@
+'''词法分析'''（{{lang-en|'''lexical analysis'''}}）是[[计算机科学|计算机科学]]中将字符序列转换为'''记号'''（token）序列的过程。进行词法分析的程序或者函数叫作'''词法分析器'''（lexical analyzer，简称lexer），也叫'''扫描器'''（scanner）。词法分析器一般以函数的形式存在，供[[语法分析器|语法分析器]]调用。
+
+== 记号 ==
+这里的'''记号'''是一个字串，是构成[[源代码|源代码]]的最小单位。从输入字符流中生成记号的过程叫作'''记号化'''（tokenization），在这个过程中，词法分析器还会对记号进行分类。
+
+词法分析器通常不会关心记号之间的关系（属于语法分析的范畴），举例来说：词法分析器能够将括号识别为记号，但并不保证括号是否匹配。
+
+针对如下[[C语言|C语言]]表达式：
+<syntaxhighlight lang="c">
+sum=3+2;
+</syntaxhighlight>
+
+将其记号化后可以得到下表内容：
+{| class="wikitable"
+|-
+! 语素 !! 记号类型
+|-
+| sum || 标识符
+|-
+| = || 赋值操作符
+|-
+| 3 || 数字
+|-
+| + || 加法操作符
+|-
+| 2 || 数字
+|-
+|; || 语句结束
+|}
+
+记号经常使用[[正则表达式|正则表达式]]进行定义，像[[lex|lex]]一类的词法分析器生成器就支持使用正则表达式。语法分析器读取输入字符流、从中识别出语素、最后生成不同类型的记号。其间一旦发现无效记号，便会报错。
+
+== 扫描器 ==
+词法分析的第一阶段即'''扫描器'''，通常基于[[有限状态自动机|有限状态自动机]]。扫描器能够识别其所能处理的记号中可能包含的所有字符序列（单个这样的字符序列即前面所说的“语素”）。例如“整数”记号可以包含所有数字字符序列。很多情况下，根据第一个非空白字符便可以推导出该记号的类型，于是便可逐个处理之后的字符，直到出现不属于该类型记号字符集中的字符（即[[最长一致原则|最长一致原则]]）。
+
+== 记号生成器 ==
+记号化（tokenization）即将输入字符串分割为记号、进而将记号进行分类的过程。生成的记号随后便被用来进行[[语法分析器|语法分析]]。
+
+例如对于如下字符串：
+<code>
+The quick brown fox jumps over the lazy dog
+</code>
+
+计算机并不知道这是以空格分隔的九个英语单词，只知道这是普通的43个字符构成的字符串。可以通过一定的方法（这里即使用空格作为分隔符）将语素（这里即英语单词）从输入字符串中分割出来。分割后的结果用[[XML|XML]]可以表示如下：
+<syntaxhighlight lang="xml"><sentence>
+  <word>The</word>
+  <word>quick</word>
+  <word>brown</word>
+  <word>fox</word>
+  <word>jumps</word>
+  <word>over</word>
+  <word>the</word>
+  <word>lazy</word>
+  <word>dog</word>
+</sentence></syntaxhighlight>
+
+然而，语素只是一类字符构成的字符串（字符序列），要构建记号，语法分析器需要第二阶段的'''评估器'''（Evaluator）。评估器根据语素中的字符序列生成一个“值”，这个“值”和语素的类型便构成了可以送入语法分析器的记号。一些诸如括号的语素并没有“值”，评估器函数便可以什么都不返回。整数、标识符、字符串的评估器则要复杂的多。评估器有时会抑制语素，被抑制的语素（例如空白语素和注释语素）随后不会被送入语法分析器。
+
+例如对于某程序设计语言的源程序片段：
+:<code>net_worth_future = (assets - liabilities);</code>
+
+在进行语法分析后可能生成以下单词流（空格被抑制）：
+ NAME "net_worth_future" 
+ EQUALS 
+ OPEN_PARENTHESIS 
+ NAME "assets" 
+ MINUS 
+ NAME "liabilities" 
+ CLOSE_PARENTHESIS 
+ SEMICOLON
+
+尽管在某些情况下需要手工编写词法分析器，一般情况下词法分析器都用自动化工具生成。
+
+== 关联项目 ==
+* [[语法分析器|语法分析器]]
+* [[lex|lex]]
+* [[flex詞法分析器|flex詞法分析器]]
+
+== 参考文献 ==
+* [https://web.archive.org/web/20110409063310/http://www.cs.berkeley.edu/~hilfingr/cs164/public_html/lectures/note2.pdf CS164: Programming Languages and Compilers (Class Notes #2: Lexical)]
+* ''Compiling with C# and Java'', Pat Terry, 2005, ISBN 0-321-26360-X 624
+* ''Algorithms + Data Structures = Programs'', Niklaus Wirth, 1975, ISBN 0-13-022418-9
+* ''Compiler Construction'', Niklaus Wirth, 1996, ISBN 0-201-40353-6
+
+[[Category:编译原理|Category:编译原理]]

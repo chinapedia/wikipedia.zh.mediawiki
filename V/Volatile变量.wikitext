@@ -1,0 +1,261 @@
+{{NoteTA
+|G1 = IT
+}}
+在[[程序设计|程序设计]]中，尤其是在[[C语言|C语言]]、[[C++|C++]]、[[C♯|C#]]和[[Java|Java]]语言中，使用volatile关键字声明的[[变量_(程序设计)|变量]]或[[对象_(计算机科学)|对象]]通常具有与优化、多线程相关的特殊属性。通常，'''volatile'''关键字是用来阻止（伪）编译器因誤認某段程式碼無法被程式碼本身所改變，而造成的過度優化。如在C语言中，'''volatile'''关键字可以用来提醒编译器它后面所定义的变量随时有可能改变，因此编译后的程序每次需要存储或读取这个变量的时候，都会直接从变量地址中读取数据。如果没有volatile关键字，则编译器可能优化读取和存储，可能暂时使用寄存器中的值，如果这个变量由别的程序更新了的话，将出现不一致的现象。
+
+在C环境中，'''volatile'''关键字的真实定义和适用范围经常被误解。虽然C++、C#和Java都保留了C中的'''volatile'''关键字，但在这些编程语言中'''volatile'''的用法和语义却大相径庭。
+
+== C和C++中的volatile ==
+在C，以及C++中，volatile关键字的作用<ref name="#1">''Publication on C++ standards committee website''; http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n2016.html {{Wayback|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n2016.html |date=20180617204548 }}</ref>：
+* 允许访问内存映射设备
+* 允许在[[setjmp.h|<code>setjmp</code>和<code>longjmp</code>]]之间使用变量
+* 允许在信号处理函数中使用sig_atomic_t变量
+
+根据相关的标准（C,C++,POSIX,WIN32)和目前绝大多数实现，对volatile变量的操作并不是原子的，也不能用来为线程建立严格的happens-before关系。<code>volatile</code>关键字就像便携式线程构建一样基本没什么用处<ref name="#1"/><ref>''Volatile Keyword In Visual C++''; http://msdn2.microsoft.com/en-us/library/12a04hfd.aspx {{Wayback|url=http://msdn2.microsoft.com/en-us/library/12a04hfd.aspx |date=20080417193529 }}</ref><ref>''Linux Kernel Documentation - Why the "volatile" type class should not be used''; {{cite web |url=http://kernel.org/doc/Documentation/volatile-considered-harmful.txt |title=存档副本 |accessdate=2007-08-17 |deadurl=yes |archiveurl=https://web.archive.org/web/20070825022328/http://kernel.org/doc/Documentation/volatile-considered-harmful.txt |archivedate=2007-08-25 }}</ref><ref>''Volatile: Almost Useless for Multi-Threaded Programming (Intel Software Network)''; {{cite web |url=http://softwareblogs.intel.com/2007/11/30/volatile-almost-useless-for-multi-threaded-programming/ |title=存档副本 |accessdate=2011-08-31 |deadurl=yes |archiveurl=https://web.archive.org/web/20071213232232/http://softwareblogs.intel.com/2007/11/30/volatile-almost-useless-for-multi-threaded-programming/ |archivedate=2007-12-13 }}</ref><ref>''C++ and the Perils of Double-Checked Locking''; http://www.aristeia.com/Papers/DDJ_Jul_Aug_2004_revised.pdf {{Wayback|url=http://www.aristeia.com/Papers/DDJ_Jul_Aug_2004_revised.pdf |date=20120207111747 }}</ref>。
+
+[[Visual_C++|Visual C++]] 2005 保证volatile变量是一种[[内存屏障|内存屏障]]，阻止编译器和CPU重新安排读入和写出语义。<ref>{{Cite web |url=http://msdn.microsoft.com/en-us/library/12a04hfd(VS.100).aspx |title=存档副本 |accessdate=2016-02-20 |archive-date=2012-10-20 |archive-url=https://web.archive.org/web/20121020054251/http://msdn.microsoft.com/en-us/library/12a04hfd(VS.100).aspx |dead-url=no }}</ref> 在先前版本的Visual C++则没有此类保证。在其他方面将指针定义为volatile可能会影响程序的性能。例如，如果指针定义对代码的其他地方可见，强制编译器将指针视为屏障，就会降低程序的性能，这是完全不必要的。
+
+===对用户定义的非基本数据类型使用volatile===
+基本类型的对象用volatile修饰后，仍旧支持所有的操作（加、乘、赋值等）。但是，用户定义的非基本类型（class、struct、union）的对象被volatile修饰后，具有不同行为：
+*只能调用volatile成员函数；即只能访问它的接口的子集。
+*只能通过const_cast运算符转为没有volatile修饰的普通对象。即由此可以获得对类型接口的完全访问。
+*volatile性质会传递给它的数据成员。
+
+===volatile与多线程语义===
+[[临界区|临界区]]内部，通过[[互斥锁|互斥锁]]（mutex）保证只有一个线程可以访问，因此临界区内的变量不需要是volatile的；而在临界区外部，被多个线程访问的变量应为volatile，这也符合了volatile的原意：防止编译器[[缓存|缓存]]（cache）了被多个线程并发用到的变量。volatile对象只能调用volatile成员函数，这意味着应仅对多线程并发安全的成员函数加volatile修饰，这种volatile成员函数可自由用于多线程并发或者[[可重入|重入]]而不必使用临界区；非volatile的成员函数意味着单线程环境，只应在临界区内调用。在多线程编程中可以令该数据对象的所有成员函数均为普通的非volatile修饰，从而保证了仅在进入临界区（即获得了互斥锁）后把该对象显式转为普通对象之后才能调用该数据对象的成员函数。这种用法避免了编程者的失误——在临界区以外访问共享对象的内容：
+<syntaxhighlight lang="cpp">
+template <typename T> class LockingPtr{
+  public:
+    LockingPtr(volatile T& obj, Mutex& mtx)
+        :pObj_(const_cast<T*>(&obj) ),  pMtx_(&mtx)
+        {  mtx.Lock();  }
+    ~LockingPtr()
+        { pMtx->Unlock();  }
+    T& operator*() 
+        {  return *pObj_;  }
+    T* operator->()
+        {  return pObj_;   }
+  private:
+    T* pObj_;
+    Mutex* pMtx_;
+    LockingPtr(const LockingPtr&);
+    LockingPtr& operator=(const LockingPtr&);
+}
+</syntaxhighlight>
+
+对于内建类型，不应直接用volatile，而应把它包装为结构的成员，就可以保护了volatile的结构对象不被不受控制地访问。
+
+=== C语言中MMIO的例子 ===
+在这里例子中，代码将<code>foo</code>的值设置为<code>0</code>。然后开始不断地[[轮询|轮询]]它的值直到它变成<code>255</code>：
+
+<syntaxhighlight lang="c">
+static int foo;
+ 
+void bar(void) {
+    foo = 0;
+ 
+    while (foo != 255)
+         ;
+}
+</syntaxhighlight>
+
+一个[[执行优化的编译器|执行优化的编译器]]会提示没有代码能修改<code>foo</code>的值，并假设它永远都只会是<code>0</code>.因此编译器将用类似下列的[[无限循环|无限循环]]替换函数体：
+
+<syntaxhighlight lang="c">
+void bar_optimized(void) {
+    foo = 0;
+ 
+    while (true)
+         ;
+}
+</syntaxhighlight>
+
+但是，foo可能指向一个随时都能被计算机系统其他部分修改的地址，例如一个连接到[[中央处理器|中央处理器]]的设备的[[硬件寄存器|硬件寄存器]]，上面的代码永远检测不到这样的修改。如果不使用volatile关键字，编译器将假设当前程序是系统中唯一能改变这个值部分（这是到目前为止最广泛的一种情况）。
+为了阻止编译器像上面那样优化代码，需要使用volatile关键字：
+
+<syntaxhighlight lang="c">
+static volatile int foo;
+ 
+void bar (void) {
+    foo = 0;
+ 
+    while (foo != 255)
+        ;
+}
+</syntaxhighlight>
+
+这样修改以后循环条件就不会被优化掉，当值改变的时候系统将会检测到。
+
+=== C语言中的优化对比 ===
+下面的C程序和后面的汇编代码展示了<code>volatile</code>关键字如何影响编译器的输出。这里使用的编译器是GCC。
+{|class="wikitable collapsible collapsed" width="100%"
+! style="text-align: center" colspan=2 | 汇编对照
+|-
+!不使用volatile||使用volatile
+|-
+|
+<syntaxhighlight lang="c">
+#include <stdio.h>
+
+int main() {
+    int a = 10, b = 100, c = 0, d = 0;
+
+    printf("%d", a + b);
+
+    a = b;
+    c = b;
+    d = b;
+
+    printf("%d", c + d);
+
+    return 0;
+}
+</syntaxhighlight>
+|
+<syntaxhighlight lang="c">
+#include <stdio.h>
+
+int main() {
+    volatile int a = 10, b = 100, c = 0, d = 0;
+
+    printf("%d", a + b);
+
+    a = b;
+    c = b;
+    d = b;
+
+    printf("%d", c + d);
+
+    return 0;
+}
+</syntaxhighlight>
+|-
+!gcc -O3 -S without.c -o without.s
+!gcc -S with.c -o with.s
+|- valign="top"
+|<syntaxhighlight lang="asm">
+    .file   "without.c"
+    .section    .rodata.str1.1,"aMS",@progbits,1
+.LC0:
+    .string "%d"
+    .text
+    .p2align 4,,15
+.globl main
+    .type   main, @function
+main:
+    leal    4(%esp), %ecx
+    andl    $-16, %esp
+    pushl   -4(%ecx)
+    pushl   %ebp
+    movl    %esp, %ebp
+    pushl   %ecx
+    subl    $20, %esp
+    movl    $110, 4(%esp)
+    movl    $.LC0, (%esp)
+    call    printf
+    movl    $200, 4(%esp)
+    movl    $.LC0, (%esp)
+    call    printf
+    addl    $20, %esp
+    xorl    %eax, %eax
+    popl    %ecx
+    popl    %ebp
+    leal    -4(%ecx), %esp
+    ret
+    .size   main, .-main
+    .ident  "GCC: (GNU) 4.2.1 20070719  [FreeBSD]"
+</syntaxhighlight>
+|<syntaxhighlight lang="asm">
+	.file   "with.c"
+	.section    .rodata.str1.1,"aMS",@progbits,1
+.LC0:
+	.string "%d"
+	.text
+	.p2align 4,,15
+.globl main
+	.type   main, @function
+main:
+	leal    4(%esp), %ecx
+	andl    $-16, %esp
+	pushl   -4(%ecx)
+	pushl   %ebp
+	movl    %esp, %ebp
+	pushl   %ecx
+	subl    $36, %esp
+	movl    $10, -8(%ebp)
+	movl    $100, -12(%ebp)
+	movl    $0, -16(%ebp)
+	movl    $0, -20(%ebp)
+	movl    -8(%ebp), %edx
+	movl    -12(%ebp), %eax
+	movl    $.LC0, (%esp)
+	addl    %edx, %eax
+	movl    %eax, 4(%esp)
+	call    printf
+	movl    -12(%ebp), %eax
+	movl    %eax, -8(%ebp)
+	movl    -12(%ebp), %eax
+	movl    %eax, -16(%ebp)
+	movl    -12(%ebp), %eax
+	movl    %eax, -20(%ebp)
+	movl    -16(%ebp), %edx
+	movl    -20(%ebp), %eax
+	movl    $.LC0, (%esp)
+	addl    %edx, %eax
+	movl    %eax, 4(%esp)
+	call    printf
+	addl    $36, %esp
+	xorl    %eax, %eax
+	popl    %ecx
+	popl    %ebp
+	leal    -4(%ecx), %esp
+	ret
+	.size   main, .-main
+	.ident  "GCC: (GNU) 4.2.1 20070719  [FreeBSD]"
+</syntaxhighlight>
+|}
+
+== Java中的volatile ==
+[[Java|Java]]也支持 <code>volatile</code> 关键字，但它被用于其他不同的用途。当 <code>volatile</code> 用于一个作用域时，Java保证如下：
+#（适用于Java所有版本）读和写一个 <code>volatile</code> 变量有全局的排序。也就是说每个[[线程|线程]]访问一个 <code>volatile</code> 作用域时会在继续执行之前读取它的当前值，而不是（可能）使用一个缓存的值。（但是并不保证经常读写 <code>volatile</code> 作用域时读和写的相对顺序，也就是说通常这并不是有用的线程构建）。
+#（适用于Java5及其之后的版本） <code>volatile</code> 的读和写建立了一个happens-before关系，类似于申请和释放一个互斥锁<ref>Section 17.4.4: Synchronization Order
+{{cite web
+|title=The Java Language Specification, 3rd Edition
+|url=http://java.sun.com/docs/books/jls/third_edition/html/memory.html#17.4.4
+|publisher=[[Sun_Microsystems|Sun Microsystems]]
+|date=2005
+|accessdate=2010-11-22
+|archive-date=2012-02-14
+|archive-url=https://web.archive.org/web/20120214060000/http://java.sun.com/docs/books/jls/third_edition/html/memory.html#17.4.4
+}}</ref>。
+使用<code>volatile</code>会比使用[[锁_(计算机科学)|锁]]更快，但是在一些情况下它不能工作。<code>volatile</code>使用范围在Java5中得到了扩展，特别是双重检查锁定现在能够正确工作<ref>{{cite web
+|title=Double-checked Locking (DCL) and how to fix it
+|url=http://www.javamex.com/tutorials/double_checked_locking_fixing.shtml
+|author=Neil Coffey
+|publisher=Javamex
+|accessdate=2009-09-19
+|archive-date=2021-03-06
+|archive-url=https://web.archive.org/web/20210306202605/https://www.javamex.com/tutorials/double_checked_locking_fixing.shtml
+}}</ref>。
+
+== Ada中的volatile ==
+在[[Ada|Ada]]中，比起关键字，<code>Volatile</code>标记更像是一种指令。“对于volatile对象而言，所有读和更新都会作为一个整体直接执行到内存”<ref>"C.6 Shared Variable Control"
+{{cite web
+|title=Ada Reference Manual
+|url=http://www.adaic.com/standards/05rm/html/RM-C-6.html
+|publisher=[[ISO|ISO]]
+|date=2005
+|accessdate=2010-05-04
+|archive-date=2021-03-06
+|archive-url=https://web.archive.org/web/20210306202739/https://www.adaic.com/resources/add_content/standards/05rm/html/RM-C-6.html
+}}</ref>。
+
+== 参考 ==
+{{reflist}}
+
+== 外部链接 ==
+*[http://www.adaic.com/standards/05rm/html/RM-C-6.html Ada Reference Manual C.6: Shared Variable Control] {{Wayback|url=http://www.adaic.com/standards/05rm/html/RM-C-6.html |date=20210306202739 }}
+
+[[Category:C語言|Category:C語言]]
+[[Category:变量|Category:变量]]
+[[Category:協同控制|Category:協同控制]]

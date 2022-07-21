@@ -1,0 +1,73 @@
+{{noteTA
+|G1=IT
+|1=zh-cn:宏; zh-tw:巨集;
+}}
+'''m4'''是一个通用的宏处理器，由[[布萊恩·柯林漢|布萊恩·柯林漢]]和[[丹尼斯·里奇|丹尼斯·里奇]]设计。m4是基于Ritchie早先为AP-3小型机开发的[[m3|m3]][[宏处理器|宏处理器]]扩展的。
+
+==使用==
+m4是POSIX标准中的一部分，所有版本的UNIX下都可用。虽然这种语言可以单独使用，但大多数人需要m4仅仅是因为GNU autoconf中的“configure”脚本依赖它。
+
+宏处理器（或预处理器）一般用作文本替换工具。最终用户经常会用它来处理要反复使用的文本模板，典型的是用于编程工具，还会用于文本编辑和文字处理工具。
+
+==历史==
+宏处理器开始流行的时候，程序员还都在使用汇编语言来编程。在早期，程序员发现他们的程序中包含了很多重复的代码，于是他们创造了这种简单的方法来重用。程序员们很快发现它不仅能用于重用整块代码，还能为类似的参数替换不同的值。这明确了宏处理器的使用范围。
+
+在1977年，Kernighan和Ritchie基于Christopher Strachey的想法开发了m4。一些与众不同的特征有：
+* 自由形式的语法（而不是像那些用于处理汇编语言的典型宏处理器一样使用基于行的语法）
+* 高度的宏扩展（宏参数被扩展两次：扫描时一次、插值时一次）
+从一开始，Rational Fortran(RatFor)就使用m4作为它的宏引擎，而大多数UNIX变种发布时都包含了它。
+截止2009年，许多应用仍在使用m4（作为GNU autoconf项目的一部分）。它还出现在sendmail（一个广泛使用的邮件传输代理）的配置过程，以及用于gEDA工具包中生成脚印。
+
+m4大多用于代码生成，和其他宏处理器一样，一旦出了问题会很难调试。
+
+==特性==
+m4提供如下功能：
+* 语法形式自由，而不是基于行的语法；
+* 高度的宏扩展（宏参数在扫描和插值中都会被扩展）
+* 文本替换
+* 参数替换
+* 文件包含
+* 字符串操作
+* 条件判断
+* 数算运算
+* 系统接口
+* 程序员诊断
+* 独立于计算机编程语言
+* 独立于自然语言
+* 可编程
+与大部分早先的宏处理器不同，m4并不面向任何计算机语言或自然语言；但从历史角度来说，它最初是为支持[[Fortran|Fortran]]的方言[[Ratfor|Ratfor]]而开发的。此外，m4还是一种图灵完备的编程语言。
+
+==示例==
+以下宏代码可生成HTML代码：自动为每个章节编号。
+<pre>
+divert(-1)
+This `divert' discards this text. Note that I had to quote the `divert'
+in the comment so it wouldn't get undiverted.
+
+# In a true comment, I'm free to use words such as divert and other builtin
+# m4 macros' names without consequence.
+
+# This starts the count at ONE as the incr is a preincrement.
+define(`H2_COUNT', 0)
+
+# The H2_COUNT macro is redefined every time the H2 macro is used.
+define(`H2',
+        `define(`H2_COUNT', incr(H2_COUNT))<h2>H2_COUNT. $1</h2>')
+
+divert(0)dnl Diversion to 0 means back to normal. dnl macro removes this line.
+H2(First Section)
+H2(Second Section)
+H2(Conclusion)
+</pre>
+上述代码在m4中执行，生成以下结果：
+<pre>
+<h2>1. First Section</h2>
+<h2>2. Second Section</h2>
+<h2>3. Conclusion</h2>
+</pre>
+dnl用于删除前面的空行。
+
+==自由软件版本==
+[[GNU|GNU]]实现了一个m4版本；FreeBSD、NetBSD和OpenBSD也提供一个m4语言的独立实现版本；此外，[[OpenSolaris|OpenSolaris]]的Heirloom项目开发工具中也包含了一个m4语言的自由版本。
+
+[[Category:程序设计语言|Category:程序设计语言]]

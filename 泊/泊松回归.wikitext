@@ -1,0 +1,99 @@
+{{回归侧栏}}
+在[[统计学|统计学]]上，'''泊松回归'''（{{lang-en|Poisson regression}}）是用来为{{le|计数资料|Count data}}和{{le|列联表|Contingency table}}[[数学模型|建模]]的一种[[回归分析|回归分析]]。泊松回归假设{{le|反应变量|response variable}}Y是[[泊松分布|泊松分布]]，并假设它[[期望值|期望值]]的[[对数|对数]]可由一组未知[[参数|参数]]进行线性表达。当其用于列联表分析时，泊松回归模型也被称作对数-线性模型。
+
+泊松回归模型是[[廣義線性模型|广义线性模型]]（GLM）的一种，以对数变化作为[[连接函数|连接函数]]（link function），该模型的假设之一是其被解释变量服从泊松分布。
+
+==泊松回归模型==
+<math>\mathbf{x} \in \mathbb{R}^n</math> 代表由一组相互独立的变量组成的向量，其泊松回归的模型形式为:
+
+<math>\log (\operatorname{E}(Y\mid\mathbf{x}))=\alpha + \mathbf{\beta}' \mathbf{x},</math> <math>\alpha \in \mathbb{R}</math>， <math>\mathbf{\beta} \in \mathbb{R}^n</math>.
+
+亦可简洁表示为：<math>\log (\operatorname{E}(Y\mid\mathbf{x}))=\boldsymbol{\theta}' \mathbf{x},\,</math>
+
+此处，<math>\mathbf{x}</math> 是 n+1维的向量，由n个独立变量（自变量向量）一个常向量（元素取值全为1）构成，用一个'''''θ''''' 代表第一个表达式当中的 ''α'' 和 ''β''。
+
+因此，当已知泊松回归模型当中的 '''''θ'''''和解释变量 <math>\mathbf{x}</math>, 其满足泊松分布的被解释变量的期望值可以由下式来预测：
+
+:<math>\operatorname{E}(Y\mid\mathbf{x})=e^{\boldsymbol{\theta}' \mathbf{x}}.\,</math>
+
+''Y''<sub>''i''</sub> 是被解释变量的观测值，相应的解释变量为 '''x'''<sub>''i''</sub> ，可由[[极大似然估计|极大似然估计]]（MLE）的方法来估计参数'''''θ'''''。 极大似然估计不能通过解析表达式获得解析解，是由其对数似然函数为凸函数的特性，可通过Newton–Raphson或其他基于梯度下降的思想方法来进行参数估计。
+
+==极大似然估计==
+
+如上所述，已知泊松回归模型当中的 '''''θ'''''和解释变量 <math>\mathbf{x}</math>, 其回归表达式为：
+
+:<math>\operatorname{E}(Y\mid x)=e^{\theta' x}\,</math>,
+ 
+泊松分布的概率密度函数为：
+
+:<math>p(y\mid x;\theta) = \frac{[\operatorname{E}(Y\mid x)]^y \times e^{-\operatorname{E}(Y\mid x)}}{y!} = \frac{e^{y  \theta' x} e^{-e^{\theta' x}}}{y!}</math>
+
+现已知解释变量的观测值为由 ''m''个向量组成 <math>x_i \in \mathbb{R}^{n+1}, \, i = 1,\ldots,m</math>, 对应 ''m'' 个被解释变量的观测值，<math>y_1,\ldots,y_m \in \mathbb{R}</math>.  若同时已知''θ'', 则该组观测值所对应的联合概率可由下式表达：
+
+
+:<math>p(y_1,\ldots,y_m\mid x_1,\ldots,x_m;\theta) = \prod_{i=1}^m \frac{e^{y_i  \theta' x_i} e^{-e^{\theta' x_i}}}{y_i!}.</math>
+ 
+
+
+极大似然方法估计 ''θ''的核心思想是，去找到能使得基于当前观测值的联合概率尽可能达到最大的''θ''。（可理解为：变量的取值当前观测值，与取值为其他任何数值相比，是发生概率最高的事件）。 既然目标是寻找到最优的''θ''，可以先将上式的等号左边简单表达为关于''θ'' 的表达式：
+
+
+:<math>L(\theta\mid X,Y) = \prod_{i=1}^m \frac{e^{y_i \theta' x_i} e^{-e^{\theta' x_i}}}{y_i!}</math>.
+
+
+
+注意等号右边的表达式并未改写，但通常难于付诸计算，因而采用其对数变化后的表达式（ ''log-likelihood''）即：
+ 
+
+:<math>\ell(\theta\mid X,Y) = \log L(\theta\mid X,Y) = \sum_{i=1}^m \left( y_i \theta' x_i - e^{\theta' x_i} - \log(y_i!)\right)</math>.
+
+
+
+由于 ''θ'' 仅出现在似然函数的前两项，因而在极大化似然函数的运算过程中，可以只考虑前两项。可以删去第三项''y''<sub>''i''</sub><nowiki>!</nowiki>，待优化的似然函数可以简洁表达为：
+
+
+
+<math>\ell(\theta\mid X,Y) = \sum_{i=1}^m \left( y_i \theta' x_i - e^{\theta' x_i}\right)</math>.
+
+
+
+为了找到极大值，需要求解方程：
+
+
+
+<math>\frac{\partial \ell(\theta\mid X,Y)}{\partial \theta} = 0 </math>  
+
+可以通过对其似然函数取负值 （negative log-likelihood）, <math>-\ell(\theta\mid X,Y)</math>是一个[[凸函数|凸函数]], 标准的凸优化方法可以考虑来求解 ''θ''的最优值。统一的方法是Newton-Raphson 与Iterative Weighted Least Square（IWLS）算法。 给''θ''一组初始值，IWLS 是通过多次迭代更新直到''θ'' 收敛。
+==泊松回归的应用==
+
+泊松回归常用于被解释变量为计数（Count）形式时，包括事件发生的次数，比如：客服中心接到的电话次数。其满足相互独立的假设。在此例子中，即为：拨打客服电话的人们之间不存在相互关联。不会因为甲拨打了客服，而影响乙拨打的可能性。但在建模时，需要考虑统计该事件发生的时期，比如目标变量统计的是一天接到的电话次数，还是一个星期，或者一个月。这个时期的数据作为回归模型中的抵消值，在下面解释。
+==="曝光量"（Exposure） 与 偏移量 (trade off)===
+泊松分布也可以适用于比率数据，即事件发生次数与其测量时间或测量范围的比值。比如生物学家测量某森林中树木种类的数目， 比率变量即为每平方千米的树木种类数。人口学家关注的是每个人口年（person-year）的人口死亡数。通常来说，比率变量表达的是单位时间内该事件发生的次数。这些例子中，平方米”，“人口年”这些变量就是所谓的"曝光量"（Exposure）。泊松回归中将其视为偏移量放在等式右边。
+
+:<math>\log{((\operatorname{E}(Y\mid x) / (\text{exposure}))} = \theta' x</math>
+which implies
+:<math>\log{(\operatorname{E}(Y\mid x))} - \log{(\text{exposure})} = 
+       \log{\left(\frac{\operatorname{E}(Y\mid x)}{\text{exposure}}\right)} = \theta' x</math>
+
+在R中运行广义线性模型时，可用offset()来指定表示“曝光量”的变量:
+
+<syntaxhighlight lang="rsplus">
+glm(y ~ offset(log(exposure)) + x, family=poisson(link=log) )
+</syntaxhighlight>
+
+===过度离势和零膨胀===
+服从泊松分布的变量,具有期望与方差相等的特征。若观测样本的方差远大于期望值的时，则认为存在过度离势，当前的模型不合理。其常见的原因是缺失重要的解释变量。解决该问题的方法，通常采用[[准似然估计|准似然估计]]（[[quasi-likelihood|quasi-likelihood]]） 或者[[负二项分布|负二项分布]]来估计。<ref>{{cite journal|author=Paternoster R, Brame R|year=1997|title=Multiple routes to delinquency? A test of developmental and general theories of crime|url=https://archive.org/details/sim_criminology_1997-02_35_1/page/45|journal=Criminology|volume=35|pages=45–84|doi=10.1111/j.1745-9125.1997.tb00870.x}}</ref><ref>{{cite journal|author=Berk R, MacDonald J|title=Overdispersion and Poisson regression|journal=Journal of Quantitative Criminology|volume=24|pages=269–284|year=2008|url=http://www.crim.upenn.edu/faculty/papers/berk/regression.pdf|doi=10.1007/s10940-008-9048-4|issue=3|deadurl=yes|archiveurl=https://web.archive.org/web/20110409191631/http://www.crim.upenn.edu/faculty/papers/berk/regression.pdf|archivedate=2011-04-09}}</ref>
+
+泊松回归的另一个常见的问题是零膨胀[[zero-inflated_model|zero-inflated model]]。标准的泊松分布其定义域为非负整数，被解释变量y取值为0的概率为：
+:<math>p(y=0\mid x;\theta) = e^{-e^{\theta' x}}</math>
+
+但如果观测样本中添加大量的0，则取值为0的频率远大于理论概率，此时不适宜直接采用泊松回归。比如观测一组人在一小时内的吸烟情况，目标变量是每人吸了多少根烟。但当观测人群中有大量的非吸烟者，就会有过多的目标变量为0， 这就是零膨胀。可以采用其他的广义线性模型，比如负二项分布[[负二项分布|负二项分布]]来建模，或者零膨胀模型[[zero-inflated_model|zero-inflated model]] 来解决。
+
+== 參考文獻 ==
+{{reflist}}
+
+{{-}}
+{{Social surveys}}
+
+[[Category:回归分析|Category:回归分析]] 
+[[Category:計量經濟學|Category:計量經濟學]]

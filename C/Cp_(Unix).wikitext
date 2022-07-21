@@ -1,0 +1,110 @@
+{{lowercase}}
+{{NoteTA|G1=IT}}
+'''cp'''是一个用于复制[[计算机文件|文件]]的[[Unix|UNIX]][[命令_(计算机)|命令]]。文件可以被复制到相同目录下，也可以复制到其他完全不同的目录中（甚至复制到不同的[[文件系统|文件系统]]或是[[硬盘|硬盘]]中）。如果文件将被复制到相同的目录中，那么目标文件文件必须使用不同于原文件的文件名；在其他情况下，目标文件的名称允许使用与原文件相同或不同的名称。原始的文件不会被改变。
+
+''cp'' 命令现在拥有多种实现版本，两个主要的版本是[[POSIX|POSIX]] ''cp'' 与 [[GNU|GNU]] ''cp''。 GNU ''cp'' 有许多额外的选项。<ref>{{Cite web |url=http://www.gnu.org/software/coreutils/manual/html_node/cp-invocation.html#cp-invocation |title=存档副本 |accessdate=2011-07-09 |archive-date=2011-06-24 |archive-url=https://web.archive.org/web/20110624130238/http://www.gnu.org/software/coreutils/manual/html_node/cp-invocation.html#cp-invocation |dead-url=no }}</ref>
+
+== 用法 ==
+
+将文件复制为另一文件：
+<syntaxhighlight lang="bash">
+ cp [-f] [-H] [-i] [-p][--] 源文件 目标文件
+</syntaxhighlight>
+
+将文件复制到一目录下：
+<syntaxhighlight lang="bash">
+ cp [-f] [-H] [-i] [-p] [-r | -R] [--] 源文件 ... 目标目录
+</syntaxhighlight>
+
+将目录复制为另一目录（必须使用参数 -r 或 -R）：
+<syntaxhighlight lang="bash">
+ cp [-f] [-H] [-i] [-p] [--] { -r | -R } 源目录 ... 目标目录
+</syntaxhighlight>
+
+== 参数 ==
+'''-f''' (强制) – 在目标文件因没有写权限而无法打开时删除目标文件。这一移除动作先于所有的cp命令复制动作。
+
+'''-L''' (间接引用) – 使cp命令跟随符号链接，这样cp命令将复制符号链接指向的文件而不是符号链接到目的位置。
+
+'''-i''' (交互) – 提示您将要被覆盖之文件的文件名。当目标目录或是目标文件中包含一个与原文件（或目录）名字相同的文件（或目录）时，交互就会发生，如果你输入 'y' 或者区域语言中等价于 'y'的字符，cp操作将覆盖目标文件，其余的任意回答都会避免目标文件被原文件覆盖。
+
+'''-p''' (保持) – 对于每个原文件（或目录），在复制时也复制下述特性：
+
+* '''最后一次修订时间'''与'''最后一次访问时间'''。
+* '''所属用户ID'''和'''所属组ID'''（仅在有权限如此做时）。
+* 文件'''权限位'''以及'''[[Setuid|SUID]]'''和'''[[Setuid|SGID]]'''权限位。
+
+'''-R''' or '''-r''' (递归) – 复制目录（递归地复制目录中的所有内容）
+
+== 范例 ==
+
+欲复制原文件的一份副本，执行：
+<syntaxhighlight lang="bash">
+     cp prog.c prog.bak
+</syntaxhighlight>
+这一操作把文件prog.c复制为prog.bak。如果prog.bak文件不存在，cp命令将创建此文件。如果目标文件已存在，cp命令将用原文件的内容替代目标文件中的内容。
+
+欲复制当前工作目录中的文件到另外一目录中，执行：
+<syntaxhighlight lang="bash">
+     cp jones /home/nick/clients
+</syntaxhighlight>
+这一操作将 jones 文件复制到 /home/nick/clients/jones。
+
+欲将文件复制为新的文件，并保留修改日期与相关的访问控制权限，执行：
+<syntaxhighlight lang="bash">
+     cp -p smith smith.jr
+</syntaxhighlight>
+操作将smith文件复制为smith.jr文件。此时系统将给与smith.jr与smith文件相同的修改日期和时间而并不使用当前的系统时间。smith.jr文件同时也继承了smith文件的访问控制保护。
+
+欲将某目录中所有文件复制到新目录中，执行：
+<syntaxhighlight lang="bash">
+     cp /home/janet/clients/* /home/nick/customers
+</syntaxhighlight>
+这一操作仅将clients目录中的文件复制到customers目录中。
+
+欲将一个目录，包括其包含的所有文件与子目录复制到另一目录中，执行：
+<syntaxhighlight lang="bash">
+     cp -R /home/nick/clients /home/nick/customers
+</syntaxhighlight>
+这一复制将clients目录以及其中包含的所有文件、子目录与子目录中的文件复制到customers/clients目录下。
+注意在原目录的结尾无斜杠符：如果你在GNU基础的系统上执行<code>cp -R /home/nick/clients/ /home/nick/customers</code>，这与原目录没有加结尾斜杠符的效果相同。 
+但如果你在BSD基础系统上执行相同的命令，这将复制所有client目录中的''内容''，而不是client目录本身。
+
+欲将复制指定的一些文件到另一目录中，执行：
+<syntaxhighlight lang="bash">
+     cp jones lewis smith /home/nick/clients
+</syntaxhighlight>
+这一操作复制当前工作目录下的 jones、lewis和smith 文件到  /home/nick/clients 目录。
+
+欲使用模式匹配字符集来复制文件，执行：
+<syntaxhighlight lang="bash">
+     cp programs/*.c .
+</syntaxhighlight>
+这一操作将programs目录下所有以 .c 结尾的文件都复制到当前目录下，当前目录用单个点符号 ''.'' 表示。在 ''.c'' 和最后的 ''.'' 之间必须用空格隔开。
+
+将文件复制到另一已存在文件的过程是：将已存在文件以更新模式打开（使用这一模式需要拥有目标文件的写入权限）。操作的结果是目标文件保留了其原来拥有的权限位。
+
+== 相关 Unix 命令 ==
+
+* [[cpio|cpio]] – 复制完整的目录结构到其他文件系统位置
+* [[tar_(计算机科学)|tar]] – 建立文件归档
+* [[link_(Unix)|link]] – 建立文件或目录的链接的系统调用
+* [[ln_(Unix)|ln]] – 建立文件或目录的链接文件
+* [[mv_(Unix)|mv]] – 移动文件或目录
+* [[Rm_(Unix)|rm]] – 移除文件或目录
+* [[unlink_(Unix)|unlink]] – 删除文件或目录的系统调用
+* [[chmod|chmod]] – 修改文件或目录的权限位
+* [[chown|chown]] – 修改文件或目录的隶属关系
+* [[chgrp|chgrp]] – 修改文件或目录的所属组
+* [[uUCP|uucp]] – UNIX间复制协议
+* [[Secure_copy|scp]] – 通过SSH隧道安全复制
+
+== 参见 ==
+* [[Unix工具列表|Unix工具列表]]
+
+== 参考来源 ==
+{{Reflist}}
+
+{{Unix commands}}
+
+[[Category:标准Unix程序|Category:标准Unix程序]]

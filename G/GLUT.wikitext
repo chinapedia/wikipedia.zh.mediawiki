@@ -1,0 +1,55 @@
+{{NoteTA
+|G1=IT
+}}
+
+'''GLUT'''（英文全寫：Open'''GL''' '''U'''tility '''T'''oolkit）是一個處理[[OpenGL|OpenGL]]程式的工具庫，負責處理和底層[[作業系統|作業系統]]的呼叫以及[[I/O|I/O]]，並包括了以下常見的功能：
+* 定義以及控制視窗
+* 偵測並處理鍵盤及滑鼠的事件
+* 以一個函數呼叫繪製某些常用的立體圖形，例如長方體、球、以及[[犹他茶壶|犹他茶壶]]（實心或只有骨架，如<code>glutWireTeapot()</code>）
+* 提供了簡單選單列的實現
+
+GLUT是由{{tsl|en|Mark Kilgard}}在[[Silicon_Graphics|Silicon Graphics]]工作時所寫，此人同時也是《OpenGL Programming for the X Window System》以及《The Cg Tutorial: The Definitive Guide to Programmable Real-Time Graphics》兩書的作者。
+
+GLUT的兩個主要目的是建立一個[[跨平台|跨平台]]的函式庫（事實上GLUT就是跨平台的），以及簡化學習OpenGL的條件。透過GLUT編寫OpenGL通常只需要增加幾行額外GLUT的程式碼，而且不需要知道每個不同作業系統處理視窗的API。
+
+所有的GLUT函數都以<code>glut</code>作為開頭，例如<code>glutPostRedisplay()</code>。
+
+== 實現 ==
+
+最早的GLUT函式庫是由Mark Kilgard所提供的{{tsl|en|GLX}}，能夠支援[[X_Window_System|X Window System]]，隨後被[[Nate_Robins|Nate Robins]]移植到了[[Microsoft_Windows|Microsoft Windows]]上（{{tsl|en|WGL (software)|WGL}}）。除此之外，[[Mac_OS_X|Mac OS X]]亦提供了一個NSGL/{{tsl|en|Core OpenGL}}的介面支援了其自身產品的架構。
+
+由於Kilgard's的GLUT函式庫已經不再被維護，且其授權亦不允許對其函式庫的再發布或是做出改版。程式設計師開始意識到必須重新製作一個[[開放原始碼|開放原始碼]]的[[API|應用程式介面]]。於是第一個開源的OpenGL API：[[freeglut|freeglut]]，以盡可能地保留原本介面的方式實現，並添加一些新的函數以解決[[GLUT#原始版本的使用限制|原始版本的使用限制]]。例如[http://sourceforge.net/projects/openglut/ OpenGLUT]{{Wayback|url=http://sourceforge.net/projects/openglut/ |date=20101215193808 }}，[[freeglut|freeglut]]的其中一個分支，相較於原版本增加了一些新的功能，但在2005年5月已停止其開發。
+
+== 原始版本的使用限制 ==
+
+原始版本的GLUT讓程式設計師難以實現某些功能，於是出現了許多非官方的擴充[http://www.mathies.com/glfaq/GLToolkitFAQ.html#II]{{Wayback|url=http://www.mathies.com/glfaq/GLToolkitFAQ.html#II |date=20101217032700 }}，而在某些版本的API的實現方式中也都或多或少解決了這些問題。
+
+以下列出數種原版GLUT中常見的問題以及解決方法：
+* 原先的GLUT需要使用者呼叫一個不會退回的<code>glutMainLoop()</code>來使相關函數開始運作。這程式設計師讓難以將其整合到其他函數中或是自行選用其他的事件迴圈。常見的作法是引入一個名為<code>glutCheckLoop()</code>的函數，這個函數只會執行一次<code>glutMainLoop()</code>的迴圈。另一個常見的方法是使用多個[[線程|執行緒]]，並將<code>glutMainLoop()</code>放在一個單獨的執行緒中，但是這個作法會引起[[同步|同步]]的問題，並且隨著作業系統會有不同的實現方式。此外Mac OS X的GLUT更規定<code>glutMainLoop()</code>必須以主執行緒執行。
+* 原先的<code>glutMainLoop()</code>會將[[線程|執行緒]]搶走，直到<code>glutMainLoop()</code>自行退出，因此程式設計師沒有一個方法可以藉由呼叫函數來直接結束程式，[[freeglut|freeglut]]則藉由引入<code>glutLeaveMainLoop()</code>來解決這個問題。
+* 承上，原先的<code>glutMainLoop()</code>當視窗被關掉時就就馬上結束執行，使得程式設計師不能定義離開程式時的行為，於是許多的API並再引入另一個函數<code>glutWMCloseFunc()</code>可以定義程式執行結束時的所需的動作。
+
+由於原始版本的GLUT已經被[[開放原始碼|開放原始碼]]的[[freeglut|freeglut]]所取代，所以以上的問題在最原始版本的GLUT一直沒有被解決。
+
+== 參見 ==
+* [[GLU|GLU]]
+* {{Tsl|en|OpenGL User Interface Library}}（GLUI）
+* [[freeglut|freeglut]]
+* [[Simple_DirectMedia_Layer|Simple DirectMedia Layer]]（SDL）
+* [[GLFW|GLFW]]
+
+== 外部連結 ==
+*[http://www.opengl.org/resources/libraries/glut/ GLUT - The OpenGL Utility Toolkit]{{Wayback|url=http://www.opengl.org/resources/libraries/glut/ |date=20110103120712 }}
+*[http://www.opengl.org/documentation/specs/glut/spec3/spec3.html GLUT documentation]{{Wayback|url=http://www.opengl.org/documentation/specs/glut/spec3/spec3.html |date=20110104203623 }}
+*[http://openglut.sourceforge.net/ OpenGLUT]{{Wayback|url=http://openglut.sourceforge.net/ |date=20101208032159 }}
+*[http://freeglut.sourceforge.net/ FreeGLUT]{{Wayback|url=http://freeglut.sourceforge.net/ |date=20101228220724 }}
+*[http://www.lighthouse3d.com/opengl/glut/index.php?1 GLUT Tutorial for C/C++]{{Wayback|url=http://www.lighthouse3d.com/opengl/glut/index.php?1 |date=20100731132244 }}
+*[https://web.archive.org/web/20071126072642/http://nehe.gamedev.net/ Glut tutorial with many lessons（Very in-depth）for C]
+*[http://msdn2.microsoft.com/en-us/library/ms537011.aspx List of OpenGL functions for Windows (GL and GLU, not GLUT)]{{Wayback|url=http://msdn2.microsoft.com/en-us/library/ms537011.aspx |date=20080409190442 }}
+*[https://web.archive.org/web/20070606124702/http://www.xmission.com/~nate/glut.html GLUT for WIN32]（found from [[ARToolKit|ARToolKit]] readme）
+*[http://www.nigels.com/glt/devpak/ GLUT Packages for Dev C++ users]{{Wayback|url=http://www.nigels.com/glt/devpak/ |date=20101127073610 }}
+*[http://www.paked.net/subject_pages/computer_science/Articles/installing_glut.htm GLUT Installation for Dev C++ ]{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }}
+*[http://students.iiit.ac.in/~rajatgoel/stuff.html GLUT Installation for Dev C++ ]{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }}
+
+[[Category:应用程序接口|Category:应用程序接口]]
+[[Category:OpenGL|Category:OpenGL]]

@@ -1,0 +1,82 @@
+{{lowercase}}
+"<code>'''typename'''</code>"是一个[[C++|C++]][[程序|程序]]设计语言中的[[关键字|关键字]]。当用于[[泛型编程|泛型编程]]时是另一[[术语|术语]]"<code>class</code>"的[[同义词|同义词]]。在第一版 ISO 标准完成之前的原始 C++ 编译器中，<code>typename</code>关键字还不是 C++ 语言的一部分，当时[https://en.wikipedia.org/wiki/Bjarne_Stroustrup Bjarne Stroustrup] {{Wayback|url=https://en.wikipedia.org/wiki/Bjarne_Stroustrup |date=20210717133152 }}使用<code>class</code>关键字作为模板参数。现在<code>typename</code>是首选关键字，但较旧的源代码可能仍会看到使用<code>class</code>关键字（例如，参见 Bjarne Stroustrup 于 1994 年出版的《The Design and Evolution of C++》与 Bjarne Stroustrup 于 2013 年出版的《The C++ Programming Language: Four Edition》中的源代码示例之间的差异）。这个关键字用于指出[[模板|模板]][[声明|声明]]（或[[定义|定义]]）中的[[非独立名称|非独立名称]]（dependent names）是[[类型|类型]]名，而非变量名。以下是对于[[泛型编程|泛型编程]]中<code>typename</code>两种迥然不同的用法的解释。
+
+== <code>class</code>关键字的同义词 ==
+这是一项[[C++|C++]][[编程语言|编程语言]]的泛型编程（或曰“模板编程”）的功能，<code>typename</code>关键字用于引入一个模板[[参数|参数]]，例如：
+<syntaxhighlight lang="cpp">
+// 定义一个返回参数中较大者的通用函数
+template <typename T>
+const T& max(const T& x, const T& y)
+{
+  if (y < x) {
+    return x;
+  }
+  return y;
+}
+</syntaxhighlight>
+
+这种情况下，<code>typename</code>可用另一个[[等效|等效]]的关键字<code>class</code>代替，如下[[代码|代码]]片段所示：
+<syntaxhighlight lang="cpp">
+// 定义一个返回参数中较大者的通用函数
+template <class T>
+const T& max(const T& x, const T& y)
+{
+  if (y < x) {
+    return x;
+  }
+  return y;
+}
+</syntaxhighlight>
+
+以上两段代码没有功能上的区别。
+
+==类型名指示符==
+考虑下面的错误代码：
+<syntaxhighlight lang="cpp">
+template <typename T>
+void foo(const T& t)
+{
+   // 声明一个指向某个类型为T::bar的对象的指针
+   T::bar * p;
+}
+
+struct StructWithBarAsType {
+   typedef int bar;
+};
+
+int main() {
+   StructWithBarAsType x;
+   foo(x);
+}
+</syntaxhighlight>
+
+这段代码看起来能通过[[编译|编译]]，但是事实上这段代码并不正确。因为[[编译器|编译器]]并不知道<code>T::bar</code>究竟是一个类型的名字还是一个某个[[变量|变量]]的名字。究其根本，造成这种[[歧义|歧义]]的原因在于，编译器不明白<code>T::bar</code>到底是不是“模板参数的非独立名字”，简称“非独立名字”(dependent name)。注意，任何含有名为“<code>bar</code>”的项的类T，都可以被当作模板参数传入<code>foo()</code>函数，包括<code>typedef</code>类型、[[枚举|枚举]]类型或者变量等。
+
+为了消除歧义，C++[[语言|语言]][[标准|标准]]规定：
+<blockquote>A name used in a template declaration or definition and that is dependent on a template-parameter is assumed not to name a type unless the applicable name lookup finds a type name or the name is qualified by the keyword typename.</blockquote>
+意即出现上述歧义时，编译器将自动默认bar为一个变量名，而不是类型名。
+所以上面示例代码中的<code>T::bar * p</code>会被解释为<code>T::bar</code>乘以<code>p</code>(但p无处可寻)，而不是声明p为指向T::bar类型的对象的[[指针|指针]]。
+实际上，就算<code>StructWithBarAsType</code>里定义了<code>bar</code>是int类型也没用，因为在编译<code>foo()</code>时，编译器还没看到<code>StructWithBarAsType</code>。
+如果还有另一个名为<code>StructWithBarAsValue</code>的类，如下：
+<syntaxhighlight lang="cpp">
+struct StructWithBarAsValue {
+    int bar;
+};
+</syntaxhighlight>
+那么，编译器就会把foo()里的
+<syntaxhighlight lang="cpp">T::bar * p</syntaxhighlight>翻译成访问<code>StructWithBarAsValue::bar</code>这个成员数据，但是<code>StructWithBarAsValue</code>里的<code>bar</code>并非静态成员数据，所以还是会报错。
+
+解决问题的最终办法，就是[[显式地|显式地]]告诉编译器，<code>T::bar</code>是一个类型名。这就必须用<code>typename</code>关键字，例如：
+<syntaxhighlight lang="cpp">
+template <typename T>
+void foo(const T& t)
+{
+   // 声明一个指向某个类型为T::bar的对象的指针
+   typename T::bar * p;
+}</syntaxhighlight>
+这样，编译器就确定了<code>T::bar</code>是一个类型名，p也就自然地被解释为指向<code>T::bar</code>类型的对象的指针了。
+
+==参考文献==
+<references />
+
+[[Category:C++|Category:C++]]

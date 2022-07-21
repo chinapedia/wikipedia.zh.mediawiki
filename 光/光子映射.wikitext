@@ -1,0 +1,58 @@
+{{RoughTranslation}}
+在[[计算机图形学|计算机图形学]]中，photon mapping是一个2 pass的全局[[光照算法|光照算法]]，发明者为Henrik Wann Jensen。其做法为：分别从光源和照相机发出射线，当满足终止条件时，两条射线被连接在一起，用来在下一步中产生辐射度数值。该方法被用来做光和物体间的真实感模拟，特别值得一提的是，该方法在能够模拟一些特殊的效果，比如处理透明介质的折射，间接漫反射，透明材质的次表面反射和某些烟及水蒸汽效果等等。经过扩展，Photon mapping也能更加精确的模拟光谱渲染。
+
+[[File:Glas-6000-enery.jpg|thumb]]
+== 效果 ==
+=== 焦散（Caustics）===
+[[File:Glas-1000-enery.jpg|thumb]]
+光经过反射和折射能产生一种叫[[Caustic_(optics)|caustics]]的效果
+
+=== 间接漫反射（Diffuse interreflection）===
+
+我们把光从一个漫反射物体反射到另外一个物体的照明效果叫做间接漫反射，这是Photon mapping的强项之一， 因为这个算法考虑了photon从一个表面反射到另外一个表面的过程，并且BRDF也能起作用，其结果自然的显示出间接漫反射的效果。Color bleed是最常见的间接漫反射的例子。
+
+=== 次表面散射（Subsurface scattering）===
+
+次表面散射是光射入物体表面后，在被完全吸收/反射前朝不同方向散射的效果。该效果也能很精确的被photon mapping模拟。Jensen曾经有过一个实现，但是，当处理一些高散射材质时该方法会变得很慢， 与之对比，BSSRDFs能更好的处理这些情况。
+
+== 实现步骤 ==
+=== 构造photon map（pass 1）===
+在光子映射算法中，光子从光源发射到场景中。一旦光子和一个几何面（surface）相交，相交点和入射方向就会被存在一个叫光子贴图（photon map）的缓存中。一般来讲我们会存两张贴图，一个给caustics另一个给其他光。经过相交检测后， 根据相交面的材质，该光子可能被反射，吸收或者折射， 这一步通常用一个叫俄罗斯轮盘（russian roulette）的蒙特卡罗方法（Monte Carlo method）来处理。如果该光子被吸收，不需要下一步处理，这个光子停止辐射。如果光子被反射，根据BRDF计算新反射方向。最后，如果光子被折射，则根据相关自然定理，算出新的传输方向。
+光子贴图被构建后，由于光子的查询时间给予光子的空间分布，所以他会被用一种叫K-nearest neighbor的算法来组织和优化。Jensen提议用kd-trees。光子贴图会被存到硬盘或者内存里，等待下一步使用。
+
+=== 渲染（pass 2）===
+这一步中，前面创建好的光子贴图将被用来估算输出图像上每个像素的最终辐射度（亮度）。 
+针对单个像素，需要做一个光线追踪去找到最近的相交面。然后在该点上，用渲染方程计算最终辐射。方便起见，渲染方程被分解成四部分：直接光照，镜面反射，光线蚀刻（caustics），和间接光照。
+
+为了精确估计直接光照，需要从该点辐射射线到各个光源，如果射线没和其他物体相交，那么那光源就会被用作直接光照。
+镜面反射一般都用光线追踪的方法来做（它可以很好的处理反射）。
+Caustics则根据caustics光子贴图来计算而来。由于该光子贴图是caustics的唯一来源，所以该光子贴图中，光子数目必须足够多。
+对于间接光照，辐射计算来自光子贴图，但其不需要像Castics计算那么精確，使用全局光子贴图即可。
+
+==== 利用photon map计算辐射度 ====
+
+为了计算相交点的表面辐射度， 一个缓存光子贴图将被使用，步骤为：
+1.用nearest neighbor搜索函数搜索光子贴图，收集临近区域的N个光子
+2.构造一个球体S，把得到的这N个光子包围起来
+3.对每个光子，根据S和BRDF，计算其光通量能量
+4.所有光子的贡献总和将为相交点的辐射强度
+
+=== 优化 ===
+* 为了避免辐射不必要的光子，我们可以对光子的初始发射方向进行一定的限制。比如只发射光子到我们关心的物体方向上。这有很多种做法：...
+* 为了柔化间接光照，如果相交面术语Lambertian面， 可以使用一种叫irrandiance caching的技术和前面计算的结果进行差值。
+* 为了避免不必要的直接照明检测，可以使用阴影光子（shadow photon）
+* 为了提高图像质量，特别是caustics质量，Jensen推荐使用cone filter。这种filter能够考虑距离权重，产生更加锐利的图像。
+* 靠使用GPU光栅化，来计算初始和最后散射（Scattering），Image space photon mapping可以取得实时的执行效率，
+
+=== 其它 ===
+尽管光子映射设计时是针对[[光線跟蹤|光線跟蹤]]渲染器的，但[[掃描線渲染|掃描線渲染]]器也能使用。
+
+==外部链接==
+* [https://web.archive.org/web/20080808140048/http://graphics.ucsd.edu/~henrik/papers/photon_map/global_illumination_using_photon_maps_egwr96.pdf Global Illumination using Photon Maps]
+* [https://web.archive.org/web/20050205094151/http://graphics.ucsd.edu/~henrik/papers/book/ ''Realistic Image Synthesis Using Photon Mapping''] ISBN 1-56881-147-0
+* [http://www.cs.wpi.edu/~emmanuel/courses/cs563/write_ups/zackw/photon_mapping/PhotonMapping.html Photon mapping introduction]{{Wayback|url=http://www.cs.wpi.edu/~emmanuel/courses/cs563/write_ups/zackw/photon_mapping/PhotonMapping.html |date=20050415153203 }} from [Worcester Polytechnic Institute]
+* [http://www.cgafaq.info/wiki/Bias_in_rendering ''Bias in Rendering'']{{Wayback|url=http://www.cgafaq.info/wiki/Bias_in_rendering |date=20120607035534 }}
+* [http://www.cs.princeton.edu/courses/archive/fall02/cs526/papers/course43sig02.pdf Siggraph Paper]{{Wayback|url=http://www.cs.princeton.edu/courses/archive/fall02/cs526/papers/course43sig02.pdf |date=20110607074737 }}
+
+[[Category:三维计算机图形学|G]]
+[[Category:全局光照算法|Category:全局光照算法]]

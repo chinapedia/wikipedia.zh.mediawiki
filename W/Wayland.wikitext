@@ -1,0 +1,144 @@
+{{NoteTA|G1=IT|G2=FL}}
+
+{{Infobox Software
+| name = Wayland
+| logo = Wayland Logo.svg
+| logo size = 100px
+| screenshot = Weston 10.0 screenshot.png
+| caption  =  Wayland[[参考实现|参考实现]][[#Weston|Weston]]
+| collapsible = 
+| author = Kristian Høgsberg
+| developer = 
+| released = 2008
+| discontinued = 
+| latest release version = 1.21.0<ref>{{cite web | author = Simon Ser | title = [ANNOUNCE] wayland 1.21.0 | date = 2022-06-30 | accessdate = 2022-06-30 | language = en | url = https://lists.freedesktop.org/archives/wayland-devel/2022-June/042268.html }}</ref> 
+| latest release date = {{Release date and age|df=yes|2022|06|30}}
+| latest preview version = 1.20.93
+| latest preview date = {{Release date and age|df=yes|2022|06|23}}
+| programming language = [[C語言|C]]
+| operating system = [[类Unix系统|类Unix系统]]
+| platform = 
+| size = 
+| language = 
+| genre = 显示服务
+| license = [[MIT許可證|MIT許可證]]
+| website = {{URL|https://wayland.freedesktop.org/}}
+}}
+
+[[File:Linux_Graphics_Stack_2013.svg|thumb]]：X Server與Wayland Compositor]]
+[[File:Free_and_open-source-software_display_servers_and_UI_toolkits.svg|thumb]]
+
+'''Wayland'''是一个[[通信协议|通信协议]]，規定了[[顯示伺服器|顯示伺服器]]與其[[客戶機|客戶機]]之間的通信方式，而使用这个协议的显示服务器称为Wayland Compositor。它由Kristian Høgsberg於2008年发起，目标是用更简单的现代化[[视窗系统|视窗系统]]取代[[X_Window_System|X Window System]]。Wayland协议的参考实现称为Weston，由Wayland项目组使用C语言开发。<ref name = "Wayland">{{cite web | author =  | title = Wayland | publisher =  | date =  | accessdate = 2013-09-18 | language = en | url = http://wayland.freedesktop.org/ | quote = Wayland is a protocol for a compositor to talk to its clients as well as a C library implementation of that protocol. | archive-date = 2010-11-22 | archive-url = https://web.archive.org/web/20101122134313/http://wayland.freedesktop.org/ }}</ref>
+
+Wayland與X Window System的最大不同在於，它規定由客戶機自身負責窗口邊框和裝飾的繪製，並且客戶機能夠通過[[Open_GL|EGL]]以及一些Wayland特定的EGL擴充元件直接在顯示記憶體中算繪自己的緩衝區。窗口管理器简化成显示管理服务，专门负责算繪那些屏幕上的程序。这比X Window System中的[[窗口管理器|窗口管理器]]要更简单、高效。<ref name="Wayland: A New X Server For Linux">{{cite web | author = Michael Larabel | title = Wayland: A New X Server For Linux | publisher = Phoronix Media | date = 2008-11-03 | accessdate = 2013-11-09 | language = en | url = http://www.phoronix.com/scan.php?page=article&item=xorg_wayland&num=1 | archive-date = 2010-11-15 | archive-url = https://web.archive.org/web/20101115134434/http://www.phoronix.com/scan.php?page=article&item=xorg_wayland&num=1 }}</ref><ref name="New Wayland X server looks to how a modern desktop works">{{cite web | author = D. J.  Walker-Morgan | title = New Wayland X server looks to how a modern desktop works | publisher = Heise Media UK Ltd | date = 2008-11-06 | accessdate = 2013-11-09 | language = en | url = http://www.h-online.com/newsticker/news/item/New-Wayland-X-server-looks-to-how-a-modern-desktop-works-737993.html | deadurl = yes | archiveurl = https://web.archive.org/web/20131029204058/http://www.h-online.com/newsticker/news/item/New-Wayland-X-server-looks-to-how-a-modern-desktop-works-737993.html | archivedate = 2013-10-29 }}</ref>
+
+Wayland项目的源码使用[[MIT許可證|MIT許可證]]釋出。现有的Compositor例如[[Compiz|Compiz]]，[[KWin|KWin]]和[[Mutter|Mutter]]对Wayland都有着不同程度的支持。
+
+== 歷史 ==
+Wayland的创始人Kristian Høgsberg是[[X.Org_Server|X.Org Server]]开发者，曾参与过{{Tsl|en|AIGLX}}和{{Tsl|en|DRI2}}的开发。他在2008年供职于[[红帽|红帽]]时发起了Wayland作为业余项目，目标是让“每一个帧都完美无瑕，也就是说应用程序要能充分地控制图形的渲染，使我们完全无法察觉任何的撕裂、延迟、重画及闪烁”{{r|Høgsberg 2008}}{{r|FOSDEM2012 interview}}{{r|Hillesley 2012}}{{r|LPC2009}}。这一灵感浮现时他正开车经过马萨诸塞州的韦兰，也就由此决定了项目的名字{{r|Hillesley 2012}}{{r|Jenkins 2011}}。
+
+2010年10月，Wayland加入了[[Freedesktop.org|Freedesktop.org]]项目{{r|Larabel 2010 freedesktop}}{{r|wayland freedesktop}}。在迁移过程中，邮件列表wayland-devel代替了原先的[[Google_group|Google group]]邮件组，用于讨论项目的开发。
+
+Wayland是[[自由软件|自由软件]]，它的库(libwayland-server和libwayland-client)以[[MIT_License|MIT License]]授权，示例程序和Compositor一开始以GPLv2授权。现在整个项目都是以[[MIT_License|MIT License]]授权。直到2010年11月份，Wayland还仅仅只能在[[Intel|Intel]]、[[Nvidia|Nvidia]]和[[AMD|AMD]]的开源驱动上运行。
+
+== 设计 ==
+{{RoughTranslation}}
+[[File:Wayland_display_server_protocol.svg|thumb]]
+Wayland运用既有的[[Linux内核|Linux核心]]技术，像是Direct Rendering Manager（DRM），Kernel Mode-Setting（KMS）以及Graphics Execution Manager（GEM）以提供一個最小化的显示管理服务。Wayland混合器（compositor）在2010年6月已从桌面常用的[[OpenGL|OpenGL]]改为[[OpenGL_ES|OpenGL ES]]<ref name="Wayland Meets Some Summer Love w/ New Changes">{{cite web | author = Michael Larabel | title = Wayland Meets Some Summer Love w/ New Changes | publisher = Phoronix Media | date = 2010-06-06 | accessdate = 2013-11-09 | language = en | url = http://www.phoronix.com/scan.php?page=news_item&px=ODMyNA | archive-date = 2018-12-25 | archive-url = https://web.archive.org/web/20181225225048/https://www.phoronix.com/scan.php?page=news_item&px=ODMyNA }}</ref>。這個專案也開發支援Wayland顯示的[[Qt|Qt]]，而不需要X。大部分應用程式都有望獲得透過函式庫，無需修改程式即可支援Wayland。
+
+近些年来，GNU/Linux桌面图形开发者将许多与渲染有关的接口从X server移动到内核中。现在，已经有许多功能被移入内核（[[内存管理|内存管理]]、[[任务调度|任务调度]]、[[模式设置|模式设置]]（KMS）等等）或是程序库（cairo、pixman、freetype、fontconfig、pango等等），所以窗口系统需要做的事情大大减少了。但是X11协议十分巨大、庞杂，并且它包括了许多已经过时的模块。虽然开发者们为了使X server适应现代化的计算机体系结构而开发出了XRandR、XRender、Composite等一些额外扩展，但这终究是治标不治本，同时这也会增加维护的难度。
+
+Wayland是一款协议，但与X server不同的是，Wayland只做它必须要做的事情。下面以「鼠标点击按钮引发按钮更新动作」为例来说明一下Wayland和X server的区别：
+
+[[File:X-architecture.png|thumb]]
+'''在X中'''：
+# 内核捕获鼠标点击事件并发送给X server。
+# X server会计算该把这一事件发送给哪个窗口（事实上，窗口位置是由Compositor控制的，X server并不能够正确的计算Compositor做过特效变化之后的按钮的正确位置）。
+# 应用程序对此事件进行处理（将引发按钮更新动作）。但是，在此之前它得向X server发送绘制请求。
+# X server接收到这条绘制请求，然后把它发给视频驱动来渲染。X还计算了更新区域，并且这条「垃圾信息」发送给了Compositor。
+# 这时，Compositor知道它必须要重新合成屏幕上的一块区域。当然，这还是要向X server发送绘制请求的。
+# 开始绘制。但是X server还会去做一些不必要的本职工作（窗口重叠计算、窗口剪裁计算等）。
+
+[[File:Wayland-architecture.png|thumb]]
+'''在Wayland中'''：
+# 内核捕获鼠标点击事件并发送给Wayland Compositor。
+# 由于是直接发给Wayland Compositor的，所以Wayland Compositor会正确地计算出按钮的位置。同时它会把这一事件发送给按钮所在的应用程序来处理。
+# 应用程序直接渲染，无需向Wayland Compositor请求。只需在绘制完成之后向Wayland Compositor发送一条信息表明这块区域被更新了。
+# Wayland Compositor收到这条信息后，立即重新合成整个桌面。
+
+目前，Wayland使用OpenGL ES而不是传统的OpenGL。“从长远来看，我们需要完整的OpenGL支持，但问题是libGL会带来X的依赖性......”<ref>{{cite web | author = Kristian Høgsberg | title = Blender3D & cursor clamping. | date = 2010-12-09 | accessdate = 2013-11-09 | language = en | url = http://lists.freedesktop.org/archives/wayland-devel/2010-December/000330.html | archive-date = 2021-03-08 | archive-url = https://web.archive.org/web/20210308142210/https://lists.freedesktop.org/archives/wayland-devel/2010-December/000330.html }}</ref>另一方面，使用OpenGL ES会使得Wayland更容易支持移动设备<ref name = "Wayland's Weston Running On Android">{{cite web | author = Michael Larabel | title = Wayland's Weston Running On Android | publisher = Phoronix Media | date = 2012-05-24 | accessdate = 2013-11-09 | language = en | url = http://www.phoronix.com/scan.php?page=news_item&px=MTEwNjQ | archive-date = 2021-03-07 | archive-url = https://web.archive.org/web/20210307055407/https://www.phoronix.com/scan.php?page=news_item&px=MTEwNjQ }}</ref>。Wayland目前并不支持网络透明性，但未来可能会支持<ref name = "Network transparency argument">{{cite web | author = Kristian Høgsberg | title = Network transparency argument | date = 2010-11-09 | accessdate = 2013-11-09 | language = en | url = http://lists.freedesktop.org/archives/wayland-devel/2010-November/000097.html | quote = Wayland isn't a remote rendering API like X, but that doesn't exclude network transparency. Clients render into a shared buffer and then have to tell the compositor the what they changed. The compositor can then send the new pixels in that region out over the network. The Wayland protocol is already violently asynchronous, so it should be able to handle a bit of network lag gracefully. Remote fullscreen video viewing or gaming isn't going to work well, but I don't know any other display system that handles that well and transparently. | archive-date = 2021-03-08 | archive-url = https://web.archive.org/web/20210308115749/https://lists.freedesktop.org/archives/wayland-devel/2010-November/000097.html }}</ref>。
+
+== 媒体关注 ==
+Phoronix於2008年11月發表了一篇标题為「Wayland: A New X Server For Linux」的文章<ref name = "Wayland: A New X Server For Linux"/>，披露Wayland這項新的项目。Kristian透過他的網誌對此關注作出回應，他告示大眾Wayland並非一個新的X server而是一個顯示伺服器，並聲明這個新興的專案尚處於未成熟的階段{{r|Høgsberg 2008}}。
+
+== 使用 ==
+=== Arch Linux ===
+[[Arch_Linux|Arch Linux]]本身不具有Wayland。但实际上，安装 Enlightenment 或 KDE 等桌面環境时，可以選用Wayland安裝作为显示服务器。
+
+=== Ubuntu ===
+[[馬克·沙特爾沃思|馬克·沙特爾沃思]]於2010年11月4日宣佈Wayland將作為[[Ubuntu|Ubuntu]]未來某一未定版本Unity介面的顯示伺服器<ref name = "Unity on Wayland">{{cite web | author = [[Mark_Shuttleworth|Mark Shuttleworth]] | title = Unity on Wayland | date = 2010-11-04 | accessdate = 2010-11-04 | language = en | url = http://www.markshuttleworth.com/archives/551 | archive-date = 2013-06-28 | archive-url = https://www.webcitation.org/6HijukWpd?url=http://www.markshuttleworth.com/archives/551 | dead-url = no }}</ref>。但是2013年3月份，Canonical确认他们将开发一个新的显示服务[[Mir_(显示服务器)|Mir]]而不是使用Wayland来替代X<ref name = "Ubuntu Announces Mir, A X.Org/Wayland Replacement">{{cite web | author = Michael Larabel | title = Ubuntu Announces Mir, A X.Org/Wayland Replacement | publisher = Phoronix Media | date = 2013-03-04 | accessdate = 2013-11-09 | language = en | url = http://www.phoronix.com/scan.php?page=news_item&px=MTMxNzI | archive-date = 2021-05-07 | archive-url = https://web.archive.org/web/20210507130731/https://www.phoronix.com/scan.php?page=news_item&px=MTMxNzI }}</ref>。2017年4月份，Canonical宣佈放棄[[Unity_(使用者介面)|Unity]]與Mir<ref>{{cite news|title=Ubuntu宣布放弃Unity界面：明年将回归GNOME|url=http://tech.sina.com.cn/it/2017-04-06/doc-ifyecezv2289886.shtml|publisher=新浪科技|date=2017-04-06|accessdate=2017-11-11|archive-date=2020-08-26|archive-url=https://web.archive.org/web/20200826204651/http://tech.sina.com.cn/it/2017-04-06/doc-ifyecezv2289886.shtml}}</ref>，並於Ubuntu 17.10開始使用Wayland<ref>{{cite news|title=Ubuntu 17.10调整：Dock始终可见 默认使用Wayland|url=http://www.sohu.com/a/162828925_223764|publisher=搜狐|date=2017-08-07|accessdate=2017-11-11|archive-date=2018-06-12|archive-url=https://web.archive.org/web/20180612143019/http://www.sohu.com/a/162828925_223764}}</ref>。但在18.04LTS版本中因為Wayland無法支持屏幕共享，遠程桌面服務以及GNOME Shell崩潰的可恢復性更換為X.Org Server。<ref>{{Cite news|url=https://hk.saowen.com/a/61aa9ad7717b851630a42edc618371689a0f83a8c4d494c2ef1180c689e84a3a|title=Ubuntu 18.04 LTS每日構建版使用Xorg而不是Wayland|newspaper=掃文資訊|accessdate=2018-04-15|archive-url=https://web.archive.org/web/20180415191112/https://hk.saowen.com/a/61aa9ad7717b851630a42edc618371689a0f83a8c4d494c2ef1180c689e84a3a|archive-date=2018-04-15|dead-url=yes}}</ref><ref>{{Cite web|url=https://insights.ubuntu.com/2018/01/26/bionic-beaver-18-04-lts-to-use-xorg-by-default|title=Bionic Beaver 18.04 LTS to use Xorg by default|accessdate=2018-04-15|work=insights.ubuntu.com|language=en|archive-date=2018-04-17|archive-url=https://web.archive.org/web/20180417155607/https://insights.ubuntu.com/2018/01/26/bionic-beaver-18-04-lts-to-use-xorg-by-default}}</ref>
+
+=== Fedora ===
+[[Fedora|Fedora]] 25整合了GNOME桌面最新版本 3.22，并将GNOME桌面的版本的显示后端切换至预设为Wayland。
+
+=== RHEL ===
+[[RHEL|RHEL]] 8整合了Wayland。
+
+=== Qt ===
+[[Qt|Qt]] 5.x提供了QtWayland模塊以支持Wayland協議<ref name = "What is QtWayland?">{{cite web | author =  | title = What is QtWayland? | publisher = Qt Project Hosting | date = 2013-05-08 | accessdate = 2013-11-09 | language = en | url = http://qt-project.org/wiki/QtWayland | archive-date = 2015-02-20 | archive-url = https://web.archive.org/web/20150220044633/http://qt-project.org/wiki/QtWayland }}</ref>，藉由-platform命令列選項，[[Qt|Qt]]應用程式可以在運行時切換圖形後端，如X與Wayland<ref name = "Getting started with Lighthouse">{{cite web | title = Getting started with Lighthouse | publisher = Qt Project Hosting | date = 2011-06-29 | accessdate = 2010-12-17 | language = en | url = http://qt-project.org/wiki/Getting_Started_With_Lighthouse | archive-date = 2014-10-21 | archive-url = https://web.archive.org/web/20141021223459/http://qt-project.org/wiki/Getting_Started_With_Lighthouse }}</ref>。2011年1月，Wayland支持进入上游Qt版本庫的Lighthouse分支<ref name="Add wayland lighthouse plugin">{{cite web | author = Kristian Høgsberg | title = Add wayland lighthouse plugin | date = 2011-01-25 | accessdate = 2013-11-09 | language = en | url = http://qt.gitorious.org/+qt-developers/qt/lighthouse/commit/6c5ea196ff086b92687033208f15e36591dc70f6 | deadurl = yes | archiveurl = https://web.archive.org/web/20130514155010/http://qt.gitorious.org/%20qt-developers/qt/lighthouse/commit/6c5ea196ff086b92687033208f15e36591dc70f6 | archivedate = 2013-05-14 }}</ref>。
+
+=== KDE ===
+[[KWin|KWin]]，[[KDE|KDE]]的視窗管理器加入支持OpenGL ES輸出<ref name = "KWin runs on OpenGL ES">{{cite web | author = Martin Gräßlin | title = KWin runs on OpenGL ES | date = 2010-11-28 | accessdate = 2013-11-09 | language = en | url = http://blog.martin-graesslin.com/blog/2010/11/kwin-runs-on-opengl-es/ | quote = It does not only help, it is a must have to start working for Wayland. So to say it’s the first part of the KWin port to Wayland | archive-date = 2020-11-09 | archive-url = https://web.archive.org/web/20201109010634/http://blog.martin-graesslin.com/blog/2010/11/kwin-runs-on-opengl-es/ }}</ref>，已在[[KDE_Software_Compilation_4|KDE SC 4.7]]發布<ref name = "On the Road to Modern OpenGL (ES)">{{cite web | author = Martin Gräßlin | title = On the Road to Modern OpenGL (ES) | date = 2011-01-18 | accessdate = 2013-11-09 | language = en | url = http://blog.martin-graesslin.com/blog/2011/01/on-the-road-to-modern-opengl-es/ | archive-date = 2021-12-06 | archive-url = https://web.archive.org/web/20211206031729/https://blog.martin-graesslin.com/blog/2011/01/on-the-road-to-modern-opengl-es/ }}</ref>。目前，KWin已經完成Wayland的初步移植<ref name="KWin goes Wayland ">{{cite web | author = Martin Gräßlin | title = KWin goes Wayland | date = 2011-06-11 | accessdate = 2013-11-09 | language = en | url = http://quickgit.kde.org/?p=kde-workspace.git&a=commit&h=e62eed99761646ba69e4154ae01087e19342922b | quote = Initial Implementation of a Wayland Server in KWin. | archive-date = 2011-08-25 | archive-url = https://web.archive.org/web/20110825114609/http://quickgit.kde.org/?p=kde-workspace.git&a=commit&h=e62eed99761646ba69e4154ae01087e19342922b | dead-url = yes }}</ref>。在2012年1月發布的KDE SC 4.8，KDE將支援X下執行Wayland。在2012年夏天發布的KDE SC 4.9，將可以直接執行Wayland，主要用於支援行動設備，也就是Plasma Active<ref name = "KDE Draws Up Plans For Wayland In 2012">{{cite web | author = Michael Larabel | title = KDE Draws Up Plans For Wayland In 2012 | publisher = Phoronix Media | date = 2011-08-07 | accessdate = 2013-11-09 | language = en | url = http://www.phoronix.com/scan.php?page=article&item=wayland_kde_2012&num=2 | quote = but the first phase (Wayland under X) should be achieved for the winter release of KDE (Software Compilation 4.8, due out next January). Martin hopes that the second phase of the Wayland upbringing, where KDE is working directly atop Wayland, will be ready for the summer 2012 release (KDE SC 4.9). | archive-date = 2021-03-07 | archive-url = https://web.archive.org/web/20210307050237/https://www.phoronix.com/scan.php?page=article&item=wayland_kde_2012&num=2 }}</ref>。
+
+=== GNOME ===
+[[GNOME|GNOME]]從3.10開始支持Wayland<ref name = "GNOME 3.10 Released!">{{cite web | author =  | title = GNOME 3.10 Released! | publisher = The GNOME Project | date = 2013-09-25 | accessdate = 2013-11-13 | language = en | url = http://www.gnome.org/news/2013/09/gnome-3-10-released/ | archive-date = 2021-02-05 | archive-url = https://web.archive.org/web/20210205070353/https://www.gnome.org/news/2013/09/gnome-3-10-released/ }}</ref>。
+
+=== Compiz ===
+[[Compiz|Compiz]]开发者们已经把它对X的依赖部分变成了一个可选插件。同时，Canonical正在为Compiz添加OpenGL ES的支持。众所周知，目前Wayland正是使用OpenGL ES，这使将得Compiz能够更容易迁移到Wayland。
+註:compiz此項目的主要作者已經離開Canonical，使得此項目進入停止開發的狀態，當然遷移到wayland的計劃也就更遙遙無期。
+
+=== Sailfish OS ===
+[[Jolla|Jolla]]的第一款裝置搭载的[[Sailfish_OS|Sailfish OS]]使用Wayland<ref name = "Jolla's First Smartphone Powered By Wayland">{{cite web | author = Michael Larabel | title = Jolla's First Smartphone Powered By Wayland | publisher = Phoronix Media | date = 2013-07-13 | accessdate = 2013-11-09 | language = en | url = http://www.phoronix.com/scan.php?page=news_item&px=MTQxMDA | archive-date = 2021-06-25 | archive-url = https://web.archive.org/web/20210625135203/https://www.phoronix.com/scan.php?page=news_item&px=MTQxMDA }}</ref>。
+
+== 工具包 ==
+截止到2012年3月：
+
+[[Clutter|Clutter]]对Wayland已经有完整的支持。
+
+[[Enlightenment_Foundation_Libraries|Enlightenment Foundation Libraries]]对Wayland已经有完整的支持。
+
+QT 5除了对client有一些改动之外，对Wayland已经有完整的支持。
+
+[[GTK+|GTK+]]3.4.0，发布于2012年3月26日，对Wayland的支持有一些缺陷。不过过随着3.4.1更新版本的发布，这个问题得到了缓解。
+
+[[SDL|SDL]]的Wayland支持正在开发中。
+
+== 参见 ==
+{{Portal|Free software}}
+
+* [[X_Window系統|X Window系統]]
+* [[Mir_(显示服务器)|Mir]]
+* [[Cairo_(繪圖)|Cairo]]
+
+== 參考資料 ==
+{{reflist|2|refs=
+
+<ref name="Høgsberg 2008">{{cite web|last1=Høgsberg|first1=Kristian|title=Premature publicity is better than no publicity|url=http://hoegsberg.blogspot.com/2008/11/premature-publicity-is-better-than-no.html|date=2008-11-03|accessdate=2016-04-06}}</ref>
+<ref name="FOSDEM2012 interview">{{cite web|title=Interview: Kristian Høgsberg|url=https://archive.fosdem.org/2012/interview/kristian-hogsberg.html|website=FOSDEM Archive|accessdate=2016-03-08|date=2012-01-29}}</ref>
+<ref name="Hillesley 2012">{{cite web|last1=Hillesley|first1=Richard|title=Wayland - Beyond X|url=http://www.h-online.com/open/features/Wayland-Beyond-X-1432046.html|website=The H Open|publisher=Heise Media UK|date=2012-02-13|accessdate=2016-03-08}}</ref>
+<ref name="LPC2009">{{cite web|url=http://linuxplumbersconf.org/ocw/users/73|title=Wayland – A New Display Server for Linux|last=Høgsberg|first=Kristian|publisher=Linux Plumbers Conference, 2009|access-date=2010-11-23|archive-url=https://web.archive.org/web/20110727035153/http://linuxplumbersconf.org/ocw/users/73|archive-date=2011-07-27|dead-url=yes}}</ref>
+<ref name="Jenkins 2011">{{cite web|last1=Jenkins|first1=Evan|title=The Linux graphics stack from X to Wayland|url=https://arstechnica.com/information-technology/2011/03/the-linux-graphics-stack-from-x-to-wayland/|website=Ars Technica|date=2011-03-22|accessdate=2016-04-17}}</ref>
+<ref name="Larabel 2010 freedesktop">{{cite web|last1=Larabel|first1=Michael|title=Wayland Becomes A FreeDesktop.org Project|url=https://www.phoronix.com/scan.php?page=news_item&px=ODczNQ|website=Phoronix.com|date=2010-10-29|accessdate=2016-04-17}}</ref>
+<ref name="wayland freedesktop">{{cite web|url=https://groups.google.com/forum/#!topic/wayland-display-server/sfvLwLaHwsE|title=Moving to freedesktop.org|last=Høgsberg|first=Kristian|date=2010-10-29|accessdate=2013-07-31|archive-date=2019-12-07|archive-url=https://web.archive.org/web/20191207213542/https://groups.google.com/forum/#!topic/wayland-display-server/sfvLwLaHwsE|dead-url=no}}</ref>
+
+}}
+
+== 外部連結 ==
+* [http://wayland.freedesktop.org/ 官方網站] {{Wayback|url=http://wayland.freedesktop.org/ |date=20101122134313 }}
+
+{{Freedesktop.org}}
+{{X桌面环境与窗口管理器}}
+{{XWinSys}}
+
+[[Category:Wayland|Category:Wayland]]
+[[Category:使用MIT许可证的软件|Category:使用MIT许可证的软件]]

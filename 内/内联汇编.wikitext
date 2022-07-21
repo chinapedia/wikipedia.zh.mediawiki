@@ -1,0 +1,100 @@
+{{地区用词3
+|zh-cn='''内联汇编'''
+|zh-hk='''行內組語'''
+|equiv-tw=hk
+|start=（{{lang-en|'''Inline assembly'''}}），
+|as=译作
+|end=，
+}}是由部分[[編譯器|編譯器]]支援的一種功能。其將非常低階的[[組合語言|組合語言]]內嵌在[[高階語言|高階語言]]源始碼中。實施行內組語通常是為了以下理由：
+*'''執行效率最佳化'''：將[[演算法|演算法]]中最攸關效能的部份使用手寫組語取代高階程式碼，優點是不會受到編譯器的限制。
+*'''使用處理器特有指令'''：某些處理器提供特定的指令，比如Compare-and-swap和Test-and-set指令可以直接用以實作[[信号_(计算机科学)|信號]]機制。因為[[多工|多工系統]]都需要信號機制，幾乎所有現代的處理器都支援前述的兩個指令。其它的一些指令集如[[SPARC|SPARC]]架構的[[VIS指令集|VIS指令集]]，[[Intel|Intel]]處理器的[[MMX|MMX指令集]]以及[[SSE|SSE指令集]]等。
+*'''[[系统调用|系統調用]]'''（System Call）：高階語言鮮少提供直接調用system calls的機制，故使用組語來進行這項工作。
+
+== 使用處理器持有指令優化範例 ==
+下面是一段在[[D語言|D語言]]進行行內組語的程式碼。該程式碼使用[[X86|x86架構]]的[[FPU|浮點運算器]]指令來計算<math>\tan x</math>。此實作快於編譯器產生的一系列浮點數運算，行內組語也使編程人員得以使用<code>fldpi</code>指令來載入在x86架構下可得到的最佳之[[pi|pi]]估計值。
+
+<syntaxhighlight lang="d">
+// 計算tan(x)
+real tan(real x)
+{
+   asm
+   {
+       fld     x[EBP]                  ; // 將x值載入浮點運算器的堆疊上
+       fxam                            ; // 測試堆疊頂端的值是否是合法、可計算浮點數
+       fstsw   AX                      ;
+       sahf                            ;
+       jc      trigerr                 ; // 若x是NAN,正負無限，或空值 
+                                         // 387可以處理denormals數值
+SC18:  fptan                           ; // 為與8087運算器相容fptan會使堆疊頂端為1.0，再來才是tan值，
+       fstp    ST(0)                   ; // 丟棄堆疊頂端的值
+       fstsw   AX                      ;
+       sahf                            ;
+       jnp     Lret                    ; // C2為FPU狀態變數，C2 == 1表示x超出允許的範圍
+                                       ; // tan之週期為pi，下面的程式碼就是將x縮至允許的範圍
+       fldpi                           ;
+       fxch                            ;
+SC17:  fprem1                          ;
+       fstsw   AX                      ;
+       sahf                            ;
+       jp      SC17                    ;
+       fstp    ST(1)                   ; // 將pi值移出堆疊
+       jmp     SC18                    ;
+   }
+trigerr:
+   return real.nan;
+Lret:
+   ;
+}
+</syntaxhighlight>
+
+== 系統調用（system calls）範例 ==
+在[[保護模式|保護模式]]運行的應用程式無法直接呼叫專屬於[[操作系統|OS]]的功能。因為[[作業系統|OS]]的行程空間包含[[核心空間|核心空間]]（kernel mode）與[[用戶空間|用戶空間]]（user mode）；運行在用戶空間的程式只能透過[[中斷|中斷]]來引用專屬於作業系統的功能。通常[[高階語言|高階語言]]都不提供這項功能，所以要運用行內組語將呼叫system calls的過程包裝為高階語言可辨認、呼叫的函式。
+
+下面的C語言片段即含有一個system call的包裝函式。其組語語法為[[GNU汇编器|GNU汇编器]]使用的[[AT&T組語語法|AT&T組語語法]]。一般這類程式都會使用[[巨集|巨集]]實作，不過為了清楚展示觀念，在此列出了完整的程式碼。
+
+GNU組譯器的行內組語語法相當直覺，基本型式如下：
+
+<syntaxhighlight lang="c">asm("assembly code");</syntaxhighlight>
+
+例如：
+
+<syntaxhighlight lang="c">asm("movl %ecx, %eax"); /* 複製ecx暫存器的內容至eax暫存器*/</syntaxhighlight>
+
+或
+
+<syntaxhighlight lang="c">__asm_("movb %bh, (%eax)"); /* 從bh暫存器複製1位元組的資料到eax暫存器所指的記憶體區塊*/</syntaxhighlight>
+
+必須注意的是，AT&T語法中的運算元順序與[[Windows|Windows平台]]下常用的[[MASM|MASM]]剛好相反。
+
+<code>asm</code>跟<code>__asm__</code>都是合法型式；當<code>asm</code>與程式碼中某些變數命名起衝突時可使用後者。
+
+<syntaxhighlight lang="c">
+extern int errno;
+
+int funcname（int arg1, int *arg2, int arg3）
+{
+  int res;
+  __asm__ volatile(
+    "int $0x80"        /* 向OS拋出請求*/
+    : "=a" (res)       /* 請編譯器將結果將儲存於eax ("a")*/
+      "+b"(arg1),     /* 請編譯器將arg1存於ebx ("b")*/
+      "+c"(arg2),     /* 請編譯器將arg2存於ecx ("c")*/
+      "+d"(arg3)      /* 請編譯器將arg3存於edx ("d")*/
+    : "a"(128)       /* 該system call的編號放於eax ("a")*/
+    : "memory", "cc"); /* 通知編譯器，記憶體與condition code register（決定分支的暫存器）己被更改*/
+
+  /* 若OS回傳負值表示錯誤；則包裝函式要設定errno global variable並回傳 -1 */
+  if (-125 <= res && res < 0) {
+    errno = -res;
+    res = -1;
+  }  
+  return res;
+}
+</syntaxhighlight>
+
+==外部链接==
+*[http://www.ibiblio.org/gferg/ldp/GCC-Inline-Assembly-HOWTO.html GCC-Inline-Assembly-HOWTO] {{Wayback|url=http://www.ibiblio.org/gferg/ldp/GCC-Inline-Assembly-HOWTO.html |date=20140125221231 }}
+*[https://web.archive.org/web/20110514100544/http://gcc.gnu.org/onlinedocs/gnat_ugn_unw/Inline-Assembler.html GNAT Inline Assembler]
+*[http://www.jaist.ac.jp/iscenter-new/mpc/altix/altixdata/opt/intel/vtune/doc/users_guide/mergedProjects/analyzer_ec/mergedProjects/reference_olh/mergedProjects/instructions/instruct32_hh/vc110.htm] {{Wayback|url=http://www.jaist.ac.jp/iscenter-new/mpc/altix/altixdata/opt/intel/vtune/doc/users_guide/mergedProjects/analyzer_ec/mergedProjects/reference_olh/mergedProjects/instructions/instruct32_hh/vc110.htm |date=20190130232909 }}
+
+[[Category:汇编语言|Category:汇编语言]]

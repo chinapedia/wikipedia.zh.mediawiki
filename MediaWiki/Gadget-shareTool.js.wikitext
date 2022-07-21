@@ -1,0 +1,244 @@
+(function($) {
+	var share_msgs_zh_hans = {
+		title: '分享与收藏',
+		title_evernote: 'Evernote',
+		title_facebook: 'Facebook',
+		title_instapaper: 'Instapaper',
+		title_qzone: 'QQ空间',
+		title_qrcode: 'QR码',
+		title_readitlaterlist: 'Read It Later',
+		title_telegram: 'Telegram',
+		title_tumblr: 'Tumblr',
+		title_twitter: 'Twitter',
+		title_douban: '豆瓣',
+		title_fanfou: '饭否',
+		title_plurk: '噗浪',
+		title_renren: '人人网',
+		title_sina: '新浪微博'
+	};
+
+	var share_msgs_zh_hant = {
+		title: '分享與收藏',
+		title_evernote: 'Evernote',
+		title_facebook: 'Facebook',
+		title_instapaper: 'Instapaper',
+		title_qzone: 'QQ空間',
+		title_qrcode: 'QR碼',
+		title_readitlaterlist: 'Read It Later',
+		title_telegram: 'Telegram',
+		title_tumblr: 'Tumblr',
+		title_twitter: 'Twitter',
+		title_douban: '豆瓣',
+		title_fanfou: '飯否',
+		title_plurk: '噗浪',
+		title_renren: '人人網',
+		title_sina: '新浪微博'
+	};
+
+	function ShareTool() {
+
+		var portal = null,
+			ul = null;
+
+		var headcontent = mw.util.$content.find('p').first().text(),
+			pagetitle = mw.config.get('wgPageName');
+
+		var sina_key = '2871381526';
+
+		var images = function() {
+			var ret = [];
+			$('a.image img', mw.util.$content).each(function() {
+				ret.push(this.src);
+			});
+			return ret;
+		}();
+
+		var urlshort = function() {
+			url = document.location.href.replace(/https:\/\/zh\.wikipedia\.org/, 'https://zhwp.org');
+			url = url.replace(/https:\/\/zhwp\.org\/(?:wiki|zh(?:-\w+)?)\//, 'https://zhwp.org/');
+			url = url.replace('https://zhwp.org/Wikipedia:', '/WP:');
+			url = url.replace('https://zhwp.org/Template:', '/T:');
+			url = url.replace('https://zhwp.org/Category:', '/CAT:');
+			return url;
+		}();
+		var urllocal = document.location.href.replace(/https:\/\/zh\.wikipedia\.org\/(?:wiki|zh(?:-\w+)?)\//, 'https://' + 'zh.' + 'wikipedia.' + 'org' + '/' + mw.config.get('wgUserVariant') + '/');
+
+		function _init() {
+			var isVectorSkin = mw.config.get( "skin" ) === "vector"  || mw.config.get( "skin" ) === "vector-2022";
+			if ( isVectorSkin  ) {
+				htmlline = '<input class="vector-menu-checkbox" type="checkbox" aria-labelledby="p-twinkle-label"><h3 id="p-twinkle-label"><span title="' + share_msgs.title + '" style="background-image: url(//upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Shareicon.svg/16px-Shareicon.svg.png); background-position: 0px 85%; background-repeat: no-repeat;width: 18px;display: inline-block;padding-top: 0;">　</span><a href="#"></a></h3><div class="vector-menu-content"><ul class="menu vector-menu-content-list"/></div>';
+				$('<nav/>').addClass('mw-portlet vector-menu-dropdown-noicon vector-menu vector-menu-dropdown').attr('id', 'p-share').html(htmlline).insertAfter('#p-cactions');
+			} else {
+				$('#p-tb').clone().attr('id', 'p-share').find('h3').text(share_msgs.title).end().find('li').remove().end().insertAfter('#p-tb');
+			}
+		}
+
+		// random array sort
+		function _array_rand(o) {
+			// https://jsfromhell.com/array/shuffle
+			for (var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+			return o;
+		}
+
+		// build li
+		function _li(id, title, url, query, w, h, scroll) {
+			if (typeof scroll === 'undefined') scroll = 'yes';
+			url += '?&' + $.param(query);
+			var portletLink = $(mw.util.addPortletLink('p-share', url, title, 's-share' + id)).find('a').addBack().filter('a');
+			$(portletLink).click(function(e) {
+				e.preventDefault();
+				window.open(url, '_blank', 'scrollbars=' + scroll + ',width=' + w + ',height=' + h + ',left=75,top=20,status=no,resizable=yes');
+			});
+		}
+
+		this._li_evernote = function() {
+			var url = 'https://www.evernote.com/clip.action';
+			var query = {
+				title: pagetitle,
+				url: urllocal
+			};
+			_li('evernote', share_msgs.title_evernote, url, query, 700, 450);
+		};
+
+		this._li_facebook = function() {
+			var url = 'https://www.facebook.com/sharer.php';
+			var query = {
+				u: urllocal
+			};
+			_li('facebook', share_msgs.title_facebook, url, query, 600, 450);
+		};
+
+		this._li_instapaper = function() {
+			var url = 'https://www.instapaper.com/hello2';
+			var query = {
+				title: pagetitle,
+				url: urllocal
+			};
+			_li('instapaper', share_msgs.title_instapaper, url, query, 800, 450);
+		};
+
+		this._li_qzone = function() {
+			var url = 'http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey',
+			query = {
+				url: urllocal.replace('https://', '')
+			};
+			_li('qzone', share_msgs.title_qzone, url, query, 800, 460);
+		};
+
+		this._li_qrcode = function() {
+			var url = 'https://chart.apis.google.com/chart';
+			var query = {
+				cht: 'qr',
+				chs: '400x400',
+				chl: urllocal
+			};
+			_li('qrcode', share_msgs.title_qrcode, url, query, 500, 450);
+		};
+
+		this._li_readitlaterlist = function() {
+			var url = 'https://readitlaterlist.com/save';
+			var query = {
+				title: pagetitle,
+				url: urllocal
+			};
+			_li('readitlaterlist', share_msgs.title_readitlaterlist, url, query, 600, 350);
+		};
+
+		this._li_telegram = function() {
+			var url = 'https://t.me/share/url',
+			query = {
+				title: pagetitle,
+				url: urlshort
+			};
+			_li('telegram', share_msgs.title_telegram, url, query, 700, 300);
+		};
+
+		this._li_tumblr = function() {
+			var url = 'https://www.tumblr.com/share',
+			query = {
+				s: headcontent,
+				t: pagetitle,
+				u: urllocal,
+				v: '3'
+			};
+			_li('tumblr', share_msgs.title_tumblr, url, query, 700, 450);
+		};
+
+		this._li_twitter = function() {
+			var url = 'https://twitter.com/intent/tweet',
+			query = {
+				status: pagetitle + ' ' + urlshort + ' #wikipedia'
+			};
+			_li('twitter', share_msgs.title_twitter, url, query, 700, 300);
+		};
+
+		this._li_douban = function() {
+			var url = 'https://www.douban.com/recommend/',
+			query = {
+				sel: '#wikipedia#',
+				title: pagetitle,
+				url: urlshort
+			};
+			_li('douban', share_msgs.title_douban, url, query, 480, 300);
+		};
+
+		this._li_fanfou = function() {
+			var url = 'https://fanfou.com/sharer';
+			var query = {
+				t: pagetitle,
+				u: urllocal
+			};
+			_li('fanfou', share_msgs.title_fanfou, url, query, 700, 450);
+		};
+
+		this._li_plurk = function() {
+			var url = 'https://www.plurk.com/',
+			query = {
+				qualifier: 'shares',
+				status: pagetitle + ' ' + urlshort
+			};
+			_li('plurk', share_msgs.title_plurk, url, query, 1024, 768);
+		};
+
+		this._li_renren = function() {
+			var url = 'http://www.connect.renren.com/share/sharer',
+			query = {
+				url: urllocal
+			};
+			_li('renren', share_msgs.title_renren, url, query, 550, 400, 'no');
+		};
+
+		this._li_sina = function() {
+			var url = 'https://service.weibo.com/share/share.php',
+			query = {
+				appkey: sina_key,
+				content: 'utf-8',
+				title: pagetitle + ' #wikipedia#',
+				url: urllocal
+			};
+			if (images.length) query.pic = images.join('||'); //新浪微博自动发现图片
+			_li('sina', share_msgs.title_sina, url, query, 440, 400);
+		};
+
+		this.init = function() {
+			var elem,
+				funcs = Array();
+			_init();
+			for (elem in this) {
+				if (elem.indexOf('_li_') === 0) funcs.push(this[elem]);
+			}
+			funcs = _array_rand(funcs);
+			for (var i = 0; i < funcs.length; i++) {
+				funcs[i]();
+			}
+		};
+	}
+
+	$(function() {
+		if (mw.config.get('wgAction') === 'view' && mw.util.getParamValue('diff') === null && !mw.config.get('wgCanonicalSpecialPageName')) {
+			share_msgs = wgULS(share_msgs_zh_hans, share_msgs_zh_hant);
+			var stobj = new ShareTool();
+			stobj.init();
+		}
+	});
+})(jQuery);

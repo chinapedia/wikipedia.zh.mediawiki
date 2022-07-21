@@ -1,0 +1,124 @@
+{{NoteTA
+|G1 = IT
+}}
+{{各地中文名
+|cn = 转义字符
+|tw = 跳脫字元，逸出字元
+}}
+在[[计算机科学|计算机科学]]与[[远程通信|远程通信]]中，当'''转义字符'''（{{lang|en|Escape Character}}）放在[[序列#计算机领域|字符序列]]时，它将对它后续的几个字符进行替代并解释。转义字符是[[元字符|元字符]]的一种特殊情况。通常，判定某字符是否为转义字符由上下文确定。转义字符即标志着[[转义序列|转义序列]]开始的那个字符。
+
+转义字符原本是指[[ASCII|ASCII]]中的十进制27，十六进制1B，八进制033所定义的[[退出键|那个字符]]。对应于标准键盘左上角的[[退出键|ESC键]]。老式键盘如果没有ESC键，替代输入是“Ctrl+[”。在老式的计算机外设控制协议，ASCII码的十进制27这个字符开始的一个字符序列，是外设的控制序列，不能按照这些字符的字面意义解释。后来，就把最初的狭义的Escape character的含义引申开来，在各种计算机语言与协议中，标志着一个转义序列开始的那个字符，都叫做Escape character。最常见的一个例子是[[C程序设计语言|C程序设计语言]]中，用反斜线字符“\”作为转义字符，来表示那些不可打印的ASCII控制符。在[[统一资源标志符|URI]]协议中，[[百分号编码|转义字符]]是百分号“%”。
+
+==定义==
+转义字符是很多程序语言、数据格式和通信协议的[[形式文法|形式文法]]的一部分。对于一个给定的[[字母表_(计算机科学)|字母表]]，一个转义字符的目的是开始一个字符序列，使得转义字符开头的该字符序列具有不同于该字符序列单独出现（没有转义字符开头）时的语义。因此转义字符开头的字符序列被叫做[[转义序列|转义序列]]。一个转义字符可能并没有它自己的意思，因此所有转义序列具有2个或更多字符。
+
+转义序列通常有两种功能。第一个是编码一个句法上的实体，如设备命令或者无法被字母表直接表示的特殊数据。第二种功能，也叫字符引用，用于表示无法在当前上下文中被键盘录入的字符（如字符串中的[[回车符|回车符]]），或者在当前上下文中会有不期望的含义的字符（如[[C语言|C语言]]字符串中的双引号字符"，不能直接出现，必须用转义序列表示）。在后面那种情况，转义序列是一种由转义字符自身和一个被引用的字符组成的一个[[二合字母|二合字母]]（digraph）情形。
+
+===控制字符===
+转义字符不属于控制字符；控制字符也不属于转义字符。如果控制字符的定义是非图形的字符，或者对输出设备（打印机、文本终端）有特殊意义的字符，那么针对这些设备的转义字符也是控制字符。但是程序设计用的转义字符是图形字符，因此它们不是控制字符。相反地，大多数ASCII控制字符单独都具有控制功能，因此它们不是转义字符。
+
+== 转义字符在各个编程语言中的使用方法 ==
+在不同的编程语言中，转义字符的使用方法均不同。
+
+=== 在java中 ===
+{| class="wikitable"
+|+
+!样式
+!含义                                         
+|-
+|\123
+|1~3位八进制数据所表示的字符，如\256
+|-
+|\uF890
+|4位十六进制数据所表示的字符，如\u0014
+|-
+|\'
+|单引号字符
+|-
+|\\
+|反斜杠字符
+|-
+|\t
+|水平制表符
+|-
+|\r
+|回车
+|-
+|\n
+|换行符
+|-
+|\b
+|退格
+|-
+|\f
+|换页
+|}
+
+==例子==
+=== ASCII转义字符 ===
+{{seealso|转义序列|ANSI转义序列}}
+ASCII的「[[退出键|Escape]]」字符被用于许多输出设备，标志着开始一个[[转义字符序列|转义字符序列]]。例如^[,后跟可打印字符<code>[2;10H</code>，将引起[[DEC|DEC]]的[[VT102|VT102]]终端把光标移动到屏幕的第2行第10个单元。在1970年代到1980年代的人机界面中，使用Esc键作为转义字符，开始一个转义序列，是非常常见的。但现在一般放弃了这种用法。
+
+===程序设计与数据格式===
+许多程序设计语言把双引号字符（<code><nowiki>"</nowiki></code>）用作字符串的分界符。反斜线（<code><nowiki>\</nowiki></code>）转义字符提供了两种方式来把双引号字符置入字符串中，或者是使用转义序列<code><nowiki>\"</nowiki></code>表示单个的<code><nowiki>"</nowiki></code>字符本身，而不是作为字符串分界符；或者是直接开始字符<code><nowiki>"</nowiki></code>的16进制编码值的转义序列<code><nowiki>\x22</nowiki></code>来表示<code><nowiki>"</nowiki></code>。也可以使用8进制编码值的转义序列，如<code><nowiki>\042</nowiki></code>。
+
+在[[Perl|Perl]]或者[[Python|Python]]程序设计语言中
+:<!-- 在python 3中，由于print代码已从一个关键字变为一个函数，所以在python 3中，以下代码不再有效。 --><syntaxhighlight lang="perl">
+print "Nancy said "Hello World!" to the crowd.";
+</syntaxhighlight>
+将产生语法错误。而
+: <syntaxhighlight lang="perl">
+print "Nancy said \"Hello World!\" to the crowd.";  ### example of \"
+</syntaxhighlight>
+将产生期望的输出结果。
+另一种可选择的办法是：
+: <syntaxhighlight lang="perl">
+print "Nancy said \x22Hello World!\x22 to them.";  ### example of \x22
+</syntaxhighlight>
+使用双引号字符编码值的十六进制"x22"转义字符序列。但是，如果其运行在非[[ASCII|ASCII]]计算机上，将不会产生预期的结果。
+
+[[C语言|C语言]]、[[C++|C++]]、[[Java|Java]]语言都具有上述两种反斜线转义字符的用法。[[PostScript|PostScript]]语言与微软的[[RTF|Rich Text Format]]也使用反斜线转义字符。[[quoted-printable|quoted-printable]]编码使用等号（<code><nowiki>=</nowiki></code>）作为转义字符。
+
+[[URL|URL]]与[[URI|URI]]使用[[%|%]]-[[百分号编码|转码]]来表示特殊字符，例如非ASCII字符。[[SGML|SGML]]及其派生的[[HTML|HTML]]与[[XML|XML]]使用[[&|&]]字符作为[[字符编码引用|字符编码引用]]的转义字符。
+
+===通信协议===
+在[[点对点协议|点对点协议]]中，<code><nowiki>0x7D</nowiki></code>被用作转义字符。
+
+===Bourne shell===
+[[Bourne_shell|Bourne shell]]（sh）中，[[*|*]]字符与[[?|?]]字符是[[通配符|通配符]]。如果没有前导的转义字符，<code><nowiki>*</nowiki></code>将扩展为工作目录下的所有不是点符号（<code><nowiki>.</nowiki></code>）开头的文件名。因此，如果想引用一个文件名就叫做"*"的文件，必须避免文件名扩展开，就得在它的前面加上转义字符反斜线（<code><nowiki>\</nowiki></code>）。比较下列两个例子：
+{|
+|width="25px" | ||
+<syntaxhighlight lang="bash">
+rm *    # 删除当前目录下所有文件
+
+rm \*   # 删除名字叫做*的文件
+</syntaxhighlight>
+|}
+
+===Windows命令行===
+[[cmd.exe|Windows命令行终端]]使用[[^|^]]字符转义那些具有特殊含义的保留字符（如：<code><nowiki>& | ( ) < > ^</nowiki></code>）。<ref>{{cite web |url=http://technet.microsoft.com/en-us/library/cc723564.aspx |title=The Windows NT Command Shell |author=Tim Hill |year=1998 |publisher=MacMillan Technical Publishing |accessdate=2010-01-13 |archive-date=2017-09-03 |archive-url=https://web.archive.org/web/20170903235342/https://technet.microsoft.com/en-us/library/cc723564.aspx |dead-url=no }}</ref>  [[COMMAND.COM|DOS命令行终端]]并不支持这一转录。
+
+例如，Windows命令行终端中输入这一命令将会产生错误
+: <syntaxhighlight lang="dos">
+echo <wiki>
+</syntaxhighlight>
+
+但下述输入将产生正确的期望结果：<code><nowiki><wiki></nowiki></code>
+: <syntaxhighlight lang="dos">
+echo ^<wiki^>
+</syntaxhighlight>
+
+===其它===
+* [[Quoted-printable|Quoted-printable]]，把8比特数据编码为7比特有限行长的数据，使用[[=|=]]作为转义字符。
+
+==参见==
+* [[倾斜牙签综合征|倾斜牙签综合征]]
+
+==参考文献==
+<references/>
+
+==外部链接==
+*[http://codecodex.com/wiki/Escape_sequences_and_escape_characters Escape characters in 9 languages] {{Wayback|url=http://codecodex.com/wiki/Escape_sequences_and_escape_characters |date=20090716174310 }}
+*[https://web.archive.org/web/20120207054444/http://www.trailing-edge.com/~bobbemer/ESCAPE.HTM That Powerful ESCAPE Character -- Key and Sequences] – Bob Bemer
+
+[[Category:控制字符|Category:控制字符]]

@@ -1,0 +1,148 @@
+{{noteTA|G1=IT}}
+{{Infobox_Software
+| name = Redis
+| logo = 
+| caption = 
+| developer = {{link-en|Salvatore Sanfilippo}}
+| released = {{Start date and age|2009|05|10}}
+| latest release version = {{LSR/wikidata}}
+| programming language = [[ANSI_C|ANSI C]]
+| operating_system = [[跨平台|跨平台]]
+| language = [[英语|英语]]
+| genre = [[非关系型数据库|非关系型数据库]]
+| license = [[BSD许可证|BSD]]
+}}
+
+'''Redis'''是一个使用[[ANSI_C|ANSI C]]编写的[[开源|开源]]、支持[[电脑网络|网络]]、基于[[内存|内存]]、[[分布式缓存|分布式]]、可选[[持久性|持久性]]的[[键值-值数据库|键值对存储数据库]]。从2015年6月开始，Redis的开发由{{tsl|en|Redis Labs}}赞助，而2013年5月至2015年6月期间，其开发由[[Pivotal|Pivotal]]赞助。<ref>{{Cite web |url=http://redis.io/topics/sponsors |title=Redis Sponsors – Redis |accessdate=2014-07-11 |archive-date=2014-06-25 |archive-url=https://web.archive.org/web/20140625052000/http://redis.io/topics/sponsors |dead-url=no }}</ref>在2013年5月之前，其开发由[[VMware|VMware]]赞助。<ref>{{Cite web |url=http://antirez.com/post/vmware-the-new-redis-home.html |title=VMware: the new Redis home |accessdate=2011-02-15 |archive-date=2010-03-22 |archive-url=https://web.archive.org/web/20100322191235/http://antirez.com/post/vmware-the-new-redis-home.html |dead-url=no }}</ref><ref>{{Cite web |url=http://blogs.vmware.com/console/2010/03/vmware-hires-key-developer-for-redis.html |title=VMWare: The Console: VMware hires key developer for Redis |accessdate=2011-02-15 |archive-date=2010-03-22 |archive-url=https://web.archive.org/web/20100322191425/http://blogs.vmware.com/console/2010/03/vmware-hires-key-developer-for-redis.html |dead-url=no }}</ref>根据月度排行网站DB-Engines.com的数据，Redis是最流行的键值对存储数据库。<ref>{{Cite web |url=http://db-engines.com/en/ranking/key-value+store |title=DB-Engines Ranking of Key-value Stores |accessdate=2013-06-29 |archive-date=2013-07-07 |archive-url=https://web.archive.org/web/20130707010933/http://db-engines.com/en/ranking/key-value+store |dead-url=yes }}</ref>
+
+== 支持语言 ==
+
+许多语言都包含Redis支持，包括：<ref>{{Cite web |url=http://redis.io/clients |title=Redis language bindings |access-date=2013-07-01 |archive-url=https://web.archive.org/web/20140208020400/http://redis.io/clients |archive-date=2014-02-08 |dead-url=yes }}</ref>
+
+{{Multicol}}
+* [[ActionScript|ActionScript]]
+* [[C语言|C]]
+* [[C++|C++]]
+* [[C_Sharp|C#]]
+* [[Clojure|Clojure]]
+{{Multicol-break}}
+* [[Common_Lisp|Common Lisp]]
+* [[Dart|Dart]]
+* [[Erlang语言|Erlang]]
+* [[Go语言|Go]]
+* [[Haskell语言|Haskell]]
+{{Multicol-break}}
+* [[Haxe|Haxe]]
+* [[Io语言|Io]]
+* [[Java语言|Java]]
+* [[Fibjs|Fibjs]]
+* [[Node.js|Node.js]]
+* [[Lua语言|Lua]]
+{{Multicol-break}}
+* [[Objective-C|Objective-C]]
+* [[Perl|Perl]]
+* [[PHP|PHP]]
+* [[Pure_Data|Pure Data]]
+* [[Python|Python]]
+{{Multicol-break}}
+* [[R语言|R]]<ref>{{Cite web |url=http://cran.r-project.org/web/packages/rredis/index.html |title=CRAN - Package rredis |accessdate=2013-07-01 |archive-date=2013-06-20 |archive-url=https://web.archive.org/web/20130620135831/http://cran.r-project.org/web/packages/rredis/index.html |dead-url=no }}</ref>
+* [[Ruby语言|Ruby]]
+* [[Scala语言|Scala]]
+* [[Smalltalk|Smalltalk]]
+* [[Tcl|Tcl]]
+{{Multicol-end}}
+===Python簡單範例===
+<syntaxhighlight lang="Python">
+# coding:utf-8
+import redis
+
+# lredis-server保持開啓狀態，如果在客戶端設定了密碼 添加password=密碼即可
+pool = redis.ConnectionPool(host='127.0.0.1', port=6379, db=0)
+r = redis.StrictRedis(connection_pool=pool)
+# 字符串
+r.set('test', 'aaa')
+print r.get('test')
+# 列表
+# 注意python、lrange兩個range的範圍
+x = 0
+for x in range(0, 11):
+    r.lpush('list', x)
+    x = x + 1
+print r.lrange('list', '0', '10')
+
+# 雜湊
+dict_hash = {'name': 'tang', 'password': 'tang_passwd'}
+r.hmset('hash_test', dict_hash)
+print r.hgetall('hash_test')
+
+# 集合
+r.sadd('set_test', 'aaa', 'bbb')
+r.sadd('set_test', 'ccc')
+r.sadd('set_test', 'ddd')
+print r.smembers('set_test')
+
+# 有序集
+r.zadd('zset_test', {'aaa': 1, 'bbb': 1})
+r.zadd('zset_test', {'ccc': 1})
+r.zadd('zset_test', {'ddd': 1})
+print r.zrange('zset_test', 0, 10)
+</syntaxhighlight>
+
+== 数据模型 ==
+
+Redis的外围由一个键、值映射的[[关联数组|字典]]构成。与其他[[非关系型数据库|非关系型数据库]]主要不同在于：Redis中值的类型不仅限于[[字符串|字符串]]，还支持如下抽象数据类型：
+
+* [[字符串|字符串]][[串列_(抽象資料型別)|列表]]
+* 无序不重复的[[字符串|字符串]][[集合_(抽象資料型別)|集合]]
+* 有序不重复的[[字符串|字符串]][[集合_(抽象資料型別)|集合]]
+* 键、值都为[[字符串|字符串]]的[[哈希表|哈希表]]
+
+值的类型决定了值本身支持的操作。Redis支持不同无序、有序的[[串列_(抽象資料型別)|列表]]，无序、有序的[[集合_(抽象資料型別)|集合]]间的交集、并集等高级服务器端原子操作。
+
+== 持久化 ==
+
+Redis通常将全部的数据存储在内存中。2.4版本后可配置为使用[[虚拟内存|虚拟内存]]，<ref>Redis documentation [http://redis.io/topics/virtual-memory "Virtual Memory"] {{Wayback|url=http://redis.io/topics/virtual-memory |date=20101224092847 }}, ''redis.io'', accessed January 18, 2011.</ref>一部分数据集存储在硬盘上，但这个特性废弃了。
+
+目前通过两种方式实现[[持久化|持久化]]：
+
+* 使用[[快照|快照]]，一种半持久耐用模式。不时的将数据集以异步方式从内存以RDB格式写入硬盘。
+* 1.1版本开始使用更安全的AOF格式替代，一种只能追加的日志类型。将数据集修改操作记录起来。Redis能够在后台对只可追加的记录进行修改，从而避免日志的無限增长。
+
+== 同步 ==
+
+Redis支持主从同步。数据可以从主服务器向任意数量的从服务器上同步，从服务器可以是关联其他从服务器的主服务器。这使得Redis可执行单层树复制。从盘可以有意无意的对数据进行写操作。由于完全实现了[[发布/订阅|发布/订阅]]机制，使得从数据库在任何地方同步树时，可订阅一个频道并接收主服务器完整的消息发布记录。同步对读取操作的可扩展性和数据冗余很有帮助。<ref>{{Cite web |url=http://code.google.com/p/redis/wiki/ReplicationHowto |title=ReplicationHowto - redis - A persistent key-value database with built-in net interface written in ANSI-C for Posix systems - Google Project Hosting |accessdate=2013-07-01 |archive-date=2013-05-29 |archive-url=https://web.archive.org/web/20130529024706/http://code.google.com/p/redis/wiki/ReplicationHowto |dead-url=no }}</ref>
+
+== 性能 ==
+
+当数据依赖不再需要，Redis这种基于内存的性质，与在执行一个事务时将每个变化都写入硬盘的数据库系统相比就显得执行效率非常高。<ref>{{cite web|title=FAQ|url=http://redis.io/topics/faq|accessdate=2013-07-01|archive-date=2013-07-16|archive-url=https://www.webcitation.org/6I9bg3Y3O?url=http://redis.io/topics/faq|dead-url=no}}</ref>写与读操作速度没有明显差别。
+
+== 参见 ==
+{{Portal|自由软件}}
+* [[Cassandra|Cassandra]]
+* [[Berkeley_DB|Berkeley DB]]
+* [[memcached|memcached]]
+* [[MongoDB|MongoDB]]
+* [[Solr|Solr]]
+* [[内存数据库|内存数据库]]
+* [[非关系型数据库|非关系型数据库]]
+
+== 参考资料 ==
+* Jeremy Zawodny, ''[http://www.linux-mag.com/cache/7496/1.html Redis: Lightweight key/value Store That Goes the Extra Mile]{{Wayback|url=http://www.linux-mag.com/cache/7496/1.html |date=20100628173505 }}'', [[Linux_Magazine|Linux Magazine]], August 31, 2009
+* Isabel Drost and Jan Lehnard（29 October 2009）,[http://www.h-online.com/open/features/Happenings-NoSQL-Conference-Berlin-843597.html Happenings: NoSQL Conference, Berlin]{{Wayback|url=http://www.h-online.com/open/features/Happenings-NoSQL-Conference-Berlin-843597.html |date=20110722110855 }}, [[The_H|The H]]. [http://nosqlberlin.de/slides/NoSQLBerlin-Redis.pdf Slides]{{Wayback|url=http://nosqlberlin.de/slides/NoSQLBerlin-Redis.pdf |date=20110719065756 }} for the Redis presentation. [http://www.paperplanes.de/2009/10/27/theres_something_about_redis.html Summary]{{Wayback|url=http://www.paperplanes.de/2009/10/27/theres_something_about_redis.html |date=20110707143601 }}.
+* Billy Newport（IBM）:"[http://www.infoq.com/presentations/newport-evolving-key-value-programming-model Evolving the Key/Value Programming Model to a Higher Level]{{Wayback|url=http://www.infoq.com/presentations/newport-evolving-key-value-programming-model |date=20110210120258 }}" Qcon Conference 2009 San Francisco.
+<references/>
+
+== 外部链接 ==
+* {{官网|http://redis.io/|Redis项目官网}}{{En}}
+* [https://web.archive.org/web/20110221132131/http://thechangelog.com/post/2801342864/episode-0-4-5-redis-with-salvatore-sanfilippo 对Salvatore Sanfillipo的播客采访]{{En}}
+* [https://web.archive.org/web/20121225104309/http://simonwillison.net/static/2010/redis-tutorial/ 由Simon Willison讲解的Redis真实应用场景教程]{{En}}
+* [https://web.archive.org/web/20111113064925/http://redis4you.com/code.php 使用PHP进行Redis开发的实例]{{En}}
+* [http://www.pagedegeek.com/2012/05/30/Ruby-Redis-scalabilite.html 使用Ruby进行Redis开发的实例]{{Wayback|url=http://www.pagedegeek.com/2012/05/30/Ruby-Redis-scalabilite.html |date=20130517010859 }}{{En}}
+
+{{NoSQL}}
+
+[[Category:开源数据库管理系统|Category:开源数据库管理系统]]
+[[Category:非关系型数据库|Category:非关系型数据库]]
+[[Category:自由软件|Category:自由软件]]
+[[Category:跨平台软件|Category:跨平台软件]]
+[[Category:键-值数据库|Category:键-值数据库]]

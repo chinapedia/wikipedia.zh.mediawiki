@@ -1,0 +1,116 @@
+{{NoteTA
+|T=zh-hans:智能指针; zh-hant:智慧指標;
+|G1=IT
+}}
+'''智能指针'''（{{lang-en|Smart pointer}}）是一種抽象的[[資料類型|資料類型]]。在程式設計中，它通常是經由[[模板_(C++)#类模板|类模板]]來實作，藉由[[模板_(C++)|模板]]來達成泛型，藉由[[类_(计算机科学)|類別]]的解構函數來達成自動釋放指標所指向的記憶體或物件。
+
+== C++中的智能指针 ==
+
+=== auto_ptr ===
+
+{{see|en:auto_ptr}}
+<code>auto_ptr</code>這個類別模板被定義在[[C++#.E6.A0.87.E5.87.86.E5.8C.96|ISO/IEC 14882]]的第20.4.5章節裡：
+<syntaxhighlight lang="cpp">
+namespace std {
+
+    template <class Y> struct auto_ptr_ref {};
+
+    template <class X>
+    class auto_ptr {
+    public:
+        typedef X element_type;
+
+        // 20.4.5.1 construct/copy/destroy:
+        explicit           auto_ptr(X* p =0)throw();
+                           auto_ptr(auto_ptr&)throw();
+        template <class Y> auto_ptr(auto_ptr<Y>&)throw();
+
+        auto_ptr&                      operator=(auto_ptr&)throw();
+        template <class Y> auto_ptr&   operator=(auto_ptr<Y>&)throw();
+        auto_ptr&                      operator=(auto_ptr_ref<X>)throw();
+
+        ~auto_ptr() throw();
+
+        // 20.4.5.2 members:
+        X&     operator*() const throw();
+        X*     operator->() const throw();
+        X*     get() const throw();
+        X*     release() throw();
+        void   reset(X* p =0)throw();
+
+        // 20.4.5.3 conversions:
+        auto_ptr(auto_ptr_ref<X>)throw();
+        template <class Y> operator auto_ptr_ref<Y>() throw();
+        template <class Y> operator auto_ptr<Y>() throw();
+    };
+
+}
+</syntaxhighlight>
+
+=== unique_ptr ===
+
+[[C++11|C++11]]中提供了{{code|std::unique_ptr}}，定义在{{code|<memory>}}头文件中。
+
+C++11新增了move语义，相比copy语义，它能更好的实现值传递.{{code|std::auto_ptr}}使用的是copy语义，为了[[向后兼容|向后兼容]],C++11没有修改std::auto_ptr，而是引入了新的使用move语义的{{code|std::unique_ptr}}.
+
+unique_ptr的拷贝构造函数和赋值运算符都声明为deleted，也就是说它不能被拷贝，只能通过{{code|std::move}}来转递它所指向的内存的所有权。
+
+<syntaxhighlight lang="cpp">
+std::unique_ptr<int> p1(new int(5));
+std::unique_ptr<int> p2 = p1; // 编译会出错
+std::unique_ptr<int> p3 = std::move (p1); // 转移所有权，现在那块内存归p3所有, p1成为无效的指针。
+
+p3.reset(); //释放内存。
+p1.reset(); //实际上什么都没做。
+</syntaxhighlight>
+
+{{code|std::auto_ptr}}依然存在，但在C++11中被标为"弃用".
+
+=== shared_ptr和weak_ptr ===
+
+基于[[Boost_C++_Libraries|Boost库]], C++11加入了{{code|shared_ptr}}和{{code|weak_ptr}}.它们最早在[[C++_Technical_Report_1#Smart_pointers|TR1]]中就被引入，但在C++11中，在Boost的基础上又加入了新的功能。
+
+{{code|std::shared_ptr}}使用[[引用计数|引用计数]]。每一个{{code|shared_ptr}}的拷贝都指向相同的内存。在最后一个{{code|shared_ptr}}析构的时候，内存才会被释放。
+
+<syntaxhighlight lang="cpp">
+std::shared_ptr<int> p1(new int(5));
+std::shared_ptr<int> p2 = p1; // 都指向同一内存。
+
+p1.reset(); // 因为p2还在，所以内存没有释放。
+p2.reset(); // 释放内存，因为没有shared_ptr指向那块内存了。
+</syntaxhighlight>
+
+{{code|std::shared_ptr}}使用引用计数，所以有[[循环计数|循环计数]]的问题。为了打破循环，可以使用{{code|std::weak_ptr}}.顾名思义, weak_ptr是一个弱引用，只引用，不计数。如果一块内存被shared_ptr和weak_ptr同时引用，当所有shared_ptr析构了之后，不管还有没有weak_ptr引用该内存，内存也会被释放。所以{{code|weak_ptr}}不保证它指向的内存一定是有效的，在使用之前需要检查。
+
+<syntaxhighlight lang="cpp">
+std::shared_ptr<int> p1(new int(5));
+std::weak_ptr<int> wp1 = p1; // 还是只有p1有所有权。
+
+{
+  std::shared_ptr<int> p2 = wp1.lock(); // p1和p2都有所有权
+  if (p2) // 使用前需要检查
+  { 
+    // 使用p2
+  }
+} // p2析构了，现在只有p1有所有权。
+
+p1.reset(); // 内存被释放。
+
+std::shared_ptr<int> p3 = wp1.lock(); // 因为内存已经被释放了，所以得到的是空指针。
+if（p3）
+{
+  // 不会执行到这。
+}
+</syntaxhighlight>
+
+==外部連結==
+*Sample chapter "[http://www.informit.com/articles/article.aspx?p=25264 Smart Pointers] {{Wayback|url=http://www.informit.com/articles/article.aspx?p=25264 |date=20110102005449 }}" from the book ''[http://www.moderncppdesign.com/ Modern C++ Design: Generic Programming and Design Patterns Applied] {{Wayback|url=http://www.moderncppdesign.com/ |date=20110202090959 }}'' by [[Andrei_Alexandrescu|Andrei Alexandrescu]], Addison-Wesley, 2001.
+*Code example "[http://www.josuttis.com/libbook/cont/countptr.hpp.html countptr.hpp] {{Wayback|url=http://www.josuttis.com/libbook/cont/countptr.hpp.html |date=20110423150418 }}" from the book ''[http://www.josuttis.com/libbook/ The C++ Standard Library - A Tutorial and Reference] {{Wayback|url=http://www.josuttis.com/libbook/ |date=20110323010809 }}'' by [[Nicolai_M._Josuttis|Nicolai M. Josuttis]]
+*"[http://boost.org/libs/smart_ptr/smart_ptr.htm Boost Smart Pointers] {{Wayback|url=http://boost.org/libs/smart_ptr/smart_ptr.htm |date=20080724032159 }}"
+*Article "[http://www.drdobbs.com/184403837/ The New C++: Smart (er) Pointers] {{Wayback|url=http://www.drdobbs.com/184403837/ |date=20110914213110 }}" by [[Herb_Sutter|Herb Sutter]] August 01, 2002
+*"[http://ootips.org/yonat/4dev/smart-pointers.html Smart Pointers - What, Why, Which?] {{Wayback|url=http://ootips.org/yonat/4dev/smart-pointers.html |date=20110613084907 }}" by [[Yonat_Sharon|Yonat Sharon]]
+*"[http://dlugosz.com/Repertoire/refman/Classics/Smart%20Pointers%20Overview.html Smart Pointers Overview] {{Wayback|url=http://dlugosz.com/Repertoire/refman/Classics/Smart%20Pointers%20Overview.html |date=20110710140852 }}" by [[John_M._Dlugosz|John M. Dlugosz]]
+* The [http://yasper.sourceforge.net/ YASPER library] {{Wayback|url=http://yasper.sourceforge.net/ |date=20110513193350 }} Yet Another Smart Pointer implementation in C++
+* [http://barrkel.blogspot.com/2008/09/smart-pointers-in-delphi.html Smart Pointers in Delphi] {{Wayback|url=http://barrkel.blogspot.com/2008/09/smart-pointers-in-delphi.html |date=20081106143659 }}
+
+[[Category:数据类型|Category:数据类型]]

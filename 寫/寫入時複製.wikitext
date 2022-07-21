@@ -1,0 +1,27 @@
+{{noteTA
+|G1=IT
+}}
+
+'''寫入時複製'''（{{lang-en|'''Copy-on-write'''}}，简称'''COW'''）是一种计算机[[程式設計|程式設計]]領域的优化策略。其核心思想是，如果有多個呼叫者（callers）同時请求相同資源（如内存或磁盘上的数据存储），他們會共同取得相同的指標指向相同的資源，直到某個呼叫者试图修改資源的内容時，系統才會真正複製一份专用副本（private copy）給該呼叫者，而其他呼叫者所见到的最初的资源仍然保持不变。這過程對其他的呼叫者都是{{tsl|en|Transparency (human–computer interaction)|透明}}的。此作法主要的優點是如果呼叫者沒有修改該資源，就不會有副本（private copy）被建立，因此多个呼叫者只是读取操作时可以共享同一份资源。
+
+== 应用 ==
+
+=== 虚拟内存管理中的写时复制 ===
+
+一般把这种被共享访问的页面标记为只读。当一个task试图向内存中写入数据时，[[内存管理单元|内存管理单元]]（MMU）抛出一个异常，内核处理该异常时为该task分配一份物理内存并复制数据到此内存，重新向MMU发出执行该task的写操作。
+
+=== 数据存储中的写时复制 ===
+
+[[Linux|Linux]]等的文件管理系统使用了写时复制策略。
+
+[[数据库|数据库]]服务器也一般采用了写时复制策略，为用户提供一份snapshot。
+
+=== 软件应用中的写时复制 ===
+
+[[C++标准程序库|C++标准程序库]]中的[[string_(C++标准库)|std::string]]类，在C++98/C++03标准中是允许写时复制策略。但在[[C++11|C++11]]标准中为了提高并行性取消了这一策略。<ref>{{cite web|title=Concurrency Modifications to Basic String|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2534.html|website=Open Standards|accessdate=2015-02-13|archive-date=2021-02-24|archive-url=https://web.archive.org/web/20210224213602/http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2534.html|dead-url=no}}</ref> GCC从版本5开始，std::string不再采用COW策略。
+
+== 参考文献 ==
+
+{{Reflist}}
+
+[[Category:计算机编程|Category:计算机编程]]

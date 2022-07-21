@@ -1,0 +1,210 @@
+{{NoteTA
+|G1=IT
+|G2=Communication
+|1 =zh-tw:交握; zh-cn:握手; 
+|2 =zh-tw:埠; zh-cn:端口;
+|3 =zh-cn:HTTP来源地址; zh-tw:HTTP參照位址
+}}
+
+{{update|time=2018-08-11T15:22:51+00:00}}
+
+'''WebSocket'''是一种[[网络传输协议|网络传输协议]]，可在单个[[传输控制协议|TCP]]连接上进行[[全双工|全双工]]通信，位于[[OSI模型|OSI模型]]的[[应用层|应用层]]。WebSocket协议在2011年由[[互联网工程任务组|IETF]]标准化为-{}-RFC 6455，后由-{}-RFC 7936-{}-补充规范。{{Link-en|Web IDL}}中的WebSocket API由[[万维网联盟|W3C]]标准化。
+
+WebSocket使得客户端和服务器之间的数据交换变得更加简单，允许服务端主动向客户端推送数据。在WebSocket API中，浏览器和服务器只需要完成一次握手，两者之间就可以建立持久性的连接，并进行双向数据传输。
+
+== 简介 ==
+WebSocket是一种与[[超文本传输协议|HTTP]]不同的协议。两者都位于[[OSI模型|OSI模型]]的[[应用层|应用层]]，并且都依赖于[[传输层|传输层]]的TCP协议。
+虽然它们不同，但是RFC 6455中规定：<code>it is designed to work over HTTP ports 80 and 443 as well as to support HTTP proxies and intermediaries</code>（WebSocket通过HTTP端口80和443进行工作，并支持HTTP代理和中介），从而使其与HTTP协议兼容。
+为了实现兼容性，WebSocket握手使用HTTP Upgrade头<ref>{{Cite IETF |title=RFC 6455 The WebSocket Protocol |publisher = [[Internet_Engineering_Task_Force|IETF]] |section=1.7 |sectionname=Relationship to TCP and HTTP |rfc=6455 |date=December 2011|author1=Ian Fette |author2=Alexey Melnikov}}</ref>从HTTP协议更改为WebSocket协议。
+
+WebSocket协议支持Web[[浏览器|浏览器]]（或其他客户端应用程序）与Web[[服务器|服务器]]之间的交互，具有较低的开销，便于实现客户端与服务器的实时数据传输。
+服务器可以通过标准化的方式来实现，而无需客户端首先请求内容，并允许消息在保持连接打开的同时来回传递。通过这种方式，可以在客户端和服务器之间进行双向持续对话。
+通信通过TCP端口80或443完成，这在防火墙阻止非Web网络连接的环境下是有益的。另外，[[Comet_(web技术)|Comet]]之类的技术以非标准化的方式实现了类似的双向通信。
+
+大多数浏览器都支持该协议，包括[[Google_Chrome|Google Chrome]]、[[Firefox|Firefox]]、[[Safari|Safari]]、[[Microsoft_Edge|Microsoft Edge]]、[[Internet_Explorer|Internet Explorer]]和[[Opera瀏覽器|Opera]]。
+
+与HTTP不同，WebSocket提供全双工通信。<ref>{{cite web|url=https://developer.mozilla.org/en-US/docs/Glossary/WebSockets|publisher=Mozilla Developer Network|date=2015|title=Glossary:WebSockets|accessdate=2019-05-09|archive-date=2016-09-14|archive-url=https://web.archive.org/web/20160914003950/https://developer.mozilla.org/en-US/docs/Glossary/WebSockets|dead-url=no}}</ref><ref name=quantum>{{Cite web |url=http://www.websocket.org/quantum.html |title=HTML5 WebSocket: A Quantum Leap in Scalability for the Web |access-date=2019-05-09 |archive-date=2021-04-01 |archive-url=https://web.archive.org/web/20210401044556/http://www.websocket.org/quantum.html }}</ref>此外，WebSocket还可以在TCP之上实现消息流。TCP单独处理字节流，没有固有的消息概念。
+在WebSocket之前，使用Comet可以实现全双工通信。但是Comet存在TCP握手和HTTP头的开销，因此对于小消息来说效率很低。WebSocket协议旨在解决这些问题。
+
+WebSocket协议规范将<code>ws</code>（WebSocket）和<code>wss</code>（WebSocket Secure）定义为两个新的[[统一资源标识符|统一资源标识符]]（URI）方案<ref>{{cite web |url=https://www.iana.org/assignments/uri-schemes.html |title=IANA Uniform Resource Identifer (URI) Schemes |publisher=[[Internet_Assigned_Numbers_Authority|Internet Assigned Numbers Authority]] |date=2011-11-14 |accessdate=2011-12-10 |editor=Graham Klyne |archive-date=2013-04-25 |archive-url=https://web.archive.org/web/20130425164755/http://www.iana.org/assignments/uri-schemes.html |dead-url=no }}</ref>，分别对应明文和加密连接。除了方案名称和片段ID（不支持<code>#</code>）之外，其余的URI组件都被定义为此URI的通用语法。<ref>{{Cite IETF |title=RFC 6455 The WebSocket Protocol|publisher = [[Internet_Engineering_Task_Force|IETF]] |section=3|sectionname=WebSocket URIs |rfc=6455|date=December 2011|author1=Ian Fette|author2=Alexey Melnikov}}</ref>
+
+使用浏览器开发人员工具，开发人员可以检查WebSocket握手以及WebSocket框架。<ref>{{cite book |last1=Wang |first1=Vanessa |last2=Salim |first2=Frank |last3=Moskovits |first3=Peter |title=The Definitive Guide to HTML5 WebSocket |chapter-url=http://my.safaribooksonline.com/book/-/9781430247401/appendix-a-inspecting-websocket-traffic/sec1_xhtml |accessdate=7 April 2013 |date=February 2013 |publisher=Apress |isbn=978-1-4302-4740-1 |chapter=APPENDIX A: WebSocket Frame Inspection with Google Chrome Developer Tools |archive-date=2015-12-31 |archive-url=https://web.archive.org/web/20151231184436/http://my.safaribooksonline.com/book/-/9781430247401/appendix-a-inspecting-websocket-traffic/sec1_xhtml |dead-url=no }}</ref>
+
+== 历史 ==
+WebSocket最初在[[HTML5|HTML5]]规范中被引用为TCPConnection，作为基于TCP的套接字API的占位符。<ref>{{Cite web|url=https://www.w3.org/TR/2008/WD-html5-20080610/comms.html#tcp-connections|title=HTML 5|website=www.w3.org|access-date=2016-04-17|archive-date=2016-09-16|archive-url=https://web.archive.org/web/20160916071246/http://www.w3.org/TR/2008/WD-html5-20080610/comms.html#tcp-connections|dead-url=no}}</ref>2008年6月，{{Link-en|Michael Carter|Michael Carter (entrepreneur)}}进行了一系列讨论，最终形成了称为WebSocket的协议。<ref>{{Cite web|url=https://lists.w3.org/Archives/Public/public-whatwg-archive/2008Jun/0165.html|title=[whatwg] TCPConnection feedback from Michael Carter on 2008-06-18 (whatwg.org from June 2008)|website=lists.w3.org|access-date=2016-04-17|archive-date=2016-04-27|archive-url=https://web.archive.org/web/20160427004936/https://lists.w3.org/Archives/Public/public-whatwg-archive/2008Jun/0165.html|dead-url=no}}</ref>
+
+“WebSocket”这个名字是Ian Hickson和Michael Carter之后在 #whatwg [[IRC|IRC]]聊天室创造的<ref>{{Cite web|url=http://krijnhoetmer.nl/irc-logs/whatwg/20080618#l-1145|title=IRC logs: freenode / #whatwg / 20080618|website=krijnhoetmer.nl|access-date=2016-04-18|archive-date=2016-08-21|archive-url=https://web.archive.org/web/20160821040755/http://krijnhoetmer.nl/irc-logs/whatwg/20080618#l-1145|dead-url=no}}</ref>，随后由Ian Hickson撰写并列入HTML5规范，并在Michael Carter的Cometdaily博客上宣布<ref>{{Cite web|url=http://cometdaily.com/2008/07/04/html5-websocket/|title=Comet Daily » Blog Archive » Independence Day: HTML5 WebSocket Liberates Comet From Hacks|access-date=2016-04-17|archive-url=https://web.archive.org/web/20160423091932/http://cometdaily.com/2008/07/04/html5-websocket/|archive-date=2016-04-23|dead-url=yes}}</ref>。
+2009年12月，Google Chrome 4是第一个提供标准支持的浏览器，默认情况下启用了WebSocket。<ref>{{Cite web|url=https://blog.chromium.org/2009/12/web-sockets-now-available-in-google.html|title=Web Sockets Now Available In Google Chrome|website=Chromium Blog|language=en-US|access-date=2016-04-17|archive-date=2021-12-09|archive-url=https://web.archive.org/web/20211209195505/https://blog.chromium.org/2009/12/web-sockets-now-available-in-google.html}}</ref>WebSocket协议的开发随后于2010年2月从W3C和WHATWG小组转移到IETF，并在Ian Hickson的指导下进行了两次修订。<ref>{{Cite web|url=https://tools.ietf.org/html/draft-hixie-thewebsocketprotocol-75|title=The WebSocket protocol|last=<ian@hixie.ch>|first=Ian Hickson|website=tools.ietf.org|access-date=2016-04-17|archive-date=2017-03-17|archive-url=https://web.archive.org/web/20170317201023/https://tools.ietf.org/html/draft-hixie-thewebsocketprotocol-75|dead-url=no}}</ref>
+
+该协议被多个浏览器默认支持并启用后，[[RFC|RFC]]于2011年12月在Ian Fette下完成。<ref>{{Cite web|url=https://tools.ietf.org/html/rfc6455|title=The WebSocket protocol|last=<ian@hixie.ch>|first=Ian Hickson|website=tools.ietf.org|access-date=2016-04-17|archive-date=2017-03-06|archive-url=https://web.archive.org/web/20170306081618/https://tools.ietf.org/html/rfc6455|dead-url=no}}</ref>
+
+== 背景 ==
+早期，很多网站为了实现[[推送技术|推送技术]]，所用的技术都是[[轮询|轮询]]。轮询是指由浏览器每隔一段时间（如每秒）向服务器发出HTTP请求，然后服务器返回最新的数据给客户端。这种传统的模式带来很明显的缺点，即浏览器需要不断的向服务器发出请求，然而HTTP请求与回复可能会包含较长的[[HTTP头字段|头部]]，其中真正有效的数据可能只是很小的一部分，所以这样会消耗很多带宽资源。
+
+比较新的轮询技术是[[Comet_(web技术)|Comet]]。这种技术虽然可以实现双向通信，但仍然需要反复发出请求。而且在Comet中普遍采用的[[HTTP持久链接|HTTP长连接]]也会消耗服务器资源。
+
+在这种情况下，[[HTML5|HTML5]]定义了WebSocket协议，能更好的节省服务器资源和带宽，并且能够更实时地进行通讯。
+
+Websocket使用<code>ws</code>或<code>wss</code>的[[统一资源标志符|统一资源标志符]]（URI）。其中<code>wss</code>表示使用了[[TLS|TLS]]的Websocket。如：
+<pre>
+ws://example.com/wsapi
+wss://secure.example.com/wsapi
+</pre>
+
+Websocket与HTTP和HTTPS使用相同的TCP[[TCP/UDP端口列表|端口]]，可以绕过大多数[[防火墙|防火墙]]的限制。默认情况下，Websocket协议使用80端口；运行在TLS之上时，默认使用443端口。
+
+== 优点 ==
+
+* 较少的控制开销。在连接建立后，服务器和客户端之间交换数据时，用于协议控制的数据包头部相对较小。在不包含扩展的情况下，对于服务器到客户端的内容，此头部大小只有2至10[[字节|字节]]（和数据包长度有关）；对于客户端到服务器的内容，此头部还需要加上额外的4字节的[[掩码|掩码]]。相对于HTTP请求每次都要携带完整的头部，此项开销显著减少了。
+
+* 更强的实时性。由于协议是全双工的，所以服务器可以随时主动给客户端下发数据。相对于HTTP请求需要等待客户端发起请求服务端才能响应，延迟明显更少；即使是和Comet等类似的[[长轮询|长轮询]]比较，其也能在短时间内更多次地传递数据。
+
+* 保持连接状态。与HTTP不同的是，Websocket需要先建立连接，这就使得其成为一种有状态的协议，之后通信时可以省略部分状态信息。而HTTP请求可能需要在每个请求都携带状态信息（如身份认证等）。
+
+* 更好的二进制支持。Websocket定义了[[二进制|二进制]]帧，相对HTTP，可以更轻松地处理二进制内容。
+
+* 可以支持扩展。Websocket定义了扩展，用户可以扩展协议、实现部分自定义的子协议。如部分浏览器支持[[数据压缩|压缩]]等。
+
+* 更好的压缩效果。相对于[[HTTP压缩|HTTP压缩]]，Websocket在适当的扩展支持下，可以沿用之前内容的[[上下文|上下文]]，在传递类似的数据时，可以显著地提高压缩率。<ref>{{Cite web |url=https://tools.ietf.org/html/rfc7692 |title=存档副本 |access-date=2017-01-17 |archive-date=2020-11-11 |archive-url=https://web.archive.org/web/20201111215614/https://tools.ietf.org/html/rfc7692 }}</ref>
+
+== 握手协议 ==
+
+WebSocket 是独立的、建立在TCP上的协议。
+
+Websocket 通过 [[HTTP|HTTP]]/1.1 协议的101[[HTTP状态码|状态码]]进行握手。
+
+为了建立Websocket连接，需要通过浏览器发出请求，之后服务器进行回应，这个过程通常称为“[[握手_(技术)|握手]]”（Handshaking）。
+
+=== 例子 ===
+
+一个典型的Websocket握手请求如下<ref>{{Cite web |url=https://tools.ietf.org/html/rfc6455#section-1.2 |title=存档副本 |accessdate=2019-05-09 |archive-date=2017-03-06 |archive-url=https://web.archive.org/web/20170306081618/https://tools.ietf.org/html/rfc6455#section-1.2 |dead-url=no }}</ref>：
+
+客户端请求：
+<pre>
+GET /chat HTTP/1.1
+Host: server.example.com
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==
+Origin: http://example.com
+Sec-WebSocket-Protocol: chat, superchat
+Sec-WebSocket-Version: 13
+</pre>
+
+服务器回应：
+<pre>
+HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=
+Sec-WebSocket-Protocol: chat
+</pre>
+
+=== 字段说明 ===
+
+* Connection必须设置Upgrade，表示客户端希望连接升级。
+* Upgrade字段必须设置Websocket，表示希望升级到Websocket协议。
+* Sec-WebSocket-Key是随机的字符串，服务器端会用这些数据来构造出一个SHA-1的信息摘要。把“Sec-WebSocket-Key”加上一个特殊字符串“258EAFA5-E914-47DA-95CA-C5AB0DC85B11”，然后计算[[SHA-1|SHA-1]]摘要，之后进行[[Base64|Base64]]编码，将结果做为“Sec-WebSocket-Accept”头的值，返回给客户端。如此操作，可以尽量避免普通HTTP请求被误认为Websocket协议。
+* Sec-WebSocket-Version 表示支持的Websocket版本。RFC6455要求使用的版本是13，之前草案的版本均应当弃用。
+* Origin字段是必须的。如果缺少origin字段，WebSocket服务器需要回复HTTP 403 状态码（禁止访问）。<ref>{{cite web|url=https://tools.ietf.org/html/rfc6455|quote=Servers that are not intended to process input from any web page but only for certain sites SHOULD verify the <nowiki>|Origin|</nowiki> field is an origin they expect.  If the origin indicated is unacceptable to the server, then it SHOULD respond to the WebSocket handshake with a reply containing HTTP 403 Forbidden status code.|title=RFC 6455 - The WebSocket Protocol|website=IETF Tools|access-date=2019-05-09|archive-date=2017-03-06|archive-url=https://web.archive.org/web/20170306081618/https://tools.ietf.org/html/rfc6455}}</ref>
+* 其他一些定义在HTTP协议中的字段，如[[Cookie|Cookie]]等，也可以在Websocket中使用。
+
+== 浏览器支持 ==
+WebSocket协议的安全版本在Firefox 6<ref>{{cite web | url=https://developer.mozilla.org/en/WebSockets | title=WebSocket enabled in Firefox 6 | author=Dirkjan Ochtman | date=May 27, 2011 | work=Mozilla.org | accessdate=2011-06-30 | archive-date=2012-05-26 | archive-url=https://web.archive.org/web/20120526230019/https://developer.mozilla.org/en/WebSockets | dead-url=yes }}</ref>、Safari 6、Google Chrome 14<ref>{{cite web | url=https://www.chromium.org/developers/web-platform-status | title=Chromium Web Platform Status | accessdate=2011-08-03 | archive-date=2017-03-04 | archive-url=https://web.archive.org/web/20170304203008/http://www.chromium.org/developers/web-platform-status | dead-url=no }}</ref>、Opera 12.10和Internet Explorer 10中实现。<ref>{{cite web |url=https://msdn.microsoft.com/en-us/library/ie/hh673567(v=vs.85).aspx |title=WebSockets (Windows) |publisher=Microsoft |date=2012-09-28 |accessdate=2012-11-07 |archive-date=2015-03-25 |archive-url=https://web.archive.org/web/20150325091443/https://msdn.microsoft.com/en-us/library/ie/hh673567(v=vs.85).aspx |dead-url=no }}</ref>详细的协议测试套件报告<ref name="autobahn">{{cite web |url=http://autobahn.ws/testsuite/reports/clients/index.html |title=WebSockets Protocol Test Report |publisher=Tavendo.de |date=2011-10-27 |accessdate=2011-12-10 |archive-url=https://web.archive.org/web/20160922040928/http://autobahn.ws/testsuite/reports/clients/index.html |archive-date=2016-09-22 |dead-url=yes }}</ref>列出了这些浏览器与特定协议方面的一致性。
+
+Opera 11和Safari 5中实现了较旧的，不太安全的协议版本，以及iOS 4.2中的Safari移动版本。<ref>{{cite web | url=http://www.appleinsider.com/articles/10/11/23/apple_adds_accelerometer_websockets_support_to_safari_in_ios_4_2.html | title=Apple adds accelerometer, WebSockets support to Safari in iOS 4.2 | author=Katie Marsal | date=November 23, 2010 | work=AppleInsider.com | accessdate=2011-05-09 | archive-date=2013-07-17 | archive-url=https://www.webcitation.org/6IAlTod14?url=http://appleinsider.com/articles/10/11/23/apple_adds_accelerometer_websockets_support_to_safari_in_ios_4_2.html | dead-url=no }}</ref>OS7中的BlackBerry Browser实现了WebSockets。<ref>{{cite web |title=Web Sockets API |url=http://docs.blackberry.com/en/developers/deliverables/29271/Web_Sockets_support_1582781_11.jsp |publisher=[[BlackBerry_Limited|BlackBerry]] |accessdate=8 July 2011 |deadurl=yes |archiveurl=https://web.archive.org/web/20110610191150/http://docs.blackberry.com/en/developers/deliverables/29271/Web_Sockets_support_1582781_11.jsp |archivedate=2011-06-10 }}</ref>由于存在漏洞，它在Firefox 4和5<ref>{{cite web | url=https://hacks.mozilla.org/2010/12/websockets-disabled-in-firefox-4/ | title=WebSocket disabled in Firefox 4 | author=Chris Heilmann | date=December 8, 2010 | work=Hacks.Mozilla.org | accessdate=2011-05-09 | archive-date=2017-03-06 | archive-url=https://web.archive.org/web/20170306114251/https://hacks.mozilla.org/2010/12/websockets-disabled-in-firefox-4/ | dead-url=no }}</ref>以及Opera 11中被禁用。<ref>{{cite web | url=http://my.opera.com/chooseopera/blog/2010/12/10/regarding-websocket | title=Regarding WebSocket | author=Aleksander Aas | date=December 10, 2010 | work=My Opera Blog | accessdate=2011-05-09 | archiveurl=https://web.archive.org/web/20101215010748/http://my.opera.com/chooseopera/blog/2010/12/10/regarding-websocket | archivedate=2010-12-15 | dead-url=no }}</ref>
+
+所有最新的浏览器支持最新规范（RFC 6455）的WebSocket协议。一个详细的测试报告<ref name="autobahn"/>列出了这些浏览器支持的Websocket版本。
+{| class="wikitable"
+|+浏览器支持现状
+! 协议
+! 发布日期
+! IE
+! Firefox<ref>{{cite web |url=https://developer.mozilla.org/en/WebSockets |title=WebSockets (support in Firefox) |publisher=Developer.mozilla.org |date=2011-09-30 |accessdate=2011-12-10 |archive-date=2012-05-26 |archive-url=https://web.archive.org/web/20120526230019/https://developer.mozilla.org/en/WebSockets |dead-url=yes }}</ref>（个人电脑）
+! Firefox (Android)
+! Chrome（个人电脑，手机）
+! Safari（Mac, iOS）
+! Opera（个人电脑，手机）
+! Android浏览器
+|-
+! [http://tools.ietf.org/html/draft-hixie-thewebsocketprotocol-75 hixie-75] {{Wayback|url=http://tools.ietf.org/html/draft-hixie-thewebsocketprotocol-75 |date=20100608054358 }}
+| 2010年2月4日
+|
+|
+|
+| 4
+| 5.0.0
+|
+|
+|-
+! [http://tools.ietf.org/html/draft-hixie-thewebsocketprotocol-76 hixie-76] {{WebCite|url=https://www.webcitation.org/672gID58r?url=http://tools.ietf.org/html/draft-hixie-thewebsocketprotocol-76 |date=20120419140442 |dateformat=iso }}<br/>[http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-00 hybi-00] {{Wayback|url=http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-00 |date=20210420080750 }}
+| 2010年5月10日，<br/>2010年5月23日
+|
+| 4.0（已禁用）
+|
+| 6
+| 5.0.1
+| 11.00（已禁用）
+|
+|-
+! 7 [http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-07 hybi-07] {{WebCite|url=https://www.webcitation.org/672gIrE0E?url=http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-07 |date=20120419140452 |dateformat=iso }}
+| 2011年4月22日
+|
+| 6<ref>{{cite web |url=https://bugzilla.mozilla.org/show_bug.cgi?id=640003 |title=Bug 640003 - WebSockets - upgrade to ietf-06 |publisher=Bugzilla.mozilla.org |date= |accessdate=2011-12-10 |archive-date=2021-04-01 |archive-url=https://web.archive.org/web/20210401044535/https://bugzilla.mozilla.org/show_bug.cgi?id=640003 }}</ref><sup>1</sup>
+|
+|
+|
+|
+|
+|-
+! 8 [http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-10 hybi-10] {{Wayback|url=http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-10 |date=20210419085001 }}
+| 2011年7月11日
+|
+| 7<ref>[https://bugzilla.mozilla.org/show_bug.cgi?id=640003#c91 WebSockets - upgrade to ietf-07] {{Wayback|url=https://bugzilla.mozilla.org/show_bug.cgi?id=640003#c91 |date=20210401044535 }}></ref><sup>1</sup>
+| 7
+| 14<ref>{{cite web |url=http://code.google.com/p/chromium/issues/detail?id=64470 |title=Chromium bug 64470 |publisher=Code.google.com |date=2010-11-25 |accessdate=2011-12-10 |archive-date=2015-12-31 |archive-url=https://web.archive.org/web/20151231184436/https://code.google.com/p/chromium/issues/detail?id=64470 }}</ref>
+|
+|
+|
+|-
+! 13 RFC 6455
+| 2011年12月
+| 10<ref>{{cite web |url=http://blogs.msdn.com/b/ie/archive/2012/03/19/websockets-in-windows-consumer-preview.aspx |title=WebSockets in Windows Consumer Preview |publisher=IE Engineering Team |date=2012-03-19 |accessdate=2012-07-23 |archive-date=2012-08-07 |archive-url=https://web.archive.org/web/20120807040313/http://blogs.msdn.com/b/ie/archive/2012/03/19/websockets-in-windows-consumer-preview.aspx |dead-url=no }}</ref>
+| 11
+| 11
+| 16<ref>{{cite web |url=http://trac.webkit.org/changeset/97249 |title=WebKit Changeset 97247: WebSocket: Update WebSocket protocol to hybi-17 |publisher=Trac.webkit.org |date= |accessdate=2011-12-10 |archive-date=2015-12-31 |archive-url=https://web.archive.org/web/20151231184436/https://trac.webkit.org/changeset/97249 }}</ref>
+| 6
+| 12.10<ref>{{cite web |url=http://my.opera.com/ODIN/blog/2012/08/03/a-hot-opera-12-50-summer-time-snapshot |title=A hot Opera 12.50 summer-time snapshot |publisher=Opera Developer News |date= |accessdate=2012-08-03 |archiveurl=https://web.archive.org/web/20120805234006/http://my.opera.com/ODIN/blog/2012/08/03/a-hot-opera-12-50-summer-time-snapshot |archivedate=2012-08-05 |deadurl=yes }}</ref>
+| 4.4<ref>{{cite web |url=http://caniuse.com/#search=websocket |title=Compatibility tables for support of HTML5, CSS3, SVG and more in desktop and mobile browsers |publisher=caniuse.com |accessdate=2014-02-10 |archive-date=2017-04-08 |archive-url=https://web.archive.org/web/20170408034823/http://caniuse.com/#search=websocket |dead-url=no }}</ref>
+|}
+
+<sup>1</sup>基于Gecko 6–10版本的浏览器的WebSocket对象为“mozwebsocket”，<ref>{{cite web |url=https://developer.mozilla.org/en/WebSockets |title=WebSockets - MDN |publisher=Developer.mozilla.org |date=2011-09-30 |accessdate=2011-12-10 |archive-date=2012-05-26 |archive-url=https://web.archive.org/web/20120526230019/https://developer.mozilla.org/en/WebSockets |dead-url=yes }}</ref>需要添加额外的代码。
+
+== 服务器 ==
+
+在服务器方面，网上都有不同对websocket支持的服务器：
+
+* [[PHP|PHP]] - https://code.google.com/p/phpwebsocket/ {{Wayback|url=https://code.google.com/p/phpwebsocket/ |date=20160817155438 }}
+* [https://www.eclipse.org/jetty/ jetty] {{Wayback|url=https://www.eclipse.org/jetty/ |date=20220507053556 }}（版本7开始支持websocket）
+* [http://www.jboss.org/netty netty] {{Wayback|url=http://www.jboss.org/netty |date=20120704123731 }}
+* [[Ruby|Ruby]] - https://github.com/gimite/web-socket-ruby {{Wayback|url=https://github.com/gimite/web-socket-ruby |date=20210616172418 }}
+* [https://web.archive.org/web/20100923224709/http://www.kaazing.org/confluence/display/KAAZING/Home Kaazing]
+* [https://web.archive.org/web/20100710004503/http://tomcat.apache.org/ Tomcat]（7.0.27支持websocket，建议用tomcat8，7.0.27中的接口已经过时）
+* [http://www.oracle.com/us/products/middleware/cloud-app-foundation/weblogic/overview/index.html WebLogic] {{Wayback|url=http://www.oracle.com/us/products/middleware/cloud-app-foundation/weblogic/overview/index.html |date=20130116112432 }}（12.1.2開始支持）
+* [[Node.js|Node.js]] - https://github.com/Worlize/WebSocket-Node {{Wayback|url=https://github.com/Worlize/WebSocket-Node |date=20140802212629 }}     
+* Node.js - http://socket.io {{Wayback|url=http://socket.io/ |date=20160607092516 }}
+* [[Nginx|Nginx]]
+* [http://mojolicio.us/ mojolicious] {{Wayback|url=http://mojolicio.us/ |date=20151215233510 }}
+* [[Python|Python]] - https://github.com/abourget/gevent-socketio {{Wayback|url=https://github.com/abourget/gevent-socketio |date=20220510131024 }}
+* [https://github.com/stephenmcd/django-socketio Django] {{Wayback|url=https://github.com/stephenmcd/django-socketio |date=20210310022244 }}
+* erlang - https://github.com/ninenines/cowboy {{Wayback|url=https://github.com/ninenines/cowboy |date=20220508163945 }}
+== 参考资料 ==
+<references/>
+
+[[Category:網路術語|Category:網路術語]]
+[[Category:網站開發|Category:網站開發]]
+[[Category:Web_2.0|Category:Web 2.0]]
+[[Category:应用层协议|Category:应用层协议]]
+
+{{網頁技術與標準}}
+{{网页浏览器}}
