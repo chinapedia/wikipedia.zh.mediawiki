@@ -1,0 +1,1 @@
+#REDIRECT [[Template:User 正體偽基ID]]

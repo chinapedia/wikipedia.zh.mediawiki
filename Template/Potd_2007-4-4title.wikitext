@@ -1,0 +1,1 @@
+由哈伯太空望遠鏡拍攝的闊邊帽星系<noinclude>[[Category:每周图片模板]]</noinclude>

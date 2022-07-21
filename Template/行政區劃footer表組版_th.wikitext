@@ -1,0 +1,1 @@
+style="text-align:right;padding-right:0.25em;vertical-align:top;white-space:nowrap"

@@ -1,0 +1,92 @@
+{{RoughTranslation}}
+{{NoteTA
+|G1=IT
+|1=zh-cn:调试;zh-tw:偵錯}}
+'''JTAG'''是'''联合测试工作组（Joint Test Action Group）'''的简称，是在名为'''标准测试访问端口和边界扫描结构'''的[[电气电子工程师协会|IEEE]]的标准1149.1的常用名称。此标准用于驗證設計與測試生產出的印刷電路板功能。
+
+1990年JTAG正式由IEEE的1149.1-1990号文档标准化，在1994年，加入了补充文档对[[边界扫描描述语言|边界扫描描述语言]]（BSDL）进行了说明。从那时开始，这个标准被全球的电子企业广泛采用。边界扫描几乎成为了JTAG的同义词。
+
+在設計印刷電路版時，目前最主要用在測試[[積體電路|積體電路]]的副區塊，而且也提供一個在[[嵌入式系統|嵌入式系統]]很有用的偵錯機制，提供一個在系統中方便的"後門"。當使用一些偵錯工具像[[在线仿真器|電路內模擬器]]用JTAG當做訊號傳輸的機制，使得程式設計師可以經由JTAG去讀取整合在CPU上的偵錯模組。偵錯模組可以讓程式設計師偵錯[[嵌入式系統|嵌入式系統]]中的軟體。
+
+== 電氣特性 ==
+
+JTAG的介面是一種特殊的4/5個接腳介面連到晶片上 ，所以在電路版上的很多晶片可以將他們的JTAG接腳通过[[Daisy_Chain|Daisy Chain]]的方式連在一起，并且[[Probe|Probe]]只需连接到一个“JTAG端口”就可以访问一块[[印刷電路板|印刷電路板]]上的所有IC。这些连接引脚是：
+
+# TDI（测试数据输入）
+# TDO（测试数据输出）
+# TCK（测试时钟）
+# TMS（测试模式选择）
+# TRST（测试复位）可选。
+
+[[File:Jtag_chain.svg|center]]
+
+因为只有一条数据线，通信协议有必要像其他[[:Category:串行总线|串行设备接口]]，如[[序列周邊介面|SPI]]一样为串列傳輸。时钟由TCK引脚输入。配置是通过TMS引脚采用[[状态机|状态机]]的形式一次操作一位来实现的。每一位数据在每个TCK时钟脉冲下分别由TDI和TDO引脚传入或传出。可以通过加载不同的命令模式来读取芯片的标识，对输入引脚采样，驱动（或悬空）输出引脚，操控芯片功能，或者旁路（将TDI与TDO连通以在逻辑上短接多个芯片的链路）。TCK的工作频率依芯片的不同而不同，但其通常工作在10-100MHz（每位10-100ns）。
+
+当在集成电路中进行边界扫描时，被处理的信号是在同一块IC的不同功能模块间的，而不是不同IC之间的。
+
+TRST引脚是一个可选的相对待测逻辑低电平有效的复位开关——通常是异步的，但有时也是同步的，依芯片而定。如果该引脚没有定义，则待测逻辑可由同步时钟输入复位指令而复位。
+
+尽管如此，极少消费类产品提供外部的JTAG端口接口，但作为开发[[样品|样品]]的残留，这些接口在[[印刷电路板|印刷电路板]]上十分常见。在研发后，这些接口常常为[[反向工程|反向工程]]提供了非常良好的途径。
+[[File:Jtag_statechart.png|center]]
+
+== 常用的扩展 ==
+
+关于制造商的扩展：[[英飞凌|英飞凌]]，MIPS [https://web.archive.org/web/20060519130244/http://www.mips.com/content/Documentation/MIPSDocumentation/EJTAG/doclibrary EJTAG]，[[飞思卡尔|飞思卡尔]]COP, [[ARM架构|ARM]] ETM (Extended Trace Macrocell), OnCE etc.
+
+== 广泛的应用 ==
+
+* 几乎所有的[[嵌入式系统|嵌入式系统]]都具有JTAG端口。
+* [[PCI|PCI]]总线接口包含JTAG引脚。一种特殊的JTAG卡可以用来刷新被破坏了的[[BIOS|BIOS]]。
+
+== 客户端软件 ==
+可以通过使用一些支持JTAG的应用程序来访问JTAG接口。
+
+=== 免费软件 ===
+* [https://web.archive.org/web/20130317113331/http://ar7.wikispaces.com/JTAG Very cheap interface] working with the [https://web.archive.org/web/20070205205345/http://ciclamab.altervista.org/index_en.htm CICLaMaB] program
+* [https://web.archive.org/web/20050825005844/http://www.opencores.org/projects.cgi/web/jtag/overview OpenCores JTAG module]是一个[[IP核|IP核]]，它可为你的设计提供JTAG。它是[[OpenCores|OpenCores]]工程的一部分。
+* [http://urjtag.org/ UrJTAG] {{Wayback|url=http://urjtag.org/ |date=20210118135738 }}，born out of the [http://openwince.sourceforge.net/ openwince] {{Wayback|url=http://openwince.sourceforge.net/ |date=20201023011303 }} project's [http://openwince.sourceforge.net/jtag/ JTAG Tools] {{Wayback|url=http://openwince.sourceforge.net/jtag/ |date=20210202182008 }}，supports a large set of inexpensive [[IEEE_1284|IEEE 1284]] parallel printer port and USB JTAG cables
+* [http://jtag-arm9.sourceforge.net/ JTAG-ARM9] {{Wayback|url=http://jtag-arm9.sourceforge.net/ |date=20050405231603 }} provides a JTAG access program for the [[ARM_architecture|ARM9]] processor.
+* [https://web.archive.org/web/20060207141803/http://www.lart.tudelft.nl/projects/jtag/ JTAG for the LART] aimed at the LART processor
+* [https://web.archive.org/web/20060717073355/http://recycle.lbl.gov/~ldoolitt/jtag.html JTAG base layer] is an attempt at creating a JTAG library
+* The [[uCLinux|uCLinux]] for [[Blackfin|Blackfin]] project have a [https://web.archive.org/web/20060716115520/http://blackfin.uclinux.org/projects/jtag/ JTAG]-backend for the [[GNU除錯器|GNU Debugger]] and a version specifically for Blackfin based on the openwince work
+* [http://www.jtag.tk/ JTAG toolkit] {{Wayback|url=http://www.jtag.tk/ |date=20200911132455 }} is a free software JTAG tool suite, including API library and several examples
+* [https://web.archive.org/web/20060721094549/http://openocd.berlios.de/web/ OpenOCD] is an GPL Open Source [[GNU除錯器|GDB]] Server that currently supports ARM7 and some ARM9 Targets
+
+=== 私有软件 ===
+* [http://www.asset-intertech.com/ JTAG ScanWorks] {{Wayback|url=http://www.asset-intertech.com/ |date=20210114175653 }} JTAG development systems.
+* [http://www.asset-intertech.com/jtag_scanworks_dft_analyzer.html JTAG DFT Analysis] {{Wayback|url=http://www.asset-intertech.com/jtag_scanworks_dft_analyzer.html |date=20101101015451 }} JTAG Design for Test software.
+* [http://www.jtag.com/ JTAG Technologies] {{Wayback|url=http://www.jtag.com/ |date=20201126183944 }} Test and programming development systems.
+* [http://www.topjtag.com/probe/ TopJTAG Probe] {{Wayback|url=http://www.topjtag.com/probe/ |date=20201130051448 }} Interactive JTAG/boundary-scan software for circuit debugging and visualization.
+* [http://www.ghs.com/ Green Hills Software] {{Wayback|url=http://www.ghs.com/ |date=20210115094938 }} ''MULTI Debugger and Green Hills Probe'', Software and hardware supports JTAG and BDM based development on ARM, XScale, PowerPC, MIPS, ColdFire, Blackfin, ARC, TI C6000, v800, StarCore, SH, M32R, and LSI ZSP. 
+* [http://www.ronetix.at/ Ronetix] {{Wayback|url=http://www.ronetix.at/ |date=20201020083419 }} ''PEEDI'', JTAG Emulator and Flash Programmer for ARM7/9, XScale
+* [[Segger_Microcontroller_Systems|SEGGER Microcontroller Systeme GmbH]] ''j-link'', USB to JTAG interface for ARM cores（J-Flash, J-Mem, RDI Pro Bundle）
+* [http://www.segger-us.com/ SEGGER Microcontroller Systems LLC] {{Wayback|url=http://www.segger-us.com/ |date=20100201133333 }} ''j-trace'', a USB to Trace Mictor and JTAG interface for ARM cores
+* [[Lauterbach_Datentechnik_GmbH|Lauterbach Datentechnik GmbH]] produce JTAG-based in-circuit emulators the most popular being ''TRACE 32''
+* [http://www.macraigor.com/ Macraigor Systems LLC] {{Wayback|url=http://www.macraigor.com/ |date=20200209031534 }} JTAG Commander and OCD Commander
+* [https://web.archive.org/web/20060719221057/http://www.abatron.ch/ Abatron AG's] BDI-2000 acts as a GDB server on your LAN, giving you source-level debugging via JTAG.
+* [http://www.etoolsmiths.com/ JTAG Emulator Embedded Toolsmiths] {{Wayback|url=http://www.etoolsmiths.com/ |date=20201203195743 }} Guardian-SE JTAG Emulator connects a GDB server on your LAN to the JTAG interface on PowerPC, MIPS, XScale and Arm Processors. This allows: JTAG FLASH Programming, JTAG Emulation and JTAG source-level debugging via JTAG for PowerPC, MIPS, XScale and ARM Processors.
+* [http://www.xjtag.com/ XJTAG] {{Wayback|url=http://www.xjtag.com/ |date=20201204141012 }} Development System
+* [http://www.goepel.com/ Göpel electronic] {{Wayback|url=http://www.goepel.com/ |date=20210114175658 }} SCANFLEX
+* [http://www.corelis.com/ Corelis] {{Wayback|url=http://www.corelis.com/ |date=20210114175654 }} ScanExpress
+* [http://zykeji.taobao.com/ yaJFP] {{Wayback|url=http://zykeji.taobao.com/ |date=20120503210215 }} Zheyuan Technlogies
+
+== 外部链接 ==
+* [https://www.xjtag.com/zh-hans/about-jtag/what-is-jtag/ 什么是JTAG那么，我怎么样才能利用它呢？] {{Wayback|url=https://www.xjtag.com/zh-hans/about-jtag/what-is-jtag/ |date=20201125134620 }}
+* [http://www.asset-intertech.com/Products/Boundary-Scan-Test/BST-Software#BSTResources JTAG Tutorial] {{Wayback|url=http://www.asset-intertech.com/Products/Boundary-Scan-Test/BST-Software#BSTResources |date=20161010162249 }}关于JTAG或边界扫描的简介。
+* [https://web.archive.org/web/20061107220320/http://www.boundary-scan.co.uk/ JTAG/Boundary-scan explained]知识库以及工业连接。
+* [http://hri.sourceforge.net/tools/jtag_faq_org.html JTAG FAQ] {{Wayback|url=http://hri.sourceforge.net/tools/jtag_faq_org.html |date=20201215070506 }}
+* [https://web.archive.org/web/20060718050546/http://www.openjtag.net/wiki/ OpenJTAG Wiki]
+* [https://web.archive.org/web/20110713022446/http://www.inaccessnetworks.com/ian/projects/ianjtag/jtag-intro/jtag-intro.html JTAG边界扫描接口的一个简明介绍]
+* [http://focus.ti.com/docs/apps/catalog/resources/appnoteabstract.jhtml?abstractName=satb002a JTAG Scan Educator - Ver. 2 (Rev. A)] - 一个[[MS-DOS|DOS]]下的教学软件，JTAG Scan Educator，介绍了IEEE 1149.1边界扫描标准的基本情况，包括框架协议，以及所需的指令集。
+
+* [https://web.archive.org/web/20060720065507/http://www.k9spud.com/jtag/ K9JTAG] - 一个便宜的为ARM微控制器的JTAG调试器而自制的并行端口。
+* [http://www.siliconfareast.com/jtag.htm Boundary-Scan Testing/JTAG] {{Wayback|url=http://www.siliconfareast.com/jtag.htm |date=20200911132646 }} - www.SiliconFarEast.com
+* [http://www.segger.com/jlink.html Segger J-Link] {{Wayback|url=http://www.segger.com/jlink.html |date=20120722175924 }}（JTAG仿真器）
+* [https://web.archive.org/web/20060514194125/https://www.segger-us.com/jlink.html Segger-US J-Link]（JTAG仿真器）
+* [https://web.archive.org/web/20070311133130/http://www.circuitcellar.com/library/newproducts/180/segger.htm Circuit Cellar Article (''SOFTWARE BREAKPOINTS IN FLASH MEMORY FOR ARM MCUs'')]
+
+{{IEEE標準}}
+
+[[Category:IEEE标准|Category:IEEE标准]]
+[[Category:电子制造|Category:电子制造]]
+[[Category:嵌入式系统|Category:嵌入式系统]]

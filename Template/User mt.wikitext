@@ -1,0 +1,1 @@
+{{User language-N|mt|Dan il-user jitkellem il-'''[[:Category:mt 使用者|Malti]]''' bħala l-'''[[:Category:mt 母語使用者|ilsien nattiv]]''' tiegħu.|马耳他语}} <noinclude></noinclude>

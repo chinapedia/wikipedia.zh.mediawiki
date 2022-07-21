@@ -1,0 +1,1 @@
+{{User language-1|czhu|<small>Chí-kāi ēng-hõu ũ-lêng íⁿ '''[[:Category:Czhu-1 使用者|káng-tuan]]''' kāi '''[[:Category:Czhu 使用者|Tiê-chiu-uē]]''' kau-liû.</small><br />之個用戶有能用'''[[:Category:Czhu-1 使用者|簡單]]'''個'''[[:Category:Czhu 使用者|潮州話]]'''交流。|潮州話|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

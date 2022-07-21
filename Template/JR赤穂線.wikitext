@@ -1,0 +1,1 @@
+#REDIRECT [[Template:赤穗線]]

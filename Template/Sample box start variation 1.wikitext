@@ -1,0 +1,2 @@
+<div style="position:relative; float:left; clear:left; border:1px solid #CCC; background-color:white; font-size:85%; width:300px; margin:3px; margin-right: 0.5cm; padding:3px;">
+<div style="font-size:100%; font-weight:bold">{{{1}}}</div>

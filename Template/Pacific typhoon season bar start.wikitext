@@ -1,0 +1,5 @@
+<div style="clear: both"></div>
+<div style="margin:1em -1em"><div style="background-color: #EEEEEE; padding-bottom: 0.25em; padding-top: 0.25em; padding-left: 0.1em; padding-right: 1em; border-bottom: 1px solid #AAAAAA; border-top: 1px solid #AAAAAA"><table cellpadding="0" style="background-color: #EEEEEE; text-align: center; margin: auto;"><tr><td><center><b>[[{{{year}}}年太平洋颱風季]]的熱帶氣旋</b><span class="noprint plainlinksneverexpand"><small>（[{{fullurl:Template:{{{year}}} Pacific typhoon season buttons|action=edit}} <span style="#002bb8" title="編輯">編輯</span>]）</small></center><table cellpadding="0" cellspacing="0" style="background-color: #EEEEEE; text-align: center; font-size: 90%;"><tr><noinclude>
+[[Category:太平洋颱風模板|{{PAGENAME}}]]
+[[Category:太平洋颱風季導航模板|{{PAGENAME}}]]
+</noinclude>

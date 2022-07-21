@@ -1,0 +1,1 @@
+#REDIRECT [[Template:朝鮮半島朝代]]

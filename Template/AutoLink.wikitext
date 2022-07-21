@@ -1,0 +1,14 @@
+<includeonly><!--
+-->{{#ifexist:{{{1|}}}
+ |{{#if:{{{2|}}}
+  |[[{{{1}}}|{{{2}}}]]
+  |[[{{{1}}}]]
+ }}
+ |{{#if:{{{2|}}}
+  |{{{2}}}
+  |{{{1}}}
+ }}
+}}<!--
+--></includeonly><noinclude>
+{{Documentation}}
+</noinclude>

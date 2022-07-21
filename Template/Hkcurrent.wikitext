@@ -1,0 +1,1 @@
+#REDIRECT [[Template:HK_current]]

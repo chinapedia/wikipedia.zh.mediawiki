@@ -1,0 +1,9 @@
+{{Userbox
+  |id=直
+  |id-c=#CCCCFF
+  |info=這個用戶自認是'''[[直同志]]'''。<br>（對[[同性戀]]友善的[[異性戀]]）
+  |info-c=#fcf5ff
+  |info-s=10
+  |border-c=#333399
+}}<includeonly>[[Category:直同志使用者|{{PAGENAME}}]]</includeonly>
+<noinclude>[[Category:性用户框模板]]</noinclude>

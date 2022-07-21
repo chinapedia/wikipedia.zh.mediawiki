@@ -1,0 +1,6 @@
+{| id="anontalktext" class="plainlinks noeditsection" style="font-size:90%; background-color:#F8F8F8; border: 1px solid #B8B8B8; margin:1em 1em 0em 1em; padding:0.25em 1em 0.25em 1em; clear: both;" 
+| style="padding-right: 1em;" | [[File:Gtk-dialog-info.svg|40px]] || 這些是查IP用的網址。你可以使用<nowiki>{{checkIP}}</nowiki>語法加入你的用戶頁。 <br/>
+&#91;[http://www.dnsstuff.com/tools/ipall.ch?domain={{PAGENAMEE}} IP資訊] | [http://www.dnsstuff.com/tools/tracert.ch?ip={{PAGENAMEE}} Traceroute] | [http://www.dnsstuff.com/tools/whois.ch?ip={{PAGENAMEE}} WHOIS] | [http://www.dnsstuff.com/tools/whois.ch?server=whois.abuse.net&ip={{PAGENAMEE}} Abuse] | [http://www.dnsstuff.com/tools/city.ch?ip={{PAGENAMEE}} 所在城市] | [http://www.dnsstuff.com/tools/ptr.ch?ip={{PAGENAMEE}} 所屬網址]&#93; | &#91;查詢網段: [http://ws.arin.net/whois/?queryinput={{PAGENAMEE}} 美洲] | [http://www.ripe.net/fcgi-bin/whois?searchtext={{PAGENAMEE}} 歐洲] | [http://www.afrinic.net/cgi-bin/whois?query={{PAGENAMEE}} 非洲] | [http://www.apnic.net/apnic-bin/whois.pl?searchtext={{PAGENAMEE}} 亞洲] | [http://www.lacnic.net/cgi-bin/lacnic/whois?lg=EN&query={{PAGENAMEE}} 拉丁美洲]&#93;
+|}<noinclude>
+[[Category:外部资源模板|IP]]
+</noinclude>

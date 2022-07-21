@@ -1,0 +1,1 @@
+{{#if:{{{par_value|}}}|{{Chembox image base|File={{{par_value}}}|Size={{{par_size}}}|Alt={{{par_alt}}}|Caption={{{par_name}}}}}| }}<noinclude>{{Documentation}}</noinclude>

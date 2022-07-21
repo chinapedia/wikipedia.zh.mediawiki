@@ -1,0 +1,2 @@
+<includeonly>{{Image label |x={{{x|0}}} |y={{{y|0}}} |scale={{{scale|1}}} |text-align={{{text-align|}}} |background={{{background|}}} |color={{{color|}}} |text={{{text}}} |font-size=85% }}</includeonly><noinclude>[[Category:圖像模板]]
+</noinclude>

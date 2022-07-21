@@ -1,0 +1,1 @@
+[[医学主题词|醫學主題詞表（MeSH）]]：''[//www.nlm.nih.gov/cgi/mesh/{{{2|2011}}}/MB_cgi?mode=&term={{{1}}} {{{3|{{{1}}}}}}]''<noinclude>[[Category:外部资源模板|生物]]</noinclude>

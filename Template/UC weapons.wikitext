@@ -1,0 +1,1 @@
+#redirect[[Template:宇宙世紀]]

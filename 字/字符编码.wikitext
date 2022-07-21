@@ -1,0 +1,172 @@
+{{refimprove|time=2014-02-06T08:54:19+00:00}}
+{{NoteTA
+|G1=IT
+|1=zh-hans:字符;zh-hant:字元
+}}
+
+'''字符编码'''（{{lang-en|Character encoding}}）、'''字集碼'''是把'''字符集'''中的[[字符|字符]][[编码|编码]]为指定[[集合|集合]]中某一[[对象|对象]]（例如：[[比特|比特]]模式、[[自然数|自然数]][[序列|序列]]、[[8位元组|8位元组]]或者[[電磁波|电脉冲]]），以便[[文本|文本]]在[[计算机|计算机]]中存储和通过[[通信|通信]][[网络|网络]]的传递。常见的例子包括将[[拉丁字母|拉丁字母]]表编码成[[摩斯电码|摩斯电码]]和[[ASCII|ASCII]]。其中，[[ASCII|ASCII]]将字母、数字和其它符号[[編號|編號]]，並用7[[位元|位元]]的[[二进制|二进制]]來表示这个整数。通常會額外使用一个扩充的位元，以便于以1个[[字节|字节]]的方式存储。
+
+在计算机技术发展的早期，如[[ASCII|ASCII]]（1963年）和[[EBCDIC|EBCDIC]]（1964年）这样的'''字符集'''逐漸成為標準。但这些字符集的局限很快就变得明显，于是人们开发了許多方法来扩展它们。对于支持包括东亚[[CJK|CJK]]字符家族在内的[[文字|写作系统]]的要求能支持更大量的字符，并且需要一种系统而不是临时的方法实现这些字符的编码。
+
+== 简单字符集 ==
+按照惯例，人们认为字符集和字符编码是[[同义词|同义词]]，因为使用同样的标准来定义提供什么字符并且这些字符如何编码到一系列的代码单元（通常一个字符一个单元）。由于历史的原因，[[MIME|MIME]]和使用这种编码的系统使用术语'''字符集'''来表示用于将一组字符编码成一系列八位字节数据的整个系统。
+
+== 现代编码模型 ==
+由[[統一碼|統一碼]]和[[通用字符集|通用字符集]]所構成的现代字符编码模型則没有跟从简单字符集的观点。它们将字符编码的概念分为：有哪些字符、它们的[[编号|编号]]、这些[[编号|编号]]如何编码成一系列的“码元”（有限大小的数字）以及最后这些单元如何組成八位字节流。區分這些概念的核心思想是建立一个能够用不同方法來编码的一个通用字符集。为了正确地表示这个模型需要更多比“字符集”和“字符编码”更为精确的术语表示。在Unicode Technical Report (UTR) #17中，现代编码模型分为5个层次，所用的术语列在下面：
+#'''抽象字符表'''（Abstract character repertoire）是一个系统支持的所有抽象字符的集合。字符表可以是封闭的，即除非创建一个新的标准（ASCII和多数ISO/IEC 8859系列都是这样的例子），否則不允许添加新的符号；字符表也可以是开放的，即允许添加新的符号（統一碼和一定程度上[[代碼頁|代碼頁]]是这方面的例子）。特定字符表中的字符反映了如何将书写系统分解成线性信息单元的决定。例如拉丁、希腊和斯拉夫字母表分为字母、数字、变音符号、标点和如空格这样的一些少数特殊字符，它们都能按照一种简单的线性序列排列（尽管对它们的处理需要另外的规则，如带有变音符号的字母这样的特定序列如何解释——但这不属于字符表的范畴）。为了方便起见，这样的字符表可以包括预先[[编号|编号]]的[[字母|字母]]和变音符号的组合。其它的书写系统，如阿拉伯语和希伯莱语，由于要适应双向文字和在不同情形下按照不同方式交叉在一起的字形，就使用更为复杂的符号表表示。
+#'''编码字符集'''（CCS:Coded Character Set）是将字符集<math>C</math>中每个字符映射到1个坐标（整数值对：x, y）或者表示为1个非负整数<math>N</math>。字符集及码位映射称为编码字符集。例如，在一个给定的字符表中，表示大写拉丁字母“A”的字符被赋予整数65、字符“B”是66，如此继续下去。多个编码字符集可以表示同样的字符表，例如[[ISO/IEC_8859-1|ISO-8859-1]]和IBM的[[代码页|代码页]]037和代码页500含蓋同样的字符表但是将字符映射为不同的[[整数|整数]]。由此产生了'''编码空间'''（encoding space）的概念：简单说就是包含所有字符的表的维度。可以用一对整数来描述，例如：[[GB_2312|GB 2312]]的汉字编码空间是94 x 94。可以用一个整数来描述，例如：ISO-8859-1的编码空间是256。也可以用字符的存储单元尺寸来描述，例如：ISO-8859-1是一个8比特的编码空间。编码空间还可以用其子集来表述，如行、列、面（plane）等。编码空间中的一个位置（position）称为'''[[码位|码位]]'''（code point）。一个字符所占用的码位称为'''码位值'''（code point value）。1个编码字符集就是把抽象字符映射为码位值。
+#'''字符编码表'''（CEF:Character Encoding Form），也称为"storage format"，是将编码字符集的非负整数值（即抽象的码位）转换成有限比特长度的整型值（称为'''码元'''code units）的序列。这对于定长编码来说是个到自身的映射（null mapping），但对于变长编码来说，该映射比较复杂，把一些码位映射到一个码元，把另外一些码位映射到由多个码元组成的序列。例如，使用16比特长的存储单元保存数字信息，系统每个单元只能够直接表示从0到65,535的数值，但是如果使用多个16位单元就能够表示更大的整数。这就是CEF的作用，它可以把Unicode从0到140万的码空间范围的每个码位映射到单个或多个在0到65,5356范围内的码值。最简单的字符编码表就是單純地选择足够大的单位，以保证编码字符集中的所有数值能够直接编码（一个码位对应一个码值）。这对于能够用使用八位元组來表示的编码字符集（如多数传统的非CJK的字符集编码）是合理的，对于能够使用十六位元來表示的编码字符集（如早期版本的Unicode）来说也足够合理。但是，随着编码字符集的大小增加（例如，现在的Unicode的字符集至少需要21位才能全部表示），这种直接表示法变得越来越没有效率，并且很难让现有计算机系统适应更大的码值。因此，许多使用新近版本Unicode的系统，或者将Unicode码位對應為可变长度的8位字节序列的[[UTF-8|UTF-8]]，或者将码位對應为可变长度的16位序列的[[UTF-16|UTF-16]]。
+#'''字符编码方案'''（CES:Character Encoding Scheme），也称作"serialization format"。將定长的整型值（即码元）映射到8位字节序列，以便编码后的数据的文件存储或网络传输。在使用Unicode的场合，使用一个简单的字符来指定字节顺序是[[大端序|大端序]]或者[[小端序|小端序]]（但对于UTF-8来说并不需要专门指明字节序）。然而，有些复杂的字符编码机制（如[[ISO/IEC_2022|ISO/IEC 2022]]）使用控制字符转义序列在几种编码字符集或者用于减小每个单元所用字节数的压缩机制（如[[SCSU|SCSU]]、[[BOCU|BOCU]]和[[Punycode|Punycode]]）之间切换。
+# '''传输编码语法'''（transfer encoding syntax），用于处理上一层次的字符编码方案提供的字节序列。一般其功能包括两种：一是把字节序列的值映射到一套更受限制的值域内，以满足传输环境的限制，例如Email传输时[[Base64|Base64]]或者[[quoted-printable|quoted-printable]]，都是把8位的字节编码为7位长的数据；另一是压缩字节序列的值，如[[LZW|LZW]]或者[[行程长度编码|行程长度编码]]等无损压缩技术。
+
+'''高层机制'''（higher level protocol）提供了额外信息，用于选择Unicode字符的特定变种，如[[XML|XML]]属性xml:lang
+
+'''字符映射'''（character map）在Unicode中保持了其传统意义：从字符序列到编码后的字节序列的映射，包括了上述的CCS, CEF, CES层次。
+
+==字符集、代码页，与字符映射==
+术语字符编码（character encoding），字符映射（character map），字符集（character set）或者[[代码页|代码页]]，在历史上往往是同义概念，即字符表（repertoire）中的字符如何编码为码元的流（stream of code units）–通常每个字符对应单个码元。
+
+码元（Code Unit，也称「代码单元」）是指一个已编码的文本中具有最短的比特组合的单元。对于[[UTF-8|UTF-8]]来说，码元是8比特长；对于[[UTF-16|UTF-16]]来说，码元是16比特长；对于[[UTF-32|UTF-32]]来说，码元是32比特长<ref>{{Cite web |url=http://unicode.org/glossary/ |title=Glossary of Unicode Terms |accessdate=2012-04-07 |archive-date=2015-12-26 |archive-url=https://web.archive.org/web/20151226015034/http://www.unicode.org/glossary/ |dead-url=no }}</ref>。码值（{{lang|en|Code Value}}）是过时的用法。
+
+代码页通常意味着面向字节的编码，但强调是一套用于不能语言的编码方案的集合.著名的如"Windows"代码页系列，"IBM"/"DOS"代码页系列.
+
+IBM的字符数据表示体系（Character Data Representation Architecture - CDRA）与[[CCSID|编码字符集标识符]]（coded character set identifiers - CCSIDs） 常常把charset, character set, code page, or CHARMAP等类似意义的术语混用.
+
+Unix或Linux不使用代码页概念，它们用charmap，比locales具有更广泛的含义.
+
+与上文的编码字符集（Coded Character Set - CCS）不同，字符编码（character encoding）是从抽象字符到代码字（code word）的映射. HTTP（与MIME）的用法中，字符集（character set）与字符编码同义，但与CCS不是一个意思.
+
+== 字符编码（不全） ==
+* [[ASCII|ASCII]]
+* [[EBCDIC|EBCDIC]]
+=== 西欧标准 ===
+*[[ISO-8859-1|ISO-8859-1]]
+*[[ISO_8859-5|ISO-8859-5]]
+*[[ISO_8859-6|ISO-8859-6]]
+*[[ISO_8859-7|ISO-8859-7]]
+*[[ISO-8859-11|ISO-8859-11]]
+*[[ISO_8859-15|ISO-8859-15]]
+* [[ISO/IEC_646|ISO/IEC 646]]
+
+=== DOS字符集（又称IBM[[代码页|代码页]]） ===
+* [[Code_page_437|CP437]]
+* [[Code_page_737|CP737]]
+* [[Code_page_850|CP850]]
+* [[Code_page_852|CP852]]
+* [[Code_page_855|CP855]]
+* [[Code_page_857|CP857]]
+* [[Code_page_858|CP858]]
+* [[Code_page_860|CP860]]
+* [[Code_page_861|CP861]]
+* [[Code_page_863|CP863]]
+* [[Code_page_865|CP865]]
+* [[Code_page_866|CP866]]
+* [[Code_page_869|CP869]]
+
+=== [[Microsoft_Windows|Windows]]字符集 ===
+* [[Windows-1250|Windows-1250]]
+* [[Windows-1251|Windows-1251]]：用于西里尔字母表
+* [[Windows-1252|Windows-1252]]
+* [[Windows-1253|Windows-1253]]
+* [[Windows-1254|Windows-1254]]
+* [[Windows-1255|Windows-1255]]：用于[[希伯莱语|希伯莱语]]
+* [[Windows-1256|Windows-1256]]：用于[[阿拉伯语|阿拉伯语]]
+* [[Windows-1257|Windows-1257]]
+* [[Windows-1258|Windows-1258]]：用于[[越南语|越南语]]
+=== 亞洲字符集 ===
+==== 臺灣 ====
+* [[大五碼|大五碼]]
+* [[中文資訊交換碼|中文資訊交換碼]]（CCCII）
+* [[中文標準交換碼|中文標準交換碼]]（CNS 11643）
+* [[EUC#EUC-TW|EUC]]
+==== 日本 ====
+* [[ISO/IEC_2022|ISO/IEC 2022]]
+* [[Shift_JIS|Shift JIS]]
+* [[EUC#EUC-JP|EUC]]
+==== 中國大陸及港澳 ====
+* [[GB_2312|GB 2312]]
+* [[EUC#EUC-CN|EUC]]
+* [[GBK|GBK]]（规定文件为GB13000）
+* [[GB_18030|GB 18030]]
+* [[香港增補字符集|香港增補字符集]]
+
+==== 朝鲜半岛 ====
+* [[EUC#EUC-KR|EUC]]
+* [[KOI8-R|KOI8-R]]
+* [[KOI8-U|KOI8-U]]
+* [[KOI7|KOI7]]
+* [[MIK_Code_page|MIK]]
+==== 越南 ====
+* [[越南資訊交換標準代碼|越南資訊交換標準代碼]]
+==== 印度 ====
+* [[印度文字資訊交換碼|印度文字資訊交換碼]]
+==== Unicode ====
+* [[Unicode|Unicode]]
+* [[UTF-7|UTF-7]]
+* [[UTF-8|UTF-8]]
+* [[UTF-16|UTF-16]]
+* [[UTF-32|UTF-32]]
+
+== 字符转换工具 ==
+由于有很多种字符编码方法被使用，从一种字符编码转换到另一种，需要一些工具。
+
+[[跨平台|跨平台]]：
+* [[网页浏览器|网页浏览器]]–大多数现代的网页浏览器都具有此功能。一般是在菜单"查看"（View）/"字符编码"（Character Encoding）
+* [[iconv|iconv]] –程序与编程API，用于字符编码转换
+* convert_encoding.py –基于[[Python|Python]]的转换工具.<ref>{{Cite web |url=http://users.physik.fu-berlin.de/~mgoerz/blog/programs/convert_encoding/ |title=Homepage of Michael Goerz – convert_encoding.py |access-date=2012-03-23 |archive-date=2010-10-28 |archive-url=https://web.archive.org/web/20101028073152/http://users.physik.fu-berlin.de/~mgoerz/blog/programs/convert_encoding/ |dead-url=yes }}</ref>
+* decodeh.py –用于启发性猜测编码方案的算法与模块.<ref>{{Cite web |url=http://gizmojo.org/code/decodeh/ |title=Decodeh – heuristically decode a string or text file |access-date=2012-03-23 |archive-date=2008-01-08 |archive-url=https://web.archive.org/web/20080108123255/http://gizmojo.org/code/decodeh/ |dead-url=yes }}</ref>
+* [[International_Components_for_Unicode|International Components for Unicode]] –一套[[C语言|C语言]]与[[Java|Java]]语言的开源库，由[[IBM|IBM]]提供，用于Unicode等多语言编码的转换、实现.
+* [https://web.archive.org/web/20130114161259/http://chardet.feedparser.org/ chardet] – [[Mozilla|Mozilla]]的编码自动检测代码的Python语言实现.
+* 新版本的Unix命令[[File_(命令)|File]]做字符编码的检测.（[[cygwin|cygwin]]与[[mac|mac]]都有此命令）
+
+[[Linux|Linux]]:
+* recode – <ref>{{Cite web |url=http://www.gnu.org/software/recode/recode.html |title=Recode – GNU Project – Free Software Foundation (FSF) |access-date=2012-03-23 |archive-date=2021-02-10 |archive-url=https://web.archive.org/web/20210210230722/http://www.gnu.org/software/recode/recode.html |dead-url=no }}</ref>
+* utrac –  将整个文件内容从一种字符编码转换到另外一种<ref>{{Cite web |url=http://utrac.sourceforge.net/ |title=Utrac Homepage |access-date=2006-05-12 |archive-date=2021-01-25 |archive-url=https://web.archive.org/web/20210125190013/http://utrac.sourceforge.net/ |dead-url=no }}</ref>
+* cstocs –
+* convmv –转换文件名.<ref>{{Cite web |url=http://www.j3e.de/linux/convmv/man/ |title=Convmv – converts filenames from one encoding to another |accessdate=2012-03-23 |archive-date=2018-06-11 |archive-url=https://web.archive.org/web/20180611013429/https://www.j3e.de/linux/convmv/man/ |dead-url=no }}</ref>
+* enca –分析编码模式.<ref>{{Cite web |url=http://directory.fsf.org/project/enca/ |title=Extremely Naive Charset Analyser |access-date=2012-03-23 |archive-url=https://web.archive.org/web/20101204060724/http://directory.fsf.org/project/enca/ |archive-date=2010-12-04 |dead-url=yes }}</ref>
+
+[[Microsoft_Windows|Microsoft Windows]]:
+* Encoding.Convert – .NET API<ref>{{Cite web |url=http://msdn.microsoft.com/en-us/library/system.text.encoding.convert(VS.71).aspx |title=Microsoft .NET Framework Class Library – Encoding.Convert Method |access-date=2012-03-23 |archive-url=https://web.archive.org/web/20120421164654/http://msdn.microsoft.com/en-us/library/system.text.encoding.convert(VS.71).aspx |archive-date=2012-04-21 |dead-url=yes }}</ref>
+* MultiByteToWideChar/WideCharToMultiByte – Windows API<ref>{{Cite web |url=http://support.microsoft.com/kb/138813 |title=MultiByteToWideChar/WideCharToMultiByte – Convert from ANSI to Unicode & Unicode to ANSI |access-date=2012-03-23 |archive-date=2015-02-12 |archive-url=https://web.archive.org/web/20150212083132/http://support.microsoft.com/kb/138813/ |dead-url=no }}</ref>
+* cscvt –转换工具<ref>{{Cite web |url=http://www.kalytta.com/tools.php |title=Character Set Converter |access-date=2012-03-23 |archive-url=https://web.archive.org/web/20120326122821/http://www.kalytta.com/tools.php |archive-date=2012-03-26 |dead-url=yes }}</ref>
+* enca –分析编码方法<ref>{{Cite web |url=http://www.john.geek.nz/2010/02/enca-binary-compiled-for-32-bit-windows/ |title=Extremely Naive Charset Analyser |access-date=2012-03-23 |archive-url=https://web.archive.org/web/20120315090223/http://www.john.geek.nz/2010/02/enca-binary-compiled-for-32-bit-windows/ |archive-date=2012-03-15 |dead-url=yes }}</ref>
+
+==参考文献==
+{{Reflist|2}}
+
+== 參閱 ==
+{{div col|2}}
+* [[:Category:字符编码|:Category:字符编码]]—关于通用字符编码的文章
+* [[:Category:字符集|:Category:字符集]]—关于特殊字符编码的文章
+* [[亂碼|亂碼]]—非映射字符集
+* [[代码页|代码页]]
+* [[字形|字形]]
+* [[位圖|位圖]]
+* [[像素|像素]]
+* [[體素|體素]]
+* [[中文軟體|中文軟體]]
+* [[中文系統|中文系統]]
+{{div col end}}
+
+== 外部链接 ==
+{{div col|2}}
+* [http://www.iana.org/assignments/character-sets Character sets registered by Internet Assigned Numbers Authority]{{Wayback|url=http://www.iana.org/assignments/character-sets |date=20040716042926 }}
+* [https://web.archive.org/web/20050323094939/http://www.unicode.org/unicode/reports/tr17/ Unicode Technical Report #17: Character Encoding Model]
+* [http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id= SIL's freeware fonts, editors and documentation] {{Wayback|url=http://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id= |date=20210113145834 }} See [[SIL國際|SIL]]
+* [http://demo.icu-project.org/icu-bin/convexp ICU Converter Explorer] {{Wayback|url=http://demo.icu-project.org/icu-bin/convexp |date=20200102215631 }}
+* [http://czyborra.com/charsets/cyrillic.html The Cyrillic Charset soup]{{Wayback|url=http://czyborra.com/charsets/cyrillic.html |date=20161203230933 }}
+* [https://web.archive.org/web/20100116001012/http://homepages.cwi.nl/~dik/english/codes/stand.html Early history of character set standardization]
+* [http://www.i18nguy.com/unicode/codepages.html Character Sets And Code Pages At The Push Of A Button] {{Wayback|url=http://www.i18nguy.com/unicode/codepages.html |date=20201107224708 }}
+* [https://web.archive.org/web/20060527013315/http://www.cs.mcgill.ca/~aelias4/encodings.html A complete introduction to Japanese character encodings]
+* [http://www.cs.tut.fi/~jkorpela/chars.html A tutorial on character code issues] {{Wayback|url=http://www.cs.tut.fi/~jkorpela/chars.html |date=20170917131301 }}
+* [http://arquivo.pt/wayback/20100530092446/http%3A//home1.paulschou.net/tools/xlate/ Online Char (ASCII), HEX, Binary, Base64, etc... Encoder/Decoder with MD2, MD4, MD5, SHA1+2, etc. hashing algorithms]
+* [http://www.2cyr.com/decode/ Universal Cyrillic decoder] {{Wayback|url=http://www.2cyr.com/decode/ |date=20210214004643 }},一个用来帮助恢复由于错误字符编码产生的不可读的[[西里尔字母|西里尔字母]]的在线程序（以及其它的一些程序）.
+* [http://www.debian.org/doc/manuals/intro-i18n/ Introduction to i18n]{{Wayback|url=http://www.debian.org/doc/manuals/intro-i18n/ |date=20050729013402 }}，请参阅Chapter 3 - Important Concepts for Character Coding Systems
+* [https://web.archive.org/web/20090708003902/http://xxcx.org/hzbm/ 汉字字符编码查询]
+* [http://blog.csdn.net/gqqnb/article/details/6266542 精确解释Unicode] {{Wayback|url=http://blog.csdn.net/gqqnb/article/details/6266542 |date=20190522080359 }}
+{{div col end}}
+{{-}}
+{{Character encoding|state=collapsed}}
+
+[[Category:字符编码|]]

@@ -1,0 +1,1 @@
+#REDIRECT [[Template:User 中華人民共和國]]

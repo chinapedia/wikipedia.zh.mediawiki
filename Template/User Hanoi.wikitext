@@ -1,0 +1,11 @@
+{{Userbox
+|border-c=#000000
+|border-s=1
+|id-c=#CE1126
+|info-c=#CE1126
+|info-s=10
+|info-fc=#FCD116
+|id=[[File:Vietnamese_Presidential_Palace%2C_Hanoi%2C_2006-Nov-17.jpg|67px]]
+|info=這個用戶現在居住於[[越南]]首都'''[[河內市|河内]]'''。
+|usercategory=河内维基人
+}}

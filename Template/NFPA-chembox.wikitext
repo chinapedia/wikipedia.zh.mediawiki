@@ -1,0 +1,1 @@
+#REDIRECT [[Template:Chembox NFPA1]]

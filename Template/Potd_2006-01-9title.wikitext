@@ -1,0 +1,1 @@
+为健锐营训练修筑的碉楼<noinclude>[[Category:每周图片模板]]</noinclude>

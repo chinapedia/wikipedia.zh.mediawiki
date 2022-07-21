@@ -1,0 +1,1 @@
+#REDIRECT [[Template:宇航员小作品]]

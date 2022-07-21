@@ -1,0 +1,72 @@
+{{noteTA|G1=IT}}
+{{lowercase}}
+{{Infobox Software
+|name = memcached
+|author = [[Brad_Fitzpatrick|Brad Fitzpatrick]]
+|released = {{start date|2003|5|22}}
+|latest release version = {{LSR/wikidata}}
+|language = [[C語言|C語言]]
+|genre = [[快取|快取]][[伺服器|伺服器]]
+|license = [[BSD許可證|BSD許可證]]<ref name="Memcached license">{{cite web | url=https://github.com/memcached/memcached/blob/master/COPYING | title=Memcached license | publisher=[[GitHub|GitHub]] | accessdate=2014-06-27 | archive-date=2018-12-21 | archive-url=https://web.archive.org/web/20181221184147/https://github.com/memcached/memcached/blob/master/COPYING | dead-url=no }}</ref>
+}}
+'''memcached'''是一套[[分布式缓存|分布式的高速缓存系統]]，由[[LiveJournal|LiveJournal]]的Brad Fitzpatrick开发，但目前被許多网站使用。這是一套[[開放原始碼|開放原始碼]][[軟體|軟體]]，以[[BSD_license|BSD license]]授權釋出。
+
+memcached缺乏[[認證|認證]]以及[[计算机安全|安全]]管制，這代表應該將memcached伺服器放置在[[防火牆|防火牆]]後。<ref>{{Cite web|title=memcached - a distributed memory object caching system|url=https://memcached.org/about|access-date=2022-05-18|work=memcached.org}}</ref>
+
+memcached的[[API|API]]使用三十二位元的[[循環冗余校驗|循環冗余校驗]]（CRC-32）計算[[鍵值|鍵值]]後，將資料分散在不同的機器上。當表格滿了以後，接下來新增的資料會以[[快取文件置换机制|LRU]]機制替換掉。由於memcached通常只是當作快取系統使用，所以使用memcached的應用程式在寫回較慢的系統時（像是後端的[[資料庫|資料庫]]）需要額外的程式碼更新memcached內的資料。
+
+== 使用單位 ==
+
+* [[Digg|Digg]]
+* [[Facebook|Facebook]]（同時也回饋了許多程式碼）
+* Meetup.com（提供memcached對[[Java|Java]]的連線函式庫）
+* [[Slashdot|Slashdot]]
+* [[Wikipedia|Wikipedia]]
+
+== 範例 ==
+
+將純粹使用資料庫查詢的程式碼加上memcached支援是很簡單的，假設這是原來的程式碼：
+
+<syntaxhighlight lang="c">
+function get_foo (int userid) {
+   result = db_select("SELECT * FROM users WHERE userid = ?", userid);
+   return result;
+}
+</syntaxhighlight>
+
+加上memcached的快取機制後：
+
+<syntaxhighlight lang="c">
+function get_foo (int userid) {
+    result = memcached_fetch("userrow:" + userid);
+    if (!result) {
+        result = db_select("SELECT * FROM users WHERE userid = ?", userid);
+        memcached_add("userrow:" + userid,  result);
+    }
+    return result;
+}
+</syntaxhighlight>
+
+上述的程式會先到memcached檢查是否有<code>userrow:userid</code>的資料，如果有則直接傳回結果，如果不存在時再去資料庫查詢，並將結果放到memcached內。
+
+在memcached內已經有快取資訊時將資料庫的資料更新後，上述的程式會抓到舊的資料，這是屬於[[Cache_coherency|Cache coherency]]的問題。其中一種解決的方法是在更新資料庫時，同時更新memcached內的資訊：
+
+<syntaxhighlight lang="c">
+function update_foo(int userid, string dbUpdateString) {
+    result = db_execute(dbUpdateString);
+    if (result) {
+        data = createUserDataFromDBString(dbUpdateString);
+        memcached_set("userrow:"+userid, data);
+    }
+}
+</syntaxhighlight>
+
+== 外部連結 ==
+* [http://memcached.org/ memcached 官方站台] {{Wayback|url=http://memcached.org/ |date=20210128161107 }}
+* [http://github.com/memcached/memcached memcached 通訊協定] {{Wayback|url=http://github.com/memcached/memcached |date=20201112020123 }}，連結至 [[CVS|CVS]]。
+
+{{NoSQL}}
+
+[[Category:开放源代码|Category:开放源代码]]
+[[Category:電腦記憶體|Category:電腦記憶體]]
+[[Category:键-值数据库|Category:键-值数据库]]

@@ -1,0 +1,1 @@
+{{Personal announcement|{{{1|{{PAGENAME}}}}}|content=反對[[香港特別行政區政府|香港政府]]開徵[[商品及服務稅]]！！|backcolor=yellow|fontcolor=black}}<includeonly>[[Category:反對香港政府開徵GST的維基人|{{PAGENAME}}]]</includeonly>

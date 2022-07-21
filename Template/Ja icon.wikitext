@@ -1,0 +1,1 @@
+{{language icon|ja|日語}}<noinclude>{{Documentation}}</noinclude>

@@ -1,0 +1,3 @@
+<div class="notice metadata" id="stub" style="font-size: small;">[[File:Nuclear physics stub.svg|30px]]&nbsp;'''{{PAGENAME}}'''是一個與'''[[原子物理學]]'''、'''[[分子物理學]]'''或'''[[光學]]'''相關的[[Wikipedia:小作品|小作品]]。你可以-{zh-hant:透過;zh-hans:通过}-<span class="plainlinks">[{{fullurl:{{FULLPAGENAME}}|action=edit}} 編輯或修訂]</span>擴充其內容。</div><includeonly>
+[[Category:原子、分子及光物理學小作品]]{{#ifexpr:{{PAGESIZE:{{FULLPAGENAME}}|R}}>3000|[[Category:字数已超过3000字节的小作品|{{PAGENAME}}]]}}</includeonly>
+<noinclude>{{Documentation}}</noinclude>

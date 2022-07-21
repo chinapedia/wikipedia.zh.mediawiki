@@ -1,0 +1,1 @@
+[[File:Wikimedia-logo.svg|15px]] [[commons:Atlas of {{{1}}}|維基媒體的{{{2|{{{1}}}}}}地圖集]] [[File:Gnome-globe.svg|15px]]

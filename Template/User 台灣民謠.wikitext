@@ -1,0 +1,10 @@
+{{Userbox
+  |id=[[File:Taiwan-icon.svg|30px]]
+  |id-c=#ffffff
+  |info=這個用戶喜歡聽'''[[台灣民謠]]'''。
+  |info-c=white
+  |info-s=9
+  |border-c=#000000
+  |usercategory=喜歡臺灣民謠的維基人
+  |nocat={{{nocat|}}}
+}}<noinclude>{{Clear}}[[Wikipedia:用户框/音乐]][[Category:關注與興趣用戶框模板]]</noinclude>

@@ -1,0 +1,1 @@
+#redirect [[Template:移自互助客栈]]

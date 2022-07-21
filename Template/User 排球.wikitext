@@ -1,0 +1,10 @@
+{{Userbox
+|border-c=#bbb
+|border-s=1
+|id-c=#f6f6f6
+|id=[[File:Volleyball.jpg|45px]]
+|info-c=#f6f6f6
+|info-s=10
+|info=這個用戶熱愛'''[[排球]]'''。
+}}[[Category:熱愛排球的維基人|{{PAGENAME}}]]
+<noinclude>[[Category:维基百科相关用户框]]</noinclude>

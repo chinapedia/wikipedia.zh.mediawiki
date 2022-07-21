@@ -1,0 +1,1 @@
+[https://database.fig-gymnastics.com/public/gymnasts/biography/{{{1|{{{id}}}}}}?backUrl= {{{2|{{{name|{{PAGENAME}}}}}}}}]{{#if:{{{brief|}}}||在[[国际体操联合会]]的相关介绍}}<noinclude>{{Documentation}}</noinclude>

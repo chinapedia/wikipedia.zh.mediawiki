@@ -1,0 +1,1 @@
+#redirect [[Template:Europe-bio-stub]]

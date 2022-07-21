@@ -1,0 +1,78 @@
+<onlyinclude></onlyinclude>{{noteTA|G1=IT}}
+{{lowercase}}
+{{Infobox Software
+| name                   = sudo
+| developer              = Todd C. Miller
+| screenshot             = Sudo on Linux screenshot.png
+| screenshot size        = 200px
+| caption                = 终端中的sudo命令
+| latest_release_version = 1.9.11p3
+| latest_release_date    = {{Release date and age|2022|06|21}}
+| latest_preview_version = 1.9.11rc1
+| latest_preview_date    = {{Release date and age|2022|06|03}}
+| operating_system       = [[类Unix系统|类Unix系统]]
+| genre                  = 權限授權
+| license                = ISC-style<ref>{{Cite web |url=http://www.sudo.ws/sudo/license.html |title=Sudo License |access-date=2009-07-07 |archive-url=https://web.archive.org/web/20150731135949/http://www.sudo.ws/sudo/license.html |archive-date=2015-07-31 |dead-url=yes }}</ref>
+| website                = {{URL|https://www.sudo.ws/}}
+}}
+
+'''sudo''' （'''s'''ubstitute '''u'''ser [或 '''s'''uper'''u'''ser] '''do'''），是一種[[電腦程式|電腦程式]]，用於[[類Unix系統|類Unix]][[作業系統|作業系統]]如[[BSD|BSD]]、[[Mac_OS_X|Mac OS X]]以及[[GNU/Linux|GNU/Linux]]，該電腦程式可以讓使用者透過安全的方式使用特殊的權限執行程式（通常為[[作業系統|作業系統]]的[[超級使用者|超級使用者]]）。
+
+==原理==
+在sudo於1980年前後被寫出之前<ref>{{cite web|url=http://www.gratisoft.us/sudo/history.html|title=A Brief History of Sudo|author=Miller, Todd C|accessdate=2008-06-20|archive-url=https://web.archive.org/web/20070222125751/http://www.gratisoft.us/sudo/history.html|archive-date=2007-02-22|dead-url=yes}}</ref>，一般使用者管理系統的方式是利用 <code>[[su_(Unix)|su]]</code> 切換為超級使用者。但是使用su的缺點之一在於必須要先告知超級使用者的密碼。
+
+sudo使一般使用者不需要知道超級使用者的密碼即可獲得權限。首先超級使用者將普通用户的名字、可以执行的特定命令、按照哪种用户或用户组的身份执行等信息，登記在特殊的檔案中（通常是<code>/etc/sudoers</code>），即完成對該使用者的授權（此時該使用者稱為「sudoer」）<ref>在Ubuntu系统中，管理员通过执行<code>visudo</code>来编辑<code>/etc/sudoers</code>，给普通用户授予某些sudo的权力</ref>；在一般使用者需要取得特殊權限時，其可在命令前加上「<code>sudo</code>」，此時sudo將會詢問該使用者'''自己的'''密碼（以確認終端機前的是該使用者本人），回答後系統即會將該命令的[[进程|-{zh-tw:行程;zh-cn:进程}-]]以超級使用者的權限執行。之後的一段時間內（預設為5分鐘<ref>依各發行版可能有所異同，例如Ubuntu下預設為15分鐘。</ref>，可在<code>/etc/sudoers</code>自訂），使用sudo不需要再次輸入密碼。
+
+由於不需要超級使用者的密碼，部分Unix系統甚至利用sudo使一般使用者取代超級使用者作為管理帳號，例如[[Ubuntu|Ubuntu]]、[[macOS|macOS]]等。
+
+==语法==
+<code>sudo [-bhHpV][-s ][-u <用户>][指令]</code>
+
+或
+
+<code>sudo [-klv]</code>
+
+===参数===
+
+　　-b　　在后台执行指令。
+
+　　-h　　显示帮助。
+
+　　-H　　将HOME环境变量设为新身份的HOME环境变量。
+
+　　-k　　结束密码的有效期限，也就是下次再执行sudo时便需要输入密码。
+
+　　-l　　列出目前用户可执行与无法执行的指令。
+
+　　-p　　改变询问密码的提示符号。
+
+　　-s　　执行指定的shell。
+
+　　-u　　<用户> 　以指定的用户作为新的身份。若不加上此参数，则预设以root作为新的身份。
+
+　　-v　　延长密码有效期限5分钟。
+
+　　-V　　显示版本信息。
+
+　　-S　　从标准输入流替代终端来获取密码
+
+== 安全漏洞 ==
+2020年1月，CVE-2019-18634公布一個已存在9年以上的漏洞，指出在pwfeedback的功能選項中。此功能讓系統可以星號字元表示目前輸入的字元，但在sudoer檔案開啟pwfeedback功能後，可能讓用戶觸發堆疊式緩衝溢位攻擊，讓沒有系統管理權限的用戶、甚至連非列於sudoer檔案中的用戶得以提升到[[超级用户|root]]帳號權限。Sudo 1.7.1到1.8.25p1都受本漏洞影響，不過前提是系統管理員需開啟pwfeedback功能。<ref>{{cite web |title=NVD - CVE-2019-18634 |url=https://nvd.nist.gov/vuln/detail/CVE-2019-18634 |website=National Vulnerability Database |accessdate=2020-01-31 |archive-date=2020-02-06 |archive-url=https://web.archive.org/web/20200206092927/https://nvd.nist.gov/vuln/detail/CVE-2019-18634 |dead-url=no }}</ref><ref>{{cite web |author1=Dan Goodin |title=Serious flaw that lurked in sudo for 9 years hands over root privileges |url=https://arstechnica.com/information-technology/2020/02/serious-flaw-that-lurked-in-sudo-for-9-years-finally-gets-a-patch/ |website=Ars Technica |accessdate=2020-02-05 |archive-date=2022-05-07 |archive-url=https://web.archive.org/web/20220507105122/https://arstechnica.com/information-technology/2020/02/serious-flaw-that-lurked-in-sudo-for-9-years-finally-gets-a-patch/ }}</ref><ref>{{cite web |author1=林妍溱 |title=Sudo爆可取得根帳號權限的漏洞 |url=https://www.ithome.com.tw/news/135665 |website=iThome |accessdate=2020-02-06 |archive-date=2020-02-06 |archive-url=https://web.archive.org/web/20200206092938/https://www.ithome.com.tw/news/135665 |dead-url=no }}</ref>
+
+==參考資訊==
+{{reflist}}
+
+==外部連結==
+* {{official|http://www.sudo.ws/}}
+* [http://sourceforge.net/projects/sudosh/ How to audit and log user and root shells with sudo via sudosh]{{Wayback|url=http://sourceforge.net/projects/sudosh/ |date=20061106012643 }}
+* [http://www.komar.org/pres/sudo-tools/ sudo tools]{{Wayback|url=http://www.komar.org/pres/sudo-tools/ |date=20061101190717 }}
+* [http://sourceforge.net/projects/rootsh a logging root shell]{{Wayback|url=http://sourceforge.net/projects/rootsh |date=20061028110712 }}
+* [https://web.archive.org/web/20151128190917/http://www.openbsd.org/cgi-bin/man.cgi?query=sudo sudo(8) man page] from [[OpenBSD|OpenBSD]]
+* [http://www.linuxmanpages.com/man8/sudo.8.php sudo(8) man page]{{Wayback|url=http://www.linuxmanpages.com/man8/sudo.8.php |date=20061031193951 }} from linuxmanpages.com
+* [http://xkcd.com/c149.html sudo explained in webcomic form]{{Wayback|url=http://xkcd.com/c149.html |date=20061109002806 }} by ''[[Xkcd|Xkcd]]''
+
+{{Unix命令}}
+
+[[Category:安全软件|Category:安全软件]]
+[[Category:系統管理|Category:系統管理]]
+[[Category:Unix用户管理和支持相关实用工具|Category:Unix用户管理和支持相关实用工具]]

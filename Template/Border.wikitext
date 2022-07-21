@@ -1,0 +1,3 @@
+<span style="display:{{{display|{{#if:{{{noinline|}}}|table-cell|inline-block}}}}}; <!--border-collapse:collapse;--> border:{{{width|1px}}} {{{style|solid}}} {{{color|#ddd}}}; {{#if:{{{lh|{{{line-height|}}}}}}|line-height:{{{lh|{{{line-height|}}}}}};}} {{{style2|}}}">{{{1}}}</span><noinclude>{{template doc}}
+<!--Please add any interwiki links etc on the /doc page, not here - thanks!-->
+</noinclude>

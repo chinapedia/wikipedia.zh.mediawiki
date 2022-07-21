@@ -1,0 +1,1 @@
+地鐵車廂內的-{zh-hans:藍屏死機; zh-hant:當機畫面}-<noinclude>[[Category:每周图片模板]]</noinclude>

@@ -1,0 +1,1 @@
+#REDIRECT [[Template:操作系统小作品]]

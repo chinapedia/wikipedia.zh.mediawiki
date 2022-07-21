@@ -1,0 +1,1 @@
+#REDIRECT [[Template:亞洲足聯會員足球代表隊]]

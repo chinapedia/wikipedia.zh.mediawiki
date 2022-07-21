@@ -1,0 +1,1 @@
+{{User language-1|zh-qiong|偌嗼用戶'''[[:Category:Zh-qiong-1 使用者|捌些囝]]''' '''[[:Category:Zh-qiong 使用者|海南話]]'''。|海南话|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

@@ -1,0 +1,1 @@
+[[File:Flag of Cornwall.svg|25px|康沃爾]]&nbsp;[[康沃爾郡|康沃爾]]<noinclude>[[Category:国家模板]]</noinclude>

@@ -1,0 +1,1 @@
+<span class="reference"><sup id="ref_{{{1}}}" class="plainlinksneverexpand">[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAME}}}}#endnote_{{{1}}} <nowiki>[</nowiki>{{{1}}}<nowiki>]</nowiki>]</sup></span><noinclude>[[Category:頁面訊息模板]]</noinclude>

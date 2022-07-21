@@ -1,0 +1,9 @@
+{{asbox
+|image=hubeie.png
+|category=湖北小作品
+|subject=與[[湖北]]相關的
+|name=Template:Hubei-stub
+}}<noinclude>
+[[Category:湖北小作品|*]]
+[[Category:中國地理小作品模板|H]]
+</noinclude>

@@ -1,0 +1,125 @@
+{{noteTA|T=zh-cn:米勒-拉宾素性检验;zh-tw:米勒-拉賓質數判定法;zh-hk:米勒-拉賓質數判定法;|1=zh-cn:米勒-拉宾素性检验;zh-tw:米勒-拉賓質數判定法;zh-hk:米勒-拉賓質數判定法;|G1=Math}}
+'''米勒-拉賓質數判定法'''（{{lang-en|Miller–Rabin primality test}}）是一种[[質數判定法則|質數判定法則]]，利用[[随机化算法|随机化算法]]判断一个数是[[合数|合数]]还是''可能是''素数。[[卡内基梅隆大学|卡内基梅隆大学]]的计算机系教授{{le|蓋瑞·米勒 (計算機科學家)|Gary Miller (computer scientist)|蓋瑞·米勒}}首先提出了基于[[广义黎曼猜想|广义黎曼猜想]]的[[确定性算法|确定性算法]]，由于广义黎曼猜想并没有被证明，其后由以色列[[耶路撒冷希伯來大學|耶路撒冷希伯來大學]]的[[迈克尔·拉宾_(科学家)|-{zh-cn:迈克尔·拉宾; zh-tw:麥可·拉賓}-]]教授作出修改，提出了不依赖于该假设的[[随机化算法|随机化算法]]。
+
+== 概念 ==
+首先介绍一个相关的引理。我们发现 <math>1^2 \bmod p</math> 和 <math>(-1)^2\bmod p</math> 总是得到 <math>1</math>，我们称 <math>-1</math> 和 <math>1</math> 是 <math>1 \bmod p</math> 的“平凡平方根”，当 <math>p</math> 是素数且 <math>p > 2</math> 时，不存在 <math>1 \bmod p</math> 的“非平凡平方根”。为了证明该引理，首先假设 <math>x</math> 是 <math>1 \bmod p</math> 的平方根之一，于是有
+
+<math display="block">x^2 \equiv 1 \pmod{p}</math>
+
+<math display="block">(x + 1)(x - 1) \equiv 0 \pmod{p}</math>
+
+也就是说，素数 <math>p</math> 能够整除 <math>(x - 1)(x + 1)</math> 或者 <math>x = p - 1</math>，根据欧几里得引理，<math>x - 1</math> 或者 <math>x + 1</math> 能够被 <math>p</math> 整除，即 <math>x \equiv 1 \pmod{p}</math> 或 <math>x \equiv -1 \pmod{p}</math>,
+
+即 <math>x</math> 是 <math>1 \bmod p</math> 的平凡平方根。
+
+现在假设 <math>n</math> 是一个素数，且 <math>n > 2</math>。于是 <math>n - 1</math> 是一个偶数，可以被表示为 <math>2^s*d</math> 的形式，<math>s</math> 和 <math>d</math> 都是正整数且<math>d</math>是奇数。对任意在 <math>(Z/nZ)^*</math> 范围内的 <math>a</math>，必须满足以下两种形式的一种：
+
+<math display="block">a^d \equiv 1 \pmod{n} \text{    ①    }</math>
+<math display="block">a^{2^rd} \equiv -1 \pmod{n}\text{    ②   }</math>
+
+其中 <math>r</math> 是某个满足 <math>0 \leq r \leq s - 1</math> 的整数。
+
+因为由于 [[费马小定理|费马小定理]] ，对于一个素数 <math>n</math> ，有
+
+<math display="block">a^{n - 1} \equiv 1 \pmod{n}</math>
+
+又由于上面的引理，如果我们不断对<math>a^{n - 1}</math>取平方根后，我们总会得到 <math>1</math> 和 <math>-1</math>。如果我们得到了 <math>-1</math> ，意味着②式成立，<math>n</math> 是一个素数。如果我们从未得到 <math>-1</math> ，那么通过这个过程我们已经取遍了所有 <math>2</math> 的幂次，即①式成立。
+
+米勒-拉宾素性测试就是基于上述原理的逆否，也就是说，如果我们能找到这样一个 <math>a</math>，使得对任意<math>0 \leq r \leq s - 1</math>以下两个式子均满足：
+
+<math display="block">a^d \not\equiv 1 \pmod{n}</math><math display="block">a^{2^rd} \not\equiv -1 \pmod{n}</math>那么 <math>n</math> 就不是一个素数。这样的 <math>a</math> 称为 <math>n</math> 是合数的一个凭证（witness）。否则 <math>a</math> 可能是一个证明 <math>n</math> 是素数的“强伪证”（strong liar），即当<math>n</math>确实是一个合数，但是对当前选取的 <math>a</math> 来说上述两个式子均不满足，这时我们认为<math>n</math>是基于<math>a</math>的大概率素数。
+
+每个奇合数 <math>n</math> 都有很多个对应的凭证 <math>a</math>，但是要生成这些 <math>a</math> 并不容易。当前解决的办法是使用概率性的测试。我们从集合 <math>(Z/nZ)^*</math> 中随机选择非零数 <math>a</math>，然后检测当前的 <math>a</math> 是否是 <math>n</math> 为合数的一个凭证。如果 <math>n</math> 本身确实是一个合数，那么大部分被选择的 <math>a</math> 都应该是 <math>n</math> 的凭证，也即通过这个测试能检测出 <math>n</math> 是合数的可能性很大。然而，仍有极小概率的情况下我们找到的 <math>a</math> 是一个“强伪证”（反而表明了 <math>n</math> 可能是一个素数）。通过多次独立测试不同的 <math>a</math>，我们能减少这种出错的概率。 
+
+对于测试一个大数是否是素数，常见的做法随机选取基数<math>a</math>，毕竟我们并不知道凭证和伪证在<math>[1, n - 1] </math>这个区间如何分布。典型的例子是 Arnault 曾经给出了一个397位的合数<math>n</math>，但是所有小于307的基数<math>a</math>都是<math>n</math>是素数的“强伪证”。不出所料，这个大合数通过了 Maple 程序的<code>isprime()</code> 函数（被判定为素数）。这个函数通过检测 <math>a = 2,3,5,7,11</math> 这几种情况来进行素性检验。
+
+== 例子 ==
+假设我们需要检验 <math>n = 221</math> 是否是一个素数。首先<math>n - 1 = 220 = (2^2) * 55</math>，于是我们得到了<math>s = 2</math>和<math>d = 55</math>.我们随机从<math>[1, n - 1]</math>中选取<math>a</math>，假设<math>a = 174</math>，于是有：
+
+<math display="block">a^{2^0d} \bmod n = 174^{55} \bmod 221 = 47 \not= 1,-1</math><math display="block">a^{2^1d} \bmod n = 174^{110} \bmod 221 = 220 = -1</math>因为我们得到了一个 -1，所以要么<math>n = 221</math>确实是一个素数，要么<math>a = 174</math>是一个“强伪证”。我们再选取<math>a = 137</math>，于是有：
+
+<math display="block">a^{2^0d} \bmod n = 137^{55} \bmod 221 = 188 \not= 1,-1</math><math display="block">a^{2^1d} \bmod n = 137^{110} \bmod 221 = 205 \not= -1</math>即<math>a = 137</math>是<math>n = 221</math>为合数的一个凭证，而<math>a = 174</math>是一个“强伪证”。
+
+选取特定的整数可以在一定范围内确定（而非单纯基于概率猜测）某个整数是质数还是合数。对于小于<math>2^{32}</math>的情形，选取<math>2, 7, 61</math>共三个凭据可以做到这一点；对于小于<math>2^{64}</math>的情形，选取<math>2, 325, 9375, 28178, 450775, 9780504, 1795265022</math>共七个凭据可以做到这一点<ref>{{cite web |title=Deterministic variants of the Miller-Rabin primality test |url=https://miller-rabin.appspot.com/ |accessdate=2019-11-01 |archive-date=2012-07-11 |archive-url=https://archive.is/20120711112013/http://miller-rabin.appspot.com/ |dead-url=yes }}</ref>。
+
+== 算法复杂度 ==
+这一算法可以被表示成如下[[伪代码|伪代码]]：
+ '''Input #1''': ''n'' > 3, an odd integer to be tested for primality;
+ '''Input #2''': ''k'', a parameter that determines the accuracy of the test
+ '''Output''': ''composite'' if ''n'' is composite, otherwise ''probably prime''
+
+ write ''n'' − 1 as 2<sup>''r''</sup>·''d'' with ''d'' odd by factoring powers of 2 from ''n'' − 1
+ WitnessLoop: '''repeat''' ''k'' times:
+    pick a random integer ''a'' in the range [2, ''n'' − 2]
+    ''x'' ← ''a''<sup>''d''</sup> mod ''n''
+    '''if''' ''x'' = 1 or ''x'' = ''n'' − 1 '''then'''
+       '''continue''' WitnessLoop
+    '''repeat''' ''r'' − 1 times:
+       ''x'' ← ''x''<sup>2</sup> mod ''n''
+       '''if''' ''x'' = ''n'' − 1 '''then'''
+          '''continue''' WitnessLoop
+    '''return''' ''composite''
+ '''return''' ''probably prime''
+使用[[wikipedia:Modular_exponentiation|模幂运算]]，这个算法的时间复杂度是<math>O(k\log ^3 n)</math>，<math>k</math>是我们测试的不同的 <math>a</math> 的值。也就是说，这是一个高效的多项式时间算法。使用[[快速傅里叶变换|快速傅里叶变换]]能够将这个时间推进到 O(''k'' log<sup>2</sup>''n'' log log ''n'' log log log ''n'') = Õ(''k'' log<sup>2</sup>''n'').
+
+如果我们加入[[最大公因數|最大公因数]]算法到上述算法中，我们有时候可以得到 <math>n</math> 的因数，而不仅仅是证明 <math>n</math> 是一个合数。例如，若 <math>n</math> 是一个基于<math>a</math> 的可能的素数，但不是一个大概率素数，则<math>\gcd((a^d \bmod n ) - 1, n )</math>或<math>\gcd((a^{2^rd} \bmod n ) - 1, n )</math>将得到 <math>n</math> 的因数。如果因式分解是必要的，这一<math>GCDs</math>算法可以加入到上述的算法中，代价是增加了一些额外的运算时间。
+
+例如，假设 <math>n = 341</math>，则<math>n - 1 = 340 = 85*4</math>.于是<math>2^{85} \bmod 341 = 32</math>，这也告诉我们 <math>n</math> 不是一个大概率素数，即 <math>n</math> 是一个合数。如果这个时候我们求最大公因数，我们可以得到一个<math>n = 341</math>的因数：<math>\gcd((2^{85} \bmod 341) - 1, 341) = 31</math>.这时可行的，因为<math>n = 341</math>是一个基于2的伪素数，但不是一个“强伪素数”。
+
+== 示例代码 ==
+下面是根据以上定义而使用Magma语言编写的“米勒-拉宾”检验程序。
+<syntaxhighlight lang="matlab">
+function ModPotenz(a,b,n)
+erg:=1;
+while (b ne 0) do
+       b, rest:=Quotrem(b,2);
+       if (rest ne 0) then erg:=((erg*a) mod n); end if;
+       a:= (a^2 mod n);
+     end while;
+     return erg;
+end function;
+;
+function Miller_rabin(n)
+  if (n mod 2 ne 0) then
+  d:=n-1; s:=0;t:=50;
+  while (d mod 2) eq 0 do
+    d:=d div 2;
+    s:=s+1;
+  end while;
+  k:=0;
+  while(k lt t) do
+    a:=Random(1,n-1);
+    k:=k+1;
+    if GCD(a,n) ne 1 then
+      continue;
+    end if;
+    x:=ModPotenz(a,d,n);
+    if(x ne 1) then
+      for r in [0,s-1] do
+        x:=ModPotenz(a,2^r*d,n);
+        if(x eq (n-1)) then
+           return "probably prime";
+        end if;
+      end for;
+    elif (x eq 1) then
+      break;
+    end if;
+  end while;
+  end if;
+  return "composite";
+end function;
+</syntaxhighlight>
+
+== 参见 ==
+* [[卢卡斯-莱默检验法|卢卡斯-莱默检验法]]
+* [[埃拉托斯特尼筛法|埃拉托斯特尼筛法]]
+* [[试除法|试除法]]
+* [[费马素性检验|费马素性检验]]
+* [[產業等級質數|產業等級質數]]
+
+== 參考資料 ==
+{{Reflist}}
+
+[[Category:素性测试|Category:素性测试]]
+[[Category:密码学|M]]
+[[Category:有限域|Category:有限域]]

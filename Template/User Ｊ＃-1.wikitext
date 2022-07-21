@@ -1,0 +1,1 @@
+#redirect [[Template:User Jsharp-1]]

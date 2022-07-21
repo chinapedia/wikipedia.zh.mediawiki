@@ -1,0 +1,3 @@
+| style="text-align: center; width: 30%; vertical-align: middle; border-bottom: 0px none; border-right: 1px #aaa solid; border-top: 1px #aaa solid;" rowspan="{{{rows|1}}}" colspan="{{{cols|1}}}"|<div>'''{{{1|請輸入車站名稱}}}'''</div>{{#if:{{{2|}}}|<div style="font-size: smaller;">{{{2}}}</div>}}<noinclude>
+*此模板與[[Template:Start rail box|Start rail box]]一起使用，欲知詳情請參見該模板的頁面及討論頁。
+[[Category:前任继任模板]]</noinclude>

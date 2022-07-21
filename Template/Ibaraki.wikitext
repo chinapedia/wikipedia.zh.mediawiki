@@ -1,0 +1,1 @@
+#REDIRECT [[Template:茨城縣]]

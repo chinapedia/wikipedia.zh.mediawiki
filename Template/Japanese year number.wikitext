@@ -1,0 +1,1 @@
+<includeonly>{{#if:{{{era|{{Nengo|{{{1|{{{year|}}}}}}}}}}}|{{#expr:{{{1|{{{year}}}}}}-{{Japanese era|{{{era|{{Nengo|{{{1|{{{year}}}}}}}}}}}|base}}}}}}</includeonly><noinclude>{{Documentation}}</noinclude>

@@ -1,0 +1,219 @@
+{{Unreferenced|time=2018-02-02T05:15:21+00:00}}
+
+'''Nuva'''语言是一种[[面向对象|面向对象]]的[[型態系統|动态]][[脚本语言|脚本语言]]。Nuva对应汉语的「[[女娲|女娲]]」（[[中国|中国]][[上古时代|上古时代]]的神话传说人物）一词。
+
+== 设计目的 ==
+设计目的是用于基于模板的代码生成。除了用于代码生成领域外，也能用于开发应用程序，如文本和数据处理、[[GUI|GUI]]应用程序等。
+
+== 特点 ==
+*语法简单灵活：采用类似[[虛擬碼|虛擬碼]][[演算法|演算法]]/[[伪码|伪码]]的语法风格，结构之间可以任意嵌套，关键字和运算符兼容大部分现有的编程语言，非常容易学习。
+<syntaxhighlight>
+  <.
+    if (a = b && c == d or e <> f)
+      ?? foo()
+     
+      function foo()
+        Result = 'foo'
+      end function
+    end if
+  .>
+</syntaxhighlight>
+*动态的，无类型约束：采用动态类型，使用时不需声明类型，赋值计算时自动进行类型转换，如下：
+<syntaxhighlight>
+  <.
+    var a = '1'
+    a ++
+    ?? 'a' ~ a
+    // 结果为: a2
+  .>
+</syntaxhighlight>
+*支持面向对象的编程方法：支持继承性和多态性。
+*支持自动垃圾回收：程序员不需显式释放其所创建的对象。
+*模板专用的语言元素
+**模板标记（「<.」、「.>」、「[.」、「.]」）可以混合配对使用，对于格式要求很严格的场合非常有用。
+ <syntaxhighlight>[.='Hello, Nuva!'.]</syntaxhighlight>
+ <syntaxhighlight><.='Hello, Nuva!'.></syntaxhighlight>
+ <syntaxhighlight>[.='Hello, Nuva!'.></syntaxhighlight>
+ <syntaxhighlight><.='Hello, Nuva!'.]</syntaxhighlight>
+**凡「[.」之前的所有空白字符原样输出，「.]」之后的所有空白字符（包括换行）也原样输出；
+**如果行首到「<.」之间均为空白字符，则该部分空白字符不输出，否则原样输出；
+**如果「.>」到行尾之间均为空白字符，则该部分空白字符和换行不输出，否则也原样输出。
+**特有的'''file'''和'''assign'''结构能够非常方便的对输出进行组合、分解，从而方便了模板的编写。
+
+== Nuva虚拟机特点 ==
+*内置[[正则表达式|正则表达式]]引擎：能够方便的进行文本处理。
+<syntaxhighlight>
+  <.
+    var text = System.File.Load('Regex_Test.nuva')
+    foreach(str = text.RegexMatchs('\w+', ''))
+      ?? str
+    end foreach
+  .>
+</syntaxhighlight>
+
+输出如下的结果：
+<syntaxhighlight>
+  var
+  text
+  System
+  File
+  Load
+  Regex_Test
+  nuva
+  foreach
+  str
+  text
+  RegexMatches
+  w
+  str
+  end
+  foreach
+</syntaxhighlight>
+*内置O/R Mapping引擎：可以通过面向对象的方式直接存取数据库架构和数据。
+*内置基于[[HTML|HTML]]/[[XML|XML]]的界面引擎：能够方便的编写GUI应用程序，典型的例子就是[http://www.macrobject.com/cn/codeauto/index.htm Macrobject CodeAuto代码生成器]{{Wayback|url=http://www.macrobject.com/cn/codeauto/index.htm |date=20061019223852 }}。
+
+== 代码示例 ==
+=== Hello, Nuva! ===
+<syntaxhighlight>
+  <.. "Hello, Nuva!" Demo ..>
+  <.
+  //======================================
+  //	Hello, Nuva! (1)
+  //======================================
+  ?? 'Hello, Nuva!'
+  
+  /*======================================
+    	Hello, Nuva! (2)
+  ======================================*/
+  function HelloNuva()
+    ?? "Hello, Nuva!";
+  end function
+  
+  HelloNuva();
+  
+  /*======================================
+    	Hello, Nuva! (3)
+  ======================================*/
+  class Nuva()
+    function Hello()
+      ?? 'Hello, Nuva!';
+    end function
+  end class
+  
+  var n = Nuva();
+  n.Hello();
+  .>
+</syntaxhighlight>
+
+=== foreach | O/R Mapping ===
+<syntaxhighlight>
+  <.
+  function Foreach_Demo()
+    // Load Schema from a Xml file
+    var schema = System.Data.LoadSchema(
+        System.Path.ProjectPath ~ '..\Northwind\Northwind.xobject'
+      );
+  
+    ?? '--------------------'
+    ?? 'Tables Order by Name'
+    ?? '--------------------'
+    foreach(table = schema.Tables.OrderbyName)
+      ?? table.Name
+    end foreach
+  
+    ?? '---------------------------------'
+    ?? 'Tables Filter by Name.Length < 10'
+    ?? '---------------------------------'
+    foreach(table = schema.Tables | table.Name.Length < 10)
+      ?? table.Name
+    end foreach
+  end function
+  .>
+</syntaxhighlight>
+
+=== file | 生成文件 ===
+<syntaxhighlight>
+  <.
+  function File_Demo()
+    ?? \r\n ~ '--Read file and Output here--'
+    file('codeexamples.nuvaproj') end file
+  
+    // Read file and write to 'Target', overwrite it if exist
+    file('codeexamples.nuvaproj', true)
+      Target = 'temp.target'
+    end file
+    
+    ?? \r\n ~ '--Read file dynamically and Output here--'
+    file('')
+      FileName = System.Path.ProjectPath ~ 'output\temp.target'
+    end file
+    
+    // Delete file
+    System.File.Delete(System.Path.ProjectPath ~ 'output\temp.target')
+  end function
+  .>
+</syntaxhighlight>
+
+=== assign | 捕获输出 ===
+<syntaxhighlight>
+  <.
+  function Assign_Demo()
+    // 'Result' assigned from the output in the assign statement
+    assign(Result).]
+      Generate Text ... @[.=System.Now.] ...
+  <.end assign
+  end function
+  .>
+</syntaxhighlight>
+
+=== 函数 | 递归调用 ===
+<syntaxhighlight>
+  <.
+  /*--------------------------------------------------------
+  	Factorial
+  --------------------------------------------------------*/
+  function Factorial ( N )
+    if (N <= 1)
+      Result = 1;
+    else
+      Result = N * Factorial(N - 1); // Recursion Call
+    end if;
+  end function;
+  .>
+</syntaxhighlight>
+
+=== 类 | 多态性 ===
+<syntaxhighlight>
+  <.
+  function Class_Demo()
+    class ClassA()
+      function Do()
+        this.DynDo()
+      end function
+      
+      function DynDo()
+        ?? 'ClassA'
+      end function
+    end class
+    
+    class ClassB = ClassA()
+      function DynDo()
+        ?? 'ClassB'
+      end function
+    end class
+  
+    var c1 = ClassA()
+    var c2 = ClassB()
+    c1.Do()
+    c2.Do()
+  end function
+  .>
+</syntaxhighlight>
+
+== 外部链接 ==
+*[http://www.macrobject.com/cn/nuva_language/index.htm Nuva语言官方主页]{{Wayback|url=http://www.macrobject.com/cn/nuva_language/index.htm |date=20061018094254 }} - 可選{{zh-cn}}或{{en}}
+
+{{程序设计语言|Logo}}
+
+[[Category:程序设计语言|Category:程序设计语言]]
+[[Category:脚本语言|Category:脚本语言]]

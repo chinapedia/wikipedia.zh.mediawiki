@@ -1,0 +1,1 @@
+#REDIRECT [[Template:音訊樣本]]

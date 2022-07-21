@@ -1,0 +1,1 @@
+{{User language-0|ru|Этот участник '''[[:Category:ru-0 使用者|не понимает]]''' '''[[:Category:ru 使用者|по-русски]]'''.|俄语}}<noinclude></noinclude>

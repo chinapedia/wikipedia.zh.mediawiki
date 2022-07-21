@@ -1,0 +1,1 @@
+#redirect [[Template:开始结束]]

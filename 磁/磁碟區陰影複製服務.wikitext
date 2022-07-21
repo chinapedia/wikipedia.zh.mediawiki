@@ -1,0 +1,210 @@
+{{noteTA
+|G1=IT
+|G2=Windows
+|1=zh-cn:分卷;zh-tw:磁碟區;
+}}
+
+'''磁碟區陰影複製服務'''（{{lang-en|Volume Shadow Copy Service}}）是[[微軟|微軟]][[Microsoft_Windows|Windows]]的一项元件服務，從[[Windows_Server_2003|Windows Server 2003]]開始支援。
+
+磁碟區陰影複製服務是一項定時為磁碟區作複製的服務。服務會在磁碟區新增一個名為「陰影複製」（Shadow Copy）的選項。這服務可為離線用戶提供離線檔案服務。
+
+欲使用這項技術，檔案系統必須為[[NTFS|NTFS]]，才可創建和儲存磁碟區陰影區複製。磁碟區陰影區複製可以由任何使用此技術的Windows原建在本地或外部磁碟（卸除式磁碟或網路磁碟）上創建。舉例而言，排程的[[備份與還原中心|Windows備份]]或[[系統還原|系統還原點]]時會用到此技術。
+
+== 總覽 ==
+VSS在[[块_(数据存储)|塊]]層級上執行。
+
+快照有兩個主要目的：它確保備份可持續進行，即確保當備份進行時檔案內容無法改變；另外，它也避免檔案被佔用的問題。藉由建立一份磁碟區的唯讀備份，備份軟體得以存取任何檔案而不會與也正在寫入這些相同檔案的其他軟體衝突。
+
+檔案複製（備份）的過程可由檔案系統或特定硬體來處理，若是後者，VSS硬體供應商將提取（abstract）其功能給作業系統。應用程式亦可提供對VSS的支援。
+
+支援VSS的Windows軟體和服務包括[[備份與還原中心|Windows備份與還原]]、[[Hyper-V|Hyper-V]]、[[Virtual_Server|Virtual Server]]、[[Active_Directory|Active Directory]]、[[Microsoft_SQL_Server|Microsoft SQL Server]]、[[Microsoft_Exchange_Server|Exchange Server]]、[[SharePoint|SharePoint]]{{Citation needed|date=May 2015}}。
+
+最終的結果類似於{{tsl|en|versioning file system|檔案版本系統}}。不同的是，使用者只能對整個磁碟區做快照，而不能只對個別檔案。其副作用是，雖然檔案擁有者可在檔案版本系統中建立該檔案的新版本，但只有[[系统管理员|系統管理員]]或備份執行者可以建立新快照（或控制何時建立新快照），因為這需要控制整個磁碟區而非個別檔案。此外許多檔案版本系統（例如[[OpenVMS|VMS]] ）在每一次檔案發生變更後即立刻儲存一份該檔案的備份：而像Windows一樣利用快照方式的系統只會定期記下硬碟的狀態。
+
+== 歷史 ==
+'''Windows XP 和 Server 2003'''
+
+磁碟區快照服務第一次新增到[[Windows_XP|Windows XP]]中；此版本的VSS被[[NTBackup|NTBackup]]使用，然而它只能建立非永久的快照（一種暫時性的快照，通常用於建立檔案備份，或複製正在被其他應用程式佔用中的檔案。後者較為常見。）NT Backup用其專利的BKF格式永久儲存磁碟區陰影區複製。
+
+建立永久性快照的功能自[[Windows_Server_2003|Windows Server 2003]]起新增到Windows中，它可以允許最多512個對同磁碟區的快照同時存在。這些永久性快照即使重新開機也不會消失，除非被系統刪除。在Windows Server 2003中VSS因此用來建立定期增量（incremental）快照，記下檔案隨時間的變化。透過網路分享，最多可有64個快照儲存在伺服器端並可由客戶端存取。此功能叫做Shadow copies for Shared Folders，是[[主從式架構|主從式架構]]的設計之一<ref>{{cite web|title=Shadow Copy Client Download|url=http://technet.microsoft.com/en-us/windowsserver/bb405951.aspx|website=[[Microsoft_TechNet|TechNet]]|publisher=[[Microsoft|Microsoft]]|accessdate=21 October 2014|archive-date=2016-01-31|archive-url=https://web.archive.org/web/20160131103558/https://technet.microsoft.com/en-us/windowsserver/bb405951.aspx|dead-url=no}}</ref>。Shadow copies for Shared Folders客戶端軟體之安裝基本需求為Windows 2000、Windows XP RTM和Windows XP SP1<ref>{{cite web |url=http://blogs.msdn.com/adioltean/archive/2004/12/17/323742.aspx |title=Tips for deploying Shadow {{sic|copies|nolink=yes}} for Shared Folders |date=17 December 2004 |accessdate=21 April 2009 |last=Oltean |first=Adi |work=Antimail |publisher=[[Microsoft|Microsoft]] |archive-date=2009-04-23 |archive-url=https://web.archive.org/web/20090423000521/http://blogs.msdn.com/adioltean/archive/2004/12/17/323742.aspx |dead-url=no }}</ref>。此Windows 32位元版客戶端軟體可從伺服器端或者微軟網頁下載。自Windows XP SP2起，此客戶端軟體內建於Windows中。Windows XP<ref name="msdn article">{{cite web |title=Volume Shadow Copy Service |url=http://msdn.microsoft.com/en-us/library/windows/desktop/bb968832(v=vs.85).aspx |work=[[MSDN|MSDN]] |publisher=[[Microsoft|Microsoft]] |accessdate=31 May 2013 |archive-date=2015-10-06 |archive-url=https://web.archive.org/web/20151006161139/https://msdn.microsoft.com/en-us/library/windows/desktop/bb968832(v=vs.85).aspx |dead-url=no }}</ref>以上的系統內建一命令提示列工具叫做<code>vssadmin</code>，可以列出、建立或刪除磁碟區陰影區複製並列出已安裝的陰影區複製提供者（provider）<ref>{{cite web  |url = http://technet.microsoft.com/en-us/library/cc754968.aspx  |title = Vssadmin  |work = Windows Server 2008 and Windows Server 2008 R2 documentations. [[Microsoft_TechNet|TechNet Library]]  |at = Windows Server Commands, References, and Tools  |publisher = Microsoft  |date = 28 September 2007  |accessdate = 27 March 2012  |archive-date = 2015-05-07  |archive-url = https://web.archive.org/web/20150507101641/https://technet.microsoft.com/en-us/library/cc754968.aspx  |dead-url = no  }}</ref>。
+
+'''Windows Vista、 7 和Server 2008'''
+
+許多微軟Windows的元件已更新以應用磁碟區陰影區複製。[[Windows_Vista|Windows Vista]]、[[Windows_Server_2008|Windows Server 2008]]、[[Windows_7|Windows 7]]和[[Windows_Server_2008_R2|Windows Server 2008 R2]]中的[[備份與還原中心|備份與還原中心]]利用磁碟區陰影區複製進行以檔案和磁區為基礎（file-based and sector-by-sector） 的備份。「[[系統還原|系統還原]]」功能也使用了VSS建立定期的系統和使用者資料備份，儲存在同磁碟區（和Windows Sever 中的Shadow Copies for Shared Folders類似，但使用者可透過系統還原來存取備份）
+
+系統還原可將系統回復到前一個陰影區複製（叫做還原點）的狀態<ref>Compare:{{cite web
+ |url          = http://answers.microsoft.com/en-us/windows/forum/windows_vista-files/information-about-spp-folder-in-windows-vista/f050c2c8-2e8f-4092-9012-cd42c26ac18f?auth=1
+ |title        = Information about SPP folder in Windows vista
+ |date         = 2010-08-20
+ |website      = Microsoft Community
+ |publisher    = Microsoft
+ |access-date  = 2015-07-22
+ |quote        = SPP stand for Shared Protection Point and is used by windows to store information on restore point.
+ |archive-date = 2015-07-23
+ |archive-url  = https://web.archive.org/web/20150723050053/http://answers.microsoft.com/en-us/windows/forum/windows_vista-files/information-about-spp-folder-in-windows-vista/f050c2c8-2e8f-4092-9012-cd42c26ac18f?auth=1
+ |dead-url     = no
+}}</ref>。在Windows Vista以前，系統還原的做法是監測特定檔案格式的變化，並在它們被複寫前備份一份<ref>{{cite book |last=Russinovich |first=Mark E. |first2=David A. |last2=Solomon |title=Microsoft Windows Internals: Microsoft Windows Server 2003, Windows XP, and Windows 2000 |url=https://archive.org/details/isbn_9780735619173 |year=2005 |publisher=[[Microsoft_Press|Microsoft Press]] |location=[[Redmond,_WA|Redmond, WA]] |isbn=0-7356-1917-4 |edition=4 |pages=[https://archive.org/details/isbn_9780735619173/page/706 706]–711}}</ref><ref>{{cite web|title=Windows Backup|url=http://www.microsoft.com/middleeast/windowsvista/features/foreveryone/backup.mspx|work=Windows Vista portal|publisher=[[Microsoft|Microsoft]]|accessdate=11 January 2014|archiveurl=https://web.archive.org/web/20070510204203/http://www.microsoft.com/middleeast/windowsvista/features/foreveryone/backup.mspx|archivedate=2007年5月10日|deadurl=yes}}</ref><ref name="BackupGuide">{{cite journal|last=Fok|first=Christine|title=A Guide to Windows Vista Backup Technologies|url=http://technet.microsoft.com/en-us/magazine/2007.09.backup.aspx|work=TechNet Magazine|publisher=[[Microsoft|Microsoft]]|accessdate=11 January 2014|date=September 2007|journal=|archive-date=2015-10-01|archive-url=https://web.archive.org/web/20151001095611/https://technet.microsoft.com/en-us/magazine/2007.09.backup.aspx|dead-url=no}}</ref>。此外，[[檔案總管|Windows檔案總管]]中叫做「先前的版本」的功能可讓使用者從之前的還原點中取回任一檔案或資料夾，由此取得該檔案先前的版本或還原誤刪檔案。最後，Windows Server 2008引入了diskshadow工具，可以以20種不同的命令操作VSS的功能<ref>{{Cite web
+ |url = http://technet.microsoft.com/en-us/library/cc772172%28WS.10%29.aspx
+ |title = Diskshadow
+ |work = Windows Server 2008 and Windows Server 2008 R2 documentations. [[Microsoft_TechNet|TechNet Library]]
+ |at = Windows Server Commands, References, and Tools
+ |publisher = Microsoft Corporation
+ |date = 28 September 2007
+ |accessdate = 27 March 2012
+ |archive-date = 2015-07-03
+ |archive-url = https://web.archive.org/web/20150703192328/https://technet.microsoft.com/en-us/library/cc772172(WS.10).aspx
+ |dead-url = no
+ }}</ref>。
+
+陰影區複製每日自動產生一次，或手動由備份軟體、安裝檔觸發建立還原點<ref>{{cite web
+ |url=http://technet.microsoft.com/en-us/library/cc749185.aspx
+ |title=Selected Scenarios for Maintaining Data Integrity with Windows Vista
+ |work=TechNet
+ |publisher=Microsoft Corporation
+ |accessdate=2015-09-06
+ |archive-date=2017-08-26
+ |archive-url=https://web.archive.org/web/20170826183505/https://technet.microsoft.com/en-us/library/cc749185.aspx
+ |dead-url=no
+ }}</ref><ref>{{cite web|url=http://technet.microsoft.com/en-us/magazine/2007.09.backup.aspx|title=A Guide to Windows Vista Backup Technologies|publisher=Microsoft|accessdate=2015-09-06|archive-date=2015-10-01|archive-url=https://web.archive.org/web/20151001095611/https://technet.microsoft.com/en-us/magazine/2007.09.backup.aspx|dead-url=no}}</ref>。「先前的版本」可在[[Windows_Vista版本列表|Windows Vista 商用版、企業版和旗鑑版]]<ref>{{cite web 
+ |url=http://www.microsoft.com/windows/products/windowsvista/footnotes.mspx 
+ |title=Volume Shadow Copy and "Previous Versions" feature in Windows Vista 
+ |publisher=Microsoft Corporation 
+ |accessdate=2015-09-06 
+ |archive-date=2008-04-29 
+ |archive-url=https://web.archive.org/web/20080429220702/http://www.microsoft.com/windows/products/windowsvista/footnotes.mspx 
+ |dead-url=no 
+ }}</ref> 以及 [[Windows_7版本列表|Windows 7任何版本]]中使用。 Vista家庭版缺少此功能,但磁碟快照服務依然包含於其中,並正在執行。
+
+使用第三方軟體亦可還原某檔案先前的版本<ref>{{Cite web |url=http://www.shadowexplorer.com/ |title=ShadowExplorer allows restoring lost or altered files |accessdate=2015-09-06 |archive-date=2015-09-05 |archive-url=https://web.archive.org/web/20150905231417/http://www.shadowexplorer.com/ |dead-url=no }}</ref>。有些此類軟體更可讓使用者自訂定時建立快照的間隔時間、設定陰影區複製佔用磁碟空間的上限、以及不同時間點的快照比對其檔案或資料夾的變化<ref>{{Cite web |url=http://www.bearsontheloose.com/ |title=TimeTraveler adds a timeline to Windows Explorer allowing the user to open, restore or compare files or directories from points-in-time |accessdate=2015-09-06 |archive-date=2015-10-11 |archive-url=https://web.archive.org/web/20151011050836/http://bearsontheloose.com/ |dead-url=no }}</ref>。Windows 7亦原生支援以圖形化介面設置陰影區佔用儲存空間的上限。
+
+'''Windows 8 和Server 2012'''
+
+在[[Windows_8|Windows 8]]中，永久性的陰影區複製已不存在。因此藉由「內容」視窗中「先前的版本」瀏覽、搜尋和/或復原檔案舊版本的功能已經移除。不過此功能在 [[Windows_Server_2012|Windows Server 2012]]中仍保留著<ref>{{cite web|url=http://msdn.microsoft.com/en-us/library/windows/desktop/hh848072%28v=vs.85%29.aspx|title=Previous versions UI removed for local volumes (Windows)|accessdate=17 November 2012|archive-date=2015-10-04|archive-url=https://web.archive.org/web/20151004192728/https://msdn.microsoft.com/en-us/library/windows/desktop/hh848072(v=vs.85).aspx|dead-url=no}}</ref>。
+
+'''Samba Server'''
+
+Linux上的[[Samba|Samba]]伺服器可在[[邏輯捲軸管理員|LVM]]儲存裝置上提供陰影區複製的服務<ref>{{cite web | url=http://www.samba.org/samba/docs/man/Samba-HOWTO-Collection/VFS.html | title=Samba HOWTO Collection, Part III. Advanced Configuration | accessdate=2 October 2012 | archive-date=2015-09-13 | archive-url=https://web.archive.org/web/20150913065350/https://www.samba.org/samba/docs/man/Samba-HOWTO-Collection/VFS.html | dead-url=no }}</ref>。
+
+== 相容性 ==
+雖然不同版本的[[NTFS|NTFS]]檔案系統對其新版和[[向下兼容|舊版]]有一定的相容性，但當舊版的Windows(Windows Vista以前)掛載存有永久性陰影區複製的NTFS磁碟區時，仍存在著一些問題，這將影響雙重作業系統以及外接硬碟。特定的說，當舊版的作業系統掛載新的NTFS磁碟區，該磁碟區的陰影區複製將被刪除，因為較舊的作業系統無法辨識較新版永久性陰影區複製的格式<ref>{{cite web | url=http://blogs.technet.com/filecab/archive/2006/07/14/441829.aspx | title=How restore points and other recovery features in Windows Vista are affected when you dual-boot with Windows XP | date=14 July 2006 | work=File Cabinet Blog | publisher=[[Microsoft|Microsoft]] | accessdate=21 March 2007 | archive-url=https://web.archive.org/web/20060718011852/http://blogs.technet.com/filecab/archive/2006/07/14/441829.aspx | archive-date=2006-07-18 | dead-url=yes }}</ref> 。
+
+== 參見 ==
+* [[快照_(電腦儲存)|快照 (電腦儲存)]]
+* [[寫入時複製|寫入時複製]]
+
+== 參考资料 ==
+* {{cite web
+ |url         = https://technet.microsoft.com/en-us/library/cc785914(WS.10).aspx
+ |title       = How Volume Shadow Copy Service Works
+ |year        = 2003年3月28日
+ |accessdate  = 2018年1月13日
+ |author      = 
+ |date        = 
+ |work        = TechNet
+ |publisher   = Microsoft
+ |deadurl     = yes
+ |archiveurl  = https://web.archive.org/web/20170826183107/https://technet.microsoft.com/en-us/library/cc785914(WS.10).aspx
+ |archivedate = 2017年8月26日
+}}
+* {{cite web
+|url=http://www.microsoft.com/technet/windowsvista/library/4ac505e6-dd8b-4ae7-80fa-b9d77cd8104d.mspx
+|title=Selected Scenarios for Maintaining Data Integrity with Windows Vista
+|accessdate=2006年5月10日
+|author=|date=|work=TechNet
+|publisher=Microsoft
+|archiveurl=https://web.archive.org/web/20060115172456/http://www.microsoft.com/technet/windowsvista/library/4ac505e6-dd8b-4ae7-80fa-b9d77cd8104d.mspx|archivedate=2006-01-15}}{{Dead link}}
+
+{{reflist|30em}}
+
+== 外部連結 ==
+* https://web.archive.org/web/20070929060125/http://www.msservermag.com.tw/win2003/article/M050303601.pdf
+* [http://www.wretch.cc/blog/josephphoto/10112989 JosephPhoto 的 網路日誌我的網誌 - Windows Server 2003：陰影複製 Volume Shadow Copy Service (VSS) 管理服務] {{Wayback|url=http://www.wretch.cc/blog/josephphoto/10112989 |date=20110818071511 }}
+
+== 相关条目 ==
+* [[時光機_(macOS)|Time Machine]] - Mac OS X的备份服务。
+
+== 延伸閱讀 ==
+{{Refbegin}}
+*{{cite book
+| title     = Windows Internals
+| url     = https://archive.org/details/windowsinternals0000russ
+| edition   = 5th
+| last1     = Russinovich | first1 = Mark E.  | authorlink = Mark Russinovich
+| last2     = Solomon     | first2 = David A.
+| last3     = Ionescu     | first3 = Alex
+| publisher = Microsoft Press
+| year      = 2009
+| chapter   = Storage Management
+| pages     = [https://archive.org/details/windowsinternals0000russ/page/688 688]–698
+| ISBN      = 978-0-7356-2530-3
+}}
+* {{cite web
+|url=http://technet.microsoft.com/en-us/library/cc749185(WS.10).aspx
+|title=Selected Scenarios for Maintaining Data Integrity with Windows Vista
+|work=Microsoft TechNet
+|publisher=Microsoft Corporation
+|accessdate=4 January 2011
+|archive-date=2017-08-26
+|archive-url=https://web.archive.org/web/20170826121940/https://technet.microsoft.com/en-us/library/cc749185(WS.10).aspx
+|dead-url=no
+}}
+* {{cite web
+|last=Russinovich
+|first=Mark
+|authorlink=Mark Russinovich
+|last2=Solomon
+|first2=David
+|title=Windows XP: Kernel Improvements Create a More Robust, Powerful, and Scalable OS
+|url=http://msdn.microsoft.com/en-us/magazine/cc302206.aspx
+|work=TechNet Magazine
+|publisher=Microsoft
+|accessdate=2 May 2013
+|date=December 2001
+|archive-date=2015-05-07
+|archive-url=https://web.archive.org/web/20150507002611/https://msdn.microsoft.com/en-us/magazine/cc302206.aspx
+|dead-url=no
+}}
+* {{cite web
+|url=http://blogs.msdn.com/adioltean/archive/2006/09/18/761515.aspx
+|title=A bit of black magic: How to assign drive letters to VSS shadow copies... on Windows XP!
+|work=Antimail
+|publisher=Microsoft Corporation
+|first1=Adi
+|last1=Oltean
+|date=19 September 2006
+|accessdate=4 January 2011
+|archive-date=2010-01-25
+|archive-url=https://web.archive.org/web/20100125232816/http://blogs.msdn.com/adioltean/archive/2006/09/18/761515.aspx
+|dead-url=no
+}}
+* {{cite web
+|url=http://blogs.msdn.com/adioltean/archive/2004/12/14/301868.aspx
+|title=Creating shadow copies from the commandline
+|work=MSDN Blogs
+|publisher=Microsoft Corporation
+|first1=Adi
+|last1=Oltean
+|date=14 December 2004
+|accessdate=4 January 2011
+|archive-date=2010-03-29
+|archive-url=https://web.archive.org/web/20100329231858/http://blogs.msdn.com/adioltean/archive/2004/12/14/301868.aspx
+|dead-url=no
+}}
+* {{cite web
+|url=http://blogs.technet.com/b/filecab/archive/2009/06/17/volume-shadow-copy-service-vss-express-writers.aspx
+|title=Volume Shadow Copy Service (VSS) Express Writers
+|publisher=Microsoft Corporation
+|accessdate=2015-09-06
+|archive-date=2011-08-27
+|archive-url=https://web.archive.org/web/20110827085104/http://blogs.technet.com/b/filecab/archive/2009/06/17/volume-shadow-copy-service-vss-express-writers.aspx
+|dead-url=no
+}}
+{{Refend}}
+
+
+[[Category:Windows管理|Category:Windows管理]]
+
+
+{{视窗应用程式}}
+
+[[Category:Windows组件|Category:Windows组件]]

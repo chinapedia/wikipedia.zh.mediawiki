@@ -1,0 +1,12 @@
+{{Userbox
+  |id=建功<br>高中
+  |id-c=#FFFFFF
+  |info=這個用戶是'''[[新竹市立建功高級中學]]'''的學生、校友或教職人員。
+  |info-c=#DAFDDA
+  |info-s=10
+  |border-c=#50C878
+}}
+<noinclude>
+[[Category:台灣高中高職用戶框模板]]
+</noinclude>
+<includeonly>[[Category:新竹市立建功高級中學維基人|{{PAGENAME}}]]</includeonly>

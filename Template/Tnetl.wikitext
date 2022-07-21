@@ -1,0 +1,2 @@
+<span class="plainlinksneverexpand">&#123;&#123;[[Template:{{{1}}}|{{lcfirst:{{{1}}}}}]]&#125;&#125; <br/>[{{SERVER}}{{localurl:Template:{{{1}}}|action=edit}} edit] &middot; [[Template talk:{{{1}}}|talk]] &middot; [{{SERVER}}{{localurl:Special:Whatlinkshere/Template:{{{1}}}|limit=999}} links]</span><noinclude>
+[[Category:内部链接模板|Tnetl]]</noinclude>

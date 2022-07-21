@@ -1,0 +1,11 @@
+{{Userbox
+  |id=<!--注意合理使用之规定：“绝对不能将“合理使用”之图片，放入个人的用户页面进行展示。”-->
+  |id-c=#FFFFFF
+  |info=這個用戶是'''[[遠東科技大學]]'''的學生、校友或教職人員。
+  |info-c=#F1EE3D
+  |info-s=10
+  |border-c=#2C1D70
+}}<includeonly>[[Category:遠東科技大學維基人|{{PAGENAME}}]]</includeonly>
+<noinclude>
+[[Category:台灣大專院校用戶框模板]]
+</noinclude>

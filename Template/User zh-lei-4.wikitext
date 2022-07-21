@@ -1,0 +1,1 @@
+{{User language-4|zh-lei|该用户能以'''[[:Category:Zh-lei-4 使用者|-{zh-hans:地道; zh-hant:道地}-]]'''的'''[[:Category:Zh-lei 使用者|雷话]]'''进行交流。|雷话|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

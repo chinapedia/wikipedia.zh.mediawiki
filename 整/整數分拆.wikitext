@@ -1,0 +1,236 @@
+{{For|將整數寫成其他整數的乘積|整数分解}}
+{{expert|time=2013-12-31T13:40:24+00:00}}
+一個正[[整數|整數]]可以寫成一些正整數的[[總和|和]]。在[[數論|數論]]上，跟這些和式有關的問題稱為'''整數拆分'''、'''整數剖分'''、'''整數分割'''、'''分割數'''或'''切割數'''（{{lang-en|Integer partition}}）。其中最常見的問題就是給定正整數<math>n</math>，求不同數組<math>(a_1,a_2,...,a_k)</math>的數目，符合下面的條件：
+
+# <math>a_1 + a_2 + ... + a_k = n</math> （<math>k</math>的大小不定）
+# <math>a_1 \ge a_2 \ge ... \ge a_k > 0</math>
+# 其他附加條件（例如限定「k是偶數」，或「<math>a_i</math>不是1就是2」等）
+
+'''分割函數'''p(''n'')是求符合以上第一、二個條件的數組數目。
+
+== 拆分數量數列 ==
+4可以用5種方法寫成和式：4, 3+1, 2+2, 2+1+1, 1+1+1+1。因此 <math>p(4)=5</math>。
+
+定義 <math>p(0)=1</math>，若n為負數則 <math>p(n)=0</math>。
+
+此函數應用於[[對稱多項式|對稱多項式]]及[[對稱群_(n次對稱群)|對稱群]]的[[表示理論|表示理論]]等。
+
+分割函數p(n)，n從0開始：
+:1, 1, 2, 3, 5, 7, 11, 15, 22, 30, 42, 56, 77......([[OEIS:A000041|OEIS:A000041]])
+
+===程式實現===
+<syntaxhighlight lang="cpp">
+#include <iostream>
+#define MAXLENTH 20000
+using namespace std;
+
+int main() {
+	const int len = MAXLENTH;
+	long num[len + 1] = { 1 };
+
+	for (int i = 1; i <= len; ++i)
+		for (int j = i; j <= len; ++j)
+			num[j] += num[j - i];
+
+	for (int i = 0; i <= len; i++)
+		cout << i << " " << num[i] << endl;
+	return 0;
+}
+</syntaxhighlight>
+
+== Ferrers圖示與恆等式 ==
+每種分割方法都可用'''Ferrers圖示'''表示。
+
+Ferrers圖示是將第1行放<math>a_1</math>個方格，第2行放<math>a_2</math>個方格……第<math>k</math>行放<math>a_k</math>個方格，來表示整數分割的其中一個方法。
+
+借助Ferrers圖示，可以推導出許多[[恆等式|恆等式]]：
+
+* 給定正整數k和n，n表達成不多於k個正整數之和的方法數目，等於將n分割成任意個不大於k的正整數之和的方法數目。
+
+證明：將表示前者其中一個數組的Ferrers圖示沿對角線反射，便得到後者的一個數組。即兩者一一對應，因此其數目相同。
+
+例如 k=3，n=6：
+
+{|
+|- valign="top" align="left"
+| [[File:RedDot.svg|16px]][[File:GrayDot.svg|16px]][[File:GrayDot.svg|16px]]<br />[[File:GrayDot.svg|16px]]<br />[[File:GrayDot.svg|16px]]<br />[[File:GrayDot.svg|16px]] 
+| valign="middle" | ↔
+| 
+[[File:RedDot.svg|16px]][[File:GrayDot.svg|16px]][[File:GrayDot.svg|16px]][[File:GrayDot.svg|16px]]<br />[[File:GrayDot.svg|16px]]<br />[[File:GrayDot.svg|16px]] 
+|- valign="top" align="center"
+| 6 || =
+| 1+1+4 || =
+| 1+1+1+3 
+|}
+
+{|
+|- valign="top" align="left"
+| [[File:RedDot.svg|16px]][[File:GrayDot.svg|16px]][[File:GrayDot.svg|16px]]<br />[[File:GrayDot.svg|16px]][[File:RedDot.svg|16px]]<br />[[File:GrayDot.svg|16px]] 
+| valign="middle" | ↔
+| 
+[[File:RedDot.svg|16px]][[File:GrayDot.svg|16px]][[File:GrayDot.svg|16px]]<br />[[File:GrayDot.svg|16px]][[File:RedDot.svg|16px]]<br />[[File:GrayDot.svg|16px]] 
+|- valign="top" align="center"
+| 6 || =
+| 1+2+3 || =
+| 1+2+3 
+|}
+
+{|
+|- valign="top" align="left"
+| [[File:RedDot.svg|16px]][[File:GrayDot.svg|16px]][[File:GrayDot.svg|16px]]<br />[[File:GrayDot.svg|16px]][[File:RedDot.svg|16px]][[File:GrayDot.svg|16px]] 
+| valign="middle" | ↔
+| 
+[[File:RedDot.svg|16px]][[File:GrayDot.svg|16px]]<br />[[File:GrayDot.svg|16px]][[File:RedDot.svg|16px]]<br />[[File:GrayDot.svg|16px]][[File:GrayDot.svg|16px]] 
+|- valign="top" align="center"
+| 6 || =
+| 2+2+2 || =
+| 3+3 
+|}
+
+此外，
+:<math>6=1+5=1+1+1+1+2</math>
+:<math>6=2+4=2+2+1+1</math>
+:<math>6=3+3=2+2+2</math>
+:<math> 6=6=1+1+1+1+1+1</math>
+
+* 上述恆等式的值亦等於將<math>n+k</math>表達成剛好<math>k</math>個正整數之和的方法的數目。
+
+* 給定正整數<math>n</math>。將<math>n</math>表達成兩兩相異正整數之和的方法的數目，等於將<math>n</math>表達成[[奇數|奇數]]之和的方法的數目。
+
+例如<math>n=8</math>：
+# 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1
+# 7 + 1
+# 3 + 3 + 1 + 1
+# 5 + 3
+# 5 + 1 + 1 + 1
+# 3 + 1 + 1 + 1 + 1 + 1
+
+# 8
+# 7 + 1
+# 6 + 2
+# 5 + 3
+# 5 + 2 + 1
+# 4 + 3 + 1
+
+* 將<math>n</math>表達成<math>p</math>個1和<math>q</math>個2之和，這些方法的數目是第<math>n</math>個[[斐波那契數|斐波那契數]]。
+
+* 將<math>n</math>表達成多於1的正整數之和的方法數目是p(''n'') - p(''n''-1)。
+
+== 生成函數 ==
+<math>p(n)</math>的[[生成函數|生成函數]]是
+
+:<math>\sum_{n=0}^\infty p(n)x^n = \prod_{k=1}^\infty \left(\frac {1}{1-x^k} \right)</math>
+
+當|x|<1，右邊可寫成：
+: <math>(1+x+x^2+x^3+...)(1+x^2+x^4+x^6+...)(1+x^3+x^6+...) ...</math>
+
+<math>p(n)</math>生成函數的倒數為[[歐拉函數_(複變函數)|歐拉函數]]，利用[[五邊形數定理|五邊形數定理]]可得到以下的展開式：
+
+:<math>\prod_{k=1}^\infty (1-x^k)=\sum_{i=-\infty}^\infty(-1)^ix^{i(3i-1)/2}.</math>
+
+將<math>p(n)</math>生成函數配合[[五邊形數定理|五邊形數定理]]，可以得到以下的遞歸關係式
+
+: <math>p(n) = \sum_i (-1)^{i-1} p(n-q_i)</math>
+
+其中<math>q_i</math>是第<math>i</math>個[[廣義五邊形數|廣義五邊形數]]。
+
+==与[[杨氏矩阵|杨氏矩阵]]的关系==
+[[Image:杨表145.jpg|thumb]]
+一个[[杨氏矩阵|杨氏矩阵]]与一个整数分拆一一对应，也就是说整数分拆的个数等于相应的杨氏矩阵的个数。如图表示一个10=5+4+1的分拆。利用杨氏矩阵来表示的
+分拆更具有直观性，和可处理性，下面是几个例子。
+===分拆的转置===
+[[Image:杨表12223.jpg|thumb]]
+整数分拆（10=5+4+1）对应的杨氏矩阵沿x=y轴翻转得到新的杨氏矩阵。它对应分拆为10=3+2+2+2+1。
+
+:
+
+== Rademacher級數 ==
+漸近式：
+
+:<math>p(n) \sim \frac {\exp \left( \pi \sqrt {2n/3}\right) } {4n\sqrt{3}} \mbox { as } n\rightarrow \infty.</math>
+
+這式子是1918年[[戈弗雷·哈羅德·哈代|哈代]]和[[拉馬努金|拉馬努金]]，以及1920年[[J._V._Uspensky|J. V. Uspensky]]獨立發現的。
+
+1937年，[[Hans_Rademacher|Hans Rademacher]]得出一個更佳的結果：
+
+:<math>p(n)=\frac{1}{\pi \sqrt{2}} \sum_{k=1}^\infty A_k(n)\;
+\sqrt{k} \; \frac{d}{dn}
+\left( \frac {\sinh \left( \frac{\pi}{k}
+\sqrt{\frac{2}{3}\left(n-\frac{1}{24}\right)}\right) }
+{\sqrt{n-\frac{1}{24}}}\right)
+</math>
+
+其中
+
+:<math>A_k(n) = \sum_{0\le m < k \; ; \; (m,k)=1}\exp \left( 
+\pi i s(m,k) - 2\pi inm/k \right).</math>。
+
+<math>(m,n)=1</math>表示<math>m,n</math>互質時才計算那項。<math>s(m,k)</math>表示[[戴德金和|戴德金和]]。這條公式的證明用上了和[[戴德金η函數|戴德金η函數]]、{{link-en|福特圓|Ford circle}}、[[法里數列|法里數列]]、{{link-en|模群|Modular group}}。
+
+== Elder定理 ==
+在將<math>n</math>表示成正整數之和的所有和式之中，任意正整數<math>r</math>作為和項出現在這些式子內的次數，跟每條和式中出現<math>r</math>次或以上的正整數數目，相同。
+
+當<math>r=1</math>時，此定理又稱為Stanley定理。<ref>{{Cite web |url=http://www.math.uiuc.edu/~rgilber1/AFineRediscovery_Gilbert.pdf |title=A Fine Rediscovery |access-date=2015-11-07 |archive-date=2016-02-22 |archive-url=https://web.archive.org/web/20160222075935/http://www.math.uiuc.edu/~rgilber1/AFineRediscovery_Gilbert.pdf |dead-url=no }}</ref><ref>{{Cite web |url=http://mathworld.wolfram.com/EldersTheorem.html |title=Elder's Theorem |access-date=2015-11-07 |archive-date=2020-03-18 |archive-url=https://web.archive.org/web/20200318234754/https://mathworld.wolfram.com/EldersTheorem.html |dead-url=no }}</ref>
+
+以<math>n=5</math>為例：
+
+* 5
+* 4+1
+* 3+2
+* 3+1+1
+* 2+2+1
+* 2+1+1+1
+* 1+1+1+1+1
+
+# 1的總出現次數：0+1+0+2+1+3+5=12；在每條和式出現1次或以上的數的數目：1+2+2+2+2+2+1=12
+# 2的總出現次數：0+0+1+0+2+1+0=4；在每條和式出現2次或以上的數的數目：0+0+0+1+1+1+1=4。
+
+== 附加要求的分拆 ==
+以下敘述带有附加条件的分拆。
+
+=== 差分拆 ===
+考虑满足-{zh-hans:下面条件; zh-hant:下面條件}-分拆
+#<math>a_1 + a_2 + \cdots + a_k = n</math> （<math>k</math>的大小不定）
+#<math>a_1 > a_2 > \cdots >a_k</math>
+及分拆的每个数都不相等。
+
+[[生成函數|生成函數]]是
+:<math>\sum_{n=0}^\infty p(n)x^n = \prod_{k=1}^\infty \left(1+x^k\right) </math>
+
+=== 奇分拆 ===
+考虑满足-{zh-hans:下面条件; zh-hant:下面條件}-分拆
+#<math>a_1 + a_2 + \cdots + a_k = n</math> （<math>k</math>的大小不定）
+#<math>a_1 \ge a_2 \ge \cdots \ge a_k</math>
+# 要求 <math>a_i(i=1,2,\ldots,k)</math>为奇数
+[[生成函數|生成函數]]是
+:<math>\sum_{n=0}^\infty p(n)x^n = \prod_{k=1}^\infty \left(\frac {1}{1-x^{2k-1}} \right)</math>.
+
+====引理====
+差分拆的个数与奇分拆的个数是一样多的。
+
+可以通过杨表证明。
+
+=== 部分個數上限的分拆 ===
+當限定將<math>n</math>表示成剛好<math>k</math>個正整數之和時，可以表示為<math>p_k(n)</math>。顯然，<math>p(n) = \sum_{k=1}^{n} p_k(n)</math>。
+
+* 對於<math>n>1</math>，<math>p_n(n) = p_1(n) = 1</math>
+* <math>p_2(n) = \left\lfloor \frac{n}{2} \right\rfloor</math> ([[OEIS:A004526|OEIS:A004526]])
+* <math>p_3(n)</math> = 最接近<math>\frac{n^2}{12}</math>的正整數。([[OEIS:A069905|OEIS:A069905]])
+* <math>p_{n-1}(n) = 1</math>
+* <math>p_k(n) = p_{k-1}(n-1) + p_k(n-k)</math>
+
+== 其他常見的問題 ==
+不少數學家亦有研究按以下方式分拆的方法數目：
+* 將正整數寫成模p同餘r的正整數之和
+* 將模p同餘r正整數寫成的正整數之和<ref>{{MathWorld |id= PartitionFunctionPCongruences|title= Partition Function P Congruences
+|access-date=2021-12-19}}{{Wayback|url=http://mathworld.wolfram.com/PartitionFunctionPCongruences.html |date=20210226145536 }}</ref>
+
+== 參考資料 ==
+{{reflist}}
+
+== 外部連結 ==
+* [http://www.math.upenn.edu/%7Ewilf/PIMS/PIMSLectures.pdf Lectures on Integer Partitions] {{Wayback|url=http://www.math.upenn.edu/%7Ewilf/PIMS/PIMSLectures.pdf |date=20210224220544 }} by Herbert S. Wilf
+
+[[Category:组合数学|Category:组合数学]]
+[[Category:算术函数|Category:算术函数]]
+[[Category:数论|Category:数论]]

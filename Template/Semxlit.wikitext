@@ -1,0 +1,1 @@
+<span    title="Semitic transliteration" class="Semitic IPA" style="white-space: nowrap; text-decoration: none">{{{1}}}</span>

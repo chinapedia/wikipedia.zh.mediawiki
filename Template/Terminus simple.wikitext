@@ -1,0 +1,1 @@
+|width="30%" align="center"|<font color=gray>''起點 / 終點''</font><noinclude>*參見：[[Template:Terminus]]</noinclude>

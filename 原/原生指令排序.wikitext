@@ -1,0 +1,82 @@
+{{Unreferenced|time=2021-06-10T10:57:42+00:00}}
+{{NoteTA|G1=IT}}
+[[File:NCQ.svg|thumb]]
+'''原生指令排序'''（英语：{{lang|en|'''Native Command Queuing'''}}，簡稱：'''NCQ'''），原先是改善伺服器硬碟存取控制技術，應用在[[SCSI|SCSI]]和[[SATA|SATA 1.0/2.0/3.0介面]][[硬碟|硬碟]]讀寫加速技術，其介面開啟磁碟陣列RAID亦能加速。透過硬碟[[韌體|韌體]]、硬碟控制器以及作業系統三者的互相配合，改善硬碟內部磁區的讀取順序，可以提高硬碟效能，亦能夠輕微減輕硬碟損耗的速率。NCQ對用於伺服器上的硬碟的效率提昇尤為明顯。
+
+== 原理 ==
+
+一般[[硬碟|硬碟]]使用的[[硬碟格式|硬碟格式]]通常為[[Windows_98|Windows 98]]核心所使用的[[FAT32|FAT32]]系列，或是[[Windows_NT|Windows NT]]所使用的[[NTFS|NTFS]]，此種硬碟格式在存取資料時，時常會出現散亂的情況，導致一個文件被不規則的分散成許多的區塊存放於[[磁盤|磁盤]]上面，時間一久，[[文件|文件]]散亂的程度會日趨嚴重，由於傳統的硬碟讀取方式，會從文件的開頭依序讀取到結尾，若文件散亂的程度愈嚴重，則[[讀取頭|讀取頭]]需要來回移動的距離就越長，導致[[硬碟|硬碟]]讀寫效能逐漸下降。一旦發生這樣的問題，解決方案便是使用[[磁碟重組軟體|磁碟重組軟體]]來進行[[硬碟重組|硬碟重組]]，將散亂的文件重新排列為連續的區塊，但由於執行磁碟重組可能會需要搬動大量的磁碟區塊，如果太常執行磁碟重組，除了會提高系統負載，亦將會縮短磁碟機的使用壽命，NCQ即為了解決此種情況而誕生。NCQ的概念原本是應用在[[伺服器|伺服器]]上常見的[[SCSI|SCSI]]介面上，在SCSI的規格中即包含此項技術，只是不叫做NCQ，將此項技術經過些許修改後稱為NCQ，並將其應用在[[SATA|SATA]]介面上，後來的[[SAS|SAS]]介面也支持此項技術。啟用NCQ技術的硬碟，在讀取文件時，會依照文件在硬碟上的分佈，將存取的順序作最有效率的排序，以減少機械臂移動的距離，進而達到省時以及延長硬碟壽命的效果。
+
+== 優勢 ==
+
+於SATA II NCQ協定中，新增3個功能，分別是：
+*Race-free status return mechanism：
+*:[[硬碟|硬碟]]在完成任一指令後，可以無須再進行[[握手_(技術)|Handshake]]即可繼續另一個指令，以便讓多個指令快速接序或同時執行。
+*Interrupt aggregation：
+*:[[硬碟|硬碟]]由於以[[NCQ|NCQ]]模式執行多個指令，所以原本每一個指令完成後必須[[中斷|中斷]]（interrupt）以便讓系統接續處理的模式，轉成可以在多個指令完成後再一次提出（interrupt），故[[介面控制器|介面控制器]]（host controller）對於多個指令只須處理一次中斷即可。
+*First party DMA（FPDMA）：
+*:當[[硬碟|硬碟]]完成[[資料|資料]]讀取後，無須靠host controller的[[DMA|DMA]]動作取得特定記憶體位置，而是由硬碟本身建立[[DMA|DMA]] setup [[FIS|FIS]]（Frame Information Structure）直接對host controller送出[[記憶體|記憶體]]存取通知，如此無須[[驅動程式|驅動程式]]的運作，可以有效提升存取效率。
+
+== 條件 ==
+
+開啟NCQ，除硬碟本身必須支持NCQ外，[[作業系統|作業系統]]（OS）與[[介面控制器|介面控制器]]（controller）的支持也是不可或缺的條件。舉例說，在[[Microsoft_Windows|Microsoft Windows]]平台上，從[[Windows_Vista|Windows Vista]]開始才支持NCQ，而[[Windows_XP|Windows XP]]若要使用NCQ，則要額外安裝支持軟件。
+
+== 支持NCQ技術的晶片組 ==
+（舊資料）
+支持NCQ的硬碟控制器（部分）:
+*[[JMicron|JMicron]]
+**JMB360
+**JMB361
+**JMB362
+**JMB363
+**JMB365
+**JMB366
+*[[Silicon_Image|Silicon Image]]
+**SiI 3124
+**SiI 3132
+**SiI 3531
+*[[nVIDIA|nVIDIA]]
+**nForce 4 Ultra, nForce 4 [[SLI|SLI]]
+**nForce 410
+**nForce 430
+**nForce 550
+**nForce 570 Ultra, nForce 570 SLI
+**nForce 590 SLI
+**nForce 650i Ultra, nForce 650i SLI
+**nForce 680i SLI
+**nForce 780i SLI
+*[[Intel|Intel]] [http://www.intel.com/support/chipsets/imst/sb/CS-012304.htm] {{Wayback|url=http://www.intel.com/support/chipsets/imst/sb/CS-012304.htm |date=20100311072237 }}
+**ESB2
+**ICH6M, ICH6R
+**ICH7DH, ICH7M, ICH7MDH, ICH7R
+**ICH8DH, ICH8DO, ICH8M, ICH8M-E, ICH8R
+**ICH9DO, ICH9M, ICH9M-E, ICH9R
+**ICH10D, ICH10DO, ICH10R
+**5 Series
+**6 Series
+**7 Series
+**3400 Series
+*[[VIA|VIA]]
+**VT 8237S
+**VT 8251
+*[[ATI|ATI]]
+**SB 600
+**SB 700
+**SB 750
+*[[ALi|ALi]]／[[ULi|ULi]]
+**M1573
+**M1575
+**M1567
+**M1697
+*[[SiS|SiS]]
+**SiS966/SiS966L
+**SiS968
+*[[Marvell|Marvell]]
+**88SE9130
+
+== 參看 ==
+* [[TCQ|TCQ]]（Tagged Command Queuing）
+* [[Intel組合儲存技術軟件|Intel組合儲存技術軟件]]（Intel Matrix Storage Manager）
+
+[[Category:Serial_ATA|Category:Serial ATA]]
+[[Category:SCSI|Category:SCSI]]

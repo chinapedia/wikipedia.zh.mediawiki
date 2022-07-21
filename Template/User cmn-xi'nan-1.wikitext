@@ -1,0 +1,1 @@
+{{User language-1|cmn-xi'nan|該用戶能以'''[[:Category:cmn-xi'nan-1 使用者|簡單]]'''的'''[[:Category:cmn-xi'nan 使用者|西南官話]]'''進行交流。|西南官話|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

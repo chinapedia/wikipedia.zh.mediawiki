@@ -1,0 +1,1 @@
+{{User language-4|zh-min|這个用户會使'''[[:Category:Zh-min-4 使用者|慣熟]]'''兮講'''[[:Category:Zh-min 使用者|闽语]]'''。|闽语|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

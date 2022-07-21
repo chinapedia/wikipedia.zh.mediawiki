@@ -1,0 +1,36 @@
+'''希爾密碼'''是運用基本[[矩陣論|矩陣論]]原理的[[替換密碼|替換密碼]]，由Lester S. Hill在1929年發明。
+
+每個字母當作26進制數字：A=0, B=1, C=2... 一串字母當成n維向量，跟一個n×n的矩陣相乘，再將得出的結果[[同餘|模26]]。
+
+注意用作加密的矩陣（即密匙）在<math>\mathbb{Z}_{26}^n</math>必須是可逆的，否則就不可能解碼。只有矩陣的行列式和26互質，才是可逆的。
+
+==例子==
+考慮訊息ACT，因為A=0，C=2，T=19，訊息是：
+: <math>\begin{pmatrix} 0 \\ 2 \\ 19 \end{pmatrix}</math>
+
+設密匙為
+:<math>\begin{pmatrix} 6 & 24 & 1 \\ 13 & 16 & 10 \\ 20 & 17 & 15 \end{pmatrix}</math>
+
+確認它是可逆的：
+:<math>\begin{vmatrix} 6 & 24 & 1 \\ 13 & 16 & 10 \\ 20 & 17 & 15 \end{vmatrix} \equiv 6(16\cdot15-10\cdot17)-24(13\cdot15-10\cdot20)+1(13\cdot17-16\cdot20) \equiv 441 \equiv 25 \mod 26</math>
+
+加密過程：
+:<math>\begin{pmatrix} 6 & 24 & 1 \\ 13 & 16 & 10 \\ 20 & 17 & 15 \end{pmatrix} \begin{pmatrix} 0 \\ 2 \\ 19 \end{pmatrix} \equiv \begin{pmatrix} 67 \\ 222 \\ 319 \end{pmatrix} \equiv \begin{pmatrix} 15 \\ 14 \\ 7 \end{pmatrix} \mod 26</math>
+
+對應的密文便是「POH」。
+
+===解碼===
+假設對方知道密文和密匙，首先找出密匙的逆矩陣：
+
+:<math>\begin{pmatrix} 8 & 5 & 10 \\ 21 & 8 & 21 \\ 21 & 12 & 8 \end{pmatrix}</math>
+
+將逆矩陣和密文相乘：
+:<math>\begin{pmatrix} 8 & 5 & 10 \\ 21 & 8 & 21 \\ 21 & 12 & 8 \end{pmatrix}</math>
+
+:<math>\begin{pmatrix} 8 & 5 & 10 \\ 21 & 8 & 21 \\ 21 & 12 & 8 \end{pmatrix} \begin{pmatrix} 15 \\ 14 \\ 7 \end{pmatrix} \equiv \begin{pmatrix} 260 \\ 574 \\ 539 \end{pmatrix} \equiv \begin{pmatrix} 0 \\ 2 \\ 19 \end{pmatrix} \mod 26</math>
+
+便得到「ACT」。
+
+{{Cryptography navbox|classical}}
+
+[[Category:古典密码|Category:古典密码]]

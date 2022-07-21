@@ -1,0 +1,1 @@
+掃描電子顯微鏡下的創傷弧菌<noinclude>[[Category:每周图片模板]]</noinclude>

@@ -1,0 +1,1 @@
+#REDIRECT [[Template:星際旅行角色]]

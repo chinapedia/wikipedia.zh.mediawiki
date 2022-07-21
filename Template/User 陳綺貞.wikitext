@@ -1,0 +1,1 @@
+{{Userbox|#ff00ff|#ffb6c1|Cheer|這個用戶喜歡聽[[陳綺貞]]的歌}}

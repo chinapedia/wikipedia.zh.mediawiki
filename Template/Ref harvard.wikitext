@@ -1,0 +1,1 @@
+<span class="reference" id="ref_{{{1}}}_{{{3}}}">[[#endnote_{{{1}}}_{{{3}}}|<nowiki>(</nowiki>{{{2}}}<nowiki>)</nowiki>]]</span><noinclude>[[Category:頁面訊息模板|注]]</noinclude>

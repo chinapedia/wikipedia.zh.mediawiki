@@ -1,0 +1,1 @@
+#REDIRECT [[Template:Coord/dms2dec]]

@@ -1,0 +1,14 @@
+{{Userbox
+  |id=[[File:WakinChau2007.jpg|43px]]
+  |id-c=deepskyblue
+  |id-fc=navy
+  |id-s=10
+  |info=這個用戶喜歡聽'''[[周華健]]'''的歌。
+  |info-c=skyblue
+  |info-s=10
+  |info-fc=black
+  |border-c=black
+  |border-s=1
+}}
+<includeonly>[[Category:喜歡聽周華健的歌的維基人]]</includeonly>
+<noinclude>[[Category:藝人用戶框模板‎|周華健]]</noinclude>

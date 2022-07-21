@@ -1,0 +1,1 @@
+#REDIRECT [[Template:虚构秘密组织信息框]]

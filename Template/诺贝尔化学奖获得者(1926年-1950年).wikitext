@@ -1,0 +1,1 @@
+#REDIRECT [[Template:诺贝尔化学奖获得者]]

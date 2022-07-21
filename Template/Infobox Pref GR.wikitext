@@ -1,0 +1,36 @@
+{{Infobox Settlement
+|name= {{{name}}}州
+|native_name= {{{name_local|}}}
+|native_name_lang= el
+|settlement_type= 已撤銷的行政區劃
+|image_map= {{{image_map|}}}
+|mapsize= 200px
+|map_caption= {{{name}}}州在希臘的位置
+|image_map1 = {{{munic_map|}}}
+|mapsize1= 200px
+|map_caption1 = 州內各市、鎮的位置
+|subdivision_type= 國家
+|subdivision_name= 希臘
+|subdivision_type1= [[希腊大区|大区]]
+|subdivision_name1= {{{periph}}}
+|seat_type = [[首府]]
+|seat = {{{capital}}}
+|population_total = {{{population}}}
+|population_as_of = {{{population_as_of|}}}
+|population_rank = {{{pop_rank|}}}
+|area_total_km2 = {{{area|}}}
+|area_rank = {{{area_rank|}}}
+|population_density_km2 = {{{pop_dens}}}
+|population_density_rank = {{{popdens_rank|}}}
+|parts_type = 下轄分區
+|p1 = {{#if:{{{provinces|}}}|{{{provinces}}}|0}}[[省 (希腊)|省]]
+|p2 = {{#if:{{{municip|}}}|{{{municip}}}|0}}[[希腊市镇|市]]
+|p3 = {{#if:{{{commun|}}}|{{{commun}}}|0}}[[希腊市镇|镇]]
+|postal_code_type = [[希腊邮政编码|邮政编码]]
+|postal_code = {{{postal_code|}}} 
+|area_code = {{{area_code|}}}
+|registration_plate = {{{licence|}}}
+|blank_name = [[ISO 3166-2:GR|ISO 3166-2码]]
+|blank_info = {{{ISO|}}}
+|website = {{{website|无}}}
+}}<noinclude>{{Documentation}}</noinclude>

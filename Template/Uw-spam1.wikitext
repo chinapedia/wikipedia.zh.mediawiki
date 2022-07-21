@@ -1,0 +1,4 @@
+[[File:Information.svg|25px]] 感谢参与維基百科。我們歡迎每位用戶為維基百科作出建設性貢獻，惟閣下{{<includeonly>safesubst:</includeonly>#if:{{{1|}}}|於[[:{{{1}}}]]裡}}所加入的[[Wikipedia:外部連結|外部連結]]並不符合[[Wikipedia:外部連結|相關指引]]。[[WP:NOTLINK|維基百科並非外部連結收集處或網站列表]]，更不應該作廣告或宣傳之用。本網站乃使用[[nofollow]]標籤，加入外部連結並不會影響-{zh-hans:链接;zh-hant:連結}-於搜尋引擎中的排名。如閣下認為條目應該包含該-{zh-hans:链接;zh-hant:連結}-並打算再次加入至條目當中，請務先提案至條目討論頁以交由社群討論。請閣下參看[[Wikipedia:歡迎，新來者|歡迎頁面]]以了解更多關於為維基百科貢獻的事宜。{{<includeonly>safesubst:</includeonly>#if:{{{2|}}}|{{{2}}}|敬希合作。}}<!-- Template:uw-spam1 --><noinclude>
+{{Templatesnotice|series = uw-spam|max = 4im|s1 = uw-s1}}
+[[Category:用戶警告模板|圾]]
+</noinclude>

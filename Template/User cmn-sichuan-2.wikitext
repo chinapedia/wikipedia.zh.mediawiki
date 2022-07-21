@@ -1,0 +1,1 @@
+{{User language-2|cmn-sichuan|这个用户的'''[[:Category:cmn-sichuan 使用者|四川話]]'''说得还'''[[:Category:cmn-sichuan-2 使用者|将就喔]]'''。|四川話|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

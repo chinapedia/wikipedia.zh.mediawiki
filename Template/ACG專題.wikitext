@@ -1,0 +1,114 @@
+{{WPBannerMeta
+|PROJECT                = ACG
+ |BANNER_NAME           = Template:ACG專題
+ |substcheck            = <includeonly>{{subst:</includeonly><includeonly>substcheck}}</includeonly>
+ |small                 = {{{small|}}}
+ |category              = {{{category|¬}}}
+ |listas                = {{{listas|}}}
+|PROJECT_LINK           = PJ:ACG
+|IMAGE_LEFT             = {{#switch: {{#invoke:Class/convert|main|1={{{class}}} }}<!-- 學英文維基，根據不同品質條目顯示不同圖片 -->
+ |fa = Wikipe-tan featured.png
+ |a|ga = Wikipe-tan good article.png
+ |stub = Anime stub.svg
+ |#default = Wikipe-tan head.png
+ }}
+| MAIN_TEXT = 本條目屬於[[PJ:ACG|ACG專題]]的範疇，一個旨在改善中文維基百科'''日系[[ACGN]]'''類條目內容的專案。如果您有意參與，請瀏覽專題首頁，參與其[[PJT:ACG|討論]]並完成相應的開放性任務。
+|PORTAL                 = 动漫
+|QUALITY_SCALE          = subpage
+ |class                 = {{{class|}}}
+ |B_CHECKLIST = yes
+  |b1={{{b1|}}}
+  |b2={{{b2|}}}
+  |b3={{{b3|}}}
+  |b4={{{b4|}}}
+  |b5={{{b5|}}}
+  |b6={{{b6|}}}
+ |auto={{{auto|}}}
+|IMPORTANCE_SCALE       = subpage
+ |importance            = {{{importance|}}}
+|ASSESSMENT_CAT         = 
+|ASSESSMENT_LINK        = 
+|HOOK_ASSESS = {{WPBannerMeta/hooks/bchecklist
+ |BANNER_NAME=Template:ACG專題 
+ |category={{{category|¬}}}
+ |class={{{class|}}}
+  |b1={{{b1|}}}
+  |b2={{{b2|}}}
+  |b3={{{b3|}}}
+  |b4={{{b4|}}}
+  |b5={{{b5|}}}
+  |b6={{{b6|}}}
+ |ASSESSMENT_LINK     = PJ:ACG/評級
+ }}{{WPBannerMeta/hooks/qualimpintersect
+ | BANNER_NAME = Template:ACG專題
+ | QUALITY_SCALE = subpage
+  | class = {{{class|}}}
+   |b1={{{b1|}}}
+   |b2={{{b2|}}}
+   |b3={{{b3|}}}
+   |b4={{{b4|}}}
+   |b5={{{b5|}}}
+   |b6={{{b6|}}}
+ | IMPORTANCE_SCALE = subpage
+  | importance = {{{importance|}}}
+ | category = {{{category|¬}}}
+ | ASSESSMENT_CAT = ACG条目
+ | SUPPRESS_NA = yes
+ }}
+|attention              = {{{attention|}}}
+ |ATTENTION_CAT         = 需要關注的動漫專題條目
+|note 1                 = {{{ref|}}}
+ |NOTE_1_TEXT           = 根據標記，本條目需要補充更多來源以供查證。
+ |NOTE_1_IMAGE          = Question book-4.svg
+ |NOTE_1_CAT            = 需要補充來源的動漫專題條目
+|note 2                 = {{{photo|}}}
+ |NOTE_2_TEXT           = 根據標記，本條目需要添加圖片以提升條目品質。
+ |NOTE_2_IMAGE          = Gnome-image-x-generic.svg
+ |NOTE_2_CAT            = 需要添加圖片的動漫專題條目
+|note 3                 = {{{problem|}}}
+ |NOTE_3_TEXT           = 根據標記，本條目需要處理編輯上的問題。
+ |NOTE_3_IMAGE          = Broom icon.svg
+ |NOTE_3_CAT            = 需要處理問題的動漫專題條目
+|infobox                = {{{needs-infobox|}}}
+ |INFOBOX_CAT           = 需要信息框的動漫專題條目
+|tf 1                   = {{{Doraemon|}}}
+ |TF_1_NESTED           =
+ |TF_1_LINK             = PJ:ACG/哆啦A梦
+ |TF_1_NAME             = '''哆啦A夢'''工作组
+ |TF_1_IMAGE            = 
+ |TF_1_PORTAL           = 哆啦A夢
+ |TF_1_MAIN_CAT         = 
+|tf 2                   = {{{Naruto|}}}
+ |TF_2_NESTED           =
+ |TF_2_LINK             = PJ:ACG/火影忍者
+ |TF_2_NAME             = '''火影忍者'''工作组
+ |TF_2_IMAGE            = Naruto_logo.svg
+ |TF_2_MAIN_CAT         = 
+|tf 3                   = {{{Gundam|}}}
+ |TF_3_NESTED           =
+ |TF_3_LINK             = PJ:ACG/GUNDAM
+ |TF_3_NAME             = '''GUNDAM'''工作组
+ |TF_3_IMAGE            = 
+ |TF_3_MAIN_CAT         =
+|tf 4                   = {{{Pokemon|}}}
+ |TF_4_NESTED           =
+ |TF_4_LINK             = PJ:电子游戏/宝可梦
+ |TF_4_NAME             = '''宝可梦'''工作组
+ |TF_4_IMAGE            = Wikiball_Crystal.svg
+ |TF_4_MAIN_CAT         = 宝可梦工作组条目
+| tf 5 = {{{Mangaka|{{{漫畫家|}}}}}}
+ | TF_5_NESTED          = 漫画家专题
+ | TF_5_LINK            = PJ:漫画家
+ | TF_5_NAME            = '''漫画家'''专题
+ | TF_5_IMAGE           = Anime_eye.svg
+ | TF_5_QUALITY         = yes
+ | TF_5_PORTAL          = 
+ | tf 5 importance = {{#ifeq: {{ns:1}} | {{NAMESPACE}} | {{#switch: {{lc: {{{class}}} }} | disambig|disamb|dab = na | #default = {{{Mangaka-importance|}}} }} }}
+ | TF_5_ASSESSMENT_CAT = 漫画家条目
+|HOOK_COLLAPSED         = {{WPBannerMeta/hooks/notecounter
+ |category              = {{{category|¬}}}
+ |BANNER_NAME           = Template:ACG專題
+ }}
+}}<noinclude>
+{{documentation}}
+</noinclude>

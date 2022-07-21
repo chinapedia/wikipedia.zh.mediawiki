@@ -1,0 +1,10 @@
+{{Userbox
+|border-c=#000000
+|border-s=1
+|id-c=#6495ED
+|info-c=#ADDFAD
+|info-s=10
+|id=[[File:中華民國總統府.JPG|60px]]
+|info=這個用戶現在或曾經居住於[[中華民國首都]]'''[[臺北市|臺北]]'''。
+|usercategory=臺北市維基人
+}}

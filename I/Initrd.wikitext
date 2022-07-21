@@ -1,0 +1,42 @@
+{{lowercase|title=initrd}}
+{{NoteTA|G1=IT}}
+'''Initrd ramdisk'''或者'''initrd'''是指一个临时[[文件系统|文件系统]]，它在启动阶段被[[Linux内核|Linux内核]]调用。initrd主要用于当[[根目录|“根”]]文件系统被[[Mount_(Unix)|挂载]]之前，进行准备工作。<ref name="almesberger2">{{citation|last = Almesberger|first = Werner|year = 2000|title = Booting linux: the history and the future|journal = Proceedings of the Ottawa Linux Symposium|url = http://www.linuxsymposium.org/2000/booting.php|deadurl = yes|archiveurl = https://web.archive.org/web/20080724162809/http://www.linuxsymposium.org/2000/booting.php|archivedate = 2008-07-24|accessdate = 2012-12-26}}</ref>
+
+== 基本原理 ==
+同其他[[Unix|Unix]]系统一样，[[Linux|Linux]]操作系统首先要将内核載入到内存。内核驻留于操作系统与应用程序的整个活动周期，其中应用程序（软件）在“用户空间”内运行，位于内核控制之下。
+
+為了使載入記憶體最小化，一些核心Linux程式轉化成[[可載入核心模組|可載入核心模組]]形式，可以動態載入系統中。
+
+initrd系統中的檔案在開機階段可以被核心存取，裡面的內容會被掛載成一個loop型態的檔案。initrd通常被壓縮成[[gzip|gzip]]類型，在開機的時候由[[bootloader|bootloader]]（[[LILO|LILO]]、[[GRUB|GRUB]]）來告知核心initrd的位置。在2.6版本内核之后出现了initramfs，它的功能類似initrd，但是它基于[[CPIO|CPIO]]格式，无须挂载就可以展开成一个文件系统。
+
+== initramfs 與 initrd ==
+[[initramfs|initramfs]]是initrd的替代品。initrd是一个被加载的块设备，内部有[[ext2|ext2]]一类文件系统的存在，于是由于Linux内核的缓存机制，其中的内容还会被缓存到内存上，造成一定的内存空间浪费。而initramfs本身就是一个[[tmpfs|tmpfs]]的[[RAM_disk|RAM disk]]，拥有最小化的设计，绕过了缓存机制，也消除了多余的内存占用。<ref>{{cite web |url=http://stackoverflow.com/questions/10603104/the-difference-between-initrd-and-initramfs |title=The difference between initrd and initramfs? |website=[[Stack_Overflow|Stack Overflow]] |accessdate=2014-04-24 |archive-date=2021-01-26 |archive-url=https://web.archive.org/web/20210126035033/https://stackoverflow.com/questions/10603104/the-difference-between-initrd-and-initramfs |dead-url=no }}</ref>
+
+initramfs的生成方式也远比initrd简单。对于initramfs，只需 <code>geninitramfs() { cd "$1"; find . -depth| cpio -o -H newc | ${3-cat}> "$2"; }</code> 就可以利用[[cpio|cpio]]生成这样一个文件，同时使用一些程序进行压缩（通过额外的管道实现，其中使用cat仅用于无压缩时转发输出，可省去）。对于initrd，则涉及生成一定大小的空文件，然后创建文件系统，挂载并添加文件等等诸多步驟。
+
+== 实现 ==
+
+[[Linux內核|Linux內核]] 與 initrd/initramfs 必須儲存在 bootloader 可以存取的位置，通常是在：
+
+* root 檔案系統內
+* 一個小的[[ext4|ext4]]或[[FAT|FAT]]檔案系統的分割區（通常掛載到 /boot）
+* TFTP server內
+
+bootloader 會將內核與 initrd 載入到記憶體中並將 initrd 的位址傳給內核。initrd會被掛載當成 initial root file system。
+
+現在的 Linux 發行版會建立客製化只包含必要元件的 initrd 映像檔，例如只包含 [[IDE|IDE]]、[[SCSI|SCSI]]、[[SATA|SATA]]、[[Serial_Attached_SCSI|SAS]] 以及檔案系統核心模組。
+
+== 参考 ==
+
+* {{citation|first = Rob|last = Landley|title = Introducing initramfs, a new model for initial RAM disks|date = 15 March 2005|url = http://linuxdevices.com/articles/AT4017834659.html|publisher = linuxdevices.com|archiveurl = https://web.archive.org/web/20090301134734/http://linuxdevices.com/articles/AT4017834659.html|archivedate = 2009-03-01|access-date = 2007-08-22|dead-url = yes}} {{citation | title=initramfs 簡介，一個新的 initial RAM disks 的模型 | url=http://gaznjang.blogspot.com/2008/04/initramfs-initial-ram-disks.html | accessdate=2018-12-17 | archive-date=2019-09-07 | archive-url=https://web.archive.org/web/20190907012528/http://gaznjang.blogspot.com/2008/04/initramfs-initial-ram-disks.html | dead-url=no }}
+<references/>
+
+== 更多链接 ==
+
+* A [http://wiki.debian.org/InitrdReplacementOptions detailed comparison] {{Wayback|url=http://wiki.debian.org/InitrdReplacementOptions |date=20200729052458 }} of initrd-generating toolkits
+* [https://www.kernel.org/doc/Documentation/early-userspace/README Kernel documentation] {{Wayback|url=https://www.kernel.org/doc/Documentation/early-userspace/README |date=20201007003232 }} on Early userspace support
+* [https://archive.is/20121227180523/http://blog.microsuncn.com/?p=253 分析linux initrd文件]
+
+{{Linux内核}}
+
+[[Category:Linux|Category:Linux]]

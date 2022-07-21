@@ -1,0 +1,68 @@
+[[Image:Bilininterp.png|right]]
+'''雙線性插值'''，又稱為'''雙線性內插'''。在[[数学|数学]]上，'''双线性插值'''是对[[线性插值|线性插值]]在二维[[直角坐标系|直角网格]]上的扩展，用于对双变量函数（例如 ''x'' 和 ''y''）进行[[插值|插值]]。其核心思想是在两个方向分别进行一次线性插值。
+
+== 算法 ==
+[[File:Bilinear_interpolation.png|right]]
+
+假如我们想得到未知函数 ''f'' 在点 <math>P=\left( x, y\right)</math> 的值，假设我们已知函数 ''f'' 在 <math>Q_{11} = \left( x_1, y_1 \right) </math>, <math>Q_{12} = \left( x_1, y_2 \right) </math>, <math>Q_{21} = \left( x_2, y_1 \right) </math>, 及 <math>Q_{22} = \left( x_2, y_2 \right) </math> 四个点的值。 
+
+首先在 ''x'' 方向进行线性插值，得到
+:<math>\begin{align}
+f(x, y_1) &\approx \frac{x_2-x}{x_2-x_1} f(Q_{11}) + \frac{x-x_1}{x_2-x_1} f(Q_{21}), \\
+f(x, y_2) &\approx \frac{x_2-x}{x_2-x_1} f(Q_{12}) + \frac{x-x_1}{x_2-x_1} f(Q_{22}).
+\end{align}</math>
+
+然后在 ''y'' 方向进行线性插值，得到 
+:<math>\begin{align}
+f(x,y) &\approx \frac{y_2-y}{y_2-y_1} f(x, y_1) + \frac{y-y_1}{y_2-y_1} f(x, y_2) \\
+&= \frac{y_2-y}{y_2-y_1} \left ( \frac{x_2-x}{x_2-x_1} f(Q_{11}) + \frac{x-x_1}{x_2-x_1} f(Q_{21}) \right ) + \frac{y-y_1}{y_2-y_1} \left ( \frac{x_2-x}{x_2-x_1} f(Q_{12}) + \frac{x-x_1}{x_2-x_1} f(Q_{22}) \right ) \\
+&= \frac{1}{(x_2-x_1)(y_2-y_1)} \big( f(Q_{11})(x_2-x)(y_2-y) + f(Q_{21})(x-x_1)(y_2-y)+  f(Q_{12})(x_2-x)(y-y_1) + f(Q_{22})(x-x_1)(y-y_1) \big)\\
+&=\frac{1}{(x_2-x_1)(y_2-y_1)}  \begin{bmatrix} x_2-x & x-x_1 \end{bmatrix} \begin{bmatrix} f(Q_{11}) & f(Q_{12}) \\ f(Q_{21})& f(Q_{22}) \end{bmatrix} \begin{bmatrix}
+y_2-y \\ y-y_1 \end{bmatrix}.
+\end{align}</math>
+
+注意此处如果先在 ''y'' 方向插值、再在 ''x'' 方向插值，其结果与按照上述顺序双线性插值的结果是一样的。
+
+=== 单位正方形 ===
+
+如果选择一个坐标系统使得 ''f'' 的四个已知点坐标分别为 (0, 0)、(0, 1)、(1, 0) 和 (1, 1)，那么插值公式就可以化简为 
+:<math> f(x,y) \approx f(0,0) \, (1-x)(1-y) + f(1,0) \, x(1-y) + f(0,1) \, (1-x)y + f(1,1) xy. </math>
+
+或者用[[矩阵|矩阵]]运算表示为
+
+:<math> f(x,y) \approx \begin{bmatrix}
+1-x & x \end{bmatrix} \begin{bmatrix}
+f(0,0) & f(0,1) \\
+f(1,0) & f(1,1) \end{bmatrix} \begin{bmatrix}
+1-y \\
+y \end{bmatrix}</math>
+
+=== 非线性 ===
+
+顾名思义，双线性插值的结果不是线性的，它是两个[[线性函数|线性函数]]的积。在单位正方形上，双线性插值可以记作
+:<math> f(x,y) = \sum_{i=0}^1 \sum_{j=0}^1 a_{ij} x^i y^j = a_{00} + a_{10} x + a_{01} y + a_{11} x y</math>
+
+常数的数目（四）对应于给定的 ''f'' 的数据点数目
+:<math> a_{00} = f(0,0),</math>
+:<math> a_{10} = f(1,0)-f(0,0),</math>
+:<math> a_{01} = f(0,1)-f(0,0),</math>
+:<math> a_{11} = f(1,1)+f(0,0)-\big(f(1,0)+f(0,1)\big).</math>
+
+双线性插值的结果与插值的顺序无关。首先进行 ''y'' 方向的插值，然后进行 ''x'' 方向的插值，所得到的结果是一样的。
+
+双线性插值的一个显然的三维空间延伸是[[三线性插值|三线性插值]]。
+
+== 在图像处理领域的应用 ==
+
+[[File:Bilin3.png|right]]
+
+在[[计算机视觉|计算机视觉]]及[[图像处理|图像处理]]领域，双线性插值是一种基本的[[图像缩放|重采样]]技术。
+
+[[材质贴图|材质贴图]]中，双线性插值也叫[[双线性过滤|双线性过滤]]或者'''双线性材质贴图'''。图像的双线性插值放大算法中，目标图像中新创造的象素值，是由源图像位置在它附近的2*2区域4个邻近象素的值通过加权平均计算得出的。双线性内插值算法放大后的图像质量较高，不会出现像素值不连续的的情况。然而此算法具有低通滤波器的性质，使高频分量受损，所以可能会使图像轮廓在一定程度上变得模糊。
+
+==参见==
+*[[双三次插值|双三次插值]]
+*[[样条插值|样条插值]]
+*[[Lanczos_resampling|Lanczos resampling]]
+
+[[Category:插值论|Category:插值论]]

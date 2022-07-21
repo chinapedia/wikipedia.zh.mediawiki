@@ -1,0 +1,1 @@
+#redirect [[Template:美國人物小作品]]

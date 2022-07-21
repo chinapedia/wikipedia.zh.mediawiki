@@ -1,0 +1,2 @@
+<includeonly><div class="float{{{2|right}}}" style="margin: {{ #switch: {{{2|}}} |left = 0 1em 1em 0|right = 0 0 1em 1em|#default = 0 0 1em 1em}}; border: 1px solid #ccc; background: #f9f9f9; padding: 3px"><div style="border: 1px solid #ccc; background: {{{bgcolor|{{{bg|#f9f9f9}}}}}};">{{{1}}}</div></div></includeonly><noinclude>
+{{template doc}}</noinclude>

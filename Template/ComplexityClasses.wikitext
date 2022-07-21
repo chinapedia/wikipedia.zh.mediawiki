@@ -1,0 +1,1 @@
+#REDIRECT [[Template:复杂度类]]

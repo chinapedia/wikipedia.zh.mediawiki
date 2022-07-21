@@ -1,0 +1,11 @@
+{{Userbox
+  |id=[[File:Zhongshan983KN.jpg|40px]]
+  |id-c=#CCFF00
+  |info=呢条友係'''[[孫中山]]嘅[[:Category:中山維基人|同鄉]]'''。
+  |info-c=white
+  |info-s=9
+  |border-c=#000000
+}}<includeonly>[[Category:中山維基人|{{PAGENAME}}]][[Category:广东维基人|{{PAGENAME}}]]</includeonly>
+<noinclude>
+[[Category:廣東省維基人用戶框模板]]
+</noinclude>

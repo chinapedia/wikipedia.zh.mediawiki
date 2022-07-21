@@ -1,0 +1,10 @@
+{{Userbox
+  |id=
+  |id-c=#FFFFFF
+  |info=這個用戶是'''[[香港專業教育學院]]'''的校友、學生或教職員。
+  |info-c=#8CD9E8
+  |info-s=10
+  |border-c=#9C9A9B
+}}
+[[Category:香港專業教育學院的維基人|{{PAGENAME}}]]
+<noinclude>[[Category:香港大專院校巴別模板]]</noinclude>

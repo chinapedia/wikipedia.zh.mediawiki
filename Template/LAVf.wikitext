@@ -1,0 +1,1 @@
+[[File:Flag of Latvia.svg|{{{1|25}}}px]] [[拉脫維亞國家足球隊|拉脫維亞]]<noinclude>[[Category:欧洲国家模板|LAVf]]</noinclude>

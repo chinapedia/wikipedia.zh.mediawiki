@@ -1,0 +1,1 @@
+#redirect [[Template:企业家小作品]]

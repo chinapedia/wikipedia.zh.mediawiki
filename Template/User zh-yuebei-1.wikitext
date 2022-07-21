@@ -1,0 +1,1 @@
+{{User language-1|zh-yuebei|該用戶能以'''[[:Category:Zh-yuebei-1 使用者|簡單]]'''的'''[[:Category:Zh-yuebei 使用者|粵北土話]]'''進行交流。|粤北土话|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

@@ -1,0 +1,1 @@
+#REDIRECT [[Template:User 地獄少女]]

@@ -1,0 +1,13 @@
+{{Userbox
+  |id=[[File:Banyan_in_Birdie_Heaven.JPG|80px|新會]]
+  |id-c=#CCFF00
+  |info=該箇用戶係'''[[:Category:新会维基人|新會人]]'''。
+  |info-c=white
+  |info-s=9
+  |border-c=#000000
+}}
+<includeonly>[[Category:新会维基人|{{PAGENAME}}]][[Category:广东维基人|{{PAGENAME}}]]</includeonly>
+<noinclude>
+{{Documentation}}
+[[Category:廣東省維基人用戶框模板]]
+</noinclude>

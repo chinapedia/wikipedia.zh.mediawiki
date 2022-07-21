@@ -1,0 +1,1 @@
+{{Createdwith|Inkscape|logo=Inkscape Logo.svg}}

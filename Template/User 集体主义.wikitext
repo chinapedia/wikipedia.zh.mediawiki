@@ -1,0 +1,12 @@
+{{Userbox
+  |border-c=black
+  |border-s=1
+  |id=集体<br>主义
+  |id-c=lime
+  |id-fc=black
+  |id-s=10
+  |info=這個用戶是'''[[集体主义]]'''者。
+  |info-c=#00bfff
+  |info-fc=
+  |info-s=9
+}}[[Category:集体主义维基人]]

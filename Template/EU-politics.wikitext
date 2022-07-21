@@ -1,0 +1,1 @@
+#REDIRECT [[Template:歐洲聯盟政治]]

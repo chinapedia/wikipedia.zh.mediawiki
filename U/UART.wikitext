@@ -1,0 +1,110 @@
+{{noteTA
+|G1=IT
+|G2=Communication
+}}
+[[File:UART_8250_Microchip.jpg|right]]上的UART晶片8250]]
+'''通用非同步收发传输器'''（Universal Asynchronous Receiver/Transmitter，通常称为'''UART'''）是一种[[异步串行通信|异步收發傳輸器]]，是[[電腦硬體|電腦硬體]]的一部分，將数据透過[[串列通訊|串列通訊]]進行传输。UART通常用在与其他通訊接口（如[[電子工業聯盟|EIA]] [[RS-232|RS-232]]）的连接上。
+
+具体实物表现为独立的模組化芯片，或是微处理器中的內部周边裝置(peripheral)。一般和RS-232C规格的，类似[[Maxim|Maxim]]的MAX232之类的标准信号幅度变换芯片进行搭配，作为连接外部设备的接口。在UART上追加同步方式的序列信号变换电路的产品，被称为USART(Universal Synchronous Asynchronous Receiver Transmitter)。
+
+== 功能 ==
+在手机设计和测试阶段被用来控制CPU与其余部分的訊息传送
+
+UART是通用异步收发器（异步串行通信口）的英文缩写，它包括了[[RS232|RS232]]、[[RS449|RS449]]、[[RS423|RS423]]、[[RS422|RS422]]和[[RS485|RS485]]等接口标准规范和总线标准规范，即UART是异步串行通信口的总称。而RS232、RS449、RS423、RS422和RS485等，是对应各种异步串行通信口的接口标准和总线标准，它规定了通信口的电气特性、传输速率、连接特性和接口的机械特性等内容。实际上是属于通信网络中的[[物理层|物理层]]（Physical Layer）的概念，与通信协议没有直接关系。而通信协议，是属于通信网络中的[[数据链路层|数据链路层]]（Data Link Layer）的概念。COM是PC（个人计算机）上，异步串行通信口的简写。由于历史原因，IBM的PC外部接口配置为RS232，成为实际上的PC界默认标准。所以，现在PC机的COM均为RS232。若配有多个异步串行通信口，则分别称为COM1、COM2... 。
+
+== 原理 ==
+{{See also |异步串行通信}}
+通用异步接受器-发送器(UART)把数据的字节按照比特顺序发送<ref name=Osborne80>Adam Osborne, ''An Introduction to Microcomputers Volume 1: Basic Concepts'', Osborne-McGraw Hill Berkeley California USA, 1980 {{ISBN|0-931988-34-9}} pp. 116–126</ref>。另一端的UART把比特组装为字节。每个UART包含一个[[移位寄存器|移位寄存器]]。通过一根线或其他媒介的串行通信比通过多根线的并行通信具有更低成本。
+
+UART通常并不直接产生或接收其他设备的外部信号。独立接口设备用于转换信号的[[逻辑电平|逻辑电平]]给UART。 
+
+通信可以是单工、全双工或半双工。
+
+=== 数据帧 ===
+[[File:UART_timing_diagram.svg|800px]]
+
+空闲状态，即没有数据传输，是高电平。这是从（有线）电报时代的历史遗存。线路保持高电平表明線路与传输设备没有损坏。每个字符表示为一个帧，以逻辑低电平为开始比特，然后是数据比特，可选的奇偶校验比特，最后是一个或多个停止比特（逻辑高电平）。大部分应用都是先传最低位的数据比特（the least significant data bit），但也有例外（如{{tsl|en|IBM 2741}}打印终端）。
+
+如果线路长期（至少大于传输一帧的时间）保持低电平，这被UART检测为Break condition.
+
+=== 接收器 ===
+UART硬件受一个内部时钟信号控制。该时钟信号是数据传输率的倍频，典型是比特率的8或16倍。接收器在每个时钟脉冲时测试接收到的信号状态是否为开始比特。如果开始比特的低电平持续传输1个比特所需时间的一半以上，则认为开始了一个数据帧的传输；否则，则认为是毛刺脉冲并忽略。到了下一个比特时间后，线路状态被采样并送入移位寄存器。约定的表示一个字符的所有数据比特(典型为5至8个比特）接收后，移位寄存器可被接收系统使用。UART将设置一个标记指出新数据可用，并产生一个[[中断|处理器中断]]请求主机处理器取走接收到的数据。 
+
+简化的UART在开始比特下降沿开始重新同步时间，然后在每个数据比特的中心时刻采样。
+
+UART的标准特性之一是在接收下一个字符时在缓冲区保存上一个接收到的字符。这种“双缓冲区”允许接收计算机用一个字符的传输时段来获取缓冲区内的上一个字符。许多UART有更大的FIFO缓冲区，允许主机一次处理多个字符，这特别适用于高传输数据率的串行通信同时处理器中断频率有限（通常中断间隔大于1毫秒）。
+
+=== 发送器 ===
+UART把一个字符放入移位寄存器，就开始产生一个数据帧。对于全双工通信，发送与接受使用不同的移位寄存器。使用更大的FIFO使得主机处理器或DMA放置多个字节后由UART自主完成传输。　UART用一个标志位表示busy。
+
+=== 应用 ===
+接收与发送的UART必须达成数据帧协议。如果接收方发现这方面错误，会向主机报告"framing error"标志。
+
+典型的连接modem的串口，使用8个比特表示一个字节，没有奇偶校验位，1个停止位。比特率除以10就是发送ASCII字符的传输速率。
+
+超低成本的嵌入式系统没有UART而是用处理器来实现异步串行通信。
+
+== UART 型號 ==
+一些早期用於 UART 的代表性 IC 型號如下表
+{| class="wikitable"
+|-
+! Model !! Description
+|-
+| EXAR XR21V1410
+|-
+|-
+| [[Intersil|Intersil]] 6402
+|-
+| Z8440 || 2000 kbit/s. Async, <!--IBM-->[[Binary_Synchronous_Communications|Bisync]], [[Synchronous_Data_Link_Control|SDLC]], [[HDLC|HDLC]], <!--CCITT-->[[X.25|X.25]]. [[循環冗餘校驗|CRC]]. 4 位元組接收緩衝區， 2 位元組發送緩衝區， [[DMA|DMA]].<ref name="zilog_com-ps0183">{{cite web|title=Zilog Product specification Z8440/1/2/4, Z84C40/1/2/3/4. Serial input/output controller|url=http://www.zilog.com/docs/z80/ps0183.pdf|access-date=2010-12-15|archive-date=2021-04-12|archive-url=https://web.archive.org/web/20210412185535/https://www.zilog.com/docs/z80/ps0183.pdf|dead-url=no}} 090529 zilog.com</ref>
+|-
+| [[Intel|Intel]] [[8251|8251]]
+| USART，非同步通信最高 19.2kbit/s，同步通信最高 64kbit/s<ref>{{Cite web |url=http://map.grauw.nl/resources/midi/intel_8251.pdf |title=Intel 8251A datasheet |access-date=2019-01-07 |archive-date=2021-12-12 |archive-url=https://web.archive.org/web/20211212103822/http://map.grauw.nl/resources/midi/intel_8251.pdf |dead-url=no }}</ref>
+|-
+| [[美國國家半導體|NS]] INS[[8250_UART|8250]]
+|rowspan=5| 緩衝區只有 1 位元組的老舊型式
+|-
+| Motorola 6850
+|-
+| {{link-en|MOS Technology 6522|MOS Technology 6522|6522}}
+|-
+| {{link-en|MOS Technology 6551|MOS Technology 6551|6551}}
+|-
+| Rockwell 65C52
+|-
+| 16450
+| 具有兩組 UART， 代號 164 = 82 x 2 暗示了它的特性。 以下 16 開頭的都有兩組 UART
+|-
+| {{link-en|16550 UART|16550 UART|16550}}
+| 推出後發現 FIFO 存在 bug，隨即以 16550A 取代
+|-
+| {{link-en|16550 UART|16550 UART|16550A}}
+|rowspan=2| 16 位元組緩衝區，可設為 TL=1,4,8,14; 標準最高速度 115.2 kbit/s, 也有可達 230.4 或 460.8 kbit/s 的，支援 DMA <ref name="cs_utk_edu-mswin_serial_faq">{{cite web|title=FAQ: The 16550A UART & TurboCom drivers 1994|url=http://www.cs.utk.edu/~shuford/terminal/mswin_serial_faq.txt|deadurl=yes|archiveurl=https://web.archive.org/web/20080517022038/http://www.cs.utk.edu/~shuford/terminal/mswin_serial_faq.txt|archivedate=2008-05-17|accessdate=2010-12-15}} 090529 cs.utk.edu</ref><!-- The 16550 also has DMA capability, but it is not clear that any PC drivers ever use this.  For more technical info, see National Semiconductor Application Note AN-491. -->
+|-
+| 16C552
+|-
+| 16650 || 32 位元組緩衝區，最高速度 460.8 kbit/s
+|-
+| 16750 || 64 位元組發送緩衝區， 56 位元組接收緩衝區，最高速度 921.6 kbit/s
+|-
+| 16850
+|rowspan=2| 128 位元組緩衝區，最高速度 460.8 kbit/s 或 1500 kbit/s
+|-
+| 16C850
+|-
+| 16950
+|-
+| {{nowrap|Hayes ESP}} || 1 k 位元組緩衝區
+|}
+
+== 資料來源 ==
+* 摘錄自：https://web.archive.org/web/20070717231509/http://hk.dictionary.yahoo.com/search.html?s=UART
+
+== 參考資料與附註 ==
+{{reflist}}
+
+== 外部連結 ==
+* {{en icon}}[https://web.archive.org/web/20080613095627/http://www.national.com/ds/PC/PC16550D.pdf  16550D UART的Datasheet]
+* {{en icon}}[http://www.freebsd.org/doc/en_US.ISO8859-1/articles/serial-uart/ Freebsd Tutorials] {{Wayback|url=http://www.freebsd.org/doc/en_US.ISO8859-1/articles/serial-uart/ |date=20201116134506 }} (includes standard signal definitions, history of UART ICs, and pinout for commonly used DB25 connector)
+* {{en icon}}[http://www.societyofrobots.com/microcontroller_uart.shtml UART Tutorial for Robotics] {{Wayback|url=http://www.societyofrobots.com/microcontroller_uart.shtml |date=20201122202857 }} (contains many practical examples)
+
+[[Category:資料傳輸|Category:資料傳輸]]

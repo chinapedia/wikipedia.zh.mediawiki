@@ -1,0 +1,13 @@
+{{Ambox
+|name=Unreferenced
+|subst=<includeonly>{{subst:substcheck}}</includeonly>
+|small=left
+|type=content
+|smallimage=[[File:Tango-nosources.svg]]
+|sect=章節
+|issue='''[[WP:列明来源|沒有提供]]參考來源'''，內容可能'''[[WP:可供查證|無法查證]]'''。
+|date={{{date|}}}
+|time={{{time|}}}
+|cat=需补充来源的条目
+|all=拒绝当选首页新条目推荐栏目的条目
+}}<noinclude>{{Documentation}}</noinclude>

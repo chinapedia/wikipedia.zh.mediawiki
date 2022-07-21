@@ -1,0 +1,7 @@
+<includeonly>{{#invoke:lang|lang_xx_inherit
+|code=mi
+|italic=unset
+}}</includeonly><noinclude>
+{{Documentation|Template:Lang-x/doc}}
+[[Category:南島語系多語言支持模板]]
+</noinclude>

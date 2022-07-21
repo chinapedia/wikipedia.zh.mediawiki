@@ -1,0 +1,13 @@
+{{Userbox
+|id-c=white
+|border-c=#000
+|id-s=12
+|id=1+1{{=}}3?
+|info-s=9
+|info-c=#FFCC00
+|info=這個用戶不喜歡或不懂'''[[数学]]'''。
+|usercategory=對數學感到乏力的維基人
+}}
+<noinclude>
+[[Category:數學愛好者模板]]
+</noinclude>

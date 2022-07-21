@@ -1,0 +1,14 @@
+{{Userbox
+  |border-c=black
+  |border-s=1
+  |id=FTV
+  |id-c=darkgreen
+  |id-fc=lightgreen
+  |id-s=15
+  |info=這個用戶喜歡看台灣'''[[民視無線台]]'''。
+  |info-c=lightgreen
+  |info-fc=green
+  |info-s=10
+}}<includeonly>[[Category:喜歡觀賞台灣民視的維基人]]</includeonly><noinclude>
+[[Category:媒體用戶框模板|視]]
+</noinclude><noinclude>{{Clear}}[[Wikipedia:用戶框/媒體]]</noinclude>

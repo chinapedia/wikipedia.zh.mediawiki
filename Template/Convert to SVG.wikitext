@@ -1,0 +1,1 @@
+#REDIRECT [[Template:Should_be_SVG]]

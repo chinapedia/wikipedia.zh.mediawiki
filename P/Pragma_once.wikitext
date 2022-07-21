@@ -1,0 +1,74 @@
+{{DISPLAYTITLE:#pragma once}}
+{{NoteTA|G1=IT}}
+在[[C語言|C]]和[[C++|C++]]程式語言中，'''#pragma once'''是一個非標準但是被廣泛支援的[[前置處理|前置處理]]符號，會讓所在的檔案在一個單獨的編譯中只被包含一次。以此方式，<code>#pragma once</code>提供類似[[include防範|include防範]]的目的，但是擁有較少的程式碼且能避免名稱的碰撞。
+
+== 示例 ==
+請參考[[include防範|include防範]]裡其中一種狀況的範例或其他的使用方法。如下：
+
+;grandparent.h
+<syntaxhighlight lang="cpp">
+#pragma once
+
+struct foo 
+{
+    int member;
+};
+</syntaxhighlight>
+
+;parent.h
+<syntaxhighlight lang="cpp">
+#include "grandparent.h"
+</syntaxhighlight>
+
+;child.c
+<syntaxhighlight lang="cpp">
+#include "grandparent.h"
+#include "parent.h"
+</syntaxhighlight>
+
+== 優缺點 ==
+使用<code>#pragma once</code>代替include防範將加快編譯速度，因為這是一種高階的機制；[[編譯器|編譯器]]會自動比對檔案名稱或[[inode|inode]]而不需要在[[標頭檔|標頭檔]]去判斷<code>#ifndef</code>和<code>#endif</code>。
+
+另一方面，部份編譯器，例如[[GCC|GCC]]、[[clang|clang]]等，也包含特別的程式碼來識別和有效率的管理include防範。因此使用<code>#pragma once</code>并不会得到明显的加速。<ref>{{cite web |url=http://gcc.gnu.org/onlinedocs/gcc-2.95.3/cpp_1.html#SEC8 |title=The C Preprocessor: 1. The C Preprocessor |publisher=Gcc.gnu.org |date=1996-02-01 |accessdate=2013-08-19 |archive-date=2013-08-07 |archive-url=https://web.archive.org/web/20130807225104/http://gcc.gnu.org/onlinedocs/gcc-2.95.3/cpp_1.html#SEC8 |dead-url=no }}</ref><ref>{{cite web |url=http://clang.llvm.org/docs/InternalsManual.html#multipleincludeopt |title=“Clang”CFE Internals Manual—Clang 3.4 documentation |publisher=Clang.llvm.org |date= |accessdate=2013-08-19 |archive-date=2013-08-06 |archive-url=https://web.archive.org/web/20130806185452/http://clang.llvm.org/docs/InternalsManual.html#multipleincludeopt |dead-url=no }}</ref><ref>{{cite web |url=http://clang.llvm.org/doxygen/group__CINDEX__FILES.html#ga1969fe907a40d9469ea68c370d0f602a |title=clang: File manipulation routines |publisher=Clang.llvm.org |date= |accessdate=2013-08-19 |archive-date=2013-11-11 |archive-url=https://web.archive.org/web/20131111172201/http://clang.llvm.org/doxygen/group__CINDEX__FILES.html#ga1969fe907a40d9469ea68c370d0f602a |dead-url=no }}</ref>
+
+此外，因為編譯器自己必須承擔管理<code>#pragma once</code>，它不必定義新的指令名稱，例如在[[include防範|include防範]]文章範例的<code>H_GRANDFATHER</code>。這能排除名稱碰撞的風險，意思就是至少第一次包含標頭檔不會再有'''錯誤'''。
+
+然而，這種高階的管理有好也有壞；設計者必須依賴編譯器正確的管理<code>#pragma once</code>。編譯器如果犯錯，例如沒有辨認出在相同檔案中的兩個不同[[符號連結|符號連結]]名稱指標，此時編譯會錯誤。編譯器對於<code>#pragma once</code>可能包含相關的bug [[LCC-Win32|LCC-Win32]] 2004年[http://groups.google.com/groups?selm=bvjqhn$q5o$1@news-reader1.wanadoo.fr][http://groups.google.com/groups?selm=488cbfe1.0304061213.264d94d@posting.google.com]和GCC 1998年。[http://gcc.gnu.org/onlinedocs/gcc-2.95.3/cpp_1.html#SEC8]{{Wayback|url=http://gcc.gnu.org/onlinedocs/gcc-2.95.3/cpp_1.html#SEC8 |date=20070425203334 }}2005年，GCC文件中將<code>#pragma once</code>列為「已淘汰」的特性。[http://gcc.gnu.org/onlinedocs/gcc-4.0.3/cpp/Obsolete-once_002donly-headers.html#Obsolete-once_002donly-headers]{{Wayback|url=http://gcc.gnu.org/onlinedocs/gcc-4.0.3/cpp/Obsolete-once_002donly-headers.html#Obsolete-once_002donly-headers |date=20070102011354 }}随着gcc 3.4的发布，gcc解决了#pragma once中的一些问题（主要是跟符号链接和硬链接有关），并且去掉了#pragma once的“已淘汰”的标签。[http://gcc.gnu.org/gcc-3.4/changes.html]{{Wayback|url=http://gcc.gnu.org/gcc-3.4/changes.html |date=20100710060842 }}
+
+==编译器支持==
+
+{| class="wikitable sortable"
+|-
+! Compiler
+! #pragma once
+
+|-
+| [[Clang|Clang]] || 支持<ref>{{cite web |url=http://clang.llvm.org/doxygen/Pragma_8cpp-source.html#l00184 |title=clang: clang: Pragma.cpp Source File |publisher=Clang.llvm.org |date= |accessdate=2013-08-19 |deadurl=yes |archiveurl=https://web.archive.org/web/20140404052351/http://clang.llvm.org/doxygen/Pragma_8cpp-source.html#l00184 |archivedate=2014-04-04 }}</ref>
+|-
+| [[Comeau_C/C++|Comeau C/C++]] || 支持<ref>{{cite web |url=http://www.comeaucomputing.com/4.0/docs/userman/pragma.html |title=Comeau C++ Pre-Release User Documentation: Pragmas |publisher=Comeaucomputing.com |date= |accessdate=2013-08-19 |archive-url=https://web.archive.org/web/20131211122659/http://www.comeaucomputing.com/4.0/docs/userman/pragma.html |archive-date=2013-12-11 |dead-url=yes }}</ref>
+|-
+| [[C++Builder_XE_Seattle|C++Builder XE Seattle]] || 支持<ref>{{cite web |url=http://docwiki.embarcadero.com/RADStudio/Seattle/en/Pragma_once |title=#pragma once - RAD Studio XE Seattle |publisher=Docwiki.embarcadero.com |date=2015-08-25 |accessdate=2016-03-10 |archive-date=2016-03-10 |archive-url=https://web.archive.org/web/20160310150020/http://docwiki.embarcadero.com/RADStudio/Seattle/en/Pragma_once |dead-url=no }}</ref>
+|-
+| [[Digital_Mars_C++|Digital Mars C++]] || 支持<ref>{{cite web |url=http://www.digitalmars.com/ctg/pragmas.html#once |title=Pragmas |publisher=Digital Mars |date= |accessdate=2013-08-19 |archive-date=2013-12-12 |archive-url=https://web.archive.org/web/20131212140057/http://www.digitalmars.com/ctg/pragmas.html#once |dead-url=no }}</ref>
+|-
+| [[GNU_Compiler_Collection|GCC]] || 支持<ref>{{cite web |url=http://gcc.gnu.org/onlinedocs/gcc-4.4.0/cpp/Alternatives-to-Wrapper-_0023ifndef.html#Alternatives-to-Wrapper-_0023ifndef |title=Alternatives to Wrapper #ifndef |publisher=Gcc.gnu.org |date= |accessdate=2013-08-20 |archive-date=2016-03-04 |archive-url=https://web.archive.org/web/20160304054532/http://gcc.gnu.org/onlinedocs/gcc-4.4.0/cpp/Alternatives-to-Wrapper-_0023ifndef.html#Alternatives-to-Wrapper-_0023ifndef |dead-url=no }}</ref>（3.4版本以后<ref>{{cite web |url=http://gcc.gnu.org/gcc-3.4/changes.html |title=GCC 3.4 Release Series—Changes, New Features, and Fixes |publisher=Gcc.gnu.org |date= |accessdate=2013-08-19 |archive-date=2013-08-07 |archive-url=https://web.archive.org/web/20130807162212/http://gcc.gnu.org/gcc-3.4/changes.html |dead-url=no }}</ref>）
+|-
+| [[Intel_C++編譯器|Intel C++編譯器]] || 支持<ref>{{cite web|title=Diagnostic 1782: #pragma once is obsolete. Use #ifndef guard instead.|url=http://software.intel.com/en-us/articles/cdiag1782#comment-9466|work=Intel Developer Zones|accessdate=4 December 2013|archive-date=2013-12-11|archive-url=https://web.archive.org/web/20131211181306/http://software.intel.com/en-us/articles/cdiag1782#comment-9466|dead-url=no}}</ref> 
+|-
+| [[Microsoft_Visual_C++|Microsoft Visual C++]] || 支持<ref>{{cite web |url=http://msdn.microsoft.com/en-us/library/4141z1cx%28v=vs.71%29.aspx |title=once(C/C++) |publisher=Msdn.microsoft.com |date= |accessdate=2013-08-19 |archive-date=2016-08-10 |archive-url=https://web.archive.org/web/20160810031340/https://msdn.microsoft.com/en-us/library/4141z1cx(v=vs.71).aspx |dead-url=no }}</ref>
+|-
+| [[Pelles_C|Pelles C]] || 支持<ref>IDE help/documentation</ref>
+|-
+| [[IAR_C/C++|IAR C/C++]] || 不支持<ref>{{cite web|title=IAR C/C++ Development Guide|url=ftp://ftp.iar.se/WWWfiles/arm/webic/doc/EWARM_DevelopmentGuide.ENU.pdf|work=IAR Systems|accessdate=4 December 2013|deadurl=yes|archiveurl=https://web.archive.org/web/20170516173602/http://ftp.iar.se/WWWfiles/arm/webic/doc/EWARM_DevelopmentGuide.ENU.pdf|archivedate=2017年5月16日}}</ref> 
+|}
+
+== 参考文献 ==
+{{Reflist|30em}}
+
+== 外部連結 ==
+* https://web.archive.org/web/20070317022009/http://msdn.microsoft.com/library/en-us/vclang/html/_PREDIR_Pragma_Directives.asp
+
+{{DEFAULTSORT:#pragma once}}
+[[Category:C語言|Category:C語言]]
+[[Category:C++|Category:C++]]
+[[Category:C頭文件|Category:C頭文件]]

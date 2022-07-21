@@ -1,0 +1,1 @@
+{{Encourage|bgcolor=#003366|fontcolor=#CCFF00|stripe=2|stripecolor=#cc0000|title=年會特別貢獻|}}<includeonly>[[Category:年會特別貢獻|{{PAGENAME}}]]</includeonly><noinclude>[[Category:年會特別貢獻| ]][[Category:維基獎勵模板|Y]]</noinclude>

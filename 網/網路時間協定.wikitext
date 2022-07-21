@@ -1,0 +1,145 @@
+{{noteTA
+|G1= IT
+|T=zh-cn:网络时间协议;zh-tw:網路時間協定;zh-hk:網路時間協定;
+|1=zh-cn:网络时间协议;zh-tw:網路時間協定;zh-hk:網路時間協定;
+|2=zh-cn:特拉华大学;zh-tw:德拉瓦大學;zh-hk:德拉瓦大學;
+|3=zh-cn:网络传输协议;zh-tw:通訊協定;zh-hk:通訊協定;
+}}
+
+{{网络协议}}
+'''网络时间协议'''（{{lang-en|'''N'''etwork '''T'''ime '''P'''rotocol}}，缩写：{{lang|en|'''NTP'''}}）是在数据网络[[潜伏时间|潜伏时间]]可变的[[计算机系统|计算机系统]]之间通过[[分组交换|分组交换]]进行[[时钟同步|时钟同步]]的一个网络协议，位于[[OSI模型|OSI模型]]的[[应用层|应用层]]。自1985年以来，NTP是目前仍在使用的最古老的[[TCP/IP协议族|互联网协议]]之一。NTP由[[特拉华大学|特拉华大学]]的{{tsl|en|David L. Mills}}设计。
+
+NTP意图将所有参与计算机的[[协调世界时|协调世界时]]（UTC）时间[[同步|同步]]到几[[毫秒|毫秒]]的误差内。<ref name="Mills2010" />{{rp|3}}它使用{{tsl|en|Marzullo's algorithm|Marzullo算法}}的修改版来选择准确的时间服务器，其设计旨在减轻可变{{tsl|en|network latency|网络延迟}}造成的影响。NTP通常可以在公共[[互联网|互联网]]保持几十毫秒的误差，并且在理想的[[局域网|局域网]]环境中可以实现超过1毫秒的精度。不对称[[路由|路由]]和[[拥塞控制|拥塞控制]]可能导致100毫秒（或更高）的错误。<ref name="summary">{{cite web |url=http://www.eecis.udel.edu/~mills/exec.html |title=Executive Summary: Computer Network Time Synchronization |accessdate=2011-11-21 |archive-date=2011-11-02 |archive-url=https://web.archive.org/web/20111102204926/http://www.eecis.udel.edu/~mills/exec.html |dead-url=no }}</ref><ref name="faq">{{cite web |url=http://www.ntp.org/ntpfaq/NTP-s-algo.htm#Q-ACCURATE-CLOCK |title=NTP FAQ |publisher=The NTP Project |accessdate=2011-08-27 |archive-date=2011-09-06 |archive-url=https://web.archive.org/web/20110906014530/http://www.ntp.org/ntpfaq/NTP-s-algo.htm#Q-ACCURATE-CLOCK |dead-url=no }}</ref>
+
+该协议通常描述为一种[[主從式架構|主從式架構]]，但它也可以用在[[對等網路|對等網路]]中，对等体双方可将另一端认定为潜在的时间源。<ref name="Mills2010" />{{Rp|20}}发送和接收[[時間戳|時間戳]]采用[[用户数据报协议|用户数据报协议]]（UDP）的[[通訊埠|通訊埠]]123实现。<ref>{{cite web |url= http://www.iana.org/assignments/port-numbers |title= Port Numbers |publisher= The Internet Assigned Numbers Authority (IANA) |accessdate= 2017-01-04 |archive-date= 2001-06-04 |archive-url= https://web.archive.org/web/20010604223215/http://www.iana.org/assignments/port-numbers |dead-url= no }}</ref><ref>{{Cite web |url=http://tools.ietf.org/html/rfc5905 |title=Page 16 |accessdate=2017-01-04 |archive-date=2018-01-01 |archive-url=https://web.archive.org/web/20180101075712/https://tools.ietf.org/html/rfc5905 |dead-url=no }}</ref>这也可以使用[[廣播_(網络)|廣播]]或[[多播|多播]]，其中的客户端在最初的往返校准交换后被动地监听时间更新。<ref name=faq/>NTP提供一个即将到来[[闰秒|闰秒]]调整的警告，但不会传输有关本地[[时区|时区]]或[[夏时制|夏时制]]的信息。<ref name="summary" /><ref name="faq" />
+
+当前协议为版本4（NTPv4），这是一个RFC 5905文档中的建议标准。它[[向下兼容|向下兼容]]指定于RFC 1305的版本3。
+
+==历史==
+[[File:DL_Mills-2.jpg|right]]
+1979年，网络[[时间同步|时间同步]]技术在[[纽约|纽约]]的{{tsl|en|National Computer Conference|国家计算机会议}}上于运行在跨大西洋卫星网络的[[互联网|互联网]]服务上公开演示，这可能是该技术的首次公开演示。该技术后在1981年互联网工程笔记（IEN）173中描述，并根据RFC 778文档开发为一个公开协议。该技术首先被部署在一个本地网络，作为Hello路由协议的一部分，并在{{tsl|en|Fuzzball router|Fuzzball}}（一个用于网络原型的实验操作系统，已运行多年）中实现。
+
+现在还有其他的相关网络工具。这包括[[DAYTIME協定|Daytime]]和[[時間協定|Time]]协议用以记录事件时间，以及[[互联网控制消息协议|互联网控制消息协议]]和IP时间戳选项（RFC 781）。更多完整的同步系统，虽然缺乏NTP的数据分析和时钟规律算法，包括Unix守护进程timed在内的软件其使用选举算法为所有客户端指定服务器。以及数字时间同步服务（Digital Time Synchronization Service，DTSS）使用类似构NTP阶层模型的服务器层次结构。
+
+1985年，NTPv0被实现于Fuzzball和Unix，文档化于RFC 958的NTP数据包头、和往返延迟和偏移计算都被留存至NTPv4。尽管当时可用的计算机和网络相对较慢，但在跨大西洋链路上也取得了优于100[[毫秒|毫秒]]的精度，在[[以太网|以太网]]网络上准确度为几十毫秒。
+
+1988年，一个更完整的NTPv1协议规范及相关的算法发表在RFC 1059。它利用了RFC 956的文献中的实验结果和时钟滤波算法，并是第一个描述[[主從式架構|客户端-服务器]]和[[對等網路|對等網路]]模型的版本。1991年，NTPv1架构、协议和算法通过{{tsl|en|David L. Mills}}在{{tsl|en|IEEE Transactions on Communications}}发布的一篇文章得到了工程学界的更广泛关注。
+
+1989年，RFC 1119发布通过[[有限状态机|有限状态机]]定义的NTPv2，使用[[伪代码|伪代码]]来描述其操作。它引入了一个管理协议和[[數位簽章|加密认证]]方案，它们留存至NTPv4。社区批评NTP的设计缺乏{{tsl|en|Correctness (computer science)|形式正确性原则}}。他们的替代设计包括{{tsl|en|Marzullo's algorithm|Marzullo算法}}，其修改版本已及时添加到NTP。这个时代的大多数算法也大部分留存至NTPv4。
+
+1992年，RFC 1305定义了NTPv3。该RFC包括一个对所有错误来源的分析，从{{tsl|en|Master clock|参考时钟}}至最终客户端，这使帮助度量和选择最佳服务器成为可能（在其中几个候选者反对的情况下）。广播模式被引入。
+
+在接下来的几年里，随着新特性的添加和算法的改进，显然还需要一个新的协议版本。<ref name="MillsES">{{cite book|author=David L. Mills|title=Computer Network Time Synchronization: The Network Time Protocol on Earth and in Space, Second Edition|url=https://books.google.com/books?id=BxTOBQAAQBAJ&pg=PA377|date=15 November 2010|publisher=CRC Press|isbn=978-1-4398-1464-2|pages=377.}}</ref>2010年，RFC 5905发布了一个对NTPv4的建议规范，但该协议自那时以来已经显著改变，截至2014年，更新的RFC尚未发布。<ref>{{cite web| url=https://www.eecis.udel.edu/~mills/ntp.html| title=Network Time Synchronization Research Project| accessdate=24 December 2014| archive-date=2014-12-23| archive-url=https://web.archive.org/web/20141223013515/http://www.eecis.udel.edu/~mills/ntp.html| dead-url=no}}</ref>在Mills从[[特拉华大学|特拉华大学]]退休后，该参考实现目前由Harlan Stenn保持为一个[[开放源代码|开放源代码]]项目。<ref>{{cite web| url=http://www.informationweek.com/cloud/infrastructure-as-a-service/ntp-needs-money-is-a-foundation-the-answer/d/d-id/1319557| title=NTP Needs Money: Is A Foundation The Answer?| work={{tsl|en|InformationWeek}}| date=March 23, 2015| accessdate=April 4, 2015| archive-date=2015-04-10| archive-url=https://web.archive.org/web/20150410033108/http://www.informationweek.com/cloud/infrastructure-as-a-service/ntp-needs-money-is-a-foundation-the-answer/d/d-id/1319557| dead-url=no}}</ref><ref>{{cite web| url=http://www.informationweek.com/it-life/ntps-fate-hinges-on-father-time/d/d-id/1319432?cmp=em-prog-na-na-newsltr_20150313_control&imm_mid=0ce65e&page_number=2| title=NTP's Fate Hinges On 'Father Time'| work={{tsl|en|InformationWeek}}| date=March 11, 2015| accessdate=April 4, 2015| archive-date=2015-04-10| archive-url=https://web.archive.org/web/20150410021745/http://www.informationweek.com/it-life/ntps-fate-hinges-on-father-time/d/d-id/1319432?cmp=em-prog-na-na-newsltr_20150313_control&imm_mid=0ce65e&page_number=2| dead-url=no}}</ref>
+
+==时钟层==
+[[File:Usno-amc.jpg|thumb]]备用主时钟{{tsl|en|Schriever Air Force Base|Schriever AFB (Colorado)}}是一个第0层的NTP源]]
+[[Image:Network_Time_Protocol_servers_and_clients.svg|thumb]]
+
+NTP使用一个分层、半分层的时间源系统。该层次的每个级别被称为“stratum”，顶层分配为数字0。一个通过阶层n同步的服务器将运行在阶层n + 1。数字表示与参考时钟的距离，用于防止层次结构中的循环依赖性。阶层并不总是指示质量或可靠性；在阶层3的时间源得到比阶层2时间源更高的时间质量也很常见。电信系统对{{tsl|en|Synchronization in telecommunications||时钟层}}使用不同的定义。以下提供了阶层0、1、2、3的简要描述。
+
+; 阶层0（Stratum 0）
+: 这些是高精度计时设备，例如[[原子鐘|原子鐘]]（如铯、铷）、[[GPS时钟|GPS时钟]]或其他[[無線電時鐘|無線電時鐘]]。它们生成非常精确的{{tsl|en|pulse per second|脉冲秒}}信号，触发所连接计算机上的[[中斷|中斷]]和时间戳。阶层0设备也称为参考（基准）时钟。
+; 阶层1
+: 这些与阶层0设备相连、在几微秒误差内同步[[系统时间|系统时钟]]的计算机。阶层1服务器可能与其他阶层1服务器对等相连，以进行完整性检查和备份。<ref name=cisco>{{cite web| url=http://www.cisco.com/en/US/tech/tk869/tk769/technologies_white_paper09186a0080117070.shtml| title=Network Time Protocol: Best Practices White Paper| accessdate=15 October 2013| archive-date=2013-10-01| archive-url=https://web.archive.org/web/20131001041853/http://www.cisco.com/en/US/tech/tk869/tk769/technologies_white_paper09186a0080117070.shtml| dead-url=no}}</ref>它们也被称为主要（primary）[[时间服务器|时间服务器]]。<ref name=summary/><ref name=faq/>
+; 阶层2
+: 这些计算机通过网络与阶层1服务器同步。提供阶层2的计算机将查询多个阶层1服务器。阶层2计算机也可能与其他阶层2计算机对等相连，为对等组中的所有设备提供更健全穩定的时间。
+; 阶层3
+: 这些计算机与阶层2的服务器同步。它们使用与阶层2相同的算法进行对等和数据采样，并可以自己作为服务器担任阶层4计算机，以此类推。
+
+阶层的上限为15；阶层16被用于标识设备未同步。每台计算机上的NTP算法相互构造一个[[贝尔曼-福特算法|贝尔曼-福特算法]]最短路径[[生成树|生成树]]，以最小化所有客户端到阶层1服务器的累积往返延迟。<ref name="Mills2010"/>{{rp|20}}
+
+==时间戳==
+
+NTP使用64[[位元|位元]]的时间戳，其中32位元表示秒，32位元表示秒的小数，给出一个每2<sup>32</sup>秒（136年）才会[[整数溢出|翻转]]的时间尺度，理论分辨率2<sup>−32</sup>秒（233皮秒）。NTP以1900年1月1日作为開始時間，因此第一次翻转将在2036年2月7日发生。<ref>{{cite web |url=https://www.eecis.udel.edu/~mills/y2k.html |author=David L. Mills |title=The NTP Era and Era Numbering |date=12 May 2012 |accessdate=24 September 2016 |archive-date=2016-10-26 |archive-url=https://web.archive.org/web/20161026011515/https://www.eecis.udel.edu/~mills/y2k.html |dead-url=no }}</ref><ref name="StevensFenner2004">{{cite book|author1=W. Richard Stevens|author2=Bill Fenner|author3=Andrew M. Rudoff|title=UNIX Network Programming|url=https://books.google.com/books?id=ptSC4LpwGA0C&pg=PA582|year=2004|publisher=Addison-Wesley Professional|isbn=978-0-13-141155-5|pages=582–|access-date=2017-01-04|archive-date=2019-03-30|archive-url=https://web.archive.org/web/20190330170620/https://books.google.com/books?id=ptSC4LpwGA0C&pg=PA582|dead-url=no}}</ref>
+
+NTP的未来版本可能将时间表示扩展到128位元：其中64位元表示秒，64位元表示秒的小数。当前的NTPv4格式支持“时代数字”（Era Number）和“时代偏移”（Era Offset），正确使用它们应该有助于解决日期翻转问题。据Mills称：“64位元的秒小数足以分辨[[光子|光子]]以[[光速|光速]]通过[[电子|电子]]所需的时间。64位元的秒足以提供明确的时间表示，直到宇宙变暗。”<ref>[[特拉华大学|特拉华大学]] Digital Systems Seminar presentation by David Mills, 2006-04-26</ref><ref group=note>2<sup>−64</sup>秒大约[[数量级_(时间)|54仄秒]]（zeptoseconds）（光行进16.26皮米，或大约0.31×[[玻尔半径|玻尔半径]]），2<sup>64</sup>秒大约{{tsl|en|1 E19 s and more||585亿年}}。</ref>
+
+==时钟同步算法==
+[[File:NTP-Algorithm.svg|thumb]]
+典型的NTP客户端将定期[[輪詢|輪詢]]不同网络上的三个或更多服务器。为同步其时钟，客户端必须计算其时间偏移量和[[來回通訊延遲|來回通訊延遲]]。时间偏移“θ”定义为：
+:<math>\theta = {(t_1 - t_0) + (t_2 - t_3 ) \over 2}</math>，
+往返延迟“δ”为：
+:<math>\delta = {(t_3 - t_0 ) - ( t_2- t_1 )}</math>，
+其中：
+:''t''<sub>0</sub> 是请求数据包传输的客户端时间戳，
+:''t''<sub>1</sub> 是请求数据包回复的服务器时间戳，
+:''t''<sub>2</sub> 是响应数据包传输的服务器时间戳
+:''t''<sub>3</sub> 是响应数据包回复的客户端时间戳。<ref name="Mills2010"/>{{rp|19}}
+
+“θ”和“δ”的值通过过滤器并进行统计分析。[[异常值|异常值]]被剔除，并从最好的三个剩余候选中导出估算的时间偏移。然后调整时钟频率以逐渐减小偏移，创建一个[[反馈|反馈回路]]。<ref name="Mills2010">{{cite book|author=David L. Mills|title=Computer Network Time Synchronization: The Network Time Protocol|url=https://books.google.com/books?id=pdTcJBfnbq8C&pg=PA12|date=12 December 2010|publisher=Taylor & Francis|isbn=978-0-8493-5805-0|pages=12–|access-date=2017-01-04|archive-date=2014-07-18|archive-url=https://web.archive.org/web/20140718092324/http://books.google.com/books?id=pdTcJBfnbq8C&pg=PA12|dead-url=no}}</ref>{{rp|20}}
+
+当客户端和服务器之间的输入和输出路由都具有对称的标称延迟时，同步是正确的。如果路由没有共同的标称延迟，则将差异取半作为[[测量误差|测量误差]]。<ref>{{cite conference |last1=Gotoh |first1=T. |last2=Imamura |first2=K. |last3=Kaneko |first3=A. |title=Improvement of NTP time offset under the asymmetric network with double packets method |conference=Conference on Precision Electromagnetic Measurements |pages=448–449 |year=2002 |doi=10.1109/CPEM.2002.1034915 |isbn=0-7803-7242-5}}</ref>
+
+==软件实现==
+[[File:Ntpq_-p_query.png|thumb]]
+
+===参考实现===
+NTP[[参考实现|参考实现]]连同协议的开发已持续发展了20多年。随着新功能的添加，向后兼容性仍保持不变。它包含几个敏感的算法，尤其是时钟规律，在同步到使用不同算法的服务器时可能会发生错误。该软件已[[移植_(軟體)|移植]]到几乎各个计算平台，包括个人计算机。<ref name="Mills2010"/>{{rp|13}}它在Unix上运行名为{{tsl|en|ntpd}}的[[守护进程|守护进程]]，或在Windows上运行为一个[[Windows服务|Windows服务]]。<ref name="Mills2010"/>{{rp|15}}支持参考时钟，并且以与远程服务器相同的方式对偏移进行过滤和分析，尽管它们通常更频繁地轮询。<ref name="Mills2010"/>{{rp|19}}
+
+===SNTP===
+一个不太复杂的NTP实现，使用相同的协议但不需要存储较长时间的{{tsl|en|state (computer science)|状态 (计算机科学)|状态}}<ref>{{cite web | url = https://tools.ietf.org/html/rfc5905#section-14 | title = Network Time Protocol Version 4: Protocol and Algorithms Specification | date = June 2010 | page = 54 | quote = Primary servers and clients complying with a subset of NTP, called the Simple Network Time Protocol (SNTPv4) [...], do not need to implement the mitigation algorithms [...] The fully developed NTPv4 implementation is intended for [...] servers with multiple upstream servers and multiple downstream servers [...] Other than these considerations, NTP and SNTP servers and clients are completely interoperable and can be intermixed [...] | accessdate = 2012-08-26 | archive-date = 2019-04-22 | archive-url = https://web.archive.org/web/20190422000027/https://tools.ietf.org/html/rfc5905#section-14 | dead-url = no }}</ref>，也称简单网络时间协议（Simple Network Time Protocol，SNTP）。它使用在某些[[嵌入式系统|嵌入式系统]]和不需要高精度时间的应用中。<ref>RFC 4330</ref><ref>RFC 5905</ref>
+
+===Windows时间服务===
+
+从[[Windows_2000|Windows 2000]]起的所有[[Microsoft_Windows|Microsoft Windows]]版本都包括Windows时间服务（W32Time），<ref>{{Cite web|title=Windows Time Service Technical Reference: Windows Time Service|url=https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc773061(v=ws.10)|access-date=2022-03-12|last=Archiveddocs|work=docs.microsoft.com|language=en-us}}</ref>其具有将计算机时钟同步到NTP服务器的能力。
+
+W32Time服务最初是为实现[[Kerberos|Kerberos]]第五版的身份验证协议，它需要误差5分钟内正确时间值以防止[[重放攻击|重放攻击]]。Windows 2000和Windows XP中只实现了简单的NTP，并在几个方面违反了NTP第3版的标准。<ref>{{cite web |url=http://support.ntp.org/bin/view/Support/WindowsTimeService |title=Windows Time Service page at NTP.org |publisher=Support.ntp.org |date=2008-02-25 |accessdate=2011-01-12 |archive-date=2021-04-09 |archive-url=https://web.archive.org/web/20210409235723/http://support.ntp.org/bin/view/Support/WindowsTimeService |dead-url=no }}</ref>从[[Windows_Server_2003|Windows Server 2003]]和[[Windows_Vista|Windows Vista]]开始，已包括符合完整NTP的实现。<ref>{{Cite web|title=How Windows Time Service Works: Windows Time Service|url=https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc773013(v=ws.10)|access-date=2022-03-12|last=Archiveddocs|work=docs.microsoft.com|language=en-us}}</ref>微软称W32Time服务不能可靠地将同步时间保持在1至2秒的范围内。<ref>{{cite web | url = http://support.microsoft.com/kb/939322 | title = Support boundary to configure the Windows Time service for high accuracy environments | date = 2011-10-19 | publisher = [[微软|微软]] | accessdate = 2017-01-04 | archive-date = 2009-01-12 | archive-url = https://web.archive.org/web/20090112213922/http://support.microsoft.com/kb/939322 | dead-url = no }}</ref>如果需要更高的精度，微软建议使用其他NTP实现。<ref>{{cite web | url = https://blogs.technet.com/b/askds/archive/2007/10/23/high-accuracy-w32time-requirements.aspx | title = High Accuracy W32time Requirements | date = 2007-10-23 | author = Ned Pyle | publisher = [[微软|微软]] | accessdate = 2012-08-26 | archive-date = 2012-10-17 | archive-url = https://web.archive.org/web/20121017165107/http://blogs.technet.com/b/askds/archive/2007/10/23/high-accuracy-w32time-requirements.aspx | dead-url = no }}</ref>
+
+Windows 10 與 Windows Server 2016 由版本 1607 開始，提供高精度的系統時間，支持1ms的时间精度。<ref>{{Cite web|title=Windows Server 2016 精确时间|url=https://docs.microsoft.com/zh-cn/windows-server/networking/windows-time-service/accurate-time|access-date=2022-03-12|last=dahavey|work=docs.microsoft.com|language=zh-cn}}</ref><ref>{{Cite web|title=Support boundary for high-accuracy time|url=https://docs.microsoft.com/en-us/windows-server/networking/windows-time-service/support-boundary|access-date=2022-03-12|last=dahavey|work=docs.microsoft.com|language=en-us}}</ref>
+
+===Ntimed===
+
+一个新的NTP客户端'''ntimed'''由{{tsl|en|Poul-Henning Kamp}}在2014年开始编写。<ref>{{cite web|last1=Poul-Henning|first1=Kamp|title=20140926 – Playing with time again|url=http://phk.freebsd.dk/time/20140926.html|website=PHK's Bikeshed|accessdate=4 June 2015|archive-url=https://web.archive.org/web/20170213163908/http://phk.freebsd.dk/time/20140926.html|archive-date=2017-02-13|dead-url=yes}}</ref>新的实现由[[Linux基金會|Linux基金會]]赞助，作为参考实现的一个替代，因为它决定更容易地从头开始编写新的实现，而不是修复现有大型代码库的现有问题。截至2015年6月，它尚未正式发布，但'''ntimed'''可以可靠地同步时钟。<ref>{{cite web|last1=Poul-Henning|first1=Kamp|title=Network time synchronization software, NTPD replacement.|url=https://github.com/bsdphk/Ntimed|website=ntimed git repository README file|publisher=Github|accessdate=4 June 2015|archive-date=2015-08-02|archive-url=https://web.archive.org/web/20150802090927/https://github.com/bsdphk/Ntimed/|dead-url=no}}</ref>'''ntimed'''在[[Debian|Debian]]和[[FreeBSD|FreeBSD]]上工作，但也被移植到Windows和Mac OS。<ref>{{cite web|last1=Poul-Henning|first1=Kamp|title=20150111 – What happened next?|url=http://phk.freebsd.dk/time/20150111.html|website=PHK's Bikeshed|accessdate=4 June 2015|date=2015-01-11|archive-url=https://web.archive.org/web/20161114130200/http://phk.freebsd.dk/time/20150111.html|archive-date=2016-11-14|dead-url=yes}}</ref>
+
+==闰秒==
+在[[闰秒|闰秒]]事件的当天，ntpd从配置文件、附加参考时钟或远程服务器收到通知。因为时间必须是[[单调函数|单调递增]]，所以闰秒的插入方式为：23:59:59、23:59:60、00:00:00。虽然时钟实际上在事件期间停止，但任何查询系统时间的[[进程|进程]]都会使它增加微小的量，以保持事件的顺序。如果必要，在序列中删除闰秒的形式为：23:59:58、00:00:00，跳过23:59:59。<ref>{{cite web |url=http://www.eecis.udel.edu/~mills/leap.html |title=The NTP Timescale and Leap Seconds |author=David Mills |accessdate=15 October 2013 |archive-date=2013-09-07 |archive-url=https://web.archive.org/web/20130907021050/http://www.eecis.udel.edu/%7emills/leap.html |dead-url=no }}</ref>
+
+==2038年問題==
+{{main|2038年问题}}
+
+==安全问题==
+2014年底，几个安全问题被发现。在以前，研究人员发现NTP服务器可能受到[[中间人攻击|中间人攻击]]的影响，除非数据包被加密和签名以验证身份。<ref>{{cite web | url=https://tools.ietf.org/html/rfc5906 | title=Network Time Protocol Version 4: Autokey Specification | publisher=IETF | date=2010 | accessdate=2014-10-16 | archive-date=2014-10-13 | archive-url=https://web.archive.org/web/20141013104753/http://tools.ietf.org/html/rfc5906 | dead-url=no }}</ref>但这所涉及的计算量在繁忙的服务器上可能是不切实际的，尤其是容易遭遇[[阻斷服務攻擊|阻斷服務攻擊]]。<ref>{{cite web| url=http://www.eecis.udel.edu/~mills/security.html| title=NTP Security Analysis| accessdate=11 October 2013| archive-date=2013-09-07| archive-url=https://web.archive.org/web/20130907040625/http://www.eecis.udel.edu/%7emills/security.html| dead-url=no}}</ref>NTP消息欺骗可以被用来偏移客户端计算机上的时钟，并配合过期的加密密钥来完成其他攻击。<ref>{{cite web | url=https://www.blackhat.com/docs/eu-14/materials/eu-14-Selvi-Bypassing-HTTP-Strict-Transport-Security-wp.pdf | title=Bypassing HTTP Strict Transport Security | date=2014-10-16 | accessdate=2014-10-16 | author=Jose Selvi | archive-date=2014-10-18 | archive-url=https://web.archive.org/web/20141018053055/https://www.blackhat.com/docs/eu-14/materials/eu-14-Selvi-Bypassing-HTTP-Strict-Transport-Security-wp.pdf | dead-url=no }}</ref>可能受到伪造NTP消息影响的服务包括[[TLS|TLS]]、[[DNSSEC|DNSSEC]]、各类[[缓存|缓存]]方案（例如[[DNS缓存|DNS缓存]]）、[[比特币|比特币]]以及许多持久登录方案。<ref>{{Cite journal|url = http://www.cs.bu.edu/~goldbe/papers/NTPattack.pdf|title = Attacking the Network Time Protocol|author1 = Aanchal Malhotra|author2 = Isaac E. Cohen|author3 = Erik Brakke|author4 = Sharon Goldberg|last-author-amp = yes|date = 20 October 2015|journal = NDSS|doi = |pmid = |access-date = |archive-date = 2015-10-22|archive-url = https://web.archive.org/web/20151022140151/http://www.cs.bu.edu/~goldbe/papers/NTPattack.pdf|dead-url = no}}</ref><ref>{{Cite web|title = Attacking the Network Time Protocol|url = http://www.cs.bu.edu/~goldbe/NTPattack.html|website = www.cs.bu.edu|accessdate = 2015-10-27|archive-date = 2015-10-24|archive-url = https://web.archive.org/web/20151024172618/http://www.cs.bu.edu/~goldbe/NTPattack.html|dead-url = no}}</ref>
+
+有着25年以上历史的NTP代码库中的参考实现中只发现了几个其他的安全问题，但{{when|最近}}出现的几个引起了人们的强烈关注。<ref>{{cite web|url=http://support.ntp.org/security |title=Security Notice |publisher=Support.ntp.org |date=2009-12-10 |accessdate=2011-01-12}}</ref><ref>results returned by a [http://search.cert.org/search?q=%22Network+Time+Protocol%22&btnG.x=0&btnG.y=0&btnG=Go&entqr=0&ud=1&sort=date%3AD%3AL%3Ad1&output=xml_no_dtd&oe=UTF-8&ie=UTF-8&client=default_frontend&proxystylesheet=default_frontend&site=default_collection search on "Network Time Protocol"]{{dead link|date=2018年4月 |bot=InternetArchiveBot |fix-attempted=yes }} at [http://cert.org] {{Wayback|url=http://cert.org/ |date=19971210183023 }}{{or|date=May 2013}}</ref>该协议正在对其整个历史进行修订和审查。截至2011年1月，在NTP规范中没有安全修订，也没有在{{tsl|en|CERT Coordination Center|CERT}}的报告。<ref>in RFC 778, RFC 891, RFC 956, RFC 958, RFC 1305, RFC 5905, and the [http://www.eecis.udel.edu/%7emills/database/reports/ntp4/ntp4.pdf NTPv4 specification] {{Wayback|url=http://www.eecis.udel.edu/%7emills/database/reports/ntp4/ntp4.pdf |date=20210225035124 }}</ref>几年来，该参考实现的当前代码库已经被多个来源进行安全审计，在当前发布的软件中没有已知的高风险漏洞。<ref>{{cite web|url=http://support.ntp.org/Main/CodeAudit |title=Code Audit |publisher=Support.ntp.org |date=2009-06-13 |accessdate=2011-01-12}}</ref>
+
+多种{{tsl|en|NTP server misuse and abuse|NTP服务器误用和滥用}}实践的存在导致了对网络时间协议（NTP）服务器的破坏或劣化。
+
+NTP已經被用于[[阻斷服務攻擊|分布式拒绝服务（DDoS）]]攻击，<ref>{{cite web |last=Goodin |first=Dan |url=http://arstechnica.com/security/2014/01/new-dos-attacks-taking-down-game-sites-deliver-crippling-100-gbps-floods/ |title=New DoS attacks taking down game sites deliver crippling 100Gbps floods |publisher=Ars Technica |date=2014-01-13 |accessdate=2014-01-25 |archive-date=2014-01-25 |archive-url=https://web.archive.org/web/20140125222518/http://arstechnica.com/security/2014/01/new-dos-attacks-taking-down-game-sites-deliver-crippling-100-gbps-floods/ |dead-url=no }}</ref><ref>{{cite web |last=Lee |first=Dave |url=http://www.bbc.co.uk/news/technology-26136774 |title=Huge hack 'ugly sign of future' for internet threats |publisher=BBC |date=2014-02-11 |accessdate=2014-02-12 |archive-date=2021-03-08 |archive-url=https://web.archive.org/web/20210308042539/https://www.bbc.co.uk/news/technology-26136774 |dead-url=no }}</ref>方法是将一个具有[[IP地址欺骗|伪造]]的返回地址的小的查询发送到NTP服务器。类似[[DNS放大攻击|DNS放大攻击]]，服务器将以比攻击者发送数据量大很多倍的数据量回复给伪造的目标。为了避免参与攻击，服务器可以配置为忽略外部查询，或者升级到4.2.7p26或更高版本。<ref>{{cite web|url=http://support.ntp.org/bin/view/Main/SecurityNotice#April_2010_DRDoS_Amplification_A|title=DRDoS / Amplification Attack using ntpdc monlist command|publisher=support.ntp.org|date=2010-04-24|accessdate=2014-04-13|archive-date=2014-02-19|archive-url=https://web.archive.org/web/20140219093152/http://support.ntp.org/bin/view/Main/SecurityNotice#April_2010_DRDoS_Amplification_A|dead-url=no}}</ref>
+
+一个[[緩衝區溢位|緩衝區溢位]]漏洞已經被发现，并自2014年12月19日提供补丁。漏洞覆盖NTP第四版所有版本，自4.2.8修复。<ref>{{cite web |url=https://ics-cert.us-cert.gov/advisories/ICSA-14-353-01 |title=Network Time Protocol Vulnerabilities (Update C) | ICS-CERT |publisher=Ics-cert.us-cert.gov |date= |accessdate=2015-04-15 |archive-date=2014-12-20 |archive-url=https://web.archive.org/web/20141220002022/https://ics-cert.us-cert.gov/advisories/ICSA-14-353-01 |dead-url=no }}</ref>[[蘋果公司|蘋果公司]]首次使用自动更新功能解决该问题<ref>{{cite web | url=http://arstechnica.com/apple/2014/12/apple-automatically-patches-macs-to-fix-severe-ntp-security-flaw/ | title=Apple automatically patches Macs to fix severe NTP security flaw | publisher=arstechnica | date=Dec 23, 2014 <!-- 3:55pm CET --> | accessdate=Apr 29, 2015 | author=Cunningham, Andrew | archive-date=2015-05-15 | archive-url=https://web.archive.org/web/20150515144147/http://arstechnica.com/apple/2014/12/apple-automatically-patches-macs-to-fix-severe-ntp-security-flaw/ | dead-url=no }}</ref>，不过这只适用最近的[[MacOS|MacOS]]版本。在10.6.8版本中，用户可以手动修复服务器版本，以及普通用户可以在系统首选项-日期和时间中关闭自动更新时间。<ref>{{cite web | url=https://discussions.apple.com/thread/6735082?start=16 | title=NTP vulnerability on versions prior to 4.2.8 -- we OK? | publisher=Apple Support Communities | accessdate=2017-01-04 | archive-date=2014-12-24 | archive-url=https://web.archive.org/web/20141224215052/https://discussions.apple.com/thread/6735082?start=16 | dead-url=no }}</ref>研究人员认为该协议的设计是相当好的，缺陷出现在协议的实现中。某些错误很基础，例如例程中缺少返回语句，这可能导致某些运行在root权限下的NTP版本被利用以无限制的访问系统。守护进程不使用root权限的系统（例如BSD）不受此缺陷的影响。<ref>{{cite web | url=http://www.i-programmer.info/news/149-security/8120-ntp-the-latest-open-source-security-problem.html | title=NTP The Latest Open Source Security Problem | publisher=I Programmer | date=23 December 2014 | author=Fairhead, Harry | accessdate=2017-01-04 | archive-date=2014-12-24 | archive-url=https://web.archive.org/web/20141224071634/http://www.i-programmer.info/news/149-security/8120-ntp-the-latest-open-source-security-problem.html | dead-url=no }}</ref>
+
+==参见==
+* {{tsl|en|Allan variance}}
+* {{tsl|en|Clock network|时钟网络}}
+* [[原子时|原子时]]
+* [[NITZ|NITZ]]
+* [[NTP_pool|NTP pool]]
+* {{tsl|en|Ntpdate}}
+* [[OpenNTPD|OpenNTPD]]
+* [[精确时间协议|精确时间协议]]（IEEE 1588 PTP）
+
+==备注==
+{{Reflist|group=note}}
+
+==参考资料==
+{{Reflist|colwidth=30em}}
+
+==拓展阅读==
+* {{cite IETF |rfc=5907 |title=Definitions of Managed Objects for Network Time Protocol Version 4 (NTPv4)}}
+* {{cite IETF |rfc=5908 |title=Network Time Protocol (NTP) Server Option for DHCPv6}}
+
+==外部链接==
+* {{Official website}} {{en}}
+* [http://support.ntp.org/bin/view/Servers/StratumOneTimeServers 公共NTP服务器列表] {{Wayback|url=http://support.ntp.org/bin/view/Servers/StratumOneTimeServers |date=20210502023506 }} {{en}}
+* [http://www.pool.ntp.org/zone/asia NTP节点镜像群] {{Wayback|url=http://www.pool.ntp.org/zone/asia |date=20210426072900 }}
+* [http://datatracker.ietf.org/wg/ntp/charter/ IETF NTP working group] {{Wayback|url=http://datatracker.ietf.org/wg/ntp/charter/ |date=20210226194158 }}
+* [http://www.ijs.si/time/ Time and NTP paper] {{Wayback|url=http://www.ijs.si/time/ |date=20210308054911 }}
+* [https://web.archive.org/web/20190504164134/http://ntpsurvey.arauc.br/ NTP Survey 2005]
+* [ftp://time.nist.gov/pub/leap-seconds.list Current NIST leap seconds file compatible with ntpd]{{dead link|date=2018年4月 |bot=InternetArchiveBot |fix-attempted=yes }}
+* David L. Mills, [http://www.eecis.udel.edu/~mills/database/papers/history.pdf A Brief History of NTP Time: Confessions of an Internet Timekeeper] {{Wayback|url=http://www.eecis.udel.edu/~mills/database/papers/history.pdf |date=20210308041751 }}
+* [http://www.cse.ucsd.edu/users/marzullo/ Keith Marzullo's homepage] {{Wayback|url=http://www.cse.ucsd.edu/users/marzullo/ |date=20090508010450 }}
+* [https://ncomputers.org/ntptest NTP Server Test Online Tool] {{Wayback|url=https://ncomputers.org/ntptest |date=20170512013400 }}
+
+[[Category:网络时间相关软件|Category:网络时间相关软件]]
+[[Category:互联网标准|Category:互联网标准]]
+[[Category:应用层协议|Category:应用层协议]]

@@ -1,0 +1,12 @@
+{{User-multi<noinclude>/template</noinclude>
+ |User={{{User|{{{1|}}}}}}
+ |1=t
+ |2=c
+ |3=bls
+ |4=pr
+ |5=del
+ |6=m
+ |7=rl
+ |8=rfa
+ |doc=yes
+}}

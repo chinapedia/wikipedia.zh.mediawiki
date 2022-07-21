@@ -1,0 +1,689 @@
+{{Expand language|en}}
+{{Redirect2|ARM|其他用法|ARM (消歧义)}}
+{{noteTA
+| G1 = IT
+| 3 = zh-hant:電玩; zh-hans:电子游戏;
+| 4 = zh-hant:週邊設備; zh-hans:外设;
+| 5 = zh-hant:衍生; zh-hans:派生;
+| 6 = zh-hant:發展; zh-hans:开发;
+| 7 = zh-hant:資料匯流排; zh-hans:数据总线;
+| 8 = zh-hant:快取; zh-hans:高速缓存;
+| 10 = zh-hant:位元; zh-hans:位;
+| 11 = zh-hant:暫存器檔案; zh-hans:寄存器阵列;
+| 12 = zh-hant:管線; zh-hans:流水线;
+| 13 = zh-hant:販售; zh-hans:出售;
+| 15 = zh-hant:透過; zh-hans:通过;
+| 16 = zh-hant:迪吉多; zh-hans:Digital;
+| 17 = zh-hant:智慧財產權核心; zh-hans:知识产权核;
+}}
+{{Infobox CPU architecture <!-- Common info belongs in this infobox -->
+|name         = ARM架構
+|image        = Arm logo 2017.svg
+|image_size   = 200px
+|caption      = ARM标志
+|designer     = [[ARM_Holdings|ARM Holdings]]
+|bits         = [[32位|32位]]或[[64位|64位]]
+|introduced   = {{Start date and age|1985}}
+|design       = [[RISC|RISC]]
+|type         = [[寄存器|寄存器]]-寄存器
+|branching    = 条件代码、比較和分支
+|open         = 专有
+}}
+{{Infobox CPU architecture <!-- 64-bit architecture info belongs in this infobox -->
+|name         = 64/32位元架構
+|introduced   = 2011年
+|version      = ARMv9、<!--note ARMv8-R and ARMv8-M do not really fit here or anywhere as only 32-bit.-->
+|encoding     = AArch64/A64、AArch32/A32：32位元<br />T32（Thumb-2）：16或32位元<br />相容ARMv7[[用戶空間|用戶空間]]<ref name="v8arch">{{cite web | url=https://www.arm.com/files/downloads/ARMv8_Architecture.pdf | title=ARMv8-A Technology Preview | year=2011 | accessdate=31 October 2011 | first=Richard | last=Grisenthwaite | archive-date=2018-11-09 | archive-url=https://web.archive.org/web/20181109191648/https://www.arm.com/files/downloads/ARMv8_Architecture.pdf | dead-url=no }}</ref>
+|endianness   = 可配置大小端序（預設小端序）
+|extensions   = [[Thumb-2|Thumb-2]]、[[NEON_(指令集)|NEON]]、[[Jazelle|Jazelle]]、VFPv4-D16、VFPv4
+|gpr          = 31個64位元整數暫存器<ref name="v8arch"/>
+|fpr          = 32個[[128位元|128位元]]暫存器<ref name="v8arch"/>，用於32位元和64位元標量[[IEEE_754|浮點數]]或[[SIMD|SIMD]]浮點數或整數；或密碼數值
+}}
+{{Infobox CPU architecture <!-- 32-bit cortex architecture info belongs in this infobox -->
+|name         = 32位元架構（Cortex）
+|introduced   = <!-- please investigate the years each of these architectures were announced -->
+|version      = ARMv8-R、ARMv8-M、ARMv7-A、ARMv7-R、ARMv7E-M、ARMv7-M、ARMv6-M
+|encoding     = 32位元<br />Thumb-2：16或32位元
+|endianness   = 可配置大小端序（預設小端序）<br />但Cortex-M不能在指令運行時調整
+|extensions   = Thumb-2、NEON、Jazelle、DSP、Saturated、FPv4-SP、FPv5
+|gpr          = 15個32位元整數暫存器<br />R15是[[程式計數器|程式計數器]]（在較老的架構設計中為26位元定址）<br />R14作為連結暫存器（link register）
+|fpr          = 最多32個64位元暫存器<ref>{{cite web|url=http://infocenter.arm.com/help/topic/com.arm.doc.ihi0042d/IHI0042D_aapcs.pdf|title=Procedure Call Standard for the ARM Architecture|publisher=[[ARM_Holdings|ARM Holdings]]|date=30 November 2013|accessdate=27 May 2013|archive-date=2013-04-28|archive-url=https://www.webcitation.org/6GDOosNTA?url=http://infocenter.arm.com/help/topic/com.arm.doc.ihi0042e/IHI0042E_aapcs.pdf|dead-url=no}}</ref>，SIMD/標準浮點數（可選項）
+}}
+{{Infobox CPU architecture <!-- 32-bit legacy architecture info belongs in this infobox -->
+|name         = 32位元架構（舊有架構）
+|introduced   = <!-- please investigate the years each of these architectures were announced -->
+|version      = ARMv6、ARMv5、ARMv4T、ARMv3、ARMv2
+|encoding     = 32位元<br />Thumb：16或32位元
+|endianness   = ARMv3開始為可配置大小端序（預設小端序）
+|extensions   = [[ARM_Thumb|Thumb]]、Jazelle<!-- please investigate and clarify -->
+|gpr          = 15個32位元整數暫存器<br />R15是[[程式計數器|程式計數器]]（在較老的架構設計中為26位元定址）<br />R14作為連結暫存器（link register）
+|fpr          = <!-- please investigate and clarify -->
+}}
+
+[[File:ARMSoCBlockDiagram.svg|右]]（system on a chip, SoC）的[[方塊圖|方塊圖]]]]
+
+'''ARM'''架構，過去稱作'''進階精簡指令集機器'''（{{lang-en|Advanced RISC Machine}}，更早稱作艾康精簡指令集機器，{{lang|en|Acorn RISC Machine}}），是一個[[精簡指令集電腦|精簡指令集]]（RISC）[[中央处理器|處理器]]架構家族，其廣泛地使用在許多[[嵌入式系統|嵌入式系統]]設計。由於[[節能|節能]]的特點，其在其他領域上也有很多作為。ARM處理器非常適用於[[行動通訊|行動通訊]]領域，符合其主要設計目標為低成本、高效能、低耗電的特性。另一方面，[[超级计算机|超级计算机]]消耗大量电能，ARM同样被视作更高效的选择<ref name="PC_World">{{Cite web |url=http://www.pcworld.com/article/3086249/fujitsu-drops-sparc-turns-to-arm-for-post-k-supercomputer.html |title=Fujitsu drops SPARC, turns to ARM for Post-K supercomputer |accessdate=2016-07-04 |archive-date=2016-06-25 |archive-url=https://web.archive.org/web/20160625105716/http://www.pcworld.com/article/3086249/fujitsu-drops-sparc-turns-to-arm-for-post-k-supercomputer.html |dead-url=no }}</ref>。[[安謀控股|安謀控股]]（ARM Holdings）開發此架構並授權其他公司使用，以供他們實現ARM的某一個架構，開發自主的[[系统芯片|系統單晶片]]和系統模組（system-on-module，SoC）。
+
+ARM架構版本從ARMv3到ARMv7支持[[32位元|32位元]]空間和32位元算數運算，大部分架構的指令為定長32位元（Thumb）指令集支持變長的[[指令集架構|指令集]]，提供對32位元和16位元指令集的支持），而2011年發佈的ARMv8-A架構添加了對[[64位元|64位元]]空間和64位元算術運算的支持，同時也更新了[[32位元|32位元]]定長指令集<ref name="armv8-a-announcement">{{cite press release|url=https://www.arm.com/about/newsroom/arm-discloses-technical-details-of-the-next-version-of-the-arm-architecture.php|title=ARM Discloses Technical Details Of The Next Version Of The ARM Architecture|date=27 October 2011|publisher=[[ARM_Holdings|ARM Holdings]]|accessdate=20 September 2013|archive-date=2019-01-01|archive-url=https://web.archive.org/web/20190101024118/https://www.arm.com/about/newsroom/arm-discloses-technical-details-of-the-next-version-of-the-arm-architecture.php|dead-url=no}}</ref>。
+
+至2009年為止，ARM架構處理器佔市面上所有32位元嵌入式RISC處理器90%的比例<ref>{{Cite journal | last1 = Fitzpatrick | first1 = J. | title = An interview with Steve Furber | doi = 10.1145/1941487.1941501 | journal = [[Communications_of_the_ACM|Communications of the ACM]] | volume = 54 | issue = 5 | pages = 34 | year = 2011 | pmid =  | url = http://cacm.acm.org/magazines/2011/5/107684-an-interview-with-steve-furber/fulltext | pmc =  | access-date = 2012-06-02 | archive-date = 2011-07-27 | archive-url = https://web.archive.org/web/20110727233519/http://cacm.acm.org/magazines/2011/5/107684-an-interview-with-steve-furber/fulltext | dead-url = no }}</ref>，使它成為占全世界最多數的32位元架構之一。ARM處理器可以在很多[[消費性電子|消費性電子]]產品上看到，從可攜式裝置（[[PDA|PDA]]、[[行動電話|行動電話]]、多媒體播放器、掌上型電玩和[[計算機|計算機]]）到電腦週邊設備（[[硬碟|硬碟]]、桌上型[[路由器|路由器]]），甚至在[[导弹|导弹]]的弹载计算机等军用设施中都有他的存在。在此还有一些基于ARM设计的衍伸产品，重要產品還包括[[Marvell_Technology_Group|Marvell]]的[[XScale|XScale]]架構和[[德州儀器|德州儀器]]的[[OMAP|OMAP]]系列。
+
+2011年，ARM的客户报告79亿ARM处理器出货量，占有95%的[[智能手机|智能手机]]、90%的[[硬盘驱动器|硬盘驱动器]]、40%的[[数字电视|数字电视]]和[[机上盒|机上盒]]、15%的[[微控制器|微控制器]]、和20%的移动电脑<ref>{{citation|url=http://www.theregister.co.uk/2011/02/01/arm_holdings_q4_2010_numbers/|title=ARM Holdings eager for PC and server expansion|date=1 Feb 2011|accessdate=2012-11-23|archive-date=2012-11-16|archive-url=https://web.archive.org/web/20121116223208/http://www.theregister.co.uk/2011/02/01/arm_holdings_q4_2010_numbers/|dead-url=no}}</ref>。在2012年，[[微软|微软]]与ARM科技生产新的[[Microsoft_Surface|Surface]]平板电脑，[[超威半导体|AMD]]宣布它将于2014年开始生产基于ARM核心的[[64位元|64位元]][[服务器|服务器]]芯片，<ref>{{citation|url=http://www.bbc.co.uk/news/technology-20137041|title=AMD in chip tie-up with UK's ARM|publisher=BBC|date=30 October 2012|accessdate=8 Nov 2012|archive-date=2012-11-16|archive-url=https://web.archive.org/web/20121116075208/http://www.bbc.co.uk/news/technology-20137041|dead-url=no}}</ref>2016年，日本[[富士通|富士通]]公司宣布[[京_(超级电脑)|“京”超级计算机]]的後繼機種将采用ARM架构<ref name="PC_World" />，該超級電腦於2019年5月定名為「[[富岳_(超级电脑)|富岳]]」<ref>{{Cite web|title=「富岳」ニュース　－２．名称決定－|url=https://www.r-ccs.riken.jp/jp/fugaku/fugaku-news/fugaku-news02.html|publisher=理化学研究所 計算科学研究センター|accessdate=2020-10-28|archive-date=2021-01-20|archive-url=https://web.archive.org/web/20210120012208/https://www.r-ccs.riken.jp/jp/fugaku/fugaku-news/fugaku-news02.html}}</ref>，2020年6月於[[TOP500|TOP500]]奪冠<ref>{{cite web|url=https://www.nikkei.com/article/DGXMZO60655390S0A620C2MM8000/|title=日本のスパコン「富岳」、8年半ぶり世界一奪還|date=2020-06-23|publisher=日本経済新聞|accessdate=2020-10-28|archive-date=2021-02-21|archive-url=https://web.archive.org/web/20210221103404/https://www.nikkei.com/article/DGXMZO60655390S0A620C2MM8000/}}</ref><ref name=":3">{{Cite web|title=日本のスパコン「富岳」世界ランキング1位、世界初の2期連続4冠|url=https://qeee.jp/magazine/articles/12340|website=QEEE|accessdate=2020-12-20|publisher=INTLOOP株式会社|date=2020-11-17|archive-date=2021-07-25|archive-url=https://web.archive.org/web/20210725014425/https://qeee.jp/magazine/articles/12340}}</ref><ref>{{Cite web|title=富岳は、主要なスパコンベンチのすべてで1位を獲得することが重要|url=https://pc.watch.impress.co.jp/docs/news/1289662.html|website=PC Watch|date=2020-11-17|accessdate=2020-12-20|last=株式会社インプレス|publisher=|archive-date=2021-07-25|archive-url=https://web.archive.org/web/20210725013054/https://pc.watch.impress.co.jp/docs/news/1289662.html}}</ref>。
+
+2016年7月18日，日本[[软银集团|软银集团]]斥资3.3兆日元（约合311亿美元）收购了[[安謀控股|安謀控股]]<ref>{{citation|url=http://pc.watch.impress.co.jp/docs/news/1010766.html|title=ソフトバンク、ARM買収を正式発表|date=18 Jul 2016|accessdate=2016-07-19|archive-date=2016-07-19|archive-url=https://web.archive.org/web/20160719182252/http://pc.watch.impress.co.jp/docs/news/1010766.html|dead-url=no}}</ref>。
+
+== 特色和应用 ==
+自2005年，每年超过一亿的手机销售约98%使用了ARM处理器<ref name=Krazit>[http://news.cnet.com/ARMed-for-the-living-room/2100-1006_3-6056729.html "ARMed for the living room"] {{Wayback|url=http://news.cnet.com/ARMed-for-the-living-room/2100-1006_3-6056729.html |date=20121109215746 }}.</ref>。截至2009年，占大约90%的嵌入式32位RISC处理器<ref>{{cite journal|title=An interview with Steve Furber|date=2011-05-01|journal=Communications of the ACM|volume=54|issue=5|doi=10.1145/1941487.1941501|pages=34–39|issn=0001-0782|url=http://dl.acm.org/citation.cfm?id=1941487.1941501|accessdate=2018-04-02|author=Jason Fitzpatrick}}</ref>和ARM处理器被广泛使用在消费性电子产品，包括[[个人数字助理|个人数字助理]]（PDA）、[[平板电脑|平板电脑]]、[[移动电话|移动电话]]、数字媒体和音乐播放器、[[掌上遊戲機|手持式游戏游戏机]]、[[计算器|计算器]]和计算机外围设备（如[[硬盘驱动器|硬盘驱动器]]和[[路由器|路由器]]）。
+
+除了消費電子，ARM架構處理器也開始用於以往[[x86|x86]]、[[x64|x64]]處理器獨大的[[個人電腦|個人電腦]]、[[伺服器|伺服器]]。而在2020年成為[[TOP500|TOP500]]排名第一的「[[富岳_(超级计算机)|富岳]]」為首部奪冠的ARM架構[[超級電腦|超級電腦]]。
+
+== 歷史 ==
+[[File:conexant_arm.jpg|右]]的[[科胜讯公司|科胜讯公司]]ARM處理器]]
+[[File:P60ARM_GC_01.jpg|右]]
+ARM的設計是[[艾康電腦公司|艾康電腦公司]]於1983年開始的發展計畫。
+
+這個團隊由[[Roger_Wilson|Roger Wilson]]和[[Steve_Furber|Steve Furber]]帶領，著手開發一種類似進階[[MOS_Technology_6502|6502架構]]的處理器。Acorn電腦有一大堆建構在6502處理器上的電腦，因此能設計出一顆類似的晶片即意味著對公司有很大的優勢。
+=== Acorn RISC Machine：ARM2 ===
+[[File:Acorn-ARM-Evaluation-System.jpg|右]]
+
+團隊在1985年時開發出樣本「ARM1」，而首顆真正能量產的「ARM2」於次年投產。ARM2具有32位元的[[資料匯流排|資料匯流排]]、26位元的[[定址空間|定址空間]]，並提供64 Mbyte的定址範圍與16個32-bit的[[暫存器|暫存器]]。暫存器中有一個作為[[程式計數器|程式計數器]]，其前面6位元和後面2位元用來保存[[旗標|處理器狀態標記]]。ARM2可能是全世界最簡單實用的32位元微處理器，僅容納了30,000個[[電晶體|電晶體]]（六年後的[[Motorola_68000|摩托羅拉68000]]包含了70,000顆）。之所以精簡的原因在於它不含[[微碼|微碼]]（這大概占了68000的電晶體數約1/4至1/3）；而且與當時大多數的處理器相同，它沒有包含任何的[[快取|快取]]。這個精簡的特色使它只需消耗很少的電能，卻能發揮比[[Intel_80286|Intel 80286]]更好的效能<ref>Patterson, Jason. [http://www.pattosoft.com.au/jason/Articles/HistoryOfComputers/1980s.html The Acorn Archimedes"] {{Wayback|url=http://www.pattosoft.com.au/jason/Articles/HistoryOfComputers/1980s.html |date=20080323100055 }}, ''The History Of Computers During My Lifetime – The 1980s'' by (accessed 12 March 2008)]</ref>。後繼的處理器「ARM3」則備有4KB的快取，使它能發揮更佳的效能。
+
+=== Apple、DEC、Intel、Marvell：ARM6、StrongARM、XScale ===
+在1980年代晚期，[[蘋果電腦|蘋果電腦]]開始與艾康電腦合作開發新版的ARM核心。由於這專案非常重要，艾康電腦甚至於1990年將設計團隊另組成一間名為[[安谋国际科技|安谋国际科技]]（Advanced RISC Machines Ltd.）的新公司。也基於這原因，使得ARM有時候反而稱作Advanced RISC Machine而不是Acorn RISC Machine。由於其母公司[[ARM_Holdings_plc|ARM Holdings plc]]於1998年在[[倫敦證券交易所|倫敦證券交易所]]和[[NASDAQ|NASDAQ]]掛牌上市<ref>{{cite web |url=http://www.arm.com/miscPDFs/3822.pdf |title=存档副本 |accessdate=2006-09-20 |deadurl=yes |archiveurl=https://web.archive.org/web/20061004150423/http://www.arm.com/miscPDFs/3822.pdf |archivedate=2006-10-04 }}</ref>，使得Advanced RISC Machines成了ARM Ltd旗下擁有的產品<ref>[http://www.arm.com/miscPDFs/3822.pdf "ARM Corporate Backgrounder"] {{Wayback|url=http://www.arm.com/miscPDFs/3822.pdf |date=20061004150423 }}, ''ARM Technology''.</ref>。
+
+這個專案到後來進入「ARM6」，首版的樣品在1991年釋出，然後蘋果電腦使用ARM6架構的ARM 610來當作他們[[Apple_Newton|Apple Newton]]產品的處理器。在1994年，艾康電腦使用ARM 610做為他們個人電腦產品的處理器。
+
+在這些變革之後，內核部份卻大多維持一樣的大小——ARM2有30,000顆電晶體，但ARM6卻也只增長到35,000顆。主要概念是以[[ODM|ODM]]的方式，使ARM核心能搭配一些選配的零件而製成一顆完整的CPU，而且可在現有的[[晶圓廠|晶圓廠]]裡製作並以低成本的方式達到很大的效能。
+
+ARM的經營模式在於出售其[[IP核|IP核]]，授權廠家依照設計製作出建構於此核的[[微控制器|微控制器]]和[[中央處理器|中央處理器]]。最成功的實作案例屬[[ARM7TDMI|ARM7TDMI]]，幾乎賣出了數億套內建微控制器的裝置。
+
+[[迪吉多|迪吉多]]曾購買這個架構的產權並研發出「[[StrongARM|StrongARM]]」。在233 MHz的頻率下，這顆CPU只消耗1瓦特的電能（後來的晶片消耗得更少）。這項設計後來為了和[[英特爾|英特爾]]的控訴和解而技術移轉，英特爾因而利用StrongARM架構補強他們老舊的[[Intel_i960|i960]]產品。英特爾後來開發出他們自有的高效能架構產品[[XScale|XScale]]，之後賣給了[[邁威爾科技|邁威爾科技]]。
+
+2020年11月11日，苹果公司发布基于ARM芯片([[Apple_M1|Apple M1]])的蘋果桌上型電腦和笔记本电脑，2021年4月21日，苹果公司发布基于M1 CPU的24 吋Mac和新iPad Pro
+
+== 內核種類 ==
+{{main|ARM處理器內核列表}}
+{| class="wikitable"
+|-
+! 指令集架構 !! 處理器家族
+|-
+| ARMv1 || [[ARM1|ARM1]]
+|-
+| ARMv2 || [[ARM2|ARM2]]、[[ARM3|ARM3]]
+|-
+| ARMv3 || ARM6、[[ARM7|ARM7]]
+|-
+| ARMv4 || [[StrongARM|StrongARM]]、[[ARM7TDMI|ARM7TDMI]]、[[ARM9|ARM9]]TDMI
+|-
+| ARMv5 || [[ARM7EJ|ARM7EJ]]、[[ARM9E|ARM9E]]、[[ARM10E|ARM10E]]、[[XScale|XScale]]
+|-
+| ARMv6 || [[ARM11|ARM11]]、[[ARM_Cortex-M|ARM Cortex-M]]
+|-
+| ARMv7 || [[ARM_Cortex-A|ARM Cortex-A]]、[[ARM_Cortex-M|ARM Cortex-M]]、[[ARM_Cortex-R|ARM Cortex-R]]
+|-
+| ARMv8 || Cortex-A35、Cortex-A50系列<ref name="cortex-a50 announce">{{cite press release | url=http://www.arm.com/about/newsroom/arm-launches-cortex-a50-series-the-worlds-most-energy-efficient-64-bit-processors.php | title=ARM Launches Cortex-A50 Series, the World’s Most Energy-Efficient 64-bit Processors | publisher=[[ARM_Holdings|ARM Holdings]] | accessdate=2012-10-31 | archive-date=2013-01-09 | archive-url=https://www.webcitation.org/6DXHAnOzS?url=http://www.arm.com/about/newsroom/arm-launches-cortex-a50-series-the-worlds-most-energy-efficient-64-bit-processors.php | dead-url=no }}</ref>、Cortex-A70系列、Cortex-X1
+|-
+| ARMv9 || Cortex-A510、Cortex-A710、Cortex-X2
+|}
+
+
+由ARM提供了一个厂商汇总，是在其设计中实现ARM内核的众多厂商一个总结<ref>{{cite web | url = http://infocenter.arm.com/help/topic/com.arm.doc.faqs/attached/6745/0141_5linecard.pdf | title = Line Card | format = PDF | year = 2003 | accessdate = 1 October 2012 | archive-date = 2017-10-20 | archive-url = https://web.archive.org/web/20171020195635/http://infocenter.arm.com/help/topic/com.arm.doc.faqs/attached/6745/0141_5linecard.pdf | dead-url = yes }}</ref>。
+
+== 架构 ==
+
+从1995年开始，《ARM体系结构参考手册》是ARM文档的主要来源，提供了关于ARM处理器架构和指令集，区分接口，所有的ARM处理器的支持（如指令语义）的实现细节可能会有所不同。该体系结构随着时间的演变，并与Cortex系列的核心开始，存在三个“配置”的定义如下：
+
+* "应用"配置: Cortex-A 系列
+* "嵌入式"配置: Cortex-R 系列
+* "微处理器"配置: [[ARM_Cortex-M|ARM Cortex-M]] 系列。
+
+每个配置允许有其子集的架构。例如，用于ARMv6-M配置（所使用的Cortex M0 / M0+/ M1）的一个子集ARMv7-M架构（支持较少的指令）。
+
+=== CPU模式 ===
+CPU ARM架构指定了以下的CPU模式。在任何时刻，CPU只可处于某一种模式，但可由于外部事件（中断）或编程方式进行模式切换。
+
+;用户模式: 仅非特权模式。
+;系统模式: 仅无需例外进入的特权模式。仅以执行明确写入CPSR的模式位的指令进入。
+;Supervisor (svc) 模式: 在CPU被重置或者SWI指令被执行时进入的特权模式。
+;Abort 模式: 预读取中断或数据中断异常发生时进入的特权模式。
+;未定义模式: 未定义指令异常发生时进入的特权模式。
+;干预模式: 处理器接受一条IRQ干预时进入的特权模式。
+;快速干预模式: 处理器接受一条IRQ干预时进入的特权模式。
+;Hyp 模式: armv-7a为cortex-A15处理器提供硬件虚拟化引进的管理模式。
+
+=== 指令集 ===
+講求精簡又快速的設計方式，整體電路化卻又不採用微碼，就像早期使用在艾康微電腦的8位元6502處理器。
+
+ARM架構包含了以下精簡指令集處理器的特性：
+
+* [[載入-儲存架構|載入-儲存架構]]
+* 不支援地址不对齐記憶體存取（ARMv6內核現已支援）
+* 大量的16 × 32-bit[[寄存器堆|寄存器堆]]
+* 固定的32 bits操作码（opcode）长度，降低編碼數量所產生的耗費，減輕解碼和管線化的負擔。
+* 大多均為一個CPU周期執行。
+
+為了補強這種簡單的設計方式，相較於同時期的處理器如Intel 80286和[[Motorola_68020|Motorola 68020]]，還多加了一些特殊設計：
+
+* 大部分指令可以條件式地執行，降低在分支時產生的負重，彌補早期晶片[[分支預測器|分支預測器]]的不足。
+* 算數指令只會在要求時更改條件編碼（condition code）
+* 32-bit[[筒型位移器|筒型位移器]]可用來執行大部分的算數指令和定址計算而不會損失效能
+* 強大的索引[[寻址模式|寻址模式]]
+* 支持快速叶端函数调用的{{le|链寄存器|Link register}}
+* 精簡但快速的双优先级[[中斷|中斷]]子系統，具有可切換的暫存器組
+
+==== 寄存器 ====
+寄存器 R0-R7 对于所有CPU模式都是相同的，它们不会被分块。
+
+对于所有的特权CPU模式，除了系统CPU模式之外，R13和R14都是分块的。也就是说，每个因为一个异常（exception）而可以进入模式，有其自己的R13和R14。这些寄存器通常分别包含堆栈指针和函数调用的返回地址。
+
+{| class="wikitable"
+|+ 寄存器，对于所有CPU模式
+|-
+! usr !! sys !! svc !! abt !! und !! irq !! fiq
+|-
+| colspan=7 align="center" | R0
+|-
+| colspan=7 align="center" | R1
+|-
+| colspan=7 align="center" | R2
+|-
+| colspan=7 align="center" | R3
+|-
+| colspan=7 align="center" | R4
+|-
+| colspan=7 align="center" | R5
+|-
+| colspan=7 align="center" | R6
+|-
+| colspan=7 align="center" | R7
+|- align=center
+| colspan=6 | R8 || R8_fiq
+|- align=center
+| colspan=6 | R9 || R9_fiq
+|- align=center
+| colspan=6 | R10 || R10_fiq
+|- align=center
+| colspan=6 | R11 || R11_fiq
+|- align=center
+| colspan=6 | R12 || R12_fiq
+|- align=center
+| colspan=2 | R13 || R13_svc || R13_abt || R13_und || R13_irq || R13_fiq
+|- align=center
+| colspan=2 | R14 || R14_svc || R14_abt || R14_und || R14_irq || R14_fiq
+|-
+| colspan=7 align="center" | R15
+|-
+| colspan=7 align="center" | CPSR
+|- align=center
+| colspan=2 | || SPSR_svc || SPSR_abt || SPSR_und || SPSR_irq || SPSR_fiq
+|}
+
+同名的名称:
+* R13 也被指为 SP（Stack Pointer）
+* R14 也被指为 LR（Link Register）
+* R15 也被指为 PC（Program Counter）
+
+==== 有条件运行 ====
+有個附加在 ARM 設計中好玩的東西，就是在每個指令前頭使用一個 4-bit 的 ''條件編碼''，表示該指令是否為有條件式地執行。
+
+這大大的減低了在記憶體存取指令時用到的編碼位元，換句話說，它避免了在小型敘述（如<code>if</code>）中做分支。以下為引用[[歐幾里得|歐幾里得]]的[[最大公因數|最大公因數]]演算法的標準範例：
+
+在[[C语言|C语言]]中，循环為：
+<syntaxhighlight lang="c">
+int gcd（int i, int j）
+{
+    while（i != j）
+        if（i > j）
+            i -= j;
+        else
+            j -= i;
+    return i;
+}
+</syntaxhighlight>
+在ARM[[汇编语言|汇编语言]]中，循环為：
+<syntaxhighlight lang="asm">
+loop: CMP    Ri, Rj       ;設定條件為"NE"(不等於) if（i != j）
+                          ;"GT"(大於) if（i > j）,
+                          ;或"LT"(小於) if（i < j）
+      SUBGT  Ri, Ri, Rj   ;若"GT"(大於), i = i-j;
+      SUBLT  Rj, Rj, Ri   ;若"LT"(小於), j = j-i;
+      BNE    loop         ;若"NE"(不等於)，则继续循环
+</syntaxhighlight>
+這避開了<code>then</code>和<code>else</code>子句之間的分支。
+
+==== 其他特色 ====
+另一項指令集的特色是，能將位移（shift）和迴轉（rotate）等功能併成"資料處理"型的指令（算數、邏輯、和暫存器之間的搬移），因此舉例來說，一個C語言的敘述
+
+<syntaxhighlight lang="asm">a += (j << 2); </syntaxhighlight>
+
+在ARM之下，可簡化成只需一個word和一個cycle即可完成的指令
+
+<syntaxhighlight lang="asm">ADD     Ra, Ra, Rj, LSL #2 </syntaxhighlight>
+
+這結果可讓一般的ARM程式變得更加緊密，而不需經常使用記憶體存取，管線也可以更有效地使用。即使在ARM以一般認定為慢速的速度下執行，與更複雜的CPU設計相比它仍能執行得不錯。
+
+ARM處理器還有一些在其他RISC的架構所不常見到的特色，例如程式計數器-相對定址（的確在ARM上程式計數器為16個暫存器的其中一個）以及前遞加或後遞加的定址模式。
+
+另外值得注意的是ARM處理器會隨著時間不斷地增加它的指令集。譬如某些早期的ARM處理器（比ARM7TDMI更早），可能並未具備指令可以讀取2 Bytes的數量；因此嚴格來講，對這些處理器產生程式碼時，就不可能處理如C語言物件中使用「volatile short」的資料型態。
+
+==== 管線 ====
+ARM7和大多數較早的設計具備三階段的[[指令管線化|管線]]：提取指令、解碼，並執行。較高效能的設計，如ARM9，則有更深階段的管線： Cortex-A8有13階段的管線。提高效能的額外方式，包含一顆較快的加法器，和更廣的分支預測邏輯線路。例如，在ARM7DI核与ARM7DMI核之间的差异，是一种改进的乘法器（因此添加的“M”）。
+
+==== 輔助處理器 ====
+這個架構使用「輔助處理器」提供一種非侵入式的方法來延伸指令集，可透過軟體下MCR、MRC、MRRC和MCRR等指令來對輔助處理器定址。輔助處理器空間邏輯上通常分成16個輔助處理器，編號分別從0至15；而第15號輔助處理器是保留用作某些常用的控制功能，像是使用快取和[[記憶管理單元|記憶管理單元]]運算（若包含於處理器時）。
+* 在ARM架構的機器中，週邊裝置連接處理器的方式，通常透過將裝置的實體暫存器對應到ARM的記憶體空間、輔助處理器空間，或是連接到另外依序接上處理器的裝置（如匯流排）。輔助處理器的存取延遲較低，所以有些周邊裝置（例如XScale中斷控制器）會設計成可透過不同方式存取（透過記憶體和輔助處理器）。
+
+=== 调试 ===
+<blockquote>DSP增强指令</blockquote>
+
+=== Thumb ===
+較新的ARM處理器有一種16-bit指令模式，叫做Thumb，也許跟每個條件式執行指令均耗用4位元的情形有關。在Thumb模式下，較小的opcode有更少的功能性。例如，只有分支可以是條件式的，且許多opcode無法存取所有CPU的暫存器。然而，較短的opcode提供整體更佳的編碼密度（注：意指程式碼在記憶體中佔的空間），即使有些運算需要更多的指令。特別在記憶體埠或匯流排寬度限制在32以下的情形時，更短的Thumb opcode能更有效地使用有限的記憶體頻寬，因而提供比32位元程式碼更佳的效能。典型的嵌入式硬體僅具有較小的32-bit datapath定址範圍以及其他更窄的16 bits定址（例如[[Game_Boy_Advance|Game Boy Advance]]）。在這種情形下，通常可行的方案是編譯成Thumb程式碼，並自行最佳化一些使用（非Thumb）32位元指令集的CPU相關程式區，因而能將它們置入受限的32-bit匯流排寬度的記憶體中。
+
+首顆具備Thumb技術的處理器是ARM7TDMI。所有ARM9和後來的家族，包括[[XScale|XScale]]，都納入了Thumb技術。
+
+=== Jazelle ===
+ARM還開發出一項技術，[https://web.archive.org/web/20120329144026/http://www.arm.com/zh/products/processors/technologies/jazelle.php Jazelle DBX]（Direct Bytecode eXecution），允許它們在某些架構的硬體上加速執行[[Java_bytecode|Java bytecode]]，就如其他執行模式般，當呼叫一些無法支援bytecodes的特殊軟體時，能提供某些bytecodes的加速執行。它能在現存的ARM與Thumb模式之間互相執行。
+
+首顆具備Jazelle技術的處理器是「ARM7EJ-S」：Jazelle以一個英文字母'J'標示於CPU名稱中。它用來讓手機製造商能夠加速執行[[Java_ME|Java ME]]的遊戲和應用程式，也因此促使了這項技術不斷地發展。
+
+=== Thumb-2 ===
+Thumb-2技術首見於「ARM1156核心」，並於2003年發表。Thumb-2擴充了受限的16位元Thumb指令集，以額外的32位元指令讓指令集的使用更廣泛。因此Thumb-2的預期目標是要達到近乎Thumb的編碼密度，但能表現出近乎ARM指令集在32位元記憶體下的效能。
+
+Thumb-2至今也從ARM和Thumb指令集中衍伸出多種指令，包含位元欄操作、分支建表和條件執行等功能。
+
+=== Thumb Execution Environment（ThumbEE） ===
+ThumbEE，也就是所謂的Thumb-2EE，業界稱為[http://www.arm.com/products/solutions/JazelleRCT.html Jazelle RCT] {{Wayback|url=http://www.arm.com/products/solutions/JazelleRCT.html |date=20220418053320 }}技術，於2005年發表，首見於「Cortex-A8」處理器。ThumbEE提供從Thumb-2而來的一些擴充性，在所處的執行環境下，使得指令集能特別適用於執行階段的編碼產生（例如[[即時編譯|即時編譯]]）。Thumb-2EE是專為一些語言如[[Limbo|Limbo]]、[[Java|Java]]、[[C_Sharp|C#]]、[[Perl|Perl]]和[[Python|Python]]，並能讓[[即時編譯|即時編譯]]器能夠輸出更小的編譯碼卻不會影響到效能。
+
+ThumbEE所提供的新功能，包括在每次存取指令時自動檢查是否有無效指標，以及一種可以執行陣列範圍檢查的指令，並能夠分支到分類器，其包含一小部份經常呼叫的編碼，通常用於高階語言功能的實作，例如對一個新物件做記憶體配置。
+
+=== 進階SIMD（NEON） ===
+進階SIMD延伸集，業界稱為「NEON」技術，它是一個結合64位元和128位元的[[单指令流多数据流|單指令多重數]]指令集（SIMD），其針對多媒體和訊號處理程式具備標準化加速的能力。NEON可以在10 MHz的處理器上執行[[MP3|MP3]]音效解碼，且可以執行13 MHz以下的[[自適應多速率音頻壓縮|自適應多速率音頻壓縮]]編碼。NEON具有一組廣泛的指令集、各自的暫存器檔案，以及獨立執行的硬體。NEON支援8、16、32和64位元的整數及單精度浮點數據，並以單指令多重數的方式運算，執行圖形和遊戲處理中關於語音及視訊的部分。單指令多重指令集在[[向量處理器|向量超級處理機]]中是個決定性的要素，它具備同時多項處理功能。在NEON技術中，SIMD最高可同時做16個運算。
+
+=== VFP ===
+VFP（向量浮點）是在協同處理器針對ARM架構的衍生技術。它提供低成本的單精度和倍精度浮點運算能力，並完全相容於[[IEEE_754|ANSI/IEEE Std 754-1985二進位浮點算數標準]]。VFP提供大多數適用於浮點運算的應用，例如PDA、智慧手機、語音壓縮與解壓、3D圖像以及數位音效、印表機、機上盒，和汽車應用等。VFP架構也支援SIMD平行化的短向量指令執行。這在圖像和訊號處理等應用上，非常有助於降低編碼大小並增加輸出效率。
+
+在ARM為基礎的處理器中，其他可見的浮點、或SIMD的協同處理器還包括了FPA、FPE、[[MMX|iwMMXt]]。他們提供類似VFP的功能，但在[[opcode|opcode]]層面上來說並不具有相容性。
+
+=== 安全性擴充（TrustZone） ===
+TrustZone技術出現在ARMv6KZ以及較晚期的應用核心架構中。它提供了一種低成本的方案，針對[[系統單晶片|系統單晶片]]內加入專屬的安全核心，由硬體建構的存取控制方式支援兩顆虛擬的處理器。這個方式可使得應用程式核心能夠在兩個狀態（領域）之間切換，在此架構下可以避免資訊從較可信的核心領域洩漏至較不安全的領域。這種內核領域之間的切換通常是與處理器其他功能完全無關聯性，因此各個領域可以各自獨立運作但卻仍能使用同一顆內核。記憶體和周邊裝置也可因此得知目前內核運作的領域為何，並能針對這個方式來提供對裝置的機密和編碼進行存取控制。典型的TrustZone技術應用是要能在一個缺乏安全性的環境下完整地執行作業系統，並在可信的環境下能有更少的安全性的編碼。T6<ref>{{citation|url=http://www.liwenhaosuper.com/projects/t6|title=T6: TrustZone Based Trusted Kernel|publisher=trustkernel|date=8 July 2014|accessdate=8 July 2014|archive-date=2022-04-18|archive-url=https://web.archive.org/web/20220418053339/http://www.liwenhaosuper.com/projects/t6}}</ref>是中国第一个开源的TrustZone安全内核(该项目目前已经在公开领域消失)。[[OP-TEE|OP-TEE]](Open Portable Trusted Executive Environment)成为目前（2017/7）较为成功的[[可信執行環境|可信執行環境]]（TEE）开源项目。
+
+== ARM授權方式 ==
+ARM公司本身並不靠自有的設計來製造或販售CPU，而是將處理器架構授權給有興趣的廠家。ARM提供了多樣的授權條款，包括售價與散播性等項目。對於授權方來說，ARM提供了ARM內核的整合硬體敘述，包含完整的軟體開發工具（編譯器、debugger、SDK），以及針對內含ARM CPU矽晶片的銷售權。對於無晶圓廠的授權方來說，其希望能將ARM內核整合到他們自行研發的晶片設計中，通常就僅針對取得一份生產就緒的[[IP核|智財核心技術]]（IP Core）認證。對這些客戶來說，ARM會釋出所選的ARM核心的閘極電路圖，連同抽象模擬模型和測試程式，以協助設計整合和驗證。需求更多的客戶，包括整合元件製造商（IDM）和晶圓廠家，就選擇可合成的RTL（[[寄存器传输级|寄存器传输级]]，如[[Verilog|Verilog]]）形式來取得處理器的智財權（IP）。藉著可整合的RTL，客戶就有能力能進行架構上的最佳化與加強。這個方式能讓設計者完成額外的設計目標（如高震盪頻率、低能量耗損、指令集延伸等）而不會受限於無法更動的電路圖。雖然ARM並不授予授權方再次販售ARM架構本身，但授權方可以任意地販售製品（如晶片元件、評估板、完整系統等）。商用晶圓廠是特殊例子，因為他們不僅授予能販售包含ARM內核的矽晶成品，對其它客戶來講，他們通常也保留重製ARM內核的權利。
+
+就像大多數IP販售方，ARM依照使用價值來決定IP的售價。在架構上而言，更低效能的ARM內核比更高效能的內核擁有較低的授權費。以矽晶片實作而言，一顆可整合的內核要比一顆硬體巨集（黑箱）內核要來得貴。更複雜的價位問題來講，持有ARM授權的商用晶圓廠（例如韓國三星和日本富士通）可以提供更低的授權價格給他們的晶圓廠客戶。透過晶圓廠自有的設計技術，客戶可以更低或是免費的ARM預付授權費來取得ARM內核。相較於不具備自有設計技術的專門半導體晶圓廠（如[[台積電|台積電]]和[[聯電|聯電]]），富士通／三星對每片晶圓多收取了兩至三倍的費用。對中少量的應用而言，具備設計部門的晶圓廠提供較低的整體價格（透過授權費用的補助）。對於量產而言，由於長期的成本縮減可藉由更低的晶圓價格，減少ARM的NRE成本，使得專門的晶圓廠也成了一個更好的選擇。
+
+許多半導體公司持有ARM授權：[[Atmel|Atmel]]、[[博通有限|Broadcom]]、[[Cirrus_Logic|Cirrus Logic]]、[[Freescale|Freescale]]（於2004從[[摩托羅拉|摩托羅拉]]公司獨立出來）、[[富士通|富士通]]、[[英特爾|英特爾]]（藉由和[[迪吉多|迪吉多]]的控訴調停）、[[IBM|IBM]]、[[NVIDIA|NVIDIA]]、台灣[[新唐科技|新唐科技]]（Nuvoton Technology）、[[英飛凌|英飛凌]]、[[任天堂|任天堂]]、[[恩智浦半導體|恩智浦半導體]]（於2006年從[[飛利浦|飛利浦]]獨立出來）、[[沖電氣|沖電氣]]、[[三星電子|三星電子]]、[[蘋果公司|蘋果]]、[[夏普|夏普]]、[[意法半導體|意法半導體]]、[[德州儀器|德州儀器]]和[[VLSI_Technology|VLSI]]等許多這些公司均擁有各個不同形式的ARM授權。雖然ARM的授權項目由[[保密合約|保密合約]]所涵蓋，在智慧財產權工業，ARM是廣為人知最昂貴的CPU內核之一。單一的客戶產品包含一個基本的ARM內核可能就需索取一次高達美金20萬的授權費用。而若是牽涉到大量架構上修改，則費用就可能超過千萬美元。
+
+== ARM核心时间线 ==
+下表列出每个核心发布年份<ref>{{Cite web |url=http://www.arm.com/about/company-profile/milestones.php |title=ARM Company Milestones. |accessdate=2018-11-30 |archive-date=2014-03-28 |archive-url=https://web.archive.org/web/20140328171411/http://www.arm.com/about/company-profile/milestones.php |dead-url=no }}</ref><ref>{{Cite web |url=http://www.arm.com/about/newsroom/index.php |title=ARM Press Releases. |accessdate=2018-11-30 |archive-date=2014-04-09 |archive-url=https://web.archive.org/web/20140409172237/http://arm.com/about/newsroom/index.php |dead-url=no }}</ref>。未包括ARM7之前的核心<!-- Please add older cores to this table! -->。
+
+{| class="wikitable" border="1" <!-- REQUEST: Need years for ARM700 and ARM710 -->
+|-
+! rowspan=2 | 年份
+! colspan=5 | 经典核心
+! colspan=4 | Cortex核心
+|-
+! [[ARM7|ARM7]] !! ARM8 !! [[ARM9|ARM9]] !! ARM10 !! [[ARM11|ARM11]] !! [[ARM_Cortex-M|微控制器]] !! [[ARM_Cortex-R|实时]] !! [[ARM_Cortex-A|应用]]<br>(32位) !! [[ARM_Cortex-A|应用]]<br>(64位) 
+|-
+! 1993
+| ARM700 || || || || || || || ||
+|-
+! 1994
+| ARM710<br/>ARM7DI<br>ARM7TDMI || || || || || || || ||
+|-
+! 1995
+| ARM710a || || || || || || || ||
+|-
+! 1996
+| || ARM810 || || || || || || ||
+|-
+! 1997
+| ARM710T<br>ARM720T<br>ARM740T || || || || || || || ||
+|-
+! 1998
+| || || ARM9TDMI<br>ARM940T || || || || || ||
+|-
+! 1999
+| || || ARM9E-S<br>ARM966E-S || || || || || ||
+|-
+! 2000
+| || || ARM920T<br>ARM922T<br>ARM946E-S || ARM1020T || || || || ||
+|-
+! 2001
+| ARM7TDMI-S<br>ARM7EJ-S || || ARM9EJ-S<br>ARM926EJ-S || ARM1020E<br>ARM1022E || || || || ||
+|-
+! 2002
+| || || || ARM1026EJ-S || ARM1136J(F)-S || || || ||
+|-
+! 2003
+| || || ARM968E-S || || ARM1156T2(F)-S<br>ARM1176JZ(F)-S || || || ||
+|-
+! 2004
+| || || || || || Cortex-M3 || || ||
+|-
+! 2005
+| || || || || ARM11MPCore || || || Cortex-A8 ||
+|-
+! 2006
+| || || ARM996HS || || || || || ||
+|-
+! 2007
+| || || || || || Cortex-M1 || || Cortex-A9 ||
+|-
+! 2008
+| || || || || || || || ||
+|-
+! 2009
+| || || || || || Cortex-M0 || || Cortex-A5 ||
+|-
+! 2010
+| || || || || || Cortex-M4(F) || || Cortex-A15 ||
+|-
+! 2011
+| || || || || || || Cortex-R4<br>Cortex-R5<br>Cortex-R7 || Cortex-A7 ||
+|-
+! 2012
+| || || || || || Cortex-M0+ || || || Cortex-A53<br>Cortex-A57
+|-
+! 2013
+| || || || || || || || Cortex-A12 ||
+|-
+! 2014
+| || || || || || Cortex-M7(F) || || Cortex-A17 ||
+|-
+! 2015
+| || || || || || || || || Cortex-A35<br>Cortex-A72
+|-
+! 2016
+| || || || || || Cortex-M23<br/>Cortex-M33(F) || Cortex-R8<br/>Cortex-R52 || Cortex-A32 || Cortex-A73
+|-
+! 2017
+| || || || || || || || || [[ARM_Cortex-A55|Cortex-A55]]<br/>[[ARM_Cortex-A75|Cortex-A75]]
+|-
+! 2018
+| || || || || || Cortex-M35P || || || [[ARM_Cortex-A76|Cortex-A76]]
+|-
+!2019
+|
+|
+|
+|
+|
+|
+|
+|
+|[[ARM_Cortex-A77|Cortex-A77]]
+|-
+!2020
+|
+|
+|
+|
+|
+|
+|
+|
+|[[ARM_Cortex-A78|Cortex-A78]]
+[[ARM_Cortex-X1|Cortex-X1]]
+|-
+!2021
+|
+|
+|
+|
+|
+|
+|
+|
+|[[ARM_Cortex-X2|Cortex-X2]]
+[[ARM_Cortex-A710|Cortex-A710]]
+
+[[ARM_Cortex-A510|Cortex-A510]]
+|}
+
+== ARM內核的授權與應用 ==
+{| class="wikitable" style="width:100%;"
+|+经典核心
+|-
+! ARM內核
+! 裝置
+! 產品
+|-
+!ARM1
+|ARM1
+|[[BBC_Micro|BBC Micro]]的[[ARM_Evaluation_System|ARM Evaluation System]]第二处理器
+|-
+!ARM2
+|ARM2
+|[[Acorn_Archimedes|Acorn Archimedes]]、[[Chessmachine|Chessmachine]]
+|-
+!ARM250
+|ARM250
+|[[Acorn_Archimedes|Acorn Archimedes]]
+|-
+!ARM3
+|ARM3
+|[[Acorn_Archimedes|Acorn Archimedes]]
+|-
+!ARM60
+|ARM60
+|[[3DO_Interactive_Multiplayer|3DO Interactive Multiplayer]]、Zarlink GPS Receiver
+|-
+!ARM610
+|ARM610
+|[[Risc_PC|Acorn Risc PC 600]]、[[Apple_Newton|Apple Newton]] 100 series
+|-
+![[ARM7|ARM700]]
+|ARM700
+|[[Risc_PC|Acorn Risc PC]] prototype CPU card
+|-
+!ARM710
+|ARM710
+|[[Risc_PC|Acorn Risc PC 700]]
+|-
+!
+!
+!
+|-
+!ARM7TDMI（-S）
+|[[Atmel|Atmel]] [[AT91SAM|AT91SAM]]7、[[恩智浦半導體|恩智浦半導體]][[LPC2000|LPC2000]]及[https://web.archive.org/web/20091124220747/http://www.standardics.nxp.com/products/lh7/ LH754xx]、[[Actel|Actel]] [https://web.archive.org/web/20110718162317/http://www.actel.com/products/mpu/coremp7/ CoreMP7]
+|[[Game_Boy_Advance|Game Boy Advance]]、[[Nintendo_DS|Nintendo DS]]、[[iPod|Apple iPod]]、[[Lego_NXT|Lego NXT]],  [[Juice_Box|Juice Box]]、[[Garmin|Garmin]]導航裝置（1990s – early 2000s）
+|-
+!ARM710a
+|ARM7100、ARM 7500和ARM7500FE
+|Acorn Risc PC 700、[[Apple_eMate_300|Apple eMate 300]]、[[Psion_Series_5|Psion Series 5]]（ARM7100）、[[Acorn_A7000|Acorn A7000]]（ARM7500）、[[Acorn_A7000|Acorn A7000+]]（ARM7500FE）、[[Acorn_Network_Computer|Acorn Network Computer]]（ARM7500FE）
+|-
+![[StrongARM|StrongARM]]
+|[[迪吉多|Digital]] SA-110, SA-1100, SA-1110
+|SA-110: Apple Newton 2x00 series、Acorn Risc PC、Rebel/Corel Netwinder、Chalice CATS，SA-1100: [[Psion_netBook|Psion netBook]]，SA-1110: [[LART|LART]]、Intel Assabet、[[Ipaq|Ipaq]] H36x0、[[Balloon_Board|Balloon2]]、[[Zaurus|Zaurus]] SL-5x00、[[HP_Jornada|HP Jornada]] 7xx、[[Jornada_560_series|Jornada 560 series]]、Palm Zire 31
+|-
+!ARM810
+|
+| Acorn Risc PC prototype CPU card
+|-
+!ARM710T
+|
+|[[Psion_Series_5mx|Psion Series 5mx]]、[[Psion_Revo|Psion Revo]]/Revo Plus/Diamond Mako
+|-
+!ARM720T
+|恩智浦半導體[https://web.archive.org/web/20091124220747/http://www.standardics.nxp.com/products/lh7/ LH7952x]
+|[[Zipit_Wireless_Messenger|Zipit Wireless Messenger]]
+|-
+!
+!
+!
+|-
+!ARM940T
+|
+|[[GP2X|GP2X]]（second core）、Meizu [[M6_Mini_Player|M6 Mini Player]]<ref>{{Cite web|url=http://www.rockbox.org/twiki/bin/view/Main/SamsungSA58|title=Rockbox Samsung SA58xxx series|accessdate=2008-02-22|archive-date=2008-07-20|archive-url=https://web.archive.org/web/20080720072321/http://www.rockbox.org/twiki/bin/view/Main/SamsungSA58|dead-url=yes}}</ref><ref>{{Cite web |url=http://www.rockbox.org/twiki/bin/view/Main/MeizuM6Port |title=Rockbox Meizu M6 Port – Hardware Information |accessdate=2008-02-22 |archive-date=2008-05-12 |archive-url=https://web.archive.org/web/20080512082109/http://www.rockbox.org/twiki/bin/view/Main/MeizuM6Port |dead-url=yes }}</ref>
+|-
+!ARM966E-S
+|[[意法半導體|意法半導體]]STR91xF<ref>{{Cite web |url=http://www.st.com/internet/mcu/subclass/828.jsp |title=STR9 – STR912 – STR912FW44 microcontroller – documents and files download page |publisher=Mcu.st.com |date= |accessdate=2009-04-18 |archive-url=https://web.archive.org/web/20120524015041/http://www.st.com/internet/mcu/subclass/828.jsp |archive-date=2012-05-24 |dead-url=yes }}</ref>
+|
+|-
+!ARM920T
+|[[Atmel|Atmel]] AT91RM9200、[[AT91SAM|AT91SAM]]9、Cirrus Logic EP9302、EP9307、EP9312、EP9315、[[Samsung|Samsung]] S3C2442 and S3C2410
+|[[Armadillo_CPU_Boards|Armadillo]]、[[GP32|GP32]]、[[GP2X|GP2X]]（first core）、[[Tapwave_Zodiac|Tapwave Zodiac]]（[[Motorola|Motorola]] i.MX1）、Hewlett-Packard [[HP-49_series|HP-49/50 Calculators]]、[[Sun_SPOT|Sun SPOT]]、[[HTC_TyTN|HTC TyTN]]、[[First_International_Computer|FIC]] [[Neo_FreeRunner|Neo FreeRunner]]<ref>{{Cite web |url=http://wiki.openmoko.org/wiki/Neo1973:_GTA01Bv4_versus_GTA02_comparison |title=Neo1973: GTA01Bv4 versus GTA02 comparison |accessdate=2007-11-15 |archive-date=2015-11-20 |archive-url=https://web.archive.org/web/20151120124430/http://wiki.openmoko.org/wiki/Neo1973:_GTA01Bv4_versus_GTA02_comparison |dead-url=no }}</ref>）、[[Garmin|Garmin]]導航裝置（mid–late 2000s）、[[TomTom|TomTom]]導航裝置<ref>{{Cite web |url=http://elinux.org/S3C2410 |title=S3C2410 |accessdate=2010-01-13 |archive-date=2012-03-13 |archive-url=https://www.webcitation.org/667okGpjS?url=http://elinux.org/S3C2410 |dead-url=no }}</ref>
+|-
+!ARM922T
+|恩智浦半導體[https://web.archive.org/web/20090521212410/http://www.standardics.nxp.com/products/lh7a/ LH7A40x]
+|
+|-
+!ARM926EJ-S
+|[[新唐科技|新唐科技]](Nuvoton)[https://web.archive.org/web/20140905214900/http://www.nuvoton.com/NuMicro/ NuMicro Family]，<ref name="ARM Cortex™-M0 NuMicro™ Family">{{Cite web |url= http://www.nuvoton.com/NuMicro/ |title= ARM Cortex™-M0 NuMicro™ Family |publisher= Nuvoton |date= 2013-04-25 |accessdate= 2013-04-25 |archive-url= https://web.archive.org/web/20140905214900/http://www.nuvoton.com/NuMicro/ |archive-date= 2014-09-05 |dead-url= yes }}</ref>德州儀器[[OMAP|OMAP]]1710、OMAP1610、OMAP1611、OMAP1612、OMAP-L137、OMAP-L138；[[Qualcomm|Qualcomm]] MSM6100、MSM6125、MSM6225、MSM6245、MSM6250、MSM6255A、MSM6260、MSM6275、MSM6280、MSM6300、MSM6500、MSM6800；[[Freescale|Freescale]] [[i.MX21|i.MX21]]、i.MX27、i.MX28、[[Atmel|Atmel]] [[AT91SAM|AT91SAM]]9、恩智浦半導體、[[Samsung|Samsung]] S3C2412 [https://web.archive.org/web/20091127231631/http://www.standardics.nxp.com/products/lpc3000/ LPC30xx], NEC C10046F5-211-PN2-A SoC –未文件化的內核有可能將[[Hollywood_(graphics_chip)|ATi Hollywood]]繪圖晶片用於Wii,<ref>[http://wiibrew.org/wiki/Starlet Starlet] {{Wayback|url=http://wiibrew.org/wiki/Starlet |date=20181010144616 }}.</ref>Telechips TCC7801、TCC7901、[[ZiiLABS|ZiiLABS]] ZMS-05、[[Rockchip|Rockchip]] RK2806及RK2808、[[NeoMagic|NeoMagic]] MiMagic Family MM6、MM6+、MM8、MTV；[[全志科技|全志科技]]F-serial（F1E200/F1C100、F20、F13、F10、F18）<ref>{{Cite web |url=http://www.allwinnertech.com/ |title=AllWinner Technology（全志科技） |accessdate=2014-09-30 |archive-date=2014-10-06 |archive-url=https://web.archive.org/web/20141006145832/http://www.allwinnertech.com/ |dead-url=no }}</ref>；[http://www.aspeedtech.com/ 信驊科技ASPEED]{{Wayback|url=http://www.aspeedtech.com/ |date=20140925222136 }} （AST1510、AST2050、AST2150、AST2300/1050、AST2400/1250、AST3100）<ref>{{Cite web |url=http://www.aspeedtech.com/products.php |title=ASPEED Technology（信驊科技） |accessdate=2014-09-30 |archive-date=2014-10-06 |archive-url=https://web.archive.org/web/20141006091703/http://www.aspeedtech.com/products.php |dead-url=no }}</ref>.
+|移动电话：[[Sony_Ericsson|Sony Ericsson]]（K, W series）；[[Siemens_AG|Siemens]]以及[[Benq|Benq]]（x65系列和更新版本）；[[LG_KM900_(Arena)|LG Arena]]；GPH Wiz；[[Squeezebox_(network_music_player)#Squeezebox_Duet_(January_2008)|Squeezebox Duet]] Controller (Samsung S3C2412)。[[Squeezebox_(network_music_player)#Squeezebox_Radio_(September_2009)|Squeezebox Radio]]；[[Buffalo_network-attached_storage_series|Buffalo]] TeraStation Live ([[網路儲存設備|NAS]])； [[Drobo|Drobo FS]] ([[網路儲存設備|NAS]])，Western Digital MyBook I World Edition；Western Digital MyBook II World Edition；[[Seagate_FreeAgent|Seagate FreeAgent]] [https://web.archive.org/web/20100913091746/http://www.seagate.com/www/en-us/products/network_storage/freeagent_dockstar DockStar] STDSD10G-RK；[[Seagate_FreeAgent|Seagate FreeAgent]] GoFlex Home；[[Chumby|Chumby]] Classic
+|-
+!ARM946E-S
+|
+|[[Nintendo_DS|Nintendo DS]]、[[Nokia|Nokia]] [[N-Gage|N-Gage]]、[[Canon_PowerShot_A470|Canon PowerShot A470]]、[[Canon_EOS_5D_Mark_II|Canon EOS 5D Mark II]]，<ref>{{Cite web |url=http://magiclantern.wikia.com/wiki/Datasheets |title=Datasheets - Magic Lantern Firmware Wiki |publisher=Magiclantern.wikia.com |date=2010-12-28 |accessdate=2011-01-06 |archive-date=2011-07-18 |archive-url=https://web.archive.org/web/20110718045528/http://magiclantern.wikia.com/wiki/Datasheets |dead-url=no }}</ref>Conexant 802.11 chips、Samsung S5L2010
+|-
+![[XScale|XScale]]
+|[[Intel|Intel]] 80200、80219、PXA210、PXA250、PXA255、PXA263、PXA26x、PXA27x、PXA3xx、PXA900、IXC1100、IXP42x
+|80219: [[Thecus|Thecus]] N2100，OP321: [[Iyonix|Iyonix]]，PXA210/PXA250: [[Zaurus|Zaurus]] SL-5600、[[iPAQ|iPAQ]] H3900、[[Sony|Sony]] [[CLIÉ|CLIÉ]] NX60、NX70V、NZ90，PXA255: [[Gumstix|Gumstix basix & connex]]、[[Palm_Tungsten|Palm Tungsten]] E2、[[Zaurus|Zaurus]] SL-C860、[[Mentor_Ranger_&_Stryder|Mentor Ranger & Stryder]]、iRex [[ILiad|ILiad]]，PXA263: [[Sony|Sony]] [[CLIÉ|CLIÉ]] NX73V, NX80V，PXA26x: [[Tungsten_T3|Tungsten T3]]，PXA27x: [[Gumstix|Gumstix verdex]]、[http://www.keith-koep.com/produkte/xscale-arm-embedded/trizeps4-pxa270-e.html "Trizeps-Modules"]{{Wayback|url=http://www.keith-koep.com/produkte/xscale-arm-embedded/trizeps4-pxa270-e.html |date=20110728173653 }}、[http://www.e-consystems.com/esom270.asp "eSOM270-Module"]{{Wayback|url=http://www.e-consystems.com/esom270.asp |date=20110504202251 }}，PXA270 COM、[[宏達電|HTC]] Universal、[[Hewlett-Packard|HP]] hx4700、[[Zaurus|Zaurus]] SL-C1000、3000、3100、3200、[[Dell_Axim|Dell Axim]] x30、x50、and x51 series、Motorola Q、[[Balloon_Board|Balloon3]]、[[Greenphone|Trolltech Greenphone]]、[[Palm_TX|Palm TX]]、Motorola Ezx Platform A728、A780、A910、A1200、E680、E680i、E680g、E690、E895、Rokr E2、Rokr E6、Fujitsu Siemens LOOX N560、Toshiba Portégé G500、Trēo 650-755p、[[Zipit_Wireless_Messenger|Zipit Z2]]、HP iPaq 614c Business Navigator、[[I-mate|I-mate]] PDA2，PXA3XX: Samsung Omnia、[[Samsung_SGH-i780|Samsung SGH-i780]]，PXA900: Blackberry 8700、Blackberry Pearl（8100），IXP42x: [[NSLU2|NSLU2]]
+|-
+!ARM1026EJ-S
+|[[Conexant|Conexant]] so4610以及so4615 ADSL SoC
+|
+|-
+!
+!
+!
+|-
+!ARM1136J（F）-S
+|德州儀器OMAP2420, Qualcomm MSM7200, MSM7201A, MSM7227, Freescale i.MX31以及MXC300-30
+|OMAP2420: [[Nokia_E90|Nokia E90]]、[[Nokia_N93|Nokia N93]]、[[Nokia_N95|Nokia N95]]、[[Nokia_N82|Nokia N82]]、[[Zune|Zune]]、[[BUGbase|BUGbase]]，<ref>{{citation | url = http://www.buglabs.net/ | title = Bug Labs | accessdate = 2011-05-16 | archive-date = 2011-05-19 | archive-url = https://web.archive.org/web/20110519145700/http://www.buglabs.net/ | dead-url = no }}.</ref>[[Nokia_N800|Nokia N800]]、[[Nokia_N810|Nokia N810]]，[[Motorola_Q9|Motorola Q9]]<br />Freescale [[i.MX31|i.MX31]]: original Zune 30 GB, Toshiba Gigabeat S and Kindle DX ，Freescale MXC300-30 :[[Nokia_E63|Nokia E63]]、[[Nokia_E71|Nokia E71]]、[[Nokia_5800|Nokia 5800]]、[[Nokia_E51|Nokia E51]]、[[Nokia_6700_Classic|Nokia 6700 Classic]]、[[Nokia_6120_Classic|Nokia 6120 Classic]]、[[Nokia_6210_Navigator|Nokia 6210 Navigator]]、[[Nokia_6220_Classic|Nokia 6220 Classic]]、[[Nokia_6290|Nokia 6290]]、[[Nokia_6710_Navigator|Nokia 6710 Navigator]]、[[Nokia_6720_Classic|Nokia 6720 Classic]]、[[Nokia_E75|Nokia E75]]、[[Nokia_N97|Nokia N97]]、[[Nokia_N81|Nokia N81]]<br />Qualcomm MSM7200: [[Eten_Glofiish|Eten Glofiish]]、[[HTC_TyTN_II|HTC TyTN II]]、[[HTC_Nike|HTC Nike]]，Qualcomm MSM7201A: [[HTC_Dream|HTC Dream]]、[[HTC_Magic|HTC Magic]]、[[Motorola_i1|Motorola i1]]、[[Motorola_Z6|Motorola Z6]]、[[HTC_Hero|HTC Hero]]、[[Samsung_SGH-i627|Samsung SGH-i627 (Propel Pro)]]、[[Sony_Ericsson_Xperia_X10_Mini_Pro|Sony Ericsson Xperia X10 Mini Pro]]，Qualcomm MSM7227: [[ZTE|ZTE]] Link, [[HTC_Legend|HTC Legend]]、[[HTC_Aria|HTC Aria]]、[[Viewsonic|Viewsonic]] [[ViewPad_7|ViewPad 7]]<ref>{{Cite web |url=http://xi0.info/qualcomm-chips-kernel-arm-phones_7000.html |title=Qualcomm chips kernel ARM—from phones to laptops |publisher=xi0.info |date= |accessdate=2010-05-08 |archive-url=https://www.webcitation.org/667onN6Aq?url=http://xi0.info/qualcomm-chips-kernel-arm-phones_7000.html |archive-date=2012-03-13 |dead-url=yes }}</ref><ref>{{Cite web |url= http://pdadb.net/index.php?m=cpu&id=a7227&c=qualcomm_msm7227 |title= Qualcomm MSM7227 RISC Chipset |publisher= PDADB |date=  |accessdate= 2010-05-08 |archive-date= 2012-03-13 |archive-url= https://www.webcitation.org/667ooM6DX?url=http://pdadb.net/index.php?m=cpu |dead-url= no }}</ref>
+|-
+!ARM968E-S
+|恩智浦半導體[https://web.archive.org/web/20090612074112/http://www.standardics.nxp.com/products/lpc2000/lpc29xx/ LPC29xx]
+|
+|-
+!ARM1176JZ（F）-S
+|[[Conexant|Conexant CX2427X]]、[[Nvidia_GoForce_6100|Nvidia GoForce 6100]]；<ref>{{Cite web|url=http://www.nvidia.com/page/goforce_6100.html|title=GoForce 6100|publisher=Nvidia|date=|accessdate=2009-04-18|archive-date=2015-11-20|archive-url=https://web.archive.org/web/20151120202753/http://www.nvidia.com/page/goforce_6100.html|dead-url=no}}</ref>；[[Telechips|Telechips]] TCC9101、TCC9201、TCC8900；[[Fujitsu_MB86H60|Fujitsu MB86H60]]；[[Samsung|Samsung]] S3C6410、S3C6430、<ref>{{Cite web |url=http://www.samsung.com/global/business/semiconductor/productInfo.do?fmly_id=229&partnum=S3C6410 |title=Samsung S3C6410 and S3C6430 Series ARM Proccessors |publisher=Samsung |date= |accessdate=2009-10-08 |deadurl=yes |archiveurl=https://web.archive.org/web/20090901161759/http://www.samsung.com/global/business/semiconductor/productInfo.do?fmly_id=229&partnum=S3C6410 |archivedate=2009-09-01 |df= }}</ref>；[[Qualcomm|Qualcomm]] MSM7627；[[Infineon|Infineon]] X-GOLD 213；[[MediaTek|MediaTek]] [https://web.archive.org/web/20111109033322/http://www.mtk.com.tw/en/Products/featured_content.php?sn=2 MT6573]；[http://www.aspeedtech.com/ 信驊科技ASPEED]{{Wayback|url=http://www.aspeedtech.com/ |date=20140925222136 }}（AST1520、AST2500、AST3200）；[[Broadcom|Broadcom]] BCM2835、BCM21553 
+|[[iPhone|Apple iPhone (original and 3G)]]、[[iPod_touch|Apple iPod touch (1st and 2nd Generation)]]、[[Motorola_RIZR_Z8|Motorola RIZR Z8]]、[[Motorola_Motorizr_Z10|Motorola RIZR Z10]]、[[Nintendo_3DS|Nintendo 3DS]]<br />S3C6410: [[Samsung_Omnia_II|Samsung Omnia II]]、[[Samsung_Moment|Samsung Moment]]、[[Samsung_M910_Intercept|Samsung M910 Intercept]]、[[SmartQ_5|SmartQ 5]]，<br />Qualcomm MSM7627: [[Palm_Pixi|Palm Pixi]]、LG Optimus V（VM670）Motorola Calgary/Devour<br />MediaTek MT6573: [[Lenovo|Lenovo]]-A60<br />BCM2835: [[Raspberry_Pi|Raspberry Pi]]
+|-
+!ARM11 MPCore
+|[[Nvidia|Nvidia]] APX 2500（[[Tegra|Tegra]]）
+|
+|}
+{| class="wikitable" style="width:100%;"
+|+Cortex核心
+|-
+! ARM內核
+! 裝置
+! 產品
+|-
+![[ARM_Cortex-M3|Cortex-M3]]
+|德州儀器[http://focus.ti.com/mcu/docs/mculuminaryprodoverview.tsp?sectionId=95&tabId=2486&familyId=1755&DCMP=Luminary&HQS=Other+OT+stellaris Stellaris]{{Wayback|url=http://focus.ti.com/mcu/docs/mculuminaryprodoverview.tsp?sectionId=95&tabId=2486&familyId=1755&DCMP=Luminary&HQS=Other+OT+stellaris |date=20110604173332 }}，意法半導體[http://www.st.com/internet/mcu/class/1734.jsp STM32F2]{{Wayback|url=http://www.st.com/internet/mcu/class/1734.jsp |date=20110523133055 }}，恩智浦半導體[https://web.archive.org/web/20091221043659/http://www.standardics.nxp.com/products/lpc1000/lpc17xx/ LPC17xx]、[[Toshiba|Toshiba]] TMPM330,<ref>{{citation | url = http://www.toshiba.com/taec/news/press_releases/2008/mcus_08_542.jsp | year = 2008 | title = Press release | publisher = Toshiba | accessdate = 2011-05-16 | archive-date = 2011-06-14 | archive-url = https://web.archive.org/web/20110614084456/http://www.toshiba.com/taec/news/press_releases/2008/mcus_08_542.jsp | dead-url = no }}.</ref>[[Ember|Ember]] EM3xx、[[Atmel|Atmel]] [[AT91SAM|AT91SAM]]3、[[Europe_Technologies|Europe Technologies]] [https://web.archive.org/web/20100310191238/http://www.europe-technologies.com/easyBCU.php EasyBCU]、[[Energy_Micro|Energy Micro]] [[EFM32|EFM32]]、[[Actel|Actel]] [https://web.archive.org/web/20120315052206/http://www.actel.com/products/SmartFusion/  SmartFusion]、[[mbed|mbed]]
+|
+|-
+![[ARM_Cortex-A8|Cortex-A8]]
+|德州儀器OMAP3xxx系列、[[飞思卡尔|飞思卡尔]]i.MX51-[[系統單晶片|SOC]]、[[Apple_A4|Apple A4]]、[[ZiiLABS|ZiiLABS]] ZMS-08、三星[[Exynos|Hummingbird]] S5PC100/S5PC110、[[Marvell|Marvell]] ARMADA 500/600、[[Rockchip|Rockchip]] RK2918<ref>{{en}} [http://www.rock-chips.com/upload/image/RK29/29.jpg RK2918 specs] {{Wayback|url=http://www.rock-chips.com/upload/image/RK29/29.jpg |date=20110715193207 }}</ref>、[[全志科技|全志科技]]A-serial（A10/A13/A10s）<ref>http://www.allwinnertech.com/product{{Dead link|date=2019年11月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>。
+|[[HTC_Desire|HTC Desire]]、SBM7000、俄勒冈州立大学[[OSWALD|OSWALD]]、[[Gumstix|Gumstix Overo Earth]]、[[Pandora_(console)|Pandora]]、[[iPhone#iPhone_3GS|Apple iPhone 3GS]]、[[iPod_touch|Apple iPod touch (3rd and 4th Generation)]]、[[iPad|iPad]]（[[Apple_A4|A4]]）、[[iPhone_4|iPhone 4]]（[[Apple_A4|A4]]）、[[Apple_TV|Apple TV (Second Generation)]]（[[Apple_A4|A4]]）、[[Archos_5|Archos 5]]、[[Archos_43|Archos 43]]、[[BeagleBoard|BeagleBoard]]、[[Genesi|Genesi]] [[EFIKA|EFIKA]] MX、[[Motorola_Droid|Motorola Droid]]、[[Motorola_Droid_X|Motorola Droid X]]、[[摩托罗拉里程碑2|摩托罗拉里程碑2]]、[[摩托罗拉里程碑2|Motorola Droid R2D2 Edition]]、[[Palm_Pre|Palm Pre]]、[[Palm_Pre_2|Palm Pre 2]]、[[HP_Veer|HP Veer]]、[[HP_Pre_3|HP Pre 3]]、[[Samsung_i8910|Samsung Omnia HD]]、[[Samsung_Wave_S8500|Samsung Wave S8500]]、[[Samsung_Galaxy_S|Samsung Galaxy S]]、[[Samsung_Galaxy_Tab|Samsung P1000 Galaxy Tab]]、[[Sony_Ericsson_Satio|Sony Ericsson Satio]]、[[Sony_Ericsson_Xperia_X10|Sony Ericsson Xperia X10]]、[[Smartbook|Touch Book]]、[[Nokia_N900|Nokia N900]]、[[魅族M9|魅族M9]]、[[Nexus_S|Google Nexus S]]、[[Galaxy_SL|Galaxy SL]]、[[HTC_Sensation|HTC Sensation]]、[[Smartbook|Sharp PC-Z1 "Netwalker"]]。
+|-
+![[ARM_Cortex-M1|Cortex-M1]]
+|[https://web.archive.org/web/20110707081336/http://www.actel.com/products/mpu/CortexM1/default.aspx  Actel ProASIC3、ProASIC3L、IGLOO及Fusion PSC devices]、[https://web.archive.org/web/20090909101407/http://www.arm.com/fpga/ Altera Cyclone III]，其他FPGA产品也支持，例如：[https://web.archive.org/web/20110716174949/http://www.synplicity.com/partners/readyip/ Synplicity]<ref>{{citation | url = http://www.arm.com/news/17017.html | title = ARM Extends Cortex Family with First Processor Optimized for FPGA | publisher = ARM | accessdate = 2011-05-16 | archive-date = 2007-05-05 | archive-url = https://web.archive.org/web/20070505180243/http://www.arm.com/news/17017.html | dead-url = no }}.</ref>
+|
+|-
+![[ARM_Cortex-A9_MPCore|Cortex-A9]]
+|德州仪器[[OMAP#OMAP4|OMAP4430/4440]]、[[ST-Ericsson|ST-Ericsson]] U8500/U5500、[[Nvidia_Tegra#Tegra_2系列|Nvidia Tegra2]]、[[Nvidia_Tegra#Tegra_2系列|Nvidia Tegra3]]、三星Orion/[[Exynos|Exynos]] 4210/4212/4412、意法半導體[http://www.st.com/internet/mcu/product/250658.jsp SPEAr1310]{{Wayback|url=http://www.st.com/internet/mcu/product/250658.jsp |date=20110927042907 }}、Xilinx Extensible Processing Platform<ref>{{Cite web |url=http://www.xilinx.com/support/documentation/white_papers/wp369_Extensible_Processing_Platform_Overview.pdf |title=Xilinx WP369 Extensible Processing Platform Ideal Solution for a Wide Range of Embedded Systems, White Paper |format=PDF |date= |accessdate=2011-01-06 |deadurl=yes |archiveurl=https://web.archive.org/web/20110902063300/http://www.xilinx.com/support/documentation/white_papers/wp369_Extensible_Processing_Platform_Overview.pdf |archivedate=2011-09-02 |df= }}</ref>、Trident PNX847x/8x/9x STB SoC<ref>{{Cite web |url=http://embeddedsystemnews.com/nxp-semiconductors-and-arm-showcase-nxp-847x8x9x-the-world%e2%80%99s-first-fully-integrated-45nm-set-top-boxstb-soc-platform-at-ces-2010.html |title=NXP Semiconductors and ARM Showcase NXP 847x/8x/9x, the World’s First Fully Integrated 45 nm Set-Top Box（STB）SoC Platform at CES 2010 |publisher=Embeddedsystemnews.com |date=2010-01-06 |accessdate=2011-01-06 |deadurl=yes |archiveurl=https://web.archive.org/web/20101219020540/http://embeddedsystemnews.com/nxp-semiconductors-and-arm-showcase-nxp-847x8x9x-the-world%E2%80%99s-first-fully-integrated-45nm-set-top-boxstb-soc-platform-at-ces-2010.html |archivedate=2010-12-19 }}</ref>、Freescale i.MX6<ref>{{Cite web |url=http://www.engadget.com/2011/01/03/freescale-announces-i-mx-6-processor-series-wants-quad-cores-in/ |title=Freescale announces i.MX 6 processor series, wants quad cores in your smartphone |publisher=Engadget |date=2010-12-29 |accessdate=2011-01-06 |archive-date=2011-01-06 |archive-url=https://web.archive.org/web/20110106074521/http://www.engadget.com/2011/01/03/freescale-announces-i-mx-6-processor-series-wants-quad-cores-in |dead-url=no }}</ref>、[[Apple_A5|Apple A5]]、[[MediaTek|MediaTek]] [[MT6575|MT6575]]/6577、[[VIA|VIA]] Elite-E1000<ref>{{Cite web|url=http://www.viaembedded.com/en/products/DatasheetPreview/2190/18434/VIA_VAB-1000_datasheet_v140521.pdf.html/|title=VAB-1000 1.0GHz VIA Elite E1000 Cortex-A9 dual-core SoC}}{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>
+<!-- Please do NOT add Apple A4 until there is either confirmation from a major可靠来源.  The Bright Side of News blog and all articles citing it（including CrunchGear and a Macworld piece）are speculative and NOT reliable. Apple A4 is based on Cortex A8, not A9, see above -->
+| [[iPad_2|Apple iPad 2]]（[[Apple_A5|A5]]）、[[LG_Optimus_2X|LG Optimus 2X]]、LG Optimus 3D、[[Motorola_Atrix_4G|Motorola Atrix 4G]]、Motorola DROID BIONIC、[[Motorola_Xoom|Motorola Xoom]]、[[PandaBoard|PandaBoard]]、PS VITA（NGP）、[[HP_TouchPad|HP TouchPad]]、Galaxy S2（GT-i9100）、Galaxy R（GT-i9103）、Galaxy S3（GT-i9300,E210）、Galaxy Tab 10.1、Galaxy Tab 2、Galaxy Note（N7000）、Galaxy Note 2、Galaxy Note 10.1、[[Galaxy_Ace_2|Galaxy Ace 2]]、[[HTC_One_X|HTC One X]]、[[魅族MX|魅族MX]]、[[魅族MX2|魅族MX2]]、[[联想集团|联想K860]]、[[PlayStation_Vita|PlayStation Vita]]、[[Sony_Xperia_U|Sony Xperia U]]、[[Sony_Xperia_sola|Sony Xperia sola]]、[[Sony_Xperia_P|Sony Xperia P]]、[[Sony_Xperia_go|Sony Xperia go]]
+|-
+![[ARM_Cortex-M0|Cortex-M0]]
+|恩智浦半導體[https://web.archive.org/web/20090924184858/http://www.standardics.nxp.com/products/lpc1000/lpc11xx/ LPC11xx]，<ref name="swift-nxp">{{Cite web |last=Walko |first=John |url=http://www.eetimes.com/news/design/rss/showArticle.jhtml?articleID=216200026 |title=NXP first to demo ARM Cortex-M0 silicon |publisher=[[EE_Times|EE Times]] |date=2009-03-23 |accessdate=2009-06-29 |archive-url=https://www.webcitation.org/667p02jg6?url=http://eetimes.com/electronics-products/processors/4110888/NXP-first-to-demo-ARM-Cortex-M0-silicon |archive-date=2012-03-13 |dead-url=yes }}</ref>[[Triad_Semiconductor|Triad Semiconductor]]，<ref>{{Cite web |url=http://www.triadsemi.com/services/arm-powered-vcas/ |title=ARM Powered VCAs |publisher=Triad Semiconductor |date= |accessdate=2011-01-06 |deadurl=yes |archiveurl=https://web.archive.org/web/20110716112427/http://www.triadsemi.com/services/arm-powered-vcas/ |archivedate=2011-07-16 }}</ref>[[Melfas|Melfas]]，<ref>{{Cite web |author=Richard Wilson |url=http://www.electronicsweekly.com/Articles/2009/06/10/46252/cortex-m0-used-in-low-power-touch-controller.htm |title=Cortex-M0 used in low power touch controller |publisher=Electronics Weekly |date=2009-06-10 |accessdate=2011-01-06 |archive-date=2011-08-16 |archive-url=https://web.archive.org/web/20110816075034/http://www.electronicsweekly.com/Articles/2009/06/10/46252/cortex-m0-used-in-low-power-touch-controller.htm |dead-url=no }}</ref>[[Chungbuk_Technopark|Chungbuk Technopark]]，<ref>{{Cite web |url = http://www.design-reuse.com/news/22137/arm-cortex-m0-processor.html |title = Chungbuk Technopark Chooses ARM Cortex-M0 Processor |publisher = Design Reuse |date =  |accessdate = 2011-01-06 |archive-date = 2010-10-07 |archive-url = https://web.archive.org/web/20101007045935/http://www.design-reuse.com/news/22137/arm-cortex-m0-processor.html |dead-url = no }}</ref>[[新唐科技|新唐科技]](Nuvoton)[https://web.archive.org/web/20140905214900/http://www.nuvoton.com/NuMicro/ NuMicro Family]，<ref name="ARM Cortex™-M0 NuMicro™ Family"/>[[austriamicrosystems|austriamicrosystems]]，<ref>{{Cite web |url= http://www10.edacafe.com/nbc/articles/view_article.php?articleid=752000 |title= Austriamicrosystems Chooses ARM Cortex-M0 Processor for Mixed Signal Applications |publisher= EDA Café |date=  |accessdate= 2011-01-06 |archive-date= 2011-07-22 |archive-url= https://web.archive.org/web/20110722230112/http://www10.edacafe.com/nbc/articles/view_article.php?articleid=752000 |dead-url= no }}</ref>[[羅姆電子|羅姆電子]]<ref>{{Cite web | url = http://www.arm.com/about/newsroom/rohm-licenses-arm-cortex-m0-processor.php | title = Rohm Licenses ARM Cortex-M0 Processor | publisher = ARM | date = 2010-05-13 | accessdate = 2011-01-06 | archive-date = 2010-11-16 | archive-url = https://web.archive.org/web/20101116222818/http://arm.com/about/newsroom/rohm-licenses-arm-cortex-m0-processor.php | dead-url = no }}</ref>
+| {{en-link|Nordic|Nordic Semiconductor}} [[nRF51|nRF51]]822：[[Micro_Bit|BBC micro:bit]]
+|-
+![[ARM_Cortex-A5|Cortex-A5]]
+| Telechips TCC892x, Qualcomm [[Qualcomm_Snapdragon|Snapdragon]] MSM7225A/MSM7625A/MSM7227A/MSM7627A, Atmel [[Atmel_ARM-based_processors#SAM_A5|SAMA5]] (D2/D3/D4), MYIR development board MYD-JA5D2X
+|
+|-
+![[ARM_Cortex-M4|Cortex-M4]]
+|飞思卡尔[http://www.freescale.com/webapp/sps/site/homepage.jsp?code=KINETIS Kinetis]{{Wayback|url=http://www.freescale.com/webapp/sps/site/homepage.jsp?code=KINETIS |date=20110711035338 }}，恩智浦半導體[https://web.archive.org/web/20110604230133/http://ics.nxp.com/products/lpc4000/lpc43xx/ LPC43xx]，意法半導體[http://www.st.com/internet/mcu/class/1734.jsp STM32F4]{{Wayback|url=http://www.st.com/internet/mcu/class/1734.jsp |date=20110523133055 }},[[新唐科技|新唐科技]](Nuvoton)[https://web.archive.org/web/20140905214900/http://www.nuvoton.com/NuMicro/ NuMicro Family]，<ref name="ARM Cortex™-M0 NuMicro™ Family"/>
+| Mikroelektronika [https://www.mikroe.com/hexiwear Hexiwear]{{Wayback|url=https://www.mikroe.com/hexiwear |date=20180429025140 }}
+|-
+![[ARM_Cortex-A15_MPCore|Cortex-A15]]
+|德州儀器OMAP5、三星 [[Exynos|Exynos]] 5250/5450、ST Ericsson<ref>{{Cite web |url= http://blogs.arm.com/2-smart-mobile-devices/entry-323-why-cortex-a15-makes-for-smarter-lightning-quick-mobile-devices-in-the-future/ |title= Why Cortex-A15 makes for Smarter, Lightning-Quick Mobile Devices in the Future—ARM Community |publisher= ARM |series= Blogs |date=  |accessdate= 2011-01-06 |archive-url= https://web.archive.org/web/20101206112936/http://blogs.arm.com/2-smart-mobile-devices/entry-323-why-cortex-a15-makes-for-smarter-lightning-quick-mobile-devices-in-the-future/ |archive-date= 2010-12-06 |dead-url= yes }}</ref>、Nvidia
+|[[Chromebook|Chromebook]]、[[Nexus_10|Nexus 10]]
+|-
+![[ARM_Cortex-R4|Cortex-R4（F）]]
+|[[博通|博通]]，德州儀器TMS570
+|
+|-
+![[ARM_Cortex-R5|Cortex-R5F]]
+|Scaleo OLEA
+|
+|-
+![[ARM_Cortex-A7|Cortex-A7]]  
+|[[Freescale_Semiconductor|Freescale]] i.MX6 UltraLite,[[Allwinner|Allwinner]] A20, [[Allwinner|Allwinner]] A31, [[Broadcom|Broadcom]] BCM2836, [[Rockchip|Rockchip]] RK3128
+|Freescale i.MX6 UltraLite:  [https://web.archive.org/web/20180420020604/http://www.armdesigner.com/EM6ul Boardcon EM6ul SBC], [http://www.armdesigner.com/EINK-IMX7/ EINK-IMX7 SBC]{{Wayback|url=http://www.armdesigner.com/EINK-IMX7/ |date=20180410071943 }}, [http://www.myirtech.com/list.asp?id=561 MYS-6ULX Single Board Computer]{{Wayback|url=http://www.myirtech.com/list.asp?id=561 |date=20180409233559 }}<br />Broadcom BCM2836: [[Raspberry_Pi|Raspberry Pi 2]]<ref>{{Cite web | url=http://www.broadcom.com/blog/raspberry-pi/love-to-get-your-hands-on-a-raspberry-pi-2-hat-tip-to-broadcom/ | title=Love to Get Your Hands on a Raspberry Pi 2? Hat Tip to Broadcom | publisher=Broadcom | date=2015-02-02 | accessdate=2015-07-22 | archive-date=2015-07-23 | archive-url=https://web.archive.org/web/20150723020429/http://www.broadcom.com/blog/raspberry-pi/love-to-get-your-hands-on-a-raspberry-pi-2-hat-tip-to-broadcom/ | dead-url=no }}</ref><br />Rockchip RK3128: Boardcon Compact3128<ref>{{cite web |url=http://www.armdesigner.com/Compact3128/ |title=Compact3128 Card size board |publisher=Boardcon Embedded Design |date= |accessdate=2018-04-09 |archive-date=2018-04-11 |archive-url=https://web.archive.org/web/20180411044928/http://www.armdesigner.com/Compact3128 |dead-url=no }}</ref><br />Lenovo a820、onda v812
+|-
+![[ARM_Cortex-M0+|Cortex-M0+]]
+|[[NXP_Semiconductors|NXP Semiconductors]] [[NXP_LPC|LPC8xx]] [[Freescale|Freescale]] [[Kinetis_L|Kinetis L]]
+|
+|-
+!
+!
+!
+|-
+![[ARM_Cortex-A53|Cortex-A53]]
+|[[Broadcom|Broadcom]]: BCM2837, [[HiSilicon|HiSilicon]]: Kirin 620, 650, 655, 658, 930, 935, 950, 955, 960, [[Mediatek|Mediatek]]: MT6737M, MT6750, [[Qualcomm|Qualcomm]]: [[Snapdragon|Snapdragon]] 410, 412, 415, 425, 427, 430, 435, 610, 615, 616, 620, 625, 626, 808, 810 
+|[[Broadcom|Broadcom]] BCM2837: [[Raspberry_Pi|Raspberry Pi 3]]<ref>{{Cite web|url=https://www.raspberrypi.org/blog/raspberry-pi-3-on-sale/|title=Raspberry Pi 3 on sale now at $35 - Raspberry Pi|last=Upton|first=Eben|date=29 February 2016|website=Raspberry Pi|language=en-GB|access-date=2016-02-29|archive-date=2016-02-29|archive-url=https://web.archive.org/web/20160229072534/https://www.raspberrypi.org/blog/raspberry-pi-3-on-sale/|dead-url=no}}</ref>
+|-
+![[ARM_Cortex-A57|Cortex-A57]]
+| [[AMD|AMD]] [[Opteron|Opteron]] A1100-series, [[Freescale|Freescale]] QorIQ LS20xx, [[Nvidia|Nvidia]] [[Tegra#Tegra_X1|Tegra X1]], [[Qualcomm|Qualcomm]] [[Qualcomm_Snapdragon|Snapdragon]] 808, 810, [[Samsung|Samsung]] [[Exynos|Exynos]] 7 5433, 7420
+|
+|-
+![[ARM_Cortex-A17|Cortex-A17]]
+|[[Rockchip|Rockchip]] [[Rockchip_RK3288|RK3288]]
+|RK3288:[[Asus_Tinker_Board|Asus Tinker Board]], [http://www.armdesigner.com/ Boardcon]{{Wayback|url=http://www.armdesigner.com/ |date=20180425024135 }} EM3288 SBC<ref>{{cite web |url=http://www.armdesigner.com/EM3288_SBC/ |title=EM3288 SBC |publisher=Boardcon Embedded Design |date= |accessdate=2018-04-09 |archive-url=https://web.archive.org/web/20171014134926/http://www.armdesigner.com/EM3288_SBC |archive-date=2017-10-14 |dead-url=yes }}</ref>
+|-
+![[ARM_Cortex-A72|Cortex-A72]]
+| [[HiSilicon|HiSilicon]] Kirin 950, 955, [[MediaTek|MediaTek]] Helio X2''x'', MT817''x'', [[Mstar|Mstar]] 6A938, [[Qualcomm|Qualcomm]] [[Qualcomm_Snapdragon|Snapdragon]] 650, 652, 653|65''x'', [[Rockchip|Rockchip]] RK3399, [[Freescale|Freescale]] QorIQ LS2088, Freescale QorIQ LS1046A
+|[[Rockchip|Rockchip]] RK3399: [http://www.armdesigner.com/EM3399/ Boardcon EM3399 SBC]{{Wayback|url=http://www.armdesigner.com/EM3399/ |date=20180505072436 }}
+|-
+![[ARM_Cortex-A73|Cortex-A73]]
+| [[HiSilicon|HiSilicon]] Kirin 960, [[HiSilicon#Kirin_970|Kirin 970]], [[MediaTek|MediaTek]] Helio X30
+|
+|-
+![[ARM_Cortex-A75|Cortex-A75]]
+|[[Qualcomm|Qualcomm]] [[Kryo_(CPU)#Kryo_385|Kryo 385]]<ref>{{cite news|last1=Frumusanu|first1=Andrei|title=Qualcomm Announces Snapdragon 845 Mobile Platform|url=https://www.anandtech.com/show/12114/qualcomm-announces-snapdragon-845-soc|accessdate=7 December 2017|publisher=Anandtech|date=6 December 2017|archive-date=2018-06-12|archive-url=https://web.archive.org/web/20180612143317/https://www.anandtech.com/show/12114/qualcomm-announces-snapdragon-845-soc|dead-url=no}}</ref>
+|
+|-
+![[ARM_Cortex-A76|Cortex-A76]]
+|[[Qualcomm|Qualcomm]] [[Kryo_(CPU)#Kryo_460|Kryo 460]]
+||
+|-
+![[ARM_Cortex-A77|Cortex-A77]]
+|
+||
+|-
+|}
+
+== 延伸閱讀 ==
+* [[AMULET_microprocessor|AMULET]] - 非同步ARM家族
+* [[Arm_v7_架构的路由器列表|Arm v7 架构的路由器列表]]
+* [[Arm_v8_架构的路由器列表|Arm v8 架构的路由器列表]]
+
+== 參考資料 ==
+{{reflist|2}}
+
+== 外部連結 ==
+* [http://infocenter.arm.com/help/index.jsp ARM Information Center]{{Wayback|url=http://infocenter.arm.com/help/index.jsp |date=20070823070944 }}
+* {{en}}[http://www.arm.com/ ARM Ltd.]{{Wayback|url=http://www.arm.com/ |date=20180415055208 }}
+* {{en}}[http://www.heyrick.co.uk/assembler/index.html ARM Assembler Programming; tutorial, resources, and examples]{{Wayback|url=http://www.heyrick.co.uk/assembler/index.html |date=20070628021816 }}
+* {{en}}[http://www.arm.com/trustzone TrustZone（TM）Technology]{{Wayback|url=http://www.arm.com/trustzone |date=20081121151913 }}
+* {{en}}[http://www.liwenhaosuper.com/projects/t6 T6: TrustZone Based Trusted Kernel] {{Wayback|url=http://www.liwenhaosuper.com/projects/t6 |date=20220418053339 }}
+* {{en}}[http://www.arm-development.com/ ARM Microcontroller Development Resources]{{Wayback|url=http://www.arm-development.com/ |date=20130111115802 }} - header files, schematics, CAD files, etc.
+* {{zh}}[https://web.archive.org/web/20121128165024/http://www.eettaiwan.com/SEARCH/ART/ARM.HTM 什麼是ARM？]
+* {{zh-tw}}[http://www.techbang.com.tw/posts/2512-ubiquitous-mcu-arm-work 無所不在的MCU，ARM行不行？]{{Wayback|url=http://www.techbang.com.tw/posts/2512-ubiquitous-mcu-arm-work |date=20100620065004 }}
+
+{{-}}
+{{RISC-based processor architectures}}
+{{CPU technologies|精简指令集}}
+{{ARM晶片}}
+{{Microcontrollers}}
+{{Authority control}}
+
+[[Category:ARM架構|Category:ARM架構]]
+[[Category:指令集架構|Category:指令集架構]]
+[[Category:带有代码示例的条目|Category:带有代码示例的条目]]

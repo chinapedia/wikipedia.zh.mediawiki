@@ -1,0 +1,11 @@
+/**
+ * Monobook preference migration code.
+ * phab:T285991
+ */
+$(function() {
+	if ($('meta[name=viewport]').length || /(?:\?|&)useskin=monobook/.test(location.search)) return;
+	mw.loader.using(['mediawiki.api', 'mediawiki.user']).then(function() {
+		// No viewport detected in HTML and new MediaWiki core preference is checked.
+		if (mw.user.options.get('skin-responsive') !== 0) new mw.Api().saveOption('skin-responsive', 0)
+	})
+});

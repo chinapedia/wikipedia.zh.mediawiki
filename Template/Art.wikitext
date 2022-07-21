@@ -1,0 +1,1 @@
+#REDIRECT [[Template:Non-free 2D art]]

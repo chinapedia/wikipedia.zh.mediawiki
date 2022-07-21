@@ -1,0 +1,9 @@
+{{Userbox
+  |id=[[File:Ruinas_de_Sao_Paulo.JPG|60px]]
+  |id-c=white
+  |info=呢條友仔係[[Wikipedia:澳門維基人列表|馬交仔女]]。
+  |info-c=#6EF7A7
+  |info-s=10
+  |border-c=#6EF7A7
+}}<includeonly>[[Category:澳門維基人|{{PAGENAME}}]]</includeonly><noinclude>
+[[Category:澳門用戶框模板]]</noinclude>

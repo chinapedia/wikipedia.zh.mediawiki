@@ -1,0 +1,1 @@
+{{User language-2|zh-pin|该用户能以'''[[:Category:Zh-pin-2 使用者|一般]]'''的'''[[:Category:Zh-pin 使用者|平话]]'''进行交流。|平话|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

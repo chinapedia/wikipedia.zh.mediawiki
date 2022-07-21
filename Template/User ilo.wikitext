@@ -1,0 +1,1 @@
+{{User language-N|ilo|Daytoy nga agar-aramat ket '''[[:Category:ilo 母語使用者|patneng]]''' nga agsasao iti '''[[:Category:ilo 使用者|Ilokano]]'''.|伊洛卡诺语}} <noinclude></noinclude>

@@ -1,0 +1,1 @@
+[[File:Flag of France.svg|25px|圣巴泰勒米]]&nbsp;[[圣巴泰勒米]]

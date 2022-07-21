@@ -1,0 +1,1 @@
+{{#if:{{{par_name|}}}|{{Chembox_{{{par_name}}}|label={{{par_label|}}}|value={{{par_value|}}}|value1={{{par_value1|}}}|value2={{{par_value2|}}}|value3={{{par_value3|}}}|value4={{{par_value4|}}}|value5={{{par_value5|}}}|value6={{{par_value6|}}}|value7={{{par_value7|}}}|value8={{{par_value8|}}}|value9={{{par_value9|}}} }}| }}<noinclude>{{Documentation}}</noinclude>

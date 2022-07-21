@@ -1,0 +1,1 @@
+#REDIRECT [[Template:Copy to Wikimedia Commons]]

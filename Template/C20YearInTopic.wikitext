@@ -1,0 +1,1 @@
+#REDIRECT [[Template:C21YearInTopic]]

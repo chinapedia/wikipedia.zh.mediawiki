@@ -1,0 +1,1 @@
+{{Copy to Wikimedia Commons|[[美國國土安全部]]|US Department of Homeland Security Seal.svg}}

@@ -1,0 +1,1 @@
+台灣雕塑家朱銘的作品「太極拱門」<noinclude>[[Category:每周图片模板]]</noinclude>

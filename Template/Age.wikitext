@@ -1,0 +1,1 @@
+{{#invoke:age|age_generic|template=age_full_years}}<noinclude>{{documentation}}</noinclude>

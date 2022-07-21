@@ -1,0 +1,249 @@
+在[[计算机科学|计算机科学]]中，'''扩充巴科斯-瑙尔范式'''（ABNF）是一种基于[[巴科斯-瑙尔范式|巴科斯-瑙尔范式]]（BNF）的[[元语言|元语言]]，但它有自己的语法和派生规则。ABNF的原动原则是描述一种作为双向[[通信协议|通信协议]]的语言的[[形式系统|形式系统]]。它是由[http://www.rfc-editor.org/std/std68.txt ''第68号互联网标准''] {{Wayback|url=http://www.rfc-editor.org/std/std68.txt |date=20170929122812 }}（"STD 68"，大小写样式按照原文）定义的，也就是RFC 5234，经常用于[[互联网工程任务组|互联网工程任务组]]（[[IETF|IETF]]）通信协议的定义语言。<ref name="Internet Standards">{{cite web
+|url= http://www.rfc-editor.org/rfcxx00.html
+|title= 官方互联网标准
+|accessdate= 2011-03-04
+|date= 2011-03-03
+|publisher= RFC编辑
+|archive-date= 2010-02-16
+|archive-url= https://web.archive.org/web/20100216141134/http://www.rfc-editor.org/rfcxx00.html
+|dead-url= no
+}}</ref><ref name="STD 68">{{cite web
+|url= ftp://ftp.rfc-editor.org/in-notes/std/std68.txt
+|title= 用于语法规范的扩充巴科斯范式: ABNF
+|accessdate= 2011-03-03
+|last= Crocker
+|first= D.
+|coauthors= Overell, P.
+|date= 2008年1月
+|format= 纯文本
+|work= 
+|publisher= RFC编辑
+|pages= 16页
+|archive-date= 2020-07-19
+|archive-url= https://web.archive.org/web/20200719235305/ftp://ftp.rfc-editor.org/in-notes/std/std68.txt
+|dead-url= yes
+}}</ref>
+
+RFC 5234取代了RFC 4234 (取代了RFC 2234).<ref name="RFC Index">{{cite web
+|url= http://www.rfc-editor.org/rfc-index2.html
+|title= RFC索引
+|accessdate= 2011-03-04
+|date= 2011-03-04
+|publisher= RFC编辑
+|archive-date= 2010-02-09
+|archive-url= https://web.archive.org/web/20100209041834/http://www.rfc-editor.org/rfc-index2.html
+|dead-url= yes
+}}</ref>
+
+==介绍==
+
+一个ABNF规范是一些推导规则的集合，书写为：
+
+ <code>规则 = 定义;注释CR LF</code>
+
+其中：
+* “规则”是不区分大小写的非最终符号
+* “定义”由定义该规则的一系列符号组成
+* “注释”用于记录
+* “CR LF”（回车、换行）用来结束
+
+规则名字是不区分大小写的: <code><rulename></code>, <code><Rulename></code>, <code><RULENAME></code>和<code><rUlENamE></code>都指的是同一个规则。规则名字由一个字母以及后续的多个字母、数字和连字符（减号）组成。
+
+用尖括号（“<code><</code>”，“<code>></code>”）包围规则名并不是必需的（如同它们在BNF里那样），但是它们可以用来在散文中界定规则名，以方便识别出规则名。
+
+==最终值==
+
+[[最终值|最终值]]由一个或多个数值字符指定。
+
+数值字符可按下面的方式指定：先是一个百分号“<code>%</code>”，紧跟着基数（b = 二进制, d = 十进制, x = 十六进制），再其后是这个数值或数值串（用“<code>.</code>”来指示串联）。例如：“回车”可以用十进制的<code>%d13</code>或十六进制的<code>%x0D</code>来指定，而“回车换行”则可以用<code>%d13.10</code>来指定。
+
+字面文本是通过包含在在双引号（<code>"</code>）中字符串来指定的。这些字符串是不区分大小写的，使用的字符集是（US-）[[ASCII|ASCII]]。所以字符串“abc”将匹配“abc”,“Abc”,“aBc”,“abC”,“ABc”,“AbC”,“aBC”和“ABC”。对于区分大小写的匹配，必须定义明确的字符，例如:若要匹配“aBc”，定义必须是<code>%d97 %d66 %d99</code>。
+
+==操作符==
+
+===空白字符===
+空白字符被用来分隔定义中的各个元素:要使空格被识别为分割符则必须明确的包含它。
+
+===串联===
+ <code>规则1规则2</code>
+
+规则可以通过列出一系列的规则名来定义。
+
+要匹配字符串“aba”可以使用下列规则:
+#<code>foo = %x61	; a</code>
+#<code>bar = %x62	; b</code>
+#<code>mumble = foo bar foo</code>
+
+===选择 /===
+ <code>规则1 / 规则2</code>
+
+一个规则可以通过用斜杠（“<code>/</code>”）分隔的可供选择的子规则列表来定义。
+
+要接受规则<foo>或规则<bar>可构造如下规则:
+#<code>foobar = foo / bar</code>
+
+===增量选择 =/ ===
+ <code>规则1 =/ 规则2</code>
+
+可以通过在''规则名''和''定义''之间使用“<code>=/</code>”来向一个规则增加补充选择。
+
+规则
+#<code>ruleset = alt1 / alt2 / alt3 / alt4 / alt5</code>
+等价于
+#<code>ruleset = alt1 / alt2</code>
+#<code>ruleset =/ alt3</code>
+#<code>ruleset =/ alt4 / alt5</code>
+
+===值范围%c##-##===
+ <code>%c##-##</code>
+
+数值范围可以通过使用连字符（“<code>-</code>”）来指定。
+
+规则
+#<code>OCTAL = "0" / "1" / "2" / "3" / "4" / "5" / "6" / "7"</code>
+等价于
+#<code>OCTAL = %x30-37</code>
+
+===序列组合 ()===
+ <code>(规则1规则2)</code>
+
+在''定义''中，元素可以放置在圆括号中来将''规则''组合起来，该组合视为单个元素。
+
+要匹配“elem foobar snafoo”或“elem tarfoo snafoo”可以构造下列规则:
+#<code>group = elem ''(foobar / tarfoo)'' snafoo</code>
+
+要匹配“elem foobar”或“tarfoo snafoo”可以构造下列规则:
+#<code>group = elem foobar / tarfoo snafoo</code>
+#<code>group = ''(elem foobar)'' / ''(tarfoo snafoo)''</code>
+
+===不定量重复m*n===
+元素前面的星号<code>*</code>表示重复，其完整形式是：
+ <code>m*n规则</code>
+
+要表示一个元素的重复，就要使用<code><m>*<n>元素</code>形式。可选的<code><m></code>给出要包含的元素的最小数目，默认为0；可选的<code><n></code>给出要包含的元素的最大数目，默认为无穷大。
+
+例子：
+* <code>*元素</code>表示零个或更多元素
+* <code>1*元素</code>表示一个或更多元素
+* <code>2*4元素</code>表示两个至四个元素
+
+===定量重复n===
+ <code>n规则</code>
+
+要表示特定数目的元素可使用形式<code><n>元素</code>，相当于用不定量重复形式表示的<code><n>*<n>元素</code>。
+
+使用<code>2DIGIT</code>得到两个数字，使用<code>3DIGIT</code>得到三个数字。(DIGIT在下面的核心规则中定义，也见例子中的''zip-code'')。
+
+===可选序列[]===
+ <code>[规则]</code>
+
+要表示可选元素，下列构造是等价的:
+#<code>[foobar snafoo]</code>
+#<code>*1(foobar snafoo)</code>
+#<code>0*1(foobar snafoo)</code>
+
+===注释;===
+ <code>;注释</code>
+
+注释从一个分号（“<code>;</code>”）开始，并持续到此行的结束。
+
+===操作符优先级===
+下面的操作符给出了从高（结合最紧密）到低（结合最松散）的优先级:
+# 规则名、最终值
+# 注释;
+# 值范围%c##-##
+# 重复*
+# 组合 ()、可选[]
+# 串联
+# 选择 /
+
+''选择''操作符与''串联''一起使用会造成混淆，因此建议使用''组合''来确保串联组的明确。
+
+例如：
+ <code>我们 = 你 我/他 她</code>
+会产生下面两种歧义：
+# <code>(<font color='blue'>你 我</font>)/(<font color='seagreen'>他 她</font>)</code>
+# <code>(<font color='blue'>你</font>) (<font color='seagreen'>我/他</font>) (<font color='red'>她</font>)</code>
+
+所以，使用''组合''来确保不会产生歧义：
+ <code>(你 我)/(他 她)</code>
+
+===核心规则===
+核心规则定义于ABNF标准中。
+{|class="wikitable"
+|- style="background-color: #efefef;"
+!规则!!形式定义!!意义
+|-
+|ALPHA	||%x41-5A / %x61-7A		||大写和小写ASCII字母（A-Z, a-z）
+|-
+|DIGIT 	||%x30-39			||数字（0-9）
+|-
+|HEXDIG	||DIGIT / "A" / "B" / "C" / "D" / "E" / "F"	||十六进制数字（0-9, A-F, a-f）
+|-
+|DQUOTE 	||%x22				||双引号
+|-
+|SP		||%x20				||空格
+|-
+|HTAB		||%x09				||横向制表符
+|-
+|WSP		||SP / HTAB			||空格或横向制表符
+|-
+|LWSP		||*(WSP / CRLF WSP)	||直线空白（晚于换行）
+|-
+|VCHAR	||%x21-7E			||可见（打印）字符
+|-
+|CHAR	||%x01-7F			||任何7-位US-ASCII字符，不包括NUL（%x00）
+|-
+|OCTET	||%x00-FF			||8位数据
+|-
+|CTL 		||%x00-1F / %x7F		||控制字符
+|-
+|CR		||%x0D				||回车
+|-
+|LF		||%x0A				||换行
+|-
+|CRLF		||CR LF			||互联网标准换行
+|-
+|BIT		||"0" / "1"			|| 二进制数字
+|-
+|}
+
+==例子==
+在[[巴科斯范式|巴科斯范式]]（BNF）条目中的邮政地址的例子可以被指定为:
+<code>
+<pre>
+postal-address = name-part street zip-part
+
+name-part = *(personal-part SP) last-name [SP suffix] CRLF
+name-part = / personal-part CRLF
+
+personal-part = first-name / (initial ".")
+first-name = *ALPHA
+initial = ALPHA
+last-name = *ALPHA
+suffix = ("Jr." / "Sr." / 1*("I" / "V" / "X"))
+
+street = [apt SP] house-num SP street-name CRLF
+apt = 1*4DIGIT
+house-num = 1*8（DIGIT / ALPHA）
+street-name = 1*VCHAR
+
+zip-part = town-name "," SP state 1*2SP zip-code CRLF
+town-name = 1*(ALPHA / SP)
+state = 2ALPHA
+zip-code = 5DIGIT ["-" 4DIGIT]
+</pre>
+</code>
+
+==隐患==
+
+[http://www.ietf.org/rfc/rfc5234.txt RFC 5234] {{Wayback|url=http://www.ietf.org/rfc/rfc5234.txt |date=20210309065904 }}加入了一条结合LWSP的警告，如下: 
+{{quote|若使用该直线空白规则，将允许存在只包含空白字符的行，而这样的行在邮件头中已不再合法，并且已在其他环境中导致了互操作问题。
+
+不要在定义邮件头时使用它，在其他环境下使用时也要格外注意。}}
+
+==参考==
+
+{{reflist}}
+
+[[Category:形式语言|K]]

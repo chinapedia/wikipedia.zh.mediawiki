@@ -1,0 +1,2 @@
+{{User language-N|sh|Ovom korisniku '''[[:Category:sh 使用者|srpskohrvatski jezik]]''' je '''[[:Category:sh 母語使用者|maternji]]'''.<br />Овом кориснику '''[[:Category:sh 使用者|српскохрватски језик]]''' је '''[[:Category:sh 母語使用者|матерњи]]'''.|塞尔维亚-克罗地亚语}} <noinclude>
+</noinclude>

@@ -1,0 +1,1 @@
+{{flag|SMOM}}<noinclude>[[Category:欧洲国家模板|SMOM]]</noinclude>

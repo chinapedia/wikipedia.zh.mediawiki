@@ -1,0 +1,20 @@
+<span class="nowrap">{{#iferror:{{#expr:{{{1|1}}}}}
+  |{{#switch:{{{1}}}
+     |fig=&#8199;
+     |en=&ensp;
+     |em=&emsp;
+     |thin=&thinsp;
+     |hair=&#8202;
+     |&nbsp;
+   }}
+  |{{#invoke:String|rep|{{#switch:{{{2}}}
+     |fig=&#8199;
+     |en=&ensp;
+     |em=&emsp;
+     |thin=&thinsp;
+     |hair=&#8202;
+     |&nbsp;
+   }}|{{{1|1}}}}}
+}}</span><noinclude>
+{{documentation}}
+</noinclude>

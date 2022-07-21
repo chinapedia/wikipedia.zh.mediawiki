@@ -1,0 +1,1 @@
+{{User language-4|zh-xiangnan|该用户能以'''[[:Category:Zh-xiangnan-4 使用者|-{zh-hans:地道; zh-hant:道地}-]]'''的'''[[:Category:Zh-xiangnan 使用者|湘南土话]]'''进行交流。|湘南土话|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

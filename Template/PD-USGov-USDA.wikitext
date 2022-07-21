@@ -1,0 +1,1 @@
+{{Copy to Wikimedia Commons|[[美國農業部]]|USDA logo.svg}}

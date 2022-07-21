@@ -1,0 +1,1 @@
+#REDIRECT [[Template:User 国际象棋]]

@@ -1,0 +1,1 @@
+#redirect [[Template:明朝人小作品]]

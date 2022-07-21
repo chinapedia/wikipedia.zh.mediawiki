@@ -1,0 +1,117 @@
+'''GLSL''' - '''OpenGL Shading Language''' 也稱作 '''GLslang'''，是一個以[[C語言|C語言]]為基礎的[[高階程式語言|高階]][[著色語言|著色語言]]。它是由 [[OpenGL_ARB|OpenGL ARB]] 所建立，提供開發者對[[繪圖管線|繪圖管線]]更多的直接控制，而無需使用汇编语言或硬體規格語言。
+
+== 背景 ==
+隨著近年來繪圖卡的進步，
+已在渲染管線中的[[頂點_(電腦圖學)|頂點]]（vertex）和片斷（fragment）層次中，加入更具彈性的新功能。
+達到在這個層次中，使用片斷和[[頂點著色器|頂點著色器]]的可編程性。
+
+最初這個功能是以組合語言撰寫著色器來達到的。組合語言對開發者的使用是不直觀而複雜的。OpenGL ARB 建立了 OpenGL 著色語言，為 GPU 的程式設計提供更加直觀的方法，當維護開放標準的時候，就有助於帶動 OpenGL 的歷史。
+
+最初 OpenGL 1.5 是以擴充形式引入，後來 {{le|OpenGL ARB|OpenGL Architecture Review Board}} 在 [[OpenGL|OpenGL]] 2.0 核心中正式納入 GLSL。自 1992 年建立的[[OpenGL|OpenGL]] 1.0 起，[[OpenGL|OpenGL]] 2.0 是第一個 [[OpenGL|OpenGL]] 的大修改版。
+
+使用 GLSL 有如下好處：
+*具有[[跨平台|跨平台]]的相容性，包括 [[Macintosh|Macintosh]]、[[Microsoft_Windows|Windows]] 和 [[Linux|Linux]] 等作業系統。
+*所有支援 OpenGL 著色語言的繪圖卡，都可以用來編寫著色器。
+*允許廠商為特定的繪圖卡產生最佳化的代碼。
+
+== 詳細資料 ==
+=== 資料類型 ===
+OpenGL 著色語言規格定義了 22 個基本資料類型，有些用法與 [[C語言|C]] 相同，其它的是繪圖處理器特有的。
+
+*void – 用於沒有返回值的函式
+*bool – 條件類型，其值可以是真或假
+*int – 帶負號整數
+*float – 浮點數
+*vec2 – 2 個浮點數組成的向量
+*vec3 – 3 個浮點數組成的向量
+*vec4 – 4 個浮點數組成的向量
+*bvec2 – 2 個布林組成的向量
+*bvec3 – 3 個布林組成的向量
+*bvec4 – 4 個布林組成的向量
+*ivec2 – 2 個整數組成的向量
+*ivec3 – 3 個整數組成的向量
+*ivec4 – 4 個整數組成的向量
+*mat2 – 浮點數的 2X2 矩陣
+*mat3 – 浮點數的 3X3 矩陣
+*mat4 – 浮點數的 4X4 矩陣
+*sampler1D – 用來存取一維紋理的句柄（handle）（或：操作，作名詞解。）
+*sampler2D – 用來存取二維紋理的句柄
+*sampler3D – 用來存取三維紋理的句柄
+*samplerCube – 用來存取立方映射紋理的句柄
+*sampler1Dshadow – 用來存取一維深度紋理的句柄
+*sampler2Dshadow – 用來存取二維深度紋理的句柄
+
+=== 運算子 ===
+OpenGL 著色語言提供類似於 [[C語言|C語言]]的運算子。給開發者編寫著色器的靈活性。GLSL 包含了 [[C和C++運算子|C和C++運算子]]，除了位元運算子和[[指標|指標]]以外。
+
+=== 函式和控制結構 ===
+類似於 [[C語言|C語言]]，GLSL 支援迴圈和分支，包括 if、else、if/else、for、do-while、break、continue 等。
+
+支援使用者定義函式，且各種常用的函式也已內建。這也就讓繪圖卡製造商，能夠在硬體層次上最佳化這些內建的函式。許多函式與 C 語言相同，如 <nowiki>exp()</nowiki> 以及 <nowiki>abs()</nowiki>，其它繪圖編程特有的，如 <nowiki>smoothstep()</nowiki> 以及 <nowiki>texture2D()</nowiki>。
+
+=== 編譯和執行 ===
+GLSL 著色器不是獨立的應用程式；其需要使用 [[OpenGL|OpenGL]] API 的應用程式。C、C++、C#、Delphi 和 Java 皆支援 [[OpenGL|OpenGL]] API，且支援 OpenGL 著色語言。
+
+GLSL 著色器本身只是簡單的字串集，這些字串集會傳送到硬體廠商的驅動程式，並從程式內部的 OpenGL API 進入點編譯。著色器可從程式內部或讀入純文字檔來即時建立，但必須以字串形式傳送到驅動程式。
+
+用以編譯、連結並傳送參數到 GLSL 程式的 API 集，已在三個 OpenGL 擴展中規定，且即將成為 [http://www.opengl.org/documentation/specs/version2.0/glspec20.pdf OpenGL 2.0]{{Wayback|url=http://www.opengl.org/documentation/specs/version2.0/glspec20.pdf |date=20070402033551 }} 核心的一部分。這些 API 可在以下擴展中找到：
+* [https://web.archive.org/web/20130804063101/http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_shader.txt ARB 頂點著色器]
+* [https://web.archive.org/web/20130526132418/http://oss.sgi.com/projects/ogl-sample/registry/ARB/fragment_shader.txt ARB 片斷著色器]
+* [https://web.archive.org/web/20070227171924/http://oss.sgi.com/projects/ogl-sample/registry/ARB/shader_objects.txt ARB 著色器物件]
+
+=== GLSL 頂點著色器的簡單範例 ===
+<syntaxhighlight lang=c>void main(void)
+{
+    gl_Position = ftransform();
+}</syntaxhighlight>
+
+=== GLSL 片斷著色器的簡單範例 ===
+<syntaxhighlight lang=c>void main(void)
+{
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}</syntaxhighlight>
+
+=== 工具 ===
+GLSL 著色器可以事先建立和測試，現有以下 GLSL 開發工具：
+* [http://www.ati.com/developer/rendermonkey/ RenderMonkey]{{Wayback|url=http://www.ati.com/developer/rendermonkey/ |date=20061004113827 }} - 這個軟體是由 ATI 製作的，提供界面用以建立、編譯和除錯 GLSL 著色器，和 DirectX 著色器一樣。僅能在 Windows 平台上執行。
+* GLSLEditorSample - 在 Mac OS X 上，它是目前唯一可用的程式，其提供著色器的建立和編譯，但不能除錯。它是 cocoa 應用程式，僅能在 Mac OS X 上執行。
+* [http://sourceforge.net/projects/lumina/ Lumina]{{Wayback|url=http://sourceforge.net/projects/lumina/ |date=20070302213333 }} - Lumina 是新的 GLSL 開發工具。其使用 QT 界面，可以跨平台。
+
+== 參考文獻 ==
+*[[Rost,_Randi_J.|Rost, Randi J.]] ''OpenGL Shading Language''. 1st ed. Pearson Education, Inc, 2004. ISBN 0-321-19789-5
+*Kessenich, John, & Baldwin, David, & Rost, Randi. ''The OpenGL Shading Language''. Version 1.10.59. 3Dlabs, Inc. Ltd. https://web.archive.org/web/20070404171317/http://developer.3dlabs.com/documents/index.htm
+
+== 外部連結 ==
+*[http://www.opengl.org/registry/doc/GLSLangSpec.Full.1.20.8.pdf GLSL 語言規格，版本 1.20]{{Wayback|url=http://www.opengl.org/registry/doc/GLSLangSpec.Full.1.20.8.pdf |date=20080513083842 }}
+*[http://www.mew.cx/glsl_quickref.pdf GLSL 參考表]{{Wayback|url=http://www.mew.cx/glsl_quickref.pdf |date=20070207041043 }}
+*[https://web.archive.org/web/20130526132418/http://oss.sgi.com/projects/ogl-sample/registry/ARB/fragment_shader.txt OpenGL 片斷著色器規格]
+*[https://web.archive.org/web/20130804063101/http://oss.sgi.com/projects/ogl-sample/registry/ARB/vertex_shader.txt OpenGL 頂點著色器規格]
+*[http://oss.sgi.com/projects/ogl-sample/registry/ARB/program_object.txt OpenGL 程式規格]{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }}
+*[http://www.opengl.org 官方 OpenGL 網站]{{Wayback|url=http://www.opengl.org/ |date=20110226000710 }}
+
+*[http://www.lighthouse3d.com/opengl/ 來自 Lighthouse3D 的教學和範例]{{Wayback|url=http://www.lighthouse3d.com/opengl/ |date=20070320160322 }}
+*[https://web.archive.org/web/20071126072642/http://nehe.gamedev.net/ 來自 NeHe Productions 的教學和範例]
+*[http://www.typhoonlabs.com GLSL 開發環境]{{Wayback|url=http://www.typhoonlabs.com/ |date=20191022073212 }}
+*[http://www.ati.com/developer/rendermonkey/ RenderMonkey 著色器開發環境]{{Wayback|url=http://www.ati.com/developer/rendermonkey/ |date=20061004113827 }}
+*[https://web.archive.org/web/20060305194538/http://www.geist3d.org/ Geist3D 繪圖引擎，內含 GLSL 編輯器]
+*[http://sourceforge.net/projects/lumina/ Lumina 跨平台 GLSL IDE]{{Wayback|url=http://sourceforge.net/projects/lumina/ |date=20070302213333 }}
+
+== 参见 ==
+* [[著色語言|著色語言]]
+* [[HLSL|HLSL]]，高階著色語言
+* [[Cg语言|Cg]]，nVIDIA 的著色語言
+* [[程式設計|程式設計]]
+* [[计算机图形学|计算机图形学]]
+* [[OpenGL|OpenGL]]
+* [[著色器|著色器]]
+
+{{-}}
+{{程序设计语言|C}}
+
+{{Authority control}}
+
+[[Category:繪圖函式庫|Category:繪圖函式庫]]
+[[Category:三维计算机图形学|Category:三维计算机图形学]]
+[[Category:C語言家族|Category:C語言家族]]
+[[Category:OpenGL|Category:OpenGL]]
+[[Category:著色器語言|Category:著色器語言]]

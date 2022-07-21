@@ -1,0 +1,11 @@
+{{Userbox
+|border-c=#FF6347
+|border-s=1
+|id-c=#FF6347
+|info-c=#F08080
+|info-s=10
+|id=[[File:CarassiusCarassius8.JPG|75px]]
+|info=這個用戶不怕'''[[魚|魚腥]]'''。
+}}
+<includeonly>[[Category:喜欢吃魚的维基人|{{PAGENAME}}]]</includeonly>
+[[Category:喜欢吃魚的维基人]]

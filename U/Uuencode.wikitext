@@ -1,0 +1,496 @@
+'''uuencode'''這個名字是衍生自"Unix-to-Unix encoding"，原先是[[Unix|Unix]]系統下將[[二進位數字系統|二進位]]的資料藉由[[UUCP|uucp]]郵件系統傳輸的一個[[編碼|編碼]]程式，是一種[[二進位到文字的編碼|二進位到文字的編碼]]。'''uudecode'''是與uuencode搭配的解碼程式，uuencode/decode常見於[[電子郵件|電子郵件]]中的檔案傳送以及[[usenet|usenet]]新聞群組和[[BBS|BBS]]的貼文等等。近來已被[[MIME|MIME]]所大量取代。
+
+== 編碼程序 ==
+Uuencode的編碼結果輸出檔案格式如下：
+ begin <輸入檔存取模式> <輸入檔名>
+ <編碼內容>
+ <nowiki>[<編碼內容>]</nowiki>
+ <nowiki>[...]</nowiki>
+ `
+ end
+=== <tt><輸入檔存取模式></tt> ===
+沿用自Unix系統檔案存取權限模式，由三個八進位的數字組成，其構成形式為：
+
+{| border="1" 
+|- 
+| colspan=3 align="center"|擁有人 || colspan=3 align="center"|群組 || colspan=3 align="center"|其他人
+|- 
+| 讀取（r）|| 寫入（w）|| 執行（x）|| 讀取（r）|| 寫入（w）|| 執行（x）||讀取（r）|| 寫入（w）|| 執行（x）
+|}
+
+舉例而言：當<tt><輸入檔存取模式></tt>為 '''666'''，轉換成二進位碼為'''110110110'''，也就是擁有人、群組以及其他人對於這個檔案都有讀取以及寫入的權力。
+
+=== <tt><輸入檔名></tt> ===
+將編碼前的檔名填入。
+
+=== <tt><編碼內容></tt> ===
+當檔案內容空無一物時，<tt><編碼內容></tt>就不存在。否則<tt><編碼內容></tt>會以下面形式出現：
+ <長度字元><編碼字元字串>
+
+Uuencode將輸入資料以每三個[[位元組|位元組]]為單位進行編碼，如此重複進行。如果最後剩下的資料少於三個位元組，不夠的部份用零補齊。這三個位元組共有24個[[位元|Bit]]，以6-bit為單位分為4個群組，每個群組以十進位來表示所出現的數值只會落在0到63之間。將每個數加上32，所產生的結果剛好落在ASCII字元集中可列印字元（32-空白...95-底線）的範圍之中。
+
+==== <長度字元> ====
+每60個編碼輸出（相當於45個輸入位元組）將輸出為獨立的一行，每行的開頭會加上'''長度字元'''，除了最後一行之外，長度字元都應該是'M'這個ASCII字元（77=32+'''45'''），最後一行的長度字元為'''32+剩下的位元組數目'''這個ASCII字元。
+
+==== <編碼字元字串> ====
+'''<編碼字元字串>'''是依照編碼結果依序填入，惟獨要注意一點：當6-bit的資料為零時，編碼應為''空白''這個字元，但是在uuencode中都用''[[grave_accent|`]]''這個字元來取代，這是因為它們的末六bit都是 100.000。
+
+==== 例外狀況 ====
+前面所說的只適用於使用ASCII字元集的電腦系統，有些比較舊型的電腦他們使用非ASCII字元集（如[[EBCDIC|EBCDIC]]字元集）。要解決這個問題，[[Xxencode|Xxencode]]是較為適切的編碼系統，它只使用到文數字字元集以及加減號字元。
+
+== uuencode編碼範例 ==
+=== 簡短的例子 ===
+下面的表格顯示如何將<code>Cat</code>這三個ASCII字元編碼成uuencode的<code>0V%T</code>：
+
+{| class="wikitable"
+| style="border-right: 2px solid black" | 原始字元
+! colspan=8 style="border-right: 2px solid green" | <code>C</code>
+! colspan=8 style="border-right: 2px solid green" | <code>a</code>
+! colspan=8 style="border-right: 2px solid black" | <code>t</code>
+|-
+| style="border-right: 2px solid black" | 原始ASCII碼（十進位）
+! colspan=8 style="border-right: 2px solid green" | 67
+! colspan=8 style="border-right: 2px solid green" | 97
+! colspan=8 style="border-right: 2px solid black" | 116
+|-
+| style="border-right: 2px solid black" | ASCII碼（二進位）
+| 0
+| 1
+| 0
+| 0
+| 0
+| style="border-right: 2px solid red" |0
+| 1
+| style="border-right: 2px solid green" | 1
+| 0
+| 1
+| 1
+| style="border-right: 2px solid red" | 0
+| 0
+| 0
+| 0
+| style="border-right: 2px solid green" | 1
+| 0
+| style="border-right: 2px solid red" | 1
+| 1
+| 1
+| 0
+| 1
+| 0
+| style="border-right: 2px solid black" | 0
+|-
+| style="border-right: 2px solid black" | 新的十進位數值
+! colspan=6 style="border-right: 2px solid red" | 16
+! colspan=6 style="border-right: 2px solid red" | 54
+! colspan=6 style="border-right: 2px solid red" | 5
+! colspan=6 style="border-right: 2px solid black" | 52
+|-
+| style="border-right: 2px solid black" | +32
+! colspan=6 style="border-right: 2px solid red" | 48
+! colspan=6 style="border-right: 2px solid red" | 86
+! colspan=6 style="border-right: 2px solid red" | 37
+! colspan=6 style="border-right: 2px solid black" | 84
+|-
+| style="border-right: 2px solid black" | 編碼後的Uuencode字元
+! colspan=6 style="border-right: 2px solid red" | <code>0</code>
+! colspan=6 style="border-right: 2px solid red" | <code>V</code>
+! colspan=6 style="border-right: 2px solid red" | <code>%</code>
+! colspan=6 style="border-right: 2px solid black" | <code>T</code>
+|}
+
+因此''Cat''這三個ASCII字元表示成uuencode的檔案形式：
+ begin 644 cat.txt
+ #0V%T
+ `
+ end
+
+=== 長範例 ===
+底下是引用自英文版的一段文字，將其存成test.txt，引用文字如下：
+
+''Each group of sixty output characters (corresponding to 45 input bytes) is output as a separate line preceded by an encoded character giving the number of encoded bytes on that line. For all lines except the last, this will be the character 'M' (ASCII code 77 = 32+45). If the input is not evenly divisible by 45, the last line will contain the remaining N output characters, preceded by the character whose code is 32 + the number of remaining input bytes. Finally, a line containing just a single space (or grave character) is output, followed by one line containing the string "end".''
+
+使用uuencode編碼後的檔案為：
+
+ begin -666 test.txt
+ M16%C:"!G<F]U<"!O9B!S:7AT>2!O=71P=70@8VAA<F%C=&5R<R`H8V]R<F5S
+ M<&]N9&EN9R!T;R`T-2!I;G!U="!B>71E<RD@:7,@;W5T<'5T(&%S(&$@<V5P
+ M87)A=&4@;&EN92!P<F5C961E9"!B>2!A;B!E;F-O9&5D(&-H87)A8W1E<B!G
+ M:79I;F<@=&AE(&YU;6)E<B!O9B!E;F-O9&5D(&)Y=&5S(&]N('1H870@;&EN
+ M92X@1F]R(&%L;"!L:6YE<R!E>&-E<'0@=&AE(&QA<W0L('1H:7,@=VEL;"!B
+ M92!T:&4@8VAA<F%C=&5R("=-)R`H05-#24D@8V]D92`W-R`](#,R*S0U*2X@
+ M268@=&AE(&EN<'5T(&ES(&YO="!E=F5N;'D@9&EV:7-I8FQE(&)Y(#0U+"!T
+ M:&4@;&%S="!L:6YE('=I;&P@8V]N=&%I;B!T:&4@<F5M86EN:6YG($X@;W5T
+ M<'5T(&-H87)A8W1E<G,L('!R96-E9&5D(&)Y('1H92!C:&%R86-T97(@=VAO
+ M<V4@8V]D92!I<R`S,B`K('1H92!N=6UB97(@;V8@<F5M86EN:6YG(&EN<'5T
+ M(&)Y=&5S+B!&:6YA;&QY+"!A(&QI;F4@8V]N=&%I;FEN9R!J=7-T(&$@<VEN
+ M9VQE('-P86-E("AO<B!G<F%V92!C:&%R86-T97(I(&ES(&]U='!U="P@9F]L
+ M;&]W960@8GD@;VYE(&QI;F4@8V]N=&%I;FEN9R!T:&4@<W1R:6YG(")E;F0B
+ !+@``
+ `
+ end
+
+== Uuencode對照表 ==
+下面的表格顯示uuencode所使用到的ASCII字元集、6-bit二進位碼以及十進位的對照。由上面''Cat''的例子可以看出其第一個編碼為十進位的16，對應下面表格''uuencode十進位表示''欄位，可以查出其uuencode的輸出碼為''0''。
+
+{| class=wikitable cellpadding="2" cellspacing="0"
+|- valign="bottom"
+!可列印的字元
+!十進位ASCII值
+!uuencode<br>二進位表示
+!uuencode<br>十進位表示
+!
+!可列印的字元
+!十進位ASCII值
+!uuencode<br>二進位表示
+!uuencode<br>十進位表示
+|-
+|-
+|align="center"|(space)
+|align="center"|32
+|align="center"|000 000
+|align="center"|0
+| 
+|align="center"|@
+|align="center"|64
+|align="center"|100 000
+|align="center"|32
+|-
+|align="center"|!
+|align="center"|33
+|align="center"|000 001
+|align="center"|1
+| 
+|align="center"|A
+|align="center"|65
+|align="center"|100 001
+|align="center"|33
+|-
+|align="center"|"
+|align="center"|34
+|align="center"|000 010
+|align="center"|2
+| 
+|align="center"|B
+|align="center"|66
+|align="center"|100 010
+|align="center"|34
+|-
+|align="center"|#
+|align="center"|35
+|align="center"|000 011
+|align="center"|3
+| 
+|align="center"|C
+|align="center"|67
+|align="center"|100 011
+|align="center"|35
+|-
+|align="center"|$
+|align="center"|36
+|align="center"|000 100
+|align="center"|4
+| 
+|align="center"|D
+|align="center"|68
+|align="center"|100 100
+|align="center"|36
+|-
+|align="center"|%
+|align="center"|37
+|align="center"|000 101
+|align="center"|5
+| 
+|align="center"|E
+|align="center"|69
+|align="center"|100 101
+|align="center"|37
+|-
+|align="center"|&
+|align="center"|38
+|align="center"|000 110
+|align="center"|6
+| 
+|align="center"|F
+|align="center"|70
+|align="center"|100 110
+|align="center"|38
+|-
+|align="center"|'
+|align="center"|39
+|align="center"|000 111
+|align="center"|7
+| 
+|align="center"|G
+|align="center"|71
+|align="center"|100 111
+|align="center"|39
+|-
+|align="center"|(
+|align="center"|40
+|align="center"|001 000
+|align="center"|8
+| 
+|align="center"|H
+|align="center"|72
+|align="center"|101 000
+|align="center"|40
+|-
+|align="center"|)
+|align="center"|41
+|align="center"|001 001
+|align="center"|9
+| 
+|align="center"|I
+|align="center"|73
+|align="center"|101 001
+|align="center"|41
+|-
+|align="center"|*
+|align="center"|42
+|align="center"|001 010
+|align="center"|10
+| 
+|align="center"|J
+|align="center"|74
+|align="center"|101 010
+|align="center"|42
+|-
+|align="center"|+
+|align="center"|43
+|align="center"|001 011
+|align="center"|11
+| 
+|align="center"|K
+|align="center"|75
+|align="center"|101 011
+|align="center"|43
+|-
+|align="center"|,
+|align="center"|44
+|align="center"|001 100
+|align="center"|12
+| 
+|align="center"|L
+|align="center"|76
+|align="center"|101 100
+|align="center"|44
+|-
+|align="center"|-
+|align="center"|45
+|align="center"|001 101
+|align="center"|13
+| 
+|align="center"|M
+|align="center"|77
+|align="center"|101 101
+|align="center"|45
+|-
+|align="center"|.
+|align="center"|46
+|align="center"|001 110
+|align="center"|14
+| 
+|align="center"|N
+|align="center"|78
+|align="center"|101 110
+|align="center"|46
+|-
+|align="center"|/
+|align="center"|47
+|align="center"|001 111
+|align="center"|15
+| 
+|align="center"|O
+|align="center"|79
+|align="center"|101 111
+|align="center"|47
+|-
+|align="center"|0
+|align="center"|48
+|align="center"|010 000
+|align="center"|16
+| 
+|align="center"|P
+|align="center"|80
+|align="center"|110 000
+|align="center"|48
+|-
+|align="center"|1
+|align="center"|49
+|align="center"|010 001
+|align="center"|17
+| 
+|align="center"|Q
+|align="center"|81
+|align="center"|110 001
+|align="center"|49
+|-
+|align="center"|2
+|align="center"|50
+|align="center"|010 010
+|align="center"|18
+| 
+|align="center"|R
+|align="center"|82
+|align="center"|110 010
+|align="center"|50
+|-
+|align="center"|3
+|align="center"|51
+|align="center"|010 011
+|align="center"|19
+| 
+|align="center"|S
+|align="center"|83
+|align="center"|110 011
+|align="center"|51
+|-
+|align="center"|4
+|align="center"|52
+|align="center"|010 100
+|align="center"|20
+| 
+|align="center"|T
+|align="center"|84
+|align="center"|110 100
+|align="center"|52
+|-
+|align="center"|5
+|align="center"|53
+|align="center"|010 101
+|align="center"|21
+| 
+|align="center"|U
+|align="center"|85
+|align="center"|110 101
+|align="center"|53
+|-
+|align="center"|6
+|align="center"|54
+|align="center"|010 110
+|align="center"|22
+| 
+|align="center"|V
+|align="center"|86
+|align="center"|110 110
+|align="center"|54
+|-
+|align="center"|7
+|align="center"|55
+|align="center"|010 111
+|align="center"|23
+| 
+|align="center"|W
+|align="center"|87
+|align="center"|110 111
+|align="center"|55
+|-
+|align="center"|8
+|align="center"|56
+|align="center"|011 000
+|align="center"|24
+| 
+|align="center"|X
+|align="center"|88
+|align="center"|111 000
+|align="center"|56
+|-
+|align="center"|9
+|align="center"|57
+|align="center"|011 001
+|align="center"|25
+| 
+|align="center"|Y
+|align="center"|89
+|align="center"|111 001
+|align="center"|57
+|-
+|align="center"|:
+|align="center"|58
+|align="center"|011 010
+|align="center"|26
+| 
+|align="center"|Z
+|align="center"|90
+|align="center"|111 010
+|align="center"|58
+|-
+|align="center"|;
+|align="center"|59
+|align="center"|011 011
+|align="center"|27
+| 
+|align="center"|<nowiki>[</nowiki>
+|align="center"|91
+|align="center"|111 011
+|align="center"|59
+|-
+|align="center"|<
+|align="center"|60
+|align="center"|011 100
+|align="center"|28
+| 
+|align="center"|\
+|align="center"|92
+|align="center"|111 100
+|align="center"|60
+|-
+|align="center"|=
+|align="center"|61
+|align="center"|011 101
+|align="center"|29
+| 
+|align="center"|<nowiki>]</nowiki>
+|align="center"|93
+|align="center"|111 101
+|align="center"|61
+|-
+|align="center"|>
+|align="center"|62
+|align="center"|011 110
+|align="center"|30
+| 
+|align="center"|^
+|align="center"|94
+|align="center"|111 110
+|align="center"|62
+|-
+|align="center"|?
+|align="center"|63
+|align="center"|011 111
+|align="center"|31
+| 
+|align="center"|_
+|align="center"|95
+|align="center"|111 111
+|align="center"|63
+|-
+|
+|
+|
+|
+| 
+|align="center"|[[Grave_accent|`]]
+|align="center"|96
+|align="center"|(1) 000 000
+|align="center"|64
+|}
+
+== 參見 ==
+* [[Base64|Base64]]
+* [[BinHex|BinHex]]
+* [[MIME|MIME]]
+* [[yEnc|yEnc]]
+
+== 參考資料 ==
+{{FOLDOC}}
+
+== 外部連結 ==
+* [http://www.fpx.de/fp/Software/UUDeview/ UUDeview] {{Wayback|url=http://www.fpx.de/fp/Software/UUDeview/ |date=20160121205406 }} - 適用於Unix/Windows/DOS等作業系統，使用Base64, BinHex, uuencode, xxencode, ...等方法編／解碼的開放源碼程式。
+* [http://www.mxcz.net/tools/uuencode.aspx 在线uuencode编码与解码]{{Wayback|url=http://www.mxcz.net/tools/uuencode.aspx |date=20100514085543 }}
+
+[[Category:电子邮件|Category:电子邮件]]
+[[Category:Unix_SUS2008实用工具|Category:Unix SUS2008实用工具]]
+[[Category:Usenet|Category:Usenet]]
+[[Category:字符编码|Category:字符编码]]
+[[Category:文件格式|Category:文件格式]]

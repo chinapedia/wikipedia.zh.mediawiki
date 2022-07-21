@@ -1,0 +1,1 @@
+#redirect [[Template:德國人物小作品]]

@@ -1,0 +1,1 @@
+#REDIRECT [[Template:使用手冊]]

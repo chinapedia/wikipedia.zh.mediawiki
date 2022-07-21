@@ -1,0 +1,1 @@
+{{User language-N|cdo|Cī ciáh ê̤ṳng-hô gì '''[[:Category:Cdo 母語使用者|mū-ngṳ̄]]''' sê [[:Category:Cdo 使用者|Mìng-dĕ̤ng-ngṳ̄]].<br>兹-{隻}-用戶其'''[[:Category:Cdo 母語使用者|母語]]'''是'''[[:Category:Cdo 使用者|閩東語]]'''。|閩東語|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

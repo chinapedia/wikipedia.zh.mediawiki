@@ -1,0 +1,1 @@
+<includeonly>{{#ifeq:{{{noplain|}}}|1| |<span class="plainlinks">}}[{{fullurl:{{#if:{{{1|}}}|{{{1}}}|{{FULLPAGENAME}}}}|{{#if:{{{2|}}}|diff={{{2}}}}}&{{#if:{{{3|}}}|oldid={{{3}}}}}}} {{{4|}}}]{{#ifeq:{{{noplain}}}|1| |</span>}}</includeonly><noinclude>{{doc}}</noinclude>

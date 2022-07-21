@@ -1,0 +1,3 @@
+{{#ifeq:{{{exclude}}}|D||{{NYCS time 2|D|icon=alltimes|text=all times|time={{{time|}}}}} {{NYCS br|time={{{time|}}}}}}} {{#ifeq:{{{exclude}}}|N||{{NYCS time 2|N|icon=alltimes|text=all times|time={{{time|}}}}} {{NYCS br|time={{{time|}}}}}}} {{#ifeq:{{{exclude}}}|R||{{NYCS time 2|R|icon=allexceptnights|text=all except late nights|time={{{time|}}}}}}}<noinclude>
+[[Category:紐約地鐵模板|{{PAGENAME}}]]
+</noinclude>

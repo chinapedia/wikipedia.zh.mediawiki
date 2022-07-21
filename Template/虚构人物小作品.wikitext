@@ -1,0 +1,1 @@
+#redirect [[Template:Fict-char-stub]]

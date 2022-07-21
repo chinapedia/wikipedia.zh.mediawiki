@@ -1,0 +1,1 @@
+[[File:Mosque.svg|20px]]

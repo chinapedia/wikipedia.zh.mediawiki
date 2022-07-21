@@ -1,0 +1,1 @@
+#REDIRECT [[Template:User 電子時報]]

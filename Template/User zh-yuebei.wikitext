@@ -1,0 +1,1 @@
+{{User language-N|zh-yuebei|這個用戶的'''[[:Category:Zh-yuebei 母語使用者|母語]]'''是'''[[:Category:Zh-yuebei 使用者|粵北土話]]'''。|粤北土话|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

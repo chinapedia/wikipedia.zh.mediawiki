@@ -1,0 +1,1 @@
+[[File:Flag_of_the_Soviet_Union.svg|{{{1|20}}}px]] [[苏联足球协会|苏联]]

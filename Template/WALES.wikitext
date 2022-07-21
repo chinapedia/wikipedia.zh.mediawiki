@@ -1,0 +1,1 @@
+[[File:Flag of Wales (1959–present).svg|25px|威爾士]] [[威爾士]]

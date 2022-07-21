@@ -1,0 +1,11 @@
+{{Userbox
+  |id=
+  |id-c=#CCFF00
+  |info=這個用戶是'''[[:Category:恩平维基人|恩平人]]'''。
+  |info-c=white
+  |info-s=9
+  |border-c=#000000
+}}<includeonly>[[Category:恩平维基人|{{PAGENAME}}]][[Category:广东维基人|{{PAGENAME}}]]</includeonly>
+<noinclude>
+[[Category:廣東省維基人用戶框模板]]
+</noinclude>

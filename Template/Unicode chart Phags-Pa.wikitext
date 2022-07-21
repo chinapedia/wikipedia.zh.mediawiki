@@ -1,0 +1,1 @@
+#REDIRECT [[Template:Unicode_chart_Phags-pa]]

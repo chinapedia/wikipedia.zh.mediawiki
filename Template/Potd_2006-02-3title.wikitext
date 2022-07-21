@@ -1,0 +1,1 @@
+位于波恩的邮政大厦<noinclude>[[Category:每周图片模板]]</noinclude>

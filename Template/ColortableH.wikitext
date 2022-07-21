@@ -1,0 +1,41 @@
+<includeonly><div style="height:8px;border:1px solid {{#switch:{{{1|}}}
+ |蓝=#8898BF
+ |绿=#97BF87
+ |黄=#AAAA66
+ |橙=#AA8833
+ |紫=#7755AA
+ |肉色=#AA8866
+ |茶色=#AA9955
+ |深绿=#88BB55
+ |深蓝=#1144AA
+ |红=#AA7777
+ |灰=#AAAAAA
+ |#default={{#if:{{{1|}}}|{{{1}}}|#AAAAAA}}
+}};-moz-border-radius-topright:8px;-moz-border-radius-topleft:8px;background:{{#switch:{{{1|}}}
+ |蓝=#C8D8FF
+ |绿=#D7FFC7
+ |黄=#FFFFB9
+ |橙=#FFDD88
+ |紫=#C9AEF1
+ |肉色=#FBDFBE
+ |茶色=#F1E2AE
+ |深绿=#99CC66
+ |深蓝=#003399
+ |红=#FFCCCC
+ |灰=#E0E0E0
+ |#default={{#if:{{{1|}}}|{{{1}}}|#E0E0E0}}
+}};font-size:1px;"></div>
+<div style="font-size:normal;margin-bottom:1.5em;border:1px solid {{#switch:{{{1|}}}
+ |蓝=#8898BF
+ |绿=#97BF87
+ |黄=#AAAA66
+ |橙=#AA8833
+ |紫=#7755AA
+ |肉色=#AA8866
+ |茶色=#AA9955
+ |深绿=#88BB55
+ |深蓝=#1144AA
+ |红=#AA7777
+ |灰=#AAAAAA
+ |#default={{#if:{{{1|}}}|{{{1}}}|#AAAAAA}}
+}};border-top:0;background:{{{底色|transparent}}};padding:5px;{{#if:{{{格式|}}}|{{{格式}}}}}"></includeonly><noinclude>{{Documentation}}</noinclude>

@@ -1,0 +1,51 @@
+{{noteTA
+|G1=IT
+|G2=FL
+|T=zh-hans:MyISAM; zh-hant:MyISAM;
+|1=zh-hans:支持; zh-tw:支援;
+|2=zh-hans:性能; zh-tw:效能;
+|3=zh-hans:参照完整性;zh-tw:參考完整性;
+|4=zh-hans:事务;zh-tw:交易;
+|5=zh-hans:数据页; zh-hant:數據頁; zh-tw:資料分頁;
+|6=zh-hans:多个连接; zh-hant:數筆連線;
+|7=zh-hans:多少; zh-hant:多寡;
+}}
+{{Infobox_Software
+| name = MyISAM
+| logo = 
+| caption = 
+| developer = [[Sun_Microsystems|Sun Microsystems]]
+| latest_release_version =
+| latest_release_date = 
+| operating_system = [[跨平台|跨平台]]
+| genre = [[資料庫引擎|資料庫引擎]]
+| license = [[GNU通用公共许可证|GNU通用公共许可证]]
+| website = https://www.mysql.com
+}}
+
+'''MyISAM'''是[[MySQL|MySQL]]的預設[[資料庫引擎|資料庫引擎]]（5.5版之前），由早期的[[ISAM|ISAM]]所改良。雖然效能極佳，但卻有一個缺點：不支援[[事务處理_(數據庫)|事务處理]]（transaction）。不過，在這幾年的發展下，[[MySQL|MySQL]]也導入了[[InnoDB|InnoDB]]（另一種資料庫引擎），以強化[[參考完整性|參考完整性]]與[[並行違規處理|並行違規處理]]機制，後來就逐漸取代MyISAM。
+
+每個MyISAM資料表，皆由儲存在硬碟上的3個檔案所組成，每個檔案都以資料表名稱為主檔名，並搭配不同副檔名區分檔案類型：
+#<code>.frm</code>－－儲存資料表定義，此檔案非MyISAM引擎的一部份。
+#<code>.MYD</code>－－存放真正的資料。
+#<code>.MYI</code>－－儲存索引資訊。
+
+== 與InnoDB之比較 ==
+#InnoDB可藉由交易記錄檔（Transaction Log）來恢復程式崩潰（crash），或非預期結束所造成的資料錯誤；而MyISAM遇到錯誤，必須完整掃瞄後才能重建索引，或修正未寫入硬碟的錯誤。InnoDB的修復時間，大略都是固定的，但MyISAM的修復時間，則與資料量的多寡成正比。相對而言，隨著資料量的增加，InnoDB會有較佳的穩定性。
+#MyISAM必須依靠作業系統來管理讀取與寫入的快取，而InnoDB則是有自己的讀寫快取管理機制。（InnoDB不會將被修改的資料分頁立即交給作業系統）因此在某些情況下，InnoDB的資料存取會比MyISAM更有效率。
+#InnoDB目前並不支援MyISAM所提供的壓縮與terse row formats，所以對硬碟與快取記憶體的使用量較大。因此MySQL從5.0版開始，提供另一個負載較輕的格式，他可減少約略20%的系統負載，而壓縮功能已計畫於未來的新版中推出。
+#當操作完全相容[[ACID|ACID]]（交易）時，雖然InnoDB會自動合併數筆連線，但每次有交易產生時，仍至少須寫入硬碟一次，因此對於某些硬碟或磁碟陣列，會造成每秒200次的交易处理上限。若希望達到更高的效能且保持交易的完整性，就必使用磁碟快取與電池備援。當然InnoDB也提供數種對效能衝擊較低的模式，但相對的也會降低交易的完整性。而MyISAM則無此問題，但這並非因為它比較先進，這只是因為它不支援交易。
+
+== 相關條目 ==
+*[[Falcon|Falcon]]
+*[[ISAM|ISAM]]
+*[[InnoDB|InnoDB]]
+
+== 參考連結 ==
+* [http://dev.mysql.com/doc/mysql/en/myisam-storage-engine.html MySQL Documentation on MyISAM Storage Engine]{{Wayback|url=http://dev.mysql.com/doc/mysql/en/myisam-storage-engine.html |date=20080718103350 }}
+
+{{MySQL}}
+{{Databases}}
+
+[[Category:MySQL|Category:MySQL]]
+[[Category:開放原始碼資料庫系統|Category:開放原始碼資料庫系統]]

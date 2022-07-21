@@ -1,0 +1,5 @@
+<includeonly><div class="topicon" style="position: relative; z-index:100; float: right; margin-right: -12px; top: -65px;">[[File:Iconshock satellite.png|{{{w|32px}}}|Google地图: {{#switch:{{{4}}}|N=北緯|S=南緯}} {{{1|0}}}°{{{2|0}}}′{{{3|0}}}″, {{#switch:{{{8}}}|E=東經|W=西經}} {{{5|0}}}°{{{6|0}}}′{{{7|0}}}″|link=https://maps.google.com/maps?ll={{#switch:{{{4}}}|S=-}}{{#expr: {{#expr: {{{1|0}}} + {{{2|0}}}/60.0 + {{{3|0}}}/3600.0 }} round 6}},{{#switch:{{{8}}}|W=-}}{{#expr: {{#expr: {{{5|0}}} + {{{6|0}}}/60.0 + {{{7|0}}}/3600.0 }} round 6}}&t=k&q={{#switch:{{{4}}}|S=-}}{{#expr: {{#expr: {{{1|0}}} + {{{2|0}}}/60.0 + {{{3|0}}}/3600.0 }} round 6}},{{#switch:{{{8}}}|W=-}}{{#expr: {{#expr: {{{5|0}}} + {{{6|0}}}/60.0 + {{{7|0}}}/3600.0 }} round 6}}&spn={{#expr: {{#expr: {{{9|1000000}}}/1000000}} round 3}},{{#expr: {{#expr: {{{9|1000000}}}/1000000}} round 3}}]]</div></includeonly><noinclude>
+{{coor icon|w=32px|43|58|43|N|15|22|59.28|E|10000}}
+{{Documentation}}
+<!-- 請在 /doc 中加入跨語言連結和模板分類，勿在此添加！ -->
+</noinclude>

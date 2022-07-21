@@ -1,0 +1,1 @@
+{{User language-N|cmn-sichuan|这個用戶的'''[[:Category:cmn-sichuan 母語使用者|母語]]'''就是'''[[:Category:cmn-sichuan 使用者|四川話]]'''。|四川話|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

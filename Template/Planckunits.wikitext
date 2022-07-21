@@ -1,0 +1,1 @@
+#REDIRECT [[Template:普朗克單位]]

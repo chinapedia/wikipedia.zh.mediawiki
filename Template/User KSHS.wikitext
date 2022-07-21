@@ -1,0 +1,12 @@
+{{Userbox
+  |id=雄中<!--[[File:雄中校徽.svg|70px]]。注意合理使用之规定：“绝对不能将“合理使用”之图片，放入个人的用户页面进行展示。”-->
+  |id-c=#FFFFC0
+  |info=這個用戶是'''[[高雄市立高雄高級中學]]'''的學生、校友或教職人員。
+  |info-c=#E0E8FF
+  |info-s=10
+  |border-c=#010422
+  |border-s=3
+}}<includeonly>[[Category:高雄市立高雄高級中學維基人|{{PAGENAME}}]]</includeonly>
+<noinclude>
+[[Category:台灣高中高職用戶框模板]]
+</noinclude>

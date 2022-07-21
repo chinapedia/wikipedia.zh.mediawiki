@@ -1,0 +1,55 @@
+{{Unreferenced|time=2018-08-03T17:57:30+00:00}}
+{{编修}}
+{{noteTA
+|G1=IT
+|G2=Windows
+|1=zh-cn:框架;zh-tw:架構
+}}
+'''使用者模式驅動程式架構'''（{{lang-en|User-Mode Driver Framework}}，簡稱UMDF）是[[微軟公司|微軟公司]]提出的'''視窗驅動程式基礎'''（[[Windows_Driver_Foundation|Windows Driver Foundation]]）的一部份，其執行於使用者模式（user mode），僅能存取使用者位址空間。它同時是[[核心模式驅動程式架構|核心模式驅動程式架構]]（Kernel-Mode Driver Framework，[[KMDF|KMDF]]）的子集，因此UMDF所提供的函數支援少於KMDF，兩者使用相同的狀態機器、使用相同的I/O模型。
+
+UMDF提供[[隨插即用|隨插即用]]（PNP）、電源管理（Power Manager）、非同步輸出輸入等功能，可設定I/O佇列，但它的限制在於不處理中斷（Interrupt）、不執行[[直接記憶體存取|直接記憶體存取]]（DMA），且不能使用核心模式資源如：未分頁集區（NonPaged Pool），也不完全支援同步化領域（Synchronization scope），在技術上UMDF使用[[组件对象模型|COM]]（Component Object Model）的[[動態連結庫|動態連結庫]]（DLL）為基底技術。
+
+== COM架構 ==
+UMDF驅動程式是一個基於COM架構的動態連結檔（DLL），但UMDF並不使用COM的動態時期執行函式（''runtime'' library），單僅是借用了COM的樣式。
+
+UMDF 呼叫 DllGetClassObject API取得一個指標（pointer），這個指標指向一個IClassFactory的介面，並且啟用 CreateInstance 這個屬於IClassFactory 介面的函式來產生一個驅動程式的記憶體實體（instance）。DLL 照例提供一些函式可以讓COM 使用基于IWDFDriver的物件：
+
+*DllCanUnloadNow 
+*DllGetClassObject 
+*DllRegisterServer 
+*DllUnregisterServer
+
+=== 進入點（entry point） ===
+UMDF 驅動程式是一個[[動態連結庫|動態連結庫]]，執行的時候如同一個[[行程|行程]]內（in-process）的COM服务器，其程式碼中包括了'''DllMain'''，這是著名的DLL檔的進入點（entry point）。
+ BOOL WINAPI DllMain(
+        HINSTANCE ModuleHandle,
+        DWORD Reason,
+        PVOID /* Reserved */)
+ {
+   if (DLL_PROCESS_ATTACH == Reason) {
+ 
+     WPP_INIT_TRACING(MYDRIVER_TRACING_ID);
+ 
+     g_ModuleHandle = ModuleHandle;
+   }
+   else if (DLL_PROCESS_DETACH == Reason) {
+ 
+     WPP_CLEANUP();
+   }
+ 
+   return TRUE;
+ };
+
+=== UMDF介面 ===
+*IWDFObject： 定義基本的 WDF 物件類型（WDF object）
+*IWDFDriver： 代表驅動程式物件（driver object）
+*IWDFDevice： 代表裝置物件（device object）
+*IWDF�：代表檔案物件（file object）
+*IWDFIoQueue： 代表 I/O 要求的佇列（IO Request Queue）
+*IWDFIoRequest： I/O 要求描述（IO Request Description）
+*IWDFIoTarget： 代表 I/O 要求的目標驅動程式（IO Target）
+*IWDFMemory： 提供存取記憶體區域（Memory）
+
+{{Microsoft APIs}}
+[[Category:驱动程式|Category:驱动程式]]
+[[Category:微軟API|Category:微軟API]]

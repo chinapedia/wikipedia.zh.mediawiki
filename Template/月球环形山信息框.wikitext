@@ -1,0 +1,1 @@
+#重定向 [[Template:Infobox lunar crater or mare]]

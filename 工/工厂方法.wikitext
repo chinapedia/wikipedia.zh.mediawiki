@@ -1,0 +1,245 @@
+{{noteTA
+|G1=IT
+}}
+[[File:FactoryMethod.svg|thumb]]描述的工厂方法模式]]
+[[File:Factory_Method_pattern_in_LePUS3.png|thumb]]描述的工厂方法模式]]
+
+'''工厂方法模式'''（{{lang-en|Factory method pattern}}）是一种实现了“工厂”概念的[[面向对象|面向对象]][[设计模式_(计算机)|设计模式]]。就像其他[[创建型模式|创建型模式]]一样，它也是处理在不指定[[对象_(计算机科学)|对象]]具体[[类_(计算机科学)|类型]]的情况下创建对象的问题。工厂方法模式的实质是“定义一个创建对象的接口，但让实现这个接口的类来决定实例化哪个类。工厂方法让类的实例化推迟到子类中进行。”<ref>[[设计模式：可复用面向对象软件的基础|设计模式：可复用面向对象软件的基础]]</ref>
+
+创建一个对象常常需要复杂的过程，所以不适合包含在一个复合对象中。创建对象可能会导致大量的重复代码，可能会需要复合对象访问不到的信息，也可能提供不了足够级别的抽象，还可能并不是复合对象概念的一部分。工厂方法模式通过定义一个单独的创建对象的方法来解决这些问题。由[[子类|子类]]实现这个方法来创建具体类型的对象。
+
+对象创建中的有些过程包括决定创建哪个对象、管理对象的生命周期，以及管理特定对象的建立和销毁的概念。
+
+== 工厂 ==
+在[[面向對象的程序設計|面向对象程序设计]]中，'''工厂'''通常是一个用来创建其他对象的对象。工厂是[[构造方法|构造方法]]的[[抽象化_(计算机科学)|抽象]]，用来实现不同的分配方案。
+
+工厂对象通常包含一个或多个方法，用来创建这个工厂所能创建的各种类型的对象。这些方法可能接收参数，用来指定对象创建的方式，最后返回创建的对象。
+
+有时，特定类型对象的控制过程比简单地创建一个对象更复杂。在这种情况下，工厂对象就派上用场了。工厂对象可能会动态地创建产品类的对象，或者从[[对象池模式|对象池]]中返回一个对象，或者对所创建的对象进行复杂的配置，或者应用其他的操作。
+
+这些类型的对象很有用。几个不同的[[设计模式_(计算机)|设计模式]]都应用了工厂的概念，并可以使用在很多语言中。例如，在[[设计模式：可复用面向对象软件的基础|《设计模式》]]一书中，像'''工厂方法模式'''、[[抽象工厂|抽象工厂模式]]、[[生成器模式|生成器模式]]，甚至是[[单例模式|单例模式]]都应用了工厂的概念。
+
+== 代码举例 ==
+例如，有一个<code>Button</code>类表示按钮，另有它的两个子类<code>WinButton</code>和<code>MacButton</code>分别代表Windows和Mac风格的按钮，那么这几个类和用于创建它们的工厂类在Java中可以如下实现（在此省略所有类和方法的可见性设置）：
+<syntaxhighlight lang="java">
+//幾個Button類
+class Button{/* ...*/}
+class WinButton extends Button{/* ...*/}
+class MacButton extends Button{/* ...*/}
+
+//他們的工廠類
+interface ButtonFactory {
+    abstract Button createButton();
+}
+class WinButtonFactory implements ButtonFactory {
+    Button createButton() {
+        return new WinButton();
+    }
+}
+class MacButtonFactory implements ButtonFactory {
+    Button createButton() {
+        return new MacButton();
+    }
+}
+</syntaxhighlight>
+
+=== 其他举例 ===
+* 在[[ADO.NET|ADO.NET]]中，[http://msdn2.microsoft.com/en-us/library/system.data.idbcommand.createparameter.aspx IDbCommand.CreateParameter] {{Wayback|url=http://msdn2.microsoft.com/en-us/library/system.data.idbcommand.createparameter.aspx |date=20080421035340 }}使用工厂方法连接平行的类层次结构。
+* 在[[Qt_(toolkit)|Qt]]，[https://web.archive.org/web/20101017030145/http://doc.trolltech.com/4.0/qmainwindow.html#createPopupMenu QMainWindow::createPopupMenu]是在框架中定义的工厂方法，可以在应用代码中重写。
+* 在[[Java|Java]]中，[http://download.oracle.com/javase/1.5.0/docs/api/javax/xml/parsers/package-summary.html javax.xml.parsers] {{Wayback|url=http://download.oracle.com/javase/1.5.0/docs/api/javax/xml/parsers/package-summary.html |date=20110903085930 }}包使用了几个工厂方法。例如javax.xml.parsers.DocumentBuilderFactory和javax.xml.parsers.SAXParserFactory。
+
+== 变种 ==
+虽然工厂方法模式的背后动机是允许子类选择创建对象的具体类型，但是使用工厂方法模式也有一些其他的好处，其中很多并不依赖于子类。因此，有时候也会创建不使用[[多态|多态]]性创建对象的工厂方法，以得到使用工厂方法的其他好处。
+
+=== 工厂“方法”而非工厂“类” ===
+如果抛开设计模式的范畴，“工厂方法”这个词也可以指作为“工厂”的方法，这个方法的主要目的就是创建对象，而这个方法不一定在单独的工厂类中。这些方法通常作为静态方法，定义在方法所实例化的类中。
+
+每个工厂方法都有特定的名称。在许多面向对象的编程语言中，[[构造方法|构造方法]]必须和它所在的类具有相同的名称，这样的话，如果有多种创建对象的方式（[[重载|重载]]）就可能导致歧义。工厂方法没有这种限制，所以可以具有描述性的名称。举例来说，根据两个实数创建一个[[复数_(数学)|复数]]，而这两个实数表示直角坐标或极坐标，如果使用工厂方法，方法的含义就非常清晰了。当工厂方法起到这种消除歧义的作用时，构造方法常常被设置为私有方法，从而强制客户端代码使用工厂方法创建对象。
+
+下面的例子展示了在不同的编程语言中实现复数创建的代码：
+
+==== Java ====
+<syntaxhighlight lang=Java>
+class Complex {
+     public static Complex fromCartesianFactory(double real, double imaginary) {
+         return new Complex(real, imaginary);
+     }
+     public static Complex fromPolarFactory(double modulus, double angle) {
+         return new Complex(modulus * cos(angle), modulus * sin(angle));
+     }
+     private Complex(double a, double b) {
+         //...
+     }
+}
+
+Complex product = Complex.fromPolarFactory(1, pi);
+</syntaxhighlight>
+
+==== VB.NET ====
+<syntaxhighlight lang=VBNet>
+Public Class Complex
+    Public Shared Function fromCartesianFactory(real As Double, imaginary As Double) As Complex
+        Return (New Complex(real, imaginary))
+    End Function
+
+    Public Shared Function fromPolarFactory(modulus As Double, angle As Double) As Complex
+        Return (New Complex(modulus * Math.Cos(angle), modulus * Math.Sin(angle)))
+    End Function
+
+    Private Sub New(a As Double, b As Double)
+        '...
+    End Sub
+End Class
+
+Complex product = Complex.fromPolarFactory(1, pi);
+</syntaxhighlight>
+
+==== C# ====
+<syntaxhighlight lang=C#>
+
+public class Complex
+{
+    public double Real;
+    public double Imaginary;
+
+    public static Complex FromCartesianFactory(double real, double imaginary) 
+    {
+        return new Complex(real, imaginary);
+    }
+
+    public static Complex FromPolarFactory(double modulus, double angle) 
+    {
+        return new Complex(modulus * Math.Cos(angle), modulus * Math.Sin(angle));
+    }
+ 
+    private Complex (double real, double imaginary)
+    {
+        Real = real;
+        Imaginary = imaginary;
+    }
+}
+
+var product = Complex.FromPolarFactory(1, pi);
+</syntaxhighlight>
+
+=== 简单工厂 ===
+普通的工厂方法模式通常伴随着对象的具体类型与工厂具体类型的一一对应，客户端代码根据需要选择合适的具体类型工厂使用。然而，这种选择可能包含复杂的逻辑。这时，可以创建一个单一的工厂类，用以包含这种选择逻辑，根据参数的不同选择实现不同的具体对象。这个工厂类不需要由每个具体产品实现一个自己的具体的工厂类，所以可以将工厂方法设置为静态方法。
+而且，工厂方法封装了对象的创建过程。如果创建过程非常复杂（比如依赖于配置文件或用户输入），工厂方法就非常有用了。
+比如，一个程序要读取图像文件。程序支持多种图像格式，每种格式都有一个对应的<code>ImageReader</code>类用来读取图像。程序每次读取图像时，需要基于文件信息创建合适类型的<code>ImageReader</code>。这个选择逻辑可以包装在一个简单工厂中：
+
+<syntaxhighlight lang=Java>
+public class ImageReaderFactory {
+    public static ImageReader imageReaderFactoryMethod(InputStream is) {
+        ImageReader product = null;
+
+        int imageType = determineImageType(is);
+        switch (imageType) {
+            case ImageReaderFactory.GIF:
+                product = new GifReader(is);
+            case ImageReaderFactory.JPEG:
+                product = new JpegReader(is);
+            //...
+        }
+        return product;
+    }
+}
+</syntaxhighlight>
+
+== 适用性 ==
+工厂方法，适用于面向接口编程（programming to interface）与实现[[依赖反转原则|依赖反转原则]]。
+下列情况可以考虑使用工厂方法模式：
+* 创建对象需要大量重复的代码。可以把这些代码写在工厂基类中。
+* 创建对象需要访问某些信息，而这些信息不应该包含在复合类中。
+* 创建对象的生命周期必须集中管理，以保证在整个程序中具有一致的行为。 对象创建时会有很多参数来决定如何创建出这个对象。
+* 创建对象可能是一个pool里的，不是每次都凭空创建一个新的。而pool的大小等参数可以用另外的逻辑去控制。比如连接池对象，线程池对象
+* 业务对象的代码作者希望隐藏对象的真实类型，而构造函数一定要真实的类名才能用
+* 简化一些常规的创建过程。根据配置去创建一个对象也很复杂；但可能95%的情况只创建某个特定类型的对象。这时可以弄个函数直接省略那些配置过程。如Java的线程池的相关创建api（如Executors.newFixedThreadPool等）
+* 创建一个对象有复杂的依赖关系，比如Foo对象的创建依赖A，A又依赖B，B又依赖C……。于是创建过程是一组对象的的创建和注入。
+* 知道怎么创建一个对象，但是无法把控创建的时机。需要把“如何创建”的代码塞给“负责决定什么时候创建”的代码。后者在适当的时机，回调执行创建对象的函数。在支持用函数作为一等公民传参的语言，比如js，go等，直接用创建函数就行了。对于java需要搞个XXXXFactory的类去传。 
+* 构造函数里不要抛出异常
+
+工厂方法模式常见于工具包和[[软件框架|框架]]中，在这些库中可能需要创建客户端代码实现的具体类型的对象。
+
+平行的类层次结构中，常常需要一个层次结构中的对象能够根据需要创建另一个层次结构中的对象。
+
+工厂方法模式可以用于[[测试驱动开发|测试驱动开发]]，从而允许将类放在测试中<ref>{{cite
+|author=[[Michael_Feathers|Feathers, Michael]]
+|isbn=978-0-13-117705-5
+|title=Working Effectively with Legacy Code
+|date=October 2004
+|publisher=Prentice Hall Professional Technical Reference
+|location=Upper Saddle River, NJ
+}}</ref>。举例来说，<code>Foo</code>这个类创建了一个<code>Dangerous</code>对象，但是<code>Dangerous</code>对象不能放在自动的[[单元测试|单元测试]]中（可能它需要访问产品数据库，而这个数据库不是随时能够访问到的）。所以，就可以把<code>Dangerous</code>对象的创建交由<code>Foo</code>类的一个方法（[[虚函数|虚函数]]）<code>createDangerous</code>完成。为了测试，再创建一个<code>Foo</code>的一个子类<code>TestFoo</code>，重写<code>createDangerous</code>方法，在方法中创建并返回一个<code>FakeDangerous</code>（<code>Dangerous</code>的子类），而这是一个[[模拟对象|模拟对象]]。这样，单元测试就可以使用<code>TestFoo</code>来测试<code>Foo</code>的功能，从而避免了使用<code>Dangerous</code>对象带来的副作用。
+
+== 局限性 ==
+使用工厂方法有三个局限，第一个与[[代码重构|代码重构]]有关，另外两个与类的扩展有关。
+
+* 第一个局限是，重构已经存在的类会破坏客户端代码。例如，<code>Complex</code>类是一个标准的类，客户端使用构造方法将其实例化。可能会有很多这样的客户端代码：<syntaxhighlight lang=Java>Complex c = new Complex(-1, 0);</syntaxhighlight>一旦Complex的编写者意识到<code>Complex</code>的实例化应该使用工厂方法实现，他会将<code>Complex</code>的构造方法设为私有。而此时使用它的构造方法的客户端代码就都失效了。
+
+* 第二个局限是，因为工厂方法所实例化的类具有私有的构造方法，所以这些类就不能扩展了。因为任何子类都必须调用父类的构造方法，但父类的私有构造方法是不能被子类调用的。
+
+* 第三个局限是，如果确实扩展了工厂方法所实例化的类（例如将构造方法设为保护的，虽然有风险但也是可行的），子类必须具有所有工厂方法的一套实现。例如，在上述<code>Complex</code>的例子中，如果<code>Complex</code>有了一个子类<code>StrangeComplex</code>，那么<code>StrangeComplex</code>必须提供属于它自己的所有工厂方法，否则<syntaxhighlight lang=Java>StrangeComplex.fromPolar(1, pi);</syntaxhighlight>将会返回一个<code>Complex</code>（父类）的实例，而不是所希望的子类实例。但有些语言的反射特性可以避免这个问题。
+
+通过修改底层编程语言，使工厂方法称为第一类的类成员，可以缓解这三个问题。<ref>{{cite journal
+|first=Ellen
+|last=Agerbo
+|first2=Aino
+|last2=Cornils
+|isbn=1-58113-005-8
+|title=How to preserve the benefits of design patterns
+|pages=134–143
+|year=1998
+|journal=Conference on Object Oriented Programming Systems Languages and Applications
+|location=Vancouver, British Columbia, Canada
+|publisher=ACM
+}}</ref>
+
+== 参考文献 ==
+{{Reflist}}
+*{{cite book
+ | author1=Martin Fowler | author2-link=肯特·貝克 | author2=Kent Beck | author3=John Brant | author4=William Opdyke | author5=Don Roberts
+ | title = Refactoring: Improving the Design of Existing Code
+ | publisher = Addison-Wesley
+ | date= 1999-06
+ | isbn = 0-201-48567-2
+| author1-link=马丁·福勒}}
+*{{cite book |author1=Gamma, Erich |author2=Helm, Richard |author3=Johnson, Ralph |author4=Vlissides, John  |
+       title=Design Patterns: Elements of Reusable Object-Oriented Software |
+       publisher=Addison-Wesley |
+       year=1994 |
+       isbn=0-201-63361-2
+       |author1-link=埃里希·伽瑪 |title-link=设计模式：可复用面向对象软件的基础}}
+*{{cite book |author1=Cox, Brad J. |
+       title=Object-oriented programming: an evolutionary approach |
+       publisher=Addison-Wesley |
+       year=1986 |
+       isbn=978-0-201-10393-9
+       |
+ title-link=面向对象程序设计 }}
+*{{cite journal |
+       last=Cohen |
+       first=Tal |
+       author2=Gil, Joseph |
+       title=Better Construction with Factories |
+       journal=Journal of Object Technology |
+       volume=6 |
+       issue=6 |
+       pages=103 |
+       year=2007 |
+       publisher=[[伯特蘭·邁耶|Bertrand Meyer]] |
+       url=http://tal.forum2.org/static/cv/Factories.pdf |
+       accessdate=2007-03-12 |
+       doi=10.5381/jot.2007.6.6.a3 |
+       archive-date=2021-03-09 |
+       archive-url=https://web.archive.org/web/20210309041633/http://tal.forum2.org/static/cv/Factories.pdf |
+       dead-url=no }}
+
+== 参见 ==
+* [[设计模式_(计算机)|设计模式 (计算机)]]
+* [[抽象工厂|抽象工厂]]
+* [[生成器模式|生成器模式]]
+* [[模板方法|模板方法]]
+
+{{软件设计模式}}
+{{Authority control}}
+[[Category:软件设计模式|]]

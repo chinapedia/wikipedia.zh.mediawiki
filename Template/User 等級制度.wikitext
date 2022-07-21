@@ -1,0 +1,11 @@
+{{Userbox
+  |id=等级制度
+  |id-c=#f80000 
+  |info=這個用户支持'''[[等级制度]]'''。
+  |info-c=#e7f2fd
+  |border-c=lightsteelblue
+}}
+[[Category:支持等级制度的维基人]]
+<noinclude>
+[[Category:维基百科相关用户框]]
+</noinclude>

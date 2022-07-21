@@ -1,0 +1,12 @@
+{{Userbox
+  |id=廢除死刑
+  |id-c=#d5e988
+  |id-s=14
+  |info-c=#d0edee
+  |info-s=10
+  |border-c=#eacdc0
+  |border-s=1
+  |info=這個用戶認為應該'''[[廢除死刑]]'''。
+}}<includeonly>[[Category:支持廢除死刑的維基人|{{PAGENAME}}]]</includeonly><noinclude>
+[[Category:支持廢除死刑的維基人|*]]
+</noinclude>

@@ -1,0 +1,13 @@
+{{Userbox
+|id={{lang|ja|腐女子}}
+|id-c=pink
+|id-fc=purple
+|id-s=10
+|info='''[[腐女|{{color|#F93FFC|腐女子}}]]'''出沒注意。
+|info-c=white
+|info-s=10
+|info-fc=purple
+|border-c=pink
+|border-s=2
+|usercategory=維基腐女子
+}}

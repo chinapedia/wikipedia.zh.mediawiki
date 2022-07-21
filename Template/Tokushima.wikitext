@@ -1,0 +1,1 @@
+#REDIRECT [[Template:德島縣]]

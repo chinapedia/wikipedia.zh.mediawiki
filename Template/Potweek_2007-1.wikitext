@@ -1,0 +1,1 @@
+#REDIRECT [[Template:Potweek/2007-01]]

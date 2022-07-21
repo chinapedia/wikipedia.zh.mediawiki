@@ -1,0 +1,3 @@
+|}
+|}<noinclude>[[Category:足球模板|{{PAGENAME}}]]
+</noinclude>

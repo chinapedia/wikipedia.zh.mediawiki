@@ -1,0 +1,2 @@
+<nowiki>{{</nowiki>[[Template:{{{1}}}|{{{1}}}]]}}<br/><small>[[Template talk:{{{1}}}|討論]] · [{{SERVER}}{{localurl:Special:Whatlinkshere/Template:{{{1}}}|limit=500}} 鏈入]</small><noinclude>[[Category:鏈接模板|T]][[Category:輸入支援模板|{{PAGENAME}}]]
+</noinclude>

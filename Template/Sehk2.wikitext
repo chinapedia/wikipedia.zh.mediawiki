@@ -1,0 +1,1 @@
+#REDIRECT [[Template:hkex2]]

@@ -1,0 +1,54 @@
+{{expand language|en|date=2021-10-12}}
+{{更新|time=2021-10-12T07:10:12+00:00}}
+{{NoteTA
+|G1 = IT
+}}
+{{信息安全}}
+'''入侵检测系统'''（{{lang-en|Intrusion-detection system}}，縮寫為 IDS）是一种網路安全設備或[[應用軟體|應用軟體]]，可以監控网络传输或者系統，檢查是否有可疑活動或者違反企業的政策。偵測到时发出警报或者采取主动反应措施。它与其他网络安全设备的不同之处便在于，IDS是一种积极主动的安全防护技术。IDS最早出现在1980年4月。该年，James P. Anderson为美国空军做了一份题为《Computer Security Threat Monitoring and Surveillance》的技术报告，在其中他提出了IDS的概念<ref>{{cite journal|access-date=2021-10-12|url-status=live|archive-url= https://web.archive.org/web/20190514033931/https://csrc.nist.gov/csrc/media/publications/conference-paper/1998/10/08/proceedings-of-the-21st-nissc-1998/documents/early-cs-papers/ande80.pdf|archive-date=2019-05-14|url= https://csrc.nist.gov/csrc/media/publications/conference-paper/1998/10/08/proceedings-of-the-21st-nissc-1998/documents/early-cs-papers/ande80.pdf|author=Anderson, James P.|title=Computer Security Threat Monitoring and Surveillance|location=Washington, PA, James P. Anderson Co.|website=csrc.nist.gov|date=1980-04-15}}</ref>。1980年代中期，IDS逐渐发展成为入侵检测[[专家系统|专家系统]]（IDES）。1990年，IDS分化为基于网络的N-IDS和基于主机的H-IDS。后又出现分布式D-IDS<ref>{{cite web|url=http://info.secu.hc360.com/list/ztgy_001.shtml|title=IDS 二十年风雨历程|access-date=2021-10-12|website=hc360.com|url-status=dead|archive-url= https://web.archive.org/web/20141115232437/http://info.secu.hc360.com/list/ztgy_001.shtml|archive-date=2014-11-15}}</ref>。
+
+== 和防火墙相比 ==
+尽管两者都与网络安全相关，IDS不同于使用一系列静态规则来放行网络连接的传统防火墙(区别于下一代防火墙)。本质上，为避免网络上的入侵，防火墙会限制网络间的访问，不关注网络内部的攻击。IDS也能监控来自系统之内的攻击。传统上，这是通过对网络通信进行检验，而实现对常见攻击模式的鉴定并发出警告。
+== 构造 ==
+{{cn|[[網際網路工程工作小组|網際網路工程工作小组]]将IDS分为四部分：}}
+* 事件产生器，从计算环境中获得事件，并向系统的其他部分提供此事件；
+* 事件分析器，分析数据；
+* 响应单元，发出警报或采取主动反应措施；
+* 事件[[数据库|数据库]]，存放各种数据。
+也有一种常见的分类，即：
+* 驱动引擎，捕获和分析网络传输；
+* 控制台，管理引擎和发出报告或采取主动反应措施；
+两种分类都是合理的。
+
+一个IDS由于其工作特性，需要有一个安全的内网环境以避免[[拒绝服务|拒绝服务]]攻击和[[黑客|黑客]]侵扰，而且进行网络传输检测也不需要合法的[[IP地址|IP地址]]。因此一个典型的IDS应处在一个有[[DNS|DNS]]服务器、防火墙或[[路由器|路由器]]的内网之中，从而完全与[[互联网|互联网]]分开，阻止任何网络主机对IDS的直接访问。
+
+基于网络的IDS的数据源是网络上的数据包。它往往将一台主机的网卡设置为混杂模式，对所有本网段内的网络传输进行检测。一般基于网络的IDS负责着保护整个网段。而基于主机的IDS功能与病毒[[防火墙|防火墙]]类似，在须保护的系统后台运行，对主机活动进行检测。
+
+== 工作 ==
+除了简单的记录和发出警报之外，IDS还可以进行主动反应：打断会话，和实现过滤管理规则。
+=== 入侵检测 ===
+发现违反安全策略的网络传输是IDS的核心功能。根据[[思科|思科]]公司对入侵检测技术的研究<ref>{{cite web|title= 入侵检测系统袭击识别研究|year=2002|url=http://www.cisco.com/global/CN/products/sc/ids/cisco_research.shtml|deadurl=yes|archive-url= https://web.archive.org/web/20021222100845/http://www.cisco.com/global/CN/products/sc/ids/cisco_research.shtml|archive-date=2002-12-22|access-date=2021-10-12|website=cisco.com}}</ref>，可以将入侵检测分为几类：简单[[模式匹配|模式匹配]]、状态模式匹配、基于协议解码的签名、启发式签名和异常检测（“签名”指一组条件，如果满足这组条件的话，就表明是某种类型的入侵活动）。很多研究将异常检测的方法与机器学习等知识相结合衍生出了新一代的自动入侵检测系统。他们各有优缺点，须根据实际情况使用。
+
+=== 攻击响应 ===
+==== 打断会话 ====
+{{main|TCP重置攻击}}
+如果使用此措施，IDS引擎会先识别并记录潜在的攻击，然后假扮会话连接的另一端，伪造一份报文给会话的两端，造成会话连接中断。这样可以有效的关闭通信会话，阻止攻击。不同的IDS有可能在随后的一段预定或随机的时间内试图阻止从攻击者主机发出的所有通信。
+
+这种措施虽然强大，但是也有缺点。这种措施能够阻止的是较长时间的攻击，而像早期的“[[泪滴攻击|泪滴攻击]]”使系统接收到一个特制分组报头时就会崩溃的情况，这种方法无能为力。
+
+==== 过滤管理规则 ====
+一些IDS能够修改远程路由器或防火墙的过滤规则，以阻止持续的攻击。根据安全策略的不同，这种措施可能包括阻止攻击主机与目标主机的其他传输、阻止攻击主机的所有传输；在某些特殊的情况下，也可以阻止目标主机的与特定网域内主机的通信。
+
+这种措施的优点是同样阻止攻击，它比打断会话节省许多网络传输。不过此种措施无法对抗来自内网的攻击，以及有可能造成拒绝服务。
+
+== 缺点 ==
+*1998年2月，Secure Networks Inc.指出IDS有许多弱点，主要为：IDS对数据的检测；对IDS自身攻击的防护。由于当代网络发展迅速，网络传输速率大大加快，这造成了IDS工作的很大负担，也意味着IDS对攻击活动检测的可靠性不高。而IDS在应对对自身的攻击时，对其他传输的检测也会被抑制。同时由于模式识别技术的不完善，IDS的高虚警率也是它的一大问题。<ref>{{Cite web|url=https://www.cs.unc.edu/~fabian/course_papers/PtacekNewsham98.pdf|title=Insertion, Evasion, and Denial of Service: Eluding Network Intrusion Detection|year=1998|author=Thomas H. Ptacek, Tomothy N. Newsham|language=en-US|access-date=2021-04-14|archive-date=2018-01-07|archive-url=https://web.archive.org/web/20180107172909/http://cs.unc.edu/~fabian/course_papers/PtacekNewsham98.pdf|dead-url=no}}</ref> 
+*由于IDS和通信两端及中间盒的TCP实现差异，其检测手段可被客户端注入的特制封包绕过，如[[防火长城|防火长城]]。<ref>{{Cite journal|doi=10.1145/3131365.3131374|title=Your State is Not Mine: A Closer Look at Evading Stateful Internet Censorship|url=http://www.cs.ucr.edu/~krish/imc17.pdf|first1=Zhongjie|last1=Wang|year=2017|language=en-US|journal=|access-date=2021-04-14|archive-date=2018-06-20|archive-url=https://web.archive.org/web/20180620063925/http://www.cs.ucr.edu/~krish/imc17.pdf|dead-url=no}}</ref>
+
+== 参考资料 ==
+{{reflist}}
+
+== 参见 ==
+*[[状态防火墙|状态防火墙]]
+
+[[Category:网络安全|Category:网络安全]]
+[[Category:電腦安全|Category:電腦安全]]

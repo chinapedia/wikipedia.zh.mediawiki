@@ -1,0 +1,109 @@
+在[[数值线性代数|数值线性代数]]中，'''雅可比旋转'''是 ''n'' 维[[内积空间|内积空间]]的二维线性子空间的[[旋转|旋转]] ''Q''<sub>''k''ℓ</sub>，在用做[[相似变换|相似变换]]的时候，被选择来置零 ''n''×''n'' [[实数|实数]][[对称矩阵|对称矩阵]] ''A'' 的非[[主对角线|对角]]元素的对称对:
+
+: <math> A \mapsto Q_{k\ell}^T A Q_{k\ell} = A' . \,\! </math>
+
+: <math>
+\begin{bmatrix}
+ {*} &   &   & \cdots &   &   & * \\
+   & \ddots &   &   &   &   &   \\
+   &   & a_{kk} & \cdots & a_{k\ell} &   &   \\
+ \vdots &   & \vdots & \ddots & \vdots &   & \vdots \\
+   &   & a_{\ell k} & \cdots & a_{\ell\ell} &   &   \\
+   &    &   &   &   & \ddots &   \\
+ {*} &   &   & \cdots &   &   & *
+\end{bmatrix}
+\to
+\begin{bmatrix}
+ {*} &   &   & \cdots &   &   & * \\
+   & \ddots &   &   &   &   &   \\
+   &   & a'_{kk} & \cdots & 0 &   &   \\
+ \vdots &   & \vdots & \ddots & \vdots &   & \vdots \\
+   &   & 0 & \cdots & a'_{\ell\ell} &   &   \\
+   &    &   &   &   & \ddots &   \\
+ {*} &   &   & \cdots &   &   & *
+\end{bmatrix}
+</math>
+
+它是[[雅可比特征值算法|雅可比特征值算法]]的核心运算，它是[[数值稳定性|数值上稳定]]的并适合用[[并行计算|并行计算]]实现。
+
+注意到只有 ''A'' 的行 ''k'' 和 ℓ 与列 ''k'' 和 ℓ 受到影响，并且 ''A''′ 将保持对称。还有给 ''Q''<sub>''k''ℓ</sub> 的明显的矩阵很少被计算，转而计算辅助值，''A'' 也有效率和数值上稳定的方式更新。但是，为了引用，我们写矩阵为
+
+: <math>
+Q_{k\ell} = 
+\begin{bmatrix}
+ 1 &   &   &   &   &   &   \\
+   & \ddots &   &   &   & 0 &   \\
+   &   & c & \cdots & s &   &   \\
+   &   & \vdots & \ddots & \vdots &   &  \\
+   &   & -s & \cdots & c &   &   \\
+   & 0 &   &   &   & \ddots &   \\
+   &   &   &   &   &   & 1
+\end{bmatrix} .
+</math>
+
+就是说，除了四个元素之外，''Q''<sub>''k''ℓ</sub> 是一个单位矩阵，两个在对角线上(''q''<sub>''kk''</sub> 和 ''q''<sub>ℓℓ</sub> 都等于 ''c'') 而两个位于远离对角的位置上(''q''<sub>''k''ℓ</sub> 和 ''Q''<sub>ℓ''k''</sub> 分别等于 ''s'' 和 −''s'')。这里的 ''c'' = cos ϑ 而 ''s'' = sin ϑ 对于某个角度 ϑ；但是对于应用这种旋转，这个角度自身是不需要的。使用[[克罗内克δ|克罗内克δ]]符号，矩阵元素可以写为
+
+: <math> q_{ij} = 
+\delta_{ij} + (\delta_{ik}\delta_{jk} 
++ \delta_{i\ell}\delta_{j\ell})(c-1) + (\delta_{ik}\delta_{j\ell} 
+- \delta_{i\ell}\delta_{jk})s . \,\!
+</math>
+
+假设 ''h'' 是不为 ''k'' 或 ℓ 的索引(它们自身必须是不同的)。类似的更改过程在代数上写为
+
+: <math> a'_{hk} = a'_{kh} = c a_{hk} - s a_{h\ell} \,\! </math>
+: <math> a'_{h\ell} = a'_{\ell h} = c a_{h\ell} + s a_{hk} \,\! </math>
+
+: <math> a'_{k\ell} = a'_{\ell k} = (c^2-s^2)a_{k\ell} + sc (a_{kk} - a_{\ell\ell}) = 0 \,\! </math>
+
+: <math> a'_{kk} = c^2 a_{kk} - s^2 a_{\ell\ell} - 2 s c a_{k\ell} \,\! </math>
+: <math> a'_{\ell\ell} = c^2 a_{kk} - s^2 a_{\ell\ell} + 2 s c a_{k\ell} \,\! </math>
+
+== 数值稳定计算 ==
+
+要确定需要更改的数量，我们必须解远离对角的元素为零的方程{{Harv|Golub|Van Loan|1996|loc=§8.4}}。这蕴涵了
+
+: <math> \frac{c^2-s^2}{sc} = \frac{a_{\ell\ell} - a_{kk}}{a_{k\ell}} . </math>
+
+设 β 是这个数量的一半，
+
+: <math> \beta = \frac{a_{\ell\ell} - a_{kk}}{2 a_{k\ell}} . </math>
+
+如果 ''a''<sub>''k''ℓ</sub> 是零，我们可以停止而不需要进行更改，因此我们永不除以零。设 ''t'' 是 tan ϑ。则通过一些三角恒等式我们简约这个方程为
+
+: <math> t^2 + 2\beta t - 1 = 0 . \,\! </math>
+
+为了稳定性我们选择解
+
+: <math> t = \frac{\sgn(\beta)}{|\beta|+\sqrt{\beta^2+1}} . </math>
+
+以此我们可以获得 ''c'' 和 ''s'' 为
+
+: <math> c = \frac{1}{\sqrt{t^2+1}} \,\! </math>
+: <math> s = c t \,\! </math>
+
+尽管我们可以使用前面给出的代数更改等式，重写它们会更好。设
+
+: <math> \rho= \frac{s}{1+c} , </math>
+
+所以 ρ = tan(ϑ/2)。则修订后的修改方程为
+
+: <math> a'_{hk} = a'_{kh} = a_{hk} - s (a_{h\ell} + \rho a_{hk}) \,\! </math>
+: <math> a'_{h\ell} = a'_{\ell h} = a_{h\ell} + s (a_{hk} - \rho a_{h\ell}) \,\! </math>
+
+: <math> a'_{k\ell} = a'_{\ell k} = 0 \,\! </math>
+
+: <math> a'_{kk} = a_{kk} - t a_{k \ell} \,\! </math>
+: <math> a'_{\ell\ell} = a_{\ell\ell} + t a_{k \ell} \,\! </math>
+
+如前面提及的，我们永不需要明确的计算旋转角度 ϑ。事实上，我们可以通过只保留三个值 ''k'', ℓ 和 ''t'' 来重新生成由 ''Q''<sub>''k''ℓ</sub> 确定的对称更改，带有 ''t'' 对零旋转设置为零。
+
+== 参见 ==
+* [[Givens旋转|Givens旋转]]
+
+== 引用 ==
+* [[Gene_H._Golub|Golub, Gene H.]] & [[Charles_F._Van_Loan|Charles F. Van Loan]] (1996), Matrix Computations (3rd ed.), Baltimore: Johns Hopkins University Press, ISBN [http://en.wikipedia.org/w/index.php?title=Special:Booksources&isbn=9780801854149 978-0-8018-5414-9]
+
+<!-- The main source for this presentation was [http://beige.ucs.indiana.edu/B673/node24.html]. -->
+
+[[Category:数值线性代数|I]]

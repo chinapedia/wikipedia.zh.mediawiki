@@ -1,0 +1,141 @@
+{{Expand English}}
+{{noteTA
+|G1=IT
+|G2=FL
+}}
+{{Infobox Filesystem
+| full_name = ZFS
+| name = ZFS
+| developer = [[甲骨文公司|甲骨文公司]]
+| introduction_os = [[OpenSolaris|OpenSolaris]]
+| introduction_date = 2005年11月
+| partition_id =
+| directory_struct = 可扩展[[哈希表|哈希表]]
+| file_struct =
+| bad_blocks_struct =
+| max_filename_size = 255字节
+| max_files_no = 2<sup>48</sup>
+| max_volume_size = 2<sup>64</sup>字节（16 [[exabyte|exabyte]]s）
+| max_capacity = 256 [[UB|UB]]（2<sup>128</sup> bytes)
+| max_file_size = 2<sup>64</sup>字节（16 [[Exabyte|Exabyte]]s)
+| filename_character_set =
+| dates_recorded =
+| date_range =
+| date_resolution =
+| forks_streams = 是（称作[[扩展文件属性|扩展文件属性]]）
+| attributes = [[POSIX|POSIX]]
+| file_system_permissions = POSIX、NFSv4 ACLs
+| compression = 是
+| data_deduplication = 是
+| encryption = 是
+| OS = [[#对其支持的操作系统|见下]]
+}}
+
+'''ZFS'''是一個擁有[[邏輯捲軸管理|邏輯捲軸管理]]功能的[[檔案系統|檔案系統]]，最早源自于[[Oracle|Oracle]]为[[Solaris|Solaris]][[操作系统|操作系统]]开发的文件系统。ZFS具有可扩展性，并且包括大量保护措施防止[[数据损坏|数据损坏]]，支持高存储容量、高效数据压缩、集成文件系统、[[Volume_(computing)|卷管理]]、快照和写时复制、连续完整性检查与自动修复、[[RAID-Z|RAID-Z]]、原生[[Network_File_System#NFSv4|NFSv4]] [[ACL|ACL]]等功能，并且能被精确配置。ZFS有两个主要实现，分别来自[[Oracle|Oracle]]和[[OpenZFS|OpenZFS]]，它们之间极度相似，这使得ZFS在[[Unix-like|类Unix]]系统中广泛可用。
+
+ZFS这一名字本身没有含义(Zettabyte File System)，也不是某种缩写。ZFS最初是[[专有软件|专有软件]]，被Sun内部开发作为Solaris的一部分，由Sun存储部门的CTO、研究员[[Jeff_Bonwick|Jeff Bonwick]]带领团队开发。在2005年，Solaris的大部分，包括ZFS成为采用[[通用开发与散布许可证|通用开发与散布许可证]]的开源软件，作为[[OpenSolaris|OpenSolaris]]项目。在2006年，ZFS成为Solaris的一项标准特性。
+
+在2010年，Sun被Oracle收购，ZFS成为Oracle的注册商标。Oracle停止为OpenSolaris和ZFS项目提供更新的源代码，使得Oracle的ZFS转为闭源。因此，有人成立了[[illumos|illumos]]项目，去维护已经存在的开源的Solaris代码，并且在2013年成立OpenZFS以配合ZFS的开源发展。OpenZFS维护管理核心ZFS代码，而一些使用ZFS的组织维护特定的代码和ZFS所需要的验证过程，以集成到他们的系统。OpenZFS在类Unix系统中广泛使用。
+
+== 历史 ==
+ZFS的设计与开发由Sun公司的[[Jeff_Bonwick|Jeff Bonwick]]所领导的一支团队完成。最早宣布于2004年9月14日，<ref name="announce">{{cite web | url = http://www.sun.com/2004-0914/feature/ | title = ZFS: the last word in file systems | accessdate = 2006-04-30 | publisher = Sun Microsystems | date = September 14, 2004 | archive-date = 2006-04-28 | archive-url = https://web.archive.org/web/20060428092023/http://www.sun.com/2004-0914/feature/ | dead-url = no }}</ref>於2005年10月31日并入了Solaris开发的主干源代码。<ref>{{cite web | url = http://blogs.sun.com/roller/page/bonwick?entry=zfs_the_last_word_in | title = ZFS: The Last Word in Filesystems | author = Jeff Bonwick | work = Jeff Bonwick's Blog | date = October 31, 2005 | accessdate = 2006-04-30 | deadurl = yes | archiveurl = https://www.webcitation.org/6BNdGOIEe?url=https://blogs.oracle.com/roller-ui/errors/404.jsp | archivedate = 2012-10-13 }}</ref>并在2005年11月16日作为[[OpenSolaris|OpenSolaris]] build 27的一部分发布。Sun在OpenSolaris社区开张1年后的2006年六月，将ZFS整合进了Solaris 10 6/06版本更新。<ref>{{cite web | url = http://www.sun.com/smi/Press/sunflash/2006-06/sunflash.20060620.1.xml | title = Sun Celebrates Successful One-Year Anniversary of OpenSolaris | publisher = Sun Microsystems | date = June 20, 2006 | accessdate = 2007-04-21 | archive-date = 2008-09-28 | archive-url = https://web.archive.org/web/20080928001733/http://www.sun.com/smi/Press/sunflash/2006-06/sunflash.20060620.1.xml | dead-url = no }}</ref>
+
+ZFS的命名來源發想於"[[Zettabyte|Zettabyte]] File System"的首字母缩写。<ref>{{cite web | title = You say zeta, I say zetta | author = Jeff Bonwick | date = 2006-05-04 | work = Jeff Bonwick's Blog | accessdate = 2006-09-08 | url = http://blogs.sun.com/bonwick/entry/you_say_zeta_i_say | deadurl = yes | archiveurl = https://www.webcitation.org/6BNdHzNju?url=https://blogs.oracle.com/roller-ui/errors/404.jsp | archivedate = 2012-10-13 }}</ref>但ZFS本身並不具備任何的縮寫意涵，只是作者想闡述做為一個具備高擴充容量檔案系統且還有支援許多延伸功能的一個產品。
+
+== 存储池 ==
+不同于传统文件系统需要驻留于单独设备或者需要一个卷管理系统去使用一个以上的设备，ZFS建立在虚拟的，被称为“zpools”的存储池之上（存储池最早在[[AdvFS|AdvFS]]實現<ref>{{cite web |url=http://sourceforge.net/projects/advfs/files/AdvFS%20design%20docs/initial%20release/ |title=AdvFS內部設計文件 (AdvFS Design Docs) |publisher=[[SourceForge.net|SourceForge.net]] |accessdate=2011-01-25 |archive-date=2013-11-02 |archive-url=https://web.archive.org/web/20131102181426/http://sourceforge.net/projects/advfs/files/AdvFS%20design%20docs/initial%20release/ |dead-url=no }}</ref>，並且加到後來的[[Btrfs|Btrfs]]）。每个存储池由若干虚拟设备（''virtual devices，vdevs''）组成。这些虚拟设备可以是原始磁盘，也可能是一个[[RAID1|RAID1]]镜像设备，或是非标准RAID等级的多磁盘组。于是zpool上的文件系统可以使用这些虚拟设备的总存储容量。
+
+可以使用[[磁盘限额|磁盘限额]]以及设置磁盘预留空间来限制存储池中单个文件系统所占用的空间。
+
+== 容量 ==
+ZFS是一个[[128位|128位]]的文件系统，这意味着它能存储1800亿亿（18.4×10<sup>18</sup>）倍于当前[[64位|64位]]文件系统的数据。ZFS的设计如此超前以至于这个极限就当前现实实际可能永远无法遇到。项目领导Bonwick曾说：“要填满一个128位的文件系统，将耗尽地球上所有存储设备。除非你拥有煮沸整个海洋的能量，不然你不可能将其填满。”<ref name="announce" />
+
+以下是ZFS的一些理论极限：
+* 2<sup>48</sup>—任意文件系统的[[快照|快照]]数量（2×10<sup>14</sup>）
+* 2<sup>48</sup>—任何单独文件系统的文件数（2×10<sup>14</sup>）
+* 16 [[exabyte|exabyte]]s (2<sup>64</sup> byte)—文件系统最大尺寸
+* 16 exabytes (2<sup>64</sup> byte)—最大单个文件尺寸
+* 16 exabytes (2<sup>64</sup> byte)—最大属性大小
+* 128 [[Zettabyte|Zettabyte]]s (2<sup>78</sup> byte)—最大zpool大小
+* 2<sup>56</sup>—单个文件的属性数量（受ZFS文件数量的约束，实际为2<sup>48</sup>）
+* 2<sup>56</sup>—单个目录的文件数（受ZFS文件数量的约束，实际为2<sup>48</sup>）
+* 2<sup>64</sup>—单一zpool的设备数
+* 2<sup>64</sup>—系统的zpools数量
+* 2<sup>64</sup>—单一zpool的文件系统数量
+
+作为对这些数字的感性认识，假设每秒钟创建1,000个新文件，达到ZFS文件数极限需要大约9,000年。
+
+在辩解填满ZFS与煮沸海洋的关系时，Bonwick写到：
+<blockquote>
+尽管我们都希望[[摩尔定律|摩尔定律]]永远延续，但是[[量子力学|量子力学]]给定了任何物理设备上计算速率（computation rate）与信息量的理论极限{{來源請求}}。举例而言，一个-{zh-hans;zh-hant|质量}-为1[[公斤|公斤]]，体积为1[[升|升]]的物体，每秒至多在10<sup>31</sup>[[位|位]][[信息|信息]]
+上进行10<sup>51</sup>次运算<ref>Seth Lloyd, "[http://puhep1.princeton.edu/~mcdonald/examples/QM/lloyd_nature_406_1047_00.pdf Ultimate physical limits to computation（计算的终极物理限制）] {{Wayback|url=http://puhep1.princeton.edu/~mcdonald/examples/QM/lloyd_nature_406_1047_00.pdf |date=20080807173904 }}." Nature 406, 1047-1054 (2000)]</ref>。一个完全的128位存储池将包含2<sup>128</sup>个块<nowiki>=</nowiki> 2<sup>137</sup>字节<nowiki>=</nowiki> 2<sup>140</sup>位；应此，保存这些数据位至少需要(2<sup>140</sup>位) / (10<sup>31</sup>位/公斤) <nowiki>=</nowiki> 1360亿公斤的物质。
+</blockquote>
+
+== 写入时复制事务模型 ==
+ZFS采用[[写入时复制|写入时复制]]事务对象模型。文件系统中的所有块指向都包含目标块的256位[[校验和|校验和]]或[[密码散列函数|hash]]值（目前有{{link-en|Fletcher-2|Fletcher's checksum}}、 Fletcher-4与[[SHA-2|SHA-2]]供选择）<ref>{{cite web |title=ZFS On-Disk Specification |url=http://opensolaris.org/os/community/zfs/docs/ondiskformat0822.pdf |publisher=Sun Microsystems, Inc. |year=2006 |deadurl=yes |archiveurl=https://web.archive.org/web/20081230170058/http://www.opensolaris.org/os/community/zfs/docs/ondiskformat0822.pdf |archivedate=2008年12月30日 |accessdate=2017年8月14日 }} 见2.4节。</ref>。在读取块时会对这些参数加以验证。包含活动数据的块不会被覆盖，而是给修改过的数据分配一个新块，任何引用此块的[[元数据|元数据]]块都被重新读取、重新分配和重写。为减少该过程的开销，多次读写更新会被归纳为一个事件组，在需要同步写入语义时会使用ZIL（{{link-en|目的日志|intent log}}）写入缓存，而这些块会与校验和一同编入{{link-en|Merkle 树|Merkle tree}}中。
+
+利用写入时复制使ZFS的快照和事物功能的实现变得更简单和自然，快照功能更灵活，但严重碎片化问题是其缺点之一。对于通过顺序写生成的大文件，如果以后随机的对其中的一部分进行了更改，那么这个文件在硬盘上的物理地址就变得不再连续，未来的顺序读会变得性能比较差。
+
+== 快照与克隆 ==
+当ZFS写入新数据时，可以保留包含旧数据的块，因而能够维护文件系统的[[快照_(电脑储存)|快照]]版本。ZFS快照具备一致性（快照基于单个时间点反映整个数据）。而因为组合快照的所有数据都会被储存，且整个存储池通常每小时会进行几次快照，所以快照的创建速度非常快。任何未变动的数据会在文件系统及其快照之间进行共享，因此也具备空间高效性。快照本质上是只读的，确保在创建后快照不会被修改。快照可以被整个恢复，也可以恢复快照中的某些文件或目录。
+
+ZFS也可以创建可写快照（“克隆”），让两个独立的文件系统共享一组块。对克隆文件系统的修改都会创建新的数据块以反映这些更改。但是无论存在多少个克隆，未变动的块仍然会被共享。这是写入时复制原则的实施方式。
+
+== 动态条带化 ==
+ZFS能动态条带化所有设备以最大化吞吐量。当额外的设备被加入到zpool中的时候，条带宽度会自动-{zh-hans;zh-hant|扩展}-以包含这些设备。这使得存储池中的所有磁盘都被用到，同时负载被平摊到所有的磁盘上。
+
+== 可变块尺寸 ==
+ZFS使用可变大小的块，最大可至128KB。现有的代码允许管理员调整最大块大小，这在大块效果不好的时候有用。未来也许能做到自动调整适合工作量的块大小。[需要引用]
+
+ZFS的可变大小的块与BtrFS和Ext4的extent不同。在ZFS中，在一个文件中所有数据块的逻辑长度必须是相同的，不同文件之间的块大小可以不同，因此ZFS可以用直接映射（direct map）的方式（同ufs/ffs/ext2/ext3）来来搜索间接块的数据指针数组（blkptr）。BtrFS和Ext4的extent方式在同一个文件中每个数据快的大小都可以不相同，因此需要用B+ Tree或者类B Tree的方式来组织间接块的数据。
+
+虽然直接映射方式比B+ Tree的查找速度快，但是这种方式的缺点也非常明显，如：元数据开销过大、顺序IO的大文件性能不好、删除比较慢等等，因此在现代文件系统中映射方式逐渐被extent变长块取代。
+
+如果数据压缩（LZJB）被启用，可变块大小需要被用到。如果一个数据块可被压缩至一个更小的数据块，则小的数据块将使用更少的存储和提高吞吐量（代价是增加CPU压缩和解压缩的负担）。
+
+== 轻量化文件系统创建 ==
+在ZFS中，存储池中文件系统的操作相比传统文件系统的卷管理更加便捷。创建ZFS文件系统或者改变一个ZFS文件系统的大小接近于传统技术中的管理目录而非管理卷。
+
+== 储存管理 ==
+
+== 限制 ==
+ZFS的最新beta版已支持透明加密。<ref>{{cite web
+ |url         = http://www.opensolaris.org/os/project/zfs-crypto/
+ |title       = OpenSolaris Project: ZFS on disk encryption support
+ |accessdate  = 2006-12-13
+ |publisher   = OpenSolaris Project
+ |deadurl     = yes
+ |archiveurl  = https://www.webcitation.org/6BNdKzJ4V?url=http://hub.opensolaris.org/bin/view/Project+zfs-crypto/WebHome
+ |archivedate = 2012-10-13
+}}</ref>
+
+== 专利争端 ==
+NetApp指控Sun的ZFS文件系统侵犯了它WAFL的七项专利，Sun[https://web.archive.org/web/20140901050937/http://news.ccidnet.com/art/1032/20071028/1255929_1.html 反诉]NetApp侵犯了12项专利，其中包括NFS协议等。后来专利争端以和解告终。
+
+==对其支持的操作系统==
+*[[Solaris|Sun Solaris]]
+*[[OpenSolaris|OpenSolaris]]
+*[[Illumos|Illumos]]发行版
+*[[OpenIndiana|OpenIndiana]]
+*[[FreeBSD|FreeBSD]]
+*[[Mac_OS_X_Server#Mac_OS_X_Server_10.5_(Leopard_Server)|Mac OS X Server 10.5]]
+*[[NetBSD|NetBSD]]
+*[[Linux|Linux]]（通过[[用户空间文件系统|用户空间文件系统]]或原生第三方内核[[可載入核心模組|可載入核心模組]]支持）<ref>{{cite web | url = http://zfsonlinux.org/faq.html#WhatAboutTheLicensingIssue | title = 1.1 What about the licensing issue? | accessdate = November 18, 2010 | archive-date = 2010-09-26 | archive-url = https://web.archive.org/web/20100926104451/http://zfsonlinux.org/faq.html#WhatAboutTheLicensingIssue | dead-url = no }}</ref>
+
+== 参见 ==
+* [[Btrfs|Btrfs]]
+* [[OpenZFS|OpenZFS]]
+
+== 參考文獻 ==
+{{reflist}}
+
+== 外部連結 ==
+* [https://web.archive.org/web/20070408132558/http://www.opensolaris.org/os/community/zfs/ ZFS主頁]
+* [http://www.zfsonlinux.org/ ZFS on Linux] {{Wayback|url=http://www.zfsonlinux.org/ |date=20220517072313 }} - 美國[[勞倫斯利福摩爾國家實驗室|勞倫斯利福摩爾國家實驗室]]的ZFS on Linux開源計劃
+
+{{Filesystem}}
+
+[[Category:磁盘文件系统|Category:磁盘文件系统]]
+[[Category:昇陽電腦軟體|Category:昇陽電腦軟體]]
+[[Category:Linux檔案系統|Category:Linux檔案系統]]
+[[Category:OpenSolaris|Category:OpenSolaris]]

@@ -1,0 +1,2 @@
+border="2" cellpadding="3" cellspacing="0" style="margin: 0.5em 0.5em 0.5em 1em; padding: 0.5em; background: #ffffff; border: 1px #aaa solid; border-collapse: collapse; font-size: 95%;"<noinclude>
+</noinclude>

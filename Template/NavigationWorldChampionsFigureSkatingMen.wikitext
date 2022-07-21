@@ -1,0 +1,1 @@
+#REDIRECT [[Template:世界花样滑冰锦标赛男子单人滑冠军]]

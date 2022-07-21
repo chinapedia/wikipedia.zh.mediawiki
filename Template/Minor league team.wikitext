@@ -1,0 +1,1 @@
+#REDIRECT [[Template:Infobox Minor League Baseball]]

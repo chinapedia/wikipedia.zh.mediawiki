@@ -1,0 +1,13 @@
+{{Userbox
+  |id=[[File:Chinesemusicians.jpg|50px]]
+  |id-c=orange
+  |info=這個用戶喜歡聽'''[[中國音樂|傳統中國音樂]]'''。
+  |info-c=white
+  |info-s=9
+  |border-c=red
+  |usercategory=喜歡傳統中國音樂的維基人
+  |nocat={{{nocat|}}}
+}}<noinclude>
+{{clear}}
+[[Wikipedia:用戶框/音樂]]
+[[Category:音樂用戶框模板]]</noinclude>

@@ -1,0 +1,1 @@
+#REDIRECT [[Template:诺贝尔和平奖获得者]]

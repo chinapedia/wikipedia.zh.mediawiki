@@ -1,0 +1,1 @@
+#REDIRECT [[Template:四川教育小作品]]

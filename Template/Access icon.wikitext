@@ -1,0 +1,1 @@
+#REDIRECT [[Template:無障礙圖示]]

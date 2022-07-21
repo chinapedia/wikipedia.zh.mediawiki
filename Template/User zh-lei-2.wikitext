@@ -1,0 +1,1 @@
+{{User language-2|zh-lei|该用户能以'''[[:Category:Zh-lei-2 使用者|一般]]'''的'''[[:Category:Zh-lei 使用者|雷话]]'''进行交流。|雷话|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

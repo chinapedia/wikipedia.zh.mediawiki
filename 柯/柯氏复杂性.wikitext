@@ -1,0 +1,269 @@
+{{TA
+|G1=IT
+|G2=Math
+|G3=通訊學
+}}
+在[[算法信息论|算法信息论]]（[[计算机科学|计算机科学]]和[[数学|数学]]的一个分支）中，一个对象比如一段文字的'''柯氏复杂性'''（亦作'''[[柯尔莫哥洛夫|柯尔莫哥洛夫]]复杂性'''、'''描述复杂性'''、'''柯尔莫哥洛夫-{{le|柴廷|Gregory Chaitin}}复杂度'''、'''随机复杂度'''，或'''算法熵'''）是衡量描述这个对象所需要的信息量的一个尺度。柯氏复杂性是由[[安德雷·柯尔莫哥洛夫|安德雷·柯尔莫哥洛夫]]于1963年发现，所以用他的名字命名。<ref>{{cite journal|authorlink=Andrey Kolmogorov|first=Andrey|last=Kolmogorov|year=1963|title=On Tables of Random Numbers| journal=[[Sankhya_(journal)|Sankhyā]] Ser. A.|volume=25|pages=369–375|mr=178484}}</ref><ref>{{cite journal|authorlink=Andrey Kolmogorov|first=Andrey|last=Kolmogorov|year=1998|title=On Tables of Random Numbers| journal=Theoretical Computer Science|volume=207|issue=2|pages=387–395|doi=10.1016/S0304-3975(98)00075-9 |mr=1643414}}</ref>
+
+以下面的两个长度为64的[[字符串|字符串]]为例。
+
+ 0101010101010101010101010101010101010101010101010101010101010101
+
+ 1100100001100001110111101110110011111010010000100101011110010110
+
+第一个字符串可以用[[中文|中文]]简短地描述为“重复32个‘01’”。第二个字符串没有明显的简短描述。
+
+一个[[字符串|字符串]]<math>s</math>的柯氏复杂性（<math>C(s)</math>或者<math>K(s)</math>，区别如后）是这个字符串的最短描述的长度。换言之，一个字符串<math>s</math>的柯氏复杂性是能够输出且仅输出这个字符串的最短计算机／[[图灵机|图灵机]]程序的长度。
+
+这样的定义导致在使用不同的描述语言或者不同的图灵机的时候柯氏复杂性不一样。所以在讨论柯氏复杂性的时候，通常都事先固定一个[[通用图灵机|通用图灵机]]<math>U</math>作为参照。可以证明在使用<math>U</math>做参照的时候，对任意的图灵机<math>M</math>，都存在一个仅决定于<math>U</math>和<math>M</math>的常数<math>c_M</math>使得对所有的字符串<math>s</math>相对于<math>U</math>的柯氏复杂性<math>C_U</math>（或者<math>K_U</math>）和相对于<math>M</math>的柯氏复杂性<math>C_M</math>（或者<math>K_M</math>）都满足
+:<math>C_U(s)\leq C_M(s)+c_M</math>。根据这点，通常确定了一个参照图灵机后就用<math>C</math>和<math>K</math>表示柯氏复杂性（省略<math>U</math>）。
+
+不难证明，任何字符串的柯氏复杂度都不会比字符串自身的长度超过太多。类似与上文中的0101字符串，它的柯氏复杂度和字符串的长度关系不大，因此并不复杂。
+
+與康托尔的[[对角论证法|对角论证法]]、[[哥德尔不完备定理|哥德尔不完备定理]]和图灵的[[停机问题|停机问题]]類似，柯氏复杂度的概念可以用于阐述和证明不可能性。
+
+==定义==
+
+柯氏复杂度可以适用于任何数学概念，但是本文只针对字符串。首先需要确定我们用以描述字符串的语言，它可以基于任何计算机语言，例如[[LISP|LISP]]、[[Pascal_(程式语言)|Pascal]]或[[Java字节码|Java字节码]]。如果 '''P''' 是一个可以输出字符串 ''x''的程序，则 '''P''' 是 ''x''的描述。描述长度就等于程序 '''P''' 作为字符串的长度，乘上每个字符的比特数。（例如，对于 [[ASCII|ASCII]]来说是7）
+
+我们也可以使用[[图灵机|图灵机]]的编码。每一个图灵机 '''M''' 都对应一个字符串 <'''M'''>。如果 '''M''' 是一个图灵机，给它输入字符串 ''w'' 它会输出字符串 ''x''，那么这段拼合起来的字符串 <'''M'''>＋''w'' 就是 ''x''的描述。这种描述更适合比较严谨的证明，通常是在正式研究中才会使用。在本文的讨论中会使用比较非正式的描述。 
+
+对于任何一个字符串 ''s'' ，都存在至少一个描述。可以用以下程序表示：
+
+  '''function''' GenerateFixedString()
+     '''return''' ''s''
+
+如果 ''s'' 的描述 ''d''(''s'') 长度达到最小（即使用最少的比特数），它就可以称为 ''s'' 的“最小描述”。同时，''d''(''s'')的长度（也就是这个描述使用的比特数）就是 ''s''的“柯氏复杂度”，写作 ''K''(''s'')。可以表示为： 
+
+:''K''(''s'') = |''d''(''s'')|.
+
+最小描述长度取决于选择什么语言来描述；但是改变描述语言所带来的长度变化是有限的，这个属性称作不变性理论（{{lang|en|invariance theorem}}）。
+
+==不变性理论==
+===非正式表述===
+一些描述语言可以被称作“最优的”（{{lang|en|optimal}}）。它们有如下属性：給定任意一个描述语言来描述一个对象，我们也可以用最优描述语言来描述該对象，只需要在原来的那段描述前面加上一段固定的前缀。这段前缀仅仅取决于使用哪一种描述语言，不取决于对对象的描述，也不取决于被描述的对象。
+
+以下是“最优描述语言”（{{lang|en|Optimal description language}}）的一个例子。这个语言中的描述都会包括以下两部分：
+
+* 第一部分描述了另一种描述语言。
+* 第二部分是對象在那一種描述語言下的表述。
+
+更技术性的说法是，第一部分是一段计算机程序，如果把第二部分输入这个程序，就会输出该对象。
+
+不变性理论指的是：对于任意的描述语言 ''L''，最优描述语言都至少和 ''L'' 同样有效，但是会增加一段固定的前缀。
+
+证明： 對於以''L''作為描述語言的任意一段描述 ''D''，''D'' 都可以转换成为最优描述语言下的一段描述，这段描述包括将 ''L'' 描述为一段计算机程序 ''P'' （前面提到的第一部分），然后将原来的描述 ''D'' 作为这段程序的输入（第二部分）。新的描述 ''D'' ’ 的长度（近似值）为：
+
+:|''D''’| = |''P''| + |''D''|
+
+''P'' 的长度为常数，不取决于 ''D'' ，所以，至多有一个常數項长度的前缀，不取决于描述对象。所以，最优描述语言在[[up_to|up to]]固定前缀的意义上是通用的。
+
+===更正式的描述===
+"'定理"'：设 ''K''<sub>1</sub> 和 ''K''<sub>2</sub> 是满足 [[图灵完备性|图灵完备性]]的描述语言 ''L''<sub>1</sub> 和 ''L''<sub>2</sub>的复杂度函数，则存在一个常数 ''c'' ，仅取决于对于语言 ''L''<sub>1</sub> 和 ''L''<sub>2</sub> 的选择，有：
+
+:∀''s''.  -''c'' ≤ ''K''<sub>1</sub>(''s'') - ''K''<sub>2</sub>(''s'') ≤ ''c''.
+
+'''证明'''：根据对称性，可以证明存在一个常数 ''c'' 对于所有的字符串 ''s'' 满足：
+
+:''K''<sub>1</sub>(''s'') ≤ ''K''<sub>2</sub>(''s'') + ''c''.
+
+然后，假设语言 ''L''<sub>1</sub> 中存在一个程序，相当于是 ''L''<sub>2</sub> 的[[解释器|解释器]]:
+
+   '''function''' InterpretLanguage('''string''' ''p'')
+
+其中 ''p'' 是 ''L''<sub>2</sub> 中的一个程序。解释器有以下属性：
+
+: 运行 <code>InterpretLanguage</code> ，输入 ''p'' 将会返回运行 ''p'' 的结果。
+
+然后，设 ''L''<sub>2</sub> 中的程序 '''P''' 是 ''s'' 的最小描述，则 <code>InterpretLanguage</code>('''P''') 将会返回字符串 ''s''。而 ''s'' 的描述长度，是以下两项之和：
+
+# 程序 <code>InterpretLanguage</code> 的长度，可以看做常数 ''c''。
+# '''P''' 的长度。根据定义，就是 ''K''<sub>2</sub>(''s'').
+
+以上证明了所需的上界。
+
+==历史与背景==
+[[算法信息论|算法信息论]]是计算机科学中的一个领域，研究柯氏复杂性和其他对于字符串（或者其他[[数据结构|数据结构]]）的复杂性度量。
+
+柯氏复杂性的理论和概念基于{{le|雷·所罗门诺夫|Ray Solomonoff}}的一些关键性理论。1960年，所罗门诺夫发表了《归纳推理的通用性理论导论》<ref>{{cite journal | authorlink=Ray Solomonoff | last=Solomonoff | first=Ray | url=http://world.std.com/~rjs/rayfeb60.pdf | format=PDF | title=A Preliminary Report on a General Theory of Inductive Inference | journal=Report V-131 | publisher=Zator Co. | location=Cambridge, Ma. | date=February 4, 1960 | access-date=2015-07-05 | archive-date=2020-08-02 | archive-url=https://web.archive.org/web/20200802001117/http://world.std.com/~rjs/rayfeb60.pdf | dead-url=no }} [http://world.std.com/~rjs/z138.pdf revision] {{Wayback|url=http://world.std.com/~rjs/z138.pdf |date=20200801232716 }}, Nov., 1960.</ref>，作为他所创立的{{le|算法概率论|Algorithmic probalility}}的一部分。在1964年发表的《信息与控制》的第一和第二部分 “归纳推理的正式理论” 中，他给出了一个更完整的描述。<ref>{{cite journal|url=http://linkinghub.elsevier.com/retrieve/pii/S0019995864902232|pages=1–22|title=A formal theory of inductive inference. Part I|journal=Information and Control|volume=7|issue=1|accessdate=2018-04-02|doi=10.1016/s0019-9958(64)90223-2|author=R.J. Solomonoff|archive-date=2021-03-01|archive-url=https://web.archive.org/web/20210301174025/https://linkinghub.elsevier.com/retrieve/pii/S0019995864902232|dead-url=no}}</ref><ref>{{cite journal|url=http://linkinghub.elsevier.com/retrieve/pii/S0019995864901317|pages=224–254|title=A formal theory of inductive inference. Part II|journal=Information and Control|volume=7|issue=2|accessdate=2018-04-02|doi=10.1016/s0019-9958(64)90131-7|author=R.J. Solomonoff|archive-date=2021-12-15|archive-url=https://web.archive.org/web/20211215074016/https://linkinghub.elsevier.com/retrieve/pii/S0019995864901317|dead-url=no}}</ref>
+
+安德雷·柯尔莫戈洛夫稍后于1965年在 ''Problems Inform. Transmission''<ref>{{cite journal|volume=1 |issue=1 |year=1965 |pages=1–7 |title=Three Approaches to the Quantitative Definition of Information |url=http://www.ece.umd.edu/~abarg/ppi/contents/1-65-abstracts.html#1-65.2 |journal=Problems Inform. Transmission |first=A.N. |last=Kolmogorov |deadurl=yes |archiveurl=https://web.archive.org/web/20110928032821/http://www.ece.umd.edu/~abarg/ppi/contents/1-65-abstracts.html |archivedate=2011-09-28 }}</ref> 上独立发表了这一理论。格里高利·柴廷也在 ''J. ACM'' 上发表了这一理论——柴廷的论文提交于1966年10月，于1968年12月修订，引用了所罗门诺夫和柯尔莫戈洛夫的论文。<ref>{{cite journal|title=On the Simplicity and Speed of Programs for Computing Infinite Sets of Natural Numbers|date=1969-07-01|journal=Journal of the ACM (JACM)|volume=16|issue=3|doi=10.1145/321526.321530|pages=407–422|issn=0004-5411|url=http://dl.acm.org/citation.cfm?id=321526.321530|accessdate=2018-04-02|author=Gregory J. Chaitin}}</ref>
+
+这个理论认为，在所有从对字符串的描述中解码出字符串的算法里，存在一个最优的算法。这个算法对于所有的字符串来说，都可以得到和其他算法同样短的代码，除去一段固定的附加代码，这段代码不取决于字符串，只取决于所选择的算法。所罗门诺夫用这个算法和它所允许的代码长度，定义了一个字符串的“普适概率”{{lang|en|universal probability}}，以对字符序列的归纳推断作为基础。柯尔莫哥诺夫利用这个理论定义了字符串的很多属性，包括复杂度、随机度和信息。
+
+当柯尔莫戈洛夫了解到所罗门诺夫的工作之后，承认了所罗门诺夫的发现在先。<ref>{{cite journal | last1=Kolmogorov | first1=A. | title=Logical basis for information theory and probability theory | journal=IEEE Transactions on Information Theory | volume=14|issue=5 | pages=662–664 | year=1968 | doi =10.1109/TIT.1968.1054210 }}</ref>在很长一段时间内，所罗门诺夫的工作在苏联比在西方更为人知晓。科学界的共识一般是把和复杂度有关的工作归功于柯尔莫戈洛夫，因为他主要研究序列的随机程度；而算法信息论的工作则归功于所罗门诺夫，他主要集中研究用普适概率分布来进行序列预测。这两个领域的边界，包括描述复杂度和概率通常被称为柯尔莫戈洛夫复杂度。计算机科学家李明认为这是[[马太效应|马太效应]]的体现。<ref>{{Cite book
+| edition = 2nd
+| publisher = Springer
+| isbn = 0-387-94868-6
+| last = Li
+| first = Ming
+| author2 = Paul Vitanyi
+| title = An Introduction to Kolmogorov Complexity and Its Applications
+| url = https://archive.org/details/introductiontoko00li
+|page=[https://archive.org/details/introductiontoko00li/page/n109 90]
+| date = 1997-02-27
+}}</ref>
+
+柯尔莫戈洛夫复杂度或者算法信息论有很多变体，其中一个广泛应用的概念是“自生成程序”{{lang|en|self-delimiting-program}}，主要来自于{{le|里奥尼德·列文|Leonid Levin}}（1974）。
+
+Mark Burgin基于[[布盧姆公理|布盧姆公理]]（Blum 1967），对于柯氏复杂度进行了公理化（Burgin 1982）。
+
+==基本结论==
+在以下讨论中，我们用 ''K''(''s'') 来表示字符串 ''s'' 的复杂度。
+
+显而易见，一个字符串的最小描述不可能超过字符串本身的长度太多。上文中的程序<code>GenerateFixedString</code> 可以输出 ''s'' ，长度比 ''s'' 稍长。
+
+定理：存在一个常数 ''c'' ，使得：
+
+:∀''s''. ''K''(''s'') ≤ |''s''| + ''c''
+
+===柯氏复杂性的不可计算性===
+定理：存在字符串，拥有任意大的柯氏复杂度。严格表述为：对于任意 ''n'' ∈ ℕ，存在一个字符串 ''s'' 的复杂度 ''K''(''s'') ≥ ''n''<ref group="note">。但是， ''s'' 的复杂度 ''K''(''s'') = ''n'' 的情况不一定对于所有 ''n'' 存在。例如，如果 ''n'' 不是7比特的倍数，没有任何 [[ASCII|ASCII]] 程序的长度会正好等于 ''n'' 比特</ref>
+
+证明：反证。如果定理不成立，则任意的无限长字符串，都可以使用有限个数，复杂性小于 ''n'' 比特的程序<ref group="note">长度为 ''n'' 比特的程序，共有 1 + 2 + 2<sup>2</sup> + 2<sup>3</sup> + ... + 2<sup>''n''</sup> = 2<sup>''n''+1</sup> − 1 个； cf. [[等比数列|等比数列]]。如果程序长度需要乘上7比特来计算的话，存在的程序会少一些。</ref> 来生成了。
+
+定理： ''K'' 不是一个[[可计算函数|可计算函数]]。也就是说，不存在一个程序，可以把字符串 ''s'' 作为输入，然后输出它的 ''K''(''s'')。
+
+证明：以下的反证法将使用类似Pascal语言的代码。为了证明的简单起见，该语言的描述（即其解释器）大概有 {{val|1400000}} 比特。下面开始反证法，假设有这样一个程序存在：
+
+   '''function''' KolmogorovComplexity('''string''' s)
+
+它可以把字符串 ''s'' 作为输入，然后输出它的 ''K''(''s'')；简单起见，假设這一函數的长度是 {{val|7000000000}} 比特。现在考虑另一段长度为 {{val|1288}} 比特的程序：
+
+   '''function''' GenerateComplexString()
+      '''for''' i = 1 '''to''' infinity:
+         '''for each''' string s '''of''' length exactly i
+            '''if''' KolmogorovComplexity(s) >= 8000000000
+               '''return''' s
+
+它将 <code>KolmogorovComplexity</code> 作为子程序，这个程序会从短到长检查所有的字符串，直到找到一个复杂度至少有 {{val|8000000000}} 比特的字符串 ''s'' <ref group="note">根据前一定理，存在一个字符串，使得这个 <code>for</code> 循环能够终止。</ref>。这也就意味着，任何短于 {{val|8000000000}} 比特的程序都不可能输出这个字符串。但是，以上的整个程序能够输出 ''s'' ，而其長度卻只有{{val|7001401288}} 比特<ref group=note>包括解释器和子程序 <code>KolmogorovComplexity</code>。</ref>，反证完毕。（如果 <code>KolmogorovComplexity</code> 的代码要更短一些，反证依然成立。如果它要更长，那么 <code>GenerateComplexString</code> 中使用的常数也可以相应变大<ref group=note>如果 <code>KolmogorovComplexity</code> 长度为 ''n'' 比特，那么使用在 <code>GenerateComplexString</code> 中的常数 ''m'' 需要变为 {{nobreak|''n'' + {{val|1400000}} + {{val|1218}} + 7·log<sub>10</sub>(''m'') < ''m''}}，不等式始终成立，因为 ''m'' 比 log<sub>10</sub>(''m'')增长得快。</ref>。）
+
+以上使用的反证法类似于{{le|佩里悖论|Berry paradox}}：“<sub>{{color|#8080ff|1}}</sub>不 <sub>{{color|#8080ff|2}}</sub>能 <sub>{{color|#8080ff|3}}</sub>用 <sub>{{color|#8080ff|4}}</sub>少 <sub>{{color|#8080ff|5}}</sub>于 <sub>{{color|#8080ff|6}}</sub>二 <sub>{{color|#8080ff|7}}</sub>十 <sub>{{color|#8080ff|8}}</sub>个 <sub>{{color|#8080ff|9}}</sub>字 <sub>{{color|#8080ff|10}}</sub>定 <sub>{{color|#8080ff|11}}</sub>义 <sub>{{color|#8080ff|12}}</sub>的 <sub>{{color|#8080ff|13}}</sub>最 <sub>{{color|#8080ff|14}}</sub>小 <sub>{{color|#8080ff|15}}</sub>整 <sub>{{color|#8080ff|16}}</sub>数”。也可以使用停机问题 ''H'' 的不可计算性来推导 ''K'' 的不可计算性，因为 ''K'' 和 ''H'' 是[[图灵等价|图灵等价]]的。
+
+它的一个结论，在程序员群体中被幽默地称为{{le|充分就业定理|Full employment theorem}}，其涵義之一是指不存在一个最优的规模优选编译器。
+
+===柯氏复杂性的链式法则===
+
+柯氏复杂性的链式法则，<ref>{{cite news
+  | first = A. 
+  | last = Zvonkin 
+  |author2=L. Levin  
+  | title = The complexity of finite objects and the development of the concepts of information and randomness by means of the theory of algorithms. 
+  | journal = Russian Mathematical Surveys 
+  | volume = 25
+  | number = 6
+  | pages = 83–124 
+  | year = 1970}}</ref>是指：
+
+:''K''(''X'',''Y'') = ''K''(''X'') + ''K''(''Y''|''X'') + ''O''(log(''K''(''X'',''Y''))).
+
+它说明，能够输出 ''X'' 和 ''Y'' 的最短程序，相当于输出 ''X'' 和已知 ''X'' 的情况下可以输出 ''Y'' 的程序之和再加上一个对数参数。使用这个法则，可以定义柯氏复杂性的[[互信息|互信息]]近似。
+
+==数据压缩==
+计算 ''K''(''s'')的上界很简单：只需要使用某种算法[[压缩|压缩]]字符串 ''s'' ，再把所选语言中的压缩算法加上压缩后的字符串，它们的和就是长度上界。其实这就相当于给定语言中的[[自解压缩档|自解压缩档]]。
+
+如果一个字符串 ''s'' 的一个描述长度不超过 |''s''|−''c'' 比特，则可以说这个字符串可以被压缩掉 ''c'' 。这相当于说 ''K''(''s'') ≤ |''s''|-''c''。否则的话，我们就说 ''s'' 不能被压缩掉 ''c'' 。如果一个字符串不能被压缩掉1，那么我们就说这个字符串是 ''不可压缩的'' 。根据[[鸽巢原理|鸽巢原理]]，每一个压缩后的字符串对应唯一的压缩前的字符串，所以{{le|不可压缩串|incompressible string}}一定存在。因为长度为 ''n'' 的字符串有 2<sup>''n''</sup> 个，但是只存在 2<sup>''n''</sup> - 1 个长度小于 ''n'' 的字符串， (i.e. 长度可能为 0,1,...,''n − 1)。 <ref group=note>因为长度为 ''L'' 的字符串有 {{nobr|1=''N''<sub>''L''</sub> = 2<sup>''L''</sup>}} 个，所以长度为 {{nowrap|1=''L'' = 0, 1, ..., ''n'' − 1}} 的字符串的个数为 {{nobr|''N''<sub>0</sub> + ''N''<sub>1</sub> + ... + ''N''<sub>''n''−1</sub>}} = {{nobr|2<sup>0</sup> + 2<sup>1</sup> + ... + 2<sup>''n''−1</sup>}}，是一个有限的等比数列求和 {{nobr|2<sup>0</sup> + 2<sup>1</sup> + ... + 2<sup>''n''−1</sup>}} = {{nobr|1 = 2<sup>0</sup> × (1 − 2<sup>''n''</sup>) / (1 − 2) = 2<sup>''n''</sup> − 1}}。</ref>
+
+由于同样的理由，大部分的字符串都是复杂的，也就是说难以被显著地压缩，它们的 ''K''(''s'')并不比 |''s''|， ''s''的长度小多少。准确地说，对于任意的 ''n'' ，有 2<sup>''n''</sup> 个长度为 ''n'' 的字符串。在这些字符串的样本空间中的[[离散型均匀分布|离散型均匀分布]]表明，对于每一个长度为 ''n'' 的字符串，权重为 2<sup>−''n''</sup> 。
+
+定理：对于长度为 ''n'' 的字符串组成的样本空间的离散型均匀分布来说，一个串不能被压缩以 ''c'' 的概率至少为 1 - 2<sup>−''c''+1</sup> + 2<sup>−''n''</sup>。
+
+证明：所有描述长度不超过 ''n''-''c'' 的字符串的数量，可以由以下等比数列得到：
+
+:1 + 2 + 2<sup>2</sup> + ... + 2<sup>''n''-''c''</sup> = 2<sup>''n''-''c''+1</sup> - 1.
+
+那么，还剩下至少：
+
+:2<sup>''n''</sup> - 2<sup>''n''-''c''+1</sup> + 1
+
+个长度为 ''n'' 的字符串不能够被压缩以 ''c'' 。对于单个字符串的概率，应该除以 2<sup>''n''</sup> 。
+
+
+==柴廷不完全定理==
+[[File:Kolmogorov_complexity_and_computable_lower_bounds_svg.svg|thumb]]来标示字符串的长度。大部分的串是不可压缩的，也就是说它们的柯氏复杂度比它们的长度要多一个常数。图中展示了17个不可压缩的字符串，是几乎垂直的那些线段。根据柴廷不完全定理，任何计算柯氏复杂性的下界的程序都不可能超过某个极限，且不取决于输入的字符串 ''s''。]]
+
+我们已经知道，在所有可能的字符串里，大部分的串都是复杂的，也就是说它们不能被显著地压缩。然而，如果一个串的复杂度超过了某个阈值，则它不能被形式化地证明为复杂的。形式化的证明如下：首先，为[[自然数|自然数]]建立一个[[公理系统|公理系统]] '''S''' 。这个公理系统需要足够强，可以判定关于字符串复杂度的断言 '''A''' ，并且和 '''S''' 中的 '''F'''<sub>'''A'''</sub> 相关联。这个关联需要有以下属性：
+
+如果 '''F'''<sub>'''A'''</sub>可以被 '''S''' 中的定理证明，则相对应的断言 '''A''' 为真。这个「形式化」可以用人工编码例如[[哥德尔数|哥德尔数]]的方法实现，或者依照对于 '''S''' 的预期解释来进行形式化。
+
+定理：存在一个常数 ''L'' （ ''L'' 仅取决于特定的公理系统以及描述语言的选择），使得没有任何一个 ''s'' 满足以下情况：
+
+:''K''(''s'') ≥  ''L'' (在 '''S''' 中形式化)
+
+可以在公理系统 '''S''' 中证明。
+
+考虑到占多数的几乎不可压缩的串，大部分这样的情况都会成立。
+
+这个结论的证明脱胎于佩里悖论中使用的[[自指|自指]]结构。使用反证法，如果定理不成立，则：
+
+:'''假设 (X)''': 对于任何整数 ''n'' ，存在一个字符串t ''s'' ，在 '''S''' 中存在不等式 "''K''(''s'') ≥ ''n''"的一个证明。 (假设可以在 '''S''' 内形式化)。
+
+我们可以使用以下方式列举 '''S''' 中的所有形式化证明
+
+   '''function''' NthProof('''int''' ''n'')
+
+它接受输入 ''n'' ，然后输出一个证明。这个函数会列举所有的证明，有一些证明是针对我们并不关心的一些公式，尽管在 '''S''' 的语言中所有可能的证明都是关于某个 ''n'' 的。其中有一些证明是针对复杂度公式  ''K''(''s'') ≥ ''n''，其中 ''s'' 和 ''n'' 都是语言 '''S''' 中的常数。以下程序
+
+   '''function''' NthProofProvesComplexityFormula('''int''' ''n'')
+
+可以确定，第 ''n'' 个证明是否证明了复杂度公式  ''K''(''s'') ≥ ''n''。字符串 ''s'' 和整数 ''L'' 分别可以由以下程序计算：
+
+   '''function''' StringNthProof('''int''' ''n'')
+
+   '''function''' ComplexityLowerBoundNthProof('''int''' ''n'')
+
+考虑以下程序：
+
+   '''function''' GenerateProvablyComplexString('''int''' ''n'')
+      '''for''' i = 1 to infinity:
+         '''if'''  NthProofProvesComplexityFormula(i) '''and''' ComplexityLowerBoundNthProof(i) ≥ ''n''
+            '''return''' StringNthProof(''i'')
+
+对于给定的 ''n'' ，这个程序会尝试所有的证明，直到找到一个字符串以及 '''S''' 中关于公式''K''(''s'') ≥ ''L'' （其中 ''L'' ≥ ''n''）的[[形式证明|形式证明]]。如果假设（X）成立，那么这个程序会停止。这个程序的长度为 ''U''. 存在一个整数 ''n''<sub>0</sub> 使得 ''U'' + log<sub>2</sub>(''n''<sub>0</sub>) + ''C'' < ''n''<sub>0</sub>，其中 ''C'' 是以下程序的前缀：
+
+    '''function''' GenerateProvablyParadoxicalString()
+       '''return''' GenerateProvablyComplexString(''n''<sub>0</sub>)
+
+（注意 ''n''<sub>0</sub> 是直接包含在以上函数中的，而前面的 log<sub>2</sub>(''n''<sub>0</sub>) 已经包含了它） 程序 GenerateProvablyParadoxicalString 输出的字符串 ''s'' ，存在一个 ''L'' 使得 ''K''(''s'') ≥ ''L'' 可以在 '''S''' 中形式化证明，且 ''L'' ≥ ''n''<sub>0</sub>。所以，''K''(''s'') ≥ ''n''<sub>0</sub> 成立。但是， ''s'' 也可以被长度为 ''U'' + log<sub>2</sub>(''n''<sub>0</sub>) + ''C'' 的程序描述，所以它的复杂度小于 ''n''<sub>0</sub>。以上矛盾证明了 '''假设 (X)''' 不能成立。
+
+== 參見 ==
+* [[柯爾莫哥洛夫公理|柯爾莫哥洛夫公理]]
+* [[零一律|零一律]]
+* [[柯爾莫哥洛夫空間|柯爾莫哥洛夫空間]]
+
+==注释==
+{{Reflist|group=note}}
+
+== 参考资料 ==
+{{Reflist|colwidth=30em}}
+
+== 延伸閱讀 ==
+* {{cite journal | authorlink=曼纽尔·布卢姆|last=Blum | title=On the size of machines | journal=Information and Control |first= M. | volume=11 | issue=3 | pages=257 | year=1967 | doi = 10.1016/S0019-9958(67)90546-3 }}
+* Brudno, A. Entropy and the complexity of the trajectories of a dynamical system., Transactions of the Moscow Mathematical Society, 2:127{151, 1983.
+* Burgin, M. (1982), "Generalized Kolmogorov complexity and duality in theory of computations", ''Notices of the Russian Academy of Sciences'', v.25, No. 3, pp. 19–23.
+* Cover, Thomas M. and Thomas, Joy A., ''Elements of information theory'', 1st Edition.  New York: Wiley-Interscience, 1991. ISBN 978-0-471-06259-2. 2nd Edition. New York: Wiley-Interscience, 2006. ISBN 978-0-471-24195-9.
+* Lajos, Rónyai and Gábor, Ivanyos and Réka, Szabó, ''Algoritmusok''. TypoTeX, 1999. ISBN 978-963-279-014-5
+* {{cite book|author=Li, Ming and Vitányi, Paul|title=An Introduction to Kolmogorov Complexity and Its Applications|publisher=Springer|year=1997 |isbn= 978-0387339986}} [http://citeseer.ist.psu.edu/li97introduction.html First chapter on citeseer] {{Wayback|url=http://citeseer.ist.psu.edu/li97introduction.html |date=20080517044147 }}
+* Yu Manin, ''A Course in Mathematical Logic'', Springer-Verlag, 1977. ISBN 978-0-7204-2844-5
+* Sipser, Michael, ''Introduction to the Theory of Computation'', PWS Publishing Company, 1997. ISBN 978-0-534-95097-2.
+* [[Chris_Wallace_(computer_scientist)|Wallace, C. S]].  and Dowe, D. L., [http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.17.321 Minimum Message Length and Kolmogorov Complexity] {{Wayback|url=http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.17.321 |date=20101017233829 }}, Computer Journal, Vol. 42, No. 4, 1999).
+* 李明，[荷]P.M.B.威塔涅（Paul Vitanyi），描述复杂性，科学出版社，北京，1998
+* [http://homepages.cwi.nl/~paulv/kolmogorov.html Ming Li and Paul Vitanyi, An Introduction to Kolmogorov Complexity and Its Applications, 2nd Edition, Springer Verlag, 1997] {{Wayback|url=http://homepages.cwi.nl/~paulv/kolmogorov.html |date=20060514235924 }}
+
+==外部链接==
+* [https://web.archive.org/web/20050115091525/http://kolmogorov.com/ The Legacy of Andrei Nikolaevich Kolmogorov]
+* [https://web.archive.org/web/20150215210504/http://www.cs.umaine.edu/~chaitin/ Chaitin's online publications]
+* [http://www.idsia.ch/~juergen/ray.html Solomonoff's IDSIA page] {{Wayback|url=http://www.idsia.ch/~juergen/ray.html |date=20060614184842 }}
+* [http://www.idsia.ch/~juergen/kolmogorov.html Generalizations of algorithmic information] {{Wayback|url=http://www.idsia.ch/~juergen/kolmogorov.html |date=20060518035534 }} by [[Juergen_Schmidhuber|J. Schmidhuber]]
+* [http://homepages.cwi.nl/~paulv/kolmogorov.html Ming Li and Paul Vitanyi, An Introduction to Kolmogorov Complexity and Its Applications, 2nd Edition, Springer Verlag, 1997.] {{Wayback|url=http://homepages.cwi.nl/~paulv/kolmogorov.html |date=20060514235924 }}
+* [http://tromp.github.io/cl/cl.html Tromp's lambda calculus computer model offers a concrete definition of K()] {{Wayback|url=http://tromp.github.io/cl/cl.html |date=20210121232529 }}
+* Universal AI based on Kolmogorov Complexity ISBN 978-3-540-22139-5 by [[Marcus_Hutter|M. Hutter]]:  ISBN 978-3-540-22139-5
+* [http://www.csse.monash.edu.au/~dld David Dowe] {{Wayback|url=http://www.csse.monash.edu.au/~dld |date=20060212185445 }}'s [http://www.csse.monash.edu.au/~dld/MML.html Minimum Message Length (MML)] {{Wayback|url=http://www.csse.monash.edu.au/~dld/MML.html |date=20060209113220 }} and [http://www.csse.monash.edu.au/~dld/Occam.html Occam's razor] {{Wayback|url=http://www.csse.monash.edu.au/~dld/Occam.html |date=20060516120226 }} pages.
+* P. Grunwald, M. A. Pitt and I. J. Myung (ed.), [http://mitpress.mit.edu/catalog/item/default.asp?sid=4C100C6F-2255-40FF-A2ED-02FC49FEBE7C&ttype=2&tid=10478 Advances in Minimum Description Length: Theory and Applications] {{Wayback|url=http://mitpress.mit.edu/catalog/item/default.asp?sid=4C100C6F-2255-40FF-A2ED-02FC49FEBE7C&ttype=2&tid=10478 |date=20060619060230 }}, M.I.T. Press, April 2005, ISBN 978-0-262-07262-5.
+
+{{压缩方法}}
+
+[[Category:计算理论|Category:计算理论]]
+[[Category:算法信息论|Category:算法信息论]]
+[[Category:递归论|Category:递归论]]
+[[Category:信息论|Category:信息论]]

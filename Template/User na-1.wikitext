@@ -1,0 +1,1 @@
+{{User language-1|na|Amuno eman etsimine '''[[:Category:na-1 使用者|ikuri ian]]''' isitsiet ituga '''[[:Category:na 使用者|Dorerin Naoero]]'''.|瑙鲁语}} <noinclude></noinclude>

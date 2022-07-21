@@ -1,0 +1,1 @@
+{{{1}}}<span style="font-size: small;"><span id="coordinates">[[经纬度|-{zh-hans:坐标;zh-hant:座標}-]]：{{{1}}}</span></span><noinclude>{{template doc|Template:Coord/sub doc}}</noinclude>

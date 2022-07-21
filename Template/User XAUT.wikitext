@@ -1,0 +1,10 @@
+{{Userbox
+  |id=<!--不是使用在条目中的非自由版权图像，根据[[Wikipedia:合理使用]]，不能在非条目名字空间展示：
+Ymedulogo.jpg
+-->
+  |id-c=#fff
+  |info=這個用戶是'''[[西安理工大学]]'''的校友、學生或老師。
+  |info-c=#fefe00
+  |info-s=10
+  |border-c=#80017f
+}}<includeonly>[[Category:西安理工大学维基人|{{PAGENAME}}]]</includeonly>

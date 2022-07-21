@@ -1,0 +1,1 @@
+{{移動}}到[[s:|维基文库]]<noinclude>{{pp-protected|small=yes}}[[Category:投票模板|移动]]</noinclude>

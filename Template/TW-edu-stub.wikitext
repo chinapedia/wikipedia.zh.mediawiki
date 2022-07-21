@@ -1,0 +1,1 @@
+#REDIRECT [[Template:台湾教育小作品]]

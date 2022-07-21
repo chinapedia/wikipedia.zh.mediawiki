@@ -1,0 +1,229 @@
+{{noteTA
+|G1=IT
+|1=zh-cn:声明; zh-tw:宣告;
+}}
+{{lowercase|typedef}}
+在[[C語言|C]]和[[C++|C++]][[程式語言|程式語言]]中，<code>'''typedef'''</code>是一個[[保留字|關鍵字]]。它用來對一個[[資料類型|資料類型]]取一個別名，目的是為了使[[原始碼|原始碼]]更易於閱讀和理解。它通常用於簡化宣告複雜的類型組成的結構 ，但它也常常在各種長度的整數資料型別中看到，例如<code>size_t</code>和<code>time_t</code>。
+
+== 語法 ==
+<code>typedef</code>的語法是 : <code>'''typedef''' ''typedeclaration'';</code><ref>{{cite web|url=http://en.cppreference.com/w/cpp/keyword/typedef|title=typedef specifier|website=cppreference.com|access-date=18 June 2016|archive-date=2018-03-10|archive-url=https://web.archive.org/web/20180310010008/http://en.cppreference.com/w/cpp/keyword/typedef|dead-url=no}}</ref>
+
+創建 <code>Length</code> 作為 <code>int</code> 的別名 : <syntaxhighlight lang="c++">typedef int Length;</syntaxhighlight>創建 <code>PFI</code> 作為一個指向 "一個擁有兩個 <code>char *</code> 當作參數並回傳 <code>int</code> 的函式" 的指標的別名<syntaxhighlight lang="c++">typedef int (*PFI)(char *, char *);</syntaxhighlight>
+
+== 使用範例 ==
+
+=== 創建一個具有特別意義的資料型別 ===
+<code>typedef</code>會被用來指定一種資料型別的意義。
+
+例如 :  以下示範一個普通的宣告，速度及分數都被宣告為<code>int</code>
+<syntaxhighlight lang="c++">
+int current_speed ; 
+int high_score ; 
+
+void congratulate(int your_score) 
+{ 
+    if (your_score > high_score) 
+        ...
+</syntaxhighlight>通過<code>typedef</code>來指定新的資料型別的意義:<syntaxhighlight lang="c++">
+typedef int km_per_hour ;
+typedef int points ;
+
+km_per_hour current_speed ;  //"km_per_hour" is synonymous with "int" here,
+points high_score ;          //and thus, the compiler treats our new variables as integers.
+
+
+void congratulate(points your_score) {
+    if (your_score > high_score)
+        ...
+</syntaxhighlight>前面兩段程式碼運作狀況一樣，但是使用<code>typedef</code>的第二段程式碼更清楚的表示了兩個變數(score和speed)，雖然資料型別都是<code>int</code>，卻是各自代表不同的意義，且他們的資料並不相容。
+
+但請注意，其清楚的表示不同意義只是對於工程師而言，C/C++的編譯器認為兩個變數都是<code>int</code>時，並不會顯示警告或錯誤，如: 以下程式碼，使用宣告為速度的變數作為<code>congratulate</code>函式的參數 : <syntaxhighlight lang="c++">
+void foo() 
+{ 
+    km_per_hour km100 = 100; 
+    congratulate(km100);
+</syntaxhighlight>
+
+但是，雖然在上面的程式碼中，編譯器認為"km_per_hour"等於<code>int</code>，但在使用前綴 <code>unsigned</code>, <code>long</code>, <code>signed</code>時，兩者並不能互換使用。<syntaxhighlight lang="c++">
+void foo() {
+    unsigned int a;         // Okay
+    unsigned km_per_hour b; // Compiler complains
+    long int c;             // Okay
+    long km_per_hour d;     // Compiler complains
+</syntaxhighlight>
+
+另一个例子：
+
+<syntaxhighlight lang="c">
+int coxes;
+int jaffa;
+...
+coxes++;
+...
+if (jaffa == 10)
+...
+</syntaxhighlight>
+
+現在來看以下程式碼：
+
+ <syntaxhighlight lang="c">
+typedef int Apple;
+typedef int Orange;
+Apple coxes;
+Orange jaffa;
+...
+coxes++;
+...
+if (jaffa == 10)
+...
+</syntaxhighlight>
+
+這兩段程式碼都做同樣的一件事。第二個例子使用了 <code>typedef</code>，使其更易於了解將要進行什麼。也就是一個變數包含關於蘋果的資訊，而另一個包含關於橘子的資訊。
+
+=== 簡化宣告語法 ===
+
+ <syntaxhighlight lang="c">
+struct var {
+    int data1;
+    int data2;
+    char data3;
+};
+</syntaxhighlight>
+
+此處使用者定義一個資料類型 ''<code>var</code>''。
+
+像這樣建立一個 ''<code>var</code>'' 類型的變數，程式碼必須寫為（注意，在 C++ 中宣告一個 <code>struct</code> 時，同時也隱含了 <code>typedef</code>，C 則沒有）：
+
+<syntaxhighlight lang="c">
+struct var a;
+</syntaxhighlight>
+
+
+在例子的最末處加入一行語句：
+
+ <syntaxhighlight lang="c">
+typedef struct var newtype;
+</syntaxhighlight>
+
+現在要建立類型 ''<code>var</code>'' 的變數時，程式碼可以寫為：
+
+<syntaxhighlight lang="c">
+newtype a;
+</syntaxhighlight>
+
+這樣就更容易閱讀了，因為不用再為每一個 ''var'' 類型的變數加上關鍵字 ''<code>struct</code>''。
+
+也可以給陣列使用 <code>typedef</code> 宣告。<syntaxhighlight lang="c++">
+typedef BaseType NewType [arrSize];
+</syntaxhighlight>這樣就可以在宣告一個 ''<code>BaseType</code>'' 類型和 ''<code>arrSize</code>'' 大小的新陣列時，將程式碼寫為：<syntaxhighlight lang="c++">
+NewType array;
+</syntaxhighlight>
+
+=== 與陣列一起使用 ===
+<code>typedef</code>可以簡單的跟陣列一起使用。例如 : <syntaxhighlight lang="c++">
+typedef char arrType[6];    // type name: arrType
+                            // new type: char[6]
+
+arrType arr={1,2,3,4,5,6};  // same as: char arr[6]={1,2,3,4,5,6}
+
+arrType *pArr;              // same as: char (*pArr)[6];
+</syntaxhighlight>在這裡，<code>arrType</code>是<code>char[6]</code>的別稱。而<code>arrType *pArr;</code>則表示<code>pArr</code>是一個指向儲存<code>char[6]</code>型別記憶體的指標。
+
+=== 與指標一起使用 ===
+可以使用typedef來定義一個新的指標型別 : <syntaxhighlight lang="c++">
+typedef int *intptr;   // type name: intptr
+                       // new type: int*
+
+intptr ptr;            // same as: int *ptr
+</syntaxhighlight>在上面那段程式碼中，<code>intptr</code>是一個 指標型態<code>int*</code>的 新的別名。<code>intptr ptr;</code>宣告了一個變數(<code>ptr</code>)，其資料型別是<code>int*</code>。如此一來<code>ptr</code>就是一個 可以指向一段儲存<code>int</code>資料的記憶體 的指標了。
+
+使用<code>typedef</code>來定義一個新的指標型別有時候會造成一些困惑 : <syntaxhighlight lang="c++">
+typedef int *intptr;
+
+intptr cliff, allen;        // both cliff and allen are int* type
+
+intptr cliff2, *allen2;     // cliff2 is int* type, but allen2 is int** type
+                            // same as: intptr cliff2;
+                            //          intptr *allen2;
+</syntaxhighlight>在上面的程式碼中,''<code>ntptr cliff, allen;</code>''表示宣告兩個變數，其資料型別是<code>int*</code>，而<code>intptr *allan2</code>則使<code>allen2</code>的型別成為<code>int**</code>
+
+=== 與結構指標一起使用 ===
+<code>Typedef</code>可以跟[[結構體_(C語言)|結構體]][[指標_(電腦科學)|指標]]一起使用。如下 : <syntaxhighlight lang="c++">
+struct Node {
+    int data;
+    struct Node *nextptr;
+};
+</syntaxhighlight>使用<code>typedef</code>可以改寫成如下 : <syntaxhighlight lang="c++">
+typedef struct Node Node;
+struct Node {
+    int data;
+    Node *nextptr;
+};
+</syntaxhighlight>在[[C語言|C語言]]中，可以在一行中宣告複數的變數，不管其是不是指標。不管如何，如果你要宣告指標，必須在每個變數前面加上星號。
+
+在下面的程式碼中，工程師可能會以為<code>errptr</code>是一個指標，這個可能會引起一些錯誤。<syntaxhighlight lang="c++">
+struct Node *startptr, *endptr, *curptr, *prevptr, errptr, *refptr;
+</syntaxhighlight>如果你用<code>typedef</code>定義一個<code>Node *</code>，這可以保證所有的變數都是一個指向一個<code>structure type</code>的指標。<syntaxhighlight lang="c++">
+typedef struct Node* NodePtr;
+...
+NodePtr startptr, endptr, curptr, prevptr, errptr, refptr;
+</syntaxhighlight>
+
+=== 與函式指標一起使用 ===
+先看看以下這段尚未使用<code>typedef</code>的程式碼：<syntaxhighlight lang="c++">
+int do_math(float arg1, int arg2) {
+    return arg2;
+}
+
+int call_a_func(int (*call_this)(float, int)) {
+    int output = call_this(5.5, 7);
+    return output;
+}
+
+int final_result = call_a_func(&do_math);
+</syntaxhighlight>這段程式碼可以被改寫成如下：<syntaxhighlight lang="c++">
+typedef int (*MathFunc)(float, int);
+
+int do_math(float arg1, int arg2) {
+    return arg2;
+}
+
+int call_a_func(MathFunc call_this) {
+    int output = call_this(5.5, 7);
+    return output;
+}
+
+int final_result = call_a_func(&do_math);
+</syntaxhighlight>在這裡，<code>MathFunc</code>是一個指標，指向一個回傳<code>int</code>並以一個<code>float</code>和一個<code>int</code>作為參數使用的函式。當一個函式被當作參數使用時，如果少了<code>typedef</code>它可能會變得難以了解。
+
+以下是<code>signal(3)</code>(來自[[FreeBSD|FreeBSD]])的函數原型：<syntaxhighlight lang="c++">
+void (*signal(int sig, void (*func)(int)))(int);
+</syntaxhighlight>上面宣告的函式相當的神祕，因為它沒有清楚的顯示它以什麼函式當作參數，或回傳了什麼資料型別。一個初心者工程師甚至可能以為它接收一個<code>int</code>作為參數，並不回傳任何東西。但它其實接收了一個<code>int</code>和一個<code>function pointer</code>作為參數，並回傳了一個<code>function pointer</code>。它可以被改寫成以下程式碼：<syntaxhighlight lang="c++">
+typedef void (*sighandler_t)(int);
+sighandler_t signal(int sig, sighandler_t func);
+</syntaxhighlight>
+
+===  用來型別轉換  ===
+<code>typedef</code>同時可以用來[[類型轉換|類型轉換]]。例如：<syntaxhighlight lang="c++">
+typedef int (*funcptr)(double);         // pointer to function taking a double returning int
+funcptr x = (funcptr) NULL;             // C or C++
+funcptr y = funcptr(NULL);              // C++ only
+funcptr z = static_cast<funcptr>(NULL); // C++ only
+</syntaxhighlight>左側，<code>funcptr</code>用來宣告變數；右側，<code>funcptr</code>則用來轉換值的型態。
+
+如果少了<code>typedef</code>，替換使用宣告語法和型別轉換語法是幾乎不能做到的。例如：<syntaxhighlight lang="c++">
+void *p = NULL;
+int (*x)(double)  = (int (*)(double)) p; // This is legal
+int (*)(double) y = (int (*)(double)) p; // Left-hand side is not legal
+int (*z)(double)  = (int (*p)(double));  // Right-hand side is not legal
+</syntaxhighlight>
+
+== 外部連結 ==
+*[http://www.cprogramming.com/tutorial/typedef.html Cprogramming.com]{{Wayback|url=http://www.cprogramming.com/tutorial/typedef.html |date=20070402152721 }} - 詳細的討論
+
+== 參照 ==
+*[[抽象資料型別|抽象資料型別]]
+*[[C_syntax|C syntax]]
+
+[[Category:C語言|Category:C語言]]
+[[Category:C++|Category:C++]]

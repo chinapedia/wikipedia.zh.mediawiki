@@ -1,0 +1,81 @@
+{{otheruses|基于原型编程}}
+'''原型模式'''是[[创建型模式|创建型模式]]的一种，其特点在于通过「复制」一个已经存在的[[实例|实例]]来返回新的实例,而不是新建实例。被复制的实例就是我们所称的「原型」，这个原型是可定制的。
+
+原型模式多用于创建复杂的或者耗时的实例，因为这种情况下，复制一个已经存在的实例使程序运行更高效；或者创建值相等，只是命名不一样的同类数据。
+
+==结构==
+[[File:Prototype_UML.svg|thumb]]类图]]
+
+== 实现 ==
+
+=== Java ===
+<syntaxhighlight lang="Java">
+ /** Prototype Class **/
+ public class Cookie implements Cloneable {
+   
+    public Object clone() throws CloneNotSupportedException
+    {
+        //In an actual implementation of this pattern you would now attach references to
+        //the expensive to produce parts from the copies that are held inside the prototype.
+        return (Cookie) super.clone();
+    }
+ }
+ 
+ /** Concrete Prototypes to clone **/
+ public class CoconutCookie extends Cookie { }
+ 
+ /** Client Class**/
+ public class CookieMachine
+ {
+ 
+   private Cookie cookie;//cookie必须是可复制的
+ 
+     public CookieMachine(Cookie cookie) { 
+         this.cookie = cookie; 
+     } 
+
+    public Cookie makeCookie()
+    {
+        try
+        {
+            return (Cookie) cookie.clone();
+        } catch (CloneNotSupportedException e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+    } 
+
+ 
+     public static void main(String args[]){ 
+         Cookie tempCookie =  null; 
+         Cookie prot = new CoconutCookie(); 
+         CookieMachine cm = new CookieMachine(prot); //设置原型
+         for(int i=0; i<100; i++) 
+             tempCookie = cm.makeCookie();//通过复制原型返回多个cookie 
+     } 
+ }
+</syntaxhighlight>
+
+
+== 引用 ==
+{{reflist}}
+==来源==
+*{{cite book |
+ author=[[Erich_Gamma|Gamma, Erich]]; [[Richard_Helm|Helm, Richard]]; Johnson, Ralph; Vlissides, John |
+ title=[[Design_Patterns|Design Patterns: Elements of Reusable Object-Oriented Software]] |
+ publisher=Addison-Wesley |
+ year=1994 |
+ isbn=0-201-63361-2
+ }}
+
+== 参见 ==
+{{Wikibooks|Computer Science Design Patterns|Prototype|Prototype implementations in various languages}}
+* [[函数原型|函数原型]]
+
+==外部链接==
+* [http://w3sdesign.com/ The Design Patterns Memory] {{Wayback|url=http://w3sdesign.com/ |date=20201124085622 }}
+
+
+{{软件设计模式}}
+[[Category:软件设计模式|Category:软件设计模式]]

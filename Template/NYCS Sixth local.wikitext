@@ -1,0 +1,3 @@
+{{#ifeq:{{{exclude}}}|F||{{NYCS time 2|F|icon=alltimes|text=all times|dicon=rushpeak|dtext=two rush hour trains, peak direction|punct={{#if:{{{complex|}}}|{{#switch:{{{complex}}}|end=,and|#default={{#ifeq:{{{exclude}}}|M|and|,}}}}|,}}|time={{{time|}}}}}{{NYCS br|punct={{#if:{{{complex|}}}|{{#switch:{{{complex}}}|end=,and|#default=,}}|{{#if:{{{exclude|}}}||,and}}}}|time={{{time|}}}}}}}{{#if:{{{exclude|}}}||&#8203;}}{{#ifeq:{{{exclude}}}|M||{{NYCS time 2|M|icon=weekdaysonly|text=Weekday rush hours, middays and early evenings|time={{{time|}}}}}}}<noinclude>
+[[Category:紐約地鐵模板|{{PAGENAME}}]]
+</noinclude>

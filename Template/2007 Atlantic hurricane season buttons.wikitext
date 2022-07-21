@@ -1,0 +1,146 @@
+{{Hurricane_season_bar_start
+|year=2007
+}}
+{{Hurricane_season_bar_button
+|buttonspacing=0.25em
+|intensity={{Storm_colour|storm}}
+|stormname=Andrea
+|strength=Subtropical Storm
+|linkname=2007年亚热带风暴安德烈亚
+|storminitial=A
+}}
+{{Hurricane_season_bar_button
+|buttonspacing=0.25em
+|intensity={{Storm_colour|storm}}
+|stormname=Barry
+|strength=Tropical Storm
+|linkname=2007年热带风暴巴里
+|storminitial=B
+}}
+{{Hurricane_season_bar_button
+|buttonspacing=0.25em
+|intensity={{Storm_colour|storm}}
+|stormname=Chantal
+|strength=Tropical Storm
+|linkname=2007年热带风暴尚塔尔
+|storminitial=C
+}}
+{{Hurricane_season_bar_button
+|buttonspacing=0.25em
+|intensity={{Storm_colour|cat5}}
+|stormname=Dean
+|strength=Hurricane
+|linkname=颶風迪安
+|storminitial=D
+}}
+{{Hurricane_season_bar_button
+|buttonspacing=0.25em
+|intensity={{Storm_colour|storm}}
+|stormname=Erin
+|strength=Tropical Storm
+|linkname=2007年热带风暴艾琳
+|storminitial=E
+}}
+{{Hurricane_season_bar_button
+|buttonspacing=0.25em
+|intensity={{Storm_colour|cat5}}
+|stormname=Felix
+|strength=Hurricane
+|linkname=颶風菲利克斯
+|storminitial=F
+}}
+{{Hurricane_season_bar_button
+|buttonspacing=0.25em
+|intensity={{Storm_colour|storm}}
+|stormname=Gabrielle
+|strength=Tropical Storm
+|linkname=2007年热带风暴加布里埃尔
+|storminitial=G
+}}
+{{Hurricane_season_bar_button
+|buttonspacing=0.25em
+|intensity={{Storm_colour|cat1}}
+|stormname=Humberto
+|strength=Hurricane
+|linkname=2007年飓风温贝托
+|storminitial=H
+}}
+{{Hurricane_season_bar_button
+|buttonspacing=0.25em
+|intensity={{Storm_colour|storm}}
+|stormname=Ingrid
+|strength=Tropical Storm
+|linkname=2007年大西洋颶風季#热带风暴英格丽
+|storminitial=I
+}}
+</tr>
+<tr><td><!--pixel-wide gap--></td></tr>
+<tr>
+{{Hurricane_season_bar_button
+|buttonspacing=0.25em
+|intensity={{Storm_colour|depression}}
+|stormname=10L
+|strength=Tropical Depression
+|linkname=2007年第十号热带低气压
+|storminitial=10
+}}
+{{Hurricane_season_bar_button
+|buttonspacing=0.25em
+|intensity={{Storm_colour|storm}}
+|stormname=Jerry
+|strength=Tropical Storm
+|linkname=2007年大西洋颶風季#热带风暴傑里
+|storminitial=J
+}}
+{{Hurricane_season_bar_button
+|buttonspacing=0.25em
+|intensity={{Storm_colour|cat1}}
+|stormname=Karen
+|strength=Hurricane
+|linkname=2007年飓风卡伦
+|storminitial=K
+}}
+{{Hurricane_season_bar_button
+|buttonspacing=0.25em
+|intensity={{Storm_colour|cat1}}
+|stormname=Lorenzo
+|strength=Hurricane
+|linkname=2007年飓风洛伦佐
+|storminitial=L
+}}
+{{Hurricane_season_bar_button
+|buttonspacing=0.25em
+|intensity={{Storm_colour|storm}}
+|stormname=Melissa
+|strength=Tropical Storm
+|linkname=2007年大西洋颶風季#热带风暴梅利莎
+|storminitial=M
+}}
+{{Hurricane_season_bar_button
+|buttonspacing=0.25em
+|intensity={{Storm_colour|depression}}
+|stormname=15L
+|strength=Tropical Depression
+|linkname=2007年大西洋颶風季#第十五号热带低气压
+|storminitial=15
+}}
+{{Hurricane_season_bar_button
+|buttonspacing=0.25em
+|intensity={{Storm_colour|cat1}}
+|stormname=Noel
+|strength=Hurricane
+|linkname=飓风诺埃尔
+|storminitial=N
+}}
+{{Hurricane_season_bar_button
+|buttonspacing=0.25em
+|intensity={{Storm_colour|storm}}
+|stormname=Olga
+|strength=Tropical Storm
+|linkname=2007年热带风暴奥尔加
+|storminitial=O
+}}
+<div><td><td><div style="width: 2.0em; text-align: center; valign: middle; margin-right: 0.25em; margin-top: 0.25em; background-color: #{{storm colour|cat5}};"><span>{{Hurricane status small|category=cat5||type={{{type}}}}}</span></td><td>[[颶風迪安|D]]<br><small>（[[飓风迪安的气象历史|历史]]）</small></td></td></div>
+{{Hurricane_season_bar_end}}<noinclude>
+[[Category:大西洋颶風季導航模板]]
+</noinclude>

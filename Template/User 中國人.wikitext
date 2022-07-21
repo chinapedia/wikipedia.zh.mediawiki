@@ -1,0 +1,1 @@
+#REDIRECT [[Template:User 炎黃子孫]]

@@ -1,0 +1,106 @@
+'''霍爾邏輯'''（{{lang-en|Hoare Logic}}），又稱'''弗洛伊德-霍爾邏輯'''（{{lang|en|Floyd–Hoare logic}}），是[[英国|英国]][[计算机科学家|计算机科学家]][[東尼·霍爾|東尼·霍爾]]开发的形式系统，这个系统的用途是为了使用严格的[[数理逻辑|数理逻辑]]推理來替[[计算机程序|计算机程序]]的[[正确性|正确性]]提供一组逻辑规则。
+
+這個想法起源於[[罗伯特·弗洛伊德|罗伯特·弗洛伊德]]於較早的研究，他为[[流程图|流程图]]提供了类似的系统。東尼·霍爾於1969年首次發表<ref name="hoare">{{cite journal|first1=C.A.R.|last1=[[C._A._R._Hoare|Hoare]]|title=An axiomatic basis for computer programming|journal=[[Communications_of_the_ACM|Communications of the ACM]]|volume=12|number=10|pages=576–585|doi=10.1145/363235.363259|url=http://www.spatial.maine.edu/~worboys/processes/hoare%20axiomatic.pdf|date=October 1969|deadurl=yes|archiveurl=https://web.archive.org/web/20160304013345/http://www.spatial.maine.edu/~worboys/processes/hoare%20axiomatic.pdf|archivedate=2016-03-04}}</ref>，随后为其他研究者所精制。
+
+==霍爾三元組==
+霍爾邏輯的中心特征是霍爾三元組（Hoare triple）。这种三元组描述一段代码的执行如何改变计算的状态。Hoare三元组有如下形式
+
+:<math>\{P\}\;C\;\{Q\}</math>
+
+这里的 ''P'' 和 ''Q'' 是 '''[[断言|断言]]''' 而 ''C'' 是'''命令''' 。''P'' 叫做 '''前条件''' 而 ''Q'' 叫做 '''后条件''' 。断言是[[谓词逻辑|谓词逻辑]]的公式。这个三元组在直觉上读做：只要 ''P'' 在 ''C'' 执行前的状态下成立，则在执行之后 ''Q'' 也成立。注意如果 ''C'' 不终止，也就没有"之后"了，所以 ''Q'' 在根本上可以是任何语句。实际上，你可以选择 ''Q'' 为假来表达 ''C'' 不终止。事實上，这種情形叫做 "部分正确（partial correctness）"。如果 ''C'' 终止并且在终止时 ''Q'' 是真，则表达式被稱作 "全部正确性（total correctness）"。终止必须被单独证明。
+
+霍爾邏輯为简单的[[指令式编程语言|指令式编程语言]]的所有构造提供了[[公理|公理]]和[[推理规则|推理规则]]。除了给Hoare论文中的简单语言的规则，其他语言构造的规则也已经被Hoare和很多其他研究者开发完成。包括[[并发|并发]]、[[过程|过程]]、[[goto语句|goto语句]]，和[[指针|指针]]。
+
+==部分正确性==
+
+===空语句公理===
+
+:<math> \frac{}{\{P\}\ \textbf{skip}\ \{P\}} \!</math>
+
+如果P在一个空语句之前成立，那么在执行这个空语句之后也是成立的。
+"skip"在这里表示空语句（Empty statement）。
+
+===赋值公理模式===
+
+赋值公理声称，关于对赋值右手端的变量的以前为真的任何命题在赋值之后仍然成立:
+
+:<math> \frac{}{\{P[E/x]\}\ x:=E \ \{P\} } \!</math>
+
+这里的<math>P[E/x]</math>指示表达式''P''中所有的[[自由变量和约束变量|自由变量]]''x''都被替代为表达式''E''。
+
+有效的三元组的兩個例子:
+
+:<math>\{x+1=43 \land x=42\} \ y:=x + 1\ \{y=43 \land x=42\} \!</math>
+:<math>\{x+1=N\} \ x:=x+1 \ \{x=N\}</math>
+
+===顺序规则===
+
+:<math>  \frac {\{P\}\ S\ \{Q\}\ , \ \{Q\}\ T\ \{R\} } {\{P\}\ S;T\ \{R\}} \!</math>
+
+例如，考虑赋值公理的下列两个实例:
+
+:<math>\{ x + 1 = 43\} \ y:=x + 1\ \{y =43 \}</math>
+
+和
+
+:<math>\{ y = 43\} \ z:=y\ \{z =43 \}</math>
+
+通过顺序规则，将得到:
+
+:<math>\{ x + 1 = 43\} \ y:=x + 1; z:= y\ \{z =43 \}</math>
+
+===条件规则===
+
+:<math>\frac { \{B \wedge P\}\ S\ \{Q\}\ ,\ \{\neg B \wedge P \}\ T\ \{Q\} }
+              { \{P\}\ \textbf{if}\ B\ \textbf{then}\ S\ \textbf{else}\ T\ \textbf{endif}\ \{Q\} } \!</math>
+
+===While规则===
+
+:<math>\frac { \{P \wedge B \}\ S\ \{P\} }
+              { \{P \}\ \textbf{while}\ B\ \textbf{do}\ S\ \textbf{done}\ \{\neg B \wedge P\} }
+\!</math>
+
+这里的''P''是[[循环不变条件|循环不变条件]]。
+
+===推论规则===
+
+:<math>
+\frac {  P^\prime \rightarrow\ P\ ,\ \lbrace P \rbrace\ S\ \lbrace Q \rbrace\ ,\ Q \rightarrow\ Q^\prime }
+{ \lbrace  P^\prime\ \rbrace\ S\ \lbrace Q^\prime\rbrace }
+\!</math>
+
+==全部正确性==
+
+上述规则只证明[[部分正确性|部分正确性]]。可以通过扩展版本的While规则证明全部正确性。
+
+* 全部正确性的While规则:
+
+::<math>
+\frac { \{P \wedge B \wedge t = z \}\ S\ \{P \wedge t < z \} \ ,\ P \rightarrow t \geq 0}
+              { \{P \}\ \textbf{while}\ B\ \textbf{do}\ S\ \textbf{done}\ \{\neg B \wedge P\} }
+\!</math>
+
+在本文中，除了维持循环不变条件，还能通过其值在每次重复期间递减的项就是这里的''t''的方式来证明[[终止|终止]]。注意''t''必须从[[良定集合|良定集合]]中取值，所以循环的每一步都通过递减有限[[链|链]]的成员来计数。
+
+==参见==
+* [[契约式设计|契约式设计]]
+* [[动态逻辑|动态逻辑]]
+* [[艾兹赫尔·戴克斯特拉|艾兹赫尔·戴克斯特拉]]
+* [[谓词变换者语义|谓词变换者语义]]
+* [[程序验证|程序验证]]
+
+== 参考文献 ==
+=== 引用 ===
+{{Reflist}}
+
+=== 来源 ===
+; 刊物文章
+* C. A. R. Hoare. "An axiomatic basis for computer programming". ''[[Communications_of_the_ACM|Communications of the ACM]]'', 12(10):576–585, October 1969. {{doi|10.1145/363235.363259}}
+
+; 书籍
+* Robert D. Tennent: "Specifying Software" (a recent textbook that includes an introduction to Hoare logic) ISBN 0-521-00401-2 [http://www.cs.queensu.ca/home/specsoft/]
+
+{{-}}
+{{Authority control}}
+
+[[Category:计算机逻辑|Category:计算机逻辑]]

@@ -1,0 +1,2 @@
+{{Include-USGov|agency=[[美国国家航空航天局]]|policy=http://www.jsc.nasa.gov/policies.html#Guidelines|url={{{url|}}}|article={{{article|}}}|author={{{author|}}}|accessdate={{{accessdate|}}}|comment={{{comment|}}} }}
+<noinclude>{{Documentation}}</noinclude>

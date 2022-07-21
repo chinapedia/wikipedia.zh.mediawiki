@@ -1,0 +1,1 @@
+#REDIRECT [[Template:Infobox islands]]{{模板重定向}}

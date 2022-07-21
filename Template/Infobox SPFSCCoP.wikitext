@@ -1,0 +1,1 @@
+#REDIRECT [[Template:花样滑冰比赛CoP]]

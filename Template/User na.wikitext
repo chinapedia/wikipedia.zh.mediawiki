@@ -1,0 +1,1 @@
+{{User language-N|na|Amuno eman wono '''[[:Category:na 母語使用者|ubwieda]]''' amen kakairu ian '''[[:Category:na 使用者|Dorerin Naoero]]'''.|瑙鲁语}} <noinclude></noinclude>

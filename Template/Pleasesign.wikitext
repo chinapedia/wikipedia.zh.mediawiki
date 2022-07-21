@@ -1,0 +1,1 @@
+留言之後請謹記輸入四條[[半形]]-{zh-hans:波浪线;zh-hant:浪紋;}-（&#126;&#126;&#126;&#126;）或-{zh-hans:单击;zh-hant:按下;}-编辑工具栏上的[[File:Signature icon april 2018.png|25px|link=Wikipedia:签名#滑鼠輸入方法]]按钮[[WP:SIGN|簽名]]。這是維基百科的[[Wikipedia:礼仪|基本禮儀]]之一，感謝配合。<noinclude>{{Documentation}}</noinclude>

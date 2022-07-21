@@ -1,0 +1,1 @@
+{{User language-2|mnp|樣-{隻}-用户話'''[[:Category:Mnp 使用者|闽北语]]'''嗰能力是'''[[:Category:Mnp-2 使用者|中級]]'''。|闽北语|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

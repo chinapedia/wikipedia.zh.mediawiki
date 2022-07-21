@@ -1,0 +1,12 @@
+{{Userbox
+  |id=Social Worker
+  |id-c=#fff
+  |info=這個用戶是[[社會工作者]]。
+  |info-c=#dfefff
+  |info-s=10
+  |border-c=#0000ff
+}}<includeonly>[[Category:社會工作者維基人|{{PAGENAME}}]]</includeonly>
+<noinclude>
+<p style="clear: both; padding-top: 2em">
+[[Category:社會工作者維基人]]
+</noinclude>

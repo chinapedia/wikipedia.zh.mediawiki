@@ -1,0 +1,77 @@
+{{NoteTA|G1=Communication|T=zh-cn:ΔΣ调制;zh-tw:ΔΣ調變}}
+[[File:DeltaSigma1.svg|thumb]]{{translating|[[:en:Wikipedia|:en:Wikipedia]]||tpercent=50|time=2022-06-15UTC09:27:41}}'''Delta-Sigma（ΔΣ）調變'''（或稱'''Sigma-Delta（ΣΔ）調變'''、'''SDM'''，中文譯作'''積分-微分調變'''）是一種數位類比互相轉換的實做方法，它是把高位元解析度低頻率信号用脉冲密度调制编码为低位元解析度高頻率信号的一种方法（[[脈衝編號調變|PCM]]轉[[脈衝寬度調變|PWM]]），可以將量化失真移往更高頻率、減少濾除時對目標頻率的影響，推導自{{le|delta調變|Delta modulation}}原理的[[類比|類比]]至[[數位|數位]]或是數位至類比轉換技術。[[類比數位轉換器|ADC]]或是[[數位類比轉換器|DAC]]可藉由低成本的[[CMOS|CMOS]]製程實現此一技術，也就是像數位[[積體電路|IC]]一樣的製程。基於上述理由，即便本技術早在1960年代已經提出，但是要到近年來由於半導體技術精進才得以普遍的使用。幾乎所有的類比IC製造商都有提供Sigma-Delta轉換器產品。
+
+== 原理 ==
+[[File:DeltaSigma2.svg|thumb]]
+ADC可被认为是一个压控震荡器，控制电压为被测量的电压，线性和比例性由负迴授决定。振荡器输出为一个脉冲串，每个脉冲为已知，常量，幅度=V且持续时间为dt，因此有一个已知的积分=Vdt但是变化的分离间隔。脉冲的间隔由迴授電路决定，所以一个低输入电压产出一个脉冲间的长间隔；而一个高输入电压产生一个短间隔。实际上，忽略开关错误，脉冲间的间隔与该间隔内输入电压的平均成反比，因此在该间隔ts内，是一个平均输入电压的样本，与v/ts成正比。
+
+最终的输出数是输入电压（该电压由脉冲计数决定）的数字化在一个固定加总间隔=Ndt产出一个计数，Σ。脉冲串的积分为ΣVdt其在时间间隔Ndt内被生成，因此输入电压在加总周期内的平均为VΣ/N，而且是平均的平均所以只遭受很小的变化。
+
+达成的精度取决于已知V的精度和一个计数内N的精度及分辨率。
+
+上面描述的脉冲可被认为是迪拉克方程的形式化分析，计数可被认为Σ。在ADC的转化中，正是这些脉冲串被delta-sigma调制所传递。
+ΔΣ架構主要是在對訊號的大小做一個粗略的估計，然後量測其誤差，將其積分並補償之，最後輸出的平均值會等於輸入訊號的平均值（若誤差的積分為有限值）。
+
+積分器的數量決定了ΔΣ調變電路的'''階數（Order）'''，圖2中所示為二階ΔΣ電路；階數越高時，noise shaping效果越好，但相對付出代價是穩定度必須妥善考量。
+
+ΔΣ調變電路也可以用量化器的輸出位元數來分類，當使用N階的比較器時，輸出為''log<sub>2</sub>N''-bit；基於線性度的考量，常見的ΔΣ電路為1-bit組態，也就是輸出僅有兩個位準：0或1。
+
+== Noise Shaping效果 ==
+由微分器、積分器構成的ΔΣ調變電路，會因其微分特性而對量化雜訊（Quantization noise）產生一種高通濾波的效果。一般線性PCM中產生的量化雜訊平均分布在各頻率上，基於前述特性，可以將量化雜訊推往高頻，而產生noise shaping功效。將取樣頻率設高，因人耳可聽到的頻段相對低頻，而此時將已經被推往高頻的量化雜訊以低通濾波器濾除，便可以得到量化雜訊較少的原訊號。
+
+當ΔΣ調變階數越多時，noise shaping效果也會越顯著，如圖所示為1~3階ΔΣ的noise shaping效果。
+
+== AD转换 ==
+对于AD转换，可以把它想象为一个压控振盪器。被测量电压是压控振盪器控制电压，线性度和比例由负回授回路决定。振盪器的输出是一连串的已知脉冲，宽度dt，幅度V，积分为Vdt。但是，各个脉冲之间的时间间隔是可变的。脉冲间隔由回授電路决定，低电压产生长间隔，高电压产生短间隔。事实上，如果不考虑转换误差，脉冲间隔和此段时间输入电压的平均值成反比。最终，在固定的时间周期Ndt内，输出计数值Σ将反映出输入电压的大小。脉冲的积分为ΣVdt。平均电压为VΣ/N。精确度取决于V的准确度，N中单位计数的准确度和解析度。可以通过改变采样总时间Ndt，或者固定比例倒计时等方法，改变输入电压和对应数字电压比例。可以将脉冲视为δ（delta）函数，计数值为Σ（sigma）。
+
+== 目的 ==
+Delta-sigma调制将模拟电压信号转换为脉冲频率或脉冲密度，可理解为[[脉冲密度调制|脉冲密度调制]](Pdm)。只要脉冲的定时和符号可以恢复，则以已知固定速率表示比特的正脉冲和负脉冲序列在接收器处非常容易产生、发送和准确地再生。给定来自增量-西格玛调制器的这样的脉冲序列，可以以足够的精度重建原始波形。相反，在不转换为脉冲流而只是直接传输模拟信号的情况下，系统中的所有[[噪声(电子)|噪声]]都将被添加到模拟信号中，从而降低其质量。使用Pdm作为信号表示是[[脉冲编码调制|脉冲编码调制]](PCM)的替代，以''奈奎斯特利率''（[[Nyquist_Rate|Nyquist Rate]]）采样和量化为多比特码。
+
+== 过采样（Oversampling） ==
+
+{{main|过采样}}
+[[File:DeltaSigmaNoise.svg|thumb]]
+
+ΔΣ调制是一种过采样技术，可降低感兴趣频段(图5中的绿色)中的噪声，从而避免使用高精度模拟电路作为抗混叠滤波器。Nyquist转换器(黄色)和过采样转换器(蓝色)中的总量化噪声是相同的，但它分布在不同的频谱上。在ΔΣ转换器中，噪声在低频率时会进一步降低，这是感兴趣的信号所在的频段，而在较高频率时，噪声会增加，在那里它可以被过滤掉。这种技术称为噪声整形。
+
+对于一阶Delta-Sigma调制器，噪声由传递函数为Hn(Z)=[1−z−1]的滤波器整形。假设采样频率fs与感兴趣的信号频率f0相比较大，则期望信号带宽中的量化噪声可以近似为：
+: <math> \mathrm{n_0} = e_\text{rms}\frac{\pi}{\sqrt{3}}\, (2f_0\tau)^\frac{3}{2}</math>.
+
+类似地，对于二阶Delta-Sigma调制器，噪声由传递函数为Hn(Z)=[1−z−1]2的滤波器整形。带内量化噪声可以近似为：
+: <math>\mathrm{n_0} = e_\text{rms}\frac{\pi^2}{\sqrt{5}}\, \left(2f_0\tau\right)^\frac{5}{2}</math>.
+
+一般而言，对于N阶ΔΣ调制器，带内量化噪声的方差为：
+: <math>\mathrm{n_0} = e_\text{rms}\frac{\pi^N}{\sqrt{2N + 1}}\, \left(2f_0\tau\right)^\frac{2N + 1}{2}</math>.
+
+当采样频率加倍时，对于一个N阶ΔΣ调制器，信噪比提高了6N+3分贝。过采样率越高，信噪比越高，分辨率以位为单位越高。
+
+过采样给出的另一个关键方面是速度/分辨率的权衡。放在调制器后面的抽取滤波器不仅在感兴趣的频带内对整个采样信号进行滤波(在较高频率处去除噪声)，而且还降低了信号的频率，提高了信号的分辨率。这是通过对较高数据速率的比特流进行某种平均来获得的。
+
+
+
+
+== 參見 ==
+* [[脈衝編碼調變|脈衝編碼調變]]
+* [[脉冲密度调制|脉冲密度调制]]
+* [[SACD|SACD]]、[[Direct_Stream_Digital|Direct Stream Digital]]
+
+== 參考資料 ==
+{{commonscat|Signal processing}}
+* [http://www.embedded.com//showArticle.jhtml?articleID=22101730 "Sigma-delta techniques extend DAC resolution"]{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }} article by Tim Wescott 2004-06-23
+* [http://www.commsdesign.com/design_corner/showArticle.jhtml?articleID=18402743 "Tutorial on Designing Delta-Sigma Modulators: Part I"]{{Dead link}}（2004-03-30）and [http://www.commsdesign.com/design_corner/showArticle.jhtml?articleID=18402763 "Part II"]{{Dead link}}（2004-04-01）a tutorial by Mingliang Liu
+* [http://eecs.oregonstate.edu/research/members/temes/pubs.html "Gabor Temes' Publications"] {{Wayback|url=http://eecs.oregonstate.edu/research/members/temes/pubs.html |date=20110716030508 }} 
+* [http://www-cis.stanford.edu/icl/wooley-grp/projects.html "Bruce Wooley's Delta-Sigma Converter Projects"] {{Wayback|url=http://www-cis.stanford.edu/icl/wooley-grp/projects.html |date=20210301000026 }} 
+* [http://www.beis.de/Elektronik/DeltaSigma/DeltaSigma.html "An Introduction to Delta Sigma Converters"] {{Wayback|url=http://www.beis.de/Elektronik/DeltaSigma/DeltaSigma.html |date=20220225054235 }}（which covers both ADC's and DAC's sigma-delta）
+* [http://www.maxim-ic.com/appnotes.cfm?appnote_number=1870&CMP=WP-10 "Demystifying Sigma-Delta ADCs"] {{Wayback|url=http://www.maxim-ic.com/appnotes.cfm?appnote_number=1870&CMP=WP-10 |date=20071208073124 }}。This in-depth article covers the theory behind a Delta-Sigma analog-to-digital converter. 
+* [https://web.archive.org/web/20060621221221/http://digitalsignallabs.com/SigmaDelta.pdf "Motorola digital signal processors: Principles of sigma-delta modulation for analog-to-digital converters"]
+* [https://web.archive.org/web/20061129090709/http://www.digitalsignallabs.com/presentation.pdf "One-Bit Delta Sigma D/A Conversion Part I: Theory"] article by Randy Yates presented at the 2004 comp.dsp conference
+
+=== 相關出版品 ===
+* J. Candy, G. Temes, ''Oversampling Delta-sigma Data Converters'', ISBN 0-87942-285-8
+* S. Norsworthy, R. Schreier, G. Temes, ''Delta-Sigma Data Converters'', ISBN 0-7803-1045-4
+* Mingliang Liu, ''Demystifying Switched-Capacitor Circuits'', ISBN 0-7506-7907-7
+* R. Schreier, G. Temes, ''Understanding Delta-Sigma Data Converters'', ISBN 0-471-46585-2
+
+[[Category:数字信号处理|Category:数字信号处理]]
+
+[[fr:Convertisseur_analogique-numérique#Convertisseur_Sigma_Delta|fr:Convertisseur analogique-numérique#Convertisseur Sigma Delta]]

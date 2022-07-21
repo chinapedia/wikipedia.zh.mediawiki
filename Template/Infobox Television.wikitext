@@ -1,0 +1,1 @@
+#REDIRECT [[Template:电视节目信息框]]

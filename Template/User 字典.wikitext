@@ -1,0 +1,12 @@
+{{Userbox-2
+|border-c=#00FF80
+|border-s=1
+|id1-c=#CCFF00
+|id1-s=30
+|id1=字
+|id2-c=#00FFFF
+|id2=[[File:Shuowen.jpg|60px]]
+|info-c=#00FF80
+|info-s=10
+|info=这个用户喜歡翻閱'''[[字典]]'''。
+}}

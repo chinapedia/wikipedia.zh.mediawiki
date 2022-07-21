@@ -1,0 +1,1 @@
+{{User language-N|zh-lei|这位用户的'''[[:Category:Zh-lei 母語使用者|母语]]'''是'''[[:Category:Zh-lei 使用者|雷话]]'''。|雷话|14|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

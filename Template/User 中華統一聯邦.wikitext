@@ -1,0 +1,13 @@
+{{Userbox
+  |border-s=1
+  |id=統一<br/>聯邦
+  |id-c=white
+  |id-fc=red
+  |id-s=12
+  |info=該用戶是中華統一聯邦公民。
+  |info-c=#FF0000
+  |info-s=9
+  |border-c=red
+}}<includeonly>[[Category:支持國共合作的維基人|{{PAGENAME}}]]</includeonly><noinclude>
+[[Category:聯邦中國維基人|統]]
+</noinclude>

@@ -1,0 +1,27 @@
+{| class="cquote pullquote" role="presentation" {{#if:{{{rtl|}}}|dir="rtl"}} style="{{#switch:{{{float|}}}
+  | left = float:left
+  | right = float:right
+  | #default = margin:auto
+  }}; display:table; border-collapse: collapse; border: none; background-color: {{{bgcolor|transparent}}}; width: {{#if: {{{wide|}}} | 100% | {{{width|auto}}}}}; {{#if: {{{bgcolor|}}} | border: 1px solid #AAAAAA;}}"
+| style="width: 20px; vertical-align: top; border: none; color: {{{qcolor|#B2B7F2}}}; font-size: {{#switch:{{{size|{{{quotewidth|{{{width|{{{4|20px}}}}}}}}}}}}
+|10px=20px
+|30px=60px
+|40px=80px
+|50px=100px
+|60px=120px
+|#default=40px}}; font-family: {{#if:{{{rtl|}}}|Roman|'Times New Roman', Times}}, serif; font-weight: bold; line-height: .6em; text-align: left; padding: {{#if:{{{small|}}}|10px 2px|10px}}; text-orientation: upright" | {{#if:{{{rtl|}}}|-{”}-|-{“}-}}
+| style="vertical-align: top; border: none;{{#if:{{{rtl|}}}|direction:rtl;}} padding: {{#if:{{{small|}}}|4px 2px|4px 10px}};" | {{{text|{{{content|{{{quotetext|{{{quote|{{{1|<includeonly>{{error|Error: No text given for quotation (or equals sign used in the actual argument to an unnamed parameter)}}</includeonly><noinclude>{{lorem ipsum}}</noinclude>}}}}}}}}}}}}}}}
+| style="width: 20px; vertical-align: bottom; border: none; color: {{{qcolor|#B2B7F2}}}; font-size: {{#switch:{{{size|{{{quotewidth|{{{width|{{{4|20px}}}}}}}}}}}}
+|10px=20px
+|30px=60px
+|40px=80px
+|50px=100px
+|60px=120px
+|#default=40px}}; font-family: {{#if:{{{rtl|}}}|Roman|'Times New Roman', Times}}, serif; font-weight: bold; line-height: .6em; text-align: right; padding: {{#if:{{{small|}}}|10px 2px|10px}}; text-orientation: upright" | {{#if:{{{rtl|}}}|-{“}-|-{”}-}}
+|-
+{{#if:{{{author|{{{personquoted|{{{source|{{{publication|{{{title|{{{quotesource|{{{2|{{{3|}}}}}}}}}}}}}}}}}}}}}}}}|{{#if:{{NAMESPACE}}||[[Category:使用抬升式引用的條目]]}}
+{{!}} colspan="3" class="cquotecite" style="border: none; padding-right: 4%; font-size: smaller; text-align: right;" {{!}} <cite>——{{#if:{{{author|{{{personquoted|{{{2|}}}}}}}}}|{{{author|{{{personquoted|{{{2}}}}}}}}}{{#if:{{{source|{{{publication|{{{title|{{{quotesource|{{{3|}}}}}}}}}}}}}}}|，{{{source|{{{publication|{{{title|{{{quotesource|{{{3}}}}}}}}}}}}}}}}}|{{#if:{{{source|{{{publication|{{{title|{{{quotesource|{{{3|}}}}}}}}}}}}}}}|{{{source|{{{publication|{{{title|{{{quotesource|{{{3}}}}}}}}}}}}}}}}}}}</cite>
+}}
+|}<!-- {{subst:FULLPAGENAME}} --><noinclude>
+{{documentation}}
+</noinclude>

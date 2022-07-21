@@ -1,0 +1,1 @@
+{{User language-4|cmn-sichuan|这个用户用'''[[:Category:cmn-sichuan-4 使用者|正宗]]'''的'''[[:Category:cmn-sichuan 使用者|四川话]]'''摆龙门阵没得丁点儿问题。|四川話|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

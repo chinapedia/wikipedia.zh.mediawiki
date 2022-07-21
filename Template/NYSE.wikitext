@@ -1,0 +1,2 @@
+{{lang|en|[[纽约证券交易所|NYSE]]}}{{#ifeq:{{{delisted}}}|yes|除牌前}}：[http://www.nyse.com/quote/XNYS:{{uc: {{{1}}} }} {{uc: {{{1}}} }}]<includeonly>[[Category:纽约证券交易所上市公司|{{{1}}}]]</includeonly><noinclude>[[Category:股票代码模板|{{PAGENAME}}]]
+</noinclude>

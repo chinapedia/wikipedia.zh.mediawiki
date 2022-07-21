@@ -1,0 +1,9 @@
+{{Userbox
+  |id=信報財經新聞
+  |id-c=GRAY
+  |info=這個用户喜歡閱讀《[[信報財經新聞]]》。
+  |info-s=9
+  |info-c=white
+  |border-c=GRAY
+}}
+<noinclude>{{Clear}}[[Category:媒體用戶框模板|報]][[Wikipedia:用戶框/媒體]]</noinclude>
