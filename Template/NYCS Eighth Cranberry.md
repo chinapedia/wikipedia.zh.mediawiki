@@ -1,1 +1,0 @@
-#redirect [[Template:NYCS Eighth far south express]]

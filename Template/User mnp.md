@@ -1,1 +1,0 @@
-{{User language-N|mnp|樣-{隻}-用戶嗰'''[[:Category:Mnp 母語使用者|母语]]'''是'''[[:Category:Mnp 使用者|闽北语]]'''。|闽北语|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

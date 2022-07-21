@@ -1,1 +1,0 @@
-{{User language-N|zh-min|这个用户的'''[[:Category:Zh-min 母語使用者|母语]]'''是'''[[:Category:Zh-min 使用者|闽语]]'''。|闽语|14|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

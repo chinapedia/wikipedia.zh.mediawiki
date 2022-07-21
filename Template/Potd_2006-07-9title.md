@@ -1,1 +1,0 @@
-#REDIRECT [[Template:Potd/2006-31-1title]]

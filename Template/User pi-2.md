@@ -1,1 +1,0 @@
-{{User language-2|pi|ayaṃ puggalo '''[[:Category:pi-2 使用者|majjhimo]]''' de '''[[:Category:pi 使用者|Pāliyaṃ]]'''.|巴利语}}

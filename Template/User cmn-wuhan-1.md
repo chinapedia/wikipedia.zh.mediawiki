@@ -1,1 +1,0 @@
-{{User language-1|cmn-wuhan|勒过用户只能讲哈子'''[[:Category:cmn-wuhan-1 使用者|弯管子]][[:Category:cmn-wuhan 使用者|武汉话]]'''。|武汉話|12|9}}<noinclude>[[Category:汉语巴别模板]][[Category:武汉模板]]</noinclude>

@@ -1,1 +1,0 @@
-#REDIRECT [[Template:新鴻基地產]]

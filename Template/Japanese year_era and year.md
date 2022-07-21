@@ -1,1 +1,0 @@
-<includeonly>{{#if:{{{era|}}}|[[{{{era}}}|{{Japanese era|{{{era}}}|label}}]] {{Japanese year number|era={{{era}}}|year={{{year}}}}}}}</includeonly>

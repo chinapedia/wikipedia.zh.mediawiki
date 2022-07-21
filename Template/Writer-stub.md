@@ -1,1 +1,0 @@
-#REDIRECT [[Template:作家小作品]]

@@ -1,1 +1,0 @@
-#REDIRECT [[Template:User 數學物理]]

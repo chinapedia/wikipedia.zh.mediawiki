@@ -1,2 +1,0 @@
-<div class="notice metadata" id="stub" style="font-size: small;">
-[[File:Signorina in viola.svg|18px]]&nbsp;'''{{PAGENAME}}'''是一個與[[服装|服飾]]或[[時尚|流行時尚]]相關的[[Wikipedia:小作品|小作品]]。你可以-{zh-hant:透過;zh-hans:通过}-<span class="plainlinks">[{{fullurl:{{FULLPAGENAME}}|action=edit}} 編輯或修訂]</span>擴充其內容。</div><includeonly>[[Category:時尚小作品]]{{#ifexpr:{{PAGESIZE:{{FULLPAGENAME}}|R}}>3000|[[Category:字数已超过3000字节的小作品|{{PAGENAME}}]]}}</includeonly><noinclude>{{Documentation}}</noinclude>

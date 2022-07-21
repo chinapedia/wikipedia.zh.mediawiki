@@ -1,1 +1,0 @@
-<includeonly>{{tlrow|User {{{1}}}|category={{#if:{{{cat|}}}|{{{cat}}}|{{{category|}}}}}|notes={{{notes|}}}|demolevel={{{demolevel|}}}|subst={{{subst|}}}|params={{{params|}}}}}</includeonly><noinclude>{{doc}}</noinclude>

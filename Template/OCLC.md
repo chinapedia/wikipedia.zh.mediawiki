@@ -1,3 +1,0 @@
-{{Catalog lookup link|{{{oclc|{{{1|}}}}}}|{{{2|}}}|{{{3|}}}|{{{4|}}}|{{{5|}}}|{{{6|}}}|{{{7|}}}|{{{8|}}}|{{{9|}}}|article-link=联机计算机图书馆中心|article-name=OCLC|link-prefix=https://www.worldcat.org/oclc/|list-leadout={{{leadout|}}}|link-postfix={{#if:{{{show|}}}|/editions}}|item-postfix={{#if:{{{show|}}}|&#32;({{#ifeq:{{{show|}}}|all|all editions|{{{show|}}}}})}}}}<noinclude>
-{{documentation}}
-</noinclude>

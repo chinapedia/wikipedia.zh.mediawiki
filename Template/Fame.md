@@ -1,2 +1,0 @@
-#REDIRECT [[Template:Notability]]
-{{RTL}}

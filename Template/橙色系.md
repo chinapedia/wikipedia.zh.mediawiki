@@ -1,1 +1,0 @@
-#REDIRECT [[Template:Shades of Orange]]

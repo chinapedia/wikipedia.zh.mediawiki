@@ -1,1 +1,0 @@
-黃石國家公園<noinclude>[[Category:每周图片模板]]</noinclude>

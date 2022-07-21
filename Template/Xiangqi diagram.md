@@ -1,1 +1,0 @@
-<noinclude>{{doc}}</noinclude><includeonly>{{#invoke:Xiangqi_diagram|board}}</includeonly>

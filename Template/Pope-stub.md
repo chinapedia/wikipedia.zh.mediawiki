@@ -1,1 +1,0 @@
-#redirect [[Template:罗马教宗小作品]]

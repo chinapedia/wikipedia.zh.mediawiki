@@ -1,1 +1,0 @@
-#REDIRECT [[Wikipedia:优良条目/2006年9月26日]]

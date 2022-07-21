@@ -1,6 +1,0 @@
-{{flag|South Vietnam}}<noinclude>
-{{DEFAULTSORT:Vietnam (South)}}
-[[Category:越南模板]]
-[[Category:旗幟模板]]
-[[Category:亞洲國家模板]]
-</noinclude>

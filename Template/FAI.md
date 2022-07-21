@@ -1,1 +1,0 @@
-[[File:Flag of the Faroe Islands.svg|25px|法罗群岛]]&nbsp;[[法罗群岛]]<noinclude>[[Category:欧洲国家模板|F]]</noinclude>

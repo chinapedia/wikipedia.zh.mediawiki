@@ -1,2 +1,0 @@
-<templatestyles src="smallcaps/styles.css"/><span class="smallcaps">{{{1}}}</span><noinclude>
-{{documentation}}<!-- PLEASE ADD DOCUMENTATION/CATEGORIES/INTERWIKIS TO THE /doc SUBPAGE, THANKS--></noinclude>

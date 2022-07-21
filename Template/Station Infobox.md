@@ -1,2 +1,0 @@
-#redirect[[Template:Infobox station]]
-{{R from merge}}

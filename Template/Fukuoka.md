@@ -1,1 +1,0 @@
-#REDIRECT [[Template:福岡縣]]

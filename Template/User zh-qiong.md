@@ -1,1 +1,0 @@
-{{User language-N|zh-qiong|'''[[:Category:Zh-qiong 使用者|海南話]]是'''偌嗼用戶亓'''[[:Category:Zh-qiong 母語使用者的|母話]]'''。|海南话|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

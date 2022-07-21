@@ -1,1 +1,0 @@
-#REDIRECT[[Template:英國政治]]

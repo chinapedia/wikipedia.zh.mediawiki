@@ -1,1 +1,0 @@
-<noinclude>{{pp-protected|reason=[[WP:PT]]用戶提出半保護請求，高使用率模板。|small=yes}}</noinclude><includeonly>{{Coord/dec2dms/{{{4}}}|{{#ifexpr:{{{1}}} >= 0||-}}{{{1}}}}}{{#ifexpr:{{{1}}} >= 0|{{{2}}}|{{{3}}}}}</includeonly><noinclude>{{template doc}}</noinclude>

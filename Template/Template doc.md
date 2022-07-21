@@ -1,1 +1,0 @@
-#REDIRECT [[Template:Documentation]]{{模板重定向}}

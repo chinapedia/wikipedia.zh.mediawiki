@@ -1,1 +1,0 @@
-{{User language-4|ht|Moun sa ka pale '''[[:Category:ht 使用者|kreyòl ayisyen]]''' a yon nivo '''[[:Category:ht-4 使用者|byen avanse]]'''.|海地克里奥尔语}} <noinclude></noinclude>

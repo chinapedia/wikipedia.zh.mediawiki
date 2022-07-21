@@ -1,1 +1,0 @@
-<small>'''[[保护现状]]：<font color="black">驯养</font>'''</small>

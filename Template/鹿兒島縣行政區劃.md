@@ -1,1 +1,0 @@
-#REDIRECT [[Template:鹿兒島縣]]

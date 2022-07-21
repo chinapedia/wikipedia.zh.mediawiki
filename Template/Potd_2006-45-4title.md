@@ -1,1 +1,0 @@
-夜晚的舊金山國際機場<noinclude>[[Category:每周图片模板]]</noinclude>

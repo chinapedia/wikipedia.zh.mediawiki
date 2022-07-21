@@ -1,1 +1,0 @@
-{{Party_meta/color/中國國民黨}}

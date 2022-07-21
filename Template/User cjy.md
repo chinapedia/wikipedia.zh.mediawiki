@@ -1,1 +1,0 @@
-{{User language-N|cjy|这个用户的'''[[:Category:cjy 母語使用者|母语]]'''是'''[[:Category:cjy 使用者|晋语]]'''。|晋语|14|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

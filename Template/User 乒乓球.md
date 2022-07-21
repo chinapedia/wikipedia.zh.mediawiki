@@ -1,6 +1,0 @@
-<div style="float: left; border: solid #213396 1px; margin: 1px;">
-{| cellspacing="0" style="width: 238px; background: #7C8BE2;"
-| style="width: 45px; height: 45px; background: {{{logo-background|steelblue}}}; text-align: center; font-size: {{{5|{{{id-s|14}}}}}}pt; color: {{{id-fc|black}}};" | '''[[File:Table tennis.svg|48px]]'''
-| style="font-size: {{{info-s|10}}}pt; padding: 4pt; line-height: 1.25em; color: {{{info-fc|black}}};" |这个用户喜欢'''[[乒乓球]]'''。
-|}</div>
-[[Category:喜欢乒乓球的维基人|{{PAGENAME}}]]

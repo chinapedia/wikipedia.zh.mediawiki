@@ -1,1 +1,0 @@
-#REDIRECT [[Template:NBC環球集團]]

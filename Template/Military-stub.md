@@ -1,1 +1,0 @@
-#redirect [[template:Mil-stub]]

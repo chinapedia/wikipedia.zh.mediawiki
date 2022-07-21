@@ -1,1 +1,0 @@
-{{language icon|zh|{{Lan|zh-hans=简体中文|zh-hant=簡體中文}}}}<noinclude>{{pp-protected|small=yes}}[[Category:语言标示模板|{{PAGENAME}}]]</noinclude>

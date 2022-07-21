@@ -1,1 +1,0 @@
-#REDIRECT [[Portal:足球/歡迎參與]]

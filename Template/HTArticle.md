@@ -1,1 +1,0 @@
-#redirect [[Template:半翻译条目]]

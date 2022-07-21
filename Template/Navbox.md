@@ -1,1 +1,0 @@
-<includeonly>{{#invoke: Navbox | navbox }}</includeonly><noinclude>{{documentation}}<!-- Add categories and interwikis to the /doc sub-page --></noinclude>

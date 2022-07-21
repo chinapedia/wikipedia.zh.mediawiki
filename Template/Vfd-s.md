@@ -1,1 +1,0 @@
-#REDIRECT [[Template:移动到维基文库]]

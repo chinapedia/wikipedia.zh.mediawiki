@@ -1,1 +1,0 @@
-[http://en.wikipedia.org/wiki/Waterfall_train_disaster]

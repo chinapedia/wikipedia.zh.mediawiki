@@ -1,1 +1,0 @@
-{{User language-4|wuu|该个用户好拿'''[[:Category:wuu-4 使用者|-{zh-hans:道地; zh-hant:道地}-]]'''个'''[[:Category:wuu 使用者|吴语]]'''来交流。|吳語|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

@@ -1,1 +1,0 @@
-<div style="float:right; clear:right; padding: .2em 0 .8em 1.4em; border:none; margin:0;"><noinclude>[[Category:格式模板|{{PAGENAME}}]]</noinclude>

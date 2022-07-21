@@ -1,1 +1,0 @@
-芝加哥夜晚的天际线<noinclude>[[Category:每周图片模板]]</noinclude>

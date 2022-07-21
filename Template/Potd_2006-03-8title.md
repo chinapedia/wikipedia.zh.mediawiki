@@ -1,1 +1,0 @@
-陳澄波的油画《嘉义街外》<noinclude>[[Category:每周图片模板]]</noinclude>

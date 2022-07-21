@@ -1,1 +1,0 @@
-#REDIRECT [[Template:量子光學算符]]

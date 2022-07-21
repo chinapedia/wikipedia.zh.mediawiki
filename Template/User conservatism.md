@@ -1,1 +1,0 @@
-#REDIRECT [[Template:User 保守主義]]

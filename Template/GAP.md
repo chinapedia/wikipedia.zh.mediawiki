@@ -1,1 +1,0 @@
-#REDIRECT [[Template:Gray's Anatomy plate]]

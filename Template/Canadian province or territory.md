@@ -1,1 +1,0 @@
-#重定向 [[Template:Infobox_province_or_territory_of_Canada]]

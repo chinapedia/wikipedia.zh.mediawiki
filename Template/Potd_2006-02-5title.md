@@ -1,1 +1,0 @@
-十分瀑布<noinclude>[[Category:每周图片模板]]</noinclude>

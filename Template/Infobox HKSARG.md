@@ -1,1 +1,0 @@
-#REDIRECT [[Template:香港政府部門基礎資訊]]

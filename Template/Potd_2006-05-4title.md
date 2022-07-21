@@ -1,1 +1,0 @@
-2008奥运会倒计时牌<noinclude>[[Category:每周图片模板]]</noinclude>

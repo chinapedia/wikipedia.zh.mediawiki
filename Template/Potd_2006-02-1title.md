@@ -1,1 +1,0 @@
-伊朗亚兹德的琐罗亚斯德教神庙<noinclude>[[Category:每周图片模板]]</noinclude>

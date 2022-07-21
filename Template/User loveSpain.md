@@ -1,1 +1,0 @@
-#REDIRECT [[Template:User Love-Spain]]

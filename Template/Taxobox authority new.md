@@ -1,1 +1,0 @@
-<small>{{{authority}}}</small>

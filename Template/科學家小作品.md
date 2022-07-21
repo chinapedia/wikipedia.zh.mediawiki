@@ -1,1 +1,0 @@
-#REDIRECT [[Template:科学家小作品]]

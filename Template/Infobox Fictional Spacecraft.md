@@ -1,1 +1,0 @@
-#REDIRECT [[Template:虚构飞船信息框]]

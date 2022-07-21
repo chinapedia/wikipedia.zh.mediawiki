@@ -1,1 +1,0 @@
-{{User language-4|cjy|该用户能以'''[[:Category:cjy-4 使用者|-{zh-hans:地道; zh-hant:道地}-]]'''的'''[[:Category:cjy 使用者|晋语]]'''进行交流。|晋语|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

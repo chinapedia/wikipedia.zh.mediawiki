@@ -1,6 +1,0 @@
-|-
-| style="padding-left: 0.5em;" |'''管理机构'''
-| colspan="2" style="padding-left: 0.5em;"|{{{1|''无''}}}<noinclude>
-[[Category:语言模板|{{PAGENAME}}]]
-[[Category:语言信息框模板|语言]]
-</noinclude>

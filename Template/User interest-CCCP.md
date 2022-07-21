@@ -1,1 +1,0 @@
-#重定向 [[Template:User Interest-USSR]]

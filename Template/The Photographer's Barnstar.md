@@ -1,1 +1,0 @@
-#REDIRECT [[Template:攝影師星章]]

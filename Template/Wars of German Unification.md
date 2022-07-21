@@ -1,1 +1,0 @@
-#REDIRECT [[Template:Campaignbox 德意志统一战争]]

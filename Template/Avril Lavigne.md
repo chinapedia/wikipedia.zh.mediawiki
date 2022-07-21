@@ -1,1 +1,0 @@
-#REDIRECT [[Template:艾薇兒·拉維尼]]

@@ -1,1 +1,0 @@
-#REDIRECT [[Template:通用頂級域]]

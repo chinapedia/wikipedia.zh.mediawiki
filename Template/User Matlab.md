@@ -1,1 +1,0 @@
-{{User language-P|Matlab|该用户会使用'''[[:Category:Matlab 使用者|Matlab]]'''语言。|Matlab}}<includeonly>[[Category:Matlab 使用者|{{PAGENAME}}]]{{#ifeq:{{NAMESPACE}}|User|[[Category:维基程序员|{{PAGENAME}}]]}}</includeonly><noinclude>[[Category:程式用戶框模板|Matlab]]</noinclude>

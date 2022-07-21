@@ -1,1 +1,0 @@
-<noinclude>{{pp-protected|reason=[[WP:PT]]用戶提出半保護請求，高使用率模板。|small=yes}}</noinclude>{{#expr:(((({{{1|0}}}) * 3600) round 0) / 3600) mod 360}}°{{padleft:{{#expr:(((3600 * ({{{1|0}}})) round 0) / 60) mod 60}}|2|0}}′{{padleft:{{#expr:((360000 * ({{{1|0}}})) round -2) mod 6000 div 100}}|2|0}}″<noinclude>{{template doc}}</noinclude>

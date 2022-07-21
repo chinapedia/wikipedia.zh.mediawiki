@@ -1,1 +1,0 @@
-#REDIRECT [[Template:Zh_icon]]

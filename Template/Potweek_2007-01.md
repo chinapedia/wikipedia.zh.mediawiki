@@ -1,9 +1,0 @@
-{{ImageOfWeek|id=2007-1-1|label=2007年1月1日|width={{{width}}}|lang={{{lang}}}}}
-{{ImageOfWeek|id=2007-1-4|label=2007年1月4日|width={{{width}}}|lang={{{lang}}}}}
-{{ImageOfWeek|id=2007-2-1|label=2007年1月8日|width={{{width}}}|lang={{{lang}}}}}
-{{ImageOfWeek|id=2007-2-4|label=2007年1月11日|width={{{width}}}|lang={{{lang}}}}}
-{{ImageOfWeek|id=2007-3-1|label=2007年1月15日|width={{{width}}}|lang={{{lang}}}}}
-{{ImageOfWeek|id=2007-3-4|label=2007年1月18日|width={{{width}}}|lang={{{lang}}}}}
-{{ImageOfWeek|id=2007-4-1|label=2007年1月22日|width={{{width}}}|lang={{{lang}}}}}
-{{ImageOfWeek|id=2007-4-4|label=2007年1月25日|width={{{width}}}|lang={{{lang}}}}}
-{{ImageOfWeek|id=2007-5-1|label=2007年1月29日|width={{{width}}}|lang={{{lang}}}}}

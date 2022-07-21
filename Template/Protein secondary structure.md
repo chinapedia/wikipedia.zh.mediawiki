@@ -1,1 +1,0 @@
-#REDIRECT [[template:蛋白质二级结构]]

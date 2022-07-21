@@ -1,1 +1,0 @@
-<div style="clear:{{{1|both}}};"></div><noinclude>{{documentation}}</noinclude>

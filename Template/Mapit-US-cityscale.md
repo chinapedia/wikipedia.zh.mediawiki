@@ -1,1 +1,0 @@
-#REDIRECT [[Template:Geolinks-US-cityscale]]

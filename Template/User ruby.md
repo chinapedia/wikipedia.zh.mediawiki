@@ -1,1 +1,0 @@
-{{User language-P|Ruby|[[:Category:Ruby 使用者|该用户]]会使用'''[[Ruby]]'''。|Ruby}}<includeonly>[[Category:Ruby 使用者|{{PAGENAME}}]]{{#ifeq:{{NAMESPACE}}|User|[[Category:维基程序员|{{PAGENAME}}]]}}</includeonly><noinclude>[[Category:程式用戶框模板|ruby]]</noinclude>

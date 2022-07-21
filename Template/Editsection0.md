@@ -1,2 +1,0 @@
-<div class="editsection plainlinks" style="float:right;margin-left:5px;"><nowiki>[</nowiki>[{{SERVER}}{{{1|{{localurl:{{NAMESPACE}}:{{PAGENAME}}|action=edit&section=0}}}}} 编辑]<nowiki>]</nowiki></div>
-<noinclude>[[Category:页面按钮|Editsection0]]</noinclude>

@@ -1,1 +1,0 @@
-#redirect [[Template:音乐家小作品]]

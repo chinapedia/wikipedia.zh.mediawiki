@@ -1,1 +1,0 @@
-[http://www.tv.com/person/{{{id}}}/summary.html {{{name|{{PAGENAME}}}}}]在[[TV.com]]<noinclude>[[Category:文化模板|{{PAGENAME}}]][[Category:外部资源模板|文化]]</noinclude>

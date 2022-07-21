@@ -1,1 +1,0 @@
-{{User language-2|cmn-wuhan|勒过用户滴'''[[:Category:cmn-wuhan 使用者|武汉話]]'''讲滴'''[[:Category:cmn-wuhan-2 使用者|还阔以]]'''。|武汉話|12|9}}<noinclude>[[Category:汉语巴别模板]][[Category:武汉模板]]</noinclude>

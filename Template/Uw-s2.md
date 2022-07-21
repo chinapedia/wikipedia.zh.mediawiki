@@ -1,3 +1,0 @@
-#REDIRECT [[Template:Uw-spam2]]
-
-[[Category:用戶警告模板的重定向模板]]

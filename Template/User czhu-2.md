@@ -1,1 +1,0 @@
-{{User language-2|czhu|該用戶能以'''[[:Category:Czhu-2 使用者|一般]]'''的'''[[:Category:Czhu 使用者|潮州話]]'''進行交流。|潮州話|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

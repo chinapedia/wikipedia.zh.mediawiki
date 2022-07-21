@@ -1,1 +1,0 @@
-[[File:Flag of the United Nations.svg|25px|-{zh-hans:联合国;zh-hant:聯合國}-]]&nbsp;-{zh-hans:[[联合国]];zh-hant:[[聯合國]]}-

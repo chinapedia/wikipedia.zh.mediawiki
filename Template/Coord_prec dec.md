@@ -1,1 +1,0 @@
-<noinclude>{{pp-protected|reason=[[WP:PT]]用戶提出半保護請求，高使用率模板。|small=yes}}</noinclude><includeonly>{{#switch:{{max|{{precision1|{{{1}}}}}|{{precision1|{{{2}}}}}}}|0=d|1|2=dm|dms}}</includeonly><noinclude>{{template doc}}</noinclude>

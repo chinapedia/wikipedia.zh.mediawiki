@@ -1,1 +1,0 @@
-{{flag|Abkhazia}}<noinclude>[[Category:亚洲国家模板]]</noinclude>

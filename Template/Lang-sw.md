@@ -1,7 +1,0 @@
-<includeonly>{{#invoke:lang|lang_xx_inherit
-|code=sw
-|italic=unset
-}}</includeonly><noinclude>
-{{Documentation|Template:Lang-x/doc}}
-[[Category:尼日-剛果語系多語言支持模板]]
-</noinclude>

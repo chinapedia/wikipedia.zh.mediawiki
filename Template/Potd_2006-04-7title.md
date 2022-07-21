@@ -1,1 +1,0 @@
-南京石鼓路天主教堂<noinclude>[[Category:每周图片模板]]</noinclude>

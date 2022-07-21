@@ -1,1 +1,0 @@
-#REDIRECT [[Template:NYCS 63rd IND]]

@@ -1,1 +1,0 @@
-[[File:Flag of Samoa.svg|25px|萨摩亚]]&nbsp;[[萨摩亚]]<noinclude>[[Category:大洋洲国家模板]]</noinclude>

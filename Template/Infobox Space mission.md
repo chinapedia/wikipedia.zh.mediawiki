@@ -1,1 +1,0 @@
-#REDIRECT [[Template:宇航信息框]]

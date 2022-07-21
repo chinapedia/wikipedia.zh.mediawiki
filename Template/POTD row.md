@@ -1,1 +1,0 @@
-{{POTD row/{{#expr:({{CURRENTTIMESTAMP}} mod 10) + 1}}}}<noinclude>[[Category:辅助模板]]</noinclude>

@@ -1,1 +1,0 @@
-劍潭車站夜景<noinclude>[[Category:每周图片模板]]</noinclude>

@@ -1,1 +1,0 @@
-{{User language-2|zh-qiong|该用户能以'''[[:Category:Zh-qiong-2 使用者|一般]]'''的'''[[:Category:Zh-qiong 使用者|海南话]]'''进行交流。|海南话|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

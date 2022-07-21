@@ -1,1 +1,0 @@
-#REDIRECT [[Template:空中客车型号]]{{模板重定向}}

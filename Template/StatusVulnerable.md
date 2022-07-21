@@ -1,1 +1,0 @@
-#REDIRECT [[Template:易危]]

@@ -1,1 +1,0 @@
-{{User language-3|bca|這位用戶能夠以'''[[:Category:Bca-3 使用者|熟練]]'''的'''[[:Category:Bca 使用者|白語]]'''交流。|白語|14|9}}

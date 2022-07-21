@@ -1,1 +1,0 @@
-{{#if:{{{2|}}}|[[{{{1|{{FULLPAGENAME}}}}}|{{{2}}}]]|}}<small class="noprint">（{{NewEditSection|{{#if:{{{1|}}}|{{{1}}}|{{FULLPAGENAME}}}}|{{{3|发表}}}|preload=template:sign|intro=Template:SignNotice|summary=問：}}）</small>

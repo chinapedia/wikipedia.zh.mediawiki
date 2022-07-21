@@ -1,1 +1,0 @@
-[[臺灣證券交易所|臺證所]]：[http://mis.twse.com.tw/stock/fibest.jsp?stock={{{1}}} '''{{{1}}}''']<noinclude>[[Category:臺灣證券交易所上市公司|+]][[Category:股票代码模板|{{PAGENAME}}]][[Category:臺灣公司模板]]</noinclude>

@@ -1,1 +1,0 @@
-{{User language-1|cjy|宰用户能讲两句'''[[:Category:cjy-1 使用者|不太地道]]'''的'''[[:Category:cjy 使用者|晋语]]'''。|晋语|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

@@ -1,1 +1,0 @@
-#REDIRECT [[Template:威尔士行政区划]]

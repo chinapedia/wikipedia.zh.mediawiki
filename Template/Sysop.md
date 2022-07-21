@@ -1,1 +1,0 @@
-#REDIRECT [[Template:維基百科管理人員]]

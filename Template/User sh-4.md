@@ -1,2 +1,0 @@
-{{User language-4|sh|Korisnik '''[[:Category:sh-4 使用者|tečno]]''' govori '''[[:Category:sh 使用者|srpskohrvatski jezik]]'''.<br />Корисник '''[[:Category:sh-4 使用者|течно]]''' говори '''[[:Category:sh 使用者|српскохрватски језик]]'''.|塞尔维亚-克罗地亚语}} <noinclude>
-</noinclude>

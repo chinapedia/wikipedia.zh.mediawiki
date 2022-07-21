@@ -1,1 +1,0 @@
-<includeonly>{{#expr:{{#ifeq:{{{1}}}|0|0|{{#ifexpr:{{{1}}} round 0={{{1}}}|0|{{#ifexpr:{{{1}}} round 1={{{1}}}|1|{{#ifexpr:{{{1}}} round 2={{{1}}}|2|{{#ifexpr:{{{1}}} round 3={{{1}}}|3|{{#ifexpr:{{{1}}} round 4={{{1}}}|4|{{#ifexpr:{{{1}}} round 5={{{1}}}|5|6}}}}}}}}}}}}}}+{{precision/tz|{{{1}}}}}}}</includeonly><noinclude>{{Documentation}}</noinclude>

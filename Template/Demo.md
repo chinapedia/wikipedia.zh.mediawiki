@@ -1,1 +1,0 @@
-<noinclude>{{Sample}}[[Category:辅助模板]]</noinclude>一二三四五，上山打老虎。老虎不吃人，因为没眼神。[[File:Zh-Template Demo.ogg]]

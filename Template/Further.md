@@ -1,4 +1,0 @@
-<includeonly>{{#invoke:labelled list hatnote|labelledList|{{#if:{{{topic|}}}|{{{topic|}}}的}}更多-{zh-cn:信息;zh-tw:資訊}-}}</includeonly><noinclude>
-{{documentation}}
-<!-- Categories go on the /doc subpage, and interwikis go on Wikidata. -->
-</noinclude>

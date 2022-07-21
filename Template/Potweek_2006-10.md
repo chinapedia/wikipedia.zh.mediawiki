@@ -1,9 +1,0 @@
-{{ImageOfWeek|id=2006-40-1|label=2006年10月2日|width={{{width}}}|lang={{{lang}}}}}
-{{ImageOfWeek|id=2006-40-4|label=2006年10月5日|width={{{width}}}|lang={{{lang}}}}}
-{{ImageOfWeek|id=2006-41-1|label=2006年10月9日|width={{{width}}}|lang={{{lang}}}}}
-{{ImageOfWeek|id=2006-41-4|label=2006年10月12日|width={{{width}}}|lang={{{lang}}}}}
-{{ImageOfWeek|id=2006-42-1|label=2006年10月16日|width={{{width}}}|lang={{{lang}}}}}
-{{ImageOfWeek|id=2006-42-4|label=2006年10月19日|width={{{width}}}|lang={{{lang}}}}}
-{{ImageOfWeek|id=2006-43-1|label=2006年10月23日|width={{{width}}}|lang={{{lang}}}}}
-{{ImageOfWeek|id=2006-43-4|label=2006年10月26日|width={{{width}}}|lang={{{lang}}}}}
-{{ImageOfWeek|id=2006-44-1|label=2006年10月30日|width={{{width}}}|lang={{{lang}}}}}

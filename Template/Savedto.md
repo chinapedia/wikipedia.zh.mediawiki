@@ -1,1 +1,0 @@
-#REDIRECT [[Template:已存檔至]]

@@ -1,1 +1,0 @@
-#REDIRECT [[Template:人名表 (W)]]

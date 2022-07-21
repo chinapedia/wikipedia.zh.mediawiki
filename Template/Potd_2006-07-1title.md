@@ -1,1 +1,0 @@
-香港會議展覽中心新翼<noinclude>[[Category:每周图片模板]]</noinclude>

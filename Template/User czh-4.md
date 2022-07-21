@@ -1,1 +1,0 @@
-{{User language-4|czh|介个人'''[[:Category:czh 使用者|徽州话]]'''讲得'''[[:Category:czh-4 使用者|好得不得了]]'''。|徽语|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

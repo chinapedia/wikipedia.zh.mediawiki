@@ -1,9 +1,0 @@
-{{Userbox
-  |id=SK2盃參賽者
-  |id-c=
-  |info=該用戶參加了[[Wikipedia:條目競賽/SK2盃條目競賽|SK2盃條目競賽]]。
-  |info-c=white
-  |info-s=9
-  |border-c=
-}}<includeonly>[[Category:SK2盃條目競賽參賽者|{{PAGENAME}}]]</includeonly>
-<noinclude>[[Category:SK2盃條目競賽參賽者|*]]</noinclude>

@@ -1,1 +1,0 @@
-仁慈堂大樓<noinclude>[[Category:每周图片模板]]</noinclude>

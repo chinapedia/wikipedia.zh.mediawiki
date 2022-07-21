@@ -1,3 +1,0 @@
-{{ambox|text=本条目的部分内容翻译自[[:{{ISO_639_name|{{lc:{{{1|{{{lang|}}}}}}}}}}]]維基百科条目{{lang|{{{1|{{{lang|zh}}}}}}|[[:{{{1|{{{lang}}}}}}:{{{2|{{{article}}}}}}|{{{2|{{{article}}}}}}]]}}{{#if:{{{3|{{{oldid|}}}}}}|（版本[{{fullurl:{{{1|{{{lang|}}}}}}:{{{2|{{{article}}}}}}|oldid={{{3|{{{oldid}}}}}}}} {{{3|{{{oldid}}}}}}]）}}並以'''[[Wikipedia:CC BY-SA 3.0协议文本|知识共享-署名-相同方式共享3.0协议]]'''授权使用。原文作者列表請參閱其'''{{fullurl2|{{{1|{{{lang|}}}}}}:{{{2|{{{article|}}}}}}|action=history|页面历史}}'''。|image=[[File:Translation to zh arrow.svg|50x40px|alt=|link=]]}}<noinclude>
-{{Documentation}}
-</noinclude>

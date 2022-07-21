@@ -1,1 +1,0 @@
-伦敦帝国学院地球科学系入口<noinclude>[[Category:每周图片模板]]</noinclude>

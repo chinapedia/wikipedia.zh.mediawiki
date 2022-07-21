@@ -1,3 +1,0 @@
-{{#ifeq:{{{exclude}}}|E||{{NYCS time 2|E|icon=nightsweekends|text=nights after 9:00 p.m., weekends, and limited a.m. rush hour trips|time={{{time|}}}}}{{NYCS br|punct={{#if:{{{exclude|}}}||,}}|time={{{time|}}}}}}}{{#if:{{{exclude|}}}||&#8203;}}{{#ifeq:{{{exclude}}}|F||{{NYCS time 2|F|icon=alltimes|text=all times|dicon=rushpeak|dtext=two rush hour trains, peak direction|punct={{#ifeq:{{{exclude|}}}|E|and|,and}}|time={{{time|}}}}}}}<noinclude>
-[[Category:紐約地鐵模板|{{PAGENAME}}]]
-</noinclude>

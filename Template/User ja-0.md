@@ -1,1 +1,0 @@
-{{User language-0|ja|-{この利用者は'''[[:Category:ja 使用者|日本語]]'''が'''[[:Category:ja-0 使用者|分かりません]]'''。}-|日语}}<noinclude>{{Babel-lang|日|ja}}[[Category:日語巴别模板]]</noinclude>

@@ -1,1 +1,0 @@
-{{<includeonly>safesubst:</includeonly>Unsigned|{{{2|}}}|{{{1|}}}|template name=Template:Nosign|demo={{{demo|}}}|example={{{example|}}}|no cat={{{no cat|}}} }}<noinclude>{{doc}}</noinclude>

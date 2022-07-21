@@ -1,1 +1,0 @@
-{{#invoke:userbox|userbox-r}}<noinclude>{{doc}}</noinclude>

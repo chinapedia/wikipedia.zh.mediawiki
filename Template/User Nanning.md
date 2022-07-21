@@ -1,9 +1,0 @@
-{{Userbox
-  |id=南宁</br>老友
-  |id-c=white
-  |info=呢个用户係'''[[南宁]]'''老友。
-  |info-c=#E6E6FA
-  |info-s=9
-  |border-c=black
-}}
-[[Category:南宁维基人]]

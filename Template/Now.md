@@ -1,1 +1,0 @@
-現在的日期與時間是'''{{#time:Y年n月j日 H時i分（[[T]]）}}'''。<small>※{{Purge|按此更新}}</small><noinclude>[[Category:时间模板]]</noinclude>

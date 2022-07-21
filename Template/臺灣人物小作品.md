@@ -1,1 +1,0 @@
-#REDIRECT [[Template:Taiwan-bio-stub]]

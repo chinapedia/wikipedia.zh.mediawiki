@@ -1,1 +1,0 @@
-[[丹麦]][[哥本哈根]]著名的美人鱼铜像<noinclude>[[Category:每周图片模板]]</noinclude>

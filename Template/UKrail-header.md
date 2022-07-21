@@ -1,1 +1,0 @@
-!colspan="2" style="color:{{{3|blak}}};background-color:{{{2}}};text-align: center; font-size: 110%; padding: 3px;"|{{{1}}}<noinclude>[[Category:鐵路系統標示|H]]</noinclude>

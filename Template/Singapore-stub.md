@@ -1,1 +1,0 @@
-#redirect [[Template:新加坡小作品]]

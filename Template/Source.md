@@ -1,1 +1,0 @@
-{{#if:{{{author|}}}|{{{author}}}：}}<span class="plainlinks">[{{{url}}} {{{title}}}]</span>，《[[{{{pub}}}]]》，{{{date}}}

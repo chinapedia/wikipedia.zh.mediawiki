@@ -1,1 +1,0 @@
-{{User language-N|wuu-suzhou|诶个用户咯'''[[:Category:Wuu-suzhou 母語使用者|母语]]'''是'''[[:Category:Wuu-suzhou 使用者|苏州闲话]]'''。|苏州话|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

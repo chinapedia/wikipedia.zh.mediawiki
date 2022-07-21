@@ -1,1 +1,0 @@
-#REDIRECT[[Template:利物浦球員名單]]

@@ -1,1 +1,0 @@
-#REDIRECT [[Template:定時消失]]

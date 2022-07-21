@@ -1,1 +1,0 @@
-<includeonly>{{{{FULLPAGENAME}}/doc}}</includeonly><noinclude>{{pp-template}}[[Category:辅助模板]][[en:Template:/doc]]</noinclude>

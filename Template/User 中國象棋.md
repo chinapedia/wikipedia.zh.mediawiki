@@ -1,1 +1,0 @@
-#REDIRECT [[Template:User 中国象棋]]

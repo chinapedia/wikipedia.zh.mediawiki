@@ -1,1 +1,0 @@
-<includeonly>{{#invoke:lan|main}}</includeonly><noinclude>{{模板文档}}</noinclude>

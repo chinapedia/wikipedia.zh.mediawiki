@@ -1,1 +1,0 @@
-馬丘比丘<noinclude>[[Category:每周图片模板]]</noinclude>

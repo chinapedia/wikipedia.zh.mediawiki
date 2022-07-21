@@ -1,1 +1,0 @@
-#REDIRECT [[模板:BS-table]]

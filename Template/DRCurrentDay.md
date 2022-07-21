@@ -1,1 +1,0 @@
-Wikipedia:删除投票和请求/{{<includeonly>subst:</includeonly>CURRENTYEAR}}年{{<includeonly>subst:</includeonly>CURRENTMONTHNAME}}{{<includeonly>subst:</includeonly>CURRENTDAY}}日

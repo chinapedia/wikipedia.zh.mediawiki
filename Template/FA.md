@@ -1,1 +1,0 @@
-#REDIRECT [[template:featured article]]

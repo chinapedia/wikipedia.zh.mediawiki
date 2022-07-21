@@ -1,1 +1,0 @@
-#REDIRECT [[Template:現在|Template:User 現在]]

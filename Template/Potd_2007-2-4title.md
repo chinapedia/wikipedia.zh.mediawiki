@@ -1,1 +1,0 @@
-清酒酒樽<noinclude>[[Category:每周图片模板]]</noinclude>

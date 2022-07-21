@@ -1,1 +1,0 @@
-國立台灣大學校門<noinclude>[[Category:每周图片模板]]</noinclude>

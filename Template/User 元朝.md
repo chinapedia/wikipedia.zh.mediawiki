@@ -1,9 +1,0 @@
-{{Userbox
-  |info=這個用戶對'''[[元朝]]'''歷史有濃厚興趣。
-  |info-fc=#000000
-  |info-s=10
-  |border-c=#000000
-  |id-c=#eeeeee
-  |id=[[File:YuanEmperorAlbumKhubilaiPortrait.jpg|45px]]
-  |usercategory=對元朝歷史有興趣的維基人
-}}

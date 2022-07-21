@@ -1,2 +1,0 @@
-|- valign=top
-|{{subgenus}}：||{{{taxon}}}

@@ -1,1 +1,0 @@
-#redirect [[T:Infobox person/doc]]

@@ -1,1 +1,0 @@
-{{Userbox|#808080|#F0F0F0|Robot|這個用戶是個[[Wikipedia:机器人|機器人]]}}

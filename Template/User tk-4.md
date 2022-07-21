@@ -1,1 +1,0 @@
-{{User language-4|tk|Bu kullanıcı '''[[:Category:tk 使用者|Türkmenceyi]]''' '''[[:Category:tk-4 使用者|anadili gibi]]''' anlıyor.|土库曼语}} <noinclude></noinclude>

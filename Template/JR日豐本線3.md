@@ -1,1 +1,0 @@
-#REDIRECT [[Template:日豐本線3]]

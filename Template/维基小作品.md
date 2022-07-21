@@ -1,1 +1,0 @@
-#REDIRECT [[Template:维基百科小作品]]

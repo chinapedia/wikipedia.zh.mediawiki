@@ -1,1 +1,0 @@
-#REDIRECT [[Template:阿波罗计划]]

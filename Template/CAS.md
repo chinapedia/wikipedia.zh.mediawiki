@@ -1,3 +1,0 @@
-<!--<includeonly>{{#ifeq:{{lc:{{{1|x}}}}}|{{uc:{{{1|y}}}}}|[http://www.ncbi.nlm.nih.gov/sites/entrez?db=pccompound&cmd=search&term={{#ifeq:{{lc:{{{1|x}}}}}|{{uc:{{{1|y}}}}}|{{{1}}}|}} {{{1|(error 1)}}}] | {{{1|}}}}} {{{2|}}}</includeonly>--><includeonly>{{#ifeq:{{#invoke:Chemicals|check_CAS_test|1={{{1}}}}}|false|{{Chembox CASNoNone|{{{1}}}}}|}}{{#ifeq:{{lc:{{{1|x}}}}}|{{uc:{{{1|y}}}}}|[//commonchemistry.cas.org/detail?cas_rn={{#ifeq:{{lc:{{{1|x}}}}}|{{uc:{{{1|y}}}}}|{{{1}}}|}}&title={{{2|}}} {{{1|(error 1)}}}] | {{{1|}}}}} {{{2|}}}</includeonly><noinclude>
-{{doc}}
-</noinclude>

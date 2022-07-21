@@ -1,1 +1,0 @@
-#REDIRECT [[Template:User_New_Taipei_City]]

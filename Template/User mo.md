@@ -1,1 +1,0 @@
-{{User language-N|mo|Acest user grăieşte '''[[:Category:mo 使用者|moldoveneşte]]''' ca '''[[:Category:mo 母語使用者|limbă mamă]].|摩尔多瓦语}} <noinclude>[[ro:Format:Utilizator mo]]</noinclude>

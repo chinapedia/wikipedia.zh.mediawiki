@@ -1,1 +1,0 @@
-<includeonly></div></includeonly><noinclude>{{documentation}}[[Category:文言文格式模板]]</noinclude>

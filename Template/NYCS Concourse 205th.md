@@ -1,1 +1,0 @@
-{{NYCS time 2|D|icon=alltimes|text=all times|time={{{time|}}}}}

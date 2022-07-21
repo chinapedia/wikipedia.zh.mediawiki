@@ -1,1 +1,0 @@
-#REDIRECT [[Template:原子核物理学]]

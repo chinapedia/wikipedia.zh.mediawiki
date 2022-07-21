@@ -1,1 +1,0 @@
-莫斯科地鐵路線圖<noinclude>[[Category:每周图片模板]]</noinclude>

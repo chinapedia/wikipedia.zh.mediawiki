@@ -1,1 +1,0 @@
-#REDIRECT [[Template:哲学家小作品]]

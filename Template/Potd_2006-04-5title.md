@@ -1,1 +1,0 @@
-由[[汀九橋]]向西遙望龍鼓水道<noinclude>[[Category:每周图片模板]]</noinclude>

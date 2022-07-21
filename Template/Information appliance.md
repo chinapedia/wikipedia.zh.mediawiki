@@ -1,1 +1,0 @@
-#重定向 [[模板:Infobox information appliance]]

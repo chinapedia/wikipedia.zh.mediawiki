@@ -1,2 +1,0 @@
-|- valign=top
-|{{supertribus}}:||{{{taxon}}}

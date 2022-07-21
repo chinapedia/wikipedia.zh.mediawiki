@@ -1,3 +1,0 @@
-<includeonly>!colspan="2" width={{{5|100%}}} style="{{#if:{{{4|}}}|color:{{{4}}};|color:white;}}{{#if:{{{3|}}}|background-color:{{{3}}};|background-color:#be2d2c;}}text-align: center;"|{{#if:{{{2|}}}|{{navbar|{{{2}}}|mini=1|fontstyle=color:{{#if:{{{4|}}}|{{{4}}}|white}};|style=float:left;}}}}<span style="float:center;margin:2px">{{#if:{{{1|}}}|{{{1}}}|路線圖}}</span></includeonly><noinclude>
-{{Documentation}}
-</noinclude>

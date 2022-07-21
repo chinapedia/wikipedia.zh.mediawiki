@@ -1,1 +1,0 @@
-赵忠祥<noinclude>[[Category:每周图片模板]]</noinclude>

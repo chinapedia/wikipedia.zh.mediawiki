@@ -1,9 +1,0 @@
-{{Userbox
-  |id=
-  |id-c=#ffffff
-  |info=這個用戶擁有[[MiniDisc|MD]]隨身聽或音響設備。
-  |info-s=10
-  |info-c=#8dcff3
-  |border-c=#6725fb
-}}
-<includeonly>[[Category:使用MD的維基人|{{PAGENAME}}]]</includeonly>

@@ -1,1 +1,0 @@
-[[File:Flag of Montenegro.svg|25px|蒙特內哥羅]]&nbsp;[[蒙特內哥羅]]<noinclude>[[Category:欧洲国家模板|CGR]]</noinclude>

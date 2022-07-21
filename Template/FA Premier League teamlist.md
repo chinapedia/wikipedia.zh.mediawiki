@@ -1,1 +1,0 @@
-#REDIRECT [[Template:英格蘭超級足球聯賽]]

@@ -1,9 +1,0 @@
-<includeonly>{{#if:{{{DeltaHf|}}}{{{生成焓|}}}{{{DeltaHc|}}}{{{燃燒焓|}}}{{{燃烧焓|}}}{{{Entropy|}}}{{{熵|}}}{{{HeatCapacity|}}}{{{熱容|}}}{{{热容|}}}{{{Cp|}}}{{{Cv|}}}|! {{Chembox header}} {{!}} 热力学{{{Reference|{{{參考|{{{参考|}}}}}}}}}
-{{!}}-
-{{Chembox entry|par_name={{#if:{{{DeltaHf|}}}{{{生成焓|}}}|DeltaHf }}|par_value={{#if:{{{DeltaHf|}}}{{{生成焓|}}}|{{{DeltaHf|{{{生成焓}}}}}} }}|par_value1={{#if:{{{DeltaHf_notes|}}}|{{{DeltaHf_notes}}} }}|par_value2={{#if:{{{DeltaHf_t|}}}|{{{DeltaHf_t}}} }} }}
-{{Chembox entry|par_name={{#if:{{{DeltaHc|}}}{{{燃燒焓|}}}{{{燃烧焓|}}}|DeltaHc }}|par_value={{#if:{{{DeltaHc|}}}{{{燃燒焓|}}}{{{燃烧焓|}}}|{{{DeltaHc|{{{燃燒焓|{{{燃烧焓}}}}}}}}} }}|par_value1={{#if:{{{DeltaHc_notes|}}}|{{{DeltaHc_notes}}} }}|par_value2={{#if:{{{DeltaHc_t|}}}|{{{DeltaHc_t}}} }} }}
-{{Chembox entry|par_name={{#if:{{{Entropy|}}}{{{熵|}}}|Entropy }}|par_value={{#if:{{{Entropy|}}}{{{熵|}}}|{{{Entropy|{{{熵}}}}}} }}|par_value1={{#if:{{{Entropy_notes|}}}|{{{Entropy_notes}}} }}|par_value2={{#if:{{{Entropy_t|}}}|{{{Entropy_t}}} }} }}
-{{Chembox entry|par_name={{#if:{{{HeatCapacity|}}}{{{熱容|}}}{{{热容|}}}|HeatCapacity }}|par_value={{#if:{{{HeatCapacity|}}}{{{熱容|}}}{{{热容|}}}|{{{HeatCapacity|{{{熱容|{{{热容}}}}}}}}} }}|par_value1={{#if:{{{HeatCapacity_notes|}}}|{{{HeatCapacity_notes}}} }} }}
-{{Chembox entry|par_name={{#if:{{{Cp|}}}|HeatCapacity }}|par_value={{#if:{{{Cp|}}}|{{{Cp}}} }}|par_value1={{#if:{{{Cp_notes|}}}|{{{Cp_notes}}} }}|par_value2=p }}
-{{Chembox entry|par_name={{#if:{{{Cv|}}}|HeatCapacity }}|par_value={{#if:{{{Cv|}}}|{{{Cv}}} }}|par_value1={{#if:{{{Cv_notes|}}}|{{{Cv_notes}}} }}|par_value2=v }} }}
-</includeonly><noinclude>{{Documentation}}</noinclude>

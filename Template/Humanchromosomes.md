@@ -1,1 +1,0 @@
-#REDIRECT [[Template:人类基因组]]

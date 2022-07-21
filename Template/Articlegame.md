@@ -1,1 +1,0 @@
-<div style="clear: both; width: 80%; margin: 0 auto 1em; border: solid #7b1a1b 1px; background: #f8f8f8; text-align: center; font-size: 90%;">'''[[Wikipedia:條目競賽|條目競賽]]：'''本條目正在進行[[Wikipedia:條目競賽/SK2盃條目競賽|SK2盃條目競賽]]，非參賽者編輯前請先查閱[[Wikipedia:條目競賽/SK2盃條目競賽|比賽頁面]]，或至[[{{NAMESPACE}}_talk:{{PAGENAME}}|討論頁]]進行討論。'''</div><noinclude>[[category:辅助模板]]</noinclude>

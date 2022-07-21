@@ -1,1 +1,0 @@
-#REDIRECT [[template:User Cucina italiana]]

@@ -1,1 +1,0 @@
-#REDIRECT [[Template:HK-buil-stub]]

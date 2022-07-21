@@ -1,1 +1,0 @@
-<center>[[{{{1}}}|<font color=white size=4>●</font>]]</center>

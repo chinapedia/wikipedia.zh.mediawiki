@@ -1,1 +1,0 @@
-舊中區警署建築<noinclude>[[Category:每周图片模板]]</noinclude>

@@ -1,1 +1,0 @@
-#REDIRECT [[Template:Los Angeles Angels of Anaheim roster]]

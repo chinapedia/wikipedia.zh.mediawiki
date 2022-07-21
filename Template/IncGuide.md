@@ -1,1 +1,0 @@
-#REDIRECT [[Template:关注度标准导航]]

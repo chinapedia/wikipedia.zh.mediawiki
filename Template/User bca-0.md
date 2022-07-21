@@ -1,1 +1,0 @@
-{{User language-0|bca|這位用戶'''[[:Category:Bca-0 使用者|無法]]'''理解'''[[:Category:Bca 使用者|白語]]'''。|白语|14|9}}

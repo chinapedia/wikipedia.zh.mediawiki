@@ -1,1 +1,0 @@
-{{language icon|ko|-{zh-cn:朝鲜文; zh-hant:韓文;}-}}<noinclude>[[Category:语言标示模板|{{PAGENAME}}]]</noinclude>

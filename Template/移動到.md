@@ -1,1 +1,0 @@
-#REDIRECT [[Template:移動至]]

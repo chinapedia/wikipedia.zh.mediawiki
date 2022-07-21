@@ -1,1 +1,0 @@
-不識[[庐山|廬山真面目]]<noinclude>[[Category:每周图片模板]]</noinclude>

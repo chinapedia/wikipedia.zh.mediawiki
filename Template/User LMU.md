@@ -1,9 +1,0 @@
-{{Userbox
-  |id=[[File:Ludwig-Maximilians-Universität_München.jpg|43px]]
-  |id-c=white
-  |info=这个用戶是'''[[慕尼黑大学]]'''的校友、学生或老师。
-  |info-c=lightgreen
-  |info-s=9
-  |info-fc=black
-  |border-c=black
-}}<includeonly>[[Category:慕尼黑大学的维基人|{{PAGENAME}}]]</includeonly><noinclude>{{Clear}}[[Wikipedia:用户框/教育程度]]</noinclude>

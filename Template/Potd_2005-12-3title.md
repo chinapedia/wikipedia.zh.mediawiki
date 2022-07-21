@@ -1,1 +1,0 @@
-晚上的彌敦道<noinclude>[[Category:每周图片模板]]</noinclude>

@@ -1,1 +1,0 @@
-#redirect [[Template:各月各日导航]]

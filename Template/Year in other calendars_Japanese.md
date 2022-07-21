@@ -1,3 +1,0 @@
-{{#if:{{{era|}}}|{{#ifeq:{{Japanese year number|era={{{era}}}|year={{{year}}}}}|1|{{#if:{{{previous year era|}}}|[[{{Japanese era|{{{previous year era}}}|kanji}}]]{{Japanese year number|era={{{previous year era}}}|year={{{year}}}}}年
-<div style="text-align: center;">''— changed to —''</div>}}}}<!--
--->[[{{Japanese era|{{{era}}}|kanji}}]]{{#ifeq:{{Japanese year number|era={{{era}}}|year={{{year}}}}}|1|元|{{Japanese year number|era={{{era}}}|year={{{year}}}}}}}年}}

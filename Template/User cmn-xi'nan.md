@@ -1,1 +1,0 @@
-{{User language-N|cmn-xi'nan|這個用戶的'''[[:Category:cmn-xi'nan 母語使用者|母語]]'''是'''[[:Category:cmn-xi'nan 使用者|西南官話]]'''。|西南官話|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

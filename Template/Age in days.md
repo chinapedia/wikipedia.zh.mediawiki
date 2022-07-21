@@ -1,1 +1,0 @@
-<includeonly>{{#invoke:age|age_generic|template=age_days}}</includeonly><noinclude>{{documentation}}</noinclude>

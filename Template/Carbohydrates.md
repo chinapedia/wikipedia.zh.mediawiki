@@ -1,1 +1,0 @@
-#REDIRECT [[Template:糖类]]

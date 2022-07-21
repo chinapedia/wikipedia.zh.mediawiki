@@ -1,1 +1,0 @@
-#redirect [[Template:体育人物小作品]]

@@ -1,1 +1,0 @@
-#REDIRECT [[Template:亚洲人物小作品]]

@@ -1,9 +1,0 @@
-{{Userbox
-  |id=UNIST<!--[[File:Ust.gif|40px]]。注意合理使用之规定：“绝对不能将“合理使用”之图片，放入个人的用户页面进行展示。”-->
-  |id-c=white
-  |info=这个用戶是'''[[斯图加特大学]]'''的校友、学生或老师。
-  |info-c=lightblue
-  |info-s=9
-  |info-fc=black
-  |border-c=black
-}}<includeonly>[[Category:斯图加特大学的维基人|{{PAGENAME}}]]</includeonly><noinclude>{{Clear}}[[Wikipedia:用户框/教育程度]]</noinclude>

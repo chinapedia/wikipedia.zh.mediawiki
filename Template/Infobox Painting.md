@@ -1,1 +1,0 @@
-#redirect [[Template:Infobox artwork]]

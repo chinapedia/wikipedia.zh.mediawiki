@@ -1,5 +1,0 @@
-<div class="wikipediauserbox" style="float:{{{float|left}}}; border:{{{border-width|{{{border-s|1}}}}}}px solid {{{border-color|{{{1|black}}}}}}; margin:1px;">
-{| cellspacing="0" style="width:236px; background:{{{info-background|{{{2|#a9a9a9}}}}}};"
-| style="width:45px; height:45px; background:{{{logo-background|{{{1|black}}}}}}; text-align:center; font-size:{{{logo-size|{{{5|11}}}}}}pt; color:{{{logo-color|{{{id-fc|black}}}}}};" | '''{{{logo|{{{3|https协议}}}}}}'''
-| style="font-size:{{{info-size|{{{info-s|9}}}}}}pt; padding:4pt; line-height:1.25em; color:{{{info-color|white}}};" | 该用户使用 '''''[[https协议|<font color=blue>https协议</font>]]''''' 绕过网络封锁，对[[中文維基百科|<font color=blue>中文維基百科</font>]]作出[[:Category:https协议 使用者|<font color=blue>贡献</font>]]。因此无法浏览[[图像|<font color=blue>图像</font>]]。
-|}</div> <includeonly>[[Category:https协议 使用者|{{PAGENAME}}]]</includeonly>

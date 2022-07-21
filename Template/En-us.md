@@ -1,1 +1,0 @@
-{{Language icon|en-US|美式英语}}<noinclude>[[Category:语言标示模板|{{PAGENAME}}]]</noinclude>

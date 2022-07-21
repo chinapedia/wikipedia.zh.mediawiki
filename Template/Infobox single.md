@@ -1,1 +1,0 @@
-#redirect[[Template:Infobox song]]{{合併重定向}}

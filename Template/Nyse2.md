@@ -1,1 +1,0 @@
-{{lang|en|[[纽约证券交易所|NYSE]]}}：[http://www.nyse.com/about/listed/lcddata.html?ticker={{{1}}} {{lang|en|{{{1}}}}}]<noinclude>[[Category:股票代码模板|Nyse2]]</noinclude>

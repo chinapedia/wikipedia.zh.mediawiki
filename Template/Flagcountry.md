@@ -1,1 +1,0 @@
-{{country data {{{1}}}|flagcountry/core|variant={{{variant|{{{2|}}}}}}|size={{{size|}}}|name={{{name|}}}}}<noinclude>{{documentation}}</noinclude>

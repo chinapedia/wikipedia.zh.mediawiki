@@ -1,1 +1,0 @@
-#REDIRECT [[Template:東海道本線 (JR東海)]]

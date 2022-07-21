@@ -1,1 +1,0 @@
-#REDIRECT [[Template:HK-rail-stub]]

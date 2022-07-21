@@ -1,9 +1,0 @@
-{{Userbox
-  |id=风顺堂区
-  |id-c=white
-  |info=这个用户居住在[[风顺堂区]]。
-  |info-c=#6EF7A7
-  |info-s=10
-  |border-c=#6EF7A7
-}}<includeonly>[[Category:澳門維基人|{{PAGENAME}}]]</includeonly><noinclude>
-[[Category:澳門用戶框模板]]</noinclude>

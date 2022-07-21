@@ -1,1 +1,0 @@
-#redirect [[Template:有争议的英语指引]]

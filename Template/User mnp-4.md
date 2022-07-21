@@ -1,1 +1,0 @@
-{{User language-4|mnp|樣-{隻}-用户話'''[[:Category:Mnp 使用者|闽北语]]'''嗰能力是'''[[:Category:Mnp-4 使用者|接近母語]]'''。|闽北语|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

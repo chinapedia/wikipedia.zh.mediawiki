@@ -1,1 +1,0 @@
-<div style="text-align:center; background-color: #DACAA5; line-height: 1.2;">[[World Conservation Union|IUCN]] 分类Ib ([[荒野区]])<div><includeonly>[[Category:IUCN分类Ib]]</includeonly><noinclude>[[Category:IUCN保护区信息框模板|IUCN Ib]]</noinclude>

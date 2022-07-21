@@ -1,1 +1,0 @@
-#REDIRECT [[Template:托爾金人物]]

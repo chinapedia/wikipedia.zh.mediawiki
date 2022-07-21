@@ -1,1 +1,0 @@
-{{{1}}}{{{2}}}<small><nowiki>［</nowiki>[[儒略曆]]{{{3}}}<nowiki>］</nowiki></small><noinclude>{{Documentation}}</noinclude>

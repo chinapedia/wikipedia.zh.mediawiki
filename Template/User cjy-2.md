@@ -1,1 +1,0 @@
-{{User language-2|cjy|宰用户的'''[[:Category:cjy 使用者|晋语]]'''还'''[[:Category:cjy-2 使用者|将就]]'''咾哇。|晋语|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

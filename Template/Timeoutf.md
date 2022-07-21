@@ -1,1 +1,0 @@
-<noinclude><div></noinclude>{{votevoidf|bordercolor=aqua|text=↑該用戶投票因{{{1|超過時限}}}而無效，但意見可供參考。{{#if:{{{sign|}}}| - {{{sign}}}}}}}<noinclude>{{doc|Template:votevoidf/doc}}</noinclude>

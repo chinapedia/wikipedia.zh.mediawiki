@@ -1,1 +1,0 @@
-<includeonly>{<noinclude><!--Syntax highlighter補丁--></noinclude>| class="navbox" style="margin: 0.5em auto;"</includeonly><noinclude>{{Documentation}}</noinclude>

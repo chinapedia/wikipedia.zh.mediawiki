@@ -1,1 +1,0 @@
-从苏花公路上俯瞰苏澳港<noinclude>[[Category:每周图片模板]]</noinclude>

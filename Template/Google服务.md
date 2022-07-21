@@ -1,1 +1,0 @@
-#REDIRECT [[Template:Google公司]]

@@ -1,1 +1,0 @@
-{{User language-4|sco|This uiser's the '''[[:Category:sco-4 使用者|stang o the trump]]''' whan it comes tae contreebutin in '''[[:Category:sco 使用者|Scots]]'''.|苏格兰盖尔语}} <noinclude></noinclude>

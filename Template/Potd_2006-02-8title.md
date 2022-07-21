@@ -1,1 +1,0 @@
-1916年九廣鐵路尖沙咀站<noinclude>[[Category:每周图片模板]]</noinclude>

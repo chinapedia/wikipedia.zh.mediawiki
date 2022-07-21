@@ -1,1 +1,0 @@
-#REDIRECT [[T:PD-author]]

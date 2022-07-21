@@ -1,1 +1,0 @@
-'''<big><div style="text-align: center;">[[Wikipedia:繁简体转换请求/{{Date.month-nY|2}}|两个月前的讨论]]>[[Wikipedia:繁简体转换请求/{{Date.month-nY|1}}|一个月前的讨论]]>[[Wikipedia:繁简体转换请求/{{CURRENTYEAR}}年{{CURRENTMONTHNAME}}|正在进行的讨论]]</div></big>'''

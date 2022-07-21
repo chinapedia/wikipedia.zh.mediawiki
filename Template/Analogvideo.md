@@ -1,1 +1,0 @@
-#REDIRECT [[Template:常见音视频端子]]

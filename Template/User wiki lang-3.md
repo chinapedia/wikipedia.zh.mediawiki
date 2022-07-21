@@ -1,1 +1,0 @@
-#REDIRECT [[Template:User Wiki-3]]

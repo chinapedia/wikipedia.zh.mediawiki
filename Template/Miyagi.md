@@ -1,1 +1,0 @@
-#REDIRECT [[Template:宮城縣]]

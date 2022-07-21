@@ -1,1 +1,0 @@
-#REDIRECT [[Template:菲尔兹奖]]

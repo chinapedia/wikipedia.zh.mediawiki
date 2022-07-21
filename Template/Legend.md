@@ -1,4 +1,0 @@
-<includeonly><div class="legend"><span class="{{#if:{{{styleclass|}}}|{{{styleclass}}} {{#if:{{yesno|{{{legend-color|yes}}}}}|legend-color|}}|legend-color}}" style="{{#if:{{{styleclass|}}}|{{#if:{{yesno|1={{{styleclass_has_border|}}} }}||border:{{{border|1px solid {{{outline|black}}}}}};}}|border:{{{border|1px solid {{{outline|black}}}}}};}}display:inline-block; height:1.5em; margin:1px; text-align:center; {{#if:{{{1|}}}|background:{{trim|{{{1|transparent}}}}};|{{#if:{{{styleclass|}}}||background:transparent;}} }}{{#if:{{{textcolor|}}}|color:{{{textcolor|black}}};|{{#if:{{{styleclass|}}}||color:black;}} }}font-size:{{{size|small}}}; width:{{{width|1.5em}}}">{{#if:{{{text|}}}|<span class="legend-text">{{{text|}}}</span>|&nbsp;}}</span> {{{2|}}}</div></includeonly><noinclude>
-{{Documentation}}
-[[Category:格式模板]]
-</noinclude>

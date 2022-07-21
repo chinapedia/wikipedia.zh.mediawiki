@@ -1,1 +1,0 @@
-#REDIRECT [[Template:Georgia state-stub]]

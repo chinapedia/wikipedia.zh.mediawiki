@@ -1,1 +1,0 @@
-#REDIRECT [[Template:清朝人物小作品]]

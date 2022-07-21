@@ -1,1 +1,0 @@
-#重定向 [[模板:Russian and Soviet missiles]]

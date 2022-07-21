@@ -1,2 +1,0 @@
-{| border="1" cellpadding="4" cellspacing="1" style="margin: 1em 1em 1em 0; background: #f9f9f9; border: 1px #aaa solid; border-collapse: collapse; font-size: 95%;"
-!style="background-color:#E9E9E9" align=left<noinclude>[[Category:政治模板]]</noinclude>

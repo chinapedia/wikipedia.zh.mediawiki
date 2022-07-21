@@ -1,1 +1,0 @@
-#重定向 [[Template:Infobox ROC Village or Li/doc]]

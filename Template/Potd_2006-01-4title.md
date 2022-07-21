@@ -1,1 +1,0 @@
-詹姆斯·库克<noinclude>[[Category:每周图片模板]]</noinclude>

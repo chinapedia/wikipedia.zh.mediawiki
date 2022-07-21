@@ -1,1 +1,0 @@
-[[伦敦证券交易所|LSE]]： [http://www.londonstockexchange.com/en-gb/pricesnews/prices/Trigger/genericsearch.htm?bsg=true&ns={{{1}}} {{{1}}}]<noinclude>[[Category:股票代码模板]][[en:Template:Lse2]]</noinclude>

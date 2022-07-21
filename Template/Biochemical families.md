@@ -1,1 +1,0 @@
-#REDIRECT [[Template:生物化学物质种类]]

@@ -1,1 +1,0 @@
-{{User language-4|zh-pin|该用户能以'''[[:Category:Zh-pin-4 使用者|-{zh-hans:地道; zh-hant:道地}-]]'''的'''[[:Category:Zh-pin 使用者|平话]]'''进行交流。|平话|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

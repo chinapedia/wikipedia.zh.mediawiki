@@ -1,2 +1,0 @@
-{{Hatnote|[[File:Confusion grey.svg|24px|link=Wikipedia:消歧义]]{{If mobile|2=&nbsp;&nbsp;}}'''提示'''：此{{{sect|{{NSPN|zh-hans}}}}}的主题不是<noinclude>'''[[:{{{1}}}]]'''</noinclude>{{#if:{{{text|}}}|{{#invoke:TemplateParameters|argTrim|{{{text}}}}}|{{#invoke:TemplateParameters|FormatingArguments|delnowiki=yes|format=<nowiki>{{#if:{{{isFirst}}}||{{#if:{{{isLast}}}|或|、}}}}'''[[:{{#invoke:TemplateParameters|argTrim|{{{1}}}|pipe=yes}}]]'''</nowiki>|count=1|usingConditionalExpressions=yes}} }}。}} <noinclude>
-{{Documentation}}</noinclude>

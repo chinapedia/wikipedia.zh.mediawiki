@@ -1,1 +1,0 @@
-#REDIRECT [[Template:Intel处理器列表]]

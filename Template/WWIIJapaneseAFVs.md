@@ -1,1 +1,0 @@
-#REDIRECT [[Template:第二次世界大戰日本裝甲戰鬥車輛]]

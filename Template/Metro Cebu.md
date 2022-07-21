@@ -1,1 +1,0 @@
-#REDIRECT [[Template:宿霧大都會]]

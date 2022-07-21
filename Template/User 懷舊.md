@@ -1,1 +1,0 @@
-#REDIRECT [[Template:User 台灣懷舊風]]

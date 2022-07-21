@@ -1,1 +1,0 @@
-蘇聯製K5-M（AA-1）空對空飛彈<noinclude>[[Category:每周图片模板]]</noinclude>

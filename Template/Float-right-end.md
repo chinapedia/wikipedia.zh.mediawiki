@@ -1,1 +1,0 @@
-</div><noinclude>[[Category:格式模板|{{PAGENAME}}]]</noinclude>

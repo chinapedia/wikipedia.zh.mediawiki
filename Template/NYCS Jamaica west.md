@@ -1,3 +1,0 @@
-{{#ifeq:{{{exclude}}}|JZ||{{NYCS time 2|J|icon=alltimes|text=任何時候停站|time={{{time|}}}}}{{NYCS br|punct={{#if:{{{complex|}}}|,|{{#if:{{{exclude|}}}|{{#switch:{{{exclude}}}|M=and|JZ=}}|,}}}}|time={{{time|}}}}}}}{{#ifeq:{{{exclude}}}|M||{{NYCS time 2|M|icon=allexceptnights|text=任何時候停站（深夜除外）|time={{{time|}}}}}{{NYCS br|punct={{#if:{{{complex|}}}|{{#switch:{{{complex}}}|end=,and|#default=,}}|{{#if:{{{exclude|}}}||,and}}}}|time={{{time|}}}}}}}{{#ifeq:{{{exclude}}}|JZ||{{NYCS time 2|Z|icon=rushpeak|text=僅繁忙時段的尖峰方向停站|time={{{time|}}}}}&#8203;}}<noinclude>
-[[Category:紐約地鐵模板|{{PAGENAME}}]]
-</noinclude>

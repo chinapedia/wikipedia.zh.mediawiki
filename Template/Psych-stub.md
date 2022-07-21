@@ -1,1 +1,0 @@
-#REDIRECT [[Template:Psychi-and-psycho-stub]]

@@ -1,1 +1,0 @@
- [[:fr:Stade Brestois 29|-{zh-hans:比斯特;zh-hk:布雷斯特}-]]

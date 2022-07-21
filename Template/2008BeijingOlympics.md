@@ -1,1 +1,0 @@
-#REDIRECT [[Template:2008年夏季奧林匹克運動會項目]]

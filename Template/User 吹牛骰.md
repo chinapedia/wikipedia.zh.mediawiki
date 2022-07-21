@@ -1,1 +1,0 @@
-#REDIRECT [[Template:User 澶ц┍楠癩]

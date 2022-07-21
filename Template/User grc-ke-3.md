@@ -1,1 +1,0 @@
-{{User language-3|grc-ke|Ο χρήστης ούτος δύναται συνεισφέρειν μετά '''[[:Category:grc-ke-3 使用者|ανωτέρας]]''' γνώσεως της '''[[:Category:grc-ke 使用者|Κοινής Ελληνικής]]'''.|通用希腊语}} <noinclude></noinclude>

@@ -1,1 +1,0 @@
-#REDIRECT [[Template:中華民國中央行政機關]]

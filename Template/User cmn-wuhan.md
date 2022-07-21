@@ -1,1 +1,0 @@
-{{User language-N|cmn-wuhan|勒过用户'''[[:Category:cmn-wuhan 母語使用者|生下来]]'''就会讲'''[[:Category:cmn-wuhan 使用者|武汉话]]'''。|武汉話|10|9}}<noinclude>[[Category:汉语巴别模板]][[Category:武汉模板]]</noinclude>

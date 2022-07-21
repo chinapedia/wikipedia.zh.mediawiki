@@ -1,1 +1,0 @@
-#重定向 [[Template:User-warning set/doc]]

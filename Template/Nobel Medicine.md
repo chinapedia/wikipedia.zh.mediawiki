@@ -1,1 +1,0 @@
-#REDIRECT [[Template:诺贝尔生理学或医学奖获得者]]

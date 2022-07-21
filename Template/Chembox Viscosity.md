@@ -1,3 +1,0 @@
-| [[黏度]]
-| {{{value}}}{{#if:{{{value2|}}}|（{{{value2}}}）}}
-|-<noinclude>{{Documentation}}</noinclude>

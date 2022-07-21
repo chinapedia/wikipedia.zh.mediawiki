@@ -1,1 +1,0 @@
-{{User language-N|zh-pin|这个用户的'''[[:Category:Zh-pin 母語使用者|母语]]'''是'''[[:Category:Zh-pin 使用者|平话]]'''。|平话|14|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

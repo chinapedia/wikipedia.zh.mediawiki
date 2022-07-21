@@ -1,1 +1,0 @@
-border="2" cellpadding="4" cellspacing="0" style="margin: 0.5em 0.5em 0.5em 1em; padding: 0.5em; background: #f9f9f9; border: 1px #aaa solid; border-collapse: collapse; font-size: 95%;{{{1|}}}"

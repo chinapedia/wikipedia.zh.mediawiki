@@ -1,1 +1,0 @@
-#REDIRECT[[Template:蒙古国小作品]]

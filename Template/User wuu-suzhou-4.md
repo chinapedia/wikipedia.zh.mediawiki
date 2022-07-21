@@ -1,1 +1,0 @@
-{{User language-4|wuu-suzhou|诶个用户可以拿'''[[:Category:Wuu-suzhou-4 使用者|-{zh-hans:道地;zh-hant:道地}-]]'''格'''[[:Category:Wuu-suzhou 使用者|苏州闲话]]'''来交流。|苏州话|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

@@ -1,1 +1,0 @@
-#REDIRECT [[Template:Old_vfd_multi]]

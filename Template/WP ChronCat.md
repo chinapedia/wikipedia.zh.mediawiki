@@ -1,1 +1,0 @@
-#redirect [[Template:年代学分类专题]]

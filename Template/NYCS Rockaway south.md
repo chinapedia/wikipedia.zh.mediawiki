@@ -1,2 +1,0 @@
-{{#ifeq:{{{exclude}}}|A||{{NYCS time 2|A|icon=alltimes|text=all times|time={{{time|}}}}} {{NYCS br|time={{{time|}}}}}}} {{#ifeq:{{{exclude}}}|S||{{NYCS time 2|S|link=紐約地鐵洛克威公園接駁線|icon=alltimes|text=all times|time={{{time|}}}}}}}<noinclude>
-</noinclude>

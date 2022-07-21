@@ -1,9 +1,0 @@
-{{Userbox
-  |id=[[File:The Chinese character 紅.png|45px|link=|alt=]]
-  |id-c = #ffa500
-  |info = 这個用户是'''[[红楼梦|<span style="color:red;">红</span>]]<span style="color:red;">迷</span>'''。
-  |info-c = #ffa500
-  |info-s=10
-  |border-c = #CFECEC
-}}
-<includeonly>[[Category:喜欢红楼梦的維基人]]</includeonly>

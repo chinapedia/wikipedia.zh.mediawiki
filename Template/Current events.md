@@ -1,1 +1,0 @@
-#redirect [[Portal:新聞動態/Sidebar]]

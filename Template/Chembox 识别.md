@@ -1,1 +1,0 @@
-#REDIRECT [[Template:Chembox Identifiers]][[Category:重定向化学信息框]]

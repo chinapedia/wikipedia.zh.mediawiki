@@ -1,1 +1,0 @@
-{{User language-3|wuu-suzhou|诶个用户可以拿'''[[:Category:Wuu-suzhou-3 使用者|熟练]]'''格'''[[:Category:Wuu-suzhou 使用者|苏州闲话]]'''来交流。|苏州话|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

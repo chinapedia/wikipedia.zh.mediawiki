@@ -1,1 +1,0 @@
-<includeonly><span class="rating">{{#ifexpr: {{{1}}} >= 0 and {{{1}}} <= 4 | [[File:Stars4{{Rounddown|{{{1}}} }}{{#ifexpr: {{{1}}} - {{Rounddown|{{{1}}} }} > 0 | 5 | 0 }}.svg|44px|{{{1}}}/4 顆星]]| '''未填入星等''' }}<span class="average" style="display: none;">{{{1}}}</span><span class="best" style="display: none;">4</span></span></includeonly><noinclude>{{doc}}</noinclude>

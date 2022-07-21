@@ -1,1 +1,0 @@
-#REDIRECT [[Template:Chembox Thermochemistry]][[Category:重定向化学信息框]]

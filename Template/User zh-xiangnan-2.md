@@ -1,1 +1,0 @@
-{{User language-2|zh-xiangnan|该用户能以'''[[:Category:Zh-xiangnan-2 使用者|一般]]'''的'''[[:Category:Zh-xiangnan 使用者|湘南土话]]'''进行交流。|湘南土话|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

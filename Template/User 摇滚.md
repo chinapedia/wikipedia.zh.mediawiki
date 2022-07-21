@@ -1,1 +1,0 @@
-#redirect [[Template:User 搖滾樂]]

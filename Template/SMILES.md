@@ -1,1 +1,0 @@
-<span class="valueSMILES">{{{S}}}</span>

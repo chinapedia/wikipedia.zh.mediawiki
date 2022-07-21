@@ -1,1 +1,0 @@
-#REDIRECT [[Template:HK MiniBus Route HK Show:61]]

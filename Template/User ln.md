@@ -1,1 +1,0 @@
-{{User language-N|ln|Motó óyo ayébí koloba '''[[:Category:ln 使用者|lingála]]''' '''[[:Category:ln 母語使用者|bandá mbótama]]'''.|林加拉语}} <noinclude></noinclude>

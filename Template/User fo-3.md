@@ -1,1 +1,0 @@
-{{User language-3|fo|Denne bruger kan bidrage på '''[[:Category:fo-3 使用者|flydende]]''' '''[[:Category:fo 使用者|føroyskt]]'''.|法罗语}} <noinclude></noinclude>

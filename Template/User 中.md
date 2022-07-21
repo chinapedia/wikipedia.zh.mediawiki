@@ -1,1 +1,0 @@
-{{User language-N|中|该用戶的'''[[:Category:Zh 母語使用者|母語]]'''是'''[[:Category:Zh 使用者|漢語]]'''。|汉语|14|9}}

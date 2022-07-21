@@ -1,9 +1,0 @@
-{{Userbox
-  |id=FF
-  |id-s=14
-  |info=这个用户喜欢玩'''[[最终幻想]]'''游戏
-  |id-c=black
-  |id-fc=#66AAAA
-  |info-c=#66AAAA
-  |info-fc=black
-}}

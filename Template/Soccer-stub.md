@@ -1,1 +1,0 @@
-#REDIRECT [[Template:足球小作品]]

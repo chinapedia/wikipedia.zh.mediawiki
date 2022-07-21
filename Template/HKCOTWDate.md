@@ -1,1 +1,0 @@
-要求的時間內([[HKT]])<noinclude>[[Category:香港條目提升計劃模板]][[Category:辅助模板]]</noinclude>

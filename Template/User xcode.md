@@ -1,1 +1,0 @@
-{{User language-P|Xcode|该用户会使用'''[[Xcode]]'''。|Xcode}}<includeonly>{{#ifeq:{{NAMESPACE}}|User|[[Category:维基程序员|{{PAGENAME}}]]}}</includeonly><noinclude>[[Category:程式用戶框模板|Xcode]]</noinclude>

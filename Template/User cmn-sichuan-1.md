@@ -1,1 +1,0 @@
-{{User language-1|cmn-sichuan|这个用户'''[[:Category:cmn-sichuan-1 使用者|只晓得点点儿]][[:Category:cmn-sichuan 使用者|四川話]]'''。|四川話|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

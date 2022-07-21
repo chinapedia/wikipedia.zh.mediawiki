@@ -1,1 +1,0 @@
-{{User language-P|J♯|该用户会使用'''[[:Category:JSharp使用者|J♯]]'''。|J♯}}<includeonly>[[Category:JSharp使用者|{{PAGENAME}}]]{{#ifeq:{{NAMESPACE}}|User|[[Category:维基程序员|{{PAGENAME}}]]}}</includeonly><noinclude>[[Category:程式用戶框模板|J♯]]</noinclude>

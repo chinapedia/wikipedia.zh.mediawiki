@@ -1,1 +1,0 @@
-{{ruby|{{{1}}}|{{{2}}}|4=zh-Bopo|large={{{large|}}}}}<noinclude>{{doc}}</noinclude>

@@ -1,1 +1,0 @@
-{{User language-3|na|Amuno eman wono '''[[:Category:na-3 使用者|iduwen omotangitang]]''' ituga '''[[:Category:na 使用者|Dorerin Naoero]]'''.|瑙鲁语}} <noinclude></noinclude>

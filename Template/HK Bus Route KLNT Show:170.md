@@ -1,1 +1,0 @@
-#REDIRECT [[Template:HK Bus Route Cross Harbour Show:170]]

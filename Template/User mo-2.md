@@ -1,1 +1,0 @@
-{{User language-2|mo|Acest user grăieşte '''[[:Category:mo 使用者|moldoveneşte]]''' la nivel '''[[:Category:mo-2 使用者|mediu]]'''.|摩尔多瓦语}} <noinclude>[[ro:Format:Utilizator mo-2]]</noinclude>

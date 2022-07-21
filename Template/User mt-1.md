@@ -1,1 +1,0 @@
-{{User language-1|mt|Dan il-user jista' jikkontribwixxi <nowiki>b'</nowiki>'''[[:Category:mt 使用者|Malti]]''' ta' livell '''[[:Category:mt-1 使用者|sempliċi]]'''.|马耳他语}} <noinclude></noinclude>

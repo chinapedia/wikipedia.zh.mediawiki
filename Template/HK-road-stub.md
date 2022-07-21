@@ -1,1 +1,0 @@
-#REDIRECT [[template:HK-road-stub]]

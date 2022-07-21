@@ -1,1 +1,0 @@
-#REDIRECT [[Template:User 台灣蘋果日報]]

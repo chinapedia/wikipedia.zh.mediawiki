@@ -1,1 +1,0 @@
-#redirect [[Template:纽约地铁]]

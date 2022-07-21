@@ -1,1 +1,0 @@
-#redirect [[Template:汉朝人小作品]]

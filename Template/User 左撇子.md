@@ -1,1 +1,0 @@
-#REDIRECT [[Template:User 左利手]]

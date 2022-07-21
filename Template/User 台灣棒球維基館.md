@@ -1,1 +1,0 @@
-#Redirect [[Template:User_TwBaseball]]

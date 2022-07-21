@@ -1,1 +1,0 @@
-1945年興建中的忠靈塔<noinclude>[[Category:每周图片模板]]</noinclude>

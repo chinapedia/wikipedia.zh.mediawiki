@@ -1,1 +1,0 @@
-#redirect[[T:Infobox shopping mall]]{{合併重定向}}

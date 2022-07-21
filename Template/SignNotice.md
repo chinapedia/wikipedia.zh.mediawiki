@@ -1,1 +1,0 @@
-<small><span style="color:#C91F37">請將「'''<nowiki>~~~~</nowiki>'''」放到你的留言最後一行，它將自動產生你的[[Wikipedia:在讨论页上签名|簽名]]。</span></small>

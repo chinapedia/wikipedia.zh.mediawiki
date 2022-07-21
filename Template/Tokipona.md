@@ -1,1 +1,0 @@
-#REDIRECT [[Template:Tokipona icon]]

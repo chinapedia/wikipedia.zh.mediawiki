@@ -1,8 +1,0 @@
-==有用參考連結==
-*'''[[網站]]'''：[http://hk.news.yahoo.com/ 雅虎香港] | [http://news.google.com.hk/ Google香港] | [http://www.news.gov.hk/tc/frontpage.shtml 香港政府新聞網] | [http://news.sina.com.hk/ 新浪網新聞]
-*'''[[報章]]'''：[http://www.mingpaonews.com/ 明報] | [http://www.mpinews.com/ 明報即時新聞網] | [http://www.singpao.com/ 成報] | [http://appledaily.atnext.com/ 蘋果日報] | [http://www.singtao.com/ 星島日報] | [http://www.hket.com/hketonline/app 香港經濟日報] | [http://www.takungpao.com 大公報] | [http://wenweipo.com 文匯報] | [http://www.am730.com.hk/ am730] | [http://www.scmp.com/ 南華早報] | [http://news.hkheadline.com/ 頭條日報] | [http://www.skypost.hk 晴報] | 
-*'''[[電台]]'''：[http://pshweb01.881903.com/framework/pccs.gateway?url=jsp/news/main.jsp&menuID=5&sid=10&k=4 商業電台] | [http://www.metroradio.com.hk/1044metroplus/engnews/ 新城電台] | [http://www.rthk.org.hk/rthk/news/expressnews 香港電台] | [http://www.tdm.com.mo/radio/news/index.shtml 澳門電台]
-*'''[[電視]]'''：[http://cablenews.i-cable.com/webapps/ 有線新聞] | [http://news.tvb.com/ 無綫新聞] | [http://www.hkatvnews.com/ 亞視新聞] | [http://news.now.com now新聞台]| [http://www.tdm.com.mo/news/index.phtml 澳門電視台]
-*'''其他'''：[http://en.wikinews.org/wiki/Category:Hong_Kong 英文維基新聞（香港）] | [http://en.wikinews.org/wiki/Category:Macau 英文維基新聞（澳門）] | [http://www.ep21.org/webnews/ 網政廿一] | [http://www.inmediahk.net/ 獨立媒體] | [http://news.bbc.co.uk/chinese/trad/hi/default.stm BBC中文網] | [http://english.ohmynews.com/ Oh My News 國際版本] | [http://www.atchinese.com/ 亞洲時報] | [http://www.merdekareview.com/index.php 獨立新聞在線] | [http://zh.globalvoicesonline.org/hans/ 全球之聲] | [http://www.hkreporter.com 香港人網]
-
-----

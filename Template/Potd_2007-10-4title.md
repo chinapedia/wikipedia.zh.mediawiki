@@ -1,1 +1,0 @@
-[[万历]]十年[[明朝]]疆域<noinclude>[[Category:每周图片模板]]</noinclude>

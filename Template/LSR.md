@@ -1,5 +1,0 @@
-{{#if:{{{latest release version|{{{latest_release_version|}}}}}}|
-{{{latest release version|{{{latest_release_version}}}}}}{{#if:{{{latest release date|{{{latest_release_date|}}}}}}|<small>（{{{latest release date|{{{latest_release_date}}}}}}）</small>}}{{#if:{{{edit|}}}||<small class="plainlinks">[{{fullurl:Template:Latest stable software release/{{{article|{{PAGENAME}}}}}|action=edit}} &#91;±&#93;]</small>}}
-}}{{#ifeq:{{BASEPAGENAME}}|Latest stable software release|{{#ifexist:{{#if:{{{article|}}}|{{{article|}}}|{{#titleparts:{{PAGENAME}}||2}}}}|{{#ifeq:{{#invoke:redirect|isRedirect|{{#if:{{{article|}}}|{{{article|}}}|{{#titleparts:{{PAGENAME}}||2}}}}}}|yes|[[Category:用于重定向页面的软件模板]]|}}|[[Category:用于不存在条目的软件模板]]}}|}}<noinclude>
-{{documentation}}<!-- place categories and language links on the /doc page, not here! -->	
-</noinclude>

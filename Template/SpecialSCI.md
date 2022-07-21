@@ -1,1 +1,0 @@
-{{Encourage|bgcolor=#4682b4|stripecolor=#ffa500|stripe=2|title=科學特別貢獻|fontcolor=#ffffff|}}<noinclude>[[Category:科學特別貢獻| ]]</noinclude><includeonly>[[Category:科學特別貢獻|{{PAGENAME}}]]</includeonly>

@@ -1,1 +1,0 @@
-#REDIRECT [[Template:IPA vowels]] {{別名重定向}}

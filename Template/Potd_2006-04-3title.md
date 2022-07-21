@@ -1,1 +1,0 @@
-澳門主教座堂<noinclude>[[Category:每周图片模板]]</noinclude>

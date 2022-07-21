@@ -1,1 +1,0 @@
-一架正在清潔的國泰航空波音747-400客機<noinclude>[[Category:每周图片模板]]</noinclude>

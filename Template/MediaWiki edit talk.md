@@ -1,1 +1,0 @@
-{{fullurl:{{TALKPAGENAMEE}}|action=edit}}<noinclude>[[Category:辅助模板]]</noinclude>

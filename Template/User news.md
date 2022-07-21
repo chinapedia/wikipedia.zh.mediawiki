@@ -1,9 +1,0 @@
-{{Userbox
-  |id=[[File:Wikinews-logo.svg|60px]]
-  |id-c=white
-  |info=這個用戶關心時事或對'''[[新聞]]'''感興趣。
-  |info-s=10
-  |info-c=#efefff
-  |border-c=#87CEEB
-}}<includeonly>[[Category:对新闻感兴趣的维基人|{{PAGENAME}}]]</includeonly>
-<noinclude>[[Category:对新闻感兴趣的维基人|*]]</noinclude>

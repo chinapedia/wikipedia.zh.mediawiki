@@ -1,1 +1,0 @@
-斷臂維納斯<noinclude>[[Category:每周图片模板]]</noinclude>
