@@ -1,0 +1,94 @@
+{{NoteTA
+|G1 = IT
+}}
+[[File:Braille_closeup.jpg|thumb]]是一种广泛使用[[数据压缩|数据压缩]]以补偿阅读速度缓慢的编码。]]
+'''编码理论'''（{{lang-en|Coding theory}}）是研究编码的性质以及它们在具体应用中的性能的理论。编码用于[[数据压缩|数据压缩]]、[[密码学|加密]]、{{le|纠错|error-correction}}，最近也用于[[网络编码|网络编码]]中。不同学科（如[[信息论|信息论]]、[[電機工程學|電機工程學]]、[[数学|数学]]、[[语言学|语言学]]以及[[计算机科学|计算机科学]]）都研究编码是为了设计出高效、可靠的[[数据传输|数据传输]]方法。这通常需要去除冗余并校正（或检测）数据传输中的错误。
+
+编码共分四类：<ref>
+James Irvine, David Harle.
+[http://books.google.com/books?id=ZigejECe4r0C "Data Communications and Networks"].
+2002.
+p. 18.
+section "2.4.4 Types of Coding".
+quote:
+"There are four types of coding"
+</ref>
+#   数据压缩（或''信源编码''）
+# [[前向錯誤更正|前向錯誤更正]]（或''[[前向錯誤更正|信道编码]]''）
+# [[密码学|加密编码]]
+# [[线路码|线路码]]
+
+数据压缩和前向錯誤更正可以{{le|信源信道联合编码|Joint source and channel coding|一起考虑}}。
+
+信源编码试图压缩来自信源的数据以使传输更高效。这种做法每天都能在互联网上见到，因为在互联网上使用常见的[[ZIP格式|ZIP格式]]来降低网络负载，使文件更小。
+
+第二种，信道编码，加入额外的数据位以使在传输信道有干扰存在的时候数据传输的[[健壮性_(计算机科学)|強健性]]更强。普通用户可能不知道许多应用中都使用了信道编码。平常的音乐CD使用[[里德-所罗门码|里德-所罗门码]]来纠正划痕和灰尘。在此应用中传输信道就是光盘本身。手机也使用编码技术纠正高频无线电传输的衰落和噪声。数据调制解调器、电话传输、[[美国国家航空航天局|NASA]]都采用信道编码技术来传输信息，例如{{le|涡輪码|turbo code}}和[[低密度奇偶檢查碼|低密度码]]。
+
+==编码理论的历史==
+1948年，[[克劳德·香农|克劳德·香农]]发表了《通信的数学理论》，这篇文章由《贝尔系统技术杂志》的七月和十月刊分两部分发行。该文重点研究了如何最有效地对发送者要发送的[[信息|信息]]进行编码的问题。在这篇基础性的论文中，他使用了[[諾伯特·維納|諾伯特·維納]]发展的概率论工具，而这些概率论工具用于通信理论在当时还尚处萌芽阶段。香农提出[[熵_(信息论)|信息熵]]作为消息不确定性的量度，而实质上创造了[[信息论|信息论]]这个领域。
+
+{{le|二进制戈莱码|binary Golay code}}在1949年被提出。更具体地说，它是一种每个24位字能够纠正三个错误、检测出第四个错误的纠错码。
+
+[[File:Hamming.jpg|thumb]]的二维可视化]]
+[[理查德·衛斯里·漢明|理查德·漢明]]因在[[贝尔实验室|贝尔实验室]]在数值方法、自动编码系统以及错误检测和纠错码的成就于1968年获得了[[图灵奖|图灵奖]]。他发明了[[汉明码|汉明码]]、[[窗函数|汉明窗]]、[[正规数_(整数)|汉明数]]和[[汉明距离|汉明距离]]等概念。
+
+==信源编码==
+{{main|数据压缩}}
+信源编码的目的是让源数据变小。
+
+===定义===
+
+* 数据可以看作是[[随机变量|随机变量]] <math>X:\Omega\rightarrow\mathcal{X}</math>，其中 <math>x \in \mathcal{X}</math> 出现概率为 <math>\mathbb{P}[X=x]</math>。
+
+* 数据用[[字母表_(计算机科学)|字母表]] <math>\Sigma</math> 中的字符串（单词）进行编码的。
+
+* '''码'''是一个函数 <math>C:\mathcal{X}\rightarrow\Sigma^*</math>（或当空字符串不在字母表内时为 <math>\Sigma^+</math>）。<math>C(x)</math> 是与 <math>x</math> 关联的码字。
+
+* '''码长'''写作 <math>l(C(x))</math>。
+
+* '''码长的期望值'''为 <math>l(C) = \sum_{x\in\mathcal{X}}l(C(x))\mathbb{P}[X=x]</math>
+
+* '''码字拼接''' <math>C(x_1,...,x_k) = C(x_1)C(x_2)...C(x_k)</math>.
+
+* 空字符串的码字为空字符串本身：<math>C(\epsilon) = \epsilon</math>
+
+===性质===
+
+# 当 <math>C:\mathcal{X}\rightarrow\Sigma^*</math> 为[[单射|单射]]时，是[[Variable-length_code#Non-singular_codes|非奇异码]]。
+# 当 <math>C:\mathcal{X}^*\rightarrow\Sigma^*</math> 为单射时，是{{le|唯一可解码|Uniquely decodable code}}。
+# 如果 <math>C(x_1)</math> 和 <math>C(x_2)</math> 相互不是另一个的前缀，则 <math>C:\mathcal{X}\rightarrow\Sigma^*</math> 是[[Variable-length_code#Prefix_codes|即时码]]。
+
+===原理===
+信源的[[熵_(信息论)|熵]]是信息的度量。基本上，信源编码在尽量减少信源的冗余，用携带更多信息的更少的比特来表示信源。
+
+明确试图根据特定的假定概率模型来最小化消息的平均长度被称为[[熵編碼法|熵编码]]。
+
+有各种采用信源编码方案试图达到信源熵的极限的技术。''C''(''x'') ≥ ''H''(''x'')，其中 ''H''(''x'') 为信源熵（比特率），''C''(''x'') 为压缩后的比特率。特别指出，没有源编码方案可以比信源的熵更好。
+
+===例子===
+[[傳真|傳真]]传输使用简单的[[游程编码|游程编码]]。信源编码去除所有发射机必要发送以外所有多余数据，降低了传输所需的带宽。
+
+==参见==
+*{{le|编码增益|Coding gain}}
+*{{le|覆盖码|Covering code}}
+*[[前向錯誤更正|前向錯誤更正]]
+*{{le|群试|Group testing}}
+*[[汉明距离|汉明距离]]、[[汉明重量|汉明重量]]
+*[[信息论|信息论]]
+*[[李距离|李距离]]
+* [[MIMO|多天线研究]]中的空间编码和[[MIMO|MIMO]]
+
+==注释==
+{{reflist|2}}
+
+==参考文献==
+*[[Vera_Pless|Vera Pless]] (1982), ''Introduction to the Theory of Error-Correcting Codes'', John Wiley & Sons, Inc., ISBN 0-471-08684-3.
+*[[埃尔温·伯利坎普|Elwyn R. Berlekamp]] (1984), ''Algebraic Coding Theory'', Aegean Park Press (revised edition), ISBN 0-89412-063-8, ISBN 978-0-89412-063-3.
+*Randy Yates, ''[https://web.archive.org/web/20110710143034/http://www.digitalsignallabs.com/tutorial.pdf A Coding Theory Tutorial]''.
+
+{{Authority control}}
+{{DEFAULTSORT:编码理论}}
+[[Category:编码理论|]]
+[[Category:错误检测与校正|Category:错误检测与校正]]
+[[Category:计算机科学|Category:计算机科学]]
+[[Category:理论计算机科学|Category:理论计算机科学]]

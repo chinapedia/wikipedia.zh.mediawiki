@@ -1,0 +1,10 @@
+{{Userbox
+  |id={{lang|ja|西武}}
+  |id-c=white
+  |info=這個用戶是'''[[西武獅]]'''隊的球迷。
+  |info-c=lightblue
+  |info-s=9
+  |info-fc=black
+  |border-c=black
+}}
+[[Category:支持西武獅隊的維基人]]

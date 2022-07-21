@@ -1,0 +1,6 @@
+<includeonly>{{ #switch: {{Ja_Urban_Expwy_Sign/has SVG image|name={{{name|}}}|number={{{number|1}}}}} 
+| 1 = [[File:{{Ja_Urban_Expwy_Sign/get Roman Name|{{{name|}}}}}_Urban_Expwy_Sign_{{ #if: {{isNumeric|{{{number|1}}}}}|{{padleft:{{{number}}}|4|0}}|{{{number}}}}}.svg|{{{width|60}}}px|{{{align|}}}|{{ #if: {{{thumb|}}} | thumb | frameless}}|alt={{{alt|{{{name|都市}}}高速{{{number|}}}號標識}}}]]
+| 2 = [[File:Japanese_Urban_Expwy_Sign_{{ #if: {{isNumeric|{{{number|1}}}}}|{{padleft:{{{number}}}|4|0}}|{{{number}}}}}.svg|{{{width|60}}}px|{{{align|}}}|{{ #if: {{{thumb|}}} | thumb | frameless}}|alt={{{alt|{{{name|都市}}}高速{{{number|}}}號標識}}}]]
+| #default = {{ #if: {{isNumeric|{{{number|1}}}}} | {{Ja_Urban_Expwy_Sign/Composite Image|number={{{number|1}}}|width={{{width|60}}}|align={{{align|}}}|alt={{{alt|{{{name|都市}}}高速{{{number|1}}}號標識}}}}} | {{Ja_Urban_Expwy_Sign/Composite Text|number={{{number|1}}}|width={{{width|60}}}|align={{{align|}}}|alt={{{alt|{{{name|都市}}}高速{{{number|1}}}號標識}}}}} }}}}</includeonly><noinclude>
+{{Documentation}}
+</noinclude>

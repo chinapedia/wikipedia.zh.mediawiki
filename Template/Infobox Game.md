@@ -1,0 +1,44 @@
+<noinclude>{{Otheruses|Template:Infobox VG|subject=遊戲的模板|other=電子遊戲的模板}}
+</noinclude>{{Infobox
+| title = <includeonly>{{{title|{{{subject_name|{{PAGENAME}} }}} }}}</includeonly>
+| above = {{#if:{{{subtitle|}}}|<small>{{{subtitle}}}</small>}}
+| image = {{{image_link|{{{image|}}}}}}
+| caption = {{{image_caption|{{{caption|}}}}}}
+| bodystyle = {{#if:{{{width|}}}|width:{{{width}}};}}
+| labelstyle=white-space: nowrap;
+| label1 = [[廠商]]
+| data1 = {{{manufacturer|}}}
+| label2 = [[遊戲設計師|設計者]]
+| data2 = {{{designer|}}}
+| label3 = [[插圖家]]
+| data3 = {{{illustrator|}}}
+| label4 = [[遊戲發行商|發行商]]
+| data4 = {{{publisher|}}}
+| label5 = 發行{{nowrap|日期}}
+| data5 = {{{date|}}}
+| label6 = 活躍{{nowrap|時期}}
+| data6 = {{{years|}}}
+| label7 = 類型
+| data7 = {{{genre|}}}
+| label8 = 方法
+| data8 = {{{system|}}}
+| label9 = {{nowrap|玩家數目}}
+| data9 = {{{players|}}}
+| label10 = {{nowrap|適用年齡}}
+| data10 = {{{ages|}}}
+| label11 = {{nowrap|準備時間}}
+| data11 = {{{setup_time|}}}
+| label12 = {{nowrap|複雜程度}}
+| data12 = {{{complexity|}}}
+| label13 = {{nowrap|策略成分}}
+| data13 = {{{strategy|}}}
+| label14 = {{nowrap|遊戲時間}}
+| data14 = {{{playing_time|}}}
+| label15 = {{nowrap|運氣成分}}
+| data15 = {{{random_chance|}}}
+| label16 = {{nowrap|所需技巧}}
+| data16 = {{{skills|}}}
+| label17 = [[網站]]
+| data17 = {{{web|}}}
+| below = {{{footnotes|}}}
+}}<noinclude>{{documentation}}<!-- Please add metadata to the Documentation subpage --></noinclude>

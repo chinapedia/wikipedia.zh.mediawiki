@@ -1,0 +1,76 @@
+'''GPS信号'''，是由[[全球定位系统|全球定位系统]]（GPS）[[卫星|卫星]]上[[振盪器|振盪器]]所产生的信号，而所有GPS信号都由一个基本[[频率|频率]]f<sub>0</sub>=10.23Mhz组成。
+[[GPS卫星|GPS卫星]]发射的信号主要分为[[载波|载波]]（Carrier wave）、测距码（Ranging Code）和导航电文（Navigation Messages ）三部分。
+
+==最初的GPS信号==
+===载波===
+GPS卫星所用的两个载波均位于[[微波|微波]]的L波段，分别称为<math>L_1</math>载波和<math>L_2</math>载波
+
+
+两个相关的载波信号：
+
+<math>L_1(t)=A_1cos(2\pi f_1t+\phi_1)</math><br />
+<math>L_2(t)=A_2cos(2\pi f_2t+\phi_2)</math><br />
+
+
+<math>\phi_1</math>和<math>\phi_2</math>描述了相位噪声。载波信号的[[频率|频率]]为基本频率<math>f_0</math>的[[整数|整数]]倍。
+
+<math>f_1=154f_0=1575.42MHz</math><br />
+<math>f_2=120f_0=1227.60MHz</math><br />
+
+<math>\to \lambda_1\approx 19cm, \lambda_2\approx 24cm</math><br />
+
+
+采用L波段的高频率载波可以较为精确的测定[[多普勒频移|多普勒频移]]和载波相位，提高测速和定位精度。使用两个频率还可以测定[[电离层|电离层]]延迟。
+
+===测距码===
+测距码有两种，都属于[[伪随机噪声码|伪随机噪声码]]（Pseudo Random Noise，简称 PRN）：C/A 碼（Coarse/Acquisition Code）和P碼（Precise Code）。
+
+====C/A碼====
+C/A碼（Coarse/Acquisition Code）是用于进行粗略测距和捕获P码的粗码，也称捕获码。周期<math>T_u</math>为1毫秒，一个周期含有码元即码长<math>N_u</math>=2<sup>10</sup> - 1=1023，每个码元持续的时间即码元周期<math>t_u</math>=1ms/1023=0.977517微秒，相应的码元宽度为293.05米。C/A码是一种公开的明码，可供全球用户免费使用。但C/A码一般只调制在<math>L_1</math>载波上，所以无法精确地消除电离层延迟。测距精度一般为±（2~3）米。
+
+是開放給民間使用的[[GPS|GPS]]衛星傳送標準定位信號，它包含有GPS接收機用來確定其定位與時間方面的訊息，精確度在100公尺左右<ref>{{Cite web |url=http://www.garmin.com.tw/support/aboutGPS/glossary.htm |title=《專業術語》，Garmin官方網站 |accessdate=2012-09-19 |archive-date=2010-03-30 |archive-url=https://web.archive.org/web/20100330103248/http://www.garmin.com.tw/support/aboutGPS/glossary.htm |dead-url=no }}</ref>。
+
+這裡所提的C/A碼是指GPS所散布的序列，以下只討論L1信號部分。在GPS中用的C/A碼是一個群集，它們通常又被叫做偽[[隨機|隨機]]雜訊（Pseudorandom Noise,PRN）序列，因為它們有著雜訊的部分性質，GPS的C/A碼裡有著1023個元素，這裡面含有512個1與511個0，他們的排列是看起來彷彿隨機的，但是卻是完全可決定的，因此叫做偽隨機雜訊序列。
+
+這些序列最重要的性質有兩個：
+
+*幾乎沒有[[互相關|互相關]]：所有的C/A碼彼此之間幾乎沒有相關，也就是說，從i衛星得到的<math>C_i</math>和從j衛星得到的<math>C_j</math>兩個碼，他們的互相關可以表示如下式：
+
+<math>r_{ij}(n)=\sum_{m=0}^{1022} C_{i}(m)C_{j}(n+m)\approx 0</math> for all n
+
+*幾乎沒有[[自相關|自相關]]，除了零延遲：所有的C/A碼幾乎沒有自相關，除了零延遲，也就是說自相關可以表示如下式：
+
+<math>r_{ii}(n)=\sum_{m=0}^{1022} C_{i}(m)C_{i}(n+m)\approx 0</math> for |n|≥1
+
+利用這兩個性質，可以做[[GPS信號擷取|GPS信號擷取]]
+
+====P码====
+P码是精确测定从GPS卫星到用户接收机距离的测距码，也称精码。实际周期为一周，码长为6.1871 × 10<sup>12</sup>码元，码元周期0.097752微秒，相应码元宽度为29.3米。P码同时调制到<math>L_1</math>载波和<math>L_2</math>载波上，测距精度为0.3米。因其巨大的军事价值，1994年起美国实施了选择性误差SA（Selective Availability）政策，故目前只有[[美国|美国]]及其盟友的军方以及少数美国政府授权的用户才能够使用到P码。普通用户可以先捕获C/A码，再通过导航电文提供的数据计算出P码在整个序列码中的位置。
+2000年以後，柯林頓政府決定取消對民用訊號的干擾。因此，現在民用GPS也可以達到十米左右的定位精度。
+
+===导航电文===
+[[File:GPS_signal_modulation_scheme.svg|300px]]
+光有测距码用户还不能够得到每颗卫星的详细訊息。因此GPS系统将导航电文调整在测距码前，导航电文中包含了反应卫星在空间位置、卫星钟的修正参数、电离层延迟改正数等GPS定位所必要的訊息，因此导航电文也称資料码（Data Message，D码）。
+
+导航电文是具有一定格式的[[二进制|二进制]]码，以“帧”为单位向用户发送。每帧电文含有1500bit，传输速率为50bit/s。每个主帧包含5个子帧：
+*子帧1包含有卫星钟改正数、GPS周数（Week Number）和卫星工作状态訊息
+*子帧2和子帧3主要向用户提供有关计算卫星在轨位置的訊息，包括广播星历参数和資料龄期（Age of Data Offset，简称AODO）
+*子帧4和子帧5提供了卫星导航、星座历书等訊息
+
+==參考文獻==
+<div class="references-small">
+<references></references>
+</div>
+
+==其他參考資料==
+{{Translation/Ref|lang=en|article=GPS signals|oldid=}}
+*{{cite book zh |author=李征航 黄劲松|title=GPS测量与数据处理 |format=M |edition=1 |location=武汉 |publisher=武汉大学出版社 |date=2005 |pages= |id= ISBN 978-7-307-04443-2}}
+*{{cite book zh |author=胡友健 罗昀 曾云|title=全球定位系统（GPS）原理与应用|format=M |edition=1 |location=武汉 |publisher=中国地质大学出版社 |date=2003 |pages= |id= ISBN 978-7-5625-1769-6}}
+*Kai Borre, Dennis M. Akos, Nicolaj Bertelsen, Peter Rinder, Soren Holdt Jensen。《A Software-Defined GPS and Galileo Receiver: A Single-Frequency Approach》[M]。Birkhäuser Boston，2006年。
+
+==參見==
+*[[全球定位系統|全球定位系統]]
+*[[GPS信號擷取|GPS信號擷取]]
+
+[[Category:衛星導航系統|Category:衛星導航系統]]
+[[分类:全球定位系统|分类:全球定位系统]]

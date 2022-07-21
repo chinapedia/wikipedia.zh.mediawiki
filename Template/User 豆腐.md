@@ -1,0 +1,10 @@
+{{Userbox
+|border-c=#CCFF66
+|border-s=1
+|id-c=#FFFFCC
+|info-c=#FFFFCC
+|info-s=10
+|id=[[File:TofuWithSoySauceAndCarrot.jpg|45px]]
+|info=這個用戶喜歡吃'''[[豆腐]]'''。
+}}
+<includeonly>[[Category:喜欢吃豆腐的维基人|{{PAGENAME}}]]</includeonly>

@@ -1,0 +1,1 @@
+{{Error|錯誤：此模板已停用。請見[[Template:HK Bus Route Cross Harbour/doc]]。}}

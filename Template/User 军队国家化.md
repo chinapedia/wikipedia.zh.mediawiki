@@ -1,0 +1,12 @@
+{{Userbox
+|border-c=#000000
+|border-s=1
+|id-fc=#3333FF
+|id-s=11
+|info-c=#32cd32
+|info-fc=#000000
+|info-s=10
+|id=效忠<br>人民
+|info=這個用戶支持'''[[军队国家化]]'''。
+|usercategory=支持军队国家化的维基人
+}}

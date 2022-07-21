@@ -1,0 +1,3 @@
+<span class="noprint plainlinksneverexpand" style="white-space: nowrap; font-size:smaller;">[[Template:Tnavbar|Use Tnavbar now]]</div><noinclude>
+{{Notice|This template and other similar templates were created because, at the time of creation, {{tl|Tnavbar}}, it wasn't possible to pass the parameters in order to mould the output to match the given given template. This template is officially deprecated, '''use {{tl|Tnavbar}} with its paramater system now'''.}}
+</noinclude>

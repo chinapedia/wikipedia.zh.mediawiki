@@ -1,0 +1,1 @@
+<includeonly>{{#expr:{{#switch:{{{1}}}|N|E=1|S|W=-1}}*({{{2|0}}}+({{{3|0}}}+{{{4|0}}}/60)/60) round {{{precdec|{{#if:{{{4|}}}|5|{{#if:{{{3|}}}|3|0}}}}+{{precision1|{{{4|{{{3|{{{2}}}}}}}}}}}}}}}}</includeonly><noinclude>{{template doc}}[[Category:經緯模板]]</noinclude>

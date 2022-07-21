@@ -1,0 +1,1 @@
+{{User language-4|Java|这个用户能'''[[:Category:Java-4 使用者|专业地]]'''使用'''[[:Category:Java 使用者|Java语言]]'''。|Java}}<includeonly>{{#ifeq:{{NAMESPACE}}|User|[[Category:维基程序员|{{PAGENAME}}]]}}</includeonly><noinclude>[[Category:程式用戶框模板|java-4]]</noinclude>

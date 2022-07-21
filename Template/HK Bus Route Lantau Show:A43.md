@@ -1,0 +1,9 @@
+{{ #switch: {{{format|}}}
+  | endpoint1 = [[聯和墟巴士總站|粉嶺（聯和墟）]]
+  | endpoint2 = [[機場（地面運輸中心）巴士總站|機場（地面運輸中心）]]
+  | direction = 2
+  | status =
+  | inline = [[聯和墟巴士總站|粉嶺（聯和墟）]] ↔ [[機場（地面運輸中心）巴士總站|機場（地面運輸中心）]]
+  | normal =
+  | full =
+}}<noinclude>{{Documentation}}</noinclude>

@@ -1,0 +1,1 @@
+#REDIRECT [[Template:User TVB周刊]]

@@ -1,0 +1,11 @@
+{{Userbox
+  |id=UCSD
+  |id-s=11
+  |id-fc=#FFB300
+  |id-c=#000080
+  |info=這個用戶是'''[[聖地牙哥加州大學]]'''的校友、學生或老師。
+  |info-c=#FFB300
+  |info-s=10
+  |border-c=#AAAA00
+}}<noinclude>{{Clear}}[[Wikipedia:用户框/教育程度]]
+</noinclude>

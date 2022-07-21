@@ -1,0 +1,1 @@
+#redirect [[Template:存檔至]]

@@ -1,0 +1,1 @@
+{{#time:{{#if:{{{link|}}}|[[Y年]][[n月j日]]|Y年n月j日}}|{{#ifexpr:{{{1|0}}}>=0|+ {{{1|0}}} days|{{{1|-1}}} days}}}}<noinclude>{{pp-template|small=yes}}[[Category:日期计算模板|{{PAGENAME}}]]</noinclude>

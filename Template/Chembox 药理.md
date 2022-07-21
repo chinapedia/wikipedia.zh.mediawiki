@@ -1,0 +1,1 @@
+#REDIRECT [[Template:Chembox Pharmacology]][[Category:重定向化学信息框]]

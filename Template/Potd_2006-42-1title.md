@@ -1,0 +1,1 @@
+永保安康火車票<noinclude>[[Category:每周图片模板]]</noinclude>

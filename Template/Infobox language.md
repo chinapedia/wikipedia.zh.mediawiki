@@ -1,0 +1,461 @@
+{{Infobox
+| bodystyle = {{#if:{{{boxsize|}}}|width: {{{boxsize}}};}}
+
+| abovestyle = color: {{#if:{{{creator|}}}{{{setting|}}}{{#ifeq:{{Infobox language/family-color|{{{familycolor|}}} }}|black|1}}|white|{{{fontcolor|black}}} }}; background-color: {{#if:{{{creator|}}}{{{setting|}}}|black|{{#if:{{{signers|}}}|silver|{{Infobox language/family-color|{{{familycolor|Default}}} }} }} }};
+| above = {{{name|{{PAGENAME}}}}}
+| aboveclass = above
+| labelstyle = white-space: nowrap;
+
+| headerstyle = color: {{#if:{{{creator|}}}{{{setting|}}}{{#ifeq:{{Infobox language/family-color|{{{familycolor|}}}}}|black|1}}|white|{{{fontcolor|black}}}}}; background-color: {{#if:{{{signers|}}}|silver|{{#if:{{{creator|}}}{{{setting|}}}|black|{{Infobox language/family-color|{{{familycolor|Default}}}}}}}}};
+
+| subheaderstyle = font-weight: bold; color: {{#if:{{{creator|}}}{{{setting|}}}{{#ifeq:{{Infobox language/family-color|{{{familycolor|}}} }}|black|1}}|white|{{{fontcolor|black}}} }}; background-color: {{#if:{{{creator|}}}{{{setting|}}}|black|{{#if:{{{signers|}}}|silver|{{Infobox language/family-color|{{{familycolor|Default}}} }} }} }};
+| subheader1 = {{#if:{{{altname|}}}|<span style="font-size: small;">{{{altname|}}}</span>}}
+| subheader2 = {{#if:{{{nativename|}}}|<span style="font-size: small;">{{{nativename|}}}</span>}}
+| subheader3 = {{#if:{{{acceptance|}}}|({{{acceptance|}}})}}
+
+| image = {{#if:{{{image|}}}
+  |{{#invoke:InfoboxImage|InfoboxImage|image={{{image|}}}|size={{{image size|{{{image_size|{{{imagesize|}}}}}}}}}|sizedefault=frameless|alt={{{alt|{{{imagealt|}}}}}}|suppressplaceholder=yes}}
+  }}
+| caption = {{{imagecaption|}}}
+
+| label1 = 发音
+| data1 = {{#if:{{{pronunciation|}}}| {{IPA|{{{pronunciation|''将会加上''}}}}}}}
+| label2 = {{#if:{{{creator|}}}{{{setting|}}}{{#ifeq:{{Infobox language/family-color|{{{familycolor|}}}}}|black|1}}
+  | 创造者
+  | 母语国家和地区<!--Native to-->
+  }}
+| data2 = {{#if:{{{creator|}}}{{{setting|}}}{{#ifeq:{{Infobox language/family-color|{{{familycolor|}}}}}|black|1}}
+  |{{{creator|–}}}
+  |{{{states|{{{state|}}}}}}
+  }}
+| label3 = 创造日期
+| data3 = {{{created|}}}
+| label4 = {{#if:{{{creator|}}}{{{setting|}}}{{#ifeq:{{Infobox language/family-color|{{{familycolor|}}}}}|black|1}}
+  |设-{}-定和用法<!--Setting and usage-->
+  |{{#if:{{{region|}}}|'''区域'''}}
+  }}
+| data4 = {{#if:{{{creator|}}}{{{setting|}}}{{#ifeq:{{Infobox language/family-color|{{{familycolor|}}}}}|black|1}}
+    |{{{setting|}}}
+    |{{{region|}}}
+    }}
+| label5 = [[地理坐标系|经纬度]]
+| data5 = {{#if:{{{latd|}}}
+  | <small style="white-space: nowrap">{{coord|{{{latd}}}|{{{latm}}}|{{{latNS}}}|{{{longd}}}|{{{longm}}}|{{{longEW}}}|type:landmark|display=inline}}</small>
+  }}
+| label6 = 族群
+| data6 = {{{ethnicity|}}}
+| label7 = {{#if:{{{extinct|}}}
+  |[[語言滅亡]]
+  |{{#if:{{{era|}}}
+  |年代<!--Era-->
+  |{{#if:{{{creator|{{{speakers_label|}}}}}}
+  |{{{speakers_label|使用者<!--Users-->}}}
+  |母语{{#if:{{{signers|}}}{{#ifeq:{{Infobox language/family-color|{{{familycolor|}}}}}|silver|1}}
+    |使用者
+    |使用人数
+    }} }}
+  }} }}
+| data7 =<!--
+-->{{#if:{{{extinct|}}}|{{#ifeq:{{{extinct}}}|?|（date missing）|{{{extinct}}}}}<!-- extinct input used
+   -->|{{#if:{{{era|}}}|{{{era}}}<!-- era input used
+      -->|<!-- no era, check for sign/spoken -->{{#if:{{{signers|}}}{{#ifeq:{{Infobox language/family-color|{{{familycolor|}}} }}|silver|1}}<!-- check for signers/silver
+         -->|<!-- SIGN language (silver) -->{{#if:{{{signers|}}}{{{speakers|}}}|{{#ifeq: {{lc:{{{date}}}}}|na|{{{signers|{{{speakers|–}}}}}}
+      |{{#ifeq:{{{signers|{{{speakers}}}}}}|?|（未估计数量<!--no estimate available-->）
+      |{{#ifeq:{{{signers|{{{speakers}}}}}}|none|无
+      |{{#if:{{{date|}}}|{{{signers|{{{speakers|–}}}}}}（{{{dateprefix|}}}{{{date}}}）
+      |{{{signers|{{{speakers|–}}}}}}（日期不详<!--date missing-->）[[Category:语言使用人数没有注明日期的条目]]}} }} }} }} }}<!--（end if:date, ifeq:date=na, if:signers. end of SIGN）
+         -->|<!-- SPOKEN language (not silver) -->{{#if:{{{speakers|}}}|{{#ifeq: {{lc:{{{date}}}}}|na|{{{speakers|–}}}
+      |{{#ifeq: {{{date}}}|无日期<!--no date-->|未知<!--unknown-->（undated figure of {{{speakers}}}）|<!--
+The following changes the display depending on the age of the data. Limit set to 25 years, as a population can double in that time.
+-->{{#if:{{{date|}}}|{{#iferror:{{#expr: {{padleft:|4|{{{date}}}|}} }}||{{#ifexpr:(({{CURRENTYEAR}} - {{padleft:|4|{{{date}}}|}})< 25)<!--
+    -->|<!-- regular-->{{{speakers|–}}}（{{{dateprefix|}}}{{{date}}}）<!--
+    -->|<!-- old (25+)  -->未知（{{{speakers}}} 根据 {{{dateprefix|}}}{{{date}}}){{main other|{{#ifeq:{{{ref}}}|e18|[[Category:包含民族语第18版语言使用者数据的条目]]|[[Category:語言使用者數據過期的條目]]}}}}}}}}<!--（end ifexpr:25+, iferror:）
+    -->|{{#ifeq:{{{speakers}}}|?|（未估计数量<!--no estimate available-->）
+       |{{#ifeq:{{{speakers}}}|none|无
+       |<!-- no date input -->{{{speakers|–}}}（日期不详）[[Category:语言使用人数没有注明日期的条目]]}} }} }}<!--（end if:date, before the 25+ expr check）
+    -->}}<!--（end ifeq:date=no date）
+    -->}}<!--（end ifeq:date=na）
+    -->|<!--（no speakers number to be shown）-->}}}}<!--（end if:speakers (in 2nd param of silver-check）, if:silver. end of SPOKEN)
+      -->}} }}<!--（end if:era, if:extinct. No open #if:s left）
+If there is a ref, and there is any input for this row (data7), then we add the reference:
+-->{{#if:{{{ref|}}}|{{#if:{{{extinct|}}}{{{era|}}}{{{signers|}}}{{{speakers|}}}{{{date|}}}{{#ifeq:{{Infobox language/family-color|{{{familycolor|}}}}}|silver|sign_language}}|{{Infobox language/ref|{{{ref}}}|iso3={{{iso3|}}}|refname={{{refname|}}}|name={{{name|{{PAGENAME}}}}}|lc1={{{lc1|}}}|ld1={{{ld1}}}|lc2={{{lc2|}}}|ld2={{{ld2}}}|lc3={{{lc3|}}}|ld3={{{ld3}}}|lc4={{{lc4|}}}|ld4={{{ld4}}}|lc5={{{lc5|}}}|ld5={{{ld5}}}|lc6={{{lc6|}}}|ld6={{{ld6}}}|lc7={{{lc7|}}}|ld7={{{ld7}}}}}}}}}<!--
+Add speakers2 after the ref:
+-->{{#if:{{{speakers2|}}}|<div>{{{speakers2|}}}</div> }}
+
+| label8 = {{#if:{{{revived|}}} |[[語言復興|復興]]{{#if:{{{revived-category|{{{revived-cat|}}}}}}|{{#ifeq:{{{revived-category|{{{revived-cat}}}}}}|nocat|<!--suppress-->|[[Category:{{{revived-category|{{{revived-cat}}}}}}]]|[[Category:Language revival]]}} }} }}
+| data8 = {{{revived|}}} 
+
+| label9 = {{#if:{{{creator|}}}{{{setting|}}}{{#ifeq:{{Infobox language/family-color|{{{familycolor|}}}}}|black|1}}
+  |分類<br />（目標）<!--Purpose-->
+  |[[语言系属分类|語系]]
+  }}
+| data9 = {{#ifeq: {{lc:{{{family}}}}}|na||<div style="text-align:left;">{{{family|{{{fam1|{{#if:{{{signers|}}}{{#ifeq:{{Infobox language/family-color|{{{familycolor|}}}}}|silver|1}}
+  |未知<includeonly>[[Category:没有系属分类的语言]]</includeonly>
+  |{{#if:{{{creator|}}}{{{setting|}}}
+    |[[人工語言|人造語言]]
+    |{{Infobox language/genetic|{{{familycolor|Default}}}}}
+    }}
+  }}}}}<!--fam11-->
+<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>
+{{#ifeq:{{{familycolor|}}}|unclassified||{{#ifeq:{{{familycolor|}}}|Unclassified||{{#ifeq:{{{familycolor|}}}|isolate||{{#ifeq:{{{familycolor|}}}|Isolate||{{#if:{{{fam2|}}}
+| {{{fam2}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>{{#if:{{{fam3|}}}
+| {{{fam3}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>{{#if:{{{fam4|}}}
+| {{{fam4}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>{{#if:{{{fam5|}}}
+| {{{fam5}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>{{#if:{{{fam6|}}}
+| {{{fam6}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>{{#if:{{{fam7|}}}
+| {{{fam7}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>{{#if:{{{fam8|}}}
+| {{{fam8}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>{{#if:{{{fam9|}}}
+| {{{fam9}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>{{#if:{{{fam10|}}}
+| {{{fam10}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>{{#if:{{{fam11|}}}
+| {{{fam11}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>{{#if:{{{fam12|}}}
+| {{{fam12}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>{{#if:{{{fam13|}}}
+| {{{fam13}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>{{#if:{{{fam14|}}}
+| {{{fam14}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>{{#if:{{{fam15|}}}
+| {{{fam15}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>'''{{{name|{{PAGENAME}}}}}'''</li></ul>
+| '''{{{name|{{PAGENAME}}}}}'''
+}}<!--fam15--></li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}</li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}</li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}</li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}</li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}</li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}</li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}</li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}</li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}</li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}</li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}</li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}<!--fam3--></li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}<!--fam2-->
+}}<!--familycolor|}}}|Isolate-->}}}}}}</li></ul>}}}<!--family--></div>}}
+| label10 = 早期形式<!--Early forms-->
+| data10 = {{#if:{{{protoname|}}}{{{ancestor|}}}|<div style="text-align:left;">{{{protoname|{{{ancestor|}}}}}}
+<ul style="line-height:100%; margin-left:15px;padding-left:0"><li>{{#if:{{{ancestor2|}}}
+| {{{ancestor2}}}<ul style="line-height:100%; margin-left:2em;padding-left:0"><li>{{#if:{{{ancestor3|}}}
+| {{{ancestor3}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>{{#if:{{{ancestor4|}}}
+| {{{ancestor4}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>{{#if:{{{ancestor5|}}}
+| {{{ancestor5}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>{{#if:{{{ancestor6|}}}
+| {{{ancestor6}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>{{#if:{{{ancestor7|}}}
+| {{{ancestor7}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>{{#if:{{{ancestor8|}}}
+| {{{ancestor8}}}<ul style="line-height:100%; margin-left:1em;padding-left:0"><li>'''{{{name|{{PAGENAME}}}}}'''</li></ul>
+| '''{{{name|{{PAGENAME}}}}}'''
+}}</li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}</li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}</li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}</li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}</li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}</li></ul>| '''{{{name|{{PAGENAME}}}}}'''
+}}</li></ul> </div>
+}}
+| label11 = [[标准方言|标准形式]]<!--Standard forms-->
+| data11 = {{#if:{{{standards|}}}|{{{standards}}}
+|{{#if:{{{stand1|}}}|
+<div>{{{stand1|}}}</div>
+<div>{{{stand2|}}}</div>
+<div>{{{stand3|}}}</div>
+<div>{{{stand4|}}}</div>
+<div>{{{stand5|}}}</div>
+<div>{{{stand6|}}}</div>
+}}}}
+| label12 = 方言<!--Dialects-->
+| data12 = {{#if:{{{dialects|}}}|{{{dialects}}}
+|{{#if:{{{dia1|}}}|
+<div>{{{dia1|}}}</div>
+<div>{{{dia2|}}}</div>
+<div>{{{dia3|}}}</div>
+<div>{{{dia4|}}}</div>
+<div>{{{dia5|}}}</div>
+<div>{{{dia6|}}}</div>
+<div>{{{dia7|}}}</div>
+<div>{{{dia8|}}}</div>
+<div>{{{dia9|}}}</div>
+<div>{{{dia10|}}}</div>
+<div>{{{dia11|}}}</div>
+<div>{{{dia12|}}}</div>
+<div>{{{dia13|}}}</div>
+<div>{{{dia14|}}}</div>
+<div>{{{dia15|}}}</div>
+<div>{{{dia16|}}}</div>
+<div>{{{dia17|}}}</div>
+<div>{{{dia18|}}}</div>
+<div>{{{dia19|}}}</div>
+<div>{{{dia20|}}}</div>
+}}}}
+| rowclass12 = {{#if:{{{dialects|}}}||{{#if:{{{dia1|}}}|{{{listclass|{{{liststyle|plainlist}}}}}}}}}}
+
+| label13 = [[文字]]
+| data13 =  {{#switch: {{lc:{{{script|}}}}}
+             | 拉丁
+             | [[拉丁语|拉丁]]
+             | 拉丁字母
+             | [[拉丁字母]]<!--
+             | [[latin alphabet|latin]] = [[Latin script|Latin]]-->
+             | #default = {{{script|}}}
+            }}
+
+| label14 = {{allow wrap|{{longitem|[[手語|手语形式]]}}}}
+| data14 = {{#if:{{{sign|}}}|{{{sign}}}}}
+
+| label15 = 分类<br />（来源）<!--Sources-->
+| data15 = {{{posteriori|}}}
+
+| header16 = {{#if:{{{nation|}}}{{{official|}}}{{{minority|}}}{{{agency|}}}|官方地位}}
+| label17 = [[官方语言列表|作为官方语言]]
+| data17 = {{{nation|{{{official|}}}}}}
+| label18 = 承认少数语言
+| data18 = {{{minority|}}}
+| label19 = 管理机构
+| data19 = {{{agency|{{#ifexpr:{{#if:{{{agency|}}}|1|0}}<!-- and -->{{#if:{{{creator|}}}{{{setting|}}}{{#ifeq:{{Infobox language/family-color|{{{familycolor|Default}}}}}|black|1}}|1|0}}
+  | 无
+<!--  | {{#if:{{{nation|}}}|无官方机构}} [this ends up claiming that languages have no regulation just cuz no-one bothered to add the regulator -->
+  }}}}}
+
+| label20 = 開發機構 
+| data20 = {{{development_body|}}}
+
+| header21 = 語言代碼
+
+| label22 = [[ISO 639-1]]
+| data22 = {{#if:{{{iso1|}}}|<code>{{#ifeq:{{str len|{{{iso1|}}}}}| 2 | {{ISO 639-1|{{{iso1}}}}} | {{{iso1}}} }}</code> {{{iso1comment|}}}}}
+
+| label23 = [[ISO 639-2]]
+| data23 = {{#if:{{{iso2|}}}{{{iso2b|}}}{{{iso2t|}}}
+ |<code>{{#if:{{{iso2b|}}}{{{iso2t|}}}
+  |[[ISO639-3:{{{iso2b|{{{iso2|–}}}}}}|{{{iso2b}}}]]&nbsp;（B）
+  |{{#if:{{{signers|}}}{{#ifeq:{{Infobox language/family-color|{{{familycolor|}}}}}|silver|1}}
+   |{{{iso2|sgn}}}
+   |{{#if:{{{creator|}}}{{{setting|}}}{{#ifeq:{{Infobox language/family-color|{{{familycolor|}}}}}|black|1}}
+    |{{{iso2|art}}}
+    |[[ISO639-3:{{{iso2}}}|{{{iso2}}}]]}}
+   }}
+  }}</code> {{{iso2comment|}}}{{
+     #if:{{{iso2b|}}}{{{iso2t|}}}
+     |<br /><code>[[ISO639-3:{{{iso2t|{{{iso2|–}}}}}}|{{{iso2t}}}]]&nbsp;（T）</code>}}
+ }}
+| label24 = [[ISO 639-3]]
+| data24 = {{#if:{{{iso3|}}}
+   |{{#ifeq:{{lc:{{{iso3|}}}}}|none|{{#if:{{{iso3comment|}}}|{{{iso3comment}}}|无（{{codespan|mis}}）}}|<code>[[ISO639-3:{{{iso3}}}|{{{iso3}}}]]</code>{{#if:{{{lc1|}}}|——<!--ISO 639 macrolanguage-->{{le|ISO 639宏语言|ISO 639 macrolanguage|囊括代码}}<!--not all are 'macrolanguages': Hittite, for example-->}} {{{iso3comment|}}}}}|{{#if:{{{lc1|}}}| |–}}}}{{#ifexpr:{{#if:{{{lc1|}}}|1|0}} and {{#if:{{{lc2|}}}|1|0}}|{{#if:{{{iso3|}}}|<br />各项代码<!--Individual codes-->|{{#if:{{{lc3|}}}|分別為|兩者之一}}}}：{{Infobox language/codelist
+|{{{lc1|}}}|{{{ld1|}}}}}{{Infobox language/codelist
+|{{{lc2|}}}|{{{ld2|}}}}}{{Infobox language/codelist
+|{{{lc3|}}}|{{{ld3|}}}}}{{Infobox language/codelist
+|{{{lc4|}}}|{{{ld4|}}}}}{{Infobox language/codelist
+|{{{lc5|}}}|{{{ld5|}}}}}{{Infobox language/codelist
+|{{{lc6|}}}|{{{ld6|}}}}}{{Infobox language/codelist
+|{{{lc7|}}}|{{{ld7|}}}}}{{Infobox language/codelist
+|{{{lc8|}}}|{{{ld8|}}}}}{{Infobox language/codelist
+|{{{lc9|}}}|{{{ld9|}}}}}{{Infobox language/codelist
+|{{{lc10|}}}|{{{ld10|}}}}}{{Infobox language/codelist
+|{{{lc11|}}}|{{{ld11|}}}}}{{Infobox language/codelist
+|{{{lc12|}}}|{{{ld12|}}}}}{{Infobox language/codelist
+|{{{lc13|}}}|{{{ld13|}}}}}{{Infobox language/codelist
+|{{{lc14|}}}|{{{ld14|}}}}}{{Infobox language/codelist
+|{{{lc15|}}}|{{{ld15|}}}}}{{Infobox language/codelist
+|{{{lc16|}}}|{{{ld16|}}}}}{{Infobox language/codelist
+|{{{lc17|}}}|{{{ld17|}}}}}{{Infobox language/codelist
+|{{{lc18|}}}|{{{ld18|}}}}}{{Infobox language/codelist
+|{{{lc19|}}}|{{{ld19|}}}}}{{Infobox language/codelist
+|{{{lc20|}}}|{{{ld20|}}}}}{{Infobox language/codelist
+|{{{lc21|}}}|{{{ld21|}}}}}{{Infobox language/codelist
+|{{{lc22|}}}|{{{ld22|}}}}}{{Infobox language/codelist
+|{{{lc23|}}}|{{{ld23|}}}}}{{Infobox language/codelist
+|{{{lc24|}}}|{{{ld24|}}}}}{{Infobox language/codelist
+|{{{lc25|}}}|{{{ld25|}}}}}{{Infobox language/codelist
+|{{{lc26|}}}|{{{ld26|}}}}}{{Infobox language/codelist
+|{{{lc27|}}}|{{{ld27|}}}}}{{Infobox language/codelist
+|{{{lc28|}}}|{{{ld28|}}}}}{{Infobox language/codelist
+|{{{lc29|}}}|{{{ld29|}}}}}{{Infobox language/codelist
+|{{{lc30|}}}|{{{ld30|}}}}}{{Infobox language/codelist
+|{{{lc31|}}}|{{{ld31|}}}}}{{Infobox language/codelist
+|{{{lc32|}}}|{{{ld32|}}}}}{{Infobox language/codelist
+|{{{lc33|}}}|{{{ld33|}}}}}{{Infobox language/codelist
+|{{{lc34|}}}|{{{ld34|}}}}}{{Infobox language/codelist
+|{{{lc35|}}}|{{{ld35|}}}}}{{Infobox language/codelist
+|{{{lc36|}}}|{{{ld36|}}}}}{{Infobox language/codelist
+|{{{lc37|}}}|{{{ld37|}}}}}{{Infobox language/codelist
+|{{{lc38|}}}|{{{ld38|}}}}}{{Infobox language/codelist
+|{{{lc39|}}}|{{{ld39|}}}}}{{Infobox language/codelist
+|{{{lc40|}}}|{{{ld40|}}}}}{{Infobox language/codelist
+|{{{lc41|}}}|{{{ld41|}}}}}{{Infobox language/codelist
+|{{{lc42|}}}|{{{ld42|}}}}}{{Infobox language/codelist
+|{{{lc43|}}}|{{{ld43|}}}}}{{Infobox language/codelist
+|{{{lc44|}}}|{{{ld44|}}}}}{{Infobox language/codelist
+|{{{lc45|}}}|{{{ld45|}}} }}
+ |{{#if:{{{lc1|}}}|{{#if:{{{iso3|}}}|<br />单项代码<!--Individual code-->：}}{{Infobox language/codelist|code={{{lc1}}}|2={{{ld1|}}} }} }} }}
+
+| label25 = [[ISO 639-6]]<!-- NOTE: ISO 639-6 was withdrawn in 2014.-->
+| data25 = {{#if:{{{iso6|}}}|<code>{{{iso6}}}</code>}}
+
+| label26 = [[語言學家列表 (網站)|语言学家列表]]<!--Linguist List-->
+| data26 = {{Infobox language/linguistlist|1={{{linglist|}}} |2={{{lingname|}}}}}
+| label27 = &nbsp;
+| data27 = {{Infobox language/linguistlist|1={{{linglist2|}}}|2={{{lingname2|}}}}}
+| label28 = &nbsp;
+| data28 = {{Infobox language/linguistlist|1={{{linglist3|}}}|2={{{lingname3|}}}}}
+| label29 = &nbsp;
+| data29 = {{Infobox language/linguistlist|1={{{linglist4|}}}|2={{{lingname4|}}}}}
+| label30 = &nbsp;
+| data30 = {{Infobox language/linguistlist|1={{{linglist5|}}}|2={{{lingname5|}}}}}
+| label31 = &nbsp;
+| data31 = {{Infobox language/linguistlist|1={{{linglist6|}}}|2={{{lingname6|}}}}}
+
+| label32 = [[Glottolog]]
+| data32 = {{#if:{{{glotto|}}}|{{#ifeq:{{lc:{{{glotto|}}}}}|none|''None''[[Category:没有Glottolog编码的语言]]|{{#ifeq:{{lc:{{{glotto|}}}}}|spurious|(insufficiently attested or not a distinct language){{main other|[[Category:Languages rejected by Glottolog]]}}|<code>{{glottolink|{{{glotto}}}}}</code>{{#if:{{{glottoname|}}}|&nbsp; {{nowrap|{{{glottoname}}}}}}}{{#ifeq:{{{glottofoot|}}}|no||{{#tag:ref|{{Glottolog|{{{glotto}}}|{{{glottorefname|{{{glottoname|{{{name}}}}}}}}}}}|name="Glottolog"}}}}}}}}}}<!--
+-->{{#if:{{{glotto2|}}}|{{#if:{{{glotto|}}}|<br />|<!--no break when more than one box on a page-->}}<code>{{glottolink|{{{glotto2}}}}}</code>{{#if:{{{glottoname2|}}}|&nbsp; {{nowrap|{{{glottoname2}}}}}}}{{#ifeq:{{{glottofoot|}}}|no||{{#tag:ref|{{Glottolog|{{{glotto2}}}|{{{glottorefname2|{{{glottoname2|{{{name}}}}}}}}}}}|name="Glottolog2"}}}}}}<!--
+-->{{#if:{{{glotto3|}}}|{{#if:{{{glotto2|}}}|<br />|<!--no break-->}}<code>{{glottolink|{{{glotto3}}}}}</code>{{#if:{{{glottoname3|}}}|&nbsp; {{nowrap|{{{glottoname3}}}}}}}{{#ifeq:{{{glottofoot|}}}|no||{{#tag:ref|{{Glottolog|{{{glotto3}}}|{{{glottorefname3|{{{glottoname3|{{{name}}}}}}}}}}}|name="Glottolog3"}}}}}}<!--
+-->{{#if:{{{glotto4|}}}|{{#if:{{{glotto3|}}}|<br />|<!--no break-->}}<code>{{glottolink|{{{glotto4}}}}}</code>{{#if:{{{glottoname4|}}}|&nbsp; {{nowrap|{{{glottoname4}}}}}}}{{#ifeq:{{{glottofoot|}}}|no||{{#tag:ref|{{Glottolog|{{{glotto4}}}|{{{glottorefname4|{{{glottoname4|{{{name}}}}}}}}}}}|name="Glottolog4"}}}}}}<!--
+-->{{#if:{{{glotto5|}}}|{{#if:{{{glotto4|}}}|<br />|<!--no break-->}}<code>{{glottolink|{{{glotto5}}}}}</code>{{#if:{{{glottoname5|}}}|&nbsp; {{nowrap|{{{glottoname5}}}}}}}{{#ifeq:{{{glottofoot|}}}|no||{{#tag:ref|{{Glottolog|{{{glotto5}}}|{{{glottorefname5|{{{glottoname5|{{{name}}}}}}}}}}}|name="Glottolog5"}}}}}}
+
+
+| label33 = [[澳大利亚原住民和托雷斯海峡岛民研究协会|AIATSIS]]{{#if:{{{aiatsis|}}}|{{#tag:ref|{{AIATSIS|{{{aiatsis|}}}|{{{aiatsisname|{{{name}}}}}}|{{{aiatsis2|}}}}}|name="AIATSIS"}}}}<!--Australian Institute of Aboriginal and Torres Strait Islander Studies-->
+| data33 = {{#if:{{{aiatsis|}}}|<code>[http://austlang.aiatsis.gov.au/main.php?code={{{aiatsis}}} {{{aiatsis}}}]</code>{{#if:{{{aiatsisname|}}}|&nbsp;{{{aiatsisname}}}}} }}{{#if:{{{aiatsis2|}}}|, <code>[http://austlang.aiatsis.gov.au/main.php?code={{{aiatsis2}}} {{{aiatsis2}}}]</code>{{#if:{{{aiatsisname2|}}}|&nbsp;{{{aiatsisname2}}}}} }}{{#if:{{{aiatsis3|}}}|, <code>[http://austlang.aiatsis.gov.au/main.php?code={{{aiatsis3}}} {{{aiatsis3}}}]</code>{{#if:{{{aiatsisname3|}}}|&nbsp;{{{aiatsisname3}}}}} }}{{#if:{{{aiatsis4|}}}|, <code>[http://austlang.aiatsis.gov.au/main.php?code={{{aiatsis4}}} {{{aiatsis4}}}]</code>{{#if:{{{aiatsisname4|}}}|&nbsp;{{{aiatsisname4}}}}} }}{{#if:{{{aiatsis5|}}}|, <code>[http://austlang.aiatsis.gov.au/main.php?code={{{aiatsis5}}} {{{aiatsis5}}}]</code>{{#if:{{{aiatsisname5|}}}|&nbsp;{{{aiatsisname5}}}}} }}{{#if:{{{aiatsis6|}}}|, <code>[http://austlang.aiatsis.gov.au/main.php?code={{{aiatsis6}}} {{{aiatsis6}}}]</code>{{#if:{{{aiatsisname3|}}}|&nbsp;{{{aiatsisname6}}}}} }}
+
+| label34 = [[班图语的格思里分类|格思里代码]]<!--Guthrie classification of Bantu languages-->
+| data34 = {{#if:{{{guthrie|}}}|<code>{{{guthrie}}}</code><ref name="Guthrie">Jouni Filip Maho, 2009. [http://goto.glocalnet.net/mahopapers/nuglonline.pdf New Updated Guthrie List Online]</ref>}}
+
+| label35 = [[瀕危語言項目|ELP]]
+| data35 = {{#ifeq: {{lc: {{{ELP|}}} }} | none | | {{Endangered Languages Project |ELP={{{ELP|}}} |ELPname={{{ELPname|}}} |qid={{{qid|}}} }} }}
+
+| label36 = &nbsp;<!--keeps ELP entries aligned-->
+| data36 = {{#if:{{{ELP2|}}}|[http://www.endangeredlanguages.com/lang/{{{ELP2}}} {{{ELPname2}}}]{{#tag:ref|[http://www.endangeredlanguages.com/lang/{{{ELP2|}}} {{{ELPname2}}}的瀕危語言項目資料].|name="ELP2"}}<!--[[Category:Language articles with manual ELP links]]-->}}
+
+| label37 = &nbsp;
+| data37 = {{#if:{{{ELP3|}}}|[http://www.endangeredlanguages.com/lang/{{{ELP3}}} {{{ELPname3}}}]{{#tag:ref|[http://www.endangeredlanguages.com/lang/{{{ELP3|}}} {{{ELPname3}}}的瀕危語言項目資料].|name="ELP3"}}<!--[[Category:Language articles with manual ELP links]]-->}}
+
+| label38 = &nbsp;
+| data38 = {{#if:{{{ELP4|}}}|[http://www.endangeredlanguages.com/lang/{{{ELP4}}} {{{ELPname4}}}]{{#tag:ref|[http://www.endangeredlanguages.com/lang/{{{ELP4|}}} {{{ELPname4}}}的瀕危語言項目資料].|name="ELP4"}}<!--[[Category:Language articles with manual ELP links]]-->}}
+
+| label39 = &nbsp;
+| data39 = {{#if:{{{ELP5|}}}|[http://www.endangeredlanguages.com/lang/{{{ELP5}}} {{{ELPname5}}}]{{#tag:ref|[http://www.endangeredlanguages.com/lang/{{{ELP5|}}} {{{ELPname5}}}的瀕危語言項目資料].|name="ELP5"}}<!--[[Category:Language articles with manual ELP links]]-->}}
+
+| label40 = &nbsp;
+| data40 = {{#if:{{{ELP6|}}}|[http://www.endangeredlanguages.com/lang/{{{ELP6}}} {{{ELPname6}}}]{{#tag:ref|[http://www.endangeredlanguages.com/lang/{{{ELP6|}}} {{{ELPname6}}}的瀕危語言項目資料].|name="ELP6"}}<!--[[Category:Language articles with manual ELP links]]-->}}
+
+| label41 = {{link-en|Glottopedia|Glottopedia}}
+| data41 = {{#if:{{{glottopedia|}}}|<code>[http://www.glottopedia.org/index.php/{{{glottopedia}}} {{{glottopedia}}}]</code>{{#tag:ref|[http://www.glottopedia.org/index.php/{{{glottopedia}}} {{PAGENAMEBASE}}的Glottopedia條目].|name="Glottopedia"}}}}
+
+| label42 = [[语言瞭望站]]
+| data42 = {{#if:{{{lingua|}}}|<code>{{{lingua}}}</code> {{{lingua_ref|}}}}}
+
+| label43 = [[IETF語言標籤|IETF]]
+| data43 = {{#if:{{{ietf|}}}|<code>{{{ietf}}}</code>{{Main other|[[Category:带有IETF标签的语言]]}}}}
+
+| header44 = {{#if:{{{IDN_ccTLD|}}}|-{zh-tw:網域名稱;zh-cn:域名;}-}}
+| label45 = [[国际化域名|IDN ccTLD]]
+| data45 = {{{IDN_ccTLD|}}}
+
+| data46 = {{#if:{{{map|}}}
+  | {{#invoke:InfoboxImage|InfoboxImage|image={{{map}}}|size={{px|{{{mapsize|}}}}}|sizedefault=300px|alt={{{alt|{{{mapalt|}}}}}}|suppressplaceholder=yes}}{{#if:{{{mapcaption|}}}|<div style="text-align:left;">{{{mapcaption}}}</div>}}
+  }}
+| data47 = {{#if:{{{map2|}}}
+  | {{#invoke:InfoboxImage|InfoboxImage|image={{{map2}}}|size={{px|{{{mapsize|}}}}}|sizedefault=300px|alt={{{alt|{{{mapalt2|}}}}}}|suppressplaceholder=yes}}{{#if:{{{mapcaption2|}}}|<div style="text-align:left;">{{{mapcaption2}}}</div>}}
+  }}
+
+| data48 = {{#if:{{both| {{{pushpin_map|}}} | {{{coordinates|}}}{{{coords|}}} }}|
+{{location map|{{{pushpin_map|}}}
+|coordinates = {{if empty|{{{coordinates|}}}|{{{coords|}}}}}
+|border = infobox
+|alt = {{{pushpin_map_alt|使用{{{name|語言}}}的大概位置}}}
+|caption = {{{pushpin_map_caption|}}}
+|float = center
+|width = {{{pushpin_mapsize|}}}
+|default_width = 250
+|AlternativeMap = {{{pushpin_image|}}}
+ |label = {{#ifeq: {{lc: {{{pushpin_label_position|}}} }} | none | | {{if empty|{{{pushpin_label|}}}|{{{name|}}}|{{PAGENAMEBASE}} }} }}
+ |marksize =6
+ |position = {{{pushpin_label_position|}}}
+}} }}
+| data49 =  {{#if:{{if empty|{{{coordinates|}}}|{{{coords|}}}}} |坐标：{{#invoke:Coordinates|coordinsert|{{{coordinates|{{{coords|}}}}}}|type:landmark}}| }}
+
+| data50 = {{{module|}}}
+
+| header51 = {{#if:{{{vitality|}}}|瀕危程度}}{{#if:{{{vitality1|}}}|濒危程度}}
+| data52 = {{Infobox_language/vitality|{{{vitality|}}}}}
+| label53 = {{{vitality-region5|}}}
+| data53 = {{Infobox language/vitality-short|{{{vitality5|}}}}}
+| label54 = {{{vitality-region4|}}}
+| data54 = {{Infobox language/vitality-short|{{{vitality4|}}}}}
+| label55 = {{{vitality-region3|}}}
+| data55 = {{Infobox language/vitality-short|{{{vitality3|}}}}}
+| label56 = {{{vitality-region2|}}}
+| data56 = {{Infobox language/vitality-short|{{{vitality2|}}}}}
+| label57 = {{{vitality-region1|}}}
+| data57 = {{Infobox language/vitality-short|{{{vitality1|}}}}} {{#if:{{{vitality1|}}}|([http://www.unesco.org/culture/languages-atlas/index.php UNESCO])}}
+
+| belowclass = noprint selfref
+| belowstyle = background-color:#ddddff;padding:0.3em 0.5em;text-align:left;line-height:1.3;
+| below = {{#ifeq:{{lc:{{{notice|{{{notice2|}}}}}}}}|ipa
+  |'''本条目包含[[國際音標|国际音标]]符号。'''部分[[操作系统|-{zh-cn:操作系统;zh-hk:作業系統;zh-mo:作業系統;zh-tw:作業系統;zh-sg:操作系统;}-]]及[[网页浏览器|浏览器]]需要[[{{{fix|Help:特殊字母與符號}}}|特殊字母与符号-{zh-cn:支持;zh-hk:支援;zh-mo:支援;zh-tw:支援;zh-sg:支持;}-]]才能正確显示，否则可能显示为{{{error|[[亂碼|乱码]]、问号、空格等其它符号}}}。
+  }}
+}}<!-- Adding tracking categories:
+-->{{#if:{{Infobox language/family-color|{{{familycolor|}}}}}{{{signers|}}}{{{creator|}}}||<includeonly>[[Category:没有语系配色的语言]]</includeonly>}}<!--
+-->{{#if:{{{extinct|}}}{{{era|}}}{{{signers|}}}{{{speakers|}}}{{{creator|}}}{{{setting|}}}||<!-- no main input for data7 -->{{main other|[[Category:沒有使用者人數的語言類條目]]}}}}<!--
+
+-->{{#ifeq:{{lc:{{{iso3|}}}}}|none|{{main other|{{#if:{{{creator|}}}{{{setting|}}}{{#ifeq:{{Infobox language/family-color|{{{familycolor|}}}}}|black|1}}|[[Category:没有ISO 639-3代码的人造语言]]|}}}}}}<!-- 下面的分類鏈接亟待解決，按照英文維基百科的設定，這些分類均歸於語言專題分類
+-->{{#if:{{{date|}}}|{{#iferror: {{#expr: {{padleft:|4|{{{date}}}|}} }} |<!--
+   -->{{#switch: {{lc:{{{date}}}}}
+   | na = [[Category:语言使用人数统计时间不明的条目]]
+   | no date = [[Category:Language articles with 'no date' set]]
+   | #default = [[Category:语言使用者及日期无效的条目]]<!--
+   -->}}|<!-- no error -->}}|<!-- no date -->}}<!--
+-->{{#if:{{{iso3|}}}|<!--ok-->|{{#if:{{{lc1|}}}|<!--ok-->|<!--
+    -->{{#switch: {{lc:{{{isoexception}}}}}
+    | dialect = [[Category:拥有ISO代码的语言的方言]]
+    | historical = [[Category:拥有ISO代码的语言的历史形态]]
+    | protolanguage = [[Category:没有ISO代码的原始语言]]
+    | talkpage =
+    |}}}}}}<!--
+-->{{#ifeq:{{{iso3|}}}|none|{{#if:{{{linglist|}}}|<!--ok-->|{{#if:{{{lingua|}}}|<!--ok-->|{{#if:{{{aiatsis|}}}|<!--ok-->|{{#if:{{{guthrie|}}}|<!--ok-->|{{#if:{{{creator|}}}|<!--ok-->|{{#if:{{{created|}}}|<!--ok-->|[[Category:没有ISO 639-3代码的语言]]}}}}}}}}}}}}}}<!--
+-->{{#if:{{{iso3|}}}|<!--ok-->|{{#if:{{{lc1|}}}|<!--ok-->|{{#if:{{{linglist|}}}|<!--ok-->|{{#if:{{{lingua|}}}|<!--ok-->|{{#if:{{{aiatsis|}}}|<!--ok-->|{{#if:{{{guthrie|}}}|<!--ok-->|{{#if:{{{isoexception|}}}|<!--ok-->|[[Category:没有语言代码的语言类条目]]}}}}}}}}}}}}}}<!--
+-->{{#if:{{{lc1|}}}|{{#if:{{{lc2|}}}|<!--ok-->|[[Category:需要ISO 639-3代码的语言]]}}}}<!--
+-->{{#ifeq:{{{iso3|}}}|none|{{#ifeq:{{{ref|}}}|e17|[[Category:Nonexistent E17 links]]}}}}<!--
+-->{{#ifeq:{{{ref|}}}|e16|[[Category:参考文献包含民族语第16版的条目]]}}<!--
+-->{{#ifeq:{{{ref|}}}|e15|[[Category:参考文献包含民族语第15版的条目]]}}<!--
+-->{{#ifeq:{{{ref|}}}|e14|[[Category:参考文献包含民族语第14版的条目]]}}<!--
+-->{{#ifeq:{{{iso3|}}}|none|{{#if:{{{linglist|}}}|{{#ifeq:{{{isoexception|}}}|dialect|[[Category:Linguist列表代码的方言]]|[[Category:没有ISO 639-3代码但有Linguist列表代码的语言]]}}}}{{#if:{{{lingua|}}}|[[Category:没有ISO 639-3代码但有Linguasphere代码的语言]]}}{{#if:{{{aiatsis|}}}|[[Category:没有ISO 639-3代码但有AIATSIS代码的语言]]}}{{#if:{{{guthrie|}}}|[[Category:没有ISO 639-3代码但有Guthrie代码的语言]]}}}}<!--
+-->{{#if:{{{iso3|}}}|<!--okay-->|{{#if:{{{lc1|}}}|<!--ok-->|{{#if:{{{linglist|}}}|{{#ifeq:{{{isoexception|}}}|dialect|[[Category:Linguist列表代码的方言]]|[[Category:没有ISO 639-3代码但有Linguist列表代码的语言]]}}}}{{#if:{{{lingua|}}}|[[Category:没有ISO 639-3代码但有Linguasphere代码的语言]]}}{{#if:{{{aiatsis|}}}|[[Category:没有ISO 639-3代码但有AIATSIS代码的语言]]}}{{#if:{{{guthrie|}}}|[[Category:没有ISO 639-3代码但有Guthrie代码的语言]]}}}}}}<!--
+-->{{#if:{{{caption|}}}{{{map_caption|}}}{{{rank|}}}{{{country|}}}{{{regions|}}}{{{status|}}}{{{SIL|}}}{{{sil|}}}{{{silname|}}}{{{child1|}}}{{{child2|}}}{{{children|}}}{{{iso5|}}}{{{year|}}}|[[Category:含有不被支持信息框字段的语言类条目]]|<!--ok-->}}<!--
+-->{{#if:{{{iso2|}}}{{{iso2b|}}}{{{iso2t|}}}|[[Category:ISO 639-2代码的语言]]|<!--ok-->}}<!--
+-->{{#if:{{{iso1|}}}|[[Category:ISO 639-1代码的语言]]|<!--ok-->}}<!--
+-->{{#if:{{{speakers|}}}|{{#if:{{{ref|}}}|<!--ok-->|{{#ifeq:{{{speakers|}}}|?|<!--ok-->|{{#ifeq:{{{speakers|}}}|none|<!--ok-->|[[Category:信息框没有参考资料字段的语言类条目]]}}}}}}}}<!--
+-->{{#invoke:Check for unknown parameters|check|unknown={{main other|[[Category:使用未知參數的語言類條目|_VALUE_]]}}|preview=本頁[[Template:Infobox language]]使用了未知參數“_VALUE_”|ignoreblank=y
+|name|altname|nativename|acceptance|pronunciation
+|states|state|region
+|latd|latm|latNS|longd|longm|longEW
+|ethnicity|speakers|speakers2|speakers_label|extinct|era|revived|revived-category|revived-cat
+|date|dateprefix|ref
+|fontcolor|familycolor
+|fam1|fam2|fam3|fam4|fam5|fam6|fam7|fam8|fam9
+|fam10|fam11|fam12|fam13|fam14|fam15|family
+|ancestor|ancestor2|ancestor3|ancestor4|ancestor5|ancestor6|ancestor7|ancestor8|protoname
+|creator|created|setting|posteriori
+|dialects|dia1|dia2|dia3|dia4|dia5|dia6|dia7|dia8|dia9|dia10
+|dia11|dia12|dia13|dia14|dia15|dia16|dia17|dia18|dia19|dia20
+|listclass|liststyle
+|stand1|stand2|stand3|stand4|stand5|stand6|standards
+|script|sign|signers
+|nation|official|minority|agency|development_body
+|iso1|iso2|iso2b|iso2t|iso3|iso1comment|iso2comment|iso3comment|isoexception|iso6|ietf|refname
+|lc1|ld1|lc2|ld2|lc3|ld3|lc4|ld4|lc5|ld5|lc6|ld6|lc7|ld7|lc8|ld8|lc9|ld9|lc10|ld10
+|lc11|ld11|lc12|ld12|lc13|ld13|lc14|ld14|lc15|ld15|lc16|ld16|lc17|ld17|lc18|ld18|lc19|ld19|lc20|ld20
+|lc21|ld21|lc22|ld22|lc23|ld23|lc24|ld24|lc25|ld25|lc26|ld26|lc27|ld27|lc28|ld28|lc29|ld29|lc30|ld30
+|lc31|ld31|lc32|ld32|lc33|ld33|lc34|ld34|lc35|ld35|lc36|ld36|lc37|ld37|lc38|ld38|lc39|ld39|lc40|ld40
+|lc41|ld41|lc42|ld42|lc43|ld43|lc44|ld44|lc45|ld45
+|linglist|lingname|linglist2|lingname2|linglist3|lingname3|linglist4|lingname4|linglist5|lingname5|linglist6|lingname6
+|lingua|lingua_ref|guthrie
+|ELP|ELPname|qid|ELP2|ELPname2|ELP3|ELPname3|ELP4|ELPname4|ELP5|ELPname5|ELP6|ELPname6|glottopedia
+|aiatsis|aiatsis2|aiatsis3|aiatsis4|aiatsis5|aiatsis6
+|aiatsisname|aiatsisname2|aiatsisname3|aiatsisname4|aiatsisname5|aiatsisname6
+|glotto|glotto2|glotto3|glotto4|glotto5
+|glottoname|glottoname2|glottoname3|glottoname4|glottoname5
+|glottorefname|glottorefname2|glottorefname3|glottorefname4|glottorefname5
+|glottofoot
+|image|imagesize|imagealt|imagecaption
+|map|mapsize|mapalt|mapcaption|map2|mapalt2|mapcaption2|boxsize
+|notice|notice2|fix|error
+|vitality|vitality1|vitality2|vitality3|vitality4|vitality5
+|vitality-region1|vitality-region2|vitality-region3|vitality-region4|vitality-region5
+|IDN_ccTLD
+|coordinates|coords|pushpin_map|pushpin_map_alt|pushpin_map_caption|pushpin_mapsize|pushpin_image|pushpin_label_position|pushpin_label
+|module
+}}<noinclude>
+{{documentation}}</noinclude>

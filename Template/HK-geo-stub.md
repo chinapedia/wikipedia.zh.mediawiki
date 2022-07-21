@@ -1,0 +1,1 @@
+#REDIRECT [[Template:HK-geo-stub]]

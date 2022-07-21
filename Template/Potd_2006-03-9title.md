@@ -1,0 +1,1 @@
+紙包裝維他奶<noinclude>[[Category:每周图片模板]]</noinclude>

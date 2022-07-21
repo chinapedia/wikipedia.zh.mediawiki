@@ -1,0 +1,11 @@
+{{Userbox
+  |id=西灣
+  |id-c=#99cc66
+  |info=這個用戶是'''[[:Category:國立中山大學維基人|國立中山大學]]'''的學生、校友或教職人員。
+  |info-c=#99ff99
+  |info-s=10
+  |border-c=#009966
+}}<includeonly>[[Category:國立中山大學維基人|{{PAGENAME}}]]</includeonly>
+<noinclude>
+[[Category:台灣大專院校用戶框模板]]
+</noinclude>

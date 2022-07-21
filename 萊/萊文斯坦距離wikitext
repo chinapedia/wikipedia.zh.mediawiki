@@ -1,0 +1,87 @@
+{{unreferenced|time=2014-08-19T17:03:54+00:00}}
+'''莱文斯坦距离'''，又称'''{{lang|en|Levenshtein}}距离'''，是[[编辑距离|编辑距离]]的一种。指两个[[字串|字串]]之間，由一个转成另一个所需的最少编辑操作次数。
+
+允许的编辑操作包括：
+
+# 将一个字符替换成另一个字符
+# 插入一个[[字符|字符]]
+# 刪除一个字符
+
+[[俄羅斯|俄羅斯]]科學家{{le|弗拉基米尔·莱文斯坦|Vladimir Levenshtein}}在1965年提出這個概念。
+
+== 定义 ==
+
+如果分别用 <math>|a|</math> 和 <math>|b|</math> 表示 <math>a, b</math> 两个字符串的长度，那么它们的列文斯坦距离为 <math>\operatorname{lev}_{a,b}(|a|,|b|)</math>，它符合：
+
+:<math>\qquad\operatorname{lev}_{a,b}(i,j) = \begin{cases}
+  \max(i,j) & \text{ if } \min(i,j)=0, \\
+  \min \begin{cases}
+          \operatorname{lev}_{a,b}(i-1,j) + 1 \\
+          \operatorname{lev}_{a,b}(i,j-1) + 1 \\
+          \operatorname{lev}_{a,b}(i-1,j-1) + 1_{(a_i \neq b_j)}
+       \end{cases} & \text{ otherwise.}
+\end{cases}</math>
+
+<math>1_{(a_i \neq b_j)}</math> 是一个[[指示函数|指示函数]]（'''indicator''' '''function'''），当 <math>a_i = b_j</math> 时，其值为0，其他时候它等于 1 。
+
+<math>\operatorname{lev}_{a,b}(i,j)</math>表示 <math>a</math> 的前 <math>i</math> 个字符与 <math>b</math> 的前 <math>j</math> 个字符之间的列文斯坦距离。（ <math>i</math> 和 <math>j</math> 都是从1开始的下标）
+
+
+注意：min运算中的第一个公式代表（ 从 <math>a</math> 中）删除字符（以到达 <math>b</math>）；第二个公式代表插入字符；第三个代表替换（取决于当前字符是否相同）
+
+=== 例如 ===
+將“kitten”一字轉成“sitting”的萊文斯坦距离为3：
+
+# '''k'''itten → '''s'''itten （k→s）
+# sitt'''e'''n → sitt'''i'''n （e→i）
+# sittin → sittin'''g''' （插入g）
+
+==應用==
+* [[DNA|DNA]]分析
+* [[拼写檢查|拼写檢查]]
+* [[語音辨識|語音辨識]]
+* [[抄襲|抄襲]]偵測
+
+==演算法==
+[[動態規劃|動態規劃]]經常被用來作為這個問題的解決手段之一。
+
+ '''int''' LevenshteinDistcance('''string''' str1[1..lenStr1], '''string''' str2[1..lenStr2])
+     '''int''' d[0..lenStr1, 0..lenStr2]
+     '''int''' i, j, cost
+  
+     '''for''' i = 0 to lenStr2
+        d[i, 0] := i
+     '''for''' j = 0 to lenStr1
+        d[0, j] := j
+  
+     '''for''' i = 1 to lenStr2
+         '''for''' j = 1 to lenStr1
+             '''if''' str2[i] = str1[j] 
+                 cost := 0
+             '''else''' 
+                 cost := 1
+             d[i, j] := min(
+                                 d[i-1, j  ] + 1,     ''// 删除''
+                                 d[i  , j-1] + 1,     ''// 插入''
+                                 d[i-1, j-1] + cost   ''// 替換''
+                             )
+  
+    '''return''' d[lenStr1, lenStr2]
+
+==參見==
+* [[漢明距離|漢明距離]]
+* [[延森-香農距離|延森-香農距離]]
+* [[序列比對|序列比對]]
+* [[Soundex|Soundex]]
+* [[最长公共子序列|最长公共子序列]]
+* [[Floyd-Warshall算法|Floyd-Warshall算法]]
+* [[维特比算法|Viterbi算法]]
+
+
+{{字符串}}
+[[Category:字符串相似性度量|Category:字符串相似性度量]]
+[[Category:编码理论|Category:编码理论]]
+[[Category:算法|Category:算法]]
+[[Category:计算生物学|Category:计算生物学]]
+[[Category:动态规划|Category:动态规划]]
+[[Category:带有伪代码示例的条目|Category:带有伪代码示例的条目]]

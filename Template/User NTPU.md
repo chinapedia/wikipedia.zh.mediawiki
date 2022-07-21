@@ -1,0 +1,12 @@
+{{Userbox
+  |id=臺北大學
+  |id-c=white
+  |info=這個用戶是'''[[國立臺北大學]]'''的學生、校友或教職人員。
+  |info-c=#E0E8FF
+  |info-s=10
+  |border-c=#aaaa00
+  |usercategory=國立臺北大學維基人
+}}
+<noinclude>
+[[Category:台灣大專院校用戶框模板]]
+</noinclude>

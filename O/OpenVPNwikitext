@@ -1,0 +1,116 @@
+{{noteTA|G1=IT}}
+{{Infobox software
+| name                 = OpenVPN
+| logo                 = Ovpntech logo-s REVISED.png
+| screenshot           = 
+| caption              = 
+| author               = James Yonan
+| developer            = OpenVPN 项目 / OpenVPN Inc.
+| released             = {{Start date and age|df=yes|2001|5|13}}<ref>OpenVPN Change Log - [https://openvpn.net/index.php/open-source/documentation/change-log/70-20-change-log.html OpenVPN Change Log] {{Wayback|url=https://openvpn.net/index.php/open-source/documentation/change-log/70-20-change-log.html |date=20160304091420 }}</ref>
+| programming language = [[C语言|C语言]]
+| operating system     = 
+| platform             = {{Plainlist|
+* [[Windows_XP|Windows XP]]或以上<ref name="OVPN">{{cite web|title=Downloads|url=https://openvpn.net/index.php/open-source/downloads.html|website=openvpn.net|accessdate=2 February 2016|archive-date=2018-10-06|archive-url=https://web.archive.org/web/20181006080854/https://openvpn.net/index.php/open-source/downloads.html|dead-url=no}}</ref>
+* [[OS_X_Mountain_Lion|OS X 10.8]]或以上
+* [[Android_4.0|Android 4.0]]或以上<ref>{{cite web|url=https://play.google.com/store/apps/details?id=net.openvpn.privatetunnel|title=Private Tunnel VPN - Android Apps on Google Play|publisher=|accessdate=2018-01-26|archive-date=2020-11-11|archive-url=https://web.archive.org/web/20201111221301/https://play.google.com/store/apps/details?id=net.openvpn.privatetunnel|dead-url=no}}</ref></small>
+* [[iOS_6|iOS 6]]或以上<ref>{{cite web|url=https://itunes.apple.com/us/app/private-tunnel-vpn/id854725970|title=Private Tunnel VPN|date=23 October 2014|work=App Store|accessdate=2018-01-26|archive-date=2019-06-05|archive-url=https://web.archive.org/web/20190605213425/https://itunes.apple.com/us/app/private-tunnel-vpn/id854725970|dead-url=no}}</ref>
+* [[Linux|Linux]]<ref>{{cite web|url=https://openvpn.net/index.php/access-server/docs/admin-guides/182-how-to-connect-to-access-server-with-linux-clients.html|title=How to connect to Access Server from a Linux computer|publisher=|accessdate=2018-01-26|archive-date=2018-09-26|archive-url=https://web.archive.org/web/20180926135019/https://openvpn.net/index.php/access-server/docs/admin-guides/182-how-to-connect-to-access-server-with-linux-clients.html|dead-url=no}}</ref>
+* [[*BSD|*BSD]]<ref>{{cite web|url=https://www.freebsd.org/cgi/ports.cgi?query=openvpn&stype=all|title=FreeBSD Ports Search|publisher=|accessdate=2018-01-26|archive-date=2020-09-29|archive-url=https://web.archive.org/web/20200929054914/https://www.freebsd.org/cgi/ports.cgi?query=openvpn&stype=all|dead-url=no}}</ref><ref>{{cite web|url=http://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/net/openvpn/README.html|title=The NetBSD Packages Collection: net/openvpn|publisher=|accessdate=2018-01-26|archive-date=2020-09-30|archive-url=https://web.archive.org/web/20200930113643/http://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/net/openvpn/README.html|dead-url=no}}</ref>
+  }}
+| language             = 
+| genre                = [[虛擬私人網路|VPN]]
+| license              = [[GNU通用公共許可證|GNU通用公共許可證]]
+| website              = {{URL|https://openvpn.net/}}
+}}
+
+{{Internet security protocols}}
+
+'''OpenVPN'''是一个用于创建[[虚拟私人網絡|虚拟私人網絡]]加密通道的软件包，最早由James Yonan编写。OpenVPN允许建立的VPN使用[[公开密钥|公开密钥]]、[[電子證書|電子證書]]、或者用户名／密碼来进行身份验证。
+
+它大量使用了[[OpenSSL|OpenSSL]]加密库中的[[SSL|SSL]]/[[TLS|TLS]]协议函数库。
+
+目前OpenVPN能在[[Solaris|Solaris]]、[[Linux|Linux]]、[[OpenBSD|OpenBSD]]、[[FreeBSD|FreeBSD]]、[[NetBSD|NetBSD]]、[[Mac_OS_X|Mac OS X]]与[[Microsoft_Windows|Microsoft Windows]]以及[[Android|Android]]和[[iOS|iOS]]上运行，並包含了许多安全性的功能。它不与[[IPsec|IPsec]]兼容。
+
+== 原理 ==
+OpenVPN的技术核心是虚拟网卡，其次是[[SSL|SSL]]协议实现。
+=== 虚拟网卡 ===
+{{main|虚拟网卡}}
+在OpenVPN中，如果用户访问一个远程的虚拟地址（属于虚拟网卡配用的地址系列，区别于真实地址），则操作系统会通过路由机制将数据包（[[TUN与TAP|TUN]]模式）或数据帧（[[TUN与TAP|TAP]]模式）发送到虚拟网卡上，服务程序接收该数据并进行相应的处理后，会通过[[网络套接字|SOCKET]]从外网上发送出去。这完成了一个单向传输的过程，反之亦然。当远程服务程序通过SOCKET从外网上接收到数据，并进行相应的处理后，又会发送回给[[虚拟网卡|虚拟网卡]]，则该应用软件就可以接收到。
+
+=== 加密 ===
+OpenVPN使用[[OpenSSL|OpenSSL]]库来加密数据与控制信息。这意味着，它能够使用任何OpenSSL支持的算法。它提供了[[HMAC|HMAC]]功能以提高连接的安全性。此外，OpenSSL的硬件加速也能提高它的性能。2.3.0以後版本引入[[PolarSSL|PolarSSL]]。
+
+== 功能 ==
+=== 身份验证 ===
+OpenVPN提供了多种[[身份验证方式|身份验证方式]]，用以确认连接双方的身份，包括：
+*预共享密钥
+*[[公開金鑰認證|数字证书]]
+*用户名／密碼组合
+预共享密钥最为简单，但它只能用于建立点对点的VPN；基于[[PKI|PKI]]的第三方证书提供了最完善的功能，但是需要额外维护一个PKI证书系统。OpenVPN2.0后引入了用户名／口令组合的身份验证方式，它可以省略客户端证书，但是仍需要一份服务器证书用作加密。
+
+=== 功能与端口 ===
+*OpenVPN所有的通信都基于一个单一的[[IP地址|IP]][[端口|端口]]，默认且推荐使用UDP协议通讯，同时也支持TCP。[[IANA|IANA]]（Internet Assigned Numbers Authority）指定给OpenVPN的官方端口为1194。OpenVPN 2.0以后版本每个进程可以同时管理数个并发的隧道。OpenVPN使用通用网络协议（[[传输控制协议|TCP]]与[[用户数据报协议|UDP]]）的特点使它成为[[IPsec|IPsec]]等协议的理想替代，尤其是在[[ISP|ISP]]（Internet service provider）过滤某些特定[[VPN|VPN]]协议的情况下。
+*OpenVPN连接能通过大多数的[[代理服务器|代理服务器]]，并且能够在[[网络地址转换|NAT]]的环境中很好地工作。
+*服务端具有向客户端“推送”某些网络配置信息的功能，这些信息包括：IP地址、[[路由|路由]]设置等。
+*OpenVPN提供了两种虚拟网络接口：[[TUN与TAP|通用TUN/TAP驱动]]，通过它们，可以建立三层IP隧道，或者虚拟二层[[以太网|以太网]]，后者可以传送任何类型的二层以太网络数据。
+*传送的数据可通过[[LZO|LZO]]算法压缩。 但傳輸時使用lzo壓縮將遭受VORACLE威脅而暴露傳輸資料，官方預設不使用也不建議開啟此功能。'''<ref>{{cite web |title=OpenVPN wiki |url=https://community.openvpn.net/openvpn/wiki/VORACLE |access-date=2021-03-18 |archive-date=2021-04-15 |archive-url=https://web.archive.org/web/20210415222216/https://community.openvpn.net/openvpn/wiki/VORACLE |dead-url=no }}</ref>'''
+'''
+=== 安全性 ===
+OpenVPN与生俱来便具备了许多安全特性：它在用户空间运行，无须对内核及网络协议栈作修改；初始完毕后以[[chroot|chroot]]方式运行，放弃root权限；使用[http://www.opengroup.org/onlinepubs/009695399/functions/mlockall.html mlockall]{{Wayback|url=http://www.opengroup.org/onlinepubs/009695399/functions/mlockall.html |date=20080706142037 }}以防止敏感数据交换到磁盘。
+
+OpenVPN通过[[PKCS11|PKCS#11]]支持硬件加密标识，如[[智能卡|智能卡]]。
+
+== 版本 ==
+===社群版本OpenVPN Community===
+伺服器端：需使用者自行下載原始碼編譯、安裝。
+
+使用者端：使用OpenVPN Connect，支援Windows、Linux、Android與iOS。
+
+===商業版本OpenVPN Access Server===
+伺服器端使用與社群版本相同的OpenVPN程式碼，但在上層建置易於操作的網頁式介面。
+
+商業版本提供無限期2個VPN連線授權可免費試用。
+
+商業版提供下列三種安裝方式：<ref>{{cite web |title=OpenVPN官方網站 |url=https://openvpn.net/vpn-software-packages/ |access-date=2021-03-18 |archive-date=2021-06-04 |archive-url=https://web.archive.org/web/20210604063859/https://openvpn.net/vpn-software-packages/ |dead-url=no }}</ref>
+# 軟體套件，支援Ubuntu、Debian、Redhat、CentOS。
+# 虛擬機映像檔，支援ESXi 5.0與Microsoft Hyper-V。
+# 雲端服務佈署，支援Amazon AWS、Microsoft Azure、Google GCP、Digital Ocean droplets與ORACLE VPC。
+
+===OpenVPN Cloud===
+提供使用者直接租用官方架設的OpenVPN Access Server，適用於不想自行安裝管理主機的企業用戶租用。
+
+===Private Tunnel===
+提供僅需要使用VPN通道服務的個人用戶直接租用。
+
+== 受中国大陆的限制 ==
+由于OpenVPN通讯协议特征明显，当从中国大陆向境外OpenVPN服务器传输大量数据或进行频繁连接后，[[防火长城|防火长城]]会封锁OpenVPN服务器所使用的TCP/UDP端口或服务器IP地址，使OpenVPN无法连接。而在敏感时期则会针对OpenVPN服务器回送证书完成握手创建有效加密连接时干扰连接，在使用TCP协议模式时握手会被连接重置，而使用UDP协议时含有服务器认证证书的数据包会被故意丢弃，使OpenVPN无法创建有效加密连接而连接失败。而在中国大陆内部的连接不受这种限制。
+
+== 伪装的改进 ==
+*[[Stunnel|Stunnel]]，通过使用Stunnel转发OpenVPN流量以消除OpenVPN的协议特征，达到提供安全保护与流量伪装的目的（通常将Stunnel设置于443端口伪装成Web网站）。
+* KCPtun，使用KCPtun将OpenVPN流量转为UDP流量传输，也可以消除OpenVPN的协议特征。
+* [[Secure_Shell|SSH]]，使用SSH创建[[隧道协议|隧道]]转发OpenVPN流量，但SSH会暴露自身协议特征<ref>{{Cite web|title=Solidot {{!}} 中国刺探加密连接测试新屏蔽方式|url=https://www.solidot.org/story?sid=27059|accessdate=2020-07-07|work=www.solidot.org|archive-date=2020-07-07|archive-url=https://web.archive.org/web/20190502072058/https://www.solidot.org/story?sid=27059|dead-url=yes}}</ref>，故这种方式已被淘汰。
+
+== 参考文献 ==
+{{Reflist}}
+
+== 外部链接 ==
+* [http://openvpn.net/ OpenVPN 项目主页] {{Wayback|url=http://openvpn.net/ |date=20070225142210 }}
+* [http://openvpn.se/ Windows的OpenVPN-GUI] {{Wayback|url=http://openvpn.se/ |date=20070227043506 }} ''2004-2006年間，由Mathias Sundman開發使用於Windows環境的OpenVPN-GUI程式，於2.3板後已併入OpenVPN專案內''<ref>{{cite web |title=OpenVPN Community Wiki |url=https://community.openvpn.net/openvpn/wiki/BuildingOpenVPN-GUI |access-date=2021-03-18 |archive-date=2020-05-17 |archive-url=https://web.archive.org/web/20200517145054/https://community.openvpn.net/openvpn/wiki/BuildingOpenVPN-GUI |dead-url=no }}</ref>
+* [https://web.archive.org/web/20070225173533/http://www.tunnelblick.net/ Tunnelblick, Mac OS X的GUI]
+* [http://code.google.com/p/android-openvpn-settings/ Android的OpenVPN-Settings]{{Wayback|url=http://code.google.com/p/android-openvpn-settings/ |date=20120322140119 }}
+
+== 参见 ==
+* [[虚拟私人网络|虚拟私人网络]]
+
+{{-}}
+{{VPN}}
+
+[[Category:网络协议|Category:网络协议]]
+[[Category:网络安全|Category:网络安全]]
+[[Category:安全软件|Category:安全软件]]
+[[Category:Unix软件|Category:Unix软件]]
+[[Category:开放源代码|Category:开放源代码]]
+[[Category:穿隧協議|Category:穿隧協議]]
+[[Category:虛擬私人網路|Category:虛擬私人網路]]
+<references />
+[[Category:翻牆軟件|Category:翻牆軟件]]

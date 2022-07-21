@@ -1,0 +1,1 @@
+#REDIRECT [[Template:哆啦A夢]]

@@ -1,0 +1,33 @@
+{{NoteTA|G1=IT}}
+{{Unreferenced|time=2021-01-08}}
+
+'''traceroute'''，[[Linux|Linux]]系統稱為'''tracepath'''，[[Windows|Windows]]系統稱為'''tracert'''，是一種電腦網絡工具。它可顯示[[封包|封包]]在IP網絡經過的[[路由器|路由器]]的[[IP位址|IP位址]]。
+
+== 原理 ==
+程式是利用增加[[存活時間|存活時間]]（TTL）值來實現其功能的。每當封包經過一個路由器，其存活時間就會減1。當其存活時間是0時，主機便取消封包，並傳送一個[[ICMP|ICMP]] TTL封包給原封包的發出者。
+
+程式發出的首3個封包TTL值是1，之後3個是2，如此類推，它便得到一連串封包路徑。注意IP不保證每個封包走的路徑都一樣。
+
+== 實現 ==
+主叫方首先發出 TTL=1 的數據包，第一個路由器將 TTL 減1得0后就不再繼續轉發此數據包，而是返回一個 ICMP 逾時報文，主叫方從逾時報文中即可提取出數據包所經過的第一個閘道器位址。然後又發出一個 TTL=2 的 ICMP 數據包，可獲得第二個閘道器位址，依次遞增 TTL 便獲取了沿途所有閘道器位址。
+
+需要注意的是，並不是所有閘道器都會如實返回 ICMP 超時報文。出於安全性考慮，大多數防火墻以及啓用了防火墻功能的路由器缺省配置為不返回各種 ICMP 報文，其餘路由器或[[交換機|交換機]]也可被管理員主動修改配置變為不返回 ICMP 報文。因此 Traceroute 程式不一定能拿全所有的沿途閘道器位址。所以，當某個 TTL 值的數據包得不到響應時，並不能停止這一追蹤過程，程式仍然會把 TTL 遞增而發出下一個數據包。一直達到預設或用參數指定的追蹤限制（maximum_hops）才结束追蹤。
+
+依據上述原理，利用了 UDP 數據包的 Traceroute 程式在數據包到達真正的目的主機時，就可能因為該主機沒有提供 [[用户数据报协议|UDP]] 服務而簡單將數據包抛棄，並不返回任何信息。爲了解決這個問題，Traceroute 故意使用了一個大於 30000 的端口號，{{来源请求|因 UDP 協定規定端口號必須小於 30000}} ，所以目標主機收到數據包后唯一能做的事就是返回一個“端口不可達”的 ICMP 報文，於是主叫方就將端口不可達報文當作跟蹤結束的標誌。
+
+除了使用 UDP 外，也有使用[[传输控制协议|TCP]]代替的实现方法。
+
+== 歷史 ==
+根據traceroute的[[man_page|man page]]：1987年，Steve Deering建議Van Jacobson寫一個這樣的程式。C. Philip Wood、Tim Seaver和Ken Adelman為這個程式提供一些意見或改動。
+
+[[Windows_NT|Windows NT]]系統有結合[[ping|ping]]和traceroute的[[pathping|pathping]]工具。
+
+== 外部連結 ==
+* [http://www.traceroute.org/ 線上traceroute工具]{{Wayback|url=http://www.traceroute.org/ |date=20060702163423 }}
+* [http://www.traceroute6.net/ TRACEROUTE6.net]{{Wayback|url=http://www.traceroute6.net/ |date=20120424151948 }}: 在亚洲区含IPv4 和 IPv6 的線上traceroute工具
+* {{en icon}} [https://web.archive.org/web/20141129021644/http://www.test-net.org/traceroute/ Traceroute test]
+* [https://myipaddress.pro/cn/traceroute 在线Traceroute路由器追踪工具]{{Dead link|date=2019年11月 |bot=InternetArchiveBot |fix-attempted=yes }}
+{{Unix命令}}
+{{視窗指令}}
+
+[[Category:网路管理软件|Category:网路管理软件]]

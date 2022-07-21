@@ -1,0 +1,1 @@
+{{NYCS time 2|6|icon=alltimes|text=任何時候停站|time={{{time|}}}}}

@@ -1,0 +1,10 @@
+{{Userbox
+  |id=新竹<br>教育
+  |id-c=#ffffff
+  |info=這名用戶是'''[[國立新竹教育大學]]'''的學生、校友或教職人員。
+  |info-c=#E0E8FF
+  |info-s=10
+  |border-c=#6699ff
+}}
+<noinclude>[[Category:台灣大專院校用戶框模板]]</noinclude>
+<includeonly>[[Category:國立新竹教育大學維基人]]</includeonly>

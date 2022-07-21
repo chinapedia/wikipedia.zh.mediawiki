@@ -1,0 +1,1 @@
+||bgcolor='#FFFF66' style='color:#000000;' align='right'|<noinclude>[[Category:格式模板]]</noinclude>

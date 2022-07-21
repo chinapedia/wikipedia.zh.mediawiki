@@ -1,0 +1,103 @@
+{{noteTA
+|T=zh-cn:宽字符;zh-tw:寬字元;
+|G1=IT
+|1=zh-cn:数据;zh-tw:資料;
+|2=zh-cn:字符;zh-tw:字元;
+|3=zh-cn:比特;zh-tw:位元;
+|4=zh-cn:头文件;zh-tw:表頭檔;
+|5=zh-cn:程序;zh-tw:程式;
+}}
+'''寬字元'''（Wide character）
+是计算机抽象術語（没有规定具体实现细节），表示比1字节還寬的[[資料類型|資料類型]]。不同於[[Unicode|Unicode]]。
+
+==Unicode==
+ISO/IEC 10646:2003 [[Unicode|Unicode]] 4.0 指出：
+
+:"The width of <code>wchar_t</code> is compiler-specific and can be as small as 8 bits. Consequently, programs that need to be portable across any C or C++ compiler should not use <code>wchar_t</code> for storing Unicode text. The <code>wchar_t</code> type is intended for storing compiler-defined wide characters, which may be [[Unicode|Unicode]] characters in some compilers." 翻译：「<code>wchar_t</code>的寬度屬於編譯器的特性，且可以小到8位元。所以程式若需要跨過所有C和C++ 編譯器的可攜性，就不應使用<code>wchar_t</code>儲存Unicode文字。<code>wchar_t</code>類型是為儲存編譯器定義的寬字元，在部分編譯器中，其可以是Unicode字元。」
+
+:"ANSI/ISO C leaves the semantics of the wide character set to the specific implementation but requires that the characters from the portable C execution set correspond to their wide character equivalents by zero extension."
+==操作系统==
+对于[[Windows_API|Windows API]]及[[Visual_Studio|Visual Studio]]编译器，<code>wchar_t</code>是16位元寬。由于不能在单个wchar_t字元中，支援系統所有可表示的字元（即[[UTF-16|UTF-16]]小尾字元），因而破壞了ANSI/ISO C標準。 
+
+在類[[Unix|Unix]]系統中，<code>wchar_t</code>是32位元寬。单个wchar_t字元可表示任意[[UTF-32|UTF-32]]大尾字元。
+
+==程序设计语言==
+
+===C/C++===
+<code>wchar_t</code>在ANSI/ISO [[C語言|C]]中是一個資料類型。某些其它的[[程式語言|程式語言]]也用它來表示寬字元。在[[C標準庫|ANSI C程式庫表頭檔]]中，<wchar.h>和<wctype.h>處理寬字元。
+
+最初，C90语言标准定义了类型<code>wchar_t</code>：
+: "an integral type whose range of values can represent distinct codes for all members of the largest extended character set specified among the supported locales" (ISO 9899:1990 §4.1.5)
+
+C语言与[[C++|C++]]语言于2011年发布的各自语言标准中引入了固定大小的字符类型<code>char16_t</code>与<code>char32_t</code>。<code>wchar_t</code>仍保持由编译器实现定义其细节。 
+===Python===
+[[Python语言|Python语言]]使用<code>wchar_t</code>作为字符类型<code>Py_UNICODE</code>的基础。它依赖于该系统是否 <code>wchar_t</code>“兼容于被选择的Python Unicode编译版本”。<ref>https://docs.python.org/c-api/unicode.html {{Wayback|url=https://docs.python.org/c-api/unicode.html |date=20121024164511 }} accessed 2009 12 19</ref>
+==宽窄转换==
+任何非宽字符的字符集，无论是单字节字符集（SBCS），还是（可变长）多字节字符集（MBCS），都称作窄字符集（narrow character set）。
+
+宽字符集的一个用途，是作为任意两个窄字符集相互转换的中间表示。
+
+宽字符集与窄字符集的转换，有多种方法。
+===使用Windows API===
+例如：
+<syntaxhighlight lang="cpp">
+// we want to convert an MBCS string in lpszA  
+int nLen = MultiByteToWideChar(CP_ACP,
+    0,
+    lpszA, -1,
+    NULL,
+    NULL);
+
+LPWSTR lpszW = new WCHAR[nLen];  
+MultiByteToWideChar(CP_ACP,
+    0,   
+    lpszA, -1,
+    lpszW,
+    nLen);
+
+// use it to call OLE here  
+pI->SomeFunctionThatNeedsUnicode(lpszW);
+
+// free the string  
+delete[] lpszW;  
+</syntaxhighlight>
+===使用ATL 3.0的字符串转换宏===
+在Microsoft的atlconv.h中，定义了四个宏：
+* A2CW ：     (LPCSTR) -> (LPCWSTR)  
+* A2W  ：   (LPCSTR) -> (LPWSTR)  
+* W2CA ：    (LPCWSTR) -> (LPCSTR)  
+* W2A  ：   (LPCWSTR) -> (LPSTR)  
+使用前需要先用宏定义中间辅助变量：
+ USES_CONVERSION;
+上述四个宏的转化过程为：对输入字符串，按照2比1计算宽窄字符串长度关系；然后在[[运行栈|运行栈]]上分配出空间，调用ATLW2AHELPER或ATLA2WHELPER帮助函数完成转换。优点是代码退出当前程序块，栈上的空间被自动回收。缺点是宽窄字符2比1的大小关系，仅适用于单字节字符集。<ref>{{Cite web |url=https://msdn.microsoft.com/EN-US/library/805c56f8(v=VS.140,d=hv.2).aspx |title=MSDN TN059: Using MFC MBCS/Unicode Conversion Macros  |access-date=2018-01-12 |archive-date=2018-01-12 |archive-url=https://web.archive.org/web/20180112214825/https://msdn.microsoft.com/EN-US/library/805c56f8(v=VS.140,d=hv.2).aspx |dead-url=no }}</ref>
+
+另外，需要注意不要在大量循环结构中使用转换宏，这会导致快速耗用栈空间。可以把转换宏写到一个小函数中。
+===使用ATL 7.0的字符串转换类与宏===
+字符串转换类（模板）的格式为：
+  C SourceType 2[ C]DestinationType[ EX]
+其中SourceType与DestinationType可以是A、W、T、OLE（等价于W）。中间可选的C表示结果为const。EX表示缓冲区存放的字符数由模板参数指定。
+
+缺省的静态缓冲区大小为128个字符。可以指定带EX后缀的模板的参数，以节约空间。可以使用第二个参数指定窄字符的locale。如果运行栈的剩余空间不够用，自动在堆上分配空间，并在超出了该变量的作用域是自动释放堆上的空间。不需要使用USES_CONVERSION宏。注意作为局部对象，如果是无名的临时实例，表达式结束时该变量将自动析构，事后再引用该实例所含的结果字符串将无效。<ref>{{Cite web |url=https://msdn.microsoft.com/EN-US/library/87zae4a3(v=VS.140,d=hv.2).aspx |title=MSDN: ATL and MFC String Conversion Macros |access-date=2018-01-12 |archive-date=2018-01-12 |archive-url=https://web.archive.org/web/20180112214816/https://msdn.microsoft.com/EN-US/library/87zae4a3(v=VS.140,d=hv.2).aspx |dead-url=no }}</ref>
+
+===使用_bstr_t类===
+适用于Microsoft开发平台。示例：
+<syntaxhighlight lang="cpp">
+#include <comutil.h>
+#pragma comment(lib, "comsuppw.lib")
+ 
+std::string ws2s(const std::wstring& ws)
+{
+    _bstr_t t = ws.c_str();
+    char* pchar = (char*)t;
+    std::string result = pchar;
+    return result;
+}
+</syntaxhighlight>
+===C语言标准库函数mbstowcs()和wcstombs()===
+定义于[[stdlib.h|stdlib.h]]。需要预先分配目标缓冲区。
+
+==参考文献==
+<references/>
+[[Category:C語言|W]]
+[[Category:C++|W]]
+[[Category:字符|Category:字符]]

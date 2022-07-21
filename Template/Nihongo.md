@@ -1,0 +1,1 @@
+<includeonly>{{#invoke:nihongo|main|1={{{1|}}}|2={{{2|}}}|3={{{3|}}}|4={{{4|{{{extra|}}}}}}|5={{{5|{{{extra2|}}}}}}|romaji={{{romaji|}}}|lead={{{lead|}}}}}{{category handler|main=[[Category:含有日語的條目]]}}{{#if:{{{4|}}}{{{extra|}}}{{{5|}}}{{{extra2|}}}|[[Category:Nihongo模板使用extra參數的頁面]]}}</includeonly><noinclude>{{Documentation}}</noinclude>

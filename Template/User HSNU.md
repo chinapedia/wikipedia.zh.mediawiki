@@ -1,0 +1,14 @@
+{{Userbox
+  |id=師大附中
+  |id-c=#dc143c
+  |id-fc=#ffffff
+  |info=這個用戶是'''[[國立臺灣師範大學附屬高級中學|國立師大附中]]'''的學生、校友或教職人員。<br>''附中附中，我們的搖籃！''
+  |info-c=white
+  |info-s=9
+  |border-c=#6699ff
+  |border-s=3
+}}<includeonly>[[Category:國立臺灣師範大學附屬高級中學維基人|{{PAGENAME}}]]</includeonly>
+<noinclude>
+[[Category:台灣高中高職用戶框模板]]
+[[Category:國立臺灣師範大學附屬高級中學維基人|*]]
+</noinclude>

@@ -1,0 +1,1 @@
+[[Entrez|EntrezGene]] [http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=retrieve&dopt=default&list_uids={{{1}}} {{{1}}}]<noinclude>[[Category:生物學模板]][[Category:外部资源模板|生物]]</noinclude>

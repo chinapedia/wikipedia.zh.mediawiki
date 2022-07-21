@@ -1,0 +1,1 @@
+#REDIRECT [[Template:Date.day-nY]]

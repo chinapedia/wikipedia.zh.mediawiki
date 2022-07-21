@@ -1,0 +1,1 @@
+#REDIRECT [[Template:DAX指数成份公司]]

@@ -1,0 +1,10 @@
+{{Userbox
+  |id=7
+  |id-c=#00FFFF
+  |info=这个用户曾经喜欢收看'''[[中國中央電視台軍事·農業頻道|中央电视台军事农业频道]]'''的节目。
+  |info-c=#E6E6FA
+  |info-s=10
+  |border-c=#FFFFFF
+}} <includeonly>[[Category:喜欢看中央电视台军事农业频道节目的维基人]]</includeonly><noinclude>
+[[Category:媒體用戶框模板|視]]
+</noinclude>

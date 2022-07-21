@@ -1,0 +1,39 @@
+'''EKA2'''（Epoc Kernel Architecture）是[[Symbian_OS|Symbian OS]]的第二代核心。
+
+如同它的第一代核心[[EKA1|EKA1]]一般，具有先佔式多工與記憶體保護功能。兩者主要的差異在於：
+* 即時處理（real-time）的保證（API的呼叫是快速、更重要、時間限制內）
+* 多執行緒的支持
+* 隨插式記憶體模型，支持更多的ARM處理器指令
+* 更友善的使用者介面支持，讓使用者可以在Symbian OS 8.0以及8.1中選取核心的設定。
+
+EKA2最主要的優勢還在於支持電話具信號堆疊（singalling stacks）。一般而言，Symbian OS的手機通常是執行於分散的處理器，或是同一個處理器，但是必須使用到複雜而且靠不住的“hacks”。這樣的“具信號堆疊”實在過於複雜，想將程式碼改寫，使其能在Symbian OS自然的運作，顯然不容易做到。因此，EKA2提供了客制化層級（personality layers），實現一般作業系統的基礎基元（basic primitives），允許具信號堆疊在Symbian OS上可擁有更多的不變性。
+<!--
+EKA2 is the second-generation kernel for Symbian OS.
+
+Like its predecessor, EKA1, it has pre-emptive multithreading and full memory protection. The main differences are:
+
+Real-time guarantees (each API call is quick, but more importantly, time-bound) 
+Multiple threads inside the kernel as well as outside 
+Pluggable memory models, allowing better support for later generations of ARM instruction set. 
+A "nanokernel", providing the most basic OS facilities, and on which other "personality layers" can be built 
+Its user-side interface is almost completely compatible with EKA1. This enables Symbian OS version such as 8.0 and 8.1 which offered a choice of kernel.
+
+The main advantage of EKA2 is its ability to run full telephone signalling stacks. Traditionally, on Symbian OS phones, these have been run on a separate CPU, or run on the same CPU only through complex and unreliable "hacks". Such signalling stacks are extremely complex, and rewriting them to work natively on Symbian OS is typically not an option. Hence, EKA2 allows "personality layers" to emulate the basic primitives of other operating systems, thus allowing existing signalling stacks to run largely unchanged on the Symbian OS CPU.
+
+The real-time guarantees are a natural pre-requisitive of this ability, and also help with multimedia tasks. However, as with any real-time operating system, a full analysis of all threads is required before any real-time guarantees can be offered to anything except the highest-priority thread. (Higher priority threads may prevent lower-priority threads from running). Any multimedia task is likely to involve graphics, storage and/or networking activity, all of which are at much higher risk of disrupting the stream than the kernel is.
+
+Inside the kernel, EKA1 only allowed a single thread (plus a 'null' idle thread). EKA2 allows many threads. This makes it much easier to write device drivers that involve complex state machines, such as that for memory sticks or USB. Interrupts are handled with an Interrupt Service Routine, which may request an Immediate Deferred Function Call (called as soon as the interrupts are processed) or a Deferred Function Call, which is queued to run on a kernel thread. This in turn may communicate with user-side threads.
+
+Power management is largely unchanged from EKA1. The exact scheme varies between phones, but generally, the task of the null thread puts the CPU and peripherals to sleep, after having requested a wake-up whenever the next timer is due to expire.
+
+EKA2 runs on ARM CPUs, and the "WINS" Symbian OS emulator. (Ports may exist for other CPUs too). On the emulator, EKA2 provides somewhat better emulation, in particular for the RProcess APIs which Symbian OS uses to represent processes. In EKA1 they didn't work at all under the emulator, because it exists as a single Windows process. EKA2, in contrast, when asked to launch another process copies the requested .exe into a .dll, changing appropriate flags so that Windows recognises it as a DLL, then loads it into the current process. These APIs therefore work as expected, with only a few limitations such as the lack of writable global data (which wasn't even possible on ARM CPUs under EKA1).
+
+EKA2 doesn't currently cope with demand paging or multiple CPUs.
+
+Much of the credit for EKA2 goes to a single Symbian kernel engineer, who began the project as an experiment, many years before it became an official part of Symbian OS.
+
+
+-->
+
+[[Category:操作系统内核|Category:操作系统内核]]
+[[Category:微內核|Category:微內核]]

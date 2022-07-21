@@ -1,0 +1,1 @@
+#REDIRECT [[Template:PD-USGov-Military-Air Force]]

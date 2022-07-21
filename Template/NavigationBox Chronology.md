@@ -1,0 +1,1 @@
+#redirect [[Template:年代学导航]]

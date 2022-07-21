@@ -1,0 +1,1 @@
+#REDIRECT [[Template:User Chien Kuo Senior High School]]

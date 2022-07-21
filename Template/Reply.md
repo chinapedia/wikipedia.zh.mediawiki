@@ -1,0 +1,1 @@
+<span lang="zh-Hant" style="font-weight: bold; color:#FFCD71; background-color: #DB6D00;">(：)</span>'''回應'''<noinclude>{{documentation}}</noinclude>

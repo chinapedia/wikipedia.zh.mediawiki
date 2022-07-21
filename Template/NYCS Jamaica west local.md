@@ -1,0 +1,1 @@
+#redirect [[Template:NYCS Jamaica west]]

@@ -1,0 +1,1 @@
+×10<sup>{{{1}}}</sup><noinclude>{{Documentation}}</noinclude>

@@ -1,0 +1,10 @@
+<includeonly>{{BSrow-sc
+|1={{BS-overlap|{{{PX|x{{BSpx}}}}}|{{{1|}}}|{{{O1|}}}|{{{O12|}}}|{{{O13|}}}|{{{O14|}}}|{{{O15|}}}|link={{{L1|}}}}}
+|2={{{2|}}}
+|3={{{3|}}}
+|bg={{{bg|}}}
+|HI={{{HI|}}}
+|km={{{km|}}}
+}}</includeonly><noinclude>
+{{doc}}
+</noinclude>

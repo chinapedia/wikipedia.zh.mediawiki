@@ -1,0 +1,1 @@
+#REDIRECT [[Template:量子力學]]

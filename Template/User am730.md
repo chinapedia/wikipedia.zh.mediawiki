@@ -1,0 +1,9 @@
+{{Userbox
+  |id=[[File:Am730_logo.svg|90px]]
+  |id-c=reD
+  |info=這個用户喜歡閱讀免費的《[[AM730]]》。
+  |info-s=9
+  |info-c=WRITE
+  |border-c=BLUE
+}}
+<noinclude>{{Clear}}[[Category:媒體用戶框模板|報]][[Wikipedia:用戶框/媒體]]</noinclude>

@@ -1,0 +1,1 @@
+#REDIRECT [[Template:Uw-vandalism4im]]

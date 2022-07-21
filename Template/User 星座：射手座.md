@@ -1,0 +1,10 @@
+{{Userbox
+  |border-c=#FFB466
+  |border-s=1
+  |id=[[File:Sagittarius.svg|30px|alt=]]
+  |id-c=#FFB466
+  |info=這個用戶的星座是'''[[人马宫|射手座]]'''。
+  |info-c=#FFE469
+  |info-s=10
+  |usercategory=射手座维基人
+}}<noinclude>{{documentation}}</noinclude>

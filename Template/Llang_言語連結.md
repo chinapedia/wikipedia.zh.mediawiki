@@ -1,0 +1,1 @@
+#REDIRECT [[Template:Llang/語言連結]]

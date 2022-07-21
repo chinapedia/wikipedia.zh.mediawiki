@@ -1,0 +1,2 @@
+<table><tr><td><div style="position: relative;"><div style="position:absolute;top:5;left:5;"><div style="position:absolute;display: block; left:{{{2}}}px; top:{{{3}}}px; width:5px;height:5px;padding:0;">[[File:dot4gb.svg|8px]]</div></div>[[File:{{{1}}}4dot.png|150px|{{PAGENAME}}]]
+</div></td></tr></table>

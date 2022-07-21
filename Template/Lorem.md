@@ -1,0 +1,1 @@
+#重定向 [[Template:Lorem ipsum]]{{模板重定向}}

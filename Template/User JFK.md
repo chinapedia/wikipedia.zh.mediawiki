@@ -1,0 +1,11 @@
+{{Userbox
+  |id=JFK
+  |id-c=white
+  |id-s=15
+  |info=这个用户曾因看了《'''[[刺杀肯尼迪]]'''》而落泪。
+  |info-c=#ffff99
+  |info-s=10
+  |border-c=yellow
+}}<includeonly>[[Category:喜欢看电影JFK的维基人|{{PAGENAME}}]]</includeonly><noinclude>
+[[Category:關注與興趣用戶框模板]]
+</noinclude>

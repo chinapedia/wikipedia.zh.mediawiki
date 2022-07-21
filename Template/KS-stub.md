@@ -1,0 +1,1 @@
+#REDIRECT [[Template:Kansas-stub]]

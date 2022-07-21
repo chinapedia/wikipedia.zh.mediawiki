@@ -1,0 +1,11 @@
+{{Userbox
+ |border-c=#00ff00
+ |id=
+ |id-c=#ffffff
+ |id-s=12
+ |info=這個用戶喜歡收聽[[香港]][[新城電台]]的節目。
+ |info-c=#00ff00
+ |info-fc=White
+ |info-s=9
+}}<noinclude>{{Clear}}[[Category:媒體用戶框模板|廣]][[Wikipedia:用戶框/媒體]]</noinclude>
+[[Category:喜歡收聽香港新城電台的維基人]]

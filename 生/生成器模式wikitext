@@ -1,0 +1,242 @@
+{{other uses|生成器}}
+'''生成器模式'''（英：Builder Pattern）是一种[[設計模式_(計算機)|設計模式]]，又名：建造模式，是一种对象构建模式。它可以將複雜對象的建造過程抽象出來（抽象類別），使这个抽象过程的不同实现方法可以构造出不同表现（属性）的对象。
+
+== 适用性 ==
+在以下情况使用生成器模式：
+*当创建复杂对象的算法应该独立于该对象的组成部分以及它们的装配方式时；
+*当构造过程必须允许被构造的对象有不同的表示时。
+
+== 参与者 ==
+*Builder
+:为创建一个Product对象的各个部件指定抽象接口。
+*ConcreteBuilder
+:实现Builder的接口以构造和装配该产品的各个部件。
+:定义并明确它所创建的表示。
+:提供一个检索产品的接口
+*Director
+:构造一个使用Builder接口的对象。
+*Product
+:表示被构造的复杂对象。ConcreateBuilder创建该产品的内部表示并定义它的装配过程。
+:包含定义组成部件的类，包括将这些部件装配成最终产品的接口。
+
+== 协作 ==
+客户创建Director对象，并用它所想要的Builder对象进行配置。
+*一旦产品部件被生成，导向器就会通知生成器。
+*生成器处理导向器的请求，并将部件添加到该产品中。
+*客户从生成器中检索产品。
+
+== 範例 ==
+
+=== [[Java|Java]] ===
+<syntaxhighlight lang="java">
+ /** "Product" */
+ class Pizza {
+   private String dough = "";
+   private String sauce = "";
+   private String topping = "";
+ 
+   public void setDough (String dough)     { this.dough = dough; }
+   public void setSauce (String sauce)     { this.sauce = sauce; }
+   public void setTopping (String topping) { this.topping = topping; }
+ }
+ 
+ 
+ ''/** "Abstract Builder" */''
+ abstract class PizzaBuilder {
+   protected Pizza pizza;
+ 
+   public Pizza getPizza() { return pizza; }
+   public void createNewPizzaProduct() { pizza = new Pizza(); }
+ 
+   public abstract void buildDough();
+   public abstract void buildSauce();
+   public abstract void buildTopping();
+ }
+ 
+ /** "ConcreteBuilder" */
+ class HawaiianPizzaBuilder extends PizzaBuilder {
+   public void buildDough()   { pizza.setDough("cross"); }
+   public void buildSauce()   { pizza.setSauce("mild"); }
+   public void buildTopping() { pizza.setTopping("ham+pineapple"); }
+ }
+ 
+ /** "ConcreteBuilder" */
+ class SpicyPizzaBuilder extends PizzaBuilder {
+   public void buildDough()   { pizza.setDough("pan baked"); }
+   public void buildSauce()   { pizza.setSauce("hot"); }
+   public void buildTopping() { pizza.setTopping("pepperoni+salami"); }
+ }
+ 
+ 
+ ''/** "Director" */''
+ class Waiter {
+   private PizzaBuilder pizzaBuilder;
+ 
+   public void setPizzaBuilder (PizzaBuilder pb) { pizzaBuilder = pb; }
+   public Pizza getPizza() { return pizzaBuilder.getPizza(); }
+ 
+   public void constructPizza() {
+     pizzaBuilder.createNewPizzaProduct();
+     pizzaBuilder.buildDough();
+     pizzaBuilder.buildSauce();
+     pizzaBuilder.buildTopping();
+   }
+ }
+ 
+ /** A customer ordering a pizza. */
+ class BuilderExample {
+   public static void main(String[] args) {
+     Waiter waiter = new Waiter();
+     PizzaBuilder hawaiianPizzabuilder = new HawaiianPizzaBuilder();
+     PizzaBuilder spicyPizzabuilder = new SpicyPizzaBuilder();
+ 
+     waiter.setPizzaBuilder ( hawaiianPizzabuilder );
+     waiter.constructPizza();
+ 
+     Pizza pizza = waiter.getPizza();
+   }
+ }
+
+</syntaxhighlight>
+
+=== [[PHP|PHP]] ===
+<syntaxhighlight lang="php">
+<?php
+//設計模式：生成器模式
+//Coder:  rollenc ( http://www.rollenc.com )
+interface Builder {
+	function buildPartA(); //创建部件A比如创建汽车车轮
+	//创建部件B 比如创建汽车方向盘
+	function buildPartB(); 
+	//创建部件C 比如创建汽车发动机
+	function buildPartC(); 
+
+	//返回最后组装成品结果 (返回最后装配好的汽车)
+	//成品的组装过程不在这里进行,而是转移到下面的Director类中进行.
+	//从而实现了解耦过程和部件
+	//return Product
+	function getResult(); 
+}
+
+class Director {
+	private $builder; 
+
+	public function __construct($builder ) { 
+		$this->builder = $builder; 
+	} 
+	// 将部件partA partB partC最后组成复杂对象
+	//这里是将车轮 方向盘和发动机组装成汽车的过程
+	public function construct() {
+		$this->builder->buildPartA();
+		$this->builder->buildPartB();
+		$this->builder->buildPartC();
+	}
+}
+
+class ConcreteBuilder implements Builder {
+	public $partA, $partB, $partC;
+	public function buildPartA() {
+		echo 'partA is builded' . "\n";
+	}
+	public function buildPartB() {
+		echo 'partB is builded' . "\n";
+	}
+	public function buildPartC() {
+		echo 'partC is builded' . "\n";
+	}
+	public function getResult () {
+		echo 'Return product.' . "\n";
+		return 1;
+	}
+}
+
+$builder = new ConcreteBuilder();
+$director = new Director( $builder ); 
+
+$director->construct(); 
+$product = $builder->getResult(); 
+
+?>
+</syntaxhighlight>
+=== [[C++|C++]] ===
+<syntaxhighlight lang="cpp">
+#pragma once
+#include<iostream>
+using namespace std;
+
+class Product{
+public:
+    string ProductName;
+};
+class ProductA: public Product{
+public:
+    inline ProductA(void): ProductName("ProductA"){}
+};
+class ProductB:public Product{
+public:
+    inline ProductB(void): ProductName("ProductB"){}
+}
+
+class Creator{
+public:
+    inline Product *CreateProduct(void){
+        return DoCreateProduct();
+    }
+protected:
+    virtual Product *DoCreateProduct(void)=0;
+};
+class CreatorA: public Creator{
+public:
+    inline Product *DoCreateProduct(void)override{
+        return new ProductA;
+    }
+};
+class CreatorB: public Creator{
+public:
+    inline Product *DoCreateProduct(void)override{
+        return new ProductB;
+    }
+};
+
+int main(int argc, char **argv){
+    Creator *creator=new CreatorA;
+    Product *product=creator->CreateProduct();
+    cout<<product->ProductName<<endl;//"ProductA"
+    delete creator;
+    delete product;
+    creator=new CreatorB;
+    product=creator->CreateProduct();
+    cout<<product->ProductName<<endl;//"ProductB"
+    delete creator;
+    delete product;
+    return 0;
+}
+</syntaxhighlight>
+
+== 注意问题 ==
+*装配和构造接口
+:生成器逐步的构造它们的产品。因此'''生成器介面必须足够普遍'''，以便为各种类型的具体生成器构造产品。
+*没有抽象类
+:通常情况下，由具体生成器生成的产品，它们的表示相差是如此之大以至于给不同的产品以公共父类没有太大意思。
+*在生成器中預設的方法为空
+:定义为空方法可以使客户只重定义他们所感兴趣的操作。
+
+== 效果 ==
+*它使你可以改变一个产品的内部表示
+*它将构造代码和表示代码分开
+*它使你可对构造过程进行更精细的控制
+
+== 相关模式 ==
+[[抽象工厂模式|抽象工厂模式]]与生成器相似，因为它也可以创建复杂对象。主要的区别是生成器模式着重于一步步构造一个复杂对象。而抽象工厂模式着重于多个系列的产品对象（简单的或是复杂的）。生成器在最后的一步返回产品，而对于抽象工廠来说，产品是立即返回的。<br />
+
+[[組合模式|組合模式]]通常是用生成器生成的。
+
+== 参考 ==
+设计模式：可复用面向对象软件的基础
+
+== 外部連結 ==
+[http://wiki.rollenc.com/index.php?title=%E5%BB%BA%E9%80%A0%E6%A8%A1%E5%BC%8F 软件工程笔记库]{{dead link|date=2018年3月 |bot=InternetArchiveBot |fix-attempted=yes }}
+
+
+{{软件设计模式}}
+[[Category:軟體設計模式|Category:軟體設計模式]]

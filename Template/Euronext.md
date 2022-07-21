@@ -1,0 +1,2 @@
+{{lang|en|[[Euronext]]}}：{{lang|en|{{#if:{{{isin|}}}|[https://europeanequities.nyx.com/en/search_instruments/{{{isin}}}?type=Stock {{{1}}}]
+|[https://europeanequities.nyx.com/en/search_instruments/{{{1}}}?type=Stock {{{1}}}]}}}}<includeonly>[[Category:泛歐證券交易所上市公司]]</includeonly><noinclude>[[Category:股票代码模板|{{PAGENAME}}]]</noinclude>

@@ -1,0 +1,11 @@
+{{Userbox
+  |id=興大
+  |id-c=#ffffff
+  |info=這名用戶是'''[[:Category:國立中興大學維基人|國立中興大學]]'''的學生、校友或教職人員。
+  |info-c=#E0E8FF
+  |info-s=10
+  |border-c=#6699ff
+}}<includeonly>[[Category:國立中興大學維基人|{{PAGENAME}}]]</includeonly>
+<noinclude>
+[[Category:台灣大專院校用戶框模板]]
+</noinclude>

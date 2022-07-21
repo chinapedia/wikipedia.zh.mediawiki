@@ -1,0 +1,1 @@
+[[File:Loudspeaker.png|有声内容图标|link=Wikipedia:有声条目]]<noinclude>

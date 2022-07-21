@@ -1,0 +1,14 @@
+{{Userbox
+|border-s=1
+|id=[[File:TPCycle06_20060311-25.jpg|60px]]
+|info-c=#d7f4e3
+|info-s=10
+|info-fc=#2d5016
+|info=這個用戶喜歡參觀'''展覽'''。
+|border-c=navy
+|nocat={{{nocat|}}}
+|usercategory=喜歡參觀展覽的維基人
+}}
+<noinclude>
+[[Category:關注與興趣用戶框模板]]
+</noinclude>

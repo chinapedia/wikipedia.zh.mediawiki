@@ -1,0 +1,1 @@
+#REDIRECT [[Template:鳥取縣]]

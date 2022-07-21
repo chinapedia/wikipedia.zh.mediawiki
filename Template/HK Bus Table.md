@@ -1,0 +1,1 @@
+#REDIRECT [[Template:一般巴士表格]]

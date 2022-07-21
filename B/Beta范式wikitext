@@ -1,0 +1,47 @@
+在 [[lambda_演算|lambda 演算]]中，一个项是'''beta 范式'''（规范型），如果没有“beta 归约”是可能的。一个项是 '''beta-eta 范式'''，如果既没有 beta 归约又没有“eta 归约”是可能的。一个项是'''头部范式'''，如果没有“在头部位置的 beta-可规约式”。
+
+== Beta 归约 ==
+
+在 lambda 演算中，'''beta 可归约式'''(redex)是如下形式的项
+
+:<math> ((\mathbf{\lambda} x . A(x)) t) </math>
+
+这里的 <math>A(x)</math> 是（可能）涉及变量 <math>x</math> 的项。
+
+“在头部位置的 beta 归约”是把如下重写规则应用于一个 beta 可归约式
+
+:<math> ((\mathbf{\lambda} x . A(x)) t) \rightarrow A(t)</math>
+
+这里的 <math>A(t)</math> 是把项 <math>A(x)</math> 中变量 <math>x</math> 替换为项 <math>t</math> 的结果。
+
+一个 beta 归约在头部位置，如果它有如下形式：
+
+* <math> \lambda x_0 \ldots \lambda x_{i-1} . (\lambda x_i . A(x_i)) M_1 M_2 \ldots M_n \rightarrow
+         \lambda x_0 \ldots \lambda x_{i-1} . A(M_1) M_2 \ldots M_n </math>, where <math> i \geq 0, n \geq 1 </math>.
+
+不是这种形式的任何归约都是内部 beta 归约。
+
+=== 归约策略 ===
+
+一般的说，对于给定项有多个不同的可能的 beta 归约。'''正规序归约'''是一种[[求值策略|求值策略]]，它始终应用“头部位置的 beta 归约”的规则，直到没有更多的这种归约是可能的。在这一点上，结果的项是“头部范式”。
+
+相反的，在'''应用序归约'''中，首先应用内部归约，而只在没有更多的内部归约是可能的时候应用头部归约。
+
+正规序归约是完备的，在如果一个项有头部范式则正规序归约总是能最终达到它的意义上。相反的，应用序归约可能不终止，即使在这个项有规范形式的时候。例如，使用应用序归约，下列归约序列是可能的：
+
+:<math> (\mathbf{\lambda} x . z) ((\lambda w. w w w) (\lambda w. w w w)) </math>
+:<math> \rightarrow (\lambda x . z) ((\lambda w. w w w) (\lambda w. w w w) (\lambda w. w w w))</math>
+:<math> \rightarrow (\lambda x . z) ((\lambda w. w w w) (\lambda w. w w w) (\lambda w. w w w) (\lambda w. w w w))</math>
+:<math> \rightarrow (\lambda x . z) ((\lambda w. w w w) (\lambda w. w w w) (\lambda w. w w w) (\lambda w. w w w) (\lambda w. w w w))</math>
+:<math>\ldots</math>
+
+而使用正规序归约，同样的起点迅速的归约到范式：
+
+:<math> (\mathbf{\lambda} x . z) ((\lambda w. w w w) (\lambda w. w w w)) </math>
+:<math> \rightarrow z </math>
+
+== 参见 ==
+* [[lambda_演算|lambda 演算]]
+* [[规范化性质|规范化性质]]
+
+[[Category:Lambda演算|Category:Lambda演算]]

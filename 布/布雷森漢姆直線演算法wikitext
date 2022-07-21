@@ -1,0 +1,121 @@
+'''布雷森漢姆直線演算法'''（{{lang-en|Bresenham's line algorithm}}）是用來描繪由兩點所決定的直線的[[演算法|演算法]]，它會算出一條線段在n維[[點陣圖|點陣圖]]上最接近的點。這個演算法只會用到較為快速的整數加法、減法和[[位元運算|位元移位]]，常用於繪製電腦畫面中的直線。是[[計算機圖形學|計算機圖形學]]中最先發展出來的演算法。
+
+經過少量的延伸之後，原本用來畫直線的演算法也可用來畫圓。且同樣可用較簡單的算術運算來完成，避免了計算二次方程式或三角函數，或遞歸地分解為較簡單的步驟。
+
+以上特性使其仍是一種重要的演算法，並且用在[[繪圖儀|繪圖儀]]、[[繪圖卡|繪圖卡]]中的[[GPU|繪圖晶片]]，以及各種[[圖形程式庫|圖形程式庫]]。這個演算法非常的精簡，使它被實作於各種裝置的[[韌體|韌體]]，以及繪圖晶片的硬體之中。
+
+「Bresenham」至今仍經常作為一整個演算法家族的名稱，即使家族中絕大部份演算法的實際開發者是其他人。該家族的演算法繼承了Bresenham的基本方法並加以發展，詳見參考資料。
+
+== 演算方法 ==
+[[File:Bresenham.png|thumb]]
+假設我們需要由(''x''<sub>0</sub>, ''y''<sub>0</sub>)這一點，繪畫一直線至右下角的另一點(''x''<sub>1</sub>, ''y''<sub>1</sub>)，x,y分別代表其水平及垂直坐标，并且''x''<sub>1</sub> - ''x''<sub>0</sub> > ''y''<sub>1</sub> - ''y''<sub>0</sub>。在此我們使用電腦系統常用的坐標系，即x坐標值沿x軸向右增長，y坐標值沿y軸向下增長。
+
+因此x及y之值分別向右及向下增加，而兩點之水平距離為<math>x_1-x_0</math>且垂直距離為<math>y_1-y_0</math>。由此得之，該線的[[斜率|斜率]]必定介乎於0至1之間。而此算法之目的，就是找出在<math>x_0</math>與<math>x_1</math>之間，第x行相對應的第y列，從而得出一[[像素|像素]]點，使得該像素點的位置最接近原本的線。
+
+對於由(''x''<sub>0</sub>, ''y''<sub>0</sub>)及(''x''<sub>1</sub>, ''y''<sub>1</sub>)兩點所組成之直線，公式如下：
+
+:<math>y - y_0 = \frac{y_1-y_0}{x_1-x_0}(x-x_0)</math>
+
+因此，對於每一點的x，其y的值是
+
+:<math>\frac{y_1-y_0}{x_1-x_0}(x-x_0) + y_0</math>
+
+因為x及y皆為整數，但並非每一點x所對應的y皆為整數，故此沒有必要去計算每一點x所對應之y值。反之由於此線之斜率介乎於1至0之間，故此我們只需要找出當x到達那一個數值時，會使y上升1，若x尚未到此值，則y不變。至於如何找出相關的x值，則需依靠斜率。斜率之計算方法為<math>m=(y_1-y_0)/(x_1-x_0)</math>。由於此值不變，故可於運算前預先計算，減少運算次數。
+
+要實行此算法，我們需計算每一像素點與該線之間的誤差。於上述例子中，誤差應為每一點x中，其相對的像素點之y值與該線實際之y值的差距。每當x的值增加1，誤差的值就會增加m。每當誤差的值超出0.5，線就會比較靠近下一個映像點，因此y的值便會加1，且誤差減1。
+
+下列[[偽代碼|偽代碼]]是這算法的簡單表達（其中的<code>plot(x,y)</code>繪畫該點，<code>abs</code>返回的是[[絕對值|絕對值]]）。雖然用了代價較高的[[浮点數|浮点运算]]，但很容易就可以改用整數運算（詳見[[#最佳化|最佳化]]一節）：
+
+  '''function''' line(x0, x1, y0, y1)
+      ''int'' deltax := x1 - x0
+      ''int'' deltay := y1 - y0
+      ''real'' error := 0
+      ''real'' deltaerr := deltay / deltax    // 假設deltax != 0（非垂直線），
+            // 注意：需保留除法運算結果的小數部份
+      ''int'' y := y0
+      '''for''' x '''from''' x0 '''to''' x1
+          plot(x,y)
+          error := error + deltaerr
+          '''if''' abs (error) ≥ 0.5 '''then'''
+              y := y + 1
+              error := error - 1.0
+
+== 一般化 ==
+
+雖然以上的演算法只能繪畫由左下至右上，且[[斜率|斜率]]小於或等於1的直線，但我們可以擴展此演算法，使之可繪畫任何的直線。第一個擴展是繪畫反方向，即由右上至左下的直線。這可以簡單地透過在<code>x0 > x1</code>時交換起點和終點來做到。第二個擴展是繪畫斜率為負的直線。可以檢查''y''<sub>0</sub> ≥ ''y''<sub>1</sub>是否成立；若該不等式成立，誤差超出0.5時''y''的值改為加-1。最後，我們還需要擴展該演算法，使之可以繪畫斜率絕對值大於1的直線。要做到這點，我們可以利用大斜率直線對直線''y=x''的[[反射_(數學)|反射]]是一條小斜率直線的事實，在整個計算過程中交換 ''x'' 和 ''y''，並一併將''plot''的參數順序交換。擴展後的偽代碼如下：
+
+  '''function''' line(x0, x1, y0, y1)
+      ''boolean'' steep := abs(y1 - y0) > abs(x1 - x0)
+      '''if''' steep '''then'''
+          swap(x0, y0)
+          swap(x1, y1)
+      '''if''' x0 > x1 '''then'''
+          swap(x0, x1)
+          swap(y0, y1)
+      ''int'' deltax := x1 - x0
+      ''int'' deltay := abs(y1 - y0)
+      ''real'' error := 0
+      ''real'' deltaerr := deltay / deltax
+      ''int'' ystep
+      ''int'' y := y0
+      '''if''' y0 < y1 '''then''' ystep := 1 '''else''' ystep := -1
+      '''for''' x '''from''' x0 '''to''' x1
+          '''if''' steep '''then''' plot(y,x) '''else''' plot(x,y)
+          error := error + deltaerr
+          '''if''' error ≥ 0.5 '''then'''
+              y := y + ystep
+              error := error - 1.0
+
+以上的程序可以處理任何的直線，實现了完整的Bresenham直線演算法。
+
+== 最佳化 ==
+
+以上的程序有一個問題：電腦處理[[浮点數|浮点运算]]的速度比較慢，而<code>error</code>與<code>deltaerr</code>的計算是浮點運算。此外，<code>error</code>的值經過多次浮點數加法之後，可能有累積誤差。使用整數運算可令演算法更快、更準確。只要將所有以上的分數數值乘以<code>deltax</code>，我們就可以用整數來表示它們。唯一的問題是程序中的常數0.5—我們可以透過改變<code>error</code>的初始方法，以及將<code>error</code>的計算由遞增改為遞減來解決。新的程序如下：
+
+  '''function''' line(x0, x1, y0, y1)
+      ''boolean'' steep := abs(y1 - y0) > abs(x1 - x0)
+      '''if''' steep '''then'''
+          swap(x0, y0)
+          swap(x1, y1)
+      '''if''' x0 > x1 '''then'''
+          swap(x0, x1)
+          swap(y0, y1)
+      ''int'' deltax := x1 - x0
+      ''int'' deltay := abs(y1 - y0)
+      ''int'' error := deltax / 2
+      ''int'' ystep
+      ''int'' y := y0
+      '''if''' y0 < y1 '''then''' ystep := 1 '''else''' ystep := -1
+      '''for''' x '''from''' x0 '''to''' x1
+          '''if''' steep '''then''' plot(y,x) '''else''' plot(x,y)
+          error := error - deltay
+          '''if''' error < 0 '''then'''
+              y := y + ystep
+              error := error + deltax
+
+== 歷史 ==
+{{tsl|en|Jack E. Bresenham|Jack E. Bresenham}}於1962年在[[IBM|IBM]]發明了此演算法。據他本人表示，他於1963年在[[丹佛|丹佛]]舉行的[[美国计算机协会|美国计算机协会]]全國大會上發表了該演算法，論文則登載於1965年的《IBM系統期刊》（IBM Systems Journal）之中。<ref name = DADS>Paul E. Black. ''Dictionary of Algorithms and Data Structures,'' [[美國國家標準與技術研究院|美國國家標準與技術研究院]]. http://www.nist.gov/dads/HTML/bresenham.html {{Wayback|url=http://www.nist.gov/dads/HTML/bresenham.html |date=20081017094131 }}</ref>Bresenham直線演算法其後被修改為能夠畫圓，修改後的演算法有時被稱為「Bresenham畫圓演算法」或[[中點畫圓演算法|中點畫圓演算法]]。
+
+== 參考資料 ==
+
+* [http://www.cs.helsinki.fi/group/goa/mallinnus/lines/bresenh.html "The Bresenham Line-Drawing Algorithm"] {{Wayback|url=http://www.cs.helsinki.fi/group/goa/mallinnus/lines/bresenh.html |date=20210225022840 }}, by Colin Flanagan
+<references/>
+
+== 參閱 ==
+* [http://www.chez.com/pmaillot Patrick-Gilles Maillot's Thesis] {{Wayback|url=http://www.chez.com/pmaillot |date=20090107113923 }} an extension of the Bresenham line drawing algorithm to perform 3D hidden lines removal; also published in MICAD '87 proceedings on CAD/CAM and Computer Graphics, page 591 - ISBN 2-86601-084-1.
+* [[數字微分分析儀演算法|數字微分分析儀演算法]]，描畫直線和三角形的一種簡單通用方法。
+* [[吳小林直線演算法|吳小林直線演算法]]，以同樣快速的方法繪製[[反鋸齒|反鋸齒]]線。
+* [[中點畫圓演算法|中點畫圓演算法]]，以類似的方法繪畫[[圓|圓]]。
+
+== 外部連結 ==
+{{commons category}}
+* [http://tide4javascript.com/?s=Bresenham Analyze Bresenham's line algorithm in an online Javascript IDE] {{Wayback|url=http://tide4javascript.com/?s=Bresenham |date=20190402114026 }}
+* [http://www.cs.helsinki.fi/group/goa/mallinnus/lines/bresenh.html ''The Bresenham Line-Drawing Algorithm'' by Colin Flanagan] {{Wayback|url=http://www.cs.helsinki.fi/group/goa/mallinnus/lines/bresenh.html |date=20210225022840 }}
+* [http://www.nist.gov/dads/HTML/bresenham.html National Institute of Standards and Technology page on Bresenham's algorithm] {{Wayback|url=http://www.nist.gov/dads/HTML/bresenham.html |date=20081017094131 }}
+* [http://www.pdp8.net/563/563.shtml Calcomp 563 Incremental Plotter Information] {{Wayback|url=http://www.pdp8.net/563/563.shtml |date=20210131020624 }}
+* [http://www.research.ibm.com/journal/sj/041/ibmsjIVRIC.pdf Bresenham's Original Paper] {{Wayback|url=http://www.research.ibm.com/journal/sj/041/ibmsjIVRIC.pdf |date=20080528040104 }}
+* [http://www.codecodex.com/wiki/index.php?title=Bresenham%27s_line_algorithm An implementation in Java] {{Wayback|url=http://www.codecodex.com/wiki/index.php?title=Bresenham%27s_line_algorithm |date=20181215173409 }} at the Code Codex
+
+[[Category:计算机图形算法|Category:计算机图形算法]]
+[[Category:數位幾何學|Category:數位幾何學]]
+[[Category:带有伪代码示例的条目|Category:带有伪代码示例的条目]]

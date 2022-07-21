@@ -1,0 +1,1 @@
+由香港太空館望向彌敦道<noinclude>[[Category:每周图片模板]]</noinclude>

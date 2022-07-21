@@ -1,0 +1,1 @@
+圣索菲亚大教堂<noinclude>[[Category:每周图片模板]]</noinclude>

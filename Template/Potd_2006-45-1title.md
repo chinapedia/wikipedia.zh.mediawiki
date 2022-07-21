@@ -1,0 +1,1 @@
+鞍帶石斑魚<noinclude>[[Category:每周图片模板]]</noinclude>

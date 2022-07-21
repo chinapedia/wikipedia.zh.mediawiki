@@ -1,0 +1,1 @@
+{{User language-3|ln|Motó óyo ayébí koloba '''[[:Category:ln 使用者|lingála]]''' '''[[:Category:ln-3 使用者|malámu]]'''.|林加拉语}} <noinclude></noinclude>

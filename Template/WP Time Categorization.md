@@ -1,0 +1,1 @@
+#redirect [[Template:时间分类专题]]

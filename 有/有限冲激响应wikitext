@@ -1,0 +1,155 @@
+{{Expert needed|subject=电子学|subject2=数学|subject3=计算机科学|time=2021-07-19T03:38:19+00:00}}
+{{NoteTA|
+|G1=Signals and Systems
+}}
+'''有限冲激响应'''（{{lang-en|Finite impulse response}}，縮寫FIR）滤波器是其[[冲激响应|冲激响应]]為有限長度的[[滤波器|滤波器]]，脉冲输入信号的响应會在有限時間內變為零，此特性和[[无限冲激响应|无限冲激响应]]（IIR）滤波器相反，无限冲激响应滤波器存在反馈回路，其[[冲激响应|冲激响应]]可能是無限長度的（不過一般會衰減）。
+
+N階離散時間的FIR滤波器，其[[冲激响应|冲激响应]]（對應[[克罗内克δ函数|克罗内克δ函数]]輸入的輸出）在變為零之前，最多只持續<math>N+1</math>個取樣點（從第一個非零取樣點，到最後一個非零取樣點）。
+
+FIR滤波器可以是連續時間的，也可能是離散時間的，可以是[[數碼資料|數位]]的，也可能是[[模拟电路|類比]]的。
+
+== 定義 ==
+[[File:FIR_Filter.svg|thumb]]下的 ''z''<sup>−1</sup>運算子]]
+
+[[File:FIR_Lattice_Filter.png|thumb]]下的 ''z''<sup>−1</sup>運算子]]
+
+針對{{le|因果濾波器|causal filter|因果}}離散時間的N階濾波器，輸出序列的每一個值都是最近輸入的加權和：
+
+:<math>\begin{align}
+ y[n] &= b_0 x[n] + b_1 x[n-1] + \cdots + b_N x[n-N] \\
+      &= \sum_{i=0}^N b_i\cdot x[n-i],
+\end{align}</math>
+
+其中
+*<math display="inline"> x[n]</math>是輸入信號
+*<math display="inline"> y[n]</math>是輸出信號
+*<math display="inline"> N</math>是濾波器階數。<math display="inline"> N</math><sup>th</sup>階濾波器表示在右邊有<math display=inline> N + 1 </math>項
+*<math display="inline"> b_i </math>是<math display="inline"> N^\text{th}</math>階FIR濾波器在第i時間（<math display=inline> 0 \le i \le N </math>）的脈波響應。若濾波器是直接型的FIR濾波器，則<math display="inline"> b_i </math>也就是濾波器的係數。
+
+計算也稱為離散[[卷积|卷积]]。
+
+上述項中的<math display=inline> x[n-i]</math>常稱為{{visible anchor|tap}}（抽頭），依{{le|數位延遲線|Digital delay line}}的結構而定，在許多實現或方塊圖中，會將延遲輸入進行乘法運算。
+
+濾波器的衝激響應定義為有限區間內的非零值。包括零值在內，衝激響應是無限數列：
+:<math>
+  h[n] = \sum_{i=0}^N b_i\cdot \delta[n-i] = 
+  \begin{cases}
+    b_n & 0 \le n \le N\\
+      0 & \text{otherwise}. 
+  \end{cases}
+</math>
+
+若FIR濾波器是非因果的，其脈衝響應上的非零值範圍可能從<math>n=0</math>前就開始。
+
+== 特性 ==
+FIR濾波器相較於IIR濾波器，有以下的優點：
+*不需要回授，因此捨去誤差不會因為連續的加總而累計。每一次的計算其相對誤差都是一樣的，因此在實現上比較簡單。
+*在本質上[[有界輸入有界輸出穩定性|穩定]]，因為其輸出是有限個輸入值乘以有限倍數的和，因此不會大於<math display="inline"> \sum |b_i|</math>乘以輸入的最大值。
+*若讓係數對稱，可以設計成{{le|線性相位|linear phase}}，這在一些相位很重要的應用（例如資料通訊、[[地震学|地震学]]或[[分音器|分音器]]）中是很好的特性。
+
+FIR濾波器的主要缺點是若要求要求低頻（相對於取樣率）截止頻率，在相同的銳利程度或是{{le|選擇性 (電子)|selectivity (electronic)|選擇性}}情形下，在通用處理器上的運算量要比IIR濾波器要大。不過目前有許多數位信號處理器提供特別的硬體來使FIR濾波器有類似IIR濾波器一樣有效率。
+
+==頻率響應==
+
+數列<math>x[n]</math>的濾波效果可以用[[卷积定理|卷积定理]]，在頻域上描述：
+
+:<math>\underbrace{\mathcal{F}\{x*h\}}_{Y(\omega)} = \underbrace{\mathcal{F}\{x\}}_{X(\omega)} \cdot \underbrace{\mathcal{F}\{h\}}_{H(\omega)}</math>     and     <math>y[n] = x[n]*h[n]= \mathcal{F}^{-1}\big\{X(\omega)\cdot H(\omega)\big\},</math>
+
+其中運算子<math>\mathcal{F}</math>和<math>\mathcal{F}^{-1}</math>表示離散時間傅立葉變換（DTFT）和其倒數。因此，複數值的乘性函數<math>H(\omega)</math>是濾波器的[[频率响应|频率响应]]，可以用以下的[[傅里叶级数|傅里叶级数]]定義：
+
+:<math>H_{2\pi}(\omega)\ \triangleq \sum_{n=-\infty}^{\infty} h[n]\cdot \left({e^{i \omega}}\right)^{-n} = \sum_{n=0}^{N}b_n\cdot \left({e^{i \omega}}\right)^{-n},</math>
+
+其中加上下標表示2π週期性。此處的<math>\omega</math>是{{le|正規頻率 (數位訊號處理)|Normalized frequency (digital signal processing)|正規單位}}（radians/sample）下的頻率。在許多濾波器設計的程式中都較常用<math>\omega = 2\pi f,</math>的定義，將頻率單位<math>(f)</math>改為cycles/sample，其週期為1{{
+efn-ua|An exception is MATLAB, which prefers units of ''half-cycles/sample'' {{=}} ''cycles/2-samples'', because the Nyquist frequency in those units is 1, a convenient choice for plotting software that displays the interval from 0 to the Nyquist frequency.
+}}。當x[n]序數是已知的取樣率<math>f_s</math> ''samples/second''，<math>\omega = 2\pi f/f_s</math>的取代會將頻率單位<math>(f)</math>變為''cycles/second''（[[赫兹|赫兹]]），週期性是<math>f_s</math>。<math>\omega = \pi</math>的值會對應<math>f = \tfrac{f_s}{2}</math> ''Hz'' <math>= \tfrac{1}{2}</math> ''cycles/sample''的頻率，也就是[[奈奎斯特频率|奈奎斯特频率]]。
+
+<math>H_{2\pi}(\omega)</math>也可以用濾波器衝激響應的[[离散时间傅里叶变换|离散时间傅里叶变换]]表示：
+
+:<math>
+\widehat H(z)\ \triangleq \sum_{n=-\infty}^{\infty} h[n]\cdot z^{-n}.
+</math>
+
+:<math>H_{2\pi}(\omega) = \left. \widehat H(z) \, \right|_{z = e^{j \omega}} = \widehat H(e^{j \omega}).</math>
+==濾波器設計==
+在設計有限脈衝響應濾波器時，要找到符合特定規格的係數以及階數，規格可能是時域的（[[匹配濾波器|匹配濾波器]]），也可能是頻域的（較常見的情形）。匹配濾波器是將輸入信號和已知形狀的脈波進行互相關（cross-correlation）。FIR摺積（FIR convolution）是脈波響應的逆時間複本（time-reversed copy）和輸入信號進行互相關。因此匹配濾波器的脈波是用針對已知脈波進行取樣，再將取樣信號倒序，做為滤波器的係數<ref>Oppenheim, Alan V., Willsky, Alan S., and Young, Ian T.,1983: Signals and Systems, p. 256 (Englewood Cliffs, New Jersey: Prentice-Hall, Inc.)  {{ISBN|0-13-809731-3}}</ref>。
+
+若希望有特定的頻率響應，以下是一些常見的濾波器設計方式：
+# 窗函數設計法
+# 頻率取樣法
+# 最小MSE（均方差）法
+# [[帕克斯-麥克萊倫演算法|帕克斯-麥克萊倫演算法]]（也稱為是等漣波法、最佳法或minimax法）常會用[[雷米茲演算法|雷米茲演算法]]來找最佳等漣波的係數。使用者會標示想要的頻率響應，此響應下誤差的加權函數，以及濾波器階數N。演算法會找到可以將最大偏移量降到最低的<math display="inline"> N + 1</math>個係數。直覺上，這可以找到在只用<math display="inline"> N + 1</math>下，最符合期望頻率響應的濾波器。此方式特別容易實作，因為至少有一本教科書<ref>Rabiner, Lawrence R., and Gold, Bernard, 1975: Theory and Application of Digital Signal Processing (Englewood Cliffs, New Jersey: Prentice-Hall, Inc.)  {{ISBN|0-13-914101-4}}</ref>有包括可以用理想濾波器以及階數''N''，得到最佳係數的程式。
+# 等漣波FIR濾波器也可以用DFT演算法設計<ref>A. E. Cetin, O.N. Gerek, Y. Yardimci, "Equiripple FIR filter design by the FFT algorithm," IEEE Signal Processing Magazine, pp. 60–64, March 1997.</ref>。此方式在本質上是迭代的，初始濾波器計設計的DFT可以用FFT演算法計算（若沒有初始估計值，可以用h[n]=delta[n]）。在傅立葉域下，可以依要想的規格調整頻率響應，接著計算反DFT。在時域下，只保留前N個係數（其他係數設為0），之後再重覆上述的流程：再計算DFT，在頻率下調整，再轉回時域。
+
+目前已有許多軟體可以進行濾波器設計，例如[[MATLAB|MATLAB]]、[[GNU_Octave|GNU Octave]]、[[Scilab|Scilab]]和[[SciPy|SciPy]]等。
+
+==移動平均濾波器的例子==
+{{multiple image   
+| direction = vertical   
+| width     = 300   
+| footer    =    
+| image1    = FIR Filter (Moving Average).svg
+| alt1      = 簡單FIR濾波器的方塊器（此例中是二階三抽頭的濾波器，是移動平均濾波器）
+| caption1  = 簡單FIR濾波器的方塊器（此例中是二階三抽頭的濾波器，是移動平均濾波器）
+
+| image2    = MA2PoleZero C.svg   
+| alt2      = Pole–zero diagram   
+| caption2  = 此例中二階FIR濾波器的{{le|極零點圖|Pole–zero diagram}}
+
+| image3    = Frequency_response_of_3-term_boxcar_filter.svg   
+| alt3      = 二階FIR濾波器的振幅（絕對值）和相位響應
+| caption3  = 二階FIR濾波器的振幅（絕對值）和相位響應
+
+| image4    = Amplitude & phase vs frequency for 3-term boxcar filter.svg   
+| alt4      = 二階FIR濾波器的振幅（允許負值）和相位響應
+| caption4  = 二階FIR濾波器的振幅（允許負值）和相位響應
+}}
+
+[[移動平均|移動平均]]濾波器是簡單的FIR濾波器，有時會稱為[[Boxcar_函数|Boxcar 函数]]濾波器（特別在之後有[[降采样|降采样]]的情形下）。濾波器的係數<math display="inline"> b_0, \ldots, b_N</math>可以用以下公式求得：
+:<math>b_i=\frac{1}{N+1}</math>
+
+以下是更具體的例子，選擇濾波器的階數：
+:<math>N = 2</math>
+
+其沖激響應如下：
+:<math>h[n] = \frac{1}{3}\delta[n] + \frac{1}{3}\delta[n-1] + \frac{1}{3}\delta[n-2]</math>
+
+右邊的方塊圖是以下要討論的二階移動平均濾波器。其遞移函數為：
+
+:<math>H(z) = \frac{1}{3} + \frac{1}{3}z^{-1} + \frac{1}{3}z^{-2} = \frac{1}{3}\frac{z^{2} + z + 1}{z^{2}}.</math>
+
+下一個圖是濾波器的{{le|極零點圖|Pole–zero diagram}}。零頻率（直流）對應(1, 0)，正頻率會繞原點逆時針旋轉，直到(−1, 0)的奈奎斯特頻率。在原點有二個極點，二個零點在<math display="inline"> z_1 = -\frac{1}{2} + j\frac{\sqrt{3}}{2}</math>，<math display="inline"> z_2 = -\frac{1}{2} - j \frac{\sqrt{3}}{2}</math>。
+
+若以{{le|正規化頻率 (數位信號處理)|Normalized frequency (digital signal processing)|正規化頻率}}''ω''表示，頻率響應為：
+:<math>
+\begin{align}
+H\left(e^{j\omega}\right) &= \frac{1}{3} + \frac{1}{3}e^{-j\omega} + \frac{1}{3}e^{-j2\omega}\\
+&= \frac{1}{3}e^{-j\omega}\left(1+2cos(\omega)\right).
+\end{align}
+</math>
+
+圖上有其振幅和相位的響應，不過此圖也可以用冲激响应的[[离散傅里叶变换|离散傅里叶变换]]得到<!--{{
+efn-ua|See {{slink|Discrete-time Fourier transform|Sampling the DTFT|nopage=y}}.
+}} -->
+
+因為其對稱性，濾波器設計或是顯示軟體多半只會顯示 [0, π]區域。可以看出移動平均濾波器的低頻增益接近1，但會衰減高頻的信號，因此是簡單的[[低通滤波器|低通滤波器]]。相位圖是線性的，但在增益降到零時出現不連續，不連續的大小是π，意思是有變號的情形。最後一張圖的振幅允許正負，此時的相位就都是線性的。
+==參考文獻==
+{{reflist}}
+*Jian-Jiun Ding (2013), [http://djj.ee.ntu.edu.tw/ADSP.htm Advanced Digital Signal Processing] {{Wayback|url=http://djj.ee.ntu.edu.tw/ADSP.htm |date=20200508102040 }} [viewed 27/06/2013]
+
+==註解==
+{{notelist-ua}}
+
+==相關條目==
+* [[数字信号处理|数字信号处理]]
+* [[数字滤波器|数字滤波器]]
+* [[电子滤波器|电子滤波器]]
+* [[濾波器|濾波器]]
+* [[无限冲激响应|无限冲激响应]]（IIR）
+* [[Z轉換|Z轉換]]
+* {{le|FIR傳遞函數|FIR transfer function}}
+* [[滤波器设计|滤波器设计]]
+* {{le|級聯積分器—梳狀濾波器|Cascaded integrator–comb filter}}
+* [[支撑集|支撑集]]
+
+[[Category:数字信号处理|]]
+[[Category:数字滤波器|Category:数字滤波器]]

@@ -1,0 +1,1 @@
+耶稣基督后期圣徒教会（Mormon）<noinclude>[[Category:每周图片模板]]</noinclude>

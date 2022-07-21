@@ -1,0 +1,1 @@
+{{User language-4|cdo|Cī ciáh ê̤ṳng-hô tĕ̤k-siā '''[[:Category:Cdo 使用者|Mìng-dĕ̤ng-ngṳ̄]]''' gì nèng-lĭk sê '''[[:Category:Cdo-4 使用者|ciék-gê̤ṳng mū-ngṳ̄]]'''.<br />兹-{隻}-用戶讀寫'''[[:Category:Cdo 使用者|閩東語]]'''其能力是'''[[:Category:Cdo-4 使用者|接近母語]]'''。|閩東語|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

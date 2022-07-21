@@ -1,0 +1,1 @@
+[http://voicechasers.com/database/showactor.php?actorid={{{1|{{{id}}}}}} {{{2|{{{name|{{PAGENAME}}}}}}}}]于[[配音演员数据库]]中的相关信息.<noinclude></noinclude>

@@ -1,0 +1,3 @@
+[[File:Information.svg|25px|alt=Information icon]] 您好，感謝參與維基百科。惟閣下[[Special:Contributions/{{<includeonly>safesubst:</includeonly>BASEPAGENAME}}|最近的編輯中]]{{<includeonly>safesubst:</includeonly>#if:{{{1|}}}|（例如在[[:{{{1}}}]]中的編輯）}}有至少一項不具建設性且已遭[[Wikipedia:回退|回退]]。如閣下想進行編輯測試，請使用[[Wikipedia:沙盒|沙盒]]。如閣下有任何疑問，可以到[[Wikipedia:互助客棧|互助客棧]]尋求協助。{{<includeonly>safesubst:</includeonly>#if:{{{2|}}}|{{{2}}}|祝編安。}}<!-- Template:uw-vandalism1 --><noinclude>{{Templatesnotice|series = uw-vandalism|max = 4im|s1 = uw-v1|s2 = uw-vand1|s3 = uw-vandal1}}
+[[Category:用戶警告模板|壞]]
+</noinclude>

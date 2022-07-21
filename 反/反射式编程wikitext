@@ -1,0 +1,196 @@
+{{noteTA
+|G1=IT
+}}
+{{编程范式}}
+在[[计算机学|计算机学]]中，'''反射式编程'''（{{lang-en|reflective programming}}）或'''反射'''（{{lang-en|reflection}}），是指[[计算机程序|计算机程序]]在[[运行时|运行时]]（{{lang|en|runtime}}）可以访问、检测和修改它本身状态或行为的一种能力。<ref name="Forman_p8">见{{Harvnb|Forman|2005|p=8}}。</ref>用比喻来说，反射就是程序在运行的时候能够“观察”并且修改自己的行为。
+
+要注意术语“反射”和“[[内省_(计算机科学)|内省]]”（{{lang|en|type introspection}}）的关系。内省（或称“自省”）机制仅指程序在运行时对自身信息（称为[[元数据|元数据]]）的检测；反射机制不仅包括要能在运行时对程序自身信息进行检测，还要求程序能进一步根据这些信息改变程序状态或结构。<ref name="Forman_p8"/>
+
+== 概况 ==
+反射用于观察并修改程序在[[运行时|运行时]]的行为。一个反射導向的程式组件可以监测一个范围内的[[代码|代码]]执行情况，可以根据获取的目标对象信息及与此相关的范围修改自身。这可通过在运行时动态分配程序代码实现。
+
+在类型检测严格的[[面向对象程序设计|面向对象]]的[[编程语言|编程语言]]如[[Java|Java]]中，一般需要在编译期间对程序中需要调用的对象的具体类型、介面（interface）、資料成員（fields）和方法的合法性进行检查。反射技术则允许将对需要调用的物件的訊息检查工作从编译期间推迟到运行期间再现场执行。这样一来，可以在编译期间先不明确目标物件的[[介面_(程式設計)|介面]]（interface）名称、[[字段|字段]]（fields），即物件的資料成員（成员变量）、可用[[方法_(電腦科學)|方法]]，然后在运行根据目标物件自身的訊息决定如何处理。它还允许根据判断结果进行[[实例化|实例化]]新物件和相关方法的呼叫。
+
+反射主要用途就是使给定的程式，动态地适应不同的运行情况。利用物件導向建模中的[[多态_(计算机科学)|多型]]（多态性）也可以简化编写分别适用于多种不同情形的功能代码，但是反射可以解决多型（多态性）并不适用的更普遍情形，从而更大程度地避免[[硬编码|硬编码]]（即把代码的细节“写死”，缺乏灵活性）的代码风格。
+
+反射也是[[元编程|元编程]]的一个关键策略。
+
+== 历史背景 ==
+早期计算机的原生[[汇编语言|汇编语言]]本质上就具有反射特性。因为这些最初架构可以通过定义指令作为数据及使用[[自修改代码|自修改代码]]来编程，实现反射功能是很平常的。编程发展到使用编译型高级语言如[[ALGOL|Algol]]、[[Cobol|Cobol]]、[[Fortran|Fortran]]和包括[[Pascal_(编程语言)|Pascal]]和[[C语言|C]]在内的很多其他语言时，[[自修改代码|自修改代码]]等实践很大程度上消失了，直到将反射特性内建入类型系统的高级编程语言出现后才再次提供了反射功能。[[Lisp|Lisp]]语言家族以具有[[同像性|同像性]]作为标志性特征，可以认为具有反射性。
+
+1982年，{{en-link|布莱恩·史密斯|Brian Cantwell Smith}}在其博士论文《编程语言中的过程式反射》中<ref>Brian Cantwell Smith, [http://hdl.handle.net/1721.1/15961 Procedural Reflection in Programming Languages], Department of Electrical Engineering and Computer Science, Massachusetts Institute of Technology, PhD dissertation, 1982.</ref><ref>Brian C. Smith. [http://publications.csail.mit.edu/lcs/specpub.php?id=840 Reflection and semantics in a procedural language] {{Wayback|url=http://publications.csail.mit.edu/lcs/specpub.php?id=840 |date=20151213034343 }}. Technical Report MIT-LCS-TR-272, Massachusetts Institute of Technology, Cambridge, Massachusetts, January 1982.</ref>，向[[过程式编程|过程式编程]]语言介入了“计算反射”的概念，并且引入[[自循環直譯器|自循環直譯器]]概念用作3-Lisp的一个组成部分。
+
+== 特点 ==
+=== 优点 ===
+支持反射的语言提供了一些在早期高级语言中难以实现的运行时特性。
+* 可以在一定程度上避免硬编码，提供灵活性和通用性。<ref name="Forman_p4"/>
+* 可以作为一个[[頭等物件|頭等物件]]发现并修改源代码的结构（如代码块、类、方法、协议等）。
+* 可以在运行时像对待源代码语句一样动态解析字符串中可执行的代码（类似[[JavaScript|JavaScript]]的eval()函数），进而可将跟class或function匹配的字符串转换成class或function的调用或引用。
+* 可以创建一个新的语言字节码解释器来给编程结构一个新的意义或用途。
+
+=== 劣势 ===
+* 此技术的学习成本高。面向反射的编程需要较多的高级知识，包括框架、关系映射和对象交互，以实现更通用的代码执行。
+* 同样因为反射的概念和语法都比较抽象，过多地滥用反射技术会使得代码难以被其他人读懂，不利于合作与交流。<ref name="Forman_p4">见{{Harvnb|Forman|2005|p=4}}。</ref>
+* 由于将部分信息检查工作从编译期推迟到了运行期，此举在提高了代码灵活性的同时，牺牲了一点点运行效率。<ref name="Forman_p4"/>
+
+通过深入学习反射的特性和技巧，它的劣势可以尽量避免，但这需要许多时间和经验的积累。<ref name="Forman_p4"/>
+
+==例子==
+下列代码片段建立[[类_(计算机科学)|类]]<tt>Foo</tt>的一个{{en-link|实例 (计算机科学)|Instance (computer science)|实例}}<tt>foo</tt>，并调用它的[[方法_(计算机科学)|方法]]<tt>PrintHello</tt>。对于每个[[编程语言|编程语言]]，展示平常的和基于反射的调用序列。
+
+=== C# ===
+<syntaxhighlight lang="c#">
+// Without reflection
+Foo foo = new Foo();
+foo.PrintHello();
+
+// With reflection
+Object foo = Activator.CreateInstance("complete.classpath.and.Foo");
+MethodInfo method = foo.GetType().GetMethod("PrintHello");
+method.Invoke(foo, null);
+</syntaxhighlight>
+
+===Go===
+<syntaxhighlight lang="go">
+import "reflect"
+
+// Without reflection
+f := Foo{}
+f.Hello()
+
+// With reflection
+fT := reflect.TypeOf(Foo{})
+fV := reflect.New(fT)
+
+m := fV.MethodByName("Hello")
+if m.IsValid() {
+    m.Call(nil)
+}
+</syntaxhighlight>
+
+===Java===
+<syntaxhighlight lang="java">
+import java.lang.reflect.Method;
+
+// Without reflection
+Foo foo = new Foo();
+foo.hello();
+
+// With reflection
+try {
+    // Alternatively: Object foo = Foo.class.newInstance();
+    Object foo = Class.forName("complete.classpath.and.Foo").newInstance();
+
+    Method m = foo.getClass().getDeclaredMethod("hello", new Class<?>[0]);
+    m.invoke(foo);
+} catch (Exception e) {
+    // Catching ClassNotFoundException, NoSuchMethodException
+    // InstantiationException, IllegalAccessException
+}
+</syntaxhighlight>
+
+===Perl===
+<syntaxhighlight lang="perl">
+# Without reflection
+my $foo = Foo->new;
+$foo->hello;
+
+# or
+Foo->new->hello;
+
+# With reflection
+my $class = "Foo"
+my $constructor = "new";
+my $method = "hello";
+
+my $f = $class->$constructor;
+$f->$method;
+
+# or
+$class->$constructor->$method;
+
+# with eval
+eval "new Foo->hello;";
+</syntaxhighlight>
+
+===PHP===
+<syntaxhighlight lang="php">
+// Without reflection
+$foo = new Foo();
+$foo->hello();
+
+// With reflection, using Reflections API
+$reflector = new ReflectionClass('Foo');
+$foo = $reflector->newInstance();
+$hello = $reflector->getMethod('hello');
+$hello->invoke($foo);
+</syntaxhighlight>
+
+===Python===
+<syntaxhighlight lang="python">
+# Without reflection
+obj = Foo()
+obj.hello()
+
+# With reflection
+obj = globals()['Foo']() # globals() Return a dictionary representing the current global symbol table. 
+getattr(obj, 'hello')()  # getattr(object, name) Return the value of the named attribute of object.  
+
+# With eval
+eval('Foo().hello()')
+</syntaxhighlight>
+
+===R===
+<syntaxhighlight lang="RSPlus">
+# Without reflection, assuming foo() returns an S3-type object that has method "hello"
+obj <- foo()
+hello(obj)
+
+# With reflection
+the.class <- "foo"
+the.method <- "hello"
+obj <- do.call(the.class, list())
+do.call(the.method, alist(obj))
+</syntaxhighlight>
+
+===Ruby===
+<syntaxhighlight lang="ruby">
+# Without reflection
+obj = Foo.new
+obj.hello
+
+# With reflection
+class_name = "Foo"
+method_name = :hello
+obj = Object.const_get(class_name).new
+obj.send method_name
+
+# With eval
+eval "Foo.new.hello"
+</syntaxhighlight>
+
+== 常见应用 ==
+* 反射经常作为[[软件测试|软件测试]]的一部分，比如运行时创建/实例化模拟对象。
+* Java语言解析[[XML|XML]]文件的技术用到了反射。
+
+== 参见 ==
+* [[程序自修改|程序自修改]]
+* [[反射式编程语言和平台列表|反射式编程语言和平台列表]]
+
+== 参考资料 ==
+=== 引用 ===
+{{Reflist|refs=
+}}
+
+=== 来源 ===
+* {{cite book |author=Ira R. Forman, Nate Forman |title=''Java Reflection in Action'' |trans_title=Java反射实战 |publisher=Manning Publications Co. |ISBN=1-932394-18-4 |edition=1 |language=en |ref={{sfnref|Forman|2005}} |date=2005年 |accessdate=2017年10月}}
+
+==外部链接==
+* [https://www-master.ufr-info-p6.jussieu.fr/2007/Ajouts/Master_esj20_2007_2008/IMG/pdf/malenfant-ijcai95.pdf Reflection in logic, functional and object-oriented programming: a short comparative study] {{Wayback|url=https://www-master.ufr-info-p6.jussieu.fr/2007/Ajouts/Master_esj20_2007_2008/IMG/pdf/malenfant-ijcai95.pdf |date=20160702050034 }}
+* [https://web.archive.org/web/20100204091328/http://www.cs.indiana.edu/~jsobel/rop.html An Introduction to Reflection-Oriented Programming]
+* [http://www.laputan.org/#Reflection Brian Foote's pages on Reflection in Smalltalk] {{Wayback|url=http://www.laputan.org/#Reflection |date=20201127132232 }}
+* [http://docs.oracle.com/javase/tutorial/reflect/index.html Java Reflection API Tutorial] {{Wayback|url=http://docs.oracle.com/javase/tutorial/reflect/index.html |date=20210203154104 }} from Oracle
+{{编程语言类别}}
+
+{{DEFAULTSORT:reflection}}
+[[Category:編程典範|Category:編程典範]]

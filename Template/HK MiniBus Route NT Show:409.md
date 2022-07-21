@@ -1,0 +1,9 @@
+{{ #switch: {{{format|}}}
+  | endpoint1 = [[長宏巴士總站|長宏]]
+  | endpoint2 = [[荃灣街市街]]
+  | direction = 0
+  | status =
+  | inline = [[長宏巴士總站|長宏]] ↺ [[荃灣街市街]]
+  | normal =
+  | full =
+}}<noinclude>[[category:新界專線小巴路線模板|409]]</noinclude>

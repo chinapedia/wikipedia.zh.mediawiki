@@ -1,0 +1,5 @@
+<includeonly>| {{#ifeq:{{{value4|}}} |yes |[[ATCvet|ATCvet代码]] |[[解剖学治疗学及化学分类系统|ATC代码]] }}
+| {{#if:{{{value|}}}|<span class="reflink plainlinks nourlexpansion">
+{{#ifeq:{{{value4|}}}|yes|
+[http://www.whocc.no/atcvet/atcvet_index/?code=Q{{{value}}} Q{{{value}}}] | [http://www.whocc.no/atc_ddd_index/?code={{{value}}} {{{value}}}]}}</span>}}{{#if:{{{value1|}}}{{{value2|}}}|{{#if:{{{value|}}}|，}}[[ATC代码 ({{{value1}}})|{{#ifeq:{{{value4|}}}|yes|Q}}{{{value1}}}]]<span class="reflink plainlinks nourlexpansion">[{{#ifeq:{{{value4}}} | yes | http://www.whocc.no/atcvet/atcvet_index/?code=Q{{{value1}}}{{{value2}}} {{{value2}}} | http://www.whocc.no/atc_ddd_index/?code={{{value1}}}{{{value2}}} {{{value2}}}}}]</span> }}{{#if:{{{value3|}}}|{{#if:{{{value|}}}{{{value1|}}}{{{value2|}}}|，}}{{{value3}}}}}
+|-</includeonly><noinclude>{{Documentation}}</noinclude>

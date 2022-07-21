@@ -1,0 +1,54 @@
+{{NoteTA|G1=IT}}
+
+在[[软件工程|软件工程]]中，'''主动记录模式'''（active record pattern）是一种[[架构模式|架构模式]]，可见于在[[关系数据库|关系数据库]]中存储内存中对象的软件中。它在[[Martin_Fowler|Martin Fowler]]的2003年著《企业应用架构的模式》书中命名<ref>{{cite book |quote=承载数据和行为二者的对象。多数这种数据是持久化的并需要被存储在数据库中。主动记录使用最明显的方式，将数据访问逻辑放置在领域对象中。这种方式下所有人都知道如何读和写他们的数据进出数据库。 |last=Fowler |first=Martin |title=Patterns of enterprise application architecture |publisher=Addison-Wesley |year=2003 |isbn=978-0-321-12742-6 |url=https://books.google.com/books?id=FyWZt5DdvFkC&q=active+record&pg=PT187 |access-date=2020-11-07 |archive-date=2021-11-24 |archive-url=https://web.archive.org/web/20211124080339/https://books.google.com/books?id=FyWZt5DdvFkC&q=active+record&pg=PT187 }}</ref>。符合这个模式的对象的接口将包括函数比如插入、更新和删除，加上直接对应于在底层数据库表格中列的或多或少的属性。
+
+主动记录模式是访问在数据库中的数据的一种方式。[[数据库表|数据库表]]或[[视图|视图]]被包装入[[类_(计算机科学)|类]]。因此，[[对象_(计算机科学)|对象]]实例被连结到这个表格的一个单一行。在一个对象建立之后，在保存时将一个新行增加到表格中。加载的任何对象都从数据库得到它的信息。在一个对象被更新的时候，在表格中对应的行也被更新。包装类为在表格或视图中的每个列都实现[[变异子与访问子|访问器]][[方法_(计算机科学)|方法]]或属性。
+
+这个模式常用于对象持久化工具和[[对象关系映射|对象关系映射]]（ORM）之中。典型的，[[外键|外键]]联系也通过一个属性而被显露为适当类型的一个对象实例。
+
+== 实现 ==
+这个概念的实现可以在很多编程环境中的各种[[软件框架|框架]]中找到。例如，如果在数据库中有一个表格<code>parts</code>，它具有列<code>name</code>（字符串类型）和<code>price</code>（数值类型），而主动记录模式用类<code>Part</code>来实现，伪码为：
+
+ part = new Part()
+ part.name = "Sample part"
+ part.price = 123.45
+ part.save()
+
+它在<code>parts</code>表格中建立有给定值的一个新行，并且粗略的等价于[[SQL|SQL]]命令：
+
+<syntaxhighlight lang="sql">
+INSERT INTO parts (name, price) VALUES ('Sample part', 123.45);
+</syntaxhighlight>
+
+反过来，这个类可以被用来查询这个数据库：
+
+ b = Part.find_first("name", "gearbox")
+
+这会找到一个新<code>Part</code>对象，基于在<code>parts</code>表格中其<code>name</code>列的值为<code>"gearbox"</code>的第一个匹配行。使用的SQL命令可能类似于下面所列，具体依赖于这个数据库的SQL实现细节：
+
+<syntaxhighlight lang="sql">
+SELECT * FROM parts WHERE name = 'gearbox' LIMIT 1; -- MySQL or PostgreSQL
+</syntaxhighlight>
+
+==主动记录框架==
+主动记录框架一般兼有[[ORM|ORM]]框架的功能，但主动记录不是简单的ORM。[[关系型数据库|关系型数据库]]往往通过[[外键|外键]]来表述实体的联系，主动记录在数据源层面上也将这种联系映射为对象的{{en-link|关联 (面向对象编程)|Association (object-oriented programming)|关联}}和{{en-link|对象复合#聚集|Object composition#Aggregation|聚集}}。著名的例子是[[解决方案堆栈|解决方案堆栈]]Web开发框架[[Ruby_on_Rails|Ruby on Rails]]，其默认使用一个纯[[Ruby|Ruby]]写成的主动记录框架来驱动[[MVC|MVC]]中的模型层。此外还有：
+* [[SQLObject|SQLObject]]，[[Python|Python]]
+* Orator<ref>{{cite web|url=https://orator-orm.com/|title=Orator － An ActiveRecord ORM for Python|accessdate=2020-11-08|archive-date=2020-12-16|archive-url=https://web.archive.org/web/20201216075123/https://orator-orm.com/|dead-url=no}}</ref>，[[Python|Python]]
+* {{en-link|Yii|}} Framework ActiveRecord，[[PHP|PHP]]
+* {{en-link|Castle计划|Castle Project|Castle}} ActiveRecord，[[.NET|.NET]]
+* {{en-link|ActiveJDBC}}，[[Java|Java]]
+* [https://github.com/braisdom/ObjectiveSql ObjectiveSql] {{Wayback|url=https://github.com/braisdom/ObjectiveSql |date=20201229135311 }}，[[Java|Java]]
+* JFinal<ref>{{cite web|url=https://github.com/jfinal/jfinal|title=JAVA 极速WEB+ORM框架 JFinal|accessdate=2020-11-08|archive-date=2020-11-21|archive-url=https://web.archive.org/web/20201121113915/https://github.com/jfinal/jfinal|dead-url=no}}</ref>，[[Java|Java]]
+
+==类似模式==
+主动记录和{{en-link|行数据门径|Row Data Gateway}}十分相似，但前者是[[领域模型|领域模型]]模式，后者只是一种数据源模式。主动记录适合非常简单的领域需求，尤其在[[领域模型|领域模型]]和数据库模型十分相似的情况下。如果遇到更加复杂的领域模型结构（例如用到继承、策略的领域模型），往往需要使用分离数据源的领域模型，结合[[数据映射器模式|数据映射器]]使用。
+
+== 资料来源 ==
+{{Reflist|2}}
+
+==外部链接==
+* [http://martinfowler.com/eaaCatalog/activeRecord.html Martin Fowler 对 Active Record 的定义]{{Wayback|url=http://martinfowler.com/eaaCatalog/activeRecord.html |date=20111121104320 }}
+
+
+{{软件设计模式}}
+[[Category:软件设计模式|Category:软件设计模式]]

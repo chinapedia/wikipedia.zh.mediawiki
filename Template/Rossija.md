@@ -1,0 +1,1 @@
+#REDIRECT [[Template:俄羅斯行政區劃]]

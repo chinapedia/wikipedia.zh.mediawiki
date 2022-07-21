@@ -1,0 +1,5 @@
+<div class="notice metadata" id="stub" style="font-size: small;">[[File:Zhejiang map.png|25px]]&nbsp;这是一个与[[:Category:浙江教育|浙江教育]]相关的[[Wikipedia:小作品|小作品]]。你可以-{zh-hant:透過;zh-hans:通过}-<span class="plainlinks">[{{fullurl:{{FULLPAGENAME}}|action=edit}} 编辑或修订]</span>扩充其内容。</div><includeonly>[[Category:浙江教育小作品|{{PAGENAME}}]]{{#ifexpr:{{PAGESIZE:{{FULLPAGENAME}}|R}}>3000|[[Category:字数已超过3000字节的小作品|{{PAGENAME}}]]}}</includeonly>
+<noinclude>[[Category:中國教育小作品模板]]
+[[Category:浙江教育小作品|*]]
+[[Category:浙江小作品模板]]
+</noinclude>

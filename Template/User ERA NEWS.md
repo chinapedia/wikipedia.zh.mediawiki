@@ -1,0 +1,12 @@
+{{Userbox
+  |border-c=black
+  |border-s=1
+  |id=年代
+  |id-c=red
+  |id-fc=white
+  |id-s=10
+  |info=這個用戶喜歡觀賞台灣'''[[年代新聞台|年代新聞台HD]]'''。
+  |info-c=yellow
+  |info-fc=green
+  |info-s=9
+}}<includeonly>[[Category:喜歡觀賞台灣年代新聞台的維基人]]</includeonly><noinclude>{{Clear}}[[Wikipedia:用戶框/媒體]]</noinclude>

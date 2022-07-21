@@ -1,0 +1,11 @@
+{{Userbox
+  |id=[[File:TangTaizong.jpg|45px]]
+  |id-c=#FFFF99
+  |info=這位用戶是'''[[皇帝|帝制]]'''的擁護者。
+  |info-c=khaki
+  |info-s=10
+  |border-c=#CCCC00
+}}<includeonly>[[Category:支持帝制的維基人]]</includeonly>
+<noinclude>[[Category:用户框模板]]
+[[Category:维基百科相关用户框]]
+</noinclude>

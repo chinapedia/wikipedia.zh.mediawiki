@@ -1,0 +1,464 @@
+{{NoteTA
+|G1 = IT
+|G2 = MediaWiki
+}}
+{{Wikipedia how to|H:T}}
+{{Wiki markup}}
+'''模板'''（{{lang-en|Template}}）是维基百科的系统中的一项功能，类似于[[计算机语言|计算机语言]]中的[[子程序|子程序]]。本文提供在[[MediaWiki|MediaWiki]]创建模板的技术指南；维基百科使用[[MediaWiki|MediaWiki]]并对模板有一定的规范<!-- (页面不存在) ，参见[[WP:模板规范|WP:模板规范]]-->。另外也可参考：
+*模板扩展语法：[[Help:解析器函数|Help:解析器函数]]
+*模板分类：[[:Category:維基百科模板|:Category:維基百科模板]]和[[Wikipedia:模板消息|Wikipedia:模板消息]]
+*模板命名空间的帮助信息：[[Wikipedia:模板命名空间|Wikipedia:模板命名空间]]
+*模板索引：{{fullurl2|Special:AllPages|namespace=10|所有模板}}
+
+== 什么是模板，为什么要用模板 ==
+您在条目的上方看到各种各样的条条框框，比如“本条目需要清理”、“本条目应避免有陈列杂项、琐碎资料的部分。”等。有时候条目右侧也能看到一个灰色的框，里面写着有关这个条目的基本信息，比如一位艺人的“生日”、“出生地”、“国籍”等。条目最下方有时候也会见到一个大方框，里面陈列着和这个条目相关的内容（称为“[[WP:导航模板|导航模板]]”，[[模板:Wikipedia_essays|比如这个]]）。这些都是“模板”。模板的形式还有很多很多，有的是直接镶嵌在条目正文里面的，有的虽然看不到但是却依然影响到条目显示的内容（比如[[T:NoteTA|字词转换模板]]）。但是如果你翻翻这些条目的源代码，就会发现这些模板都长成类似“{{Code|<nowiki>{{模板名字|模板参数}}</nowiki>}}”这样子，用一对双大括号将模板的内容扩起来。
+
+为什么有这些麻烦的东西？有时候，一段内容会在多个条目中反复出现，这时候如果一遍一遍复制那些内容，一遍遍粘贴到各个条目里面，简直会累死人，而且大段大段的看起来也很烦人；而且，万一日后内容有变动，又要进到各个条目里面把这些内容一个个全改一遍，这会产生大量的重复劳动。模板就是为了这样的目的：只需要给重复的部分放到一个模板裡、起个名字，以后需要用到这些内容的时候直接调用模板就行了。需要更改内容的时候，也只需要在模板里改动，那些调用了模板的条目也会随着模板自动变更，十分方便。
+
+所有的模板都会放在一个叫“Template”的[[WP:NS|命名空间]]，即“[[WP:模板命名空间|模板命名空间]]”，标题名稱是“<code>Template:模板名字</code>”、“<code>模板:模板名字</code>”这样。在写作条目时，只需要在合适的位置放上“{{Code|<nowiki>{{模板名字}}</nowiki>}}”，模板就会在合适的地方显示出来了。有时候对于同一个模板，雖然显示的内容稍有差异，但大体的框架是一致的，这个时候就会用到“模板参数”，即“{{Code|<nowiki>{{模板名字|模板参数}}</nowiki>}}”的形式，具体的用法请见下文。
+
+需要注意的一点是，维基百科的系统——MediaWiki本身并不会自动为条目挂上模板。因此，当看到条目里面显示了“本条目需要补充更多来源”等文字时，是其他维基人人工将模板挂上去。在模板所述问题修正之后，可以自行将模板从源代码中删除，这段提示文字將自动消失。
+
+== 调用模板 ==
+调用模板就是把模板内容嵌入到调用方页面。
+
+在Template[[WP:命名空间|命名空间]]里的页面才是模板，所以模板都由'''Template:'''开头，在中文维基，以'''模板:'''开头同样有效。调用时必须使用'''模板标签'''，即<nowiki>{{Template:模板名}}</nowiki>的形式，“Template:”可以在无歧义的情况下省略。如[[Template:tc|Template:tc]]是一个模板，内容为“in”。如果把<code>{{tl|tc}}</code>加入某个页面，则{{tl|tc}}的内容会在此頁面显示，即{{tc}}。
+
+如果“[[Template:模板名|Template:模板名]]”不存在，<code><nowiki>{{模板名}}</nowiki></code>的作用就与<code><nowiki>[[Template:模板名|Template:模板名]]</nowiki></code>相同，提供一个连接到不存在页面的链接：{{模板名}}。
+
+模板可以被[[WP:重定向|重定向]]。例如[[Template:请求来源|Template:请求来源]]被重定向到[[Template:Citation_needed|Template:Citation needed]]，所以<nowiki>{{请求来源}}</nowiki>效果等同于<nowiki>{{Citation needed}}</nowiki>。有时移动模板并建立重定向后，原调用重定向的页面可能会出错，只要过一段时间（几小时）等服务器刷新缓存即可。
+
+=== 设定参数 ===
+在模板名后可用管道符（即竖线）追加参数（这种做法称为'''传参'''）。参数有编号参数和命名参数两种。在模板的说明文档里一般会列出该模板的所有参数。
+
+例如，{{Code|<nowiki>{{fact|1=维基百科的编者大部分是男性|time=</nowiki>{{CURRENTYEAR}}-{{CURRENTMONTH}}-{{CURRENTDAY2}}<nowiki>}}</nowiki>}}得到「{{fact|1=维基百科的编者大部分是男性|time={{CURRENTYEAR}}-{{CURRENTMONTH}}-{{CURRENTDAY2}}}}」。
+
+“维基百科的编者大部分是男性”的参数名为<code>1</code>。“{{CURRENTYEAR}}-{{CURRENTMONTH}}-{{CURRENTDAY2}}”的参数名为<code>time</code>。参数名为数字就是'''编号参数'''，否则就是'''命名参数'''。
+
+编号参数的参数名（1、2、3、4等）和等号可以省略。上例的效果和<nowiki>{{fact|维基百科的编者大部分是男性|time=</nowiki>{{CURRENTYEAR}}-{{CURRENTMONTH}}-{{CURRENTDAY2}}<nowiki>}}</nowiki>是一样的。注意，以省略形式赋值的第一个编号参数的参数名是1，而不是很多编程语言习惯的0。
+
+{| class="wikitable"
+|-
+! 调用 !! 效果
+|-
+|{{tlc|catnav|页面分类|地理|大洲|亚洲|亚洲国家}} || {{catnav|页面分类|地理|大洲|亚洲|亚洲国家}}
+|-
+|{{tlc|catnav|2='''0=页面分类'''|3=1=地理|4=2=大洲|5=3=亚洲|6=4=亚洲国家}} || {{catnav|0=页面分类|1=地理|2=大洲|3=亚洲|4=亚洲国家}}
+|-
+|{{tlc|catnav|2=1=页面分类|3=2=地理|4=3=大洲|5=4=亚洲|6=5=亚洲国家}}|| {{catnav|1=页面分类|2=地理|3=大洲|4=亚洲|5=亚洲国家}}
+|-
+|{{tlc|catnav|2=5=亚洲国家|3=4=亚洲|4=3=大洲|5=2=地理|6=1=页面分类}}|| {{catnav|5=亚洲国家|4=亚洲|3=大洲|2=地理|1=页面分类}}
+|-
+|{{tlc|catnav|2=1=页面分类|3=2=地理|4='''大洲'''|5=4=亚洲|6='''亚洲国家'''}}
+
+'''要么全不省略编号参数参数名，要么全都省略，否则极易出错。'''
+
+可以理解为参数1第一次赋值为“页面分类”，然后“大洲”作为隐藏的参数1第二次赋值覆盖了第一次赋值的内容。
+
+如此类推。
+
+在编辑预览中会警示这种重复赋值问题。
+ ||{{catnav|1=页面分类|2=地理|大洲|4=亚洲|亚洲国家}}
+|}
+
+==== 需要转义的参数 ====
+*如果参数值中含有等号（<code>=</code>），传参时则必须使用参数名，即使是编号参数也要使用。	
+*如果参数值中含有两个连续的右大括号（<code><nowiki>}}</nowiki></code>），调用参数时必须将其放入nowiki标记中，例如<code><nowiki><nowiki>}}</nowiki></nowiki></code>。
+*如果参数值中含有竖线（<code><nowiki>|</nowiki></code>），调用参数时必须将其放入nowiki标记中，例如<code><nowiki><nowiki>|</nowiki></nowiki></code>，或用<code><nowiki>{{!}}</nowiki></code>代替<ref>{{cite web|title=[[Help:魔术字#.E5.85.B6.E4.BB.96|Help:魔术字#.E5.85.B6.E4.BB.96]]|date=2015-08-02}}</ref><ref>{{cite web|url=https://gerrit.wikimedia.org/r/#/c/136234/|title=MediaWiki更新记录|date=2015-08-02}}</ref>。
+<!--请改良下面这行-->
+<!--*参数值可以很长，比如这个[http://zh.wikipedia.org/w/index.php?title=Help:%E6%A8%A1%E6%9D%BF&action=edit§ion=13 例子]。-->
+*参数值中可以包含一对双方括号（即两个左方括号，两个右方括号），用于链接一个条目，或是其他[[WP:命名空间|命名空间]]的页面，但不能先写右双方括号，然后再接左双方括号。例如[[Template:数数1|Template:数数1]]中的内容是：
+<pre>
+[[一二{{{1}}}六七|一二{{{1}}}六七]]
+</pre>
+:{{tlc|数数1|<nowiki>三]]四[[五</nowiki>}}会造成模板调用失败，显示为：
+ -{}-{{数数1|三]]四[[五}}
+:而不是你所期望的
+ [[一二三|一二三]]四[[五六七|五六七]]
+:不過可以使用{{tlx|!((}}（<nowiki>[[</nowiki>）及{{tlx|))!}}（<nowiki>]]</nowiki>）來讓這個結果成真，因此：
+<pre>-{}-
+{{数数1|三{{))!}}四{{((!}}五}}
+</pre>
+會變成：
+  -{}-{{数数1|三{{))!}}四{{!((}}五}}
+
+===替换引用===
+{{main|Help:替换引用}}
+另见[[:分类:应被替换引用的模板|:分类:应被替换引用的模板]]
+
+放置修饰符“subst:”（substitute，替代）位于模板标签的“{{”之后，模板名之前，即可替换引用。它能在调用方页面保存时，将所调模板展开，而不是每次显示页面的时候读取有关模板。这样可以按模板当前的形式编辑条目，并使条目免受模板变化的影响，并减轻服务器负担。所以对模板的替换引用不会显示在页面历史和模板的链入页面中。
+
+例如{{tl|fact/auto}}和{{tl|未签名}}都是应被替换引用的模板。
+
+== 嵌入页面 ==
+{{Main|WP:嵌入包含}}
+模板标签不仅可以调用模板，也可以调用（嵌入）其他页面，就是像模板一样把被调页面的内容加入到调用方页面。
+
+* <code><nowiki>{{帮助讨论:模板}}</nowiki></code>会将[[帮助讨论:模板|帮助讨论:模板]]中的内容加入到该页来。
+* 如果调用[[WP:命名空间|主命名空间]]的条目，为了避免和调用同名模板产生歧义，需要在条目名前加冒号。如<code><nowiki>{{:福寿岭站}}</nowiki></code>会将[[福寿岭站|福寿岭站]]中的内容加入到该页来，而不是调用<nowiki>{{福寿岭站}}</nowiki>（{{福寿岭站}}）。
+
+这样一来，所有页面都可以当作是模板。但是，使用在模板命名空间的页面（即真正的模板）有以下独特的好处：
+*所有被页面使用的模板都在页面编辑页显示出来。
+*当模板改变时，所有使用模板页面的服务器缓存（相对于浏览器缓存）自动被清空；而位于其他命名空间的页面，服务器缓存往往要手工清空。
+
+而模板命名空间以外的页面一般在如下情况下被嵌入其他页面：
+*引用维基百科命名空间的界面消息。
+*将一個长页面（可以屬于主条目命名空间，假設名字就叫做“长页面”，[http://zh.wikipedia.org/w/index.php?title=%E8%A5%BF%E6%B1%89%E5%88%97%E4%BE%AF%E5%88%97%E8%A1%A8_%28%E5%8A%9F%E8%87%A3%E4%BE%AF%29&action=historysubmit&diff=16538515&oldid=16345825 例子]）拆分为较短页面时，可以将短页面命名为“长页面/第一部分”、“长页面/第二部分”等，然后使用<code><nowiki>{{/第一部分}}<br />{{/第二部分}}</nowiki></code>来拼成长页面。[[Wikipedia:互助客栈_(全部)|Wikipedia:互助客栈 (全部)]]就是一个好例子。
+
+一个模板可以调用另一个模板，它也可以调用它自己，但自我调用只有一层有效。例如：[[Template:模板1|Template:模板1]]的内容是<code><nowiki>“一次，{{模板1}}”</nowiki></code>，在[[Template:模板1|Template:模板1]]中将显示：<nowiki>“一次，一次，{{模板1}}”</nowiki>，如果其他条目调用该模板，所加入的文字将是
+
+{{模板1}}
+
+在2010年前，如果把其他模板重定向至某模板，该模板又引用重定向，且多次自我调用均为不同重定向，则该模板可以实现多次自我调用。MediaWiki后来取消此功能。如{{tl|RR|7}}的结果为{{RR|7}}。
+
+模板中[[Help:变量|变量]]在调用模板的地方被赋值。因此，如果一个模板中含有<code><nowiki>{{PAGENAME}}</nowiki></code>，该模板被某页面调用，相应的位置显示的将是调用方的名称，而不是被调模板的名称。
+
+一个页面所调用的所有模板都在该页编辑页面中列出，并提供相应的链接，而且：
+*一个段落的编辑页面不会列出任何模板；
+*编辑旧版本的页面，这个列表仍然是当前最新的；
+*可加入[[Help:模板擴展語法|模板擴展語法]]#if, #ifeq, #ifexist, #ifexpr, 或 #switch；
+*如果不真正提交编辑，仅仅在预览中使用的模板不被列出。
+*如果模板名里面嵌套另一个模板，如<nowiki>{{{{tc}}{{CURRENTDAY}}}}</nowiki>，则会得到{{{{tc}}{{CURRENTDAY}}}}；编辑页面里会显示[[Template:{{tc}}{{CURRENTDAY}}|Template:{{tc}}{{CURRENTDAY}}]]。
+*模板名#后的内容会忽略。
+
+请注意，如果页面结尾没有换行，编辑页面中总是在结尾添加一个换行，但这并不影响模板的某些效果，即这个换行不真正起作用。例如：
+ <nowiki>{{编号演示}}{{编号演示}}</nowiki>
+ <nowiki>{{编号演示}}</nowiki>
+的结果是：
+{{编号演示}}{{编号演示}}
+{{编号演示}}
+
+== 创建并编辑模板 ==
+维基百科现存大量模板供编者使用，如果有现存模板可以完成您的任务，则应该调用现有模板，而不是另建新模板。<!-- (页面不存在) 关于模板的制作规范，请参见[[WP:模板规范|WP:模板规范]]。-->
+
+您在新建模板前，请先搜索相应的模板名称，如“Template:维基百科模板”。新建模板后，请在[[Wikipedia:模板消息|Wikipedia:模板消息]]内添加您新建的模板的信息，并请对模板进行分类。模板分类的方法请参考[[:Category:维基百科模板|:Category:维基百科模板]]以及[[:Category_talk:维基百科模板|:Category talk:维基百科模板]]中的相关内容。
+
+当您在模板中需要使用图标时，建议使用维基共享资源[[commons:Crystal_Clear|水晶风格图标库]]中提供的图标。
+
+模板页面会自动调用这个模板本身，实际上相当于一次没有参数赋值的模板调用，因此如果参数有默认值，将被显示。例如：模板[[Template:数一数|Template:数一数]]的内容是
+ <nowiki>一二三{{{1|四五六}}}七八九</nowiki>
+模板页面的内容是
+:{{数一数}}
+
+===读取参数===
+
+在模板页面中，用三个[[大括号|大括号]]可以读取参数，例如：{{code|{{參數|参数1|参数1的默认值}}}}可以读取''参数1''，如果在模板调用中参数1没有赋值，则使用''参数1的默认值''作为参数1的赋值。另见[[Help:默认参数|Help:默认参数]]
+
+'''注意：'''参数默认值和参数赋空值是不同的。
+
+====例1：含有命名参数的模板====
+
+例如：[[Template:姓名|Template:姓名]]的模板，内容为：
+ 我是{{參數|姓}}{{參數|名}}。
+如果用<code>{{tl|姓名}}</code>调用这个模板，將会看到：
+:{{姓名}}
+如果用<code>{{tl|姓名|<nowiki>姓=张|名=飞</nowiki>}}</code>，我们则看到：
+:{{姓名|姓=张|名=飞}}
+
+====例2：含有编号参数的模板====
+
+再来一个例子，说明一个编号参数的定义和调用：我们还是先要定义一个带参数的模板，例如模板[[Template:数数|Template:数数]]的内容是
+ 一二三{{參數|1|四五六}}七八九
+赋值调用<code>{{tl|数数|六五四}}</code>的结果是：
+:{{数数|六五四}}
+赋空值调用<code>{{tl|数数|<nowiki></nowiki>}}</code>的结果是：
+:{{数数|}}
+未赋值调用，就会调用默认值，<code>{{tl|数数}}</code>的结果是：
+:{{数数}}
+
+===编号参数还是命名参数？===
+
+====编号参数的优点====
+*调用模板时参数名和等号可以省略，从而节约打字时间和存储空间。参见[[#设定参数|#设定参数]]。
+*阿拉伯数字是世界性的，在翻译的时候省事，也可以被不懂中文的人理解。
+
+====命名参数的优点====
+*参数的顺序可以变化，模板的参数可以任意添加和修改，而不会对调用模板的页面产生致命影响。
+*参数的意义容易理解。
+*当模板具有大量缺省参数时，命名参数使语法更为清晰
+*一些特殊的技巧利用这样一个特性：在一次模板调用中允许对同一个参数多次赋值，这导致最后一次赋值的内容生效；这种做法隐式保证了在本次模板调用中该参数至少被赋值一次
+
+===未赋值且没有默认值的参数===
+例如：模板[[Template:再数数|Template:再数数]]的内容是
+ <nowiki>一-{{{1}}}-三-{{{2}}}-五</nowiki>
+<code>{{tl|再数数|<nowiki>|</nowiki>}}</code>的结果是
+:{{再数数||}}
+<code>{{tl|再数数|<nowiki>二|</nowiki>}}</code>的结果是
+:{{再数数|二|}}
+<code>{{tl|再数数|<nowiki>|二</nowiki>}}</code>的结果是
+:{{再数数||二}}
+<code>{{tl|再数数|<nowiki>二|{{{1}}}</nowiki>}}</code>的结果是
+:{{再数数|二|{{{1}}}}}
+<code>{{tl|再数数|<nowiki>{{{1}}}|四</nowiki>}}</code>的结果是
+:{{再数数|{{{1}}}|四}}
+<code>{{tl|再数数|<nowiki>{{{1}}}|{{{2}}}</nowiki>}}</code>的结果是
+:{{再数数|{{{1}}}|{{{2}}}}}
+
+===例4：参数赋值中包含参数===
+
+如果一个参数未赋值，则在三个大括号中的参数名在模板调用时不起参数的作用。如果要它起作用，一定要赋值。
+
+*模板[[Template:数数A|Template:数数A]]的内容是
+ <nowiki>{{再数数|二}}</nowiki>
+:<code>{{tl|数数A|四}}</code>的结果是：
+::{{数数A|四}}
+*模板[[Template:数数B|Template:数数B]]的内容是
+ <nowiki>{{再数数|二|{{{1}}}}}</nowiki>
+:调用<code>{{tl|数数B|四}}</code>的结果是：
+::{{数数B|四}}
+*模板[[Template:数数C|Template:数数C]]的内容是
+ <nowiki>{{再数数|二|2={{{1}}}}}</nowiki>
+:调用<code>{{tl|数数C|四}}</code>的结果是：
+::{{数数C|四}}
+
+
+===例5：参数迭代===
+當模板需要隔層叫用時（例如有一個父模板，然後建立許多子模板，子模板使用父模板的功能）要讓底層（A模板叫用B模板，B模板為A模板的底層）層使用上層參數時，則需要参数迭代。
+
+最简单的参数迭代办法就是在模板中用同样的参数名。
+
+例如：[[Template:姓名国籍|Template:姓名国籍]]
+ <nowiki>{{姓名|姓={{{姓}}}|名={{{名}}}}}{{{国籍}}}人。</nowiki>
+:我現在叫用「<code><nowiki>{{姓名国籍|姓=王|名=小奇|国籍=火星}}</nowiki></code>」
+::結果為「{{姓名国籍|姓=王|名=小奇|国籍=火星}}」
+
+您可能會認為，[[Template:姓名|Template:姓名]]模板也有包含<code><nowiki>{{{姓}}}</nowiki></code>和<code><nowiki>{{{名}}}</nowiki></code>參數。
+
+因此我們可以試著將[[Template:姓名国籍|Template:姓名国籍]]改成
+ <nowiki>{{姓名}}{{{国籍}}}人。</nowiki>
+:此時叫用「<code><nowiki>{{姓名国籍|姓=王|名=小奇|国籍=火星}}</nowiki></code>」
+::結果為「{{虛擬模板|delnowiki=yes|code=<nowiki>{{姓名}}{{{国籍}}}人。</nowiki>|姓=王|名=小奇|国籍=火星}}」
+這是因為在[[Template:姓名|Template:姓名]]模板中，無法讀取到[[Template:姓名国籍|Template:姓名国籍]]中傳遞的「<code><nowiki>|姓=王|名=小奇|国籍=火星</nowiki></code>」參數
+
+由于每一層模板呼叫參數都互不相關，因此要讓參數能一層一層傳遞下去，則每層都需要迭代一次參數。
+
+====进一步====
+
+像<code><nowiki>{{再数数||四}}</nowiki></code>这样的调用将空值赋给参数1，而不是没有赋值，所以结果是
+:{{再数数||四}}
+如果我们希望参数1不赋值，则应该将参数2用命名参数形式赋值，如
+ <code>{{tl|再数数|<nowiki>2=四</nowiki>}}</code>
+结果则是
+:{{再数数|2=四}}
+
+如果这样的参数值被赋给如<code><nowiki><font size></nowiki></code>这样的标记，会使编码错误，但这些错误会被系统（MediaWiki）忽略，而不产生奇怪的结果。请参看英文的例子：[http://meta.wikimedia.org/wiki/Template_talk:Fontsize 字体大小]。
+
+参数“02”和参数“2”是不同的，例如模板[[Template:例5|Template:例5]]的内容是
+ <nowiki>{{{1}}}{{{2}}}{{{02}}}</nowiki>
+调用<code>{{tl|例5|<nowiki>3|4|5|6</nowiki>}}</code>的结果是
+:{{例5|3|4|5|6}}
+
+'''注意：'''维基系统命名空间的参数名是不同的，它们是<code><nowiki>$1, $2, ...</nowiki></code>，参见[[WP:命名空间|WP:命名空间]]、[[Special:所有消息|Special:所有消息]]和[[MediaWiki:Blockedtext|MediaWiki:Blockedtext]]。
+
+===参数及模板命名===
+参数命名可以调用其他参数，如[[Template:XYZ|Template:XYZ]]内容为<nowiki>{{{{{{XYZ}}}}}}</nowiki>，则调用<nowiki>{{XYZ|XYZ=SDF|SDF=789}}</nowiki>会把参数XYZ的值SDF作为参数名，显示参数SDF的值，即{{XYZ|XYZ=SDF|SDF=789}}。MediaWiki会把<nowiki>{{{{{{XYZ}}}}}}</nowiki>解析为<nowiki>{{{ {{{XYZ}}} }}}</nowiki>而不是<nowiki>{{ {{ {{XYZ}} }} }}</nowiki>（结果是{{ {{ {{XYZ}} }} }}）。这里空格是敏感的。另外，调用其他参数仅可调用1层。如[[Template:XYZ2|Template:XYZ2]]内容为<nowiki>{{{{{{{{{XYZ}}}}}}}}}</nowiki>，则<nowiki>{{XYZ2|XYZ=SDF|SDF=ABC|ABC=789}}</nowiki>结果为{{XYZ2|XYZ=SDF|SDF=ABC|ABC=789}}。
+
+又如，[[Template:1a2b|Template:1a2b]]内容为{{-{}-{第一个|第一个未定}}-{}-}<nowiki></nowiki>-<nowiki></nowiki>{{-{}-{第二个|第二个未定}}-{}-}，[[Template:nanb|Template:nanb]]内容为<nowiki>{{</nowiki>1a2b|<nowiki>{{{</nowiki>1|第一个}}} = <nowiki>{{{</nowiki>1|第一个}}}已定}}，则{{tl|nanb}}结果为{{nanb}}，{{tl|nanb|第一个}}结果为{{nanb|第一个}}，{{tl|nanb|第二个}}结果为{{nanb|第二个}}，{{tl|nanb|第三个}}<结果为{{nanb|第三个}}。
+
+又如，[[Template:testif|Template:testif]]内容为<nowiki>{{{test{{{test|}}}|{{{then}}}}}}</nowiki>，则<nowiki>{{testif|test=11|test11=233}}</nowiki>结果为{{testif|test=11|test11=233}}，<nowiki>{{testif|test=11|then=255}}</nowiki>结果为{{testif|test=11|then=255}}，<nowiki>{{testif|then=333}}</nowiki>结果为{{testif|then=333}}，<nowiki>{{testif|test=|then=335}}</nowiki>结果为{{testif|test=|then=335}}。
+
+另外，如果模板名为参数，如[[Template:Sample2|Template:Sample2]]内容为<nowiki>{{{{{tc}}}}}</nowiki>，则调用<nowiki>{{Sample2|tc=!}}</nowiki>相当于<nowiki>{{!}}</nowiki>，显示为{{Sample2|tc=!}}。这里，<nowiki>{{{{{tc}}}}}</nowiki>解析为<nowiki>{{ {{{tc}}} }}</nowiki>而不是<nowiki>{{{ {{tc}} }}}</nowiki>。如果[[Template:Sample3|Template:Sample3]]内容为<nowiki>{{{ {{tc}} }}}</nowiki>，{{tl|tc}}内容为in，则<nowiki>{{Sample3|in=11}}</nowiki>显示为{{Sample3|in=11}}。
+
+模板调用时，模板名可以是解析器函数。如<nowiki>{{{{NAMESPACE}}1}}</nowiki>相当于{{tl|help1}}，结果为{{ {{NAMESPACE}}1}}。
+
+模板名可以是另一个模板。如[[Template:tctc|Template:tctc]]内容为<nowiki>{{tc}}</nowiki>，<nowiki>{{{{tctc}}}}</nowiki>相当于<nowiki>{{tc}}</nowiki>，结果为{{{{tctc}}}}。
+
+可以使用参数选择模板名。如[[Template:Hist3|Template:Hist3]]内容为<nowiki>{{{{{2}}}x|{{{1}}}}}-{{{{{3}}}x|{{{1}}}}}-{{{{{4}}}x|{{{1}}}}}</nowiki>，[[Template:1x|Template:1x]]内容为<nowiki>{{{1}}}</nowiki>，[[Template:2x|Template:2x]]内容为<nowiki>{{{1}}}{{{1}}}</nowiki>，[[Template:3x|Template:3x]]内容为<nowiki>{{{1}}}{{{1}}}{{{1}}}</nowiki>，则<nowiki>{{Hist3|4|3|2|1}}</nowiki>结果为{{Hist3|4|3|2|1}}。又如[[Template:a2b2c2d|Template:a2b2c2d]]内容为<nowiki>{{{{{1}}}|a{{{2}}}b{{{2}}}c{{{2}}}d}}</nowiki>，[[Template:t2|Template:t2]]内容为<nowiki>start_{{{1}}}_middle_{{{2}}}_end</nowiki>，<nowiki>{{a2b2c2d|t2|V}}</nowiki>相当于<nowiki>{{t2|aVbVcVd}}</nowiki>，即{{a2b2c2d|t2|V}}。
+
+模板可以多次嵌套。如<nowiki>{{3x|{{2x|{{3x|{{1x|{{2x|{{tc}}}}}}}}}}}}</nowiki>结果是{{3x|{{2x|{{3x|{{1x|{{2x|{{tc}}}}}}}}}}}}。
+
+===模板分类===
+
+模板也要进行分类，目的是为了更好的整理模板，以便更好的使用和管理模板。模板的分类同条目的分类相似，可以参阅有关条目分类的帮助文件，如[[Help:分类|Help:分类]]等，不同之处在于对于模板的分类需要使用<code><nowiki><noinclude></nowiki></code>标识，如果不加<code><nowiki><noinclude></nowiki></code>标识，则不仅模板被分类，所有使用该模板的条目也被分入同一类。
+
+所有模板的根目录（即分类）是[[:Category:维基百科模板|:Category:维基百科模板]]，所有模板分类名最后一定要含有“模板”二字，以区别于普通条目的分类。
+
+====例7：模板分类方法====
+将例1中的模板[[Template:姓名/分类|Template:姓名]]分为[[:Category:人物模板|:Category:人物模板]]，需要加入：
+ <nowiki>我是{{{姓}}}{{{名}}}。<noinclude>[[Category:人物模板|Category:人物模板]]</noinclude></nowiki>
+
+===标识===
+
+'''注意：'''以下内容只限于模板中使用的情况，在其他命名空间使用的情况请参考相关帮助文挡。
+
+====<nowiki><noinclude>、<includeonly>和<onlyinclude></nowiki>====
+{{ombox|text=在模板中使用<code><nowiki><noinclude></nowiki></code>标识时要小心！<code><nowiki><noinclude></nowiki></code>应接在模板原始码（例如结尾双大括号<nowiki>}}</nowiki>）或文字最后一列的后方，不要新起一列；也不要在<code><nowiki></noinclude></nowiki></code>之后'''加空行'''（虽然系统会自动忽略<code><nowiki></noinclude></nowiki></code>之后的单个空行），否则空行将被当作模板的一部分反映在调用模板的条目中。}}
+<code><nowiki><noinclude></nowiki></code>标识的作用是将<code><nowiki><noinclude></nowiki></code>和<code><nowiki></noinclude></nowiki></code>之间的文本加入所在的模板页中，而不加入调用模板的条目或模板中，针对模板的说明、分类都可以置于该标识之间。
+
+<code><nowiki><includeonly></nowiki></code>标识的作用跟<code><nowiki><noinclude></nowiki></code>标识的作用正好相反，是将<code><nowiki><includeonly></nowiki></code>和<code><nowiki></includeonly></nowiki></code>之间的文本'''不'''加入所在的模板页中，而加入调用模板的页面中。
+
+<code><nowiki><onlyinclude></nowiki></code>标识不常用，其作用是只有被<code><nowiki><onlyinclude></nowiki></code>和<code><nowiki></onlyinclude></nowiki></code>包含的文本才出现在调用模板的页面中，模板的其他内容不出现在调用模板的页面中。
+{| class="wikitable" style="text-align: center;"
+! 原始碼
+! 原始頁面看到的
+! 其他頁面看到的
+|-
+|<code><nowiki><noinclude> text1 </noinclude> text2</nowiki></code>
+|<code>text1 text2</code>
+|<code>text2</code>
+|-
+|<code><nowiki><onlyinclude> text1 </onlyinclude> text2</nowiki></code>
+|<code>text1 text2</code>
+|<code>text1</code>
+|-
+|<code><nowiki><includeonly> text1 </includeonly> text2</nowiki></code>
+|<code>text2</code>
+|<code>text1 text2</code>
+|}
+
+===={{Anchor|SPioIO}}subst与preload过程中的noinclude、includeonly和IncludeOnly====
+: ''以下部分行为是错误的，是'''旧版本软件的缺陷'''，并将'''随MediaWiki 1.17的部署被修正'''（[[bugzilla:5210|bugzilla:5210]]）。''
+; 解释与传递
+{| class=wikitable
+|-
+| 模板源码
+| '''includeonly''' 
+| '''noinclude''' 
+| '''includeonly''' 
+| '''noinclude''' 
+| '''include<includeonly></includeonly>only''' 
+|-
+| '''模板显示''' 
+| interpret 
+| interpret 
+| interpret 
+| rowspan="4" | 同noinclude
+| 解释内层，传递外层 
+|-
+| '''嵌入过程''' 
+| interpret 
+| interpret 
+| interpret 
+| 解释内层，传递外层
+|-
+| '''subst过程''' 
+| interpret 
+| 传递 
+| interpret 
+| 成为includeonly
+|-
+| '''preload过程''' 
+| interpret 
+| 传递 
+| 传递 
+| 成为includeonly
+|}
+* [http://zh.wikipedia.org/w/index.php?title=User:%E8%99%9E%E6%B5%B7/doc/super&action=edit&preload=User:%E8%99%9E%E6%B5%B7/doc/preload 测试页]
+; 嵌套
+{| class=wikitable
+|-
+| 模板源码 
+| '''includeonly pair中的includeonly pair''' 
+| '''noinclude pair中的includeonly pair'''
+|-
+| '''模板显示''' 
+| 错乱[http://zh.wikipedia.org/w/index.php?title=Template:Documentation/preload&oldid=15532392]
+| 
+|-
+| '''嵌入过程''' 
+| ？ 
+| /<!--impossible-->
+|-
+| '''subst过程''' 
+|  
+| /<!--impossible-->
+|-
+| '''preload过程''' 
+| 正常
+| /<!--impossible-->
+|}
+
+==特殊的模板引用==
+* 子页面引用
+** 格式：<nowiki>{{/子页面}}</nowiki>
+
+{{hideh|示例}}
+{{/子页面}}
+{{hidef}}
+
+:* 引用过程中“子页面”的意义是引用模板的页面的子页面，而非被引用的模板的子页面。
+* 其它命名空间的模板引用
+** 格式：<nowiki>{{命名空间:子页面}}</nowiki>如<nowiki>{{Template talk:!}}</nowiki>
+
+== 一般用法 ==
+
+模板的一般用法有：
+*[[Wikipedia:模板消息|模板消息]]，例如：[[Template:stub|Template:stub]]传递“小作品”的消息。
+*[[Wikipedia:导航模板|导航模板]]，用于给读者提供类似的条目，例如：[[Template:洲|Template:洲]]。
+*信息框模板，用于同一类条目中提供统一格式的信息，例如：[[Template:Infobox_网球|Template:Infobox 网球]]在条目右边绘制信息框，提供网球运动员的相关信息。
+*提供跨语言文本。
+*提供合成图片，例如：围棋棋谱[http://en.wikipedia.org/wiki/Template:Game_of_Go_Position Template:Game of Go Position]和国际象棋棋谱和[http://en.wikipedia.org/wiki/Template:Chess_position Template:Chess position]。
+*以上几种的组合。
+
+==提及模板==
+在某些情况下，我们可能需要'''提及某一个模板（而非调用它）'''。提及模板可用[[帮助:HTML#解析器标签和扩展标签|nowiki标签]]，但是已经有热心的用户建立了专门的模板，用于提及模板。
+{| class="wikitable"
+! style="width: 50%" | 您所输入的
+! style="width: 50%" | 您所看到的
+|-
+|请您不要再随意删除<nowiki>{{afd}}</nowiki>模板。
+|请您不要再随意删除{{delcat|{{afd}}}}模板。
+|-
+|请您不要再随意删除<nowiki><nowiki>{{afd}}</nowiki></nowiki>模板。
+|请您不要再随意删除<nowiki>{{afd}}</nowiki>模板。
+|-
+|请您不要再随意删除<nowiki>{{</nowiki>'''tl'''<nowiki>|afd}}</nowiki>模板。
+|请您不要再随意删除{{tl|afd}}模板。
+|-
+|欢迎新用户可以使用<nowiki>{{</nowiki>'''tls'''<nowiki>|welcome}}</nowiki>语法，但不要使用<nowiki>{{tl|welcome}}</nowiki>语法。
+|欢迎新用户可以使用{{tls|welcome}}语法，但不要使用{{tl|welcome}}语法。
+|-
+|<nowiki>[[:Template:nosign|:Template:nosign]]</nowiki>的用法如下：<br /><nowiki>{{</nowiki>'''tlx'''<nowiki>|nosign|用户留言时间|用户名}}</nowiki>
+|[[Template:nosign|Template:nosign]]的用法如下：<br />{{tlx|nosign|用户留言时间|用户名}}
+|-
+|<nowiki>{{</nowiki>'''tnull'''<nowiki>|nosign|用户留言时间|用户名}}</nowiki>用于补签名。
+|{{tnull|nosign|用户留言时间|用户名}}用于补签名。
+|}
+
+== 类似语法 ==
+<nowiki>{{CURRENTYEAR}}、{{DISPLAYTITLE:}}</nowiki>等等为魔术字。魔术字可以返回关于当前页面、wiki站点或日期的信息，也可以设置数据。参见[[Help:魔术字#变量|Help:魔术字#变量]]。
+
+调用[[WP:解析器函数|解析器函数]]的语法是<nowiki>{{#xxx:}}</nowiki>。如<nowiki>{{#ifeq:{{{lang}}}|zh|我使用中文|I<ins> don't</ins> use Chinese}}</nowiki>给出{{#ifeq:{{{lang}}}|zh|我使用中文|I<ins> don't</ins> use Chinese}}。
+
+读取模板参数是三个大括号，形如<nowiki>{{{1|}}}、{{{date}}}</nowiki>。详见[[#读取参数|#读取参数]]。
+
+==常见问题==
+
+'''我可以在多个语言维基百科中使用同一个模板吗？'''
+:不能。如果你要这么做，只能在各个维基百科中分别创建该模板。
+'''开头是“Template:”，“template:”，還是“模板:”？'''
+:都行。英文不区分大小写，中文会繁简自动转换。一定要用[[半角|英文半角]]冒號。
+'''我可以使用参数吗？'''
+:可以。请参阅[[#top|此頁上方]]。
+'''一个页面中最多可以使用多少模板？'''
+:2MB。参见[[Wikipedia:模板限制|Wikipedia:模板限制]]。
+'''我已经修改了模板，但为什么页面不更新呢？'''
+:有很多原因。第一、你可能没有刷新页面。在你的浏览器里使用刷新（Refresh）功能。第二、系统可能存在缓存漏洞（bug）。一种解决方法是'''编辑'''使用模板的页面，然后什么也不修改就'''保存'''，这样你就强制该页面进行刷新了。这一操作不会在历史中留下记录。
+'''我可以修改模板的名字吗？'''
+:可以。移动模板跟移动普通页面一样。模板也可以重定向。
+'''我可以在一个模板中使用另一个模板吗？'''
+:可以。当然可以在一个模板的内容中调用另一个模板。但如果使用诸如<nowiki>{{一个模板{{另一个模板}}}}</nowiki>这样的语句，假设<nowiki>{{另一个模板}}</nowiki>的内容为“123”，则实际上是<nowiki>{{一个模板123}}</nowiki>。
+
+==参考资料==
+<div class='references-small'>
+<references/>
+</div>
+
+==参见==
+===中文===
+* [[Help:替换引用|Help:替换引用]]
+* [[Help:魔术字|Help:魔术字]]
+* [[Wikipedia:嵌入包含|Wikipedia:嵌入包含]]
+* [[Wikipedia:模板指导|Wikipedia:模板指导]]
+* [[Wikipedia:模板命名空间|Wikipedia:模板命名空间]]
+* [[:Category:維基百科模板|:Category:維基百科模板]]
+
+===英文===
+*[[meta:Help:Template|元维基上的英文模板帮助]]
+*[[meta:Help:Advanced_templates|元维基上的英文模板高级帮助]]
+
+{{-}}
+{{H-f Help}}
+
+[[Category:帮助文档|MB]]
+[[Category:维基百科帮助|维基百科帮助]]

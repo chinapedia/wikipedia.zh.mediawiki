@@ -1,0 +1,7 @@
+{| style="margin:0 auto; text-align:center;" class="toccolours"
+| 上一场：<br />{{{Previous_race_in_season}}} || rowspan=2 style="padding:0 1em;" |'''[[{{{Year_of_race}}}年世界一级方程式锦标赛]]'''<br />'''{{{Name_of_race}}}''' || 下一场：<br />{{{Next_race_in_season}}}
+|-
+| 上一届：<br />{{{Previous_year's_race}}} || 下一届：<br />{{{Next_year's_race}}}
+|}<noinclude>
+[[Category:一級方程式模板]]
+</noinclude>

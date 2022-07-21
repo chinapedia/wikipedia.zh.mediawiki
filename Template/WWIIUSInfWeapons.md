@@ -1,0 +1,1 @@
+#REDIRECT [[Template:二戰美國步兵槍械]]

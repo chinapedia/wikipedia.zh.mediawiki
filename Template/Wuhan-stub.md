@@ -1,0 +1,9 @@
+{{asbox
+|name=Template:Wuhan-stub
+|image=TheYellowCraneTower.jpg
+|category=武汉小作品
+|subject=與[[武汉]]相關的
+}}<noinclude>
+[[Category:武汉小作品|*]]
+[[Category:中國地理小作品模板|W]]
+</noinclude>

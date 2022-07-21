@@ -1,0 +1,1 @@
+#REDIRECT [[Template:洛杉矶湖人历任主教练]]

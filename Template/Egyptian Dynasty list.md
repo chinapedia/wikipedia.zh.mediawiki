@@ -1,0 +1,1 @@
+#REDIRECT [[Template:古埃及歷史]]

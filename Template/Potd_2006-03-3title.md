@@ -1,0 +1,1 @@
+[[穆斯林]]在[[倭马亚清真寺]]中做[[礼拜]]<noinclude>[[Category:每周图片模板]]</noinclude>

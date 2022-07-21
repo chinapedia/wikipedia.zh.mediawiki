@@ -1,0 +1,10 @@
+{{Userbox
+  |id=
+  |id-c=white
+  |info=這個用戶是'''[[興農牛]]'''隊的球迷。
+  |info-c=green
+  |info-s=9
+  |info-fc=white
+  |border-c=gray
+}}
+[[Category:支持興農牛隊的維基人]]

@@ -1,0 +1,1 @@
+{{User language-2|ilo|Daytoy nga agar-aramat ket makapagsao iti '''[[:Category:ilo 使用者|Iloko]]''' iti '''[[:Category:ilo-2 使用者|kalalainganna]]''' nga agpang.|伊洛卡诺语}} <noinclude></noinclude>

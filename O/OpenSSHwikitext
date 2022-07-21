@@ -1,0 +1,114 @@
+{{Distinguish|OpenSSL}}
+{{noteTA|G1=IT|G2=FL}}
+{{Infobox software
+| name                   = OpenSSH
+| logo                   = Openssh.gif
+| logo size              = 190px
+| logo caption           = "Keeping your communiqués secret"
+| logo alt               = 
+| screenshot             = <!-- Image name is enough -->
+| caption                = 
+| screenshot alt         = 
+| collapsible            = 
+| author                 = 
+| developer              = [[OpenBSD|OpenBSD]]計畫組
+| released               = {{Start date and age|1999|12|01|df=yes}}
+| discontinued           = 
+| latest release version = 9.0<ref name="9.0-released">{{cite web
+ | url = https://www.openssh.com/txt/release-9.0
+ | title = OpenSSH 9.0 Release Notes
+ | date = 2022-04-08
+ | accessdate = 2022-04-08
+ | archive-date = 2022-04-10
+ | archive-url = https://web.archive.org/web/20220410074332/https://www.openssh.com/txt/release-9.0
+ }}</ref>
+| latest release date    = {{Start date and age|2022|04|08|df=yes}}
+| programming_language   = [[C语言|C语言]]
+| operating system       = [[跨平台|跨平台]]<ref name="portable">{{Cite web |title=OpenSSH Portable Release |url=https://www.openssh.com/portable.html |publisher=OpenBSD |access-date=15 October 2015 |archive-date=2018-02-16 |archive-url=https://web.archive.org/web/20180216100119/https://www.openssh.com/portable.html |dead-url=no }}</ref>
+| platform               = 
+| size                   = 
+| language               = 
+| language footnote      = 
+| genre                  = [[虚拟终端|远程访问]]
+| license                = 简化版[[BSD许可证|BSD许可证]]<br>[[ISC許可證|ISC許可證]]<br>{{tsl|en|Public-domain software|公共领域}}
+| alexa                  = 
+| website                = {{URL|https://www.openssh.com/}}
+| standard               = RFC 4250, RFC 4251, RFC 4252, RFC 4253, RFC 4254, RFC 4255, RFC 4256, RFC 4335, RFC 4344, RFC 4345, RFC 4419, RFC 4462, RFC 5656, RFC 6594, RFC 6668, RFC 7479<ref name="specifications-implemented">{{Cite web |url=https://www.openssh.com/specs.html |title=Specifications implemented by OpenSSH |publisher=The OpenBSD Project |website=The OpenBSD Project |access-date=14 October 2015 |archive-date=2018-01-25 |archive-url=https://web.archive.org/web/20180125231328/http://www.openssh.com/specs.html |dead-url=no }}</ref>
+}}
+
+'''OpenSSH'''（'''{{lang|en|OpenBSD Secure Shell}}'''）是使用[[Secure_Shell|SSH]]透過[[計算機網路|計算機網路]]加密通訊的實現。它是取代由SSH Communications Security所提供商用版本的[[開放原始碼|開放原始碼]]方案。目前OpenSSH是[[OpenBSD|OpenBSD]]的子計畫。
+
+OpenSSH常常被誤認以為與[[OpenSSL|OpenSSL]]有關聯，但實際上這兩個計畫有不同的目的，不同的發展團隊，名稱相近只是因為兩者有同樣的軟體發展目標──提供開放原始碼的[[加密通訊|加密通訊]]軟體。
+
+== 歷史 ==
+OpenSSH是在1999年10月第一次在[[OpenBSD|OpenBSD]] 2.6裡出現，當初的計畫是取代由SSH Communications Security所提供的[[Secure_Shell|SSH]]軟體。
+
+== 發展及程式架構 ==
+程式主要包括了幾個部份：
+* '''ssh'''
+: [[rlogin|rlogin]]與[[Telnet|Telnet]]的替代方案。
+* '''scp'''、'''sftp'''
+: rcp的替代方案，將檔案複製到其他電腦上。
+* '''sshd'''
+: [[Secure_Shell|SSH]]伺服器。
+* '''ssh-keygen'''
+: 產生[[RSA|RSA]]或[[ECDSA|ECDSA]][[金鑰|金鑰]]，用來認證用。
+* '''ssh-agent'''、'''ssh-add'''
+: 幫助使用者不需要每次都要輸入金鑰密碼的工具。
+* '''ssh-keyscan'''
+: 掃描一群[[機器|機器]]，並记錄其[[公鑰|公鑰]]。
+
+==常见用法==
+<code>ssh -V #查看版本</code>
+
+一般在个人主目录下的.ssh子目录中的authorized_keys文件为公钥，可用于ssh通过公私秘钥认证方式登录操作系统。
+
+ssh会把访问过的主机的公钥(public key)记录在<code>~/.ssh/known_hosts</code>。当下次访问相同计算机时，OpenSSH会核对公钥。如果公钥不同，OpenSSH会发出警告， 避免受到DNS Hijack之类的攻击。
+
+通过ssh可以直接远程执行目标机上的命令行：<code> ssh username@host "command_line"</code> 注意使用单引号或者双引号把命令行包围起来(还可以多行输入）。如果被执行的命令行需要与用户交互(需要 TTY)，应该使用<code>-t</code>选项，例如<code> ssh -t username@host "command_line"</code>
+
+通过ssh可以远程执行本地脚本，如<code> ssh username@host < my.sh </code>，但在Windows上暂时可能不行。如果本地脚本带有命令行参数，需要如此格式：<code> ssh username@host 'bash -s' < my.sh helloworld </code>
+
+通过ssh可以远程执行远程主机上的脚本，如<code> ssh username@host /home/nick/test.sh arg1 arg2 </code> 注意，此时需要指定脚本的绝对路径！
+
+==SSH的config文件==
+在个人主目录下的.ssh子目录中的config文件。示例：
+<syntaxhighlight lang="bash">
+# configuration 1
+Host cluster
+	HostName 192.168.11.11
+	User tom
+
+# configuration 2
+Host=aliyun
+	Hostname=202.44.2.2
+	User tom
+</syntaxhighlight>
+
+每项配置都是<code>参数名 参数值</code>或<code>参数值=参数名</code>两种形式，可以混用。<code>参数名</code>不区分大小写，<code>参数值</code>区分大小写。
+
+*Host 主机的昵称。可用于在ssh命令行中代替 username@ip_address 
+*HostName 主机IP地址或主机名
+*User  ssh登录时使用的用户名
+*IdentityFile  认证证书文件，默认位置是<code>~/.ssh/id_rsa</code>或<code>~/ssh/id_dsa</code>等，如果采用默认的证书，可以不用设置此参数，除非证书放在某个自定义的目录，那么就需要设置该参数来指向该证书
+*Port SSH访问主机的端口号，默认是22端口
+==另请参阅==
+*[[lsh|lsh]]
+
+==参考文献==
+{{reflist}}
+
+== 外部連結 ==
+* [http://www.openssh.com/ OpenSSH] {{Wayback|url=http://www.openssh.com/ |date=20060410160932 }}{{en}}
+* [https://github.com/PowerShell/Win32-OpenSSH/releases/ Windows操作系统可用的OpenSSH版本] {{Wayback|url=https://github.com/PowerShell/Win32-OpenSSH/releases/ |date=20220118102822 }}
+
+{{OpenBSD}}
+{{加密软件}}
+{{FLOSS}}
+
+[[Category:加密软件|Category:加密软件]]
+[[Category:自由跨平台軟體|Category:自由跨平台軟體]]
+[[Category:自由網路軟體|Category:自由網路軟體]]
+[[Category:OpenBSD|Category:OpenBSD]]
+[[Category:Secure_Shell|Category:Secure Shell]]
+[[Category:Windows命令|Category:Windows命令]]

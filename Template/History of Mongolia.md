@@ -1,0 +1,1 @@
+#REDIRECT [[Template:蒙古历史]]

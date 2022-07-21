@@ -1,0 +1,1 @@
+<span class="plainlinks">[[User:{{{1}}}|{{{1}}}]] ([[User talk:{{{1}}}|討論頁]] · [[Special:Contributions/{{{1}}}|貢獻]] · [//tools.wmflabs.org/whois/gateway.py?lookup=true&ip={{{1}}} whois])</span><noinclude>{{Documentation}}</noinclude>

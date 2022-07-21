@@ -1,0 +1,1 @@
+#重定向 [[Template:Infobox Italian comune]]

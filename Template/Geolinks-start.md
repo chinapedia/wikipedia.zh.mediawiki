@@ -1,0 +1,2 @@
+*{{coor|{{{1}}}_N_{{{2}}}_E_{{{3}}}|{{lang|zh|地圖與航空圖片}}}} <span id="coordinates" class="plainlinksneverexpand">[[經緯度]]: [{{Coor URL}}{{{1}}}_N_{{{2}}}_E_{{{3}}} {{{1}}}° {{{2}}}°]</span><noinclude>
+[[Category:經緯模板|{{PAGENAME}}]]</noinclude>

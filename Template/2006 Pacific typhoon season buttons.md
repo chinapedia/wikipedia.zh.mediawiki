@@ -1,0 +1,1 @@
+#REDIRECT [[Template:2006年太平洋颱風季]]

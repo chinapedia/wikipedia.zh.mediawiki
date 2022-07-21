@@ -1,0 +1,9 @@
+{{ #switch: {{{format|}}}
+  | endpoint1 = [[白田巴士總站|白田]]
+  | endpoint2 = [[旺角東站公共運輸交匯處|旺角東站]]
+  | direction = 2
+  | status =
+  | inline = [[白田巴士總站|白田]] ↔ [[旺角東站公共運輸交匯處|旺角東站]]
+  | normal =
+  | full =
+}}<noinclude>[[Category:九龍專線小巴路線模板|12]]</noinclude>

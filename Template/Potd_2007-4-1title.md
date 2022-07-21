@@ -1,0 +1,1 @@
+雲霧瀰漫的廬山<noinclude>[[Category:每周图片模板]]</noinclude>

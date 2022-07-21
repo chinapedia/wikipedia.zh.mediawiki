@@ -1,0 +1,12 @@
+{{Userbox
+  |id=[[File:Heshanhongqiqu.jpg|80px|鶴山]]
+  |id-c=#CCFF00
+  |info=這個用戶是'''[[:Category:鹤山市维基人|鶴山人]]'''。
+  |info-c=lightblue
+  |info-s=9
+  |border-c=#000000
+  |usercategory=鹤山市维基人
+}}
+<noinclude>
+[[Category:廣東省維基人用戶框模板]]
+</noinclude>

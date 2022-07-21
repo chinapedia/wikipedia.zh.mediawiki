@@ -1,0 +1,1 @@
+#重定向 [[Template:AllMovie_title]]

@@ -1,0 +1,1 @@
+#REDIRECT [[Template:User 國父思想]]

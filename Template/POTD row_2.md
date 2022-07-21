@@ -1,0 +1,2 @@
+[[File:Angelica morrisonicola in Hehuan Mount DSC 1418-2.jpg|200px|left|thumb|玉山當歸]]
+'''[[玉山当归]]'''為[[伞形科]][[當歸屬]]的植物，為[[臺灣|-{zh-cn:台湾; zh-hk:臺灣; zh-tw:臺灣;}-]]的特有植物。分布-{zh-cn:于; zh-hk:於; zh-tw:於;}--{zh-cn:台湾; zh-hk:臺灣; zh-tw:臺灣;}-，生長於海拔3,000-{zh-cn:米; zh-hk:公尺; zh-sg:公尺; zh-tw:公尺;}-至3,500-{zh-cn:米; zh-hk:公尺; zh-sg:公尺; zh-tw:公尺;}-的地區，常生長在高山地區，目前尚未由人工引種栽培。

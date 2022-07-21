@@ -1,0 +1,116 @@
+{{noteTA
+|T=zh-cn:第二范式; zh-tw:第二正規化; zh-hk:第二規範化;
+|1=zh-cn:规范化;zh-tw:正規化;zh-hk:規範化;
+|2= zh-cn:范式;zh-tw:正規化;zh-hk:範式;
+|3=zh-cn:依赖;zh-tw:相依;zh-hk:依賴;
+|4=zh-cn:当且仅当;zh-tw:若且唯若;
+|G1=IT
+}}
+
+'''第二正規化'''（2NF）是[[資料庫正規化|資料庫正規化]]所使用的[[正規形式|正規形式]]。規則是要求資料表裡的所有資料都要和該資料表的[[關係鍵|鍵]]（主键与候选键）有[[依赖关系|完全依赖关系]]：每个非键属性必须独立于任意一个候选键的任意一部分属性。如果有哪些資料只和一个鍵的一部份有關的話，就得把它們獨立出來變成另一個資料表。如果一個資料表的键只有單個欄位的話，它就一定符合第二正規化。
+
+一個資料表符合第二正規化[[若且唯若|若且唯若]]
+* 它符合[[第一正規化|第一正規化]]
+* 所有非键字段都不能是候选键非全体字段的函数
+
+==範例==
+有一個資料表記錄了設備元件的資訊，如下所示：
+
+{| class="wikitable"
+|+ 元件來源
+! 元件 ID （主键）
+! 價格
+! 供應商ID （主键）
+! 供應商名稱
+! 供應商住址
+|-
+| 65
+| 59.99
+| 1
+| Stylized Parts
+| VA
+|-
+| 73
+| 20.00
+| 1
+| Stylized Parts
+| VA
+|-
+| 65
+| 69.99
+| 2
+| ACME Industries
+| CA
+|}
+
+這個資料表的每個值都是單一值，所以它符合第一正規化。因為同一個元件有可能由不同的供應商提供，所以得把元件 ID 和供應商 ID 合在一起組成一個主键。
+
+元件（关键词）和價格之間的關係很正確：同一個元件在不同供應商有可能會有不同的報價，所以價格確實和主鍵完全相關（完全依赖）。
+
+另一方面，供應商的名稱和住址就只和供應商 ID 有關（部分依赖），這不符合第二正規化的原則。仔細看就會發現 "Stylized Parts" 這個名稱和 "VA" 這個住址重複出現了兩次；要是它改名了或是被其他公司併購了怎麼辦？這時候最好把這些資料獨立出新的資料表：
+
+{| class="wikitable"
+|+ 供應商
+! 供應商 ID （主键）
+! 名稱
+! 住址
+|-
+| 1
+| Stylized Parts
+| VA
+|-
+| 2
+| ACME Industries
+| CA
+|}
+
+這麼一來，原本的 "元件來源" 資料表就得要做相對應的改動：
+
+{| class="wikitable"
+|+ 元件來源
+! 元件 ID （主键）
+! 價格
+! 供應商 ID（主键、非关键词）
+|-
+| 65
+| 59.99
+| 1
+|-
+| 73
+| 20.00
+| 1
+|-
+| 65
+| 69.99
+| 2
+|}
+
+檢查資料表裡的每個欄位，確認它們是不是都和关键词完全相關，
+這樣才能知道這個資料表是不是符合第二正規化；
+如果不是的話，就把那些不完全相關的欄位獨立出一個資料表。
+接下來的步驟是要確保所有不是鍵的欄位都和彼此沒有相依關係，這就叫做[[第三正規化|第三正規化]]。
+
+== 参考文献 ==
+{{Reflist}}
+* [http://www.troubleshooters.com/littstip/ltnorm.html Litt's Tips: Normalization] {{Wayback|url=http://www.troubleshooters.com/littstip/ltnorm.html |date=20070210121236 }}
+* [https://web.archive.org/web/20080805014412/http://www.datamodel.org/NormalizationRules.html Rules Of Data Normalization]
+* Date, C. J., & Lorentzos, N., & Darwen, H. （2002）. ''[http://www.elsevier.com/wps/product/cws_home/680662 Temporal Data & the Relational Model] {{Webarchive|url=https://archive.today/20121209052842/http://www.elsevier.com/wps/product/cws_home/680662 |date=2012-12-09 }}'' （1st ed.）. Morgan Kaufmann. ISBN 1-55860-855-9.
+* Date, C. J. （1999）, ''[https://web.archive.org/web/20050404010227/http://www.aw-bc.com/catalog/academic/product/0,1144,0321197844,00.html  An Introduction to Database Systems]'' （8th ed.）. Addison-Wesley Longman. ISBN 0-321-19784-4.
+* Kent, W. （1983） ''[http://www.bkent.net/Doc/simple5.htm A Simple Guide to Five Normal Forms in Relational Database Theory] {{Wayback|url=http://www.bkent.net/Doc/simple5.htm |date=20070202060442 }}'', Communications of the ACM, vol. 26, pp. 120-125
+* Date, C.J., & Darwen, H., & Pascal, F. ''[http://www.dbdebunk.com Database Debunkings] {{Wayback|url=http://www.dbdebunk.com/ |date=20200627203408 }}''
+* H.-J. Schek, P.Pistor Data Structures for an Integrated Data Base Management and Information Retrieval System
+
+==外部連結==
+*[http://databases.about.com/od/specificproducts/a/normalization.htm Database Nomalization Basics] {{Wayback|url=http://databases.about.com/od/specificproducts/a/normalization.htm |date=20070205184226 }} by Mike Chapple （About.com）
+*[https://web.archive.org/web/20110606025027/http://dev.mysql.com/tech-resources/articles/intro-to-normalization.html An Introduction to Database Normalization] by Mike Hillyer.
+*[https://web.archive.org/web/20100106115112/http://www.utexas.edu/its/archive/windows/database/datamodeling/rm/rm7.html Normalization] by ITS, University of Texas.
+*[https://web.archive.org/web/20110715075109/http://phlonx.com/resources/nf3/ A tutorial on the first 3 normal forms] by Fred Coulson
+*[https://web.archive.org/web/20071227154911/http://www.marcrettig.com/poster/ Free PDF poster available] by Marc Rettig
+*[http://support.microsoft.com/kb/283878 Description of the database normalization basics] {{Wayback|url=http://support.microsoft.com/kb/283878 |date=20070210080439 }} by Microsoft
+
+{{-}}
+{{資料庫正規化}}
+
+[[Category:資料庫正規化|2NF]]
+
+[[de:Normalisierung_(Datenbank)#Zweite_Normalform_(2NF)|de:Normalisierung (Datenbank)#Zweite Normalform (2NF)]]

@@ -1,0 +1,1 @@
+#REDIRECT [[Template:星际旅行]]

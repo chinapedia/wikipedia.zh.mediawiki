@@ -1,0 +1,156 @@
+[[File:MovingAverage.GIF|thumb]]
+'''移动平均'''（{{lang-en|Moving average}}，縮寫：'''MA '''），又稱'''滾動平均值'''、'''滑動平均'''，在[[統計學|統計學]]中是一種通過創建整個數據集中不同子集的一系列平均數來分析數據點的計算方法。它也是有限脈衝響應濾波器的一種。變化包括: 簡單移動平均、指數移動平均、加權移動平均，以及累積移動平均（描述如下）。
+
+给定一个数列和一个固定子集大小，移动平均数的第一个元素是由数列的初始固定子集的平均值得到的。然后通过“向前移位”修改子集，即排除序列的第一个数，并在子集中包含下一个值。
+
+移动平均通常与[[時間序列|時間序列]]数据一起使用，以消除短期波动，突出长期趋势或周期。短期和长期之间的阈值取决于应用，移动平均的参数将相应地设置。例如，它通常用于对财务数据进行[[技术分析|技术分析]]，如股票[[价格|价格]]、收益率或交易量。它也用于[[经济学|经济学]]中研究国内生产总值、就业或其他宏观经济时间序列。数学上，移动平均是[[卷积|卷积]]的一种类型，因此它可以被看作是用于[[信号处理|信号处理]]的[[低通滤波器|低通滤波器]]的一个例子。当与非时间序列数据一起使用时，移动平均滤波器的频率分量更高，但与时间没有任何特定的联系，尽管通常暗含某种排序。简单地看，它可以看作是把数据变得更平滑。
+
+[[File:點金靈-MA_MV.png|thumb]]和其簡單移動平均線（SMA，周期：5,10,20,60,120,240）；<br />下圖為成交量和其均量（周期：5,20）。]]
+
+==简单移动平均==
+[[File:Moving_Average_Types_comparison_-_Simple_and_Exponential.png|thumb]]
+在金融应用中，一个'''简单移动平均'''（'''SMA'''）是以前 ''n'' 个数据的未加权[[算术平均数|平均数]]。然而，在科学和工程中，平均值通常取自中心值两边相等数量的数据。这样可以确保平均值的变化与数据的变化一致，而不是随时间变化。
+{{Anchor|algorithm}}
+例如，对于 ''n'' 天的收盘价样本，简单等权重移动平均是前 ''n'' 天收盘价的平均值。如果收盘价为 <math>p_M, p_{M-1}, \dots, p_{M-(n-1)}</math>，则公式为
+<!--
+this used to be a hairy sigma style with i's and j's, but prefer dots since it's a lot easier for financial people with limited math -->
+
+: <math>\begin{align}
+  \overline{p}_\text{SM} &= \frac{p_M + p_{M-1} + \cdots + p_{M-(n-1)}}{n} \\
+      &= \frac{1}{n} \sum_{i=0}^{n-1} p_{M-i}.
+\end{align}</math>
+
+当计算下一天的移动平均的时候，就会在求和中加入一个新值，剔除一个旧值，无需把所有数值重新加一遍：
+
+: <math>\overline{p}_\text{SM} = \overline{p}_{\text{SM},\text{prev}} + \frac{1}{n} (p_M - p_{M-n}).</math>
+
+所选择的时间段取决于利率变动的类型，如短期、中期或长期。从金融角度来看，移动平均线水平可以解释为市场下跌时的支撑，或者市场上涨时的阻力。
+
+如果使用的数据不以平均值为中心，那么简单移动平均就会落后于最新的数据点一半的采样宽度。旧数据点的丢掉和新数据点的加入也会对SMA造成较大影响。SMA的一个特点是，如果数据存在周期性波动，那么应用该周期的SMA将消除这种波动（平均值总是包含一个完整的周期）。但是完全规律的循环是几乎不会遇到的。<ref>''Statistical Analysis'', Ya-lun Chou, Holt International, 1975, {{ISBN|0-03-089422-0}}, section 17.9.</ref>
+
+对于许多应用来说，这有利于避免仅使用“过去”数据而引起的移位。因此，可以使用在计算平均值的系列中点的任一侧等距分布的数据来计算'''中心移动平均'''。<ref>The derivation and properties of the simple central moving average are given in full at [[Savitzky–Golay_filter|Savitzky–Golay filter]].</ref> 这需要在样本窗口中使用奇数个数据点。
+
+SMA的主要缺点是，它使比窗口长度短的大量信号通过。更糟糕的是，它实际上将其反转。这可能会导致意外的伪影，例如，平滑结果中的峰值出现在数据中出现波谷的位置。由于某些较高的频率未正确消除，这也导致结果不如预期的平滑。
+
+在技術分析中，不同的市場對常用天數（'''n值'''）有不同的需求，例如：某些市場普遍的'''n值'''為10日、40日、200日；有些則是5日、10日、20日、60日、120日、240日，視乎分析時期長短而定。投資者冀從移動平均線的圖表中分辨出支持位或阻力位。
+
+[[File:富邦e01-SMA_EMA_WMA.png|thumb]]
+
+==指數移動平均==
+[[File:Exponential_moving_average_weights_N=15.png|thumb]]
+'''指數移動平均'''（{{lang-en|exponential moving average}}，'''EMA'''或'''EWMA'''）是以[[指數|指數式]]遞減加權的移動平均。
+各數值的加權影響力隨時間而指數式遞減，越近期的數據加權影響力越重，但較舊的數據也給予一定的加權值。右圖是一例子。
+
+加權的程度以常數 α 決定，α 數值介乎 0 至 1。α 也可用天數'''N'''來代表：<math>\alpha={2\over{N+1}}</math>，所以，N=19天，代表  α=0.1。
+
+設時間 ''t'' 的實際數值為 ''Y''<sub>''t''</sub>，而時間''t''的EMA則為''S''<sub>''t''</sub>；時間 ''t-1'' 的EMA則為 ''S''<sub>''t-1''</sub>，計算時間 ''t≥2'' 是方程式為：<ref>[http://www.itl.nist.gov/div898/handbook/pmc/section4/pmc431.htm NIST/SEMATECH e-Handbook of Statistical Methods: Single Exponential Smoothing] {{Wayback|url=http://www.itl.nist.gov/div898/handbook/pmc/section4/pmc431.htm |date=20110310120208 }}，National Institute of Standards and Technology</ref>
+
+:<math> S_{t} = \alpha \times Y_{t} +(1-\alpha) \times S_{t-1}</math>
+
+設今日（''t''）價格為<math>p_{t}</math>，則今日（''t''）的<math>EMA_{t}</math>方程式為：
+:<math>EMA_{t} = \alpha \times p_{t} + (1-\alpha) \times EMA_{t-1} = EMA_{t-1} + \alpha \times (p_{t} - EMA_{t-1})</math>
+
+將<math>EMA_{t-1}</math>遞迴代入：
+:<math>EMA_{t} = \alpha \times ( p_{t} +(1-\alpha)p_{t-1} +(1-\alpha)^2 p_{t-2} +(1-\alpha)^3 p_{t-3} + \cdots ) </math>
+
+理論上這是一個[[无穷级数|无穷级数]]，由於<math>(1 - \alpha)</math>小於 1，後面的數值會越來越小，可以被忽略只計算前  (N+1) 項。 
+
+對於近似均勻無變的數據少算的部份約為<math>(1-\alpha)^{N+1}</math>
+:<math> \text{EMA權 重}\;= \alpha \times \Big[1+(1-\alpha)+(1-\alpha)^2+(1-\alpha)^3+ \cdots +(1-\alpha)^N \Big]</math>
+:<math>\qquad\qquad\;=\Big[ 1 - (1 - \alpha)^{N+1} \Big] </math>
+
+假設MA和EMA有相同質心, MA質心= <math>{(1+N) \over 2}</math> ,
+EMA 質心= <math>\alpha \times \Big[1+2(1-\alpha)+3(1-\alpha)^2  + \cdots \Big]= {1 \over \alpha}</math> , ​
+
+即 <math>{{(1+N)} \over 2} = {1 \over \alpha} ,  \quad  \alpha= {2 \over{ (N+1)}} </math>​
+
+
+​根據1697年 Johann Bernoulli: <math>\lim_{n \to \infty} {(1 + {x \over n})^n} = \mbox{e}^x</math> , 則
+:<math>1 - (1 - \alpha)^{N+1} = 1- \left(1 - {2 \over (N+1)}\right)^{N+1} \approx  1 - \mbox{e}^{-2} \approx 86%</math> ; 
+即當 <math>\alpha = {2 \over (N+1)}</math>時, 只計算前 N+1 項已涵蓋了 86% 完整權重;
+
+​
+若要計算函蓋 99.9% 的完整加權，計算前 k-1  項( k-1 天) 忽略第k項之後,  則約略漏算了<math>\;(1 - \alpha)^{k} = 0.1%=0.001</math> ,  則  
+: <math> k = {\log_{e}(0.001) \over {\log_{e}(1-\alpha)}} \approx {\log_{e}(0.001) \over {- \alpha} }  \approx 3.45(N+1) </math> ,
+由於當 ''N'' 值很大時  α  很小接近零,    <math>\; \log_{e}(1-\alpha)</math> = <math>- \alpha + {\alpha^2 \over 2} + \cdots</math> 將趨近<math>- \alpha</math> (泰勒展開)。
+
+若只要函蓋 99% 的加權則  <math> k  \approx {\log_{e}(0.01) \over {- \alpha} }  \approx 2.30(N+1) </math>; 
+要包含 95% 的加權則  <math> k  \approx {\log_{e}(0.05) \over {- \alpha} }  \approx 1.50(N+1) </math>; 
+:例如: 當 N=9, α = 0.200 , k  ∼15 函蓋95% , k ∼23 能函蓋99% ; k ∼35 函蓋達99.9% ;
+:當 N=26, α &approx; 0.074 , k ∼40 函蓋95%.
+
+==加權移動平均==
+'''加權移動平均'''（{{lang-en|weighted moving average}}，'''WMA'''）指計算平均值時將個別數據[[乘法|乘]]以不同數值，在技術分析中，''n''日WMA的最近期一個數值乘以''n''、次近的乘以''n-1''，如此類推，一直到0：
+
+:<math>WMA_{M} = { n p_{M} +(n-1) p_{M-1} + \cdots + 2 p_{M-n+2} + p_{M-n+1} \over n +(n-1) + \cdots + 2 + 1}</math>
+
+[[File:Weighted_moving_average_weights_N=15.png|thumb]]
+由於<math>WMA_{M+1}</math>與<math>WMA_{M}</math>的分子相差<math>n p_{M+1} - p_{M} - \cdots - p_{M-n+1}</math>，假設<math>p_{M} + p_{M-1} + \cdots + p_{M-n+1}</math>為總和<sub>M</sub>：
+
+:總和<sub>M+1</sub> <math>=</math>總和<sub>M</sub> <math>+ p_{M+1} - p_{M-n+1}</math>
+
+:分子<sub>M+1</sub> <math>= N_{M+1} =</math>分子<sub>M</sub> <math>+ n p_{M+1} - </math>總和<sub>M</sub>
+
+:<math>WMA_{M+1} = { N_{M+1} \over n +(n-1) + \cdots + 2 + 1}</math>
+
+留意分母為[[三角形數|三角形數]]，方程式為<math>n(n+1)\over2</math>
+
+右圖顯示出加權是隨日子遠離而遞減，直至遞減至零。
+
+==累积移动平均==
+在'''累积移动平均'''（'''CMA'''）中，数据以有序数据流的形式到达，用户希望获得直到当前数据点为止的所有数据的平均值。例如，投资者可能想要特定股票直到当前时间的所有股票交易的平均价格。随着每笔新交易的发生，可以使用累计平均值（通常是直到当前时间的 ''n'' 个值序列 <math>x_1, \ldots, x_n</math> 的均等加权平均值）计算该点之前所有交易的平均交易价格：
+
+:<math>\text{CMA}_n = {{x_1 + \cdots + x_n} \over n}\,.</math>
+
+计算此问题的暴力方法是存储所有数据，并计算总和，并在每次新数据点到来时除以数据点数。但其实，可以使用下面地公式，在拿到新值 <math>x_{n+1}</math> 时，简单地更新累计平均值：
+
+:<math>\text{CMA}_{n+1} = {{x_{n+1} + n \cdot \text{CMA}_n} \over {n+1}}.</math>
+
+因此，新数据点的当前累积平均值等于先前的累积平均值乘以 ''n''，再加上最新的数据点，所有这些均除以到目前为止已接收的点数 ''n''+1。 当所有数据点都到达（{{nowrap|1=''n'' = ''N''}}）时，累积平均值将等于最终平均值。还可以存储数据点的当前总和以及点的数目，并将总数除以数据点的数目，以便在每次有新的基准点到达时得到CMA。
+
+累积平均公式的推导很直接。使用
+
+:<math>x_1 + \cdots + x_n = n \cdot \text{CMA}_n</math>
+
+对于 {{nowrap|''n'' + 1}}，我们有
+
+:<math>
+\begin{align}
+x_{n+1} & = (x_1 + \cdots + x_{n+1}) - (x_1 + \cdots + x_n) \\[6pt]
+
+\end{align}
+</math>
+
+求解 <math>\text{CMA}_{n+1}</math> 就可以得到
+
+: <math>
+\begin{align}
+\text{CMA}_{n+1} & = {x_{n+1} + n \cdot \text{CMA}_n \over {n+1}} \\[6pt]
+& = {x_{n+1} + (n + 1 - 1) \cdot \text{CMA}_n \over {n+1}} \\[6pt]
+& = {(n + 1) \cdot \text{CMA}_n + x_{n+1} - \text{CMA}_n \over {n+1}} \\[6pt]
+& = {\text{CMA}_n} + {{x_{n+1} - \text{CMA}_n} \over {n+1}}
+\end{align}
+</math>
+
+== 其他加權 ==
+有時計算移動平均時會加入其他變數，例如，「'''交易量加權'''」會加入交易量的因素。
+
+==內部連結==
+*[[技術分析|技術分析]]
+*[[K線|K線]]
+*[[布林帶|布林帶]]（BBands）
+*[[隨機指標|隨機指標]]（KD）
+*[[相對強弱指數|相對強弱指數]]（RSI）
+*[[MACD|指數平滑異同移動平均線]]（MACD）
+*[[乖離率|乖離率]]（BIAS）
+
+==參考文献==
+{{Reflist}}
+
+==外部連結==
+*[http://www.investopedia.com/terms/m/movingaverage.asp Investopedia的介紹] {{Wayback|url=http://www.investopedia.com/terms/m/movingaverage.asp |date=20070108012104 }}
+{{技术分析}}
+[[Category:技术分析|Category:技术分析]]
+[[Category:金融數據分析|Category:金融數據分析]]
+[[Category:市場趨勢|Category:市場趨勢]]
+[[Category:股市|Category:股市]]

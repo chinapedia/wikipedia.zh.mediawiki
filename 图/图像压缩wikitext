@@ -1,0 +1,248 @@
+{{unreferenced|time=2018-03-23T07:28:04+00:00}}
+{{noteTA
+|T=zh-cn:图像压缩; zh-tw:影像壓縮;
+|1=zh-cn:图像压缩; zh-tw:影像壓縮;
+|G1=IT
+|G2=Signals and Systems
+}}
+'''图像压缩'''是[[数据压缩|数据压缩]]技术在[[数字图像|数字图像]]上的应用，目的是减少图像数据中的冗余信息，从而用更加高效的格式存储和传输数据。
+
+==壓縮的原理==
+資料越一致，代表統計特性越集中，包括傅立葉轉換域(Fourier transform domain)、直方圖(histogram)、特徵值(eigenvalue)......等方面的集中度。壓縮的通則即是利用資料的'''一致性'''，越一致的資料，越能夠進行壓縮。除此之外，也可利用資料的規則性與可預測性來對其作壓縮。通常而言，若可以用比較<u>'''精簡的自然語言'''</u>來描述一個東西，那麼也就越能夠對這個東西作壓縮。
+===利用資料的特性作壓縮===
+*文章：常用字或字母(字母多出現E，少出現QXZ)。
+*歌曲：重複的旋律、頻率的倍頻關係、節拍內頻率的穩定。
+*聲音：能量多集中在低頻、頻率在短區間內的穩定。
+*卡通：每塊區域的邊緣(edge)資訊與顏色(color)、邊緣(edge)資訊可以用較少參數編碼(如果邊緣(edge)是幾何圖案)。
+
+===資料壓縮範例===
+*聲音：MP3(.mp3)，壓縮率約1/3。
+*圖片：JPEG(.jpg)，壓縮率約1/10(灰階)或1/20(彩色，利用4：2：0)。
+*影片：MPEG(H.264、H.265)，壓縮率約1/30(灰階)或1/60(彩色)。
+
+==影像的一致性==
+===空間上的一致性===
+影像中每一點的值，會和相鄰的點的值非常接近。
+
+<math>\operatorname{F}[m,n+1] \,\!</math> ≈ <math>\operatorname{F}[m,n] \,\!</math>
+
+<math>\operatorname{F}[m+1,n] \,\!</math> ≈ <math>\operatorname{F}[m,n] \,\!</math>
+
+直方圖(histogram)是統計出現次數的一種方法，它會去計算一個向量(vector)或一個矩陣(matrix)當中，有多少個點會等於某一個值。
+
+舉例來說，<math>\operatorname{x}[n]=[1,2,3,4,4,5,5,3,5,5,4] \,\!</math>
+
+則 <math>\operatorname{x}[n]\,\!</math>的直方圖(histogram)為
+<math>\operatorname{h}[1]=1 \,\!</math>，<math>\operatorname{h}[2]=1 \,\!</math>，<math>\operatorname{h}[3]=2 \,\!</math>，<math>\operatorname{h}[4]=3 \,\!</math>，<math>\operatorname{h}[5]=4 \,\!</math>
+
+將影像相臨值的差異，利用直方圖(histogram)來統計，會發現值幾乎都落在0附近。
+===頻率上的一致性===
+一張影像的頻譜大多集中在'''低頻'''的地方。
+影像的「頻率」是在空間域(space domain)作分析：
+*<u>'''低頻成分'''</u>代表變化較為緩和的地方，對應的是影像的'''「顏色」(color)'''和'''「強度」(intensity)'''。
+*<u>'''高頻成分'''</u>代表變化較為劇烈的地方，對應的是影像的'''「邊緣」(edge)'''和'''「雜訊」(noise)'''。
+
+
+==常用影像壓縮技術==
+壓縮的技術分成兩種：<u>'''失真壓縮(lossy compression)'''</u>的壓縮率較高，但無法重建原來的資料，例如：DFT、DCT、KLT(搭配量化(quantization)與截斷(truncation))、4：2：2或4：2：0、多項式曲線的近似(polynomial approximation)；<u>'''無失真壓縮(lossless compression)'''</u>的壓縮率較低，但可以重建原來的資料，例如：二元編碼(binary coding)、霍夫曼編碼(Huffman coding)、算術編碼(arithmetic coding)、格倫布編碼 (Golomb coding)。
+
+===4：2：2或4：2：0===
+此技術運用的是<u>'''空間上的一致性'''</u>。
+
+將像素(pixel)的RGB值，利用以下的公式轉換成YCbCr
+
+Y  =  0.299 R + 0.578 G + 0.114 B
+
+Cb = -0.169 R - 0.331 G + 0.500 B ( Cb = 0.565 (B - Y) )
+
+Cr =  0.500 R - 0.419 G - 0.081 B ( Cr = 0.713 (R - Y) )
+
+其中 Y 是亮度(Luminance)，Cb是藍色色差(chrominance) ，Cr 是紅色色差(chrominance)。 
+
+人類的視覺系統，對於亮度比較敏感，而對於彩度比較不敏感。
+因此我們可以利用人類視覺的特性，減少Cb、Cr的取樣個數，取樣格式有4：2：2 與 4：2：0兩種。
+
+假設一張圖片原本壓縮前(即4：4：4)的Y、Cb、Cr各有M×N個值，4：2：2的壓縮Y保留為M×N個值、Cb、Cr則取樣到各剩下M/2×N個值；4：2：0的壓縮Y同樣保留為M×N個值、Cb、Cr則進一步取樣到各剩下M/2×N/2個值。
+從4：4：4到4：2：2，壓縮率約為2/3；從4：4：4到4：2：0，壓縮率約為1/2。
+從4：4：4壓縮到4：2：2，再壓縮到4：2：0，單一像素(pixel)儲存的bit 數可以等效為：24 bits/pixel → 16 bits/pixel → 12 bits/pixel。
+
+還原時，則是利用插值(interpolation)的方式：
+
+<math>\operatorname{C_{\text{b}}}[2m+1,2n] \,\!</math> = 1/2 ×(<math>\operatorname{C_{\text{b}}}[2m,2n] \,\!</math> + <math>\operatorname{C_{\text{b}}}[2m+2,2n] \,\!</math>             )
+
+
+
+===8×8 離散餘弦轉換(DCT)===
+此技術運用的是<u>'''頻率上的一致性'''</u>。
+
+通常我們會將影像切成8×8的方格作離散餘弦轉換(DCT)，原因如下：
+*一張影像的每個區塊，其高低頻成分都不一樣，對整張影像直接作離散餘弦轉換(DCT)，多少會有高頻成分的出現。如果切成8×8的方格，則對大部分的方格幾乎都沒有高頻成分。
+*降低記憶體的需要量
+*降低運算量
+
+經過離散餘弦轉換(DCT)後的8×8矩陣稱為DCT矩陣。DCT矩陣最左上角的係數稱為<u>'''直流(DC)成分'''</u>，而其他63個係數則稱為<u>'''交流(AC)成分'''</u>。越靠近DC值的AC值係數表示頻率較低的部分，而越往右下角方向的AC值代表的頻率則越高。
+
+2D的8×8 DCT的輸出通常會按照"zigzag"的順序，將2D轉為1D的型態。按照此順序排列，能量可能較大的會被擺在前面，而後面的高頻成分從某個值開始後幾乎為零，以符號EOB(end of block)表示，指後面的高頻的部分經過量化(quantization)之後皆為0。
+
+===差分編碼(Differential coding)===
+此技術運用的是<u>'''空間上的一致性'''</u>。
+
+差分編碼指的是，除第一個元素外，將其中各元素都表示為各該元素與其前一元素的差的編碼。
+
+對<math>\operatorname{DC}[i,j] \,\!</math> ，是針對 <math>\operatorname{DC}[i,j] \,\!</math> - <math>\operatorname{DC}[i,j-1] \,\!</math> 去編碼，
+而不是直接對<math>\operatorname{DC}[i,j] \,\!</math>作編碼。
+
+===霍夫曼編碼(Huffman coding)===
+霍夫曼編碼(Huffman coding)的編碼原則：(Greedy Algorithm)
+*所有的碼皆在編碼樹(coding tree)的端點，再下去沒有分枝。滿足<u>'''唯一可解譯碼(uniquely decodable code)'''</u>與<u>'''即時可解碼(instantaneous decodable code)'''</u>。
+*機率越大的，編碼長度(code length)越短；機率越小的，編碼長度(code length)越長。
+*假設 <math> S_{\text{a}}\,\!</math> 是第L層的節點(node)，<math> S_{\text{b}}\,\!</math> 是第L+1層的節點(node)，則 <math>\operatorname{P}(S_{\text{a}})\,\!</math> >= <math>\operatorname{P}(S_{\text{b}})\,\!</math> 必須滿足。
+不滿足以上的條件則往上推一層。
+
+===算術編碼(Arithmetic coding)===
+霍夫曼編碼(Huffman coding)是將每一筆資料分開編碼，算術編碼(Arithmetic coding)則是將<u>'''多筆資料一起編碼'''</u>，因此壓縮效率比霍夫曼編碼(Huffman coding)更高，近年來的壓縮資料大多使用算術編碼(Arithmetic coding)。
+
+*範例：
+假設要對X來作二進位的編碼，且經過事先的估計，<math>\operatorname{X}[i]= a \,\!</math> 的機率為0.8，<math>\operatorname{X}[i]= b \,\!</math> 的機率為0.2。
+
+若實際上輸入的資料為 <math>\operatorname{X}= aaabaa \,\!</math>
+
+Initial(<math>\operatorname{X}[1]= a \,\!</math>)：lower =0，upper=0.8
+
+When i = 2 (<math>\operatorname{X}[2]= a \,\!</math>)：lower =0，upper=0.64
+
+When i = 3 (<math>\operatorname{X}[3]= a \,\!</math>)：lower =0，upper=0.512
+
+When i = 4 (<math>\operatorname{X}[4]= b \,\!</math>)：lower =0.4096，upper=0.512
+
+When i = 5 (<math>\operatorname{X}[5]= a \,\!</math>)：lower =0.4096，upper=0.49152
+
+When i = 6 (<math>\operatorname{X}[6]= a \,\!</math>)：lower =0.4096，upper=0.475136
+
+由於 lower =0.4096，upper=0.475136
+
+lower <= 14*<math>2^{-5} \,\!</math> < 15*<math>2^{-5} \,\!</math> <= upper
+
+所以編碼的結果為
+
+<math> 14_{\text{(2,5)}} = 01110\,\!</math> 
+
+==動態影像之編碼==
+MPEG(Moving Picture Experts Group)為動態影像編碼的國際標準。
+動態影像編碼的使用原理為：不同時間，同一個像素(pixel)之間的相關度通常極高，只需對有移動的物件(objects)記錄'''移動向量(motion vector)'''。
+
+<math>\operatorname{F}[m,n,t] \,\!</math> ：時間為t的影像
+
+如何由<math>\operatorname{F}[m,n,t]\,\!</math> ，<math>\operatorname{F}[m,n,t+delta] \,\!</math> 來預測 
+<math>\operatorname{F}[m,n,t+2*delta] \,\!</math>？
+
+(1)移動向量<math>\operatorname {V_{\text{x}}}[m,n] \,\!</math>，<math>\operatorname {V_{\text{y}}}[m,n] \,\!</math>
+
+(2)預測<math>\operatorname{F}[m,n,t+2*delta] \,\!</math>：
+
+<math>\operatorname{F_{\text{p}}}[m,n,t+2*delta] \,\!</math> = <math>\operatorname{F}[m- {V_{\text{x}}}[m,n] ,n- {V_{\text{y}}}[m,n],t+delta] \,\!</math>
+
+(3)計算「預測誤差」
+
+<math>\operatorname{E}[m,n,t+2*delta] \,\!</math> = <math>\operatorname{F}[m,n,t+2*delta] \,\!</math> - <math>\operatorname{F_{\text{p}}}[m,n,t+2*delta] \,\!</math>
+
+對預測誤差 <math>\operatorname{E}[m,n,t+2*delta] \,\!</math> 作編碼。
+
+==影像檔案的處理(Matlab)==
+===基本概念===
+*灰階影像在Matlab 當中是一個矩陣，彩色影像在Matlab 當中是三個矩陣，分別代表紅色(Red)、綠色(Green)、藍色(Blue)。
+
+.bmp: 沒有經過任何壓縮處理的圖檔
+
+.jpg: 有經過JPEG 壓縮的圖檔
+
+*要對影像做運算時，<u>'''要先變成double的格式'''</u>，否則電腦會預設影像為integer 的格式，在做浮點運算時會產生誤差。
+
+例如，若要對影像做2D離散傅立葉轉換(Discrete Fourier transform)：
+
+im=imread('C:\Program Files\MATLAB\pic\Pepper.bmp');
+
+im=double(im);
+
+Imf=fft2(im);
+
+===基本指令===
+*Image 檔讀取: imread
+*Image 檔顯示: imshow, image, imagesc
+*Image 檔製作: imwrite
+*Video 檔讀取: aviread
+
+===範例===
+*黑白影像
+im=double(imread('C:\Program Files\MATLAB\pic\Pepper.bmp'));
+
+(如果Pepper.bmp 是個灰階圖，im 將是一個矩陣)
+
+size(im);
+
+(用size 這個指令來看im 這個矩陣的大小)
+
+image(im);
+
+colormap(gray(256));
+
+*彩色影像
+im2=double(imread('C:\Program Files\MATLAB\pic\Pepper512c.bmp'));
+
+size(im2);
+
+(由於這個圖檔是個彩色的，所以im2 將由三個矩陣複合而成)
+
+==压缩方法==
+图像压缩可以是[[有损数据压缩|有损数据压缩]]也可以是[[无损数据压缩|无损数据压缩]]。常见的应用有raw和tiff格式等。gif和jpeg是有损压缩。通过DCT变换后选择性丢掉人眼不敏感的信号分量，实现高压缩比率。
+
+===无损压缩===
+对于如[[绘制|绘制]]的技术图、图表或者[[漫画|漫画]]，优先使用无损压缩，这是因为有损压缩方法，尤其是在低的位速条件下，将会带来[[压缩失真|压缩失真]]，如医疗图像或者用于存档的扫描图像……等，这些有价值的内容的压缩也尽量选择无损压缩方法。
+
+* [[游程编码|游程编码]]
+* [[熵編碼法|熵編碼法]]
+* 如[[LZW|LZW]]这样的自适应字典算法
+
+===有损压缩===
+有损方法非常适合于自然的图像，例如一些应用中图像的微小损失是可以接受的（有时是无法感知的），这样就可以大幅度地减小位速。
+
+* [[色彩空间|色彩空间]]：这是化减到图像中常用的颜色。所选择的颜色定义在压缩图像头的调色板中，图像中的每个像素都用调色板中颜色索引表示。这种方法可以与[[抖动|抖动]]一起使用以模糊颜色边界。
+* [[色度抽样|色度抽样]]：这利用了人眼对于亮度变化的敏感性远大于颜色变化，这样就可以将图像中的颜色信息减少一半甚至更多。
+* [[变换编码|变换编码]]：这是最常用的方法。首先使用如[[离散余弦变换|离散余弦变换]]（DCT）或者[[小波变换|小波变换]]这样的[[傅立叶相关变换|傅立叶相关变换]]，然后进行[[量化|量化]]和用[[熵編碼法|熵編碼法]]压缩。
+* [[分形压缩|分形压缩]]：
+
+==特性==
+图像压缩的目的就是在给定位速或者压缩比下实现最好的图像质量。但是，还有一些其它的图像压缩机制的重要特性：
+
+*可扩展编码 ：又稱渐进编码、嵌入式位流，通常表示操作位流和文件产生的质量下降（没有解压缩和再压缩）。尽管具有不同的特性，在无损编码中也有可扩展编码，它通常是使用粗糙到精细像素扫描的格式。尤其是在下载时预览图像（如浏览器中）或者提供不同的图像质量访问时（如在数据库中）可扩展编码非常有用，有几种不同类型的可扩展性：
+**质量渐进：又稱层渐进，位流渐进更新重建的图像。
+**分辨率渐进：首先在低分辨率编码图像，然后编码与高分辨率之间的差别。
+**成分渐进：首先编码灰度数据，然后编码彩色数据。
+
+*感兴趣区域编码：图像某些部分的编码质量要高于其它部分，这种方法可以与可扩展编码组合在一起（首先编码这些部分，然后编码其它部分）。
+*元数据信息：压缩数据可以包含关于图像的信息用来分类、查询或者浏览图像。这些信息可以包括颜色、纹理统计信息、小[[预览|预览]]图像以及作者和版权信息。
+
+压缩方法的质量经常使用[[峰值信噪比|峰值信噪比]]来衡量，峰值信噪比用来表示图象有损压缩带来的噪声。但是，观察者的主观判断也认为是一个重要的、或许是最重要的衡量标准。
+
+==参见==
+* [[數據壓縮|數據壓縮]]
+* [[图形文件格式|图形文件格式]]
+* [[数字信号处理|数字信号处理]]
+* [[图像处理|图像处理]]
+* [[计算机图形学|计算机图形学]]
+* [[萊娜圖|萊娜圖]]
+* [[标准测试图像|标准测试图像]]
+* 图像质量
+** [[峰值信噪比|峰值信噪比]]
+** [[结构相似度|结构相似度]]
+
+==參考文獻==
+Jian-Jiun Ding, “Advanced Digital Signal Processing”, NTU, 2021. 
+
+
+{{压缩方法}}
+{{Computer Science}}
+
+[[Category:图像处理|Category:图像处理]]
+
+[[Category:ITU-T建议书|Category:ITU-T建议书]]

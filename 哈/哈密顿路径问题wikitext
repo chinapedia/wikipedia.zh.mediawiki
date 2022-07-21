@@ -1,0 +1,208 @@
+{{Copy edit|time=2022-06-07T12:23:02+00:00}}
+{{translating|[[:en:Hamiltonian_path_problem|:en:Hamiltonian path problem]]||tpercent=95|time=2020-10-04}}
+[[File:Hamiltonian_path.svg|thumb]]上的[[哈密顿环|哈密顿环]]（红色）。]]
+
+[[图论|图论]]中的经典问题{{地區用詞|cn=哈密顿路径问题|tw=漢米頓路徑問題}}（'''Hamiltonian path problem'''）与{{地區用詞|cn=哈密顿环问题|tw=漢米頓環問題}}（'''Hamiltonian cycle problem'''）分别是来确定在一个给定的图上是否存在哈密顿路径（一条经过图上每个顶点的路径）和哈密顿环（一条经过图上每个顶点的环）。两个问题皆为[[NP完全|NP完全]]。<ref>{{Citation|author = [[Michael_R._Garey|Michael R. Garey]] and [[David_S._Johnson|David S. Johnson]] | year = 1979 | title = Computers and Intractability: A Guide to the Theory of NP-Completeness | publisher = W.H. Freeman | isbn = 978-0-7167-1045-5| title-link = Computers and Intractability: A Guide to the Theory of NP-Completeness }} A1.3: GT37–39, pp. 199–200.</ref>
+
+==哈密顿环问题与哈密顿路径问题之间的关系==
+哈密顿环问题与哈密顿路径问题之间有着很简单的关系：
+* 给定图<math>G</math> ,通过加入新顶点<math>v</math> 并将新顶点与所有其他顶点连接起来，我们得到了图<math>H</math>。 在图<math>G</math> 之上的哈密顿路径问题与在<math>H</math>之上的哈密顿环问题等价。因此寻找哈密顿路径的速度不可能比寻找哈密顿环的速度快很多。
+* 从另一个方向来看，给定图<math>G</math>，给定图上一个顶点<math>v</math>，通过加入新顶点给定图<math>v'</math>,并且让<math>v'</math>的邻居等于<math>v</math>的邻居，再增加两个[[度_(图论)|度]]为1的新顶点，并让他们分别与<math>v</math>和<math>v'</math>相连，得到图<math>H</math>，则图<math>G</math>上的哈密顿环问题与图<math>H</math>上的哈密顿路径问题等价。<ref>[https://math.stackexchange.com/q/1290804 Reduction from Hamiltonian cycle to Hamiltonian path]</ref>
+
+
+==算法==
+在一个阶数为<math>n</math>的图中，可能成为哈密顿路径的顶点序列最多有有<math>n</math>!个（在[[完全图|完全图]]的情况下恰好为<math>n</math>!个)，因此[[暴力搜索|暴力搜索]]所有可能的顶点序列是非常慢的。
+一个早期的在有向图上寻找哈密顿环的算法是Martello的枚举算法<ref>{{citation
+ | last = Martello | first = Silvano
+ | journal = [[ACM_Transactions_on_Mathematical_Software|ACM Transactions on Mathematical Software]]
+ | pages = 131–138
+ | title = An Enumerative Algorithm for Finding Hamiltonian Circuits in a Directed Graph
+ | volume = 9
+ | year = 1983
+ | doi = 10.1145/356022.356030
+ | issue = 1}}</ref> 
+由Frank Rubin<ref>{{citation
+ | last = Rubin | first = Frank
+ | journal = [[Journal_of_the_ACM|Journal of the ACM]]
+ | pages = 576–80
+ | title = A Search Procedure for Hamilton Paths and Circuits                         
+ | volume = 21
+ | year = 1974
+ | doi = 10.1145/321850.321854
+ | issue = 4}}</ref>
+提供的搜索过程将图的边分为3种类型：必须在路径上的边，不能在路径上的边，和未定边。在搜索的过程中，一个决策规则的集合将未定边进行分类，并且决定是否继续进行搜索。这个算法将图分成几个部分，在它们上问题能够被单独地解决。
+
+另外，[[Held-Karp_algorithm|Bellman, Held, and Karp]] 的[[动态规划|动态规划]] 算法可以在O(''n''<sup>2</sup> 2<sup>''n''</sup>)时间内解决问题。在这个方法中，对每个顶点集<math>S</math>和其中的每一个顶点<math>v</math> ，均做出如下的判定：是否有一条经过<math>S</math>中每个顶点，并且在<math>v</math>结束的路径，对于每一对<math>S</math>和<math>v</math>，当且仅当存在<math>v</math>的邻居<math>w</math>满足存在一条路径经过<math>S-v</math>的所有顶点，并在<math>w</math>上结束的路径时，存在路径经过<math>S</math>中每个顶点，并且在<math>v</math>结束。这个充要条件已经可以之前的动态规划计算中确认。<ref>{{citation
+ | last = Bellman | first = R. | authorlink = Richard Bellman
+ | doi = 10.1145/321105.321111
+ | journal = [[Journal_of_the_ACM|Journal of the ACM]]
+ | pages = 61–63
+ | title = Dynamic programming treatment of the travelling salesman problem
+ | volume = 9
+ | year = 1962}}.</ref><ref>{{citation
+ | last1 = Held
+ | first1 = M.
+ | last2 = Karp
+ | first2 = R. M.
+ | author2-link = Richard Karp
+ | doi = 10.1137/0110015
+ | issue = 1
+ | journal = J. SIAM
+ | pages = 196–210
+ | title = A dynamic programming approach to sequencing problems
+ | volume = 10
+ | year = 1962
+ | hdl = 10338.dmlcz/103900
+ | url = http://dml.cz/bitstream/handle/10338.dmlcz/103900/AplMat_26-1981-2_3.pdf
+ | accessdate = 2020-10-03
+ | archive-date = 2019-09-22
+ | archive-url = https://web.archive.org/web/20190922181930/https://dml.cz/bitstream/handle/10338.dmlcz/103900/AplMat_26-1981-2_3.pdf
+ | dead-url = no
+ }}.</ref>
+
+Andreas Björklund通过[[inclusion–exclusion_principle|inclusion–exclusion principle]]将哈密尔顿环的计数问题规约成一个更简单，圈覆盖的计数问题，后者可以被通过计算某些矩阵的行列式解决。通过这个方法，并通过[[蒙特卡洛算法|蒙特卡洛算法]]，对任意 <math>n</math>阶图，可以在O(1.657<sup>''n''</sup>)时间内解决。对于[[二分图|二分图]]，这个算法可以被进一步提升至[[Big_O_notation#Little-o_notation|o]](1.415<sup>''n''</sup>).<ref>{{citation
+ | last = Björklund | first = Andreas
+ | arxiv = 1008.0541
+ | contribution = Determinant sums for undirected Hamiltonicity
+ | doi = 10.1109/FOCS.2010.24
+ | pages = 173–182
+ | title = Proc. 51st IEEE Symposium on Foundations of Computer Science (FOCS '10)
+ | year = 2010
+ | isbn = 978-1-4244-8525-3}}.</ref>
+
+对于最大度小于等于3的图，一个回溯搜索的方法可以在 O(1.251<sup>''n''</sup>)时间内找到哈密顿环.<ref>{{citation
+ | last1 = Iwama | first1 = Kazuo
+ | last2 = Nakashima | first2 = Takuya
+ | contribution = An improved exact algorithm for cubic graph TSP
+ | doi = 10.1007/978-3-540-73545-8_13
+ | pages = 108–117
+ | series = Lecture Notes in Computer Science
+ | title = Proc. 13th Annual International Conference on Computing and Combinatorics (COCOON 2007)
+ | volume = 4598
+ | year = 2007
+ | isbn = 978-3-540-73544-1
+ }}.</ref>
+
+哈密顿环和哈密顿路径也可以通过[[SAT_solver|SAT solver]]找到.
+
+
+==复杂度==
+哈密顿环和哈密顿路径问题是[[FNP_(complexity)|FNP]]问题，它的[[决定性问题|决定性问题]] 是检测是否存在一条哈密顿环或哈密顿路径。有向图和无向图上的哈密顿环问题是 [[卡普的二十一个NP-完全问题|卡普的二十一个NP-完全问题]]中的其中两个。对于一些特殊类型的图来说，它们仍然是NP完全的。例如：
+
+* [[二分图|二分图]],<ref>{{Cite web|url=https://cs.stackexchange.com/q/18335 |title=Proof that the existence of a Hamilton Path in a bipartite graph is NP-complete|website=Computer Science Stack Exchange|access-date=2019-03-18}}</ref>
+* 最大度为3的无向[[平面图|平面图]],<ref>{{citation
+ | last1 = Garey | first1 = M. R. | author1-link = Michael Garey
+ | last2 = Johnson | first2 = D. S. | author2-link = David S. Johnson
+ | last3 = Stockmeyer | first3 = L. | author3-link = Larry Stockmeyer
+ | contribution = Some simplified NP-complete problems
+ | doi = 10.1145/800119.803884
+ | pages = 47–63
+ | title = Proc. 6th ACM Symposium on Theory of Computing (STOC '74)
+ | year = 1974}}.</ref> 
+* 入度和出度最大为2的有向平面图,<ref>{{citation
+ | last = Plesńik
+ | first = J.
+ | issue = 4
+ | journal = [[Information_Processing_Letters|Information Processing Letters]]
+ | pages = 199–201
+ | title = The NP-completeness of the Hamiltonian cycle problem in planar digraphs with degree bound two
+ | url = http://www.aya.or.jp/~babalabo/DownLoad/Plesnik%208.4.192-196.pdf
+ | volume = 8
+ | year = 1979
+ | doi = 10.1016/0020-0190(79)90023-1
+ | accessdate = 2020-10-03
+ | archive-date = 2020-11-25
+ | archive-url = https://web.archive.org/web/20201125165140/http://www.aya.or.jp/~babalabo/DownLoad/Plesnik%208.4.192-196.pdf
+ | dead-url = no
+ }}.</ref> 
+* [[桥（图论）|无桥]]的无向的平面3-正则二分图， 
+* 3-顶点连通，3-正则的二分图，<ref>{{citation
+ | last1 = Akiyama | first1 = Takanori
+ | last2 = Nishizeki | first2 = Takao | author2-link = Takao Nishizeki
+ | last3 = Saito | first3 = Nobuji
+ | issue = 2
+ | journal = Journal of Information Processing
+ | mr = 596313
+ | pages = 73–76
+ | title = NP-completeness of the Hamiltonian cycle problem for bipartite graphs
+ | url = 
+ | volume = 3
+ | year = 1980–1981}}.</ref> 
+* [[Lattice_graph#Square_grid_graph|square grid graph]]的子图,<ref>{{citation
+ | last1 = Itai | first1 = Alon
+ | last2 = Papadimitriou | first2 = Christos
+ | last3 = Szwarcfiter | first3 = Jayme
+ | issue = 11
+ | journal = [[SIAM_Journal_on_Computing|SIAM Journal on Computing]]
+ | pages = 676–686
+ | title = Hamilton Paths in Grid Graphs
+ | doi = 10.1137/0211056
+ | volume = 4
+ | year = 1982}}.</ref> 
+* square grid graph的3-正则子图.<ref>{{citation
+ | last = Buro
+ | first = Michael
+ | contribution = Simple Amazons endgames and their connection to Hamilton circuits in cubic subgrid graphs
+ | contribution-url = http://skatgame.net/mburo/ps/amaend.pdf
+ | title = Conference on Computers and Games
+ | volume = 2063
+ | pages = 250–261
+ | year = 2000
+ | doi = 10.1007/3-540-45579-5_17
+ | series = Lecture Notes in Computer Science
+ | isbn = 978-3-540-43080-3
+ | accessdate = 2020-10-03
+ | archive-date = 2020-11-06
+ | archive-url = https://web.archive.org/web/20201106232927/https://skatgame.net/mburo/ps/amaend.pdf
+ | dead-url = no
+ }}.</ref>
+
+然而，对于某些类型的图，哈密顿环和哈密顿路径问题可以在多项式时间内解决：
+* 根据Tutte的结论，[[k-vertex-connected_graph|4-顶点连通]] 平面图总是存在哈密顿环，并且可以在线性时间内找到哈密顿环。<ref>{{citation
+ | last1 = Chiba| first1 = Norishige
+ | last2 = Nishizeki| first2 = Takao
+ | title = The Hamiltonian cycle problem is linear-time solvable for 4-connected planar graphs
+ | doi = 10.1016/0196-6774(89)90012-6
+ | pages = 187–211
+ | journal = Journal of Algorithms
+ | volume = 10
+ | issue = 2
+ | year = 1989}}</ref> by computing a so-called [[Tutte_path|Tutte path]]. 
+* Tutte通过证明2-正则平面图包含Tutte路径，证明了以上的结论。对2-正则平面图来说，其Tutte路径可以在平方时间内找到，<ref>{{citation
+ | last1 = Schmid| first1 = Andreas
+ | last2 = Schmidt| first2 = Jens M.
+ | contribution = Computing Tutte Paths
+ | title = Proceedings of the 45th International Colloquium on Automata, Languages and Programming (ICALP'18), to appear.
+ | year = 2018
+}}</ref>, 这可能可以被用来寻找一般平面图上的哈密顿环和较长的环。
+
+将以上提供的条件汇总起来，3-正则，3-定点连通的二分图是否总是存在哈密顿环这一问题仍然是开放的,在这个情况下这一问题不是NP完全的，详见 [[Barnette's_conjecture|Barnette's conjecture]].
+
+在所有顶点的度都是奇数的途中，一个与握手引理有关的结论说明对于任意一条边来说，经过它的哈密顿环的个数总是偶数，因此如果存在一条哈密顿环，则一定存在另一条 <ref>{{citation
+ | last = Thomason
+ | first = A. G.
+ | contribution = Hamiltonian cycles and uniquely edge colourable graphs
+ | doi = 10.1016/S0167-5060(08)70511-9
+ | mr = 499124
+ | pages = [https://archive.org/details/advancesingrapht0000camb/page/259 259–268]
+ | series = Annals of Discrete Mathematics
+ | title = Advances in Graph Theory (Cambridge Combinatorial Conf., Trinity College, Cambridge, 1977)
+ | volume = 3
+ | year = 1978
+ | isbn = 9780720408430
+ | url = https://archive.org/details/advancesingrapht0000camb/page/259
+ }}.</ref> 然而，找到第二条哈密顿换并不是一个简单的计算问题。[[Christos_Papadimitriou|Papadimitriou]]定义了一个 复杂性类[[复杂性类|复杂性类]] [[PPA_(complexity)|PPA]]来描述这一类问题。 <ref>{{citation | last = Papadimitriou| first = Christos H.| author-link = Christos Papadimitriou | doi = 10.1016/S0022-0000(05)80063-7
+| issue = 3
+| journal = [[Journal_of_Computer_and_System_Sciences|Journal of Computer and System Sciences]]
+| pages = 498–532
+| title = On the complexity of the parity argument and other inefficient proofs of existence
+| volume = 48
+| year = 1994 | mr = 1279412
+}}.</ref>
+
+==外部連結==
+
+* Hamiltonian Page : [https://web.archive.org/web/20070708164450/http://www.densis.fee.unicamp.br/~moscato/Hamilton.html Hamiltonian cycle and path problems, their generalizations and variations]
+
+[[Category:圖論|Category:圖論]]
+[[Category:NP完全问题|Category:NP完全问题]]

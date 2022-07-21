@@ -1,0 +1,3 @@
+{{#ifeq:{{{exclude}}}|2||{{NYCS time 2|2|icon=weekdaysnights|text=僅平日和平日深夜停站|time={{{time|}}}}} {{NYCS br|time={{{time|}}}}}}} {{#ifeq:{{{exclude}}}|3||{{NYCS time 2|3|icon=weekdaysonly|text=僅平日停站|time={{{time|}}}}} {{NYCS br|time={{{time|}}}}}}} {{#ifeq:{{{exclude}}}|4||{{NYCS time 2|4|icon=nightsweekends|text=僅深夜和週末停站|time={{{time|}}}}} {{NYCS br|time={{{time|}}}}}}} {{#ifeq:{{{exclude}}}|5||{{NYCS time 2|5|icon=weekendsnights|text=僅週末和週末深夜停站|time={{{time|}}}}}}}<noinclude>
+[[Category:紐約地鐵模板|{{PAGENAME}}]]
+</noinclude>

@@ -1,0 +1,138 @@
+{{noteTA
+|G1=IT
+}}
+{{lowercase|title=ext3}}
+{{infobox filesystem
+| name = ext3
+| full_name = 第三代扩展文件系统
+| developer = [[Stephen_Tweedie|Stephen Tweedie]]
+| introduction_os = [[Linux|Linux]] 2.4.15
+|variants=| introduction_date = 2001年11月
+| partition_id = 0x83（[[主引导记录|MBR]]）<br /> EBD0A0A2-B9E5-4433-87C0-68B6B72699C7（[[全局唯一標識分區表|GPT]]）
+| directory_struct = 表，树
+| file_struct = 位图（空闲区域），表（元数据）
+| bad_blocks_struct = 表
+| max_filename_size = 255字节
+| max_files_no = 可变<ref>最大i节点（并且之后作为文件和目录的最大数量）数目在文件系统创建时确定。如果''V''是卷的大小（字节数），则默认的i节点数量位''V''/2<sup>13</sup>（或块的数量，以最小的为准），且最小为''V'/2<sup>23</sup>。绝大多数应用程序认为默认值已经足够了。</ref>
+| max_volume_size = 4[[tebibyte|TiB]] – 32[[tebibyte|TiB]]
+| max_file_size = 16[[gibibyte|GiB]] – 2[[tebibyte|TiB]]
+| filename_character_set = 除NULL和'/'外的所有字节
+| dates_recorded = 修改（mtime），属性修改（ctime），访问（atime）
+| date_range = 1901年12月14日－2038年1月18日
+| date_resolution = 1秒
+| forks_streams = 是
+| attributes = No-atime, append-only, synchronous-write, no-dump, h-tree (directory), immutable, journal, secure-delete, top (directory), allow-undelete
+| file_system_permissions = Unix权限，[[访问控制列表|ACLs]]和arbitrary security attributes（Linux 2.6 and later）
+| compression = 否
+| encryption = 否（块设备级上提供）
+| OS = [[Linux|Linux]]、[[BSD|BSD]]、[[Windows|Windows]]（通过[[可安装文件系统|IFS]]或[[Ext2Fsd|Ext2Fsd]]）
+}}
+'''第三代扩展文件系统'''（{{lang-en|Third extended filesystem}}，縮寫為'''ext3'''），是一个[[日志文件系统|日志文件系统]]，常用于[[Linux操作系统|Linux操作系统]]。它是很多[[Linux发行版|Linux发行版]]的默认[[文件系统|文件系统]]。[[Stephen_Tweedie|Stephen Tweedie]]在1999年2月的内核邮件列表<ref>{{cite web | url=http://marc.info/?l=linux-kernel&m=91926557602501&w=2 | title=Re: fsync on large files | author=Stephen C. Tweedie | year=February 17, 1999 | work=Linux kernel mailing list | access-date=2007-09-01 | archive-date=2021-02-25 | archive-url=https://web.archive.org/web/20210225083445/https://marc.info/?l=linux-kernel&m=91926557602501&w=2 }}</ref>中，最早显示了他使用扩展的[[ext2|ext2]]，该文件系统从2.4.15版本的内核开始，合并到内核主线中<ref>{{cite web | url=http://marc.info/?l=linux-kernel&m=100650331813822&w=2 | title=2.4.15-final | author=Rob Radez | year=November 23, 2001 | work=Linux kernel mailing list | accessdate=2007-09-01 | archive-date=2011-08-26 | archive-url=https://www.webcitation.org/61Dfpe6zn?url=http://marc.info/?l=linux-kernel | dead-url=no }}</ref>。
+
+== 优势 ==
+虽然它的性能（速度）不如它的竞争对手，例如[[JFS文件系统|JFS2]]，[[ReiserFS|ReiserFS]]和[[XFS|XFS]]，但它具有重要的优势，那就是它允许在适当的时候从流行的[[ext2|ext2]]文件系统升级，而无需[[备份|备份]]和恢复数据；除此之外，它还具有比[[ReiserFS|ReiserFS]]和[[XFS|XFS]]更低的的[[CPU使用率|CPU使用率]][http://linuxgazette.net/122/TWDT.html#piszcz]{{Wayback|url=http://linuxgazette.net/122/TWDT.html#piszcz |date=20070824181600 }} 。
+
+ext3文件系统增加的超越其前代的包括：
+* [[日志文件系统|日志]]
+* 位目录跨越多个块提供基于树的目录索引
+* 在线系统增长
+如果没有这些，ext3文件系统也同时是个有效的ext2文件系统。这样，经过良好测试的、成熟的文件系统工具来管理和修复ext2文件系统工具，可以无需大的变动，就应用于ext3文件系统。ext2和ext3文件系统共享相同的工具集，带有[[fsck|fsck]]工具的[[e2fsprogs|e2fsprogs]]。这种紧密的联系也将两种文件系统之间进行转换（包括升级到ext3和降级为ext2）变得非常容易。
+
+Linux实现的ext3文件系统，包括3个级别的日志：
+*日记：（慢，但风险小）元数据和文件内容都在提交到主文件系统前写入。这样将提高稳定性但性能上有所损失，因为所有的数据都要写入2次。如果没有在/etc/fstab中加上这个选项，修改中的档案遇上[[kernel_panic|kernel panic]]或突然断电的时候就可能发生损毁的情况，当然，这还是得看软体是怎么写入档案的。
+
+*顺序：（中速，中等风险）顺序和''写回''类似，但在对应的元数据标记为提交前，强制写入文件内容。这是很多Linux发行版默认的方式。
+
+*回写：（快，但风险最大；在某种感觉上和ext2相当）这边会写入日志的只有metadata而已，档案的内容并不会跟著写入日志里面。这样的作法让整个效率变快了不少，不过也同样造成了档案写入时不按顺序的结果。举例来说，档案在附加变大的同时发生了crash的情况，就可能造成下次挂载时档案后面就附加一堆垃圾数据的情况。
+
+尽管ext3缺少一些当代文件系统的特点，像是动态的[[inode|inode]]、树状的资料储放结构等等，都是被视作ext3的缺点之一，不过在这些特点之外，ext3在文件系统回复上面就有了很好的表现。跟树状结构的文件系统相比，在ext3上面metadata是放在固定的位置，而且在写入的同时会重复写入的一些资料让ext2/3在面临资料损毁的情况下还有挽回的机会。
+
+== 劣势 ==
+=== 功能 ===
+当初ext3的设计目标就是提供对於[[ext2|ext2]]的高度相容，很多磁盘上的结构和都和[[ext2|ext2]]很相似。也因为这样，ext3缺乏很多最新设计中的功能，例如动态分配inode和可变块大小（frags或tails）。
+
+ext3文件系统在被挂载为写入的时候，是不能进行[[fsck|fsck]]的。ext3档案系统的倾倒作业在这个档案系统还是挂载中的时候执行可能会造成资料的损坏。
+
+ext3不支持在其他文件系统上已经支持（例如：[[JFS_(文件系统)|JFS2]]和[[ext4|ext4]]）的[[扩展_(文件系统)|扩展]]。
+
+=== 磁盘碎片 ===
+在文件系统级别上，没有在线的ext3[[磁盘碎片整理|磁盘碎片整理]]工具。
+
+离线的ext2磁盘碎片整理工具<code>e2defrag</code>，可以用于ext3文件系统，但前提是在使用前要将文件系统转换回ext2。但依赖于功能位在文件系统中打开，<code>e2defrag</code>可能会毁灭数据；目前仍然不知道如何处理新的ext3功能。<ref>{{cite web|url=http://marc.info/?l=ext3-users&m=116231468911590&w=2|title=Post to the ext3-users mailing list（英文）|author=Andreas Dilger|work=ext3-users mailing list post|access-date=2007-09-01|archive-date=2021-02-24|archive-url=https://web.archive.org/web/20210224231824/https://marc.info/?l=ext3-users&m=116231468911590&w=2}}</ref>
+
+有一些用户使用的磁盘碎片整理工具，例如Shake[http://vleu.net/shake/]{{Wayback|url=http://vleu.net/shake/ |date=20070912175036 }} 和defrag[http://ck.kolivas.org/apps/defrag/]{{Wayback|url=http://ck.kolivas.org/apps/defrag/ |date=20110721214727 }}，这些工具通过复制文件来实现新分配的文件不存在碎片。但这只在文件系统相当空的情况下有效，并且该文件系统不经常出现碎片。目前没有真正的用于ext3的磁盘碎片整理工具[http://www.redhat.com/archives/ext3-users/2005-March/msg00013.html]{{Wayback|url=http://www.redhat.com/archives/ext3-users/2005-March/msg00013.html |date=20071012013211 }} 。
+
+事实上，磁盘碎片整理完全是一种人们在[[单用户|单用户]][[单进程|单进程]]环境下（如DOS／早期Windows）工作时养成的旧习。
+
+在多任务环境下，磁盘碎片的出现根本是不可避免的，而且碎片化的速度非常之快。操作系统的任务不是不负责任地给用户提供一个整理工具，而是应该在系统设计的时候消除碎片化对性能的伤害。比如[[Linux|Linux]]的[[块设备|块设备]]操作都要经过一个'''I/O调度层'''，通过在调度层中使用带有[[电梯算法|电梯算法]]的调度策略来消除碎片对性能的影响。
+
+另外，如果将来[[固态硬盘|固态硬盘]]普及乃至取代传统硬盘，也会让磁盘碎片的概念成为历史。
+
+=== 反删除 ===
+和ext2不同，ext3会在删除文件时把文件的节点（inode）中的块指标清除。这样做可以在unclean载入文件系统后，重放日志时，可以减少对文件系统的访问。但也同样也增加了文件在反删除上面的困难。用户唯一的补救是在硬盘中捞取数据，并且要知道文件的起始到结束的块指标。尽管提供了比ext2在删除文件上稍微高一些的安全性，却也无可避免的带来了不便之处。
+
+=== 压缩 ===
+Ext3不支持透明[[数据压缩|压缩]]（Ext2以非官方补丁支持）。
+
+=== 大小限制 ===
+ext3有一个相对较小的对于单个文件和整个文件系统的最大尺寸。这些限制依赖于文件系统的块大小；下面的表格总结了这些限制<ref>{{cite web|url=http://www.charmed.com/txt/ext2.txt|title=Documentation/filesystems/ext2.txt|author=Matthew Wilcox|work=Linux kernel source documentation|deadurl=yes|archiveurl=https://web.archive.org/web/20070824163241/http://www.charmed.com/txt/ext2.txt|archivedate=2007-08-24|accessdate=2007-09-01}}</ref>：
+
+{| class="wikitable"
+|-
+! 區塊大小
+! 最大檔案容量
+! 最大檔案系統容量
+|-
+| 1[[kibibyte|KiB]]
+| 16[[gibibyte|GiB]]
+| 2[[tebibyte|TiB]]
+|-
+| 2[[kibibyte|KiB]]
+| 256[[gibibyte|GiB]]
+| 8[[tebibyte|TiB]]
+|-
+| 4[[kibibyte|KiB]]
+| 2[[tebibyte|TiB]]
+| 16[[tebibyte|TiB]]
+|-
+| 8[[kibibyte|KiB]]<ref group="limits">8[[Kibibyte|KiB]]块，只能用于允许8[[Kibibyte|KiB]]页面的架构（例如[[DEC_Alpha|alpha]]）。</ref>
+| 2[[tebibyte|TiB]]
+| 32[[tebibyte|TiB]]
+|}
+
+<references group="limits" />
+
+=== 日志中没有校验和 ===
+Ext3在写入日志时，并不做[[校验和|校验和]]。如果barrier=1没有作为加载参数（在文件/etc/fstab），并且如果硬件在无次序的写入缓存，在崩溃时会严重损坏文件系统<ref>{{Cite web |url=http://archives.free.net.ph/message/20070518.134838.52e26369.en.html |title=存档副本 |accessdate=2007-09-01 |archive-date=2007-09-28 |archive-url=https://web.archive.org/web/20070928031902/http://archives.free.net.ph/message/20070518.134838.52e26369.en.html |dead-url=no }}</ref><ref>{{Cite web |url=http://archives.free.net.ph/message/20070519.014256.ac3a2e07.en.html |title=存档副本 |accessdate=2007-09-01 |archive-date=2007-09-28 |archive-url=https://web.archive.org/web/20070928031908/http://archives.free.net.ph/message/20070519.014256.ac3a2e07.en.html |dead-url=no }}</ref>（该选项在大多数流行的Linux发行版中都没有被启用，所以大多数发行版的处境都很危险。）
+
+考虑下面的情况：如果硬盘无序的做写入操作（因为现在的硬盘都使用缓存机制以便[[摊销分析|摊销]]写入速度），那么有可能出现在写入处理的提交块时，其他的相关的块已经被写入了。如果电源掉电、内核panic出现在其他块写入前，那么系统将必须重启。在重启后，文件系统将按照正常方式重演日志，并且重演“优胜者”（具有提交块的处理，包括上面无效的但被标记为有效的提交块的处理）。于是，上面没有完成的磁盘写入将处理，但使用已经损坏的日志数据。''文件系统在重演日志的时候，将错误的使用已经损坏的数据覆盖正常数据。''如果使用[[校验和|校验和]]（如果假的“优胜者”处理被标记为互斥的校验和），文件系统会处理的更好，并且不会在磁盘上重演错误的数据。截止到2007年6月24日，已经有补丁来修复这个问题。
+
+== Ext4dev / Ext4 ==
+{{main|ext4}}
+2006年10月10日发布了一个增强版本的文件系统，使用[[ext4|ext4]]作为名称。该文件系统包含很多新的功能。
+
+== 注释和引用 ==
+<div class="references-small">
+<references/>
+</div>
+
+== 参考 ==
+*[[ext2|ext2]]
+*[[ext4|ext4]]
+*[[List_of_file_systems|List of file systems]]
+*[[Comparison_of_file_systems|Comparison of file systems]]
+
+== 外部链接 ==
+*[http://batleth.sapienti-sat.org/projects/FAQs/ext3-faq.html Linux ext3 FAQ]{{Wayback|url=http://batleth.sapienti-sat.org/projects/FAQs/ext3-faq.html |date=20110719134357 }}
+*[http://www-128.ibm.com/developerworks/linux/library/l-fs7.html Introducing ext3 - IBM developerWorks Advanced filesystem implementor's guide, Part 7]{{Wayback|url=http://www-128.ibm.com/developerworks/linux/library/l-fs7.html |date=20070223065619 }}
+*[http://sourceforge.net/projects/ext2fsd Ext2 File System For Windows]{{Wayback|url=http://sourceforge.net/projects/ext2fsd |date=20070829101756 }} GPL ext2/ext3 file system driver for Windows NT/2000/XP/Vista（opensource, supports read & write, supports 2K/XP/VISTA on X86/AMD64）
+*[http://www.fs-driver.org/ Ext2 Installable File System For Windows]{{Wayback|url=http://www.fs-driver.org/ |date=20070827003812 }} ext2/ext3 file system driver for MS Windows NT/2000/XP（freeware, supports read & write on Windows NT4.0/2000/XP/2003 on x86 processors only）
+*[https://web.archive.org/web/20070829085513/http://uranus.it.swin.edu.au/~jn/linux/ext2ifs.htm EXT2 IFS] ext2/ext3 file system driver for MS Windows NT/2000/XP（opensource, doesn't support writing, doesn't support Windows XP SP2 or Windows Vista）
+*[http://www.chrysocome.net/explore2fs Explore2fs]{{Wayback|url=http://www.chrysocome.net/explore2fs |date=20070909031145 }} An explorer-like GUI tool for accessing ext2/ext3 filesystems under MS Windows
+*[http://ext2resize.sourceforge.net/ ext2/ext3 resizing tools]{{Wayback|url=http://ext2resize.sourceforge.net/ |date=20070824043052 }}
+*[http://olstrans.sourceforge.net/release/OLS2000-ext3/OLS2000-ext3.html Presentation on EXT3 Journaling Filesystem]{{Wayback|url=http://olstrans.sourceforge.net/release/OLS2000-ext3/OLS2000-ext3.html |date=20070826093617 }} by Dr. Stephen Tweedie at the Ottawa Linux Symposium, 20 July, 2000
+
+[[Category:磁盘文件系统|Category:磁盘文件系统]]
+[[Category:Linux檔案系統|Category:Linux檔案系統]]
+
+{{Filesystem}}

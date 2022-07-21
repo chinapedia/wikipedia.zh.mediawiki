@@ -1,0 +1,1 @@
+<includeonly>{{#invoke:Infobox military conflict|main}}</includeonly><noinclude>{{documentation}}</noinclude>

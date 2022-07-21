@@ -1,0 +1,1 @@
+#REDIRECT [[Template:有争议的地区小作品]]

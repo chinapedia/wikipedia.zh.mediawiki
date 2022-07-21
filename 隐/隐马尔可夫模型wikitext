@@ -1,0 +1,161 @@
+{{refimprove|time=2015-07-03T14:46:34+00:00}}
+{{noteTA|G1=Math|G2=IT}}
+{{机器学习导航栏}}
+[[File:Hmm.png|right|thumb|300px|
+隐马尔可夫模型状态变迁图（例子）<br>
+''x'' — 隐含状态<br>
+''y'' — 可观察的输出<br>
+''a'' — 转换概率（transition probabilities）<br>
+''b'' — 输出概率（output probabilities）]]
+'''隐马尔可夫模型'''（{{lang|en|Hidden Markov Model}}；[[縮寫|縮寫]]：{{lang|en|'''HMM'''}}）或稱作'''-{zh-cn:隐性马尔可夫模型;zh-tw:隱性馬可夫模型}-'''，是[[统计|统计]][[模型|模型]]，它用来描述一个含有隐含未知参数的[[马尔可夫过程|马尔可夫过程]]。其难点是从可观察的参数中确定该过程的隐含参数。然后利用这些参数来作进一步的分析，例如[[模式识别|模式识别]]。
+
+在'''正常的'''马尔可夫模型中，状态对于观察者来说是直接可见的。这样状态的转换概率便是全部的参数。而在隐马尔可夫模型中，状态并不是直接可见的，但受状态影响的某些变量则是可见的。每一个状态在可能输出的符号上都有一[[概率分布|概率分布]]。因此输出符号的序列能够透露出状态序列的一些信息。
+
+== 马尔可夫模型的演化 ==
+
+下边的图示强调了HMM的状态变迁。有时，明确的表示出模型的演化也是有用的，我们用 ''x''(''t''<sub>1</sub>) 与 ''x''(''t''<sub>2</sub>) 来表达不同时刻 ''t''<sub>1</sub> 和 ''t''<sub>2</sub> 的状态。
+
+圖中箭頭方向則表示不同資訊間的關聯性，因此可以得知<math>x(t)</math>和<math>x(t-1)</math>有關，而<math>x(t-1)</math>又和<math>x(t-2)</math>有關。
+
+而每個<math>y(t)</math>只和<math>x(t)</math>有關，其中<math>x(t)</math>我們稱為隱藏變數（hidden variable），是觀察者無法得知的變數。
+
+隱性馬可夫模型常被用來解決有未知條件的數學問題。
+
+假設隱藏狀態的值對應到的空間有<math>N</math>個元素，也就是說在時間<math>t</math>時，隱藏狀態會有<math>N</math>種可能。
+
+同樣的，<math>t+1</math>也會有<math>N</math>種可能的值，所以從<math>t</math>到<math>t+1</math>間的關係會有<math>N^2</math>種可能。
+
+除了<math>x(t)</math>間的關係外，每組<math>x(t),y(t)</math>間也有對應的關係。
+
+若觀察到的<math>y(t)</math>有<math>M</math>種可能的值，則从<math>x(t)</math>到<math>y(t)</math>的输出模型复杂度為<math>O(NM)</math>。如果<math>y(t)</math>是一个<math>M</math>维的向量，则从<math>x(t)</math>到<math>y(t)</math>的输出模型复杂度為<math>O(NM^2)</math>。
+
+<center>
+[[File:Hmm_temporal_bayesian_net.svg|center]]
+</center>
+
+在这个图中,每一个时间块（''x''(''t''), ''y''(''t'')）都可以向前或向后延伸。通常，时间的起点被设置为''t''=0 或 ''t''=1.
+
+==马尔可夫模型的機率==
+
+假設觀察到的結果為<math>Y</math>
+
+<math>Y=y(0),y(1),...,y(L-1)</math>
+
+隱藏條件為<math>X</math>
+
+<math>X=x(0),x(1),...,x(L-1)</math>
+
+長度為<math>L</math>，則馬可夫模型的機率可以表達為：
+
+<math>P(Y)=\sum_{X}P(Y\mid X)P(X)\,</math>
+
+由這個機率模型來看，可以得知馬可夫模型將該時間點前後的資訊都納入考量。
+
+==使用隐马尔可夫模型==
+
+HMM有三个典型(canonical)问题:
+* 预测(filter)：已知模型参数和某一特定输出序列，求最后时刻各个隐含状态的概率分布，即求 <math> P(x(t)\ |\ y(1),\dots ,y(t))</math>. 通常使用[[前向算法|前向算法]]解决.
+* 平滑(smoothing)：已知模型参数和某一特定输出序列，求中间时刻各个隐含状态的概率分布，即求 <math> P(x(k)\ |\ y(1),\dots ,y(t)), k<t</math>. 通常使用[[前向-后向算法|前向-后向算法]]解决.
+* 解码(most likely explanation): 已知模型参数，寻找最可能的能产生某一特定输出序列的隐含状态的序列. 即求 <math> P( [x(1) \dots x(t)]  |  [y(1) \dots ,y(t)] ), </math>, 通常使用[[维特比算法|Viterbi算法]]解决.
+
+{{fact|
+此外，已知输出序列，寻找最可能的状态转移以及输出概率.通常使用[[Baum-Welch算法|Baum-Welch算法]]以及{{tsl|en|Viterbi algorithm|}}解决.
+另外,最近的一些方法使用{{tsl|en|Junction tree algorithm|联结树算法}}来解决这三个问题。
+}}
+
+=== 具体实例 ===
+
+假设你有一个住得很远的朋友，他每天跟你打电话告诉你他那天做了什么。你的朋友仅仅对三种活动感兴趣：公园散步，购物以及清理房间。他选择做什么事情只凭天气。你对于他所住的地方的天气情况并不了解，但是你知道总的趋势。在他告诉你每天所做的事情基础上，你想要猜测他所在地的天气情况。
+
+你认为天气的运行就像一个[[马尔可夫链|马尔可夫链]]。其有两个状态「雨」和「晴」，但是你无法直接观察它们，也就是说，它们对于你是隐藏的。每天，你的朋友有一定的概率进行下列活动：「散步」、「购物」、「清理」。因为你朋友告诉你他的活动，所以这些活动就是你的观察数据。这整个系统就是一个隐马尔可夫模型（HMM）。
+
+你知道这个地区的总的天气趋势，并且平时知道你朋友会做的事情。也就是说这个隐马尔可夫模型的参数是已知的。你可以用程序语言（Python）写下来：
+<syntaxhighlight lang="python">
+ states = ('Rainy', 'Sunny')
+ 
+ observations = ('walk', 'shop', 'clean')
+ 
+ start_probability = {'Rainy': 0.6, 'Sunny': 0.4}
+ 
+ transition_probability = {
+    'Rainy' : {'Rainy': 0.7, 'Sunny': 0.3},
+    'Sunny' : {'Rainy': 0.4, 'Sunny': 0.6},
+    }
+ 
+ emission_probability = {
+    'Rainy' : {'walk': 0.1, 'shop': 0.4, 'clean': 0.5},
+    'Sunny' : {'walk': 0.6, 'shop': 0.3, 'clean': 0.1},
+    }
+</syntaxhighlight>
+在这些代码中,<code>start_probability</code>代表了你对于你朋友第一次给你打电话时的天气情况的不确定性（你知道的只是那个地方平均起来下雨多些）。在这里，这个特定的概率分布并非平衡的，平衡概率应该接近（在给定变迁概率的情况下）<code>{'Rainy': 0.571, 'Sunny': 0.429}</code>。
+<code>transition_probability</code> 表示基于马尔可夫链模型的天气变迁，在这个例子中，如果今天下雨，那么明天天晴的概率只有30%。代码<code>emission_probability</code> 表示了你朋友每天做某件事的概率。如果下雨，有50% 的概率他在清理房间；如果天晴，则有60%的概率他在外头散步。
+
+这个例子在[[维特比算法|维特比算法]]页上有更多的解释。
+
+===隐马尔可夫模型的应用===
+* [[语音识别|语音识别]]、[[中文自动分词|中文斷詞/分詞]]或[[光学字符识别|光学字符识别]]
+* [[机器翻译|机器翻译]]
+* [[生物信息学|生物信息学]] 和 [[基因组学|基因组学]]
+** 基因组序列中蛋白质编码区域的预测
+** 对于相互关联的DNA或蛋白质族的建模
+** 从基本结构中预测第二结构元素
+**通信中的译码过程
+**地图匹配算法
+* ''还有更多...''
+
+===隐马尔可夫模型在語音處理上的應用===
+
+因為馬可夫模型有下列特色：
+ 
+* 時間點<math>t</math>的隱藏條件和時間點<math>t-1</math>的隱藏條件有關。因為人類語音擁有前後的關聯，可以從語義與發音兩點來看：
+:#單字的發音擁有前後關聯：例如"They are"常常發音成"They're"，或是"Did you"會因為"you"的發音受"did"的影響，常常發音成"did ju"，而且語音辨識中用句子的發音來進行分析，因此需要考慮到每個音節的前後關係，才能夠有較高的準確率。
+:#句子中的單字有前後關係：從英文文法來看，主詞後面常常接助動詞或是動詞，動詞後面接的會是受詞或介係詞。而或是從單一單字的使用方法來看，對應的動詞會有固定使用的介係詞或對應名詞。因此分析語音訊息時需要為了提升每個單字的準確率，也需要分析前後的單字。
+
+* 馬可夫模型將輸入訊息視為一單位一單位，接著進行分析，與人類語音模型的特性相似。語音系統辨識的單位為一個單位時間內的聲音。利用梅爾倒頻譜等語音處理方法，轉換成一個發音單位，為離散型的資訊。而馬可夫模型使用的隱藏條件也是一個個被封包的<math>x(t)</math>，因此使用馬可夫模型來處理聲音訊號比較合適。
+
+== 历史 ==
+
+隐马尔可夫模型最初是在20世纪60年代后半期[[Leonard_E._Baum|Leonard E. Baum]]和其它一些作者在一系列的统计学论文中描述的。HMM最初的应用之一是开始于20世纪70年代中期的[[语音识别|语音识别]]。<ref>Rabiner, p. 258</ref>
+
+在1980年代后半期，HMM开始应用到生物序列尤其是[[DNA|DNA]]的分析中。此后，在[[生物信息学|生物信息学]]领域HMM逐渐成为一项不可或缺的技术。<ref>Durbin</ref>
+
+==参见==
+* [[安德雷·马尔可夫|安德雷·马尔可夫]]
+* [[贝叶斯推断|贝叶斯推断]]
+* [[估计理论|估计理论]]
+* [[條件隨機域|條件隨機域]]
+* [[排队理论|排队理论]]
+* [[馬可夫決策過程|馬可夫決策過程]]
+
+==注解==
+{{reflist}}
+
+==参考书目==
+{{refbegin}}
+* [[Lawrence_Rabiner|Lawrence R. Rabiner]], [https://web.archive.org/web/20070209162249/http://www.caip.rutgers.edu/~lrr/Reprints/tutorial%20on%20hmm%20and%20applications.pdf A Tutorial on Hidden Markov Models and Selected Applications in Speech Recognition]. ''Proceedings of the [[IEEE|IEEE]]'', 77 (2), p. 257–286, February 1989.
+* Richard Durbin, Sean R. Eddy, Anders Krogh, Graeme Mitchison. ''Biological Sequence Analysis: Probabilistic Models of Proteins and Nucleic Acids''. Cambridge University Press, 1999. ISBN 0521629713.
+* Kristie Seymore, Andrew McCallum, and Roni Rosenfeld. ''Learning Hidden Markov Model Structure for Information Extraction''. AAAI 99 Workshop on Machine Learning for Information Extraction, 1999. ''(also at [[CiteSeer|CiteSeer]]: [http://citeseer.ist.psu.edu/seymore99learning.html])''
+* http://www.comp.leeds.ac.uk/roger/HiddenMarkovModels/html_dev/main.html
+*[http://www.stat.psu.edu/~jiali J. Li], A. Najmi, R. M. Gray, Image classification by a two dimensional hidden Markov model, ''IEEE Transactions on Signal Processing'', 48(2):517-33, February 2000.
+* 隐马尔可夫模型(课件), 徐从富,浙江大学人工智能研究所 [http://www.google.com/url?sa=t&source=web&cd=2&ved=0CCoQFjAB&url=http%3A%2F%2Fwww.cad.zju.edu.cn%2Fhome%2Fsiuleung%2Fpresentation%2FHMM.ppt&ei=SJn-TL_bMcSblgez3qC2AQ&usg=AFQjCNEoBKmrGm85iYpc_q867oGBNdHnNg&sig2=8_mFxmWb7XyyN80xjpy1dA]
+{{refend}}
+
+==外部链接==
+{{refbegin}}
+* [https://web.archive.org/web/20050107091901/http://www.ai.mit.edu/~murphyk/Software/HMM/hmm.html Hidden Markov Model (HMM) Toolbox for Matlab] ''(by Kevin Murphy)''
+* [http://htk.eng.cam.ac.uk/ Hidden Markov Model Toolkit (HTK)] {{Wayback|url=http://htk.eng.cam.ac.uk/ |date=20081208234109 }} ''(a portable toolkit for building and manipulating hidden Markov models)''
+*[http://www.cs.brown.edu/research/ai/dynamics/tutorial/Documents/HiddenMarkovModels.html Hidden Markov Models] ''(an exposition using basic mathematics)''
+*[http://www.ghmm.org GHMM Library] ''(home page of the GHMM Library project)''
+*[https://web.archive.org/web/20060519050209/http://www.run.montefiore.ulg.ac.be/%7Efrancois/software/jahmm/ Jahmm Java Library] ''(Java library and associated graphical application)''
+*[http://www.comp.leeds.ac.uk/roger/HiddenMarkovModels/html_dev/main.html A step-by-step tutorial on HMMs] ''(University of Leeds)''
+* [https://web.archive.org/web/20060503171822/http://www.treeage.com/products/overviewHealth.html Software for Markov Models and Processes] '' (TreeAge Software)''
+{{refend}}
+
+{{Stochastic processes}}
+
+{{Authority control}}
+[[Category:统计学|Y]]
+[[Category:机器学习|Y]]
+[[Category:计算机视觉|Y]]
+[[Category:概率图模型|Y]]
+[[Category:马尔可夫模型|Y]]

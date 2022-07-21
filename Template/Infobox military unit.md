@@ -1,0 +1,120 @@
+{{Infobox
+|bodystyle = width: {{{width|300px}}};
+
+|abovestyle = background: lightsteelblue
+|above = {{{unit_name|{{{名稱|{{PAGENAME}}}}}}}}
+| subheader      = {{{native_name|}}}
+
+|image = {{#invoke:InfoboxImage|InfoboxImage|image={{{image|{{{圖片|}}}}}}|size={{{image_size|}}}|sizedefault=frameless|upright=1|alt={{{alt|}}}}}
+|caption = {{{caption|{{{圖片說明|}}}}}}
+
+|image2 = {{{image2|}}}
+|caption2 = {{{caption2|}}}
+
+|headerstyle = background: lightsteelblue
+|labelstyle = white-space: nowrap;
+
+|data1 = <hr />
+|label2 = 存在時期
+|data2 =   {{{dates|{{{時期|{{{創設|}}}}}}}}}{{#if:{{{廃止|}}}|-{{{廃止|}}}}}{{#if:{{{再編成|}}}|，{{{再編成|}}}}}{{#if:{{{再廃止|}}}|-{{{再廃止|}}}}}
+|label3 = {{nowrap|國家或地區}}
+|data3 = {{{country|{{{國家|{{{国籍|}}}}}}}}}
+|label4 = 效忠於
+|data4 = {{{allegiance|{{{效忠|{{{忠誠|}}}}}}}}}
+|label5 = {{#if:{{{軍種|}}}|軍種|部門}}
+|data5 = {{{軍種|{{{部門|{{{branch|}}}}}}}}}
+|label6 = {{#if:{{{兵科|}}}{{{兵种|}}}|-{zh-tw:兵科; zh-cn:兵种}-|種類}}
+|data6 = {{{兵科|{{{兵种|{{{種類|{{{type|}}}}}}}}}}}}
+|label7 = 功能
+|data7 = {{{role|{{{功能|}}}}}}{{{specialization|}}}
+|label8 = 規模
+|data8 = {{{size|{{{規模|}}}}}}
+|label9 = {{#if:{{{隸屬|}}}|隸屬於|直屬}}
+|data9 = {{{command_structure|{{{隸屬|}}}}}}
+|label10 = {{#if:{{{garrison_label|}}}|{{{garrison_label|}}}|{{#if:{{{駐地|}}}|駐地|駐軍／總部}} }}
+|data10 = {{{garrison|{{{駐地|}}}}}}
+|label11 = {{#if:{{{equipment_label|}}}|{{{equipment_label|}}}|裝備}}
+|data11 = {{{equipment|{{{裝備|}}}}}}
+|label12 = {{#if:{{{nickname_label|}}}|{{{nickname_label|}}}|別稱}}
+|data12 = {{{nickname|{{{別稱|}}}}}}
+|label15 = 主保聖人
+|data15 = {{{守護|}}}
+|label16 = 冠名自
+|data16 = {{{patron|{{{named_for|}}}}}}
+|label18 = 格言
+|data18 = {{{motto|{{{格言|}}}}}}
+|label19 = {{#if:{{{colors_label|}}}|{{{colors_label|}}}|專用顏色}}
+|data19 = {{{colors|{{{顏色|}}}}}}
+|label21 = {{#if:{{{军歌|}}}|军歌|{{#if:{{{隊歌|}}}|隊歌|進行曲}}}}
+|data21 = {{{march|{{{隊歌|{{{军歌|}}}}}}}}}
+|label22 = 吉祥物
+|data22 = {{{mascot|{{{吉祥物|}}}}}}
+|label24 = 參與戰役
+|data24 = {{{battles|{{{戰役|}}}}}}
+|label25 = {{#if:{{{anniversaries_label|}}}|{{{anniversaries_label|}}}|{{#if:{{{隊慶|}}}|隊慶|紀念日}} }}
+|data25 = {{{anniversaries|{{{隊慶|}}}}}}
+|label27 = {{#if:{{{decorations_label|}}}|{{{decorations_label|}}}|{{#if:{{{獎章|}}}|獎章|嘉獎}} }}
+|data27 = {{{decorations|{{{獎章|}}}}}}
+|label28 = {{#if:{{{battle_honours_label|}}}|{{{battle_honours_label|}}}|戰鬥榮譽}}
+|data28 = {{{battle_honours|{{{榮譽|}}}}}}
+|header30 = {{#if:{{{commander1|}}}{{{commander2|}}}{{{commander3|}}}{{{commander4|}}}{{{current_commander|}}}{{{ceremonial_chief|}}}{{{colonel_of_the_regiment|}}}{{{command_sergeant_major|}}}{{{notable_commanders|}}}{{{現任指揮官|}}}{{{著名指揮官|}}}{{{象徵性指揮官|}}}{{{團長|}}}{{{军士长|}}} | 指挥官}}
+|label31 = {{#if:{{{commander1_label|}}}|{{{commander1_label|}}}|{{#if:{{{current_commander_label|}}}|{{{current_commander_label|}}}|現任指揮官}}}}
+|data31 = {{{commander1|{{{current_commander|{{{現任指揮官|}}}}}}}}}
+|label33 = {{#if:{{{commander2_label|}}}|{{{commander2_label|}}}|{{#if:{{{ceremonial_chief_label|}}}|{{{ceremonial_chief_label|}}}|象徵性指揮官}}}}
+|data33 = {{{commander2|{{{ceremonial_chief|{{{象徵指揮官|}}}}}}}}}
+|label34 = {{#if:{{{commander3_label|}}}|{{{commander3_label|}}}|{{#if:{{{colonel_of_the_regiment_label|}}}|{{{colonel_of_the_regiment_label|}}}|团长}}}}
+|data34 = {{{commander3|{{{colonel_of_the_regiment|{{{團長|}}}}}}}}}
+|label36 = {{#if:{{{commander4_label|}}}|{{{commander4_label|}}}|{{#if:{{{command_sergeant_major_label|}}}|{{{command_sergeant_major_label|}}}|军士长}}}}
+|data36 = {{{commander4|{{{command_sergeant_major|{{{军士长|}}}}}}}}}
+|label37 = 著名指揮官
+|data37 = {{{notable_commanders|{{{著名指揮官|}}}}}}
+|header40 = {{#if:{{{identification_symbol|}}}{{{identification_symbol_2|}}}{{{identification_symbol_3|}}}{{{identification_symbol_4|}}}{{{佩章一|}}}{{{佩章二|}}}{{{佩章三|}}}{{{佩章四|}}} | 標識}}
+|label41 = {{#if:{{{identification_symbol_label|}}}|{{{identification_symbol_label|}}}|一式佩章}}
+|data41 = {{{identification_symbol|{{{佩章一|}}}}}}
+|label42 = {{#if:{{{identification_symbol_2_label|}}}|{{{identification_symbol_2_label|}}}|二式佩章}}
+|data42 = {{{identification_symbol_2|{{{佩章二|}}}}}}
+|label43 = {{#if:{{{identification_symbol_3_label|}}}|{{{identification_symbol_3_label|}}}|三式佩章}}
+|data43 = {{{identification_symbol_3|{{{佩章三|}}}}}}
+|label44 = {{#if:{{{identification_symbol_4_label|}}}|{{{identification_symbol_4_label|}}}|四式佩章}}
+|data44 = {{{identification_symbol_4|{{{佩章四|}}}}}}
+|header47 = {{#if:{{{aircraft_attack|}}}{{{aircraft_bomber|}}}{{{aircraft_electronic|}}}{{{aircraft_fighter|}}}{{{aircraft_interceptor|}}}{{{aircraft_patrol|}}}{{{aircraft_recon|}}}{{{aircraft_trainer|}}}{{{aircraft_transport|}}}{{{aircraft_tanker|}}}{{{aircraft_helicopter|}}}{{{aircraft_helicopter_attack|}}}{{{aircraft_helicopter_cargo|}}}{{{aircraft_helicopter_multirole|}}}{{{aircraft_helicopter_observation|}}}{{{aircraft_helicopter_trainer|}}}{{{aircraft_helicopter_utility|}}}{{{攻擊機|}}}{{{轟炸機|}}}{{{電戰機|}}}{{{戰鬥機|}}}{{{直昇機|}}}{{{攻擊直昇機|}}}{{{運輸直昇機|}}}{{{多用途直昇機|}}}{{{偵察直昇機|}}}{{{教練直昇機|}}}{{{通用直昇機|}}}{{{攔截機|}}}{{{巡邏機|}}}{{{偵察機|}}}{{{教練機|}}}{{{運輸機|}}}{{{空中加油機|}}} | 飛機}}
+|label49 = [[攻擊機]]
+|data49 = {{{aircraft_attack|{{{攻擊機|}}}}}}
+|label51 = [[轟炸機]]
+|data51 = {{{aircraft_bomber|{{{轟炸機|}}}}}}
+|label52 = [[電戰機]]
+|data52 = {{{aircraft_electronic|{{{電戰機|}}}}}}
+|label53 = [[戰鬥機]]
+|data53 = {{{aircraft_fighter|{{{戰鬥機|}}}}}}
+|label55 = [[直昇機]]
+|data55 = {{{aircraft_helicopter|{{{直昇機|}}}}}}
+|label56 = [[攻擊直昇機]]
+|data56 = {{{aircraft_helicopter_attack|{{{攻擊直昇機|}}}}}}
+|label57 = [[運輸直昇機]]
+|data57 = {{{aircraft_helicopter_cargo|{{{運輸直昇機|}}}}}}
+|label58 = 多用途[[直昇機]]
+|data58 = {{{aircraft_helicopter_multirole|{{{多用途直昇機|}}}}}}
+|label60 = [[偵察直昇機]]
+|data60 = {{{aircraft_helicopter_observation|{{{偵察直昇機|}}}}}}
+|label61 = 教練[[直昇機]]
+|data61 = {{{aircraft_helicopter_trainer|{{{教練直昇機|}}}}}}
+|label62 = 通用[[直昇機]]
+|data62 = {{{aircraft_helicopter_utility|{{{通用直昇機|}}}}}}
+|label64 = [[攔截機]]
+|data64 = {{{aircraft_interceptor|{{{攔截機|}}}}}}
+|label65 = [[海上巡逻机|巡邏機]]
+|data65 = {{{aircraft_patrol|{{{巡邏機|}}}}}}
+|label67 = [[偵察機]]
+|data67 = {{{aircraft_recon|{{{偵察機|}}}}}}
+|label68 = [[教練機]]
+|data68 = {{{aircraft_trainer|{{{教練機|}}}}}}
+|label69 = [[運輸機]]
+|data69 = {{{aircraft_transport|{{{運輸機|}}}}}}
+|label70 = [[空中加油機]]
+|data70 = {{{aircraft_tanker|{{{空中加油機|}}}}}}
+
+|belowstyle = text-align:left;
+|below = {{{below|}}}
+}}<noinclude>
+{{Documentation}}
+</noinclude>

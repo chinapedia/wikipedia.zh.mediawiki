@@ -1,0 +1,1 @@
+{{移動}}到[[wikt:|维基词典]]<noinclude>{{pp-protected|small=yes}}[[Category:投票模板|移动]]</noinclude>

@@ -1,0 +1,1 @@
+</table><noinclude>[[Category:系譜模板|{{PAGENAME}}]]</noinclude>

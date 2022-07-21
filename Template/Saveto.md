@@ -1,0 +1,1 @@
+#REDIRECT [[Template:存檔至]]{{模板重定向}}

@@ -1,0 +1,1 @@
+#redirect [[Template:军事人物小作品]]

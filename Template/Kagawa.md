@@ -1,0 +1,1 @@
+#REDIRECT [[Template:香川縣]]

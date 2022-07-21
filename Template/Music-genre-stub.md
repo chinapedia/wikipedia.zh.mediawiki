@@ -1,0 +1,9 @@
+{{asbox
+|image=Musical_notes.svg
+|category=音樂類型小作品
+|subject=與[[音樂類型]]相關的
+|name=Template:Music-genre-stub
+}}<noinclude>
+[[Category:音樂小作品模板|G]]
+[[Category:音樂類型小作品|*]]
+</noinclude>

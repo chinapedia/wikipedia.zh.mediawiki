@@ -1,0 +1,1 @@
+#redirect [[Template:政治人物小作品]]

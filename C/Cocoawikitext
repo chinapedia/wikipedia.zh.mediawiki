@@ -1,0 +1,106 @@
+{{noteTA
+|G1=IT
+}}
+{{about|macOS的API|日本[[厚生勞動省|厚生勞動省]]的應用程式|COCOA}}
+{{Infobox software
+| name = Cocoa
+| logo = 
+| developer = [[苹果公司|苹果公司]]
+| latest_release_version =
+| latest_release_date = 
+| latest_preview_version =
+| latest_preview_date = 
+| programming language = [[C语言|C]], [[C++|C++]], [[Objective-C|Objective-C]], [[Swift_(编程语言)|Swift]]
+| operating_system = [[macOS|macOS]]
+| genre = [[软件框架|软件框架]]
+| license = [[专有软件|专有]]
+| website = [http://developer.apple.com/documentation/Cocoa/Cocoa.html developer.apple.com]
+}}
+
+'''Cocoa'''是[[苹果公司|苹果公司]]为[[macOS|macOS]]所创建的原生[[面向对象的程序设计|面向对象]]的[[应用程序接口|应用程序接口]]，是Mac OS X上五大[[API|API]]之一（其它四个是[[Carbon_(API)|Carbon]]、[[POSIX|POSIX]]、[[X11|X11]]和[[Java|Java]]）。
+
+Cocoa应用程序一般在苹果公司的开发工具[[Xcode|Xcode]]（前身为{{tsl|en|Project Builder}}）和[[Interface_Builder|Interface Builder]]上用[[Objective-C|Objective-C]]写成。不过，通过Java bridge、{{tsl|en|PasCocoa}}、{{le|PyObjC}}、{{tsl|en|CamelBones}}以及{{tsl|en|RubyCocoa}}等桥接技术，[[Java|Java]]、[[Clozure_CL|Clozure CL]]、{{le|LispWorks}}、[[Object_Pascal|Object Pascal]]、[[Python|Python]]、[[Perl|Perl]]、[[Ruby|Ruby]]等其它工具或者语言也可以用来开发Cocoa应用。也有一些其它语言的Cocoa实现无须桥接，比如苹果公司开发的{{tsl|en|MacRuby}}和类似[[Lisp|Lisp]]的[[Nu|Nu]]语言。不使用Xcode和Interface Builder，仅仅通过文本编辑器、[[GCC|GCC]]和[[GNU_make|GNU make]]工具也可以用Objective-C语言开发Cocoa应用。
+
+对最终用户来说，使用Cocoa编程环境开发的应用程序即为'''Cocoa應用程式'''。这类应用有独特的外观，因为Cocoa编程环境让程序在多方面自动遵循苹果公司的{{tsl|en|Human interface guidelines|人机界面守则}}。
+
+== Cocoa历史 ==
+{{further|Mac OS X历史}}
+Cocoa是从1980年代由[[NeXT|NeXT]]开发的编程环境NeXTSTEP和OPENSTEP演变而来，這點可由其類別之名皆以NS前綴（代表NeXTSTEP）看出端倪。苹果电脑公司在1996年12月收购了NeXT。开发NeXTSTEP和OPENSTEP的大量工作都转化到了Mac OS X中，最显而易见的部分当属Cocoa。但差异也存在。例如，NeXTSTEP和OPENSTEP使用[[Display_PostScript|Display PostScript]]实现文字和图形的屏幕显示，而Cocoa依赖苹果的[[Quartz|Quartz]]（基于PDF的绘图模型）。
+
+Cocoa这个名词曾经被用来称呼一款帮助儿童创建多媒体工程的应用程序。随后该应用停产。该名称被用作现在的用途。
+
+==内存管理==
+Cocoa环境的一个特点是它可以管理动态分配的内存。Cocoa中绝大部分类的基类都是NSObject，它实现了[[引用计数|引用计数]]的内存管理模型。从NSObject继承的类可以响应<code>retain</code>和<code>release</code>消息，以增减其引用计数；也可以通过发送<code>retainCount</code>消息来获取其引用计数。一个以<code>alloc</code>，<code>copy</code>或[[Objective-C_2.0|Objective-C 2.0]]中增加的<code>new</code>所创建的对象的引用计数为1；向对象发送<code>retain</code>消息会将计数加1，而发送<code>release</code>消息则会将计数减1。若对象的引用计数减少到了0，则它会被销毁。<code>dealloc</code>消息类似于[[C++|C++]]中的[[析构函数|析构函数]]，在对象被销毁之前可能会被调用，但系统不保证会发送该消息。这种引用计数的模型与[[微软|微软]]的[[组件对象模型|COM]]中的[[IUnknown|IUnknown]]接口特性十分相似，它提供了<code>AddRef</code>和<code>Release</code>接口，与<code>retain</code>和<code>release</code>对应。
+
+从[[Objective-C_2.0|Objective-C 2.0]]开始，Objective-C运行时实现了可选的[[Objective-C#垃圾收集|垃圾收集器]]。若垃圾收集的特性被激活，则运行时会将引用计数相关的操作，例如“retain”和“release”，变为[[NOP|无操作]]。[[iOS|iOS]]上的Objective-C 2.0实现中不包含垃圾收集器。垃圾收集器运行在一个低优先级的后台线程中，并可以在用户动作时暂停，从而保持良好的用户体验。<ref>{{cite web |author=Apple Computer, Inc. |url=http://developer.apple.com/leopard/overview/objectivec2.html |title=Leopard Technology Series for Developers: Objective-C 2.0 Overview |publisher=Developer.apple.com |date=2007-11-06 |accessdate=2010-05-30 |deadurl=yes |archiveurl=https://web.archive.org/web/20100724195423/http://developer.apple.com/leopard/overview/objectivec2.html |archivedate=2010-07-24 }}</ref>
+
+==主要框架==
+
+Cocoa包含三个主要的[[Objective-C|Objective-C]]对象库，称为“[[框架|框架]]”。框架的功能类似于[[动态库|动态库]]，即可以在运行时动态的载入应用程序的地址空间，但框架作为一个[[捆绑_(计算机)|捆绑]]而非独立文件，其中除了可执行代码外，也包含了资源，头文件和文档。
+
+* “{{tsl|en|Foundation Kit|Foundation工具包}}”，或简称为“Foundation”，首先出现在OpenStep中。在[[Mac_OS_X|Mac OS X]]中，它是基于{{tsl|en|Core Foundation}}的。作为通用的[[面向对象|面向对象]]的[[函数库|函数库]]，Foundation提供了[[字符串|字符串]]，数值的管理，[[容器_(计算机科学)|容器]]及其枚举，[[分布式计算|分布式计算]]，[[事件循环|事件循环]]，以及一些其它的与[[图形用户界面|图形用户界面]]没有直接关系的功能。其中用于类和[[常数|常数]]的“NS”前缀来自于Cocoa的来源，[[NeXTSTEP|NeXTSTEP]]。它可以在[[Mac_OS_X|Mac OS X]]和[[iOS|iOS]]中使用。
+
+* “{{tsl|en|AppKit|应用程序工具包}}”，或称AppKit（'''App'''lication '''Kit'''）是直接衍生自NeXTSTEP的AppKit的。它包含了程序与[[图形用户界面|图形用户界面]]交互所需的代码。它是基于Foundation建立的，也使用“NS”前缀。它只能在[[Mac_OS_X|Mac OS X]]中使用。
+
+* “[[UIKit|用户界面工具包]]”，或称UIKit（'''U'''ser '''I'''nterface '''Kit'''），是用于[[iOS|iOS]]的图形用户界面工具包。与AppKit不同，它使用“UI”的前缀。
+
+Cocoa构架的一个关键部分是其多样的视图模型。总体而言，它是基于由[[Quartz|Quartz]]提供的[[PDF|PDF]]绘制模型的，该特性允许使用[[PostScript|PostScript]]绘制自定义图形内容，同时也自动的支持了打印机以及类似设备。由于Cocoa框架管理了全部的绘图操作，例如裁剪，滚动，缩放等，程序员可以不再重复实现基础的功能，而可以集中于提供程序的关键功能上。
+
+==模型-视图-控制器==
+
+[[施乐|施乐]][[帕罗奥多研究中心|帕罗奥多研究中心]]的[[Smalltalk|Smalltalk]]开发小组最终发明了一种可以简化开发过程，提高代码重用率的设计哲学，即“[[模型-视图-控制器|模型-视图-控制器]]”模式（MVC）。这种模式将应用程序分为三个可以交互的对象集，即模型，视图和控制器。其中，模型类代表原始数据，例如文档、设置、文件、内存中的对象等，视图是模型中数据的可视化表现，而控制器类则包含了将模型和其对应视图连接起来的逻辑，并保持前二者的状态同步。
+
+Cocoa的设计遵循了严格的MVC原则。在OpenStep下，绝大多数的类要么是高层的视图类（AppKit），或者是相对底层的模型类（Foundation）。与类似的MVC系统相比，OpenStep没有强的模型层，例如它不包含表示“文档”的存储类。在向Cocoa迁移的过程中，模型层被大大扩展了，引入了一系列的类，它们提供了一些桌面程序所需的常用功能。
+
+在[[Mac_OS_X_10.3|Mac OS X 10.3]]中，苹果引入了NSController系列类以提供预定义的控制器层。这些类是[[Cocoa绑定|Cocoa绑定]]系统的一部分，该系统也允许使用类似[[键-值-观测器|键-值-观测器]]和[[键-值-绑定|键-值-绑定]]协议来对其进行扩展。其中，“绑定”的概念表明两个对象（通常是视图和控制器）之间的关系。绑定使得开发者可以集中于定义这种关系，而不是编写大量的“胶水代码”来实现这些关系。
+
+在[[Mac_OS_X_10.4|Mac OS X 10.4]]中，苹果引入了[[Core_Data|Core Data]]框架，进一步扩展了这种概念。Core Data标准化了对更改的追踪和模型层的保存行为。因此，该框架大大简化了改变应用程序数据，撤销更改，在磁盘中保存和读取数据的过程。
+
+通过提供对MVC模型中全部3层的框架支持，苹果的目的在于减少程序员所需编写的“胶水代码”量，以解放这些资源而用于程序的真正特性。
+
+==动态绑定==
+在多数[[面向对象的程序设计|面向对象]]的[[编程语言|编程语言]]中，调用方法是由直接调用内存中一段固定的代码实现的。由于这种方法需要预定义的处理命令的类，因而限制了程序的设计，通常采用[[责任链模式|责任链模式]]作为其[[设计模式|设计模式]]。虽然Cocoa在多数地方仍然采用这种方式，但通过Objective-C的[[Objective-C#讯息传递|动态绑定]]特性增加了更多设计的自由性。
+
+在Objective-C中，消息由'''selector'''所代表，其为描述需要调用的方法的一个字符串。在发送消息时，该selector被送入Objective-C运行时中，在可用方法列表中寻找对应的方法，然后调用该方法的实际'''实现'''。由于selector只是文本数据，因此它可以保存在文件中，通过网络或在进程间传输，或以其它方式进行操作。方法的实现是在运行时查找的，而非编译时。这样的做法会造成一些性能损失<ref>{{Cite web |url=http://en.wikibooks.org/wiki/Programming_Mac_OS_X_with_Cocoa_for_beginners/Objective_C,_the_language_and_its_advantages#Some_Objective-C_advantages |title=Wikibooks - Some Objective-C advantages |accessdate=2010-10-16 |archive-date=2010-11-15 |archive-url=https://web.archive.org/web/20101115063419/http://en.wikibooks.org/wiki/Programming_Mac_OS_X_with_Cocoa_for_Beginners/Objective_C,_the_language_and_its_advantages#Some_Objective-C_advantages |dead-url=no }}</ref>，但动态绑定允许相同的selector代表不同的实现。
+
+利用这些特性，Cocoa提供了一种通用的数据管理技术，称为'''[[键-值编码|键-值编码]]'''(KVC)<ref>{{Cite web |url=http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/KeyValueCoding/index.html |title=Key-Value Coding Programming Guide |accessdate=2010-10-16 |archive-date=2013-05-04 |archive-url=https://web.archive.org/web/20130504142911/http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/KeyValueCoding/index.html |dead-url=no }}</ref>。这种技术允许对象的数据或属性可以在运行时通过其键名进行查找，其中，属性的名称即为其值的键名。在静态语言中，这样的做法是不可能的。KVC大大的增加了设计的自由度：通过KVC，无需知道对象的类型即可访问其属性或数据。另外，利用'''[[键-值-观测器|键-值-观测器]]'''（KVO）技术和NSUndoManager类，可以提供自动的撤销/重做支持<ref>[http://developer.apple.com/library/ios/documentation/cocoa/Conceptual/KeyValueObserving/Concepts/KVOBasics.html Key-Value Observing Programming Guide]{{dead link|date=2017年11月 |bot=InternetArchiveBot |fix-attempted=yes }}</ref>。
+
+==Rich objects==
+Cocoa中最有用的特性是系统提供的强大的“基础对象”，例如Foundation中的<code>NSString</code>和<code>NSAttributedString</code>类，提供了[[Unicode|Unicode]][[字符串|字符串]]的支持；而AppKit中的<code>NSText</code>系统则允许程序员在GUI中放置字符串对象。
+
+<code>NSText</code>及其相关类是用于显示和编辑字符串的。这些对象允许程序实现简单的单行文本框，也可以实现完整的多页，多栏文本显示方案
+，方案同时可以提供支持完整的专业[[排版|排版]]特性，例如{{tsl|en|Kerning|压缩字符}}，[[合字|合字]]，环绕形状的文字，[[旋转|旋转]]，完整的Unicode支持和[[反锯齿|反锯齿]][[字形|字形]]渲染。段落格式可以自动控制或由用户自定义；可以使用内建的“ruler”对象附加到任何文本视图上。这些类也有自动[[拼写检查|拼写检查]]特性，该特性使用一个由所有程序共享的字典。另外，也允许无限制数量的撤销/重做操作。只使用内建的特性，任何人都可以只用不到10行代码写出一个具备上述特性的文本编辑器，而若使用[[Cocoa绑定|Cocoa绑定]]，甚至可以不用写一行代码。
+
+若需要对已有特性进行扩展，Objective-C中的[[Objective-C#类别|类别]]特性使得这项操作变得相当容易<ref>{{Cite web |url=http://developer.apple.com/documentation/Cocoa/Conceptual/ObjectiveC/Articles/ocCategories.html#//apple_ref/doc/uid/TP30001163-CH20-SW1 |title=Categories and Extensions |accessdate=2010-10-16 |archive-date=2009-08-26 |archive-url=https://web.archive.org/web/20090826124453/http://developer.apple.com/documentation/Cocoa/Conceptual/ObjectiveC/Articles/ocCategories.html#//apple_ref/doc/uid/TP30001163-CH20-SW1 |dead-url=no }}</ref>。通过类别可以直接对已有类进行功能添加，而无需对其进行更改或获得其源代码。一般而言，这样的目的需要通过继承原有的类并修改原有的代码，将原有的类以新的子类代替来完成。
+
+== 实现 ==
+Cocoa本身由Objective-C语言写成，因此Objective-C是开发Cocoa应用的首选语言。虽然也提供Java到Cocoa的绑定，但是在开发者中并未得到广泛采用。而且，由于使用桥接机制，Java的绑定并不能全面利用Cocoa的所有功能。2005年，苹果公司宣布Java的Cocoa绑定在Mac OS X 10.4和之后版本中属被废弃的技术。換句話說，Cocoa  API中可能會逐漸出現不支援Java的功能。
+
+作为Xcode一部分的[[AppleScript|AppleScript Studio]]工具允许用户和开发者用AppleScript编写一些简单的Cocoa应用。第三方实现的绑定有Clozure CL、LispWorks、PyObjC（Python）、RubyCocoa（Ruby）、CamelBones（Perl）、Cocoa#、Monobjc（C#）和NObjective（C#）。Nu语言直接使用Objective-C的对象模型，所以无须绑定就可以调用Cocoa API。
+
+也有开源项目把Cocoa的大部分在其它操作系统上实现（包括Windows），从而使开发跨平台的Cocoa应用成为可能。比如[[GNUstep|GNUstep]]和[[Cocotron|Cocotron]]<ref>[http://www.cocotron.org/ Cocotron] {{Wayback|url=http://www.cocotron.org/ |date=20191213232806 }} - Cocoa的免費版本</ref>。
+
+== 参考文献 ==
+{{reflist|2}}
+{{refbegin|2}}
+* [[Aaron_Hillegass|Aaron Hillegass]]: <cite>Cocoa Programming for Mac OS X</cite>, Addison-Wesley, 3rd Edition 2008, Paperback, ISBN 0-321-50361-9.
+* [[Stephen_Kochan|Stephen Kochan]]: <cite>Programming in Objective-C</cite>, Sams, 1st Edition 2003, Paperback, ISBN 0-672-32586-1.
+* [[Michael_Beam|Michael Beam]], [[James_Duncan_Davidson|James Duncan Davidson]]: <cite>Cocoa in a Nutshell</cite>, O'Reilly, 1st Edition 2003, Paperback, ISBN 0-596-00462-1.
+* [[Erick_Tejkowski|Erick Tejkowski]]: <cite>Cocoa Programming for Dummies</cite>, 1st Edition 2003, Paperback, ISBN 0-7645-2613-8.
+* [[Simson_Garfinkel|Simson Garfinkel]], [[Michael_K._Mahoney|Michael K. Mahoney]]: <cite>Building Cocoa Applications : A Step by Step Guide</cite>, O'Reilly, 1st Edition 2002, Paperback, ISBN 0-596-00235-1.
+* [[James_Duncan_Davidson|James Duncan Davidson]]: <cite>Learning Cocoa with Objective-C</cite>, O'Reilly, 2nd Edition 2002, Paperback, ISBN 0-596-00301-3.
+* [[Scott_Anguish|Scott Anguish]], [[Erik_M._Buck|Erik M. Buck]], [[Donald_A._Yacktman|Donald A. Yacktman]]: <cite>Cocoa Programming</cite>, Sams, 1st Edition 2002, Paperback, ISBN 0-672-32230-7.
+* [[Bill_Cheeseman|Bill Cheeseman]]: <cite>Cocoa Recipes for Mac OS X</cite>, Peachpit Press, 1st Edition 2002, Paperback, ISBN 0-201-87801-1.
+* Andrew Duncan: <cite>Objective-C Pocket Reference</cite>, O'Reilly, 1st Edition 2002, Paperback, ISBN 0-596-00423-0.
+* [[Apple_Inc.|Apple Inc.]]: <cite>Learning Cocoa</cite>, O'Reilly, 1st Edition 2001, Paperback, ISBN 0-596-00160-6.
+{{refend}}
+
+== 外部链接 ==
+* [https://web.archive.org/web/20090301174219/http://developer.apple.com/documentation/Cocoa/Cocoa.html Apple的Cocoa文档]
+* [https://web.archive.org/web/20190202170514/http://www.idevapps.com/ iDevApps - Cocoa编程论坛]
+* [https://web.archive.org/web/20080801025517/http://www.cocoadev.com/ CocoaDev]
+* [http://cocoadevcentral.com/ Cocoa Dev Central]{{Wayback|url=http://cocoadevcentral.com/ |date=20110208041602 }}
+
+{{MacOS}}
+
+[[Category:Mac_OS介面|Category:Mac OS介面]]

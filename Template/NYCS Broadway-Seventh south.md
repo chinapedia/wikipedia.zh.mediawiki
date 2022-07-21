@@ -1,0 +1,2 @@
+{{#ifeq:{{{exclude|}}}|1||{{NYCS time 2|1|icon=alltimes|text=任何時候停站|time={{{time|}}}}} {{NYCS br|time={{{time|}}}}}}} {{#ifeq:{{{exclude|}}}|2||{{NYCS time 2|2|icon=alltimes|text=任何時候停站|time={{{time|}}}}} {{NYCS br|time={{{time|}}}}}}} {{#ifeq:{{{exclude|}}}|3||{{NYCS time 2|3|icon=weekdaysonly|text=僅平日停站|time={{{time|}}}}}}}<noinclude>
+</noinclude>

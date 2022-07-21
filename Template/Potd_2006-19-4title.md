@@ -1,0 +1,1 @@
+{{Template:Potd/2006-05-4title}}

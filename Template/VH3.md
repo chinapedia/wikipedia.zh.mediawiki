@@ -1,0 +1,2 @@
+<includeonly><div style="font-size:large; font-weight:bold; line-height:1em; width:1.5em; float:right; cursor:vertical-text;">{{{1}}}</div></includeonly>
+<noinclude>{{documentation}}[[Category:文言文格式模板]]</noinclude>

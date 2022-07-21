@@ -1,0 +1,1 @@
+#REDIRECT [[Template:User_MLB_BOS]]

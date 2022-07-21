@@ -1,0 +1,1 @@
+{{User language-2|cmn-jianghuai|该用户能以'''[[:Category:cmn-jianghuai-2 使用者|一般]]'''的'''[[:Category:cmn-jianghuai 使用者|江淮官话]]'''进行交流。|江淮官話|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

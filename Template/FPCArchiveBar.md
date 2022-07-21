@@ -1,0 +1,13 @@
+{{Featuredpicturetools}}
+{{Mbox|text=存檔時請按该图片开始评选（而不是结束评选）的日期存档至对应月份的子页面（而不是本页），以避免分類出現不一致的情况。}}
+{| style="margin: auto; "
+|-
+|<div style = "overflow: auto; height: 250px; ">
+*{{#expr:{{CURRENTYEAR}}-1}}年：[[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}-1}}年1月|1月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}-1}}年2月|2月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}-1}}年3月|3月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}-1}}年4月|4月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}-1}}年5月|5月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}-1}}年6月|6月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}-1}}年7月|7月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}-1}}年8月|8月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}-1}}年9月|9月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}-1}}年10月|10月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}-1}}年11月|11月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}-1}}年12月|12月]]
+*{{CURRENTYEAR}}年：[[Wikipedia:特色圖片評選/存檔/{{CURRENTYEAR}}年1月|1月]] · [[Wikipedia:特色圖片評選/存檔/{{CURRENTYEAR}}年2月|2月]] · [[Wikipedia:特色圖片評選/存檔/{{CURRENTYEAR}}年3月|3月]] · [[Wikipedia:特色圖片評選/存檔/{{CURRENTYEAR}}年4月|4月]] · [[Wikipedia:特色圖片評選/存檔/{{CURRENTYEAR}}年5月|5月]] · [[Wikipedia:特色圖片評選/存檔/{{CURRENTYEAR}}年6月|6月]] · [[Wikipedia:特色圖片評選/存檔/{{CURRENTYEAR}}年7月|7月]] · [[Wikipedia:特色圖片評選/存檔/{{CURRENTYEAR}}年8月|8月]] · [[Wikipedia:特色圖片評選/存檔/{{CURRENTYEAR}}年9月|9月]] · [[Wikipedia:特色圖片評選/存檔/{{CURRENTYEAR}}年10月|10月]] · [[Wikipedia:特色圖片評選/存檔/{{CURRENTYEAR}}年11月|11月]] · [[Wikipedia:特色圖片評選/存檔/{{CURRENTYEAR}}年12月|12月]]
+*{{#expr:{{CURRENTYEAR}}+1}}年：[[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}+1}}年1月|1月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}+1}}年2月|2月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}+1}}年3月|3月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}+1}}年4月|4月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}+1}}年5月|5月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}+1}}年6月|6月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}+1}}年7月|7月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}+1}}年8月|8月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}+1}}年9月|9月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}+1}}年10月|10月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}+1}}年11月|11月]] · [[Wikipedia:特色圖片評選/存檔/{{#expr:{{CURRENTYEAR}}+1}}年12月|12月]]
+（過往存檔請參見[[Wikipedia talk:特色图片/过去的特色图片评选/存档1|存檔討論頁]]）
+|-
+| colspan="2" style="text-align: center; padding-top: 1em; " | '''若沒有即時更新，請先[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAME}}|action=purge}} <span title="刷新緩存">刷新</span>]'''
+|}
+<br style="clear:both;" /><noinclude>[[Category:典範條目模板]]</noinclude>

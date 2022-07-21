@@ -1,0 +1,1 @@
+{{User language-3|zh-min|這个用户會使講'''[[:Category:Zh-min-3 使用者|-{zh-hant:道地; zh-hans:地道}-]]'''兮'''[[:Category:Zh-min 使用者|闽语]]'''。|闽语|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

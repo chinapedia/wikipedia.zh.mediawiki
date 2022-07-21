@@ -1,0 +1,14 @@
+<div style="float:{{{float|left}}}; border:{{{border-width|1}}}px solid {{{border-color|{{{1|#000000}}}}}}; margin:1px;">
+{| cellspacing="0" style="width:238px; background:{{{info-background|{{{2|#5588AA}}}}}};"
+| style="width:45px; height:45px; background:{{{logo-background|{{{1|#FFFFFF}}}}}}; text-align:center; font-size:{{{logo-size|{{{5|12}}}}}}pt; color:{{{logo-color|#000000}}};" | <!--注意合理使用之规定：“绝对不能将“合理使用”之图片，放入个人的用户页面进行展示。”-->
+| style="font-size:{{{info-size|10}}}pt; padding:4pt; line-height:1.25em; color:{{{info-color|#FFFF88}}};" | 这个用户是'''[[中国科学院]]'''的校友、研究生或老师。
+|}</div>
+
+<includeonly>[[Category:中国科学院维基人|{{PAGENAME}}]]</includeonly>
+
+<noinclude>
+<div style="clear:both">
+----
+[[Wikipedia:用户框/教育程度]]</div>
+[[Category:中国大陆学校用户框模板]]
+</noinclude>

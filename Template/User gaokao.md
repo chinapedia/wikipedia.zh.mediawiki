@@ -1,0 +1,14 @@
+{{Userbox
+  |border-c=#0000aa
+  |border-s=1
+  |id=高考
+  |id-c=white
+  |id-fc=black
+  |id-s=
+  |info=這個用戶正在准备[[普通高等学校招生全国统一考试|'''高考''']]。
+  |info-c=#ccf
+  |info-fc=black
+  |info-s=10
+}}
+<noinclude>[[Category:准备高考的维基人]]</noinclude>
+<noinclude>[[Category:维基百科相关用户框]]</noinclude>

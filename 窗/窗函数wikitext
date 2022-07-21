@@ -1,0 +1,223 @@
+{{otheruses|other=SQL语句中的窗口函数|查询　(SQL)}}
+'''窗函数'''（{{lang-en|window function}}）在[[信号处理|信号处理]]中是指一种除在给定[[区间|区间]]之外取值均为0的实[[函数|函数]]。譬如：在给定区间内为[[常数|常数]]而在区间外为0的窗函数被形象地称为'''矩形窗'''。
+
+任何函数与窗函数之积仍为窗函数，所以相乘的结果就像透过窗口“看”其他函数一样。窗函数在[[頻譜|頻譜]]分析、[[滤波器设计|滤波器设计]]、波束形成、以及音频数据压缩（如在[[Ogg_Vorbis|Ogg Vorbis]]音频格式中）等方面有广泛的应用。'''
+
+==频谱分析==
+从理论上可以得出函数 <math>\cos(\omega t)\,</math> 的[[傅立叶变换|傅立叶变换]]除了在频率 <math>\pm \omega\,</math> 之外处处为 0。但是许多其它的函数或者波形数据并没有这样方便的闭式变换，或者是我们只对某一时间范围内的频谱数据感兴趣，在这种情况下，就需要对有限时间范围的波形进行傅立叶变换或者其它类似的变换。通常通过波形与一个窗函数的乘积来表示。但是，包括矩形窗在内的所有窗函数都会对待测频谱产生影响。
+
+===离散时间信号===
+当输入波形是采样信号而非连续信号时，傅立叶分析通常对信号应用窗函数并用离散傅立叶变换。但是[[离散傅里叶变换|离散傅里叶变换]]得到的频谱只是[[离散时间傅里叶变换|离散时间傅里叶变换]]频谱的一个粗糙采样。上图是正弦信号应用矩形窗后傅立叶频谱的一部分。位于横轴0点位置的是正弦信号真实频谱，其余频谱均为谱泄漏。频率单位为“DFT bins”（DFT 量化单位）即这些整数值是DFT采样得到的频率。所以该图显示了这样一种情况，正弦信号的实际频率正好与DFT的采样频率一致，并且频谱的最大值通过采样得到。采样错过最大值时的测量误差被称为“扇形损失”（名称源于顶点的形状）。但是这种状况下最有趣的是那些与实际频谱相一致的即值为零的那些点。这种情况下，DFT创造了没有泄露的假象。尽管不如本例这样，泄露是DFT中人为引入的也是普遍误解。但是既然任何窗函数都有泄露，那些表面上的不存在泄露才是人为造成的。
+
+===总泄漏===
+概念的分辨率和动态范围往往是有些主观的，這取決於用戶的实际意图。但他們也往往是高度相關，與總洩漏，這是量化的。它通常表示為一個等效帶寬，B認為它作為再分配DTFT成長方形的高度等於頻譜寬度 B的最大和洩漏的，更大的帶寬。它有時被稱為噪聲等效帶寬或等效噪聲帶寬，因為它是成正比的平均功率將每個登記的DFT并當輸入信號包含隨機噪聲組件（或者只是隨機噪聲）。圖的功率譜，平均隨著時間的推移，通常顯示一個單位的噪聲底，造成這種效果。噪聲的高度層是成正比的，所以乙兩個不同的窗口功能可以產生不同的噪音樓層。
+
+===处理增益與損耗===
+[[File:Processing_losses_for_3_window_functions.gif|right]]
+在[[信號處理|信號處理]]中，透過某些操作，可以利用信號和噪聲之間性質的差異，來提高信號某些方面的品質。當某個正弦信號隨機地疊加的破壞性噪聲，頻譜分析能區別的信號與噪聲的分量，往往能使檢測信號的某些特性更容易，如測量振幅和頻率。比如說，若將大多數的正弦信號能量集中於一個頻率附近，並將噪聲均勻分布，能有效的改善[[信噪比|信噪比]]（{{lang|en|signal to noise ratio, SNR}}）。'''處理增益'''通常用來描述SNR改善的程度。頻譜分析的處理增益取決於窗函數的'''噪聲頻寬（B）'''和潛在的'''扇形損失'''。這些效果可能部分抵消，因為窗函數有最少的扇形自然有最大的滲漏。
+
+
+右圖描述了三種不同的窗函數對相同的數據的影響。此數據包含兩個相等強度的正弦信號與外加的噪聲。兩正弦波的頻率被定為其中一個無扇形而另一個有最大扇形。兩個正弦信號在Hann Window下都造成比Blackman–Harris window更少的信噪比損耗。
+一般情況下，這防止我們在低動態範圍的應用採用高動態範圍的窗。
+
+===不應使用窗函數的應用===
+在一些應用中，最好不使用窗函數。例如：
+
+* 在衝擊模型測試中，當分析[[暫態|暫態]]信號，如重錘打擊產生的激發信號（'''脈衝激發技術'''）時，大部分能量位於記錄的開頭。若使用非矩形的窗，會無謂的減弱大部分能量和傳播[[頻率響應|頻率響應]]。
+* 上述的一種推廣，當測量[[自窗口信號|自窗口信號]]，如[[脈衝|脈衝]]，[[衝擊響應|衝擊響應]]，正弦[[叢發|叢發]]，連續變頻叢發，噪聲叢發時，這樣的信號使用模態分析。在這種情況下應用窗函數只會惡化信噪比。
+
+* 測量一個週期T的[[虛擬隨機噪聲|虛擬隨機噪聲]]（PRN）激發信號，​​並使用相同的記錄週期T時。PRN信號是週期性的，因此，該信號的所有頻譜分量將會與FFT區間中心重合而無洩漏。
+
+* 當測量被鎖定於採樣頻率的重複信號，例如在測量的振動頻譜分析的軸對準，軸承，發動機，變速器等的故障診斷。由於信號是重複的，所有的頻譜能量被限制到基本的重複頻率的整數倍。
+
+* 在[[正交分頻多工|正交分頻多工]](OFDM)接收器中，輸入信號不經窗函數，被直接乘以FFT。的頻率子載波（也稱為符號）被設計為恰好對齊FFT頻率區間。一個Cyclic prefix通常添加到所傳輸的信號，使得肇因於[[多徑|多徑]]的[[頻率|頻率]][[選擇性衰落|選擇性衰落]]可用[[圓周摺積|圓周摺積]]模擬，從而避免了在OFDM中相當於[[頻譜洩漏|頻譜洩漏]]的[[符號間干擾|符號間干擾]]。
+
+== 典型的窗函数 ==
+
+=== 矩形窗(Rectangular) === 
+  
+每個DFT過程都被窗所修飾限制，因為一個有限時間序列等效上是由無限長時間序列乘上一長度與資料區塊長度相同(NΔt)的矩形窗。在矩形窗的例子中，其DFT是由訊號本身的DFT及一矩形的DFT做迴旋所產生，然而矩形窗屬於時間變量的零次冪窗。矩形窗使用最多，
+習慣上不加窗就是使信號通過了矩形窗。這種窗的優點是主瓣比較集中，缺點是旁瓣較高，並有負旁瓣，導致變換中帶進了高頻干擾和洩漏，甚至出現負譜現象。
+:[[File:Window_function_(rectangular).svg|thumb]]{{clear}}
+
+:<math>w(n) = 1\,</math>{{clear}}
+
+=== 高斯窗 ===
+
+:[[File:window_function_(gauss).svg|thumb]]{{clear}}
+
+:<math>w(n)=e^{-\frac{1}{2} \left ( \frac{n-(N-1)/2}{\sigma (N-1)/2} \right)^{2}}</math>
+
+:<math>\sigma \le \;0.5\,</math>{{clear}}
+
+高斯函數經由傅立葉轉換得到的結果，仍然是高斯函數。由於高斯函數會向無限大與負無限大處無限延伸，因此一般都會設定一個截斷高斯函數的閾值，或是將高斯函數搭配其他兩端數值為零的函數。
+
+另外，由於取高斯函數的對數會產生拋物曲線，此性質可用於頻率估測的近二次內插中。
+
+=== 受限高斯窗 ===
+:[[File:Window_function_and_frequency_response_-_Confined_Gaussian_(sigma_t_=_0.1).svg|thumb]]{{clear}}
+
+受限高斯窗在給定時間寬度 N''σ''<sub>''t''</sub> 下，將產生最小可能的方均根頻率寬度 ''σ''<sub>''ω''</sub>，並最佳化方均根時頻帶寬的乘積。
+
+=== 近似受限高斯窗 ===
+:[[File:Window_function_and_frequency_response_-_Approximate_confined_Gaussian_(sigma_t_=_0.1).svg|thumb]]{{clear}}
+
+近似受限高斯窗，在給定時間寬度  N''σ''<sub>''t''</sub> 下，可由下方的式子進一步近似：
+:<math>w(n) = G(n) - \frac{G(-\tfrac{1}{2})[G(n + N) + G(n - N)]}{G(-\tfrac{1}{2} + N) + G(-\tfrac{1}{2} - N)}</math>
+
+其中 Gaussian 定義為:
+::<math>G(x) = e^{- \left(\cfrac{x - \frac{N-1}{2}}{2 N \sigma_t}\right)^2}</math>
+
+
+=== Hamming窗與Hann窗 ===
+:<math>w(n) = a_0 - \underbrace{(1-a_0)}_{a_1}\cdot \cos\left( \tfrac{2 \pi n}{N - 1} \right),\quad 0\le n \le N-1,</math>
+
+當  <math>a_0 = 0.53836</math> ，稱作 '''Hamming窗'''；當  <math>a_0 = 0.5</math>  則叫作 '''Hann窗'''。
+
+==== Hann窗 ====
+:[[File:Window_function_(hann).svg|thumb]]{{clear}}
+
+:<math>w(n)= 0.5\; \left(1 - \cos \left ( \frac{2 \pi n}{N-1} \right) \right)</math>
+
+[[Hann窗|Hann窗]]有时也称为 "Hanning" 窗（“汉宁窗”），以与 Hamming 窗的名稱類似。但是这是不對的，因为这兩个窗是分别根據 [[Julius_von_Hann|Julius von Hann]] 和 [[Richard_Hamming|Richard Hamming]] 的名字命名的。{{clear}}
+Hann窗又称升餘弦窗。Hann窗可以看作是3个矩形时间窗的頻譜之和，或者说是 3个 sinc(t) 型函数之和，而括号中的两项相对于第一个谱窗向左、右各移动了π/T，从而使旁瓣互相抵消，消去高频干扰和漏能。
+
+从减小泄漏观点出发，Hann窗优于矩形窗。但Hann窗主瓣加宽，相当于分析带宽加宽，频率分辨力下降。
+
+==== Hamming窗 ====
+:[[File:Window_function_(hamming).svg|thumb]]{{clear}}
+
+:<math>w(n)=0.53836 - 0.46164\; \cos \left ( \frac{2 \pi n}{N-1} \right)</math>{{clear}}
+
+如果我們將  <math>a_0</math>  設為接近 0.53836 的數值，或是更精確來說是 25/46，便會得到Hamming窗，而設定這個數值的用意，是在頻率為 5π/(''N'' − 1) 處產生零交會處(zero-crossing)，使原先Hann窗的第一個旁瓣(sidelobe)可以被大幅消除，產生只有Hann窗 1/5 高度的旁瓣。
+
+=== Bartlett窗（端点值为0） ===
+
+:[[File:Window_function_(bartlett).png|thumb]]{{clear}}
+
+:<math>w(n)=\frac{2}{N-1}\cdot\left(\frac{N-1}{2}-\left |n-\frac{N-1}{2}\right |\right)\,</math>{{clear}}
+
+=== 三角形窗（端点值非0） ===
+
+:[[File:Window_function_(triangular).png|thumb]]{{clear}}
+
+:<math>w(n)=\frac{2}{N}\cdot\left(\frac{N}{2}-\left |n-\frac{N-1}{2}\right |\right)\,</math>{{clear}}
+
+=== Bartlett-Hann窗 ===
+
+:[[File:Window_function_(bartlett-hann).png|thumb]]{{clear}}
+
+:<math>w(n)=a_0 - a_1 \left |\frac{n}{N-1}-\frac{1}{2} \right| - a_2 \cos \left (\frac{2 \pi n}{N-1}\right )</math>
+
+:<math>a_0=0.62;\quad a_1=0.48;\quad a_2=0.38\,</math>{{clear}}
+
+=== Blackman窗 ===
+
+:[[File:Window_function_(blackman).png|thumb]]{{clear}}
+
+:<math>w(n)=a_0 - a_1 \cos \left ( \frac{2 \pi n}{N-1} \right) + a_2 \cos \left ( \frac{4 \pi n}{N-1} \right)</math>
+
+:<math>a_0=0.42;\quad a_1=0.5;\quad a_2=0.08\,</math>{{clear}}
+
+根據一般習慣，Blackman窗所設定的數值並非完全精確(''α'' = 0.16, ''a''<sub>0</sub> = 0.42, ''a''<sub>1</sub> = 0.5, ''a''<sub>2</sub> = 0.08)，而是近似於精確Blackman的數值(''a''<sub>0</sub> = 7938/18608 ≈ 0.42659, ''a''<sub>1</sub> = 9240/18608 ≈ 0.49656, ''a''<sub>2</sub> = 1430/18608 ≈ 0.076849)。
+
+如此的數值設定，其用意是在第三個及第四個旁瓣位置產生零交會處(zero-crossing)。
+
+=== Kaiser窗 ===
+[[File:Window_function_and_frequency_response_-_Kaiser_(alpha_=_2).svg|thumb]]
+[[File:Window_function_and_frequency_response_-_Kaiser_(alpha_=_3).svg|thumb]]
+{{main|Kaiser窗}}
+
+:<math>w(n)=\frac{I_0\Bigg (\pi\alpha \sqrt{1 - (\begin{matrix} \frac{2 n}{N-1} \end{matrix}-1)^2}\Bigg )} {I_0(\pi\alpha)}</math>
+
+{{clear}}
+----
+
+===低分辨率（高動態範圍）窗===
+
+====Nuttall窗（一階導數連續）====
+:[[File:Window_function_(nuttall).png|thumb]]{{clear}}
+
+:<math>w(n)=a_0 - a_1 \cos \left ( \frac{2 \pi n}{N-1} \right)+ a_2 \cos \left ( \frac{4 \pi n}{N-1} \right)- a_3 \cos \left ( \frac{6 \pi n}{N-1} \right)</math>
+
+:<math>a_0=0.355768;\quad a_1=0.487396;\quad a_2=0.144232;\quad a_3=0.012604\,</math>{{clear}}
+
+當我們考慮 ''n'' 為一實數，Nuttall窗函數及其一次導數在任意處皆為連續，且當 ''n = 0'' 時的數值為 0，而Blackman-Nuttall窗及Blackman-Harris窗，在 ''n = 0'' 處則有一微小的正值。
+
+====Blackman-Nuttall窗====
+
+:[[File:Window_function_(blackman-nuttall).png|thumb]]{{clear}}
+
+:<math>w(n)=a_0 - a_1 \cos \left ( \frac{2 \pi n}{N-1} \right)+ a_2 \cos \left ( \frac{4 \pi n}{N-1} \right)- a_3 \cos \left ( \frac{6 \pi n}{N-1} \right)</math>
+
+:<math>a_0=0.3635819; \quad a_1=0.4891775; \quad a_2=0.1365995; \quad a_3=0.0106411\,</math>{{clear}}
+
+====Blackman-Harris窗====
+:[[File:Window_function_(blackman-harris).png|thumb]]{{clear}}
+
+:<math>w(n)=a_0 - a_1 \cos \left ( \frac{2 \pi n}{N-1} \right)+ a_2 \cos \left ( \frac{4 \pi n}{N-1} \right)- a_3 \cos \left ( \frac{6 \pi n}{N-1} \right)</math>
+
+:<math>a_0=0.35875;\quad a_1=0.48829;\quad a_2=0.14128;\quad a_3=0.01168\,</math>{{clear}}
+
+Blackman-Harris窗是Hamming窗家族的一般化，藉由加上更多位移sinc函數而產生，並能夠減低旁瓣的影響。
+
+
+====平頂窗====
+:[[File:Window_function_(flat_top).png|thumb]]{{clear}}
+
+:<math>w(n)=a_0 - a_1 \cos \left ( \frac{2 \pi n}{N-1} \right)+ a_2 \cos \left ( \frac{4 \pi n}{N-1} \right)- a_3 \cos \left ( \frac{6 \pi n}{N-1} \right)+a_4 \cos \left ( \frac{8 \pi n}{N-1} \right)</math>
+
+:<math>a_0=1;\quad a_1=1.93;\quad a_2=1.29;\quad a_3=0.388;\quad a_4=0.032\,</math>
+
+平頂窗在部分區域為負值，並且在頻域中具有較小的扇形損失。該特性有利於測量正弦頻率分量，但具有較低頻率精準度以及高雜訊頻帶等缺點。我們可以利用低通濾波器的設計方法產生平頂窗函數。
+
+=== 其他窗函数 ===
+
+==== 貝賽爾窗 ====
+
+==== 正弦窗 ====
+:[[File:Window_function_and_frequency_response_-_Cosine.svg|thumb]]{{clear}}
+
+:<math>w(n) = \sin\left(\frac{\pi n}{N-1}\right) = \cos\left(\frac{\pi n}{N-1} - \frac{\pi}{2}\right)</math>
+
+正弦窗有時也稱作餘弦窗，因為其函數可同時由正弦或餘弦函數的方式表示。
+
+正弦窗的自相關函數可產生波曼窗(Bohman window)。
+
+==== 指數正弦/餘弦窗 ====
+此類別的窗具有以下形式：
+
+:<math>w(n) = \sin^\alpha\left(\frac{\pi n}{N-1}\right) = \cos^\alpha\left(\frac{\pi n}{N-1} - \frac{\pi}{2}\right).</math>
+
+矩形窗(''α'' = 0)、正弦窗、以及Hann窗(''α'' = 2)皆屬於這類窗的一員。
+
+
+==== 多夫-柴比雪夫窗 ====
+<math>\begin{align} W_0(k) &= \frac{\cos \{N \cos^{-1}[ \beta\cos(\frac{\pi k}{N})]\} }{\cosh [N \cosh^{-1}(\beta)]}\\ \beta &= \cosh [\frac{1}{N} \cosh^{-1}(10^\alpha)], \end{align}</math>
+
+α參數控制了窗口的尖細程度，α也是旁瓣准尉的對數，因此α=2.0表示比主瓣低了兩個度(decades)或是-40dB。窗口的特徵是主瓣的背景洩漏在轉換後的輸出唯一常數振福。對一個已給定洩漏等級，當主瓣的寬度為最小時，這個窗口是最佳化。
+另外優點在於，當只有小數目輸入訊號取樣點時，可用來做小轉換，這個窗口在主瓣附近提供很好的能見度。
+
+[[File:Window_function_and_frequency_response_-_Dolph-Chebyshev_(alpha_=_5).svg|300px]]
+
+==多重窗==
+
+===三重余弦窗===
+
+==参看==
+* [[短時距傅立葉變換|短時距傅立葉變換]]
+* [[Boxcar_函数|Boxcar 函数]]
+
+==参考文献==
+*Oppenheim, A.V., and R.W. Schafer, ''Discrete-Time Signal Processing'', Upper Saddle River, NJ: Prentice-Hall, 1999, pp 468-471.
+*Albert H. Nuttall, ''Some Windows with Very Good Sidelobe Behavior'', IEEE Transactions on Acoustics, Speech, and Signal Processing, Vol.ASSP-29, No.1, February 1981, pp 84-91.
+*Frederic J. Harris, ''On the use of Windows for Harmonic Analysis with the Discrete Fourier Transform'', Proceedings of the IEEE, Vol.66, No.1, January 1978, pp 51-83.
+* S.W.A. Bergen and A. Antoniou, ''Design of Ultraspherical Window Functions with Prescribed Spectral Characteristics,'' EURASIP Journal on Applied Signal Processing, vol. 2004, no. 13, pp. 2053-2065, 2004.
+* S.W.A. Bergen and A. Antoniou, ''Design of Nonrecursive Digital Filters Using the Ultraspherical Window Function,'' EURASIP Journal on Applied Signal Processing, vol. 2005, no. 12, pp. 1910-1922, 2005.
+Jian-Jiun Ding, class lecture of Time Frequency Analysis and Wavelet transform, Graduate Institute of Communication Engineering, National Taiwan University, Taipei, Taiwan, 2018.
+
+[[Category:统计学|Category:统计学]]
+[[Category:傅里叶分析|Category:傅里叶分析]]
+[[Category:信号处理|Category:信号处理]]
+[[Category:数字信号处理|Category:数字信号处理]]
+[[Category:函数|Category:函数]]

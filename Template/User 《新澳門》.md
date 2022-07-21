@@ -1,0 +1,10 @@
+{{Userbox
+  |id=新澳門<br>Issue
+  |id-c=green
+  |id-fc=white
+  |id-s=10
+  |info=這個用戶喜歡閱讀'''[[新澳門學社]]'''出版的刊物。
+  |info-c=white
+  |info-s=9
+  |border-c=green
+}}<includeonly></includeonly><noinclude>{{Clear}}[[Category:媒體用戶框模板|刊]][[Wikipedia:用戶框/媒體]]</noinclude>

@@ -1,0 +1,1249 @@
+{{other uses}}
+{{noteTA
+|G1=IT
+}}
+'''ID3'''是一种[[metadata|metadata]]容器，多应用于MP3格式的音频文件中。它可以将相关的曲名、演唱者、专辑、音轨数等信息存储在MP3文件中，又稱作「ID3Tags」。
+
+ID3也被[[蘋果公司|蘋果公司]]指定為[[HTTP_Live_Streaming|HTTP Live Streaming]]中的時間[[後設資料|後設資料]]，在主要的[[MPEG2-TS|傳輸流]]或單獨的音頻傳輸流中作為{{abbr|PID|packet Identifier}}乘載。
+
+ID3一般位于一个mp3文件的开头或末尾的若干字节内，附加了关于该mp3的歌手，标题，专辑名称，年代，风格等信息，该信息就被称为ID3信息。ID3信息分为两个版本，v1和v2版。其中： v1版的ID3在[[mp3|mp3]]文件的末尾128字节，以TAG三个字符开头，后面跟上歌曲信息。v1.1版將「評論」欄位縮短，增設「曲目」欄位。v2版則和v1版截然不同，其通常將一系列可擴展的資料框架（frames）儲存在檔案開頭，而每一塊資料框架都有當作辨識標籤的、大小約3到4個位元組的字串，以及其所儲存的資料。在最新的ID3v2.4版本中，總共宣告有83種資料框架，而使用者也可以自訂屬於自己的資料框架。目前總共有三種版本的ID3v2，其中每一版都有對資料框架的定義進行擴展。
+
+ID3是mp3檔案後設資料自然而然發展出來的[[事實標準|事實標準]]；其成品並沒有包含任何的實質規範，也沒有任何組織給予其正式的批准或認證。其與[[APE_tag|APE tag]]在音樂檔案的後設資料標籤領域互相角逐。
+
+
+== ID3v1 ==
+
+MP3並未預設儲存檔案後設資料的方式。在1996年，埃里克·肯普（Eric Kemp）想要在音訊檔案後方加入一小串資料，也因此解決了這個問題。這個方法就是現在的ID3v1，很快就變成了MP3檔案儲存後設資料的事實標準<ref name="id3origin">[https://books.google.com/books?id=Bby4FJy49QUC&pg=PA335 Practical Common Lisp] {{Wayback|url=https://books.google.com/books?id=Bby4FJy49QUC&pg=PA335 |date=20140705102150 }}, p. 335.</ref>。一個開發控制台遊戲系統的地下組織「傷害控制論」（Damaged Cybernetics）宣布了格式。因為所有已開發的控制台ROM都沒有任何的辨識資訊，所以他們創造了一個標籤系統來讓其更容易查找。埃里克和合作夥伴們將其帶進MP3檔案中。這種格式被應用在許多當時格式不明的檔案當中。
+
+ID3v1標籤總共佔據128個[[位元組|位元組]]，接在檔案的末尾以維持檔案在舊版的[[媒體播放器|媒體播放器]]中的兼容性。有些播放器會在讀取到這些標籤時誤認為音訊檔而產生一些雜音，不過大部分的播放器和幾乎全部的現代播放器都會正確地跳過標籤。標籤有30位元組用來儲存標題、演唱者、專輯以及「評論」，4個位元組儲存年分，以及一個位元組儲存歌曲的[[藝術類型|藝術類型]]。預設有80種藝術類型，[[Winamp|Winamp]]後來將其擴展到總共148種。
+
+在1997年，邁克爾·邁克塞勒對ID3v1做了一些改進。因為評論欄位實在是小到不可能寫出一些有用的東西，所以他乾脆拿掉兩個位元組來儲存「曲目」。這種標籤被稱作'''ID3v1.1'''<ref name="id3origin" />。
+
+=== 格式 ===
+字串由空格或零填充。未設置的選項會填入空字串。ID3v1總長為128個位元組<ref>關於ID3v1在[[Python|Python]]中的應用，請看[http://www.diveintopython.net/object_oriented_framework/index.html Dive Into Python, Chapter 5. Objects and Object-Orientation] {{Wayback|url=http://www.diveintopython.net/object_oriented_framework/index.html |date=20130831144346 }}</ref>。
+
+{| class="wikitable"
+|-
+! 區域
+! 長度
+! 描述
+|-
+| 開頭
+| 3
+| 「''TAG''」，標籤。
+|-
+| 標題
+| 30
+| 歌曲標題，最多30個英文字元。
+|-
+| 藝術家
+| 30
+| 作曲或演唱者的名字，最多30個英文字元。
+|-
+| 專輯
+| 30
+| 專輯名稱，最多30個英文字元。
+|-
+| 年分
+| 4
+| 西元年分，四個數字。
+|-
+| 評論
+| 28<ref name=storage>曲目會儲存在評論區的最後兩個位元組中。如果評論有29或30個字元那麼長，就無法儲存曲目。</ref>或30
+| 就是評論。
+|-
+| 零位元組<ref name=storage />
+| 1
+| 如果有儲存曲目，那麼這個位元組會儲存一個二進位的0。
+|-
+| 曲目<ref name=storage />
+| 1
+| 這首歌在該專輯中的曲目，或者為0。若前一個位元組非零，則此欄內容無效。
+|-
+| 藝術類型
+| 1
+| 一系列藝術類型清單中的編號數，預設為255。
+|}
+
+ID3v1預設了一系列的藝術類型，以數字作為索引。[[Winamp|Winamp]]在自家的音樂播放器加入更多選項到該清單中，後來其他播放器也隨之跟進；有一部份的值沒有標準規範<ref>「Primus」是單一樂團而非藝術類型，而「Negerpunk」似乎是瑞典的種族歧視笑話</ref>。不過，並非全世界都支援Winamp的擴展清單。有時候，有些播放器只支援到125種藝術類型<ref>{{cite web|url=http://id3.org/id3v2.3.0#Appendix_A_-_Genre_List_from_ID3v1|title=Genre List from ID3v1|access-date=2016-11-13|archive-url=https://web.archive.org/web/20151121080450/http://id3.org/id3v2.3.0#Appendix_A_-_Genre_List_from_ID3v1|archive-date=2015-11-21|dead-url=yes}}</ref>。
+
+=== 擴展標籤 ===
+擴展標籤（extended tag）是位於ID3v1標籤前的額外資料區塊，其將標題、藝術家與專輯欄位各自擴展到60個位元組長度，提供可自由輸入文字的藝術類型欄位、一位元組大小的曲速（值為0到5）以及MP3檔案的起始與結束時間。如果以上的區域都沒有被使用，那麼這個資料區塊就會自動被省略。
+
+有些支援ID3v1的程式也可以讀到擴展標籤，不過寫入時可能會在擴展區塊中留下過舊的值。擴展區塊並非官方標準，而且只有少數程式支援，不包含[[XMMS|XMMS]]或[[Winamp|Winamp]]。擴展標籤有時也被稱作「補強標籤」（enhanced tag）。
+
+擴展標籤總長227個位元組，並且位於ID3v1標籤之前。
+
+{| class="wikitable"
+|-
+! 區域
+! 長度
+! 描述
+|-
+| 開頭
+| 4
+| 「''TAG+''」，代表其為擴展標籤。
+|-
+| 標題
+| 60
+| 歌曲標題，最多60個英文字元。
+|-
+| 藝術家
+| 60
+| 作曲或演唱者的名字，最多60個英文字元。
+|-
+| 專輯
+| 60
+| 專輯名稱，最多60個英文字元。
+|-
+| 曲速
+| 1
+| 0：未設置，1：慢板，2：中板，3：快板，4：極快
+|-
+| 藝術類型
+| 30
+| 可自由輸入文字的藝術類型區塊。
+|-
+| 開始時間
+| 6
+| 音樂開始的時間：mmm:ss
+|-
+| 結束時間
+| 6
+| 音樂結束的時間：mmm:ss
+|}
+
+=== 藝術類型列表 ===
+{| class="wikitable"
+|-
+! 編號
+! 英文代碼
+! 中文維基百科
+! Winamp擴展
+|-
+| 0
+| Blues
+| [[藍調|藍調]]
+| 
+|-
+| 1
+| Classic Rock
+| [[古典摇滚乐|古典摇滚乐]]
+| 
+|-
+| 2
+| Country
+| [[乡村音乐|乡村音乐]]
+| 
+|-
+| 3
+| Dance
+| [[舞曲|舞曲]]
+| 
+|-
+| 4
+| Disco
+| [[迪斯科|迪斯科]]
+| 
+|-
+| 5
+| Funk
+| [[放克|放克]]
+| 
+|-
+| 6
+| Grunge
+| [[油漬搖滾|油漬搖滾]]
+| 
+|-
+| 7
+| Hip-Hop
+| [[嘻哈|嘻哈]]
+| 
+|-
+| 8
+| Jazz
+| [[爵士乐|爵士乐]]
+| 
+|-
+| 9
+| Metal
+| [[重金属音乐|重金属音乐]]
+| 
+|-
+| 10
+| New Age
+| [[新世紀音樂|新世紀音樂]]
+| 
+|-
+| 11
+| Oldies
+| [[Oldies|Oldies]]
+| 
+|-
+| 12
+| Other
+| 
+| 
+|-
+| 13
+| Pop
+| [[流行_(音樂類型)|流行 (音樂類型)]]
+| 
+|-
+| 14
+| R&B
+| [[节奏布鲁斯|节奏布鲁斯]]
+| 
+|-
+| 15
+| Rap
+| [[饒舌|饒舌]]
+| 
+|-
+| 16
+| Reggae
+| [[雷鬼音樂|雷鬼音樂]]
+| 
+|-
+| 17
+| Rock
+| [[摇滚乐|摇滚乐]]
+| 
+|-
+| 18
+| Techno
+| [[铁克诺音乐|铁克诺音乐]]
+| 
+|-
+| 19
+| Industrial
+| [[Industrial|Industrial]]
+| 
+|-
+| 20
+| Alternative
+| [[另类摇滚|另类摇滚]]
+| 
+|-
+| 21
+| Ska
+| [[斯卡曲風|斯卡曲風]]
+| 
+|-
+| 22
+| Death Metal
+| [[死亡金屬音樂|死亡金屬音樂]]
+| 
+|-
+| 23
+| Pranks
+| [[Pranks|Pranks]]
+| 
+|-
+| 24
+| Soundtrack
+| [[原声音乐|原声音乐]]
+| 
+|-
+| 25
+| Euro-Techno
+| [[Euro-Techno|Euro-Techno]]
+| 
+|-
+| 26
+| Ambient
+| [[氛围音乐|氛围音乐]]
+| 
+|-
+| 27
+| Trip-Hop
+| [[神遊舞曲|神遊舞曲]]
+| 
+|-
+| 28
+| Vocal
+| [[聲樂|聲樂]]
+| 
+|-
+| 29
+| Jazz+Funk
+| [[爵士乐|爵士乐]]+[[放克|放克]]
+| 
+|-
+| 30
+| Fusion
+| [[融合爵士樂|融合爵士樂]]
+| 
+|-
+| 31
+| Trance
+| [[出神音樂|出神音樂]]
+| 
+|-
+| 32
+| Classical
+| [[古典音乐|古典音乐]]
+| 
+|-
+| 33
+| Instrumental
+| [[器樂|器樂]]
+| 
+|-
+| 34
+| Acid
+| [[Acid|Acid]]
+| 
+|-
+| 35
+| House
+| [[浩室音乐|浩室音乐]]
+| 
+|-
+| 36
+| Game
+| [[Game|Game]]
+| 
+|-
+| 37
+| Sound Clip
+| 音效及聲音片段
+| 
+|-
+| 38
+| Gospel
+| [[福音音乐|福音音乐]]
+| 
+|-
+| 39
+| Noise
+| [[噪音音樂|噪音音樂]]
+| 
+|-
+| 40
+| AlternRock
+| [[AlternRock|AlternRock]]
+| 
+|-
+| 41
+| Bass
+| [[電貝斯|電貝斯]]
+| 
+|-
+| 42
+| Soul
+| [[靈魂樂|靈魂樂]]
+| 
+|-
+| 43
+| Punk
+| [[龐克文化|龐克文化]]
+| 
+|-
+| 44
+| Space
+| [[Space|Space]]
+| 
+|-
+| 45
+| Meditative
+| [[冥想音樂|冥想音樂]]
+| 
+|-
+| 46
+| Instrumental Pop
+| [[Instrumental_Pop|Instrumental Pop]]
+| 
+|-
+| 47
+| Instrumental Rock
+| [[Instrumental_Rock|Instrumental Rock]]
+| 
+|-
+| 48
+| Ethnic
+| [[Ethnic|Ethnic]]
+| 
+|-
+| 49
+| Gothic
+| [[Gothic|Gothic]]
+| 
+|-
+| 50
+| Darkwave
+| [[Darkwave|Darkwave]]
+| 
+|-
+| 51
+| Techno-Industrial
+| [[Techno-Industrial|Techno-Industrial]]
+| 
+|-
+| 52
+| Electronic
+| [[電子音樂|電子音樂]]
+| 
+|-
+| 53
+| Pop-Folk
+| [[Pop-Folk|Pop-Folk]]
+| 
+|-
+| 54
+| Eurodance
+| [[歐陸舞曲|歐陸舞曲]]
+| 
+|-
+| 55
+| Dream
+| [[Dream_(日本音樂團體)|Dream]]
+| 
+|-
+| 56
+| Southern Rock
+| [[Southern_Rock|Southern Rock]]
+| 
+|-
+| 57
+| Comedy
+| [[喜劇|喜劇]]
+| 
+|-
+| 58
+| Cult
+| [[Cult|Cult]]
+| 
+|-
+| 59
+| Gangsta
+| [[Gangsta|Gangsta]]
+| 
+|-
+| 60
+| Top 40
+| [[Top_40|Top 40]]
+| 
+|-
+| 61
+| Christian Rap
+| [[Christian_Rap|Christian Rap]]
+| 
+|-
+| 62
+| Pop/Funk
+| [[流行_(音樂類型)|流行 (音樂類型)]]/[[放克|放克]]
+| 
+|-
+| 63
+| Jungle
+| [[早期叢林舞曲|早期叢林舞曲]]
+| 
+|-
+| 64
+| Native American
+| [[Native_American|Native American]]
+| 
+|-
+| 65
+| Cabaret
+| [[卡巴萊|卡巴萊]]
+| 
+|-
+| 66
+| New Wave
+| [[新浪潮|新浪潮]]
+| 
+|-
+| 67
+| Psychadelic
+| [[Psychadelic|Psychadelic]]
+| 
+|-
+| 68
+| Rave
+| [[銳舞|銳舞]]
+| 
+|-
+| 69
+| Showtunes
+| [[Showtunes|Showtunes]]
+| 
+|-
+| 70
+| Trailer
+| [[Trailer|Trailer]]
+| 
+|-
+| 71
+| Lo-Fi
+| [[Lo-Fi|Lo-Fi]]
+| 
+|-
+| 72
+| Tribal
+| [[Tribal|Tribal]]
+| 
+|-
+| 73
+| Acid Punk
+| [[Acid_Punk|Acid Punk]]
+| 
+|-
+| 74
+| Acid Jazz
+| [[酸爵士|酸爵士]]
+| 
+|-
+| 75
+| Polka
+| [[波尔卡|波尔卡]]
+| 
+|-
+| 76
+| Retro
+| [[Retro|Retro]]
+| 
+|-
+| 77
+| Musical
+| [[Musical|Musical]]
+| 
+|-
+| 78
+| Rock & Roll
+| [[摇滚|摇滚]]
+| 
+|-
+| 79
+| Hard Rock
+| [[硬式搖滾|硬式搖滾]]
+| 
+|-
+| 80
+| Folk
+| [[民俗音樂|民俗音樂]]
+| 是
+|-
+| 81
+| Folk-Rock
+| [[民谣摇滚|民谣摇滚]]
+| 是
+|-
+| 82
+| National Folk
+| [[National_Folk|National Folk]]
+| 是
+|-
+| 83
+| Swing
+| [[Swing|Swing]]
+| 是
+|-
+| 84
+| Fast Fusion
+| [[Fast_Fusion|Fast Fusion]]
+| 是
+|-
+| 85
+| Bebob
+| [[咆勃爵士樂|咆勃爵士樂]]
+| 是
+|-
+| 86
+| Latin
+| [[拉丁舞|拉丁舞]]
+| 是
+|-
+| 87
+| Revival
+| [[Revival|Revival]]
+| 是
+|-
+| 88
+| Celtic
+| [[凱爾特音樂|凱爾特音樂]]
+| 是
+|-
+| 89
+| Bluegrass
+| [[藍草音樂|藍草音樂]]
+| 是
+|-
+| 90
+| Avantgarde
+| [[前衛|前衛]]
+| 是
+|-
+| 91
+| Gothic Rock
+| [[哥德搖滾|哥德搖滾]]
+| 是
+|-
+| 92
+| Progressive Rock
+| [[前衛搖滾|前衛搖滾]]
+| 是
+|-
+| 93
+| Psychedelic Rock
+| [[迷幻搖滾|迷幻搖滾]]
+| 是
+|-
+| 94
+| Symphonic Rock
+| [[前衛搖滾|前衛搖滾]]
+| 是
+|-
+| 95
+| Slow Rock
+| [[Slow_Rock|Slow Rock]]
+| 是
+|-
+| 96
+| Big Band
+| [[大樂團|大樂團]]
+| 是
+|-
+| 97
+| Chorus
+| [[副歌|副歌]]
+| 是
+|-
+| 98
+| Easy Listening
+| [[Easy_Listening|Easy Listening]]
+| 是
+|-
+| 99
+| Acoustic
+| [[原音乐|原音乐]]
+| 是
+|-
+| 100
+| Humour
+| [[幽默|幽默]]
+| 是
+|-
+| 101
+| Speech
+| [[語音|語音]]
+| 是
+|-
+| 102
+| Chanson
+| [[香颂|香颂]]
+| 是
+|-
+| 103
+| Opera
+| [[歌剧|歌剧]]
+| 是
+|-
+| 104
+| Chamber Music
+| [[室内乐|室内乐]]
+| 是
+|-
+| 105
+| Sonata
+| [[奏鸣曲|奏鸣曲]]
+| 是
+|-
+| 106
+| Symphony
+| [[交響曲|交響曲]]
+| 是
+|-
+| 107
+| Booty Bass
+| [[Booty_Bass|Booty Bass]]
+| 是
+|-
+| 108
+| Primus
+| [[讽刺|讽刺]]
+| 是
+|-
+| 109
+| Porn Groove
+| [[Porn_Groove|Porn Groove]]
+| 是
+|-
+| 110
+| Satire
+| [[Satire|Satire]]
+| 是
+|-
+| 111
+| Slow Jam
+| [[Slow_Jam|Slow Jam]]
+| 是
+|-
+| 112
+| Club
+| [[電子舞曲|電子舞曲]]
+| 是
+|-
+| 113
+| Tango
+| [[探戈|探戈]]
+| 是
+|-
+| 114
+| Samba
+| [[森巴_(巴西音樂)|桑巴]]
+| 是
+|-
+| 115
+| Folklore
+| [[民俗學|民俗學]]
+| 是
+|-
+| 116
+| Ballad
+| [[谣曲|谣曲]]
+| 是
+|-
+| 117
+| Power Ballad
+| [[Power_Ballad|Power Ballad]]
+| 是
+|-
+| 118
+| Rhythmic Soul
+| [[Rhythmic_Soul|Rhythmic Soul]]
+| 是
+|-
+| 119
+| Freestyle
+| [[Freestyle|Freestyle]]
+| 是
+|-
+| 120
+| Duet
+| [[Duet|Duet]]
+| 是
+|-
+| 121
+| Punk Rock
+| [[朋克搖滾|朋克搖滾]]
+| 是
+|-
+| 122
+| Drum Solo
+| [[Drum_Solo|Drum Solo]]
+| 是
+|-
+| 123
+| A capella
+| [[無伴奏合唱|無伴奏合唱]]
+| 是
+|-
+| 124
+| Euro-House
+| [[浩室音乐|浩室音乐]]
+| 是
+|-
+| 125
+| Dance Hall
+| [[Dance_Hall|Dance Hall]]
+| 是
+|}
+
+== {{anchor|ID3v2.1|ID3v2.2|ID3v2.3|ID3v2.4|}}ID3v2 ==
+<!-- 檔案不存在 [[File:Id3v2_logo.png|125px]] ，可從英文維基百科取得 -->
+1998年，一個由許多貢獻者創造、被稱作ID3v2的新規範問世<ref>{{cite web|url=http://www.id3.org/Contributors|title=Contributors - ID3.org|publisher=|access-date=2016-11-13|archive-url=https://web.archive.org/web/20161203120103/http://id3.org/Contributors|archive-date=2016-12-03|dead-url=yes}}</ref>。雖然繼承了ID3的名字，但其結構與ID3v1大相逕庭。
+
+ID3v2標籤有各種不同的大小，而且經常位於檔案開頭，以運用於[[串流媒體|串流媒體]]中。舉例來說，''TIT2''資料框架包含標題，而''WOAR''資料框架則包含該藝術家的網站[[URL|URL]]連結。資料框架最大可達16MB，不過標籤總大小上限為256MB。標籤也不再侷限於[[ISO/IEC_8859-1|西歐編碼]]，而支援[[Unicode|Unicode]]，解決了國際化的問題。
+
+文字框架會由一個編碼位元組標記，以得知其是由哪種編碼存入的<ref>{{cite web|url=http://id3.org/id3v2-00|title=id3v2-00 - ID3.org|publisher=|accessdate=2016-11-13|archive-date=2016-11-24|archive-url=https://web.archive.org/web/20161124001116/http://id3.org/id3v2-00|dead-url=no}}</ref>。
+
+<pre>
+$00 – ISO-8859-1 (LATIN-1, Identical to ASCII for values smaller than 0x80).
+$01 – UCS-2 (UTF-16 encoded Unicode with BOM), in ID3v2.2 and ID3v2.3.
+$02 – UTF-16BE encoded Unicode without BOM, in ID3v2.4.
+$03 – UTF-8 encoded Unicode, in ID3v2.4.
+</pre>
+
+不過，在使用地區編碼而非萬國碼的時候，還是很容易出現[[亂碼|亂碼]]。特別是有些使用[[Shift_JIS|Shift JIS]]編碼的日文編輯者經常造成一些災難性的後果：因為並非標準支援，所以不管地區設定為何，都無法運用於任何符合標準的軟體；因為日本以外的地區幾乎不支援Shift JIS，所以也無法在日本以外的地區使用；甚至連日本境內也並非通用，因為其取決於軟體與設置。
+
+在最新版ID3v2.4，總共宣告了83種資料框架<ref>{{cite web|title=ID3v2.4.0 Native Frames|url=http://id3.org/id3v2.4.0-frames|accessdate=2012-12-27|archive-date=2012-12-21|archive-url=https://web.archive.org/web/20121221082946/http://id3.org/id3v2.4.0-frames|dead-url=no}}</ref>，而使用者也可以自訂屬於自己的資料框架。標準的資料框架有[[速度_(音樂)|量測音樂速度]]、版權、歌詞、任意文字和URL數據等等。ID3v2總共有三種版本：
+
+;ID3v2.2
+:v2.2是ID3v2的第一個公開版本。他使用3個字元作為資料框架識別碼，而非4個（舉例來說，其使用''TT2''而非''T1T2''）。v2.3和v2.4中大多數的資料框架都在v2.2中有著相似的框架。這個標準已經被認為過時<ref>{{cite web|last=Nilsson|first=Martin|title=ID3 Developer Information|url=http://id3.org/Developer_Information|work=ID3.org.|accessdate=9 April 2011|archive-date=2012-08-26|archive-url=https://web.archive.org/web/20120826070707/http://www.id3.org/Developer_Information|dead-url=no}}</ref>。
+;ID3v2.3
+:v2.3將資料框架識別碼擴展到4個字元，並且加入了一些新的資料框架。一個框架可以包含複數值，由[[空字符|空字符]]分隔。這是目前最廣泛使用的ID3v2標籤<ref>{{cite web|title=ID3 tag version 2.3.0|url=http://id3.org/d3v2.3.0|accessdate=2016-11-13|archive-date=2016-11-17|archive-url=https://web.archive.org/web/20161117211455/http://id3.org/d3v2.3.0|dead-url=no}}</ref>。
+;ID3v2.4
+:v2.4出版於2000年11月1日，至今仍是最新的版本。其允許文字資料以早期常用（因為它比起[[UTF-16|UTF-16]]而言有許多顯著的優點）但非標準的標籤編碼[[UTF-8|UTF-8]]寫入。另外一項新功能是可以選擇是否在檔案末端、其他標籤前面加入標籤，就像ID3v1那樣<ref>{{cite web|title=ID3 tag version 2.4.0 - Native Frames|url=http://id3.org/id3v2.4.0-structure|accessdate=2016-11-13|archive-date=2016-10-28|archive-url=https://web.archive.org/web/20161028093833/http://id3.org/id3v2.4.0-structure|dead-url=no}}</ref>。
+:沒有任何版本的[[Windows檔案總管|Windows檔案總管]]和[[Windows_Media_Player|Windows Media Player]]──甚至是最新的[[Windows_10|Windows 10]]和{{abbr|WMP|Windows Media Player}} 12──都無法正確的解讀ID3v2.4標籤，不過依然能解讀v2.3或是更早的版本<ref name="ArsTechnicaReview">{{cite web | last = Bright | first = Peter | date = 28 October 2012 | url = http://arstechnica.com/features/2012/10/a-work-in-progress-the-windows-8-multimedia-experience/2/ | title = Music and Video in Windows 8: a work in progress | work = arstechnica.com | accessdate = 2012-10-29 | archive-date = 2012-10-30 | archive-url = https://web.archive.org/web/20121030210557/http://arstechnica.com/features/2012/10/a-work-in-progress-the-windows-8-multimedia-experience/2/ | dead-url = no }}</ref><ref name="MicrosoftCommunitysupport">{{cite web | date = 11 January 2011 | url = http://answers.microsoft.com/en-us/windows/forum/windows_7-pictures/how-to-add-id3v24-support-for-windows-7-64bit/a9427521-eb6f-4fe4-affb-f61532846503 | title = Microsoft support community | accessdate = 2016-11-13 | archive-date = 2014-07-12 | archive-url = https://web.archive.org/web/20140712134550/http://answers.microsoft.com/en-us/windows/forum/windows_7-pictures/how-to-add-id3v24-support-for-windows-7-64bit/a9427521-eb6f-4fe4-affb-f61532846503 | dead-url = no }}</ref>。
+
+=== 評分標籤的爭議 ===
+對於歌曲的評分，有一個寬鬆的事實標準。大多數應用程式會替所有歌曲展示0到5顆星的評分，而星數會以何種形式展示則各有不同。舉例來說，當你在[[iTunes|iTunes]]替歌曲評分的時候，評分並不會嵌入那個音樂檔案的標籤裡，而是會儲存在iTunes自己的後設資料數據庫中。其他的[[媒體播放器|媒體播放器]]可以嵌入標籤，但方法不一定相同，所以在一個媒體播放器評分的音樂不一定會在其他的播放器以相同的形式展示。
+
+不過，在新版的ID3v2中有一個「[https://web.archive.org/web/20151121080450/http://id3.org/id3v2.3.0#sec4.18 Popularimeter]」資料框架用來解決這個問題。這個資料框架的識別碼是'''POPM'''，而Windows檔案總管、WMP、[[Winamp|Winamp]]、[[foobar2000|foobar2000]]、[[MediaMonkey|MediaMonkey]]以及其他軟體都將0-255這範圍內的值大致相同地分為0-5星展示。
+
+以Windows檔案總管讀寫POPM資料框架的標準為例：
+{| class="wikitable"
+|-
+! 星數 !! 讀取 !! 寫入
+|-
+| 5 || 224-225 || 255
+|-
+| 4 || 160-223 || 196
+|-
+| 3 || 96-159 || 128
+|-
+| 2 || 32-95 || 64
+|-
+| 1 || 1-31 || 1
+|-
+| 0 || 0 || 0
+|}
+
+語法則為：
+ Windows Media Player 9 Series | 255 | 0
+
+其中0是POPM的計數器部分，不要與PCNT資料框架的播放次數混淆。不過如果有應用程式支援[[粒度|粒度]]，一顆星的話會寫入1，而2到31則會是一顆星之下的粒度點。值得一提的是，Windows所使用的ID字串並非規範所要求的電子郵件地址。而且，直到[[Windows_7|Windows 7]]和WMP 12的Windows檔案總管和WMP都有一個漏洞是：如果你使用以上軟體替音樂評分的話，任何有關[[回放增益|回放增益]]的標籤都會損壞{{citation needed|date=February 2014}}。WMP也以上述方式讀寫相同的值，除了4到5星之間有著些微莫名的不同。WMP使用221和222來區隔4、5星，[https://msdn.microsoft.com/en-us/library/windows/desktop/dd564545%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396 理由不明]{{Wayback|url=https://msdn.microsoft.com/en-us/library/windows/desktop/dd564545%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396 |date=20170623145245 }}。
+
+=== ID3v2章節 ===
+'''ID3v2章節補遺'''（ID3v2 Chapter Addendum）出版於2005年12月，不過至今尚未被廣泛支援。它讓使用者們可以簡單地跳到音訊檔案中特定的地點或樂章，並且可以在播放期間提供同步的圖片與文字的-{zh:投影片;zh-hans:幻灯片;zh-hant:投影片;zh-cn:幻灯片;zh-tw:投影片;}-。典型的應用程式包括補強[[播客|播客]]，而且其可用於v2.3或v2.4標籤中<ref name="Newell">{{cite web | last = Newell | first = C. | date = 2 December 2005 | url = http://www.id3.org/id3v2-chapters-1.0 | title = ID3v2 Chapter Frame Addendum | work = ID3.org | accessdate = 2008-02-06 | archive-url = https://www.webcitation.org/66AktrgSo?url=http://www.id3.org/id3v2-chapters-1.0 | archive-date = 2012-03-15 | dead-url = yes }}</ref>。
+
+=== ID3v2嵌入圖片 ===
+後設資料可以包含以下類型的圖片<ref name="fish">{{cite web|url=http://id3.org/id3v2.3.0#Attached_picture|title=id3v2.3.0 - ID3.org|publisher=|access-date=2016-11-13|archive-url=https://web.archive.org/web/20151121080450/http://id3.org/id3v2.3.0#Attached_picture|archive-date=2015-11-21|dead-url=yes}}</ref>：<pre>
+$00     其他
+$01     32x32 pixels 'file icon' (PNG only)
+$02     Other file icon
+$03     Cover (front)
+$04     Cover (back)
+$05     Leaflet page
+$06     Media (e.g. label side of CD)
+$07     Lead artist/lead performer/soloist
+$08     Artist/performer
+$09     Conductor
+$0A     Band/Orchestra
+$0B     Composer
+$0C     Lyricist/text writer
+$0D     Recording Location
+$0E     During recording
+$0F     During performance
+$10     Movie/video screen capture
+$11     A bright coloured fish
+$12     Illustration
+$13     Band/artist logotype
+$14     Publisher/Studio logotype
+</pre>
+
+=== ID3v2資料框架規範 ===
+{| class="wikitable sortable" style="text-align: center"
+! rowspan="2" | 英文描述
+! rowspan="2" | 中文描述
+! colspan="2" | 資料框架
+|-
+! {{small|v2.3}}
+! {{small|v2.4}}
+|-
+| style="text-align: left" | Audio encryption
+| style="text-align: left" | 音頻加密
+| colspan="2" | AENC
+|-
+| style="text-align: left" | Audio seek point index
+| style="text-align: left" | 音頻搜索點索引
+|{{N/A}}
+|ASPI
+|-
+| style="text-align: left" | Attached picture
+| style="text-align: left" | 附圖
+| colspan="2" | APIC
+|-
+| style="text-align: left" | Comments
+| style="text-align: left" | 評論
+| colspan="2" | COMM
+|-
+| style="text-align: left" | Commercial frame
+| style="text-align: left" | 商業用資料框架
+| colspan="2" | COMR
+|-
+| style="text-align: left" | Encryption method registration
+| style="text-align: left" | 加密方式註冊
+| colspan="2" | ENCR
+|-
+| style="text-align: left" | Equalization
+| style="text-align: left" | [[等化器|等化]]
+| EQUA
+| EQU2
+|-
+| style="text-align: left" | Event timing codes
+| style="text-align: left" | 事件時間代碼
+| colspan="2" | ETCO
+|-
+| style="text-align: left" | General encapsulated object
+| style="text-align: left" | 一般[[封裝_(物件導向程式設計)|封裝]]物件
+| colspan="2" | GEOB
+|-
+| style="text-align: left" | Group identification registration
+| style="text-align: left" | 組織識別註冊
+| colspan="2" | GRID
+|-
+| style="text-align: left" | Involved people list
+| style="text-align: left" | 相關人員列表
+| IPLS
+| TIPL{{ref|TIPL|a}}
+|-
+| style="text-align: left" | Linked information
+| style="text-align: left" | 連結資訊
+| colspan="2" | LINK
+|-
+| style="text-align: left" | Music CD identifier
+| style="text-align: left" | 音樂光碟識別碼
+| colspan="2" | MCDI
+|-
+| style="text-align: left" | MPEG location lookup table
+| style="text-align: left" | MPEG位置查詢表
+| colspan="2" | MLLT
+|-
+| style="text-align: left" | Ownership frame
+| style="text-align: left" | 所有權
+| colspan="2" | OWNE
+|-
+| style="text-align: left" | Private frame
+| style="text-align: left" | 隱私權
+| colspan="2" | PRIV
+|-
+| style="text-align: left" | Play counter
+| style="text-align: left" | 播放次數
+| colspan="2" | PCNT
+|-
+| style="text-align: left" | Popularimeter
+| style="text-align: left" | 評等
+| colspan="2" | POPM
+|-
+| style="text-align: left" | Position synchronisation frame
+| style="text-align: left" | 位置同步
+| colspan="2" | POSS
+|-
+| style="text-align: left" | Recommended buffer size
+| style="text-align: left" | 推薦緩衝區大小
+| colspan="2" | RBUF
+|-
+| style="text-align: left" | Relative volume adjustment
+| style="text-align: left" | 相對音量調整
+|RVAD
+|RVA2
+|-
+| style="text-align: left" | Reverb
+| style="text-align: left" | 混響
+| colspan="2" | RVRB
+|-
+| style="text-align: left" | Seek frame
+| style="text-align: left" | 搜尋用
+|{{N/A}}
+|SEEK
+|-
+| style="text-align: left" | Signature frame
+| style="text-align: left" | 簽名用
+|{{N/A}}
+|SIGN
+|-
+| style="text-align: left" | Synchronized lyric/text
+| style="text-align: left" | 同步歌詞、文字
+| colspan="2" | SYLT
+|-
+| style="text-align: left" | Synchronized tempo codes
+| style="text-align: left" | 同步節拍代碼
+| colspan="2" | SYTC
+|-
+| style="text-align: left" | Album/Movie/Show title
+| style="text-align: left" | 專輯/電影/節目標題
+| colspan="2" | TALB
+|-
+| style="text-align: left" | [[Beats_per_minute|Beats per minute]] (BPM)
+| style="text-align: left" | [[速度_(音樂)|量度音樂速度]]
+| colspan="2" | TBPM
+|-
+| style="text-align: left" | Composer
+| style="text-align: left" | 作曲者
+| colspan="2" | TCOM{{ref|TCOM|c}}
+|-
+| style="text-align: left" | Content type
+| style="text-align: left" | 內容類型
+| colspan="2" | TCON
+|-
+| style="text-align: left" | Copyright message
+| style="text-align: left" | 版權信息
+| colspan="2" | TCOP
+|-
+| style="text-align: left" | Date
+| style="text-align: left" | 日期
+|TDAT
+|TDRC{{ref|TDAT|b}}
+|-
+| style="text-align: left" | Encoding time
+| style="text-align: left" | 編碼時間
+|{{N/A}}
+|TDEN
+|-
+| style="text-align: left" | Playlist delay
+| style="text-align: left" | 播放清單中的間隔時間
+| colspan="2" | TDLY
+|-
+| style="text-align: left" | Recording time
+| style="text-align: left" | 音訊紀錄時間
+|{{N/A}}
+|TDRC{{ref|TDRC|b}}
+|-
+| style="text-align: left" | Release time
+| style="text-align: left" | 音訊發行時間
+|{{N/A}}
+|TDRL
+|-
+| style="text-align: left" | Tagging time
+| style="text-align: left" | 音訊被標記時間
+|{{N/A}}
+|TDTG
+|-
+| style="text-align: left" | Encoded by
+| style="text-align: left" | 編碼者
+| colspan="2" | TENC
+|-
+| style="text-align: left" | Lyricist/Text writer
+| style="text-align: left" | 作詞者
+| colspan="2" | TEXT{{ref|TEXT|c}}
+|-
+| style="text-align: left" | File type
+| style="text-align: left" | 檔案類型
+| colspan="2" | TFLT
+|-
+| style="text-align: left" | Time
+| style="text-align: left" | 包含記錄用的時間
+|TIME
+|TDRC{{ref|TIME|b}}
+|-
+| style="text-align: left" | Content group description
+| style="text-align: left" | 群組描述
+| colspan="2" | TIT1
+|-
+| style="text-align: left" | Title/songname/content description
+| style="text-align: left" | 標題
+| colspan="2" | TIT2
+|-
+| style="text-align: left" | Subtitle/Description refinement
+| style="text-align: left" | 字幕
+| colspan="2" | TIT3
+|-
+| style="text-align: left" | Initial key
+| style="text-align: left" | [[調|初始調]]
+| colspan="2" | TKEY
+|-
+| style="text-align: left" | Language(s)
+| style="text-align: left" | 語言
+| colspan="2" | TLAN
+|-
+| style="text-align: left" | Length
+| style="text-align: left" | 長度
+| colspan="2" | TLEN
+|-
+| style="text-align: left" | Musician credits list
+| style="text-align: left" | 音樂家與樂器對照
+|{{N/A}}
+| TMCL{{ref|TMCL|a}}
+|-
+| style="text-align: left" | Media type
+| style="text-align: left" | 屬性
+| colspan="2" | TMED
+|-
+|-
+| style="text-align: left" | Mood
+| style="text-align: left" | 情境
+|{{N/A}}
+|TMOO
+|-
+| style="text-align: left" | Original album/movie/show title
+| style="text-align: left" | 原始標題
+| colspan="2" | TOAL
+|-
+| style="text-align: left" | Original filename
+| style="text-align: left" | 原始檔案名稱
+| colspan="2" | TOFN
+|-
+| style="text-align: left" | Original lyricist(s)/text writer(s)
+| style="text-align: left" | 原始作詞者
+| colspan="2" | TOLY{{ref|TOLY|c}}
+|-
+| style="text-align: left" | Original artist(s)/performer(s)
+| style="text-align: left" | 原始演唱者
+| colspan="2" | TOPE{{ref|TOPE|c}}
+|-
+| style="text-align: left" | Original release year
+| style="text-align: left" | 年分
+|TORY
+|TDOR
+|-
+| style="text-align: left" | File owner/licensee
+| style="text-align: left" | 著作權
+| colspan="2" | TOWN
+|-
+| style="text-align: left" | Lead performer(s)/Soloist(s)
+| style="text-align: left" | 指揮
+| colspan="2" | TPE1{{ref|TPE1|c}}
+|-
+| style="text-align: left" | Band/orchestra/accompaniment
+| style="text-align: left" | 樂團/樂隊/伴奏
+| colspan="2" | TPE2
+|-
+| style="text-align: left" | Conductor/performer refinement
+| style="text-align: left" | 詳細參與演出者
+| colspan="2" | TPE3
+|-
+| style="text-align: left" | Interpreted, remixed, or otherwise modified by
+| style="text-align: left" | 後製
+| colspan="2" | TPE4
+|-
+| style="text-align: left" | Part of a set
+| style="text-align: left" | Part of a set
+| colspan="2" | TPOS
+|-
+| style="text-align: left" | Produced notice
+| style="text-align: left" | Produced notice
+|{{N/A}}
+|TPRO
+|-
+| style="text-align: left" | Publisher
+| style="text-align: left" | 發行者
+| colspan="2" | TPUB
+|-
+| style="text-align: left" | Track number/Position in set
+| style="text-align: left" | 曲目
+| colspan="2" | TRCK
+|-
+| style="text-align: left" | Recording dates
+| style="text-align: left" | 建立日期
+|TRDA
+|TDRC{{ref|TRDA|b}}
+|-
+| style="text-align: left" | Internet radio station name
+| style="text-align: left" | Internet radio station name
+| colspan="2" | TRSN
+|-
+| style="text-align: left" | Internet radio station owner
+| style="text-align: left" | Internet radio station owner
+| colspan="2" | TRSO
+|-
+| style="text-align: left" | Size
+| style="text-align: left" | 大小
+|TSIZ
+|{{dropped}}
+|-
+| style="text-align: left" | Album sort order
+| style="text-align: left" | 依專輯排序
+|{{N/A}}
+|TSOA
+|-
+| style="text-align: left" | Performer sort order
+| style="text-align: left" | 依演出者排序
+|{{N/A}}
+|TSOP
+|-
+| style="text-align: left" | Title sort order
+| style="text-align: left" | 依標題排序
+|{{N/A}}
+|TSOT
+|-
+| style="text-align: left" | International Standard Recording Code (ISRC)
+| style="text-align: left" | [[國際標準音像製品編碼|國際標準音像製品編碼]]
+| colspan="2" | TSRC
+|-
+| style="text-align: left" | Software/Hardware and settings used for encoding
+| style="text-align: left" | 編碼環境設置
+| colspan="2" | TSSE
+|-
+| style="text-align: left" | Set subtitle
+| style="text-align: left" | 設置字幕
+|{{N/A}}
+|TSST
+|-
+| style="text-align: left" | Year
+| style="text-align: left" | 年分
+|TYER
+|TDRC{{ref|TYER|b}}
+|-
+| style="text-align: left" | User defined text information frame
+| style="text-align: left" | 自訂文字
+| colspan="2" | TXXX
+|-
+| style="text-align: left" | Unique file identifier
+| style="text-align: left" | 檔案識別碼
+| colspan="2" | UFID
+|-
+| style="text-align: left" | Terms of use
+| style="text-align: left" | 使用條款
+| colspan="2" | USER
+|-
+| style="text-align: left" | Unsynchronized lyric/text transcription
+| style="text-align: left" | 非同步歌詞轉錄
+| colspan="2" | USLT
+|-
+| style="text-align: left" | Commercial information
+| style="text-align: left" | 商業資訊
+| colspan="2" | WCOM
+|-
+| style="text-align: left" | Copyright/Legal information
+| style="text-align: left" | 版權資訊
+| colspan="2" | WCOP
+|-
+| style="text-align: left" | Official audio file webpage
+| style="text-align: left" | 官方音訊檔案網站
+| colspan="2" | WOAF
+|-
+| style="text-align: left" | Official artist/performer webpage
+| style="text-align: left" | 作者URL
+| colspan="2" | WOAR
+|-
+| style="text-align: left" | Official audio source webpage
+| style="text-align: left" | 官方音源URL
+| colspan="2" | WOAS
+|-
+| style="text-align: left" | Official internet radio station homepage
+| style="text-align: left" | Official internet radio station homepage
+| colspan="2" | WORS
+|-
+| style="text-align: left" | Payment
+| style="text-align: left" | 付費URL
+| colspan="2" | WPAY
+|-
+| style="text-align: left" | Publishers official webpage
+| style="text-align: left" | 發行者官網
+| colspan="2" | WPUB
+|-
+| style="text-align: left" | User defined URL link frame
+| style="text-align: left" | 自定義URL
+| colspan="2" | WXXX
+|}
+
+'''注意：'''
+{{Small|
+{{Ordered list|type=lower-alpha
+|{{note label|TIPL|}}{{note label|TMCL|}} [[#ref_TIPL|IPLS]] of ID3v2.3 maps both to [[#ref_TIPL|TIPL]] (the "involved people list") and to [[#ref_TMCL|TMCL]] (the "musician credits list").
+|{{note label|TDAT|}}{{note label|TIME|}}{{note label|TRDA|}}{{note label|TRDC|}}{{note label|TYER|}} [[#ref_TDRC|TDRC]] (recording time) consolidates [[#ref_TDAT|TDAT]] (date), [[#ref_TIME|TIME]] (time), [[#ref_TRDA|TRDA]] (recording dates), and [[#ref_TYER|TYER]] (year).
+|{{note label|TCOM|}}{{note label|TEXT|}}{{note label|TOLY|}}{{note label|TOPE|}}{{note label|TPE1|}} [[#ref_TCOM|TCOM]], [[#ref_TEXT|TEXT]], [[#ref_TOLY|TOLY]], [[#ref_TOPE|TOPE]], and [[#ref_TPE1|TPE1]] can contain multiple values separated by a [[foreslash|foreslash]] ("/").{{Citation needed|date=August 2014}}
+}}
+}}
+
+
+Version 2.4 of the specification prescribes that all text fields (the fields that start with a ''T'', except for TXXX) can contain multiple values separated by a [[null_character|null character]]. The null character varies by [[character_encoding|character encoding]].
+
+== 注释 ==
+{{reflist}}
+
+== 参见 ==
+*[[MP3|MP3]]
+*[[APEv2_tag|APEv2]]
+*[[Mp3tag|Mp3tag]]
+
+== 外部链接 ==
+*[https://web.archive.org/web/20111111055609/http://www.id3.org/ ID3官方网站（英文）]
+
+
+[[Category:元数据标准|Category:元数据标准]]
+[[Category:文件格式|Category:文件格式]]

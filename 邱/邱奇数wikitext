@@ -1,0 +1,214 @@
+'''邱奇编码'''是把数据和运算符嵌入到[[lambda演算|lambda演算]]内的一种方式，最常见的形式即邱奇数，它使用lambda符号表示自然数。方法得名于[[阿隆佐·邱奇|阿隆佐·邱奇]]，他首先以这种方法把数据编码到lambda演算中。
+
+透過邱奇編碼，在其他符号系统中通常被认定为基本的项（比如整数、布尔值、有序对、列表和tagged unions）都會被映射到[[高阶函数|高阶函数]]。<!---問題: 邱奇-圖靈問題應為討論停機問題，lambda 演算採用 beta 規約仍可停機 ---根据[[邱奇-图灵论题|邱奇-图灵论题]]我们知道任何可计算的运算符（和它的运算数）都可以用邱奇编码表示。--->在[[lambda_演算|無型別lambda演算]]，函數是唯一的[[原始型別|原始型別]]。
+
+邱奇編碼本身並非用來實踐原始型別，而是透過它來展現我們不須額外原始型別即可表達計算。
+
+很多学数学的学生熟悉[[可计算函数|可计算函数]]集合的[[哥德尔编号|哥德尔编号]]；邱奇编码是定义在[[Λ演算|lambda抽象]]而不是自然数上的等价运算。
+
+==邱奇数==
+
+'''邱奇数'''為使用邱奇编码的[[自然数|自然数]]表示法，而用以表示自然数<math>n</math>的[[高阶函数|高阶函数]]是個任意函数<math>f</math>映射到它自身的''n''重[[函数复合|函数复合]]之函数，簡言之，數的「值」即等價於參數被函數包裹的次數。
+
+:<math>f^{\circ n} = \underbrace{f \circ f \circ \cdots \circ f}_{n\text{ 次}}.\,</math>
+
+不論邱奇數為何，其都是接受兩個參數的函數。
+:<math>
+\begin{array}{r|l|l}
+\text{ 自 然 數} & \text{函 數 定 義} & \text{lambda 表 達 式} \\
+\hline
+0 & 0\ f\ x = x & 0 = \lambda f.\lambda x.x 
+\\
+1 & 1\ f\ x = f\ x & 1 = \lambda f.\lambda x.f\ x 
+\\
+2 & 2\ f\ x = f\ (f\ x) & 2 = \lambda f.\lambda x.f\ (f\ x) 
+\\
+3 & 3\ f\ x = f\ (f\ (f\ x)) & 3 = \lambda f.\lambda x.f\ (f\ (f\ x))
+\\
+\vdots & \vdots & \vdots
+\\
+n & n\ f\ x = f^n\ x & n = \lambda f.\lambda x.f^{\circ n}\ x
+\end{array}
+</math>
+
+就是说，自然数<math>n</math>被表示为邱奇数'''n'''，它对于任何lambda-项<code>F</code>和<code>X</code>有着性质：
+
+: '''n''' <code>F X</code> [[Lambda演算#β-归约|=<sub>β</sub>]] <code>F<sup>''n''</sup> X</code>。
+
+===使用邱奇数的计算===
+在 lambda 演算中，数值函数被表示为在邱奇数上的相应函数。这些函数在大多数函数式语言中可以通过 lambda 项的直接变换来实现（服从于类型约束）。
+
+加法函数 <math>\text{plus}(m,n)=m+n</math> 利用了恒等式 <math>f^{(m+n)}(x)=f^m(f^n(x))</math>。
+
+: '''plus''' ≡ <code>λm.λn.λf.λx. m f (n f x)</code>
+
+后继函数 <math>\text{succ}(n)=n+1</math> [[beta归约|β-等价]]于（'''plus''' '''1'''）。
+
+: '''succ''' ≡ <code>λn.λf.λx. f (n f x)</code>
+
+乘法函数 <math>\text{times}(m,n)=m \times n</math> 利用了恒等式 <math>f^{(m \times n)} = (f^m)^n</math>。
+
+: '''mult''' ≡ <code>λm.λn.λf. n (m f)</code>
+
+指数函数 <math>\exp(m,n)=m^n</math> 由邱奇数定义直接给出。
+
+: '''exp''' ≡ <code>λm.λn. n m</code>
+
+前驱函数 <math>\text{pred}(n) = \begin{cases} 0 & \mbox{if }n=0, \\ n-1 & \mbox{otherwise}\end{cases}</math> 通过生成每次都应用它们的参数 <code>g</code> 于 <code>f</code> 的 <math>n</math> 重函数复合来工作；基础情况丢弃它的 <code>f</code> 复本并返回 <code>x</code>。
+
+: '''pred''' ≡ <code>λn.λf.λx. n (λg.λh. h (g f)) (λu. x) (λu. u)</code>
+
+=== 邱奇數函數一表 ===
+
+{| class="wikitable"
+|-
+! 函數 !! 代數 !! 等同 !! 函數定義
+! colspan="2" | Lambda 表達式
+|-
+| [[后继函数|後繼]] || <math>n + 1</math> || <math>f^{n+1}\ x = f (f^n x)</math> ||  <math>\operatorname{succ}\ n\ f\ x = f\ (n\ f\ x)</math> || <math>\lambda n.\lambda f.\lambda x.f\ (n\ f\ x)</math> || ...
+|-
+| [[加法|加法]] || <math>m + n</math> || <math>f^{m+n}\ x = f^m (f^n x)</math> || <math>\operatorname{plus}\ m\ n\ f\ x = m\ f\ (n\ f\ x)</math> || <math>\lambda m.\lambda n.\lambda f.\lambda x.m\ f\ (n\ f\ x)</math> || <math>\lambda m.\lambda n.n \operatorname{succ} m</math>
+|-
+| [[乘法|乘法]] || <math>m \times n</math> || <math>f^{m \times n}\ x = (f^m)^n\ x</math> ||<math>\operatorname{multiply}\ m\ n\ f\ x = m\ (n\ f) \ x </math> || <math>\lambda m.\lambda n.\lambda f.\lambda x.m\ (n\ f) \ x</math> || <math>\lambda m.\lambda n.\lambda f.m\ (n\ f)</math>
+|-
+| [[指數|指數]] || <math>m^n</math> || <math>n\ m\ f = m^n\ f</math><ref name="Church numeral definition">This formula is the definition of a Church numeral n with f -> m, x -> f.</ref> ||<math>\operatorname{exp} \ m\ n\ f\ x = (n\ m)\ f\ x</math> || <math>\lambda m.\lambda n.\lambda f.\lambda x.(n\ m)\ f\ x</math> || <math>\lambda m.\lambda n.n\ m</math>
+|-
+| [[前驅|前驅]]* || <math>n - 1</math> || <math>\operatorname{inc}^n \operatorname{con} = \operatorname{val} (f^{n-1} x) </math> || <math>if (n == 0)\ 0\ else\ (n-1)</math> 
+| colspan="2" |
+<math>\lambda n.\lambda f.\lambda x.n\ (\lambda g.\lambda h.h\ (g\ f))\ (\lambda u.x)\ (\lambda u.u)</math>
+|-
+| [[減法|減法]]* || <math>m - n</math> || <math>f^{m-n}\ x = (f^{-1})^n (f^{m} x)</math> || <math>\operatorname{minus}\ m\ n = (n \operatorname{pred})\ m</math> || ... || <math>\lambda m.\lambda n.n \operatorname{pred} m</math>
+|}
+
+<nowiki>* </nowiki>注意在邱奇編碼中,
+* <math>\operatorname{pred}(0) = 0</math>
+* <math>m < n \to m - n = 0</math>
+
+
+
+=== 除法函式 ===
+以下列定義可實作自然數的除法
+: <math> n/m = \operatorname{if}\ n \ge m\ \operatorname{then}\ 1 + (n-m)/m\ \operatorname{else}\ 0 </math>
+
+
+計算 <math>n</math> 除以 <math>m</math> 的遞迴相減時，將會計算很多次的beta歸約。除非以紙筆手工來做，那麼多步驟倒無關緊要，<br>
+但我們不想一直重複瑣碎的歸約；而判別數字是否為零的函式是 IsZero，所以考慮下列條件：
+: <math> \operatorname{IsZero}\ (\operatorname{minus}\ n\ m) </math>
+
+
+這個判別式相當於 <math>n</math> 小於等於 <math>m</math> 而非 <math>n</math> 小於 <math>m</math>。如果使用這式子，那麼要將上面給出的除法定義，<br>
+轉化為邱奇編碼的自然數函數如下，
+: <math> \operatorname{divide1}\ n\ m\ f\ x = (\lambda d.\operatorname{IsZero}\ d\ (0\ f\ x)\ (f\ (\operatorname{divide1}\ d\ m\ f\ x)))\ (\operatorname{minus}\ n\ m) </math>
+
+
+這樣的定義只呼叫了一次 <math>n</math> 減去 <math>m</math>，正如我們所想的。然而問題是這式子計算成錯誤的結果，<br>
+是 (n-1)/m 除法的商。要更正則需在呼叫 ''divide'' 之前把 <math>n</math> 再加回 1。 因此除法的正確定義是，
+: <math> \operatorname{divide}\ n = \operatorname{divide1}\ (\operatorname{succ}\ n) </math>
+
+
+''divide1'' 是一個內含遞迴的定義式，要以 Y 組合子來發生遞迴作用。 所以要再宣告一個名為 div 的新函數；
+
+*等號左側為    divide1 → div c
+*等號右側為    divide1 → c
+
+
+要獲得
+: <math> \operatorname{div} = \lambda c.\lambda n.\lambda m.\lambda f.\lambda x.(\lambda d.\operatorname{IsZero}\ d\ (0\ f\ x)\ (f\ (c\ d\ m\ f\ x)))\ (\operatorname{minus}\ n\ m) </math>
+
+
+那麼
+:<math> \operatorname{divide} = \lambda n.\operatorname{divide1}\ (\operatorname{succ}\ n) </math>
+
+
+而式中所用的其它函式定義如下列：
+: <math>\begin{align}
+ \operatorname{divide1} &= Y\ \operatorname{div} \\
+ \operatorname{succ} &= \lambda n.\lambda f.\lambda x. f\ (n\ f\ x) \\
+ Y &= \lambda f.(\lambda x.f\ (x\ x))\ (\lambda x.f\ (x\ x)) \\
+ 0 &= \lambda f.\lambda x.x\\
+ \operatorname{IsZero} &= \lambda n.n\ (\lambda x.\operatorname{false})\ \operatorname{true}
+\end{align}</math>
+:: <math>\begin{align}
+\operatorname{true} &\equiv \lambda a.\lambda b.a\\
+\operatorname{false} &\equiv \lambda a.\lambda b.b
+\end{align}</math>
+: <math>\begin{align}
+\operatorname{minus} &= \lambda m.\lambda n.n \operatorname{pred} m\\
+\operatorname{pred} &= \lambda n.\lambda f.\lambda x.n\ (\lambda g.\lambda h.h\ (g\ f))\ (\lambda u.x)\ (\lambda u.u) 
+\end{align}</math>
+
+
+使用倒斜線 \ 代替 λ 符號，完整的除法函式則如下列，
+
+ divide = (\n.((\f.(\x.x x) (\x.f (x x))) (\c.\n.\m.\f.\x.(\d.(\n.n (\x.(\a.\b.b)) (\a.\b.a)) d ((\f.\x.x) f x) (f (c d m f x))) ((\m.\n.n (\n.\f.\x.n (\g.\h.h (g f)) (\u.x) (\u.u)) m) n m))) ((\n.\f.\x. f (n f x)) n))
+
+
+===換成其它表達法===
+大部分真實世界的程式語言都提供原生於機器的整數，''church'' 與 ''unchurch'' 函式會在整數及與之對應的邱奇數間轉換。這裡使用[[Haskell|Haskell]]撰寫函式， <code>\</code> 等同於lambda演算的 λ。 用其它語言表達也會很類似。
+
+<syntaxhighlight lang="haskell">
+
+type Church a = (a -> a) -> a -> a
+
+church :: Integer -> Church Integer
+church 0 = \f -> \x -> x
+church n = \f -> \x -> f (church (n-1) f x)
+
+unchurch :: Church Integer -> Integer
+unchurch cn = cn (+ 1) 0
+</syntaxhighlight>
+
+==邱奇布尔值==
+
+'''邱奇布尔值'''是布尔值'''真'''和'''假'''的邱奇编码形式。某些程式語言使用這個方式來實踐布爾算術的模型，[[Smalltalk|Smalltalk]] 即為一例。 
+
+布爾邏輯可以想成二選一，而布尔值則表示为有两个参数的函数，它得到两个参数中的一个：
+
+* ''真'' 則選擇第一個參數
+* ''假'' 則選擇第二個參數
+
+邱奇布爾值在[[lambda演算|lambda演算]]中的形式定义如下：
+
+: <math>\begin{align}
+\operatorname{true} &\equiv \lambda a.\lambda b.a\\
+\operatorname{false} &\equiv \lambda a.\lambda b.b
+\end{align}</math>
+
+由於'''真'''、'''假''' 可以選擇第一個或第二個參數，所以其能夠由組合來產生邏輯運算子。注意到 '''not''' 版本因不同[[求值策略|求值策略]]而有兩個。下列為从邱奇布尔值推导来的布尔算术的函数：
+
+: <math>\begin{align}
+\operatorname{and} &= \lambda p.\lambda q.p\ q\ p\\
+\operatorname{or} &= \lambda p.\lambda q.p\ p\ q\\
+\operatorname{not}_1 &= \lambda p.\lambda a.\lambda b.p\ b\ a \ ^{\scriptstyle\text{*1}}\\
+\operatorname{not}_2 &= \lambda p.p\ (\lambda a.\lambda b. b)\ (\lambda a.\lambda b. a) = \lambda p.p \operatorname{false} \operatorname{true} \ ^{\scriptstyle\text{*2}}\\
+\operatorname{xor} &= \lambda a.\lambda b.a\ (\operatorname{not}\ b)\ b\\
+\operatorname{if} &= \lambda p.\lambda a.\lambda b.p\ a\ b
+\end{align}</math>
+
+''註：''
+*''<sup>1</sup> 求值策略使用應用次序時，這個方法才正確。''
+*''<sup>2</sup> 求值策略使用正常次序時，這個方法才正確。''
+
+
+下頭為一些範例：
+
+: <math>\begin{align}
+
+\operatorname{and} \operatorname{true} \operatorname{false} &= (\lambda p.\lambda q.p\ q\ p)\ \operatorname{true}\ \operatorname{false} = \operatorname{true} \operatorname{false} \operatorname{true} = (\lambda a.\lambda b.a) \operatorname{false} \operatorname{true} = \operatorname{false} 
+\\
+\operatorname{or} \operatorname{true} \operatorname{false} &= (\lambda p.\lambda q.p\ p\ q)\ (\lambda a.\lambda b.a)\ (\lambda a.\lambda b.b) = (\lambda a.\lambda b.a)\ (\lambda a.\lambda b.a)\ (\lambda a.\lambda b.b) = (\lambda a.\lambda b.a) = \operatorname{true}
+\\
+\operatorname{not}_1\ \operatorname{true} &= (\lambda p.\lambda a.\lambda b.p\ b\ a) (\lambda a.\lambda b.a) = \lambda a.\lambda b.(\lambda a.\lambda b.a)\ b\ a = \lambda a.\lambda b.(\lambda c.b)\ a = \lambda a.\lambda b.b = \operatorname{false} 
+\\
+\operatorname{not}_2\ \operatorname{true} &= (\lambda p.p\ (\lambda a.\lambda b. b) (\lambda a.\lambda b. a)) (\lambda a.\lambda b. a) = (\lambda a.\lambda b. a) (\lambda a.\lambda b. b) (\lambda a.\lambda b. a) = (\lambda b. (\lambda a.\lambda b. b))\ (\lambda a.\lambda b. a) = \lambda a.\lambda b.b = \operatorname{false} 
+\end{align}</math>
+
+==参见==
+*[[Lambda演算|Lambda演算]]
+*[[系统F|系统F]]，在有类型lambda演算中的邱奇数
+
+==外部链接==
+*[http://www.csse.monash.edu.au/~lloyd/tildeFP/Lambda/Examples/const-int/ Some interactive examples of Church numerals] {{Wayback|url=http://www.csse.monash.edu.au/~lloyd/tildeFP/Lambda/Examples/const-int/ |date=20060512015859 }}
+
+[[Category:Lambda演算|Category:Lambda演算]]
+[[Category:递归论|Category:递归论]]

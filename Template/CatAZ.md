@@ -1,0 +1,37 @@
+{|class="toccolours plainlinks" style="font-size:100%" align=center
+| align="center" class="plainlinks"|
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}}} 頁首] 
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=A}} A]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=B}} B]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=C}} C]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=D}} D]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=E}} E]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=F}} F]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=G}} G]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=H}} H]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=I}} I]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=J}} J]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=K}} K]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=L}} L]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=M}} M]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=N}} N]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=O}} O]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=P}} P]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=Q}} Q]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=R}} R]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=S}} S]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=T}} T]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=U}} U]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=V}} V]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=W}} W]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=X}} X]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=Y}} Y]
+[{{SERVER}}{{localurl:{{NAMESPACE}}:{{PAGENAMEE}}|from=Z}} Z] __NOTOC__
+|}<noinclude>
+[[Category:維基百科分類目錄模板|{{PAGENAME}}]]
+[[Category:分類頁模板|{{PAGENAME}}]]
+
+[[mk:Шаблон:КатАШ]]
+[[ms:Templat:CatAZ]]
+[[vo:Samafomot:KladAZ]]
+</noinclude>

@@ -1,0 +1,17 @@
+{{Userbox-2
+|border-c = #0000C4
+|id1-s  = 14
+|id1-fc = brown
+|id1-c  = #FFAA88
+|id1    = 公制
+|id2-s  = 14
+|id2-fc = brown
+|id2-c  = #BA55D3
+|id2    = [[File:Metre couturiere.png|42px]]
+|info-c  = #FFDAB9
+|info-s  = 11
+|info-fc = black
+|info    = 這個維基人喜歡使用<br />'''[[國際單位制]]'''。
+}}<noinclude>
+[[Category:數學愛好者模板|*]]
+</noinclude>

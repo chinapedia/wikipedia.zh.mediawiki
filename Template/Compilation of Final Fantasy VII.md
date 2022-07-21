@@ -1,0 +1,1 @@
+#REDIRECT [[Template:最终幻想系列]]

@@ -1,0 +1,1 @@
+{{{2}}}. <cite id="fn_{{{1}}}" style="font-style: inherit;">'''[[#fn_{{{1}}}_back|^]]'''&nbsp;</cite><noinclude>[[Category:辅助模板]]</noinclude>

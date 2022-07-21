@@ -1,0 +1,36 @@
+{{Infobox settlement
+|name={{{name}}}
+|native_name={{{native_name|}}}
+|image_caption=行政分區地圖
+|image_skyline={{#if:{{{counties|}}}|[[File:{{{counties}}}|250px|Counties]]}}
+|image_flag=[[File:{{{flag}}}|140px|border]]
+|image_shield=[[File:{{{coat-of-arms}}}|100px|]] 
+|image_map=[[File:{{{location}}}|280px]]
+|map_caption={{#if:{{{map_caption|}}}|{{{map_caption}}}|{{PAGENAME}}在波蘭的位置}}
+|seat_type=[[首府]]
+|seat={{{capital|{{{seat}}}}}}
+|subdivision_type=国家
+|subdivision_name={{POL}}
+|subdivision_type2=[[县 (波兰)|都市县]]
+|subdivision_name2={{{urban}}}
+|subdivision_type3=乡村县
+|subdivision_name3={{{land}}}
+|subdivision_type4=乡
+|subdivision_name4={{{gmina}}}
+|settlement_type=[[波兰省份|省份]]
+|leader_title=省長
+|leader_name={{{leader_name|}}}
+|area_footnotes={{{area_footnotes|}}}
+|area_total_km2={{{area|{{{area_total_km2|}}}}}}
+|population_footnotes={{{population_footnotes|}}}
+|population_total={{{pop|{{{population_total|}}}}}}
+|population_as_of={{#if:{{{population_as_of|}}}|{{{population_as_of}}}|{{#if:{{{pop-year|}}}|{{{pop-year}}}年}}}}
+|population_density_km2={{{population_density_km2|{{{density|}}}}}}
+|population_urban={{{population_urban|}}}
+|population_blank1_title=鄉村
+|population_blank1={{{population_rural|}}}
+|website={{{website|}}}
+}}<noinclude>{{Documentation}}
+[[Category:欧洲国家模板|{{PAGENAME}}]]
+[[Category:行政区划信息框模板|欧]]
+</noinclude>

@@ -1,0 +1,1 @@
+{{Language_icon|tok|道本语}}<noinclude>[[Category:语言标示模板|{{PAGENAME}}]]</noinclude>

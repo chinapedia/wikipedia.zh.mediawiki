@@ -1,0 +1,1 @@
+{{ruby|{{{1}}}|{{{2}}}|ja|ja|large={{{large|}}}}}<noinclude>{{doc}}</noinclude>

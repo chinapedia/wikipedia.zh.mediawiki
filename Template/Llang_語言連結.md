@@ -1,0 +1,1 @@
+[[{{語言名稱|{{{1}}}}}]]<noinclude>[[Category:语言模板|{{PAGENAME}}]]</noinclude>

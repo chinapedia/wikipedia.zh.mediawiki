@@ -1,0 +1,1 @@
+<includeonly><span style="color:{{{1}}};">{{{2}}}</span></includeonly><noinclude>{{doc}}</noinclude>

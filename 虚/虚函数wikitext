@@ -1,0 +1,262 @@
+{{Refimprove|time=2013-03-21T02:39:42+00:00}}
+{{NoteTA
+|G1 = IT
+|1 = zh-cn:虚; zh-tw:虛擬;
+}}
+{{多态}}
+在[[面向对象编程|面向对象程序设计]]领域，[[C++|C++]]、[[Object_Pascal|Object Pascal]] 等语言中有'''虚函数'''（{{lang-en|virtual function}}）或'''虚方法'''（{{lang-en|virtual method}}）的概念。这种[[函数|函数]]或[[方法_(计算机科学)|方法]]可以被子类[[继承_(计算机科学)|继承]]和{{Tsl|en|Method_overriding|覆盖}}，通常使用[[动态分派|动态分派]]实现。这一概念是[[面向对象编程|面向对象程序设计]]中（运行时）[[多型_(物件導向程式設計)|-{zh:多型;zh-tw:多型;zh-cn:多态}-]]的重要组成部分。简言之，虚函数可以给出目标函数的定义，但该目标的具体指向在编译期可能无法确定。
+
+虚函数在[[设计模式_(计算机)|设计模式]]方面扮演重要角色。例如，《设计模式》一书中提到的23种设计模式中，仅5个对象创建模式就有4个用到了虚函数（[[抽象工厂|抽象工厂]]、[[工厂方法|工厂方法]]、[[生成器_(设计模式)|生成器]]、[[原型模式|原型]]），只有[[单例模式|单例]]没有用到。
+
+== 目的 ==
+虚函数概念的引入可以解决这样的问题：
+
+在[[面向对象编程|面向对象程序设计]]中，派生类继承自基类。使用[[指针_(信息学)|指针]]或[[參照|引用]]访问派生类对象时，指针或引用本身所指向的类型是基类而不是派生类。如果派生类覆盖了基类中的方法，通过上述指针或引用调用该方法时，可以有两种结果：
+
+# 调用到基类的方法：编译器根据指针或引用的类型决定，称作「早绑定」；
+# 调用到派生类的方法：语言的运行时系统根据对象的实际类型决定，称作「迟绑定」。
+
+虚函数的效果属于后者。如果问题中基类的函数是「虚」的，则调用到的都是最终派生类（{{lang-en|most-derived class}}）中的函数实现，与指针或引用的类型无关。反之，如果函数非「虚」，调用到的函数就在编译期根据指针或者引用所指向的类型决定。
+
+有了虚函数，程序甚至能够调用编译期还不存在的函数。
+
+在 [[C++|C++]] 中，在基类的成员函数声明前加上关键字 <code>virtual</code> 即可让该函数成为 '''虚函数'''，派生类中对此函数的不同实现都会继承这一修饰符，允许后续派生类覆盖，达到迟绑定的效果。即便是基类中的成员函数调用虚函数，也会调用到派生类中的版本。
+
+== 程式範例 ==
+例如，一個基礎類別 <code>Animal</code> 有一個虛擬函式 <code>eat</code>。子類別 <code>Fish</code> 要實做一個函式 <code>eat()</code>，這個子類別 <code>Fish</code> 與子類別 <code>Wolf</code> 是完全不同的，但是你可以引用類別 Animal 底下的函式 <code>eat()</code> 定義，而使用子類別 <code>Fish</code> 底下函式 <code>eat()</code> 的處理程序。
+
+=== C++ ===
+以下程式碼是 C++ 的程式範例。要注意的是，這個範例沒有异常處理的程式碼。尤其是 <tt>new</tt> 或是 <tt>vector::push_back</tt> 丟出一個异常時，程式在執行時有可能會出現崩溃或是錯誤的現象。
+
+[[File:ClassDiagram_for_VirtualFunction.png|200px]]
+
+<syntaxhighlight lang="cpp">
+# include <iostream>
+# include <vector>
+
+using namespace std;
+class Animal
+{
+public:
+    virtual void eat() const { cout << "I eat like a generic Animal." << endl; }
+    virtual ~Animal() {}
+};
+ 
+class Wolf : public Animal
+{
+public:
+    void eat() const { cout << "I eat like a wolf!" << endl; }
+};
+ 
+class Fish : public Animal
+{
+public:
+    void eat() const { cout << "I eat like a fish!" << endl; }
+};
+ 
+class GoldFish : public Fish
+{
+public:
+    void eat() const { cout << "I eat like a goldfish!" << endl; }
+};
+ 
+ 
+class OtherAnimal : public Animal
+{
+};
+ 
+int main()
+{
+    std::vector<Animal*> animals;
+    animals.push_back( new Animal() );
+    animals.push_back( new Wolf() );
+    animals.push_back( new Fish() );
+    animals.push_back( new GoldFish() );
+    animals.push_back( new OtherAnimal() );
+ 
+    for( std::vector<Animal*>::const_iterator it = animals.begin();
+       it != animals.end(); ++it) 
+    {
+        (*it)->eat();
+        delete *it;
+    }
+ 
+   return 0;
+}
+</syntaxhighlight>
+
+以下是虛擬函式 <code>Animal::eat()</code> 的輸出：
+ I eat like a generic Animal.
+ I eat like a wolf!
+ I eat like a fish!
+ I eat like a goldfish!
+ I eat like a generic Animal.
+
+當 <code>Animal::eat()</code> 不是被宣告為虛擬函式時，輸出如下所示：
+ I eat like a generic Animal.
+ I eat like a generic Animal.
+ I eat like a generic Animal.
+ I eat like a generic Animal.
+ I eat like a generic Animal.
+
+=== Java ===
+在Java语言中, 所有的方法默认都是"虚函数". 只有以关键字 final 标记的方法才是非虚函数. 以下是 Java 中虚方法的一个例子:
+<syntaxhighlight lang="java">
+import java.util.*;
+
+public class Animal {
+   public void eat() { System.out.println("I eat like a generic Animal."); }
+ 
+   public static void main(String[] args) {
+      List<Animal> animals = new LinkedList<Animal>();
+
+      animals.add(new Animal());
+      animals.add(new Wolf());
+      animals.add(new Fish());
+      animals.add(new OtherAnimal());
+
+      for (Animal currentAnimal : animals) {
+         currentAnimal.eat();
+      }
+   }
+}
+ 
+public class Wolf extends Animal {
+   public void eat() { System.out.println("I eat like a wolf!"); }
+}
+ 
+public class Fish extends Animal {
+   public void eat() { System.out.println("I eat like a fish!"); }
+}
+ 
+public class OtherAnimal extends Animal {}
+</syntaxhighlight> 
+
+输出:
+ I eat like a generic Animal.
+ I eat like a wolf!
+ I eat like a fish!
+ I eat like a generic Animal.
+
+=== C# ===
+在 C# 语言中, 对基类中的任何虚方法必须用 <code>virtual</code> 修饰, 而衍生类中由基类继承而来的重载方法必须用 <code>override</code> 修饰. 以下是 C# 的一个程序实例:
+<syntaxhighlight lang="csharp">
+using System;
+using System.Collections.Generic;
+
+namespace ConsoleApplication1
+{
+  public class Animal
+  {
+    public virtual void Eat()
+    {
+      Console.WriteLine("I eat like a generic Animal.");
+    }
+  }
+
+  public class Wolf : Animal
+  {
+    public override void Eat()
+    {
+      Console.WriteLine("I eat like a wolf!");
+    }
+  }
+
+  public class Fish : Animal
+  {
+    public override void Eat()
+    {
+      Console.WriteLine("I eat like a fish!");
+    }
+  }
+
+  public class GoldFish : Fish
+  {
+    public override void Eat()
+    {
+      Console.WriteLine("I eat like a goldfish!");
+    }
+  }
+
+  public class OtherAnimal : Animal
+  {
+    // Eat() method is not overridden, so the base class method will be used.
+  }
+
+  public class Program
+  {
+    public static void Main(string[] args)
+    {
+      IList<Animal> animals = new List<Animal>();
+      
+      animals.Add(new Animal());
+      animals.Add(new Wolf());
+      animals.Add(new Fish());
+      animals.Add(new GoldFish());
+      animals.Add(new OtherAnimal());
+
+      foreach (Animal currentAnimal in animals)
+      {
+        currentAnimal.Eat();
+      }
+    }
+  }
+}
+</syntaxhighlight> 
+
+输出:
+<pre>
+I eat like a generic Animal.
+I eat like a wolf!
+I eat like a fish!
+I eat like a goldfish!
+I eat like a generic Animal.
+</pre>
+
+== 抽象类和纯虚函数 ==
+'''纯虚函数'''或'''纯虚方法'''是一个需要被非抽象的派生类覆盖（override）的虚函数. 包含纯虚方法的类被称作'''抽象类'''; 抽象类不能被直接实例化。 一个抽象基类的一个[[子类|子类]]只有在所有的纯虚函数在该类(或其父类)内给出实现时, 才能直接实例化. 纯虚方法通常只有[[声明|声明]](签名)而没有定义(实现)，但有特例情形要求纯虚函数必须给出函数体定义.
+
+作为一个例子, 抽象基类"MathSymbol"可能提供一个纯虚函数 <code>doOperation()</code>, 和衍生类 "Plus" 和 "Minus" 提供<code>doOperation()</code> 的具体实现. 由于 "MathSymbol" 是一个抽象概念, 为其每个子类定义了同一的动作, 在 "MathSymbol" 类中执行 <code>doOperation()</code> 没有任何意义. 类似的, 一个给定的 "MathSymbol" 子类如果没有 <code>doOperation()</code> 的具体实现是不完全的.
+
+虽然纯虚方法通常在定义它的类中没有实现, 在 C++ 语言中, 允许纯虚函数在定义它的类中包含其实现, 这为衍生类提供了备用或默认的行为. C++的虚基类的虚析构函数必须提供函数体定义，否则[[链接时|链接时]]（linking）在析构该抽象类的派生实例对象的语句处会报错。<ref>[https://msdn.microsoft.com/en-us/library/81h27t8c.aspx  MSDN "Using dllimport and dllexport in C++ Classes"] {{Wayback|url=https://msdn.microsoft.com/en-us/library/81h27t8c.aspx |date=20160910105052 }}:  However, because a destructor for an abstract class is always called by the destructor for the base class, pure virtual destructors must always provide a definition. Note that these rules are the same for nonexportable classes.</ref>
+
+=== C++ ===
+在[[C++|C++]]语言中, 纯虚函数用一种特别的语法[''=0'']定义（但 VS 也支持 abstract 关键字：virtual ReturnType Function()abstract;）, 见以下示例.
+<syntaxhighlight lang="cpp">
+class Abstract {
+public:
+   virtual void pure_virtual() = 0;
+};
+</syntaxhighlight>
+
+纯虚函数的定义仅提供方法的原型. 虽然在抽象类中通常不提供纯虚函数的实现, 但是抽象类中可以包含其实现, 而且可以不在声明的同时给出定义<ref>Standard C++ 98 - 10.4/2</ref>. 每个非抽象子类仍然需要重载该方法, 抽象类中实现的调用可以采用以下这种形式:
+
+<syntaxhighlight lang="cpp">
+ void Abstract::pure_virtual() {
+   // do something
+ }
+ 
+ class Child : public Abstract {
+   virtual void pure_virtual(); // no longer abstract, this class may be
+                                // instantiated.
+ };
+ 
+ void Child::pure_virtual() {
+   Abstract::pure_virtual(); // the implementation in the abstract class 
+                             // is executed
+ }
+</syntaxhighlight>
+
+== 构造与析构时的行为 ==
+
+在对象的[[构造函数|构造函数]]和[[析构函数|析构函数]]中涉及虚函数时，不同的语言有不同的规定。在以 C++ 为代表的一些语言中，虚函数调度机制在对象的构造和析构时有不同的语义，一般建议尽可能避免在 C++ 的构造函数中调用虚函数<ref>{{cite web|title=Never Call Virtual Functions during Construction or Destruction|last=Meyers|first=Scott|date=June 6, 2005|url=http://www.artima.com/cppsource/nevercall.html|access-date=2018-06-22|archive-date=2021-01-26|archive-url=https://web.archive.org/web/20210126013950/https://www.artima.com/cppsource/nevercall.html|dead-url=no}}</ref>。而在 [[C♯|C#]]、[[Java|Java]] 等另一些语言中，构造时可以调用派生类中的实现，[[抽象工厂模式|抽象工厂模式]]等[[设计模式|设计模式]]也鼓励在支持这一特性的语言中使用这种用法。
+
+== 参考文献 ==
+<references />
+* [https://web.archive.org/web/20060429012936/http://www.parashift.com/c++-faq-lite/virtual-functions.html C++ FAQ Lite] Copyright © 1991-2006, Marshall Cline.
+
+[[Category:面向对象的程序设计|V]]
+[[Category:C++|V]]
+[[Category:带有C++代码示例的条目|V]]
+
+[[sv:Funktion_(programmering)#Virtuell_funktion|sv:Funktion (programmering)#Virtuell funktion]]

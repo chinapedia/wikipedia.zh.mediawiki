@@ -1,0 +1,93 @@
+{{Infobox
+|headerstyle = background-color: #b0c4de;
+|labelstyle = font-weight: normal; white-space:nowrap;
+| bodyclass  = vcard
+| bodystyle  = {{#if:{{{box_width|}}}|width:{{{box_width}}};}}
+| aboveclass  = fn
+| above       = <span class="fn org">{{{group|<includeonly>{{PAGENAME}}</includeonly>}}}</span>{{#if:{{{native_name|}}}|<br /><span class="nickname" {{#if:{{{native_name_lang|}}}|lang="{{{native_name_lang}}}"}}>{{{native_name}}}</span>}}
+|image1 = {{#invoke:InfoboxImage|InfoboxImage|image={{{flag|}}} }}
+|caption1 = {{{flag_caption|}}}
+|image2 = {{#if:{{{rawimage|}}}|{{{rawimage}}}|{{#invoke:InfoboxImage|InfoboxImage|image={{{image|}}} }} }}
+|caption2 = {{{image_caption|{{{caption|}}} }}}
+|header1 = {{#if:{{{population|}}}{{{pop|}}}{{{poptime|}}}|總人口}}
+|data2 = {{{population|}}}{{{pop|}}}{{{poptime|}}} {{#if:{{{genealogy|}}}|{{{genealogy|}}} (including those of [[Genealogy|ancestral descent]])}}
+|header3 = {{#if:{{{popplace|}}}{{{regions|}}}{{{region|}}}{{{region1|}}}|分佈地區}}
+|data4 = {{{popplace|}}}{{{regions|}}}{{{region|}}}
+|header10 = {{{tablehdr|}}}
+|label11 = {{{region1|}}}
+|data11 = {{{pop1|}}}{{{ref1|}}}
+|label12 = {{{region2|}}}
+|data12 = {{{pop2|}}}{{{ref2|}}}
+|label13 = {{{region3|}}}
+|data13 = {{{pop3|}}}{{{ref3|}}}
+|label14 = {{{region4|}}}
+|data14 = {{{pop4|}}}{{{ref4|}}}
+|label15 = {{{region5|}}}
+|data15 = {{{pop5|}}}{{{ref5|}}}
+|label16 = {{{region6|}}}
+|data16 = {{{pop6|}}}{{{ref6|}}}
+|label17 = {{{region7|}}}
+|data17 = {{{pop7|}}}{{{ref7|}}}
+|label18 = {{{region8|}}}
+|data18 = {{{pop8|}}}{{{ref8|}}}
+|label19 = {{{region9|}}}
+|data19 = {{{pop9|}}}{{{ref9|}}}
+|label20 = {{{region10|}}}
+|data20 = {{{pop10|}}}{{{ref10|}}}
+|label21 = {{{region11|}}}
+|data21 = {{{pop11|}}}{{{ref11|}}}
+|label22 = {{{region12|}}}
+|data22 = {{{pop12|}}}{{{ref12|}}}
+|label23 = {{{region13|}}}
+|data23 = {{{pop13|}}}{{{ref13|}}}
+|label24 = {{{region14|}}}
+|data24 = {{{pop14|}}}{{{ref14|}}}
+|label25 = {{{region15|}}}
+|data25 = {{{pop15|}}}{{{ref15|}}}
+|label26 = {{{region16|}}}
+|data26 = {{{pop16|}}}{{{ref16|}}}
+|label27 = {{{region17|}}}
+|data27 = {{{pop17|}}}{{{ref17|}}}
+|label28 = {{{region18|}}}
+|data28 = {{{pop18|}}}{{{ref18|}}}
+|label29 = {{{region19|}}}
+|data29 = {{{pop19|}}}{{{ref19|}}}
+|label30 = {{{region20|}}}
+|data30 = {{{pop20|}}}{{{ref20|}}}
+|label31 = {{{region21|}}}
+|data31 = {{{pop21|}}}{{{ref21|}}}
+|label32 = {{{region22|}}}
+|data32 = {{{pop22|}}}{{{ref22|}}}
+|label33 = {{{region23|}}}
+|data33 = {{{pop23|}}}{{{ref23|}}}
+|label34 = {{{region24|}}}
+|data34 = {{{pop24|}}}{{{ref24|}}}
+|label35 = {{{region25|}}}
+|data35 = {{{pop25|}}}{{{ref25|}}}
+|label36 = {{{region26|}}}
+|data36 = {{{pop26|}}}{{{ref26|}}}
+|label37 = {{{region27|}}}
+|data37 = {{{pop27|}}}{{{ref27|}}}
+|label38 = {{{region28|}}}
+|data38 = {{{pop28|}}}{{{ref28|}}}
+|label39 = {{{region29|}}}
+|data39 = {{{pop29|}}}{{{ref29|}}}
+|label40 = {{{region30|}}}
+|data40 = {{{pop30|}}}{{{ref30|}}}
+|label41 = {{{region31|}}}
+|data41 = {{{pop31|}}}{{{ref31|}}}
+|label42 = {{{region32|}}}
+|data42 = {{{pop32|}}}{{{ref32|}}}
+|header43 = {{#if:{{{langs|}}}{{{languages|}}}|語言}}
+|data44 = {{{langs|}}}{{{languages|}}}
+|header45 = {{#if:{{{rels|}}}{{{religions|}}}|宗教信仰}}
+|data46 = {{{rels|}}}{{{religions|}}}
+|header47 = {{#if:{{{related|}}}{{{related-c|}}}|相关族群}}
+|data48 = {{{related-c|}}}{{#if: {{{related|}}}|{{{related}}}}}
+|data49 = {{#if:{{{footnotes|}}}|註釋}}
+|belowstyle = text-align: center; font-size: 80%;
+|below = {{{footnotes|}}}
+}}<noinclude>
+{{clear}}
+{{Documentation}}
+</noinclude>

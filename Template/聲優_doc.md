@@ -1,0 +1,1 @@
+#REDIRECT [[Template:配音員/doc]]

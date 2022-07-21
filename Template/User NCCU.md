@@ -1,0 +1,12 @@
+{{Userbox
+  |id=政大 
+  |id-c=#fff
+  |info=這個用户是'''[[國立政治大學]]'''的學生、校友或教職人員。
+  |info-c=#E0E8FF
+  |info-s=10
+  |border-c=#6699ff
+}}<includeonly>[[Category:國立政治大學維基人|{{PAGENAME}}]]</includeonly>
+<noinclude>
+[[Category:台灣大專院校用戶框模板]]
+[[Category:國立政治大學維基人|{{PAGENAME}}]]
+<noinclude>

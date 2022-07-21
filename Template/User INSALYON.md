@@ -1,0 +1,11 @@
+{{Userbox
+  |id=<!--不是使用在条目中的非自由版权图像，根据[[Wikipedia:合理使用]]，不能在非条目名字空间展示：
+wnic.gif
+-->
+  |id-c=white
+  |info=这个用戶是'''[[国立里昂应用科学学院]]'''的校友、学生或老师。
+  |info-c=lightyellow
+  |info-s=9
+  |info-fc=black
+  |border-c=black
+}}<includeonly>[[Category:国立里昂应用科学学院的维基人|{{PAGENAME}}]]</includeonly><noinclude>{{Clear}}[[Wikipedia:用户框/教育程度]]</noinclude>

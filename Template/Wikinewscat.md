@@ -1,0 +1,16 @@
+{{sister
+|project=wikinews
+|text=[[維基新聞]]專題報導：'''[[n:Category:{{{1|{{PAGENAME}}}}}|{{{1|{{PAGENAME}}}}}]]'''
+}}<noinclude>
+==模板資訊==
+*使用目的：可以在維基百科條目中引用其姊妹計劃——維基新聞的同名專題報導分類，如果名稱與條目名不同時，可輸入位在該姐妹計畫的專題報導分類名稱。
+==使用方法==
+<pre>
+{{Wikinewscat|專題報導分類名稱}}
+</pre>
+輸出的結果是：{{Wikinewscat|專題報導分類名稱}}
+==參見==
+*[[Template:Wikinews]]——單一新聞使用
+*[[Template:Wikinewshas]]——多個新聞，不同分類時使用。
+*[[Wikipedia:姊妹計劃]]——來獲得引用其它維基計劃的更多信息。[[Category:姊妹计划链接模板|{{PAGENAME}}]]
+</noinclude>

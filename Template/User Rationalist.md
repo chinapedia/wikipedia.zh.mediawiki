@@ -1,0 +1,10 @@
+{{Userbox
+  |id=[[File:Frans_Hals_-_Portret_van_René_Descartes.jpg|45px]]
+  |id-c=#e7f2fd 
+  |info=這位用戶是一個[[理性主義|理性主義]]者。
+  |info-c=#e7f2fd 
+  |border-c=lightsteelblue
+}}
+<includeonly>[[Category:哲學思想信奉理性主義的維基人|{{PAGENAME}}]]</includeonly><noinclude>
+[[Category:哲学信仰用戶框模板]]
+</noinclude>

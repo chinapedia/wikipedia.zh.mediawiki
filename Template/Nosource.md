@@ -1,0 +1,1 @@
+#Redirect [[Template:No source]]

@@ -1,0 +1,1 @@
+{{User language-N|wuu-wenzhou|這個用戶的'''[[:Category:Wuu-wenzhou 母語使用者|母語]]'''是'''[[:Category:Wuu-wenzhou 使用者|温州话]]'''。|温州话|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

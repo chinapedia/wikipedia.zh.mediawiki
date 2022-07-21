@@ -1,0 +1,9 @@
+{{Userbox
+  |id=[[File:Pavilion_of_Prince_Teng_3.jpg|40px]]
+  |id-c=pink
+  |info=该用户现在或曾经居住于'''[[南昌市]]'''。
+  |info-c=#E6E6FA
+  |info-s=9
+  |border-c=black
+}}
+[[Category:南昌维基人]]

@@ -1,0 +1,1 @@
+{{#expr:{{Date.YearFromSerial}} - {{{1|0}}}}}<noinclude>[[category:日期计算模板]]</noinclude>

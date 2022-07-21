@@ -1,0 +1,1 @@
+#redirect [[Template:非中文重定向]]

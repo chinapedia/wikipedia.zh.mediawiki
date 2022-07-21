@@ -1,0 +1,61 @@
+{{About|计算机专业术语|财务术语|先進先出會計法}}
+[[File:Data_Queue.svg|160px]]
+'''-{zh-cn:先进先出算法;zh-tw:先進先出法}-'''（{{lang-en|'''first in, first out'''}}，简称 '''FIFO'''）是一種[[計算機|計算機]]科學的排程[[演算法|演算法]]。它描述了一個[[佇列|佇列]]所使用的先到先得服務方式：先進入佇列的工作將先被完成，之後進來的則必須稍候。
+
+==範例==
+一個C++語言的範例
+<syntaxhighlight lang="cpp">
+#include <iostream>
+#include <stdexcept>
+ 
+template <typename T>
+class FIFO
+{
+private:
+
+    struct Node {
+        T     value;
+        Node *next;
+
+        Node(T _value) : value(_value), next(NULL) {}
+    };
+
+    Node *front;
+    Node *back;
+
+public:
+    FIFO() : front(NULL), back(NULL) {}
+
+    ~FIFO() {
+        while (front != NULL)
+            dequeue();
+    }
+
+    void enqueue(T _value) {
+        Node *newNode = new Node(_value);
+
+        if (front == NULL)
+            front = newNode;
+        else
+            back->next = newNode;
+
+        back = newNode;
+    }
+
+    T dequeue() {
+        if (front == NULL)
+           throw std::underflow_error("Nothing to dequeue");
+
+        Node *temp   = front;        
+        T     result = front->value;
+
+        front = front->next;
+        delete temp;
+
+        return result;
+    }
+};
+</syntaxhighlight>
+{{Authority control}}
+[[Category:控制论|Category:控制论]]
+[[Category:进程间通信|Category:进程间通信]]

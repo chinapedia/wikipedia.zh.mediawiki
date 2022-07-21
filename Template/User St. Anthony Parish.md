@@ -1,0 +1,9 @@
+{{Userbox
+  |id=花王堂區
+  |id-c=white
+  |info=這個用戶住在[[聖安多尼堂區]]
+  |info-c=#6EF7A7
+  |info-s=10
+  |border-c=#6EF7A7
+}}<includeonly>[[Category:澳門維基人|{{PAGENAME}}]]</includeonly><noinclude>
+[[Category:澳門用戶框模板]]</noinclude>

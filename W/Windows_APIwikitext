@@ -1,0 +1,156 @@
+{{noteTA
+|G1=IT
+|G2=Windows
+}}
+'''Windows应用程序接口'''（{{lang|en|Windows API}}），或俗称的'''WinAPI'''，是[[微软|微软]][[Windows|Windows]][[操作系统|操作系统]]中的一套核心[[API|应用程序接口]]。Windows API这一叫法实际上是多个Windows平台上相似接口的统称，这些接口也拥有各自的名字，如Win32 API。几乎所有的Windows应用程序都在与 Windows API 进行交互。
+
+Windows API将与Windows系统有关的复杂操作封装在简单的函数当中，编译成动态链接库，再随Windows一同发布。开发者可以简单地借助这些函数来完成复杂的操作，有效降低了编写Windows程序的难度。
+
+Windows有一个[[Windows_SDK|软件开发套件]]（SDK, software development kit）提供相应的文档和工具，以使程序员开发使用Windows API的软件和利用Windows技术。
+
+[[C语言|C]]是Windows API（Win32）的主要编程语言<ref>{{Cite web|title=Walkthrough: Creating Windows Desktop Applications (C++)|url=https://docs.microsoft.com/en-us/previous-versions/bb384843(v=vs.140)|access-date=2021-10-12|work=docs.microsoft.com|language=en-us|archive-date=2022-04-23|archive-url=https://web.archive.org/web/20220423040613/https://docs.microsoft.com/en-us/previous-versions/bb384843%28v=vs.140%29}}</ref>，在该API的文档中所公开的函数和数据结构均以该语言进行了描述。但是，如果某种编程语言能够处理（明确定义的）低级数据结构，并能按照规定进行调用与回调，那么其编译器或汇编器也可以调用Windows API。类似地，在历史上Windows API也由多种语言进行了开发。<ref>在C成为主流语言之前，Windows API中使用了大量的[[Pascal語言|Pascal]]和[[X86|x86汇编语言]]。对此一个遗留的痕迹就是API函数中仍然使用了Pascal的方式来处理调用函数时传递的参数（而不是像C的那样）。</ref>尽管C不是[[面向对象程序设计|面向对象]]的编程语言，但Windows API和Windows都具有面向对象的特性；同时，也有许多面向对象语言的包装类和扩展（如[[MFC_(微軟)|微软基础类库MFC]]、可视化组件库VCL、GDI+等）使这种面向对象的结构更加清晰。例如，Windows 8提供的Windows API和WinRT API就是用C++<ref name="rtcpp">{{cite book |title=WinRT Revealed |publisher=Apress |author=Mayberry, Michael |year=2012 |location=New York City |pages=3 |isbn=978-1-4302-4585-8}}</ref>实现的，并且在设计上也是面向对象的<ref name="rtcpp"/>。
+
+== 概述 ==
+Windows API所提供的功能可以归为八类：<ref name="msdn-overview">[[Microsoft_Developer_Network|Microsoft Developer Network]]（July 2005）. ''[http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winprog/winprog/overview_of_the_windows_api.asp Overview of the Windows API.] {{Wayback|url=http://msdn.microsoft.com/library/default.asp?url=%2Flibrary%2Fen-us%2Fwinprog%2Fwinprog%2Foverview_of_the_windows_api.asp|date=20200731024005}}'' Retrieved August 28, 2005.</ref>
+
+==== 基础服务（Base Services）<ref name="msdn-base">[[Microsoft_Developer_Network|Microsoft Developer Network]]（July 2005）. ''[http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winprog/winprog/base_services.asp Base Services.]{{Dead link|date=2018年8月|bot=InternetArchiveBot|fix-attempted=yes}}'' Retrieved August 28, 2005.</ref> ====
+提供了对Windows系统可用的基础资源的访问接口，包括[[文件系统|文件系统]]（file system）、[[外部设备|外部设备]]（device）、[[进程|进程]]（process）、[[线程|线程]]（thread）和错误处理（error handling）等。这些功能接口在16位Windows中位于<tt>kernel.exe</tt>、<tt>krnl286.exe</tt>或<tt>krnl386.exe</tt>中；在32位和64位Windows下位于<tt>kernel32.dll</tt>和<tt>KernelBase.dll</tt>中。这些文件在所有Windows的<samp>\Windows\System32</samp> 目录中都可以被找到。
+
+==== 高级服务（Advanced Services） ====
+提供了对内核以外功能的访问，包括[[注册表|注册表]]（Windows registry）、关闭/重启系统（shutdown/restart）、服务（Windows Service）、用户账户（user accounts)等。这些函数位于32位Windows上的<samp>advapi32.dll</samp>和<samp>advapires32.dll</samp>中。
+
+==== [[图形设备接口|图形设备接口]]（GDI）<ref name="msdn-gdi">[[Microsoft_Developer_Network|Microsoft Developer Network]]（July 2005）. ''[http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winprog/winprog/graphics_device_interface.asp Graphics Device Interface.]{{Dead link|date=2018年8月|bot=InternetArchiveBot|fix-attempted=yes}}'' Retrieved August 28, 2005.</ref> ====
+提供了将图形内容输出到[[显示器|显示器]]、[[打印机|打印机]]和其他外部输出设备的功能。它位于16位Windows下的<tt>gdi.exe，</tt>以及32位Windows下的<tt>gdi32.dll</tt>中。
+
+==== 图形化用户界面（[[GUI|GUI]]）<ref name="msdn-ui">[[Microsoft_Developer_Network|Microsoft Developer Network]]（July 2005）. ''[http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winprog/winprog/user_interface.asp User Interface.]{{Dead link|date=2018年8月|bot=InternetArchiveBot|fix-attempted=yes}}'' Retrieved August 28, 2005.</ref> ====
+提供了创建和管理窗口和大多数基本控件（control）、接收[[鼠标|鼠标]]和[[键盘|键盘]]输入，以及其他与GUI有关的功能。这些调用接口位于：16位Windows下的<tt>user.exe</tt>，以及32位Windows下的<tt>user32.dll</tt>。从[[Windows_XP|Windows XP]]版本之后，基本控件和通用对话框控件（Common Control Library）的调用接口放在<tt>comctl32.dll</tt>中。
+
+==== 通用对话框链接库（Common Dialog Box Library）<ref name="msdn-comdlg">[[Microsoft_Developer_Network|Microsoft Developer Network]]（2005）. ''[http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winui/winui/windowsuserinterface/userinput/commondialogboxlibrary.asp Common Dialog Box Library.]{{Dead link|date=2018年8月|bot=InternetArchiveBot|fix-attempted=yes}}'' Retrieved September 22, 2005.</ref> ====
+为应用程序提供标准对话框（如打开／保存文件对话框、颜色对话框和字体对话框等）。这个链接库位于：16位Windows下的<tt>commdlg.dll</tt>中，以及32位Windows下的<tt>comdlg32.dll</tt>中。它被归类为User Interface API之下。
+
+==== 通用控件链接库（Common Control Library）<ref name="msdn-ccl">[[Microsoft_Developer_Network|Microsoft Developer Network]]（July 2005）. ''[http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winprog/winprog/common_control_library.asp Common Control Library.]{{Dead link|date=2018年8月|bot=InternetArchiveBot|fix-attempted=yes}}'' Retrieved August 28, 2005.</ref> ====
+为应用程序提供接口来访问操作系统提供的一些高级控件。比如像：[[状态栏|状态栏]]（status bar）、进度条（progress bars）、[[工具栏|工具栏]]（toolbar）和[[标签|标签]]（tab）。这个链接库位于：16位Windows下的<tt>commctrl.dll</tt>中，以及32位Windows下<tt>comctl32.dll</tt>中。它被归类为User Interface API之下。使用API函数InitCommonControls或InitCommonControlsEx初始化（即注册）相应的窗口类。InitCommonControlsEx实际注册指定的通用控件的窗口类。注意ICC_WIN95_CLASSES代表12个控件类的集合。InitCommonControls是个空函数，但会使应用程序加载<tt>comctl32.dll</tt>；在<tt>comctl32.dll</tt>加载到进程时会在DLL的入口点调用InitCommonControlsEx注册ICC_WIN95_CLASSES控件类。
+
+==== Windows Shell<ref name="msdn-shell">[[Microsoft_Developer_Network|Microsoft Developer Network]]（July 2005）. ''[http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winprog/winprog/windows_shell.asp Windows Shell.]{{Dead link|date=2018年8月|bot=InternetArchiveBot|fix-attempted=yes}}'' Retrieved August 28, 2005.</ref><ref name="msdn-shell2">[[Microsoft_Developer_Network|Microsoft Developer Network]]（2005）. ''[http://msdn.microsoft.com/library/default.asp?url=/library/en-us/shellcc/platform/shell/programmersguide/shell_intro.asp Shell Programmer's Guide.]{{Dead link|date=2018年8月|bot=InternetArchiveBot|fix-attempted=yes}}'' Retrieved August 28, 2005.</ref> ====
+作为Windows API的组成部分，不仅允许应用程序访问[[Windows_shell|Windows Shell]]提供的功能，还对之有所改进和增强。它位于16位Windows下的<tt>shell.dll</tt>中，以及32位Windows下的<tt>shell32.dll</tt>中（[[Windows_95|Windows 95]]则在<tt>shlwapi.dll</tt>中）。它被归类为User Interface API之下。
+
+==== 网络服务（Network Services）<ref name="msdn-network">[[Microsoft_Developer_Network|Microsoft Developer Network]]（July 2005）. ''[http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winprog/winprog/network_services.asp Network Services.]'' Retrieved August 28, 2005.</ref> ====
+为访问操作系统提供的多种[[网络|网络]]功能提供接口。它包括[[NetBIOS|NetBIOS]]、[[Winsock|Winsock]]、[[NetDDE|NetDDE]]及[[遠程過程調用|遠程過程調用]]（RPC）等。
+
+=== Web相关API ===
+[[Internet_Explorer|Internet Explorer]]网页浏览器还公开了许多经常被应用程序调用的API，因此通常其也被视为是Windows API的一部分。IE从Windows 95 OSR2起就包含在了Windows系统中，并从Windows 98起开始为应用程序提供Web相关服务<ref name="msdn-browser">[[Microsoft_Developer_Network|Microsoft Developer Network]]（January 2006）. ''[http://msdn.microsoft.com/library/default.asp?url=/workshop/browser/prog_browser_node_entry.asp Programming and reusing the browser] {{Wayback|url=http://msdn.microsoft.com/library/default.asp?url=%2Fworkshop%2Fbrowser%2Fprog_browser_node_entry.asp|date=20061015195532}}'' Retrieved January 22, 2006.</ref>。具体来说，它提供：
+* 可嵌入的网页浏览器控件（以及 [[Trident|Trident]] / [[MSHTML|MSHTML]] 引擎），位于<tt>shdocvw.dll</tt>和<tt>mshtml.dll</tt>之中。
+* <tt>urlmon.dll</tt>中的命名服务（URL moniters service），利用COM对象为应用程序提供解析URL服务。应用程序也可以为其他程序提供自己的URL处理程序。
+* WinInet IE的网络层，支持HTTP和HTTPS等协议。
+* 一个支持多种语言文本的链接库（<tt>mlang.dll</tt>）。
+* DirectX Transforms，一组图像过滤组件。
+* [[XML|XML]]支持（MSXML组件）。
+
+和Windows的邮件功能相关的API，例如地址本和邮件API，在Windows 7取消邮件功能之后也随之从Windows API中去除。由于Windows Mail在Windows Vista上取代了Outlook Express，对应的API也随之变化。
+
+=== 多媒体相关API ===
+经典的Windows多媒体API位于winmm.dll中，包含了播放音频、MIDI通讯、游戏手柄及其他促进多媒体体验的功能。该API源自Windows 3.x。
+
+自从[[Windows_95|Windows 95 OSR2]]以来，Microsoft把[[DirectX|DirectX]] API作为Windows安装的一部分。DirectX提供一组松散相关的[[多媒体|多媒体]]和游戏服务，包括：
+* [[Direct3D|Direct3D]]可以作为[[OpenGL|OpenGL]]的替代，来访问3D加速硬件。
+* [[DirectDraw|DirectDraw]]提供硬件加速2D framebuffer（帧缓冲）访问接口。自DirectX 9以来，相比Direct3D更倾向于后者，因为Direct3D提供更全面的高性能图形功能（毕竟2D渲染只是3D渲染的（不严格）子集）。已被[[Direct2D|Direct2D]]替代。
+* [[DirectSound|DirectSound]]提供底层次的硬件加速声卡访问。被[[XAudio|XAudio]]替代。
+* [[DirectInput|DirectInput]]用来与输入设备（[[搖桿|搖桿]]和gamepad）进行通信。已被DirectX 9中引入的[[XInput|XInput]]所替代。
+* [[DirectPlay|DirectPlay]]提供一个多人游戏的架构（multiplayer gaming infrastructure）。它已经被DirectX 9所替代，Microsoft不建议用它开发游戏。
+* [[DirectShow|DirectShow]]可以创建和运行通用的多媒体管道（generic multimedia pipelines）。它可以与[[GStreamer|GStreamer]]框架相媲美，并且经常被用来渲染游戏视频和创建媒体播放器（[[Windows_Media_Player|Windows Media Player]]及诸如[[Ffdshow|FFDShow]]之类的编解码器正是基于此；但在Windows Vista及更高版本中，DirectShow被[[Media_Foundation|Media Foundation]]替代）。不建议用DirectShow开发游戏。
+* [[DirectMusic|DirectMusic]]提供类似[[MIDI|MIDI]]的功能。与DirectSound一起被XAudio替代。
+Microsoft还提供了多个用于媒体编码和播放的API：
+
+* [[DirectShow|DirectShow]]，用于构建和运行通用的媒体管道。它类似于GStreamer框架，常用于渲染游戏内的视频和构建媒体播放器（著名的Windows Media Player即基于它）。如今DirectShow已不再被推荐用于开发。
+* [[Media_Foundation|Media Foundation]]，一种较新的数字媒体API，旨在取代DirectShow。
+
+=== 程序通信API ===
+Windows API最重要功能即为此：处理操作系统和应用程序之间的交互。对于不同的Windows应用程序之间的通信，Microsoft发展了一系列的技术并开发了最主要的Windows API。这些技术从[[動態資料交換|动态数据交换]]（DDE）开始，随后被[[对象链接与嵌入|对象链接和嵌入]]（OLE）取代，再被[[组件对象模型|组件对象模型]]（COM）、自动化对象、[[ActiveX|ActiveX]]控件和[[.NET|.NET]]框架取代。不过，这些技术之间区别并不总是十分明显，并且有很多重叠之处。
+
+这些技术的多样性基本上是对软件开发的不同方面进行细分的结果。自动化特别涉及了导出应用程序和组件的功能为API，以便使其可以由其他应用程序而不是人类来进行控制。.NET是一种自包含的通用方法和技术，用于开发各种使用即时编译语言编写的桌面和Web应用程序。
+
+Windows.pas是一个Pascal/Delphi单元，其中包含了Windows特定的API声明。它在Pascal中的作用就像C中的windows.h一样。
+
+=== 封装库 ===
+微軟利用许多更底层的Windows API函数，开发出许多[[封装库|封装库]]（wrapper），让应用程序以更抽象的方式与Windows API进行交互。[[MFC|MFC]]（Microsoft Foundation Class Library）用[[C++|C++]] [[類_(計算機科學)|類]]来封装Windows API的功能，因而允许用更為[[物件導向|物件導向]]的方式与API进行交互。[[ATL|ATL]]（Active Template Library）是对COM的[[面向模板|面向模板]]（template oriented）的封装。[[WTL|WTL]]（Windows Template Library）作为ATL的增强，被用来作为MFC的轻型的替代物。
+
+其他著名的封装库是[[Borland|Borland]]公司的产品，为了与MFC竞争而推出的[[OWL|OWL]]（Object Windows Library）提供了类似的物件導向封装。不久Borland又推出[[VCL|VCL]]（Visual Component Library）来取而代之。
+
+大多數的Windows [[程序框架|程序框架]]（application framework）是对Windows API的封装，因而[[.NET_Framework|.NET Framework]]、[[Java|Java]]以及其他在Windows下的[[程序语言|程序语言]]，都是（或者包含）封装库。
+
+== 歷史 ==
+Windows API總會為程式設計師提供大量的構建不同 Windows的底層結構，這有助於為 Windows 程式設計師開發應用程序提供大量的靈活性和功能。但是，它同樣使Windows应用程式要負責處理大量底層且有時是繁瑣的與[[图形用户界面|图形用户界面]]（GUI）相關的操作。
+
+例如，初学C的程序员通常会把编写简单的“Hello world”作为他们的第一项任务。程序的工作部分仅仅是主程序中的一个printf行，在链接到标准I/O库时也仅需要一个include行：<syntaxhighlight lang="c" line="1">
+#include <stdio.h>
+
+int main(void) {
+    printf("Hello, World!\n");
+}
+</syntaxhighlight>Windows版本的工作部分仍然只有一行代码，但除此之外它需要很多很多行的额外开销。
+
+許多有關Windows API的暢銷書的作者查尔斯·佩佐德（Charles Petzold）曾經說過：<ref name="petzold-47">[[Charles_Petzold|Charles Petzold]] (December 2001). ''Programming Microsoft Windows with C#.'' Microsoft Press. Beyond the Console, page 47.</ref>
+
+{{cquote|Windows 1.0 SDK中的最初的Hello world程式或多或少沾了些丑闻。HELLO.C大约有150行，而HELLO.RC资源脚本还多加了大约20多行……在接触到Windows 的Hello world程式时，资深的C程式员通常会惊恐或大笑起来。|查尔斯·佩佐德（Charles Petzold）|Programming Microsoft Windows with C#}}
+
+這些年來，Windows作業系統已經今非昔比，而Windows API也隨之改變和成長並反映出這種變化。Windows API的[[Windows_1.0|Windows 1.0]]版本只提供不到450個[[函數調用|函數調用]]（Subroutine），而現在的版本提供上千個。然而，整體而言，Windows接口保持了相當好的一致性，習慣於現在版本Windows API的程式設計師對古老的Windows 1.0程序也並不会陌生。<ref name="petzold-9">Charles Petzold（November 11, 1998）. ''Programming Windows, Fifth Edition.'' Microsoft Press. APIs and Memory Models, page 9.</ref>
+
+[[微软|微软]]特别強調維持軟件的[[向後兼容性|向後兼容性]]。為了實現此一目標，有時微軟甚至不惜支持使用了非官方乃至（編程上）非法的API的軟件。一位致力於Windows API的Windows開發者雷蒙德·陈（Raymond Chen）曾提及：<ref name="chen-bozos">Raymond Chen（October 15, 2003）. ''[http://blogs.msdn.com/oldnewthing/archive/2003/10/15/55296.aspx What about BOZOSLIVEHERE and TABTHETEXTOUTFORWIMPS?] {{Wayback|url=http://blogs.msdn.com/oldnewthing/archive/2003/10/15/55296.aspx |date=20100316193530 }}'' Retrieved August 27, 2005.</ref>
+
+{{cquote|仅仅是关于应用程序所做出的坏事以及我们让应用程序重新运作所必须（通常是在不由自主的情况下）采用的方法，我可能会写上几个月。这就是在人们指责微软在操作系统升级期间恶意破坏应用程序时，我会特别愤怒的原因。如果有任何无法在Windows95上运行的应用程序，我会将这些应用程序视为个人故障。|Raymond Chen|What about BOZOSLIVEHERE and TABTHETEXTOUTFORWIMPS?}}
+对Windows API来说，其历史上最大的变化之一就是从Win16（在Windows 3.1及更早的版本中提供）到Win32（Windows NT和Windows 95及更高版本）的过渡。虽然Win32早已在Windows NT 3.1中引入，并在Windows 95前就已允许使用，但直到Windows 95应用程序才开始广泛移植到Win32。为了简化转换的过程，在Windows 95中对Microsoft内外的开发人员Windows使用了一种复杂的API thunk方案来允许32位代码调用到16位代码（对大多数Win16 API有效），反之亦然。同样的，64位的Windows也可以通过WoW64运行32位的应用程序，而位于Windows目录下的SysWOW64文件夹中包含了多个用于支持32位应用程序的工具。
+
+== 版本 ==
+几乎每个版本的Windows都引入了其对Windows API的添加和修改<ref>{{Cite web|title=History of the Windows API|url=https://web.archive.org/web/20020802081510/http://www.iseran.com/Win32/FAQ/history.html|access-date=2021-10-12|date=2002-08-02|work=web.archive.org}}</ref>，但是API的名称在不同版本的Windows间保持了一致，并且仅当Windows主要的架构和平台都更改时API的名称才会改变。Microsoft最终将当时名叫Win32的API家族改名为Windows API，并使其成为过去和未来API版本的统称。
+
+* '''Win16'''是第一个16位版本Windows的API。它最早被简单地叫做Windows API，但后来为了与较新的32位API区分，它被重新命名为了Win16。Win16 API的功能主要驻留在操作系统的核心文件中，如''kernel.exe''（或''krnl286.exe''、''krnl386.exe''）、''user.exe''和''gdi.exe''。值得一提的是，尽管这些文件采用了exe的扩展名，它们本质上其实是动态链接库。
+* '''Win32'''是Windows 95及后续版本的32位API。与Win16相同，这个API由在系统DLL中实现的函数组成。Win32的核心文件是''kernel32.dll''、''user32.dll''和''gdi32.dll''。Win32最早在Windows NT中引入，而不是Windows 95。Windows 95中的Win32最早被称为Win32c，其中的“c”表示兼容性（英语：compatibility）；这个名称后来被微软舍弃，转而使用Win32。
+* '''Win32s'''是Windows 3.1x系列的扩展，它为这些系统实现了Win32 API的一部分功能。其中的“s”表示子集（英语：subset）。
+* '''Win64'''是64位Windows上的Windows API变体。此时应用程序的32位和64位版本可以从同一个代码库进行编译。在默认情况下，所有内存指针都是64位的（LLP64型），因此部分程序的源代码必须被重写以兼容64位指针算法。
+* '''WinCE'''是Windows CE操作系统中的Windows API。
+
+== 其它实现 ==
+尽管微软的Windows API实现有版权保护，但被普遍认可的是，根据美国的法律先例，其他厂商仍然可以通过提供一致的API来模拟Windows，而不会侵犯版权。
+
+[[Wine|Wine]]项目为类Unix平台提供了一个在Linux内核API与Windows API程序之间的Win32 API兼容层。[[ReactOS|ReactOS]]则更进一步，想要实现一个完整的Windows操作系统；它通过与Wine项目的密切合作来促进其代码的重用和兼容。DosWin32和[[HX_DOS-Extender|HX DOS-Extender]]是另外两个模拟Windows API的项目，它们允许通过[[DOS|DOS]]命令行来运行简单的Windows程序。Odin是一个在OS/2平台上模拟Win32的项目。
+
+== 编译器支持 ==
+为了开发使用Windows API的软件，编译器必须能处理和导入微软相关的DLLs或者COM对象。编译器必须接受一种C或C++方言，或者能够处理揭示了内部API函数名称的[[接口定义语言|接口定义语言]]（Interface description language）文件和头文件及生成的类型库（Type Library）。概括而言，这些预备条件（编译器、开发工具、库和头文件）被统称为[[Microsoft_Platform_SDK|Microsoft Platform SDK]]。很长时间以来，包含了[[编译器|编译器]]和开发工具的专利产品如[[Microsoft_Visual_Studio|Microsoft Visual Studio]]系列和[[Borland|Borland]]编译器（尽管至少在Windows下，SDK是可以从整个[[集成开发环境|IDE]]环境中剥离出来单独免费下载的，据[https://web.archive.org/web/20061018045905/http://www.microsoft.com/msdownload/platformsdk/sdkupdate/XPSP2FULLInstall.htm Microsoft Platform SDK Update]），是仅有的能提供整套开发环境的选择。如今[[MinGW|MinGW]]和[[Cygwin|Cygwin]]也能提供一套这样的开发环境——是基于采用一种独立头文件集合来保证能与微软DLL连接的[[GCC|GCC]]。[[LCC-Win32|LCC-Win32]]是由Jacob Navia维护的一种“非商业用途免费”的C编译器。[[Pellesc|Pellesc]]是由Pelle Orinius维护的一种免费C编译器。[[MASM32|MASM32]]是一个成熟的项目，它通过自制或由SDK平台转换的头文件和库，并利用32位微软汇编器来实现支持Windows API。
+
+微软相关的编译器支持也是[[异常处理|异常处理]]（Structured Exception Handling）特性所需要的。这个体制有双重目的：它提供了语言相关的异常处理赖以实现的基础，同时也是内核藉以通知程序发生诸如解除一个非法指针的引用或堆栈溢出之类异常状况的渠道。甫一被引入Windows 95和NT，微软／Borland C++编译器就有使用这种体制的能力，然而实际实现未被公开，而且必须经过反向工程方可用于Wine项目和免费编译器。SEH的运行机制是先把异常的句柄推入堆栈，继而将它们添加到存储于线程本地资源（即线程环境块的首字段）的一个链表里。事实上，每一个未有程序本身处理的异常，都将由会弹出常规Windows崩溃对话框的默认backstop处理器处理。
+
+API在[[Visual_Basic|Visual Basic]]中的实现示例（这个简化的例子使得用户可以让命令按钮在窗体上四处移动）：
+
+<syntaxhighlight lang=vb>
+  Private Const WM_NCLBUTTONDOWN As Long = &HA1&
+  Private Const HTCAPTION As Long = 2&
+  Private Declare Function ReleaseCapture Lib "user32" () As Long
+  Private Declare Function SendMessage Lib "user32" Alias "SendMessageA" (ByVal hWnd&, ByVal wMsg&, wParam As Any, lParam As Any) As Long
+
+  If Command1.MousePointer = 14 Then
+    Call ReleaseCapture
+    Call SendMessage(Command1.hWnd, WM_NCLBUTTONDOWN, ByVal HTCAPTION, ByVal 0&)
+  End If
+</syntaxhighlight>
+
+== 注释 ==
+{{reflist}}
+
+== 参考资料 ==
+#[[Diomidis_Spinellis|Diomidis Spinellis]]。[http://www.spinellis.gr/pubs/jrnl/1997-CSI-WinApi/html/win.html A critique of the Windows application programming interface] {{Wayback|url=http://www.spinellis.gr/pubs/jrnl/1997-CSI-WinApi/html/win.html |date=20110605105544 }}. ''Computer Standards & Interfaces'', 20(1):1–8, November 1998. [http://dx.doi.org/10.1016/S0920-5489(98)00012-9 doi:10.1016/S0920-5489(98)00012-9]。
+
+== 外部链接 ==
+*[http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winprog/winprog/windows_api_start_page.asp Microsoft Developer Network Windows API development guide] {{Wayback|url=http://msdn.microsoft.com/library/default.asp?url=%2Flibrary%2Fen-us%2Fwinprog%2Fwinprog%2Fwindows_api_start_page.asp |date=20061015164816 }}
+*[http://blogs.msdn.com/oldnewthing/ The Old New Thing] {{Wayback|url=http://blogs.msdn.com/oldnewthing/ |date=20100522223058 }} Weblog by Microsoft developer [[Raymond_Chen|Raymond Chen]]，who works on the Windows API and posts extensively about it.
+*[http://www.lingobit.com/solutions/win32/index.html Localization in Win32] {{Wayback|url=http://www.lingobit.com/solutions/win32/index.html |date=20090206092948 }}
+*[http://pinvoke.net pinvoke.net: the interop wiki!] {{Wayback|url=http://pinvoke.net/ |date=20220517175532 }} PINVOKE.NET attempts to address the difficulty of calling Win32 or other unmanaged APIs in managed code (languages such as C# and VB .NET).
+*[https://web.archive.org/web/20061105114306/http://www.cppworld.com/dante/winapinotes/index.htm Windows API Notes]
+*[http://www.winapizone.net WinapiZone] {{Wayback|url=http://www.winapizone.net/ |date=20220417213909 }} Free tutorials and extensions for Winapi
+*[http://www.stromcode.com/modules.php?name=Glowdot_Tutorials&op=view&tid=1 Stromcode's Win32/C++ tutorial] {{Wayback|url=http://www.stromcode.com/modules.php?name=Glowdot_Tutorials&op=view&tid=1 |date=20080303172832 }} (formerly Glowdot) an extensive, 20-part tutorial.
+*[https://web.archive.org/web/20061023224552/http://www.catch22.net/tuts/ Catch22 Tutorials] Well documented Win32 API tutorials for developing small, nifty, and efficient programs in Windows.
+*[https://web.archive.org/web/20060820232034/http://www.winprog.net/tutorial/ theForger's Win32 API Tutorial]
+*[http://www.news2news.com/vfp/ Using Win32 API in Visual FoxPro] {{Wayback|url=http://www.news2news.com/vfp/ |date=20110121092632 }} online reference
+
+{{Microsoft development tools}}
+
+[[Category:Windows_API|Category:Windows API]]

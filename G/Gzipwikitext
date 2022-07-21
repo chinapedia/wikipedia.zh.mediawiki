@@ -1,0 +1,115 @@
+{{NoteTA/lua|G1 = IT|G2 = FL}}
+{{lowercase}}
+{{Infobox software
+| logo = Gzip-Logo.svg
+| name = Gzip
+| author               = {{plainlist|
+* {{tsl|en|Jean-loup Gailly|}}<!--Person prefers lowercase l (ell), see his article-->
+* {{tsl|en|Mark Adler|}}
+}}
+| developer = [[GNU计划|GNU计划]]
+| released             = {{Start date and age|df=yes|1992|10|31}}
+| frequently updated = yes
+| operating system = [[Unix-like|Unix-like]]
+| genre = [[数据压缩|数据压缩]]
+| programming language = [[C语言|C]]
+| license = [[GNU通用公共许可证|GNU GPLv3]]
+| website = {{URL|https://www.gnu.org/software/gzip/}}
+| repo                 = {{URL|//git.savannah.gnu.org/cgit/gzip.git}}
+}}
+
+{{Infobox software
+| name = NetBSD Gzip / FreeBSD Gzip
+| developer =NetBSD基金会
+| frequently updated = no
+| operating system = [[跨平台|跨平台]]
+| genre = [[数据压缩|数据压缩]]
+| programming language = [[C语言|C]]
+| license = [[BSD许可证|BSD许可证]]
+}}
+
+'''Gzip'''是一种压缩文件格式并且也是一个在类 Unix 上的一种文件解压缩的软件，通常指[[GNU計劃|GNU計劃]]的實現，此處的gzip代表GNU zip。也經常用來表示gzip這種文件格式。軟件的作者是Jean-loup Gailly和Mark Adler。在1992年10月31日第一次公開發布，版本號0.1，1993年2月，发布了1.0版本。
+
+[[OpenBSD|OpenBSD]]中所包含的gzip版本實際上是<tt>compress</tt>程序，其對gzip文件的支持在OpenBSD 3.4中被添加，此處的g代表免費（{{lang|en|gratis}}）<ref>{{cite web|url=http://www.openbsd.org/cgi-bin/man.cgi?query=gzip#HISTORY|title=OpenBSD gzip(1) manual page|accessdate= 2007-07-23|publisher=OpenBSD}}</ref>。
+
+== 文件格式 ==
+{{Infobox file format
+| name = gzip
+| extension = .gz
+| mime = application/gzip<ref>RFC 6713 - '' The 'application/zlib' and 'application/gzip' Media Types''</ref>
+| uniform type = org.gnu.gnu-zip-archive
+| owner = Jean-Loup Gailly and Mark Adler
+| genre = [[数据压缩|数据压缩]]
+| website = http://www.gzip.org/
+| free = 是
+| magic = 0x1f8b
+}}
+gzip的基础是[[DEFLATE|DEFLATE]]，DEFLATE是[[LZ77与LZ78|LZ77]]与[[哈夫曼编码|哈夫曼编码]]的一个组合体。DEFLATE最初是作为[[LZW|LZW]]以及其它受[[专利|专利]]保护的[[数据压缩|数据压缩]][[算法|算法]]的替代版本而设计的，当时那些专利限制了<tt>{{tsl|en|compress|}}</tt>以及其它一些流行的归档工具的应用。
+
+文件格式说明：
+* 10字节的头，包含[[魔術數字_(程式設計)|幻数]]、版本号以及时间戳
+* 可选的扩展头，如原文件名
+* 文件体，包括DEFLATE压缩的数据
+* 8字节的尾注，包括[[循环冗余校验|CRC-32]]校验和以及未压缩的原始数据长度
+
+尽管这种文件格式允许多个这样的数据拼接在一起，在解压时也能认出它们是拼接在一起的数据，但通常gzip仅用来压缩单个文件。多个文件的压缩归档通常是首先将这些文件合并成一个[[tar_(计算机科学)|tar]]文件，然后再使用gzip进行压缩，最后生成的<tt>.tar.gz</tt>或者<tt>.tgz</tt>文件就是所谓的“tar压缩包”或者“tarball”。
+
+注意不要将gzip和[[ZIP_(文件格式)|ZIP]]压缩格式混淆。ZIP也使用DEFLATE算法，而且可移植性更好，不需要一个外部的归档工具就可以包容多个文件。但是，由于ZIP对每个文件进行单独压缩而没有利用文件间的冗余信息（即[[固实压缩|固实压缩]]），所以ZIP的压缩率会稍逊于tar压缩包。
+
+== gzip命令的常用选项 ==
+*-c，--stdout将解压缩的内容输出到[[标准输出|标准输出]]，原文件保持不变
+*-d，--decompress解压缩
+*-f，--force强制覆盖旧文件
+*-l，--list列出压缩包内储存的原始文件的信息（如，解压后的名字、压缩率等）
+*-n，--no-name压缩时不保存原始文件的文件名和时间戳，解压缩时不恢复原始文件的文件名和时间戳（此时，解出来的文件，其文件名为压缩包的文件名）
+*-N，--name压缩时保存原始文件的文件名和时间戳，解压缩时恢复原始文件的文件名和时间戳
+*-q，--quiet抑制所有警告信息
+*-r，--recursive递归
+*-t，--test测试压缩文件完整性
+*-v，--verbose冗余模式（即显示每一步的执行内容）
+*-1、-2、...、-9压缩率依次增大，速度依次减慢，默认为-6
+
+== 衍生品和其它应用 ==
+在大多数Linux发行版中，通过使用 zx 选项来提取.tar.gz格式的压缩文件，例如：tar -zxf file.tar.gz
+
+[[zlib|zlib]]是DEFLATE算法的实现库，它的API同时支持gzip文件格式以及一个简化的数据流格式。zlib数据流格式、DEFLATE以及gzip文件格式均已被分别标准化为 RFC 1950、RFC 1951、RFC 1952。
+
+gzip在[https://en.wikipedia.org/wiki/HTTP_compression HTTP压缩] {{Wayback|url=https://en.wikipedia.org/wiki/HTTP_compression |date=20210126002650 }}，一种在万维网中加速传输HTML和其他内容的技术。它是在 RFC 2016 中规定的三种标准HTTP压缩格式之一。这个RFC（征求意见稿）页定义了一种叫做"DEFLATE"的zlib格式，它和gzip格式相同，除了gzip添加了11字节头部和尾部的负载。但是，现在还是建议使用gzip而不是zlib，因为根据 RFC 1950, [https://en.wikipedia.org/wiki/Internet_Explorer IE]{{Wayback|url=https://en.wikipedia.org/wiki/Internet_Explorer |date=20170831212258 }}还没有正确的实现该标准，还不能处理zlib格式。
+
+zlib DEFLATE 已经在 [https://en.wikipedia.org/wiki/Portable_Network_Graphics Portable Network Graphics] {{Wayback|url=https://en.wikipedia.org/wiki/Portable_Network_Graphics |date=20210202114310 }}（PNG）格式中使用。
+
+自20世纪90年代末期以来，一个基于数据块排序算法的文件压缩工具[[bzip2|bzip2]]作为gzip的替代者逐渐得到流行，它可以生成相当小的压缩文件，尤其是对于源代码和其他结构化文本更是这样，但代价是最高达4倍的内存与处理器时间消耗。bzip2压缩的tar包传统上叫作<tt>.tar.bz2</tt>或<tt>.tbz</tt>。
+
+{{tsl|en|AdvanceCOMP|}}和[[7zip|7zip]]内部也有一个DEFLATE实现，可以制作gzip兼容的压缩文件，与gzip相比有更高的压缩率，不过比较耗费处理器的处理时间。
+
+gzip压缩文件对应的解压程序是'''gunzip'''。
+
+== 参见 ==
+{{portalpar|自由软件}}
+*[[归档格式列表|归档格式列表]]
+*[[归档工具列表|归档工具列表]]
+*[[归档工具比较|归档工具比较]]
+*[[Unix程序列表|Unix程序列表]]
+*[[Tar|.tar.gz.gpg]]
+*[[自由文件格式|自由文件格式]]
+
+==参考资料==
+{{Reflist}}
+
+== 外部链接 ==
+*gzip [http://www.ietf.org/rfc/rfc1952.txt 文件格式规范]{{Wayback|url=http://www.ietf.org/rfc/rfc1952.txt |date=20061127042745 }}
+*[https://www.gnu.org/software/gzip/gzip.html gzip主页] {{Wayback|url=https://www.gnu.org/software/gzip/gzip.html |date=20210202154155 }}以及http://www.gzip.org/{{Wayback|url=http://www.gzip.org/ |date=20180102044624 }}
+*[http://www.zlib.org/ Zlib主页] {{Wayback|url=http://www.zlib.org/ |date=20210129045136 }}
+*[http://www.compression-links.info/Gzip GZIP相关的资源、教程及源码]{{Wayback|url=http://www.compression-links.info/Gzip |date=20061210081411 }}
+*[http://www.urbanophile.com/arenn/coding/gzrt/gzrt.html gzip恢复工具箱] {{Wayback|url=http://www.urbanophile.com/arenn/coding/gzrt/gzrt.html |date=20180707010843 }}
+*[https://web.archive.org/web/20060826120751/http://blog.usweb.com/archives/the-value-online-marketing-benefits-of-gzip The Online Marketing Benefits of gzip]
+
+{{压缩软件}}
+{{Archive formats}}
+
+[[Category:数据压缩自由软件|Category:数据压缩自由软件]]
+[[Category:GNU计划软件|Category:GNU计划软件]]
+[[Category:归档格式|Category:归档格式]]
+[[Category:Unix归档和压缩相关实用工具|Category:Unix归档和压缩相关实用工具]]
+[[Category:无损压缩算法|Category:无损压缩算法]]
+[[Category:用C編程的自由軟體|Category:用C編程的自由軟體]]

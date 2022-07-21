@@ -1,0 +1,11 @@
+{{Userbox
+  |border-c=#FF0000
+  |border-s=1
+  |id=[[File:Aries.svg|30px|alt=]]
+  |id-c=#FF0000
+  |info=這個用戶的星座是'''[[白羊宮|白羊座]]'''。
+  |info-c=#FF8C69
+  |info-s=10
+  |usercategory=白羊座维基人
+}}
+<noinclude>{{documentation}}</noinclude>

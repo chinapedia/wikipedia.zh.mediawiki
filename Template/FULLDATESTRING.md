@@ -1,0 +1,1 @@
+{{#ifeq: {{{YEARURL}}}|1|[[{{CURRENTYEAR}}年]]|{{CURRENTYEAR}}年}}{{#ifeq: {{{DATEURL}}}|1|[[{{CURRENTMONTHNAME}}{{CURRENTDAY}}日]]|{{CURRENTMONTHNAME}}{{CURRENTDAY}}日}} ({{#ifeq: {{{WEEKURL}}}|1|[[星期{{CURRENTDAYNAMEABB}}|{{CURRENTDAYNAMEABB}}]]|{{CURRENTDAYNAMEABB}}}}) {{CURRENTTIME}} ({{#ifeq: {{{UTCURL}}}|1|[[UTC]]|UTC}})<noinclude>{{doc}}</noinclude>

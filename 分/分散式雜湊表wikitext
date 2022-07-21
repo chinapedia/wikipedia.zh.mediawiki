@@ -1,0 +1,111 @@
+{{noteTA
+|T=zh-cn:分布式散列表; zh-tw:分散式雜湊表;
+|G1=IT
+}}
+[[File:DHT_en.svg|thumb]]
+
+'''分散式雜湊表'''（{{lang-en|distributed hash table}}，缩写'''{{lang|en|DHT}}'''）是[[分散式計算|分散式計算]]系統中的一類，用來將一個關鍵值（key）的集合分散到所有在分散式系統中的節點，並且可以有效地將訊息轉送到唯一一個擁有查詢者提供的關鍵值的節點（Peers）。這裡的節點類似[[雜湊表|雜湊表]]中的儲存位置。分散式雜湊表通常是為了擁有極大節點數量的系統，而且在系統的節點常常會加入或離開（例如網路斷線）而設計的。在一個結構性的[[覆盖网络|覆盖网络]]（overlay network）中，參加的節點需要與系統中一小部份的節點溝通，這也需要使用分散式雜湊表。分散式雜湊表可以用以建立更複雜的服務，例如[[分散式檔案系統|分散式檔案系統]]、[[點對點技術|點對點技術]][[檔案分享|檔案分享]]系統、合作的[[網頁快取|網頁快取]]、[[多播|多播]]、[[任播|任播]]、[[網域名稱系統|網域名稱系統]]以及[[即時通訊|即時通訊]]等。
+
+== 發展背景 ==
+研究分散式雜湊表的主要動機是為了開發點對點系統，像是[[Napster|Napster]]、[[Gnutella|Gnutella]]及[[Freenet|Freenet]]。這些系統得益於使用分散在[[網際網路|網際網路]]上的各項資源以提供實用的應用，特別在[[頻寬|頻寬]]及[[硬碟|硬碟]]儲存空間上，他們所提供的檔案分享功能因此得到最大的好處。
+
+這些系統使用不同的方法來解決如何'''找到擁有某資料的節點'''的問題。Napster使用中央的索引伺服器：每個節點加入網路的同時，會將他們所擁有的檔案列表傳送給伺服器，這使得伺服器可以進行搜尋並將結果回傳給進行查詢的節點。但中央索引伺服器讓整個系統易受攻擊，且可能造成法律問題。於是，Gnutella和相似的網路改用大量查詢模式（flooding query model）：每次搜尋都會把查詢訊息廣播給網路上的所有節點。雖然這個方式能夠防止[[單點故障|單點故障]]（[[单点故障|single point of failure]]），但比起Napster來說卻極沒效率。
+
+最後，Freenet使用了完全分散式的系統，但它建置了一套使用經驗法則的[[基於關鍵值的轉送方法|基於關鍵值的轉送方法]]（{{tsl|en|key based routing|key based routing}}）。在這個方法中，每個檔案與一個關鍵值相結合，而擁有相似關鍵值的檔案會傾向被相似的節點構成的集合所保管。於是查詢訊息就可以根據它所提供的關鍵值被轉送到該集合，而不需要經過所有的節點。然而，Freenet並不保證存在網路上的資料在查詢時一定會被找到。
+
+分散式雜湊表為了達到Gnutella與Freenet的分散性（decentralization）以及Napster的效率與正確結果，使用了較為結構化的基於關鍵值的轉送方法。不過分散式雜湊表也有個Freenet有的缺點，就是只能作精確搜尋，而不能只提供部份的關鍵字；但這個功能可以在分散式雜湊表的上層實做。
+
+最初的四項分散式雜湊表技術——[[內容可定址網路|內容可定址網路]]（{{tsl|en|Content addressable network|Content addressable network}}，CAN）、[[Chord|Chord]]（{{tsl|en|Chord project|Chord project}}）<ref>{{en}} Hari Balakrishnan, M. Frans Kaashoek, David Karger, Robert Morris與Ion Stoica, [http://www.project-iris.net/irisbib/papers/dht:cacm03/paper.pdf Looking up data in P2P systems] {{Wayback|url=http://www.project-iris.net/irisbib/papers/dht:cacm03/paper.pdf |date=20160315082728 }}.  於Communications of the ACM, 2003年1月</ref>、[[Pastry|Pastry]]（{{tsl|en|Pastry (DHT)|Pastry (DHT)}}），以及[[Tapestry_(DHT)|Tapestry (DHT)]]（{{tsl|en|Tapestry (DHT)|Tapestry (DHT)}}）皆同時於2001年發表。從那時開始，相關的研究便一直十分活躍。在學術領域以外，分散式雜湊表技術已經被應用在[[BitTorrent|BitTorrent]]及[[CoralCDN|CoralCDN]]（{{tsl|en|Coral Content Distribution Network|Coral Content Distribution Network}}）等。
+
+== 性質 ==
+分散式雜湊表本質上強調以下特性：
+
+* [[離散性|離散性]]：構成系統的節點並沒有任何中央式的協調機制。
+* [[伸縮性|伸縮性]]：即使有成千上萬個節點，系統仍然應該十分有效率。
+* [[容錯性|容錯性]]：即使節點不斷地加入、離開或是停止工作，系統仍然必須達到一定的可靠度。
+
+要達到以上的目標，有一個關鍵的技術：任一個節點只需要與系統中的部份節點溝通。一般來說，若系統有<math>n</math>個節點，那麼只有<math>\Theta(\log n)</math>個節點是必須的（見後述）。因此，當成員改變的時候，只有一部分的工作（例如資料或關鍵值的傳送，雜湊表的改變等）必須要完成。
+
+有些分散式雜湊表的設計尋求能對抗網路中惡意的節點的安全性，但仍然保留參加節點的[[匿名性|匿名性]]。在其他的點對點系統（特別是檔案分享）中較為少見。參見[[匿名點對點技術|匿名點對點技術]]。
+
+最後，分散式雜湊表必須處理傳統分散式系統可能遇到的問題，例如[[負載均衡_(計算機)|負載平衡]]、[[資料完整性|資料完整性]]，以及效能問題（特別是確認轉送訊息、資料儲存及讀取等動作能快速完成）。
+
+== 結構 ==
+分散式雜湊表的結構可以分成幾個主要的元件<ref>{{en}} Moni Naor與Udi Wieder. [http://www.wisdom.weizmann.ac.il/~naor/PAPERS/dh.pdf Novel Architectures for P2P Applications: the Continuous-Discrete Approach] {{Wayback|url=http://www.wisdom.weizmann.ac.il/~naor/PAPERS/dh.pdf |date=20191209032152 }}. Proc. SPAA, 2003年</ref><ref>{{en}} Gurmeet Singh Manku. [http://www-db.stanford.edu/~manku/phd/index.html Dipsea: A Modular Distributed Hash Table] {{Wayback|url=http://www-db.stanford.edu/~manku/phd/index.html |date=20040910154927 }}.博士論文（史丹佛大學），2004年8月</ref>。其基礎是一個抽象的'''關鍵值空間'''（keyspace），例如說所有160位元長的[[字元串|字元串]]集合。'''關鍵值空間分割'''（keyspace partitioning）將關鍵值空間分割成數個，並指定到在此系統的節點中。而'''延展網路'''則連接這些節點，並讓他們能夠藉由在關鍵值空間內的任一值找到擁有該值的節點。
+
+當這些元件都準備好後，一般使用分散式雜湊表來儲存與讀取的方式如下所述。假設關鍵值空間是一個160位元長的字元串集合。為了在分散式雜湊表中儲存一個檔案，名稱為<math>filename</math>且內容為<math>data</math>，我們計算出<math>filename</math>的[[SHA家族|SHA1]]雜湊值——一個160位元的關鍵值<math>k</math>——並將訊息<math>put(k, data)</math>送給分散式雜湊表中的任意參與節點。此訊息在延展網路中被轉送，直到抵達在關鍵值空間分割中被指定負責儲存關鍵值<math>k</math>的節點。而<math>(k, data)</math>即儲存在該節點。其他的節點只需要重新計算<math>filename</math>的雜湊值<math>k</math>，然後送出訊息    <math>get(k)</math>給分散式雜湊表中的任意參與節點，以此來找與<math>k</math>相關的資料。此訊息也會在延展網路中被轉送到負責儲存<math>k</math>的節點。而此節點則會負責傳回儲存的資料<math>data</math>。
+
+以下分別描述關鍵值空間分割及延展網路的基本概念。這些概念在大多數的分散式雜湊表實作中是相同的，但設計的細節部份則大多不同。
+
+=== 關鍵值空間分割 ===
+
+大多數的分散式雜湊表使用某些[[一致哈希|穩定雜湊]]（[[一致哈希|consistent hashing]]）方法來將關鍵值對應到節點。此方法使用了一個函數<math>\delta(k_1, k_2)</math>來定義一個抽象的概念：從關鍵值<math>k_1</math>到<math>k_2</math>的距離。每個節點被指定了一個關鍵值，稱為ID。ID為<math>i</math>的節點擁有根據函數<math>\delta</math>計算，最接近<math>i</math>的所有關鍵值。
+
+<blockquote>
+'''例：'''Chord分散式雜湊表實作將關鍵值視為一個圓上的點，而<math>\delta(k_1, k_2)</math>則是沿著圓順時鐘地從<math>k_1</math>走到<math>k_2</math>的距離。結果，圓形的關鍵值空間就被切成連續的圓弧段，而每段的端點都是節點的ID。如果<math>i_1</math>與<math>i_2</math>是鄰近的ID，則ID為<math>i_2</math>的節點擁有落在<math>i_1</math>及<math>i_2</math>之間的所有關鍵值。
+</blockquote>
+
+穩定雜湊擁有一個基本的性質：增加或移除節點只改變鄰近ID的節點所擁有的關鍵值集合，而其他節點的則不會被改變。對比於傳統的雜湊表，若增加或移除一個位置，則整個關鍵值空間就必須重新對應。由於擁有資料的改變通常會導致資料從分散式雜湊表中的一個節點被搬到另一個節點，而這是非常浪費頻寬的，因此若要有效率地支援大量密集的節點增加或離開的動作，這種重新配置的行為必須盡量減少。
+
+将相近的关键值分配给了距离相近的节点{{tsl|en|Locality-preserving_hashing|}}，可以实现更短的查询延迟，从而提高DHT的查询效率。相关工作包括Self-Chord<ref>{{en}} Agostino Forestiero, Emilio Leonardi, Carlo Mastroianni and Michela Meo. [http://dx.doi.org/10.1109/TNET.2010.2046745 Self-Chord: a Bio-Inspired P2P Framework for Self-Organizing Distributed Systems]. IEEE/ACM Transactions on Networking, 2010.</ref>和LDHT<ref>{{en}} W. Wu, Y. Chen, X. Zhang, X. Shi, B. Deng, X. Li. LDHT: locality-aware distributed hash tables. Proc. of International Conference on Information Networking (ICOIN), 2008.</ref>
+
+=== 延展網路 ===
+每個節點保有一些到其他節點（它的鄰居）的連結。將這些連結總合起來就形成延展網路。而這些連結是使用一個結構性的方式來挑選的，稱為[[網路拓樸|網路拓樸]]。
+
+所有的分散式雜湊表實作拓樸有某些基本的性質：對於任一關鍵值<math>k</math>，某個節點要不就擁有<math>k</math>，要不就擁有一個連結能連結到距離較接近<math>k</math>的節點。因此使用以下的[[貪心法|貪心演算法]]即可容易地將訊息轉送到擁有關鍵值<math>k</math>的節點：在每次執行時，將訊息轉送到ID較接近<math>k</math>的鄰近節點。若沒有這樣的節點，那我們一定抵達了最接近<math>k</math>的節點，也就是擁有<math>k</math>的節點。這樣的轉送方法有時被稱為「基於關鍵值的轉送方法」。
+
+除了基本的轉送正確性之外，拓樸中另有兩個關鍵的限制：其一為保證任何的轉送路徑長度必須盡量短，因而請求能快速地被完成；其二為任一節點的鄰近節點數目（又稱[[圖|最大節點度]]（{{tsl|en|Degree (graph theory)|Degree (graph theory)}}））必須盡量少，因此維護的花費不會過多。當然，轉送長度越短，則最大節點度越大。以下列出常見的最大節點度及轉送長度（<math>n</math>為分散式雜湊表中的節點數）
+
+* 最大節點度<math>O(1)</math>，轉送長度<math>O(\log n)</math>
+* 最大節點度<math>O(\log n)</math>，轉送長度<math>O(\log n / \log \log n)</math>
+* 最大節點度<math>O(\log n)</math>，轉送長度<math>O(\log n)</math>
+* 最大節點度<math>O(n^{1/2})</math>，轉送長度<math>O(1)</math>
+
+第三個選擇最為常見。雖然他在最大節點度與轉送長度的取捨中並不是最佳的選擇，但這樣的拓樸允許較為有彈性地選擇鄰近節點。許多分散式雜湊表實作利用這種彈性來選擇延遲較低的鄰近節點。
+
+最大的轉送長度與[[直徑_(圖論)|直徑]]有關：最遠的兩節點之間的最短跳数（Hop Distance）。無疑地，網路的最大轉送長度至少要與它的直徑一樣長，因而拓樸也被最大節點度與直徑的取捨限制住<ref>{{en}} {{cite web |url=http://maite71.upc.es/grup_de_grafs/table_g.html |title=存档副本 |accessdate=2012-01-10 |deadurl=yes |archiveurl=https://web.archive.org/web/20120217054532/http://maite71.upc.es/grup_de_grafs/table_g.html/ |archivedate=2012-02-17 }}</ref>，而這在[[圖論|圖論]]中是基本的性質。因為貪婪演算法（Greedy Method）可能找不到最短路徑，因此轉送長度可能比直徑長<ref>{{en}} Gurmeet Singh Manku, Moni Naor, and Udi Wieder. [http://citeseer.ist.psu.edu/naor04know.html Know thy Neighbor's Neighbor: the Power of Lookahead in Randomized P2P Networks] {{Wayback|url=http://citeseer.ist.psu.edu/naor04know.html |date=20080420030133 }}. Proc. STOC, 2004.</ref>。
+
+== 範例 ==
+=== 分散式雜湊表實作與協定 ===
+* [[Bamboo_(DHT)|Bamboo]]<ref>{{Cite web |url=http://www.bamboo-dht.org/ |title=存档副本 |accessdate=2007-01-21 |archive-date=2020-09-01 |archive-url=https://web.archive.org/web/20200901020743/http://bamboo-dht.org/ |dead-url=no }}</ref>
+* [[Bunshin|Bunshin]]<ref>{{Cite web |url=http://planet.urv.es/bunshin/ |title=存档副本 |accessdate=2007-01-21 |archive-date=2018-10-05 |archive-url=https://web.archive.org/web/20181005005204/http://planet.urv.es/bunshin/ |dead-url=no }}</ref>
+* [[內容可定址網路|內容可定址網路]]（Content Addressable Network）
+* {{tsl|en|Chord||Chord}}
+* [[DKS系統|DKS系統]]<ref>{{Cite web |url=http://dks.sics.se/ |title=存档副本 |accessdate=2017-09-12 |archive-date=2012-01-20 |archive-url=https://web.archive.org/web/20120120045552/http://dks.sics.se/ |dead-url=no }}</ref>
+* [[Kademlia|Kademlia]]
+* [[Leopard_(DHT)|Leopard]]
+* {{tsl|en|MACE||MACE}}<ref>{{Cite web |url=http://mace.ucsd.edu/ |title=存档副本 |accessdate=2017-09-12 |archive-date=2005-10-18 |archive-url=https://archive.is/20051018191925/http://mace.ucsd.edu/ |dead-url=no }}</ref>
+* {{tsl|en|Pastry (DHT)||Pastry}}
+* {{tsl|en|P-Grid||P-Grid}}
+* {{tsl|en|Tapestry (DHT)||Tapestry}}
+
+=== 分散式雜湊表的應用 ===
+* [[BitTorrent_(协议)|BitTorrent]]：檔案分享應用。BitTorrent可以選用DHT作為分散式Tracker。
+* {{tsl|en|Warez P2P||Warez P2P}}：檔案分享應用。
+* The Circle：檔案分享應用與聊天。
+* [[CSpace|CSpace]]：安全的溝通系統。
+* {{tsl|en|Codeen||Codeen}}：網頁快取。
+* {{tsl|en|CoralCDN||CoralCDN}}
+* [[Dijjer|Dijjer]]
+* [[eMule|eMule]]：檔案分享應用。
+* [[I2P|I2P]]：匿名網路。
+* {{tsl|en|JXTA||JXTA}}：開放原始碼的點對點平台。
+* [[NEOnet|NEOnet]]：檔案分享應用。
+* [[Overnet|Overnet]]：檔案分享應用。
+
+== 参考文献 ==
+{{Reflist|2}}
+
+== 外部連結 ==
+* {{en}} [http://linuxjournal.com/article/6797 Distributed Hash Tables, Part 1] {{Wayback|url=http://linuxjournal.com/article/6797 |date=20201109025305 }}由Brandon Wiley所著。
+* {{en}} [https://web.archive.org/web/20050207101834/http://www.scs.cs.nyu.edu/coral/pubs/ Sloppy Hashing and Self-Organizing Clusters]由[[CoralCDN|CoralCDN]]專案提供的著作。
+* {{en}} [http://wiki.tangosol.com/display/COH32UG/Partitioned+Cache+Service Tangosol Coherence] {{Wayback|url=http://wiki.tangosol.com/display/COH32UG/Partitioned+Cache+Service |date=20131203005515 }}介紹一個類似DHT的架構，但所有節點都知道網路中其他參與者的資訊。
+
+== 參見 ==
+* [[memcached|memcached]]：一個高效能、分散式的物件快取系統。
+
+{{-}}
+{{BitTorrent}}
+
+[[Category:分散式計算|Category:分散式計算]]
+[[Category:BitTorrent|Category:BitTorrent]]

@@ -1,0 +1,1 @@
+#REDIRECT [[Template:沖繩縣]]

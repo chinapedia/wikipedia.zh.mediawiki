@@ -1,0 +1,9 @@
+{{Userbox
+  |id=[[File:NO-Fasces.png|45px]]
+  |id-c=#DEDEDE
+  |info=這個用戶反對'''[[法西斯主義]]'''。
+  |info-c=#E0FFFF
+  |info-s=10
+  |border-c=#3333FF
+}}<includeonly>[[Category:反對法西斯主義的維基人]]</includeonly>
+<noinclude>[[Category:政治主張用戶框模板]]</noinclude>

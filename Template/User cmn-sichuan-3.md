@@ -1,0 +1,1 @@
+{{User language-3|cmn-sichuan|这个用户的'''[[:Category:cmn-sichuan 使用者|四川话]]'''说得'''[[:Category:cmn-sichuan-3 使用者|算伸展]]'''了。|四川話|12|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

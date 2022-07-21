@@ -1,0 +1,9 @@
+{{Userbox
+  |id=UQ
+  |id-c=white
+  |info=这个用戶是'''[[昆士兰大学]]'''的校友、学生或老师。
+  |info-c=gold
+  |info-s=9
+  |info-fc=Blue
+  |border-c=Blue
+}}<includeonly>[[Category:昆士兰的维基人|{{PAGENAME}}]]</includeonly><noinclude>{{Clear}}[[Wikipedia:用户框/教育程度]]</noinclude>

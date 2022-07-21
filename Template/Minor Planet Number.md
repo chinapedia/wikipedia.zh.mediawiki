@@ -1,0 +1,1 @@
+{{serial|width={{#if:{{{3|}}}|{{{3}}}|auto}}|前一小行星|{{{1}}}|[[小行星列表]]|後一小行星|{{{2}}}}}<noinclude>{{Documentation}}</noinclude>

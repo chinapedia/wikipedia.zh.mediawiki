@@ -1,0 +1,16 @@
+{{Userbox
+  |border-c = lightgrey
+  |border-s = 1
+  |id-c     = lightgrey
+  |id-s     = 12
+  |id-fc    = 
+  |info-c   = #f9f9f9
+  |info-s   = 9
+  |info-fc  = black
+  |id       = [[Image:Flag of the United States.svg|40px]]
+  |info     = 这个用户是'''[[美国]]'''公民。
+}}
+[[Category:美國维基人]]
+<noinclude>
+[[Category:地域用戶框模板]]
+</noinclude>

@@ -1,0 +1,1 @@
+{{User language-N|czhu|Chí-kâi ēng-hõu kâi '''[[:Category:Czhu 母語使用者|bó-gṳ́]]''' sĩ '''[[:Category:Czhu 使用者|Tiê-chiu-uē]]'''<br />兹个用户其'''[[:Category:Czhu 母語使用者|母语]]'''是'''[[:Category:Czhu 使用者|潮州话]]'''。|潮州話|13|9}}<noinclude>[[Category:汉语巴别模板]]</noinclude>

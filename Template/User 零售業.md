@@ -1,0 +1,9 @@
+{{Userbox
+  |id=[[File:Antique_cash_register.png|50px|收銀機]]
+  |id-c=#6FA5F7
+  |info=這用戶從事'''[[零售業]]'''工作
+  |info-c=#C5DBFD
+  |border-c=#6FA5F7
+}}<includeonly>[[Category:零售業工作的維基人]]</includeonly><noinclude>
+[[Category:用户框模板]]
+</noinclude>

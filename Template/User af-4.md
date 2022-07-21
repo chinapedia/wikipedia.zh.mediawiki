@@ -1,0 +1,1 @@
+{{User language-4|af|Hierdie gebruiker praat '''[[:Category:af 使用者|Afrikaans]]''' op '''[[:Category:af-4 使用者|moedertaalvlak]]'''.|南非荷兰语}} <noinclude></noinclude>

@@ -1,0 +1,1 @@
+{{User language-4|ms|Pengguna ini boleh menyumbang dengan taraf semacam bahasa '''[[:Category:ms-4 使用者|ibunda]]''' dalam '''[[:Category:ms 使用者|Bahasa Melayu]]'''.|马来语}}<noinclude>[[Category:馬來語巴別模板‎]]</noinclude>

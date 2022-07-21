@@ -1,0 +1,1 @@
+#REDIRECT [[Template:和歌山縣]]

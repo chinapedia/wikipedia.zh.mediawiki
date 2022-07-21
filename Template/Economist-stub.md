@@ -1,0 +1,12 @@
+<div class="notice metadata" id="stub" style="font-size: small;">[[File:Berenike_II.jpg|25px|经济学家]]&nbsp;&nbsp;這是关于[[:Category:经济学家|经济学家]]的[[Wikipedia:小作品|小作品]]。你可以-{zh-hant:透過;zh-hans:通过}-<span class="plainlinks">[{{fullurl:{{FULLPAGENAME}}|action=edit}} 编辑或修订]</span>扩充其内容。</div><includeonly>[[Category:经济学家小作品|{{PAGENAME}}]]{{#ifexpr:{{PAGESIZE:{{FULLPAGENAME}}|R}}>3000|[[Category:字数已超过3000字节的小作品|{{PAGENAME}}]]}}</includeonly><noinclude>
+
+==使用方法==
+加入以下文字在條目中即可。
+<pre>{{经济学家小作品}}</pre>
+
+置放本模板的頁面將自動加入[[:Category:经济学家小作品]]中。
+
+[[Category:學者小作品模板|E]]
+[[Category:經濟小作品模板|B]]
+[[Category:經濟學家小作品|*]]
+</noinclude>

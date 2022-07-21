@@ -1,0 +1,1 @@
+#REDIRECT [[Template:山口縣]]

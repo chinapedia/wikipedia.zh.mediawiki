@@ -1,0 +1,2 @@
+<div style="text-align:center; background-color: #A5CADA; line-height: 1.2;">[[World Conservation Union|IUCN]] 分类V (陆地/海洋保护景观)<includeonly>[[Category:IUCN分类V]]</div></includeonly><noinclude>
+</noinclude><noinclude>[[Category:IUCN保护区信息框模板|IUCN V]]</noinclude>

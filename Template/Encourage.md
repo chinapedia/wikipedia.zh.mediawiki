@@ -1,0 +1,7 @@
+<includeonly><table style="float:{{{align|right}}}; border-left:1px solid #AAA; border-top:1px solid #AAA; border-bottom:1px solid #000; border-right:1px solid #000; clear:{{{align|right}}}; background-color:{{{bgcolor|gold}}}; border-collapse:collapse; width:118px; margin-bottom:2px; table-layout:fixed;line-height:97%;"><tr>{{ #switch: {{{stripe|0}}}
+|1 = <td style="width:1px;"></td><td style="background-color:{{{stripecolor1|{{{stripecolor|red}}}}}}; width:1px;"></td><td style="width:1px;"></td><td style="width:1px;"></td>
+|2 = <td style="width:1px;"></td><td style="background-color:{{{stripecolor1|{{{stripecolor|red}}}}}}; width:1px;"></td><td style="width:1px;"></td><td style="background-color:{{{stripecolor2|{{{stripecolor|red}}}}}}; width:1px;"></td>
+|3 = <td style="width:1px;"></td><td style="background-color:{{{stripecolor1|{{{stripecolor|red}}}}}}; width:1px;"></td><td style="width:1px;"></td><td style="background-color:{{{stripecolor2|{{{stripecolor|red}}}}}}; width:1px;"></td><td style="width:1px;"></td><td style="background-color:{{{stripecolor3|{{{stripecolor|red}}}}}}; width:1px;"></td>
+|#default = <td style="width:1px;"></td><td style="width:1px;"></td><td style="width:1px;"></td><td style="width:1px;"></td>
+}}<td style="font-size:12px;text-align:center;">{{#if:{{{image|}}}|[[File:{{{image|}}}{{!}}{{{imagesize|15px}}}]]}} [[:{{{link|Category:{{{title|}}}}}}|<span style="top:5px;color:{{{fontcolor|black}}};font-weight: {{{fontweight|normal}}}">{{{title|}}}</span>]]</td>
+</tr></table></includeonly><noinclude>{{Documentation}}</noinclude>

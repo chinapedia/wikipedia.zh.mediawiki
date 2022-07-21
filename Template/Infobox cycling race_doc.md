@@ -1,0 +1,29 @@
+<includeonly><!-- 在這裡加入模板的保護標識 --></includeonly><noinclude>{{Documentation subpage}}</noinclude>
+==使用說明==
+{|
+|<small><pre>
+{{Infobox Cycling Race
+|current_event=目前舉辦的賽會
+|image=賽會標誌，語法為[[File:圖像檔案名稱|100px]]
+|date=該賽會的舉辦期間（提供約略月份即可）
+|region=舉辦的地區或國家
+|english=該賽會的英文名稱
+|localnames=當地常用的名稱
+|nickname=該項賽會的簡稱
+|discipline=該項賽會包含的賽制
+|competition=隸屬的聯賽
+|type=競賽的種類（例如：公路賽、登山賽等）
+|organiser=主辦單位
+|director=競賽總監
+|first=第一次辦理的年份（如有實際期間，可加入日期）
+|number=舉辦的次數
+|last=最近舉辦的日期
+|firstwinner=第一屆的冠軍選手
+|mostwins=最多勝的車手
+|mostrecent=目前的冠軍
+}}</pre></small>
+|}
+所有參數全部都是選填的。
+<includeonly>
+[[Category:体育信息框模板|赛]]
+</includeonly>

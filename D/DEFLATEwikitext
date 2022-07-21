@@ -1,0 +1,84 @@
+'''DEFLATE'''是同时使用了[[LZ77与LZ78|LZ77]]算法与[[哈夫曼编码|哈夫曼编码]]（Huffman Coding）的一个[[无损数据压缩|无损数据压缩]][[算法|算法]]。它最初是由[[菲尔·卡茨|菲尔·卡茨]]（Phil Katz）为他的[[PKZIP|PKZIP]]软件第二版所定义的，后来被[https://tools.ietf.org/html/rfc1951 RFC 1951]{{Wayback|url=https://tools.ietf.org/html/rfc1951 |date=20160805184948 }}标准化。
+
+[[菲尔·卡茨|菲尔·卡茨]]及其所拥有的{{tsl|en|PKWARE, Inc}}为该算法申请了[https://www.google.com/patents/US5051745 美国专利5051745号]{{Wayback|url=https://www.google.com/patents/US5051745 |date=20160825213812 }}。人们普遍认为DEFLATE不受任何[[专利|专利]]所覆盖，并且在[[LZW|LZW]]（[[GIF|GIF]]文件格式使用）相关的专利失效之前，这种格式除了在[[ZIP_(文件格式)|ZIP]]文件格式中得到应用之外也在[[gzip|gzip]]压缩文件以及[[PNG|PNG]]图像文件中得到了应用。
+
+DEFLATE压缩与解压的源代码可以在自由、通用的压缩库[[zlib|zlib]]上找到。
+
+更高压缩率的DEFLATE是[[7-zip|7-zip]]所实现的。[[AdvanceCOMP|AdvanceCOMP]]也使用这种实现，它可以对[[gzip|gzip]]、[[PNG|PNG]]、[[MNG|MNG]]以及[[ZIP_(文件格式)|ZIP]]文件进行压缩从而得到比[[zlib|zlib]]更小的文件大小。在Ken Silverman的KZIP与PNGOUT中使用了一种更加高效同时要求更多用户输入的DEFLATE程序。
+
+== 流格式 ==
+Deflate流是指比特流。也即，我们首先把它看作字节流，然后对每个字节，确定其比特顺序。对于[[X86|X86]]这样的[[小端序|小端序]]平台，就是按照字节内部[[最不显著比特|最不显著比特]]（Least Significant Bit） 到[[最显著比特|最显著比特]]（Most Significant Bit）的顺序。例如，对于字节0x15，它的比特序列是10101000。
+
+Deflate流包含一系列数据块。每块以3比特的头部开始:
+
+* 第1比特: Last-block-in-stream marker:
+** <code>1</code>: 流的最后一块
+** <code>0</code>: 不是流的最后一块
+* 第2、第3比特: 编码方法
+** <code>00</code>: 无压缩的stored/raw/literal, 长度在0至65,535字节
+** <code>01</code>: 静态霍夫曼压缩。采用事先定义（因而无须存储在流中）的[[霍夫曼树|霍夫曼树]]
+** <code>10</code>: 动态霍夫曼树
+** <code>11</code>: 保留，未使用
+
+<!---
+=== 冗余字符串删除 ===
+{{main|LZ77与LZ78}}
+
+Within compressed blocks, if a duplicate series of bytes is spotted (a repeated string), then a back-[[Reference_(computer_science)|reference]] is inserted, linking to the previous location of that identical string instead.  An encoded match to an earlier string consists of an 8-bit length (3–258 bytes) and a 15-bit distance (1–32,768 bytes) to the beginning of the duplicate.  Relative back-references can be made across any number of blocks, as long as the distance appears within the last 32 [[Kibibyte|KB]] of uncompressed data decoded (termed the ''sliding window'').
+
+If the distance is less than the length, the duplicate overlaps itself, indicating repetition.  For example, a run of 10 identical bytes can be encoded as one byte, followed by a duplicate of length 9 beginning 1 byte ago.
+
+=== Bit reduction ===
+{{main|Huffman coding}}
+
+The second compression stage consists of replacing commonly used symbols with shorter representations and less commonly used symbols with longer representations.  The method used is [[Huffman_coding|Huffman coding]] which creates an unprefixed tree of non-overlapping intervals, where the length of each sequence is inversely proportional to the probability of that symbol needing to be encoded. The more likely a symbol has to be encoded, the shorter its bit-sequence will be.
+
+A tree is created, containing space for 288 symbols:
+
+* 0–255: represent the literal bytes/symbols 0–255.
+* 256: end of block – stop processing if last block, otherwise start processing next block.
+* 257–285: combined with extra-bits, a match length of 3–258 bytes.
+* 286, 287: not used, reserved and illegal but still part of the tree.
+
+A match length code will always be followed by a distance code. Based on the distance code read, further "extra" bits may be read in order to produce the final distance.  The distance tree contains space for 32 symbols:
+
+* 0–3: distances 1–4
+* 4–5: distances 5–8, 1 extra bit
+* 6–7: distances 9–16, 2 extra bits
+* 8–9: distances 17–32, 3 extra bits
+* ...
+* 26–27: distances 8,193–16,384, 12 extra bits
+* 28–29: distances 16,385–32,768, 13 extra bits
+* 30–31: not used, reserved and illegal but still part of the tree.
+
+Note that for the match distance symbols 2–29, the number of extra bits can be calculated as <math>\frac{n}{2}-1</math>.
+
+The code is itself a [[canonical_Huffman_code|canonical Huffman code]] sent by giving the bit length of the code for each symbol.  The bit lengths are themselves run-length encoded to produce as compact a representation as possible.  As an alternative to including the tree representation, the "static tree" option provides a standard fixed Huffman tree.  The compressed size using the static tree can be computed using the same statistics (the number of times each symbol appears) as are used to generate the dynamic tree, so it is easy for a compressor to choose whichever is smaller.
+--->
+== 编程接口 == 
+Deflate可以免费在很多编程语言中使用。C语言通常使用zlib库。[[C++|C++]]语言可以使用[[7-Zip|7-Zip]]/[[AdvanceCOMP|AdvanceCOMP]]。Java语言包含在标准库java.util.zip中。[[Microsoft_.NET_Framework|Microsoft .NET Framework]] 2.0包含在System.IO.Compression命名空间中。
+ 
+* [[PKZIP|PKZIP]]: 该算法最早的实现。
+* [[zlib|zlib]]/[[gzip|gzip]]: 标准参考实现（standard reference implementation），由于其公共可用性，得到了及其广泛的使用。
+* [[Crypto++|Crypto++]]: [[C++|C++]]开源实现.
+* [[7-Zip|7-Zip]]/[[AdvanceCOMP|AdvanceCOMP]]: Igor Pavlov的[[C++|C++]]开源自由实现
+* [[PuTTY|PuTTY]] ‘sshzlib.c’: 一份单独实现
+* [[Plan_9_from_Bell_Labs|Plan 9 from Bell Labs]] 的[http://plan9.bell-labs.com/sources/plan9/sys/src/libflate/ libflate]{{Wayback|url=http://plan9.bell-labs.com/sources/plan9/sys/src/libflate/ |date=20060315063934 }} 
+* [[Red_Gate_Software#HyperBac|Hyperbac]]: C++与汇编实现
+* [[Zopfli|Zopfli]]: Google的C实现   
+== 参见 ==
+*[[归档格式列表|归档格式列表]]
+*[[压缩软件列表|压缩软件列表]]
+*[[压缩软件比较|压缩软件比较]]
+== 参考文献==
+{{reflist|30em}}
+== 外部链接 ==
+* [[PKWARE,_Inc.|PKWARE, Inc.]]'s <code>appnote.txt</code>, [http://www.pkware.com/documents/casestudies/APPNOTE.TXT ''.ZIP File Format Specification'']{{Wayback|url=http://www.pkware.com/documents/casestudies/APPNOTE.TXT |date=20141205201932 }}; Section 10, ''X. Deflating – Method 8''.<!-- Really "Section 10?, not "5.5 Deflating - Method 8"? Does this need an archive.org-url?-->
+* RFC 1951 – ''Deflate Compressed Data Format Specification version 1.3''
+* [http://www.zlib.net zlib Home Page]{{Wayback|url=http://www.zlib.net/ |date=20200917202529 }}
+* [http://zlib.net/feldspar.html ''An Explanation of the Deflate Algorithm'']{{Wayback|url=http://zlib.net/feldspar.html |date=20160808203607 }} – by Antaeus Feldspar
+* [http://www.larsson.dogma.net/dccpaper.pdf  ''Extended Application of Suffix Trees to Data Compression'' ]{{Wayback|url=http://www.larsson.dogma.net/dccpaper.pdf |date=20160923065920 }} – an excellent algorithm to implement Deflate by Jesper Larsson
+
+{{压缩方法}}
+
+[[Category:无损压缩算法|Category:无损压缩算法]]

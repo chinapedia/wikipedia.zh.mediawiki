@@ -1,0 +1,94 @@
+{{Unreferenced|time=2020-06-25T06:35:00+00:00}}
+{{noteTA
+|T=zh-hans:解释器; zh-hant:直譯器;
+|G1=IT
+|1=zh:直譯;zh-hans:解释; zh-hant:直譯;
+|2=zh-hans:解释; zh-hant:直接轉譯;
+|3=zh-hans:翻译; zh-hant:轉譯;
+|4=zh-hans:源代码;zh-hant:原程式碼;
+|5=zh-hans:机器码;zh-hant:機械碼;
+|6=zh-hans:程序;zh-hant:程式;
+|7=zh-hans:编程语言;zh-hant:程式语言;
+}}
+{{Program execution}}
+
+'''解释器'''（{{lang-en|interpreter}}），是一种[[计算机程序|计算机程序]]，能够把[[解释型语言|解释型语言]]解释执行。解释器就像一位「中間人」。解释器边解释边执行，因此依赖于解释器的[[程序设计|程序]]运行速度比较缓慢。解释器的好处是它不需要重新[[編譯器|编译]]整个程序，从而减轻了每次程序更新后编译的负担。相对的[[编译器|编译器]]一次性将所有[[源代码|源代码]]编译成二进制文件，执行时无需依赖编译器或其他额外的程序。
+
+==历史==
+
+第一个解释器是由[[史帝芬·罗素|史帝芬·罗素]]（Steve Russell）写成的[[LISP|LISP]]的解释器，基于[[IBM_704|IBM 704]]的[[机器语言|机器码]]。
+
+==解释器与编译器==
+解释器执行程序的方法有：
+# 直接执行[[高级编程语言|高级编程语言]]（如Shell内建的编译器）
+# 转换高级编程语言到更有效率的[[字节码|字节码]]，并执行字节码
+# 用解释器包含的编译器对高级语言进行编译，並指示[[中央处理器|中央处理器]]执行编译后的程序（例如：[[JIT|JIT]]）
+
+[[Perl|Perl]]，[[Python|Python]]，[[MATLAB|MATLAB]]，與[[Ruby|Ruby]]是屬於第二種方法，而[[UCSD_Pascal|UCSD Pascal]]則是屬於第三種方式。在轉譯的過程中，這組高階語言所寫成的程式仍然維持在原始碼的格式（或某種[[中繼語言|中繼語言]]的格式），而程式本身所指涉的動作或行為則由直譯器來表現。
+
+使用直譯器來執行程式會比直接執行編譯過的機器碼來得慢，但是相對的這個直譯的行為會比編譯再執行來得快。這在程式開發的雛型化階段和只是撰寫試驗性的程式碼時尤其來得重要，因為這個「編輯-直譯-除錯」的循環通常比「編輯-編譯-執行-除錯」的循環來得省時許多。
+
+在直譯器上執行程式比直接執行編譯過的程式碼來得慢，是因為直譯器每次都必須去分析並轉譯它所執行到的程式行，而編譯過的程式就只是直接執行。這個在執行時的分析被稱為"直譯式的成本"。在直譯器中，變數的存取也是比較慢的，因為每次要存取變數的時候它都必須找出該變數實際儲存的位置，而不像編譯過的程式在編譯的時候就決定好了變數的位置了。
+
+在使用直譯器來達到較快的開發速度和使用編譯器來達到較快的執行進度之間是有許多妥協的。有些系統（例如有一些[[LISP|LISP]]）允許直譯和編譯的程式碼互相呼叫並共享變數。這意味著一旦一個子程式在直譯器中被測試併除錯過之後，它就可以被編譯以獲得較快的執行進度。許多直譯器並不像其名稱所說的那樣執行原始程式碼，反而是把原始程式碼轉換成更壓縮的內部格式。舉例來說，有些[[BASIC|BASIC]]的直譯器會把[[保留字|保留字]]取代成可以用來在[[转移表|转移表]]中找出相對應指令的單一[[字节|字节]]符號。直譯器也可以使用如同編譯器一般的[[文字分析器|文字分析器]]和[[語法分析器|語法分析器]]然後再轉譯產生出來的[[抽象語法樹|抽象語法樹]]。
+
+直譯式程式相較於編譯式程式有較佳的可攜性，可以容易的在不同軟硬體平台上執行。而編譯式程式經過編譯後的程式則只限定於執行在開發環境平台。
+
+==字节码直譯器==
+
+考量程式執行之前所需要分析的時間，存在了一個介於直譯與編譯之間的可能性。例如，用[[Emacs_Lisp|Emacs Lisp]]所撰寫的原始碼會被編譯成一種高度壓縮且最佳化的另一種[[Lisp|Lisp]]原始碼格式，這就是一種[[字节码|字节码]]（bytecode），而它並不是機器碼（因此不會被綁死在特定的硬體上）。這個"編譯過的"碼之後會被字节码直译器（使用[[C语言|C]]寫成的）轉譯。在這種情況下，這個"編譯過的"碼可以被說成是[[虚拟机|虚拟机]]（不是真的硬體，而是一種字节码直譯器）的機器碼。這個方式被用在[[Open_Firmware|Open Firmware]]系統所使用的[[Forth|Forth]]程式碼中：原始程式將會被編譯成"F code"（一種字节码），然後被一個特定平台的虛擬機器直譯和執行。
+
+==即-{}-時-{}-編譯==
+{{main|即時編譯}}
+即时编译（Just-in-time compilation）是指一種在執行時期把字节码編譯成原生[[機器語言|機器碼]]的技術;這項技術是被用來改善[[虛擬機器|虛擬機器]]的效能的。該技術在近幾年來才開始獲得重視，而它後來模糊了直譯、字节码直譯及編譯的差異性。在[[.NET_Framework|.NET]]和[[Java|Java]]的平台上都有用到JIT的技術。大約在1980年代[[Smalltalk|Smalltalk]]語言出現的時候JIT的技術就存在了。
+
+==一個簡單的直譯器的例子==
+在[[文學編程|文學編程]]文章中有一個簡單的程式和一個直譯器。
+
+==打孔卡讀卡機==
+“interpreter”這個字眼有時候是指一些可以讀取[[打孔卡|打孔卡]]的機器。這些機器可以讀取卡片上的孔並以人們讀得懂的格式列印出來。[[IBM_550|IBM 550]]數字讀卡機和[[IBM_557|IBM 557]]字母讀卡機是主要的兩個例子。
+
+== 有编译器的高级语言==
+* [[AWK|AWK]]
+* [[BASIC|BASIC]]
+* [[JavaScript|JavaScript]]
+* [[LISP|LISP]]
+* [[Racket|Racket]]
+* [[Scheme|Scheme]]
+* [[Haskell|Haskell]]
+* [[Idris|Idris]]
+* [[Clojure|Clojure]]
+* [[Shell|Shell]]
+* [[Perl|Perl]]
+* [[Prolog|Prolog]]
+* [[Ruby|Ruby]]
+* [[Python|Python]]
+* [[Php|PHP Hypertext Preprocessor]]
+* [[C|C]]
+* [[C++|C++]]
+* [[Java|Java]]
+
+== 参考文献 ==
+{{Reflist}}
+
+== 參閱 ==
+{{Portal box|计算机科学|计算机程序设计|软件}}
+* {{link-en|partial evaluation|partial evaluation}}
+* [[直譯語言|直譯語言]]
+* [[编译语言|编译语言]]
+* [[動態編譯|動態編譯]]
+* {{link-en|Threaded code|Threaded code}}, a compact form of code that depends on a simple interpreter.
+* {{link-en|Metacircular Interpreter|Metacircular Interpreter}}
+
+== 外部链接 ==
+* [http://www.columbia.edu/acis/history/interpreter.html IBM Card Interpreters] {{Wayback|url=http://www.columbia.edu/acis/history/interpreter.html |date=20110412120106 }} page at Columbia University
+{{-}}
+{{Computer Science|state=collapsed}}
+{{FOLDOC|state=collapsed}}
+
+[[Category:計算機語言|Zhiyiqi]]
+[[Category:系統軟件|Zhiyiqi]]
+[[Category:编译原理|Zhiyiqi]]
+[[Category:程序设计工具|Zhiyiqi]]
+[[Category:软件工程|Zhiyiqi]]
+[[Category:计算机编程|Zhiyiqi]]

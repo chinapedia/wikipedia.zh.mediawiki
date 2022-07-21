@@ -1,0 +1,11 @@
+{{Userbox
+  |id=逢甲<!--[[File:Fcu-cmyk.jpg|48px]]。注意合理使用之规定：“绝对不能将“合理使用”之图片，放入个人的用户页面进行展示。”-->
+  |id-c=#fff
+  |info=這名用戶是'''[[逢甲大學]]'''的學生、校友或教職人員。
+  |info-c=#ffefd5
+  |info-s=10
+  |border-c=#8b0000
+}}<includeonly>[[Category:逢甲大學維基人|{{PAGENAME}}]]</includeonly>
+<noinclude>
+[[Category:台灣大專院校用戶框模板]]
+</noinclude>

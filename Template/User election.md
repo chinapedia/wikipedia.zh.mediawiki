@@ -1,0 +1,1 @@
+{{Personal announcement|{{{1|{{PAGENAME}}}}}|content=要求香港盡早落實雙[[普選]]！！|backcolor=yellow|fontcolor=black}}<includeonly>[[Category:要求香港盡早落實雙普選的维基人|{{PAGENAME}}]]</includeonly>

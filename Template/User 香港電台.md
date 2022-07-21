@@ -1,0 +1,14 @@
+{{Userbox
+ |id=RTHK
+ |id-c=white
+ |id-fc=red
+ |id-s=11
+ |info=這個用戶喜歡收聽或收看[[香港電台]]的節目。
+ |info-c=white
+ |info-s=9
+ |border-c=red
+}}
+<includeonly>[[Category:喜歡香港電台節目的維基人]]</includeonly>
+<noinclude>
+[[Wikipedia:用戶框/媒體]][[Category:媒體用戶框模板|廣]][[Category:媒體用戶框模板|視]]
+</noinclude>

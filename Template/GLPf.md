@@ -1,0 +1,1 @@
+[[File:Flag of Guadeloupe (local).svg|{{{1|25px}}}]] [[瓜德羅普足球代表隊|瓜德羅普]]<noinclude>[[Category:中美洲國家模板]]</noinclude>

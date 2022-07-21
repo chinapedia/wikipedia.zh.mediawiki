@@ -1,0 +1,1 @@
+{{User language-N|ie|Ti person posse contribuer con nivell de  '''[[:Category:ie 母語使用者|bon experte (presc lingue matrin)]]''' de '''[[:Category:ie 使用者|interlingue]]'''.|国际语E}} <noinclude></noinclude>

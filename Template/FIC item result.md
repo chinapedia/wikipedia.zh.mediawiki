@@ -1,0 +1,1 @@
+'''投票結束，結果：{{{support}}}票支持，{{{oppose}}}票反對，{{{result}}}特色圖片。'''<noinclude>[[Category:辅助模板]]</noinclude>

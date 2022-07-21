@@ -1,0 +1,1 @@
+[[蛋白質資料庫|PDB]] [http://www.rcsb.org/pdb/cgi/explore.cgi?pdbId={{{1}}} {{{1}}}]<noinclude>[[Category:生物學模板|PDB]][[Category:外部資源模板|生物]]</noinclude>

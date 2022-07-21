@@ -1,0 +1,1 @@
+<center>'''''這個[[Wikipedia:模板|模板]]擺放的位置錯誤。它應該放在[[Wikipedia:討論頁|討論頁]]上：'' [[Wikipedia talk:{{PAGENAME}}]]。'''</center><noinclude>[[Category:檢查討論名字空間的模板]]</noinclude>

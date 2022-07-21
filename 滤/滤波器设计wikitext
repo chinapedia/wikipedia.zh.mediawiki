@@ -1,0 +1,65 @@
+{{NoteTA
+|G1=Communication
+}}
+频域'''[[电子滤波器|电子滤波器]]'''的'''设计'''必须首先考虑任务所需滤波器的类型。首先必须确定滤波器的基本功能，如[[低通滤波器|低通滤波器]]、[[高通滤波器|高通滤波器]]、[[带通滤波器|带通滤波器]]、[[全通滤波器|全通滤波器]]或者是更为复杂的功能。
+
+* 低通滤波器用于阻止不需要的高频信号。
+* 高通滤波器允许高频信号通过，阻止不需要的低频信号成分通过。
+* 带通滤波器只允许有限频率范围的信号通过。
+* 带阻滤波器允许低于和高于特定频率范围的信号通过，对于这个范围内的频率阻止通过。这种滤波器较少见。
+
+滤波器的一个重要[[参数|参数]]是所要求的[[频率响应|频率响应]]。尤其是频率响应曲线的陡峭性和复杂性是滤波器阶数和可行性的一个决定性因素。
+
+一阶滤波器只有一个依赖于频率的成分，这就意味着频率响应[[slope|slope]]就局限在每[[倍频|倍频]]6 [[Decibel|dB]]。对于许多应用来说，这是不够的，为了实现更陡的斜率，必须使用更高阶的滤波器。
+
+另外必须决定如何实现滤波器：
+* [[模拟滤波器|模拟滤波器]]
+* [[模拟采样滤波器|模拟采样滤波器]]
+* [[数字滤波器|数字滤波器]]
+* [[机械滤波器|机械滤波器]]
+
+===模拟滤波器===
+
+线性模拟滤波器设计大部分都在[[线性滤波器|线性滤波器]]中涵盖。
+
+===数字滤波器===
+
+[[数字滤波器|数字滤波器]]根据两个基本原理之一实现，根据它们响应冲击信号的不同可以分为：
+* [[无限脉冲响应|无限脉冲响应]]（[[无限脉冲响应|IIR]]）
+* [[有限脉冲响应|有限脉冲响应]]（[[有限脉冲响应|FIR]]）
+
+==采样率==
+
+除非[[采样率|采样率]]受到其它外部约束条件限定，否则选择合适的采样率就是一项重要的设计决定。高的采样率需要更多的计算资源，但是需要较少的{{tsl|en|anti-aliasing|抗混淆}}措施。与系统中其它信号的[[干涉|干涉]]和[[beating|beating]]也是应该考虑的问题。
+
+==抗混淆==
+
+对于数字滤波器的设计来说，分析避免[[混淆|混淆]]效应是很关键的。经常通过在输入和输出增加一个[[抗混淆|抗混淆]]滤波器来滤除任何高于[[奈奎斯特频率|奈奎斯特频率]]的信号，这种滤波器的复杂性依赖于[[信噪比|信噪比]]和[[采样率|采样率]]与信号最高频率之比。
+
+==无限脉冲响应==
+
+[[无限脉冲响应|无限脉冲响应]]是与模拟滤波器对应数字实现。无限脉冲响应使用了[[反馈|反馈]]过程，所以通常要比同样性能的有限脉冲响应滤波器所耗费的资源要少。同样是由于反馈的因素，高阶的无限脉冲响应滤波器可能会有[[不稳定|不稳定]]和[[运算溢出|运算溢出]]的问题，因此需要细心设计以避免出现类似问题。另外，它们有内在的依赖于频率的[[相移|相移]]，在很多情况下这可能成为问题。二阶无限脉冲响应滤波器经常叫作'biquads'，更高阶的滤波器就是biquads的层叠。一个有用的计算biquad系数的参考文献是[https://archive.is/20121220231853/http://www.musicdsp.org/files/Audio-EQ-Cookbook.txt RBJ Audio EQ Cookbook]。
+
+==有限脉冲响应==
+
+[[有限脉冲响应|有限脉冲响应]]滤波器不使用反馈，本身是稳定的。有限脉冲响应滤波器[[系数|系数]]通常是[[对称|对称]]的，这样很自然地[[相移|相移]]就被抵消。并且也很容易避免运算溢出。它的主要缺点是要比灵巧设计的无限脉冲响应变量的计算要花费多得多的[[处理|处理]]和[[内存|内存]]资源。有限脉冲响应设计比较简单：[[Remez_exchange|Remez exchange]][[算法|算法]]就是一个能够半自动设计相当高质量滤波器的方法。
+
+==参考文献==
+
+*A. Antoniou, ''Digital Filters: Analysis, Design, and Applications'', New York, NY: McGraw-Hill, 1993.
+*S.K. Mitra, ''Digital Signal Processing: A Computer-Based Approach'', New York, NY: McGraw-Hill, 1998.
+*A.V. Oppenheim and R.W. Schafer, ''Discrete-Time Signal Processing'', Upper Saddle River, NJ: Prentice-Hall, 1999.
+* J.K. Kaiser, ''Nonrecursive Digital Filter Design Using the Io-sinh Window Function,'' Proc. 1974 IEEE Int. Symp. Circuit Theory, pp. 20-23, 1974.
+* S.W.A. Bergen and A. Antoniou, ''Design of Nonrecursive Digital Filters Using the Ultraspherical Window Function,'' EURASIP Journal on Applied Signal Processing, vol. 2005, no. 12, pp. 1910-1922, 2005.
+* T.W. Parks and J.H. McClellan, ''Chebyshev Approximation for Nonrecursive Digital Filters with Linear Phase,'' IEEE Trans. Circuit Theory, vol. CT-19, pp. 189-194, Mar. 1972.
+* L.R. Rabiner, J.H. McClellan, and T.W. Parks, ''FIR Digital Filter Design Techniques Using Weighted Chebyshev Approximation,'' Proc. IEEE, vol. 63, pp. 595-610, Apr. 1975.
+* A.G. Deczky, ''Synthesis of Recursive Digital Filters Using the Minimum p-Error Criterion,'' IEEE Trans. Audio Electroacoust., vol. AU-20, pp. 257-263, Oct. 1972.
+
+==外部链接==
+
+*[http://www.dspguru.com/sw/tools/filtdsn.htm Digital Filter Design Software] {{Wayback|url=http://www.dspguru.com/sw/tools/filtdsn.htm |date=20090416170714 }}
+*[https://web.archive.org/web/20060408071947/http://www.digitalfilterdesign.com/ Free digital filter design software]
+*[https://web.archive.org/web/20061230135201/http://focus.ti.com/lit/sw/slvc003d/slvc003d.zip Free Analog acitve filter design software]
+
+[[Category:数字信号处理|Category:数字信号处理]]
+[[Category:滤波器理论|Category:滤波器理论]]

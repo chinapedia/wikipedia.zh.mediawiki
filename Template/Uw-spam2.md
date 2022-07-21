@@ -1,0 +1,4 @@
+[[File:Information orange.svg|25px]] 請勿加入不當外部連結{{<includeonly>safesubst:</includeonly>#if:{{{1|}}}|，如閣下於[[:{{{1}}}]]的編輯}}。[[WP:NOTLINK|維基百科並非外部連結收集站]]，更[[WP:SOAP|非廣告宣傳發布處]]。不當-{zh-hans:链接;zh-hant:連結}-包括個人網站-{zh-hans:链接;zh-hant:連結}-、與閣下有所聯繫之網站-{zh-hans:链接;zh-hant:連結}-及用於吸引訪客或宣傳目的的-{zh-hans:链接;zh-hant:連結}-，惟不僅限於此。請參閱[[Wikipedia:外部連結|外部連結指引]]以獲取更多資訊。維基百科网站使用[[nofollow]]標籤，条目中之外部連結不会影响其搜尋引擎排名。如閣下認為條目內應包含該-{zh-hans:链接;zh-hant:連結}-並打算再次加入，請務先提案至條目討論頁以交由社群討論。{{<includeonly>safesubst:</includeonly>#if:{{{2|}}}|{{{2}}}|敬希合作。}}<!-- Template:uw-spam2 --><noinclude>
+{{Templatesnotice|series = uw-spam|max = 4im|s1 = uw-s2}}
+[[Category:用戶警告模板|圾]]
+</noinclude>

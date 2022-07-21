@@ -1,0 +1,1 @@
+{{User language-0|dog|這個使用者'''[[:Category:dog-0 使用者|無法理解]][[:Category:dog 使用者|狗語]]'''，或討厭狗叫聲。|犬|12|9}}

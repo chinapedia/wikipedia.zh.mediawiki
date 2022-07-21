@@ -1,0 +1,1 @@
+#redirect[[Template:宇宙纪元|機動兵器]]

@@ -1,0 +1,11 @@
+{{Userbox
+|border-c=#bbb
+|border-s=1
+|id-c=#f6f6f6
+|id=[[File:Nationalencyklopedin.jpg|65px]]
+|info-c=#f6f6f6
+|info-s=10
+|info=這個用戶喜歡看'''[[百科全書]]'''。
+|usercategory=喜歡看百科全書的維基人
+|nocat={{{nocat|}}}
+}}<noinclude>[[Category:关注与兴趣用户框模板]]</noinclude>

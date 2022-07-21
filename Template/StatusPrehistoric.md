@@ -1,0 +1,1 @@
+<small>'''[[保护现状|保护现状]]：<font color=#3c436c>史前 <!--({{{when}}})--></font>'''</small>

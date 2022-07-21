@@ -1,0 +1,135 @@
+{{NoteTA|G1=IT}}
+{{Refimprove|time=2019-08-28T08:17:22+00:00}}
+{{Expand English}}
+'''遠端用户撥入驗證服務'''（RADIUS, Remote Authentication Dial In User Service）是一個{{link-en|AAA protocol|AAA_protocol|AAA}}协议{{NoteTag|AAA协议是同時兼顧[[驗證|驗證]]（authentication）、授权（authorization）及计帐（accounting）三種服務的协议}}，通常用於網絡存取、或流動IP服務，適用於[[局域網|局域網]]及[[漫遊|漫遊]]服務。
+
+RADIUS协议包括RADIUS验证协议（对应AAA的验证和授权）和RADIUS记账协议，分别定义于IETF RFC 2865和RFC 2866。
+
+== 协议 ==
+=== 客户端-服务器结构 ===
+RADIUS协议是一种基于[[主從式架構|主從式架構]]的协议。RADIUS协议中的客户端是对用户（人或者计算机）提供网络连接服务的器材，对服务器提出验证和计费要求。服务器针对客户端的通过进行验证和计费给予应答。服务器只有针对客户端的请求进行应答，而无法反方向地对用户进行服务停止等的请求。
+
+==== RADIUS客户端的实例 ====
+因特网连接服务中，拨号呼叫装置和宽带接入服务器（BAS、Broadband Access Server）等[[网络接入服务器|网络接入服务器]]（NAS、Network Access Server）即为RADIUS客户端{{r|Cisco}}。（虽然名字含有“服务器”，但从RADIUS协议的角度来看是客户端。）
+
+无线LAN环境中的[[無線接取器|無線接取器]]和VLAN中的交换机等都是。
+
+在内容提供的服务中，Web 服务器起到RADIUS客户端的作用。
+
+在[[移动电话网络|移动电话网络]]（例如[[LTE|LTE]]等）网络中，[[系统架构演进|核心网]]节点作为RADIUS客户端，使用RADIUS的认证和记账功能。{{r|ElNashar}}
+
+=== 协议的概要 ===
+RADIUS协议使用[[UDP协议|UDP协议]]承载。RADIUS协议自身不具备[[会话_(计算机科学)|会话]]管理机制，UDP也缺乏相应机制，因此RADIUS的路径管理和传输可靠性需要由使用RADIUS协议的[[应用程序|应用程序]]来实现。{{r|Cisco}}
+
+客户端对服务器提出“RADIUS请求包”，服务器对客户端发送“RADIUS应答包”。
+
+双方的数据包，头部分由20个 [[8位元|8位元]]和“属性”组成。头部分包括类别码（Code）1个[[8位元|8位元]]、识别码（Identifier）1个[[8位元|8位元]]、数据包整体长度2个[[8位元|8位元]]、验证码（Authenticator）16个[[8位元|8位元]]。识别码根据客户端决定的需求而设定，服务器根据根据请求包的验证码生成应答包的验证码里，因为客户端需要在收到的应答包与之前发出的请求包匹配。客户端可以仅用累计数值编号来设置验证码，但验证码并不必然是[[序列号|序列号]]。验证码是为了证明无发送者伪装和篡改。属性部分包含任意个属性（AVP，Attribute Value Pair，字面上为属性值对）。属性采用TLV格式，即“{{le|类型-长度-值|type-length-value}}”格式{{r|华为}}。属性値对由1个[[8位元|8位元]]的属性编号、1个[[8位元|8位元]]的长度，以及属性的値组成。値的类型可以是4个[[8位元|8位元]]的整数値、4个[[8位元|8位元]]的[[IP地址|IP地址]]、1 - 253个[[8位元|8位元]]的文字串等。
+
+对于每个属性编号，每个属性値对里值的含义在[[Request_for_Comments|RFC文件]]里均有规定，还可以通过给属性编号赋予新的定义来增加使用目的，RADIUS协议的灵活性所在也是其最大的特征。但是一般不推荐各个机器产商为各自目的独自给属性标号赋值。产商特有功能应做为属性编号26号(Vendor Specific)的值与产商编号一起加到数据里。属性编号 26 号的属性値对一般称为 VSA (Vendor Specific Attribute) 。厂家编号由[[Internet_Assigned_Numbers_Authority|IANA]]进行管理和赋予。
+
+协议为了实现验证和计费，规定了各种相应的属性。为实现验证，用户名和密码各有属性编号。拨号上网使用[[Point-to-Point_Protocol|PPP]]时针对PPP用的验证协议[[密碼認證協議|PAP]]、[[CHAP|CHAP]]、[[PPP_Extensible_Authentication_Protocol|EAP]]均备有各自的属性编号。为实现计费，有使用秒数、收发数据量等的属性编号。
+
+RADIUS分组的最大长度，在RADIUS验证协议中是4096个8位元、RADIUS计费协议中是4095个8位元，这个差异据说并没有特殊含义，而是 RFC 当初的错字将错就错地沿用下来的缘故。
+
+=== 協議流程 ===
+一個常見的RADIUS認證、計費協議的流程如下。
+<small>
+ +------+                         +--------------+     +------------------+     +------------------+
+ | 用戶 |                         | RADIUS客戶端 |     | RADIUS認證服務端 |     | RADIUS計費服務端 |
+ +--+---+                         +------+-------+     +--------+---------+     +---------+--------+
+    | 用戶發起連接請求並提供用戶名、密碼 |                      |                         |
+    |----------------------------------->| 認證請求消息         |                         |
+    |                                    |--------------------->|                         |
+    |                                    | 認證接受/拒絕消息    |                         |
+    | 通知用戶認證結果                   |<---------------------|                         |
+    |<-----------------------------------|                                                |
+    |                                    |（若認證已被接受）                              |
+    |                                    |  計費請求（開始）消息                           |
+    |                                    |----------------------------------------------->|
+    |                                    | 計費響應消息                                   |
+    |                                    |<-----------------------------------------------|
+    |                                    |                                                |
+    |                            ................                                         |
+    |                            . 用戶使用服務 .                                         |
+    |                            ................                                         |
+    |                                    | （可選）                                       |
+    |                                    | 計費請求（中間）消息                           |
+    |                                    |----------------------------------------------->|
+    |                                    | 計費響應消息                                   |            |
+    |                                    |<-----------------------------------------------|
+    | 用戶請求斷開連接                   |                                                |
+    |----------------------------------->| 計費請求（結束）消息                           |
+    |                                    |----------------------------------------------->|
+    |                                    | 計費響應消息                                   |
+    | 通知用戶連接斷開                   |<-----------------------------------------------|
+    |<-----------------------------------|                                                |
+    |                                    |                                                |
+ </small>
+
+=== 共享密码 ===
+UDP与[[传输控制协议|TCP]]不同，无法识别伪装送信者和数据篡改。因此仅靠通信对方的IP地址是不足以信任通信内容的。为了防止伪装和篡改，RADIUS客户端和服务器之间共享一个叫“[[共享密码|共享密码]]”的密钥字符串，将数据包的内容和共享密码得到的[[散列函数|摘要信息]]配给验证符号和属性值。应该为每对 RADIUS客户端和服务器准备一个共享密码。针对一个RADIUS服务器只用一个密码而与所有RADIUS客户端都共用会造成安全上的重大隐患。另外，从安全的角度来说，共享密码的内容若被第三方泄露也是一大问题<ref>{{cite web
+  |url=http://www.win.tue.nl/hashclash/rogue-ca/
+  |title=MD5 considered harmful today - Creating a rogue CA certificate
+  |publisher=[[Technische_Universiteit_Eindhoven|Technische Universiteit Eindhoven]]
+  |author=Alexander Sotirov, Marc Stevens, Jacob Appelbaum, Arjen Lenstra, David Molnar, Dag Arne Osvik, Benne de Weger
+  |date=2008-12-08
+  |accessdate=2009-04-19
+  |archive-date=2017-09-20
+  |archive-url=https://web.archive.org/web/20170920093616/http://www.win.tue.nl/hashclash/rogue-ca/
+  |dead-url=no
+  }}</ref>。
+
+=== 代理 ===
+[[File:Drawing_Roaming_RADIUS.png|thumb]]
+自身作为RADIUS服务器，而把实际的验证和计费处理委托其他RADIUS服务器的情况即为“RADIUS[[代理服务器|代理服务器]]”。也就是说本身既是RADIUS服务器也是RADIUS客户端，将需求“转送”。
+
+可以通过判断用户名的字符串改变转送地址。比如用户名做成含有[[电子邮件|电子邮件]]地址“[[@|@]]”符号和[[域名|域名]]的字符串，根据不同的域名部分字符串转送到其他RADIUS服务器上。这种技术广泛被利用于 [[ISP|ISP]]（互联网服务提供商）之间的漫游服务等。上述例子中用于判断转送目的类似域名的部分通常被称为 Realm。
+
+== AAA ==
+RADIUS协议是一种{{link-en|AAA protocol|AAA_protocol|AAA}}协议，但由于RADIUS协议本身创建于AAA模式之前，因此，RADIUS协议中并没有区分“验证”和“授权”，而是合为“验证”处理， 因此RADIUS客户端在实际操作中无法知道被拒绝的原因是由于密码错误还是因为没有权限。
+
+== IEEE 802.1X ==
+[[IEEE_802.1X|IEEE 802.1X]]是以太网中一个控制可否使用[[局域网|局域网]]的一个协议。通过使用IEEE 802.1X和RADIUS协议，可以对仅通过RADIUS服务器验证的用户允许局域网服务。当然，为此需要配备IEEE 802.1X以及RADIUS协议双方能使用的无线接入点或VLAN开关。另外“802.1x”中的 X 一般为大写，这是因为小写x易被人误解其像数学中 <math>x</math> 一样可代表任意参数。
+
+IEEE802.1X和RADIUS协议均没有规定实际的验证步骤。实际的验证中通常使用 [[EAP-TLS|EAP-TLS]]、[[PEAP|PEAP]]、[[EAP-TTLS|EAP-TTLS]] 等 EAP上的验证步骤进行。为实现 EAP 验证的数据交换，用户终端和接入点或开关之间的以太网使用 IEEE 802.1X，接入点或开关与RADIUS服务器之间使用RADIUS协议进行中継。
+
+EAP-TLS 对于基于[[TLS|TLS]]数字证书进行相互验证（为防止伪装服务提供者）这一点虽然很重要，但数字证书的管理和运用对于一般机构是一个很大的负担。PEAP 和 EAP-TTLS 的验证步骤是在创建以 TLS [[加密|加密]]的通讯线路后再进行密码信息的交换 。EAP-TLS 与 PEAP・EAP-TTLS 的对比可以参照比较是通过[[网页浏览器|网页浏览器]]的[[TLS|TLS]]中利用数字证书进行相互验证还是 SSL 上的密码验证。
+
+== 应用实例 ==
+*[[ISP|ISP]]（互联网服务提供商）
+*[[移动电话|移动电话]]的网络连接服务
+*无线 LAN、VLAN
+* Web 上提供收费内容的服务
+
+== 定义 ==
+通过下述 RFC 文件定义：
+*RFC 2865 - RADIUS验证协议
+*RFC 2866 - RADIUS计费协议
+*RFC 2867 - 为通道协议的RADIUS计费拓展
+*RFC 2868 - 通道协议中使用的RADIUS属性
+*RFC 2869 - RADIUS协议拓展
+*RFC 3162 - [[IPv6|IPv6]]网络中RADIUS协议的使用
+*RFC 3579 - RADIUS协议中EAP(RFC 2284)的使用
+*RFC 3580 - IEEE 802.1X中RADIUS协议的使用指南
+
+==注释==
+{{Notelist}}
+{{Notefoot}}
+
+==参考资料==
+{{Reflist|refs=
+<ref name=Cisco>{{Cite web|title=How Does RADIUS Work?|publisher=[[Cisco|Cisco]]|url=https://www.cisco.com/c/en/us/support/docs/security-vpn/remote-authentication-dial-user-service-radius/12433-32.html|date=2006-01-19|language=en|accessdate=2019-08-29|archive-date=2021-05-04|archive-url=https://web.archive.org/web/20210504203240/https://www.cisco.com/c/en/us/support/docs/security-vpn/remote-authentication-dial-user-service-radius/12433-32.html|dead-url=no}}</ref>
+<ref name=ElNashar>{{Cite book|url=https://books.google.co.jp/books?id=-bQZAwAAQBAJ&pg=PT358&lpg=PT358&dq=PGW+radius&source=bl&ots=_oZqufnNeR&sig=ACfU3U190OdFRyaCKuXU73wQVPvboqzRtA&hl=en&sa=X&ved=2ahUKEwj29OmDgqfkAhVMJaYKHWYBDVYQ6AEwEHoECAgQAQ#v=onepage&q=PGW%20radius&f=false|title=Design, Deployment and Performance of 4G-LTE Networks: A Practical Approach|author1=Ayman ElNashar|author2=Mohamed A. El-saidny|author3=Mahmoud Sherif|publisher=John Wiley & Sons|date=2014-05-13|pages=608|isbn=9781118703441}}</ref>
+<ref name=华为>{{Cite web|url=https://support.huawei.com/enterprise/zh/doc/EDOC1100038910?section=j008|title=RADIUS认证、授权和计费|publisher=[[华为|华为]]|date=2018-09-04|accessdate=2019-08-29}}</ref>
+}}
+
+== 外部链接 ==
+* [http://standards.ieee.org/getieee802/download/802.1X-2001.pdf IEEE 802.1X] {{Wayback|url=http://standards.ieee.org/getieee802/download/802.1X-2001.pdf |date=20121006004030 }}
+
+:''Copyright (c) 2004 by Accense Technology, Inc.''<br />''Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License Version 1.1 published by the Free Software Foundation.''<br />''本文档允许在基于 GNU Free Documentation License Version 1.1 规定的条件下复制、发布和变更。''
+
+{{Authority control}}
+[[Category:認證方法|Category:認證方法]]
+[[Category:互联网标准|Category:互联网标准]]
+[[Category:网际协议|Category:网际协议]]
+[[Category:应用层协议|Category:应用层协议]]

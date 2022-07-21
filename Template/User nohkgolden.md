@@ -1,0 +1,1 @@
+{{Personal announcement|content=強烈抗議高登文化入侵維基百科！！！|backcolor=black|fontcolor=white}}<includeonly>[[Category:強烈抗議高登文化入侵維基百科的維基人|{{PAGENAME}}]]</includeonly>

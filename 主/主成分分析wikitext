@@ -1,0 +1,307 @@
+{{NoteTA
+|G1 = Math
+}}
+[[Image:GaussianScatterPCA.png|thumb]]，[[平均值|平均值]]為(1, 3)，標準差在(0.878, 0.478)方向上為3、在其正交方向上為1的主成分分析。黑色的兩個向量是此分布的[[共變異數矩陣|共變異數矩陣]]的[[特征向量|特征向量]]，其長度為對應的[[特征值|特征值]]之平方根，並以分布的平均值為原點。]]在多元统计分析中，'''主成分分析'''（{{lang-en|'''Principal components analysis'''}}，{{lang|en|'''PCA'''}}）是一種统计分析、簡化數據集的方法。它利用[[正交变换|正交变换]]来对一系列可能相关的变量的观测值进行线性变换，从而投影为一系列线性不相关变量的值，这些不相关变量称为主成分（Principal Components）。具体地，主成分可以看做一个线性方程，其包含一系列线性系数来指示投影方向。PCA对原始数据的正则化或预处理敏感（相对缩放）。
+
+'''基本思想：'''
+
+* 将坐标轴中心移到数据的中心，然后旋转坐标轴，使得数据在C1轴上的方差最大，即全部n个数据个体在该方向上的投影最为分散。意味着更多的信息被保留下来。C1成为'''第一主成分'''。
+* C2'''第二主成分'''：找一个C2，使得C2与C1的协方差（相关系数）为0，以免与C1信息重叠，并且使数据在该方向的方差尽量最大。
+* 以此类推，找到第三主成分，第四主成分……第p个主成分。p个随机变量可以有p个主成分<ref>{{Cite web|title=主成分分析（principal components analysis, PCA）——无监督学习|url=https://www.cnblogs.com/fuleying/p/4458439.html|accessdate=|author=|date=|format=|publisher=|language=|archive-date=2020-08-19|archive-url=https://web.archive.org/web/20200819234734/https://www.cnblogs.com/fuleying/p/4458439.html|dead-url=no}}</ref>。
+
+主成分分析经常用于减少数据集的[[维数|维数]]，同时保留数据集當中对方差贡献最大的特征。这是通过保留低維主成分，忽略高維主成分做到的。这样低維成分往往能够保留住数据的最重要部分。但是，这也不是一定的，要视具体应用而定。由于主成分分析依赖所给数据，所以数据的准确性对分析结果影响很大。
+
+主成分分析由[[卡尔·皮尔逊|卡尔·皮尔逊]]於1901年發明<ref>{{Cite journal|title=On Lines and Planes of Closest Fit to Systems of Points in Space|author=Pearson, K.|url=http://stat.smmu.edu.cn/history/pearson1901.pdf|authorlink=Karl Pearson|journal=Philosophical Magazine|issue=6|year=1901|volume=2|pages=559–572|format=PDF|archiveurl=https://web.archive.org/web/20131020092552/http://stat.smmu.edu.cn/history/pearson1901.pdf|archivedate=2013-10-20|deadurl=yes|access-date=2012-01-24}}</ref>，用於分析數據及建立數理模型，在原理上与{{link-en|主轴定理|Principal axis theorem}}相似。之后在1930年左右由[[哈罗德·霍特林|哈罗德·霍特林]]独立发展并命名。依据应用领域的不同，在信号处理中它也叫做离散[[K-L_轉換|K-L 转换]]（discrete Karhunen–Loève transform (KLT)）。其方法主要是通過對[[共變異數矩陣|共變異數矩陣]]進行特征分解<ref>{{Cite journal|title=Principal component analysis.|author=Abdi. H., & Williams, L.J.|authorlink=AbdiWilliams|journal=Wiley Interdisciplinary Reviews: Computational Statistics,|year=2010|volume=2|pages=433–459}}</ref>，以得出數據的主成分（即[[特征向量|特征向量]]）與它們的權值（即[[特征值|特征值]]<ref>Shaw P.J.A. (2003) ''Multivariate statistics for the Environmental Sciences'', Hodder-Arnold. ISBN 978-0-340-80763-7. {{Page needed|date=June 2011}}</ref>）。PCA是最簡單的以特征量分析多元統計分布的方法。其結果可以理解為對原數據中的[[方差|方差]]做出解釋：哪一個方向上的數據值對方差的影響最大？換而言之，PCA提供了一種降低數據[[維度|維度]]的有效辦法；如果分析者在原數據中除掉最小的[[特征值|特征值]]所對應的成分，那麼所得的低維度數據必定是最優化的（也即，這樣降低維度必定是失去訊息最少的方法）。主成分分析在分析複雜數據時尤為有用，比如[[人臉識別|人臉識別]]。
+
+PCA是最简单的以特征量分析多元统计分布的方法。通常，这种运算可以被看作是揭露数据的内部结构，從而更好地展現数据的變異度。如果一个多元数据集是用高维数据空间之坐标系來表示的，那么PCA能提供一幅较低维度的图像，相當於数据集在讯息量最多之角度上的一個投影。这样就可以利用少量的主成分讓数据的维度降低了。
+
+PCA 跟[[因子分析|因子分析]]密切相关。因子分析通常包含更多特定領域底層結構的假設，並且求解稍微不同矩陣的特徵向量。
+
+PCA 也跟[[典型相关分析|典型相關分析]]（CCA）有關。CCA定義的坐標系可以最佳地描述兩個數據集之間的[[互协方差|互協方差]]，而PCA定義了新的正交坐標系，能最佳地描述單個數據集當中的變異數。
+
+==数学定义==
+
+PCA的数学定义是：一个[[正交化|正交化]][[线性变换|线性变换]]，把数据变换到一个新的[[坐标系统|坐标系统]]中，使得这一数据的任何[[投影|投影]]的第一大[[方差|方差]]在第一个坐标（称为第一主成分）上，第二大方差在第二个坐标（第二主成分）上，依次类推<ref>Jolliffe I.T. [http://www.springer.com/west/home/new+%26+forthcoming+titles+%28default%29?SGWID=4-40356-22-2285433-0 Principal Component Analysis] {{Wayback|url=http://www.springer.com/west/home/new+%26+forthcoming+titles+%28default%29?SGWID=4-40356-22-2285433-0|date=20191016161904}}, Series: [http://www.springer.com/west/home/statistics/statistical+theory+and+methods?SGWID=4-10129-69-173621571-0 Springer Series in Statistics] {{Wayback|url=http://www.springer.com/west/home/statistics/statistical+theory+and+methods?SGWID=4-10129-69-173621571-0|date=20191016161926}}, 2nd ed., Springer, NY, 2002, XXIX, 487 p. 28 illus. ISBN 978-0-387-95442-4</ref>。
+
+定义一个''n'' × ''m''的[[矩阵|矩阵]], '''X'''<sup>T</sup>为去[[平均值|平均值]]（以平均值为中心移动至原点）的数据，其行为数据样本，列为数据类别（注意，这里定义的是'''X'''<sup>T</sup> 而不是'''X'''）。则'''X'''的[[奇异值分解|奇异值分解]]为'''X''' = '''WΣV<sup>T</sup>'''，其中''m'' × ''m''矩阵'''W'''是'''XX'''<sup>T</sup>的[[特征向量|特征向量]]矩阵， '''Σ'''是''m'' × ''n''的非负矩形对角矩阵，V是''n'' × ''n''的'''X<sup>T</sup>X'''的[[特征向量|特征向量]]矩阵。据此，
+
+:<math>
+\begin{align}
+\boldsymbol{Y}^\top & = \boldsymbol{X}^\top\boldsymbol{W} \\
+& = \boldsymbol{V}\boldsymbol{\Sigma}^\top\boldsymbol{W}^\top\boldsymbol{W} \\
+& = \boldsymbol{V}\boldsymbol{\Sigma}^\top
+\end{align}
+</math>
+
+当 ''m'' < ''n'' − 1时，'''V''' 在通常情况下不是唯一定义的，而'''Y''' 则是唯一定义的。'''W''' 是一个[[正交矩阵|正交矩阵]]，'''Y'''<sup>T</sup>'''W'''<sup>T</sup>='''X'''<sup>T</sup>，且'''Y'''<sup>T</sup>的第一列由第一主成分组成，第二列由第二主成分组成，依此类推。
+
+为了得到一种降低数据维度的有效办法，我们可以利用'''W'''<sub>L</sub>把 '''X''' 映射到一个只应用前面L个向量的低维空间中去：
+
+:<math>\mathbf{Y}=\mathbf{W_L}^\top\mathbf{X} = \mathbf{\Sigma_L}\mathbf{V}^\top</math> 
+其中<math>\mathbf{\Sigma_L}=\mathbf{I}_{L\times m}\mathbf{\Sigma}</math>，且<math>\mathbf{I}_{L\times m}</math>為<math>L\times m</math>的[[單位矩陣|單位矩陣]]。
+
+'''X''' 的单向量矩阵'''W'''相当于[[协方差矩阵|协方差矩阵]]的[[特征向量|特征向量]] '''C''' = '''X X'''<sup>T</sup>,
+
+:<math>\mathbf{X}\mathbf{X}^\top = \mathbf{W}\mathbf{\Sigma}\mathbf{\Sigma}^\top\mathbf{W}^\top</math>
+
+在[[欧几里得空间|欧几里得空间]]给定一组点数，第一主成分对应于通过多维空间平均点的一条线，同时保证各个点到这条直线距离的平方和最小。去除掉第一主成分后，用同样的方法得到第二主成分。依此类推。在'''Σ'''中的[[奇异值|奇异值]]均为矩阵 '''XX'''<sup>T</sup>的[[特征值|特征值]]的平方根。每一个特征值都与跟它们相关的方差是成正比的，而且所有特征值的总和等于所有点到它们的多维空间平均点距离的平方和。PCA提供了一种降低维度的有效办法，本质上，它利用正交变换将围绕平均点的点集中尽可能多的变量投影到第一维中去，因此，降低维度必定是失去讯息最少的方法。PCA具有保持子空间拥有最大方差的最优正交变换的特性。然而，当与[[离散余弦变换|离散余弦变换]]相比时，它需要更大的计算需求代价。非线性降维技术相对于PCA来说则需要更高的计算要求。
+
+PCA对变量的缩放很敏感。如果我们只有两个变量，而且它们具有相同的样本方差，并且成正相关，那么PCA将涉及两个变量的主成分的旋转。但是，如果把第一个变量的所有值都乘以100，那么第一主成分就几乎和这个变量一样，另一个变量只提供了很小的贡献，第二主成分也将和第二个原始变量几乎一致。这就意味着当不同的变量代表不同的单位（如温度和质量）时，PCA是一种比较武断的分析方法。但是在Pearson的题为
+"On Lines and Planes of Closest Fit to Systems of Points in Space"的原始文件里，是假设在欧几里得空间里不考虑这些。一种使PCA不那么武断的方法是使用变量缩放以得到单位方差。
+
+==讨论==
+
+通常，为了确保第一主成分描述的是最大方差的方向，我们会使用平均减法进行主成分分析。如果不执行平均减法，第一主成分有可能或多或少的对应于数据的平均值。另外，为了找到近似数据的最小均方误差，我们必须选取一个零均值<ref>A. A. Miranda, Y. A. Le Borgne, and G. Bontempi. [http://www.ulb.ac.be/di/map/yleborgn/pub/NPL_PCA_07.pdf New Routes from Minimal Approximation Error to Principal Components] {{Wayback|url=http://www.ulb.ac.be/di/map/yleborgn/pub/NPL_PCA_07.pdf |date=20180721043245 }}, Volume 27, Number 3 / June, 2008, Neural Processing Letters, Springer</ref>。
+
+假设零经验均值，数据集 '''X''' 的主成分''w''<sub>1</sub>可以被定义为：
+
+:<math>\mathbf{w}_1
+ = \underset{\Vert \mathbf{w} \Vert = 1}{\operatorname{\arg\,max}}\,\operatorname{Var}\{ \mathbf{w}^\top \mathbf{X} \}
+ = \underset{\Vert \mathbf{w} \Vert = 1}{\operatorname{\arg\,max}}\,E\left\{ \left( \mathbf{w}^\top \mathbf{X}\right)^2 \right\}</math>
+
+为了得到第 ''k''个主成分，必须先从'''X'''中减去前面的 <math>k - 1</math> 个主成分：
+
+:<math>\mathbf{\hat{X}}_{k - 1}
+ = \mathbf{X} -
+ \sum_{i = 1}^{k - 1}
+ \mathbf{w}_i \mathbf{w}_i^\top \mathbf{X}</math>
+
+然后把求得的第''k''个主成分带入数据集，得到新的数据集，继续寻找主成分。
+
+:<math>\mathbf{w}_k
+ = \underset{\Vert \mathbf{w} \Vert = 1}{\operatorname{arg\,max}}\,E\left\{
+ \left( \mathbf{w}^\top \mathbf{\hat{X}}_{k - 1}
+ \right)^2 \right\}.</math>
+
+
+PCA相当于在气象学中使用的经验正交函数（EOF）,同时也类似于一个线性隐层神经网络。 隐含层 ''K'' 个神经元的权重向量收敛后，将形成一个由前 ''K'' 个主成分跨越空间的基础。但是与PCA不同的是，这种技术并不一定会产生正交向量。
+
+PCA是一种很流行且主要的的模式识别技术。然而，它并不能最优化类别可分离性<ref>{{Cite book| author=Fukunaga, Keinosuke | title = Introduction to Statistical Pattern Recognition |publisher=Elsevier | year = 1990 | url=http://books.google.com/books?visbn=0122698517| isbn=0122698517}}</ref> 。另一种不考虑这一点的方法是线性判别分析。
+
+==符号和缩写表==
+
+{| class="wikitable"
+|-
+! Symbol符号
+! Meaning意义
+! Dimensions尺寸
+! Indices指数
+|-
+| <math>\mathbf{X} = \{ X[m,n] \}</math>
+| 由所有数据向量集组成的数据矩阵，一列代表一个向量
+| <math> M \times N</math>
+| <math> m = 1 \ldots M </math> <br /> <math> n = 1 \ldots N </math>
+|-
+| <math>N \,</math>
+|数据集中列向量的个数
+| <math>1 \times 1</math>
+| ''标量''
+|-
+| <math>M \,</math>
+| 每个列向量的元素个数
+| <math>1 \times 1</math>
+| ''标量''
+|-
+| <math>L \,</math>
+| 子空间的维数, <math> 1 \le L \le M </math>
+| <math>1 \times 1</math>
+| ''标量''
+|-
+| <math>\mathbf{u} = \{ u[m] \}</math>
+| 经验均值向量
+| <math> M \times 1</math>
+| <math> m = 1 \ldots M </math>
+|-
+| <math>\mathbf{s} = \{ s[m] \}</math>
+| 经验标准方差向量
+| <math> M \times 1</math>
+| <math> m = 1 \ldots M </math>
+|-
+| <math>\mathbf{h} = \{ h[n] \}</math>
+|所有的单位向量
+| <math> 1 \times N</math>
+| <math> n = 1 \ldots N </math>
+|-
+| <math>\mathbf{B} = \{ B[m,n] \}</math>
+|对均值的偏离向量
+| <math> M \times N</math>
+| <math> m = 1 \ldots M </math> <br /> <math> n = 1 \ldots N </math>
+|-
+| <math>\mathbf{Z} = \{ Z[m,n] \} </math>
+| Z-分数，利用均值和标准差计算得到
+| <math> M \times N</math>
+| <math> m = 1 \ldots M </math> <br /> <math> n = 1 \ldots N </math>
+|-
+| <math>\mathbf{C} = \{ C[p,q] \} </math>
+| [[协方差矩阵|协方差矩阵]]
+| <math> M \times M </math>
+| <math> p = 1 \ldots M </math> <br /> <math> q = 1 \ldots M </math>
+|-
+| <math>\mathbf{R} = \{ R[p,q] \} </math>
+| [[相关矩阵|相关矩阵]]
+| <math> M \times M </math>
+| <math> p = 1 \ldots M </math> <br /> <math> q = 1 \ldots M </math>
+|-
+| <math> \mathbf{V} = \{ V[p,q] \} </math>
+| '''C'''的所有特征向量集
+| <math> M \times M </math>
+| <math> p = 1 \ldots M </math> <br /> <math> q = 1 \ldots M </math>
+|-
+| <math>\mathbf{D} = \{ D[p,q] \} </math>
+| 主对角线为特征值的对角矩阵
+| <math> M \times M </math>
+| <math> p = 1 \ldots M </math> <br /> <math> q = 1 \ldots M </math>
+|-
+| <math>\mathbf{W} = \{ W[p,q] \} </math>
+| 基向量矩阵
+| <math> M \times L</math>
+| <math> p = 1 \ldots M </math> <br /> <math> q = 1 \ldots L</math>
+|-
+| <math>\mathbf{Y} = \{ Y[m,n] \} </math>
+| '''X''' 和'''W'''矩阵的投影矩阵
+| <math> L \times N</math>
+| <math> m = 1 \ldots L </math> <br /> <math> n = 1 \ldots N</math>
+|}
+
+==主成分分析的属性和限制==
+
+如上所述，主成分分析的结果依赖于变量的缩放。
+
+主成分分析的适用性受到由它的派生物产生的某些假设<ref>Jonathon Shlens, [http://www.snl.salk.edu/~shlens/pca.pdf A Tutorial on Principal Component Analysis.] {{Wayback|url=http://www.snl.salk.edu/~shlens/pca.pdf |date=20100215191953 }}</ref> 的限制。
+
+==主成分分析和信息理论==
+
+通过使用降维来保存大部分数据信息的主成分分析的观点是不正确的。确实如此，当没有任何假设信息的信号模型时，主成分分析在降维的同时并不能保证信息的不丢失，其中信息是由[[香农熵|香农熵]]<ref>Geiger, Bernhard; Kubin, Gernot (Sep 2012), [http://arxiv.org/abs/1204.0429 Relative Information Loss in the PCA] {{Wayback|url=http://arxiv.org/abs/1204.0429 |date=20190514224655 }}</ref>来衡量的。
+基于假设得
+<math> \mathbf{x} = \mathbf{s} +  \mathbf{n}  </math>
+也就是说，向量 ''x'' 是含有信息的目标信号 ''s'' 和噪声信号 ''n'' 之和，从信息论角度考虑主成分分析在降维上是最优的。
+
+特别地，Linsker证明了如果 ''s'' 是高斯分布，且 ''n'' 是 与密度矩阵相应的协方差矩阵的高斯噪声，
+
+==使用统计方法计算PCA==
+
+以下是使用统计方法计算PCA的详细说明。但是请注意，如果利用奇异值分解（使用标准的软件）效果会更好。
+
+我们的目标是把一个给定的具有 ''M'' 维的数据集'''X''' 变换成具有较小维度 ''L''的数据集'''Y'''。现在要求的就是矩阵'''Y'''，'''Y'''是矩阵'''X'''  Karhunen–Loève变换。:<math> \mathbf{Y} = \mathbb{KLT} \{ \mathbf{X} \} </math>
+
+==组织数据集==
+
+假设有一组 ''M'' 个变量的观察数据，我们的目的是减少数据，使得能够用''L'' 个向量来描述每个观察值，''L'' < ''M''。进一步假设，该数据被整理成一组具有''N''个向量的数据集，其中每个向量都代表''M'' 个变量的单一观察数据。
+
+* <math>\mathbf{x}_1 \ldots \mathbf{x}_N</math>为列向量，其中每个列向量有''M'' 行。
+
+* 将列向量放入''M'' × ''N''的单矩阵'''X''' 裡。
+
+==计算经验均值==
+
+*对每一维''m'' = 1, ..., ''M''计算经验均值
+
+*将计算得到的均值放入一个 ''M'' × 1维的经验均值向量'''u'''中
+
+::<math>u[m] = {1 \over N} \sum_{n=1}^N X[m,n] </math>
+
+==计算平均偏差==
+
+对于在最大限度地减少近似数据的均方误差的基础上找到一个主成分来说，均值减去法是该解决方案的不可或缺的组成部分<ref>A.A. Miranda, Y.-A. Le Borgne, and G. Bontempi. [http://www.ulb.ac.be/di/map/yleborgn/pub/NPL_PCA_07.pdf New Routes from Minimal Approximation Error to Principal Components] {{Wayback|url=http://www.ulb.ac.be/di/map/yleborgn/pub/NPL_PCA_07.pdf |date=20180721043245 }}, Volume 27, Number 3 / June, 2008, Neural Processing Letters, Springer</ref> 。因此，我们继续如下步骤：
+
+*从数据矩阵'''X'''的每一列中减去经验均值向量 '''u''' 
+
+*将平均减去过的数据存储在''M'' × ''N''矩阵'''B'''中
+
+::<math>\mathbf{B} = \mathbf{X} - \mathbf{u}\mathbf{h} </math>
+:: where '''h''' is a 1 × ''N'' row vector of all 1s:
+
+其中'''h'''是一个全 1s:的1 × ''N'' 的行向量
+
+:::<math>h[n] = 1 \, \qquad \qquad \text{for } n = 1, \ldots, N </math>
+
+==求协方差矩阵==
+
+*从矩阵'''B''' 中找到''M'' × ''M'' 的经验协方差矩阵'''C''' 
+
+::<math>\mathbf{C} = \mathbb{ E } \left[ \mathbf{B} \otimes \mathbf{B} \right] = \mathbb{ E } \left[ \mathbf{B} \cdot \mathbf{B}^{*} \right] = { 1 \over N - 1 } \sum_{} \mathbf{B} \cdot \mathbf{B}^{*}</math>
+
+其中  <math>\mathbb{E} </math>为期望值
+
+<math> \otimes </math>是最外层运算符
+
+<math> * \ </math>是共轭转置运算符。
+
+请注意，如果B完全由实数组成，那么共轭转置与正常的转置一样。
+
+* 为什么是N-1,而不是N，[[Bessel's_correction|Bessel's correction]]<ref>[https://en.wikipedia.org/wiki/Bessel%27s_correction Bessel's correction] {{Wayback|url=https://en.wikipedia.org/wiki/Bessel%27s_correction |date=20201203023311 }} Bessel's correction</ref>给出了解释
+
+=== 查找协方差矩阵的特征值和特征向量===
+
+* 计算矩阵'''C''' 的特征向量
+
+::<math>\mathbf{V}^{-1} \mathbf{C} \mathbf{V} = \mathbf{D} </math>
+
+: 其中，'''D''' 是'''C'''的特征值对角矩阵，这一步通常会涉及到使用基于计算机的计算特征值和特征向量的算法。在很多矩阵代数系统中这些算法都是现成可用的，如[[R语言|R语言]]，[[MATLAB|MATLAB]],<ref>[http://www.mathworks.com/access/helpdesk/help/techdoc/ref/eig.html#998306 eig function] {{Wayback|url=http://www.mathworks.com/access/helpdesk/help/techdoc/ref/eig.html#998306 |date=20100430173026 }} Matlab documentation</ref><ref>{{Cite web |url=http://www.mathworks.com/matlabcentral/fileexchange/24634 |title=MATLAB PCA-based Face recognition software |accessdate=2012-04-30 |archive-date=2012-03-09 |archive-url=https://web.archive.org/web/20120309160035/http://www.mathworks.com/matlabcentral/fileexchange/24634 |dead-url=no }}</ref> [[Mathematica|Mathematica]],<ref>[http://reference.wolfram.com/mathematica/ref/Eigenvalues.html Eigenvalues function] {{Wayback|url=http://reference.wolfram.com/mathematica/ref/Eigenvalues.html |date=20140414023625 }} Mathematica documentation</ref> [[SciPy|SciPy]], [[IDL_(编程语言)|IDL]](交互式数据语言), 或者[[GNU_Octave|GNU Octave]]以及[[OpenCV|OpenCV]]。
+
+*矩阵'''D'''为''M'' × ''M''的对角矩阵 
+
+* 各个特征值和特征向量都是配对的，''m''个特征值对应''m''个特征向量。
+
+== 参见== 
+    
+<div style="-moz-column-count:2; column-count:2;">
+* {{tsl|en|Correspondence analysis||Correspondence analysis}}
+* [[典型相关|Canonical correlation]]
+* {{tsl|en|CUR matrix approximation||CUR matrix approximation}} (can replace of low-rank SVD approximation)
+* {{tsl|en|Detrended correspondence analysis||Detrended correspondence analysis}}
+* {{tsl|en|Dynamic mode decomposition||Dynamic mode decomposition}}
+* [[特征脸|特征脸]](Eigenface)
+* [[多線性主成分分析|多線性主成分分析]](Multilinear PCA)
+* {{tsl|en|Geometric data analysis||Geometric data analysis}}
+* {{tsl|en|Factorial code||Factorial code}}
+* [[独立成分分析|独立成分分析]]
+* [[核主成分分析|核主成分分析]]
+* [[矩阵分解|矩阵分解]]
+* [[非线性降维|Nonlinear dimensionality reduction]]
+* {{tsl|en|Oja's rule||Oja's rule}}
+* {{tsl|en|Point distribution model||Point distribution model}} (PCA applied to morphometry and computer vision)
+* {{tsl|en|Principal component regression||Principal component regression}}
+* {{tsl|en|Singular spectrum analysis||Singular spectrum analysis}}
+* [[奇异值分解|奇异值分解]]
+* {{tsl|en|Sparse PCA||Sparse PCA}}
+* [[变换编码|变换编码]]
+* [[最小二乘法|最小二乘法]]
+* {{tsl|en|Low-rank approximation||Low-rank approximation}}
+</div>
+* [[圖模式|圖模式]]
+* [[马尔可夫链|马尔可夫链]]
+* [[马尔可夫逻辑网络|马尔可夫逻辑网络]]
+
+==注释==
+{{Reflist|2}}
+
+
+==参考==
+{{Commonscat|Principal component analysis}}
+* {{Cite book
+  | last = Jolliffe
+  | first = I. T.
+  | authorlink = 
+  | coauthors = 
+  | title = Principal Component Analysis
+  | publisher = Springer-Verlag
+  | year = 1986
+  | location = 
+  | pages = 487
+  | url = http://www.springer.com/west/home/new+%26+forthcoming+titles+%28default%29?SGWID=4-40356-22-2285433-0
+  | doi = 10.1007/b98835
+  | id = 
+  | isbn = 978-0-387-95442-4
+  | access-date = 2012-01-24
+  | archive-date = 2019-10-16
+  | archive-url = https://web.archive.org/web/20191016161904/https://www.springer.com/us/book/9780387954424
+  | dead-url = no
+  }}
+
+{{Statistics|analysis|state=collapsed}}
+
+{{DEFAULTSORT:Principal Component Analysis}}
+[[Category:多變量統計|Category:多變量統計]]
+[[Category:矩阵分解|Category:矩阵分解]]
+[[Category:資料分析|Category:資料分析]]

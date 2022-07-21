@@ -1,0 +1,1 @@
+ <center>  '''此条目应移入维基词典，因其定义更像针对一个单词，而不是百科条目。'''<br><small>请参看[[维基帮助|帮助]]</small>。</center><noinclude>[[Category:辅助模板]]</noinclude>

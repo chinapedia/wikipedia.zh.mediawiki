@@ -1,0 +1,1 @@
+#REDIRECT [[Template:User 言论自由]]

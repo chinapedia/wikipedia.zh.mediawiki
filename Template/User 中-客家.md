@@ -1,0 +1,1 @@
+{{User language-N|中-客家|哩隻用戶介'''[[:Category:zh-hakka 母語使用者|母語]]'''係'''[[:Category:zh-hakka 使用者|客家话]]'''。|客家话|10}}
