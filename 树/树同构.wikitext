@@ -1,0 +1,50 @@
+{{Multiple issues|
+{{Expert needed|subject=數學|time=2021-01-02T07:40:33+00:00}}
+{{Refimprove|time=2021-01-02T07:40:33+00:00}}
+}}
+'''树同构(Tree Isomorphism)'''描述的是[[图论|图论]]中，两个[[树_(数学)|树]]之间的'''完全'''等价关系。在[[图论|图论]]的观点下，两个同构的[[树_(数学)|树]]可以被当作同一个图来研究。
+
+==定义==
+树同构的概念源于[[图同构|图同构]]。[[图同构|图同构]]的概念为，两个[[图_(数学)|简单图]]<math>G</math>和<math>H</math>称为是'''同构'''的，当且仅当存在一个将<math>G</math>的节点 <math>1,\ldots,n</math> 映射到<math>H</math>的节点<math>1,\ldots,n</math>的'''一一对应'''<math>\sigma</math>，使得<math>G</math>中任意两个节点<math>i</math>和<math>j</math>相连接，当且仅当<math>H</math>中对应的两个节点<math>\sigma(i)</math>和<math>\sigma(j)</math>相连接。树同构即在以上定义中增加<math>G</math>和<math>H</math>都是[[树_(数学)|树]]的限制条件。两颗树<math>T_1,T_2</math>同构可以记作<math>T_1\simeq T_2</math>。
+
+在此基础上，定义'''有根树'''及其同构的概念<ref>{{cite book |author1=Jiří Matoušek (mathematician) |author2=Jaroslav Nešetřil|title=Invitation to discrete mathematics |location=Oxford |isbn=9780198570431 |edition=2nd}}</ref>。'''有根树'''可表示为(''T'',''r'')，其中''T''表示一棵树，<math>r\in V(T)</math>是一个有特殊标记的点，称为树的'''根结点'''。对于边<math>xy\in E(T)</math>，若''x''在根结点到''y''的[[路径|路径]]上，称''x''为''y''的'''父结点'''，''y''为''x''的'''子结点'''。有根树的表示形式可以为“种植的树”，即根节点''r''标有向下箭头；所有结点的子节点都画在该点上方。
+
+'''有根树同构'''的定义为，对于两颗有根树<math>(T_1,r_1)</math>，<math>(T_2,r_2)</math>，存在一个同构映射<math>f</math>，其中<math>f(r_1)=r_2</math>。<math>(T_1,r_1)</math>与<math>(T_2,r_2)</math>同构可记作<math>(T_1,r_1)\simeq (T_2,r_2)</math>。
+
+由以上定义可知，有根树同构的关系严格强于树同构的关系。
+
+==有根树同构判定算法==
+有根树同构的判定问题是'''P问题'''（[[P/NP问题|P/NP问题]]）。这里介绍其中一种算法，该算法将有根树的比较转化为字符串的比较。
+===有根树的0-1编码===
+对有根树进行0-1编码，并且采用'''字典序'''对编码进行比较。字典序的比较方法为：
+对不同序列<math>s=s_1s_2\dots s_n</math>和<math>t=t_1t_2\dots t_m</math>：
+* 如果<math>s</math>是<math>t</math>的初始序列（即<math>t=st_i\dots t_m</math>），则<math>s<t</math>;
+* 如果<math>t</math>是<math>s</math>的初始序列（即<math>s=ts_i\dots s_n</math>），则<math>t<s</math>;
+* 令<math>i</math>是<math>s_i\neq t_i</math>的最小下标，若<math>s_i< t_i</math>则<math>s<t</math>，若<math>t_i< s_i</math>则<math>t<s</math>。
+例：<math>00<001</math>,<math>01\textbf{0}11<01\textbf{1}0</math>。
+
+对有根树(''T'',''r'')进行如下编码：
+* 所有非根叶结点都赋值为01；
+* 假设点''v''的子结点<math>w_1,w_2,\dots,w_k</math>都已经完成编码，编码为<math>A(w_1),A(w_2),\dots,A(w_k)</math>，且有<math>A(w_1)\le A(w_2)\le \dots\le A(w_k)</math>，则''v''结点的编码<math>A(v)=0A(w_1)A(w_2)\dots A(w_k)1</math>
+如此递归。''r''结点的编码<math>A(r)</math>即为该有根树的编码，用<math>\# (T,r)</math>表示。
+
+若<math>\#(T_1,r_1)=\#(T_2,r_2)</math>，则说明有根树<math>(T_1,r_1)</math>与<math>(T_2,r_2)</math>同构。
+===判定定理的简单证明===
+该算法的判定定理是：<math>(T_1,r_1)\simeq (T_2,r_2)</math>当且仅当他们具有相同的0-1编码。
+对该定理进行如下简单证明：
+* 充分性：从有根树同构的定义和编码过程可证。
+* 必要性：对编码进行解码。任意有根树的编码必然有<math>0S1</math>的一般形式，其中<math>S=S_1S_2\dots S_t</math>。<math>S_1</math>是<math>S</math>中0,1个数相等的最小前缀，<math>S_2</math>是第二个0,1平衡的最小前缀，以此类推，可以解码出唯一形态的有根树。这棵有根树的其他表示形式都与该解码形式同构。
+==树同构判定算法==
+树同构的判定算法基于有根树同构的判定算法构成。在前文所述中，有根树相对于树的区别在于，有根树有一个特定标记的根。对于一般的树，我们需要一种找根的算法；在确定这棵树的有根表达形式之后，对于有根树进行编码判定即可。
+
+定义树的中心点集合<math>C(T):\{v\in T(V,E)|v\text{ 是使 }\max_{u\in T}d(u,w)\text{  最小的点  }\}</math>。由于<math>C(T)</math>至多包含两个顶点，且若<math>C(T)=2</math>，那么该两点必定相邻，故可以选择<math>C(T)</math>中的点为根。
+
+树同构的判定算法中，首先通过删叶子结点的方式，算出<math>C(T)</math>。
+* 若<math>C(T)=\{r\}</math>，那么<math>\# (T,r)</math>即为树''T''的编码。
+* 若<math>C(T)=\{r_1,r_2\}</math>，那么分别计算<math>\# (T,r_1)</math>与<math>\# (T,r_2)</math>，以其中较小的作为树''T''的编码。
+若两棵树的编码相同，即可认为两棵树是同构的。
+
+==参考文献==
+
+[[Category:图论|Category:图论]]
+[[Category:离散数学|Category:离散数学]]

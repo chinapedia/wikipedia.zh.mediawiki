@@ -1,0 +1,58 @@
+--由 [[Module:沙盒/逆襲的天邪鬼/vandal|Module:沙盒/逆襲的天邪鬼/vandal]] 分割出來
+local p = {}
+local yesno = require('Module:Yesno')
+
+local WaitForDelete = '<div class=%"wikipediauserbox%" style=%"float:left;border:2px solid red;margin:1px;width:236px%"><table role=%"presentation%" style=%"border%-collapse:collapse;width:236px;margin%-bottom:0;margin%-top:0;background:white%"><tr><td style=%"border:0;width:45px;height:45px;background:#FFFFFF;text%-align:center;font%-size:14pt;font%-weight:bold;color:black;padding:0 1px 0 0;line%-height:1%.25em;vertical-align:middle%">%[%[File:Station Clock%.svg%|45px%]%]<%/td><td style=%"border:0;text-align:left;font%-size:10pt;padding:0 4px 0 4px;height:45px;line%-height:1%.25em;color:red;vertical%-align:middle%">這個用戶正坐等他人來\'\'\'%[%[Template:User 全部刪光%|刪除用戶框%]%]\'\'\'。<%/td><%/tr><%/table>%[%[Category:可能難以辨認的用戶框模板%]%]<%/div>%[%[Category:坐等刪除用戶框的維基人%|' .. mw.getCurrentFrame():getTitle() .. '%]%]'
+
+local DeleteDone = tostring(mw.getCurrentFrame():expandTemplate{ title = 'Template:User_全部删光/raw'}):gsub('%sclass=%"wikipediauserbox%"', '')
+
+local function ifempty (val)
+	return val and val ~= ''
+end
+
+local function set_args (frame,key)
+	if frame ~= mw.getCurrentFrame() then
+		if frame[key] then
+			return frame[key]
+		else
+			return nil
+		end
+	elseif frame:getParent().args and ifempty(frame:getParent().args[key]) then
+		return frame.args[key]
+	elseif frame:getParent().args[key] and ifempty(frame.args[key])  then
+		return frame.args[key]
+	else
+		return nil
+	end
+end
+
+function p._main(args)
+	local text = args[1] or ''
+	local wt = ''
+	
+	wt = string.gsub(wt, '(<div style=".-)(">%s*{%|%s*cellspacing="0")', '%1;visibility:hidden;%2')
+	-- 專殺{{現在}}
+	wt = string.gsub(wt, '(<div style="float:left; border: 1px solid orange; margin:1px; background: white; width: 238px; height:45px; text%-align: center; vertical%-align: middle;.-)(">)', '%1;visibility:hidden;%2')
+	
+	-- 將「坐等刪除」換成已被刪光
+	if not args['notaunt'] then
+		wt = wt:gsub(WaitForDelete, DeleteDone)
+	end
+
+	if args['nocategory'] then
+		wt = require('Module:Delcat').delete_category(wt)
+	else
+		wt = wt .. '[[Category:用戶框被刪光了的維基人|Category:用戶框被刪光了的維基人]]'
+	end
+
+	return wt
+end
+
+function p.main(frame)
+	return p._main({
+		[1] = set_args (frame,1),
+		['notaunt'] = yesno(set_args(frame,'notaunt')),
+		['nocategory'] = yesno(set_args(frame,'nocategory'))
+	})
+end
+return p

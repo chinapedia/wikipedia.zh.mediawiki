@@ -1,0 +1,41 @@
+<includeonly>{{maplink|frame=yes|raw={
+  "type": "ExternalData",
+  "service": "geoline",
+  "properties": {
+    "stroke-width": 3
+  },
+  "query": "
+
+SELECT ?id
+  (if(BOUND(?idhexcolor),
+      concat('#', str(?idhexcolor)),
+      if(BOUND(?hexcolor),
+         concat('#', str(?hexcolor)),
+         '#07c63e'
+         )
+     )
+      as ?stroke)
+  (concat('路線長度: ', str(?length), ' 公里' ) as ?description)
+  (if(BOUND(?link),
+      concat('[[', substr(str(?link),31,500),  '{{!}}', ?idLabel, ']]'),
+      ?idLabel)
+   as ?title)
+WHERE {  
+  {  ?id p:P361/ps:P361/wdt:P361* wd:{{{system_qid}}}.
+  hint:Prior hint:gearing 'forward' 
+}
+  OPTIONAL { ?id wdt:P465 ?idhexcolor. }
+  OPTIONAL { ?id wdt:P462 ?color. 
+  ?color wdt:P465 ?hexcolor.}
+  SERVICE wikibase:label {
+    bd:serviceParam wikibase:language 'en' .
+    ?id rdfs:label ?idLabel .
+  }
+  OPTIONAL {?link schema:about ?id.
+  ?link schema:isPartOf <https://en.wikipedia.org/> . }
+} GROUP BY ?id ?link ?idLabel ?length ?hexcolor ?idhexcolor
+
+"}|plain={{{plain|yes}}}|zoom={{{zoom|10}}}|type=|id=|frame-lat={{{frame-lat|}}}|frame-long={{{frame-long|}}}|frame-width={{{frame-width|}}}|frame-height={{{frame-height|}}}|text={{{text|}}}|frame-align={{{frame-align|center}}}
+}}</includeonly><noinclude>
+
+{{doc}}

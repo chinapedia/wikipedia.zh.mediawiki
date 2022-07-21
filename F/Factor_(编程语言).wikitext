@@ -1,0 +1,81 @@
+{{NoteTA|G1=IT}}
+{{Infobox programming language
+|name = Factor
+|logo = 
+|paradigm = [[编程范型|多范型]]: [[面向堆栈编程|面向堆栈]], [[串接编程语言|串接式]], [[函数式编程|函数式]]
+|year = {{start date and age|2003}}
+|developer = Slava Pestov
+|latest_release_version = 0.98
+|latest_release_date = {{release date|mf=yes|2018|7|31}}
+|typing = [[强类型|强类型]], [[动态类型|动态]]
+|influenced_by = [[Joy_(编程语言)|Joy]], [[Forth|Forth]], [[Lisp|Lisp]], [[Self|Self]]
+|influenced =
+|operating_system = [[Microsoft_Windows|Windows]], [[macOS|macOS]], [[Linux|Linux]]
+|license = [[BSD许可证|BSD许可证]]
+|website = [http://factorcode.org/ factorcode.org]
+}}
+
+'''Factor'''是Slava Pestov创建的[[面向堆栈编程|面向堆栈]][[编程语言|编程语言]]。Factor是[[动态类型|动态类型]]的并拥有[[垃圾回收_(计算机科学)|自动内存管理]]，还有强力的元编程特征。语言有一个单一的实现，特征包括自宿主的{{en-link|优化编译器|Optimizing compiler}}和一个[[集成开发环境|集成开发环境]]。Factor发行包括一个大型的[[标准库|标准库]]。
+
+==历史==
+Slava Pestov在2003年创建Factor作为[[视频游戏|视频游戏]]的[[脚本语言|脚本语言]]<ref>{{cite web | url = http://factorcode.org/slava/ | first = Slava | last = Pestov | title = Slava Pestov's corner of the web | access-date = 2021-03-08 | archive-date = 2021-02-25 | archive-url = https://web.archive.org/web/20210225082251/http://factorcode.org/slava/ }}</ref>。最初的实现，现在称为JFactor，是用[[Java|Java]]实现的并运行在[[Java虚拟机|Java虚拟机]]上。尽管在语法方面早期的语言表面上类似现代的Factor，现代的语言在实践方面是非常不同的，并且当前实现更加快速。
+
+==概述==
+Factor是[[动态类型|动态类型]]的、[[函数式编程|函数式]]和[[面向对象编程|面向对象]]的[[编程语言|编程语言]]。代码可以围绕叫做单词的小型过程来构造。在典型的代码中，这些过程一般1–3行长，多于7行长的过程是非常少见的。在其他编程语言中习惯上表达为一个过程的某个东西，在Factor中可以写为多个单词<ref name="dls">{{cite journal |last1=Pestov |first1=Sviatoslav |last2=Ehrenberg |first2=Daniel |year=2010 |title=Factor: a dynamic stack-based programming language |journal=ACM SIGPLAN Notices |volume=45 |issue=12 |pages=43–58 |publisher=ACM |doi=10.1145/1899661.1869637 }}</ref>。
+
+每个单词接受固定数目的实际参数并有固定数目的返回值。给单词的实际参数被传递到[[堆栈|数据栈]]上，使用[[逆波兰表示法|逆波兰表示法]]。这个堆栈只用来组织到单词的调用，并非用作数据结构。在Factor中以类似于[[Forth|Forth]]中堆栈的方式使用堆栈；因此它们都被当作是[[面向堆栈编程语言|堆栈语言]]。例如，下面的代码片段打印“hello world”到当前输出流：
+<syntaxhighlight lang="factor">
+ "hello world" print
+</syntaxhighlight>
+<code>print</code>是在<code>io</code>词汇表中的一个单词，它从堆栈接受一个字符串而不返回东西。它打印这个字符串到当前输出流（缺省的是终端或图形收听器）<ref name = "dls" />。
+
+[[阶乘|阶乘函数]]<math>n!</math>，在Factor中可以用如下方式实现：
+<syntaxhighlight lang="factor">
+: factorial ( n -- n! ) dup 1 > [ [1,b] product ] [ drop 1 ] if
+</syntaxhighlight>
+
+不是所有数据都必须只通过堆栈来传递。[[作用域|词法作用域]]的局部变量，在过程内可用作{{en-link|临时变量|Temporary variable}}来存储和访问。[[作用域|动态作用域]]的变量被用于在过程调用之间传递东西而不使用堆栈。例如，当前输入和输出流被存储在动态作用域的变量中<ref name="dls" />。
+
+Factor强调灵活性和扩展语言的能力<ref name = "dls" />。有宏系统，还有对Factor语法的任意扩展。Factor的语法经常被扩展来允许新类型的单词定义和用于数据结构的新类型的{{en-link|文字 (计算机编程)|Literal (computer programming)|文字}}。它还被用在[[XML|XML]]库中提供生成XML的文字语法。例如，下列单词接受一个字符串并产生一个XML文档对象，它是强调这个字符串的一个HTML文档：
+<syntaxhighlight lang="factor">
+ : make-html ( string -- xml )
+    dup
+    <XML
+        <html>
+            <head><title><-></title></head>
+            <body><h1><-></h1></body>
+        </html>
+    XML> ;
+</syntaxhighlight>
+单词<code>dup</code>重复在堆栈上的顶部元素。<code><-></code>表示将来自堆栈的一个项目填入XML文档的指定部份。
+
+==实现和库==
+Factor包括一个大型的标准库，完全用本语言写成。包括有：
+* 跨平台GUI工具箱，建造在[[OpenGL|OpenGL]]和各种窗口系统之上，用于开发环境<ref>{{cite web | url = http://docs.factorcode.org/content/article-ui.html | title = Factor documentation: UI framework | first = Slava | last = Pestov | access-date = 2021-03-08 | archive-date = 2018-06-26 | archive-url = https://web.archive.org/web/20180626080539/http://docs.factorcode.org/content/article-ui.html }}</ref>。
+* 绑定到多个数据库函数库，包括[[PostgreSQL|PostgreSQL]]和[[SQLite|SQLite]]<ref>{{cite web | url = http://docs.factorcode.org/content/article-db.html | title = Factor documentation: Database library | first = Doug | last = Coleman | access-date = 2021-03-08 | archive-date = 2018-01-12 | archive-url = https://web.archive.org/web/20180112134929/http://docs.factorcode.org/content/article-db.html }}</ref>。
+* 一个[[HTTP|HTTP]]服务器和客户端，具有Furnace web框架<ref>{{cite web | url = http://docs.factorcode.org/content/article-http.server.html | title = Factor documentation: HTTP server | first = Slava | last = Pestov | access-date = 2021-03-08 | archive-date = 2021-02-25 | archive-url = https://web.archive.org/web/20210225222010/https://docs.factorcode.org/content/article-http.server.html }}</ref>。
+* 高效的同质的整数、浮点数和C结构的数组<ref>{{cite web | url = http://docs.factorcode.org/content/article-specialized-arrays.html | title = Factor documentation: Specialized arrays | first = Slava | last = Pestov | access-date = 2021-03-08 | archive-date = 2020-10-25 | archive-url = https://web.archive.org/web/20201025052301/https://docs.factorcode.org/content/article-specialized-arrays.html }}</ref>。
+* 实现正则表达式的一个库，生成机器代码来进行匹配<ref>{{cite web | url = http://docs.factorcode.org/content/article-regexp.html | title = Factor documentation: Regular expressions | first = Doug | last = Coleman | first2 = Daniel | last2 = Ehrenberg | access-date = 2021-03-08 | archive-date = 2018-08-07 | archive-url = https://web.archive.org/web/20180807111106/http://docs.factorcode.org/content/article-regexp.html }}</ref>。
+
+Factor内建了{{en-link|外界函数接口|foreign function interface}}，允许同[[C语言|C]]、[[Objective-C|Objective-C]]和[[Fortran|Fortran]]程序进行通信。还支持执行用[[GLSL|GLSL]]书写的着色器并与之通信<ref name="dls"/><ref>{{cite web | first = Slava | last = Pestov | url = http://factor-language.blogspot.com/2010/07/overhauling-factors-c-library-interface.html | title = Overhauling Factor's C library interface | access-date = 2021-03-08 | archive-date = 2020-11-09 | archive-url = https://web.archive.org/web/20201109025406/http://factor-language.blogspot.com/2010/07/overhauling-factors-c-library-interface.html }}</ref>。
+
+Factor是用Factor和[[C++|C++]]实现的。它最初自举于早期的Java实现。现在，解析器和优化编译器都用本语言书写。语言的特定的基础部分是用C++实现的，比如垃圾回收器和特定原始操作（primitive）。
+
+Factor使用基于{{en-link|系统映像|system image|映像}}的模型，类似于很多[[Smalltalk|Smalltalk]]实现，这里编译的代码和数据都存储在映像之中<ref>{{cite web | first = Slava | last = Pestov | url = http://factor-language.blogspot.com/2010/01/factors-bootstrap-process-explained.html | title = Factor's bootstrap process explained | access-date = 2021-03-08 | archive-date = 2021-04-28 | archive-url = https://web.archive.org/web/20210428173257/https://factor-language.blogspot.com/2010/01/factors-bootstrap-process-explained.html }}</ref>。要编译一个程序，这个程序被装载入一个映像并保存这个映像。一个特殊工具辅助建立最小映像来运行一个特定程序的过程，包装这个结果进入可以被部署为一个独立应用的某个东西中<ref name="dls"/><ref>{{cite web | first = Slava | last = Pestov | url = http://factor-language.blogspot.com/2008/07/on-shaking-trees.html | title = On shaking trees | access-date = 2021-03-08 | archive-date = 2020-11-09 | archive-url = https://web.archive.org/web/20201109025831/http://factor-language.blogspot.com/2008/07/on-shaking-trees.html }}</ref>。
+
+Factor编译器实现了很多高级优化并被用于新优化技术研究中的目标<ref name="dls"/><ref>{{cite web|first=Daniel |last=Ehrenberg |title=Closure elimination as constant propagation |url=http://factorcode.org/littledan/abstract.pdf |year=2010 |archive-url=https://web.archive.org/web/20110726044425/http://factorcode.org/littledan/abstract.pdf |archive-date=2011-07-26 }}</ref>。
+
+==引用==
+{{Reflist|2}}
+
+==外部链接==
+*{{Official website|http://factorcode.org}}
+*{{cite video |people=Slava Pestov |date=October 27, 2008 |title=Factor: An Extensible Interactive Language |url=https://www.youtube.com/watch?v=f_0QlhYlS8g |format=flv |medium=Tech talk |publisher=[[Google|Google]] |access-date=2021-03-07 |archive-date=2021-01-15 |archive-url=https://web.archive.org/web/20210115180449/https://www.youtube.com/watch?v=f_0QlhYlS8g }}
+*{{cite video |people=Zed Shaw |date=2008 |title=The ACL is Dead |url=http://vimeo.com/2723800 |format=flv |medium=CUSEC 2008 |publisher=CUSEC |access-date=2021-03-07 |archive-date=2020-11-19 |archive-url=https://web.archive.org/web/20201119235002/http://vimeo.com/2723800 }} – a presentation written in Factor which mentions and praises Factor
+{{程序设计语言}}
+
+[[Category:函数式编程语言|Category:函数式编程语言]]
+[[Category:函数级语言|Category:函数级语言]]
+[[Category:面向堆栈编程语言|Category:面向堆栈编程语言]]
+[[Category:2003年建立的程式語言|Category:2003年建立的程式語言]]
+[[Category:使用BSD许可证的软件|Category:使用BSD许可证的软件]]

@@ -1,0 +1,243 @@
+{{noteTA
+|G1=IT
+|1=zh:文件; zh-hans:文件; zh-hant:檔案;
+|2=zh:递归; zh-hans:递归; zh-hant:遞迴;
+|3=zh:无符号整数; zh-hans:无符号整数; zh-hant:無號整數;
+|4=zh:表达式; zh-hans:表达式; zh-hant:運算式;
+|5=zh:循环; zh-hans:循环; zh-hant:迴圈;
+|6=zh:字符串; zh-hans:字符串; zh-hant:字串;
+|7=zh:头文件; zh-hans:头文件; zh-hant:標頭檔;
+|8=zh:过程式; zh-hans:过程式; zh-hant:程序式;
+|9=zh:预处理器; zh-hans:预处理器; zh-hant:前置處理器;
+|10=zh:巨集; zh-hans:宏; zh-hant:巨集;
+|11=zh:陣列; zh-hans:数组; zh-hant:陣列;
+}}
+在C和C ++编程语言中，'''逗号运算符'''（ <code>,</code>）是一个[[二元运算|二元运算符]]，使用形式如{{Qcode|a, b}}。它计算其第一个操作数并丢弃结果，然后计算第二个操作数并返回。这些计算之间有一个[[顺序点|顺序点]]。
+
+逗号运算符的用途不同于逗号在[[子程序|函数调用]]和定义，变量声明，枚举声明以及类似结构中的使用，逗号在这些例子中的作用是作为{{le|分隔符|Delimiter}}。
+[[File:Comma_Example_1.png|缩略图]]
+
+==句法==
+[[File:Comma_Example_2.png|缩略图]]
+逗号运算符在C/C++中作为顺序点的显式标记，同时具有最低的[[C和C++運算子#運算子優先級|优先级]]<ref>{{Cite web|title=ISO/IEC 9899:2018|url=http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2310.pdf|accessdate=2020-06-10}}</ref>。
+
+==示例==
+在这些例子中，第二组和第三组之间的行为不同是由于逗号运算符的优先级低于[[赋值|赋值]]运算。最后一个示例与其他例子不同，因为在函数在返回前必须对返回的表达式进行完全求值。
+
+<syntaxhighlight lang="c" line="1">
+/** 
+ * 逗号在此行中充当分隔符，而不是运算符。
+ * 结果：a = 1，b = 2，c = 3，i = 0 
+ */ 
+int a=1, b=2, c=3, i=0;
+
+/** 
+ * 将b的值赋给i。
+ * 逗号在第一行中充当分隔符，在第二行中充当运算符。
+ * 结果：a = 1，b = 2，c = 3，i = 2 
+ */ 
+int a=1, b=2, c=3;              
+int i = (a, b);           
+                      
+/** 
+ * 将a的值赋给i。
+ * 逗号在第一行中充当分隔符。
+ * 在第二行中作为运算符。而逗号运算符的优先级最低，所以等效于：int（i = a），b; 
+ * 也可以这样理解：在第二行中逗号作为分隔符，使"int i = a"和"b"分离。
+ * 第二行的大括号可避免在同一作用域中声明变量
+ * 结果：a = 1，b = 2，c = 3，i = 1 
+ */ 
+int a=1, b=2, c=3;                                
+{ int i = a, b; }
+
+/** 
+* 将a的值增加2，然后将a + b的值分配给i。
+* 逗号在第一行中充当分隔符，在第二行中充当运算符。
+* 结果：a = 3，b = 2，c = 3，i = 5 
+*/ 
+int a=1, b=2, c=3;
+int i = (a += 2, a + b);
+          
+/** 
+* 将a的值增加2，然后将a的值存储到i，并丢弃a+b的值。
+* 等效于：（i =（a + = 2）），a + b; 
+* 逗号在第一行中充当分隔符，在第三行中充当运算符。
+* 结果：a = 3，b = 2，c = 3，i = 3 
+*/ 
+int a=1, b=2, c=3;
+int i;
+i = a += 2, a + b;
+
+/**
+ * 同第三组。
+ *  结果: a=1, b=2, c=3, i=1
+ */
+int a=1, b=2, c=3;
+{ int i = a, b, c; }
+
+/** 
+* 逗号在第一行中充当分隔符，在第二行中充当运算符。
+* 将c的值赋给i，丢弃未使用的a和b值。
+* 结果：a = 1，b = 2，c = 3，i = 3 
+*/ 
+int a=1, b=2, c=3;
+int i = (a, b, c);
+
+/**
+ * 返回6，而不是4，因为关键字return之后的逗号运算符序列点被认为是单个表达式。
+ */
+return a=4, b=5, c=6;
+
+/**
+ * 同理，返回3
+ */
+return 1, 2, 3;
+
+/**
+ * 同上，返回3。但因为return不是一个函数而是一个关键字，因此1的括号没有任何实际作用。
+ */
+return(1), 2, 3;
+</syntaxhighlight>
+
+==用法==
+逗号运算符具有相对有限的用处。因为它会丢弃其第一个操作数，所以通常仅在第一个操作数具有的副作用必须在第二个操作数之前进行的情况下才有用。此外，由于它很少在特定的习惯用法之外使用，并且很容易与其他逗号或分号混淆，因此它可能会造成混淆并且容易出错。但是，在某些情况下通常会使用它，特别是在for循环和[[SFINAE|SFINAE]]中。<ref>{{cite web|url=https://en.cppreference.com/w/cpp/language/sfinae|title=SFINAE - cppreference.com|website=en.cppreference.com}}</ref> 对于可能没有完整调试功能的嵌入式系统，可以将逗号运算符与宏结合使用，以实现无缝覆盖函数调用，从而在函数调用之前插入代码。
+
+===循环===
+最常见的用法是允许使用多个赋值语句而不使用块语句，主要用在for循环的初始化和增量表达式中。这是逗号运算符在基础C编程中唯一的惯用用法。在以下示例中，循环中第一部分赋值的顺序很重要：
+<syntaxhighlight lang=C>
+void rev(char *s, size_t len)
+{
+    char *first;
+    for (first = s, s += len; s >= first; --s) {
+        putchar(*s);
+    }
+}
+</syntaxhighlight>
+其他语言中可以使用另一种方法来解决这个问题：[[并行赋值|并行赋值]]，它允许在单个语句中进行多个赋值。它也使用逗号，但语法和语义不同。一个例子：[[Go语言|Go语言]]的for循环。<ref>[http://golang.org/doc/effective_go.html Effective Go]: [http://golang.org/doc/effective_go.html#for for],
+"Finally, Go has no comma operator and ++ and -- are statements not expressions. Thus if you want to run multiple variables in a for you should use parallel assignment (although that precludes ++ and --)."</ref>
+
+在循环体内部通常也会使用逗号运算符，比如在教学用程序和商用程序的循环末尾，通常会进行如下示例第二行的操作以更新变量的值；这也可以用第一行所示形式来实现：
+<syntaxhighlight lang=C>
+++p, ++q;
+++p; ++q;
+</syntaxhighlight>
+事实上，上面第一行中的操作有严格的顺序要求：必须先完成++p再完成++q，而在使用类似第二行的形式是则没有这个要求——现代计算机大多数在遇到类似代码时会使用[[并行计算|并行计算]]的方式。在某些特殊情况下这种差异可能会导致一些问题（如与[[线程|线程]]或[[进程|进程]]有关的代码）。
+
+===宏===
+逗号运算符可以在[[C预处理器|预处理器]]宏中使用，以在单个表达式内执行多个操作。
+
+一种常见用法是在断言失败时显示自定义错误消息。这是通过将带括号的表达式列表传递给assert宏来完成的，其中第一个表达式是自定义的错误字符串，第二个表达式是断言条件。当断言失败时，assert会逐字输出所提供的全部参数。以下是一个示例：
+
+
+<syntaxhighlight lang="c">
+#include <stdio.h>
+#include <assert.h>
+
+int main ( void )
+{
+    int i;
+    for (i=0; i<=9; i++)
+    {
+        assert( ( "i is too big!", i <= 4 ) );
+        printf("i = %i\n", i);
+    }
+    return 0;
+}
+</syntaxhighlight>
+输出:
+ i = 0
+ i = 1
+ i = 2
+ i = 3
+ i = 4
+ assert: assert.c:6: test_assert: Assertion `( "i is too big!", i <= 4 )' failed.
+ Aborted
+
+这种行为是由于assert的定义实现的。下面是GNU的assert.h节选，其中包括了在C++中assert宏的定义：
+<syntaxhighlight lang="c">
+...
+
+# if defined __cplusplus
+#  define assert(expr)							\
+     (static_cast <bool> (expr)						\
+      ? void (0)							\
+      : __assert_fail (#expr, __FILE__, __LINE__, __ASSERT_FUNCTION))
+
+...
+</syntaxhighlight>
+
+可以看到，assert宏的参数被包裹在括号中，随后转换为bool形式，若判断失败则调用{{qcode|__assert_fail}}函数。正常情况下，将一个字符串转换为bool会出错<ref>{{cite web |title=ISO/IEC 14882:2017 |url=https://www.iso.org/standard/68564.html?browse=tc }}</ref>，然而在这里，示例程序使用了逗号运算符的性质，使得在第三行执行时抛弃第一个值（即字符串），只测试第二个值；而在第5行中，宏参数expr被完整地传递到__assert_fail函数中，因此实现了自定义错误信息的功能。另外，这里使用了一些[[预处理器|预处理器]]的特殊用法。
+
+断言通常在生产环境中被禁用，因此只应该在调试时使用。
+
+===判断语句===
+逗号可以在[[程式迴圈|循环语句]]和[[條件判斷|判断语句]]（if，while，do while或for）内使用，以辅助计算，尤其是在调用函数和使用函数返回值时。变量具有块作用域：:
+<syntaxhighlight lang="C">
+if (y = f(x), y > x) { 
+    ... // statements involving x and y
+}
+
+//等价于：
+y = f(x);
+if (y > x ) {
+    ...
+}
+</syntaxhighlight>
+[[Go|Go]]语言中的if语句存在类似的用法，然而讨论它偏离了本文的主题。关于其更多信息见参考资料<ref>{{Cite web|title=The Go Programming Language Specification - The Go Programming Language|url=https://golang.org/ref/spec#If_statements|accessdate=2020-07-12|work=golang.org}}</ref>。
+
+===复合返回值===
+逗号可以在return语句中使用，以使结构更加紧凑。表明两个操作是一个整体。但通常不建议这么做。因为任何一个这种操作都可以转换为几个更加清晰的结构。如下面这个例子所示：
+<syntaxhighlight lang="C">
+if (failure)
+    return (errno = EINVAL, -1);
+</syntaxhighlight>
+也可以写成：
+<syntaxhighlight lang="C">
+if (failure) {
+    errno = EINVAL;
+    return -1;
+}
+</syntaxhighlight>
+如果写成第一种形式，很有可能会被认为是返回了一个“[[元组|元组]]”或是被认为返回一组数据，没有第二种方案清晰。
+
+===代替块语句===
+为了简便书写，可以使用逗号代替块语句。
+<syntaxhighlight lang="C">
+if (x == 1) y = 2, z = 3;
+if (x == 1)
+    y = 2, z = 3;
+</syntaxhighlight>
+使用块语句的版本：
+<syntaxhighlight lang="C">
+if (x == 1) {y = 2; z = 3;}
+if (x == 1) {
+    y = 2; z = 3;
+}
+</syntaxhighlight>
+
+==其它语言==
+在[[OCaml|OCaml]]和[[Ruby|Ruby]]中，分号（“;”）和这里的逗号用处相同。JavaScript<ref>{{Cite web|title=Comma operator - JavaScript {{!}} MDN|url=https://web.archive.org/web/20140712200108/https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Comma_Operator|accessdate=2020-07-12|date=2014-07-12|work=web.archive.org}}</ref> 和Perl <ref>{{Cite web|title=perlop - perldoc.perl.org|url=https://perldoc.perl.org/perlop.html#Comma-Operator|accessdate=2020-07-12|work=perldoc.perl.org}}</ref>中的逗号 和 C / C ++中的作用相同。在Java中，逗号是分隔符，用于在各种上下文中隔开列表中的元素<ref>{{Cite web|title=Chapter 2. Grammars|url=https://web.archive.org/web/20190722130849/https://docs.oracle.com/javase/specs/jls/se7/html/jls-2.html|accessdate=2020-07-12|date=2019-07-22|work=web.archive.org}}</ref>。它不是运算符，不会对任何数据求值<ref>{{Cite web|title=Is comma (,) operator or separator in Java?|url=https://stackoverflow.com/questions/38733508/is-comma-operator-or-separator-in-java|accessdate=2020-07-12|work=Stack Overflow}}</ref>。
+
+==另请参见==
+* [[顺序点|顺序点]]
+* [[C和C++运算符|C和C++运算符]]
+* [[运算符|运算符]]
+
+==参考资料==
+{{reflist}}
+===参考书目===
+{{refbegin}}
+* {{citation|last=Ramajaran|first=V.|title=Computer Programming in C|publisher=Prentice Hall of India|place=New Delhi|year=1994}}
+* {{citation|last=Dixit|first=J.B|title=Fundamentals of computers and programming in C|publisher=Laxmi Publications|place=New Delhi|year=2005}}
+* {{citation |last1=Kernighan |first1=Brian W. |last2=Ritchie |first2=Dennis M. |authorlink2=Dennis M. Ritchie |date=1988 |title=The C Programming Language |edition=2nd |publisher=Prentice Hall |place=Englewood Cliffs, NJ}}
+{{refend}}
+
+==外部链接==
+* "[https://stackoverflow.com/questions/2087026/effect-of-using-a-comma-instead-of-a-semi-colon-in-c-and-c Effect of using a comma instead of a semi-colon in C and C++]", ''Stack Overflow''
+*  [http://www.boost.org/doc/libs/1_44_0/libs/assign/doc/index.html Boost.Assignment] –  [[Boost库|Boost库]]中的工具，通过重载逗号运算符可以使填充容器变得更加轻松。
+
+{{C语言}}
+{{C++}}
+[[Category:C語言|Category:C語言]]
+[[Category:C++|Category:C++]]
+[[Category:运算符_(编程)|Category:运算符_(编程)]]

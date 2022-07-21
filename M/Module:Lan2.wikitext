@@ -1,0 +1,60 @@
+local l = {}
+local getArgs
+
+l.fallbackList = {
+	['zh'] = {'zh', 'zh-hans', 'zh-hant', 'zh-cn', 'zh-tw', 'zh-hk', 'zh-mo', 'zh-sg', 'zh-my'},
+	['zh-hans'] = {'zh-hans', 'zh-cn', 'zh-sg', 'zh-my', 'zh'},
+	['zh-hant'] = {'zh-hant','zh-tw', 'zh-hk', 'zh-mo', 'zh'},
+	['zh-cn'] = {'zh-cn', 'zh-hans', 'zh-sg', 'zh-my', 'zh'},
+	['zh-sg'] = {'zh-sg', 'zh-hans', 'zh-cn', 'zh-my', 'zh'},
+	['zh-my'] = {'zh-my', 'zh-hans', 'zh-cn', 'zh-sg', 'zh'},
+	['zh-tw'] = {'zh-tw', 'zh-hant', 'zh-hk', 'zh-mo', 'zh'},
+	['zh-hk'] = {'zh-hk', 'zh-hant', 'zh-mo', 'zh-tw', 'zh'},
+	['zh-mo'] = {'zh-mo', 'zh-hant', 'zh-hk',' zh-tw', 'zh'}
+}
+
+function l.extend (target, ...)
+	local tabs = {...}
+	if not target or not tabs then
+		return target or {}
+	end
+	for i = 1, #tabs do
+		if tabs and type(tabs) == 'table' then
+			for k, v in pairs(tabs[i]) do
+				if type(k) ~= 'number' and v then
+					if type(target[k]) == 'table' and type(v) == 'table' then
+						target[k] = l.extend(target[k], v)
+					else
+						target[k] = v
+					end
+				end
+			end
+			for k, v in ipairs(tabs[i]) do
+				if v then
+					target[#target + 1] = v
+				end
+			end
+		else
+			break
+		end
+	end
+	return target
+end
+
+function l.main(args, lang, fallbackList)
+	local userlanguage = lang and lang:lower() or mw.getCurrentFrame():callParserFunction{ name = 'int', args = {'Conversionname'} }
+	fallbackList = l.extend(l.fallbackList, fallbackList)
+	local fallback = fallbackList[userlanguage]
+	args = args or {}
+	if fallback == nil then
+		fallback = fallbackList['def'] or fallbackList['zh'] or l.fallbackList['zh']
+	end
+	for _,langArgName in ipairs(fallback)  do
+		if 	args[langArgName] ~= nil then
+			return args[langArgName]
+		end
+	end
+	return ''
+end
+
+return l

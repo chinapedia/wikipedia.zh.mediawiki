@@ -1,0 +1,24 @@
+'''[[边界网关协议|边界网关协议]]'''（BGP）'''劫持'''是指通過一個[[自治系统|自治系统]]錯誤宣稱IP為其所有，使得使用[[边界网关协议|边界网关协议]]維護的互联网[[路由表|路由表]]的路由器錯誤地將用戶發送的數據傳送給非數據傳送目的地<ref>{{Cite web|title=Practical Defenses Against BGP Prefix Hijacking|url=https://web.eecs.umich.edu/~zmao/Papers/conextDefendHijack07.pdf|accessdate=2018-04-24|author=Zhang|first=Zheng|work=University of Michigan|deadurl=no|archive-date=2020-12-22|archive-url=https://web.archive.org/web/20201222010844/https://web.eecs.umich.edu/~zmao/Papers/conextDefendHijack07.pdf}}</ref><ref>{{Cite web|title=Breaking HTTPS with BGP Hijacking|url=https://www.blackhat.com/docs/us-15/materials/us-15-Gavrichenkov-Breaking-HTTPS-With-BGP-Hijacking-wp.pdf|accessdate=2018-04-24|author=Gavrichenkov|first=Artyom|work=Black Hat|archive-date=2020-11-11|archive-url=https://web.archive.org/web/20201111215713/https://www.blackhat.com/docs/us-15/materials/us-15-Gavrichenkov-Breaking-HTTPS-With-BGP-Hijacking-wp.pdf|dead-url=no}}</ref><ref>{{Cite web|title=Using BGP to Acquire Bogus TLS Certificates|url=https://www.princeton.edu/~pmittal/publications/bgp-tls-hotpets17|accessdate=2018-04-24|author=Birge-Lee|first=Henry|work=Princeton University|deadurl=no|archive-date=2020-09-05|archive-url=https://web.archive.org/web/20200905025731/https://www.princeton.edu/~pmittal/publications/bgp-tls-hotpets17}}</ref><ref>{{Cite news|url=https://www.bishopfox.com/blog/2015/08/an-overview-of-bgp-hijacking/|title=An Overview of BGP Hijacking - Bishop Fox|author=Julian|first=Zach|date=2015-08-17|work=Bishop Fox|accessdate=2018-04-25|language=en-US|archive-date=2019-04-28|archive-url=https://web.archive.org/web/20190428180238/https://www.bishopfox.com/blog/2015/08/an-overview-of-bgp-hijacking/|dead-url=no}}</ref><ref>{{Cite news|url=https://www.wired.com/2008/08/revealed-the-in/|title=Revealed: The Internet's Biggest Security Hole|author=Zetter|first=Kim|date=2008-08-26|work=WIRED|accessdate=2018-04-25|language=en-US|archive-date=2020-12-11|archive-url=https://web.archive.org/web/20201211233410/https://www.wired.com/2008/08/revealed-the-in/|dead-url=no}}</ref>。
+
+== 背景 ==
+任何连接上[[互聯網|互聯網]]的主机，通过其自身的[[IP地址|IP地址]]，能够与世界上任何連接上互聯網的主机通信。主机將數據傳送給路由器，每個[[路由器|路由器]]再将[[数据包|数据包]]傳給另一個路由器，直到數據被傳遞給目的主機。為了順利將數據傳遞到目的主機，每个路由器必须定期提供最新的[[路由表|路由表]]。具有相同的IP地址前綴的IP為同一家[[自治系统|自治系统]]（AS）拥有，[[自治系统|自治系统]]之间的路由器的路由表通過[[边界网关协议|边界网关协议]]进行维护。[[边界网关协议|边界网关协议]]能讓路由表內保存最佳[[路由|路由]]路線。
+
+每个[[自治系统|自治系统]]都通過[[边界网关协议|边界网关协议]]来表明它可以向哪些IP前缀發送數據。例如如果IP前缀192.0.2.0/24位於AS 64496内，那么该[[自治系统|自治系统]]就會将向其供應商表示它可以向192.0.2.0/24发送任何數據。
+
+== 劫持 ==
+可以通过以下几种方式進行劫持：
+
+* 一个[[自治系统|自治系统]]宣稱一些IP前綴歸其所有，但實際上並不是
+* 一个[[自治系统|自治系统]]聲稱擁有某個IP前缀範圍比實際聲明擁有某個IP前缀的[[自治系统|自治系统]]要更小
+* 一个[[自治系统|自治系统]]聲稱它可以通过一条比已知的更短的路徑将數據傳遞到被劫持的[[自治系统|自治系统]]，而不管该路徑是否真的存在
+
+这些方式的共同点是它们破坏了网络的正常[[路由|路由]]，自治系統宣稱的內容被添加至使用[[边界网关协议|边界网关协议]]的路由器的路由表中，那路由器則會根據路由表將數據包傳輸給錯誤的自治系統，[[数据包|数据包]]最终無法被轉發到目的地<ref>{{Cite web|title=什么是 BGP 劫持？|url=https://www.cloudflare.com/zh-cn/learning/security/glossary/bgp-hijacking/|accessdate=|author=cloudflare|date=|format=|publisher=|language=|archive-date=2020-11-24|archive-url=https://web.archive.org/web/20201124160232/https://www.cloudflare.com/zh-cn/learning/security/glossary/bgp-hijacking/|dead-url=no}}</ref>。
+
+== 用例 ==
+[[防火长城|防火长城]]使用BGP劫持阻止到某些网站的连接<ref>{{Cite web|url=https://cn1lib.org/book/6035593/712e26|title=一种基于路由扩散的大规模网络控管方法|author=刘刚，云晓春，方滨兴，胡铭曾|year=2003}}</ref><ref>{{Cite journal|first1=Chis|last1=Demchak|first2=Yuval|last2=Shavitt|url=https://scholarcommons.usf.edu/mca/vol3/iss1/7/|title=China’s Maxim – Leave No Access Point Unexploited: The Hidden Story of China Telecom’s BGP Hijacking|doi=10.5038/2378-0789.3.1.1050|journal=|access-date=2021-05-09|archive-date=2021-04-20|archive-url=https://web.archive.org/web/20210420041230/https://scholarcommons.usf.edu/mca/vol3/iss1/7/}}</ref>或执行[[中间人攻击|中间人攻击]]。
+
+== 参考文献 ==
+{{Reflist}}
+
+[[Category:路由|Category:路由]]
+[[Category:互联网安全|Category:互联网安全]]

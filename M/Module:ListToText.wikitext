@@ -1,0 +1,26 @@
+local p = {}
+local getArgs = require('Module:Arguments').getArgs
+
+function p._main (args)
+	local list = {}
+	local null = 0
+	for i, v in ipairs(args) do
+		if v == '' then
+			null = null + 1
+		else
+			list[i - null] = v
+		end
+	end
+	local middle = args.middle or '、'
+	local last = args.last or '和'
+	return mw.text.listToText(list, middle, last)
+end
+
+function p.main(frame)
+	local args = getArgs(frame, {
+		parentFirst = true
+	})
+	return p._main(args)
+end
+
+return p

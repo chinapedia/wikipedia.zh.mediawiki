@@ -1,0 +1,77 @@
+在[[程序设计语言|程序设计语言]]中，'''名字绑定'''是把实体（数据或/且代码）关联到[[标识符|标识符]]。<ref name=tkac08>{{Citation |title=Using early binding and late binding in Automation |author=Microsoft |url=http://support.microsoft.com/kb/245115 |publisher=Microsoft |date=May 11, 2007 |accessdate=May 11, 2009 |archive-date=2015-02-22 |archive-url=https://web.archive.org/web/20150222220224/http://support.microsoft.com/kb/245115 |dead-url=no }}</ref>标识符绑定到实体被称为[[引用_(程序设计)|引用]]该对象。[[机器语言|机器语言]]没有内建的标识符表示方法，但程序设计语言实现了名字与对象的绑定。绑定最初是与[[作用域|作用域]]相关，因为作用域确定了哪个名字绑定到哪个对象——在程序代码中的哪个位置与哪条执行路径。 
+==绑定时机==
+* 静态绑定（Static binding）或称早绑定（early binding）：名字绑定发生在程序开始运行之前。<ref name=ieee24765:2010(E)>{{Citation |title=Systems and software engineering — Vocabulary ISO/IEC/IEEE 24765:2010(E)|publisher=IEEE |date=Dec 15, 2010}}</ref>
+* 动态绑定（Dynamic binding）或称迟绑定（late binding）、虚绑定（virtual binding）：名字绑定发生在程序运行时。<ref name=ieee24765:2010(E) />
+
+静态绑定的例子，如[[C语言|C语言]]的函数调用：用标识符引用的函数在运行时不能改变。
+
+动态绑定的例子如[[C++|C++]]虚函数调用时的[[动态分派|动态分派]]。由于[[多态|多态]]对象的具体类型在运行前是未知的，因此被执行函数需要动态绑定。
+
+<syntaxhighlight lang="java">
+public void foo(java.util.List<String> list) {
+    list.add("bar");
+}
+</syntaxhighlight>
+
+<code>List</code>是一个[[接口_(信息技术)|接口]]，因此<code>list</code>必须引用到它的[[子类型|子类型]]。它是引用到<code>LinkedList</code>，<code>ArrayList</code>或<code>List</code>的其它[[子类型|子类型]]？<code>add</code>实际引用到的方法在运行时之前也是未知的。C语言中，这种动态绑定可以通过调用一个函数指针类型的变量或表达式，其值直到运行时求值之前都是未知的。
+
+==重绑定与变异==
+重绑定不能与变异混淆：
+* 重绑定（Rebinding）是改变引用的标识符；
+* 变异（Mutation）是改变被引用的实体。
+
+考虑下面[[Java|Java]]代码：
+
+<syntaxhighlight lang="java">
+LinkedList<String> list;
+list = new LinkedList<String>();
+list.add("foo");
+list = null;
+</syntaxhighlight>
+
+标识符<code>list</code>最初引用到空（{{tsl|en|uninitialized variable|未初始化变量|未初始化]]）；然后重绑定到一个对象（一个字符串链表）；这个被<code>list</code>引用的字符串链表被变异，即增加一个字符串到该链表；最后，<code>list</code>被重绑定到<code>null</code>。
+
+==静态迟绑定==
+静态迟绑定（late static binding）是静态绑定与动态绑定之间的一个变种。考虑下述[[PHP|PHP]]例子：
+<syntaxhighlight lang="php">
+class A
+{
+    static $word = "hello";
+    static function hello() { print self::$word; }
+}
+
+class B extends A
+{
+    static $word = "bye";
+}
+
+B::hello();
+</syntaxhighlight>
+在上例中，PHP解释器把<code>A::hello()</code>关键字<code>self</code>绑定到类<code>A</code>，因此<code>B::hello()</code>打印出字符串"hello"。如果<code>self::$word</code>的语义是基于静态迟绑定，结果就是"bye"。
+
+从PHP版本5.3开始支持静态迟绑定。<ref>{{cite web|url=http://us2.php.net/manual/en/language.oop5.late-static-bindings.php|title=Late Static Bindings|accessdate=July 3, 2013|archive-date=2019-02-21|archive-url=https://web.archive.org/web/20190221145351/http://us2.php.net/manual/en/language.oop5.late-static-bindings.php|dead-url=no}}</ref>具体说，上例中的<code>self::$word</code>如果改为下例中的<code>static::$word</code>，关键字<code>static</code>指示运行时才绑定，<code>B::hello()</code>的调用结果将是"bye"：
+<syntaxhighlight lang="php">
+class A
+{
+    static $word = "hello";
+    static function hello() { print static::$word; }
+}
+
+class B extends A
+{
+    static $word = "bye";
+}
+
+B::hello();
+</syntaxhighlight>
+
+==参见==
+* {{tsl|en|Late binding|迟绑定}}
+* {{tsl|en|Branch table|分支表}}
+* [[动态分派|动态分派]]
+* {{tsl|en|Higher-order abstract syntax|高阶抽象语法}} (HOAS)
+
+==参考文献==
+{{reflist}}
+
+[[Category:编程语言概念|Category:编程语言概念]]

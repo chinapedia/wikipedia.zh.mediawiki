@@ -1,0 +1,265 @@
+{{copyedit}}
+{{Underlinked|time=2020-07-08T08:44:30+00:00}}
+{{Translating|||time=2020-07-01T07:41:59+00:00}}
+{{NoteTA|G1=IT}}
+[[C语言|C语言]]和[[C++|C++]]的关系相當密切，但是也存在许多显著的差异。C++标准起源于[[ANSI_C|早期C标准]], 并被设计为与当时的[[C語言|C语言]]在源代码编写和[[链接|链接]]方面很大程度上兼容.<ref name="overview">{{cite web | url=http://www.stroustrup.com/crc.pdf | title=An Overview of the C++ Programming Language in The Handbook of Object Technology (Editor: Saba Zamir). CRC Press LLC, Boca Raton. 1999. ISBN 0-8493-3135-8. | first=Bjarne | last=Stroustrup | authorlink=Bjarne Stroustrup | page=4 | format=PDF | accessdate=2009-08-12 | archiveurl=https://web.archive.org/web/20120816122304/http://www.stroustrup.com/crc.pdf | archivedate=2012-08-16 | dead-url=no }}</ref><ref>{{cite web |url=http://www.stroustrup.com/siblings_short.pdf |title=C and C++: Siblings. The C/C++ Users Journal. July 2002. |author=B.Stroustrup |date= |accessdate=2019-03-17 |archive-date=2018-12-21 |archive-url=https://web.archive.org/web/20181221025717/http://www.stroustrup.com/siblings_short.pdf |dead-url=no }}</ref> 因此，两种语言的开发工具（例如[[IDE|IDE]]和[[编译器|编译器]]）通常被集成到单个产品中，[[程序员|程序员]]可以自己选择编写的是C还是C++，开发工具通常会根据程序员的选择使用不同的[[编译器|编译器]]和[[链接器|链接器]]或不同的[[库|库]]。
+
+即便如此，C并不是C++的[[子集|子集]]<ref name="subset">{{cite web |url=http://www.stroustrup.com/bs_faq.html#C-is-subset |title=Bjarne Stroustrup's FAQ – Is C a subset of C++? |accessdate=22 Sep 2019 |archive-date=2016-02-06 |archive-url=https://web.archive.org/web/20160206214150/http://www.stroustrup.com/bs_faq.html#C-is-subset |dead-url=no }}</ref>， 一般的C语言代码不经修改很难被一些严格符合C++标准的C++[[編譯器|编译器]]成功编译；同样，几乎所有的C++代码都无法被[[C语言|C语言]][[編譯器|编译器]]编译。 在这篇文章中，我们主要讨论的是它们在公共部分的差异，比如在[[C语言|C语言]]中合法的代码到了C++中成为了不合法的代码，或一段代码在C和C++中表现出不同的行为。
+
+C++的创始人[[Bjarne_Stroustrup|Bjarne Stroustrup]]建议<ref>{{cite web|title=C and C++: A Case for Compatibility. The C/C++ Users Journal. August 2002.|url=http://www.stroustrup.com/compat_short.pdf|accessdate=18 August 2013|author=B. Stroustrup|date=|format=|publisher=|language=|archiveurl=https://web.archive.org/web/20120722012742/http://www2.research.att.com/~bs/compat_short.pdf|archivedate=2012-07-22|dead-url=no}}</ref> C和C++应该尽可能减小差异，以提高这两种语言的[[兼容性|兼容性]]；而另一些人则认为C和C++毕竟是两种不同的语言——虽然C++起源于C——因此它们之间的[[兼容性|兼容性]]并不是那么重要。 而ANSI的看法：「我们赞同保持C与C++的最大公共子集原则」，同时「保持它们的差别，使这两种语言继续独立发展」，「......委员会希望C++成为重要的和强有力的语言。」<ref>[http://www.open-std.org/jtc1/sc22/wg14/www/C99RationaleV5.10.pdf Rationale for International Standard—Programming Languages—C] {{Wayback|url=http://www.open-std.org/jtc1/sc22/wg14/www/C99RationaleV5.10.pdf |date=20160606072228 }}, revision 5.10 (2003.04).</ref><ref>{{Cite book|title=C Primer Plus第5版中文版|url=https://archive.org/details/cprimerplusdiwub0005unse|last=Prata|first=Stephen|publisher=人民邮电出版社|year=2005|isbn=9787115130228|location=北京|pages=[https://archive.org/details/cprimerplusdiwub0005unse/page/12 12]}}</ref> 
+
+截止到[[C++20|C++20]]和[[C2x|C2x]]，C++不支持部分[[C语言|C语言]]特性，如[[变长数组|变长数组]]，原生复数支持和<code>[[restrict|restrict]]</code>{{link-en|类型修饰符|Type qualifier}}。另一方面，与C89相比，C99通过合并C++功能（例如<code>//</code>注释，允许声明出现在代码中而不只是在函数头）减少了一些其他不兼容性。
+
+==在C中允许而在C++中不允许存在的代码语句==
+C++较[[C语言|C语言]]有更严格的类型转换和初始化规则<ref name="overview" /><ref>{{cite web|title=N4659: Working Draft, Standard for Programming Language C++|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4659.pdf|accessdate=|author=|date=|format=|publisher=|language=|archiveurl=https://web.archive.org/web/20171207092618/http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4659.pdf|archivedate=2017-12-07|at=§Annex C.1|dead-url=no}} ("It is invalid to jump past a declaration with explicit or implicit initializer (except across entire block not entered). … With this simple compile-time rule, C++ assures that if an initialized variable is in scope, then it has assuredly been initialized.")</ref> , 因此一些在[[C语言|C语言]]里合法的语句在C++里是不合法的。ISO C++附录C.1列出了这些区别。<ref>{{cite web|title=N4659: Working Draft, Standard for Programming Language C++|url=http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4659.pdf|accessdate=|author=|date=|format=|publisher=|language=|archiveurl=https://web.archive.org/web/20171207092618/http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/n4659.pdf|archivedate=2017-12-07|at=§Annex C.1|dead-url=no}}</ref>
+* 一个常见的区别是在[[C语言|C语言]]中的指针类型更加[[弱类型|弱类型]].。具体来说，[[C语言|C语言]]允许将<code>void*</code> 指针赋值给任何类型的指针而无需强制转换，而C++则不允许；这个习惯用法经常出现在使用<code>malloc</code> 管理内存的C代码中，<ref name="publib.boulder.ibm.com">{{cite web|url=http://publib.boulder.ibm.com/infocenter/macxhelp/v6v81/index.jsp?topic=%2Fcom.ibm.vacpp6m.doc%2Flanguage%2Fref%2Fclrc07cplr243.htm|title=IBM Knowledge Center|work=ibm.com}}</ref> 或[[POSIX|POSIX]]线程库的上下文传递以及其他涉及[[回调函数|回调]]的框架。例如，下面这个例子在[[C语言|C语言]]中是可行的，但在C++中不允许: <syntaxhighlight lang="c">void *ptr;
+/*从void *到int *的隐式转换*/
+int *i = ptr;
+</syntaxhighlight>或类似的：<syntaxhighlight lang="c">
+int *j = malloc(5 * sizeof *j);     /*从void *到int *的隐式转换 */
+</syntaxhighlight>为了使代码在C和C++中同时可用, 必须使用强制类型转换, 如下所示 (然而这样在两种语言中都会报警告<ref>{{cite web|title=FAQ > Casting malloc - Cprogramming.com|url=http://faq.cprogramming.com/cgi-bin/smartfaq.cgi?id=1043284351&answer=1047673478|accessdate=|author=|date=|format=|publisher=|language=|archiveurl=https://web.archive.org/web/20070405121807/http://faq.cprogramming.com/cgi-bin/smartfaq.cgi?answer=1047673478&id=1043284351|archivedate=2007-04-05|dead-url=no}}</ref><ref>{{cite web|title=4.4a — Explicit type conversion (casting)|url=http://www.learncpp.com/cpp-tutorial/4-4a-explicit-type-conversion-casting/|accessdate=|author=|date=16 April 2015|format=|publisher=|language=|archiveurl=https://web.archive.org/web/20160925003229/http://www.learncpp.com/cpp-tutorial/4-4a-explicit-type-conversion-casting/|archivedate=2016-09-25|dead-url=no}}</ref>)：<syntaxhighlight lang="c++">
+void *ptr;
+int *i = (int *)ptr;
+int *j = (int *)malloc(5 * sizeof *j);
+</syntaxhighlight>C++中提供了其它方法来实现指针类型转换。C++不推荐继续使用老式类型转换。老式类型转换在形式上来说不是特别清晰，容易被忽略。<ref>{{Cite book|title=C++ Primer 5th|last=Lippman|first=Stanley|publisher=Addison-Wesley Professional|year=2012|isbn=9780321714114|location=|pages=165|first2=Josee|last2=Lajoie|first3=Barbara|last3=Moo}}</ref>。<syntaxhighlight lang="c++">
+void *ptr;
+auto i = reinterpret_cast<int *>(ptr);
+auto j = new int[5];
+</syntaxhighlight>
+* [[C语言|C语言]]允许在安全的前提下隐式添加除const和volatile的关键字，而C++则不会。
+* C++为[[C语言|C语言]]的部分函数添加了一个参数带const的[[函数重载|重载]]，例如<code>strchr</code>在[[C语言|C语言]]中的声明为{{Qcode|char *strchr(char *)}}，而在C++中则有一个重载函数为<code>const char *strchr(const char *)</code>。
+* C++在枚举方面也更加严格。在C++中，int不能被隐式转换为枚举类型。因为在C++标准中并没有规定枚举的类型为int（在[[C语言|C语言]]标准中则规定了），并且大小可能与C++中int的大小不同。从[[C++11|C++11]]开始，C++允许程序员将自定义的整数类型赋值给枚举类型。
+* 在C++中，const变量必须被[[初始化|初始化]]，但在[[C语言|C语言]]中不必。也就是说，下面这个例子：<syntaxhighlight lang="c++">
+const int var1;
+const int var2 = 1;
+</syntaxhighlight>第一行代码在[[C语言|C语言]]中是允许的（在某些[[編譯器|编译器]]中可能会报告一个“Warning”），但在C++中会报错；第二行代码在C和C++中都是合法的。
+* C++不允许{{Qcode|goto}}和标签之间出现初始化语句。如下示例所示，该段代码在[[C语言|C语言]]中是允许的，但在C++中不允许。<syntaxhighlight lang="c">
+void fn(void)
+{
+    goto flack;
+    int i = 1;
+flack:
+    ;
+}
+</syntaxhighlight>
+* 虽然[[语法|语法]]上有效，但如果跳过的堆栈帧包含具有非[[平凡_(數學)|平凡]]（nontrivial）[[析构函数|析构函数]]的对象（即指针），则longjmp（）会在C++中导致未定义的行为。<ref>{{cite web|title=longjmp - C++ Reference|url=http://www.cplusplus.com/reference/csetjmp/longjmp/|accessdate=|author=|date=|format=|publisher=|language=|archiveurl=https://web.archive.org/web/20180519163512/http://www.cplusplus.com/reference/csetjmp/longjmp/|archivedate=2018-05-19|website=www.cplusplus.com|dead-url=no}}</ref> C++实现可以自由定义此时的行为，以便能够调用[[析构函数|析构函数]]。但是，这样会使{{Qcode|longjump()}}的一些用法失效, 否则就可以通过在单独的调用堆栈之间进行longjmp来实现[[线程|线程]]或[[协程|协程]]——在全局地址空间中从较低的调用堆栈跳转到较高的调用堆栈时，将析构函数用于较低调用堆栈中的每个对象。这个问题在[[C语言|C语言]]中不存在。
+<!--我自己做了测试，不太理解这部分，因此暂时删除
+* C allows for multiple tentative definitions of a single global variable in a single [[translation_unit|translation unit]], which is disallowed as an [[One_Definition_Rule|ODR]] violation in C++.
+<syntaxhighlight lang="c">
+int N;
+int N = 10;
+</syntaxhighlight>
+-->
+* 在[[C语言|C语言]]中允许使用与用{{qcode|struct}},{{qcode|enum}}和{{qcode|union}}类型名称相同的名称定义新类型。<syntaxhighlight lang="c">
+enum BOOL {FALSE, TRUE};
+typedef int BOOL;//在C语言中允许，在C++中不允许
+</syntaxhighlight>
+* 在[[C语言|C语言]]中，由{{qcode|struct}},{{qcode|enum}}或{{qcode|union}}创建的类型在声明[[变量|变量]]时必须在自定义的类型前加{{qcode|struct}},{{qcode|enum}}或{{qcode|union}}（取决于定义时的类型），而在C++中不必。因为自定义类型在创建时已隐含typedef（这也是上一点区别形成的原因）。<syntaxhighlight lang="c">
+struct foo{
+        int bar;
+};
+/*
+在C++中，以上形式被隐式转换为：
+typedef struct foo{
+        int bar;
+} foo;
+*/
+struct foo foobar;//在C与C++中均可
+foo foobar2; //在C语言中不允许，在C++中允许
+</syntaxhighlight>
+* 在C++中不允许使用旧式K&R声明（如下所示），这种声明在[[C语言|C语言]]中仍然可用，但是标准已将这种声明方式列为「过时」（「过时」是在ISO C标准中定义的术语，它表示委员会可以考虑在未来的标准中将其删除）。<syntaxhighlight lang="c">
+int add(a,b)
+int a;
+int b;
+{
+    return a+b;
+}
+</syntaxhighlight>
+* 在C99标准出现之前，[[C语言|C语言]]允许隐式函数声明（即省略函数声明），而C++不允许；但在C99标准出现及以后，C与C++均不允许使用这种形式。
+<!-- 这条在很久以后应该删掉o_o -->
+* 在[[C语言|C语言]]中，如果函数原型中没有[[参数_(程式设计)|参数]]（如{{qcode|int foo();}}，表明该函数的参数不确定（这是一种标准不推荐的用法）；而在C++中相同的形式等同于{{qcode|int foo(void);}}。如果想要在C语言中表示没有参数，应该使用{{qcode|int foo(void);}}。
+* 在C和C++中，都可以嵌套定义<code>struct</code>类型，如下所示：<syntaxhighlight lang="c">
+struct foo{
+    struct bar{
+        int x;
+    };
+    int y;
+}
+</syntaxhighlight>然而，在使用时，C和C++采用不同的方法，假设此时已有struct foo类型变量a, 且x = 1，y = 2；若要将x赋值给变量b，c：<syntaxhighlight lang="c">
+//以下是C语言方法,在C++中不允许：
+int b = a.x;
+
+//以下是C++特有方法，在C中不允许:
+int c = a::x
+</syntaxhighlight>
+* C99和C11添加了一些未包含在标准C ++中的附加功能，例如[[复数_(数学)|复数]]，[[变长数组|变长数组]]（值得注意的是，在C99中列为强制要求的VLA（变长数组）和复数在C11中被列为了可选项，这是由于部分特殊平台的C编译器无法有效率地实现或无法实现这两个功能导致的。目前基本所有平台都有对应的可使用VLA的编译器），[[柔性数组|柔性数组]]（也叫[[伸缩型数组成员|伸缩型数组成员]]），{{Qcode|restrict}}关键字，数组参数限定词，[[复合文字|复合文字]]，指定初始化项目，可变参数宏，附加数学库，预定义的标识符（如__func__)和可移植整数类型<ref>{{Cite book|title=C Primer Plus 5th|last=Prata|first=Stephen|publisher=|year=|isbn=0672326965|location=|pages=}}</ref>。
+* C99中通过内建的关键字_Complex和由它定义的宏complex实现了虚数类型——<code>float complex</code>和<code>double complex</code>；而C++通过一种完全不同的方式实现了它——使用虚数库。这两种方式是不兼容的。
+* VLA可能导致sizeof的值在运行时才能确定。<ref>{{cite web|title=Incompatibilities Between  ISO C and ISO C++|url=http://david.tribble.com/text/cdiffs.htm#C90-vs-CPP98|accessdate=|author=|date=|format=|publisher=|language=|archiveurl=https://web.archive.org/web/20060409075755/http://david.tribble.com/text/cdiffs.htm#C90-vs-CPP98|archivedate=2006-04-09|dead-url=no}}</ref><syntaxhighlight lang="c">
+void foo(size_t x, int a[*]);  // 使用VLA的函数
+void foo(size_t x, int a[x]) 
+{
+    printf("%zu\n", sizeof a); // 等同于sizeof(int*)
+    char s[x*2];
+    printf("%zu\n", sizeof s); // 将显示x*2
+}
+</syntaxhighlight>
+<!-- * C99 allows declaration of function macros with empty arguments. For example macro <code>#define ADD(A,B) (A+B)</code> applied to <code>ADD(4,)</code> will be evaluated to <code>(4+)</code> -->
+* 在C99中，如果一个结构有多个成员且它的最后一个成员为数组，则它可以是一个柔性数组成员。它与VLA类似，但VLA不能出现在定义中。它不指定数组的长度。截止到C++20，C++中没有类似的功能。下面是它的一个例子：<syntaxhighlight lang="C">
+struct X
+{
+    int n, m;
+    char bytes[];
+}
+</syntaxhighlight>
+* 截止到C++20标准，restrict类型限定符并没有出现在C++里；但是很多编译器都提供了对它的支持（如GCC，MSVC，ICC，Clang等）。
+* 函数声明中的数组类型限定符在C++中是不允许的，下面是一个例子：<syntaxhighlight lang="c">
+int foo(int a[const]);     // 相当于int foo(int *const a);
+int bar(char s[static 5]); // 表示s的长度至少为5
+</syntaxhighlight>
+* C中的复合文字特性在C++中以一种叫做“列表初始化”的方法被实现——虽然它们在语义和作用上是不同的，但它们通常能起到相同的效果。<syntaxhighlight lang="c">
+struct X a = (struct X){4, 6};  // 在C++ 中等于 X{4, 6}. 
+</syntaxhighlight>
+* 从C99开始，C语言支持结构的指定值初始化；在C++20以前，这是不允许的；但是从C++20标准开始，C++也支持了这个特性。<!-- 在以后删除: ） --><syntaxhighlight lang="C">
+struct X a = {.n = 4, .m = 6};  
+char s[20] = {[0] = 'a', [8]='g'}; 
+</syntaxhighlight>
+* 在C++中，可以使用“noreturn”来标记一个没有返回值的函数；在C11以前没有这样一个关键字，在C11中增加了关键字“_Noreturn”。
+* C语言允许在函数原型中声明[[数据类型_(C语言)#复合数据类型|复合数据类型]]，而C++不允许。
+* C++较C语言增加了一些关键字，这使得如果一段C语言代码使用了C++中新增的关键字作为标识符，它将会是非法的。<syntaxhighlight lang="c">
+struct template 
+{
+    int new;
+    struct template* class;
+};
+</syntaxhighlight>以上代码在C语言中是允许的，但是在C++中不允许。
+
+==在C和C++中行为不同的语句==
+有一些语句在C和C ++中都有效，但是在两种语言中会产生不同的结果。
+
+* Char类型在C语言中的大小等于int类型的大小，而在C++中的大小就是“char”类型的大小，即1字节。因此当有语句{{qcode|sizeof(char)}}时，在C语言中的结果等于{{qcode|sizeof(int)}}，在C++中的结果为1。而且这种差异导致在C语言中，无论声明形式为{{qcode|signed char}}还是{{qcode| unsigned char}}，其所声明的都是一个有符号表达式，而在C++中，这取决于实现。
+* 在C++中，一个<code>const</code>变量除非被显式声明为<code>extern</code>，否则这个变量将为内部链接，这与C <code>extern</code>语言默认变量作用域为文件不同。实际上，这不会导致相同的C和C ++代码产生不同的结果，而是会导致编译时或链接错误。
+* 在C语言中，如果不希望在一个文件中链接到一个不再此文件中的内联函数，则必须在函数声明中加extern；而C++则会自动处理这些问题。更详细地，C语言有两种inline函数定义：普通的外部定义（即显式添加extern）和内联版本。另一方面，C++仅为内联函数提供内联定义。在C语言中，内联定义与static定义类似，因为它可以与其他文件中有文件作用域的同名函数或同一翻译单元中任意数量的相同名称的内联或普通函数共存，这是合法的。当这些函数对编译器可见时，C编译器会选择一个函数（这取决于实现）。而在C++中，若一个inline函数具有外部作用域，则它在所有文件中的声明都必须相同。最后，静态内联函数在C和C++中的行为相同。
+*C和C++中都有布尔类型，但是它们有不同的定义。在C++中，{{qcode|bool}},{{qcode|false}},{{qcode|true}}作为内建类型关键字提供，在实现时，true和false为“bool”类型。而在C99以前，C语言中没有布尔类型；C99提供了关键字{{qcode|_Bool}}类型，但没有提供表达“true”，“false”的关键字。为了增加与C++的兼容性，C99提供了头文件{{qcode|<stdbool.h>}}<ref>{{Cite web|title=ISO/IEC 9899:1999 7.16|url=http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf|accessdate=2020-07-02|author=|date=|format=|publisher=|language=|archive-date=2018-01-27|archive-url=https://web.archive.org/web/20180127192726/http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf|dead-url=no}}</ref>，其中有代码（这段代码选自GCC编译器，版权信息在注释中）：
+<syntaxhighlight lang="c">
+/* Copyright (C) 1998-2020 Free Software Foundation, Inc.
+
+This file is part of GCC.
+
+GCC is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+GCC is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+Under Section 7 of GPL version 3, you are granted additional
+permissions described in the GCC Runtime Library Exception, version
+3.1, as published by the Free Software Foundation.
+
+You should have received a copy of the GNU General Public License and
+a copy of the GCC Runtime Library Exception along with this program;
+see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+<http://www.gnu.org/licenses/>.  */
+
+/*
+ * ISO C Standard:  7.16  Boolean type and values  <stdbool.h>
+ */
+#ifndef __cplusplus
+
+#define bool	_Bool
+#define true	1
+#define false	0
+#else
+
+...
+
+</syntaxhighlight>
+需要注意的是，_Bool在C语言中被储存为int类型。
+
+* 下面这个函数在C++和C中返回不同的值。
+<syntaxhighlight lang="C">
+extern int T;
+
+int size(void)
+{
+    struct T {  int i;  int j;  };
+    
+    return sizeof(T);
+    /* C:   return sizeof(int)
+     * C++: return sizeof(struct T)
+     */
+}
+</syntaxhighlight>
+这是因为在C语言中，struct类型前需要添加“struct”，而在这个例子中，因为T前没有struct，所以它所代表的是在外部定义的int变量；而在C++中，因为可以省略struct，因此造成了歧义。然而，在C++中如果使用{{qcode|sizeof T}}这种形式，编译器会更倾向于认为T是一个表达式，因此编译会出错；而在C语言中则不会。
+
+
+<!--正在翻译！
+
+ ==Linking C and C++ code==
+While C and C++ maintain a large degree of source compatibility, the object files their respective compilers produce can have important differences that manifest themselves when intermixing C and C++ code.  Notably:
+* C compilers do not [[name_mangling|name mangle]] symbols in the way that C++ compilers do.<ref>{{cite web|url=http://publib.boulder.ibm.com/infocenter/macxhelp/v6v81/index.jsp?topic=%2Fcom.ibm.vacpp6m.doc%2Flanguage%2Fref%2Fclrc01name_mangling.htm|title=IBM Knowledge Center|work=ibm.com}}</ref>
+* Depending on the compiler and architecture, it also may be the case that [[calling_convention|calling convention]]s differ between the two languages.
+
+For these reasons, for C++ code to call a C function <code>foo()</code>, the C++ code must [[Function_prototype|prototype]] <code>foo()</code> with <code>extern "C"</code>. Likewise, for C code to call a C++ function <code>bar()</code>, the C++ code for <code>bar()</code> must be declared with <code>extern "C"</code>.
+
+A common practice for [[header_file|header file]]s to maintain both C and C++ compatibility is to make its declaration be <code>extern "C"</code> for the scope of the header:<ref>{{cite web|url=http://publib.boulder.ibm.com/infocenter/comphelp/v8v101/index.jsp?topic=%2Fcom.ibm.xlcpp8a.doc%2Fstandlib%2Fref%2Fstdcpplib.htm|title=IBM Knowledge Center|work=ibm.com}}</ref>
+
+<syntaxhighlight lang="c">
+/* Header file foo.h */
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
+
+/* These functions get C linkage */
+void foo();
+ 
+struct bar { /* ... */ };
+
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
+</syntaxhighlight>
+
+Differences between C and C++ [[Linkage_(software)|linkage]] and calling conventions can also have subtle implications for code that uses [[function_pointer|function pointer]]s. Some compilers will produce non-working code if a function pointer declared <code>extern "C"</code> points to a C++ function that is not declared <code>extern "C"</code>.<ref>{{cite web |url=http://docs.sun.com/source/819-3689/Ch3.Std.html#pgfId-18503 |title=Oracle Documentation |publisher=Docs.sun.com |accessdate=18 August 2013 |url-status=live |archiveurl=https://web.archive.org/web/20090403134627/http://docs.sun.com/source/819-3689/Ch3.Std.html#pgfId-18503 |archivedate=3 April 2009 |df=dmy-all }}</ref>
+
+For example, the following code:
+<syntaxhighlight lang="c" line highlight="2,6">
+void my_function();
+extern "C" void foo(void (*fn_ptr)(void));
+
+void bar()
+{
+   foo(my_function);
+}
+</syntaxhighlight>
+
+Using [[Sun_Microsystems|Sun Microsystems]]' C++ compiler, this produces the following warning:
+<syntaxhighlight lang="c" highlight="1">
+ $ CC -c test.cc
+ "test.cc", line 6: Warning (Anachronism): Formal argument fn_ptr of type
+ extern "C" void(*)() in call to foo(extern "C" void(*)()) is being passed
+ void(*)().
+</syntaxhighlight>
+This is because <code>my_function()</code> is not declared with C linkage and calling conventions, but is being passed to the C function <code>foo()</code>.
+
+
+-->
+
+==参考资料==
+{{Reflist|30em}}
+
+==外部链接==
+* [http://www.coding-guidelines.com/cbook/c90c++.pdf Detailed comparison]{{Wayback|url=http://www.coding-guidelines.com/cbook/c90c++.pdf |date=20191113054452 }}, C89标准与C++标准逐句比较
+* [http://david.tribble.com/text/cdiffs.htm  Incompatibilities Between ISO C and ISO C++]{{Wayback|url=http://david.tribble.com/text/cdiffs.htm |date=20060409075755 }}, David R. Tribble (2001-08).
+* [http://docs.oracle.com/cd/E19422-01/819-3689/Ch3.Std.html#pgfId-18041 Oracle (Sun Microsystems) C++ Migration Guide, section 3.11]{{Wayback|url=http://docs.oracle.com/cd/E19422-01/819-3689/Ch3.Std.html#pgfId-18041 |date=20200801030350 }}, Sun编译器有关链接的文档
+* [http://www.oracle.com/technetwork/articles/servers-storage-dev/mixingcandcpluspluscode-305840.html Oracle: Mixing C and C++ Code in the Same Program]{{Wayback|url=http://www.oracle.com/technetwork/articles/servers-storage-dev/mixingcandcpluspluscode-305840.html |date=20190928191649 }}, 由Steve Clamage（ANSI C ++委员会主席）概述。
+
+{{CProLang}}
+{{C++}}
+
+
+[[Category:C语言|Category:C语言]]
+[[Category:C++|Category:C++]]

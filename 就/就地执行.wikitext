@@ -1,0 +1,55 @@
+{{Refimprove|time=2020-09-22T05:34:04+00:00}}
+在[[计算机科学|计算机科学]]中，'''就地执行'''，或称'''片内执行'''（{{lang-en|Execute in place}}，'''XIP'''）是指[[CPU|CPU]]直接从[[存储器|存储器]]中读取[[程序代码|程序代码]]执行，而不用再读到[[内存|内存]]中。好处即是程序代码无需占用内存，减少内存的要求。
+
+== 要求 ==
+为实现就地执行，必须满足几个条件：
+# 存储器必须提供与内存相似的接口给CPU。
+# 该接口必须提供足够快的读取操作，并具有[[随机访问|随机访问]]模式。
+# 如有文件系统，则需要提供合适的映射功能
+# 程序链接时需要知道存储器的地址或地址与位置无关。
+# 程序不能修改已加载映像中的数据。
+
+[[NOR_Flash|NOR Flash]]和[[EEPROM|EEPROM]]通常能满足上述要求。
+
+== 系统引导时的就地执行 ==
+通常，第一阶段的[[引导程序|引导程序]]是一个XIP程序，它链接时指定从flash芯片上电后的映射地址开始运行，设置系统RAM，把第二阶段的引导程序或[[操作系统|操作系统]][[内核|内核]]加载进RAM。
+
+在这初始化期间，可写存储器可能不可用，所有的计算都必须在处理器[[寄存器|寄存器]]中执行。因此，第一阶段的引导程序通常以[[汇编语言|汇编语言]]编写，提供尽量少的功能，只为下一阶段程序的提供正常的执行环境。有些处理器也能通过嵌入少量[[SRAM|SRAM]]<ref>Samsung S3C2416X have 64kB embedded SRAM available on the system bus</ref>或允许将[[Cache|Cache]]用作RAM<ref>Broadcom BCM2835 uses its Level 2 Cache as boot loader RAM before SDRAM is initialized</ref>来允许用[[高级语言|高级语言]]编写这些程序。
+
+对于内核和引导程序，[[地址空间|地址空间]]通常是内部分配的。为了使用XIP，需要指示链接程序将不可修改的数据和可修改数据放在不同的地址区间，并提供将可修改数据复制到可写内存的机制，使得任何程序正常访问这些数据。
+
+如果地址空间是外部分配的，比如不提供[[虚拟内存|虚拟内存]]的系统，编译器需要通过向数据区域的私有副本的指针添加偏移量来访问所有可修改的数据。在这种情况下，外部加载程序负责设置实例特定的内存区域。
+
+主内存初始化之前，[[BIOS|BIOS]] 和 [[UEFI|UEFI]] 使用 XIP技术。
+
+== 作为文件系统的就地执行 ==
+[[文件系统|文件系统]]的XIP通常难以满足。在没有页表的系统中，整个文件必须连续存储，不能碎片化，而基于闪存的文件系统通常会将数据分配到擦除周期最小，[[磨损平衡|磨损最少]]的扇区，以延长生命周期。
+
+复杂性和速度的折中意味着XIP通常仅用于第一阶段引导程序或RAM极度短缺的情况。例如，第二代至第四代的视频游戏机如[[Atari_2600|Atari 2600]]将ROM卡带的地址和数据总线连接到游戏机的[[地址总线|地址]]和[[数据总线|数据总线]]，<ref name="Balaska">{{cite patent|country=US|number=4485457A|status=patent|title=Memory system including RAM and page switchable ROM|gdate=1984-11-27|fdate=1983-05-31|inventor=Richard K. Balaska, Robert L. Hunter, and Scott S. Robinson|assign1=CBS Inc.}}</ref>，从而能在只有128字节的RAM上。
+
+[[AXFS|AXFS]] （高级XIP文件系统，Advanced XIP File System）是[[Linux系统|Linux系统]]上一种较新的文件系统，旨在克服与XIP相关的，特别是在XIP[[用户空间|用户空间]]应用程序方面的某些缺点。例如，可以将可执行的二进制文件拆分为“ XIP区域”，从而避免了上面提到的碎片限制。[[NetBSD|NetBSD]]的实现也在开发中<ref>{{cite web|title=eXecute-In-Place (XIP) Support for NetBSD|url=http://www.bsdcan.org/2010/schedule/attachments/127_xip.pdf|date=2010-04-05|last=Uebayashi|first=Masao|publisher=[[BSDCan|BSDCan]]|accessdate=2020-09-22|archive-date=2020-07-31|archive-url=https://web.archive.org/web/20200731232930/https://www.bsdcan.org/2010/schedule/attachments/127_xip.pdf|dead-url=no}}</ref>
+
+== 参见 ==
+
+* [[韌體|韌體]]
+* [[ROM卡带|ROM卡带]]
+* [[文件系统的对比|文件系统的对比]]
+* [[AXFS|AXFS]]
+
+== 参考 ==
+<references />
+
+== 外部链接 ==
+
+* {{cite web|title=Methods to Improve Bootup Time in Linux|url=https://www.kernel.org/doc/ols/2004/ols2004v1-pages-79-88.pdf|last=Bird|first=Tim R.|year=2004|publisher={{tsl|en|Ottawa Linux Symposium||Ottawa Linux Symposium}}|accessdate=2020-09-22|archive-date=2020-07-31|archive-url=https://web.archive.org/web/20200731232929/https://www.kernel.org/doc/ols/2004/ols2004v1-pages-79-88.pdf|dead-url=no}}
+* {{cite web|title=Introducing the Advanced XIP File System|url=https://www.kernel.org/doc/ols/2008/ols2008v1-pages-211-218.pdf|last=Hulbert|first=Jared|year=2008|publisher={{tsl|en|Ottawa Linux Symposium||Ottawa Linux Symposium}}|accessdate=2020-09-22|archive-date=2020-07-31|archive-url=https://web.archive.org/web/20200731232931/https://www.kernel.org/doc/ols/2008/ols2008v1-pages-211-218.pdf|dead-url=no}}
+* {{cite web|title=eXecute In Place (XIP) overview|url=http://www.ucdot.org/article.pl?sid=02/08/28/0434210&mode=thread|accessdate=2007-09-25|date=2002-08-28|last=Wilshire|first=Phil|work=uCdot|archive-url=https://web.archive.org/web/20071020090413/http://www.ucdot.org/article.pl?sid=02%2F08%2F28%2F0434210&mode=thread|archive-date=2007-10-20|dead-url=yes}}
+* {{cite web|title=Application eXecute-In-Place (XIP) with Linux and AXFS|url=https://www.scribd.com/doc/19855245/Application-eXecuteInPlace-XIP-with-Linux-and-AXFS|accessdate=2009-09-17|date=2009-09-17|last=Wellhöfer|first=Sören|archive-date=2012-07-15|archive-url=https://web.archive.org/web/20120715000347/http://www.scribd.com/doc/19855245/Application-eXecuteInPlace-XIP-with-Linux-and-AXFS|dead-url=no}}
+* {{cite web|title=Configure Linux for XIP (Execution In Place) on PowerPC|url=http://www.denx.de/wiki/bin/view/DULG/ConfigureLinuxForXIP|publisher=DENX Software Engineering|accessdate=2020-09-22|archive-date=2019-09-18|archive-url=https://web.archive.org/web/20190918084808/http://www.denx.de/wiki/bin/view/DULG/ConfigureLinuxForXIP|dead-url=no}}
+* {{cite web|title=Kernel XIP|url=http://elinux.org/Kernel_XIP|work=Embedded Linux Wiki|accessdate=2020-09-22|archive-date=2019-08-26|archive-url=https://web.archive.org/web/20190826034413/https://elinux.org/Kernel_XIP|dead-url=no}}
+* {{cite web|title=Linux Application XIP|url=http://elinux.org/Application_XIP|work=Embedded Linux Wiki|accessdate=2020-09-22|archive-date=2017-06-11|archive-url=https://web.archive.org/web/20170611005518/http://elinux.org/Application_XIP|dead-url=no}}
+* {{cite web|title=Execute in Place file system driver - xip2fs|url=http://linuxvm.org/Patches/index.html|work=Linux for S/390|accessdate=2020-09-22|archive-date=2020-02-20|archive-url=https://web.archive.org/web/20200220203352/http://linuxvm.org/Patches/index.html|dead-url=no}}
+
+
+[[Category:文件系统|Category:文件系统]]
+[[Category:嵌入式系统|Category:嵌入式系统]]

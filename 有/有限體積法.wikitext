@@ -1,0 +1,102 @@
+'''有限体积法'''（ 英文：'''finite volume method''' ）是一种以[[数值方法|数值方法]]解[[偏微分方程|偏微分方程]]的計算方式<ref>{{Cite book|last=LeVeque|first=Randall|date=2002|title=Finite Volume Methods for Hyperbolic Problems|url=https://www.cambridge.org/core/books/finite-volume-methods-for-hyperbolic-problems/97D5D1ACB1926DA1D4D52EAD6909E2B9|isbn=9780511791253|access-date=2020-12-23|archive-date=2020-10-23|archive-url=https://web.archive.org/web/20201023215410/https://www.cambridge.org/core/books/finite-volume-methods-for-hyperbolic-problems/97D5D1ACB1926DA1D4D52EAD6909E2B9|dead-url=no}}</ref>。 在有限體積法中，將要描述的物理實體切分為網格單元來描述，並使用[[高斯散度定理|发散定理]]，將所有包含[[散度|发散]]项的偏微分方程中的體積積分轉換為[[曲面积分|表面积分]]。然后將每個網格的项加總，便成為每個有限體積表面的通量。因为進入给定體積的通量与离开相鄰體積的通量相同，所以这些方法是[[守恒定律|守恆的]]。该方法用於许多[[计算流体力学|计算流体动力学]]軟體。
+
+有限体积法常被拿來與[[有限元素分析|有限元素分析]]做比較，后者使用節點值来近似[[導數|導數]]，或者使用[[有限单元法|有限元方法]]来使用局部數值来逼近解的局部近似值，并通過將它們加總在一起来形成全域近似值。另一方面，有限體積法會計算某个體積中的網格解之平均，然后使用此平均值来決定單元内解的近似值<ref>{{Cite journal|title=Comparison of finite element and finite volume methods application in geometrically nonlinear stress analysis|url=http://www.sciencedirect.com/science/article/pii/S0307904X99000475|first1=N. A.|last2=Bailey|first2=C.|date=2000-06-01|journal=Applied Mathematical Modelling|issue=7|doi=10.1016/S0307-904X(99)00047-5|volume=24|pages=439–455|language=en|issn=0307-904X|last3=Cross|first3=M.|last4=Taylor|first4=G. A.|last1=Fallah}}</ref><ref>{{Cite book|last=Ranganayakulu, C. (Chennu)|title=Compact heat exchangers : analysis, design and optimization using FEM and CFD approach|others=Seetharamu, K. N.|isbn=978-1-119-42435-2|location=Hoboken, NJ|chapter=Chapter 3, Section 3.1|oclc=1006524487}}</ref>。
+
+== 舉例 ==
+一维平流問題：
+
+: <math>\quad (1) \qquad \qquad \frac{\partial\rho}{\partial t}+\frac{\partial f}{\partial x}=0,\quad t\ge0.</math>
+
+<math> \rho=\rho \left( x,t \right) \ </math>在這裡代表狀態變量， <math> f=f \left( \rho \left( x,t \right) \right) \ </math>代表的[[通量|通量]]或[[流量|流量]]<math> \rho \ </math> 。習慣上，<math> f \ </math>正值代表向右流動，而<math> f \ </math>負值代表向左流動。如果假設式（1）表示恆定面積的流動介質，則可以空间域 <math> x \ </math> ，细分為數個網格單元''，''以每個網格單元所佔的有限體積以<math> i \ </math>作為標記 。對於特定的單元<math> i \ </math> ，我们可以定義該體積某物理量（ 壓力、溫度等 ）之[[流量|通量]]或[[流量|流量]]平均值<math> {\rho }_i \left( t \right) = \rho \left( x, t \right) \ </math>在時間<math> {t=t_1}\ </math>和<math>{ x \in \left[ x_{i-\frac{1}{2}}, x_{i+\frac{1}{2}} \right] }\ </math> ，如式（2）
+
+: <math>\quad (2) \qquad \qquad \bar{\rho}_i \left( t_1 \right) = \frac{1}{ x_{i+\frac{1}{2}} - x_{i-\frac{1}{2}}} \int_{x_{i-\frac{1}{2}}}^{x_{i+\frac{1}{2}}} \rho \left(x,t_1 \right)\, dx ,</math>
+
+而在時間<math> {t = t_2}\ </math>時式（2）可寫為：
+
+: <math>\quad (3) \qquad \qquad \bar{\rho}_i \left( t_2 \right) = \frac{1}{x_{i+\frac{1}{2}} - x_{i-\frac{1}{2}}} \int_{x_{i-\frac{1}{2}}}^{x_{i+\frac{1}{2}}} \rho \left(x,t_2 \right)\, dx ,</math>
+
+此處<math> x_{i-\frac{1}{2}} \ </math>和<math> x_{i+\frac{1}{2}} \ </math>分别代表上游和下游面或網格單元的交界面位置<math> i^{th} \ </math>。
+
+將式（1）積分，可得：
+
+: <math>\quad (4) \qquad \qquad \rho \left( x, t_2 \right) = \rho \left( x, t_1 \right) - \int_{t_1}^{t_2} f_x \left( x,t \right)\, dt,</math>
+
+當<math>f_x=\frac{\partial f}{\partial x}</math> 。
+
+為了得到在時間<math> t=t_{2} \ </math> 的有限體積平均值<math> \rho\left(x,t\right) </math>，在此積分位於整個有限體積的所有網格的[[流量|流量]]<math> \rho\left(x,t_2 \right) </math>，並<math>\left[ x_{i-\frac{1}{2}}, x_{i+\frac{1}{2}} \right] </math>並將計算结果除以<math>\Delta x_i = x_{i+\frac{1}{2}}-x_{i-\frac{1}{2}} </math> ，即可得：
+
+: <math> \quad (5) \qquad \qquad \bar{\rho}_{i}\left( t_{2}\right) =\frac{1}{\Delta x_i}\int_{x_{i-\frac{1}{2}}}^{x_{i+\frac{1}{2}}}\left\{ \rho\left( x,t_{1}\right) - \int_{t_{1}}^{t_2} f_{x} \left( x,t \right) dt \right\} dx.</math>
+
+我們可以逆向[[積分|積分]]的順序。同样，请记住，流量垂直於單元的表面。現在，因为一维<math>f_x \triangleq \nabla \cdot f </math> ，我们可以應用[[高斯散度定理|散度定理]]，即<math>\oint_{v}\nabla\cdot fdv=\oint_{S}f\, dS </math> ，并用的值代替[[散度|散度]]的体积积分<math>f(x) \ </math>在網格單元表面計算（某單元與其他單元之前後交界面<math>x_{i-\frac{1}{2}} \ </math>和<math> x_{i+\frac{1}{2}} \ </math> ）的有限體積如下：
+
+: <math>\quad (6) \qquad \qquad \bar{\rho}_i \left( t_2 \right) = \bar{\rho}_i \left( t_1 \right)
+
+- \frac{1}{\Delta x_{i}} 
+ \left( \int_{t_1}^{t_2} f_{i + \frac{1}{2}} dt
+- \int_{t_1}^{t_2} f_{i - \frac{1}{2}} dt
+\right) .</math>
+
+當<math>f_{i \pm \frac{1}{2}} =f \left( x_{i \pm \frac{1}{2}}, t \right) </math> 。
+
+因此，對于上述問題，我们可以得出一个半離散的數值格式，其單元中心的索引為<math> i\ </math> ，且單元交界面通量的索引為<math> i\pm\frac{1}{2} </math> ，通過對時間對式（6）進行微分，可得：
+
+: <math>\quad (7) \qquad \qquad \frac{d \bar{\rho}_i}{d t} + \frac{1}{\Delta x_i} \left[ 
+f_{i + \frac{1}{2}} - f_{i - \frac{1}{2}} \right] =0 ,</math>
+
+通過某單元交界面通量的值<math> f_{i \pm \frac{1}{2}} </math>可以通过對單元平均值进行[[插值|内插]]或[[外推|外推]]来獲得。式（7）對於該有限體積的平均值是精确的，因為在推導過程中未進行任何近似。
+
+該方法也可以應用於2D形況，只要同時考慮單元四周交界面，北面、南面、东面和西面即可。
+
+== 一般守恆法則 ==
+我們還可以考慮以下[[偏微分方程|PDE]]代表的一般[[守恒定律|守恒定律]]問題，
+
+: <math> \quad (8) \qquad \qquad {{\partial {\mathbf u}} \over {\partial t}} + \nabla \cdot {\mathbf f}\left( {\mathbf u } \right) = {\mathbf 0} . </math>
+
+此處 <math> {\mathbf u} \ </math>代表狀態向量<math>\mathbf f \ </math>代表相应的[[通量|通量]]張量。同样，我們可以將空間域细分為有限體積的網格單元。對於特定的網格單元<math>i \ </math> ，將體積[[積分|積分]]乘以單元的總體積 <math>v _{i} \ </math> ， 如式（9）。
+
+: <math> \quad (9) \qquad \qquad \int _{v_{i}} {{\partial {\mathbf u}} \over {\partial t}}\, dv 
++ \int _{v_{i}} \nabla \cdot {\mathbf f}\left( {\mathbf u } \right)\, dv = {\mathbf 0} .</math>
+
+將第一項[[積分|積分]]可得体积平均值''，''然后将[[散度定理|散度定理]]應用於第二項，可得：
+
+: <math>\quad (10) \qquad \qquad 
+v_{i} {{d {\mathbf {\bar u} }_{i} } \over {dt}} + \oint _{S_{i} } 
+ {\mathbf f} \left( {\mathbf u } \right) \cdot {\mathbf n }\ dS = {\mathbf 0}, </math>
+
+此處<math> S_{i} \ </math>代表單元的總表面積， <math>{\mathbf n}</math>是垂直於表面並指向外的單位向量。最后，可得一般结果如式（11）。
+
+: <math> \quad (11) \qquad \qquad 
+{{d {\mathbf {\bar u} }_{i} } \over {dt}} + {{1} \over {v_{i}} } \oint _{S_{i} } 
+ {\mathbf f} \left( {\mathbf u } \right)\cdot {\mathbf n }\ dS = {\mathbf 0} .</math>
+
+同樣的，可以通過對單元平均值进行内插或外推来重建交界面通量的值。實際的數值將取决於問題的幾何形狀和軮格結構。 
+
+有限体积方案是[[守恆定律|守恆]]的，因為單元平均会通过交界面通量而變化。換句話說，某個單元所損失的物理量，必定會通過交界面而被另一單元所獲得！
+
+== 相關文獻 ==
+
+* '''Eymard, R. Gallouët, T.   R., {{link-en|拉斐尔·赫宾|Raphaèle Herbin|Herbin, R.}}''' (2000) ''The finite volume method''  Handbook of Numerical Analysis, Vol. VII, 2000, p. 713–1020. Editors: P.G. Ciarlet and J.L. Lions.
+* '''Hirsch, C.''' (1990), ''Numerical Computation of Internal and External Flows, Volume 2: Computational Methods for Inviscid and Viscous Flows'', Wiley.
+* '''Laney, Culbert B.''' (1998), ''Computational Gas Dynamics'', Cambridge University Press.
+* '''LeVeque, Randall''' (1990), ''Numerical Methods for Conservation Laws'', ETH Lectures in Mathematics Series, Birkhauser-Verlag.
+* '''LeVeque, Randall''' (2002), ''Finite Volume Methods for Hyperbolic Problems'', Cambridge University Press.
+* '''Patankar, Suhas V.''' (1980), ''Numerical Heat Transfer and Fluid Flow'', Hemisphere.
+* '''Tannehill, John C.''', et al., (1997), ''Computational Fluid mechanics and Heat Transfer'', 2nd Ed., Taylor and Francis.
+* '''Toro, E. F.''' (1999), ''Riemann Solvers and Numerical Methods for Fluid Dynamics'', Springer-Verlag.
+* '''Wesseling, Pieter''' (2001), ''Principles of Computational Fluid Dynamics'', Springer-Verlag.
+
+== 参考資料 ==
+{{reflist|2}}
+
+== 外部連結 ==
+
+* [https://www.i2m.univ-amu.fr/perso/raphaele.herbin/PUBLI/bookevol.pdf Finite volume methods] {{Wayback|url=https://www.i2m.univ-amu.fr/perso/raphaele.herbin/PUBLI/bookevol.pdf |date=20190717095350 }} by R. Eymard, T Gallouët and {{link-en|拉斐尔·赫宾|Raphaèle Herbin|R. Herbin}}, update of the article published in Handbook of Numerical Analysis, 2000
+* {{cite journal|title=The Finite Volume Method (FVM) – An introduction|url=http://www.imtek.uni-freiburg.de/simulation/mathematica/IMSweb/imsTOC/Lectures%20and%20Tips/Simulation%20I/FVM_introDocu.html|last=Rübenkönig|first=Oliver|archive-url=https://web.archive.org/web/20091002233707/http://www.imtek.uni-freiburg.de/simulation/mathematica/IMSweb/imsTOC/Lectures%20and%20Tips/Simulation%20I/FVM_introDocu.html|archive-date=2009-10-02}}, available under the [[GNU自由文档许可证|GFDL]].
+* [http://www.ctcms.nist.gov/fipy/ FiPy: A Finite Volume PDE Solver Using Python] {{Wayback|url=http://www.ctcms.nist.gov/fipy/ |date=20210319140353 }} from NIST.
+* [http://depts.washington.edu/clawpack/ CLAWPACK] {{Wayback|url=http://depts.washington.edu/clawpack/ |date=20210310070045 }}: a software package designed to compute numerical solutions to hyperbolic partial differential equations using a wave propagation approach
+
+{{数值偏微分方程}}
+[[Category:计算流体力学|Category:计算流体力学]]
+[[Category:数值分析|Category:数值分析]]
+[[Category:计算流体力学|Category:计算流体力学]]
+[[Category:数值微分方程|Category:数值微分方程]]

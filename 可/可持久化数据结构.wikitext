@@ -1,0 +1,34 @@
+在计算机编程中，'''可持久化数据结构（Persistent data structure）'''是一种能够在修改之后其保留历史版本（即可以在保留原来数据的基础上进行修改——比如增添、删除、赋值）的[[数据结构|数据结构]]。这种数据结构实际上是[[不可變物件|不可变对象]]，因为相关操作不会直接修改被保存的数据，而是会在原版本上产生一个新分支。这个术语是在1986年Driscoll、Sarnak、Sleator和Tarjans的文章中提出的。<ref name="Journal">{{Cite book|vauthors=Driscoll JR, Sarnak N, Sleator DD, Tarjan RE|year=1986|title=Making data structures persistent|isbn=978-0-89791-193-1|doi=10.1145/12130.12142|journal=Proceeding STOC '86. Proceedings of the Eighteenth Annual ACM Symposium on Theory of Computing|pages=109–121}}</ref>
+
+如果一个数据结构包括当前版本在内的所有历史版本都可以被访问，但只有当前版本可以被修改，那么该数据结构就是部分可持久化数据结构。如果该数据结构的所有版本都可以被查询或修改，那么这种数据结构就是完全可持久化数据结构。如果存在能够创建基于两个历史版本的新版本（即合并两个版本 <code>meld()</code> （<s>浇铸（？）</s>混合（？））或 <code>merge()</code> （合并）操作），那么这种数据结构就是可汇合的可持久化数据结构。不可持久化的数据结构被称为''短暂性数据结构''。<ref name="kaplan2">{{Cite journal|title=Persistent data structures|author=Kaplan, Haim|url=http://www.math.tau.ac.il/~haimk/papers/persistent-survey.ps|journal=Handbook on Data Structures and Applications|year=2001|access-date=2020-07-29|archive-date=2020-07-29|archive-url=https://web.archive.org/web/20200729063847/http://www.math.tau.ac.il/~haimk/papers/persistent-survey.ps|dead-url=no}}</ref>
+
+这些类型的数据结构在[[邏輯編程|逻辑编程]]和[[函数式编程|函数式编程]]之中非常常见。<ref name="kaplan2" />
+
+== 部分可持久化与完全可持久化 ==
+
+在部分可持久化模型中，编程者可以查询该类数据结构的任一历史版本，但是只能修改（更新）最新版本。这意味着数据结构的每个版本之间是[[全序关系|线性排序]]的。<ref>{{Citation|last=Conchon|first=Sylvain|chapter=Semi-persistent Data Structures|pages=322–336|publisher=Springer Berlin Heidelberg|isbn=9783540787389|last2=Filliâtre|first2=Jean-Christophe|doi=10.1007/978-3-540-78739-6_25|title=Programming Languages and Systems|volume=4960|series=Lecture Notes in Computer Science|year=2008}}</ref>在完全持久化模型中，编程者可以查询和修改（更新）该类数据结构的所有版本，在某些情况之下，允许查询和或修改（更新）历史版本的功能会削减，比如 {{Internal link helper/en|Rope 数据结构|Rope_(data_structure)}}就是如此。<ref>{{Cite book|title=RRB-Trees: Efficient Immutable Vectors|last=Tiark|first=Bagwell, Philip Rompf|date=2011|oclc=820379112}}</ref>另外，如果一个数据结构除了完全可持久化外，还可以将同种数据结构的两个版本合并成一个新的版本，且这个新版本仍然是完全持久化的，那么这个数据结构就可以被称为可汇合的持久化的。<ref>{{Citation|last=Brodal|first=Gerth Stølting|title=Purely Functional Worst Case Constant Time Catenable Sorted Lists|date=2006|work=Lecture Notes in Computer Science|pages=172–183|publisher=Springer Berlin Heidelberg|isbn=9783540388753|last2=Makris|first2=Christos|last3=Tsichlas|first3=Kostas|doi=10.1007/11841036_18}}</ref>
+
+== 保留历史版本的方法 ==
+
+=== “Copy on Write”（写入时复制） ===
+
+创建可持久化数据结构的一种方式是使用平台提供的短暂数据结构（比如[[数组|数组]]）来存储数据结构中的数据，并对对于数据结构的任何更改使用[[寫入時複製|复制整个数据结构]]的方式来记录每次更改。这是一种效率低下的技术，因为每次写入都必须复制整个数据结构，这使得对一个大小为 <math>n</math> 的数组进行 <math>m</math> 次修改时，出现最差情况下的时间复杂度为 <math>\text{O}(nm)</math> 。{{citation needed|date=May 2019}}
+
+=== “Fat node”（胖节点） ===
+“胖节点”的方法是将对于该节点的所有更改记录在节点本身，但是在修改时不覆盖节点上原来的数值。这就要求允许节点能任意“变胖”。换句话说，每一个胖节点都包含了与它的历史版本的信息和[[指標_(電腦科學)|指针字段]]，同时还拥有任意数量的额外字段值空间。每个额外的字段值都有一个相关联的字段名和一个版本戳，它表示该节点在哪个版本中被更改和被改为值。此外，每个胖节点都有自己的版本戳，用于记录该版本是在那个版本中被修改的。节点的版本戳的唯一目的是确保每个节点在被一个版本中的每一个字段仅仅包含一个唯一的值。为了浏览结构，每个节点中每个原始字段值的版本戳为零。
+
+==== “胖节点”算法的时间复杂度 ====
+
+使用“胖节点”算法完成可持久化，每次修改需要 <math>\text{O}(1)</math> 的空间：只需要存储新数据。每一次修改都需要额外的 <math>\text{O}(1)</math> 的时间来在历史版本的结尾处存储更改。这是[[均摊分析|均摊分析]]的（假设修改历史存储在一个可以扩大的[[数组|数组]]之中）。在查询时，必须遍历整个结构以找到每个节点的正确的版本。如果要进行 <math>m</math> 次修改，那么每一次查询操作都会遭到 <math>\text{O}(\log m)</math> 的减速——这是在数组中寻找最近修改的版本造成的。 
+
+=== “Path copying”（路径复制） ===
+路径复制算法，将即将被修改的点路径上的所有节点克隆出一个新的。这些修改必须通过数据结构逐级连接：克隆而得的所有节点指向旧节点的指针必须被修改为指向新节点。这些修改会引起连锁更改，直达根节点。
+
+== 參考資料 ==
+{{Reflist|2}}
+
+
+== 外部連結 ==
+
+
+[[Category:使用创建条目精灵建立的页面|Category:使用创建条目精灵建立的页面]]

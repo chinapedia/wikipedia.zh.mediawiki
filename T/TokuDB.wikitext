@@ -1,0 +1,55 @@
+{{NoteTA
+|G1=IT
+}}
+{{校对翻译|en}}
+{{Infobox software
+| title = TokuDB
+| logo = 
+| caption = 
+| developer = [https://www.percona.com/software/mysql-database/percona-tokudb Percona]
+| latest release version = 7.5.5<ref>{{cite web|url=https://www.percona.com/doc/percona-tokudb/release-notes.html|title=Release Notes|accessdate=2015-10-20|archive-date=2016-06-23|archive-url=https://web.archive.org/web/20160623230852/https://www.percona.com/doc/percona-tokudb/release-notes.html|dead-url=no}}</ref>
+| latest release date = 2015年1月29日{{Citation needed|date=October 2015}}
+| operating system = 
+| genre = [[数据库引擎|数据库引擎]]
+| license = [[GNU通用公共许可证|GNU通用公共许可证]]（第二版）<ref>{{cite web
+ |url        = https://github.com/percona/percona-server/blob/master/COPYING
+ |title      = Percona Server COPYING
+ |accessdate = 2015-12-17
+}}</ref>
+| website = [https://www.percona.com/software/mysql-database/percona-tokudb Percona TokuDB]
+}}
+'''TokuDB'''是一个[[开源|开源]]的高性能{{tsl|en|storage engine|存储引擎}}，适用于[[MySQL|MySQL]]和[[MariaDB|MariaDB]]。它通过{{tsl|en|fractal tree index|分形树索引}}来实现，具[[可扩展性|可扩展性]]，与[[ACID|ACID]]和[[多版本并发控制|MVCC]]兼容，可改善基于[[数据库索引|索引]]的查询，可在线修改[[綱要_(資料庫)|模式]]，并能降低[[硬盘|硬盘驱动器]]和[[闪存|闪存]]的{{tsl|en|Replication (computing)#Database replication||复制}}滞后。
+
+{{tsl|en|Percona Server}}、[[MariaDB|MariaDB]]和基于{{tsl|en|opmon}}的[[Nagios|Nagios]]中含有TokuDB。但在Percona Server 8和MariaDB 10.5中，已不推荐使用TokuDB。
+
+== 分形树索引 ==
+
+=== 概述 ===
+TokuDB使用一个分形树索引[[树_(数据结构)|树数据结构]]保持数据顺序，并允许同时以[[B树|B树]]进行搜索和顺序访问，不过其插入和删除操作比B树稍快。分形树还允许将消息注入树中，从而可以于后台在线地进行架构更改（例如添加或删除[[行_(資料庫)|列]]，添加索引）。<ref>{{Cite web|title=Covering Indexes: Orders-of-Magnitude Improvements|url=http://www.percona.com/ppc2009/PPC2009_Covering_Indexes_Tokutek.pdf|accessdate=2011-01-17|publisher=Percona|archive-date=2009-05-09|archive-url=https://web.archive.org/web/20090509082040/http://www.percona.com/ppc2009/PPC2009_Covering_Indexes_Tokutek.pdf|dead-url=no}}</ref>如此可以维护更多索引而不降低性能。因为将数据添加到索引较依赖B树的性能，而这在分形树索引中影响不大。<ref>{{Cite web|title=Detailed review of Tokutek storage engine|url=http://www.mysqlperformanceblog.com/2009/04/28/detailed-review-of-tokutek-storage-engine/|accessdate=2012-02-22|publisher=Percona|archive-date=2014-07-29|archive-url=https://web.archive.org/web/20140729213700/http://www.mysqlperformanceblog.com/2009/04/28/detailed-review-of-tokutek-storage-engine/|dead-url=no}}</ref>
+
+=== 用途 ===
+分形树索引适用于以流数据近实时分析为特征的许多应用程序。它可以用作数据库或文件系统的存储层。在数据库中使用时，可用在任何设置的B树上来提高性能，这包括：网络事件管理，在线广告网络，{{tsl|en|clickstream|点击流}}分析，以及[[空中交通管制|空中交通管制]]系统。 <ref>{{Cite web|title=Air traffic queries in MyISAM and Tokutek (TokuDB)|url=http://www.mysqlperformanceblog.com/2009/11/05/air-traffic-queries-in-myisam-and-tokutek-tokudb/|accessdate=2011-01-17|publisher=MySQL Performance Blog|archive-date=2014-08-12|archive-url=https://web.archive.org/web/20140812190117/http://www.mysqlperformanceblog.com/2009/11/05/air-traffic-queries-in-myisam-and-tokutek-tokudb/|dead-url=no}}</ref>其他用途包括为[[社会化媒体|社会化媒体]]网站[[网络搜索引擎|搜索引擎]]提高[[網路爬蟲|網路爬蟲]]的性能。这还可用于在线创建索引和列，从而为电子商务个性化的查询提供灵活性。它也适合提高性能并减少交易网站上的现有负载。通常来说，它在必须存储[[日志文件|日志文件]]数据并同时执行热查询的应用程序中表现良好。
+
+=== 起源 ===
+这种高效能的存储系统方法最早是由[[麻省理工学院|麻省理工学院]]<ref>{{Cite web|title=How TokuDB Fractal Tree Databases Work|url=http://en.oreilly.com/mysql2010/public/schedule/detail/13265|accessdate=2011-01-17|publisher=O'Reilly|archive-date=2015-05-14|archive-url=https://web.archive.org/web/20150514230703/http://en.oreilly.com/mysql2010/public/schedule/detail/13265|dead-url=yes}}</ref> <ref>{{Cite web|title=Cache-Oblivious Search Trees Project|url=http://supertech.csail.mit.edu/cacheObliviousBTree.html|accessdate=2011-01-17|publisher=Massachusetts Institute of Technology|archive-date=2020-11-11|archive-url=https://web.archive.org/web/20201111180821/http://supertech.csail.mit.edu/cacheObliviousBTree.html|dead-url=no}}</ref>、罗格斯大学<ref>{{Cite web|title=Cache-Oblivious B-trees|url=http://www.cs.rutgers.edu/~farach/pubs/cache-oblivious-Btree-full.pdf|accessdate=2011-01-17|publisher=Rutgers University|archive-date=2021-03-04|archive-url=https://web.archive.org/web/20210304222459/https://www.cs.rutgers.edu/~farach/pubs/cache-oblivious-Btree-full.pdf|dead-url=no}}</ref>和[[石溪大学|斯托尼布鲁克大学]]的研究人员联合开发。 <ref>{{Cite web|title=Cache Oblivious B-trees|url=http://www.cs.sunysb.edu/~bender/pub/sicomp05-BenderDeFa.ps|accessdate=2011-01-17|publisher=State University of New York (SUNY) at Stony Brook|archive-date=2012-03-19|archive-url=https://web.archive.org/web/20120319223618/http://www.cs.sunysb.edu/~bender/pub/sicomp05-BenderDeFa.ps|dead-url=no}}</ref>
+
+=== 大数据市场上的作用 ===
+TokuDB的名字来自MySQL中的一项[[大數據|大數據]]技术。<ref>{{Cite web|title=Big Data is Creating The Future - It's A $50 Billion Market|url=https://www.forbes.com/sites/siliconangle/2012/02/29/big-data-is-creating-the-future-its-a-50-billion-market/2/|accessdate=2012-05-21|work=Forbes|archive-date=2016-03-04|archive-url=https://web.archive.org/web/20160304065433/http://www.forbes.com/sites/siliconangle/2012/02/29/big-data-is-creating-the-future-its-a-50-billion-market/2/|dead-url=no}}</ref>Tokutek是2012年[[歐萊禮媒體|O'Reilly]] Strata大会上有关大数据的一个初创企业展示赛入围者。<ref>{{Cite web|title=Strata 2012 Startup Showcase|url=http://strataconf.com/strata2012/public/cfp/202|accessdate=2012-05-21|publisher=O'Reilly|archive-date=2015-09-10|archive-url=https://web.archive.org/web/20150910021455/http://strataconf.com/strata2012/public/cfp/202|dead-url=yes}}</ref>
+
+== 参见 ==
+* [[MySQL数据库引擎的比较|MySQL数据库引擎的比较]]
+* [[NewSQL|NewSQL]]
+
+== 参考文献 ==
+{{Reflist|30em}}
+
+== 外部链接 ==
+* {{Official website|https://www.percona.com/software/mysql-database/percona-tokudb}}
+* 被Percona从[[Wayback_Machine|Wayback Machine]]手中收购前的[https://web.archive.org/web/20150726100738/http://www.tokutek.com/ TokuTek网站]
+* [https://github.com/Tokutek GitHub上的TokuTek组织] {{Wayback|url=https://github.com/Tokutek |date=20211221032250 }}
+* {{cite web |title=数据库内核月报 － 2017 / 07 |url=http://mysql.taobao.org/monthly/2017/07/04/ |website=阿里云RDS-数据库内核组 |publisher=阿里巴巴 |accessdate=2021-02-02 |page=TokuDB · 引擎特性 · HybridDB for MySQL高压缩引擎TokuDB 揭秘 |date=2017-07 |archive-date=2021-02-27 |archive-url=https://web.archive.org/web/20210227003933/http://mysql.taobao.org/monthly/2017/07/04/ |dead-url=no }}
+
+[[Category:MariaDB|Category:MariaDB]]
+[[Category:MySQL|Category:MySQL]]
+[[Category:数据库引擎|Category:数据库引擎]]
+[[Category:NewSQL|Category:NewSQL]]

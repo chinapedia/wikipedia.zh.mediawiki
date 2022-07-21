@@ -1,0 +1,276 @@
+{{Documentation subpage}}
+{{Lua|Module:Excerpt}}
+这种模板用于在其他页面中重复使用部分页面。这种做法有以下优点:
+
+* 通过避免必须多次更新的重复内容而'''减少维护工作'''
+* 通过鼓励编辑合并相关内容来'''提高内容质量'''，而不是在不同的开发阶段有多个版本。
+* 通过引导贡献者到一个地方编辑来'''促进合作'''。
+
+但它也具有以下缺点 :
+
+* 因为您必须转到子文章才能对主要文章进行更改 
+* 由于代码生成的问题，一篇文章的摘录格式不能完美地融入一篇新文章，存在段落丢失问题
+* 对子文章的更改不会出现在主文章的编辑监视列表中
+
+This template extends the capabilities of the built-in [[Help:Transclusion|normal transclusion]] and [[Help:Labeled section transclusion|labeled section transclusion]].
+
+==Usage==
+
+===Basic usage===
+
+* <code><nowiki>{{Excerpt|Page title}}</nowiki></code> — Transclude the lead section ([[Africa#Water|example]])
+* <code><nowiki>{{Excerpt|Page title|Section title}}</nowiki></code> — Transclude a specific section, excluding any subsections ([[Eating#Mammals|example]])
+
+===Parameters===
+
+* <code>1</code> or <code>article</code> or <code>page</code> — '''Required.''' Name of the article or page to transclude. By default the lead section is transcluded ([[Africa#Water|example]]). If the page contains an infobox, the image and caption of the infobox will be transcluded but not the infobox. Also, templates listed at [[Module:Excerpt/config]] will not be transcluded (unless requested explicitly with {{para|templates}}, see below).
+* <code>2</code> or <code>section</code> or <code>fragment</code> — Name of the section to transclude ([[Eating#Mammals|example]]) or of the <code><nowiki><section></nowiki></code> tag to transclude ([[Axiom Space#AX-1|example]]). Must be marked with <code><nowiki><section begin=Name of the fragment/></nowiki></code> and <code><nowiki><section end=Name of the fragment/></nowiki></code> in the transcluded page. Notice that this template provides other ways of targeting specific fragments of a page without having to resort to section tags.
+* <code>only</code> — Elements to transclude. By default all elements are transcluded (except templates blacklisted at [[Module:Excerpt/config]])
+** <code>only=file</code> — Transclude only the first file
+** <code>only=files</code> — Transclude only files ([[Robotic spacecraft#SpaceX Dragon|example]])
+** <code>only=list</code> — Transclude only the first list
+** <code>only=lists</code> — Transclude only lists
+** <code>only=table</code> — Transclude only the first table
+** <code>only=tables</code> — Transclude only tables ([[JKT48#Singles|example]])
+** <code>only=template</code> — Transclude only the first template
+** <code>only=templates</code> — Transclude only templates
+** <code>only=paragraph</code> — Transclude only the first paragraph
+** <code>only=paragraphs</code> — Transclude only paragraphs
+* <code>paragraphs</code> — Paragraphs to transclude. By default all paragraphs are transcluded.
+** <code>paragraphs=0</code> — Transclude no paragraphs
+** <code>paragraphs=1</code> — Transclude the first paragraph
+** <code>paragraphs=2</code> — Transclude the second paragraph
+** <code>paragraphs=1,3</code> — Transclude the first and third paragraphs
+** <code>paragraphs=1-3</code> — Transclude the first, second and third paragraphs
+** <code>paragraphs=1-3,5</code> — Transclude the first, second, third and fifth paragraphs
+** <code>paragraphs=-1</code> — Transclude all paragraphs except the first
+** <code>paragraphs=-2</code> — Transclude all paragraphs except the second
+** <code>paragraphs=-1,3</code> — Transclude all paragraphs except the first and third
+** <code>paragraphs=-1-3</code> — Transclude all paragraphs except the first, second and third
+** <code>paragraphs=-1-3,5</code> — Transclude all paragraphs except the first, second, third and fifth
+* <code>lists</code> — Lists to transclude. By default all lists are transcluded. Same syntax as when transcluding paragraphs.
+* <code>files</code> — Files to transclude. By default all files are transcluded. Same syntax as when transcluding paragraphs, but also:
+** <code>files=A.jpg</code> — Transclude the file named 'A.jpg'
+** <code>files=A.jpg, B.png, C.gif</code> — Transclude the files named 'A.jpg', 'B.png' and 'C.gif'
+** <code>files=.+%.png</code> — Transclude all PNG files
+** <code>files=-A.jpg</code> — Transclude all files except the one named 'A.jpg'
+** <code>files=-A.jpg, B.png, C.gif</code> — Transclude all files except the ones named 'A.jpg', 'B.png' and 'C.gif'
+** <code>files=-.+%.png</code> — Transclude all non-PNG files
+* <code>tables</code> — Tables to transclude. By default all tables are transcluded. Same syntax as when transcluding paragraphs, but also:
+** <code>tables=Stats2020</code> — Transclude the table with id 'Stats2020'
+** <code>tables=Stats2020, Stats2019, Stats2018</code> — Transclude the tables with ids 'Stats2020', 'Stats2019' and 'Stats2018'
+** <code>tables=-Stats2020</code> — Transclude all tables except the one with id 'Stats2020'
+** <code>tables=-Stats2020, Stats2019, Stats2018</code> — Transclude all tables except the ones with ids 'Stats2020', 'Stats2019' and 'Stats2018'
+* <code>templates</code> — Templates to transclude. By default all templates are transcluded except those blacklisted at [[Module:Excerpt/config]]. Using a hyphen before a comma-delimited list of templates adds those templates to the blacklist.
+** <code>templates=-Ocean</code> — Add the template 'Ocean' to the blacklist
+** <code>templates=-Ocean, Nature</code> — Add the templates 'Ocean' and 'Nature' to the blacklist
+** <code>templates=Infobox person</code> — Ignore the blacklist and transclude the template 'Infobox person'
+** <code>templates=Infobox person, Ocean</code> — Ignore the blacklist and transclude the templates 'Infobox person' and 'Ocean'
+** <code>templates=.*</code> — Ignore the blacklist and transclude all templates
+* <code>this</code> — Change the initial text of the hatnote. For example, if the transcluded content is a gallery, you can set <code>this=This gallery is</code> so that the hatnote reads "This gallery is an excerpt from..." ([[Eastern Distributor#Tolls|example]]).
+* <code>hat=no</code> — Hide the [[Wikipedia:Hatnote|hatnote]] "This section is an excerpt from..."
+* <code>bold=yes</code> — Preserve '''bold''' text.
+* <code>quote=yes</code> — Wrap the excerpt with <code><nowiki><blockquote></nowiki></code> tags.
+* <code>inline=yes</code> — Remove the hatnote and wrap the excerpt with <code><nowiki><span></nowiki></code> tags to use it inside other text.
+* <code>references=no</code> — Remove all references.
+* <code>subsections=yes</code> — Include subsections of the transcluded section. Notice that if the transclusion is done from a section level 3, and the transcluded subsections are level 3 too, then the transcluded subsections will show with the same hierarchy as the transcluding section, which is probably not desirable, so use with caution.
+
+=== Replacing Template:Main ===
+
+[[File:How to excerpt.webm|thumb|How to replace a section for an excerpt.]]
+
+Sections are often summaries of more precise subpages (generally linked with [[Template:Main]]). Sometimes it's convenient to replace the content of such sections for excerpts of the subpages (after merging any valuable content of the section into the subpage). In such cases, an efficient way to proceed is:
+
+# Open the section in one tab and the subpage in another.
+# Edit both.
+# Copy the text of the section and paste it below the lead section of the subpage.
+# Delete repeated content and adjust using common sense.
+# Save the changes in the subpage with an edit summary like: Bring content from <nowiki>[[Page]]</nowiki>.
+# Back to the section, delete all content and replace it for an excerpt of the subpage.
+# Save the changes in the section with an edit summary like: Move content to <nowiki>[[Subpage]]</nowiki> and leave an excerpt.
+
+===Refinement using inclusion control===
+
+{{Further|Help:Template#Noinclude, includeonly, and onlyinclude}}
+
+Sometimes, a passage will almost fit for a transclusion, but not quite. In these cases, you can edit the source page to add <code><nowiki><noinclude>...</noinclude></nowiki></code> tags around content you don't want in the excerpt and <code><nowiki><includeonly>...</includeonly></nowiki></code> tags around content you want only in the excerpt.
+
+For instance, the page [[COVID-19 misinformation]] begins {{xt|The [[COVID-19 pandemic]] has resulted in [[misinformation]]...}}. However, when excerpting this lead to the misinformation section of [[COVID-19 pandemic]], we don't need to specify which pandemic we're referring to. Therefore, the code <code><nowiki>The <noinclude>[[COVID-19 pandemic]]</noinclude><includeonly>pandemic</includeonly> has resulted in [[misinformation]]</nowiki></code> can be used at the misinformation page, so that it will appear at the pandemic page as {{xt|The pandemic has resulted in [[misinformation]]...}}.
+
+For pages with a high volume of edits, it may be a good idea to leave a hidden comment explaining why the tags are there, so that no one will be [[WP:FENCE|tempted]] to remove them.
+
+Please note that when the <code><nowiki></noinclude></nowiki></code> tag is wrapped into a new line, a character next to it would be interpreted as a line beginning. This can lead to some formatting problems. For example, when a <code><nowiki></noinclude></nowiki></code> at line beginning is succeeded by a [[whitespace character]], the page engine would translate this as a [[Help:Wikitext#Limiting formatting / escaping wiki markup|leading space]] that renders the subsequent paragraph in [[code block]] and [[monospaced font]] with preserved formatting. For this reason, no spaces should separate the <code><nowiki></noinclude></nowiki></code> tag from the text it precedes.
+
+===Compared to #section===
+
+For simple cases of transcluding sections of articles, the {{pf|section}}, {{pf|section-x}}, and {{pf|section-h}} (abbreviated {{pf|lst}}, {{pf|lstx}}, and {{pf|lsth}})) parser functions can be used instead of this template. {{pf|lsth|''article''|''fragmentname''}} will transclude the section of "''article''" with the header "''fragmentname''", and {{pf|lsth|''article''}} will transclude the lead section of "''article''". Excerpting only specific paragraphs can be done by marking up the source article with <code><nowiki><section begin=</nowiki>''<nowiki>fragmentname</nowiki>''<nowiki>/>...<section end=</nowiki>''<nowiki>fragmentname</nowiki>''<nowiki>/></nowiki></code> tags and using {{pf|lst|''article''|''fragmentname''}} to transclude those fragments, which is equivalent to using the {{para|fragment|''fragmentname''}} parameter with this template. {{pf|lsth|''article''|''fragmentname''}} can also be used to transclude everything ''but'' those fragments.
+
+The text will not be trimmed of excess whitespace, there will not be a header (equivalent to {{para|hat|no}}, and all files, templates, tables, references, and subsections will be included unless the source article is marked up with <code><nowiki><section begin=</nowiki>''<nowiki>fragmentname</nowiki>''<nowiki>/>...<section end=</nowiki>''<nowiki>fragmentname</nowiki>''<nowiki>/></nowiki></code>, {{tag|noinclude}}, or {{tag|onlyinclude}} tags. [[Help:Self link|Self links]] will appear in bold.
+
+==See also==
+
+* [[Module:Excerpt]]
+* [[Module:Excerpt/config]]
+* [[Module:Transcluder]]
+* [[:Category:Articles with excerpts]], or [https://en.wikipedia.org/w/index.php?title=Special%3AWhatLinksHere&target=Template%3AExcerpt&namespace=0 Articles that link to "Template:Excerpt"] (unsorted)
+* [[:Category:Articles with broken excerpts]]
+* [[Help:Labeled section transclusion]] – A more efficient method for simple section transclusions
+* [[Wikipedia:Transclusion#Selective transclusion]] – how to transclude one or more sections of an article or project page into another
+* [[Wikipedia:Summary style#Synchronization]]
+* [[Wikipedia:Manual of Style/Lead section]]
+* [[Wikipedia:WikiProject Introductions]]
+* {{tl|Transcluded section}} – creates hatnote but ''does not transclude'' the section
+** [https://en.wikipedia.org/w/index.php?title=Special%3AWhatLinksHere&target=Template%3ATranscluded+section&namespace=0 Pages that link to "Template:Transcluded section" (articles)] (unsorted)
+* {{tl|Transcluding article}} – transcludes one or more entire pages
+** [https://en.wikipedia.org/w/index.php?title=Special%3AWhatLinksHere&target=Template%3ATranscluding+article&namespace=0 Pages that link to "Template:Transcluding article" (articles)] (unsorted)
+* [[meta:Grants:Project/Rapid/Sophivorus/Excerpts]] - Grant to spread excerpts to various Wikipedias
+* [[meta:Concise Wikipedia]] - Perennial new project proposal (see the [[meta:Concise Wikipedia#A summary of existing short-options, using an example|comparison table]] at the bottom in particular)
+* [[Single source of truth]]
+* [[Wikimania:2021:Submissions/Excerpts: Modular and Reusable Content within Wikipedia|Excerpts: Modular and Reusable Content within Wikipedia]] - Video presentation about excerpts for Wikimania 2021
+* {{tl|Transclude lead excerpt}} and {{tl|Transclude linked excerpt}} – templates designed for excerpt transclusion in portals
+
+==Template data==
+
+<templatedata>
+{
+	"params": {
+		"1": {
+			"aliases": [
+				"article",
+				"page"
+			],
+			"label": "Article",
+			"description": "Name of the article or page to transclude",
+			"example": "Science",
+			"type": "wiki-page-name",
+			"required": true
+		},
+		"2": {
+			"aliases": [
+				"section",
+				"fragment"
+			],
+			"label": "Section",
+			"description": "Name of the section or <section> tag to transclude",
+			"example": "History",
+			"type": "string"
+		},
+		"paragraphs": {
+			"label": "Paragraphs",
+			"description": "Paragraphs to transclude",
+			"example": "1-3,5",
+			"type": "string",
+			"aliases": [
+				"paragraph"
+			]
+		},
+		"files": {
+			"label": "Files",
+			"description": "Files to transclude",
+			"example": "1-3,5",
+			"type": "string",
+			"default": "1",
+			"aliases": [
+				"file"
+			]
+		},
+		"subsections": {
+			"label": "Subsections",
+			"description": "Whether to transclude the subsections of the requested section",
+			"example": "yes",
+			"type": "boolean"
+		},
+		"tables": {
+			"label": "Tables",
+			"description": "Tables to transclude",
+			"example": "Stats2020",
+			"type": "string",
+			"aliases": [
+				"table"
+			]
+		},
+		"references": {
+			"label": "References",
+			"description": "Whether to transclude the references",
+			"example": "no",
+			"type": "boolean"
+		},
+		"only": {
+			"label": "Only",
+			"description": "Transclude only this kind of element",
+			"example": "table",
+			"type": "string"
+		},
+		"this": {
+			"label": "This",
+			"description": "Change the initial text of the hatnote",
+			"example": "This gallery is",
+			"type": "string"
+		},
+		"class": {
+			"label": "Class",
+			"description": "Additional CSS class",
+			"example": "noprint",
+			"type": "string"
+		},
+		"hat": {
+			"label": "Hatnote",
+			"description": "Whether to include the hatnote",
+			"example": "no",
+			"type": "boolean"
+		},
+		"inline": {
+			"label": "Inline",
+			"description": "Remove the hatnote and wrap the excerpt with <span> tags to use it inside other text",
+			"example": "yes",
+			"type": "boolean"
+		},
+		"lists": {
+			"aliases": [
+				"list"
+			],
+			"label": "Lists",
+			"description": "Lists to transclude",
+			"example": "1",
+			"type": "string"
+		},
+		"templates": {
+			"aliases": [
+				"template"
+			],
+			"label": "Templates",
+			"description": "Templates to transclude",
+			"example": "Infobox person",
+			"type": "string"
+		},
+		"link": {
+			"label": "链接",
+			"description": "指向摘录信息的链接",
+			"type": "unbalanced-wikitext"
+		}
+	},
+	"description": "This template is used for transcluding part of an article into another article.",
+	"paramOrder": [
+		"1",
+		"2",
+		"only",
+		"paragraphs",
+		"files",
+		"tables",
+		"lists",
+		"templates",
+		"references",
+		"subsections",
+		"hat",
+		"this",
+		"inline",
+		"class",
+		"link"
+	]
+}
+</templatedata>
+
+<includeonly>{{sandbox other||
+<!-- Categories go below this line; interwikis go to Wikidata. -->
+[[Category:Wikipedia page-section templates]]
+}}</includeonly>

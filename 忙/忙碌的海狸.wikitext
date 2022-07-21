@@ -1,0 +1,312 @@
+{{Unreferenced|time=2020-07-23T12:17:46+00:00}}
+在[[计算机科学|计算机科学]]中，'''忙碌的海狸'''（{{lang|en|Busy Beaver}}）是一个在给定参数后，寻找可能产生的最大输出的可终止程序。忙碌的海狸游戏包括设计一个可终止的，只输出0或1的[[图灵机|图灵机]]，让其在一条纸带上尽可能多的输出1.
+
+包含两个状态的忙碌的海狸游戏有下面两条规则：
+
+# 该图灵机包括除终止态以外的两个状态
+# 纸带初始值都是0
+
+玩家需要设计出可能输出最多1的状态转换表格，同时也要确保图灵机是会终止的。
+
+能赢得n个状态的忙碌的海狸游戏的图灵机，称为第n个忙碌的海狸，或者用BB-n表示(BB是英文忙碌的海狸的缩写)。BB-n，是在所有n个状态的图灵机里面，可以输出最多的1的。比如BB-2，可能通过6次状态转换输出4个1。
+
+忙碌的海狸游戏是由匈牙利的数学家[[Tibor_Radó|Tibor Radó]]在1962年发表的论文《On Non-Computable Functions》中提出的。
+
+==无限旅馆的机器人==
+假设有一排无限房间的旅馆，每个房间里面都装了一盏灯和一个开关。最初，所有房间的灯都是关的（状态0）。一个机器人管家从其中某一个房间开始工作。进入房间后，它的行为只能是选择开灯或关灯，然后移到相邻的左边或者右边房间去。
+
+这个机器人可以处于若干个预先设定的状态中。在不同的状态下，它会根据房间灯的开关情况，选择不同的行为和下一步的状态。
+
+===一个状态的机器人===
+* 在“工作”态下：
+:# 如果房间灯是关的，开灯，移动到左边的房间并转换到“停止”态
+:# 如果房间灯是开的，关灯，移动到左边的房间并转换到“停止”态
+* 在“停止”态下（这个游戏必须有一个停止态，不计算在机器人状态中）：机器人停止，游戏结束。
+
+游戏开始后，这个“工作”态机器人进入某个房间后，开一盏灯，然后移到左边的房间并转换到“停止”态，游戏结束。我们可以验证，无论你如何设计机器人的行为(64种可能)，在只有一种状态的约束下，机器人最多只能打开一盏灯，所以<math>\Sigma(1)=1</math>。
+  
+===两个状态的机器人===
+* 在“惊恐”态下：
+:# 如果房间灯是关的，开灯并移动到左边的房间去
+:# 如果房间灯是开的，恢复到“正常”态
+* 在“正常”态下：
+:# 如果房间灯是开的，关灯并移动到左边的房间去
+:# 其余情况，转变到“惊恐”态
+* 在“停止”态下（这个游戏必须有一个停止态，不计算在两种状态中）：机器人停止，游戏结束。
+
+对于以上两种状态的机器人，如果它初始态是“惊恐”，从它进入某一个房间开放，它便会打开房间的灯然后移到左边的房间。然后继续开灯，向左移，无限循环下去。这样的状态设定是不符合忙碌的海狸必须可以终止的条件。同理，如果它的初始态是“正常”，它也会无限向左移，并不属于忙碌的海狸。
+
+下面我们看另外一种两个状态的机器人。
+* 在“1”态下：
+:# 如果房间灯是关的，开灯，移动到右边的房间，并转变到“2”态
+:# 如果房间灯是开的，保持，移动到左边的房间，并转变到“2”态
+* 在“2”态下：
+:# 如果房间灯是关的，开灯，移动到左边的房间，并转变到“1”态
+:# 如果房间灯是开的，保持，移动到左边的房间，并转变到“H”态
+* 在“H”态下：机器人停止，游戏结束。
+
+这样的状态“1”机器人，从某个房间开始，可以进行6次移动，最终打开四盏灯（左边2个房间，开始的房间，和右边的一个房间），回到最左邊的房间并停止游戏。2个状态的机器人，全部有<math>(2\times2\times3)^{2\times2}=20736</math>种行为设计，其实最多开灯的设计是4盏，所以<math>\Sigma(2)=4</math>。
+
+3个状态的机器人，可以通过14次移动，最多打开6盏灯<math>\Sigma(3)=6</math>。
+
+4个状态的机器人，可以通过107次移动，最多打开13盏灯，<math>\Sigma(4)=13</math>。
+
+4个更多状态的机器人，目前还不能计算出忙碌的海狸的函数值，比如目前我们猜测<math>\Sigma(5)\geqslant4098</math>，但还不能确认。
+
+==相关的函数==
+===忙碌的海狸函数===
+忙碌的海狸函数，又称为BB函数，或者Radó Sigma函数，记做<math>\Sigma(n)</math>或者BB(n),是n个状态的忙碌的海狸图灵机的最大输出。这一个增长特别快的函数，是一个非常著名的不可计算函数。Radó证明了这个函数最终会超过全部的[[可计算函数|可计算函数]]。  
+
+<math>\Sigma(n)</math>还可以定义为集合<math>T = \{n_1,n_2,\cdots,n_k\}</math>中最大的数，这个集合包括了n个状态的2色图灵机全部的输出。集合<math>T</math>的大小不超过<math>(4n+4)^{2n}</math>（这是n个状态的全部图灵机数量）。
+
+更普遍的，<math>\Sigma(n,m)</math>表示n个状态，m个颜色的忙碌的海狸图灵机。
+
+===方程值和下界===
+:{| class="wikitable"
+|+Values of S(''n'', ''m'')
+! {{diagonal split header|''m''|''n''}}
+! width="120px" | 2-state
+! width="120px" | 3-state
+! width="120px" | 4-state
+! width="120px" | 5-state
+! width="120px" | 6-state
+! width="120px" | 7-state
+|-
+! 2-symbol
+| align="right" | 6
+| align="right" | 21
+| align="right" | 107
+| align="right" |  {{val|47176870}}?
+| align="right" | > {{val|7.4|e=36534}}
+| align="right" | > 10<sup>2*10<sup>10<sup>10<sup>{{val|18705353}}</sup></sup></sup></sup>
+|-
+! 3-symbol
+| align="right" | 38
+| align="right" | {{nowrap|≥ {{val|119112334170342540}}}}
+| align="right" | > {{val|1.0|e=14072}}
+| align="center" | ???
+| align="center" | ???
+| align="center" | ???
+|-
+! 4-symbol
+| align="right" | ≥ {{val|3932964}}
+| align="right" | > {{val|5.2|e=13036}}
+| align="center" | ???
+| align="center" | ???
+| align="center" | ???
+| align="center" | ???
+|-
+! 5-symbol
+| align="right" | > {{val|1.9|e=704}}
+| align="center" | ???
+| align="center" | ???
+| align="center" | ???
+| align="center" | ???
+| align="center" | ???
+|-
+! 6-symbol
+| align="right" | > {{val|2.4|e=9866}}
+| align="center" | ???
+| align="center" | ???
+| align="center" | ???
+| align="center" | ???
+| align="center" | ???
+|}
+
+:{| class="wikitable"
+|+Values of Σ(''n'', ''m'')
+! {{diagonal split header|''m''|''n''}}
+! width="120px" | 2-state
+! width="120px" | 3-state
+! width="120px" | 4-state
+! width="120px" | 5-state
+! width="120px" | 6-state
+! width="120px" | 7-state
+|-
+! 2-symbol
+| align="right" | 4
+| align="right" | 6
+| align="right" | 13
+| align="right" |  {{val|4098}}?
+| align="right" | > {{val|3.5|e=18267}}
+| align="right" | > 10<sup>10<sup>10<sup>10<sup>{{val|18705353}}</sup></sup></sup></sup>
+|-
+! 3-symbol
+| align="right" | 9
+| align="right" | ≥ {{val|374676383}}
+| align="right" | > {{val|1.3|e=7036}}
+| align="center" | ???
+| align="center" | ???
+| align="center" | ???
+|-
+! 4-symbol
+| align="right" | ≥ {{val|2050}}
+| align="right" | > {{val|3.7|e=6518}}
+| align="center" | ???
+| align="center" | ???
+| align="center" | ???
+| align="center" | ???
+|-
+! 5-symbol
+| align="right" | > {{val|1.7|e=352}}
+| align="center" | ???
+| align="center" | ???
+| align="center" | ???
+| align="center" | ???
+| align="center" | ???
+|-
+! 6-symbol
+| align="right" | > {{val|1.9|e=4933}}
+| align="center" | ???
+| align="center" | ???
+| align="center" | ???
+| align="center" | ???
+| align="center" | ???
+|}
+
+==例子==
+[[File:Busy_Beaver_4-state_2-symbol_Run.gif|thumb]]
+
+在下面的表格中，列代表了当前的状态，行代表了当前从纸带读取的标记。表格中的每一项有三个字母，分别表示向纸带写的标记，移动的方向和下一步的新的状态。终止态用<span style="color:red">'''H'''</span>代表。
+
+每个图灵机都从状态'''A'''开始，纸带无限长且初始值都是0。
+
+结果指示: (启始位置 {{overline|1}}, 结束位置 {{underline|1}})
+
+:{| class="wikitable"
+|+ 1-状态, 2-标记
+! width="20px" |
+! A
+|-
+! 0
+| 1R<span style="color:red">'''H'''</span>
+|-
+! 1
+| (not used)
+|}
+
+'''结果:''' 0 0 {{overline|1}} {{underline|0}} 0 (1 步, 一个 "1" )
+
+:{| class="wikitable"
+|+ 2-状态, 2-标记
+! width="20px" |
+! A
+! B
+|-
+! 0
+| 1R'''B'''
+| 1L'''A'''
+|-
+! 1
+| 1L'''B'''
+| 1R<span style="color:red">'''H'''</span>
+|}
+
+'''结果:''' 0 0 1 1 {{underline|{{overline|1}}}} 1 0 0 (6 步, 四个 "1")
+
+:{| class="wikitable"
+|+ 3-状态, 2-标记
+! width="20px" |
+! A
+! B
+! C
+|-
+! 0
+| 1R'''B'''
+| 0R'''C'''
+| 1L'''C'''
+|-
+! 1
+| 1R<span style="color:red">'''H'''</span>
+| 1R'''B'''
+| 1L'''A'''
+|}
+
+'''结果:''' 0 0 1 {{overline|1}} 1 {{underline|1}} 1 1 0 0 (14 步, 六个 "1").
+
+:{| class="wikitable"
+|+ 4-状态, 2-标记
+! width="20px" |
+! A
+! B
+! C
+! D
+|-
+! 0
+| 1R'''B'''
+| 1L'''A'''
+| 1R<span style="color:red">'''H'''</span>
+| 1R'''D'''
+|-
+! 1
+| 1L'''B'''
+| 0L'''C'''
+| 1L'''D'''
+| 0R'''A'''
+|}
+
+'''结果:''' 0 0 1 {{underline|0}} 1 1 1 1 1 1 1 1 {{overline|1}} 1 1 1 0 0 (107 步, 十三个 "1",见图)
+
+:{| class="wikitable"
+|+ 5-状态, 2-标记 (目前最大估计)
+! width="20px" |
+! A
+! B
+! C
+! D
+! E
+|-
+! 0
+| 1R'''B'''
+| 1R'''C'''
+| 1R'''D'''
+| 1L'''A'''
+| 1R<span style="color:red">'''H'''</span>
+|-
+! 1
+| 1L'''C'''
+| 1R'''B'''
+| 0L'''E'''
+| 1L'''D'''
+| 0L'''A'''
+|}
+
+'''结果:''' 4098 个"1"中间隔 8191 个"0"。 47,176,870 步。
+
+:{| class="wikitable"
+|+ 6-状态, 2-标记 （目前最大估计）
+! width="20px" |
+! A
+! B
+! C
+! D
+! E
+! F
+|-
+! 0
+| 1R'''B'''
+| 1R'''C'''
+| 1L'''D'''
+| 1R'''E'''
+| 1L'''A'''
+| 1L<span style="color:red">'''H'''</span>
+|-
+! 1
+| 1L'''E'''
+| 1R'''F'''
+| 0R'''B'''
+| 0L'''C'''
+| 0R'''D'''
+| 1R'''C'''
+|}
+
+'''结果:''' ≈3.515 × 10<sup>18267</sup> 个"1" ≈7.412 × 10<sup>36534</sup> 步。
+
+==相关词条==
+*[[拉約數|拉約數]]
+*[[葛立恆數|葛立恆數]]
+
+[[Category:递归论|Category:递归论]]
+[[Category:計算理論|Category:計算理論]]
+[[Category:大整数|Category:大整数]]
+[[Category:以动物作比喻|Category:以动物作比喻]]

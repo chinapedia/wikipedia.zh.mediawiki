@@ -1,0 +1,56 @@
+local p={}
+local lib_arg={}
+local base_data = {binary=2,ternary=3,quaternary=4,quinary=5,senary=6,septenary=7,octal=8,nonary=9,denary=10,decimal==10,undecimal=11,duodecimal=12,tridecimal=13,tetradecimal=14,pentadecimal=15,hexadecimal=16,heptadecimal=17,octodecimal=18,enneadecimal=19,vigesimal=20,unvigesimal=21,duovigesimal=22,trivigesimal=23,tetravigesimal=24,pentavigesimal=25,hexavigesimal=26,heptavigesimal=27,septemvigesimal=27,octovigesimal=28,enneavigesimal=29,trigesimal=30,untrigesimal=31,duotrigesimal=32,tritrigesimal=33,tetratrigesimal=34,pentatrigesimal=35,hexatrigesimal=36,heptatrigesimal=37,octotrigesimal=38,quadragesimal=40,duoquadragesimal=42,pentaquadragesimal=45,octoquadragesimal=48,enneaquadragesimal=49,quinquagesimal=50,duoquinquagesimal=52,tetraquinquagesimal=54,hexaquinquagesimal=56,heptaquinquagesimal=57,octoquinquagesimal=58,sexagesimal=60}
+local pre60={'一','二','三','四','五','六','七','八','九','十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十','二十一','二十二','二十三','二十四','二十五','二十六','二十七','二十八','二十九','三十','三十一','三十二','三十三','三十四','三十五','三十六','三十七','三十八','三十九','四十','四十一','四十二','四十三','四十四','四十五','四十六','四十七','四十八','四十九','五十','五十一','五十二','五十三','五十四','五十五','五十六','五十七','五十八','五十九','六十','六十一','六十二','六十三','六十四',[0]='零'}
+local numberToChinese = require('Module:NumberToChinese')
+function p.nbase(frame)
+	-- For calling from #invoke. {{#invoke:Infobox number|nbase}}
+    local args, working_frame
+    if frame == mw.getCurrentFrame() then
+        -- We're being called via #invoke. The args are passed through to the module
+        -- from the template page, so use the args that were passed into the template.
+        if lib_arg.getArgs == nil then lib_arg = require('Module:Arguments') end
+        args = lib_arg.getArgs(frame) --frame
+    else
+        -- We're being called from another module or from the debug console, so assume
+        -- the args are passed in directly.
+        args = frame
+    end
+    working_frame = mw.getCurrentFrame()
+    local base_args = {}
+    for k,v in pairs(args) do
+    	local finder=mw.ustring.lower(k)
+		if mw.ustring.find(finder,'[進进][位制]') or mw.ustring.find(finder,'base') then
+			if finder~='进位制' and finder~='進位制' then
+				local basedata=mw.ustring.gsub(finder,'[進进][位制]','')
+				basedata=mw.ustring.gsub(basedata,'base','')
+				local base_id = basedata
+				xpcall(function()base_id=numberToChinese._numberToChinese(basedata)end,function(err)end)
+				if base_id=='這不是一個數字'then base_id = basedata end
+				base_args[base_id] = v
+			end
+		elseif base_data[finder] then
+			local base_id = numberToChinese._numberToChinese(base_data[finder])
+			base_args[base_id] = v
+		end
+    end
+    local body = ''
+    local test_data = {}
+    for i=0,64 do
+    	if base_args[pre60[i]] then
+    		if mw.text.trim(base_args[pre60[i]]) ~= '' then
+	    		body = body .. '<tr><th>[['.._pre60[i]_.._'進制|'.. pre60[i] .. '進制]]</th><td>'..base_args[pre60[i]]..'</td></tr>'
+    		end
+    		test_data[pre60[i]]=true
+    	end
+    end
+    for k,v in pairs(base_args) do
+    	if not test_data[k] then
+    		if mw.text.trim(v) ~= '' then
+    			body = body .. '<tr><th>[['.._k_.._'進制|'.. k .. '進制]]</th><td>'..v..'</td></tr>'
+    		end
+    	end
+    end
+	return body
+end
+return p

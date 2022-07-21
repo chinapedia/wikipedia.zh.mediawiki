@@ -1,0 +1,209 @@
+{{Documentation subpage}}<!-- 在本行下編輯模板說明 -->
+{{lua|Module:Currency|Module:Currency/Presentation}}
+{{Lua sidebar}}
+
+== 概要 ==
+Formats a currency value with the appropriate symbol which is linked to the article about the currency. If no currency is specified, the template will show the amount in [[United States dollar|United States dollars]].
+
+== 參數及使用方法 ==
+Using unnamed parameters:
+:<code><nowiki>{{</nowiki>currency|{{var|value}}|{{var|code}}|first=|linked=|fmt=|passthrough=}}</code>
+Using named parameters:
+:<code><nowiki>{{</nowiki>currency|amount={{var|value}}|code={{var|code}}|first=|linked=|passthrough=}}</code>
+where:
+:{{var|value}} is a number with or without comma separators; may be followed by an optional quantifier: 'thousand', 'million', 'M', 'billion', 'B', or 'trillion'
+:{{var|code}} is an [[ISO 4217|ISO 4217 currency code]] or one of the supported non-standard codes listed below
+:{{para|first}} when set to any value produces a long-form currency name
+:{{para|linked}} when set to <code>no</code> disables wikilinks on the rendered currency symbol or long-form currency name
+:{{para|fmt}} specifies how {{var|value}} digit-groups are separated:
+::<code>commas</code> (default) separates {{var|value}} digit-groups with commas; this is the default, same as when {{para|fmt}} is empty or omitted
+::<code>gaps</code> separates {{var|value}} digit-groups with narrow gaps
+::<code>none</code> renders {{var|value}} without digit grouping
+Note: Using both named and unnamed parameters may produce unexpected results. In this example, the template expects the first unnamed parameter to be a value number:
+::<code><nowiki>{{Currency|amount=1000|GBP}}</nowiki></code>
+:::{{Currency|amount=1000|GBP}}
+:{{para|passthrough}} specifies whether or not the template should attempt to parse the number according to {{para|fmt}} or just put whatever string is provided in {{para|amount}} directly after the currency sign. Should have value of either {{para|passthrough|yes}} or {{para|passthrough|no}}
+
+When using parameter names, {{para|amount}} and {{para|code}} are preferred.  The template will also accept {{para|Amount}} and {{para|type}} and {{para|Type}}, though.
+
+==非標準貨幣代碼支持==
+===可轉換為ISO 4217貨幣===
+These non-standard codes are aliases of standard ISO 4217 codes.
+{{Div col|colwidth=15em}}
+*EGE
+*EU
+*EURO
+*FRW
+*KSH
+*NEP
+*POUND
+*POUND STERLING
+*RMB
+*TSH
+*UK
+*UNITED STATES
+*US
+*U.S.
+*USA
+*USH
+{{Div col end}}
+
+===其他非標準貨幣代碼===
+These codes either do not have a matching ISO 4217 currency code or are alternate versions of existing ISO 4217 codes or support unique aspects of a currency.
+
+* BITCOIN – no matching ISO 4217 code
+* BTC – no matching ISO 4217 code
+* DKK2 – alternate version of DKK
+* FRF – historical
+* GRD – historical
+* LSL2 – plural version of LSL
+* LTL – historical
+* NOK2 – alternate version of NOK
+* SEK2 – alternate version of SEK
+* SZL2 – plural version of SZL
+* US$ - special case: like the standard codes "USD" (and "$"), but only displays "$" instead of the longer "US$" (for articles where displaying "US$" might appear inappropriately long, but the template should still link to "United States dollar" to avoid any ambiguity)
+* XBT – no matching ISO 4217 code
+
+== 範例 ==
+Currencies other than the [[United States dollar]] can be rendered by using the appropriate [[ISO 4217|ISO 4217 currency code]]
+*{{xpsoc|Currency|1000|BMD}}（[[百慕達元|Bermudian dollar]]）
+*{{xpsoc|Currency|1000|BDT}}（[[孟加拉塔卡|Bangladeshi taka]]）
+*{{xpsoc|Currency|1000|AMD}}（[[亚美尼亚德拉姆|Armenian dram]]）
+
+Some of the more well known currencies also provide the ability to use common abbreviations or full names.
+*{{xpsoc|Currency|1000|us}}
+*{{xpsoc|Currency|1000|United States}}
+*{{xpsoc|Currency|1,000|JPY}}
+
+Parameter names can also be used, if preferred:
+*<code><nowiki>{{Currency|amount=1000|code=US}}</nowiki></code> → {{Currency|amount=1000|code=US}}
+*<code><nowiki>{{Currency|1000|code=euro}}</nowiki></code> → {{Currency|1000|code=euro}}
+
+Negative amount:
+*<code><nowiki>{{Currency|amount=-1000|code=US}}</nowiki></code> → {{Currency|amount=-1000|code=US}}
+
+Text quantifiers:
+*<code><nowiki>{{Currency|1000 million|code=euro}}</nowiki></code> → {{Currency|1000 million|code=euro}}
+*<code><nowiki>{{Currency|1000M|code=euro}}</nowiki></code> → {{Currency|1000M|code=euro}}
+
+The first use of a currency should show the value and the full name of the currency, so if the "first" parameter is defined then that is what will be given.
+*<code><nowiki>{{Currency|1000|cve|first=yes}}</nowiki></code> → {{Currency|1000|cve|first=yes}}
+*{{xpsoc|Currency|1000|cve}}
+
+Because the symbol for the currencies DKK, NOK, and SEK may be ambiguous, these may be represented in two ways:
+*For DKK:
+*:{{xpsoc|Currency|1000|dkk}}
+*:{{xpsoc|Currency|1000|dkk2}}
+*For NOK:
+*:{{xpsoc|Currency|1000|NOK}}
+*:{{xpsoc|Currency|1000|NOK2}}
+*For SEK:
+*:{{xpsoc|Currency|1000|SEK}}
+*:{{xpsoc|Currency|1000|SEK2}}
+
+Similarly, some currencies use different symbols for single and plural amounts:
+*:{{xpsoc|Currency|1|LSL}}
+*:{{xpsoc|Currency|1000|LSL2}}
+*::''The template does not currently make this distinction automatically so it is the responsibility of the editor using these kinds of codes to get the code right.''
+
+Digit grouping:
+*{{para|fmt|commas}}
+*:<code><nowiki>{{Currency|1000 million|code=euro|fmt=commas}}</nowiki></code> → {{Currency|1000 million|code=euro|fmt=commas}}
+*{{para|fmt|gaps}}
+*:<code><nowiki>{{Currency|1000 million|code=euro|fmt=gaps}}</nowiki></code> → {{Currency|1000 million|code=euro|fmt=gaps}}
+*{{para|fmt|none}}
+*:<code><nowiki>{{Currency|1000 million|code=euro|fmt=none}}</nowiki></code> → {{Currency|1000 million|code=euro|fmt=none}}
+
+Passthrough:
+*{{para|passthrough|yes}}
+*:<code><nowiki>{{Currency|6 million|PHP|passthrough=yes}}</nowiki></code> → {{Currency|6 million|PHP|passthrough=yes}}
+*:<code><nowiki>{{Currency|6 trillion|PHP|passthrough=yes}}</nowiki></code> → {{Currency|6 trillion|PHP|passthrough=yes}}
+*:<code><nowiki>{{Currency|6 tn|PHP|passthrough=yes}}</nowiki></code> → {{Currency|6 tn|PHP|passthrough=yes}}
+*{{para|passthrough|no}}
+*:<code><nowiki>{{Currency|6 million|PHP|passthrough=no}}</nowiki></code> → {{Currency|6 million|PHP|passthrough=no}}
+*:<code><nowiki>{{Currency|6 trillion|PHP|passthrough=no}}</nowiki></code> → {{Currency|6 trillion|PHP|passthrough=no}}
+*:<code><nowiki>{{Currency|6 tn|PHP|passthrough=no}}</nowiki></code> gives: {{Currency|6 tn|PHP|passthrough=no}} (error expected, as template doesn't know how to parse {{code|6 tn}} to {{code|6,000,000,000,000}})
+*''Use sparingly! Usually you want {{para|fmt}} instead. {{para|passthrough}} should only be used in ways compatible with [[MOS:CURRENCY]].''
+
+==錯誤訊息==
+{{tld|currency}} can produce several error message.  These are:
+*<span style="font-size:inherit" class="error"><nowiki>{{currency}}</nowiki> – invalid code</span> – the value in the second unnamed parameter or assigned to {{para|code}} cannot be found in the template's list of codes.  Make sure that the assigned code is a correct ISO 4217 currency code or one of the supported non-standard codes listed above.
+*<span style="font-size:inherit" class="error"><nowiki>{{currency}}</nowiki> – invalid amount</span> – the value in the first unnamed parameter or assigned to {{para|amount}} contains one or more characters that is not a minus sign, a digit, comma, or decimal point, or has some text that is not one of the permitted quantifiers.  Make sure that comma separators group three digits and that the number has only one decimal point.  Make sure that the amount and code parameters are either both named ({{para|amount}} and {{para|code}}) or both unnamed.
+*<span style="font-size:inherit" class="error"><nowiki>{{currency}}</nowiki> – definition missing position</span> – an internal error that should only occur when an editor is mucking about in [[Module:Currency/Presentation]].  It indicates that [[Module:Currency]] doesn't know where to place the currency's symbol in relation to its value.
+*<span style="font-size:inherit" class="error"><nowiki>{{currency}}</nowiki> – definition missing page</span> – an internal error that should only occur when an editor is mucking about in Module:Currency/Presentation.  It indicates that Module:Currency doesn't have a page that it can use to link the currency's symbol or name.
+<!--
+== 重定向 ==
+
+== 注意事项 ==
+
+== 模板编辑说明 ==
+-->
+
+==TemplateData==
+{{TemplateData header}}
+<templatedata>
+{
+	"format": "inline",
+	"params": {
+		"1": {
+			"aliases": [
+				"amount",
+				"Amount"
+			],
+			"label": "Amount",
+			"description": "The value in the given currency",
+			"required": true,
+			"type": "line"
+		},
+		"2": {
+			"aliases": [
+				"code",
+				"type",
+				"Type"
+			],
+			"label": "Currency",
+			"description": "The currency represented. Should be a valid ISO&nbsp;4217 code or one of the special codes listed on the template’s page",
+			"example": "USD",
+			"default": "USD",
+			"suggested": true,
+			"type": "line"
+		},
+		"first": {
+			"label": "Long form",
+			"description": "When set to any value, produces a long-form currency name. This should be used for the first mention of a currency within the article",
+			"type": "line"
+		},
+		"linked": {
+			"label": "Link currency",
+			"description": "Whether to link to the article on that currency. “no” suppresses the link, any other value displays it",
+			"example": "no",
+			"default": "yes",
+			"type": "line"
+		},
+		"fmt": {
+			"label": "Format",
+			"description": "Specifies how value digit-groups are separated: commas, gaps or none",
+			"example": "gaps",
+			"default": "commas",
+			"type": "line"
+		},
+		"passthrough": {
+			"label": "Passthrough",
+			"description": "If \"yes\", put the string in Amount directly after its symbol without turning it into a number.",
+			"example": "yes",
+			"default": "no",
+			"type": "line"
+		}
+	}
+}
+</templatedata>
+
+== 參見 ==
+* {{tl|Format price}}, a template that handles rounding and "big number" formatting
+* {{tl|Inflation}}, a template that adjusts historical costs to current (or other-year) equivalent value
+* {{tlx|Infobox currency}}
+
+<includeonly>{{Sandbox other||<!-- 本行下加入模板的分類 -->
+[[Category:货币模板]]
+[[Category:金融模板]]
+}}</includeonly>

@@ -1,0 +1,182 @@
+local p,lib_arg ={},{}
+function p.main(frame)
+-- For calling from #invoke.
+    local args, working_frame
+    if frame == mw.getCurrentFrame() then
+        -- We're being called via #invoke. The args are passed through to the module
+        -- from the template page, so use the args that were passed into the template.
+        if lib_arg.getArgs == nil then lib_arg = require('Module:Arguments') end
+        args = lib_arg.getArgs(frame) --frame
+    else
+        -- We're being called from another module or from the debug console, so assume
+        -- the args are passed in directly.
+        args = frame
+    end
+    working_frame = mw.getCurrentFrame()
+    local yesno = require('Module:Yesno')
+    local is_article = (mw.title.getCurrentTitle().namespace==0)
+    local is_test_article=yesno(working_frame.args.TestIsArticle) or yesno(args.TestIsArticle)
+    if is_test_article then is_article = true end
+
+	local check_flag = yesno(working_frame.args.checkOnly)
+    local chembox_str,start,chembox_start,chembox_end='',0,'',''
+    if not check_flag then
+		chembox_str = working_frame:preprocess('{{Chembox CASNo}}')
+		start=mw.ustring.find(chembox_str, '|', 1+({mw.ustring.find(chembox_str, '\n')})[1] )
+		chembox_start, chembox_end = mw.ustring.sub(chembox_str,1,start), mw.ustring.sub(chembox_str,start+1,-1)
+	end
+	local casData = {}
+	local lower_args = {}
+	for k,v in pairs(args) do
+		if mw.ustring.find(k,'CAS') then
+			local check_id = mw.ustring.gsub(k, '%d+', function(str) check_id = check_id or tonumber(str) end )
+			local check_k = mw.ustring.lower(k)
+			local norm_k = check_k
+			local argtype = 'number'
+			lower_args[check_k]=v
+		
+			
+			if mw.ustring.find(check_k,'ref') then argtype = 'ref'
+				norm_k = mw.ustring.gsub(norm_k,'[_%s]-ref','')
+			elseif mw.ustring.find(check_k,'comment') or mw.ustring.find(check_k,'cmt') or mw.ustring.find(check_k,'supplemental') then argtype = 'comment'
+				norm_k = mw.ustring.gsub(mw.ustring.gsub(mw.ustring.gsub(norm_k,'[_%s]-comment',''),'[_%s]-cmt',''),'[_%s]-supplemental','')
+			elseif mw.ustring.find(check_k,'ur[li]') then argtype = 'url'
+				norm_k = mw.ustring.gsub(norm_k,'[_%s]-ur[li]','')
+			else
+			end
+			casData[norm_k] = casData[norm_k] or {}
+			if argtype == 'number' or argtype == 'url' then
+				casData[norm_k][argtype] = casData[norm_k][argtype] or v
+			else
+				local casData_temp = casData[norm_k][argtype]
+				if casData_temp then casData_temp = casData_temp .. '、' .. v
+				else casData_temp = v
+				end
+				casData[norm_k][argtype] = casData_temp
+			end
+		end
+	end
+
+	local norm_casData = {}
+	local casDataChecker = {}
+	for k,v in pairs(casData) do
+		if not v.number then
+			local fst,lst = mw.ustring.find(k,'%d+')
+			local head_s, end_s = mw.ustring.sub(k,1,(fst or-1)-1), mw.ustring.sub(k,fst or -1,-1)
+			if not fst then head_s,end_s=k,'' end
+			local temp_data = casData[head_s..'number'..end_s] or casData[head_s..'_number'..end_s] or casData[head_s..'number_'..end_s] or casData[head_s..'_number_'..end_s]
+			if not norm_casData[k] then
+				norm_casData[k]={}
+				for k1,v1 in pairs(v) do norm_casData[k][k1]=v1 end
+				for k1,v1 in pairs(temp_data or {}) do norm_casData[k][k1]=norm_casData[k][k1] or v1 end
+			end
+			if (temp_data or {}).number then
+			casDataChecker[temp_data.number]=true
+			end
+		end
+	end
+	for k,v in pairs(casData) do
+		if v.number then
+			if not norm_casData[k] then
+				if not casDataChecker[v.number] then
+					norm_casData[k]={}
+					for k1,v1 in pairs(v) do norm_casData[k][k1]=v1 end
+				end
+			end
+		end
+	end
+
+	local count = 0
+	local body = ''
+	local last = nil
+	local no_ref=false
+	local no_index=false
+	local is_none = false
+	for k,v in pairs(norm_casData) do
+		if not check_flag and mw.ustring.lower(v.number or "") == 'none' and is_article and yesno(working_frame.args.hideNone) then 
+			require('Module:TrackingCategory').append(working_frame,'暫未分配CAS號的化學物質')
+			if is_test_article then return '[[Category:暫未分配CAS號的化學物質|Category:暫未分配CAS號的化學物質]]' end
+			return ''
+		end
+		com_check = mw.ustring.lower(v.comment or "")..mw.ustring.lower(v.ref or "")
+		if not check_flag and mw.ustring.find(com_check,"%d%d+%-%d%d-%d") and is_article then 
+			require('Module:TrackingCategory').append(working_frame,'CAS號參數誤植的條目')
+			if is_test_article then body=body..'[[Category:CAS號參數誤植的條目|Category:CAS號參數誤植的條目]]' end
+		end
+
+		local check_k = mw.ustring.lower(k)
+		if mw.ustring.find(check_k,'nos') or mw.ustring.find(check_k,'other') then
+			if body~='' then body = body .. '<br/>' end
+			body = body .. v.number .. (v.comment and ' ' .. v.comment or '') .. (v.ref and ' ' .. v.ref or '')
+			no_index = true
+		else
+			if v.number then
+				if not v.ref then no_ref=true end
+				
+				if not check_flag and mw.ustring.find(v.number,"[^%d%s-]") and mw.ustring.lower(v.number or "") ~= 'none' and is_article then 
+					require('Module:TrackingCategory').append(working_frame,'CAS號參數格式不正確的條目')
+					if is_test_article then body=body..'[[Category:CAS號參數格式不正確的條目|Category:CAS號參數格式不正確的條目]]' end
+				end
+				
+				count = count + 1
+				if not check_flag then 
+					body = body .. require('Module:Template invocation').invocation('Chembox CASCheck', {
+						count=count,
+						value=v.number,
+						value_url=v.url,
+						value_comment=v.comment,
+						value_ref=v.ref,
+						value0=last
+					})
+				end
+				last=v.number
+			end
+		end
+	end
+	if check_flag then if count==0 then return '' else return'1' end end
+	if is_article then
+		if no_ref then body=body..'[[Category:未提供參考文獻的CAS號|Category:未提供參考文獻的CAS號]]' end
+		if no_index then body=body..'[[Category:含有未被索引CAS號的條目|Category:含有未被索引CAS號的條目]]' end
+		if count==0 and yesno(working_frame.args.tagNoInput) then body=body..'[[Category:没有CAS注册号的化学条目|Category:没有CAS注册号的化学条目]]' end
+	else
+		body = require('Module:Delcat').delete_category(working_frame:preprocess(body),{})
+	end
+	if yesno(working_frame.args.inChembox) then
+		body = chembox_start..body..chembox_end
+	end
+
+	return working_frame:preprocess(body)
+end
+
+function p.checkHeader(frame)
+-- For calling from #invoke.
+    local args, working_frame
+    if frame == mw.getCurrentFrame() then
+        -- We're being called via #invoke. The args are passed through to the module
+        -- from the template page, so use the args that were passed into the template.
+        if lib_arg.getArgs == nil then lib_arg = require('Module:Arguments') end
+        args = lib_arg.getArgs(frame) --frame
+    else
+        -- We're being called from another module or from the debug console, so assume
+        -- the args are passed in directly.
+        args = frame
+    end
+    working_frame = mw.getCurrentFrame()
+    local magic_str='{{subst:void|僅能透過模板內部呼叫}}'
+    local input_str = working_frame.args[1] or working_frame.args['1']
+    local arg_str = working_frame.args[2] or working_frame.args['2']
+    if input_str then
+    	local start = mw.ustring.len(magic_str) + 1
+    	local check_start = mw.ustring.lower(mw.ustring.sub(input_str,1,start-1))
+    	if mw.ustring.lower(check_start) ~= mw.ustring.lower(magic_str) then
+    		if arg_str then mw.addWarning( '錯誤! 參數 \''.. arg_str ..'\' 僅能由模板呼叫。' ) end
+    		require('Module:TrackingCategory').append(working_frame,'CAS號參數誤植的條目')
+    		require('Module:TrackingCategory').append(working_frame,'含有未被索引CAS號的條目')
+    		return input_str
+    	else return mw.ustring.sub(input_str,start,-1)
+    	end
+    else return magic_str
+    end
+end
+
+return p

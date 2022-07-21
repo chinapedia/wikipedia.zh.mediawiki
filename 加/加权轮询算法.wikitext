@@ -1,0 +1,83 @@
+ 
+'''加权轮询'''（ '''Weighted round robin''' ）是网络中用于调度数据流的算法，也可用于[[调度_(计算机)|调度进程]]。
+
+加权轮询<ref name="WRR-ATM-1991">{{Cite journal|title=Weighted round-robin cell multiplexing in a general-purpose ATM switch chip|last=Katevenis|first=M.|last2=Sidgiropoulos|first2=S.|journal=IEEE Journal on Selected Areas in Communications|issue=8|doi=10.1109/49.105173|year=1991|volume=9|pages=1265–1279|issn=07338716|last3=Courcoubetis|first3=C.}}</ref>是[[循環制|轮询调度]]的一般化。加权轮询在队列或一系列任务上循环，每个轮次中各数据包或进程按权重获得运行机会。
+
+加权轮询<ref name="WRR-2003">{{Cite journal|title=Fair scheduling with tunable latency: A round-robin approach|last=Chaskar|first=H.M.|last2=Madhow|first2=U.|journal=IEEE/ACM Transactions on Networking|issue=4|doi=10.1109/TNET.2003.815290|year=2003|volume=11|pages=592–601|issn=1063-6692}}</ref>有若干种类，比如经典加权轮询和交替加权轮询。
+
+== 算法 ==
+下面以网络调度程序为例介绍加权轮询。
+
+假设有<math>n</math>个输入队列<math>q_1,...,q_n</math>。每个队列<math>q_i</math>的权重是一个正整数<math>w_i</math>。使用加权轮询时，队列运行过程有周期性。在每个周期中，队列<math>q_i</math>有<math>w_i</math>次发送机会。
+
+不同的加权轮询算法的区别是在一个周期中如何分配机会。
+
+=== 经典加权轮询 ===
+采用经典加权轮询算法时<ref name="WRR-2003">{{Cite journal|title=Fair scheduling with tunable latency: A round-robin approach|last=Chaskar|first=H.M.|last2=Madhow|first2=U.|journal=IEEE/ACM Transactions on Networking|issue=4|doi=10.1109/TNET.2003.815290|year=2003|volume=11|pages=592–601|issn=1063-6692}}</ref><ref name="CPN-WRR-ETFA06">{{Cite journal|title=Modelling and Simulation of Scheduling Policies Implemented in Ethernet Switch by Using Coloured Petri Nets|last=Brahimi|first=B.|last2=Aubrun|first2=C.|doi=10.1109/ETFA.2006.355373|year=2006|pages=667–674|last3=Rondeau|first3=E.}}</ref>，调度程序会在队列间循环。轮到队列<math>q_i</math>时，调度程序开始发送数据包，直到发出<math>w_i</math>个数据包或遇到队尾为止。
+{|
+|-
+| colspan="2" |
+ '''常量和变量:''' 
+     const N             // 队列数 N
+     const weight[1..N]  // 每个队列的权重
+     queues[1..N]        // 队列
+     i                   // 队列序号
+     c                   // 数据包计数器
+     
+ '''指令:'''
+ '''while''' true '''do''' 
+    '''for''' i '''in''' 1 .. N '''do'''
+       c:= 0
+       '''while''' (not queue[i].empty) and (c<weight[i]) '''do'''
+          send( queue[i].head() )
+          queue[i].dequeue()
+          c:= c+1
+|}
+
+=== 交替加权轮询 ===
+令<math>w_{max}=\max\{ w_i \}</math>为所有队列中的最大权重。在交替加权轮询算法中<ref name="WRR-ATM-1991">{{Cite journal|title=Weighted round-robin cell multiplexing in a general-purpose ATM switch chip|last=Katevenis|first=M.|last2=Sidgiropoulos|first2=S.|journal=IEEE Journal on Selected Areas in Communications|issue=8|doi=10.1109/49.105173|year=1991|volume=9|pages=1265–1279|issn=07338716|last3=Courcoubetis|first3=C.}}</ref><ref name="Juniper-Queuing">{{Cite report|url=http://users.jyu.fi/~timoh/kurssit/verkot/scheduling.pdf|title=Supporting Differentiated Service Classes: Queue Scheduling Disciplines|last=Semeria|first=Chuck|pages=15-18|access-date=4 May 2020|date=|archive-date=2017-08-29|archive-url=https://web.archive.org/web/20170829012038/http://users.jyu.fi/~timoh/kurssit/verkot/scheduling.pdf|dead-url=no}}</ref>，每个周期分为<math>w_{max}</math>轮。第<math>r</math>轮中，如果<math>r \leq w_i</math>，队列i可以发送一个数据包。
+{|
+|-
+| colspan="2" |
+ '''常量和变量:''' 
+     const N             // 队列数 N 
+     const weight[1..N]  // 每个队列的权重
+     const w_max
+     queues[1..N]        // 队列
+     i                   // 队列序号
+     r                   // 轮次计数器
+     
+ '''指令:'''
+ '''while''' true '''do'''
+    '''for''' r '''in''' 1 .. w_max '''do''' 
+       '''for''' i '''in''' 1 .. N '''do'''
+          '''if''' (not queue[i].empty) and (weight[1..N] >= r)'''then'''
+             send( queue[i].head() )
+             queue[i].dequeue()
+|}
+
+=== 示例 ===
+[[File:WRR-Examples.svg|居中]]
+假设一个系统有三个队列<math>q_1,q_2,q_3</math>, 其各自的权重<math>w_1=5,w_2=2,w_3=3</math>。第一个队列中有7个数据包'''A，B，C，D，E，F，G'''，第二队列中为3个数据包'''U，V，W'''，第三个队列中有两个数据包'''X，Y'''。且不会有新数据包到达。
+
+如果使用经典加权轮询算法，在第一个周期中，调度程序首先选择<math>q_1</math>并传送位于队列头部的'''A，B，C，D，E'''（因为<math>w_1=5</math>），然后选择第二个队列<math>q_2</math> ，传送队列开头的'''U，V'''（因为<math>w_2=2</math>），最后选择第三个队列，该队列的权重等于3，然而该队列一共只有两个数据包，因此传输'''X，Y''' 。在'''Y'''的传输完毕后，第二个周期开始，先是发送<math>q_1</math>中的'''F，G'''，然后是<math>q_2</math>中的'''W'''。
+
+如果使用交替加权轮询算法，第一个周期分为5轮。第一轮（'''r = 1'''），每个队列发送一个数据包（'''A，U，X'''），第二轮（'''r = 2'''），每个队列再发送一个数据包（'''B，V，Y'''），第三轮（'''r = 3'''），仅排队<math>q_1,q_3</math>被允许发送数据包（'''<math>w_1 >= r</math>'''，'''<math>w_2 < r</math>''' 和 '''<math>w_3 >= r</math>'''），但由于<math>q_3</math>为空，只有来自<math>q_1</math>的'''C'''被发送，在第四和第五轮，只有'''D，E'''从<math>q_1</math>被发送。然后开始第二个周期，依次发送'''F，W，G'''。
+
+== 任务调度 ==
+与数据包调度类似，加权轮询完成任务或进程调度时：<math>n</math>个现行任务以循环方式安排，每个任务<math>\tau_i</math>得到<math>w_i</math>份的处理器时间<ref name="Beaulieu-Course">{{Cite web|title=Real Time Operating Systems -- Scheduling & Schedulers|url=http://beaulieu.segfaults.net/courses/17w/EEE499/lecture/07%20-%20Scheduling%20and%20Schedulers.pdf|accessdate=4 May 2020|author=Beaulieu|date=Winter 2017|first=Alain|quote=}}{{Dead link}}</ref><ref name="WRR-Pattent">
+{{Cite patent|number=20190266019|url=http://www.freepatentsonline.com/y2019/0266019.html}}
+</ref> 。
+
+== 性质 ==
+调度数据包时，如果所有数据包都具有相同的大小，则WRR是通用处理器共享算法的近似<ref name="kfall-lecture">{{Cite web|title=EECS 122, "Introduction to Communication Networks", Lecture 27, "Scheduling Best-Effort and Guaranteed Connections"|url=http://kfall.net/ucbpage/EE122/lec27/sld006.htm|accessdate=4 May 2020|author=Fall|date=29 April 1999|first=Kevin|publisher=|quote=|archive-date=2012-07-22|archive-url=https://web.archive.org/web/20120722185252/http://kfall.net/ucbpage/EE122/lec27/sld006.htm|dead-url=no}}</ref>：长期来看，队列<math>q_i</math>将占据<math>\frac{w_i}{\sum_{j=1}^n w_j}</math>的带宽（假设所有队列均处于现行状态）。
+
+如果数据包长度可变，则每个队列接收的带宽部分不仅取决于权重，还取决于数据包大小。
+
+如果队列<math>q_i</math>的平均数据包大小是<math>s_i</math>，则每个队列将获得的长期带宽份额等于<math>\frac{s_i \times w_i}{\sum_{j=1}^n s_j \times w_j}</math> 。如果目标是给每个队列<math>q_i</math>分配链接容量的<math>\rho_i</math>（ <math>\sum_{i=1}^n \rho_i=1</math> ），则可以设置权重<math>w_i = \frac{\rho_i}{s_i}</math>。
+
+== 参考文献 ==
+{{Reflist}}
+
+[[Category:網路算法|Category:網路算法]]
+[[Category:网络性能|Category:网络性能]]

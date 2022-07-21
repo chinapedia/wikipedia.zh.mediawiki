@@ -1,0 +1,169 @@
+{{NoteTA|G1=IT}}
+{{Infobox programming language
+| title = Ur
+| name = Ur, Ur/Web 
+| logo = 
+| logo caption =
+| family = [[ML语言|ML]]
+| released = {{start date and age|2014|12}} <ref>{{Cite web |url=https://www.reddit.com/r/programming/comments/2qbdm0/urweb_is_out_of_beta/ |title=UrWeb is out of beta |access-date=2021-03-03 |archive-date=2016-06-04 |archive-url=https://web.archive.org/web/20160604202848/https://www.reddit.com/r/programming/comments/2qbdm0/urweb_is_out_of_beta/ }}</ref> 
+| designer = Adam Chlipala
+| latest release version = 20200209
+| latest release date = {{start date and age|2020|02|09}}
+| implementations =
+| influenced by = [[ML语言|ML]]<ref name="ur-pl-family">{{cite web
+   | url = http://impredicative.com/ur/
+   | title = The Ur Programming Language Family
+   | publisher = impredicative.com/ur
+   | access-date = 3 April 2016
+   | archive-date = 2020-11-30
+   | archive-url = https://web.archive.org/web/20201130055351/http://www.impredicative.com/ur/
+   }}</ref>, [[Haskell|Haskell]]
+| platform = [[POSIX|POSIX]]
+| license = [[BSD许可证|三条款BSD许可证]]
+| website = {{url|impredicative.com/ur}}
+| paradigms = [[函数式编程|函数式]], [[响应式编程|响应式]]
+| developers = 
+| file ext = .ur, .urs, .urp
+| file format = 
+}}
+'''Ur'''也叫作'''Ur/Web'''，是一个[[自由软件|自由]]和[[开源软件|开源]]的[[函数式编程|函数式]][[编程语言|编程语言]]，专门用于[[網頁程式設計|web开发]]，由Adam Chlipala在[[麻省理工学院|麻省理工学院]]创建<ref>{{cite web | url = http://adam.chlipala.net/papers/UrWebPOPL15/UrWebPOPL15.pdf | author = Adam Chlipala | title = Ur/Web: A Simple Model for Programming the Web | publisher = MIT / Association for Computing Machinery (ACM) | date = January 2015 | access-date = 2021-09-04 | archive-date = 2022-01-16 | archive-url = https://web.archive.org/web/20220116210303/http://adam.chlipala.net/papers/UrWebPOPL15/UrWebPOPL15.pdf }}</ref>，它从一个单一的程序产生[[服务器|服务器]]代码、[[web浏览器|web浏览器]]客户端代码、和特定于选择的[[数据库|数据库]][[前端和后端|后端]]的[[SQL|SQL]]代码。
+
+==概述==
+Ur的语法基于了[[Standard_ML|Standard ML]]，然而语言也包括来自[[Haskell|Haskell]]的概念，具有额外的类型操纵。Ur支持一种基于行类型的强力的[[元编程|元编程]]<ref name="ur-pl-family"/>。Ur/Web是Ur加上特殊的标准库和用于[[语法分析|解析]]和优化的关联规则。Ur/Web编译器还产生不使用[[垃圾回收_(计算机科学)|垃圾回收]]的非常高效的目标代码<ref name="ur-pl-family"/>。所有这些实现都是[[开源软件|开放源代码]]的<ref name="ur-pl-family"/>。
+
+Ur/Web支持构造以[[SQL|SQL]]数据库为后端的[[动态网页|动态web应用]]。嵌入到语言中的[[SQL|SQL]]语法模板便利了表格处理。浏览器客户端，包括了[[函数式响应式编程|函数式响应式编程]]设施，使用了<code>(source a)</code>类型和<code>signal</code>[[单子_(函数式编程)|单子]]。[[Ajax|Ajax]]调用/反响，通过叫作“[[事务处理|事务]]”（对应于[[Haskell|Haskell]]的IO）的[[单子_(函数式编程)|单子]]来[[序列化|序列化]]，并且它的集结和解码被封装在rpc函数中。
+
+标准库的签名（signature），使得有良好类型的Ur/Web程序，在非常宽广的意义上不会出错。不只是在特定页面生成期间不崩溃，它们还能够做到<ref name="ur-pl-family"/>：
+* 不遭受任何种类的[[代码注入|代码注入]]攻击。
+* 不返回无效的[[HTML|HTML]]。
+* 不包含应用内部死链接。
+* 在[[网页表单|HTML表单]]和它们的处理器所预期的字段之间，没有不匹配。
+* 不包括对远程web服务器提供的[[Ajax|Ajax]]风格服务有不正确假定的客户端代码。
+* 不尝试无效的[[SQL|SQL]]查询。
+* 在[[web浏览器|web浏览器]]和[[web服务|web服务]]之间或与[[SQL|SQL]][[数据库|数据库]]的通信中，不使用不正确的[[Marshalling_(计算机科学)|集结]]（marshaling）或解散（unmarshaling）。
+这种[[类型安全|类型安全]]正是Ur/Web方法论的基础。还有可能使用元编程，通过分析类型结构来建造重要的应用部件<ref name="ur-pl-family"/>。
+
+== 例子程序 ==
+
+下面是展示客户端、服务器和数据库采用[[Ajax|Ajax]]通信的演示程序，来自web demos<ref>{{Cite web |url=http://impredicative.com/ur/demo/ |title=Ur language demo programs |access-date=2021-03-04 |archive-date=2020-11-12 |archive-url=https://web.archive.org/web/20201112000544/http://www.impredicative.com/ur/demo/ }}</ref>，有着勾画每个构件的额外注释：
+
+接口文件（类似[[Standard_ML|ML]]的签名）具有<code>.urs</code>扩展名：
+<syntaxhighlight lang="sml">
+(* 环境单子叫做transaction，对应于Haskell的IO单子 *)
+val main : unit -> transaction page
+</syntaxhighlight>
+
+实现文件（<code>.ur</code>扩展名）：
+<syntaxhighlight lang="sml">
+datatype list t = Nil | Cons of t * list t
+
+table t : { Id : int, A : string }
+  PRIMARY KEY Id
+
+(* 服务器端数据库访问，通过AJAX XmlHttpRequest调用，
+                    封装为rpc函数(远程过程调用) *)
+fun add id s =
+    (* sql dml模板，据有表达式{[expression]} *)
+    dml (INSERT INTO t (Id, A) VALUES ({[id]}, {[s]}))
+
+fun del id =
+    dml (DELETE FROM t WHERE t.Id = {[id]})
+
+fun lookup id =
+    (* haskell风格单子代码 *)
+    ro <- oneOrNoRows (SELECT t.A FROM t WHERE t.Id = {[id]});
+    case ro of
+        None => return None           (* return是单子提升函数 *)
+      | Some r => return (Some r.T.A)
+
+(* check由客户端onClick事件处理器调用，
+               所以它将被编译成JavaScript，成为嵌入了客户端脚本的页面 *)
+fun check ls =
+    case ls of
+        Nil => return ()
+      | Cons (id, ls') =>
+            ao <- rpc (lookup id);      (* Ajax调用至服务器端 *)
+            alert (case ao of
+                   None => "Nada"
+                 | Some a => a
+                 );
+            check ls'
+
+fun main () =
+    idAdd <- source "";
+    aAdd <- source "";
+
+    idDel <- source "";
+
+    (* 生成包含有JavaScript的web页面 *)
+    return <xml><body>
+      <button value="Check values of 1, 2, and 3"
+              onclick={fn _ => let val mylist = 1 :: 2 :: 3 :: []
+                               in
+                                  check mylist
+                               end
+                               }/><br/>
+      <br/>
+      <button value="Add"
+              onclick={fn _ => id <- get idAdd;
+                               a <- get aAdd;
+                               rpc (add (readError id) a)  (* Ajax调用到服务器端 *)
+                               }/>
+      <ctextbox source={idAdd}/>
+      <ctextbox source={aAdd}/><br/>
+      <br/>
+      <button value="Delete"
+              onclick={fn _ => id <- get idDel;
+                               rpc (del (readError id))    (* Ajax调用到服务器端 *)
+                               }/>
+      <ctextbox source={idDel}/>
+    </body></xml>
+</syntaxhighlight>
+
+项目文件（<code>.urp</code>扩展名），必须包含可选的指令（directive）列表，跟随着项目模块的列表<ref>{{cite web
+   | url = https://enn.github.io/urweb-doc/node5.html
+   | last = Chlipala
+   | first = Adam
+   | author-link = Adam Chlipala
+   | title = The Ur/Web Manual – Project files
+   | publisher = urweb-doc
+   | date = January 2015
+   | access-date = 8 January 2015
+   | archive-date = 2016-03-04
+   | archive-url = https://web.archive.org/web/20160304064757/http://enn.github.io/urweb-doc/node5.html
+   }}</ref>：
+<syntaxhighlight lang="shell">
+ # hash号前缀于行注释
+ rewrite url Module1/main        # 设置根URL至Module1/main函数
+ exe myexename
+ database dbname=test            # 数据库特性和参数
+ sql noisy.sql
+
+ $/list     # stdlib模块前缀着"$/"
+ module2    # 如果被module1所用则必须前导于它
+ module1    # main模块
+</syntaxhighlight>
+* 服务器端，没有副作用的检索函数的页面（HTTP<code>GET</code>方法），经由一个URL而可访问为<code>/ModulePath/functionName</code>，它们应当具有类型<code>(unit -> transaction page)</code>。
+* 要导出可能导致副作用的一个页面，只能通过HTTP<code>POST</code>方法来访问，包括指定页面处理器的一个实际参数，它具有类型<code>Basis.postBody</code><ref>{{Cite web |url=https://enn.github.io/urweb-doc/node54.html |title=The Ur/Web Manual - The Structure of Web Applications |access-date=2021-03-04 |archive-date=2016-03-04 |archive-url=https://web.archive.org/web/20160304094503/http://enn.github.io/urweb-doc/node54.html }}</ref>。
+
+编译：
+<syntaxhighlight lang="bash">
+ urweb module1   # 查找module1.urp
+</syntaxhighlight>
+作为一个web服务器来执行（其他模态有[[通用网关接口|CGI]]、[[FastCGI|FastCGI]]等等）：
+<syntaxhighlight lang="bash">
+ ./module1.exe -p 8081   # -h : RTS选项帮助
+</syntaxhighlight>
+
+== 引用 ==
+{{reflist|2}}
+
+== 外部链接 ==
+* [http://impredicative.com/ur Ur language home page] {{Wayback|url=http://impredicative.com/ur |date=20201130055351 }}
+* [https://github.com/urweb/urweb Ur/Web project page on GitHub] {{Wayback|url=https://github.com/urweb/urweb |date=20201108143325 }}
+* [http://www.impredicative.com/wiki/index.php/Special:AllPages Ur wiki] {{Wayback|url=http://www.impredicative.com/wiki/index.php/Special:AllPages |date=20190201013135 }}
+
+{{程序设计语言}}
+[[Category:函数式编程语言|Category:函数式编程语言]]
+[[Category:ML语言家族|Category:ML语言家族]]
+[[Category:麻省理工學院|Category:麻省理工學院]]

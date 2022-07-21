@@ -1,0 +1,631 @@
+{{NoteTA|G1=Geography}}
+[[File:Claudius_Ptolemy-_The_World.jpg|thumb]]》中的坐标为基础，利用他的第二幅地图投影绘制而成]]
+在[[地图学|地图学]]中，'''地图投影'''（{{lang-en|map projection}}）是一种将[[地球儀|地球]]表面展平的方法，以便制作地图，这就需要一种方法将球面上的点转换为[[平面_(数学)|平面]]上的点。<ref name='Snyder1453'>{{cite book
+ |author       = Snyder, J.P.
+ |title        = Album of Map Projections, United States Geological Survey Professional Paper
+ |id           = 1453
+ |publisher    = United States Government Printing Office
+ |year         = 1989
+ |url          = https://pubs.er.usgs.gov/usgspubs/pp/pp1453
+ |access-date  = 2020-12-27
+ |archive-date = 2010-07-01
+ |archive-url  = https://web.archive.org/web/20100701102858/http://pubs.er.usgs.gov/usgspubs/pp/pp1453
+ |dead-url     = yes
+}}</ref> 将球体投影到平面上，球面必然会有一定程度的变形，根据地图的目的，有些变形是可以接受的，有些则是不可以接受的，因此，为了保留球面的某些性质而牺牲其他性质，就存在不同的地图投影。<ref name="SnyderFlattening">
+{{cite book
+  | author    = Snyder, John P.
+  | title     = Flattening the earth: two thousand years of map projections
+  | publisher = [[芝加哥大學出版社|University of Chicago Press]]
+  | year      = 1993
+  | isbn      = 0-226-76746-9
+  }}
+</ref>{{rp|1}} 研究地图投影就是研究变形的特征。潜在的地图投影有无数种。投影是一些纯数学领域的主题，包括[[微分几何|微分几何]]、[[射影几何|射影几何]]和[[流形|流形]]，然而“地图投影”是特指制图投影。
+
+尽管名字的字面意思是这样的，但投影并不限于[[透视|透视]]投影，例如在屏幕上投射阴影所产生的投影，或者[[針孔相機|針孔相機]]在平面胶卷板上产生的{{le|直线投影|rectilinear projection|直线}}图像。相反，任何将坐标从曲面清晰而平稳地转换到平面的数学函数都是投影。实际使用中很少有投影是透视的。
+
+本文大部分内容都是假设要测绘的表面是球面。[[地球|地球]]和其他大型[[天體|天體]]一般以[[類球面|扁球形]]为较好的模型，而[[小行星|小行星]]等小型天体则常为不规则形状。行星体的表面即使是不规则的，不能用球体或椭球体很好地建模，也可以绘制地图。<ref>{{Citation|last=Hargitai|first=Henrik|title=Map Projections in Planetary Cartography|date=2017|work=Lecture Notes in Geoinformation and Cartography|pages=177–202|publisher=Springer International Publishing|isbn=978-3-319-51834-3|last2=Wang|first2=Jue|last3=Stooke|first3=Philip J.|last4=Karachevtseva|first4=Irina|last5=Kereszturi|first5=Akos|last6=Gede|first6=Mátyás|doi=10.1007/978-3-319-51835-0_7}}</ref> 因此，更一般地说，地图投影是将连续的曲面展平到一个平面上的任何方法。
+
+模型地球仪不会像地图那样让地表关系变形，但地图在许多情况下更有用：它们更紧凑，更容易储存；它们很容易容纳大量的比例尺；它们很容易在计算机显示器上查看；它们可以被测量以找到被测绘区域的属性；它们可以同时显示地球表面的更大部分；它们的生产和运输更便宜。地图的这些有用的特点促使人们开发地图投影。
+
+==地图的度量属性==
+[[File:USGS_map_Albers_conic_tall.gif|frame]]能准确地显示区域，但会发生形变。]]
+
+许多属性可以在地球表面测量，与地理环境无关。
+* [[面积|面积]]
+* [[形狀|形狀]]
+* [[定向_(幾何)|方向]]
+* [[方位|方位]]
+* [[距离|距离]]
+
+地图投影的构造可以以牺牲其他属性为代价来保留其中的一些属性。由于弯曲的地球表面与平面不是[[等距同构|等距的]]，因此，保留形状不可避免地会导致[[比例尺_(地圖)|比例尺]]的变化，从而导致区域的非比例表现。反之亦然，保留面积的投影不可能是[[共形映射|保形的]]，导致地图上大部分地方的形状和方位失真。每一种投影都以不同的方式保留、妥协或近似于基本的度量属性。地图的目的决定了哪种投影应该构成地图的基础。由于地图存在许多目的，因此创造了多种多样的投影以适应这些目的。
+
+投影构造的另一个考虑因素是它与地图上要使用的数据集的兼容性。数据集是地理信息；它们的收集取决于所选择的地球[[大地测量系统|基准]]（模型）。不同的基准为同一位置分配的坐标略有不同，因此在[[比例尺_(地圖)|大比例尺]]地图中，如国家测绘系统的地图，将基准与投影相匹配非常重要。不同基准之间坐标分配的细微差异对于世界地图或其他广袤的地域来说并不重要，因为在那里这种差异会缩小到无法察觉的程度。
+
+===变形===
+{{main|Tissot指示线}}
+[[卡爾·弗里德里希·高斯|卡爾·弗里德里希·高斯]]的[[絕妙定理|絕妙定理]]证明了球面不可能在平面上不失真地表现出来，这同样适用于其他用于地球模型的参考面，如扁球体、椭球体和地球仪。同样的道理也适用于其他用作地球模型的参考面，如[[扁球面|扁球面]]、[[椭球|椭球面]]和[[大地水准面|大地水准面]]。由于任何地图投影都是这些曲面之一在平面上的表现，因此所有地图投影都会变形。
+
+[[File:Tissot_mercator.png|thumb]]上的Tissot指示线]]
+显示投影固有变形的经典方法是使用Tissot变形椭圆。对于一个给定的点，利用沿子午线的比例因子 ''h''，沿纬线的比例因子 ''k''，以及它们之间的角度 ''θ′''，Nicolas Tissot描述了如何构建一个椭圆，以描述变形成分的数量和方向。<ref name="SnyderFlattening"/>{{rp|147–149}}<ref name=SnyderManual>Snyder. Working Manual, p. 24.</ref> 通过沿子午线和纬线有规律地排列椭圆，指示线网络显示了整个地图的失真变化情况。
+
+====其他变形度量====
+已经有许多其他方法来描述投影中的变形。<ref>Karen A. Mulcahy and Keith C. Clarke (2001) [http://www.geog.ucsb.edu/~kclarke/Geography232/MulcahyClarke2001.pdf "Symbolization of Map Projection Distortion: A Review"] {{Wayback|url=http://www.geog.ucsb.edu/~kclarke/Geography232/MulcahyClarke2001.pdf |date=20181126023631 }}, ''Cartography and Geographic Information Science'', 101.28, No.3, pp.167-181</ref><ref>{{Cite web |url=https://books.google.com/books?id=8cR7yG5ohHoC&lpg=PA291&ots=G7LZ2ptRLF&dq=Finite%20distortions%20in%20map%20projection&pg=PA291#v=onepage&q=Finite%20distortions%20in%20map%20projection&f=false |title=Frank Canters (2002), ''Small-Scale Map Projection Design'', CRC Press |access-date=2020-12-27 |archive-date=2021-04-16 |archive-url=https://web.archive.org/web/20210416225054/https://books.google.com/books?id=8cR7yG5ohHoC&lpg=PA291&ots=G7LZ2ptRLF&dq=Finite%20distortions%20in%20map%20projection&pg=PA291#v=onepage&q=Finite%20distortions%20in%20map%20projection&f=false |dead-url=no }}</ref> 像Tissot变形椭圆一样，Goldberg-Gott指示线也是以无限小圆为基础的，它描述了'''弯曲'''和'''偏斜'''变形。<ref name="Goldberg-Gott">{{cite journal
+ |url          = http://www.physics.drexel.edu/~goldberg/projections/goldberg_gott.pdf
+ |title        = Flexion and Skewness in Map Projections of the Earth
+ |year         = 2007
+ |first1       = David M.
+ |last1        = Goldberg
+ |first2       = J. Richard
+ |last2        = Gott III
+ |journal      = Cartographica
+ |volume       = 42
+ |issue        = 4
+ |pages        = 297–318
+ |accessdate   = 2011-11-14
+ |doi          = 10.3138/carto.42.4.297
+ |arxiv        = astro-ph/0608501
+ |archive-date = 2016-02-16
+ |archive-url  = https://web.archive.org/web/20160216075805/http://www.physics.drexel.edu/~goldberg/projections/goldberg_gott.pdf
+ |dead-url     = no
+}}</ref>
+
+有些视觉方法不是像Tissot的指示线那样，用原始的（放大的）无限小圆来投影，而是用有限的形状来投影地图的一部分。例如，一个固定半径的小圆（如15度[[角直徑|角半径]]）。<ref name="tiss">{{cite web
+  | title      = Real-time projection visualisation with Indicatrix Mapper QGIS Plugin
+  | url      = http://geomatica.como.polimi.it/workbooks/n12/FOSS4G-eu15_submission_214.pdf
+  }}{{Dead link}}</ref> 有时也使用[[球面三角學|球面三角形]]。在20世纪上半叶，将一个人的头部投射到不同的投影上是很常见的，以显示在一个投影上与另一个投影上的失真如何变化。<ref name="rutgers">{{cite web
+  | title      = Strange Maps: This is your brain on maps
+  | date      = 18 September 2013
+  | url      = http://bigthink.com/strange-maps/624-this-is-your-brain-on-maps
+  | access-date      = 2020-12-27
+  | archive-date      = 2013-12-17
+  | archive-url      = https://web.archive.org/web/20131217175412/http://bigthink.com/strange-maps/624-this-is-your-brain-on-maps
+  | dead-url      = no
+  }}</ref>
+在动态媒体中，熟悉的海岸线和边界的形状可以在交互式地图上拖动，以显示投影如何根据地图上的位置扭曲大小和形状。<ref>{{cite web |url=https://bramus.github.io/mercator-puzzle-redux/ |title=Mercator Puzzle Redux |accessdate=2018-01-24 |archive-date=2021-04-16 |archive-url=https://web.archive.org/web/20210416234549/https://bramus.github.io/mercator-puzzle-redux/ |dead-url=no }}</ref>
+
+另一种可视化局部变形的方法是通过灰度或颜色渐变，其阴影代表角度变形或等高线膨胀的大小。有时，通过混合两种颜色来创建一个{{le|二元地图|bivariate ma}}，两者同时显示。<ref name="cornucopia">{{cite web
+  | title      = A cornucopia of map projections
+  | url      = http://www.mapthematics.com/Downloads/Images/Cornucopia33.jpg
+  | access-date      = 2020-12-27
+  | archive-date      = 2021-06-13
+  | archive-url      = https://web.archive.org/web/20210613030428/https://www.mapthematics.com/Downloads/Images/Cornucopia33.jpg
+  | dead-url      = no
+  }}</ref>
+
+在全局范围内而不是只在一个点上描述失真的问题是，它必然涉及到选择优先级以达成妥协。一些方案使用距离失真作为角度变形和等高线膨胀二者结合的指标；这种方法任意选择要测量的路径和如何加权，以产生单一结果。已经用来描述许多种投影。<ref name="Goldberg-Gott" /><ref name="AB Peters">
+{{cite journal
+| last1 = Peters
+| first1 = A. B.
+| title = Uber Weltkartenverzerrunngen und Weltkartenmittelpunkte
+| journal = {{ill|Kartographische Nachrichten|de}}
+| pages = 106–113
+| year = 1978
+}}</ref><ref name = "GMC">
+{{cite arXiv
+| last1 = Gott, III
+| first1 = J. Richard
+| last2 = Mugnolo
+| first2 = Charles
+| last3 = Colley
+| first3 = Wesley N.
+| title = Map projections for minimizing distance errors
+| eprint = astro-ph/0608500v1
+| year = 2006
+}}</ref><ref name = "Laskowski">
+{{cite journal
+| last1 = Laskowski
+| first1 = P.
+| title = Distortion-spectrum fundamentals: A new tool for analyzing and visualizing map distortions
+| journal = Cartographica
+| volume = 34
+| issue = 3
+| year = 1997
+| doi = 10.3138/Y51X-1590-PV21-136G
+| doi-access = free
+}}</ref><ref name = "Airy">
+{{cite journal
+| last1 = Airy
+| first1 = G.B.
+| title = Explanation of a projection by balance of errors for maps applying to a very large extent of the Earth's surface; and comparison of this projection with other projections
+| journal = London, Edinburgh, and Dublin Philosophical Magazine
+| year = 1861
+| series = 4
+| volume = 22
+| issue = 149
+| pages = 409–421
+| doi = 10.1080/14786446108643179
+}}</ref>
+
+==设计与构造==
+地图投影的创建包括两个步骤：
+
+# 选择地球或行星体形状的模型（通常选择[[球面|球面]]或[[椭球|椭球面]]）。由于地球的实际形状是不规则的，所以在这一步骤中会丢失信息。
+# 将地理坐标（[[经度|经度]]和[[纬度|纬度]]）转换为[[笛卡尔坐标系|笛卡尔坐标]] (''x'',''y'') 或[[极坐标系|极坐标]]。在大比例尺地图中，笛卡尔坐标通常与东经和北纬有简单的关系，定义为叠加在投影上的网格。在小比例尺地图中，东经和北纬没有意义，网格也没有叠加。
+
+一些最简单的地图投影是字面意义上的投影，通过将光源放置在相对于地球仪的某个确定的点上，并将其特征投影到指定的表面上而得到的。虽然大多数投影不是以这种方式定义的，但描绘光源-地球模型可以帮助理解地图投影的基本概念。
+
+===选择投影面===
+[[File:Usgs_map_miller_cylindrical.PNG|thumb]]
+
+能展开成平面而不发生拉伸、撕裂或收缩的曲面称为[[可展曲面|可展曲面]]。[[圆柱体|圆柱]]、[[圆锥|圆锥]]和平面都是可展曲面。球面和椭圆面没有可展开的表面，所以把它们投影到平面上都要变形。（打个比方，把橘子皮压平，就不能不使其撕裂和变形。）
+
+描述投影的一种方法是，先从地球表面投影到一个可展曲面，如圆柱或圆锥，然后再把这个表面展开成一个平面。虽然第一步不可避免地会使地球仪的某些特性发生扭曲，但可展开的表面就可以不发生进一步的变形。
+
+===投影的朝向===
+[[File:Usgs_map_traverse_mercator.PNG|thumb]]在数学上与标准的墨卡托相同，只是方向不同。]]
+一旦选择了投影到圆柱、圆锥或平面上，就必须指定形状的'''朝向'''（aspect）。朝向描述了可展曲面相对于地球的位置：它可以是'''法向'''（使曲面的对称轴与地轴重合）、'''横向'''（与地轴成直角）或'''斜向'''（两者之间的任何角度）。
+
+===重要的线===
+[[File:comparison_of_cartography_surface_development.svg|thumb]]
+可展曲面也可以是与球面或椭球面[[切线|相切]]或[[割线|相割]]的表面。相切是指曲面与地球接触但不切开地球；相割是指曲面会切开地球。将可展曲面从与地球的接触处移开，永远不会保持或改善度量特性，所以这里不进一步讨论这种可能性。
+
+切线和割线（'''标准线'''）是不变形的。如果这些线是纬线的平行线，如在圆锥投影中，则称为'''标准平行线'''。'''中心子午线'''是地球在投影前所旋转到的子午线。中心子午线（通常写为 ''λ''{{sub|0}}）和原点平行线（通常写为 ''φ''{{sub|0}}）通常用来确定地图投影的原点。<ref>{{cite web
+  | url   = http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture04/concepts/Map%20coordinate%20systems/Projection%20parameters.htm
+  | title   = Projection parameters
+  | access-date   = 2020-12-27
+  | archive-date   = 2021-04-16
+  | archive-url   = https://web.archive.org/web/20210416230317/http://www.geography.hunter.cuny.edu/~jochen/GTECH361/lectures/lecture04/concepts/Map%20coordinate%20systems/Projection%20parameters.htm
+  | dead-url   = no
+  }}</ref><ref>{{cite web
+  | url   = http://edndoc.esri.com/arcsde/9.2/concepts/geometry/coordref/coordsys/projected/mapprojections.htm
+  | title   = Map projections
+  | access-date   = 2020-12-27
+  | archive-date   = 2018-11-28
+  | archive-url   = https://web.archive.org/web/20181128234249/http://edndoc.esri.com/arcsde/9.2/concepts/geometry/coordref/coordsys/projected/mapprojections.htm
+  | dead-url   = no
+  }}</ref>
+
+===比例尺===
+[[地球儀|地球儀]]是代表地球的唯一方法，它在整个地图的所有方向上都具有恒定的[[比例尺_(地圖)|比例]]。地图无法在任何区域实现这一属性，无论区域有多小。然而，它可以沿着特定的线实现恒定的比例尺。
+
+一些可能的属性是：
+* 比例尺取决于位置，但不取决于方向。这相当于保角，[[共形映射|保形地图]]的定义特性。
+* 沿着任何平行线的方向，比例尺是恒定的。这适用于任何圆柱形或伪圆柱形的法线投影。
+* 以上组合：比例尺只取决于纬度，不取决于经度或方向。这适用于[[麥卡托投影法|墨卡托投影]]在法线上的投影。
+* 沿着从特定地理位置辐射的所有直线的比例尺是不变的。这是等距投影的决定性特征，如{{le|等距方位投影|Azimuthal equidistant projection}}。也有一些投影（Maurer的{{le|两点等距投影|Two-point equidistant projection}}），两点之间的真实距离被保留下来。<ref name="SnyderFlattening"/>{{rp|234}}
+
+===为天体的形状选择模型===
+投影构造还受到如何近似地球或行星体形状的影响。在下面关于投影类别的一节中，为了简化讨论，将地球作为一个球体。但是，地球的实际形状更接近于长圆椭球体。不管是球体还是椭球体，所讨论的原则都是成立的，而不失通用性。
+
+选择地球形状的模型涉及到在球面与椭球面的优缺点之间进行选择。球面模型对于小比例尺的地图如世界地图集和地球仪是有用的，因为该比例尺的误差通常不明显或不重要，不足以证明使用更复杂的椭球体是合理的。椭球面模型通常用于绘制[[地形图|地形图]]和其他需要精确描绘陆地表面的大中型地图。辅助纬度常用于投影椭球面。
+
+第三种模型是[[大地水准面|大地水准面]]，它是一种更复杂、更精确的地球形状表示，与没有风、潮汐或陆地时的[[海平面|平均海平面]]相吻合。与最密合椭球面（{{lang-en|best fitting ellipsoid}}）相比，大地水准面模型将改变重要性质的表征，如距离、保形性和等值性。因此，在保留这类性质的大地水准面投影地图中，[[地理坐标系|地理坐标网]]会偏离椭球面地图的地理坐标网。但通常情况下，大地水准面不会被用作{{le|地球模型|Earth model}}进行投影，因为地球的形状是非常规则的，大地水准面的起伏量与椭球面模型相差不到100米（而[[地球半径|地球半径]]是630万米）。但对于不规则的行星体，如[[小行星|小行星]]，有时会用类似于大地水准面的模型来推算地图。<ref>
+{{Cite journal
+  | doi     = 10.1559/152304000783547957
+  | title   = Equal Area Map Projection for Irregularly Shaped Objects
+  | journal = Cartography and Geographic Information Science
+  | volume  = 27
+  | issue   = 2
+  | page    = 91
+  | year    = 2000
+  | last1   = Cheng
+  | first1  = Y.
+  | last2   = Lorre
+  | first2  = J. J.
+  }}</ref><ref>
+{{Cite journal
+  | doi     = 10.1111/j.1541-0064.1998.tb01553.x
+  | title   = Mapping Worlds with Irregular Shapes
+  | url     = https://archive.org/details/sim_canadian-geographer_spring-1998_42_1/page/61
+  | journal = The Canadian Geographer
+  | volume  = 42
+  | page    = 61
+  | year    = 1998
+  | last1   = Stooke
+  | first1  = P. J.
+  }}</ref><ref>{{cite journal
+ |last1        = Shingareva
+ |first1       = K.B.
+ |last2        = Bugaevsky
+ |first2       = L.M.
+ |last3        = Nyrtsov
+ |first3       = M.
+ |title        = Mathematical Basis for Non-spherical Celestial Bodies Maps
+ |journal      = Journal of Geospatial Engineering
+ |volume       = 2
+ |issue        = 2
+ |pages        = 45–50
+ |year         = 2000
+ |url          = http://www.lsgi.polyu.edu.hk/staff/ZL.Li/vol_2_2/06_nyrtsov.pdf
+ |access-date  = 2020-12-27
+ |archive-date = 2004-12-09
+ |archive-url  = https://web.archive.org/web/20041209190316/http://www.lsgi.polyu.edu.hk/staff/ZL.Li/vol_2_2/06_nyrtsov.pdf
+ |dead-url     = no
+}}</ref><ref>{{cite journal
+ |last1        = Nyrtsov
+ |first1       = M.V.
+ |date         = August 2003
+ |title        = The Classification of Projections of Irregularly-shaped Celestial Bodies
+ |journal      = Proceedings of the 21st International Cartographic Conference (ICC)
+ |pages        = 1158–1164
+ |url          = http://icaci.org/files/documents/ICC_proceedings/ICC2003/Papers/141.pdf
+ |access-date  = 2020-12-27
+ |archive-date = 2021-04-29
+ |archive-url  = https://web.archive.org/web/20210429113747/https://icaci.org/files/documents/ICC_proceedings/ICC2003/Papers/141.pdf
+ |dead-url     = no
+}}</ref><ref>
+{{Cite book
+  | doi     = 10.1007/978-1-4614-7762-4_6
+  | chapter = CSNB Mapping Applied to Irregular Bodies
+  | title   = Constant-Scale Natural Boundary Mapping to Reveal Global and Cosmic Processes
+  | page    = 71
+  | series  = SpringerBriefs in Astronomy
+  | year    = 2013
+  | last1   = Clark
+  | first1  = P. E.
+  | last2   = Clark
+  | first2  = C. S.
+  | isbn    = 978-1-4614-7761-7
+  }}</ref> 其他规则固体有时被用作较小天体大地水准面等效的一般化。例如，[[木卫一|木卫一]]最好用三轴椭球面或偏心率较小的椭球面来建模。吸器的形状是一个雅可比椭圆体，其长轴是次长轴的两倍，[[妊神星|妊神星]]的形状是{{le|雅各比椭球面|Jacobi ellipsoid}}，其长轴是短轴的2倍，中轴是短轴的1.5倍。
+
+==分类==
+一个基本的投影分类是基于地球所投影的投影面的类型。投影其实就是将一个巨大的曲面与地球接触，然后进行隐含的缩放操作。这些曲面有圆柱面（如[[麥卡托投影法|墨卡托投影]]）、圆锥面（如[[亚尔勃斯投影|亚尔勃斯投影]]）和平面（如[[球极平面投影|球极平面投影]]）。然而，许多数学投影并不能整齐地归入这三种概念投影方法中的任何一种。因此，文献中还描述了其他的同级分类，如伪圆锥投影、伪圆柱投影、伪方位投影、反方位投影和多圆锥投影。
+
+对投影进行分类的另一种方法是根据它们所保存的模型的属性。一些比较常见的类别有：
+* 保方向（方位投影），仅限从一个或两个点到其他点的特征<ref>{{cite book
+  | title      = Map Projections – a Working Manual
+  | first      = John Parr
+  | last      = Snyder
+  | publisher      = U.S. Government Printing Office
+  | year      = 1987
+  | page      = 192
+  | url      = https://books.google.com/books?id=nPdOAAAAMAAJ&pg=PA192
+  | access-date      = 2020-12-27
+  | archive-date      = 2021-04-16
+  | archive-url      = https://web.archive.org/web/20210416232846/https://books.google.com/books?id=nPdOAAAAMAAJ&pg=PA192
+  | dead-url      = no
+  }}</ref>
+* 局部保形（正形投影）
+* 保面积（等面积）
+* 保距离（等距），仅限从一个或两个点到其他点的特征
+* 保最短路径，只有{{le|球心投影|gnomonic projection}}才会保留的特征
+因为球面不是一个[[可展曲面|可展曲面]]，所以不可能构造一个既等面积又保形的地图投影。
+
+==以投影面分类的投影==
+
+三种可展曲面（平面、圆柱体、圆锥体）为理解、描述和开发地图投影提供了有用的模型。然而，这些模型在两个基本方面受到限制。首先，大多数使用中的世界投影并不属于这些类别。另外，即使是大多数属于这些类别的投影，也不能自然地通过物理投影来实现。正如L.P.Lee所指出的那样，
+
+{{quote|在上述定义中没有提到圆柱面、圆锥面或平面。这些投影被称为圆柱面或圆锥面投影，因为它们可以被认为是在圆柱面或圆锥面上展开起来的，视情况而定，但最好不要把圆柱面和圆锥面想象成圆柱面和圆锥面，因为它们已经引起了许多误解。特别是对于有两个标准平行线的圆锥投影来说更是如此：它们可以被看作是在圆锥上发展起来的，但它们是与球体没有简单关系的圆锥。实际上，圆柱面和圆锥面为我们提供了方便的描述性术语，而不是别的什么。<ref name=Lee>
+{{cite journal
+  | first   = L.P.
+  | last    = Lee
+  | year    = 1944
+  | title   = The nomenclature and classification of map projections
+  | journal = Empire Survey Review
+  | volume  = VII
+  | issue   = 51
+  | pages   = 190–200
+  | doi     = 10.1179/sre.1944.7.51.190
+  }} p. 193</ref>}}
+
+Lee的反对意见是指在地图投影领域，圆柱形、圆锥形和平面（方位角）等术语被抽象化的方式。如果地图的投影就像光线通过地球照射到可展曲面一样，那么平行线的间距将遵循一套非常有限的可能性。例如这样的圆柱形投影是:
+# 长方形的;
+# 都有垂直的子午线，间隔均匀;
+# 与赤道呈平行对称分布;
+# 当光线通过地球照射到圆柱体上时，它们会落在平行线上，光源位于本初子午线与赤道的交点，以及球体中心所形成的线上。
+
+（如果你在投射之前旋转地球，那么纬线和经线不一定还是直线。为了分类，通常忽略转动。）
+
+光源沿着最后一个约束所描述的线发射的地方，就是产生各种“自然”圆柱形投影之间的差异的地方。 但是，在地图投影领域中使用的[[圆柱|圆柱]]一词完全放宽了最后一个约束。 相反，平行线可以根据设计者决定的任何算法放置，以适应地图的需要。在著名的墨卡托投影中，平行线的位置不是通过投影产生的，而是按照需要的方式放置，以满足恒定方向角的轨迹始终绘制为直线的性质。
+
+===圆柱投影===
+[[File:Usgs_map_mercator.svg|frame]]
+
+正圆柱投影是将经线映射到等距的垂直线上，将[[纬线|纬度圈]]（平行线）映射到水平线上的任何投影。
+
+通过想象一个轴线与地球自转轴线重合的圆柱，可以可视化经线到垂直线的映射关系。这个圆柱体环绕地球，投射到地球上，然后展开。
+
+根据其构造的几何学原理，圆柱投影会拉伸东西方向的距离。在任何特定的纬度上，所有圆柱投影的拉伸量都是相同的，其大小是[[纬度|纬度]]的[[正割|正割]]乘以赤道处的比例尺。各种圆柱投影之间的区别仅在于它们的南北向拉伸量（其中纬度用 ''φ'' 表示）：
+* 南北拉伸等于东西拉伸（[[正割|sec]] ''φ''）：东西比例尺与南北比例尺一致：保形圆柱投影或[[墨卡托投影法|墨卡托投影]]；这使高纬度地区过度变形（另见[[横轴墨卡托投影|横轴墨卡托]]）。
+* 南北拉伸比东西延伸得快（sec{{sup|2}}''φ''）。圆柱透视投影（或{{le|圆柱中心投影|Central cylindrical projection}}）；不宜使用，因为变形比墨卡托投影更严重。
+* 南北拉伸随纬度增长，但不如东西拉伸快：如{{le|米勒圆柱投影|Miller cylindrical projection}}（sec {{sfrac|4|5}}''φ''）。
+* 南北距离既不拉伸也不收缩（1）：{{le|等量矩形投影|Equirectangular projection}} 或者“简易圆柱投影”（plate carrée）。
+* 南北收缩等于纬度的余弦（东西向拉伸的倒数）：{{le|等积圆柱投影|Cylindrical equal-area projection}}。这类投影有很多种，这些投影只在缩放常数上面不一样，比如[[高尔-彼得斯投影|高尔-彼得斯投影]]（在45°纬线上不变形）。{{le|贝尔曼投影|Behrmann projection}}（30°纬线处不变形），以及{{le|朗伯等积圆柱投影|Lambert cylindrical equal-area projection}}（在赤道处不变形）。由于这种投影是以东西拉伸程度的倒数来缩放南北距离的，它保面积的代价是形状会改变。
+
+在第一种情况下（墨卡托投影），东西比例尺总是等于南北比例尺。在第二种情况下（圆柱中心投影），南北比例尺在远离赤道的地方都超过东西比例尺。其余的每种情况都有一对[[割线|割线]]——一对符号相反的相同纬度（或赤道），在这对纬度上，东西比例尺与南北比例尺一致。
+
+正圆柱投影将整个地球映射为一个有限的矩形，但前两种情况除外；在前两种情况下，矩形会无限延伸，同时保持宽度不变。
+
+===伪圆柱投影===
+[[File:Usgs_map_sinousidal_equal_area.PNG|right]]
+
+伪圆柱投影将'''中央'''[[经线|经线]]表示为一条直线段。其他经线比中央经线长，向外弯曲，远离中央经线。伪圆柱投影把纬线映射为直线。沿着纬线，从地表出发的每一点与中心经线的距离都是按其与中心经线的经度差成比例绘制的。因此，沿某一纬线的经线间距相等。在伪圆柱投影地图上，任何一点离赤道的距离比另一点更远，其纬度就比另一点高，保持了南北关系。这一特征在说明气候等依赖纬度的现象时很有用。伪圆柱投影的例子包括：
+*{{Link-en|正弦投影|Sinusoidal projection}}，这是最早发展起来的伪圆柱投影。与现实情况相同，在地图上每条纬线的长度与纬度的余弦成正比。<ref>{{MathWorld | urlname= SinusoidalProjection | title= Sinusoidal Projection}}</ref>任何区域的面积都是真实准确的。
+* {{le|科里侬投影|Collignon projection}}，最常见的形式是将每条经线表示为两条直线段，从两极各有一条直线段到赤道。
+{|
+|
+*{{Link-en|托布勒超椭圆投影|Tobler hyperelliptical projection}}
+: [[File:Tobler_hyperelliptical_projection_SW.jpg|200px]]
+||
+*{{Link-en|莫尔魏德投影|Mollweide projection}}
+: [[File:Mollweide_projection_SW.jpg|200px]]
+||
+*{{Link-en|古德等面积投影|Goode homolosine projection}}
+: [[File:Goode_homolosine_projection_SW.jpg|200px]]
+|-
+|
+*{{Link-en|埃克特第四投影|Eckert IV projection}}
+: [[File:Ecker_IV_projection_SW.jpg|200px]]
+||
+*{{Link-en|埃克特第六投影|Eckert VI projection}}
+: [[File:Ecker_VI_projection_SW.jpg|200px]]
+||
+*{{Link-en|Kavrayskiy第七投影|Kavrayskiy VII projection}}
+: [[File:Kavraiskiy_VII_projection_SW.jpg|200px]]
+|}
+
+===混合投影===
+[[HEALPix|HEALPix]]投影结合了赤道地区的等积圆柱投影和极地地区的{{le|科里侬投影|Collignon projection}}。
+
+===圆锥投影===
+[[File:USGS_map_Albers_conic_tall.gif|frame]]
+
+“圆锥投影”用于指任何投影，其中经线被映射到从顶点辐射出来的等距线上，纬度圈（平行线）被映射到以顶点为中心的圆弧上。<ref>Carlos A. Furuti.
+[http://www.progonos.com/furuti/MapProj/Normal/ProjCon/projCon.html "Conic Projections"] {{Wayback|url=http://www.progonos.com/furuti/MapProj/Normal/ProjCon/projCon.html |date=20121130154139 }}</ref>
+
+在绘制圆锥地图时，地图制作者会任意选择两条标准纬线。这些标准纬线可以被看作是圆锥与地球相交的[[割线|割线]]，或者，如果地图制作者两次选择同一纬线，则可以看作是圆锥与地球仪相切的切线。所得到的圆锥地图在这些标准纬线附近的比例尺、形状和面积上都有较低的失真。沿着两条标准平行线以北的纬线或沿着两条标准纬线以南的纬线的距离被拉长；沿着标准纬线之间的纬线的距离被压缩。当使用单一标准纬线时，沿所有其他纬线的距离被拉长。
+
+常用的圆锥投影有：
+*{{Link-en|等距圆锥投影|Equidistant conic projection}}：纬线沿子午线均匀分布，以保持每个子午线的恒定距离比例尺，通常与标准纬线的比例尺相同或相似。
+*[[亚尔勃斯投影|亚尔勃斯投影]]：调整非标准纬线之间的南北距离，以补偿东西向的拉伸或压缩，从而得到等面积的地图。
+*{{Link-en|朗伯共形圆锥投影|Lambert conformal conic projection}}，它将非标准纬线之间的南北距离调整为等于东西向拉伸，从而形成保形图。
+
+===伪圆锥投影===
+*[[彭纳投影|彭纳投影]]，这是一种等面积投影，大多数经线和纬线在其上被显示为曲线。它有一个可配置的标准纬线，沿此不会发生变形。
+*{{Link-en|维尔纳投影|Werner projection}}，从一极到所有纬线的距离都是准确的。
+*{{Link-en|美国多圆锥投影|American polyconic projection}}
+
+===方位投影===
+[[File:Usgs_map_azimuthal_equidistant.PNG|frame]]
+
+[[方位角|方位]]投影的特性是，从中心点出发的方向被保留下来，因此通过中心点的[[大圆|大圆]]在地图上用直线表示。这些投影在比例尺上也具有径向对称性，因此在变形上也具有径向对称性：地图与中心点的距离由真实距离 ''d'' 的函数 ''r''(''d'') 计算，与角度无关；相应地，以中心点为中心的圆被映射成以地图上中心点为圆心的圆。
+
+径向线的映射可以通过想象一个与地球相切的[[平面_(数学)|平面]]，以中心点为[[切线|切点]]来直观地体现。
+
+径向比例尺为 ''r′''(''d'')，横向比例尺为 ''r''(''d'')/(''R'' sin {{sfrac|''d''|''R''}})，其中 ''R'' 为地球半径。
+
+有些方位投影是真正的[[透视|透视投影]]；也就是说，它们可以机械地构造，通过从透视点（沿无限线通过切点和切点的反极点）延伸出的线，将地球表面投影到平面上：
+* {{le|球心投影|gnomonic projection}}将[[大圆|大圆]]显示为直线。可以用地球中心的透视点来构造。 ''r''(''d'') = ''c'' tan {{sfrac|''d''|''R''}}；所以，即使只是一个半球也会映射到无限大的范围。<ref>{{MathWorld | urlname= GnomonicProjection | title= Gnomonic Projection}}</ref><ref>{{cite web
+  | title      = The Gnomonic Projection
+  | url      = http://members.shaw.ca/quadibloc/maps/maz0201.htm
+  | accessdate      = November 18, 2005
+  | archive-date      = 2012-11-05
+  | archive-url      = https://web.archive.org/web/20121105145451/http://members.shaw.ca/quadibloc/maps/maz0201.htm
+  | dead-url      = no
+  }}</ref>
+* [[正投影|正投影]]将地球上的每一点映射到平面上最近的一点。可以从距离切点无限远的透视点出发构造；''r''(''d'') = ''c'' sin {{sfrac|''d''|''R''}}。<ref>{{MathWorld | urlname= OrthographicProjection | title= Orthographic Projection}}</ref> 可以在有限圆上显示出最多一个半球。从足够远的地方拍摄的地球照片，如[[月球|月球]]，近似于这种透视。
+* 近侧透视投影，模拟有限距离的空间景象，因此显示的是不到一个完整的半球，如2012年的[[藍色彈珠|藍色彈珠]]中使用。<ref name="PROJ 7.1.1 documentation 2020">{{cite web | title=Near-sided perspective | website=PROJ 7.1.1 documentation | date=2020-09-17 | url=https://proj.org/operations/projections/nsper.html | access-date=2020-10-05 | archive-date=2021-04-16 | archive-url=https://web.archive.org/web/20210416235635/https://proj.org/operations/projections/nsper.html | dead-url=no }}</ref>
+* {{le|一般透视投影|General Perspective projection}}可以通过使用地球以外的透视点来构建。地球的照片（如[[国际空间站|国际空间站]]的照片）可以提供这种透视。它是近边透视投影的概括，允许倾斜。
+* [[球极平面投影|球极平面投影]]是保形的，可以用切点的反极点作为透视点来构造。''r''(''d'') = ''c'' tan {{sfrac|''d''|2''R''}}；比例尺为 ''c''/(2''R'' cos{{sup|2}} {{sfrac|''d''|2''R''}})。<ref>{{MathWorld | urlname= StereographicProjection | title= Stereographic Projection}}</ref> 可以在有限的圆上显示几乎整个球体的表面。球体的全部表面需要一个无限大的地图。
+
+其他方位投影不是真正的透视投影：
+*{{Link-en|方位等距投影|Azimuthal equidistant projection}}：''r''(''d'') = ''cd''；[[业余无线电|业余无线电]]操作员用它来知道天线指向某点的方向，并看到与该点的距离。地图上与切点的距离与地球上的表面距离成正比（切点为北极的情况，见[[联合国会旗|联合国会旗]]）
+*{{Link-en|朗伯方位等积投影|Lambert azimuthal equal-area projection}}。地图上切点的距离与通过地球的直线距离成正比：''r''(''d'') = ''c'' sin {{sfrac|''d''|2''R''}}<ref>{{MathWorld | urlname= LambertAzimuthalEqual-AreaProjection | title= Lambert Azimuthal Equal-Area Projection}}</ref>
+*{{Link-en|对数方位投影|Logarithmic azimuthal projection}}是通过让每个点与地图中心的距离是其与地球上切点距离的对数构造的。''r''(''d'') = ''c'' ln {{sfrac|''d''|''d''<sub>0</sub>}})；不显示距离小于常数 ''d''<sub>0</sub> 的位置。<ref>{{cite web
+  | title       = Enlarging the Heart of a Map
+  | last        = Snyder
+  | first       = John P.
+  | url         = http://www.gis.psu.edu/projection/chapter6.html
+  | url-status    = dead
+  | archiveurl  = https://web.archive.org/web/20100702090236/http://www.gis.psu.edu/projection/chapter6.html
+  | archivedate = July 2, 2010
+  | accessdate  = April 14, 2016
+  }}</ref><ref>{{cite web
+  | title       = Enlarging the Heart of a Map (accompanying figures)
+  | url         = http://www.gis.psu.edu/projection/chap6figs.html
+  | last        = Snyder
+  | first       = John P.
+  | url-status    = dead
+  | archiveurl  = https://web.archive.org/web/20110410232300/http://www.gis.psu.edu/projection/chap6figs.html
+  | archivedate = April 10, 2011
+  | accessdate  = November 18, 2005
+  }} (see figure 6-5)</ref>
+[[File:Comparison_azimuthal_projections.svg|600px]]
+{{Clear}}
+
+==以保留的度量性质分类的投影==
+[[File:Usgs_map_stereographic.PNG|frame]]是保形和透视的，但不是等面积或等距离的。]]
+
+===正形投影===
+{{Main|正形地图投影}}
+正形地图投影能局部保留角度，这意味着它们能将地球上任何地方大小不变的无限小圆映射到地图上大小不一的无限小圆上。相反，非保形的地图会将大多数这样的小圆变形成变形椭圆。保形的一个重要结果是地图上每一点的相对角度都是正确的，而且任何一点周围的每一个方向上的局部比例尺（虽然在整个地图上是变化的）是恒定的。这就是一些正形投影：
+* [[麥卡托投影法|墨卡托投影]]：{{le|等角航线|Rhumb line}}用直线段表示。
+* [[横轴墨卡托投影|横轴墨卡托投影]]
+* [[球极平面投影|球极平面投影]]：球体的任何一个圆，无论大小，都可以映射成圆或直线。
+* {{Link-en|Roussilhe斜向球极平面投影|Roussilhe oblique stereographic projection}}
+* {{Link-en|朗伯共形圆锥投影|Lambert conformal conic projection}}
+* {{Link-en|皮尔斯梅花投影|Peirce quincuncial projection}}
+* {{Link-en|亚当斯方形半球投影|Adams hemisphere-in-a-square projection}}
+* {{Link-en|古尤方形半球投影|Guyou hemisphere-in-a-square projection}}
+
+===等面积投影===
+[[File:Mollweide_projection_SW.jpg|thumb]]
+
+等面积地图保留了面积度量，一般都会变形以达到这一目的。这是一些保面积的投影：
+
+{{div col|colwidth=25em}}
+* [[亚尔勃斯投影|亚尔勃斯投影]]
+* [[彭纳投影|彭纳投影]]
+* {{le|博顿利投影|Bottomley projection}}
+* {{le|科里侬投影|Collignon projection}}
+* {{le|等积圆柱投影|Cylindrical equal-area projection}}
+* 埃克特{{le|埃克特第二投影|Eckert II projection|第二}}、{{le|埃克特第四投影|Eckert IV projection|第四}}和{{le|埃克特第六投影|Eckert VI projection|第六}}投影
+* {{le|等地球投影|Equal Earth projection}}
+* [[高尔-彼得斯投影|高尔-彼得斯投影]]
+* {{Link-en|古德等面积投影|Goode homolosine projection}}
+* {{le|哈默投影|Hammer projection}}
+* {{le|霍鲍-代尔投影|Hobo–Dyer projection}}
+* {{Link-en|朗伯方位等积投影|Lambert azimuthal equal-area projection}}
+* {{Link-en|朗伯等积圆柱投影|Lambert cylindrical equal-area projection}}
+* {{le|莫尔魏德投影|Mollweide projection}}
+* {{Link-en|正弦投影|Sinusoidal projection}}
+* {{Link-en|斯特雷贝1995年投影|Strebe 1995 projection}}
+* 斯奈德的等积多面体投影，用于{{Link-en|测地线网格|geodesic grid}}。
+* {{Link-en|托布勒超椭圆投影|Tobler hyperelliptical projection}}
+* {{Link-en|维尔纳投影|Werner projection}}
+{{div col end}}
+
+===等距离投影===
+[[File:Two-point_equidistant_projection_SW.jpg|thumb]]
+如果连接平面上两个投影点的线段长度与地球仪上两个未投影点之间的测地线（最短面）距离成正比，那么我们就说这两个点之间的距离得到了保留。'''等距投影'''保留了一个或两个特殊点到其他所有点的距离。特殊点在投影时可能会被拉伸成一条线或一条曲线段。在这种情况下，必须用直线或曲线段上最接近被测点的点来测量距离。
+* {{le|等距圆柱投影|Equirectangular projection}}：在赤道方向上，两极间的距离得到保留。
+* {{le|方位等距投影|Azimuthal equidistant projection}}：中心与边缘的距离得到保留。
+* {{le|等距圆锥投影|Equidistant conic projection}}：在赤道方向上，两极间的距离得到保留。
+* {{Link-en|维尔纳投影|Werner projection}}：在赤道方向上，与[[北极点|北极点]]的距离得到保留。
+* {{le|两点等距投影|Two-point equidistant projection}}：两个“轨迹点”由地图制作者任意选取；各轨迹点间的距离得到保留。
+
+===球心投影===
+[[File:Usgs_map_gnomic.PNG|frame]]于公元前6世纪发展起来。]]
+
+[[大圆|大圆]]在其上显示为直线：
+* {{le|球心投影|Gnomonic projection}}
+
+===反方位投影===
+到固定位置B的方向（最短路线起点A的方位）对应于地图上A到B的方向：
+* {{le|利特罗投影|Littrow projection}}，唯一的保形方位投影。
+* {{le|哈默反方位投影|Hammer retroazimuthal projection}}，也保留了与中心点的距离。
+* {{le|克雷格反方位投影|Craig retroazimuthal projection}}的所有子午线也都是垂直的。
+
+===折衷投影===
+[[File:Usgs_map_robinson.PNG|frame]]在1988年被《[[国家地理_(杂志)|国家地理]]》杂志采用，但在1997年左右被他们放弃，改用{{le|温克尔三重投影|Winkel tripel projection}}。]]
+
+折衷投影放弃了完全保留度量性质的想法，而是寻求在变形之间取得平衡，或者只是让事情看起来正确。大多数这些类型的投影在极地地区比在赤道地区变形得更厉害。这些是一些折衷投影：
+* [[罗宾森投影|罗宾森投影]]
+* {{le|范德格林氏投影|Van der Grinten projection}}
+* {{le|米勒圆柱投影|Miller cylindrical projection}}
+* {{le|温克尔三重投影|Winkel tripel projection}}
+* [[戴美克森氏地圖投影|戴美克森氏地圖投影]]
+* {{le|伯纳德·J·S·卡希尔的蝴蝶地图|Bernard J. S. Cahill}}
+* {{Link-en|Kavrayskiy第七投影|Kavrayskiy VII projection}}
+* {{le|瓦格纳第六投影|Wagner VI projection}}
+* {{le|张伯伦三点等距投影|Chamberlin trimetric projection}}
+* {{le|奥龙斯·菲内|Oronce Finé}}的心形投影
+* [[Authagraph投影|Authagraph投影]]
+
+== 哪种投影最好？ ==
+
+从数学角度来看，不会出现对各种场景都适用的投影。<ref>{{Cite book|title=Choosing a map projection|others=Lapaine, Miljenko,, Usery, E. Lynn (Eddy Lynn), 1951-|isbn=978-3-319-51835-0|location=Cham, Switzerland|oclc=981765011|date = 2017-04-04}}</ref> 总是会有些东西要变形。因此，存在着许多投影，以满足地图的多种用途及其广泛的比例尺。
+
+现代国家测绘系统通常对[[比例尺_(地圖)|大比例尺]]地图采用[[横轴墨卡托投影|横轴墨卡托]]或近似变体，以在小范围内比例尺的 [[共形映射|保形]]、减小变化。对于较小比例尺的地图，如跨越各大洲或整个世界的地图，根据其适用性，许多投影都是常用的，如{{le|温克尔三重投影|Winkel tripel projection}}、[[罗宾森投影|罗宾森投影]]和{{le|莫尔魏德投影|Mollweide projection}}。<ref name="choosing">{{cite book
+  | title     = Choosing a World Map
+  | publisher = American Congress on Surveying and Mapping
+  | year      = 1988
+  | isbn      = 0-9613459-2-6
+  | location  = Falls Church, Virginia
+  | page      = 1
+  }}</ref>  世界地图通常使用折衷投影。由于任何世界地图都存在固有的变形，投影的选择在很大程度上成了一个美学问题。
+
+专题地图通常要求采用等面积投影，使单位面积上的现象能以正确的比例显示。<ref name="slocum">{{cite book
+  | title     = Thematic Cartography and Geographic Visualization
+  | url     = https://archive.org/details/thematiccartogra0000unse
+  | last      = Slocum
+  | first     = Terry A.
+  | author2   = Robert B. McMaster
+  | author3   = Fritz C. Kessler
+  | author4   = Hugh H. Howard
+  | publisher = Pearson Prentice Hall
+  | year      = 2005
+  | isbn      = 0-13-035123-7
+  | edition   = 2nd
+  | location  = Upper Saddle River, NJ
+  | page      = [https://archive.org/details/thematiccartogra0000unse/page/166 166]
+  }}</ref>
+但是，正确地表示面积比例，必然比许多非等面积的地图变形更大。
+
+为导航而开发的[[麥卡托投影法|墨卡托投影]]，经常用于世界地图，但其实有其他投影更为合适。<ref name="Bauer">Bauer, H.A. (1942). "Globes, Maps, and Skyways (Air Education Series)". New York. p. 28</ref><ref name="Miller">{{cite journal
+  | last1   = Miller
+  | first1  = Osborn Maitland
+  | year    = 1942
+  | title   = Notes on Cylindrical World Map Projections
+  | url     =https://archive.org/details/sim_geographical-review_1942-07_32_3/page/424
+  | journal = Geographical Review
+  | volume  = 32
+  | issue   = 3
+  | pages   = 424–430
+  | doi     = 10.2307/210384
+  | jstor = 210384
+ }}</ref><ref name="Raisz">Raisz, Erwin Josephus. (1938). ''General Cartography''. New York: McGraw–Hill. 2d ed., 1948. p. 87.</ref><ref name="RobinsonElements">Robinson, Arthur Howard. (1960). ''Elements of Cartography'', second edition. New York: John Wiley and Sons. p. 82.</ref> 即使在非专业界领域，人们也早已认识到这个问题。例如，1943年《[[纽约时报|纽约时报]]》的一篇社论指出：
+
+{{quote|现在是时候抛弃（墨卡托）了，换一种能较少欺骗性地表示大陆和方向的投影……虽然它的用途已经减少，但它作为挂图仍然非常受欢迎，部分原因显然是，作为一幅长方形地图，它用更多的地图填满了长方形的墙面空间，而且显然是由于它的熟悉性带来了更多的人气。<ref name="SnyderFlattening"/>{{rp|166}}}}
+
+1980年代关于[[高尔-彼得斯投影|彼得斯地图]]的争论促使美国制图协会（现为制图和地理信息协会）制作了一系列小册子（包括《哪种地图最好》<ref name="ACA1986">American Cartographic Association's Committee on Map Projections, 1986. ''Which Map is Best'' p. 12. Falls Church: American Congress on Surveying and Mapping.</ref>），旨在教育公众了解地图投影和地图失真。1989年和1990年，经过一些内部辩论，七个北美地理组织通过了一项决议，建议反对使用任何矩形投影（包括墨卡托和高尔-彼得斯）作为世界参考地图。<ref name="Robinson">{{cite journal
+  | last1   = Robinson
+  | first1  = Arthur
+  | year    = 1990
+  | title   = Rectangular World Maps—No!
+  | url     =https://archive.org/details/sim_professional-geographer_1990-02_42_1/page/101
+  | journal = Professional Geographer
+  | volume  = 42
+  | issue   = 1
+  | pages   = 101–104
+  | doi     = 10.1111/j.0033-0124.1990.00101.x
+  }}</ref><ref name="AmericanCartographer">{{cite journal
+  | title   = Geographers and Cartographers Urge End to Popular Use of Rectangular Maps
+  | url     =
+  | doi     = 10.1559/152304089783814089
+  | journal = American Cartographer
+  | year    = 1989
+  | volume  = 16
+  | pages   = 222–223
+  }}</ref>
+
+==参见==
+{{div col|colwidth=22em}}
+* [[大地测量系统|大地测量系统]]
+* [[地理信息系统|地理信息系统]]（GIS）
+* [[地理信息科學|地理信息科學]]
+* {{le|格网参考系统|Grid reference system}}
+* {{le|地图投影列表|List of map projections}}
+* {{le|设计图|Plan (drawing)}}
+* {{le|橡皮拉伸|Rubbersheeting}}
+* [[南上北下地圖|南上北下地圖]]
+* [[UV映射|UV映射]]
+* [[世界地图|世界地图]]
+* {{le|360度视频投影|360 video projection}}{{div col end}}
+
+== 参考文献 ==
+=== 引用 ===
+{{Reflist|30em}}
+
+=== 来源 ===
+{{refbegin}}
+* Fran Evanisko, American River College, lectures for Geography 20: "Cartographic Design for GIS", Fall 2002
+* [http://www.csiss.org/map-projections/index.html Map Projections] {{Wayback|url=http://www.csiss.org/map-projections/index.html |date=20210415012626 }}—PDF versions of numerous projections, created and released into the Public Domain by Paul B. Anderson ... member of the International Cartographic Association's Commission on Map Projections
+{{refend}}
+
+==外部链接==
+{{sisterlinks|d=Q186386|c=category:Map projections|n=no|b=no|v=no|voy=no|mw=no|s=no|m=no|species=no|q=no|wikt=no}}
+* {{cite web
+  | url   = http://pubs.usgs.gov/pp/1453/report.pdf
+  | title   = An Album of Map Projections
+  | access-date   = 2020-12-27
+  | archive-date   = 2021-04-23
+  | archive-url   = https://web.archive.org/web/20210423211635/https://pubs.usgs.gov/pp/1453/report.pdf
+  | dead-url   = no
+  }} {{small|(12.6 MB)}}, U.S. Geological Survey Professional Paper 1453, by John P. Snyder (USGS) and Philip M. Voxland (U. Minnesota), 1989.
+* [http://www.mapthematics.com/Projections/Images/Cornucopia33.jpg A Cornucopia of Map Projections] {{Wayback|url=http://www.mapthematics.com/Projections/Images/Cornucopia33.jpg |date=20120425142244 }}, a visualization of distortion on a vast array of map projections in a single image.
+* [http://www.giss.nasa.gov/tools/gprojector/ G.Projector] {{Wayback|url=http://www.giss.nasa.gov/tools/gprojector/ |date=20120728214457 }}, free software can render many projections ([[美国国家航空航天局|NASA]] [[戈達德太空研究所|GISS]]).
+* [http://www.mapthematics.com/ProjectionsList.php Color images of map projections and distortion] {{Wayback|url=http://www.mapthematics.com/ProjectionsList.php |date=20120723090050 }} (Mapthematics.com).
+* [http://kartoweb.itc.nl/geometrics/Map%20projections/body.htm Geometric aspects of mapping: map projection] {{Wayback|url=http://kartoweb.itc.nl/geometrics/Map%20projections/body.htm |date=20121107182703 }} (KartoWeb.itc.nl).
+* [http://www.se16.info/js/mapproj.htm Java world map projections] {{Wayback|url=http://www.se16.info/js/mapproj.htm |date=20210303035055 }}, Henry Bottomley (SE16.info).
+* [http://mathworld.wolfram.com/topics/MapProjections.html Map Projections] {{Wayback|url=http://mathworld.wolfram.com/topics/MapProjections.html |date=20120815105330 }} (MathWorld).
+* [http://www.mapref.org/ MapRef: The Internet Collection of MapProjections and Reference Systems in Europe] {{Wayback|url=http://www.mapref.org/ |date=20190418082511 }}
+* [http://trac.osgeo.org/proj/ PROJ.4 – Cartographic Projections Library] {{Wayback|url=http://trac.osgeo.org/proj/ |date=20120730033254 }}.
+* [http://www.radicalcartography.net/?projectionref Projection Reference] {{Wayback|url=http://www.radicalcartography.net/?projectionref |date=20090425214731 }} Table of examples and properties of all common projections (RadicalCartography.net).
+* {{cite web
+  | url   = http://kartoweb.itc.nl/geometrics/Map%20projections/Understanding%20Map%20Projections.pdf
+  | title   = Understanding Map Projections
+  | access-date   = 2020-12-27
+  | archive-date   = 2021-04-29
+  | archive-url   = https://web.archive.org/web/20210429154316/https://kartoweb.itc.nl/geometrics/Map%20projections/Understanding%20Map%20Projections.pdf
+  | dead-url   = no
+  }} {{small|(1.70 MB)}}, Melita Kennedy ([[美國環境系統研究所公司|Esri]]).
+* [http://demonstrations.wolfram.com/WorldMapProjections/ World Map Projections] {{Wayback|url=http://demonstrations.wolfram.com/WorldMapProjections/ |date=20120419164427 }}, [[史蒂芬·沃爾夫勒姆|Stephen Wolfram]] based on work by Yu-Sung Chang ([[Wolfram_演示项目|Wolfram Demonstrations Project]]).
+* [http://map-projections.net/ Compare Map Projections] {{Wayback|url=http://map-projections.net/ |date=20210318181455 }}
+{{atlas}}
+{{Authority control}}
+[[Category:地圖投影法|]]
+[[Category:地图学|Category:地图学]]
+[[Category:信息图形|Category:信息图形]]
+[[Category:画法几何|Category:画法几何]]
+[[Category:大地测量学|Category:大地测量学]]

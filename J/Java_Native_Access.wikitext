@@ -1,0 +1,230 @@
+{{noteTA
+|G1=IT
+|1=zh:文件; zh-hans:文件; zh-hant:檔案;
+|2=zh:递归; zh-hans:递归; zh-hant:遞迴;
+|3=zh:无符号整数; zh-hans:无符号整数; zh-hant:無號整數;
+|4=zh:表达式; zh-hans:表达式; zh-hant:運算式;
+|5=zh:循环; zh-hans:循环; zh-hant:迴圈;
+|6=zh:字符串; zh-hans:字符串; zh-hant:字串;
+|7=zh:头文件; zh-hans:头文件; zh-hant:標頭檔;
+|8=zh:过程式; zh-hans:过程式; zh-hant:程序式;
+|9=zh:预处理器; zh-hans:预处理器; zh-hant:前置處理器;
+|10=zh:巨集; zh-hans:宏; zh-hant:巨集;
+|11=zh:陣列; zh-hans:数组; zh-hant:陣列;
+}}
+{{Infobox software
+| name = Java Native Access
+| logo = 
+| screenshot = 
+| caption = 
+| developer = 
+| released = {{Start date|2007|05|09}}<!-- https://github.com/twall/jna/commits/master?page=35 as of May 2xxx
+
+012 -->
+| latest release version = 5.5.0
+| latest release date = {{Start date and age|2019|07|19}}<ref name="5.5.0">{{cite web| url=https://groups.google.com/forum/#!topic/jna-users/o3yvvgVOU5w| website=Groups.google.com| title=Release 5.5.0| date=2019-10-30| accessdate=2020-07-23| archive-date=2011-01-22| archive-url=http://arquivo.pt/wayback/20110122130054/https://groups.google.com/forum/#!topic/jna-users/o3yvvgVOU5w| dead-url=no}}</ref>
+| latest preview version = 
+| latest preview date = 
+| operating system = Windows, macOS, Android, AIX, FreeBSD, [[GNU|GNU]]/[[Linux_kernel|Linux]], OpenBSD, Solaris, Windows Mobile
+| platform = [[Java|Java]] 1.4 或更高 (只能使用JNA 3.5.2前的版本), Java 1.6 （JNA 4.0.0 以上）
+| size = 1.83 MB (存档后)
+| programming language = [[C语言|C]] 和 [[Java|Java]]
+| genre = [[库|库]]
+| license = [[LGPL|LGPL]] version 2.1，JNA 4.0后增加了 Apache Software License, version 2.0
+| website = {{url|https://github.com/java-native-access/jna}}
+| author = Todd Fast, Timothy Wall, Liang Chen
+}}
+
+'''Java Native Access''' ('''JNA''') 是一个由社区开发的库，它使Java程序无需使用[[Java_Native_Interface|Java Native Interface]]即可轻松访问本地[[共享库|共享库]]。JNA的设计旨在以最少的努力以原生的方式提供本地访问，且不需要[[样板|样板代码]]或[[胶水代码|胶水代码]]。
+
+== 结构 ==
+JNA库使用一个称为外部函数接口库（{{le|libffi}}）的小型本机库来动态调用本机代码。JNA库使用本地函数，允许代码按名称加载库并检索指向该库中函数的指针，使用libffi库来调用它，而无需静态绑定，头文件或任何编译。开发人员使用[[Java_interface|Java interface]]描述目标本机库中的函数和结构（struct）。这使得利用平台功能非常容易，而避免了配置或构建JNI的高开销。
+
+JNA支持在macOS，Microsoft Windows，FreeBSD / OpenBSD，Solaris，GNU/Linux，AIX，Windows Mobile和Android上构建和测试。经过适当调整和重编译，可以使其在大多数能够运行Java的平台上运行。
+
+==类型对应==
+这个表格显示了JNA所支持的类型与java类型，Windows通用类型的对应关系.<ref>{{cite web |url=https://github.com/twall/jna/blob/master/www/Mappings.md |title=Default Type Mappings |publisher=jna.dev.java.net |accessdate=2011-08-02 |archive-date=2014-06-01 |archive-url=https://web.archive.org/web/20140601131916/https://github.com/twall/jna/blob/master/www/Mappings.md |dead-url=no }}</ref>
+
+{| class="wikitable"
+!C类型
+!大小
+!Java类型
+!Windows通用类型
+|-
+|[[数据类型_(C语言)|char]]
+|8-bit integer
+|[[byte|byte]]
+|BYTE, TCHAR
+|-
+|[[数据类型_(C语言)|short]]
+|16-bit
+|[[short|short]]
+|short WORD
+|-
+|[[宽字符|wchar_t]]
+|16/32-bit character
+|[[char|char]]
+|WCHAR, TCHAR
+|-
+|[[int|int]]
+|32-bit integer
+|[[int|int]]
+|DWORD
+|-
+|[[int|int]]
+|boolean value
+|boolean
+|BOOL
+|-
+|[[数据类型_(C语言)|long]]
+|32/64-bit integer
+|NativeLong
+|LONG
+|-
+|[[long_long|long long]], __int64
+|64-bit integer
+|[[long|long]]
+|LONGLONG
+|-
+|[[單精度浮點數|float]]
+|32-bit FP
+|[[float|float]]
+|
+|-
+|[[雙精度浮點數|double]]
+|64-bit FP
+|[[double|double]]
+|
+|-
+|[[数据类型_(C语言)|char]]*
+|C string
+|String
+|LPCTSTR
+|-
+|void*
+|pointer
+|Pointer
+|LPVOID, HANDLE, LPXXX
+|}
+
+'''注意：'''根据一些预处理器指令和不同的实现，TCHAR可能为char或wchar_t。LPCTSTR也是一样的。
+
+== 数据结构的内存字节对齐 ==
+JNA没有规定内存字节的对齐方式。JNA默认为遵循OS平台的设置，但也可以自定义对齐方式。如果本机库的文档中未提供关于内存对齐的详细信息，则必须通过反复试验确定正确的对齐方式。
+
+== 示例 ==
+<!-- To exposes the methods in the native library an interface needed to extends the class com.sun.jna.Library with same name of -->
+下面这个例子展示了JNA如何加载C标准库并使用其中的printf函数。
+
+'''注意:''' 这个例子是跨平台的，这意味着它可以在 [[Microsoft_Windows|Windows]] / [[GNU|GNU]]+[[Linux_kernel|Linux]] / [[Unix|Unix]] / [[macOS|macOS]] 运行，并得到完全相同的结果。
+
+<syntaxhighlight lang="java">
+import com.sun.jna.Library;
+import com.sun.jna.Native;
+import com.sun.jna.Platform;
+
+/** 这个例子展示了JNA的一个用法 */
+public class HelloWorld {
+    public interface CLibrary extends Library {
+        CLibrary INSTANCE = (CLibrary) Native.loadLibrary(
+            (Platform.isWindows() ? "msvcrt" : "c"), CLibrary.class);
+        void printf(String format, Object... args);
+    }
+
+    public static void main(String[] args) {
+        CLibrary.INSTANCE.printf("Hello, World\n");
+        for (int i = 0; i < args.length; i++) {
+            CLibrary.INSTANCE.printf("Argument %d: %s\n", i, args[i]);
+        }
+    }
+}
+</syntaxhighlight>
+
+下面这个例子使用了C [[POSIX|POSIX]]库并调用其中的mkdir函数。
+
+'''注意:''' 这个例子在POSIX兼容的系统中是跨平台的，这意味着它可以在所有POSIX兼容系统中运行并获得相同结果，但它无法在大多数Windows系统上运行。
+
+<syntaxhighlight lang="java">
+import com.sun.jna.Library;
+import com.sun.jna.Native;
+
+/** Simple example of native C POSIX library declaration and usage. */
+public class ExampleOfPOSIX {
+    public interface POSIX extends Library {
+	    public int chmod(String filename, int mode);
+	    public int chown(String filename, int user, int group);
+	    public int rename(String oldpath, String newpath);
+	    public int kill(int pid, int signal);
+	    public int link(String oldpath, String newpath);
+	    public int mkdir(String path, int mode);
+	    public int rmdir(String path);
+    }
+
+    public static void main(String[] args) {
+        POSIX posix = (POSIX) Native.loadLibrary("c", POSIX.class);
+	    posix.mkdir("/tmp/newdir", 0777);
+	    posix.rename("/tmp/newdir","/tmp/renamedir");
+    }
+}
+</syntaxhighlight>
+
+下面这个例子加载了Kernel32.dll并调用了其中的Beep和Sleep函数。
+
+'''注意:''' 这个例子只能在Windows下运行。 
+<syntaxhighlight lang="java">
+import com.sun.jna.Library;
+import com.sun.jna.Native;
+
+/** 这是JNA调用Windows dll的一个例子 */
+public class BeepExample {
+    public interface Kernel32 extends Library {
+        // FREQUENCY可以为 37 和 32767间任意一整数
+        // DURATION 的单位为毫秒
+        public boolean Beep(int FREQUENCY, int DURATION);
+        public void Sleep(int DURATION);
+    }
+
+    public static void main(String[] args) {
+	    Kernel32 lib = (Kernel32) Native.loadLibrary("kernel32", Kernel32.class);
+	    lib.Beep(698, 500);
+	    lib.Sleep(500);
+	    lib.Beep(698, 500);
+    }
+}
+</syntaxhighlight>
+
+== 用处 ==
+JNA被用于下列项目中：
+* [[Armed_Bear_Common_Lisp|Armed Bear Common Lisp]], 使用JNA实现CFFI。<ref>{{cite web|url=https://abcl.org/trac/wiki/asdf/cffi|title=asdf/cffi – armedbear|website=Abcl.org|accessdate=2018-12-07|archive-date=2020-07-17|archive-url=https://web.archive.org/web/20200717102437/https://abcl.org/trac/wiki/asdf/cffi|dead-url=no}}</ref>
+* [[JRuby|JRuby]],使用JNA实现 [[POSIX|POSIX]] 相关功能。<ref>{{cite web|url=http://headius.blogspot.com/2007/09/java-native-access-jruby-true-posix.html|title=Java Native Access + JRuby = True POSIX|first=Charles Oliver|last=Nutter|date=2007-09-02|publisher=|accessdate=2018-12-07|archive-date=2020-11-09|archive-url=https://web.archive.org/web/20201109025050/http://headius.blogspot.com/2007/09/java-native-access-jruby-true-posix.html|dead-url=no}}</ref><ref>{{cite web|url=http://www.infoq.com/news/2007/09/jna-jruby/|title=JNA brings native code to JRuby|publisher=infoq.com|accessdate=2010-05-22|date=2007-09-05|archive-date=2020-10-26|archive-url=https://web.archive.org/web/20201026134029/https://www.infoq.com/news/2007/09/jna-jruby/|dead-url=no}}</ref>
+* [[Freedom_for_Media_in_Java|Freedom for Media in Java]] (FMJ)。<ref>{{cite web|url=http://fmj-sf.net/|title=Home - FMJ|website=Fmj-sf.net|accessdate=2018-12-07|archive-date=2020-11-23|archive-url=https://web.archive.org/web/20201123191451/http://fmj-sf.net/|dead-url=no}}</ref>
+*[[JetBrains|JetBrains]]的[[IntelliJ_IDEA|IntelliJ IDEA]]。
+* [[OpenSearchServer|OpenSearchServer]],一个开源搜索引擎。
+*[[SVNKit|SVNKit]], 一个纯Java的Java Subversion client库 ，通过JNA实现相关功能。
+*[[VLC_media_player|VLC media player]], 在vlcj库中使用。<ref>{{Cite web|url=http://capricasoftware.co.uk/#/projects/vlcj|title=vlcj|website=Capricasoftware.co.uk|publisher=Caprica Software Limited|access-date=2018-10-23|archive-date=2020-11-01|archive-url=https://web.archive.org/web/20201101013436/https://capricasoftware.co.uk/#/projects/vlcj|dead-url=no}}</ref>
+* [[Cyberduck|Cyberduck]] 适用于FTP, SFTP, WebDAV, Cloud Files & Amazon S3的浏览器。
+* [[Log4j|Log4j]],附加日志库。<ref>{{Cite web|url=https://github.com/dblock/log4jna|title=dblock/log4jna|website=GitHub|language=en|access-date=2018-10-23|archive-date=2020-09-17|archive-url=https://web.archive.org/web/20200917113231/https://github.com/dblock/log4jna|dead-url=no}}</ref>
+* [[Hudson_(software)|Hudson]] 和· [[Jenkins_(software)|Jenkins]]，持续集成服务器。
+* [[Selenium_(Software)|Webdriver]]。
+* YAJSW (Yet Another Java Service Wrapper)。
+* [[Apache_Cassandra|Cassandra]], 来自 [[Apache_Software_Foundation|Apache Software Foundation]] 的开源分布数据库，使用JNA。<ref>{{cite web|url=https://github.com/apache/cassandra|title=apache/cassandra|website=GitHub|accessdate=2018-12-07|archive-date=2020-12-10|archive-url=https://web.archive.org/web/20201210203359/https://github.com/apache/cassandra|dead-url=no}}</ref>
+
+==另见==
+* [[Platform_Invocation_Services|P/Invoke]]
+* [[SWIG|SWIG]]
+
+==参考链接==
+{{Reflist}}
+
+==外部链接==
+* [https://github.com/java-native-access/jna#readme Java Native Access Web Page] {{Wayback|url=https://github.com/java-native-access/jna#readme |date=20210118184033 }}
+* [https://github.com/java-native-access/jna#download Java Native Access - Download page] {{Wayback|url=https://github.com/java-native-access/jna#download |date=20210118184033 }}
+* [http://groups.google.com/group/jna-users/about Java Native Access - User Mailing List] {{Wayback|url=http://groups.google.com/group/jna-users/about |date=20121110152126 }}
+* [http://www.javaworld.com/javaworld/jw-02-2008/jw-02-opensourcejava-jna.html Java Native Access:An easier way to access native code] {{Wayback|url=http://www.javaworld.com/javaworld/jw-02-2008/jw-02-opensourcejava-jna.html |date=20130512133418 }} by Jeff Friesen, JavaWorld.com,2008-02-05
+* [https://web.archive.org/web/20090523145246/http://today.java.net/pub/a/today/2009/05/19/protect-your-legacy-code-jna.html Protect Your Legacy Code Investment with JNA] by Stephen B. Morris, Java.net,2009-05-20
+<!-- http://www.jroller.com/phidias/entry/joys_of_jna -->
+*{{Cite web|url=http://today.java.net/article/2009/11/11/simplify-native-code-access-jna|title=Simplify Native Code Access with JNA|last=Dasgupta|first=Sanjay|date=2009-09-11|website=Java.net|archive-url=https://web.archive.org/web/20091115074230/http://today.java.net/article/2009/11/11/simplify-native-code-access-jna|archive-date=2009-11-15|url-status=|accessdate=2020-07-23|dead-url=no}}
+* [http://code.dblock.org/ShowPost.aspx?id=219 JNA is now a Githubber]{{Wayback|url=http://code.dblock.org/ShowPost.aspx?id=219 |date=20150524105539 }} by Daniel Doubrovkine, 2011-09-20
+* [http://nevermind.dk/nevermind/blog.nsf/subject/calling-the-domino-c-api-from-an-xpage-or-a-java-agent Calling the Lotus Domino C-API with JNA] {{Wayback|url=http://nevermind.dk/nevermind/blog.nsf/subject/calling-the-domino-c-api-from-an-xpage-or-a-java-agent |date=20200717185326 }} by Jesper Kiaer 2010-03-21
+
+[[Category:Java|Category:Java]]

@@ -1,0 +1,208 @@
+
+{{Infobox file format
+| name                   = XAR
+| icon                   = 
+| logo                   = 
+| screenshot             = 
+| caption                = 
+|_noextcode = on
+| extensions = {{code|.xar}}, [[安裝程序_(macOS)|{{code]], [[.XIP|{{code]]<ref name="x-xar" />
+| mime                   = application/x-xar<ref name="x-xar">{{cite web|url=https://reposcope.com/mimetype/application/x-xar|language=en|title=application/x-xar|accessdate=2019-03-19|archive-date=2019-03-27|archive-url=https://web.archive.org/web/20190327090443/https://reposcope.com/mimetype/application/x-xar}}</ref>
+| type code              = 
+| uniform type           = com.apple.xar-archive
+| magic                  = xar!
+| owner                  = 
+| released               = <!-- {{Start date|YYYY|mm|dd}} -->
+| latest release version = 1.6.1
+| latest release date    = {{Start date and age|2012|09|17}}
+| genre                  = [[归档文件|归档文件]]
+| container for          = 
+| contained by           = 
+| extended from          = [[XML|XML]], [[gzip|gzip]]
+| extended to            = 
+| standard               = 
+| free                   = 
+| url                    = {{URL|https://mackyle.github.io/xar/}} {{URL|https://github.com/mackyle/xar}}
+}}
+
+'''XAR'''为'''可扩展归档格式'''（{{lang-en|''e'''X'''tensible '''AR'''chive format''}}）的缩写，是一种[[开源|开源]][[文件归档器|文件归档器]]和其[[檔案格式|文件格式]]。它创建于[[OpenDarwin|OpenDarwin]]项目，并在[[Mac_OS_X_10.5|Mac OS X 10.5]]及更高版本中用于软件安装例程，以及在[[Safari|Safari 5.0]]及更高版本中用于[[浏览器扩展|浏览器扩展]]安装。 它取代了[[Gzip|gzip压缩]]的[[pax文件|pax文件]]的使用。<ref name="xarLeopard">{{Cite web|url=http://www.nabble.com/xar-in-Mac-OS-X-t2081148.html|archiveurl=https://web.archive.org/web/20070207045420/http://www.nabble.com/xar-in-Mac-OS-X-t2081148.html|deadurl=yes|title=Nabble – xar in Mac OS X|archivedate=2007年2月7日|accessdate=2020年9月21日}}</ref>
+
+[[RPM套件管理員|RPM]]的一个开发分支RPM5也使用xar。<ref name="xarRPM">{{Cite web|url=http://rpm5.org/roadmap.php|title=rpm package manager|website=rpm5.org|accessdate=2020-09-21|archive-date=2011-12-04|archive-url=https://web.archive.org/web/20111204224249/http://rpm5.org/roadmap.php|dead-url=no}}</ref>
+
+== 文件结构 ==
+[[File:XAR_File_Structure.svg|thumb]]
+.xar文件包含三部分：文件头，目录表（Table of Contents, TOC）和堆。 所有字段均按[[大端序|大端]]顺序存储。<ref name="project wiki">{{Cite web|url=https://github.com/mackyle/xar|title=mackyle/xar|website=GitHub|access-date=2020-09-21|archive-date=2021-05-06|archive-url=https://web.archive.org/web/20210506132946/https://github.com/mackyle/xar}}</ref>
+=== 文件头 ===
+{| class="wikitable"
+! 偏移#
+! 长度（字节）
+! 描述
+|-
+| 0
+| 4
+| 文件特征签名，总是<code>xar!</code>
+|-
+| 4
+| 2
+| 文件头大小
+|-
+| 6
+| 2
+| 文件版本，目前只有版本1
+|-
+|8
+|8
+|TOC压缩后大小
+|-
+|16
+|8
+|TOC压缩前大小
+|-
+|24
+|4
+|[[校验和|校验和]]算法:{{plainlist}}
+* 0 = 无
+* 1 = [[SHA1|SHA1]]
+* 2 = [[MD5|MD5]]
+* 3 = [[SHA-256|SHA-256]]<ref name="xar-man1">{{cite web|url=https://www.unix.com/man-page/mojave/1/xar|title=xar - eXtensible ARchiver mojave man page|accessdate=2019-03-26|last1=Braun|first1=Rob|last2=Fuller|first2=Landon|last3=Leimbach|first3=David|last4=Van Vechten|first4=Kevin|date=2015-06-04}}</ref>
+* 4 = [[SHA-512|SHA-512]]
+{{endplainlist}}
+|-
+|28
+|0, 4 , 36
+|填充字节或校验和算法名称
+|}
+
+=== 目录表（TOC） ===
+与[[cpio|cpio]]，[[tar|tar]]或[[Ar_(Unix)|ar]]的不同，Xar将TOC（目录表）存储在文件的开头，这使得附加到归档文件变得更加复杂，但是好处是不必扫描整个归档文件来提取单个包含的文件。 TOC以[[UTF-8|UTF-8编码]]的[[XML|XML文档]]存储,[[zlib|zlib]]压缩。<ref>{{Cite web|url=https://code.google.com/archive/p/xar/wikis/xarformat.wiki|title=Google Code Archive - Long-term storage for Google Code Project Hosting.|website=code.google.com|access-date=2020-09-21|archive-date=2021-10-29|archive-url=https://web.archive.org/web/20211029012921/https://code.google.com/archive/p/xar/wikis/xarformat.wiki}}</ref><ref name="project wiki"/> 存储在Xar中的每个文件都经过独立压缩/编码，可以使用不同的压缩方法对不同文件进行编码。在某些系统上，文件还可以通过xz或lzma压缩方法进行编码。<ref name="xar-man1" />
+
+'''TOC示例'''
+<syntaxhighlight lang="xml">
+<?xml version="1.0" encoding="UTF-8"?>
+<xar>
+ <toc>
+  <checksum style="sha1">
+   <offset>0</offset>
+   <size>20</size>
+  </checksum>
+  <file id="1">
+   <group>staff</group>
+   <gid>20</gid>
+   <user>joe</user>
+   <uid>501</uid>
+   <mode>0755</mode>
+   <type>directory</type>
+   <name>com.foobar</name>
+   <file id="2">
+    <group></group>
+    <gid>20</gid>
+    <user></user>
+    <uid>501</uid>
+    <mode>0775</mode>
+    <type>directory</type>
+    <name>Contents</name>
+    <file id="3">
+     <data>
+      <length>428</length>
+      <offset>20</offset>
+      <size>1005</size>
+      <encoding style="application/x-gzip"/>
+      <archived-checksum style="SHA1">a5f6f1461213a904f831d4ef6f214638342842ed</archived-checksum>
+      <extracted-checksum style="SHA1">21d21a0c90378248ce0dfb6f345376d1b00d65fc</extracted-checksum>
+     </data>
+     <group></group>
+     <gid>20</gid>
+     <user></user>
+     <uid>501</uid>
+     <mode>0664</mode>
+     <type>file</type>
+     <name>Info.plist</name>
+    </file>
+    <file id="4">
+     <group></group>
+     <gid>20</gid>
+     <user></user>
+     <uid>501</uid>
+     <mode>0775</mode>
+     <type>directory</type>
+     <name>Resources</name>
+     <file id="5">
+      <data>
+       <length>14868</length>
+       <offset>448</offset>
+       <size>274432</size>
+       <encoding style="application/x-gzip"/>
+       <archived-checksum style="SHA1">efe5c97921de7ccc5aebc158d158e9d4280d6814</archived-checksum>
+       <extracted-checksum style="SHA1">45c8be42d1d9afdb57ddd5e9311453010ec46161</extracted-checksum>
+      </data>
+      <group></group>
+      <gid>20</gid>
+      <user></user>
+      <uid>501</uid>
+      <mode>0664</mode>
+      <type>file</type>
+      <name>foobar</name>
+     </file>
+     <file id="6">
+      <data>
+       <length>17635</length>
+       <offset>15316</offset>
+       <size>45056</size>
+       <encoding style="application/x-gzip"/>
+       <archived-checksum style="SHA1">3c761ffcc81ee6e232e4f4a1c4a81654c26c4e52</archived-checksum>
+       <extracted-checksum style="SHA1">0ea31f8ef0e5987a1838a64ab5c26ebf3ee4bc37</extracted-checksum>
+      </data>
+      <group></group>
+      <gid>20</gid>
+      <user></user>
+      <uid>501</uid>
+      <mode>0664</mode>
+      <type>file</type>
+      <name>docSet.skidx</name>
+     </file>
+     <file id="7">
+      <group></group>
+      <gid>20</gid>
+      <user></user>
+      <uid>501</uid>
+      <mode>0775</mode>
+      <type>directory</type>
+      <name>Documents</name>
+      <file id="8">
+       <data>
+        <length>35790</length>
+        <offset>32951</offset>
+        <size>209242</size>
+        <encoding style="application/x-gzip"/>
+        <archived-checksum style="SHA1">5242cd71585c34e722932f324706f8c00e1ae0c5</archived-checksum>
+        <extracted-checksum style="SHA1">c0e013e53d829511835e2b429abb5198731e9a3e</extracted-checksum>
+       </data>
+       <group></group>
+       <gid>20</gid>
+       <user></user>
+       <uid>501</uid>
+       <mode>0664</mode>
+       <type>file</type>
+       <name>foobar.html</name>
+      </file>
+     </file>
+    </file>
+   </file>
+  </file>
+ </toc>
+</xar>
+</syntaxhighlight>
+
+==参考来源==
+{{Reflist}}
+
+==外部链接==
+{{Portal|自由軟體}}
+*[http://code.google.com/p/xar/ Xar homepage] {{Wayback|url=http://code.google.com/p/xar/ |date=20120406152702 }}
+*[https://opensource.apple.com/source/xar/ Apple xar homepage] {{Wayback|url=https://opensource.apple.com/source/xar/ |date=20210727071500 }}
+
+{{Archive formats}}
+
+{{DEFAULTSORT:Xar (Archiver)}}
+
+[[Category:归档格式|Category:归档格式]]

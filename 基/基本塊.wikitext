@@ -1,0 +1,87 @@
+{{refimprove|date=2020年7月}}
+
+在電腦[[編譯器|編譯器]]架構中，'''基本塊'''（basic block）是一段線性的程式碼，只能從這段程式碼開始處進入這段程式，沒有其他程式碼會跳躍進入這段程式，只能從這段程式碼最後一行離開這段程式，中間沒有其他程式碼會跳躍離開這段程式<ref>Hennessy, John L., and David A. Patterson. Computer architecture: a quantitative approach. Elsevier, 2011.</ref><ref>{{Cite book|title=Engineering a compiler|last=Daniel)|first=Cooper, Keith D. (Keith|date=2012|publisher=Elsevier/Morgan Kaufmann|others=Torczon, Linda.|isbn=978-0120884780|edition=2nd|location=Amsterdam|pages=231|oclc=714113472}}</ref>。這種程式的限制使得基本塊非常好分析<ref>{{Cite web |url=http://portal.acm.org/citation.cfm?id=808479 |title="Control Flow Analysis" by Frances E. Allen |accessdate=2020-07-07 |archive-date=2020-05-26 |archive-url=https://web.archive.org/web/20200526100217/https://dl.acm.org/doi/10.1145/390013.808479 |dead-url=no }}</ref>。[[編譯器|編譯器]]處理程式時，會在分析程序中，將程式分解為所有基本塊的組合。在[[控制流圖|控制流圖]]中，基本塊是控制流圖中的節點。
+
+以下是一段[[QuickBASIC|QuickBASIC]]程式，程式中的前二行（DO之前的程式碼）即為基本塊。
+
+<syntaxhighlight lang="QBasic">
+INPUT "What is your name: ", UserName$
+PRINT "Hello "; UserName$
+DO
+  INPUT "How many stars do you want: ", NumStars
+  Stars$ = STRING$(NumStars, "*") 
+  PRINT Stars$
+  DO
+    INPUT "Do you want more stars? ", Answer$
+  LOOP UNTIL Answer$ <> ""
+  Answer$ = LEFT$(Answer$, 1)
+LOOP WHILE UCASE$(Answer$) = "Y"
+PRINT "Goodbye "; UserName$
+</syntaxhighlight>
+==定義==
+基本塊的程式有以下特點：
+*單一[[入口点|入口点]]，其他程式中，沒有任何一個[[分支_(計算機科學)|分支]]指令的目標在這段程式基本塊之內（基本塊的第一行除外）。
+*單一結束點，這段程式一定要執行完最後一行才會執行其他基本塊的程式。
+因為上述特點，基本塊中的程式，只要執行了第一行，後面的程式碼就會依序執行，每一行程式都會執行一次<ref>{{cite conference |title=Masking wrong-successor Control Flow Errors employing data redundancy  |last1=Yousefi |first1=Javad |date= 2015|publisher=IEEE |book-title= |pages=201–205 |location= |doi=10.1109/ICCKE.2015.7365827 }}</ref><ref>[http://portal.acm.org/citation.cfm?id=808480 "Global Common Subexpression Elimination" by John Cocke]</ref>。
+
+程式碼可以是[[源代码|源代码]]、[[汇编语言|汇编语言]]等型式的程式。
+
+以下是更型式化的定義一串的指令屬於基本塊的方式：
+* 程式碼中的每一個指令都[[支配_(圖論)|支配]]（dominate）位置在較後面的指令，也就是位置在較後面的指令一定會比較晚執行。
+* 這串程式中的連續兩個指令之間，不會再執行其他的指令。
+此定義會比一開始較直觀定義的範圍更廣。例如，此定義可以允許程式碼中間有無條件的跳躍，只要跳躍目的的程式碼不是其他跳躍的目的即可。使用此定義，在產生基本塊的演算法中，會比較容易產生基本塊。
+
+在執行某一基本塊最後一行之後，可能會執行的基本塊稱為「後繼」（Successor），而執行此基本塊之前，可能會執行的基本塊稱為「前驅」（Predecessor）。會跳到基本塊啟始程式的程式碼可能不止一處。
+
+==產生基本塊的演算法==
+若要由一串的指令中產生基本塊，其[[演算法|演算法]]如下：程式先分析指令，找到「基本塊的邊界」，基本塊的邊界是指可能會開始一個基本塊（因為是其他流程控制指令的跳躍目標）或是結束一個基本塊的指令（因為有流程控制指令，可能會跳躍到其他的基本塊）。因此，指令列表會因為這些「基本塊的邊界」而切割成幾段，這幾段就是基本塊。
+
+上述方式不一定能找到（在型式化定義下）最大的基本塊，不過多半而言都已足夠了（最大的基本塊是指基本塊無法在不違反規則的情形下，和鄰近基本塊合併，形成更大的基本塊<ref>Modern Compiler Design by Dick Grune, Henri E. Bal, Ceriel J.H. Jacobs, and Koen G. Langendoen p320</ref>）。
+
+輸入：一串指令（多半是[[三位址碼|三位址碼]]）<ref>Compiler Principles, Techniques and Tools, Aho Sethi Ullman</ref>。
+輸出：一串的基本塊，其中每一個三位址碼都恰好在一個基本塊內。
+
+步驟1：找到程式碼中的啟始指令（leader）。滿足以下任何一項的就是啟始指令：
+# 第一個指令。
+# goto、無條件跳躍或有條件跳躍目的的指令。
+# 緊接在goto、無條件跳躍或有條件跳躍後面的指令。
+
+步驟2：從啟始指令開始，一直往下檢查，直到找到下一個基本塊的啟始指令為止，從啟始指令開始，到下一個基本塊的啟始指令之前的程式碼就是對應啟始指令的基本塊。
+
+每一個基本塊都會有一個啟始指令。
+
+以下的程式碼會結束一個基本塊：
+* 無條件或是有條件的[[分支_(計算機科學)|分支]]指令，不論是直接的或是間接的都是。
+* [[函式|函式]]的{{le|返回指令|return statement}}。
+* 可能會丟出[[异常处理|异常]]的指令。
+* 函式呼叫若無法返回，也可能是基本塊的結束，例如會產生异常的函式，或是像[[C语言|C语言]]中<code>[[Setjmp.h|longjmp]]</code> 指令及<code>exit</code> 指令。
+* return指令本身。
+
+以下的程式碼會開始一個基本塊：
+* 程序或是函式的進入點。
+* 跳躍或是分支指令的目標。
+* 一些條件分支指令後的「貫穿」(fall-through）程式碼（某一條件成立後，除了執行自身程式嗎外，還會執行對應其他條件的程式碼）
+* 在丟出异常指令之後的程式碼
+* 异常處理程式。
+
+因為流程控制無法越過基本塊的結尾，在找到基本塊之後，有些基本塊邊界可能要調整。特別是「貫穿」(fall-through）的條件分支需要改為傳統二路的條件分支，丟出异常的函數後面需要加上無條件的跳躍。這些調整可能需要在其他基本塊的開始處加上[[標記_(程式語言)|標記]]，表示是無條件跳躍的目標。
+
+==相關條目==
+{{Portal|電腦程式設計}}
+
+* [[块_(编程)|块 (编程)]]
+* [[控制流圖|控制流圖]]
+* [[决策到决策路径|决策到决策路径]]
+* {{le|Extended basic block|Extended basic block}}
+* [[線性程式碼順序及跳轉|線性程式碼順序及跳轉]]
+
+==參考資料==
+{{Reflist}}
+
+==外部連結==
+* [https://gcc.gnu.org/onlinedocs/gccint/Basic-Blocks.html Basic Blocks - GNU Compiler Collection]{{Wayback|url=https://gcc.gnu.org/onlinedocs/gccint/Basic-Blocks.html |date=20191220071514 }}
+* [http://en.wiktionary.org/wiki/extended_basic_block Extended Basic Block - Wiktionary]{{Wayback|url=http://en.wiktionary.org/wiki/extended_basic_block |date=20200201170345 }}
+
+{{DEFAULTSORT:Basic Block}}
+{{编译器优化}}
+[[Category:编译原理|Category:编译原理]]

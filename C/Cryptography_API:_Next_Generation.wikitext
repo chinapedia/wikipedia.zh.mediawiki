@@ -1,0 +1,52 @@
+{{noteTA|G1=IT}}
+'''下一代密码学API''' ('''Cryptography API: Next Generation， CNG''') 是[[微軟|微軟]]从[[Windows_Vista|Windows Vista]]开始在[[作業系統|作業系統]]中包含的密碼学编程接口。替代了当时已经发布了十年的[[Cryptographic_API|Cryptographic API]]。
+
+CNG允许同一个函数可用更多的密码学算法，并包含了[[美国国家安全局|美国国家安全局]]{{tsl|en|NSA Suite B Cryptography}}中发布的新算法。<ref>{{Cite web |url=http://www.nsa.gov/ia/programs/suiteb_cryptography/index.shtml |title=Suite B |accessdate=2020-07-15 |archive-date=2009-02-07 |archive-url=https://web.archive.org/web/20090207005135/http://www.nsa.gov/ia/programs/suiteb_cryptography/index.shtml |dead-url=no }}</ref>并灵活地支持插件定制密码学API到CNG的运行时中。但CNG的密钥存储机制仍然不支持存储对称密钥。<ref>{{Cite web |url=https://msdn.microsoft.com/en-us/library/bb204778%28v=vs.85%29.aspx |title=Key Storage and Retrieval, Microsoft |accessdate=2020-07-15 |archive-date=2017-09-21 |archive-url=https://web.archive.org/web/20170921001832/https://msdn.microsoft.com/en-us/library/bb204778%28v=vs.85%29.aspx |dead-url=no }}</ref> CNG既可以工作在用户模式下，也可以工作在内核模式下，支持CryptoAPI的所有算法。其运行代码在Bcrypt.dll文件中。
+
+CNG也支持[[椭圆曲线密码学|椭圆曲线密码学]]非对称加密。<ref>{{Cite web |url=https://www.nsa.gov/business/programs/elliptic_curve.shtml |title=The Case for Elliptic Curve Cryptography, NSA |accessdate=2020-07-15 |archive-date=2018-09-18 |archive-url=https://web.archive.org/web/20180918145859/https://www.nsa.gov/business/programs/elliptic_curve.shtml |dead-url=no }}</ref>CNG API集成了[[智能卡|智能卡]]子系统，包括Base Smart Card Cryptographic Service Provider (Base CSP) 模块，封装了智能卡API。智能卡制造商只需要使其产品兼容与该API，而不需要从头写解决方案。 
+
+CNG增加了[[双椭圆曲线确定性随机比特生成器|双椭圆曲线确定性随机比特生成器]]<ref name="Schneier">{{cite web |url=http://www.schneier.com/blog/archives/2007/12/dual_ec_drbg_ad.html |title=Dual_EC_DRBG Added to Windows Vista |last=Schneier |first=Bruce |authorlink=Bruce Schneier |date=December 17, 2007 |work=Schneier on Security |accessdate=January 13, 2010 |archive-date=2020-07-10 |archive-url=https://web.archive.org/web/20200710065457/https://www.schneier.com/blog/archives/2007/12/dual_ec_drbg_ad.html |dead-url=no }}</ref>，一套定义于{{tsl|en|NIST SP 800-90A}}中的[[伪随机数生成器|伪随机数生成器]]，被认为存在NSA的安全后门。除非开发者记得每次都用其它伪随机数生成器或[[真随机数生成器|真随机数生成器]]产生初始化种子。该算法也很慢。<ref name="Schneier2">{{cite web |url=http://www.schneier.com/blog/archives/2007/11/the_strange_sto.html |title=The Strange Story of Dual_EC_DRBG |last=Schneier |first=Bruce |authorlink=Bruce Schneier |date=November 15, 2007 |work=Schneier on Security |accessdate=January 12, 2010 |archive-date=2020-07-10 |archive-url=https://web.archive.org/web/20200710065535/https://www.schneier.com/blog/archives/2007/11/the_strange_sto.html |dead-url=no }}</ref>该算法只在明确调用时才会被使用。
+
+CNG的缺省的[[伪随机数生成算法|伪随机数生成算法]]已经被使用AES作为块加密器的{{tsl|en|CTR_DRBG}}替代了。因为老的算法使用[[資料加密標準|DES]]与[[SHA-1|SHA-1]]，都已经被攻破。<ref>{{cite web |url=http://csrc.nist.gov/publications/fips/archive/fips186-2/fips186-2.pdf |title=FIPS PUB 186-2 |publisher=[[National_Institute_of_Standards_and_Technology|National Institute of Standards and Technology]] |work=[[Federal_Information_Processing_Standard|Federal Information Processing Standard]]s |date=January 27, 2000 |accessdate=January 13, 2010 |archive-date=2011-08-12 |archive-url=https://web.archive.org/web/20110812232347/http://csrc.nist.gov/publications/fips/archive/fips186-2/fips186-2.pdf |dead-url=no }}</ref> CTR_DRBG定义在NIST SP 800-90中的两种算法之一，由[[布魯斯·施奈爾|布魯斯·施奈爾]]捐赠。<ref name="Schneier2" />
+==示例源代码==
+产生指定字节长度的伪随机数：
+<syntaxhighlight lang="cpp">
+ #include <Windows.h>
+#include <bcrypt.h>
+#include <iostream>
+#include <stdio.h>
+#pragma comment(lib, "bcrypt.lib")
+using namespace std;
+unsigned long getSeed(ULONG buffer_size) {
+	NTSTATUS status = 0;
+	ULONG flags = 0;
+	UCHAR c_seed[128] = { 0 };
+	BCRYPT_ALG_HANDLE handle;
+	status = BCryptOpenAlgorithmProvider(
+		&handle, BCRYPT_RNG_ALGORITHM, NULL, 0
+	);
+	if (!BCRYPT_SUCCESS(status)) {
+		cout << "BCryptOpenAlgorithmProvider";
+		printf("%X", status);
+	}
+	status = BCryptGenRandom(
+		handle, c_seed, buffer_size, 0
+	);
+	if (!BCRYPT_SUCCESS(status)) {
+		cout << "Error in BCryptGenRandom";
+		printf("%X", status);
+	}
+	status = BCryptCloseAlgorithmProvider(
+		handle, 0
+	);
+	if (!BCRYPT_SUCCESS(status)) {
+		cout << "BCryptCloseAlgorithmProvider";
+		printf("%X", status);
+	}
+	unsigned long seedNo = (unsigned long)c_seed;
+	return seedNo;
+}
+</syntaxhighlight>
+==参考文献==
+<references/>
+[[Category:Windows_API|Category:Windows API]]

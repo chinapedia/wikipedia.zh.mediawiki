@@ -1,0 +1,47 @@
+'''时滞斐波那契生成器（Lagged Fibonacci generator，LFG或LFib）'''，是一类[[伪随机数生成器|伪随机数生成器]]。用于改进标准的[[线性同余生成器|线性同余生成器]]。
+
+用[[递推关系|递推关系]]表示序列的生成：
+:<math>S_n \equiv S_{n-j} \star S_{n-k}  \pmod{m},   0 < j < k</math>
+其中，新项由两个老项计算生成。''m''通常是2的幂 (''m'' = 2<sup>''M''</sup>), 经常2<sup>32</sup>或2<sup>64</sup>。其中 <math>\star</math>算符表示一般的[[二元运算符|二元运算符]]，这可以是加法、减法、乘法或者[[位运算|位运算]][[异或|异或]]。相应地称作''加法时滞斐波那契生成器''（ALFG）、''乘法时滞斐波那契生成器''（MLFG）、 ''双抽头[[广义反馈移位寄存器|广义反馈移位寄存器]]''（GFSR）。[[梅森旋转算法|梅森旋转算法]]是GFSR的变种。GFSR与[[线性反馈移位寄存器|线性反馈移位寄存器]]有关。
+
+使用''k''个状态字的生成器，称作'记住'了过去''k''个值。
+
+时滞斐波那契生成器的理论相当复杂，理论也不够充分到能指导如何选择{{var|j}}与{{var|k}}。生成器的初始化也非常敏感。 
+==性值 ==
+'''时滞斐波那契生成器'''对于加减法运算，有最大周期(2<sup>k</sup> - 1)*2<sup>M-1</sup>；对异或运算有最大周期(2<sup>''k''</sup> − 1) × ''k''；对乘法运算的最大周期为(2<sup>''k''</sup> − 1) × 2<sup>M−3</sup>, 即加法运算最大周期的1/4.
+
+为了达到最大周期，多项式:
+
+:''y'' = ''x''<sup>''k''</sup> + ''x''<sup>''j''</sup> + 1
+
+必须是{{tsl|en|primitive polynomial (field theory)|本原多项式]]，对于mod 2的整数. 满足这样的约束的j与k，已经在文献中公布，常用的有:
+
+:{j = 7, k = 10},  {j = 5, k = 17},  {j = 24, k = 55},  {j = 65, k = 71},  {j = 128, k = 159}  [https://web.archive.org/web/20040309175607/http://www.ccs.uky.edu/csep/RN/RN.html], {j = 6, k = 31}, {j = 31, k = 63}, {j = 97, k = 127}, {j = 353, k = 521}, {j = 168, k = 521}, {j = 334, k = 607}, {j = 273, k = 607}, {j = 418, k = 1279} [http://www.nersc.gov/nusers/resources/software/libs/math/random/www2.0/DOCS/www/parameters.html] {{Wayback|url=http://www.nersc.gov/nusers/resources/software/libs/math/random/www2.0/DOCS/www/parameters.html |date=20100614213822 }}
+
+另一套''j''与''k''的可能值在《[[计算机程序设计艺术|计算机程序设计艺术]]》第2卷第29页公布:
+
+:(24, 55), (38, 89), (37, 100), (30, 127), (83, 258), (107, 378), (273, 607), (1029, 2281), (576, 3217), (4187, 9689), (7083, 19937), (9739, 23209)
+
+注意到上述数越小，周期就越短。
+
+如果使用加法，要求前''k''个初始化生成器的值中至少一个是奇数。如果使用乘法，要求前''k''个值都必须是奇数.<ref>[http://www.cs.fsu.edu/~asriniva/papers/mlfg.ps Parameterizing Parallel Multiplicative Lagged-Fibonacci Generators] {{Wayback|url=http://www.cs.fsu.edu/~asriniva/papers/mlfg.ps |date=20180721222733 }}, M.Mascagni, A.Srinivasan</ref>
+
+有研究建议{{var|j}}与{{var|k}}最好近似[[黄金比例|黄金比例]].<ref name="uniform">[https://openresearch-repository.anu.edu.au/bitstream/1885/40805/3/TR-CS-92-02.pdf "Uniform random number generators for supercomputers"] {{Wayback|url=https://openresearch-repository.anu.edu.au/bitstream/1885/40805/3/TR-CS-92-02.pdf |date=20201205030151 }}, Richard Brent, 1992</ref>
+
+== 时滞斐波那契生成器的问题 ==
+Robert M. Ziff在四抽头移位寄存器的论文中指出“众所周知这种生成器，特别是双抽头的 R(103, 250)，有严重的缺陷。{{tsl
+en|George Marsaglia}}发现R(24, 55)与更小的生成器的作为相当差，并建议不要用这类生成器。 ... 双抽头生成器R(a, b)的基础问题是给定了生成器，则有内在的三点相关：<math>x_{n}</math>, <math>x_{n-a}</math>, <math>x_{n-b}</math>。这种相关性在<math>p = max(a, b, c, \ldots )</math>尺度上传播，显然导致了问题。”<ref>[https://arxiv.org/abs/cond-mat/9710104 "Four-tap shift-register-sequence random-number generators"] {{Wayback|url=https://arxiv.org/abs/cond-mat/9710104 |date=20200712113237 }}, Robert M. Ziff, Computers in Physics, 12(4), Jul/Aug 1998, pp. 385–392</ref>这是指标准的时滞斐波那契生成器，每个新数依赖于以前的2个老数。三抽头的时滞斐波那契生成器去除了很多统计问题，如在{{tsl|en|Diehard tests|Birthday Spacings}}与Generalized Triple测试失败问题.<ref name="uniform" />
+
+时滞斐波那契生成器的初始化是个非常复杂的问题。时滞斐波那契生成器的输出对其初始化条件非常敏感。时滞斐波那契生成器的数学理论是不完备的，使它依赖于统计测试而不是理论分析。
+
+== 使用 ==
+* [[Freeciv|Freeciv]]游戏使用时滞斐波那契生成器{j = 24, k = 55}。
+* [[Boost_C++_Libraries|Boost C++ Libraries]]实现了时滞斐波那契生成器。
+* [[Subtract_with_carry|Subtract with carry]]是时滞斐波那契生成器的一种实现，包含在[[C++11|C++11]][[标准模板库|标准模板库]]中。
+* [[Oracle数据库|Oracle数据库]]在DBMS_RANDOM包中实现了时滞斐波那契生成器。
+ 
+== 参考文献==
+:[https://web.archive.org/web/20100610050921/http://stat.fsu.edu/techreports/M766.pdf Toward a universal random number generator], G.Marsaglia, A.Zaman
+<references/>
+ 
+[[Category:伪随机数生成器|Category:伪随机数生成器]]

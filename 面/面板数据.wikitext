@@ -1,0 +1,98 @@
+'''面板数据'''（或称'''纵向数据'''）是[[统计学|统计学]]与[[计量经济学|计量经济学]]中[[截面数据|截面数据]]与[[时间序列数据|时间序列数据]]的结合。<ref>{{cite book|title=Analysis of Longitudinal Data|url=https://archive.org/details/analysislongitud00digg_730|url-access=limited|last=Diggle|first=Peter J.|last2=Heagerty|first2=Patrick|last3=Liang|first3=Kung-Yee|last4=Zeger|first4=Scott L.|publisher=Oxford University Press|year=2002|isbn=0-19-852484-6|edition=2nd|location=|page=[https://archive.org/details/analysislongitud00digg_730/page/n19 2]}}</ref><ref>{{cite book|title=Applied Longitudinal Analysis|url=https://archive.org/details/appliedlongitudi00fitz|last=Fitzmaurice|first=Garrett M.|last2=Laird|first2=Nan M.|last3=Ware|first3=James H.|publisher=John Wiley & Sons|year=2004|isbn=0-471-21487-6|location=Hoboken|page=[https://archive.org/details/appliedlongitudi00fitz/page/n11 2]}}</ref>面板数据不同于'''混合横截面数据'''（pooled cross-sectional data）。面板数据是对 同一主体的不同时间点的观测值。混合横截面数据是在不同时点从同一个大总体内部分别抽样，将所得到的数据混合起来的一种数据集。如许多关于个人、家庭和企业的调查，每隔一段时间，常常是每隔一年，重复进行一次，如果每个时期都抽取一个随机样本，那么把所得到的随机样本合并起来就给出一个混合横截面。 
+
+相关的技术为{{tsl|en|longitudinal study|纵向分析}}或面板分析。
+
+==例子==
+{| class="wikitable sortable" style="display:inline-table"
+|+ MRPP balanced panel
+|-
+! scope="col" | person
+! scope="col" | year
+! scope="col" | income
+! scope="col" | age
+! scope="col" | sex
+|-
+| 1 || 2016 || 1300 || 27 || 1
+|-
+| 1 || 2017 || 1600 || 28 || 1
+|-
+| 1 || 2018 || 2000 || 29 || 1
+|-
+| 2 || 2016 || 2000 || 38 || 2
+|-
+| 2 || 2017 || 2300 || 39 || 2
+|-
+| 2 || 2018 || 2400 || 40 || 2
+|}
+{| class="wikitable sortable" style="display:inline-table"
+|+ MRPP unbalanced panel
+|-
+! scope="col" | person
+! scope="col" | year
+! scope="col" | income
+! scope="col" | age
+! scope="col" | sex
+|-
+| 1 || 2016 || 1600 || 23 || 1
+|-
+| 1 || 2017 || 1500 || 24 || 1
+|-
+| 2 || 2016 || 1900 || 41 || 2
+|-
+| 2 || 2017 || 2000 || 42 || 2
+|-
+| 2 || 2018 || 2100 || 43 || 2
+|-
+| 3 || 2017 || 3300 || 34 || 1
+|}
+
+上例的多响应置换过程分析（Multiple Response Permutation Procedure, MRPP），两个数据集分别是
+*'''平衡面板''' (balanced panel)：每个面板成员（如person）在每个时间点都被观测到数据。
+*'''不平衡面板''' (unbalanced panel)：每个面板成员至少被观测到一次。
+
+上例两个数据集都是'''长格式'''（long format），即每行数据是一个成员在一个时间点被观测到的数据。另一种格式是'''宽格式'''（wide format），即每行数据是一个成员在所有时间点的观测数据。
+
+==分析==
+{{Main|面板分析}}
+
+面板可表示为：
+
+: <math>X_{it}, \quad i = 1, \dots, N, \quad t = 1, \dots, T, </math>
+
+其中<math>i</math>是个体的维度，<math>t</math>是时间维度。一般的面板数据回归模型可写作：<math>y_{it} = \alpha + \beta' X_{it} + u_{it}.</math>
+不同的假定可用于这个通用模型的精细结构。两个重要的模型是{{tsl|en|fixed effects model|固定效果模型}}与{{tsl|en|random effects model|随机效果模型}}。
+
+考虑一个通用的面板数据模型：
+
+: <math>y_{it} = \alpha + \beta' X_{it} + u_{it}, </math>
+
+: <math>u_{it} = \mu_i + v_{it}.</math>
+
+<math>\mu_i</math>是个体相关的，时不变效果（如一个国家的地理、气候等），而<math>v_{it}</math>是一个时变随机成分。
+
+如果<math>\mu_i</math>是不可观测的，并相关于至少一个独立变量，这导致了在标准的[[普通最小二乘法|普通最小二乘法]]回归时不可观测的方差偏。 但是，面板数据方法，如固定效果估计器或其他可选方法，可用[[first-difference estimator|一阶差分估计器}}来控制。 
+
+<math>\mu_i</math>不相关于任何独立变量，普通最小二乘线性回归方法可产生回归参数的无偏的、一致的估计。但是，因为<math>\mu_i</math>是时不变的，这将导致回归误差项的序列相关性（serial correlation）。这意味着更为更有效地估计技术可用。随机效果是这样一种方法：{{tsl|en|generalized least squares|广义最小二乘法}}特例可控制<math>\mu_i</math>导致的序列相关性结构。 
+
+===动态面板数据===
+动态面板数据描述了回归器用到的相依变量的{{tsl|en|Lag operator|滞后算子}}（lag）的情形：
+
+: <math>y_{it} = \alpha + \beta' X_{it} +\gamma y_{it-1}+ u_{it}, </math>
+
+滞后相依变量的存在违背了严格的外部性（strict exogeneity），即外部性出现了。固定效果估计器与一阶差分估计器依赖于严格的外部性。因此如果<math>u_{i}</math>被相信相关于一个独立变量，必须采取其他估计技术，如工具变量(instrumental variable) 或高斯混合模型(GMM)技术，如{{tsl|en|Arellano–Bond estimator}}。
+
+==参考文献==
+{{reflist}}
+*{{cite book |last=Baltagi |first=Badi H. |year=2008 |title=Econometric Analysis of Panel Data |location=Chichester |publisher=John Wiley & Sons |edition=Fourth |isbn=978-0-470-51886-1 }}
+*{{cite journal |last=Davies |first=A. |last2=Lahiri |first2=K. |year=1995 |title=A New Framework for Testing Rationality and Measuring Aggregate Shocks Using Panel Data |url=https://archive.org/details/sim_journal-of-econometrics_1995-07_68_1/page/205 |journal=[[Journal_of_Econometrics|Journal of Econometrics]] |volume=68 |issue=1 |pages=205–227 |doi=10.1016/0304-4076(94)01649-K }}
+*{{cite book |last=Davies |first=A. |last2=Lahiri |first2=K. |year=2000 |chapter=Re-examining the Rational Expectations Hypothesis Using Panel Data on Multi-Period Forecasts |title=Analysis of Panels and Limited Dependent Variable Models |location=Cambridge |publisher=Cambridge University Press |isbn=0-521-63169-6 |pages=226–254 }}
+*{{cite book |last=Frees |first=E. |year=2004 |title=Longitudinal and Panel Data: Analysis and Applications in the Social Sciences |location=New York |publisher=Cambridge University Press |isbn=0-521-82828-7 }}
+*{{cite book |last=Hsiao |first=Cheng |year=2003 |title=Analysis of Panel Data |location=New York |publisher=Cambridge University Press |edition=Second |isbn=0-521-52271-4 }}
+
+==外部链接==
+*[http://psidonline.isr.umich.edu/ PSID] {{Wayback|url=http://psidonline.isr.umich.edu/ |date=20210506090142 }}
+*[http://www.kli.re.kr/klips/ KLIPS] {{Wayback|url=http://www.kli.re.kr/klips/ |date=20190529013547 }}
+*[https://web.archive.org/web/20110719101922/http://www.pairfam.uni-bremen.de/en/study.html pairfam]
+*[https://web.archive.org/web/20140416182301/http://survey.keis.or.kr/ENCOMAM0000N.do Korea Employment Survey]
+
+[[Category:統計資料型態|Category:統計資料型態]]

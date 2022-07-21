@@ -1,0 +1,41 @@
+local p = {}
+local alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+local args
+
+local function get_layer(frame, layer)
+	local sublayer = 1
+	local c = alphabet:sub(sublayer, sublayer)
+	local row = 0
+	local s = ''
+	
+	while args['label'..layer..c] do
+		if sublayer ~= 1 then
+			s = s..'<tr>'
+		end
+		s = s..'<td style="vertical-align: top; min-width: 4em; border-top: 1px solid #a2a9b1">'..args['label'..layer..c]..'</td><td style="vertical-align: top; min-width: 12em; max-width: 40em; border-top: 1px solid #a2a9b1">'..(args['text'..layer..c] or '')..'</td></tr>'
+		row = row + 1
+		if args['map'..layer..c] then
+			s = s..'<tr><td colspan=2>'..frame:expandTemplate{ title = 'Routemap', args = { args['map'..layer..c], inline = '1', bg = 'transparent', legend = 'no' } }..'</td></tr>'
+			row = row + 1
+		end
+		sublayer = sublayer + 1
+		c = alphabet:sub(sublayer, sublayer)
+	end
+	return '<tr style="border-top: 1px solid #a2a9b1"><th rowspan='..row..' style="vertical-align: top; text-align: left; min-width: 4em; border-top: 1px solid #a2a9b1">'..args['floor'..layer]..'层</th>'..s
+end
+
+function p.main(frame)
+	args = frame:getParent().args
+	local layer = 1
+	local s = ''
+	
+	while args['floor'..layer] do
+		s = s..get_layer(frame, layer)
+		layer = layer + 1
+	end
+	
+	return '<table style="border-spacing:0; border-bottom: 1px solid #a2a9b1" cellpadding=4>'..s..'</table>'
+end
+
+return p

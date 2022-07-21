@@ -1,0 +1,79 @@
+local z = {}
+
+function getItems(args, onlytitle)
+	local page = mw.title.new(args.title):getContent()
+	local matches = {}
+	local black = {}
+	if args.black then
+		for b in mw.text.gsplit(args.black, '|', true ) do
+			black[b] = true
+		end
+	end
+	for m in mw.ustring.gmatch (page, args.pattern) do
+		if not black[m] then
+			if onlytitle then
+				m = m:gsub('^%:', '')
+					:gsub('(.*)%|.*', '%1')
+			end
+			table.insert (matches, m)
+		end
+	end
+	return matches
+end
+
+function z.listall( frame )
+	local args
+	local wt = ''
+	if frame == mw.getCurrentFrame() then
+        args = frame.args
+    else
+        args = frame
+        if type(args) ~= type({}) then args = {frame} end
+    end
+	local d = getItems(args)
+	for i, page in ipairs(d) do
+		wt = wt .. ']]－[[' .. page
+	end
+	return '[['_.._wt_.._'|' .. wt .. ']]'
+end
+
+function z.ramdomtitle( frame )
+	local args
+	local wt
+	if frame == mw.getCurrentFrame() then
+        args = frame.args
+    else
+        args = frame
+        if type(args) ~= type({}) then args = {frame} end
+    end
+	local d = getItems(args, true)
+	local n = 0
+	for i, page in ipairs(d) do
+		n = n +1
+	end
+	return d[require('Module:Random').number({1, n})]
+end
+
+function z.ramdomimage( frame )
+	local args
+	local wt
+	if frame == mw.getCurrentFrame() then
+        args = frame.args
+    else
+        args = frame
+        if type(args) ~= type({}) then args = {frame} end
+    end
+	local d = getItems(args)
+	local n = 0
+	local image, alt
+	for i, v in ipairs(d) do
+		n = n + 1
+		image[i] = 'File:' .. page:gsub('^(.*)%|.*', '%1')
+		alt[i] = page:gsub('^.*%|(.*)', '%1')
+		alt[i] = alt[i]:gsub('(.*)<br>.*', '%1')
+	end
+	randomid = require('Module:Random').number({1, n})
+	return mw.getCurrentFrame():preprocess('{{Featurepic/format\n| type = packed-hover\n| Image = ' .. image[randomid] .. '\n| Content = ' .. alt[randomid] .. '\n}}')
+end
+
+return z

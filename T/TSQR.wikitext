@@ -1,0 +1,158 @@
+{{Citation style|time=2020-07-07T17:58:38+00:00}}
+'''TSQR'''是针对高瘦(tall and skinny)矩阵QR的分解。这类矩阵有着行(Row)远大于列(Column)的特点， 高瘦(TS)矩阵往往常见于评价系统，评价的项目少于评价的人数等。
+
+TSQR分解和普通的QR分解的区别在于，TSQR的分解可以进行并行加速。
+
+== TS矩阵 ==
+TS矩阵的特点是行(Row) <math>\gg</math> 列(Column)。 如下图<math> A </math>就是一个典型的TS矩阵。
+:<math>A_{m \times n} = 
+       \begin{bmatrix}   a_{11}   & \cdots &    a_{1i}   & \cdots &    a_{in}   \\
+                      \vdots & \ddots & \vdots &        & \vdots  \\
+                         a_{i1}   & \cdots &    a_{ii}   & \cdots &   a_{in}    \\
+                      \vdots &        & \vdots & \ddots & \vdots \\
+                         a_{j1}   & \cdots &   a_{ji}   & \cdots &    a_{jn}  \\
+                      \vdots &        & \vdots &        & \vdots\\
+                         a_{m1}   & \cdots &    a_{mi}   & \cdots &    a_{mn}   
+       \end{bmatrix}</math>
+
+这里 <math> m \gg n </math>。
+
+== TSQR分解的方法优劣比较 ==
+TSQR分解主要依赖于[[QR分解|QR分解]]，有以下三种方法的详细介绍和例子说明，以下将详细比较三种方法的优劣势作用于TS矩阵。
+=== Householder变换 ===
+针对[[Householder变换|Householder变换]]，其优势在于计算的时间复杂度较低，一次变换可以将一整个列除了首个元素都化成0，但是对数据的依赖度较高，不容易进行并行化计算，但是该方法对于稠密矩阵，相比于以下两种方法，计算效率会更高。
+[[File:HouseholderReflection.png|thumb]]
+=== 吉文斯旋转 ===
+针对吉文斯旋转，其优势在于对于数据的依赖性较低，可以很好的并行化，对于[[稀疏矩阵|稀疏矩阵]]有很大的优势。缺点在于其时间复杂度较高，一次只能对两行做吉文斯旋转。
+=== 格拉姆-施密特正交化方法 === 
+[[格拉姆-施密特正交化|格拉姆-施密特正交化]]方法对于并行化计算并不友好，它的优势在于算法理解其他直观，时间复杂度介于Householder变换和吉文斯旋转之间。
+== 并行TSQR分解 ==
+=== 基本思想 ===
+利用矩阵分块的思想，对于TS矩阵进行切割，从而对若干个子块矩阵进行分而治之。
+=== TSQR分解算法 ===
+
+:<math>A_{m \times n} = 
+       \begin{bmatrix}   a_{1,1}   & \cdots &       a_{1,n}   \\
+                      \vdots &  & \vdots &          \\
+                         a_{i,1}   & \cdots &    a_{i,n}       \\
+                     
+                         a_{i+1,1}   & \cdots &   a_{i+1 , n}   \\
+                      \vdots &        & \vdots &      \\
+                         a_{m,n}   & \cdots &    a_{m,n}      
+       \end{bmatrix}</math>
+
+我们将<math>A_{m \times n}</math>拆成若干个子矩阵（这里拆成2个）<math>A_1{m_1 \times n_1}</math>和 <math>A_2</math>，<math>A_1,A_2</math>的维度分别是<math>m_1 \times n_1, m_2 \times n_2</math>, 注意拆开的子矩阵要保证行数仍然大于列数，即
+<math>m_1 > n_1, m_2 > n_2</math>。
+
+我们分别对<math>A_1</math>和 <math>A_2</math>做QR分解。
+:<math>A_1 = Q_1 R_1 </math>
+:<math>A_2 = Q_2 R_2 </math>
+此时的QR分解是完全可以并行的。
+我们再将<math>R_1, R_2</math>合并并惊醒QR分解
+
+:<math>\hat{R} = 
+       \begin{bmatrix}  R_1 \\
+                        R_2
+       \end{bmatrix} = Q_{11}
+
+       \begin{bmatrix}  R_{11} \\
+                        0
+       \end{bmatrix} 
+</math>
+
+此时的 <math>R_{11}</math> 便是我们所需要的最后分解所得的 <math>R</math>。
+=== 例子 ===
+我们现在需要分解如下矩阵
+
+:<math>A = 
+       \begin{bmatrix}   0 & 3 & 1     \\
+                         0 & 4 & -2     \\
+                         2 & 1 & 1      \\
+                         1 & 2 & 4     \\
+                         0 & 0 & 5     \\
+                         0 & 3 & 6      \\
+       \end{bmatrix}
+</math> 
+
+现在将其分解成两个矩阵<math>A_1,A_2</math>，并对其做相应的QR分解。
+
+:<math> A_1 = Q_1 R_1 =
+       \begin{bmatrix}   0 & 3 & -4     \\
+                         0 & 4 & 3     \\
+                         5 & 0 & 0      \\
+       \end{bmatrix}
+       \begin{bmatrix}   2 & 1 & 2     \\
+                         0 & 5 & -1     \\
+                         0 & 0 & -2      \\
+       \end{bmatrix}
+</math>
+:<math> A_2 = Q_2 R_2 =
+       \begin{bmatrix}   1 & 0 & 0     \\
+                         0 & 0 & 1     \\
+                         0 & 1 & 0      \\
+       \end{bmatrix}
+       \begin{bmatrix}   1 & 2 & 4     \\
+                         0 & 3 & 6      \\
+                         0 & 0 & 5     \\
+       \end{bmatrix}
+
+</math>
+
+那么
+:<math>\hat{R} = 
+       \begin{bmatrix}  R_1 \\
+                        R_2
+       \end{bmatrix} = 
+
+       \begin{bmatrix}  
+                         2 & 1 & 2     \\
+                         0 & 5 & -1    \\
+                         0 & 0 & -2    \\
+                         1 & 2 & 4     \\
+                         0 & 3 & 6     \\
+                         0 & 0 & 5     \\  
+       \end{bmatrix} 
+</math>
+
+
+我们对<math>\hat{R}</math>进行QR分解，
+:<math>\hat{R} = 
+ Q_{11}R_{11} = Q_{11}
+</math>
+:<math> R  = Q_{11} = 
+       \begin{bmatrix}  
+                         -2.2360  & -1,7888 & -3.5777    \\
+                         0 & -5.9833 & -2.7743    \\
+                         0 & 0 & 8.0933    \\
+       \end{bmatrix} 
+</math>
+
+=== 优势 ===
+上述的TSQR和普通的QR分解的优势在于:
+
+1）不同于QR分解，此类的QR分解是可以高度并行化的； 
+
+2）在并行阶段，其特殊的上三角形式也可以用并行的方式进行加速。
+
+== 用途 ==
+=== 快速求解奇异值分解（SVD）===
+对于一个TS矩阵<math>A_{m \times n}</math>求解其SVD，我们可以先对矩阵<math>A</math>做TSQR分解。那么
+:<math>A = QR </math>
+我们在对<math> R </math>做SVD分解 ,相比于直接做SVD，这样做的好处在于<math> R </math>的维度是 <math> n \times n </math>, 所以速度会快很多。
+:<math>R = \tilde{U}\Sigma V </math>
+所以最后只需要<math>U</math>计算
+:<math> U  = Q \tilde{U} </math>
+就可以得到所有的特征量向量
+
+== 外部連結 ==
+<ref>{{cite conference |author=M. Anderson |coauthors=G. Ballard, J. Demmel and K. Keutzer |title=Communication-Avoiding QR Decomposition for GPUs |conference=2011 IEEE International Parallel & Distributed Processing Symposium |year=2011 |pages=48-58 |doi=10.1109/IPDPS.2011.15}}</ref>
+
+<ref>{{cite web |author1=MIT |title=QR Decomposition |url=https://www.youtube.com/watch?v=TRktLuAktBQ&t=300s |accessdate=2020-07-01 |archive-date=2020-07-27 |archive-url=https://web.archive.org/web/20200727160442/https://www.youtube.com/watch?v=TRktLuAktBQ&t=300s |dead-url=no }}</ref>
+
+<ref>{{cite conference |author=N.-Y. Cheng and M.-S. Chen |title=Exploring Dual-Triangular Structure for Efficient R-initiated Tall-skinny QR on GPGPU |conference=Pacific-Asia Conf. on Knowledge Discovery and Data Mining |year=April 14-17, 2019.}}</ref>
+
+<ref>{{cite conference |author=A. Rafique, N. Kapre and G. A. Constantinides |title=Enhancing performance of Tall-Skinny QR factorization using FPGAs |conference=International Conference on Field Programmable Logic and Applications |pages=443-450}}</ref>
+
+[[Category:使用创建条目精灵建立的页面|Category:使用创建条目精灵建立的页面]]
+[[Category:線性代數|Category:線性代數]]
+[[Category:数据挖掘|Category:数据挖掘]]

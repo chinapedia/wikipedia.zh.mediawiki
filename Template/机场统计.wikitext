@@ -1,0 +1,94 @@
+<!--fr
+Ce modèle permet d'afficher un graphique tiré d'une requête Wikidata, elle-même affichant la source ayant permis d'indiquer le chiffre annuel.
+Ce modèle est originellement maintenu sur frwiki  : [[:fr:Modèle:Aéroport-Statistiques|]]
+Il utilise cette brique importante : le modèle {{Graph:Lines}} et les données Wikidata
+S'il y a une donnée fausse sur Wikidata pour un aéroport, il faut changer sur le wikidata de cet aéroport, cela sera transparent et visible à travers tous les wikipédias affichant ce modèle.
+  // traductions==> https://commons.wikimedia.org/wiki/Data:I18n/Template:Airport-Statistics.tab
+
+Dernière version : 19 FEB 2021
+-->
+<!--en
+This template helps show a graph from a  Wikidata query, showing both source and numbers.
+This template is maintained on   frwiki  : [[:fr:Modèle:Aéroport-Statistiques|]]
+it uses both template {{Graph:Lines}} and data from Wikidata.
+if you find something wrong in Wikidata for an airport, please change number on the wikidata for this airport : it will automatically show the right value among the wikis.
+  // Template translations are in https://commons.wikimedia.org/wiki/Data:I18n/Template:Airport-Statistics.tab
+Last version : 19 FEB 2021
+-->
+<includeonly>
+{{Graph:Lines
+| tabletype=query | table=# Scroll down and hit blue arrow down to run and see the results + the sources
+SELECT ?year ?item ?itemLabel (MAX(?number) AS ?passengers)
+  (SAMPLE(COALESCE(?reference_URL, ?monthly_reference_URL2)) AS ?sample_reference_URL)
+WITH
+{
+  SELECT ?item ?statement ?date ?year ?timevalue ?numberperperiod ?reference_URL
+  WHERE
+  {
+    ?item wdt:{{#if: {{{iata|}}} |P238|}}{{#if: {{{icao|}}} |P239|}}{{#if: {{{faa|}}} |P240|}} ?airport_code
+    VALUES ?airport_code 
+    {
+ "{{#invoke:String|replace|{{{iata|}}}{{{icao|}}}{{{faa|}}}| |" "||}}"
+    }
+    ?item p:P3872 ?statement.
+    ?statement pqv:P585 ?timevalue;
+               ps:P3872 ?numberperperiod.
+    ?timevalue wikibase:timeValue ?date.
+    OPTIONAL { ?statement pq:P518 ?applies. }
+    OPTIONAL { ?statement prov:wasDerivedFrom / (pr:P854{{!}}pr:P4656) ?reference_URL. }
+    FILTER (BOUND(?applies)=false {{!!}} ?applies = wd:Q2165236 )
+    MINUS { ?statement wikibase:rank wikibase:DeprecatedRank }
+    BIND (YEAR(?date) AS ?year)
+    FILTER (?year >{{{début|1949}}}).
+    FILTER (?year < YEAR(NOW()))
+  }
+} AS %airport
+WHERE
+{
+  {
+    # Get the sum of monthly values within a year
+    SELECT ?item ?year (SUM(?max_numberperperiod) AS ?number) (SAMPLE(?monthly_reference_URL) AS ?monthly_reference_URL2)
+    WHERE
+    {
+      # Get the maximal value and a sample reference URL for each unique month
+      {
+        SELECT ?item ?year (MAX(?numberperperiod) AS ?max_numberperperiod) (SAMPLE(?reference_URL) AS ?monthly_reference_URL)
+        WHERE
+        {
+          INCLUDE %airport
+          ?timevalue wikibase:timePrecision ?prec.
+          FILTER (?prec > 9)# precision more precise or equal to month
+        }
+        GROUP BY ?item ?year ?date
+      }
+    }
+    GROUP BY ?item ?year
+  }
+  UNION
+  {
+    ?timevalue wikibase:timePrecision 9 .
+    BIND (?numberperperiod AS ?number)
+    BIND (?reference_URL AS ?sample_reference_URL)
+    INCLUDE %airport
+  }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "{{CONTENTLANGUAGE}}". }
+}
+GROUP BY ?item ?itemLabel ?year
+ORDER BY ?item DESC (?year)
+|yGrid=true
+|legend={{#ifexpr:{{#invoke:String|len|{{{iata|}}}{{{icao|}}}{{{faa|}}}}}>4|-|}}
+|group=itemLabel
+|yAxis={{#invoke:TNT|msg|I18n/Template:Airport-Statistics.tab|passengers}}
+|yAxisFormat=.1s
+| yZero=false
+| value=passengers| type=year | xField=year|width={{{width|540}}}
+| title={{#if: {{{titre|}}} |{{{titre|}}}| 
+{{#invoke:TNT|msg|I18n/Template:Airport-Statistics.tab|title_start}} {{#ifexpr:{{#invoke:String|len|{{{iata|}}}{{{icao|}}}{{{faa|}}}}}>4|
+{{#if: {{#invoke:TNT|msg|I18n/Template:Airport-Statistics.tab|middle_title_if_airports}}|
+{{#invoke:TNT|msg|I18n/Template:Airport-Statistics.tab|middle_title_if_airports}} {{{iata|}}}{{{icao|}}}{{{faa|}}} {{#invoke:TNT|msg|I18n/Template:Airport-Statistics.tab|end_title_if_airports}} |
+{{#invoke:TNT|msg|I18n/Template:Airport-Statistics.tab|end_title_if_airports}} {{{iata|}}}{{{icao|}}}{{{faa|}}} }}  |
+{{#if: {{#invoke:TNT|msg|I18n/Template:Airport-Statistics.tab|middle_title_if_one_airport}}| 
+{{#invoke:TNT|msg|I18n/Template:Airport-Statistics.tab|middle_title_if_one_airport}} {{{iata|}}}{{{icao|}}}{{{faa|}}} {{#invoke:TNT|msg|I18n/Template:Airport-Statistics.tab|end_title_if_one_airport}} |
+{{#invoke:TNT|msg|I18n/Template:Airport-Statistics.tab|end_title_if_one_airport}} {{{iata|}}}{{{icao|}}}{{{faa|}}} }} 
+}}}}
+}}</includeonly><noinclude>{{Documentation}}</noinclude>

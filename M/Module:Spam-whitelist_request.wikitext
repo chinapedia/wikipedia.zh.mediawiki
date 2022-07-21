@@ -1,0 +1,45 @@
+local p = {}
+
+local error = require('Module:Error')
+
+function p.main(frame)
+	local args = frame:getParent().args
+	
+	local argurl = args["網址"] or ""
+	local text = {}
+	local url = nil
+	local host = ""
+	
+	table.insert(text, "== 申請解除對")
+	
+	if argurl ~= "" then
+		url = mw.uri.new(argurl)
+		if url.host == nil then
+			url = mw.uri.new("//" .. argurl)
+		end
+		table.insert(text, url.host)
+	else
+		table.insert(text, "未給網址")
+	end
+	
+	table.insert(text, "的限制 ==")
+	table.insert(text, "\n{{Editprotected")
+	table.insert(text, "}}\n* 網址：")
+	if url ~= nil then
+		table.insert(text, url.host .. url.relativePath .. "")
+	else
+		table.insert(text, error.error{[1] = "錯誤：沒有提供網址！"})
+	end
+	
+	table.insert(text, "\n* 工具：")
+	table.insert(text, string.format("[[Special:Log/spamblacklist/%s|垃圾連結黑名單日誌]]、[https://searchsbl.toolforge.org/?userdeflang=zh&userdefproj=w&url=%s searchsbl]",
+		frame:preprocess('{{subst:REVISIONUSER}}'),
+		(url and mw.uri.encode(url.host .. url.relativePath)) or ""
+	))
+
+	table.insert(text, "\n理由：" .. (args["理由"] or ""))
+	
+	return table.concat(text)
+end
+
+return p

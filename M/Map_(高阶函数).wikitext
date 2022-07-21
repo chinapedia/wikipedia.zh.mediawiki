@@ -1,0 +1,400 @@
+{{NoteTA|G1=IT}}
+{{for|同名的由键值对构成的抽象数据类型|关联数组}}
+在很多[[编程语言|编程语言]]中，'''映射'''（map）是一个高阶函数的名字，它将一个{{en-link|过程参数|procedural parameter|给定函数}}应用到一个[[函子_(函数式编程)|函子]]比如[[列表_(抽象数据类型)|列表]]的每个元素，返回按相同次序的一个列表。映射的概念不受限于列表：它可工作在顺序的[[容器_(数据类型)|容器]]，类似树的容器，甚至是抽象容器比如[[future与promise|future与promise]]。
+
+映射在作为[[高阶函数|泛函形式]]考虑时，经常叫做“应用于全部”。在支持[[头等函数|头等函数]]和[[柯里化|柯里化]]的语言中，<code>map</code>可以{{en-link|部份函数|partial application|部份应用}}在一个函数上，将这个只工作在一个值之上函数，提升为工作在整个容器上的逐个元素上的函数。
+
+==定义==
+<code>map</code>作为[[Haskell|Haskell]]的基本前序（prelude：就是标准库）的一部份提供并被实现为：
+
+<syntaxhighlight lang="haskell">
+map :: (a -> b) -> [a] -> [b]
+map _ []       = []
+map f (x : xs) = f x : map f xs
+</syntaxhighlight>
+
+在这个定义之中，涉及到四种不同的[[模式|模式]]：
+* <code>f</code>是[[模式匹配|匹配]]“无论任何事物”的模式，并绑定<code>f</code>变量至所匹配的任何事物。
+* <code>(x : xs)</code>是匹配“非空列表”的模式，它是通过将要被绑定到<code>x</code>变量某个事物，<code>cons</code>（这里是<code>(:)</code>函数）到要被绑定到<code>xs</code>变量的某个其他事物之上而形成的。
+* <code>[]</code>是匹配“空列表”的模式，它不绑定任何变量。
+* <code>_</code>是匹配不被绑定的任何事物的模式（[[通配符|通配符]]即“不在意”模式）。
+
+[[Lisp|Lisp]]语言在1959年介入了叫做<code>maplist</code>的映射函数<ref>{{Cite web |url=http://www.softwarepreservation.org/projects/LISP/MIT/LISP_Prog_Man-Mar_1959.pdf/view |title=J. McCarthy, K. Maling, S. Russell, N. Rochester, S. Goldberg, J. Slagle. LISP Programmer's Manual. March-April, 1959 |access-date=2021-02-11 |archive-date=2021-04-04 |archive-url=https://web.archive.org/web/20210404083002/http://www.softwarepreservation.org/projects/LISP/MIT/LISP_Prog_Man-Mar_1959.pdf/view }}</ref>，与1958年出现的版本稍有不同<ref>{{Cite web |url=http://www.softwarepreservation.org/projects/LISP/MIT/AIM-004.pdf/view |title=J. McCarthy: Symbol Manipulating Language - Revisions of the Language. AI Memo No. 4, October 1958 |access-date=2021-02-11 |archive-date=2021-04-04 |archive-url=https://web.archive.org/web/20210404073448/http://www.softwarepreservation.org/projects/LISP/MIT/AIM-004.pdf/view }}</ref>。这是<code>maplist</code>的最初定义，将一个函数连续的映射到整个列表和去除第一个元素余下列表之上：
+<pre>
+maplist[x;f] = [null[x] -> NIL;T -> cons[f[x];maplist[cdr[x];f]]]
+</pre>
+
+函数<code>maplist</code>在更新近的Lisp比如[[Common_Lisp|Common Lisp]]中仍可获得到<ref>{{Cite web |url=http://www.lispworks.com/documentation/HyperSpec/Body/f_mapc_.htm |title=Function MAPC, MAPCAR, MAPCAN, MAPL, MAPLIST, MAPCON in ANSI Common Lisp |access-date=2021-02-11 |archive-date=2020-11-12 |archive-url=https://web.archive.org/web/20201112005442/http://www.lispworks.com/documentation/HyperSpec/Body/f_mapc_.htm }}</ref>。[[Common_Lisp|Common Lisp]]提供映射函数家族，如<code>mapcar</code>和更一般性的<code>map</code>等，其中对应这里所描述行为的那叫做<code>mapcar</code>，这里的后缀<code>car</code>指示取列表第一个元素的{{en-link|CAR与CDR|CAR and CDR|CAR运算}}。
+
+==例子：映射一个列表==
+
+假定我们有一个整数的列表<code>[1, 2, 3, 4, 5]</code>，并想要计算每个整数的平方。要完成这个任务，首先要定义一个函数<code>square</code>来做单一数值的平方，下面用[[Haskell|Haskell]]演示：
+
+<syntaxhighlight lang="haskell">
+square x = x * x
+</syntaxhighlight>
+
+然后就可以调用：
+
+<syntaxhighlight lang="haskell">
+>>> map square [1, 2, 3, 4, 5]
+</syntaxhighlight>
+
+它产生<code>[1, 4, 9, 16, 25]</code>，展示了<code>map</code>遍历了整个列表并应用函数<code>square</code>于每个元素。在[[ML语言|ML]]、[[Haskell|Haskell]]和[[F♯|F#]]中，函数是缺省以[[柯里化|柯里化]]形式定义的，从而<code>map square</code>是对列表的每个元素做平方的Haskell函数。 
+
+在[[Lisp|Lisp]]中，使用<code>mapcar</code>对列表的元素做平方，使用[[S-表达式|S-表达式]]表示法写为：
+
+<syntaxhighlight lang="lisp">
+(mapcar (function sqr) '(1 2 3 4 5))
+</syntaxhighlight>
+
+使用函数<code>maplist</code>，上例将写为：
+
+<syntaxhighlight lang="lisp">
+(maplist (lambda (l) (sqr (car l))) '(1 2 3 4 5))
+</syntaxhighlight>
+
+=== 可视的例子 ===
+下面将看到一个映射过程的每一步骤的可视演示，它依据函数<math>f(x) = x + 1</math>将整数列表<code>X = [0, 5, 8, 3, 2, 1]</code>映射成新的列表<code>X'</code>：
+
+[[File:Mapping-steps-loillibe-new.gif|alt=applying map function processing steps]]
+
+==推广==
+{{main|函子 (函数式编程)}}
+
+在Haskell中，[[多态_(计算机科学)|多态函数]]<code>map :: (a -> b) -> [a] -> [b]</code>，被推广成[[多态_(计算机科学)#多类型|多类型函数]]<code>fmap :: Functor f => (a -> b) -> f a -> f b</code>，它应用于属于[[函子_(函数式编程)|函子]]<code>Functor</code>[[类型类|类型类]]的任何类型上。
+
+列表的[[类型构造子|类型构造子]]<code>[]</code>可以定义为<code>Functor</code>类型类的实例，使用上例中的<code>map</code>函数：
+
+<syntaxhighlight lang="haskell">
+instance Functor [] where
+  fmap = map
+</syntaxhighlight>
+
+其他<code>Functor</code>实例的例子包括树：
+
+<syntaxhighlight lang="haskell">
+-- 一个简单的二叉树
+data Tree a = Leaf a | Fork (Tree a) (Tree a)
+
+instance Functor Tree where  
+  fmap f (Leaf x) = Leaf (f x)
+  fmap f (Fork l r) = Fork (fmap f l) (fmap f r)
+</syntaxhighlight>
+
+在一个树之上的映射产生：
+
+<syntaxhighlight lang="haskell">
+>>> fmap square (Fork (Fork (Leaf 1) (Leaf 2)) (Fork (Leaf 3) (Leaf 4)))
+Fork (Fork (Leaf 1) (Leaf 4)) (Fork (Leaf 9) (Leaf 16))
+</syntaxhighlight>
+
+对于<code>Functor</code>类型类的所有实例，<code>fmap</code>都在[[契约式设计|契约义务]]上要满足函子定律：
+<syntaxhighlight lang="haskell">
+fmap id      ≡ id              -- 同一律
+fmap (f . g) ≡ fmap f . fmap g -- 复合律
+</syntaxhighlight>
+这里的<code>.</code>在Haskell中指示{{en-link|函数复合 (计算机科学)|Function composition (computer science)|函数复合}}。
+
+尤其是，它允许为各种[[集合_(计算机科学)|搜集]]定义逐个元素的运算。
+
+此外，如果{{math|''F''}}和{{math|''G''}}是两个函子，[[自然变换|自然变换]]是多态类型<math>h : \forall T . F(T) \to G(T)</math>的函数，它遵守<math>fmap</math>：
+: <math>h_Y \circ \operatorname{fmap}(f) = \operatorname{fmap}(f) \circ h_X</math>，对于任何函数<math>f : X \to Y</math>。
+
+如果<math>h</math>函数是按上述类型定义那样用[[参数多态|参数多态]]定义的，这个规定总是满足的。
+
+==优化==
+
+映射的数学基础允许很多{{en-link|程序优化|Program optimization|优化}}。复合定律确保了如下二者：
+* <code>(map f . map g) list</code>
+* <code>map (f . g) list</code>
+导致相同的结果；就是说<math>\operatorname{map}(f) \circ \operatorname{map}(g) = \operatorname{map}(f \circ g)</math>。但是第二种形式比第一种形式在计算上更加有效率，因为每个<code>map</code>要求从头重建整个列表。因此，编译器将尝试将第一种形式变换第二种形式；这种类型的优化叫做“映射融合”，是{{en-link|循环分裂与融合|Loop fission and fusion|循环融合}}的[[函数式编程|函数式]]类似者<ref>{{Cite web |url=http://www.randomhacks.net/articles/2007/02/10/map-fusion-and-haskell-performance |title="Map fusion: Making Haskell 225% faster" |access-date=2021-02-11 |archive-date=2013-08-06 |archive-url=https://web.archive.org/web/20130806205458/http://www.randomhacks.net/articles/2007/02/10/map-fusion-and-haskell-performance }}</ref>。
+
+映射函数可以并经常依据[[Fold_(高阶函数)|fold]]比如<code>foldr</code>来定义，这意味着可以做“map-fold融合”：<code>foldr f z . map g</code>等价于<code>foldr (f . g) z</code>。
+
+在一个单链表上的map实现不是[[尾调用|尾递归]]的，所以它在调用于大型列表的时候，可能在栈上建造大量的帧。很多语言作为替代的提供“逆向map”函数，它等价于逆转一个映射后的列表，但它是尾递归的。下面是利用了左[[Fold_(高阶函数)|fold]]函数的一个实现：
+
+<syntaxhighlight lang="haskell">
+reverseMap f = foldl (\ys x -> f x : ys) []
+</syntaxhighlight>
+
+因为逆转单链表也是尾递归的，reverse和reverse-map可以复合起来以尾递归方式进行正常的map，尽管这需要在这个列表上进行两趟。
+
+==语言比较==
+
+映射函数出现在[[函数式编程|函数式编程]]语言之中。现在映射函数在很多[[过程式编程|过程式]]、[[面向对象编程|面向对象]]和多[[编程范型|范型]]语言中也能获得到（或能够定义）：在[[C++|C++]]的[[标准模板库|标准模板库]]中，它叫做<code>std::transform</code>，在[[C♯|C#]]（3.0）的LINQ库中，它被作为叫做<code>Select</code>的扩展方法。映射也经常在高级语言中的计算，比如{{en-link|ColdFusion标记语言|ColdFusion Markup Language}}（CFML）、[[Perl|Perl]]、[[Python|Python]]和[[Ruby|Ruby]]；在这四种语言中这个运算都叫做<code>map</code> 。在Ruby中还提供<code>collect</code>作为<code>map</code>的别名（来自[[Smalltalk|Smalltalk]]）。有些语言通过语法构造提供与映射函数相同的功能。
+
+映射有时被推广为接收二元的（2个参数）函数，它可以把用户提供的函数应用到来自两个列表的对应元素上。有些语言对它使用特殊名字，比如“map2”或“zipWith”。使用显式的[[可变参数函数|可变元数函数]]的语言拥有可变[[元数|元数]]版本的映射来支持可变元数函数。有2个或更多列表在这些列表有不同长度的时候遇到需要处理的问题。各种语言在这个问题上是不同的。有些引起异常。有些在达到最短列表长度之后停止并忽略在其他列表上的额外项目。有些继续直到最长列表长度，并对已经结束的列表，向函数传递某个占位符的值来指示没有值。
+
+{| class="wikitable" style="font-size: 85%"
+|+ 各种语言中的Map
+! 语言 !! Map !! Map 2个列表 !! Map n个列表 !! 注释 !! 处理不同长度的列表
+|- valign="top"
+| [[APL语言|APL]]
+| <code>''func'' ''list''</code>
+| <code>''list1'' ''func'' ''list2''</code>
+| <code>''func''/ ''list1'' ''list2'' ''list3'' ''list4''</code>
+| APL的数组处理能力使得map这样的运算隐式进行
+| 如果列表窗度不相等或者是1则长度错误
+|- valign="top"
+| [[Common_Lisp|Common Lisp]]
+| <code>(mapcar ''func'' ''list'')</code>
+| <code>(mapcar ''func'' ''list1'' ''list2'')</code>
+| <code>(mapcar ''func'' ''list1'' ''list2'' ...)</code>
+|
+| 在达到最短列表长度后停止
+|- valign="top"
+| [[C++|C++]]
+| <code>std::transform(<wbr/>''begin'', ''end'', ''result'', ''func'')</code>
+| <code>std::transform(<wbr/>''begin1'', ''end1'', ''begin2'', ''result'', ''func'')</code>
+|
+| 在头文件<algorithm>中<br />begin、end和result是迭代器<br />书写结果起始于result
+|
+|- valign="top"
+| [[C♯|C#]]
+| <code>''ienum''.Select(''func'')</code><br />或<br /><code>select</code>子句<ref>[https://msdn.microsoft.com/en-us/library/bb384087.aspx select clause (C# Reference)] {{Wayback|url=https://msdn.microsoft.com/en-us/library/bb384087.aspx |date=20160924100612 }}.</ref>
+| <code>''ienum1''.Zip(''ienum2'', ''func'')</code>
+|
+| <code>Select</code>是扩展方法<br /> ienum是个IEnumerable<br /><code>Zip</code>介入于.NET 4.0<br />在所有.NET语言中都类似
+| 在最短列表结束后停止
+|- valign="top"
+| {{en-link|ColdFusion标记语言|ColdFusion Markup Language|CFML}}
+| <code>obj.map(func)</code>
+| 
+| 
+| 这里的<code>obj</code>是一个数组或结构。<code>func</code>接受作为参数的是每个项目的值，它的索引或键，和到最初对象的引用。
+|
+|- valign="top"
+| [[Clojure|Clojure]]
+| <code>(map ''func'' ''list'')</code>
+| <code>(map ''func'' ''list1'' ''list2'')</code>
+| <code>(map ''func'' ''list1'' ''list2'' ...)</code>
+|
+| 在最短列表结束后停止
+|- valign="top"
+| [[D语言|D]]
+| <code>''list''.map!''func''</code>
+| <code>zip(''list1'', ''list2'').map!''func''</code>
+| <code>zip(''list1'', ''list2'', ...).map!''func''</code>
+|
+| 给定给zip可通过StoppingPolicy: 最短、最长或requireSameLength
+|- valign="top"
+| [[Erlang|Erlang]]
+| <code>lists:map(''Fun'', ''List'')</code>
+| <code>lists:zipwith(''Fun'', ''List1'', ''List2'')</code>
+| <code>''zipwith3''</code>也能得到
+|
+| 列表必须等长
+|- valign="top"
+| [[Elixir|Elixir]]
+| <code>Enum.map(''list'', ''fun'')</code>
+| <code>Enum.zip(''list1'', ''list2'') |> Enum.map(fun)</code>
+| <code>List.zip([''list1'', ''list2'', ...]) |> Enum.map(fun)</code>
+|
+| 在最短列表结束后停止
+|- valign="top"
+| [[F♯|F#]]
+| <code>List.map ''func'' ''list''</code>
+| <code>List.map2 ''func'' ''list1'' ''list2''</code>
+|
+| 函数对其他类型存在（Seq和Array） 
+| 抛出异常
+|- valign="top"
+| [[Groovy|Groovy]]
+| <code>list.collect(func)</code>
+| <code>[list1 list2]<wbr>.transpose()<wbr>.collect(func)</code>
+| <code>[list1 list2 ...]<wbr>.transpose()<wbr>.collect(func)</code>
+| 
+| 
+|- valign="top"
+| [[Haskell|Haskell]]
+| <code>map ''func'' ''list''</code>
+| <code>zipWith ''func'' ''list1'' ''list2''</code>
+| <code>zipWith''n'' ''func'' ''list1'' ''list2'' ...</code>
+| <code>''n''</code>对应于列表的数目，预先定义直到<code>''zipWith7''</code>
+| 在最短列表结束后停止
+|- valign="top"
+| [[Haxe|Haxe]]
+| <code>''array''.map(''func'')<br />
+''list''.map(''func'')<br />
+Lambda.map(''iterable'', ''func'')
+</code>
+| 
+| 
+| 
+| 
+|- valign="top"
+| [[J语言|J]]
+| <code>''func'' ''list''</code>
+| <code>''list1'' ''func'' ''list2''</code>
+| <code>''func''/ ''list1'', ''list2'', ''list3'' ,: ''list4''</code>
+| J的数组处理能力使得map这样的运算隐式进行
+| 如果列表长度不等则长度错误
+|- valign="top"
+| [[Java|Java]] 8+
+| <code>''stream''.map(''func'')</code>
+| 
+| 
+| 
+| 
+|- valign="top"
+| [[JavaScript|JavaScript]] 1.6<br />[[ECMAScript|ECMAScript]] 5
+| [https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/map <code>''array''#map(''func'')</code>] {{Wayback|url=https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/map |date=20120801215406 }}
+| <code>''List1''.map(function (elem1, i) { <br />return ''func''(elem1, ''List2''[i]); })</code>
+| <code>''List1''.map(function (elem1, i) { <br />return ''func''(elem1, ''List2''[i], ''List3''[i], ...); })</code>
+| Array#map 传递3个实际参数到func: 元素、元素的索引和这个数组。不用的实际参数可以忽略。
+| 在List1结束时停止，用undefined项目扩展较短的数组，如果需要的话。
+
+|- valign="top"
+| [[Julia_(编程语言)|Julia]]
+| <code>map(''func'', ''list'')</code>
+| <code>map(''func'', ''list1, list2'')</code>
+| <code>map(''func'', ''list1, list2, ..., listN'')</code>
+|
+| ERROR: DimensionMismatch
+
+|- valign="top"
+| {{en-link|Logtalk}}
+| <code>map(''Closure'', ''List'')</code>
+| <code>map(''Closure'', ''List1'', ''List2'')</code>
+| <code>map(''Closure'', ''List1'', ''List2'', ''List3'', ...) (直到7个列表)</code>
+| 只有Closure参数必须被实例化。
+| 失败
+|- valign="top"
+| [[Mathematica|Mathematica]]
+| <code>''func'' /@ ''list'' <br /> Map[''func'', ''list'']</code>
+| <code>MapThread[''func'', {''list1'', ''list2''}]</code>
+| <code>MapThread[''func'', {''list1'', ''list2'', ...}]</code>
+|
+| 列表必须等长
+|- valign="top"
+| [[Maxima_(software)|Maxima]]
+| <code>map(''f'', ''expr<sub>1</sub>'', ..., ''expr<sub>n</sub>'')<br />maplist(''f'', ''expr<sub>1</sub>'', ..., ''expr<sub>n</sub>'')</code>
+|
+|
+| map返回一个表达式，其前导算子同于这个表达式的算子；<br />maplist返回一个列表
+|
+|- valign="top"
+| [[OCaml|OCaml]]
+| <code>List.map ''func'' ''list''<br /> Array.map ''func'' ''array''</code>
+| <code>List.map2 ''func'' ''list1'' ''list2''</code>
+|
+| 
+| 发起Invalid_argument异常
+|- valign="top"
+| {{en-link|PARI/GP|}}
+| <code>apply(''func'', ''list'')</code>
+|
+|
+| 
+| {{n/a}}
+|- valign="top"
+| [[Perl|Perl]]
+| <code>map ''block'' ''list''<br /> map ''expr'', ''list''</code>
+|
+|
+| 在block或expr中特殊变量$_持有依次来自这个列表的值。
+| Helper <code>''List::MoreUtils::each_array''</code>组合多于一个列表直到最长的那个被耗尽，用<code>''undef''.</code>填入其他的。
+|- valign="top"
+| [[PHP|PHP]]
+| <code>array_map(''callable'', ''array'')</code>
+| <code>array_map(''callable'', ''array1'',''array2'')</code>
+| <code>array_map(''callable'', ''array1'',''array2'', ...)</code>
+| callable的形式参数的数目<br />应当匹配数组的数目。
+| 用NULL项目扩展较短的列表
+|- valign="top"
+| [[Prolog|Prolog]]
+| <code>maplist(''Cont'', ''List1'', ''List2'').</code>
+| <code>maplist(''Cont'', ''List1'', ''List2'', ''List3'').</code>
+| <code>maplist(''Cont'', ''List1'', ''...'').</code>
+| 列表实际参数是输入、输出或二者。也包括zipWith, unzip, all
+| 静默失败（不是错误）
+|- valign="top"
+| [[Python|Python]]
+| <code>map(''func'', ''list'')</code>
+| <code>map(''func'', ''list1'', ''list2'')</code>
+| <code>map(''func'', ''list1'', ''list2'', ...)</code>
+| 在Python 2中返回一个列表，在Python 3中返回一个[[迭代器|迭代器]]。
+| <code>''zip()''</code>和<code>''map()''</code> (3.x)在最短列表结束后停止，而<code>''map()''</code>(2.x)和<code>''itertools.zip_longest()''</code>(3.x)用<code>''None''</code>项目扩展较短的列表
+|- valign="top"
+| [[Ruby|Ruby]]
+| <code>''enum''.collect {''block''}<br /> ''enum''.map {''block''}</code>
+| <code>''enum1''.zip(''enum2'')<wbr/>.map {''block''}</code>
+| <code>''enum1''.zip(''enum2'', ...)<wbr/>.map {''block''} <br /> [''enum1'', ''enum2'', ...]<wbr/>.transpose.map {''block''}</code>
+| <code>''enum'' is an Enumeration</code>
+| 在它调用在其上的对象（第一个列表）结束时停止；如果任何其他列表更短，用nil项目扩展它
+|-
+|[[Rust|Rust]]
+| <code>''list1''.into_iter().map(''func'')</code>
+| <code>''list1''.into_iter().zip(''list2'').map(''func'')</code>
+|
+| <code>Iterator::map</code>和<code>Iterator::zip</code>方法二者接受最初迭代器的所属关系并返回一个新的；<code>Iterator::zip</code>方法内部的调用<code>IntoIterator::into_iter</code>方法在<code>''list2''</code>之上
+| 在较短列表结束后停止
+|- valign="top"
+| [[S语言|S]]-[[R语言|R]]
+| <code>lapply(''list'', ''func'')</code>
+| <code>mapply(''func'', ''list1'', ''list2'')</code>
+| <code>mapply(''func'', ''list1'', ''list2'', ...)</code>
+|
+| 较短列表被循环
+|- valign="top"
+| [[Scala|Scala]]
+| <code>''list''.map(''func'')</code>
+| <code>(''list1'', ''list2'')<wbr/>.zipped.map(''func'')</code>
+| <code>(''list1'', ''list2'', ''list3'')<wbr/>.zipped.map(''func'')</code>
+| 注意：多于3不可能。
+| 在较短列表结束后停止
+|- valign="top"
+| [[Scheme|Scheme]]（包括[[GNU_Guile|Guile]]和[[Racket|Racket]]）
+| <code>(map ''func'' ''list'')</code>
+| <code>(map ''func'' ''list1'' ''list2'')</code>
+| <code>(map ''func'' ''list1'' ''list2'' ...)</code>
+|
+| 列表必须都有相同长度（SRFI-1扩展接受不同长度的列表）
+|- valign="top"
+| [[Smalltalk|Smalltalk]]
+| <code>''aCollection'' collect: ''aBlock''</code>
+| <code>''aCollection1'' with: ''aCollection2'' collect: ''aBlock''</code>
+|
+|
+| 失败
+|- valign="top"
+| [[Standard_ML|Standard ML]]
+| <code>map ''func'' ''list''</code>
+| <code>ListPair.map ''func'' (''list1'', ''list2'') <br /> ListPair.mapEq ''func'' (''list1'', ''list2'')</code>
+|
+| 对于2实际参数map，func接受在一个元组中的实际参数
+| <code>''ListPair.map''</code>在最短列表结束后停止，而<code>''ListPair.mapEq''</code>引起<code>UnequalLengths</code>异常
+|- valign="top"
+| [[Swift|Swift]]
+| <code>''sequence''.map(''func'')</code>
+| <code>zip(''sequence1'', ''sequence2'').map(''func'')</code>
+|
+|
+| 在最短列表结束后停止
+|- valign="top"
+| [[XPath|XPath]] 3<br />{{en-link|XQuery|}} 3
+| <code>list ! block</code><br /> <code>for-each(list, func)</code>
+| <code>for-each-pair(list1, list2, func)</code>
+|
+| 在<code>block</code>上下文中项目<code>.</code>持有当前值
+| 在最短列表结束后停止
+|}
+
+==参见==
+*[[函子_(函数式编程)|函子 (函数式编程)]]
+* {{en-link|卷绕 (计算机科学)|Convolution (computer science)}}，也叫做“conv”或“zip”
+* [[Filter_(高阶函数)|Filter (高阶函数)]]
+* [[Fold_(高阶函数)|Fold (高阶函数)]]
+* [[foreach循环|foreach循环]]
+* [[自由幺半群|自由幺半群]]
+* [[高阶函数|高阶函数]]
+* [[列表推导式|列表推导式]]
+* {{en-link|Map (并行模式)|Map (parallel pattern)}}
+
+==引用==
+{{Reflist|2}}
+
+[[Category:高阶函数|Category:高阶函数]]
+[[Category:编程语言比较|Category:编程语言比较]]
+[[Category:编程中的迭代|Category:编程中的迭代]]

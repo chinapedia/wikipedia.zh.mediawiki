@@ -1,0 +1,64 @@
+{{Infobox software
+| name = Theano
+| logo = Theano_logo.svg
+| author = 
+| developer = [[蒙特利尔大学|蒙特利尔大学]]的{{en-link|蒙特利尔学习算法研究所|Montreal Institute for Learning Algorithms}}（MILA）
+| released = {{Start date and age|df=yes|2007}}
+| latest release version = {{LSR/wikidata}}
+
+| repo = {{URL|https://github.com/Theano/Theano}}
+| programming language = [[Python|Python]], [[CUDA|CUDA]]
+| platform = [[Linux|Linux]], [[macOS|macOS]], [[Windows|Windows]]
+| genre = [[机器学习|机器学习]] [[函式库|函式库]]
+| license = [[BSD许可证|3条款BSD许可证]]
+| website = {{URL|http://www.deeplearning.net/software/theano/}}
+}}
+
+'''Theano'''是一个[[Python|Python]]库和优化的编译器，用来操纵和求值数学表达式特别是矩阵值表达式<ref>{{cite journal |last=Bergstra |first=J. |author2=O. Breuleux |author3=F. Bastien |author4=P. Lamblin |author5=R. Pascanu |author6=G. Desjardins |author7=J. Turian |author8=D. Warde-Farley |author9=Y. Bengio |title=Theano: A CPU and GPU Math Expression Compiler |journal=Proceedings of the Python for Scientific Computing Conference (SciPy) 2010 |date=30 June 2010 |url=http://www.iro.umontreal.ca/~lisa/pointeurs/theano_scipy2010.pdf |access-date=2020-11-06 |archive-date=2020-11-01 |archive-url=https://web.archive.org/web/20201101042841/http://www.iro.umontreal.ca/~lisa/pointeurs/theano_scipy2010.pdf |dead-url=no }}</ref>。在Theano中，计算使用[[NumPy|NumPy]]形式的语法来表达并被[[编译器|编译]]，用来在CPU或者[[图形处理器通用计算|GPU]]架构上高效的运行。
+
+==历史==
+Theano是[[开放源代码|开源]]项目<ref>{{cite web|title=Github Repository|url=https://github.com/Theano/Theano/|accessdate=2020-11-06|archive-date=2020-11-16|archive-url=https://web.archive.org/web/20201116203703/https://github.com/Theano/Theano|dead-url=no}}</ref>，主要由[[蒙特利尔大学|蒙特利尔大学]]的{{en-link|蒙特利尔学习算法研究所|Montreal Institute for Learning Algorithms}}（MILA）开发<ref>{{cite web|url=http://deeplearning.net/|title=deeplearning.net|accessdate=2020-11-06|archive-date=2017-12-13|archive-url=https://web.archive.org/web/20171213184650/http://deeplearning.net/|dead-url=yes}}</ref>。软件名字取自古代哲学家{{en-link|Theano (哲学家)|Theano (philosopher)|Theano}}。
+
+在2017年9月28日，Pascal Lamblin发布了来自[[约书亚·本希奥|约书亚·本希奥]]的一则信息，MILA负责人：由于更强大的工业参与者的竞争，主要的开发在1.0发行之后将会停止<ref>{{cite mailing list |url=https://groups.google.com/forum/#!topic/theano-users/7Poq8BZutbY |title=MILA and the future of Theano |date=28 September 2017 |accessdate=28 September 2017 |mailing-list=theano-users |last=Lamblin |first=Pascal |archive-date=2011-01-22 |archive-url=http://arquivo.pt/wayback/20110122130054/https://groups.google.com/forum/#!topic/theano-users/7Poq8BZutbY |dead-url=no }}</ref>。Theano 1.0.0随后在2017年11月15日发行<ref>{{cite web|url=http://deeplearning.net/software/theano/NEWS.html|title=Release Notes – Theano 1.0.0 documentation|accessdate=2020-11-06|archive-date=2020-09-14|archive-url=https://web.archive.org/web/20200914204342/http://deeplearning.net/software/theano/NEWS.html|dead-url=yes}}</ref>。在2018年5月17日，Chris Fonnesbeck代表[[PyMC3|PyMC3]]开发团队写道：PyMC开发者将在他们退场后取得对Theano维护的控制权<ref>{{Cite web|url=https://medium.com/@pymc_devs/theano-tensorflow-and-the-future-of-pymc-6c9987bb19d5|title=Theano, TensorFlow and the Future of PyMC|last=Developers|first=PyMC|date=2019-06-01|website=Medium|language=en|access-date=2019-08-27|archive-date=2020-08-06|archive-url=https://web.archive.org/web/20200806150843/https://medium.com/@pymc_devs/theano-tensorflow-and-the-future-of-pymc-6c9987bb19d5|dead-url=no}}</ref>。
+
+==样例代码==
+下列代码是最初的Theano的例子。它定义具有类型<code>double</code>的2个标量<code>a</code>和<code>b</code>及在它们上的运算（加法）的一个计算图，并接着建立一个Python函数<code>f</code>来进行实际计算<ref name="LISA Lab">{{cite web |title=Theano Documentation Release 1.0.0 |url=http://deeplearning.net/software/theano/theano.pdf |publisher=LISA lab, University of Montreal |accessdate=31 August 2018 |pages=22 |date=21 November 2017 |archive-date=2020-08-05 |archive-url=https://web.archive.org/web/20200805154803/http://deeplearning.net/software/theano/theano.pdf |dead-url=yes }}</ref>。
+
+<syntaxhighlight lang="python">
+import theano
+from theano import tensor
+
+# 声明2个符号浮点标量
+a = tensor.dscalar()
+b = tensor.dscalar()
+
+# 建立一个简单的表达式
+c = a + b
+
+# 将这个表达式转换成一个可调用对象，
+# 它接收(a, b)值作为输入并计算出一个值给c
+f = theano.function([a, b], c)
+
+# 绑定1.5至'a'，2.5至'b'，并求值'c'
+assert 4.0 == f(1.5, 2.5)
+</syntaxhighlight>
+
+==参见==
+* {{en-link|深度学习软件比较|Comparison of deep learning software}}
+* [[可微分编程|可微分编程]]
+
+==引用==
+{{Reflist|2}}
+
+==外部链接==
+* {{Official website|https://github.com/Theano/}} (GitHub)
+* [http://deeplearning.net/software/theano/ Theano]{{Wayback|url=http://deeplearning.net/software/theano/ |date=20201108233358 }} at Deep Learning, Université de Montréal
+
+{{深度学习软件}}
+
+[[Category:阵列编程语言|Category:阵列编程语言]]
+[[Category:深度学习|Category:深度学习]]
+[[Category:自由科学软件|Category:自由科学软件]]
+[[Category:数值分析语言|Category:数值分析语言]]
+[[Category:Python科学库|Category:Python科学库]]
+[[Category:使用BSD许可证的软件|Category:使用BSD许可证的软件]]

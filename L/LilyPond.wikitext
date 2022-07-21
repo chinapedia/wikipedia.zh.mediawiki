@@ -1,0 +1,134 @@
+{{NoteTA|G1=IT|G2=FL}}
+{{NotChineseTitle|time=2021-12-18T03:09:00+00:00}}
+{{Infobox software
+| name                   = LilyPond
+| logo                   = LilyPond-logo-with-music.png
+| screenshot             = Fibonacci composition.svg
+| screenshot size        = 300px
+| caption                = 
+| operating system       = {{Plainlist|
+*[[Windows_2000|Windows 2000]]以及後續版本
+*[[Mac_OS_X_Tiger|Mac OS X Tiger]]以及後續版本
+*[[Linux|Linux]]
+*[[FreeBSD|FreeBSD]]<ref>{{cite web|title=Downloads for LilyPond 2.18.2|url=http://lilypond.org/download.html|website=lilypond.org|access-date=March 4, 2016}}</ref>}}
+
+<!--Current developers get listed here-->
+| developer              = David Kastrup, Werner Lemberg, Han-Wen Nienhuys, Jan Nieuwenhuizen, Carl Sorensen, Janek Warchoł, {{no wrap|et al.}}<ref name="devteam">{{cite web |url=http://lilypond.org/authors.html |title=Authors |publisher=LilyPond Development team |access-date=March 21, 2015 |archive-date=2015-09-06 |archive-url=https://web.archive.org/web/20150906052632/http://www.lilypond.org/authors.html }}</ref>
+
+| released               = {{start date and age|1996}}
+| license                = [[GNU通用公共许可证|GNU通用公共许可证]]<ref>{{Cite web|url=http://git.savannah.gnu.org/cgit/lilypond.git/tree/COPYING|title=COPYING - lilypond.git - GNU LilyPond|website=git.savannah.gnu.org|access-date=2021-03-30|archive-date=2021-04-15|archive-url=https://web.archive.org/web/20210415005115/http://git.savannah.gnu.org/cgit/lilypond.git/tree/COPYING}}</ref>
+| programming language   = [[C++|C++]]、{{link-en|Scheme}}、[[METAFONT|METAFONT]]、[[PostScript|PostScript]]、[[Python|Python]]<ref>{{cite web|title=Source tarball|url=http://lilypond.org/source.html|website=lilypond.org|access-date=March 4, 2016|archive-date=2021-03-30|archive-url=https://web.archive.org/web/20210330204806/https://lilypond.org/source.html}}</ref>
+| website                = {{URL|http://lilypond.org}}
+| status                 = 
+| size                   = 20–100 MB
+| language               = 
+| standard               = [[EPS|EPS]]、[[MIDI|MIDI]]、[[MusicXML|MusicXML]]、[[可移植文档格式|可移植文档格式]]、[[PostScript|PostScript]]、[[可縮放向量圖形|可縮放向量圖形]]
+| genre                  = {{link-en|音樂軟件|Music software}}、[[制谱软件|制谱软件]]
+}}
+'''LilyPond'''是一個用于[[音乐雕刻|音乐雕刻]]的[[计算机程序|计算机程序]]和[[檔案格式|檔案格式]]。LilyPond的主要目标之一是制作出具有传统布局规则的乐谱。LilyPond為[[跨平臺|跨平臺]]且可用于多种常见的[[操作系统|操作系统]]。LilyPond是[[自由软件|自由软件]]，它在[[GNU通用公共许可证|GNU通用公共许可证]]的条款下发布。
+==LilyPond輸入文件==
+<syntaxhighlight lang="latex">
+\version "2.19.82"
+
+\include "english.ly"
+
+\header {
+  title = \markup { "Excerpt from" \italic "fibonacci" }
+  composer = "Patrick McCarty"
+  %  copyright = \markup \fontsize #-5 
+  %  {
+  %    Copyright © 2009.
+  %    Typeset with GNU LilyPond.
+  %    Released into public domain by the composer.
+  %  }
+}
+
+\paper {
+  paper-height = 4.6\in
+  paper-width = 8.5\in
+  indent = #0
+  system-count = #2
+}
+
+\score {
+  \new PianoStaff = "pianostaff" <<
+    \new Staff = "RH" \relative c' {
+      \accidentalStyle Score.piano
+      \clef "treble"
+      \time 2/4
+      \set Score.currentBarNumber = #51
+      \tempo "Slow and steady" 4 = 60
+      <e gs,>4 \acciaccatura { cs16[ ds] } <e gs,>4 | % m. 51
+      <ds gs,>4 \acciaccatura { e16[ ds] } <cs gs>4 | % m. 52
+      <cs gs>4 \acciaccatura { ds16[ cs] } <c g>4  | % m. 53
+      <cs gs>4 \acciaccatura { ds16[ e] } <es bs gs>4 | % m. 54
+
+      <e gs,>4 \acciaccatura { cs16[ ds] } e16 f gs a | % m. 55
+      <gs c,>8 \acciaccatura { as16[ gs] }
+      <es b>8 ~ <es b>16 ds b as | % m. 56
+
+      b16 d8 bf32 f' g16 af bf c | % m. 57
+      <df df,>16 ( c af ) <e' e,> ( ds b ) <g' g,> ( ds | % m. 58
+
+      \time 3/4
+      <gs gs,>16 ) \noBeam d,16 f gs
+      a16 e f b
+      c16 d, ( f gs | % m. 59
+
+      a16 b ) e, ( f
+      gs16 b c ) f, (
+      gs16 as b c ) | % m. 60
+    }
+
+    \new Dynamics = "Dynamics_pf" {
+      s4 \p \< s4 | % m. 51
+      s4 s4 | % m. 52
+      s4 \mp \> s4 | % m. 53
+      s4 s4 \! | % m. 54
+      s4 \p s4 | % m. 55
+      s1 * 2/4 | % m. 56
+      s4 \< s4 | % m. 57
+      s4 s4 | % m. 58
+      \override DynamicText.extra-spacing-width = #'(-0.75 . 0.75)
+      s16 \mf s16 \p s8 s4 s4 | % m. 59
+      s2. | % m. 60
+    }
+
+    \new Staff = "LH" \relative c, {
+      \clef "bass"
+      \time 2/4
+      cs4. cs8 | % m. 51
+      cs4. d8 | % m. 52
+      f4. a8 | % m. 53
+      f4. d8 | % m. 54
+
+      cs4. cs8 | % m. 55
+      d4 ds | % m. 56
+      gs4. bf,8 | % m. 57
+      f'4 b, | % m. 58
+
+      \time 3/4
+      d4. d8 ~ d4 | % m. 59
+      ef2 f4 | % m. 60
+    }
+  >>
+}
+</syntaxhighlight>
+
+===輸出===
+[[Image:Fibonacci_composition.svg|700px]]
+== 參考資料 ==
+{{Reflist|2}}
+
+== 外部連結 ==
+* {{Official website}}
+
+{{GNU}}
+{{Document markup languages}}
+[[Category:1996年软件|Category:1996年软件]]
+[[Category:跨平台軟體|Category:跨平台軟體]]
+[[Category:自由音訊軟體|Category:自由音訊軟體]]
+[[Category:用C++編程的自由軟體|Category:用C++編程的自由軟體]]
+[[Category:自由排版软件|Category:自由排版软件]]
+[[Category:GNU计划软件|Category:GNU计划软件]]
+[[Category:樂譜檔案格式|Category:樂譜檔案格式]]

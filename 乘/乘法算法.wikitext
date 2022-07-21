@@ -1,0 +1,389 @@
+'''乘法算法'''是计算两个[[数值|数值]][[乘法|相乘]]乘積的[[算法|算法]]。为了提高运算效率，不同大小的数字适用不同的乘法算法。自十进制数字系统诞生以来，就已开始发展乘法算法。
+
+== 网格法 ==
+
+{{main|网格式乘法}}
+
+{{le|网格式乘法|Grid method multiplication|网格法}} （或盒式法）是一种用于给[[小学生|小学生]]进行乘法计算启蒙的简单乘法算法。自1990年代后期以来，它一直是英格兰和威尔士公立小学数学课程的标准部分<ref>Gary Eason, [http://news.bbc.co.uk/1/hi/education/639937.stm Back to school for parents] {{Wayback|url=http://news.bbc.co.uk/1/hi/education/639937.stm |date=20220515053129 }}, ''[[BBC_News|BBC News]]'', 13 February 2000<br>Rob Eastaway, [https://www.bbc.co.uk/news/magazine-11258175 Why parents can't do maths today] {{Wayback|url=https://www.bbc.co.uk/news/magazine-11258175 |date=20181105053311 }}, ''[[BBC_News|BBC News]]'', 10 September 2010</ref>。
+
+将两个乘数分解（“划分”）为百位、十位或个位的部分，然后在相对简单的乘法步骤中直接算出这些部分的乘积，再将其一一相加以算出最终结果。用这种方法计算 <math>34 \times 13</math>，可以画出如下网格：
+
+<div style="float:right">
+<pre>  300
+   40
+   90
+ + 12
+ ————
+  442</pre></div>
+:{| class="wikitable" style="text-align: center;"
+! width="40" scope="col" | ×
+! width="40" scope="col" | 30
+! width="40" scope="col" | 4
+|-
+! scope="row" | 10
+|300
+|40
+|-
+! scope="row" | 3
+|90
+|12
+|}
+
+最后再通过一次求和或逐行累加得到结果（见右），实质是计算了 <math>(300 + 40) + (90 + 12) = 340 + 102 = 442</math>。
+
+这种计算方法（尽管不一定显式地用网格排列乘数）也称为「部分乘积算法」。它的本质是分别计算简单的个位乘法，所有加法都留到最后的「加總」阶段。
+
+尽管随着位数的增加，伴随的中间过程越来越繁琐，但网格方法原则上可以应用于任何大小的乘数。一般认为此方式是引入多位乘法概念時，有用的显式方法，而在当今利用计算器或电子表格就能完成大多数计算的时代，它可能是某些学生唯一需要的乘法算法。
+== 長乘法 ==
+[[進位制|位值制数字系统]]在人类社会的垄断性地位，使得'''長乘法'''成为最自然的乘法算法，世界各地的学校都会教学生使用这种算法完成日常的乘法计算。其内容是：将一个乘数乘以另一个乘数的每位数字，然后将所有数字按照适当的位置相加得出结果。这需要预先记住所有个位数字两两相乘后的结果，即华人世界常见的[[乘法表|乘法表]]。长乘法又被称为'''教科书乘法'''或'''标准乘法'''。
+
+若在十進制下，人工計算較大的數字加乘，长乘法是常見的算法。電腦在二進制下，也有類似的算法「[[#移位和相加|移位和相加]]」，不少現代的處理器已設計最佳化的乘法線路，以進行快速的乘法計算，但其代價是硬體會變的更加複雜。若是在紙上計算長乘法，會先將所有數字寫下，然後相加，若是使用[[珠算|珠算]]，會在計算完每一個乘積後，直接和已計算的和加總。
+=== 示例 ===
+此例用長乘法計算23,958,233（被乘數）乘以5,830（乘數），結果是139,676,498,390（積）。
+
+         23958233
+   ×         5830
+   ———————————————
+         00000000 ( =      23,958,233 ×     0)
+        71874699  ( =      23,958,233 ×    30)
+      191665864   ( =      23,958,233 ×   800)
+   + 119791165    ( =      23,958,233 × 5,000)
+   ———————————————
+     139676498390 ( = 139,676,498,390        )
+以下的虛擬碼描述上述乘法的步驟。此作法會持續的更新乘積，在乘完所有數字後，乘積即為結果。其中+=運算子用來表示將某變數原有的值加上其他的值，再存回該變數中（類似在Java及C語言中的用法），以讓程式緊湊。
+
+<syntaxhighlight lang="pascal">
+multiply(a[1..p], b[1..q], base)                            // index 1對應數字的個位數
+  product = [1..p+q]                                        // 先預留乘積的空間
+  for b_i = 1 to q                                          // 針對b的每一位數
+    carry = 0
+    for a_i = 1 to p                                        // 針對a的每一位數
+      product[a_i + b_i - 1] += carry + a[a_i] * b[b_i]
+      carry = product[a_i + b_i - 1] / base
+      product[a_i + b_i - 1] = product[a_i + b_i - 1] mod base
+    product[b_i + p] = carry                               // 最高位數是最後一次計算乘法的進位
+  return product
+</syntaxhighlight>
+
+=== 优化空间复杂度 ===
+假設在[[基數_(進位記數法)|基數]]为<math>D</math>，令 <math>n</math> 为两个输入数字位數長度的總和，若其结果需保存在存储器中，则其空间复杂度通常为<math>\Theta(n)</math>。然而在某些应用中，不需要把整个结果保存在内存中，而可以在计算时将数字以字元流的方式输出（例如输出到系统终端或文件中）。在这些情况下，长乘法的优势在于可以将其轻松表示为[[对数空间|对数空间]]算法——也就是说，只需要一个工作空间与输入中位数的对数成正比的算法（<math>\Theta(\log n)</math>），这是乘数之积的雙重对数（<math>\log \log N</math>）。注意，乘数本身仍保留在内存中，并且在此分析中忽略其 <math>\Theta(n)</math> 的空间。
+
+只要知道之前乘積產生的進位，就可以由最低位起，一位一位的計算乘積的每一位數字，這是優化空間複雜度的關鍵。令''a''<sub>''i''</sub>和''b''<sub>''i''</sub>分別是被乘數及乘數的第''i''位數字，''a''和 ''b''的最高位都已補0，補到''n''位數，而''r''<sub>''i''</sub>是乘積的第''i''位，而''c''<sub>''i''</sub>是計算''r''<sub>''i''</sub>後產生的進位（i=1表示是個位），則
+
+:<math>\begin{align}
+r_i &= \left( c_{i-1} + \sum_{j+k=i+1} a_j b_k \right) \mod D \\
+c_i &= \left\lfloor (c_{i-1} + \sum_{j+k=i} a_j b_k) / D \right\rfloor \\
+c_0 &= 0
+\end{align}</math>
+or
+:<math>
+c_i = \left( \sum_{m = 0}^{i - 2} \sum_{j + k = i - m} a_j b_k \right) / D.
+</math>
+
+簡單的推論可以證明進位不會超過''n''，''r''<sub>''i''</sub>的總和不會超過''D'' * ''n''：第一欄的進位是0，其他欄最多有''n''個數字，最多也只會從前一欄進位''n''。總和最多是''D'' * ''n''，進位到下一位的最多是''D'' * ''n'' / ''D''或''n''。因此這些數字都可以用O(log ''n'')位數儲存。
+
+偽代碼下的對數空間演算法為<syntaxhighlight lang="pascal">：
+multiply(a[1..p], b[1..q], base)                  // Operands containing rightmost digits at index 1
+    tot = 0
+    for ri = 1 to p + q - 1                       //For each digit of result
+        for bi = MAX(1, ri - p + 1) to MIN(ri, q) //Digits from b that need to be considered
+            ai = ri − bi + 1                      //Digits from a follow "symmetry"
+            tot = tot + (a[ai] * b[bi])
+        product[ri] = tot mod base
+        tot = floor(tot / base)
+    product[p+q] = tot mod base                   //Last digit of the result comes from last carry
+    return product
+</syntaxhighlight>
+
+=== 在计算机中的用法 ===
+有些[[集成电路|集成电路]]會實現乘法，可能是用[[硬件|硬件]]或是[[微程序|微程序]]，可能針對各種整數及浮點數。在[[高精度计算|高精度计算]]中，在乘比較小的數字時，用底數為2<sup>''w''</sup>的長乘法，其中''w''為字元的位元數。
+
+若要用此方式乘二個''n''位數數字，約需要''n''<sup>2</sup>次的運算。若用比較型式的方式表示，用數字位數這個自然的數字大小度量，用長乘法乘二個''n''位數數字的時間複雜度是[[大O符号#一些相关的渐近符号|Θ]](''n''<sup>2</sup>)。
+
+若要用軟體實現，長乘法演算法需要處理在加法時會出現的溢位問題，可能會很耗成本。典型的作法是用比較小的基底來進行運算，例如''b''，而讓8''b''為機器中表示的整數大小。這樣可以進行幾次運算之後才會溢位。若數字太大，可以只加數字的一部份到結果中，或是進位，將剩下的數字映射為一個小於''b''的較小數字。此作法稱為「正規化」。Richard Brent有在其Fortran軟體包MP中使用此一作法<ref>{{cite journal|first1=Richard P|last1=Brent|title=A Fortran Multiple-Precision Arithmetic Package.|doi=10.1145/355769.355775|url=https://dl.acm.org/doi/10.1145/355769.355775|journal=ACM Transactions on Mathematical Software|date=March 1978|citeseerx=10.1.1.117.8425|access-date=2020-08-01|archive-date=2021-04-02|archive-url=https://web.archive.org/web/20210402050047/https://dl.acm.org/doi/10.1145/355769.355775}}</ref>。
+
+==格子乘法==
+{{main|格子乘法}}
+[[File:Hindu_lattice.svg|thumb]]
+[[File:Hindu_lattice_2.svg|thumb]]
+
+格子乘法在演算法上和長乘法等效。需要在紙上劃格子，以引導計算，並且將乘法和加法分為二個步驟進行。這是在1202年在[[斐波那契|斐波那契]]的《{{le|計算書|Liber Abaci}}》中引進到歐洲。斐波那契用此方式心算，用左手和右手處理計算的中間值。16世紀的{{le|馬特拉克·那西|Matrakçı Nasuh}}在《Umdet-ul Hisab》書籍上列出了此演算法六種不同的變體。在奧斯曼帝國的[[恩德倫學校|恩德倫學校]]中，廣為使用此一演算法<ref>Corlu, M. S., Burlbaw, L. M., Capraro, R. M., Corlu, M. A.,& Han, S. (2010). The Ottoman Palace School Enderun and The Man with Multiple Talents, Matrakçı Nasuh. Journal of the Korea Society of Mathematical Education Series D: Research in Mathematical Education. 14(1), pp. 19-31.</ref>。[[納皮爾的骨頭|納皮爾的骨頭]]（Napier's bones）或稱為納皮爾算籌（Napier's rods）也是用此方式，是[[約翰·納皮爾|約翰·納皮爾]]過世的1617年發表。
+
+如圖所示，被乘數和乘數寫在格子的上方和右邊，此方法在[[花拉子米|花拉子米]]的《算數》（Arithmetic）書中有提到，這是斐波那契的來源之一，曾被Sigler在2002年的《Fibonacci's Liber Abaci》中提到{{citation needed|date=January 2016}}。
+
+*在乘法階段，格子中會填上其對應行和列上所寫，被乘數和乘數的位數相乘後的二位數乘積：格子中左上方的三角形會列十位數字，格子中右下方的三角形會列個位數字。
+*在加法階段，會延著斜線將數字相加，將相加後的個位數寫在格子的最下方，對應斜線，若有進位，將進位寫在下一個斜線區域格子的右方或上方。
+*下方的數字即為兩數字相乘的積。
+===示例===
+考慮以下較複雜的計算，考慮23,958,233乘以5,830，結果是139,676,498,390。不過以下計算中，其中的23,958,233是寫在格子的上方，5,830寫在右方。將乘積寫在格子的二個三角形中，將和寫在左邊和下方。結果條列如下：
+{|
+| rowspan="2" |
+<pre>
+     2   3   9   5   8   2   3   3
+   +---+---+---+---+---+---+---+---+-
+   |1 /|1 /|4 /|2 /|4 /|1 /|1 /|1 /|
+   | / | / | / | / | / | / | / | / | 5
+ 01|/ 0|/ 5|/ 5|/ 5|/ 0|/ 0|/ 5|/ 5|
+   +---+---+---+---+---+---+---+---+-
+   |1 /|2 /|7 /|4 /|6 /|1 /|2 /|2 /|
+   | / | / | / | / | / | / | / | / | 8
+ 02|/ 6|/ 4|/ 2|/ 0|/ 4|/ 6|/ 4|/ 4|
+   +---+---+---+---+---+---+---+---+-
+   |0 /|0 /|2 /|1 /|2 /|0 /|0 /|0 /|
+   | / | / | / | / | / | / | / | / | 3
+ 17|/ 6|/ 9|/ 7|/ 5|/ 4|/ 6|/ 9|/ 9|
+   +---+---+---+---+---+---+---+---+-
+   |0 /|0 /|0 /|0 /|0 /|0 /|0 /|0 /|
+   | / | / | / | / | / | / | / | / | 0
+ 24|/ 0|/ 0|/ 0|/ 0|/ 0|/ 0|/ 0|/ 0|
+   +---+---+---+---+---+---+---+---+-
+     26  15  13  18  17  13  09  00</pre>
+||
+<pre>
+ 01
+ 002
+ 0017
+ 00024
+ 000026
+ 0000015
+ 00000013
+ 000000018
+ 0000000017
+ 00000000013
+ 000000000009
+ 0000000000000
+ —————————————
+  139676498390
+</pre>
+|-
+||
+ = 139,676,498,390
+|}
+
+==二進制或農夫演算法==
+{{Main2|{{le|農夫演算法|Peasant multiplication}}}}
+{{le|農夫演算法|Peasant multiplication}}是廣為在農民中使用的算法，其中不需要像長乘法一樣記憶[[乘法表|乘法表]]<ref>{{Cite web|url=https://www.cut-the-knot.org/Curriculum/Algebra/PeasantMultiplication.shtml|title=Peasant Multiplication|last=Bogomolny|first=Alexander|website=www.cut-the-knot.org|access-date=2017-11-04|archive-date=2021-04-23|archive-url=https://web.archive.org/web/20210423223815/https://www.cut-the-knot.org/Curriculum/Algebra/PeasantMultiplication.shtml}}</ref>{{failed verification|date=March 2020}}。此演算法曾在古埃及使用<ref>{{Cite book |author=D. Wells |year=1987 |page=[https://archive.org/details/penguindictionar00well/page/n44 44] |title=The Penguin Dictionary of Curious and Interesting Numbers |url=https://archive.org/details/penguindictionar00well |publisher=Penguin Books}}</ref><ref>{{Citation|title=Cool Multiplication Math Trick|url=https://www.youtube.com/watch?v=dtfz5U8bt8A|language=en|access-date=2020-03-14|archive-date=2020-06-13|archive-url=https://web.archive.org/web/20200613190808/https://www.youtube.com/watch?v=dtfz5U8bt8A&gl=US&hl=en}}</ref>，農夫演算法的優點是可以快速教授、不需要記憶、若沒有紙筆的話，也可以用其他東西輔助計算（例如[[籌碼|籌碼]]），缺點是步驟比長除法要長，在計算大數字的乘法時不方便，
+
+===說明===
+在紙上，寫下被乘數，被乘數的下方寫下被乘數反覆除二（且無條件捨去小數）的結果，被乘數的旁邊寫下乘數，乘數下方寫上乘數反覆乘二的結果。一直到被乘數那一欄為1為止。將乘數那一欄的數字相加，但若被乘數那一欄為偶數，跳過此數字不累加，所得結果即為乘積。
+
+===示例===
+以下用農夫演算法計算11乘以3 。
+
+ 十進制:     二進制:
+ 11   3       1011  11
+ 5    6       101  110
+ 2   <s>12</s>       10  <s>1100</s>
+ 1   24       1  11000
+     ——         ——————
+     33         100001
+
+說明上述的步驟：
+
+* 二欄的最上方分別是11和3。
+* 11除以2（5.5）無條件捨去，變成5，3乘以2（6）。
+* 5除以2（2.5）無條件捨去，變成2，6乘以2（12），這一行的最左邊（2）是偶數，因此12要劃掉，不能累加到乘積中。
+* 2除以2（1），12乘以2（24）
+* 將沒有劃掉的數字相加：3 + 6 + 24 = 33.
+
+此作法有效的原因是因為乘法滿足[[分配律|分配律]]，因此：
+
+: <math>
+\begin{align}
+3 \times 11 & = 3 \times (1\times 2^0 + 1\times 2^1 + 0\times 2^2 + 1\times 2^3) \\
+& = 3 \times (1 + 2 + 8) \\
+& = 3 + 6 + 24 \\
+& = 33.
+\end{align}
+</math>
+
+以下是一個複雜的例子，仍用之前用過的範例（23,958,233 and 5,830）：
+
+ Decimal:             Binary:
+ 5830  <s>23958233</s>       1011011000110  <s>1011011011001001011011001</s>
+ 2915  47916466       101101100011  10110110110010010110110010
+ 1457  95832932       10110110001  101101101100100101101100100
+ 728  <s>191665864</s>       1011011000  <s>1011011011001001011011001000</s>
+ 364  <s>383331728</s>       101101100  <s>10110110110010010110110010000</s>
+ 182  <s>766663456</s>       10110110  <s>101101101100100101101100100000</s>
+ 91  1533326912       1011011  1011011011001001011011001000000
+ 45  3066653824       101101  10110110110010010110110010000000
+ 22  <s>6133307648</s>       10110  <s>101101101100100101101100100000000</s>
+ 11 12266615296       1011  1011011011001001011011001000000000
+ 5  24533230592       101  10110110110010010110110010000000000
+ 2  <s>49066461184</s>       10  <s>101101101100100101101100100000000000</s>
+ 1  98132922368       1  <u>1011011011001001011011001000000000000</u>
+   ————————————          1022143253354344244353353243222210110 （進位前）
+   139676498390         10000010000101010111100011100111010110
+
+==電腦中的二進制乘法==
+{{unreferenced section|date=2013年1月}}
+這是農夫演算法的變體。
+
+二進制下，長乘法會變成很簡單的處理，針對每一個被乘數位數的1，將乘數往左位移適當的位元數，將乘數各次位移的結果相加，即為乘積。在一些[[中央處理器|中央處理器]]中，加法和位移的速度會比乘法要快，尤其被乘數不大，或是幾乎是定值的情形。
+
+==移位和相加==
+以往的電腦會用「移位和相加」的乘法來計算小整數的乘法。二進制的[[#長乘法|長乘法]]和農夫演算法都可以簡化到相同的演算法。
+在二進制下，將數字和二進制的一個位元相乘，可以簡化為各位元的[[逻辑与|逻辑与]]運算。會將算出來的部份和相加。，大部份目前的微處理器都會以此方式或是其他類似方式（例如[[布斯乘法算法|布斯乘法算法]]）實現不同整數以及浮點長度的乘法，，可能是用[[乘法器|乘法器]]中或是[[微程序|微程序]]。
+
+目前的處理器，位元的移位運算會比乘法要快很多，因此可以用往左移位代替乘以2的次幂。乘以常數的乘法也可以用一連串的移位和加減法來代替。例如，以下是只有移位及相加來表示乘以10的演算法。
+
+ ((x << 2) + x) << 1 # 此處是用 (x*2^2 + x)*2 來計算 10*x
+ (x << 3) + (x << 1) # 此處是用 x*2^3 + x*2 來計算 10*x
+
+有時的移位和加減法的組合會比硬體乘法器還快。
+
+若電腦沒有乘法的運算，需要用上述方式來進行計算<ref>[http://techref.massmind.org/techref/method/math/muldiv.htm "Novel Methods of Integer Multiplication and Division"] {{Wayback|url=http://techref.massmind.org/techref/method/math/muldiv.htm |date=20201202164058 }} by G. Reichborn-Kjennerud</ref>，若將向左移位表示為相同的數加二次（兩者在邏輯上等價），也可以延伸到浮點數。
+
+==平方的四分之一乘法==
+可以用平方的算式，計算二個數的乘積，有些來源的算式中會包括[[取整函数|取整函数]]<ref>{{citation |title=Quarter Tables Revisited: Earlier Tables, Division of Labor in Table Construction, and Later Implementations in Analog Computers |last=McFarland |first=David |url=http://escholarship.org/uc/item/5n31064n |page=1 |year=2007 |accessdate=2020-08-01 |archive-date=2021-04-22 |archive-url=https://web.archive.org/web/20210422173221/https://escholarship.org/uc/item/5n31064n }}</ref><ref>{{cite book| title=Mathematics in Ancient Iraq: A Social History |last=Robson |first=Eleanor |page=227 |year=2008 |isbn= 978-0691091822 }}</ref>，此方式源自於[[巴比伦数学|巴比伦数学]]（西元前2000-1600年）。
+
+: <math>
+\left\lfloor \frac{\left(x+y\right)^2}{4} \right\rfloor - \left\lfloor \frac{\left(x-y\right)^2}{4} \right\rfloor =
+\frac{1}{4}\left(\left(x^2+2xy+y^2\right) - \left(x^2-2xy+y^2\right)\right) =
+\frac{1}{4}\left(4xy\right) = xy.
+</math>
+
+{{math|''x''}}和{{math|''y''}}為整數，若{{math|''x''+''y''}}和{{math|''x''−''y''}}中有一個為奇數，另一個也一定會是奇數，因此上式中若有一項在取整數之前有分數，另一項也會有，兩者會相消，不會影響所得的結果。以下是從0到18計算平方的四分之一取整數的對照表，可以計算{{math|9×9}}以內的乘法：
+
+{| border="1" cellspacing="0" cellpadding="3" style="margin:0 0 0 0.5em; background:#fff; border-collapse:collapse; border-color:#7070090;" class="wikitable"
+|- style="text-align:right;"
+|{{math|''n''}}   ||   0 ||   1 ||   2 ||   3 ||   4 ||   5 ||   6 || 7 || 8 || 9 || 10 || 11 || 12 || 13 || 14 || 15 || 16 || 17 || 18
+|- style="text-align:right;"
+|{{math|⌊''n''<sup>2</sup>/4⌋}} || 0 || 0 || 1 || 2 || 4 || 6 || 9 || 12 || 16 || 20 || 25 || 30 || 36 || 42 || 49 || 56 || 64 || 72 || 81
+|}
+
+若要計算9乘3，其和以及差分別是12以及6，根據上式可得36和9，兩者的差是27，這就是9乘3的乘積。
+
+Antoine Voisin在1817年有出版一個平方的四分之一的表，從1列到1000，可以幫助乘法的運算。Samuel Laundy在1856年有出版過1到100000的表<ref>{{Citation |title=Reviews |journal=The Civil Engineer and Architect's Journal |year=1857 |pages=54-55 |url=https://books.google.com/books?id=gcNAAAAAcAAJ&pg=PA54#v=onepage&f=false |postscript=. |accessdate=2020-08-01 |archive-date=2021-04-02 |archive-url=https://web.archive.org/web/20210402050148/https://books.google.com/books?id=gcNAAAAAcAAJ&pg=PA54#v=onepage&f=false }}</ref>，Joseph Blater在1888年出版了1到200000的表<ref>{{Citation|title=Multiplying with quarter squares |first=Neville |last=Holmes| journal=The Mathematical Gazette |volume=87 |issue=509 |year=2003 |pages=296-299 |jstor=3621048|postscript=.|doi=10.1017/S0025557200172778 }}</ref>。
+
+平方的四分之一乘法曾用在[[模拟计算机|模拟计算机]]上，以形成二訊號相乘的[[模擬信號|模擬信號]]。二個輸入電壓的和或差可以用[[运算放大器|运算放大器]]達到。電壓平方可以用{{le|分段線性函數|piecewise linear function|分段線性}}電路達成。最後二個平方的四分之一以及兩電壓的差以及再用运算放大器實現。
+
+Everett L. Johnson在1980年時提出將此方式應用在[[數碼|數碼]]乘法器中<ref name=eljohnson>{{Citation |last = Everett L. |first = Johnson |date = March 1980 |title = A Digital Quarter Square Multiplier |periodical = IEEE Transactions on Computers |location = Washington, DC, USA |publisher = IEEE Computer Society |volume = C-29 |issue = 3 |pages = 258-261 |issn = 0018-9340 |doi =10.1109/TC.1980.1675558 }}</ref>。為了產生8位元整數的乘積，數位裝置計算兩數的和以及差，查表計算平方，計算差值，再往右移位二個位元。
+
+平方的四分之一乘法對8位元的系統有益，可以在沒有硬體乘法器的情形下實現乘法。Charles Putney有將此演算法實現在[[MOS_6502|MOS 6502]]中<ref name=cputney>{{Citation |last = Putney |first = Charles |title = Fastest 6502 Multiplication Yet |date = Mar 1986 |periodical = Apple Assembly Line |volume = 6 |issue = 6 |url = http://www.txbobsc.com/aal/1986/aal8603.html#a5 |accessdate = 2020-08-01 |archive-date = 2016-03-04 |archive-url = https://web.archive.org/web/20160304230942/http://www.txbobsc.com/aal/1986/aal8603.html#a5 }}</ref>。
+
+==複數乘法演算法==
+複數乘法包括四個實數乘法以及二個加法。
+
+:<math>(a+bi) (c+di) = (ac-bd) + (bc+ad)i.</math>
+
+或
+
+:<math>
+\begin{array}{c|c|c}
+\times & a & bi \\
+\hline
+c & ac & bci \\
+\hline
+di & adi & -bd
+\end{array}
+</math>
+
+不過有辦法將實數乘法由四個減少到三個<ref name="taocp-vol2-sec464-ex41">{{Citation | last1=Knuth | first1=Donald E. | author1-link=Donald Knuth | title=The Art of Computer Programming volume 2: Seminumerical algorithms | publisher=Addison-Wesley | year=1988 | pages=519, 706| title-link=The Art of Computer Programming }}
+</ref>
+
+乘積(''a'' + ''bi'') · (''c'' + ''di'')可以用以下方式計算。
+
+:''k''<sub>1</sub> = ''c'' · (''a'' + ''b'')
+:''k''<sub>2</sub> = ''a'' · (''d'' − ''c'')
+:''k''<sub>3</sub> = ''b'' · (''c'' + ''d'')
+:實部 = ''k''<sub>1</sub> − ''k''<sub>3</sub>
+:虛部  = ''k''<sub>1</sub> + ''k''<sub>2</sub>.
+
+此演算法只用了三個乘法，比原來的四個乘法少一個，但加減法由原來的二個增加到五個。假如乘法的成本遠大於計算加減法的成本，此演算法的速度會比原來的演算法快。在現代先進的電腦上，乘法和加法花的時間可能相同，那麼此演算法就沒有速度上的優勢。若使用浮點數計算，此演算法可能會有精準度下降的問題，因此需要取捨。
+
+在[[快速傅里叶变换|FFT]]（或是其他的[[线性映射|线性映射]]），若是乘以固定係數（''c'' + ''di''，在FFT中稱為[[旋轉因子|旋轉因子]]）的複數乘法，其中二個加法（''d''−''c''和''c''+''d''）可以事先計算，需要即時計算只剩三個乘法以及三個加法<ref>P. Duhamel and M. Vetterli, [http://math.berkeley.edu/~strain/273.F10/duhamel.vetterli.fft.review.pdf Fast Fourier transforms: A tutorial review and a state of the art"] {{webarchive|url=https://web.archive.org/web/20140529212847/http://math.berkeley.edu/~strain/273.F10/duhamel.vetterli.fft.review.pdf |date=2014-05-29 }}, ''Signal Processing'' vol. 19, pp. 259-299 (1990), section 4.1.</ref>。不過若是配合有[[浮点运算器|浮点运算器]]的處理器，加法的速度和乘法相當，因此減少乘法，增加加減法的演算法，沒有速度上的優勢<ref>S. G. Johnson and M. Frigo, "[http://fftw.org/newsplit.pdf A modified split-radix FFT with fewer arithmetic operations] {{Wayback|url=http://fftw.org/newsplit.pdf |date=20210225225026 }}," ''IEEE Trans. Signal Process.'' vol. 55, pp. 111-119 (2007), section IV.</ref>。
+
+==大數字的快速乘法演算法==
+{{unsolved|計算機科學|針對二個<math>n</math>位數數字的乘法，哪個乘法演算法的速度最快？}}
+
+===Karatsuba乘法===
+{{Main|Karatsuba算法}}
+若需要計算到上千位數字相乘的系統，例如[[計算機代數系統|計算機代數系統]]或[[高精度计算|高精度计算]]函式庫，長乘法的速度太慢。因此會使用[[Karatsuba算法|Karatsuba算法]]，此乘法演算法是{{le|Anatoly Karatsuba|Anatoly Karatsuba}}在1960年發現的，在1962年出版。此乘法演算法的精神在於觀察到二位數的乘法可以不用傳統四個乘法的作法，可以只用三個乘法完成。這是[[分治法|分治法]]的例子。假設要將二個二位數''m''進位數字 ''x''<sub>1</sub>'' m + x''<sub>2</sub>和''y''<sub>1</sub>'' m + y''<sub>2</sub>相乘：
+
+# 計算''x''<sub>1</sub> · ''y''<sub>1</sub>，稱此結果是''F''
+# 計算''x''<sub>2</sub> · ''y''<sub>2</sub>，稱此結果是''G''
+# 計算(''x''<sub>1</sub> + ''x''<sub>2</sub>) · (''y''<sub>1</sub> + ''y''<sub>2</sub>)，稱此結果是''H''
+# 計算''H'' − ''F'' − ''G''，稱此結果是''K''，此數字等於''x''<sub>1</sub> · ''y''<sub>2</sub> + ''x''<sub>2</sub> · ''y''<sub>1</sub>
+# 計算''F'' · ''m''<sup>2</sup> + ''K'' · ''m'' + ''G''.
+
+若要計算三個''m''進位數字的乘積，又可以用上述的技巧，使用[[递归|递归]]的方式進行（但需要改為其他的進位），此方式。只要計算出乘積數字，再將數字相加，需要''n''個步驟。
+
+Karatsuba算法的時間複雜度是[[大O符号|O]](''n''<sup>log<sub>2</sub>3</sup>) ≈ O(''n''<sup>1.585</sup>)，此方式明顯的比長乘法要快。因為递归產生的額外計算，若''n''較小時，Karatsuba算法會比長乘法慢，因此在''n''較小時，會切換回長乘法進行計算。
+
+Karatsuba算法是第一個時間複雜度漸進的比長乘法快的演算法<ref>D. Knuth, ''The Art of Computer Programming'', vol. 2, sec. 4.3.3 (1998)</ref>，也可以視為是快速乘法理論的基礎。
+
+1963年時，Peter Ungar建議將''m''改為''i''，以產生快速複數乘法的演算法<ref name="taocp-vol2-sec464-ex41"/>。若要計算 (''a'' + ''b i'') · (''c'' + ''d i'')，可依以下步驟進行：
+# 計算''b'' · ''d''，稱結果為''F''
+# 計算''a'' · ''c''，稱結果為''G''
+# 計算(''a'' + ''b'') · (''c'' + ''d'')，稱結果為''H''
+# 結果的實部是 ''K'' = ''H'' − ''F'' − ''G'' = ''a'' · ''d'' + ''b'' · ''c''
+# 結果的虛部是 ''G'' − ''F'' = ''a'' · ''c'' − ''b'' · ''d''
+
+如同上述複數乘法演算法所述的一樣，需要三個乘法以及五個加減法。
+===Toom-Cook 算法===
+{{Main|Toom-Cook算法}}
+另一種乘法的演算法是Toom-Cook算法，或稱為Toom-3算法。Toom-Cook算法將每一個要相乘的數字切成幾部份，是Karatsuba算法的推廣。三路的Toom-Cook演算法可以針對大小為<math>3N</math>的被乘數和乘數進行乘法，其成本是大小為<math>N</math>的被乘數和乘數乘法的5倍，因為運算加速的係數是<math>9/5</math>，Karatsuba算法的加速係數是<math>4/3</math>。
+
+若用遞迴的方式將數字分成更多份，可以再縮減計算時間，但位數管理以及加法的成本也會增加。若位數到上千位數，一般會使用傅立葉轉換，速度多半會比較快，若位數更多，傅立葉轉換的優勢更加明顯。
+
+===傅立葉變換法===
+[[File:Integer_multiplication_by_FFT.svg|thumb]]，選擇85為1的8次方根。<!--Base 10 is used in place of base 2<sup>''w''</sup> for illustrative purposes.-->]]
+[[沃爾克·施特拉森|Strassen]]（1968年）曾提出用快速多項式乘法來計算快速整數乘法的基本概念。後來在1971年由Strassen和{{le|Arnold Schönhage|Arnold Schönhage|Schönhage}}找到理論和實務的確認，所得的就是[[Schönhage-Strassen演算法|Schönhage-Strassen演算法]]<ref name="schönhage">A. Schönhage and V. Strassen, "Schnelle Multiplikation großer Zahlen", ''Computing'' '''7''' (1971), pp. 281-292.</ref>。
+
+==下限==
+若用單一處理器將二個''n''進位的數字相乘，時間複雜度有一個trivial的下界Ω(''n'') ，<!--沒有匹配算法on conventional machines, that is on Turing equivalent machines，-->沒有更接近實際應用的下界。乘法在{{le|ACC0|ACC0|AC<sup>0</sup>[''p'']}}以外（''p''為任意整數），意思是不存在固定深度，多項式（甚至是次指數）大小，以AND、OR、NOT、MOD<sub>''p''</sub>電路組合成的電路可以計算乘法。<!--This follows from a constant-depth reduction of MOD<sub>''q''</sub> to multiplication.--><ref>Sanjeev Arora and Boaz Barak, ''Computational Complexity: A Modern Approach'', Cambridge University Press, 2009.</ref>。<!--Lower bounds for multiplication are also known for some classes of [[二元决策图|branching program]]s.<ref>Farid Ablayev and Marek Karpinski, ''A lower bound for integer multiplication on randomized ordered read-once branching programs'', Information and Computation 186 (2003), 78-89.</ref>。-->
+
+==多項式乘法==
+上述的乘法演算法也可以用來計算[[多項式|多項式]]的乘法。例如Strassen演算法就可以用來計算多項式的乘積<ref>{{cite web|url=http://everything2.com/title/Strassen+algorithm+for+polynomial+multiplication|title=Strassen algorithm for polynomial multiplication|publisher=Everything2|access-date=2020-08-01|archive-date=2016-08-10|archive-url=https://web.archive.org/web/20160810125339/http://everything2.com/title/Strassen+algorithm+for+polynomial+multiplication}}</ref>。而
+{{le|Kronecker替代|Kronecker substitution}}也可以將多項式的乘法轉換為二個整數的乘法<ref>{{citation |first1 = Joachim |last1 = von zur Gathen |first2 = Jürgen |last2 = Gerhard |title = Modern Computer Algebra |publisher = Cambridge University Press |year = 1999 |isbn = 978-0-521-64176-0 |pages = 243-244 |url = https://books.google.com/books?id=AE5PN5QGgvUC&pg=PA245 |accessdate = 2020-08-01 |archive-date = 2021-04-02 |archive-url = https://web.archive.org/web/20210402050132/https://books.google.com/books?id=AE5PN5QGgvUC&pg=PA245 }}</ref>。
+
+以下是用長乘法來計算多項式乘法的例子：
+
+  14ac - 3ab + 2 乘以 ac - ab + 1
+
+  14ac  -3ab   2
+    ac   -ab   1
+  ————————————————————
+  14a<sup>2</sup>c<sup>2</sup>  -3a<sup>2</sup>bc   2ac
+         -14a<sup>2</sup>bc         3 a<sup>2</sup>b<sup>2</sup>  -2ab
+                  14ac           -3ab   2
+  ———————————————————————————————————————
+  14a<sup>2</sup>c<sup>2</sup> -17a<sup>2</sup>bc   16ac  3a<sup>2</sup>b<sup>2</sup>    -5ab  +2
+  <nowiki>=======================================</nowiki><ref>{{cite book|last1=Castle|first1=Frank|title=Workshop Mathematics|url=https://archive.org/details/workshopmathema00castgoog|date=1900|publisher=MacMillan and Co|location=London|page=[https://archive.org/details/workshopmathema00castgoog/page/n88 74]|ref=harv}}</ref>
+
+==相關條目==
+* [[乘法器|乘法器]]
+* [[除法器|除法器]]
+* [[对数|对数]]
+* [[心算|心算]]
+* {{le|積化和差|Prosthaphaeresis}}
+* [[计算尺|计算尺]]
+* {{le|特拉亨伯格速算系统|Trachtenberg system}}
+* [[秦九韶算法|秦九韶算法]]，計算多項式的演算法
+<!--* {{section link|Residue number system#Multiplication}} for another fast multiplication algorithm, specially efficient when many operations are done in sequence, such as in linear algebra-->
+* {{le|Dadda乘法器|Dadda multiplier}}
+* {{le|Wallace樹|Wallace tree}}
+
+==參考資料==
+{{Reflist}}
+
+==延伸閱讀==
+* {{Cite book |title=Hacker's Delight |url=https://archive.org/details/hackersdelight0000warr |first=Henry S. |last=Warren Jr. |date=2013 |edition=2 |publisher=Addison Wesley - Pearson Education, Inc. |isbn=978-0-321-84268-8 }}
+* {{cite web |title=Advanced Arithmetic Techniques |author-first=John J. G. |author-last=Savard |date=2018 |orig-year=2006 |work=quadibloc |url=http://www.quadibloc.com/comp/cp0202.htm |access-date=2018-07-16 |url-status=live |archive-url=https://web.archive.org/web/20180703001722/http://www.quadibloc.com/comp/cp0202.htm |archive-date=2018-07-03}}
+
+==外部連結==
+===基本運算===
+* [http://www.nychold.com/em-arith.html The Many Ways of Arithmetic in UCSMP Everyday Mathematics] {{Wayback|url=http://www.nychold.com/em-arith.html |date=20210425222434 }}
+* [http://math.widulski.net/slides/CH05_MustAllGoodThings.ppt A Powerpoint presentation about ancient mathematics] {{Wayback|url=http://math.widulski.net/slides/CH05_MustAllGoodThings.ppt |date=20180922014059 }}
+* [http://www.pedagonet.com/maths/lattice.htm Lattice Multiplication Flash Video] {{Wayback|url=http://www.pedagonet.com/maths/lattice.htm |date=20210402050151 }}
+
+===進階演算法===
+* [http://gmplib.org/manual/Multiplication-Algorithms.html#Multiplication%20Algorithms Multiplication Algorithms used by GMP] {{Wayback|url=http://gmplib.org/manual/Multiplication-Algorithms.html#Multiplication%20Algorithms |date=20180924034758 }}
+
+{{数论算法}}
+
+{{DEFAULTSORT:Multiplication Algorithm}}
+[[Category:算机算术算法|*]]
+[[Category:乘法|Category:乘法]]

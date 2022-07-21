@@ -1,0 +1,34 @@
+local p = {}
+local data = mw.loadData('Module:Auto/data');
+
+local function string_args (frame, parent)
+	local SubstArgs = {}
+	local args = frame.args
+	local AutoLoadArgs = data.AutoLoadArgs
+	local content = args['$count'] or args['$B']
+	if content and content ~= '' then
+		local titleobj = mw.title.new(parent.getTitle())
+		local title
+		if titleobj.namespace == 10 then -- NS_TEMPLATE
+			title = titleobj.text
+		elseif titleobj.namespace == 0 then -- NS_MAIN
+			title = ':' .. titleobj.text
+		else
+			title = titleobj.prefixedText
+		end
+		if AutoLoadArgs[titleobj.prefixedText] then
+			for k, v in ipairs(AutoLoadArgs[titleobj.prefixedText]) do
+				SubstArgs[#SubstArgs + 1] = v
+			end
+		end
+	else
+		local Tname, Targ = '', {}, {}
+	end
+	if args.parent then
+		for k, v in ipairs(mw.text.split(args.parent, ',')) do
+			SubstArgs[#SubstArgs + 1] = mw.text.trim(v)
+		end
+	end
+end
+
+return p

@@ -1,0 +1,165 @@
+'''守卫命令语言'''（'''GCL'''：Guarded Command Language）是[[艾兹赫尔·戴克斯特拉|艾兹赫尔·戴克斯特拉]]为{{en-link|谓词变换语义|predicate transformer semantics}}定义的一门语言<ref name="EWD472">{{cite web | last=Dijkstra | first=Edsger W | authorlink=E. W. Dijkstra | url=http://www.cs.utexas.edu/users/EWD/ewd04xx/EWD472.PDF | format=PDF | title=EWD472: Guarded commands, non-determinacy and formal. derivation of programs. | accessdate=August 16, 2006 | archive-date=2021-01-18 | archive-url=https://web.archive.org/web/20210118012043/https://www.cs.utexas.edu/users/EWD/ewd04xx/EWD472.PDF | dead-url=no }}</ref>。它以精简方式组合了编程概念，它们处在以某种实际的编程语言书写程序之前。它的简单性使得采用[[霍尔逻辑|霍尔逻辑]]证明程序的正确性更加容易。
+
+==守卫命令==
+守卫（guarded）命令是守卫命令语言的最重要元素。在守卫命令中，同名字所说一样，这个命令是被守卫着的。这个守卫是[[先决条件|先决条件]]，在这个语言被{{en-link|执行 (计算机)|execution (computers)|执行}}之前，它必须为真。在这个语句执行开始时，可以假定这个守卫为真。还有，如果这个守卫为假，这个语句将不被执行。使用守卫命令使得证明[[计算机程序|程序]]满足{{en-link|形式规定|Formal specification|规定}}更加容易。这个语句也经常是另一个守卫命令。
+
+===语法===
+一个守卫命令是形如G → S的一个[[语句_(计算机科学)|语句]]，这里的
+* G是[[先决条件|先决条件]]，叫做守卫（guard）；
+* S是语句。
+
+如果G为真，守卫命令可以简单的写为S。
+
+===语义===
+当在计算中遇到G的时刻，求值它。
+* 如果G为真，执行S；
+* 如果G为假，查看上下文来决定做什么（在任何情况下，都不执行S）。
+
+==跃过和中止==
+在守卫命令语言中，跃过（skip）和中止（abort）是非常简单也是非常重要的语句。中止是未定义指令：做任何事情。中止语句甚至不需要终止（terminate）。在公式化一个证明的时候，它被用来描述一个程序，在这种情况下证明通常失败。跃过是空指令：什么事情都不做。它被用在程序自身中，当语法要求一个语句的时候，而编程者却不想要机器改变{{en-link|状态 (计算机科学)|state (computer science)|状态}}。
+
+===语法===
+ '''skip'''
+
+ '''abort'''
+
+===语义===
+* Skip: 什么事情都不做
+* Abort: 做任何事情
+
+==赋值==
+将值指派给[[变量_(计算机科学)|变量]]。
+
+===语法===
+ v := E
+或
+ v0, v1, ..., vn := E0, E1, ..., En
+
+这里的
+* v是程序变量，
+* E是[[数据类型|数据类型]]同于其对应变量的表达式。
+
+==串接==
+语句由分号（;）来分割。
+
+==选择：if==
+
+选择（经常叫做“条件语句”或“if语句”）是守卫命令的列表，从中选取一个来执行。如果多于一个守卫为真，非确定性的选取一个语句来执行。如果没有守卫为真，结果是未定义的。因为至少一个守卫必须为真，空语句"skip"经常是需要的。
+
+===语法===
+ '''if''' G0 → S0
+ |  G1 → S1
+ ...
+ |  Gn → Sn
+ '''fi'''
+
+===语义===
+在执行一个选择的时候求值所有的守卫。如果没有守卫被求值为真，则选择的执行会abort，否则非确定性的选择其值为真的守卫之一，并执行对应的语句<ref name="Kal90">{{citation | author=Anne Kaldewaij | title=Programming: The Derivation of Algorithms | publisher=Prentice Hall | year=1990}}</ref>。
+
+===例子===
+====简单====
+用[[伪代码|伪代码]]：
+:if a < b then c := True
+:else c := False
+
+用守卫命令语言：
+ '''if''' a < b → c := true
+ |  a ≥ b → c := false
+ '''fi'''
+
+====使用skip====
+用伪代码：
+:if error = True then x := 0
+
+用守卫命令语言：
+ '''if''' error = true → x := 0
+ |  error = false → '''skip'''
+ '''fi'''
+
+如果第二个守卫被省略，并且error = False，结果是abort。
+
+====多个守卫为真====
+ '''if''' a ≥ b → max := a
+ |  b ≥ a → max := b
+ '''fi'''
+
+如果a = b，要么a要么b被选取为极大值的新值，具有相同的结果。但是，在实现这个例子的时候，可能会发现一个比另一个更容易或更快。因为对于编程者这里没有区别，可以随意实现任何一种方式。
+
+==重复：do==
+重复会反复的执行守卫命令知道没有守卫为真。通常，这里只有一个守卫。
+
+===语法===
+ '''do''' G0 → S0
+ |  G1 → S1
+ ...
+ |  Gn → Sn
+ '''od'''
+
+===语义===
+当执行重复的时候所有守卫都求值。如果所有守卫都求值为假，则执行skip。否则非确定性的选取其值为真的守卫之一，并执行对应的语句，此后再次执行重复。
+
+=== 例子 ===
+====欧几里德算法====
+ a, b := A, B;
+ '''do''' a < b → b := b - a
+ |  b < a → a := a - b
+ '''od'''
+
+这个重复在a = b时候结束，在这种情况下a和b持有A和B的最大公约数。
+
+戴克斯特拉在这个算法中见到了两个无限循环<code>a := a - b</code>和<code>b := b - a</code>同步的一种方式，在这种方式下<code>a≥0</code>和<code>b≥0</code>保持为真。
+
+====扩展欧几里德算法====
+ a, b, x, y, u, v := A, B, 1, 0, 0, 1;
+ '''do''' b ≠ 0 →
+ |  q, r := a '''div''' b, a '''mod''' b;
+ |  a, b, x, y, u, v := b, r, u, v, x - q*u, y - q*v
+ '''od'''
+
+这个重复在b = 0的时候结束，在这种情况下变量持有对[[贝祖等式|贝祖等式]]：xA + yB = gcd(A,B)的解。
+
+====非确定性排序====
+ '''do''' a>b → a, b := b, a
+ |  b>c → b, c := c, b
+ |  c>d → c, d := d, c
+ '''od'''
+
+这个程序在其中一个元素大于它的后续者的时候持续的置换元素。这个非确定性[[冒泡排序|冒泡排序]]不比它的确定性版本更加有效率， 但是易于证明：只要元素仍未有序它就不会停止并且它每步至少排序2个元素。
+
+====Arg max====
+ x, y = 1, 1 
+ '''do''' x≠n →
+ |  '''if''' f(x) ≤ f(y) → x := x+1
+ |  |  f(x) ≥ f(y) → y := x; x := x+1
+ |  '''fi'''
+ '''od'''
+
+这个算法找到值1 ≤ ''y'' ≤ ''n''，对于它给定整数函数是最大的。不只是这个计算而且最终状态都不是必然唯一确定的。
+
+== 应用 ==
+=== 构造正确程序 ===
+
+将观察的守卫命令的[[同余关系|同余关系]]推广成[[格_(数学)|格]]导致了{{en-link|精制演算|Refinement Calculus}}<ref>{{cite web | title=On the Correctness of Refinement Steps in Program Development (Phd-Thesis) | last=Back | first=Ralph J | authorlink=Ralph-Johan_Back | url=http://crest.abo.fi/publications/public/1978/OnTheCorrectnessOfRefinementStepsInProgramDevelpmentTR.pdf | format=pdf | year=1978 | archiveurl=https://web.archive.org/web/20110720175255/http://crest.abo.fi/publications/public/1978/OnTheCorrectnessOfRefinementStepsInProgramDevelpmentTR.pdf | archivedate=2011-07-20 | access-date=2021-02-17 | dead-url=yes }}</ref>。这已经机制化于[[形式化方法|形式化方法]]如{{en-link|B方法|B-Method}}中，它允许从它们的规定形式化的导出程序。
+
+=== 异步电路 ===
+
+守卫命令适合于{{en-link|准延迟不敏感电路|quasi-delay-insensitive circuit}}设计，因为重复允许不同命令选择的任意相对延迟。在这种应用之，在电路中驱动一个节点y的逻辑门构成自两个守卫命令如下：
+
+ PullDownGuard → y := 0
+ PullUpGuard → y := 1
+
+这里的PullDownGuard和PullUpGuard是逻辑门输入的函数，它描述了什么时候这个逻辑门分别将输出拉下或拉上。不同于经典的电路评估模型，一组守卫命令的重复（对应于一个异步电路）可以准确的描述这个电路的所有可能的动态行为。<ref name="synthesis_tr">{{cite web | title=Synthesis of Asynchronous VLSI Circuits|last=Martin | first=Alain J | url=http://resolver.caltech.edu/CaltechCSTR:1991.cs-tr-93-28 }}</ref>
+
+=== 模型检查 ===
+守卫命令可以用在{{en-link|Promela|}}编程语言中，它被用于{{en-link|SPIN模型检查器|SPIN model checker}}。SPIN验证并发软件应用的正确操作。
+
+=== 其他 ===
+Perl模块[https://metacpan.org/module/Commands::Guarded Commands::Guarded]实现了戴克斯特拉的守卫命令的一个确定性的校正变体。
+
+== 引用 ==
+{{reflist|2}}
+==参见==
+*[[卫语句|卫语句]]
+
+[[Category:逻辑编程|Category:逻辑编程]]
+[[Category:艾兹赫尔·戴克斯特拉|Category:艾兹赫尔·戴克斯特拉]]

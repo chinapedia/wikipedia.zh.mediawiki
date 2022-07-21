@@ -1,0 +1,626 @@
+'''内容抄袭检测'''、'''抄袭检测'''（plagiarism detection），或'''內容類似檢測'''（content similarity detection）是在一份文件中找到[[抄袭|抄袭]]或[[盗版|侵權]]詞句所在位置的方法。隨著電腦的普遍使用，網際網路的發明，抄袭其他作品的難度越來越低<ref>{{Cite web |url=http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.107.178&rep=rep1&type=pdf |title=Culwin, F., & Lancaster, T. (2001). "Plagiarism, prevention, deterrence and detection". ''Higher Education Academy''. |access-date=2020-07-27 |archive-date=2021-04-18 |archive-url=https://web.archive.org/web/20210418111409/http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.107.178&rep=rep1&type=pdf |dead-url=no }}</ref><ref name=":0">Bretag, T., & Mahmud, S. (2009). A model for determining student plagiarism: Electronic detection and academic judgement. ''Journal of University Teaching & Learning Practice, 6''(1). Retrieved from <nowiki>http://ro.uow.edu.au/jutlp/vol6/iss1/6</nowiki></ref>。
+
+抄袭检测可以用許多方式來進行。人工檢測是傳統檢測是否有抄袭的方法，相當的耗時間<ref name=":0" />，而且可能因為組織內對於抄袭定義的不同，會有不一致的情形<ref>Macdonald, R., & Carroll, J. (2006). Plagiarism—a complex issue requiring a holistic institutional approach. ''Assessment & Evaluation in Higher Education, 31''(2), 233–245. {{doi|10.1080/02602930500262536}}</ref>。目前已有許多文字匹配軟體（text-matching software、TMS），也稱為反剽竊軟體（anti-plagiarism software）或剽竊檢測軟體（plagiarism detection software），這些軟體可能是商業軟體，也可能是開源軟體。文字比對軟體不會一句一句的檢查是否有抄袭，不過軟體會從一份文件中找到和其他文件相符的特定片段，若相符的特定片段越多，抄袭的可能性也就越高。
+
+==軟體輔助的文件抄袭检测==
+電腦輔助的抄袭检测（computer-assisted plagiarism detection、簡稱CaPD）是由特製的[[信息檢索|信息檢索]]系統所進行的信息檢索工作，此系統稱為抄袭检测系統（plagiarism detection system、PDS）或文件相似度檢測系統。2019年的一篇[[系統綜述|系統綜述]] <ref>{{Cite journal|last=Foltýnek|first=Tomáš|last2=Meuschke|first2=Norman|last3=Gipp|first3=Bela|date=2019-10-16|title=Academic Plagiarism Detection: A Systematic Literature Review|journal=ACM Computing Surveys|language=en|volume=52|issue=6|pages=1–42|doi=10.1145/3345317<!--|doi-access=free-->}}</ref>簡單說明了目前正在使用的抄袭检测系統。
+
+文件相似度檢測系統有兩種通用的檢測方式，一種是外在的，一種則和文件的固有特性有關<ref name="Stein07"/>。
+外在檢測系統會將待測的文件和一些參考用的文件進行比較，這些參考用的文件是假定原創，沒有抄袭的文件
+<ref name=Potthast09/>。
+依照給定的文件模型，以及事先定義的相似度準則，檢測工作就是檢索出參考用的文件中，內容和待測文件相似度超過一定比例的比文件<ref name=Stein07a/>。
+固有特性的抄袭检测系統會直接用待測的文件進行分析。分析的目的是找出作者獨特的寫作方式變化，作為抄袭可能性的指標<ref name=MeyerZuEissen06/>。
+抄袭检测系統一定要配合人類的判斷，才能可靠的識別文件抄袭。相似度是依事先定義的文件模型來計算，因此可能出現[[偽陽性|偽陽性]]<ref name=Bao06/><ref name=Clough00/><ref name="Culwin01"/><ref name=Lancaster03/><ref name=Maurer07/>。
+
+====檢測方式====
+下圖繪出目前各種以電腦軟體來輔助檢測文章內容相似性的方式，並依檢測的範圍為全域或局部加以分類。全域（global）相似性評估方式會擷取文章中大部分的特徵文本甚至整篇文章和其他文章進行比對，以計算二者間的相似度；而局部（local）相似性評估方式則僅是事先選擇小部分文本段落，並輸入電腦軟體進行比對。
+
+[[File:PDS_Classification_zh_t.png|thumb]]
+
+=====文章指紋識別=====
+文章指紋識別（fingerprinting）是目前檢測內容相似性的方式中所最為廣泛運用者。此方式是藉由從文章中擇定一組由多個字母所組成的「符串」（[[n元语法|n-gram]]），並定義為該篇文章中具有代表性的摘要。這些符串即如同指紋一般，而構成指紋的元素即稱為「細節」（minutaie）<ref name = Hoad03 /> <ref name = Stein05 />。
+文章指紋識別會先針對待確認的文件計算其指紋，並且在所有的參考文件中，查詢是否有出現指紋中一定比例的細節。和其他文件的細節符合表示二份文件中有共同的文字區塊，若相似度超過一定比例，有可能是抄袭的<ref name="Brin95"/>。指紋識別的限制因素是運算資源以及時間，因此此方法多半只會選擇一部份的細節進行比較，一方面加速計算，也可以在大量的文本（例如網際網路）中搜尋<ref name=Hoad03 />。
+
+=====字串匹配=====
+[[字串搜尋演算法|字串匹配]]是電腦科學中常用的方法。若應用在内容抄袭检测時，會針對文件進行逐字逐字的重疊比較。針對這項任務，已提出了許多不同的方法，其中也有一些已用在外部的抄袭检测上。以此方法檢查待測文件，要有足夠的計算資源以及容量，才能高效的針對所有的參考文件，進行兩兩文件的比較。有些文件模型（例如[[后缀树|后缀树]]或后缀向量）已用在此任務上。無疑的，子字串匹配的運算量相當的大，因此在比較大量參考文件時，不能使用字串匹配進行檢查<ref name=Monostori00/><ref name=Baker93/><ref name=Khmelev03/>。
+
+=====词袋分析=====
+[[词袋模型|词袋分析]]（Bag of words analysis）是由傳統信息檢索概念中的[[向量空間模型|向量空間模型]]，轉換到內容相似度檢測旳技術。文件可以用一個或是多個向量（可能是分別表示文件的不同部份）表示，這些向量會用來進行成對的相似度計算。相似度計算可以用傳統的[[余弦相似性|余弦相似性]]計算，或是用更複雜的相似性計算方式<ref name=Si97/><ref name="Dreher07"/><ref name=Muhr09/>。
+
+=====引用文獻分析=====
+引用文獻為基礎的抄袭检测（CbPD）<ref name=Gipp14/>是依[[引文分析|引文分析]]為基礎，是唯一不靠文本相似度（textual similarity）的抄袭检测演算法<ref name=Gipp10/>。CbPD會檢查引用文獻以及文件中用文獻佐證的部份，識別是否有類似的[[模式|模式]]。因此，此方式適用於科學論文或是其他一定會引用文獻的學術論文。引用文獻為基礎的抄袭检测是相對而言較晚發展的概念。目前還沒有商用軟體使用此一作法，不過已有使用此一技術的原形系統<ref name=Gipp13/>。待檢查文件中的類似程度以及接近（proximity）文獻的程度是此一技術的判斷準則。
+
+=====计量文献学=====
+{{le|计量文献学|Stylometry}}是用統計的方式識別作者獨特寫作風格的方式<ref name=Holmes98/><ref name=Juola08/>，主要用在作者歸屬確認，或是考慮文件固有特性的電腦輔助抄襲檢測（CaPD）。可以針對不同的文字建構其文體模型，並且進行比較，來自不同來源的文字，其文體模型也會不同，因此可以依此偵測到抄袭或是侵權的情形<ref name=MeyerZuEissen06 />。
+
+====性能比較====
+内容抄袭检测的比較性評估<ref name=Potthast09 /><ref name=HTW04/><ref name=HTW08/><ref name=HTW10/><ref name=Potthast10/><ref name=Potthast11/>指出，检测系統的性能會因抄袭的方式不同而不同。除了引用文獻分析外，其他的檢測都是以文本相似度為基礎。因此若混合許多文獻抄袭，檢測系統的準確度就會下降。
+
+[[File:PD_Methods_Detection_Performance_zh_t.png|thumb]]
+
+若是「複製貼上」（copy and paste）型式的抄袭，公然侵犯版權的抄袭、或是適度掩飾的抄袭，若軟體可以找到來源的文字，目前的内容抄袭系統的精確度很高。特別是子字串比對程序針對「複製貼上」型式的抄袭，其效果非常的好，因為其中會使用無損的文件模型，例如[[后缀树|后缀树]]。利用文章指紋或是詞袋分析的性能會因為文件模型中，資訊的減少程度而受到影響。若文章指紋或是詞袋分析再配合靈活的分塊及選擇策略，檢測變相抄襲的性能會比相較於子字串比對程序要好。
+
+利用Stylometry的固有特性抄袭检测可以用比較語言相似性，克服一些文本相似度的問題。假設原始文件及待確認文件的風格都很明確，而且是用可靠的方式識別，Stylometry可以識別變相抄襲及文字[[改寫|改寫]]（Paraphrasing）式的抄袭。但若文字重組的非常嚴重，反而產生了不同於來源資料的風格，或是抄袭自數個不同的來源，Stylometry分析可能會失效。2009年至2011年國際抄袭检测比賽的結果<ref name="Potthast09" /><ref name="Potthast10" /><ref name="Potthast11" />，以及Stein的實驗<ref name=Stein11/>都指出，Stylometry分析若要正常運作，只能針對數千到上萬字之間的文件，這限制了電腦輔助的抄襲檢測的應用性。
+
+越來越多的研究是針對可偵測翻譯抄袭的方式或是系統。目前跨語言的抄袭检测（cross-language plagiarism detection、CLPD）還不是成熟的技術<ref name=Potthast10a/>，各系統在評估時還無法有令人滿意的結果<ref name=HTW10 />。
+
+和其他方式比較，引用文獻分析的抄袭检测在識別改寫情形較嚴重的抄袭，或是識別翻譯抄袭上的成功率較高，因為和文本相似度沒有關係<ref name=Gipp10 /><ref name=Gipp11 />。不過因為引用文獻分析要有足夠的文獻資訊，因此只限制在學術文件。引用文獻分析在檢測較短的抄袭文字（例如「複製貼上」的抄袭或是「複製重組貼上」的抄袭）時，效果不如以文字為基礎的抄袭检测。「複製重組貼上」（shake-and-paste）的抄袭是指用不同的來源，略為混合後再抄袭的作法<ref name=Weber-Wulff08/>。
+
+=== 使用文字匹配軟體的副作用 ===
+若利用文字匹配軟體來進行内容抄袭检测，目前已出現一些副作用。目前最受闗注的問題是被參考文件的[[智慧財產權|智慧財產權]]問題。文件要可以被文字匹配系統檢查到，就需要加到文字匹配系統的[[資料庫|資料庫]]中，才能有效的匹配，但是將其他人創作，有智慧財產權的文件加入資料庫，有[[侵權|侵權]]的問題。目前已經有一些相關的訴訟案。
+
+另一個副作用是因為文字匹配軟體只會計算文字精準匹配的結果。若在抄袭後將夠多的單字改為同義字，減少和原文完全相同的文字，有可能可以騙過檢測軟體，此方法稱為{{le|rogeting|rogeting}}。
+
+==程式碼抄袭检测==
+程式碼的抄袭也很常見，程式碼抄袭的检测工具和文件抄袭的檢測工具不同。在程式碼抄袭檢測上，已有許多的學術研究<ref>[http://www.ics.heacademy.ac.uk/resources/assessment/plagiarism/research_sourcecode.html "Plagiarism Prevention and Detection - On-line Resources on Source Code Plagiarism"] {{Wayback|url=http://www.ics.heacademy.ac.uk/resources/assessment/plagiarism/research_sourcecode.html |date=20121115105655 }}. Higher Education Academy　University of Ulster</ref>。
+
+程式碼抄袭常常出現在程式相關的作業上。大部份的作業都會給學生很明確的需求，要學生寫出符合該需求的程式。不一定可以在網路上找到已有，符合該需求的程式。網路上可找到的程式可能只能符合部份需求，若要滿足作業需求，還需要改寫程式或整合程式，這多半會比學生自己學程式作業要難。大部份的學生若要抄袭程式碼作業，多半會抄袭同學寫的作業。
+
+根據Roy和Cordy的研究<ref>Roy, Chanchal Kumar;Cordy, James R. (2007-09-26).[http://research.cs.queensu.ca/TechReports/Reports/2007-541.pdf "A Survey on Software Clone Detection Research"] {{Wayback|url=http://research.cs.queensu.ca/TechReports/Reports/2007-541.pdf |date=20170830061621 }}. School of Computing, Queen's University, Canada</ref>，程式碼抄袭检测演算法可以分為以下幾種
+* 字串：找文本中完全相同的文字片段，例如連續五個字相同。此演算法速度很快，但若修改變數名稱，即無法識別。
+* 符記（Tokens）：也和字串演算法相同，但是由[[詞法分析|詞法分析]]將程式先轉換為符記（Token），忽略空白、註解、識別符名稱，因此若只是單純修改變數名稱，此方式仍可以法識別。大部份學術的程式碼抄袭系統會使用此演算法，用不同的演算法來評估二個符記序列的相似度。
+* [[分析树|分析树]]（Parse Trees）：先建立分析树然後再比較，這可以偵測更高層次的類似性。例如，分析树比較可以正規化條件敘述，再偵測兩者是否有類似的等效結構。
+* [[函式呼叫圖|程式相依圖]]（PDG）：程式相依圖可以表示程式中各函式之間彼此呼叫的關係，可以找到更高層次的相似，不過複雜度及運算時間都多很多。
+* 軟體度量：會依照一些準則（例如迴圈及條件判斷的個數，或是變數使用的數量）去算程式碼的分數。軟體度量很容易計算，也很容易比較，不過偽陽性的比例很高。二段不同的程式可能剛好有相同的軟體度量值。
+* 混合法：例如分析树加上[[后缀树|后缀树]]，可以結合分析树的能力以及后缀树（一種用於字串比對的資料結構）的計算效率。
+
+上述的分類一開始是為了[[代码重构|代码重构]]所開發的，不是為了程式碼抄袭。代码重构的一個重要目的是避免程式中重複的程式碼，在文獻中稱為[[代码重复|代码重复]]。上述的作法可以偵測到不同層次的相似性：低層次的相似性是指完全相同的文字，高層次的相似性可能是因為類似的規格所產生。在學術的使用上，因為學生是依相同的規格寫程式作業，其作業的程式在機能上等效（即高層次的相似性）是合理的，因此若用在在程式作業的抄袭檢測上，一般只會考慮低層次的相似性。
+
+==相關條目==
+* {{le|反剽竊軟體比較|Comparison of anti-plagiarism software}}
+* {{le|局部敏感哈希|Locality sensitive hashing}}
+* [[最邻近搜索|最邻近搜索]]
+* {{le|改寫檢測|Paraphrase detection}}
+* [[柯氏复杂性|柯氏复杂性]]：用來評估多個系統中，符記序列（token sequences）的類似程度
+
+==參考資料==
+{{reflist|refs=
+<ref name=Bao06>{{citation
+ | last1=Bao
+ | first1=Jun-Peng
+ | last2=Malcolm
+ | first2=James A.
+ | contribution=Text similarity in academic conference papers
+ | year=2006
+ | title=2nd International Plagiarism Conference Proceedings
+ | publisher=Northumbria University Press
+ | url=http://www.plagiarismadvice.org/images/stories/old_site/media/2006papers/JunPengBao.pdf
+ | access-date=2011-10-07
+ | archive-url=https://web.archive.org/web/20180916130353/http://www.plagiarismadvice.org/images/stories/old_site/media/2006papers/JunPengBao.pdf
+ | archive-date=2018-09-16
+ | deadurl=yes
+ }}</ref>
+
+<ref name=Clough00>{{citation
+ |last        = Clough
+ |first        = Paul
+ |title        = Plagiarism in natural and programming languages an overview of current tools and technologies
+ |year        = 2000
+ |type        = Technical Report
+ |publisher        = Department of Computer Science, University of Sheffield
+ |url        = http://www.ir.shef.ac.uk/cloughie/papers/plagiarism2000.pdf
+<!-- |url-status     = dead--->
+ |archiveurl        = https://web.archive.org/web/20110818161514/http://ir.shef.ac.uk/cloughie/papers/plagiarism2000.pdf
+ |archivedate        = 2011-08-18
+ |accessdate        = 2020-07-27
+ |dead-url        = no
+ }}</ref>
+
+<ref name="Culwin01">{{citation
+ |last1       = Culwin
+ |first1      = Fintan
+ |last2       = Lancaster
+ |first2      = Thomas
+ |title       = Plagiarism issues for higher education
+ |journal     = Vine
+ |volume      = 31
+ |issue       = 2
+ |year        = 2001
+ |pages       = 36–41
+ |doi         = 10.1108/03055720010804005
+ |url         = http://www.essaycoursework.com/howtowriteessaynet/pdf/plagiarism-higheredu.pdf
+ |deadurl     = yes
+ |archiveurl  = https://web.archive.org/web/20120405090134/http://www.essaycoursework.com/howtowriteessaynet/pdf/plagiarism-higheredu.pdf
+ |archivedate = 2012-04-05
+ |accessdate  = 2020-07-27
+}}</ref>
+
+<ref name=Lancaster03>{{citation
+ |last      = Lancaster
+ |first     = Thomas
+ |title     = Effective and Efficient Plagiarism Detection
+ |year      = 2003
+ |type      = PhD Thesis
+ |publisher = School of Computing, Information Systems and Mathematics South Bank University
+ |url       = https://www.researchgate.net/publication/228729388
+}}</ref>
+
+<ref name=Maurer07>{{citation
+ | last1=Maurer
+ | first1=Hermann
+ | last2=Zaka
+ | first2=Bilal
+ | contribution=Plagiarism - A Problem And How To Fight It
+ | year=2007
+ | title=Proceedings of World Conference on Educational Multimedia, Hypermedia and Telecommunications 2007
+ | pages=4451–4458
+ | publisher=AACE
+ | url=http://www.editlib.org/p/26021
+ | accessdate=2020-07-27
+ | archive-date=2016-08-15
+ | archive-url=https://web.archive.org/web/20160815132601/http://www.editlib.org/p/26021
+ | dead-url=no
+ }}</ref>
+
+<ref name=MeyerZuEissen06>{{citation
+ | last1=Meyer zu Eissen
+ | first1=Sven
+ | last2=Stein
+ | first2=Benno
+ | contribution=Intrinsic Plagiarism Detection
+ | year=2006
+ | title=Advances in Information Retrieval 28th European Conference on IR Research, ECIR 2006, London, UK, April 10–12, 2006 Proceedings
+ | series=Lecture Notes in Computer Science
+ | volume=3936
+ | pages=565–569
+ | publisher=Springer
+ | doi=10.1007/11735106_66
+ | url=http://www.uni-weimar.de/medien/webis/publications/papers/stein_2006d.pdf
+ | isbn=978-3-540-33347-0
+<!-- | citeseerx=10.1.1.110.5366 -->
+ | access-date=2011-10-07
+ | archive-url=https://web.archive.org/web/20120402051009/http://www.uni-weimar.de/medien/webis/publications/papers/stein_2006d.pdf
+ | archive-date=2012-04-02
+ | deadurl=yes
+ }}</ref>
+
+<ref name=Potthast09>{{citation
+ |last1        = Potthast
+ |first1       = Martin
+ |last2        = Stein
+ |first2       = Benno
+ |last3        = Eiselt
+ |first3       = Andreas
+ |last4        = Barrón-Cedeño
+ |first4       = Alberto
+ |last5        = Rosso
+ |first5       = Paolo
+ |contribution = Overview of the 1st International Competition on Plagiarism Detection
+ |year         = 2009
+ |title        = PAN09 - 3rd Workshop on Uncovering Plagiarism, Authorship and Social Software Misuse and 1st International Competition on Plagiarism Detection
+ |series       = CEUR Workshop Proceedings
+ |volume       = 502
+ |pages        = 1–9
+ |issn         = 1613-0073
+ |url          = http://www.uni-weimar.de/medien/webis/research/events/pan-09/pan09-papers-final/potthast09-overview-first-international-competition-plagiarism-detection.pdf
+ |deadurl      = yes
+ |archiveurl   = https://web.archive.org/web/20120402050919/http://www.uni-weimar.de/medien/webis/research/events/pan-09/pan09-papers-final/potthast09-overview-first-international-competition-plagiarism-detection.pdf
+ |archivedate  = 2012-04-02
+ |accessdate   = 2020-07-27
+}}</ref>
+
+<ref name="Stein07">{{citation
+ | last1=Stein
+ | first1=Benno
+ | last2=Koppel
+ | first2=Moshe
+ | last3=Stamatatos
+ | first3=Efstathios
+ | title=Plagiarism Analysis, Authorship Identification, and Near-Duplicate Detection PAN'07
+ | journal=SIGIR Forum
+ | volume=41
+ | issue=2
+ | pages=68
+ | date=2007-12
+ | doi=10.1145/1328964.1328976
+ | url=http://www.uni-weimar.de/medien/webis/publications/papers/stein_2007o.pdf
+ | access-date=2011-10-07
+ | archive-url=https://web.archive.org/web/20120402050840/http://www.uni-weimar.de/medien/webis/publications/papers/stein_2007o.pdf
+ | archive-date=2012-04-02
+ | deadurl=yes
+ }}</ref>
+
+<ref name=Stein07a>{{citation
+ | last1=Stein
+ | first1=Benno
+ | last2=Meyer zu Eissen
+ | first2=Sven
+ | last3=Potthast
+ | first3=Martin
+ | contribution=Strategies for Retrieving Plagiarized Documents
+ | year=2007
+ | title=Proceedings 30th Annual International ACM SIGIR Conference
+ | pages=825–826
+ | publisher=ACM
+ | isbn=978-1-59593-597-7
+ | doi=10.1145/1277741.1277928
+ | url=http://www.uni-weimar.de/medien/webis/publications/papers/stein_2007f.pdf
+ | access-date=2011-10-07
+ | archive-url=https://web.archive.org/web/20120402050937/http://www.uni-weimar.de/medien/webis/publications/papers/stein_2007f.pdf
+ | archive-date=2012-04-02
+ | deadurl=yes
+ }}</ref>
+
+<ref name=Hoad03>{{citation
+ |last1        = Hoad
+ |first1       = Timothy
+ |last2        = Zobel
+ |first2       = Justin
+ |title        = Methods for Identifying Versioned and Plagiarised Documents
+ |journal      = Journal of the American Society for Information Science and Technology
+ |volume       = 54
+ |issue        = 3
+ |year         = 2003
+ |pages        = 203–215
+ |doi          = 10.1002/asi.10170
+<!--  |citeseerx    = 10.1.1.18.2680 --->
+ |url          = http://goanna.cs.rmit.edu.au/~jz/fulltext/jasist-tch.pdf
+ |access-date  = 2014-10-14
+ |archive-url  = https://web.archive.org/web/20150430234004/http://goanna.cs.rmit.edu.au/~jz/fulltext/jasist-tch.pdf
+ |archive-date = 2015-04-30
+ |deadurl      = yes
+}}</ref>
+
+<ref name=Stein05>{{citation
+ | last=Stein
+ | first=Benno
+ | contribution=Fuzzy-Fingerprints for Text-Based Information Retrieval
+ | date=2005-07
+ | title=Proceedings of the I-KNOW '05, 5th International Conference on Knowledge Management, Graz, Austria
+ | pages=572–579
+ | publisher=Springer, Know-Center
+ | url=http://www.uni-weimar.de/medien/webis/publications/papers/stein_2005a.pdf
+ | access-date=2011-10-07
+ | archive-url=https://web.archive.org/web/20120402051020/http://www.uni-weimar.de/medien/webis/publications/papers/stein_2005a.pdf
+ | archive-date=2012-04-02
+ | deadurl=yes
+ }}</ref>
+
+<ref name="Brin95">{{citation
+ | last1=Brin
+ | first1=Sergey
+ | last2=Davis
+ | first2=James
+ | last3=Garcia-Molina
+ | first3=Hector
+ | contribution=Copy Detection Mechanisms for Digital Documents
+ | year=1995
+ | title=Proceedings of the 1995 ACM SIGMOD International Conference on Management of Data
+ | pages=398–409
+ | publisher=ACM
+ | isbn=978-1-59593-060-6
+ | doi=10.1145/223784.223855
+ | url=http://ilpubs.stanford.edu:8090/112/1/1995-43.pdf
+<!-- | citeseerx=10.1.1.49.1567 -->
+ | accessdate=2020-07-28
+ | archive-date=2016-08-18
+ | archive-url=https://web.archive.org/web/20160818191411/http://ilpubs.stanford.edu:8090/112/1/1995-43.pdf
+ | dead-url=no
+ }}</ref>
+
+<ref name=Monostori00>{{citation
+ |last1        = Monostori
+ |first1       = Krisztián
+ |last2        = Zaslavsky
+ |first2       = Arkady
+ |last3        = Schmidt
+ |first3       = Heinz
+ |contribution = Document Overlap Detection System for Distributed Digital Libraries
+ |year         = 2000
+ |title        = Proceedings of the fifth ACM conference on Digital libraries
+ |pages        = 226–227
+ |publisher    = ACM
+ |isbn         = 978-1-58113-231-1
+ |doi          = 10.1145/336597.336667
+ |url          = http://www.csse.monash.edu.au/projects/MDR/papers/dl2000-monostori.pdf
+ |access-date  = 2011-10-07
+ |archive-url  = https://web.archive.org/web/20120415160915/http://www.csse.monash.edu.au/projects/MDR/papers/dl2000-monostori.pdf
+ |archive-date = 2012-04-15
+ |deadurl      = yes
+}}</ref>
+
+<ref name=Baker93>{{citation
+ |last        = Baker
+ |first       = Brenda S.
+ |title       = On Finding Duplication in Strings and Software
+ |date        = 1993-02
+ |type        = Technical Report
+ |publisher   = AT&T Bell Laboratories, NJ
+ |url         = http://cm.bell-labs.com/cm/cs/doc/93/2-bsb-1.ps.gz
+ |format      = gs
+ |deadurl     = yes
+ |archiveurl  = https://web.archive.org/web/20071030140253/http://cm.bell-labs.com/cm/cs/doc/93/2-bsb-1.ps.gz
+ |archivedate = 2007-10-30
+ |accessdate  = 2020-07-28
+}}</ref>
+
+<ref name=Khmelev03>{{citation
+ |last1=Khmelev
+ |first1=Dmitry V.
+ |last2=Teahan
+ |first2=William J.
+ |contribution=A Repetition Based Measure for Verification of Text Collections and for Text Categorization
+ |year=2003
+ |title=SIGIR'03: Proceedings of the 26th annual international ACM SIGIR conference on Research and development in information retrieval
+ |pages=[https://archive.org/details/sigir2003proceed0000inte/page/104 104–110]
+ |publisher=ACM
+ |doi=10.1145/860435.860456
+<!-- |citeseerx=10.1.1.9.6155 -->
+ |isbn=978-1581136463
+<!-- |url-access=registration -->
+ |url=https://archive.org/details/sigir2003proceed0000inte/page/104
+ }}</ref>
+
+<ref name=Si97>{{citation
+ |last1        = Si
+ |first1       = Antonio
+ |last2        = Leong
+ |first2       = Hong Va
+ |last3        = Lau
+ |first3       = Rynson W. H.
+ |contribution = CHECK: A Document Plagiarism Detection System
+ |year         = 1997
+ |title        = SAC '97: Proceedings of the 1997 ACM symposium on Applied computing
+ |pages        = 70–77
+ |publisher    = ACM
+ |isbn         = 978-0-89791-850-3
+ |doi          = 10.1145/331697.335176
+ |url          = http://www.cs.cityu.edu.hk/~rynson/papers/sac97.pdf
+ |accessdate   = 2020-08-10
+ |archive-date = 2019-08-19
+ |archive-url  = https://web.archive.org/web/20190819065253/http://www.cs.cityu.edu.hk/~rynson/papers/sac97.pdf
+ |dead-url     = no
+}}</ref>
+
+<ref name="Dreher07">{{citation
+ | last=Dreher
+ | first=Heinz
+ | title=Automatic Conceptual Analysis for Plagiarism Detection
+ | journal=Information and Beyond: The Journal of Issues in Informing Science and Information Technology
+ | volume=4
+ | year=2007
+ | pages=601–614
+ | url=http://proceedings.informingscience.org/InSITE2007/IISITv4p601-614Dreh383.pdf
+ | doi=10.28945/974
+ | accessdate=2020-08-10
+ | archive-date=2019-08-19
+ | archive-url=https://web.archive.org/web/20190819081049/http://proceedings.informingscience.org/InSITE2007/IISITv4p601-614Dreh383.pdf
+ | dead-url=no
+ }}</ref>
+
+<ref name=Muhr09>{{citation
+ |last1        = Muhr
+ |first1       = Markus
+ |last2        = Zechner
+ |first2       = Mario
+ |last3        = Kern
+ |first3       = Roman
+ |last4        = Granitzer
+ |first4       = Michael
+ |contribution = External and Intrinsic Plagiarism Detection Using Vector Space Models
+ |year         = 2009
+ |title        = PAN09 - 3rd Workshop on Uncovering Plagiarism, Authorship and Social Software Misuse and 1st International Competition on Plagiarism Detection
+ |series       = CEUR Workshop Proceedings
+ |volume       = 502
+ |pages        = 47–55
+ |issn         = 1613-0073
+ |url          = http://www.uni-weimar.de/medien/webis/research/events/pan-09/pan09-papers-final/zechner09-external-and-intrinsic-plagiarism-detection-using-vsm.pdf
+ |deadurl      = yes
+ |archiveurl   = https://web.archive.org/web/20120402051035/http://www.uni-weimar.de/medien/webis/research/events/pan-09/pan09-papers-final/zechner09-external-and-intrinsic-plagiarism-detection-using-vsm.pdf
+ |archivedate  = 2012-04-02
+ |accessdate   = 2020-08-10
+}}</ref>
+
+<ref name=Gipp14>{{citation
+ |last         = Gipp
+ |first        = Bela
+ |title        = Citation-based Plagiarism Detection
+ |date         = 2014
+ |publisher    = Springer Vieweg Research
+ |isbn         = 978-3-658-06393-1
+ |url          = https://www.springer.com/springer+vieweg/it+%26+informatik/k%C3%BCnstliche+intelligenz/book/978-3-658-06393-1
+ |accessdate   = 2020-08-10
+ |archive-date = 2014-10-04
+ |archive-url  = https://web.archive.org/web/20141004195748/http://www.springer.com/springer+vieweg/it+%26+informatik/k%C3%BCnstliche+intelligenz/book/978-3-658-06393-1
+ |dead-url     = no
+}}</ref>
+
+<ref name=Gipp13>{{citation | last1=Gipp | first1=Bela | last2=Meuschke | first2=Norman | last3=Breitinger | first3=Corinna | last4=Lipinski | first4=Mario | last5=Nürnberger | first5=Andreas | contribution=Demonstration of Citation Pattern Analysis for Plagiarism Detection | date=2013-07-28 | title=Proceedings of the 36th International ACM SIGIR Conference on Research and Development in Information Retrieval | pages=1119 | publisher=ACM | doi=10.1145/2484028.2484214 | url=http://sciplore.org/wp-content/papercite-data/pdf/gipp13.pdf | isbn=9781450320344 | accessdate=2020-08-10 | archive-date=2018-04-10 | archive-url=https://web.archive.org/web/20180410113812/http://sciplore.org/wp-content/papercite-data/pdf/gipp13.pdf | dead-url=no }}</ref>
+
+<ref name=Gipp10>{{citation
+ |last1        = Gipp
+ |first1       = Bela
+ |last2        = Beel
+ |first2       = Jöran
+ |contribution = Citation Based Plagiarism Detection - A New Approach to Identifying Plagiarized Work Language Independently
+ |date         = 2010-06
+ |title        = Proceedings of the 21st ACM Conference on Hypertext and Hypermedia (HT'10)
+ |pages        = 273–274
+ |publisher    = ACM
+ |isbn         = 978-1-4503-0041-4
+ |doi          = 10.1145/1810617.1810671
+ |url          = http://www.sciplore.org/publications/2010-Citation_Based_Plagiarism_Detection_-_A_New_Approach_to_Identify_Plagiarized_Work_Language_Independently_-_preprint.pdf
+ |access-date  = 2011-10-21
+ |archive-url  = https://web.archive.org/web/20120425044631/http://www.sciplore.org/publications/2010-Citation_Based_Plagiarism_Detection_-_A_New_Approach_to_Identify_Plagiarized_Work_Language_Independently_-_preprint.pdf
+ |archive-date = 2012-04-25
+ |deadurl      = yes
+}}</ref>
+
+<ref name=Gipp11>{{citation
+ | last1=Gipp
+ | first1=Bela
+ | last2=Meuschke
+ | first2=Norman
+ | last3=Beel
+ | first3=Jöran
+ | contribution=Comparative Evaluation of Text- and Citation-based Plagiarism Detection Approaches using GuttenPlag
+ | date=2011-06
+ | title=Proceedings of 11th ACM/IEEE-CS Joint Conference on Digital Libraries (JCDL'11)
+ | pages=255–258
+ | publisher=ACM
+ | isbn=978-1-4503-0744-4
+ | doi=10.1145/1998076.1998124
+ | url=http://www.sciplore.org/publications/2011-Comparative_Evaluation_of_Text-_and_Citation-based_Plagiarism_Detection_Approaches_using_GuttenPlag.pdf
+<!-- | citeseerx=10.1.1.736.4865 -->
+ | access-date=2011-10-07
+ | archive-url=https://web.archive.org/web/20120425044618/http://www.sciplore.org/publications/2011-Comparative_Evaluation_of_Text-_and_Citation-based_Plagiarism_Detection_Approaches_using_GuttenPlag.pdf
+ | archive-date=2012-04-25
+ | deadurl=yes
+ }}</ref>
+
+<ref name=Holmes98>{{citation
+ | last=Holmes | first=David I.
+ | title=The Evolution of Stylometry in Humanities Scholarship
+ | journal=Literary and Linguistic Computing
+ | volume=13
+ | issue=3
+ | year=1998
+ | pages=111–117
+ | doi=10.1093/llc/13.3.111
+}}</ref>
+
+<ref name=Juola08>{{citation
+ | last=Juola
+ | first=Patrick
+ | title=Authorship Attribution
+ | journal=Foundations and Trends in Information Retrieval
+ | volume=1
+ | issue=3
+ | year=2006
+ | pages=233–334
+ | issn=1554-0669
+ | doi=10.1561/1500000005
+ | url=http://www.mathcs.duq.edu/~juola/papers.d/fnt-aa.pdf
+<!--| citeseerx=10.1.1.219.1605-->
+ | accessdate=2020-08-10
+ | archive-date=2020-10-24
+ | archive-url=https://web.archive.org/web/20201024054632/http://www.mathcs.duq.edu/~juola/papers.d/fnt-aa.pdf
+ | dead-url=no
+ }}</ref>
+
+<ref name=HTW04>{{citation
+ | url=http://plagiat.htw-berlin.de/ff-alt/05hilfen/programme.html
+ | title=Portal Plagiat - Softwaretest 2004
+ | language=de
+ | publisher=HTW University of Applied Sciences Berlin
+ | accessdate=2011-10-06
+ | archive-url=https://web.archive.org/web/20111025051028/http://plagiat.htw-berlin.de/ff-alt/05hilfen/programme.html
+ | archive-date=2011-10-25
+ | deadurl=yes
+ }}</ref>
+
+<ref name=HTW08>{{citation
+ | url=http://plagiat.htw-berlin.de/software/2008/
+ | title=Portal Plagiat - Softwaretest 2008
+ | language=de
+ | publisher=HTW University of Applied Sciences Berlin
+ | accessdate=2011-10-06
+ | archive-date=2019-03-27
+ | archive-url=https://web.archive.org/web/20190327182022/http://plagiat.htw-berlin.de/software/2008/
+ | dead-url=no
+ }}</ref>
+
+<ref name=HTW10>{{citation
+ | url=http://plagiat.htw-berlin.de/software/2010-2/
+ | title=Portal Plagiat - Softwaretest 2010
+ | language=de
+ | publisher=HTW University of Applied Sciences Berlin
+ | accessdate=2011-10-06
+ | archive-date=2019-04-26
+ | archive-url=https://web.archive.org/web/20190426133551/http://plagiat.htw-berlin.de/software/2010-2/
+ | dead-url=no
+ }}</ref>
+
+<ref name=Potthast10>{{citation | last1=Potthast | first1=Martin | last2=Barrón-Cedeño | first2=Alberto | last3=Eiselt | first3=Andreas | last4=Stein | first4=Benno | last5=Rosso | first5=Paolo | contribution=Overview of the 2nd International Competition on Plagiarism Detection | year=2010 | title=Notebook Papers of CLEF 2010 LABs and Workshops, 22–23 September, Padua, Italy | url=http://clef2010.org/resources/proceedings/clef2010labs_submission_125.pdf | access-date=2011-10-07 | archive-url=https://web.archive.org/web/20120403191349/http://clef2010.org/resources/proceedings/clef2010labs_submission_125.pdf | archive-date=2012-04-03 | deadurl=yes }}</ref>
+
+<ref name=Potthast11>{{citation
+ | last1=Potthast
+ | first1=Martin
+ | last2=Eiselt
+ | first2=Andreas
+ | last3=Barrón-Cedeño
+ | first3=Alberto
+ | last4=Stein
+ | first4=Benno
+ | last5=Rosso
+ | first5=Paolo
+ | contribution=Overview of the 3rd International Competition on Plagiarism Detection
+ | year=2011
+ | title=Notebook Papers of CLEF 2011 LABs and Workshops, 19–22 September, Amsterdam, Netherlands
+ | url=http://www.uni-weimar.de/medien/webis/publications/papers/stein_2011t.pdf
+ | access-date=2011-10-07
+ | archive-url=https://web.archive.org/web/20120402051053/http://www.uni-weimar.de/medien/webis/publications/papers/stein_2011t.pdf
+ | archive-date=2012-04-02
+ | deadurl=yes
+ }}</ref>
+
+<ref name=Stein11>{{citation
+ | last1=Stein
+ | first1=Benno
+ | last2=Lipka
+ | first2=Nedim
+ | last3=Prettenhofer
+ | first3=Peter
+ | title=Intrinsic Plagiarism Analysis
+ | journal=Language Resources and Evaluation
+ | volume=45
+ | issue=1
+ | year=2011
+ | pages=63–82
+ | issn=1574-020X
+ | doi=10.1007/s10579-010-9115-y
+ | url=http://www.uni-weimar.de/medien/webis/publications/papers/stein_2011a.pdf
+ | access-date=2011-10-07
+ | archive-url=https://web.archive.org/web/20120402051105/http://www.uni-weimar.de/medien/webis/publications/papers/stein_2011a.pdf
+ | archive-date=2012-04-02
+ | deadurl=yes
+ }}</ref>
+
+<ref name=Potthast10a>{{citation
+ | last1=Potthast
+ | first1=Martin
+ | last2=Barrón-Cedeño
+ | first2=Alberto
+ | last3=Stein
+ | first3=Benno
+ | last4=Rosso
+ | first4=Paolo
+ | title=Cross-Language Plagiarism Detection
+ | journal=Language Resources and Evaluation
+ | volume=45
+ | issue=1
+ | year=2011
+ | pages=45–62
+ | issn=1574-020X
+ | doi=10.1007/s10579-009-9114-z
+ | hdl=10251/37479
+ | url=http://www.uni-weimar.de/medien/webis/publications/papers/stein_2011b.pdf
+ | access-date=2011-10-07
+ | archive-url=https://web.archive.org/web/20131126010114/http://www.uni-weimar.de/medien/webis/publications/papers/stein_2011b.pdf
+ | archive-date=2013-11-26
+ | deadurl=yes
+ }}</ref>
+
+<ref name=Weber-Wulff08>{{citation
+ | last=Weber-Wulff
+ | first=Debora
+ | contribution=On the Utility of Plagiarism Detection Software
+ | date=2008-06
+ | title=In Proceedings of the 3rd International Plagiarism Conference, Newcastle Upon Tyne
+ | url=http://archive.plagiarismadvice.org/images/stories/old_site/media/2008papers/P21%20Weber-Wulff.pdf
+ | accessdate=2020-08-10
+ | archive-date=2013-10-01
+ | archive-url=https://web.archive.org/web/20131001000000/http://archive.plagiarismadvice.org/images/stories/old_site/media/2008papers/P21%2BWeber-Wulff.pdf
+ | dead-url=no
+ }}</ref>
+
+}}
+
+==文獻==
+* Carroll, J. (2002). A'' handbook for deterring plagiarism in higher education''. Oxford: The Oxford Centre for Staff and Learning Development, Oxford Brookes University. (96 p.), {{ISBN|1873576560}}
+* Zeidman, B. (2011). ''The Software IP Detective’s Handbook''.  Prentice Hall. (480 p.), {{ISBN|0137035330}}
+
+{{DEFAULTSORT:Plagiarism Detection}}
+[[Category:教育評估及評量|Category:教育評估及評量]]
+[[Category:抄襲|Category:抄襲]]
+[[Category:抄襲檢測工具|]]

@@ -1,0 +1,28 @@
+/**
+ * The script used to simplify the language options for the [Minerva
+ * Neue](https://www.mediawiki.org/wiki/Skin:Minerva_Neue) skin.
+ *
+ * @author Jason Kwok (https://zh.wikipedia.org/wiki/User:JasonHK)
+ */
+(function (mw, $) {
+	$(function() {
+		var HIDDEN_LANGUAGE_SELECTOR = '.zh, .zh-hans, .zh-hant';
+
+		if ((mw.config.get('skin') === 'minerva') && (typeof MutationObserver === 'function')) {
+			var observer = new MutationObserver(function(records) {
+				$.each(records, function(_, record) {
+					$(record.addedNodes)
+						.filter('.language-searcher')
+						.find(HIDDEN_LANGUAGE_SELECTOR)
+						.parent()
+						.hide();
+				})
+			});
+
+			observer.observe(document.documentElement || document.body, {
+				childList: true,
+				subtree: true
+			})
+		}
+	})
+})(mw, jQuery);

@@ -1,0 +1,208 @@
+--[=[
+Module:Tl
+改自 https://en.wikipedia.org/w/index.php?title=Module:Tlg&oldid=952327088
+{{Tl}}系列模板的模組化
+]=]
+local getArgs = require('Module:Arguments').getArgs
+local p = {}
+local mError = require('Module:Error')
+local yesno = require('Module:Yesno')
+
+local function isempty (s) 
+	return s ~= nil and s ~= ""
+end
+
+local nowiki = mw.text.nowiki
+
+local function transclude(s)
+	local title = mw.title.new(s)
+	if not title then
+		mw.addWarning(mError.error{[1]="[[Module:Tl|Module:Tl]]錯誤：無效的頁面名<code>" .. nowiki(s) .. '</code>。'})
+		return nowiki(s)
+	elseif title:match("^%:") then
+		return tostring(title)
+	elseif title.namespace == 0 then
+		return 'Template:' .. tostring(title)
+	else
+		return tostring(title)
+	end
+end
+
+function p._gettemplatelink(title, a)
+	if not title then
+		return '{{{1}}}'
+	end
+	
+	return '[['_.._transclude(title)_.._'|' .. (a or title) .. ']]'
+end
+
+p._magicword_title = {
+	-- [[Help:解析器函数|Help:解析器函数]]
+	["#expr"] = 'Help:解析器函数#expr',
+	["#if"] = 'Help:解析器函数#if',
+	["#ifeq"] = 'Help:解析器函数#ifeq',
+	["#ifexist"] = 'Help:解析器函数#ifexist',
+	["#ifexpr"] = 'Help:解析器函数#ifexpr',
+	["#switch"] = 'Help:解析器函数#switch',
+	["#babel"] = 'Help:解析器函数#babel',
+	["#time"] = 'Help:解析器函数#time',
+	-- [[Help:魔术字|Help:魔术字]]
+	["REVISIONDAY"] = "Help:魔术字#REVISIONDAY",
+	["REVISIONDAY2"] = "Help:魔术字#REVISIONDAY2",
+	["REVISIONMONTH"] = "Help:魔术字#REVISIONMONTH",
+	["REVISIONTIMESTAMP"] = "Help:魔术字#REVISIONTIMESTAMP",
+	["REVISIONUSER"] = "Help:魔术字#REVISIONUSER",
+	["PAGESIZE"] = "Help:魔术字#PAGESIZE",
+	["PROTECTIONLEVEL"] = "Help:魔术字#PROTECTIONLEVEL",
+	["DISPLAYTITLE"] = "Help:魔术字#DISPLAYTITLE",
+	["DEFAULTSORT"] = "Help:魔术字#DEFAULTSORT",
+	["PAGESINCAT"] = "Help:魔术字#PAGESINCAT",
+	["PAGESINCATEGORY"] = "Help:魔术字#PAGESINCATEGORY",
+	["NUMBERINGROUP"] = "Help:魔术字#NUMBERINGROUP",
+	["PAGESINNS"] = "Help:魔术字#PAGESINNS",
+	["PAGESINNAMESPACE"] = "Help:魔术字#PAGESINNAMESPACE",
+	["NUMBEROFCONTRIBS"] = "Help:魔术字#NUMBEROFCONTRIBS",
+	["FULLPAGENAME"] = "Help:魔术字#FULLPAGENAME",
+	["PAGENAME"] = "Help:魔术字#PAGENAME",
+	["BASEPAGENAME"] = "Help:魔术字#BASEPAGENAME",
+	["SUBPAGENAME"] = "Help:魔术字#SUBPAGENAME",
+	["SUBJECTPAGENAME"] = "Help:魔术字#SUBJECTPAGENAME",
+	["TALKPAGENAME"] = "Help:魔术字#TALKPAGENAME",
+	["NAMESPACE"] = "Help:魔术字#NAMESPACE",
+	["SUBJECTSPACE"] = "Help:魔术字#SUBJECTSPACE",
+	["ARTICLESPACE"] = "Help:魔术字#ARTICLESPACE",
+	["localurl"] = "Help:魔术字#localurl",
+	["fullurl"] = "Help:魔术字#fullurl",
+	["filepath"] = "Help:魔术字#filepath",
+	["urlencode"] = "Help:魔术字#urlencode",
+	["anchorencode"] = "Help:魔术字#anchorencode",
+	["lc"] = "Help:魔术字#lc",
+	["lcfirst"] = "Help:魔术字#lcfirst",
+	["uc"] = "Help:魔术字#uc",
+	["ucfirst"] = "Help:魔术字#ucfirst",
+	["formatnum"] = "Help:魔术字#formatnum",
+	["#dateformat"] = "Help:魔术字##dateformat",
+	["#formatdate"] = "Help:魔术字##formatdate",
+	["padleft"] = "Help:魔术字#padleft",
+	["padright"] = "Help:魔术字#padright",
+	["plural"] = "Help:魔术字#plural",
+	["int"] = "Help:魔术字#int",
+	["#language"] = "Help:魔术字##language",
+	["#special"] = "Help:魔术字##special",
+	["#tag"] = "Help:魔术字##tag",
+	["gender"] = "Help:魔术字#gender",
+	["groupconvert"] = "Help:魔术字#groupconvert",
+	["PAGEID"] = "Help:魔术字#PAGEID",
+	["noexternallanglinks"] = "Help:魔术字#noexternallanglinks",
+}
+
+function p._getmagicwordlink(wt, i)
+	if not wt then
+		return '{{{1}}}:{{{2}}}'
+	end
+	local s = p.magicword_title[wt]
+	if wt == "#invoke" then
+		return '[[Wikipedia:Lua|#invoke]]:[['_.._transclude('Module:'_.._i)_.._'|' .. i .. ']]'
+	elseif s then
+		if i then
+			return '[['_.._s_.._'|' .. wt .. ']]:' .. i
+		else
+			return '[['_.._s_.._'|' .. wt .. ']]'
+		end
+	else
+		return s .. (i and ':' .. i)
+	end
+end
+
+function p._main(args)
+	-- 設定
+	local nowrap = yesno(args.nowrap) or false
+	local code = yesno(args.code) or yesno(args.tt) or false
+	local kbd = yesno(args.kbd) or false
+	local nowrapname = yesno(args.nowrapname) or false
+	local braceinside = yesno(args.braceinside) or false
+	local subst = yesno(args.subst) or false
+	local nosubstlink = yesno(args.nosubstlink) or false
+	local bold = yesno(args.bold) or yesno(args.boldlink) or yesno(args.boldname) or false
+	local nolink = yesno(args.nolink) or false
+	local italic = yesno(args.italic) or yesno(args.italics) or false
+	local alttext = isempty(args.alttext) or nil
+	local debug = yesno(args.debug) or false
+	-- 構建{{tl}}
+	local wt = '&#123'
+	if braceinside then
+		if alttext then
+			alttext = '{' .. alttext .. '}'
+		else
+			alttext = '{' .. title .. '}'
+		end
+		wt = wt .. p._gettemplatelink(title, alttext)
+	else
+		wt = wt .. '{'
+		if subst then
+			if nolink and nosubstlink then
+				wt = wt .. 'subst:'
+			else
+				wt = wt .. '[[Help:替换引用|subst]]:'
+			end
+		end
+		local t = ''
+		if nolink then
+			t = alttext or title
+		else
+			t = p._gettemplatelink(title, alttext)
+		end
+		if bold then
+			t = '<span style="font-weight:bold;">' .. t .. '</span>'
+		end
+		if nowrapname then
+			t = '<span class="nowrap">' .. t .. '</span>'
+		end
+		wt = wt .. t
+		
+		local i = 1
+		local val
+		local vals = ''
+		while i < 11 do
+			val = args[i]
+			if val ~= nil then
+				val = mw.text.unstripNoWiki(val)
+			else
+				break
+			end
+			vals = vals .. '|' .. val
+			i = i + 1
+		end
+		if args[12] then
+			vals = vals .. '|...'
+		end
+		if vals ~= '' and italic then
+			vals = '<span style="font-style:italic;">' .. vals .. '</span>'
+		end
+		wt = wt .. vals
+		
+		wt = wt .. '}'
+	end
+	wt = wt .. '}'
+	
+
+	if kbd then wt = '<kbd>' .. wt .. '</kbd>' end
+	if code then
+		wt = '<code>' .. wt .. '</code>'
+	end
+	
+	if nowrap then wt = '<span class="nowrap">' .. wt .. '</span>' end
+	
+	if debug then wt = wt .. '\n<pre>' .. mw.text.encode(mw.dumpObject(args)) .. '</pre>' end
+	return wt
+end
+
+function p.main(frame)
+	local args = getArgs(frame, {
+		trim = true,
+		removeBlanks = false
+	})
+	return p._main(args)
+end
+
+return p

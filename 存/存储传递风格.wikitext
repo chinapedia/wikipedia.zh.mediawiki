@@ -1,0 +1,72 @@
+'''存储传递风格'''是一种技术，用来建模[[不可变对象|可变]]{{en-link|状态 (计算机科学)|State (computer science)|状态}}而不用使用全局变量<ref name="eopl">{{cite book|last1=Friedman|first1=Daniel|last2=Wand|first2=Mitchell|title=Essentials of Programming Languages|date=April 2008|publisher=MIT Press|location=Boston, MA|isbn=978-0262062794|edition=4th}}</ref><ref name="plai">{{cite book|last1=Krishnamurthi|first1=Shriram|title=Programming Languages, Application and Interpretation|date=November 2012|publisher=self-published|edition=Second|url=http://cs.brown.edu/courses/cs173/2012/book/|accessdate=10 February 2016|archive-date=2016-03-13|archive-url=https://web.archive.org/web/20160313153547/http://cs.brown.edu/courses/cs173/2012/book/|dead-url=no}}</ref>。它通常出现在将[[指令式编程|指令式程序]]转换成[[纯函数式编程|纯函数式]]程序的场合。
+
+==实例==
+考虑如下这个用“非存储传递风格”书写的[[JavaScript|JavaScript]]程序：
+
+<syntaxhighlight lang="JavaScript">
+var lastWasA = false
+
+// treebin表示字符串的二叉树。
+// treebin要么是一个字符串，
+// 要么是{l : <treebin>, r: <treebin>}。
+
+// 对这个树的叶子的中序遍历含有'a'跟随着'b'吗？
+function aThenB(treebin) {
+  if (typeof(treebin) === "string") {
+    if (treebin === "a") {
+      lastWasA = true;
+      return false;
+    } else if (treebin === "b") {
+      if (lastWasA) {
+        return true;
+      } else {
+        lastWasA = false;
+        return false;
+      }
+    } else {
+      lastWasA = false;
+      return false;
+    }
+  } else { // 不是字符串，必定是内部节点：
+    return ((aThenB(treebin.l))||(aThenB(treebin.r)));
+  }
+}
+</syntaxhighlight>
+
+这里包含了对[[全局变量|全局变量]]<code>lastWasA</code>引用。在存储传递风格中，一个或更多的全局变量在每次函数调用时一起传入，而且从每次调用返回并传入下次函数调用从而形成牵连（thread）。代码可以写为如下:
+
+<syntaxhighlight lang="JavaScript>
+function aThenB(treebin, lastWasA) {
+  if (typeof(treebin) === "string") {
+    if (treebin === "a") {
+      return {result: false, lastWasA: true};
+    } else if (treebin === "b") {
+      if (lastWasA) {
+        return {result: true, lastWasA: false};
+      }
+    } else {
+      return {result: false, lastWasA: false};
+    }
+  } else { // 不是字符串，必定是内部节点：
+    var leftCall = aThenB(treebin.l, lastWasA);
+    if (leftCall.result) {
+      return {result: true, lastWasA: false}
+    } else {
+      return aThenB(treebin.r, leftCall.lastWasA);
+    }
+  }
+}
+</syntaxhighlight>
+
+注意现在每次调用都接受一个额外的实际参数<code>lastWasA</code>，还返回两个值：平常的返回值，和一个新值来表示原先的可变变量<code>lastWasA</code>的状态。
+
+写存储传递风格的程序可能非常痛苦，但通过将状态隔离在函数调用之中，有助于消除竞争条件，从使代码潜在的更加可并行化。
+
+==参见==
+* {{en-link|续体传递风格|Continuation-passing style}}
+
+==引用==
+{{Reflist}}
+
+[[Category:软件设计模式|Category:软件设计模式]]
+[[Category:函数式编程|Category:函数式编程]]

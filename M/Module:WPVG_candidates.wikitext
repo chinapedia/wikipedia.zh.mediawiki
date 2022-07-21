@@ -1,0 +1,46 @@
+require('Module:No globals')
+
+local getArgs = require('Module:Arguments').getArgs
+local vgc = require('Module:Vgclass')._getClass
+local p = {}
+
+local typeList = {
+	['FAC'] = { 'Wikipedia:典范条目评选/提名区', '===%s*(.-)%s*===' },
+	['FLC'] = { 'Wikipedia:特色列表评选/提名区', '===%s*(.-)%s*===' },
+	['GAN'] = { 'Wikipedia:優良條目評選/提名區', '===%s*(.-)%s*===' },
+	['PR'] = { 'Wikipedia:同行评审/提案区', '===%s*(.-)%s*===' },
+	['DYK'] = { 'Wikipedia:新条目推荐/候选', '|%s*article%s*=%s*(.-)%s*\n?%s*[|}]' },
+}
+
+function p.main(frame)
+	local args = getArgs(frame)
+	return p._main(args)
+end
+
+function p._main(args)
+	local ret = {}
+	    
+	local type = args[1]
+	local pagename = typeList[type][1]
+	local pattern = typeList[type][2]
+
+	local link 
+
+    for value in mw.ustring.gmatch(mw.title.new(pagename):getContent(), pattern)  do
+       if vgc{value} then
+
+    		link = '# ' .. mw.getCurrentFrame():expandTemplate{ title = 'icon', args = { type, ['style'] = "padding-right: 0.25em;" } }
+    			.. ' [['_.._value_.._'|' .. value .. ']]'
+    			.. '<span style="font-size: small;">（[['_.._pagename_.._'#'_.._value_..'|提名]]）</small>\n'
+        	table.insert(ret, link)
+        end
+    end
+    
+    if #ret > 0 then 
+	    return table.concat(ret)
+    end
+
+	return '# ' .. mw.getCurrentFrame():expandTemplate{ title = 'icon', args = { type, ['style'] = "padding-right: 0.25em; " } } .. ' （无）'
+end
+
+return p

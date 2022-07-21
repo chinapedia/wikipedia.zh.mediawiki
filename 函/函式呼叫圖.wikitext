@@ -1,0 +1,63 @@
+[[File:A_Call_Graph_generated_by_pycallgraph.png|thumb]]
+
+'''函式呼叫圖'''（call graph，也稱為call multigraph）<ref>{{cite journal |last1=Callahan |first1=D. |last2=Carle |first2=A. |last3=Hall |first3=M.W. |last4=Kennedy |first4=K. |title=Constructing the procedure call multigraph |journal=IEEE Transactions on Software Engineering |date=April 1990 |volume=16 |issue=4 |pages=483–487 |doi=10.1109/32.54302}}</ref><ref name="KhedkerSanyal2009">{{cite book|author1=Uday Khedker|author2=Amitabha Sanyal|author3=Bageshri Sathe|title=Data Flow Analysis: Theory and Practice|year=2009|publisher=CRC Press|isbn=978-0-8493-3251-7|page=234}}</ref>，屬於[[控制流圖|控制流圖]]<ref name="Jalote1997">{{cite book|author=Pankaj Jalote|title=An Integrated Approach to Software Engineering|year=1997|publisher=Springer Science & Business Media|isbn=978-0-387-94899-7|page=[https://archive.org/details/integratedapproa0000jalo/page/372 372]<!--|url-access=registration-->|url=https://archive.org/details/integratedapproa0000jalo/page/372}}</ref>，可以展示[[计算机程序|计算机程序]]中[[子程序|函式]]之間的關係。每一個節點是一個函式，每一個邊(f, g)表示函式f呼叫函式g。若其中有出現互相呼叫的[[環_(圖論)|環]]，表示程式中可能有[[递归_(计算机科学)|遞迴呼叫]]。
+
+== 基本概念 ==
+函式呼叫圖可以由動態程式分析產生（動態函式呼叫圖），也可以由靜態程式分析產生（靜態函式呼叫圖）<ref>{{cite journal |last1=Ryder |first1=B.G. |title=Constructing the Call Graph of a Program |journal=IEEE Transactions on Software Engineering |date=May 1979 |volume=SE-5 |issue=3 |pages=216–226 |doi=10.1109/tse.1979.234183}}</ref>。動態函式呼叫圖是程式執行過程的記錄，可能是[[效能分析|效能分析工具]]所輸出的。動態函式呼叫圖可以準確的描述這次程式執行時,各函式之間的關係。但會遺漏這次沒有執行到的程式碼。靜態函式呼叫圖則是設法表示所有可能執行情形下，所有函式之間的關係。準確的靜態函式呼叫圖是[[不可判定问题|不可判定问题]]，因此靜態函式呼叫圖是多半只是近似情形。函式呼叫圖上有所有函式之間的呼叫關係，但有可能其中有一些呼叫是永遠不會執行到的。
+
+函式呼叫圖可以定義來呈現不同程度的準確度。更準確的函式呼叫圖會更近似真正程式的行為，不過要計算的時間會比較長，要儲存的資料也會比較多。最準確的函式呼叫圖是完全「上下文相關」（context-sensitive），針對每一個函式，圖中會對不同情形，不同[[呼叫堆疊|呼叫堆疊]]下的呼叫，有不同的節點。全上下文相關的函式呼叫圖稱為{{le|呼叫上下文樹|calling context tree}}。利用動態程式分析可以輕易的產生，不過會花許多的記憶體。呼叫上下文樹一般不會用靜態程式分析產生，因為對大型程式會花許多時間。最不準確的函式呼叫圖稱為「上下文無關」（context-insensitive），針對每一個函式只會有一個節點。
+
+若程式語言中有[[动态分派|动态分派]]的特性（例如[[Java|Java]]或[[C++|C++]]）,要產生準確的靜態程式分析會需要{{le|假名分析|alias analysis}}的結果<ref>{{cite journal |last1=Grove |first1=David |last2=DeFouw |first2=Greg |last3=Dean |first3=Jeffrey |last4=Chambers |first4=Craig |last5=Grove |first5=David |last6=DeFouw |first6=Greg |last7=Dean |first7=Jeffrey |last8=Chambers |first8=Craig |title=Call graph construction in object-oriented languages|journal=ACM SIGPLAN Notices |date=9 October 1997 |volume=32 |issue=10 |pages=108, 108–124, 124 |doi=10.1145/263700.264352|publisher=ACM}}</ref>。相對的，要得到準確的假名分析也需要函式呼叫圖。許多靜態分析系統可以同步產生這二份資料，解決這個看似無限迴圈的問題。
+
+== 用途 ==
+函式呼叫圖有幾種不同的用途。其中一個簡單的應用是找出沒有被其他程式呼叫的子函式。函式呼叫圖可以當做文件，有助於程式設計師的[[程式理解|程式理解]]<ref>{{cite journal |last1=Eisenbarth |first1=T. |last2=Koschke |first2=R. |last3=Simon |first3=D. |title=Aiding program comprehension by static and dynamic feature analysis |journal=Proceedings IEEE International Conference on Software Maintenance. ICSM 2001 |pages=602–611 |doi=10.1109/icsm.2001.972777|year=2001 |isbn=0-7695-1189-9 }}</ref>。函式呼叫圖也是進一步分析的基礎，例如追蹤某一變數數值在各子函式中的變化，或是進行[[變更影響分析|變更影響分析]]<ref>{{cite journal |last1=Musco |first1=Vincenzo |last2=Monperrus |first2=Martin |last3=Preux |first3=Philippe |title=A large-scale study of call graph-based impact prediction using mutation testing |journal=Software Quality Journal |date=26 July 2016 |volume=25 |issue=3 |pages=921–950 |doi=10.1007/s11219-016-9332-8 |url=https://hal.archives-ouvertes.fr/hal-01346046/document|arxiv=1812.06286 }}</ref>。函式呼叫圖可以用來偵測異常的程式執行，或是偵測[[代碼注入|代碼注入]]攻擊<ref>{{cite book |last1=Gao |first1=Debin |title=Proceedings of the 11th ACM conference on Computer and communications security - CCS '04 |last2=Reiter |first2=Michael K. |last3=Song |first3=Dawn |chapter=Gray-box extraction of execution graphs for anomaly detection |date=25 October 2004 |pages=318–329 |doi=10.1145/1030083.1030126|publisher=ACM|isbn=1581139616 }}</ref>。
+
+==範例的圖==
+以下是用{{le|gprof|gprof}}自我分析得到的函式呼叫圖
+<pre>
+index    called     name                              |index    called     name
+      72384/72384       sym_id_parse [54]             |       1508/1508        cg_dfn [15]
+[3]   72384             match [3]                     |[13]   1508             pre_visit [13]
+----------------------                                |----------------------
+          4/9052        cg_tally [32]                 |       1508/1508        cg_assemble [38]
+       3016/9052        hist_print [49]               |[14]   1508             propagate_time [14]
+       6032/9052        propagate_flags [52]          |----------------------
+[4]    9052             sym_lookup [4]                |          2             cg_dfn [15]
+----------------------                                |       1507/1507        cg_assemble [38]
+       5766/5766        core_create_function_syms [41]|[15]   1507+2           cg_dfn [15]
+[5]    5766             core_sym_class [5]            |       1509/1509        is_numbered [9]
+----------------------                                |       1508/1508        is_busy [11]
+         24/1537        parse_spec [19]               |       1508/1508        pre_visit [13]
+       1513/1537        core_create_function_syms [41]|       1508/1508        post_visit [12]
+[6]    1537             sym_init [6]                  |          2             cg_dfn [15]
+----------------------                                |----------------------
+       1511/1511        core_create_function_syms [41]|       1505/1505        hist_print [49]
+[7]    1511             get_src_info [7]              |[16]   1505             print_line [16]
+----------------------                                |          2/9           print_name_only [25]
+          2/1510        arc_add [31]                  |----------------------
+       1508/1510        cg_assemble [38]              |       1430/1430        core_create_function_syms [41]
+[8]    1510             arc_lookup [8]                |[17]   1430             source_file_lookup_path [17]
+----------------------                                |----------------------
+       1509/1509        cg_dfn [15]                   |         24/24          sym_id_parse [54]
+[9]    1509             is_numbered [9]               |[18]     24             parse_id [18]
+----------------------                                |         24/24          parse_spec [19]
+       1508/1508        propagate_flags [52]          |----------------------
+[10]   1508             inherit_flags [10]            |         24/24          parse_id [18]
+----------------------                                |[19]     24             parse_spec [19]
+       1508/1508        cg_dfn [15]                   |         24/1537        sym_init [6]
+[11]   1508             is_busy [11]                  |----------------------
+----------------------                                |         24/24          main [1210]
+       1508/1508        cg_dfn [15]                   |[20]     24             sym_id_add [20]
+[12]   1508             post_visit [12]               |
+</pre>
+
+==相關條目==
+*{{le|相依性圖|Dependency graph}}
+*[[功能樹|功能樹]]
+
+==參考資料==
+{{Reflist}}
+
+[[Category:编译原理|Category:编译原理]]
+[[Category:文档生成器|Category:文档生成器]]
+[[Category:静态程序分析|Category:静态程序分析]]

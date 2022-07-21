@@ -1,0 +1,78 @@
+local p = {}
+
+local function parse(wt)
+	local argsCount, split, templateArgs, t, s, i, l
+	if not match:match('^%{') then
+		if not match:match('%|') then
+			ret[#ret + 1] = {name = match}
+		else
+			argsCount = 0
+			split = mw.text.split(match, '|')
+			templateArgs = {}
+			for _, v in ipairs(split) do
+				s = mw.text.split(v, '=')
+				if v:match('%{%{') then
+					if v:match('%}%}') then
+						l = {}
+						t = v:match('{{(.-)}}')
+						while true do
+							if t then
+								i[#i+1] = parse('{{' .. t .. '}}')
+								v = v:gsub('{{' .. t .. '}}', '<剖析分隔符 />')
+							else
+								break
+							end
+							t = v:match('{{(.-)}}')
+						end
+						v = v:split('<剖析分隔符 />')
+						for o, j in ipairs(v) do
+							if o < #v then
+								l[#l+1] = j
+								l[#l+1] = i[(#i+1)/2]
+							else
+								l[#l+1] = j
+							end
+						end
+						if s[2] then
+							templateArgs[s[1]] = l
+						else
+							argsCount = argsCount + 1
+							templateArgs[argsCount] = l
+						end
+					else
+						split[_ + 1] = v + split[_ + 1]
+					end
+				elseif s[2] then
+					templateArgs[s[1]] = s[2]
+				else
+					argsCount = argsCount + 1
+					templateArgs[argsCount] = s[1]
+				end
+			end
+			ret[#ret + 1] = {name = match, args = templateArgs}
+		end
+	end
+end
+
+function p.main(template)
+	if template == mw.getCurrgeFrame() then
+		error('Module:ParseWikitextTemplate不能被直接調用')
+	end
+	local ret = {}
+	if not template or type(template) ~= 'string' or template == '' then
+		return nil
+	end
+	local match = template:match('{{(.-)}}')
+	while true do
+		if match then
+			ret[#ret+1] = parse(match)
+			template = template:gsub('{{' .. match .. '}}', '')
+		else
+			break
+		end
+		match = template:match('{{(.-)}}')
+	end
+	return ret
+end
+
+return p

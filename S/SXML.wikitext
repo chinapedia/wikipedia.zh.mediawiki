@@ -1,0 +1,56 @@
+{{Infobox file format|name=SXML|icon=|extension=.sxml, .scm|mime=|type_code=文本|uniform_type=|developer=|type=[[标记语言|标记语言]]|container_for=|contained_by=|extended_from=|extended_to=|standard=|url=}} '''SXML'''是为了方便在[[LISP|Lisp]]和[[Scheme|Scheme]]中使用[[XML|XML]]而设计开发的，用于将XML数据（[[XML信息集|XML Infosets]] <ref>{{Cite journal|title=SXML Specification|last=Kiselyov|first=Oleg|journal=ACM SIGPLAN Notices|issue=6|doi=10.1145/571727.571736|year=2002|volume=37|pages=52–58}}</ref>）编写为[[S-表达式|S-表达式的]]一种替代语法。 
+
+下面的对比表格显示了XML、SXML之间的异同： 
+{|
+! XML 
+! SXML 
+|- valign="top"
+|<syntaxhighlight lang="xml"><tag attr1="value1"
+   attr2="value2">
+ <nested>Text node</nested>
+ <empty/>
+</tag></syntaxhighlight>
+|<syntaxhighlight lang="lisp">(tag (@ (attr1 "value1")
+    (attr2 "value2"))(tag (@ (attr1 "value1")
+    (attr2 "value2"))
+ (nested "Text node")
+ (empty))</syntaxhighlight>
+|}
+与XML（和其他类似XML的语言）相比，SXML的优点是可以被Scheme解析器直接解析。尽管SXML的系统略显不成熟，文档也比较简单，David Mertz还是在他的IBM developerWorks专栏中盛赞SXML的相关工具和文档。 <ref>{{Cite web|title=XML Matters: Investigating SXML and SSAX|url=http://www-106.ibm.com/developerworks/library/x-matters31.html|accessdate=10 January 2015|author=Mertz|date=23 October 2003|first=David|work=[[IBM_developerWorks|IBM developerWorks]]|archiveurl=https://web.archive.org/web/20041204123716/http://www-106.ibm.com/developerworks/library/x-matters31.html|archivedate=2004-12-04|dead-url=no}}</ref> 
+
+== 实例 ==
+下面是一个简单的[[XHTML|XHTML]]页面： <syntaxhighlight lang="html4strict">
+ <html ns="http://www.w3.org/1999/xhtml"
+     xml:lang="en" lang="en">
+  <head>
+    <title>An example page</title>
+  </head>
+  <body>
+    <h1 id="greeting">Hi, there!</h1>
+    <p>This is just an >>example<< to show XHTML & SXML.</p>
+  </body>
+ </html>
+</syntaxhighlight> 使用SXML编写的同一页面如下所示： <syntaxhighlight lang="lisp">
+ (*TOP* (@ (*NAMESPACES* (x "http://www.w3.org/1999/xhtml")))
+ (x:html (@ (xml:lang "en") (lang "en"))
+  (x:head
+    (x:title "An example page"))
+  (x:body
+    (x:h1 (@ (id "greeting")) "Hi, there")
+    (x:p "This is just an >>example<< to show XHTML & SXML."))))
+</syntaxhighlight> 在SXML中，原本元素的标签对（“<标签名>和</标签名>”）都由一组括号代替。 标签名只是列表中的第一个字符串，末尾不重复。 元素的属性和/或值则直接跟在后面，不需要通过特殊的语法（比如添加“=”）标记出来。在SXML中，属性、值都是节点，使用@来标记哪些节点是属性，而且由于XML中@不能作为元素名，也就不存在@与元素名冲突的问题。 在SXML中经常可以见到把XML中定义的非法名称作为特殊标识符使用的情况。 
+
+此外，在SXML中，由于所有的值都被视为没有标签的纯字符串，“&”和“<>”这样的字符无需转义写成“&amp/&lt/&gt”。从好的方面来讲，这意味着插入自动生成的内容要容易得多，并且不存在忘记为用户显示的内容转义的问题，但同时也可能导致各种[[跨網站指令碼|跨站点脚本]]攻击的泛滥或其他开发时候的麻烦。
+
+== 参考资料 ==
+{{Reflist}}
+
+== 外部链接 ==
+
+* [https://web.archive.org/web/20070414181503/http://modis.ispras.ru/Lizorkin/sxml-tutorial.html SXML Tools Tutorial by Dmitry Lizorkin]
+* [https://pkgs.racket-lang.org/package/sxml SXML package for Racket]{{Wayback|url=https://pkgs.racket-lang.org/package/sxml |date=20180514142257 }}
+** 
+
+[[Category:Scheme語言|Category:Scheme語言]]
+[[Category:技術通信|Category:技術通信]]
+[[Category:标记语言|Category:标记语言]]

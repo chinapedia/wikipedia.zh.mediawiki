@@ -1,0 +1,606 @@
+{{NoteTA|G1=IT}}
+在[[函数式编程|函数式编程]]中，'''折叠'''（fold），也称为'''归约'''（reduce）、'''积累'''（accumulate）、'''聚集'''（aggregate）、'''压缩'''（compress）或'''注入'''（inject），指称一组[[高阶函数|高阶函数]]，它们分析[[递归数据类型|递归]]数据结构并通过使用给定组合运算，将[[递归|递归]]的处理它的构成部件、建造一个返回值的结果重组起来。典型的，要向折叠提供一个组合[[子程序|函数]]，一个数据结构的顶端{{en-link|节点 (计算机科学)|Node (computer science)|节点}}，和可能的在特定条件下使用的某些缺省值。折叠接着以系统性方式使用这个函数，进行组合这个数据结构的层级中的元素。
+
+折叠在某种意义上是{{en-link|Anamorphism|Anamorphism|展开}}（unfold）的对偶，它接受一个种子值并[[共递归|共递归]]的应用一个函数，来确定如何进一步的构造一个共递归的数据结构。折叠递归的分解这个数据结构，在每个节点应用一个组合函数于它的[[终结符与非终结符|终结]]值和递归结果之上，用得到这个结果替代它。折叠是{{en-link|catamorphism|}}，而展开是{{en-link|anamorphism|}}。
+
+==作为结构性变换==
+折叠可以视为是将数据结构的结构性构件一致性的替代为函数和值。例如在很多函数式语言中，[[列表_(抽象数据类型)|列表]]是用两个原语建造的：任何列表要么是一个空列表，通常叫做<code>nil</code>（<code>[]</code>），要么是通过将一个元素前缀于另一个列表之前来构造的，通过应用<code>cons</code>函数（在[[Haskell|Haskell]]中写为冒号<code>(:)</code>），建立所谓的[[列表构造函数|cons]]{{en-link|节点 (计算机科学)|Node (computer science)|节点}}，比如<code> Cons(X1,Cons(X2,Cons(...(Cons(Xn,nil)))))</code>。可以将在列表上的折叠看作是将这个列表的末端的<code>nil</code>替代为一个特殊的值，并用一个特殊函数替代每个<code>cons</code>。
+
+使用Haskell作为例子，可以用几个等式公式化出右折叠<code>foldr</code>：
+
+<syntaxhighlight lang="haskell">
+foldr :: (a -> b -> b) -> b -> [a] -> b
+foldr f z []     = z
+foldr f z (x:xs) = f x (foldr f z xs)
+</syntaxhighlight>
+
+如果列表为空，结果是初始值<code>z</code>。如果不是空，应用<code>f</code>于第一个元素和折叠余下列表的结果。这种替代可以图示如下：
+
+::[[Image:right-fold-transformation.png|Image:right-fold-transformation.png]]
+
+以一致性风格进行结构性变换的另一种方式，左折叠<code>foldl</code>：
+<syntaxhighlight lang="haskell">
+foldl :: (b -> a -> b) -> b -> [a] -> b
+foldl f z []     = z
+foldl f z (x:xs) = foldl f (f z x) xs
+</syntaxhighlight>
+
+如果列表为空，结果是初始值。如果不是空，将应用<code>f</code>于旧初始值和第一个元素的结果作为新初始值，折叠它和余下列表。这种替代可以图示如下：
+
+::[[Image:left-fold-transformation.png|Image:left-fold-transformation.png]]
+
+这两个示意图展示在一个列表上的右折叠和左折叠。逐个元素的使用<code>cons</code>构造的列表，每个节点的左链接是终结值，而右链接是另一个节点，右折叠之后保持这种形态。左折叠之后，承载函数的每个节点的右链接是终结值，而左链接是另一个节点。
+
+这两个示意图还突出了如下事实：{{code|1=id = foldr (:) []|2=haskell}}是在列表上的同一函数（按[[Lisp|Lisp]]说法是“浅层复制”），因为替代<code>cons</code>为<code>cons</code>并替代<code>nil</code>为<code>nil</code>不改变结果。并提示了逆转一个列表的一种容易的方法：{{code|1=reverse = foldl (flip (:)) []|2=haskell}}。注意这里用<code>flip</code>函数将给<code>cons</code>的二个参数进行了翻转。<code>flip</code>只在[[Haskell|Haskell]]这样的语言中需要，它翻转给<code>foldl</code>的组合函数的实际参数的次序，不像在[[Scheme|Scheme]]中，这里对<code>foldl</code>和<code>foldr</code>二者的组合函数使用相同的实际参数次序。
+
+另一个易得的结果是，高阶函数[[Map_(高阶函数)|map]]也可以凭借<code>foldr</code>书写，通过将要作用在元素上的那个函数复合于<code>cons</code>，即是：
+
+<syntaxhighlight lang="haskell">
+map f = foldr ((:) . f) []
+</syntaxhighlight>
+
+这里的点号<code>(.)</code>是指示{{en-link|函数复合 (计算机科学)|Function composition (computer science)|函数复合}}的算子。
+
+通过演示在线性列表上的折叠函数的构造方式，就会得到启发在其他{{en-link|代数数据类型|Algebraic data type}}和结构比如各种树之上设计类似的折叠函数。我们可以写一个高阶函数，递归的将数据类型的构造子替代为所提供的函数，并将任何这个类型的常量值替代为所提供的值。这种函数一般称为{{en-link|catamorphism|}}。
+
+==在列表上==
+用加法算子折叠列表<code>[1,2,3,4,5]</code>会得到结果<code>15</code>, 它是这个列表元素的总和。粗略近似的说，折叠将这个列表中逗号替代成了<code>+</code>运算，得出了<code>1 + 2 + 3 + 4 + 5</code>。
+
+在上述的例子中，<code>+</code>是[[结合律|结合律]]运算，所有最终的结果不管如何加括号都是相同的，尽管括号导致的特定计算次序是不同的。在非结合律二元运算的一般情况下，组合元素的次序可以影响最终的结果值。在列表之上，有二个面向的进行这个工作的方式：要么组合第一个元素和递归的组合余下列表的结果（叫做右折叠），要么组合递归的组合除了最后一个元素的所有元素的结果和最后一个元素（叫做左折叠）。着对应于一个二元算子要么是右结合的要么是左结合的，采用了[[Haskell|Haskell]]或[[Prolog|Prolog]]的术语。使用右折叠，合计将加括号为<code>1 + (2 + (3 + (4 + 5)))</code>，而使用左折叠它将加括号为<code>(((1 + 2) + 3) + 4) + 5</code>。
+
+实际上，在使用右折叠的情况下有一个初始值同列表的最后一个元素组合，在使用左折叠的情况下有一个初始值同和列表的第一个元素组合，是方便和自然的。在上述的例子中，值<code>0</code>（[[加法单位元|加法单位元]]）可以被选择为初始值，对于右折叠得到<code>1 + (2 + (3 + (4 + (5 + 0))))</code>，对于左折叠得到<code>((((0 + 1) + 2) + 3) + 4) + 5</code>。对于乘法，选择<code>1</code>（[[乘法单位元|乘法单位元]]）作为初始值，这将得出<code>1 * 1 * 2 * 3 * 4 * 5 = 120 = 5!</code>。 
+
+在组合函数<code>f</code>的类型是不对称的情况下，比如<code>a -> b -> b</code>，就是说如果结果的类型不同于列表元素的类型，使用初始值是必需的。要使一个线性的应用链成为可能，使用的这个初始值的类型必须同于<code>f</code>的结果的类型。不管是右折叠还是左折叠，它的类型都确定为组合函数的参数所预期的类型。如果第二个参数必须与结果相同类型，则<code>f</code>可以被看作是右结合的，如果是第一个参数则为左结合的。那些使用对称类型二元运算的折叠，它的二个参数的类型和它的结果的类型必须相同。
+
+===树状折叠===
+在组合函数是个[[原群|原群]]的情况下，就是说它的类型是对称的，比如<code>a -> a -> a</code>，就是说结果的类型同于列表元素的类型，则可以用任意方式放置括号，因而建立嵌套子表达式的“树”，比如<code>((1 + 2) + (3 + 4)) + 5</code>。如果二元运算<code>f</code>是结合律的，则这个值将是良好定义的，就是对于任何加括号情况，都是相同的，尽管如何计算它的运算细节会是不同的。如果<code>f</code>是[[求值策略#非严格求值|非严格求值]]的，这可能在效能上有重大影响。
+线性折叠是面向节点的，并以一致方式对列表的每个节点进行运算；而树状折叠是面向整个列表的，并以一致方式跨越节点“群”进行运算。
+
+列表可以按树状风格来折叠，分别对于有限和不明确定义的列表二者：
+
+<syntaxhighlight lang="haskell">
+
+foldt :: (a -> a -> a) -> a -> [a] -> a
+foldt f z []     = z
+foldt f z [x]    = f x z
+foldt f z xs     = foldt f z (pairs f xs)
+
+foldi :: (a -> a -> a) -> a -> [a] -> a 
+foldi f z []     = z
+foldi f z (x:xs) = f x (foldi f z (pairs f xs))
+
+pairs :: (a -> a -> a) -> [a] -> [a] 
+pairs f (x:y:t)  = f x y : pairs f t
+pairs _ t        = t
+</syntaxhighlight>
+
+在<code>foldi</code>函数的情况下，为了避免在不明确定义的列表上失控求值，函数<code>f</code>必须“不总是”需求它的第二个参数的值，至少不是所有都要，或者不是立即就要。
+
+===非空列表的特殊折叠===
+人们经常希望选择<code>f</code>的[[单位元|单位元]]作为初始值<code>z</code>。在没有合适的初始值的时候，例如在想要把计算它的二个参数的极大值的函数，折叠到一个非空列表之上，来得到这个列表的极大值，可以用<code>foldr</code>和<code>foldl</code>的变体，它们分别使用这个列表的最后一个和第一个元素作为初始值。在Haskell和其他一些语言中，它们叫做<code>foldr1</code>和<code>foldl1</code>，这里的“1”所指的是自动提供初始元素，和它们所应用到的列表至少要有一个元素的事实。
+
+<syntaxhighlight lang="haskell">
+foldl1 f [x]      = x
+foldl1 f (x:y:xs) = foldl1 f (f x y : xs)
+
+foldr1 f [x]      = x
+foldr1 f (x:xs)   = f x (foldr1 f xs)
+
+foldt1 f [x]      = x
+foldt1 f (x:y:xs) = foldt1 f (f x y : pairs f xs)
+ 
+foldi1 f [x]      = x
+foldi1 f (x:xs)   = f x (foldi1 f (pairs f xs))
+</syntaxhighlight>
+
+===例子===
+使用[[Haskell|Haskell]]解释器，折叠进行的结构性变换可以用构造一个字符串来展示：
+
+<syntaxhighlight lang="haskell">
+λ> foldr (\x y -> concat ["(",x,"+",y,")"]) "0" (map show [1..13])
+"(1+(2+(3+(4+(5+(6+(7+(8+(9+(10+(11+(12+(13+0)))))))))))))"
+ 
+λ> foldl (\x y -> concat ["(",x,"+",y,")"]) "0" (map show [1..13])
+"(((((((((((((0+1)+2)+3)+4)+5)+6)+7)+8)+9)+10)+11)+12)+13)"
+ 
+λ> foldt (\x y -> concat ["(",x,"+",y,")"]) "0" (map show [1..13])
+"(((((1+2)+(3+4))+((5+6)+(7+8)))+(((9+10)+(11+12))+13))+0)"
+ 
+λ> foldi (\x y -> concat ["(",x,"+",y,")"]) "0" (map show [1..13])
+"(1+((2+3)+(((4+5)+(6+7))+((((8+9)+(10+11))+(12+13))+0))))"
+</syntaxhighlight>
+
+无限树状折叠，可以用[[Haskell|Haskell]]的通过[[埃拉托斯特尼筛法|埃拉托斯特尼筛法]]的[[递归_(计算机科学)|递归]]素数生成来演示：
+<syntaxhighlight lang="haskell">
+primes = 2 : _Y ((3 :) . minus [5,7..] . foldi (\(x:xs) ys -> x : union xs ys) [] 
+                       . map (\p-> [p*p, p*p+2*p..]))
+_Y g = g (_Y g)     -- = g . g . g . g . ...
+</syntaxhighlight>
+这里的函数<code>union</code>以本地方式运算于有序列表之上来高效的产生它们的[[并集|并集]]，而<code>minus</code> 做它们的[[补集|集合差]]。
+
+对于有限列表，[[归并排序|归并排序]]（和它的去除重复变体<code>nubsort</code>）可以使用树状折叠轻易的定义为：
+<syntaxhighlight lang="haskell">
+mergesort xs = foldt merge [] [[x] | x <- xs]
+nubsort   xs = foldt union [] [[x] | x <- xs]
+</syntaxhighlight>
+采用的函数<code>merge</code>是<code>union</code>的保留重复的变体。
+
+函数<code>head</code>和<code>last</code>也可以通过折叠定义为：
+<syntaxhighlight lang="haskell">
+head = foldr (\x r -> x) (error "head: Empty list")
+last = foldl (\a x -> x) (error "last: Empty list")
+</syntaxhighlight>
+
+===求值次序考虑===
+在采用[[惰性求值|惰性]]或非严格求值策略的场合下，<code>foldr</code>将立即返回<code>f</code>在列表头部和折叠余下列表的递归案例上的这个应用。因此，如果<code>f</code>能够产生其结果的一部份，而不需要引用到递归案例，它在<code>f</code>的“右”也就是第二个实际参数上，而余下的结果永不需要，那么递归就会停止，例如上节定义的<code>head</code>函数。这允许右折叠可以运算在无限列表之上。与之相反，<code>foldl</code>将立即的调用具有新参数的自身，直到它达到了列表的末端。这种[[尾调用|尾递归]]可以高效的编译为循环，但是根本不能处理无限列表，它会永久递归于[[无限循环|无限循环]]。
+
+已经到达列表的末端之后，<code>foldl</code>有效的建造了一个“表达式”，它是嵌套的左深化<code>f</code>应用，它被提供给调用者进行求值。如果函数<code>f</code>首先引用它的第二个参数，并且能够产生其结果的一部份，而不需要引用到递归案例，这里是在它的“左”也就是第一个实际参数上，那么递归会停止，例如上节定义的<code>last</code>函数。这意味着尽管<code>foldr</code>递归“于右侧”，它允许惰性组合函数来从左至右检查列表的元素；而反过来，尽管<code>foldl</code>递归“于左侧”，它允许惰性组合函数从从右至左检查列表的元素。
+
+逆转一个列表也是尾递归的，它可以使用{{code|1=rev = foldl (\ys x -> x : ys) []|2=haskell}}实现。在有限列表上，这意味着左折叠和逆转可以复合起来以尾递归方式进行右折叠，通过修改<code>f</code>使它逆转其参数的次序，例如{{code|1=foldr f z == foldl (flip f) z . rev|2=haskell}}，这样尾递归的建造出的一个表达式的表示同于右折叠所建造的。
+
+额外的中间列表结构可以通过形似{{en-link|传递续体风格|continuation-passing style}}的手段去除：{{code|1=foldr f z xs == foldl (\k x-> k . f x) id xs z|2=haskell}}；另一个在也类似：{{code|1=foldl f z xs == foldr (\x k-> k . flip f x) id xs z|2=haskell}}。它们也常被写为<ref>{{cite web |url=https://wiki.haskell.org/Foldl_as_foldr |title=Foldl as foldr |access-date=2021-03-05 |archive-date=2020-11-11 |archive-url=https://web.archive.org/web/20201111222615/https://wiki.haskell.org/Foldl_as_foldr }}</ref>：
+<syntaxhighlight lang="haskell">
+foldr :: (a -> b -> b) -> b -> [a] -> b
+foldr f z xs = foldl (\k x y -> k (f x y)) id xs z
+
+foldl :: (b -> a -> b) -> b -> [a] -> b
+foldl f z xs = foldr (\x k y -> k (f y x)) id xs z
+</syntaxhighlight>
+另一个技术要点是，在使用惰性求值的左折叠的情况下，新初始化参数在进行递归调用之前是不被求值的。在达到了列表末端并尝试计算结果的巨大的表达式的时候，这可能导致堆栈溢出。为此，这种语言经常提供左折叠的更严格变体，它在进行递归调用之前强制的求值初始化参数。在Haskell中它是Data.List库里的<code>foldl'</code>函数（注意这个撇号读作“prime”）。需要意识到一个事实，强制一个值用惰性数据构造子建造，其自身不会自动的强制它的构件。结合于尾递归，这种折叠接近了循环的效率，在惰性求值的最终结果是不可能或不可取的时候，确保了恒定空间运算。
+
+==在各种语言中==
+{| class="wikitable" style="font-size: 85%"
+! 语言 !! 左fold !! 右fold !! 无初始值左fold !! 无初始值右fold !! Unfold !! 注释
+|- valign="top"
+| [[APL语言|APL]]
+| <code>''func''⍨/⌽''initval'',''vector''</code>
+| <code>''func''/''vector'',''initval''</code>
+| <code>''func''⍨/⌽''vector''</code>
+| <code>''func''/''vector''</code>
+|
+|
+|- valign="top"
+| [[C♯|C#]] [[C_Sharp_3.0|3.0]]
+| <code>''ienum''<wbr/>.Aggregate(''initval'', ''func'')</code>
+| <code>''ienum''.Reverse()<wbr/>.Aggregate(''initval'', ''func'')</code>
+| <code>''ienum''<wbr/>.Aggregate(''func'')</code>
+| <code>''ienum''.Reverse()<wbr/>.Aggregate(''func'')</code>
+|
+| Aggregate是{{en-link|扩展方法|Extension method}}<br /> ienum是<code>IEnumerable<T></code><br />在所有的.NET语言中都类似
+|- valign="top"
+| [[C++|C++]]
+| <code>std::accumulate(<wbr/>''begin'', ''end'', ''initval'', ''func'')</code>
+| <code>std::accumulate(<wbr/>''rbegin'', ''rend'', ''initval'', ''func'')</code>
+|
+|
+|
+| 在头文件 <code><numeric></code>中<br />begin, end, rbegin, rend是迭代器<br />func可以是一个[[函数指针|函数指针]]或[[函数对象|函数对象]]
+|- valign="top"
+| [[C++17|C++17]]
+| <code>(''initval'' ''op'' ... ''op'' ''pack'')</code>
+| <code>(''pack'' ''op'' ... ''op'' ''initval'')</code>
+| <code>(... ''op'' ''pack'')</code>
+| <code>(''pack'' ''op'' ...)</code>
+|
+| Fold表达式（只用于变元函数模板）：op是二元算子（两个op必须相同，比如<code>(std::cout << ... << args)</code>)， pack是未展开的参数包。
+|- valign="top"
+| {{en-link|ColdFusion标记语言|ColdFusion Markup Language|CFML}}
+| <code>obj.reduce(func,initial)</code>
+| 
+| <code>obj.reduce(func)</code>
+| 
+|
+| 这里的<code>func</code>接受为实际参数的是前面运算的结果（或在第一次迭代上的<code>initial</code>值）；当前项；当前项的索引或键；和到<code>obj</code>的引用。
+|- valign="top"
+| [[Clojure|Clojure]]
+| <code>(reduce ''func'' ''initval'' ''list'')</code>
+| <code>(reduce ''func'' ''initval'' (reverse ''list'))</code>
+| <code>(reduce ''func'' ''list'')</code>
+| <code>(reduce ''func" (reverse ''list''))</code>
+|
+| 参见clojure.core.reducers/fold<ref>{{Cite web |url=https://clojure.github.com/clojure/branch-master/clojure.core-api.html#clojure.core.reducers/fold |title=clojure.core.reducers/fold |access-date=2021-02-12 |archive-date=2012-02-04 |archive-url=https://web.archive.org/web/20120204144852/http://clojure.github.com/clojure/branch-master/clojure.core-api.html#clojure.core.reducers/fold }}</ref>
+|- valign="top"
+| [[Common_Lisp|Common Lisp]]
+| <code>(reduce ''func'' ''list'' :initial-value ''initval'')</code>
+| <code>(reduce ''func'' ''list'' :from-end t :initial-value ''initval'')</code>
+| <code>(reduce ''func'' ''list'')</code>
+| <code>(reduce ''func'' ''list'' :from-end t)</code>
+|
+| 
+|- valign="top"
+| [[Curl_(编程语言)|Curl]]
+| <code>{{TreeNode.''default'' ''treeNode'' ...} ''.to-Iterator''}</code>
+| <code>{{TreeNode.''default'' ''treeNode'' ...} ''.reverse}<wbr/>.{{nobr|to-Iterator}}''}</code>
+| <code>{for {treeNode''<wbr/>.{{nobr|to-Iterator}}}'' ''do}''</code>
+| <code>{for {{treeNode.reverse}''<wbr/>.{{nobr|to-Iterator}}}'' ''do}''</code>
+|
+| 还有DefaultListModel和HashTable实现<code>to-Iterator</code>
+|- valign="top"
+| [[D语言|D]]
+| <code>reduce!''func''(''initval'', ''list'')</code>
+| <code>reduce!''func''(''initval'', ''list''<wbr/>.reverse)</code>
+| <code>reduce!''func''(''list'')</code>
+| <code>reduce!''func''(<wbr/>''list''.reverse)</code>
+|
+| 在模块<code>std.algorithm</code>中
+|- valign="top"
+| [[Elixir|Elixir]]
+| <code>List.foldl(list, acc, fun)</code>
+| <code>List.foldr(list, acc, fun)</code>
+|
+|
+|
+| 样例用法见于documentation<ref>{{Cite web |url=https://hexdocs.pm/elixir/List.html#foldl/3 |title=documentation |access-date=2021-02-12 |archive-date=2021-06-09 |archive-url=https://web.archive.org/web/20210609212436/https://hexdocs.pm/elixir/List.html#foldl/3 }}</ref>
+|- valign="top"
+| [[Elm_(编程语言)|Elm]]
+| <code>List.foldl(''Fun'', ''Accumulator'', ''List'')</code>
+| <code>List.foldr(''Fun'', ''Accumulator'', ''List'')</code>
+|
+|
+|
+| 参见List API [http://package.elm-lang.org/packages/elm-lang/core/3.0.0/List#foldr] {{Wayback|url=http://package.elm-lang.org/packages/elm-lang/core/3.0.0/List#foldr |date=20210429102409 }}
+|- valign="top"
+| [[Erlang|Erlang]]
+| <code>lists:foldl(''Fun'', ''Accumulator'', ''List'')</code>
+| <code>lists:foldr(''Fun'', ''Accumulator'', ''List'')</code>
+|
+|
+|
+|
+|- valign="top"
+| [[F♯|F#]]
+| <code>Seq/List.fold ''func'' ''initval'' ''list''</code>
+| <code>List.foldBack ''func'' ''list'' ''initval''</code>
+| <code>Seq/List.reduce ''func'' ''list''</code>
+| <code>List.reduceBack ''func'' ''list''</code>
+| <code>Seq.unfold ''func'' ''initval''</code>
+|
+|- valign="top"
+| {{en-link|Gosu (编程语言)|Gosu (programming language)|Gosu}}
+| <code>''Iterable''.fold(''f''(agg, e))<wbr/>''Iterable''.reduce(init, ''f''(agg, e)) <wbr/>''Iterable''.partition(''f''(e))
+</code>
+|
+|
+|
+|
+| 都是在java的Iterable接口上的{{en-link|扩展方法|extension methods}}，数组也支持。
+|- valign="top"
+| [[Groovy|Groovy]]
+| <code>''list''<wbr/>.inject(''initval'', ''func'')</code>
+| <code>''list''.reverse()<wbr/>.inject(''initval'', ''func'')</code>
+| <code>''list''<wbr/>.inject(''func'')</code>
+| <code>''list''.reverse()<wbr/>.inject(''func'')</code>
+|
+|
+|- valign="top"
+| [[Haskell|Haskell]]
+| <code>foldl ''func'' ''initval'' ''list''</code>
+| <code>foldr ''func'' ''initval'' ''list''</code>
+| <code>foldl1 ''func'' ''list''</code>
+| <code>foldr1 ''func'' ''list''</code>
+| <code>unfoldr ''func'' ''initval''</code>
+| 对于foldl，折叠函数接受参数的次序与foldr的次序相反。
+|- valign="top"
+| [[Haxe|Haxe]]
+| <code>Lambda.fold(''iterable'', ''func'', ''initval'')</code>
+|
+|
+|
+|
+|
+|- valign="top"
+| [[J语言|J]]
+| <code>''verb''<nowiki>~/|.</nowiki> ''initval'',''array''</code>
+| <code>''verb''/ ''array'',''initval''</code>
+| <code>''verb''<nowiki>~/|.</nowiki> ''array''</code>
+| <code>''verb''/ ''array''</code>
+|
+|  u/y应用二元u于y的项目之间。参见"J Dictionary: Insert"<ref>{{Cite web |url=http://www.jsoftware.com/help/dictionary/d420.htm |title="J Dictionary: Insert" |access-date=2021-02-12 |archive-date=2021-05-06 |archive-url=https://web.archive.org/web/20210506202906/https://www.jsoftware.com/help/dictionary/d420.htm }}</ref>
+|- valign="top"
+| [[Java|Java]] 8+
+| <code>''stream''.reduce<wbr/>(''initval'', ''func'')</code>
+| 
+| <code>''stream''.reduce<wbr/>(''func'')</code>
+| 
+|
+|
+|- valign="top"
+| [[JavaScript|JavaScript]] 1.8<br>[[ECMAScript|ECMAScript]] 5
+| <code>''array''.reduce<wbr/>(''func'', ''initval'')</code>
+| <code>''array''.reduceRight<wbr/>(''func'', ''initval'')</code>
+| <code>''array''.reduce<wbr/>(''func'')</code>
+| <code>''array''.reduceRight<wbr/>(''func'')</code>
+|
+|
+|- valign="top"
+| [[Julia_(编程语言)|Julia]]
+| <code>foldl(''op'', ''itr''; [init])</code>
+| <code>foldr(''op'', ''itr''; [init])</code>
+| <code>foldl(''op'', ''itr'')</code>
+| <code>foldr(''op'', ''itr'')</code>
+|
+|
+|-
+|[[Kotlin|Kotlin]]
+|<code>''Iterable''.fold<wbr />(''initval'', ''func'')</code>
+|<code>''Iterable''.foldRight<wbr />(''initval'', ''func'')</code>
+|<code>''Iterable''.reduce''(func'')</code>
+|''<code>Iterable</code>''<code>.reduceRight''(func'')</code>
+|
+|其他搜集也支持<code>fold</code><ref>{{cite web |title=fold - Kotlin Programming Language |url=https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/fold.html |website=Kotlin |publisher=Jetbrains |access-date=29 March 2019 |ref=fold.kt |archive-date=2021-01-23 |archive-url=https://web.archive.org/web/20210123012231/https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/fold.html }}</ref>和<code>reduce</code><ref>{{cite web |title=reduce - Kotlin Programming Language |url=https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/reduce.html |website=Kotlin |publisher=Jetbrains |access-date=29 March 2019 |ref=reduce.kt |archive-date=2021-01-16 |archive-url=https://web.archive.org/web/20210116210439/https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/reduce.html }}</ref>。还有<code>Result.fold(onSuccess, onFailure)</code><ref>{{cite web |title=Result - Kotlin Programming Language |url=https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-result/index.html |website=Kotlin |publisher=Jetbrains |access-date=29 March 2019 |ref=Result.kt |archive-date=2019-11-13 |archive-url=https://web.archive.org/web/20191113222341/https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-result/index.html }}</ref>，它归约<code>Result<T></code>（要么成功要么失败）成<code>onSuccess</code>和<code>onFailure</code>的返回类型。
+|- valign="top"
+|  {{en-link|LFE (编程语言)|LFE (programming language)|LFE}}
+| <code>(lists:foldl ''func'' ''accum'' ''list'')</code>
+| <code>(lists:foldr ''func'' ''accum'' ''list'')</code>
+|
+|
+|
+|
+|- valign="top"
+| {{en-link|Logtalk|}}
+| <code>fold_left(Closure, Initial, List, Result)</code>
+| <code>fold_right(Closure, Initial, List, Result)</code>
+|
+|
+|
+| meta标准库对象提供元谓词。缩写foldl和foldr也可以使用。
+|- valign="top"
+| [[Maple|Maple]]
+| <code>foldl(''func'', ''initval'', ''sequence'')</code>
+| <code>foldr(''func'', ''initval'', ''sequence'')</code>
+|
+|
+|
+|
+|- valign="top"
+| [[Mathematica|Mathematica]]
+| <code>Fold[''func'', ''initval'', ''list'']</code>
+| <code>Fold[''func'', ''initval'', Reverse[''list'']]</code>
+| <code>Fold[''func'', ''list'']</code>
+| <code>Fold[''func'', Reverse[''list'']]</code>
+| <code>NestWhileList[''func,'', ''initval'', ''predicate'']</code>
+| 不带初始值的<code>Fold</code>在版本10.0和更高版本中支持。
+|- valign="top"
+| [[MATLAB|MATLAB]]
+| <code>fold(@''func'', ''list'', ''defaultVal'')</code>
+| <code>fold(@''func'', flip(''list''), ''defaultVal'')</code>
+| <code>fold(@''func'', ''list'')</code>
+| <code>fold(@''func'', flip(''list''))</code>
+| <code></code>
+| 要求Symbolic Math Toolbox，从R2016b开始支持。
+|- valign="top"
+| [[Maxima|Maxima]]
+| <code>lreduce(''func'', ''list'', ''initval'')</code>
+| <code>rreduce(''func'', ''list'', ''initval'')</code>
+| <code>lreduce(''func'', ''list'')</code>
+| <code>rreduce(''func'', ''list'')</code>
+|
+|
+|- valign="top"
+| Mythryl
+| <code>fold_left ''func'' ''initval'' ''list''<br /> vector::fold_left ''func'' ''initval'' ''vector''</code>
+| <code>fold_right ''func'' ''initval'' ''list''<br /> vector::fold_right ''func'' ''initval'' ''vector''</code>
+|
+|
+|
+| 提供的函数接受在元组中实际参数。
+|- valign="top"
+| [[OCaml|OCaml]]
+| <code>List.fold_left ''func'' ''initval'' ''list''<br /> Array.fold_left ''func'' ''initval'' ''array''</code>
+| <code>List.fold_right ''func'' ''list'' ''initval''<br /> Array.fold_right ''func'' ''array'' ''initval''</code>
+|
+|
+| <code>Base.Sequence.unfold ''~init'' ''~f''</code> <ref>{{cite web|url = https://opensource.janestreet.com/base/|title = Base|publisher = Jane Street Capital|access-date = February 26, 2019|archive-date = 2020-08-20|archive-url = https://web.archive.org/web/20200820185354/https://opensource.janestreet.com/base/}}</ref>
+|
+|- valign="top"
+| [[Oz_(编程语言)|Oz]]
+| <code>{FoldL ''List'' ''Func'' ''InitVal''}</code>
+| <code>{FoldR ''List'' ''Func'' ''InitVal''}</code>
+|
+|
+|
+|
+|- valign="top"
+| {{en-link|PARI/GP|}}
+| <code>fold( ''f'', ''A'' )</code>
+|
+|
+|
+|
+|
+|- valign="top"
+| [[Perl|Perl]]
+| <code>reduce ''block'' ''initval'', ''list''</code>
+|
+| <code>reduce ''block'' ''list''</code>
+|
+|
+| 在<code>List::Util</code>模块中
+|- valign="top"
+| [[PHP|PHP]]
+| <code>array_reduce(''array'', ''func'', ''initval'')</code>
+| <code>array_reduce(<wbr/>array_reverse(''array''), ''func'', ''initval'')</code>
+| <code>array_reduce(''array'', ''func'')</code>
+| <code>array_reduce(<wbr/>array_reverse(''array''), ''func'')</code>
+|
+| 在未提供initval的时候，使用了NULL，所以不是真正的foldl1。在PHP 5.3之前，initval只能是整数。func是一个callback<ref>{{Cite web |url=http://php.net/manual/en/language.pseudo-types.php#language.types.callback |title=callback |access-date=2021-02-12 |archive-date=2020-11-28 |archive-url=https://web.archive.org/web/20201128173922/https://www.php.net/manual/en/language.pseudo-types.php#language.types.callback }}</ref>。参见在线的array_reduce文档<ref>{{Cite web |url=http://micmap.org/php-by-example/en/function/array_reduce |title=array_reduce |access-date=2021-02-12 |archive-date=2020-08-05 |archive-url=https://web.archive.org/web/20200805033647/http://micmap.org/php-by-example/en/function/array_reduce }}</ref>。
+|- valign="top"
+| [[Python|Python]] 2.x
+| <code>reduce(''func'', ''list'', ''initval'')</code>
+| <code>reduce(lambda x,y: ''func''(y,x), reversed(''list''), ''initval'')</code>
+| <code>reduce(''func'', ''list'')</code>
+| <code>reduce(lambda x,y: ''func''(y,x), reversed(''list''))</code>
+|
+|
+|- valign="top"
+| [[Python|Python]] 3.x
+| <code>functools.reduce(''func'', ''list'', ''initval'')</code>
+| <code>functools.reduce(lambda x,y: ''func''(y,x), reversed(''list''), ''initval'')</code>
+| <code>functools.reduce(''func'', ''list'')</code>
+| <code>functools.reduce(lambda x,y: ''func''(y,x), reversed(''list''))</code>
+|
+| 在模块functools中<ref>参考见于[https://docs.python.org/3/library/functools.html functools] {{Wayback|url=https://docs.python.org/3/library/functools.html |date=20210602023813 }}中，<code>''functools.reduce''</code>: <code>import functools</code>，<code>''reduce''</code>: <code>from functools import reduce</code>。</ref>。
+|- valign="top"
+| [[R语言|R]]
+| <code>Reduce(''func'', ''list'', ''initval'')</code>
+| <code>Reduce(''func'', ''list'', ''initval'', right=TRUE)</code>
+| <code>Reduce(''func'', ''list'')</code>
+| <code>Reduce(''func'', ''list'', right=TRUE)</code>
+|
+| R通过给Reduce函数的right和init实际参数，支持右折叠和有或没有初始值的左或右折叠。
+|- valign="top"
+| [[Ruby|Ruby]]
+| <code>''enum''<wbr/>.inject(''initval'', ''&block'')<br /> ''enum''<wbr/>.reduce(''initval'', ''&block'')</code>
+| <code>''enum''.reverse_each<wbr/>.inject(''initval'', ''&block'')<br /> ''enum''.reverse_each<wbr/>.reduce(''initval'', ''&block'')</code>
+| <code>''enum''<wbr/>.inject(''&block'')<br /> ''enum''.reduce(''&block'')</code>
+| <code>''enum''.reverse_each<wbr/>.inject(''&block'')<br /> ''enum''.reverse_each<wbr/>.reduce(''&block'')</code>
+|
+| 在Ruby 1.8.7+中，还可以传递表示一个函数而非块的一个符号。<br />enum是Enumeration <br />请注意这些右折叠的实现对于非交换律的&block是有误的（还有初始值放在错误的一侧）。
+|- valign="top"
+| [[Rust|Rust]]
+| <code>''iterator''.fold(''initval'', ''func'')</code>
+| <code>''iterator''.rev().fold(''initval'', ''func'')</code>
+|
+|
+|
+|
+|- valign="top"
+| [[Scala|Scala]]
+| <code>''list''.foldLeft(''initval'')(''func'')</code><br /><code>(''initval'' /: ''list'')(''func'')</code>
+| <code>''list''.foldRight(''initval'')(''func'')</code><br /><code>(''list'' :\ ''initval'')(''func'')</code>
+| <code>''list''.reduceLeft(''func'')</code>
+| <code>''list''.reduceRight(''func'')</code>
+|
+| Scala的符号式fold语法意图重组常用来解释折叠运算的左或右倾斜树<ref>{{cite newsgroup |title= Re: Blog: My verdict on the Scala language |author= Odersky, Martin |date= 2008-01-05 |newsgroup= comp.scala.lang |url= http://permalink.gmane.org/gmane.comp.lang.scala/9557 |access-date= 14 October 2013 |archive-date= 2015-05-14 |archive-url= https://web.archive.org/web/20150514122827/http://permalink.gmane.org/gmane.comp.lang.scala/9557 }}</ref>，已经被重释义为一个顶级多米诺骨牌的例证<ref>{{cite web|last1=Sterling|first1=Nicholas|title=An intuitive feel for Scala’s /: operator (foldLeft)|url=https://nicholassterling.wordpress.com/2010/07/28/an-intuition-about-scalas-operator-foldleft/|access-date=24 June 2016|archive-date=2016-10-13|archive-url=https://web.archive.org/web/20161013140033/https://nicholassterling.wordpress.com/2010/07/28/an-intuition-about-scalas-operator-foldleft/}}</ref>。来自通用Scala语法机制的冒号，凭借显见的中缀算子，被调用为一个方法在左操作数上，具有右操作数作为一个实际参数传递，或反之如果这个算子的最后字符是冒号，这里是对称应用的。
+Scala还有使用方法<code>list.fold(z)(op)</code>的树状折叠特征<ref>{{Cite web|url=https://www.scala-lang.org/api/current/scala/collection/Seq.html#fold%5BA1%3E:A%5D(z:A1)(op:(A1,A1)=%3EA1):A1|title=Fold API - Scala Standard Library|website=www.scala-lang.org|access-date=2018-04-10|archive-date=2021-05-06|archive-url=https://web.archive.org/web/20210506210226/https://www.scala-lang.org/api/current/scala/collection/Seq.html#fold%5BA1%3E:A%5D(z:A1)(op:(A1,A1)=%3EA1):A1}}</ref>。
+|- valign="top"
+| [[Scheme|Scheme]] R<sup>6</sup>RS
+| <code>(fold-left ''func'' ''initval'' ''list'')<br /> (vector-fold ''func'' ''initval'' ''vector'')</code>
+| <code>(fold-right ''func'' ''initval'' ''list'')<br /> (vector-fold-right ''func'' ''initval'' ''vector'')</code>
+| <code>(reduce-left ''func'' ''defaultval'' ''list'')</code>
+| <code>(reduce-right ''func'' ''defaultval'' ''list'')</code>
+|
+| srfi/1 srfi/43
+|- valign="top"
+| [[Smalltalk|Smalltalk]]
+| <code>''aCollection'' inject: ''aValue'' into: ''aBlock''</code>
+|
+| <code>''aCollection'' reduce: ''aBlock''</code>
+|
+|
+| ANSI Smalltalk不定义#reduce: 但是很多实现定义了。
+|- valign="top"
+| [[Standard_ML|Standard ML]]
+| <code>foldl ''func'' ''initval'' ''list''<br /> Array.foldl ''func'' ''initval'' ''array''</code>
+| <code>foldr ''func'' ''initval'' ''list''<br /> Array.foldr ''func'' ''initval'' ''array''</code>
+|
+|
+|
+| 提供的函数接受在元组中的实际参数。对于foldl，折叠函数接受实际参数的次序同于foldr的次序。
+|- valign="top"
+| [[Swift|Swift]]
+| <code>''array''.reduce(''initval'', ''func'')<br /> reduce(''sequence'', ''initval'', ''func'')</code>
+| <code>''array''.reverse()<wbr/>.reduce(''initval'', ''func'')</code>
+|
+|
+|
+|
+|-valign="top"
+|[[XPath|XPath]] 3.1
+|
+<code>''array'':fold-left(
+$array as array(*),
+$zero as item()*,
+$f as function(item()*, item()*) as item()*) as item()*</code><ref>[https://www.w3.org/TR/xpath-functions-31/#func-array-fold-left array:fold-left] {{Wayback|url=https://www.w3.org/TR/xpath-functions-31/#func-array-fold-left |date=20210510164729 }}(XPath and XQuery Functions and Operators 3.1)</ref>
+
+<code>fold-left(
+$seq as item()*,
+$zero as item()*,
+$f as function(item()*, item()) as item()*) as item()*</code><ref>[https://www.w3.org/TR/xpath-functions-31/#func-fold-left fold-left] {{Wayback|url=https://www.w3.org/TR/xpath-functions-31/#func-fold-left |date=20210510164729 }}(XPath and XQuery Functions and Operators 3.1)</ref>
+<br />
+|
+<code>''array'':fold-right(
+$array as array(*),
+$zero as item()*,
+$f as</code><code>function(item()*, item()*) as item()*) as item()*</code><ref>[https://www.w3.org/TR/xpath-functions-31/#func-array-fold-right array:fold-right] {{Wayback|url=https://www.w3.org/TR/xpath-functions-31/#func-array-fold-right |date=20210510164729 }}(XPath and XQuery Functions and Operators 3.1)</ref>
+
+<code>fold-right(
+$seq as item()*,
+$zero as item()*,
+$f as function(item(), item()*) as item()*) as item()*</code><ref>[https://www.w3.org/TR/xpath-functions-31/#func-fold-right fold-right] {{Wayback|url=https://www.w3.org/TR/xpath-functions-31/#func-fold-right |date=20210510164729 }}(XPath and XQuery Functions and Operators 3.1)</ref>
+|
+|
+|
+|在XPath 3.1中由于历史原因，<code>array</code>和<code>sequence</code>类型是不相容的 -- 因此需要分离给<code>array</code>和给<code>sequence</code>的<code>fold</code>函数。在签名上的不同是由于<code>array</code>项目的值可以是<code>sequence</code>，但是XPath没有<code>sequence</code>的<code>sequence</code>。
+<br />
+|- valign="top"
+| {{en-link|Xtend|}}
+| <code>''iterable''.fold(''initval'',[''func''])</code>
+| 
+| <code>''iterable''.reduce[''func'']</code>
+| 
+|
+| 
+|}
+
+==普遍性==
+折叠是[[多态_(计算机科学)|多态]]函数。对于有如下这样定义的任何<code>g</code>：
+
+<syntaxhighlight lang="haskell">
+g [] = v
+g (x:xs) = f x (g xs)
+</syntaxhighlight>
+
+<code>g</code>都可以表达为<ref>{{cite journal
+ |last= Hutton
+ |first= Graham
+ |title= A tutorial on the universality and expressiveness of fold
+ |journal= Journal of Functional Programming
+ |issue= 9 (4)
+ |pages= 355–372
+ |url= http://www.cs.nott.ac.uk/~gmh/fold.pdf
+ |access-date= March 26, 2009
+ |archive-date= 2015-02-13
+ |archive-url= https://web.archive.org/web/20150213051446/http://www.cs.nott.ac.uk/~gmh/fold.pdf
+ }}</ref>：
+<syntaxhighlight lang="haskell">
+g = foldr f v
+</syntaxhighlight>
+
+还有，[[不动点组合子|不动点组合子]]可以通过折叠实现<ref>{{cite journal
+ |last= Pope
+ |first= Bernie
+ |title= Getting a Fix from the Right Fold
+ |journal= The Monad.Reader
+ |issue= 6
+ |pages= 5–16
+ |url= http://www.haskell.org/wikiupload/1/14/TMR-Issue6.pdf
+ |access-date= May 1, 2011
+ |archive-date= 2014-08-28
+ |archive-url= https://web.archive.org/web/20140828010644/http://www.haskell.org/wikiupload/1/14/TMR-Issue6.pdf
+ }}</ref>，证明迭代可以被归约成折叠：
+<syntaxhighlight lang="haskell">
+y f = foldr (\_ -> f) undefined (repeat undefined)
+</syntaxhighlight>
+
+==参见==
+* {{en-link|聚集函数|Aggregate function}}
+* {{en-link|迭代二元关系|Iterated binary operation}}
+* [[Map_(高阶函数)|Map (高阶函数)]]
+* [[Filter_(高阶函数)|Filter (高阶函数)]]
+* {{en-link|前缀和|Prefix sum}}
+* [[递归数据类型|递归数据类型]]
+* {{en-link|递归算子|Reduction Operator}}
+* [[递归_(计算机科学)|递归 (计算机科学)]]
+
+==引用==
+{{Reflist|2}}
+
+==外部链接==
+* [http://www.cantab.net/users/antoni.diller/haskell/units/unit06.html "Unit 6: The Higher-order fold Functions"] {{Wayback|url=http://www.cantab.net/users/antoni.diller/haskell/units/unit06.html |date=20210506160604 }}
+* [https://wiki.haskell.org/Fold HaskellWiki: Fold] {{Wayback|url=https://wiki.haskell.org/Fold |date=20201112002850 }}
+
+[[Category:高阶函数|Category:高阶函数]]
+[[Category:递归|Category:递归]]
+[[Category:编程语言比较|Category:编程语言比较]]
+[[Category:编程中的迭代|Category:编程中的迭代]]

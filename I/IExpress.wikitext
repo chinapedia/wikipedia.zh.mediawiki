@@ -1,0 +1,26 @@
+'''IExpress'''是[[Windows_2000|Windows 2000]]和更高版本的操作系统的组件，用于从一组文件中创建自解压缩程序包。此类软件包可用于安装软件。
+
+== 概述 ==
+IExpress（<code>IEXPRESS.EXE</code>）可用于将自包含的安装程序包（基于INF的安装可执行文件）分发到多台本地或远程Windows计算机。它使用提供的前端界面（IExpress向导）或自定义的自我提取指令（SED）文件创建自解压缩的可执行文件（.EXE）或压缩的Cabinet（.CAB）文件。<ref>{{Cite web|title=SED Overview|url=http://www.mdgx.com/INF_web/cdfinfo.htm|accessdate=2020-07-12|work=www.mdgx.com|archive-date=2018-02-06|archive-url=https://web.archive.org/web/20180206073511/http://www.mdgx.com/INF_web/cdfinfo.htm|dead-url=no}}</ref> 可以使用任何纯文本/ [[ASCII|ASCII]]编辑器（例如[[記事本|Notepad]]）修改SED文件。由IExpress创建的所有自解压缩文件均使用[[CAB|CAB]]压缩算法，使用MakeCab（<code>MAKECAB.EXE</code>）工具压缩 ，并使用WExtract（<code>WEXTRACT.EXE</code>）工具提取。  <code>IEXPRESS.EXE</code>位于Windows<code>SYSTEM32</code>的32位和64位安装文件夹中。可以通过手动导航到相应目录并打开可执行文件（IExpress.exe）或在“开始”菜单的“运行”窗口中键入IExpress来启动前端界面（IExpress向导）。也可以从命令行（Windows命令提示符或批处理文件）中使用它来创建自定义安装程序包，这些程序包将会自动操作：
+
+<code>IEXPRESS /N drive_letter:\directory_name\file_name.SED</code>
+
+IExpress向导界面指导用户完成创建自解压程序包的过程。它询问程序包应该做什么，提取文件然后运行程序，或者仅提取文件。然后，它允许用户为程序包指定标题，添加确认提示，添加最终用户必须接受以允许提取的许可协议，选择要归档的文件，为进度窗口设置显示选项，以及最后指定要在完成时显示的消息。
+
+如果选择了创建归档文件并运行程序的选项，则将有一个附加步骤，提示用户选择要在提取时运行的程序。
+
+IExpress将根据操作系统类型（32或64位）创建相应的自解压缩存档，而且64位将无法在32位计算机上运行解压缩。<ref>{{Cite web|title=macos - Installing IIS Express 32-bit on a 64-bit operating system using MAC Parallels Windows 7|url=https://stackoverflow.com/questions/25104343/installing-iis-express-32-bit-on-a-64-bit-operating-system-using-mac-parallels-w|accessdate=2020-07-12|work=Stack Overflow|archive-date=2016-03-12|archive-url=https://web.archive.org/web/20160312022444/http://stackoverflow.com/questions/25104343/installing-iis-express-32-bit-on-a-64-bit-operating-system-using-mac-parallels-w|dead-url=no}}</ref>
+
+== 安全性 ==
+使用IExpress创建的自解压程序包具有（固有的）漏洞，由于处理安装命令和命令行处理的方式，它们允许任意代码的执行。<ref>{{Cite web|title=Command-line switches for IExpress software update packages|url=https://web.archive.org/web/20160824110237/https://support.microsoft.com/en-us/kb/197147|accessdate=2020-07-12|date=2016-08-24|work=web.archive.org}}</ref> <ref>{{Cite web|title=IExpress 向导命令行选项（适用于 IT 专业人员的 Internet Explorer 管理工具包 11） - Internet Explorer|url=https://docs.microsoft.com/zh-cn/internet-explorer/ie11-ieak/iexpress-command-line-options|accessdate=2020-07-12|last=Dansimp|work=docs.microsoft.com|language=zh-cn|archive-date=2020-07-15|archive-url=https://web.archive.org/web/20200715011008/https://docs.microsoft.com/zh-cn/internet-explorer/ie11-ieak/iexpress-command-line-options|dead-url=no}}</ref> 此外，由于Windows 用户帐户控制处理安装程序的方式，这些漏洞允许[[特权提升|特权提升]]。<ref name=":0">{{Cite web|title=Full Disclosure: Defense in depth -- the Microsoft way (part 11): privilege escalation for dummies|url=https://seclists.org/fulldisclosure/2013/Oct/5|accessdate=2020-07-12|work=seclists.org|archive-date=2019-04-10|archive-url=https://web.archive.org/web/20190410155009/https://seclists.org/fulldisclosure/2013/Oct/5|dead-url=no}}</ref><ref name=":1">{{Cite web|title=Full Disclosure: Defense in depth -- the Microsoft way (part 32): yet another (trivial) UAC bypass resp. privilege escalation|url=https://seclists.org/fulldisclosure/2015/Sep/21|accessdate=2020-07-12|work=seclists.org|archive-date=2019-08-08|archive-url=https://web.archive.org/web/20190808151551/https://seclists.org/fulldisclosure/2015/Sep/21|dead-url=no}}</ref>
+
+更具体地说，此漏洞有两个版本：最明显的是<code>/c:</code>开关告诉软件包在提取的目录中运行任意命令；另一个是该目录对于任何普通用户都是可预测的和可写的，因此<code>msiexec.exe</code>可以用攻击有效载荷代替常用命令。<ref name=":0" /> 后者已由[[微软|Microsoft]]在MS14-049中修复，但是仅通过弃用IExpress的策略解决了前者。<ref name=":1" /> 此外，IExpress还可能存在[[动态链接库|DLL]]劫持漏洞。<ref>{{Cite web|title=Microsoft IExpress DLL Hijacking ≈ Packet Storm|url=https://packetstormsecurity.com/files/135252/Microsoft-IExpress-DLL-Hijacking.html|accessdate=2020-07-12|work=packetstormsecurity.com|archive-date=2020-07-12|archive-url=https://web.archive.org/web/20200712112114/https://packetstormsecurity.com/files/135252/Microsoft-IExpress-DLL-Hijacking.html|dead-url=no}}</ref>
+
+== 参考资料 ==
+
+<references />
+
+{{-}}
+{{Windows Components}}
+
+[[Category:安裝軟體|Category:安裝軟體]]

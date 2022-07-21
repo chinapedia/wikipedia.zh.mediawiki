@@ -1,0 +1,104 @@
+{{Refimprove|time=2021-03-16T04:01:35+00:00}}
+{{noteTA
+|G1=IT
+}}
+{{lowercase}}
+{{Infobox software
+| name                   = tail
+| logo                   = 
+| screenshot             = 
+| screenshot size        = 
+| caption                = 
+| author                 = 
+| developer              = 多個[[开放源码|开放源码]]和[[商业|商业]]开发者
+| latest release version = 
+| latest release date    = 
+| operating system       = [[Unix|Unix]], [[Unix-like|Unix-like]], [[Plan_9_from_Bell_Labs|Plan 9]], [[Inferno_(operating_system)|Inferno]], [[MSX-DOS|MSX-DOS]], [[FreeDOS|FreeDOS]]
+| platform               = [[跨平臺|跨平臺]]
+| genre                  = [[指令_(電腦)|指令]]
+| license                = Plan 9: [[Lucent_Public_License|Lucent Public License]] or [[GNU_General_Public_License|GPLv2]]<br />[[coreutils|coreutils]]: [[GPLv3+|GPLv3+]]
+| website                = 
+}}
+'''tail'''是[[Unix|Unix]]、[[类Unix系统|类Unix系统]]、[[FreeDOS|FreeDOS]]和[[MSX-DOS|MSX-DOS]]上的一个程序，用于显示文本文件或管道数据的尾部。
+
+== 實作 ==
+FreeDOS版本是由M.Aitchison开发的。<ref>{{Cite web|url=http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/1.2/repos/pkg-html/tail.html|title=ibiblio.org FreeDOS Package -- tail (Unix-like)|website=www.ibiblio.org|language=en|access-date=2021-03-16|archive-date=2019-03-02|archive-url=https://web.archive.org/web/20190302104106/http://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/1.2/repos/pkg-html/tail.html}}</ref>
+
+<code>tail</code>命令也是[[ASCII|ASCII]]的MSX-DOS版本2的MSX-DOS2工具的一部分。<ref>{{Cite web|url=http://archive.org/details/MSXDOS2TOOLS|title=MSX-DOS2 Tools User's Manual - MSX-DOS2 TOOLS ユーザーズマニュアル|date=April 1, 1993|via=Internet Archive|language = jp}}</ref>
+<!-- CCZE is tail-like while displaying its output in color.<ref>{{Cite web|url=http://freshmeat.sourceforge.net/projects/ccze/|title=CCZE|website=freshmeat.sourceforge.net|language = en}}</ref> --><!-- IDK how to translate -->
+
+<code>pctail</code>是使用[[Python|Python]]編寫的，可以对syslog的尾部进行着色並輸出。<ref>{{Cite web|url=https://sourceforge.net/projects/pctail/|title=pctail|website=SourceForge|language=en|access-date=2021-03-16|archive-date=2021-02-04|archive-url=https://web.archive.org/web/20210204235847/https://sourceforge.net/projects/pctail/}}</ref>
+<!-- Inotail is a deprecated implementation of inotify kernel interface. The early implementation of tail polled every second to see if new data can be displayed, as tail implemented inotifiy kernel interface Inotail become deprecated and it is not longer maintained. Inotail used the Linux kernel's inotify-interface introduced in version 2.6.13 on August 2005 so that it only checks for new data when there really is some.<ref>{{Cite web|url=https://distanz.ch/inotail/|title=distanz.ch - inotail|website=distanz.ch|language = en}}</ref> --><!-- IDK how to translate -->
+
+MultiTail不仅可以用颜色显示日志文件，还可以对一个终端窗口进行合并、过滤、回滚和分割成子窗口<ref name="Kalsi2016">{{cite book|last1=Kalsi|first1=Tajinder|title=Practical Linux Security Cookbook|date=2016|publisher=Packt Publishing Ltd|isbn=9781785285301|pages=234–236|url=https://books.google.com/books?id=T_7fDAAAQBAJ&q=%22MultiTail%22|access-date=22 September 2017|language=en}}</ref>，它多少是tail、sed、watch、CCZE/pctail、grep、diff、Beeper等的组合。
+
+== 用法 ==
+命令语法是：
+<pre>
+tail [options] <filename>
+</pre>
+默认情况下，tail会将其输入的最后10行输出到[[标准输出|标准输出]]。通过命令行选项，可以改变输出量和单位（行、块或字节）。
+<pre>
+> tail -n1 report-13*
+==> report-1301 <==
+Total tons output for month of January '13 was 523
+
+==> report-1302 <==
+Total tons output for month of February '13 was 272
+
+==> report-1303 <==
+Total tons output for month of March '13 was 623
+</pre>
+这个例子输出了报告的最后4个字符，並使用<code>--slient</code>禁止了文件名的顯示。请注意，计数包括每行末尾的换行符，因此输出的结果并不包括预期的前导空格。
+<pre>
+> tail --silent -c4 report*
+523
+272
+623
+</pre>
+这个例子显示了从第二行开始的所有行。
+<syntaxhighlight lang="bash">
+tail -n +2 report
+</syntaxhighlight>
+使用旧的语法（在[[Sun_Solaris|Sun Solaris]]的旧版本中仍然使用，因为不支持<code>-n</code>选项），最后20行和最后50个字节的文件名可以用以下命令显示。
+<syntaxhighlight lang="bash">
+tail -20 filename
+tail -50c filename
+</syntaxhighlight>
+然而这种语法现在已经过时了，不符合POSIX 1003.1-2001标准。即使在当前的版本中仍然支持，当与其他选项（如 <code>-f</code>，见下文）一起使用时，这些选项可能根本无法工作。
+
+与所有的Unix命令一样，使用系统上的[[手册页|手册页]]来获取特定的选项和操作。
+
+== 文件监控 ==
+tail有两个特殊的命令行选项：「-f」和「-F」(follow)，允许监视一个文件。tail不是只显示最后几行然后退出，而是显示这些行，然后监视文件。当其他进程向文件中添加新行时，tail会更新显示。这对于监控日志文件特别有用。古老版本的tail默认每秒钟轮询一次文件，但[[GNU_coreutils|GNU coreutils]] 7.5版本的尾巴支持2005年8月[[Linux内核|Linux内核]]2.6.13版本中引入的inotify基础架构，只有当内核通知文件发生变化时才会检查文件。
+
+下面的命令将显示最后10行信息，并在信息中添加新行时追加新行。
+<syntaxhighlight lang="bash">
+tail -f /var/adm/messages
+</syntaxhighlight>
+为了保持跟踪日志，即使它被重新创建、重命名或作为日志轮换的一部分被删除，至少BSD和GNU的实现提供了一个-F选项，这在用户跟踪一个会轮换的日志文件时很有用。
+<syntaxhighlight lang="bash">
+tail -F /var/adm/messages
+</syntaxhighlight>
+要在tail监控时中断它，用<code>Ctrl+C</code>中斷。
+
+有一个[[GNU_Emacs|GNU Emacs]]的模式可以模拟<code>tail -f</code>的功能，称为auto-revert-tail-mode。
+
+== 參見 ==
+*[[head_(Unix)|head (Unix)]]
+*[[less_(Unix)|less (Unix)]]
+*[[Unix指令列表|Unix指令列表]]
+
+== 參考來源 ==
+{{Reflist}}
+
+== 外部鏈接 ==
+{{Wikibooks|Guide to Unix|Commands}}
+* [https://www.gnu.org/software/coreutils/manual/html_node/tail-invocation.html GNU Project documentation for tail] {{Wayback|url=https://www.gnu.org/software/coreutils/manual/html_node/tail-invocation.html |date=20210427073618 }}
+* {{man|1|tail|FreeBSD}}
+* {{man|1|tail|Plan 9}}
+
+{{Unix commands}}
+
+[[Category:Unix_SUS2008实用工具|Category:Unix SUS2008实用工具]]
+[[Category:Unix文字处理实用工具|Category:Unix文字处理实用工具]]

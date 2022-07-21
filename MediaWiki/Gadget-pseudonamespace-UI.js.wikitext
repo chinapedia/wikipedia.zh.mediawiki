@@ -1,0 +1,76 @@
+(function($, mw) {
+	//偽命名空間的討論頁亦需要提示。
+	if (mw.config.get('wgNamespaceNumber') !== 0 && mw.config.get('wgNamespaceNumber') !== 1) return;
+	//等待DOM加載完成
+	$(function() {
+		//判斷語言，若設定為非中文，以英文顯示
+		var wgULS2 = function(english, zh_hans, zh_hant) {
+						if (mw.config.get('wgUserLanguage').indexOf('zh') !== 0) return english;
+						return (wgULS(zh_hans, zh_hant))
+					};
+		//偽命名空間表
+		var pseudoNS_list = {
+					MOS: wgULS2('Shortcut of Manual of style', '格式手册快捷方式', '格式手冊捷徑'),
+					LTA: wgULS2('Shortcut of Long-term abuse', '持续出没的破坏者快捷方式', '持續出沒的破壞者捷徑'),
+					NC: wgULS2('Shortcut of Naming Conventions', '命名常规快捷方式', '命名常規捷徑'),
+					NT: wgULS2('Shortcut of Notability Guidelines', '关注度指引快捷方式', '關注度指引捷徑')
+				},
+			pseudoNS_tips = wgULS2('(Pseudo namespace)', '（伪命名空间）', '（偽命名空間）'),
+			pseudoNS_name = wgULS2('Pseudo namespace', '伪命名空间', '偽命名空間');
+		var ns = (function(test) {
+					return test.length > 1 ? test[0] : ''
+				})(mw.config.get('wgPageName').replace(/[_\s]talk/i, '').replace(/talk:/i, '').split(':'));
+		var newregexp = function(test) {
+					return new RegExp(test.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'), 'ig')
+				};
+		var user_skin = mw.config.get('skin');
+		//依據皮膚偵測NS Tab
+		if (pseudoNS_list.hasOwnProperty(ns)) {
+			var nstab = (function() {
+						var parent_ele, child_ele;
+						var NSTab_selector = {
+									minerva: '.minerva__tab-container',
+									modern: 'div.pBody>ul>li',
+									monobook: 'div.pBody>ul>li',
+									timeless: 'div.mw-portlet-body>ul>li',
+									vector: '.vector-menu-content-list>li'
+								};
+						switch (user_skin) {
+						case 'minerva':
+							parent_ele = $(NSTab_selector[user_skin]);
+							child_ele = parent_ele.children().first();
+							break;
+						case 'modern':
+						case 'monobook':
+						case 'timeless':
+						case 'vector':
+							child_ele = $(NSTab_selector[user_skin]).filter(function() {
+								return this.id.match(/nstab/i);
+							}).first();
+							parent_ele = child_ele.closest('ul');
+							break;
+						}
+						return {
+							parent: parent_ele,
+							child: child_ele
+						};
+					})();
+			//顯示偽命名空間種類於NS Tab
+			if (nstab.parent && nstab.parent.length > 0) nstab.parent.html(nstab.parent.html().replace(newregexp(nstab.child.text()), pseudoNS_list[ns.toUpperCase()]));
+			//提示文字選擇器
+			var tips_selector = ({
+						minerva: '#section_0',
+						modern: '#mw_header',
+						monobook: '#firstHeading',
+						timeless: '#firstHeading',
+						vector: '#firstHeading'
+					})[user_skin];
+			//link to [[WP:PNS+|WP:PNS+]]
+			$('.mw-indicators').append($('<div class="mw-indicator">').append($('<a>').append($('<img>').attr('src', '/w/resources/src/mediawiki.helplink/images/helpNotice.svg').css('padding-right', '0.25em')).append(pseudoNS_name).attr('href', '../wiki/WP:PNS%2B')));
+			//顯示偽造命名空間於頁面資訊
+			$('<tr><td>' + pseudoNS_name + '</td><td>' + ns + ' (' + pseudoNS_list[ns] + ')</td></tr>').insertAfter('#mw-pageinfo-length');
+			//非處空式的設備上顯示提示文字，並避免與POPUP小工具衝突
+			if (!('ontouchstart' in document.documentElement)) $(tips_selector).html($(tips_selector).html().replace(ns.toUpperCase() + ':', $('<abbr>' + ns.toUpperCase() + ':</abbr>').attr('title', pseudoNS_list[ns.toUpperCase()] + ' ' + pseudoNS_tips)[0].outerHTML));
+		}
+	})
+})(jQuery, mw);

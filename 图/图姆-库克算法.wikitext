@@ -1,0 +1,369 @@
+{{Expert needed|subject=数学|time=2020-12-31T08:24:46+00:00}}
+'''图姆-库克算法'''（{{lang-en|Toom–Cook}}），有时也被称为'''Toom-3算法'''，由[[安德鲁·图姆|安德鲁·图姆]]命名，他提出了这种算法的基本原理，而[[斯蒂芬·库克|斯蒂芬·库克]]则最先用简洁的形式描述并改进了这种算法，将其作为大整数的[[乘法算法|乘法算法]]。
+
+图姆-库克算法的原理是：对于给定的两个大整数<math>a</math>和<math>b</math> ，将<math>a</math>和<math>b</math>分成<math>k</math>个较小的部分，每个部分的长度为<math>l</math> ，并对这些部分执行运算。随着<math>k</math>的增长，可以组合许多乘法子运算，从而降低算法的整体复杂度，然后再次使用图姆-库克算法递归计算乘法子运算，依此类推。Toom-3和图姆-库克两个术语有时会被错误的混用，但事实上Toom-3只是图姆-库克算法在<math>k = 3</math>时的特例。
+
+Toom-3将9次乘法降低至仅需5次，使其在<math>\Theta(n^{\log(5)/\log(3)}) \approx \Theta(n^{1.46})</math>的时间里运行。通常，Toom-<math>k</math>的时间复杂度为<math>\Theta(c(k)n^e)</math> ，其中<math>e = \log(2k - 1) / \log(k)</math>。<math>n^e</math>是在乘法子运算上花费的时间，<math>c</math>则是花费在对小常数进行的加法和乘法运算上的时间<ref name="Knuth, p. 296">Knuth, p. 296</ref>。著名的[[Karatsuba算法|Karatsuba算法]]实际上是图姆-库克算法的特例，在Karatsuba算法中，原始乘数被拆分成两个较小的数，而原本的4次乘法运算缩减为3次，使之在<math>\Theta(n^{\log(3)/\log(2)}) \approx \Theta(n^{1.58})</math>的时间内完成运算。Toom-1等价于普通的长乘法，具有<math>\Theta(n^2)</math>的复杂度。
+
+尽管可以通过增加<math>k</math>来使指数<math>e</math>任意接近1，但函数<math>c</math>增长速度非常快<ref name="Knuth, p. 296"/><ref>Crandall & Pomerance, p. 474</ref>。混合级别图姆-库克算法的增长率直到2005年仍然是一个广为研究的开放性问题<ref>Crandall & Pomerance, p. 536</ref>。根据[[高德纳|高德纳]]所描述算法的一种实现，其复杂度可降低至<math>\Theta(n 2^{\sqrt{2 \log n}} \log n)</math><ref>Knuth, p. 302</ref>。
+
+由于工作时的开销，当乘数包括较小的数时，图姆-库克算法会比长乘法更慢，因此它适用于中等规模的乘法。对于更大规模的数据，则有渐进更快的[[Schönhage-Strassen演算法|史恩哈格·施特拉森算法]]（复杂度为<math>\Theta(n \log n \log \log n)</math>）。
+
+这一算法由安德鲁·图姆1963年首次描述，并在斯蒂芬·库克1966年的博士学位论文中得到渐进等效的改进<ref>[http：//cr.yp.to/bib/1966/cook.html Positive Results], chapter III of Stephen A. Cook: ''On the Minimum Computation Time of Functions''.</ref>。
+
+== 细节 ==
+
+本节将讨论对于任意给定 <math>k</math> 值， Toom-<math>k</math>究竟是如何运作的，这是[[马可·波德拉托|马可·波德拉托]]对图姆-库克多项式乘法的简化描述<ref name="Bodrato2007">Marco Bodrato. Towards Optimal Toom-Cook Algorithms for Univariate and Multivariate Polynomials in Characteristic 2 and 0. In ''WAIFI'07 proceedings'', volume 4547 of LNCS, pages 116–133. June 21–22, 2007. [http：//bodrato.it/papers/#WAIFI2007 author website]</ref>。这个算法包括五个主要步骤：
+
+# [[#拆分|拆分]]
+# [[#求值|求值]]
+# [[#点乘|点乘]]
+# [[#插值|插值]]
+# [[#重组|重组]]
+
+在典型的大整数实现中，每个整数都表示为<math>b</math>进制的数字序列（<math>b</math>通常取较大的数）。在此示例中，<math>b = 10000</math>，因此每个数字序列对应一组十进制数字（在实践中，<math>b</math>通常取<math>2</math>的幂）。设要相乘的两个大整数<math>m</math> 、 <math>n</math>分别是：
+
+:{|
+| <math>m</math> || = || <math>12</math> || <math>3456</math> || <math>7890</math> || <math>1234</math> || <math>5678</math> || <math>9012</math> 
+|-
+| <math>n</math>  || =
+|align=right| <math>9</math> || <math>8765</math> || <math>4321</math> || <math>9876</math> || <math>5432</math> || <math>1098</math> 
+|}
+
+这对乘数实际上比图姆-库克算法通常要处理的数据小很多，在此使用学校里学习的普通乘法可能会更快，但这个示例仍有助于说明图姆-库克算法的工作原理。
+
+=== 拆分 ===
+
+第一步是选择基数<math>B = b^i</math>，使得两个数字<math>m</math>和<math>n</math>可以分成<math>k</math>段大小不超过<math>B</math>的数字（例如在Toom-3算法中，拆分段数应至多为3）。<math>i</math>常常根据如下公式求得：
+
+: <math>i = \max\left\{\left\lfloor\frac{\left\lfloor\log_b m\right\rfloor}{k}\right\rfloor, \left\lfloor\frac{\left\lfloor\log_b n\right\rfloor}{k}\right\rfloor\right\} + 1.</math> 
+
+我们的示例将演绎Toom-3算法的运算过程，因此确定<math>B = b^2 = 10^8</math>，接着把<math>m</math>和<math>n</math>拆分为3段，即<math>m_i</math>和<math>n_i</math>，则有：
+
+: <math>
+\begin{align}
+m_2 & {} = 123456 \\
+m_1 & {} = 78901234 \\
+m_0 & {} = 56789012 \\
+n_2 & {} = 98765 \\
+n_1 & {} = 43219876 \\
+n_0 & {} = 54321098
+\end{align}
+</math> 
+
+然后，我们把这些数作为<math>(k - 1)</math>阶多项式<math>p</math>和<math>q</math>的系数，with the property that  <math>p(B) = m</math>  and  <math>q(B) = n</math>：
+
+: <math>p(x) = m_2x^2 + m_1x + m_0 = 123456x^2 + 78901234x + 56789012 \, </math> 
+: <math>q(x) = n_2x^2 + n_1x + n_0 = 98765x^2 + 43219876x + 54321098 \, </math> 
+
+定义这些多项式的目的在于：如果计算出它们的乘积<math>r(x) = p(x)q(x)</math>，我们的答案就会是<math>r(B) = m \times n</math>。
+
+如果乘数位数不同，对于<math>m</math>、<math>n</math>分别取不同的<math>k</math>值十分有用，我们将其称为<math>k_m</math>和<math>k_n</math>。例如，算法“Toom-2.5”是指<math>k_m = 3</math>且<math>k_n = 2</math>时的图姆-库克算法。这时<math>B = b^i</math>中的<math>i</math>通常被确定为：
+
+: <math>i = \max\left\{\left\lfloor\frac{\left\lceil\log_b m\right\rceil}{k_m}\right\rfloor, \left\lfloor\frac{\left\lceil\log_b n\right\rceil}{k_n}\right\rfloor\right\}.</math> 
+
+=== 求值 ===
+图姆-库克算法包含一种常用的方法，来计算多项式<math>p(x)</math>、<math>q(x)</math>的乘积。注意，次数为<math>d</math>的多项式可以通过<math>d + 1</math>个空间中的点确定（例如一次多项式是一条直线，它由两个点确定）。这个方法是在各个点上求值<math>p(\cdot)</math>和<math>q(\cdot)</math>，然后把这些点相乘以获得多项式乘积上的点，最后进行插值以找到其系数。
+
+由于<math>\deg(pq) = \deg(p) + \deg(q)</math>，我们将需要<math>\deg(p) + \deg(q) + 1 = k_m + k_n - 1</math>个点来确定最终结果<math>d</math>。在Toom-3的情况下，<math>d = 5</math>。无论选择什么点，该算法都可以工作（有一些小例外，请参阅[[#插值|插值]]中的矩阵可逆性约束），但为了简化算法，最好选择较小的整数值，例如<math>0</math> 、<math>1</math> 、<math>-1</math>和<math>-2</math>。
+
+无穷大是一个常被使用的不寻常点，其记作<math>\infty</math>或<math>1/0</math>。求多项式<math>p</math>在无穷大时的值，实际上意味着令<math>p(x) / x^{\deg p}</math>的上限为<math>x</math> 且趋向无穷大。因此，<math>p(\infty)</math>总是其高阶系数的值（<math>m_2</math>是上文中的系数）。
+
+在我们的Toom-3示例中，我们将使用点<math>0</math> 、 <math>1</math> 、 <math>-1</math> 、 <math>-2</math>和<math>\infty</math>，这些选择简化了求值，如下式子：
+
+: <math>
+\begin{array}{lrlrl}
+p(0) & = & m_0 + m_1(0) + m_2(0)^2 & = & m_0 \\
+p(1) & = & m_0 + m_1(1) + m_2(1)^2 & = & m_0 + m_1 + m_2 \\
+p(-1) & = & m_0 + m_1(-1) + m_2(-1)^2 & = & m_0 - m_1 + m_2 \\
+p(-2) & = & m_0 + m_1(-2) + m_2(-2)^2 & = & m_0 - 2m_1 + 4m_2 \\
+p(\infty) & = & m_2 & &
+\end{array}
+</math> 
+
+对于<math>q</math>也是如此。在示例中，我们得到的值是：
+
+:{|
+|-
+| <math>p(0)</math>  || = ||  <math>m_0</math>  || = ||  <math>56789012</math>  || = ||align="right"|  <math>56789012</math> 
+|-
+| <math>p(1)</math>  || = ||  <math>m_0 + m_1 + m_2</math>  || = ||  <math>56789012 + 78901234 + 123456</math>  || = ||align="right"|  <math>135813702</math> 
+|-
+| <math>p(-1)</math>  || = ||  <math>m_0 - m_1 + m_2</math>  || = ||  <math>56789012 - 78901234 + 123456</math>  || = ||align="right"|  <math>-21988766</math> 
+|-
+| <math>p(-2)</math>  || = ||  <math>m_0 - 2m_1 + 4m_2</math>  || = ||  <math>56789012 - 2 \times 78901234 + 4 \times 123456</math>  || = ||align="right"|  <math>-100519632</math> 
+|-
+| <math>p(\infty)</math>  || = ||  <math>m_2</math> || = ||  <math>123456</math>  || = ||align="right"|  <math>123456</math> 
+|-
+| <math>q(0)</math>  || = ||  <math>n_0</math>  || = ||  <math>54321098</math>  || = ||align="right"|  <math>54321098</math> 
+|-
+| <math>q(1)</math>  || = ||  <math>n_0 + n_1 + n_2</math>  || = ||  <math>54321098 + 43219876 + 98765</math>  || = ||align="right"|  <math>97639739</math> 
+|-
+| <math>q(-1)</math>  || = ||  <math>n_0 - n_1 + n_2</math>  || = ||  <math>54321098 - 43219876 + 98765</math>  || = ||align="right"|  <math>11199987</math> 
+|-
+| <math>q(-2)</math>  || = ||  <math>n_0 - 2n_1 + 4n_2</math>  || = ||  <math>54321098 - 2 \times 43219876 + 4 \times 98765</math>  || = ||align="right"|  <math>-31723594</math> 
+|-
+| <math>q(\infty)</math>  || = ||  <math>n_2</math>  || = ||  <math>98765</math>  || = ||align="right"|  <math>98765</math> .
+|}
+
+如上所示，这些值可以包括负值。
+
+为了下文的阐述，把这个求值过程视作矩阵向量乘法较为有用。其中，矩阵的每一行都包含求值点之一的幂，且向量包含多项式的系数：
+
+: <math>
+\left(\begin{matrix}p(0) \\ p(1) \\ p(-1) \\ p(-2) \\ p(\infty)\end{matrix}\right) =
+\left(\begin{matrix}
+0^0 & 0^1 & 0^2 \\
+1^0 & 1^1 & 1^2 \\
+(-1)^0 & (-1)^1 & (-1)^2 \\
+(-2)^0 & (-2)^1 & (-2)^2 \\
+0 & 0 & 1
+\end{matrix}\right)
+\left(\begin{matrix}m_0 \\ m_1 \\ m_2\end{matrix}\right) =
+\left(\begin{matrix}
+1 & 0 & 0 \\
+1 & 1 & 1 \\
+1 & -1 & 1 \\
+1 & -2 & 4 \\
+0 & 0 & 1
+\end{matrix}\right)
+\left(\begin{matrix}m_0 \\ m_1 \\ m_2\end{matrix}\right).
+</math> 
+
+The dimensions of the matrix are  <math>d</math>  by  <math>k_m</math>  for  <math>p</math>  and  <math>d</math>  by  <math>k_n</math>  for  <math>q</math>。除最后一列的 <math>1</math> 以外，无穷大的行总是<math>0</math>。
+
+==== 更快的求值 ====
+
+与上述公式相比，多点求值可能会减少基本运算（加、减）的次数，更快获得需要的结果。波德拉托<ref name="Bodrato2007"/> 为Toom-3给出的序列如下所示，它是在运行示例的第一个操作数（多项式<math>p</math>上进行的）：
+
+:{|
+|-
+| <math>p_0</math>  || <math>\leftarrow</math> ||  <math>m_0 + m_2</math>  || = ||  <math>56789012 + 123456</math>  || = ||align="right"|  <math>56912468</math> 
+|-
+| <math>p(0)</math>  || = ||  <math>m_0</math>  || = ||  <math>56789012</math>  || = ||align="right"|  <math>56789012</math> 
+|-
+| <math>p(1)</math>  || = ||  <math>p_0 + m_1</math>  || = ||  <math>56912468 + 78901234</math>  || = ||align="right"|  <math>135813702</math> 
+|-
+| <math>p(-1)</math>  || = ||  <math>p_0 - m_1</math>  || = ||  <math>56912468 - 78901234</math>  || = ||align="right"|  <math>-21988766</math> 
+|-
+| <math>p(-2)</math>  || = ||  <math>(p(-1) + m_2) \times 2 -m_0</math>  || = ||align="right"|  <math>(-21988766 + 123456 ) \times 2 - 56789012</math>  || = ||  <math>-100519632</math> 
+|-
+| <math>p(\infty)</math>  || = ||  <math>m_2</math>  || = ||  <math>123456</math>  || = ||align="right"|  <math>123456</math> 
+|}
+
+此序列需要进行五次加/减运算，比简单求值少一次，同时节省了在计算<math>p(-2)</math>时乘以<math>4</math>的开销。
+
+=== 点乘 ===
+
+与对多项式<math>p(\cdot)</math>和<math>q(\cdot)</math>所进行的乘法不同，将<math>p(a)</math> 和<math>q(a)</math>被求出的值相乘仅涉及整数相乘——这是原始问题的较小实例。我们递归调用我们的乘法过程来使每对已求值的点相乘。在实践中，随着乘数减小，算法将逐渐过渡为[[乘法算法#長乘法|教科书长乘法]]。令<math>r</math>为多项式乘积，我们将得到：
+
+:{|
+|-
+| <math>r(0)</math>  || = ||  <math>p(0)q(0)</math>  || = ||  <math>56789012 \times 54321098</math>  || = ||align="right"|  <math>3084841486175176</math> 
+|-
+| <math>r(1)</math>  || = ||  <math>p(1)q(1)</math>  || = ||  <math>135813702 \times 97639739</math>  || = ||align="right"|  <math>13260814415903778</math> 
+|-
+| <math>r(-1)</math>  || = ||  <math>p(-1)q(-1)</math>  || = ||  <math>-21988766 \times 11199987</math>  || = ||align="right"|  <math>-246273893346042</math> 
+|-
+| <math>r(-2)</math>  || = ||  <math>p(-2)q(-2)</math>  || = ||  <math>-100519632 \times -31723594</math>  || = ||align="right"|  <math>3188843994597408</math> 
+|-
+| <math>r(\infty)</math>  || = ||  <math>p(\infty)q(\infty)</math>  || = ||  <math>123456 \times 98765</math>  || = ||align="right"|  <math>12193131840</math> 
+|}
+
+如上所示，这些值也可以是负数。对于足够大的数值，这里是最昂贵的、唯一与<math>m</math>、<math>n</math>大小不成线性关系的步骤。
+
+=== 插值 ===
+
+这一步最为复杂。与求值相反：给定多项式乘积<math>r(\cdot)</math>上的<math>d</math>点，我们需要确定其系数。换句话说，我们要在右侧求解其向量的矩阵方程：
+
+: <math>
+\begin{align}
+\left(\begin{matrix}r(0) \\ r(1) \\ r(-1) \\ r(-2) \\ r(\infty)\end{matrix}\right) & {} =
+\left(\begin{matrix}
+0^0 & 0^1 & 0^2 & 0^3 & 0^4 \\
+1^0 & 1^1 & 1^2 & 1^3 & 1^4 \\
+(-1)^0 & (-1)^1 & (-1)^2 & (-1)^3 & (-1)^4 \\
+(-2)^0 & (-2)^1 & (-2)^2 & (-2)^3 & (-2)^4 \\
+0 & 0 & 0 & 0 & 1
+\end{matrix}\right)
+\left(\begin{matrix}r_0 \\ r_1 \\ r_2 \\ r_3 \\ r_4\end{matrix}\right) \\
+ & {} =
+\left(\begin{matrix}
+1 & 0 & 0 & 0 & 0 \\
+1 & 1 & 1 & 1 & 1 \\
+1 & -1 & 1 & -1 & 1 \\
+1 & -2 & 4 & -8 & 16 \\
+0 & 0 & 0 & 0 & 1
+\end{matrix}\right)
+\left(\begin{matrix}r_0 \\ r_1 \\ r_2 \\ r_3 \\ r_4\end{matrix}\right).
+\end{align}
+</math> 
+
+此矩阵的构造与求值步骤中的矩阵相同，不过它是<math>d \times d</math>的。我们可以用[[高斯消元法|高斯消元法]]来求出方程的解，但这样非常昂贵。根据以下事实：只要求值点的选择合适，这个矩阵就是可逆的。因此我们有：
+
+: <math>
+\begin{align}
+\left(\begin{matrix}r_0 \\ r_1 \\ r_2 \\ r_3 \\ r_4\end{matrix}\right) & {} =
+\left(\begin{matrix}
+1 & 0 & 0 & 0 & 0 \\
+1 & 1 & 1 & 1 & 1 \\
+1 & -1 & 1 & -1 & 1 \\
+1 & -2 & 4 & -8 & 16 \\
+0 & 0 & 0 & 0 & 1
+\end{matrix}\right)^{-1}
+\left(\begin{matrix}r(0) \\ r(1) \\ r(-1) \\ r(-2) \\ r(\infty)\end{matrix}\right) \\
+& {} =
+\left(\begin{matrix}
+ 1 & 0 & 0 & 0 & 0 \\
+ \tfrac12 & \tfrac13 & -1 & \tfrac16 & -2 \\
+ -1 & \tfrac12 & \tfrac12 & 0 & -1 \\
+-\tfrac12 & \tfrac16 & \tfrac12 & -\tfrac16 & 2 \\
+ 0 & 0 & 0 & 0 & 1
+\end{matrix}\right)
+\left(\begin{matrix}r(0) \\ r(1) \\ r(-1) \\ r(-2) \\ r(\infty)\end{matrix}\right).
+\end{align}
+</math> 
+
+接下来即要求得该矩阵的向量积。尽管矩阵中包含分数，但所得的系数却是整数——因此所有这些都可以在整数算术中完成，仅仅是与小常数进行加减乘除。图姆-库克设计时面临的一个困难挑战就是找到有效的操作顺序来计算该乘积。下面是波德拉托为Toom-3找到的一组顺序，通过上面的示例演示：
+
+:{|
+|-
+| <math>r_0</math>  ||  <math>\leftarrow</math>  ||  <math>r(0)</math>  || = ||  <math>3084841486175176</math> 
+|-
+| <math>r_4</math>  ||  <math>\leftarrow</math>  ||  <math>r(\infty)</math>  || = ||  <math>12193131840</math>  
+|-
+| <math>r_3</math>  ||  <math>\leftarrow</math>  ||  <math>(r(-2) - r(1))/3</math>  || = ||  <math>(3188843994597408 - 13260814415903778)/3</math>  
+|-
+| || || || = ||  <math>-3357323473768790</math> 
+|-
+| <math>r_1</math>  ||  <math>\leftarrow</math>  ||  <math>(r(1) - r(-1))/2</math>  || = ||  <math>(13260814415903778 - (-246273893346042))/2</math>  
+|-
+| || || || = ||  <math>6753544154624910</math> 
+|-
+| <math>r_2</math>  ||  <math>\leftarrow</math>  ||  <math>r(-1) - r(0)</math>  || = ||  <math>-246273893346042 - 3084841486175176</math>  
+|-
+| || || || = ||  <math>-3331115379521218</math> 
+|-
+| <math>r_3</math>  ||  <math>\leftarrow</math>  ||  <math>(r_2 - r_3)/2 + 2r(\infty)</math>  || = ||  <math>(-3331115379521218 - (-3357323473768790))/2 + 2 \times 12193131840</math>  
+|-
+| || || || = ||  <math>13128433387466</math> 
+|-
+| <math>r_2</math>  ||  <math>\leftarrow</math>  ||  <math>r_2 + r_1 - r_4</math>  || = ||  <math>-3331115379521218 + 6753544154624910 - 12193131840</math>  
+|-
+| || || || = ||  <math>3422416581971852</math> 
+|-
+| <math>r_1</math>  ||  <math>\leftarrow</math>  ||  <math>r_1 -r_3</math>  || = ||  <math>6753544154624910 - 13128433387466</math>  
+|-
+| || || || = ||  <math>6740415721237444.</math> 
+|}
+
+现在我们知道多项式乘积<math>r</math>：
+
+: <math>
+\begin{array}{rrr}
+r(x) = & {} & 3084841486175176 \\
+ & + & 6740415721237444x \\
+ & + & 3422416581971852x^2 \\
+ & + & 13128433387466x^3 \\
+ & + & 12193131840x^4
+\end{array}
+</math> 
+
+如果我们使用不同的<math>k_m</math>、<math>k_n</math>或求值点，矩阵和我们的插值将改变。但是它不依赖于输入，因此可以对任何给定的参数集进行硬编码。
+
+=== 重组 ===
+
+最后，我们将求出<math>r(B)</math>的值以获得最终结果。很显然，由于<math>B</math>是<math>b</math>的幂，因此对<math>B</math>的幂的乘法同样也可以应用于所有以<math>b</math>为底数的数值。在这个示例中，<math>b = 10^4</math>且<math>B = b^2 = 10^8</math>。
+
+:{|
+|-
+| || || || || || || || || <math>3084</math> || <math>8414</math> || <math>8617</math> || <math>5176</math> 
+|-
+| || || || || || || <math>6740</math> || <math>4157</math> || <math>2123</math> || <math>7444</math> || ||
+|-
+| || || || || <math>3422</math> || <math>4165</math> || <math>8197</math> || <math>1852</math> || || || ||
+|-
+| || 
+|align=right|  <math>13</math> || <math>1284</math> || <math>3338</math> || <math>7466</math> || || || || || ||
+|-
+|  <math>+</math>  || <math>121</math> || <math>9313</math> || <math>1840</math> || || || || || || || ||
+|-
+|colspan=100|<hr>
+|-
+| || <math>121</math> || <math>9326</math> || <math>3124</math> || <math>6761</math> || <math>1632</math> || <math>4937</math> || <math>6009</math> || <math>5208</math> || <math>5858</math> || <math>8617</math> || <math>5176</math> 
+|}
+
+这实际上是<math>1234567890123456789012</math>与<math>987654321987654321098</math>的乘积。
+
+== <math>k</math>在其他取值时的插值矩阵 ==
+
+这里我们给出了几种<math>k_m</math>和<math>k_n</math>取常见较小值的插值矩阵。
+
+=== Toom-1 ===
+Toom-1（<math>k_m = k_n = 1</math>）需要一个求值点，这里选择<math>0</math>。它退化为长乘法，并且使用恒等矩阵的插值矩阵。
+
+: <math>\left(\begin{matrix}1\end{matrix}\right)^{-1} = 
+\left(\begin{matrix}1\end{matrix}\right).</math> 
+
+=== Toom-1.5 ===
+Toom-1.5（<math>k_m = 2, k_n = 1</math>）需要两个求值点，这里选择<math>0</math>和<math>\infty</math>，且其插值矩阵就是恒等矩阵。
+
+: <math>\left(\begin{matrix}1 & 0 \\ 0 & 1\end{matrix}\right)^{-1} =
+\left(\begin{matrix}1 & 0 \\ 0 & 1\end{matrix}\right).</math> 
+
+这里亦退化为长乘法：一个因数的两个系数都乘以另一个因数的两个系数。
+
+=== Toom-2 ===
+Toom-2（<math>k_m = 2, k_n = 2</math>）需要三个求值点，这里选择<math>0</math>、<math>1</math>和<math>\infty</math>。它与 [[Karatsuba算法|Karatsuba 算法]]相同，其插值矩阵为：
+
+: <math>\left(\begin{matrix}
+1 & 0 & 0 \\
+1 & 1 & 1 \\
+0 & 0 & 1
+\end{matrix}\right)^{-1} =
+\left(\begin{matrix}
+1 & 0 & 0 \\
+-1 & 1 & -1 \\
+0 & 0 & 1
+\end{matrix}\right).</math> 
+
+=== Toom-2.5 ===
+Toom-2.5（<math>k_m = 3, k_n = 2</math>）需要四个求值点，这里选择<math>0</math>、<math>1</math>、<math>-1</math>和<math>\infty</math>。它的插值矩阵为：
+
+: <math>\left(\begin{matrix}
+1 & 0 & 0 & 0 \\
+1 & 1 & 1 & 1 \\
+1 & -1 & 1 & -1 \\
+0 & 0 & 0 & 1
+\end{matrix}\right)^{-1} =
+\left(\begin{matrix}
+1 & 0 & 0 & 0 \\
+0 & \tfrac12 & -\tfrac12 & -1 \\
+-1 & \tfrac12 & \tfrac12 & 0 \\
+0 & 0 & 0 & 1
+\end{matrix}\right).</math>
+
+== 另见 ==
+
+* [[乘法算法|乘法算法]]
+* [[任意精度整数|任意精度整数]]
+* [[长乘法|长乘法]]
+* [[Karatsuba算法|Karatsuba 算法]]
+* [[施特拉森算法|施特拉森算法]]
+* [[富尔算法|富尔算法]]
+
+== 参考资料 ==
+<references/>
+
+== 引用 ==
+* D. Knuth. ''[[The_Art_of_Computer_Programming|The Art of Computer Programming]]'', Volume 2. Third Edition, Addison-Wesley, 1997. Section 4.3.3.A： Digital methods, pg.294.
+* R. Crandall & C. Pomerance. ''Prime Numbers – A Computational Perspective''. Second Edition, Springer, 2005. Section 9.5.1： Karatsuba and Toom–Cook methods, pg.473.
+* M. Bodrato. ''[http://bodrato.it/toom-cook/ Toward Optimal Toom-Cook] {{Wayback|url=http://bodrato.it/toom-cook/ |date=20070706025358 }}''. In WAIFI'07, Springer, 2007.
+
+== 外部链接 ==
+{{Portal|数学}}
+* http://gmplib.org/manual/Toom-3_002dWay-Multiplication.html{{Wayback|url=http://gmplib.org/manual/Toom-3_002dWay-Multiplication.html |date=20180628233441 }}
+
+{{数论算法}}
+[[Category:计算机算术|Category:计算机算术]]
+[[Category:乘法|Category:乘法]]

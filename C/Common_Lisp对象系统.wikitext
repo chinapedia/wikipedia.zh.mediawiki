@@ -1,0 +1,129 @@
+{{noteTA
+|G1=IT
+|G2=FL
+}}
+{{Infobox programming language
+| name                   = Common Lisp Object System
+| title                  = Common Lisp对象系统
+| logo                   = <!-- Image name is enough -->
+| screenshot             = <!-- Image name is enough -->
+| paradigm               = [[面向对象编程|面向对象]]
+| developer              = ANSI {{en-link|X3J13}}委员会
+| released               = {{Start date and age|1988}}
+| discontinued           = 
+| latest release version = [[ANSI|ANSI]] [[Common_Lisp|Common Lisp]]的一部份
+| latest release date    = {{Start date and age|1994}}
+| latest preview version = 
+| latest preview date    = <!-- {{Start date and age|YYYY|MM|DD|df=yes/no}} -->
+| programming language   = [[Common_Lisp|Common Lisp]]
+| operating system       = [[跨平台|跨平台]]
+| influenced_by          = [[MIT|MIT]] {{en-link|Flavors (编程语言)|Flavors (programming language)|Flavors}}, [[Xerox|Xerox]] {{en-link|CommonLoops}}
+| influenced             = [[Dylan_(编程语言)|Dylan]], Tiny CLOS<ref name="tiny clos">{{Cite web |url=http://community.schemewiki.org/?Tiny-CLOS |title=Tiny CLOS, developed by Gregor Kiczales |access-date=2021-03-27 |archive-date=2008-12-11 |archive-url=https://web.archive.org/web/20081211190914/http://community.schemewiki.org/?tiny-clos }}</ref>, COOPS<ref name="coops">{{Cite web |url=http://wiki.call-cc.org/eggref/4/coops |title=COOPS |access-date=2021-03-27 |archive-date=2020-07-25 |archive-url=https://web.archive.org/web/20200725124051/http://wiki.call-cc.org/eggref/4/coops }}</ref>, {{en-link|STklos}}, {{en-link|Gauche|Gauche (Scheme implementation)|Gauche}}
+| license                = 
+| website                = [http://www.lispworks.com/documentation/HyperSpec/Body/07_.htm Common Lisp HyperSpec, Chapter 7: Objects]<!--One link only-->
+}}
+'''Common Lisp对象系统'''（'''CLOS'''）是一种[[面向对象编程|面向对象编程]]设施，它是[[美国国家标准协会|ANSI]] [[Common_Lisp|Common Lisp]]的一部份。CLOS是强力的[[动态编程语言|动态]]对象系统，在根本上不同于静态语言，比如[[C++|C++]]或[[Java|Java]]中的那种OOP设施。CLOS受到更早期的Lisp对象系统，比如[[MIT|MIT]] {{en-link|Flavors (编程语言)|Flavors (programming language)|Flavors}}和[[Xerox|Xerox]] {{en-link|CommonLoops}}的启发，然而它比二者要更加泛化。
+
+==历史==
+CLOS最初被提议作为一种附加件，首次出现在1988年发表的《{{en-link|Common Lisp面向对象编程|Object-Oriented Programming in Common Lisp}}》<ref>{{cite web|title=Object-Oriented Programming in Common Lisp: A Programmer's Guide to CLOS|year=1988|publisher=Addison-Wesley|ISBN=0-201-17589-4|url=https://epdf.pub/object-oriented-programming-in-common-lisp.html|author=Sonya Keene|access-date=2022-02-09|archive-date=2022-02-09|archive-url=https://web.archive.org/web/20220209204613/https://epdf.pub/object-oriented-programming-in-common-lisp.html}}</ref>，和1990年出版的《{{en-link|Common Lisp语言|Common Lisp the Language}}》第二版（也叫做CLtL2）中。在1994年，CLOS被接受为ANSI标准Common Lisp的一部份，并且已经被适配入其他Lisp方言比如{{en-link|EuLisp}}和[[Emacs_Lisp|Emacs Lisp]]之中<ref>"CLOS is a standard. Multiple vendors supply CLOS. CLOS (or parts of it) is being used to add object-orientation to other Lisp dialects such as EuLisp or Emacs Lisp." p. 110 of Veitch 1998</ref>。
+
+== 特征 ==
+CLOS的基本建造块是[[类_(计算机科学)|类]]、[[方法_(计算机科学)|方法]]、[[泛化函数|泛化函数]]和类的实例。CLOS提供了定义它们的宏：<code>defclass</code>、<code>defmethod</code>和<code>defgeneric</code>。实例通过方法<code>make-instance</code>来创建。CLOS不是[[基于原型编程|基于原型语言]]，类必须声明于对象可以实例化为这个类的成员之前。
+
+===类===
+类是槽的一个列表，它可以有多个[[继承_(计算机科学)|超类]]，和一个特定的[[元类|元类]]。槽（C++/Java用语中的成员变量），可以由类（一个类的所有实例共享这个槽）或实例来分配。每个槽都有一个名字，而一个槽的值可以使用函数<code>slot-value</code>，通过这个名字来访问。可以定义额外的特定泛化函数，来写或读这些槽的值。在CLOS类中的每个槽，都必须有一个唯一的名字。
+
+如同多数[[动态编程语言|动态语言]]中的OO系统那样，CLOS不强制[[封装_(计算机科学)|封装]]。任何槽都可以使用<code>slot-value</code>函数，或通过（可选的自动生成的）[[变异子与访问子|访问子方法]]来访问。要通过<code>slot-value</code>进行访问，就要知道这个槽的名字。CL编程者使用这个语言的[[命名空间|包]]设施，来声明哪些函数或数据结构意图被导出。
+
+CLOS允许[[多重继承|多重继承]]。在多重继承中方法执行的缺省次序不正确的时候，编程者可以通过指定方法组合的次序，来解决这种{{en-link|菱形问题|diamond problem|菱形继承问题}}（类D同时继承一个超类A的两个子类B和C，四者形成菱形，如果A的某一方法被B和C覆写，D该继承二者中哪一个？）。在CLOS中已经解决了{{en-link|圆–椭圆问题|Circle-ellipse problem}}（圆是椭圆的长轴与短轴相等的特殊情况，故而是其子类，但圆不能继承椭圆的使得其不再为圆的方法，比如单独改变长轴或短轴）。而多数OOP[[设计模式_(计算机)|设计模式]]，要么消失，要么在性质上更加简单了<ref>In the [http://norvig.com/design-patterns/ Design Patterns in Dynamic Languages] {{Wayback|url=http://norvig.com/design-patterns/ |date=20210529174601 }} slides, Peter Norvig presents his findings that 16 out of 23 design patterns taken from various textbooks are either "invisible or simpler" in Dylan or Common Lisp than in C++.</ref>。
+
+CLOS是[[动态语言|动态]]的，意味着不只是内容，它的对象的“结构”，也可以在运行时间修改。CLOS支持现场（on-the-fly）变更类定义，即使正在考虑的这个类的实例已经存在；还有通过<code>change-class</code>算子，变更一个给定实例的类成员关系。CLOS还允许在运行时间增加、重新定义和移除方法。
+
+===多分派===
+CLOS是一个[[多分派|多分派]]系统，这意味着[[方法_(计算机科学)|方法]]，可以依据它们所要求的任何或所有实际参数来指定。多数OO语言是单分派的，意味着方法只能依据第一个实际参数来指定。其他不常见特征是方法不“属于”类；类不为泛化函数或方法提供命名空间。方法是独立于类而定义的，并且它们对类的槽没有特殊的访问（比如<code>this</code>、<code>self</code>或<code>protected</code>）。
+
+在CLOS中的方法被组织入[[泛化函数|泛化函数]]。泛化函数是像函数一样可调用的一个对象，它关联着有共享的名字和参数结构的方法的一个搜集，其中每个都特定于不同的实际参数。因为Common Lisp为结构和内建数据类型（数值、字符串、字符、符号等）提供了非CLOS类，CLOS分派也工作在这些非CLOS类之上。CLOS还支持分派在个体对象之上（eql特殊化者）。CLOS缺省的不支持分派于所有Common Lisp数据类型上，比如分派不工作于完全特殊化的数组类型，或通过<code>deftype</code>介入的类型。然而多数Common Lisp实现，提供了[[元对象|元对象协议]]，它允许[[泛化函数|泛化函数]]提供特定于应用的特殊化和分派规则。例如：
+
+<syntaxhighlight lang="lisp">
+; 声明共同的实际参数结构原型
+(defgeneric f (x y))
+
+; 定义对(f integer t)的实现，这里的t匹配所有类型
+(defmethod f ((x integer) y) 1)
+
+(f 1 2.0)
+ => 1
+
+; 定义对(f integer real)的实现
+(defmethod f ((x integer) (y real)) 2)
+
+(f 1 2.0) ; 分派发生在运行时间
+ => 2 
+</syntaxhighlight>
+
+===方法组合===
+[[File:Method-combination.png|thumb]]
+在CLOS中的分派还不同于多数OO语言：
+# 给出一个实际参数列表，确定一个可应用的方法的列表。
+# 这个列表依据它们的形式参数的特殊化者（specializer）的特殊性（specificity）来排序。
+# 接着使用泛化函数所用的那个方法组合，将从这个列表选择出的那些方法组合成一个有效方法。
+# 接着用最初的实际参数调用这个有效方法。
+
+这个分派机制工作在运行时间。增加或移除方法，将导致在运行时间变更有效方法（即使在以相同实际参数调用泛化函数的时候）。变更方法组合还导致不同的有效方法。
+
+除了常规（“主要”）方法之外，还有<code>:before</code>、<code>:after</code>和<code>:around</code>这些“辅助”方法。前两个方法按照基于类层级的特定次序，分别先于或后于主要方法而调用。<code>:around</code>方法可能控制主要方法是否执行。此外，编程者可以指定沿着类层级的所有可能的主要方法，是都应当被调用，还是只调用提供最接近匹配的那个方法。
+
+“标准方法组合”提供上述的主要、之前、之后和围绕方法。还有具有其他方法类型的其他方法组合。可以定义新的（简单和复杂二者）方法组合和方法类型。
+
+== 元对象协议 ==
+在ANSI Common Lisp标准之外，有一个广泛实现的对CLOS的扩展，叫做[[元对象|元对象]][[协议_(面向对象编程)|协议]]（MOP）。MOP定义到CLOS实现基础支撑的标准接口，将类、槽描述、泛化函数和方法自身，当作[[元类|元类]]的实例，并允许定义新的元类，和修改所有CLOS行为。CLOS MOP的灵活性，预示了[[面向切面编程|面向切面编程]]，它是由同一群工程师比如{{en-link|Gregor Kiczales}}开发的。MOP通过一组协议，定义了整个对象系统的行为。这些定义是依据CLOS定义的。因此有可能通过扩展或变更已提供的CLOS系统的功能，来建立新的对象系统。1991年出版的图书《{{en-link|元对象协议的艺术|The Art of the Metaobject Protocol}}》描述了CLOS MOP的使用和实现<ref name="AMOP">{{Cite web |url=https://clos-mop.hexstreamsoft.com/ |title=The Art of the Metaobject Protocol, Chapters 5 and 6 in Hypertext |access-date=2022-02-05 |archive-date=2021-04-06 |archive-url=https://web.archive.org/web/20210406114149/https://clos-mop.hexstreamsoft.com/ }}</ref>。
+
+各种Common Lisp实现对元对象协议有稍微不同的支持。Closer计划致力于提供缺失的特征<ref>{{Cite web |url=http://common-lisp.net/project/closer/closer-mop.html |title=Closer Project: Closer to MOP |access-date=2021-03-27 |archive-date=2010-06-12 |archive-url=https://web.archive.org/web/20100612013938/http://common-lisp.net/project/closer/closer-mop.html }}</ref>。
+
+== 来自更早的基于Lisp的对象系统的影响 ==
+{{en-link|Flavors (编程语言)|Flavors (programming language)|Flavor}}<ref>Howard Cannon, [http://www.softwarepreservation.org/projects/LISP/MIT/nnnfla1-20040122.pdf Flavors: A non-hierarchical approach to object-oriented programming] {{Wayback|url=http://www.softwarepreservation.org/projects/LISP/MIT/nnnfla1-20040122.pdf |date=20220410180444 }}, Symbolics Inc., 1982</ref>（和它的后继者New Flavors），是MIT [[Lisp机器|Lisp机器]]上的对象系统。Lisp机器操作系统的很大部份和它的很多应用，使用了Flavors或New Flavors。Flavors介入了[[多重继承|多重继承]]和[[mixin|mixin]]和其他一些特征<ref>pg 46 of Thompson, C. W., Ross, K. M., Tennant, H. R., and Saenz, R. M. 1983. "Building Usable Menu-Based Natural Language Interfaces To Databases". In ''Proceedings of the 9th international Conference on Very Large Data Bases'' (October 31 – November 2, 1983). M. Schkolnick and C. Thanos, Eds. Very Large Data Bases. Morgan Kaufmann Publishers, San Francisco, CA, 43–55.</ref>。Flavors几乎废止了，尽管存在针对Common Lisp实现。Flavors使用消息传递范型。New Flavors介入了[[泛化函数|泛化函数]]。
+
+{{en-link|CommonLoops}}<ref>{{cite web|url=https://dl.acm.org/doi/pdf/10.1145/28697.28700|title=CommonLoops, Merging Lisp and Object-Oriented Programming|author=Daniel G. Bobrow, Kenneth Kahn, Gregor Kiczales, Larry Masinter, Mark Stefik, Frank Zdybel|year=1986|publisher=Portland, Oregon, United States. Pages 17–29 of the Conference on Object Oriented Programming Systems Languages and Applications|ISSN=0362-1340|access-date=2022-04-28|archive-date=2022-04-28|archive-url=https://web.archive.org/web/20220428175205/https://dl.acm.org/doi/pdf/10.1145/28697.28700}}</ref>，是Xerox {{en-link|Interlisp}}-D的LOOPS的后继者。CommonLoops是针对Common Lisp的实现。叫做可移植CommonLoops（PCL）的可移植实现，是第一个CLOS实现。PCL被广泛的移植了，并仍为很多[[Common_Lisp|Common Lisp]]实现提供CLOS实现的基础。PCL绝大部份以可移植的Common Lisp实现，而只有很少的系统依赖部份。
+
+==其他语言中的CLOS==
+
+由于CLOS的能力和表达力，还有历史上能获得到TinyCLOS，它是{{en-link|Gregor Kiczales}}为用于[[Scheme|Scheme]]而书写的简化的可移植的CLOS实现，故而类CLOS的基于MOP的对象系统，成为大多数Lisp方言实现的事实规范，还能在一些其他语言的[[面向对象编程|OOP]]设施中找到它：
+{{div col|colwidth=20em}}
+* COOPS，用在[[Chicken_(Scheme)|Chicken Scheme]]中<ref name="coops" />
+* COS，C对象系统<ref>{{Cite web|url=https://github.com/CObjectSystem/COS|title=C Object System: a framework that brings C to the level of other high level programming languages and beyond|access-date=2022-02-05|archive-date=2021-05-01|archive-url=https://web.archive.org/web/20210501145045/https://github.com/CObjectSystem/COS}}<br />[http://ldeniau.web.cern.ch/ldeniau/html/cos-oopsla09-draft.pdf COS, the C Object System] {{Wayback|url=http://ldeniau.web.cern.ch/ldeniau/html/cos-oopsla09-draft.pdf |date=20140620141819 }}</ref>
+* [[Dylan_(编程语言)|Dylan]]
+* Dynace，（很大程度上）CLOS的C实现<ref>{{Cite web |url=https://github.com/blakemcbride/Dynace |title=Dynace Object Oriented Extension To C |access-date=2021-03-27 |archive-date=2021-02-11 |archive-url=https://web.archive.org/web/20210211172643/https://github.com/blakemcbride/Dynace }}</ref>
+* EIEIO，用于[[Emacs_Lisp|Emacs Lisp]]<ref>{{Cite web |url=https://www.gnu.org/software/emacs/manual/html_mono/eieio.html |title=EIEIO |access-date=2021-03-27 |archive-date=2021-01-13 |archive-url=https://web.archive.org/web/20210113015038/https://www.gnu.org/software/emacs/manual/html_mono/eieio.html }}</ref>
+* {{en-link|Gauche|Gauche (Scheme implementation)|Gauche}}，一个具有CLOS的Scheme<ref>{{Cite web |url=http://practical-scheme.net/gauche/ |title=Gauche |access-date=2021-03-27 |archive-date=2020-11-09 |archive-url=https://web.archive.org/web/20201109030923/http://practical-scheme.net/gauche/ }}</ref>
+* GOOPS，在[[GNU_Guile|GNU Guile]]中<ref>{{Cite web |url=https://www.gnu.org/software/guile/manual/html_node/GOOPS.html#GOOPS |title=GOOPS |access-date=2021-03-27 |archive-date=2021-05-08 |archive-url=https://web.archive.org/web/20210508021245/http://www.gnu.org/software/guile/manual/html_node/GOOPS.html#GOOPS }}</ref>
+* ILOS，在[[ISLISP|ISLISP]]中
+* Meroon，Scheme中的一个对象系统<ref>{{Cite web |url=https://pages.lip6.fr/Christian.Queinnec/WWW/Meroon.html |title=Meroon |access-date=2021-03-27 |archive-date=2016-01-22 |archive-url=https://web.archive.org/web/20160122070506/https://pages.lip6.fr/Christian.Queinnec/WWW/Meroon.html }}</ref>
+* PyCLOS，为Python 3实现了CLOS风格的泛化函数<ref>[https://pypi.org/project/PyCLOS/ PyCLOS]</ref>
+* Sagittarius，一个具有CLOS的Scheme<ref>{{Cite web |url=https://ktakashi.github.io/sagittarius-ref.html |title=Sagittarius |access-date=2021-03-27 |archive-date=2020-05-03 |archive-url=https://web.archive.org/web/20200503124606/https://ktakashi.github.io/sagittarius-ref.html }}</ref>
+* SOS，用于MIT Scheme<ref>{{Cite web |url=https://www.gnu.org/software/mit-scheme/documentation/stable/mit-scheme-sos/index.html |title=sos |access-date=2021-06-13 |archive-date=2021-04-24 |archive-url=https://web.archive.org/web/20210424203848/http://www.gnu.org/software/mit-scheme/documentation/stable/mit-scheme-sos/index.html }}</ref>
+* {{en-link|STklos}}，一个具有CLOS的Scheme<ref>{{Cite web |url=http://www.stklos.net/ |title=STklos |access-date=2022-05-11 |archive-date=2021-03-04 |archive-url=https://web.archive.org/web/20210304071603/https://stklos.net/ }}</ref>
+* Swindle，在[[Racket|Racket]]中<ref>{{Cite web |url=http://docs.racket-lang.org/swindle/ |title=Swindle |access-date=2021-03-27 |archive-date=2016-12-23 |archive-url=https://web.archive.org/web/20161223221457/http://docs.racket-lang.org/swindle/ }}</ref>
+* Tiny CLOS，Gregor Kiczales开发<ref name="tiny clos" />
+* VCLOS for [[Cadence_SKILL|SKILL]]<ref>{{Cite web |url=http://www.doc.gold.ac.uk/~mas01cr/talks/2008-05-23%20Bordeaux/specializers.pdf |title=VCLOS, CLOS for Skill |access-date=2021-03-27 |archive-date=2015-09-18 |archive-url=https://web.archive.org/web/20150918221527/http://www.doc.gold.ac.uk/~mas01cr/talks/2008-05-23%20Bordeaux/specializers.pdf }}</ref>
+{{div col end}}
+
+==引用==
+{{reflist|2}}
+==延伸阅读==
+* {{cite book|chapter=A History and Description of CLOS|author=Jim Veitch|page=107–158|title=Handbook of Programming Languages, Volume IV: Functional and Logic Programming Languages|editor={{en-link|Peter H. Salus}}|year=1998 (1st edition)|publisher=Macmillan Technical Publishing|ISBN=1-57870-011-6}}
+
+==参考文献==
+* {{cite web|url=https://doc.lagout.org/programmation/Lisp/Object-Oriented%20Programming%20in%20Common%20Lisp_%20A%20Programmer%27s%20Guide%20to%20CLOS%20%5BKeene%201989-01-11%5D.pdf|title=Object-Oriented Programming in Common Lisp: A Programmer's Guide to CLOS|author=Sonya Keene|year=1988|publisher=Addison-Wesley|ISBN=0-201-17589-4|access-date=2022-02-05|archive-date=2022-05-06|archive-url=https://web.archive.org/web/20220506070546/https://doc.lagout.org/programmation/Lisp/Object-Oriented%20Programming%20in%20Common%20Lisp_%20A%20Programmer%27s%20Guide%20to%20CLOS%20%5BKeene%201989-01-11%5D.pdf}}
+* {{cite web|url=https://raw.githubusercontent.com/lisp-books/lisp-books/main/Art%20of%20Metaobject%20Protocol.pdf|title=The Art of the Metaobject Protocol|author={{en-link|Gregor Kiczales}}, Jim des Rivieres, {{en-link|Daniel G. Bobrow}}|year=1991|publisher=MIT Press|ISBN=0-262-61074-4|access-date=2022-02-05|archive-date=2022-02-05|archive-url=https://web.archive.org/web/20220205094725/https://raw.githubusercontent.com/lisp-books/lisp-books/main/Art%20of%20Metaobject%20Protocol.pdf}}
+* Jo A. Lawless and Molly M. Miller, Understanding CLOS: the Common Lisp Object System, 1991, Digital Press, {{ISBN|1-55558-064-5}}
+* {{cite web|url=https://vdoc.pub/documents/object-oriented-programming-the-clos-perspective-6cf6hnm5eg20|title=Object-Oriented Programming: the CLOS Perspective|author=Andreas Paepcke|year=1993|publisher=The MIT Press|ISBN=0-262-16136-2|access-date=2022-02-05|archive-date=2022-02-05|archive-url=https://web.archive.org/web/20220205100127/https://vdoc.pub/documents/object-oriented-programming-the-clos-perspective-6cf6hnm5eg20}}
+* [http://www.dreamsongs.com/Files/ECOOP.pdf The Common Lisp Object System: An Overview] {{Wayback|url=http://www.dreamsongs.com/Files/ECOOP.pdf |date=20210324061255 }} by {{en-link|Richard P. Gabriel}} and Linda DeMichiel provides a good introduction to the motivation for defining classes by means of generic functions.
+* [http://cl-cookbook.sourceforge.net/clos-tutorial/ Fundamentals of CLOS] {{Wayback|url=http://cl-cookbook.sourceforge.net/clos-tutorial/ |date=20140610114656 }} by Nick Levine provides a step-by-step exposure to the implementation of OO concepts in CLOS, and how to utilize them. It is intended for anybody with a basic knowledge of Lisp or Scheme.
+* {{en-link|Common Lisp HyperSpec}}, [http://www.lispworks.com/documentation/HyperSpec/Body/07_.htm Chapter 7: Objects] {{Wayback|url=http://www.lispworks.com/documentation/HyperSpec/Body/07_.htm |date=20210425155557 }}
+
+{{Lisp programming language}}
+{{程序设计语言}}
+
+[[Category:Common_Lisp|Category:Common Lisp]]
+[[Category:LISP程式語言|Category:LISP程式語言]]
+[[Category:面向对象的程序设计|Category:面向对象的程序设计]]

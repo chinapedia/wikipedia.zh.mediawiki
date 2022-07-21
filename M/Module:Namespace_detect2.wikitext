@@ -1,0 +1,63 @@
+local p = {}
+local mNS = require('Module:Namespace')
+local mError = require('Module:Error')
+local yesno = require('Module:Yesno')
+
+local function inArray (str, arr)
+	for i, v in ipairs(arr) do
+		if str == v then
+			return v
+		end
+	end
+	return nil
+end
+
+function p.main (frame)
+	local ns
+	local demospace
+	local subjectns
+	local CanOutputTalkValue
+	local uselist = {}
+	local args = require('Module:Arguments').getArgs(frame)
+	for key, value in pairs(args) do
+		local isNS = mNS.isNamespace(key)
+		if isNS then
+			if tostring(key):lower() == 'talk' then
+				isNS = 'talk'
+			end
+			if not uselist[isNS] then
+				uselist[isNS] = value
+			else
+				local warnmsg = '警告：命名空間<code>' .. (type(isNS) == 'number' and mNS.NamespacesDisplay('', isNS) or isNS) .. '</code>已被寫入過，無法再次寫入！'
+				mw.log(warnmsg)
+				mw.addWarning(mError.error(warnmsg))
+			end
+		elseif tostring(key):lower() == 'other' then
+			uselist.other = value
+		elseif tostring(key):lower() == 'page' then
+			demospace = mw.title.new(value).namespace
+		elseif tostring(key):lower() == 'demospace' then
+			demospace = mNS.isNamespace(value)
+		elseif tostring(key):lower() == 'subjectns' then
+			subjectns = yesno(value)
+		elseif tostring(key):lower() == 'talk' then
+			CanOutputTalkValue = yesno(value)
+		end
+	end
+	ns = demospace or mw.title.getCurrentTitle().namespace
+	if mw.site.talkNamespaces[ns] then
+		if subjectns and CanOutputTalkValue then
+			return uselist[ns] or uselist[ns - 1] or uselist.other
+		elseif subjectns then
+			return uselist[ns - 1] or uselist.other
+		elseif CanOutputTalkValue then
+			return uselist[ns] or uselist.talk or uselist.other
+		else
+			return uselist.talk or uselist.other
+		end
+	else
+		return uselist[ns] or uselist.other
+	end
+end
+
+return p

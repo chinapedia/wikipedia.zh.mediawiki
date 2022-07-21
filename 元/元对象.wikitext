@@ -1,0 +1,50 @@
+{{noteTA
+|G1=IT
+}}
+{{编程范式}}
+在[[计算机科学|计算机科学]]中，'''元对象'''（metaobject）是操纵、创建、描述或实现对象（包括自身）的[[对象_(计算机科学)|对象]]。适用于元对象的对象叫做基础对象。元对象可以定义的一些信息包括：基础对象的[[类型系统|类型]]、[[接口_(计算机科学)|接口]]、[[类_(计算机科学)|类]]、[[方法_(计算机科学)|方法]]、[[特性_(计算机科学)|特性]]、[[解析树|解析树]]等。元对象是计算机科学[[反射_(计算机科学)|反射]]概念的例子，这里的系统（通常在运行时间）能访问它自己的内部结构。反射在根本上确使一个系统能现场重写自身，在其运行时改变自己的实现<ref>{{cite journal|last=Smith|first=Brian C|title=Procedural Reflection In Programming Languages|journal=MIT Technical Report|date=1982-01-01|issue=MIT-LCS-TR-272|url=http://publications.csail.mit.edu/lcs/specpub.php?id=840|access-date=16 December 2013|archive-url=https://web.archive.org/web/20151213034343/http://publications.csail.mit.edu/lcs/specpub.php?id=840|archive-date=13 December 2015}}</ref>。
+
+== 元对象协议 ==
+'''元对象协议'''（'''MOP'''：metaobject protocol）提供了访问和操纵对象系统的结构和行为的词汇表（[[协议_(面向对象编程)|协议]]）。元对象协议的典型功能包括<ref>{{cite journal|last=Foote|first=Brian|author2=Ralph Johnson|title=Reflective Facilities in Smalltalk-80|journal=Oopsla '89|pages=327–335|date=1–6 October 1989|url=http://www.laputan.org/ref89/ref89.html|access-date=16 December 2013|doi=10.1145/74877.74911|isbn=0897913337|archive-date=2021-03-24|archive-url=https://web.archive.org/web/20210324045422/http://www.laputan.org/ref89/ref89.html|dead-url=no}}</ref>：
+*创建或删除一个新类，
+*创建一个新属性或方法，
+*致使一个类继承自一个不同的类（“变更类结构”），
+*产生或变更定义一个类的方法的代码。
+
+进一步的说，元对象协议不只是到底层实现的[[介面_(資訊科技)|接口]]，转而，通过元对象协议，对象系统是依据元对象系统而[[递归定义|递归实现]]的，而它自身在理论上是依据元-元对象系统来实现的，以此类推直到任意一个基础情况（对象系统的一个一致性{{en-link|状态 (计算机科学)|State (computer science)|状态}}）被确定，协议就自身而言，是在这些实现层级之间的递归泛函联系。
+
+元对象协议对立于[[伯特蘭·邁耶|伯特蘭·邁耶]]的[[开闭原则|开闭原则]]，它声称软件对象系统，应当“开放扩展”而“关闭修改”。这个原则有效的划分了，对其做出增加的扩展对象，和对其重定义的修改对象之间的不同，提出前者是需要的品质（“对象应当可以扩展来满足将来使用情况的要求”），而后者是不需要的（“对象应当提供拒绝概要修订的稳定的接口”）。元对象协议与之相反，透明的暴露对象的内部构成，和就系统自身而言的整个对象系统。实际上，这意味着编程者可以使用对象来重定义自身，可能要以非常复杂的方式。
+
+以元对象协议方式实现对象系统，开放了彻底自主的重新设计的可能性，提供了深度灵活性，但介入了可能的复杂性，和难以理解的元稳定性问题（例如，对象系统不可以[[持久性数据结构|破坏性更新]]它自己的元对象协议，这是它的内部自我表示，但是某些更新的潜在破坏性要预测出来，是件不平凡之事，并可能难以推理），这依赖于想要的修改所传播到的递归深度<ref name="AMOP text">''The Art of the Metaobject Protocol'', Appendix C — Living with Circularity</ref>。由于这些原因，当元对象协议出现于一个语言之中的时候，通常被适度使用并用于特殊用途，比如以复杂方式转换其他软件或自身的软件，例如在逆向工程中用到的那些软件<ref>{{cite book|last=Favre|first=Lilliana|title=MDA-Based Reverse Engineering of Object Oriented Code|year=2009|publisher=Springer|isbn=978-3-642-01861-9|author2=Liliana Martinez |author3=Claudia Pereira |doi=10.1007/978-3-642-01862-6_21}}</ref>。
+
+=== 运行时间和编译时间 ===
+在于运行时间不能获得编译的时候，元对象协议的实现就有额外的复杂性。例如，有可能通过这种协议变更类型层级，但是这么做可能导致，用可替代类模型定义编译的代码出问题。一些环境找到了有创意的解决方法，比如通过在编译时间处理元对象问题。一个好例子是OpenC++<ref>{{cite journal|last=Chiba|first=Shigeru|title=A Metaobject Protocol for C++|journal=Oopsla '95|pages=285–299|year=1995|url=http://citeseer.ist.psu.edu/viewdoc/summary?doi=10.1.1.15.7049|access-date=27 December 2013|doi=10.1145/217838.217868|isbn=978-0897917032|archive-date=2013-12-29|archive-url=https://web.archive.org/web/20131229045058/http://citeseer.ist.psu.edu/viewdoc/summary?doi=10.1.1.15.7049|dead-url=no}}</ref>。[[语义网|语义网]]的面向对象模型，比多数标准对象系统更加动态，并一致于运行时间元对象协议。例如，在语义网中模型类被预期变更它们的相互关系，并有叫做分类器的一个特殊的[[推理机|推论引擎]]，可以验证和分析演化中的类模型<ref>{{cite web|url=http://www.w3.org/2001/sw/BestPractices/SE/ODSD/|title=A Semantic Web Primer for Object-Oriented Software Developers|last1=Knublauch|first1=Holger|last2=Oberle|first2=Daniel|last3=Tetlow|first3=Phil|last4=Wallace|first4=Evan|publisher=[[W3C|W3C]]|date=2006-03-09|access-date=2008-07-30|archive-date=2018-01-06|archive-url=https://web.archive.org/web/20180106172902/http://www.w3.org/2001/sw/BestPractices/SE/ODSD/|dead-url=no}}</ref>。
+
+=== 用途 ===
+第一个元对象协议，是在[[Xerox_PARC|Xerox PARC]]开发的面向对象编程语言[[Smalltalk|Smalltalk]]之中的[[元类|元类]]。随后的[[Common_Lisp对象系统|Common Lisp对象系统]]（CLOS），受到Smalltalk协议，还有{{en-link|Brian Cantwell Smith||Brian C. Smith}}在[[反射_(计算机科学)|3-Lisp]]作为求值器无穷塔上的原创研究的影响<ref>{{cite book |title=The mystery of the tower revealed: A non-reflective description of the reflective tower |pages=298–307 |author1=Daniel P. Friedman |author2=Mitchell Wand |date=1988 |doi=10.1145/319838.319871 |chapter=The mystery of the tower revealed |isbn=978-0897912006 |chapter-url=https://www.semanticscholar.org/paper/54119198d387d5bca7717330b07322ff77b445db }}</ref>。CLOS模型，不像Smalltalk模型，允许一个类有[[多重继承|多于一个超类]]；这引起了额外的复杂性，比如有解决某些对象实例的类沿袭（lineage）的问题。CLOS还允许[[多分派|动态多方法分派]]，这是通过[[泛化函数|泛化函数]]来处理的，而非Smalltalk的[[单一分派|单一分派]]中的[[消息传递|消息传递]]<ref>{{cite web|title=Integrating Object-Oriented and Functional Programming|url=https://www.cip.ifi.lmu.de/~langeh/test/2004%20-%20Gabriel%20-%20CLOS%20-%20Integrating%20Object-Oriented%20and%20Functional%20Programming.pdf|access-date=7 July 2016|archive-date=2020-07-09|archive-url=https://web.archive.org/web/20200709230443/https://www.cip.ifi.lmu.de/~langeh/test/2004%20-%20Gabriel%20-%20CLOS%20-%20Integrating%20Object-Oriented%20and%20Functional%20Programming.pdf|dead-url=no}}</ref>。描述Common Lisp中元对象协议的语义和实现的最有影响的图书，是{{en-link|Gregor Kiczales}}等人的《{{en-link|元对象协议的艺术|The Art of the Metaobject Protocol}}》<ref>{{cite web|url=https://raw.githubusercontent.com/lisp-books/lisp-books/main/Art%20of%20Metaobject%20Protocol.pdf|title=The Art of the Metaobject Protocol|author={{en-link|Gregor Kiczales}}, Jim des Rivieres, {{en-link|Daniel G. Bobrow}}|year=1991|publisher=MIT Press|ISBN=0-262-61074-4|access-date=2022-03-11|archive-date=2022-02-05|archive-url=https://web.archive.org/web/20220205094725/https://raw.githubusercontent.com/lisp-books/lisp-books/main/Art%20of%20Metaobject%20Protocol.pdf}}<br />[https://clos-mop.hexstreamsoft.com/ ''The Art of the Metaobject Protocol'', Chapters 5 and 6 in Hypertext] {{Wayback|url=https://clos-mop.hexstreamsoft.com/ |date=20210406114149 }}</ref>。
+
+元对象协议还广泛的用于软件工程应用中。在几乎所有的商业[[计算机辅助软件工程|CASE]]、[[代码重构|代码重构]]和[[集成开发环境|集成开发环境]]中，都有某种形式的元对象协议，用来表示和操纵设计工件<ref>{{cite journal|last=Johnson|first=Lewis|author2=David R. Harris |author3=Kevin M. Benner |author4=Martin S. Feather |title=Aries: The Requirements/Specification Facet for KBSA|journal=Rome Laboratory Final Technical Report|date=October 1992|volume=RL-TR-92-248}}</ref><ref>{{cite web|title=The Origin of Refine|url=http://www.metaware.fr/images/pdf/1_Metaware_The_Origin%20of_Refine_Whitepaper.pdf|work=www.metaware.fr|publisher=Metaware White Paper|access-date=6 January 2014|archive-url=https://web.archive.org/web/20140107000613/http://www.metaware.fr/images/pdf/1_Metaware_The_Origin%20of_Refine_Whitepaper.pdf|archive-date=7 January 2014}}</ref><ref>{{cite web|title=OMG's MetaObject Facility|url=http://www.omg.org/mof/|work=omg.org|publisher=Object Management Group|access-date=7 January 2014|archive-date=2021-05-11|archive-url=https://web.archive.org/web/20210511042053/https://www.omg.org/mof/|dead-url=no}}</ref>。
+
+元对象协议是实现[[面向切面编程|面向切面编程]]的一种方式。很多MOP的早期创立者，包括{{en-link|Gregor Kiczales}}，此后成为了面向切面编程的主要倡导者。[[帕羅奧多研究中心|PARC]]雇用了Kiczales等人，为不拥有原生元对象协议的[[Java|Java]]设计了{{en-link|AspectJ}}。
+
+==参见==
+*{{en-link|种类 (类型论)|Kind (type theory)}}
+*[[元类|元类]]
+*{{en-link|Javassist}}
+*{{en-link|Joose (框架)|Joose (framework)|Joose JavaScript元对象系统}}
+*OpenC++<ref>{{Cite web |url=https://chibash.github.io/public/opencxx/ |title=OpenC++ Home Page |access-date=2021-03-28 |archive-date=2020-12-05 |archive-url=https://web.archive.org/web/20201205064333/https://chibash.github.io/public/opencxx/ |dead-url=no }}</ref>
+*[[统一建模语言|统一建模语言]]：UML
+
+==引用==
+{{Reflist|2}}
+
+==外部链接==
+* [https://www.gnu.org/software/guile/docs/goops/MOP-Specification.html#MOP%20Specification The Guile MOP specification (GOOPS, based on Tiny CLOS)] {{Wayback|url=https://www.gnu.org/software/guile/docs/goops/MOP-Specification.html#MOP%20Specification |date=20210303124734 }}
+* [https://www.gnu.org/software/guile/docs/goops/Metaobjects-and-the-Metaobject-Protocol.html Metaobjects and the Metaobject Protocol] {{Wayback|url=https://www.gnu.org/software/guile/docs/goops/Metaobjects-and-the-Metaobject-Protocol.html |date=20190918204741 }}
+* [https://clos-mop.hexstreamsoft.com/ Common Lisp Object System Metaobject Protocol] {{Wayback|url=https://clos-mop.hexstreamsoft.com/ |date=20210406114149 }}  (contains two chapters from ''The Art of the Metaobject Protocol'')
+* [http://python-3-patterns-idioms-test.readthedocs.org/en/latest/Metaprogramming.html Python 2.6 Metaprogramming] {{Wayback|url=http://python-3-patterns-idioms-test.readthedocs.org/en/latest/Metaprogramming.html |date=20160419113850 }}
+
+{{数据类型}}
+
+[[Category:面向对象的程序设计|Category:面向对象的程序设计]]
+[[Category:数据类型|Category:数据类型]]

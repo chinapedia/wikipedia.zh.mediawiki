@@ -1,0 +1,152 @@
+local p = {}
+local mError = require('Module:Error').error
+local fullurl = require('Module:Fullurl')._fullurl
+local gFrame = mw.getCurrentFrame()
+
+local csslist = {
+	[1] = "font-size: 1.8em; margin-top: 1em; margin-bottom: 0.25em; display: block; line-height: 1.3; border-bottom-color: rgb(162, 169, 177); border-bottom-style: solid; border-bottom-width: 1px; font-family: 'Linux Libertine','Georgia','Times',serif",
+	[2] = "font-size: 1.5em; margin-top: 1em; line-height: 1.3; display: block; border-bottom-color: rgb(162, 169, 177); border-bottom-style: solid; border-bottom-width: 1px; font-family: 'Linux Libertine','Georgia','Times',serif",
+	[3] = "font-size: 1.2em; font-weight: bold; display: block; margin-top: 0.3em; padding-top: 0.5em;",
+	[4] = "font-size: 100%; font-weight: bold; display: block; margin-top: 0.3em; padding-top: 0.5em;",
+	[5] = "font-size: 100%; font-weight: bold; display: block; margin-top: 0.3em; padding-top: 0.5em;",
+	[6] = "font-size: 100%; font-weight: bold; display: block; margin-top: 0.3em; padding-top: 0.5em;"
+}
+
+local function getFakeH (text, level, id)
+	if id then
+		return tostring(mw.html.create('span'):attr('id', id):cssText(csslist[level]):wikitext(text):done())
+	else
+		return tostring(mw.html.create('span'):cssText(csslist[level]):wikitext(text):done())
+	end
+end
+
+local function setEditLink (title, section)
+	return tostring(mw.html.create('span'):addClass('mw-editsection plainlinks'):wikitext(
+		tostring(mw.html.create('span'):addClass('mw-editsection-bracket'):wikitext('['):done()) ..
+		fullurl({
+			title = title,
+			action = 'edit',
+			section = p.getSectionIDByName(title, section),
+			text = tostring(mw.html.create('span'):attr('id',
+				mw.message.new('editsectionhint', {p.getSectionNameByID(title, section)}):inLanguage(
+					gFrame:callParserFunction{ name = 'int', args = {'Lang'} }
+				):plain()
+			):wikitext(
+				mw.message.new('editsection', {title}):inLanguage(
+					gFrame:callParserFunction{ name = 'int', args = {'Lang'} }
+				):plain()
+			):done())
+		}) .. 
+		tostring(mw.html.create('span'):addClass('mw-editsection-bracket'):wikitext(']'):done())
+	):done())
+end
+
+
+local function indexOf (arr, str)
+	if not arr then
+		return -1
+	end
+	for i, v in ipairs(arr) do
+		if str == v then
+			return i
+		end
+	end
+	return -1
+end
+
+function p.getSectionsList (title)
+	title = mw.title.new(title, '')
+	if title then
+		if not title:getContent() then
+			return nil
+		end
+		local wikitext = title:getContent():gsub('{{[^}]+}}', ''):gsub('{%|(.-)%|}', '')
+		local sections = {}
+		local match = wikitext:match('%=([^\n]+)%=')
+		while true do
+			if not match then
+				break
+			end
+			match = '=' .. match .. '='
+			sections[#sections + 1] = mw.text.trim(match:gsub('^%=+([^\n%=]+)%=+$', '%1'), '\t\r\n\f%s')
+			wikitext = wikitext:gsub(match, '')
+			match = wikitext:match('%=([^\n]+)%=')
+		end
+		return sections
+	end
+	return nil
+end
+
+function p.getSectionIDByName (title, section) 
+	if tonumber(section) then
+		return tonumber(section)
+	elseif section == '__FIRST_SECTION__' then
+		return 0
+	end
+	return indexOf(p.getSectionsList(title), section) or -1
+end
+
+function p.getSectionNameByID (title, section) 
+	if not tonumber(section) then
+		return section
+	elseif tonumber(section) == 0 then
+		return '首段'
+	end
+	return p.getSectionsList(title)[section] or ''
+end
+
+function p._main (text, configs)
+	local frame = mw.getCurrentFrame()
+	local level, id, title, section
+	if type(configs) == 'string' then
+		level = tonumber(configs)
+	else
+		level = tonumber(configs.level)
+		id = configs.id
+		if configs.editlink then
+			if type(configs.editlink) == 'string' then
+				title, section = mw.text.split(configs.editlink, ',')
+				title, section = mw.text.trim(title), mw.text.trim(section)
+			else
+				title, section = configs.editlink['title'], configs.editlink['section']
+			end
+			text = text .. setEditLink(title, section)
+		end
+	end
+	if not level or not csslist[level] then
+		return mError({[1] = '無法解釋章節等級' .. tostring(frame:extensionTag('syntaxhighlight', '<h' .. level .. '></h .. level .. >', {lang = 'html', inline = ''}))})
+	end
+	return getFakeH (text, level, id)
+end
+
+function p.main (frame)
+	local text = ''
+	local getArgs = require('Module:Arguments').getArgs
+	local configs = getArgs(frame, {
+		frameOnly = true
+	})
+	local args = getArgs(frame, {
+		removeBlanks = false,
+		valueFunc = (function (key, value)
+			if key == 1 then
+				return value
+			end
+			return nil
+		end),
+		parentFirst = true
+	})
+	if not args[1] then
+		text = '標題'
+	else
+		text = args[1]
+	end
+	if args['editlink'] then
+		configs['editlink'] = args['editlink']
+	end
+	if args['id'] then
+		configs['id'] = args['id']
+	end
+	return p._main (text, configs)
+end
+
+return p

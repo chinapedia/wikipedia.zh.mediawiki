@@ -1,0 +1,397 @@
+-- This module implements Template:Bibleverse.
+local p = {}
+
+--codes from bvf that may be in use
+local version_num_codes = {
+	[9] = 'kjv', [31] = 'niv', [45] = 'amp', [49] = 'nasb', [64] = 'nivuk',
+	[51] = 'nlt', [65] = 'msg', [76] = 'nirv', [105] = 'he', [104] = 'jps',
+	[120] = 'opb', [121] = 'bb', [122] = 'bbc', [123] = 'bbl', [131] = 'nrsv',
+}
+
+--possible book inputs, based on Chicago Manual and CUV 和合本
+local book_aliases = {
+	--old testament/tanakh
+	['genesis'] = {'gen', 'gn', '创世记', '創世記'},
+	['exodus'] = {'exod', 'ex', '出埃及记', '出埃及記'},
+	['leviticus'] = {'lev', 'lv', '利未记', '利未記'},
+	['numbers'] = {'num', 'nm', '民数记', '民數記'},
+	['deuteronomy'] = {'deut', 'dt', '申命记', '申命記'},
+	['joshua'] = {'josh' , 'jo', '约书亚记'},
+	['judges'] = {'judg', 'jgs', '士师记', '士師記'},
+	['ruth'] = {'ru', '路得记', '路得記'},
+	['1_samuel'] = {'1sam', '1sm', '撒母耳记上', '撒母耳記上'},
+	['2_samuel'] = {'2sam', '2sm', '撒母耳记下', '撒母耳記下'},
+	['1_kings'] = {'1kgs', '列王纪上', '列王紀上'},
+	['2_kings'] = {'2kgs', '列王纪下', '列王紀下'},
+	['1_chronicles'] = {'1chron', '1chr', '历代志上', '歷代志上'},
+	['2_chronicles'] = {'2chron', '2chr', '历代志下', '歷代志下'},
+	['ezra'] = {'ezr', '以斯拉记', '以斯拉記'},
+	['nehemiah'] = {'neh', '尼希米记', '尼希米記'},
+	['esther'] = {'est', '以斯帖记', '以斯帖記'},
+	['job'] = {'jb', '约伯记', '約伯記'},
+	['psalms'] = {'ps', 'pss', 'psalm', '诗篇', '詩篇'},
+	['proverbs'] = {'prov', 'prv', '箴言'},
+	['ecclesiastes'] = {'eccles', 'eccl', 'qoheleth', '传道书', '傳道書'},
+	['song_of_solomon'] = {'songofsol', 'songofsongs', 'song', 'sg', 'canticles', 'canticleofcanticles', '雅歌'},
+	['isaiah'] = {'isa', 'is', '以赛亚书', '以賽亞書'},
+	['jeremiah'] = {'jer', '耶利米书', '耶利米書'},
+	['lamentations'] = {'lam', '耶利米哀歌'},
+	['ezekiel'] = {'ezek', 'ez', '以西结书', '以西結書'},
+	['daniel'] = {'dan', 'dn', '但以理书', '但以理書'},
+	['hosea'] = {'hos', '何西阿书', '何西阿書'},
+	['joel'] = {'jl', '约珥书', '約珥書'},
+	['amos'] = {'am', '阿摩司书', '阿摩司書'},
+	['obadiah'] = {'obad', 'ob', '俄巴底亚书', '俄巴底亞書'},
+	['jonah'] = {'jon', '约拿书', '約拿書'},
+	['micah'] = {'mic', 'mi', '弥迦书', '彌迦書'},
+	['nahum'] = {'nah', 'na', '那鸿书', '那鴻書'},
+	['habakkuk'] = {'hab', 'hb', '哈巴谷书', '哈巴谷書'},
+	['zephaniah'] = {'zeph', 'zep', '西番雅书', '西番雅書'},
+	['haggai'] = {'hag', 'hg', '哈该书', '哈該書'},
+	['zechariah'] = {'zech', 'zec', '撒迦利亚书', '撒迦利亞書'},
+	['malachi'] = {'mal', '玛拉基书', '瑪拉基書'},
+	--apocrypha/deuterocanon
+	['baruch'] = {'bar'},
+	['ecclesiasticus'] = {'ecclus', 'wisdomofsirach', 'sirach', 'sir'},
+	['1_esdras'] = {'1esd'},
+	['2_esdras'] = {'2esd'},
+	['judith'] = {'jth', 'jdt'},
+	['1_maccabees'] = {'1macc', '1mc'},
+	['2_maccabees'] = {'2macc', '2mc'},
+	['3_maccabees'] = {'3macc', '3mc'},
+	['4_maccabees'] = {'4macc', '4mc'},
+	['prayer_of_manasseh'] = {'profman', 'prayerofmanasses'},
+	['susanna'] = {'sus'},
+	['tobit'] = {'tob', 'tb'},
+	['wisdom_of_solomon'] = {'ws', 'wisdom', 'wisofsol'},
+	['prayer_of_azariah'] = {'prayerofazariahandhymnofthethreechildren'},
+	['rest_of_esther'] = {'additionstoesther'},
+	['bel_and_the_dragon'] = {'bel'},
+	['epistle_of_jeremiah'] = {'letterofjeremiah'},
+	--new testament
+	['matthew'] = {'matt', 'mt', '马太福音', '馬太福音'},
+	['mark'] = {'mk', '马可福音', '馬可福音'},
+	['luke'] = {'lk', '路加福音'},
+	['john'] = {'jn', '约翰福音', '約翰福音'},
+	['acts'] = {'actsoftheapostles', '使徒行传', '使徒行傳'},
+	['romans'] = {'rom', '罗马书', '羅馬書'},
+	['1_corinthians'] = {'1cor', '哥林多前书', '哥林多前書'},
+	['2_corinthians'] = {'2cor', '哥林多后书', '哥林多後書'},
+	['galatians'] = {'gal', '加拉太书', '加拉太書'},
+	['ephesians'] = {'eph', '以弗所书', '以弗所書'},
+	['philippians'] = {'phil', '腓立比书', '腓立比書'},
+	['colossians'] = {'col', '歌罗西书', '歌羅西書'},
+	['1_thessalonians'] = {'1thess', '1thes', '帖撒罗尼迦前书', '帖撒羅尼迦前書'},
+	['2_thessalonians'] = {'2thess', '2thes', '帖撒罗尼迦后书', '帖撒羅尼迦後書'},
+	['1_timothy'] = {'1tim', '1tm', '提摩太前书', '提摩太前書'},
+	['2_timothy'] = {'2tim', '2tm', '提摩太后书', '提摩太後書'},
+	['titus'] = {'ti', '提多书', '提多書'},
+	['philemon'] = {'philem', 'phlm', '腓利门书', '腓利門書'},
+	['hebrews'] = {'heb', '希伯来书', '希伯來書'},
+	['james'] = {'jas', '雅各书', '雅各書'},
+	['1_peter'] = {'1pet', '1pt', '彼得前书', '彼得前書'},
+	['2_peter'] = {'2pet', '2pt', '彼得后书', '彼得後書'},
+	['1_john'] = {'1jn', '约翰一书', '約翰一書'},
+	['2_john'] = {'2jn', '约翰二书', '約翰二書'},
+	['3_john'] = {'3jn', '约翰三书', '約翰三書'},
+	['jude'] = {'jude', '犹大书', '猶大書'},
+	['revelation'] = {'rev', 'apocalypse', 'apoc', 'rv', '启示录', '啟示錄'},
+}
+
+local apoc = {
+	['1_esdras'] = true, ['2_esdras'] = true, ['judith'] = true, ['1_maccabees'] = true,
+	['2_maccabees'] = true, ['3_maccabees'] = true, ['4_maccabees'] = true,
+	['prayer_of_manasseh'] = true, ['susanna'] = true, ['tobit'] = true,
+	['wisdom_of_solomon'] = true, ['prayer_of_azariah'] = true, ['rest_of_esther'] = true,
+	['bel_and_the_dragon'] = true, ['epistle_of_jeremiah'] = true,
+	['sirach'] = true, ['ecclesiasticus'] = true,
+}
+
+--these books only have one chapter, have to be handled differently
+local no_chapters = {
+	['obadiah'] = true, ['epistle_of_jeremiah'] = true, ['prayer_of_azariah'] = true,
+	['susanna'] = true, ['bel_and_the_dragon'] = true, ['prayer_of_manasseh'] = true,
+	['philemon'] = true, ['2_john'] = true, ['3_john'] = true, ['jude'] = true,
+}
+
+--sets the website to be used for each version, biblegateway is the fallback so don't define any for it
+local site_tbl = {
+	nrsv = 'oremus', nrsvae = 'oremus',
+	kjv = 'wikisource', asv = 'wikisource',
+	he = 'mechon_mamre', jps = 'mechon_mamre',
+	niv = 'biblica', nivuk = 'biblica', amp = 'biblica', ab = 'biblica',
+	nasb = 'biblica', msg = 'biblica', nlt = 'biblica', nirv = 'biblica',
+	nab = 'usccb',
+	bb = 'bible_hub', bbc = 'bible_hub', bbl = 'bible_hub', opb = 'bible_hub',
+	esv = 'esv_bible',
+}
+
+--pattern for the url of each site using _book etc. (underscore then letters [a-z]) for variables
+local urlpat_tbl = {
+	oremus = 'https://bible.oremus.org/?passage=_book%20_vrange&version=_version',
+	wikisource = ':en:s:Bible (_version)/_book#_schap:_svers',
+	mechon_mamre = 'https://www.mechon-mamre.org/_version_book_schap.htm#_svers',
+	biblica = 'https://www.biblica.com/bible/?osis=_version:_book%20_vrange',
+	usccb = 'https://bible.usccb.org/bible/_book/_schap?_svers',
+	biblegateway = 'https://www.biblegateway.com/passage/?search=_book%20_vrange&version=_version',
+	bible_hub = 'https://_version/_book/_schap-_svers.htm',
+	esv_bible = 'https://www.esv.org/_book+_schap:_svers',
+}
+
+--changes book name to use in url for each site, only if necessary
+local site_book_tbl = {
+	oremus = {
+		['epistle_of_jeremiah'] = 'letter of jeremiah',
+	},
+	usccb = {
+		['song_of_solomon'] = 'song_of_songs',
+		['wisdom_of_solomon'] = 'wisdom',
+		['ecclesiasticus'] = 'sirach',
+	},
+	mechon_mamre = {
+		['genesis'] = '01', ['exodus'] = '02', ['leviticus'] = '03',
+		['numbers'] = '04', ['deuteronomy'] = '05', ['joshua'] = '06',
+		['judges'] = '07', ['1_samuel'] = '08a', ['2_samuel'] = '08b',
+		['1_kings'] = '09a', ['2_kings'] = '09b', ['isaiah'] = '10',
+		['jeremiah'] = '11', ['ezekiel'] = '12', ['hosea'] = '13',
+		['joel'] = '14', ['amos'] = '15', ['obadiah'] = '16', ['jonah'] = '17',
+		['micah'] = '18', ['nahum'] = '19', ['habakkuk'] = '20',
+		['zephaniah'] = '21', ['haggai'] = '22', ['zechariah'] = '23',
+		['malachi'] = '24', ['1_chronicles'] = '25a', ['2_chronicles'] = '25b',
+		['psalms'] = '26', ['job'] = '27', ['proverbs'] = '28', ['ruth'] = '29',
+		['song_of_solomon'] = '30', ['ecclesiastes'] = '31', ['lamentations'] = '32',
+		['esther'] = '33', ['daniel'] = '34', ['ezra'] = '35a', ['nehemiah'] = '35b',
+	}
+}
+
+--changes to the version name to be used in urls, only if necessary
+local site_version_tbl = {
+	mechon_mamre = {
+		he = 'p/pt/pt',
+		jps = 'e/et/et',
+	},
+	wikisource = {
+		kjv = 'King James', ['9'] = 'King James',
+		asv = 'American Standard',
+	},
+	bible_hub = {
+		bb = 'biblebrowser.com',
+		bbc = 'biblecommenter.com',
+		bbl = 'scripturetext.com',
+		opb = 'bible.cc',
+	}
+}
+
+local function trimArg(text)
+	if type(text) == 'string' then
+		text = text:match('(%S.-)%s*$')  --trimmed text or nil if empty
+	end
+	return text
+end
+
+local function valueExists(tbl, value)
+	for _, v in pairs(tbl) do
+		if value == v then
+			return true
+		end
+	end
+	return false
+end
+
+local function titlecase(arg)
+	-- http://grammar.yourdictionary.com/capitalization/rules-for-capitalization-in-titles.html
+	-- recommended by The U.S. Government Printing Office Style Manual:
+	-- 'Capitalize all words in titles of publications and documents,
+	-- except a, an, the, at, by, for, in, of, on, to, up, and, as, but, or, and nor.'
+	local alwayslower = {
+		['a'] = true, ['an'] = true, ['the'] = true,
+		['and'] = true, ['but'] = true, ['or'] = true, ['for'] = true,
+		['nor'] = true, ['on'] = true, ['in'] = true, ['at'] = true, ['to'] = true,
+		['from'] = true, ['by'] = true, ['of'] = true, ['up'] = true,
+	}
+	local words = mw.text.split(mw.text.trim(arg or ''), '_')
+	for i, s in ipairs(words) do
+		s = string.lower(s)
+		if i > 1 then
+			if not alwayslower[s] then
+				s = mw.getContentLanguage():ucfirst(s)
+			end
+		else
+			s = mw.getContentLanguage():ucfirst(s)
+		end
+		words[i] = s
+	end
+	return table.concat(words, '_')
+end
+
+function p.main(frame)
+	local targs = frame:getParent().args
+	local args = {}
+	for _, param in ipairs({1, 2, 3, 4, 5, 'nobook'}) do
+		args[param] = trimArg(targs[param])
+	end
+	local default_version = 'cuv'
+	local input_book = ''
+	local ref = ''
+	local version = ''
+	local version_num
+	local text = ''
+	local mainspace = mw.title.getCurrentTitle():inNamespaces(0)
+	if tonumber(args[1]) ~= nil and args[2] ~= nil then
+		-- first argument is a numeric prefix and second is book name
+		input_book = trimArg((args[1] or '') .. ' ' .. (args[2] or '')) or ''
+		ref = args[3] or ''
+		version = mw.ustring.lower(args[4] or default_version)
+		text = args[5] or trimArg((input_book .. ' ' .. ref))
+	elseif args[1] == nil then
+		-- second argument is the whole book name
+		input_book = args[2] or ''
+		ref = args[3] or ''
+		version = mw.ustring.lower(args[4] or default_version)
+		text = args[5] or (input_book .. ' ' .. ref)
+	else
+		-- first argument is the whole book name
+		input_book = args[1] or ''
+		ref = args[2] or ''
+		version = mw.ustring.lower(args[3] or default_version)
+		text = args[4] or (input_book .. ' ' .. ref)
+	end
+	if args.nobook == 'yes' then
+		text = ref
+	end
+	text = text:gsub('-', '–')  --change hyphens to en dashes (3:2-5 → 3:2–5)
+
+	if tonumber(version) then
+		version = version_num_codes[tonumber(version)] or version
+		version_num = true
+	end
+
+	local errors = {}
+	if version == 'jpr' or version == 'jp' then  --chabad doesn't work so reroute
+		version = 'he'
+		if mainspace then
+			table.insert(errors, '[[Category:Pages_with_Bible_version_errors|Category:Pages with Bible version errors]]')
+		end
+	end
+
+	local book = input_book:gsub('%p', ''):gsub(' ', '_')
+	book = mw.ustring.lower(book)
+
+	local book_found = false
+	local standard = book:gsub('_', '')
+	for full_book, aliases in pairs(book_aliases) do
+		if standard == full_book:gsub('_', '') or valueExists(aliases, standard) then
+			book = full_book
+			book_found = true
+			break
+		end
+	end
+
+	local site = site_tbl[version] or 'biblegateway'    --fall back on biblegateway for unrecognized version because it has so many versions
+
+	if apoc[book] and version == 'nrsv' and site == 'oremus' then  --oremus's nrsv doesn't have the apocrypha
+		version = 'nrsvae'  --the anglicized version does
+	end
+
+	if apoc[book] and version == 'cuv' then  --cuv doesn't have the apocrypha
+		version = 'nrsv'  --the biblegateway's nrsv version does
+	end
+
+	local urlpat = urlpat_tbl[site]
+
+	local split_ref = mw.text.split(ref, '[-–—]')       --split the ref into the part before and after the dash/hyphen
+	local s_ref = mw.text.split(split_ref[1], '%p')     --any punctuation can be used to separate chapter from verse
+	local e_ref = split_ref[2] or split_ref[1]
+	e_ref = mw.text.split(e_ref, '%p')
+	for i, v in ipairs(s_ref) do s_ref[i] = v:gsub('%D', '') end  --remove any non-numeric character (such as f)
+	for i, v in ipairs(e_ref) do e_ref[i] = v:gsub('%D', '') end
+
+	local e_chap, e_vers, s_chap, s_vers
+	local chapter_only = not s_ref[2]
+	if no_chapters[book] then
+		chapter_only = false
+		s_chap = 1
+		s_vers = s_ref[2] or s_ref[1] or 1   --verse 3 can be specified as "3" or "1:3"
+		e_chap = 1
+		e_vers = e_ref[2] or e_ref[1] or 1
+	else
+		s_chap = s_ref[1] or 1
+		s_vers = s_ref[2] or 1
+		if e_ref[2] or not s_ref[2] then     --chapter-chapter or chapter(:verse)?-chapter:verse
+			e_chap = e_ref[1] or s_chap
+		else                                 --chapter:verse-verse
+			e_chap = s_chap
+		end
+		e_vers = e_ref[2] or e_ref[1] or s_vers
+	end
+
+	if type(site_book_tbl[site]) == 'table' then
+		book = site_book_tbl[site][book] or book
+	end
+
+	book = titlecase(book)  --title case looks better at oremus where they display the input
+
+	if site == 'mechon_mamre' then    --special case handling for components of the url
+		if not tonumber(s_chap) then  --non-numeric characters were omitted above so this may not be what was entered
+			error('Bibleverse error: start chapter should be a number', 0)
+		end
+		s_chap = string.format('%x', s_chap/10) .. (s_chap % 10)
+	elseif site == 'biblica' or site == 'oremus' then
+		book = book:gsub('_', '%%20')
+	elseif site == 'esv_bible' then
+		book = book:gsub('_', '+')
+	elseif site == 'bible_hub' then
+		book = string.lower(book)
+	elseif site == 'usccb' then
+		book = book:gsub('_', '')
+	end
+	if type(site_version_tbl[site]) == 'table' then
+		version = site_version_tbl[site][version]
+	end
+
+	local v_range
+	if chapter_only then
+		if e_chap == s_chap then
+			v_range = s_chap
+		else
+			v_range = s_chap .. '–' .. e_chap
+		end
+	else
+		if e_chap == s_chap and e_vers == s_vers then
+			v_range = s_chap ..':' .. s_vers
+		elseif e_chap == s_chap then
+			v_range = s_chap .. ':' .. s_vers .. '–' .. e_vers
+		else
+			v_range = s_chap .. ':' .. s_vers .. '–' .. e_chap .. ':' .. e_vers
+		end
+	end
+
+	local url = urlpat:gsub('_%l+', {  --get the components into the url
+					_book    = book,
+					_schap   = s_chap,
+					_svers   = s_vers,
+					_echap   = e_chap,
+					_evers   = e_vers,
+					_vrange  = v_range,
+					_version = version,
+				})
+
+	local fulllink
+	if site == 'wikisource' then  --interwikilink
+		fulllink = '[['_.._url_.._'|' .. text .. ']]'
+	else
+		fulllink = '[' .. url .. ' ' .. text .. ']'
+	end
+
+	if mainspace then
+		if not book_found then
+			table.insert(errors, '<span style="color:red">Template:Bibleverse with invalid book</span>[[Category:Pages_with_Bible_book_errors|Category:Pages with Bible book errors]]')
+		end
+		if version_num then
+			table.insert(errors, '[[Category:Pages_with_numeric_Bible_version_references|Category:Pages with numeric Bible version references]]')
+		end
+	end
+	return fulllink .. table.concat(errors)
+end
+
+return p

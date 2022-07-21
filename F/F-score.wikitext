@@ -1,0 +1,95 @@
+{{Multiple issues|
+{{Cleanup-jargon|time=2020-07-04T03:12:30+00:00}}
+{{Copy edit|time=2020-07-04T03:12:30+00:00}}
+{{Expand language|1=en|time=2020-07-04T03:12:30+00:00}}
+{{Refimprove|time=2020-07-04T03:12:30+00:00}}
+{{Underlinked|time=2020-07-04T03:12:30+00:00}}
+{{Citation style|time=2020-07-04T03:12:30+00:00}}
+{{nofootnotes|time=2022-4-24}}
+
+}}
+[[File:F-score_的_precision_rate_與_recall_rate_的關係.jpg|thumb]]
+
+'''F值'''，亦被稱做'''F-measure'''，是一種量測方法的精確度常用的指標，經常用來判斷[[算法|演算法]]的精確度。目前在辨識、偵測相關的演算法中經常會分別提到'''精確率'''（precision）和'''召回率'''（recall），F-score能同時考慮這兩個數值，平衡的反映這個演算法的精確度。
+
+==定義==
+=== 一般式 ===
+:<math>F-score\;\;=\;\;\frac{(\;1+\beta^{2}\;)\;precision\;\times\;recall}{\beta^{2}\;precision\;+\;recall} </math>
+<math>\beta</math>是使用者自行定義的參數，由一般式可見F-score能同時考慮precision和recall這兩種數值。分子為precision和recall相乘，根據這個式子，只要precision或recall趨近於0，F-score就會趨近於0，代表著這個演算法的精確度非常低。一個好的演算法，最好能夠平衡recall和precision，且儘量讓兩種指標都很高。
+所以有一套判斷方式可以同時考慮recall和precision
+
+===Precision和Recall權重一樣時===
+一般上來說，提到F-score且沒有特別的定義時，是指<math>\beta=1</math>時的F-score，亦有寫作'''F1-score'''。代表使用者同樣的注重precision和recall的這兩個指標。其分數可以說是precision和recall的[[調和平均|調和平均]]，式子如下：
+:<math> F-score\;\;=\;\;2\;\frac{precision\;\times\;recall}{precision\;+\;recall} </math>
+F-score最理想的數值是趨近於1，做法是讓precision和recall都有很高的值。若兩者皆為1，使得<math>2\cdot \frac{1}{2}=1</math>，則F-score = 1 （100%），代表該演算法有著最佳的精確度。
+
+
+==F-score的組成元素==
+===TP, FN, FP, TN===
+前面的true/false修饰后面的positive/negative，后面的positive/negative是我们的方法的判断。
+* TP (true positive)：我们的方法判断为真，这个判断是对的。即事實上為真，而且被我們的方法判斷為真的情形。
+* FN (false negative)：我们的方法判断为不真，这个判断是错的。即事實上為真，卻未被我們的方法判斷為不真的情形。
+* FP (false positive)：我们的方法判断为真，这个判断是错的。即事實上不為真，卻被我們的方法誤判為真的情形。
+* TN (true negative)：我们的方法判断为不真，这个判断是对的。即事實上不為真，而且被我們的方法判斷成不為真的情形。
+
+以抓犯人為例，TP是有罪而且被抓到的情形，FP是無罪但被誤抓的情形，FN是有罪但沒被抓到的情形，TN是無罪且未被誤逮的情形
+{| class="wikitable"
+|+ [[混淆矩陣|混淆矩陣]]
+|-
+!   !! 判斷為真 !! 判斷不為真 
+|-
+| 事實上為真 || TP || FN 
+|-
+| 事實上不為真 || FP || TN 
+|}
+
+=== Precision和Recall===
+<math> precision = \frac{TP}{TP + FP} = +P\;\;</math> (positive prediction rate)
+
+Precision的分母為兩種'''判斷為真'''的情形的總和（范恩圖中完整綠色的部份）
+:解釋：當辨識結果為FP的代價很高時，F-score應該著重此指標，亦即precision要很高。
+:例子：辨識電郵信箱里的垃圾郵件時，如果某封被誤判成垃圾郵件（即FP）時，使用者可能就此錯過重要的通知。
+
+
+<math> recall = \frac{TP}{TP + FN} </math>
+
+Recall的分母為'''事實上為真'''的情形的總和（范恩圖中完整紫色的部份）
+:解釋：當辨識結果為FN的代價很高時，F-score應該著重此指標，亦即precall要很高。
+:舉例：一個傳染病診斷辨識系統中，如果某個傳染病患者被誤判成陰性（即FN），當地的社區的居民就落入被傳染的高風險之中。
+:舉例：真正犯罪的人當中，有多少比例的罪犯被抓到。或，一張照片當中，有多少人臉被偵測到。
+
+
+====Precision和Recall的異同====
+* 它們的分子皆為TP。
+* F-score的recall和precision之間存在著'''權衡'''的關係，可通過 β 調整更重視的部份。
+
+
+以警察抓犯人的故事為例：
+
+一位警察很厲害，抓了很多犯人，但是這些犯人當中，只有少部分真正有罪，其他都是被冤枉的。
+* recall高，因為該抓與不該抓的犯人都被抓到了
+* precision低，因為很多都是沒犯罪的人
+:「寧可錯抓一百，也不可放過一個」
+:→   recall 高，但 precision 低
+
+
+一個警察非常嚴謹，只逮捕真正有犯罪的人，不抓實在是沒辦法肯定的犯人。
+* precision高，因為通常被抓到人的都是有罪的，
+* recall低，因為不小心放掉一大群犯人
+:「寧可錯放一百，也不可冤枉一個」
+:→   precision 高，但 recall 低
+
+
+==應用==
+F-score經常用於評估[[資訊檢索|資訊檢索]]的結果，如：
+* [[圖像檢索|圖像檢索]]
+* [[機器學習|機器學習]]模型
+
+==參考==
+* {{cite web |author1=國立台灣大學電信工程學研究所丁建均教授 |title=高等數位訊號處理 |url=http://djj.ee.ntu.edu.tw/ADSP.htm |accessdate=2020-07-01 |archive-date=2020-05-08 |archive-url=https://web.archive.org/web/20200508102040/http://djj.ee.ntu.edu.tw/ADSP.htm |dead-url=no }}
+* {{cite web |title=F度量 （F-measure） |url=https://terms.naer.edu.tw/detail/1679003/ |website=國家教育研究院雙語詞彙資料庫 |accessdate=2020-07-01 |archive-date=2020-07-03 |archive-url=https://web.archive.org/web/20200703160928/https://terms.naer.edu.tw/detail/1679003/ |dead-url=no }}
+
+[[Category:機器翻譯|Category:機器翻譯]]
+[[Category:评价|Category:评价]]
+[[Category:软件测试|Category:软件测试]]
+[[Category:统计学比率|Category:统计学比率]]

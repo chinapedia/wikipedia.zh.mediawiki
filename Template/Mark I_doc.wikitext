@@ -1,0 +1,73 @@
+{{NoteTA|G1=MediaWiki}}{{Documentation subpage}}
+
+{{mbox|text=这是专为中文维基百科设计的{{tl|Fix}}模板。本模板由Mark和Fix部分组成，关于Fix部分请参考[[Template:Fix]]，以下仅介绍Mark部分。}}
+== 设计目的 ==
+英文维基百科使用Fix作为固定的内联标签模板，然而此模板不能包裹文字。先前亦有用户使用Fix包裹文字，结果导致文字消失的情况（[[Special:Diff/prev/60628651|差异]]）。因此我设计了此模板，用于在显示内联标签的同时包裹文字。
+
+== 使用方法 ==
+'''一切可以传入{{tl|Fix}}的参数皆可传入{{tl|Mark I}}'''。但由于date，cat和cat-date参数对中文维基百科并不适用，本模板重新实现了这些功能。如您仍然想要把参数传至{{tnull|Fix}}，请在欲传过的参数前加上fix-。
+
+本模板同时提供了{{{mark-text}}}用于Mark标签，以显示被包裹的文本。让我们沿用{{tl|Fix}}的例子：
+
+<pre>
+{{Mark I
+ |mark-text=我在扯淡
+ |link=Wikipedia:可供查证
+ |pre-text=提供的资料太模糊而
+ |text=不足证实
+ |title=该标记周围有一段文字缺乏具体的信息来查证
+ |time={{subst:#time:c}}
+ |cat=需补充来源的条目
+}}
+</pre>
+
+这段代码生成：{{Mark I
+ |mark-text=我在扯淡
+ |link=Wikipedia:可供查证
+ |pre-text=提供的资料太模糊而
+ |text=不足证实
+ |title=该标记周围有一段文字缺乏具体的信息来查证
+ |date=2020-07-16T21:42:43+00:00
+ |cat=需补充来源的条目
+}}
+
+该模板还提供了缩写参数。{{{1}}}可以替代{{{mark-text}}}，{{{2}}}可以替代{{{text}}}。
+
+== 如何制作一个标准内联模板？ ==
+
+简单。在这个例子中，Unsubst，Mark和Fix一应俱全。
+
+<pre>
+{{{{{|safesubst:}}}#invoke:Unsubst||time=__DATE__ |$B= <!--不要改动这一行，执行反替换引用-->
+{{Mark I            <!--不要改动这一行，调用此模板-->
+ |mark-text={{{1|<noinclude></noinclude>}}}<!--在<noinclude>和</noinclude>中间加入默认显示的文字，不要改动其他地方-->
+ |link=             <!--你想要链接到的页面-->
+ |pre-text=         <!--你想要加在链接前面的内容，可以不要-->
+ |post-text=        <!--你想要加在链接后面的内容，可以不要-->
+ |text=             <!--你想要显示的链接文字-->
+ |title={{reason|}} <!--在{{reason|和}}中间填入，你想让用户鼠标悬停在上面的时候出现的提示文字-->
+ |time={{{time|}}}  <!--请注意中文维基百科不使用date参数而使用time参数。不要改动这一行-->
+ |cat=              <!--你想把加了这个模板的条目放到什么分类里面去。请注意只在主条目空间中有效-->
+}}}}<noinclude>{{Documentation}}</noinclude><!--显示文档页-->
+</pre>
+
+== 不，我只想复制。 ==
+
+我很贴心。
+
+<pre>
+{{{{{|safesubst:}}}#invoke:Unsubst||time=__DATE__ |$B=
+{{Mark I
+ |mark-text={{{1|<noinclude></noinclude>}}}
+ |link=
+ |text=
+ |title={{{reason|}}}
+ |time={{{time|}}}
+ |cat=[[Category:]]
+ |cat-date=Category:
+}}}}<noinclude>{{Documentation}}</noinclude>
+</pre>
+
+<del>''（其实我是因为自己要复制）''</del>
+
+{{inline tags}}

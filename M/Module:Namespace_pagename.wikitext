@@ -1,0 +1,242 @@
+local p = {}
+local yesno = require('Module:Yesno')
+local mError = require('Module:Error')
+local mNS = require('Module:Namespace')
+local data = mw.loadData('Module:Namespace_pagename/data')
+
+local lan = mNS._lan
+
+local function getNSbyID (key, lang) 
+	return mNS._NamespacesDisplay({lang, key})
+end
+
+local function msg (group, key, lang) 
+	return lan(data[tostring(group)][tostring(key)] or {}, lang)
+end
+
+local function Error (msg, arg)
+	return mError.error{'[[Module:Namespace_pagename|Module:Namespace_pagename]]錯誤：' + msg:gsub('$1', arg)}
+end
+
+local function inArray (str, arr)
+	for i, v in ipairs(arr) do
+		if str == v then
+			return v
+		end
+	end
+	return nil
+end
+
+local no_need_suffix = {-2, 0, 14, 100, 118, 119, 2300, 2600}
+
+local can_add_extend_suffix = {2, 10, 828}
+	
+local function def_suffix (ns, lang)
+	if ns == -1 then
+		return lan({
+			['en'] = ' page',
+			['zh-hans'] = '页面',
+			['zh-hant'] = '頁面'
+		}, lang)
+	elseif ns == 2 then
+		return lan({
+			['en'] = ' page',
+			['zh-hans'] = '页',
+			['zh-hant'] = '頁',
+			['zh-tw'] = '頁面' -- 使用者頁面
+		}, lang)
+	elseif inArray(ns, {-2, 0, 6, 10, 14, 100, 102, 118, 828, 2300}) then
+		return ''
+	else
+		return lan({
+			['en'] = ' page',
+			['zh-hans'] = '页',
+			['zh-hant'] = '頁'
+		}, lang)
+	end
+end
+
+p._ispseudo = mNS._ispseudo
+p.ispseudo = mNS.ispseudo
+
+function p._main (args)
+	local lang = args[1]
+	local title
+	local nsid
+	local isCallFromNs = false
+	local arg = args[2]
+	if arg then
+		if arg == '' then
+			return getNSbyID(0, lang)
+		elseif arg:match('([Pp]age):') then -- 兼容：早期版本
+			arg = arg:gsub('[Pp]age:', '')
+			title = mw.title.new(arg)
+			if not title then
+				return Error(msg('Error', 'pg-error', lang), arg)
+			end
+			nsid = title.namespace
+		elseif arg:match('([Nn]ame):') then -- 兼容：早期版本
+			title = nil
+			arg = arg:gsub('([Nn]ame):', '')
+			nsid_info = mw.site.namespaces[tonumber(arg)] or mw.site.namespaces[arg]
+			if mw.text.split(arg, ':')[2] and not nsid_info and not p._ispseudo(arg) then
+				return Error(msg('Error', 'ns-error', lang), arg)
+			end
+			nsid = nsid_info and nsid_info.id
+			isCallFromNs = true
+		else
+			local arg_title = mw.title.new(arg)
+			local arg_ns = mw.site.namespaces[tonumber(arg)] or mw.site.namespaces[arg]
+			if not arg_title then -- args2 無法被mediawiki正確解析
+				return Error(msg('Error', 'pg-error', lang), arg)
+			elseif arg_ns then -- args2 是{{ns:}}能解析的
+				title = nil
+				nsid = arg_ns.id
+				isCallFromNs = true
+			else -- 其他正常標題，無效的命名空間也被當條目處理
+				title = arg_title
+				nsid = arg_title.namespace
+			end
+		end
+	else -- 以標題讀取
+		arg = mw.title.getCurrentTitle().fullText
+		title = mw.title.getCurrentTitle()
+		nsid = title.namespace
+	end
+	if p._ispseudo(arg) then --偽命名空間
+		return getNSbyID((nsid == 1 and 'Talk:' .. p._ispseudo(arg) or p._ispseudo(arg)), lang)
+	end
+	if title and title.isExternal then
+		return msg('Type', 'External', lang)
+	end
+	local statue, wt = pcall(getNSbyID, nsid, lang)
+	if not statue then
+		return Error(msg('Error', 'ns-error', lang), 'namespace number = ' .. nsid)
+	end
+	if not isCallFromNs then
+		if title then
+			local content = title:getContent() or ''
+			local contentModel = title.contentModel
+			local titletext = title.fullText
+			local subtext = title.subpageText
+			if contentModel == 'css' or contentModel == 'sanitized-css' then
+				return wt .. msg('Type', 'style', lang)
+			elseif contentModel == 'javascript' then
+				return wt .. msg('Type', 'script', lang)
+			elseif contentModel == 'json' then
+				return wt .. msg('Type', 'JSON', lang)
+			elseif contentModel == 'json' then
+				return wt .. msg('Type', 'JSON', lang)
+			elseif title.isRedirect then
+				return wt .. msg('Type', 'redirect', lang)
+			end
+			if not inArray(nsid, no_need_suffix) then
+				return wt
+			end
+			if 
+				(
+					content:match('%{%{[Dd]ocumentation[_%s]subpage')
+					or content:match('%{%{[Tt]emplate[_%s]doc[_%s]inline')
+					or content:match('%{%{[Tt]emplate[_%s]doc[_%s]viewed[_%s]directly')
+					or subtext:match('^[Dd]oc$')
+				) and inArray(nsid, can_add_extend_suffix)
+			then
+				return wt .. msg('Type', 'doc', lang)
+			elseif 
+				content:match('%{%{[Ss]andbox')
+				or content:match('%{%{[Tt]emplate[_%s]sandbox[_%s]notice')
+				or content:match('%{%{請注意：請在這行文字底下進行您的測試，請不要刪除或變更這行文字以及這行文字以上的部份。')
+				or content:match('%{%{请注意：请在这行文字底下进行您的测试，请不要删除或变更这行文字以及这行文字以上的部分。')
+				or content:match('%{%{[Pp]D%-self%/沙盒%|')
+				or nsid > 1 and titletext:gsub('^[A-z][a-z]+%:', '') == '沙盒'
+				or titletext:match('^File%:沙盒%.[A-Za-z]+$')
+				or titletext:match('^Template%:沙盒%/')
+				or titletext:match('^Template%:X%d')
+				or (
+					(
+						subtext:match('^[Ss]andbox$')
+						or subtext == '沙盒'
+					)
+					and inArray(nsid, can_add_extend_suffix)
+				)
+			then
+				return wt .. msg('Type', 'sandbox', lang)
+			elseif 
+				(
+					content:match('%{%{[Tt]emplate[_%s]testcases[_%s]notice')
+					or content:match('%{%{[Tt]est[_%s]cases[_%s]notice')
+					or content:match('%{%{测试样例')
+					or content:match('%{%{測試樣例')
+					or subtext:match('^[Tt]estcases$')
+					or subtext == '测试样例'
+					or subtext == '測試樣例'
+				)
+				and inArray(nsid, can_add_extend_suffix)
+			then
+				return wt .. msg('Type', 'testcases', lang)
+			elseif 
+				(
+					titletext:match('%/[Tt]emp$')
+					or titletext:match('%/[Tt]emporary$')
+				)
+				and inArray(nsid, {2, 4, 10, 118, 828})
+			then
+				return wt .. msg('Type', 'temp', lang)
+			elseif
+				nsid == 10
+				and (
+					subtext:match('^[Ii]ntro$')
+					or subtext:match('^[Ii]ntroduction$')
+					or subtext == '说明'
+					or subtext == '說明'
+				)
+			then
+				return wt .. msg('Type', 'intro', lang)
+			elseif
+				titletext:match('^Template%:Editnotices%/')
+				or titletext:match('^User%:[^/]+%/Editnotice$')
+				or titletext:match('^User[_%s]talk%:[^/]+%/Editnotice$')
+			then
+				return msg('Type', 'editnotice', lang)
+			elseif
+				titletext:match('^User%:[^/]+%/Emailnotice$')
+			then
+				local user = titletext:gsub('^User%:([^/]+)%/Emailnotice$', '%1')
+				return '[[User:'_.._user_.._'|' .. user .. ']]' .. lan({
+					['en'] = "'s ",
+					['zh-hans'] = '的',
+					['zh-hant'] = '的'
+				}, lang) .. msg('Type', 'mailnotice', lang)
+			elseif
+				titletext:match('{{捷徑重定向([^}]+)}}')
+				or titletext:match('{{捷径重定向([^}]+)}}')
+				or titletext:match('{{快捷重定向([^}]+)}}')
+				or titletext:match('{{快捷方式重定向([^}]+)}}')
+				or titletext:match('{{RTL([^}]+)%|捷徑')
+			then
+				return string.format(msg('Type', 'shortcut', lang), wt)
+			end
+		end
+		wt = (wt .. (inArray(nsid, no_need_suffix) and def_suffix(nsid, lang) or '')):gsub('talk page', 'talkpage')
+	end
+	return wt
+end
+
+function p.main (frame) 
+	local args = require('Module:Arguments').getArgs(frame, {
+		valueFunc = function (key, value)
+			if key == 2 then
+				return type(value) == 'string' and mw.text.trim(value) or value
+			elseif value then
+				value = mw.text.trim(value)
+				if value ~= '' then
+					return value
+				end
+			end
+			return nil
+		end
+	})
+	return p._main(args)
+end
+
+return p

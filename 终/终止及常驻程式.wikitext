@@ -1,0 +1,62 @@
+{{NoteTA
+|1=zh-cn:程序; zh-tw:程式;
+}}
+'''終止及常駐程式''' （{{Lang-en|Terminate and stay resident}}，縮寫為TSR），簡稱'''常駐程式'''，是[[DOS|DOS]]系統下特殊的[[電腦程式|電腦程式]]，此程式利用DOS的[[系統呼叫|系統呼叫]]，將電腦控制權交給作業系統，彷彿程式已經結束。但程式仍保留在[[電腦記憶體|電腦記憶體]]中，可以通過硬體或軟體[[中斷|中斷]]重新喚醒它<ref>{{cite web |author-first=Rick |author-last=Maybury |author-link=Rick Maybury |url=http://www.pctoptips.co.uk/Bootcamp/1998/004.htm |title=Beat the Bug—Computer Viruses |work=PC Top Tips |date=1998 |access-date=2012-02-09 |archive-date=2013-09-28 |archive-url=https://web.archive.org/web/20130928074003/http://www.pctoptips.co.uk/Bootcamp/1998/004.htm |dead-url=no }}</ref>。該技術某部分克服了DOS同一時間只能執行一個[[作業_(電腦)|任務]]（Task）的限制。TSR是DOS特有的程式，不會在Windows系統中執行。
+
+常駐程式中有些是[[工具軟體|工具軟體]]，使用者在日常使用電腦時，可能每天會用[[熱鍵|熱鍵]]多次呼叫工具軟體。像[[Borland|Borland]]公司的[[SideKick|SideKick]]就是早期流行的應用軟體。有些常駐程式則是作業系統不直接支援的硬體裝置[[驅動程式|驅動程式]]，。
+
+==使用TSR==
+通常在DOS中，任何指定時間只能執行一個程式。要停止執行，它將使用[[系統呼叫|系統呼叫]] <tt>INT 21h/4Ch</tt>將控制權交回給[[DOS|DOS]] shell程式<tt>[[COMMAND.COM|COMMAND.COM]]</tt>。<ref>[http://stanislavs.org/helppc/int_21-0.html] {{Wayback|url=http://stanislavs.org/helppc/int_21-0.html |date=20200222133945 }} HelpPC reference: INT 21,0 – Program Terminate</ref>然後將程式使用的記憶體和系統資源標示為未使用。事實上，這使得無法重新啟動程式的某些部分而不必從頭開始重新載入整個程式。但是，如果程式以系統呼叫<tt>INT 27h</tt>或<tt>INT 21h/31h</tt>結尾，則作業系統不會重用程式暫存器的特定部分。 
+
+原本呼叫<tt>INT 27h</tt>被稱為“停止但仍駐留”，因此名稱為“ TSR”。使用此呼叫，程式最多可佔用其記憶體64 KB。MS-DOS 2.0版引入了改進的呼叫<tt>INT 21h/函數31h</tt>（“保留程式”），該呼叫拿掉了此限制，並允許程式返回一個[[離開狀態|返回碼]]。在進行此呼叫之前，程式可以安裝一個或多個指向其自身的[[中斷|中斷]]處理程式，以便可以再次呼叫它。安裝硬體中斷向量可使此類程式對硬體事件做出反應。安裝軟體中斷向量可使當前執行的程式呼叫它。安裝計時器中斷處理程式可使TSR定期執行（請參閱[[ISA|ISA]]）和[[可編程間隔計時器|可編程間隔計時器]]，尤其是“ [[可編程間隔計時器|IBM PC相容]] ”部分）。
+
+使用中斷向量的典型方法包括讀取其當前值（位址），將其儲存在TSR的儲存空間中以及安裝指向其自身程式碼的指標。在TSR接收到中斷並完成其處理之前或之後，將呼叫儲存的位址，事實上形成了[[中斷處理程式|中斷處理程式]]的單連結列表，也稱為''中斷服務程式''或ISRs。安裝ISRs的過程稱為''連結''或''[[攔截|攔截]]''[[中斷|中斷]]或[[中斷向量|中斷向量]]。
+
+通過連結中斷向量，TSR程式可以完全控制電腦。TSR可以具有以下兩種行為之一：
+* 通過不呼叫先前已更改相同中斷向量的其他TSR，來完全控制中斷。
+* 通過呼叫舊的中斷向量與其他TSR串連。這可以在他們執行實際程式碼之前或之後完成。這樣，TSR可以形成一系列程式，其中每個程式都呼叫下一個程式。
+
+大多數DOS [[電腦病毒|電腦病毒]]和其他惡意軟體都使用暫停並駐留方法，這些方法可以控制PC或使其處於後端。該惡意軟體將在執行時感染可執行檔（.EXE或.COM），並在打開資料檔時對磁盤讀寫或執行檔案做出反應。
+
+DOS本身的某些部分（尤其是在DOS 5.0及更高版本中）使用相同的技術來執行有用的功能，例如[[DOSKEY|DOSKEY]]命令列編輯器和各種其他可安裝的工具程式，這些工具程式是通過在命令列上執行它們來安裝的（通常是從[[AUTOEXEC_.BAT|AUTOEXEC .BAT]]或<code>[[INSTALL_(CONFIG.SYS_directive)|INSTALL]]</code>從CONFIG.SYS內部執行），而不是通過<code>[[DEVICE_(CONFIG.SYS_directive)|DEVICE]]</code>在CONFIG.SYS中的語法將它們作為裝置驅動程式載入。
+
+TSR程式可以隨時被載入。有時會在作業系統啟動後透過AUTOEXEC.BAT批次處理檔中來載入，也可以根據使用者的要求載入（例如，[[Borland|Borland]]的[[Borland_Sidekick|Sidekick]]和Turbo Debugger，Quicken的QuickPay或FunStuff軟體的Personal Calendar）。正如“ TSR”所暗示的那樣，這些程式將在執行其他程式時保持駐留在記憶體中。它們中的一些沒有辦法從記憶體中將自身卸載，因此呼叫TSR意味著程式將保留在記憶體中，直到重新啟動電腦為止。但是，可以使用[[MARK.EXE|MARK.EXE]]/[[RELEASE.EXE|RELEASE.EXE]]搭配[[TurboPower_Software|TurboPower Software]] 或 ''soft reboot'' TSRs等工具程式從外部進行卸載。它們將被特定的鍵組合觸發，然後釋放在它們之後載入的所有TSR。由於ISR鏈是單個連結的，因此沒有發現前一個處理程式的位址的方法（除了嘗試回溯中斷鍊之外），或通知其前任它需要更新其“要跳轉到的下一個位址”。不要指向要刪除自身的TSR，以便為了安全地卸載鏈中間的TSR，在大多數情況下，必須在記憶體中保留存根，從而導致記憶體碎片。這產生了諸如TesSeRact和AMIS之類的TSR合作架構。<ref>[http://hdebruijn.soo.dto.tudelft.nl/newpage/interupt/CAT-042.HTM a list of TSR libraries] {{Webarchive|url=https://web.archive.org/web/20070817023830/http://hdebruijn.soo.dto.tudelft.nl/newpage/interupt/CAT-042.HTM |date=2007-08-17 }} also known as frameworks.</ref>
+
+==中斷共享==
+為了處理共享相同中斷的許多TSR程式的問題，[[Ralf_D._Brown|Ralf D. Brown]]提出了一種稱為“輪流多路中斷規範”（AMIS）的方法，作為對以前通過INT 2Fh提供的服務的改進。AMIS提供了以受控方式共享軟體中斷的方法。它以IBM的[[中斷共享協定|中斷共享協定]]為模型，該協定最初是為共享x86處理器的硬體中斷而發明的。AMIS服務可通過Int 2Dh獲得。<ref>{{cite web|url=https://web.archive.org/web/20171201103232/http://www.ctyme.com/intr/int-2d.htm |title=int 2D |publisher=Web.archive.org |date= |accessdate=2019-11-14}}</ref>
+
+該提案在當時未受到程式設計師的廣泛關注。它與其他幾個複雜程度各異的競爭規範並存。<ref>{{cite web|url=https://web.archive.org/web/20160619045026/http://www.ctyme.com/intr/cat-042.htm |title=TSR Libraries |publisher=Web.archive.org |date=2016-06-19 |accessdate=2019-11-14}}</ref>
+
+==缺點==
+儘管TSR程式對克服[[DOS|DOS]]的限制非常有用，甚至是必不可少的，但它在製造麻煩方面享有盛譽。許多程式以各種明文或無規範的方式有效劫持了作業系統，當與特定應用程式或其他TSR一起使用時，通常會導致系統在啟動或停用時當機。如上所述，某些[[電腦病毒|電腦病毒]]和其他惡意軟體被編碼為TSR，因此存在一定的麻煩。此外，[[DOS|DOS]]系統中的所有程式程式碼，甚至那些具有大量物理[[隨機存取記憶體|RAM]]的程式碼，都必須載入到前640[[kilobyte|KB]]的RAM中（[[常規記憶體|常規記憶體]]）。TSR也不例外，它佔用了640 KB的塊，因此應用程式無法使用這些塊。這意味著編寫一個TSR是一個挑戰，要使其達到最小尺寸，並檢查它與不同供應商的許多軟體產品的相容性-這通常是一項非常令人沮喪的工作。
+
+在1980年代末期和1990年代初，許多PC平台上的[[電視遊戲|電視遊戲]]都打破了這一限制，並為TSR（甚至是[[光碟機|CD-ROM]]驅動程式之類的基本驅動器）留下了越來越少的空間，並進行了整理，以便有足夠的可用RAM執行這些遊戲在保留必要的TSR的同時，變成了一種黑色藝術。許多遊戲玩家都有幾個啟動分割區具有針對不同遊戲的不同配置。在更高版本的MS-DOS中，“啟動選單”命令搞允許通過單個[[啟動磁碟|啟動磁碟]]選擇各種配置。在1990年代中期到後期，儘管仍然為DOS編寫許多遊戲，但通過將游戲資料和/或程式程式碼的部分放在前1 MB記憶體之上並使用640 KB以下的程式碼，最終克服了640 KB的限制。 （使用[[DOS擴展器|DOS擴展器]]的方法）訪問擴展的記憶體，並將程式碼交換為最低的1 MB RAM作為一層覆蓋。因為具有許多覆蓋層的程式設計本身就是一個挑戰，所以一旦程式太大而無法完全容納大約512 KB，幾乎總是使用第三方DOS擴展器來實現[[擴展記憶體|擴展記憶體]]，該擴展器實作了VCPI或DPMI，因為當x86處理器從[[真實模式|真實模式]]切換到[[保護模式|保護模式]]時，訪問1 MB邊界以上的記憶體變得更加容易和方便，並且可以在該區域中執行程式碼。但是，由於DOS和大多數DOS程式以真實模式執行（[[Virtual_Control_Program_Interface|VCPI]]或[[DOS_Protected_Mode_Interface|DPMI]]通過在兩種模式之間來回切換，使得受保護模式程式對於DOS和系統的其餘部分而言看起來像真實模式程式），因此，DOS TSR和裝置驅動程式也以真實模式執行，因此，只要有人獲得控制，DOS擴展器就必須切換回真實模式，直到放棄控制，這會造成時間損失（除非他們使用諸如[[DOS_Protected_Mode_Services|DPMS]] 或 [[CLOAKING.EXE|CLOAKING]]之類的技術）。
+
+==回歸==
+隨著[[擴展記憶體板|擴展記憶體板]]（尤其是[[Intel_80386|Intel 80386]]處理器）在1980年代下半年的到來，使用640 KB以上的記憶體來載入TSR成為可能。這需要復雜的軟體解決方案，稱為[[擴展記憶體管理器|擴展記憶體管理器]]。一些記憶體管理器[[QEMM#QEMM_product_ranges|QRAM]]和[[Quarterdeck_Office_Systems|Quarterdeck]]的[[QEMM|QEMM]]，[[Qualitas|Qualitas]]的[[386MAX|386<sup>MAX</sup>]]，[[Compaq|康柏]]的[[CEMM|CEMM]] ，後來[[微軟|微軟]]的[[EMM386|EMM386]]。可用於載入640 KB以上的TSR的儲存區稱為“ [[Upper_Memory_Area|上層記憶體]]”（UMB）並將程式載入到其中被稱為載入上層記憶體。後來，記憶體管理器開始包括一些程式，這些程式試圖自動確定如何在低記憶體和高記憶體之間最佳地分配TSR（Quarterdeck的Optimize或Microsoft的[[MEMMAKER|MemMaker]]），以嘗試最大程度地提高底層640 KB記憶體的利用率和可用空間。
+
+==滅亡==
+隨著使用[[DOS擴展器|DOS擴展器]]的遊戲的發展（早期的例子是[[Doom|Doom]]）繞過了640 KB的障礙，許多與TSR相關的問題都消失了，並且[[Microsoft_Windows|Microsoft Windows]]尤其是[[Windows_95|Windows 95]]的廣泛採用（隨後是[[Windows_98|Windows 98]]）–這使得大多數TSR變得不必要，並且某些TSR不相容-儘管[[Win16|Win16]]應用程式可以執行類似TSR的技巧，例如修補中斷描述表（IDT），因為Windows允許，但TSR逐漸變得過時了。由於多工作業系統（例如[[Windows_Vista|Windows Vista]]，[[Windows_7|Windows 7]]，[[Mac_OS_X|Mac OS X]]和[[Linux|Linux]]提供了多個程式和裝置驅動程式可以同時執行的功能，而無需特殊的程式設計技巧，而現代的[[受保護記憶體|受保護記憶體]]概念使[[核心|核心]]及其模組專門負責修改中斷表。
+
+== 參見 ==
+* [[守护进程|守护进程]]（Unix）
+* {{le|DOS保護模式服務|DOS Protected Mode Services}}（DPMS）
+* {{le|桌面附屬程式|Desk accessory}}
+* {{le|擴展程式 (Mac OS)|Extension (Mac OS)}}
+<!--* 常駐系統擴展（RSX）-->
+* [[Windows服務|Windows服務]]
+
+== 參考文獻 ==
+{{reflist}}
+
+== 外部連結 ==
+* [http://groups.google.com/group/net.micro.pc/browse_frm/thread/bc364506af962208/77d26c5cce247c51?lnk=st&q=int+27h&rnum=1#77d26c5cce247c51 An early TSR] {{Wayback|url=http://groups.google.com/group/net.micro.pc/browse_frm/thread/bc364506af962208/77d26c5cce247c51?lnk=st&q=int+27h&rnum=1#77d26c5cce247c51 |date=20121102130548 }}
+* comp.os.msdos.programmer FAQ – [http://www.faqs.org/faqs/msdos-programmer-faq/part4/section-21.html How can I write a TSR (Terminate-and-Stay-Resident) utility?] {{Wayback|url=http://www.faqs.org/faqs/msdos-programmer-faq/part4/section-21.html |date=20200104072334 }}
+* The [https://www.cs.cmu.edu/~ralf/pub-files/altmpx35.zip Alternate Multiplex Interrupt Specification] {{Wayback|url=https://www.cs.cmu.edu/~ralf/pub-files/altmpx35.zip |date=20160303184821 }} (AMIS), v.3.5
+* [https://www.cs.cmu.edu/~ralf/pub-files/amisl092.zip AMISLIB] {{Wayback|url=https://www.cs.cmu.edu/~ralf/pub-files/amisl092.zip |date=20160303213633 }} – a function library to write self-highloading, removable TSRs in assembler
+* [http://guideme.itgo.com/atozofc/ A to Z of C] {{Wayback|url=http://guideme.itgo.com/atozofc/ |date=20200205040829 }}; a free book on DOS programming in C; Chapter 27 – {{cite web |url= http://guideme.itgo.com/atozofc/ch27.pdf |title= TSR programming |accessdate= 2020-08-05 |archive-date= 2020-06-12 |archive-url= https://web.archive.org/web/20200612044246/http://guideme.itgo.com/atozofc/ch27.pdf |dead-url= no }} {{small|(80 KB)}}
+* [https://web.archive.org/web/20100403220515/http://www.simtel.net/product/view/id/46893 IBM's Interrupt-Sharing Protocol], zip archive, 6.5 KB ([[Simtel|Simtel]])
+
+{{DEFAULTSORT:Terminate And Stay Resident}}
+[[Category:DOS技术|Category:DOS技术]]
+[[Category:DOS內存管理|Category:DOS內存管理]]

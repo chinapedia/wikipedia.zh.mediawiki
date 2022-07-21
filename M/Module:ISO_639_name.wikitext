@@ -1,0 +1,462 @@
+require('Module:No globals');
+
+local getArgs = require ('Module:Arguments').getArgs;
+local override_data = mw.loadData ('Module:Language/data/ISO 639 override');
+local parts = {
+	{'Module:Language/data/iana languages', 1},
+	{'Module:Language/data/ISO 639-2', 2},
+	{'Module:Language/data/ISO 639-3', 3},
+	{'Module:Language/data/ISO 639-5', 5},
+	}
+
+
+--[[--------------------------< E R R O R _ M E S S A G E S >--------------------------------------------------
+
+]]
+
+local error_messages = {
+	['err_msg'] = '<span style="font-size:100%;" class="error show_639_err_msgs">error: $1</span>[[Category:ISO_639_name_template_errors|Category:ISO 639 name template errors]]',
+	['err_text'] = {															-- error messages used only in the code to name functions
+		['ietf'] = '$1 is an IETF tag',											-- $1 is the ietf tag
+		['required'] = 'ISO 639$1 code is required',							-- $1 is the 639 '-1', '-2', '-3', '-5' part suffix; may be empty string
+		['not_code'] = '$1 is not an ISO 639$2 code',							-- $1 is non-code input; $2 is 639 part suffix; may be empty string
+
+																				-- code to name functions and iso_639_name_to_code()
+		['not_found'] = '$1 not found in ISO 639-$2 list',						-- $1 is code or language name; $2 is 639 part suffix(es)
+
+																				-- iso_639_name_to_code() only
+		['name'] = 'language name required',
+		['not_part'] = '$1 not an ISO 639 part',								-- $1 is invalid 639 suffix (without hyphen)
+		['no_code'] = 'no code in ISO 639-$1 for $2',							-- $1 is 639 part suffix; $2 is language name
+
+		['code_name'] = 'language code or name required',						-- iso_639() only
+		}
+	}
+
+
+--[[--------------------------< S U B S T I T U T E >----------------------------------------------------------
+
+Populates numbered arguments in a message string using an argument table.
+
+]]
+
+local function substitute (msg, args)
+	return args and mw.message.newRawMessage (msg, args):plain() or msg;
+end
+
+
+--[[--------------------------< E R R O R _ M S G >------------------------------------------------------------
+
+create an error message
+
+]]
+
+local function error_msg (msg, arg, hide)
+	return not hide and substitute (error_messages.err_msg, substitute (error_messages.err_text[msg], arg)) or '';
+end
+
+
+--[[--------------------------< I S _ S E T >------------------------------------------------------------------
+
+Returns true if argument is set; false otherwise. Argument is 'set' when it exists (not nil) or when it is not an empty string.
+
+]]
+
+local function is_set( var )
+	return not (var == nil or var == '');
+end
+
+
+--[=[-------------------------< M A K E _ W I K I L I N K >----------------------------------------------------
+
+Makes a wikilink; when both link and display text is provided, returns a wikilink in the form [[L|D]]; if only
+link is provided, returns a wikilink in the form [[L|L]]; if neither are provided or link is omitted, returns an
+empty string.
+
+]=]
+
+local function make_wikilink (link, display)
+	if is_set (link) then
+		if is_set (display) then
+			return table.concat ({'[[',_link,_'|', display, ']]'});
+		else
+			return table.concat ({'[[',_link,_'|', link, ']]'});
+		end
+	else
+		return '';
+	end
+end
+
+
+--[[--------------------------< L A N G _ N A M E _ G E T >----------------------------------------------------
+
+returns first listed language name for code from data{} table; strips parenthetical disambiguation; wikilinks to
+the language article if link is true; returns nil else
+
+]]
+
+local function lang_name_get (code, data, link, label)
+	local name;
+	
+	if data[code] then
+		name = data[code][1]:gsub ('%s*%b()', '');								-- get the name and strip parenthetical disambiguators if any
+		if link then															-- make a link to the language article?
+			if name:find ('languages') then
+				name = make_wikilink (name, label);								-- simple wikilink for collective languages unless there is a label
+			elseif override_data.article_name[code] then
+				name = make_wikilink (override_data.article_name[code][1], label or name);	-- language name or label with wikilink from override data
+			else
+				name = make_wikilink (name .. ' language', label or name);		-- [[name_language|name]] or [[name_language|label]]
+			end
+		end
+		return name;
+	end
+end
+
+
+--[[--------------------------< A D D _ I E T F _ E R R O R _ M S G >------------------------------------------
+
+assembles return-text (language code, language name, or error message) with IETF error message into properly
+formatted readable text
+
+]]
+
+local function add_ietf_error_msg (text, ietf_err, hide)
+	if hide then
+		ietf_err = '';
+	end
+	return table.concat ({
+		text,																	-- code name, language name, or error message
+		'' ~= ietf_err and ' ' or '',											-- needs a space when ietf_err is not empty
+		ietf_err,});															-- tack on ietf error message if one exists
+end
+
+
+--[[--------------------------< G E T _ P A R T _ I N D E X >--------------------------------------------------
+
+gets index suitable for parts{} table from ISO 639-<part> (usually args[2])
+
+return valid index [1] - [4]; nil else
+
+]]
+
+local function get_part_index (part)
+	return ({1, 2, 3, nil, 4})[tonumber(part)];
+end
+
+
+--[[--------------------------< I S O _ 6 3 9 _ C O D E _ T O _ N A M E _ C O M M O N >------------------------
+
+this is code that is common to all of the iso_639_code_n_to_name() functions which serve only as template entry points to
+provide the frame, the name of the appropriate data source, and to identify which 639 part applies.
+
+this function returns a language name or an error message.
+a second retval used by _iso_639_name_to_code() is true when a code is found; nil else
+
+]]
+
+local function iso_639_code_to_name_common (args, source, part)
+	local hide = 'yes' == args['hide-err'];
+
+	if not args[1] then															-- if code not provided in the template call
+		return error_msg ('required', '-' .. part, hide);						-- abandon
+	end
+
+	local code;																	-- used for error messaging
+	local ietf_err;																-- holds an error message when args[1] (language code) is in IETF tag form (may or may not be a valid IETF tag)
+	code, ietf_err = args[1]:gsub('(.-)%-.*', '%1');							-- strip ietf subtags; ietf_err is non-zero when subtags are stripped
+	ietf_err = (0 ~= ietf_err) and error_msg ('ietf', args[1], hide) or '';		-- when tags are stripped create an error message; empty string for concatenation else
+
+	if (1 == part and 2 ~= #code) or (1 < part and 3 ~= #code) then				-- 639-1 codes are 2 characters only; all others 3 characters
+		return  error_msg ('not_code', {code, '-' .. part}, hide);
+	end
+
+	local data = override_data['override_' .. part];							-- get override data for this part
+	local name = lang_name_get (code:lower(), data, args.link, args.label);		-- get override language name if there is one
+
+	if not name then
+		data = mw.loadData (source);											-- get the data for this ISO 639 part
+		name = lang_name_get (code:lower(), data, args.link, args.label);		-- get language name if there is one
+		if not name then
+			return error_msg ('not_found', {code, part}, hide);					-- code not found, return error message
+		end
+	end
+	return add_ietf_error_msg (name, ietf_err, hide), true;						-- return language name with ietf error message if any; true because we found a code
+end
+
+
+--[[--------------------------< _ I S O _ 6 3 9 _ C O D E _ T O _ N A M E >------------------------------------
+
+searches through the ISO 639 language tables for a name that matches the supplied code.  on success returns first
+language name that matches code from template frame perhaps with an error message and a second return value of true;
+on failure returns an error message and a second return value of nil.  The second return value is a return value
+used by iso_639_code_exists()
+
+looks first in the override data and then sequentially in the 639-1, -2, -3, and -5 data
+
+]]
+
+local function _iso_639_code_to_name (frame)
+	local args = getArgs(frame);
+	local hide = 'yes' == args['hide-err'];
+	
+	if not args[1] then															-- if code not provided in the template call
+		return error_msg ('required', '', hide);								-- abandon
+	end
+
+	local code = args[1];														-- used in error messaging
+	local name;																	-- the retrieved language name and / or error message
+	local found;																-- set to true when language name is found
+
+	code = code:gsub('(.-)%-.*', '%1');											-- strip ietf subtags; ietf_err is non-zero when subtags are stripped
+
+	if 2 > #code or 3 < #code then												-- 639 codes are 2 or three characters only
+		return  table.concat ({code, ' ', error_msg ('not_code', {code, ''}, hide)});	-- return whatever is in code + an error message; empty string hides $1
+	end
+
+	for _, part in ipairs (parts) do
+		name, found = iso_639_code_to_name_common (args, part[1],  part[2]);
+		if found then
+			return name, true;													-- second retval for iso_639_name_exists()
+		end
+	end
+
+	return error_msg ('not_found', {code, '1, -2, -3, -5'}, hide);				-- here when code is not found in the data tables
+end
+
+
+--[[--------------------------< I S O _ 6 3 9 _ C O D E _ T O _ N A M E >--------------------------------------
+
+template entry point; returns first language name that matches code from template frame or an error message
+looks first in the override data and then sequentially in the 639-1, -2, -3, and -5 data
+
+]]
+
+local function iso_639_code_to_name (frame)
+	local ret_val = _iso_639_code_to_name (frame);								-- ignore second return value
+	return ret_val;																-- return language name and / or error message
+end
+
+
+--[[--------------------------< I S O _ 6 3 9 _ C O D E _ E X I S T S >----------------------------------------
+
+template entry point; returns true if language code maps to a language name; intended as a replacement for:
+	{{#exist:Template:ISO 639 name <code>|<exists>|<doesn't exist>}}
+Instead of that expensive parser function call use this function:
+	{{#if:{{#invoke:ISO 639 name|iso_639_code_exists|<code>}}|<exists>|<doesn't exist>}}
+on success, returns true; nil else
+
+]]
+
+local function iso_639_code_exists (frame)
+	local _, exists;
+	 _, exists = _iso_639_code_to_name (frame);									-- ignore name/error message return; <exists> is true when name found for code; nil else
+	 return exists;
+end
+
+
+--[[--------------------------< I S O _ 6 3 9 _ C O D E _ 1 _ T O _ N A M E >----------------------------------
+
+template entry point; returns first language name that matches ISO 639-1 code from template frame or an error message
+
+]]
+
+local function iso_639_code_1_to_name (frame)
+	local args = getArgs (frame);
+	local retval = iso_639_code_to_name_common (args, parts[1][1],  parts[1][2]);		-- suppress second return value
+	return retval;
+end
+
+
+--[[--------------------------< I S O _ 6 3 9 _ C O D E _ 2 _ T O _ N A M E >----------------------------------
+
+template entry point; returns first language name that matches ISO 639-2 code from template frame or an error message
+
+]]
+
+local function iso_639_code_2_to_name (frame)
+	local args = getArgs (frame);
+	local retval = iso_639_code_to_name_common (args, parts[2][1],  parts[2][2]);		-- suppress second return value
+	return retval;
+end
+
+
+--[[--------------------------< I S O _ 6 3 9 _ C O D E _ 3 _ T O _ N A M E >----------------------------------
+
+template entry point; returns first language name that matches ISO 639-3 code from template frame or an error message
+
+]]
+
+local function iso_639_code_3_to_name (frame)
+	local args = getArgs (frame);
+	local retval = iso_639_code_to_name_common (args, parts[3][1],  parts[3][2]);		-- suppress second return value
+	return retval;
+end
+
+
+--[[--------------------------< I S O _ 6 3 9 _ C O D E _ 5 _ T O _ N A M E >----------------------------------
+
+template entry point; returns first language name that matches ISO 639-5 code from template frame or an error message
+
+]]
+
+local function iso_639_code_5_to_name (frame)
+	local args = getArgs (frame);
+	local retval = iso_639_code_to_name_common (args, parts[4][1],  parts[4][2]);		-- index [4] -> part 5 because there is no part 4; suppress second return value
+	return retval;
+end
+
+
+--[[--------------------------< _ I S O _ 6 3 9 _ N A M E _ T O _ C O D E >------------------------------------
+
+module entry point; returns ISO 639-1, -2, -3, or -5 code associated with language name according to part (1, 2, 3, 5) argument;
+when part is not provided scans 1, 2, 3 , 5 and returns first code
+
+override data are examined first
+
+<args> is frame arguments from getArgs(frame)
+
+]]
+
+local function _iso_639_name_to_code (args)
+	local hide = 'yes' == args['hide-err'];
+
+	if not args[1] then
+		return error_msg ('name', '', hide);
+	end
+	
+	local name = args[1];														-- used in error messaging
+	local lc_name = name:lower();												-- holds lowercase version of name for indexing into the data table
+
+	local part_idx;
+	if args[2] then
+		part_idx = get_part_index (args[2]);
+		if not part_idx then
+			return error_msg ('not_part', args[2], hide);						-- abandon; args[2] is not a valid ISO 639 part
+		end
+	end
+	local part = args[2];
+
+	local name_data = {};
+
+	if part then
+		name_data = override_data['override_' .. part];							-- select the override table for the specified part
+
+		for k, v in pairs (name_data) do										-- spin through the override table for the specified part
+			if lc_name == v[1]:lower() then										-- if name is found
+				return k;														-- return the code
+			end
+		end
+	else																		-- part not specified
+		for _, part in ipairs ({'1', '2', '3', '5'}) do							-- search the part in order
+			name_data = override_data['override_' .. part];
+			for k, v in pairs (name_data) do									-- spin through the override table for the specified part
+				if lc_name == v[1]:lower() then									-- if name is found
+					return k;													-- return the code
+				end
+			end
+		end
+	end
+
+	local name_data = mw.loadData ('Module:Language/data/ISO 639 name to code');	-- ISO 639 language names to code table
+
+	if name_data[lc_name] then
+		if part_idx then														-- if a specific part was specified
+			if '' == name_data[lc_name][part_idx] then							-- empty string when specified part does not have code for specified language name
+				return error_msg ('no_code', {part, name}, hide);				-- no code in ISO 639-part for language
+			else
+				return name_data[lc_name][part_idx];							-- part has code for language name
+			end
+		else
+			for _, v in ipairs ({1, 2, 3, 5-1}) do								-- no part provided, scan through name's list of codes to get the first available code
+				if '' ~= name_data[lc_name][v] then								-- empty string when specified part does not have code for specified language name
+					return name_data[lc_name][v];								-- return the first available code
+				end
+			end
+		end
+	else
+		return error_msg ('not_found', {name, part or '1, -2, -3, -5'}, hide);
+	end
+end
+
+
+--[[--------------------------< I S O _ 6 3 9 _ N A M E _ T O _ C O D E >--------------------------------------------------
+
+template entry point; returns ISO 639-1, -2, -3, or -5 code associated with language name according to part (1, 2, 3, 5) argument;
+when part is not provided scans 1, 2, 3 , 5 and returns first code
+
+override data are examined first
+
+args[1] is language name
+args[2] is ISO 639 part
+
+]]
+
+local function iso_639_name_to_code (frame)
+	local args = getArgs(frame);
+	return _iso_639_name_to_code (args);
+end
+
+
+--[[--------------------------< I S O _ 6 3 9 >----------------------------------------------------------------
+
+template entry point.
+returns:
+	language name if args[1] is valid language code
+	language code if args[1] is valid language name
+
+this function is constrained to the ISO 639 part specified in args[2] which must be 1, 2, 3, or 5.  When not provided
+all parts are tested. The first match is found
+
+]]
+
+local function iso_639 (frame)
+	local args = getArgs (frame);
+	local hide = 'yes' == args['hide-err'];
+	local result;
+	local found;																-- set to true when language name is found
+
+	if not args[1] then
+		return error_msg ('code_name', '', hide);
+	end
+	
+	if args[2] then																-- if ISO 639 part supplied
+		local part_idx = get_part_index (args[2]);								-- fix part 5; 1-3 same, 4 and anything else nil
+
+		if not part_idx then
+			return error_msg ('not_part', args[2], hide);						-- abandon args[2] is not a valid ISO 639 part
+		end
+
+		result, found = iso_639_code_to_name_common (args, parts[part_idx][1], parts[part_idx][2]);		-- attempt to find a code match
+		if found then
+			return result;														-- found the code so return the language name
+		end
+		return iso_639_name_to_code (frame);									-- might be a language name; return code if it is; error message or empty string else
+	else		
+		for _, part in ipairs (parts) do										-- for each of the iso 639 parts
+			result, found = iso_639_code_to_name_common (args, part[1], part[2]);				-- attempt to find a code match
+			if found then
+				return result;													-- found the code so return the language name
+			end
+		end
+	end	
+	return iso_639_name_to_code (frame);										-- might be a language name; return code if it is; error message or empty string else
+end
+
+
+--[[--------------------------< E X P O R T E D   F U N C T I O N S >------------------------------------------
+]]
+
+return {
+	iso_639 = iso_639,															-- returns code when given name; returns name when given code
+
+	iso_639_code_exists = iso_639_code_exists,
+
+	iso_639_code_to_name = iso_639_code_to_name,
+	iso_639_code_1_to_name = iso_639_code_1_to_name,
+	iso_639_code_2_to_name = iso_639_code_2_to_name,
+	iso_639_code_3_to_name = iso_639_code_3_to_name,
+	iso_639_code_5_to_name = iso_639_code_5_to_name,
+
+	iso_639_name_to_code = iso_639_name_to_code,
+	};

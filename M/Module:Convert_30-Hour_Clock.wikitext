@@ -1,0 +1,100 @@
+local getArgs = require('Module:Arguments').getArgs
+local error = require('Module:Error').error
+
+local function splitTime(time)
+  local rawResult = time:gmatch("[^:]+")
+  local result = {}
+  for portion in rawResult do
+  	local value
+  	if #result == 0 then 
+  		value = tonumber(portion)
+  	else 
+  		value = portion
+  	end
+    table.insert(result, value)
+  end
+  return result
+end
+
+local function hourPadLeft(hourNumber)
+  return string.format("%02d", hourNumber)
+end
+
+local function concatenateToTime(timeTable, decorator)
+  local stringTable = {}
+  for key, value in pairs(timeTable) do
+    if key == 1 then 
+      stringTable[key] = hourPadLeft(value)
+    else 
+      stringTable[key] = value 
+    end
+  end
+  return decorator .. table.concat(stringTable, ':')
+end
+
+local function _convert(time)
+  local rawHour = time[1]
+  if rawHour < 24 then
+  	return concatenateToTime(time, '当日')
+  else
+    time[1] = rawHour - 24
+    return concatenateToTime(time, '次日')
+  end 
+end
+
+local function isint(n)
+  return n == math.floor(n)
+end
+
+local function prepare(frame)
+  local args = getArgs(frame)
+  local timeTable = splitTime(args[1] or '')
+  local clock = tonumber(args[2])
+  return { rawTime = args[1], timeTable = timeTable, clock = clock }
+end
+
+local function _verify(time, clock)
+  if time[1] == nil then
+    return "错误：第一个argument的值必须要有小时数字部分。"
+  end
+  if clock ~= nil then 
+    if not isint(clock) then 
+  	  return "错误：第二个argument必须是整数。"
+    end
+    if clock <= 24 or clock >= 48 then
+  	  return "错误：第二个argument超过阈值，应该在25（含）至47（含）之间。"
+    end
+  
+    if time[1] - (clock - 24) < 0 or time[1] > clock then -- TODO 对小时后面的单位也进行验证
+  	  return "错误：时间和时间制不匹配。"
+    end
+  end
+  return nil
+end
+
+-- arg1: 时间，必需。如12，7:00，08:00，19:00，26:30，23:59:11，25:30:11.2325461等，但是第一个分号前必须是小时数字（24小时制）。不支持12小时制。
+-- arg2: 小时制，可选。必须是整数且在25（含）至47（含）之间。此数字不用被用于转换，但是会对arg1的值进行验证，是否符合X小时制，但是目前会对小时后面的单位进行验证（如30小时制的30:29依旧可以通过验证）。
+-- return: 转换成24小时制的时间，如“当日19:00”、“次日03:30”等。
+local function convert(frame)
+  local prepared = prepare(frame)
+  local timeTable, clock = prepared.timeTable, prepared.clock
+  local result = _verify(timeTable, clock)
+  if result == nil then
+	return _convert(timeTable, clock)
+  else
+  	return error({ message = result })
+  end
+end
+
+local function verify(frame)
+  local prepared = prepare(frame)
+  local rawTime, timeTable, clock = prepared.rawTime, prepared.timeTable, prepared.clock
+  local result = _verify(timeTable, clock)
+  if result == nil then
+	return rawTime
+  else
+  	return error({ message = result })
+  end
+end
+
+return { convert = convert, verify = verify }

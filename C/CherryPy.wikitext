@@ -1,0 +1,82 @@
+{{NoteTA|G1=IT}}
+{{Infobox software
+| name = CherryPy
+| caption = CherryPy库
+| developer = [https://bitbucket.org/cherrypy/cherrypy/wiki/CherryPyTeam CherryPy team]
+| released = {{Start date and age|2002|06}}<ref>{{cite web|title=History of CherryPy|url=https://subscription.packtpub.com/book/web_development/9781904811848/1/ch01lvl1sec09/history-of-cherrypy|access-date=2021-03-12|archive-date=2018-12-15|archive-url=https://web.archive.org/web/20181215022039/https://subscription.packtpub.com/book/web_development/9781904811848/1/ch01lvl1sec09/history-of-cherrypy}}</ref>
+| latest release version = {{wikidata|property|reference|edit|P348}}
+| latest release date    = {{wikidata|qualifier|P348|P577}}，{{Time ago|{{wikidata|qualifier|raw|P348|P577}}}}
+| repo = {{URL|https://github.com/cherrypy/cherrypy|CherryPy Repository}}
+| programming language = [[Python|Python]]
+| operating_system = [[跨平台|跨平台]]
+| genre = [[Web应用框架|Web应用框架]]
+| license = [[BSD许可证|BSD许可证]]<ref name="license-bitbucket">{{Cite web|url=https://bitbucket.org/cherrypy/cherrypy/src/1f32d95ca00d3bb7b7c8e435a47747fe1d63b190/cherrypy/LICENSE.txt|access-date=2015-02-21|publisher=BitBucket|title=cherrypy / CherryPy / source / cherrypy / LICENSE.txt|archive-date=2017-07-15|archive-url=https://web.archive.org/web/20170715092634/https://bitbucket.org/cherrypy/cherrypy/src/1f32d95ca00d3bb7b7c8e435a47747fe1d63b190/cherrypy/LICENSE.txt}}</ref>
+| website = {{url|https://cherrypy.org/}}
+}}
+
+'''CherryPy'''是一个[[面向对象编程|面向对象]]的[[web应用框架|web应用框架]]，使用了[[Python|Python]][[编程语言|编程语言]]。它设计用于[[网络应用程序|web应用]]的[[快速应用开发|快速开发]]，通过[[适配器模式|包裹]][[超文本传输协议|HTTP协议]]，但停留在低层而不提供超出<nowiki>RFC 7231</nowiki>所定义的东西。
+
+CherryPy自身可以是个web服务器，也可以通过任何[[Web服务器网关接口|WSGI]]兼容环境来启动它。它不处置用于输出呈现的模板或后端访问的任务。这个框架可以采用过滤器来扩展，它被调用于请求/响应处理的确定点上。
+
+==Python化接口==
+这个项目创立者{{en-link|Remi Delon}}的目标之一，是使得CherryPy尽可能的体现[[Python之禅|Python原则]]。这允许开发者将这个框架同任何正规Python模块一样的使用，而忘记（从技术的角度）这个应用是用于web。
+
+例如，常见的[[Hello_World|Hello World]]程序用CherryPy 3将写为如下：
+
+<syntaxhighlight lang="python">
+import cherrypy
+
+class HelloWorld:
+    def index(self):
+        return "Hello World!"
+    index.exposed = True
+
+cherrypy.quickstart(HelloWorld())
+</syntaxhighlight>
+
+==特征==
+CherryPy实现了：
+* 遵循[[HTTP|HTTP]]/1.1、[[Web服务器网关接口|WSGI]]的[[线程池|线程池]]的webserver<ref>{{Cite web |url=http://www.cherrypy.org/#Features |title=存档副本 |access-date=2021-03-12 |archive-date=2021-05-14 |archive-url=https://web.archive.org/web/20210514234054/https://cherrypy.org/#Features }}</ref>。典型的，CherryPy自身每页只用1–2ms<ref>{{Cite web |url=http://www.aminus.org/blogs/index.php/2006/12/23/cherrypy_3_has_fastest_wsgi_server_yet |title=CherryPy v3 WSGI server benchmark results |access-date=2009-09-23 |archive-url=https://web.archive.org/web/20160303200606/http://www.aminus.org/blogs/index.php/2006/12/23/cherrypy_3_has_fastest_wsgi_server_yet |archive-date=2016-03-03 }}</ref><ref>[http://www.cherrypy.org/wiki/CherryPySpeed How fast is CherryPy?] {{webarchive |url=https://web.archive.org/web/20100210133216/http://www.cherrypy.org/wiki/CherryPySpeed |date=2010-02-10 }}</ref>。
+* 支持任何任何其他启用WSGI的[[web服务器|web服务器]]或适配器，包括[[Apache_HTTP_Server|Apache]]、[[互联网信息服务|IIS]]、[[lighttpd|lighttpd]]、{{en-link|mod_python}}、[[FastCGI|FastCGI]]、[[SCGI|SCGI]]和{{en-link|mod_wsgi}}。
+* 一个原生的{{en-link|mod_python}}适配器。
+* 多个HTTP服务器（就是有能力监听多个端口）<ref>{{Cite web |url=http://tools.cherrypy.org/wiki/MultipleHttpServers |title=How to set up multiple HTTP servers with CherryPy |access-date=2009-09-23 |archive-url=https://web.archive.org/web/20160303175022/http://tools.cherrypy.org/wiki/MultipleHttpServers |archive-date=2016-03-03  }}</ref>。
+* 一个[[插件|插件]]系统<ref>[http://www.cherrypy.org/wiki/CustomPlugins Custom engine plugins with CherryPy] {{webarchive |url=https://web.archive.org/web/20090503091300/http://www.cherrypy.org/wiki/CustomPlugins |date=2009-05-03 }}</ref>，CherryPy插件挂钩到在服务器进程内的事件，服务器启动、服务器关闭、服务器退出等，用来执行在服务器启动和关闭时需要运行的代码。
+* 内建工具用于[[web缓存|缓存]]、[[字符编码|编码]]、[[会话_(计算机科学)|会话]]、[[授權_(資安)|授权]]、静态内容和其他。CherryPy工具挂钩到在请求处理内的事件。在CherryPy服务器收到一个请求的时候，它有一组特定的步骤要履行来处理这个请求。页面处理器只是这个处理的步骤之一。工具还提供语法和配置API来为特定集合的处理器而打开和关闭它们。
+* 给开发者和部署者的一个配置系统<ref>[http://www.cherrypy.org/chrome/common/2.2/docs/book/chunk/ch03.html#id3467720 Configuration system of CherryPy] {{webarchive |url=https://web.archive.org/web/20090626050839/http://www.cherrypy.org/chrome/common/2.2/docs/book/chunk/ch03.html#id3467720 |date=2009-06-26 }}</ref><ref>[http://www.cherrypy.org/wiki/ConfigAPI Configuration API of CherryPy] {{webarchive |url=https://web.archive.org/web/20090701025825/http://www.cherrypy.org/wiki/ConfigAPI |date=2009-07-01 }}</ref><ref>{{Cite web |url=http://docs.turbogears.org/1.0/Configuration#id5 |title=Short summary of configuration options |access-date=2021-03-12 |archive-date=2010-08-18 |archive-url=https://web.archive.org/web/20100818231635/http://docs.turbogears.org/1.0/Configuration#id5 }}</ref>。CherryPy部署可配置于站点上、应用上和在控制器层面上，通过Python字典、配置文件和打开文件对象。
+* 一个完全的[[测试套件|测试套件]]用于核心功能和有关框架，可以用来测试CherryPy应用<ref>[http://www.cherrypy.org/wiki/Testing How to test CherryPy itself] {{webarchive |url=https://web.archive.org/web/20090927033305/http://www.cherrypy.org/wiki/Testing |date=2009-09-27 }}</ref>。
+* 内建[[性能分析|剖析]]自从v2.1<ref>[http://www.cherrypy.org/wiki/WhatsNewIn21#NewProfilermodule Profiler module of CherryPy] {{webarchive |url=https://web.archive.org/web/20100209001310/http://www.cherrypy.org/wiki/WhatsNewIn21#NewProfilermodule |date=2010-02-09 }}</ref>、[[代码覆盖|覆盖]]<ref>{{Cite web |url=http://www.aminus.org/blogs/index.php/2005/08/19/code_coverage_with_cherrypy_2_1?blog=2 |title=How to collect and the analyse coverage data of application code with CherryPy |access-date=2009-09-23 |archive-url=https://web.archive.org/web/20151117025544/http://www.aminus.org/blogs/index.php/2005/08/19/code_coverage_with_cherrypy_2_1?blog=2 |archive-date=2015-11-17 }}</ref>和测试支持。
+
+CherryPy不强制使用特定[[对象关系映射器|对象关系映射器]]（ORM）、{{en-link|Web模板系统|Web template system|模板语言}}或[[JavaScript库|JavaScript库]]。
+
+===可用于CherryPy的模块===
+* Routes，一个[[Ruby_on_Rails|Ruby on Rails]]的路由系统的Python重新实现，用于映射[[URL|URL]]到控制器/行动和生成URL<ref>{{Cite web |url=https://routes.readthedocs.io/en/latest/ |title=Routes Documentation |access-date=2021-03-13 |archive-date=2019-11-28 |archive-url=https://web.archive.org/web/20191128201941/https://routes.readthedocs.io/en/latest/ }}</ref>。
+
+====对象关系映射器====
+* [[SQLAlchemy|SQLAlchemy]]，用于Python应用的一个数据库后端和[[对象关系映射|ORM]]。
+* [[SQLObject|SQLObject]]，一个流行的[[对象关系映射|ORM]]用于提供到数据库的对象接口。支持很多常见数据库后端：包括在发行中的有[[MySQL|MySQL]]、[[PostgreSQL|PostgreSQL]]、[[SQLite|SQLite]]、[[Sybase_SQL_Server|Sybase SQL Server]]、[[MaxDB|MaxDB]]、[[Microsoft_SQL_Server|Microsoft SQL Server]]和[[Firebird_(数据库)|Firebird]]。
+* {{en-link|Storm (软件)|Storm (software)|Storm}}，[[Canonical|Canonical]]公司的[[对象关系映射|ORM]]。
+* MongoEngine，用于连接到[[MongoDB|MongoDB]]的[[对象关系映射|ODM]]<ref>{{cite web |url=http://mongoengine.org/ |title=mongoengine.org |access-date=2021-03-13 |archive-date=2021-01-17 |archive-url=https://web.archive.org/web/20210117144122/http://mongoengine.org/ }}</ref>。
+
+====模板语言====
+* Mako<ref>{{Cite web |url=http://www.makotemplates.org/ |title=Mako Templates for Python |access-date=2021-03-12 |archive-date=2021-05-11 |archive-url=https://web.archive.org/web/20210511153743/https://www.makotemplates.org/ }}</ref>，用Python写的模板库，可用于简单的CherryPy工具<ref>{{Cite web |url=http://tools.cherrypy.org/wiki/Mako |title=A simple CherryPy tool for Mako templating |access-date=2009-09-21 |archive-url=https://web.archive.org/web/20160303201627/http://tools.cherrypy.org/wiki/Mako |archive-date=2016-03-03 }}</ref>。
+* {{en-link|CheetahTemplate||Cheetah}}，开源{{en-link|Web模板系统|Web template system|模板引擎}}和代码生成工具，用Python写成。
+* CherryTemplate，CherryPy的模板语言。
+* {{en-link|Genshi (模板语言)|Genshi (templating language)|Genshi}}<ref>{{cite web|url=http://genshi.edgewall.org/wiki/CherryPy|title=CherryPy – Genshi|access-date=2009-09-26|archive-date=2012-07-04|archive-url=https://www.webcitation.org/68trwhFFO?url=http://genshi.edgewall.org/wiki/CherryPy}}</ref><ref>{{cite web|url=http://tools.cherrypy.org/wiki/Genshi|title=Genshi - CherryPy Tools - Trac|access-date=2009-09-26|archive-url=https://web.archive.org/web/20120227062117/http://tools.cherrypy.org/wiki/Genshi|archive-date=2012-02-27}}</ref>，强力的XML模板引擎。
+* [[Jinja2|Jinja]]，通用模板语言。CherryPy拥有使用Jinja模板的一个工具<ref>{{Cite web |url=http://tools.cherrypy.org/wiki/Jinja |title=A basic CherryPy Tool for using Jinja templates |access-date=2009-09-23 |archive-url=https://web.archive.org/web/20150905175257/http://tools.cherrypy.org/wiki/Jinja |archive-date=2015-09-05}}</ref>。
+* {{en-link|Kid (模板语言)|Kid (templating language)|Kid}}，一个简单的模板语言，用于基于XML的用Python写的词汇表。
+
+==参见==
+* [[各網頁框架系統的比較|各網頁框架系統的比較]]
+
+==引用==
+{{Reflist|30em}}
+
+==外部链接==
+*{{Official website}}
+{{Python web frameworks}}
+{{Web frameworks}}
+
+{{DEFAULTSORT:Cherrypy}}
+[[Category:Python库|Category:Python库]]
+[[Category:web应用框架|Category:web应用框架]]
+[[Category:使用BSD许可证的软件|Category:使用BSD许可证的软件]]

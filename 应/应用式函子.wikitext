@@ -1,0 +1,68 @@
+{{NoteTA|G1=IT}}
+在[[函数式编程|函数式编程]]中， '''应用式函子'''，或简称应用式（applicative），是在[[函子_(函数式编程)|函子]]和[[单子_(函数式编程)|单子]]之间的中间结构。应用式函子允许函子式计算成为序列（不同于平常函子），但是不允许使用前面计算的结果于后续计算的定义之中（不同于单子）。应用式函子是[[范畴论|范畴论]]中具有{{en-link|强单子|Strong monad|张量强度}}的{{en-link|幺半群函子|Monoidal functor|不严格幺半群函子}}的编程等价者。
+
+应用式函子是2008年Conor McBride和Ross Paterson在他们的论文《Applicative programming with effects》中介入的<ref>{{Cite journal|last=McBride|first=Conor|last2=Paterson|first2=Ross|date=2008-01-01|title=Applicative programming with effects|journal=Journal of Functional Programming|volume=18|issue=1|pages=1–13|doi=10.1017/S0956796807006326|issn=1469-7653}}</ref>。应用式函子在[[Haskell|Haskell]]中最初作为库特征出现，现在已经传播到了其他语言，包括[[Idris|Idris]]、[[Agda|Agda]]、[[OCaml|OCaml]]、[[Scala|Scala]]和[[F♯|F#]]。为了方便使用应用式函子编程，Glasgow Haskell和Idris二者现在提供了专门设计的语言特征。在Haskell中，应用式函子实现在<code>Applicative</code>[[类型类|类型类]]中。
+
+== 定义 ==
+
+在Haskell中，应用式是[[泛型编程|参数化类型]]，被当作这个类型的数据的容器，加上两个方法：<code>pure</code>和{{code|code=<*>}}。考虑一个参数化类型<code>f a</code>，类型<code>f</code>的一个应用式的<code>pure</code>方法有着类型：
+<syntaxhighlight lang="haskell">
+pure :: a -> f a
+</syntaxhighlight>
+它可被认为是把值带入应用式。类型<code>f</code>的应用式{{code|code=<*>}}方法有着类型：
+<syntaxhighlight lang="haskell">
+(<*>) :: f (a -> b) -> f a -> f b
+</syntaxhighlight>
+它可被认为是在应用式内部函数应用的等价者<ref name="Hutton">{{Cite book|last=Hutton|first=Bride|date=2016|title=Programming in Haskell|edition=2|pages=157-163}}</ref>。
+
+可作为替代，不提供{{code|code=<*>}}，转而提供一个叫做<code>liftA2</code>的函数。这两个函数都可以依据另一个来定义，因此在极小化完备定义中只需要其中一个<ref name="Hackage">{{Cite web|title=Control.Applicative|url=https://hackage.haskell.org/package/base-4.14.1.0/docs/Control-Applicative.html|access-date=2021-02-08|archive-date=2021-03-16|archive-url=https://web.archive.org/web/20210316230250/https://hackage.haskell.org/package/base-4.14.1.0/docs/Control-Applicative.html|dead-url=no}}</ref>。
+
+应用式还要求满足四个方程式定律<ref name="Hackage" />：
+* 同一：{{code|lang=haskell|code=pure id <*> v = v}}
+* 复合：{{code|lang=haskell|code=pure (.) <*> u <*> v <*> w = u <*> (v <*> w)}}
+* 同态：{{code|lang=haskell|code=pure f <*> pure x = pure (f x)}}
+* 互换：{{code|lang=haskell|code=u <*> pure y = pure ($ y) <*> u}}
+
+所有应用式都是函子。出于明确性，给定方法<code>pure</code>和{{code|code=<*>}}，<code>fmap</code>可以被实现为<ref name="Hackage" />：
+<syntaxhighlight lang="haskell">
+fmap f x = pure f <*> x
+</syntaxhighlight>
+
+常用的表示法{{code|lang=haskell|code=f <$> x}}等价于{{code|lang=haskell|code=pure f <*> x}}。
+
+== 例子 ==
+
+在Haskell中，[[可选类型|Maybe类型]]可以做成[[类型类|类型类]]<code>Applicative</code>的实例，使用下列定义<ref name="Hutton" />：
+<syntaxhighlight lang="haskell">
+instance Applicative Maybe where
+    -- pure :: a -> Maybe a
+    pure a = Just a
+
+    -- (<*>) :: Maybe (a -> b) -> Maybe a -> Maybe b
+    Nothing  <*> _        = Nothing
+    _        <*> Nothing  = Nothing
+    (Just g) <*> (Just x) = Just (g x)
+</syntaxhighlight>
+如定义章节所述，<code>pure</code>将一个<code>a</code>转变成一个{{code|lang=haskell|code=Maybe a}}，而{{code|code=<*>}}应用一个<code>Maybe</code>函数到一个<code>Maybe</code>值。对类型<code>a</code>使用<code>Maybe</code>应用式，允许在类型<code>a</code>的值上进行运算，其错误由应用式机制自动处理。例如，要加<code>1</code>到{{code|lang=haskell|code=n :: Maybe Int}}，只需要写：
+<syntaxhighlight lang="haskell">
+(+1) <$> n
+</syntaxhighlight>
+如果{{code|lang=haskell|code=n = Nothing}}，则结果将是{{code|lang=haskell|code=Nothing}}；而如果{{code|lang=haskell|code=n = Just k}}，则结果会是{{code|lang=haskell|code=Just (k+1)}}。这个例子还展示了应用式如何允许某种泛型函数应用。
+
+== 参见 ==
+* [[类型类|类型类]]
+* [[函子_(函数式编程)|函子]]
+* [[单子_(函数式编程)|单子]]
+
+==引用==
+{{Reflist|2}}
+
+==外部链接==
+{{Wikibooks|en:Haskell/Applicative functors|应用式函子}}
+* [https://hackage.haskell.org/package/base-4.14.1.0/docs/Control-Applicative.html Description of the Applicative typeclass in the Haskell docs] {{Wayback|url=https://hackage.haskell.org/package/base-4.14.1.0/docs/Control-Applicative.html |date=20210316230250 }}
+* [http://hackage.haskell.org/package/base/docs/src/GHC.Base.html#Applicative Definition of the Applicative typeclass in the Glasgow Haskell Prelude]{{Dead link}}
+
+{{软件设计模式}}
+
+[[Category:函数式编程|Category:函数式编程]]
+[[Category:软件设计模式|Category:软件设计模式]]

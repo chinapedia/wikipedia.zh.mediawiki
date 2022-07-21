@@ -1,0 +1,189 @@
+local p = {}
+local data = mw.loadData('Module:Namespace/data')
+local mLan = require('Module:Lan2')
+
+local function Error (msg)
+	return mError.error{'[[Module:Namespace|Module:Namespace]]錯誤：' + msg}
+end
+
+local function ifempty (ret, val)
+	return ret ~= '' and ret or val
+end
+
+function p._lan (args, lang)
+	return mLan.main(args, ifempty(lang and lang:lower(), mw.getCurrentFrame():callParserFunction{ name = 'int', args = {'Lang'} }), {
+		['def'] = {'en'}
+	})
+end
+
+function p.isNamespace (id)
+	id = tostring(id)
+	return 
+		mw.site.namespaces[tonumber(id) or id:lower()] and mw.site.namespaces[tonumber(id) or id:lower()].id
+		or p._ispseudoNS(id)
+		or nil
+end
+
+function p.namespace (frame)
+	local args
+	if frame == mw.getCurrentFrame() then
+		-- We're being called via #invoke. The args are passed through to the module
+		-- from the template page, so use the args that were passed into the template.
+		if not getArgs then
+			getArgs = require('Module:Arguments').getArgs
+		end
+		args = getArgs(frame, {parentFirst=true})
+	else
+		-- We're being called from another module or from the debug console, so assume
+		-- the args are passed in directly.
+		args = frame
+		if type(args) ~= type({}) then args = {frame} end
+	end
+	id = tostring(args.namespace or args[1])
+	return (p._ispseudo() or mw.title.getCurrentTitle().namespace) == p.isNamespace(id) and (args['then'] or args[2]) or (args['else'] or args[3])
+end
+
+local MsgCallFunc = {
+	['NamespacesDisplay'] = (function (nsid) 
+		return data.Namespace[tostring(nsid)]
+	end),
+	['NamespacesConversionDisplay'] = (function (nsid) 
+		return data.Namespace[tostring(nsid) .. '-display'] or data.Namespace[tostring(nsid)]
+	end),
+	
+}
+
+for key, func in pairs(MsgCallFunc) do
+	p['_' .. key] = function (lang, ns)
+		if type(lang)  == 'table' then
+			ns = lang[2]
+			lang = lang[1]
+		end
+		local PNS
+		local lang = lang
+		local nsid
+		if ns then
+			if ns == '' then
+				nsid = -3
+			else
+				local nsid_info = mw.site.namespaces[tonumber(ns)] or mw.site.namespaces[ns]
+				if not nsid_info then
+					PNS = p._ispseudo(ns)
+					if PNS then
+						if ns:match('^[Tt][Aa][Ll][Kk]:') then
+							nsid = 'Talk:' .. PNS
+						else
+							nsid = PNS
+						end
+					else
+						nsid = -3
+					end
+				else
+					nsid = nsid_info.id
+				end
+			
+			end
+		else
+			PNS = p._ispseudo()
+			if PNS then
+				nsid = (mw.title.getCurrentTitle().namespace == 1 and 'Talk:' or '') .. PNS
+			else
+				nsid = mw.title.getCurrentTitle().namespace
+			end
+		end
+		if type(nsid) == 'string' then
+			return p._lan(data['PseudoNamespace'][nsid], lang)
+		elseif nsid < -2 then
+			error('Input namespace error.')
+		end
+		return p._lan(MsgCallFunc[key](nsid), lang)
+	end
+	
+	p[key] = function (frame) 
+		local args = require('Module:Arguments').getArgs(frame, {
+			valueFunc = function (key, value)
+				if key == 2 then
+					return type(value) == 'string' and mw.text.trim(value) or value
+				elseif value then
+					value = mw.text.trim(value)
+					if value ~= '' then
+						return value
+					end
+				end
+				return nil
+			end
+		})
+		local statue, wt = pcall(p['_' .. key], args)
+		if statue then
+			return wt
+		end
+		return tostring(mw.html.create('span'):attr('style', 'color:red;'):wikitext(
+			p._lan ({
+				['zh'] = 'Input namespace error',
+				['zh-hans'] = '输入名字空间错误',
+				['zh-hant'] = '輸入命名空間錯誤'
+			}, lang)
+		):done())
+	end
+end
+
+local function inArray (str, arr)
+	for i, v in ipairs(arr) do
+		if str == v then
+			return v
+		end
+	end
+	return nil
+end
+
+function p._ispseudo (title)
+	local success, titleObj = pcall(mw.title.new, title)
+	if not success or not titleObj then
+		if title == '' then
+			return nil
+		elseif not title then
+			titleObj = mw.title.getCurrentTitle()
+		elseif type(title) == 'table' and tostring(title) ~= 'table' then -- for arg title is mw.title obj
+			local titleText = title.fullText
+			if not titleText then
+				return nil
+			end
+			success, titleObj = pcall(mw.title.new, title)
+			if not success or not titleObj or titleObj ~= title then
+				return nil
+			end
+		else
+			return nil
+		end
+	end
+	title = titleObj.fullText:gsub('^Talk:', '')
+	local split = mw.text.split(title, ':')
+	if inArray(split[1], data['PseudoNamespace']['list']) then
+		return split[1]
+	end
+	return nil
+end
+
+function p.ispseudo (frame)
+	local arg = require('Module:Arguments').getArgs(frame)['1']
+	return p._ispseudo(arg) or ''
+end
+
+function p._ispseudoNS (ns)
+	if not ns or ns == '' then
+		return nil
+	end
+	local success, titleObj = pcall(mw.title.new, ns .. ':$1')
+	if not success or not titleObj then
+		return nil
+	end
+	ns = titleObj.fullText:gsub('^Talk:', ''):gsub(':%$1$', '')
+	if inArray(ns, data['PseudoNamespace']['list']) then
+		return ns
+	end
+	return nil
+end
+
+p._PNSArray = data['PseudoNamespace']['list']
+
+return p

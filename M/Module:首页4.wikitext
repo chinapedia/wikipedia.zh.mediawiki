@@ -1,0 +1,64 @@
+require('Module:No globals')
+local p = {}
+
+local random = require('Module:Random').item
+
+local function getPage(page)
+	return mw.getCurrentFrame():preprocess('{{' .. page .. '}}')
+end
+
+function p.random(list)
+	return getPage(random(list)[2])
+end
+
+function p.all(list)
+	local function heading(title, wptitle)
+		local i = '[['_.._title_.._'|' .. title .. ']]<span class="mw-editsection plainlinks">[' .. 
+			require('Module:Fullurl')._fullurl({wptitle, action = 'edit', '编辑展示页'}) .. 
+			']</span>'
+		return mw.getCurrentFrame():preprocess('{{fakeh3|1=' .. i .. '}}')
+	end
+	
+	local ret = mw.html.create():tag('table'):addClass('wikitable'):attr('style', 'width: 100%;'):newline()
+	local i = 1
+	while i < #list/2+1 do
+		local v1 = list[i*2-1]
+		local v2 = list[i*2]
+		if v2 then
+			ret
+				:tag('tr'):attr('style', 'vertical-align: top;')
+					:newline()
+					:tag('td'):attr('style', 'width: 49%;')
+						:wikitext(heading(v1[1], v1[2]) .. getPage(v1[2]))
+						:done()
+					:newline()
+					:tag('td'):attr('style', 'width: 49%;')
+						:wikitext(heading(v2[1], v2[2]) .. getPage(v2[2]))
+						:done()
+					:done()
+				:newline()
+		else
+			ret
+				:tag('tr'):attr('style', 'vertical-align: top;')
+					:tag('td'):attr('style', 'width: 49%;')
+						:wikitext(heading(v1[1], v1[2]) .. getPage(v1[2]))
+						:done()
+					:tag('td'):attr('style', 'width: 49%;')
+						:done()
+					:done()
+		end
+		i = i + 1
+	end
+	return ret
+		:newline()
+		:done()
+end
+
+p.set_own = function(list)
+	local s = {}
+	s.random = function () return p.random(list) end
+	s.all = function () return p.all(list) end
+	return s
+end
+
+return p

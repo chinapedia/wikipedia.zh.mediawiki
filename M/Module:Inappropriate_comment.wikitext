@@ -1,0 +1,92 @@
+local p = {}
+local action = {}
+local getArgs = require('Module:Arguments').getArgs
+local gFrame = mw.getCurrentFrame()
+local mError = require('Module:Error')
+
+local function tag (tag, title, class, cssText, wt, newline)
+	if newline == true then
+		return tostring( mw.html.create(tag):attr('title', title):addClass(class):cssText(cssText):newline():wikitext(wt):newline():done() )
+	else
+		return tostring( mw.html.create(tag):attr('title', title):addClass(class):cssText(cssText):wikitext(wt):done() )
+	end
+end
+
+local function _DoThisAction (sign, user, time)
+	if not sign then
+		sign = user and gFrame:expandTemplate{ 'Template:User sign', args = { [1] = user }} or nil
+	end
+	return (sign and '由' .. sign or '') .. (date and '於' .. date or '')
+end
+
+function action.remove (comment, reason, DoThisAction) 
+	local wt = '註：此處原有評論，因為其已被認定為不合適評論，已依據[[WP:TPG|討論頁指引]]' .. DoThisAction .. '移除，尚祈見諒。若有異議請至[[Wikipedia:互助客栈|互助客棧]]或向[[Wikipedia:管理员名单|管理員]]反映。' .. (reason and '原因：' .. reason)
+	return tag('div', nil, nil, 'clear: both; margin: 1em auto; border: #999 solid 1px; padding: 0.2em; color: #333; font-size: 80%; background: #fff;', wt, true)
+end
+
+function action.tag (comment, reason)
+	local ret = ''
+	if comment then
+		ret = tag('mark', '不合適的評論', nil, nil, comment, false)
+	end
+	ret = ret .. tag('sup', nil, 'noprint', nil, '[[Wikipedia:討論頁指引#不能接受的行為|' .. 
+		tag('span', '不合適的評論', nil, 'white-space: nowrap;', '[不合適的評論]', nil)
+	.. ']]', false)
+	return ret
+end
+
+function action.tag_over (comment, reason, DoThisAction) 
+	local wt = '[[File:Information.svg|20x20px]]依據[[WP:TPG|討論頁指引]]，此評論已被認定為不合適評論並' .. DoThisAction .. '標記。' .. (reason and '原因：' .. reason)
+	return tag('div', nil, nil, 'position: relative;',
+		comment .. tag('div', nil, nil, 'clear: both; margin: 1em auto; border: #999 solid 1px; padding: 0.2em; color: #333; font-size: 80%; background:#fff;', wt, true)
+	, true)
+end
+
+function action.no_action (comment)
+	return comment
+end
+
+function action.collapse (comment, reason, DoThisAction)
+	local wt = '依據[[WP:TPG|討論頁指引]]，此評論已被認定為不合適評論並' .. DoThisAction .. '標記。' .. (reason and '原因：' .. reason)
+	return tag('div', nil, 'NavFrame collapsed', 'width:100%; border:none;',
+		tag('div', nil, 'NavHead', 'background: transparent; color: #999; padding-right: 3.5em;', wt, true) .. 
+		tag('div', nil, 'NavContent', 'width: 100%; margin: 2px; border: 1px dashed #eee; padding: 4px; text-align: left;', comment, true)
+	, true)
+end
+
+function p._main (args)
+	local _action = string.lower((args.action or ''):gsub(' ', '_'))
+	if _action == '' and args[1] and action[string.lower(args[1]:gsub(' ', '_'))] then
+		_action = string.lower(args[1]:gsub(' ', '_'))
+	end
+	local ActionIsTag = not _action or _action == '' or _action == 'tag'
+	local comment = args.comment or (ActionIsTag and args[2] or nil)
+	local reason = args.reason or (ActionIsTag and args[1] or args[2])
+	local DoThisAction = _DoThisAction(args.sign, args.user, args.date)
+	if ActionIsTag then
+		return action['tag'](comment, reason)
+	elseif action[_action] and comment then
+		return action[_action](comment, reason, DoThisAction)
+	elseif not action[_action] and comment then
+		return mError.error({
+			[1] = '請輸入「action=remove/collapse/tag over/tag/no action」。',
+			tag = 'p'
+		})
+	else
+		return mError.error({
+			[1] = '請輸入「comment=所涉及的評論」。',
+			tag = 'p'
+		})
+	end
+end
+
+function p.main(frame)
+	local args = getArgs(frame)
+	return p._main(args)
+end
+
+for k, v in pairs(action) do
+	p['_' .. k] = v
+end
+
+return p

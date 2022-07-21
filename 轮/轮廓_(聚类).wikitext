@@ -1,0 +1,54 @@
+在机器学习与数据挖掘领域，'''轮廓'''指的是一种反映数据[[聚类|聚类]]结果一致性的方法，可以用于评估聚类后簇与簇之间的离散程度。<ref>{{Cite journal|title=Silhouettes: a Graphical Aid to the Interpretation and Validation of Cluster Analysis|url=https://archive.org/details/sim_journal-of-computational-and-applied-mathematics_1987-11_20/page/53|last=Peter J. Rousseeuw|authorlink=Peter J. Rousseeuw|journal=Computational and Applied Mathematics|doi=10.1016/0377-0427(87)90125-7|year=1987|volume=20|pages=53–65}}</ref>轮廓的取值范围为[-1, +1]，如果某一样本的轮廓接近1，则说明样本聚类结果合理；如果接近-1，则说明其更应该分类到其他的簇；如果轮廓近似为0，则说明该样本在两个簇的边界上。所有样本轮廓的均值称为聚类结果的轮廓系数（Silhouette Coefficiency），是该聚类是否合理、有效的度量。
+
+== 定义 ==
+[[File:Silhouette-plot-orange.png|缩略图]]
+假设某一数据集使用如[[K-平均算法|k-means]]等聚类方法分成了<math>k</math> 个簇：
+
+对于某一属于簇<math>C_i</math>样本<math>i</math>，记为 <math>i \in C_i</math> ，设<math>d(i, j)</math>为样本<math>i</math>与<math>j</math>之间的距离，求算样本<math>i</math>与其他样本之间的平均距离的公式如下（由于不计算样本与自身的距离<math>d(i, i)</math>，故计算平均值时样本总数为<math>|C_i| - 1</math>）：
+
+: <math>a(i) = \frac{1}{|C_i| - 1} \sum_{j \in C_i, i \neq j} d(i, j)</math>
+上述公式结果记为<math>a(i)</math>，它反映了样本<math>i</math>当前聚类结果的优劣（值越小，聚类结果越好）。
+
+然后，我们定义样本与某簇<math>C_k</math>的平均相异性为与样本<math>i</math>距离簇的平均值<math>i</math>到簇<math>C_k</math>内所有样本的距离均值 （<math>C_k \neq C_i</math>），则对于样本 <math>i \in C_i</math>，有<math>i</math>最小平均距离<math>b(i)</math>对应的簇<math>C_k</math>，我们称其为<math>i</math>的“相邻簇”：
+
+: <math>b(i) = \min_{k \neq i} \frac{1}{|C_k|} \sum_{j \in C_k} d(i, j)</math>
+结合上述内容，我们定义<math>i</math>的轮廓值为：
+
+: <math>s(i) = \frac{b(i)-a(i)}{\max\{a(i),b(i)\}} </math>
+等效为：
+
+: <math>s(i) = \begin{cases}
+  1-a(i)/b(i), & \mbox{if } a(i) < b(i) \\
+  0,  & \mbox{if } a(i) = b(i) \\
+  b(i)/a(i)-1, & \mbox{if } a(i) > b(i) \\
+\end{cases}
+</math>
+
+对于上述定义，显然<math> -1 \le s(i) \le 1.
+</math>
+
+为了防止簇数量暴增，对于仅有一个样本的簇（<math>|C_i| = 1 </math>），定义其<math>s(i) = 0 </math>。
+<math>a(i)</math>反映了<math>i</math>与其所属簇的距离，较小的<math>a(i)</math>值说明其与所属簇的关系紧密；而较大的<math>b(i)</math>反映了<math>i</math>与其他簇关系疏远；故为提高<math>s(i)</math>（或称为优化聚类结果），我们需要使<math>a(i) \ll b(i)</math><ref>{{Cite journal|title=Recovering the number of clusters in data sets with noise features using feature rescaling factors|author=R.C. de Amorim, C. Hennig|journal=Information Sciences|doi=10.1016/j.ins.2015.06.039|year=2015|volume=324|pages=126–145|arxiv=1602.06989}}</ref>。
+
+考夫曼（Kaufman）等人定义了轮廓系数（''silhouette coefficient'' ）的概念——在某个数据集的有限种聚类方法中，平均<math>s(i)</math>的最大值<ref>{{Cite book|last=Leonard Kaufman|last2=Peter J. Rousseeuw|authorlink2=Peter J. Rousseeuw|title=Finding groups in data : An introduction to cluster analysis|date=1990|publisher=Wiley-Interscience|location=Hoboken, NJ|isbn=9780471878766|doi=10.1002/9780470316801|page=[https://archive.org/details/findinggroupsind00kauf/page/87 87]|url=https://archive.org/details/findinggroupsind00kauf/page/87}}
+</ref>：
+: <math>
+SC = \max_{k} \tilde{s}\left(k\right)
+</math>
+上式中<math>\tilde{s}\left(k\right)</math>代表被分为<math>k</math>个簇后该数据集的平均<math>s(i)</math> 。
+
+
+== 评价 ==
+轮廓系数一般不能用于横向评价多种聚类方法。凸簇（如经由DBSCAN方法得出的簇）的轮廓系数一般高于其他类型的簇。
+[[File:SC_for_3_clustering_method.pdf|右]]
+
+== 另见 ==
+
+* Davies–Bouldin指数
+* k-medoids
+* 如何确定数据集中有多少簇
+
+== 参考文献 ==
+{{Reflist}}
+[[Category:机器学习|Category:机器学习]]
+[[Category:数学术语|Category:数学术语]]

@@ -1,0 +1,643 @@
+local p={}
+local lib_arg={}
+local yesno=require("Module:Yesno")
+
+--二維空間填充(鑲嵌圖)生成
+function p.simple_regular_tile(frame)
+	local args
+    if frame == mw.getCurrentFrame() then
+        -- We're being called via #invoke. The args are passed through to the module
+        -- from the template page, so use the args that were passed into the template.
+        if lib_arg.getArgs == nil then lib_arg = require('Module:Arguments') end
+        args = lib_arg.getArgs(frame, {parentFirst=true})
+    else
+        -- We're being called from another module or from the debug console, so assume
+        -- the args are passed in directly.
+        args = frame
+    end
+    local tile_type=args['type']or 4
+    local tile_type_list={[3]=3,['3']=3,[4]=4,['4']=4,[6]=6,['6']=6,
+    	tri=3,triangle=3,['三']=3,['三角']=3,['三角形']=3,
+    	square=4,['方']=4,['四']=4,['四角']=4,['正方']=4,['方形']=4,['正方形']=4,['四角形']=4,['四邊形']=4,
+    	hex=6,hexa=6,hexagon=6,['六']=6,['六角']=6,['六角形']=6,['六邊形']=6,
+    }
+    tile_type = tile_type_list[tile_type] or 4
+    local arg_len,wid_len,table_list,color_map_str=0,0,{},args.color_map or args['color map']
+    local color_map_in = color_map_str and mw.text.split(color_map_str,',') or {}
+    for key,val in pairs(args)do if tonumber(key)or-1 > 0 then
+    	if tonumber(key) > arg_len then arg_len=tonumber(key) end
+    	local val_len=#(mw.text.split(val or'',','))
+    	if tonumber(key)%2==0 and tile_type==6 then val_len=val_len-1 end
+    	if val_len>wid_len then wid_len=val_len end
+    end end
+    for i=1,arg_len do
+    	table_list[i]={}
+	    for j=1,wid_len + ((i%2==0 and tile_type==6)and 1 or 0) do
+	    	local val = mw.text.split(args[i] or'',',')
+	    	table_list[i][j]=val[j]or''
+	    end
+    end
+    local result_i=''
+    for i=1,arg_len do
+    	local tilerow_class = ((i%2==0 and tile_type==6)and' hex even'or'')
+    	if args.tilerow_class or args['tilerow class'] then tilerow_class=tilerow_class..(args.tilerow_class or args['tilerow class']) end
+    	tilerow_class=mw.text.trim(tilerow_class)
+    	result_i = result_i .. '<div class="tile-row'..((tilerow_class~='')and(' '..tilerow_class)or'')..'">'
+	    for j=1,wid_len + ((i%2==0 and tile_type==6)and 1 or 0) do
+	    	local tile_class = {[3]='tri'..(((i+j)%2==0)and' inv'or''),[6]='hex'}
+	    	local color_css_list = {[3]='border-'..(((i+j)%2==0)and'top'or'bottom')..'-color:*',[6]='border-bottom:0 solid *;border-top:0 solid *;'}
+			local chk_color = mw.text.trim(table_list[i][j])
+			chk_color = color_map_in[tonumber(chk_color)or-1]or color_map_in[chk_color]or chk_color
+			if tonumber(chk_color:lower(),16) then chk_color='#'..chk_color end
+			if chk_color==''then chk_color='transparent'end
+			result_i = result_i .. '<div class="tile-cell'
+			..(tile_class[tile_type]and(' '..tile_class[tile_type])or'')..'" style="'
+			..(color_css_list[tile_type]or'background:*'):gsub('%*',chk_color)..';'..((args.textstyle and tile_type~=6) and (args.textstyle..';')or'')..'">'
+			
+			if tile_type==6 then result_i = result_i .. '<div></div><div style="background:'..chk_color..';'..(args.textstyle and (args.textstyle..';')or'')..'">'
+			elseif tile_type==3 then result_i = result_i .. '<span class="center">'end
+
+			result_i = result_i .. (args[i..','..j]or'')
+			
+			if tile_type==6 then result_i = result_i .. '</div><div></div>'
+			elseif tile_type==3 then result_i = result_i .. '</span>'end
+
+			result_i = result_i .. '</div>'
+	    end
+	    result_i = result_i .. '</div>'
+    end
+    local height_offset = (tile_type==6)and 30 or 0
+    local width_offset = (tile_type==3)and -60 or 0
+    local width_unit_list = {[3]=60,[4]=50,[6]=104}
+    local height_unit_list = {[3]=104,[4]=50,[6]=90}
+    local full_width = width_offset + width_unit_list[tile_type] * wid_len
+    local full_height = height_offset + height_unit_list[tile_type] * arg_len
+    local width_val = tonumber(mw.ustring.match(args.width or '','%-?%d+'))or full_width
+	local scale_val = width_val/full_width
+
+    local result='<div '..((mw.text.trim(args.class or '')=='')and''or('class="'..mw.text.trim(args.class or '')..'" '))
+				..'style="width:'..width_val..'px;height:'..(full_height*scale_val)..'px;overflow:hidden;'..(args.style or'')..';">'
+	result = result .. '<div style="position:relative;width:'..width_val..'px;height:'..width_val..'px;'
+		..'"><div style="transform: scale('..scale_val..','..scale_val..');transform-origin: left top;">'
+	result = result .. '<div class="tile-grid" style="width:'..(full_width+120)..'px;height:'..(full_height)..'px;">'
+	result = result .. result_i
+	result = result .. '</div></div></div></div>'
+	return result
+end
+
+--QR碼生成
+local qrrenderer={}
+local qrencode=require( 'Module:EncoderUtil' )._get_libqrcode()
+local color_table = require( 'Module:PeriodicTable' ).renderClassTable
+
+--{CODE_0, CODE_1, FUNC_0, FUNC_1, OTHER}
+local qr_color_table = {"F","T","F","T","F"}
+local qr_color_mapping={[-2]=3,[-1]=1,[0]=5,[1]=2,[2]=4}
+
+function p.simple_qr(frame)
+	local args
+    if frame == mw.getCurrentFrame() then
+        -- We're being called via #invoke. The args are passed through to the module
+        -- from the template page, so use the args that were passed into the template.
+        if lib_arg.getArgs == nil then lib_arg = require('Module:Arguments') end
+        args = lib_arg.getArgs(frame, {parentFirst=true})
+    else
+        -- We're being called from another module or from the debug console, so assume
+        -- the args are passed in directly.
+        args = frame
+    end
+    local input_text=args.text or args.message or args.msg or args[1] or args['1']
+    local ec_level_list={l=1,m=2,q=3,h=4,[0]=1,[1]=1,[2]=2,[3]=3,[4]=4,
+		low=1,medium=2,quartile=3,high=4
+    }
+    local ec_level = ec_level_list[args.eclevel or'']or 1
+    
+    local color_map_in = args.color_map or args['color map']
+    color_map_in = color_map_in and mw.text.split(color_map_in,',') or color_map_in
+    
+    local color_map_qr = {"T","T","T",[0]="",[-1]="",[-2]=""}
+    if color_map_in then 
+    	for i=-2,2 do
+    		color_map_qr[i]=color_map_in[qr_color_mapping[i]]or color_map_in[''..qr_color_mapping[i]]or color_map_qr[i]
+    	end 
+    end
+    local input_pre_data = input_text
+    if yesno(args.bitstream or false) then input_pre_data = mw.text.split(input_text or '',',')end
+	if not qrrenderer._CreateQRcode then qrrenderer = require( 'Module:QR' ) end
+    --local ok, endata = qrencode.qrcode(input_pre_data,ec_level,nil,tonumber(args.version or args.ver))
+    local ok, endata = qrrenderer._CreateQRcode(input_pre_data,ec_level,args.mode,tonumber(args.version or args.ver),tonumber(args.mask))
+    if not ok then return "" end
+    local full_width = 20 + 8*#endata
+    local width_val = tonumber(mw.ustring.match(args.width or '','%-?%d+'))or full_width
+	local scale_val = width_val/full_width
+	local ten_times = scale_val * 10
+	local result = '<div class="tile-grid qrcode'..((mw.text.trim(args.class or '')=='')and''or(' '..mw.text.trim(args.class or '')))
+				..'" style="width:'..width_val..'px;height:'..width_val..'px;'..(args.style or'')..';">'
+	result = result .. '<div style="position:relative;width:'..width_val..'px;height:'..width_val..'px;'
+		..'"><div style="margin:'..ten_times..'px '..ten_times..'px '..ten_times..'px '..ten_times
+		..'px;transform: scale('..scale_val..','..scale_val..');transform-origin: left top;">'
+	result = result .. '<div style="width:'..(full_width-20)..'px;height:'..(full_width-20)..'px;">\n'
+	result = result .. color_table("","",endata,',',color_map_qr,"")
+	result = result .. '\n</div></div></div></div>'
+	return result
+end
+function p.qr_graph(frame)
+	-- For calling from #invoke.
+    local args, working_frame
+    if frame == mw.getCurrentFrame() then
+        -- We're being called via #invoke. The args are passed through to the module
+        -- from the template page, so use the args that were passed into the template.
+        if lib_arg.getArgs == nil then lib_arg = require('Module:Arguments') end
+        args = lib_arg.getArgs(frame, {parentFirst=true}) --frame
+        working_frame = frame
+    else
+        -- We're being called from another module or from the debug console, so assume
+        -- the args are passed in directly.
+        args = frame
+        working_frame = mw.getCurrentFrame()
+    end
+    local ec_level_list={l=1,m=2,q=3,h=4,[0]=1,[1]=1,[2]=2,[3]=3,[4]=4,
+		low=1,medium=2,quartile=3,high=4
+    }
+    local qr_message =args.text or args.message or args.msg or args['string'] or args[1] or args['1'] or 'QR Code'
+    local ec_level = ec_level_list[args.eclevel or'']or 1
+	local pxsize = tonumber(args.width or args.size or args.height or 120)
+	
+    local color_map_in = args.color_map or args['color map']
+    color_map_in = color_map_in and mw.text.split(color_map_in,',') or color_map_in
+    
+    local color_map_qr = {"#000","#000","#000",[0]="#000",[-1]="#fff",[-2]="#fff"}
+    if color_map_in then 
+    	for i=-2,2 do
+    		color_map_qr[i]=color_map_in[qr_color_mapping[i]]or color_map_in[''..qr_color_mapping[i]]or color_map_qr[i]
+    	end 
+    end
+	
+	local fun_light = args.fun_light or args.light or color_map_qr[-2]
+	local message_light = args.message_light or args.light or color_map_qr[-1]
+	local fun_dark = args.fun_dark or args.dark or color_map_qr[2]
+	local message_dark = args.message_dark or args.dark or color_map_qr[1]
+	
+	if not qrrenderer._CreateQRcode then qrrenderer = require( 'Module:QR' ) end
+	--local success,result = qrencode.qrcode(qr_message,ec_level,nil,tonumber(args.version or args.ver))
+	local success,result = qrrenderer._CreateQRcode(qr_message,ec_level,args.mode,tonumber(args.version or args.ver),tonumber(args.mask))
+	
+	local w_count = #result
+	local cell_width = pxsize / (w_count+2)
+	local graph_data = {
+		width=pxsize,
+		height=pxsize,
+		data={},
+		padding={left=cell_width,top=cell_width,bottom=cell_width,right=cell_width},
+		scales={
+		    {name="x",type="linear",domain={0,w_count},range="width"},
+		    {name="y",type="linear",domain={0,w_count},range="height"},
+		    {name="qr",type="ordinal",domain={-2,-1,0,1,2},range={fun_light,message_light,message_light,message_dark,fun_dark}}
+		},
+		marks={
+		    {
+		      type="rect",
+		      from={data="qrcode"},
+		      properties={
+		        enter={
+		          x={scale="x",field="0"},y={scale="y",field="1"},
+		          width={value=cell_width},height={value=cell_width},
+		          stroke={scale="qr",field="2"},
+		          fill={scale="qr",field="2"}
+		        }
+		      }
+		    }
+		 }
+	}
+
+	local qr_data = {name="qrcode",values={}}
+	for x=1,w_count do
+		for y=1,#(result[x]) do
+			qr_data.values[#(qr_data.values)+1] = {x-1,#(result[x])-y+1,result[y][x]}
+		end
+	end
+	graph_data.data[#(graph_data.data)+1] = qr_data
+	local body = working_frame:callParserFunction{ name = '#tag:graph', args = {
+    	mw.text.jsonEncode(graph_data)
+	} }
+	return body
+end
+function p.show_qr(input_text)
+	local str = ""
+	if type(input_text) == type(str) then
+		str = input_text
+	else
+		if lib_arg.getArgs == nil then lib_arg = require('Module:Arguments') end
+        local args = lib_arg.getArgs(input_text, {parentFirst=true}) 
+		str = args[1] or args["1"] or '{{{1}}}'
+	end
+	local ok, endata = qrencode.qrcode(str,4)
+	if not ok then return "" end
+mw.logObject(8*#endata)
+	return color_table("","",endata,',',{"T","T","T",[0]="F",[-1]="F",[-2]="F"},"")
+end
+
+--魔方生成
+local enum_face = {'u','d','f','b','l','r'}
+local default_color_map = {'yellow','white','blue','green','orange','red','magenta','lime','cyan','black',[32768]='none',[32769]='null'}
+local default_colors = {{0,0,0,0,0,0,0,0,0},{1,1,1,1,1,1,1,1,1},{2,2,2,2,2,2,2,2,2},{3,3,3,3,3,3,3,3,3},{4,4,4,4,4,4,4,4,4},{5,5,5,5,5,5,5,5,5}}
+local enum_face_lookup = {u=0,d=1,f=2,b=3,l=4,r=5}
+local default_text = {}
+local cube_33 = {--lvl1
+	{{{'u0','l0','b6'},{'u1','b7'},{'u2','r2','b8'}},--row
+	{{'u3','l1'},{'u4'},{'u5','r1'}},
+	{{'f0','u6','l2'},{'f1','u7'},{'f2','u8','r0'}}},
+	--lvl2
+	{{{'l3','b3'},{'b4'},{'r5','b5'}},
+	{{'l4'},{},{'r4'}},
+	{{'f3','l5'},{'f4'},{'f5','r3'}}},
+	--lvl3
+	{{{'d6','l6','b0'},{'d7','b1'},{'d8','r8','b2'}},
+	{{'d3','l7'},{'d4'},{'d5','r7'}},
+	{{'f6','d0','l8'},{'f7','d1'},{'f8','d2','r6'}}}
+}
+local rotate_face_lookup_if = {
+		u={{{0,1,2},{0,1,2},{8,7,6},{0,1,2}},{{3,4,5},{3,4,5},{5,4,3},{3,4,5}}},
+		d={{{8,7,6},{8,7,6},{0,1,2},{8,7,6}},{{5,4,3},{5,4,3},{3,4,5},{5,4,3}}},
+		f={{{8,7,6},{2,5,8},{0,1,2},{6,3,0}},{{5,4,3},{1,4,7},{3,4,5},{7,4,1}}},
+		b={{{0,1,2},{2,5,8},{8,7,6},{6,3,0}},{{3,4,5},{1,4,7},{5,4,3},{7,4,1}}},
+		l={{{6,3,0},{6,3,0},{6,3,0},{6,3,0}},{{7,4,1},{7,4,1},{7,4,1},{7,4,1}}},
+		r={{{2,5,8},{2,5,8},{2,5,8},{2,5,8}},{{1,4,7},{1,4,7},{1,4,7},{1,4,7}}},
+	};
+local rotate_face_lookup = {
+		u={'f','r','b','l'},
+		d={'f','l','b','r'},
+		f={'u','l','d','r'},
+		b={'u','r','d','l'},
+		l={'u','b','d','f'},
+		r={'u','f','d','b'},
+	};
+local face_center_rotate = {{2,6},{5,3},{8,0},{1,7},{-1,-1},{7,1},{0,8},{3,5},{6,2}};
+local antipodes_table = {u='d',d='u',l='r',r='l',f='b',b='f'};
+
+function p.initCube()
+	local RubikCube = {
+		color = {{0,0,0,0,0,0,0,0,0},{1,1,1,1,1,1,1,1,1},{2,2,2,2,2,2,2,2,2},{3,3,3,3,3,3,3,3,3},{4,4,4,4,4,4,4,4,4},{5,5,5,5,5,5,5,5,5}},
+		text = {{'','','','','','','','',''},{'','','','','','','','',''},{'','','','','','','','',''},{'','','','','','','','',''},{'','','','','','','','',''},{'','','','','','','','',''}},
+		color_map = default_color_map,
+		side = 3,
+		name = '',
+	}
+	function RubikCube:init(colors,texts,color_maps)
+		self.color = {{0,0,0,0,0,0,0,0,0},{1,1,1,1,1,1,1,1,1},{2,2,2,2,2,2,2,2,2},{3,3,3,3,3,3,3,3,3},{4,4,4,4,4,4,4,4,4},{5,5,5,5,5,5,5,5,5}}
+		self.color_map = default_color_map
+		self.text={{'','','','','','','','',''},{'','','','','','','','',''},{'','','','','','','','',''},{'','','','','','','','',''},{'','','','','','','','',''},{'','','','','','','','',''}}
+		if #colors ~= 6 then
+			self.side = 3
+		else
+			self.side = math.sqrt(#(colors[1]))
+			if self.side < 1 then self.side = 3 end
+			self.color_map = color_maps or default_color_map
+			local face_by2 = {0,2,6,8}
+			local face_by2_inv = {0,-1,1,-1,-1,-1,2,-1,3}
+			for i=0,5 do
+				for j=0,8 do
+					local color_id = -1
+					local face_index = j
+					if self.side < 3 then face_index = (self.side==1) and (j==4 and 0 or -1) or face_by2_inv[j+1]end
+					self.color[i+1][j+1] = colors[i+1][face_index+1]
+					self.text[i+1][j+1] = mw.text.trim((texts or {})[enum_face[i+1]..face_index]or'')
+				end
+			end
+		end
+	end
+	function RubikCube:html(scale_val,style_data,class_data)
+		local result,result_='',''
+		local face_name = {'top','bottom','front','back','left','right'}
+		for i=#cube_33,1,-1 do local result_i=''
+			for j=1,#(cube_33[i]) do local result_ij=''
+				for k=1,#(cube_33[i][j]) do local result_ijk='' if self.side~=1 or (self.side==1 and #(cube_33[i][j][k])==1) then
+					for l=1,#(cube_33[i][j][k]) do 
+						local face_iterator_name = cube_33[i][j][k][l]:sub(1,1)
+						local face_iterator = tonumber(cube_33[i][j][k][l]:sub(2,2))
+						local face_enum_id = enum_face_lookup[face_iterator_name]
+						local color_class_data = (self.color[face_enum_id+1][face_iterator+1]or-1)
+						if (face_iterator==0 or face_iterator) and color_class_data>-1 then --self.color_map
+						    result_ijk = result_ijk .. '<div class="cube-'..face_name[face_enum_id+1]..' '
+						    	..self.color_map[color_class_data+1]..' '..cube_33[i][j][k][l]..'">'
+						    	..self.text[face_enum_id+1][face_iterator+1]..'</div>'
+						end
+					end end
+					result_ijk = mw.text.trim(result_ijk)
+					if result_ijk~=''then
+						result_ij = result_ij .. '<div class="cube col col'..k..'">' .. result_ijk .. '</div>'
+					end
+				end
+				result_ij = mw.text.trim(result_ij)
+				if result_ij~=''then
+					result_i = result_i .. '<div class="row row'..j..'">' .. result_ij .. '</div>'
+				end
+			end
+			result_i = mw.text.trim(result_i)
+			if result_i~=''then
+				result_ = result_ .. '<div class="lvl lvl'..i..'">' .. result_i .. '</div>'
+			end
+		end
+		result_ = mw.text.trim(result_)
+		if result_~=''then
+			local cscale = tonumber(scale_val) or 1
+			local fine_width = nil
+			local find_px = mw.ustring.match(scale_val or '',"%d+px")
+			if find_px then
+				find_px = mw.ustring.match(find_px,"%d+")
+				find_px = tonumber(find_px)
+				if find_px then
+					cscale = self.side==2 and ( -0.00355543 * (10.4658 - find_px) ) or ( -0.00234954 * (2.94521 - find_px) );
+					fine_width = find_px
+				end
+			end
+			if cscale <= 0 then cscale = 1 end
+			local cwidth = self.side==2 and (10.4658 + 281.26 * cscale) or (2.94521 + 425.616 * cscale);
+			local cheight = self.side==2 and (10.6849 + 294.795 * cscale) or (3.69863 + 455.89 * cscale);
+			local margintop = self.side==2 and (-204.182 + 155.066*cscale + 55.8492*cscale*cscale) or (-253.44 + 113.609*cscale + 76.3805*cscale*cscale);
+			local marginleft = self.side==2 and (-71.9178 + 166.575 * cscale) or (-74.0411 + 136.712 * cscale);
+			result = result .. '<div '..((mw.text.trim(class_data or '')=='')and''or('class="'..mw.text.trim(class_data or '')..'" '))
+				..'style="width:'..(fine_width or cwidth)..'px;height:'..cheight..'px;'..(style_data or'')..';">'
+			result = result .. '<div style="width:'..(fine_width or cwidth)..'px;height:'..cheight..'px;position:relative;float:left;"><div style="width:150px;height:250px;margin-top:'
+				..margintop..'px;margin-left:'..marginleft..'px;transform: scale('..cscale..', '..cscale..');">'
+			result = result .. '<div class="cube-main'..(self.side<3 and(' by'..self.side)or'')
+				..((mw.text.trim(self.name or '')=='')and''or(' '..mw.text.trim(self.name or '')))
+				..((mw.text.trim(self.class or '')=='')and''or(' '..mw.text.trim(self.class or '')))..'">'
+				.. result_ .. '</div>'
+			result = result .. '</div></div></div>'
+		end
+		return result
+	end
+	function RubikCube:netString()
+		local result = ''
+		local tmp_map = {[2]={1,3,-1,7,9},[3]={1,2,3,4,5,6,7,8,9}}
+		
+		result = result .. '__' .. ((self.side > 2)and'_'or'')
+		result = result .. self.color[1][tmp_map[self.side][1]] .. self.color[1][tmp_map[self.side][2]]  .. ((self.side > 2)and self.color[1][tmp_map[self.side][3]]  or'') .. '\n'
+		result = result .. '__' .. ((self.side > 2)and'_'or'')
+		result = result .. self.color[1][tmp_map[self.side][4]]  .. self.color[1][tmp_map[self.side][5]]  .. ((self.side > 2)and self.color[1][tmp_map[self.side][6]]  or'') .. '\n'
+		if self.side > 2 then result = result .. '___' .. self.color[1][7] .. self.color[1][8] .. self.color[1][9] .. '\n' end
+		local prt_map = {5,3,6}
+		for prt=1,#prt_map do
+			for i=1,2 do result = result .. self.color[prt_map[prt]][tmp_map[self.side][i]] end 
+			if self.side > 2 then result = result .. self.color[prt_map[prt]][3] end
+		end
+		result = result .. '\n'
+		for prt=1,#prt_map do
+			for i=4,5 do result = result .. self.color[prt_map[prt]][tmp_map[self.side][i]] end 
+			if self.side > 2 then result = result .. self.color[prt_map[prt]][6] end
+		end
+		result = result .. '\n'
+		if self.side > 2 then
+			for prt=1,#prt_map do
+				for i=7,9 do result = result .. self.color[prt_map[prt]][tmp_map[self.side][i]] end 
+			end
+			result = result .. '\n'
+		end
+		prt_map = {2,4}
+		for prt=1,#prt_map do
+			result = result .. '__' .. ((self.side > 2)and'_'or'')
+			result = result .. self.color[prt_map[prt]][tmp_map[self.side][1]] .. self.color[prt_map[prt]][tmp_map[self.side][2]]  .. ((self.side > 2)and self.color[prt_map[prt]][tmp_map[self.side][3]] or'') .. '\n'
+			result = result .. '__' .. ((self.side > 2)and'_'or'')
+			result = result .. self.color[prt_map[prt]][tmp_map[self.side][4]]  .. self.color[prt_map[prt]][tmp_map[self.side][5]]  .. ((self.side > 2)and self.color[prt_map[prt]][tmp_map[self.side][6]] or'') ..'\n'
+			if self.side > 2 then 
+				result = result .. '___' 
+				for i=7,9 do result = result .. self.color[prt_map[prt]][tmp_map[self.side][i]] end 
+				result = result .. '\n'
+			end
+		end
+		return mw.text.trim(result)
+	end
+	function RubikCube:turn(face,layer,cw)
+		local rotate_face_lookup_it=rotate_face_lookup_if[face][layer+1]
+		local face_index_id=enum_face_lookup[face]
+		local face_turn_it_id=1
+		if cw==1 or cw==true then face_turn_it_id=0 end
+		local tmp_dom,last_color,last_text={},{},{}
+		for i=0,#rotate_face_lookup_it-1 do
+			local i0=i
+			if cw==1 or cw==true then i0=#rotate_face_lookup_it-1-i end
+			local turn_face_it = rotate_face_lookup[face][i0+1]
+			local turn_face_it_id = enum_face_lookup[turn_face_it]
+
+			for j=0,#(rotate_face_lookup_it[i0+1])-1 do
+				local this_color = self.color[turn_face_it_id+1][rotate_face_lookup_it[i0+1][j+1]+1]
+				local this_text = self.text[turn_face_it_id+1][rotate_face_lookup_it[i0+1][j+1]+1]
+				if (this_color or -1) >= 0 then 
+					if i==0 then
+						tmp_dom[j+1] = {turn_face_it_id+1,rotate_face_lookup_it[i0+1][j+1]+1}
+					else
+						if i==#rotate_face_lookup_it-1 then 
+							self.color[tmp_dom[j+1][1]][tmp_dom[j+1][2]] = this_color 
+							self.text[tmp_dom[j+1][1]][tmp_dom[j+1][2]] = this_text 
+						end
+						self.color[turn_face_it_id+1][rotate_face_lookup_it[i0+1][j+1]+1] = last_color[j+1]
+						self.text[turn_face_it_id+1][rotate_face_lookup_it[i0+1][j+1]+1] = last_text[j+1]
+					end
+					last_color[j+1]=this_color;
+					last_text[j+1]=this_text;
+				end
+			end
+		end
+		if layer<1 then
+			last_color,last_text={},{};for i=0,#face_center_rotate-1 do 
+				last_color[i+1]=self.color[face_index_id+1][i+1] 
+				last_text[i+1]=self.text[face_index_id+1][i+1] 
+			end
+			for i=0,#face_center_rotate-1 do
+				local move_to = face_center_rotate[i+1][face_turn_it_id+1]
+				if (move_to or -1) >= 0 then
+					self.color[face_index_id+1][move_to+1]=last_color[i+1]
+					self.text[face_index_id+1][move_to+1]=last_text[i+1]
+				end
+			end
+		end
+	end
+	function RubikCube:turnByCommand(cmd_in)
+		local cmd = mw.ustring.gsub(cmd_in, "[%+%-]", " " )
+		cmd = mw.ustring.gsub(mw.ustring.gsub(cmd, "[Rr][Aa][Nn][Dd][Oo][Mm]", "-" ),"[Rr][Aa][Nn][Dd]","-")
+		
+		local parse,todo_cmd = {},{}
+		mw.ustring.gsub(cmd,"[A-Za-z%-][%d']*",function(pcmd)parse[#parse+1]=pcmd end)
+		if #parse<=0 then return nil end
+
+		for i=1,#parse do
+			if mw.ustring.sub(mw.text.trim(parse[i]),1,1) == '-' then
+				local m_count = nil
+				mw.ustring.gsub(parse[i],"%d+",function(numbers)m_count=m_count or numbers end)
+				m_count = tonumber(m_count)or 1
+				if m_count > 0 then for m_i=1,m_count do todo_cmd[#todo_cmd+1]="-" end end
+			else
+				todo_cmd[#todo_cmd+1]=parse[i]
+			end
+		end
+		local result = {};
+		for i=1,#todo_cmd do
+			local turn_data = self:turnBySymbol(todo_cmd[i]);
+			if turn_data ~= false then
+				result[#result+1]=(turn_data~=true and turn_data or todo_cmd[i]);
+			end
+		end
+		return result;
+	end
+
+	function RubikCube:turnBySymbol(sym)
+		local chk_sym,is_rand=sym..'',false;
+		if mw.ustring.sub(mw.text.trim(chk_sym),1,1)=="-" then
+			local rand_sample = "udlrfbmesxyz";
+			if self.side < 3 then rand_sample = "udlrfbxyz"end
+			local sampling_val = math.floor(math.random() * rand_sample:len())+1
+			chk_sym=rand_sample:sub(sampling_val,sampling_val);
+			local rand_count=math.floor(math.random()*4);
+			if math.floor(math.random()*2)==0 then chk_sym=chk_sym:lower()end
+			if rand_count>1 then chk_sym=chk_sym..rand_count end
+			if math.floor(math.random()*2)==0 then chk_sym=chk_sym.."'"end
+			is_rand = true;
+		end
+		local checker = nil
+		mw.ustring.gsub(chk_sym,"([UuDdLlRrFfBbMmEeSsXxYyZz])('?)(%-?%d*)('?)",function(m,inv,count,inv2)checker=checker or{m,inv,count,inv2}end)
+		if checker==nil then return false end
+		local turn_count=tonumber(checker[3])or 1;
+		if turn_count<0 then turn_count=turn_count+(math.ceil((4-turn_count)/4)+4)*4 end
+		turn_count = turn_count % 4
+		local turn_count_inv=false;
+		if turn_count>2 then
+			turn_count=4-turn_count
+			turn_count_inv=true
+		end
+		if turn_count==0 then return false end
+		local way_test0 = (checker[2]==nil) and ""or checker[2]
+		local way_test1 = (checker[4]==nil) and ""or checker[4]
+		
+		local inv_turn = (way_test0 ~= way_test1 and (way_test0=="'" or way_test1=="'"))
+		local mid_turn = mw.ustring.match(checker[1], "[MmEeSs]")~=nil
+		local all_turn = mw.ustring.match(checker[1], "[XxYyZz]")~=nil
+		local single_turn = mw.ustring.upper(checker[1])==checker[1];
+		if turn_count_inv then inv_turn=not inv_turn end
+		local turning=function()return false end
+
+		if mid_turn and self.side < 3 then return false end
+		if single_turn and (not all_turn) or mid_turn then
+			local command = mw.ustring.lower(checker[1]);
+			local mid_table = {m='d',e='d',s='f'};
+			command = mid_table[command] or command
+			local local_do = function(this_the_cube,turn_comm,layer,turn_way)
+				turning=function()
+					this_the_cube:turn(turn_comm,layer,turn_way)
+					return true
+				end
+			end
+			local_do(self,command,mid_turn and 1 or 0,inv_turn and 0 or 1);
+		elseif (not single_turn) or all_turn then
+			local command = mw.ustring.lower(checker[1]);
+			local mid_table = {x='r',y='u',z='f'};
+			command = mid_table[command] or command
+			local local_do = function(this_the_cube,turn_comm,every_turn,turn_way)
+				turning=function()
+					for vj=0,1 do this_the_cube:turn(turn_comm,vj,turn_way and 0 or 1) end
+					if every_turn then this_the_cube:turn(antipodes_table[turn_comm],0,turn_way and 1 or 0)end
+					return true
+				end
+			end
+			local_do(self,command,all_turn,inv_turn);
+		end
+		
+		local flag=false;
+		for i=1,turn_count do 
+			local check_flag = turning()
+			flag = flag or check_flag
+		end
+		if is_rand then return chk_sym end
+		return flag;
+	end
+	return RubikCube
+end
+
+function p.invertRubikCmd(cmd_in)
+	local cmd = mw.ustring.gsub(cmd_in, "[%+%-]", " " )
+	cmd = mw.ustring.gsub(mw.ustring.gsub(cmd, "[Rr][Aa][Nn][Dd][Oo][Mm]", " " ),"[Rr][Aa][Nn][Dd]"," ")
+	
+	local parse,todo_cmd = {},{}
+	mw.ustring.gsub(cmd,"[UuDdLlRrFfBbMmEeSsXxYyZz][%d']*",function(pcmd)parse[#parse+1]=pcmd end)
+	if #parse<=0 then return "" end
+	local result = {}
+	for i=#parse,1,-1 do
+		local has_prime = false
+		local prime_test = mw.ustring.gsub(parse[i],"'",function()
+			has_prime = true
+			return ''
+		end)
+		result[#result+1]=prime_test..((has_prime == false)and"'"or'')
+	end
+	return table.concat(result,' ');
+end
+
+function p.simple_cube(frame)
+	local args
+    if frame == mw.getCurrentFrame() then
+        -- We're being called via #invoke. The args are passed through to the module
+        -- from the template page, so use the args that were passed into the template.
+        if lib_arg.getArgs == nil then lib_arg = require('Module:Arguments') end
+        args = lib_arg.getArgs(frame, {parentFirst=true})
+    else
+        -- We're being called from another module or from the debug console, so assume
+        -- the args are passed in directly.
+        args = frame
+    end
+    local cube_face_data={}
+    local cube_back_do={}
+    local cube_side=nil
+    
+    for i=1,6 do 
+    	local checker=args[mw.ustring.lower(enum_face[i])] or args[mw.ustring.upper(enum_face[i])]
+    	cube_face_data[i]={}
+    	if checker then
+    		local data_array = mw.text.split(checker,',')
+    		for j=1,#data_array do
+    			local get_number = tonumber(mw.ustring.match(data_array[j],'%-?%d+'))
+    			if not get_number then
+    				if mw.text.trim(data_array[j])=='' then--no input
+    					cube_face_data[i][j] = 32767
+    				elseif mw.ustring.match(data_array[j],'[Nn][UuIi][Ll][Ll]?') then--指定為null
+    					cube_face_data[i][j] = 32768
+    				else--錯誤數值
+    					cube_face_data[i][j] = -1
+    				end
+    			else
+    				cube_face_data[i][j]=get_number
+    			end
+    		end
+    		cube_side = cube_side or #data_array
+    	else
+    		cube_back_do[#cube_back_do+1]=i
+    	end
+    end
+    if #cube_back_do >= 6 then cube_face_data = mw.clone( default_colors ) 
+    else for i=1,#cube_back_do do 
+		for j=1,(cube_side or 9) do
+			cube_face_data[cube_back_do[i]][j]=32767
+		end
+    end end
+    local color_map_in = args.color_map or args['color map']
+    color_map_in = color_map_in and mw.text.split(color_map_in,',') or color_map_in
+    if color_map_in then for i_t=32767,32769 do color_map_in[i_t]=default_color_map[i_t] end 
+    	for i_key,i_val in pairs(color_map_in) do
+    		color_map_in[i_key] = mw.text.trim(i_val)
+    	end
+    end
+    local new_cube = p.initCube()
+    new_cube:init(cube_face_data,args,color_map_in)
+    if args.cube_class or args["cube class"] then new_cube.class = args.cube_class or args["cube class"] end
+    if args.name then new_cube.class = args.name end
+    local width_data = tonumber(mw.ustring.match(args.width or '','%-?%d+'))
+    local scale_input = tonumber(mw.ustring.match(args.scale or '','%-?%d+'))
+    local scale_data = width_data and (width_data .. 'px') or (scale_input or 1)
+    if args.by_turn or args["by turn"] then
+    	local cmd = args.by_turn or args["by turn"]
+    	new_cube:turnByCommand(p.invertRubikCmd(cmd))
+    end
+    if args.turn then new_cube:turnByCommand(args.turn) end
+    return new_cube:html(scale_data,args.style,args.class)
+end
+
+return p

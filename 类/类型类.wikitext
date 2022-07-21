@@ -1,0 +1,149 @@
+{{NoteTA|G1=IT}}
+在[[计算机科学|计算机科学]]中，'''类型类'''（type class），是支持[[特设多态|特设多态]]的[[类型系统|类型系统]]构造。这是通过向[[参数多态|参数多态]]类型的类型变量增加约束完成的。这种约束典型的涉及到一个类型类<code>T</code>和一个{{en-link|类型变量|Type variable}}<code>a</code>，并意味着<code>a</code>所能实例化的类型，其成员必须支持关联于<code>T</code>的重载运算。
+
+类型类首先在[[Haskell|Haskell]]中实现，当时[[Philip_Wadler|Philip Wadler]]和Stephen Blott提出它，作为对[[Standard_ML|Standard ML]]的<code>eqtype</code>的扩展<ref>{{Cite web|url=https://jgbm.github.io/pubs/morris-dissertation.pdf|title=Type Classes and Instance Chains|last=Morris|first=John|date=2013|access-date=2021-02-08|archive-date=2020-11-04|archive-url=https://web.archive.org/web/20201104014848/https://jgbm.github.io/pubs/morris-dissertation.pdf|dead-url=no}}</ref><ref>{{Cite web|url=https://www.researchgate.net/publication/2710954|title=How to make ad-hoc polymorphism less ad hoc|last=Wadler|first=Philip|date=October 1988}}</ref>，并且最初构想为以本原方式实现[[运算符重载|重载算术及等式算符]]的一种途径<ref name="kaes88parametric">{{cite conference
+ | first = Stefan 
+ | last = Kaes
+ | title = Parametric overloading in polymorphic programming languages
+ | book-title = Proc. 2nd European Symposium on Programming Languages
+ | date = March 1988| doi = 10.1007/3-540-19027-9_9}}
+</ref><ref name="wadler88how">{{cite conference
+ | first = Philip
+ | last = Wadler
+ | author2 = Stephen Blott
+ | url = http://homepages.inf.ed.ac.uk/wadler/papers/class/class.ps
+ | title = How to make ad-hoc polymorphism less ad hoc
+ | book-title = Proc. 16th ACM Symposium on Principles of Programming Languages
+ | date = January 1989
+ | access-date = 2021-02-08
+ | archive-date = 2016-03-11
+ | archive-url = https://web.archive.org/web/20160311163323/http://homepages.inf.ed.ac.uk/wadler/papers/class/class.ps
+ | dead-url = no
+ }}</ref>。
+对比于Standard ML的“eqtypes”，在Haskell中通过使用类型类重载等式算符，不要求编译器前端或底层类型系统的广泛修改<ref name="appel91standard">{{cite conference
+ | first = Andrew
+ | last = Appel
+ | author2 = David MacQueen
+ | url = http://citeseer.ist.psu.edu/appel91standard.html
+ | title = Standard ML of New Jersey
+ | book-title = Proc. 3rd International Symposium on Programming Language Implementation and Logic Programming
+ | date = June 1991
+ | access-date = 2021-02-08
+ | archive-date = 2008-05-09
+ | archive-url = https://web.archive.org/web/20080509103542/http://citeseer.ist.psu.edu/appel91standard.html
+ | dead-url = no
+ }}</ref>。
+
+自从它们创立之后，已经发现了类型类的很多其他应用。
+
+== 概述 ==
+定义类型类需要通过规定一组函数或约束名字，它们分别具有同在的类型，它们对属于这个类的所有类型都必须存在。在Haskell中，类型可以被参数化，意图包含允许等式的类型一个类型类<code>Eq</code>，可以如下这样声明：
+
+<syntaxhighlight lang="haskell">
+class Eq a where
+  (==) :: a -> a -> Bool
+  (/=) :: a -> a -> Bool
+  x /= y  =  not (x == y)
+  x == y  =  not (x /= y)
+</syntaxhighlight>
+
+这里的<code>a</code>是类型类<code>Eq</code>的一个实例，并且<code>a</code>定义的函数签名，针对了2个函数（等式和不等式函数），它们每个都接受2个类型<code>a</code>的实际参数并返回一个布尔值。这个声明可以读作：“类型<code>a</code>属于类型类<code>Eq</code>，如果在其上定义了有适当类型的，叫做<code>(==)</code>、<code>(/=)</code>的的函数。”
+
+编程者可以使任何类型<code>t</code>成为给定类型类<code>C</code> 的成员，通过使用“实例声明” 为特定类型<code>t</code>实现所有的<code>C</code>方法。如果编程者定义一个新的[[记录|记录]]数据类型<code>Foo</code>，可以接着使这个新类型成为<code>Eq</code>的实例，通过以任何他们认为合适的方式，提供在类型<code>Foo</code>的值之上的等式函数和不等式函数，例如：
+
+<syntaxhighlight lang = "haskell">
+data Foo = Foo {x :: Integer, str :: String}
+ 
+instance Eq Foo where
+   (Foo x1 str1) == (Foo x2 str2) = (x1 == x2) && (str1 == str2)
+</syntaxhighlight>
+
+编程者可以接着如下这样定义函数<code>elem</code>，它确定一个元素是否在一个列表之中：
+<syntaxhighlight lang="haskell">
+elem :: Eq a => a -> [a] -> Bool
+elem y []     = False
+elem y (x:xs) = (x == y) || elem y xs
+</syntaxhighlight>
+
+函数<code>elem</code>的类型<code>a -> [a] -> Bool</code>具有上下文<code>Eq a</code>，将[[参数多态|参数多态]]函数的类型变量<code>a</code>可包括的类型，约束为属于<code>Eq</code>类型类的那些类型。Haskell中的<code> => </code>可表示“类型类继承”或“类型约束”。函数<code>elem</code>可应用于属于<code>Eg</code>类型类的任何类型的元素和这个类型的列表二者之上。
+
+注意类型类不同于面向对象编程语言中的[[类_(计算机科学)|类]]。特别是，<code>Eq</code>不是一个类型：没有类型<code>Eq</code>的值这种东西。类型变量<code>a</code>有{{en-link|种类 (类型论)|Kind (type theory)|种类}}（kind）<math>*</math>，在最新的{{en-link|格拉斯哥Haskell编译器|Glasgow Haskell Compiler|GHC}}发行中叫做<code>Type</code><ref>[https://hackage.haskell.org/package/base-4.9.0.0/docs/Data-Kind.html#t:Type <code>Type</code>] {{Wayback|url=https://hackage.haskell.org/package/base-4.9.0.0/docs/Data-Kind.html#t:Type |date=20210210052839 }} from <code>Data.Kind</code> appeared in version 8 of the [[Glasgow_Haskell_Compiler|Glasgow Haskell Compiler]]</ref>。意味着<code>Eq</code>的种类是：
+
+<syntaxhighlight lang="haskell">
+Eq :: Type -> Constraint
+</syntaxhighlight>
+
+== 高种类多态 ==
+类型类不但接受{{en-link|种类 (类型论)|Kind (type theory)|种类}}<code>Type</code>的类型变量，它可以接受任何种类的类型变量。这些有更高种类的类型类有时叫做构造子类，这里的构造子指称的是[[类型构造子|类型构造子]]比如<code>Maybe</code>，而非[[构造器|数据构造子]]比如<code>Just</code>。例如[[单子_(函数式编程)|单子]]类<code>Monad</code>：
+
+<syntaxhighlight lang="haskell">
+class Monad m where
+  return :: a -> m a
+  (>>=)  :: m a -> (a -> m b) -> m b
+</syntaxhighlight>
+
+<code>m</code>应用到一个类型变量上的事实，指出了它有着种类<code>Type -> Type</code>，就是说它接受一个类型并返回一个类型，因而<code>Monad</code>的种类是：
+
+<syntaxhighlight lang="haskell">
+Monad :: (Type -> Type) -> Constraint
+</syntaxhighlight>
+
+== 多参数类型类 ==
+类型类允许多个类型参数，因此类型类可以被看作在类型上的关系<ref>[[Haskell'|Haskell']] page ''[https://wiki.haskell.org/Multi-parameter_type_class MultiParamTypeClasses] {{Wayback|url=https://wiki.haskell.org/Multi-parameter_type_class |date=20210211075526 }}''.</ref>。例如，在{{en-link|格拉斯哥Haskell编译器|Glasgow Haskell Compiler|GHC}}标准库中，类<code>IArray</code>表达一个通用不可变数组[[协议_(面向对象编程)|接口]]。在这个类中，类型约束<code>IArray a e</code>意味着<code>a</code>是一个数组类型，它包含类型<code>e</code>的元素。例如，在多态上的这种限制被用来实现{{en-link|对象类型 (面向对象编程)#Unboxing|Object type (object-oriented programming)#Unboxing|开箱}}数组类型。
+
+== 函数依赖 ==
+在Haskell中，类型类已经被精制为允许编程者声明在类型参数之间的函数依赖，这个概念受到关系数据库理论中的[[函数依赖|函数依赖]]的启发<ref>Mark Jones. ''[http://web.cecs.pdx.edu/~mpj/pubs/fundeps.html Type Classes with Functional Dependencies] {{Wayback|url=http://web.cecs.pdx.edu/~mpj/pubs/fundeps.html |date=20200401202934 }}''. From Proc. 9th European Symposium on Programming. March, 2000.</ref><ref>[[Haskell'|Haskell']] page ''[https://wiki.haskell.org/Functional_dependencies FunctionalDependencies] {{Wayback|url=https://wiki.haskell.org/Functional_dependencies |date=20210214140158 }}''.</ref>。就是说，编程者可以断言对类型参数的某个子集的给定指派，唯一性的确定余下的类型参数。例如，承载一个类型<code>s</code>的状态参数的，一个一般性的[[单子_(函数式编程)|单子]]<code>m</code>，满足类型类约束<code>Monad.State s m</code>。在这个约束中，有函数依赖<code>m -> s</code>。这意味着对于类型类<code>Monad.State</code>的一个给定单子<code>m</code>，从<code>m</code>能访问到的状态类型是被唯一性确定的。这会辅助编译器进行[[类型推论|类型推论]]，还能辅助编程者进行类型导向编程。
+
+[[Simon_Peyton-Jones|Simon Peyton-Jones]]因其复杂性而反对在Haskell中介入函数依赖<ref>{{Cite web |url=http://www.haskell.org/pipermail/haskell-prime/2006-February/000289.html |title=存档副本 |access-date=2021-02-10 |archive-date=2014-12-25 |archive-url=https://web.archive.org/web/20141225090044/https://www.haskell.org/pipermail/haskell-prime/2006-February/000289.html |dead-url=no }}</ref>。
+
+== 运算符重载的其他方式 ==
+在[[Standard_ML|Standard ML]]中，“等式类型”的机制粗略的对应于Haskell的内建类型类<code>Eq</code>，但是所有等式算符都自动的由编译器导出。编程者的过程控制局限于，指定在一个结构中哪些类型成员是等式类型，和在多态类型中哪些类型变量涉及等式类型。
+
+SML和[[OCaml|OCaml]]的模块和函子可以扮演类似于Haskell的类型类的角色，原则区别在于类型推论的角色，它使得类型类适合于特设多态<ref name="dreyer06modular">{{cite journal
+ |first        = Derek
+ |last         = Dreyer
+ |author2      = Robert Harper
+ |author3      = Manuel M.T. Chakravarty
+ |url          = http://citeseer.ist.psu.edu/751836.html
+ |title        = Modular Type Classes
+ |book-title   = Technical Report TR-2006-03
+ |date         = April 2006
+ |journal      = 
+ |access-date  = 2021-03-01
+ |archive-date = 2007-05-19
+ |archive-url  = https://web.archive.org/web/20070519052611/http://citeseer.ist.psu.edu/751836.html
+ |dead-url     = no
+}}</ref>。[[OCaml|OCaml]]的面向对象子集是某种程度上与类型类有可比性的另一种方式。
+
+== 有关概念 ==
+用于重载数据的一个类似概念（实现于{{en-link|格拉斯哥Haskell编译器|Glasgow Haskell Compiler|GHC}}中）是{{en-link|类型家族|type family}}<ref>{{Cite web | url=http://www.haskell.org/haskellwiki/GHC/Type_families | title=GHC/Type families - HaskellWiki | access-date=2021-02-10 | archive-date=2014-10-28 | archive-url=https://web.archive.org/web/20141028171806/http://www.haskell.org/haskellwiki/GHC/Type_families | dead-url=no }}</ref>。
+
+在[[Clean_(编程语言)|Clean]]中的类型类与Haskell相似，但是有稍微不同的语法。
+
+[[Rust|Rust]]支持[[traits_(计算机科学)|trait]]，这是具有一致性的有限形式的类型类<ref>{{Cite web | url=https://aturon.github.io/blog/2017/02/06/specialization-and-coherence/ | title=Specialization, coherence, and API evolution · Aaron Turon | access-date=2021-02-10 | archive-date=2020-11-12 | archive-url=https://web.archive.org/web/20201112013416/http://aturon.github.io/blog/2017/02/06/specialization-and-coherence/ | dead-url=no }}</ref>。
+
+[[Mercury_(编程语言)|Mercury]]有类型类，却不完全同于Haskell。
+
+在[[Scala|Scala]]中，类型类是{{en-link|编程惯例|programming idiom}}，可以用现存语言特征比如隐式参数来实现，本身不是独立的语言特征。由于它们在Scala中的这种实现方式，在有歧义的情况下，有可能显式的指定哪种类型类实例用作在代码中特定位置上的类型。但是，这不必然有益处，因为有歧义的类型类实例是易于出错的。
+
+证明辅助[[Coq|Coq]]在新近版本也支持类型类。不像在平常编程语言中那样，在Coq中，在类型类定义内陈述的任何类型类定律（比如单子定律），在使用它们之前，必须对每个类型类实例进行数学证明。
+
+== 参见 ==
+* [[多态_(计算机科学)|多态 (计算机科学)]]
+* [[运算符重载|运算符重载]] － 类型类的应用之一
+* [[单子_(函数式编程)|单子 (函数式编程)]]，[[函子_(函数式编程)|函子 (函数式编程)]] － 是类型类的例子
+* [[概念_(C++)|概念 (C++)]]（自从C++20）
+
+== 引用 ==
+{{Reflist|2}}
+
+== 外部链接 ==
+{{Wikibooks|en:Haskell/Classes and types|类和类型}}
+* A Gentle Introduction to Haskell, Version 98, chapter [http://www.haskell.org/tutorial/classes.html 5. Type Classes and Overloading] {{Wayback|url=http://www.haskell.org/tutorial/classes.html |date=20210418005601 }}. June 2000.
+* [http://okmij.org/ftp/Computation/typeclass.html Implementing, and Understanding Type Classes] {{Wayback|url=http://okmij.org/ftp/Computation/typeclass.html |date=20201107224735 }}. 2014-11-13.
+
+{{数据类型}}
+
+[[Category:函数式编程|Category:函数式编程]]
+[[Category:类型论|Category:类型论]]
+[[Category:数据类型|Category:数据类型]]

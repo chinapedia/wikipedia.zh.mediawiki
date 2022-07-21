@@ -1,0 +1,34 @@
+{{Multiple issues|1=
+{{Refimprove|time=2020-10-16T15:04:15+00:00}}
+{{Rough_translation|time=2020-10-16T15:04:15+00:00}}
+}}
+{{NoteTA
+|G1 = IT
+}}
+在[[计算机科学|计算机科学]]中，'''租约'''授予其持有者在一定期限内对某些资源的特定权利。由于它是有时间限制的，因此租用是资源[[序列化|序列化]][[锁_(计算机科学)|锁]]的替代方法。 
+
+== 动机 ==
+传统的资源上的锁一直都处于持有状态，直到锁定它的进程显式释放它为止。 可能无法释放锁的原因包括：
+
+* 客户端在释放资源之前失效 
+* 客户端在尝试分配其他资源时陷入僵局 
+* 客户被阻止或延迟了不合理的时间 
+* 客户可能由于[[程序错误|错误]]而忘记了释放资源 
+* 释放资源的请求已丢失 
+* 资源管理器失效或丢失了对资源的控制 
+
+在重置系统之前，所有这些方法都可能会降低重要的可重用资源的可用性。 相比来说，租约的有效期限是有限的，到期后租约会自动过期，从而使资源可供新客户重新分配。 
+
+== 历史 ==
+术语“租约”（{{lang|en|Lease}}）在1989年由[[卡里·格雷|卡里·格雷]]和{{link-en|大衛·切瑞頓|David Cheriton}}提出<ref>{{Cite book|last=Gray|first=Cary|last2=David Cheriton|title=Leases: An Efficient Fault-Tolerant Mechanism for Distributed File Cache Consistency|work=Proceedings of the Twelfth ACM Symposium on Operating Systems Principles|date=1989年12月|volume=23|pages=202–210|doi=10.1145/74850.74870|isbn=978-0897913386|bibcode=10.1.1.115.1696}}</ref>，但类似的概念（过期令牌<ref>{{Cite journal|title=Efficient Data Sharing|last=Burrows|first=M|date=1988年12月|journal=Technical Report #153, University of Cambridge}}</ref>和带有超时的锁<ref>{{Cite journal|title=Issues in the design and use of a distributed file system|last=Stugis|first=H|last2=Israel, J|date=1980年7月|journal=Operating Systems Review|issue=3|doi=10.1145/850697.850705|volume=14|pages=55–69}}</ref> ）在之前的系统中已有应用。   
+
+== 问题 ==  
+
+租约在分布式系统中通常用于从[[动态主机设置协议|DHCP地址分配]]到[[文件锁定|文件锁定的]]应用程序，但是它们本身不是完整的解决方案：
+
+* 必须采取某种方式将到期信息通知租赁持有人，并防止该代理继续依赖该资源。 通常，这是通过要求所有请求都带有[[访问令牌_(Windows)|访问令牌来完成的]] ，如果关联的租约已过期，则该[[访问令牌_(Windows)|访问令牌]]将无效。 
+* 如果在租约所有者开始对资源进行操作后撤销了租约，则这可能会使资源处于受损状态。 在这种情况下，通常使用原子事务来确保未完成的更新不起作用。 
+
+== 参考文献 ==
+{{Reflist}}
+[[Category:協同控制|Category:協同控制]]

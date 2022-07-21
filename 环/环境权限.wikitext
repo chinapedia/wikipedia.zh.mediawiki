@@ -1,0 +1,37 @@
+
+'''环境权限'''（英文：Ambient Authority）是系统[[访问控制|访问控制]]研究中的术语。当[[主体|主体]]（比如某个计算机程序或Linux上的某个用户）指明它需要的[[客體|客体]]（Object，比如某一文件）的名称和它将要对该客体执行的动作（Operation，比如“复制”）便可以完成该动作的时候，我们称该主体使用了环境权限。<ref>{{Cite journal|title=Capability Myths Demolished|url=http://www.cs.umd.edu/~jkatz/security/downloads/capability-myths.pdf|last=Miller|first=Mark S.|last2=Yee|first2=Ka-Ping|year=2003|last3=Shapiro|first3=Jonathan}}</ref><ref>{{Cite mailing list|last=Donnelley|first=Jed|mailinglist=cap-talk}}</ref><ref>
+{{Cite mailing list|last=Tribble|first=Dean|mailinglist=e-lang}}</ref>
+
+在“环境权限”的定义中：
+
+# 客体的“名称”指的是可被任何主体使用的某一客体的唯一标识符，这一“名称”本身不包含它所指代的客体的权限信息。（举例来说，有一客体名为“foo.txt”，主体“root”拥有权限“rwx”，名称指的就是“foo.txt”，并不包含权限“rwx”）；
+# 一个由主体发起的动作“获得许可（或称“可以完成”）”指的是该主体能够提出任何一种能够完成该动作的请求。（举例来说，主体“root”具有“foo.txt”的“r”权限，那么当主体提出“r foo.txt”的时候能够完成“r”的动作，我们说主体的“r”动作获得了许可）
+
+
+“环境权限”存在于“广泛的可见空间（比如全局环境变量）”，也就是说任何主体都可以通过名称请求它并完成动作。
+
+下面是一个C程序通过open()程序调用来完成读取文件的操作：
+ open(“filename”，O_RDONLY, 0)
+在程序调用过程中，程序仅仅指明了目标文件的文件名，此文件名不包含任何的权限信息，也就是说C程序无法从此文件名中获得权限信息。在这个语境中，权限信息存在于环境中，这也就是我们所说的“环境权限”。
+
+=== 问题 ===
+当环境权限被请求时，是否授予或拒绝权限取决于动作的全局属性，比如作出动作的身份或角色（在Li/Unix语境下，这里的身份即为“用户”）。在使用环境权限的时候，权限的管理将独立于原有的{{link-en|权限控制表|Access-control list|权限控制表}}或{{link-en|基于角色的权限控制|Role-based_access_control|基于角色的权限控制}}等模式，因而正在使用环境权限的程序不会被传统的权限控制手段限制。在这种情况下，系统的权限控制机制无法区分环境权限的使用者是谁，导致了{{link-en|代理混淆问题|Confused deputy problem|代理混淆问题}}
+
+下面的例子来自于 [[加利福尼亞大學柏克萊分校|UC Barkely]] EECS学院 David Wagner教授的PLAS06课程<ref>Ambient authority ,David Wagner, UC Berkeley</ref>：<syntaxhighlight lang="shell">
+# “cp” 必须运行在环境权限下，它可以访问任意用户能够访问的文件
+$ cp foo.txt bar.txt
+#“cat” 只需要它用得到的权限
+$ cat < foo.txt > bar.txt
+
+# 环境权限：即使你不需要，也会在调用时带来的权限
+</syntaxhighlight>今天，因为[[Unix|Unix]]和[[Windows|Windows]]系统都是在用户启动程序后直接赋予程序所有用户拥有的权限，所以这两种操作系统都在使用环境权限模式进行权限管理。这不仅可能赋予被执行程序多于所需的权限，还无法控制程序使用了何种、来源于何的权限。这种情形下，用户只能祈望程序没有使用过多权限。
+
+=== 解决方案 ===
+与环境权限相对应的是“基于能力的权限控制”<ref>{{Cite journal|title=A capability-based security approach to manage access control in the Internet of Things|url=https://www.sciencedirect.com/science/article/pii/S089571771300054X|date=2013-09-01|journal=Mathematical and Computer Modelling|issue=5-6|doi=10.1016/j.mcm.2013.02.006|volume=58|pages=1189–1205|language=en|issn=0895-7177|access-date=2020-10-29|archive-date=2020-11-03|archive-url=https://web.archive.org/web/20201103223951/https://www.sciencedirect.com/science/article/pii/S089571771300054X|dead-url=no}}</ref>，这一模式要求程序执行时像接收数据那样接收并利用权限。权限授予机制在程序请求权限时审查并发放“权限”，以此赋予主体使用客体的“能力”，以便于避免代理混淆问题。
+
+但是请注意，基于能力的权限管理系统与非环境权限授权系统并不是同义词。
+
+== 参考文献 ==
+{{Reflist}}
+[[Category:存取控制|Category:存取控制]]
+[[Category:電腦安全|Category:電腦安全]]

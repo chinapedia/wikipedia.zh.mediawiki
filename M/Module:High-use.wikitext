@@ -1,0 +1,145 @@
+local p = {}
+
+local _fetch = require('Module:Transclusion_count').fetch
+local nspn = mw.getCurrentFrame():preprocess('{{Namespace pagename}}')
+local _separated_entries = require('Module:Separated entries').main
+
+function p.num(frame, count)
+	if count == nil then count = _fetch(frame) end
+	
+	-- Build output string
+	local return_value = ""
+	if count == nil then
+		if frame.args[1] == "risk" then
+			return_value = "大量頁面"
+		else
+			return_value = "許多頁面"
+		end
+	else
+		-- Use 2 significant figures for smaller numbers and 3 for larger ones
+		local sigfig = 2
+		if count >= 100000 then
+			sigfig = 3
+		end
+		
+		-- Prepare to round to appropriate number of sigfigs
+		local f = math.floor(math.log10(count)) - sigfig + 1
+		
+		-- Round and insert "approximately" or "+" when appropriate
+		if (frame.args[2] == "yes") or (mw.ustring.sub(frame.args[1],-1) == "+") then
+			-- Round down
+			return_value = string.format("%s+個頁面", mw.getContentLanguage():formatNum(math.floor( (count / 10^(f)) ) * (10^(f))) )
+		else
+			-- Round to nearest
+			return_value = string.format("約%s個頁面", mw.getContentLanguage():formatNum(math.floor( (count / 10^(f)) + 0.5) * (10^(f))) )
+		end
+		
+		-- Insert percent of pages
+		if frame.args["all-pages"] and frame.args["all-pages"] ~= "" then
+			local percent = math.floor( ( (count/frame:callParserFunction('NUMBEROFPAGES', 'R') ) * 100) + 0.5)
+			return_value = string.format("%s，佔全部頁面的%s%%", return_value, percent)
+		end	
+	end
+	
+	return return_value
+end
+-- Actions if there is a large (greater than or equal to 100,000) transclusion count
+function p.risk(frame)
+	local return_value = ""
+	if frame.args[1] == "risk" then
+		return_value = "risk"
+	else
+		local count = _fetch(frame)
+		if count and count >= 100000 then return_value = "risk" end
+	end
+	return return_value
+end
+
+function p.text(frame, count)
+	local bot_text = "\n\n----\n<small>模板引用數量會自動更新。</small>"
+	if frame.args["nobot"] == "true" then
+		bot_text = ""
+	end
+	
+	if count == nil then count = _fetch(frame) end
+	local return_value = {}
+	
+	local title = mw.title.getCurrentTitle()
+	local isdemo = false
+	if frame.args["demo"] and frame.args["demo"] ~= "" then
+		isdemo = true
+		title = mw.title.new(frame.args["demo"], "Template")
+	end
+	if title.subpageText == "doc" or title.subpageText == "sandbox" or title.subpageText == "testcases" then
+		title = title.basePageTitle
+	end
+
+	local templatecount = string.format("https://templatecount.toolforge.org/index.php?lang=zh&namespace=%s&name=%s", title.namespace,mw.uri.encode(title.text))
+	
+	local used_on_text = string.format("'''%s被引用於[%s %s]'''",
+			(isdemo and "[["..title.fullText.."|"..title.fullText.."]]") or ("此"..nspn),
+			templatecount,
+			p.num(frame, count)
+	)
+	
+	local sandbox_text = _separated_entries({
+		string.format("[[%s/sandbox|'''沙盒''']]", title.fullText),
+		string.format("[[%s/testcases|'''測試樣例''']]", title.fullText),
+		(title.namespace == 828 and "" or "[[Special:Mypage/沙盒|'''您的沙盒''']]"),
+		separator="、",
+		conjunction="或"
+	})
+	
+	local info = "" 
+	if frame.args["info"] and frame.args["info"] ~= "" then
+		info = "<br />" .. frame.args["info"]
+	end
+	sandbox_text = string.format("。%s<br /><small>為了避免造成大規模的影響，所有對此%s的編輯應先於%s上測試。</small>",
+			info, nspn, sandbox_text
+	)
+	
+	local discussion_text = string.format("<br /><small>測試後無誤的版本可以一次性地加入此%s中，但是修改前請務必於", nspn)
+	if frame.args["2"] and frame.args["2"] ~= "" and frame.args["2"] ~= "yes" then
+		discussion_text = string.format("%s'''[[%s|%s]]'''", discussion_text, frame.args["2"])
+	else
+		discussion_text = string.format("%s[[%s|'''討論頁''']]", discussion_text, title.talkPageTitle.fullText )
+	end
+	
+	return table.concat({used_on_text, sandbox_text, discussion_text, "發起討論。</small>", bot_text})
+end
+
+function p.main(frame)
+	local count = _fetch(frame)
+	local return_value = ""
+	local image = "[[File:Dialog-warning-yellow.svg|64px]]"
+	local type_param = "style"
+	if (frame.args[1] == "risk" or (count and count >= 100000) ) then
+		image = "[[File:Dialog-warning-orange.svg|64px]]"
+		type_param = "content"
+	end
+	
+	if frame.args["form"] == "editnotice" then
+		return_value = frame:expandTemplate{
+				title = 'editnotice',
+				args = {
+						["image"] = image,
+						["text"] = p.text(frame, count),
+						["expiry"] = (frame.args["expiry"] or "")
+				}
+		}
+	else
+		return_value = frame:expandTemplate{
+				title = 'ombox',
+				args = {
+						["type"] = type_param,
+						["image"] = image,
+						["text"] = p.text(frame, count),
+						["expiry"] = (frame.args["expiry"] or "")
+				}
+		}
+	end
+	
+	return return_value
+end
+
+return p

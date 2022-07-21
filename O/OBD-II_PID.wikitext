@@ -1,0 +1,2653 @@
+'''OBD-II PID'''是[[車上診斷系統|車上診斷系統]]（OBD）參數ID的簡稱，是在診斷工具上向[[载具|車輛]]請求資料用的編碼。
+
+[[国际汽车工程师学会|国际汽车工程师学会]]（SAE）標準 J1979（電子診斷測試模式）中定義了許多OBD-II PID。所有北美的道路車輛及卡車都要支援一部份的OBD-II PID，主要是在有強制{{le|車輛排氣管制|vehicle emissions control|排氣}}{{le|車輛檢測|vehicle inspection|檢測}}的州。制造商也定義針對個別車輛的PID。目前沒有強制[[摩托車|摩托車]]要支援OBD-II PID，不過也有許多的摩托車支援。
+
+在1996年時，輕型商用車（重量小於{{convert|8500|lbs|abbr=on|disp=sqbr}}）首先強制要支援OBD-II PID，之後是中型商用車（重量在{{convert|8500|–|14000|lbs|abbr=on|disp=sqbr}}之間）在2005年強制支援<ref name=epa>{{cite web |url=http://www.epa.gov/obd/basic.htm |title=Basic Information {{!}} On-Board Diagnostics (OBD) |publisher=US EPA |date=16 March 2015 |accessdate=24 June 2015 |archive-date=2016-04-06 |archive-url=https://web.archive.org/web/20160406174401/https://www3.epa.gov/obd/basic.htm |dead-url=no }}</ref>。輕型商用車及中型商用車都要可以透過由SAE J1962定義的標準{{le|數據鏈路連接器 (車用)|Data link connector (automotive)|數據鏈路連接器}}進行存取。
+
+依加州空氣資源局（CARB）的加州法規（CCR） sections 1971.1 title 13，美國2010年之後生產的重型商用車（重量大於{{convert|14000|lbs||abbr=on|disp=sqbr}}）可以透過{{le|SAE J1939|SAE J1939|SAE standard J1939-13}}（圓型的診斷用連接頭）支援OBD-II的診斷機能。有些北美的重型卡車使用SAE J1962 OBD-II診斷連接器，這也是一般轎車常用的連接器，知名的有麥克貨車及富豪卡車，不過[[控制區域網路|CAN]]識別符是29位元，不是一般轎車的11位元。
+
+== 模式 ==
+在最新的OBD-II標準SAE J1979中，有列出十種診斷服務。2002年以前的J1979，將這些服務稱為模式（modes）。其說明如下：
+
+{| class="wikitable"
+! 模式（十六進制） !! 敘述
+|-
+| align="center" | [[#服務01|{{mono]] || 顯示目前資料 
+|-
+| align="center" | [[#服務02|{{mono]] || 顯示凍結的頁框資料
+|-
+| align="center" | [[#服務03|{{mono]] || 顯示已儲存的{{le|診斷錯誤碼|Diagnostic Trouble Codes}}（DTC）
+|-
+| align="center" | [[#服務04|{{mono]] || 清除診斷錯誤碼以及儲存數值
+|-
+| align="center" | [[#服務04|{{mono]] || 測試結果，氧氣感測器監控（只在不用CAN傳輸時有效）
+|-
+| align="center" | {{mono|06}} || 測試結果、其他元件／系統監控（測試結果，氧氣感測器監控只在用CAN傳輸時有效）
+|-
+| align="center" | {{mono|07}} || 顯示未處理的診斷錯誤碼（在目前或上一次駕駛週期偵測到的診斷錯誤碼）
+|-
+| align="center" | {{mono|08}} || on-board元件或系統的控制動作
+|-
+| align="center" | [[#服務09|{{mono]] || 請求車輛的資訊
+|-
+| align="center" | {{mono|0A}} || 清除診斷錯誤碼
+|}
+
+汽車制造商不一定要實現所有的服務，製造商可以在#9以上增加製造商定義的服務（例如服務22是由Ford/GM的SAE J2190所定義，而服務21是因Toyota而定義) ，這些服務可以提供其他的資料，例如[[混合动力电动汽车|混合动力电动汽车]]（HEV）中牽引電池的電壓<ref>{{cite web|title=Escape PHEV TechInfo - PIDs|url=http://www.eaa-phev.org/wiki/Escape_PHEV_TechInfo#PIDs|work=Electric Auto Association - Plug in Hybrid Electric Vehicle|accessdate=11 December 2013|archive-date=2020-06-14|archive-url=https://web.archive.org/web/20200614112726/http://www.eaa-phev.org/wiki/Escape_PHEV_TechInfo#PIDs|dead-url=no}}</ref>。
+
+非OBD的[[统一诊断服务|统一诊断服务]]從0x10開始，避免和ID範圍重疊。
+
+== 標準PID ==
+下表中所列的是依SAE J1979定義的標準OBD-II PID。也列出每個PID的預期回應，以及回應和實際物理量之間的關係。不是所有車輛都會支援每一個PID，也有一些PID是廠商定義的，不在OBD-II標準中。
+
+服務01和02基本上是相同的，不過服務01會提供目前的資訊，而服務02會提供上一次出現診斷錯誤碼時的資訊。但PID 01和PID 02是例外，PID 01只出現在服務01，而PID 02只出現在服務02，若服務02的PID 02為零，表示沒有凍結的頁框資料，其他服務02的資料都沒有意義。
+
+若用位元編碼表示（Bit-Encoded-Notation）時，像C4表示是資料位元組C的第4位元。每一個位元都有0到7的編號，7是最高位元，而0是最低位元。
+
+{| class="wikitable"
+|- align=center
+| colspan=8 | A
+| colspan=8 | B
+| colspan=8 | C
+| colspan=8 | D
+|- align=center
+| A7 || A6 || A5 || A4 || A3 || A2 || A1 || A0
+| B7 || B6 || B5 || B4 || B3 || B2 || B1 || B0
+| C7 || C6 || C5 || C4 || C3 || C2 || C1 || C0
+| D7 || D6 || D5 || D4 || D3 || D2 || D1 || D0
+|}
+=== 服務{{mono|01}} ===
+{| class="wikitable" style="text-align: center"
+! PID<br />（HEX）
+! PID<br />（DEC）
+! 回應資料位元組個數
+! 描述
+! 最小值
+! 最大值
+! 單位
+! 公式{{efn|name=formula|在公式欄中，字母A, B, C,.....表示資料位元組的第一位元組、第二位元組、第三位元組......的十進位。若有問號，表示有衝突或是不完整的資料<!-- Someone with a copy of the 2006 SAE HS-3000 should fact-check these.-->}}
+|-
+| {{mono|00}}
+| {{mono|0}}
+| 4
+| align=left | 支援的PID[01 - 20]
+|
+|
+|
+| align=left | 位元編碼[A7..D0] == [PID $01..PID $20] [[#服務01_PID_00|見以下敘述]]
+|-
+| {{mono|01}}
+| {{mono|1}}
+| 4
+| align=left | 自從DTC清除後的監控狀態，包括異常指示燈（MIL）狀態，以及DTC的個數
+|
+|
+|
+| align=left | 位元編碼。<!-- 沒有連結 -->[[#服務01_PID_01|見以下敘述]]
+|-
+| {{mono|02}}
+| {{mono|2}}
+| 2
+| align=left | 凍結的DTC
+|
+|
+|
+| align=left |
+|-
+| {{mono|03}}
+| {{mono|3}}
+| 2
+| align=left | 燃油系統狀態
+|
+|
+|
+| align=left | 枚舉編碼。[[#服務01_PID_03|見以下敘述]]
+|-
+| {{mono|04}}
+| {{mono|4}}
+| 1
+| align=left | 計算的發動機負載
+| 0
+| 100
+| %
+| align=left | <math>\tfrac{100}{255} A</math>（或<math>\tfrac {A} {2.55}</math>）
+|-
+| {{mono|05}}
+| {{mono|5}}
+| 1
+| align=left | 發動機冷媒溫度
+| -40
+| 215
+| °C
+| align=left | <math>A - 40</math>
+|-
+| {{mono|06}}
+| {{mono|6}}
+| 1
+| align=left | 短期燃油調整—Bank 1
+| rowspan="4" | -100（燃油需減少：過多燃油）
+| rowspan="4" | 99.2（燃油需增加：過少燃油）
+| rowspan="4" | %
+| rowspan="4" align="left" | <math display="block">\frac{100}{128} A - 100</math>(or <math>\tfrac{A}{1.28} - 100</math> )
+|-
+| {{mono|07}}
+| {{mono|7}}
+| 1
+| align=left | 長期燃油調整—Bank 1
+|-
+| {{mono|08}}
+| {{mono|8}}
+| 1
+| align=left | 短期燃油調整—Bank 2
+|-
+| {{mono|09}}
+| {{mono|9}}
+| 1
+| align=left | 長期燃油調整—Bank 2
+|-
+| {{mono|0A}}
+| {{mono|10}}
+| 1
+| align=left | 燃油壓力（{{le|壓力量測|Pressure measurement|表壓}}）
+| 0
+| 765
+| kPa
+| align=left | <math>3 A</math>
+|-
+| {{mono|0B}}
+| {{mono|11}}
+| 1
+| align=left | 進氣歧管絕對壓力
+| 0
+| 255
+| kPa
+| align=left | <math>A</math>
+|-
+| {{mono|0C}}
+| {{mono|12}}
+| 2
+| align=left | 發動機速度
+| 0
+| 16,383.75
+| rpm
+| align=left | <math> \frac{256 A + B}{4}</math>
+|-
+| {{mono|0D}}
+| {{mono|13}}
+| 1
+| align=left | 車輛速度
+| 0
+| 255
+| km/h
+| align=left | <math>A</math>
+|-
+| {{mono|0E}}
+| {{mono|14}}
+| 1
+| align=left | 點火提前
+| -64
+| 63.5
+| [[止点|止点]]前的角度
+| align=left | <math>\frac{A}{2} - 64</math> 
+|-
+| {{mono|0F}}
+| {{mono|15}}
+| 1
+| align=left | 進氣溫度
+| -40
+| 215
+| °C
+| align=left | <math>A - 40</math>
+|-
+| {{mono|10}}
+| {{mono|16}}
+| 2
+| align=left | {{le|空氣流量感測器|Mass airflow sensor}}（MAF）空氣流率
+| 0
+| 655.35
+| grams/sec
+| align=left | <math> \frac{256 A + B}{100}</math>
+|-
+| {{mono|11}}
+| {{mono|17}}
+| 1
+| align=left | 油門位置
+| 0
+| 100
+| %
+| align=left | <math>\tfrac{100}{255} A</math>
+|-
+| {{mono|12}}
+| {{mono|18}}
+| 1
+| align=left | 命令第二側空氣狀態
+|
+|
+|
+| align=left | [[#服務01_PID_12|見以下敘述]]
+|-
+| {{mono|13}}
+| {{mono|19}}
+| 1
+| align=left | 有氧氣傳感器（2 banks時）
+|
+|
+|
+| align=left | [A0..A3] == Bank 1, 感測器1-4. [A4..A7] == Bank 2...
+|-
+| {{mono|14}}
+| {{mono|20}}
+| 2
+| align=left | 氧氣傳感器 1<BR>A:電壓<BR>B:短期燃油調整
+| rowspan="8" | 0<BR>-100
+| rowspan="8" | 1.275<BR>99.2
+| rowspan="8" | 伏特
+%
+| rowspan="8" align="left" | <math display="block">\frac{A}{200}</math><math display="block">\frac{100}{128} B - 100</math>（若B==$FF，傳感器未用來做燃油調整）
+|-
+| {{mono|15}}
+| {{mono|21}}
+| 2
+| align=left |氧氣傳感器 2<BR>A:電壓<BR>B:短期燃油調整
+|-
+| {{mono|16}}
+| {{mono|22}}
+| 2
+| align=left |氧氣傳感器 3<BR>A:電壓<BR>B:短期燃油調整
+|-
+| {{mono|17}}
+| {{mono|23}}
+| 2
+| align=left |氧氣傳感器 4<BR>A:電壓<BR>B:短期燃油調整
+|-
+| {{mono|18}}
+| {{mono|24}}
+| 2
+| align=left |氧氣傳感器 5<BR>A:電壓<BR>B:短期燃油調整
+|-
+| {{mono|19}}
+| {{mono|25}}
+| 2
+| align=left |氧氣傳感器 6<BR>A:電壓<BR>B:短期燃油調整
+|-
+| {{mono|1A}}
+| {{mono|26}}
+| 2
+| align=left |氧氣傳感器 7<BR>A:電壓<BR>B:短期燃油調整
+|-
+| {{mono|1B}}
+| {{mono|27}}
+| 2
+| align=left |氧氣傳感器 8<BR>A:電壓<BR>B:短期燃油調整
+|-
+| {{mono|1C}}
+| {{mono|28}}
+| 1
+| align=left | 車輛使用的OBD標準
+| 1
+| 250
+| -
+| align=left | 枚举。[[#服務01_PID_1C|如下]]
+|-
+| {{mono|1D}}
+| {{mono|29}}
+| 1
+| align=left | 存在的氧氣傳感器（在4 banks時）
+|
+|
+|
+| align=left | 類似PID 13，但[A0..A7] == [B1S1, B1S2, B2S1, B2S2, B3S1, B3S2, B4S1, B4S2]
+|-
+| {{mono|1E}}
+| {{mono|30}}
+| 1
+| align=left | 輔助輸入狀態
+|
+|
+|
+| align=left | A0 == {{le|動力分導|Power Take Off}}（PTO）狀態（1 == 有效）<BR>[A1..A7] 未使用
+|-
+| {{mono|1F}}
+| {{mono|31}}
+| 2
+| align=left | 發動機啟動後的運行時間
+| 0
+| 65,535
+| 秒
+| align=left |<math>256 A + B</math>
+|-
+| {{mono|20}}
+| {{mono|32}}
+| 4
+| align=left | 支援的PID[21 - 40]
+|
+|
+|
+| align=left | 位元編碼[A7..D0] == [PID $21..PID $40] [[#服務01_PID_00|見以下敘述]]
+|-
+| {{mono|21}}
+| {{mono|33}}
+| 2
+| align=left | 故障指示燈（MIL）亮時行駛的距離
+| 0
+| 65,535
+| km
+| align=left |<math>256 A + B</math>
+|-
+| {{mono|22}}
+| {{mono|34}}
+| 2
+| align=left | [[高压共轨|高压共轨]]壓力（相對進氣歧管真空）
+| 0
+| 5177.265
+| kPa
+| align=left | <math>0.079 (256 A + B)</math>
+|-
+| {{mono|23}}
+| {{mono|35}}
+| 2
+| align=left | [[高压共轨|高压共轨]]表壓力（柴油，或是汽油直接噴射）
+| 0
+| 655,350
+| kPa
+| align=left | <math>10 (256 A + B)</math>
+|-
+| {{mono|24}}
+| {{mono|36}}
+| 4
+| align=left | 氧氣偵測器1<BR>AB: 燃油-空氣當量比<BR>CD: 電壓
+| rowspan="8" | 0<BR>0
+| rowspan="8" | < 2<BR>< 8
+| rowspan="8" | ratio<BR>V
+| rowspan="8" align="left" | <math display="block">\frac{2}{65536} (256 A + B)</math><math display="block">\frac{8}{65536} (256 C + D)</math>
+|-
+| {{mono|25}}
+| {{mono|37}}
+| 4
+| align=left |　氧氣偵測器2<BR>AB: 燃油-空氣當量比<BR>CD: 電壓
+|-
+| {{mono|26}}
+| {{mono|38}}
+| 4
+| align=left | 氧氣偵測器3<BR>AB: 燃油-空氣當量比<BR>CD: 電壓
+|-
+| {{mono|27}}
+| {{mono|39}}
+| 4
+| align=left | 氧氣偵測器4<BR>AB: 燃油-空氣當量比<BR>CD: 電壓
+|-
+| {{mono|28}}
+| {{mono|40}}
+| 4
+| align=left | 氧氣偵測器5<BR>AB: 燃油-空氣當量比<BR>CD: 電壓
+|-
+| {{mono|29}}
+| {{mono|41}}
+| 4
+| align=left | 氧氣偵測器6<BR>AB: 燃油-空氣當量比<BR>CD: 電壓
+|-
+| {{mono|2A}}
+| {{mono|42}}
+| 4
+| align=left | 氧氣偵測器7<BR>AB: 燃油-空氣當量比<BR>CD: 電壓
+|-
+| {{mono|2B}}
+| {{mono|43}}
+| 4
+| align=left | 氧氣偵測器8<BR>AB: 燃油-空氣當量比<BR>CD: 電壓
+|-
+| {{mono|2C}}
+| {{mono|44}}
+| 1
+| align=left | [[排氣再循環|排氣再循環]]（EGR）指令
+| 0
+| 100
+| %
+| align=left |<math>\tfrac{100}{255} A</math>
+|-
+| {{mono|2D}}
+| {{mono|45}}
+| 1
+| align=left | EGR錯誤
+| -100
+| 99.2
+| %
+| align=left | <math>\tfrac{100}{128} A - 100</math>
+|-
+| {{mono|2E}}
+| {{mono|46}}
+| 1
+| align=left | 指令蒸發清除
+| 0
+| 100
+| %
+| align=left |<math>\tfrac{100}{255} A</math>
+|-
+| {{mono|2F}}
+| {{mono|47}}
+| 1
+| align=left | 燃油Tank水準輸入
+| 0
+| 100
+| %
+| align=left |<math>\tfrac{100}{255} A</math>
+|-
+| {{mono|30}}
+| {{mono|48}}
+| 1
+| align=left | 錯誤碼清除後的暖機
+| 0
+| 255
+| count
+| align=left | <math>A</math>
+|-
+| {{mono|31}}
+| {{mono|49}}
+| 2
+| align=left | 錯誤碼清除後行駛的距離
+| 0
+| 65,535
+| km
+| align=left |<math>256 A + B</math>
+|-
+| {{mono|32}}
+| {{mono|50}}
+| 2
+| align=left | 蒸發系統蒸氣壓力
+| -8,192
+| 8191.75
+| Pa
+| align=left | <math> \frac{256 A + B}{4}</math>
+（AB 是有號[[二補數|二補數]]）<ref>{{cite web|title=Extended PID's - Signed Variables|url=http://torque-bhp.com/forums/?wpforumaction=viewtopic&t=1981.0#postid-1199516|website=Torque-BHP|accessdate=17 March 2016|archive-date=2016-03-23|archive-url=https://web.archive.org/web/20160323043549/http://torque-bhp.com/forums/?wpforumaction=viewtopic&t=1981.0#postid-1199516|dead-url=no}}</ref>
+|-
+| {{mono|33}}
+| {{mono|51}}
+| 1
+| align=left | 絕對大氣壓
+| 0
+| 255
+| kPa 
+| align=left | <math>A</math>
+|-
+| {{mono|34}}
+| {{mono|52}}
+| 4
+| align=left | 氧氣偵測器1<BR>AB: 燃油-空氣當量比<BR>CD: 電流
+| rowspan="8" | 0<BR>-128
+| rowspan="8" | < 2<BR><128
+| rowspan="8" | ratio<BR>mA
+| rowspan="8" align="left" | <math display="block">\frac{2}{65536} (256 A + B)</math><math display="block">\frac{256 C + D}{256} - 128</math>or <math>C + \frac{D}{256} - 128</math>
+|-
+| {{mono|35}}
+| {{mono|53}}
+| 4
+| align=left | 氧氣偵測器2<BR>AB: 燃油-空氣當量比<BR>CD: 電流
+|-
+| {{mono|36}}
+| {{mono|54}}
+| 4
+| align=left | 氧氣偵測器3<BR>AB: 燃油-空氣當量比<BR>CD: 電流
+|-
+| {{mono|37}}
+| {{mono|55}}
+| 4
+| align=left | 氧氣偵測器4<BR>AB: 燃油-空氣當量比<BR>CD: 電流
+|-
+| {{mono|38}}
+| {{mono|56}}
+| 4
+| align=left | 氧氣偵測器5<BR>AB: 燃油-空氣當量比<BR>CD: 電流
+|-
+| {{mono|39}}
+| {{mono|57}}
+| 4
+| align=left | 氧氣偵測器6<BR>AB: 燃油-空氣當量比<BR>CD: 電流
+|-
+| {{mono|3A}}
+| {{mono|58}}
+| 4
+| align=left | 氧氣偵測器7<BR>AB: 燃油-空氣當量比<BR>CD: 電流
+|-
+| {{mono|3B}}
+| {{mono|59}}
+| 4
+| align=left | 氧氣偵測器8<BR>AB: 燃油-空氣當量比<BR>CD: 電流
+|-
+| {{mono|3C}}
+| {{mono|60}}
+| 2
+| align="left" | 催化劑溫度：Bank 1，感測器1
+| rowspan="4" | -40
+| rowspan="4" | 6,513.5
+| rowspan="4" | °C
+| rowspan="4" align="left" | <math>\frac{256 A + B}{10} - 40</math>
+|-
+| {{mono|3D}}
+| {{mono|61}}
+| 2
+| align="left" | 催化劑溫度：Bank 2，感測器1
+|-
+| {{mono|3E}}
+| {{mono|62}}
+| 2
+| align="left" | 催化劑溫度：Bank 1，感測器2
+|-
+| {{mono|3F}}
+| {{mono|63}}
+| 2
+| align="left" | 催化劑溫度：Bank 2，感測器2
+|-
+| {{mono|40}}
+| {{mono|64}}
+| 4
+| align=left | 支援的PID[41 - 60]
+|
+|
+|
+| align=left | 位元編碼[A7..D0] == [PID $41..PID $60] [[#服務01_PID_00|見以下敘述]]
+|-
+| {{mono|41}}
+| {{mono|65}}
+| 4
+| align=left | 監控狀態，目前駕駛週期
+|
+|
+|
+| align=left | 位元編碼 [[#服務01_PID_41|見以下敘述]]
+|-
+| {{mono|42}}
+| {{mono|66}}
+| 2
+| align=left | 控制模組電壓
+| 0
+| 65.535
+| V
+| align=left | <math>\frac{256A + B}{1000}</math>
+|-
+| {{mono|43}}
+| {{mono|67}}
+| 2
+| align=left | 絕對負載值
+| 0
+| 25,700
+| %
+| align=left | <math>\tfrac{100}{255} (256A + B)</math>
+|-
+| {{mono|44}}
+| {{mono|68}}
+| 2
+| align=left | 燃油–空氣命令等效比
+| 0
+| < 2
+| ratio
+| align=left | <math>\tfrac{2}{65536} (256 A + B)</math>
+|-
+| {{mono|45}}
+| {{mono|69}}
+| 1
+| align=left | 相對油門位置
+| 0
+| 100
+| %
+| align=left |<math>\tfrac{100}{255} A</math>
+|-
+| {{mono|46}}
+| {{mono|70}}
+| 1
+| align=left | 環境空氣溫度
+| -40
+| 215
+| °C
+| align=left | <math>A - 40</math>
+|-
+| {{mono|47}}
+| {{mono|71}}
+| 1
+| align=left | 絕對油門位置B
+| rowspan="6" | 0
+| rowspan="6" | 100
+| rowspan="6" | %
+| rowspan="6" align="left" |<math>\frac{100}{255} A</math>
+|-
+| {{mono|48}}
+| {{mono|72}}
+| 1
+| align=left | 絕對油門位置C
+|-
+| {{mono|49}}
+| {{mono|73}}
+| 1
+| align=left | 加速踏板位置D
+|-
+| {{mono|4A}}
+| {{mono|74}}
+| 1
+| align=left | 加速踏板位置E
+|-
+| {{mono|4B}}
+| {{mono|75}}
+| 1
+| align=left | 加速踏板位置F
+|-
+| {{mono|4C}}
+| {{mono|76}}
+| 1
+| align=left | 指令油門致動器
+|-
+| {{mono|4D}}
+| {{mono|77}}
+| 2
+| align=left | MIL燈亮的行駛時間
+| rowspan="2" | 0
+| rowspan="2" | 65,535
+| rowspan="2" | 分
+| rowspan="2" align="left" |<math>256 A + B</math>
+|-
+| {{mono|4E}}
+| {{mono|78}}
+| 2
+| align=left | 錯誤碼清除後的時間
+|-
+| {{mono|4F}}
+| {{mono|79}}
+| 4
+| align=left | 燃油-空氣當量比最大值, 氧氣偵測器電壓，氧氣偵測器電流，及進氣歧管絕對壓力
+| 0, 0, 0, 0
+| 255, 255, 255, 2550
+|ratio, V, mA, kPa
+| align=left | A, B, C, D*10
+|-
+| {{mono|50}}
+| {{mono|80}}
+| 4
+| align=left | 質量空氣流量計的最大空氣流率
+| 0
+| 2550
+| g/s
+| align=left | A*10, B, C和D保留
+|-
+| {{mono|51}}
+| {{mono|81}}
+| 1
+| align=left | 燃料種類
+|
+|
+|
+| align=left | 燃料種類碼。[[#燃料碼|見以下敘述]]
+|-
+| {{mono|52}}
+| {{mono|82}}
+| 1
+| align=left | 乙醇燃料百分比
+| 0
+| 100
+| %
+| align=left |<math>\tfrac{100}{255} A</math>
+|-
+| {{mono|53}}
+| {{mono|83}}
+| 2
+| align=left | 蒸發系統絕對蒸氣壓力
+| 0
+| 327.675
+| kPa
+| align=left | <math>\frac{256A + B}{200}</math>
+|-
+| {{mono|54}}
+| {{mono|84}}
+| 2
+| align=left | 蒸發系統（相對）蒸氣壓力
+| -32,767
+| 32,768
+| Pa
+| align=left | ((A*256)+B)-32767
+|-
+| {{mono|55}}
+| {{mono|85}}
+| 2
+| align=left | 第二側氧氣偵測器短期修正，A：bank 1, B：bank 3
+| rowspan="4" | -100
+| rowspan="4" | 99.2
+| rowspan="4" | %
+| rowspan="4" align="left" | <math>\frac{100}{128}A - 100</math>
+
+<math>\frac{100}{128} B - 100</math>
+|-
+| {{mono|56}}
+| {{mono|86}}
+| 2
+| align=left | 第二側氧氣偵測器長期修正，A：bank 1, B：bank 3
+|-
+| {{mono|57}}
+| {{mono|87}}
+| 2
+| align=left | 第二側氧氣偵測器短期修正，A：bank 2, B：bank 4
+|-
+| {{mono|58}}
+| {{mono|88}}
+| 2
+| align=left | 第二側氧氣偵測器長期修正，A：bank 2, B：bank 4
+|-
+| {{mono|59}}
+| {{mono|89}}
+| 2
+| align=left | [[高压共轨|高压共轨]]絕對壓力
+| 0
+| 655,350
+| kPa
+| align=left |<math>10 (256 A + B)</math>
+|-
+| {{mono|5A}}
+| {{mono|90}}
+| 1
+| align=left | 加速踏板相對位置
+| 0
+| 100
+| %
+| align=left |<math>\tfrac{100}{255} A</math>
+|-
+| {{mono|5B}}
+| {{mono|91}}
+| 1
+| align=left | 油電混合電池組剩下壽命
+| 0
+| 100
+| %
+| align=left |<math>\tfrac{100}{255} A</math>
+|-
+| {{mono|5C}}
+| {{mono|92}}
+| 1
+| align=left | 發動機油溫
+| -40
+| 210
+| °C
+| align=left |<math>A - 40</math>
+|-
+| {{mono|5D}}
+| {{mono|93}}
+| 2
+| align=left | 燃料噴射正時
+| -210.00
+| 301.992
+| °
+| align=left | <math>\frac{256A + B}{128} - 210</math>
+|-
+| {{mono|5E}}
+| {{mono|94}}
+| 2
+| align=left | 發動機燃料率
+| 0
+| 3212.75
+| L/h
+| align=left | <math>\frac{256A + B}{20}</math>
+|-
+| {{mono|5F}}
+| {{mono|95}}
+| 1
+| align=left | 車輛設計的排氣要求
+|
+|
+|
+| align=left | 位元編碼
+|-
+| {{mono|60}}
+| {{mono|96}}
+| 4
+| align=left | 支援的PID[61 - 80]
+|
+|
+|
+| align=left | 位元編碼[A7..D0] == [PID $61..PID $80] [[#服務01_PID_00|見以下敘述]]
+|-
+| {{mono|61}}
+| {{mono|97}}
+| 1
+| align=left | 駕駛的發動機命令-力矩百分比
+| -125
+| 130
+| %
+| align=left | A-125
+|-
+| {{mono|62}}
+| {{mono|98}}
+| 1
+| align=left | 實際發動機-力矩百分比
+| -125
+| 130
+| %
+| align=left | A-125
+|-
+| {{mono|63}}
+| {{mono|99}}
+| 2
+| align=left | 發動機參考力矩
+| 0
+| 65,535
+| Nm
+| align=left |<math>256 A + B</math>
+|-
+| {{mono|64}}
+| {{mono|100}}
+| 5
+| align=left | 發動機力矩百分比資料
+| -125
+| 130
+| %
+| align=left | A-125 閒置<BR>B-125 發動機點1<BR>C-125 發動機點2<BR>D-125 發動機點3<BR>E-125 發動機點4
+|-
+| {{mono|65}}
+| {{mono|101}}
+| 2
+| align=left | 支援輔助輸入／輸出
+|
+|
+|
+| align=left | 位元編碼
+|-
+| {{mono|66}}
+| {{mono|102}}
+| 5
+| align=left | 質量空氣流量計
+|
+|
+|
+| align=left |
+|-
+| {{mono|67}}
+| {{mono|103}}
+| 3
+| align=left | 發動機冷媒溫度
+|
+|
+| °C
+| align=left |
+|-
+| {{mono|68}}
+| {{mono|104}}
+| 7
+| align=left | 進氣溫度感測器
+|
+|
+|
+| align=left |
+|-
+| {{mono|69}}
+| {{mono|105}}
+| 7
+| align=left | EGR命令及EGR錯誤
+|
+|
+|
+| align=left |
+|-
+| {{mono|6A}}
+| {{mono|106}}
+| 5
+| align=left | 柴油進氣空氣流率控制命令及相對進氣氣流位置
+|
+|
+|
+| align=left |
+|-
+| {{mono|6B}}
+| {{mono|107}}
+| 5
+| align=left | 排氣再循環溫度
+|
+|
+|
+| align=left |
+|-
+| {{mono|6C}}
+| {{mono|108}}
+| 5
+| align=left | 油門致動器控制命令和相對油門位置
+|
+|
+|
+| align=left |
+|-
+| {{mono|6D}}
+| {{mono|109}}
+| 6
+| align=left | 燃料壓力控制系統
+|
+|
+|
+| align=left |
+|-
+| {{mono|6E}}
+| {{mono|110}}
+| 5
+| align=left | 噴射壓力控制系統
+|
+|
+|
+| align=left |
+|-
+| {{mono|6F}}
+| {{mono|111}}
+| 3
+| align=left | 渦輪增壓壓縮機入口壓力
+|
+|
+|
+| align=left |
+|-
+| {{mono|70}}
+| {{mono|112}}
+| 9
+| align=left | 提昇壓力控制
+|
+|
+|
+| align=left |
+|-
+| {{mono|71}}
+| {{mono|113}}
+| 5
+| align=left | 可變幾何渦輪增壓（VGT）控制
+|
+|
+|
+| align=left |
+|-
+| {{mono|72}}
+| {{mono|114}}
+| 5
+| align=left | 洩壓閥（Wastegate）控制
+|
+|
+|
+| align=left |
+|-
+| {{mono|73}}
+| {{mono|115}}
+| 5
+| align=left | 排氣壓力
+|
+|
+|
+| align=left |
+|-
+| {{mono|74}}
+| {{mono|116}}
+| 5
+| align=left | 渦輪增壓器RPM
+|
+|
+|
+| align=left |
+|-
+| {{mono|75}}
+| {{mono|117}}
+| 7
+| align=left | 渦輪增壓器溫度
+|
+|
+|
+| align=left |
+|-
+| {{mono|76}}
+| {{mono|118}}
+| 7
+| align=left | 渦輪增壓器溫度
+|
+|
+|
+| align=left |
+|-
+| {{mono|77}}
+| {{mono|119}}
+| 5
+| align=left | 增壓空氣冷卻器溫度（Charge air cooler temperature，CACT）
+|
+|
+|
+| align=left |
+|-
+| {{mono|78}}
+| {{mono|120}}
+| 9
+| align=left | 排氣溫度（EGT）Bank 1
+|
+|
+|
+| align=left | 特別PID。[[#服務01_PID_78|見以下敘述]]
+|-
+| {{mono|79}}
+| {{mono|121}}
+| 9
+| align=left | 排氣溫度（EGT）Bank 2
+|
+|
+|
+| align=left | 特別PID。[[#服務01_PID_78|見以下敘述]]
+|-
+| {{mono|7A}}
+| {{mono|122}}
+| 7
+| align=left | 柴油粒子過濾器（DPF）
+|
+|
+|
+| align=left |
+|-
+| {{mono|7B}}
+| {{mono|123}}
+| 7
+| align=left | 柴油粒子過濾器（DPF）
+|
+|
+|
+| align=left |
+|-
+| {{mono|7C}}
+| {{mono|124}}
+| 9
+| align=left | 柴油粒子過濾器（DPF）溫度
+|
+|
+| °C
+| align=left |<math>\frac{256 A + B}{10} - 40</math>
+|-
+| {{mono|7D}}
+| {{mono|125}}
+| 1
+| align=left | NOx NTE（{{le|Not-To-Exceed|Not-To-Exceed}}）控制區狀態
+|
+|
+|
+| align=left |
+|-
+| {{mono|7E}}
+| {{mono|126}}
+| 1
+| align=left | PM NTE（{{le|Not-To-Exceed|Not-To-Exceed}}）控制區狀態
+|
+|
+|
+| align=left |
+|-
+| {{mono|7F}}
+| {{mono|127}}
+| 13
+| align=left | 發動機運行時間
+|
+|
+| seconds
+| align=left |
+|-
+| {{mono|80}}
+| {{mono|128}}
+| 4
+| align=left | 支援的PID[81 - A0]
+|
+|
+|
+| align=left | 位元編碼[A7..D0] == [PID $81..PID $A0] [[#服務01_PID_00|見以下敘述]]
+|-
+| {{mono|81}}
+| {{mono|129}}
+| 21
+| align=left | 給輔助排放控制設備（AECD）的發動機運行時間
+|
+|
+|
+| align=left |
+|-
+| {{mono|82}}
+| {{mono|130}}
+| 21
+| align=left | 給輔助排放控制設備（AECD）的發動機運行時間
+|
+|
+|
+| align=left |
+|-
+| {{mono|83}}
+| {{mono|131}}
+| 5
+| align=left | NOx感測器
+|
+|
+|
+| align=left |
+|-
+| {{mono|84}}
+| {{mono|132}}
+|1
+| align=left | 歧管表面溫度
+|
+|
+|
+| align=left |
+|-
+| {{mono|85}}
+| {{mono|133}}
+|10
+| align=left | NOx試劑系統
+|
+|
+|
+| align=left |
+|-
+| {{mono|86}}
+| {{mono|134}}
+|5
+| align=left | 粒子（PM）感測器
+|
+|
+|
+| align=left |
+|-
+| {{mono|87}}
+| {{mono|135}}
+|5
+| align=left | 進氣歧管絕對壓力
+|
+|
+|
+| align=left |
+|-
+|{{mono|88}}
+|{{mono|136}}
+|13
+| align=left |選擇性觸媒還原 (SCR）引入系統
+|
+|
+|
+|
+|-
+|{{mono|89}}
+|{{mono|137}}
+|41
+| align=left |AECD #11-#15的運行時間
+|
+|
+|
+|
+|-
+|{{mono|8A}}
+|{{mono|138}}
+|41
+| align=left |AECD #16-#20的運行時間
+|
+|
+|
+|
+|-
+|{{mono|8B}}
+|{{mono|139}}
+|7
+| align=left |柴油後處理
+|
+|
+|
+|
+|-
+|{{mono|8C}}
+|{{mono|140}}
+|16
+| align=left |O2感測器（廣義）
+|
+|
+|
+|
+|-
+|{{mono|8D}}
+|{{mono|141}}
+|1
+| align=left |油門位置G
+|0
+|100
+|%
+|
+|-
+|{{mono|8E}}
+|{{mono|142}}
+|1
+| align=left |發動機摩擦力-力矩百分比
+| -125
+|130
+|%
+| align=left | <math>A - 125</math>
+|-
+|{{mono|8F}}
+|{{mono|143}}
+|5
+| align=left |PM感測器Bank 1 & 2
+|
+|
+|
+|
+|-
+|{{mono|90}}
+|{{mono|144}}
+|3
+| align=left |WWH-OBD車輛OBD系統資訊
+|
+|
+|hours
+|
+|-
+|{{mono|91}}
+|{{mono|145}}
+|5
+| align=left |WWH-OBD車輛OBD系統資訊
+|
+|
+|hours
+|
+|-
+|{{mono|92}}
+|{{mono|146}}
+|2
+| align=left |燃料系統控制
+|
+|
+|
+|
+|-
+|{{mono|93}}
+|{{mono|147}}
+|3
+| align=left |支援WWH-OBD車輛OBD計數器
+|
+|
+|hours
+|
+|-
+|{{mono|94}}
+|{{mono|148}}
+|12
+| align=left |NOx警告及誘導系統
+|
+|
+|
+|
+|-
+|{{mono|98}}
+|{{mono|152}}
+|9
+| align=left |排氣溫度感測器
+|
+|
+|
+|
+|-
+|{{mono|99}}
+|{{mono|153}}
+|9
+| align=left |排氣溫度感測器
+|
+|
+|
+|
+|-
+|{{mono|9A}}
+|{{mono|154}}
+|6
+| align=left |油電混合車/電動車系統資料，電池，電壓
+|
+|
+|
+|
+|-
+|{{mono|9B}}
+|{{mono|155}}
+|4
+| align=left |柴油車排氣流體感測器資料
+|
+|
+|
+|
+|-
+|{{mono|9C}}
+|{{mono|156}}
+|17
+| align=left |O2感測器資料
+|
+|
+|
+|
+|-
+|{{mono|9D}}
+|{{mono|157}}
+|4
+| align=left |發動機燃油率
+|
+|
+|g/s
+|
+|-
+|{{mono|9E}}
+|{{mono|158}}
+|2
+| align=left |發動機燃油流率
+|
+|
+|kg/h
+|
+|-
+|{{mono|9F}}
+|{{mono|159}}
+|9
+| align=left |燃料系統使用百分比
+|
+|
+|
+|
+|-
+| {{mono|A0}}
+| {{mono|160}}
+| 4
+| align=left | 支援的PID[A1 - C0]
+|
+|
+|
+| align=left | 位元編碼[A7..D0] == [PID $A1..PID $C0] [[#服務01_PID_00|見以下敘述]]
+|-
+|{{mono|A1}}
+|{{mono|161}}
+|9
+| align=left |NOx感測器校正資料
+|
+|
+|ppm
+|
+|-
+|{{mono|A2}}
+|{{mono|162}}
+|2
+| align=left |汽缸燃油率
+|
+|
+|mg/stroke
+|
+|-
+|{{mono|A3}}
+|{{mono|163}}
+|9
+| align=left |蒸發系統蒸氣壓
+|
+|
+|Pa
+|
+|-
+|{{mono|A4}}
+|{{mono|164}}
+|4
+| align=left |變速箱實際檔位
+|
+|
+|
+|
+|-
+|{{mono|A5}}
+|{{mono|165}}
+|4
+| align=left |柴油排氣液體量
+|
+|
+|
+|
+|-
+|{{mono|A6}}
+|{{mono|166}}
+|4
+| align=left |[[里程錶|里程錶]]
+| 0
+| 526 385 151.9
+| [[公引|公引]]（km/10）
+|  <math>\frac{A(2^{24}) + B(2^{16}) + C(2^{8}) + D}{10}</math>
+|-
+| {{mono|C0}}
+| {{mono|192}}
+| 4
+| align=left | 支援的PID[C1 - E0]
+| 0x0
+| 0xffffffff
+|
+| align=left | 位元編碼[A7..D0] == [PID $C1..PID $E0] [[#服務01_PID_00|見以下敘述]]
+|-
+| {{mono|C3}}
+| {{mono|195}}
+| ?
+| align=left | ?
+| ?
+| ?
+| ?
+| align=left | 回傳數值資料，包括駕駛條件ID及發動機速度*
+|-
+| {{mono|C4}}
+| {{mono|196}}
+| ?
+| align=left | ?
+| ?
+| ?
+| ?
+| align=left | B5是發動機閒置請求<BR>B6是發動機停止請求*
+|-
+! PID<br />（HEX）
+! PID<br />（DEC）
+! 回應資料位元組個數
+! 描述
+! 最小值
+! 最大值
+! 單位
+! 公式{{efn|name=formula}}
+|}
+
+=== 服務{{mono|02}} ===
+服務{{mono|02}}的PID和服務{{mono|01}}相同，意義也相同<ref>{{cite web |url=https://bads.lt/en/obd2-codes-and-meanings-2/ |title=OBD2 Codes and Meanings |publisher=Baltic Automotive Diagnostic Systems |location=Lithuania |access-date=11 June 2020 |archive-date=2020-06-15 |archive-url=https://web.archive.org/web/20200615102533/https://bads.lt/en/obd2-codes-and-meanings-2/ |dead-url=no }}</ref>，不過資訊是在產生凍結頁框<ref>{{Cite web|url=https://www.obdadvisor.com/freeze-frame/|title=OBD2 Freeze Frame Data: What is It? How To Read It?|date=2018-02-28|website=OBD Advisor|language=en-US|access-date=2020-03-14|archive-date=2019-08-03|archive-url=https://web.archive.org/web/20190803043313/https://www.obdadvisor.com/freeze-frame/|dead-url=no}}</ref>時的資料。
+
+需要在訊息的資料區中傳送頁框號碼。
+
+{| class="wikitable" style="text-align: center"
+! PID<BR>(hex)
+! 回應資料位元組個數
+! 描述
+! 最小值
+! 最大值
+! 單位
+! 公式{{efn|name=formula}}
+|-
+| {{mono|02}}
+| 2
+| align=left | 產生凍結頁框，要儲存資料的DTC
+|
+|
+|
+| align=left | BCD編碼。[[#服務03（不需PID）|格式如下]]
+|}
+
+=== 服務{{mono|03}} ===
+{| class="wikitable" style="text-align: center"
+! PID<BR>(hex)
+! 回應資料位元組個數
+! 敘述
+! 最小值
+! 最大值
+! 單位
+! 公式{{efn|name=formula}}
+|-
+| N/A
+| n*6
+| align=left | 請求的錯誤碼
+|
+|
+|
+| align=left | 每個訊息三個錯誤碼。[[#服務03（不需PID）|見以下敘述]]
+|}
+
+=== 服務{{mono|04}} ===
+{| class="wikitable" style="text-align: center"
+! PID<BR>(hex)
+! 回應資料位元組個數
+! 描述
+! 最小值
+! 最大值
+! 單位
+! 公式{{efn|name=formula}}
+|-
+| N/A
+| 0
+| align=left | 清除錯誤碼 / 故障指示燈（MIL） / 檢查發動機燈
+|
+|
+|
+| align=left | 清除所有儲存的錯誤碼，並且關閉故障指示燈
+|}
+
+=== 服務{{mono|05}} ===
+{| class="wikitable" style="text-align: center"
+! PID<BR>(hex)
+! 回應資料位元組個數
+! 描述
+! 最小值
+! 最大值
+! 單位
+! 公式{{efn|name=formula}}
+|-
+| {{mono|0100}}
+| 4
+| align=left | 支持的OBD監控ID ($01 – $20)
+| 0x0
+| 0xffffffff
+|
+| align=left |
+|-
+| {{mono|0101}}
+| 2
+| align=left | O2感測器Bank 1，感測器1
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Rich to lean sensor threshold voltage
+|-
+| {{mono|0102}}
+|
+| align=left | O2感測器Bank 1，感測器2
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Rich to lean sensor threshold voltage
+|-
+| {{mono|0103}}
+|
+| align=left | O2感測器Bank 1，感測器3
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Rich to lean sensor threshold voltage
+|-
+| {{mono|0104}}
+|
+| align=left | O2感測器Bank 1，感測器4
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Rich to lean sensor threshold voltage
+|-
+| {{mono|0105}}
+|
+| align=left | O2感測器Bank 2，感測器1
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Rich to lean sensor threshold voltage
+|-
+| {{mono|0106}}
+|
+| align=left | O2感測器Bank 2，感測器2
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Rich to lean sensor threshold voltage
+|-
+| {{mono|0107}}
+|
+| align=left | O2感測器Bank 2，感測器3
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Rich to lean sensor threshold voltage
+|-
+| {{mono|0108}}
+|
+| align=left | O2感測器Bank 2，感測器4
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Rich to lean sensor threshold voltage
+|-
+| {{mono|0109}}
+|
+| align=left | O2感測器Bank 3，感測器1
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Rich to lean sensor threshold voltage
+|-
+| {{mono|010A}}
+|
+| align=left | O2感測器Bank 3，感測器2
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Rich to lean sensor threshold voltage
+|-
+| {{mono|010B}}
+|
+| align=left | O2感測器Bank 3，感測器3
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Rich to lean sensor threshold voltage
+|-
+| {{mono|010C}}
+|
+| align=left | O2感測器Bank 3，感測器4
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Rich to lean sensor threshold voltage
+|-
+| {{mono|010D}}
+|
+| align=left | O2感測器Bank 4，感測器1
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Rich to lean sensor threshold voltage
+|-
+| {{mono|010E}}
+|
+| align=left | O2感測器Bank 4，感測器2
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Rich to lean sensor threshold voltage
+|-
+| {{mono|010F}}
+|
+| align=left | O2感測器Bank 4，感測器3
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Rich to lean sensor threshold voltage
+|-
+| {{mono|0110}}
+|
+| align=left | O2感測器Bank 4，感測器4
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Rich to lean sensor threshold voltage
+|-
+| {{mono|0201}}
+|
+| align=left | O2感測器Bank 1，感測器1
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Lean to Rich sensor threshold voltage
+|-
+| {{mono|0202}}
+|
+| align=left | O2感測器Bank 1，感測器2
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Lean to Rich sensor threshold voltage
+|-
+| {{mono|0203}}
+|
+| align=left | O2感測器Bank 1，感測器3
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Lean to Rich sensor threshold voltage
+|-
+| {{mono|0204}}
+|
+| align=left | O2感測器Bank 1，感測器4
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Lean to Rich sensor threshold voltage
+|-
+| {{mono|0205}}
+|
+| align=left | O2感測器Bank 2，感測器1
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Lean to Rich sensor threshold voltage
+|-
+| {{mono|0206}}
+|
+| align=left | O2感測器Bank 2，感測器2
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Lean to Rich sensor threshold voltage
+|-
+| {{mono|0207}}
+|
+| align=left | O2感測器Bank 2，感測器3
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Lean to Rich sensor threshold voltage
+|-
+| {{mono|0208}}
+|
+| align=left | O2感測器Bank 2，感測器4
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Lean to Rich sensor threshold voltage
+|-
+| {{mono|0209}}
+|
+| align=left | O2感測器Bank 3，感測器1
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Lean to Rich sensor threshold voltage
+|-
+| {{mono|020A}}
+|
+| align=left | O2感測器Bank 3，感測器2
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Lean to Rich sensor threshold voltage
+|-
+| {{mono|020B}}
+|
+| align=left | O2感測器Bank 3，感測器3
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Lean to Rich sensor threshold voltage
+|-
+| {{mono|020C}}
+|
+| align=left | O2感測器Bank 3，感測器4
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Lean to Rich sensor threshold voltage
+|-
+| {{mono|020D}}
+|
+| align=left | O2感測器Bank 4，感測器1
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Lean to Rich sensor threshold voltage
+|-
+| {{mono|020E}}
+|
+| align=left | O2感測器Bank 4，感測器2
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Lean to Rich sensor threshold voltage
+|-
+| {{mono|020F}}
+|
+| align=left | O2感測器Bank 4，感測器3
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Lean to Rich sensor threshold voltage
+|-
+| {{mono|0210}}
+|
+| align=left | O2感測器Bank 4，感測器4
+| 0.00
+| 1.275
+| volts
+| align=left | 0.005 Lean to Rich sensor threshold voltage
+|-
+! PID<BR>(hex)
+! 回應資料位元組個數
+! 描述
+! 最小值
+! 最大值
+! 單位
+! 公式{{efn|name=formula}}
+|}
+
+=== 服務 {{mono|09}} ===
+{| class="wikitable" style="text-align: center"
+! PID<BR>(hex)
+! 回應資料位元組個數
+! 描述
+! 最小值
+! 最大值
+! 單位
+! 公式{{efn|name=formula}}
+|-
+| {{mono|00}}
+| 4
+| align=left | 服務9支援的PID(01 to 20)
+|
+|
+|
+| align=left | 位元編碼[A7..D0] = [PID $01..PID $20] [[#服務01_PID_00|見以下敘述]]
+|-
+| {{mono|01}}
+| 1
+| align=left | PID {{mono|02}}中的VIN訊息計數，只針對ISO 9141-2、ISO 14230-4及SAE J1850.
+|
+|
+|
+| align=left | 多半數值會是5
+|-
+| {{mono|02}}
+| 17
+| align=left | [[車輛識別號碼|車輛識別號碼]] (VIN)
+|
+|
+|
+| align=left | 17字元的VIN，ASCII編碼，若不滿17個字元，左邊會填入空字元（{{mono|0x00}}）
+|-
+| {{mono|03}}
+| 1
+| align=left | PID {{mono|04}}中的校正ID訊息計數，只針對ISO 9141-2、ISO 14230-4及SAE J1850。
+|
+|
+|
+| align=left | 會是四的倍數（每一個ID需要四個訊息）
+|-
+| {{mono|04}}
+| 16,32,48,64..
+| align=left | 校正ID
+|
+|
+|
+| align=left | 最多16個ASCII字元。未使用的資料位元組會回傳空字元（{{mono|0x00}}）。可以輸出多個校正ID（每個ID 16個位元組）
+|-
+| {{mono|05}}
+| 1
+| align=left | PID {{mono|06}}的校正驗證碼（CVN）訊息計數，只針對ISO 9141-2、ISO 14230-4及SAE J1850。
+|
+|
+|
+| align=left |
+|-
+| {{mono|06}}
+| 4,8,12,16
+| align=left | 校正驗證碼（CVN）。可以輸出多個校正驗證碼（每個碼4個位元組），校正驗證碼和校正ID的數量需符合
+|
+|
+|
+| align=left | 原始資料，左邊會補空字元（{{mono|0x00}}），一般會以十六進制字串顯示。
+|-
+| {{mono|07}}
+| 1
+| align=left | PID {{mono|08}}和{{mono|0B}}的使用中性能跟踪訊息計數，只針對ISO 9141-2、ISO 14230-4及SAE J1850。
+| 8
+| 10
+|
+| align=left | 數值會是8表示要回應16個數值，數值會是9表示要回應18個數值，數值會是10表示要回應20個數值
+|-
+| {{mono|08}}
+| 4
+| align=left | 火星塞點火發動機車輛的使用中性能跟踪
+|
+|
+|
+| align=left | 四個或五個訊息，每一個有四個位元組（二個數值）[[#服務09_PID_08|見以下敘述]]
+|-
+| {{mono|09}}
+| 1
+| align=left | PID {{mono|0A}} 的ECU名稱訊息計數 
+|
+|
+|
+| align=left |
+|-
+| {{mono|0A}}
+| 20
+| align=left | ECU名稱
+|
+|
+|
+| align=left | ASCII編碼，右邊會補空字元（{{mono|0x00}}）
+|-
+| {{mono|0B}}
+| 4
+| align=left | 壓縮點火發動機車輛的使用中性能跟踪
+|
+|
+|
+| align=left | 5個訊息，每個訊息4個位元組（2個數值）[[#服務09_PID_0B|見以下敘述]]
+|-
+! PID<BR>(hex)
+! 回應資料位元組個數
+! 描述
+! 最小值
+! 最大值
+! 單位
+! 公式{{efn|name=formula}}
+|}
+
+{{notelist|close}}
+
+=== 位元編碼PID ===
+上表中有部份的PID無法用簡單的公式來說明。以下是這些PID的細部說明。
+
+==== 服務01 PID {{mono|00}} ====
+這個PID的請求會回傳4位元組的資料（[[字节序|Big-endian]]。每一個位元的排序順序是由[[最高有效位|MSB]]到[[最低有效位|LSB]]。表示接下來的32個PID，並且說明支援哪些PID。
+
+例如，若汽車的回覆是{{mono|BE1FA813}}，可以解碼如下
+
+{| class="wikitable"
+|- align="center"
+! scope="col" | 十六進位
+| colspan="4" | {{mono|B}} || colspan="4" | {{mono|E}}
+| colspan="4" | {{mono|1}} || colspan="4" | {{mono|F}}
+| colspan="4" | {{mono|A}} || colspan="4" | {{mono|8}}
+| colspan="4" | {{mono|1}} || colspan="4" | {{mono|3}}
+|- align="center"
+! scope="col" | 二進位
+| {{mono|1}} || {{mono|0}} || {{mono|1}} || {{mono|1}} || {{mono|1}} || {{mono|1}} || {{mono|1}} || {{mono|0}}
+| {{mono|0}} || {{mono|0}} || {{mono|0}} || {{mono|1}} || {{mono|1}} || {{mono|1}} || {{mono|1}} || {{mono|1}}
+| {{mono|1}} || {{mono|0}} || {{mono|1}} || {{mono|0}} || {{mono|1}} || {{mono|0}} || {{mono|0}} || {{mono|0}}
+| {{mono|0}} || {{mono|0}} || {{mono|0}} || {{mono|1}} || {{mono|0}} || {{mono|0}} || {{mono|1}} || {{mono|1}}
+|-
+! scope="col" | 是否支援
+
+| {{Yes}} ||  {{No}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} ||  {{No}}
+|  {{No}} ||  {{No}} ||  {{No}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}}
+| {{Yes}} ||  {{No}} || {{Yes}} ||  {{No}} || {{Yes}} ||  {{No}} ||  {{No}} ||  {{No}}
+|  {{No}} ||  {{No}} ||  {{No}} || {{Yes}} ||  {{No}} ||  {{No}} || {{Yes}} || {{Yes}}
+|- align="center"
+! scope="col" | PID編號
+| {{mono|01}} || {{mono|02}} || {{mono|03}} || {{mono|04}} || {{mono|05}} || {{mono|06}} || {{mono|07}} || {{mono|08}}
+| {{mono|09}} || {{mono|0A}} || {{mono|0B}} || {{mono|0C}} || {{mono|0D}} || {{mono|0E}} || {{mono|0F}} || {{mono|10}}
+| {{mono|11}} || {{mono|12}} || {{mono|13}} || {{mono|14}} || {{mono|15}} || {{mono|16}} || {{mono|17}} || {{mono|18}}
+| {{mono|19}} || {{mono|1A}} || {{mono|1B}} || {{mono|1C}} || {{mono|1D}} || {{mono|1E}} || {{mono|1F}} || {{mono|20}}
+|}
+
+因此，支援的PID有：{{mono|01}}、{{mono|03}}、{{mono|04}}、{{mono|05}}、{{mono|06}}、{{mono|07}}、{{mono|0C}}、{{mono|0D}}、{{mono|0E}}、{{mono|0F}}、{{mono|10}}、{{mono|11}}、{{mono|13}}、{{mono|15}}、{{mono|1C}}、{{mono|1F}}及{{mono|20}}
+
+==== 服務01 PID {{mono|01}} ====
+這個PID的請求會回傳4位元組的資料，分別標示A B C、D。
+
+第一個位元組（A）包括二部份的資訊。位元{{mono|A7}}（位元組A的MSB）表示MIL（檢查發動機警示燈）是否點亮。位元{{mono|A6}}到{{mono|A0}}表示發動機控制器顯示的診斷故障碼。
+
+第二至第四位元組（B, C和D）表示特定在線測試的可進行程度（availability）及完整性（completeness）。可用程度會用設定位元{{mono|1}}來表示，而完整性會用清除位元{{mono|0}}來表示。
+
+{| class="wikitable"
+! 位元
+! 名稱
+! 敘述
+|-
+| {{mono|A7}}
+| MIL
+| 關閉或點亮。為1表示CEL/MIL點亮（或應該點亮）
+|-
+| {{mono|A6}}-{{mono|A0}}
+| DTC_CNT
+| 顯示幕上和尾氣排放相關DTC的個數
+|-
+| {{mono|B7}}
+| 保留
+| 保留（應該為{{mono|0}}）
+|-
+| {{mono|B3}}
+| 
+| {{mono|0}} = 支援火星塞點火監控（奧托發動機或汪克爾發動機）<br/> {{mono|1}} = 支援壓縮點火監控（柴油發動機）
+|}
+
+以下是常見的B位元組定義，是以測試為基礎的內容。
+
+{| class="wikitable"
+! !! 可進行測試 !! 測試不完整
+|- align="center"
+! scope="row" | 元件
+| {{mono|B2}} || {{mono|B6}}
+|- align="center"
+! scope="row" | 燃料系統
+| {{mono|B1}} || {{mono|B5}}
+|- align="center"
+! scope="row" | 不發火
+| {{mono|B0}} || {{mono|B4}}
+|}
+
+第三位元組及第四位元組的定義會依發動機是[[火星塞|火星塞]][[点火系统|点火]]（奧托發動機或汪克爾發動機）或[[柴油引擎|柴油發動機]]而不同。第二位元組的bit 3會說明如何定義位元組C和D，{{mono|0}}表示是火星塞点火（奧托發動機或汪克爾發動機），{{mono|1}}表示是壓縮點火（柴油發動機）
+
+火星塞点火監控時的位元組C和D （奧托發動機或汪克爾發動機）：
+{| class="wikitable"
+! !! 可進行測試 !! 測試不完整
+|- align="center"
+! scope="row" | 尾氣再循環系統
+| {{mono|C7}}|| {{mono|D7}}
+|- align="center"
+! scope="row" | 氧氣偵測器加熱器
+| {{mono|C6}} || {{mono|D6}}
+|- align="center"
+! scope="row" | 氧氣偵測器
+| {{mono|C5}}|| {{mono|D5}}
+|- align="center"
+! scope="row" | 冷氣冷媒
+| {{mono|C4}} || {{mono|D4}}
+|- align="center"
+! scope="row" | 第二側空氣系統
+| {{mono|C3}} || {{mono|D3}}
+|- align="center"
+! scope="row" | 蒸發系統
+| {{mono|C2}} || {{mono|D2}}
+|- align="center"
+! scope="row" | 已加熱催化劑
+| {{mono|C1}} || {{mono|D1}}
+|- align="center"
+! scope="row" | 催化劑
+| {{mono|C0}} || {{mono|D0}}
+|}
+
+柴油發動機監控時的位元組C和D：
+
+{| class="wikitable"
+! !! 可進行測試 !! 測試不完整
+|- align="center"
+! scope="row" | EGR（排氣再循環）及／或VVT（可變氣門正時）系統
+| {{mono|C7}} || {{mono|D7}}
+|- align="center"
+! scope="row" | PM過濾器監控
+| {{mono|C6}} || {{mono|D6}}
+|- align="center"
+! scope="row" | 尾氣感測器
+| {{mono|C5}} || {{mono|D5}}
+|- align="center"
+! scope="row" | - 保留 -
+| {{mono|C4}} || {{mono|D4}}
+|- align="center"
+! scope="row" | 提昇壓力
+| {{mono|C3}} || {{mono| D3}}
+|- align="center"
+! scope="row" | - 保留 -
+| {{mono|C2}} || {{mono|D2}}
+|- align="center"
+! scope="row" | NOx/SCR監控
+| {{mono|C1}} || {{mono|D1}}
+|- align="center"
+! scope="row" | NMHC催化劑{{efn|NMHC可以表示甲烷之外的碳氫化合物（Non-Methane HydroCarbons），不過J1979沒有明確說明。<!--The translation would be the ammonia sensor in the SCR催化劑--->}}
+| {{mono|C0}} || {{mono|D0}}
+|}
+
+{{notelist|close}}
+==== 服務01 PID {{mono|41}} ====
+這個PID的請求會回傳4位元組的資料。 
+第一個位元組會是0，第二個到第四個位元組會提供特定在線測試（on-board test）可進行程度（availability）及完整性（completeness）。和PID 01相同，第三和第四個位元組的定義會依發動機類型（B3）而不同，B3為{{mono|0}}表示是火星塞，為{{mono|1}}表示是壓縮點火。可進行程度（availability）是用位元{{mono|1}}表示，而完整性（completeness）是用位元{{mono|0}}表示。
+
+以下是共用的位元組B的定義，以測試為基礎。
+{| class="wikitable"
+! !! 可進行測試 !! 測試不完整
+|- align="center"
+! scope="row" | 元件
+| {{mono|B2}} || {{mono|B6}}
+|- align="center"
+! scope="row" | 燃料系統
+| {{mono|B1}} || {{mono|B5}}
+|- align="center"
+! scope="row" | 不發火
+| {{mono|B0}} || {{mono|B4}}
+|}
+
+針對火星塞點火監控的位元組C和D（奧托發動機或汪克爾發動機）：
+{| class="wikitable"
+! !! 可進行測試 !! 測試不完整
+|- align="center"
+! scope="row" | EGR系統
+| {{mono|C7}}|| {{mono|D7}}
+|- align="center"
+! scope="row" | 氧氣偵測器加熱器
+| {{mono|C6}} || {{mono|D6}}
+|- align="center"
+! scope="row" | 氧氣偵測器
+| {{mono|C5}}|| {{mono|D5}}
+|- align="center"
+! scope="row" | 冷氣冷媒
+| {{mono|C4}} || {{mono|D4}}
+|- align="center"
+! scope="row" | 第二側空氣系統
+| {{mono|C3}} || {{mono|D3}}
+|- align="center"
+! scope="row" | 蒸發系統
+| {{mono|C2}} || {{mono|D2}}
+|- align="center"
+! scope="row" | 已加熱催化劑
+| {{mono|C1}} || {{mono|D1}}
+|- align="center"
+! scope="row" | 催化劑
+| {{mono|C0}} || {{mono|D0}}
+|}
+
+柴油發動機監控時的位元組C和D：
+{| class="wikitable"
+! !! 可進行測試 !! 測試不完整
+|- align="center"
+! scope="row" | EGR（排氣再循環）及／或VVT（可變氣門正時）系統
+| {{mono|C7}} || {{mono|D7}}
+|- align="center"
+! scope="row" | PM過濾器監控
+| {{mono|C6}} || {{mono|D6}}
+|- align="center"
+! scope="row" | 尾氣感測器
+| {{mono|C5}} || {{mono|D5}}
+|- align="center"
+! scope="row" | - 保留 -
+| {{mono|C4}} || {{mono|D4}}
+|- align="center"
+! scope="row" | 提昇壓力
+| {{mono|C3}} || {{mono| D3}}
+|- align="center"
+! scope="row" |  - 保留 -
+| {{mono|C2}} || {{mono|D2}}
+|- align="center"
+! scope="row" | NOx/SCR Monitor
+| {{mono|C1}} || {{mono|D1}}
+|- align="center"
+! scope="row" | NMHC催化劑{{efn|NMHC可以表示甲烷之外的碳氫化合物（Non-Methane HydroCarbons），不過J1979沒有明確說明。<!--The translation would be the ammonia sensor in the SCR催化劑--->}}
+| {{mono|C0}} || {{mono|D0}}
+|}
+
+{{notelist|close}}
+==== 服務01 PID 78 ====
+這個PID的請求會回傳9位元組的資料。 
+第一個位元組是位元編碼，表示支援的[[尾气|尾气]]溫度感測器：
+
+{| class="wikitable"
+! Byte !! 敘述
+|-
+| align="center" | {{mono|A}} || 支援的尾氣感測器
+|-
+| align="center" | {{mono|B}}-{{mono|C}} || EGT11讀到的溫度
+|-
+| align="center" | {{mono|D}}-{{mono|E}} || EGT12讀到的溫度
+|-
+| align="center" | {{mono|F}}-{{mono|G}} || EGT13讀到的溫度
+|-
+| align="center" | {{mono|H}}-{{mono|I}} || EGT14讀到的溫度
+|}
+
+第一個位元組的位元編碼如下：
+
+{| class="wikitable"
+! Bit !! 敘述
+|-
+| align="center" | {{mono|A7}}-{{mono|A4}} || 保留
+|-
+| align="center" | {{mono|A3}} || EGT bank 1是否支援感測器4？
+|-
+| align="center" | {{mono|A2}} || EGT bank 1是否支援感測器3？
+|-
+| align="center" | {{mono|A1}} || EGT bank 1是否支援感測器2？
+|-
+| align="center" | {{mono|A0}} || EGT bank 1是否支援感測器1？
+|}
+
+剩下的位元組是16位元的整數，表示攝氏下的溫度，範圍從-40到6513.5（比例0.1），其轉換公式為<math>(A \times 256 + B) / 10 - 40</math>（高位元組為A，低位元組是B）。只有有支援的感測器對應的值是有意義的。
+
+PID {{mono|79}}的結構相同，但是是針對bank 2的感測器。
+
+==== 服務03（不需PID） ====
+此服務的請求會回傳一串已設定的DTC。會用[[ISO_15765-2|ISO 15765-2]]的協定進行封裝。
+
+若DTC不超過二個（4位元組），會用[[ISO_15765-2|ISO-TP]]單一頁框格式（SF）回覆。若三個或三個以上的DTC，會分為多個頁框傳送，實際的頁框數會依通訊格式以及定址方式而定。
+
+每個診斷錯誤碼為二個位元組。診斷錯誤碼的文字敘述如下。診斷錯誤碼的第一個字會由第一個位元組的前二個位元決定：
+{| class="wikitable"
+! {{mono|A7}}-{{mono|A6}} !! DTC的第一個字元
+|-
+| align="center" | 00 || {{mono|'''P'''}}—動力總成（Powertrain）
+|-
+| align="center" | 01 || {{mono|'''C'''}}—底盤（Chassis）
+|-
+| align="center" | 10 || {{mono|'''B'''}}—車體（Body）
+|-
+| align="center" | 11 || {{mono|'''U'''}}—網路（Powertrain）
+|}
+
+DTC碼的第二個字由會由第一個位元組的下二個位元決定：
+
+{| class="wikitable"
+! {{mono|A5}}-{{mono|A4}} !! DTC的第二個字元
+|-
+| align="center" | 00 || {{mono|0}}
+|-
+| align="center" | 01 || {{mono|1}}
+|-
+| align="center" | 10 || {{mono|2}}
+|-
+| align="center" | 11 || {{mono|3}}
+|}
+
+DTC碼的第三個字是一個數字，定義如下：
+
+{| class="wikitable"
+! {{mono|A3}}-{{mono|A0}} !! DTC的第三個字元
+|-
+| align="center" | 0000 || {{mono|0}}
+|-
+| align="center" | 0001 || {{mono|1}}
+|-
+| align="center" | 0010 || {{mono|2}}
+|-
+| align="center" | 0011 || {{mono|3}}
+|-
+| align="center" | 0100 || {{mono|4}}
+|-
+| align="center" | 0101 || {{mono|5}}
+|-
+| align="center" | 0110 || {{mono|6}}
+|-
+| align="center" | 0111 || {{mono|7}}
+|-
+| align="center" | 1000 || {{mono|8}}
+|-
+| align="center" | 1001 || {{mono|9}}
+|-
+| align="center" | 1010 || {{mono|A}}
+|-
+| align="center" | 1011 || {{mono|B}}
+|-
+| align="center" | 1100 || {{mono|C}}
+|-
+| align="center" | 1101 || {{mono|D}}
+|-
+| align="center" | 1110 || {{mono|E}}
+|-
+| align="center" | 1111 || {{mono|F}}
+|}
+
+DTC碼的第四個字及第五個字定義方式類似，不過是用{{mono|B7}}-{{mono|B4}}和{{mono|B3}}-{{mono|B0}}位元。所產生的五個字元需類似{{mono|U0158}}之類的字元，而且可以在OBD-II DTC表上找到。最後三個字允許使用十六進制的數字（0-9, A-F），不過常見的還是使用十進制的數字（0-9）。
+
+==== 服務09 PID 08 ====
+
+會提供有關催化劑bank、氧氣偵測器bank、蒸發泄漏偵測系統、[[排氣再循環|排氣再循環]]及第二側空氣系統的使用追蹤資訊。
+
+每一個元件或是系統的分子針對偵測特定誤動作的監控，追蹤該監控所有條件成立的次數
+每一個元件或是系統的分母針對該特定條件，車輛運作的次數
+
+資料的個數需在訊息的一開始就說明（第一個位元組）
+
+所有使用中性能追蹤的資料會包括二個位元組，依次數送出（每個訊息有二個資料，因此長度為4）
+
+{| class="wikitable"
+! Mnemonic !! 敘述
+|-
+| OBDCOND || OBD監控條件成立計數
+|-
+| IGNCNTR || 點火計數
+|-
+| CATCOMP1 || 催化劑監控完成計數Bank 1
+|-
+| CATCOND1 || 催化劑監控條件成立計數Bank 1
+|-
+| CATCOMP2 || 催化劑監控完成計數Bank 2
+|-
+| CATCOND2 || 催化劑監控條件成立計數Bank 2
+|-
+| O2SCOMP1 || O2感測器監控完成計數Bank 1
+|-
+| O2SCOND1 || O2感測器監控條件成立計數Bank 1
+|-
+| O2SCOMP2 || O2感測器監控完成計數Bank 2
+|-
+| O2SCOND2 || O2感測器監控條件成立計數Bank 2
+|-
+| EGRCOMP || EGR監控完成條件計數
+|-
+| EGRCOND || EGR監控條件成立計數
+|-
+| AIRCOMP || AIR監控完成條件計數（第二組）
+|-
+| AIRCOND || AIR監控條件成立計數（第二組）
+|-
+| EVAPCOMP || EVAP監控完成條件計數
+|-
+| EVAPCOND || EVAP監控條件成立計數
+|-
+| SO2SCOMP1 || 第二組O2感測器監控完成計數Bank 1
+|-
+| SO2SCOND1 || 第二組O2感測器監控條件成立計數Bank 1
+|-
+| SO2SCOMP2 || 第二組O2感測器監控完成計數Bank 2
+|-
+| SO2SCOND2 || 第二組O2感測器監控條件成立計數Bank 2
+|}
+
+==== 服務09 PID 0B ====
+
+此服務提供有關NMHC 催化劑監控、NOx 催化劑監控、NOx吸收器監控、PM過濾器監控、排氣感測器監控、GR（排氣再循環）及／或VVT（可變氣門正時）監控, 提昇壓力監控及燃料系統監控的使用性能資訊。
+
+所有的資料都有2個位元，以以下的順序排列（每一個訊息有二個資料，因為是4個位元）：
+
+{| class="wikitable"
+! 記憶字 !! 敘述
+|-
+| OBDCOND || OBD監控條件計數
+|-
+| IGNCNTR || Ignition計數
+|-
+| HCCATCOMP || NMHC催化劑監控完成條件計數
+|-
+| HCCATCOND || NMHC催化劑監控條件計數
+|-
+| NCATCOMP || NOx/SCR催化劑監控完成條件計數
+|-
+| NCATCOND || NOx/SCR催化劑監控條件計數
+|-
+| NADSCOMP || NOx吸收器監控完成條件計數
+|-
+| NADSCOND || NOx吸收器監控條件計數
+|-
+| PMCOMP || PM過濾器監控完成條件計數
+|-
+| PMCOND || PM過濾器監控條件計數
+|-
+| EGSCOMP || 排氣感測器監控完成條件計數
+|-
+| EGSCOND || 排氣感測器監控條件計數
+|-
+| EGRCOMP || EGR（排氣再循環）及／或VVT（可變氣門正時）監控完成條件計數
+|-
+| EGRCOND || EGR及／或VVT監控條件計數
+|-
+| BPCOMP || 提昇壓力監控完成條件計數
+|-
+| BPCOND || 提昇壓力監控條件計數
+|-
+| FUELCOMP || 燃料監控完成條件計數
+|-
+| FUELCOND || 燃料監控條件計數
+|}
+
+=== 枚舉PID ===
+有些PID的解讀方式比較特殊，是有[[枚举|枚举]]的型式，這類PID沒有位元定義，也沒有單位。
+
+==== 服務01 PID {{mono|03}} ====
+這種PID的請求會回覆二個位元組的資料。
+第一個位元組表示燃料系統#1。
+
+{| class="wikitable"
+! 值 !! 敘述
+|-
+| align="center" | 1 || 因為發動機溫度不足而開路
+|-
+| align="center" | 2 || 閉迴路，利用氧氣偵測器回授來決定fuel mix
+|-
+| align="center" | 4 || 因為發動機負載或是因減速燃料減少而開路
+|-
+| align="center" | 8 || 因為系統失效而開路
+|-
+| align="center" | 16 || 閉迴路，利用至少一個氧氣偵測器，但回授系統出現故障
+|}
+
+其他的值無效。
+
+第二個位元組表示燃料系統#1，定義完全相同。
+
+==== 服務01 PID {{mono|12}} ====
+這種PID的請求會回覆一個位元組的資料，表示第二側空氣狀態。
+
+{| class="wikitable"
+! 值 !! 敘述
+|-
+| align="center" | 1 || 上游 
+|-
+| align="center" | 2 || 催化轉化器的下游
+|-
+| align="center" | 4 || 來自外部大氣，或是關閉
+|-
+| align="center" | 8 || 泵浦因診斷機能而開啟
+|}
+
+其他的值無效。
+
+==== 服務01 PID {{mono|1C}} ====
+此種PID請求會回覆一個位元組的資料，說明電子控制器使用的OBD標準。以下是數值以及其對應的標準。
+
+{| class="wikitable"
+! 值 !! 敘述
+|-
+| align="center" | 1 || 由{{le|加州空氣資源局|California Air Resources Board}}（CARB）定義的OBD-II
+|-
+| align="center" | 2 || 由[[美国国家环境保护局|美国国家环境保护局]]定義的OBD
+|-
+| align="center" | 3 || OBD及OBD-II
+|-
+| align="center" | 4 || OBD-I
+|-
+| align="center" | 5 || 沒有相容的OBD
+|-
+| align="center" | 6 || EOBD（歐洲）
+|-
+| align="center" | 7 || EOBD及OBD-II
+|-
+| align="center" | 8 || EOBD及OBD
+|-
+| align="center" | 9 || EOBD、OBD及OBD II
+|-
+| align="center" | 10 || JOBD（日本）
+|-
+| align="center" | 11 || JOBD及OBD II
+|-
+| align="center" | 12 || JOBD及EOBD
+|-
+| align="center" | 13 || JOBD、EOBD及OBD II
+|-
+| align="center" | 14 || 保留
+|-
+| align="center" | 15 || 保留
+|-
+| align="center" | 16 || 保留
+|-
+| align="center" | 17 || 發動機製造商診斷（Engine Manufacturer Diagnostics、EMD）
+|-
+| align="center" | 18 || 發動機製造商增強診斷（Engine Manufacturer Diagnostics Enhanced、EMD+）
+|-
+| align="center" | 19 || 重載OBD（部份）（HD OBD-C）
+|-
+| align="center" | 20 || 重載OBD（HD OBD）
+|-
+| align="center" | 21 || 全球協調OBD（WWH OBD）
+|-
+| align="center" | 22 || 保留
+|-
+| align="center" | 23 || 重載歐盟OBD第一階段，沒有NOx控制（HD EOBD-I）
+|-
+| align="center" | 24 || 重載歐盟OBD第一階段，有NOx控制（HD EOBD-I N）
+|-
+| align="center" | 25 || 重載歐盟OBD第二階段，沒有NOx控制（HD EOBD-II）
+|-
+| align="center" | 26 || 重載歐盟OBD第二階段，有NOx控制（HD EOBD-II N）
+|-
+| align="center" | 27 || 保留
+|-
+| align="center" | 28 || 巴西OBD第一階段（OBDBr-1）
+|-
+| align="center" | 29 || 巴西OBD第二階段（OBDBr-2）
+|-
+| align="center" | 30 || 韓國OBD（KOBD）
+|-
+| align="center" | 31 || 印度OBD I（IOBD I）
+|-
+| align="center" | 32 || 印度OBD II（IOBD II）
+|-
+| align="center" | 33 || 重載歐盟OBD第四階段（HD EOBD-IV）
+|-
+| align="center" | 34-250 || 保留
+|-
+| align="center" | 251-255 || 沒有適合的系統（SAE [[J1939|J1939]]有特殊意義）
+|}
+
+==== 燃料碼 ====
+服務01 PID {{mono|51}}會回傳數值，對應車輛的燃料型態。燃料型態一個位元組，數值和燃料對應如下：
+
+{| class="wikitable"
+! 數值 !! 描述
+|-
+| align="center" | 0 || 無
+|-
+| align="center" | 1 || 石油
+|-
+| align="center" | 2 || 甲醇
+|-
+| align="center" | 3 || 乙醇
+|-
+| align="center" | 4 || 柴油
+|-
+| align="center" | 5 || [[液化石油气|液化石油气]]
+|-
+| align="center" | 6 || [[壓縮天然氣|壓縮天然氣]]
+|-
+| align="center" | 7 || 丙烷
+|-
+| align="center" | 8 || 電力
+|-
+| align="center" | 9 || {{le|生質燃料汽車|Bi-fuel vehicle}}，目前用汽油運行
+|-
+| align="center" | 10 || 生質燃料汽車，目前用甲醇運行
+|-
+| align="center" | 11 || 生質燃料汽車，目前用乙醇運行
+|-
+| align="center" | 12 || 生質燃料汽車，目前用LPG運行
+|-
+| align="center" | 13 || 生質燃料汽車，目前用CNG運行
+|-
+| align="center" | 14 || 生質燃料汽車，目前用丙烷運行
+|-
+| align="center" | 15 || 生質燃料汽車，目前用電力運行
+|-
+| align="center" | 16 || 生質燃料汽車，目前用電力及內燃機發動機運行
+|-
+| align="center" | 17 || 汽油燃料的油電車
+|-
+| align="center" | 18 || 乙醇燃料的油電車
+|-
+| align="center" | 19 || 柴油燃料的油電車
+|-
+| align="center" | 20 || 以電力運行的油電車
+|-
+| align="center" | 21 || 以電力及內燃機發動機運行的油電車
+|-
+| align="center" | 22 || 油電車，能源回昇模式
+|-
+| align="center" | 23 || 生質燃料汽車，目前用柴油運行
+|}
+
+其他的值保留供ISO/SAE使用，目前沒有針對{{le|彈性燃料車|flexible-fuel vehicle}}的定義。
+
+== 非標準的PID ==
+大部份的在使用的OBD-II PID都是非標準的，針對大部份現今的車輛，OBD-II界面中支持的非標準PID功能比標準PID功能還多，各家的非標準PID只有少部份的重疊。
+
+在公眾領域中非標準PID的資訊相當有限。有一個以美國為主的{{le|設備工具研究所|Equipment and Tool Institute}}（ETI）有維護一些廠商的非標準PID，只提供給其會員。ETI的年費和公司在北美車輛工具及設備的營業額有關：
+
+{| class="wikitable"  
+|-
+! 北美年營業額 !! 年費
+|-
+| $10,000,000以下 || $5,000
+|-
+| $10,000,000 - $50,000,000 || $7,500
+|-
+| $50,000,000以上 || $10,000
+|}
+就算是ETI，也沒有所有非標準PID的文件。ETI表示<ref name=eti-faq>{{cite web
+  | last = 
+  | first = 
+  | authorlink = 
+  | coauthors = 
+  | title = ETI Full Membership FAQ
+  | work = 
+  | publisher = The Equipment and Tool Institute
+  | date = 
+  | url = http://www.etools.org/FullMembershipFAQ
+  | doi = 
+  | accessdate = 29 November 2013
+  | archive-date = 2017-03-10
+  | archive-url = https://web.archive.org/web/20170310110523/http://www.etools.org/FullMembershipFAQ
+  | dead-url = no
+  }}： state:
+ showing cost of access to OBD-II PID documentation</ref><ref>{{cite web |url=http://www.etools.org/OEMLicensing/ |title=Special OEM License Requirements |publisher=The Equipment and Tool Institute |accessdate=13 April 2015 |archive-date=2017-05-03 |archive-url=https://web.archive.org/web/20170503171908/http://etools.org/OEMLicensing |dead-url=no }}</ref>
+<blockquote>
+有些車廠拒絕用ETI來提供資訊給相關工具廠商。他們比較想和每一家工具廠商個別作生意。這些公司會要求你和他們簽合約。其費用是變動的，以下是2015年4月13日的年費：
+{| class="wikitable"  
+|-
+|通用汽車   || $50,000
+|-
+|豐田       || $5,000
+|-
+|鈴木       || $1,000
+|-
+|BMW        || $25,500，每次更新要加$2,000，每年更新一次
+|}
+</blockquote>
+
+== CAN（11位元）通訊格式 ==
+在車內的CAN網路中會有查詢PID以及PID回覆的訊息。標準OBD查詢以及回覆會用機能式的地址。診斷讀取器會用CAN ID 7DFh送出查詢訊息，此位址是廣播位置，並且會接受從7E8h到7EFh的回覆。回覆OBD查詢的電子控制器也會接收7DFh廣播位置的訊息，並且接收7E0h到7E7h範圍內指定ID的訊息。其回應的ID是指定ID值加8，範圍從7E8h到7EFh。
+
+此作法可以允許最多8個電子控制器，每一個都可以回覆OBD的查詢。診斷讀取器可以用ECU回覆的ID繼續和特定的電子控制器通訊。特別是多頁框的通訊需要特定ID電子控制器的回覆。
+
+CAN也可以傳送標準OBD訊息以外的資訊，實體位址會用這些特殊模組的CAN訊息（例如720h是福特汽車的組合儀表），也會有專屬的頁框以及傳送資料。
+
+=== 查詢 ===
+機能性的PID查詢會用ID 7DFh的CAN訊息送出，其資料為：
+{| class="wikitable"
+|- 
+! 
+! colspan="8" |Byte
+|-
+! width = 8% | PID Type
+! width=22% | 0 
+! width=22% | 1 
+! width=22% | 2 
+! width=5% | 3 
+! width=5% | 4 
+! width=5% | 5 
+! width=5% | 6 
+! width=5% | 7 
+|-
+| SAE標準
+| 額外資料位元組的數量：<br>2
+| 服務<br>01 = 顯示目前資料<br>02 = 顯示凍結的頁框資料<br>......
+| PID code<br>（例如：05 = 發動機冷媒溫度）
+|colspan=5| 未使用<br>（[[ISO_15765-2|ISO 15765-2]]建議用CCh）
+|-
+| 個別車輛
+| 額外資料位元組的數量：<br>3
+| 自定服務（例如，22 = 加強資料）
+|colspan=2| PID碼<br>（例如4980h）
+|colspan=4| 未使用<br>（[[ISO_15765-2|ISO 15765-2]]建議用CCh）
+|}
+
+=== 回應 ===
+車輛會用訊息ID來回應PID查詢，其ID編輯和回應的模組有關。一般而言發動機及主發動機控制器會用ID 7E8h回應，其他設備，像是混合控制器或是Prius裡的電池控制器，會用07E9h、07EAh、07EBh等ID回應。設備回應的訊息ID會比其設備接收的訊息ID多8。回應值的長度會變動，但回應訊息固定都是8個位元。
+各位元組的定義為：
+{| class="wikitable"
+|- 
+! 
+! colspan="8" |Byte
+|-
+! width = 15% | PID Type
+! width=12% | 0 
+! width=26% | 1 
+! width=21% | 2 
+! width=5% | 3 
+! width=5% | 4 
+! width=5% | 5 
+! width=5% | 6 
+! width=5% | 7 
+|-
+| SAE標準<br>7E8h, <br>7E9h, <br>7EAh, <br>等
+| 額外資料位元組的長度：<br>3到6
+| 自定服務<br>和查詢的相同，但服務編號會加上40h。因此：<br>41h 是顯示目前資料；<br>42h是顯示凍結的頁框資料等.
+| PID code<br>（例如05是發動機冷媒溫度）
+| 特定參數的值，位元組0
+| 值，位元組1（可選）
+| 值，位元組2（可選）
+| 值，位元組3（可選）
+| 未使用<br>（可以是00h或55h）
+|-
+| 車輛指定<br>7E8h，或實體模組ID + 8h
+| 額外資料位元組的長度：<br>4到7
+| 自定服務<br>和查詢的相同，但服務編號會加上40h。（例如，62h 是服務22h請求的回覆訊息）
+|colspan=2| PID碼<br>（例如4980h）
+| 特定參數的值，位元組0
+| 值，位元組1（可選）
+| 值，位元組2（可選）
+| 值，位元組3（可選）
+|-
+| 車輛指定<br>7E8h，或實體模組ID + 8h
+| 額外資料位元組的長度：<br>3
+| 7Fh，此通用回應一般表示模組不識別請求
+| 自定服務（例如22h是PID的加強診斷資料）
+| 31h
+|colspan=4|未使用<br>（可以是00h）
+|}
+
+==相關條目==
+* [[发动机控制器|发动机控制器]]
+* {{le|ELM327|ELM327}}：OBD-II介面上常見的微控制器
+
+==參考資料==
+{{reflist|30em}}
+
+==延伸閱讀==
+*{{Cite journal|date=2017-02-16|title=E/E Diagnostic Test Modes|department=Vehicle E E System Diagnostic Standards Committee|journal=J1979|publisher=SAE International|doi=10.4271/J1979_201702}}
+*{{Cite journal|date=2017-02-16|title=Digital Annex of E/E Diagnostic Test Modes|department=Vehicle E E System Diagnostic Standards Committee|journal=J1979-DA|publisher=SAE International|doi=10.4271/J1979DA_201702}}
+*{{cite web |url=https://www.kpit.com/insights/the-lifecycle-of-a-diagnostic-trouble-code-dtc/ |title=The Lifecycle of a Diagnostic Trouble Code (DTC) |first=Bernhard |last=Wagner |location=Germany |website=KPIT |access-date=2020-08-29 |archive-date=2021-06-11 |archive-url=https://web.archive.org/web/20210611111349/https://www.kpit.com/insights/the-lifecycle-of-a-diagnostic-trouble-code-dtc/ }}
+
+[[Category:科技相關列表|Category:科技相關列表]]
+[[Category:汽车工程技术|Category:汽车工程技术]]

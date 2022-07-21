@@ -1,0 +1,56 @@
+
+在[[密码学|密码学中]]，'''最优非对称加密填充'''（英语：'''Optimal Asymmetric Encryption Padding'''，缩写：'''OAEP'''）是一种经常与[[RSA加密演算法|RSA加密]]一起使用的[[填充_(密码学)|填充方案]]。OAEP 由 [[米希尔·贝勒（Mihir_Bellare）|Mihir Bellare]] 和 [[菲利普·罗加威（Phillip_Rogaway）|Phillip Rogaway]] 发明<ref>[[Mihir_Bellare|M. Bellare]], [[Phillip_Rogaway|P. Rogaway]]. ''Optimal Asymmetric Encryption -- How to encrypt with RSA''. Extended abstract in Advances in Cryptology - [[Eurocrypt|Eurocrypt]] '94 Proceedings, [[Lecture_Notes_in_Computer_Science|Lecture Notes in Computer Science]] Vol. 950, A. De Santis ed, [[Springer-Verlag|Springer-Verlag]], 1995. [http://www-cse.ucsd.edu/users/mihir/papers/oae.pdf full version (pdf)] {{Wayback|url=http://www-cse.ucsd.edu/users/mihir/papers/oae.pdf |date=20080708233234 }}</ref>，随后在 [[PKCS1|PKCS#1 v2]] 和 RFC 2437<nowiki/>中得到标准化。
+
+OAEP 算法是[[费斯妥密码|费斯妥密码]]的一种形式，它使用一对[[隨機預言機|随机预言]] G 和 H 在进行[[公开密钥加密|非对称加密]]之前处理明文。OAEP 与任何安全的[[陷门函数|陷门单向置换]] <math>f</math> 结合使用在[[隨機預言機|随机预言模型]]中被证明是一种在[[选择明文攻击|选择明文攻击]]（[[密文不可区分性|IND-CPA]]）下[[语义安全|语义安全]]的组合方案。当使用某些陷门置换（如 RSA）实现时，OAEP 也被证明可以抵抗[[选择密文攻击|选择密文攻击]]。OAEP 可用于构建[[全有或全无转换|全有或全无转换]]（all-or-nothing transform）。
+
+OAEP 满足以下两个目标：
+
+# 添加随机性元素，这可用于将[[确定性加密|确定性加密]]方案（如传统 [[RSA加密演算法|RSA]]）转变为[[概率加密|概率加密]]方案。
+# 通过确保无法反转[[陷门函数|陷门单向置换]] <math>f</math>，从而无法恢复明文的任何部分，来防止密文的部分解密（或造成其他信息泄漏）。
+
+当 OAEP 与任何陷门置换一起使用时，OAEP 的原始版本（Bellare/Rogaway, 1994）在随机预言机模型中显示了一种“[[纯文本感知加密|明文知晓性]]”的形式（他们声称这意味着对[[选择密文攻击|选择密文攻击]]是安全的）。然而随后的结果与这一点相抵触，表明 OAEP 仅是 [[密文不可区分性|IND-CCA1]] 安全的。但是与 RSA-OAEP 的情况一样，当将OAEP与使用标准加密指数的 RSA 置换一起使用时，在[[隨機預言機|随机预言模型中]]证明了原始方案是 [[密文不可区分性|IND-CCA2]] 安全的。<ref>Eiichiro Fujisaki, Tatsuaki Okamoto, David Pointcheval, and [[Jacques_Stern|Jacques Stern]]. ''RSA-- OAEP is secure under the RSA assumption''. In J. Kilian, ed., Advances in Cryptology -- [[CRYPTO|CRYPTO]] 2001, vol. 2139 of Lecture Notes in Computer Science, SpringerVerlag, 2001. [http://eprint.iacr.org/2000/061.pdf full version (pdf)] {{Wayback|url=http://eprint.iacr.org/2000/061.pdf |date=20210318024239 }}</ref>[[维克多·肖普|Victor Shoup]] 提供了一种改进的方案（称为 OAEP+），该方案可与任何陷门单向置换配合使用，以解决此问题。<ref>Victor Shoup. ''OAEP Reconsidered''. IBM Zurich Research Lab, Saumerstr. 4, 8803 Ruschlikon, Switzerland. September 18, 2001. [http://www.shoup.net/papers/oaep.pdf full version (pdf)] {{Wayback|url=http://www.shoup.net/papers/oaep.pdf |date=20190605230454 }}</ref>近期的研究表明，在[[標準模型_(密碼學)|标准模型]]中（即当哈希函数未建模为随机预言时），无法在假定 RSA 问题的难度下证明 RSA-OAEP 具有 IND-CCA2 安全性。<ref>
+P. Paillier and J. Villar, ''Trading One-Wayness against Chosen-Ciphertext Security in Factoring-Based Encryption'', Advances in Cryptology -- [[Asiacrypt|Asiacrypt]] 2006.</ref><ref>D. Brown, [http://eprint.iacr.org/2006/223 ''What Hashes Make RSA-OAEP Secure?''] {{Wayback|url=http://eprint.iacr.org/2006/223 |date=20180413124747 }}, IACR ePrint 2006/233.</ref>
+
+== 算法 ==
+[[File:Oaep-diagram-20080305.png|右]]]]
+在图中，
+
+* ''n'' 是 RSA 模数的位数。
+* ''k''<sub>0</sub> 和 ''k''<sub>1</sub>是协议中的固定整数。
+* ''m'' 是''n'' -''k<sub>0</sub>'' -''k''<sub>1</sub>位长的明文消息 
+* ''G'' 和 ''H'' 是[[隨機預言機|随机预言]]，如[[密碼雜湊函數|加密散列函数]]。
+* ⊕ 是异或运算。
+
+编码过程包括如下步骤：
+
+# 用 ''k''<sub>1</sub> 位长的 0 将消息填充至 ''n'' - ''k''<sub>0</sub> 位的长度。
+# 随机生成 ''k''<sub>0</sub> 位长的串 ''r'' 
+# 用 ''G'' 将''k''<sub>0</sub> 位长的 ''r'' 扩展至 ''n'' - ''k''<sub>0</sub> 位长。
+# ''X'' = ''m''00...0 ⊕ ''G''(''r'') 
+# ''H'' 将 ''n'' - ''k<sub>0</sub>'' 位长的 ''X'' 缩短至 ''k''<sub>0</sub> 位长。
+# ''Y'' = ''r'' ⊕ ''H''(''X'') 
+# 输出为 ''X'' || ''Y''，在图中 ''X'' 为最左边的块，''Y'' 位最右边的块。
+
+随后可以使用 RSA 加密编码的消息，使用 OAEP 可以避免 RSA 的确定性。
+
+解码过程包括如下步骤：
+
+# 恢复随机串 ''r'' 为 ''Y''⊕''H''(''X'') 
+# 恢复消息 ''m''00...0 为 ''X'' ⊕ ''G''(''r'') 
+
+=== 安全性 ===
+“[[全有或全无转换|全有或全无]]”的安全性基于以下事实：要恢复 ''m''，必须完整地恢复 ''X'' 和 ''Y。''从 ''Y'' 中恢复 ''r''  需要 ''X''，而从 ''X'' 中恢复 ''m'' 需要 ''r''。由于加密哈希的任何更改的位都完全改变了结果，因此整个 ''X''和整个 ''Y'' 必须都被完全恢复。
+
+=== 实现 ===
+在 PKCS#1 标准中，随机预言 ''G'' 和 ''H'' 是相同的。但 PKCS#1 标准进一步要求随机预言应是具有合适散列函数的 [[MGF1|MGF1]]。<ref>{{Cite journal|title=What Hashes Make RSA-OAEP Secure?|url=https://eprint.iacr.org/2006/223.pdf|last=Brown|first=Daniel R. L.|date=2006|journal=IACR Cryptology ePrint Archive|accessdate=2019-04-03|language=en|archive-date=2016-07-22|archive-url=https://web.archive.org/web/20160722102148/http://eprint.iacr.org/2006/223.pdf|dead-url=no}}</ref>
+
+== 参见 ==
+
+* [[密钥封装|密钥封装]] 
+
+== 参考文献 ==
+<references />
+
+[[Category:密码学|Category:密码学]]
+
+{{公钥密码学}}

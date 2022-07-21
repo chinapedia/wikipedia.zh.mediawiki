@@ -1,0 +1,40 @@
+local p = {}
+local getArgs = require('Module:Arguments').getArgs
+
+function p.match(args)
+	if not args["page"] then
+		args.page = mw.title.getCurrentTitle().fullText
+	end
+	local page = mw.title.new(args.page)
+	if not page then
+		return args["3"] or ""
+	end
+	local content = page:getContent()
+	if not content then
+		return args["3"] or ""
+	end
+	if mw.ustring.match(content, args["1"] or "") then
+		if args["subst"] then
+			local pattern = args["1"] or ""
+			if mw.ustring.sub(pattern, 1, 1) ~= "^" then
+				pattern = "^.-" .. pattern
+			end
+			if mw.ustring.sub(pattern, -1) ~= "$" then
+				pattern = pattern .. ".*$"
+			end
+			local out = mw.ustring.gsub(content, pattern, args["2"] or "")
+			return out
+		else
+			return args["2"] or ""
+		end
+	else
+		return args["3"] or ""
+	end
+end
+
+function p.main(frame)
+	local args = getArgs(frame)
+	return p.match(args)
+end
+
+return p

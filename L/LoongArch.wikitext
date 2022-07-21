@@ -1,0 +1,198 @@
+{{专家}}
+{{NoteTA|G1=IT|G2=FL}}
+{{Infobox CPU
+| name       = LoongArch
+| image      = 
+| designer   = [[龙芯中科|龙芯中科]]
+| bits       = [[32位|32位]]、[[64位|64位]]
+| introduced = {{Start date and age|2020|8|13}}
+| version    = 
+| design     = [[精简指令集计算机|精簡指令集]]（RISC）
+| type       = 寄存器-寄存器，Load-Store
+| encoding   = 固定长度
+| branching  = 比較和分支
+| endianness = 小端序
+| extensions = LSX1/2<br/>LASX<br/>LBT1/2/3<br/>LVZ
+| open       = 是（仅限LA Primary）
+| gpr        = 32
+| fpr        = 32
+}}
+
+'''LoongArch'''，简称'''LA'''，是一个[[龙芯中科|龙芯中科]]研发的[[指令集架構|指令集架构]]。该架构包含了架构翻译（Architecture Translate）的指令子集，可在软硬配合下高效率翻译诸如[[x86-64|x86-64]]、[[ARM架构|ARM架构]]、[[MIPS架構|MIPS架构]]、[[RISC-V|RISC-V架构]]等指令集架构。其拥有基础指令 337 条、虚拟机扩展 10 条、二进制翻译扩展 176 条、128 位向量扩展 1024 条、256 位向量扩展 1018 条，共计 2565 条原生指令。<ref name=":1">{{Cite web|title=如何看待龙芯对外公开的 LoongArch 指令集？|url=https://www.zhihu.com/question/414069789/answer/1408602033|accessdate=2020-10-11|author=guee|date=2020-08-21|format=|publisher=|language=}}</ref><ref name=":0">{{Cite web|title=龙芯放弃MIPS指令集就能实现自主可控吗？|url=https://www.donews.com/article/detail/4660/24198.html|accessdate=2020-10-11|author=maomaobear|date=2020-08-18 11:30:34|format=|publisher=|language=|archive-date=2020-08-20|archive-url=https://web.archive.org/web/20200820034341/https://www.donews.com/article/detail/4660/24198.html|dead-url=no}}</ref>
+
+2020年8月13日，龙芯中科[[董事長|董事長]][[胡伟武|胡伟武]]在视频会议上首次公开介绍了LoongArch。2021年4月15日，LoongArch在2021年山西信息技术应用创新论坛主论坛上正式对外发布。<ref>{{Cite web|title=自主需要从根--龙芯中科正式发布完全自主指令集架构LoongArch|url=http://www.xinhuanet.com/tech/2021-04/16/c_1127339088.htm|access-date=2021-06-07|date=2021-04-16 17:15:31|archive-date=2021-06-07|archive-url=https://web.archive.org/web/20210607073157/http://www.xinhuanet.com/tech/2021-04/16/c_1127339088.htm|dead-url=no}}</ref><ref>{{Cite web|title=龙芯3A5000国产CPU即将发布：基于完全自主指令系统架构LoongArch|url=https://www.163.com/dy/article/G86H9GH40511B8LM.html|access-date=2021-06-07|author=IT之家|date=2021-04-22 12:20:13|archive-date=2021-06-07|archive-url=https://web.archive.org/web/20210607073200/https://www.163.com/dy/article/G86H9GH40511B8LM.html|dead-url=no}}</ref>2021年4月30日，LoongArch32和LoongArch64基本指令集手册正式公布。<ref>{{Cite web|title=龙芯正式发布LoongArch指令系统手册|url=https://tech.ifeng.com/c/85s2K4m2tvD|access-date=2021-06-07|date=2021年04月30日 20:50:26|archive-date=2021-06-07|archive-url=https://web.archive.org/web/20210607073159/https://tech.ifeng.com/c/85s2K4m2tvD|dead-url=no}}</ref>
+
+== 设计 ==
+
+=== 设计理念 ===
+LoongArch为32位定长[[精简指令集计算机|RISC]]指令集，32个通用寄存器、32个浮点/向量寄存器，LoongArch可用的格式多达10种 ，其包含3种无立即数格式和7种有立即数格式。相对于MIPS，摒弃部分不适合现代CPU的指令，做了改进和扩展，例如单条指令支持的立即数从MIPS的最大16位扩展到最大24位，分支跳转偏移也从64[[Kibibyte|KiB]]扩展到1[[MiB|MiB]]字节，以及寻址空间从固定分段改变为单一平面等，有效减少编译结果的目标指令条数和访存次数，提高了效能。<ref name=":1" /><ref name=":0" />
+
+=== 指令格式 ===
+{| class="wikitable" style="text-align:center;"
+! rowspan="2" |类型
+! colspan="32" |[[位元|位]]
+|-
+!31
+!30
+!29
+!28
+!27
+!26
+!25
+!24
+!23
+!22
+!21
+!20
+!19
+!18
+!17
+!16
+!15
+!14
+!13
+!12
+!11
+!10
+!9
+!8
+!7
+!6
+!5
+!4
+!3
+!2
+!1
+!0
+|-
+| rowspan="3" |无立即数
+| colspan="22" |
+| colspan="5" style="background:#dfd;" |rj (5)
+| colspan="5" style="background:#ffb7b7;" |rd (5)
+|-
+| colspan="17" |
+| colspan="5" style="background:#FFFDD0;" |rk (5)
+| colspan="5" style="background:#dfd;" |rj (5)
+| colspan="5" style="background:#ffb7b7;" |rd (5)
+|-
+| colspan="12" |
+| colspan="5" style="background:#EE82EE;" |fa (5)
+| colspan="5" style="background:#FFD700;" |fk (5)
+| colspan="5" style="background:#dfd;" |rj (5)
+| colspan="5" style="background:#ffb7b7;" |rd (5)
+|-
+| rowspan="7"|有立即数
+| colspan="16" |
+| colspan="6" style="background:#def;" |immediate (6)
+| colspan="5" style="background:#dfd;" |rj (5)
+| colspan="5" style="background:#ffb7b7;" |rd (5)
+|-
+| colspan="14" |
+| colspan="8" style="background:#def;" |immediate (8)
+| colspan="5" style="background:#dfd;" |rj (5)
+| colspan="5" style="background:#ffb7b7;" |rd (5)
+|-
+| colspan="10" |
+| colspan="12" style="background:#def;" |immediate (12)
+| colspan="5" style="background:#dfd;" |rj (5)
+| colspan="5" style="background:#ffb7b7;" |rd (5)
+|-
+| colspan="8" |
+| colspan="14" style="background:#def;" |immediate (14)
+| colspan="5" style="background:#dfd;" |rj (5)
+| colspan="5" style="background:#ffb7b7;" |rd (5)
+|-
+| colspan="6" |
+| colspan="16" style="background:#def;" |immediate (16)
+| colspan="5" style="background:#dfd;" |rj (5)
+| colspan="5" style="background:#ffb7b7;" |rd (5)
+|-
+| colspan="6" |
+| colspan="16" style="background:#def;" |immediate [15:0]
+| colspan="5" style="background:#dfd;" |rj (5)
+| colspan="5" style="background:#def;" |immediate [20:16]
+|-
+| colspan="6" |
+| colspan="16" style="background:#def;" |immediate [15:0]
+|
+| colspan="9" style="background:#def;" |immediate [24:16]
+|}
+
+=== 指令子集 ===
+{| class="wikitable"
+!指令集名称
+!描述
+!指令数量
+|-
+! colspan=3 |基本指令集
+|-
+|LoongArch64
+|64[[位元|位]]基础指令
+|337 条
+|-
+|LoongArch32
+|32位基础指令
+|
+|-
+|LoongArch
+Primary
+|32位精简指令
+|79 条
+|-
+! colspan=3 |扩展指令子集
+|-
+|LSX
+|128位向量扩展
+|1024 条
+|-
+|LASX
+|256位向量扩展
+|1018 条
+|-
+|LBT
+|二进制翻译扩展
+|176 条
+|-
+|LVZ
+|虚拟机扩展
+|10 条
+|}
+
+=== 指令集架构和微架构实现特点 ===
+寄存器集中包含RISC所具备的0号寄存器。<ref name=":1" />整体上，LoongArch64是MIPS64R6和RISC64GC的超集，且原生上兼容RISC64的用户态指令。
+
+== 纠纷 ==
+2021年6月2日，上海[[芯联芯|芯联芯]]发布公告，称LoongArch或与其所拥有的[[MIPS架構|MIPS]]专利存在[[知识产权|知识产权]][[侵权行为|侵权]]，在香港启动[[仲裁|仲裁]]审理。<ref>{{Cite web|title=龙芯中科LoongArch或存知识产权侵权风险 芯联芯称已对其提起仲裁_腾讯新闻|url=https://new.qq.com/omn/20210602/20210602A09D2O00.html|access-date=2021-06-07|work=new.qq.com|archive-date=2021-06-07|archive-url=https://web.archive.org/web/20210607073155/https://new.qq.com/omn/20210602/20210602A09D2O00.html|dead-url=no}}</ref><ref>{{Cite web|title=龙芯中科LoongArch或存知识产权侵权风险被提起仲裁_财经_澎湃新闻-The Paper|url=https://www.thepaper.cn/newsDetail_forward_12969997|access-date=2021-06-07|work=www.thepaper.cn|archive-date=2021-06-07|archive-url=https://web.archive.org/web/20210607145818/https://www.thepaper.cn/newsDetail_forward_12969997|dead-url=no}}</ref>
+
+== 參見 ==
+{{Portal|電腦科學|資訊科技}}
+*[[龍芯|龍芯]]
+*[[龍芯中科|龍芯中科]]
+*[[精簡指令集|精簡指令集]]
+
+== 參考資料 ==
+{{Reflist|2}}
+
+== 外部連結 ==
+* {{cite web |title=丢掉幻想！龙芯中科将推出LoongArch自主指令集，深度兼容Windows、Linux、Android程序 |url=http://www.mittrchina.com/news/5506 |website=《麻省理工科技评论》中文网 |accessdate=2020-10-18 |archive-date=2020-11-17 |archive-url=https://web.archive.org/web/20201117072803/http://www.mittrchina.com/news/5506 |dead-url=no }}
+
+{{Free-content attribution
+| title = 如何看待龙芯对外公开的 LoongArch 指令集？
+| author = 知乎用户[https://www.zhihu.com/people/peng-dong-feng-50 guee]
+| publisher = 
+| page numbers = 
+| source = 
+| documentURL = https://www.zhihu.com/question/414069789/answer/1408602033
+| license statement URL = https://creativecommons.org/licenses/by-sa/3.0/deed.zh
+| license = CC-BY-SA 3.0协议
+}}
+
+{{RISC-based processor architectures}}
+{{CPU technologies}}
+
+[[Category:2020年建立的程式語言|Category:2020年建立的程式語言]]
+
+[[Category:2020年建立的程式語言|Category:2020年建立的程式語言]]
+[[Category:指令集架構|Category:指令集架構]]
+[[Category:龙芯|Category:龙芯]]
+[[Category:龙芯|Category:龙芯]]

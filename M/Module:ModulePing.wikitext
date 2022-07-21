@@ -1,0 +1,27 @@
+p = {}
+function p.main(frame)
+	args = frame:getParent().args
+	RSTR = args["prefix"] or "@"
+	c = 1
+	suf = args["p"] or "："
+	while true do
+		if args[tostring(c)] then
+			if c == 1 then
+				RSTR = RSTR .. "[[User:"_.._args[tostring(c)]_.._"|" .. args[tostring(c)] .. "]]"
+			elseif c > 50 then
+				RSTR = RSTR .. "、" .. mw.getCurrentFrame():expandTemplate{title = "error", args = {"回覆模板最多支持50個用戶。模板用法見於[[Template:ModulePing|Template:ModulePing]]。"}}
+				return RSTR .. suf
+			else
+				RSTR = RSTR .. "、[[User:"_.._args[tostring(c)]_.._"|" .. args[tostring(c)] .. "]]"
+			end
+		else
+			if c == 1 then
+				return mw.getCurrentFrame():expandTemplate{title = "error", args = {"使用回覆模板時出現錯誤：並無提供使用者名稱。模板用法見於[[Template:ModulePing|Template:ModulePing]]。"}}
+			end
+			return RSTR .. suf
+		end
+		c = c + 1
+	end
+end
+
+return p

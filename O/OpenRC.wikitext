@@ -1,0 +1,61 @@
+{{Infobox software
+| name = OpenRC
+| author = Roy Marples
+| developer = OpenRC开发者
+| released = {{Start date and age|2007|04|05|df=yes}}
+| latest_release_version = 0.43.3
+| latest_release_date = {{Start date and age|2021|04|16|df=yes}}<ref>{{cite web | url=https://github.com/OpenRC/openrc/releases | title=openrc-0.43.3 | accessdate=2021-04-16 | archive-date=2020-11-05 | archive-url=https://web.archive.org/web/20201105202033/https://github.com/OpenRC/openrc/releases | dead-url=no }}</ref>
+| programming_language = [[C语言|C]]<ref name="ohloh">{{citation |url=http://www.ohloh.net/p/openrc |publisher=[[Ohloh|Ohloh]] |work=Analysis Summary |title=openrc |accessdate=2012-03-10 |archive-date=2012-11-05 |archive-url=https://web.archive.org/web/20121105151210/http://www.ohloh.net/p/openrc |dead-url=no }}</ref>, Shell
+| operating_system = [[Linux|Linux]], [[FreeBSD|FreeBSD]], [[NetBSD|NetBSD]], [[TrueOS|TrueOS]]
+| platform = 
+| size = ~900 [[Kilobyte|KB]]
+| language = 
+| genre = [[Init|Init]]守护进程
+| license = [[BSD许可证|2条款BSD许可证]]
+| website = {{URL|http://www.gentoo.org/proj/en/base/openrc/}}
+}}
+
+在[[类Unix|类Unix]]系统上，'''OpenRC'''是一个基于依赖的[[init|init]]系统。因为多数发行版切换成了[[systemd|systemd]]，它被用作一种替代的init系统<ref>{{Cite web|url=https://distrowatch.com/weekly.php?issue=20150601|title=DistroWatch.com: Put the fun back into computing. Use Linux, BSD.|website=distrowatch.com|access-date=2020-04-04|archive-date=2020-11-17|archive-url=https://web.archive.org/web/20201117070917/https://distrowatch.com/weekly.php?issue=20150601|dead-url=no}}</ref><ref>{{cite web |title=5 Differences Between TrueOS & Linux |url=https://www.kompulsa.com/2018/02/23/5-differences-trueos-linux/ |accessdate=6 April 2020 |archive-date=2020-11-17 |archive-url=https://web.archive.org/web/20201117070920/https://www.kompulsa.com/2018/02/23/5-differences-trueos-linux/ |dead-url=no }}</ref><ref>{{cite web |title=Improving TrueOS: OpenRC |url=https://www.trueos.org/blog/improving-trueos-openrc/ |accessdate=6 April 2020 |archive-date=2020-04-06 |archive-url=https://web.archive.org/web/20200406220550/https://www.trueos.org/blog/improving-trueos-openrc/ |dead-url=no }}</ref>。它是Roy Marples创建的，他是也活跃于
+Gentoo计划的[[NetBSD|NetBSD]]开发者<ref>{{cite web |title=History |url=https://github.com/OpenRC/openrc/blob/master/HISTORY.md |accessdate=6 April 2020 |archive-date=2018-02-18 |archive-url=https://web.archive.org/web/20180218233609/https://github.com/OpenRC/openrc/blob/master/HISTORY.md |dead-url=no }}</ref><ref>{{cite web |title=Developers |url=https://www.netbsd.org/people/developers.html |accessdate=6 April 2020 |archive-date=2011-07-19 |archive-url=https://web.archive.org/web/20110719012253/http://www.netbsd.org/people/developers.html |dead-url=no }}</ref>。
+
+OpenRC是[[Gentoo_Linux|Gentoo]]、[[Alpine_Linux|Alpine Linux]]、[[Hyperbola_GNU/Linux-libre|Hyperbola GNU/Linux-libre]]、[[Parabola_GNU/Linux-libre|Parabola GNU/Linux-libre]]、{{en-link|Artix Linux|}}、[[Maemo#Maemo_Leste|Maemo Leste]]、[[TrueOS|TrueOS]]<ref>{{Cite web|title=4. Post Installation Configuration — TrueOS® User Guide|url=https://www.trueos.org/handbook/postinstall.html#managing-system-services-and-daemons|access-date=2017-03-12|website=www.trueos.org|language=en|archive-date=2017-09-18|archive-url=https://web.archive.org/web/20170918154514/https://www.trueos.org/handbook/postinstall.html#managing-system-services-and-daemons|dead-url=no}}</ref>和其他类unix系统的缺省init系统，而其他一些发行版比如[[Devuan|Devuan]]把它作为一个选项提供<ref>{{Cite web|url=https://devuan.org/os/debian-fork/ascii-stable-announce-060818|title=Devuan ASCII 2.0.0 stable release|language=en|access-date=2018-07-17|archive-date=2018-09-23|archive-url=https://web.archive.org/web/20180923085518/https://devuan.org/os/debian-fork/ascii-stable-announce-060818|dead-url=yes}}</ref>。这意味着这些支持它的系统/发行版的软件包和[[守护进程|守护进程]]（daemon），带有或使用可获得的脚本。
+
+== 设计 ==
+OpenRC构成自一些模块组件，主要的组件是init（可选）、核心依赖管理系统和守护进程{{en-link|进程监管|Process supervision|监管器}}（supervisor）（可选）。它用C语言和遵循POSIX的shell写成，这使得它在BSD和Linux系统上可以使用。 
+
+OpenRC的核心部份处理依赖管理和init脚本分析。OpenRC通过扫描运行级别，建造依赖图，接着启动需要的服务脚本来工作。一旦脚本都已经启动它就退出。缺省的，OpenRC使用一个修改版本的start-stop-daemon用于守护进程管理<ref>{{cite web |title=user guide |url=https://github.com/OpenRC/openrc/blob/master/user-guide.md#start-stop-daemon |accessdate=6 April 2020 |archive-date=2021-12-11 |archive-url=https://web.archive.org/web/20211211030839/https://github.com/OpenRC/openrc/blob/master/user-guide.md#start-stop-daemon |dead-url=no }}</ref>。
+
+init脚本享有与[[SysVinit|SysVinit]]使用的脚本的相似性，但是提供了一些特征来简化它们的创建。脚本都假定有<code>start()</code>、<code>stop()</code>和<code>status()</code>，而系统使用已经声明的变量来创建这些缺省函数<ref>{{cite web |title=service script guide |url=https://github.com/OpenRC/openrc/blob/master/service-script-guide.md#the-default-functions |accessdate=6 April 2020 |archive-date=2020-11-11 |archive-url=https://web.archive.org/web/20201111195630/https://github.com/OpenRC/openrc/blob/master/service-script-guide.md#the-default-functions |dead-url=no }}</ref>。使用依赖函数来声明对其他服务的依赖性，这在[[SysVinit|SysVinit]]中是用LSB头完成的。配置和机制是分离的，分别采用在<code>conf.d</code>目录中的配置文件和在<code>init.d</code>目录中的init文件。
+
+Openrc-init首先出现在版本0.25中，用作对<code>{{en-link|Unix文件系统#常规目录布局|Unix filesystem#Conventional directory layout|/sbin/init}}</code>的可选的替代。还支持一些其他init包括[[SysVinit|SysVinit]]和[[BusyBox|BusyBox]]<ref>{{Cite web |url=http://wiki.gentoo.org/wiki/OpenRC |title=OpenRC |accessdate=2020-11-15 |archive-date=2021-01-25 |archive-url=https://web.archive.org/web/20210125165558/https://wiki.gentoo.org/wiki/OpenRC |dead-url=no }}</ref>。
+
+监管守护进程（supervise-daemon）首次出现在版本0.21中，给予openrc监管能力。它可以在init脚本中启用，用作启动和监控一个守护进程的监管守护进程。支持一些其他其他守护进程监管器包括[[runit|runit]]<ref>{{cite web |title=runit guide |url=https://github.com/OpenRC/openrc/blob/master/runit-guide.md |accessdate=6 April 2020 |archive-date=2021-03-08 |archive-url=https://web.archive.org/web/20210308152257/https://github.com/OpenRC/openrc/blob/master/runit-guide.md |dead-url=no }}</ref>和s6<ref>{{cite web |title=s6 Guide |url=https://github.com/OpenRC/openrc/blob/master/s6-guide.md |accessdate=6 April 2020 |archive-date=2019-03-06 |archive-url=https://web.archive.org/web/20190306231515/https://github.com/OpenRC/openrc/blob/master/s6-guide.md |dead-url=no }}</ref>。
+
+== 特征 ==
+* 在Linux、TrueOS、FreeBSD和NetBSD<!-- OpenRC has been designed to be portable from the beginning. cgroups and other functionality which cannot be fully ported to FreeBSD or NetBSD is OPTIONAL -->之间可移植。
+* 并行的服务启动（缺省关闭）。
+* 基于依赖的引导。
+* 通过[[cgroups|cgroups]]的进程隔离<ref>{{cite web |title=CGroups Support |url=https://wiki.gentoo.org/wiki/OpenRC#CGroups_support |accessdate=5 April 2020 |archive-date=2021-01-25 |archive-url=https://web.archive.org/web/20210125165558/https://wiki.gentoo.org/wiki/OpenRC#CGroups_support |dead-url=no }}</ref>。
+* 每服务资源限制（ulimit）。
+* 代码和配置分离（init.d / conf.d）。
+* 可扩展的启动脚本。
+* 有状态的init脚本（它已经启动了吗？）。
+* 启动多个组件的复杂init脚本（[[Samba|Samba]]（smbd和nmbd），[[网络文件系统|NFS]]（nfsd、portmap等））。
+* 自动的依赖计算和服务定序。
+* 模块化架构和可选组件的分离（[[Cron|Cron]]、[[syslog|syslog]]）。
+* 有表达力和灵活性的网络处理（包括[[虚拟专用网|VPN]]，网桥等）。
+* 冗长调试模式。
+
+== 引用 ==
+{{Reflist|2}}
+
+== 外部链接 ==
+* {{Official website|http://www.gentoo.org/proj/en/base/openrc/}}
+* OpenRC git repositories at [https://gitweb.gentoo.org/proj/openrc.git gentoo.org] {{Wayback|url=https://gitweb.gentoo.org/proj/openrc.git |date=20180917110007 }} and [https://github.com/OpenRC/openrc GitHub] {{Wayback|url=https://github.com/OpenRC/openrc |date=20201112004250 }}
+* Init systems comparison: [https://lwn.net/Articles/578209/ part 1] {{Wayback|url=https://lwn.net/Articles/578209/ |date=20201116130258 }} and [https://lwn.net/Articles/578210/ part 2] {{Wayback|url=https://lwn.net/Articles/578210/ |date=20201116173548 }} ([[LWN.net|LWN.net]])
+* Openrc-init [https://wiki.gentoo.org/wiki/OpenRC#openrc-init gentoo wiki ] {{Wayback|url=https://wiki.gentoo.org/wiki/OpenRC#openrc-init |date=20210125165558 }} and [https://gitweb.gentoo.org/proj/openrc.git/commit/?id=13ca79856e5836117e469c3edbcfd4bf47b6bab0 git commit  ]{{Dead link}}
+
+{{Unix中的服务管理}}
+
+[[Category:使用BSD许可证的软件|Category:使用BSD许可证的软件]]
+[[Category:Unix进程和任务管理相关软件|Category:Unix进程和任务管理相关软件]]

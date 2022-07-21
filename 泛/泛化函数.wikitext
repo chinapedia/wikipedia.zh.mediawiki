@@ -1,0 +1,66 @@
+{{noteTA
+|G1=IT
+|G2=FL
+}}
+{{多态}}
+在[[计算机编程|计算机编程]]中，'''泛化函数'''（generic function）或译'''泛型函数'''，是为[[多态_(计算机科学)|多态]]而定义的函数。
+
+== 在静态类型语言中 ==
+在静态类型语言（比如[[C++|C++]]和[[Java|Java]]）中，术语“泛型函数”，指称一种叫做[[泛型编程|泛型编程]]的编译时间多态机制（{{en-link|静态分派|Static dispatch}}），特别是[[参数多态|参数多态]]。它们是使用{{en-link|类型参数|TypeParameter}}定义的函数，意图用[[编译期|编译时间]]类型信息来解决它。编译器使用这些类型来实例化适合的版本，适当的解决任何[[函数重载|函数重载]]。
+
+==在Common Lisp对象系统中==
+在某些[[面向对象编程|面向对象编程]]系统，比如[[Common_Lisp对象系统|Common Lisp对象系统]]（CLOS）<ref>{{Cite web |url=http://www.dreamsongs.com/Files/ECOOP.pdf |title=The Common Lisp Object System: An Overview |access-date=2021-03-27 |archive-date=2021-03-24 |archive-url=https://web.archive.org/web/20210324061255/https://www.dreamsongs.com/Files/ECOOP.pdf |dead-url=no }}</ref>和[[Dylan_(编程语言)|Dylan]]中，泛化函数是一个实体，由具有相同名字的所有方法组成。泛化函数典型的是从<code>function</code>和<code>standard-object</code>二者[[继承_(计算机科学)|继承]]而来的类的实例。因此泛化函数是函数（可以被调用而应至实际参数）和正常对象二者。图书《{{en-link|元对象协议的艺术|The Art of the Metaobject Protocol}}》详细解释了CLOS泛化函数的实现和使用。
+
+Lisp的早期面向对象编程扩展是{{en-link|Flavors (编程语言)|Flavors (programming language)|Flavors}}<ref>Howard Cannon, [http://www.softwarepreservation.org/projects/LISP/MIT/nnnfla1-20040122.pdf Flavors: A non-hierarchical approach to object-oriented programming], Symbolics Inc., 1982</ref>。它受[[Smalltalk|Smalltalk]]影响，而使用平常的消息发送范型。发送一个消息的Flavors语法是：
+
+<syntaxhighlight lang="lisp">
+ (send object :message)
+</syntaxhighlight>
+
+对于New Flavors<ref>{{cite paper|title=New Flavors|author={{en-link|David A. Moon}}, S Keene |publisher=Proceedings of ACM Conf. Object-Oriented Programming, Systems (ACM 1986 OOPSLA Conference)|year=1986}}</ref>，它决定<code>message</code>应当是真正的函数，并使用常规函数调用语法：
+
+<syntaxhighlight lang="lisp">
+ (message object)
+</syntaxhighlight>
+
+<code>message</code>现在是泛化函数，是一个对象并且自身就是函数。<code>message</code>的个体实现叫做方法。
+
+相同的想法实现于{{en-link|CommonLoops}}之中<ref>{{Cite web |url=http://www2.parc.com/istl/groups/gir/papers/stefik-commonloops-oopsla66.pdf |title=CommonLoops, Merging Lisp and Object-Oriented Programming |access-date=2009-12-10 |archive-url=https://web.archive.org/web/20110604013117/http://www2.parc.com/istl/groups/gir/papers/stefik-commonloops-oopsla66.pdf |archive-date=2011-06-04}}</ref>。New Flavors和CommonLoops，是Common Lisp对象系统的主要影响者。
+
+== 例子 ==
+=== Common Lisp ===
+下面在[[SBCL|SBCL]]中定义一个泛化函数，有两个形式参数<code>object-1</code>和<code>object-2</code>。这个泛化函数的名字是<code>collide</code>：
+<syntaxhighlight lang="lisp">
+(defgeneric collide (object-1 object-2))
+</syntaxhighlight>
+
+属于这个泛化函数的方法定义在类之外。这里为泛化函数<code>collide</code>定义一个方法，它特定于类<code>asteroid</code>（第一个形式参数<code>object-1</code>）和类<code>spaceship</code>（第二个形式参数<code>object-2</code>）。形式参数在方法体内作为正常变量使用。没有访问类槽的特殊命名空间：
+
+<syntaxhighlight lang="lisp">
+(defclass asteroid () ())
+(defclass spaceship () ())
+(defmethod collide ((object-1 asteroid) (object-2 spaceship))
+  (format t "asteroid ~a collides with spaceship ~a" object-1 object-2))
+</syntaxhighlight>
+
+调用泛化函数：
+<syntaxhighlight lang="lisp">
+* (collide (make-instance 'asteroid) (make-instance 'spaceship))
+asteroid #<ASTEROID {1001959923}> collides with spaceship #<SPACESHIP {1001959963}>
+NIL
+</syntaxhighlight>
+
+Common Lisp还可以检索一个泛化函数的个体方法。<code>FIND-METHOD</code>从泛化函数<code>collide</code>找到特定于类<code>asteroid</code>和<code>spaceship</code>的方法。
+<syntaxhighlight lang="lisp">
+* (find-method #'collide nil (list (find-class 'asteroid) (find-class 'spaceship)))
+#<STANDARD-METHOD COMMON-LISP-USER::COLLIDE (ASTEROID SPACESHIP) {1001939333}>
+</syntaxhighlight>
+
+== 比较于其他语言 ==
+泛化函数粗略的对应于[[Smalltalk|Smalltalk]]术语[[方法_(计算机科学)|方法]]，但具有显著的例外，在Smalltalk的[[单一分派|单一分派]]中，接收者的类，是调用哪个代码体的唯一确定者，与实际参数的类型或值无关。在具有[[多分派|多分派]]的编程语言中，在调用一个泛化函数的时候，方法分派在所有实际参数的基础之上发生，不只是有特权的那个实际参数。{{en-link|Flavors (编程语言)|Flavors (programming language)|New Flavors}}也提供了泛化函数，但只有单一分派。
+
+== 引用 ==
+{{Reflist}}
+
+[[Category:方法_(電腦科學)|Category:方法 (電腦科學)]]
+[[Category:多态|Category:多态]]

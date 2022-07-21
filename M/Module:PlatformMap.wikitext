@@ -1,0 +1,294 @@
+local p = {}
+
+local alias_map = {
+	['SS']  = { set = 'lr\\lr', subset = 'a\\\\\\e' },
+	['SIS'] = { set = 'lr\\\\lr', subset = 'a\\\\ae\\\\e' },
+	['I']   = { set = 'lr\\\\\\lr', subset = 'e\\a' }
+}
+
+function p.main(frame)
+	local args = frame:getParent().args
+	local util = require('Module:PlatformMap/Shared')
+	local strs = require('Module:PlatformMap/Strings')
+	
+	-- Import set inst
+	local set = args[1]
+	local subset = args[2]
+	if not set then
+		return -- TODO: err
+	end
+	if alias_map[set] then
+		subset = alias_map[set].subset
+		set = alias_map[set].set
+	end
+	set = require('Module:PlatformMap/'..set)
+	
+	-- Init
+	if not set.subsets[subset] then return '~~ ~~'..args[1]..'~~'..subset end -- DEBUG
+	local inst = set.subsets[subset]
+	local err = { unknown_switches = {} }
+	
+	local i
+	-- Left switches
+	i = 1
+	while (true) do
+		local name = args['switchL'..i]
+		if not name then
+			break
+		end
+			
+		local switch = set.switches.both[name] or set.switches.left[name]
+		if switch then
+			util.matrix.prepend(inst, switch)
+		else
+			if mw.ustring.sub(name, 1, 3) == 'STR' and mw.ustring.sub(name, -1, -1) == '#' then
+				local pad = tonumber(mw.ustring.sub(name, 4, -2))
+				for r = 1, #inst do
+					local info = set.rows[r]
+					if info and (info.bound == 'both' or info.bound == 'left') then
+						for p = 1, pad do
+							table.insert(inst[r], 1, 'uSTRq')
+						end
+					else
+						for p = 1, pad do
+							table.insert(inst[r], 1, '')
+						end
+					end
+				end
+			else
+				table.insert(err.unknown_switches, name)
+			end
+		end
+		
+		i = i + 1
+	end
+
+	-- Right switches
+	i = 1
+	while (true) do
+		local name = args['switchR'..i]
+		if not name then
+			break
+		end
+			
+		local switch = set.switches.both[name] or set.switches.right[name]
+		if switch then
+			util.matrix.append(inst, switch)
+		else
+			if mw.ustring.sub(name, 1, 3) == 'STR' then
+				local pad = tonumber(mw.ustring.sub(name, 4, -1))
+				for r = 1, #inst do
+					local info = set.rows[r]
+					if info and (info.bound == 'both' or info.bound == 'right') then
+						for p = 1, pad do
+							table.insert(inst[r], 'uSTRq')
+						end
+					else
+						for p = 1, pad do
+							table.insert(inst[r], '')
+						end
+					end
+				end
+			else
+				table.insert(err.unknown_switches, name)
+			end
+		end
+		
+		i = i + 1
+	end
+	
+	-- Tracks (round I)
+	local replace_l = true
+	local replace_r = true
+	for t = 1, #set.rows.tracks do
+		-- track end detection
+		local row = inst[set.rows.tracks[t]]
+		if not util.icon.map[row[1]] then
+			replace_l = false
+		end
+		if not util.icon.map[row[#row]] then
+			replace_r = false
+		end
+		-- override orientions
+		if args['orien'..t] then set.rows[set.rows.tracks[t]].orien = args['orien'..t] end
+		-- outbound text (overrided by manual)
+		local nxt = args['next'..t]
+		if nxt then
+			local system = args['system'..t] or args.system
+			local line = args['line'..t] or args.line
+			local typ = args['type'..t] or args.type
+			local inverse = args['inverse'..t] or false
+			if set.rows[set.rows.tracks[t]].orien == 'left' then
+				row.textL = util.text.adjacent(frame, { system = system, line = line, type = typ, next = nxt, left = true, inverse = inverse })..'~~'
+			else
+				row.textR = '~~'..util.text.adjacent(frame, { system = system, line = line, type = typ, next = nxt, left = false, inverse = inverse })
+			end
+		end
+	end
+	-- Manual texts
+	for r = 1, #inst do
+		local row = inst[r]
+		-- Manual text
+		if args['textL'..r] then
+			row.textL = args['textL'..r]
+		end
+		if args['textR'..r] then
+			row.textR = args['textR'..r]
+		end
+	end
+	-- Tracks (round II)
+	local noextend_l = true
+	local noextend_r = true
+	for t = 1, #set.rows.tracks do
+		-- track ends
+		local r = set.rows.tracks[t]
+		local row = inst[r]
+		local info = set.rows[r]
+		-- left
+		if info.bound == 'both' or info.bound == 'left' then
+			local bound = args['bound'..t..'L'] or args['boundL']
+			if bound == 'hard' then
+				if replace_l then
+					row[1] = util.icon.map[row[1]].hard.on_left
+				else
+					table.insert(row, 1, util.icon.map['uSTRq'].hard.on_left)
+				end
+			elseif bound == 'soft' then
+				noextend_l = false
+				if replace_l then
+					row[1] = util.icon.map[row[1]].soft.on_left
+				else
+					table.insert(row, 1, util.icon.map['uSTRq'].soft.on_left)
+				end
+				table.insert(row, 1, 'uexLSTRaq')
+			else
+				noextend_l = false
+				if replace_l then
+					row[1] = util.icon.map[row[1]].open[info.orien]
+				else
+					table.insert(row, 1, util.icon.map['uSTRq'].open[info.orien])
+				end
+				table.insert(row, 1, 'uLSTRaq')
+			end
+		end
+		-- right
+		if info.bound == 'both' or info.bound == 'right' then
+			local bound = args['bound'..t..'R'] or args['boundR']
+			if bound == 'hard' then
+				if replace_r then
+					row[#row] = util.icon.map[row[#row]].hard.on_right
+				else
+					table.insert(row, util.icon.map['uSTRq'].hard.on_right)
+				end
+			elseif bound == 'soft' then
+				noextend_r = false
+				if replace_r then
+					row[#row] = util.icon.map[row[#row]].soft.on_right
+				else
+					table.insert(row, util.icon.map['uSTRq'].soft.on_right)
+				end
+				table.insert(row, 'uexLSTReq')
+			else
+				noextend_r = false
+				if replace_r then
+					row[#row] = util.icon.map[row[#row]].open[info.orien]
+				else
+					table.insert(row, util.icon.map['uSTRq'].open[info.orien])
+				end
+				table.insert(row, 'uLSTReq')
+			end
+		end
+	end
+	
+	-- Fix align
+	local nontrack_pad = 0
+	if replace_r then nontrack_pad = nontrack_pad - 1 end
+	if replace_l then nontrack_pad = nontrack_pad + 1 end
+	if noextend_r then nontrack_pad = nontrack_pad - 1 end
+	if noextend_l then nontrack_pad = nontrack_pad + 1 end
+	if nontrack_pad ~= 0 then
+		for r = 1, #inst do
+			local row = inst[r]
+			local info = set.rows[r]
+			if not info or not info.bound then
+				if nontrack_pad == -2 then
+					table.insert(row, 1, '')
+					table.insert(row, 1, '')
+				elseif nontrack_pad == -1 then
+					table.insert(row, 1, '')
+				elseif nontrack_pad == 1 then
+					table.insert(row, '')
+				elseif nontrack_pad == 2 then
+					table.insert(row, '')
+					table.insert(row, '')
+				end
+			end
+		end
+	end
+	
+	-- Trim unused rows
+	for r = #inst, 1, -1 do
+		local row = inst[r]
+		local info = set.rows[r]
+		if info and info.trimable then
+			local trim = true
+			for c = 1, #row do
+				if row[c] ~= '' then
+					trim = false
+					break
+				end
+			end
+			if trim then table.remove(inst, r) end
+		end
+	end
+	
+	-- Padding
+	if args.pad then
+		local pad = tonumber(args.pad)
+		if pad < 0 then
+			for r = 1, #inst do
+				for p = 1, -pad do
+					table.insert(inst[r], 1, '')
+				end
+			end
+		elseif pad > 0 then
+			for r = 1, #inst do
+				for p = 1, pad do
+					table.insert(inst[r], '')
+				end
+			end
+		end
+	end
+	
+	-- Output
+	local lines = {}
+	
+	for l = 1, #inst do
+		lines[l] = table.concat(inst[l], '\\')
+		if inst[l].textL then lines[l] = inst[l].textL..'! !'..lines[l] end
+		if inst[l].textR then lines[l] = lines[l]..'~~ '..inst[l].textR end
+	end
+	
+	-- Error
+	if #err.unknown_switches > 0 then
+		table.insert(lines, '~~ ~~<span style="color: red; font-weight: 600">'..strs.err_unknown_switches..table.concat(err.unknown_switches, ', ')..'</span>')
+	end
+	
+	return table.concat(lines, '\n')
+end
+
+function p.switch(frame)
+	local args = frame.args
+	local set = args[1]
+	set = require('Module:PlatformMap/'..set)
+	local switch = args[2]
+	local side = args[3] or 'both'
+	switch = set.switches[side][switch]
+	local lines = {}
+	for l = 1, #switch do
+		lines[l] = table.concat(switch[l], '\\')..'~~'..l..'~~'
+	end
+	return table.concat(lines, '\n')
+end
+
+return p

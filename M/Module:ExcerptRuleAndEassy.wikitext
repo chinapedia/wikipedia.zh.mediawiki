@@ -1,0 +1,181 @@
+local p = {}
+local mDelcat = require('Module:Delcat')
+local mError = require('Module:Error')
+local yesno = require('Module:Yesno')
+
+local function Error (msg)
+	return mError.error{'[[Module:ExcerptRuleAndEassy|Module:ExcerptRuleAndEassy]]錯誤：' .. msg}
+end
+
+local function killRuleTemplate (wt)
+	return wt
+		-- 方針
+		:gsub('{{[Ll]egal[_%s]policy%|[^}]+}}', '')
+		:gsub('{{[Pp]olicy%|[^}]+}}', '')
+		:gsub('{{方针%|[^}]+}}', '')
+		:gsub('{{方針%|[^}]+}}', '')
+		:gsub('{{[Pp]olicy[_%s]section%|[^}]+}}', '')
+		:gsub('{{[Pp]olicy[_%s]sentence%|[^}]+}}', '')
+		:gsub('{{方針段落%|[^}]+}}', '')
+		:gsub('{{[Pp]olicy[_%s]section[_%s]top}}', '')
+		
+		-- 指引
+		:gsub('{{[Gg]uideline%|[^}]+}}', '')
+		:gsub('{{指引%|[^}]+}}', '')
+		:gsub('{{[Gg]uideline[_%s]section%|[^}]+}}', '')
+		:gsub('{{[Gg]uideline[_%s]section[_%s]top}}', '')
+
+end
+
+function p._catchPageType (title, section)
+	local content = mDelcat.include({[1] = title .. '#__FIRST_SECTION__', NoPreprocess = true})
+	local Type
+	if content:match('{{[Ll]egal[_%s]policy%|') then
+		return 'Legal policy'
+	elseif (
+		content:match('{{[Pp]olicy%|')
+		or content:match('{{方针%|')
+		or content:match('{{方針%|')
+	) then
+		Type = content:match('{{[Pp]olicy%|=([^%|]+)%|')
+			or content:match('{{方针%|=([^%|]+)%|')
+			or content:match('{{方針%|=([^%|]+)%|')
+		return (Type and Type .. ' ' or '') .. 'policy'
+	elseif (
+		content:match('{{[Gg]uideline%|')
+		or content:match('{{指引%|')
+	) then
+		Type = content:match('{{[Gg]uideline%|=([^%|]+)%|')
+			or content:match('{{指引%|=([^%|]+)%|')
+		if (
+			content:match('{{[Pp]olicy[_%s]section[_%s]top}}')
+		) then
+			return (Type and Type .. ' ' or '') .. 'guideline+policy(section)'
+		end
+		Type = content:match('{{[Pp]olicy%|=([^%|]+)%|')
+			or content:match('{{方针%|=([^%|]+)%|')
+			or content:match('{{方針%|=([^%|]+)%|')
+		return (Type and Type .. ' ' or '') .. 'guideline'
+	elseif (
+		content:match('{{[Gg]uideline[_%s]section[_%s]top}}')
+	) then
+		return 'guideline(section)'
+	end
+	
+	return 'essay'
+end
+
+function p.catchPageType (frame)
+	local args
+	if frame == mw.getCurrentFrame() then
+		-- We're being called via #invoke. The args are passed through to the module
+		-- from the template page, so use the args that were passed into the template.
+		if not getArgs then
+			getArgs = require('Module:Arguments').getArgs
+		end
+		args = getArgs(frame, {parentFirst=true})
+	else
+		-- We're being called from another module or from the debug console, so assume
+		-- the args are passed in directly.
+		args = frame
+		if type(args) ~= type({}) then args = {frame} end
+	end
+	return catchPageType(args[1] or mw.title.getCurrentTitle().fullText)
+end
+
+
+function p._main (path, configs)
+	if not path or path == '' then
+		return Error('缺失參數<code>path</code>！')
+	end
+	local split = mw.text.split(path, '#')
+	local title = split[1]
+	local section = split[2]
+	local s, t = pcall(mw.title.new, title)
+	if path == '' or title == '' or t == mw.title.getCurrentTitle() then
+		return Error('禁止自己引用自己！')
+	elseif not s or not t then
+		return Error('無法解析標題<code>' .. title .. '</code>！')
+--	elseif not section or section == '' then
+--		return Error('想要引用整頁嗎？似乎不太適合耶...')
+	else
+		title = t.fullText
+	end
+	local from = title .. (section and '#' .. section or '')
+	local catch = mDelcat.include({path, NoPreprocess = true, keep_title = "hide" --[=[, full_include = "true" ]=] })
+	local template
+	local Type
+	local Rtype
+	local pagetype = p._catchPageType(title)
+	if pagetype == 'Legal policy' then
+		Rtype = '法律方針'
+		template = '{{Legal_policy_section|From=' .. from .. '}}'
+	elseif pagetype:match('(.-) policy') then
+		Type = pagetype:match('^(.-) policy$') or ''
+		Rtype = '方針'
+		template = '{{Policy section|=' .. Type .. '|From=' .. from .. '}}'
+	elseif pagetype:match('(.-) guideline') then
+		Type = pagetype:match('^(.-) guideline$') or ''
+		Rtype = '指引'
+		template = '{{Guideline section|=' .. Type .. '|From=' .. from .. '}}'
+	elseif pagetype == 'essay' then
+		Rtype = '論述'
+		template = ''
+	else
+		template = (function (content)
+			if (
+				content:match('{{[Pp]olicy[_%s]section%|')
+				or content:match('{{[Pp]olicy[_%s]sentence%|')
+				or content:match('{{方針段落%|')
+			) then
+				Type = content:match('{{[Pp]olicy[_%s]section%|=([^%|]+)%|')
+					or content:match('{{[Pp]olicy[_%s]sentence%|=([^%|]+)%|')
+					or content:match('{{方針段落%|=([^%|]+)%|') or ''
+				Rtype = '方針'
+				return '{{Policy section|=' .. Type .. '|From=' .. from .. '}}'
+			elseif (
+				content:match('{{[Gg]uideline[_%s]section%|')
+			) then
+				Type = content:match('{{[Gg]uideline[_%s]section%|=([^%|]+)%|') or ''
+				Rtype = '指引'
+				return '{{Guideline section|=' .. Type .. '|From=' .. from .. '}}'
+			elseif pagetype:match('^(.-) guideline%+policy%(section%)$') then
+				Type = pagetype:match('^(.-) guideline%+policy%(section%)$') or ''
+				Rtype = '指引'
+				return '{{Guideline section|=' .. Type .. '|From=' .. from .. '}}'
+			end
+			Rtype = '論述'
+			return ''
+		end)(catch)
+	end
+	template = template .. '\n'
+	
+	local wt = not yesno(configs.notitle) and (require('Module:FakeH')._main(configs.text or '相關' .. Rtype, {
+		level = configs.level or 2,
+		editlink = {
+			title = title,
+			section = section
+		}
+	}) .. '\n') or ''
+	
+	if not yesno(configs.notemplate) then
+		wt = wt .. template
+	end
+	wt = wt .. killRuleTemplate(catch)
+	return mw.getCurrentFrame():preprocess(wt)
+end
+
+function p.main (frame) 
+	local args = {configs = {}}
+	local mArgs = require('Module:Arguments').getArgs(frame)
+	for k, v in pairs(mArgs) do
+		if k == 1 or k == '1' then
+			args[1] = v
+		else
+			args.configs[k] = v
+		end
+	end
+	return p._main(args[1], args.configs)
+end
+
+return p

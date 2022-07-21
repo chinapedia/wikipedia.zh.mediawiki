@@ -1,0 +1,474 @@
+[[File:ARM_Cortex-M0_and_M3_ICs_in_SMD_Packages.jpg|thumb]]和Silicon Labs所設計的ARM Cortex-M0和and Cortex-M3微控制器（{{le|Energy Micro|Energy Micro}}）]]
+[[Image:STM32F100C4T6B-HD.jpg|thumb]]<br/>24  [[赫兹|MHz]] ARM Cortex-M3 [[单片机|单片机]]，有16[[千字节|千字节]][[闪存|闪存]]，4 KB RAM。由[[意法半導體|意法半導體]]生產]]
+
+'''ARM Cortex-M'''是[[ARM架構|ARM架構]]處理器核心中，低階系列的統稱，由[[安謀控股|安謀控股]]所授權。這組核心的特點為低成本以及高能源效率的微處理器而優化設計，已有上千萬個消費性設備中有此系列的微處理器<ref>{{Cite web |url=http://www.arm.com/products/processors/cortex-m |title=ARM Cortex-M website; arm.com |accessdate=2020-09-22 |archive-date=2018-07-27 |archive-url=https://web.archive.org/web/20180727220214/https://www.arm.com/products/processors/cortex-m |dead-url=yes }}</ref>。此系列核心包括Cortex-M0、Cortex-M0+、Cortex-M1、Cortex-M3、Cortex-M4、Cortex-M7、Cortex-M23、Cortex-M33、Cortex-M35P和Cortex-M55<!--<ref name="M0-TRM"/><ref name="M0+-TRM"/><ref name="M1-TRM"/><ref name="M3-TRM"/><ref name="M4-TRM"/><ref name="M7-TRM"/><ref name="M23-TRM"/>-->。其中Cortex-M4 / M7 / M33 / M35P / M55 核心有[[浮点运算器|浮点运算器]]的選項，若有浮点运算器的選項，會在型號後面說明，例如Cortex-Mx with FPU或Cortex-MxF，其中x是核心編號。
+==簡介==
+{| class="wikitable" border="1" style="float:right; margin-left:9px;"
+|-
+! colspan=2 | 32-bit
+|-
+! 年份 !! 核心
+|-
+| 2004年 || [[#Cortex-M3|Cortex-M3]]
+|-
+| 2007年 || [[#Cortex-M1|Cortex-M1]]
+|-
+| 2009年 || [[#Cortex-M0|Cortex-M0]]
+|-
+| 2010年 || [[#Cortex-M4|Cortex-M4]]
+|-
+| 2012年 || [[#Cortex-M0+|Cortex-M0+]]
+|-
+| 2014年 || [[#Cortex-M7|Cortex-M7]]
+|-
+| 2016年 || [[#Cortex-M23|Cortex-M23]]
+|-
+| 2016年 || [[#Cortex-M33|Cortex-M33]]
+|-
+| 2018年 || [[#Cortex-M35P|Cortex-M35P]]
+|-
+| 2020年 || [[#Cortex-M55|Cortex-M55]]
+|}
+{{See also|ARM架構|ARM處理器內核列表}}
+
+ARM Cortex-M系列是為了[[单片机|单片机]]、[[特殊應用積體電路|特殊應用積體電路]]（ASIC）、應用專門標準產品（ASSP）、[[现场可编程逻辑门阵列|现场可编程逻辑门阵列]]（FPGA）及[[单片系统|单片系统]]（SoC）設計的ARM微處理器核心。Cortex-M核心常用在
+專用微控制器晶片中，但也會藏在SoC晶片中，例如電源管理制器、輸入／輸出控制器、系統控制器、觸碰螢幕制器、智慧電池控制器以及感測器控制器。
+
+以往8位元的微控制器相當流行，但低階的Cortex-M晶片已經降價，佔據了一些8位元微控制器的市場。在取代8位元微控制器時，Cortex-M是常出現的選項，因為有32位元數學運算上的優勢，也會用來替換一些較舊的ARM核心 ，例如[[ARM7|ARM7]]及ARM9。
+
+===授權===
+[[安謀控股|安謀控股]]不會以其自身的技術生產CPU或販售CPU，而是其將處理器的架構授權給其他有意願開發的公司。安謀有許多不同的授權條款，差異在成本以及可交付成果。對於所有的授權，安謀都會提出一份可整合的ARM核心硬體描述，也包括完整的軟體開發工具組，以及販售包括ARM CPU在內的積體電路的權利。
+
+===矽定制===
+[[整合元件製造廠|整合元件製造廠]]（IDM）收到的ARM處理器[[知识产权|知识产权]]，是[[逻辑综合|可逻辑综合]]的[[寄存器传输级|寄存器传输级]]（用[[Verilog|Verilog]]所寫）。以此型式，整合元件製造商可以進行架構層級的最佳化以及延伸，可以讓製造商達成其客戶的設計目的，例如高時脈速度、非常低的能耗、指令集延伸（包括浮點數）、針對大小的最佳化、除錯器的支援等。若要確認特定的ARM CPU晶片中已有那些功能，則需確認製造商的資料表以及相關文件。
+
+Cortex-M核心的部份選配機能如下：
+* SysTick計時器：24位元的系統計時器，延伸了處理器以及巢狀向量中斷控制器（Nested Vectored Interrupt Controller、NVIC）的機能。若有此計時器，也可以提供額外的SysTick中斷，可以配置其優先權<ref name="ARMv6-M-Manual"/><ref name="ARMv7-M-Manual"/><ref name="AppNote179"/>。雖然SysTick計時器不是必備的，不過幾乎沒有不支援SysTick的Cortex-M微處理器。若Cortex-M33控制器有安全擴展（Security Extension）選項，會有二個SysTicks，一個是安全的，另一個是一般的。
+* 位元帶（Bit-Band）：位元帶區域內記憶體中的每一個位元，可以個別映射到一個字元組。例如，寫入特定的假名字元組，就代表設定或是清除位元帶區域內特定的位元。因此位元帶區域內的每一個位元都可以透過字元組對齊的位址來直接讀寫。而且，每一個位元都可以用C/C++進行設定、清除、反相等功能，不需要透過一連串畗讀取-修改-寫入的指令順序<ref name="ARMv6-M-Manual"/><ref name="ARMv7-M-Manual"/><ref name="AppNote179"/>。位元帶也不是Cortex-M一定會有的功能，不過不支援位元帶的Cortex-M3或Cortex-M4微處理器較不常見。有些Cortex-M0及Cortex-M0+微處理器也會有位元帶。
+* {{le|記憶體保護單元|Memory protection unit}}（MPU）：透過強制的權限以及存取規則，可以保護特定區域的記憶體。最多可以支援八個不同的記憶體區域，每個還可以分成八個等大小的子區域<ref name="ARMv6-M-Manual"/><ref name="ARMv7-M-Manual"/><ref name="AppNote179"/>。
+* 緊密耦合記憶體（Tightly-Coupled Memory、TCM）：是低延遲的RAM，可以保存關鍵性的程序、資料及堆疊。緊密耦合記憶體一般會是微處理器中最快的RAM，僅次於[[緩存|緩存]]記憶體。
+
+{| class="wikitable"
+|+ <big>ARM Cortex-M選配元件</big>
+|-
+! ARM Core !! Cortex<br/>M0<ref name="M0-TRM"/> !! Cortex<br/>M0+<ref name="M0+-TRM"/> !! Cortex<br/>M1<ref name="M1-TRM"/> !! Cortex<br/>M3<ref name="M3-TRM"/> !! Cortex<br/>M4<ref name="M4-TRM"/> !! Cortex<br/>M7<ref name="M7-TRM"/> !! Cortex<br/>M23<ref name="M23-TRM"/> !! Cortex<br/>M33<ref name="M33-TRM"/> !! Cortex<br/>M35P<!--M35P TRM not available at this time-->
+|-
+| SysTick 24位元{{le|可程式化計時器|Programmable interval timer|計時器}}|| style="background: yellow; text-align: center;" | 選配<br/>(0,1) || style="background: yellow; text-align: center;" | 選配<br/>(0,1) || style="background: yellow; text-align: center;" | 選配<br/>(0,1) || {{Yes|是<br/>(1)}} || {{Yes|是<br/>(1)}} || {{Yes|是<br/>(1)}} || style="background: yellow; text-align: center;" | 選配<br/>(0,1,2) || {{Yes|是<br/>(1,2)}} || {{Yes|是<br/>(1,2)}}
+|-
+| 單週期I/O埠 || {{No}} || style="background: yellow; text-align: center;" | 選配 || {{No}} || {{No}} || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 選配 || {{No}} || {{No}}
+|-
+| 位元帶記憶體 || {{No}}<ref name="Cortex-M-SDK"/> || {{No}}<ref name="Cortex-M-SDK"/> || {{No}}* || style="background: yellow; text-align: center;" | 選配 || style="background: yellow; text-align: center;" | 選配 || style="background: yellow; text-align: center;" | 選配 || {{No}} || {{No}} || {{No}}
+|-
+| 記憶體保護單元<br/>（MPU） || {{No}} || style="background: yellow; text-align: center;" | 選配<br/>(0,8) || {{No}} || style="background: yellow; text-align: center;" | 選配<br/>(0,8) || style="background: yellow; text-align: center;" | 選配<br/>(0,8) || style="background: yellow; text-align: center;" | 選配<br/>(0,8,16) || style="background: yellow; text-align: center;" | 選配<br/>(0,4,8,12,16) || style="background: yellow; text-align: center;" | 選配<br/>(0,4,8,12,16) || style="background: grey; text-align: center;" | 選配<br/>*
+|-
+| 安全屬性單元（SAU）<br/>及堆疊限制 || {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 選配<br/>(0,4,8) || style="background: yellow; text-align: center;" | 選配<br/>(0,4,8) || style="background: grey; text-align: center;" | 選配<br/>*
+|-
+| 指令TCM || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 選配 || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 選配 || {{No}} || {{No}} || {{No}}
+|-
+| 資料TCM || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 選配 || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 選配 || {{No}} || {{No}} || {{No}} 
+|-
+| 指令[[緩存|緩存]] || {{No}}<ref name="AppNote321">{{Cite web |url=http://infocenter.arm.com/help/index.jsp?topic=%2Fcom.arm.doc.dai0321a%2FBIHEADII.html |title=ARM Cortex-M Programming Guide to Memory Barrier Instructions; Section 3.6 System implementation requirements; AppNote 321; arm.com |accessdate=2021-01-26 |archive-date=2020-01-26 |archive-url=https://web.archive.org/web/20200126103655/http://infocenter.arm.com/help/index.jsp?topic=%2Fcom.arm.doc.dai0321a%2FBIHEADII.html |dead-url=no }}</ref> || {{No}}<ref name="AppNote321"/> || {{No}}<ref name="AppNote321"/> || {{No}}<ref name="AppNote321"/> || {{No}}<ref name="AppNote321"/> || style="background: yellow; text-align: center;" | 選配 || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 選配
+|-
+| 資料緩存 || {{No}}<ref name="AppNote321"/> || {{No}}<ref name="AppNote321"/> || {{No}}<ref name="AppNote321"/> || {{No}}<ref name="AppNote321"/> || {{No}}<ref name="AppNote321"/> || style="background: yellow; text-align: center;" | 選配 || {{No}} || {{No}} || {{No}} 
+|-
+| {{le|中斷向量表|Interrupt vector table|向量表}}位移暫存器<br/>（VTOR） || {{No}} || style="background: yellow; text-align: center;" | 選配<br/>(0,1) || style="background: yellow; text-align: center;" | 選配<br/>(0,1) || style="background: yellow; text-align: center;" | 選配<br/>(0,1) || style="background: yellow; text-align: center;" | 選配<br/>(0,1) || style="background: yellow; text-align: center;" | 選配<br/>(0,1) || style="background: yellow; text-align: center;" | 選配<br/>(0,1,2) || {{Yes|是<br/>(1,2)}} || {{Yes|是<br/>(1,2)}}
+|}
+* 註：大部份Cortex-M3及M4的微處理器有位元帶及記憶體保護單元。M0/M0+可以用Cortex-M系統開發工具加入位元帶選項<ref name="Cortex-M-SDK">{{Cite web |url=http://www.arm.com/products/processors/cortex-m/cortex-m-system-design-kit.php |title=Cortex-M System Design Kit; Arm Holdings. |accessdate=2020-10-01 |archive-date=2017-03-16 |archive-url=https://web.archive.org/web/20170316145046/https://www.arm.com/products/processors/cortex-m/cortex-m-system-design-kit.php |dead-url=no }}</ref>
+* 註：軟體在試圖使用特定機能時，需要先確認該機能是否有效<ref name="AppNote179">{{Cite web |url=http://infocenter.arm.com/help/topic/com.arm.doc.dai0179b/AppsNote179.pdf |title=Cortex-M3 Embedded Software Development; App Note 179; Arm Holdings. |accessdate=2020-10-01 |archive-date=2020-06-19 |archive-url=https://web.archive.org/web/20200619201626/http://infocenter.arm.com/help/topic/com.arm.doc.dai0179b/AppsNote179.pdf |dead-url=no }}</ref>
+* 註：Cortex-M35P的公開資料不多，一直到其技術參考手冊發行後才有改善。
+
+'''額外的''矽智財''選項'''<ref name="ARMv6-M-Manual"/><ref name="ARMv7-M-Manual"/>：
+* 字节序：小端序（Little-endian）或大端序（big-endian）。Cortex-M和其他早期的ARM核心不同，在製作晶片時就要選用小端序或大端序。
+* 中斷：1至32個（M0/M0+/M1）、1至240個（M3/M4/M7/M23）、1至480個（M33/M35P）
+* 喚醒中斷控制器：選配
+* 向量表位移暫存器：選配（M0沒有此選項）
+* 指令存取寬度：只有16位元，或幾乎是32位元
+* 支援使用者／特取模式：選配
+* 重置所有的暫存器：選配
+* 單一週期的I/O埠：選配（M0+/M23）
+* 除錯存取埠（DAP）：無、SWD、JTAG及SWD（所有Cortex-M核心都有此選項）
+* 支援Halting除錯：選配
+* 監視點比較器數量：0至2個（M0/M0+/M1），0至4個（M3/M4/M7/M23/M33/M35P）
+* 中斷點比較器數量：0至4個 (M0/M0+/M1/M23)，0至8個（M3/M4/M7/M33/M35P）
+
+==={{anchor|ARMv6-M|ARMv7-M|ARMv7E-M}}指令集===
+{{See also|ARM架構#指令集}}
+Cortex-M0 / M0+ / M1實現的是'''ARMv6-M'''架構<ref name="ARMv6-M-Manual"/>，Cortex-M3實現的是'''ARMv7-M'''架構<ref name="ARMv7-M-Manual"/>，Cortex-M4 / Cortex-M7實現的是'''ARMv7E-M'''架構<ref name="ARMv7-M-Manual"/>。Cortex-M23 / M33 / M35P實現的是'''ARMv8-M'''架構<ref name="ARMv8-M-Manual"/>，Cortex-M55實現的是'''ARMv8.1-M'''架構<ref name="ARMv8.1-M-Manual">{{Cite web |url=https://developer.arm.com/docs/ddi0553/bi/armv81-m-architecture-reference-manual |title=ARMv8.1-M Architecture Reference Manual; Arm Holdings. |accessdate=2020-10-06 |archive-date=2020-06-29 |archive-url=https://web.archive.org/web/20200629025017/https://developer.arm.com/docs/ddi0553/bi/armv81-m-architecture-reference-manual |dead-url=no }}</ref>。這些架構是二進制的指令碼，可以和ARMv6-M、 ARMv7-M、ARMv7E-M向上相容。Cortex-M0 / Cortex-M0+ / Cortex-M1的指令碼不用修改就可以在Cortex-M3 / Cortex-M4 / Cortex-M7上執行。Cortex-M3上可以執行的二進制程式碼不需修改就可以在Cortex-M4 / Cortex-M7 / Cortex-M33 / Cortex-M35P上執行<ref name="ARMv6-M-Manual"/><ref name="ARMv7-M-Manual"/>。Cortex-M架構中支援Thumb-1和Thumb-2的指令集，不支援早期的32-bit ARM指令集。
+
+所有Cortex-M的核心都有一個共通的指令子集，包括大部份Thumb-1指令、一些Thumb-2指令，以及結果為32位元的乘法。Cortex-M0 / Cortex-M0+ / Cortex-M1 / Cortex-M23設計目的就是希望讓矽晶面積最小，因此其指令集也是Cortex-M家族中最少的。
+
+Cortex-M0 / M0+ / M1中有Thumb-1指令，不過沒有ARMv7-M架構才加入的指令（CBZ, CBNZ, IT）。Cortex-M0 / M0+ / M1包括一小部份的Thumb-2指令（BL, DMB, DSB, ISB, MRS, MSR）。Cortex-M3 / M4 / M7 / M33 / M35P 有所有基本的Thumb-1和Thumb-2指令。Cortex-M3加上了三個Thumb-1指令、所有的Thumb-2指令、硬體的整體除法、以及[[饱和运算|饱和运算]]指令。Cortex-M4加上了[[數位訊號處理器|數位訊號處理]]（DSP）指令，以及可選的單精度[[浮点运算器|浮点运算器]]（VFPv4-SP）。Cortex-M7加上了可選的雙精度浮点运算器（VFPv5）<ref name="ARMv6-M-Manual"/><ref name="ARMv7-M-Manual"/>。Cortex-M23 / M33加上了TrustZone指令。
+
+{| class="wikitable"
+|+ <big>ARM Cortex-M指令變化</big>
+|-
+! Arm Core !! Cortex<br/>M0<ref name="M0-TRM"/> !! Cortex<br/>M0+<ref name="M0+-TRM"/> !! Cortex<br/>M1<ref name="M1-TRM"/> !! Cortex<br/>M3<ref name="M3-TRM"/> !! Cortex<br/>M4<ref name="M4-TRM"/> !! Cortex<br/>M7<ref name="M7-TRM"/> !! Cortex<br/>M23<ref name="M23-TRM"/> !! Cortex<br/>M33<ref name="M33-TRM"/> !! Cortex<br/>M35P !! Cortex<br/>M55
+|-
+| [[ARM架構|ARM架構]] || style="text-align: center;" | ARMv6-M<ref name="ARMv6-M-Manual">[https://silver.arm.com/download/download.tm?pv=1102513 ARMv6-M Architecture Reference Manual; Arm Holdings.]</ref> || style="text-align: center;" | ARMv6-M<ref name="ARMv6-M-Manual"/> || style="text-align: center;" | ARMv6-M<ref name="ARMv6-M-Manual"/> || style="text-align: center;" | ARMv7-M<ref name="ARMv7-M-Manual">[https://silver.arm.com/download/download.tm?pv=1111932 ARMv7-M Architecture Reference Manual; Arm Holdings.]</ref> || style="text-align: center;" | ARMv7E-M<ref name="ARMv7-M-Manual"/> || style="text-align: center;" | ARMv7E-M<ref name="ARMv7-M-Manual"/> || style="text-align: center;" | ARMv8-M<br/>Baseline<ref name="ARMv8-M-Manual">{{Cite web |url=http://infocenter.arm.com/help/topic/com.arm.doc.ddi0553a.d/index.html |title=ARMv8-M Architecture Reference Manual; Arm Holdings. |accessdate=2020-10-20 |archive-date=2020-06-20 |archive-url=https://web.archive.org/web/20200620122021/http://infocenter.arm.com/help/topic/com.arm.doc.ddi0553a.d/index.html |dead-url=no }}</ref> || style="text-align: center;" | ARMv8-M<br/>Mainline<ref name="ARMv8-M-Manual"/> || style="text-align: center;" | ARMv8-M<br/>Mainline<ref name="ARMv8-M-Manual"/> || style="text-align: center;" | Armv8.1-M
+|-
+| [[计算机系统结构|计算机系统结构]] || style="text-align: center;" | [[冯·诺伊曼结构|Von Neumann]] || style="text-align: center;" | Von Neumann || style="text-align: center;" | Von Neumann || style="text-align: center;" | [[哈佛结构|Harvard]] || style="text-align: center;" | Harvard || style="text-align: center;" | Harvard || style="text-align: center;" | Von Neumann || style="text-align: center;" | Harvard || style="text-align: center;" | Harvard || style="text-align: center;" | Harvard
+|-
+| [[指令管線化|指令管線化]] || style="text-align: center;" | 3層 || style="text-align: center;" | 2層 || style="text-align: center;" | 3層 || style="text-align: center;" | 3層 || style="text-align: center;" | 3層 || style="text-align: center;" | 6層 || style="text-align: center;" | 2層 || style="text-align: center;" | 3層 || style="text-align: center;" | 3層 || style="text-align: center;" | 4到5層
+|-
+| Thumb-1指令 || style="background: cyan; text-align: center;" | 大部份 || style="background: cyan; text-align: center;" | Most || style="background: cyan; text-align: center;" | 大部份 || {{Yes|全部}} || {{Yes|全部}} || {{Yes|全部}} || style="background: cyan; text-align: center;" | 大部份 || {{Yes|全部}} || {{Yes|全部}} || {{Yes|全部}} 
+|-
+| Thumb-2指令 || style="background: cyan; text-align: center;" | 部份 || style="background: cyan; text-align: center;" | 部份 || style="background: cyan; text-align: center;" | 部份 || {{Yes|全部}} || {{Yes|全部}} || {{Yes|全部}} || style="background: cyan; text-align: center;" | 部份 || {{Yes|全部}} || {{Yes|全部}} || {{Yes|全部}} 
+|-
+| {{le|乘法演算法|Multiplication algorithm|乘法}}指令<br/>32x32, 輸出32-bit  || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} 
+|-
+| 乘法指令<br/>32x32, 輸出64-bit || {{No}} || {{No}} || {{No}} || {{Yes}} || {{Yes}} || {{Yes}} || {{No}} || {{Yes}} || {{Yes}} || {{Yes}} 
+|-
+| [[除法器|除法]]指令<br/>32/32，商32-bit || {{No}} || {{No}} || {{No}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} 
+|-
+| [[饱和运算|饱和]]指令 || {{No}} || {{No}} || {{No}} || style="background: cyan; text-align: center;" | 部份 || {{Yes}} || {{Yes}} || {{No}} || {{Yes}} || {{Yes}} || {{Yes}} 
+|-
+| [[數位訊號處理器|DSP]]指令 instructions || {{No}} || {{No}} || {{No}} || {{No}} || {{Yes}} || {{Yes}} || {{No}} || style="background: yellow; text-align: center;" | 可選 || style="background: yellow; text-align: center;" | 可選 || style="background: yellow; text-align: center;" | 可選
+|-
+| [[單精度浮點數|單精度浮點數]]（SP）<br/>[[浮点运算器|浮点运算]]指令 || {{No}} || {{No}} || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 可選 || style="background: yellow; text-align: center;" | 可選 || {{No}} || style="background: yellow; text-align: center;" | 可選 || style="background: yellow; text-align: center;" | 可選 || style="background: yellow; text-align: center;" | 可選
+|-
+| [[雙精度浮點數|雙精度浮點數]]（DP）<br/>浮點指令 || {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 可選 || {{No}} || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 可選
+|-
+|半精度（HP）|| {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 可選
+|-
+|TrustZone指令 || {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 可選 || style="background: yellow; text-align: center;" | 可選 || style="background: yellow; text-align: center;" | 可選 || style="background: yellow; text-align: center;" | 可選
+|-
+|[[輔助處理器|輔助處理器]]指令 || {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 可選 || style="background: yellow; text-align: center;" | 可選 || style="background: yellow; text-align: center;" | 可選
+|-
+|Helium技術|| {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 可選
+|-
+|{{le|中斷延遲|Interrupt latency}}<br />（若用零等待狀態的RAM） || style="text-align: center;" | 16 cycles || style="text-align: center;" | 15 cycles || style="text-align: center;" | 23 for NMI<br />26 for IRQ || style="text-align: center;" | 12 cycles || style="text-align: center;" | 12 cycles || style="text-align: center;" | 12 cycles || style="text-align: center;" | 15 no security ext<br />27 security ext || style="background: grey; text-align: center;" | TBD || style="background: grey; text-align: center;" | TBD || style="background: grey; text-align: center;" | TBD
+|}
+* 註：Cortex-M0／M0+／M1不包括以下16位元的Thumb-1指令：CBZ, CBNZ, IT<ref name="ARMv6-M-Manual"/><ref name="ARMv7-M-Manual"/>。
+* 註：Cortex-M0／M0+／M1只包括以下32位元的Thumb-2指令：BL, DMB, DSB, ISB, MRS, MSR.<ref name="ARMv6-M-Manual"/><ref name="ARMv7-M-Manual"/>
+* 註：Cortex-M0／M0+／M1／M23只有乘積結果為32位元的乘法指令（32bit × 32bit = lower 32bit），而Cortex-M3／M4／M7／M33／M35P有32位元相乘，結果為32位元的乘法指令（32bit × 32bit = 64bit）。Cortex-M4／M7（M33／M35P可選）包括DSP乘法指令 (16bit × 16bit = 32bit）、（32bit × 16bit = upper 32bi）、（32bit × 32bit = upper 32bit）ref name="ARMv6-M-Manual"/><ref name="ARMv7-M-Manual"/> 
+* 註：要計算完乘法及除法的週期數依ARM Cortex-M的核心設計而不同。有些核心有較快速度或是較小尺寸的矽智財選項，因此核心可能用較少的矽面積，但需要的週期數較長。在執行除法指令或慢速迭代乘法指令時發生的中斷會讓處理器放棄其指令，在中斷結束後再繼續。
+**Cortex-M0/M0+/M23中，結果為32位元的乘法可以選擇是1個週期或是32個週期。Cortex-M1可以選擇是3個週期或是33個週期。Cortex-M3/M4/M7/M33/M35P都是一個週期。.
+**Cortex-M3中，結果為32位元的乘法指令，可能是3–5個週期（視數值而定）。Cortex-M4/M7/M33/M35P是一個週期。
+**Cortex-M3/M4的除法指令是2–12個週期（視數值而定）。Cortex-M7是3–20個週期（視數值而定）。Cortex-M23有17個週期或34個週期的選項。Cortex-M33是2–11個週期（視數值而定）。Cortex-M35P的資料還不確定。
+*註：Cortex-M4 / M7 / M33 / M35P有不含FPU的矽智財選項，或是單精度（SP）的FPU，Cortex-M7加上第三個矽智財選項，可以支援單精度以及雙精度（DP）的FPU。若Cortex-M4 / M7 / M33 / M35P有FPU，其型號會是Cortex-M4'''F''' / Cortex-M7'''F''' / Cortex-M33'''F''' / Cortex-M35P'''F'''.<ref name="ARMv6-M-Manual"/><ref name="ARMv7-M-Manual"/>。
+*註：Cortex-M系列包括三個新的16位元睡眠模式Thumb-1指令：SEV, WFE, WFI。
+*註：中斷延遲週期計數假設
+**1.堆疊放在零等待狀態RAM
+**2.沒有在執行其他的中斷
+**3.沒有安全延伸機能選項（因為會增加週期）
+*註：哈佛架構的Cortex-M，其中斷延遲週期計數會比較短。
+
+{| class="wikitable"
+|+ <big>ARM Cortex-M指令群</big>
+|-
+! Group !! Instr<br/>bits !! Instructions !! Cortex<br/>M0,M0+,M1 !! Cortex<br/>M3 !! Cortex<br/>M4 !! Cortex<br/>M7 !! Cortex<br/>M23 !! Cortex<br/>M33,M35P !! Cortex<br/>M55
+|-
+| style="text-align: center;" | {{nowrap|Thumb-1}} || style="text-align: center;" | 16 || ADC, ADD, ADR, AND, ASR, B, BIC, BKPT, BLX, BX, CMN, CMP, CPS, EOR, LDM, LDR, LDRB, LDRH, LDRSB, LDRSH, LSL, LSR, MOV, MUL, MVN, NOP, ORR, POP, PUSH, REV, REV16, REVSH, ROR, RSB, SBC, SEV, STM, STR, STRB, STRH, SUB, SVC, SXTB, SXTH, TST, UXTB, UXTH, WFE, WFI, YIELD || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} 
+|-
+| style="text-align: center;" | {{nowrap|Thumb-1}} || style="text-align: center;" | 16 ||| CBNZ, CBZ || {{No}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} 
+|-
+| style="text-align: center;" | {{nowrap|Thumb-1}} || style="text-align: center;" | 16 ||| IT || {{No}} || {{Yes}} || {{Yes}} || {{Yes}} || {{No}} || {{Yes}} || {{Yes}} 
+|-
+| style="text-align: center;" | {{nowrap|Thumb-2}} || style="text-align: center;" | 32 || BL, DMB, DSB, ISB, MRS, MSR || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} 
+|-
+| style="text-align: center;" | {{nowrap|Thumb-2}} || style="text-align: center;" | 32 ||| SDIV, UDIV || {{No}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} || {{Yes}} 
+|-
+| style="text-align: center;" | {{nowrap|Thumb-2}} || style="text-align: center;" | 32 || ADC, ADD, ADR, AND, ASR, B, BFC, BFI, BIC, CDP, CLREX, [[Find_first_set#CLZ|CLZ]], CMN, CMP, DBG, EOR, LDC, LDM, LDR, LDRB, LDRBT, LDRD, LDREX, LDREXB, LDREXH, LDRH, LDRHT, LDRSB, LDRSBT, LDRSH, LDRSHT, LDRT, LSL, LSR, MCR, MCRR, MLA, MLS, MOV, MOVT, MRC, MRRC, MUL, MVN, NOP, ORN, ORR, PLD, PLDW, PLI, POP, PUSH, RBIT, REV, REV16, REVSH, ROR, RRX, RSB, SBC, SBFX, SEV, SMLAL, SMULL, SSAT, STC, STM, STR, STRB, STRBT, STRD, STREX, STREXB, STREXH, STRH, STRHT, STRT, SUB, SXTB, SXTH, TBB, TBH, TEQ, TST, UBFX, UMLAL, UMULL, USAT, UXTB, UXTH, WFE, WFI, YIELD || {{No}} || {{Yes}} || {{Yes}} || {{Yes}} || {{No}} || {{Yes}} || {{Yes}} 
+|-
+| style="text-align: center;" | [[數位訊號處理器|DSP]] || style="text-align: center;" | 32 || PKH, QADD, QADD16, QADD8, QASX, QDADD, QDSUB, QSAX, QSUB, QSUB16, QSUB8, SADD16, SADD8, SASX, SEL, SHADD16, SHADD8, SHASX, SHSAX, SHSUB16, SHSUB8, SMLABB, SMLABT, SMLATB, SMLATT, SMLAD, SMLALBB, SMLALBT, SMLALTB, SMLALTT, SMLALD, SMLAWB, SMLAWT, SMLSD, SMLSLD, SMMLA, SMMLS, SMMUL, SMUAD, SMULBB, SMULBT, SMULTT, SMULTB, SMULWT, SMULWB, SMUSD, SSAT16, SSAX, SSUB16, SSUB8, SXTAB, SXTAB16, SXTAH, SXTB16, UADD16, UADD8, UASX, UHADD16, UHADD8, UHASX, UHSAX, UHSUB16, UHSUB8, UMAAL, UQADD16, UQADD8, UQASX, UQSAX, UQSUB16, UQSUB8, USAD8, USADA8, USAT16, USAX, USUB16, USUB8, UXTAB, UXTAB16, UXTAH, UXTB16 || {{No}} || {{No}} || {{Yes}} || {{Yes}}|| {{No}} || style="background: yellow; text-align: center;" | 可選 || {{Yes}} 
+|-
+| style="text-align: center;" | [[單精度浮點數|單精度浮點數]] || style="text-align: center;" | 32 || VABS, VADD, VCMP, VCMPE, VCVT, VCVTR, VDIV, VLDM, VLDR, VMLA, VMLS, VMOV, VMRS, VMSR, VMUL, VNEG, VNMLA, VNMLS, VNMUL, VPOP, VPUSH, VSQRT, VSTM, VSTR, VSUB || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 可選 || style="background: yellow; text-align: center;" | 可選 || {{No}} || style="background: yellow; text-align: center;" | 可選 || style="background: yellow; text-align: center;" | 可選
+|-
+| style="text-align: center;" | [[雙精度浮點數|雙精度浮點數]] || style="text-align: center;" | 32 || VCVTA, VCVTM, VCVTN, VCVTP, VMAXNM, VMINNM, VRINTA, VRINTM, VRINTN, VRINTP, VRINTR, VRINTX, VRINTZ, VSEL || {{No}} || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 可選 || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 可選
+|-
+| style="text-align: center;" | TrustZone || style="text-align: center;" | 16 || BLXNS, BXNS || {{No}} || {{No}} || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 可選 || style="background: yellow; text-align: center;" | 可選 || style="background: yellow; text-align: center;" | 可選
+|-
+| style="text-align: center;" | TrustZone || style="text-align: center;" | 32 || SG, TT, TTT, TTA, TTAT || {{No}} || {{No}} || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 可選 || style="background: yellow; text-align: center;" | 可選 || style="background: yellow; text-align: center;" | 可選
+|-
+| style="text-align: center;" | [[輔助處理器|輔助處理器]] || style="text-align: center;" | 16 || CDP, CDP2, MCR, MCR2, MCRR, MCRR2, MRC, MRC2, MRRC, MRRC2 || {{No}} || {{No}} || {{No}} || {{No}} || {{No}} || style="background: yellow; text-align: center;" | 可選 || style="background: yellow; text-align: center;" | 可選
+|}
+* 註：針對Cortex-M4 / M7 / M33 / M35P，單精度（SP）浮點運算器指令只有在矽智財中有SP FPU選項時才有效。
+* 註：針對Cortex-M7，雙精度（DP）浮點運算器指令只有在矽智財中有DP FPU選項時才有效。
+
+===停用機能===
+ARM Cortex-M系列的ARM架構，已停用一些早期核心的穖能<ref name="ARMv6-M-Manual"/><ref name="ARMv7-M-Manual"/>：
+* Cortex-M核心中沒有32位的ARM指令集。
+* 字節序在矽智財實現時就需要決定。早期的核心允許依MCU資料字節序模式設定而調整。
+* Cortex-M核心不支援[[輔助處理器|輔助處理器]]，一直到ARM Cortex-M33/M35P核心的ARMv8-M Mainline才重新支援此一選項。
+
+32位元ARM指令的能力和Thumb-1和Thumb-2指令集有很多地方重疊了，不過有些ARM的特徵找不到類似的特性。
+* SWP和SWPB（swap）ARM架構在Cortex-M中沒有類似的架構。
+
+16位元Thumb-1指令集最早是出現在早期ARMv4T架構的[[ARM7|ARM7T]]核心，隨著時代而演進。在ARMv5 / ARMv6 / ARMv6T2　架構問世時，Thumb-1指令集也有擴充。不過也有移除一些Thumb-1指令。
+* 不存在BLX <immediate>指令，此指令是用來從Thumb-1切換到ARM的指令集。BLX <register>指令在Cortex-M系列仍然支援。
+* 不存在SETEND指令，因為不允許在執行時切換字節序。
+* 不支援輔助處理器指令，一直到ARM Cortex-M33/M35P核心的ARMv8-M Mainline才重新支援此些指令。
+* SWI指令更名為SVC，雖二進位碼相同。不過SVC的處理程式和SWI的處理程式在例外模式的處理上差很多。
+
+==Cortex-M0==
+{{Infobox CPU
+|name = Cortex-M0
+|arch = Thumb-1（大部份）<br/>Thumb-2（少數）
+|microarch = ARMv6-M
+}}
+
+Cortex-M0核心是依小矽晶元面積以及最低價晶片進行最佳化的核心。
+
+Cortex-M0核心的主要特點有<ref name="M0-TRM">{{Cite web |url=http://infocenter.arm.com/help/topic/com.arm.doc.ddi0432c/DDI0432C_cortex_m0_r0p0_trm.pdf |title=Cortex-M0 r0p0 Technical Reference Manual; Arm Holdings. |accessdate=2020-11-30 |archive-date=2020-06-22 |archive-url=https://web.archive.org/web/20200622233148/http://infocenter.arm.com/help/topic/com.arm.doc.ddi0432c/DDI0432C_cortex_m0_r0p0_trm.pdf |dead-url=no }}</ref>：
+* ARMv6-M架構<ref name="ARMv6-M-Manual"/>
+* 三層[[管線|管線]]
+* 指令集：
+** Thumb-1（大部份），但沒有CBZ, CBNZ, IT
+** Thumb-2（少部份），只有BL, DMB, DSB, ISB, MRS, MSR
+** 32-bit硬體整數乘法，結果也是32-bit
+* 1到32個[[中斷|中斷]]，以及{{le|不可遮罩中斷|Non-maskable interrupt}}
+
+'''矽智財選項'''：
+* 硬體整數乘法速度：1週期或32週期。
+
+==Cortex-M0+==
+{{Infobox CPU
+|name = Cortex-M0+
+|arch = [[ARM_architecture#Thumb|Thumb-1 (most)]],<br/>[[ARM_architecture#Thumb-2|Thumb-2 (some)]]
+|microarch = ARMv6-M
+}}
+Cortex-M0+是以Cortex-M0再進行優化的版本。Cortex-M0+支援所有Cortex-M0的指令，因此可以用相同的編譯器以及除錯工具。Cortex-M0+的管線由三層變成二層，因此耗能較少。除了Cortex-M0已有的除錯功能外，Cortex-M0+增加了稱為微追蹤緩衝區（Micro Trace Buffer、MTB）的選項，有簡易的指令追蹤緩衝區。Cortex-M0+也有加入Cortex-M3和Cortex-M4的一些特點，是以矽智財選項的方式加入，例如記憶體保護單元（MPU），以及中斷向量表重新定位<ref name="M0+-TRM"/>。
+
+Cortex-M0+核心的主要特點有<ref name="M0+-TRM">{{Cite web |url=http://infocenter.arm.com/help/topic/com.arm.doc.ddi0484b/DDI0484B_cortex_m0p_r0p0_trm.pdf |title=Cortex-M0+ r0p0 Technical Reference Manual; Arm Holdings. |accessdate=2020-11-30 |archive-date=2020-06-19 |archive-url=https://web.archive.org/web/20200619190738/http://infocenter.arm.com/help/topic/com.arm.doc.ddi0484b/DDI0484B_cortex_m0p_r0p0_trm.pdf |dead-url=no }}</ref>：
+* ARMv6-M架構<ref name="ARMv6-M-Manual"/>
+* 二層[[管線|管線]]（比Cortex-M0少一層）
+* 指令集（和Cortex-M0）相同
+** Thumb-1（大部份），但沒有CBZ, CBNZ, IT
+** Thumb-2（少部份），只有BL, DMB, DSB, ISB, MRS, MSR
+** 32-bit硬體整數乘法，結果也是32-bit
+* 1到32個中斷，以及不可遮罩中斷
+
+'''矽智財選項'''：
+* 硬體整數乘法速度：1週期或32週期。
+* 八個區塊的記憶體保護單元（MPU）（和M3、M4相同）
+* 中斷向量表重新定位（和M3、M4相同）
+* 單一週期的I/O埠（在M0+/M23上有此機能）
+* 微追蹤緩衝區（Micro Trace Buffer、MTB）（在M0+/M23/M33/M35P上有此機能）
+==Cortex-M1==
+{{Infobox CPU
+|name = Cortex-M1
+|arch = [[ARM_architecture#Thumb|Thumb-1 (most)]],<br/>[[ARM_architecture#Thumb-2|Thumb-2 (some)]]
+|microarch = ARMv6-M
+}}
+
+The Cortex-M1是特別設計可以放入[[FPGA|FPGA]]晶片的內核。
+
+Cortex-M1內核的主要特點有<ref name="M1-TRM">{{Cite web |url=http://infocenter.arm.com/help/topic/com.arm.doc.ddi0413d/DDI0413D_cortexm1_r1p0_trm.pdf |title=Cortex-M1 r1p0 Technical Reference Manual; Arm Holdings. |accessdate=2020-12-09 |archive-date=2020-06-19 |archive-url=https://web.archive.org/web/20200619191845/http://infocenter.arm.com/help/topic/com.arm.doc.ddi0413d/DDI0413D_cortexm1_r1p0_trm.pdf |dead-url=no }}</ref>：
+* ARMv6-M架構<ref name="ARMv6-M-Manual"/>
+* 二層管線
+* 指令集
+** Thumb-1（大部份），但沒有CBZ, CBNZ, IT.
+** Thumb-2（少部份），只有BL, DMB, DSB, ISB, MRS, MSR.
+** 32-bit硬體整數乘法，結果也是32-bit
+* 1到32個中斷，以及不可遮罩中斷
+
+'''矽智財選項'''：
+* 硬體整數乘法速度：3或33週期。
+* 選配的緊密耦合記憶體（TCM）0 to 1 MB 指令TCM，0 to 1 MB 資料TCM，都可以選擇要不要ECC.
+* 外部中斷：0, 1, 8, 16, 32.
+* 除錯模式：無，簡易功能，完整
+* 字節序：little-endian或BE-8 big-endian. 
+* 作業系統延伸：可以選擇
+
+==Cortex-M3==
+{{Infobox CPU
+|name = Cortex-M3
+|arch = [[ARM_architecture#Thumb|Thumb-1]], [[ARM_architecture#Thumb-2|Thumb-2]],<br/> [[饱和运算|饱和运算]]（部份），除法
+|microarch = ARMv7-M
+}}
+
+Cortex-M3內核的主要特點有<ref name="M3-TRM">{{Cite web |url=http://infocenter.arm.com/help/topic/com.arm.doc.ddi0337i/DDI0337I_cortexm3_r2p1_trm.pdf |title=Cortex-M3 r2p1 Technical Reference Manual; Arm Holdings. |accessdate=2020-12-09 |archive-date=2015-02-16 |archive-url=https://web.archive.org/web/20150216090332/http://infocenter.arm.com/help/topic/com.arm.doc.ddi0337i/DDI0337I_cortexm3_r2p1_trm.pdf |dead-url=no }}</ref><ref>{{cite web |last=Sadasivan |first=Shyam |title=An Introduction to the ARM Cortex-M3 Processor |url=http://www.arm.com/files/pdf/IntroToCortex-M3.pdf |publisher=[[Arm_Holdings|Arm Holdings]] |url-status=dead |archiveurl=https://web.archive.org/web/20140726212528/http://www.arm.com/files/pdf/IntroToCortex-M3.pdf |archivedate=2014-07-26 |accessdate=2020-12-09 |dead-url=no }}</ref> 
+* ARMv7-M架構<ref name="ARMv7-M-Manual"/>：
+* 三層管線以及[[分支預測|分支預測]]
+* 指令集：
+** Thumb-1（完整）
+** Thumb-2（完整）
+** 32-bit硬體整數乘法，結果可以是32-bit或64-bit，有號或無號，在乘法後允許加法或減法。32-bit乘法是一個週期，64-bit乘法和乘積累加（MAC）需要的週期較多
+** 32-bit硬體整數除法（2–12週期）
+** 支援[[饱和运算|饱和运算]]
+* 12個週期的中斷延遲
+* 整合休眠模式
+
+'''矽智財選項'''：
+* 可選的記憶體保護單元（MPU）：0個區或8個區
+==Cortex-M4==
+{{Infobox CPU
+|name = Cortex-M4
+|arch = [[ARM_architecture#Thumb|Thumb-1]], [[ARM_architecture#Thumb-2|Thumb-2]],<br/>[[饱和运算|饱和运算]], 數位信號處理,<br/>除法、浮點運算器（SP）
+|microarch = ARMv7E-M
+}}
+在概念上，Cortex-M4是Cortex-M3加上數位信號處理（DSP）指令、可選的浮點運算器。若有浮點運算器，會稱為Cortex-M4F。
+
+Cortex-M4內核的主要特點有<ref name="M4-TRM">{{Cite web |url=http://infocenter.arm.com/help/topic/com.arm.doc.ddi0439d/DDI0439D_cortex_m4_processor_r0p1_trm.pdf |title=Cortex-M4 r0p1 Technical Reference Manual; Arm Holdings. |accessdate=2020-12-09 |archive-date=2015-02-16 |archive-url=https://web.archive.org/web/20150216090339/http://infocenter.arm.com/help/topic/com.arm.doc.ddi0439d/DDI0439D_cortex_m4_processor_r0p1_trm.pdf |dead-url=no }}</ref>：
+* ARMv7E-M架構<ref name="ARMv7-M-Manual"/>
+* 三層管線以及分支預測
+* 指令集：
+** Thumb-1（完整）
+** Thumb-2（完整）
+** 32-bit硬體整數乘法，結果可以是32-bit或64-bit，有號或無號，在乘法後允許加法或減法。32-bit乘法及乘積累加（MAC）是一個週期
+** 32-bit硬體整數除法（2–12週期）
+** 支援[[饱和运算|饱和运算]]
+** DSP延伸：單一週期16/32-bit [[乘積累加|MAC]]，單一週期雙16-bit MAC，8/16-bit [[单指令流多数据流|SIMD]]運算
+* 12個週期的中斷延遲
+* 整合休眠模式
+
+'''矽智財選項'''：
+* 可選的浮點運算器（FPU）：只有單精度{{le|IEEE-754|IEEE-754}}的，稱為FPv4-SP延伸
+* 可選的記憶體保護單元（MPU）：0個區或8個區
+
+==Cortex-M7==
+{{Infobox CPU
+|name = Cortex-M7
+|arch = [[ARM_architecture#Thumb|Thumb-1]], [[ARM_architecture#Thumb-2|Thumb-2]],<br/>[[饱和运算|饱和运算]], 數位信號處理,<br/>除法、浮點運算器（SP、DP）
+|microarch = ARMv7E-M
+}}
+
+Cortex-M7是高性能的內核，其運算效能是Cortex-M4的二倍。其中包括六層的[[超純量|超純量]]管線有分支預測，有可選的單精度浮點運算器或{{le|雙精度|double-precision floating-point format}}浮點運算器<ref>{{cite web |url=https://arm.com/products/processors/cortex-m/cortex-m7-processor.php |title=Cortex-M7 Processor |publisher=Arm Holdings |accessdate=2014-09-24 |archive-date=2017-03-16 |archive-url=https://web.archive.org/web/20170316124915/https://www.arm.com/products/processors/cortex-m/cortex-m7-processor.php |dead-url=no }}</ref><ref name="M7-PressRelease">{{cite press |url=https://arm.com/about/newsroom/arm-supercharges-mcu-market-with-high-performance-cortex-m7-processor.php |title=ARM Supercharges MCU Market with High Performance Cortex-M7 Processor |website=arm.com |date=September 24, 2014 |access-date=2020-12-09 |archive-date=2018-07-16 |archive-url=https://web.archive.org/web/20180716165835/https://www.arm.com/about/newsroom/arm-supercharges-mcu-market-with-high-performance-cortex-m7-processor.php |dead-url=no }}</ref>。指令集以及資料匯流排已由32-bit寬度增加到64-bit寬度。若內核中有FPU，會稱為Cortex-M7F，不然會稱為Cortex-M7。
+
+Cortex-M7內核的主要特點有<ref name="M7-TRM">{{Cite web |url=http://infocenter.arm.com/help/topic/com.arm.doc.ddi0489b/DDI0489B_cortex_m7_trm.pdf |title=Cortex-M7 r0p2 Technical Reference Manual; Arm Holdings. |accessdate=2020-12-09 |archive-date=2020-06-19 |archive-url=https://web.archive.org/web/20200619191646/http://infocenter.arm.com/help/topic/com.arm.doc.ddi0489b/DDI0489B_cortex_m7_trm.pdf |dead-url=no }}</ref>：
+* ARMv7E-M架構
+* 6階管線以及[[分支預測|分支預測]]。在ARM Cortex-M內核中是最多的。
+* 指令集：
+** Thumb-1（完整）
+** Thumb-2（完整）
+** 32-bit硬體整數乘法，結果可以是32-bit或64-bit，有號或無號，在乘法後允許加法或減法。32-bit乘法及乘積累加（MAC）是一個週期
+** 32-bit硬體整數除法（2–12週期）
+** 支援[[饱和运算|饱和运算]]
+** DSP延伸：單一週期16/32-bit [[乘積累加|MAC]]，單一週期雙16-bit MAC，8/16-bit [[单指令流多数据流|SIMD]]運算
+* 1至240個中斷，以及不可遮罩中斷
+* 12個週期的中斷延遲
+* 整合休眠模式
+
+'''矽智財選項'''：
+* 可選的浮點運算器（FPU）：單精度或雙精度，都和IEEE-754-2008相容，稱為FPv5延伸
+* 可選的[[CPU缓存|CPU缓存]]：0至64 KB 的指令緩存，0至64 KB 的資料緩存，都有可選的[[纠错内存|纠错内存]]
+* 可選的緊密耦合記憶體（TCM）：0至16 MB 指令TCM，0至16 MB 資料TCM，都可以選擇要不要ECC.
+* 可選的記憶體保護單元（MPU）：8區或16區。
+* 可選的嵌入式追蹤巨集電路元（ETM）：可以只針對指令，或針對指令及資料。
+* 可選的休眠模式保留模式（配合Arm功率管理元件）。
+==Cortex-M23==
+{{Infobox CPU
+|name = Cortex-M23
+|arch = [[ARM_architecture#Thumb|Thumb-1 (most)]],<br/>[[ARM_architecture#Thumb-2|Thumb-2 (some)]],<br/>除法、{{le|TrustZone|TrustZone}}
+|microarch = ARMv8-M Baseline
+}}
+
+Cortex-M23內核在2016年10月上市<ref name="Cortex-M23-M33-PR">{{Cite web |url=https://www.arm.com/files/pdf/cortex_m23_and_cortex_m33.pdf |title=New ARM Cortex-M processors offer the next industry standard for secure IoT; Arm Holdings; October 25, 2016. |accessdate=2020-12-09 |archive-date=2017-12-01 |archive-url=https://web.archive.org/web/20171201030711/https://www.arm.com/files/pdf/cortex_m23_and_cortex_m33.pdf |dead-url=no }}</ref>，以2015年11月發佈的ARMv8-M架構為基礎<ref name="ARMv8-M-PR">{{Cite web |url=https://www.arm.com/about/newsroom/armv8-m-architecture-simplifies-security-for-smart-embedded-devices.php |title=ARMv8-M Architecture Simplifies Security for Smart Embedded Devices; Arm Holdings; November 10, 2015. |accessdate=2020-12-09 |archive-date=2019-01-01 |archive-url=https://web.archive.org/web/20190101024123/https://www.arm.com/about/newsroom/armv8-m-architecture-simplifies-security-for-smart-embedded-devices.php |dead-url=no }}</ref>。在概念上Cortex-M23類似Cortex-M0+，加上整數除法指令、TrustZone安全特性、也是二層管線。
+
+Cortex-M23核心的主要特點有<ref name="M23-TRM">{{Cite web |url=http://infocenter.arm.com/help/topic/com.arm.doc.ddi0550c/cortex_m23_r1p0_technical_reference_manual_DDI0550C_en.pdf |title=Cortex-M23 r1p0 Technical Reference Manual; Arm Holdings. |accessdate=2020-12-09 |archive-date=2020-06-20 |archive-url=https://web.archive.org/web/20200620122304/http://infocenter.arm.com/help/topic/com.arm.doc.ddi0550c/cortex_m23_r1p0_technical_reference_manual_DDI0550C_en.pdf |dead-url=no }}</ref><ref name="Cortex-M23-M33-PR"/>：
+* ARMv8-M基線架構<ref name="ARMv8-M-Manual"/>
+* 二層管線（類似Cortex-M0+）
+* TrustZone安全指令（只有在M23/M33/M35P）
+* 32-bit硬體整數除法（17 或 34 週期）（M0/M0+/M1沒有）
+* 堆疊邊界限制（只有在SAU選項開啟時才有）（M23/M33/M35P才有）
+
+'''矽智財選項'''：
+* 硬體整數乘法速度：1週期或32週期。
+* 硬體整數除法速度：最長17週期或34週期，依除數而定，指令有可能會提早完成。
+* 可選的記憶體保護單元（MPU）：0, 4, 8, 12, 16個區塊
+* 可選的安全屬性單元（SAU）：0, 4, 8個區塊
+* 單一週期的I/O埠（在M0+/M23上有此機能）
+* 微追蹤緩衝區（Micro Trace Buffer、MTB）（在M0+/M23/M33/M35P上有此機能）
+==Cortex-M33==
+{{Infobox CPU
+|name = Cortex-M33
+|arch = [[ARM_architecture#Thumb|Thumb-1]], [[ARM_architecture#Thumb-2|Thumb-2]],<br/>[[飽和運算|飽和運算]]、數位信號處理<br/>除法、浮點運算器（SP）<br/>{{le|TrustZone|TrustZone}}、協處理器
+|microarch = ARMv8-M Mainline
+}}
+
+Cortex-M33內核是在2016年10月發佈<ref name="Cortex-M23-M33-PR"/>，是以2015年11月發佈的ARMv8-M架構為基礎<ref name="ARMv8-M-PR"/>。概念上類似Cortex-M4和Cortex-M23的交集，也有三階的指令管道。
+
+Cortex-M33核心的主要特點有<ref name="M33-TRM">{{Cite web |url=http://infocenter.arm.com/help/topic/com.arm.doc.100230_0003_00_en/cortex_m33_trm_100230_0003_00_en.pdf |title=Cortex-M33 r0p3 Technical Reference Manual; Arm Holdings. |accessdate=2020-12-09 |archive-date=2020-06-19 |archive-url=https://web.archive.org/web/20200619191921/http://infocenter.arm.com/help/topic/com.arm.doc.100230_0003_00_en/cortex_m33_trm_100230_0003_00_en.pdf |dead-url=no }}</ref><ref name="Cortex-M23-M33-PR"/>
+* ARMv8-M架構<ref name="ARMv8-M-Manual"/>：
+* 三階管道
+* {{le|TrustZone|TrustZone}}安全指令（只有在M23/M33/M35P才有）
+* 32-bit硬體整數除法（最長11個週期）（M0/M0+/M1無此選項）
+* 堆疊邊界限制（只有在SAU選項開啟時才有）（M23/M33/M35P才有）
+
+'''矽智財選項'''：
+* 可選的浮點運算器（FPU）：只有單精度{{le|IEEE-754|IEEE-754}}的，稱為FPv5延伸
+* 可選的記憶體保護單元（MPU）：0, 4, 8, 12, 16個區塊
+* 可選的安全屬性單元（SAU）：0, 4, 8個區塊
+* 微追蹤緩衝區（Micro Trace Buffer、MTB）（在M0+/M23/M33/M35P上有此機能）
+==Cortex-M35P==
+{{Infobox CPU
+|name = Cortex-M35P
+|arch = [[ARM_architecture#Thumb|Thumb-1]], [[ARM_architecture#Thumb-2|Thumb-2]],<br/>[[飽和運算|飽和運算]]、數位信號處理<br/>除法、浮點運算器（SP）<br/>{{le|TrustZone|TrustZone}}、協處理器
+|microarch = ARMv8-M Mainline
+}}
+Cortex-M35P內核是在2018年5月發佈的，在概念上是Cortex-M33內核加上新的指令集，以及來自ARM SecurCore系列，新的防篡改硬體、可選的同位元以及ECC功能<ref>{{cite web |url=https://developer.arm.com/products/processors/cortex-m/cortex-m35p |title=Cortex-M35P Processor |publisher=[[Arm_Holdings|Arm Holdings]] |accessdate=2018-06-04 |archive-date=2018-06-22 |archive-url=https://web.archive.org/web/20180622192711/https://developer.arm.com/products/processors/cortex-m/cortex-m35p |dead-url=no }}</ref>。
+
+目前此晶片的公開資料不多，只有技術參考手冊。到2020年2月為止，尚未看到各廠商推出此系列的微處理器。
+
+==Cortex-M55==
+{{Infobox CPU
+|name = Cortex-M55
+|arch = [[ARM_architecture#Thumb|Thumb-1]], [[ARM_architecture#Thumb-2|Thumb-2]],<br/>[[Saturation_arithmetic|Saturated]], 數位信號處理,<br/>除法, 浮點運算器（VFPv5）,<br/>TrustZone, 協處理器, MVE
+|microarch = ARMv8.1-M Mainline Helium
+}}
+
+Cortex-M55是在2020年2月發佈，是以2019年2月發佈的Armv8.1-M架構為基礎，有四階指令管道。
+
+Cortex-M55核心的主要特點有：
+* ARMv8.1-M Mainline/Helium內核<ref name="ARMv8-M-Manual"/>
+* 四階管道
+* 堆疊邊界限制（只有在SAU選項開啟時才有）
+
+'''矽智財選項'''：
+* Helium (M-Profile Vector Extension, MVE)
+* 單精度和雙精度的浮點運算器
+* 可選的DSP延伸
+* 可選的TrustZone安全延伸
+* 支援RAS（Safety and reliability）功能
+* 支援協處理器
+* 區分安全區和非安全區的MPU，可以分為0, 4, 8, 12或16個區
+* 安全屬性單元可以分為0, 4或8個區
+* 指令緩存，大小可以設定為4KB, 8KB, 16KB, 32KB, 64KB
+* 資料緩存，大小可以設定為4KB, 8KB, 16KB, 32KB, 64KB
+* 緩存及TCM支援ECC
+* 1–480個中斷
+* 3–8個例外優先位元
+* 內部和外部的唤醒中断控制器（WIC）選項，可選的CTI, ITM及DWT
+* ARM客製指令（未來發佈的版本中會支援）
+
+==文件==
+ARM晶片的文件很多。 過去八位元的微處理器只有一份文件，不過隨著微處理器的進步，許多功能都需要支援。ARM晶片的文件包一般會包括IC製造商以及CPU內核供應商（Arm）的文件。
+
+典型的文件結構如下：
+
+;文件樹（從上到下）
+# IC製造商網頁
+# IC製造商宣傳投影片
+# IC製造商實際晶片的數據表
+# IC製造商該晶片家族的參考手冊，其中有常用週邊以及特點
+# ARM內核網站
+# ARM內核通用使用手冊
+# ARM內核技術參考手冊
+# ARM架構參考手冊
+
+IC製造商可能會有其他資料，例如開發板使用手冊、應用指南、快速手冊、軟體函式庫文件、已知問題等。
+==參考資料==
+{{reflist}}
+
+==延伸閱讀==
+* ''Embedded Systems with ARM Cortex-M Microcontrollers in Assembly Language and C''; 3rd Ed; Yifeng Zhu; 738 pages; 2017; {{ISBN|978-0982692660}}.
+* ''Designer's Guide to the Cortex-M Processor Family''; 2nd Ed; Trevor Martin; 490 pages; 2016; {{ISBN|978-0081006290}}.
+* ''ARM Assembly for Embedded Applications''; 3rd Ed; Daniel Lewis; 318 pages; 2017; {{ISBN|978-1543908046}}.
+* ''Definitive Guide to the ARM Cortex-M0 and Cortex-M0+ Processors''; 2nd Ed; Joseph Yiu; 784 pages; 2015; {{ISBN|978-0128032770}}.
+* ''Definitive Guide to the ARM Cortex-M3 and Cortex-M4 Processors''; 3rd Ed; Joseph Yiu; 600 pages; 2013; {{ISBN|978-0124080829}}.
+* ''Digital Signal Processing and Applications Using the ARM Cortex-M4''; 1st Ed; Donald Reay; 250 pages; 2014; {{ISBN|978-1118859049}}.
+* ''Embedded Systems: Introduction to ARM Cortex-M Microcontrollers''; 5th Ed; Jonathan Valvano; 506 pages; 2012; {{ISBN|978-1477508992}}.
+* ''Assembly Language Programming: ARM Cortex-M3''; 1st Ed; Vincent Mahout; 256 pages; 2012; {{ISBN|978-1848213296}}.
+
+==外部連結==
+{{Commons category|ARM Cortex-M}}
+
+{{Clear}}
+<!--{{Embedded ARM-based chips|state=expanded}}-->
+{{ARM晶片}}
+{{Microcontrollers}}
+{{可编程逻辑设备 }}
+{{Clear}}
+
+[[Category:ARM架構|Cortex-M]]
+[[Category:ARM核心|Category:ARM核心]]

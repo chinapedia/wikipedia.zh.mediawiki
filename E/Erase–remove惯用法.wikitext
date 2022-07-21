@@ -1,0 +1,90 @@
+''Erase–remove惯用法'''是[[C++|C++]]程序设计语言常用的技术，用于在[[C++标准模板库|C++标准模板库]]容器中删除元素。<ref name="EffSTL">{{ cite book 
+| first = Scott
+| last = Meyers
+| authorlink = Scott Meyers
+| year = 2001
+| title = Effective STL: 50 Specific Ways to Improve Your Use of the Standard Template Library 
+| publisher = Addison-Wesley 
+}}
+</ref><ref name="CS">{{ cite book 
+| first1 = Herb
+| last1 = Sutter
+| first2 = Andrei
+| last2 = Alexandrescu
+| authorlink1 = Herb Sutter
+| authorlink2 = Andrei Alexandrescu
+| year = 2004
+| title = C++ Coding Standards: 101 Rules, Guidelines, and Best Practices 
+| publisher = Addison-Wesley 
+}}
+</ref><ref name="DDJ">C/C++ Users Journal, October 2001. [http://www.ddj.com/cpp/184401446 ''STL Algorithms vs. Hand-Written Loops''] {{Wayback|url=http://www.ddj.com/cpp/184401446 |date=20090725054114 }}</ref>
+
+== 动机 ==
+一个常见的编程任务是从[[集合_(计算机科学)|集合]]（collection）中删除等于某个值或满足某个标准的所有元素。C++语言可以通过手写循环完成这个任务。但更好的办法是使用C++标准模板库中的算法来实现。<ref name="EffSTL"/><ref name="CS"/><ref name="DDJ"/>
+
+<code>erase</code>用于从一个集合中删除一个元素，但是对于基于数组的容器，如<code>vector</code>，存储在被删除元素后的所有元素都需要向前移動以避免集合中有一个空位（gap）。在同一容器中多次调用产生了大量移动元素的开销。
+
+<code>algorithm</code>库提供了<code>remove</code>与<code>remove_if</code>算法。由于这些算法运行在两个前向迭代器确定的元素范围上，它们没有底层容器或集合的具体知识。<ref name="EffSTL" /><ref name="Josuttis">{{cite book 
+| first = Nicolai
+| last = Josuttis
+| authorlink = Nicolai Josuttis
+| year = 1999
+| title = C++ Standard Library – A Tutorial and Reference
+| publisher = Addison-Wesley 
+}}</ref>这些算法并不从容器删除元素，而是把不“符合”删除标准的元素搬移到容器的前部，并保持这些元素的相对次序。该算法一次通过数据范围即可实现该目标。
+
+由于没有元素被删除，因此容器尺寸保持不变。容器尾部的元素都是需要被删除的，但其状态未指定（unspecified state）。<code>remove</code>返回一个迭代器指向尾部这些需要用<code>erase</code>删除的元素的第一个。
+
+同样的事情（删除多个元素），用容器的方法<code>erase</code>会导致多次遍历这个容器，每一次遍历时，在被删除元素之后的所有元素都必须向前移动，其时间消耗远大于单次通过。
+
+== 局限 ==
+erase–remove惯用法不能用于返回<code>const_iterator</code> （例如：[[关联性容器|set]]）<ref name="Erase–remove idiom with std::set">{{cite web|title=Erase–remove idiom with std::set|url=https://stackoverflow.com/q/3792600/183120|accessdate=14 April 2013}}</ref>的容器。
+
+<code>std::remove</code>与<code>std::remove_if</code>不能保持被删除的元素（不像<code>std::partition</code>, <code>std::stable_partition</code>）。因此，erase–remove只能用于容器的元素是全值语义不会招致资源泄露。<ref name="effective_stl">{{Cite book |title=Effective STL : 50 specific ways to improve your use of the standard template library |url=https://archive.org/details/effectivestlspec00meye |url-access=limited |last=Meyers |first=Scott |date=2001 |publisher=Addison-Wesley |isbn=0201749629 |location=Boston |pages=[https://archive.org/details/effectivestlspec00meye/page/n146 143]–145 |oclc=46713127}}</ref>
+
+== 例子==
+<!-- "iff" is not a typo, it's an abbreviation of "if and only if" -->
+<!-- "iff" is extremely uncommon, removing the abbreviation for clarity -->
+<syntaxhighlight lang="cpp">
+// Use g++ -std=c++11 or clang++ -std=c++11 to compile.
+
+#include <algorithm>  // remove and remove_if
+#include <iostream>
+#include <vector>  // the general-purpose vector container
+
+bool IsOdd(int i) { return i & 1; }
+
+void Print(const std::vector<int>& vec) {
+  for (const auto& i : vec) {
+    std::cout << i << ' ';
+  }
+  std::cout << std::endl;
+}
+
+int main() {
+  // Initializes a vector that holds numbers from 0-9.
+  std::vector<int> v = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+  Print(v);
+
+  // Removes all elements with the value 5.
+  v.erase(std::remove(v.begin(), v.end(), 5), v.end());
+  Print(v);
+
+  // Removes all odd numbers.
+  v.erase(std::remove_if(v.begin(), v.end(), IsOdd), v.end());
+  Print(v);
+}
+
+/*
+Output:
+0 1 2 3 4 5 6 7 8 9
+0 1 2 3 4 6 7 8 9
+0 2 4 6 8
+*/
+
+</syntaxhighlight>
+
+== 参考文献==
+{{reflist}}
+
+[[Category:C++|Category:C++]]

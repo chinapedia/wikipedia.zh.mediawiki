@@ -1,0 +1,456 @@
+local p = {}
+
+local getArgs = require('Module:Arguments').getArgs
+
+local function makeInvokeFunction(funcName)
+    return function(frame)
+        local args = getArgs(frame, {parentOnly = true})
+        return p[funcName](args, frame)
+    end
+end
+
+local data
+local adj_data
+
+-- 初始化
+local function getData(system)
+    local title = mw.title.new('Module:线路时刻表/' .. system)
+    if not (title and title.exists) then return nil end
+    return require('Module:线路时刻表/' .. system)
+end
+
+local function getAdjData(system)
+    local title = mw.title.new('Module:Adjacent stations/' .. system)
+    if not (title and title.exists) then return nil end
+    return require('Module:Adjacent stations/' .. system)
+end
+
+local function initData(system)
+    data = getData(system)
+    if not data then error('不存在模块:线路时刻表/' .. system) end
+    adj_data = getAdjData(system)
+    if not adj_data then
+        error('不存在模块:Adjacent stations/' .. system)
+    end
+end
+
+-- Adjacent stations 数据接口
+local function getTitle(line, _type)
+    if _type and _type ~= '' then
+        return adj_data.lines[line].types[_type].title or
+                   adj_data.lines[line].title
+    else
+        return adj_data.lines[line].title
+    end
+end
+
+local function getColor(line, _type)
+    if _type and _type ~= '' then
+        return adj_data.lines[line].types[_type].color or
+                   adj_data.lines[line].color
+    else
+        return adj_data.lines[line].color
+    end
+end
+
+local function getTermini(line, _type)
+    if _type and _type ~= '' then
+        return {
+            adj_data.lines[line].types[_type]['right terminus'] or
+                adj_data.lines[line]['right terminus'],
+            adj_data.lines[line].types[_type]['left terminus'] or
+                adj_data.lines[line]['left terminus']
+        }
+    else
+        return {
+            adj_data.lines[line]['right terminus'],
+            adj_data.lines[line]['left terminus']
+        }
+    end
+end
+
+-- Adjacent stations 函数接口
+local function getStation(frame, name, system, line, _type)
+    return require('Module:Adjacent stations')._station(
+               { system, name, line, _type },
+               frame)
+end
+
+-- 文本处理函数
+local function makeTerminus(frame, name, system, line, _type)
+    local circular
+    if _type and _type ~= '' then
+        circular = adj_data.lines[line].types[_type].circular
+        if circular == nil then
+            circular = adj_data.lines[line].circular
+        end
+    else
+        circular = adj_data.lines[line].circular
+    end
+    if circular then
+        return name
+    else
+        return '往' .. getStation(frame, name, system, line, _type)
+    end
+end
+
+local function makeChildTerminus(frame, name, system, line, _type)
+    return '终至' .. getStation(frame, name, system, line, _type)
+end
+
+-- 检测计数函数
+local function checkOperated(t)
+    if type(t) == 'table' then
+        return checkOperated(t[1])
+    else
+        return t[1] ~= '-'
+    end
+end
+
+-- 平面化数组
+local function flattenArray(input, flattened)
+    flattened = flattened or {}
+    for i, element in ipairs(input) do
+        if type(element) == "table" then
+            flattenArray(element, flattened)
+        else
+            table.insert(flattened, element)
+        end
+    end
+    return flattened
+end
+
+-- 调用接口
+function p._as_station(args, frame)
+    local system = args[1]
+    local station = args[2]
+
+    initData(system)
+
+    local body = {}
+    for r, route_data in ipairs(data.timespans) do
+        local _data = route_data[station]
+        if _data and checkOperated(_data) then
+            local row = {}
+            local color = getColor(route_data.line, route_data.type)
+            local termini = route_data.override_termini or
+                                getTermini(route_data.line, route_data.type)
+            if route_data.child_termini then
+                if route_data.child_termini.scope == 'last' then
+                    local n_row = 0
+                    local sum_child = 0
+                    for t, terminus in ipairs(termini) do
+                        row[t] = {}
+                        local n_child = 0
+                        local valid = {}
+                        for c, child_terminus in ipairs(route_data.child_termini[t]) do
+                            valid[c] = false -- 检测有效性
+                            for v, variant in ipairs(data.variants) do
+                                if _data[v][2][t][c] ~= '' then
+                                    valid[c] = true
+                                end
+                            end
+                            if valid[c] then
+                                n_child = n_child + 1
+                            end
+                        end
+                        if t ~= 1 then
+                            table.insert(row[t], '<tr>')
+                        end
+                        table.insert(row[t], '<th class="major" rowspan=' .. n_child .. '>' ..
+                                         makeTerminus(frame, terminus, system,
+                                                      route_data.line, route_data.type) ..
+                                         '</th>')
+                        local first_child = true
+                        for c, child_terminus in ipairs(route_data.child_termini[t]) do
+                            if valid[c] then
+                                if first_child then
+                                    first_child = false
+                                    if terminus == child_terminus then
+                                        table.insert(row[t], '<th class="minor">全程</th>')
+                                    else
+                                        table.insert(row[t], '<th class="minor">' ..
+                                                         makeChildTerminus(frame, child_terminus, system,
+                                                                           route_data.line, route_data.type) ..
+                                                         '</th>')
+                                    end
+                                    for v, variant in ipairs(data.variants) do
+                                        table.insert(row[t],
+                                                     '<td rowspan=' .. n_child .. '>' .. _data[v][1][t] ..
+                                                         '</td><td>' .. _data[v][2][t][c] .. '</td>')
+                                    end
+                                else
+                                    if terminus == child_terminus then
+                                        table.insert(row[t], '<tr><th class="minor">全程</th>')
+                                    else
+                                        table.insert(row[t], '<tr><th class="minor">' ..
+                                                         makeChildTerminus(frame, child_terminus, system,
+                                                                           route_data.line, route_data.type) ..
+                                                         '</th>')
+                                    end
+                                    for v, variant in ipairs(data.variants) do
+                                        table.insert(row[t], '<td>' .. _data[v][2][t][c] .. '</td>')
+                                    end
+                                end
+                                table.insert(row[t], '</tr>')
+                            end
+                        end
+                        row[t] = table.concat(row[t])
+                        sum_child = sum_child + n_child
+                    end
+                    table.insert(row, 1,
+                                 '<tr><td class="bar" rowspan=' .. sum_child ..
+                                     ' style="background-color: #' .. color ..
+                                     '"></td>')
+                else
+                    error('不支持的子终点站作用域') -- 目前仅实现末班车的子终点站
+                end
+            else
+                table.insert(row,
+                             '<tr><td class="bar" rowspan=' .. #termini ..
+                                 ' style="background-color: #' .. color ..
+                                 '"></td>')
+                local first = true
+                for t, terminus in ipairs(termini) do
+                    local valid = false
+                    for v, variant in ipairs(data.variants) do
+                        if #_data[v][1][t] > 0 or #_data[v][2][t] > 0 then
+                            valid = true
+                        end
+                    end
+                    if valid or terminus == station then
+                        if first then
+                            first = false
+                        else
+                            table.insert(row, '<tr>')
+                        end
+                        table.insert(row, '<th colspan=2>' ..
+                                         makeTerminus(frame, terminus, system,
+                                                      route_data.line, route_data.type) ..
+                                         '</th>')
+                        if terminus == station then
+                            table.insert(row,
+                                         '<td class="note" colspan=6>终点站</td>')
+                        else
+                            for v, variant in ipairs(data.variants) do
+                                table.insert(row, '<td>' .. _data[v][1][t] .. '</td><td>' ..
+                                                      _data[v][2][t] .. '</td>')
+                            end
+                        end
+                        table.insert(row, '</tr>')
+                    end
+                end
+            end
+            table.insert(body, table.concat(row))
+        end
+    end
+
+    if body then
+        if #data.variants > 1 then
+            local header = { {}, {} }
+            for v, variant in ipairs(data.variants) do
+                table.insert(header[1], '<th colspan=2>' .. variant .. '</th>')
+                table.insert(header[2], '<th>首班</th><th>末班</th>')
+            end
+            header[1] = table.concat(header[1])
+            header[2] = table.concat(header[2])
+            return
+                '<table class="wikitable station-infobox-timetable"><tr><th colspan=3 rowspan=2>' ..
+                    frame:preprocess(data.ref) .. '</th>' .. table.concat(header, '</tr><tr>') ..
+                    '</tr>' .. table.concat(body) .. '</table>'
+        else
+            return
+                '<table class="wikitable station-infobox-timetable"><tr><th colspan=3>' ..
+                    frame:preprocess(data.ref) .. '</th><th>首班</th><th>末班</th></tr>' ..
+                    table.concat(body) .. '</table>'
+        end
+    else
+        return nil
+    end
+end
+
+function p._as_station_ext(args, frame)
+    local system = args[1]
+    local station = args[2]
+
+    initData(system)
+
+    local body = {}
+    for r, route_data in ipairs(data.points) do
+        local _data = route_data[station]
+        if _data then
+            if type(route_data.line) == 'table' then
+                local num_lines = #(route_data.line)
+                for l, line in ipairs(route_data.line) do
+                    table.insert(body,
+                                 '<tr><td colspan=' .. (#data.variants + 1) ..
+                                     ' class="bar composed" style="background-color: #' ..
+                                     getColor(route_data.line[l], route_data.type) ..
+                                     '"></td></tr>')
+                end
+                table.insert(body,
+                             '<tr><th class="ref">' ..
+                                 frame:preprocess(
+                                     getTitle(route_data.line[1],
+                                              route_data.type)) .. '</th>')
+            else
+                table.insert(body,
+                            '<tr><td colspan=' .. (#data.variants + 1) ..
+                                ' class="bar" style="background-color: #' ..
+                                getColor(route_data.line, route_data.type) ..
+                                '"></td></tr>')
+                table.insert(body,
+                            '<tr><th class="ref">' ..
+                                frame:preprocess(
+                                    getTitle(route_data.line, route_data.type)) ..
+                                '</th>')
+            end
+            for v, variant in ipairs(data.variants) do
+                table.insert(body, '<th>' .. variant .. '</th>')
+            end
+            table.insert(body, '</tr>')
+            local termini = route_data.override_termini or
+                                getTermini(route_data.line[1] or route_data.line, route_data.type)
+            for t, terminus in ipairs(termini) do
+                table.insert(body, '<tr><th>' ..
+                                makeTerminus(frame, terminus, system,
+                                    route_data.line[1] or route_data.line, route_data.type) ..
+                                '</th>')
+                for v, variant in ipairs(data.variants) do
+                    table.insert(body, '<td>' ..
+                                    frame:expandTemplate{
+                            title = 'hlist',
+                            args = _data[t][v]
+                        } .. '</td>')
+                end
+                table.insert(body, '</tr>')
+            end
+        end
+    end
+
+    if body then
+        return '<table class="wikitable station-route-timetable">' ..
+                   table.concat(body) .. '</table>'
+    else
+        return nil
+    end
+end
+
+function p._as_line(args, frame)
+    local system = args[1]
+    local line = args[2]
+    local _type = args[3]
+
+    initData(system)
+
+    for r, route_data in ipairs(data.timespans) do
+        if line == route_data.line and _type == route_data.type then
+            local body = {}
+
+            local header
+            local bar
+
+            local color = getColor(route_data.line, route_data.type)
+            local termini = route_data.override_termini or
+                                getTermini(route_data.line, route_data.type)
+                                
+            local num_cols
+            local num_ref_rows = 2
+            if #data.variants > 1 then num_ref_rows = num_ref_rows + 1 end
+            if route_data.child_termini then num_ref_rows = num_ref_rows + 1 end
+            table.insert(body, '<tr><th rowspan=' .. num_ref_rows .. ' class="ref">' ..
+                                   frame:preprocess(data.ref) .. '</th>')
+
+            if route_data.child_termini then
+                if route_data.child_termini.scope == 'last' then
+                    local num_f_cols = #termini
+                    local num_l_cols = #flattenArray(route_data.child_termini)
+                    num_cols = #data.variants * (num_f_cols + num_l_cols) 
+                    bar = '<tr><td class="bar" colspan=' .. (num_cols + 1) ..
+                              ' style="background-color: #' .. color .. '"></td></tr>'
+
+                    local hr = {{}, {}}
+                    local hr_c = {}
+                    for t, terminus in ipairs(termini) do
+                        table.insert(hr[1], '<th class="major" rowspan=2>' ..
+                                                makeTerminus(frame, terminus, system, line, _type) ..
+                                                '</th>')
+                        table.insert(hr[2], '<th colspan=' .. #route_data.child_termini[t] .. '>' ..
+                                                makeTerminus(frame, terminus, system, line, _type) ..
+                                                '</th>')
+                        for i, child_terminus in ipairs(route_data.child_termini[t]) do
+                            if terminus == child_terminus then
+                                table.insert(hr_c, '<th class="minor">全程</th>')
+                            else
+                                table.insert(hr_c, '<th class="minor">' ..
+                                                       makeChildTerminus(frame, child_terminus, system, line, _type) ..
+                                                       '</th>')
+                            end
+                        end
+                    end
+                    hr = table.concat(hr[1]) .. table.concat(hr[2])
+                    hr_c = table.concat(hr_c)
+
+                    header = { {}, {}, {}, {} }
+                    for v, variant in ipairs(data.variants) do
+                        table.insert(header[1], '<th colspan=' .. (num_f_cols + num_l_cols) .. '>' .. variant .. '</th>')
+                        table.insert(header[2], '<th colspan=' .. num_f_cols .. '>首班</th><th colspan=' .. 
+                                                    num_l_cols .. '>末班</th>')
+                        table.insert(header[3], hr)
+                        table.insert(header[4], hr_c)
+                    end
+                    header[1] = table.concat(header[1])
+                    header[2] = table.concat(header[2])
+                    header[3] = table.concat(header[3])
+                    header[4] = table.concat(header[4])
+                else
+                    error('不支持的子终点站作用域')
+                end
+            else
+                num_cols = 2 * #data.variants * #termini
+                bar = '<tr><td class="bar" colspan=' .. (num_cols + 1) ..
+                          ' style="background-color: #' .. color .. '"></td></tr>'
+                
+                local hr = { }
+                for t, terminus in ipairs(termini) do
+                    table.insert(hr, '<th class="major">' ..
+                                         makeTerminus(frame, terminus, system, line, _type) ..
+                                         '</th>')
+                end
+                hr = table.concat(hr)
+ 
+                header = { {}, {}, {} }
+                for v, variant in ipairs(data.variants) do
+                    table.insert(header[1], '<th colspan=' .. (2 * #termini) .. '>' .. variant .. '</th>')
+                    table.insert(header[2], '<th colspan=' .. #termini .. '>首班</th><th colspan=' .. #termini .. '>末班</th>')
+                    table.insert(header[3], hr .. hr)
+                end
+                header[1] = table.concat(header[1])
+                header[2] = table.concat(header[2])
+                header[3] = table.concat(header[3])
+            end
+
+            if #data.variants == 1 then table.remove(header, 1) end
+            table.insert(body, table.concat(header, '</tr><tr>') .. '</tr>' .. bar)
+
+            for s, station in ipairs(route_data.stations) do
+                local _data = flattenArray(route_data[station])
+                table.insert(body, '<tr><th>' .. station .. '</th>')
+                if _data[1] == '-' then
+                    table.insert(body, '<td class="closed" colspan=' .. num_cols .. '>未运营</td>')
+                else
+                    table.insert(body, '<td>' .. table.concat(_data, '</td><td>'))
+                end    
+                table.insert(body, '</td></tr>')            
+            end
+
+            return '<table class="wikitable line-timetable">' .. bar .. table.concat(body) .. bar .. '</table>'
+        end    
+    end
+end
+
+p.as_station = makeInvokeFunction('_as_station')
+p.as_station_ext = makeInvokeFunction('_as_station_ext')
+p.as_line = makeInvokeFunction('_as_line')
+
+return p

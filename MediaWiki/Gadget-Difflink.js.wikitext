@@ -1,0 +1,78 @@
+/*!
+ * @author 安忆 [[zh:User:AnYiLin|zh:User:AnYiLin]]
+ * @file Difflink.js
+ *
+ * Copyright (c) 2020-present, 安忆.
+ *
+ * This source code is licensed under the GPL v3 license.
+ */
+/*如想自定义复制结果中的文本可通过向自己的common.js中加入以下内容：
+window.difflink = ['版本差异', '固定版本'];
+  如想使用默认值1，但自定值2，请将值1留空，如下例：
+window.difflink = ['', '固定版本'];
+*/
+$(function() {
+	var $nav = $('#contentSub').find('#mw-revision-nav').length === 1 || $('main#content>.pre-content #mw-revision-nav').length === 1;
+	if (!($nav || $('table').hasClass('diff'))) return;
+	mw.loader.using(['ext.gadget.site-lib', 'mediawiki.api', 'mediawiki.util', 'mediawiki.widgets', 'oojs-ui-windows']).then(function() {
+		var defaultTex = [wgUVS('版本差异', '版本差異'), '固定版本'];
+		if (typeof(window.difflink) !== 'undefined' && Object.prototype.toString.call(window.difflink) === '[object Array]') {
+			if (window.difflink[0] !== '' && Object.prototype.toString.call(window.difflink[0]) === '[object String]') defaultTex[0] = difflink[0];
+			if (window.difflink[1] !== '' && Object.prototype.toString.call(window.difflink[1]) === '[object String]') defaultTex[1] = difflink[1]
+		}
+		var isMinerva = mw.config.get('skin') === 'minerva',
+			pos = 'p-cactions';
+		if ($('body').hasClass('mw-special-MobileDiff')) pos = 'mw-mf-diffarea'
+		else if (isMinerva) pos = 'p-tb';
+		var ins = function(tex, dec, link, id, perma) {
+			var linkDom = document.getElementById('t-difflink');
+			if (linkDom === null) {
+				linkDom = mw.util.addPortletLink(pos, '#', tex, 't-difflink', dec);
+				if (linkDom === null) return;
+				if (isMinerva) {
+					var style = document.createElement('style');
+					style.id = 'css-difflink';
+					style.appendChild(document.createTextNode('.mw-ui-icon-portletlink-t-difflink:before{background-image:url(data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cg%20fill%3D%22%2354595d%22%3E%3Cpath%20d%3D%22M4.83%2015h2.91a4.88%204.88%200%2001-1.55-2H5a3%203%200%20110-6h3a3%203%200%20012.82%204h2.1a4.82%204.82%200%2000.08-.83v-.34A4.83%204.83%200%20008.17%205H4.83A4.83%204.83%200%20000%209.83v.34A4.83%204.83%200%20004.83%2015z%22%2F%3E%3Cpath%20d%3D%22M15.17%205h-2.91a4.88%204.88%200%20011.55%202H15a3%203%200%20110%206h-3a3%203%200%2001-2.82-4h-2.1a4.82%204.82%200%2000-.08.83v.34A4.83%204.83%200%200011.83%2015h3.34A4.83%204.83%200%200020%2010.17v-.34A4.83%204.83%200%200015.17%205z%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E)}'));
+					document.head.appendChild(style)
+				}
+				if (pos === 'mw-mf-diffarea') $('#css-difflink').html($('#css-difflink').html() + '#t-difflink{float:right}#t-difflink>a>span:first-child{vertical-align:text-bottom}')
+			}
+			(pos !== 'mw-mf-diffarea' && isMinerva ? linkDom : linkDom.firstElementChild).onclick = function(e) {
+				e.preventDefault();
+				var $dom = $('<div>'),
+					hash = perma ? decodeURIComponent(window.location.hash) : '';
+				new Array(link, '[['_+_link_+_hash_+_'|' + link + hash + ']]', '[['_+_link_+_hash_+_'|' + defaultTex[id] + ']]').forEach(function(v) {
+					$dom.append(new mw.widgets.CopyTextLayout({align: 'top', copyText: v}).$element)
+				});
+				/(?:Android|iPhone|Mobile)/i.test(navigator.userAgent) ? OO.ui.alert($dom) : OO.ui.alert($dom, {size: 'medium'})
+			}
+		};
+		var init = function(diffId, oldId, revisionId) {
+			if (diffId) {
+				var buildLink = function(oldId) {
+					var link = 'Special:Diff/';
+					oldId && (link += oldId + '/');
+					link += diffId;
+					ins(wgUVS('当前差异链接', '當前差異連結'), wgUVS('复制链接到当前差异版本的维基语法', '複製連結到當前差異版本的維基語法'), link, 0, 0)
+				};
+				buildLink(oldId);
+				if (oldId) {
+					new mw.Api().get({
+						action: 'compare',
+						fromrev: diffId,
+						prop: 'ids',
+						torelative: 'prev'
+					}).then(function(data) {
+						diffId === mw.config.get('wgDiffNewId') && data.compare && data.compare.fromrevid === mw.config.get('wgDiffOldId') && buildLink(false)
+					})
+				}
+			} else if ($nav && revisionId) {
+				ins(wgUVS('当前修订链接', '當前修訂連結'), wgUVS('复制链接到当前修订版本的维基语法', '複製連結到當前修訂版本的維基語法'), 'Special:PermaLink/' + revisionId, 1, 1)
+			}
+		};
+		mw.hook('wikipage.content').add(function(e) {
+			if (e.attr('id') !== 'mw-content-text') return;
+			init(mw.config.get('wgDiffNewId'), mw.config.get('wgDiffOldId'), mw.config.get('wgRevisionId'))
+		})
+	})
+});

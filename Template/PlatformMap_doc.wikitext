@@ -1,0 +1,104 @@
+{{NoteTA|G1=MediaWiki}}{{Documentation subpage}}<!-- 在本行下編輯模板說明 -->
+{{Lua|PlatformMap}}
+
+此模板主要面向城市轨道交通车站，用以生成站台布线示意图，输出格式为'''{{tl|Routemap}}'''源码。
+
+== 站台 ==
+
+站台预设根据配线的数量和间距分为若干'''父集'''（{{lang|en|set}}），下设若干不同的'''子集'''（{{lang|en|subset}}）。下文将要讲到的道岔，是随不同的父集而变的，也即同父集下的子集可用的道岔相同，而各父集之间不同。父集和子集分别由模板的第一顺序参数和模板第二顺序参数确定，即：
+
+ <nowiki>{{</nowiki>PlatformMap|''set''|''subset''}}
+
+{| class="wikitable" style="text-align: center"
+! 父集
+! 子集
+|-
+| rowspan=2 | {{anchor|lr\lr}}<code>[[Module:PlatformMap/lr\lr|lr\lr]]</code><br/>{{small|两条紧邻的轨道}}
+| {{anchor|a\\\e}}{{PlatformMap/Sample|{{PlatformMap|lr\lr|a\\\e}}|top={{code|a\\\e}}}}
+|-
+| {{PlatformMap/Sample|{{PlatformMap|lr\lr|ae\\\ae}}|top={{code|ae\\\ae}}}}
+|-
+| rowspan=3 | {{anchor|lr\\lr}}<code>[[Module:PlatformMap/lr\\lr|lr\\lr]]</code><br/>{{small|两条间隔1行的轨道}}
+| {{anchor|a\\ae\\e}}{{PlatformMap/Sample|{{PlatformMap|lr\\lr|a\\ae\\e}}|top={{code|a\\ae\\e}}}}
+|-
+| {{PlatformMap/Sample|{{PlatformMap|lr\\lr|a\g\ae\f\e}}|top={{code|a\g\ae\f\e}}}}
+|-
+| {{PlatformMap/Sample|{{PlatformMap|lr\\lr|a\f\ae\g\e}}|top={{code|a\f\ae\g\e}}}}
+|-
+| rowspan=1 | {{anchor|lr\\lr}}<code>[[Module:PlatformMap/lr\\\lr|lr\\\lr]]</code><br/>{{small|两条间隔2行的轨道}}
+| {{anchor|e\a}}{{PlatformMap/Sample|{{PlatformMap|lr\\\lr|e\a}}|top={{code|e\a}}}}
+|}
+
+另外，对于常用的子集，有'''别名'''（{{lang|en|alias}}）可供快速选择；当使用别名时，仅需填写一项参数，即：
+
+ <nowiki>{{</nowiki>PlatformMap|''alias''}}
+
+现有的别名包括：
+
+* 双侧式站台：SS → lr\lr, [[#a\\\e|a\\\e]]
+* 一岛两侧式站台：SIS → lr\\lr, [[#a\\ae\\e|a\\ae\\e]]
+* 岛式站台：I → lr\\\lr, [[#e\a|e\a]]
+
+== 轨道 ==
+
+{{Routemap|legend=no|{{PlatformMap|lr\\lr|a\\ae\\e|textL2=~~1|textL4=~~2}}|top=轨道编号一例}}
+
+在站台布局中，每条向外连接（左右皆可）的轨道行都被赋予一个编号，从上至下依次为1、2、3……与轨道相关的参数将于本节中阐述。
+
+=== 依赖其他模板的参数 ===
+
+通过'''{{tl|adjacent stations}}'''，可以实现线路、临近车站和终点站的信息展示。参数包括：
+
+; system''t''
+: 轨道所属系统；轨道编号{{code|t}}为可选，不带时包含所有轨道，并可被指定轨道的参数覆盖，下同。
+; line''t''
+: 轨道所在线路。
+; type''t''
+: 轨道所运行服务，主线、平图运行的情况下，一般不填写此项。
+; next''t''
+: 指定临近车站；轨道编号{{code|t}}为必选，下同。
+; orien''t''
+: 改变默认的轨道方向，可选值包括{{code|left}}和{{code|right}}。默认方向一般是右行系统的通常方向。
+; inverse''t''
+: 指定该轨道为逆向，即终点站方向与图上轨道的指向相反；主要使用于不同线路同台时导致的终点站倒置。
+
+=== 原生参数 ===
+
+; bound''tO''
+: 指定轨道的端头形式，不填写时轨道向外延伸，可选值包括{{code|hard}}（断头）和{{code|soft}}（断头外有待开通或已废止路段）；轨道编号{{code|t}}为可选，不带时包含所有轨道，并可被指定轨道的参数覆盖；位置标记{{code|O}}为必选，包括{{code|L}}和{{code|R}}。
+
+== 道岔 ==
+
+; switch''On''
+: 指定道岔；位置标记{{code|O}}为必选，编号{{code|n}}从1递增。
+
+基本命名规则为{{code|[方向前缀]词根[尺寸附注#][位置后缀]}}。各父集可用的道岔有差异，且布线不对称的站台两侧可用的道岔亦可能不同。道岔列表需至各[[#站台|站台]]页面中查看文档。
+
+{| class="wikitable"
+|+ 词根表
+|-
+| [[联络线]]
+| {{code|CNX}}
+| '''C'''o'''n'''ne'''ct'''ion
+|-
+| 出入[[车辆段 (铁路运输)|段]]线
+| {{code|DPT}}
+| '''D'''e'''p'''o'''t'''
+|-
+| [[存车线]]
+| {{code|STS}}
+| '''St'''orage '''s'''iding
+|-
+| 交叉[[渡线]]
+| {{code|XVR}}
+| '''C'''ro'''ss'''o'''v'''e'''r'''
+|}
+
+== 杂项 ==
+
+; pad
+: 附加指定数目的空列，负值为在左侧。
+; text''Or''
+: 向某行添加文字；位置标记{{code|O}}为必选；行号{{code|r}}为必选，表记从上至下的行号，且某些预设下，图示的前后可能有供部分道岔使用的空行，无可见图标的空行会在输出前被删去，但无论是否被删，这些空行总是会占用固定的编号。
+
+== 示例 ==
